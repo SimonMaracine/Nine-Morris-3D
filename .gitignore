@@ -4,3 +4,4 @@
 /lib64
 /.idea
 pyvenv.cfg
+/src/__pycache__
