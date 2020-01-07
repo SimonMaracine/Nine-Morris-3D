@@ -1,4 +1,6 @@
+import glm
 from OpenGL.GL import *
+
 from src.log import get_logger
 
 logger = get_logger(__name__)
@@ -39,6 +41,15 @@ class Shader:
         glDeleteShader(self.vertex_shader_id)
         glDeleteShader(self.fragment_shader_id)
         glDeleteProgram(self.id)
+
+    def upload_uniform_float3(self, name: str, vector: glm.vec3):
+        glUniform3f(name, vector.x, vector.y, vector.z)
+
+    def upload_uniform_float2(self, name: str, vector: glm.vec2):
+        glUniform2f(name, vector.x, vector.y)
+
+    def upload_uniform_int1(self, name: str, value: int):
+        glUniform1i(name, value)
 
     @staticmethod
     def _compile_shader(source_file: str, type: int) -> int:

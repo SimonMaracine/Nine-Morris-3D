@@ -1,7 +1,8 @@
 /bin
 /include
 /lib
-/lib64
+lib64
 /.idea
 pyvenv.cfg
 /src/__pycache__
+/share
