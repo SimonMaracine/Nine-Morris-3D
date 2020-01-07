@@ -1,24 +1,24 @@
-from typing import Optional
-
-import pygame
 from OpenGL.GL import *
+from pyglfw.libapi import *
 
 WIDTH = 1280
 HEIGHT = 720
 
-window: Optional[pygame.Surface] = None
-clock = pygame.time.Clock()
-
-pygame.init()
+if not glfwInit():
+    raise RuntimeError("Could not initialise GLFW")
 
 
 def create_window():
-    global window
-    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
-    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
-    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE)
-    window = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.OPENGL)
-    # glViewport(0, 0, WIDTH, HEIGHT)
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+
+    window = glfwCreateWindow(WIDTH, HEIGHT, b"Nine Norris 3D", None, None)
+
+    glfwMakeContextCurrent(window)
+    glfwSwapInterval(1)
+
+    return window
 
 
 def set_clear_color(red: float, green: float, blue: float):
