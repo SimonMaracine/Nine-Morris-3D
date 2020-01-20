@@ -3,6 +3,8 @@ from copy import copy
 
 from pyglfw.libapi import *
 
+import src.display as display
+
 KEY_PRESSED = 1
 KEY_RELEASED = 2
 MOUSE_BUTTON_PRESSED = 3
@@ -119,12 +121,12 @@ def _cursor_position_callback(window, xpos, ypos):
     _post_event(MouseMovedEvent(xpos, ypos))
 
 
-def init(window):
-    glfwSetWindowCloseCallback(window, _window_closed_callback)
-    glfwSetKeyCallback(window, _key_callback)
-    glfwSetMouseButtonCallback(window, _mouse_button_callback)
-    glfwSetScrollCallback(window, _scrool_callback)
-    glfwSetCursorPosCallback(window, _cursor_position_callback)
+def init():
+    glfwSetWindowCloseCallback(display.windowp, _window_closed_callback)
+    glfwSetKeyCallback(display.windowp, _key_callback)
+    glfwSetMouseButtonCallback(display.windowp, _mouse_button_callback)
+    glfwSetScrollCallback(display.windowp, _scrool_callback)
+    glfwSetCursorPosCallback(display.windowp, _cursor_position_callback)
 
 
 def get_events() -> list:

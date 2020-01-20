@@ -1,4 +1,5 @@
 import glm
+import numpy as np
 from OpenGL.GL import *
 
 from src.log import get_logger
@@ -43,13 +44,27 @@ class Shader:
         glDeleteProgram(self.id)
 
     def upload_uniform_float3(self, name: str, vector: glm.vec3):
-        glUniform3f(name, vector.x, vector.y, vector.z)
+        loc = self._get_uniform_location(name)
+        glUniform3f(loc, vector.x, vector.y, vector.z)
 
     def upload_uniform_float2(self, name: str, vector: glm.vec2):
-        glUniform2f(name, vector.x, vector.y)
+        loc = self._get_uniform_location(name)
+        glUniform2f(loc, vector.x, vector.y)
 
     def upload_uniform_int1(self, name: str, value: int):
-        glUniform1i(name, value)
+        loc = self._get_uniform_location(name)
+        glUniform1i(loc, value)
+
+    def upload_uniform_float16(self, name: str, matrix: glm.mat4):
+        loc = self._get_uniform_location(name)
+        glUniformMatrix4fv(loc, 1, GL_FALSE, np.array(matrix, dtype="float32"))  # TODO maybe it works?
+
+    def _get_uniform_location(self, name: str) -> int:
+        location = glGetUniformLocation(self.id, name)
+        if location == -1:
+            logger.error(f"Uniform variable '{name}' not found")
+
+        return location
 
     @staticmethod
     def _compile_shader(source_file: str, type: int) -> int:

@@ -1,50 +1,49 @@
-from OpenGL.GL import *
-from pyglfw.libapi import *
+import glm
+import numpy as np
 
-from src.renderer import set_clear_color
-from src.display import create_window, clear
-from src.shader import Shader
-from src.model import Model
-from src.errors import get_errors
+from OpenGL.GL import *
+
+import src.renderer as renderer
+import src.display as display
+import src.model as model
+import src.errors as errors
+import src.camera as camera
 from src import events
 
 
 def main():
-    window = create_window()
-    events.init(window)
-    set_clear_color(1, 0, 0)
+    display.init()
+    display.create_window()
 
-    model = Model("data/models/dragon.obj")
+    renderer.init()
+    events.init()
+    renderer.set_clear_color(0, 0, 0)
 
-    # shader = Shader("data/shaders/vert_shader.vert", "data/shaders/frag_shader.frag")
-    # shader.use()
+    cam = camera.Camera(glm.vec3(0, 0, -10))
 
-    # positions = np.array([
-    #     -0.5, -0.5, 0.0,
-    #     0.5, -0.5, 0.0,
-    #     0.0, 0.5, 0.0,
-    # ], dtype="float32")
+    dragon = model.Model("data/models/dragon.obj")
+    # box = model.Model("data/models/box.obj")
 
-    get_errors()
+    errors.get_errors()
 
     running = True
 
     while running:
         for event in events.get_events():
-            print(event)
+            # print(event)
             if event.type == events.WINDOW_CLOSED:
                 running = False
 
-        clear()
+        cam.update()
 
-        # glDrawArrays(GL_TRIANGLES, 0, 3)
+        renderer.begin(cam)
+        renderer.draw(dragon)
+        # renderer.draw(box)
 
-        get_errors()
+        errors.get_errors()
 
-        glfwSwapBuffers(window)
+        display.update()
 
-    # shader.dispose()
-
-    # Don't make any OpenGL calls after this!
-    glfwDestroyWindow(window)
-    glfwTerminate()
+    dragon.dispose()
+    renderer.dispose()
+    display.dispose()
