@@ -4,6 +4,7 @@ import glm
 from pyglfw.libapi import *
 
 import src.display as display
+from src.input import get_key_pressed
 
 
 class Camera:
@@ -17,18 +18,37 @@ class Camera:
         self.look_direction = glm.vec3()
         self.view_matrix = glm.mat4(1)
 
-    def update(self):
-        self.look_direction.x = cos(radians(self.pitch) * cos(radians(self.yaw)))
-        self.look_direction.y - sin(radians(self.pitch))
-        self.look_direction.z = cos(radians(self.pitch) * sin(radians(self.yaw)))
+        self.last_mouse_x = display.WIDTH // 2
+        self.last_mouse_y = display.HEIGHT // 2
 
-        if glfwGetKey(display.windowp, GLFW_KEY_W) == GLFW_PRESS:
+    def update(self):
+        if self.pitch > 89:
+            self.pitch = 89
+        if self.pitch < -89:
+            self.pitch = -89
+
+        self.look_direction.x = cos(radians(self.pitch)) * cos(radians(self.yaw))
+        self.look_direction.y = sin(radians(self.pitch))
+        self.look_direction.z = cos(radians(self.pitch)) * sin(radians(self.yaw))
+
+        if get_key_pressed(GLFW_KEY_W):
             self.position += glm.normalize(self.look_direction) * 2
-        elif glfwGetKey(display.windowp, GLFW_KEY_S) == GLFW_PRESS:
+        elif get_key_pressed(GLFW_KEY_S):
             self.position -= glm.normalize(self.look_direction) * 2
-        elif glfwGetKey(display.windowp, GLFW_KEY_A) == GLFW_PRESS:
+        elif get_key_pressed(GLFW_KEY_A):
             self.position -= glm.normalize(glm.cross(self.look_direction, glm.vec3(0, 1, 0))) * 2
-        elif glfwGetKey(display.windowp, GLFW_KEY_D) == GLFW_PRESS:
+        elif get_key_pressed(GLFW_KEY_D):
             self.position += glm.normalize(glm.cross(self.look_direction, glm.vec3(0, 1, 0))) * 2
 
         self.view_matrix = glm.lookAt(self.position, self.position + self.look_direction, glm.vec3(0, 1, 0))
+
+    def update_look_direction(self, mouse_x_pos: float, mouse_y_pos: float, change_look: bool):
+        x_offset = (mouse_x_pos - self.last_mouse_x) * 0.1
+        y_offset = (self.last_mouse_y - mouse_y_pos) * 0.1
+
+        self.last_mouse_x = mouse_x_pos
+        self.last_mouse_y = mouse_y_pos
+
+        if change_look:
+            self.pitch -= y_offset
+            self.yaw -= x_offset

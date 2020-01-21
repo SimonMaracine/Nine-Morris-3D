@@ -31,8 +31,8 @@ def begin(camera: Camera):
     _simple_shader.upload_uniform_float16("view_matrix", camera.view_matrix)
 
 
-def draw(model):
-    _simple_shader.upload_uniform_float16("model_matrix", _create_transformation_matrix(glm.vec3(0), glm.vec3(0), 2))
+def draw(model, position: glm.vec3, rotation: glm.vec3, scale: float):
+    _simple_shader.upload_uniform_float16("model_matrix", _create_transformation_matrix(position, rotation, scale))
 
     vao = model.vertex_array
 

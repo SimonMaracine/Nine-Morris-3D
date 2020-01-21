@@ -87,7 +87,7 @@ class MouseMovedEvent(Event):
         self.y_pos = y_pos
 
     def __repr__(self):
-        return f"MOUSE_SCROLLED {self.x_pos}, {self.y_pos}"
+        return f"MOUSE_MOVED {self.x_pos}, {self.y_pos}"
 
 
 @GLFWwindowclosefun
