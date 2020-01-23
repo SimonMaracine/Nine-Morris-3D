@@ -1,10 +1,14 @@
 from src.vertex_array import VertexArray
 from load_model import load_model as _load_model
 
+from src.disposable import Disposable
 
-class Model:
+
+class Model(Disposable):
 
     def __init__(self, file_path: str):
+        super().__init__()
+
         self.vertex_array = VertexArray()
 
         positions, texture_coordinates, normals, indices = Model._load(file_path)
@@ -15,6 +19,7 @@ class Model:
         self.vertex_array.add_index_buffer(indices)
 
     def dispose(self):
+        super().dispose()
         self.vertex_array.dispose()
 
     @staticmethod

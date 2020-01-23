@@ -1,10 +1,14 @@
 import pygame
 from OpenGL.GL import *
 
+from src.disposable import Disposable
 
-class Texture:
+
+class Texture(Disposable):
 
     def __init__(self, file_path: str, has_alpha: bool = False):
+        super().__init__()
+
         self.width = 0
         self.height = 0
 
@@ -34,6 +38,7 @@ class Texture:
         glBindTexture(GL_TEXTURE_2D, 0)
 
     def dispose(self):
+        super().dispose()
         glDeleteTextures(self.id)
 
     def _load(self, file_path: str, format: str) -> bytes:
