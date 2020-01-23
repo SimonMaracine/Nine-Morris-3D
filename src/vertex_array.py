@@ -19,7 +19,7 @@ class VertexArray:
         glBufferData(GL_ARRAY_BUFFER, np.array(data, dtype="float32"), GL_STATIC_DRAW)
 
         glVertexAttribPointer(attr_list, size, GL_FLOAT, GL_FALSE, 0, None)
-        self.attributes.append(attr_list)
+        glEnableVertexAttribArray(attr_list)
 
     def add_index_buffer(self, data: list):
         self.index_buffer = glGenBuffers(1)
@@ -27,6 +27,8 @@ class VertexArray:
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, np.array(data, dtype="uint32"), GL_STATIC_DRAW)
 
         self.vertex_count = len(data)
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
 
     def bind(self):
         glBindVertexArray(self.id)
@@ -36,10 +38,6 @@ class VertexArray:
 
     def dispose(self):
         glDeleteVertexArrays(1, self.id)
-
-    def enable_attributes(self):
-        for attr in self.attributes:
-            glEnableVertexAttribArray(attr)
 
     def enable_index_buffer(self):
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.index_buffer)

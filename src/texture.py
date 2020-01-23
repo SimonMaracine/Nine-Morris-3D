@@ -4,13 +4,19 @@ from OpenGL.GL import *
 
 class Texture:
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, has_alpha: bool = False):
         self.width = 0
         self.height = 0
-        self.data = self._load(file_path, "RGB")
+
+        if not has_alpha:
+            tex_format = "RGB"
+        else:
+            tex_format = "RGBA"
+
+        self.data = self._load(file_path, tex_format)
 
         self.id = glGenTextures(1)
-        glBindTexture(self.id)
+        glBindTexture(GL_TEXTURE_2D, self.id)
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
@@ -20,7 +26,8 @@ class Texture:
         glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, self.width, self.height)
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, self.width, self.height, GL_RGB, GL_UNSIGNED_BYTE, self.data)
 
-    def bind(self):
+    def bind(self, unit: int):
+        glActiveTexture(GL_TEXTURE0 + unit)
         glBindTexture(GL_TEXTURE_2D, self.id)
 
     def unbind(self):

@@ -10,7 +10,7 @@ class Model:
         positions, texture_coordinates, normals, indices = Model._load(file_path)
 
         self.vertex_array.add_attribute(0, 3, positions)
-        # self.vertex_array.add_attribute(1, 2, texture_coordinates)
+        self.vertex_array.add_attribute(1, 2, texture_coordinates)
         # self.vertex_array.add_attribute(2, 3, normals)
         self.vertex_array.add_index_buffer(indices)
 

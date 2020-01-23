@@ -6,40 +6,43 @@ OpenGL.ERROR_CHECKING = False
 from OpenGL.GL import *
 
 import src.display as display
-# from src.entity import Entity
+from src.entity import Entity
 from src.shader import Shader
 from src.camera import Camera
 
-_simple_shader: Optional[Shader] = None
+_basic_shader: Optional[Shader] = None
 
 
 def init():
-    global _simple_shader
-    _simple_shader = Shader("data/shaders/vert_shader.vert", "data/shaders/frag_shader.frag")
+    global _basic_shader
+    _basic_shader = Shader("data/shaders/vert_shader.vert", "data/shaders/frag_shader.frag")
 
     proj_matrix = glm.perspective(glm.radians(45), display.WIDTH / display.HEIGHT, 0.1, 1500)
 
-    _simple_shader.use()
-    _simple_shader.upload_uniform_float16("projection_matrix", proj_matrix)
-    _simple_shader.stop()
+    _basic_shader.use()
+    _basic_shader.upload_uniform_float16("projection_matrix", proj_matrix)
+    _basic_shader.stop()
+
+    glEnable(GL_DEPTH_TEST)
 
 
 def begin(camera: Camera):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    _simple_shader.use()
-    _simple_shader.upload_uniform_float16("view_matrix", camera.view_matrix)
+    _basic_shader.use()
+    _basic_shader.upload_uniform_float16("view_matrix", camera.view_matrix)
 
 
-def draw(model, position: glm.vec3, rotation: glm.vec3, scale: float):
-    _simple_shader.upload_uniform_float16("model_matrix", _create_transformation_matrix(position, rotation, scale))
+def draw(entity: Entity, position: glm.vec3, rotation: glm.vec3, scale: float):
+    _basic_shader.upload_uniform_float16("model_matrix", _create_transformation_matrix(position, rotation, scale))
+    _basic_shader.upload_uniform_int1("texture", 0)
 
-    vao = model.vertex_array
+    vao = entity.model.vertex_array
+
+    entity.texture.bind(0)
 
     vao.bind()
-    vao.enable_attributes()
     vao.enable_index_buffer()
-
     glDrawElements(GL_TRIANGLES, vao.vertex_count, GL_UNSIGNED_INT, None)
 
 
@@ -48,7 +51,7 @@ def set_clear_color(red: float, green: float, blue: float):
 
 
 def dispose():
-    _simple_shader.dispose()
+    _basic_shader.dispose()
 
 
 def _create_transformation_matrix(position: glm.vec3, rotation: glm.vec3, scale: float):

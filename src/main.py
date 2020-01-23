@@ -6,11 +6,13 @@ from pyglfw.libapi.constant import GLFW_MOUSE_BUTTON_LEFT, GLFW_KEY_ESCAPE
 
 import src.renderer as renderer
 import src.display as display
-import src.model as model
 import src.errors as errors
 import src.camera as camera
 import src.input as input
 from src import events
+from src.texture import Texture
+from src.model import Model
+from src.entity import Entity
 
 
 def main():
@@ -23,8 +25,13 @@ def main():
 
     cam = camera.Camera(glm.vec3(0, 0, -10))
 
-    dragon = model.Model("data/models/dragon.obj")
-    box = model.Model("data/models/box.obj")
+    dragon_model = Model("data/models/dragon.obj")
+    dragon_texture = Texture("data/textures/whiteish.png")
+    dragon = Entity(dragon_model, dragon_texture)
+
+    box_model = Model("data/models/box.obj")
+    box_texture = Texture("data/textures/box.png")
+    box = Entity(box_model, box_texture)
 
     errors.get_errors()
 
@@ -44,12 +51,13 @@ def main():
 
         renderer.begin(cam)
         renderer.draw(dragon, glm.vec3(0), glm.vec3(0), 1)
-        renderer.draw(box, glm.vec3(100, 0, 0), glm.vec3(0), 1)
+        renderer.draw(box, glm.vec3(100, 0, 0), glm.vec3(0), 1.5)
 
         errors.get_errors()
 
         display.update()
 
     dragon.dispose()
+    box.dispose()
     renderer.dispose()
-    display.dispose()
+    display.dispose()  # Must be last dispose

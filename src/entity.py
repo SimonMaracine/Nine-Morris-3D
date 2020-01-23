@@ -13,3 +13,7 @@ class Entity:
         self.position = glm.vec3()
         self.rotation = glm.vec3()
         self.scale = 1
+
+    def dispose(self):
+        self.model.dispose()
+        self.texture.dispose()
