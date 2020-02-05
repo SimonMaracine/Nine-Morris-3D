@@ -25,13 +25,17 @@ def main():
 
     cam = camera.Camera(glm.vec3(0, 0, -10))
 
-    dragon_model = Model("data/models/dragon.obj")
-    dragon_texture = Texture("data/textures/whiteish.png")
-    dragon = Entity(dragon_model, dragon_texture)
+    # dragon_model = Model("data/models/dragon.obj")
+    # dragon_texture = Texture("data/textures/whiteish.png")
+    # dragon = Entity(dragon_model, dragon_texture)
+    #
+    # box_model = Model("data/models/box.obj")
+    # box_texture = Texture("data/textures/box.png")
+    # box = Entity(box_model, box_texture)
 
-    box_model = Model("data/models/box.obj")
-    box_texture = Texture("data/textures/box.png")
-    box = Entity(box_model, box_texture)
+    board_model = Model("data/models/board.obj")
+    board_texture = Texture("data/textures/board_texture.png")
+    board = Entity(board_model, board_texture)
 
     errors.get_errors()
 
@@ -50,14 +54,16 @@ def main():
         cam.update()
 
         renderer.begin(cam)
-        renderer.draw(dragon, glm.vec3(0), glm.vec3(0), 1)
-        renderer.draw(box, glm.vec3(100, 0, 0), glm.vec3(0), 1.5)
+        # renderer.draw(dragon, glm.vec3(0), glm.vec3(0), 1)
+        # renderer.draw(box, glm.vec3(100, 0, 0), glm.vec3(0), 1.5)
+        renderer.draw(board, glm.vec3(0, 0, 0), glm.vec3(0), 1)
 
         errors.get_errors()
 
         display.update()
 
-    dragon.dispose()
-    box.dispose()
+    # dragon.dispose()
+    # box.dispose()
+    board.dispose()
     renderer.dispose()
     display.dispose()  # Must be last dispose

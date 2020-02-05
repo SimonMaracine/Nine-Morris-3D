@@ -12,6 +12,7 @@ class VertexArray(Disposable):
         self.id = glGenVertexArrays(1)
         glBindVertexArray(self.id)
 
+        self.buffers = []
         self.vertex_count = 0
         self.index_buffer = 0
 
@@ -22,6 +23,8 @@ class VertexArray(Disposable):
 
         glVertexAttribPointer(attr_list, size, GL_FLOAT, GL_FALSE, 0, None)
         glEnableVertexAttribArray(attr_list)
+
+        self.buffers.append(buffer)
 
     def add_index_buffer(self, data: list):
         self.index_buffer = glGenBuffers(1)
@@ -41,6 +44,8 @@ class VertexArray(Disposable):
     def dispose(self):
         super().dispose()
         glDeleteVertexArrays(1, self.id)
+        for buffer in self.buffers:
+            glDeleteBuffers(1, buffer)
 
     def enable_index_buffer(self):
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.index_buffer)
