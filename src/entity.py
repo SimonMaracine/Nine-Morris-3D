@@ -2,7 +2,6 @@ import glm
 
 from src.model import Model
 from src.texture import Texture
-
 from src.disposable import Disposable
 
 

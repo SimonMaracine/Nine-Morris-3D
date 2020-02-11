@@ -11,10 +11,11 @@ from src.shader import Shader
 from src.camera import Camera
 
 _basic_shader: Optional[Shader] = None
+proj_matrix: Optional[glm.vec4] = None
 
 
 def init():
-    global _basic_shader
+    global _basic_shader, proj_matrix
     _basic_shader = Shader("data/shaders/vert_shader.vert", "data/shaders/frag_shader.frag")
 
     proj_matrix = glm.perspective(glm.radians(45), display.WIDTH / display.HEIGHT, 0.1, 1500)

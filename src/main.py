@@ -9,6 +9,7 @@ import src.display as display
 import src.errors as errors
 import src.camera as camera
 import src.input as input
+from src.mouse_ray import MouseRay
 from src import events
 from src.texture import Texture
 from src.model import Model
@@ -37,6 +38,8 @@ def main():
     board_texture = Texture("data/textures/board_texture.png")
     board = Entity(board_model, board_texture)
 
+    ray = MouseRay(cam, renderer.proj_matrix)
+
     errors.get_errors()
 
     running = True
@@ -52,6 +55,9 @@ def main():
                     running = False
 
         cam.update()
+        ray.update()
+
+        print(ray.current_ray)
 
         renderer.begin(cam)
         # renderer.draw(dragon, glm.vec3(0), glm.vec3(0), 1)
