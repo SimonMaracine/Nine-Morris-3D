@@ -22,7 +22,7 @@ def main():
 
     renderer.init()
     events.init()
-    renderer.set_clear_color(0, 0, 0)
+    renderer.set_clear_color(0.2, 0.2, 0.6)
 
     cam = camera.Camera(glm.vec3(0, 0, -10))
 

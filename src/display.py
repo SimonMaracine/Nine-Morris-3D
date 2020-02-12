@@ -37,6 +37,7 @@ def create_window():
 
 
 def update():
+    # Must be called after all drawing
     glfwSwapBuffers(windowp)
 
 
