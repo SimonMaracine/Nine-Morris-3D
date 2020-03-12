@@ -32,13 +32,13 @@ class Camera:
         self._look_direction.z = cos(radians(self.pitch)) * sin(radians(self.yaw))
 
         if get_key_pressed(GLFW_KEY_W):
-            self.position += glm.normalize(self._look_direction) * 2
+            self.position += glm.normalize(self._look_direction) * 0.4
         elif get_key_pressed(GLFW_KEY_S):
-            self.position -= glm.normalize(self._look_direction) * 2
+            self.position -= glm.normalize(self._look_direction) * 0.4
         elif get_key_pressed(GLFW_KEY_A):
-            self.position -= glm.normalize(glm.cross(self._look_direction, glm.vec3(0, 1, 0))) * 2
+            self.position -= glm.normalize(glm.cross(self._look_direction, glm.vec3(0, 1, 0))) * 0.4
         elif get_key_pressed(GLFW_KEY_D):
-            self.position += glm.normalize(glm.cross(self._look_direction, glm.vec3(0, 1, 0))) * 2
+            self.position += glm.normalize(glm.cross(self._look_direction, glm.vec3(0, 1, 0))) * 0.4
 
         self.view_matrix = glm.lookAt(self.position, self.position + self._look_direction, glm.vec3(0, 1, 0))
 

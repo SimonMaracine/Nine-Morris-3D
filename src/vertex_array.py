@@ -1,14 +1,10 @@
 import numpy as np
 from OpenGL.GL import *
 
-from src.disposable import Disposable
 
-
-class VertexArray(Disposable):
+class VertexArray:
 
     def __init__(self):
-        super().__init__()
-
         self.id = glGenVertexArrays(1)
         glBindVertexArray(self.id)
 
@@ -42,7 +38,6 @@ class VertexArray(Disposable):
         glBindVertexArray(0)
 
     def dispose(self):
-        super().dispose()
         glDeleteVertexArrays(1, self.id)
         for buffer in self.buffers:
             glDeleteBuffers(1, buffer)

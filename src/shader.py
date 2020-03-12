@@ -3,17 +3,14 @@ import numpy as np
 from OpenGL.GL import *
 
 from src.log import get_logger
-from src.disposable import Disposable
 
 logger = get_logger(__name__)
 logger.setLevel(10)
 
 
-class Shader(Disposable):
+class Shader:
 
     def __init__(self, vert_file: str, frag_file: str):
-        super().__init__()
-
         self.id = glCreateProgram()
         logger.debug(f"Shader program id {self.id}")
 
@@ -40,7 +37,6 @@ class Shader(Disposable):
         glUseProgram(0)
 
     def dispose(self):
-        super().dispose()
         glDetachShader(self.id, self.vertex_shader_id)
         glDetachShader(self.id, self.fragment_shader_id)
         glDeleteShader(self.vertex_shader_id)
