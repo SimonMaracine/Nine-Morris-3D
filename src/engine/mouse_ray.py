@@ -1,9 +1,7 @@
 import math
 import glm
 
-import src.input as input
-import src.display as display
-from src.camera import Camera
+from engine import display, input, Camera
 
 
 class MouseRay:
@@ -18,8 +16,8 @@ class MouseRay:
     def update(self):
         self.view_matrix = self._create_view_matrix()
 
-        mouse_x = input.get_mouse_poition()[0]
-        mouse_y = input.get_mouse_poition()[1]
+        mouse_x = input.get_mouse_position()[0]
+        mouse_y = input.get_mouse_position()[1]
 
         normalized_coordinates = self._convert_to_normalized_device_coordinates(mouse_x, mouse_y)
         clip_coordinates = glm.vec4(normalized_coordinates.x, normalized_coordinates.y, -1, 1)

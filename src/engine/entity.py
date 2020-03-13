@@ -1,7 +1,7 @@
 import glm
 
-from src.model import Model
-from src.texture import Texture
+from engine.model import Model
+from engine.texture import Texture
 
 
 class Entity:

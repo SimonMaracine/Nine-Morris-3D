@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 
-from src.log import get_logger
+from engine.log import get_logger
 
 logger = get_logger(__name__)
 logger.setLevel(10)

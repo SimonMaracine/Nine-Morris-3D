@@ -1,17 +1,12 @@
-from typing import Optional
-
 import glm
 import OpenGL
 OpenGL.ERROR_CHECKING = False
 from OpenGL.GL import *
 
-import src.display as display
-from src.entity import Entity
-from src.shader import Shader
-from src.camera import Camera
+from engine import display, Entity, Shader, Camera
 
-_basic_shader: Optional[Shader] = None
-proj_matrix: Optional[glm.vec4] = None
+_basic_shader = None
+proj_matrix = None
 
 
 def init():

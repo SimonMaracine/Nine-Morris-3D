@@ -3,7 +3,7 @@ from copy import copy
 
 from pyglfw.libapi import *
 
-import src.display as display
+import engine.display as display
 
 KEY_PRESSED = 1
 KEY_RELEASED = 2
