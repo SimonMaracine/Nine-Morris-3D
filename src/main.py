@@ -9,7 +9,7 @@ from game.board import Board
 def main():
     renderer.set_clear_color(0.2, 0.2, 0.6)
 
-    cam = Camera(glm.vec3(-7, 7.5, -0.3))
+    cam = Camera(glm.vec3(-7, 7.5, -0.3), glm.vec3())
 
     ray = MouseRay(cam, renderer.proj_matrix)
     board = Board()

@@ -2,8 +2,8 @@ import glm
 
 from engine import renderer, Entity, Model, Texture
 
-WHITE = 0
-BLACK = 1
+WHITE = "WHITE"
+BLACK = "BLACK"
 
 _model = Model("data/models/piece.obj")
 _white_texture = Texture("data/textures/white_piece_texture.png")

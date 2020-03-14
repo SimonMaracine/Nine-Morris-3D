@@ -3,18 +3,19 @@ from math import sin, cos, radians
 import glm
 from pyglfw.libapi import *
 
-from engine import display, input
+from engine import input
 
 
 class Camera:
 
-    def __init__(self, position: glm.vec3):
+    def __init__(self, position: glm.vec3, point: glm.vec3):
         self.position = position
+        self.point = point
 
-        self.pitch = 0
+        self.pitch = -40
         self.yaw = 0
 
-        self.distance_to_point = 20
+        self.distance_to_point = 50
         self.angle_around_point = 0
 
         self.view_matrix = glm.mat4(1)
@@ -26,13 +27,21 @@ class Camera:
         if self.pitch < -89:
             self.pitch = -89
 
-        if input.get_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT):
-            self.angle_around_point -= input.get_mouse_rel_x() / 2
-
-        horizontal_distance = self.distance_to_point * cos(radians(self.pitch))
-        vertical_distance = self.distance_to_point * sin(radians(self.pitch))
-
-
+        # if input.get_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT):
+        #     self.angle_around_point -= input.get_mouse_rel_x() / 2
+        #
+        # horizontal_distance = self.distance_to_point * cos(radians(self.pitch))
+        # vertical_distance = self.distance_to_point * sin(radians(self.pitch))
+        #
+        # theta = 0 + self.angle_around_point
+        # offset_x = horizontal_distance * sin(radians(theta))
+        # offset_z = horizontal_distance * cos(radians(theta))
+        #
+        # self.position.x = self.point.x - offset_x
+        # self.position.y = self.point.y + vertical_distance
+        # self.position.z = self.point.z - offset_z
+        #
+        # self.yaw = 180 - (0 + self.angle_around_point)
 
         self._look_direction.x = cos(radians(self.pitch)) * cos(radians(self.yaw))
         self._look_direction.y = sin(radians(self.pitch))
