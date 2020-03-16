@@ -30,6 +30,7 @@ def main():
 
         cam.update()
         ray.update()
+        board.update(ray.current_ray)
 
         # print(ray.current_ray)
 
