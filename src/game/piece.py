@@ -23,6 +23,3 @@ class Piece(Entity):
 
     def render(self):
         renderer.draw(self, self.position, self.rotation, self.scale)
-
-    def dispose(self):
-        super().dispose()

@@ -38,3 +38,5 @@ class Board(Entity):
         super().dispose()
         for piece in self.pieces:
             piece.dispose()
+        for node in self.nodes:
+            node.dispose()

@@ -1,4 +1,4 @@
-import math
+from math import radians
 import glm
 
 from engine import display, input, Camera
@@ -27,7 +27,7 @@ class MouseRay:
     def _convert_to_normalized_device_coordinates(self, mouse_x: float, mouse_y: float) -> glm.vec2:
         x = (2 * mouse_x) / display.WIDTH - 1
         y = (2 * mouse_y) / display.HEIGHT - 1
-        return glm.vec2(x, y)
+        return glm.vec2(x, -y)
 
     def _convert_to_eye_coordinates(self, vector: glm.vec4) -> glm.vec4:
         inverted_projection = glm.inverse(self.projection_matrix)
@@ -42,9 +42,10 @@ class MouseRay:
     def _create_view_matrix(self) -> glm.mat4:
         view_matrix = glm.mat4(1)
 
-        view_matrix = glm.rotate(view_matrix, math.radians(self.camera.pitch), glm.vec3(1, 0, 0))
-        view_matrix = glm.rotate(view_matrix, math.radians(self.camera.yaw), glm.vec3(0, 1,0))
+        view_matrix = glm.rotate(view_matrix, radians(self.camera.pitch), glm.vec3(1, 0, 0))
+        view_matrix = glm.rotate(view_matrix, radians(self.camera.yaw), glm.vec3(0, 1, 0))
         camera_position = self.camera.position
+        print(camera_position)
         negative_camera_position = glm.vec3(-camera_position.x, -camera_position.y, -camera_position.z)
         view_matrix = glm.translate(view_matrix, negative_camera_position)
 

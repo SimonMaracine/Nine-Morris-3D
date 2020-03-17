@@ -14,11 +14,11 @@ class Node(Entity):
     def __init__(self, x: float, y: float):
         super().__init__(_model, _texture)
 
-        self.position = BOARD_ORIGIN + glm.vec3(x, 0, y)  # position in 3D space
+        self.position = BOARD_ORIGIN + glm.vec3(x, 0.2, y)  # position in 3D space
         self.scale = 0.3
 
         self.board_pos = (x, y)
-        self.radius = 10
+        self.radius = 2
 
         self.piece: Optional[Piece] = None
         self.highlight = False
