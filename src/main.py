@@ -1,12 +1,21 @@
 import glm
+import pyglfw.libapi as GLFW
 
-from pyglfw.libapi.constant import GLFW_KEY_ESCAPE
-
-from engine import renderer, display, events, input, errors, Camera, MouseRay
-from game.board import Board
+from src.engine import renderer
+from src.engine import display
+from src.engine import events
+from src.engine import input
+from src.engine import errors
+from src.engine.camera import Camera
+from src.engine.mouse_ray import MouseRay
+from src.game.board import Board
 
 
 def main():
+    display.init()
+    renderer.init()
+    events.init()
+
     renderer.set_clear_color(0.2, 0.2, 0.6)
 
     camera = Camera(glm.vec3(-7, 7.5, -0.3), glm.vec3())
@@ -20,12 +29,12 @@ def main():
 
     while running:
         for event in events.get_events():
-            if event.type == events.WINDOW_CLOSED:
+            if event.type == events.EventType.WINDOW_CLOSED:
                 running = False
-            elif event.type == events.MOUSE_MOVED:
+            elif event.type == events.EventType.MOUSE_MOVED:
                 camera.update_look_direction()
-            elif event.type == events.KEY_PRESSED:
-                if event.key == GLFW_KEY_ESCAPE:
+            elif event.type == events.EventType.KEY_PRESSED:
+                if event.key == GLFW.GLFW_KEY_ESCAPE:
                     running = False
 
         camera.update()

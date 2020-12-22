@@ -1,5 +1,5 @@
 import pygame
-from OpenGL.GL import *
+import OpenGL.GL as GL
 
 
 class Texture:
@@ -15,26 +15,26 @@ class Texture:
 
         self.data = self._load(file_path, tex_format)
 
-        self.id = glGenTextures(1)
-        glBindTexture(GL_TEXTURE_2D, self.id)
+        self.id = GL.glGenTextures(1)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, self.id)
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST)
 
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, self.width, self.height)
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, self.width, self.height, GL_RGB, GL_UNSIGNED_BYTE, self.data)
+        GL.glTexStorage2D(GL.GL_TEXTURE_2D, 1, GL.GL_RGB8, self.width, self.height)
+        GL.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, self.width, self.height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, self.data)
 
     def bind(self, unit: int):
-        glActiveTexture(GL_TEXTURE0 + unit)
-        glBindTexture(GL_TEXTURE_2D, self.id)
+        GL.glActiveTexture(GL.GL_TEXTURE0 + unit)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, self.id)
 
     def unbind(self):
-        glBindTexture(GL_TEXTURE_2D, 0)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, 0)
 
     def dispose(self):
-        glDeleteTextures(self.id)
+        GL.glDeleteTextures(self.id)
 
     def _load(self, file_path: str, format: str) -> bytes:
         image_surf = pygame.image.load(file_path)

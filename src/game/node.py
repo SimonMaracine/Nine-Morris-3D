@@ -2,16 +2,19 @@ from typing import Optional
 
 import glm
 
-from engine import renderer, Entity, Model, Texture
-from game.piece import Piece, BOARD_ORIGIN
-
-_model = Model("data/models/node_highlight.obj")
-_texture = Texture("data/textures/whiteish.png")
+from src.engine import renderer
+from src.engine.entity import Entity
+from src.engine.model import Model
+from src.engine.texture import Texture
+from src.game.piece import Piece, BOARD_ORIGIN
 
 
 class Node(Entity):
 
     def __init__(self, x: float, y: float):
+        _model = Model("data/models/node_highlight.obj")
+        _texture = Texture("data/textures/whiteish.png")
+
         super().__init__(_model, _texture)
 
         self.position = BOARD_ORIGIN + glm.vec3(x, 0.2, y)  # position in 3D space

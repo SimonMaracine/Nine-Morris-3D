@@ -1,9 +1,12 @@
 import glm
 import OpenGL
 OpenGL.ERROR_CHECKING = False
-from OpenGL.GL import *
+import OpenGL.GL as GL
 
-from engine import display, Entity, Shader, Camera
+from src.engine import display
+from src.engine.entity import Entity
+from src.engine.shader import Shader
+from src.engine.camera import Camera
 
 _basic_shader = None
 proj_matrix = None
@@ -13,17 +16,18 @@ def init():
     global _basic_shader, proj_matrix
     _basic_shader = Shader("data/shaders/vert_shader.vert", "data/shaders/frag_shader.frag")
 
-    proj_matrix = glm.perspective(glm.radians(45), display.WIDTH / display.HEIGHT, 0.1, 1500)
+    # proj_matrix = glm.perspective(glm.radians(45), display.WIDTH / display.HEIGHT, 0.1, 1500)
+    proj_matrix = glm.perspective(glm.radians(45), 1280 / 720, 0.1, 1500)
 
     _basic_shader.use()
     _basic_shader.upload_uniform_float16("projection_matrix", proj_matrix)
     _basic_shader.stop()
 
-    glEnable(GL_DEPTH_TEST)
+    GL.glEnable(GL.GL_DEPTH_TEST)
 
 
 def begin(camera: Camera):
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
     _basic_shader.use()
     _basic_shader.upload_uniform_float16("view_matrix", camera.view_matrix)
@@ -39,11 +43,11 @@ def draw(entity: Entity, position: glm.vec3, rotation: glm.vec3, scale: float):
 
     vao.bind()
     vao.enable_index_buffer()
-    glDrawElements(GL_TRIANGLES, vao.vertex_count, GL_UNSIGNED_INT, None)
+    GL.glDrawElements(GL.GL_TRIANGLES, vao.vertex_count, GL.GL_UNSIGNED_INT, None)
 
 
 def set_clear_color(red: float, green: float, blue: float):
-    glClearColor(red, green, blue, 1)
+    GL.glClearColor(red, green, blue, 1)
 
 
 def dispose():

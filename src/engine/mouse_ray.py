@@ -1,7 +1,10 @@
 from math import radians
+
 import glm
 
-from engine import display, input, Camera
+from src.engine import display
+from src.engine import input
+from src.engine.camera import Camera
 
 
 class MouseRay:
@@ -45,8 +48,7 @@ class MouseRay:
         view_matrix = glm.rotate(view_matrix, radians(self.camera.pitch), glm.vec3(1, 0, 0))
         view_matrix = glm.rotate(view_matrix, radians(self.camera.yaw), glm.vec3(0, 1, 0))
         camera_position = self.camera.position
-        print(camera_position)
         negative_camera_position = glm.vec3(-camera_position.x, -camera_position.y, -camera_position.z)
         view_matrix = glm.translate(view_matrix, negative_camera_position)
 
-        return view_matrix
+        return glm.transpose(view_matrix)

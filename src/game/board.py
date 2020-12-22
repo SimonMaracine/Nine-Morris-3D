@@ -1,16 +1,19 @@
-from engine import renderer, Entity, Model, Texture
-from game.node import Node
-from game.piece import Piece, WHITE, BLACK
+from src.engine import renderer
+from src.engine.entity import Entity
+from src.engine.model import Model
+from src.engine.texture import Texture
+from src.game.node import Node
+from src.game.piece import Piece, WHITE, BLACK
 
 GRID = 1.065
-
-_model = Model("data/models/board.obj")
-_texture = Texture("data/textures/board_texture.png")
 
 
 class Board(Entity):
 
     def __init__(self):
+        _model = Model("data/models/board.obj")
+        _texture = Texture("data/textures/board_texture.png")
+
         super().__init__(_model, _texture)
 
         self.nodes = (

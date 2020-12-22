@@ -1,21 +1,21 @@
-from pyglfw.libapi import *
+import pyglfw.libapi as GLFW
 
-from engine import display
+from src.engine import display
 
 _mouse_x_pos = 0
 _mouse_y_pos = 0
 
 
 def get_key_pressed(key: int) -> bool:
-    return glfwGetKey(display.windowp, key) == GLFW_PRESS
+    return GLFW.glfwGetKey(display.windowp, key) == GLFW.GLFW_PRESS
 
 
 def get_mouse_button_pressed(button: int) -> bool:
-    return glfwGetMouseButton(display.windowp, button) == GLFW_PRESS
+    return GLFW.glfwGetMouseButton(display.windowp, button) == GLFW.GLFW_PRESS
 
 
 def get_mouse_position() -> tuple:
-    return glfwGetCursorPos(display.windowp)
+    return GLFW.glfwGetCursorPos(display.windowp)
 
 
 def get_mouse_rel_x():

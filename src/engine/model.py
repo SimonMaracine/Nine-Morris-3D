@@ -1,6 +1,6 @@
 import pyassimp
 
-from engine.vertex_array import VertexArray
+from src.engine.vertex_array import VertexArray
 # from load_model import load_model as _load_model
 
 

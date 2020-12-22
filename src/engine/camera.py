@@ -1,9 +1,9 @@
 from math import sin, cos, radians
 
 import glm
-from pyglfw.libapi import *
+import pyglfw.libapi as GLFW
 
-from engine import input
+from src.engine import input
 
 
 class Camera:
@@ -47,13 +47,13 @@ class Camera:
         self._look_direction.y = sin(radians(self.pitch))
         self._look_direction.z = cos(radians(self.pitch)) * sin(radians(self.yaw))
 
-        if input.get_key_pressed(GLFW_KEY_W):
+        if input.get_key_pressed(GLFW.GLFW_KEY_W):
             self.position += glm.normalize(self._look_direction) * 0.4
-        elif input.get_key_pressed(GLFW_KEY_S):
+        elif input.get_key_pressed(GLFW.GLFW_KEY_S):
             self.position -= glm.normalize(self._look_direction) * 0.4
-        elif input.get_key_pressed(GLFW_KEY_A):
+        elif input.get_key_pressed(GLFW.GLFW_KEY_A):
             self.position -= glm.normalize(glm.cross(self._look_direction, glm.vec3(0, 1, 0))) * 0.4
-        elif input.get_key_pressed(GLFW_KEY_D):
+        elif input.get_key_pressed(GLFW.GLFW_KEY_D):
             self.position += glm.normalize(glm.cross(self._look_direction, glm.vec3(0, 1, 0))) * 0.4
 
         self.view_matrix = glm.lookAt(self.position, self.position + self._look_direction, glm.vec3(0, 1, 0))
@@ -62,6 +62,6 @@ class Camera:
         x_offset = input.get_mouse_rel_x() * 0.1  # these should always be called to update the internal variables
         y_offset = -input.get_mouse_rel_y() * 0.1
 
-        if input.get_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT):
+        if input.get_mouse_button_pressed(GLFW.GLFW_MOUSE_BUTTON_LEFT):
             self.pitch -= y_offset
             self.yaw -= x_offset

@@ -1,17 +1,21 @@
 from abc import ABC
 from copy import copy
+from enum import Enum, auto
 
-from pyglfw.libapi import *
+import pyglfw.libapi as GLFW
 
-import engine.display as display
+import src.engine.display as display
 
-KEY_PRESSED = 1
-KEY_RELEASED = 2
-MOUSE_BUTTON_PRESSED = 3
-MOUSE_BUTTON_RELEASED = 4
-WINDOW_CLOSED = 5
-MOUSE_SCROLLED = 6
-MOUSE_MOVED = 7
+
+class EventType(Enum):
+    KEY_PRESSED = auto()
+    KEY_RELEASED = auto()
+    MOUSE_BUTTON_PRESSED = auto()
+    MOUSE_BUTTON_RELEASED = auto()
+    WINDOW_CLOSED = auto()
+    MOUSE_SCROLLED = auto()
+    MOUSE_MOVED = auto()
+
 
 _event_list = []
 
@@ -23,7 +27,7 @@ class Event(ABC):
 class KeyPressedEvent(Event):
 
     def __init__(self, key: int):
-        self.type = KEY_PRESSED
+        self.type = EventType.KEY_PRESSED
         self.key = key
 
     def __repr__(self):
@@ -33,7 +37,7 @@ class KeyPressedEvent(Event):
 class KeyReleasedEvent(Event):
 
     def __init__(self, key: int):
-        self.type = KEY_RELEASED
+        self.type = EventType.KEY_RELEASED
         self.key = key
 
     def __repr__(self):
@@ -43,7 +47,7 @@ class KeyReleasedEvent(Event):
 class MouseButtonPressedEvent(Event):
 
     def __init__(self, mouse_button: int):
-        self.type = MOUSE_BUTTON_PRESSED
+        self.type = EventType.MOUSE_BUTTON_PRESSED
         self.mouse_button = mouse_button
 
     def __repr__(self):
@@ -53,7 +57,7 @@ class MouseButtonPressedEvent(Event):
 class MouseButtonReleasedEvent(Event):
 
     def __init__(self, mouse_button: int):
-        self.type = MOUSE_BUTTON_RELEASED
+        self.type = EventType.MOUSE_BUTTON_RELEASED
         self.mouse_button = mouse_button
 
     def __repr__(self):
@@ -63,7 +67,7 @@ class MouseButtonReleasedEvent(Event):
 class WindowClosedEvent(Event):
 
     def __init__(self):
-        self.type = WINDOW_CLOSED
+        self.type = EventType.WINDOW_CLOSED
 
     def __repr__(self):
         return "WINDOW_CLOSED"
@@ -71,9 +75,9 @@ class WindowClosedEvent(Event):
 
 class MouseScrolledEvent(Event):
 
-    def __init__(self, scrool: int):
-        self.type = MOUSE_SCROLLED
-        self.scrool = scrool
+    def __init__(self, scroll: int):
+        self.type = EventType.MOUSE_SCROLLED
+        self.scroll = scroll
 
     def __repr__(self):
         return "MOUSE_SCROLLED " + str(self.scrool)
@@ -82,7 +86,7 @@ class MouseScrolledEvent(Event):
 class MouseMovedEvent(Event):
 
     def __init__(self, x_pos: float, y_pos: float):
-        self.type = MOUSE_MOVED
+        self.type = EventType.MOUSE_MOVED
         self.x_pos = x_pos
         self.y_pos = y_pos
 
@@ -90,47 +94,47 @@ class MouseMovedEvent(Event):
         return f"MOUSE_MOVED {self.x_pos}, {self.y_pos}"
 
 
-@GLFWwindowclosefun
+@GLFW.GLFWwindowclosefun
 def _window_closed_callback(window):
     _post_event(WindowClosedEvent())
 
 
-@GLFWkeyfun
+@GLFW.GLFWkeyfun
 def _key_callback(window, key, scancode, action, mods):
-    if action == GLFW_PRESS:
+    if action == GLFW.GLFW_PRESS:
         _post_event(KeyPressedEvent(key))
-    elif action == GLFW_RELEASE:
+    elif action == GLFW.GLFW_RELEASE:
         _post_event(KeyReleasedEvent(key))
 
 
-@GLFWmousebuttonfun
+@GLFW.GLFWmousebuttonfun
 def _mouse_button_callback(window, button, action, mods):
-    if action == GLFW_PRESS:
+    if action == GLFW.GLFW_PRESS:
         _post_event(MouseButtonPressedEvent(button))
-    elif action == GLFW_RELEASE:
+    elif action == GLFW.GLFW_RELEASE:
         _post_event(MouseButtonReleasedEvent(button))
 
 
-@GLFWscrollfun
-def _scrool_callback(window, xoffset, yoffset):
+@GLFW.GLFWscrollfun
+def _scroll_callback(window, xoffset, yoffset):
     _post_event(MouseScrolledEvent(yoffset))
 
 
-@GLFWcursorposfun
+@GLFW.GLFWcursorposfun
 def _cursor_position_callback(window, xpos, ypos):
     _post_event(MouseMovedEvent(xpos, ypos))
 
 
 def init():
-    glfwSetWindowCloseCallback(display.windowp, _window_closed_callback)
-    glfwSetKeyCallback(display.windowp, _key_callback)
-    glfwSetMouseButtonCallback(display.windowp, _mouse_button_callback)
-    glfwSetScrollCallback(display.windowp, _scrool_callback)
-    glfwSetCursorPosCallback(display.windowp, _cursor_position_callback)
+    GLFW.glfwSetWindowCloseCallback(display.windowp, _window_closed_callback)
+    GLFW.glfwSetKeyCallback(display.windowp, _key_callback)
+    GLFW.glfwSetMouseButtonCallback(display.windowp, _mouse_button_callback)
+    GLFW.glfwSetScrollCallback(display.windowp, _scroll_callback)
+    GLFW.glfwSetCursorPosCallback(display.windowp, _cursor_position_callback)
 
 
 def get_events() -> list:
-    glfwPollEvents()
+    GLFW.glfwPollEvents()
 
     events = copy(_event_list)  # shallow copy here; it should work
     _event_list.clear()
