@@ -1,2 +1,5 @@
 /old
 /data
+/dependencies/source
+/.vscode
+/build
