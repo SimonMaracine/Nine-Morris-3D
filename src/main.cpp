@@ -210,8 +210,8 @@ void exit_game(Fl_Widget *_w, void *data) {
 }
 
 int main() {
-    Fl_Window* window = new Fl_Window(640, 480, "Test");
-    OpenGLWindow* canvas = new OpenGLWindow(10, 40, 620, 430, "Test");
+    Fl_Window* window = new Fl_Window(640, 480, "Nine Morris 3D");
+    OpenGLWindow* canvas = new OpenGLWindow(10, 40, 620, 430, "Nine Morris 3D");
 
     Fl_Menu_Item menuitems[] = {
         { "Game", 0, 0, 0, FL_SUBMENU },
