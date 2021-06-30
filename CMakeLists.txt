@@ -20,7 +20,6 @@ set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 # Add include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/dependencies/FLTK/include"
     "${CMAKE_SOURCE_DIR}/dependencies/GLAD/include")
 
 # Dirty way to link FLTK (for now; I should change that)
