@@ -8,7 +8,8 @@ project("Nine Morris 3D"
 
 add_executable(${EXECUTABLE_NAME}
     "src/main.cpp"
-    "dependencies/GLAD/src/glad.c")
+    "src/logging.cpp"
+    "dependencies/Glad/src/glad.c")
 
 # Enable warnings
 target_compile_options(${EXECUTABLE_NAME} PUBLIC -Wall -Wextra)
@@ -17,12 +18,20 @@ target_compile_options(${EXECUTABLE_NAME} PUBLIC -Wall -Wextra)
 target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
+# Add subdirectories
+add_subdirectory(extern/spdlog)
+add_subdirectory(extern/fltk)
+
 # Add include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/dependencies/GLAD/include")
+    "${CMAKE_SOURCE_DIR}/dependencies/Glad/include"
+    "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
+    "${CMAKE_SOURCE_DIR}/extern/fltk")
 
-# Dirty way to link FLTK (for now; I should change that)
+target_link_directories(${EXECUTABLE_NAME} PUBLIC
+    "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+    "${CMAKE_SOURCE_DIR}/build/extern/fltk/lib")
+
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-    -lfltk -lfltk_gl -lGLU -lGL -lXrender -lXcursor -lXfixes -lXext -lXft
-    -lfontconfig -lXinerama -lpthread -ldl -lm -lX11)
+    spdlog fltk fltk_gl)

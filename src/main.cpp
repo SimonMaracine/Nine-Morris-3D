@@ -13,6 +13,8 @@
 #include <FL/gl.h>
 #include <FL/Fl_Gl_Window.H>
 
+#include "logging.h"
+
 void update_game(void* data);
 
 unsigned int compile_shader(int type, const char* source) {
@@ -71,7 +73,7 @@ private:
     };
 
     const char* vertex_source =
-        "#version 330 core\n"
+        "#version 430 core\n"
         ""
         "layout(location = 0) in vec2 position;"
         ""
@@ -80,7 +82,7 @@ private:
         "}";
 
     const char* fragment_source =
-        "#version 330 core\n"
+        "#version 430 core\n"
         ""
         "out vec4 fragment_color;"
         ""
@@ -96,6 +98,7 @@ OpenGLWindow::OpenGLWindow(int x, int y, int w, int h, const char* t)
         : Fl_Gl_Window(x, y, w, h, t) {
     mode(FL_OPENGL3 | FL_DOUBLE);
     Fl::add_idle(update_game, this);
+    log();
 }
 
 void OpenGLWindow::draw() {
@@ -158,12 +161,12 @@ void OpenGLWindow::start() {
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof (float), positions, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &array);
     glBindVertexArray(array);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof (float), (const void*) 0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*) 0);
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
@@ -203,7 +206,7 @@ void new_game(Fl_Widget* _w, void* data) {
     std::cout << canvas->foo << std::endl;
 }
 
-void exit_game(Fl_Widget *_w, void *data) {
+void exit_game(Fl_Widget* _w, void* data) {
     OpenGLWindow* canvas = (OpenGLWindow*) data;
     canvas->end_program();
     std::exit(0);
@@ -219,7 +222,7 @@ int main() {
             { "Exit", 0, (Fl_Callback*) exit_game, canvas },
             { 0 },
         { "Help", 0, 0, 0, FL_SUBMENU },
-            { "About", 0, (Fl_Callback*) NULL, 0 },
+            { "About", 0, (Fl_Callback*) nullptr, 0 },
             { 0 },
         { 0 }
     };
