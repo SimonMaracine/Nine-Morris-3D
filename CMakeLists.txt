@@ -18,6 +18,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/main.cpp"
     "src/logging.cpp"
     "src/opengl_canvas.cpp"
+    "src/debug_opengl.cpp"
     "dependencies/Glad/src/glad.c")
 
 # Enable warnings

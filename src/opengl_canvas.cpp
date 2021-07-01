@@ -46,7 +46,6 @@ OpenGLCanvas::OpenGLCanvas(int x, int y, int w, int h, const char* t)
     Fl::add_idle(update_game, this);
 
     logging::init();
-    SPDLOG_DEBUG("Running in debug");
 }
 
 void OpenGLCanvas::draw() {
@@ -105,6 +104,7 @@ int OpenGLCanvas::handle(int event) {
 
 void OpenGLCanvas::start() {
     std::cout << glGetString(GL_VERSION) << std::endl;
+    logging::log_opengl_info(false);
 
     unsigned int buffer;
     glGenBuffers(1, &buffer);

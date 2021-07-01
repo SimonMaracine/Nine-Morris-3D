@@ -3,4 +3,4 @@
 /dependencies/source
 /.vscode
 /build
-# /extern
+opengl_log.txt
