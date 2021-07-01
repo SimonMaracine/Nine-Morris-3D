@@ -17,30 +17,33 @@ project("Nine Morris 3D"
 add_executable(${EXECUTABLE_NAME}
     "src/main.cpp"
     "src/logging.cpp"
+    "src/opengl_canvas.cpp"
     "dependencies/Glad/src/glad.c")
 
 # Enable warnings
-target_compile_options(${EXECUTABLE_NAME} PUBLIC -Wall -Wextra)
+target_compile_options(${EXECUTABLE_NAME} PUBLIC
+    -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers)
 
 # Use c++17
 target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
-# Add subdirectories
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/fltk)
 
-# Add include directories
-target_include_directories(${EXECUTABLE_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}/src"
+# Add all include directories
+target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
+target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/Glad/include"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/fltk")
 
+# Add all link directories
 target_link_directories(${EXECUTABLE_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
     "${CMAKE_SOURCE_DIR}/build/extern/fltk/lib")
 
+# Add all libraries
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC
     spdlog fltk fltk_gl)
 
