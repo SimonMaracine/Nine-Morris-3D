@@ -1,6 +1,14 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
+
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(EXECUTABLE_NAME "Nine-Morris-3D")
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+set(FLTK_BUILD_TEST OFF)
 
 project("Nine Morris 3D"
     VERSION 0.1.0
@@ -35,3 +43,12 @@ target_link_directories(${EXECUTABLE_NAME} PUBLIC
 
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC
     spdlog fltk fltk_gl)
+
+# Add some defines
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    message("Building DEBUG mode")
+    target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SPDLOG_ACTIVE_LEVEL=0)
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+    message("Building RELEASE mode")
+    target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SPDLOG_ACTIVE_LEVEL=6 NDEBUG)
+endif()

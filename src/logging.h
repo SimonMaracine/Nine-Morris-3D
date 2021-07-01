@@ -1,3 +1,7 @@
 #pragma once
 
-void log();
+#include <spdlog/spdlog.h>
+
+namespace logging {
+    void init();
+}

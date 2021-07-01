@@ -98,7 +98,9 @@ OpenGLWindow::OpenGLWindow(int x, int y, int w, int h, const char* t)
         : Fl_Gl_Window(x, y, w, h, t) {
     mode(FL_OPENGL3 | FL_DOUBLE);
     Fl::add_idle(update_game, this);
-    log();
+
+    logging::init();
+    SPDLOG_DEBUG("Running in debug");
 }
 
 void OpenGLWindow::draw() {
