@@ -4,6 +4,7 @@
 
 #include "opengl_canvas.h"
 #include "logging.h"
+#include "debug_opengl.h"
 
 unsigned int compile_shader(int type, const char* source) {
     unsigned int shader = glCreateShader(type);
@@ -103,8 +104,8 @@ int OpenGLCanvas::handle(int event) {
 }
 
 void OpenGLCanvas::start() {
-    std::cout << glGetString(GL_VERSION) << std::endl;
-    logging::log_opengl_info(false);
+    logging::log_opengl_info(true);
+    auto [major, minor] = debug_opengl::get_opengl_version();
 
     unsigned int buffer;
     glGenBuffers(1, &buffer);
