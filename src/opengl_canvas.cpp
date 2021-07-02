@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cassert>
+#include <chrono>
 
 #include <glad/glad.h>
 
@@ -143,8 +144,30 @@ void OpenGLCanvas::end_program() {
     // Do ending stuff
 }
 
+static void update_fps_counter() {
+    using namespace std::chrono;
+    using clock = high_resolution_clock;
+
+    static clock::time_point previous_seconds = clock::now();
+    static int frame_count = 0;
+
+    clock::time_point current_seconds = clock::now();
+    duration<double> elapsed_seconds =
+        duration_cast<duration<double>>(current_seconds - previous_seconds);
+
+    if (elapsed_seconds.count() > 0.25) {
+        previous_seconds = current_seconds;
+        double fps = (double) frame_count / elapsed_seconds.count();
+        SPDLOG_DEBUG("{}", fps);
+        frame_count = 0;
+    }
+    frame_count++;
+}
+
 static void update_game(void* data) {
     OpenGLCanvas* canvas = (OpenGLCanvas*) data;
+
+    update_fps_counter();
 
     // Update stuff
 
