@@ -13,10 +13,9 @@ public:
 
     void reset();
     void end_program();
-    void hello();
 private:
     void resize();
-    void start();
+    void start_program();
 
     float positions[6] = {
         0.0f, 0.5f,

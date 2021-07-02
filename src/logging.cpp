@@ -11,7 +11,7 @@ const char* LOG_FILE = "opengl_log.txt";
 
 namespace logging {
     void init() {
-        spdlog::set_pattern("[%l] [%H:%M:%S] %v");
+        spdlog::set_pattern("[%^%l%$] [%H:%M:%S] %v");
         spdlog::set_level(spdlog::level::trace);
     }
 

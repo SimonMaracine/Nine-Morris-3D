@@ -53,7 +53,7 @@ void OpenGLCanvas::draw() {
     if (!context_valid()) {
         make_current();
         gladLoadGL();
-        start();
+        start_program();
     }
 
     if (!valid()) {
@@ -103,8 +103,8 @@ int OpenGLCanvas::handle(int event) {
     }
 }
 
-void OpenGLCanvas::start() {
-    logging::log_opengl_info(true);
+void OpenGLCanvas::start_program() {
+    logging::log_opengl_info(false);
     auto [major, minor] = debug_opengl::get_opengl_version();
 
     unsigned int buffer;
@@ -132,7 +132,7 @@ void OpenGLCanvas::resize() {
 void OpenGLCanvas::reset() {
     glDeleteProgram(shader);
     glDeleteVertexArrays(1, &array);
-    start();
+    start_program();
     std::cout << "Reset!" << std::endl;
 }
 

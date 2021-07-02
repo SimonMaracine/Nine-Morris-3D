@@ -29,7 +29,7 @@ int main() {
             { "Exit", 0, (Fl_Callback*) exit_game, canvas },
             { 0 },
         { "Help", 0, 0, 0, FL_SUBMENU },
-            { "About", 0, (Fl_Callback*) nullptr, 0 },
+            { "About", 0, (Fl_Callback*) nullptr, nullptr },
             { 0 },
         { 0 }
     };
