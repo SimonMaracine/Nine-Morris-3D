@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <string.h>
 #include <string>
 #include <utility>
+#include <iostream>
 
 #include "glad/glad.h"
 
@@ -38,6 +38,36 @@ const char* names[] = {
 };
 
 namespace debug_opengl {
+    static void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
+                               GLsizei length, const GLchar* message,
+                               const void* userParam) {
+        switch (severity) {
+            case GL_DEBUG_SEVERITY_HIGH:
+                std::cerr << "[SEVERITY HIGH] " << message << std::endl;
+                break;
+            case GL_DEBUG_SEVERITY_MEDIUM:
+                std::cerr << "[SEVERITY MEDIUM] " << message << std::endl;
+                break;
+            case GL_DEBUG_SEVERITY_LOW:
+                std::cerr << "[SEVERITY LOW] " << message << std::endl;
+                break;
+            case GL_DEBUG_SEVERITY_NOTIFICATION:
+                std::cerr << "[SEVERITY NOTIFICATION] " << message << std::endl;
+                break;
+        }
+    }
+
+    void maybe_init_debugging() {
+#if !defined(NDEBUG)
+        glDebugMessageCallback(error_callback, nullptr);
+        glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION,
+                              0, nullptr, GL_FALSE);
+        spdlog::info("OpenGL message callback is set");
+#endif
+    }
+
     const std::string get_info() {
         std::string output;
 
@@ -81,14 +111,11 @@ namespace debug_opengl {
         return output;
     }
 
-    const std::pair<int, int> get_opengl_version() {
-        std::string version_string;
-        version_string.append((const char*) glGetString(GL_VERSION));
+    const std::pair<int, int> get_version() {
+        int major, minor;
+		glGetIntegerv(GL_MAJOR_VERSION, &major);
+		glGetIntegerv(GL_MINOR_VERSION, &minor);
 
-        char* version = strtok(version_string.data(), " ");
-        char* major = strtok(version, ".");
-        char* minor = strtok(nullptr, ".");
-
-        return std::make_pair(atoi(major), atoi(minor));
+        return std::make_pair(major, minor);
     }
 }

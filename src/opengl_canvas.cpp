@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 #include <glad/glad.h>
 
@@ -105,7 +106,9 @@ int OpenGLCanvas::handle(int event) {
 
 void OpenGLCanvas::start_program() {
     logging::log_opengl_info(false);
-    auto [major, minor] = debug_opengl::get_opengl_version();
+    debug_opengl::maybe_init_debugging();
+    auto [major, minor] = debug_opengl::get_version();
+    assert(major >= 4 && minor >= 3);
 
     unsigned int buffer;
     glGenBuffers(1, &buffer);
