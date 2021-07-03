@@ -18,7 +18,12 @@ add_executable(${EXECUTABLE_NAME}
     "src/main.cpp"
     "src/logging.cpp"
     "src/opengl_canvas.cpp"
-    "src/debug_opengl.cpp"
+    "src/opengl/debug_opengl.cpp"
+    "src/opengl/renderer/vertex_array.cpp"
+    "src/opengl/renderer/vertex_buffer.cpp"
+    "src/opengl/renderer/buffer_layout.cpp"
+    "src/opengl/renderer/shader.cpp"
+    "src/opengl/renderer/renderer.cpp"
     "dependencies/Glad/src/glad.c")
 
 # Enable warnings

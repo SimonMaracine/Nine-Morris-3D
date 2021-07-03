@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "debug_opengl.h"
+#include "opengl/debug_opengl.h"
 
 /* SPDLOG_TRACE, SPDLOG_DEBUG, SPDLOG_INFO,
 SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
@@ -19,9 +19,9 @@ namespace logging {
         const std::string contents = debug_opengl::get_info();
 
         if (to_file) {
-            std::ofstream stream(LOG_FILE, std::ofstream::out);
-            stream << contents.c_str();
-            stream.close();
+            std::ofstream file = std::ofstream(LOG_FILE, std::ofstream::out);
+            file << contents.c_str();
+            file.close();
         } else {
             spdlog::info("{}", contents.c_str());
         }

@@ -1,45 +1,12 @@
 #include <iostream>
 #include <cassert>
 #include <chrono>
-
-#include <glad/glad.h>
+#include <memory>
 
 #include "opengl_canvas.h"
 #include "logging.h"
-#include "debug_opengl.h"
-
-unsigned int compile_shader(int type, const char* source) {
-    unsigned int shader = glCreateShader(type);
-    glShaderSource(shader, 1, &source, NULL);
-    glCompileShader(shader);
-
-    int success;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success)
-        printf("Compilation error!\n");
-
-    return shader;
-}
-
-unsigned int create_shader_program(const char* vertex_source, const char* fragment_source) {
-    unsigned int vertex_shader = compile_shader(GL_VERTEX_SHADER, vertex_source);
-    unsigned int fragment_shader = compile_shader(GL_FRAGMENT_SHADER, fragment_source);
-
-    unsigned int program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
-
-    int success;
-	glGetProgramiv(program, GL_LINK_STATUS, &success);
-	if (!success)
-        printf("Linking error!\n");
-
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-
-    return program;
-}
+#include "opengl/debug_opengl.h"
+#include "opengl/renderer/renderer.h"
 
 static void update_game(void* data);
 
@@ -62,12 +29,12 @@ void OpenGLCanvas::draw() {
         resize();
     }
 
-    glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    renderer::set_clear_color(0.5f, 0.0f, 0.5f);
+    renderer::clear();
 
-    glUseProgram(shader);
-    glBindVertexArray(array);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    shader->bind();
+    array->bind();
+    renderer::draw_indexed(array, 3);
 }
 
 int OpenGLCanvas::handle(int event) {
@@ -111,33 +78,29 @@ void OpenGLCanvas::start_program() {
     auto [major, minor] = debug_opengl::get_version();
     assert(major >= 4 && minor >= 3);
 
-    unsigned int buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+    shader = Shader::create("data/shaders/minimum.vert",
+                            "data/shaders/minimum.frag");
+    buffer = VertexBuffer::create_with_data(positions, sizeof(positions));
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 2);
 
-    glGenVertexArrays(1, &array);
-    glBindVertexArray(array);
+    index_buffer = VertexBuffer::create_index(indices, sizeof(indices));
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*) 0);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
-
-    shader = create_shader_program(vertex_source, fragment_source);
+    array = VertexArray::create();
+    index_buffer->bind();
+    array->add_buffer(buffer, layout);
+    VertexArray::unbind();
 }
 
 void OpenGLCanvas::resize() {
     int width = w();
     int height = h();
-    std::cout << width << ", " << height << std::endl;
-    glViewport(0, 0, width, height);
+    renderer::set_viewport(width, height);
 }
 
 void OpenGLCanvas::reset() {
-    glDeleteProgram(shader);
-    glDeleteVertexArrays(1, &array);
+    std::cout << "Resetting!" << std::endl;
     start_program();
-    std::cout << "Reset!" << std::endl;
 }
 
 void OpenGLCanvas::end_program() {

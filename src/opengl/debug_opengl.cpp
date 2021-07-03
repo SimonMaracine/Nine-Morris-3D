@@ -43,17 +43,16 @@ namespace debug_opengl {
                                const void* userParam) {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                std::cerr << "[SEVERITY HIGH] " << message << std::endl;
-                break;
+                spdlog::critical(message);
+                std::exit(1);
             case GL_DEBUG_SEVERITY_MEDIUM:
-                std::cerr << "[SEVERITY MEDIUM] " << message << std::endl;
+                spdlog::error(message);
                 break;
             case GL_DEBUG_SEVERITY_LOW:
-                std::cerr << "[SEVERITY LOW] " << message << std::endl;
+                spdlog::warn(message);
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
-                std::cerr << "[SEVERITY NOTIFICATION] " << message << std::endl;
-                break;
+                assert(false);
         }
     }
 

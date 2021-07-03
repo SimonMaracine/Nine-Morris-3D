@@ -1,8 +1,12 @@
 #pragma once
 
+#include <memory>
+
 #include <FL/Fl.H>
-#include <FL/gl.h>
 #include <FL/Fl_Gl_Window.H>
+
+#include "opengl/renderer/shader.h"
+#include "opengl/renderer/vertex_array.h"
 
 class OpenGLCanvas : public Fl_Gl_Window {
 public:
@@ -23,24 +27,12 @@ private:
         0.5f, -0.5f
     };
 
-    const char* vertex_source =
-        "#version 430 core\n"
-        ""
-        "layout(location = 0) in vec2 position;"
-        ""
-        "void main() {"
-        "   gl_Position = vec4(position, 0.0, 1.0);"
-        "}";
+    unsigned int indices[3] = {
+        0, 1, 2
+    };
 
-    const char* fragment_source =
-        "#version 430 core\n"
-        ""
-        "out vec4 fragment_color;"
-        ""
-        "void main() {"
-        "   fragment_color = vec4(1.0, 0.0, 0.0, 1.0);"
-        "}";
-
-    unsigned int array;
-    unsigned int shader;
+    std::shared_ptr<Shader> shader = nullptr;
+    std::shared_ptr<VertexArray> array = nullptr;
+    std::shared_ptr<VertexBuffer> buffer = nullptr;
+    std::shared_ptr<VertexBuffer> index_buffer = nullptr;
 };
