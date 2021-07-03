@@ -7,6 +7,7 @@
 #include "logging.h"
 #include "opengl/debug_opengl.h"
 #include "opengl/renderer/renderer.h"
+#include "opengl/renderer/texture.h"
 
 static void update_game(void* data);
 
@@ -90,6 +91,8 @@ void OpenGLCanvas::start_program() {
     index_buffer->bind();
     array->add_buffer(buffer, layout);
     VertexArray::unbind();
+
+    // std::shared_ptr<Texture> texture = Texture::create("data/textures/box.png");
 }
 
 void OpenGLCanvas::resize() {

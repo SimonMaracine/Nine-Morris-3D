@@ -24,7 +24,9 @@ add_executable(${EXECUTABLE_NAME}
     "src/opengl/renderer/buffer_layout.cpp"
     "src/opengl/renderer/shader.cpp"
     "src/opengl/renderer/renderer.cpp"
-    "dependencies/Glad/src/glad.c")
+    "src/opengl/renderer/texture.cpp"
+    "dependencies/Glad/src/glad.c"
+    "dependencies/stb_image/stb_image.c")
 
 # Enable warnings
 target_compile_options(${EXECUTABLE_NAME} PUBLIC
@@ -41,6 +43,7 @@ add_subdirectory(extern/fltk)
 target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
 target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/Glad/include"
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/fltk")
 
