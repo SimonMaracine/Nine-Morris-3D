@@ -13,7 +13,7 @@ set(ASSIMP_BUILD_TESTS OFF)
 set(BUILD_SHARED_LIBS OFF)
 set(INJECT_DEBUG_POSTFIX OFF)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
-set(ASSIMP_INSTALL_PDB OFF)  # Should check this on MSVC
+set(ASSIMP_INSTALL_PDB OFF)  # TODO Should check this on MSVC
 
 project("Nine Morris 3D"
     VERSION 0.1.0
@@ -45,6 +45,7 @@ set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/fltk)
 add_subdirectory(extern/Assimp)
+add_subdirectory(extern/entt)
 
 # Add all include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
@@ -53,7 +54,8 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/fltk"
-    "${CMAKE_SOURCE_DIR}/extern/Assimp/include")
+    "${CMAKE_SOURCE_DIR}/extern/Assimp/include"
+    "${CMAKE_SOURCE_DIR}/extern/entt/single_include")
 
 # Add all link directories
 target_link_directories(${EXECUTABLE_NAME} PUBLIC
