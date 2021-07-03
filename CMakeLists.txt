@@ -55,9 +55,9 @@ target_link_libraries(${EXECUTABLE_NAME} PUBLIC
 
 # Add some defines
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-    message("Building DEBUG mode")
+    message("Building in DEBUG mode")
     target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SPDLOG_ACTIVE_LEVEL=0)
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
-    message("Building RELEASE mode")
+    message("Building in RELEASE mode")
     target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SPDLOG_ACTIVE_LEVEL=6 NDEBUG)
 endif()
