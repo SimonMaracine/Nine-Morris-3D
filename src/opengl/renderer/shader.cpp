@@ -39,7 +39,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader);
 }
 
-void Shader::bind() {
+void Shader::bind() const {
     glUseProgram(program);
 }
 
@@ -47,7 +47,7 @@ void Shader::unbind() {
     glUseProgram(0);
 }
 
-GLint Shader::get_uniform_location(const std::string& name) {
+GLint Shader::get_uniform_location(const std::string& name) const {
     GLint location = glGetUniformLocation(program, name.c_str());
     if (location == -1) {
         SPDLOG_ERROR("Uniform variable '{}' not found", name.c_str());

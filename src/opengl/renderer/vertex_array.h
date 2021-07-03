@@ -14,10 +14,11 @@ public:
 
     static std::shared_ptr<VertexArray> create();
 
-    void bind();
+    void bind() const;
     static void unbind();
 
-    void add_buffer(std::shared_ptr<VertexBuffer> buffer, const BufferLayout& layout);
+    void add_buffer(std::shared_ptr<VertexBuffer> buffer,
+                    const BufferLayout& layout) const;
 private:
     GLuint array;
 };

@@ -13,10 +13,10 @@ public:
     static std::shared_ptr<Shader> create(const std::string& vertex_source,
                                           const std::string& fragment_source);
 
-    void bind();
+    void bind() const;
     static void unbind();
 private:
-    GLint get_uniform_location(const std::string& name);
+    GLint get_uniform_location(const std::string& name) const;
 
     static GLuint compile_shader(const std::string& source_path, GLenum type);
     static void check_compilation(GLuint shader, GLenum type);

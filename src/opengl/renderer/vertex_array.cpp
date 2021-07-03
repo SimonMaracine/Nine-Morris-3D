@@ -26,7 +26,7 @@ std::shared_ptr<VertexArray> VertexArray::create() {
     return std::make_shared<VertexArray>(array);
 }
 
-void VertexArray::bind() {
+void VertexArray::bind() const {
     glBindVertexArray(array);
 }
 
@@ -35,7 +35,7 @@ void VertexArray::unbind() {
 }
 
 void VertexArray::add_buffer(std::shared_ptr<VertexBuffer> buffer,
-                             const BufferLayout& layout) {
+                             const BufferLayout& layout) const {
     glBindVertexArray(array);  // TODO be careful with these
     glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
 

@@ -46,7 +46,7 @@ std::shared_ptr<VertexBuffer> VertexBuffer::create_index(unsigned int* data,
     return std::make_shared<VertexBuffer>(buffer, Type::Index);
 }
 
-void VertexBuffer::bind() {
+void VertexBuffer::bind() const {
     switch (type) {
         case Type::Array: glBindBuffer(GL_ARRAY_BUFFER, buffer); break;
         case Type::Index: glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer); break;

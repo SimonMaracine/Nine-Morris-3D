@@ -19,7 +19,7 @@ public:
     static std::shared_ptr<VertexBuffer> create_index(unsigned int* data,
                                                       std::size_t size);
 
-    void bind();
+    void bind() const;
     static void unbind();  // This only unbinds the ARRAY_BUFFER, not ELEMENT_ARRAY_BUFFER
 private:
     GLuint buffer;
