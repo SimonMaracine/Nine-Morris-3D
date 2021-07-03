@@ -9,6 +9,11 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(FLTK_BUILD_TEST OFF)
+set(ASSIMP_BUILD_TESTS OFF)
+set(BUILD_SHARED_LIBS OFF)
+set(INJECT_DEBUG_POSTFIX OFF)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
+set(ASSIMP_INSTALL_PDB OFF)  # Should check this on MSVC
 
 project("Nine Morris 3D"
     VERSION 0.1.0
@@ -30,7 +35,8 @@ add_executable(${EXECUTABLE_NAME}
 
 # Enable warnings
 target_compile_options(${EXECUTABLE_NAME} PUBLIC
-    -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers)
+    -Wall -Wextra
+    -Wno-unused-parameter -Wno-missing-field-initializers -Wno-type-limits))
 
 # Use c++17
 target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
@@ -38,6 +44,7 @@ set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/fltk)
+add_subdirectory(extern/Assimp)
 
 # Add all include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
@@ -45,16 +52,18 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/Glad/include"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
-    "${CMAKE_SOURCE_DIR}/extern/fltk")
+    "${CMAKE_SOURCE_DIR}/extern/fltk"
+    "${CMAKE_SOURCE_DIR}/extern/Assimp/include"))
 
 # Add all link directories
 target_link_directories(${EXECUTABLE_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-    "${CMAKE_SOURCE_DIR}/build/extern/fltk/lib")
+    "${CMAKE_SOURCE_DIR}/build/extern/fltk/lib"
+    "${CMAKE_SOURCE_DIR}/build/extern/Assmip/bin")
 
 # Add all libraries
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-    spdlog fltk fltk_gl)
+    spdlog fltk fltk_gl assimp)
 
 # Add some defines
 if(CMAKE_BUILD_TYPE MATCHES Debug)

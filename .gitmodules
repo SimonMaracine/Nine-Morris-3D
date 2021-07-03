@@ -4,3 +4,6 @@
 [submodule "extern/fltk"]
 	path = extern/fltk
 	url = https://github.com/fltk/fltk.git
+[submodule "extern/Assimp"]
+	path = extern/Assimp
+	url = https://github.com/assimp/assimp.git
