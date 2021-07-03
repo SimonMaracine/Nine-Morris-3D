@@ -74,7 +74,7 @@ int OpenGLCanvas::handle(int event) {
 }
 
 void OpenGLCanvas::start_program() {
-    logging::log_opengl_info(false);
+    logging::log_opengl_info(true);
     debug_opengl::maybe_init_debugging();
     auto [major, minor] = debug_opengl::get_version();
     assert(major >= 4 && minor >= 3);

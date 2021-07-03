@@ -46,6 +46,7 @@ add_subdirectory(extern/spdlog)
 add_subdirectory(extern/fltk)
 add_subdirectory(extern/Assimp)
 add_subdirectory(extern/entt)
+add_subdirectory(extern/glm)
 
 # Add all include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
@@ -55,7 +56,8 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/fltk"
     "${CMAKE_SOURCE_DIR}/extern/Assimp/include"
-    "${CMAKE_SOURCE_DIR}/extern/entt/single_include")
+    "${CMAKE_SOURCE_DIR}/extern/entt/single_include"
+    "${CMAKE_SOURCE_DIR}/extern/glm")
 
 # Add all link directories
 target_link_directories(${EXECUTABLE_NAME} PUBLIC
