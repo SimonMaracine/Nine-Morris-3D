@@ -30,6 +30,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/opengl/renderer/shader.cpp"
     "src/opengl/renderer/renderer.cpp"
     "src/opengl/renderer/texture.cpp"
+    "src/opengl/renderer/camera.cpp"
     "dependencies/Glad/src/glad.c"
     "dependencies/stb_image/stb_image.c")
 
