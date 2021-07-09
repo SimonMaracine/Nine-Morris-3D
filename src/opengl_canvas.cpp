@@ -110,7 +110,7 @@ void OpenGLCanvas::end_program() {
     // Do ending stuff
 }
 
-static void update_fps_counter() {
+static float update_fps_counter() {
     using namespace std::chrono;
     using clock = high_resolution_clock;
 
@@ -128,12 +128,14 @@ static void update_fps_counter() {
         frame_count = 0;
     }
     frame_count++;
+
+    return (float) elapsed_seconds.count();
 }
 
 static void update_game(void* data) {
     OpenGLCanvas* canvas = (OpenGLCanvas*) data;
 
-    update_fps_counter();
+    static float dt = update_fps_counter();
 
     // Update stuff
 
