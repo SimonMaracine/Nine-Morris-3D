@@ -12,6 +12,7 @@
 namespace renderer {
     void init() {
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
     }
 
     void set_viewport(GLint width, GLint height) {

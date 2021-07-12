@@ -22,6 +22,11 @@ public:
     void resize();
     void start_program();
 
+    void build_board();
+    void build_camera();
+    void build_skybox();
+    void build_box();
+
     int mouse_x = 0;
     int mouse_y = 0;
     int mouse_wheel = 0;
@@ -34,20 +39,7 @@ public:
 
     entt::registry registry;
 
-    std::shared_ptr<Shader> shader = nullptr;
-    std::shared_ptr<VertexArray> board_vertex_array = nullptr;
-    std::shared_ptr<VertexBuffer> board_vertices = nullptr;
-    std::shared_ptr<VertexBuffer> board_texture_coordinates = nullptr;
-    std::shared_ptr<VertexBuffer> board_index_buffer = nullptr;
-
-    std::shared_ptr<VertexArray> box_vertex_array = nullptr;
-    std::shared_ptr<VertexBuffer> box_vertices = nullptr;
-    std::shared_ptr<VertexBuffer> box_texture_coordinates = nullptr;
-    std::shared_ptr<VertexBuffer> box_index_buffer = nullptr;
-
-    std::shared_ptr<Shader> skybox_shader = nullptr;
-    std::shared_ptr<VertexArray> skybox_vertex_array = nullptr;
-    std::shared_ptr<VertexBuffer> skybox_positions = nullptr;
+    std::shared_ptr<Shader> basic_shader = nullptr;
 
     entt::entity board = entt::null;
     entt::entity camera = entt::null;

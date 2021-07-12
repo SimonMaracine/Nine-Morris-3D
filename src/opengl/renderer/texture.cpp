@@ -5,9 +5,6 @@
 #include <stb_image.h>
 
 #include "opengl/renderer/texture.h"
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/vertex_buffer.h"
-#include "opengl/renderer/buffer_layout.h"
 #include "other/logging.h"
 
 Texture::Texture(GLuint texture, Type type)
@@ -72,7 +69,7 @@ Texture3D::~Texture3D() {
     SPDLOG_DEBUG("Deleted 3D texture {}", texture);    
 }
 
-std::shared_ptr<Texture3D> Texture3D::create(const std::array<std::string, 6>& file_paths) {
+std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
@@ -89,10 +86,10 @@ std::shared_ptr<Texture3D> Texture3D::create(const std::array<std::string, 6>& f
     stbi_uc* data;
 
     for (int i = 0; i < 6; i++) {
-        data = stbi_load(file_paths[i].c_str(), &width, &height, &channels, 3);  // TODO make this flexible
+        data = stbi_load(file_paths[i], &width, &height, &channels, 3);  // TODO make this flexible
 
         if (!data) {
-            spdlog::critical("Could not load texture '{}'", file_paths[i].c_str());
+            spdlog::critical("Could not load texture '{}'", file_paths[i]);
             std::exit(1);
         }
 
