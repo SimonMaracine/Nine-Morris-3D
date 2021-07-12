@@ -1,6 +1,9 @@
+#pragma once
+
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
@@ -11,30 +14,40 @@
 #include "opengl/renderer/texture.h"
 
 struct TransformComponent {
-    TransformComponent(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+    TransformComponent() {}
+    TransformComponent(const glm::vec3& rotation) : rotation(rotation) {}
+    TransformComponent(const glm::vec3& position, const glm::vec3& rotation, float scale)
             : position(position), rotation(rotation), scale(scale) {}
 
-    glm::vec3 position;
-    glm::vec3 rotation;
-    glm::vec3 scale;
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
+    float scale = 1.0f;
 };
 
 struct CameraComponent {
-    CameraComponent(glm::mat3 projection_matrix)
-            : projection_matrix(projection_matrix) {}
+    CameraComponent(const glm::mat4& projection_matrix, const glm::vec3& point)
+            : projection_matrix(projection_matrix), point(point) {}
 
-    glm::mat3 view_matrix = glm::mat3(1.0f);
-    glm::mat3 projection_matrix;
-    glm::mat3 view_projection_matrix = glm::mat3(1.0f);  // This is a cache
+    glm::mat4 view_matrix = glm::mat4(1.0f);
+    glm::mat4 projection_matrix;
+    glm::mat4 projection_view_matrix = glm::mat4(1.0f);  // This is a cache
+    glm::vec3 point;
+    float distance_to_point = 5.0f;
+    float angle_around_point = 0.0f;
+    // Pitch and yaw are in transform.rotation
 };
 
 struct MeshComponent {
     MeshComponent(std::shared_ptr<VertexArray> vertex_array,
-                  std::shared_ptr<VertexBuffer> vertex_buffer)
-            : vertex_array(vertex_array), vertex_buffer(vertex_buffer) {}
+                  std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers,
+                  std::shared_ptr<VertexBuffer> index_buffer, int index_count)
+            : vertex_array(vertex_array), vertex_buffers(vertex_buffers),
+              index_buffer(index_buffer), index_count(index_count) {}
 
     std::shared_ptr<VertexArray> vertex_array;
-    std::shared_ptr<VertexBuffer> vertex_buffer;
+    std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers;
+    std::shared_ptr<VertexBuffer> index_buffer;
+    int index_count;
 };
 
 struct MaterialComponent {
@@ -47,10 +60,26 @@ struct MaterialComponent {
 };
 
 struct TextureComponent {
-    TextureComponent(std::shared_ptr<Texture> albedo_map)
-            : albedo_map(albedo_map) {}
+    TextureComponent(std::shared_ptr<Texture> diffuse_map)
+            : diffuse_map(diffuse_map) {}
     
-    std::shared_ptr<Texture> albedo_map;
+    std::shared_ptr<Texture> diffuse_map;
     // std::shared_ptr<Texture> specular_map;
     // std::shared_ptr<Texture> normal_map;
+};
+
+struct SkyboxMeshComponent {
+    SkyboxMeshComponent(std::shared_ptr<VertexArray> vertex_array,
+                        std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers)
+            : vertex_array(vertex_array), vertex_buffers(vertex_buffers) {}
+
+    std::shared_ptr<VertexArray> vertex_array;
+    std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers;
+};
+
+struct SkyboxTextureComponent {
+    SkyboxTextureComponent(std::shared_ptr<Texture3D> cube_map)
+            : cube_map(cube_map) {}
+    
+    std::shared_ptr<Texture3D> cube_map;
 };

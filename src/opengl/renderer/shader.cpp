@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "opengl/renderer/shader.h"
 #include "logging.h"
@@ -45,6 +46,16 @@ void Shader::bind() const {
 
 void Shader::unbind() {
     glUseProgram(0);
+}
+
+void Shader::set_uniform_matrix(const std::string& name, const glm::mat4& matrix) const {
+    GLint location = get_uniform_location(name);
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::set_uniform_int(const std::string& name, int value) const {
+    GLint location = get_uniform_location(name);
+    glUniform1i(location, value);
 }
 
 GLint Shader::get_uniform_location(const std::string& name) const {

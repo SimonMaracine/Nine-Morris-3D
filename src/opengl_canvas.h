@@ -4,6 +4,7 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Gl_Window.H>
+#include <entt/entt.hpp>
 
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/vertex_array.h"
@@ -17,22 +18,38 @@ public:
 
     void reset();
     void end_program();
-private:
     void resize();
     void start_program();
 
-    float positions[6] = {
-        0.0f, 0.5f,
-        -0.5f, -0.5f,
-        0.5f, -0.5f
-    };
+    int mouse_x = 0;
+    int mouse_y = 0;
+    int mouse_wheel = 0;
+    bool left_mouse_pressed = false;
+    bool right_mouse_pressed = false;
+    float mouse_dt_x = 0;
+    float mouse_dt_y = 0;
 
-    unsigned int indices[3] = {
-        0, 1, 2
-    };
+    float mouse_sensitivity = 0.1f;
+
+    entt::registry registry;
 
     std::shared_ptr<Shader> shader = nullptr;
-    std::shared_ptr<VertexArray> array = nullptr;
-    std::shared_ptr<VertexBuffer> buffer = nullptr;
-    std::shared_ptr<VertexBuffer> index_buffer = nullptr;
+    std::shared_ptr<VertexArray> board_vertex_array = nullptr;
+    std::shared_ptr<VertexBuffer> board_vertices = nullptr;
+    std::shared_ptr<VertexBuffer> board_texture_coordinates = nullptr;
+    std::shared_ptr<VertexBuffer> board_index_buffer = nullptr;
+
+    std::shared_ptr<VertexArray> box_vertex_array = nullptr;
+    std::shared_ptr<VertexBuffer> box_vertices = nullptr;
+    std::shared_ptr<VertexBuffer> box_texture_coordinates = nullptr;
+    std::shared_ptr<VertexBuffer> box_index_buffer = nullptr;
+
+    std::shared_ptr<Shader> skybox_shader = nullptr;
+    std::shared_ptr<VertexArray> skybox_vertex_array = nullptr;
+    std::shared_ptr<VertexBuffer> skybox_positions = nullptr;
+
+    entt::entity board = entt::null;
+    entt::entity camera = entt::null;
+    entt::entity skybox = entt::null;
+    entt::entity box = entt::null;
 };

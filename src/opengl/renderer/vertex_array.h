@@ -18,7 +18,7 @@ public:
     static void unbind();
 
     void add_buffer(std::shared_ptr<VertexBuffer> buffer,
-                    const BufferLayout& layout) const;
+                    const BufferLayout& layout);
 private:
     GLuint array;
 };

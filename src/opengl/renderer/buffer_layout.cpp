@@ -1,5 +1,4 @@
 #include <cstddef>
-#include <cassert>
 
 #include <glad/glad.h>
 
@@ -14,7 +13,7 @@ std::size_t VertexElement::get_size(GLenum type) {
             return sizeof(GLint);
         default:
             spdlog::critical("Type {} is not supported", type);
-            assert(false);
+            std::exit(1);
     }
 }
 

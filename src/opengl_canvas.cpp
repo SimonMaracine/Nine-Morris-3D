@@ -2,18 +2,25 @@
 #include <cassert>
 #include <chrono>
 #include <memory>
+#include <vector>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "opengl_canvas.h"
 #include "logging.h"
 #include "opengl/debug_opengl.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/texture.h"
+#include "ecs/components.h"
+#include "ecs/systems.h"
+#include "other/model.h"
 
 static void update_game(void* data);
 
 OpenGLCanvas::OpenGLCanvas(int x, int y, int w, int h, const char* t)
         : Fl_Gl_Window(x, y, w, h, t) {
-    mode(FL_OPENGL3 | FL_DOUBLE);
+    mode(FL_OPENGL3 | FL_DOUBLE | FL_DEPTH);
     Fl::add_idle(update_game, this);
 
     logging::init();
@@ -33,21 +40,51 @@ void OpenGLCanvas::draw() {
     renderer::set_clear_color(0.5f, 0.0f, 0.5f);
     renderer::clear();
 
-    shader->bind();
-    array->bind();
-    renderer::draw_indexed(array, 3);
+    cube_map_render_system(registry, camera);
+    render_system(registry, camera);
 }
 
 int OpenGLCanvas::handle(int event) {
     switch(event) {
         case FL_PUSH:
-            std::cout << "Mouse down { " << Fl::event_x() << ", " << Fl::event_y() << " }" << std::endl;
+            SPDLOG_DEBUG("Mouse down [ {}, {} ]", Fl::event_x(), Fl::event_y());
+            switch (Fl::event_button()) {
+                case FL_LEFT_MOUSE:
+                    left_mouse_pressed = true;
+                    break;
+                case FL_RIGHT_MOUSE:
+                    right_mouse_pressed = true;
+                    break;
+            }
             return 1;
-        case FL_DRAG:
-            // ... mouse moved while down event ...
+        case FL_DRAG: {
+            int x = Fl::event_x();
+            int y = Fl::event_y();
+
+            mouse_dt_x = (x - mouse_x) * mouse_sensitivity;
+            mouse_dt_y = (mouse_y - y) * mouse_sensitivity;
+
+            mouse_x = x;
+            mouse_y = y;
             return 1;
+        }
         case FL_RELEASE:
-            // ... mouse up event ...
+            switch (Fl::event_button()) {
+                case FL_LEFT_MOUSE:
+                    left_mouse_pressed = false;
+                    break;
+                case FL_RIGHT_MOUSE:
+                    right_mouse_pressed = false;
+                    break;
+            }
+            return 1;
+        case FL_ENTER:
+            return 1;
+        case FL_MOVE:
+            mouse_x = Fl::event_x();
+            mouse_y = Fl::event_y();
+            return 1;
+        case FL_LEAVE:
             return 1;
         case FL_FOCUS:
         case FL_UNFOCUS:
@@ -63,10 +100,10 @@ int OpenGLCanvas::handle(int event) {
             }
             return 1;
         }
-        case FL_SHORTCUT:
-            // ... shortcut, key is in Fl::event_key(), ascii in Fl::event_text()
-            // ... Return 1 if you understand/use the shortcut event, 0 otherwise...
+        case FL_MOUSEWHEEL: {
+            mouse_wheel = Fl::event_dy();
             return 1;
+        }
         default:
             // pass other events to the base class...
             return Fl_Gl_Window::handle(event);
@@ -76,23 +113,119 @@ int OpenGLCanvas::handle(int event) {
 void OpenGLCanvas::start_program() {
     logging::log_opengl_info(true);
     debug_opengl::maybe_init_debugging();
-    auto [major, minor] = debug_opengl::get_version();
-    assert(major >= 4 && minor >= 3);
+    renderer::init();
+    auto [version_major, version_minor] = debug_opengl::get_version();
+    assert(version_major >= 4 && version_minor >= 3);
 
-    shader = Shader::create("data/shaders/minimum.vert",
-                            "data/shaders/minimum.frag");
-    buffer = VertexBuffer::create_with_data(positions, sizeof(positions));
+    //////////////////////////////////////////////////////////////// Board entity
+    shader = Shader::create("data/shaders/basic.vert",
+                            "data/shaders/basic.frag");
+
+    model::Mesh board_mesh = model::load_model("data/models/board.obj");
+
+    std::shared_ptr<Texture> board_diffuse =
+        Texture::create("data/textures/board_texture.png", Texture::Type::Diffuse);
+
+    board_vertices =
+        VertexBuffer::create_with_data(board_mesh.vertices.data(),
+                                       board_mesh.vertices.size() * sizeof(model::Vertex));
+
     BufferLayout layout;
-    layout.add(0, BufferLayout::Type::Float, 2);
+    layout.add(0, BufferLayout::Type::Float, 3);
+    layout.add(1, BufferLayout::Type::Float, 2);
 
-    index_buffer = VertexBuffer::create_index(indices, sizeof(indices));
+    board_index_buffer =
+        VertexBuffer::create_index(board_mesh.indices.data(),
+                                   board_mesh.indices.size() * sizeof(unsigned int));
 
-    array = VertexArray::create();
-    index_buffer->bind();
-    array->add_buffer(buffer, layout);
+    board_vertex_array = VertexArray::create();
+    board_index_buffer->bind();
+    board_vertex_array->add_buffer(board_vertices, layout);
+    
     VertexArray::unbind();
 
-    // std::shared_ptr<Texture> texture = Texture::create("data/textures/box.png");
+    board = registry.create();
+    registry.emplace<TransformComponent>(board);
+    std::vector<std::shared_ptr<VertexBuffer>> buffers =
+        { board_vertices };
+    registry.emplace<MeshComponent>(board, board_vertex_array, buffers, board_index_buffer,
+                                    board_mesh.indices.size());
+    registry.emplace<MaterialComponent>(board, shader,
+                                        std::unordered_map<std::string, int>());
+    registry.emplace<TextureComponent>(board, board_diffuse);
+
+    ////////////////////////////////////////////////////////////////// Camera entity
+    camera = registry.create();
+    registry.emplace<TransformComponent>(camera, glm::vec3(15.0f, 0.0f, 0.0f));
+    registry.emplace<CameraComponent>(camera,
+            glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.1f, 1000.0f),
+            glm::vec3(0.0f));
+
+    ///////////////////////////////////////////////////////////////// Skybox entity
+    skybox_shader = Shader::create("data/shaders/cubemap.vert",
+                                   "data/shaders/cubemap.frag");
+
+    const std::array<std::string, 6> skybox_images = {
+        "data/textures/skybox/right.jpg",
+        "data/textures/skybox/left.jpg",
+        "data/textures/skybox/top.jpg",
+        "data/textures/skybox/bottom.jpg",
+        "data/textures/skybox/front.jpg",
+        "data/textures/skybox/back.jpg"
+    };
+    std::shared_ptr<Texture3D> skybox_texture = Texture3D::create(skybox_images);
+
+    skybox_positions = VertexBuffer::create_with_data(cube_map_points,
+                                                      108 * sizeof(float));
+
+    BufferLayout layout2;
+    layout2.add(0, BufferLayout::Type::Float, 3);
+
+    skybox_vertex_array = VertexArray::create();
+    skybox_vertex_array->add_buffer(skybox_positions, layout2);
+    VertexArray::unbind();
+
+    skybox = registry.create();
+    std::vector<std::shared_ptr<VertexBuffer>> buffers2 = { skybox_positions };
+    registry.emplace<SkyboxMeshComponent>(skybox, skybox_vertex_array, buffers2);
+    registry.emplace<MaterialComponent>(skybox, skybox_shader,
+                                        std::unordered_map<std::string, int>());
+    registry.emplace<SkyboxTextureComponent>(skybox, skybox_texture);
+
+    ///////////////////////////////////////////////////////////////// Box entity
+    model::Mesh box_mesh = model::load_model("data/models/box.obj");
+
+    std::shared_ptr<Texture> box_diffuse =
+        Texture::create("data/textures/box.png", Texture::Type::Diffuse);
+
+    box_vertices =
+        VertexBuffer::create_with_data(box_mesh.vertices.data(),
+                                       box_mesh.vertices.size() * sizeof(model::Vertex));
+
+    BufferLayout layout3;
+    layout3.add(0, BufferLayout::Type::Float, 3);
+    layout3.add(1, BufferLayout::Type::Float, 2);
+
+    box_index_buffer =
+        VertexBuffer::create_index(box_mesh.indices.data(),
+                                   box_mesh.indices.size() * sizeof(unsigned int));
+
+    box_vertex_array = VertexArray::create();
+    box_index_buffer->bind();
+    box_vertex_array->add_buffer(box_vertices, layout3);
+    
+    VertexArray::unbind();
+
+    box = registry.create();
+    registry.emplace<TransformComponent>(box);
+    std::vector<std::shared_ptr<VertexBuffer>> buffers3 = { box_vertices };
+    registry.emplace<MeshComponent>(box, box_vertex_array, buffers3, box_index_buffer,
+                                    box_mesh.indices.size());
+    registry.emplace<MaterialComponent>(box, shader,
+                                        std::unordered_map<std::string, int>());
+    registry.emplace<TextureComponent>(box, box_diffuse);
+
+    SPDLOG_DEBUG("Finished initializing program");
 }
 
 void OpenGLCanvas::resize() {
@@ -135,9 +268,15 @@ static float update_fps_counter() {
 static void update_game(void* data) {
     OpenGLCanvas* canvas = (OpenGLCanvas*) data;
 
-    static float dt = update_fps_counter();
+    static float dt;
+    dt = update_fps_counter();
 
-    // Update stuff
+    camera_system(canvas->registry, { canvas->mouse_x, canvas->mouse_y,
+                                      canvas->mouse_wheel, canvas->left_mouse_pressed,
+                                      canvas->right_mouse_pressed, canvas->mouse_dt_x,
+                                      canvas->mouse_dt_y });
+    
+    canvas->mouse_wheel = 0;
 
     canvas->redraw();
 }

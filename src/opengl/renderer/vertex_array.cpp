@@ -35,7 +35,7 @@ void VertexArray::unbind() {
 }
 
 void VertexArray::add_buffer(std::shared_ptr<VertexBuffer> buffer,
-                             const BufferLayout& layout) const {
+                             const BufferLayout& layout) {
     glBindVertexArray(array);  // TODO be careful with these
     glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
 
@@ -45,7 +45,7 @@ void VertexArray::add_buffer(std::shared_ptr<VertexBuffer> buffer,
         const VertexElement& element = layout.elements[i];
 
         glVertexAttribPointer(element.index, element.size, element.type, GL_FALSE,
-                                layout.stride, (GLvoid*) offset);
+                              layout.stride, (GLvoid*) offset);
         glEnableVertexAttribArray(element.index);
         offset += element.size * VertexElement::get_size(element.type);
     }

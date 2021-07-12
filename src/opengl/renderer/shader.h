@@ -4,6 +4,7 @@
 #include <string>
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 class Shader {
 public:
@@ -15,6 +16,9 @@ public:
 
     void bind() const;
     static void unbind();
+
+    void set_uniform_matrix(const std::string& name, const glm::mat4& matrix) const;
+    void set_uniform_int(const std::string& name, int value) const;
 private:
     GLint get_uniform_location(const std::string& name) const;
 

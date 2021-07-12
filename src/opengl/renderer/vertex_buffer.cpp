@@ -26,7 +26,7 @@ std::shared_ptr<VertexBuffer> VertexBuffer::create(std::size_t size) {
     return std::make_shared<VertexBuffer>(buffer, Type::Array);
 }
 
-std::shared_ptr<VertexBuffer> VertexBuffer::create_with_data(float* data,
+std::shared_ptr<VertexBuffer> VertexBuffer::create_with_data(const void* data,
                                                              std::size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
@@ -36,7 +36,7 @@ std::shared_ptr<VertexBuffer> VertexBuffer::create_with_data(float* data,
     return std::make_shared<VertexBuffer>(buffer, Type::Array);
 }
 
-std::shared_ptr<VertexBuffer> VertexBuffer::create_index(unsigned int* data,
+std::shared_ptr<VertexBuffer> VertexBuffer::create_index(const unsigned int* data,
                                                          std::size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
