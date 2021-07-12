@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cassert>
 #include <chrono>
 #include <memory>
@@ -95,9 +94,7 @@ int OpenGLCanvas::handle(int event) {
             // ... Return 1 if you understand/use the keyboard event, 0 otherwise...
             int key = Fl::event_key();
             char keycode = (char) key;
-            if (keycode == ' ') {
-                std::cout << "Pressed space" << std::endl;
-            }
+            // Do something based on keycode
             return 1;
         }
         case FL_MOUSEWHEEL: {
@@ -123,7 +120,7 @@ void OpenGLCanvas::start_program() {
     build_board();
     build_camera();
     build_skybox();
-    build_box();
+    // build_box();
 
     SPDLOG_DEBUG("Finished initializing program");
 }
@@ -135,7 +132,7 @@ void OpenGLCanvas::resize() {
 }
 
 void OpenGLCanvas::reset() {
-    std::cout << "Resetting!" << std::endl;
+    SPDLOG_DEBUG("Resetting");
     start_program();
 }
 
@@ -184,37 +181,37 @@ static void update_game(void* data) {
 }
 
 void OpenGLCanvas::build_board() {
-    model::Mesh board_mesh = model::load_model("data/models/board.obj");
+    model::Mesh mesh = model::load_model("data/models/board.obj");
 
-    std::shared_ptr<Texture> board_diffuse =
+    std::shared_ptr<Texture> diffuse_texture =
         Texture::create("data/textures/board_texture.png", Texture::Type::Diffuse);
 
-    std::shared_ptr<VertexBuffer> board_vertices =
-        VertexBuffer::create_with_data(board_mesh.vertices.data(),
-                                       board_mesh.vertices.size() * sizeof(model::Vertex));
+    std::shared_ptr<VertexBuffer> vertices =
+        VertexBuffer::create_with_data(mesh.vertices.data(),
+                                       mesh.vertices.size() * sizeof(model::Vertex));
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     layout.add(1, BufferLayout::Type::Float, 2);
 
-    std::shared_ptr<VertexBuffer> board_index_buffer =
-        VertexBuffer::create_index(board_mesh.indices.data(),
-                                   board_mesh.indices.size() * sizeof(unsigned int));
+    std::shared_ptr<VertexBuffer> index_buffer =
+        VertexBuffer::create_index(mesh.indices.data(),
+                                   mesh.indices.size() * sizeof(unsigned int));
 
-    std::shared_ptr<VertexArray> board_vertex_array = VertexArray::create();
-    board_index_buffer->bind();
-    board_vertex_array->add_buffer(board_vertices, layout);
+    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    index_buffer->bind();
+    vertex_array->add_buffer(vertices, layout);
     
     VertexArray::unbind();
 
     board = registry.create();
     registry.emplace<TransformComponent>(board);
-    std::vector<std::shared_ptr<VertexBuffer>> buffers = { board_vertices };
-    registry.emplace<MeshComponent>(board, board_vertex_array, buffers, board_index_buffer,
-                                    board_mesh.indices.size());
+    std::vector<std::shared_ptr<VertexBuffer>> buffers = { vertices };
+    registry.emplace<MeshComponent>(board, vertex_array, buffers, index_buffer,
+                                    mesh.indices.size());
     registry.emplace<MaterialComponent>(board, basic_shader,
                                         std::unordered_map<std::string, int>());
-    registry.emplace<TextureComponent>(board, board_diffuse);
+    registry.emplace<TextureComponent>(board, diffuse_texture);
 }
 
 void OpenGLCanvas::build_camera() {
@@ -226,10 +223,10 @@ void OpenGLCanvas::build_camera() {
 }
 
 void OpenGLCanvas::build_skybox() {
-    std::shared_ptr<Shader> skybox_shader = Shader::create("data/shaders/cubemap.vert",
+    std::shared_ptr<Shader> shader = Shader::create("data/shaders/cubemap.vert",
                                                            "data/shaders/cubemap.frag");
 
-    const char* skybox_images[6] = {
+    const char* images[6] = {
         "data/textures/skybox/right.jpg",
         "data/textures/skybox/left.jpg",
         "data/textures/skybox/top.jpg",
@@ -237,56 +234,56 @@ void OpenGLCanvas::build_skybox() {
         "data/textures/skybox/front.jpg",
         "data/textures/skybox/back.jpg"
     };
-    std::shared_ptr<Texture3D> skybox_texture = Texture3D::create(skybox_images);
+    std::shared_ptr<Texture3D> texture = Texture3D::create(images);
 
-    std::shared_ptr<VertexBuffer> skybox_positions =
+    std::shared_ptr<VertexBuffer> positions =
         VertexBuffer::create_with_data(cube_map_points, 108 * sizeof(float));
 
-    BufferLayout layout2;
-    layout2.add(0, BufferLayout::Type::Float, 3);
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
 
-    std::shared_ptr<VertexArray> skybox_vertex_array = VertexArray::create();
-    skybox_vertex_array->add_buffer(skybox_positions, layout2);
+    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    vertex_array->add_buffer(positions, layout);
     VertexArray::unbind();
 
     skybox = registry.create();
-    std::vector<std::shared_ptr<VertexBuffer>> buffers2 = { skybox_positions };
-    registry.emplace<SkyboxMeshComponent>(skybox, skybox_vertex_array, buffers2);
-    registry.emplace<MaterialComponent>(skybox, skybox_shader,
+    std::vector<std::shared_ptr<VertexBuffer>> buffers2 = { positions };
+    registry.emplace<SkyboxMeshComponent>(skybox, vertex_array, buffers2);
+    registry.emplace<MaterialComponent>(skybox, shader,
                                         std::unordered_map<std::string, int>());
-    registry.emplace<SkyboxTextureComponent>(skybox, skybox_texture);
+    registry.emplace<SkyboxTextureComponent>(skybox, texture);
 }
 
 void OpenGLCanvas::build_box() {
-    model::Mesh box_mesh = model::load_model("data/models/box.obj");
+    model::Mesh mesh = model::load_model("data/models/box.obj");
 
-    std::shared_ptr<Texture> box_diffuse =
+    std::shared_ptr<Texture> diffuse_texture =
         Texture::create("data/textures/box.png", Texture::Type::Diffuse);
 
-    std::shared_ptr<VertexBuffer> box_vertices =
-        VertexBuffer::create_with_data(box_mesh.vertices.data(),
-                                       box_mesh.vertices.size() * sizeof(model::Vertex));
+    std::shared_ptr<VertexBuffer> vertices =
+        VertexBuffer::create_with_data(mesh.vertices.data(),
+                                       mesh.vertices.size() * sizeof(model::Vertex));
 
-    BufferLayout layout3;
-    layout3.add(0, BufferLayout::Type::Float, 3);
-    layout3.add(1, BufferLayout::Type::Float, 2);
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+    layout.add(1, BufferLayout::Type::Float, 2);
 
-    std::shared_ptr<VertexBuffer> box_index_buffer =
-        VertexBuffer::create_index(box_mesh.indices.data(),
-                                   box_mesh.indices.size() * sizeof(unsigned int));
+    std::shared_ptr<VertexBuffer> index_buffer =
+        VertexBuffer::create_index(mesh.indices.data(),
+                                   mesh.indices.size() * sizeof(unsigned int));
 
-    std::shared_ptr<VertexArray> box_vertex_array = VertexArray::create();
-    box_index_buffer->bind();
-    box_vertex_array->add_buffer(box_vertices, layout3);
+    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    index_buffer->bind();
+    vertex_array->add_buffer(vertices, layout);
     
     VertexArray::unbind();
 
     box = registry.create();
     registry.emplace<TransformComponent>(box);
-    std::vector<std::shared_ptr<VertexBuffer>> buffers3 = { box_vertices };
-    registry.emplace<MeshComponent>(box, box_vertex_array, buffers3, box_index_buffer,
-                                    box_mesh.indices.size());
+    std::vector<std::shared_ptr<VertexBuffer>> buffers3 = { vertices };
+    registry.emplace<MeshComponent>(box, vertex_array, buffers3, index_buffer,
+                                    mesh.indices.size());
     registry.emplace<MaterialComponent>(box, basic_shader,
                                         std::unordered_map<std::string, int>());
-    registry.emplace<TextureComponent>(box, box_diffuse);
+    registry.emplace<TextureComponent>(box, diffuse_texture);
 }
