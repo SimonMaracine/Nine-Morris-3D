@@ -156,10 +156,10 @@ void OpenGLCanvas::start_program() {
 
     ////////////////////////////////////////////////////////////////// Camera entity
     camera = registry.create();
-    registry.emplace<TransformComponent>(camera, glm::vec3(15.0f, 0.0f, 0.0f));
+    registry.emplace<TransformComponent>(camera, glm::vec3(25.0f, 0.0f, 0.0f));
     registry.emplace<CameraComponent>(camera,
             glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.1f, 1000.0f),
-            glm::vec3(0.0f));
+            glm::vec3(0.0f), 12.0f);
 
     ///////////////////////////////////////////////////////////////// Skybox entity
     skybox_shader = Shader::create("data/shaders/cubemap.vert",
@@ -276,7 +276,9 @@ static void update_game(void* data) {
                                       canvas->right_mouse_pressed, canvas->mouse_dt_x,
                                       canvas->mouse_dt_y });
     
-    canvas->mouse_wheel = 0;
+    canvas->mouse_wheel = 0.0f;
+    canvas->mouse_dt_x = 0.0f;
+    canvas->mouse_dt_y = 0.0f;
 
     canvas->redraw();
 }

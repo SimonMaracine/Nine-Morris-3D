@@ -25,14 +25,16 @@ struct TransformComponent {
 };
 
 struct CameraComponent {
-    CameraComponent(const glm::mat4& projection_matrix, const glm::vec3& point)
-            : projection_matrix(projection_matrix), point(point) {}
+    CameraComponent(const glm::mat4& projection_matrix, const glm::vec3& point,
+                    float distance_to_point)
+            : projection_matrix(projection_matrix), point(point),
+              distance_to_point(distance_to_point) {}
 
     glm::mat4 view_matrix = glm::mat4(1.0f);
     glm::mat4 projection_matrix;
     glm::mat4 projection_view_matrix = glm::mat4(1.0f);  // This is a cache
     glm::vec3 point;
-    float distance_to_point = 5.0f;
+    float distance_to_point;
     float angle_around_point = 0.0f;
     // Pitch and yaw are in transform.rotation
 };

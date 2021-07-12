@@ -30,7 +30,7 @@ public:
     float mouse_dt_x = 0;
     float mouse_dt_y = 0;
 
-    float mouse_sensitivity = 0.1f;
+    float mouse_sensitivity = 0.13f;
 
     entt::registry registry;
 
