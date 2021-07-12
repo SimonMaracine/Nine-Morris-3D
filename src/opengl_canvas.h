@@ -8,6 +8,7 @@
 
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/vertex_array.h"
+#include "opengl/renderer/vertex_buffer.h"
 
 class OpenGLCanvas : public Fl_Gl_Window {
 public:

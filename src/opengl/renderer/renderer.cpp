@@ -35,10 +35,6 @@ namespace renderer {
 
     }
 
-    static void draw_indexed(GLsizei count) {
-        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
-    }
-
     void draw_model(const glm::vec3& position, const glm::vec3& rotation,
                     float scale, std::shared_ptr<Shader> shader,
                     std::shared_ptr<VertexArray> array,
@@ -57,7 +53,7 @@ namespace renderer {
 
         array->bind();
         diffuse_map->bind(0);
-        draw_indexed(index_count);
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
     }
 
     void draw_cube_map(const glm::mat4& view_projection_matrix,

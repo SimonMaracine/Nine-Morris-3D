@@ -93,6 +93,7 @@ void cube_map_render_system(entt::registry& registry, entt::entity camera_entity
 
         const glm::mat4& projection_matrix = camera.projection_matrix;
         glm::mat4 view_matrix = glm::mat4(glm::mat3(camera.view_matrix));
+        
         renderer::draw_cube_map(projection_matrix * view_matrix, material.shader,
                                 mesh.vertex_array, texture.cube_map);
     }

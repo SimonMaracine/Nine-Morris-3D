@@ -6,7 +6,7 @@
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/vertex_buffer.h"
 #include "opengl/renderer/buffer_layout.h"
-#include "logging.h"
+#include "other/logging.h"
 
 VertexArray::VertexArray(GLuint array) : array(array) {
     SPDLOG_DEBUG("Created vertex array {}", array);

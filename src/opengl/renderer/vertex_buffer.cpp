@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 
 #include "opengl/renderer/vertex_buffer.h"
-#include "logging.h"
+#include "other/logging.h"
 
 VertexBuffer::VertexBuffer(GLuint buffer, Type type)
         : buffer(buffer), type(type) {

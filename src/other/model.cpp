@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 
 #include "other/model.h"
-#include "logging.h"
+#include "other/logging.h"
 
 namespace model {
     Mesh load_model(const std::string& file_path) {

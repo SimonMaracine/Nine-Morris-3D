@@ -21,7 +21,6 @@ project("Nine Morris 3D"
 
 add_executable(${EXECUTABLE_NAME}
     "src/main.cpp"
-    "src/logging.cpp"
     "src/opengl_canvas.cpp"
     "src/opengl/debug_opengl.cpp"
     "src/opengl/renderer/vertex_array.cpp"
@@ -30,7 +29,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/opengl/renderer/shader.cpp"
     "src/opengl/renderer/renderer.cpp"
     "src/opengl/renderer/texture.cpp"
-    "src/opengl/renderer/camera.cpp"
+    "src/other/logging.cpp"
     "src/other/model.cpp"
     "dependencies/Glad/src/glad.c"
     "dependencies/stb_image/stb_image.c")
@@ -40,7 +39,7 @@ target_compile_options(${EXECUTABLE_NAME} PUBLIC
     -Wall -Wextra
     -Wno-unused-parameter -Wno-missing-field-initializers -Wno-type-limits)
 
-# Use c++17
+# Use C++17
 target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 

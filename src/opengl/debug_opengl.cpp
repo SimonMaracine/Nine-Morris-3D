@@ -3,9 +3,9 @@
 #include <utility>
 #include <iostream>
 
-#include "glad/glad.h"
+#include <glad/glad.h>
 
-#include "logging.h"
+#include "other/logging.h"
 
 constexpr GLenum parameters[] = {
     GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,

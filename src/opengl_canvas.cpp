@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "opengl_canvas.h"
-#include "logging.h"
+#include "other/logging.h"
 #include "opengl/debug_opengl.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/texture.h"

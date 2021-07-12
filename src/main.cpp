@@ -4,7 +4,6 @@
 #include <FL/Fl_Menu_Item.H>
 
 #include "opengl_canvas.h"
-#include "logging.h"
 
 static void new_game(Fl_Widget* _w, void* data) {
     OpenGLCanvas* canvas = (OpenGLCanvas*) data;

@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "opengl/renderer/shader.h"
-#include "logging.h"
+#include "other/logging.h"
 
 Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader)
         : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader) {
