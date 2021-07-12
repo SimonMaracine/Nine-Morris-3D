@@ -37,31 +37,37 @@ void render_system(entt::registry& registry, entt::entity camera_entity) {
 void camera_system(entt::registry& registry, const InputData& input) {
     auto view = registry.view<TransformComponent, CameraComponent>();
 
-    /* pitch = transform.rotation.x
-       yaw = transform.rotation.y */
-
     for (entt::entity entity : view) {
         auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
 
         float& pitch = transform.rotation.x;
         float& yaw = transform.rotation.y;
+        float& zoom = camera.distance_to_point;
 
-        camera.distance_to_point += input.mouse_wheel;
+        zoom += input.mouse_wheel;
+
+        if (zoom < 0.0f) {
+            zoom = 0.0f;
+        } else if (zoom > 70.0f) {
+            zoom = 70.0f;
+        }
 
         if (input.right_mouse_pressed) {
             pitch -= input.mouse_dt_y;
+            
             if (pitch > 90.0f) {
                 pitch = 90.0f;
             } else if (pitch < -90.0f) {
                 pitch = -90.0f;
             }
+
             camera.angle_around_point -= input.mouse_dt_x;
         }
 
         float horizontal_distance =
-            camera.distance_to_point * glm::cos(glm::radians(pitch));
+            zoom * glm::cos(glm::radians(pitch));
         float vertical_distance =
-            camera.distance_to_point * glm::sin(glm::radians(pitch));
+            zoom * glm::sin(glm::radians(pitch));
 
         float offset_x =
             horizontal_distance * glm::sin(glm::radians(camera.angle_around_point));
