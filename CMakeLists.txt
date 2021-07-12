@@ -29,6 +29,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/opengl/renderer/shader.cpp"
     "src/opengl/renderer/renderer.cpp"
     "src/opengl/renderer/texture.cpp"
+    "src/opengl/renderer/framebuffer.cpp"
     "src/other/logging.cpp"
     "src/other/model.cpp"
     "dependencies/Glad/src/glad.c"

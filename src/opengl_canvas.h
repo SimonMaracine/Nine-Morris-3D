@@ -26,6 +26,7 @@ public:
     void build_camera();
     void build_skybox();
     void build_box();
+    void build_piece();
 
     int mouse_x = 0;
     int mouse_y = 0;
@@ -45,4 +46,5 @@ public:
     entt::entity camera = entt::null;
     entt::entity skybox = entt::null;
     entt::entity box = entt::null;
+    entt::entity piece = entt::null;
 };
