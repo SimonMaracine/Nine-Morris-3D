@@ -98,7 +98,7 @@ int OpenGLCanvas::handle(int event) {
             return 1;
         }
         case FL_MOUSEWHEEL: {
-            mouse_wheel = Fl::event_dy();
+            mouse_wheel = Fl::event_dy() * scroll_sensitivity;
             return 1;
         }
         default:

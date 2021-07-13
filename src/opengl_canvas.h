@@ -37,6 +37,7 @@ public:
     float mouse_dt_y = 0;
 
     float mouse_sensitivity = 0.13f;
+    float scroll_sensitivity = 1.2f;
 
     entt::registry registry;
 
