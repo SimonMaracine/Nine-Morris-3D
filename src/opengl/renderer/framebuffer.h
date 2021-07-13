@@ -9,11 +9,12 @@ enum class TextureFormat {
     None,
     RGB8,
     RGBA8,
-    DEPTH24_STENCIL8
+    Depth24Stencil8,
+    RedInteger
 };
 
 struct Specification {
-    unsigned int width, height;
+    int width, height;
     int samples = 1;
 
     std::vector<TextureFormat> attachments;
@@ -21,17 +22,20 @@ struct Specification {
 
 class Framebuffer {
 public:
-    Framebuffer(const Specification& specification);
+    Framebuffer(const std::vector<TextureFormat>& color_attachment_formats,
+                TextureFormat depth_attachment_format, const Specification& specification);
     ~Framebuffer();
 
     static std::shared_ptr<Framebuffer> create(const Specification& specification);
 
     void bind() const;
-    static void unbind();
+    static void bind_default();
 
     Specification& get_specification() { return specification; }
+    GLuint get_color_attachment(unsigned int index);
 
-    void resize(unsigned int width, unsigned int height);
+    void resize(int width, int height);
+    int read_pixel(unsigned int attachment_index, int x, int y);
 private:
     void build();
 

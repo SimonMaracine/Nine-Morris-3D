@@ -19,7 +19,7 @@ static void update_game(void* data);
 
 OpenGLCanvas::OpenGLCanvas(int x, int y, int w, int h, const char* t)
         : Fl_Gl_Window(x, y, w, h, t) {
-    mode(FL_OPENGL3 | FL_DOUBLE | FL_DEPTH);
+    mode(FL_OPENGL3 | FL_DOUBLE | FL_DEPTH /* | FL_RGB8 | FL_ALPHA*/);
     Fl::add_idle(update_game, this);
 
     logging::init();
@@ -36,11 +36,27 @@ void OpenGLCanvas::draw() {
         resize();
     }
 
+    framebuffer->bind();
+
     renderer::set_clear_color(0.5f, 0.0f, 0.5f);
-    renderer::clear();
+    renderer::clear(renderer::Color | renderer::Depth);
 
     cube_map_render_system(registry, camera);
     render_system(registry, camera);
+
+    int result = framebuffer->read_pixel(1, mouse_x, height - mouse_y);
+    SPDLOG_DEBUG("Pixel: {}", result);
+
+    Framebuffer::bind_default();
+
+    renderer::clear(renderer::Color);
+    storage->quad_shader->bind();
+    storage->quad_shader->set_uniform_int("u_screen_texture", 0);
+    storage->quad_vertex_array->bind();
+    renderer::bind_texture(framebuffer->get_color_attachment(0));
+    renderer::disable_depth();
+    renderer::draw_quad();
+    renderer::enable_depth();
 }
 
 int OpenGLCanvas::handle(int event) {
@@ -110,12 +126,19 @@ int OpenGLCanvas::handle(int event) {
 void OpenGLCanvas::start_program() {
     logging::log_opengl_info(logging::LogTarget::Console);
     debug_opengl::maybe_init_debugging();
-    renderer::init();
-    auto [version_major, version_minor] = debug_opengl::get_version();
-    assert(version_major >= 4 && version_minor >= 3);
+    storage = renderer::init();
 
-    basic_shader = Shader::create("data/shaders/basic.vert",
-                                  "data/shaders/basic.frag");
+    auto [version_major, version_minor] = debug_opengl::get_version();
+    assert(version_major == 4 && version_minor >= 3);
+
+    basic_shader = Shader::create("data/shaders/basic.vert", "data/shaders/basic.frag");
+
+    Specification specification;
+    specification.width = 1024;
+    specification.height = 576;
+    specification.attachments = { TextureFormat::RGB8, TextureFormat::RedInteger,
+                                  TextureFormat::Depth24Stencil8 };
+    framebuffer = Framebuffer::create(specification);
 
     build_board();
     build_camera();
@@ -127,8 +150,9 @@ void OpenGLCanvas::start_program() {
 }
 
 void OpenGLCanvas::resize() {
-    int width = w();
-    int height = h();
+    width = w();
+    height = h();
+    framebuffer->resize(width, height);
     renderer::set_viewport(width, height);
 }
 
@@ -155,7 +179,7 @@ static float update_fps_counter() {
     if (elapsed_seconds.count() > 0.25) {
         previous_seconds = current_seconds;
         double fps = (double) frame_count / elapsed_seconds.count();
-        SPDLOG_DEBUG("{}", fps);
+        // SPDLOG_DEBUG("{}", fps);
         frame_count = 0;
     }
     frame_count++;

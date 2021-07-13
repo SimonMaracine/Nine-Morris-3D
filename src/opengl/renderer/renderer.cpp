@@ -5,14 +5,38 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "opengl/renderer/renderer.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
 
 namespace renderer {
-    void init() {
-        glEnable(GL_DEPTH_TEST);
+    static Storage storage;
+
+    const Storage* init() {
         glEnable(GL_CULL_FACE);
+
+        storage.quad_shader = Shader::create("data/shaders/quad.vert",
+                                             "data/shaders/quad.frag");
+        constexpr float quad_vertices[] = {
+            -1.0f,  1.0f,    0.0f, 1.0f,
+            -1.0f, -1.0f,    0.0f, 0.0f,
+            1.0f,  1.0f,    1.0f, 1.0f,
+            1.0f,  1.0f,    1.0f, 1.0f,
+            -1.0f, -1.0f,    0.0f, 0.0f,
+            1.0f, -1.0f,    1.0f, 0.0f
+        };
+        storage.quad_vertex_buffer = VertexBuffer::create_with_data(quad_vertices,
+                                                                    sizeof(quad_vertices));
+        BufferLayout layout;
+        layout.add(0, BufferLayout::Type::Float, 2);
+        layout.add(1, BufferLayout::Type::Float, 2);
+        storage.quad_vertex_array = VertexArray::create();
+        storage.quad_vertex_array->add_buffer(storage.quad_vertex_buffer, layout);
+
+        VertexArray::unbind();
+
+        return &storage;
     }
 
     void set_viewport(GLint width, GLint height) {
@@ -23,8 +47,8 @@ namespace renderer {
         glClearColor(red, green, blue, 1.0f);
     }
 
-    void clear() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    void clear(int buffers) {
+        glClear(buffers);
     }
 
     void begin(std::shared_ptr<Shader> shader, const glm::mat4& view_projection_matrix) {
@@ -34,6 +58,23 @@ namespace renderer {
 
     void end() {
 
+    }
+
+    void draw_quad() {
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
+    void enable_depth() {
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    void disable_depth() {
+        glDisable(GL_DEPTH_TEST);
+    }
+
+    void bind_texture(GLuint texture) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
     }
 
     void draw_model(const glm::vec3& position, const glm::vec3& rotation,

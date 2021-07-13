@@ -19,8 +19,8 @@ static void exit_game(Fl_Widget* _w, void* data) {
 }
 
 int main() {
-    Fl_Window* window = new Fl_Window(1024, 576, "Nine Morris 3D");
-    OpenGLCanvas* canvas = new OpenGLCanvas(10, 40, 1024 - 20, 576 - 50, "Nine Morris 3D");
+    Fl_Window* window = new Fl_Window(1024 + 20, 576 + 50, "Nine Morris 3D");
+    OpenGLCanvas* canvas = new OpenGLCanvas(10, 40, 1024, 576, "Nine Morris 3D");
 
     Fl_Menu_Item menuitems[] = {
         { "Game", 0, 0, 0, FL_SUBMENU },
@@ -33,7 +33,7 @@ int main() {
         { 0 }
     };
 
-    Fl_Menu_Bar* bar_menu = new Fl_Menu_Bar(0, 0, 1024, 30);
+    Fl_Menu_Bar* bar_menu = new Fl_Menu_Bar(0, 0, 1024 + 20, 30);
     bar_menu->copy(menuitems);
 
     window->end();

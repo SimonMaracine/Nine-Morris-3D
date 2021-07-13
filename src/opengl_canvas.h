@@ -8,7 +8,8 @@
 
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/vertex_buffer.h"
+#include "opengl/renderer/framebuffer.h"
+#include "opengl/renderer/renderer.h"
 
 class OpenGLCanvas : public Fl_Gl_Window {
 public:
@@ -28,6 +29,8 @@ public:
     void build_box();
     void build_piece();
 
+    int width = 0, height = 0;
+
     int mouse_x = 0;
     int mouse_y = 0;
     int mouse_wheel = 0;
@@ -41,7 +44,10 @@ public:
 
     entt::registry registry;
 
+    const renderer::Storage* storage = nullptr;
+
     std::shared_ptr<Shader> basic_shader = nullptr;
+    std::shared_ptr<Framebuffer> framebuffer = nullptr;
 
     entt::entity board = entt::null;
     entt::entity camera = entt::null;
