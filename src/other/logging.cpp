@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "other/logging.h"
 #include "opengl/debug_opengl.h"
 
 /* SPDLOG_TRACE, SPDLOG_DEBUG, SPDLOG_INFO,
@@ -15,14 +16,14 @@ namespace logging {
         spdlog::set_level(spdlog::level::trace);
     }
 
-    void log_opengl_info(bool to_file) {
+    void log_opengl_info(LogTarget target) {
         const std::string contents = debug_opengl::get_info();
 
-        if (to_file) {
+        if (target == LogTarget::File) {
             std::ofstream file = std::ofstream(LOG_FILE, std::ofstream::out);
             file << contents.c_str();
             file.close();
-        } else {
+        } else if (target == LogTarget::Console) {
             spdlog::info("{}", contents.c_str());
         }
     }

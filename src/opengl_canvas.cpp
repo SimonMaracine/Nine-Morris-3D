@@ -108,7 +108,7 @@ int OpenGLCanvas::handle(int event) {
 }
 
 void OpenGLCanvas::start_program() {
-    logging::log_opengl_info(true);
+    logging::log_opengl_info(logging::LogTarget::Console);
     debug_opengl::maybe_init_debugging();
     renderer::init();
     auto [version_major, version_minor] = debug_opengl::get_version();

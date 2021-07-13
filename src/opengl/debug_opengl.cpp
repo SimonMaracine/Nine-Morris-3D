@@ -2,8 +2,14 @@
 #include <string>
 #include <utility>
 #include <iostream>
+#include <cassert>
 
 #include <glad/glad.h>
+#include <FL/Fl.H>
+#include <assimp/version.h>
+#include <glm/glm.hpp>
+#include <spdlog/version.h>
+#include <entt/entt.hpp>
 
 #include "other/logging.h"
 
@@ -38,6 +44,26 @@ const char* names[] = {
 };
 
 namespace debug_opengl {
+    static const std::string parse_version(int version) {
+        int major, minor, patch;
+        int numbers[5];
+
+        for (int i = 4; i >= 0; i--) {
+            int digit = version % 10;
+            numbers[i] = digit;
+            version /= 10;
+        }
+
+        major = numbers[0];
+        minor = numbers[2];
+        patch = numbers[4];
+
+        char str[50];
+        sprintf(str, "%d.%d.%d", major, minor, patch);
+
+        return std::string(str);
+    }
+
     static void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
                                GLsizei length, const GLchar* message,
                                const void* userParam) {
@@ -70,18 +96,22 @@ namespace debug_opengl {
     const std::string get_info() {
         std::string output;
 
+        //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** OpenGL Version And Driver Information ***\n");
 
-        char line[100];  // 100 should be enough
-        sprintf(line, "OpenGL version: %s\n", glGetString(GL_VERSION));
-        output.append(line);
-        sprintf(line, "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-        output.append(line);
-        sprintf(line, "Vendor: %s\n", glGetString(GL_VENDOR));
-        output.append(line);
-        sprintf(line, "Renderer: %s\n", glGetString(GL_RENDERER));
-        output.append(line);
+        {
+            char line[100];  // 100 should be enough
+            sprintf(line, "OpenGL version: %s\n", glGetString(GL_VERSION));
+            output.append(line);
+            sprintf(line, "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+            output.append(line);
+            sprintf(line, "Vendor: %s\n", glGetString(GL_VENDOR));
+            output.append(line);
+            sprintf(line, "Renderer: %s\n", glGetString(GL_RENDERER));
+            output.append(line);
+        }
 
+        //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** OpenGL Context Parameters ***\n");
 
         for (int i = 0; i < 10; i++) {
@@ -92,20 +122,61 @@ namespace debug_opengl {
             sprintf(line, "%s %i\n", names[i], result);
             output.append(line);
         }
+        {
+            GLint result[2];
+            glGetIntegerv(parameters[10], result);
 
-        GLint result[2];
-        glGetIntegerv(parameters[10], result);
+            char line[50];
+            sprintf(line, "%s %i %i\n", names[10], result[0], result[1]);
+            output.append(line);
+        }
+        {
+            GLboolean result;
+            glGetBooleanv(parameters[11], &result);
 
-        char line2[50];  // 50 must be enough
-        sprintf(line2, "%s %i %i\n", names[10], result[0], result[1]);
-        output.append(line2);
-    
-        GLboolean result2;
-        glGetBooleanv(parameters[11], &result2);
+            char line[50];
+            sprintf(line, "%s %u\n", names[11], (unsigned int) result);
+            output.append(line);
+        }
 
-        char line3[50];  // 50 must be enough
-        sprintf(line3, "%s %u\n", names[11], (unsigned int) result2);
-        output.append(line3);
+        //////////////////////////////////////////////////////////////////////////////////
+        output.append("\n*** Dependencies Versions ***\n");
+
+        {
+            char line[50];
+            sprintf(line, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
+            output.append(line);
+        }
+        {
+            char line[50];
+            const char* version = parse_version(Fl::api_version()).c_str();
+            sprintf(line, "FLTK version: %s\n", version);
+            output.append(line);
+        }
+        {
+            char line[50];
+            sprintf(line, "Assimp version: %d.%d.%d\n", aiGetVersionMajor(),
+                    aiGetVersionMinor(), aiGetVersionPatch());
+            output.append(line);
+        }
+        {
+            char line[50];
+            sprintf(line, "GLM version: %d.%d.%d\n", GLM_VERSION_MAJOR, GLM_VERSION_MINOR,
+                    GLM_VERSION_PATCH);
+            output.append(line);
+        }
+        {
+            char line[50];
+            const char* version = parse_version(SPDLOG_VERSION).c_str();
+            sprintf(line, "spdlog version: %s\n", version);
+            output.append(line);
+        }
+        {
+            char line[50];
+            sprintf(line, "ENTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR,
+                    ENTT_VERSION_MINOR, ENTT_VERSION_PATCH);
+            output.append(line);
+        }
 
         return output;
     }
