@@ -14,7 +14,7 @@
 #include "opengl/renderer/texture.h"
 
 struct TransformComponent {
-    TransformComponent() {}
+    TransformComponent() = default;
     TransformComponent(const glm::vec3& rotation) : rotation(rotation) {}
     TransformComponent(const glm::vec3& position, const glm::vec3& rotation, float scale)
             : position(position), rotation(rotation), scale(scale) {}
