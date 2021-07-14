@@ -34,7 +34,7 @@ public:
     void build_camera();
     void build_skybox();
     void build_box();
-    void build_piece();
+    void build_piece(const glm::vec3& position);
 
     int width = 0, height = 0;
 
@@ -61,4 +61,6 @@ public:
     entt::entity skybox = entt::null;
     entt::entity box = entt::null;
     entt::entity piece = entt::null;
+
+    entt::entity selected_entity = entt::null;
 };

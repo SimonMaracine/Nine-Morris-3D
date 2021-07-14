@@ -18,19 +18,22 @@ struct InputData {
 void render_system(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
-    auto view = registry.view<TransformComponent, MeshComponent,
-                              MaterialComponent, TextureComponent>();
+    auto view = registry.view<TransformComponent,
+                              MeshComponent,
+                              MaterialComponent,
+                              TextureComponent>(entt::exclude<OutlineComponent>);
 
     for (entt::entity entity : view) {
         auto [transform, mesh, material, textures] =
             view.get<TransformComponent, MeshComponent,
                      MaterialComponent, TextureComponent>(entity);
 
-        renderer::begin(material.shader, camera.projection_view_matrix);
+        material.shader->bind();
+        material.shader->set_uniform_matrix("u_projection_view_matrix",
+                                            camera.projection_view_matrix);
         renderer::draw_model(transform.position, transform.rotation, transform.scale,
                              material.shader, mesh.vertex_array, textures.diffuse_map,
                              mesh.index_count);
-        renderer::end();
     }
 }
 
@@ -110,5 +113,37 @@ void cube_map_render_system(entt::registry& registry, entt::entity camera_entity
 
         renderer::draw_cube_map(projection_matrix * view_matrix, material.shader,
                                 mesh.vertex_array, texture.cube_map);
+    }
+}
+
+void pieces_render_system(entt::registry& registry, entt::entity camera_entity,
+                          entt::entity selected_entity) {
+    auto& camera = registry.get<CameraComponent>(camera_entity);
+
+    auto view = registry.view<TransformComponent, MeshComponent,
+                              MaterialComponent, TextureComponent, OutlineComponent>();
+
+    for (entt::entity entity : view) {
+        auto [transform, mesh, material, textures, outline] =
+            view.get<TransformComponent, MeshComponent,
+                     MaterialComponent, TextureComponent,
+                     OutlineComponent>(entity);
+
+        if (selected_entity == entity) {
+            outline.shader->bind();
+            outline.shader->set_uniform_matrix("u_projection_view_matrix",
+                                               camera.projection_view_matrix);
+            renderer::draw_model_outline(transform.position, transform.rotation,
+                                     transform.scale, material.shader, mesh.vertex_array,
+                                     textures.diffuse_map, mesh.index_count,
+                                     outline.outline_color);
+        } else {
+            material.shader->bind();
+            material.shader->set_uniform_matrix("u_projection_view_matrix",
+                                                camera.projection_view_matrix);
+            renderer::draw_model(transform.position, transform.rotation,
+                                 transform.scale, material.shader, mesh.vertex_array,
+                                 textures.diffuse_map, mesh.index_count);
+        }
     }
 }

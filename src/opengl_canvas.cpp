@@ -40,19 +40,21 @@ void OpenGLCanvas::draw() {
     framebuffer->bind();
 
     renderer::set_clear_color(0.5f, 0.0f, 0.5f);
-    renderer::clear(renderer::Color | renderer::Depth);
+    renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
+    renderer::set_stencil_mask_zero();
 
     framebuffer->clear_red_integer_attachment(1, -1);
 
     cube_map_render_system(registry, camera);
     render_system(registry, camera);
+    pieces_render_system(registry, camera, selected_entity);
 
     int result;
     if (mouse_x == 0 && mouse_y == 0)
         result = -1;
     else
         result = framebuffer->read_pixel(1, mouse_x, height - mouse_y);
-    SPDLOG_DEBUG("Pixel: {}", result);
+    selected_entity = (entt::entity) result;
 
     Framebuffer::bind_default();
 
@@ -150,8 +152,12 @@ void OpenGLCanvas::start_program() {
     build_board();
     build_camera();
     build_skybox();
-    build_box();
-    build_piece();
+    // build_box();
+
+    build_piece(glm::vec3(0.0f, 1.4f, 0.0f));
+    build_piece(glm::vec3(2.0f, 1.4f, 0.0f));
+    build_piece(glm::vec3(2.0f, 1.4f, 1.3f));
+    build_piece(glm::vec3(-1.2f, 1.4f, -1.1f));
 
     SPDLOG_DEBUG("Finished initializing program");
 }
@@ -229,7 +235,7 @@ static float update_fps_counter() {
     if (elapsed_seconds.count() > 0.25) {
         previous_seconds = current_seconds;
         double fps = (double) frame_count / elapsed_seconds.count();
-        // SPDLOG_DEBUG("{}", fps);
+        SPDLOG_DEBUG("{}", fps);
         frame_count = 0;
     }
     frame_count++;
@@ -336,7 +342,7 @@ void OpenGLCanvas::build_box() {
     SPDLOG_DEBUG("Built box entity {}", box);
 }
 
-void OpenGLCanvas::build_piece() {
+void OpenGLCanvas::build_piece(const glm::vec3& position) {
     piece = registry.create();
 
     model::Mesh mesh = model::load_model("data/models/piece.obj");
@@ -346,12 +352,13 @@ void OpenGLCanvas::build_piece() {
 
     std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, piece);
     
-    registry.emplace<TransformComponent>(piece, glm::vec3(0.0f, 2.0f, 0.0f),
-                                         glm::vec3(0.0f), 0.3f);
+    registry.emplace<TransformComponent>(piece, position, glm::vec3(0.0f), 0.3f);
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(piece, basic_shader,
                                         std::unordered_map<std::string, int>());
     registry.emplace<TextureComponent>(piece, diffuse_texture);
+    registry.emplace<OutlineComponent>(piece, storage->outline_shader,
+                                       glm::vec3(1.0f, 0.0f, 0.0f));
 
     SPDLOG_DEBUG("Built piece entity {}", piece);
 }

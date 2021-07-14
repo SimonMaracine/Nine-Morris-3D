@@ -78,3 +78,11 @@ struct SkyboxTextureComponent {
     
     std::shared_ptr<Texture3D> cube_map;
 };
+
+struct OutlineComponent {
+    OutlineComponent(std::shared_ptr<Shader> shader, const glm::vec3& outline_color)
+            : shader(shader), outline_color(outline_color) {}
+
+    std::shared_ptr<Shader> shader;
+    glm::vec3 outline_color;
+};
