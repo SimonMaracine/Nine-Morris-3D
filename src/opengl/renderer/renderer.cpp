@@ -24,10 +24,10 @@ namespace renderer {
         constexpr float quad_vertices[] = {
             -1.0f,  1.0f,    0.0f, 1.0f,
             -1.0f, -1.0f,    0.0f, 0.0f,
-            1.0f,  1.0f,    1.0f, 1.0f,
-            1.0f,  1.0f,    1.0f, 1.0f,
+             1.0f,  1.0f,    1.0f, 1.0f,
+             1.0f,  1.0f,    1.0f, 1.0f,
             -1.0f, -1.0f,    0.0f, 0.0f,
-            1.0f, -1.0f,    1.0f, 0.0f
+             1.0f, -1.0f,    1.0f, 0.0f
         };
         storage.quad_vertex_buffer = VertexBuffer::create_with_data(quad_vertices,
                                                                     sizeof(quad_vertices));
@@ -62,9 +62,9 @@ namespace renderer {
     //     shader->set_uniform_matrix("u_projection_view_matrix", view_projection_matrix);
     // }
 
-    void end() {
+    // void end() {
 
-    }
+    // }
 
     void draw_quad() {
         glDrawArrays(GL_TRIANGLES, 0, 6);

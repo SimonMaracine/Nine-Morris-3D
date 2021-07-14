@@ -5,8 +5,6 @@
 
 #include "opengl_canvas.h"
 
-#include <iostream>
-
 static void new_game(Fl_Widget* _w, void* data) {
     OpenGLCanvas* canvas = (OpenGLCanvas*) data;
 
@@ -21,8 +19,11 @@ static void exit_game(Fl_Widget* _w, void* data) {
 }
 
 int main() {
-    Fl_Window* window = new Fl_Window(1024 + 20, 576 + 50, "Nine Morris 3D");
-    OpenGLCanvas* canvas = new OpenGLCanvas(10, 40, 1024, 576, "Nine Morris 3D");
+    constexpr int width = 1024;
+    constexpr int height = 576;
+
+    Fl_Window* window = new Fl_Window(width + 20, height + 50, "Nine Morris 3D");
+    OpenGLCanvas* canvas = new OpenGLCanvas(10, 40, width, height, "Nine Morris 3D");
 
     Fl_Menu_Item menuitems[] = {
         { "Game", 0, 0, 0, FL_SUBMENU },
@@ -35,7 +36,7 @@ int main() {
         { 0 }
     };
 
-    Fl_Menu_Bar* bar_menu = new Fl_Menu_Bar(0, 0, 1024 + 20, 30);
+    Fl_Menu_Bar* bar_menu = new Fl_Menu_Bar(0, 0, width + 20, 30);
     bar_menu->copy(menuitems);
 
     window->end();

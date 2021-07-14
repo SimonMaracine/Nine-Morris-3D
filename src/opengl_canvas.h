@@ -62,5 +62,5 @@ public:
     entt::entity box = entt::null;
     entt::entity piece = entt::null;
 
-    entt::entity selected_entity = entt::null;
+    entt::entity hovered_entity = entt::null;
 };

@@ -47,14 +47,12 @@ void OpenGLCanvas::draw() {
 
     cube_map_render_system(registry, camera);
     render_system(registry, camera);
-    pieces_render_system(registry, camera, selected_entity);
+    pieces_render_system(registry, camera, hovered_entity);
 
-    int result;
     if (mouse_x == 0 && mouse_y == 0)
-        result = -1;
+        hovered_entity = entt::null;
     else
-        result = framebuffer->read_pixel(1, mouse_x, height - mouse_y);
-    selected_entity = (entt::entity) result;
+        hovered_entity = (entt::entity) framebuffer->read_pixel(1, mouse_x, height - mouse_y);
 
     Framebuffer::bind_default();
 

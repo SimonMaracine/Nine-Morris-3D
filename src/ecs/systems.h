@@ -117,7 +117,7 @@ void cube_map_render_system(entt::registry& registry, entt::entity camera_entity
 }
 
 void pieces_render_system(entt::registry& registry, entt::entity camera_entity,
-                          entt::entity selected_entity) {
+                          entt::entity hovered_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
     auto view = registry.view<TransformComponent, MeshComponent,
@@ -129,7 +129,7 @@ void pieces_render_system(entt::registry& registry, entt::entity camera_entity,
                      MaterialComponent, TextureComponent,
                      OutlineComponent>(entity);
 
-        if (selected_entity == entity) {
+        if (hovered_entity == entity) {
             outline.shader->bind();
             outline.shader->set_uniform_matrix("u_projection_view_matrix",
                                                camera.projection_view_matrix);
