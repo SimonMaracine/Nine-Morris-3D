@@ -20,7 +20,7 @@ static void update_game(void* data);
 
 OpenGLCanvas::OpenGLCanvas(int x, int y, int w, int h, const char* t)
         : Fl_Gl_Window(x, y, w, h, t) {
-    mode(FL_OPENGL3 | FL_DOUBLE | FL_DEPTH /* | FL_RGB8 | FL_ALPHA*/);
+    mode(FL_OPENGL3 | FL_DOUBLE /*| FL_DEPTH | FL_RGB8 | FL_ALPHA*/);
     Fl::add_idle(update_game, this);
 
     logging::init();
@@ -37,13 +37,13 @@ void OpenGLCanvas::draw() {
         resize();
     }
 
-    framebuffer->bind();
+    storage->framebuffer->bind();
 
     renderer::set_clear_color(0.5f, 0.0f, 0.5f);
     renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
     renderer::set_stencil_mask_zero();
 
-    framebuffer->clear_red_integer_attachment(1, -1);
+    storage->framebuffer->clear_red_integer_attachment(1, -1);
 
     cube_map_render_system(registry, camera);
     render_system(registry, camera);
@@ -52,7 +52,8 @@ void OpenGLCanvas::draw() {
     if (mouse_x == 0 && mouse_y == 0)
         hovered_entity = entt::null;
     else
-        hovered_entity = (entt::entity) framebuffer->read_pixel(1, mouse_x, height - mouse_y);
+        hovered_entity =
+            (entt::entity) storage->framebuffer->read_pixel(1, mouse_x, height - mouse_y);
 
     Framebuffer::bind_default();
 
@@ -60,7 +61,7 @@ void OpenGLCanvas::draw() {
     storage->quad_shader->bind();
     storage->quad_shader->set_uniform_int("u_screen_texture", 0);
     storage->quad_vertex_array->bind();
-    renderer::bind_texture(framebuffer->get_color_attachment(0));
+    renderer::bind_texture(storage->framebuffer->get_color_attachment(0));
     renderer::disable_depth();
     renderer::draw_quad();
     renderer::enable_depth();
@@ -138,15 +139,6 @@ void OpenGLCanvas::start_program() {
     auto [version_major, version_minor] = debug_opengl::get_version();
     assert(version_major == 4 && version_minor >= 3);
 
-    basic_shader = Shader::create("data/shaders/basic.vert", "data/shaders/basic.frag");
-
-    Specification specification;
-    specification.width = 1024;
-    specification.height = 576;
-    specification.attachments = { TextureFormat::RGB8, TextureFormat::RedInteger,
-                                  TextureFormat::Depth24Stencil8 };
-    framebuffer = Framebuffer::create(specification);
-
     build_board();
     build_camera();
     build_skybox();
@@ -163,7 +155,7 @@ void OpenGLCanvas::start_program() {
 void OpenGLCanvas::resize() {
     width = w();
     height = h();
-    framebuffer->resize(width, height);
+    storage->framebuffer->resize(width, height);
     renderer::set_viewport(width, height);
 }
 
@@ -271,7 +263,7 @@ void OpenGLCanvas::build_board() {
 
     registry.emplace<TransformComponent>(board);
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(board, basic_shader,
+    registry.emplace<MaterialComponent>(board, storage->basic_shader,
                                         std::unordered_map<std::string, int>());
     registry.emplace<TextureComponent>(board, diffuse_texture);
 
@@ -333,7 +325,7 @@ void OpenGLCanvas::build_box() {
 
     registry.emplace<TransformComponent>(box);
     registry.emplace<MeshComponent>(box, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(box, basic_shader,
+    registry.emplace<MaterialComponent>(box, storage->basic_shader,
                                         std::unordered_map<std::string, int>());
     registry.emplace<TextureComponent>(box, diffuse_texture);
 
@@ -352,7 +344,7 @@ void OpenGLCanvas::build_piece(const glm::vec3& position) {
     
     registry.emplace<TransformComponent>(piece, position, glm::vec3(0.0f), 0.3f);
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(piece, basic_shader,
+    registry.emplace<MaterialComponent>(piece, storage->basic_shader,
                                         std::unordered_map<std::string, int>());
     registry.emplace<TextureComponent>(piece, diffuse_texture);
     registry.emplace<OutlineComponent>(piece, storage->outline_shader,

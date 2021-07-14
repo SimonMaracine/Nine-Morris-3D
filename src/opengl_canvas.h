@@ -53,9 +53,6 @@ public:
 
     const renderer::Storage* storage = nullptr;
 
-    std::shared_ptr<Shader> basic_shader = nullptr;
-    std::shared_ptr<Framebuffer> framebuffer = nullptr;
-
     entt::entity board = entt::null;
     entt::entity camera = entt::null;
     entt::entity skybox = entt::null;

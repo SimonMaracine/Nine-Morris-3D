@@ -8,6 +8,7 @@
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
+#include "opengl/renderer/framebuffer.h"
 
 namespace renderer {
     enum {
@@ -17,6 +18,9 @@ namespace renderer {
     };
 
     struct Storage {
+        std::shared_ptr<Shader> basic_shader = nullptr;
+        std::shared_ptr<Framebuffer> framebuffer = nullptr;
+
         std::shared_ptr<Shader> quad_shader = nullptr;
         std::shared_ptr<VertexArray> quad_vertex_array = nullptr;
         std::shared_ptr<VertexBuffer> quad_vertex_buffer = nullptr;

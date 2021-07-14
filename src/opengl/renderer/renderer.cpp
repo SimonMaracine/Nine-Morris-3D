@@ -9,6 +9,7 @@
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
+#include "opengl/renderer/framebuffer.h"
 
 namespace renderer {
     static Storage storage;
@@ -18,6 +19,16 @@ namespace renderer {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+        storage.basic_shader = Shader::create("data/shaders/basic.vert",
+                                              "data/shaders/basic.frag");
+
+        Specification specification;
+        specification.width = 1024;
+        specification.height = 576;
+        specification.attachments = { TextureFormat::RGB8, TextureFormat::RedInteger,
+                                    TextureFormat::Depth24Stencil8 };
+        storage.framebuffer = Framebuffer::create(specification);
 
         storage.quad_shader = Shader::create("data/shaders/quad.vert",
                                              "data/shaders/quad.frag");
