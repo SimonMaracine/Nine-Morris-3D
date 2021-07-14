@@ -185,6 +185,36 @@ std::shared_ptr<VertexBuffer> OpenGLCanvas::create_ids_buffer(unsigned int verti
     return buffer;
 }
 
+std::shared_ptr<VertexArray> OpenGLCanvas::create_entity_vertex_buffer(model::Mesh mesh,
+                                                                       entt::entity entity) {
+    std::shared_ptr<VertexBuffer> vertices =
+        VertexBuffer::create_with_data(mesh.vertices.data(),
+                                       mesh.vertices.size() * sizeof(model::Vertex));
+
+    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), entity);
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+    layout.add(1, BufferLayout::Type::Float, 2);
+
+    BufferLayout layout2;
+    layout2.add(2, BufferLayout::Type::Int, 1);
+
+    std::shared_ptr<VertexBuffer> index_buffer =
+        VertexBuffer::create_index(mesh.indices.data(),
+                                   mesh.indices.size() * sizeof(unsigned int));
+
+    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    index_buffer->bind();
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(ids, layout2);
+    vertex_array->hold_index_buffer(index_buffer);
+
+    VertexArray::unbind();
+
+    return vertex_array;
+}
+
 static float update_fps_counter() {
     using namespace std::chrono;
     using clock = high_resolution_clock;
@@ -233,30 +263,7 @@ void OpenGLCanvas::build_board() {
     std::shared_ptr<Texture> diffuse_texture =
         Texture::create("data/textures/board_texture.png", Texture::Type::Diffuse);
 
-    std::shared_ptr<VertexBuffer> vertices =
-        VertexBuffer::create_with_data(mesh.vertices.data(),
-                                       mesh.vertices.size() * sizeof(model::Vertex));
-
-    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), board);
-
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Type::Float, 3);
-    layout.add(1, BufferLayout::Type::Float, 2);
-
-    BufferLayout layout2;
-    layout2.add(2, BufferLayout::Type::Int, 1);
-
-    std::shared_ptr<VertexBuffer> index_buffer =
-        VertexBuffer::create_index(mesh.indices.data(),
-                                   mesh.indices.size() * sizeof(unsigned int));
-
-    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
-    index_buffer->bind();
-    vertex_array->add_buffer(vertices, layout);
-    vertex_array->add_buffer(ids, layout2);
-    vertex_array->hold_index_buffer(index_buffer);
-    
-    VertexArray::unbind();
+    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, board);
 
     registry.emplace<TransformComponent>(board);
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
@@ -318,30 +325,7 @@ void OpenGLCanvas::build_box() {
     std::shared_ptr<Texture> diffuse_texture =
         Texture::create("data/textures/box.png", Texture::Type::Diffuse);
 
-    std::shared_ptr<VertexBuffer> vertices =
-        VertexBuffer::create_with_data(mesh.vertices.data(),
-                                       mesh.vertices.size() * sizeof(model::Vertex));
-
-    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), box);
-
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Type::Float, 3);
-    layout.add(1, BufferLayout::Type::Float, 2);
-
-    BufferLayout layout2;
-    layout2.add(2, BufferLayout::Type::Int, 1);
-
-    std::shared_ptr<VertexBuffer> index_buffer =
-        VertexBuffer::create_index(mesh.indices.data(),
-                                   mesh.indices.size() * sizeof(unsigned int));
-
-    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
-    index_buffer->bind();
-    vertex_array->add_buffer(vertices, layout);
-    vertex_array->add_buffer(ids, layout2);
-    vertex_array->hold_index_buffer(index_buffer);
-    
-    VertexArray::unbind();
+    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, box);
 
     registry.emplace<TransformComponent>(box);
     registry.emplace<MeshComponent>(box, vertex_array, mesh.indices.size());
@@ -360,30 +344,7 @@ void OpenGLCanvas::build_piece() {
     std::shared_ptr<Texture> diffuse_texture =
         Texture::create("data/textures/black_piece_texture.png", Texture::Type::Diffuse);
 
-    std::shared_ptr<VertexBuffer> vertices =
-        VertexBuffer::create_with_data(mesh.vertices.data(),
-                                       mesh.vertices.size() * sizeof(model::Vertex));
-
-    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), piece);
-
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Type::Float, 3);
-    layout.add(1, BufferLayout::Type::Float, 2);
-
-    BufferLayout layout2;
-    layout2.add(2, BufferLayout::Type::Int, 1);
-
-    std::shared_ptr<VertexBuffer> index_buffer =
-        VertexBuffer::create_index(mesh.indices.data(),
-                                   mesh.indices.size() * sizeof(unsigned int));
-
-    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
-    index_buffer->bind();
-    vertex_array->add_buffer(vertices, layout);
-    vertex_array->add_buffer(ids, layout2);
-    vertex_array->hold_index_buffer(index_buffer);
-    
-    VertexArray::unbind();
+    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, piece);
     
     registry.emplace<TransformComponent>(piece, glm::vec3(0.0f, 2.0f, 0.0f),
                                          glm::vec3(0.0f), 0.3f);

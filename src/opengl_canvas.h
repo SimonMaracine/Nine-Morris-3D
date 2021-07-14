@@ -11,6 +11,7 @@
 #include "opengl/renderer/framebuffer.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/vertex_buffer.h"
+#include <other/model.h>
 
 class OpenGLCanvas : public Fl_Gl_Window {
 public:
@@ -26,6 +27,8 @@ public:
 
     std::shared_ptr<VertexBuffer> create_ids_buffer(unsigned int vertices_size,
                                                     entt::entity entity);
+    std::shared_ptr<VertexArray> create_entity_vertex_buffer(model::Mesh mesh,
+                                                             entt::entity entity);
 
     void build_board();
     void build_camera();
