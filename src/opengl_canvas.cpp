@@ -2,6 +2,7 @@
 #include <chrono>
 #include <memory>
 #include <vector>
+#include <string.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -41,10 +42,16 @@ void OpenGLCanvas::draw() {
     renderer::set_clear_color(0.5f, 0.0f, 0.5f);
     renderer::clear(renderer::Color | renderer::Depth);
 
+    framebuffer->clear_red_integer_attachment(1, -1);
+
     cube_map_render_system(registry, camera);
     render_system(registry, camera);
 
-    int result = framebuffer->read_pixel(1, mouse_x, height - mouse_y);
+    int result;
+    if (mouse_x == 0 && mouse_y == 0)
+        result = -1;
+    else
+        result = framebuffer->read_pixel(1, mouse_x, height - mouse_y);
     SPDLOG_DEBUG("Pixel: {}", result);
 
     Framebuffer::bind_default();
@@ -143,7 +150,7 @@ void OpenGLCanvas::start_program() {
     build_board();
     build_camera();
     build_skybox();
-    // build_box();
+    build_box();
     build_piece();
 
     SPDLOG_DEBUG("Finished initializing program");
@@ -163,6 +170,19 @@ void OpenGLCanvas::reset() {
 
 void OpenGLCanvas::end_program() {
     // Do ending stuff
+}
+
+std::shared_ptr<VertexBuffer> OpenGLCanvas::create_ids_buffer(unsigned int vertices_size,
+                                                              entt::entity entity) {
+    std::vector<int> array;
+    array.resize(vertices_size);
+    for (unsigned int i = 0; i < array.size(); i++) {
+        array[i] = (int) entt::to_integral(entity);
+    }
+    std::shared_ptr<VertexBuffer> buffer =
+        VertexBuffer::create_with_data(array.data(), array.size() * sizeof(int));
+
+    return buffer;
 }
 
 static float update_fps_counter() {
@@ -206,6 +226,8 @@ static void update_game(void* data) {
 }
 
 void OpenGLCanvas::build_board() {
+    board = registry.create();
+
     model::Mesh mesh = model::load_model("data/models/board.obj");
 
     std::shared_ptr<Texture> diffuse_texture =
@@ -215,9 +237,14 @@ void OpenGLCanvas::build_board() {
         VertexBuffer::create_with_data(mesh.vertices.data(),
                                        mesh.vertices.size() * sizeof(model::Vertex));
 
+    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), board);
+
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     layout.add(1, BufferLayout::Type::Float, 2);
+
+    BufferLayout layout2;
+    layout2.add(2, BufferLayout::Type::Int, 1);
 
     std::shared_ptr<VertexBuffer> index_buffer =
         VertexBuffer::create_index(mesh.indices.data(),
@@ -226,17 +253,18 @@ void OpenGLCanvas::build_board() {
     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
     index_buffer->bind();
     vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(ids, layout2);
+    vertex_array->hold_index_buffer(index_buffer);
     
     VertexArray::unbind();
 
-    board = registry.create();
     registry.emplace<TransformComponent>(board);
-    std::vector<std::shared_ptr<VertexBuffer>> buffers = { vertices };
-    registry.emplace<MeshComponent>(board, vertex_array, buffers, index_buffer,
-                                    mesh.indices.size());
+    registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(board, basic_shader,
                                         std::unordered_map<std::string, int>());
     registry.emplace<TextureComponent>(board, diffuse_texture);
+
+    SPDLOG_DEBUG("Built board entity {}", board);
 }
 
 void OpenGLCanvas::build_camera() {
@@ -245,6 +273,8 @@ void OpenGLCanvas::build_camera() {
     registry.emplace<CameraComponent>(camera,
             glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.1f, 1000.0f),
             glm::vec3(0.0f), 12.0f);
+
+    SPDLOG_DEBUG("Built camera entity {}", camera);
 }
 
 void OpenGLCanvas::build_skybox() {
@@ -272,14 +302,17 @@ void OpenGLCanvas::build_skybox() {
     VertexArray::unbind();
 
     skybox = registry.create();
-    std::vector<std::shared_ptr<VertexBuffer>> buffers = { positions };
-    registry.emplace<SkyboxMeshComponent>(skybox, vertex_array, buffers);
+    registry.emplace<SkyboxMeshComponent>(skybox, vertex_array);
     registry.emplace<MaterialComponent>(skybox, shader,
                                         std::unordered_map<std::string, int>());
     registry.emplace<SkyboxTextureComponent>(skybox, texture);
+
+    SPDLOG_DEBUG("Built skybox entity {}", skybox);
 }
 
 void OpenGLCanvas::build_box() {
+    box = registry.create();
+
     model::Mesh mesh = model::load_model("data/models/box.obj");
 
     std::shared_ptr<Texture> diffuse_texture =
@@ -289,9 +322,14 @@ void OpenGLCanvas::build_box() {
         VertexBuffer::create_with_data(mesh.vertices.data(),
                                        mesh.vertices.size() * sizeof(model::Vertex));
 
+    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), box);
+
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     layout.add(1, BufferLayout::Type::Float, 2);
+
+    BufferLayout layout2;
+    layout2.add(2, BufferLayout::Type::Int, 1);
 
     std::shared_ptr<VertexBuffer> index_buffer =
         VertexBuffer::create_index(mesh.indices.data(),
@@ -300,20 +338,23 @@ void OpenGLCanvas::build_box() {
     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
     index_buffer->bind();
     vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(ids, layout2);
+    vertex_array->hold_index_buffer(index_buffer);
     
     VertexArray::unbind();
 
-    box = registry.create();
     registry.emplace<TransformComponent>(box);
-    std::vector<std::shared_ptr<VertexBuffer>> buffers = { vertices };
-    registry.emplace<MeshComponent>(box, vertex_array, buffers, index_buffer,
-                                    mesh.indices.size());
+    registry.emplace<MeshComponent>(box, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(box, basic_shader,
                                         std::unordered_map<std::string, int>());
     registry.emplace<TextureComponent>(box, diffuse_texture);
+
+    SPDLOG_DEBUG("Built box entity {}", box);
 }
 
 void OpenGLCanvas::build_piece() {
+    piece = registry.create();
+
     model::Mesh mesh = model::load_model("data/models/piece.obj");
 
     std::shared_ptr<Texture> diffuse_texture =
@@ -323,9 +364,14 @@ void OpenGLCanvas::build_piece() {
         VertexBuffer::create_with_data(mesh.vertices.data(),
                                        mesh.vertices.size() * sizeof(model::Vertex));
 
+    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), piece);
+
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     layout.add(1, BufferLayout::Type::Float, 2);
+
+    BufferLayout layout2;
+    layout2.add(2, BufferLayout::Type::Int, 1);
 
     std::shared_ptr<VertexBuffer> index_buffer =
         VertexBuffer::create_index(mesh.indices.data(),
@@ -334,16 +380,17 @@ void OpenGLCanvas::build_piece() {
     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
     index_buffer->bind();
     vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(ids, layout2);
+    vertex_array->hold_index_buffer(index_buffer);
     
     VertexArray::unbind();
-
-    piece = registry.create();
+    
     registry.emplace<TransformComponent>(piece, glm::vec3(0.0f, 2.0f, 0.0f),
                                          glm::vec3(0.0f), 0.3f);
-    std::vector<std::shared_ptr<VertexBuffer>> buffers = { vertices };
-    registry.emplace<MeshComponent>(piece, vertex_array, buffers, index_buffer,
-                                    mesh.indices.size());
+    registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(piece, basic_shader,
                                         std::unordered_map<std::string, int>());
     registry.emplace<TextureComponent>(piece, diffuse_texture);
+
+    SPDLOG_DEBUG("Built piece entity {}", piece);
 }

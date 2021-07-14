@@ -10,6 +10,7 @@
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/framebuffer.h"
 #include "opengl/renderer/renderer.h"
+#include "opengl/renderer/vertex_buffer.h"
 
 class OpenGLCanvas : public Fl_Gl_Window {
 public:
@@ -18,10 +19,13 @@ public:
     virtual void draw();
     virtual int handle(int event);
 
+    void start_program();
+    void resize();
     void reset();
     void end_program();
-    void resize();
-    void start_program();
+
+    std::shared_ptr<VertexBuffer> create_ids_buffer(unsigned int vertices_size,
+                                                    entt::entity entity);
 
     void build_board();
     void build_camera();

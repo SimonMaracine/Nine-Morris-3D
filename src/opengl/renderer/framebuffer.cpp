@@ -74,6 +74,12 @@ int Framebuffer::read_pixel(unsigned int attachment_index, int x, int y) {
     return pixel;
 }
 
+void Framebuffer::clear_red_integer_attachment(int index, int value) {
+    assert(index < (int) color_attachments.size());
+
+    glClearBufferiv(GL_COLOR, index, &value);
+}
+
 static void attach_color_texture(GLuint texture, GLenum internal_format, GLenum format,
                                  int width, int height, unsigned int index) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

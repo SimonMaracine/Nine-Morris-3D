@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <glad/glad.h>
 
@@ -19,6 +20,10 @@ public:
 
     void add_buffer(std::shared_ptr<VertexBuffer> buffer,
                     const BufferLayout& layout);
+    void hold_index_buffer(std::shared_ptr<VertexBuffer> index_buffer);
 private:
     GLuint array;
+
+    // This just to hold a strong reference to the buffers
+    std::vector<std::shared_ptr<VertexBuffer>> buffers;
 };

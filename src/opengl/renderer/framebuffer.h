@@ -36,6 +36,7 @@ public:
 
     void resize(int width, int height);
     int read_pixel(unsigned int attachment_index, int x, int y);
+    void clear_red_integer_attachment(int index, int value);
 private:
     void build();
 

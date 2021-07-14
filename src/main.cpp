@@ -5,6 +5,8 @@
 
 #include "opengl_canvas.h"
 
+#include <iostream>
+
 static void new_game(Fl_Widget* _w, void* data) {
     OpenGLCanvas* canvas = (OpenGLCanvas*) data;
 

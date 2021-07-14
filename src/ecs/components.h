@@ -40,15 +40,10 @@ struct CameraComponent {
 };
 
 struct MeshComponent {
-    MeshComponent(std::shared_ptr<VertexArray> vertex_array,
-                  std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers,
-                  std::shared_ptr<VertexBuffer> index_buffer, int index_count)
-            : vertex_array(vertex_array), vertex_buffers(vertex_buffers),
-              index_buffer(index_buffer), index_count(index_count) {}
+    MeshComponent(std::shared_ptr<VertexArray> vertex_array, int index_count)
+            : vertex_array(vertex_array), index_count(index_count) {}
 
     std::shared_ptr<VertexArray> vertex_array;
-    std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers;
-    std::shared_ptr<VertexBuffer> index_buffer;
     int index_count;
 };
 
@@ -71,12 +66,10 @@ struct TextureComponent {
 };
 
 struct SkyboxMeshComponent {
-    SkyboxMeshComponent(std::shared_ptr<VertexArray> vertex_array,
-                        std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers)
-            : vertex_array(vertex_array), vertex_buffers(vertex_buffers) {}
+    SkyboxMeshComponent(std::shared_ptr<VertexArray> vertex_array)
+            : vertex_array(vertex_array) {}
 
     std::shared_ptr<VertexArray> vertex_array;
-    std::vector<std::shared_ptr<VertexBuffer>> vertex_buffers;
 };
 
 struct SkyboxTextureComponent {
