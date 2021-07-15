@@ -98,12 +98,19 @@ namespace renderer {
         glStencilMask(0x00);
     }
 
-    void draw_model(const glm::vec3& position, const glm::vec3& rotation,
-                    float scale, std::shared_ptr<Shader> shader,
+    void draw_model(const glm::vec3& position,
+                    const glm::vec3& rotation,
+                    float scale,
+                    std::shared_ptr<Shader> shader,
                     std::shared_ptr<VertexArray> array,
-                    std::shared_ptr<Texture> diffuse_map, GLuint index_count) {
+                    std::shared_ptr<Texture> diffuse_map,
+                    const glm::vec3& specular_color,
+                    float shininess,
+                    GLuint index_count) {
         shader->bind();
-        shader->set_uniform_int("u_diffuse", 0);
+        shader->set_uniform_int("u_material.diffuse", 0);
+        shader->set_uniform_vec3("u_material.specular", specular_color);
+        shader->set_uniform_float("u_material.shininess", shininess);
 
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);
@@ -119,17 +126,24 @@ namespace renderer {
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
     }
 
-    void draw_model_outline(const glm::vec3& position, const glm::vec3& rotation,
-                            float scale, std::shared_ptr<Shader> shader,
+    void draw_model_outline(const glm::vec3& position,
+                            const glm::vec3& rotation,
+                            float scale,
+                            std::shared_ptr<Shader> shader,
                             std::shared_ptr<VertexArray> array,
-                            std::shared_ptr<Texture> diffuse_map, GLuint index_count,
+                            std::shared_ptr<Texture> diffuse_map,
+                            const glm::vec3& specular_color,
+                            float shininess,
+                            GLuint index_count,
                             const glm::vec3& outline_color) {
         glStencilFunc(GL_ALWAYS, 1, 0xFF); 
         glStencilMask(0xFF);
 
         {
             shader->bind();
-            shader->set_uniform_int("u_diffuse", 0);
+            shader->set_uniform_int("u_material.diffuse", 0);
+            shader->set_uniform_vec3("u_material.specular", specular_color);
+            shader->set_uniform_float("u_material.shininess", shininess);
 
             glm::mat4 matrix = glm::mat4(1.0f);
             matrix = glm::translate(matrix, position);

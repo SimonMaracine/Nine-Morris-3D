@@ -50,15 +50,16 @@ struct MeshComponent {
 };
 
 struct MaterialComponent {
-    MaterialComponent(std::shared_ptr<Shader> shader,
-                      std::unordered_map<std::string, int> uniforms)
-            : shader(shader), uniforms(uniforms) {}
+    MaterialComponent(std::shared_ptr<Shader> shader, glm::vec3 specular_color,
+                      float shininess)
+            : shader(shader), specular_color(specular_color), shininess(shininess) {}
 
     std::shared_ptr<Shader> shader;
-    std::unordered_map<std::string, int> uniforms;
+    glm::vec3 specular_color;
+    float shininess;
 };
 
-struct TextureComponent {
+struct TextureComponent {  // TODO maybe I should move this to MaterialComponent
     TextureComponent(std::shared_ptr<Texture> diffuse_map)
             : diffuse_map(diffuse_map) {}
     
@@ -72,6 +73,13 @@ struct SkyboxMeshComponent {
             : vertex_array(vertex_array) {}
 
     std::shared_ptr<VertexArray> vertex_array;
+};
+
+struct SkyboxMaterialComponent {
+    SkyboxMaterialComponent(std::shared_ptr<Shader> shader)
+            : shader(shader) {}
+
+    std::shared_ptr<Shader> shader;
 };
 
 struct SkyboxTextureComponent {
@@ -90,9 +98,14 @@ struct OutlineComponent {
 };
 
 struct LightComponent {
-    LightComponent(const glm::vec3& color) : color(color) {}
+    LightComponent(const glm::vec3& ambient_color, const glm::vec3& diffuse_color,
+                   const glm::vec3& specular_color)
+            : ambient_color(ambient_color), diffuse_color(diffuse_color),
+              specular_color(specular_color) {}
 
-    glm::vec3 color;
+    glm::vec3 ambient_color;
+    glm::vec3 diffuse_color;
+    glm::vec3 specular_color;
 };
 
 struct ShaderComponent {

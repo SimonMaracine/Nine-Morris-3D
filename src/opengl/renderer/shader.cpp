@@ -63,6 +63,11 @@ void Shader::set_uniform_vec3(const std::string& name, const glm::vec3& vector) 
     glUniform3f(location, vector.x, vector.y, vector.z);
 }
 
+void Shader::set_uniform_float(const std::string& name, float value) const {
+    GLint location = get_uniform_location(name);
+    glUniform1f(location, value);
+}
+
 GLint Shader::get_uniform_location(const std::string& name) const {
     GLint location = glGetUniformLocation(program, name.c_str());
     if (location == -1) {

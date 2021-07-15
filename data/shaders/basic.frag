@@ -8,25 +8,54 @@ in vec3 v_fragment_position;
 layout (location = 0) out vec4 fragment_color;
 layout (location = 1) out int entity_id;
 
-uniform sampler2D u_diffuse;
-uniform vec3 u_light_color;
-uniform vec3 u_light_position;
+uniform vec3 u_view_position;
 
-void main() {
+struct Material {
+    sampler2D diffuse;
+    vec3 specular;
+    float shininess;
+};
+
+uniform Material u_material;
+
+struct Light {
+    vec3 position;
+  
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+uniform Light u_light;
+
+vec3 calculate_light(Material material, Light light, vec3 texture_colors) {
     // Ambient light
-    const float ambientStrength = 0.05;
-    vec3 ambient = ambientStrength * u_light_color;
+    vec3 ambient_light = texture_colors * light.ambient;
 
     // Diffuse light
-    vec3 norm = normalize(v_normal);
-    vec3 lightDir = normalize(u_light_position - v_fragment_position);
+    vec3 normal = normalize(v_normal);
+    vec3 light_direction = normalize(light.position - v_fragment_position);
 
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * u_light_color;
+    float diffuse_strength = max(dot(normal, light_direction), 0.0);
+    vec3 diffuse_light = diffuse_strength * texture_colors * light.diffuse;
+
+    // Specular light
+    vec3 view_direction = normalize(u_view_position - v_fragment_position);
+    vec3 reflect_direction = reflect(-light_direction, normal);
+
+    float specular_strength = pow(max(dot(view_direction, reflect_direction), 0.0), material.shininess);
+    vec3 specular_light = material.specular * specular_strength * light.specular;
+
+    return ambient_light + diffuse_light + specular_light;
+}
+
+void main() {
+    vec3 texture_colors = vec3(texture(u_material.diffuse, v_texture_coordinate));
+
+    vec3 total_light = calculate_light(u_material, u_light, texture_colors);
 
     // Add everything up
-    vec4 result_fragment = vec4(ambient + diffuse, 1.0)
-            * texture(u_diffuse, v_texture_coordinate);
+    vec4 result_fragment = vec4(total_light, 1.0);
 
     fragment_color = result_fragment;
     entity_id = v_entity_id;

@@ -34,6 +34,7 @@ void render_system(entt::registry& registry, entt::entity camera_entity) {
                                             camera.projection_view_matrix);
         renderer::draw_model(transform.position, transform.rotation, transform.scale,
                              material.shader, mesh.vertex_array, textures.diffuse_map,
+                             material.specular_color, material.shininess,
                              mesh.index_count);
     }
 }
@@ -102,11 +103,12 @@ void camera_system(entt::registry& registry, const InputData& input) {
 void cube_map_render_system(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
-    auto view = registry.view<SkyboxMeshComponent, MaterialComponent,
+    auto view = registry.view<SkyboxMeshComponent, SkyboxMaterialComponent,
                               SkyboxTextureComponent>();
 
     for (entt::entity entity : view) {
-        auto [mesh, material, texture] = view.get<SkyboxMeshComponent, MaterialComponent,
+        auto [mesh, material, texture] = view.get<SkyboxMeshComponent,
+                                                  SkyboxMaterialComponent,
                                                   SkyboxTextureComponent>(entity);
 
         const glm::mat4& projection_matrix = camera.projection_matrix;
@@ -136,7 +138,8 @@ void pieces_render_system(entt::registry& registry, entt::entity camera_entity,
                                                camera.projection_view_matrix);
             renderer::draw_model_outline(transform.position, transform.rotation,
                                      transform.scale, material.shader, mesh.vertex_array,
-                                     textures.diffuse_map, mesh.index_count,
+                                     textures.diffuse_map, material.specular_color,
+                                     material.shininess, mesh.index_count,
                                      outline.outline_color);
         } else {
             material.shader->bind();
@@ -144,12 +147,15 @@ void pieces_render_system(entt::registry& registry, entt::entity camera_entity,
                                                 camera.projection_view_matrix);
             renderer::draw_model(transform.position, transform.rotation,
                                  transform.scale, material.shader, mesh.vertex_array,
-                                 textures.diffuse_map, mesh.index_count);
+                                 textures.diffuse_map, material.specular_color,
+                                 material.shininess, mesh.index_count);
         }
     }
 }
 
-void lighting_system(entt::registry& registry) {
+void lighting_system(entt::registry& registry, entt::entity camera_entity) {
+    auto& camera_transform = registry.get<TransformComponent>(camera_entity);
+
     auto view = registry.view<TransformComponent, LightComponent, ShaderComponent>();
 
     for (entt::entity entity : view) {
@@ -157,7 +163,11 @@ void lighting_system(entt::registry& registry) {
                                                    ShaderComponent>(entity);
 
         shader.shader->bind();
-        shader.shader->set_uniform_vec3("u_light_color", light.color);
-        shader.shader->set_uniform_vec3("u_light_position", transform.position);
+        shader.shader->set_uniform_vec3("u_light.position", transform.position);
+        shader.shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+        shader.shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+        shader.shader->set_uniform_vec3("u_light.specular", light.specular_color);
+        
+        shader.shader->set_uniform_vec3("u_view_position", camera_transform.position);
     }
 }

@@ -45,7 +45,7 @@ void OpenGLCanvas::draw() {
 
     storage->framebuffer->clear_red_integer_attachment(1, -1);
 
-    lighting_system(registry);
+    lighting_system(registry, camera);
     cube_map_render_system(registry, camera);
     render_system(registry, camera);
     pieces_render_system(registry, camera, hovered_entity);
@@ -229,7 +229,7 @@ static float update_fps_counter() {
     if (elapsed_seconds.count() > 0.25) {
         previous_seconds = current_seconds;
         double fps = (double) frame_count / elapsed_seconds.count();
-        SPDLOG_DEBUG("{}", fps);
+        // SPDLOG_DEBUG("{}", fps);
         frame_count = 0;
     }
     frame_count++;
@@ -267,8 +267,7 @@ void OpenGLCanvas::build_board() {
 
     registry.emplace<TransformComponent>(board);
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(board, storage->basic_shader,
-                                        std::unordered_map<std::string, int>());
+    registry.emplace<MaterialComponent>(board, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(board, diffuse_texture);
 
     SPDLOG_DEBUG("Built board entity {}", board);
@@ -310,8 +309,7 @@ void OpenGLCanvas::build_skybox() {
 
     skybox = registry.create();
     registry.emplace<SkyboxMeshComponent>(skybox, vertex_array);
-    registry.emplace<MaterialComponent>(skybox, shader,
-                                        std::unordered_map<std::string, int>());
+    registry.emplace<SkyboxMaterialComponent>(skybox, shader);
     registry.emplace<SkyboxTextureComponent>(skybox, texture);
 
     SPDLOG_DEBUG("Built skybox entity {}", skybox);
@@ -329,8 +327,7 @@ void OpenGLCanvas::build_box() {
 
     registry.emplace<TransformComponent>(box);
     registry.emplace<MeshComponent>(box, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(box, storage->basic_shader,
-                                        std::unordered_map<std::string, int>());
+    registry.emplace<MaterialComponent>(box, storage->basic_shader, glm::vec3(1.0f), 32.0f);
     registry.emplace<TextureComponent>(box, diffuse_texture);
 
     SPDLOG_DEBUG("Built box entity {}", box);
@@ -348,8 +345,7 @@ void OpenGLCanvas::build_piece(const glm::vec3& position) {
     
     registry.emplace<TransformComponent>(piece, position, glm::vec3(0.0f), 0.3f);
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(piece, storage->basic_shader,
-                                        std::unordered_map<std::string, int>());
+    registry.emplace<MaterialComponent>(piece, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(piece, diffuse_texture);
     registry.emplace<OutlineComponent>(piece, storage->outline_shader,
                                        glm::vec3(1.0f, 0.0f, 0.0f));
@@ -361,6 +357,9 @@ void OpenGLCanvas::build_directional_light() {
     directional_light = registry.create();
     registry.emplace<TransformComponent>(directional_light, glm::vec3(10.0f, 20.0f, -15.0f),
                                          glm::vec3(0.0f));
-    registry.emplace<LightComponent>(directional_light, glm::vec3(1.0f));
+    registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f),
+                                     glm::vec3(1.0f));
     registry.emplace<ShaderComponent>(directional_light, storage->basic_shader);
+
+    SPDLOG_DEBUG("Built directional light entity {}", piece);
 }
