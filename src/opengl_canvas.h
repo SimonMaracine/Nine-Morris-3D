@@ -30,10 +30,10 @@ public:
     std::shared_ptr<VertexArray> create_entity_vertex_buffer(model::Mesh mesh,
                                                              entt::entity entity);
 
-    void build_board(model::Mesh mesh);
+    void build_board(const model::Mesh& mesh);
     void build_camera();
     void build_skybox();
-    void build_piece(model::Mesh mesh, std::shared_ptr<Texture> diffuse_texture,
+    void build_piece(const model::Mesh& mesh, std::shared_ptr<Texture> diffuse_texture,
                      const glm::vec3& position);
     void build_directional_light();
 

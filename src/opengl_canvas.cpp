@@ -159,7 +159,7 @@ void OpenGLCanvas::start_program() {
 
     build_directional_light();
 
-    SPDLOG_DEBUG("Finished initializing program");
+    SPDLOG_INFO("Finished initializing program");
 }
 
 void OpenGLCanvas::resize() {
@@ -262,7 +262,7 @@ static void update_game(void* data) {
     canvas->redraw();
 }
 
-void OpenGLCanvas::build_board(model::Mesh mesh) {
+void OpenGLCanvas::build_board(const model::Mesh& mesh) {
     board = registry.create();
 
     std::shared_ptr<Texture> diffuse_texture =
@@ -320,7 +320,7 @@ void OpenGLCanvas::build_skybox() {
     SPDLOG_DEBUG("Built skybox entity {}", skybox);
 }
 
-void OpenGLCanvas::build_piece(model::Mesh mesh, std::shared_ptr<Texture> diffuse_texture,
+void OpenGLCanvas::build_piece(const model::Mesh& mesh, std::shared_ptr<Texture> diffuse_texture,
                                const glm::vec3& position) {
     piece = registry.create();
 
