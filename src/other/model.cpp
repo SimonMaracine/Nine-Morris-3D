@@ -16,8 +16,8 @@ namespace model {
                                                  aiProcess_ValidateDataStructure);
 
         if (!scene) {
-            SPDLOG_CRITICAL("Could not load model {}", file_path.c_str());
-            SPDLOG_CRITICAL(importer.GetErrorString());
+            spdlog::critical("Could not load model {}", file_path.c_str());
+            spdlog::critical(importer.GetErrorString());
             std::exit(1);
         }
 
@@ -41,6 +41,12 @@ namespace model {
             texture_coordinate.x = mesh->mTextureCoords[0][i].x;
             texture_coordinate.y = mesh->mTextureCoords[0][i].y;
             vertex.texture_coordinate = texture_coordinate;
+
+            glm::vec3 normal;
+            normal.x = mesh->mNormals[i].x;
+            normal.y = mesh->mNormals[i].y;
+            normal.z = mesh->mNormals[i].z;
+            vertex.normal = normal;
 
             vertices.push_back(vertex);
         }

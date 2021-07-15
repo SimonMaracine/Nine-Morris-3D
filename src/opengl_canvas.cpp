@@ -45,6 +45,7 @@ void OpenGLCanvas::draw() {
 
     storage->framebuffer->clear_red_integer_attachment(1, -1);
 
+    lighting_system(registry);
     cube_map_render_system(registry, camera);
     render_system(registry, camera);
     pieces_render_system(registry, camera, hovered_entity);
@@ -149,6 +150,8 @@ void OpenGLCanvas::start_program() {
     build_piece(glm::vec3(2.0f, 1.4f, 1.3f));
     build_piece(glm::vec3(-1.2f, 1.4f, -1.1f));
 
+    build_directional_light();
+
     SPDLOG_DEBUG("Finished initializing program");
 }
 
@@ -192,9 +195,10 @@ std::shared_ptr<VertexArray> OpenGLCanvas::create_entity_vertex_buffer(model::Me
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     layout.add(1, BufferLayout::Type::Float, 2);
+    layout.add(2, BufferLayout::Type::Float, 3);
 
     BufferLayout layout2;
-    layout2.add(2, BufferLayout::Type::Int, 1);
+    layout2.add(3, BufferLayout::Type::Int, 1);
 
     std::shared_ptr<VertexBuffer> index_buffer =
         VertexBuffer::create_index(mesh.indices.data(),
@@ -351,4 +355,12 @@ void OpenGLCanvas::build_piece(const glm::vec3& position) {
                                        glm::vec3(1.0f, 0.0f, 0.0f));
 
     SPDLOG_DEBUG("Built piece entity {}", piece);
+}
+
+void OpenGLCanvas::build_directional_light() {
+    directional_light = registry.create();
+    registry.emplace<TransformComponent>(directional_light, glm::vec3(10.0f, 20.0f, -15.0f),
+                                         glm::vec3(0.0f));
+    registry.emplace<LightComponent>(directional_light, glm::vec3(1.0f));
+    registry.emplace<ShaderComponent>(directional_light, storage->basic_shader);
 }

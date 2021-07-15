@@ -16,6 +16,8 @@
 struct TransformComponent {
     TransformComponent() = default;
     TransformComponent(const glm::vec3& rotation) : rotation(rotation) {}
+    TransformComponent(const glm::vec3& position, const glm::vec3& rotation)
+            : position(position), rotation(rotation) {}
     TransformComponent(const glm::vec3& position, const glm::vec3& rotation, float scale)
             : position(position), rotation(rotation), scale(scale) {}
 
@@ -85,4 +87,16 @@ struct OutlineComponent {
 
     std::shared_ptr<Shader> shader;
     glm::vec3 outline_color;
+};
+
+struct LightComponent {
+    LightComponent(const glm::vec3& color) : color(color) {}
+
+    glm::vec3 color;
+};
+
+struct ShaderComponent {
+    ShaderComponent(std::shared_ptr<Shader> shader) : shader(shader) {}
+
+    std::shared_ptr<Shader> shader;
 };

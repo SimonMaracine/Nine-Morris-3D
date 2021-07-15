@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "opengl/renderer/renderer.h"
+#include "other/logging.h"
 
 struct InputData {
     int mouse_x;
@@ -145,5 +146,18 @@ void pieces_render_system(entt::registry& registry, entt::entity camera_entity,
                                  transform.scale, material.shader, mesh.vertex_array,
                                  textures.diffuse_map, mesh.index_count);
         }
+    }
+}
+
+void lighting_system(entt::registry& registry) {
+    auto view = registry.view<TransformComponent, LightComponent, ShaderComponent>();
+
+    for (entt::entity entity : view) {
+        auto [transform, light, shader] = view.get<TransformComponent, LightComponent,
+                                                   ShaderComponent>(entity);
+
+        shader.shader->bind();
+        shader.shader->set_uniform_vec3("u_light_color", light.color);
+        shader.shader->set_uniform_vec3("u_light_position", transform.position);
     }
 }

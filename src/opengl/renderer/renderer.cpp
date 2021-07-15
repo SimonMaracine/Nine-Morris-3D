@@ -27,7 +27,7 @@ namespace renderer {
         specification.width = 1024;
         specification.height = 576;
         specification.attachments = { TextureFormat::RGB8, TextureFormat::RedInteger,
-                                    TextureFormat::Depth24Stencil8 };
+                                      TextureFormat::Depth24Stencil8 };
         storage.framebuffer = Framebuffer::create(specification);
 
         storage.quad_shader = Shader::create("data/shaders/quad.vert",

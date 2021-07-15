@@ -35,6 +35,7 @@ public:
     void build_skybox();
     void build_box();
     void build_piece(const glm::vec3& position);
+    void build_directional_light();
 
     int width = 0, height = 0;
 
@@ -58,6 +59,7 @@ public:
     entt::entity skybox = entt::null;
     entt::entity box = entt::null;
     entt::entity piece = entt::null;
+    entt::entity directional_light = entt::null;
 
     entt::entity hovered_entity = entt::null;
 };
