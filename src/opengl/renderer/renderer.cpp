@@ -167,13 +167,16 @@ namespace renderer {
         storage.outline_shader->set_uniform_vec3("u_color", outline_color);
 
         {
+            constexpr glm::vec3 offset = glm::vec3(0.0f, 0.0f, 0.1f);
+            constexpr float size = 1.2f;
+
             glm::mat4 matrix = glm::mat4(1.0f);
-            matrix = glm::translate(matrix, position);
+            matrix = glm::translate(matrix, position + offset);
             matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
             matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
             matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix = glm::scale(matrix, glm::vec3(scale + 0.04f, scale + 0.04f, scale + 0.04f));
-
+            matrix = glm::scale(matrix, glm::vec3(scale + size, scale + size, scale + size));
+    
             shader->set_uniform_matrix("u_model_matrix", matrix);
 
             glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);

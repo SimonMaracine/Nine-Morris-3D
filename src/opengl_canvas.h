@@ -30,11 +30,11 @@ public:
     std::shared_ptr<VertexArray> create_entity_vertex_buffer(model::Mesh mesh,
                                                              entt::entity entity);
 
-    void build_board();
+    void build_board(model::Mesh mesh);
     void build_camera();
     void build_skybox();
-    void build_box();
-    void build_piece(const glm::vec3& position);
+    void build_piece(model::Mesh mesh, std::shared_ptr<Texture> diffuse_texture,
+                     const glm::vec3& position);
     void build_directional_light();
 
     int width = 0, height = 0;
@@ -57,7 +57,6 @@ public:
     entt::entity board = entt::null;
     entt::entity camera = entt::null;
     entt::entity skybox = entt::null;
-    entt::entity box = entt::null;
     entt::entity piece = entt::null;
     entt::entity directional_light = entt::null;
 

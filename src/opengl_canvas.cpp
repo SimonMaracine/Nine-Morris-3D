@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <string.h>
+#include <utility>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -140,15 +141,21 @@ void OpenGLCanvas::start_program() {
     auto [version_major, version_minor] = debug_opengl::get_version();
     assert(version_major == 4 && version_minor >= 3);
 
-    build_board();
+    std::tuple<model::Mesh, model::Mesh> meshes =
+            model::load_models("data/models/board.obj");
+
+    std::shared_ptr<Texture> white_piece_diffuse =
+        Texture::create("data/textures/white_piece.png", Texture::Type::Diffuse);
+
+    build_board(std::get<0>(meshes));
     build_camera();
     build_skybox();
     // build_box();
 
-    build_piece(glm::vec3(0.0f, 1.4f, 0.0f));
-    build_piece(glm::vec3(2.0f, 1.4f, 0.0f));
-    build_piece(glm::vec3(2.0f, 1.4f, 1.3f));
-    build_piece(glm::vec3(-1.2f, 1.4f, -1.1f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, 0.03f, 1.0f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, 0.03f, 2.0f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(2.0f, 0.03f, 2.7f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, 0.03f, 3.0f));
 
     build_directional_light();
 
@@ -255,17 +262,15 @@ static void update_game(void* data) {
     canvas->redraw();
 }
 
-void OpenGLCanvas::build_board() {
+void OpenGLCanvas::build_board(model::Mesh mesh) {
     board = registry.create();
 
-    model::Mesh mesh = model::load_model("data/models/board.obj");
-
     std::shared_ptr<Texture> diffuse_texture =
-        Texture::create("data/textures/board_texture.png", Texture::Type::Diffuse);
+        Texture::create("data/textures/board.png", Texture::Type::Diffuse);
 
     std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, board);
 
-    registry.emplace<TransformComponent>(board);
+    registry.emplace<TransformComponent>(board, 20.0f);
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(board, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(board, diffuse_texture);
@@ -315,35 +320,13 @@ void OpenGLCanvas::build_skybox() {
     SPDLOG_DEBUG("Built skybox entity {}", skybox);
 }
 
-void OpenGLCanvas::build_box() {
-    box = registry.create();
-
-    model::Mesh mesh = model::load_model("data/models/box.obj");
-
-    std::shared_ptr<Texture> diffuse_texture =
-        Texture::create("data/textures/box.png", Texture::Type::Diffuse);
-
-    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, box);
-
-    registry.emplace<TransformComponent>(box);
-    registry.emplace<MeshComponent>(box, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(box, storage->basic_shader, glm::vec3(1.0f), 32.0f);
-    registry.emplace<TextureComponent>(box, diffuse_texture);
-
-    SPDLOG_DEBUG("Built box entity {}", box);
-}
-
-void OpenGLCanvas::build_piece(const glm::vec3& position) {
+void OpenGLCanvas::build_piece(model::Mesh mesh, std::shared_ptr<Texture> diffuse_texture,
+                               const glm::vec3& position) {
     piece = registry.create();
-
-    model::Mesh mesh = model::load_model("data/models/piece.obj");
-
-    std::shared_ptr<Texture> diffuse_texture =
-        Texture::create("data/textures/black_piece_texture.png", Texture::Type::Diffuse);
 
     std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, piece);
     
-    registry.emplace<TransformComponent>(piece, position, glm::vec3(0.0f), 0.3f);
+    registry.emplace<TransformComponent>(piece, position, glm::vec3(0.0f), 20.0f);
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(piece, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(piece, diffuse_texture);

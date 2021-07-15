@@ -16,6 +16,7 @@
 struct TransformComponent {
     TransformComponent() = default;
     TransformComponent(const glm::vec3& rotation) : rotation(rotation) {}
+    TransformComponent(float scale) : scale(scale) {}
     TransformComponent(const glm::vec3& position, const glm::vec3& rotation)
             : position(position), rotation(rotation) {}
     TransformComponent(const glm::vec3& position, const glm::vec3& rotation, float scale)

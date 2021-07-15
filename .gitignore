@@ -2,4 +2,7 @@
 /dependencies/source
 /.vscode
 /build
+/data/textures/old
+/data/models/boardold.blend
+/data/models/pieceold.blend
 opengl_log.txt
