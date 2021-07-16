@@ -126,17 +126,19 @@ void cube_map_render_system(entt::registry& registry, entt::entity camera_entity
 void pieces_render_system(entt::registry& registry, entt::entity camera_entity,
                           entt::entity hovered_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
+    auto& camera_transform = registry.get<TransformComponent>(camera_entity);
 
     auto view = registry.view<TransformComponent, MeshComponent,
                               MaterialComponent, TextureComponent, OutlineComponent>();
 
     for (entt::entity entity : view) {
         auto [transform, mesh, material, textures, outline] =
-            view.get<TransformComponent, MeshComponent,
-                     MaterialComponent, TextureComponent,
-                     OutlineComponent>(entity);
+            view.get<TransformComponent, MeshComponent, MaterialComponent,
+                     TextureComponent, OutlineComponent>(entity);
 
         if (hovered_entity == entity) {
+            float outline_size = (camera_transform.position - transform.position).length() * 1.2f;
+
             outline.shader->bind();
             outline.shader->set_uniform_matrix("u_projection_view_matrix",
                                                camera.projection_view_matrix);
@@ -144,7 +146,7 @@ void pieces_render_system(entt::registry& registry, entt::entity camera_entity,
                                      transform.scale, material.shader, mesh.vertex_array,
                                      textures.diffuse_map, material.specular_color,
                                      material.shininess, mesh.index_count,
-                                     outline.outline_color);
+                                     outline.outline_color, outline_size);
         } else {
             material.shader->bind();
             material.shader->set_uniform_matrix("u_projection_view_matrix",

@@ -163,7 +163,8 @@ namespace renderer {
                             const glm::vec3& specular_color,
                             float shininess,
                             GLuint index_count,
-                            const glm::vec3& outline_color) {
+                            const glm::vec3& outline_color,
+                            float outline_size) {
         glStencilFunc(GL_ALWAYS, 1, 0xFF); 
         glStencilMask(0xFF);
 
@@ -195,7 +196,7 @@ namespace renderer {
             storage.outline_shader->bind();
             storage.outline_shader->set_uniform_vec3("u_color", outline_color);
 
-            constexpr float size = 1.7f;
+            const float size = outline_size;
 
             glm::mat4 matrix = glm::mat4(1.0f);
             matrix = glm::translate(matrix, position);

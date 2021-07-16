@@ -64,7 +64,8 @@ namespace renderer {
                             const glm::vec3& specular_color,
                             float shininess,
                             GLuint index_count,
-                            const glm::vec3& outline_color);
+                            const glm::vec3& outline_color,
+                            float outline_size);
 
     void draw_cube_map(const glm::mat4& view_projection_matrix,
                        std::shared_ptr<Shader> shader, std::shared_ptr<VertexArray> array,
