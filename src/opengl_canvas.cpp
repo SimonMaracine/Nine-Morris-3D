@@ -114,28 +114,58 @@ int OpenGLCanvas::handle(int event) {
             return 1;
         case FL_FOCUS:
         case FL_UNFOCUS:
-            // ... Return 1 if you want keyboard events, 0 otherwise
             return 1;
-        case FL_KEYBOARD: {
-            // ... keypress, key is in Fl::event_key(), ascii in Fl::event_text()
-            // ... Return 1 if you understand/use the keyboard event, 0 otherwise...
+        case FL_KEYDOWN: {
             int key = Fl::event_key();
             char keycode = (char) key;
             
-            // switch (keycode) {
-            //     case 'a':
-            //         A_pressed = true;
-            //         break;
-            //     case 'd':
-            //         D_pressed = true;
-            //         break;
-            //     case 'w':
-            //         W_pressed = true;
-            //         break;
-            //     case 's':
-            //         S_pressed = true;
-            //         break;
-            // }
+            switch (keycode) {
+                case 'a':
+                    pressed_A = true;
+                    break;
+                case 'd':
+                    pressed_D = true;
+                    break;
+                case 'w':
+                    pressed_W = true;
+                    break;
+                case 's':
+                    pressed_S = true;
+                    break;
+                case 'r':
+                    pressed_R = true;
+                    break;
+                case 'f':
+                    pressed_F = true;
+                    break;
+            }
+
+            return 1;
+        }
+        case FL_KEYUP: {
+            int key = Fl::event_key();
+            char keycode = (char) key;
+            
+            switch (keycode) {
+                case 'a':
+                    pressed_A = false;
+                    break;
+                case 'd':
+                    pressed_D = false;
+                    break;
+                case 'w':
+                    pressed_W = false;
+                    break;
+                case 's':
+                    pressed_S = false;
+                    break;
+                case 'r':
+                    pressed_R = false;
+                    break;
+                case 'f':
+                    pressed_F = false;
+                    break;
+            }
 
             return 1;
         }
@@ -269,17 +299,14 @@ static void update_game(void* data) {
     camera_system(canvas->registry, { canvas->mouse_x, canvas->mouse_y,
                                       canvas->mouse_wheel, canvas->left_mouse_pressed,
                                       canvas->right_mouse_pressed, canvas->mouse_dt_x,
-                                      canvas->mouse_dt_y/*, canvas->A_pressed,
-                                      canvas->D_pressed, canvas->W_pressed,
-                                      canvas->S_pressed*/ });
+                                      canvas->mouse_dt_y, canvas->pressed_A,
+                                      canvas->pressed_D, canvas->pressed_W,
+                                      canvas->pressed_S, canvas->pressed_R,
+                                      canvas->pressed_F });
     
     canvas->mouse_wheel = 0.0f;
     canvas->mouse_dt_x = 0.0f;
     canvas->mouse_dt_y = 0.0f;
-    // canvas->A_pressed = false;
-    // canvas->D_pressed = false;
-    // canvas->W_pressed = false;
-    // canvas->S_pressed = false;
         
     canvas->redraw();
 }

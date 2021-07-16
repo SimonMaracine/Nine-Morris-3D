@@ -47,10 +47,12 @@ public:
     bool right_mouse_pressed = false;
     float mouse_dt_x = 0;
     float mouse_dt_y = 0;
-    // bool A_pressed = false;
-    // bool D_pressed = false;
-    // bool W_pressed = false;
-    // bool S_pressed = false;
+    bool pressed_A = false;
+    bool pressed_D = false;
+    bool pressed_W = false;
+    bool pressed_S = false;
+    bool pressed_R = false;
+    bool pressed_F = false;
 
     float mouse_sensitivity = 0.13f;
     float scroll_sensitivity = 1.2f;

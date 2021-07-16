@@ -14,10 +14,12 @@ struct InputData {
     bool right_mouse_pressed;
     float mouse_dt_x;
     float mouse_dt_y;
-    // bool A_pressed = false;
-    // bool D_pressed = false;
-    // bool W_pressed = false;
-    // bool S_pressed = false;
+    bool pressed_A = false;
+    bool pressed_D = false;
+    bool pressed_W = false;
+    bool pressed_S = false;
+    bool pressed_R = false;
+    bool pressed_F = false;
 };
 
 void render_system(entt::registry& registry, entt::entity camera_entity) {
@@ -53,25 +55,41 @@ void camera_system(entt::registry& registry, const InputData& input) {
         float& yaw = transform.rotation.y;
         float& zoom = camera.distance_to_point;
 
-        zoom += input.mouse_wheel;
+        const float move_speed = 2.0f;
+        const float zoom_speed = 0.08f * zoom;
 
-        if (zoom < 0.0f) {
-            zoom = 0.0f;
-        } else if (zoom > 70.0f) {
-            zoom = 70.0f;
+        zoom += zoom_speed * input.mouse_wheel;
+        
+        if (input.pressed_R) {
+            zoom -= zoom_speed;
+        } else if (input.pressed_F) {
+            zoom += zoom_speed;
         }
+
+        // Limit zoom
+        zoom = std::max(zoom, 0.0f);
+        zoom = std::min(zoom, 70.0f);
 
         if (input.right_mouse_pressed) {
             pitch -= input.mouse_dt_y;
-            
-            if (pitch > 90.0f) {
-                pitch = 90.0f;
-            } else if (pitch < -90.0f) {
-                pitch = -90.0f;
-            }
-
             camera.angle_around_point -= input.mouse_dt_x;
         }
+
+        if (input.pressed_W) {
+            pitch += move_speed;
+        } else if (input.pressed_S) {
+            pitch -= move_speed;
+        }
+
+        if (input.pressed_A) {
+            camera.angle_around_point -= move_speed;
+        } else if (input.pressed_D) {
+            camera.angle_around_point += move_speed;
+        }
+
+        // Limit pitch
+        pitch = std::min(pitch, 90.0f);
+        pitch = std::max(pitch, -90.0f);
 
         float horizontal_distance =
             zoom * glm::cos(glm::radians(pitch));
