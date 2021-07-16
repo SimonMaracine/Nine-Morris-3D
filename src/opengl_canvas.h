@@ -36,6 +36,7 @@ public:
     void build_piece(const model::Mesh& mesh, std::shared_ptr<Texture> diffuse_texture,
                      const glm::vec3& position);
     void build_directional_light();
+    void build_origin();
 
     int width = 0, height = 0;
 
@@ -46,6 +47,10 @@ public:
     bool right_mouse_pressed = false;
     float mouse_dt_x = 0;
     float mouse_dt_y = 0;
+    // bool A_pressed = false;
+    // bool D_pressed = false;
+    // bool W_pressed = false;
+    // bool S_pressed = false;
 
     float mouse_sensitivity = 0.13f;
     float scroll_sensitivity = 1.2f;
@@ -59,6 +64,7 @@ public:
     entt::entity skybox = entt::null;
     entt::entity piece = entt::null;
     entt::entity directional_light = entt::null;
+    entt::entity origin = entt::null;
 
     entt::entity hovered_entity = entt::null;
 };

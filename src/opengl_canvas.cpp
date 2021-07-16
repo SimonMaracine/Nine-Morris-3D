@@ -50,6 +50,7 @@ void OpenGLCanvas::draw() {
     cube_map_render_system(registry, camera);
     render_system(registry, camera);
     pieces_render_system(registry, camera, hovered_entity);
+    origin_render_system(registry, camera);
 
     if (mouse_x == 0 && mouse_y == 0)
         hovered_entity = entt::null;
@@ -120,7 +121,22 @@ int OpenGLCanvas::handle(int event) {
             // ... Return 1 if you understand/use the keyboard event, 0 otherwise...
             int key = Fl::event_key();
             char keycode = (char) key;
-            // Do something based on keycode
+            
+            // switch (keycode) {
+            //     case 'a':
+            //         A_pressed = true;
+            //         break;
+            //     case 'd':
+            //         D_pressed = true;
+            //         break;
+            //     case 'w':
+            //         W_pressed = true;
+            //         break;
+            //     case 's':
+            //         S_pressed = true;
+            //         break;
+            // }
+
             return 1;
         }
         case FL_MOUSEWHEEL: {
@@ -150,14 +166,14 @@ void OpenGLCanvas::start_program() {
     build_board(std::get<0>(meshes));
     build_camera();
     build_skybox();
-    // build_box();
 
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, 0.03f, 1.0f));
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, 0.03f, 2.0f));
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(2.0f, 0.03f, 2.7f));
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, 0.03f, 3.0f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, 0.15f, 0.0f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, 0.15f, -1.5f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(1.0f, 0.15f, 2.3f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, 0.15f, 2.1f));
 
     build_directional_light();
+    build_origin();
 
     SPDLOG_INFO("Finished initializing program");
 }
@@ -253,12 +269,18 @@ static void update_game(void* data) {
     camera_system(canvas->registry, { canvas->mouse_x, canvas->mouse_y,
                                       canvas->mouse_wheel, canvas->left_mouse_pressed,
                                       canvas->right_mouse_pressed, canvas->mouse_dt_x,
-                                      canvas->mouse_dt_y });
+                                      canvas->mouse_dt_y/*, canvas->A_pressed,
+                                      canvas->D_pressed, canvas->W_pressed,
+                                      canvas->S_pressed*/ });
     
     canvas->mouse_wheel = 0.0f;
     canvas->mouse_dt_x = 0.0f;
     canvas->mouse_dt_y = 0.0f;
-
+    // canvas->A_pressed = false;
+    // canvas->D_pressed = false;
+    // canvas->W_pressed = false;
+    // canvas->S_pressed = false;
+        
     canvas->redraw();
 }
 
@@ -282,7 +304,7 @@ void OpenGLCanvas::build_camera() {
     camera = registry.create();
     registry.emplace<TransformComponent>(camera, glm::vec3(25.0f, 0.0f, 0.0f));
     registry.emplace<CameraComponent>(camera,
-            glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.1f, 1000.0f),
+            glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.08f, 1000.0f),
             glm::vec3(0.0f), 12.0f);
 
     SPDLOG_DEBUG("Built camera entity {}", camera);
@@ -345,4 +367,12 @@ void OpenGLCanvas::build_directional_light() {
     registry.emplace<ShaderComponent>(directional_light, storage->basic_shader);
 
     SPDLOG_DEBUG("Built directional light entity {}", piece);
+}
+
+void OpenGLCanvas::build_origin() {
+    origin = registry.create();
+    registry.emplace<TransformComponent>(origin);
+    registry.emplace<OriginComponent>(origin, storage->origin_shader);
+
+    SPDLOG_DEBUG("Built origin entity {}", origin);   
 }

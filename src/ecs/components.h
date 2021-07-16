@@ -114,3 +114,9 @@ struct ShaderComponent {
 
     std::shared_ptr<Shader> shader;
 };
+
+struct OriginComponent {
+    OriginComponent(std::shared_ptr<Shader> shader) : shader(shader) {}
+
+    std::shared_ptr<Shader> shader;
+};

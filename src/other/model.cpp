@@ -31,9 +31,9 @@ namespace model {
         for (int i = 0; i < 2; i++) {
             const aiNode* node = root_node->mChildren[i];
 
-            if (strcmp(node->mName.C_Str(), "Board_Cube.001") == 0) {
+            if (strcmp(node->mName.C_Str(), "Board_export_Cube") == 0) {
                 board_mesh = scene->mMeshes[node->mMeshes[0]];
-            } else if (strcmp(node->mName.C_Str(), "White_Piece_Cylinder") == 0) {
+            } else if (strcmp(node->mName.C_Str(), "White_Piece_export_Cylinder") == 0) {
                 piece_mesh = scene->mMeshes[node->mMeshes[0]];
             } else {
                 spdlog::critical("Could not find meshes");

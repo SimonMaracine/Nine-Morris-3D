@@ -26,6 +26,10 @@ namespace renderer {
         std::shared_ptr<VertexBuffer> quad_vertex_buffer = nullptr;
 
         std::shared_ptr<Shader> outline_shader = nullptr;
+
+        std::shared_ptr<Shader> origin_shader = nullptr;
+        std::shared_ptr<VertexArray> origin_vertex_array = nullptr;
+        std::shared_ptr<VertexBuffer> origin_vertex_buffer = nullptr;
     };
 
     const Storage* init();
@@ -35,6 +39,7 @@ namespace renderer {
     // void begin(std::shared_ptr<Shader> shader, const glm::mat4& view_projection_matrix);
     // void end();
     void draw_quad();
+    void draw_origin();
     void enable_depth();
     void disable_depth();
     void bind_texture(GLuint texture);

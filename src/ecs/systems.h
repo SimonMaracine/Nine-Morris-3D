@@ -14,6 +14,10 @@ struct InputData {
     bool right_mouse_pressed;
     float mouse_dt_x;
     float mouse_dt_y;
+    // bool A_pressed = false;
+    // bool D_pressed = false;
+    // bool W_pressed = false;
+    // bool S_pressed = false;
 };
 
 void render_system(entt::registry& registry, entt::entity camera_entity) {
@@ -169,5 +173,21 @@ void lighting_system(entt::registry& registry, entt::entity camera_entity) {
         shader.shader->set_uniform_vec3("u_light.specular", light.specular_color);
         
         shader.shader->set_uniform_vec3("u_view_position", camera_transform.position);
+    }
+}
+
+void origin_render_system(entt::registry& registry, entt::entity camera_entity) {
+    auto& camera = registry.get<CameraComponent>(camera_entity);
+
+    auto view = registry.view<TransformComponent, OriginComponent>();
+
+    for (entt::entity entity : view) {
+        auto [transform, origin] = view.get<TransformComponent, OriginComponent>(entity);
+
+        origin.shader->bind();
+        origin.shader->set_uniform_matrix("u_projection_view_matrix",
+                                          camera.projection_view_matrix);
+
+        renderer::draw_origin();
     }
 }
