@@ -282,7 +282,7 @@ static float update_fps_counter() {
     if (elapsed_seconds.count() > 0.25) {
         previous_seconds = current_seconds;
         double fps = (double) frame_count / elapsed_seconds.count();
-        // SPDLOG_DEBUG("{}", fps);
+        SPDLOG_DEBUG("{}", fps);
         frame_count = 0;
     }
     frame_count++;
@@ -302,7 +302,7 @@ static void update_game(void* data) {
                                       canvas->mouse_dt_y, canvas->pressed_A,
                                       canvas->pressed_D, canvas->pressed_W,
                                       canvas->pressed_S, canvas->pressed_R,
-                                      canvas->pressed_F });
+                                      canvas->pressed_F }, dt);
     
     canvas->mouse_wheel = 0.0f;
     canvas->mouse_dt_x = 0.0f;
@@ -398,7 +398,6 @@ void OpenGLCanvas::build_directional_light() {
 
 void OpenGLCanvas::build_origin() {
     origin = registry.create();
-    registry.emplace<TransformComponent>(origin);
     registry.emplace<OriginComponent>(origin, storage->origin_shader);
 
     SPDLOG_DEBUG("Built origin entity {}", origin);   

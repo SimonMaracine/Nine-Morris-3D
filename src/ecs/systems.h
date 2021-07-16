@@ -45,7 +45,7 @@ void render_system(entt::registry& registry, entt::entity camera_entity) {
     }
 }
 
-void camera_system(entt::registry& registry, const InputData& input) {
+void camera_system(entt::registry& registry, const InputData& input, float dt) {
     auto view = registry.view<TransformComponent, CameraComponent>();
 
     for (entt::entity entity : view) {
@@ -67,7 +67,7 @@ void camera_system(entt::registry& registry, const InputData& input) {
         }
 
         // Limit zoom
-        zoom = std::max(zoom, 0.0f);
+        zoom = std::max(zoom, 1.0f);
         zoom = std::min(zoom, 70.0f);
 
         if (input.right_mouse_pressed) {
@@ -199,10 +199,10 @@ void lighting_system(entt::registry& registry, entt::entity camera_entity) {
 void origin_render_system(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
-    auto view = registry.view<TransformComponent, OriginComponent>();
+    auto view = registry.view<OriginComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, origin] = view.get<TransformComponent, OriginComponent>(entity);
+        OriginComponent& origin = view.get<OriginComponent>(entity);
 
         origin.shader->bind();
         origin.shader->set_uniform_matrix("u_projection_view_matrix",
