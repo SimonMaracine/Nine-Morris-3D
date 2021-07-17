@@ -196,10 +196,10 @@ void OpenGLCanvas::start_program() {
     build_camera();
     build_skybox();
 
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, 0.15f, 0.0f));
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, 0.15f, -1.5f));
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(1.0f, 0.15f, 2.3f));
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, 0.15f, 2.1f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, 0.135f, 0.0f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, 0.135f, -1.5f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(1.0f, 0.135f, 2.3f));
+    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, 0.135f, 2.1f));
 
     build_directional_light();
     build_origin();

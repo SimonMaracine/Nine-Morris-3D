@@ -15,7 +15,7 @@ namespace renderer {
     static Storage storage;
 
     const Storage* init() {
-        // glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -33,14 +33,14 @@ namespace renderer {
 
         {
             storage.quad_shader = Shader::create("data/shaders/quad.vert",
-                                                "data/shaders/quad.frag");
+                                                 "data/shaders/quad.frag");
             constexpr float quad_vertices[] = {
                 -1.0f,  1.0f,    0.0f, 1.0f,
                 -1.0f, -1.0f,    0.0f, 0.0f,
-                1.0f,  1.0f,    1.0f, 1.0f,
-                1.0f,  1.0f,    1.0f, 1.0f,
+                 1.0f,  1.0f,    1.0f, 1.0f,
+                 1.0f,  1.0f,    1.0f, 1.0f,
                 -1.0f, -1.0f,    0.0f, 0.0f,
-                1.0f, -1.0f,    1.0f, 0.0f
+                 1.0f, -1.0f,    1.0f, 0.0f
             };
             storage.quad_vertex_buffer = VertexBuffer::create_with_data(quad_vertices,
                                                                         sizeof(quad_vertices));

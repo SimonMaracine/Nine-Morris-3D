@@ -22,6 +22,8 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path,
                                          Texture::Type type) {
     stbi_set_flip_vertically_on_load(1);
 
+    SPDLOG_DEBUG("Loading texture {}...", file_path.c_str());
+
     int width, height, channels;
     stbi_uc* data = stbi_load(file_path.c_str(), &width, &height, &channels, 3);  // TODO make this flexible
 
@@ -86,6 +88,8 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
     stbi_uc* data;
 
     for (int i = 0; i < 6; i++) {
+        SPDLOG_DEBUG("Loading texture {}...", file_paths[i]);
+
         data = stbi_load(file_paths[i], &width, &height, &channels, 3);  // TODO make this flexible
 
         if (!data) {
