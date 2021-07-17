@@ -173,6 +173,12 @@ int OpenGLCanvas::handle(int event) {
             mouse_wheel = Fl::event_dy() * scroll_sensitivity;
             return 1;
         }
+        case FL_HIDE: {
+            if (!closed_program)
+                end_program();
+            closed_program = true;
+            return 1;
+        }
         default:
             return Fl_Gl_Window::handle(event);
     }
@@ -220,7 +226,7 @@ void OpenGLCanvas::reset() {
 }
 
 void OpenGLCanvas::end_program() {
-    // Do ending stuff
+    SPDLOG_INFO("Closing program");
 }
 
 std::shared_ptr<VertexBuffer> OpenGLCanvas::create_ids_buffer(unsigned int vertices_size,
@@ -266,11 +272,12 @@ std::shared_ptr<VertexArray> OpenGLCanvas::create_entity_vertex_buffer(model::Me
 
     return vertex_array;
 }
-
-static float update_fps_counter() {
+        
+static float update_fps_counter(OpenGLCanvas* canvas) {
     using namespace std::chrono;
     using clock = high_resolution_clock;
 
+    static double fps = 0;
     static clock::time_point previous_seconds = clock::now();
     static int frame_count = 0;
 
@@ -280,20 +287,22 @@ static float update_fps_counter() {
 
     if (elapsed_seconds.count() > 0.25) {
         previous_seconds = current_seconds;
-        double fps = (double) frame_count / elapsed_seconds.count();
-        SPDLOG_DEBUG("{}", fps);
+        fps = (double) frame_count / elapsed_seconds.count();
+        // SPDLOG_DEBUG("FPS: {}", fps);
         frame_count = 0;
     }
     frame_count++;
 
-    return (float) elapsed_seconds.count();
+    // SPDLOG_DEBUG("Delta: {}", elapsed_seconds.count() * 1000.0f);
+
+    return elapsed_seconds.count();
 }
 
 static void update_game(void* data) {
     OpenGLCanvas* canvas = (OpenGLCanvas*) data;
 
     static float dt;
-    dt = update_fps_counter();
+    dt = update_fps_counter(canvas);
 
     camera_system(canvas->registry, { canvas->mouse_x, canvas->mouse_y,
                                       canvas->mouse_wheel, canvas->left_mouse_pressed,

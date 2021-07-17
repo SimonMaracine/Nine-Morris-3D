@@ -42,5 +42,6 @@ int main() {
     window->end();
     window->resizable(canvas);
     window->show();
+
     return Fl::run();
 }

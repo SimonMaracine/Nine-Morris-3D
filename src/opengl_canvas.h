@@ -38,8 +38,9 @@ public:
     void build_directional_light();
     void build_origin();
 
-    int width = 0, height = 0;
+    bool closed_program = false;
 
+    int width = 0, height = 0;
     int mouse_x = 0;
     int mouse_y = 0;
     int mouse_wheel = 0;

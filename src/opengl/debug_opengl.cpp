@@ -1,8 +1,8 @@
-#include <stdio.h>
 #include <string>
 #include <utility>
 #include <iostream>
 #include <cassert>
+#include <stdio.h>
 
 #include <glad/glad.h>
 #include <FL/Fl.H>
