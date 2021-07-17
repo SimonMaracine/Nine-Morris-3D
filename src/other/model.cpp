@@ -18,7 +18,7 @@ namespace model {
                                                  aiProcess_ValidateDataStructure);
 
         if (!scene) {
-            spdlog::critical("Could not load models {}", file_path.c_str());
+            spdlog::critical("Could not load model '{}'", file_path.c_str());
             spdlog::critical(importer.GetErrorString());
             std::exit(1);
         }

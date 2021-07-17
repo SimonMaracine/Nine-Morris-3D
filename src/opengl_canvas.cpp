@@ -380,8 +380,7 @@ void OpenGLCanvas::build_piece(const model::Mesh& mesh, std::shared_ptr<Texture>
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(piece, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(piece, diffuse_texture);
-    registry.emplace<OutlineComponent>(piece, storage->outline_shader,
-                                       glm::vec3(1.0f, 0.0f, 0.0f));
+    registry.emplace<OutlineComponent>(piece, storage->outline_shader, glm::vec3(1.0f, 0.0f, 0.0f));
 
     SPDLOG_DEBUG("Built piece entity {}", piece);
 }
