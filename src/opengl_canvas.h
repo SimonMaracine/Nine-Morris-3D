@@ -13,6 +13,22 @@
 #include "opengl/renderer/vertex_buffer.h"
 #include <other/model.h>
 
+struct Input {
+    int mouse_x;
+    int mouse_y;
+    int mouse_wheel;
+    bool left_mouse_pressed;
+    bool right_mouse_pressed;
+    float mouse_dt_x;
+    float mouse_dt_y;
+    bool pressed_A;
+    bool pressed_D;
+    bool pressed_W;
+    bool pressed_S;
+    bool pressed_R;
+    bool pressed_F;
+};
+
 class OpenGLCanvas : public Fl_Gl_Window {
 public:
     OpenGLCanvas(int x, int y, int w, int h, const char* t);
@@ -39,27 +55,28 @@ public:
     void build_origin();
 
     bool closed_program = false;
-
     int width = 0, height = 0;
-    int mouse_x = 0;
-    int mouse_y = 0;
-    int mouse_wheel = 0;
-    bool left_mouse_pressed = false;
-    bool right_mouse_pressed = false;
-    float mouse_dt_x = 0;
-    float mouse_dt_y = 0;
-    bool pressed_A = false;
-    bool pressed_D = false;
-    bool pressed_W = false;
-    bool pressed_S = false;
-    bool pressed_R = false;
-    bool pressed_F = false;
+
+    Input input;
+
+    // int mouse_x = 0;
+    // int mouse_y = 0;
+    // int mouse_wheel = 0;
+    // bool left_mouse_pressed = false;
+    // bool right_mouse_pressed = false;
+    // float mouse_dt_x = 0;
+    // float mouse_dt_y = 0;
+    // bool pressed_A = false;
+    // bool pressed_D = false;
+    // bool pressed_W = false;
+    // bool pressed_S = false;
+    // bool pressed_R = false;
+    // bool pressed_F = false;
 
     float mouse_sensitivity = 0.13f;
     float scroll_sensitivity = 1.2f;
 
     entt::registry registry;
-
     const renderer::Storage* storage = nullptr;
 
     entt::entity board = entt::null;

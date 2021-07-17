@@ -46,17 +46,18 @@ void OpenGLCanvas::draw() {
 
     storage->framebuffer->clear_red_integer_attachment(1, -1);
 
-    lighting_system(registry, camera);
     cube_map_render_system(registry, camera);
+    lighting_system(registry, camera);
     render_system(registry, camera);
     pieces_render_system(registry, camera, hovered_entity);
     origin_render_system(registry, camera);
+    lighting_render_system(registry, camera);
 
-    if (mouse_x == 0 && mouse_y == 0)
+    if (input.mouse_x == 0 && input.mouse_y == 0)
         hovered_entity = entt::null;
     else
         hovered_entity =
-            (entt::entity) storage->framebuffer->read_pixel(1, mouse_x, height - mouse_y);
+            (entt::entity) storage->framebuffer->read_pixel(1, input.mouse_x, height - input.mouse_y);
 
     Framebuffer::bind_default();
 
@@ -76,10 +77,10 @@ int OpenGLCanvas::handle(int event) {
             SPDLOG_DEBUG("Mouse down [ {}, {} ]", Fl::event_x(), Fl::event_y());
             switch (Fl::event_button()) {
                 case FL_LEFT_MOUSE:
-                    left_mouse_pressed = true;
+                    input.left_mouse_pressed = true;
                     break;
                 case FL_RIGHT_MOUSE:
-                    right_mouse_pressed = true;
+                    input.right_mouse_pressed = true;
                     break;
             }
             return 1;
@@ -87,28 +88,28 @@ int OpenGLCanvas::handle(int event) {
             int x = Fl::event_x();
             int y = Fl::event_y();
 
-            mouse_dt_x = (x - mouse_x) * mouse_sensitivity;
-            mouse_dt_y = (mouse_y - y) * mouse_sensitivity;
+            input.mouse_dt_x = (x - input.mouse_x) * mouse_sensitivity;
+            input.mouse_dt_y = (input.mouse_y - y) * mouse_sensitivity;
 
-            mouse_x = x;
-            mouse_y = y;
+            input.mouse_x = x;
+            input.mouse_y = y;
             return 1;
         }
         case FL_RELEASE:
             switch (Fl::event_button()) {
                 case FL_LEFT_MOUSE:
-                    left_mouse_pressed = false;
+                    input.left_mouse_pressed = false;
                     break;
                 case FL_RIGHT_MOUSE:
-                    right_mouse_pressed = false;
+                    input.right_mouse_pressed = false;
                     break;
             }
             return 1;
         case FL_ENTER:
             return 1;
         case FL_MOVE:
-            mouse_x = Fl::event_x();
-            mouse_y = Fl::event_y();
+            input.mouse_x = Fl::event_x();
+            input.mouse_y = Fl::event_y();
             return 1;
         case FL_LEAVE:
             return 1;
@@ -121,22 +122,22 @@ int OpenGLCanvas::handle(int event) {
             
             switch (keycode) {
                 case 'a':
-                    pressed_A = true;
+                    input.pressed_A = true;
                     break;
                 case 'd':
-                    pressed_D = true;
+                    input.pressed_D = true;
                     break;
                 case 'w':
-                    pressed_W = true;
+                    input.pressed_W = true;
                     break;
                 case 's':
-                    pressed_S = true;
+                    input.pressed_S = true;
                     break;
                 case 'r':
-                    pressed_R = true;
+                    input.pressed_R = true;
                     break;
                 case 'f':
-                    pressed_F = true;
+                    input.pressed_F = true;
                     break;
             }
 
@@ -148,29 +149,29 @@ int OpenGLCanvas::handle(int event) {
             
             switch (keycode) {
                 case 'a':
-                    pressed_A = false;
+                    input.pressed_A = false;
                     break;
                 case 'd':
-                    pressed_D = false;
+                    input.pressed_D = false;
                     break;
                 case 'w':
-                    pressed_W = false;
+                    input.pressed_W = false;
                     break;
                 case 's':
-                    pressed_S = false;
+                    input.pressed_S = false;
                     break;
                 case 'r':
-                    pressed_R = false;
+                    input.pressed_R = false;
                     break;
                 case 'f':
-                    pressed_F = false;
+                    input.pressed_F = false;
                     break;
             }
 
             return 1;
         }
         case FL_MOUSEWHEEL: {
-            mouse_wheel = Fl::event_dy() * scroll_sensitivity;
+            input.mouse_wheel = Fl::event_dy() * scroll_sensitivity;
             return 1;
         }
         case FL_HIDE: {
@@ -192,11 +193,9 @@ void OpenGLCanvas::start_program() {
     auto [version_major, version_minor] = debug_opengl::get_version();
     assert(version_major == 4 && version_minor >= 3);
 
-    std::tuple<model::Mesh, model::Mesh> meshes =
-            model::load_models("data/models/board.obj");
+    std::tuple<model::Mesh, model::Mesh> meshes = model::load_models("data/models/board.obj");
 
-    std::shared_ptr<Texture> white_piece_diffuse =
-        Texture::create("data/textures/white_piece.png", Texture::Type::Diffuse);
+    std::shared_ptr<Texture> white_piece_diffuse = Texture::create("data/textures/white_piece.png");
 
     build_board(std::get<0>(meshes));
     build_camera();
@@ -304,17 +303,12 @@ static void update_game(void* data) {
     static float dt;
     dt = update_fps_counter(canvas);
 
-    camera_system(canvas->registry, { canvas->mouse_x, canvas->mouse_y,
-                                      canvas->mouse_wheel, canvas->left_mouse_pressed,
-                                      canvas->right_mouse_pressed, canvas->mouse_dt_x,
-                                      canvas->mouse_dt_y, canvas->pressed_A,
-                                      canvas->pressed_D, canvas->pressed_W,
-                                      canvas->pressed_S, canvas->pressed_R,
-                                      canvas->pressed_F }, dt);
+    camera_system(canvas->registry, canvas->input, dt);
+    // lighting_move_system(canvas->registry, canvas->input, dt);
     
-    canvas->mouse_wheel = 0.0f;
-    canvas->mouse_dt_x = 0.0f;
-    canvas->mouse_dt_y = 0.0f;
+    canvas->input.mouse_wheel = 0.0f;
+    canvas->input.mouse_dt_x = 0.0f;
+    canvas->input.mouse_dt_y = 0.0f;
         
     canvas->redraw();
 }
@@ -322,8 +316,7 @@ static void update_game(void* data) {
 void OpenGLCanvas::build_board(const model::Mesh& mesh) {
     board = registry.create();
 
-    std::shared_ptr<Texture> diffuse_texture =
-        Texture::create("data/textures/board.png", Texture::Type::Diffuse);
+    std::shared_ptr<Texture> diffuse_texture = Texture::create("data/textures/board.png");
 
     std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, board);
 
@@ -395,11 +388,12 @@ void OpenGLCanvas::build_piece(const model::Mesh& mesh, std::shared_ptr<Texture>
 
 void OpenGLCanvas::build_directional_light() {
     directional_light = registry.create();
-    registry.emplace<TransformComponent>(directional_light, glm::vec3(10.0f, 20.0f, -15.0f),
+    registry.emplace<TransformComponent>(directional_light, glm::vec3(10.0f, 15.0f, -15.0f),
                                          glm::vec3(0.0f));
     registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f),
                                      glm::vec3(1.0f));
     registry.emplace<ShaderComponent>(directional_light, storage->basic_shader);
+    registry.emplace<LightMeshComponent>(directional_light, storage->light_shader);
 
     SPDLOG_DEBUG("Built directional light entity {}", piece);
 }

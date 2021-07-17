@@ -8,20 +8,15 @@
 
 class Texture {
 public:
-    enum class Type {
-        Diffuse, Specular
-    };
-
-    Texture(GLuint texture, Type type);
+    Texture(GLuint texture);
     ~Texture();
 
-    static std::shared_ptr<Texture> create(const std::string& file_path, Type type);
+    static std::shared_ptr<Texture> create(const std::string& file_path);
 
     void bind(GLenum slot) const;
     static void unbind();
 private:
     GLuint texture;
-    Type type;
 };
 
 class Texture3D {

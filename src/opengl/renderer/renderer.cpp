@@ -15,6 +15,8 @@ namespace renderer {
     static Storage storage;
 
     const Storage* init() {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
@@ -27,7 +29,7 @@ namespace renderer {
         Specification specification;
         specification.width = 1024;
         specification.height = 576;
-        specification.attachments = { TextureFormat::RGB8, TextureFormat::RedInteger,
+        specification.attachments = { TextureFormat::RGBA8, TextureFormat::RedInteger,
                                       TextureFormat::Depth24Stencil8 };
         storage.framebuffer = Framebuffer::create(specification);
 
@@ -76,6 +78,27 @@ namespace renderer {
             storage.origin_vertex_array->add_buffer(storage.origin_vertex_buffer, layout);
         }
 
+        {
+            storage.light_shader = Shader::create("data/shaders/light.vert",
+                                                  "data/shaders/light.frag");
+            constexpr float light_vertices[] = {
+                -1.0f,  1.0f,    0.0f, 1.0f,
+                -1.0f, -1.0f,    0.0f, 0.0f,
+                 1.0f,  1.0f,    1.0f, 1.0f,
+                 1.0f,  1.0f,    1.0f, 1.0f,
+                -1.0f, -1.0f,    0.0f, 0.0f,
+                 1.0f, -1.0f,    1.0f, 0.0f
+            };
+            storage.light_vertex_buffer = VertexBuffer::create_with_data(light_vertices,
+                                                                         sizeof(light_vertices));
+            BufferLayout layout;
+            layout.add(0, BufferLayout::Type::Float, 2);
+            layout.add(1, BufferLayout::Type::Float, 2);
+            storage.light_vertex_array = VertexArray::create();
+            storage.light_vertex_array->add_buffer(storage.light_vertex_buffer, layout);
+            storage.light_texture = Texture::create("data/textures/light.png");
+        }
+
         return &storage;
     }
 
@@ -107,6 +130,20 @@ namespace renderer {
     void draw_origin() {
         storage.origin_vertex_array->bind();
         glDrawArrays(GL_LINES, 0, 6);
+    }
+
+    void draw_light(const glm::vec3& position) {
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, position);
+        matrix = glm::scale(matrix, glm::vec3(0.3f, 0.3f, 0.3f));
+
+        storage.light_shader->bind();
+        storage.light_shader->set_uniform_matrix("u_model_matrix", matrix);
+        storage.light_shader->set_uniform_int("u_texture", 0);
+
+        storage.light_vertex_array->bind();
+        storage.light_texture->bind(0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
     void enable_depth() {

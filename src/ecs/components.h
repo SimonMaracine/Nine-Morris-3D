@@ -120,3 +120,9 @@ struct OriginComponent {
 
     std::shared_ptr<Shader> shader;
 };
+
+struct LightMeshComponent {
+    LightMeshComponent(std::shared_ptr<Shader> shader) : shader(shader) {}
+
+    std::shared_ptr<Shader> shader;
+};

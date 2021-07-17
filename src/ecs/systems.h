@@ -6,22 +6,6 @@
 #include "opengl/renderer/renderer.h"
 #include "other/logging.h"
 
-struct InputData {
-    int mouse_x;
-    int mouse_y;
-    int mouse_wheel;
-    bool left_mouse_pressed;
-    bool right_mouse_pressed;
-    float mouse_dt_x;
-    float mouse_dt_y;
-    bool pressed_A;
-    bool pressed_D;
-    bool pressed_W;
-    bool pressed_S;
-    bool pressed_R;
-    bool pressed_F;
-};
-
 void render_system(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
@@ -45,7 +29,7 @@ void render_system(entt::registry& registry, entt::entity camera_entity) {
     }
 }
 
-void camera_system(entt::registry& registry, const InputData& input, float dt) {
+void camera_system(entt::registry& registry, const Input& input, float dt) {
     auto view = registry.view<TransformComponent, CameraComponent>();
 
     for (entt::entity entity : view) {
@@ -193,6 +177,42 @@ void lighting_system(entt::registry& registry, entt::entity camera_entity) {
         shader.shader->set_uniform_vec3("u_light.specular", light.specular_color);
         
         shader.shader->set_uniform_vec3("u_view_position", camera_transform.position);
+    }
+}
+
+void lighting_render_system(entt::registry& registry, entt::entity camera_entity) {
+    auto& camera = registry.get<CameraComponent>(camera_entity);
+
+    auto view = registry.view<TransformComponent, LightMeshComponent>();
+
+    for (entt::entity entity : view) {
+        auto [transform, light] = view.get<TransformComponent, LightMeshComponent>(entity);
+
+        light.shader->bind();
+        light.shader->set_uniform_matrix("u_projection_matrix", camera.projection_matrix);
+        light.shader->set_uniform_matrix("u_view_matrix", camera.view_matrix);
+
+        renderer::draw_light(transform.position);
+    }
+}
+
+void lighting_move_system(entt::registry& registry, const Input& input, float dt) {
+    auto view = registry.view<TransformComponent, LightMeshComponent>();
+
+    for (entt::entity entity : view) {
+        auto& transform = view.get<TransformComponent>(entity);
+
+        if (input.pressed_W) {
+            transform.position.z += 0.2f;
+        } else if (input.pressed_S) {
+            transform.position.z -= 0.2f;
+        }
+
+        if (input.pressed_A) {
+            transform.position.x += 0.2f;
+        } else if (input.pressed_D) {
+            transform.position.x -= 0.2f;
+        }
     }
 }
 

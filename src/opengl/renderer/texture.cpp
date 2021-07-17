@@ -7,8 +7,8 @@
 #include "opengl/renderer/texture.h"
 #include "other/logging.h"
 
-Texture::Texture(GLuint texture, Type type)
-        : texture(texture), type(type) {
+Texture::Texture(GLuint texture)
+        : texture(texture) {
     SPDLOG_DEBUG("Created texture {}", texture);
 }
 
@@ -18,14 +18,13 @@ Texture::~Texture() {
     SPDLOG_DEBUG("Deleted texture {}", texture);
 }
 
-std::shared_ptr<Texture> Texture::create(const std::string& file_path,
-                                         Texture::Type type) {
+std::shared_ptr<Texture> Texture::create(const std::string& file_path) {
     stbi_set_flip_vertically_on_load(1);
 
-    SPDLOG_DEBUG("Loading texture {}...", file_path.c_str());
+    SPDLOG_DEBUG("Loading texture '{}'...", file_path.c_str());
 
     int width, height, channels;
-    stbi_uc* data = stbi_load(file_path.c_str(), &width, &height, &channels, 3);  // TODO make this flexible
+    stbi_uc* data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
 
     if (!data) {
         spdlog::critical("Could not load texture '{}'", file_path.c_str());
@@ -41,15 +40,24 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, width, height);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB,
-                    GL_UNSIGNED_BYTE, data);
+    if (channels == 3) {
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, width, height);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB,
+                        GL_UNSIGNED_BYTE, data);
+    } else if (channels == 4) {
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA,
+                        GL_UNSIGNED_BYTE, data);
+    } else {
+        spdlog::critical("Texture has {} channels", channels);
+        std::exit(1);
+    }
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
     stbi_image_free(data);
 
-    return std::make_shared<Texture>(texture, type);
+    return std::make_shared<Texture>(texture);
 }
 
 void Texture::bind(GLenum slot) const {
@@ -88,7 +96,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
     stbi_uc* data;
 
     for (int i = 0; i < 6; i++) {
-        SPDLOG_DEBUG("Loading texture {}...", file_paths[i]);
+        SPDLOG_DEBUG("Loading texture '{}'...", file_paths[i]);
 
         data = stbi_load(file_paths[i], &width, &height, &channels, 3);  // TODO make this flexible
 

@@ -30,6 +30,11 @@ namespace renderer {
         std::shared_ptr<Shader> origin_shader = nullptr;
         std::shared_ptr<VertexArray> origin_vertex_array = nullptr;
         std::shared_ptr<VertexBuffer> origin_vertex_buffer = nullptr;
+
+        std::shared_ptr<Shader> light_shader = nullptr;
+        std::shared_ptr<VertexArray> light_vertex_array = nullptr;
+        std::shared_ptr<VertexBuffer> light_vertex_buffer = nullptr;
+        std::shared_ptr<Texture> light_texture = nullptr;
     };
 
     const Storage* init();
@@ -40,6 +45,7 @@ namespace renderer {
     // void end();
     void draw_quad();
     void draw_origin();
+    void draw_light(const glm::vec3& position);
     void enable_depth();
     void disable_depth();
     void bind_texture(GLuint texture);
