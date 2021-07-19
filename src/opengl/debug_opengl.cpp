@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #include <glad/glad.h>
-#include <FL/Fl.H>
+// #include <FL/Fl.H>
 #include <assimp/version.h>
 #include <glm/glm.hpp>
 #include <spdlog/version.h>
@@ -147,12 +147,12 @@ namespace debug_opengl {
             sprintf(line, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
             output.append(line);
         }
-        {
-            char line[50];
-            const char* version = parse_version(Fl::api_version()).c_str();
-            sprintf(line, "FLTK version: %s\n", version);
-            output.append(line);
-        }
+        // {
+        //     char line[50];
+        //     const char* version = parse_version(Fl::api_version()).c_str();
+        //     sprintf(line, "FLTK version: %s\n", version);
+        //     output.append(line);
+        // }
         {
             char line[50];
             sprintf(line, "Assimp version: %d.%d.%d\n", aiGetVersionMajor(),
