@@ -27,6 +27,10 @@ struct Input {
     bool pressed_S;
     bool pressed_R;
     bool pressed_F;
+    bool pressed_left;
+    bool pressed_right;
+    bool pressed_up;
+    bool pressed_down;
 };
 
 class OpenGLCanvas : public Fl_Gl_Window {

@@ -2,6 +2,7 @@
 /dependencies/source
 /.vscode
 /build
+/build-release
 /data/textures/old
 /data/models/boardold.blend
 /data/models/pieceold.blend

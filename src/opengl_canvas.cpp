@@ -2,8 +2,8 @@
 #include <chrono>
 #include <memory>
 #include <vector>
-#include <string.h>
 #include <utility>
+#include <string.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -49,7 +49,7 @@ void OpenGLCanvas::draw() {
     cube_map_render_system(registry, camera);
     lighting_system(registry, camera);
     render_system(registry, camera);
-    pieces_render_system(registry, camera, hovered_entity);
+    with_outline_render_system(registry, camera, hovered_entity);
     origin_render_system(registry, camera);
     lighting_render_system(registry, camera);
 
@@ -139,6 +139,18 @@ int OpenGLCanvas::handle(int event) {
                 case 'f':
                     input.pressed_F = true;
                     break;
+                case 'Q':
+                    input.pressed_left = true;
+                    break;
+                case 'S':
+                    input.pressed_right = true;
+                    break;
+                case 'R':
+                    input.pressed_up = true;
+                    break;
+                case 'T':
+                    input.pressed_down = true;
+                    break;
             }
 
             return 1;
@@ -165,6 +177,18 @@ int OpenGLCanvas::handle(int event) {
                     break;
                 case 'f':
                     input.pressed_F = false;
+                    break;
+                case 'Q':
+                    input.pressed_left = false;
+                    break;
+                case 'S':
+                    input.pressed_right = false;
+                    break;
+                case 'R':
+                    input.pressed_up = false;
+                    break;
+                case 'T':
+                    input.pressed_down = false;
                     break;
             }
 
@@ -287,7 +311,7 @@ static float update_fps_counter(OpenGLCanvas* canvas) {
     if (elapsed_seconds.count() > 0.25) {
         previous_seconds = current_seconds;
         fps = (double) frame_count / elapsed_seconds.count();
-        // SPDLOG_DEBUG("FPS: {}", fps);
+        spdlog::debug("FPS: {}", fps);
         frame_count = 0;
     }
     frame_count++;
@@ -304,7 +328,7 @@ static void update_game(void* data) {
     dt = update_fps_counter(canvas);
 
     camera_system(canvas->registry, canvas->input, dt);
-    // lighting_move_system(canvas->registry, canvas->input, dt);
+    lighting_move_system(canvas->registry, canvas->input, dt);
     
     canvas->input.mouse_wheel = 0.0f;
     canvas->input.mouse_dt_x = 0.0f;

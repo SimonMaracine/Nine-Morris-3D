@@ -27,6 +27,9 @@ void BufferLayout::add(GLuint index, Type type, GLint size) {
         case Type::Int:
             gl_type = GL_INT;
             break;
+        default:
+            spdlog::critical("Unrecognized type");
+            std::exit(1);
     }
 
     elements.push_back({ index, gl_type, size });
