@@ -2,7 +2,9 @@
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
+#include <GLFW/glfw3.h>
 
+#include "application/input.h"
 #include "opengl/renderer/renderer.h"
 #include "other/logging.h"
 
@@ -29,7 +31,7 @@ void render_system(entt::registry& registry, entt::entity camera_entity) {
     }
 }
 
-void camera_system(entt::registry& registry, const Input& input, float dt) {
+void camera_system(entt::registry& registry, float mouse_wheel, float dx, float dy, float dt) {
     auto view = registry.view<TransformComponent, CameraComponent>();
 
     for (entt::entity entity : view) {
@@ -39,14 +41,14 @@ void camera_system(entt::registry& registry, const Input& input, float dt) {
         float& yaw = transform.rotation.y;
         float& zoom = camera.distance_to_point;
 
-        const float move_speed = 20.0f;  // 2.0f;
-        const float zoom_speed = 0.8f * zoom;  // 0.08f
+        const float move_speed = 12.0f;
+        const float zoom_speed = 0.4f * zoom;
 
-        zoom += zoom_speed * input.mouse_wheel * dt;
+        zoom -= zoom_speed * mouse_wheel * 0.9f * dt;
         
-        if (input.pressed_R) {
+        if (input::is_key_pressed(GLFW_KEY_R)) {
             zoom -= zoom_speed * dt;
-        } else if (input.pressed_F) {
+        } else if (input::is_key_pressed(GLFW_KEY_F)) {
             zoom += zoom_speed * dt;
         }
 
@@ -54,20 +56,20 @@ void camera_system(entt::registry& registry, const Input& input, float dt) {
         zoom = std::max(zoom, 1.0f);
         zoom = std::min(zoom, 70.0f);
 
-        if (input.right_mouse_pressed) {
-            pitch -= move_speed * 0.5f * input.mouse_dt_y * dt;
-            camera.angle_around_point -= move_speed * 0.5f * input.mouse_dt_x * dt;
+        if (input::is_mouse_button_pressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+            pitch -= move_speed * 0.3f * dy * dt;
+            camera.angle_around_point += move_speed * 0.3f * dx * dt;
         }
 
-        if (input.pressed_W) {
+        if (input::is_key_pressed(GLFW_KEY_W)) {
             pitch += move_speed * dt;
-        } else if (input.pressed_S) {
+        } else if (input::is_key_pressed(GLFW_KEY_S)) {
             pitch -= move_speed * dt;
         }
 
-        if (input.pressed_A) {
+        if (input::is_key_pressed(GLFW_KEY_A)) {
             camera.angle_around_point -= move_speed * dt;
-        } else if (input.pressed_D) {
+        } else if (input::is_key_pressed(GLFW_KEY_D)) {
             camera.angle_around_point += move_speed * dt;
         }
 
@@ -196,21 +198,21 @@ void lighting_render_system(entt::registry& registry, entt::entity camera_entity
     }
 }
 
-void lighting_move_system(entt::registry& registry, const Input& input, float dt) {
+void lighting_move_system(entt::registry& registry, float dt) {
     auto view = registry.view<TransformComponent, LightMeshComponent>();
 
     for (entt::entity entity : view) {
         auto& transform = view.get<TransformComponent>(entity);
 
-        if (input.pressed_up) {
+        if (input::is_key_pressed(GLFW_KEY_UP)) {
             transform.position.z += 0.2f;
-        } else if (input.pressed_down) {
+        } else if (input::is_key_pressed(GLFW_KEY_DOWN)) {
             transform.position.z -= 0.2f;
         }
 
-        if (input.pressed_left) {
+        if (input::is_key_pressed(GLFW_KEY_LEFT)) {
             transform.position.x += 0.2f;
-        } else if (input.pressed_right) {
+        } else if (input::is_key_pressed(GLFW_KEY_RIGHT)) {
             transform.position.x -= 0.2f;
         }
     }

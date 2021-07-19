@@ -38,6 +38,7 @@ namespace renderer {
     };
 
     const Storage* init();
+    void terminate();
     void set_viewport(GLint width, GLint height);
     void set_clear_color(GLfloat red, GLfloat green, GLfloat blue);
     void clear(int buffers);
