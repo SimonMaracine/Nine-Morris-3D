@@ -12,7 +12,7 @@
 #include "other/logging.h"
 
 namespace model {
-    std::tuple<Mesh, Mesh> load_models(const std::string& file_path) {
+    std::tuple<Mesh, Mesh, Mesh> load_models(const std::string& file_path) {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(file_path,
                                                  aiProcess_ValidateDataStructure);
@@ -27,25 +27,28 @@ namespace model {
         
         const aiMesh* board_mesh;
         const aiMesh* piece_mesh;
+        const aiMesh* node_mesh;
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             const aiNode* node = root_node->mChildren[i];
 
             if (strcmp(node->mName.C_Str(), "Board_export_Cube") == 0) {
                 board_mesh = scene->mMeshes[node->mMeshes[0]];
             } else if (strcmp(node->mName.C_Str(), "White_Piece_export_Cylinder") == 0) {
                 piece_mesh = scene->mMeshes[node->mMeshes[0]];
+            } else if (strcmp(node->mName.C_Str(), "Node_Cylinder2") == 0) {
+                node_mesh = scene->mMeshes[node->mMeshes[0]];
             } else {
                 spdlog::critical("Could not find meshes");
                 std::exit(1);
             }
         }
 
-        const aiMesh* meshes[2] = { board_mesh, piece_mesh };
+        const aiMesh* meshes[3] = { board_mesh, piece_mesh, node_mesh };
 
-        Mesh board, piece;
+        Mesh board, piece, node;
 
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j < 3; j++) {
             std::vector<Vertex> vertices;
             std::vector<unsigned int> indices;
 
@@ -86,9 +89,11 @@ namespace model {
                 case 1:
                     piece = { Piece, vertices, indices };
                     break;
+                case 2:
+                    node = { Node, vertices, indices };
             }
         }
 
-        return std::make_tuple(board, piece);
+        return std::make_tuple(board, piece, node);
     }
 }

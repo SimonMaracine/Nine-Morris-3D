@@ -233,3 +233,51 @@ void origin_render_system(entt::registry& registry, entt::entity camera_entity) 
         renderer::draw_origin();
     }
 }
+
+void node_render_system(entt::registry& registry, entt::entity camera_entity,
+                        entt::entity hovered_entity) {
+    auto& camera = registry.get<CameraComponent>(camera_entity);
+
+    auto view = registry.view<TransformComponent, MeshComponent, NodeMaterialComponent>();
+
+    for (entt::entity entity : view) {
+        auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent,
+                                                    NodeMaterialComponent>(entity);
+
+        material.shader->bind();
+        material.shader->set_uniform_matrix("u_projection_view_matrix",
+                                            camera.projection_view_matrix);
+
+        if (hovered_entity == entity) {
+            renderer::draw_node(transform.position, transform.scale,
+                                material.shader, mesh.vertex_array,
+                                glm::vec4(0.7f, 0.7f, 0.7f, 1.0f),
+                                mesh.index_count);
+        } else {
+            renderer::draw_node(transform.position, transform.scale,
+                                material.shader, mesh.vertex_array,
+                                glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
+                                mesh.index_count);   
+        }
+    }
+}
+
+// void node_move_system(entt::registry& registry, float dt) {
+//     auto view = registry.view<TransformComponent, NodeMaterialComponent>();
+
+//     for (entt::entity entity : view) {
+//         auto& transform = view.get<TransformComponent>(entity);
+
+//         if (input::is_key_pressed(GLFW_KEY_UP)) {
+//             transform.position.z += 0.01f;
+//         } else if (input::is_key_pressed(GLFW_KEY_DOWN)) {
+//             transform.position.z -= 0.01f;
+//         }
+
+//         if (input::is_key_pressed(GLFW_KEY_LEFT)) {
+//             transform.position.x += 0.01f;
+//         } else if (input::is_key_pressed(GLFW_KEY_RIGHT)) {
+//             transform.position.x -= 0.01f;
+//         }
+//     }
+// }

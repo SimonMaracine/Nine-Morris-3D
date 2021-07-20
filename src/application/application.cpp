@@ -187,6 +187,7 @@ void Application::draw() {
     lighting_system(registry, camera);
     render_system(registry, camera);
     with_outline_render_system(registry, camera, hovered_entity);
+    node_render_system(registry, camera, hovered_entity);
     origin_render_system(registry, camera);
     lighting_render_system(registry, camera);
 
@@ -218,7 +219,8 @@ void Application::start() {
     auto [version_major, version_minor] = debug_opengl::get_version();
     assert(version_major == 4 && version_minor >= 3);
 
-    std::tuple<model::Mesh, model::Mesh> meshes = model::load_models("data/models/board.obj");
+    using namespace model;
+    std::tuple<Mesh, Mesh, Mesh> meshes = load_models("data/models/board.obj");
 
     std::shared_ptr<Texture> white_piece_diffuse = Texture::create("data/textures/white_piece.png");
 
@@ -226,10 +228,14 @@ void Application::start() {
     build_camera();
     build_skybox();
 
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, 0.135f, 0.0f));
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, 0.135f, -1.5f));
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(1.0f, 0.135f, 2.3f));
-    build_piece(std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, 0.135f, 2.1f));
+    build_piece(0, std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, 0.135f, 0.0f));
+    build_piece(1, std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, 0.135f, -1.5f));
+    build_piece(2, std::get<1>(meshes), white_piece_diffuse, glm::vec3(1.0f, 0.135f, 2.3f));
+    build_piece(3, std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, 0.135f, 2.1f));
+
+    for (int i = 0; i < 24; i++) {
+        build_node(0, std::get<2>(meshes), node_positions[i]);
+    }
 
     build_directional_light();
     build_origin();
@@ -243,7 +249,7 @@ void Application::end() {
 }
 
 float Application::update_fps_counter() {
-    static double fps = 0;
+    // static double fps = 0.0f;
     static double previous_seconds = glfwGetTime();
     static int frame_count = 0;
 
@@ -253,7 +259,7 @@ float Application::update_fps_counter() {
     if (elapsed_seconds > 0.25) {
         previous_seconds = current_seconds;
         fps = (double) frame_count / elapsed_seconds;
-        spdlog::debug("FPS: {}", fps);
+        // spdlog::debug("FPS: {}", fps);
         frame_count = 0;
     }
     frame_count++;
@@ -298,12 +304,17 @@ void Application::imgui_update(float dt) {
         }
         if (ImGui::BeginMenu("Help")) {
             ImGui::MenuItem("About", nullptr, false);
-            
+
             ImGui::EndMenu();
         }
 
         ImGui::EndMainMenuBar();
     }
+
+    ImGui::Begin("Debug");
+    ImGui::Text("FPS: %f)", fps);
+    ImGui::Text("Frame time: %f", dt);
+    ImGui::End();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -362,7 +373,7 @@ bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& eve
 }
 
 std::shared_ptr<VertexBuffer> Application::create_ids_buffer(unsigned int vertices_size,
-                                                              entt::entity entity) {
+                                                             entt::entity entity) {
     std::vector<int> array;
     array.resize(vertices_size);
     for (unsigned int i = 0; i < array.size(); i++) {
@@ -375,7 +386,7 @@ std::shared_ptr<VertexBuffer> Application::create_ids_buffer(unsigned int vertic
 }
 
 std::shared_ptr<VertexArray> Application::create_entity_vertex_buffer(model::Mesh mesh,
-                                                                       entt::entity entity) {
+                                                                      entt::entity entity) {
     std::shared_ptr<VertexBuffer> vertices =
         VertexBuffer::create_with_data(mesh.vertices.data(),
                                        mesh.vertices.size() * sizeof(model::Vertex));
@@ -462,9 +473,10 @@ void Application::build_skybox() {
     SPDLOG_DEBUG("Built skybox entity {}", skybox);
 }
 
-void Application::build_piece(const model::Mesh& mesh, std::shared_ptr<Texture> diffuse_texture,
-                               const glm::vec3& position) {
-    piece = registry.create();
+void Application::build_piece(int index, const model::Mesh& mesh,
+                              std::shared_ptr<Texture> diffuse_texture, const glm::vec3& position) {
+    pieces[index] = registry.create();
+    entt::entity piece = pieces[index];
 
     std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, piece);
     
@@ -472,7 +484,8 @@ void Application::build_piece(const model::Mesh& mesh, std::shared_ptr<Texture> 
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(piece, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(piece, diffuse_texture);
-    registry.emplace<OutlineComponent>(piece, storage->outline_shader, glm::vec3(1.0f, 0.0f, 0.0f));
+    registry.emplace<OutlineComponent>(piece, storage->outline_shader,
+                                       glm::vec3(1.0f, 0.0f, 0.0f));
 
     SPDLOG_DEBUG("Built piece entity {}", piece);
 }
@@ -486,7 +499,7 @@ void Application::build_directional_light() {
     registry.emplace<ShaderComponent>(directional_light, storage->basic_shader);
     registry.emplace<LightMeshComponent>(directional_light, storage->light_shader);
 
-    SPDLOG_DEBUG("Built directional light entity {}", piece);
+    SPDLOG_DEBUG("Built directional light entity {}", directional_light);
 }
 
 void Application::build_origin() {
@@ -494,4 +507,41 @@ void Application::build_origin() {
     registry.emplace<OriginComponent>(origin, storage->origin_shader);
 
     SPDLOG_DEBUG("Built origin entity {}", origin);   
+}
+
+void Application::build_node(int index, const model::Mesh& mesh, const glm::vec3& position) {
+    nodes[index] = registry.create();
+    entt::entity node = nodes[index];
+
+    std::vector<glm::vec3> data;
+    for (const model::Vertex& vertex : mesh.vertices) {
+        data.push_back(vertex.position);
+    }
+    std::shared_ptr<VertexBuffer> vertices =
+        VertexBuffer::create_with_data(data.data(), data.size() * sizeof(glm::vec3));
+
+    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), node);
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+    BufferLayout layout2;
+    layout2.add(1, BufferLayout::Type::Int, 1);
+
+    std::shared_ptr<VertexBuffer> index_buffer =
+        VertexBuffer::create_index(mesh.indices.data(),
+                                   mesh.indices.size() * sizeof(unsigned int));
+
+    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    index_buffer->bind();
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(ids, layout2);
+    vertex_array->hold_index_buffer(index_buffer);
+
+    VertexArray::unbind();
+
+    registry.emplace<TransformComponent>(node, position, glm::vec3(0.0f), 20.0f);
+    registry.emplace<MeshComponent>(node, vertex_array, mesh.indices.size());
+    registry.emplace<NodeMaterialComponent>(node, storage->node_shader);
+
+    SPDLOG_DEBUG("Built node entity {}", node);
 }

@@ -126,3 +126,10 @@ struct LightMeshComponent {
 
     std::shared_ptr<Shader> shader;
 };
+
+struct NodeMaterialComponent {
+    NodeMaterialComponent(std::shared_ptr<Shader> shader)
+            : shader(shader) {}
+
+    std::shared_ptr<Shader> shader;
+};

@@ -26,6 +26,7 @@ namespace renderer {
         std::shared_ptr<VertexBuffer> quad_vertex_buffer = nullptr;
 
         std::shared_ptr<Shader> outline_shader = nullptr;
+        std::shared_ptr<Shader> node_shader = nullptr;
 
         std::shared_ptr<Shader> origin_shader = nullptr;
         std::shared_ptr<VertexArray> origin_vertex_array = nullptr;
@@ -77,4 +78,11 @@ namespace renderer {
     void draw_cube_map(const glm::mat4& view_projection_matrix,
                        std::shared_ptr<Shader> shader, std::shared_ptr<VertexArray> array,
                        std::shared_ptr<Texture3D> texture);
+
+    void draw_node(const glm::vec3& position,
+                   float scale,
+                   std::shared_ptr<Shader> shader,
+                   std::shared_ptr<VertexArray> array,
+                   const glm::vec4& color,
+                   GLuint index_count);
 }

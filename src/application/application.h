@@ -15,7 +15,33 @@
 #include <other/model.h>
 
 struct GLFWwindow;
-class Application;
+
+constexpr glm::vec3 node_positions[24] = {
+    glm::vec3(2.25f, 0.062f, 2.295f),
+    glm::vec3(-0.04f, 0.062f, 2.29f),
+    glm::vec3(-2.26f, 0.062f, 2.27f),
+    glm::vec3(1.6f, 0.062f, 1.65f),
+    glm::vec3(-0.04f, 0.062f, 1.65f),
+    glm::vec3(-1.66f, 0.062f, 1.65f),
+    glm::vec3(0.98f, 0.062f, 1.01f),
+    glm::vec3(-0.03f, 0.062f, 1.01f),
+    glm::vec3(-0.99f, 0.062f, 1.0f),
+    glm::vec3(2.26f, 0.062f, 0.03f),
+    glm::vec3(1.61f, 0.062f, 0.03f),
+    glm::vec3(0.99f, 0.062f, 0.04f),
+    glm::vec3(-0.99f, 0.062f, 0.03f),
+    glm::vec3(-1.66f, 0.062f, 0.03f),
+    glm::vec3(-2.29f, 0.062f, 0.02f),
+    glm::vec3(0.98f, 0.062f, -1.0f),
+    glm::vec3(-0.07f, 0.062f, -1.0f),
+    glm::vec3(-0.98f, 0.062f, -1.0f),
+    glm::vec3(1.6f, 0.062f, -1.62f),
+    glm::vec3(-0.06f, 0.062f, -1.63f),
+    glm::vec3(-1.65f, 0.062f, -1.63f),
+    glm::vec3(2.25f, 0.062f, -2.26f),
+    glm::vec3(-0.06f, 0.062f, -2.26f),
+    glm::vec3(-2.28f, 0.062f, -2.28f)
+};
 
 struct ApplicationData {
     int width, height;
@@ -44,6 +70,8 @@ public:
     GLFWwindow* window;
     ApplicationData data;
 
+    double fps = 0.0f;
+
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
     bool on_mouse_scrolled(events::MouseScrolledEvent& event);
@@ -59,10 +87,11 @@ public:
     void build_board(const model::Mesh& mesh);
     void build_camera();
     void build_skybox();
-    void build_piece(const model::Mesh& mesh, std::shared_ptr<Texture> diffuse_texture,
+    void build_piece(int index, const model::Mesh& mesh, std::shared_ptr<Texture> diffuse_texture,
                      const glm::vec3& position);
     void build_directional_light();
     void build_origin();
+    void build_node(int index, const model::Mesh& mesh, const glm::vec3& position);
 
     // const float mouse_sensitivity = 0.13f;
     // const float scroll_sensitivity = 1.2f;
@@ -78,10 +107,10 @@ public:
     entt::entity board = entt::null;
     entt::entity camera = entt::null;
     entt::entity skybox = entt::null;
-    entt::entity piece = entt::null;
+    entt::entity pieces[4] = { entt::null, entt::null, entt::null, entt::null };
     entt::entity directional_light = entt::null;
     entt::entity origin = entt::null;
+    entt::entity nodes[24];
 
     entt::entity hovered_entity = entt::null;
 };
-
