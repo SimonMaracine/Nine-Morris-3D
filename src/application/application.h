@@ -36,19 +36,25 @@ public:
     void end();
     float update_fps_counter();
 
+    void imgui_start();
+    void imgui_update(float dt);
+    void imgui_end();
+
     bool running = true;
     GLFWwindow* window;
     ApplicationData data;
-
-    std::shared_ptr<VertexBuffer> create_ids_buffer(unsigned int vertices_size,
-                                                    entt::entity entity);
-    std::shared_ptr<VertexArray> create_entity_vertex_buffer(model::Mesh mesh,
-                                                             entt::entity entity);
 
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
     bool on_mouse_scrolled(events::MouseScrolledEvent& event);
     bool on_mouse_moved(events::MouseMovedEvent& event);
+    bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
+    bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
+
+    std::shared_ptr<VertexBuffer> create_ids_buffer(unsigned int vertices_size,
+                                                    entt::entity entity);
+    std::shared_ptr<VertexArray> create_entity_vertex_buffer(model::Mesh mesh,
+                                                             entt::entity entity);
 
     void build_board(const model::Mesh& mesh);
     void build_camera();

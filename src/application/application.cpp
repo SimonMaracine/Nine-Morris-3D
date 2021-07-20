@@ -6,10 +6,13 @@
 #include <vector>
 #include <cassert>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glad/glad.h>
+#include <imgui.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_glfw.h>
+#include <GLFW/glfw3.h>
 
 #include "application/application.h"
 #include "application/events.h"
@@ -133,28 +136,31 @@ Application::~Application() {
 void Application::run() {
     float dt;
     start();
+    imgui_start();
 
     while (running) {
         dt = update_fps_counter();
         update(dt);
+        imgui_update(dt);
 
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
 
+    imgui_end();
     end();
 }
 
 void Application::on_event(events::Event& event) {
-    events::Dispatcher dispatcher = events::Dispatcher(event);
-    dispatcher.dispatch<events::WindowClosedEvent>(events::WindowClosed,
-                                                   BIND(Application::on_window_closed));
-    dispatcher.dispatch<events::WindowResizedEvent>(events::WindowResized,
-                                                    BIND(Application::on_window_resized));
-    dispatcher.dispatch<events::MouseScrolledEvent>(events::MouseScrolled,
-                                                    BIND(Application::on_mouse_scrolled));
-    dispatcher.dispatch<events::MouseMovedEvent>(events::MouseMoved,
-                                                    BIND(Application::on_mouse_moved));
+    using namespace events;
+
+    Dispatcher dispatcher = Dispatcher(event);
+    dispatcher.dispatch<WindowClosedEvent>(WindowClosed, BIND(Application::on_window_closed));
+    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(Application::on_window_resized));
+    dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(Application::on_mouse_scrolled));
+    dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(Application::on_mouse_moved));
+    dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(Application::on_mouse_button_pressed));
+    dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(Application::on_mouse_button_released));
 }
 
 void Application::update(float dt) {
@@ -257,6 +263,104 @@ float Application::update_fps_counter() {
     return (float) elapsed_seconds;
 }
 
+void Application::imgui_start() {
+    ImGui::CreateContext();
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+
+    ImGui_ImplOpenGL3_Init("#version 430");
+    ImGui_ImplGlfw_InitForOpenGL(window, false);
+}
+
+void Application::imgui_update(float dt) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2(data.width, data.height);
+    io.DeltaTime = dt;
+
+    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("Game")) {
+            ImGui::MenuItem("New", nullptr, false);
+            if (ImGui::MenuItem("Exit", nullptr, false)) {
+                running = false;
+            }
+
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Options")) {
+
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Help")) {
+            ImGui::MenuItem("About", nullptr, false);
+            
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Application::imgui_end() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
+
+bool Application::on_window_closed(events::WindowClosedEvent& event) {
+    running = false;
+    return true;
+}
+
+bool Application::on_window_resized(events::WindowResizedEvent& event) {
+    renderer::set_viewport(event.width, event.height);
+    storage->framebuffer->resize(event.width, event.height);
+
+    return true;
+}
+
+bool Application::on_mouse_scrolled(events::MouseScrolledEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseWheel = event.scroll;
+
+    mouse_wheel = event.scroll;
+    return true;
+}
+
+bool Application::on_mouse_moved(events::MouseMovedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
+
+    dx = last_mouse_x - event.mouse_x;
+    dy = last_mouse_y - event.mouse_y;
+    last_mouse_x = event.mouse_x;
+    last_mouse_y = event.mouse_y;
+
+    return true;
+}
+
+bool Application::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[event.button] = true;
+
+    return false;
+}
+
+bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[event.button] = false;
+
+    return false;
+}
+
 std::shared_ptr<VertexBuffer> Application::create_ids_buffer(unsigned int vertices_size,
                                                               entt::entity entity) {
     std::vector<int> array;
@@ -299,30 +403,6 @@ std::shared_ptr<VertexArray> Application::create_entity_vertex_buffer(model::Mes
     VertexArray::unbind();
 
     return vertex_array;
-}
-
-bool Application::on_window_closed(events::WindowClosedEvent& event) {
-    running = false;
-    return true;
-}
-
-bool Application::on_window_resized(events::WindowResizedEvent& event) {
-    renderer::set_viewport(event.width, event.height);
-    storage->framebuffer->resize(event.width, event.height);
-    return true;
-}
-
-bool Application::on_mouse_scrolled(events::MouseScrolledEvent& event) {
-    mouse_wheel = event.scroll;
-    return true;
-}
-
-bool Application::on_mouse_moved(events::MouseMovedEvent& event) {
-    dx = last_mouse_x - event.mouse_x;
-    dy = last_mouse_y - event.mouse_y;
-    last_mouse_x = event.mouse_x;
-    last_mouse_y = event.mouse_y;
-    return true;
 }
 
 void Application::build_board(const model::Mesh& mesh) {

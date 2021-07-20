@@ -33,7 +33,14 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/logging.cpp"
     "src/other/model.cpp"
     "dependencies/Glad/src/glad.c"
-    "dependencies/stb_image/stb_image.c")
+    "dependencies/stb_image/stb_image.c"
+    "extern/imgui/imgui_draw.cpp"
+    "extern/imgui/imgui_demo.cpp"
+    "extern/imgui/imgui_tables.cpp"
+    "extern/imgui/imgui_widgets.cpp"
+    "extern/imgui/imgui.cpp"
+    "extern/imgui/backends/imgui_impl_opengl3.cpp"
+    "extern/imgui/backends/imgui_impl_glfw.cpp")
 
 # Enable warnings
 target_compile_options(${EXECUTABLE_NAME} PUBLIC
@@ -59,7 +66,8 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/Assimp/include"
     "${CMAKE_SOURCE_DIR}/extern/entt/single_include"
     "${CMAKE_SOURCE_DIR}/extern/glm"
-    "${CMAKE_SOURCE_DIR}/extern/glfw/include")
+    "${CMAKE_SOURCE_DIR}/extern/glfw/include"
+    "${CMAKE_SOURCE_DIR}/extern/imgui")
 
 # Add all link directories
 target_link_directories(${EXECUTABLE_NAME} PUBLIC
@@ -81,3 +89,5 @@ elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message("Building in RELEASE mode")
     target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SPDLOG_ACTIVE_LEVEL=6 NDEBUG)
 endif()
+
+target_compile_definitions(${EXECUTABLE_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
