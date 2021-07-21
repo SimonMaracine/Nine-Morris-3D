@@ -7,14 +7,13 @@
 
 #include "application/events.h"
 
+#include "application/window.h"
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/framebuffer.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/vertex_buffer.h"
 #include <other/model.h>
-
-struct GLFWwindow;
 
 constexpr glm::vec3 node_positions[24] = {
     glm::vec3(2.25f, 0.062f, 2.295f),
@@ -67,10 +66,9 @@ public:
     void imgui_end();
 
     bool running = true;
-    GLFWwindow* window;
+    std::unique_ptr<Window> window = nullptr;
     ApplicationData data;
-
-    double fps = 0.0f;
+    double fps = 0.0;
 
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);

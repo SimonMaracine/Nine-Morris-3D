@@ -23,5 +23,5 @@ namespace model {
         std::vector<unsigned int> indices;
     };
 
-    std::tuple<Mesh, Mesh, Mesh> load_models(const std::string& file_path);
+    std::tuple<Mesh, Mesh, Mesh> load_model(const std::string& file_path);
 }

@@ -1,20 +1,18 @@
 #include <string>
 #include <functional>
 #include <memory>
-#include <cstdlib>
 #include <utility>
 #include <vector>
 #include <cassert>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glad/glad.h>
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
-#include <GLFW/glfw3.h>
 
 #include "application/application.h"
+#include "application/window.h"
 #include "application/events.h"
 #include "application/input.h"
 #include "opengl/debug_opengl.h"
@@ -30,125 +28,31 @@
 #define BIND(function) std::bind(&function, this, std::placeholders::_1)
 
 Application::Application(int width, int height) {
-    if (!glfwInit()) {
-        spdlog::critical("Could not initialize GLFW");
-        std::exit(1);
-    }
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-
-    window = glfwCreateWindow(width, height, "Nine Morris 3D", nullptr, nullptr);
-    if (!window) {
-        spdlog::critical("Could not create window");
-        std::exit(1);
-    }
-
-    glfwMakeContextCurrent(window);
-
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-        spdlog::critical("Could not initialize GLAD");
-        std::exit(1);
-    }
-
-    glfwSwapInterval(1);
-    glfwSetWindowUserPointer(window, &data);
-
-    glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
-
-        events::WindowClosedEvent event = events::WindowClosedEvent();
-        data->event_function(event);
-    });
-
-    glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
-
-        events::WindowResizedEvent event = events::WindowResizedEvent(width, height);
-        data->width = width;
-        data->height = height;
-        data->event_function(event);
-    });
-
-    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
-
-        switch (action) {
-            case GLFW_PRESS: {
-                events::KeyPressedEvent event = events::KeyPressedEvent(key);
-                data->event_function(event);
-                break;
-            }
-            case GLFW_RELEASE: {
-                events::KeyReleasedEvent event = events::KeyReleasedEvent(key);
-                data->event_function(event);
-                break;
-            }
-            case GLFW_REPEAT: {
-                events::KeyPressedEvent event = events::KeyPressedEvent(key);
-                data->event_function(event);
-                break;
-            }
-        }
-    });
-
-    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
-
-        if (action == GLFW_PRESS) {
-            events::MouseButtonPressedEvent event = events::MouseButtonPressedEvent(button);
-            data->event_function(event);
-        } else if (action == GLFW_RELEASE) {
-            events::MouseButtonReleasedEvent event = events::MouseButtonReleasedEvent(button);
-            data->event_function(event);
-        }
-    });
-
-    glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
-
-        events::MouseScrolledEvent event = events::MouseScrolledEvent((float) yoffset);
-        data->event_function(event);
-    });
-
-    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
-
-        events::MouseMovedEvent event = events::MouseMovedEvent((float) xpos, (float) ypos);
-        data->event_function(event);
-    });
+    window = std::make_unique<Window>(width, height, &data);
 
     data.width = width;
     data.height = height;
     data.event_function = BIND(Application::on_event);
 
-    std::atexit(glfwTerminate);
+    start();
+    imgui_start();
 }
 
 Application::~Application() {
-    glfwDestroyWindow(window);
+    imgui_end();
+    end();
 }
 
 void Application::run() {
     float dt;
-    start();
-    imgui_start();
 
     while (running) {
         dt = update_fps_counter();
         update(dt);
         imgui_update(dt);
 
-        glfwPollEvents();
-        glfwSwapBuffers(window);
+        window->update();
     }
-
-    imgui_end();
-    end();
 }
 
 void Application::on_event(events::Event& event) {
@@ -213,14 +117,14 @@ void Application::start() {
     logging::init();
     logging::log_opengl_info(logging::LogTarget::Console);
     debug_opengl::maybe_init_debugging();
-    input::init(window);
+    input::init(window->get_handle());
     storage = renderer::init();
 
     auto [version_major, version_minor] = debug_opengl::get_version();
     assert(version_major == 4 && version_minor >= 3);
 
     using namespace model;
-    std::tuple<Mesh, Mesh, Mesh> meshes = load_models("data/models/board.obj");
+    std::tuple<Mesh, Mesh, Mesh> meshes = load_model("data/models/board.obj");
 
     std::shared_ptr<Texture> white_piece_diffuse = Texture::create("data/textures/white_piece.png");
 
@@ -259,12 +163,9 @@ float Application::update_fps_counter() {
     if (elapsed_seconds > 0.25) {
         previous_seconds = current_seconds;
         fps = (double) frame_count / elapsed_seconds;
-        // spdlog::debug("FPS: {}", fps);
         frame_count = 0;
     }
     frame_count++;
-
-    // SPDLOG_DEBUG("Delta: {}", elapsed_seconds.count() * 1000.0f);
 
     return (float) elapsed_seconds;
 }
@@ -277,7 +178,7 @@ void Application::imgui_start() {
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
     ImGui_ImplOpenGL3_Init("#version 430");
-    ImGui_ImplGlfw_InitForOpenGL(window, false);
+    ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
 }
 
 void Application::imgui_update(float dt) {
@@ -312,7 +213,7 @@ void Application::imgui_update(float dt) {
     }
 
     ImGui::Begin("Debug");
-    ImGui::Text("FPS: %f)", fps);
+    ImGui::Text("FPS: %f", fps);
     ImGui::Text("Frame time: %f", dt);
     ImGui::End();
 
