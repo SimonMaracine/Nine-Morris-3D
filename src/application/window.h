@@ -8,7 +8,7 @@ public:
     Window(int width, int height, ApplicationData* data);
     ~Window();
 
-    void update();
+    void update() const;
 
     GLFWwindow* get_handle() const;
 private:

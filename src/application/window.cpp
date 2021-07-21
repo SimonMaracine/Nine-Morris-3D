@@ -19,6 +19,10 @@ Window::Window(int width, int height, ApplicationData* data) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+#ifndef NDEBUG
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+    spdlog::info("Using debug OpenGL context");
+#endif
 
     window = glfwCreateWindow(width, height, "Nine Morris 3D", nullptr, nullptr);
     if (!window) {
@@ -43,7 +47,7 @@ Window::Window(int width, int height, ApplicationData* data) {
         data->event_function(event);
     });
 
-    glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
         ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
 
         events::WindowResizedEvent event = events::WindowResizedEvent(width, height);
@@ -107,7 +111,7 @@ Window::~Window() {
     glfwDestroyWindow(window);
 }
 
-void Window::update() {
+void Window::update() const {
     glfwPollEvents();
     glfwSwapBuffers(window);
 }
