@@ -324,7 +324,9 @@ void Application::build_board(const model::Mesh& mesh) {
 
     std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, board);
 
-    registry.emplace<TransformComponent>(board, 20.0f);
+    auto& transform = registry.emplace<TransformComponent>(board);
+    transform.scale = 20.0f;
+    
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(board, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(board, diffuse_texture);
@@ -334,7 +336,9 @@ void Application::build_board(const model::Mesh& mesh) {
 
 void Application::build_camera() {
     camera = registry.create();
-    registry.emplace<TransformComponent>(camera, glm::vec3(25.0f, 0.0f, 0.0f));
+    auto& transform = registry.emplace<TransformComponent>(camera);
+    transform.rotation = glm::vec3(25.0f, 0.0f, 0.0f);
+
     registry.emplace<CameraComponent>(camera,
             glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.08f, 1000.0f),
             glm::vec3(0.0f), 12.0f);
@@ -381,7 +385,10 @@ void Application::build_piece(int index, const model::Mesh& mesh,
 
     std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, piece);
     
-    registry.emplace<TransformComponent>(piece, position, glm::vec3(0.0f), 20.0f);
+    auto& transform = registry.emplace<TransformComponent>(piece);
+    transform.position = position;
+    transform.scale = 20.0f;
+
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(piece, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(piece, diffuse_texture);
@@ -393,8 +400,9 @@ void Application::build_piece(int index, const model::Mesh& mesh,
 
 void Application::build_directional_light() {
     directional_light = registry.create();
-    registry.emplace<TransformComponent>(directional_light, glm::vec3(10.0f, 15.0f, -15.0f),
-                                         glm::vec3(0.0f));
+    auto& transform = registry.emplace<TransformComponent>(directional_light);
+    transform.position = glm::vec3(10.0f, 15.0f, -15.0f);
+
     registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f),
                                      glm::vec3(1.0f));
     registry.emplace<ShaderComponent>(directional_light, storage->basic_shader);
@@ -440,7 +448,10 @@ void Application::build_node(int index, const model::Mesh& mesh, const glm::vec3
 
     VertexArray::unbind();
 
-    registry.emplace<TransformComponent>(node, position, glm::vec3(0.0f), 20.0f);
+    auto& transform = registry.emplace<TransformComponent>(node);
+    transform.position = position;
+    transform.scale = 20.0f;
+
     registry.emplace<MeshComponent>(node, vertex_array, mesh.indices.size());
     registry.emplace<NodeMaterialComponent>(node, storage->node_shader);
 

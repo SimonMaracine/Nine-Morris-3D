@@ -1,9 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
-#include <string>
-#include <vector>
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
@@ -15,12 +12,6 @@
 
 struct TransformComponent {
     TransformComponent() = default;
-    TransformComponent(const glm::vec3& rotation) : rotation(rotation) {}
-    TransformComponent(float scale) : scale(scale) {}
-    TransformComponent(const glm::vec3& position, const glm::vec3& rotation)
-            : position(position), rotation(rotation) {}
-    TransformComponent(const glm::vec3& position, const glm::vec3& rotation, float scale)
-            : position(position), rotation(rotation), scale(scale) {}
 
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);
@@ -51,7 +42,7 @@ struct MeshComponent {
 };
 
 struct MaterialComponent {
-    MaterialComponent(std::shared_ptr<Shader> shader, glm::vec3 specular_color,
+    MaterialComponent(std::shared_ptr<Shader> shader, const glm::vec3& specular_color,
                       float shininess)
             : shader(shader), specular_color(specular_color), shininess(shininess) {}
 
@@ -128,8 +119,7 @@ struct LightMeshComponent {
 };
 
 struct NodeMaterialComponent {
-    NodeMaterialComponent(std::shared_ptr<Shader> shader)
-            : shader(shader) {}
+    NodeMaterialComponent(std::shared_ptr<Shader> shader) : shader(shader) {}
 
     std::shared_ptr<Shader> shader;
 };
