@@ -138,7 +138,7 @@ void Application::start() {
     build_piece(3, std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, PIECE_Y_POSITION, 2.1f));
 
     for (int i = 0; i < 24; i++) {
-        build_node(0, std::get<2>(meshes), NODE_POSITIONS[i]);
+        build_node(i, std::get<2>(meshes), NODE_POSITIONS[i]);
     }
 
     build_directional_light();
