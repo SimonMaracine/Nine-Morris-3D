@@ -15,31 +15,34 @@
 #include "opengl/renderer/vertex_buffer.h"
 #include <other/model.h>
 
-constexpr glm::vec3 node_positions[24] = {
-    glm::vec3(2.25f, 0.062f, 2.295f),
-    glm::vec3(-0.04f, 0.062f, 2.29f),
-    glm::vec3(-2.26f, 0.062f, 2.27f),
-    glm::vec3(1.6f, 0.062f, 1.65f),
-    glm::vec3(-0.04f, 0.062f, 1.65f),
-    glm::vec3(-1.66f, 0.062f, 1.65f),
-    glm::vec3(0.98f, 0.062f, 1.01f),
-    glm::vec3(-0.03f, 0.062f, 1.01f),
-    glm::vec3(-0.99f, 0.062f, 1.0f),
-    glm::vec3(2.26f, 0.062f, 0.03f),
-    glm::vec3(1.61f, 0.062f, 0.03f),
-    glm::vec3(0.99f, 0.062f, 0.04f),
-    glm::vec3(-0.99f, 0.062f, 0.03f),
-    glm::vec3(-1.66f, 0.062f, 0.03f),
-    glm::vec3(-2.29f, 0.062f, 0.02f),
-    glm::vec3(0.98f, 0.062f, -1.0f),
-    glm::vec3(-0.07f, 0.062f, -1.0f),
-    glm::vec3(-0.98f, 0.062f, -1.0f),
-    glm::vec3(1.6f, 0.062f, -1.62f),
-    glm::vec3(-0.06f, 0.062f, -1.63f),
-    glm::vec3(-1.65f, 0.062f, -1.63f),
-    glm::vec3(2.25f, 0.062f, -2.26f),
-    glm::vec3(-0.06f, 0.062f, -2.26f),
-    glm::vec3(-2.28f, 0.062f, -2.28f)
+constexpr float PIECE_Y_POSITION = 0.135f;
+constexpr float NODE_Y_POSITION = 0.062f;
+
+constexpr glm::vec3 NODE_POSITIONS[24] = {
+    glm::vec3(2.25f, NODE_Y_POSITION, 2.295f),
+    glm::vec3(-0.04f, NODE_Y_POSITION, 2.29f),
+    glm::vec3(-2.26f, NODE_Y_POSITION, 2.27f),
+    glm::vec3(1.6f, NODE_Y_POSITION, 1.65f),
+    glm::vec3(-0.04f, NODE_Y_POSITION, 1.65f),
+    glm::vec3(-1.66f, NODE_Y_POSITION, 1.65f),
+    glm::vec3(0.98f, NODE_Y_POSITION, 1.01f),
+    glm::vec3(-0.03f, NODE_Y_POSITION, 1.01f),
+    glm::vec3(-0.99f, NODE_Y_POSITION, 1.0f),
+    glm::vec3(2.26f, NODE_Y_POSITION, 0.03f),
+    glm::vec3(1.61f, NODE_Y_POSITION, 0.03f),
+    glm::vec3(0.99f, NODE_Y_POSITION, 0.04f),
+    glm::vec3(-0.99f, NODE_Y_POSITION, 0.03f),
+    glm::vec3(-1.66f, NODE_Y_POSITION, 0.03f),
+    glm::vec3(-2.29f, NODE_Y_POSITION, 0.02f),
+    glm::vec3(0.98f, NODE_Y_POSITION, -1.0f),
+    glm::vec3(-0.07f, NODE_Y_POSITION, -1.0f),
+    glm::vec3(-0.98f, NODE_Y_POSITION, -1.0f),
+    glm::vec3(1.6f, NODE_Y_POSITION, -1.62f),
+    glm::vec3(-0.06f, NODE_Y_POSITION, -1.63f),
+    glm::vec3(-1.65f, NODE_Y_POSITION, -1.63f),
+    glm::vec3(2.25f, NODE_Y_POSITION, -2.26f),
+    glm::vec3(-0.06f, NODE_Y_POSITION, -2.26f),
+    glm::vec3(-2.28f, NODE_Y_POSITION, -2.28f)
 };
 
 struct ApplicationData {

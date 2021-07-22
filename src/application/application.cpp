@@ -132,13 +132,13 @@ void Application::start() {
     build_camera();
     build_skybox();
 
-    build_piece(0, std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, 0.135f, 0.0f));
-    build_piece(1, std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, 0.135f, -1.5f));
-    build_piece(2, std::get<1>(meshes), white_piece_diffuse, glm::vec3(1.0f, 0.135f, 2.3f));
-    build_piece(3, std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, 0.135f, 2.1f));
+    build_piece(0, std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, PIECE_Y_POSITION, 0.0f));
+    build_piece(1, std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, PIECE_Y_POSITION, -1.5f));
+    build_piece(2, std::get<1>(meshes), white_piece_diffuse, glm::vec3(1.0f, PIECE_Y_POSITION, 2.3f));
+    build_piece(3, std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, PIECE_Y_POSITION, 2.1f));
 
     for (int i = 0; i < 24; i++) {
-        build_node(0, std::get<2>(meshes), node_positions[i]);
+        build_node(0, std::get<2>(meshes), NODE_POSITIONS[i]);
     }
 
     build_directional_light();
@@ -379,7 +379,8 @@ void Application::build_skybox() {
 }
 
 void Application::build_piece(int index, const model::Mesh& mesh,
-                              std::shared_ptr<Texture> diffuse_texture, const glm::vec3& position) {
+                              std::shared_ptr<Texture> diffuse_texture,
+                              const glm::vec3& position) {
     pieces[index] = registry.create();
     entt::entity piece = pieces[index];
 
