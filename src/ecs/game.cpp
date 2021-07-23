@@ -15,11 +15,20 @@ static entt::entity put_piece(entt::registry& registry, Piece type, float x_pos,
         if (!piece.active && piece.type == type) {
             transform.position.x = x_pos;
             transform.position.z = z_pos;
+            piece.active = true;
             return entity;
         }
     }
 
     assert(false);
+}
+
+static Player switch_turn(Player turn) {
+    if (turn == Player::White) {
+        return Player::Black;
+    } else {
+        return Player::White;
+    }
 }
 
 void game_update_system(entt::registry& registry, entt::entity board, entt::entity hovered) {
@@ -38,9 +47,17 @@ void game_update_system(entt::registry& registry, entt::entity board, entt::enti
                     if (state.turn == Player::White) {
                         node.piece = put_piece(registry, Piece::White,
                                                position.x, position.z);
+                        state.white_pieces_count++;
                     } else {
                         node.piece = put_piece(registry, Piece::Black,
                                                position.x, position.z);
+                        state.black_pieces_count++;
+                    }
+
+                    state.turn = switch_turn(state.turn);
+
+                    if (state.white_pieces_count == 9 && state.black_pieces_count == 9) {
+                        state.phase = Phase::MovePieces;
                     }
                 }
             }

@@ -12,7 +12,7 @@
 #include "other/logging.h"
 
 namespace model {
-    std::tuple<Mesh, Mesh, Mesh> load_model(const std::string& file_path) {
+    std::tuple<Mesh, Mesh, Mesh, Mesh> load_model(const std::string& file_path) {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(file_path,
                                                  aiProcess_ValidateDataStructure);
@@ -26,17 +26,20 @@ namespace model {
         const aiNode* root_node = scene->mRootNode;
         
         const aiMesh* board_mesh;
-        const aiMesh* piece_mesh;
+        const aiMesh* white_piece_mesh;
+        const aiMesh* black_piece_mesh;
         const aiMesh* node_mesh;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             const aiNode* node = root_node->mChildren[i];
 
             if (strcmp(node->mName.C_Str(), "Board_export_Cube") == 0) {
                 board_mesh = scene->mMeshes[node->mMeshes[0]];
             } else if (strcmp(node->mName.C_Str(), "White_Piece_export_Cylinder") == 0) {
-                piece_mesh = scene->mMeshes[node->mMeshes[0]];
-            } else if (strcmp(node->mName.C_Str(), "Node_Cylinder2") == 0) {
+                white_piece_mesh = scene->mMeshes[node->mMeshes[0]];
+            } else if (strcmp(node->mName.C_Str(), "Black_Piece_export_Cylinder3") == 0) {
+                black_piece_mesh = scene->mMeshes[node->mMeshes[0]];
+            } else if (strcmp(node->mName.C_Str(), "Node_export_Cylinder2") == 0) {
                 node_mesh = scene->mMeshes[node->mMeshes[0]];
             } else {
                 spdlog::critical("Could not find meshes");
@@ -44,11 +47,12 @@ namespace model {
             }
         }
 
-        const aiMesh* meshes[3] = { board_mesh, piece_mesh, node_mesh };
+        const aiMesh* meshes[4] = { board_mesh, white_piece_mesh,
+                                    black_piece_mesh, node_mesh };
 
-        Mesh board, piece, node;
+        Mesh board, white_piece, black_piece, node;
 
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < 4; j++) {
             std::vector<Vertex> vertices;
             std::vector<unsigned int> indices;
 
@@ -84,16 +88,20 @@ namespace model {
 
             switch (j) {
                 case 0:
-                    board = { Board, vertices, indices };
+                    board = { Model::Board, vertices, indices };
                     break;
                 case 1:
-                    piece = { Piece, vertices, indices };
+                    white_piece = { Model::WhitePiece, vertices, indices };
                     break;
                 case 2:
-                    node = { Node, vertices, indices };
+                    black_piece = { Model::BlackPiece, vertices, indices };
+                    break;
+                case 3:
+                    node = { Model::Node, vertices, indices };
+                    break;
             }
         }
 
-        return std::make_tuple(board, piece, node);
+        return std::make_tuple(board, white_piece, black_piece, node);
     }
 }

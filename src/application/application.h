@@ -13,7 +13,8 @@
 #include "opengl/renderer/framebuffer.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/vertex_buffer.h"
-#include <other/model.h>
+#include "other/model.h"
+#include "ecs/game.h"
 
 constexpr float PIECE_Y_POSITION = 0.135f;
 constexpr float NODE_Y_POSITION = 0.062f;
@@ -88,14 +89,12 @@ public:
     void build_board(const model::Mesh& mesh);
     void build_camera();
     void build_skybox();
-    void build_piece(int index, const model::Mesh& mesh, std::shared_ptr<Texture> diffuse_texture,
-                     const glm::vec3& position);
+    void build_piece(int index, Piece type, const model::Mesh& mesh,
+                     std::shared_ptr<Texture> diffuse_texture, const glm::vec3& position);
     void build_directional_light();
     void build_origin();
     void build_node(int index, const model::Mesh& mesh, const glm::vec3& position);
 
-    // const float mouse_sensitivity = 0.13f;
-    // const float scroll_sensitivity = 1.2f;
     float mouse_wheel = 0.0f;
     float dx = 0.0f;
     float dy = 0.0f;
@@ -108,7 +107,7 @@ public:
     entt::entity board = entt::null;
     entt::entity camera = entt::null;
     entt::entity skybox = entt::null;
-    entt::entity pieces[4] = { entt::null, entt::null, entt::null, entt::null };
+    entt::entity pieces[18];
     entt::entity directional_light = entt::null;
     entt::entity origin = entt::null;
     entt::entity nodes[24];

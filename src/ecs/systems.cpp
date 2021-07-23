@@ -255,7 +255,7 @@ void node_render_system(entt::registry& registry, entt::entity camera_entity,
         } else {
             renderer::draw_node(transform.position, transform.scale,
                                 material.shader, mesh.vertex_array,
-                                glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
+                                glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
                                 mesh.index_count);   
         }
     }

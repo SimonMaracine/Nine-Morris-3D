@@ -22,6 +22,7 @@
 #include "opengl/renderer/vertex_buffer.h"
 #include "ecs/components.h"
 #include "ecs/systems.h"
+#include "ecs/game.h"
 #include "other/model.h"
 #include "other/logging.h"
 
@@ -71,6 +72,7 @@ void Application::on_event(events::Event& event) {
 void Application::update(float dt) {
     camera_system(registry, mouse_wheel, dx, dy, dt);
     lighting_move_system(registry, dt);
+    game_update_system(registry, board, hovered_entity);
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -123,21 +125,27 @@ void Application::start() {
     assert(version_major == 4 && version_minor >= 3);
 
     using namespace model;
-    std::tuple<Mesh, Mesh, Mesh> meshes = load_model("data/models/board.obj");
+    std::tuple<Mesh, Mesh, Mesh, Mesh> meshes = load_model("data/models/board.obj");
 
     std::shared_ptr<Texture> white_piece_diffuse = Texture::create("data/textures/white_piece.png");
+    std::shared_ptr<Texture> black_piece_diffuse = Texture::create("data/textures/black_piece.png");
 
     build_board(std::get<0>(meshes));
     build_camera();
     build_skybox();
 
-    build_piece(0, std::get<1>(meshes), white_piece_diffuse, glm::vec3(0.0f, PIECE_Y_POSITION, 0.0f));
-    build_piece(1, std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.0f, PIECE_Y_POSITION, -1.5f));
-    build_piece(2, std::get<1>(meshes), white_piece_diffuse, glm::vec3(1.0f, PIECE_Y_POSITION, 2.3f));
-    build_piece(3, std::get<1>(meshes), white_piece_diffuse, glm::vec3(-1.2f, PIECE_Y_POSITION, 2.1f));
+    for (int i = 0; i < 9; i++) {
+        build_piece(i, Piece::White, std::get<1>(meshes), white_piece_diffuse,
+                    glm::vec3(4.0f, PIECE_Y_POSITION, -2.0f + i * 0.5f));
+    }
+    
+    for (int i = 9; i < 18; i++) {
+        build_piece(i, Piece::Black, std::get<2>(meshes), black_piece_diffuse,
+                    glm::vec3(-4.0f, PIECE_Y_POSITION, -2.0f + (i - 9) * 0.5f));
+    }
 
     for (int i = 0; i < 24; i++) {
-        build_node(i, std::get<2>(meshes), NODE_POSITIONS[i]);
+        build_node(i, std::get<3>(meshes), NODE_POSITIONS[i]);
     }
 
     build_directional_light();
@@ -152,7 +160,6 @@ void Application::end() {
 }
 
 float Application::update_fps_counter() {
-    // static double fps = 0.0f;
     static double previous_seconds = glfwGetTime();
     static int frame_count = 0;
 
@@ -330,6 +337,8 @@ void Application::build_board(const model::Mesh& mesh) {
     registry.emplace<MaterialComponent>(board, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(board, diffuse_texture);
 
+    registry.emplace<GameStateComponent>(board);
+
     SPDLOG_DEBUG("Built board entity {}", board);
 }
 
@@ -377,7 +386,7 @@ void Application::build_skybox() {
     SPDLOG_DEBUG("Built skybox entity {}", skybox);
 }
 
-void Application::build_piece(int index, const model::Mesh& mesh,
+void Application::build_piece(int index, Piece type, const model::Mesh& mesh,
                               std::shared_ptr<Texture> diffuse_texture,
                               const glm::vec3& position) {
     pieces[index] = registry.create();
@@ -394,6 +403,8 @@ void Application::build_piece(int index, const model::Mesh& mesh,
     registry.emplace<TextureComponent>(piece, diffuse_texture);
     registry.emplace<OutlineComponent>(piece, storage->outline_shader,
                                        glm::vec3(1.0f, 0.0f, 0.0f));
+
+    registry.emplace<PieceComponent>(piece, type);
 
     SPDLOG_DEBUG("Built piece entity {}", piece);
 }
@@ -454,6 +465,8 @@ void Application::build_node(int index, const model::Mesh& mesh, const glm::vec3
 
     registry.emplace<MeshComponent>(node, vertex_array, mesh.indices.size());
     registry.emplace<NodeMaterialComponent>(node, storage->node_shader);
+
+    registry.emplace<NodeComponent>(node);
 
     SPDLOG_DEBUG("Built node entity {}", node);
 }

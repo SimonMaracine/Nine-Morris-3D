@@ -7,8 +7,8 @@
 #include <glm/glm.hpp>
 
 namespace model {
-    enum Model {
-        Board, Piece, Node
+    enum class Model {
+        Board, WhitePiece, BlackPiece, Node
     };
 
     struct Vertex {
@@ -23,5 +23,5 @@ namespace model {
         std::vector<unsigned int> indices;
     };
 
-    std::tuple<Mesh, Mesh, Mesh> load_model(const std::string& file_path);
+    std::tuple<Mesh, Mesh, Mesh, Mesh> load_model(const std::string& file_path);
 }
