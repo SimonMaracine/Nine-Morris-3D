@@ -70,13 +70,16 @@ namespace debug_opengl {
                                const void* userParam) {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                spdlog::critical(message);
+                spdlog::critical("(ID: {}) {}", id, message);
                 std::exit(1);
             case GL_DEBUG_SEVERITY_MEDIUM:
-                spdlog::error(message);
+                switch (id) {
+                    case 7: return;  // Ignore this warning
+                }
+                spdlog::warn("(ID: {}) {}", id, message);
                 break;
             case GL_DEBUG_SEVERITY_LOW:
-                spdlog::warn(message);
+                spdlog::info("(ID: {}) {}", id, message);
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 assert(false);

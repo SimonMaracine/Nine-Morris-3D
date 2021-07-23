@@ -49,6 +49,7 @@ void Application::run() {
     while (running) {
         dt = update_fps_counter();
         update(dt);
+        draw();
         imgui_update(dt);
 
         window->update();
@@ -74,8 +75,6 @@ void Application::update(float dt) {
     mouse_wheel = 0.0f;
     dx = 0.0f;
     dy = 0.0f;
-    
-    draw();
 }
 
 void Application::draw() {
