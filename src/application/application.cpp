@@ -72,6 +72,7 @@ void Application::on_event(events::Event& event) {
 void Application::update(float dt) {
     camera_system(registry, mouse_wheel, dx, dy, dt);
     lighting_move_system(registry, dt);
+    piece_move_system(registry, dt);
     game_update_system(registry, board, hovered_entity);
 
     mouse_wheel = 0.0f;
@@ -405,6 +406,7 @@ void Application::build_piece(int index, Piece type, const model::Mesh& mesh,
                                        glm::vec3(1.0f, 0.0f, 0.0f));
 
     registry.emplace<PieceComponent>(piece, type);
+    registry.emplace<MoveComponent>(piece);
 
     SPDLOG_DEBUG("Built piece entity {}", piece);
 }

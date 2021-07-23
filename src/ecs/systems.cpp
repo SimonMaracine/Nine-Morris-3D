@@ -76,10 +76,8 @@ void camera_system(entt::registry& registry, float mouse_wheel, float dx, float 
         pitch = std::min(pitch, 90.0f);
         pitch = std::max(pitch, -90.0f);
 
-        float horizontal_distance =
-            zoom * glm::cos(glm::radians(pitch));
-        float vertical_distance =
-            zoom * glm::sin(glm::radians(pitch));
+        float horizontal_distance = zoom * glm::cos(glm::radians(pitch));
+        float vertical_distance = zoom * glm::sin(glm::radians(pitch));
 
         float offset_x =
             horizontal_distance * glm::sin(glm::radians(camera.angle_around_point));
@@ -93,10 +91,8 @@ void camera_system(entt::registry& registry, float mouse_wheel, float dx, float 
         yaw = 180 - camera.angle_around_point;
 
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::rotate(matrix, glm::radians(pitch),
-                             glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, glm::radians(yaw),
-                             glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, glm::radians(pitch), glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, glm::radians(yaw), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec3 negative_camera_position = glm::vec3(-transform.position.x,
                                                        -transform.position.y,
                                                        -transform.position.z);

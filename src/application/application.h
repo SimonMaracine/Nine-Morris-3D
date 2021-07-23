@@ -15,36 +15,6 @@
 #include "other/model.h"
 #include "ecs/game.h"
 
-constexpr float PIECE_Y_POSITION = 0.135f;
-constexpr float NODE_Y_POSITION = 0.062f;
-
-constexpr glm::vec3 NODE_POSITIONS[24] = {
-    glm::vec3(2.25f, NODE_Y_POSITION, 2.295f),
-    glm::vec3(-0.04f, NODE_Y_POSITION, 2.29f),
-    glm::vec3(-2.26f, NODE_Y_POSITION, 2.27f),
-    glm::vec3(1.6f, NODE_Y_POSITION, 1.65f),
-    glm::vec3(-0.04f, NODE_Y_POSITION, 1.65f),
-    glm::vec3(-1.66f, NODE_Y_POSITION, 1.65f),
-    glm::vec3(0.98f, NODE_Y_POSITION, 1.01f),
-    glm::vec3(-0.03f, NODE_Y_POSITION, 1.01f),
-    glm::vec3(-0.99f, NODE_Y_POSITION, 1.0f),
-    glm::vec3(2.26f, NODE_Y_POSITION, 0.03f),
-    glm::vec3(1.61f, NODE_Y_POSITION, 0.03f),
-    glm::vec3(0.99f, NODE_Y_POSITION, 0.04f),
-    glm::vec3(-0.99f, NODE_Y_POSITION, 0.03f),
-    glm::vec3(-1.66f, NODE_Y_POSITION, 0.03f),
-    glm::vec3(-2.29f, NODE_Y_POSITION, 0.02f),
-    glm::vec3(0.98f, NODE_Y_POSITION, -1.0f),
-    glm::vec3(-0.07f, NODE_Y_POSITION, -1.0f),
-    glm::vec3(-0.98f, NODE_Y_POSITION, -1.0f),
-    glm::vec3(1.6f, NODE_Y_POSITION, -1.62f),
-    glm::vec3(-0.06f, NODE_Y_POSITION, -1.63f),
-    glm::vec3(-1.65f, NODE_Y_POSITION, -1.63f),
-    glm::vec3(2.25f, NODE_Y_POSITION, -2.26f),
-    glm::vec3(-0.06f, NODE_Y_POSITION, -2.26f),
-    glm::vec3(-2.28f, NODE_Y_POSITION, -2.28f)
-};
-
 struct ApplicationData {
     int width, height;
     std::function<void(events::Event&)> event_function;
