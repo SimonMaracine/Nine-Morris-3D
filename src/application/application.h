@@ -6,7 +6,6 @@
 #include <entt/entt.hpp>
 
 #include "application/events.h"
-
 #include "application/window.h"
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/vertex_array.h"
