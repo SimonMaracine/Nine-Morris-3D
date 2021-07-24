@@ -163,14 +163,18 @@ void Application::end() {
 float Application::update_fps_counter() {
     static double previous_seconds = glfwGetTime();
     static int frame_count = 0;
+    static double total_time = 0.0;
 
     double current_seconds = glfwGetTime();
     double elapsed_seconds = current_seconds - previous_seconds;
+    previous_seconds = current_seconds;
 
-    if (elapsed_seconds > 0.25) {
-        previous_seconds = current_seconds;
-        fps = (double) frame_count / elapsed_seconds;
+    total_time += elapsed_seconds;
+
+    if (total_time > 0.25) {
+        fps = (double) frame_count / total_time;
         frame_count = 0;
+        total_time = 0.0;
     }
     frame_count++;
 
@@ -221,7 +225,17 @@ void Application::imgui_update(float dt) {
 
     ImGui::Begin("Debug");
     ImGui::Text("FPS: %f", fps);
-    ImGui::Text("Frame time: %f", dt);
+    ImGui::Text("Frame time (ms): %f", dt * 1000);
+    if (ImGui::Button("VSync")) {
+        static bool on = true;
+        if (on) {
+            window->set_vsync(0);
+            on = false;
+        } else {
+            window->set_vsync(1);
+            on = true;
+        }
+    }
     ImGui::End();
 
     ImGui::Render();

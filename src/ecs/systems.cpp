@@ -40,8 +40,8 @@ void camera_system(entt::registry& registry, float mouse_wheel, float dx, float 
         float& yaw = transform.rotation.y;
         float& zoom = camera.distance_to_point;
 
-        const float move_speed = 12.0f;
-        const float zoom_speed = 0.4f * zoom;
+        const float move_speed = 90.0f;
+        const float zoom_speed = 5.0f * zoom;
 
         zoom -= zoom_speed * mouse_wheel * 0.9f * dt;
         
@@ -56,8 +56,8 @@ void camera_system(entt::registry& registry, float mouse_wheel, float dx, float 
         zoom = std::min(zoom, 70.0f);
 
         if (input::is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)) {
-            pitch -= move_speed * 0.3f * dy * dt;
-            camera.angle_around_point += move_speed * 0.3f * dx * dt;
+            pitch -= move_speed * 0.2f * dy * dt;
+            camera.angle_around_point += move_speed * 0.2f * dx * dt;
         }
 
         if (input::is_key_pressed(KEY_W)) {
@@ -200,15 +200,15 @@ void lighting_move_system(entt::registry& registry, float dt) {
         auto& transform = view.get<TransformComponent>(entity);
 
         if (input::is_key_pressed(KEY_UP)) {
-            transform.position.z += 0.2f;
+            transform.position.z += 10.0f * dt;
         } else if (input::is_key_pressed(KEY_DOWN)) {
-            transform.position.z -= 0.2f;
+            transform.position.z -= 10.0f * dt;
         }
 
         if (input::is_key_pressed(KEY_LEFT)) {
-            transform.position.x += 0.2f;
+            transform.position.x += 10.0f * dt;
         } else if (input::is_key_pressed(KEY_RIGHT)) {
-            transform.position.x -= 0.2f;
+            transform.position.x -= 10.0f * dt;
         }
     }
 }

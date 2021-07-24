@@ -75,7 +75,7 @@ struct NodeComponent {
 struct GameStateComponent {
     Phase phase = Phase::PlacePieces;
     Player turn = Player::White;
-    int white_pieces_count = 0;
+    int white_pieces_count = 0;  // Number of pieces on the board
     int black_pieces_count = 0;
     entt::entity nodes[24];
 };

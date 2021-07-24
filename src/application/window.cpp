@@ -119,3 +119,7 @@ void Window::update() const {
 GLFWwindow* Window::get_handle() const {
     return window;
 }
+
+void Window::set_vsync(int interval) const {
+    glfwSwapInterval(interval);
+}
