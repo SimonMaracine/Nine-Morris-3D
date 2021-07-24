@@ -32,7 +32,7 @@ public:
 
     void start();
     void end();
-    float update_fps_counter();
+    float update_frame_counter();
 
     void imgui_start();
     void imgui_update(float dt);

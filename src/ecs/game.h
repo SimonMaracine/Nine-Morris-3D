@@ -33,8 +33,7 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.28f, NODE_Y_POSITION, -2.28f)
 };
 
-constexpr int FRAMES = 20;
-constexpr float MOVE_SPEED = 0.05f;
+constexpr float PIECE_MOVE_SPEED = 0.9f;
 
 enum class Phase {
     PlacePieces,
@@ -63,8 +62,7 @@ struct PieceComponent {
 struct MoveComponent {
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 target = glm::vec3(0.0f);
-    int current_frame = 0;
-    bool move = false;
+    bool should_move = false;
 };
 
 struct NodeComponent {

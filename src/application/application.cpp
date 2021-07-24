@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include <cassert>
+#include <algorithm>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -48,7 +49,7 @@ void Application::run() {
     float dt;
 
     while (running) {
-        dt = update_fps_counter();
+        dt = update_frame_counter();
         update(dt);
         draw();
         imgui_update(dt);
@@ -137,12 +138,12 @@ void Application::start() {
 
     for (int i = 0; i < 9; i++) {
         build_piece(i, Piece::White, std::get<1>(meshes), white_piece_diffuse,
-                    glm::vec3(4.0f, PIECE_Y_POSITION, -2.0f + i * 0.5f));
+                    glm::vec3(4.0f, 0.3f, -2.0f + i * 0.5f));
     }
     
     for (int i = 9; i < 18; i++) {
         build_piece(i, Piece::Black, std::get<2>(meshes), black_piece_diffuse,
-                    glm::vec3(-4.0f, PIECE_Y_POSITION, -2.0f + (i - 9) * 0.5f));
+                    glm::vec3(-4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
     for (int i = 0; i < 24; i++) {
@@ -160,7 +161,9 @@ void Application::end() {
     renderer::terminate();
 }
 
-float Application::update_fps_counter() {
+float Application::update_frame_counter() {
+    constexpr double MAX_DT = 1.0 / 20.0;
+
     static double previous_seconds = glfwGetTime();
     static int frame_count = 0;
     static double total_time = 0.0;
@@ -178,7 +181,9 @@ float Application::update_fps_counter() {
     }
     frame_count++;
 
-    return (float) elapsed_seconds;
+    double delta_time = std::min(elapsed_seconds, MAX_DT);
+
+    return (float) delta_time;
 }
 
 void Application::imgui_start() {

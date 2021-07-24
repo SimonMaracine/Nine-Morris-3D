@@ -5,6 +5,7 @@
 #include "ecs/game.h"
 #include "ecs/components.h"
 #include "application/input.h"
+#include "other/logging.h"
 
 static entt::entity place_piece(entt::registry& registry, Piece type, float x_pos, float z_pos) {
     auto view = registry.view<TransformComponent, PieceComponent, MoveComponent>();
@@ -15,12 +16,11 @@ static entt::entity place_piece(entt::registry& registry, Piece type, float x_po
 
         if (!piece.active && piece.type == type) {
             move.target.x = x_pos;
+            move.target.y = PIECE_Y_POSITION;
             move.target.z = z_pos;
 
-            move.velocity = (move.target +
-                             glm::vec3(0.0f, PIECE_Y_POSITION, 0.0f) -
-                             transform.position) * MOVE_SPEED;
-            move.move = true;
+            move.velocity = (move.target - transform.position) * PIECE_MOVE_SPEED;
+            move.should_move = true;
 
             piece.active = true;
             return entity;
@@ -82,18 +82,16 @@ void piece_move_system(entt::registry& registry, float dt) {
     for (entt::entity entity : view) {
         auto [transform, move] = view.get<TransformComponent, MoveComponent>(entity);
 
-        if (move.move) {
-            if (move.current_frame < FRAMES) {
-                transform.position += move.velocity;
-                move.current_frame++;
-            }
-
-            if (move.current_frame == FRAMES) {
-                transform.position = move.target + glm::vec3(0.0f, PIECE_Y_POSITION, 0.0f);
+        if (move.should_move) {
+            if (glm::length(move.target - transform.position) > 0.35f) {
+                transform.position += move.velocity * dt;
+            } else if (glm::length(move.target - transform.position) > 0.1f) {
+                transform.position += move.velocity * 0.5f * dt;
+            } else {
+                transform.position = move.target;
 
                 // Reset all
-                move.move = false;
-                move.current_frame = 0;
+                move.should_move = false;
                 move.velocity = glm::vec3(0.0f);
                 move.target = glm::vec3(0.0f);
             }
