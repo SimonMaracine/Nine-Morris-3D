@@ -40,7 +40,7 @@ void camera_system(entt::registry& registry, float mouse_wheel, float dx, float 
         float& yaw = transform.rotation.y;
         float& zoom = camera.distance_to_point;
 
-        const float move_speed = 90.0f;
+        constexpr float move_speed = 100.0f;
         const float zoom_speed = 5.0f * zoom;
 
         zoom -= zoom_speed * mouse_wheel * 0.9f * dt;
