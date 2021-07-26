@@ -1,4 +1,5 @@
 #include <cassert>
+// #include <algorithm>
 
 #include <entt/entt.hpp>
 
@@ -7,7 +8,8 @@
 #include "application/input.h"
 #include "other/logging.h"
 
-static entt::entity place_piece(entt::registry& registry, Piece type, float x_pos, float z_pos) {
+static entt::entity place_piece(entt::registry& registry, Piece type, float x_pos,
+                                float z_pos, entt::entity node_entity) {
     auto view = registry.view<TransformComponent, PieceComponent, MoveComponent>();
 
     for (entt::entity entity : view) {
@@ -23,6 +25,8 @@ static entt::entity place_piece(entt::registry& registry, Piece type, float x_po
             move.should_move = true;
 
             piece.active = true;
+            piece.node = node_entity;
+
             return entity;
         }
     }
@@ -38,7 +42,41 @@ static Player switch_turn(Player turn) {
     }
 }
 
-void game_update_system(entt::registry& registry, entt::entity board, entt::entity hovered) {
+static bool is_windmill_made(entt::registry& registry, entt::entity board, entt::entity node) {
+    constexpr int windmills[16][3] = {
+        { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
+        { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
+        { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
+        { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
+    };
+
+    auto& state = registry.get<GameStateComponent>(board);
+
+    for (int i = 0; i < 16; i++) {
+        const int* mill = windmills[i];
+
+        auto& node1 = NODE(state.nodes[mill[0]]);
+        auto& node2 = NODE(state.nodes[mill[1]]);
+        auto& node3 = NODE(state.nodes[mill[2]]);
+
+        if (node1.piece != entt::null && node2.piece != entt::null &&
+                node3.piece != entt::null) {
+            auto& piece1 = PIECE(node1.piece);
+            auto& piece2 = PIECE(node2.piece);
+            auto& piece3 = PIECE(node3.piece);
+
+            if (piece1.type == piece2.type && piece2.type == piece3.type) {
+                if (piece1.node == node || piece2.node == node || piece3.node == node) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+void systems::game_update(entt::registry& registry, entt::entity board, entt::entity hovered) {
     auto& state = registry.get<GameStateComponent>(board);
 
     auto view = registry.view<TransformComponent, NodeComponent>();
@@ -49,16 +87,22 @@ void game_update_system(entt::registry& registry, entt::entity board, entt::enti
         if (state.phase == Phase::PlacePieces) {
             if (input::is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
                 if (entity == hovered && node.piece == entt::null) {
+                    SPDLOG_DEBUG("Placing piece");
                     const glm::vec3& position = transform.position;
 
                     if (state.turn == Player::White) {
                         node.piece = place_piece(registry, Piece::White,
-                                                 position.x, position.z);
+                                                 position.x, position.z, entity);
                         state.white_pieces_count++;
                     } else {
                         node.piece = place_piece(registry, Piece::Black,
-                                                 position.x, position.z);
+                                                 position.x, position.z, entity);
                         state.black_pieces_count++;
+                    }
+
+                    if (is_windmill_made(registry, board, entity)) {
+                        SPDLOG_DEBUG("WINDMILL MADE");
+                        
                     }
 
                     state.turn = switch_turn(state.turn);
@@ -76,7 +120,7 @@ void game_update_system(entt::registry& registry, entt::entity board, entt::enti
     }
 }
 
-void piece_move_system(entt::registry& registry, float dt) {
+void systems::piece_move(entt::registry& registry, float dt) {
     auto view = registry.view<TransformComponent, MoveComponent>();
 
     for (entt::entity entity : view) {

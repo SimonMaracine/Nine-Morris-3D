@@ -22,6 +22,8 @@ Window::Window(int width, int height, ApplicationData* data) {
 #ifndef NDEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
     spdlog::info("Using debug OpenGL context");
+#else
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif
 
     window = glfwCreateWindow(width, height, "Nine Morris 3D", nullptr, nullptr);

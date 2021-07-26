@@ -87,10 +87,10 @@ namespace debug_opengl {
     }
 
     void maybe_init_debugging() {
-#if !defined(NDEBUG)
+#ifndef NDEBUG
         glDebugMessageCallback(error_callback, nullptr);
         glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION,
                               0, nullptr, GL_FALSE);
         spdlog::info("OpenGL message callback is set");
@@ -191,8 +191,8 @@ namespace debug_opengl {
 
     const std::pair<int, int> get_version() {
         int major, minor;
-		glGetIntegerv(GL_MAJOR_VERSION, &major);
-		glGetIntegerv(GL_MINOR_VERSION, &minor);
+        glGetIntegerv(GL_MAJOR_VERSION, &major);
+        glGetIntegerv(GL_MINOR_VERSION, &minor);
 
         return std::make_pair(major, minor);
     }

@@ -71,10 +71,10 @@ void Application::on_event(events::Event& event) {
 }
 
 void Application::update(float dt) {
-    camera_system(registry, mouse_wheel, dx, dy, dt);
-    lighting_move_system(registry, dt);
-    piece_move_system(registry, dt);
-    game_update_system(registry, board, hovered_entity);
+    systems::camera(registry, mouse_wheel, dx, dy, dt);
+    systems::lighting_move(registry, dt);
+    systems::piece_move(registry, dt);
+    systems::game_update(registry, board, hovered_entity);
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -90,13 +90,13 @@ void Application::draw() {
 
     storage->framebuffer->clear_red_integer_attachment(1, -1);
 
-    cube_map_render_system(registry, camera);
-    lighting_system(registry, camera);
-    render_system(registry, camera);
-    with_outline_render_system(registry, camera, hovered_entity);
-    node_render_system(registry, camera, hovered_entity);
-    origin_render_system(registry, camera);
-    lighting_render_system(registry, camera);
+    systems::cube_map_render(registry, camera);
+    systems::lighting(registry, camera);
+    systems::render(registry, camera);
+    systems::with_outline_render(registry, camera, hovered_entity);
+    systems::node_render(registry, camera, hovered_entity);
+    systems::origin_render(registry, camera);
+    systems::lighting_render(registry, camera);
 
     hovered_entity = (entt::entity) storage->framebuffer->read_pixel(
                           1,
@@ -132,7 +132,6 @@ void Application::start() {
     std::shared_ptr<Texture> white_piece_diffuse = Texture::create("data/textures/white_piece.png");
     std::shared_ptr<Texture> black_piece_diffuse = Texture::create("data/textures/black_piece.png");
 
-    build_board(std::get<0>(meshes));
     build_camera();
     build_skybox();
 
@@ -149,6 +148,8 @@ void Application::start() {
     for (int i = 0; i < 24; i++) {
         build_node(i, std::get<3>(meshes), NODE_POSITIONS[i]);
     }
+
+    build_board(std::get<0>(meshes));
 
     build_directional_light();
     build_origin();
@@ -357,7 +358,7 @@ void Application::build_board(const model::Mesh& mesh) {
     registry.emplace<MaterialComponent>(board, storage->basic_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(board, diffuse_texture);
 
-    registry.emplace<GameStateComponent>(board);
+    registry.emplace<GameStateComponent>(board, nodes);
 
     SPDLOG_DEBUG("Built board entity {}", board);
 }
@@ -487,7 +488,7 @@ void Application::build_node(int index, const model::Mesh& mesh, const glm::vec3
     registry.emplace<MeshComponent>(node, vertex_array, mesh.indices.size());
     registry.emplace<NodeMaterialComponent>(node, storage->node_shader);
 
-    registry.emplace<NodeComponent>(node);
+    registry.emplace<NodeComponent>(node, index);
 
     SPDLOG_DEBUG("Built node entity {}", node);
 }

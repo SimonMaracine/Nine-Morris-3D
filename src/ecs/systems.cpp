@@ -2,12 +2,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "ecs/systems.h"
 #include "ecs/components.h"
 #include "application/input.h"
 #include "opengl/renderer/renderer.h"
 #include "other/logging.h"
 
-void render_system(entt::registry& registry, entt::entity camera_entity) {
+void systems::render(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
     auto view = registry.view<TransformComponent,
@@ -30,7 +31,7 @@ void render_system(entt::registry& registry, entt::entity camera_entity) {
     }
 }
 
-void camera_system(entt::registry& registry, float mouse_wheel, float dx, float dy, float dt) {
+void systems::camera(entt::registry& registry, float mouse_wheel, float dx, float dy, float dt) {
     auto view = registry.view<TransformComponent, CameraComponent>();
 
     for (entt::entity entity : view) {
@@ -103,7 +104,7 @@ void camera_system(entt::registry& registry, float mouse_wheel, float dx, float 
     }
 }
 
-void cube_map_render_system(entt::registry& registry, entt::entity camera_entity) {
+void systems::cube_map_render(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
     auto view = registry.view<SkyboxMeshComponent, SkyboxMaterialComponent,
@@ -122,7 +123,7 @@ void cube_map_render_system(entt::registry& registry, entt::entity camera_entity
     }
 }
 
-void with_outline_render_system(entt::registry& registry, entt::entity camera_entity,
+void systems::with_outline_render(entt::registry& registry, entt::entity camera_entity,
                                 entt::entity hovered_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
     auto& camera_transform = registry.get<TransformComponent>(camera_entity);
@@ -158,7 +159,7 @@ void with_outline_render_system(entt::registry& registry, entt::entity camera_en
     }
 }
 
-void lighting_system(entt::registry& registry, entt::entity camera_entity) {
+void systems::lighting(entt::registry& registry, entt::entity camera_entity) {
     auto& camera_transform = registry.get<TransformComponent>(camera_entity);
 
     auto view = registry.view<TransformComponent, LightComponent, ShaderComponent>();
@@ -177,7 +178,7 @@ void lighting_system(entt::registry& registry, entt::entity camera_entity) {
     }
 }
 
-void lighting_render_system(entt::registry& registry, entt::entity camera_entity) {
+void systems::lighting_render(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
     auto view = registry.view<TransformComponent, LightMeshComponent>();
@@ -193,7 +194,7 @@ void lighting_render_system(entt::registry& registry, entt::entity camera_entity
     }
 }
 
-void lighting_move_system(entt::registry& registry, float dt) {
+void systems::lighting_move(entt::registry& registry, float dt) {
     auto view = registry.view<TransformComponent, LightMeshComponent>();
 
     for (entt::entity entity : view) {
@@ -213,7 +214,7 @@ void lighting_move_system(entt::registry& registry, float dt) {
     }
 }
 
-void origin_render_system(entt::registry& registry, entt::entity camera_entity) {
+void systems::origin_render(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
     auto view = registry.view<OriginComponent>();
@@ -229,7 +230,7 @@ void origin_render_system(entt::registry& registry, entt::entity camera_entity) 
     }
 }
 
-void node_render_system(entt::registry& registry, entt::entity camera_entity,
+void systems::node_render(entt::registry& registry, entt::entity camera_entity,
                         entt::entity hovered_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
@@ -257,7 +258,7 @@ void node_render_system(entt::registry& registry, entt::entity camera_entity,
     }
 }
 
-// void node_move_system(entt::registry& registry, float dt) {
+// void systems::node_move(entt::registry& registry, float dt) {
 //     auto view = registry.view<TransformComponent, NodeMaterialComponent>();
 
 //     for (entt::entity entity : view) {

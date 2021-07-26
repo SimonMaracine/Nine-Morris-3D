@@ -3,6 +3,9 @@
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
+#define PIECE(entity) registry.get<PieceComponent>(entity)
+#define NODE(entity) registry.get<NodeComponent>(entity)
+
 constexpr float PIECE_Y_POSITION = 0.135f;
 constexpr float NODE_Y_POSITION = 0.062f;
 
@@ -55,8 +58,9 @@ enum class Player {
 struct PieceComponent {
     PieceComponent(Piece type) : type(type) {}
 
-    bool active = false;
     Piece type;
+    bool active = false;
+    entt::entity node = entt::null;
 };
 
 struct MoveComponent {
@@ -66,17 +70,28 @@ struct MoveComponent {
 };
 
 struct NodeComponent {
-    // Piece type = Piece::None;
+    NodeComponent(int id) : id(id) {}
+
+    int id;
     entt::entity piece = entt::null;
 };
 
 struct GameStateComponent {
+    GameStateComponent(entt::entity* nodes) {
+        for (int i = 0; i < 24; i++) {
+            this->nodes[i] = nodes[i];
+        }
+    }
+
     Phase phase = Phase::PlacePieces;
     Player turn = Player::White;
     int white_pieces_count = 0;  // Number of pieces on the board
     int black_pieces_count = 0;
+    bool should_take_piece = false;
     entt::entity nodes[24];
 };
 
-void game_update_system(entt::registry& registry, entt::entity board, entt::entity hovered);
-void piece_move_system(entt::registry& registry, float dt);
+namespace systems {
+    void game_update(entt::registry& registry, entt::entity board, entt::entity hovered);
+    void piece_move(entt::registry& registry, float dt);
+}
