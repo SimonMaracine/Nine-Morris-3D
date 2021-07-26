@@ -1,14 +1,17 @@
+#include <algorithm>
+
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "ecs/systems.h"
 #include "ecs/components.h"
+#include "ecs/game.h"
 #include "application/input.h"
 #include "opengl/renderer/renderer.h"
 #include "other/logging.h"
 
-void systems::render(entt::registry& registry, entt::entity camera_entity) {
+void systems::board_render(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
 
     auto view = registry.view<TransformComponent,
@@ -17,9 +20,7 @@ void systems::render(entt::registry& registry, entt::entity camera_entity) {
                               TextureComponent>(entt::exclude<OutlineComponent>);
 
     for (entt::entity entity : view) {
-        auto [transform, mesh, material, textures] =
-            view.get<TransformComponent, MeshComponent,
-                     MaterialComponent, TextureComponent>(entity);
+        auto [transform, mesh, material, textures] = view.get(entity);
 
         material.shader->bind();
         material.shader->set_uniform_matrix("u_projection_view_matrix",
@@ -27,7 +28,7 @@ void systems::render(entt::registry& registry, entt::entity camera_entity) {
         renderer::draw_model(transform.position, transform.rotation, transform.scale,
                              material.shader, mesh.vertex_array, textures.diffuse_map,
                              material.specular_color, material.shininess,
-                             mesh.index_count);
+                             mesh.index_count, glm::vec3(1.0f, 1.0f, 1.0f));
     }
 }
 
@@ -35,7 +36,7 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
     auto view = registry.view<TransformComponent, CameraComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+        auto [transform, camera] = view.get(entity);
 
         float& pitch = transform.rotation.x;
         float& yaw = transform.rotation.y;
@@ -111,9 +112,7 @@ void systems::cube_map_render(entt::registry& registry, entt::entity camera_enti
                               SkyboxTextureComponent>();
 
     for (entt::entity entity : view) {
-        auto [mesh, material, texture] = view.get<SkyboxMeshComponent,
-                                                  SkyboxMaterialComponent,
-                                                  SkyboxTextureComponent>(entity);
+        auto [mesh, material, texture] = view.get(entity);
 
         const glm::mat4& projection_matrix = camera.projection_matrix;
         glm::mat4 view_matrix = glm::mat4(glm::mat3(camera.view_matrix));
@@ -123,38 +122,46 @@ void systems::cube_map_render(entt::registry& registry, entt::entity camera_enti
     }
 }
 
-void systems::with_outline_render(entt::registry& registry, entt::entity camera_entity,
-                                entt::entity hovered_entity) {
+void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
+                           entt::entity hovered_entity) {
     auto& camera = registry.get<CameraComponent>(camera_entity);
-    auto& camera_transform = registry.get<TransformComponent>(camera_entity);
 
     auto view = registry.view<TransformComponent, MeshComponent,
-                              MaterialComponent, TextureComponent, OutlineComponent>();
+                              MaterialComponent, TextureComponent,
+                              OutlineComponent, PieceComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, mesh, material, textures, outline] =
-            view.get<TransformComponent, MeshComponent, MaterialComponent,
-                     TextureComponent, OutlineComponent>(entity);
+        auto [transform, mesh, material, textures, outline, piece] = view.get(entity);
 
-        if (hovered_entity == entity) {
-            float outline_size = (camera_transform.position - transform.position).length() * 1.2f;
+        if (hovered_entity == entity && piece.active && piece.show_outline) {
+            constexpr float outline_size = 3.6f;
 
             outline.shader->bind();
             outline.shader->set_uniform_matrix("u_projection_view_matrix",
                                                camera.projection_view_matrix);
             renderer::draw_model_outline(transform.position, transform.rotation,
-                                     transform.scale, material.shader, mesh.vertex_array,
-                                     textures.diffuse_map, material.specular_color,
-                                     material.shininess, mesh.index_count,
-                                     outline.outline_color, outline_size);
+                                    transform.scale, material.shader, mesh.vertex_array,
+                                    textures.diffuse_map, material.specular_color,
+                                    material.shininess, mesh.index_count,
+                                    outline.outline_color, outline_size);
+        } else if (hovered_entity == entity && piece.active && piece.to_take) {
+            material.shader->bind();
+            material.shader->set_uniform_matrix("u_projection_view_matrix",
+                                                camera.projection_view_matrix);
+            renderer::draw_model(transform.position, transform.rotation,
+                            transform.scale, material.shader, mesh.vertex_array,
+                            textures.diffuse_map, material.specular_color,
+                            material.shininess, mesh.index_count,
+                            glm::vec3(0.9f, 0.0f, 0.0f));
         } else {
             material.shader->bind();
             material.shader->set_uniform_matrix("u_projection_view_matrix",
                                                 camera.projection_view_matrix);
             renderer::draw_model(transform.position, transform.rotation,
-                                 transform.scale, material.shader, mesh.vertex_array,
-                                 textures.diffuse_map, material.specular_color,
-                                 material.shininess, mesh.index_count);
+                            transform.scale, material.shader, mesh.vertex_array,
+                            textures.diffuse_map, material.specular_color,
+                            material.shininess, mesh.index_count,
+                            glm::vec3(1.0f, 1.0f, 1.0f));
         }
     }
 }
@@ -165,8 +172,7 @@ void systems::lighting(entt::registry& registry, entt::entity camera_entity) {
     auto view = registry.view<TransformComponent, LightComponent, ShaderComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, light, shader] = view.get<TransformComponent, LightComponent,
-                                                   ShaderComponent>(entity);
+        auto [transform, light, shader] = view.get(entity);
 
         shader.shader->bind();
         shader.shader->set_uniform_vec3("u_light.position", transform.position);
@@ -184,7 +190,7 @@ void systems::lighting_render(entt::registry& registry, entt::entity camera_enti
     auto view = registry.view<TransformComponent, LightMeshComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, light] = view.get<TransformComponent, LightMeshComponent>(entity);
+        auto [transform, light] = view.get(entity);
 
         light.shader->bind();
         light.shader->set_uniform_matrix("u_projection_matrix", camera.projection_matrix);
@@ -220,7 +226,7 @@ void systems::origin_render(entt::registry& registry, entt::entity camera_entity
     auto view = registry.view<OriginComponent>();
 
     for (entt::entity entity : view) {
-        OriginComponent& origin = view.get<OriginComponent>(entity);
+        auto& origin = view.get<OriginComponent>(entity);
 
         origin.shader->bind();
         origin.shader->set_uniform_matrix("u_projection_view_matrix",
@@ -237,8 +243,7 @@ void systems::node_render(entt::registry& registry, entt::entity camera_entity,
     auto view = registry.view<TransformComponent, MeshComponent, NodeMaterialComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent,
-                                                    NodeMaterialComponent>(entity);
+        auto [transform, mesh, material] = view.get(entity);
 
         material.shader->bind();
         material.shader->set_uniform_matrix("u_projection_view_matrix",

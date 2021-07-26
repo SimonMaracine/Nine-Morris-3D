@@ -73,8 +73,8 @@ void Application::on_event(events::Event& event) {
 void Application::update(float dt) {
     systems::camera(registry, mouse_wheel, dx, dy, dt);
     systems::lighting_move(registry, dt);
-    systems::piece_move(registry, dt);
-    systems::game_update(registry, board, hovered_entity);
+    systems::move_piece(registry, dt);
+    // systems::game_update(registry, board, hovered_entity);
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -92,8 +92,8 @@ void Application::draw() {
 
     systems::cube_map_render(registry, camera);
     systems::lighting(registry, camera);
-    systems::render(registry, camera);
-    systems::with_outline_render(registry, camera, hovered_entity);
+    systems::board_render(registry, camera);
+    systems::piece_render(registry, camera, hovered_entity);
     systems::node_render(registry, camera, hovered_entity);
     systems::origin_render(registry, camera);
     systems::lighting_render(registry, camera);
@@ -296,6 +296,18 @@ bool Application::on_mouse_button_pressed(events::MouseButtonPressedEvent& event
 bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[event.button] = false;
+
+    auto& state = registry.get<GameStateComponent>(board);
+
+    if (state.phase == Phase::PlacePieces) {
+        if (state.should_take_piece) {
+            systems::take_piece(registry, board, hovered_entity);
+        } else {
+            systems::place_piece(registry, board, hovered_entity);
+        }
+    } else if (state.phase == Phase::MovePieces) {
+
+    }
 
     return false;
 }

@@ -61,7 +61,8 @@ namespace renderer {
                     std::shared_ptr<Texture> diffuse_map,
                     const glm::vec3& specular_color,
                     float shininess,
-                    GLuint index_count);
+                    GLuint index_count,
+                    const glm::vec3& tint_color);
 
     void draw_model_outline(const glm::vec3& position,
                             const glm::vec3& rotation,

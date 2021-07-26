@@ -3,14 +3,14 @@
 #include <entt/entt.hpp>
 
 namespace systems {
-    void render(entt::registry& registry, entt::entity camera_entity);
+    void board_render(entt::registry& registry, entt::entity camera_entity);
 
     void camera(entt::registry& registry, float mouse_wheel, float dx, float dy, float dt);
 
     void cube_map_render(entt::registry& registry, entt::entity camera_entity);
 
-    void with_outline_render(entt::registry& registry, entt::entity camera_entity,
-                             entt::entity hovered_entity);
+    void piece_render(entt::registry& registry, entt::entity camera_entity,
+                      entt::entity hovered_entity);
 
     void lighting(entt::registry& registry, entt::entity camera_entity);
 

@@ -13,8 +13,7 @@ static entt::entity place_piece(entt::registry& registry, Piece type, float x_po
     auto view = registry.view<TransformComponent, PieceComponent, MoveComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, piece, move] = view.get<TransformComponent, PieceComponent,
-                                                 MoveComponent>(entity);
+        auto [transform, piece, move] = view.get(entity);
 
         if (!piece.active && piece.type == type) {
             move.target.x = x_pos;
@@ -42,7 +41,8 @@ static Player switch_turn(Player turn) {
     }
 }
 
-static bool is_windmill_made(entt::registry& registry, entt::entity board, entt::entity node) {
+static bool is_windmill_made(entt::registry& registry, entt::entity board,
+                             entt::entity node, Piece type) {
     constexpr int windmills[16][3] = {
         { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
         { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
@@ -65,7 +65,7 @@ static bool is_windmill_made(entt::registry& registry, entt::entity board, entt:
             auto& piece2 = PIECE(node2.piece);
             auto& piece3 = PIECE(node3.piece);
 
-            if (piece1.type == piece2.type && piece2.type == piece3.type) {
+            if (piece1.type == type && piece2.type == type && piece3.type == type) {
                 if (piece1.node == node || piece2.node == node || piece3.node == node) {
                     return true;
                 }
@@ -76,55 +76,70 @@ static bool is_windmill_made(entt::registry& registry, entt::entity board, entt:
     return false;
 }
 
-void systems::game_update(entt::registry& registry, entt::entity board, entt::entity hovered) {
+static void set_pieces_to_take(entt::registry& registry, Piece type, bool take) {
+    auto view = registry.view<PieceComponent>();
+
+    for (entt::entity entity : view) {
+        auto& piece = view.get<PieceComponent>(entity);
+
+        if (piece.type == type) {
+            piece.to_take = take;
+        }
+    }
+}
+
+void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
     auto& state = registry.get<GameStateComponent>(board);
 
     auto view = registry.view<TransformComponent, NodeComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, node] = view.get<TransformComponent, NodeComponent>(entity);
+        auto [transform, node] = view.get(entity);
 
-        if (state.phase == Phase::PlacePieces) {
-            if (input::is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) {
-                if (entity == hovered && node.piece == entt::null) {
-                    SPDLOG_DEBUG("Placing piece");
-                    const glm::vec3& position = transform.position;
+        if (entity == hovered && node.piece == entt::null) {
+            const glm::vec3& position = transform.position;
 
-                    if (state.turn == Player::White) {
-                        node.piece = place_piece(registry, Piece::White,
-                                                 position.x, position.z, entity);
-                        state.white_pieces_count++;
-                    } else {
-                        node.piece = place_piece(registry, Piece::Black,
-                                                 position.x, position.z, entity);
-                        state.black_pieces_count++;
-                    }
-
-                    if (is_windmill_made(registry, board, entity)) {
-                        SPDLOG_DEBUG("WINDMILL MADE");
-                        
-                    }
-
-                    state.turn = switch_turn(state.turn);
-
-                    if (state.white_pieces_count == 9 && state.black_pieces_count == 9) {
-                        state.phase = Phase::MovePieces;
-                    }
-                }
+            if (state.turn == Player::White) {
+                node.piece = place_piece(registry, Piece::White,
+                                         position.x, position.z, entity);
+                state.white_pieces_count++;
+                state.not_placed_pieces_count--;
+            } else {
+                node.piece = place_piece(registry, Piece::Black,
+                                         position.x, position.z, entity);
+                state.black_pieces_count++;
+                state.not_placed_pieces_count--;
             }
-        } else if (state.phase == Phase::MovePieces) {
 
-        } else {
+            if (is_windmill_made(registry, board, entity,
+                    state.turn == Player::White ? Piece::White : Piece::Black)) {
+                SPDLOG_DEBUG("Windmill made");
+                state.should_take_piece = true;
 
+                if (state.turn == Player::White) {
+                    set_pieces_to_take(registry, Piece::Black, true);
+                } else {
+                    set_pieces_to_take(registry, Piece::White, true);
+                }
+            } else {
+                state.turn = switch_turn(state.turn);
+            }
+
+            if (state.not_placed_pieces_count == 0 && !state.should_take_piece) {
+                state.phase = Phase::MovePieces;
+                SPDLOG_INFO("Phase 2");
+            }
+
+            break;
         }
     }
 }
 
-void systems::piece_move(entt::registry& registry, float dt) {
+void systems::move_piece(entt::registry& registry, float dt) {
     auto view = registry.view<TransformComponent, MoveComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, move] = view.get<TransformComponent, MoveComponent>(entity);
+        auto [transform, move] = view.get(entity);
 
         if (move.should_move) {
             if (glm::length(move.target - transform.position) > 0.35f) {
@@ -140,5 +155,52 @@ void systems::piece_move(entt::registry& registry, float dt) {
                 move.target = glm::vec3(0.0f);
             }
         }
+    }
+}
+
+void systems::take_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
+    auto& state = registry.get<GameStateComponent>(board);
+
+    auto view = registry.view<NodeComponent>();
+
+    for (entt::entity entity : view) {
+        auto& node = view.get<NodeComponent>(entity);
+
+        if (node.piece != entt::null) {
+            auto& piece = PIECE(node.piece);
+            if (state.turn == Player::White) {
+                if (node.piece == hovered && piece.type == Piece::Black) {
+                    if (!is_windmill_made(registry, board, entity, Piece::Black)) {
+                        registry.destroy(node.piece);  // Should work?
+                        node.piece = entt::null;
+                        state.turn = switch_turn(state.turn);
+                        state.should_take_piece = false;
+                        set_pieces_to_take(registry, Piece::Black, false);
+                        state.black_pieces_count--;
+                    } else {
+                        SPDLOG_DEBUG("Cannot take piece from windmill");
+                    }
+                }
+            } else {
+                if (node.piece == hovered && piece.type == Piece::White) {
+                    if (!is_windmill_made(registry, board, entity, Piece::White)) {
+                        registry.destroy(node.piece);  // Should work?
+                        node.piece = entt::null;
+                        state.turn = switch_turn(state.turn);
+                        state.should_take_piece = false;
+                        set_pieces_to_take(registry, Piece::White, false);
+                        state.white_pieces_count--;
+                    } else {
+                        SPDLOG_DEBUG("Cannot take piece from windmill");
+                    }
+                }
+            }
+        }
+    }
+
+    // Do this even if it may be not needed
+    if (state.not_placed_pieces_count == 0 && !state.should_take_piece) {
+        state.phase = Phase::MovePieces;
+        SPDLOG_INFO("Phase 2");
     }
 }

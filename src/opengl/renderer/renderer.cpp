@@ -178,11 +178,13 @@ namespace renderer {
                     std::shared_ptr<Texture> diffuse_map,
                     const glm::vec3& specular_color,
                     float shininess,
-                    GLuint index_count) {
+                    GLuint index_count,
+                    const glm::vec3& tint_color) {
         shader->bind();
         shader->set_uniform_int("u_material.diffuse", 0);
         shader->set_uniform_vec3("u_material.specular", specular_color);
         shader->set_uniform_float("u_material.shininess", shininess);
+        shader->set_uniform_vec3("u_tint_color", tint_color);
 
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);

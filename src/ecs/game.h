@@ -61,6 +61,8 @@ struct PieceComponent {
     Piece type;
     bool active = false;
     entt::entity node = entt::null;
+    bool show_outline = false;
+    bool to_take = false;
 };
 
 struct MoveComponent {
@@ -87,11 +89,13 @@ struct GameStateComponent {
     Player turn = Player::White;
     int white_pieces_count = 0;  // Number of pieces on the board
     int black_pieces_count = 0;
+    int not_placed_pieces_count = 18;
     bool should_take_piece = false;
     entt::entity nodes[24];
 };
 
 namespace systems {
-    void game_update(entt::registry& registry, entt::entity board, entt::entity hovered);
-    void piece_move(entt::registry& registry, float dt);
+    void place_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
+    void move_piece(entt::registry& registry, float dt);
+    void take_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
 }
