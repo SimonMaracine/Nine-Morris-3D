@@ -28,7 +28,7 @@ void systems::board_render(entt::registry& registry, entt::entity camera_entity)
         renderer::draw_model(transform.position, transform.rotation, transform.scale,
                              material.shader, mesh.vertex_array, textures.diffuse_map,
                              material.specular_color, material.shininess,
-                             mesh.index_count, glm::vec3(1.0f, 1.0f, 1.0f));
+                             mesh.index_count, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 }
 
@@ -133,7 +133,7 @@ void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
     for (entt::entity entity : view) {
         auto [transform, mesh, material, textures, outline, piece] = view.get(entity);
 
-        if (hovered_entity == entity && piece.active && piece.show_outline) {
+        if (piece.show_outline && entity == hovered_entity && piece.active) {
             constexpr float outline_size = 3.6f;
 
             outline.shader->bind();
@@ -144,7 +144,7 @@ void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
                                     textures.diffuse_map, material.specular_color,
                                     material.shininess, mesh.index_count,
                                     outline.outline_color, outline_size);
-        } else if (hovered_entity == entity && piece.active && piece.to_take) {
+        } else if (piece.to_take && entity == hovered_entity && piece.active) {
             material.shader->bind();
             material.shader->set_uniform_matrix("u_projection_view_matrix",
                                                 camera.projection_view_matrix);

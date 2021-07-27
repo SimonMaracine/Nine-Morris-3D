@@ -61,8 +61,10 @@ struct PieceComponent {
     Piece type;
     bool active = false;
     entt::entity node = entt::null;
+
     bool show_outline = false;
     bool to_take = false;
+    bool pending_remove = false;
 };
 
 struct MoveComponent {

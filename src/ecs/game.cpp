@@ -41,6 +41,21 @@ static entt::entity place_piece(entt::registry& registry, Piece type, float x_po
     assert(false);
 }
 
+static void take_raise_piece(entt::registry& registry, entt::entity piece_entity) {
+    auto [transform, piece, move] = registry.get<TransformComponent, PieceComponent,
+                                                 MoveComponent>(piece_entity);
+
+    move.target.x = transform.position.x;
+    move.target.y = PIECE_Y_POSITION + 1.5f;
+    move.target.z = transform.position.z;
+
+    move.velocity = (move.target - transform.position) * PIECE_MOVE_SPEED;
+    move.should_move = true;
+
+    piece.node = entt::null;
+    piece.pending_remove = true;
+}
+
 static Player switch_turn(Player turn) {
     if (turn == Player::White) {
         return Player::Black;
@@ -179,10 +194,10 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
 }
 
 void systems::move_piece(entt::registry& registry, float dt) {
-    auto view = registry.view<TransformComponent, MoveComponent>();
+    auto view = registry.view<TransformComponent, MoveComponent, PieceComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, move] = view.get(entity);
+        auto [transform, move, piece] = view.get(entity);
 
         if (move.should_move) {
             if (glm::length(move.target - transform.position) > 0.35f) {
@@ -196,6 +211,11 @@ void systems::move_piece(entt::registry& registry, float dt) {
                 move.should_move = false;
                 move.velocity = glm::vec3(0.0f);
                 move.target = glm::vec3(0.0f);
+
+                // Remove if set to remove
+                if (piece.pending_remove) {
+                    registry.destroy(entity);
+                }
             }
         }
     }
@@ -217,7 +237,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::Black) ||
                             number_of_pieces_in_windmills(registry, board, Piece::Black) ==
                             state.black_pieces_count) {
-                        registry.destroy(node.piece);
+                        take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
                         state.turn = switch_turn(state.turn);
                         state.should_take_piece = false;
@@ -235,7 +255,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::White) ||
                             number_of_pieces_in_windmills(registry, board, Piece::White) ==
                             state.white_pieces_count) {
-                        registry.destroy(node.piece);
+                        take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
                         state.turn = switch_turn(state.turn);
                         state.should_take_piece = false;

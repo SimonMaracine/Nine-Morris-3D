@@ -74,7 +74,8 @@ namespace debug_opengl {
                 std::exit(1);
             case GL_DEBUG_SEVERITY_MEDIUM:
                 switch (id) {
-                    case 7: return;  // Ignore this warning
+                    case 10:
+                    case 7: return;  // Ignore these warnings
                 }
                 spdlog::warn("(ID: {}) {}", id, message);
                 break;
