@@ -31,12 +31,12 @@ public:
     void bind() const;
     static void bind_default();
 
-    Specification& get_specification() { return specification; }
-    GLuint get_color_attachment(unsigned int index);
+    const Specification& get_specification() const { return specification; }
+    GLuint get_color_attachment(unsigned int index) const;
 
     void resize(int width, int height);
-    int read_pixel(unsigned int attachment_index, int x, int y);
-    void clear_red_integer_attachment(int index, int value);
+    int read_pixel(unsigned int attachment_index, int x, int y) const;
+    void clear_red_integer_attachment(int index, int value) const;
 private:
     void build();
 

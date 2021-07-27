@@ -212,7 +212,7 @@ void systems::move_piece(entt::registry& registry, float dt) {
                 move.velocity = glm::vec3(0.0f);
                 move.target = glm::vec3(0.0f);
 
-                // Remove if set to remove
+                // Remove piece if set to remove
                 if (piece.pending_remove) {
                     registry.destroy(entity);
                 }

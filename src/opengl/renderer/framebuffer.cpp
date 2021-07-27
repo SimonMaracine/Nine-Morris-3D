@@ -48,7 +48,7 @@ void Framebuffer::bind_default() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-GLuint Framebuffer::get_color_attachment(unsigned int index) {
+GLuint Framebuffer::get_color_attachment(unsigned int index) const {
     assert(index < color_attachments.size());
     return color_attachments[index];
 }
@@ -64,7 +64,7 @@ void Framebuffer::resize(int width, int height) {
     build();
 }
 
-int Framebuffer::read_pixel(unsigned int attachment_index, int x, int y) {
+int Framebuffer::read_pixel(unsigned int attachment_index, int x, int y) const {
     assert(attachment_index < color_attachments.size());
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -74,7 +74,7 @@ int Framebuffer::read_pixel(unsigned int attachment_index, int x, int y) {
     return pixel;
 }
 
-void Framebuffer::clear_red_integer_attachment(int index, int value) {
+void Framebuffer::clear_red_integer_attachment(int index, int value) const {
     assert(index < (int) color_attachments.size());
 
     glClearBufferiv(GL_COLOR, index, &value);
@@ -173,7 +173,7 @@ void Framebuffer::build() {
         glDrawBuffer(GL_NONE);
     }
 
-    if (!(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)) {
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         spdlog::critical("Framebuffer {} is incomplete", framebuffer);
         std::exit(1);
     }
