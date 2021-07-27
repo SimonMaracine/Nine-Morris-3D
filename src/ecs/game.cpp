@@ -1,5 +1,6 @@
 #include <cassert>
-// #include <algorithm>
+#include <algorithm>
+#include <vector>
 
 #include <entt/entt.hpp>
 
@@ -7,6 +8,13 @@
 #include "ecs/components.h"
 #include "application/input.h"
 #include "other/logging.h"
+
+constexpr int windmills[16][3] = {
+    { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
+    { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
+    { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
+    { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
+};
 
 static entt::entity place_piece(entt::registry& registry, Piece type, float x_pos,
                                 float z_pos, entt::entity node_entity) {
@@ -43,13 +51,6 @@ static Player switch_turn(Player turn) {
 
 static bool is_windmill_made(entt::registry& registry, entt::entity board,
                              entt::entity node, Piece type) {
-    constexpr int windmills[16][3] = {
-        { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
-        { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
-        { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
-        { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
-    };
-
     auto& state = registry.get<GameStateComponent>(board);
 
     for (int i = 0; i < 16; i++) {
@@ -86,6 +87,48 @@ static void set_pieces_to_take(entt::registry& registry, Piece type, bool take) 
             piece.to_take = take;
         }
     }
+}
+
+static int number_of_pieces_in_windmills(entt::registry& registry, entt::entity board, Piece type) {
+    auto& state = registry.get<GameStateComponent>(board);
+
+    std::vector<entt::entity> pieces_inside_mills;
+
+    for (int i = 0; i < 16; i++) {
+        const int* mill = windmills[i];
+
+        auto& node1 = NODE(state.nodes[mill[0]]);
+        auto& node2 = NODE(state.nodes[mill[1]]);
+        auto& node3 = NODE(state.nodes[mill[2]]);
+
+        if (node1.piece != entt::null && node2.piece != entt::null &&
+                node3.piece != entt::null) {
+            auto& piece1 = PIECE(node1.piece);
+            auto& piece2 = PIECE(node2.piece);
+            auto& piece3 = PIECE(node3.piece);
+
+            if (piece1.type == type && piece2.type == type && piece3.type == type) {
+                std::vector<entt::entity>::iterator it;
+
+                it = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), node1.piece);
+                if (it == pieces_inside_mills.end()) {
+                    pieces_inside_mills.push_back(node1.piece);
+                }
+                it = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), node2.piece);
+                if (it == pieces_inside_mills.end()) {
+                    pieces_inside_mills.push_back(node2.piece);
+                }
+                it = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), node3.piece);
+                if (it == pieces_inside_mills.end()) {
+                    pieces_inside_mills.push_back(node3.piece);
+                }
+            }
+        }
+    }
+
+    SPDLOG_DEBUG("Number of {} pieces in mills: {}", type == Piece::White ? "white" : "black", pieces_inside_mills.size());
+
+    return pieces_inside_mills.size();
 }
 
 void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
@@ -171,7 +214,9 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
             if (state.turn == Player::White) {
                 if (node.piece == hovered && state.pressed_piece == hovered &&
                         piece.type == Piece::Black) {
-                    if (!is_windmill_made(registry, board, entity, Piece::Black)) {
+                    if (!is_windmill_made(registry, board, entity, Piece::Black) ||
+                            number_of_pieces_in_windmills(registry, board, Piece::Black) ==
+                            state.black_pieces_count) {
                         registry.destroy(node.piece);
                         node.piece = entt::null;
                         state.turn = switch_turn(state.turn);
@@ -181,11 +226,15 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
+
+                    break;
                 }
             } else {
                 if (node.piece == hovered && state.pressed_piece == hovered &&
                         piece.type == Piece::White) {
-                    if (!is_windmill_made(registry, board, entity, Piece::White)) {
+                    if (!is_windmill_made(registry, board, entity, Piece::White) ||
+                            number_of_pieces_in_windmills(registry, board, Piece::White) ==
+                            state.white_pieces_count) {
                         registry.destroy(node.piece);
                         node.piece = entt::null;
                         state.turn = switch_turn(state.turn);
@@ -195,6 +244,8 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
+
+                    break;
                 }
             }
         }
