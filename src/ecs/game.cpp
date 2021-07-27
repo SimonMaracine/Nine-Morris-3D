@@ -96,7 +96,7 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
     for (entt::entity entity : view) {
         auto [transform, node] = view.get(entity);
 
-        if (entity == hovered && node.piece == entt::null) {
+        if (entity == hovered && entity == state.pressed_node && node.piece == entt::null) {
             const glm::vec3& position = transform.position;
 
             if (state.turn == Player::White) {
@@ -169,9 +169,10 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
         if (node.piece != entt::null) {
             auto& piece = PIECE(node.piece);
             if (state.turn == Player::White) {
-                if (node.piece == hovered && piece.type == Piece::Black) {
+                if (node.piece == hovered && state.pressed_piece == hovered &&
+                        piece.type == Piece::Black) {
                     if (!is_windmill_made(registry, board, entity, Piece::Black)) {
-                        registry.destroy(node.piece);  // Should work?
+                        registry.destroy(node.piece);
                         node.piece = entt::null;
                         state.turn = switch_turn(state.turn);
                         state.should_take_piece = false;
@@ -182,9 +183,10 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     }
                 }
             } else {
-                if (node.piece == hovered && piece.type == Piece::White) {
+                if (node.piece == hovered && state.pressed_piece == hovered &&
+                        piece.type == Piece::White) {
                     if (!is_windmill_made(registry, board, entity, Piece::White)) {
-                        registry.destroy(node.piece);  // Should work?
+                        registry.destroy(node.piece);
                         node.piece = entt::null;
                         state.turn = switch_turn(state.turn);
                         state.should_take_piece = false;
@@ -203,4 +205,33 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
         state.phase = Phase::MovePieces;
         SPDLOG_INFO("Phase 2");
     }
+}
+
+void systems::press(entt::registry& registry, entt::entity board, entt::entity hovered) {
+    auto& state = registry.get<GameStateComponent>(board);
+
+    {
+        auto view = registry.view<NodeComponent>();
+        for (entt::entity entity : view) {
+            if (entity == hovered) {
+                state.pressed_node = entity;
+            }
+        }
+    }
+
+    {
+        auto view = registry.view<PieceComponent>();
+        for (entt::entity entity : view) {
+            if (entity == hovered) {
+                state.pressed_piece = entity;
+            }
+        }
+    }
+}
+
+void systems::release(entt::registry& registry, entt::entity board) {
+    auto& state = registry.get<GameStateComponent>(board);
+
+    state.pressed_node = entt::null;
+    state.pressed_piece = entt::null;
 }

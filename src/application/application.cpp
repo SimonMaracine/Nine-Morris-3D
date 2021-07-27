@@ -290,6 +290,8 @@ bool Application::on_mouse_button_pressed(events::MouseButtonPressedEvent& event
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[event.button] = true;
 
+    systems::press(registry, board, hovered_entity);
+
     return false;
 }
 
@@ -308,6 +310,8 @@ bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& eve
     } else if (state.phase == Phase::MovePieces) {
 
     }
+
+    systems::release(registry, board);
 
     return false;
 }
