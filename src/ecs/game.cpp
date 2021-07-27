@@ -104,6 +104,18 @@ static void set_pieces_to_take(entt::registry& registry, Piece type, bool take) 
     }
 }
 
+static void set_pieces_show_outline(entt::registry& registry, Piece type, bool show) {
+    auto view = registry.view<PieceComponent>();
+
+    for (entt::entity entity : view) {
+        auto& piece = view.get<PieceComponent>(entity);
+
+        if (piece.type == type) {
+            piece.show_outline = show;
+        }
+    }
+}
+
 static int number_of_pieces_in_windmills(entt::registry& registry, entt::entity board, Piece type) {
     auto& state = registry.get<GameStateComponent>(board);
 
@@ -141,9 +153,36 @@ static int number_of_pieces_in_windmills(entt::registry& registry, entt::entity 
         }
     }
 
-    SPDLOG_DEBUG("Number of {} pieces in mills: {}", type == Piece::White ? "white" : "black", pieces_inside_mills.size());
+    SPDLOG_DEBUG("Number of {} pieces in mills: {}", type == Piece::White ? "white" : "black",
+                 pieces_inside_mills.size());
 
     return pieces_inside_mills.size();
+}
+
+static void unselect_other_pieces(entt::registry& registry, entt::entity currently_selected_piece) {
+    auto view = registry.view<PieceComponent>();
+
+    for (entt::entity entity : view) {
+        auto& piece = view.get<PieceComponent>(entity);
+
+        if (entity != currently_selected_piece) {
+            piece.selected = false;
+        }
+    }
+}
+
+static void update_outlines(entt::registry& registry, entt::entity board) {
+    auto& state = registry.get<GameStateComponent>(board);
+
+    if (state.phase == Phase::MovePieces) {
+        if (state.turn == Player::White) {
+            set_pieces_show_outline(registry, Piece::White, true);
+            set_pieces_show_outline(registry, Piece::Black, false);
+        } else {
+            set_pieces_show_outline(registry, Piece::Black, true);
+            set_pieces_show_outline(registry, Piece::White, false);
+        }
+    }
 }
 
 void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
@@ -185,6 +224,7 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
 
             if (state.not_placed_pieces_count == 0 && !state.should_take_piece) {
                 state.phase = Phase::MovePieces;
+                update_outlines(registry, board);
                 SPDLOG_INFO("Phase 2");
             }
 
@@ -240,6 +280,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
                         state.turn = switch_turn(state.turn);
+                        update_outlines(registry, board);
                         state.should_take_piece = false;
                         set_pieces_to_take(registry, Piece::Black, false);
                         state.black_pieces_count--;
@@ -258,6 +299,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
                         state.turn = switch_turn(state.turn);
+                        update_outlines(registry, board);
                         state.should_take_piece = false;
                         set_pieces_to_take(registry, Piece::White, false);
                         state.white_pieces_count--;
@@ -275,6 +317,30 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
     if (state.not_placed_pieces_count == 0 && !state.should_take_piece) {
         state.phase = Phase::MovePieces;
         SPDLOG_INFO("Phase 2");
+    }
+}
+
+void systems::select_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
+    auto& state = registry.get<GameStateComponent>(board);
+
+    auto view = registry.view<PieceComponent>();
+
+    for (entt::entity entity : view) {
+        auto& piece = view.get<PieceComponent>(entity);
+
+        if (entity == hovered) {
+            if (state.turn == Player::White && piece.type == Piece::White ||
+                    state.turn == Player::Black && piece.type == Piece::Black) {
+                if (!piece.selected) {
+                    state.selected_piece = entity;
+                    piece.selected = true;
+                    unselect_other_pieces(registry, entity);
+                } else {
+                    state.selected_piece = entt::null;
+                    piece.selected = false;
+                }
+            }
+        }
     }
 }
 

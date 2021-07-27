@@ -47,7 +47,8 @@ add_executable(${EXECUTABLE_NAME}
 # Enable warnings
 target_compile_options(${EXECUTABLE_NAME} PUBLIC
     -Wall -Wextra
-    -Wno-unused-parameter -Wno-missing-field-initializers -Wno-type-limits)
+    -Wno-unused-parameter -Wno-missing-field-initializers -Wno-type-limits
+    -Wno-parentheses)
 
 # Use C++17
 target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)

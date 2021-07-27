@@ -301,17 +301,23 @@ bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& eve
 
     auto& state = registry.get<GameStateComponent>(board);
 
-    if (state.phase == Phase::PlacePieces) {
-        if (state.should_take_piece) {
-            systems::take_piece(registry, board, hovered_entity);
-        } else {
-            systems::place_piece(registry, board, hovered_entity);
+    if (event.button == MOUSE_BUTTON_LEFT) {
+        if (state.phase == Phase::PlacePieces) {
+            if (state.should_take_piece) {
+                systems::take_piece(registry, board, hovered_entity);
+            } else {
+                systems::place_piece(registry, board, hovered_entity);
+            }
+        } else if (state.phase == Phase::MovePieces) {
+            if (state.should_take_piece) {
+
+            } else {
+                systems::select_piece(registry, board, hovered_entity);
+            }
         }
-    } else if (state.phase == Phase::MovePieces) {
 
+        systems::release(registry, board);
     }
-
-    systems::release(registry, board);
 
     return false;
 }

@@ -65,6 +65,7 @@ struct PieceComponent {
     bool show_outline = false;
     bool to_take = false;
     bool pending_remove = false;
+    bool selected = false;
 };
 
 struct MoveComponent {
@@ -99,12 +100,15 @@ struct GameStateComponent {
 
     entt::entity pressed_node = entt::null;
     entt::entity pressed_piece = entt::null;
+
+    entt::entity selected_piece = entt::null;
 };
 
 namespace systems {
     void place_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void move_piece(entt::registry& registry, float dt);
     void take_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
+    void select_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void press(entt::registry& registry, entt::entity board, entt::entity hovered);
     void release(entt::registry& registry, entt::entity board);
 }
