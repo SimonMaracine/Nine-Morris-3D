@@ -16,7 +16,7 @@ constexpr int windmills[16][3] = {
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-static entt::entity place_piece(entt::registry& registry, Piece type, float x_pos,
+static entt::entity place_new_piece(entt::registry& registry, Piece type, float x_pos,
                                 float z_pos, entt::entity node_entity) {
     auto view = registry.view<TransformComponent, PieceComponent, MoveComponent>();
 
@@ -29,6 +29,7 @@ static entt::entity place_piece(entt::registry& registry, Piece type, float x_po
             move.target.z = z_pos;
 
             move.velocity = (move.target - transform.position) * PIECE_MOVE_SPEED;
+            move.distance_to_travel = move.target - transform.position;
             move.should_move = true;
 
             piece.active = true;
@@ -50,6 +51,7 @@ static void take_raise_piece(entt::registry& registry, entt::entity piece_entity
     move.target.z = transform.position.z;
 
     move.velocity = (move.target - transform.position) * PIECE_MOVE_SPEED;
+    move.distance_to_travel = move.target - transform.position;
     move.should_move = true;
 
     piece.node = entt::null;
@@ -197,13 +199,13 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
             const glm::vec3& position = transform.position;
 
             if (state.turn == Player::White) {
-                node.piece = place_piece(registry, Piece::White,
-                                         position.x, position.z, entity);
+                node.piece = place_new_piece(registry, Piece::White,
+                                             position.x, position.z, entity);
                 state.white_pieces_count++;
                 state.not_placed_pieces_count--;
             } else {
-                node.piece = place_piece(registry, Piece::Black,
-                                         position.x, position.z, entity);
+                node.piece = place_new_piece(registry, Piece::Black,
+                                             position.x, position.z, entity);
                 state.black_pieces_count++;
                 state.not_placed_pieces_count--;
             }
@@ -240,10 +242,10 @@ void systems::move_piece(entt::registry& registry, float dt) {
         auto [transform, move, piece] = view.get(entity);
 
         if (move.should_move) {
-            if (glm::length(move.target - transform.position) > 0.35f) {
-                transform.position += move.velocity * dt;
-            } else if (glm::length(move.target - transform.position) > 0.1f) {
-                transform.position += move.velocity * 0.5f * dt;
+            if (move.distance_travelled < glm::length(move.distance_to_travel)) {
+                glm::vec3 velocity = move.velocity * dt;
+                transform.position += velocity;
+                move.distance_travelled += glm::length(velocity);
             } else {
                 transform.position = move.target;
 
@@ -251,6 +253,8 @@ void systems::move_piece(entt::registry& registry, float dt) {
                 move.should_move = false;
                 move.velocity = glm::vec3(0.0f);
                 move.target = glm::vec3(0.0f);
+                move.distance_travelled = 0.0f;
+                move.distance_to_travel = glm::vec3(0.0f);
 
                 // Remove piece if set to remove
                 if (piece.pending_remove) {
@@ -314,7 +318,8 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
     }
 
     // Do this even if it may be not needed
-    if (state.not_placed_pieces_count == 0 && !state.should_take_piece) {
+    if (state.phase == Phase::PlacePieces && state.not_placed_pieces_count == 0 &&
+            !state.should_take_piece) {
         state.phase = Phase::MovePieces;
         SPDLOG_INFO("Phase 2");
     }
@@ -341,6 +346,59 @@ void systems::select_piece(entt::registry& registry, entt::entity board, entt::e
                 }
             }
         }
+    }
+}
+
+void systems::put_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
+    auto& state = registry.get<GameStateComponent>(board);
+
+    auto view = registry.view<TransformComponent, NodeComponent>();
+
+    if (state.selected_piece != entt::null) {
+        for (entt::entity entity : view) {
+            auto [transform, node] = view.get(entity);
+
+            if (entity == hovered) {
+                auto& selected_piece = PIECE(state.selected_piece);
+                auto& piece_move = registry.get<MoveComponent>(state.selected_piece);
+                auto& piece_transform = registry.get<TransformComponent>(state.selected_piece);
+
+                piece_move.target.x = transform.position.x;
+                piece_move.target.y = PIECE_Y_POSITION;
+                piece_move.target.z = transform.position.z;
+
+                piece_move.velocity = (piece_move.target - piece_transform.position) * PIECE_MOVE_SPEED;
+                piece_move.distance_to_travel = piece_move.target - piece_transform.position;
+                piece_move.should_move = true;
+
+                // Reset all variables
+                auto& previous_node = registry.get<NodeComponent>(selected_piece.node);
+
+                previous_node.piece = entt::null;
+                selected_piece.node = entity;
+                selected_piece.selected = false;
+                node.piece = state.selected_piece;
+                state.selected_piece = entt::null;
+
+                if (is_windmill_made(registry, board, entity,
+                        state.turn == Player::White ? Piece::White : Piece::Black)) {
+                    SPDLOG_DEBUG("Windmill made");
+                    state.should_take_piece = true;
+
+                    if (state.turn == Player::White) {
+                        set_pieces_to_take(registry, Piece::Black, true);
+                    } else {
+                        set_pieces_to_take(registry, Piece::White, true);
+                    }
+                } else {
+                    state.turn = switch_turn(state.turn);
+                }
+
+                update_outlines(registry, board);
+
+                break;
+            }
+        }        
     }
 }
 

@@ -261,7 +261,7 @@ bool Application::on_window_closed(events::WindowClosedEvent& event) {
 
 bool Application::on_window_resized(events::WindowResizedEvent& event) {
     renderer::set_viewport(event.width, event.height);
-    storage->framebuffer->resize(event.width, event.height);
+    storage->framebuffer->resize(event.width, event.height);  // TODO should glViewport be called?
 
     return true;
 }
@@ -310,9 +310,10 @@ bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& eve
             }
         } else if (state.phase == Phase::MovePieces) {
             if (state.should_take_piece) {
-
+                systems::take_piece(registry, board, hovered_entity);
             } else {
                 systems::select_piece(registry, board, hovered_entity);
+                systems::put_piece(registry, board, hovered_entity);
             }
         }
 

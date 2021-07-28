@@ -72,6 +72,9 @@ struct MoveComponent {
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 target = glm::vec3(0.0f);
     bool should_move = false;
+
+    float distance_travelled = 0.0f;
+    glm::vec3 distance_to_travel = glm::vec3(0.0f);
 };
 
 struct NodeComponent {
@@ -109,6 +112,7 @@ namespace systems {
     void move_piece(entt::registry& registry, float dt);
     void take_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void select_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
+    void put_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void press(entt::registry& registry, entt::entity board, entt::entity hovered);
     void release(entt::registry& registry, entt::entity board);
 }
