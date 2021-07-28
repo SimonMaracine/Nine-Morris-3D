@@ -144,7 +144,8 @@ void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
                                     textures.diffuse_map, material.specular_color,
                                     material.shininess, mesh.index_count,
                                     outline.outline_color, outline_size);
-        } else if (piece.show_outline && entity == hovered_entity && piece.active) {
+        } else if (piece.show_outline && entity == hovered_entity && piece.active &&
+                !piece.pending_remove) {
             outline.shader->bind();
             outline.shader->set_uniform_matrix("u_projection_view_matrix",
                                                camera.projection_view_matrix);

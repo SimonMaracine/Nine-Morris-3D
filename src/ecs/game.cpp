@@ -17,7 +17,7 @@ constexpr int windmills[16][3] = {
 };
 
 static entt::entity place_new_piece(entt::registry& registry, Piece type, float x_pos,
-                                float z_pos, entt::entity node_entity) {
+                                    float z_pos, entt::entity node_entity) {
     auto view = registry.view<TransformComponent, PieceComponent, MoveComponent>();
 
     for (entt::entity entity : view) {
@@ -336,7 +336,7 @@ void systems::select_piece(entt::registry& registry, entt::entity board, entt::e
         if (entity == hovered) {
             if (state.turn == Player::White && piece.type == Piece::White ||
                     state.turn == Player::Black && piece.type == Piece::Black) {
-                if (!piece.selected) {
+                if (!piece.selected && !piece.pending_remove) {
                     state.selected_piece = entity;
                     piece.selected = true;
                     unselect_other_pieces(registry, entity);
