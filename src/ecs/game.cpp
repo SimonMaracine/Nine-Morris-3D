@@ -187,6 +187,114 @@ static void update_outlines(entt::registry& registry, entt::entity board) {
     }
 }
 
+static bool can_go(entt::registry& registry, entt::entity source_node, entt::entity destination_node) {
+    auto& source = NODE(source_node);
+    auto& destination = NODE(destination_node);
+
+    assert(source_node != destination_node);
+
+    switch (source.id) {
+        case 0:
+            if (destination.id == 1 || destination.id == 9)
+                return true;
+            break;
+        case 1:
+            if (destination.id == 0 || destination.id == 2 || destination.id == 4)
+                return true;
+            break;
+        case 2:
+            if (destination.id == 1 || destination.id == 14)
+                return true;
+            break;
+        case 3:
+            if (destination.id == 4 || destination.id == 10)
+                return true;
+            break;
+        case 4:
+            if (destination.id == 1 || destination.id == 3 || destination.id == 5 || destination.id == 7)
+                return true;
+            break;
+        case 5:
+            if (destination.id == 4 || destination.id == 13)
+                return true;
+            break;
+        case 6:
+            if (destination.id == 7 || destination.id == 11)
+                return true;
+            break;
+        case 7:
+            if (destination.id == 4 || destination.id == 6 || destination.id == 8)
+                return true;
+            break;
+        case 8:
+            if (destination.id == 7 || destination.id == 12)
+                return true;
+            break;
+        case 9:
+            if (destination.id == 0 || destination.id == 10 || destination.id == 21)
+                return true;
+            break;
+        case 10:
+            if (destination.id == 3 || destination.id == 9 || destination.id == 11 || destination.id == 18)
+                return true;
+            break;
+        case 11:
+            if (destination.id == 6 || destination.id == 10 || destination.id == 15)
+                return true;
+            break;
+        case 12:
+            if (destination.id == 8 || destination.id == 13 || destination.id == 17)
+                return true;
+            break;
+        case 13:
+            if (destination.id == 5 || destination.id == 12 || destination.id == 14 || destination.id == 20)
+                return true;
+            break;
+        case 14:
+            if (destination.id == 2 || destination.id == 13 || destination.id == 23)
+                return true;
+            break;
+        case 15:
+            if (destination.id == 11 || destination.id == 16)
+                return true;
+            break;
+        case 16:
+            if (destination.id == 15 || destination.id == 17 || destination.id == 19)
+                return true;
+            break;
+        case 17:
+            if (destination.id == 12 || destination.id == 16)
+                return true;
+            break;
+        case 18:
+            if (destination.id == 10 || destination.id == 19)
+                return true;
+            break;
+        case 19:
+            if (destination.id == 16 || destination.id == 18 || destination.id == 20 || destination.id == 22)
+                return true;
+            break;
+        case 20:
+            if (destination.id == 13 || destination.id == 19)
+                return true;
+            break;
+        case 21:
+            if (destination.id == 9 || destination.id == 22)
+                return true;
+            break;
+        case 22:
+            if (destination.id == 19 || destination.id == 21 || destination.id == 23)
+                return true;
+            break;
+        case 23:
+            if (destination.id == 14 || destination.id == 22)
+                return true;
+            break;
+    }
+
+    return false;
+}
+
 void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
     auto& state = registry.get<GameStateComponent>(board);
 
@@ -359,8 +467,9 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
         for (entt::entity entity : view) {
             auto [transform, node] = view.get(entity);
 
-            if (entity == hovered) {
-                auto& selected_piece = PIECE(state.selected_piece);
+            auto& selected_piece = PIECE(state.selected_piece);
+
+            if (entity == hovered && can_go(registry, selected_piece.node, entity)) {
                 auto& piece_move = registry.get<MoveComponent>(state.selected_piece);
                 auto& piece_transform = registry.get<TransformComponent>(state.selected_piece);
 
