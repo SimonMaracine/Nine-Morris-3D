@@ -321,6 +321,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
     if (state.phase == Phase::PlacePieces && state.not_placed_pieces_count == 0 &&
             !state.should_take_piece) {
         state.phase = Phase::MovePieces;
+        update_outlines(registry, board);
         SPDLOG_INFO("Phase 2");
     }
 }
@@ -387,14 +388,15 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
 
                     if (state.turn == Player::White) {
                         set_pieces_to_take(registry, Piece::Black, true);
+                        set_pieces_show_outline(registry, Piece::White, false);
                     } else {
                         set_pieces_to_take(registry, Piece::White, true);
+                        set_pieces_show_outline(registry, Piece::Black, false);
                     }
                 } else {
                     state.turn = switch_turn(state.turn);
+                    update_outlines(registry, board);
                 }
-
-                update_outlines(registry, board);
 
                 break;
             }
