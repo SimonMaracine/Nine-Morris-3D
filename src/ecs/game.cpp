@@ -68,7 +68,7 @@ static Player switch_turn(Player turn) {
 
 static bool is_windmill_made(entt::registry& registry, entt::entity board,
                              entt::entity node, Piece type) {
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     for (int i = 0; i < 16; i++) {
         const int* mill = windmills[i];
@@ -119,7 +119,7 @@ static void set_pieces_show_outline(entt::registry& registry, Piece type, bool s
 }
 
 static int number_of_pieces_in_windmills(entt::registry& registry, entt::entity board, Piece type) {
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     std::vector<entt::entity> pieces_inside_mills;
 
@@ -156,7 +156,7 @@ static int number_of_pieces_in_windmills(entt::registry& registry, entt::entity 
     }
 
     SPDLOG_DEBUG("Number of {} pieces in mills: {}", type == Piece::White ? "white" : "black",
-                 pieces_inside_mills.size());
+        pieces_inside_mills.size());
 
     return pieces_inside_mills.size();
 }
@@ -174,7 +174,7 @@ static void unselect_other_pieces(entt::registry& registry, entt::entity current
 }
 
 static void update_outlines(entt::registry& registry, entt::entity board) {
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     if (state.phase == Phase::MovePieces) {
         if (state.turn == Player::White) {
@@ -187,11 +187,17 @@ static void update_outlines(entt::registry& registry, entt::entity board) {
     }
 }
 
-static bool can_go(entt::registry& registry, entt::entity source_node, entt::entity destination_node) {
+static bool can_go(entt::registry& registry, entt::entity board, entt::entity source_node,
+                   entt::entity destination_node) {
+    auto& state = STATE(board);
     auto& source = NODE(source_node);
     auto& destination = NODE(destination_node);
 
     assert(source_node != destination_node);
+
+    if (state.can_jump[(int) state.turn]) {
+        return true;
+    }
 
     switch (source.id) {
         case 0:
@@ -295,8 +301,255 @@ static bool can_go(entt::registry& registry, entt::entity source_node, entt::ent
     return false;
 }
 
+static void check_player_pieces_number(entt::registry& registry, entt::entity board, Player player) {
+    auto& state = STATE(board);
+
+    if (player == Player::White) {
+        SPDLOG_DEBUG("White player checked");
+
+        if (state.white_pieces_count == 3) {
+            state.can_jump[(int) player] = true;
+        } else if (state.white_pieces_count == 2) {
+            state.phase = Phase::GameOver;
+            SPDLOG_INFO("Game over, black wins");
+        }
+    } else {
+        SPDLOG_DEBUG("Black player checked");
+
+        if (state.black_pieces_count == 3) {
+            state.can_jump[(int) player] = true;
+        } else if (state.black_pieces_count == 2) {
+            state.phase = Phase::GameOver;
+            SPDLOG_INFO("Game over, white wins");
+        }
+    }
+}
+
+static bool check_player_blocked(entt::registry& registry, entt::entity board, Player player) {
+    auto& state = STATE(board);
+
+    auto view = registry.view<PieceComponent>();
+
+    SPDLOG_DEBUG("{} player is checked if is blocked",
+        player == Player::White ? "White" : "Black");
+
+    if (state.can_jump[(int) player]) {
+        return false;
+    }
+
+    for (entt::entity entity : view) {
+        auto& piece = view.get<PieceComponent>(entity);
+
+        Piece type = player == Player::White ? Piece::White : Piece::Black;
+
+        if (piece.type == type && !piece.pending_remove) {
+            auto& node = NODE(piece.node);  // TODO this probably crashes
+
+            switch (node.id) {
+                case 0: {
+                    auto& node1 = NODE(state.nodes[1]);
+                    auto& node2 = NODE(state.nodes[9]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 1: {
+                    auto& node1 = NODE(state.nodes[0]);
+                    auto& node2 = NODE(state.nodes[2]);
+                    auto& node3 = NODE(state.nodes[4]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 2: {
+                    auto& node1 = NODE(state.nodes[1]);
+                    auto& node2 = NODE(state.nodes[14]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 3: {
+                    auto& node1 = NODE(state.nodes[4]);
+                    auto& node2 = NODE(state.nodes[10]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 4: {
+                    auto& node1 = NODE(state.nodes[1]);
+                    auto& node2 = NODE(state.nodes[3]);
+                    auto& node3 = NODE(state.nodes[5]);
+                    auto& node4 = NODE(state.nodes[7]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null || node4.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 5: {
+                    auto& node1 = NODE(state.nodes[4]);
+                    auto& node2 = NODE(state.nodes[13]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 6: {
+                    auto& node1 = NODE(state.nodes[7]);
+                    auto& node2 = NODE(state.nodes[11]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 7: {
+                    auto& node1 = NODE(state.nodes[4]);
+                    auto& node2 = NODE(state.nodes[6]);
+                    auto& node3 = NODE(state.nodes[8]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 8: {
+                    auto& node1 = NODE(state.nodes[7]);
+                    auto& node2 = NODE(state.nodes[12]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 9: {
+                    auto& node1 = NODE(state.nodes[0]);
+                    auto& node2 = NODE(state.nodes[10]);
+                    auto& node3 = NODE(state.nodes[21]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 10: {
+                    auto& node1 = NODE(state.nodes[3]);
+                    auto& node2 = NODE(state.nodes[9]);
+                    auto& node3 = NODE(state.nodes[11]);
+                    auto& node4 = NODE(state.nodes[18]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null || node4.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 11: {
+                    auto& node1 = NODE(state.nodes[6]);
+                    auto& node2 = NODE(state.nodes[10]);
+                    auto& node3 = NODE(state.nodes[15]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 12: {
+                    auto& node1 = NODE(state.nodes[8]);
+                    auto& node2 = NODE(state.nodes[13]);
+                    auto& node3 = NODE(state.nodes[17]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 13: {
+                    auto& node1 = NODE(state.nodes[5]);
+                    auto& node2 = NODE(state.nodes[12]);
+                    auto& node3 = NODE(state.nodes[14]);
+                    auto& node4 = NODE(state.nodes[20]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null || node4.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 14: {
+                    auto& node1 = NODE(state.nodes[2]);
+                    auto& node2 = NODE(state.nodes[13]);
+                    auto& node3 = NODE(state.nodes[23]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 15: {
+                    auto& node1 = NODE(state.nodes[11]);
+                    auto& node2 = NODE(state.nodes[16]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 16: {
+                    auto& node1 = NODE(state.nodes[15]);
+                    auto& node2 = NODE(state.nodes[17]);
+                    auto& node3 = NODE(state.nodes[19]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 17: {
+                    auto& node1 = NODE(state.nodes[12]);
+                    auto& node2 = NODE(state.nodes[16]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 18: {
+                    auto& node1 = NODE(state.nodes[10]);
+                    auto& node2 = NODE(state.nodes[19]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 19: {
+                    auto& node1 = NODE(state.nodes[16]);
+                    auto& node2 = NODE(state.nodes[18]);
+                    auto& node3 = NODE(state.nodes[20]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 20: {
+                    auto& node1 = NODE(state.nodes[13]);
+                    auto& node2 = NODE(state.nodes[19]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 21: {
+                    auto& node1 = NODE(state.nodes[9]);
+                    auto& node2 = NODE(state.nodes[22]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 22: {
+                    auto& node1 = NODE(state.nodes[19]);
+                    auto& node2 = NODE(state.nodes[21]);
+                    auto& node3 = NODE(state.nodes[23]);
+                    if (node1.piece == entt::null || node2.piece == entt::null ||
+                            node3.piece == entt::null)
+                        return false;
+                    break;
+                }
+                case 23: {
+                    auto& node1 = NODE(state.nodes[14]);
+                    auto& node2 = NODE(state.nodes[22]);
+                    if (node1.piece == entt::null || node2.piece == entt::null)
+                        return false;
+                    break;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     auto view = registry.view<TransformComponent, NodeComponent>();
 
@@ -374,7 +627,7 @@ void systems::move_piece(entt::registry& registry, float dt) {
 }
 
 void systems::take_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     auto view = registry.view<NodeComponent>();
 
@@ -396,6 +649,14 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                         state.should_take_piece = false;
                         set_pieces_to_take(registry, Piece::Black, false);
                         state.black_pieces_count--;
+
+                        check_player_pieces_number(registry, board, state.turn);
+
+                        if (check_player_blocked(registry, board, state.turn)) {
+                            state.phase = Phase::GameOver;
+                            SPDLOG_INFO("Game over, {} wins",
+                                state.turn == Player::White ? "black" : "white");
+                        }
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -415,6 +676,14 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                         state.should_take_piece = false;
                         set_pieces_to_take(registry, Piece::White, false);
                         state.white_pieces_count--;
+
+                        check_player_pieces_number(registry, board, state.turn);
+
+                        if (check_player_blocked(registry, board, state.turn)) {
+                            state.phase = Phase::GameOver;
+                            SPDLOG_INFO("Game over, {} wins",
+                                state.turn == Player::White ? "black" : "white");
+                        }
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -435,7 +704,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
 }
 
 void systems::select_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     auto view = registry.view<PieceComponent>();
 
@@ -459,7 +728,7 @@ void systems::select_piece(entt::registry& registry, entt::entity board, entt::e
 }
 
 void systems::put_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     auto view = registry.view<TransformComponent, NodeComponent>();
 
@@ -469,7 +738,7 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
 
             auto& selected_piece = PIECE(state.selected_piece);
 
-            if (entity == hovered && can_go(registry, selected_piece.node, entity)) {
+            if (entity == hovered && can_go(registry, board, selected_piece.node, entity)) {
                 auto& piece_move = registry.get<MoveComponent>(state.selected_piece);
                 auto& piece_transform = registry.get<TransformComponent>(state.selected_piece);
 
@@ -505,6 +774,12 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
                 } else {
                     state.turn = switch_turn(state.turn);
                     update_outlines(registry, board);
+
+                    if (check_player_blocked(registry, board, state.turn)) {
+                        state.phase = Phase::GameOver;
+                        SPDLOG_INFO("Game over, {} wins",
+                            state.turn == Player::White ? "black" : "white");
+                    }
                 }
 
                 break;
@@ -514,7 +789,7 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
 }
 
 void systems::press(entt::registry& registry, entt::entity board, entt::entity hovered) {
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     {
         auto view = registry.view<NodeComponent>();
@@ -524,7 +799,6 @@ void systems::press(entt::registry& registry, entt::entity board, entt::entity h
             }
         }
     }
-
     {
         auto view = registry.view<PieceComponent>();
         for (entt::entity entity : view) {
@@ -536,7 +810,7 @@ void systems::press(entt::registry& registry, entt::entity board, entt::entity h
 }
 
 void systems::release(entt::registry& registry, entt::entity board) {
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     state.pressed_node = entt::null;
     state.pressed_piece = entt::null;

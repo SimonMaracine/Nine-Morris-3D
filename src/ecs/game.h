@@ -5,6 +5,7 @@
 
 #define PIECE(entity) registry.get<PieceComponent>(entity)
 #define NODE(entity) registry.get<NodeComponent>(entity)
+#define STATE(entity) registry.get<GameStateComponent>(entity)
 
 constexpr float PIECE_Y_POSITION = 0.135f;
 constexpr float NODE_Y_POSITION = 0.062f;
@@ -51,8 +52,8 @@ enum class Piece {
 };
 
 enum class Player {
-    White,
-    Black
+    White = 0,
+    Black = 1
 };
 
 struct PieceComponent {
@@ -105,6 +106,8 @@ struct GameStateComponent {
     entt::entity pressed_piece = entt::null;
 
     entt::entity selected_piece = entt::null;
+
+    bool can_jump[2] = { false, false };
 };
 
 namespace systems {
