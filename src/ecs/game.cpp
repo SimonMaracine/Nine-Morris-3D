@@ -311,6 +311,8 @@ static void check_player_pieces_number(entt::registry& registry, entt::entity bo
             state.can_jump[(int) player] = true;
         } else if (state.white_pieces_count == 2) {
             state.phase = Phase::GameOver;
+            state.ending = Ending::WinnerBlack;
+            set_pieces_show_outline(registry, Piece::Black, false);
             SPDLOG_INFO("Game over, black wins");
         }
     } else {
@@ -320,6 +322,8 @@ static void check_player_pieces_number(entt::registry& registry, entt::entity bo
             state.can_jump[(int) player] = true;
         } else if (state.black_pieces_count == 2) {
             state.phase = Phase::GameOver;
+            state.ending = Ending::WinnerWhite;
+            set_pieces_show_outline(registry, Piece::White, false);
             SPDLOG_INFO("Game over, white wins");
         }
     }
@@ -333,6 +337,9 @@ static bool check_player_blocked(entt::registry& registry, entt::entity board, P
     SPDLOG_DEBUG("{} player is checked if is blocked",
         player == Player::White ? "White" : "Black");
 
+    bool at_least_one_piece = false;
+    Piece type = player == Player::White ? Piece::White : Piece::Black;
+
     if (state.can_jump[(int) player]) {
         return false;
     }
@@ -340,10 +347,10 @@ static bool check_player_blocked(entt::registry& registry, entt::entity board, P
     for (entt::entity entity : view) {
         auto& piece = view.get<PieceComponent>(entity);
 
-        Piece type = player == Player::White ? Piece::White : Piece::Black;
+        if (piece.type == type && !piece.pending_remove && piece.active) {
+            at_least_one_piece = true;
 
-        if (piece.type == type && !piece.pending_remove) {
-            auto& node = NODE(piece.node);  // TODO this probably crashes
+            auto& node = NODE(piece.node);
 
             switch (node.id) {
                 case 0: {
@@ -545,7 +552,10 @@ static bool check_player_blocked(entt::registry& registry, entt::entity board, P
         }
     }
 
-    return true;
+    if (at_least_one_piece)
+        return true;
+    else
+        return false;
 }
 
 void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
@@ -562,14 +572,14 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
             if (state.turn == Player::White) {
                 node.piece = place_new_piece(registry, Piece::White,
                                              position.x, position.z, entity);
-                state.white_pieces_count++;
-                state.not_placed_pieces_count--;
+                state.white_pieces_count++;   
             } else {
                 node.piece = place_new_piece(registry, Piece::Black,
                                              position.x, position.z, entity);
                 state.black_pieces_count++;
-                state.not_placed_pieces_count--;
             }
+
+            state.not_placed_pieces_count--;
 
             if (is_windmill_made(registry, board, entity,
                     state.turn == Player::White ? Piece::White : Piece::Black)) {
@@ -588,6 +598,17 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
             if (state.not_placed_pieces_count == 0 && !state.should_take_piece) {
                 state.phase = Phase::MovePieces;
                 update_outlines(registry, board);
+
+                if (check_player_blocked(registry, board, state.turn)) {
+                    state.phase = Phase::GameOver;
+                    state.ending = state.turn == Player::White ?
+                        Ending::WinnerBlack : Ending::WinnerWhite;
+                    set_pieces_show_outline(registry, state.turn == Player::White ?
+                        Piece::White : Piece::Black, false);
+                    SPDLOG_INFO("Game over, {} wins",
+                        state.turn == Player::White ? "black" : "white");
+                }
+
                 SPDLOG_INFO("Phase 2");
             }
 
@@ -654,6 +675,10 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
 
                         if (check_player_blocked(registry, board, state.turn)) {
                             state.phase = Phase::GameOver;
+                            state.ending = state.turn == Player::White ?
+                                Ending::WinnerBlack : Ending::WinnerWhite;
+                            set_pieces_show_outline(registry, state.turn == Player::White ?
+                                Piece::White : Piece::Black, false);
                             SPDLOG_INFO("Game over, {} wins",
                                 state.turn == Player::White ? "black" : "white");
                         }
@@ -681,6 +706,10 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
 
                         if (check_player_blocked(registry, board, state.turn)) {
                             state.phase = Phase::GameOver;
+                            state.ending = state.turn == Player::White ?
+                                Ending::WinnerBlack : Ending::WinnerWhite;
+                            set_pieces_show_outline(registry, state.turn == Player::White ?
+                                Piece::White : Piece::Black, false);
                             SPDLOG_INFO("Game over, {} wins",
                                 state.turn == Player::White ? "black" : "white");
                         }
@@ -777,6 +806,10 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
 
                     if (check_player_blocked(registry, board, state.turn)) {
                         state.phase = Phase::GameOver;
+                        state.ending = state.turn == Player::White ?
+                            Ending::WinnerBlack : Ending::WinnerWhite;
+                        set_pieces_show_outline(registry, state.turn == Player::White ?
+                            Piece::White : Piece::Black, false);
                         SPDLOG_INFO("Game over, {} wins",
                             state.turn == Player::White ? "black" : "white");
                     }

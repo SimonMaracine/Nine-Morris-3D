@@ -244,6 +244,49 @@ void Application::imgui_update(float dt) {
     }
     ImGui::End();
 
+    auto& state = STATE(board);
+
+    if (state.phase == Phase::GameOver) {
+        ImGui::OpenPopup("Game Over");
+
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.WindowTitleAlign = ImVec2(0.5f,0.5f);
+
+        if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            switch (state.ending) {
+                case Ending::WinnerWhite: {
+                    float font_size = ImGui::GetFontSize() * 11 / 2;
+                    ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+                    ImGui::Text("White wins!");
+                    break;
+                }
+                case Ending::WinnerBlack: {
+                    float font_size = ImGui::GetFontSize() * 11 / 2;
+                    ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+                    ImGui::Text("Black wins!");
+                    break;
+                }
+                case Ending::TieBetweenBothPlayers: {
+                    float font_size = ImGui::GetFontSize() * 25 / 2;
+                    ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+                    ImGui::Text("Tie between both players!");
+                    break;
+                }
+                case Ending::None:
+                    assert(false);
+            }
+
+            if (ImGui::Button("Ok", ImVec2(110, 0))) {
+                ImGui::CloseCurrentPopup();
+                state.phase = Phase::None;
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -299,7 +342,7 @@ bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& eve
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[event.button] = false;
 
-    auto& state = registry.get<GameStateComponent>(board);
+    auto& state = STATE(board);
 
     if (event.button == MOUSE_BUTTON_LEFT) {
         if (state.phase == Phase::PlacePieces) {

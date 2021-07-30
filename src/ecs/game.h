@@ -42,18 +42,25 @@ constexpr float PIECE_MOVE_SPEED = 0.9f;
 enum class Phase {
     PlacePieces,
     MovePieces,
-    GameOver
+    GameOver,
+    None
 };
 
 enum class Piece {
     White,
     Black,
-    None
 };
 
 enum class Player {
     White = 0,
     Black = 1
+};
+
+enum class Ending {
+    None,
+    WinnerWhite,
+    WinnerBlack,
+    TieBetweenBothPlayers
 };
 
 struct PieceComponent {
@@ -94,6 +101,7 @@ struct GameStateComponent {
 
     Phase phase = Phase::PlacePieces;
     Player turn = Player::White;
+    Ending ending = Ending::None;
 
     int white_pieces_count = 0;  // Number of pieces on the board
     int black_pieces_count = 0;
