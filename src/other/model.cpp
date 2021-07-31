@@ -13,6 +13,8 @@
 
 namespace model {
     std::tuple<Mesh, Mesh, Mesh, Mesh> load_model(const std::string& file_path) {
+        SPDLOG_DEBUG("Loading models...");
+
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(file_path,
                                                  aiProcess_ValidateDataStructure);

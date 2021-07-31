@@ -5,6 +5,18 @@
 #include <array>
 
 #include <glad/glad.h>
+#include <stb_image.h>
+
+class TextureData {
+public:
+	TextureData(const std::string& file_path, bool flip);
+	~TextureData();
+
+	stbi_uc* data = nullptr;
+	int width;
+	int height;
+	int channels;
+};
 
 class Texture {
 public:
@@ -12,6 +24,7 @@ public:
     ~Texture();
 
     static std::shared_ptr<Texture> create(const std::string& file_path);
+	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data);
 
     void bind(GLenum slot) const;
     static void unbind();
@@ -25,6 +38,7 @@ public:
     ~Texture3D();
 
     static std::shared_ptr<Texture3D> create(const char** file_paths);
+	static std::shared_ptr<Texture3D> create(std::array<std::shared_ptr<TextureData>, 6> data);
 
     void bind(GLenum slot) const;
     static void unbind();

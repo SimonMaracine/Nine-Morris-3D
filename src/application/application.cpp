@@ -25,6 +25,7 @@
 #include "ecs/systems.h"
 #include "ecs/game.h"
 #include "other/model.h"
+#include "other/loader.h"
 #include "other/logging.h"
 
 #define BIND(function) std::bind(&function, this, std::placeholders::_1)
@@ -46,13 +47,24 @@ Application::~Application() {
 }
 
 void Application::run() {
+    bool loaded = false;
     float dt;
 
     while (running) {
         dt = update_frame_counter();
-        update(dt);
-        draw();
-        imgui_update(dt);
+
+        if (!loader->done_loading()) {
+            draw_loading_screen();
+        } else {
+            if (!loaded) {
+                assets = loader->get_assets();
+                start_after_load();
+                loaded = true;
+            }
+            update(dt);
+            draw();
+            imgui_update(dt);
+        }
 
         window->update();
     }
@@ -115,43 +127,57 @@ void Application::draw() {
     renderer::enable_depth();
 }
 
+void Application::draw_loading_screen() {
+    renderer::disable_depth();
+    renderer::disable_stencil();
+    renderer::set_clear_color(0.0f, 0.0f, 0.0f);
+    renderer::clear(renderer::Color);
+    renderer::draw_loading();
+    renderer::enable_stencil();
+    renderer::enable_depth();
+}
+
 void Application::start() {
     logging::init();
     logging::log_opengl_info(logging::LogTarget::Console);
     debug_opengl::maybe_init_debugging();
     input::init(window->get_handle());
     storage = renderer::init();
+    loader = std::make_unique<Loader>();
 
     auto [version_major, version_minor] = debug_opengl::get_version();
     assert(version_major == 4 && version_minor >= 3);
 
-    using namespace model;
-    std::tuple<Mesh, Mesh, Mesh, Mesh> meshes = load_model("data/models/board.obj");
-
-    std::shared_ptr<Texture> white_piece_diffuse = Texture::create("data/textures/white_piece.png");
-    std::shared_ptr<Texture> black_piece_diffuse = Texture::create("data/textures/black_piece.png");
-
     build_camera();
+    build_directional_light();
+    build_origin();
+
+    SPDLOG_INFO("Finished initializing the first part of the program");
+}
+
+void Application::start_after_load() {
+    SPDLOG_INFO("Done loading assets; initializing the rest of the game...");
+
     build_skybox();
 
+    std::shared_ptr<Texture> white_piece_diffuse = Texture::create(assets->white_piece_diffuse_data);
+    std::shared_ptr<Texture> black_piece_diffuse = Texture::create(assets->black_piece_diffuse_data);
+
     for (int i = 0; i < 9; i++) {
-        build_piece(i, Piece::White, std::get<1>(meshes), white_piece_diffuse,
+        build_piece(Piece::White, std::get<1>(assets->meshes), white_piece_diffuse,
                     glm::vec3(4.0f, 0.3f, -2.0f + i * 0.5f));
     }
     
     for (int i = 9; i < 18; i++) {
-        build_piece(i, Piece::Black, std::get<2>(meshes), black_piece_diffuse,
+        build_piece(Piece::Black, std::get<2>(assets->meshes), black_piece_diffuse,
                     glm::vec3(-4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
     for (int i = 0; i < 24; i++) {
-        build_node(i, std::get<3>(meshes), NODE_POSITIONS[i]);
+        build_node(i, std::get<3>(assets->meshes), NODE_POSITIONS[i]);
     }
 
-    build_board(std::get<0>(meshes));
-
-    build_directional_light();
-    build_origin();
+    build_board(std::get<0>(assets->meshes));
 
     SPDLOG_INFO("Finished initializing program");
 }
@@ -159,6 +185,9 @@ void Application::start() {
 void Application::end() {
     SPDLOG_INFO("Closing program");
     renderer::terminate();
+    if (loader->get_thread().joinable()) {
+        loader->get_thread().detach();
+    }
 }
 
 float Application::update_frame_counter() {
@@ -252,29 +281,32 @@ void Application::imgui_update(float dt) {
         ImVec2 center = ImGui::GetMainViewport()->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
         ImGuiStyle& style = ImGui::GetStyle();
-        style.WindowTitleAlign = ImVec2(0.5f,0.5f);
+        style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
 
         if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
             switch (state.ending) {
                 case Ending::WinnerWhite: {
+                    const char* message = "White player wins!";
                     float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize("White wins!").x;
+                    float text_width = ImGui::CalcTextSize(message).x;
                     ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                    ImGui::Text("White wins!");
+                    ImGui::Text("%s", message);
                     break;
                 }
                 case Ending::WinnerBlack: {
+                    const char* message = "Black player wins!";
                     float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize("Black wins!").x;
+                    float text_width = ImGui::CalcTextSize(message).x;
                     ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                    ImGui::Text("Black wins!");
+                    ImGui::Text("%s", message);
                     break;
                 }
                 case Ending::TieBetweenBothPlayers: {
+                    const char* message = "Tie between both players!";
                     float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize("Tie between both players!").x;
+                    float text_width = ImGui::CalcTextSize(message).x;
                     ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                    ImGui::Text("Tie between both players!");
+                    ImGui::Text("%s", message);
                     break;
                 }
                 case Ending::None:
@@ -382,8 +414,8 @@ std::shared_ptr<VertexBuffer> Application::create_ids_buffer(unsigned int vertic
     return buffer;
 }
 
-std::shared_ptr<VertexArray> Application::create_entity_vertex_buffer(model::Mesh mesh,
-                                                                      entt::entity entity) {
+std::shared_ptr<VertexArray> Application::create_entity_vertex_array(model::Mesh mesh,
+                                                                     entt::entity entity) {
     std::shared_ptr<VertexBuffer> vertices =
         VertexBuffer::create_with_data(mesh.vertices.data(),
                                        mesh.vertices.size() * sizeof(model::Vertex));
@@ -416,16 +448,16 @@ std::shared_ptr<VertexArray> Application::create_entity_vertex_buffer(model::Mes
 void Application::build_board(const model::Mesh& mesh) {
     board = registry.create();
 
-    std::shared_ptr<Texture> diffuse_texture = Texture::create("data/textures/board.png");
+    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_array(mesh, board);
 
-    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, board);
+    std::shared_ptr<Texture> board_diffuse_texture = Texture::create(assets->board_diffuse_texture_data);
 
     auto& transform = registry.emplace<TransformComponent>(board);
     transform.scale = 20.0f;
     
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(board, storage->basic_shader, glm::vec3(0.25f), 8.0f);
-    registry.emplace<TextureComponent>(board, diffuse_texture);
+    registry.emplace<TextureComponent>(board, board_diffuse_texture);
 
     registry.emplace<GameStateComponent>(board, nodes);
 
@@ -438,26 +470,13 @@ void Application::build_camera() {
     transform.rotation = glm::vec3(40.0f, 0.0f, 0.0f);
 
     registry.emplace<CameraComponent>(camera,
-            glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.08f, 100.0f),
-            glm::vec3(0.0f), 8.0f);
+        glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.08f, 100.0f),
+        glm::vec3(0.0f), 8.0f);
 
     SPDLOG_DEBUG("Built camera entity {}", camera);
 }
 
 void Application::build_skybox() {
-    std::shared_ptr<Shader> shader = Shader::create("data/shaders/cubemap.vert",
-                                                    "data/shaders/cubemap.frag");
-
-    const char* images[6] = {
-        "data/textures/skybox/right.jpg",
-        "data/textures/skybox/left.jpg",
-        "data/textures/skybox/top.jpg",
-        "data/textures/skybox/bottom.jpg",
-        "data/textures/skybox/front.jpg",
-        "data/textures/skybox/back.jpg"
-    };
-    std::shared_ptr<Texture3D> texture = Texture3D::create(images);
-
     std::shared_ptr<VertexBuffer> positions =
         VertexBuffer::create_with_data(cube_map_points, 108 * sizeof(float));
 
@@ -468,21 +487,22 @@ void Application::build_skybox() {
     vertex_array->add_buffer(positions, layout);
     VertexArray::unbind();
 
-    skybox = registry.create();
+    std::shared_ptr<Texture3D> skybox_texture = Texture3D::create(assets->skybox_textures_data);
+
+    entt::entity skybox = registry.create();
     registry.emplace<SkyboxMeshComponent>(skybox, vertex_array);
-    registry.emplace<SkyboxMaterialComponent>(skybox, shader);
-    registry.emplace<SkyboxTextureComponent>(skybox, texture);
+    registry.emplace<SkyboxMaterialComponent>(skybox, storage->skybox_shader);
+    registry.emplace<SkyboxTextureComponent>(skybox, skybox_texture);
 
     SPDLOG_DEBUG("Built skybox entity {}", skybox);
 }
 
-void Application::build_piece(int index, Piece type, const model::Mesh& mesh,
+void Application::build_piece(Piece type, const model::Mesh& mesh,
                               std::shared_ptr<Texture> diffuse_texture,
                               const glm::vec3& position) {
-    pieces[index] = registry.create();
-    entt::entity piece = pieces[index];
+    entt::entity piece = registry.create();
 
-    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_buffer(mesh, piece);
+    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_array(mesh, piece);
     
     auto& transform = registry.emplace<TransformComponent>(piece);
     transform.position = position;
@@ -501,7 +521,7 @@ void Application::build_piece(int index, Piece type, const model::Mesh& mesh,
 }
 
 void Application::build_directional_light() {
-    directional_light = registry.create();
+    entt::entity directional_light = registry.create();
     auto& transform = registry.emplace<TransformComponent>(directional_light);
     transform.position = glm::vec3(-11.0f, 15.0f, -15.0f);
 
@@ -514,7 +534,7 @@ void Application::build_directional_light() {
 }
 
 void Application::build_origin() {
-    origin = registry.create();
+    entt::entity origin = registry.create();
     registry.emplace<OriginComponent>(origin, storage->origin_shader);
 
     SPDLOG_DEBUG("Built origin entity {}", origin);   

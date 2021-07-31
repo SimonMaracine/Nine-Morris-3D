@@ -32,6 +32,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/opengl/renderer/framebuffer.cpp"
     "src/other/logging.cpp"
     "src/other/model.cpp"
+    "src/other/loader.cpp"
     "src/ecs/systems.cpp"
     "src/ecs/game.cpp"
     "dependencies/Glad/src/glad.c"

@@ -1,11 +1,29 @@
 #include <memory>
 #include <string>
+#include <cassert>
 
 #include <glad/glad.h>
 #include <stb_image.h>
 
 #include "opengl/renderer/texture.h"
 #include "other/logging.h"
+
+TextureData::TextureData(const std::string& file_path, bool flip) {
+    SPDLOG_DEBUG("Loading texture '{}'...", file_path.c_str());
+
+    stbi_set_flip_vertically_on_load((int) flip);
+
+    data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
+
+    if (!data) {
+        spdlog::critical("Could not load texture '{}'", file_path.c_str());
+        std::exit(1);
+    }
+}
+
+TextureData::~TextureData() {
+    stbi_image_free(data);
+}
 
 Texture::Texture(GLuint texture)
         : texture(texture) {
@@ -19,9 +37,9 @@ Texture::~Texture() {
 }
 
 std::shared_ptr<Texture> Texture::create(const std::string& file_path) {
-    stbi_set_flip_vertically_on_load(1);
-
     SPDLOG_DEBUG("Loading texture '{}'...", file_path.c_str());
+
+    stbi_set_flip_vertically_on_load(1);
 
     int width, height, channels;
     stbi_uc* data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
@@ -56,6 +74,36 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path) {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     stbi_image_free(data);
+
+    return std::make_shared<Texture>(texture);
+}
+
+std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data) {
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    assert(data->data != nullptr);
+
+    if (data->channels == 3) {
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, data->width, data->height);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGB,
+                        GL_UNSIGNED_BYTE, data->data);
+    } else if (data->channels == 4) {
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, data->width, data->height);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA,
+                        GL_UNSIGNED_BYTE, data->data);
+    } else {
+        spdlog::critical("Texture has {} channels", data->channels);
+        std::exit(1);
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     return std::make_shared<Texture>(texture);
 }
@@ -109,6 +157,27 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
                      0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
         stbi_image_free(data);
+    }
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    return std::make_shared<Texture3D>(texture);
+}
+
+std::shared_ptr<Texture3D> Texture3D::create(std::array<std::shared_ptr<TextureData>, 6> data) {
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    for (int i = 0; i < 6; i++) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB8, data[i]->width,
+                     data[i]->height, 0, GL_RGB, GL_UNSIGNED_BYTE, data[i]->data);
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);

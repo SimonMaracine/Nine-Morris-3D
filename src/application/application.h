@@ -13,6 +13,7 @@
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/vertex_buffer.h"
 #include "other/model.h"
+#include "other/loader.h"
 #include "ecs/game.h"
 
 struct ApplicationData {
@@ -29,8 +30,10 @@ public:
     void on_event(events::Event& event);
     void update(float dt);
     void draw();
+    void draw_loading_screen();
 
     void start();
+    void start_after_load();
     void end();
     float update_frame_counter();
 
@@ -52,14 +55,14 @@ public:
 
     std::shared_ptr<VertexBuffer> create_ids_buffer(unsigned int vertices_size,
                                                     entt::entity entity);
-    std::shared_ptr<VertexArray> create_entity_vertex_buffer(model::Mesh mesh,
+    std::shared_ptr<VertexArray> create_entity_vertex_array(model::Mesh mesh,
                                                              entt::entity entity);
 
     void build_board(const model::Mesh& mesh);
     void build_camera();
     void build_skybox();
-    void build_piece(int index, Piece type, const model::Mesh& mesh,
-                     std::shared_ptr<Texture> diffuse_texture, const glm::vec3& position);
+    void build_piece(Piece type, const model::Mesh& mesh, std::shared_ptr<Texture> diffuse_texture,
+                     const glm::vec3& position);
     void build_directional_light();
     void build_origin();
     void build_node(int index, const model::Mesh& mesh, const glm::vec3& position);
@@ -72,13 +75,11 @@ public:
 
     entt::registry registry;
     const renderer::Storage* storage = nullptr;
+    std::shared_ptr<Assets> assets = nullptr;
+    std::unique_ptr<Loader> loader = nullptr;
 
     entt::entity board = entt::null;
     entt::entity camera = entt::null;
-    entt::entity skybox = entt::null;
-    entt::entity pieces[18];
-    entt::entity directional_light = entt::null;
-    entt::entity origin = entt::null;
     entt::entity nodes[24];
 
     entt::entity hovered_entity = entt::null;

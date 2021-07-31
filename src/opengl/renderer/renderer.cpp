@@ -44,8 +44,8 @@ namespace renderer {
                 -1.0f, -1.0f,    0.0f, 0.0f,
                  1.0f, -1.0f,    1.0f, 0.0f
             };
-            storage->quad_vertex_buffer = VertexBuffer::create_with_data(quad_vertices,
-                                                                         sizeof(quad_vertices));
+            storage->quad_vertex_buffer =
+                VertexBuffer::create_with_data(quad_vertices, sizeof(quad_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
@@ -61,6 +61,9 @@ namespace renderer {
         storage->node_shader = Shader::create("data/shaders/node.vert",
                                               "data/shaders/node.frag");
 
+        storage->skybox_shader = Shader::create("data/shaders/cubemap.vert",
+                                                "data/shaders/cubemap.frag");
+
         {
             storage->origin_shader = Shader::create("data/shaders/origin.vert",
                                                     "data/shaders/origin.frag");
@@ -72,8 +75,8 @@ namespace renderer {
                   0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
                   0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
             };
-            storage->origin_vertex_buffer = VertexBuffer::create_with_data(origin_vertices,
-                                                                           sizeof(origin_vertices));
+            storage->origin_vertex_buffer =
+                VertexBuffer::create_with_data(origin_vertices, sizeof(origin_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 3);
             layout.add(1, BufferLayout::Type::Float, 3);
@@ -92,14 +95,35 @@ namespace renderer {
                 -1.0f, -1.0f,    0.0f, 0.0f,
                  1.0f, -1.0f,    1.0f, 0.0f
             };
-            storage->light_vertex_buffer = VertexBuffer::create_with_data(light_vertices,
-                                                                          sizeof(light_vertices));
+            storage->light_vertex_buffer =
+                VertexBuffer::create_with_data(light_vertices, sizeof(light_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
             storage->light_vertex_array = VertexArray::create();
             storage->light_vertex_array->add_buffer(storage->light_vertex_buffer, layout);
             storage->light_texture = Texture::create("data/textures/light.png");
+        }
+
+        {
+            storage->loading_shader = Shader::create("data/shaders/loading.vert",
+                                                     "data/shaders/loading.frag");
+            constexpr float loading_vertices[] = {
+                -1.0f,  1.0f,    0.0f, 1.0f,
+                -1.0f, -1.0f,    0.0f, 0.0f,
+                 1.0f,  1.0f,    1.0f, 1.0f,
+                 1.0f,  1.0f,    1.0f, 1.0f,
+                -1.0f, -1.0f,    0.0f, 0.0f,
+                 1.0f, -1.0f,    1.0f, 0.0f
+            };
+            storage->loading_vertex_buffer =
+                VertexBuffer::create_with_data(loading_vertices, sizeof(loading_vertices));
+            BufferLayout layout;
+            layout.add(0, BufferLayout::Type::Float, 2);
+            layout.add(1, BufferLayout::Type::Float, 2);
+            storage->loading_vertex_array = VertexArray::create();
+            storage->loading_vertex_array->add_buffer(storage->loading_vertex_buffer, layout);
+            storage->loading_texture = Texture::create("data/textures/loading.png");
         }
 
         return storage;
@@ -121,16 +145,15 @@ namespace renderer {
         glClear(buffers);
     }
 
-    // void begin(std::shared_ptr<Shader> shader, const glm::mat4& view_projection_matrix) {
-    //     shader->bind();
-    //     shader->set_uniform_matrix("u_projection_view_matrix", view_projection_matrix);
-    // }
-
-    // void end() {
-
-    // }
-
     void draw_quad() {
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
+    void draw_loading() {
+        storage->loading_shader->bind();
+        storage->loading_shader->set_uniform_int("u_texture", 0);
+        storage->loading_vertex_array->bind();
+        storage->loading_texture->bind(0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
@@ -159,6 +182,14 @@ namespace renderer {
 
     void disable_depth() {
         glDisable(GL_DEPTH_TEST);
+    }
+
+    void enable_stencil() {
+        glEnable(GL_STENCIL_TEST);
+    }
+
+    void disable_stencil() {
+        glDisable(GL_STENCIL_TEST);
     }
 
     void bind_texture(GLuint texture) {

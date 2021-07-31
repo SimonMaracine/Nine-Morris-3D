@@ -27,6 +27,7 @@ namespace renderer {
 
         std::shared_ptr<Shader> outline_shader = nullptr;
         std::shared_ptr<Shader> node_shader = nullptr;
+        std::shared_ptr<Shader> skybox_shader = nullptr;
 
         std::shared_ptr<Shader> origin_shader = nullptr;
         std::shared_ptr<VertexArray> origin_vertex_array = nullptr;
@@ -36,6 +37,11 @@ namespace renderer {
         std::shared_ptr<VertexArray> light_vertex_array = nullptr;
         std::shared_ptr<VertexBuffer> light_vertex_buffer = nullptr;
         std::shared_ptr<Texture> light_texture = nullptr;
+
+        std::shared_ptr<Shader> loading_shader = nullptr;
+        std::shared_ptr<VertexArray> loading_vertex_array = nullptr;
+        std::shared_ptr<VertexBuffer> loading_vertex_buffer = nullptr;
+        std::shared_ptr<Texture> loading_texture = nullptr;
     };
 
     const Storage* init();
@@ -43,13 +49,14 @@ namespace renderer {
     void set_viewport(GLint width, GLint height);
     void set_clear_color(GLfloat red, GLfloat green, GLfloat blue);
     void clear(int buffers);
-    // void begin(std::shared_ptr<Shader> shader, const glm::mat4& view_projection_matrix);
-    // void end();
     void draw_quad();
+    void draw_loading();
     void draw_origin();
     void draw_light(const glm::vec3& position);
     void enable_depth();
     void disable_depth();
+    void enable_stencil();
+    void disable_stencil();
     void bind_texture(GLuint texture);
     void set_stencil_mask_zero();
 
