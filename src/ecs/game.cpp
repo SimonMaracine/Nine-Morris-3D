@@ -619,7 +619,7 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
     }
 }
 
-void systems::move_piece(entt::registry& registry, float dt) {
+void systems::move_pieces(entt::registry& registry, float dt) {
     auto view = registry.view<TransformComponent, MoveComponent, PieceComponent>();
 
     for (entt::entity entity : view) {

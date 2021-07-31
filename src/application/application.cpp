@@ -73,7 +73,7 @@ void Application::on_event(events::Event& event) {
 void Application::update(float dt) {
     systems::camera(registry, mouse_wheel, dx, dy, dt);
     systems::lighting_move(registry, dt);
-    systems::move_piece(registry, dt);
+    systems::move_pieces(registry, dt);
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -503,7 +503,7 @@ void Application::build_piece(int index, Piece type, const model::Mesh& mesh,
 void Application::build_directional_light() {
     directional_light = registry.create();
     auto& transform = registry.emplace<TransformComponent>(directional_light);
-    transform.position = glm::vec3(10.0f, 15.0f, -15.0f);
+    transform.position = glm::vec3(-11.0f, 15.0f, -15.0f);
 
     registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f),
                                      glm::vec3(1.0f));

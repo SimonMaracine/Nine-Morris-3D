@@ -120,7 +120,7 @@ struct GameStateComponent {
 
 namespace systems {
     void place_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
-    void move_piece(entt::registry& registry, float dt);
+    void move_pieces(entt::registry& registry, float dt);
     void take_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void select_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void put_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
