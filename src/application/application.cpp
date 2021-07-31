@@ -74,7 +74,6 @@ void Application::update(float dt) {
     systems::camera(registry, mouse_wheel, dx, dy, dt);
     systems::lighting_move(registry, dt);
     systems::move_piece(registry, dt);
-    // systems::game_update(registry, board, hovered_entity);
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -94,7 +93,7 @@ void Application::draw() {
     systems::lighting(registry, camera);
     systems::board_render(registry, camera);
     systems::piece_render(registry, camera, hovered_entity);
-    systems::node_render(registry, camera, hovered_entity);
+    systems::node_render(registry, camera, hovered_entity, board);
     systems::origin_render(registry, camera);
     systems::lighting_render(registry, camera);
 
@@ -193,6 +192,7 @@ void Application::imgui_start() {
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+    io.FontDefault = io.Fonts->AddFontFromFileTTF("data/fonts/OpenSans-Regular.ttf", 20.0f);
 
     ImGui_ImplOpenGL3_Init("#version 430");
     ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
@@ -257,20 +257,23 @@ void Application::imgui_update(float dt) {
         if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
             switch (state.ending) {
                 case Ending::WinnerWhite: {
-                    float font_size = ImGui::GetFontSize() * 11 / 2;
-                    ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+                    float window_width = ImGui::GetWindowSize().x;
+                    float text_width = ImGui::CalcTextSize("White wins!").x;
+                    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
                     ImGui::Text("White wins!");
                     break;
                 }
                 case Ending::WinnerBlack: {
-                    float font_size = ImGui::GetFontSize() * 11 / 2;
-                    ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+                    float window_width = ImGui::GetWindowSize().x;
+                    float text_width = ImGui::CalcTextSize("White wins!").x;
+                    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
                     ImGui::Text("Black wins!");
                     break;
                 }
                 case Ending::TieBetweenBothPlayers: {
-                    float font_size = ImGui::GetFontSize() * 25 / 2;
-                    ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 2));
+                    float window_width = ImGui::GetWindowSize().x;
+                    float text_width = ImGui::CalcTextSize("White wins!").x;
+                    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
                     ImGui::Text("Tie between both players!");
                     break;
                 }
@@ -278,7 +281,7 @@ void Application::imgui_update(float dt) {
                     assert(false);
             }
 
-            if (ImGui::Button("Ok", ImVec2(110, 0))) {
+            if (ImGui::Button("Ok", ImVec2(120, 0))) {
                 ImGui::CloseCurrentPopup();
                 state.phase = Phase::None;
             }

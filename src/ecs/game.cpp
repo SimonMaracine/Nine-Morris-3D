@@ -304,27 +304,29 @@ static bool can_go(entt::registry& registry, entt::entity board, entt::entity so
 static void check_player_pieces_number(entt::registry& registry, entt::entity board, Player player) {
     auto& state = STATE(board);
 
-    if (player == Player::White) {
-        SPDLOG_DEBUG("White player checked");
+    if (state.phase == Phase::MovePieces) {
+        if (player == Player::White) {
+            SPDLOG_DEBUG("White player checked");
 
-        if (state.white_pieces_count == 3) {
-            state.can_jump[(int) player] = true;
-        } else if (state.white_pieces_count == 2) {
-            state.phase = Phase::GameOver;
-            state.ending = Ending::WinnerBlack;
-            set_pieces_show_outline(registry, Piece::Black, false);
-            SPDLOG_INFO("Game over, black wins");
-        }
-    } else {
-        SPDLOG_DEBUG("Black player checked");
+            if (state.white_pieces_count == 3) {
+                state.can_jump[(int) player] = true;
+            } else if (state.white_pieces_count == 2) {
+                state.phase = Phase::GameOver;
+                state.ending = Ending::WinnerBlack;
+                set_pieces_show_outline(registry, Piece::White, false);
+                SPDLOG_INFO("Game over, black wins");
+            }
+        } else {
+            SPDLOG_DEBUG("Black player checked");
 
-        if (state.black_pieces_count == 3) {
-            state.can_jump[(int) player] = true;
-        } else if (state.black_pieces_count == 2) {
-            state.phase = Phase::GameOver;
-            state.ending = Ending::WinnerWhite;
-            set_pieces_show_outline(registry, Piece::White, false);
-            SPDLOG_INFO("Game over, white wins");
+            if (state.black_pieces_count == 3) {
+                state.can_jump[(int) player] = true;
+            } else if (state.black_pieces_count == 2) {
+                state.phase = Phase::GameOver;
+                state.ending = Ending::WinnerWhite;
+                set_pieces_show_outline(registry, Piece::Black, false);
+                SPDLOG_INFO("Game over, white wins");
+            }
         }
     }
 }

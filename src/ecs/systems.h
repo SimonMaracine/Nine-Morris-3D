@@ -2,6 +2,8 @@
 
 #include <entt/entt.hpp>
 
+#define CAMERA(entity) registry.get<CameraComponent>(entity)
+
 namespace systems {
     void board_render(entt::registry& registry, entt::entity camera_entity);
 
@@ -21,7 +23,7 @@ namespace systems {
     void origin_render(entt::registry& registry, entt::entity camera_entity);
 
     void node_render(entt::registry& registry, entt::entity camera_entity,
-                     entt::entity hovered_entity);
+                     entt::entity hovered_entity, entt::entity board_entity);
 
     // void node_move(entt::registry& registry, float dt);
 }

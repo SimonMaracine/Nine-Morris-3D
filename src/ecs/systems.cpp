@@ -12,7 +12,7 @@
 #include "other/logging.h"
 
 void systems::board_render(entt::registry& registry, entt::entity camera_entity) {
-    auto& camera = registry.get<CameraComponent>(camera_entity);
+    auto& camera = CAMERA(camera_entity);
 
     auto view = registry.view<TransformComponent,
                               MeshComponent,
@@ -106,7 +106,7 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
 }
 
 void systems::cube_map_render(entt::registry& registry, entt::entity camera_entity) {
-    auto& camera = registry.get<CameraComponent>(camera_entity);
+    auto& camera = CAMERA(camera_entity);
 
     auto view = registry.view<SkyboxMeshComponent, SkyboxMaterialComponent,
                               SkyboxTextureComponent>();
@@ -124,7 +124,7 @@ void systems::cube_map_render(entt::registry& registry, entt::entity camera_enti
 
 void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
                            entt::entity hovered_entity) {
-    auto& camera = registry.get<CameraComponent>(camera_entity);
+    auto& camera = CAMERA(camera_entity);
 
     auto view = registry.view<TransformComponent, MeshComponent,
                               MaterialComponent, TextureComponent,
@@ -195,7 +195,7 @@ void systems::lighting(entt::registry& registry, entt::entity camera_entity) {
 }
 
 void systems::lighting_render(entt::registry& registry, entt::entity camera_entity) {
-    auto& camera = registry.get<CameraComponent>(camera_entity);
+    auto& camera = CAMERA(camera_entity);
 
     auto view = registry.view<TransformComponent, LightMeshComponent>();
 
@@ -231,7 +231,7 @@ void systems::lighting_move(entt::registry& registry, float dt) {
 }
 
 void systems::origin_render(entt::registry& registry, entt::entity camera_entity) {
-    auto& camera = registry.get<CameraComponent>(camera_entity);
+    auto& camera = CAMERA(camera_entity);
 
     auto view = registry.view<OriginComponent>();
 
@@ -247,8 +247,9 @@ void systems::origin_render(entt::registry& registry, entt::entity camera_entity
 }
 
 void systems::node_render(entt::registry& registry, entt::entity camera_entity,
-                        entt::entity hovered_entity) {
-    auto& camera = registry.get<CameraComponent>(camera_entity);
+                          entt::entity hovered_entity, entt::entity board_entity) {
+    auto& camera = CAMERA(camera_entity);
+    auto& state = STATE(board_entity);
 
     auto view = registry.view<TransformComponent, MeshComponent, NodeMaterialComponent>();
 
@@ -259,7 +260,8 @@ void systems::node_render(entt::registry& registry, entt::entity camera_entity,
         material.shader->set_uniform_matrix("u_projection_view_matrix",
                                             camera.projection_view_matrix);
 
-        if (hovered_entity == entity) {
+        if (hovered_entity == entity &&
+                state.phase != Phase::None && state.phase != Phase::GameOver) {
             renderer::draw_node(transform.position, transform.scale,
                                 material.shader, mesh.vertex_array,
                                 glm::vec4(0.7f, 0.7f, 0.7f, 1.0f),

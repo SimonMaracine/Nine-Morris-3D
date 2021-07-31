@@ -1,7 +1,5 @@
 #pragma once
 
-class Application;
-
 namespace events {
     enum EventType {
         WindowClosed, WindowResized,
