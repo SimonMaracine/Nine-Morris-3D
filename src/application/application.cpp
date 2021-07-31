@@ -265,14 +265,14 @@ void Application::imgui_update(float dt) {
                 }
                 case Ending::WinnerBlack: {
                     float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize("White wins!").x;
+                    float text_width = ImGui::CalcTextSize("Black wins!").x;
                     ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
                     ImGui::Text("Black wins!");
                     break;
                 }
                 case Ending::TieBetweenBothPlayers: {
                     float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize("White wins!").x;
+                    float text_width = ImGui::CalcTextSize("Tie between both players!").x;
                     ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
                     ImGui::Text("Tie between both players!");
                     break;
