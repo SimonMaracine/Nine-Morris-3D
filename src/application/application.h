@@ -56,7 +56,7 @@ public:
     std::shared_ptr<VertexBuffer> create_ids_buffer(unsigned int vertices_size,
                                                     entt::entity entity);
     std::shared_ptr<VertexArray> create_entity_vertex_array(model::Mesh mesh,
-                                                             entt::entity entity);
+                                                            entt::entity entity);
 
     void build_board(const model::Mesh& mesh);
     void build_camera();

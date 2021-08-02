@@ -95,7 +95,6 @@ void Application::update(float dt) {
 void Application::draw() {
     storage->framebuffer->bind();
 
-    renderer::set_clear_color(0.5f, 0.0f, 0.5f);
     renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
     renderer::set_stencil_mask_zero();
 
@@ -130,7 +129,6 @@ void Application::draw() {
 void Application::draw_loading_screen() {
     renderer::disable_depth();
     renderer::disable_stencil();
-    renderer::set_clear_color(0.0f, 0.0f, 0.0f);
     renderer::clear(renderer::Color);
     renderer::draw_loading();
     renderer::enable_stencil();
@@ -146,7 +144,10 @@ void Application::start() {
     loader = std::make_unique<Loader>();
 
     auto [version_major, version_minor] = debug_opengl::get_version();
-    assert(version_major == 4 && version_minor >= 3);
+    if (!(version_major == 4 && version_minor >= 3)) {
+        spdlog::critical("Graphics card must support minimum OpenGL 4.3");
+        std::exit(1);
+    }
 
     build_camera();
     build_directional_light();
@@ -221,7 +222,7 @@ void Application::imgui_start() {
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("data/fonts/OpenSans-Regular.ttf", 20.0f);
+    io.FontDefault = io.Fonts->AddFontFromFileTTF("data/fonts/OpenSans-Semibold.ttf", 20.0f);
 
     ImGui_ImplOpenGL3_Init("#version 430");
     ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);

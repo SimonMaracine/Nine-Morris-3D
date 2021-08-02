@@ -22,6 +22,7 @@ namespace renderer {
         glEnable(GL_STENCIL_TEST);
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         storage->basic_shader = Shader::create("data/shaders/basic.vert",
                                                "data/shaders/basic.frag");
