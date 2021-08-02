@@ -183,6 +183,36 @@ void Application::start_after_load() {
     SPDLOG_INFO("Finished initializing program");
 }
 
+void Application::restart() {
+    registry.clear();
+
+    build_camera();
+    build_directional_light();
+    build_origin();
+    build_skybox();
+
+    std::shared_ptr<Texture> white_piece_diffuse = Texture::create(assets->white_piece_diffuse_data);
+    std::shared_ptr<Texture> black_piece_diffuse = Texture::create(assets->black_piece_diffuse_data);
+
+    for (int i = 0; i < 9; i++) {
+        build_piece(Piece::White, std::get<1>(assets->meshes), white_piece_diffuse,
+                    glm::vec3(4.0f, 0.3f, -2.0f + i * 0.5f));
+    }
+    
+    for (int i = 9; i < 18; i++) {
+        build_piece(Piece::Black, std::get<2>(assets->meshes), black_piece_diffuse,
+                    glm::vec3(-4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
+    }
+
+    for (int i = 0; i < 24; i++) {
+        build_node(i, std::get<3>(assets->meshes), NODE_POSITIONS[i]);
+    }
+
+    build_board(std::get<0>(assets->meshes));
+
+    SPDLOG_INFO("Restarted game");
+}
+
 void Application::end() {
     SPDLOG_INFO("Closing program");
     renderer::terminate();
@@ -239,7 +269,9 @@ void Application::imgui_update(float dt) {
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
-            ImGui::MenuItem("New", nullptr, false);
+            if (ImGui::MenuItem("New Game", nullptr, false)) {
+                restart();
+            }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
                 running = false;
             }
@@ -340,7 +372,7 @@ bool Application::on_window_closed(events::WindowClosedEvent& event) {
 
 bool Application::on_window_resized(events::WindowResizedEvent& event) {
     renderer::set_viewport(event.width, event.height);
-    storage->framebuffer->resize(event.width, event.height);  // TODO should glViewport be called?
+    storage->framebuffer->resize(event.width, event.height);
 
     return true;
 }
@@ -410,7 +442,7 @@ std::shared_ptr<VertexBuffer> Application::create_ids_buffer(unsigned int vertic
         array[i] = (int) entt::to_integral(entity);
     }
     std::shared_ptr<VertexBuffer> buffer =
-        VertexBuffer::create_with_data(array.data(), array.size() * sizeof(int));
+        VertexBuffer::create(array.data(), array.size() * sizeof(int));
 
     return buffer;
 }
@@ -418,8 +450,7 @@ std::shared_ptr<VertexBuffer> Application::create_ids_buffer(unsigned int vertic
 std::shared_ptr<VertexArray> Application::create_entity_vertex_array(model::Mesh mesh,
                                                                      entt::entity entity) {
     std::shared_ptr<VertexBuffer> vertices =
-        VertexBuffer::create_with_data(mesh.vertices.data(),
-                                       mesh.vertices.size() * sizeof(model::Vertex));
+        VertexBuffer::create(mesh.vertices.data(), mesh.vertices.size() * sizeof(model::Vertex));
 
     std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), entity);
 
@@ -479,7 +510,7 @@ void Application::build_camera() {
 
 void Application::build_skybox() {
     std::shared_ptr<VertexBuffer> positions =
-        VertexBuffer::create_with_data(cube_map_points, 108 * sizeof(float));
+        VertexBuffer::create(cube_map_points, 108 * sizeof(float));
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
@@ -550,7 +581,7 @@ void Application::build_node(int index, const model::Mesh& mesh, const glm::vec3
         data.push_back(vertex.position);
     }
     std::shared_ptr<VertexBuffer> vertices =
-        VertexBuffer::create_with_data(data.data(), data.size() * sizeof(glm::vec3));
+        VertexBuffer::create(data.data(), data.size() * sizeof(glm::vec3));
 
     std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), node);
 

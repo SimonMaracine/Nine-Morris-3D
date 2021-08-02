@@ -15,7 +15,7 @@ public:
     ~VertexBuffer();
 
     static std::shared_ptr<VertexBuffer> create(std::size_t size);
-    static std::shared_ptr<VertexBuffer> create_with_data(const void* data,
+    static std::shared_ptr<VertexBuffer> create(const void* data,
                                                           std::size_t size);
     static std::shared_ptr<VertexBuffer> create_index(const unsigned int* data,
                                                       std::size_t size);

@@ -26,7 +26,7 @@ std::shared_ptr<VertexBuffer> VertexBuffer::create(std::size_t size) {
     return std::make_shared<VertexBuffer>(buffer, Type::Array);
 }
 
-std::shared_ptr<VertexBuffer> VertexBuffer::create_with_data(const void* data,
+std::shared_ptr<VertexBuffer> VertexBuffer::create(const void* data,
                                                              std::size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);

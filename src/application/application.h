@@ -34,6 +34,7 @@ public:
 
     void start();
     void start_after_load();
+    void restart();
     void end();
     float update_frame_counter();
 
