@@ -33,50 +33,60 @@ void systems::board_render(entt::registry& registry, entt::entity camera_entity)
 }
 
 void systems::camera(entt::registry& registry, float mouse_wheel, float dx, float dy, float dt) {
-    auto view = registry.view<TransformComponent, CameraComponent>();
+    auto view = registry.view<TransformComponent, CameraComponent, CameraMoveComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, camera] = view.get(entity);
+        auto [transform, camera, move] = view.get(entity);
 
         float& pitch = transform.rotation.x;
         float& yaw = transform.rotation.y;
         float& zoom = camera.distance_to_point;
 
-        constexpr float move_speed = 100.0f;
-        const float zoom_speed = 5.0f * zoom;
+        constexpr float move_speed = 60.0f;
+        const float zoom_speed = 1.05f * zoom;
 
-        zoom -= zoom_speed * mouse_wheel * 0.9f * dt;
+        move.zoom_velocity -= zoom_speed * mouse_wheel * 1.25f * dt;
         
         if (input::is_key_pressed(KEY_R)) {
-            zoom -= zoom_speed * dt;
+            move.zoom_velocity -= zoom_speed * dt;
         } else if (input::is_key_pressed(KEY_F)) {
-            zoom += zoom_speed * dt;
+            move.zoom_velocity += zoom_speed * dt;
         }
+
+        zoom += move.zoom_velocity;
 
         // Limit zoom
         zoom = std::max(zoom, 1.0f);
         zoom = std::min(zoom, 70.0f);
 
         if (input::is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)) {
-            pitch -= move_speed * 0.2f * dy * dt;
-            camera.angle_around_point += move_speed * 0.2f * dx * dt;
+            move.y_velocity -= move_speed * 0.3f * dy * dt;
+            move.x_velocity += move_speed * 0.3f * dx * dt;
         }
 
         if (input::is_key_pressed(KEY_W)) {
-            pitch += move_speed * dt;
+            move.y_velocity += move_speed * dt;
         } else if (input::is_key_pressed(KEY_S)) {
-            pitch -= move_speed * dt;
+            move.y_velocity -= move_speed * dt;
         }
 
         if (input::is_key_pressed(KEY_A)) {
-            camera.angle_around_point -= move_speed * dt;
+            move.x_velocity -= move_speed * dt;
         } else if (input::is_key_pressed(KEY_D)) {
-            camera.angle_around_point += move_speed * dt;
+            move.x_velocity += move_speed * dt;
         }
+
+        pitch += move.y_velocity;
+        camera.angle_around_point += move.x_velocity;
 
         // Limit pitch
         pitch = std::min(pitch, 90.0f);
         pitch = std::max(pitch, -90.0f);
+
+        // Slow down velocity
+        move.x_velocity *= 0.8f;
+        move.y_velocity *= 0.8f;
+        move.zoom_velocity *= 0.8f;
 
         float horizontal_distance = zoom * glm::cos(glm::radians(pitch));
         float vertical_distance = zoom * glm::sin(glm::radians(pitch));

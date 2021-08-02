@@ -46,6 +46,7 @@ public:
     std::unique_ptr<Window> window = nullptr;
     ApplicationData data;
     double fps = 0.0;
+    bool game_ready = false;
 
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);

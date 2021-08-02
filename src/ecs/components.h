@@ -33,6 +33,14 @@ struct CameraComponent {
     // Pitch and yaw are in transform.rotation
 };
 
+struct CameraMoveComponent {
+    CameraMoveComponent() = default;
+
+    float x_velocity = 0.0f;
+    float y_velocity = 0.0f;
+    float zoom_velocity = 0.0f;
+};
+
 struct MeshComponent {
     MeshComponent(std::shared_ptr<VertexArray> vertex_array, int index_count)
             : vertex_array(vertex_array), index_count(index_count) {}

@@ -181,6 +181,7 @@ void Application::start_after_load() {
     build_board(std::get<0>(assets->meshes));
 
     SPDLOG_INFO("Finished initializing program");
+    game_ready = true;
 }
 
 void Application::restart() {
@@ -401,8 +402,10 @@ bool Application::on_mouse_button_pressed(events::MouseButtonPressedEvent& event
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[event.button] = true;
 
-    systems::press(registry, board, hovered_entity);
-
+    if (game_ready) {
+        systems::press(registry, board, hovered_entity);
+    }
+    
     return false;
 }
 
@@ -410,25 +413,27 @@ bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& eve
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[event.button] = false;
 
-    auto& state = STATE(board);
+    if (game_ready) {
+        auto& state = STATE(board);
 
-    if (event.button == MOUSE_BUTTON_LEFT) {
-        if (state.phase == Phase::PlacePieces) {
-            if (state.should_take_piece) {
-                systems::take_piece(registry, board, hovered_entity);
-            } else {
-                systems::place_piece(registry, board, hovered_entity);
+        if (event.button == MOUSE_BUTTON_LEFT) {
+            if (state.phase == Phase::PlacePieces) {
+                if (state.should_take_piece) {
+                    systems::take_piece(registry, board, hovered_entity);
+                } else {
+                    systems::place_piece(registry, board, hovered_entity);
+                }
+            } else if (state.phase == Phase::MovePieces) {
+                if (state.should_take_piece) {
+                    systems::take_piece(registry, board, hovered_entity);
+                } else {
+                    systems::select_piece(registry, board, hovered_entity);
+                    systems::put_piece(registry, board, hovered_entity);
+                }
             }
-        } else if (state.phase == Phase::MovePieces) {
-            if (state.should_take_piece) {
-                systems::take_piece(registry, board, hovered_entity);
-            } else {
-                systems::select_piece(registry, board, hovered_entity);
-                systems::put_piece(registry, board, hovered_entity);
-            }
+
+            systems::release(registry, board);
         }
-
-        systems::release(registry, board);
     }
 
     return false;
@@ -504,6 +509,7 @@ void Application::build_camera() {
     registry.emplace<CameraComponent>(camera,
         glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.08f, 100.0f),
         glm::vec3(0.0f), 8.0f);
+    registry.emplace<CameraMoveComponent>(camera);
 
     SPDLOG_DEBUG("Built camera entity {}", camera);
 }
