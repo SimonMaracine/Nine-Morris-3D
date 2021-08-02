@@ -1,5 +1,6 @@
 #include <memory>
 #include <thread>
+#include <atomic>
 
 #include "other/loader.h"
 #include "other/model.h"
@@ -17,7 +18,7 @@ std::shared_ptr<Assets> Loader::get_assets() {
 }
 
 bool Loader::done_loading() {
-    return loaded;
+    return loaded.load(std::memory_order_relaxed);
 }
 
 std::thread& Loader::get_thread() {
@@ -51,5 +52,5 @@ void Loader::load() {
     }
     assets->skybox_textures_data = skybox_textures;
 
-    loaded = true;
+    loaded.store(true, std::memory_order_relaxed);
 }

@@ -4,6 +4,7 @@
 #include <utility>
 #include <array>
 #include <thread>
+#include <atomic>
 
 #include "opengl/renderer/texture.h"
 #include "other/model.h"
@@ -30,6 +31,6 @@ private:
     void load();
 
     std::shared_ptr<Assets> assets = std::make_shared<Assets>();
-    volatile bool loaded = false;  // TODO maybe should use atomic
+    std::atomic<bool> loaded = false;
     std::thread loading_thread;
 };
