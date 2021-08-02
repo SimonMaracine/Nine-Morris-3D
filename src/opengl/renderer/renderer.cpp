@@ -24,8 +24,11 @@ namespace renderer {
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        storage->basic_shader = Shader::create("data/shaders/basic.vert",
-                                               "data/shaders/basic.frag");
+        storage->board_shader = Shader::create("data/shaders/board.vert",
+                                               "data/shaders/board.frag");
+
+        storage->piece_shader = Shader::create("data/shaders/piece.vert",
+                                               "data/shaders/piece.frag");
 
         Specification specification;
         specification.width = 1024;
@@ -45,8 +48,7 @@ namespace renderer {
                 -1.0f, -1.0f,    0.0f, 0.0f,
                  1.0f, -1.0f,    1.0f, 0.0f
             };
-            storage->quad_vertex_buffer =
-                VertexBuffer::create_with_data(quad_vertices, sizeof(quad_vertices));
+            storage->quad_vertex_buffer = VertexBuffer::create(quad_vertices, sizeof(quad_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
@@ -76,8 +78,7 @@ namespace renderer {
                   0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
                   0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
             };
-            storage->origin_vertex_buffer =
-                VertexBuffer::create_with_data(origin_vertices, sizeof(origin_vertices));
+            storage->origin_vertex_buffer = VertexBuffer::create(origin_vertices, sizeof(origin_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 3);
             layout.add(1, BufferLayout::Type::Float, 3);
@@ -96,8 +97,7 @@ namespace renderer {
                 -1.0f, -1.0f,    0.0f, 0.0f,
                  1.0f, -1.0f,    1.0f, 0.0f
             };
-            storage->light_vertex_buffer =
-                VertexBuffer::create_with_data(light_vertices, sizeof(light_vertices));
+            storage->light_vertex_buffer = VertexBuffer::create(light_vertices, sizeof(light_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
@@ -117,8 +117,7 @@ namespace renderer {
                 -1.0f, -1.0f,    0.0f, 0.0f,
                  1.0f, -1.0f,    1.0f, 0.0f
             };
-            storage->loading_vertex_buffer =
-                VertexBuffer::create_with_data(loading_vertices, sizeof(loading_vertices));
+            storage->loading_vertex_buffer = VertexBuffer::create(loading_vertices, sizeof(loading_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
@@ -202,7 +201,35 @@ namespace renderer {
         glStencilMask(0x00);
     }
 
-    void draw_model(const glm::vec3& position,
+    void draw_board(const glm::vec3& position,
+                    const glm::vec3& rotation,
+                    float scale,
+                    std::shared_ptr<Shader> shader,
+                    std::shared_ptr<VertexArray> array,
+                    std::shared_ptr<Texture> diffuse_map,
+                    const glm::vec3& specular_color,
+                    float shininess,
+                    GLuint index_count) {
+        shader->bind();
+        shader->set_uniform_int("u_material.diffuse", 0);
+        shader->set_uniform_vec3("u_material.specular", specular_color);
+        shader->set_uniform_float("u_material.shininess", shininess);
+
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, position);
+        matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+
+        shader->set_uniform_matrix("u_model_matrix", matrix);
+
+        array->bind();
+        diffuse_map->bind(0);
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+    }
+
+    void draw_piece(const glm::vec3& position,
                     const glm::vec3& rotation,
                     float scale,
                     std::shared_ptr<Shader> shader,
@@ -232,7 +259,7 @@ namespace renderer {
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
     }
 
-    void draw_model_outline(const glm::vec3& position,
+    void draw_piece_outline(const glm::vec3& position,
                             const glm::vec3& rotation,
                             float scale,
                             std::shared_ptr<Shader> shader,
@@ -241,8 +268,7 @@ namespace renderer {
                             const glm::vec3& specular_color,
                             float shininess,
                             GLuint index_count,
-                            const glm::vec3& outline_color,
-                            float outline_size) {
+                            const glm::vec3& outline_color) {
         glStencilFunc(GL_ALWAYS, 1, 0xFF); 
         glStencilMask(0xFF);
 
@@ -274,7 +300,7 @@ namespace renderer {
             storage->outline_shader->bind();
             storage->outline_shader->set_uniform_vec3("u_color", outline_color);
 
-            const float size = outline_size;
+            constexpr float size = 3.6f;
 
             glm::mat4 matrix = glm::mat4(1.0f);
             matrix = glm::translate(matrix, position);

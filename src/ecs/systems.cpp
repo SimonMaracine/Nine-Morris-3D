@@ -25,10 +25,10 @@ void systems::board_render(entt::registry& registry, entt::entity camera_entity)
         material.shader->bind();
         material.shader->set_uniform_matrix("u_projection_view_matrix",
                                             camera.projection_view_matrix);
-        renderer::draw_model(transform.position, transform.rotation, transform.scale,
+        renderer::draw_board(transform.position, transform.rotation, transform.scale,
                              material.shader, mesh.vertex_array, textures.diffuse_map,
                              material.specular_color, material.shininess,
-                             mesh.index_count, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+                             mesh.index_count);
     }
 }
 
@@ -133,32 +133,30 @@ void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
     for (entt::entity entity : view) {
         auto [transform, mesh, material, textures, outline, piece] = view.get(entity);
 
-        constexpr float outline_size = 3.6f;
-
         if (piece.selected) {
             outline.shader->bind();
             outline.shader->set_uniform_matrix("u_projection_view_matrix",
                                                camera.projection_view_matrix);
-            renderer::draw_model_outline(transform.position, transform.rotation,
+            renderer::draw_piece_outline(transform.position, transform.rotation,
                                     transform.scale, material.shader, mesh.vertex_array,
                                     textures.diffuse_map, material.specular_color,
                                     material.shininess, mesh.index_count,
-                                    outline.outline_color, outline_size);
+                                    outline.outline_color);
         } else if (piece.show_outline && entity == hovered_entity && piece.active &&
                 !piece.pending_remove) {
             outline.shader->bind();
             outline.shader->set_uniform_matrix("u_projection_view_matrix",
                                                camera.projection_view_matrix);
-            renderer::draw_model_outline(transform.position, transform.rotation,
+            renderer::draw_piece_outline(transform.position, transform.rotation,
                                     transform.scale, material.shader, mesh.vertex_array,
                                     textures.diffuse_map, material.specular_color,
                                     material.shininess, mesh.index_count,
-                                    glm::vec3(1.0f, 0.5f, 0.0f), outline_size);
+                                    glm::vec3(1.0f, 0.5f, 0.0f));
         } else if (piece.to_take && entity == hovered_entity && piece.active) {
             material.shader->bind();
             material.shader->set_uniform_matrix("u_projection_view_matrix",
                                                 camera.projection_view_matrix);
-            renderer::draw_model(transform.position, transform.rotation,
+            renderer::draw_piece(transform.position, transform.rotation,
                             transform.scale, material.shader, mesh.vertex_array,
                             textures.diffuse_map, material.specular_color,
                             material.shininess, mesh.index_count,
@@ -167,7 +165,7 @@ void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
             material.shader->bind();
             material.shader->set_uniform_matrix("u_projection_view_matrix",
                                                 camera.projection_view_matrix);
-            renderer::draw_model(transform.position, transform.rotation,
+            renderer::draw_piece(transform.position, transform.rotation,
                             transform.scale, material.shader, mesh.vertex_array,
                             textures.diffuse_map, material.specular_color,
                             material.shininess, mesh.index_count,
@@ -182,15 +180,21 @@ void systems::lighting(entt::registry& registry, entt::entity camera_entity) {
     auto view = registry.view<TransformComponent, LightComponent, ShaderComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, light, shader] = view.get(entity);
+        auto [transform, light, shaders] = view.get(entity);
 
-        shader.shader->bind();
-        shader.shader->set_uniform_vec3("u_light.position", transform.position);
-        shader.shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
-        shader.shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-        shader.shader->set_uniform_vec3("u_light.specular", light.specular_color);
-        
-        shader.shader->set_uniform_vec3("u_view_position", camera_transform.position);
+        shaders.board_shader->bind();
+        shaders.board_shader->set_uniform_vec3("u_light.position", transform.position);
+        shaders.board_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+        shaders.board_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+        shaders.board_shader->set_uniform_vec3("u_light.specular", light.specular_color);
+        shaders.board_shader->set_uniform_vec3("u_view_position", camera_transform.position);
+
+        shaders.piece_shader->bind();
+        shaders.piece_shader->set_uniform_vec3("u_light.position", transform.position);
+        shaders.piece_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+        shaders.piece_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+        shaders.piece_shader->set_uniform_vec3("u_light.specular", light.specular_color);
+        shaders.piece_shader->set_uniform_vec3("u_view_position", camera_transform.position);
     }
 }
 

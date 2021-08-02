@@ -18,7 +18,8 @@ namespace renderer {
     };
 
     struct Storage {
-        std::shared_ptr<Shader> basic_shader = nullptr;
+        std::shared_ptr<Shader> board_shader = nullptr;
+        std::shared_ptr<Shader> piece_shader = nullptr;
         std::shared_ptr<Framebuffer> framebuffer = nullptr;
 
         std::shared_ptr<Shader> quad_shader = nullptr;
@@ -60,7 +61,17 @@ namespace renderer {
     void bind_texture(GLuint texture);
     void set_stencil_mask_zero();
 
-    void draw_model(const glm::vec3& position,
+    void draw_board(const glm::vec3& position,
+                    const glm::vec3& rotation,
+                    float scale,
+                    std::shared_ptr<Shader> shader,
+                    std::shared_ptr<VertexArray> array,
+                    std::shared_ptr<Texture> diffuse_map,
+                    const glm::vec3& specular_color,
+                    float shininess,
+                    GLuint index_count);
+
+    void draw_piece(const glm::vec3& position,
                     const glm::vec3& rotation,
                     float scale,
                     std::shared_ptr<Shader> shader,
@@ -71,7 +82,7 @@ namespace renderer {
                     GLuint index_count,
                     const glm::vec3& tint_color);
 
-    void draw_model_outline(const glm::vec3& position,
+    void draw_piece_outline(const glm::vec3& position,
                             const glm::vec3& rotation,
                             float scale,
                             std::shared_ptr<Shader> shader,
@@ -80,8 +91,7 @@ namespace renderer {
                             const glm::vec3& specular_color,
                             float shininess,
                             GLuint index_count,
-                            const glm::vec3& outline_color,
-                            float outline_size);
+                            const glm::vec3& outline_color);
 
     void draw_cube_map(const glm::mat4& view_projection_matrix,
                        std::shared_ptr<Shader> shader, std::shared_ptr<VertexArray> array,

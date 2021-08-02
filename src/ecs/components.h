@@ -101,9 +101,11 @@ struct LightComponent {
 };
 
 struct ShaderComponent {
-    ShaderComponent(std::shared_ptr<Shader> shader) : shader(shader) {}
+    ShaderComponent(std::shared_ptr<Shader> board_shader, std::shared_ptr<Shader> piece_shader)
+            : board_shader(board_shader), piece_shader(piece_shader) {}
 
-    std::shared_ptr<Shader> shader;
+    std::shared_ptr<Shader> board_shader;
+    std::shared_ptr<Shader> piece_shader;
 };
 
 struct OriginComponent {

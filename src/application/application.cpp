@@ -488,7 +488,7 @@ void Application::build_board(const model::Mesh& mesh) {
     transform.scale = 20.0f;
     
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(board, storage->basic_shader, glm::vec3(0.25f), 8.0f);
+    registry.emplace<MaterialComponent>(board, storage->board_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(board, board_diffuse_texture);
 
     registry.emplace<GameStateComponent>(board, nodes);
@@ -541,7 +541,7 @@ void Application::build_piece(Piece type, const model::Mesh& mesh,
     transform.scale = 20.0f;
 
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(piece, storage->basic_shader, glm::vec3(0.25f), 8.0f);
+    registry.emplace<MaterialComponent>(piece, storage->piece_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(piece, diffuse_texture);
     registry.emplace<OutlineComponent>(piece, storage->outline_shader,
                                        glm::vec3(1.0f, 0.0f, 0.0f));
@@ -559,7 +559,7 @@ void Application::build_directional_light() {
 
     registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f),
                                      glm::vec3(1.0f));
-    registry.emplace<ShaderComponent>(directional_light, storage->basic_shader);
+    registry.emplace<ShaderComponent>(directional_light, storage->board_shader, storage->piece_shader);
     registry.emplace<LightMeshComponent>(directional_light, storage->light_shader);
 
     SPDLOG_DEBUG("Built directional light entity {}", directional_light);
