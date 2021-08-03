@@ -20,7 +20,7 @@
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/vertex_buffer.h"
+#include "opengl/renderer/buffer.h"
 #include "ecs/components.h"
 #include "ecs/systems.h"
 #include "ecs/game.h"
@@ -100,11 +100,12 @@ void Application::draw() {
 
     storage->framebuffer->clear_red_integer_attachment(1, -1);
 
+    systems::load_projection_view(registry, camera);
     systems::cube_map_render(registry, camera);
     systems::lighting(registry, camera);
-    systems::board_render(registry, camera);
-    systems::piece_render(registry, camera, hovered_entity);
-    systems::node_render(registry, camera, hovered_entity, board);
+    systems::board_render(registry);
+    systems::piece_render(registry, hovered_entity);
+    systems::node_render(registry, hovered_entity, board);
     systems::origin_render(registry, camera);
     systems::lighting_render(registry, camera);
 
@@ -439,25 +440,25 @@ bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& eve
     return false;
 }
 
-std::shared_ptr<VertexBuffer> Application::create_ids_buffer(unsigned int vertices_size,
+std::shared_ptr<Buffer> Application::create_ids_buffer(unsigned int vertices_size,
                                                              entt::entity entity) {
     std::vector<int> array;
     array.resize(vertices_size);
     for (unsigned int i = 0; i < array.size(); i++) {
         array[i] = (int) entt::to_integral(entity);
     }
-    std::shared_ptr<VertexBuffer> buffer =
-        VertexBuffer::create(array.data(), array.size() * sizeof(int));
+    std::shared_ptr<Buffer> buffer =
+        Buffer::create(array.data(), array.size() * sizeof(int));
 
     return buffer;
 }
 
 std::shared_ptr<VertexArray> Application::create_entity_vertex_array(model::Mesh mesh,
                                                                      entt::entity entity) {
-    std::shared_ptr<VertexBuffer> vertices =
-        VertexBuffer::create(mesh.vertices.data(), mesh.vertices.size() * sizeof(model::Vertex));
+    std::shared_ptr<Buffer> vertices =
+        Buffer::create(mesh.vertices.data(), mesh.vertices.size() * sizeof(model::Vertex));
 
-    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), entity);
+    std::shared_ptr<Buffer> ids = create_ids_buffer(mesh.vertices.size(), entity);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
@@ -467,8 +468,8 @@ std::shared_ptr<VertexArray> Application::create_entity_vertex_array(model::Mesh
     BufferLayout layout2;
     layout2.add(3, BufferLayout::Type::Int, 1);
 
-    std::shared_ptr<VertexBuffer> index_buffer =
-        VertexBuffer::create_index(mesh.indices.data(),
+    std::shared_ptr<Buffer> index_buffer =
+        Buffer::create_index(mesh.indices.data(),
                                    mesh.indices.size() * sizeof(unsigned int));
 
     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
@@ -515,8 +516,8 @@ void Application::build_camera() {
 }
 
 void Application::build_skybox() {
-    std::shared_ptr<VertexBuffer> positions =
-        VertexBuffer::create(cube_map_points, 108 * sizeof(float));
+    std::shared_ptr<Buffer> positions =
+        Buffer::create(cube_map_points, 108 * sizeof(float));
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
@@ -586,18 +587,18 @@ void Application::build_node(int index, const model::Mesh& mesh, const glm::vec3
     for (const model::Vertex& vertex : mesh.vertices) {
         data.push_back(vertex.position);
     }
-    std::shared_ptr<VertexBuffer> vertices =
-        VertexBuffer::create(data.data(), data.size() * sizeof(glm::vec3));
+    std::shared_ptr<Buffer> vertices =
+        Buffer::create(data.data(), data.size() * sizeof(glm::vec3));
 
-    std::shared_ptr<VertexBuffer> ids = create_ids_buffer(mesh.vertices.size(), node);
+    std::shared_ptr<Buffer> ids = create_ids_buffer(mesh.vertices.size(), node);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     BufferLayout layout2;
     layout2.add(1, BufferLayout::Type::Int, 1);
 
-    std::shared_ptr<VertexBuffer> index_buffer =
-        VertexBuffer::create_index(mesh.indices.data(),
+    std::shared_ptr<Buffer> index_buffer =
+        Buffer::create_index(mesh.indices.data(),
                                    mesh.indices.size() * sizeof(unsigned int));
 
     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();

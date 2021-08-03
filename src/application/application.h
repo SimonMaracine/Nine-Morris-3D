@@ -9,9 +9,9 @@
 #include "application/window.h"
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/vertex_array.h"
+#include "opengl/renderer/buffer.h"
 #include "opengl/renderer/framebuffer.h"
 #include "opengl/renderer/renderer.h"
-#include "opengl/renderer/vertex_buffer.h"
 #include "other/model.h"
 #include "other/loader.h"
 #include "ecs/game.h"
@@ -55,8 +55,8 @@ public:
     bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
 
-    std::shared_ptr<VertexBuffer> create_ids_buffer(unsigned int vertices_size,
-                                                    entt::entity entity);
+    std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size,
+                                              entt::entity entity);
     std::shared_ptr<VertexArray> create_entity_vertex_array(model::Mesh mesh,
                                                             entt::entity entity);
 

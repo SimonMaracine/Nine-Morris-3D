@@ -6,7 +6,9 @@ layout (location = 2) in vec3 a_normal;
 layout (location = 3) in int a_entity_id;
 
 uniform mat4 u_model_matrix;
-uniform mat4 u_projection_view_matrix;
+uniform Matrices {
+    mat4 u_projection_view_matrix;
+};
 
 void main() {
     gl_Position = u_projection_view_matrix * u_model_matrix * vec4(a_position, 1.0);

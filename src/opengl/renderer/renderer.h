@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "opengl/renderer/vertex_array.h"
+#include "opengl/renderer/buffer.h"
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/framebuffer.h"
@@ -18,13 +19,15 @@ namespace renderer {
     };
 
     struct Storage {
+        std::shared_ptr<Buffer> uniform_buffer = nullptr;
+
         std::shared_ptr<Shader> board_shader = nullptr;
         std::shared_ptr<Shader> piece_shader = nullptr;
         std::shared_ptr<Framebuffer> framebuffer = nullptr;
 
         std::shared_ptr<Shader> quad_shader = nullptr;
         std::shared_ptr<VertexArray> quad_vertex_array = nullptr;
-        std::shared_ptr<VertexBuffer> quad_vertex_buffer = nullptr;
+        std::shared_ptr<Buffer> quad_vertex_buffer = nullptr;
 
         std::shared_ptr<Shader> outline_shader = nullptr;
         std::shared_ptr<Shader> node_shader = nullptr;
@@ -32,16 +35,16 @@ namespace renderer {
 
         std::shared_ptr<Shader> origin_shader = nullptr;
         std::shared_ptr<VertexArray> origin_vertex_array = nullptr;
-        std::shared_ptr<VertexBuffer> origin_vertex_buffer = nullptr;
+        std::shared_ptr<Buffer> origin_vertex_buffer = nullptr;
 
         std::shared_ptr<Shader> light_shader = nullptr;
         std::shared_ptr<VertexArray> light_vertex_array = nullptr;
-        std::shared_ptr<VertexBuffer> light_vertex_buffer = nullptr;
+        std::shared_ptr<Buffer> light_vertex_buffer = nullptr;
         std::shared_ptr<Texture> light_texture = nullptr;
 
         std::shared_ptr<Shader> loading_shader = nullptr;
         std::shared_ptr<VertexArray> loading_vertex_array = nullptr;
-        std::shared_ptr<VertexBuffer> loading_vertex_buffer = nullptr;
+        std::shared_ptr<Buffer> loading_vertex_buffer = nullptr;
         std::shared_ptr<Texture> loading_texture = nullptr;
     };
 
@@ -60,6 +63,7 @@ namespace renderer {
     void disable_stencil();
     void bind_texture(GLuint texture);
     void set_stencil_mask_zero();
+    void load_projection_view(const glm::mat4& matrix);
 
     void draw_board(const glm::vec3& position,
                     const glm::vec3& rotation,

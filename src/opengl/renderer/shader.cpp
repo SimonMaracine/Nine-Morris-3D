@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "opengl/renderer/shader.h"
+#include "opengl/renderer/buffer.h"
 #include "other/logging.h"
 
 Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader)
@@ -24,10 +25,10 @@ Shader::~Shader() {
     SPDLOG_DEBUG("Deleted shader {}", program);
 }
 
-std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
-                                       const std::string& fragment_source_path) {
-    GLuint vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
-    GLuint fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
+std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
+                                       const std::string& fragment_source) {
+    GLuint vertex_shader = compile_shader(vertex_source, GL_VERTEX_SHADER);
+    GLuint fragment_shader = compile_shader(fragment_source, GL_FRAGMENT_SHADER);
 
     GLuint program = glCreateProgram();
     glAttachShader(program, vertex_shader);
@@ -36,6 +37,48 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
     glValidateProgram(program);
 
     check_linking(program);
+
+    return std::make_shared<Shader>(program, vertex_shader, fragment_shader);
+}
+
+std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
+                                       const std::string& fragment_source,
+                                       const char* block_name,
+                                       const char** uniforms,
+                                       int uniforms_count,
+                                       std::shared_ptr<Buffer> uniform_buffer) {
+    GLuint vertex_shader = compile_shader(vertex_source, GL_VERTEX_SHADER);
+    GLuint fragment_shader = compile_shader(fragment_source, GL_FRAGMENT_SHADER);
+
+    GLuint program = glCreateProgram();
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    check_linking(program);
+
+    // Set up uniform buffer
+    GLuint block_index = glGetUniformBlockIndex(program, block_name);
+    if (block_index == GL_INVALID_INDEX) {
+        spdlog::critical("Invalid block index");
+        std::exit(1);
+    }
+
+    GLint buffer_size;
+    glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &buffer_size);
+
+    // GLuint indices[uniforms_count];
+    // GLint size[uniforms_count];
+    // GLint offset[uniforms_count];
+    // GLint type[uniforms_count];
+
+    // glGetUniformIndices(program, uniforms_count, uniforms, indices);
+    // glGetActiveUniformsiv(program, uniforms_count, indices, GL_UNIFORM_SIZE, size);
+    // glGetActiveUniformsiv(program, uniforms_count, indices, GL_UNIFORM_OFFSET, offset);
+    // glGetActiveUniformsiv(program, uniforms_count, indices, GL_UNIFORM_TYPE, type);
+
+    glBindBufferBase(GL_UNIFORM_BUFFER, block_index, uniform_buffer->buffer);
 
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader);
 }

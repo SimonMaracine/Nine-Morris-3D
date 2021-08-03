@@ -11,7 +11,9 @@ out flat int v_entity_id;
 out vec3 v_fragment_position;
 
 uniform mat4 u_model_matrix;
-uniform mat4 u_projection_view_matrix;
+uniform Matrices {
+    mat4 u_projection_view_matrix;
+};
 
 void main() {
     v_texture_coordinate = a_texture_coordinate;

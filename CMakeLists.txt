@@ -24,7 +24,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/application/window.cpp"
     "src/opengl/debug_opengl.cpp"
     "src/opengl/renderer/vertex_array.cpp"
-    "src/opengl/renderer/vertex_buffer.cpp"
+    "src/opengl/renderer/buffer.cpp"
     "src/opengl/renderer/buffer_layout.cpp"
     "src/opengl/renderer/shader.cpp"
     "src/opengl/renderer/renderer.cpp"

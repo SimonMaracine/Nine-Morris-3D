@@ -11,9 +11,13 @@
 #include "opengl/renderer/renderer.h"
 #include "other/logging.h"
 
-void systems::board_render(entt::registry& registry, entt::entity camera_entity) {
+void systems::load_projection_view(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = CAMERA(camera_entity);
 
+    renderer::load_projection_view(camera.projection_view_matrix);
+}
+
+void systems::board_render(entt::registry& registry) {
     auto view = registry.view<TransformComponent,
                               MeshComponent,
                               MaterialComponent,
@@ -22,9 +26,6 @@ void systems::board_render(entt::registry& registry, entt::entity camera_entity)
     for (entt::entity entity : view) {
         auto [transform, mesh, material, textures] = view.get(entity);
 
-        material.shader->bind();
-        material.shader->set_uniform_matrix("u_projection_view_matrix",
-                                            camera.projection_view_matrix);
         renderer::draw_board(transform.position, transform.rotation, transform.scale,
                              material.shader, mesh.vertex_array, textures.diffuse_map,
                              material.specular_color, material.shininess,
@@ -132,10 +133,7 @@ void systems::cube_map_render(entt::registry& registry, entt::entity camera_enti
     }
 }
 
-void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
-                           entt::entity hovered_entity) {
-    auto& camera = CAMERA(camera_entity);
-
+void systems::piece_render(entt::registry& registry, entt::entity hovered_entity) {
     auto view = registry.view<TransformComponent, MeshComponent,
                               MaterialComponent, TextureComponent,
                               OutlineComponent, PieceComponent>();
@@ -144,9 +142,6 @@ void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
         auto [transform, mesh, material, textures, outline, piece] = view.get(entity);
 
         if (piece.selected) {
-            outline.shader->bind();
-            outline.shader->set_uniform_matrix("u_projection_view_matrix",
-                                               camera.projection_view_matrix);
             renderer::draw_piece_outline(transform.position, transform.rotation,
                                     transform.scale, material.shader, mesh.vertex_array,
                                     textures.diffuse_map, material.specular_color,
@@ -154,27 +149,18 @@ void systems::piece_render(entt::registry& registry, entt::entity camera_entity,
                                     outline.outline_color);
         } else if (piece.show_outline && entity == hovered_entity && piece.active &&
                 !piece.pending_remove) {
-            outline.shader->bind();
-            outline.shader->set_uniform_matrix("u_projection_view_matrix",
-                                               camera.projection_view_matrix);
             renderer::draw_piece_outline(transform.position, transform.rotation,
                                     transform.scale, material.shader, mesh.vertex_array,
                                     textures.diffuse_map, material.specular_color,
                                     material.shininess, mesh.index_count,
                                     glm::vec3(1.0f, 0.5f, 0.0f));
         } else if (piece.to_take && entity == hovered_entity && piece.active) {
-            material.shader->bind();
-            material.shader->set_uniform_matrix("u_projection_view_matrix",
-                                                camera.projection_view_matrix);
             renderer::draw_piece(transform.position, transform.rotation,
                             transform.scale, material.shader, mesh.vertex_array,
                             textures.diffuse_map, material.specular_color,
                             material.shininess, mesh.index_count,
                             glm::vec3(0.9f, 0.0f, 0.0f));
         } else {
-            material.shader->bind();
-            material.shader->set_uniform_matrix("u_projection_view_matrix",
-                                                camera.projection_view_matrix);
             renderer::draw_piece(transform.position, transform.rotation,
                             transform.scale, material.shader, mesh.vertex_array,
                             textures.diffuse_map, material.specular_color,
@@ -260,19 +246,14 @@ void systems::origin_render(entt::registry& registry, entt::entity camera_entity
     }
 }
 
-void systems::node_render(entt::registry& registry, entt::entity camera_entity,
+void systems::node_render(entt::registry& registry,
                           entt::entity hovered_entity, entt::entity board_entity) {
-    auto& camera = CAMERA(camera_entity);
     auto& state = STATE(board_entity);
 
     auto view = registry.view<TransformComponent, MeshComponent, NodeMaterialComponent>();
 
     for (entt::entity entity : view) {
         auto [transform, mesh, material] = view.get(entity);
-
-        material.shader->bind();
-        material.shader->set_uniform_matrix("u_projection_view_matrix",
-                                            camera.projection_view_matrix);
 
         if (hovered_entity == entity &&
                 state.phase != Phase::None && state.phase != Phase::GameOver) {

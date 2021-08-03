@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 
 #include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/vertex_buffer.h"
+#include "opengl/renderer/buffer.h"
 #include "opengl/renderer/buffer_layout.h"
 #include "other/logging.h"
 
@@ -34,7 +34,7 @@ void VertexArray::unbind() {
     glBindVertexArray(0);
 }
 
-void VertexArray::add_buffer(std::shared_ptr<VertexBuffer> buffer,
+void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer,
                              const BufferLayout& layout) {
     glBindVertexArray(array);  // TODO be careful with these
     glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
@@ -65,6 +65,6 @@ void VertexArray::add_buffer(std::shared_ptr<VertexBuffer> buffer,
     buffers.push_back(buffer);
 }
 
-void VertexArray::hold_index_buffer(std::shared_ptr<VertexBuffer> index_buffer) {
+void VertexArray::hold_index_buffer(std::shared_ptr<Buffer> index_buffer) {
     buffers.push_back(index_buffer);
 }

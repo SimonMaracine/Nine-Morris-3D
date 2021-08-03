@@ -6,6 +6,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include "opengl/renderer/buffer.h"
+
 class Shader {
 public:
     Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader);
@@ -13,6 +15,12 @@ public:
 
     static std::shared_ptr<Shader> create(const std::string& vertex_source,
                                           const std::string& fragment_source);
+    static std::shared_ptr<Shader> create(const std::string& vertex_source,
+                                          const std::string& fragment_source,
+                                          const char* block_name,
+                                          const char** uniforms,
+                                          int uniforms_count,
+                                          std::shared_ptr<Buffer> uniform_buffer);
 
     void bind() const;
     static void unbind();

@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/vertex_buffer.h"
+#include "opengl/renderer/buffer.h"
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
 

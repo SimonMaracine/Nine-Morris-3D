@@ -1,12 +1,15 @@
 #include <memory>
 #include <iostream>
+#include <string.h>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/vertex_array.h"
+#include "opengl/renderer/buffer.h"
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/framebuffer.h"
@@ -24,11 +27,23 @@ namespace renderer {
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+        storage->uniform_buffer = Buffer::create_uniform(nullptr, sizeof(glm::mat4));
+        const char* block_name = "Matrices";
+        const char* uniforms[] = {
+            "u_projection_view_matrix"
+        };
+
         storage->board_shader = Shader::create("data/shaders/board.vert",
-                                               "data/shaders/board.frag");
+                                               "data/shaders/board.frag",
+                                               block_name,
+                                               uniforms, 1,
+                                               storage->uniform_buffer);
 
         storage->piece_shader = Shader::create("data/shaders/piece.vert",
-                                               "data/shaders/piece.frag");
+                                               "data/shaders/piece.frag",
+                                               block_name,
+                                               uniforms, 1,
+                                               storage->uniform_buffer);
 
         Specification specification;
         specification.width = 1024;
@@ -48,7 +63,7 @@ namespace renderer {
                 -1.0f, -1.0f,    0.0f, 0.0f,
                  1.0f, -1.0f,    1.0f, 0.0f
             };
-            storage->quad_vertex_buffer = VertexBuffer::create(quad_vertices, sizeof(quad_vertices));
+            storage->quad_vertex_buffer = Buffer::create(quad_vertices, sizeof(quad_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
@@ -59,10 +74,16 @@ namespace renderer {
         }
 
         storage->outline_shader = Shader::create("data/shaders/outline.vert",
-                                                 "data/shaders/outline.frag");
+                                                 "data/shaders/outline.frag",
+                                                 block_name,
+                                                 uniforms, 1,
+                                                 storage->uniform_buffer);
 
         storage->node_shader = Shader::create("data/shaders/node.vert",
-                                              "data/shaders/node.frag");
+                                              "data/shaders/node.frag",
+                                               block_name,
+                                               uniforms, 1,
+                                               storage->uniform_buffer);
 
         storage->skybox_shader = Shader::create("data/shaders/cubemap.vert",
                                                 "data/shaders/cubemap.frag");
@@ -78,7 +99,7 @@ namespace renderer {
                   0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
                   0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
             };
-            storage->origin_vertex_buffer = VertexBuffer::create(origin_vertices, sizeof(origin_vertices));
+            storage->origin_vertex_buffer = Buffer::create(origin_vertices, sizeof(origin_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 3);
             layout.add(1, BufferLayout::Type::Float, 3);
@@ -97,7 +118,7 @@ namespace renderer {
                 -1.0f, -1.0f,    0.0f, 0.0f,
                  1.0f, -1.0f,    1.0f, 0.0f
             };
-            storage->light_vertex_buffer = VertexBuffer::create(light_vertices, sizeof(light_vertices));
+            storage->light_vertex_buffer = Buffer::create(light_vertices, sizeof(light_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
@@ -117,7 +138,7 @@ namespace renderer {
                 -1.0f, -1.0f,    0.0f, 0.0f,
                  1.0f, -1.0f,    1.0f, 0.0f
             };
-            storage->loading_vertex_buffer = VertexBuffer::create(loading_vertices, sizeof(loading_vertices));
+            storage->loading_vertex_buffer = Buffer::create(loading_vertices, sizeof(loading_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
@@ -199,6 +220,13 @@ namespace renderer {
 
     void set_stencil_mask_zero() {
         glStencilMask(0x00);
+    }
+
+    void load_projection_view(const glm::mat4& matrix) {
+        const std::size_t size = sizeof(glm::mat4);
+        float* buffer[size];
+        memcpy(buffer, glm::value_ptr(matrix), size);
+        storage->uniform_buffer->update_data(buffer, size);
     }
 
     void draw_board(const glm::vec3& position,
