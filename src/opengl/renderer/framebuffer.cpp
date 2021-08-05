@@ -31,6 +31,8 @@ std::shared_ptr<Framebuffer> Framebuffer::create(const Specification& specificat
     for (TextureFormat format : specification.attachments) {
         if (format == TextureFormat::Depth24Stencil8) {
             depth_attachment_format = format;
+        } else if (format == TextureFormat::DepthForShadow) {
+            depth_attachment_format = format;
         } else {
             color_attachment_formats.push_back(format);
         }
@@ -51,6 +53,10 @@ void Framebuffer::bind_default() {
 GLuint Framebuffer::get_color_attachment(unsigned int index) const {
     assert(index < color_attachments.size());
     return color_attachments[index];
+}
+
+GLuint Framebuffer::get_depth_attachment() const {
+    return depth_attachment;
 }
 
 void Framebuffer::resize(int width, int height) {
@@ -106,6 +112,18 @@ static void attach_depth_texture(GLuint texture, GLenum format, GLenum attachmen
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment_type, GL_TEXTURE_2D, texture, 0);
 }
 
+static void attach_depth_shadow_texture(GLuint texture, int width, int height) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT,
+                 GL_FLOAT, nullptr);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
+}
+
 void Framebuffer::build() {
     if (framebuffer) {
         glDeleteFramebuffers(1, &framebuffer);
@@ -157,6 +175,10 @@ void Framebuffer::build() {
                                      GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
                                      specification.height);
                 break;
+            case TextureFormat::DepthForShadow:
+                attach_depth_shadow_texture(depth_attachment, specification.width,
+                                            specification.height);
+                break;
             default:
                 spdlog::critical("Texture format unrecognized");
                 std::exit(1);
@@ -171,6 +193,7 @@ void Framebuffer::build() {
         glDrawBuffers(color_attachments.size(), buffers);
     } else if (color_attachments.empty()) {
         glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
     }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {

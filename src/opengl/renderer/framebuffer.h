@@ -10,6 +10,7 @@ enum class TextureFormat {
     RGB8,
     RGBA8,
     Depth24Stencil8,
+    DepthForShadow,
     RedInteger
 };
 
@@ -33,6 +34,7 @@ public:
 
     const Specification& get_specification() const { return specification; }
     GLuint get_color_attachment(unsigned int index) const;
+    GLuint get_depth_attachment() const;
 
     void resize(int width, int height);
     int read_pixel(unsigned int attachment_index, int x, int y) const;

@@ -85,4 +85,6 @@ public:
     entt::entity nodes[24];
 
     entt::entity hovered_entity = entt::null;
+
+    std::shared_ptr<Shader> debug = nullptr;
 };
