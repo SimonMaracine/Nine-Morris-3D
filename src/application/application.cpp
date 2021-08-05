@@ -109,11 +109,9 @@ void Application::draw() {
     systems::origin_render(registry, camera);
     systems::lighting_render(registry, camera);
 
-    hovered_entity = (entt::entity) storage->framebuffer->read_pixel(
-                          1,
-                          input::get_mouse_x(),
-                          data.height - input::get_mouse_y()
-                     );
+    int y = data.height - input::get_mouse_y();
+    hovered_entity =
+        (entt::entity) storage->framebuffer->read_pixel(1, input::get_mouse_x(), y);
 
     Framebuffer::bind_default();
 
@@ -441,7 +439,7 @@ bool Application::on_mouse_button_released(events::MouseButtonReleasedEvent& eve
 }
 
 std::shared_ptr<Buffer> Application::create_ids_buffer(unsigned int vertices_size,
-                                                             entt::entity entity) {
+                                                       entt::entity entity) {
     std::vector<int> array;
     array.resize(vertices_size);
     for (unsigned int i = 0; i < array.size(); i++) {
