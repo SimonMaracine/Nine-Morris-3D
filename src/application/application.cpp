@@ -104,7 +104,7 @@ void Application::draw() {
     systems::cube_map_render(registry, camera);
     systems::lighting(registry, camera);
     systems::board_render(registry);
-    systems::piece_render(registry, hovered_entity);
+    systems::piece_render(registry, hovered_entity, camera);
     systems::node_render(registry, hovered_entity, board);
     systems::origin_render(registry, camera);
     systems::lighting_render(registry, camera);

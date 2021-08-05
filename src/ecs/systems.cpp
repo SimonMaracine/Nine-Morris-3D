@@ -133,20 +133,23 @@ void systems::cube_map_render(entt::registry& registry, entt::entity camera_enti
     }
 }
 
-void systems::piece_render(entt::registry& registry, entt::entity hovered_entity) {
-    // auto& camera_transform = registry.get<TransformComponent>(camera_entity);
+void systems::piece_render(entt::registry& registry, entt::entity hovered_entity,
+                           entt::entity camera_entity) {
+    auto& camera_transform = registry.get<TransformComponent>(camera_entity);
 
-    // auto func = [&camera_transform](const TransformComponent& lhs, const TransformComponent& rhs) {
-    //     float distance1 = glm::length(camera_transform.position - lhs.position);
-    //     float distance2 = glm::length(camera_transform.position - rhs.position);
-    //     return distance1 < distance2;
-    // };
+    auto func = [&camera_transform](const TransformComponent& lhs, const TransformComponent& rhs) {
+        float distance1 = glm::length(camera_transform.position - lhs.position);
+        float distance2 = glm::length(camera_transform.position - rhs.position);
+        return distance1 > distance2;
+    };
 
-    // registry.sort<TransformComponent>(func);
+    registry.sort<TransformComponent>(func);
 
     auto view = registry.view<TransformComponent, MeshComponent,
                               MaterialComponent, TextureComponent,
                               OutlineComponent, PieceComponent>();
+
+    view.use<TransformComponent>();
 
     for (entt::entity entity : view) {
         auto [transform, mesh, material, textures, outline, piece] = view.get(entity);

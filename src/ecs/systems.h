@@ -13,7 +13,8 @@ namespace systems {
 
     void cube_map_render(entt::registry& registry, entt::entity camera_entity);
 
-    void piece_render(entt::registry& registry, entt::entity hovered_entity);
+    void piece_render(entt::registry& registry, entt::entity hovered_entity,
+                      entt::entity camera_entity);
 
     void lighting(entt::registry& registry, entt::entity camera_entity);
 
@@ -23,7 +24,8 @@ namespace systems {
 
     void origin_render(entt::registry& registry, entt::entity camera_entity);
 
-    void node_render(entt::registry& registry, entt::entity hovered_entity, entt::entity board_entity);
+    void node_render(entt::registry& registry, entt::entity hovered_entity,
+                     entt::entity board_entity);
 
     // void node_move(entt::registry& registry, float dt);
 }
