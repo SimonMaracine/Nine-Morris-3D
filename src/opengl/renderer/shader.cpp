@@ -65,19 +65,8 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
         std::exit(1);
     }
 
-    GLint buffer_size;
+    GLint buffer_size;  // TODO this is not used
     glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &buffer_size);
-
-    // GLuint indices[uniforms_count];
-    // GLint size[uniforms_count];
-    // GLint offset[uniforms_count];
-    // GLint type[uniforms_count];
-
-    // glGetUniformIndices(program, uniforms_count, uniforms, indices);
-    // glGetActiveUniformsiv(program, uniforms_count, indices, GL_UNIFORM_SIZE, size);
-    // glGetActiveUniformsiv(program, uniforms_count, indices, GL_UNIFORM_OFFSET, offset);
-    // glGetActiveUniformsiv(program, uniforms_count, indices, GL_UNIFORM_TYPE, type);
-
     glBindBufferBase(GL_UNIFORM_BUFFER, block_index, uniform_buffer->buffer);
 
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader);
@@ -119,7 +108,7 @@ void Shader::set_uniform_float(const std::string& name, float value) const {
 GLint Shader::get_uniform_location(const std::string& name) const {
     GLint location = glGetUniformLocation(program, name.c_str());
     if (location == -1) {
-        SPDLOG_ERROR("Uniform variable '{}' not found", name.c_str());
+        SPDLOG_WARN("Uniform variable '{}' not found", name.c_str());
     }
 
     return location;

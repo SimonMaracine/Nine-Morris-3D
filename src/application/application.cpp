@@ -39,14 +39,7 @@ Application::Application(int width, int height) {
 
     start();
     imgui_start();
-
-    debug = Shader::create("data/shaders/temp.vert", "data/shaders/temp.frag");
-    debug->bind();
-    debug->set_uniform_int("depthMap", 0);
 }
-
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
 
 Application::~Application() {
     imgui_end();
@@ -102,78 +95,56 @@ void Application::update(float dt) {
 void Application::draw() {
     renderer::clear(renderer::Color | renderer::Depth);
 
-    renderer::set_viewport(1024, 1024);
-    storage->depth_map_framebuffer->bind();
-    renderer::clear(renderer::Depth);
-
-    // Shader and matrices
     glm::mat4 projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
-    glm::mat4 view = glm::lookAt(glm::vec3(-11.0f, 15.0f, -15.0f), 
-                                 glm::vec3(0.0f, 0.0f, 0.0f), 
+    glm::mat4 view = glm::lookAt(glm::vec3(-6.0f, 8.0f, -8.0f),
+                                 glm::vec3(0.0f, 0.0f, 0.0f),
                                  glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 light_space_matrix = projection * view;
     storage->shadow_shader->bind();
     storage->shadow_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
     
-    // Render
+    storage->depth_map_framebuffer->bind();
+
+    renderer::set_viewport(1024, 1024);
+    renderer::clear(renderer::Depth);
+
     systems::render_board_to_depth(registry);
     systems::render_piece_to_depth(registry);
 
+    storage->framebuffer->bind();
+
     renderer::set_viewport(data.width, data.height);
-    // storage->framebuffer->bind();
     renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
-    // renderer::set_stencil_mask_zero();
+    renderer::set_stencil_mask_zero();
 
-    debug->bind();
-    renderer::bind_texture(storage->depth_map_framebuffer->get_depth_attachment(), 0);
-    if (quadVAO == 0)
-    {
-        float quadVertices[] = {
-            // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    storage->framebuffer->clear_red_integer_attachment(1, -1);
+    storage->board_shader->bind();
+    storage->board_shader->set_uniform_int("u_shadow_map", 1);
+    renderer::bind_texture(storage->depth_map_framebuffer->get_depth_attachment(), 1);
 
-    // storage->framebuffer->clear_red_integer_attachment(1, -1);
+    systems::load_projection_view(registry, camera);
+    systems::cube_map_render(registry, camera);
+    systems::lighting(registry, camera);
+    systems::board_render(registry);
+    systems::piece_render(registry, hovered_entity);
+    systems::node_render(registry, hovered_entity, board);
+    systems::origin_render(registry, camera);
+    systems::lighting_render(registry, camera);
 
-    // systems::load_projection_view(registry, camera);
-    // systems::cube_map_render(registry, camera);
-    // systems::lighting(registry, camera);
-    // systems::board_render(registry);
-    // systems::piece_render(registry, hovered_entity);
-    // systems::node_render(registry, hovered_entity, board);
-    // systems::origin_render(registry, camera);
-    // systems::lighting_render(registry, camera);
+    int y = data.height - input::get_mouse_y();
+    hovered_entity =
+        (entt::entity) storage->framebuffer->read_pixel(1, input::get_mouse_x(), y);
 
-    // int y = data.height - input::get_mouse_y();
-    // hovered_entity =
-    //     (entt::entity) storage->framebuffer->read_pixel(1, input::get_mouse_x(), y);
+    Framebuffer::bind_default();
 
-    // Framebuffer::bind_default();
-
-    // renderer::clear(renderer::Color);
-    // storage->quad_shader->bind();
-    // storage->quad_shader->set_uniform_int("u_screen_texture", 0);
-    // storage->quad_vertex_array->bind();
-    // renderer::bind_texture(storage->framebuffer->get_color_attachment(0));
-    // renderer::disable_depth();
-    // renderer::draw_quad();
-    // renderer::enable_depth();
+    renderer::clear(renderer::Color);
+    storage->quad_shader->bind();
+    storage->quad_shader->set_uniform_int("u_screen_texture", 0);
+    storage->quad_vertex_array->bind();
+    renderer::bind_texture(storage->framebuffer->get_color_attachment(0), 0);
+    renderer::disable_depth();
+    renderer::draw_quad();
+    renderer::enable_depth();
 }
 
 void Application::draw_loading_screen() {
