@@ -179,6 +179,7 @@ namespace renderer {
     }
 
     void draw_quad() {
+        storage->quad_vertex_array->bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
