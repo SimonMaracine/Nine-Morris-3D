@@ -58,8 +58,8 @@ namespace renderer {
 
         {
             Specification specification;
-            specification.width = 1024;
-            specification.height = 1024;
+            specification.width = 2048;
+            specification.height = 2048;
             specification.attachments = { TextureFormat::DepthForShadow };
             storage->depth_map_framebuffer = Framebuffer::create(specification);
         }

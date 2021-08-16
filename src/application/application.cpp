@@ -93,8 +93,8 @@ void Application::update(float dt) {
 }
 
 void Application::draw() {
-    glm::mat4 projection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 25.0f);
-    glm::mat4 view = glm::lookAt(glm::vec3(-11.0f, 13.0f, -15.0f),
+    glm::mat4 projection = glm::ortho(-7.0f, 7.0f, -7.0f, 7.0f, 1.0f, 11.0f);
+    glm::mat4 view = glm::lookAt(glm::vec3(-11.0f, 13.0f, -15.0f) / 3.0f,
                                  glm::vec3(0.0f, 0.0f, 0.0f),
                                  glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 light_space_matrix = projection * view;
@@ -103,7 +103,7 @@ void Application::draw() {
     
     storage->depth_map_framebuffer->bind();
 
-    renderer::set_viewport(1024, 1024);
+    renderer::set_viewport(2048, 2048);
     renderer::clear(renderer::Depth);
 
     systems::render_board_to_depth(registry);
