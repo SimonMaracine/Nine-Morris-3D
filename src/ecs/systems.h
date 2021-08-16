@@ -27,5 +27,9 @@ namespace systems {
     void node_render(entt::registry& registry, entt::entity hovered_entity,
                      entt::entity board_entity);
 
+    void render_board_to_depth(entt::registry& registry);
+
+    void render_piece_to_depth(entt::registry& registry);
+
     // void node_move(entt::registry& registry, float dt);
 }

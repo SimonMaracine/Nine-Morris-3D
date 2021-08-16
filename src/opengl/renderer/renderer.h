@@ -23,7 +23,9 @@ namespace renderer {
 
         std::shared_ptr<Shader> board_shader = nullptr;
         std::shared_ptr<Shader> piece_shader = nullptr;
+        std::shared_ptr<Shader> shadow_shader = nullptr;
         std::shared_ptr<Framebuffer> framebuffer = nullptr;
+        std::shared_ptr<Framebuffer> depth_map_framebuffer = nullptr;
 
         std::shared_ptr<Shader> quad_shader = nullptr;
         std::shared_ptr<VertexArray> quad_vertex_array = nullptr;
@@ -61,7 +63,7 @@ namespace renderer {
     void disable_depth();
     void enable_stencil();
     void disable_stencil();
-    void bind_texture(GLuint texture);
+    void bind_texture(GLuint texture, GLenum slot);
     void set_stencil_mask_zero();
     void load_projection_view(const glm::mat4& matrix);
 
@@ -107,4 +109,18 @@ namespace renderer {
                    std::shared_ptr<VertexArray> array,
                    const glm::vec4& color,
                    GLuint index_count);
+
+    void draw_board_depth(const glm::vec3& position,
+                          const glm::vec3& rotation,
+                          float scale,
+                          std::shared_ptr<Shader> shader,
+                          std::shared_ptr<VertexArray> array,
+                          GLuint index_count);
+
+    void draw_piece_depth(const glm::vec3& position,
+                          const glm::vec3& rotation,
+                          float scale,
+                          std::shared_ptr<Shader> shader,
+                          std::shared_ptr<VertexArray> array,
+                          GLuint index_count);
 }

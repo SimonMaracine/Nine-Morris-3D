@@ -133,3 +133,9 @@ struct NodeMaterialComponent {
 
     std::shared_ptr<Shader> shader;
 };
+
+struct ShadowComponent {
+    ShadowComponent(std::shared_ptr<Shader> shader) : shader(shader) {}
+
+    std::shared_ptr<Shader> shader;
+};

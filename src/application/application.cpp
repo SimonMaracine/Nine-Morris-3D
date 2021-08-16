@@ -93,12 +93,36 @@ void Application::update(float dt) {
 }
 
 void Application::draw() {
+    glm::mat4 projection = glm::ortho(-6.0f, 6.0f, -6.0f, 6.0f, 1.0f, 10.0f);
+    glm::mat4 view = glm::lookAt(glm::vec3(-11.0f, 13.0f, -15.0f) / 4.0f,
+                                 glm::vec3(0.0f, 0.0f, 0.0f),
+                                 glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 light_space_matrix = projection * view;
+    storage->shadow_shader->bind();
+    storage->shadow_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    
+    storage->depth_map_framebuffer->bind();
+
+    renderer::set_viewport(2048, 2048);
+    renderer::clear(renderer::Depth);
+
+    systems::render_board_to_depth(registry);
+    systems::render_piece_to_depth(registry);
+
     storage->framebuffer->bind();
 
+    renderer::set_viewport(data.width, data.height);
     renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
     renderer::set_stencil_mask_zero();
 
     storage->framebuffer->clear_red_integer_attachment(1, -1);
+    storage->board_shader->bind();
+    storage->board_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    storage->board_shader->set_uniform_int("u_shadow_map", 1);
+    storage->piece_shader->bind();
+    storage->piece_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    storage->piece_shader->set_uniform_int("u_shadow_map", 1);
+    renderer::bind_texture(storage->depth_map_framebuffer->get_depth_attachment(), 1);
 
     systems::load_projection_view(registry, camera);
     systems::cube_map_render(registry, camera);
@@ -109,26 +133,25 @@ void Application::draw() {
     systems::origin_render(registry, camera);
     systems::lighting_render(registry, camera);
 
+    int x = input::get_mouse_x();
     int y = data.height - input::get_mouse_y();
-    hovered_entity =
-        (entt::entity) storage->framebuffer->read_pixel(1, input::get_mouse_x(), y);
+    hovered_entity = (entt::entity) storage->framebuffer->read_pixel(1, x, y);
 
     Framebuffer::bind_default();
 
     renderer::clear(renderer::Color);
     storage->quad_shader->bind();
     storage->quad_shader->set_uniform_int("u_screen_texture", 0);
-    storage->quad_vertex_array->bind();
-    renderer::bind_texture(storage->framebuffer->get_color_attachment(0));
+    renderer::bind_texture(storage->framebuffer->get_color_attachment(0), 0);
     renderer::disable_depth();
     renderer::draw_quad();
     renderer::enable_depth();
 }
 
 void Application::draw_loading_screen() {
+    renderer::clear(renderer::Color);
     renderer::disable_depth();
     renderer::disable_stencil();
-    renderer::clear(renderer::Color);
     renderer::draw_loading();
     renderer::enable_stencil();
     renderer::enable_depth();
@@ -494,6 +517,7 @@ void Application::build_board(const model::Mesh& mesh) {
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(board, storage->board_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(board, board_diffuse_texture);
+    registry.emplace<ShadowComponent>(board, storage->shadow_shader);
 
     registry.emplace<GameStateComponent>(board, nodes);
 
@@ -550,6 +574,7 @@ void Application::build_piece(Piece type, const model::Mesh& mesh,
     registry.emplace<TextureComponent>(piece, diffuse_texture);
     registry.emplace<OutlineComponent>(piece, storage->outline_shader,
                                        glm::vec3(1.0f, 0.0f, 0.0f));
+    registry.emplace<ShadowComponent>(piece, storage->shadow_shader);
 
     registry.emplace<PieceComponent>(piece, type);
     registry.emplace<MoveComponent>(piece);
@@ -560,7 +585,7 @@ void Application::build_piece(Piece type, const model::Mesh& mesh,
 void Application::build_directional_light() {
     entt::entity directional_light = registry.create();
     auto& transform = registry.emplace<TransformComponent>(directional_light);
-    transform.position = glm::vec3(-11.0f, 15.0f, -15.0f);
+    transform.position = glm::vec3(-11.0f, 13.0f, -15.0f);
 
     registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f),
                                      glm::vec3(1.0f));

@@ -57,7 +57,7 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
         zoom += move.zoom_velocity;
 
         // Limit zoom
-        zoom = std::max(zoom, 1.0f);
+        zoom = std::max(zoom, 4.0f);
         zoom = std::min(zoom, 70.0f);
 
         if (input::is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)) {
@@ -280,6 +280,34 @@ void systems::node_render(entt::registry& registry,
                                 glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
                                 mesh.index_count);   
         }
+    }
+}
+
+void systems::render_board_to_depth(entt::registry& registry) {
+    auto view = registry.view<TransformComponent,
+                              MeshComponent,
+                              ShadowComponent>(entt::exclude<PieceComponent>);
+
+    for (entt::entity entity : view) {
+        auto [transform, mesh, shadow] = view.get(entity);
+
+        renderer::draw_board_depth(transform.position, transform.rotation,
+                                   transform.scale, shadow.shader,
+                                   mesh.vertex_array, mesh.index_count);
+    }
+}
+
+void systems::render_piece_to_depth(entt::registry& registry) {
+    auto view = registry.view<TransformComponent,
+                              MeshComponent,
+                              ShadowComponent>(entt::exclude<GameStateComponent>);
+
+    for (entt::entity entity : view) {
+        auto [transform, mesh, shadow] = view.get(entity);
+
+        renderer::draw_piece_depth(transform.position, transform.rotation,
+                                   transform.scale, shadow.shader,
+                                   mesh.vertex_array, mesh.index_count);
     }
 }
 
