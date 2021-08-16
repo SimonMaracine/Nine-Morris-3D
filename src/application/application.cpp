@@ -93,8 +93,8 @@ void Application::update(float dt) {
 }
 
 void Application::draw() {
-    glm::mat4 projection = glm::ortho(-7.0f, 7.0f, -7.0f, 7.0f, 1.0f, 11.0f);
-    glm::mat4 view = glm::lookAt(glm::vec3(-11.0f, 13.0f, -15.0f) / 3.0f,
+    glm::mat4 projection = glm::ortho(-6.0f, 6.0f, -6.0f, 6.0f, 1.0f, 10.0f);
+    glm::mat4 view = glm::lookAt(glm::vec3(-11.0f, 13.0f, -15.0f) / 4.0f,
                                  glm::vec3(0.0f, 0.0f, 0.0f),
                                  glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 light_space_matrix = projection * view;
@@ -119,6 +119,9 @@ void Application::draw() {
     storage->board_shader->bind();
     storage->board_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
     storage->board_shader->set_uniform_int("u_shadow_map", 1);
+    storage->piece_shader->bind();
+    storage->piece_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    storage->piece_shader->set_uniform_int("u_shadow_map", 1);
     renderer::bind_texture(storage->depth_map_framebuffer->get_depth_attachment(), 1);
 
     systems::load_projection_view(registry, camera);

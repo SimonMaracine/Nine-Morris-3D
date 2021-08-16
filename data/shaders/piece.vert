@@ -9,11 +9,14 @@ out vec2 v_texture_coordinate;
 out vec3 v_normal;
 out flat int v_entity_id;
 out vec3 v_fragment_position;
+out vec4 v_fragment_position_light_space;
 
 uniform mat4 u_model_matrix;
 uniform Matrices {
     mat4 u_projection_view_matrix;
 };
+
+uniform mat4 u_light_space_matrix;
 
 void main() {
     v_texture_coordinate = a_texture_coordinate;
@@ -21,6 +24,8 @@ void main() {
     v_entity_id = a_entity_id;
 
     v_fragment_position = vec3(u_model_matrix * vec4(a_position, 1.0));
+
+    v_fragment_position_light_space = u_light_space_matrix * vec4(v_fragment_position, 1.0);
 
     gl_Position = u_projection_view_matrix * u_model_matrix * vec4(a_position, 1.0);
 }
