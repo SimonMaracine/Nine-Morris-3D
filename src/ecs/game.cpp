@@ -515,8 +515,9 @@ static bool check_player_blocked(entt::registry& registry, entt::entity board, P
                     auto& node1 = NODE(state.nodes[16]);
                     auto& node2 = NODE(state.nodes[18]);
                     auto& node3 = NODE(state.nodes[20]);
+                    auto& node4 = NODE(state.nodes[22]);
                     if (node1.piece == entt::null || node2.piece == entt::null ||
-                            node3.piece == entt::null)
+                            node3.piece == entt::null || node4.piece == entt::null)
                         return false;
                     break;
                 }
