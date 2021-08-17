@@ -270,7 +270,7 @@ void Application::imgui_start() {
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
     io.FontDefault = io.Fonts->AddFontFromFileTTF("data/fonts/OpenSans-Semibold.ttf", 20.0f);
 
-    ImGui_ImplOpenGL3_Init("#version 430");
+    ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
 }
 
@@ -362,7 +362,7 @@ void Application::imgui_update(float dt) {
                     assert(false);
             }
 
-            if (ImGui::Button("Ok", ImVec2(120, 0))) {
+            if (ImGui::Button("Ok", ImVec2(200, 0))) {
                 ImGui::CloseCurrentPopup();
                 state.phase = Phase::None;
             }

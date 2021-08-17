@@ -58,11 +58,37 @@ static void take_raise_piece(entt::registry& registry, entt::entity piece_entity
     piece.pending_remove = true;
 }
 
-static Player switch_turn(Player turn) {
-    if (turn == Player::White) {
-        return Player::Black;
+static void set_pieces_show_outline(entt::registry& registry, Piece type, bool show) {
+    auto view = registry.view<PieceComponent>();
+
+    for (entt::entity entity : view) {
+        auto& piece = view.get<PieceComponent>(entity);
+
+        if (piece.type == type) {
+            piece.show_outline = show;
+        }
+    }
+}
+
+static void switch_turn(entt::registry& registry, entt::entity board) {
+    auto& state = STATE(board);
+
+    if (state.phase == Phase::MovePieces) {
+        state.turns_without_mills++;
+
+        if (state.turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
+            state.phase = Phase::GameOver;
+            state.ending = Ending::TieBetweenBothPlayers;
+            set_pieces_show_outline(registry, state.turn == Player::White ?
+                Piece::White : Piece::Black, false);
+            SPDLOG_INFO("Game over, tie between both players");
+        }
+    }
+
+    if (state.turn == Player::White) {
+        state.turn = Player::Black;
     } else {
-        return Player::White;
+        state.turn = Player::White;
     }
 }
 
@@ -102,18 +128,6 @@ static void set_pieces_to_take(entt::registry& registry, Piece type, bool take) 
 
         if (piece.type == type) {
             piece.to_take = take;
-        }
-    }
-}
-
-static void set_pieces_show_outline(entt::registry& registry, Piece type, bool show) {
-    auto view = registry.view<PieceComponent>();
-
-    for (entt::entity entity : view) {
-        auto& piece = view.get<PieceComponent>(entity);
-
-        if (piece.type == type) {
-            piece.show_outline = show;
         }
     }
 }
@@ -594,8 +608,10 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
                 } else {
                     set_pieces_to_take(registry, Piece::White, true);
                 }
+
+                state.turns_without_mills = 0;
             } else {
-                state.turn = switch_turn(state.turn);
+                switch_turn(registry, board);
             }
 
             if (state.not_placed_pieces_count == 0 && !state.should_take_piece) {
@@ -668,7 +684,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                             state.black_pieces_count) {
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
-                        state.turn = switch_turn(state.turn);
+                        switch_turn(registry, board);
                         update_outlines(registry, board);
                         state.should_take_piece = false;
                         set_pieces_to_take(registry, Piece::Black, false);
@@ -699,7 +715,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                             state.white_pieces_count) {
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
-                        state.turn = switch_turn(state.turn);
+                        switch_turn(registry, board);
                         update_outlines(registry, board);
                         state.should_take_piece = false;
                         set_pieces_to_take(registry, Piece::White, false);
@@ -803,8 +819,10 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
                         set_pieces_to_take(registry, Piece::White, true);
                         set_pieces_show_outline(registry, Piece::Black, false);
                     }
+
+                    state.turns_without_mills = 0;
                 } else {
-                    state.turn = switch_turn(state.turn);
+                    switch_turn(registry, board);
                     update_outlines(registry, board);
 
                     if (check_player_blocked(registry, board, state.turn)) {

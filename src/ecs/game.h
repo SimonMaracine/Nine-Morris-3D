@@ -38,6 +38,7 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
 };
 
 constexpr float PIECE_MOVE_SPEED = 1.5f;
+constexpr int MAX_TURNS_WITHOUT_MILLS = 40 + 1;
 
 enum class Phase {
     PlacePieces,
@@ -116,6 +117,8 @@ struct GameStateComponent {
     entt::entity selected_piece = entt::null;
 
     bool can_jump[2] = { false, false };
+
+    int turns_without_mills = 0;
 };
 
 namespace systems {
