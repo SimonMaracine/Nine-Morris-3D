@@ -179,16 +179,26 @@ namespace renderer {
     }
 
     void draw_quad() {
+        glDisable(GL_DEPTH_TEST);
+
         storage->quad_vertex_array->bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glEnable(GL_DEPTH_TEST);
     }
 
     void draw_loading() {
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_STENCIL_TEST);
+
         storage->loading_shader->bind();
         storage->loading_shader->set_uniform_int("u_texture", 0);
         storage->loading_vertex_array->bind();
         storage->loading_texture->bind(0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glEnable(GL_STENCIL_TEST);
+        glEnable(GL_DEPTH_TEST);
     }
 
     void draw_origin() {
@@ -210,22 +220,6 @@ namespace renderer {
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
-    void enable_depth() {
-        glEnable(GL_DEPTH_TEST);
-    }
-
-    void disable_depth() {
-        glDisable(GL_DEPTH_TEST);
-    }
-
-    void enable_stencil() {
-        glEnable(GL_STENCIL_TEST);
-    }
-
-    void disable_stencil() {
-        glDisable(GL_STENCIL_TEST);
-    }
-
     void bind_texture(GLuint texture, GLenum slot) {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -236,7 +230,7 @@ namespace renderer {
     }
 
     void load_projection_view(const glm::mat4& matrix) {
-        const std::size_t size = sizeof(glm::mat4);
+        constexpr std::size_t size = sizeof(glm::mat4);
         float* buffer[size];
         memcpy(buffer, glm::value_ptr(matrix), size);
         storage->uniform_buffer->update_data(buffer, size);
@@ -356,7 +350,7 @@ namespace renderer {
         }
 
         glStencilMask(0xFF);
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
         glEnable(GL_DEPTH_TEST);
     }
 
@@ -364,7 +358,6 @@ namespace renderer {
                        std::shared_ptr<Shader> shader, std::shared_ptr<VertexArray> array,
                        std::shared_ptr<Texture3D> texture) {
         glDepthMask(GL_FALSE);
-        glDisable(GL_STENCIL_TEST);
 
         shader->bind();
         shader->set_uniform_int("u_skybox", 0);
@@ -375,7 +368,6 @@ namespace renderer {
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glDepthMask(GL_TRUE);
-        glEnable(GL_STENCIL_TEST);
     }
 
     void draw_node(const glm::vec3& position,

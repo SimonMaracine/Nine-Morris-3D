@@ -59,10 +59,6 @@ namespace renderer {
     void draw_loading();
     void draw_origin();
     void draw_light(const glm::vec3& position);
-    void enable_depth();
-    void disable_depth();
-    void enable_stencil();
-    void disable_stencil();
     void bind_texture(GLuint texture, GLenum slot);
     void set_stencil_mask_zero();
     void load_projection_view(const glm::mat4& matrix);

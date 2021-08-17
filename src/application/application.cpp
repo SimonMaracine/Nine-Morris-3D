@@ -143,18 +143,12 @@ void Application::draw() {
     storage->quad_shader->bind();
     storage->quad_shader->set_uniform_int("u_screen_texture", 0);
     renderer::bind_texture(storage->framebuffer->get_color_attachment(0), 0);
-    renderer::disable_depth();
     renderer::draw_quad();
-    renderer::enable_depth();
 }
 
 void Application::draw_loading_screen() {
     renderer::clear(renderer::Color);
-    renderer::disable_depth();
-    renderer::disable_stencil();
     renderer::draw_loading();
-    renderer::enable_stencil();
-    renderer::enable_depth();
 }
 
 void Application::start() {
