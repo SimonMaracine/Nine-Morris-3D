@@ -283,31 +283,15 @@ void systems::node_render(entt::registry& registry,
     }
 }
 
-void systems::render_board_to_depth(entt::registry& registry) {
-    auto view = registry.view<TransformComponent,
-                              MeshComponent,
-                              ShadowComponent>(entt::exclude<PieceComponent>);
+void systems::render_to_depth(entt::registry& registry) {
+    auto view = registry.view<TransformComponent, MeshComponent, ShadowComponent>();
 
     for (entt::entity entity : view) {
         auto [transform, mesh, shadow] = view.get(entity);
 
-        renderer::draw_board_depth(transform.position, transform.rotation,
-                                   transform.scale, shadow.shader,
-                                   mesh.vertex_array, mesh.index_count);
-    }
-}
-
-void systems::render_piece_to_depth(entt::registry& registry) {
-    auto view = registry.view<TransformComponent,
-                              MeshComponent,
-                              ShadowComponent>(entt::exclude<GameStateComponent>);
-
-    for (entt::entity entity : view) {
-        auto [transform, mesh, shadow] = view.get(entity);
-
-        renderer::draw_piece_depth(transform.position, transform.rotation,
-                                   transform.scale, shadow.shader,
-                                   mesh.vertex_array, mesh.index_count);
+        renderer::draw_to_depth(transform.position, transform.rotation,
+                                transform.scale, shadow.shader,
+                                mesh.vertex_array, mesh.index_count);
     }
 }
 

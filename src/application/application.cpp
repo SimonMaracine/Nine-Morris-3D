@@ -106,8 +106,7 @@ void Application::draw() {
     renderer::set_viewport(2048, 2048);
     renderer::clear(renderer::Depth);
 
-    systems::render_board_to_depth(registry);
-    systems::render_piece_to_depth(registry);
+    systems::render_to_depth(registry);
 
     storage->framebuffer->bind();
 
@@ -115,7 +114,7 @@ void Application::draw() {
     renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
     renderer::set_stencil_mask_zero();
 
-    storage->framebuffer->clear_red_integer_attachment(1, -1);
+    storage->framebuffer->clear_red_integer_attachment(1, -1);  // TODO May not be needed
     storage->board_shader->bind();
     storage->board_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
     storage->board_shader->set_uniform_int("u_shadow_map", 1);

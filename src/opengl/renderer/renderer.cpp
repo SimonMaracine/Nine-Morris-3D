@@ -393,33 +393,12 @@ namespace renderer {
         glCullFace(GL_BACK);
     }
 
-    void draw_board_depth(const glm::vec3& position,
-                          const glm::vec3& rotation,
-                          float scale,
-                          std::shared_ptr<Shader> shader,
-                          std::shared_ptr<VertexArray> array,
-                          GLuint index_count) {
-        shader->bind();
-
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, position);
-        matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
-
-        shader->set_uniform_matrix("u_model_matrix", matrix);
-
-        array->bind();
-        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
-    }
-
-    void draw_piece_depth(const glm::vec3& position,
-                          const glm::vec3& rotation,
-                          float scale,
-                          std::shared_ptr<Shader> shader,
-                          std::shared_ptr<VertexArray> array,
-                          GLuint index_count) {
+    void draw_to_depth(const glm::vec3& position,
+                       const glm::vec3& rotation,
+                       float scale,
+                       std::shared_ptr<Shader> shader,
+                       std::shared_ptr<VertexArray> array,
+                       GLuint index_count) {
         shader->bind();
 
         glm::mat4 matrix = glm::mat4(1.0f);

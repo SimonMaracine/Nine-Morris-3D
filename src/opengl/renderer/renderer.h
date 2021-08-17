@@ -106,17 +106,10 @@ namespace renderer {
                    const glm::vec4& color,
                    GLuint index_count);
 
-    void draw_board_depth(const glm::vec3& position,
-                          const glm::vec3& rotation,
-                          float scale,
-                          std::shared_ptr<Shader> shader,
-                          std::shared_ptr<VertexArray> array,
-                          GLuint index_count);
-
-    void draw_piece_depth(const glm::vec3& position,
-                          const glm::vec3& rotation,
-                          float scale,
-                          std::shared_ptr<Shader> shader,
-                          std::shared_ptr<VertexArray> array,
-                          GLuint index_count);
+    void draw_to_depth(const glm::vec3& position,
+                       const glm::vec3& rotation,
+                       float scale,
+                       std::shared_ptr<Shader> shader,
+                       std::shared_ptr<VertexArray> array,
+                       GLuint index_count);
 }
