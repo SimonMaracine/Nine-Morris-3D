@@ -37,7 +37,7 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.28f, NODE_Y_POSITION, -2.28f)
 };
 
-constexpr float PIECE_MOVE_SPEED = 0.9f;
+constexpr float PIECE_MOVE_SPEED = 1.5f;
 
 enum class Phase {
     PlacePieces,
