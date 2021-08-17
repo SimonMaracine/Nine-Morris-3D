@@ -52,7 +52,7 @@ namespace renderer {
             specification.width = 1024;
             specification.height = 576;
             specification.attachments = { TextureFormat::RGBA8, TextureFormat::RedInteger,
-                                        TextureFormat::Depth24Stencil8 };
+                                          TextureFormat::Depth24Stencil8 };
             storage->framebuffer = Framebuffer::create(specification);
         }
 
@@ -93,9 +93,9 @@ namespace renderer {
 
         storage->node_shader = Shader::create("data/shaders/node.vert",
                                               "data/shaders/node.frag",
-                                               block_name,
-                                               uniforms, 1,
-                                               storage->uniform_buffer);
+                                              block_name,
+                                              uniforms, 1,
+                                              storage->uniform_buffer);
 
         storage->skybox_shader = Shader::create("data/shaders/cubemap.vert",
                                                 "data/shaders/cubemap.frag");
@@ -245,17 +245,17 @@ namespace renderer {
                     const glm::vec3& specular_color,
                     float shininess,
                     GLuint index_count) {
-        shader->bind();
-        shader->set_uniform_int("u_material.diffuse", 0);
-        shader->set_uniform_vec3("u_material.specular", specular_color);
-        shader->set_uniform_float("u_material.shininess", shininess);
-
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);
         matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
         matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
         matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+
+        shader->bind();
+        shader->set_uniform_int("u_material.diffuse", 0);
+        shader->set_uniform_vec3("u_material.specular", specular_color);
+        shader->set_uniform_float("u_material.shininess", shininess);
 
         shader->set_uniform_matrix("u_model_matrix", matrix);
 
@@ -274,18 +274,18 @@ namespace renderer {
                     float shininess,
                     GLuint index_count,
                     const glm::vec3& tint_color) {
-        shader->bind();
-        shader->set_uniform_int("u_material.diffuse", 0);
-        shader->set_uniform_vec3("u_material.specular", specular_color);
-        shader->set_uniform_float("u_material.shininess", shininess);
-        shader->set_uniform_vec3("u_tint_color", tint_color);
-
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);
         matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
         matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
         matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+
+        shader->bind();
+        shader->set_uniform_int("u_material.diffuse", 0);
+        shader->set_uniform_vec3("u_material.specular", specular_color);
+        shader->set_uniform_float("u_material.shininess", shininess);
+        shader->set_uniform_vec3("u_tint_color", tint_color);
 
         shader->set_uniform_matrix("u_model_matrix", matrix);
 
@@ -308,17 +308,17 @@ namespace renderer {
         glStencilMask(0xFF);
 
         {
-            shader->bind();
-            shader->set_uniform_int("u_material.diffuse", 0);
-            shader->set_uniform_vec3("u_material.specular", specular_color);
-            shader->set_uniform_float("u_material.shininess", shininess);
-
             glm::mat4 matrix = glm::mat4(1.0f);
             matrix = glm::translate(matrix, position);
             matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
             matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
             matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
             matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+
+            shader->bind();
+            shader->set_uniform_int("u_material.diffuse", 0);
+            shader->set_uniform_vec3("u_material.specular", specular_color);
+            shader->set_uniform_float("u_material.shininess", shininess);
 
             shader->set_uniform_matrix("u_model_matrix", matrix);
 
@@ -332,9 +332,6 @@ namespace renderer {
         glDisable(GL_DEPTH_TEST);
 
         {
-            storage->outline_shader->bind();
-            storage->outline_shader->set_uniform_vec3("u_color", outline_color);
-
             constexpr float size = 3.6f;
 
             glm::mat4 matrix = glm::mat4(1.0f);
@@ -343,7 +340,9 @@ namespace renderer {
             matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
             matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
             matrix = glm::scale(matrix, glm::vec3(scale + size, scale + size, scale + size));
-    
+
+            storage->outline_shader->bind();
+            storage->outline_shader->set_uniform_vec3("u_color", outline_color);
             storage->outline_shader->set_uniform_matrix("u_model_matrix", matrix);
 
             glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
@@ -377,14 +376,13 @@ namespace renderer {
                    const glm::vec4& color,
                    GLuint index_count) {
         glCullFace(GL_FRONT);
-    
-        shader->bind();
-        shader->set_uniform_vec4("u_color", color);
 
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);
         matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
 
+        shader->bind();
+        shader->set_uniform_vec4("u_color", color);
         shader->set_uniform_matrix("u_model_matrix", matrix);
 
         array->bind();
@@ -399,8 +397,6 @@ namespace renderer {
                        std::shared_ptr<Shader> shader,
                        std::shared_ptr<VertexArray> array,
                        GLuint index_count) {
-        shader->bind();
-
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);
         matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -408,6 +404,7 @@ namespace renderer {
         matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
 
+        shader->bind();
         shader->set_uniform_matrix("u_model_matrix", matrix);
 
         array->bind();
