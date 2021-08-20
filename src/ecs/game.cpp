@@ -1,6 +1,7 @@
 #include <cassert>
 #include <algorithm>
 #include <vector>
+#include <array>
 
 #include <entt/entt.hpp>
 
@@ -70,6 +71,28 @@ static void set_pieces_show_outline(entt::registry& registry, Piece type, bool s
     }
 }
 
+static void game_over(entt::registry& registry, entt::entity board, Ending ending, Piece type_to_hide) {
+    auto& state = STATE(board);
+
+    state.phase = Phase::GameOver;
+    state.ending = ending;
+    set_pieces_show_outline(registry, type_to_hide, false);
+
+    switch (ending) {
+        case Ending::WinnerWhite:
+            SPDLOG_INFO("Game over, white wins");
+            break;
+        case Ending::WinnerBlack:
+            SPDLOG_INFO("Game over, black wins");
+            break;
+        case Ending::TieBetweenBothPlayers:
+            SPDLOG_INFO("Game over, tie between both players");
+            break;
+        default:
+            assert(false);
+    }
+}
+
 static void switch_turn(entt::registry& registry, entt::entity board) {
     auto& state = STATE(board);
 
@@ -77,11 +100,8 @@ static void switch_turn(entt::registry& registry, entt::entity board) {
         state.turns_without_mills++;
 
         if (state.turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
-            state.phase = Phase::GameOver;
-            state.ending = Ending::TieBetweenBothPlayers;
-            set_pieces_show_outline(registry, state.turn == Player::White ?
-                Piece::White : Piece::Black, false);
-            SPDLOG_INFO("Game over, tie between both players");
+            game_over(registry, board, Ending::TieBetweenBothPlayers,
+                state.turn == Player::White ? Piece::White : Piece::Black);
         }
     }
 
@@ -325,10 +345,7 @@ static void check_player_pieces_number(entt::registry& registry, entt::entity bo
             if (state.white_pieces_count == 3) {
                 state.can_jump[(int) player] = true;
             } else if (state.white_pieces_count == 2) {
-                state.phase = Phase::GameOver;
-                state.ending = Ending::WinnerBlack;
-                set_pieces_show_outline(registry, Piece::White, false);
-                SPDLOG_INFO("Game over, black wins");
+                game_over(registry, board, Ending::WinnerBlack, Piece::White);
             }
         } else {
             SPDLOG_DEBUG("Black player checked");
@@ -336,10 +353,7 @@ static void check_player_pieces_number(entt::registry& registry, entt::entity bo
             if (state.black_pieces_count == 3) {
                 state.can_jump[(int) player] = true;
             } else if (state.black_pieces_count == 2) {
-                state.phase = Phase::GameOver;
-                state.ending = Ending::WinnerWhite;
-                set_pieces_show_outline(registry, Piece::Black, false);
-                SPDLOG_INFO("Game over, white wins");
+                game_over(registry, board, Ending::WinnerWhite, Piece::Black);
             }
         }
     }
@@ -575,6 +589,57 @@ static bool check_player_blocked(entt::registry& registry, entt::entity board, P
         return false;
 }
 
+static std::array<Piece, 24> get_position(entt::registry& registry, entt::entity board) {
+    auto& state = STATE(board);
+
+    std::array<Piece, 24> position;
+
+    for (int i = 0; i < 24; i++) {
+        auto& node = NODE(state.nodes[i]);
+
+        if (node.piece != entt::null) {
+            auto& piece = PIECE(node.piece);
+            position[i] = piece.type;
+        } else {
+            position[i] = Piece::None;
+        }
+    }
+
+    return position;
+}
+
+static void remember_position_and_check_repetition(entt::registry& registry, entt::entity board) {
+    auto& state = STATE(board);
+
+    std::array<Piece, 24> current_position = get_position(registry, board);
+
+    for (const std::array<Piece, 24>& position : state.history.twos) {
+        if (position == current_position) {
+            game_over(registry, board, Ending::TieBetweenBothPlayers,
+                state.turn == Player::White ? Piece::White : Piece::Black);
+            return;
+        }
+    }
+
+    for (const std::array<Piece, 24>& position : state.history.ones) {
+        if (position == current_position) {
+            std::vector<std::array<Piece, 24>>& vec = state.history.ones;
+            vec.erase(std::remove(vec.begin(), vec.end(), position), vec.end());
+            state.history.twos.push_back(position);
+            return;
+        }
+    }
+
+    state.history.ones.push_back(current_position);
+}
+
+static void clear_history(entt::registry& registry, entt::entity board) {
+    auto& state = STATE(board);
+
+    state.history.ones.clear();
+    state.history.twos.clear();
+}
+
 void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
     auto& state = STATE(board);
 
@@ -619,13 +684,9 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
                 update_outlines(registry, board);
 
                 if (check_player_blocked(registry, board, state.turn)) {
-                    state.phase = Phase::GameOver;
-                    state.ending = state.turn == Player::White ?
-                        Ending::WinnerBlack : Ending::WinnerWhite;
-                    set_pieces_show_outline(registry, state.turn == Player::White ?
-                        Piece::White : Piece::Black, false);
-                    SPDLOG_INFO("Game over, {} wins",
-                        state.turn == Player::White ? "black" : "white");
+                    game_over(registry, board, state.turn == Player::White ?
+                        Ending::WinnerBlack : Ending::WinnerWhite,
+                        state.turn == Player::White ? Piece::White : Piece::Black);
                 }
 
                 SPDLOG_INFO("Phase 2");
@@ -693,14 +754,12 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                         check_player_pieces_number(registry, board, state.turn);
 
                         if (check_player_blocked(registry, board, state.turn)) {
-                            state.phase = Phase::GameOver;
-                            state.ending = state.turn == Player::White ?
-                                Ending::WinnerBlack : Ending::WinnerWhite;
-                            set_pieces_show_outline(registry, state.turn == Player::White ?
-                                Piece::White : Piece::Black, false);
-                            SPDLOG_INFO("Game over, {} wins",
-                                state.turn == Player::White ? "black" : "white");
+                            game_over(registry, board, state.turn == Player::White ?
+                                Ending::WinnerBlack : Ending::WinnerWhite,
+                                state.turn == Player::White ? Piece::White : Piece::Black);
                         }
+
+                        clear_history(registry, board);
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -724,14 +783,12 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                         check_player_pieces_number(registry, board, state.turn);
 
                         if (check_player_blocked(registry, board, state.turn)) {
-                            state.phase = Phase::GameOver;
-                            state.ending = state.turn == Player::White ?
-                                Ending::WinnerBlack : Ending::WinnerWhite;
-                            set_pieces_show_outline(registry, state.turn == Player::White ?
-                                Piece::White : Piece::Black, false);
-                            SPDLOG_INFO("Game over, {} wins",
-                                state.turn == Player::White ? "black" : "white");
+                            game_over(registry, board, state.turn == Player::White ?
+                                Ending::WinnerBlack : Ending::WinnerWhite,
+                                state.turn == Player::White ? Piece::White : Piece::Black);
                         }
+
+                        clear_history(registry, board);
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -799,7 +856,7 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
                 piece_move.should_move = true;
 
                 // Reset all variables
-                auto& previous_node = registry.get<NodeComponent>(selected_piece.node);
+                auto& previous_node = NODE(selected_piece.node);
 
                 previous_node.piece = entt::null;
                 selected_piece.node = entity;
@@ -826,14 +883,12 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
                     update_outlines(registry, board);
 
                     if (check_player_blocked(registry, board, state.turn)) {
-                        state.phase = Phase::GameOver;
-                        state.ending = state.turn == Player::White ?
-                            Ending::WinnerBlack : Ending::WinnerWhite;
-                        set_pieces_show_outline(registry, state.turn == Player::White ?
-                            Piece::White : Piece::Black, false);
-                        SPDLOG_INFO("Game over, {} wins",
-                            state.turn == Player::White ? "black" : "white");
+                        game_over(registry, board, state.turn == Player::White ?
+                            Ending::WinnerBlack : Ending::WinnerWhite,
+                            state.turn == Player::White ? Piece::White : Piece::Black);
                     }
+
+                    remember_position_and_check_repetition(registry, board);
                 }
 
                 break;

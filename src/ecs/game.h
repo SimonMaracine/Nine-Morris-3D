@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
@@ -50,6 +52,7 @@ enum class Phase {
 enum class Piece {
     White,
     Black,
+    None
 };
 
 enum class Player {
@@ -93,6 +96,11 @@ struct NodeComponent {
     entt::entity piece = entt::null;
 };
 
+struct ThreefoldRepetitionHistory {
+    std::vector<std::array<Piece, 24>> ones;
+    std::vector<std::array<Piece, 24>> twos;
+};
+
 struct GameStateComponent {
     GameStateComponent(entt::entity* nodes) {
         for (int i = 0; i < 24; i++) {
@@ -119,6 +127,7 @@ struct GameStateComponent {
     bool can_jump[2] = { false, false };
 
     int turns_without_mills = 0;
+    ThreefoldRepetitionHistory history;
 };
 
 namespace systems {
