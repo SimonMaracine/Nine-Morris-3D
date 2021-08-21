@@ -35,6 +35,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/loader.cpp"
     "src/ecs/systems.cpp"
     "src/ecs/game.cpp"
+    "src/ecs/undo.cpp"
     "dependencies/Glad/src/glad.c"
     "dependencies/stb_image/stb_image.c"
     "extern/imgui/imgui_draw.cpp"

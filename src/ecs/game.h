@@ -5,6 +5,8 @@
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
+#include "ecs/undo.h"
+
 #define PIECE(entity) registry.get<PieceComponent>(entity)
 #define NODE(entity) registry.get<NodeComponent>(entity)
 #define STATE(entity) registry.get<GameStateComponent>(entity)
@@ -39,12 +41,14 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.28f, NODE_Y_POSITION, -2.28f)
 };
 
+constexpr glm::vec3 AFTER_UNDO_POSITION = glm::vec3(0.0f, 0.45f, 0.0f);
+
 constexpr float PIECE_MOVE_SPEED = 1.5f;
 constexpr int MAX_TURNS_WITHOUT_MILLS = 40 + 1;
 
 enum class Phase {
-    PlacePieces,
-    MovePieces,
+    PlacePieces = 1,
+    MovePieces = 2,
     GameOver,
     None
 };
@@ -72,7 +76,7 @@ struct PieceComponent {
 
     Piece type;
     bool active = false;
-    entt::entity node = entt::null;
+    entt::entity node = entt::null;  // Reference to the node where it sits on
 
     bool show_outline = false;
     bool to_take = false;
@@ -127,7 +131,8 @@ struct GameStateComponent {
     bool can_jump[2] = { false, false };
 
     int turns_without_mills = 0;
-    ThreefoldRepetitionHistory history;
+    ThreefoldRepetitionHistory repetition_history;
+    undo::MovesHistory moves_history;
 };
 
 namespace systems {
@@ -138,4 +143,5 @@ namespace systems {
     void put_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void press(entt::registry& registry, entt::entity board, entt::entity hovered);
     void release(entt::registry& registry, entt::entity board);
+    void undo_move(entt::registry& registry, entt::entity board);
 }

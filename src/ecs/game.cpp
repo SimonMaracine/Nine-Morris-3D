@@ -7,6 +7,7 @@
 
 #include "ecs/game.h"
 #include "ecs/components.h"
+#include "ecs/undo.h"
 #include "application/input.h"
 #include "other/logging.h"
 
@@ -104,6 +105,16 @@ static void switch_turn(entt::registry& registry, entt::entity board) {
                 state.turn == Player::White ? Piece::White : Piece::Black);
         }
     }
+
+    if (state.turn == Player::White) {
+        state.turn = Player::Black;
+    } else {
+        state.turn = Player::White;
+    }
+}
+
+static void switch_turn_no_check(entt::registry& registry, entt::entity board) {
+    auto& state = STATE(board);
 
     if (state.turn == Player::White) {
         state.turn = Player::Black;
@@ -613,7 +624,7 @@ static void remember_position_and_check_repetition(entt::registry& registry, ent
 
     std::array<Piece, 24> current_position = get_position(registry, board);
 
-    for (const std::array<Piece, 24>& position : state.history.twos) {
+    for (const std::array<Piece, 24>& position : state.repetition_history.twos) {
         if (position == current_position) {
             game_over(registry, board, Ending::TieBetweenBothPlayers,
                 state.turn == Player::White ? Piece::White : Piece::Black);
@@ -621,23 +632,46 @@ static void remember_position_and_check_repetition(entt::registry& registry, ent
         }
     }
 
-    for (const std::array<Piece, 24>& position : state.history.ones) {
+    for (const std::array<Piece, 24>& position : state.repetition_history.ones) {
         if (position == current_position) {
-            std::vector<std::array<Piece, 24>>& vec = state.history.ones;
+            std::vector<std::array<Piece, 24>>& vec = state.repetition_history.ones;
             vec.erase(std::remove(vec.begin(), vec.end(), position), vec.end());
-            state.history.twos.push_back(position);
+            state.repetition_history.twos.push_back(position);
             return;
         }
     }
 
-    state.history.ones.push_back(current_position);
+    state.repetition_history.ones.push_back(current_position);
 }
 
-static void clear_history(entt::registry& registry, entt::entity board) {
+static void clear_repetition_history(entt::registry& registry, entt::entity board) {
     auto& state = STATE(board);
 
-    state.history.ones.clear();
-    state.history.twos.clear();
+    state.repetition_history.ones.clear();
+    state.repetition_history.twos.clear();
+}
+
+static void undo_repetition_history(entt::registry& registry, entt::entity board,
+                                    const std::array<Piece, 24>& position_to_remove) {
+    auto& state = STATE(board);
+
+    for (const std::array<Piece, 24>& position : state.repetition_history.twos) {
+        if (position == position_to_remove) {
+            std::vector<std::array<Piece, 24>>& vec = state.repetition_history.twos;
+            vec.erase(std::remove(vec.begin(), vec.end(), position), vec.end());
+            return;
+        }
+    }
+
+    for (const std::array<Piece, 24>& position : state.repetition_history.ones) {
+        if (position == position_to_remove) {
+            std::vector<std::array<Piece, 24>>& vec = state.repetition_history.ones;
+            vec.erase(std::remove(vec.begin(), vec.end(), position), vec.end());
+            return;
+        }
+    }
+
+    assert(false);
 }
 
 void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
@@ -692,6 +726,8 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
                 SPDLOG_INFO("Phase 2");
             }
 
+            undo::remember_place(state.moves_history, entity, node.piece);
+
             break;
         }
     }
@@ -743,6 +779,8 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::Black) ||
                             number_of_pieces_in_windmills(registry, board, Piece::Black) ==
                             state.black_pieces_count) {
+                        undo::remember_take(state.moves_history, entity, node.piece);
+
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
                         switch_turn(registry, board);
@@ -759,7 +797,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                                 state.turn == Player::White ? Piece::White : Piece::Black);
                         }
 
-                        clear_history(registry, board);
+                        clear_repetition_history(registry, board);
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -772,6 +810,8 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::White) ||
                             number_of_pieces_in_windmills(registry, board, Piece::White) ==
                             state.white_pieces_count) {
+                        undo::remember_take(state.moves_history, entity, node.piece);
+
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
                         switch_turn(registry, board);
@@ -788,7 +828,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                                 state.turn == Player::White ? Piece::White : Piece::Black);
                         }
 
-                        clear_history(registry, board);
+                        clear_repetition_history(registry, board);
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -854,6 +894,8 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
                 piece_move.velocity = (piece_move.target - piece_transform.position) * PIECE_MOVE_SPEED;
                 piece_move.distance_to_travel = piece_move.target - piece_transform.position;
                 piece_move.should_move = true;
+
+                undo::remember_move(state.moves_history, selected_piece.node, entity, state.selected_piece);
 
                 // Reset all variables
                 auto& previous_node = NODE(selected_piece.node);
@@ -923,4 +965,73 @@ void systems::release(entt::registry& registry, entt::entity board) {
 
     state.pressed_node = entt::null;
     state.pressed_piece = entt::null;
+}
+
+void systems::undo_move(entt::registry& registry, entt::entity board) {
+    auto& state = STATE(board);
+
+    undo::MoveType move_type = undo::get_undo_type(state.moves_history);
+
+    switch (move_type) {
+        case undo::MoveType::Place: {
+            undo::PlacedPiece placed_piece = undo::undo_place(state.moves_history);
+
+            auto& node = NODE(placed_piece.node);
+            auto& piece = PIECE(placed_piece.piece);
+
+            node.piece = entt::null;
+            piece.node = entt::null;
+            piece.active = false;
+
+            auto [transform, move] = registry.get<TransformComponent, MoveComponent>(placed_piece.piece);
+            move.target = AFTER_UNDO_POSITION;
+            move.velocity = (move.target - transform.position) * PIECE_MOVE_SPEED;
+            move.distance_to_travel = move.target - transform.position;
+            move.should_move = true;
+
+            if (piece.type == Piece::White) {
+                state.white_pieces_count--;
+            } else {
+                state.black_pieces_count--;
+            }
+
+            state.not_placed_pieces_count++;
+            state.phase = Phase::PlacePieces;
+
+            switch_turn_no_check(registry, board);
+
+            break;
+        }
+        case undo::MoveType::Move: {
+            undo::MovedPiece moved_piece = undo::undo_move(state.moves_history);
+
+            auto& destination_node = NODE(moved_piece.destination_node);
+            auto& source_node = NODE(moved_piece.source_node);
+            auto& piece = PIECE(moved_piece.piece);
+
+            undo_repetition_history(registry, board, get_position(registry, board));
+
+            destination_node.piece = entt::null;
+            source_node.piece = moved_piece.piece;
+            piece.node = moved_piece.source_node;
+
+            auto [transform, move] = registry.get<TransformComponent, MoveComponent>(moved_piece.piece);
+            auto& source_node_transform = registry.get<TransformComponent>(moved_piece.source_node);
+            move.target.x = source_node_transform.position.x;
+            move.target.y = PIECE_Y_POSITION;
+            move.target.z = source_node_transform.position.z;
+            move.velocity = (move.target - transform.position) * PIECE_MOVE_SPEED;
+            move.distance_to_travel = move.target - transform.position;
+            move.should_move = true;
+
+            switch_turn_no_check(registry, board);
+            update_outlines(registry, board);
+            state.turns_without_mills--;
+
+            break;
+        }
+        case undo::MoveType::Take: {
+            break;
+        }
+    }
 }

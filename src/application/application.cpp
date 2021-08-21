@@ -288,6 +288,9 @@ void Application::imgui_update(float dt) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
                 restart();
             }
+            if (ImGui::MenuItem("Undo", nullptr, false)) {
+                systems::undo_move(registry, board);
+            }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
                 running = false;
             }
@@ -306,21 +309,6 @@ void Application::imgui_update(float dt) {
 
         ImGui::EndMainMenuBar();
     }
-
-    ImGui::Begin("Debug");
-    ImGui::Text("FPS: %f", fps);
-    ImGui::Text("Frame time (ms): %f", dt * 1000);
-    if (ImGui::Button("VSync")) {
-        static bool on = true;
-        if (on) {
-            window->set_vsync(0);
-            on = false;
-        } else {
-            window->set_vsync(1);
-            on = true;
-        }
-    }
-    ImGui::End();
 
     auto& state = STATE(board);
 
@@ -370,6 +358,31 @@ void Application::imgui_update(float dt) {
             ImGui::EndPopup();
         }
     }
+
+    ImGui::Begin("Debug");
+    ImGui::Text("FPS: %f", fps);
+    ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
+    if (ImGui::Button("VSync")) {
+        static bool on = true;
+        if (on) {
+            window->set_vsync(0);
+            on = false;
+        } else {
+            window->set_vsync(1);
+            on = true;
+        }
+    }
+    ImGui::Text("White pieces: %d", state.white_pieces_count);
+    ImGui::Text("Black pieces: %d", state.black_pieces_count);
+    ImGui::Text("Not placed pieces: %d", state.not_placed_pieces_count);
+    ImGui::Text("Phase: %d", (int) state.phase);
+    ImGui::Text("Turn: %s", state.turn == Player::White ? "white" : "black");
+    ImGui::Text("Should take piece: %d", state.should_take_piece);
+    ImGui::Text("Turns without mills: %d", state.turns_without_mills);
+    ImGui::Text("History size (place): %lu", state.moves_history.placed_pieces.size());
+    ImGui::Text("History size (move): %lu", state.moves_history.moved_pieces.size());
+    ImGui::Text("History size (take): %lu", state.moves_history.taken_pieces.size());
+    ImGui::End();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
