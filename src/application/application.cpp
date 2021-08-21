@@ -268,7 +268,16 @@ void Application::imgui_start() {
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("data/fonts/OpenSans-Semibold.ttf", 20.0f);
+
+    ImFontAtlas::GlyphRangesBuilder builder;
+    builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+    builder.AddText(u8"ă");
+
+    ImVector<ImWchar>* ranges = new ImVector<ImWchar>;
+    builder.BuildRanges(ranges);
+
+    io.FontDefault = io.Fonts->AddFontFromFileTTF("data/fonts/OpenSans-Semibold.ttf", 20.0f,
+        nullptr, ranges->Data);
 
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
@@ -283,6 +292,7 @@ void Application::imgui_update(float dt) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
+    bool about = false;
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
@@ -302,12 +312,35 @@ void Application::imgui_update(float dt) {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help")) {
-            ImGui::MenuItem("About", nullptr, false);
+            if (ImGui::MenuItem("About", nullptr, false)) {
+                about = true;
+            }
 
             ImGui::EndMenu();
         }
 
         ImGui::EndMainMenuBar();
+    }
+
+    if (about) {
+        ImGui::OpenPopup("About Nine Morris 3D");
+
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+    }
+
+    if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+        ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
+        ImGui::Text(u8"All programming by Simon Teodor Mărăcine");
+
+        if (ImGui::Button("Ok", ImVec2(430, 0))) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
     }
 
     auto& state = STATE(board);

@@ -16,6 +16,10 @@
 #include "other/loader.h"
 #include "ecs/game.h"
 
+constexpr int VERSION_MAJOR = 0;
+constexpr int VERSION_MINOR = 1;
+constexpr int VERSION_PATCH = 0;
+
 struct ApplicationData {
     int width, height;
     std::function<void(events::Event&)> event_function;
