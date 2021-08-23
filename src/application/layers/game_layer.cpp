@@ -6,7 +6,6 @@
 #include <cassert>
 #include <algorithm>
 
-#include <imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -40,6 +39,12 @@ void GameLayer::on_detach() {
 void GameLayer::on_update(float dt) {
     static bool loaded = false;
 
+    if (!loaded) {
+        assets = loader->get_assets();
+        start_after_load();
+        loaded = true;
+    }
+
     systems::camera(registry, mouse_wheel, dx, dy, dt);
     systems::lighting_move(registry, dt);
     systems::move_pieces(registry, dt);
@@ -47,12 +52,6 @@ void GameLayer::on_update(float dt) {
     mouse_wheel = 0.0f;
     dx = 0.0f;
     dy = 0.0f;
-
-    if (!loaded) {
-        assets = loader->get_assets();
-        start_after_load();
-        loaded = true;
-    }
 }
 
 void GameLayer::on_draw() {
@@ -120,17 +119,11 @@ void GameLayer::on_event(events::Event& event) {
 }
 
 bool GameLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseWheel = event.scroll;
-
     mouse_wheel = event.scroll;
     return true;
 }
 
 bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
-
     dx = last_mouse_x - event.mouse_x;
     dy = last_mouse_y - event.mouse_y;
     last_mouse_x = event.mouse_x;
@@ -140,42 +133,32 @@ bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 }
 
 bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.button] = true;
-
-    // if (game_ready) {
-        systems::press(registry, board, hovered_entity);
-    // }
+    systems::press(registry, board, hovered_entity);
     
     return false;
 }
 
 bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.button] = false;
+    auto& state = STATE(board);
 
-    // if (game_ready) {
-        auto& state = STATE(board);
-
-        if (event.button == MOUSE_BUTTON_LEFT) {
-            if (state.phase == Phase::PlacePieces) {
-                if (state.should_take_piece) {
-                    systems::take_piece(registry, board, hovered_entity);
-                } else {
-                    systems::place_piece(registry, board, hovered_entity);
-                }
-            } else if (state.phase == Phase::MovePieces) {
-                if (state.should_take_piece) {
-                    systems::take_piece(registry, board, hovered_entity);
-                } else {
-                    systems::select_piece(registry, board, hovered_entity);
-                    systems::put_piece(registry, board, hovered_entity);
-                }
+    if (event.button == MOUSE_BUTTON_LEFT) {
+        if (state.phase == Phase::PlacePieces) {
+            if (state.should_take_piece) {
+                systems::take_piece(registry, board, hovered_entity);
+            } else {
+                systems::place_piece(registry, board, hovered_entity);
             }
-
-            systems::release(registry, board);
+        } else if (state.phase == Phase::MovePieces) {
+            if (state.should_take_piece) {
+                systems::take_piece(registry, board, hovered_entity);
+            } else {
+                systems::select_piece(registry, board, hovered_entity);
+                systems::put_piece(registry, board, hovered_entity);
+            }
         }
-    // }
+
+        systems::release(registry, board);
+    }
 
     return false;
 }
@@ -232,7 +215,6 @@ void GameLayer::start_after_load() {
     build_board(std::get<0>(assets->meshes));
 
     SPDLOG_INFO("Finished initializing program");
-    // game_ready = true;
 }
 
 void GameLayer::restart() {

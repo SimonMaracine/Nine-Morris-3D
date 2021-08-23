@@ -7,16 +7,19 @@
 
 void GuiLayer::on_attach() {
     imgui_start();
-
-    game_layer = (GameLayer*) get_layer(0);
+    active = false;
 }
 
 void GuiLayer::on_detach() {
     imgui_end();
 }
 
-void GuiLayer::on_update(float dt) {
+void GuiLayer::on_bind_layers() {
+    game_layer = (GameLayer*) get_layer(2);
+}
 
+void GuiLayer::on_update(float dt) {
+    imgui_update(dt);
 }
 
 void GuiLayer::on_draw() {
@@ -24,27 +27,46 @@ void GuiLayer::on_draw() {
 }
 
 void GuiLayer::on_event(events::Event& event) {
+    using namespace events;
 
+    Dispatcher dispatcher = Dispatcher(event);
+
+    dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(GuiLayer::on_mouse_scrolled));
+    dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(GuiLayer::on_mouse_moved));
+    dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(GuiLayer::on_mouse_button_pressed));
+    dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(GuiLayer::on_mouse_button_released));
 }
 
 bool GuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseWheel = event.scroll;
 
+    return false;
 }
 
 bool GuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
 
+    return false;
 }
 
 bool GuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[event.button] = true;
 
+    return false;
 }
 
 bool GuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[event.button] = false;
 
+    return false;
 }
 
 bool GuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-
+    return false;
 }
 
 void GuiLayer::imgui_start() {

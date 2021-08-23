@@ -1,17 +1,23 @@
 #include "application/layers/loading_layer.h"
 
 void LoadingLayer::on_attach() {
-    game_layer = (GameLayer*) get_layer(0);
+    
 }
 
 void LoadingLayer::on_detach() {
 
 }
 
+void LoadingLayer::on_bind_layers() {
+    game_layer = (GameLayer*) get_layer(2);
+    gui_layer = (GuiLayer*) get_layer(1);
+}
+
 void LoadingLayer::on_update(float dt) {
     if (game_layer->loader->done_loading()) {
         active = false;
         game_layer->active = true;
+        gui_layer->active = true;
     }
 }
 

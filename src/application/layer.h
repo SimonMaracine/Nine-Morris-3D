@@ -13,6 +13,7 @@ public:
 
     virtual void on_attach() {}
     virtual void on_detach() {}
+    virtual void on_bind_layers() {}
     virtual void on_update(float dt) {}
     virtual void on_draw() {}
     virtual void on_event(events::Event& event) {}
