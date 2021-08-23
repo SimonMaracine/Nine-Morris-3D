@@ -1,5 +1,7 @@
 #pragma once
 
+#define BIND(function) std::bind(&function, this, std::placeholders::_1)
+
 namespace events {
     enum EventType {
         WindowClosed, WindowResized,
@@ -18,7 +20,7 @@ namespace events {
     class Dispatcher {
     public:
         Dispatcher(Event& event)
-                : event(event) {}
+            : event(event) {}
 
         template<typename E, typename F>
         void dispatch(EventType type, const F& function) {
