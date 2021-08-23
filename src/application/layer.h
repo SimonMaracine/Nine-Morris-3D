@@ -20,10 +20,11 @@ public:
 
     bool active = true;
 protected:
-    Layer* get_layer(unsigned int id) {
+    template<typename T>
+    T* get_layer(unsigned int id) {
         for (unsigned int i = 0; i < application->layer_stack.size(); i++) {
             if (application->layer_stack[i]->id == id) {
-                return application->layer_stack[i];
+                return (T*) application->layer_stack[i];
             }
         }
 

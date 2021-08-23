@@ -17,7 +17,7 @@ void GuiLayer::on_detach() {
 }
 
 void GuiLayer::on_bind_layers() {
-    game_layer = (GameLayer*) get_layer(2);
+    game_layer = get_layer<GameLayer>(2);
 }
 
 void GuiLayer::on_update(float dt) {

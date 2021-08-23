@@ -9,8 +9,8 @@ void LoadingLayer::on_detach() {
 }
 
 void LoadingLayer::on_bind_layers() {
-    game_layer = (GameLayer*) get_layer(2);
-    gui_layer = (GuiLayer*) get_layer(1);
+    game_layer = get_layer<GameLayer>(2);
+    gui_layer = get_layer<GuiLayer>(1);
 }
 
 void LoadingLayer::on_update(float dt) {
