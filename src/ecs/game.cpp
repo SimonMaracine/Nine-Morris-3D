@@ -999,6 +999,13 @@ void systems::undo_move(entt::registry& registry, entt::entity board) {
             state.phase = Phase::PlacePieces;
 
             switch_turn_no_check(registry, board);
+            set_pieces_show_outline(registry, Piece::White, false);
+
+            if (state.selected_piece != entt::null) {
+                auto& selected_piece = PIECE(state.selected_piece);
+                selected_piece.selected = false;
+                state.selected_piece = entt::null;
+            }
 
             break;
         }

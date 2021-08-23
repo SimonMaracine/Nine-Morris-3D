@@ -332,9 +332,11 @@ void Application::imgui_update(float dt) {
     }
 
     if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
         ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
-        ImGui::Text(u8"All programming by Simon Teodor Mărăcine");
+        ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+        ImGui::Separator();
+        ImGui::Text("All programming by:");
+        ImGui::Text("Simon Teodor Mărăcine - simonmaracine@gmail.com");
 
         if (ImGui::Button("Ok", ImVec2(430, 0))) {
             ImGui::CloseCurrentPopup();
@@ -660,8 +662,7 @@ void Application::build_node(int index, const model::Mesh& mesh, const glm::vec3
     layout2.add(1, BufferLayout::Type::Int, 1);
 
     std::shared_ptr<Buffer> index_buffer =
-        Buffer::create_index(mesh.indices.data(),
-                                   mesh.indices.size() * sizeof(unsigned int));
+        Buffer::create_index(mesh.indices.data(), mesh.indices.size() * sizeof(unsigned int));
 
     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
     index_buffer->bind();
