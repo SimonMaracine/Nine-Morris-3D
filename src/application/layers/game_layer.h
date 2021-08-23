@@ -1,17 +1,12 @@
 #pragma once
 
-#include <string>
-
 #include <entt/entt.hpp>
 
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/events.h"
-#include "application/window.h"
-#include "opengl/renderer/shader.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/buffer.h"
-#include "opengl/renderer/framebuffer.h"
 #include "opengl/renderer/renderer.h"
 #include "other/model.h"
 #include "other/loader.h"

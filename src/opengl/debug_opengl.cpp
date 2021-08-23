@@ -182,7 +182,7 @@ namespace debug_opengl {
         }
         {
             char line[50];
-            sprintf(line, "ENTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR,
+            sprintf(line, "EnTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR,
                     ENTT_VERSION_MINOR, ENTT_VERSION_PATCH);
             output.append(line);
         }

@@ -1,33 +1,10 @@
-#include <string>
 #include <functional>
 #include <memory>
-#include <utility>
-#include <vector>
-#include <cassert>
-#include <algorithm>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <imgui.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <backends/imgui_impl_glfw.h>
 
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/window.h"
 #include "application/events.h"
-#include "application/input.h"
-#include "opengl/debug_opengl.h"
-#include "opengl/renderer/renderer.h"
-#include "opengl/renderer/texture.h"
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/buffer.h"
-#include "ecs/components.h"
-#include "ecs/systems.h"
-#include "ecs/game.h"
-#include "other/model.h"
-#include "other/loader.h"
-#include "other/logging.h"
 
 Application::Application(int width, int height) {
     window = std::make_shared<Window>(width, height, &data);
@@ -86,11 +63,11 @@ void Application::on_event(events::Event& event) {
 float Application::update_frame_counter() {
     constexpr double MAX_DT = 1.0 / 20.0;
 
-    static double previous_seconds = glfwGetTime();
+    static double previous_seconds = window->get_time();
     static int frame_count = 0;
     static double total_time = 0.0;
 
-    double current_seconds = glfwGetTime();
+    double current_seconds = window->get_time();
     double elapsed_seconds = current_seconds - previous_seconds;
     previous_seconds = current_seconds;
 

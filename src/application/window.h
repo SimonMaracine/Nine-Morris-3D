@@ -11,7 +11,8 @@ public:
     void update() const;
 
     GLFWwindow* get_handle() const;
-
+    double get_time() const;
+    
     void set_vsync(int interval) const;
 private:
     GLFWwindow* window;

@@ -1,9 +1,7 @@
-#include <string>
 #include <functional>
 #include <memory>
 #include <utility>
 #include <vector>
-#include <cassert>
 #include <algorithm>
 
 #include <glm/glm.hpp>
@@ -324,7 +322,7 @@ void GameLayer::build_board(const model::Mesh& mesh) {
 void GameLayer::build_camera() {
     camera = registry.create();
     auto& transform = registry.emplace<TransformComponent>(camera);
-    transform.rotation = glm::vec3(40.0f, 0.0f, 0.0f);
+    transform.rotation = glm::vec3(47.0f, 0.0f, 0.0f);
 
     registry.emplace<CameraComponent>(camera,
         glm::perspective(glm::radians(45.0f), 1024.0f / 576.0f, 0.08f, 100.0f),

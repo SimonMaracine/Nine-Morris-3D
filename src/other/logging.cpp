@@ -8,7 +8,7 @@
 /* SPDLOG_TRACE, SPDLOG_DEBUG, SPDLOG_INFO,
 SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
 
-const char* LOG_FILE = "opengl_log.txt";
+const char* LOG_FILE = "opengl_log.txt";  // TODO This should be changed
 
 namespace logging {
     void init() {

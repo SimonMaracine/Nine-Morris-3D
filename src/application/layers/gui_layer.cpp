@@ -131,13 +131,28 @@ void GuiLayer::imgui_update(float dt) {
             ImGui::EndMenu();
             HOVERING_GUI;
         }
+        static bool vsync = true;
         if (ImGui::BeginMenu("Options")) {
+            if (ImGui::MenuItem("VSync", nullptr, &vsync)) {
+                if (vsync) {
+                    application->window->set_vsync(1);
+                    SPDLOG_INFO("VSync enabled");
+                } else {
+                    application->window->set_vsync(0);
+                    SPDLOG_INFO("VSync disabled");
+                }
+            }
+
             ImGui::EndMenu();
             HOVERING_GUI;
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About", nullptr, false)) {
                 about = true;
+            }
+            if (ImGui::MenuItem("Log Info", nullptr, false)) {
+                logging::log_opengl_info(logging::LogTarget::File);
+                SPDLOG_INFO("Logged OpenGL info");
             }
 
             ImGui::EndMenu();
@@ -227,16 +242,6 @@ void GuiLayer::imgui_update(float dt) {
     ImGui::Begin("Debug");
     ImGui::Text("FPS: %f", application->fps);
     ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
-    if (ImGui::Button("VSync")) {
-        static bool on = true;
-        if (on) {
-            application->window->set_vsync(0);
-            on = false;
-        } else {
-            application->window->set_vsync(1);
-            on = true;
-        }
-    }
     ImGui::Text("White pieces: %d", state.white_pieces_count);
     ImGui::Text("Black pieces: %d", state.black_pieces_count);
     ImGui::Text("Not placed pieces: %d", state.not_placed_pieces_count);
