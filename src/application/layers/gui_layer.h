@@ -3,6 +3,8 @@
 #include "application/layer.h"
 #include "application/layers/game_layer.h"
 
+#define HOVERING_GUI hovering_gui = true
+
 class GuiLayer : public Layer {
 public:
     GuiLayer(unsigned int id, Application* application)
@@ -26,5 +28,6 @@ public:
     void imgui_update(float dt);
     void imgui_end();
 
+    bool hovering_gui = false;
     GameLayer* game_layer;
 };

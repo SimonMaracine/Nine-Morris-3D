@@ -3,7 +3,9 @@
 #include <backends/imgui_impl_glfw.h>
 
 #include "application/layers/gui_layer.h"
+#include "application/application.h"
 #include "application/events.h"
+#include "other/logging.h"
 
 void GuiLayer::on_attach() {
     imgui_start();
@@ -41,28 +43,40 @@ bool GuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheel = event.scroll;
 
-    return false;
+    if (hovering_gui)
+        return true;
+    else
+        return false;
 }
 
 bool GuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
 
-    return false;
+    if (hovering_gui)
+        return true;
+    else
+        return false;
 }
 
 bool GuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[event.button] = true;
 
-    return false;
+    if (hovering_gui)
+        return true;
+    else
+        return false;
 }
 
 bool GuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[event.button] = false;
 
-    return false;
+    if (hovering_gui)
+        return true;
+    else
+        return false;
 }
 
 bool GuiLayer::on_window_resized(events::WindowResizedEvent& event) {
@@ -99,7 +113,9 @@ void GuiLayer::imgui_update(float dt) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
+    hovering_gui = false;
     bool about = false;
+
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
@@ -113,10 +129,11 @@ void GuiLayer::imgui_update(float dt) {
             }
 
             ImGui::EndMenu();
+            HOVERING_GUI;
         }
         if (ImGui::BeginMenu("Options")) {
-
             ImGui::EndMenu();
+            HOVERING_GUI;
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About", nullptr, false)) {
@@ -124,6 +141,7 @@ void GuiLayer::imgui_update(float dt) {
             }
 
             ImGui::EndMenu();
+            HOVERING_GUI;
         }
 
         ImGui::EndMainMenuBar();
@@ -136,6 +154,8 @@ void GuiLayer::imgui_update(float dt) {
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
         ImGuiStyle& style = ImGui::GetStyle();
         style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+    } else {
+        game_layer->active = true;
     }
 
     if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -150,6 +170,8 @@ void GuiLayer::imgui_update(float dt) {
         }
 
         ImGui::EndPopup();
+        HOVERING_GUI;
+        game_layer->active = false;
     }
 
     auto& state = game_layer->registry.get<GameStateComponent>(game_layer->board);
@@ -198,6 +220,7 @@ void GuiLayer::imgui_update(float dt) {
             }
 
             ImGui::EndPopup();
+            HOVERING_GUI;
         }
     }
 
@@ -219,7 +242,7 @@ void GuiLayer::imgui_update(float dt) {
     ImGui::Text("Not placed pieces: %d", state.not_placed_pieces_count);
     ImGui::Text("Phase: %d", (int) state.phase);
     ImGui::Text("Turn: %s", state.turn == Player::White ? "white" : "black");
-    ImGui::Text("Should take piece: %d", state.should_take_piece);
+    ImGui::Text("Should take piece: %s", state.should_take_piece ? "true" : "false");
     ImGui::Text("Turns without mills: %d", state.turns_without_mills);
     ImGui::Text("History size (place): %lu", state.moves_history.placed_pieces.size());
     ImGui::Text("History size (move): %lu", state.moves_history.moved_pieces.size());
