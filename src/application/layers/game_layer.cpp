@@ -121,6 +121,7 @@ void GameLayer::on_event(events::Event& event) {
 
 bool GameLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
     mouse_wheel = event.scroll;
+
     return true;
 }
 
@@ -166,6 +167,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
 bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
     storage->framebuffer->resize(event.width, event.height);
+    systems::projection_matrix(registry, (float) event.width, (float) event.height);
 
     return false;
 }
@@ -325,7 +327,7 @@ void GameLayer::build_camera() {
     transform.rotation = glm::vec3(40.0f, 0.0f, 0.0f);
 
     registry.emplace<CameraComponent>(camera,
-        glm::perspective(glm::radians(45.0f), 1600.0f / 900.0f, 0.08f, 100.0f),
+        glm::perspective(glm::radians(45.0f), 1024.0f / 576.0f, 0.08f, 100.0f),
         glm::vec3(0.0f), 8.0f);
     registry.emplace<CameraMoveComponent>(camera);
 

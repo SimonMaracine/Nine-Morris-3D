@@ -11,6 +11,8 @@ namespace systems {
 
     void camera(entt::registry& registry, float mouse_wheel, float dx, float dy, float dt);
 
+    void projection_matrix(entt::registry& registry, float witdh, float height);
+
     void cube_map_render(entt::registry& registry, entt::entity camera_entity);
 
     void piece_render(entt::registry& registry, entt::entity hovered_entity,

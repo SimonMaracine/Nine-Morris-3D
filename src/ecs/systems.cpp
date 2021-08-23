@@ -116,6 +116,17 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
     }
 }
 
+void systems::projection_matrix(entt::registry& registry, float witdh, float height) {
+    auto view = registry.view<CameraComponent>();
+
+    for (entt::entity entity : view) {
+        auto& camera = view.get<CameraComponent>(entity);
+
+        camera.projection_matrix = glm::perspective(glm::radians(45.0f), witdh / height, 0.08f, 100.0f);
+        camera.projection_view_matrix = camera.projection_matrix * camera.view_matrix;
+    }
+}
+
 void systems::cube_map_render(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = CAMERA(camera_entity);
 
