@@ -1035,6 +1035,12 @@ void systems::undo_move(entt::registry& registry, entt::entity board) {
             update_outlines(registry, board);
             state.turns_without_mills--;
 
+            if (state.selected_piece != entt::null) {
+                auto& selected_piece = PIECE(state.selected_piece);
+                selected_piece.selected = false;
+                state.selected_piece = entt::null;
+            }
+
             break;
         }
         case undo::MoveType::Take: {
