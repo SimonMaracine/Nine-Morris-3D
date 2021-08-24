@@ -22,11 +22,11 @@ Application::~Application() {
 }
 
 void Application::run() {
-    float dt;
-
     for (unsigned int i = 0; i < layer_stack.size(); i++) {
         layer_stack[i]->on_bind_layers();
     }
+
+    float dt;
 
     while (running) {
         dt = update_frame_counter();
