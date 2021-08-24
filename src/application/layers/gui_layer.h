@@ -5,6 +5,10 @@
 
 #define HOVERING_GUI hovering_gui = true
 
+#define DEFAULT_BROWN ImVec4(0.6f, 0.35f, 0.12f, 1.0f)
+#define DARK_BROWN ImVec4(0.4f, 0.25f, 0.10f, 1.0f)
+#define LIGHT_BROWN ImVec4(0.68f, 0.42f, 0.12f, 1.0f)
+
 class GuiLayer : public Layer {
 public:
     GuiLayer(unsigned int id, Application* application)

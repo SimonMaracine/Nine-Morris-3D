@@ -101,14 +101,14 @@ void GuiLayer::imgui_start() {
         nullptr, ranges->Data);
 
     ImVec4* colors = ImGui::GetStyle().Colors;
-    colors[ImGuiCol_TitleBg] = ImVec4(0.6f, 0.35f, 0.12f, 1.0f);
-    colors[ImGuiCol_TitleBgActive] = ImVec4(0.6f, 0.35f, 0.12f, 1.0f);
-    colors[ImGuiCol_FrameBg] = ImVec4(0.6f, 0.35f, 0.12f, 1.0f);
-    colors[ImGuiCol_Button] = ImVec4(0.4f, 0.25f, 0.10f, 1.0f);
-    colors[ImGuiCol_ButtonHovered] = ImVec4(0.6f, 0.35f, 0.12f, 1.0f);
-    colors[ImGuiCol_ButtonActive] = ImVec4(0.68f, 0.42f, 0.12f, 1.0f);
-    colors[ImGuiCol_Header] = ImVec4(0.4f, 0.25f, 0.10f, 1.0f);
-    colors[ImGuiCol_HeaderHovered] = ImVec4(0.6f, 0.35f, 0.12f, 1.0f);
+    colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
+    colors[ImGuiCol_TitleBgActive] = DEFAULT_BROWN;
+    colors[ImGuiCol_FrameBg] = DEFAULT_BROWN;
+    colors[ImGuiCol_Button] = DARK_BROWN;
+    colors[ImGuiCol_ButtonHovered] = DEFAULT_BROWN;
+    colors[ImGuiCol_ButtonActive] = LIGHT_BROWN;
+    colors[ImGuiCol_Header] = DARK_BROWN;
+    colors[ImGuiCol_HeaderHovered] = DEFAULT_BROWN;
 
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(application->window->get_handle(), false);
