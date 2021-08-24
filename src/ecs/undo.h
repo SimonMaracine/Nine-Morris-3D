@@ -1,8 +1,10 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
 
 #include <entt/entt.hpp>
+
+enum class Piece;
 
 namespace undo {
     struct PlacedPiece {
@@ -18,15 +20,15 @@ namespace undo {
 
     struct TakenPiece {
         entt::entity node = entt::null;
-        entt::entity piece = entt::null;
+        Piece piece_type;
     };
 
     struct MovesHistory {
         unsigned int moves = 0;
 
-        std::map<unsigned int, PlacedPiece> placed_pieces;
-        std::map<unsigned int, MovedPiece> moved_pieces;
-        std::map<unsigned int, TakenPiece> taken_pieces;
+        std::unordered_map<unsigned int, PlacedPiece> placed_pieces;
+        std::unordered_map<unsigned int, MovedPiece> moved_pieces;
+        std::unordered_map<unsigned int, TakenPiece> taken_pieces;
     };
 
     enum class MoveType {
@@ -36,7 +38,7 @@ namespace undo {
     void remember_place(MovesHistory& history, entt::entity node, entt::entity piece);
     void remember_move(MovesHistory& history, entt::entity source_node, entt::entity destination_node,
                        entt::entity piece);
-    void remember_take(MovesHistory& history, entt::entity node, entt::entity piece);
+    void remember_take(MovesHistory& history, entt::entity node, Piece piece_type);
 
     MoveType get_undo_type(MovesHistory& history);
 

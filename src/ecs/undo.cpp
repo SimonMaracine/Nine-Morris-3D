@@ -2,6 +2,7 @@
 #include <cassert>
 
 #include "ecs/undo.h"
+#include "ecs/game.h"
 #include "other/logging.h"
 
 namespace undo {
@@ -31,12 +32,14 @@ namespace undo {
         history.moves++;
     }
 
-    void remember_take(MovesHistory& history, entt::entity node, entt::entity piece) {
+    void remember_take(MovesHistory& history, entt::entity node, Piece piece_type) {
         SPDLOG_DEBUG("Remember take");
+
+        assert(node != entt::null);
 
         TakenPiece taken_piece;
         taken_piece.node = node;
-        taken_piece.piece = piece;
+        taken_piece.piece_type = piece_type;
 
         history.taken_pieces[history.moves] = taken_piece;
 
@@ -68,21 +71,21 @@ namespace undo {
     }
 
     PlacedPiece undo_place(MovesHistory& history) {
-        PlacedPiece& placed_piece = history.placed_pieces.at(history.moves);
+        PlacedPiece placed_piece = history.placed_pieces.at(history.moves);
         history.placed_pieces.erase(history.moves);
 
         return placed_piece;
     }
 
     MovedPiece undo_move(MovesHistory& history) {
-        MovedPiece& moved_piece = history.moved_pieces.at(history.moves);
+        MovedPiece moved_piece = history.moved_pieces.at(history.moves);
         history.moved_pieces.erase(history.moves);
 
         return moved_piece;
     }
 
     TakenPiece undo_take(MovesHistory& history) {
-        TakenPiece& taken_piece = history.taken_pieces.at(history.moves);
+        TakenPiece taken_piece = history.taken_pieces.at(history.moves);
         history.taken_pieces.erase(history.moves);
 
         return taken_piece;

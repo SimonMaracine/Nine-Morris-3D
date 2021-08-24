@@ -1,4 +1,6 @@
 #include "application/layers/loading_layer.h"
+#include "application/layers/game_layer.h"
+#include "application/layers/gui_layer.h"
 
 void LoadingLayer::on_attach() {
     

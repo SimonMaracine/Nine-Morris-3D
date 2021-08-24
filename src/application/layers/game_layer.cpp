@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "application/layers/game_layer.h"
+#include "application/layers/gui_layer.h"
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/window.h"
@@ -34,6 +35,10 @@ void GameLayer::on_detach() {
     end();
 }
 
+void GameLayer::on_bind_layers() {
+    gui_layer = get_layer<GuiLayer>(1);
+}
+
 void GameLayer::on_update(float dt) {
     static bool loaded = false;
 
@@ -54,7 +59,7 @@ void GameLayer::on_update(float dt) {
 
 void GameLayer::on_draw() {
     glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);
-    glm::mat4 view = glm::lookAt(glm::vec3(-11.0f, 13.0f, -15.0f) / 4.0f,
+    glm::mat4 view = glm::lookAt(LIGHT_POSITION / 4.0f,
                                  glm::vec3(0.0f, 0.0f, 0.0f),
                                  glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 light_space_matrix = projection * view;
@@ -144,16 +149,16 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
     if (event.button == MOUSE_BUTTON_LEFT) {
         if (state.phase == Phase::PlacePieces) {
             if (state.should_take_piece) {
-                systems::take_piece(registry, board, hovered_entity);
+                systems::take_piece(registry, board, hovered_entity, gui_layer->can_undo);
             } else {
-                systems::place_piece(registry, board, hovered_entity);
+                systems::place_piece(registry, board, hovered_entity, gui_layer->can_undo);
             }
         } else if (state.phase == Phase::MovePieces) {
             if (state.should_take_piece) {
-                systems::take_piece(registry, board, hovered_entity);
+                systems::take_piece(registry, board, hovered_entity, gui_layer->can_undo);
             } else {
                 systems::select_piece(registry, board, hovered_entity);
-                systems::put_piece(registry, board, hovered_entity);
+                systems::put_piece(registry, board, hovered_entity, gui_layer->can_undo);
             }
         }
 
@@ -201,12 +206,12 @@ void GameLayer::start_after_load() {
 
     for (int i = 0; i < 9; i++) {
         build_piece(Piece::White, std::get<1>(assets->meshes), white_piece_diffuse,
-                    glm::vec3(4.0f, 0.3f, -2.0f + i * 0.5f));
+                    glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
     }
     
     for (int i = 9; i < 18; i++) {
         build_piece(Piece::Black, std::get<2>(assets->meshes), black_piece_diffuse,
-                    glm::vec3(-4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
+                    glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
     for (int i = 0; i < 24; i++) {
@@ -231,12 +236,12 @@ void GameLayer::restart() {
 
     for (int i = 0; i < 9; i++) {
         build_piece(Piece::White, std::get<1>(assets->meshes), white_piece_diffuse,
-                    glm::vec3(4.0f, 0.3f, -2.0f + i * 0.5f));
+                    glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
     }
     
     for (int i = 9; i < 18; i++) {
         build_piece(Piece::Black, std::get<2>(assets->meshes), black_piece_diffuse,
-                    glm::vec3(-4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
+                    glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
     for (int i = 0; i < 24; i++) {
@@ -333,8 +338,7 @@ void GameLayer::build_camera() {
 }
 
 void GameLayer::build_skybox() {
-    std::shared_ptr<Buffer> positions =
-        Buffer::create(cube_map_points, 108 * sizeof(float));
+    std::shared_ptr<Buffer> positions = Buffer::create(cube_map_points, 108 * sizeof(float));
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
@@ -354,8 +358,8 @@ void GameLayer::build_skybox() {
 }
 
 void GameLayer::build_piece(Piece type, const model::Mesh& mesh,
-                              std::shared_ptr<Texture> diffuse_texture,
-                              const glm::vec3& position) {
+                            std::shared_ptr<Texture> diffuse_texture,
+                            const glm::vec3& position) {
     entt::entity piece = registry.create();
 
     std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_array(mesh, piece);
@@ -380,7 +384,7 @@ void GameLayer::build_piece(Piece type, const model::Mesh& mesh,
 void GameLayer::build_directional_light() {
     entt::entity directional_light = registry.create();
     auto& transform = registry.emplace<TransformComponent>(directional_light);
-    transform.position = glm::vec3(-11.0f, 13.0f, -15.0f);
+    transform.position = LIGHT_POSITION;
 
     registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f),
                                      glm::vec3(1.0f));
@@ -436,4 +440,42 @@ void GameLayer::build_node(int index, const model::Mesh& mesh, const glm::vec3& 
     registry.emplace<NodeComponent>(node, index);
 
     SPDLOG_DEBUG("Built node entity {}", node);
+}
+
+entt::entity GameLayer::build_piece(entt::registry& registry, const renderer::Storage* storage,
+                                    Piece type, std::shared_ptr<Assets> assets, const glm::vec3& position) {
+    entt::entity piece = registry.create();
+
+    if (type == Piece::White) {
+        const model::Mesh& mesh = std::get<1>(assets->meshes);
+        std::shared_ptr<Texture> texture = Texture::create(assets->white_piece_diffuse_data);
+        std::shared_ptr<VertexArray> vertex_array = nullptr;
+
+        vertex_array = create_entity_vertex_array(mesh, piece);
+        registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
+        registry.emplace<TextureComponent>(piece, texture);
+    } else {
+        const model::Mesh& mesh = std::get<2>(assets->meshes);
+        std::shared_ptr<Texture> texture = Texture::create(assets->black_piece_diffuse_data);
+        std::shared_ptr<VertexArray> vertex_array = nullptr;
+
+        vertex_array = create_entity_vertex_array(mesh, piece);
+        registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
+        registry.emplace<TextureComponent>(piece, texture);
+    }
+
+    auto& transform = registry.emplace<TransformComponent>(piece);
+    transform.position = position;
+    transform.scale = 20.0f;
+
+    registry.emplace<MaterialComponent>(piece, storage->piece_shader, glm::vec3(0.25f), 8.0f);
+    registry.emplace<OutlineComponent>(piece, storage->outline_shader,
+                                       glm::vec3(1.0f, 0.0f, 0.0f));
+    registry.emplace<ShadowComponent>(piece, storage->shadow_shader);
+    registry.emplace<PieceComponent>(piece, type);
+    registry.emplace<MoveComponent>(piece);
+
+    SPDLOG_DEBUG("Built piece entity {}", piece);
+
+    return piece;
 }

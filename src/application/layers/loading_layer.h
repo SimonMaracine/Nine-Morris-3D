@@ -1,8 +1,9 @@
 #pragma once
 
 #include "application/layer.h"
-#include "application/layers/game_layer.h"
-#include "application/layers/gui_layer.h"
+
+class GameLayer;
+class GuiLayer;
 
 class LoadingLayer : public Layer {
 public:

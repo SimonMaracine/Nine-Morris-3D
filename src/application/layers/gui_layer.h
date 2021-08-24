@@ -1,7 +1,8 @@
 #pragma once
 
 #include "application/layer.h"
-#include "application/layers/game_layer.h"
+
+class GameLayer;
 
 #define HOVERING_GUI hovering_gui = true
 
@@ -33,5 +34,6 @@ public:
     void imgui_end();
 
     bool hovering_gui = false;
+    bool can_undo = true;
     GameLayer* game_layer;
 };

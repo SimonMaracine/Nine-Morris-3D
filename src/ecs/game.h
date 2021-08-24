@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>
 
 #include "ecs/undo.h"
+#include "opengl/renderer/renderer.h"
+#include "other/loader.h"
 
 #define PIECE(entity) registry.get<PieceComponent>(entity)
 #define NODE(entity) registry.get<NodeComponent>(entity)
@@ -136,12 +138,13 @@ struct GameStateComponent {
 };
 
 namespace systems {
-    void place_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
+    void place_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo);
     void move_pieces(entt::registry& registry, float dt);
-    void take_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
+    void take_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo);
     void select_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
-    void put_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
+    void put_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo);
     void press(entt::registry& registry, entt::entity board, entt::entity hovered);
     void release(entt::registry& registry, entt::entity board);
-    void undo_move(entt::registry& registry, entt::entity board);
+    void undo_move(entt::registry& registry, entt::entity board, const renderer::Storage* storage,
+                   std::shared_ptr<Assets> assets);
 }

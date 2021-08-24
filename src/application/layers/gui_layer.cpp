@@ -3,6 +3,7 @@
 #include <backends/imgui_impl_glfw.h>
 
 #include "application/layers/gui_layer.h"
+#include "application/layers/game_layer.h"
 #include "application/application.h"
 #include "application/events.h"
 #include "other/logging.h"
@@ -131,8 +132,10 @@ void GuiLayer::imgui_update(float dt) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
                 game_layer->restart();
             }
-            if (ImGui::MenuItem("Undo", nullptr, false)) {
-                systems::undo_move(game_layer->registry, game_layer->board);
+            if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
+                systems::undo_move(game_layer->registry, game_layer->board,
+                                   game_layer->storage, game_layer->assets);
+                can_undo = false;
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
                 application->running = false;

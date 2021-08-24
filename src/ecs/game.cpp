@@ -8,8 +8,9 @@
 #include "ecs/game.h"
 #include "ecs/components.h"
 #include "ecs/undo.h"
-#include "application/input.h"
+#include "application/layers/game_layer.h"
 #include "other/logging.h"
+#include "other/loader.h"
 
 constexpr int windmills[16][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
@@ -644,12 +645,12 @@ static void remember_position_and_check_repetition(entt::registry& registry, ent
     state.repetition_history.ones.push_back(current_position);
 }
 
-static void clear_repetition_history(entt::registry& registry, entt::entity board) {
-    auto& state = STATE(board);
+// static void clear_repetition_history(entt::registry& registry, entt::entity board) {
+//     auto& state = STATE(board);
 
-    state.repetition_history.ones.clear();
-    state.repetition_history.twos.clear();
-}
+//     state.repetition_history.ones.clear();
+//     state.repetition_history.twos.clear();
+// }
 
 static void undo_repetition_history(entt::registry& registry, entt::entity board,
                                     const std::array<Piece, 24>& position_to_remove) {
@@ -674,7 +675,7 @@ static void undo_repetition_history(entt::registry& registry, entt::entity board
     assert(false);
 }
 
-void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
+void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo) {
     auto& state = STATE(board);
 
     auto view = registry.view<TransformComponent, NodeComponent>();
@@ -728,6 +729,8 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
 
             undo::remember_place(state.moves_history, entity, node.piece);
 
+            can_undo = true;
+
             break;
         }
     }
@@ -763,7 +766,7 @@ void systems::move_pieces(entt::registry& registry, float dt) {
     }
 }
 
-void systems::take_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
+void systems::take_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo) {
     auto& state = STATE(board);
 
     auto view = registry.view<NodeComponent>();
@@ -779,7 +782,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::Black) ||
                             number_of_pieces_in_windmills(registry, board, Piece::Black) ==
                             state.black_pieces_count) {
-                        undo::remember_take(state.moves_history, entity, node.piece);
+                        undo::remember_take(state.moves_history, entity, piece.type);
 
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
@@ -797,7 +800,9 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                                 state.turn == Player::White ? Piece::White : Piece::Black);
                         }
 
-                        clear_repetition_history(registry, board);
+                        // clear_repetition_history(registry, board);
+
+                        can_undo = true;
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -810,7 +815,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::White) ||
                             number_of_pieces_in_windmills(registry, board, Piece::White) ==
                             state.white_pieces_count) {
-                        undo::remember_take(state.moves_history, entity, node.piece);
+                        undo::remember_take(state.moves_history, entity, piece.type);
 
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
@@ -828,7 +833,9 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                                 state.turn == Player::White ? Piece::White : Piece::Black);
                         }
 
-                        clear_repetition_history(registry, board);
+                        // clear_repetition_history(registry, board);
+
+                        can_undo = true;
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -872,7 +879,7 @@ void systems::select_piece(entt::registry& registry, entt::entity board, entt::e
     }
 }
 
-void systems::put_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
+void systems::put_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo) {
     auto& state = STATE(board);
 
     auto view = registry.view<TransformComponent, NodeComponent>();
@@ -920,6 +927,8 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
                     }
 
                     state.turns_without_mills = 0;
+
+                    // TODO Maybe remember position here too
                 } else {
                     switch_turn(registry, board);
                     update_outlines(registry, board);
@@ -932,6 +941,8 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
 
                     remember_position_and_check_repetition(registry, board);
                 }
+
+                can_undo = true;
 
                 break;
             }
@@ -967,10 +978,11 @@ void systems::release(entt::registry& registry, entt::entity board) {
     state.pressed_piece = entt::null;
 }
 
-void systems::undo_move(entt::registry& registry, entt::entity board) {
+void systems::undo_move(entt::registry& registry, entt::entity board, const renderer::Storage* storage,
+                        std::shared_ptr<Assets> assets) {
     auto& state = STATE(board);
 
-    undo::MoveType move_type = undo::get_undo_type(state.moves_history);
+    const undo::MoveType move_type = undo::get_undo_type(state.moves_history);
 
     switch (move_type) {
         case undo::MoveType::Place: {
@@ -1044,6 +1056,44 @@ void systems::undo_move(entt::registry& registry, entt::entity board) {
             break;
         }
         case undo::MoveType::Take: {
+            undo::TakenPiece taken_piece = undo::undo_take(state.moves_history);
+
+            auto& node = NODE(taken_piece.node);
+            auto& node_transform = registry.get<TransformComponent>(taken_piece.node);
+
+            glm::vec3 position;
+            position.x = node_transform.position.x;
+            position.y = PIECE_Y_POSITION;
+            position.z = node_transform.position.z;
+
+            node.piece = GameLayer::build_piece(registry, storage, taken_piece.piece_type,
+                                                assets, position);
+
+            auto& piece = PIECE(node.piece);
+            piece.node = taken_piece.node;
+            piece.active = true;
+            piece.to_take = true;
+
+            state.should_take_piece = true;
+
+            if (taken_piece.piece_type == Piece::White) {
+                state.white_pieces_count++;
+                set_pieces_show_outline(registry, Piece::White, false);
+                set_pieces_to_take(registry, Piece::White, true);
+            } else {
+                state.black_pieces_count++;
+                set_pieces_show_outline(registry, Piece::Black, false);
+                set_pieces_to_take(registry, Piece::Black, true);
+            }
+
+            switch_turn_no_check(registry, board);
+
+            if (state.selected_piece != entt::null) {
+                auto& selected_piece = PIECE(state.selected_piece);
+                selected_piece.selected = false;
+                state.selected_piece = entt::null;
+            }
+
             break;
         }
     }
