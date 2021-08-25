@@ -124,17 +124,18 @@ void GuiLayer::imgui_update(float dt) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
-    hovering_gui = false;
     bool about = false;
+    RESET_HOVERING_GUI;
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
                 game_layer->restart();
+                can_undo = false;
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
-                systems::undo_move(game_layer->registry, game_layer->board,
-                                   game_layer->storage, game_layer->assets);
+                systems::undo(game_layer->registry, game_layer->board,
+                              game_layer->storage, game_layer->assets);
                 can_undo = false;
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
@@ -203,6 +204,7 @@ void GuiLayer::imgui_update(float dt) {
     }
 
     auto& state = game_layer->registry.get<GameStateComponent>(game_layer->board);
+    auto& moves_history = game_layer->registry.get<MovesHistoryComponent>(game_layer->board);
 
     if (state.phase == Phase::GameOver) {
         ImGui::OpenPopup("Game Over");
@@ -262,9 +264,9 @@ void GuiLayer::imgui_update(float dt) {
     ImGui::Text("Turn: %s", state.turn == Player::White ? "white" : "black");
     ImGui::Text("Should take piece: %s", state.should_take_piece ? "true" : "false");
     ImGui::Text("Turns without mills: %d", state.turns_without_mills);
-    ImGui::Text("History size (place): %lu", state.moves_history.placed_pieces.size());
-    ImGui::Text("History size (move): %lu", state.moves_history.moved_pieces.size());
-    ImGui::Text("History size (take): %lu", state.moves_history.taken_pieces.size());
+    ImGui::Text("History size (place): %lu", moves_history.placed_pieces.size());
+    ImGui::Text("History size (move): %lu", moves_history.moved_pieces.size());
+    ImGui::Text("History size (take): %lu", moves_history.taken_pieces.size());
     ImGui::End();
 
     ImGui::Render();

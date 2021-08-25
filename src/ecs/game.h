@@ -1,17 +1,22 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
-#include "ecs/undo.h"
 #include "opengl/renderer/renderer.h"
 #include "other/loader.h"
 
 #define PIECE(entity) registry.get<PieceComponent>(entity)
 #define NODE(entity) registry.get<NodeComponent>(entity)
 #define STATE(entity) registry.get<GameStateComponent>(entity)
+#define MOVES_HISTORY(entity) registry.get<MovesHistoryComponent>(entity)
+
+namespace undo {
+    struct MovesHistory;
+}
 
 constexpr float PIECE_Y_POSITION = 0.135f;
 constexpr float NODE_Y_POSITION = 0.062f;
@@ -74,8 +79,10 @@ enum class Ending {
 };
 
 struct PieceComponent {
-    PieceComponent(Piece type) : type(type) {}
+    PieceComponent() : id(-1) {}
+    PieceComponent(int id, Piece type) : id(id), type(type) {}
 
+    int id;
     Piece type;
     bool active = false;
     entt::entity node = entt::null;  // Reference to the node where it sits on
@@ -96,6 +103,7 @@ struct MoveComponent {
 };
 
 struct NodeComponent {
+    NodeComponent() = default;
     NodeComponent(int id) : id(id) {}
 
     int id;
@@ -108,6 +116,7 @@ struct ThreefoldRepetitionHistory {
 };
 
 struct GameStateComponent {
+    GameStateComponent() = default;
     GameStateComponent(entt::entity* nodes) {
         for (int i = 0; i < 24; i++) {
             this->nodes[i] = nodes[i];
@@ -134,7 +143,48 @@ struct GameStateComponent {
 
     int turns_without_mills = 0;
     ThreefoldRepetitionHistory repetition_history;
-    undo::MovesHistory moves_history;
+};
+
+namespace undo {
+    struct PlacedPiece {
+        GameStateComponent state;
+        NodeComponent nodes[24];
+        PieceComponent pieces[18];  // Some of these will remain uninitialized
+    };
+
+    struct MovedPiece {    
+        GameStateComponent state;
+        NodeComponent nodes[24];
+        PieceComponent pieces[18];  // Some of these will remain uninitialized
+    };
+
+    struct TakenPiece {
+        GameStateComponent state;
+        NodeComponent nodes[24];
+        PieceComponent pieces[18];  // Some of these will remain uninitialized
+    };
+
+    enum class MoveType {
+        Place, Move, Take
+    };
+
+    void remember_place(entt::registry& registry, entt::entity board);
+    void remember_move(entt::registry& registry, entt::entity board);
+    void remember_take(entt::registry& registry, entt::entity board);
+
+    MoveType get_undo_type(entt::registry& registry, entt::entity board);
+
+    PlacedPiece undo_place(entt::registry& registry, entt::entity board);
+    MovedPiece undo_move(entt::registry& registry, entt::entity board);
+    TakenPiece undo_take(entt::registry& registry, entt::entity board);
+}
+
+struct MovesHistoryComponent {
+    unsigned int moves = 0;
+
+    std::unordered_map<unsigned int, undo::PlacedPiece> placed_pieces;
+    std::unordered_map<unsigned int, undo::MovedPiece> moved_pieces;
+    std::unordered_map<unsigned int, undo::TakenPiece> taken_pieces;
 };
 
 namespace systems {
@@ -145,6 +195,6 @@ namespace systems {
     void put_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo);
     void press(entt::registry& registry, entt::entity board, entt::entity hovered);
     void release(entt::registry& registry, entt::entity board);
-    void undo_move(entt::registry& registry, entt::entity board, const renderer::Storage* storage,
-                   std::shared_ptr<Assets> assets);
+    void undo(entt::registry& registry, entt::entity board, const renderer::Storage* storage,
+              std::shared_ptr<Assets> assets);
 }

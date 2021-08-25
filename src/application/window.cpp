@@ -1,4 +1,4 @@
-#include <cstdlib>
+#include <stdlib.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -106,7 +106,7 @@ Window::Window(int width, int height, ApplicationData* data) {
         data->event_function(event);
     });
 
-    std::atexit(glfwTerminate);
+    atexit(glfwTerminate);
 }
 
 Window::~Window() {

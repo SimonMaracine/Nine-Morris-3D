@@ -4,6 +4,7 @@
 
 class GameLayer;
 
+#define RESET_HOVERING_GUI hovering_gui = false
 #define HOVERING_GUI hovering_gui = true
 
 #define DEFAULT_BROWN ImVec4(0.6f, 0.35f, 0.12f, 1.0f)
@@ -34,6 +35,6 @@ public:
     void imgui_end();
 
     bool hovering_gui = false;
-    bool can_undo = true;
+    bool can_undo = false;
     GameLayer* game_layer;
 };

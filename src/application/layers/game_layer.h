@@ -48,8 +48,8 @@ public:
     void build_board(const model::Mesh& mesh);
     void build_camera();
     void build_skybox();
-    void build_piece(Piece type, const model::Mesh& mesh, std::shared_ptr<Texture> diffuse_texture,
-                     const glm::vec3& position);
+    void build_piece(int id, Piece type, const model::Mesh& mesh,
+                     std::shared_ptr<Texture> diffuse_texture, const glm::vec3& position);
     void build_directional_light();
     void build_origin();
     void build_node(int index, const model::Mesh& mesh, const glm::vec3& position);
