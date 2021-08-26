@@ -149,16 +149,16 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
     if (event.button == MOUSE_BUTTON_LEFT) {
         if (state.phase == Phase::PlacePieces) {
             if (state.should_take_piece) {
-                systems::take_piece(registry, board, hovered_entity, gui_layer->can_undo);
+                systems::take_piece(registry, board, hovered_entity);
             } else {
                 systems::place_piece(registry, board, hovered_entity, gui_layer->can_undo);
             }
         } else if (state.phase == Phase::MovePieces) {
             if (state.should_take_piece) {
-                systems::take_piece(registry, board, hovered_entity, gui_layer->can_undo);
+                systems::take_piece(registry, board, hovered_entity);
             } else {
                 systems::select_piece(registry, board, hovered_entity);
-                systems::put_piece(registry, board, hovered_entity, gui_layer->can_undo);
+                systems::put_piece(registry, board, hovered_entity);
             }
         }
 

@@ -134,8 +134,7 @@ void GuiLayer::imgui_update(float dt) {
                 can_undo = false;
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
-                systems::undo(game_layer->registry, game_layer->board,
-                              game_layer->storage, game_layer->assets);
+                systems::undo(game_layer->registry, game_layer->board);
 
                 auto& state = game_layer->registry.get<GameStateComponent>(game_layer->board);
 

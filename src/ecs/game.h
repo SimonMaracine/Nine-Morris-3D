@@ -197,11 +197,10 @@ struct MovesHistoryComponent {
 namespace systems {
     void place_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo);
     void move_pieces(entt::registry& registry, float dt);
-    void take_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo);
+    void take_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void select_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
-    void put_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo);
+    void put_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void press(entt::registry& registry, entt::entity board, entt::entity hovered);
     void release(entt::registry& registry, entt::entity board);
-    void undo(entt::registry& registry, entt::entity board, const renderer::Storage* storage,
-              std::shared_ptr<Assets> assets);
+    void undo(entt::registry& registry, entt::entity board);
 }

@@ -728,7 +728,7 @@ void systems::move_pieces(entt::registry& registry, float dt) {
     }
 }
 
-void systems::take_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo) {
+void systems::take_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
     auto& state = STATE(board);
 
     auto view = registry.view<NodeComponent>();
@@ -761,8 +761,6 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                                 Ending::WinnerBlack : Ending::WinnerWhite,
                                 state.turn == Player::White ? Piece::White : Piece::Black);
                         }
-
-                        can_undo = true;
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -792,8 +790,6 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                                 Ending::WinnerBlack : Ending::WinnerWhite,
                                 state.turn == Player::White ? Piece::White : Piece::Black);
                         }
-
-                        can_undo = true;
                     } else {
                         SPDLOG_DEBUG("Cannot take piece from windmill");
                     }
@@ -837,7 +833,7 @@ void systems::select_piece(entt::registry& registry, entt::entity board, entt::e
     }
 }
 
-void systems::put_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo) {
+void systems::put_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
     auto& state = STATE(board);
 
     auto view = registry.view<TransformComponent, NodeComponent>();
@@ -900,8 +896,6 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
                     remember_position_and_check_repetition(registry, board);
                 }
 
-                can_undo = true;
-
                 break;
             }
         }
@@ -936,8 +930,7 @@ void systems::release(entt::registry& registry, entt::entity board) {
     state.pressed_piece = entt::null;
 }
 
-void systems::undo(entt::registry& registry, entt::entity board, const renderer::Storage* storage,
-                   std::shared_ptr<Assets> assets) {
+void systems::undo(entt::registry& registry, entt::entity board) {
     auto& state = STATE(board);
 
     const undo::MoveType move_type = undo::get_undo_type(registry, board);
