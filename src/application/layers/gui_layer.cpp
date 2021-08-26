@@ -131,12 +131,17 @@ void GuiLayer::imgui_update(float dt) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
                 game_layer->restart();
-                // can_undo = false;
+                can_undo = false;
             }
-            if (ImGui::MenuItem("Undo", nullptr, false)) {
+            if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 systems::undo(game_layer->registry, game_layer->board,
                               game_layer->storage, game_layer->assets);
-                // can_undo = false;
+
+                auto& state = game_layer->registry.get<GameStateComponent>(game_layer->board);
+
+                if (state.not_placed_pieces_count == 18) {
+                    can_undo = false;
+                }
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
                 application->running = false;

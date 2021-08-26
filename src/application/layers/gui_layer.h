@@ -36,5 +36,6 @@ public:
 
     bool hovering_gui = false;
     bool can_undo = false;
+
     GameLayer* game_layer;
 };

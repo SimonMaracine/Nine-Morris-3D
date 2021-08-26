@@ -34,7 +34,7 @@ public:
     float update_frame_counter();
 
     void push_layer(Layer* layer);
-    
+
     bool running = true;
     std::shared_ptr<Window> window = nullptr;
     ApplicationData data;

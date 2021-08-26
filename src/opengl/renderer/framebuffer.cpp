@@ -12,7 +12,7 @@ Framebuffer::Framebuffer(const std::vector<TextureFormat>& color_attachment_form
         : color_attachment_formats(color_attachment_formats),
           depth_attachment_format(depth_attachment_format), specification(specification) {
     build();
-    
+
     SPDLOG_DEBUG("Created framebuffer {}", framebuffer);
 }
 

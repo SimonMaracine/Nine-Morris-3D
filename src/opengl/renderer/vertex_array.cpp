@@ -57,7 +57,7 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer,
                 spdlog::critical("Unknown element type");
                 std::exit(1);
         }
-        
+
         glEnableVertexAttribArray(element.index);
         offset += element.size * VertexElement::get_size(element.type);
     }

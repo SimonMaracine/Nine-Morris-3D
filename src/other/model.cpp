@@ -26,7 +26,7 @@ namespace model {
         }
 
         const aiNode* root_node = scene->mRootNode;
-        
+
         const aiMesh* board_mesh;
         const aiMesh* white_piece_mesh;
         const aiMesh* black_piece_mesh;
@@ -80,7 +80,7 @@ namespace model {
 
                 vertices.push_back(vertex);
             }
-            
+
             for (unsigned int i = 0; i < meshes[j]->mNumFaces; i++) {
                 aiFace face = meshes[j]->mFaces[i];
                 for (unsigned int j = 0; j < face.mNumIndices; j++) {

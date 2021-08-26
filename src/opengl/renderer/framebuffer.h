@@ -43,7 +43,7 @@ private:
     void build();
 
     GLuint framebuffer = 0;
-    
+
     std::vector<TextureFormat> color_attachment_formats;
     TextureFormat depth_attachment_format = TextureFormat::None;
 

@@ -62,7 +62,7 @@ struct MaterialComponent {
 struct TextureComponent {  // TODO maybe I should move this to MaterialComponent
     TextureComponent(std::shared_ptr<Texture> diffuse_map)
             : diffuse_map(diffuse_map) {}
-    
+
     std::shared_ptr<Texture> diffuse_map;
     // std::shared_ptr<Texture> specular_map;
     // std::shared_ptr<Texture> normal_map;
@@ -85,7 +85,7 @@ struct SkyboxMaterialComponent {
 struct SkyboxTextureComponent {
     SkyboxTextureComponent(std::shared_ptr<Texture3D> cube_map)
             : cube_map(cube_map) {}
-    
+
     std::shared_ptr<Texture3D> cube_map;
 };
 

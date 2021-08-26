@@ -304,7 +304,7 @@ namespace renderer {
                             float shininess,
                             GLuint index_count,
                             const glm::vec3& outline_color) {
-        glStencilFunc(GL_ALWAYS, 1, 0xFF); 
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
 
         {

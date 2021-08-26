@@ -3,7 +3,7 @@
 #include "application/layers/gui_layer.h"
 
 void LoadingLayer::on_attach() {
-    
+
 }
 
 void LoadingLayer::on_detach() {

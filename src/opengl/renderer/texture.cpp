@@ -57,7 +57,7 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	
+
     if (channels == 3) {
         glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, width, height);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB,
@@ -124,7 +124,7 @@ Texture3D::Texture3D(GLuint texture) : texture(texture) {
 Texture3D::~Texture3D() {
     glDeleteTextures(1, &texture);
 
-    SPDLOG_DEBUG("Deleted 3D texture {}", texture);    
+    SPDLOG_DEBUG("Deleted 3D texture {}", texture);
 }
 
 std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
@@ -153,7 +153,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
             std::exit(1);
         }
 
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
                      0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
         stbi_image_free(data);

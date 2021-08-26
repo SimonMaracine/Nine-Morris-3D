@@ -14,6 +14,7 @@
 #define NODE(entity) registry.get<NodeComponent>(entity)
 #define STATE(entity) registry.get<GameStateComponent>(entity)
 #define MOVES_HISTORY(entity) registry.get<MovesHistoryComponent>(entity)
+#define TRANSFORM(entity) registry.get<TransformComponent>(entity)
 
 constexpr float PIECE_Y_POSITION = 0.135f;
 constexpr float NODE_Y_POSITION = 0.062f;
