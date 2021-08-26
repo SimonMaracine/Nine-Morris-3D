@@ -91,10 +91,12 @@ target_link_libraries(${EXECUTABLE_NAME} PUBLIC "${CMAKE_DL_LIBS}")
 # Add some defines
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("Building in DEBUG mode")
-    target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SPDLOG_ACTIVE_LEVEL=0)
+    target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
+        SPDLOG_ACTIVE_LEVEL=0)
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message("Building in RELEASE mode")
-    target_compile_definitions(${EXECUTABLE_NAME} PUBLIC SPDLOG_ACTIVE_LEVEL=6 NDEBUG)
+    target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
+        SPDLOG_ACTIVE_LEVEL=6 NDEBUG ENTT_DISABLE_ASSERT)
 endif()
 
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
