@@ -81,7 +81,7 @@ struct PieceComponent {
 
     int id;
     Piece type;
-    bool active = false;
+    bool in_use = false;
     entt::entity node = entt::null;  // Reference to the node where it sits on
 
     bool show_outline = false;
@@ -97,6 +97,10 @@ struct MoveComponent {
 
     float distance_travelled = 0.0f;
     glm::vec3 distance_to_travel = glm::vec3(0.0f);
+};
+
+struct InactiveTag {
+    char inactive;
 };
 
 struct NodeComponent {
@@ -150,7 +154,7 @@ namespace undo {
         TransformComponent transforms[18];
     };
 
-    struct MovedPiece {    
+    struct MovedPiece {
         GameStateComponent state;
         NodeComponent nodes[24];
         PieceComponent pieces[18];  // Some of these will remain uninitialized
@@ -162,8 +166,8 @@ namespace undo {
         NodeComponent nodes[24];
         PieceComponent pieces[18];  // Some of these will remain uninitialized
         PieceComponent removed_piece;
+        entt::entity removed_piece_entity;
         TransformComponent transform;
-        entt::entity node;
     };
 
     enum class MoveType {
@@ -172,8 +176,7 @@ namespace undo {
 
     void remember_place(entt::registry& registry, entt::entity board);
     void remember_move(entt::registry& registry, entt::entity board);
-    void remember_take(entt::registry& registry, entt::entity board,
-                       entt::entity removed_piece, entt::entity node);
+    void remember_take(entt::registry& registry, entt::entity board, entt::entity removed_piece);
 
     MoveType get_undo_type(entt::registry& registry, entt::entity board);
 

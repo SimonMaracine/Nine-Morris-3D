@@ -47,7 +47,7 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
         const float zoom_speed = 1.05f * zoom;
 
         move.zoom_velocity -= zoom_speed * mouse_wheel * 1.25f * dt;
-        
+
         if (input::is_key_pressed(KEY_R)) {
             move.zoom_velocity -= zoom_speed * dt;
         } else if (input::is_key_pressed(KEY_F)) {
@@ -100,7 +100,7 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
         transform.position.x = camera.point.x - offset_x;
         transform.position.z = camera.point.z - offset_z;
         transform.position.y = camera.point.y + vertical_distance;
-        
+
         yaw = 180 - camera.angle_around_point;
 
         glm::mat4 matrix = glm::mat4(1.0f);
@@ -158,7 +158,7 @@ void systems::piece_render(entt::registry& registry, entt::entity hovered_entity
 
     auto view = registry.view<TransformComponent, MeshComponent,
                               MaterialComponent, TextureComponent,
-                              OutlineComponent, PieceComponent>();
+                              OutlineComponent, PieceComponent>(entt::exclude<InactiveTag>);
 
     view.use<TransformComponent>();
 
@@ -171,14 +171,14 @@ void systems::piece_render(entt::registry& registry, entt::entity hovered_entity
                                     textures.diffuse_map, material.specular_color,
                                     material.shininess, mesh.index_count,
                                     outline.outline_color);
-        } else if (piece.show_outline && entity == hovered_entity && piece.active &&
+        } else if (piece.show_outline && entity == hovered_entity && piece.in_use &&
                 !piece.pending_remove) {
             renderer::draw_piece_outline(transform.position, transform.rotation,
                                     transform.scale, material.shader, mesh.vertex_array,
                                     textures.diffuse_map, material.specular_color,
                                     material.shininess, mesh.index_count,
                                     glm::vec3(1.0f, 0.5f, 0.0f));
-        } else if (piece.to_take && entity == hovered_entity && piece.active) {
+        } else if (piece.to_take && entity == hovered_entity && piece.in_use) {
             renderer::draw_piece(transform.position, transform.rotation,
                             transform.scale, material.shader, mesh.vertex_array,
                             textures.diffuse_map, material.specular_color,
@@ -289,13 +289,13 @@ void systems::node_render(entt::registry& registry,
             renderer::draw_node(transform.position, transform.scale,
                                 material.shader, mesh.vertex_array,
                                 glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
-                                mesh.index_count);   
+                                mesh.index_count);
         }
     }
 }
 
 void systems::render_to_depth(entt::registry& registry) {
-    auto view = registry.view<TransformComponent, MeshComponent, ShadowComponent>();
+    auto view = registry.view<TransformComponent, MeshComponent, ShadowComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
         auto [transform, mesh, shadow] = view.get(entity);

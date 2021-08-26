@@ -23,12 +23,12 @@ constexpr int windmills[16][3] = {
 
 static entt::entity place_new_piece(entt::registry& registry, Piece type, float x_pos,
                                     float z_pos, entt::entity node_entity) {
-    auto view = registry.view<TransformComponent, PieceComponent, MoveComponent>();
+    auto view = registry.view<TransformComponent, PieceComponent, MoveComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
         auto [transform, piece, move] = view.get(entity);
 
-        if (!piece.active && piece.type == type) {
+        if (!piece.in_use && piece.type == type) {
             move.target.x = x_pos;
             move.target.y = PIECE_Y_POSITION;
             move.target.z = z_pos;
@@ -37,7 +37,7 @@ static entt::entity place_new_piece(entt::registry& registry, Piece type, float 
             move.distance_to_travel = move.target - transform.position;
             move.should_move = true;
 
-            piece.active = true;
+            piece.in_use = true;
             piece.node = node_entity;
 
             return entity;
@@ -64,7 +64,7 @@ static void take_raise_piece(entt::registry& registry, entt::entity piece_entity
 }
 
 static void set_pieces_show_outline(entt::registry& registry, Piece type, bool show) {
-    auto view = registry.view<PieceComponent>();
+    auto view = registry.view<PieceComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
         auto& piece = view.get<PieceComponent>(entity);
@@ -155,7 +155,7 @@ static bool is_windmill_made(entt::registry& registry, entt::entity board,
 }
 
 static void set_pieces_to_take(entt::registry& registry, Piece type, bool take) {
-    auto view = registry.view<PieceComponent>();
+    auto view = registry.view<PieceComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
         auto& piece = view.get<PieceComponent>(entity);
@@ -210,7 +210,7 @@ static int number_of_pieces_in_windmills(entt::registry& registry, entt::entity 
 }
 
 static void unselect_other_pieces(entt::registry& registry, entt::entity currently_selected_piece) {
-    auto view = registry.view<PieceComponent>();
+    auto view = registry.view<PieceComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
         auto& piece = view.get<PieceComponent>(entity);
@@ -376,7 +376,7 @@ static void check_player_pieces_number(entt::registry& registry, entt::entity bo
 static bool check_player_blocked(entt::registry& registry, entt::entity board, Player player) {
     auto& state = STATE(board);
 
-    auto view = registry.view<PieceComponent>();
+    auto view = registry.view<PieceComponent>(entt::exclude<InactiveTag>);
 
     SPDLOG_DEBUG("{} player is checked if is blocked",
         player == Player::White ? "White" : "Black");
@@ -391,7 +391,7 @@ static bool check_player_blocked(entt::registry& registry, entt::entity board, P
     for (entt::entity entity : view) {
         auto& piece = view.get<PieceComponent>(entity);
 
-        if (piece.type == type && !piece.pending_remove && piece.active) {
+        if (piece.type == type && !piece.pending_remove && piece.in_use) {
             at_least_one_piece = true;
 
             auto& node = NODE(piece.node);
@@ -679,7 +679,6 @@ static void undo_repetition_history(entt::registry& registry, entt::entity board
 
 void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo) {
     auto& state = STATE(board);
-    // auto& moves_history = MOVES_HISTORY(board);  // TODO Remove
 
     auto view = registry.view<TransformComponent, NodeComponent>();
 
@@ -694,7 +693,7 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
             if (state.turn == Player::White) {
                 node.piece = place_new_piece(registry, Piece::White,
                                              position.x, position.z, entity);
-                state.white_pieces_count++;   
+                state.white_pieces_count++;
             } else {
                 node.piece = place_new_piece(registry, Piece::Black,
                                              position.x, position.z, entity);
@@ -740,7 +739,7 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
 }
 
 void systems::move_pieces(entt::registry& registry, float dt) {
-    auto view = registry.view<TransformComponent, MoveComponent, PieceComponent>();
+    auto view = registry.view<TransformComponent, MoveComponent, PieceComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
         auto [transform, move, piece] = view.get(entity);
@@ -762,7 +761,8 @@ void systems::move_pieces(entt::registry& registry, float dt) {
 
                 // Remove piece if set to remove
                 if (piece.pending_remove) {
-                    registry.destroy(entity);
+                    // piece.active = false;
+                    registry.emplace<InactiveTag>(entity);
                 }
             }
         }
@@ -785,7 +785,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::Black) ||
                             number_of_pieces_in_windmills(registry, board, Piece::Black) ==
                             state.black_pieces_count) {
-                        undo::remember_take(registry, board, node.piece, entity);
+                        undo::remember_take(registry, board, node.piece);
 
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
@@ -818,7 +818,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::White) ||
                             number_of_pieces_in_windmills(registry, board, Piece::White) ==
                             state.white_pieces_count) {
-                        undo::remember_take(registry, board, node.piece, entity);
+                        undo::remember_take(registry, board, node.piece);
 
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
@@ -861,7 +861,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
 void systems::select_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
     auto& state = STATE(board);
 
-    auto view = registry.view<PieceComponent>();
+    auto view = registry.view<PieceComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
         auto& piece = view.get<PieceComponent>(entity);
@@ -965,7 +965,7 @@ void systems::press(entt::registry& registry, entt::entity board, entt::entity h
         }
     }
     {
-        auto view = registry.view<PieceComponent>();
+        auto view = registry.view<PieceComponent>(entt::exclude<InactiveTag>);
         for (entt::entity entity : view) {
             if (entity == hovered) {
                 state.pressed_piece = entity;
@@ -1044,7 +1044,7 @@ void systems::undo(entt::registry& registry, entt::entity board, const renderer:
             for (int i = 0; i < 24; i++) {
                 auto& node = NODE(state.nodes[i]);
 
-                 if (node.piece != entt::null && registry.valid(node.piece)) {
+                if (node.piece != entt::null) {
                     auto& piece = PIECE(node.piece);
 
                     for (int j = 0; j < 18; j++) {
@@ -1052,23 +1052,19 @@ void systems::undo(entt::registry& registry, entt::entity board, const renderer:
                             piece = taken_piece.pieces[j];  // Replace pieces
                         }
                     }
-                 }
+                }
 
                 node = taken_piece.nodes[i];  // Replace nodes
             }
 
             state = taken_piece.state;  // Replace state
 
-            Piece type = taken_piece.removed_piece.type;
-            const glm::vec3& position = taken_piece.transform.position;
+            auto& piece = PIECE(taken_piece.removed_piece_entity);
+            auto& transform = registry.get<TransformComponent>(taken_piece.removed_piece_entity);
 
-            entt::entity new_piece = GameLayer::build_piece(registry, storage, type, assets, position);
-
-            auto& piece = PIECE(new_piece);
-            auto& node = NODE(taken_piece.node);
-
-            piece = taken_piece.removed_piece;  // Set piece
-            node.piece = new_piece;  // Reset this
+            piece = taken_piece.removed_piece;
+            transform = taken_piece.transform;
+            registry.remove<InactiveTag>(taken_piece.removed_piece_entity);
 
             break;
         }
@@ -1092,14 +1088,21 @@ void undo::remember_place(entt::registry& registry, entt::entity board) {
     }
 
     int pieces = 0;
-    auto view = registry.view<PieceComponent, TransformComponent>();
+    auto view = registry.view<PieceComponent, TransformComponent, MoveComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
-        auto [piece, transform] = view.get(entity);
+        auto [piece, transform, move] = view.get(entity);
 
         assert(pieces < 18);
         placed_piece.pieces[pieces] = piece;
-        placed_piece.transforms[pieces] = transform;
+
+        if (move.should_move) {
+            placed_piece.transforms[pieces] = transform;
+            placed_piece.transforms[pieces].position = move.target;
+        } else {
+            placed_piece.transforms[pieces] = transform;
+        }
+
         pieces++;
     }
 
@@ -1126,15 +1129,22 @@ void undo::remember_move(entt::registry& registry, entt::entity board) {
     }
 
     int pieces = 0;
-    auto view = registry.view<PieceComponent, TransformComponent>();
+    auto view = registry.view<PieceComponent, TransformComponent, MoveComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
-        auto [piece, transform] = view.get(entity);
+        auto [piece, transform, move] = view.get(entity);
 
         assert(pieces < 18);
         moved_piece.pieces[pieces] = piece;
         moved_piece.pieces[pieces].selected = false;  // Reset this
-        moved_piece.transforms[pieces] = transform;
+
+        if (move.should_move) {
+            moved_piece.transforms[pieces] = transform;
+            moved_piece.transforms[pieces].position = move.target;
+        } else {
+            moved_piece.transforms[pieces] = transform;
+        }
+
         pieces++;
     }
 
@@ -1143,8 +1153,7 @@ void undo::remember_move(entt::registry& registry, entt::entity board) {
     history.moves++;
 }
 
-void undo::remember_take(entt::registry& registry, entt::entity board, entt::entity removed_piece,
-                         entt::entity node) {
+void undo::remember_take(entt::registry& registry, entt::entity board, entt::entity removed_piece) {
     SPDLOG_DEBUG("Remember take");
 
     auto& state = STATE(board);
@@ -1161,7 +1170,7 @@ void undo::remember_take(entt::registry& registry, entt::entity board, entt::ent
     }
 
     int pieces = 0;
-    auto view = registry.view<PieceComponent, TransformComponent>();
+    auto view = registry.view<PieceComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
         auto& piece = view.get<PieceComponent>(entity);
@@ -1171,9 +1180,9 @@ void undo::remember_take(entt::registry& registry, entt::entity board, entt::ent
         pieces++;
     }
 
+    taken_piece.removed_piece_entity = removed_piece;
     taken_piece.removed_piece = PIECE(removed_piece);
     taken_piece.transform = registry.get<TransformComponent>(removed_piece);
-    taken_piece.node = node;
 
     history.taken_pieces[history.moves] = taken_piece;
 

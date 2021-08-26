@@ -54,10 +54,6 @@ public:
     void build_origin();
     void build_node(int index, const model::Mesh& mesh, const glm::vec3& position);
 
-    static entt::entity build_piece(entt::registry& registry, const renderer::Storage* storage,
-                                    Piece type, std::shared_ptr<Assets> assets,
-                                    const glm::vec3& position);
-
     float mouse_wheel = 0.0f;
     float dx = 0.0f;
     float dy = 0.0f;

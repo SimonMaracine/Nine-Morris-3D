@@ -65,7 +65,7 @@ void GameLayer::on_draw() {
     glm::mat4 light_space_matrix = projection * view;
     storage->shadow_shader->bind();
     storage->shadow_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
-    
+
     storage->depth_map_framebuffer->bind();
 
     renderer::set_viewport(2048, 2048);
@@ -139,7 +139,7 @@ bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 
 bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
     systems::press(registry, board, hovered_entity);
-    
+
     return false;
 }
 
@@ -238,7 +238,7 @@ void GameLayer::restart() {
         build_piece(i, Piece::White, std::get<1>(assets->meshes), white_piece_diffuse,
                     glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
     }
-    
+
     for (int i = 9; i < 18; i++) {
         build_piece(i, Piece::Black, std::get<2>(assets->meshes), black_piece_diffuse,
                     glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
@@ -313,7 +313,7 @@ void GameLayer::build_board(const model::Mesh& mesh) {
 
     auto& transform = registry.emplace<TransformComponent>(board);
     transform.scale = 20.0f;
-    
+
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(board, storage->board_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(board, board_diffuse_texture);
@@ -364,7 +364,7 @@ void GameLayer::build_piece(int id, Piece type, const model::Mesh& mesh,
     entt::entity piece = registry.create();
 
     std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_array(mesh, piece);
-    
+
     auto& transform = registry.emplace<TransformComponent>(piece);
     transform.position = position;
     transform.scale = 20.0f;
@@ -398,7 +398,7 @@ void GameLayer::build_origin() {
     entt::entity origin = registry.create();
     registry.emplace<OriginComponent>(origin, storage->origin_shader);
 
-    SPDLOG_DEBUG("Built origin entity {}", origin);   
+    SPDLOG_DEBUG("Built origin entity {}", origin);
 }
 
 void GameLayer::build_node(int index, const model::Mesh& mesh, const glm::vec3& position) {
@@ -440,41 +440,4 @@ void GameLayer::build_node(int index, const model::Mesh& mesh, const glm::vec3& 
     registry.emplace<NodeComponent>(node, index);
 
     SPDLOG_DEBUG("Built node entity {}", node);
-}
-
-entt::entity GameLayer::build_piece(entt::registry& registry, const renderer::Storage* storage,
-                                    Piece type, std::shared_ptr<Assets> assets, const glm::vec3& position) {
-    entt::entity piece = registry.create();
-
-    if (type == Piece::White) {
-        const model::Mesh& mesh = std::get<1>(assets->meshes);
-        std::shared_ptr<Texture> texture = Texture::create(assets->white_piece_diffuse_data);
-        std::shared_ptr<VertexArray> vertex_array = nullptr;
-
-        vertex_array = create_entity_vertex_array(mesh, piece);
-        registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
-        registry.emplace<TextureComponent>(piece, texture);
-    } else {
-        const model::Mesh& mesh = std::get<2>(assets->meshes);
-        std::shared_ptr<Texture> texture = Texture::create(assets->black_piece_diffuse_data);
-        std::shared_ptr<VertexArray> vertex_array = nullptr;
-
-        vertex_array = create_entity_vertex_array(mesh, piece);
-        registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
-        registry.emplace<TextureComponent>(piece, texture);
-    }
-
-    auto& transform = registry.emplace<TransformComponent>(piece);
-    transform.position = position;
-    transform.scale = 20.0f;
-
-    registry.emplace<MaterialComponent>(piece, storage->piece_shader, glm::vec3(0.25f), 8.0f);
-    registry.emplace<OutlineComponent>(piece, storage->outline_shader, glm::vec3(1.0f, 0.0f, 0.0f));
-    registry.emplace<ShadowComponent>(piece, storage->shadow_shader);
-    registry.emplace<PieceComponent>(piece);
-    registry.emplace<MoveComponent>(piece);
-
-    SPDLOG_DEBUG("Built piece entity {}", piece);
-
-    return piece;
 }
