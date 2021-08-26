@@ -785,7 +785,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::Black) ||
                             number_of_pieces_in_windmills(registry, board, Piece::Black) ==
                             state.black_pieces_count) {
-                        undo::remember_take(registry, board);
+                        undo::remember_take(registry, board, node.piece, entity);
 
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
@@ -818,7 +818,7 @@ void systems::take_piece(entt::registry& registry, entt::entity board, entt::ent
                     if (!is_windmill_made(registry, board, entity, Piece::White) ||
                             number_of_pieces_in_windmills(registry, board, Piece::White) ==
                             state.white_pieces_count) {
-                        undo::remember_take(registry, board);
+                        undo::remember_take(registry, board, node.piece, entity);
 
                         take_raise_piece(registry, node.piece);
                         node.piece = entt::null;
@@ -949,7 +949,7 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
 
                 break;
             }
-        }        
+        }
     }
 }
 
@@ -1000,13 +1000,13 @@ void systems::undo(entt::registry& registry, entt::entity board, const renderer:
 
                     for (int j = 0; j < 18; j++) {
                         if (placed_piece.pieces[j].id == piece.id) {
-                            piece = placed_piece.pieces[j];  // Replace piece
-                            transform = placed_piece.transforms[j];  // Replace transform
+                            piece = placed_piece.pieces[j];  // Replace pieces
+                            transform = placed_piece.transforms[j];  // Replace transforms
                         }
                     }
                 }
 
-                node = placed_piece.nodes[i];  // Replace node
+                node = placed_piece.nodes[i];  // Replace nodes
             }
 
             state = placed_piece.state;  // Replace state
@@ -1025,13 +1025,13 @@ void systems::undo(entt::registry& registry, entt::entity board, const renderer:
 
                     for (int j = 0; j < 18; j++) {
                         if (moved_piece.pieces[j].id == piece.id) {
-                            piece = moved_piece.pieces[j];  // Replace piece
-                            transform = moved_piece.transforms[j];  // Replace transform
+                            piece = moved_piece.pieces[j];  // Replace pieces
+                            transform = moved_piece.transforms[j];  // Replace transforms
                         }
                     }
                 }
 
-                node = moved_piece.nodes[i];  // Replace node
+                node = moved_piece.nodes[i];  // Replace nodes
             }
 
             state = moved_piece.state;  // Replace state
@@ -1041,7 +1041,34 @@ void systems::undo(entt::registry& registry, entt::entity board, const renderer:
         case undo::MoveType::Take: {
             undo::TakenPiece taken_piece = undo::undo_take(registry, board);
 
-            assert(false);
+            for (int i = 0; i < 24; i++) {
+                auto& node = NODE(state.nodes[i]);
+
+                 if (node.piece != entt::null && registry.valid(node.piece)) {
+                    auto& piece = PIECE(node.piece);
+
+                    for (int j = 0; j < 18; j++) {
+                        if (taken_piece.pieces[j].id == piece.id) {
+                            piece = taken_piece.pieces[j];  // Replace pieces
+                        }
+                    }
+                 }
+
+                node = taken_piece.nodes[i];  // Replace nodes
+            }
+
+            state = taken_piece.state;  // Replace state
+
+            Piece type = taken_piece.removed_piece.type;
+            const glm::vec3& position = taken_piece.transform.position;
+
+            entt::entity new_piece = GameLayer::build_piece(registry, storage, type, assets, position);
+
+            auto& piece = PIECE(new_piece);
+            auto& node = NODE(taken_piece.node);
+
+            piece = taken_piece.removed_piece;  // Set piece
+            node.piece = new_piece;  // Reset this
 
             break;
         }
@@ -1116,12 +1143,13 @@ void undo::remember_move(entt::registry& registry, entt::entity board) {
     history.moves++;
 }
 
-void undo::remember_take(entt::registry& registry, entt::entity board) {
+void undo::remember_take(entt::registry& registry, entt::entity board, entt::entity removed_piece,
+                         entt::entity node) {
     SPDLOG_DEBUG("Remember take");
 
     auto& state = STATE(board);
     auto& history = MOVES_HISTORY(board);
-    
+
     TakenPiece taken_piece;
 
     taken_piece.state = state;
@@ -1133,7 +1161,7 @@ void undo::remember_take(entt::registry& registry, entt::entity board) {
     }
 
     int pieces = 0;
-    auto view = registry.view<PieceComponent>();
+    auto view = registry.view<PieceComponent, TransformComponent>();
 
     for (entt::entity entity : view) {
         auto& piece = view.get<PieceComponent>(entity);
@@ -1142,6 +1170,10 @@ void undo::remember_take(entt::registry& registry, entt::entity board) {
         taken_piece.pieces[pieces] = piece;
         pieces++;
     }
+
+    taken_piece.removed_piece = PIECE(removed_piece);
+    taken_piece.transform = registry.get<TransformComponent>(removed_piece);
+    taken_piece.node = node;
 
     history.taken_pieces[history.moves] = taken_piece;
 

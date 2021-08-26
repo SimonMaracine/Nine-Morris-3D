@@ -372,8 +372,7 @@ void GameLayer::build_piece(int id, Piece type, const model::Mesh& mesh,
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
     registry.emplace<MaterialComponent>(piece, storage->piece_shader, glm::vec3(0.25f), 8.0f);
     registry.emplace<TextureComponent>(piece, diffuse_texture);
-    registry.emplace<OutlineComponent>(piece, storage->outline_shader,
-                                       glm::vec3(1.0f, 0.0f, 0.0f));
+    registry.emplace<OutlineComponent>(piece, storage->outline_shader, glm::vec3(1.0f, 0.0f, 0.0f));
     registry.emplace<ShadowComponent>(piece, storage->shadow_shader);
 
     registry.emplace<PieceComponent>(piece, id, type);
@@ -443,40 +442,39 @@ void GameLayer::build_node(int index, const model::Mesh& mesh, const glm::vec3& 
     SPDLOG_DEBUG("Built node entity {}", node);
 }
 
-// entt::entity GameLayer::build_piece(entt::registry& registry, const renderer::Storage* storage,
-//                                     Piece type, std::shared_ptr<Assets> assets, const glm::vec3& position) {
-//     entt::entity piece = registry.create();
+entt::entity GameLayer::build_piece(entt::registry& registry, const renderer::Storage* storage,
+                                    Piece type, std::shared_ptr<Assets> assets, const glm::vec3& position) {
+    entt::entity piece = registry.create();
 
-//     if (type == Piece::White) {
-//         const model::Mesh& mesh = std::get<1>(assets->meshes);
-//         std::shared_ptr<Texture> texture = Texture::create(assets->white_piece_diffuse_data);
-//         std::shared_ptr<VertexArray> vertex_array = nullptr;
+    if (type == Piece::White) {
+        const model::Mesh& mesh = std::get<1>(assets->meshes);
+        std::shared_ptr<Texture> texture = Texture::create(assets->white_piece_diffuse_data);
+        std::shared_ptr<VertexArray> vertex_array = nullptr;
 
-//         vertex_array = create_entity_vertex_array(mesh, piece);
-//         registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
-//         registry.emplace<TextureComponent>(piece, texture);
-//     } else {
-//         const model::Mesh& mesh = std::get<2>(assets->meshes);
-//         std::shared_ptr<Texture> texture = Texture::create(assets->black_piece_diffuse_data);
-//         std::shared_ptr<VertexArray> vertex_array = nullptr;
+        vertex_array = create_entity_vertex_array(mesh, piece);
+        registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
+        registry.emplace<TextureComponent>(piece, texture);
+    } else {
+        const model::Mesh& mesh = std::get<2>(assets->meshes);
+        std::shared_ptr<Texture> texture = Texture::create(assets->black_piece_diffuse_data);
+        std::shared_ptr<VertexArray> vertex_array = nullptr;
 
-//         vertex_array = create_entity_vertex_array(mesh, piece);
-//         registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
-//         registry.emplace<TextureComponent>(piece, texture);
-//     }
+        vertex_array = create_entity_vertex_array(mesh, piece);
+        registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
+        registry.emplace<TextureComponent>(piece, texture);
+    }
 
-//     auto& transform = registry.emplace<TransformComponent>(piece);
-//     transform.position = position;
-//     transform.scale = 20.0f;
+    auto& transform = registry.emplace<TransformComponent>(piece);
+    transform.position = position;
+    transform.scale = 20.0f;
 
-//     registry.emplace<MaterialComponent>(piece, storage->piece_shader, glm::vec3(0.25f), 8.0f);
-//     registry.emplace<OutlineComponent>(piece, storage->outline_shader,
-//                                        glm::vec3(1.0f, 0.0f, 0.0f));
-//     registry.emplace<ShadowComponent>(piece, storage->shadow_shader);
-//     registry.emplace<PieceComponent>(piece, type);
-//     registry.emplace<MoveComponent>(piece);
+    registry.emplace<MaterialComponent>(piece, storage->piece_shader, glm::vec3(0.25f), 8.0f);
+    registry.emplace<OutlineComponent>(piece, storage->outline_shader, glm::vec3(1.0f, 0.0f, 0.0f));
+    registry.emplace<ShadowComponent>(piece, storage->shadow_shader);
+    registry.emplace<PieceComponent>(piece);
+    registry.emplace<MoveComponent>(piece);
 
-//     SPDLOG_DEBUG("Built piece entity {}", piece);
+    SPDLOG_DEBUG("Built piece entity {}", piece);
 
-//     return piece;
-// }
+    return piece;
+}

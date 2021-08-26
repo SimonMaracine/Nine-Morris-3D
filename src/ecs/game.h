@@ -161,6 +161,9 @@ namespace undo {
         GameStateComponent state;
         NodeComponent nodes[24];
         PieceComponent pieces[18];  // Some of these will remain uninitialized
+        PieceComponent removed_piece;
+        TransformComponent transform;
+        entt::entity node;
     };
 
     enum class MoveType {
@@ -169,7 +172,8 @@ namespace undo {
 
     void remember_place(entt::registry& registry, entt::entity board);
     void remember_move(entt::registry& registry, entt::entity board);
-    void remember_take(entt::registry& registry, entt::entity board);
+    void remember_take(entt::registry& registry, entt::entity board,
+                       entt::entity removed_piece, entt::entity node);
 
     MoveType get_undo_type(entt::registry& registry, entt::entity board);
 
