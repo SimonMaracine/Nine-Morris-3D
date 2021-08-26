@@ -4,7 +4,8 @@
 #include <GLFW/glfw3.h>
 
 #include "application/window.h"
-#include "application/application.h"
+#include "application/application_data.h"
+#include "application/events.h"
 #include "other/logging.h"
 
 Window::Window(int width, int height, ApplicationData* data) {

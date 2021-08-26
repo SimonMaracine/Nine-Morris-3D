@@ -1,7 +1,8 @@
 #pragma once
 
+#include "application/application_data.h"
+
 struct GLFWwindow;
-struct ApplicationData;
 
 class Window {
 public:

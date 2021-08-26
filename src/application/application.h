@@ -1,11 +1,11 @@
 #pragma once
 
 #include <memory>
-#include <functional>
 #include <vector>
 
 #include <entt/entt.hpp>
 
+#include "application/application_data.h"
 #include "application/events.h"
 #include "application/window.h"
 #include "opengl/renderer/shader.h"
@@ -22,11 +22,6 @@ constexpr int VERSION_MINOR = 1;
 constexpr int VERSION_PATCH = 0;
 
 class Layer;
-
-struct ApplicationData {
-    int width, height;
-    std::function<void(events::Event&)> event_function;
-};
 
 class Application {
 public:

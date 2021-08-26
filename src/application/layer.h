@@ -1,9 +1,9 @@
 #pragma once
 
-#include <cassert>
-
-#include "application/application.h"
 #include "application/events.h"
+#include "application/application.h"
+
+class Application;
 
 class Layer {
 public:

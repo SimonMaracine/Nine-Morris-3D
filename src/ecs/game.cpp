@@ -679,7 +679,7 @@ static void undo_repetition_history(entt::registry& registry, entt::entity board
 
 void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo) {
     auto& state = STATE(board);
-    // auto& moves_history = MOVES_HISTORY(board);
+    // auto& moves_history = MOVES_HISTORY(board);  // TODO Remove
 
     auto view = registry.view<TransformComponent, NodeComponent>();
 
@@ -996,10 +996,12 @@ void systems::undo(entt::registry& registry, entt::entity board, const renderer:
 
                 if (node.piece != entt::null) {
                     auto& piece = PIECE(node.piece);
+                    auto& transform = registry.get<TransformComponent>(node.piece);
 
                     for (int j = 0; j < 18; j++) {
                         if (placed_piece.pieces[j].id == piece.id) {
                             piece = placed_piece.pieces[j];  // Replace piece
+                            transform = placed_piece.transforms[j];  // Replace transform
                         }
                     }
                 }
@@ -1019,10 +1021,12 @@ void systems::undo(entt::registry& registry, entt::entity board, const renderer:
 
                 if (node.piece != entt::null) {
                     auto& piece = PIECE(node.piece);
+                    auto& transform = registry.get<TransformComponent>(node.piece);
 
                     for (int j = 0; j < 18; j++) {
                         if (moved_piece.pieces[j].id == piece.id) {
                             piece = moved_piece.pieces[j];  // Replace piece
+                            transform = moved_piece.transforms[j];  // Replace transform
                         }
                     }
                 }
@@ -1061,13 +1065,14 @@ void undo::remember_place(entt::registry& registry, entt::entity board) {
     }
 
     int pieces = 0;
-    auto view = registry.view<PieceComponent>();
+    auto view = registry.view<PieceComponent, TransformComponent>();
 
     for (entt::entity entity : view) {
-        auto& piece = view.get<PieceComponent>(entity);
+        auto [piece, transform] = view.get(entity);
 
         assert(pieces < 18);
         placed_piece.pieces[pieces] = piece;
+        placed_piece.transforms[pieces] = transform;
         pieces++;
     }
 
@@ -1081,10 +1086,11 @@ void undo::remember_move(entt::registry& registry, entt::entity board) {
 
     auto& state = STATE(board);
     auto& history = MOVES_HISTORY(board);
-    
+
     MovedPiece moved_piece;
 
     moved_piece.state = state;
+    moved_piece.state.selected_piece = entt::null;  // Reset this
 
     for (int i = 0; i < 24; i++) {
         auto& node = NODE(state.nodes[i]);
@@ -1093,13 +1099,15 @@ void undo::remember_move(entt::registry& registry, entt::entity board) {
     }
 
     int pieces = 0;
-    auto view = registry.view<PieceComponent>();
+    auto view = registry.view<PieceComponent, TransformComponent>();
 
     for (entt::entity entity : view) {
-        auto& piece = view.get<PieceComponent>(entity);
+        auto [piece, transform] = view.get(entity);
 
         assert(pieces < 18);
         moved_piece.pieces[pieces] = piece;
+        moved_piece.pieces[pieces].selected = false;  // Reset this
+        moved_piece.transforms[pieces] = transform;
         pieces++;
     }
 

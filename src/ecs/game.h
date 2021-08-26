@@ -6,6 +6,7 @@
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
+#include "ecs/components.h"
 #include "opengl/renderer/renderer.h"
 #include "other/loader.h"
 
@@ -13,10 +14,6 @@
 #define NODE(entity) registry.get<NodeComponent>(entity)
 #define STATE(entity) registry.get<GameStateComponent>(entity)
 #define MOVES_HISTORY(entity) registry.get<MovesHistoryComponent>(entity)
-
-namespace undo {
-    struct MovesHistory;
-}
 
 constexpr float PIECE_Y_POSITION = 0.135f;
 constexpr float NODE_Y_POSITION = 0.062f;
@@ -150,12 +147,14 @@ namespace undo {
         GameStateComponent state;
         NodeComponent nodes[24];
         PieceComponent pieces[18];  // Some of these will remain uninitialized
+        TransformComponent transforms[18];
     };
 
     struct MovedPiece {    
         GameStateComponent state;
         NodeComponent nodes[24];
         PieceComponent pieces[18];  // Some of these will remain uninitialized
+        TransformComponent transforms[18];
     };
 
     struct TakenPiece {
