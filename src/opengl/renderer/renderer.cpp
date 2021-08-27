@@ -136,7 +136,7 @@ namespace renderer {
             layout.add(1, BufferLayout::Type::Float, 2);
             storage->light_vertex_array = VertexArray::create();
             storage->light_vertex_array->add_buffer(storage->light_vertex_buffer, layout);
-            storage->light_texture = Texture::create("data/textures/light.png");
+            storage->light_texture = Texture::create("data/textures/light.png", false);
         }
 
         {
@@ -156,7 +156,7 @@ namespace renderer {
             layout.add(1, BufferLayout::Type::Float, 2);
             storage->loading_vertex_array = VertexArray::create();
             storage->loading_vertex_array->add_buffer(storage->loading_vertex_buffer, layout);
-            storage->loading_texture = Texture::create("data/textures/loading.png");
+            storage->loading_texture = Texture::create("data/textures/loading.png", false);
         }
 
         return storage;
@@ -239,9 +239,9 @@ namespace renderer {
     void draw_board(const glm::vec3& position,
                     const glm::vec3& rotation,
                     float scale,
-                    std::shared_ptr<Shader> shader,
-                    std::shared_ptr<VertexArray> array,
-                    std::shared_ptr<Texture> diffuse_map,
+                    Rc<Shader> shader,
+                    Rc<VertexArray> array,
+                    Rc<Texture> diffuse_map,
                     const glm::vec3& specular_color,
                     float shininess,
                     GLuint index_count) {
@@ -267,9 +267,9 @@ namespace renderer {
     void draw_piece(const glm::vec3& position,
                     const glm::vec3& rotation,
                     float scale,
-                    std::shared_ptr<Shader> shader,
-                    std::shared_ptr<VertexArray> array,
-                    std::shared_ptr<Texture> diffuse_map,
+                    Rc<Shader> shader,
+                    Rc<VertexArray> array,
+                    Rc<Texture> diffuse_map,
                     const glm::vec3& specular_color,
                     float shininess,
                     GLuint index_count,
@@ -297,9 +297,9 @@ namespace renderer {
     void draw_piece_outline(const glm::vec3& position,
                             const glm::vec3& rotation,
                             float scale,
-                            std::shared_ptr<Shader> shader,
-                            std::shared_ptr<VertexArray> array,
-                            std::shared_ptr<Texture> diffuse_map,
+                            Rc<Shader> shader,
+                            Rc<VertexArray> array,
+                            Rc<Texture> diffuse_map,
                             const glm::vec3& specular_color,
                             float shininess,
                             GLuint index_count,
@@ -354,8 +354,8 @@ namespace renderer {
     }
 
     void draw_cube_map(const glm::mat4& view_projection_matrix,
-                       std::shared_ptr<Shader> shader, std::shared_ptr<VertexArray> array,
-                       std::shared_ptr<Texture3D> texture) {
+                       Rc<Shader> shader, Rc<VertexArray> array,
+                       Rc<Texture3D> texture) {
         glDepthMask(GL_FALSE);
 
         shader->bind();
@@ -371,8 +371,8 @@ namespace renderer {
 
     void draw_node(const glm::vec3& position,
                    float scale,
-                   std::shared_ptr<Shader> shader,
-                   std::shared_ptr<VertexArray> array,
+                   Rc<Shader> shader,
+                   Rc<VertexArray> array,
                    const glm::vec4& color,
                    GLuint index_count) {
         glCullFace(GL_FRONT);
@@ -394,8 +394,8 @@ namespace renderer {
     void draw_to_depth(const glm::vec3& position,
                        const glm::vec3& rotation,
                        float scale,
-                       std::shared_ptr<Shader> shader,
-                       std::shared_ptr<VertexArray> array,
+                       Rc<Shader> shader,
+                       Rc<VertexArray> array,
                        GLuint index_count) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);

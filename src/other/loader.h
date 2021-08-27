@@ -14,10 +14,10 @@ using namespace model;
 struct Assets {
     std::tuple<Mesh, Mesh, Mesh, Mesh> meshes;
 
-    std::shared_ptr<TextureData> board_diffuse_texture_data = nullptr;
-    std::shared_ptr<TextureData> white_piece_diffuse_data = nullptr;
-    std::shared_ptr<TextureData> black_piece_diffuse_data = nullptr;
-    std::array<std::shared_ptr<TextureData>, 6> skybox_textures_data;
+    Rc<TextureData> board_diffuse_texture_data = nullptr;
+    Rc<TextureData> white_piece_diffuse_data = nullptr;
+    Rc<TextureData> black_piece_diffuse_data = nullptr;
+    std::array<Rc<TextureData>, 6> skybox_textures_data;
 };
 
 class Loader {

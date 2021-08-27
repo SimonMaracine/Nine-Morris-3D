@@ -882,7 +882,6 @@ void systems::put_piece(entt::registry& registry, entt::entity board, entt::enti
 
                     state.turns_without_mills = 0;
 
-                    // TODO Maybe remember position here too
                 } else {
                     switch_turn(registry, board);
                     update_outlines(registry, board);

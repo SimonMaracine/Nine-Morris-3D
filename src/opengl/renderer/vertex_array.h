@@ -18,8 +18,7 @@ public:
     void bind() const;
     static void unbind();
 
-    void add_buffer(std::shared_ptr<Buffer> buffer,
-                    const BufferLayout& layout);
+    void add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout);
     void hold_index_buffer(std::shared_ptr<Buffer> index_buffer);
 private:
     GLuint array;
@@ -27,3 +26,6 @@ private:
     // This just to hold a strong reference to the buffers
     std::vector<std::shared_ptr<Buffer>> buffers;
 };
+
+template<typename T>
+using Rc = std::shared_ptr<T>;

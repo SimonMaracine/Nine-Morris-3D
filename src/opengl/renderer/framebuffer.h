@@ -52,3 +52,6 @@ private:
 
     Specification specification;
 };
+
+template<typename T>
+using Rc = std::shared_ptr<T>;

@@ -23,8 +23,8 @@ public:
     Texture(GLuint texture);
     ~Texture();
 
-    static std::shared_ptr<Texture> create(const std::string& file_path);
-	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data);
+    static std::shared_ptr<Texture> create(const std::string& file_path, bool mipmapping, float bias = 0.0f);
+	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, bool mipmapping, float bias = 0.0f);
 
     void bind(GLenum slot) const;
     static void unbind();
@@ -45,6 +45,9 @@ public:
 private:
     GLuint texture;
 };
+
+template<typename T>
+using Rc = std::shared_ptr<T>;
 
 constexpr float cube_map_points[] = {
     -5.0f,  5.0f, -5.0f,

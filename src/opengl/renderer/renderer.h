@@ -19,35 +19,35 @@ namespace renderer {
     };
 
     struct Storage {
-        std::shared_ptr<Buffer> uniform_buffer = nullptr;
+        Rc<Buffer> uniform_buffer = nullptr;
 
-        std::shared_ptr<Shader> board_shader = nullptr;
-        std::shared_ptr<Shader> piece_shader = nullptr;
-        std::shared_ptr<Shader> shadow_shader = nullptr;
-        std::shared_ptr<Framebuffer> framebuffer = nullptr;
-        std::shared_ptr<Framebuffer> depth_map_framebuffer = nullptr;
+        Rc<Shader> board_shader = nullptr;
+        Rc<Shader> piece_shader = nullptr;
+        Rc<Shader> shadow_shader = nullptr;
+        Rc<Framebuffer> framebuffer = nullptr;
+        Rc<Framebuffer> depth_map_framebuffer = nullptr;
 
-        std::shared_ptr<Shader> quad_shader = nullptr;
-        std::shared_ptr<VertexArray> quad_vertex_array = nullptr;
-        std::shared_ptr<Buffer> quad_vertex_buffer = nullptr;
+        Rc<Shader> quad_shader = nullptr;
+        Rc<VertexArray> quad_vertex_array = nullptr;
+        Rc<Buffer> quad_vertex_buffer = nullptr;
 
-        std::shared_ptr<Shader> outline_shader = nullptr;
-        std::shared_ptr<Shader> node_shader = nullptr;
-        std::shared_ptr<Shader> skybox_shader = nullptr;
+        Rc<Shader> outline_shader = nullptr;
+        Rc<Shader> node_shader = nullptr;
+        Rc<Shader> skybox_shader = nullptr;
 
-        std::shared_ptr<Shader> origin_shader = nullptr;
-        std::shared_ptr<VertexArray> origin_vertex_array = nullptr;
-        std::shared_ptr<Buffer> origin_vertex_buffer = nullptr;
+        Rc<Shader> origin_shader = nullptr;
+        Rc<VertexArray> origin_vertex_array = nullptr;
+        Rc<Buffer> origin_vertex_buffer = nullptr;
 
-        std::shared_ptr<Shader> light_shader = nullptr;
-        std::shared_ptr<VertexArray> light_vertex_array = nullptr;
-        std::shared_ptr<Buffer> light_vertex_buffer = nullptr;
-        std::shared_ptr<Texture> light_texture = nullptr;
+        Rc<Shader> light_shader = nullptr;
+        Rc<VertexArray> light_vertex_array = nullptr;
+        Rc<Buffer> light_vertex_buffer = nullptr;
+        Rc<Texture> light_texture = nullptr;
 
-        std::shared_ptr<Shader> loading_shader = nullptr;
-        std::shared_ptr<VertexArray> loading_vertex_array = nullptr;
-        std::shared_ptr<Buffer> loading_vertex_buffer = nullptr;
-        std::shared_ptr<Texture> loading_texture = nullptr;
+        Rc<Shader> loading_shader = nullptr;
+        Rc<VertexArray> loading_vertex_array = nullptr;
+        Rc<Buffer> loading_vertex_buffer = nullptr;
+        Rc<Texture> loading_texture = nullptr;
     };
 
     const Storage* init();
@@ -66,9 +66,9 @@ namespace renderer {
     void draw_board(const glm::vec3& position,
                     const glm::vec3& rotation,
                     float scale,
-                    std::shared_ptr<Shader> shader,
-                    std::shared_ptr<VertexArray> array,
-                    std::shared_ptr<Texture> diffuse_map,
+                    Rc<Shader> shader,
+                    Rc<VertexArray> array,
+                    Rc<Texture> diffuse_map,
                     const glm::vec3& specular_color,
                     float shininess,
                     GLuint index_count);
@@ -76,9 +76,9 @@ namespace renderer {
     void draw_piece(const glm::vec3& position,
                     const glm::vec3& rotation,
                     float scale,
-                    std::shared_ptr<Shader> shader,
-                    std::shared_ptr<VertexArray> array,
-                    std::shared_ptr<Texture> diffuse_map,
+                    Rc<Shader> shader,
+                    Rc<VertexArray> array,
+                    Rc<Texture> diffuse_map,
                     const glm::vec3& specular_color,
                     float shininess,
                     GLuint index_count,
@@ -87,29 +87,29 @@ namespace renderer {
     void draw_piece_outline(const glm::vec3& position,
                             const glm::vec3& rotation,
                             float scale,
-                            std::shared_ptr<Shader> shader,
-                            std::shared_ptr<VertexArray> array,
-                            std::shared_ptr<Texture> diffuse_map,
+                            Rc<Shader> shader,
+                            Rc<VertexArray> array,
+                            Rc<Texture> diffuse_map,
                             const glm::vec3& specular_color,
                             float shininess,
                             GLuint index_count,
                             const glm::vec3& outline_color);
 
     void draw_cube_map(const glm::mat4& view_projection_matrix,
-                       std::shared_ptr<Shader> shader, std::shared_ptr<VertexArray> array,
-                       std::shared_ptr<Texture3D> texture);
+                       Rc<Shader> shader, Rc<VertexArray> array,
+                       Rc<Texture3D> texture);
 
     void draw_node(const glm::vec3& position,
                    float scale,
-                   std::shared_ptr<Shader> shader,
-                   std::shared_ptr<VertexArray> array,
+                   Rc<Shader> shader,
+                   Rc<VertexArray> array,
                    const glm::vec4& color,
                    GLuint index_count);
 
     void draw_to_depth(const glm::vec3& position,
                        const glm::vec3& rotation,
                        float scale,
-                       std::shared_ptr<Shader> shader,
-                       std::shared_ptr<VertexArray> array,
+                       Rc<Shader> shader,
+                       Rc<VertexArray> array,
                        GLuint index_count);
 }

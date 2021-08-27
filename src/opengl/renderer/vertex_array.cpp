@@ -34,8 +34,7 @@ void VertexArray::unbind() {
     glBindVertexArray(0);
 }
 
-void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer,
-                             const BufferLayout& layout) {
+void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout) {
     glBindVertexArray(array);  // TODO be careful with these
     glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
 

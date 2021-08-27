@@ -36,7 +36,7 @@ Texture::~Texture() {
     SPDLOG_DEBUG("Deleted texture {}", texture);
 }
 
-std::shared_ptr<Texture> Texture::create(const std::string& file_path) {
+std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipmapping, float bias) {
     SPDLOG_DEBUG("Loading texture '{}'...", file_path.c_str());
 
     stbi_set_flip_vertically_on_load(1);
@@ -53,22 +53,30 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    if (mipmapping)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    else
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     if (channels == 3) {
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, width, height);
+        glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGB8, width, height);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB,
                         GL_UNSIGNED_BYTE, data);
     } else if (channels == 4) {
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+        glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA,
                         GL_UNSIGNED_BYTE, data);
     } else {
         spdlog::critical("Texture has {} channels", channels);
         std::exit(1);
+    }
+
+    if (mipmapping) {
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
     }
 
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -78,12 +86,15 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path) {
     return std::make_shared<Texture>(texture);
 }
 
-std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data) {
+std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool mipmapping, float bias) {
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    if (mipmapping)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    else
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -91,16 +102,21 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data) {
     assert(data->data != nullptr);
 
     if (data->channels == 3) {
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, data->width, data->height);
+        glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGB8, data->width, data->height);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGB,
                         GL_UNSIGNED_BYTE, data->data);
     } else if (data->channels == 4) {
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, data->width, data->height);
+        glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, data->width, data->height);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA,
                         GL_UNSIGNED_BYTE, data->data);
     } else {
         spdlog::critical("Texture has {} channels", data->channels);
         std::exit(1);
+    }
+
+    if (mipmapping) {
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
     }
 
     glBindTexture(GL_TEXTURE_2D, 0);

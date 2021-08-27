@@ -25,6 +25,7 @@ constexpr GLenum parameters[] = {
     GL_MAX_VERTEX_ATTRIBS,
     GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
     GL_MAX_VERTEX_UNIFORM_COMPONENTS,
+    GL_MAX_TEXTURE_LOD_BIAS,
     GL_MAX_VIEWPORT_DIMS,
     GL_STEREO
 };
@@ -40,8 +41,9 @@ const char* names[] = {
     "GL_MAX_VERTEX_ATTRIBS",
     "GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS",
     "GL_MAX_VERTEX_UNIFORM_COMPONENTS",
+    "GL_MAX_TEXTURE_LOD_BIAS",
     "GL_MAX_VIEWPORT_DIMS",
-    "GL_STEREO"
+    "GL_STEREO",
 };
 
 namespace debug_opengl {
@@ -75,7 +77,9 @@ namespace debug_opengl {
             case GL_DEBUG_SEVERITY_MEDIUM:
                 switch (id) {
                     case 10:
-                    case 7: return;  // Ignore these warnings
+                    case 9:
+                    case 7:
+                        return;  // Ignore these warnings
                 }
                 spdlog::warn("(ID: {}) {}", id, message);
                 break;
@@ -119,7 +123,7 @@ namespace debug_opengl {
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** OpenGL Context Parameters ***\n");
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 11; i++) {
             GLint result;
             glGetIntegerv(parameters[i], &result);
 
@@ -129,18 +133,18 @@ namespace debug_opengl {
         }
         {
             GLint result[2];
-            glGetIntegerv(parameters[10], result);
+            glGetIntegerv(parameters[11], result);
 
             char line[50];
-            sprintf(line, "%s %i %i\n", names[10], result[0], result[1]);
+            sprintf(line, "%s %i %i\n", names[11], result[0], result[1]);
             output.append(line);
         }
         {
             GLboolean result;
-            glGetBooleanv(parameters[11], &result);
+            glGetBooleanv(parameters[12], &result);
 
             char line[50];
-            sprintf(line, "%s %u\n", names[11], (unsigned int) result);
+            sprintf(line, "%s %u\n", names[12], (unsigned int) result);
             output.append(line);
         }
 

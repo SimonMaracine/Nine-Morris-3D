@@ -46,7 +46,7 @@ void Loader::load() {
         "data/textures/skybox/back.jpg"
     };
 
-    std::array<std::shared_ptr<TextureData>, 6> skybox_textures;
+    std::array<Rc<TextureData>, 6> skybox_textures;
     for (int i = 0; i < 6; i++) {
         skybox_textures[i] = std::make_shared<TextureData>(images[i], false);
     }

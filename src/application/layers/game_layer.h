@@ -40,16 +40,14 @@ public:
     void restart();
     void end();
 
-    static std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size,
-                                                     entt::entity entity);
-    static std::shared_ptr<VertexArray> create_entity_vertex_array(model::Mesh mesh,
-                                                                   entt::entity entity);
+    static Rc<Buffer> create_ids_buffer(unsigned int vertices_size, entt::entity entity);
+    static Rc<VertexArray> create_entity_vertex_array(model::Mesh mesh, entt::entity entity);
 
     void build_board(const model::Mesh& mesh);
     void build_camera();
     void build_skybox();
     void build_piece(int id, Piece type, const model::Mesh& mesh,
-                     std::shared_ptr<Texture> diffuse_texture, const glm::vec3& position);
+                     Rc<Texture> diffuse_texture, const glm::vec3& position);
     void build_directional_light();
     void build_origin();
     void build_node(int index, const model::Mesh& mesh, const glm::vec3& position);

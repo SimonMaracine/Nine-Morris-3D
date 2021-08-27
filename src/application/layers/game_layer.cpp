@@ -201,8 +201,8 @@ void GameLayer::start_after_load() {
 
     build_skybox();
 
-    std::shared_ptr<Texture> white_piece_diffuse = Texture::create(assets->white_piece_diffuse_data);
-    std::shared_ptr<Texture> black_piece_diffuse = Texture::create(assets->black_piece_diffuse_data);
+    Rc<Texture> white_piece_diffuse = Texture::create(assets->white_piece_diffuse_data, true, -1.5f);
+    Rc<Texture> black_piece_diffuse = Texture::create(assets->black_piece_diffuse_data, true, -1.5f);
 
     for (int i = 0; i < 9; i++) {
         build_piece(i, Piece::White, std::get<1>(assets->meshes), white_piece_diffuse,
@@ -231,8 +231,8 @@ void GameLayer::restart() {
     build_origin();
     build_skybox();
 
-    std::shared_ptr<Texture> white_piece_diffuse = Texture::create(assets->white_piece_diffuse_data);
-    std::shared_ptr<Texture> black_piece_diffuse = Texture::create(assets->black_piece_diffuse_data);
+    Rc<Texture> white_piece_diffuse = Texture::create(assets->white_piece_diffuse_data, true, -1.5f);
+    Rc<Texture> black_piece_diffuse = Texture::create(assets->black_piece_diffuse_data, true, -1.5f);
 
     for (int i = 0; i < 9; i++) {
         build_piece(i, Piece::White, std::get<1>(assets->meshes), white_piece_diffuse,
@@ -261,25 +261,21 @@ void GameLayer::end() {
     }
 }
 
-std::shared_ptr<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size,
-                                                       entt::entity entity) {
+Rc<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size, entt::entity entity) {
     std::vector<int> array;
     array.resize(vertices_size);
     for (unsigned int i = 0; i < array.size(); i++) {
         array[i] = (int) entt::to_integral(entity);
     }
-    std::shared_ptr<Buffer> buffer =
-        Buffer::create(array.data(), array.size() * sizeof(int));
+    Rc<Buffer> buffer = Buffer::create(array.data(), array.size() * sizeof(int));
 
     return buffer;
 }
 
-std::shared_ptr<VertexArray> GameLayer::create_entity_vertex_array(model::Mesh mesh,
-                                                                     entt::entity entity) {
-    std::shared_ptr<Buffer> vertices =
-        Buffer::create(mesh.vertices.data(), mesh.vertices.size() * sizeof(model::Vertex));
+Rc<VertexArray> GameLayer::create_entity_vertex_array(model::Mesh mesh, entt::entity entity) {
+    Rc<Buffer> vertices = Buffer::create(mesh.vertices.data(), mesh.vertices.size() * sizeof(model::Vertex));
 
-    std::shared_ptr<Buffer> ids = create_ids_buffer(mesh.vertices.size(), entity);
+    Rc<Buffer> ids = create_ids_buffer(mesh.vertices.size(), entity);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
@@ -289,11 +285,9 @@ std::shared_ptr<VertexArray> GameLayer::create_entity_vertex_array(model::Mesh m
     BufferLayout layout2;
     layout2.add(3, BufferLayout::Type::Int, 1);
 
-    std::shared_ptr<Buffer> index_buffer =
-        Buffer::create_index(mesh.indices.data(),
-                                   mesh.indices.size() * sizeof(unsigned int));
+    Rc<Buffer> index_buffer = Buffer::create_index(mesh.indices.data(), mesh.indices.size() * sizeof(unsigned int));
 
-    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    Rc<VertexArray> vertex_array = VertexArray::create();
     index_buffer->bind();
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_buffer(ids, layout2);
@@ -307,9 +301,9 @@ std::shared_ptr<VertexArray> GameLayer::create_entity_vertex_array(model::Mesh m
 void GameLayer::build_board(const model::Mesh& mesh) {
     board = registry.create();
 
-    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_array(mesh, board);
+    Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, board);
 
-    std::shared_ptr<Texture> board_diffuse_texture = Texture::create(assets->board_diffuse_texture_data);
+    Rc<Texture> board_diffuse_texture = Texture::create(assets->board_diffuse_texture_data, true, -2.0f);
 
     auto& transform = registry.emplace<TransformComponent>(board);
     transform.scale = 20.0f;
@@ -339,16 +333,16 @@ void GameLayer::build_camera() {
 }
 
 void GameLayer::build_skybox() {
-    std::shared_ptr<Buffer> positions = Buffer::create(cube_map_points, 108 * sizeof(float));
+    Rc<Buffer> positions = Buffer::create(cube_map_points, 108 * sizeof(float));
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
 
-    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    Rc<VertexArray> vertex_array = VertexArray::create();
     vertex_array->add_buffer(positions, layout);
     VertexArray::unbind();
 
-    std::shared_ptr<Texture3D> skybox_texture = Texture3D::create(assets->skybox_textures_data);
+    Rc<Texture3D> skybox_texture = Texture3D::create(assets->skybox_textures_data);
 
     entt::entity skybox = registry.create();
     registry.emplace<SkyboxMeshComponent>(skybox, vertex_array);
@@ -359,11 +353,11 @@ void GameLayer::build_skybox() {
 }
 
 void GameLayer::build_piece(int id, Piece type, const model::Mesh& mesh,
-                            std::shared_ptr<Texture> diffuse_texture,
+                            Rc<Texture> diffuse_texture,
                             const glm::vec3& position) {
     entt::entity piece = registry.create();
 
-    std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_array(mesh, piece);
+    Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, piece);
 
     auto& transform = registry.emplace<TransformComponent>(piece);
     transform.position = position;
@@ -409,20 +403,18 @@ void GameLayer::build_node(int index, const model::Mesh& mesh, const glm::vec3& 
     for (const model::Vertex& vertex : mesh.vertices) {
         data.push_back(vertex.position);
     }
-    std::shared_ptr<Buffer> vertices =
-        Buffer::create(data.data(), data.size() * sizeof(glm::vec3));
+    Rc<Buffer> vertices = Buffer::create(data.data(), data.size() * sizeof(glm::vec3));
 
-    std::shared_ptr<Buffer> ids = create_ids_buffer(mesh.vertices.size(), node);
+    Rc<Buffer> ids = create_ids_buffer(mesh.vertices.size(), node);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     BufferLayout layout2;
     layout2.add(1, BufferLayout::Type::Int, 1);
 
-    std::shared_ptr<Buffer> index_buffer =
-        Buffer::create_index(mesh.indices.data(), mesh.indices.size() * sizeof(unsigned int));
+    Rc<Buffer> index_buffer = Buffer::create_index(mesh.indices.data(), mesh.indices.size() * sizeof(unsigned int));
 
-    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    Rc<VertexArray> vertex_array = VertexArray::create();
     index_buffer->bind();
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_buffer(ids, layout2);

@@ -41,3 +41,6 @@ private:
     GLuint vertex_shader;
     GLuint fragment_shader;
 };
+
+template<typename T>
+using Rc = std::shared_ptr<T>;
