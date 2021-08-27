@@ -24,8 +24,9 @@ namespace renderer {
         Rc<Shader> board_shader = nullptr;
         Rc<Shader> piece_shader = nullptr;
         Rc<Shader> shadow_shader = nullptr;
-        Rc<Framebuffer> framebuffer = nullptr;
+        Rc<Framebuffer> scene_framebuffer = nullptr;
         Rc<Framebuffer> depth_map_framebuffer = nullptr;
+        Rc<Framebuffer> intermediate_framebuffer = nullptr;
 
         Rc<Shader> quad_shader = nullptr;
         Rc<VertexArray> quad_vertex_array = nullptr;
@@ -50,7 +51,7 @@ namespace renderer {
         Rc<Texture> loading_texture = nullptr;
     };
 
-    const Storage* init();
+    const Storage* init(int width, int height);
     void terminate();
     void set_viewport(GLint width, GLint height);
     void set_clear_color(GLfloat red, GLfloat green, GLfloat blue);

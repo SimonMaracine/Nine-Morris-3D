@@ -76,6 +76,7 @@ namespace debug_opengl {
                 std::exit(1);
             case GL_DEBUG_SEVERITY_MEDIUM:
                 switch (id) {
+                    case 13:
                     case 10:
                     case 9:
                     case 7:

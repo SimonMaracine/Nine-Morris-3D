@@ -6,40 +6,33 @@
 #include "opengl/renderer/framebuffer.h"
 #include "other/logging.h"
 
-Framebuffer::Framebuffer(const std::vector<TextureFormat>& color_attachment_formats,
-                         TextureFormat depth_attachment_format,
-                         const Specification& specification)
-        : color_attachment_formats(color_attachment_formats),
-          depth_attachment_format(depth_attachment_format), specification(specification) {
+Framebuffer::Framebuffer(Type type, int width, int height, int samples, int color_attachment_count)
+        : type(type), width(width), height(height), samples(samples),
+          color_attachment_count(color_attachment_count) {
     build();
 
     SPDLOG_DEBUG("Created framebuffer {}", framebuffer);
 }
 
 Framebuffer::~Framebuffer() {
-    glDeleteFramebuffers(1, &framebuffer);
     glDeleteTextures(color_attachments.size(), color_attachments.data());
-    glDeleteTextures(1, &depth_attachment);
+    switch (type) {
+        case Type::Scene:
+        case Type::Intermediate:
+            glDeleteRenderbuffers(1, &depth_attachment);
+            break;
+        case Type::DepthMap:
+            glDeleteTextures(1, &depth_attachment);
+            break;
+    }
+    glDeleteFramebuffers(1, &framebuffer);
 
     SPDLOG_DEBUG("Deleted framebuffer {}", framebuffer);
 }
 
-std::shared_ptr<Framebuffer> Framebuffer::create(const Specification& specification) {
-    std::vector<TextureFormat> color_attachment_formats;
-    TextureFormat depth_attachment_format = TextureFormat::None;
-
-    for (TextureFormat format : specification.attachments) {
-        if (format == TextureFormat::Depth24Stencil8) {
-            depth_attachment_format = format;
-        } else if (format == TextureFormat::DepthForShadow) {
-            depth_attachment_format = format;
-        } else {
-            color_attachment_formats.push_back(format);
-        }
-    }
-
-    return std::make_shared<Framebuffer>(color_attachment_formats, depth_attachment_format,
-                                         specification);
+std::shared_ptr<Framebuffer> Framebuffer::create(Type type, int width, int height, int samples,
+                                                 int color_attachments_count) {
+    return std::make_shared<Framebuffer>(type, width, height, samples, color_attachments_count);
 }
 
 void Framebuffer::bind() const {
@@ -52,6 +45,7 @@ void Framebuffer::bind_default() {
 
 GLuint Framebuffer::get_color_attachment(unsigned int index) const {
     assert(index < color_attachments.size());
+
     return color_attachments[index];
 }
 
@@ -64,8 +58,8 @@ void Framebuffer::resize(int width, int height) {
         SPDLOG_ERROR("Attempted to rezize framebuffer to [ {}, {} ]", width, height);
         return;
     }
-    specification.width = width;
-    specification.height = height;
+    this->width = width;
+    this->height = height;
 
     build();
 }
@@ -86,33 +80,63 @@ void Framebuffer::clear_red_integer_attachment(int index, int value) const {
     glClearBufferiv(GL_COLOR, index, &value);
 }
 
-static void attach_color_texture(GLuint texture, GLenum internal_format, GLenum format,
+void Framebuffer::resolve_framebuffer(GLuint read_framebuffer, GLuint draw_framebuffer,
+                                      int width, int height) {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, read_framebuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
+
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+    glReadBuffer(GL_COLOR_ATTACHMENT1);
+    glDrawBuffer(GL_COLOR_ATTACHMENT1);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
+
+static GLenum target(bool multisampled) {
+    return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+}
+
+static void attach_color_texture(GLuint texture, int samples, GLenum internal_format, GLenum format,
                                  int width, int height, unsigned int index) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    bool multisampled = samples > 1;
 
-    glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
+    glBindTexture(target(multisampled), texture);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D,
+    if (multisampled) {
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_TRUE);
+    } else {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
+    }
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target(multisampled),
                            texture, 0);
 }
 
-static void attach_depth_texture(GLuint texture, GLenum format, GLenum attachment_type,
-                                 int width, int height) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum internal_format,
+                                      GLenum attachment_type, int width, int height) {
+    bool multisampled = samples > 1;
 
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_DEPTH_STENCIL,
-                 GL_UNSIGNED_INT_24_8, nullptr);
+    glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment_type, GL_TEXTURE_2D, texture, 0);
+    if (multisampled) {
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
+    } else {
+        glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
+    }
+
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment_type, GL_RENDERBUFFER, renderbuffer);
 }
 
 static void attach_depth_shadow_texture(GLuint texture, int width, int height) {
+    glBindTexture(GL_TEXTURE_2D, texture);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -129,74 +153,51 @@ static void attach_depth_shadow_texture(GLuint texture, int width, int height) {
 
 void Framebuffer::build() {
     if (framebuffer) {
+        glDeleteTextures(color_attachment_count, color_attachments.data());
+        switch (type) {
+            case Type::Scene:
+            case Type::Intermediate:
+                glDeleteRenderbuffers(1, &depth_attachment);
+                break;
+            case Type::DepthMap:
+                glDeleteTextures(1, &depth_attachment);
+                break;
+        }
         glDeleteFramebuffers(1, &framebuffer);
-        glDeleteTextures(color_attachments.size(), color_attachments.data());
-        glDeleteTextures(1, &depth_attachment);
 
-        color_attachments.clear();
+        color_attachments.fill(0);
         depth_attachment = 0;
     }
 
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-    if (!color_attachment_formats.empty()) {
-        color_attachments.resize(color_attachment_formats.size());
+    switch (type) {
+        case Type::Scene:
+        case Type::Intermediate: {
+            glGenTextures(color_attachment_count, color_attachments.data());
+            glGenRenderbuffers(1, &depth_attachment);
 
-        glGenTextures(color_attachments.size(), color_attachments.data());
+            attach_color_texture(color_attachments[0], samples, GL_RGBA8, GL_BGRA, width, height, 0);
+            attach_color_texture(color_attachments[1], samples, GL_R32I, GL_RED_INTEGER, width, height, 1);
+            attach_depth_renderbuffer(depth_attachment, samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, width, height);
 
-        for (unsigned int i = 0; i < color_attachments.size(); i++) {
-            glBindTexture(GL_TEXTURE_2D, color_attachments[i]);
+            GLenum attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+                                      GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+            glDrawBuffers(color_attachment_count, attachments);
 
-            switch (color_attachment_formats[i]) {
-                case TextureFormat::RGB8:
-                    attach_color_texture(color_attachments[i], GL_RGB8, GL_RGB,
-                                         specification.width, specification.height, i);
-                    break;
-                case TextureFormat::RGBA8:
-                    attach_color_texture(color_attachments[i], GL_RGBA8, GL_RGBA,
-                                         specification.width, specification.height, i);
-                    break;
-                case TextureFormat::RedInteger:
-                    attach_color_texture(color_attachments[i], GL_R32I, GL_RED_INTEGER,
-                                         specification.width, specification.height, i);
-                    break;
-                default:
-                    spdlog::critical("Texture format unrecognized");
-                    std::exit(1);
-            }
+            break;
         }
-    }
+        case Type::DepthMap: {
+            glGenTextures(1, &depth_attachment);
 
-    if (depth_attachment_format != TextureFormat::None) {
-        glGenTextures(1, &depth_attachment);
-        glBindTexture(GL_TEXTURE_2D, depth_attachment);
+            attach_depth_shadow_texture(depth_attachment, width, height);
 
-        switch (depth_attachment_format) {
-            case TextureFormat::Depth24Stencil8:
-                attach_depth_texture(depth_attachment, GL_DEPTH24_STENCIL8,
-                                     GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
-                                     specification.height);
-                break;
-            case TextureFormat::DepthForShadow:
-                attach_depth_shadow_texture(depth_attachment, specification.width,
-                                            specification.height);
-                break;
-            default:
-                spdlog::critical("Texture format unrecognized");
-                std::exit(1);
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+
+            break;
         }
-    }
-
-    if (color_attachments.size() > 1) {
-        assert(color_attachments.size() <= 4);
-
-        GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-                              GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-        glDrawBuffers(color_attachments.size(), buffers);
-    } else if (color_attachments.empty()) {
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
     }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {

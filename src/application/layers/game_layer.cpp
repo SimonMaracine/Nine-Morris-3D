@@ -68,18 +68,17 @@ void GameLayer::on_draw() {
 
     storage->depth_map_framebuffer->bind();
 
-    renderer::set_viewport(2048, 2048);
     renderer::clear(renderer::Depth);
+    renderer::set_viewport(2048, 2048);
 
     systems::render_to_depth(registry);
 
-    storage->framebuffer->bind();
+    storage->scene_framebuffer->bind();
 
-    renderer::set_viewport(application->data.width, application->data.height);
     renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
+    renderer::set_viewport(application->data.width, application->data.height);
     renderer::set_stencil_mask_zero();
 
-    storage->framebuffer->clear_red_integer_attachment(1, -1);  // TODO May not be needed
     storage->board_shader->bind();
     storage->board_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
     storage->board_shader->set_uniform_int("u_shadow_map", 1);
@@ -97,16 +96,22 @@ void GameLayer::on_draw() {
     systems::origin_render(registry, camera);
     systems::lighting_render(registry, camera);
 
+    Framebuffer::resolve_framebuffer(storage->scene_framebuffer->get_id(),
+                                     storage->intermediate_framebuffer->get_id(),
+                                     application->data.width, application->data.height);
+
+    storage->intermediate_framebuffer->bind();
+
     int x = input::get_mouse_x();
     int y = application->data.height - input::get_mouse_y();
-    hovered_entity = (entt::entity) storage->framebuffer->read_pixel(1, x, y);
+    hovered_entity = (entt::entity) storage->intermediate_framebuffer->read_pixel(1, x, y);
 
     Framebuffer::bind_default();
 
     renderer::clear(renderer::Color);
     storage->quad_shader->bind();
     storage->quad_shader->set_uniform_int("u_screen_texture", 0);
-    renderer::bind_texture(storage->framebuffer->get_color_attachment(0), 0);
+    renderer::bind_texture(storage->intermediate_framebuffer->get_color_attachment(0), 0);
     renderer::draw_quad();
 }
 
@@ -169,7 +174,8 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 }
 
 bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
-    storage->framebuffer->resize(event.width, event.height);
+    storage->scene_framebuffer->resize(event.width, event.height);
+    storage->intermediate_framebuffer->resize(event.width, event.height);
     systems::projection_matrix(registry, (float) event.width, (float) event.height);
 
     return false;
@@ -180,7 +186,7 @@ void GameLayer::start() {
     logging::log_opengl_info(logging::LogTarget::Console);
     debug_opengl::maybe_init_debugging();
     input::init(application->window->get_handle());
-    storage = renderer::init();
+    storage = renderer::init(application->data.width, application->data.height);
     loader = std::make_unique<Loader>();
 
     auto [version_major, version_minor] = debug_opengl::get_version();

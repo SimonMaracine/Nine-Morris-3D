@@ -22,7 +22,7 @@ Window::Window(int width, int height, ApplicationData* data) {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 #ifndef NDEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-    spdlog::info("Using debug OpenGL context");
+    spdlog::info("Using OpenGL debug context");
 #else
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif

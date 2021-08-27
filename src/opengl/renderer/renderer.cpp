@@ -17,7 +17,7 @@
 namespace renderer {
     static Storage* storage = new Storage;
 
-    const Storage* init() {
+    const Storage* init(int width, int height) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_CULL_FACE);
@@ -47,22 +47,10 @@ namespace renderer {
 
         storage->shadow_shader = Shader::create("data/shaders/shadow.vert",
                                                 "data/shaders/shadow.frag");
-        {
-            Specification specification;
-            specification.width = 1024;
-            specification.height = 576;
-            specification.attachments = { TextureFormat::RGBA8, TextureFormat::RedInteger,
-                                          TextureFormat::Depth24Stencil8 };
-            storage->framebuffer = Framebuffer::create(specification);
-        }
 
-        {
-            Specification specification;
-            specification.width = 2048;
-            specification.height = 2048;
-            specification.attachments = { TextureFormat::DepthForShadow };
-            storage->depth_map_framebuffer = Framebuffer::create(specification);
-        }
+        storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, 4, 2);
+        storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
+        storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate, width, height, 1, 2);
 
         {
             storage->quad_shader = Shader::create("data/shaders/quad.vert",

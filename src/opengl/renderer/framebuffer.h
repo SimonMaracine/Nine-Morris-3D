@@ -1,56 +1,46 @@
 #pragma once
 
 #include <memory>
-#include <vector>
+#include <array>
 
 #include <glad/glad.h>
 
-enum class TextureFormat {
-    None,
-    RGB8,
-    RGBA8,
-    Depth24Stencil8,
-    DepthForShadow,
-    RedInteger
-};
-
-struct Specification {
-    int width, height;
-    int samples = 1;
-
-    std::vector<TextureFormat> attachments;
-};
-
 class Framebuffer {
 public:
-    Framebuffer(const std::vector<TextureFormat>& color_attachment_formats,
-                TextureFormat depth_attachment_format, const Specification& specification);
+    enum class Type {
+        Scene, Intermediate, DepthMap
+    };
+
+    Framebuffer(Type type, int width, int height, int samples, int color_attachment_count);
     ~Framebuffer();
 
-    static std::shared_ptr<Framebuffer> create(const Specification& specification);
+    static std::shared_ptr<Framebuffer> create(Type type, int width, int height, int samples,
+                                               int color_attachment_count);
 
     void bind() const;
     static void bind_default();
 
-    const Specification& get_specification() const { return specification; }
     GLuint get_color_attachment(unsigned int index) const;
     GLuint get_depth_attachment() const;
+    GLuint get_id() const { return framebuffer; }
 
     void resize(int width, int height);
     int read_pixel(unsigned int attachment_index, int x, int y) const;
     void clear_red_integer_attachment(int index, int value) const;
+
+    static void resolve_framebuffer(GLuint read_framebuffer, GLuint draw_framebuffer,
+                                    int width, int height);
 private:
     void build();
 
+    Type type;
+    int width, height, samples;
+    int color_attachment_count;
+
     GLuint framebuffer = 0;
 
-    std::vector<TextureFormat> color_attachment_formats;
-    TextureFormat depth_attachment_format = TextureFormat::None;
-
-    std::vector<GLuint> color_attachments;
+    std::array<GLuint, 4> color_attachments = { 0, 0, 0, 0 };
     GLuint depth_attachment = 0;
-
-    Specification specification;
 };
 
 template<typename T>
