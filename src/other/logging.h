@@ -8,5 +8,5 @@ namespace logging {
     };
 
     void init();
-    void log_opengl_info(LogTarget target);
+    void log_opengl_and_dependencies_info(LogTarget target);
 }

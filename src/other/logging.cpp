@@ -2,13 +2,13 @@
 
 #include <spdlog/spdlog.h>
 
-#include "other/logging.h"
 #include "opengl/debug_opengl.h"
+#include "other/logging.h"
+
+#define LOG_FILE "log.txt"  // TODO This should be changed
 
 /* SPDLOG_TRACE, SPDLOG_DEBUG, SPDLOG_INFO,
 SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
-
-const char* LOG_FILE = "opengl_log.txt";  // TODO This should be changed
 
 namespace logging {
     void init() {
@@ -16,7 +16,7 @@ namespace logging {
         spdlog::set_level(spdlog::level::trace);
     }
 
-    void log_opengl_info(LogTarget target) {
+    void log_opengl_and_dependencies_info(LogTarget target) {
         const std::string contents = debug_opengl::get_info();
 
         if (target == LogTarget::File) {

@@ -164,7 +164,7 @@ void GuiLayer::imgui_update(float dt) {
             }
             static int samples = DEFAULT_MSAA;
             if (ImGui::BeginMenu("Anti-Aliasing", true)) {
-                if (ImGui::RadioButton("No anti-aliasing", &samples, 1)) {
+                if (ImGui::RadioButton("No Anti-Aliasing", &samples, 1)) {
                     int width = application->data.width;
                     int height = application->data.height;
                     game_layer->storage->scene_framebuffer =
@@ -200,8 +200,8 @@ void GuiLayer::imgui_update(float dt) {
                 about = true;
             }
             if (ImGui::MenuItem("Log Info", nullptr, false)) {
-                logging::log_opengl_info(logging::LogTarget::File);
-                SPDLOG_INFO("Logged OpenGL info");
+                logging::log_opengl_and_dependencies_info(logging::LogTarget::File);
+                SPDLOG_INFO("Logged OpenGL and dependencies info");
             }
 
             ImGui::EndMenu();

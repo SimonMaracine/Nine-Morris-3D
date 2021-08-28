@@ -6,6 +6,7 @@
 /data/textures/old
 /data/models/boardold.blend
 /data/models/pieceold.blend
-opengl_log.txt
+log.txt
 imgui.ini
 *.blend1
+assets.morrisdat

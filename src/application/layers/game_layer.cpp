@@ -183,7 +183,7 @@ bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
 
 void GameLayer::start() {
     logging::init();
-    logging::log_opengl_info(logging::LogTarget::Console);
+    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
     debug_opengl::maybe_init_debugging();
     input::init(application->window->get_handle());
     storage = renderer::init(application->data.width, application->data.height);
