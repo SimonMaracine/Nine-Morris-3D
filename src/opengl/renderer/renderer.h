@@ -11,6 +11,8 @@
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/framebuffer.h"
 
+#define DEFAULT_MSAA 2
+
 namespace renderer {
     enum {
         Color = GL_COLOR_BUFFER_BIT,
@@ -51,7 +53,7 @@ namespace renderer {
         Rc<Texture> loading_texture = nullptr;
     };
 
-    const Storage* init(int width, int height);
+    Storage* init(int width, int height);
     void terminate();
     void set_viewport(GLint width, GLint height);
     void set_clear_color(GLfloat red, GLfloat green, GLfloat blue);

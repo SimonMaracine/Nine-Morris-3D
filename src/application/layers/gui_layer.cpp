@@ -6,6 +6,8 @@
 #include "application/layers/game_layer.h"
 #include "application/application.h"
 #include "application/events.h"
+#include "opengl/renderer/renderer.h"
+#include "opengl/renderer/framebuffer.h"
 #include "other/logging.h"
 
 void GuiLayer::on_attach() {
@@ -149,8 +151,8 @@ void GuiLayer::imgui_update(float dt) {
             ImGui::EndMenu();
             HOVERING_GUI;
         }
-        static bool vsync = true;
         if (ImGui::BeginMenu("Options")) {
+            static bool vsync = true;
             if (ImGui::MenuItem("VSync", nullptr, &vsync)) {
                 if (vsync) {
                     application->window->set_vsync(1);
@@ -159,6 +161,35 @@ void GuiLayer::imgui_update(float dt) {
                     application->window->set_vsync(0);
                     SPDLOG_INFO("VSync disabled");
                 }
+            }
+            static int samples = DEFAULT_MSAA;
+            if (ImGui::BeginMenu("Anti-Aliasing", true)) {
+                if (ImGui::RadioButton("No anti-aliasing", &samples, 1)) {
+                    int width = application->data.width;
+                    int height = application->data.height;
+                    game_layer->storage->scene_framebuffer =
+                        Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+
+                    SPDLOG_INFO("Anti-aliasing disabled");
+                }
+                if (ImGui::RadioButton("2x", &samples, 2)) {
+                    int width = application->data.width;
+                    int height = application->data.height;
+                    game_layer->storage->scene_framebuffer =
+                        Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+
+                    SPDLOG_INFO("2x anti-aliasing");
+                }
+                if (ImGui::RadioButton("4x", &samples, 4)) {
+                    int width = application->data.width;
+                    int height = application->data.height;
+                    game_layer->storage->scene_framebuffer =
+                        Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+
+                    SPDLOG_INFO("4x anti-aliasing");
+                }
+
+                ImGui::EndMenu();
             }
 
             ImGui::EndMenu();

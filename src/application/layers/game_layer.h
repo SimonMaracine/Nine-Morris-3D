@@ -58,7 +58,7 @@ public:
     float last_mouse_x = 0.0f;
     float last_mouse_y = 0.0f;
 
-    const renderer::Storage* storage = nullptr;
+    renderer::Storage* storage = nullptr;
     std::shared_ptr<Assets> assets = nullptr;
     std::unique_ptr<Loader> loader = nullptr;
 
