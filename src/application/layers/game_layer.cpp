@@ -88,13 +88,13 @@ void GameLayer::on_draw() {
     renderer::bind_texture(storage->depth_map_framebuffer->get_depth_attachment(), 1);
 
     systems::load_projection_view(registry, camera);
-    systems::cube_map_render(registry, camera);
-    systems::lighting(registry, camera);
-    systems::board_render(registry);
-    systems::piece_render(registry, hovered_entity, camera);
+    systems::skybox_render(registry, camera, storage);
+    systems::lighting(registry, camera, storage);
+    systems::board_render(registry, storage);
+    systems::piece_render(registry, hovered_entity, camera, storage);
     systems::node_render(registry, hovered_entity, board);
-    systems::origin_render(registry, camera);
-    systems::lighting_render(registry, camera);
+    systems::origin_render(registry, camera, storage);
+    systems::lighting_render(registry, camera, storage);
 
     Framebuffer::resolve_framebuffer(storage->scene_framebuffer->get_id(),
                                      storage->intermediate_framebuffer->get_id(),
@@ -239,16 +239,18 @@ void GameLayer::restart() {
     build_origin();
     build_skybox();
 
-    Rc<Texture> white_piece_diffuse = Texture::create(assets->white_piece_diffuse_data, true, -1.5f);
-    Rc<Texture> black_piece_diffuse = Texture::create(assets->black_piece_diffuse_data, true, -1.5f);
+    if (!storage->white_piece_diffuse_texture) {
+        storage->white_piece_diffuse_texture = Texture::create(assets->white_piece_diffuse_data, true, -1.5f);
+        storage->black_piece_diffuse_texture = Texture::create(assets->black_piece_diffuse_data, true, -1.5f);
+    }
 
     for (int i = 0; i < 9; i++) {
-        build_piece(i, Piece::White, std::get<1>(assets->meshes), white_piece_diffuse,
+        build_piece(i, Piece::White, std::get<1>(assets->meshes), storage->white_piece_diffuse_texture,
                     glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
     }
 
     for (int i = 9; i < 18; i++) {
-        build_piece(i, Piece::Black, std::get<2>(assets->meshes), black_piece_diffuse,
+        build_piece(i, Piece::Black, std::get<2>(assets->meshes), storage->black_piece_diffuse_texture,
                     glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
@@ -314,15 +316,16 @@ void GameLayer::build_board(const model::Mesh& mesh) {
 
     Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, board);
 
-    Rc<Texture> board_diffuse_texture = Texture::create(assets->board_diffuse_texture_data, true, -2.0f);
+    if (!storage->board_diffuse_texture) {
+        storage->board_diffuse_texture = Texture::create(assets->board_diffuse_texture_data, true, -2.0f);
+    }
 
     auto& transform = registry.emplace<TransformComponent>(board);
     transform.scale = 20.0f;
 
     registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(board, storage->board_shader, glm::vec3(0.25f), 8.0f);
-    registry.emplace<TextureComponent>(board, board_diffuse_texture);
-    registry.emplace<ShadowComponent>(board, storage->shadow_shader);
+    registry.emplace<MaterialComponent>(board, glm::vec3(0.25f), 8.0f);
+    registry.emplace<ShadowComponent>(board);
 
     registry.emplace<GameStateComponent>(board, nodes);
     registry.emplace<MovesHistoryComponent>(board);
@@ -345,29 +348,26 @@ void GameLayer::build_camera() {
 }
 
 void GameLayer::build_skybox() {
-    Rc<Buffer> positions = Buffer::create(cube_map_points, 108 * sizeof(float));
+    Rc<Buffer> positions = Buffer::create(skybox_points, sizeof(skybox_points));
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
 
-    Rc<VertexArray> vertex_array = VertexArray::create();
-    vertex_array->add_buffer(positions, layout);
+    storage->skybox_vertex_array = VertexArray::create();
+    storage->skybox_vertex_array->add_buffer(positions, layout);
     VertexArray::unbind();
 
-    Rc<Texture3D> skybox_texture = Texture3D::create(assets->skybox_textures_data);
+    storage->skybox_texture = Texture3D::create(assets->skybox_textures_data);
 
     entt::entity skybox = registry.create();
 
-    registry.emplace<SkyboxMeshComponent>(skybox, vertex_array);
-    registry.emplace<SkyboxMaterialComponent>(skybox, storage->skybox_shader);
-    registry.emplace<SkyboxTextureComponent>(skybox, skybox_texture);
+    registry.emplace<SkyboxComponent>(skybox);
 
     SPDLOG_DEBUG("Built skybox entity {}", skybox);
 }
 
 void GameLayer::build_piece(int id, Piece type, const model::Mesh& mesh,
-                            Rc<Texture> diffuse_texture,
-                            const glm::vec3& position) {
+                            Rc<Texture> diffuse_texture, const glm::vec3& position) {
     entt::entity piece = registry.create();
 
     Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, piece);
@@ -377,10 +377,10 @@ void GameLayer::build_piece(int id, Piece type, const model::Mesh& mesh,
     transform.scale = 20.0f;
 
     registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
-    registry.emplace<MaterialComponent>(piece, storage->piece_shader, glm::vec3(0.25f), 8.0f);
-    registry.emplace<TextureComponent>(piece, diffuse_texture);
+    registry.emplace<MaterialComponent>(piece, glm::vec3(0.25f), 8.0f);
+    registry.emplace<PieceTextureComponent>(piece, diffuse_texture);
     registry.emplace<OutlineComponent>(piece, storage->outline_shader, glm::vec3(1.0f, 0.0f, 0.0f));
-    registry.emplace<ShadowComponent>(piece, storage->shadow_shader);
+    registry.emplace<ShadowComponent>(piece);
 
     registry.emplace<PieceComponent>(piece, id, type);
     registry.emplace<MoveComponent>(piece);
@@ -395,10 +395,7 @@ void GameLayer::build_directional_light() {
     transform.position = LIGHT_POSITION;
     transform.scale = 0.3f;
 
-    registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f),
-                                     glm::vec3(1.0f));
-    registry.emplace<ShaderComponent>(directional_light, storage->board_shader, storage->piece_shader);
-    registry.emplace<LightMeshComponent>(directional_light, storage->quad3d_shader);
+    registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f), glm::vec3(1.0f));
     registry.emplace<QuadTextureComponent>(directional_light, storage->light_texture);
 
     SPDLOG_DEBUG("Built directional light entity {}", directional_light);
@@ -407,7 +404,7 @@ void GameLayer::build_directional_light() {
 void GameLayer::build_origin() {
     entt::entity origin = registry.create();
 
-    registry.emplace<OriginComponent>(origin, storage->origin_shader);
+    registry.emplace<OriginComponent>(origin);
 
     SPDLOG_DEBUG("Built origin entity {}", origin);
 }
@@ -444,7 +441,6 @@ void GameLayer::build_node(int index, const model::Mesh& mesh, const glm::vec3& 
     transform.scale = 20.0f;
 
     registry.emplace<MeshComponent>(node, vertex_array, mesh.indices.size());
-    registry.emplace<NodeMaterialComponent>(node, storage->node_shader);
 
     registry.emplace<NodeComponent>(node, index);
 
@@ -454,13 +450,13 @@ void GameLayer::build_node(int index, const model::Mesh& mesh, const glm::vec3& 
 void GameLayer::build_turn_indicator() {
     entt::entity turn_indicator = registry.create();
 
-    Rc<Texture> white = Texture::create(assets->white_indicator_data, false);
-    Rc<Texture> black = Texture::create(assets->black_indicator_data, false);
+    storage->white_indicator_texture = Texture::create(assets->white_indicator_data, false);
+    storage->black_indicator_texture = Texture::create(assets->black_indicator_data, false);
 
     auto& transform = registry.emplace<TransformComponent>(turn_indicator);
-    transform.position = glm::vec3(application->data.width - 100, application->data.height - 125, 0.0f);
+    transform.position = glm::vec3(application->data.width - 90, application->data.height - 115, 0.0f);
 
-    registry.emplace<TurnIndicatorTextureComponent>(turn_indicator, white, black);
+    registry.emplace<TurnIndicatorComponent>(turn_indicator);
 
     SPDLOG_DEBUG("Built turn indicator entity {}", turn_indicator);
 }

@@ -53,7 +53,7 @@ private:
 template<typename T>
 using Rc = std::shared_ptr<T>;
 
-constexpr float cube_map_points[] = {
+constexpr float skybox_points[] = {
     -5.0f,  5.0f, -5.0f,
 	-5.0f, -5.0f, -5.0f,
 	 5.0f, -5.0f, -5.0f,

@@ -50,42 +50,44 @@ struct MeshComponent {
 };
 
 struct MaterialComponent {
-    MaterialComponent(Rc<Shader> shader, const glm::vec3& specular_color, float shininess)
-        : shader(shader), specular_color(specular_color), shininess(shininess) {}
+    MaterialComponent(const glm::vec3& specular_color, float shininess)
+        : specular_color(specular_color), shininess(shininess) {}
 
-    Rc<Shader> shader;
     glm::vec3 specular_color;
     float shininess;
 };
 
-struct TextureComponent {  // TODO maybe I should move this to MaterialComponent
-    TextureComponent(Rc<Texture> diffuse_map)
-        : diffuse_map(diffuse_map) {}
+struct PieceTextureComponent {
+    PieceTextureComponent(Rc<Texture> diffuse_texture)
+        : diffuse_texture(diffuse_texture) {}
 
-    Rc<Texture> diffuse_map;
-    // Rc<Texture> specular_map;
-    // Rc<Texture> normal_map;
+    Rc<Texture> diffuse_texture;
+    // Rc<Texture> normal_texture;
 };
 
-struct SkyboxMeshComponent {
-    SkyboxMeshComponent(Rc<VertexArray> vertex_array)
-        : vertex_array(vertex_array) {}
+// struct SkyboxMeshComponent {
+//     SkyboxMeshComponent(Rc<VertexArray> vertex_array)
+//         : vertex_array(vertex_array) {}
 
-    Rc<VertexArray> vertex_array;
-};
+//     Rc<VertexArray> vertex_array;
+// };
 
-struct SkyboxMaterialComponent {
-    SkyboxMaterialComponent(Rc<Shader> shader)
-        : shader(shader) {}
+// struct SkyboxMaterialComponent {
+//     SkyboxMaterialComponent(Rc<Shader> shader)
+//         : shader(shader) {}
 
-    Rc<Shader> shader;
-};
+//     Rc<Shader> shader;
+// };
 
-struct SkyboxTextureComponent {
-    SkyboxTextureComponent(Rc<Texture3D> cube_map)
-        : cube_map(cube_map) {}
+// struct SkyboxTextureComponent {
+//     SkyboxTextureComponent(Rc<Texture3D> cube_map)
+//         : cube_map(cube_map) {}
 
-    Rc<Texture3D> cube_map;
+//     Rc<Texture3D> cube_map;
+// };
+
+struct SkyboxComponent {
+    char skybox;
 };
 
 struct OutlineComponent {
@@ -107,25 +109,23 @@ struct LightComponent {
     glm::vec3 specular_color;
 };
 
-struct ShaderComponent {
-    ShaderComponent(Rc<Shader> board_shader, Rc<Shader> piece_shader)
-        : board_shader(board_shader), piece_shader(piece_shader) {}
+// struct ShaderComponent {
+//     ShaderComponent(Rc<Shader> board_shader, Rc<Shader> piece_shader)
+//         : board_shader(board_shader), piece_shader(piece_shader) {}
 
-    Rc<Shader> board_shader;
-    Rc<Shader> piece_shader;
-};
+//     Rc<Shader> board_shader;
+//     Rc<Shader> piece_shader;
+// };
 
 struct OriginComponent {
-    OriginComponent(Rc<Shader> shader) : shader(shader) {}
-
-    Rc<Shader> shader;
+    char origin;
 };
 
-struct LightMeshComponent {
-    LightMeshComponent(Rc<Shader> shader) : shader(shader) {}
+// struct LightMeshComponent {
+//     LightMeshComponent(Rc<Shader> shader) : shader(shader) {}
 
-    Rc<Shader> shader;
-};
+//     Rc<Shader> shader;
+// };
 
 struct QuadTextureComponent {
     QuadTextureComponent(Rc<Texture> texture) : texture(texture) {}
@@ -133,22 +133,16 @@ struct QuadTextureComponent {
     Rc<Texture> texture;
 };
 
-struct TurnIndicatorTextureComponent {
-    TurnIndicatorTextureComponent(Rc<Texture> white_texture, Rc<Texture> black_texture)
-        : white_texture(white_texture), black_texture(black_texture) {}
-
-    Rc<Texture> white_texture;
-    Rc<Texture> black_texture;
+struct TurnIndicatorComponent {
+    char turn_indicator;
 };
 
-struct NodeMaterialComponent {
-    NodeMaterialComponent(Rc<Shader> shader) : shader(shader) {}
+// struct NodeMaterialComponent {
+//     NodeMaterialComponent(Rc<Shader> shader) : shader(shader) {}
 
-    Rc<Shader> shader;
-};
+//     Rc<Shader> shader;
+// };
 
 struct ShadowComponent {
-    ShadowComponent(Rc<Shader> shader) : shader(shader) {}
-
-    Rc<Shader> shader;
+    char shadow;
 };

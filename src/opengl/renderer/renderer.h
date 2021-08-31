@@ -26,6 +26,10 @@ namespace renderer {
         Rc<Shader> board_shader = nullptr;
         Rc<Shader> piece_shader = nullptr;
         Rc<Shader> shadow_shader = nullptr;
+        Rc<Shader> screen_quad_shader = nullptr;
+        Rc<Shader> outline_shader = nullptr;
+        Rc<Shader> node_shader = nullptr;
+        Rc<Shader> skybox_shader = nullptr;
 
         Rc<Framebuffer> scene_framebuffer = nullptr;
         Rc<Framebuffer> depth_map_framebuffer = nullptr;
@@ -37,11 +41,6 @@ namespace renderer {
         Rc<VertexArray> quad2d_vertex_array = nullptr;
         Rc<Buffer> quad2d_vertex_buffer = nullptr;
 
-        Rc<Shader> screen_quad_shader = nullptr;
-        Rc<Shader> outline_shader = nullptr;
-        Rc<Shader> node_shader = nullptr;
-        Rc<Shader> skybox_shader = nullptr;
-
         Rc<Shader> origin_shader = nullptr;
         Rc<VertexArray> origin_vertex_array = nullptr;
         Rc<Buffer> origin_vertex_buffer = nullptr;
@@ -52,7 +51,15 @@ namespace renderer {
         Rc<Texture> light_texture = nullptr;
         Rc<Texture> loading_texture = nullptr;
 
-        glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
+        glm::mat4 orthographic_projection_matrix;
+
+        Rc<Texture> board_diffuse_texture = nullptr;
+        Rc<Texture> white_piece_diffuse_texture = nullptr;
+        Rc<Texture> black_piece_diffuse_texture = nullptr;
+        Rc<VertexArray> skybox_vertex_array = nullptr;
+        Rc<Texture3D> skybox_texture = nullptr;
+        Rc<Texture> white_indicator_texture = nullptr;
+        Rc<Texture> black_indicator_texture = nullptr;
     };
 
     Storage* init(int width, int height);
@@ -72,9 +79,7 @@ namespace renderer {
     void draw_board(const glm::vec3& position,
                     const glm::vec3& rotation,
                     float scale,
-                    Rc<Shader> shader,
-                    Rc<VertexArray> array,
-                    Rc<Texture> diffuse_map,
+                    Rc<VertexArray> vertex_array,
                     const glm::vec3& specular_color,
                     float shininess,
                     GLuint index_count);
@@ -82,9 +87,8 @@ namespace renderer {
     void draw_piece(const glm::vec3& position,
                     const glm::vec3& rotation,
                     float scale,
-                    Rc<Shader> shader,
-                    Rc<VertexArray> array,
-                    Rc<Texture> diffuse_map,
+                    Rc<VertexArray> vertex_array,
+                    Rc<Texture> diffuse_texture,
                     const glm::vec3& specular_color,
                     float shininess,
                     GLuint index_count,
@@ -93,29 +97,24 @@ namespace renderer {
     void draw_piece_outline(const glm::vec3& position,
                             const glm::vec3& rotation,
                             float scale,
-                            Rc<Shader> shader,
-                            Rc<VertexArray> array,
-                            Rc<Texture> diffuse_map,
+                            Rc<VertexArray> vertex_array,
+                            Rc<Texture> diffuse_texture,
                             const glm::vec3& specular_color,
                             float shininess,
                             GLuint index_count,
                             const glm::vec3& outline_color);
 
-    void draw_cube_map(const glm::mat4& view_projection_matrix,
-                       Rc<Shader> shader, Rc<VertexArray> array,
-                       Rc<Texture3D> texture);
+    void draw_skybox(const glm::mat4& view_projection_matrix);
 
     void draw_node(const glm::vec3& position,
                    float scale,
-                   Rc<Shader> shader,
-                   Rc<VertexArray> array,
+                   Rc<VertexArray> vertex_array,
                    const glm::vec4& color,
                    GLuint index_count);
 
     void draw_to_depth(const glm::vec3& position,
                        const glm::vec3& rotation,
                        float scale,
-                       Rc<Shader> shader,
-                       Rc<VertexArray> array,
+                       Rc<VertexArray> vertex_array,
                        GLuint index_count);
 }

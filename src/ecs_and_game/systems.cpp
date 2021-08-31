@@ -17,18 +17,15 @@ void systems::load_projection_view(entt::registry& registry, entt::entity camera
     renderer::load_projection_view(camera.projection_view_matrix);
 }
 
-void systems::board_render(entt::registry& registry) {
-    auto view = registry.view<TransformComponent,
-                              MeshComponent,
-                              MaterialComponent,
-                              TextureComponent>(entt::exclude<OutlineComponent>);
+void systems::board_render(entt::registry& registry, RenderStorage* storage) {
+    auto view = registry.view<TransformComponent, MeshComponent,
+                              MaterialComponent, GameStateComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, mesh, material, textures] = view.get(entity);
+        auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
 
         renderer::draw_board(transform.position, transform.rotation, transform.scale,
-                             material.shader, mesh.vertex_array, textures.diffuse_map,
-                             material.specular_color, material.shininess,
+                             mesh.vertex_array, material.specular_color, material.shininess,
                              mesh.index_count);
     }
 }
@@ -127,25 +124,21 @@ void systems::projection_matrix(entt::registry& registry, float width, float hei
     }
 }
 
-void systems::cube_map_render(entt::registry& registry, entt::entity camera_entity) {
+void systems::skybox_render(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage) {
     auto& camera = CAMERA(camera_entity);
 
-    auto view = registry.view<SkyboxMeshComponent, SkyboxMaterialComponent,
-                              SkyboxTextureComponent>();
+    auto view = registry.view<SkyboxComponent>();
 
-    for (entt::entity entity : view) {
-        auto [mesh, material, texture] = view.get(entity);
-
+    for (entt::entity _ : view) {
         const glm::mat4& projection_matrix = camera.projection_matrix;
         glm::mat4 view_matrix = glm::mat4(glm::mat3(camera.view_matrix));
 
-        renderer::draw_cube_map(projection_matrix * view_matrix, material.shader,
-                                mesh.vertex_array, texture.cube_map);
+        renderer::draw_skybox(projection_matrix * view_matrix);
     }
 }
 
 void systems::piece_render(entt::registry& registry, entt::entity hovered_entity,
-                           entt::entity camera_entity) {
+                           entt::entity camera_entity, RenderStorage* storage) {
     auto& camera_transform = registry.get<TransformComponent>(camera_entity);
 
     auto func = [&camera_transform](const TransformComponent& lhs, const TransformComponent& rhs) {
@@ -157,85 +150,83 @@ void systems::piece_render(entt::registry& registry, entt::entity hovered_entity
     registry.sort<TransformComponent>(func);
 
     auto view = registry.view<TransformComponent, MeshComponent,
-                              MaterialComponent, TextureComponent,
-                              OutlineComponent, PieceComponent>(entt::exclude<InactiveTag>);
+                              MaterialComponent, OutlineComponent,
+                              PieceTextureComponent, PieceComponent>(entt::exclude<InactiveTag>);
 
     view.use<TransformComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, mesh, material, textures, outline, piece] = view.get(entity);
+        auto [transform, mesh, material, outline, textures, piece] = view.get(entity);
 
         if (piece.selected) {
             renderer::draw_piece_outline(transform.position, transform.rotation,
-                                    transform.scale, material.shader, mesh.vertex_array,
-                                    textures.diffuse_map, material.specular_color,
+                                    transform.scale, mesh.vertex_array,
+                                    textures.diffuse_texture, material.specular_color,
                                     material.shininess, mesh.index_count,
                                     outline.outline_color);
-        } else if (piece.show_outline && entity == hovered_entity && piece.in_use &&
-                !piece.pending_remove) {
+        } else if (piece.show_outline && entity == hovered_entity && piece.in_use && !piece.pending_remove) {
             renderer::draw_piece_outline(transform.position, transform.rotation,
-                                    transform.scale, material.shader, mesh.vertex_array,
-                                    textures.diffuse_map, material.specular_color,
+                                    transform.scale, mesh.vertex_array,
+                                    textures.diffuse_texture, material.specular_color,
                                     material.shininess, mesh.index_count,
                                     glm::vec3(1.0f, 0.5f, 0.0f));
         } else if (piece.to_take && entity == hovered_entity && piece.in_use) {
             renderer::draw_piece(transform.position, transform.rotation,
-                            transform.scale, material.shader, mesh.vertex_array,
-                            textures.diffuse_map, material.specular_color,
+                            transform.scale, mesh.vertex_array,
+                            textures.diffuse_texture, material.specular_color,
                             material.shininess, mesh.index_count,
                             glm::vec3(0.9f, 0.0f, 0.0f));
         } else {
             renderer::draw_piece(transform.position, transform.rotation,
-                            transform.scale, material.shader, mesh.vertex_array,
-                            textures.diffuse_map, material.specular_color,
-                            material.shininess, mesh.index_count,
+                            transform.scale, mesh.vertex_array, textures.diffuse_texture,
+                            material.specular_color, material.shininess, mesh.index_count,
                             glm::vec3(1.0f, 1.0f, 1.0f));
         }
     }
 }
 
-void systems::lighting(entt::registry& registry, entt::entity camera_entity) {
+void systems::lighting(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage) {
     auto& camera_transform = registry.get<TransformComponent>(camera_entity);
 
-    auto view = registry.view<TransformComponent, LightComponent, ShaderComponent>();
+    auto view = registry.view<TransformComponent, LightComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, light, shaders] = view.get(entity);
+        auto [transform, light] = view.get(entity);
 
-        shaders.board_shader->bind();
-        shaders.board_shader->set_uniform_vec3("u_light.position", transform.position);
-        shaders.board_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
-        shaders.board_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-        shaders.board_shader->set_uniform_vec3("u_light.specular", light.specular_color);
-        shaders.board_shader->set_uniform_vec3("u_view_position", camera_transform.position);
+        storage->board_shader->bind();
+        storage->board_shader->set_uniform_vec3("u_light.position", transform.position);
+        storage->board_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+        storage->board_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+        storage->board_shader->set_uniform_vec3("u_light.specular", light.specular_color);
+        storage->board_shader->set_uniform_vec3("u_view_position", camera_transform.position);
 
-        shaders.piece_shader->bind();
-        shaders.piece_shader->set_uniform_vec3("u_light.position", transform.position);
-        shaders.piece_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
-        shaders.piece_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-        shaders.piece_shader->set_uniform_vec3("u_light.specular", light.specular_color);
-        shaders.piece_shader->set_uniform_vec3("u_view_position", camera_transform.position);
+        storage->piece_shader->bind();
+        storage->piece_shader->set_uniform_vec3("u_light.position", transform.position);
+        storage->piece_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+        storage->piece_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+        storage->piece_shader->set_uniform_vec3("u_light.specular", light.specular_color);
+        storage->piece_shader->set_uniform_vec3("u_view_position", camera_transform.position);
     }
 }
 
-void systems::lighting_render(entt::registry& registry, entt::entity camera_entity) {
+void systems::lighting_render(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage) {
     auto& camera = CAMERA(camera_entity);
 
-    auto view = registry.view<TransformComponent, LightMeshComponent, QuadTextureComponent>();
+    auto view = registry.view<TransformComponent, QuadTextureComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, mesh, texture] = view.get(entity);
+        auto [transform, texture] = view.get(entity);
 
-        mesh.shader->bind();
-        mesh.shader->set_uniform_matrix("u_projection_matrix", camera.projection_matrix);
-        mesh.shader->set_uniform_matrix("u_view_matrix", camera.view_matrix);
+        storage->quad3d_shader->bind();
+        storage->quad3d_shader->set_uniform_matrix("u_projection_matrix", camera.projection_matrix);
+        storage->quad3d_shader->set_uniform_matrix("u_view_matrix", camera.view_matrix);
 
         renderer::draw_quad_3d(transform.position, transform.scale, texture.texture);
     }
 }
 
 void systems::lighting_move(entt::registry& registry, float dt) {
-    auto view = registry.view<TransformComponent, LightMeshComponent>();
+    auto view = registry.view<TransformComponent, LightComponent>();
 
     for (entt::entity entity : view) {
         auto& transform = view.get<TransformComponent>(entity);
@@ -254,42 +245,34 @@ void systems::lighting_move(entt::registry& registry, float dt) {
     }
 }
 
-void systems::origin_render(entt::registry& registry, entt::entity camera_entity) {
+void systems::origin_render(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage) {
     auto& camera = CAMERA(camera_entity);
 
     auto view = registry.view<OriginComponent>();
 
-    for (entt::entity entity : view) {
-        auto& origin = view.get<OriginComponent>(entity);
-
-        origin.shader->bind();
-        origin.shader->set_uniform_matrix("u_projection_view_matrix",
-                                          camera.projection_view_matrix);
+    for (entt::entity _ : view) {
+        storage->origin_shader->bind();
+        storage->origin_shader->set_uniform_matrix("u_projection_view_matrix",
+                                                   camera.projection_view_matrix);
 
         renderer::draw_origin();
     }
 }
 
-void systems::node_render(entt::registry& registry,
-                          entt::entity hovered_entity, entt::entity board_entity) {
+void systems::node_render(entt::registry& registry, entt::entity hovered_entity, entt::entity board_entity) {
     auto& state = STATE(board_entity);
 
-    auto view = registry.view<TransformComponent, MeshComponent, NodeMaterialComponent>();
+    auto view = registry.view<TransformComponent, MeshComponent, NodeComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, mesh, material] = view.get(entity);
+        auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
 
-        if (hovered_entity == entity &&
-                state.phase != Phase::None && state.phase != Phase::GameOver) {
-            renderer::draw_node(transform.position, transform.scale,
-                                material.shader, mesh.vertex_array,
-                                glm::vec4(0.7f, 0.7f, 0.7f, 1.0f),
-                                mesh.index_count);
+        if (hovered_entity == entity && state.phase != Phase::None && state.phase != Phase::GameOver) {
+            renderer::draw_node(transform.position, transform.scale, mesh.vertex_array,
+                                glm::vec4(0.7f, 0.7f, 0.7f, 1.0f), mesh.index_count);
         } else {
-            renderer::draw_node(transform.position, transform.scale,
-                                material.shader, mesh.vertex_array,
-                                glm::vec4(0.0f, 0.0f, 0.0f, 0.0f),
-                                mesh.index_count);
+            renderer::draw_node(transform.position, transform.scale, mesh.vertex_array,
+                                glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), mesh.index_count);
         }
     }
 }
@@ -298,42 +281,40 @@ void systems::render_to_depth(entt::registry& registry) {
     auto view = registry.view<TransformComponent, MeshComponent, ShadowComponent>(entt::exclude<InactiveTag>);
 
     for (entt::entity entity : view) {
-        auto [transform, mesh, shadow] = view.get(entity);
+        auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
 
         renderer::draw_to_depth(transform.position, transform.rotation,
-                                transform.scale, shadow.shader,
-                                mesh.vertex_array, mesh.index_count);
+                                transform.scale, mesh.vertex_array, mesh.index_count);
     }
 }
 
-void systems::turn_indicator_render(entt::registry& registry, entt::entity board, const renderer::Storage* storage) {
+void systems::turn_indicator_render(entt::registry& registry, entt::entity board, RenderStorage* storage) {
     auto& state = STATE(board);
 
-    auto view = registry.view<TransformComponent, TurnIndicatorTextureComponent>(entt::exclude<LightMeshComponent>);
+    auto view = registry.view<TransformComponent, TurnIndicatorComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, textures] = view.get(entity);
+        auto& transform = view.get<TransformComponent>(entity);
 
         storage->quad2d_shader->bind();
         storage->quad2d_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);
 
         if (state.turn == Player::White) {
-            renderer::draw_quad_2d(transform.position, transform.scale, textures.white_texture);
+            renderer::draw_quad_2d(transform.position, transform.scale, storage->white_indicator_texture);
         } else {
-            renderer::draw_quad_2d(transform.position, transform.scale, textures.black_texture);
+            renderer::draw_quad_2d(transform.position, transform.scale, storage->black_indicator_texture);
         }
     }
 }
 
 void systems::turn_indicator(entt::registry& registry, float width, float height) {
-    auto view = registry.view<TransformComponent, TurnIndicatorTextureComponent>(entt::exclude<LightMeshComponent>);
+    auto view = registry.view<TransformComponent, TurnIndicatorComponent>();
 
     for (entt::entity entity : view) {
         auto& transform = view.get<TransformComponent>(entity);
 
-        transform.position = glm::vec3(width - 100, height - 125, 0.0f);
+        transform.position = glm::vec3(width - 90, height - 115, 0.0f);
     }
-
 }
 
 // void systems::node_move(entt::registry& registry, float dt) {

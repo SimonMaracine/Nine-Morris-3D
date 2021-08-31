@@ -6,34 +6,36 @@
 
 #define CAMERA(entity) registry.get<CameraComponent>(entity)
 
+typedef const renderer::Storage RenderStorage;
+
 namespace systems {
     void load_projection_view(entt::registry& registry, entt::entity camera_entity);
 
-    void board_render(entt::registry& registry);
+    void board_render(entt::registry& registry, RenderStorage* storage);
 
     void camera(entt::registry& registry, float mouse_wheel, float dx, float dy, float dt);
 
     void projection_matrix(entt::registry& registry, float width, float height);
 
-    void cube_map_render(entt::registry& registry, entt::entity camera_entity);
+    void skybox_render(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage);
 
     void piece_render(entt::registry& registry, entt::entity hovered_entity,
-                      entt::entity camera_entity);
+                      entt::entity camera_entity, RenderStorage* storage);
 
-    void lighting(entt::registry& registry, entt::entity camera_entity);
+    void lighting(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage);
 
-    void lighting_render(entt::registry& registry, entt::entity camera_entity);
+    void lighting_render(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage);
 
     void lighting_move(entt::registry& registry, float dt);
 
-    void origin_render(entt::registry& registry, entt::entity camera_entity);
+    void origin_render(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage);
 
     void node_render(entt::registry& registry, entt::entity hovered_entity,
                      entt::entity board_entity);
 
     void render_to_depth(entt::registry& registry);
 
-    void turn_indicator_render(entt::registry& registry, entt::entity board, const renderer::Storage* storage);
+    void turn_indicator_render(entt::registry& registry, entt::entity board, RenderStorage* storage);
 
     void turn_indicator(entt::registry& registry, float witdh, float height);
 
