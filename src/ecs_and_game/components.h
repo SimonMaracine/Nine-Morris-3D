@@ -65,27 +65,6 @@ struct PieceTextureComponent {
     // Rc<Texture> normal_texture;
 };
 
-// struct SkyboxMeshComponent {
-//     SkyboxMeshComponent(Rc<VertexArray> vertex_array)
-//         : vertex_array(vertex_array) {}
-
-//     Rc<VertexArray> vertex_array;
-// };
-
-// struct SkyboxMaterialComponent {
-//     SkyboxMaterialComponent(Rc<Shader> shader)
-//         : shader(shader) {}
-
-//     Rc<Shader> shader;
-// };
-
-// struct SkyboxTextureComponent {
-//     SkyboxTextureComponent(Rc<Texture3D> cube_map)
-//         : cube_map(cube_map) {}
-
-//     Rc<Texture3D> cube_map;
-// };
-
 struct SkyboxComponent {
     char skybox;
 };
@@ -109,23 +88,9 @@ struct LightComponent {
     glm::vec3 specular_color;
 };
 
-// struct ShaderComponent {
-//     ShaderComponent(Rc<Shader> board_shader, Rc<Shader> piece_shader)
-//         : board_shader(board_shader), piece_shader(piece_shader) {}
-
-//     Rc<Shader> board_shader;
-//     Rc<Shader> piece_shader;
-// };
-
 struct OriginComponent {
     char origin;
 };
-
-// struct LightMeshComponent {
-//     LightMeshComponent(Rc<Shader> shader) : shader(shader) {}
-
-//     Rc<Shader> shader;
-// };
 
 struct QuadTextureComponent {
     QuadTextureComponent(Rc<Texture> texture) : texture(texture) {}
@@ -137,11 +102,6 @@ struct TurnIndicatorComponent {
     char turn_indicator;
 };
 
-// struct NodeMaterialComponent {
-//     NodeMaterialComponent(Rc<Shader> shader) : shader(shader) {}
-
-//     Rc<Shader> shader;
-// };
 
 struct ShadowComponent {
     char shadow;
