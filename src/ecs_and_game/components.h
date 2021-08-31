@@ -127,6 +127,20 @@ struct LightMeshComponent {
     Rc<Shader> shader;
 };
 
+struct QuadTextureComponent {
+    QuadTextureComponent(Rc<Texture> texture) : texture(texture) {}
+
+    Rc<Texture> texture;
+};
+
+struct TurnIndicatorTextureComponent {
+    TurnIndicatorTextureComponent(Rc<Texture> white_texture, Rc<Texture> black_texture)
+        : white_texture(white_texture), black_texture(black_texture) {}
+
+    Rc<Texture> white_texture;
+    Rc<Texture> black_texture;
+};
+
 struct NodeMaterialComponent {
     NodeMaterialComponent(Rc<Shader> shader) : shader(shader) {}
 

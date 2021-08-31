@@ -10,7 +10,7 @@
 #include "opengl/renderer/renderer.h"
 #include "other/model.h"
 #include "other/loader.h"
-#include "ecs/game.h"
+#include "ecs_and_game/game.h"
 
 #define LIGHT_POSITION glm::vec3(-11.0f, 13.0f, -15.0f)
 
@@ -51,6 +51,7 @@ public:
     void build_directional_light();
     void build_origin();
     void build_node(int index, const model::Mesh& mesh, const glm::vec3& position);
+    void build_turn_indicator();
 
     float mouse_wheel = 0.0f;
     float dx = 0.0f;

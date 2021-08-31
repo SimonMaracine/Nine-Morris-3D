@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "application/events.h"
 #include "application/application.h"
 

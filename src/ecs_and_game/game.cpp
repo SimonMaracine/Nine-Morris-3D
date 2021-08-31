@@ -8,8 +8,8 @@
 
 #include <entt/entt.hpp>
 
-#include "ecs/game.h"
-#include "ecs/components.h"
+#include "ecs_and_game/game.h"
+#include "ecs_and_game/components.h"
 #include "application/layers/game_layer.h"
 #include "other/logging.h"
 #include "other/loader.h"

@@ -26,14 +26,18 @@ namespace renderer {
         Rc<Shader> board_shader = nullptr;
         Rc<Shader> piece_shader = nullptr;
         Rc<Shader> shadow_shader = nullptr;
+
         Rc<Framebuffer> scene_framebuffer = nullptr;
         Rc<Framebuffer> depth_map_framebuffer = nullptr;
         Rc<Framebuffer> intermediate_framebuffer = nullptr;
 
-        Rc<Shader> quad_shader = nullptr;
-        Rc<VertexArray> quad_vertex_array = nullptr;
-        Rc<Buffer> quad_vertex_buffer = nullptr;
+        Rc<VertexArray> screen_quad_vertex_array = nullptr;
+        Rc<Buffer> screen_quad_vertex_buffer = nullptr;
 
+        Rc<VertexArray> quad2d_vertex_array = nullptr;
+        Rc<Buffer> quad2d_vertex_buffer = nullptr;
+
+        Rc<Shader> screen_quad_shader = nullptr;
         Rc<Shader> outline_shader = nullptr;
         Rc<Shader> node_shader = nullptr;
         Rc<Shader> skybox_shader = nullptr;
@@ -42,15 +46,13 @@ namespace renderer {
         Rc<VertexArray> origin_vertex_array = nullptr;
         Rc<Buffer> origin_vertex_buffer = nullptr;
 
-        Rc<Shader> light_shader = nullptr;
-        Rc<VertexArray> light_vertex_array = nullptr;
-        Rc<Buffer> light_vertex_buffer = nullptr;
-        Rc<Texture> light_texture = nullptr;
+        Rc<Shader> quad2d_shader = nullptr;
+        Rc<Shader> quad3d_shader = nullptr;
 
-        Rc<Shader> loading_shader = nullptr;
-        Rc<VertexArray> loading_vertex_array = nullptr;
-        Rc<Buffer> loading_vertex_buffer = nullptr;
+        Rc<Texture> light_texture = nullptr;
         Rc<Texture> loading_texture = nullptr;
+
+        glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
     };
 
     Storage* init(int width, int height);
@@ -58,10 +60,11 @@ namespace renderer {
     void set_viewport(GLint width, GLint height);
     void set_clear_color(GLfloat red, GLfloat green, GLfloat blue);
     void clear(int buffers);
-    void draw_quad();
+    void draw_screen_quad();
     void draw_loading();
     void draw_origin();
-    void draw_light(const glm::vec3& position);
+    void draw_quad_2d(const glm::vec3& position, float scale, Rc<Texture> texture);
+    void draw_quad_3d(const glm::vec3& position, float scale, Rc<Texture> texture);
     void bind_texture(GLuint texture, GLenum slot);
     void set_stencil_mask_zero();
     void load_projection_view(const glm::mat4& matrix);

@@ -15,7 +15,7 @@
 #include "opengl/renderer/renderer.h"
 #include "other/model.h"
 #include "other/loader.h"
-#include "ecs/game.h"
+#include "ecs_and_game/game.h"
 
 constexpr int VERSION_MAJOR = 0;
 constexpr int VERSION_MINOR = 1;

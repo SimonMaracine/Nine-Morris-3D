@@ -8,9 +8,11 @@ int main() {
     constexpr int height = 576;
 
     Application* application = new Application(width, height);
+
     application->push_layer(new GameLayer(2, application));
     application->push_layer(new GuiLayer(1, application));
     application->push_layer(new LoadingLayer(0, application));
     application->run();
+
     delete application;
 }

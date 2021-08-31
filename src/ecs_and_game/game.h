@@ -6,7 +6,7 @@
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
-#include "ecs/components.h"
+#include "ecs_and_game/components.h"
 #include "opengl/renderer/renderer.h"
 #include "other/loader.h"
 

@@ -20,16 +20,20 @@ public:
 
 class Texture {
 public:
-    Texture(GLuint texture);
+    Texture(GLuint texture, int width, int height);
     ~Texture();
 
     static std::shared_ptr<Texture> create(const std::string& file_path, bool mipmapping, float bias = 0.0f);
 	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, bool mipmapping, float bias = 0.0f);
 
+	int get_width() const { return width; }
+	int get_height() const { return height; }
+
     void bind(GLenum slot) const;
     static void unbind();
 private:
     GLuint texture;
+	int width, height;
 };
 
 class Texture3D {

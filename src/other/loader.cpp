@@ -52,5 +52,9 @@ void Loader::load() {
     }
     assets->skybox_textures_data = skybox_textures;
 
+    assets->white_indicator_data = std::make_shared<TextureData>("data/textures/white_indicator.png", true);
+
+    assets->black_indicator_data = std::make_shared<TextureData>("data/textures/black_indicator.png", true);
+
     loaded.store(true, std::memory_order_relaxed);
 }

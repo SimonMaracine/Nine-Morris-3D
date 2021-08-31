@@ -8,6 +8,7 @@
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
+#include "ecs_and_game/systems.h"
 #include "other/logging.h"
 
 void GuiLayer::on_attach() {
@@ -24,6 +25,8 @@ void GuiLayer::on_bind_layers() {
 }
 
 void GuiLayer::on_update(float dt) {
+    systems::turn_indicator(game_layer->registry, application->data.width, application->data.height);
+    systems::turn_indicator_render(game_layer->registry, game_layer->board, game_layer->storage);
     imgui_update(dt);
 }
 

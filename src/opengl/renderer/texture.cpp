@@ -25,8 +25,8 @@ TextureData::~TextureData() {
     stbi_image_free(data);
 }
 
-Texture::Texture(GLuint texture)
-        : texture(texture) {
+Texture::Texture(GLuint texture, int width, int height)
+        : texture(texture), width(width), height(height) {
     SPDLOG_DEBUG("Created texture {}", texture);
 }
 
@@ -83,7 +83,7 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipm
 
     stbi_image_free(data);
 
-    return std::make_shared<Texture>(texture);
+    return std::make_shared<Texture>(texture, width, height);
 }
 
 std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool mipmapping, float bias) {
@@ -121,7 +121,7 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    return std::make_shared<Texture>(texture);
+    return std::make_shared<Texture>(texture, data->width, data->height);
 }
 
 void Texture::bind(GLenum slot) const {

@@ -19,9 +19,9 @@
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/buffer.h"
-#include "ecs/components.h"
-#include "ecs/systems.h"
-#include "ecs/game.h"
+#include "ecs_and_game/components.h"
+#include "ecs_and_game/systems.h"
+#include "ecs_and_game/game.h"
 #include "other/model.h"
 #include "other/loader.h"
 #include "other/logging.h"
@@ -109,10 +109,10 @@ void GameLayer::on_draw() {
     Framebuffer::bind_default();
 
     renderer::clear(renderer::Color);
-    storage->quad_shader->bind();
-    storage->quad_shader->set_uniform_int("u_screen_texture", 0);
+    storage->screen_quad_shader->bind();
+    storage->screen_quad_shader->set_uniform_int("u_screen_texture", 0);
     renderer::bind_texture(storage->intermediate_framebuffer->get_color_attachment(0), 0);
-    renderer::draw_quad();
+    renderer::draw_screen_quad();
 }
 
 void GameLayer::on_event(events::Event& event) {
@@ -177,6 +177,7 @@ bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
     storage->scene_framebuffer->resize(event.width, event.height);
     storage->intermediate_framebuffer->resize(event.width, event.height);
     systems::projection_matrix(registry, (float) event.width, (float) event.height);
+    storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
 
     return false;
 }
@@ -225,6 +226,7 @@ void GameLayer::start_after_load() {
     }
 
     build_board(std::get<0>(assets->meshes));
+    build_turn_indicator();
 
     SPDLOG_INFO("Finished initializing program");
 }
@@ -255,13 +257,16 @@ void GameLayer::restart() {
     }
 
     build_board(std::get<0>(assets->meshes));
+    build_turn_indicator();
 
     SPDLOG_INFO("Restarted game");
 }
 
 void GameLayer::end() {
     SPDLOG_INFO("Closing program");
+
     renderer::terminate();
+
     if (loader->get_thread().joinable()) {
         loader->get_thread().detach();
     }
@@ -327,6 +332,7 @@ void GameLayer::build_board(const model::Mesh& mesh) {
 
 void GameLayer::build_camera() {
     camera = registry.create();
+
     auto& transform = registry.emplace<TransformComponent>(camera);
     transform.rotation = glm::vec3(47.0f, 0.0f, 0.0f);
 
@@ -351,6 +357,7 @@ void GameLayer::build_skybox() {
     Rc<Texture3D> skybox_texture = Texture3D::create(assets->skybox_textures_data);
 
     entt::entity skybox = registry.create();
+
     registry.emplace<SkyboxMeshComponent>(skybox, vertex_array);
     registry.emplace<SkyboxMaterialComponent>(skybox, storage->skybox_shader);
     registry.emplace<SkyboxTextureComponent>(skybox, skybox_texture);
@@ -383,19 +390,23 @@ void GameLayer::build_piece(int id, Piece type, const model::Mesh& mesh,
 
 void GameLayer::build_directional_light() {
     entt::entity directional_light = registry.create();
+
     auto& transform = registry.emplace<TransformComponent>(directional_light);
     transform.position = LIGHT_POSITION;
+    transform.scale = 0.3f;
 
     registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f),
                                      glm::vec3(1.0f));
     registry.emplace<ShaderComponent>(directional_light, storage->board_shader, storage->piece_shader);
-    registry.emplace<LightMeshComponent>(directional_light, storage->light_shader);
+    registry.emplace<LightMeshComponent>(directional_light, storage->quad3d_shader);
+    registry.emplace<QuadTextureComponent>(directional_light, storage->light_texture);
 
     SPDLOG_DEBUG("Built directional light entity {}", directional_light);
 }
 
 void GameLayer::build_origin() {
     entt::entity origin = registry.create();
+
     registry.emplace<OriginComponent>(origin, storage->origin_shader);
 
     SPDLOG_DEBUG("Built origin entity {}", origin);
@@ -438,4 +449,18 @@ void GameLayer::build_node(int index, const model::Mesh& mesh, const glm::vec3& 
     registry.emplace<NodeComponent>(node, index);
 
     SPDLOG_DEBUG("Built node entity {}", node);
+}
+
+void GameLayer::build_turn_indicator() {
+    entt::entity turn_indicator = registry.create();
+
+    Rc<Texture> white = Texture::create(assets->white_indicator_data, false);
+    Rc<Texture> black = Texture::create(assets->black_indicator_data, false);
+
+    auto& transform = registry.emplace<TransformComponent>(turn_indicator);
+    transform.position = glm::vec3(application->data.width - 100, application->data.height - 125, 0.0f);
+
+    registry.emplace<TurnIndicatorTextureComponent>(turn_indicator, white, black);
+
+    SPDLOG_DEBUG("Built turn indicator entity {}", turn_indicator);
 }

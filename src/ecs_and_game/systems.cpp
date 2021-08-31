@@ -4,9 +4,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "ecs/systems.h"
-#include "ecs/components.h"
-#include "ecs/game.h"
+#include "ecs_and_game/systems.h"
+#include "ecs_and_game/components.h"
+#include "ecs_and_game/game.h"
 #include "application/input.h"
 #include "opengl/renderer/renderer.h"
 #include "other/logging.h"
@@ -116,13 +116,13 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
     }
 }
 
-void systems::projection_matrix(entt::registry& registry, float witdh, float height) {
+void systems::projection_matrix(entt::registry& registry, float width, float height) {
     auto view = registry.view<CameraComponent>();
 
     for (entt::entity entity : view) {
         auto& camera = view.get<CameraComponent>(entity);
 
-        camera.projection_matrix = glm::perspective(glm::radians(45.0f), witdh / height, 0.08f, 100.0f);
+        camera.projection_matrix = glm::perspective(glm::radians(45.0f), width / height, 0.08f, 100.0f);
         camera.projection_view_matrix = camera.projection_matrix * camera.view_matrix;
     }
 }
@@ -221,16 +221,16 @@ void systems::lighting(entt::registry& registry, entt::entity camera_entity) {
 void systems::lighting_render(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = CAMERA(camera_entity);
 
-    auto view = registry.view<TransformComponent, LightMeshComponent>();
+    auto view = registry.view<TransformComponent, LightMeshComponent, QuadTextureComponent>();
 
     for (entt::entity entity : view) {
-        auto [transform, light] = view.get(entity);
+        auto [transform, mesh, texture] = view.get(entity);
 
-        light.shader->bind();
-        light.shader->set_uniform_matrix("u_projection_matrix", camera.projection_matrix);
-        light.shader->set_uniform_matrix("u_view_matrix", camera.view_matrix);
+        mesh.shader->bind();
+        mesh.shader->set_uniform_matrix("u_projection_matrix", camera.projection_matrix);
+        mesh.shader->set_uniform_matrix("u_view_matrix", camera.view_matrix);
 
-        renderer::draw_light(transform.position);
+        renderer::draw_quad_3d(transform.position, transform.scale, texture.texture);
     }
 }
 
@@ -304,6 +304,36 @@ void systems::render_to_depth(entt::registry& registry) {
                                 transform.scale, shadow.shader,
                                 mesh.vertex_array, mesh.index_count);
     }
+}
+
+void systems::turn_indicator_render(entt::registry& registry, entt::entity board, const renderer::Storage* storage) {
+    auto& state = STATE(board);
+
+    auto view = registry.view<TransformComponent, TurnIndicatorTextureComponent>(entt::exclude<LightMeshComponent>);
+
+    for (entt::entity entity : view) {
+        auto [transform, textures] = view.get(entity);
+
+        storage->quad2d_shader->bind();
+        storage->quad2d_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);
+
+        if (state.turn == Player::White) {
+            renderer::draw_quad_2d(transform.position, transform.scale, textures.white_texture);
+        } else {
+            renderer::draw_quad_2d(transform.position, transform.scale, textures.black_texture);
+        }
+    }
+}
+
+void systems::turn_indicator(entt::registry& registry, float width, float height) {
+    auto view = registry.view<TransformComponent, TurnIndicatorTextureComponent>(entt::exclude<LightMeshComponent>);
+
+    for (entt::entity entity : view) {
+        auto& transform = view.get<TransformComponent>(entity);
+
+        transform.position = glm::vec3(width - 100, height - 125, 0.0f);
+    }
+
 }
 
 // void systems::node_move(entt::registry& registry, float dt) {

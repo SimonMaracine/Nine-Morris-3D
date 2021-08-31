@@ -18,6 +18,9 @@ struct Assets {
     Rc<TextureData> white_piece_diffuse_data = nullptr;
     Rc<TextureData> black_piece_diffuse_data = nullptr;
     std::array<Rc<TextureData>, 6> skybox_textures_data;
+
+    Rc<TextureData> white_indicator_data = nullptr;
+    Rc<TextureData> black_indicator_data = nullptr;
 };
 
 class Loader {
