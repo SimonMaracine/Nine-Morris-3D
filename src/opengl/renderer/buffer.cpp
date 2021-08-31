@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 
 #include "opengl/renderer/buffer.h"
+#include "opengl/debug_opengl.h"
 #include "other/logging.h"
 
 Buffer::Buffer(GLuint buffer, Type type)
@@ -22,6 +23,7 @@ std::shared_ptr<Buffer> Buffer::create(std::size_t size) {
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
+    LOG_ALLOCATION(size);
 
     return std::make_shared<Buffer>(buffer, Type::Array);
 }
@@ -32,6 +34,7 @@ std::shared_ptr<Buffer> Buffer::create(const void* data,
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    LOG_ALLOCATION(size);
 
     return std::make_shared<Buffer>(buffer, Type::Array);
 }
@@ -42,6 +45,7 @@ std::shared_ptr<Buffer> Buffer::create_index(const unsigned int* data,
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    LOG_ALLOCATION(size);
 
     return std::make_shared<Buffer>(buffer, Type::Index);
 }
@@ -52,6 +56,7 @@ std::shared_ptr<Buffer> Buffer::create_uniform(const void* data,
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_UNIFORM_BUFFER, buffer);
     glBufferData(GL_UNIFORM_BUFFER, size, data, GL_STATIC_DRAW);
+    LOG_ALLOCATION(size);
 
     return std::make_shared<Buffer>(buffer, Type::Uniform);
 }
@@ -70,8 +75,8 @@ void Buffer::unbind() {
 
 void Buffer::update_data(const void* data, std::size_t size) const {
     switch (type) {
-        case Type::Array: glBufferData(GL_UNIFORM_BUFFER, size, data, GL_STATIC_DRAW); break;
-        case Type::Index: glBufferData(GL_UNIFORM_BUFFER, size, data, GL_STATIC_DRAW); break;
+        case Type::Array: glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); break;
+        case Type::Index: glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); break;
         case Type::Uniform: glBufferData(GL_UNIFORM_BUFFER, size, data, GL_STATIC_DRAW); break;
     }
 }

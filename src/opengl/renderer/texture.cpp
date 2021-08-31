@@ -6,6 +6,7 @@
 #include <stb_image.h>
 
 #include "opengl/renderer/texture.h"
+#include "opengl/debug_opengl.h"
 #include "other/logging.h"
 
 TextureData::TextureData(const std::string& file_path, bool flip) {
@@ -65,10 +66,12 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipm
         glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGB8, width, height);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB,
                         GL_UNSIGNED_BYTE, data);
+        LOG_ALLOCATION(width * height * 4);
     } else if (channels == 4) {
         glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA,
                         GL_UNSIGNED_BYTE, data);
+        LOG_ALLOCATION(width * height * 4);
     } else {
         spdlog::critical("Texture has {} channels", channels);
         std::exit(1);
@@ -105,10 +108,12 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool
         glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGB8, data->width, data->height);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGB,
                         GL_UNSIGNED_BYTE, data->data);
+        LOG_ALLOCATION(data->width * data->height * 4);
     } else if (data->channels == 4) {
         glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, data->width, data->height);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA,
                         GL_UNSIGNED_BYTE, data->data);
+        LOG_ALLOCATION(data->width * data->height * 4);
     } else {
         spdlog::critical("Texture has {} channels", data->channels);
         std::exit(1);
@@ -171,6 +176,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
 
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
                      0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        LOG_ALLOCATION(width * height * 4);
 
         stbi_image_free(data);
     }
@@ -194,6 +200,7 @@ std::shared_ptr<Texture3D> Texture3D::create(std::array<std::shared_ptr<TextureD
     for (int i = 0; i < 6; i++) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB8, data[i]->width,
                      data[i]->height, 0, GL_RGB, GL_UNSIGNED_BYTE, data[i]->data);
+        LOG_ALLOCATION(data[i]->width * data[i]->height * 4);
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);

@@ -229,6 +229,7 @@ void GameLayer::start_after_load() {
     build_turn_indicator();
 
     SPDLOG_INFO("Finished initializing program");
+    STOP_ALLOCATION_LOG;
 }
 
 void GameLayer::restart() {

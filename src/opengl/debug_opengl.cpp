@@ -46,6 +46,9 @@ const char* names[] = {
     "GL_STEREO",
 };
 
+unsigned long long approximately_bytes_allocated_gpu = 0;
+bool stop_counting_bytes_allocated_gpu = false;
+
 namespace debug_opengl {
     static const std::string parse_version(int version) {
         int major, minor, patch;

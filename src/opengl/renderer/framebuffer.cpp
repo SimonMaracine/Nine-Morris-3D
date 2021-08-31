@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 
 #include "opengl/renderer/framebuffer.h"
+#include "opengl/debug_opengl.h"
 #include "other/logging.h"
 
 Framebuffer::Framebuffer(Type type, int width, int height, int samples, int color_attachment_count)
@@ -113,6 +114,7 @@ static void attach_color_texture(GLuint texture, int samples, GLenum internal_fo
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
+        LOG_ALLOCATION(width * height * 4);
     }
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target(multisampled),
@@ -129,6 +131,7 @@ static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum i
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
     } else {
         glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
+        LOG_ALLOCATION(width * height);
     }
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment_type, GL_RENDERBUFFER, renderbuffer);
@@ -147,6 +150,7 @@ static void attach_depth_shadow_texture(GLuint texture, int width, int height) {
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT,
                  GL_FLOAT, nullptr);
+    LOG_ALLOCATION(width * height);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
 }
