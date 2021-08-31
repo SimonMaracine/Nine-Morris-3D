@@ -131,7 +131,7 @@ static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum i
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
     } else {
         glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
-        LOG_ALLOCATION(width * height);
+        LOG_ALLOCATION(width * height * 4);
     }
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment_type, GL_RENDERBUFFER, renderbuffer);
@@ -150,7 +150,7 @@ static void attach_depth_shadow_texture(GLuint texture, int width, int height) {
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT,
                  GL_FLOAT, nullptr);
-    LOG_ALLOCATION(width * height);
+    LOG_ALLOCATION(width * height * 4);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
 }
