@@ -26,16 +26,16 @@ std::thread& Loader::get_thread() {
 }
 
 void Loader::load() {
-    assets->meshes = model::load_model("data/models/board.obj");
+    assets->board_mesh = model::load_model("data/models/board.obj");
+    assets->board_paint_mesh = model::load_model("data/models/board_paint.obj");
+    assets->white_piece_mesh = model::load_model("data/models/white_piece.obj");
+    assets->black_piece_mesh = model::load_model("data/models/black_piece.obj");
+    assets->node_mesh = model::load_model("data/models/node.obj");
 
-    assets->board_diffuse_texture_data =
-        std::make_shared<TextureData>("data/textures/board.png", true);
+    assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board.png", true);
 
-    assets->white_piece_diffuse_data =
-        std::make_shared<TextureData>("data/textures/white_piece.png", true);
-
-    assets->black_piece_diffuse_data =
-        std::make_shared<TextureData>("data/textures/black_piece.png", true);
+    assets->white_piece_diffuse_data = std::make_shared<TextureData>("data/textures/white_piece.png", true);
+    assets->black_piece_diffuse_data = std::make_shared<TextureData>("data/textures/black_piece.png", true);
 
     const char* images[6] = {
         "data/textures/skybox/right.jpg",
@@ -50,10 +50,11 @@ void Loader::load() {
     for (int i = 0; i < 6; i++) {
         skybox_textures[i] = std::make_shared<TextureData>(images[i], false);
     }
-    assets->skybox_textures_data = skybox_textures;
+    assets->skybox_data = skybox_textures;
+
+    assets->board_paint_data = std::make_shared<TextureData>("data/textures/board_paint.png");
 
     assets->white_indicator_data = std::make_shared<TextureData>("data/textures/white_indicator.png", true);
-
     assets->black_indicator_data = std::make_shared<TextureData>("data/textures/black_indicator.png", true);
 
     loaded.store(true, std::memory_order_relaxed);

@@ -1,6 +1,5 @@
 #include <functional>
 #include <memory>
-#include <utility>
 #include <vector>
 #include <algorithm>
 
@@ -208,24 +207,24 @@ void GameLayer::start_after_load() {
 
     build_skybox();
 
-    Rc<Texture> white_piece_diffuse = Texture::create(assets->white_piece_diffuse_data, true, -1.5f);
-    Rc<Texture> black_piece_diffuse = Texture::create(assets->black_piece_diffuse_data, true, -1.5f);
+    storage->white_piece_diffuse_texture = Texture::create(assets->white_piece_diffuse_data, true, -1.5f);
+    storage->black_piece_diffuse_texture = Texture::create(assets->black_piece_diffuse_data, true, -1.5f);
 
     for (int i = 0; i < 9; i++) {
-        build_piece(i, Piece::White, std::get<1>(assets->meshes), white_piece_diffuse,
+        build_piece(i, Piece::White, assets->white_piece_mesh, storage->white_piece_diffuse_texture,
                     glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
     }
 
     for (int i = 9; i < 18; i++) {
-        build_piece(i, Piece::Black, std::get<2>(assets->meshes), black_piece_diffuse,
+        build_piece(i, Piece::Black, assets->black_piece_mesh, storage->black_piece_diffuse_texture,
                     glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
     for (int i = 0; i < 24; i++) {
-        build_node(i, std::get<3>(assets->meshes), NODE_POSITIONS[i]);
+        build_node(i, assets->node_mesh, NODE_POSITIONS[i]);
     }
 
-    build_board(std::get<0>(assets->meshes));
+    build_board(assets->board_mesh);
     build_turn_indicator();
 
     SPDLOG_INFO("Finished initializing program");
@@ -240,26 +239,24 @@ void GameLayer::restart() {
     build_origin();
     build_skybox();
 
-    if (!storage->white_piece_diffuse_texture) {
-        storage->white_piece_diffuse_texture = Texture::create(assets->white_piece_diffuse_data, true, -1.5f);
-        storage->black_piece_diffuse_texture = Texture::create(assets->black_piece_diffuse_data, true, -1.5f);
-    }
+    // storage->white_piece_diffuse_texture = Texture::create(assets->white_piece_diffuse_data, true, -1.5f);
+    // storage->black_piece_diffuse_texture = Texture::create(assets->black_piece_diffuse_data, true, -1.5f);
 
     for (int i = 0; i < 9; i++) {
-        build_piece(i, Piece::White, std::get<1>(assets->meshes), storage->white_piece_diffuse_texture,
+        build_piece(i, Piece::White, assets->white_piece_mesh, storage->white_piece_diffuse_texture,
                     glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
     }
 
     for (int i = 9; i < 18; i++) {
-        build_piece(i, Piece::Black, std::get<2>(assets->meshes), storage->black_piece_diffuse_texture,
+        build_piece(i, Piece::Black, assets->black_piece_mesh, storage->black_piece_diffuse_texture,
                     glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
     for (int i = 0; i < 24; i++) {
-        build_node(i, std::get<3>(assets->meshes), NODE_POSITIONS[i]);
+        build_node(i, assets->node_mesh, NODE_POSITIONS[i]);
     }
 
-    build_board(std::get<0>(assets->meshes));
+    build_board(assets->board_mesh);
     build_turn_indicator();
 
     SPDLOG_INFO("Restarted game");
@@ -318,7 +315,7 @@ void GameLayer::build_board(const model::Mesh& mesh) {
     Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, board);
 
     if (!storage->board_diffuse_texture) {
-        storage->board_diffuse_texture = Texture::create(assets->board_diffuse_texture_data, true, -2.0f);
+        storage->board_diffuse_texture = Texture::create(assets->board_diffuse_data, true, -2.0f);
     }
 
     auto& transform = registry.emplace<TransformComponent>(board);
@@ -358,7 +355,7 @@ void GameLayer::build_skybox() {
     storage->skybox_vertex_array->add_buffer(positions, layout);
     VertexArray::unbind();
 
-    storage->skybox_texture = Texture3D::create(assets->skybox_textures_data);
+    storage->skybox_texture = Texture3D::create(assets->skybox_data);
 
     entt::entity skybox = registry.create();
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 #include <array>
 #include <thread>
 #include <atomic>
@@ -12,12 +11,17 @@
 using namespace model;
 
 struct Assets {
-    std::tuple<Mesh, Mesh, Mesh, Mesh> meshes;
+    Mesh board_mesh;
+    Mesh board_paint_mesh;
+    Mesh white_piece_mesh;
+    Mesh black_piece_mesh;
+    Mesh node_mesh;
 
-    Rc<TextureData> board_diffuse_texture_data = nullptr;
+    Rc<TextureData> board_diffuse_data = nullptr;
     Rc<TextureData> white_piece_diffuse_data = nullptr;
     Rc<TextureData> black_piece_diffuse_data = nullptr;
-    std::array<Rc<TextureData>, 6> skybox_textures_data;
+    std::array<Rc<TextureData>, 6> skybox_data;
+    Rc<TextureData> board_paint_data = nullptr;
 
     Rc<TextureData> white_indicator_data = nullptr;
     Rc<TextureData> black_indicator_data = nullptr;

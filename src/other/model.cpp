@@ -1,7 +1,5 @@
 #include <string>
 #include <vector>
-#include <utility>
-#include <string.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -12,8 +10,8 @@
 #include "other/logging.h"
 
 namespace model {
-    std::tuple<Mesh, Mesh, Mesh, Mesh> load_model(const std::string& file_path) {
-        SPDLOG_DEBUG("Loading models...");
+    Mesh load_model(const std::string& file_path) {
+        SPDLOG_DEBUG("Loading model '{}'...", file_path.c_str());
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(file_path,
@@ -27,83 +25,42 @@ namespace model {
 
         const aiNode* root_node = scene->mRootNode;
 
-        const aiMesh* board_mesh;
-        const aiMesh* white_piece_mesh;
-        const aiMesh* black_piece_mesh;
-        const aiMesh* node_mesh;
+        const aiNode* collection = root_node->mChildren[0];
+        const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-        for (int i = 0; i < 4; i++) {
-            const aiNode* node = root_node->mChildren[i];
+        std::vector<Vertex> vertices;
+        std::vector<unsigned int> indices;
 
-            if (strcmp(node->mName.C_Str(), "Board_export_Cube") == 0) {
-                board_mesh = scene->mMeshes[node->mMeshes[0]];
-            } else if (strcmp(node->mName.C_Str(), "White_Piece_export_Cylinder") == 0) {
-                white_piece_mesh = scene->mMeshes[node->mMeshes[0]];
-            } else if (strcmp(node->mName.C_Str(), "Black_Piece_export_Cylinder3") == 0) {
-                black_piece_mesh = scene->mMeshes[node->mMeshes[0]];
-            } else if (strcmp(node->mName.C_Str(), "Node_export_Cylinder2") == 0) {
-                node_mesh = scene->mMeshes[node->mMeshes[0]];
-            } else {
-                spdlog::critical("Could not find meshes");
-                std::exit(1);
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+            Vertex vertex;
+
+            glm::vec3 position;
+            position.x = mesh->mVertices[i].x;
+            position.y = mesh->mVertices[i].y;
+            position.z = mesh->mVertices[i].z;
+            vertex.position = position;
+
+            glm::vec2 texture_coordinate;
+            texture_coordinate.x = mesh->mTextureCoords[0][i].x;
+            texture_coordinate.y = mesh->mTextureCoords[0][i].y;
+            vertex.texture_coordinate = texture_coordinate;
+
+            glm::vec3 normal;
+            normal.x = mesh->mNormals[i].x;
+            normal.y = mesh->mNormals[i].y;
+            normal.z = mesh->mNormals[i].z;
+            vertex.normal = normal;
+
+            vertices.push_back(vertex);
+        }
+
+        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+            aiFace face = mesh->mFaces[i];
+            for (unsigned int j = 0; j < face.mNumIndices; j++) {
+                indices.push_back(face.mIndices[j]);
             }
         }
 
-        const aiMesh* meshes[4] = { board_mesh, white_piece_mesh,
-                                    black_piece_mesh, node_mesh };
-
-        Mesh board, white_piece, black_piece, node;
-
-        for (int j = 0; j < 4; j++) {
-            std::vector<Vertex> vertices;
-            std::vector<unsigned int> indices;
-
-            for (unsigned int i = 0; i < meshes[j]->mNumVertices; i++) {
-                Vertex vertex;
-
-                glm::vec3 position;
-                position.x = meshes[j]->mVertices[i].x;
-                position.y = meshes[j]->mVertices[i].y;
-                position.z = meshes[j]->mVertices[i].z;
-                vertex.position = position;
-
-                glm::vec2 texture_coordinate;
-                texture_coordinate.x = meshes[j]->mTextureCoords[0][i].x;
-                texture_coordinate.y = meshes[j]->mTextureCoords[0][i].y;
-                vertex.texture_coordinate = texture_coordinate;
-
-                glm::vec3 normal;
-                normal.x = meshes[j]->mNormals[i].x;
-                normal.y = meshes[j]->mNormals[i].y;
-                normal.z = meshes[j]->mNormals[i].z;
-                vertex.normal = normal;
-
-                vertices.push_back(vertex);
-            }
-
-            for (unsigned int i = 0; i < meshes[j]->mNumFaces; i++) {
-                aiFace face = meshes[j]->mFaces[i];
-                for (unsigned int j = 0; j < face.mNumIndices; j++) {
-                    indices.push_back(face.mIndices[j]);
-                }
-            }
-
-            switch (j) {
-                case 0:
-                    board = { Model::Board, vertices, indices };
-                    break;
-                case 1:
-                    white_piece = { Model::WhitePiece, vertices, indices };
-                    break;
-                case 2:
-                    black_piece = { Model::BlackPiece, vertices, indices };
-                    break;
-                case 3:
-                    node = { Model::Node, vertices, indices };
-                    break;
-            }
-        }
-
-        return std::make_tuple(board, white_piece, black_piece, node);
+        return { vertices, indices };
     }
 }
