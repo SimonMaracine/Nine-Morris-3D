@@ -81,6 +81,9 @@ void GameLayer::on_draw() {
     storage->board_shader->bind();
     storage->board_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
     storage->board_shader->set_uniform_int("u_shadow_map", 1);
+    storage->board_paint_shader->bind();
+    storage->board_paint_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    storage->board_paint_shader->set_uniform_int("u_shadow_map", 1);
     storage->piece_shader->bind();
     storage->piece_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
     storage->piece_shader->set_uniform_int("u_shadow_map", 1);
