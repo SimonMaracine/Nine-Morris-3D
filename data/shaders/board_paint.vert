@@ -18,7 +18,7 @@ uniform mat4 u_light_space_matrix;
 
 void main() {
     v_texture_coordinate = a_texture_coordinate;
-    v_normal = mat3(transpose(inverse(u_model_matrix))) * a_normal;
+    v_normal = mat3(u_model_matrix) * a_normal;
 
     v_fragment_position = vec3(u_model_matrix * vec4(a_position, 1.0));
 
