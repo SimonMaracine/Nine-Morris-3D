@@ -16,6 +16,7 @@ public:
 	int width;
 	int height;
 	int channels;
+	std::string name;
 };
 
 class Texture {

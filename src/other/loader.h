@@ -7,10 +7,13 @@
 
 #include "opengl/renderer/texture.h"
 #include "other/model.h"
+#include "other/logging.h"
 
 using namespace model;
 
 struct Assets {
+    ~Assets() { SPDLOG_DEBUG("Deleted assets struct"); }
+
     Mesh board_mesh;
     Mesh board_paint_mesh;
     Mesh white_piece_mesh;

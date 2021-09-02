@@ -233,6 +233,14 @@ void GameLayer::start_after_load() {
     build_board_paint();
     build_turn_indicator();
 
+    assets->board_diffuse_data = nullptr;
+    assets->white_piece_diffuse_data = nullptr;
+    assets->black_piece_diffuse_data = nullptr;
+    assets->skybox_data.fill(nullptr);
+    assets->board_paint_data = nullptr;
+    assets->white_indicator_data = nullptr;
+    assets->black_indicator_data = nullptr;
+
     SPDLOG_INFO("Finished initializing program");
     STOP_ALLOCATION_LOG;
 }
@@ -397,7 +405,9 @@ void GameLayer::build_skybox() {
     storage->skybox_vertex_array->add_buffer(positions, layout);
     VertexArray::unbind();
 
-    storage->skybox_texture = Texture3D::create(assets->skybox_data);
+    if (!storage->skybox_texture) {
+        storage->skybox_texture = Texture3D::create(assets->skybox_data);
+    }
 
     entt::entity skybox = registry.create();
 
@@ -492,8 +502,10 @@ void GameLayer::build_node(int index, const glm::vec3& position) {
 void GameLayer::build_turn_indicator() {
     entt::entity turn_indicator = registry.create();
 
-    storage->white_indicator_texture = Texture::create(assets->white_indicator_data, false);
-    storage->black_indicator_texture = Texture::create(assets->black_indicator_data, false);
+    if (!storage->white_indicator_texture) {
+        storage->white_indicator_texture = Texture::create(assets->white_indicator_data, false);
+        storage->black_indicator_texture = Texture::create(assets->black_indicator_data, false);
+    }
 
     auto& transform = registry.emplace<TransformComponent>(turn_indicator);
     transform.position = glm::vec3(application->data.width - 90, application->data.height - 115, 0.0f);

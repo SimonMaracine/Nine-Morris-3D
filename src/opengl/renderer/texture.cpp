@@ -20,10 +20,14 @@ TextureData::TextureData(const std::string& file_path, bool flip) {
         spdlog::critical("Could not load texture '{}'", file_path.c_str());
         std::exit(1);
     }
+
+    name = file_path;
 }
 
 TextureData::~TextureData() {
     stbi_image_free(data);
+
+    SPDLOG_DEBUG("Freed texture memory '{}'", name.c_str());
 }
 
 Texture::Texture(GLuint texture, int width, int height)

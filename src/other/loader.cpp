@@ -14,7 +14,9 @@ Loader::Loader() {
 
 std::shared_ptr<Assets> Loader::get_assets() {
     loading_thread.join();
-    return assets;
+    std::shared_ptr<Assets> copy = assets;
+    assets = nullptr;
+    return copy;
 }
 
 bool Loader::done_loading() {
@@ -31,6 +33,19 @@ void Loader::load() {
     assets->white_piece_mesh = model::load_model("data/models/white_piece.obj");
     assets->black_piece_mesh = model::load_model("data/models/black_piece.obj");
     assets->node_mesh = model::load_model("data/models/node.obj");
+
+    SPDLOG_DEBUG("Meshes size: {} bytes",
+        assets->board_mesh.vertices.capacity() * sizeof(model::Vertex) +
+        assets->board_mesh.indices.capacity() * sizeof(unsigned int) +
+        assets->board_paint_mesh.vertices.capacity() * sizeof(model::Vertex) +
+        assets->board_paint_mesh.indices.capacity() * sizeof(unsigned int) +
+        assets->white_piece_mesh.vertices.capacity() * sizeof(model::Vertex) +
+        assets->white_piece_mesh.indices.capacity() * sizeof(unsigned int) +
+        assets->black_piece_mesh.vertices.capacity() * sizeof(model::Vertex) +
+        assets->black_piece_mesh.indices.capacity() * sizeof(unsigned int) +
+        assets->node_mesh.vertices.capacity() * sizeof(model::Vertex) +
+        assets->node_mesh.indices.capacity() * sizeof(unsigned int)
+    );
 
     assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board_wood.png", true);
 
