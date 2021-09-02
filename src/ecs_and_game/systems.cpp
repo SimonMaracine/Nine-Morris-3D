@@ -337,22 +337,28 @@ void systems::turn_indicator(entt::registry& registry, float width, float height
     }
 }
 
-// void systems::node_move(entt::registry& registry, float dt) {
-//     auto view = registry.view<TransformComponent, NodeMaterialComponent>();
+// void systems::node_move(entt::registry& registry, float dt, entt::entity cam) {
+//     auto& camera = registry.get<CameraComponent>(cam);
+
+//     auto view = registry.view<TransformComponent, NodeComponent>();
 
 //     for (entt::entity entity : view) {
 //         auto& transform = view.get<TransformComponent>(entity);
 
 //         if (input::is_key_pressed(KEY_UP)) {
-//             transform.position.z += 0.01f;
+//             transform.position.z += 0.001f;
 //         } else if (input::is_key_pressed(KEY_DOWN)) {
-//             transform.position.z -= 0.01f;
+//             transform.position.z -= 0.001f;
 //         }
 
 //         if (input::is_key_pressed(KEY_LEFT)) {
-//             transform.position.x += 0.01f;
+//             transform.position.x += 0.001f;
 //         } else if (input::is_key_pressed(KEY_RIGHT)) {
-//             transform.position.x -= 0.01f;
+//             transform.position.x -= 0.001f;
 //         }
+
+//         camera.point = transform.position;
+
+//         // SPDLOG_DEBUG("[ {}, {} ]", transform.position.x, transform.position.z);
 //     }
 // }

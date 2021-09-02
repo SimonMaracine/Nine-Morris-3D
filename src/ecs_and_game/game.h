@@ -20,33 +20,31 @@ constexpr float PIECE_Y_POSITION = 0.135f;
 constexpr float NODE_Y_POSITION = 0.063f;
 
 constexpr glm::vec3 NODE_POSITIONS[24] = {
-    glm::vec3(2.25f, NODE_Y_POSITION, 2.295f),
-    glm::vec3(-0.04f, NODE_Y_POSITION, 2.29f),
-    glm::vec3(-2.26f, NODE_Y_POSITION, 2.27f),
-    glm::vec3(1.6f, NODE_Y_POSITION, 1.65f),
-    glm::vec3(-0.04f, NODE_Y_POSITION, 1.65f),
-    glm::vec3(-1.66f, NODE_Y_POSITION, 1.65f),
-    glm::vec3(0.98f, NODE_Y_POSITION, 1.01f),
-    glm::vec3(-0.03f, NODE_Y_POSITION, 1.01f),
-    glm::vec3(-0.99f, NODE_Y_POSITION, 1.0f),
-    glm::vec3(2.26f, NODE_Y_POSITION, 0.03f),
-    glm::vec3(1.61f, NODE_Y_POSITION, 0.03f),
-    glm::vec3(0.99f, NODE_Y_POSITION, 0.04f),
-    glm::vec3(-0.99f, NODE_Y_POSITION, 0.03f),
-    glm::vec3(-1.66f, NODE_Y_POSITION, 0.03f),
-    glm::vec3(-2.29f, NODE_Y_POSITION, 0.02f),
-    glm::vec3(0.98f, NODE_Y_POSITION, -1.0f),
-    glm::vec3(-0.07f, NODE_Y_POSITION, -1.0f),
-    glm::vec3(-0.98f, NODE_Y_POSITION, -1.0f),
-    glm::vec3(1.6f, NODE_Y_POSITION, -1.62f),
-    glm::vec3(-0.06f, NODE_Y_POSITION, -1.63f),
-    glm::vec3(-1.65f, NODE_Y_POSITION, -1.63f),
-    glm::vec3(2.25f, NODE_Y_POSITION, -2.26f),
-    glm::vec3(-0.06f, NODE_Y_POSITION, -2.26f),
-    glm::vec3(-2.28f, NODE_Y_POSITION, -2.28f)
+    glm::vec3(2.046f, NODE_Y_POSITION, 2.062f),    // 0
+    glm::vec3(-0.008f, NODE_Y_POSITION, 2.089f),   // 1
+    glm::vec3(-2.101f, NODE_Y_POSITION, 2.076f),   // 2
+    glm::vec3(1.480f, NODE_Y_POSITION, 1.512f),    // 3
+    glm::vec3(0.001f, NODE_Y_POSITION, 1.513f),    // 4
+    glm::vec3(-1.509f, NODE_Y_POSITION, 1.502f),   // 5
+    glm::vec3(0.889f, NODE_Y_POSITION, 0.898f),    // 6
+    glm::vec3(0.001f, NODE_Y_POSITION, 0.906f),    // 7
+    glm::vec3(-0.930f, NODE_Y_POSITION, 0.892f),   // 8
+    glm::vec3(2.058f, NODE_Y_POSITION, 0.041f),    // 9
+    glm::vec3(1.481f, NODE_Y_POSITION, 0.035f),    // 10
+    glm::vec3(0.894f, NODE_Y_POSITION, 0.036f),    // 11
+    glm::vec3(-0.934f, NODE_Y_POSITION, 0.060f),   // 12
+    glm::vec3(-1.508f, NODE_Y_POSITION, 0.060f),   // 13
+    glm::vec3(-2.083f, NODE_Y_POSITION, 0.057f),   // 14
+    glm::vec3(0.882f, NODE_Y_POSITION, -0.894f),   // 15
+    glm::vec3(0.011f, NODE_Y_POSITION, -0.900f),   // 16
+    glm::vec3(-0.930f, NODE_Y_POSITION, -0.890f),  // 17
+    glm::vec3(1.477f, NODE_Y_POSITION, -1.455f),   // 18
+    glm::vec3(0.006f, NODE_Y_POSITION, -1.463f),   // 19
+    glm::vec3(-1.493f, NODE_Y_POSITION, -1.458f),  // 20
+    glm::vec3(2.063f, NODE_Y_POSITION, -2.046f),   // 21
+    glm::vec3(0.001f, NODE_Y_POSITION, -2.061f),   // 22
+    glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
-
-constexpr glm::vec3 AFTER_UNDO_POSITION = glm::vec3(0.0f, 0.45f, 0.0f);
 
 constexpr float PIECE_MOVE_SPEED = 1.5f;
 constexpr int MAX_TURNS_WITHOUT_MILLS = 40 + 1;

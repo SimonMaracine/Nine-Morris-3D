@@ -26,5 +26,5 @@ namespace systems {
     void turn_indicator_render(entt::registry& registry, entt::entity board, RenderStorage* storage);
     void turn_indicator(entt::registry& registry, float witdh, float height);
 
-    // void node_move(entt::registry& registry, float dt);
+    // void node_move(entt::registry& registry, float dt, entt::entity cam);
 }

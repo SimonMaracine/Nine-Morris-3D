@@ -50,6 +50,7 @@ void GameLayer::on_update(float dt) {
     systems::camera(registry, mouse_wheel, dx, dy, dt);
     systems::lighting_move(registry, dt);
     systems::move_pieces(registry, dt);
+    // systems::node_move(registry, dt, camera);
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
