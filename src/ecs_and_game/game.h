@@ -17,7 +17,7 @@
 #define TRANSFORM(entity) registry.get<TransformComponent>(entity)
 
 constexpr float PIECE_Y_POSITION = 0.135f;
-constexpr float NODE_Y_POSITION = 0.062f;
+constexpr float NODE_Y_POSITION = 0.063f;
 
 constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(2.25f, NODE_Y_POSITION, 2.295f),

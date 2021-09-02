@@ -39,6 +39,12 @@ namespace renderer {
                                                uniforms, 1,
                                                storage->uniform_buffer);
 
+        storage->board_paint_shader = Shader::create("data/shaders/board_paint.vert",
+                                                     "data/shaders/board_paint.frag",
+                                                     block_name,
+                                                     uniforms, 1,
+                                                     storage->uniform_buffer);
+
         storage->piece_shader = Shader::create("data/shaders/piece.vert",
                                                "data/shaders/piece.frag",
                                                block_name,
@@ -262,6 +268,32 @@ namespace renderer {
 
         vertex_array->bind();
         storage->board_diffuse_texture->bind(0);
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+    }
+
+    void draw_board_paint(const glm::vec3& position,
+                          const glm::vec3& rotation,
+                          float scale,
+                          Rc<VertexArray> vertex_array,
+                          const glm::vec3& specular_color,
+                          float shininess,
+                          GLuint index_count) {
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, position);
+        matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+
+        storage->board_paint_shader->bind();
+        storage->board_paint_shader->set_uniform_int("u_material.diffuse", 0);
+        storage->board_paint_shader->set_uniform_vec3("u_material.specular", specular_color);
+        storage->board_paint_shader->set_uniform_float("u_material.shininess", shininess);
+
+        storage->board_paint_shader->set_uniform_matrix("u_model_matrix", matrix);
+
+        vertex_array->bind();
+        storage->board_paint_texture->bind(0);
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
     }
 

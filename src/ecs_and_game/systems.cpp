@@ -17,7 +17,7 @@ void systems::load_projection_view(entt::registry& registry, entt::entity camera
     renderer::load_projection_view(camera.projection_view_matrix);
 }
 
-void systems::board_render(entt::registry& registry, RenderStorage* storage) {
+void systems::board_render(entt::registry& registry) {
     auto view = registry.view<TransformComponent, MeshComponent,
                               MaterialComponent, GameStateComponent>();
 
@@ -27,6 +27,19 @@ void systems::board_render(entt::registry& registry, RenderStorage* storage) {
         renderer::draw_board(transform.position, transform.rotation, transform.scale,
                              mesh.vertex_array, material.specular_color, material.shininess,
                              mesh.index_count);
+    }
+}
+
+void systems::board_paint_render(entt::registry& registry) {
+    auto view = registry.view<TransformComponent, MeshComponent,
+                              MaterialComponent, BoardPaintComponent>();
+
+    for (entt::entity entity : view) {
+        auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
+
+        renderer::draw_board_paint(transform.position, transform.rotation, transform.scale,
+                                   mesh.vertex_array, material.specular_color, material.shininess,
+                                   mesh.index_count);
     }
 }
 
@@ -55,7 +68,7 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
 
         // Limit zoom
         zoom = std::max(zoom, 5.0f);
-        zoom = std::min(zoom, 70.0f);
+        zoom = std::min(zoom, 60.0f);
 
         if (input::is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)) {
             move.y_velocity -= move_speed * 0.3f * dy * dt;
@@ -119,7 +132,7 @@ void systems::projection_matrix(entt::registry& registry, float width, float hei
     for (entt::entity entity : view) {
         auto& camera = view.get<CameraComponent>(entity);
 
-        camera.projection_matrix = glm::perspective(glm::radians(45.0f), width / height, 0.08f, 100.0f);
+        camera.projection_matrix = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 70.0f);
         camera.projection_view_matrix = camera.projection_matrix * camera.view_matrix;
     }
 }
@@ -199,6 +212,13 @@ void systems::lighting(entt::registry& registry, entt::entity camera_entity, Ren
         storage->board_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
         storage->board_shader->set_uniform_vec3("u_light.specular", light.specular_color);
         storage->board_shader->set_uniform_vec3("u_view_position", camera_transform.position);
+
+        storage->board_paint_shader->bind();
+        storage->board_paint_shader->set_uniform_vec3("u_light.position", transform.position);
+        storage->board_paint_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+        storage->board_paint_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+        storage->board_paint_shader->set_uniform_vec3("u_light.specular", light.specular_color);
+        storage->board_paint_shader->set_uniform_vec3("u_view_position", camera_transform.position);
 
         storage->piece_shader->bind();
         storage->piece_shader->set_uniform_vec3("u_light.position", transform.position);

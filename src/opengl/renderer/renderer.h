@@ -24,6 +24,7 @@ namespace renderer {
         Rc<Buffer> uniform_buffer = nullptr;
 
         Rc<Shader> board_shader = nullptr;
+        Rc<Shader> board_paint_shader = nullptr;
         Rc<Shader> piece_shader = nullptr;
         Rc<Shader> shadow_shader = nullptr;
         Rc<Shader> screen_quad_shader = nullptr;
@@ -54,6 +55,7 @@ namespace renderer {
         glm::mat4 orthographic_projection_matrix;
 
         Rc<Texture> board_diffuse_texture = nullptr;
+        Rc<Texture> board_paint_texture = nullptr;
         Rc<Texture> white_piece_diffuse_texture = nullptr;
         Rc<Texture> black_piece_diffuse_texture = nullptr;
         Rc<VertexArray> skybox_vertex_array = nullptr;
@@ -83,6 +85,14 @@ namespace renderer {
                     const glm::vec3& specular_color,
                     float shininess,
                     GLuint index_count);
+
+    void draw_board_paint(const glm::vec3& position,
+                          const glm::vec3& rotation,
+                          float scale,
+                          Rc<VertexArray> vertex_array,
+                          const glm::vec3& specular_color,
+                          float shininess,
+                          GLuint index_count);
 
     void draw_piece(const glm::vec3& position,
                     const glm::vec3& rotation,

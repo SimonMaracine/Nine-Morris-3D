@@ -28,8 +28,7 @@ std::shared_ptr<Buffer> Buffer::create(std::size_t size) {
     return std::make_shared<Buffer>(buffer, Type::Array);
 }
 
-std::shared_ptr<Buffer> Buffer::create(const void* data,
-                                       std::size_t size) {
+std::shared_ptr<Buffer> Buffer::create(const void* data, std::size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -39,8 +38,7 @@ std::shared_ptr<Buffer> Buffer::create(const void* data,
     return std::make_shared<Buffer>(buffer, Type::Array);
 }
 
-std::shared_ptr<Buffer> Buffer::create_index(const unsigned int* data,
-                                             std::size_t size) {
+std::shared_ptr<Buffer> Buffer::create_index(const unsigned int* data, std::size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
@@ -50,8 +48,7 @@ std::shared_ptr<Buffer> Buffer::create_index(const unsigned int* data,
     return std::make_shared<Buffer>(buffer, Type::Index);
 }
 
-std::shared_ptr<Buffer> Buffer::create_uniform(const void* data,
-                                               std::size_t size) {
+std::shared_ptr<Buffer> Buffer::create_uniform(const void* data, std::size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_UNIFORM_BUFFER, buffer);

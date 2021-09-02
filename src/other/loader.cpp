@@ -32,7 +32,7 @@ void Loader::load() {
     assets->black_piece_mesh = model::load_model("data/models/black_piece.obj");
     assets->node_mesh = model::load_model("data/models/node.obj");
 
-    assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board.png", true);
+    assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board_wood.png", true);
 
     assets->white_piece_diffuse_data = std::make_shared<TextureData>("data/textures/white_piece.png", true);
     assets->black_piece_diffuse_data = std::make_shared<TextureData>("data/textures/black_piece.png", true);
@@ -52,7 +52,7 @@ void Loader::load() {
     }
     assets->skybox_data = skybox_textures;
 
-    assets->board_paint_data = std::make_shared<TextureData>("data/textures/board_paint.png");
+    assets->board_paint_data = std::make_shared<TextureData>("data/textures/board_paint.png", true);
 
     assets->white_indicator_data = std::make_shared<TextureData>("data/textures/white_indicator.png", true);
     assets->black_indicator_data = std::make_shared<TextureData>("data/textures/black_indicator.png", true);

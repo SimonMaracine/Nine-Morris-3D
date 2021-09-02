@@ -22,7 +22,7 @@ struct CameraComponent {
     CameraComponent(const glm::mat4& projection_matrix, const glm::vec3& point,
                     float distance_to_point)
         : projection_matrix(projection_matrix), point(point),
-            distance_to_point(distance_to_point) {}
+          distance_to_point(distance_to_point) {}
 
     glm::mat4 view_matrix = glm::mat4(1.0f);
     glm::mat4 projection_matrix;
@@ -81,7 +81,7 @@ struct LightComponent {
     LightComponent(const glm::vec3& ambient_color, const glm::vec3& diffuse_color,
                    const glm::vec3& specular_color)
         : ambient_color(ambient_color), diffuse_color(diffuse_color),
-            specular_color(specular_color) {}
+          specular_color(specular_color) {}
 
     glm::vec3 ambient_color;
     glm::vec3 diffuse_color;
@@ -105,4 +105,8 @@ struct TurnIndicatorComponent {
 
 struct ShadowComponent {
     char shadow;
+};
+
+struct BoardPaintComponent {
+    char board_paint;
 };

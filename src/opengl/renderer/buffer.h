@@ -15,12 +15,9 @@ public:
     ~Buffer();
 
     static std::shared_ptr<Buffer> create(std::size_t size);
-    static std::shared_ptr<Buffer> create(const void* data,
-                                          std::size_t size);
-    static std::shared_ptr<Buffer> create_index(const unsigned int* data,
-                                                std::size_t size);
-    static std::shared_ptr<Buffer> create_uniform(const void* data,
-                                                  std::size_t size);
+    static std::shared_ptr<Buffer> create(const void* data, std::size_t size);
+    static std::shared_ptr<Buffer> create_index(const unsigned int* data, std::size_t size);
+    static std::shared_ptr<Buffer> create_uniform(const void* data, std::size_t size);
 
     void bind() const;
     // This only unbinds the ARRAY_BUFFER, not ELEMENT_ARRAY_BUFFER or UNIFORM_BUFFER

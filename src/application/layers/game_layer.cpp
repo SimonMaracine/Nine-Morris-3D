@@ -89,7 +89,8 @@ void GameLayer::on_draw() {
     systems::load_projection_view(registry, camera);
     systems::skybox_render(registry, camera, storage);
     systems::lighting(registry, camera, storage);
-    systems::board_render(registry, storage);
+    systems::board_render(registry);
+    systems::board_paint_render(registry);
     systems::piece_render(registry, hovered_entity, camera, storage);
     systems::node_render(registry, hovered_entity, board);
     systems::origin_render(registry, camera, storage);
@@ -221,10 +222,11 @@ void GameLayer::start_after_load() {
     }
 
     for (int i = 0; i < 24; i++) {
-        build_node(i, assets->node_mesh, NODE_POSITIONS[i]);
+        build_node(i, NODE_POSITIONS[i]);
     }
 
-    build_board(assets->board_mesh);
+    build_board();
+    build_board_paint();
     build_turn_indicator();
 
     SPDLOG_INFO("Finished initializing program");
@@ -239,9 +241,6 @@ void GameLayer::restart() {
     build_origin();
     build_skybox();
 
-    // storage->white_piece_diffuse_texture = Texture::create(assets->white_piece_diffuse_data, true, -1.5f);
-    // storage->black_piece_diffuse_texture = Texture::create(assets->black_piece_diffuse_data, true, -1.5f);
-
     for (int i = 0; i < 9; i++) {
         build_piece(i, Piece::White, assets->white_piece_mesh, storage->white_piece_diffuse_texture,
                     glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
@@ -253,10 +252,11 @@ void GameLayer::restart() {
     }
 
     for (int i = 0; i < 24; i++) {
-        build_node(i, assets->node_mesh, NODE_POSITIONS[i]);
+        build_node(i, NODE_POSITIONS[i]);
     }
 
-    build_board(assets->board_mesh);
+    build_board();
+    build_board_paint();
     build_turn_indicator();
 
     SPDLOG_INFO("Restarted game");
@@ -283,7 +283,7 @@ Rc<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size, entt::entity
     return buffer;
 }
 
-Rc<VertexArray> GameLayer::create_entity_vertex_array(model::Mesh mesh, entt::entity entity) {
+Rc<VertexArray> GameLayer::create_entity_vertex_array(const model::Mesh& mesh, entt::entity entity) {
     Rc<Buffer> vertices = Buffer::create(mesh.vertices.data(), mesh.vertices.size() * sizeof(model::Vertex));
 
     Rc<Buffer> ids = create_ids_buffer(mesh.vertices.size(), entity);
@@ -309,7 +309,9 @@ Rc<VertexArray> GameLayer::create_entity_vertex_array(model::Mesh mesh, entt::en
     return vertex_array;
 }
 
-void GameLayer::build_board(const model::Mesh& mesh) {
+void GameLayer::build_board() {
+    const Mesh& mesh = assets->board_mesh;
+
     board = registry.create();
 
     Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, board);
@@ -331,6 +333,42 @@ void GameLayer::build_board(const model::Mesh& mesh) {
     SPDLOG_DEBUG("Built board entity {}", board);
 }
 
+void GameLayer::build_board_paint() {
+    const Mesh& mesh = assets->board_paint_mesh;
+
+    Rc<Buffer> vertices = Buffer::create(mesh.vertices.data(), mesh.vertices.size() * sizeof(model::Vertex));
+    Rc<VertexArray> vertex_array = VertexArray::create();
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+    layout.add(1, BufferLayout::Type::Float, 2);
+    layout.add(2, BufferLayout::Type::Float, 3);
+
+    Rc<Buffer> index_buffer = Buffer::create_index(mesh.indices.data(), mesh.indices.size() * sizeof(unsigned int));
+
+    index_buffer->bind();
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->hold_index_buffer(index_buffer);
+
+    VertexArray::unbind();
+
+    if (!storage->board_paint_texture) {
+        storage->board_paint_texture = Texture::create(assets->board_paint_data, true, -1.0f);
+    }
+
+    entt::entity board_paint = registry.create();
+
+    auto& transform = registry.emplace<TransformComponent>(board_paint);
+    transform.position = glm::vec3(0.0f, 0.062f, 0.0f);
+    transform.scale = 20.0f;
+
+    registry.emplace<MeshComponent>(board_paint, vertex_array, mesh.indices.size());
+    registry.emplace<MaterialComponent>(board_paint, glm::vec3(0.25f), 8.0f);
+    registry.emplace<BoardPaintComponent>(board_paint);
+
+    SPDLOG_DEBUG("Built board paint entity {}", board_paint);
+}
+
 void GameLayer::build_camera() {
     camera = registry.create();
 
@@ -338,7 +376,7 @@ void GameLayer::build_camera() {
     transform.rotation = glm::vec3(47.0f, 0.0f, 0.0f);
 
     registry.emplace<CameraComponent>(camera,
-        glm::perspective(glm::radians(45.0f), 1024.0f / 576.0f, 0.08f, 100.0f),
+        glm::perspective(glm::radians(45.0f), 1024.0f / 576.0f, 0.1f, 70.0f),
         glm::vec3(0.0f), 8.0f);
     registry.emplace<CameraMoveComponent>(camera);
 
@@ -407,7 +445,9 @@ void GameLayer::build_origin() {
     SPDLOG_DEBUG("Built origin entity {}", origin);
 }
 
-void GameLayer::build_node(int index, const model::Mesh& mesh, const glm::vec3& position) {
+void GameLayer::build_node(int index, const glm::vec3& position) {
+    const Mesh& mesh = assets->node_mesh;
+
     nodes[index] = registry.create();
     entt::entity node = nodes[index];
 
