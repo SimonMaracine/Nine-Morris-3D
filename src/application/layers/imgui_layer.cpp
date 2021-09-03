@@ -167,26 +167,17 @@ void ImGuiLayer::imgui_update(float dt) {
             if (ImGui::BeginMenu("Anti-Aliasing", true)) {
                 static int samples = DEFAULT_MSAA;
                 if (ImGui::RadioButton("No Anti-Aliasing", &samples, 1)) {
-                    int width = application->data.width;
-                    int height = application->data.height;
-                    game_layer->storage->scene_framebuffer =
-                        Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+                    game_layer->set_scene_framebuffer(samples);
 
                     SPDLOG_INFO("Anti-aliasing disabled");
                 }
                 if (ImGui::RadioButton("2x", &samples, 2)) {
-                    int width = application->data.width;
-                    int height = application->data.height;
-                    game_layer->storage->scene_framebuffer =
-                        Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+                    game_layer->set_scene_framebuffer(samples);
 
                     SPDLOG_INFO("2x anti-aliasing");
                 }
                 if (ImGui::RadioButton("4x", &samples, 4)) {
-                    int width = application->data.width;
-                    int height = application->data.height;
-                    game_layer->storage->scene_framebuffer =
-                        Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+                    game_layer->set_scene_framebuffer(samples);
 
                     SPDLOG_INFO("4x anti-aliasing");
                 }

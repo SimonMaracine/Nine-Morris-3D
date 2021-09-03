@@ -43,6 +43,8 @@ public:
     void start_after_load();
     void restart();
     void end();
+
+    void set_scene_framebuffer(int samples);
     void set_textures_quality(TextureQuality quality);
 
     static Rc<Buffer> create_ids_buffer(unsigned int vertices_size, entt::entity entity);

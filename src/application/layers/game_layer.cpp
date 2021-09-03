@@ -288,6 +288,12 @@ void GameLayer::end() {
     }
 }
 
+void GameLayer::set_scene_framebuffer(int samples) {
+    int width = application->data.width;
+    int height = application->data.height;
+    storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+}
+
 void GameLayer::set_textures_quality(TextureQuality quality) {
     if (quality == texture_quality) {
         return;
