@@ -28,11 +28,11 @@ void Loader::start_loading_thread() {
 }
 
 void Loader::load() {
-    assets->board_mesh = model::load_model_full("data/models/board.obj");
-    assets->board_paint_mesh = model::load_model_full("data/models/board_paint.obj");
-    assets->white_piece_mesh = model::load_model_full("data/models/white_piece.obj");
-    assets->black_piece_mesh = model::load_model_full("data/models/black_piece.obj");
-    assets->node_mesh = model::load_model_position("data/models/node.obj");
+    assets->board_mesh = model::load_model_full("data/models/board/board.obj");
+    assets->board_paint_mesh = model::load_model_full("data/models/board/board_paint.obj");
+    assets->white_piece_mesh = model::load_model_full("data/models/piece/white_piece.obj");
+    assets->black_piece_mesh = model::load_model_full("data/models/piece/black_piece.obj");
+    assets->node_mesh = model::load_model_position("data/models/node/node.obj");
 
     SPDLOG_DEBUG("Meshes size: {} bytes",
         assets->board_mesh->vertices.capacity() * sizeof(model::FullVertex) +
@@ -47,10 +47,10 @@ void Loader::load() {
         assets->node_mesh->indices.capacity() * sizeof(unsigned int)
     );
 
-    assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board_wood.png", true);
+    assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board/board_wood.png", true);
 
-    assets->white_piece_diffuse_data = std::make_shared<TextureData>("data/textures/white_piece.png", true);
-    assets->black_piece_diffuse_data = std::make_shared<TextureData>("data/textures/black_piece.png", true);
+    assets->white_piece_diffuse_data = std::make_shared<TextureData>("data/textures/piece/white_piece.png", true);
+    assets->black_piece_diffuse_data = std::make_shared<TextureData>("data/textures/piece/black_piece.png", true);
 
     const char* images[6] = {
         "data/textures/skybox/right.jpg",
@@ -67,10 +67,10 @@ void Loader::load() {
     }
     assets->skybox_data = skybox_textures;
 
-    assets->board_paint_data = std::make_shared<TextureData>("data/textures/board_paint.png", true);
+    assets->board_paint_data = std::make_shared<TextureData>("data/textures/board/board_paint.png", true);
 
-    assets->white_indicator_data = std::make_shared<TextureData>("data/textures/white_indicator.png", true);
-    assets->black_indicator_data = std::make_shared<TextureData>("data/textures/black_indicator.png", true);
+    assets->white_indicator_data = std::make_shared<TextureData>("data/textures/indicator/white_indicator.png", true);
+    assets->black_indicator_data = std::make_shared<TextureData>("data/textures/indicator/black_indicator.png", true);
 
     loaded.store(true, std::memory_order_relaxed);
 }

@@ -142,7 +142,7 @@ namespace renderer {
 
         storage->light_texture = Texture::create("data/textures/light.png", false);
 
-        storage->loading_texture = Texture::create("data/textures/loading.png", false);
+        storage->loading_texture = Texture::create("data/textures/loading/loading.png", false);
 
         storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) width, 0.0f, (float) height);
 
