@@ -26,6 +26,7 @@
 #include "other/model.h"
 #include "other/loader.h"
 #include "other/logging.h"
+#include "other/options.h"
 
 void GameLayer::on_attach() {
     start();
@@ -193,8 +194,10 @@ void GameLayer::start() {
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
     debug_opengl::maybe_init_debugging();
     input::init(application->window->get_handle());
-    storage = renderer::init(application->data.width, application->data.height);
-    loader.start_loading_thread();
+    options::get_options_from_file(options);
+    storage = renderer::init(application->data.width, application->data.height, options.samples);
+    loader.start_loading_thread(options.texture_quality);
+    application->window->set_vsync(options.vsync);
 
     auto [version_major, version_minor] = debug_opengl::get_version();
     if (!(version_major == 4 && version_minor >= 3)) {
@@ -294,24 +297,20 @@ void GameLayer::set_scene_framebuffer(int samples) {
     storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
 }
 
-void GameLayer::set_textures_quality(TextureQuality quality) {
-    if (quality == texture_quality) {
-        return;
-    }
-
-    if (quality == TextureQuality::High) {
+void GameLayer::set_textures_quality(int quality) {
+    if (quality == 0) {
         storage->board_diffuse_texture = Texture::create("data/textures/board/board_wood.png", true, -2.0f);
         storage->board_paint_texture = Texture::create("data/textures/board/board_paint.png", true, -1.0f);
         storage->white_piece_diffuse_texture = Texture::create("data/textures/piece/white_piece.png", true, -1.5f);
         storage->black_piece_diffuse_texture = Texture::create("data/textures/piece/black_piece.png", true, -1.5f);
-    } else {
+    } else if (quality == 1) {
         storage->board_diffuse_texture = Texture::create("data/textures/board/board_wood-small.png", true, -2.0f);
         storage->board_paint_texture = Texture::create("data/textures/board/board_paint-small.png", true, -1.0f);
         storage->white_piece_diffuse_texture = Texture::create("data/textures/piece/white_piece-small.png", true, -1.5f);
         storage->black_piece_diffuse_texture = Texture::create("data/textures/piece/black_piece-small.png", true, -1.5f);
+    } else {
+        assert(false);
     }
-
-    texture_quality = quality;
 }
 
 Rc<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size, entt::entity entity) {

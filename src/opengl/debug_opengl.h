@@ -7,12 +7,12 @@
     if (!stop_counting_bytes_allocated_gpu) { \
         SPDLOG_DEBUG("GPU: Allocated {} bytes", (bytes)); \
         approximately_bytes_allocated_gpu += (bytes); \
-        SPDLOG_DEBUG("GPU: Now there are {} bytes allocated", approximately_bytes_allocated_gpu); \
     }
 
 #define STOP_ALLOCATION_LOG \
     stop_counting_bytes_allocated_gpu = true; \
-    SPDLOG_DEBUG("GPU: Stop counting memory allocated");
+    SPDLOG_DEBUG("GPU: Stop counting memory allocated"); \
+    SPDLOG_DEBUG("GPU: {} total bytes allocated", approximately_bytes_allocated_gpu);
 
 extern unsigned long long approximately_bytes_allocated_gpu;
 extern bool stop_counting_bytes_allocated_gpu;

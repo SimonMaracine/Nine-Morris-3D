@@ -37,6 +37,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/logging.cpp"
     "src/other/model.cpp"
     "src/other/loader.cpp"
+    "src/other/options.cpp"
     "src/ecs_and_game/systems.cpp"
     "src/ecs_and_game/game.cpp"
     "dependencies/Glad/src/glad.c"
@@ -64,6 +65,7 @@ add_subdirectory(extern/Assimp)
 add_subdirectory(extern/entt)
 add_subdirectory(extern/glm)
 add_subdirectory(extern/glfw)
+add_subdirectory(extern/json)
 
 # Add all include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
@@ -75,7 +77,8 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/entt/single_include"
     "${CMAKE_SOURCE_DIR}/extern/glm"
     "${CMAKE_SOURCE_DIR}/extern/glfw/include"
-    "${CMAKE_SOURCE_DIR}/extern/imgui")
+    "${CMAKE_SOURCE_DIR}/extern/imgui"
+    "${CMAKE_SOURCE_DIR}/extern/json/single_include")
 
 # Add all link directories
 target_link_directories(${EXECUTABLE_NAME} PUBLIC

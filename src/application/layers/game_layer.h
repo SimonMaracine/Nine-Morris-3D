@@ -8,9 +8,10 @@
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/buffer.h"
 #include "opengl/renderer/renderer.h"
+#include "ecs_and_game/game.h"
 #include "other/model.h"
 #include "other/loader.h"
-#include "ecs_and_game/game.h"
+#include "other/options.h"
 
 #define LIGHT_POSITION glm::vec3(-11.0f, 13.0f, -15.0f)
 
@@ -35,17 +36,13 @@ public:
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
 
-    enum class TextureQuality {
-        High, Normal
-    };
-
     void start();
     void start_after_load();
     void restart();
     void end();
 
     void set_scene_framebuffer(int samples);
-    void set_textures_quality(TextureQuality quality);
+    void set_textures_quality(int quality);
 
     static Rc<Buffer> create_ids_buffer(unsigned int vertices_size, entt::entity entity);
     static Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<FullVertex>> mesh, entt::entity entity);
@@ -67,7 +64,8 @@ public:
     float last_mouse_x = 0.0f;
     float last_mouse_y = 0.0f;
 
-    TextureQuality texture_quality = TextureQuality::High;
+    options::Options options;
+
     renderer::Storage* storage = nullptr;
     std::shared_ptr<Assets> assets = nullptr;
     Loader loader;

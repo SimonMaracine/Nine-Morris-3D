@@ -20,7 +20,7 @@ namespace logging {
         const std::string contents = debug_opengl::get_info();
 
         if (target == LogTarget::File) {
-            std::ofstream file = std::ofstream(LOG_FILE, std::ofstream::out);
+            std::ofstream file = std::ofstream(LOG_FILE, std::ios::out | std::ios::trunc);
             file << contents.c_str();
             file.close();
         } else if (target == LogTarget::Console) {

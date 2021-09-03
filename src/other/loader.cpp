@@ -21,13 +21,13 @@ std::thread& Loader::get_thread() {
     return loading_thread;
 }
 
-void Loader::start_loading_thread() {
+void Loader::start_loading_thread(bool small_textures) {
     SPDLOG_INFO("Loading assets...");
 
-    loading_thread = std::thread(&Loader::load, this);
+    loading_thread = std::thread(&Loader::load, this, small_textures);
 }
 
-void Loader::load() {
+void Loader::load(bool small_textures) {
     assets->board_mesh = model::load_model_full("data/models/board/board.obj");
     assets->board_paint_mesh = model::load_model_full("data/models/board/board_paint.obj");
     assets->white_piece_mesh = model::load_model_full("data/models/piece/white_piece.obj");
@@ -47,10 +47,23 @@ void Loader::load() {
         assets->node_mesh->indices.capacity() * sizeof(unsigned int)
     );
 
-    assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board/board_wood.png", true);
+    if (small_textures) {
+        SPDLOG_DEBUG("Loading small textures");
 
-    assets->white_piece_diffuse_data = std::make_shared<TextureData>("data/textures/piece/white_piece.png", true);
-    assets->black_piece_diffuse_data = std::make_shared<TextureData>("data/textures/piece/black_piece.png", true);
+        assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board/board_wood-small.png", true);
+        assets->board_paint_data = std::make_shared<TextureData>("data/textures/board/board_paint-small.png", true);
+
+        assets->white_piece_diffuse_data = std::make_shared<TextureData>("data/textures/piece/white_piece-small.png", true);
+        assets->black_piece_diffuse_data = std::make_shared<TextureData>("data/textures/piece/black_piece-small.png", true);
+    } else {
+        SPDLOG_DEBUG("Loading high resolution textures");
+
+        assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board/board_wood.png", true);
+        assets->board_paint_data = std::make_shared<TextureData>("data/textures/board/board_paint.png", true);
+
+        assets->white_piece_diffuse_data = std::make_shared<TextureData>("data/textures/piece/white_piece.png", true);
+        assets->black_piece_diffuse_data = std::make_shared<TextureData>("data/textures/piece/black_piece.png", true);
+    }
 
     const char* images[6] = {
         "data/textures/skybox/right.jpg",
@@ -66,8 +79,6 @@ void Loader::load() {
         skybox_textures[i] = std::make_shared<TextureData>(images[i], false);
     }
     assets->skybox_data = skybox_textures;
-
-    assets->board_paint_data = std::make_shared<TextureData>("data/textures/board/board_paint.png", true);
 
     assets->white_indicator_data = std::make_shared<TextureData>("data/textures/indicator/white_indicator.png", true);
     assets->black_indicator_data = std::make_shared<TextureData>("data/textures/indicator/black_indicator.png", true);

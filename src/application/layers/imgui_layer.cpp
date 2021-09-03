@@ -154,30 +154,30 @@ void ImGuiLayer::imgui_update(float dt) {
             HOVERING_GUI;
         }
         if (ImGui::BeginMenu("Options")) {
-            static bool vsync = true;
-            if (ImGui::MenuItem("VSync", nullptr, &vsync)) {
-                if (vsync) {
+            if (ImGui::MenuItem("VSync", nullptr, &game_layer->options.vsync)) {
+                if (game_layer->options.vsync) {
                     application->window->set_vsync(1);
+
                     SPDLOG_INFO("VSync enabled");
                 } else {
                     application->window->set_vsync(0);
+
                     SPDLOG_INFO("VSync disabled");
                 }
             }
             if (ImGui::BeginMenu("Anti-Aliasing", true)) {
-                static int samples = DEFAULT_MSAA;
-                if (ImGui::RadioButton("No Anti-Aliasing", &samples, 1)) {
-                    game_layer->set_scene_framebuffer(samples);
+                if (ImGui::RadioButton("No Anti-Aliasing", &game_layer->options.samples, 1)) {
+                    game_layer->set_scene_framebuffer(game_layer->options.samples);
 
                     SPDLOG_INFO("Anti-aliasing disabled");
                 }
-                if (ImGui::RadioButton("2x", &samples, 2)) {
-                    game_layer->set_scene_framebuffer(samples);
+                if (ImGui::RadioButton("2x", &game_layer->options.samples, 2)) {
+                    game_layer->set_scene_framebuffer(game_layer->options.samples);
 
                     SPDLOG_INFO("2x anti-aliasing");
                 }
-                if (ImGui::RadioButton("4x", &samples, 4)) {
-                    game_layer->set_scene_framebuffer(samples);
+                if (ImGui::RadioButton("4x", &game_layer->options.samples, 4)) {
+                    game_layer->set_scene_framebuffer(game_layer->options.samples);
 
                     SPDLOG_INFO("4x anti-aliasing");
                 }
@@ -185,14 +185,13 @@ void ImGuiLayer::imgui_update(float dt) {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Texture Quality", true)) {
-                static int quality = 0;
-                if (ImGui::RadioButton("High", &quality, 0)) {
-                    game_layer->set_textures_quality(GameLayer::TextureQuality::High);
+                if (ImGui::RadioButton("High", &game_layer->options.texture_quality, 0)) {
+                    game_layer->set_textures_quality(game_layer->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to high quality");
                 }
-                if (ImGui::RadioButton("Normal", &quality, 1)) {
-                    game_layer->set_textures_quality(GameLayer::TextureQuality::Normal);
+                if (ImGui::RadioButton("Normal", &game_layer->options.texture_quality, 1)) {
+                    game_layer->set_textures_quality(game_layer->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to normal quality");
                 }
@@ -209,6 +208,7 @@ void ImGuiLayer::imgui_update(float dt) {
             }
             if (ImGui::MenuItem("Log Info", nullptr, false)) {
                 logging::log_opengl_and_dependencies_info(logging::LogTarget::File);
+
                 SPDLOG_INFO("Logged OpenGL and dependencies info");
             }
 
