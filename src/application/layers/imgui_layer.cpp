@@ -164,8 +164,8 @@ void ImGuiLayer::imgui_update(float dt) {
                     SPDLOG_INFO("VSync disabled");
                 }
             }
-            static int samples = DEFAULT_MSAA;
             if (ImGui::BeginMenu("Anti-Aliasing", true)) {
+                static int samples = DEFAULT_MSAA;
                 if (ImGui::RadioButton("No Anti-Aliasing", &samples, 1)) {
                     int width = application->data.width;
                     int height = application->data.height;
@@ -189,6 +189,21 @@ void ImGuiLayer::imgui_update(float dt) {
                         Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
 
                     SPDLOG_INFO("4x anti-aliasing");
+                }
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Texture Quality", true)) {
+                static int quality = 0;
+                if (ImGui::RadioButton("High", &quality, 0)) {
+                    game_layer->set_textures_quality(GameLayer::TextureQuality::High);
+
+                    SPDLOG_INFO("Textures set to high quality");
+                }
+                if (ImGui::RadioButton("Normal", &quality, 1)) {
+                    game_layer->set_textures_quality(GameLayer::TextureQuality::Normal);
+
+                    SPDLOG_INFO("Textures set to normal quality");
                 }
 
                 ImGui::EndMenu();

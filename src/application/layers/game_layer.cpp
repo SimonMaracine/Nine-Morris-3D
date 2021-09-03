@@ -288,6 +288,26 @@ void GameLayer::end() {
     }
 }
 
+void GameLayer::set_textures_quality(TextureQuality quality) {
+    if (quality == texture_quality) {
+        return;
+    }
+
+    if (quality == TextureQuality::High) {
+        storage->board_diffuse_texture = Texture::create("data/textures/board/board_wood.png", true, -2.0f);
+        storage->board_paint_texture = Texture::create("data/textures/board/board_paint.png", true, -1.0f);
+        storage->white_piece_diffuse_texture = Texture::create("data/textures/piece/white_piece.png", true, -1.5f);
+        storage->black_piece_diffuse_texture = Texture::create("data/textures/piece/black_piece.png", true, -1.5f);
+    } else {
+        storage->board_diffuse_texture = Texture::create("data/textures/board/board_wood-small.png", true, -2.0f);
+        storage->board_paint_texture = Texture::create("data/textures/board/board_paint-small.png", true, -1.0f);
+        storage->white_piece_diffuse_texture = Texture::create("data/textures/piece/white_piece-small.png", true, -1.5f);
+        storage->black_piece_diffuse_texture = Texture::create("data/textures/piece/black_piece-small.png", true, -1.5f);
+    }
+
+    texture_quality = quality;
+}
+
 Rc<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size, entt::entity entity) {
     std::vector<int> array;
     array.resize(vertices_size);
