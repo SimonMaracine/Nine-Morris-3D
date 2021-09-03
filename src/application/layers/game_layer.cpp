@@ -42,7 +42,7 @@ void GameLayer::on_update(float dt) {
     static bool loaded = false;
 
     if (!loaded) {
-        assets = loader->get_assets();
+        assets = loader.get_assets();
         start_after_load();
         loaded = true;
     }
@@ -192,7 +192,7 @@ void GameLayer::start() {
     debug_opengl::maybe_init_debugging();
     input::init(application->window->get_handle());
     storage = renderer::init(application->data.width, application->data.height);
-    loader = std::make_unique<Loader>();
+    loader.start_loading_thread();
 
     auto [version_major, version_minor] = debug_opengl::get_version();
     if (!(version_major == 4 && version_minor >= 3)) {
@@ -279,8 +279,8 @@ void GameLayer::end() {
 
     renderer::terminate();
 
-    if (loader->get_thread().joinable()) {
-        loader->get_thread().detach();
+    if (loader.get_thread().joinable()) {
+        loader.get_thread().detach();
     }
 }
 
@@ -295,10 +295,10 @@ Rc<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size, entt::entity
     return buffer;
 }
 
-Rc<VertexArray> GameLayer::create_entity_vertex_array(const model::Mesh& mesh, entt::entity entity) {
-    Rc<Buffer> vertices = Buffer::create(mesh.vertices.data(), mesh.vertices.size() * sizeof(model::Vertex));
+Rc<VertexArray> GameLayer::create_entity_vertex_array(Rc<model::Mesh<FullVertex>> mesh, entt::entity entity) {
+    Rc<Buffer> vertices = Buffer::create(mesh->vertices.data(), mesh->vertices.size() * sizeof(model::FullVertex));
 
-    Rc<Buffer> ids = create_ids_buffer(mesh.vertices.size(), entity);
+    Rc<Buffer> ids = create_ids_buffer(mesh->vertices.size(), entity);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
@@ -308,7 +308,7 @@ Rc<VertexArray> GameLayer::create_entity_vertex_array(const model::Mesh& mesh, e
     BufferLayout layout2;
     layout2.add(3, BufferLayout::Type::Int, 1);
 
-    Rc<Buffer> index_buffer = Buffer::create_index(mesh.indices.data(), mesh.indices.size() * sizeof(unsigned int));
+    Rc<Buffer> index_buffer = Buffer::create_index(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
 
     Rc<VertexArray> vertex_array = VertexArray::create();
     index_buffer->bind();
@@ -321,12 +321,10 @@ Rc<VertexArray> GameLayer::create_entity_vertex_array(const model::Mesh& mesh, e
     return vertex_array;
 }
 
-void GameLayer::build_board() {
-    const Mesh& mesh = assets->board_mesh;
-
+void GameLayer::build_board() {;
     board = registry.create();
 
-    Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, board);
+    Rc<VertexArray> vertex_array = create_entity_vertex_array(assets->board_mesh, board);
 
     if (!storage->board_diffuse_texture) {
         storage->board_diffuse_texture = Texture::create(assets->board_diffuse_data, true, -2.0f);
@@ -335,7 +333,7 @@ void GameLayer::build_board() {
     auto& transform = registry.emplace<TransformComponent>(board);
     transform.scale = 20.0f;
 
-    registry.emplace<MeshComponent>(board, vertex_array, mesh.indices.size());
+    registry.emplace<MeshComponent>(board, vertex_array, assets->board_mesh->indices.size());
     registry.emplace<MaterialComponent>(board, glm::vec3(0.25f), 8.0f);
     registry.emplace<ShadowComponent>(board);
 
@@ -346,9 +344,8 @@ void GameLayer::build_board() {
 }
 
 void GameLayer::build_board_paint() {
-    const Mesh& mesh = assets->board_paint_mesh;
-
-    Rc<Buffer> vertices = Buffer::create(mesh.vertices.data(), mesh.vertices.size() * sizeof(model::Vertex));
+    Rc<Buffer> vertices = Buffer::create(assets->board_paint_mesh->vertices.data(),
+                                         assets->board_paint_mesh->vertices.size() * sizeof(model::FullVertex));
     Rc<VertexArray> vertex_array = VertexArray::create();
 
     BufferLayout layout;
@@ -356,7 +353,8 @@ void GameLayer::build_board_paint() {
     layout.add(1, BufferLayout::Type::Float, 2);
     layout.add(2, BufferLayout::Type::Float, 3);
 
-    Rc<Buffer> index_buffer = Buffer::create_index(mesh.indices.data(), mesh.indices.size() * sizeof(unsigned int));
+    Rc<Buffer> index_buffer = Buffer::create_index(assets->board_paint_mesh->indices.data(),
+                                                   assets->board_paint_mesh->indices.size() * sizeof(unsigned int));
 
     index_buffer->bind();
     vertex_array->add_buffer(vertices, layout);
@@ -374,7 +372,7 @@ void GameLayer::build_board_paint() {
     transform.position = glm::vec3(0.0f, 0.062f, 0.0f);
     transform.scale = 20.0f;
 
-    registry.emplace<MeshComponent>(board_paint, vertex_array, mesh.indices.size());
+    registry.emplace<MeshComponent>(board_paint, vertex_array, assets->board_paint_mesh->indices.size());
     registry.emplace<MaterialComponent>(board_paint, glm::vec3(0.25f), 8.0f);
     registry.emplace<BoardPaintComponent>(board_paint);
 
@@ -416,7 +414,7 @@ void GameLayer::build_skybox() {
     SPDLOG_DEBUG("Built skybox entity {}", skybox);
 }
 
-void GameLayer::build_piece(int id, Piece type, const model::Mesh& mesh,
+void GameLayer::build_piece(int id, Piece type, Rc<model::Mesh<FullVertex>> mesh,
                             Rc<Texture> diffuse_texture, const glm::vec3& position) {
     entt::entity piece = registry.create();
 
@@ -426,7 +424,7 @@ void GameLayer::build_piece(int id, Piece type, const model::Mesh& mesh,
     transform.position = position;
     transform.scale = 20.0f;
 
-    registry.emplace<MeshComponent>(piece, vertex_array, mesh.indices.size());
+    registry.emplace<MeshComponent>(piece, vertex_array, mesh->indices.size());
     registry.emplace<MaterialComponent>(piece, glm::vec3(0.25f), 8.0f);
     registry.emplace<PieceTextureComponent>(piece, diffuse_texture);
     registry.emplace<OutlineComponent>(piece, storage->outline_shader, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -460,25 +458,21 @@ void GameLayer::build_origin() {
 }
 
 void GameLayer::build_node(int index, const glm::vec3& position) {
-    const Mesh& mesh = assets->node_mesh;
-
     nodes[index] = registry.create();
     entt::entity node = nodes[index];
 
-    std::vector<glm::vec3> data;
-    for (const model::Vertex& vertex : mesh.vertices) {
-        data.push_back(vertex.position);
-    }
-    Rc<Buffer> vertices = Buffer::create(data.data(), data.size() * sizeof(glm::vec3));
+    Rc<Buffer> vertices = Buffer::create(assets->node_mesh->vertices.data(),
+                                         assets->node_mesh->vertices.size() * sizeof(glm::vec3));
 
-    Rc<Buffer> ids = create_ids_buffer(mesh.vertices.size(), node);
+    Rc<Buffer> ids = create_ids_buffer(assets->node_mesh->vertices.size(), node);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     BufferLayout layout2;
     layout2.add(1, BufferLayout::Type::Int, 1);
 
-    Rc<Buffer> index_buffer = Buffer::create_index(mesh.indices.data(), mesh.indices.size() * sizeof(unsigned int));
+    Rc<Buffer> index_buffer = Buffer::create_index(assets->node_mesh->indices.data(),
+                                                   assets->node_mesh->indices.size() * sizeof(unsigned int));
 
     Rc<VertexArray> vertex_array = VertexArray::create();
     index_buffer->bind();
@@ -492,7 +486,7 @@ void GameLayer::build_node(int index, const glm::vec3& position) {
     transform.position = position;
     transform.scale = 20.0f;
 
-    registry.emplace<MeshComponent>(node, vertex_array, mesh.indices.size());
+    registry.emplace<MeshComponent>(node, vertex_array, assets->node_mesh->indices.size());
 
     registry.emplace<NodeComponent>(node, index);
 

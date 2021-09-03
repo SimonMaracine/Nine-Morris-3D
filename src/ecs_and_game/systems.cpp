@@ -68,7 +68,7 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
 
         // Limit zoom
         zoom = std::max(zoom, 5.0f);
-        zoom = std::min(zoom, 60.0f);
+        zoom = std::min(zoom, 50.0f);
 
         if (input::is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)) {
             move.y_velocity -= move_speed * 0.3f * dy * dt;

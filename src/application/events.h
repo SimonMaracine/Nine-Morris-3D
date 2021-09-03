@@ -48,7 +48,7 @@ namespace events {
     class WindowResizedEvent : public Event {
     public:
         WindowResizedEvent(int width, int height)
-                : width(width), height(height) {}
+            : width(width), height(height) {}
 
         virtual EventType get_type() override {
             return WindowResized;
@@ -139,7 +139,7 @@ namespace events {
     class MouseMovedEvent : public Event {
     public:
         MouseMovedEvent(float mouse_x, float mouse_y)
-                : mouse_x(mouse_x), mouse_y(mouse_y) {}
+            : mouse_x(mouse_x), mouse_y(mouse_y) {}
 
         virtual EventType get_type() override {
             return MouseMoved;

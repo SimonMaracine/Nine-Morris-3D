@@ -16,7 +16,7 @@ void LoadingLayer::on_bind_layers() {
 }
 
 void LoadingLayer::on_update(float dt) {
-    if (game_layer->loader->done_loading()) {
+    if (game_layer->loader.done_loading()) {
         active = false;
         game_layer->active = true;
         gui_layer->active = true;

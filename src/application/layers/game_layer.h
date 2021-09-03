@@ -41,13 +41,13 @@ public:
     void end();
 
     static Rc<Buffer> create_ids_buffer(unsigned int vertices_size, entt::entity entity);
-    static Rc<VertexArray> create_entity_vertex_array(const model::Mesh& mesh, entt::entity entity);
+    static Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<FullVertex>> mesh, entt::entity entity);
 
     void build_board();
     void build_board_paint();
     void build_camera();
     void build_skybox();
-    void build_piece(int id, Piece type, const model::Mesh& mesh,
+    void build_piece(int id, Piece type, Rc<model::Mesh<FullVertex>> mesh,
                      Rc<Texture> diffuse_texture, const glm::vec3& position);
     void build_directional_light();
     void build_origin();
@@ -62,7 +62,7 @@ public:
 
     renderer::Storage* storage = nullptr;
     std::shared_ptr<Assets> assets = nullptr;
-    std::unique_ptr<Loader> loader = nullptr;
+    Loader loader;
 
     entt::registry registry;
     entt::entity board = entt::null;

@@ -6,12 +6,6 @@
 #include "other/model.h"
 #include "other/logging.h"
 
-Loader::Loader() {
-    SPDLOG_INFO("Loading assets...");
-
-    loading_thread = std::thread(&Loader::load, this);
-}
-
 std::shared_ptr<Assets> Loader::get_assets() {
     loading_thread.join();
     std::shared_ptr<Assets> copy = assets;
@@ -27,24 +21,30 @@ std::thread& Loader::get_thread() {
     return loading_thread;
 }
 
+void Loader::start_loading_thread() {
+    SPDLOG_INFO("Loading assets...");
+
+    loading_thread = std::thread(&Loader::load, this);
+}
+
 void Loader::load() {
-    assets->board_mesh = model::load_model("data/models/board.obj");
-    assets->board_paint_mesh = model::load_model("data/models/board_paint.obj");
-    assets->white_piece_mesh = model::load_model("data/models/white_piece.obj");
-    assets->black_piece_mesh = model::load_model("data/models/black_piece.obj");
-    assets->node_mesh = model::load_model("data/models/node.obj");
+    assets->board_mesh = model::load_model_full("data/models/board.obj");
+    assets->board_paint_mesh = model::load_model_full("data/models/board_paint.obj");
+    assets->white_piece_mesh = model::load_model_full("data/models/white_piece.obj");
+    assets->black_piece_mesh = model::load_model_full("data/models/black_piece.obj");
+    assets->node_mesh = model::load_model_position("data/models/node.obj");
 
     SPDLOG_DEBUG("Meshes size: {} bytes",
-        assets->board_mesh.vertices.capacity() * sizeof(model::Vertex) +
-        assets->board_mesh.indices.capacity() * sizeof(unsigned int) +
-        assets->board_paint_mesh.vertices.capacity() * sizeof(model::Vertex) +
-        assets->board_paint_mesh.indices.capacity() * sizeof(unsigned int) +
-        assets->white_piece_mesh.vertices.capacity() * sizeof(model::Vertex) +
-        assets->white_piece_mesh.indices.capacity() * sizeof(unsigned int) +
-        assets->black_piece_mesh.vertices.capacity() * sizeof(model::Vertex) +
-        assets->black_piece_mesh.indices.capacity() * sizeof(unsigned int) +
-        assets->node_mesh.vertices.capacity() * sizeof(model::Vertex) +
-        assets->node_mesh.indices.capacity() * sizeof(unsigned int)
+        assets->board_mesh->vertices.capacity() * sizeof(model::FullVertex) +
+        assets->board_mesh->indices.capacity() * sizeof(unsigned int) +
+        assets->board_paint_mesh->vertices.capacity() * sizeof(model::FullVertex) +
+        assets->board_paint_mesh->indices.capacity() * sizeof(unsigned int) +
+        assets->white_piece_mesh->vertices.capacity() * sizeof(model::FullVertex) +
+        assets->white_piece_mesh->indices.capacity() * sizeof(unsigned int) +
+        assets->black_piece_mesh->vertices.capacity() * sizeof(model::FullVertex) +
+        assets->black_piece_mesh->indices.capacity() * sizeof(unsigned int) +
+        assets->node_mesh->vertices.capacity() * sizeof(model::PositionVertex) +
+        assets->node_mesh->indices.capacity() * sizeof(unsigned int)
     );
 
     assets->board_diffuse_data = std::make_shared<TextureData>("data/textures/board_wood.png", true);

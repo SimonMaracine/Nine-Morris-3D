@@ -14,11 +14,11 @@ using namespace model;
 struct Assets {
     ~Assets() { SPDLOG_DEBUG("Deleted assets struct"); }
 
-    Mesh board_mesh;
-    Mesh board_paint_mesh;
-    Mesh white_piece_mesh;
-    Mesh black_piece_mesh;
-    Mesh node_mesh;
+    Rc<Mesh<FullVertex>> board_mesh;
+    Rc<Mesh<FullVertex>> board_paint_mesh;
+    Rc<Mesh<FullVertex>> white_piece_mesh;
+    Rc<Mesh<FullVertex>> black_piece_mesh;
+    Rc<Mesh<PositionVertex>> node_mesh;
 
     Rc<TextureData> board_diffuse_data = nullptr;
     Rc<TextureData> white_piece_diffuse_data = nullptr;
@@ -32,11 +32,12 @@ struct Assets {
 
 class Loader {
 public:
-    Loader();
+    Loader() = default;
 
     std::shared_ptr<Assets> get_assets();
     bool done_loading();
     std::thread& get_thread();
+    void start_loading_thread();
 private:
     void load();
 
