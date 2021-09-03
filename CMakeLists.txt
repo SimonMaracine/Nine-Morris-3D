@@ -24,6 +24,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/application/window.cpp"
     "src/application/layers/game_layer.cpp"
     "src/application/layers/loading_layer.cpp"
+    "src/application/layers/imgui_layer.cpp"
     "src/application/layers/gui_layer.cpp"
     "src/opengl/debug_opengl.cpp"
     "src/opengl/renderer/vertex_array.cpp"

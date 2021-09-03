@@ -3,12 +3,20 @@
 #include "application/layer.h"
 
 class GameLayer;
+class GuiLayer;
 
-class GuiLayer : public Layer {
+#define RESET_HOVERING_GUI hovering_gui = false
+#define HOVERING_GUI hovering_gui = true
+
+#define DEFAULT_BROWN ImVec4(0.6f, 0.35f, 0.12f, 1.0f)
+#define DARK_BROWN ImVec4(0.4f, 0.25f, 0.10f, 1.0f)
+#define LIGHT_BROWN ImVec4(0.68f, 0.42f, 0.12f, 1.0f)
+
+class ImGuiLayer : public Layer {
 public:
-    GuiLayer(unsigned int id, Application* application)
+    ImGuiLayer(unsigned int id, Application* application)
         : Layer(id, application) {};
-    virtual ~GuiLayer() = default;
+    virtual ~ImGuiLayer() = default;
 
     virtual void on_attach() override;
     virtual void on_detach() override;
@@ -31,4 +39,5 @@ public:
     bool can_undo = false;
 
     GameLayer* game_layer;
+    GuiLayer* gui_layer;
 };

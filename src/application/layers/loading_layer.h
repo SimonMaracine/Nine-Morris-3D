@@ -3,6 +3,7 @@
 #include "application/layer.h"
 
 class GameLayer;
+class ImGuiLayer;
 class GuiLayer;
 
 class LoadingLayer : public Layer {
@@ -19,5 +20,6 @@ public:
     virtual void on_event(events::Event& event) override;
 
     GameLayer* game_layer;
+    ImGuiLayer* imgui_layer;
     GuiLayer* gui_layer;
 };

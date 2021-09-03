@@ -32,15 +32,17 @@ public:
     void on_event(events::Event& event);
 
     float update_frame_counter();
-
     void push_layer(Layer* layer);
 
     bool running = true;
-    std::shared_ptr<Window> window = nullptr;
-    ApplicationData data;
-    std::vector<Layer*> layer_stack;
     double fps = 0.0;
-
+    ApplicationData data;
+    std::shared_ptr<Window> window = nullptr;
+private:
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
+
+    std::vector<Layer*> layer_stack;
+
+    friend class Layer;
 };

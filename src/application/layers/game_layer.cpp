@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "application/layers/game_layer.h"
-#include "application/layers/gui_layer.h"
+#include "application/layers/imgui_layer.h"
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/window.h"
@@ -35,7 +35,7 @@ void GameLayer::on_detach() {
 }
 
 void GameLayer::on_bind_layers() {
-    gui_layer = get_layer<GuiLayer>(1);
+    imgui_layer = get_layer<ImGuiLayer>(2);
 }
 
 void GameLayer::on_update(float dt) {
@@ -160,7 +160,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
             if (state.should_take_piece) {
                 systems::take_piece(registry, board, hovered_entity);
             } else {
-                systems::place_piece(registry, board, hovered_entity, gui_layer->can_undo);
+                systems::place_piece(registry, board, hovered_entity, imgui_layer->can_undo);
             }
         } else if (state.phase == Phase::MovePieces) {
             if (state.should_take_piece) {

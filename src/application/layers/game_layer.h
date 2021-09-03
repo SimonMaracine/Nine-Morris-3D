@@ -14,7 +14,7 @@
 
 #define LIGHT_POSITION glm::vec3(-11.0f, 13.0f, -15.0f)
 
-class GuiLayer;
+class ImGuiLayer;
 
 class GameLayer : public Layer {
 public:
@@ -71,5 +71,5 @@ public:
 
     entt::entity hovered_entity = entt::null;
 
-    GuiLayer* gui_layer;
+    ImGuiLayer* imgui_layer;
 };

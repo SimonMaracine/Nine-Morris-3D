@@ -1,6 +1,7 @@
 #include "application/application.h"
 #include "application/layers/game_layer.h"
 #include "application/layers/loading_layer.h"
+#include "application/layers/imgui_layer.h"
 #include "application/layers/gui_layer.h"
 
 int main() {
@@ -9,9 +10,10 @@ int main() {
 
     Application* application = new Application(width, height);
 
-    application->push_layer(new GameLayer(2, application));
+    application->push_layer(new GameLayer(0, application));
     application->push_layer(new GuiLayer(1, application));
-    application->push_layer(new LoadingLayer(0, application));
+    application->push_layer(new ImGuiLayer(2, application));
+    application->push_layer(new LoadingLayer(3, application));
     application->run();
 
     delete application;
