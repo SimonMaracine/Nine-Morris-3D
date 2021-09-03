@@ -9,7 +9,6 @@
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
-#include "ecs_and_game/systems.h"
 #include "other/logging.h"
 
 void ImGuiLayer::on_attach() {

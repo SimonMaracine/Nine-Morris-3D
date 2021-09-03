@@ -2,6 +2,8 @@
 #include <memory>
 #include <vector>
 #include <algorithm>
+#include <stdlib.h>
+#include <time.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -203,6 +205,8 @@ void GameLayer::start() {
     build_camera();
     build_directional_light();
     build_origin();
+
+    srand(time(nullptr));
 
     SPDLOG_INFO("Finished initializing the first part of the program");
 }
@@ -420,8 +424,11 @@ void GameLayer::build_piece(int id, Piece type, Rc<model::Mesh<FullVertex>> mesh
 
     Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, piece);
 
+    int random_rotation = rand() % 360;
+
     auto& transform = registry.emplace<TransformComponent>(piece);
     transform.position = position;
+    transform.rotation = glm::vec3(0.0f, glm::radians((float) random_rotation), 0.0f);
     transform.scale = 20.0f;
 
     registry.emplace<MeshComponent>(piece, vertex_array, mesh->indices.size());
