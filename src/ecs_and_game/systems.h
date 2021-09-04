@@ -18,9 +18,11 @@ namespace systems {
     void piece_render(entt::registry& registry, entt::entity hovered_entity,
                       entt::entity camera_entity, RenderStorage* storage);
     void lighting(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage);
+#ifndef NDEBUG
     void lighting_render(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage);
     void lighting_move(entt::registry& registry, float dt);
     void origin_render(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage);
+#endif
     void node_render(entt::registry& registry, entt::entity hovered_entity, entt::entity board_entity);
     void render_to_depth(entt::registry& registry);
     void turn_indicator_render(entt::registry& registry, entt::entity board, RenderStorage* storage);

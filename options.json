@@ -1,5 +1,5 @@
 {
     "samples": 2,
     "texture_quality": 0,
-    "vsync": true
+    "vsync": false
 }

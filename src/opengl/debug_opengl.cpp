@@ -47,8 +47,10 @@ const char* names[] = {
     "GL_STEREO",
 };
 
+#ifndef NDEBUG
 unsigned long long approximately_bytes_allocated_gpu = 0;
 bool stop_counting_bytes_allocated_gpu = false;
+#endif
 
 namespace debug_opengl {
     static const std::string parse_version(int version) {
@@ -71,6 +73,7 @@ namespace debug_opengl {
         return std::string(str);
     }
 
+#ifndef NDEBUG
     static void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
                                GLsizei length, const GLchar* message, const void* userParam) {
         switch (severity) {
@@ -130,6 +133,7 @@ namespace debug_opengl {
                 assert(false);
         }
     }
+#endif
 
     void maybe_init_debugging() {
 #ifndef NDEBUG

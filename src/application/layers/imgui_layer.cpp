@@ -30,6 +30,7 @@ void ImGuiLayer::on_update(float dt) {
 }
 
 void ImGuiLayer::on_draw() {
+
 }
 
 void ImGuiLayer::on_event(events::Event& event) {
@@ -299,6 +300,7 @@ void ImGuiLayer::imgui_update(float dt) {
         }
     }
 
+#ifndef NDEBUG
     ImGui::Begin("Debug");
     ImGui::Text("FPS: %f", application->fps);
     ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
@@ -313,6 +315,7 @@ void ImGuiLayer::imgui_update(float dt) {
     ImGui::Text("History size (move): %lu", moves_history.moved_pieces.size());
     ImGui::Text("History size (take): %lu", moves_history.taken_pieces.size());
     ImGui::End();
+#endif
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

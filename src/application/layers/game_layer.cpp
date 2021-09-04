@@ -51,7 +51,9 @@ void GameLayer::on_update(float dt) {
     }
 
     systems::camera(registry, mouse_wheel, dx, dy, dt);
+#ifndef NDEBUG
     systems::lighting_move(registry, dt);
+#endif
     systems::move_pieces(registry, dt);
     // systems::node_move(registry, dt, camera);
 
@@ -100,8 +102,10 @@ void GameLayer::on_draw() {
     systems::board_paint_render(registry);
     systems::piece_render(registry, hovered_entity, camera, storage);
     systems::node_render(registry, hovered_entity, board);
+#ifndef NDEBUG
     systems::origin_render(registry, camera, storage);
     systems::lighting_render(registry, camera, storage);
+#endif
 
     Framebuffer::resolve_framebuffer(storage->scene_framebuffer->get_id(),
                                      storage->intermediate_framebuffer->get_id(),
@@ -191,7 +195,9 @@ bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
 
 void GameLayer::start() {
     logging::init();
+#ifndef NDEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
+#endif
     debug_opengl::maybe_init_debugging();
     input::init(application->window->get_handle());
     options::load_options_from_file(options);
@@ -207,7 +213,9 @@ void GameLayer::start() {
 
     build_camera();
     build_directional_light();
+#ifndef NDEBUG
     build_origin();
+#endif
 
     srand(time(nullptr));
 
@@ -257,7 +265,9 @@ void GameLayer::restart() {
 
     build_camera();
     build_directional_light();
+#ifndef NDEBUG
     build_origin();
+#endif
     build_skybox();
 
     for (int i = 0; i < 9; i++) {

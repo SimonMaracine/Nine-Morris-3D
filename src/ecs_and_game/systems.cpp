@@ -229,6 +229,7 @@ void systems::lighting(entt::registry& registry, entt::entity camera_entity, Ren
     }
 }
 
+#ifndef NDEBUG
 void systems::lighting_render(entt::registry& registry, entt::entity camera_entity, RenderStorage* storage) {
     auto& camera = CAMERA(camera_entity);
 
@@ -278,6 +279,7 @@ void systems::origin_render(entt::registry& registry, entt::entity camera_entity
         renderer::draw_origin();
     }
 }
+#endif
 
 void systems::node_render(entt::registry& registry, entt::entity hovered_entity, entt::entity board_entity) {
     auto& state = STATE(board_entity);

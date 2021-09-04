@@ -54,7 +54,9 @@ public:
     void build_piece(int id, Piece type, Rc<model::Mesh<FullVertex>> mesh,
                      Rc<Texture> diffuse_texture, const glm::vec3& position);
     void build_directional_light();
+#ifndef NDEBUG
     void build_origin();
+#endif
     void build_node(int index, const glm::vec3& position);
     void build_turn_indicator();
 

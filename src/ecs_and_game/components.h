@@ -88,9 +88,11 @@ struct LightComponent {
     glm::vec3 specular_color;
 };
 
+#ifndef NDEBUG
 struct OriginComponent {
     char origin;
 };
+#endif
 
 struct QuadTextureComponent {
     QuadTextureComponent(Rc<Texture> texture) : texture(texture) {}

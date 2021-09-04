@@ -69,7 +69,9 @@ namespace renderer {
     void clear(int buffers);
     void draw_screen_quad();
     void draw_loading();
+#ifndef NDEBUG
     void draw_origin();
+#endif
     void draw_quad_2d(const glm::vec3& position, float scale, Rc<Texture> texture);
     void draw_quad_3d(const glm::vec3& position, float scale, Rc<Texture> texture);
     void bind_texture(GLuint texture, GLenum slot);

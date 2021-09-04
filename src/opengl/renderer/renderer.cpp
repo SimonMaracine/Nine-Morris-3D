@@ -140,7 +140,9 @@ namespace renderer {
         storage->quad3d_shader = Shader::create("data/shaders/quad3d.vert",
                                                 "data/shaders/quad3d.frag");
 
+#ifndef NDEBUG
         storage->light_texture = Texture::create("data/textures/light.png", false);
+#endif
 
         storage->loading_texture = Texture::create("data/textures/loading/loading.png", false);
 
@@ -189,10 +191,12 @@ namespace renderer {
         glEnable(GL_DEPTH_TEST);
     }
 
+#ifndef NDEBUG
     void draw_origin() {
         storage->origin_vertex_array->bind();
         glDrawArrays(GL_LINES, 0, 6);
     }
+#endif
 
     void draw_quad_2d(const glm::vec3& position, float scale, Rc<Texture> texture) {
         glDisable(GL_DEPTH_TEST);
