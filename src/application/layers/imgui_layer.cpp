@@ -137,6 +137,9 @@ void ImGuiLayer::imgui_update(float dt) {
                 game_layer->restart();
                 can_undo = false;
             }
+            if (ImGui::MenuItem("Load Game", nullptr, false)) {
+                
+            }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 systems::undo(game_layer->registry, game_layer->board);
 
