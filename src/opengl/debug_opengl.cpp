@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <spdlog/version.h>
 #include <entt/entt.hpp>
+#include <nlohmann/json.hpp>
 
 #include "other/logging.h"
 
@@ -227,6 +228,12 @@ namespace debug_opengl {
             char line[50];
             sprintf(line, "EnTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR,
                     ENTT_VERSION_MINOR, ENTT_VERSION_PATCH);
+            output.append(line);
+        }
+        {
+            char line[50];
+            sprintf(line, "json version: %d.%d.%d\n", NLOHMANN_JSON_VERSION_MAJOR,
+                    NLOHMANN_JSON_VERSION_MINOR, NLOHMANN_JSON_VERSION_PATCH);
             output.append(line);
         }
 
