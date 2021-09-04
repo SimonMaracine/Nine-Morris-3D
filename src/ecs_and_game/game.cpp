@@ -45,6 +45,7 @@ static entt::entity place_new_piece(entt::registry& registry, Piece type, float 
     }
 
     assert(false);
+    return entt::null;
 }
 
 static void take_raise_piece(entt::registry& registry, entt::entity piece_entity) {
@@ -1160,6 +1161,7 @@ undo::MoveType undo::get_undo_type(entt::registry& registry, entt::entity board)
     }
 
     assert(false);
+    return MoveType::None;
 }
 
 undo::PlacedPiece undo::undo_place(entt::registry& registry, entt::entity board) {

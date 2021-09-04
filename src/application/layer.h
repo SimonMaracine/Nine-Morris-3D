@@ -31,6 +31,7 @@ protected:
         }
 
         assert(false);
+        return nullptr;
     }
 
     Application* application;

@@ -493,6 +493,7 @@ void GameLayer::build_directional_light() {
     SPDLOG_DEBUG("Built directional light entity {}", directional_light);
 }
 
+#ifndef NDEBUG
 void GameLayer::build_origin() {
     entt::entity origin = registry.create();
 
@@ -500,6 +501,7 @@ void GameLayer::build_origin() {
 
     SPDLOG_DEBUG("Built origin entity {}", origin);
 }
+#endif
 
 void GameLayer::build_node(int index, const glm::vec3& position) {
     nodes[index] = registry.create();

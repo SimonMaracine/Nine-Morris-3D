@@ -250,7 +250,6 @@ void ImGuiLayer::imgui_update(float dt) {
     }
 
     auto& state = game_layer->registry.get<GameStateComponent>(game_layer->board);
-    auto& moves_history = game_layer->registry.get<MovesHistoryComponent>(game_layer->board);
 
     if (state.phase == Phase::GameOver) {
         ImGui::OpenPopup("Game Over");
@@ -301,6 +300,8 @@ void ImGuiLayer::imgui_update(float dt) {
     }
 
 #ifndef NDEBUG
+    auto& moves_history = game_layer->registry.get<MovesHistoryComponent>(game_layer->board);
+
     ImGui::Begin("Debug");
     ImGui::Text("FPS: %f", application->fps);
     ImGui::Text("Frame time (ms): %f", dt * 1000.0f);

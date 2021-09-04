@@ -170,7 +170,7 @@ namespace undo {
     };
 
     enum class MoveType {
-        Place, Move, Take
+        Place, Move, Take, None
     };
 
     void remember_place(entt::registry& registry, entt::entity board);
