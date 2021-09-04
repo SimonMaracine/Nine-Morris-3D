@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 namespace options {
     struct Options {
         int texture_quality = 0;
@@ -9,5 +7,6 @@ namespace options {
         bool vsync = true;
     };
 
-    void get_options_from_file(Options& options);
+    void load_options_from_file(Options& options);
+    void save_options_to_file(const Options& options);
 }

@@ -1,5 +1,5 @@
-#include <string>
 #include <fstream>
+#include <iomanip>
 
 #include <nlohmann/json.hpp>
 
@@ -11,7 +11,7 @@
 using json = nlohmann::json;
 
 namespace options {
-    void get_options_from_file(Options& options) {
+    void load_options_from_file(Options& options) {
         std::ifstream file = std::ifstream(OPTIONS_FILE, std::ios::in | std::ios::ate);
 
         if (!file.is_open()) {
@@ -28,14 +28,17 @@ namespace options {
 
         buffer[size] = 0;
 
-        json object = json::parse(buffer, nullptr, false);
+        json object;
 
-        delete[] buffer;
-
-        if (object.is_discarded()) {
-            spdlog::error("Options file is either corrupted or just invalid");
+        try {
+            object = json::parse(buffer);
+        } catch (json::parse_error& e) {
+            spdlog::error("{}", e.what());
+            delete[] buffer;
             return;
         }
+
+        delete[] buffer;
 
         int vsync;
         int samples;
@@ -69,6 +72,20 @@ namespace options {
         options.samples = samples;
         options.texture_quality = texture_quality;
 
-        SPDLOG_INFO("Got options from file '{}'", OPTIONS_FILE);
+        SPDLOG_INFO("Loaded options from file '{}'", OPTIONS_FILE);
+    }
+
+    void save_options_to_file(const Options& options) {
+        std::ofstream file = std::ofstream(OPTIONS_FILE, std::ios::out | std::ios::trunc);
+
+        json object;
+        object["vsync"] = options.vsync;
+        object["samples"] = options.samples;
+        object["texture_quality"] = options.texture_quality;
+        
+        file << std::setw(4) << object;
+        file.close();
+
+        SPDLOG_INFO("Saved options to file '{}'", OPTIONS_FILE);
     }
 }

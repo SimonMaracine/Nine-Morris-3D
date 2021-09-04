@@ -194,7 +194,7 @@ void GameLayer::start() {
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
     debug_opengl::maybe_init_debugging();
     input::init(application->window->get_handle());
-    options::get_options_from_file(options);
+    options::load_options_from_file(options);
     storage = renderer::init(application->data.width, application->data.height, options.samples);
     loader.start_loading_thread(options.texture_quality);
     application->window->set_vsync(options.vsync);
@@ -289,6 +289,8 @@ void GameLayer::end() {
     if (loader.get_thread().joinable()) {
         loader.get_thread().detach();
     }
+
+    options::save_options_to_file(options);
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {
