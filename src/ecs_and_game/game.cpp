@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <vector>
 #include <array>
-#include <string.h>
-#include <stdlib.h>
 
 #include <entt/entt.hpp>
 
@@ -1161,7 +1159,7 @@ undo::MoveType undo::get_undo_type(entt::registry& registry, entt::entity board)
     }
 
     assert(false);
-    return MoveType::None;
+    return MoveType::Place;
 }
 
 undo::PlacedPiece undo::undo_place(entt::registry& registry, entt::entity board) {
