@@ -4,10 +4,7 @@
 /build
 /build-release
 /data/textures/old
-/data/models/boardold.blend
-/data/models/pieceold.blend
 log.txt
 imgui.ini
 *.blend1
-assets.morrisdat
 Nine-Morris-3D

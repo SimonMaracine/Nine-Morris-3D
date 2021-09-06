@@ -141,7 +141,7 @@ namespace renderer {
                                                 "data/shaders/quad3d.frag");
 
 #ifndef NDEBUG
-        storage->light_texture = Texture::create("data/textures/light.png", false);
+        storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);
 #endif
 
         storage->loading_texture = Texture::create("data/textures/loading/loading.png", false);
