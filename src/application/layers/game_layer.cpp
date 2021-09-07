@@ -294,7 +294,7 @@ void GameLayer::end() {
     options::save_options_to_file(options);
 
     if (options.save_on_exit) {
-        save_load::save_game(registry);
+        save_load::save_game(registry, save_load::gather_entities(board, camera, nodes, pieces));
     }
 }
 
@@ -322,7 +322,11 @@ void GameLayer::set_textures_quality(int quality) {
 
 void GameLayer::load_game() {
     registry.clear();
-    save_load::load_game(registry);
+
+    save_load::Entities entities;
+    save_load::load_game(registry, entities);
+
+    save_load::reset_entities(entities, &board, &camera, nodes, pieces);
 
     rebuild_board_after_load();
     rebuild_camera_after_load();
@@ -339,8 +343,12 @@ void GameLayer::load_game() {
     build_board_paint();
     build_skybox();
     build_directional_light();
+#ifndef NDEBUG
     build_origin();
+#endif
     build_turn_indicator();
+
+    systems::projection_matrix(registry, (float) application->data.width, (float) application->data.height);
 
     SPDLOG_INFO("Loaded game");
 }
@@ -509,7 +517,9 @@ void GameLayer::build_directional_light() {
     transform.scale = 0.3f;
 
     registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f), glm::vec3(1.0f));
+#ifndef NDEBUG
     registry.emplace<QuadTextureComponent>(directional_light, storage->light_texture);
+#endif
 
     SPDLOG_DEBUG("Built directional light entity {}", directional_light);
 }

@@ -143,7 +143,8 @@ void ImGuiLayer::imgui_update(float dt) {
                 game_layer->load_game();
             }
             if (ImGui::MenuItem("Save Game", nullptr, false)) {
-                save_load::save_game(game_layer->registry);
+                save_load::save_game(game_layer->registry, save_load::gather_entities(game_layer->board,
+                    game_layer->camera, game_layer->nodes, game_layer->pieces));
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 systems::undo(game_layer->registry, game_layer->board);

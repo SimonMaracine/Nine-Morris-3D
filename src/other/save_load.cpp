@@ -14,12 +14,14 @@
 #include "other/logging.h"
 
 #define SAVE_GAME_FILE "last_game.dat"
+#define SAVE_ENTITIES_FILE "last_game_entities.dat"
 
 using json = nlohmann::json;
 
 template<typename Archive>
 void serialize(Archive& archive, MovesHistoryComponent& moves_history) {
-    archive(moves_history.moves, moves_history.placed_pieces);
+    archive(moves_history.moves, moves_history.placed_pieces, moves_history.moved_pieces,
+        moves_history.taken_pieces);
 }
 
 template<typename Archive>
@@ -53,8 +55,7 @@ void serialize(Archive& archive, TransformComponent& transform) {
 
 template<typename Archive>
 void serialize(Archive& archive, CameraComponent& camera) {
-    archive(camera.view_matrix, camera.projection_matrix, camera.projection_view_matrix,
-        camera.point, camera.distance_to_point, camera.angle_around_point);
+    archive(camera.point, camera.distance_to_point, camera.angle_around_point);
 }
 
 namespace undo {
@@ -96,34 +97,87 @@ namespace glm {
 }
 
 namespace save_load {
-    void save_game(const entt::registry& registry) {
-        std::ofstream file = std::ofstream(SAVE_GAME_FILE, std::ios::out | std::ios::binary | std::ios::trunc);
+    Entities gather_entities(entt::entity board, entt::entity camera, entt::entity* nodes, entt::entity* pieces) {
+        Entities entities;
 
-        cereal::BinaryOutputArchive output{file};
-        entt::snapshot{registry}.entities(output).component<MovesHistoryComponent,
-            GameStateComponent, NodeComponent, PieceComponent, InactiveTag,
-            TransformComponent, CameraComponent>(output);
-
-        file.close();
-
-        SPDLOG_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
-    }
-
-    void load_game(entt::registry& registry) {
-        std::ifstream file = std::ifstream(SAVE_GAME_FILE, std::ios::in | std::ios::binary);
-
-        if (!file.is_open()) {
-            spdlog::error("Could not open the save game file '{}'", SAVE_GAME_FILE);
-            return;
+        entities.board = board;
+        entities.camera = camera;
+        for (int i = 0; i < 24; i++) {
+            entities.nodes[i] = nodes[i];
+        }
+        for (int i = 0; i < 18; i++) {
+            entities.pieces[i] = pieces[i];
         }
 
-        cereal::BinaryInputArchive input{file};
-        entt::snapshot_loader{registry}.entities(input).component<MovesHistoryComponent,
-            GameStateComponent, NodeComponent, PieceComponent, InactiveTag,
-            TransformComponent, CameraComponent>(input).orphans();
+        return entities;
+    }
 
-        file.close();
+    void reset_entities(const Entities& entities, entt::entity* board, entt::entity* camera, entt::entity* nodes, entt::entity* pieces) {
+        *board = entities.board;
+        *camera = entities.camera;
+        for (int i = 0; i < 24; i++) {
+            nodes[i] = entities.nodes[i];
+        }
+        for (int i = 0; i < 18; i++) {
+            pieces[i] = entities.pieces[i];
+        }
+    }
 
-        SPDLOG_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
+    void save_game(const entt::registry& registry, const Entities& entities) {
+        {
+            std::ofstream file = std::ofstream(SAVE_GAME_FILE, std::ios::out | std::ios::binary | std::ios::trunc);
+
+            cereal::BinaryOutputArchive output{file};
+            entt::snapshot{registry}.entities(output).component<MovesHistoryComponent,
+                GameStateComponent, NodeComponent, PieceComponent, InactiveTag,
+                TransformComponent, CameraComponent>(output);
+
+            file.close();
+        }
+
+        {
+            std::ofstream file = std::ofstream(SAVE_ENTITIES_FILE, std::ios::out | std::ios::binary | std::ios::trunc);
+
+            cereal::BinaryOutputArchive output{file};
+            output(entities);
+
+            file.close();
+        }
+
+        SPDLOG_INFO("Saved game to files '{}' and '{}'", SAVE_GAME_FILE, SAVE_ENTITIES_FILE);
+    }
+
+    void load_game(entt::registry& registry, Entities& entities) {
+        {
+            std::ifstream file = std::ifstream(SAVE_GAME_FILE, std::ios::in | std::ios::binary);
+
+            if (!file.is_open()) {
+                spdlog::error("Could not open the save game file '{}'", SAVE_GAME_FILE);
+                return;
+            }
+
+            cereal::BinaryInputArchive input{file};
+            entt::snapshot_loader{registry}.entities(input).component<MovesHistoryComponent,
+                GameStateComponent, NodeComponent, PieceComponent, InactiveTag,
+                TransformComponent, CameraComponent>(input).orphans();
+
+            file.close();
+        }
+
+        {
+            std::ifstream file = std::ifstream(SAVE_ENTITIES_FILE, std::ios::in | std::ios::binary);
+
+            if (!file.is_open()) {
+                spdlog::error("Could not open the save entities file '{}'", SAVE_ENTITIES_FILE);
+                return;
+            }
+
+            cereal::BinaryInputArchive input{file};
+            input(entities);
+
+            file.close();
+        }
+
+        SPDLOG_INFO("Loaded game from files '{}' and '{}'", SAVE_GAME_FILE, SAVE_ENTITIES_FILE);
     }
 }
