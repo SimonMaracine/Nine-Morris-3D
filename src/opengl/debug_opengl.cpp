@@ -12,6 +12,7 @@
 #include <spdlog/version.h>
 #include <entt/entt.hpp>
 #include <nlohmann/json.hpp>
+#include <cereal/version.hpp>
 
 #include "other/logging.h"
 
@@ -195,11 +196,15 @@ namespace debug_opengl {
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** Dependencies Versions ***\n");
 
+#if defined(__GNUG__)
         {
             char line[50];
             sprintf(line, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
             output.append(line);
         }
+#elif defined(_MSC_VER)
+
+#endif
         {
             char line[50];
             sprintf(line, "GLFW version: %s\n", glfwGetVersionString());
@@ -238,6 +243,12 @@ namespace debug_opengl {
             char line[50];
             sprintf(line, "json version: %d.%d.%d\n", NLOHMANN_JSON_VERSION_MAJOR,
                     NLOHMANN_JSON_VERSION_MINOR, NLOHMANN_JSON_VERSION_PATCH);
+            output.append(line);
+        }
+        {
+            char line[50];
+            sprintf(line, "cereal version: %d.%d.%d\n", CEREAL_VERSION_MAJOR,
+                    CEREAL_VERSION_MINOR, CEREAL_VERSION_PATCH);
             output.append(line);
         }
 

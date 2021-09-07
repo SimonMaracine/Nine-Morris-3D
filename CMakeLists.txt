@@ -38,6 +38,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/model.cpp"
     "src/other/loader.cpp"
     "src/other/options.cpp"
+    "src/other/save_load.cpp"
     "src/ecs_and_game/systems.cpp"
     "src/ecs_and_game/game.cpp"
     "dependencies/Glad/src/glad.c"
@@ -72,6 +73,7 @@ target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
 target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/Glad/include"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
+    "${CMAKE_SOURCE_DIR}/dependencies/cereal/include"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/Assimp/include"
     "${CMAKE_SOURCE_DIR}/extern/entt/single_include"

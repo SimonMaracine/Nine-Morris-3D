@@ -43,6 +43,7 @@ public:
 
     void set_scene_framebuffer(int samples);
     void set_textures_quality(int quality);
+    void load_game();
 
     static Rc<Buffer> create_ids_buffer(unsigned int vertices_size, entt::entity entity);
     static Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<FullVertex>> mesh, entt::entity entity);
@@ -60,6 +61,12 @@ public:
     void build_node(int index, const glm::vec3& position);
     void build_turn_indicator();
 
+    void rebuild_board_after_load();
+    void rebuild_camera_after_load();
+    void rebuild_piece_after_load(entt::entity piece, Rc<model::Mesh<FullVertex>> mesh,
+                                  Rc<Texture> diffuse_texture);
+    void rebuild_node_after_load(entt::entity node);
+
     float mouse_wheel = 0.0f;
     float dx = 0.0f;
     float dy = 0.0f;
@@ -76,8 +83,7 @@ public:
     entt::entity board = entt::null;
     entt::entity camera = entt::null;
     entt::entity nodes[24];
+    entt::entity pieces[18];
 
     entt::entity hovered_entity = entt::null;
-
-    ImGuiLayer* imgui_layer;
 };

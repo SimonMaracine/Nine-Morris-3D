@@ -27,6 +27,7 @@
 #include "other/loader.h"
 #include "other/logging.h"
 #include "other/options.h"
+#include "other/save_load.h"
 
 void GameLayer::on_attach() {
     start();
@@ -38,7 +39,7 @@ void GameLayer::on_detach() {
 }
 
 void GameLayer::on_bind_layers() {
-    imgui_layer = get_layer<ImGuiLayer>(2);
+    
 }
 
 void GameLayer::on_update(float dt) {
@@ -167,7 +168,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
             if (state.should_take_piece) {
                 systems::take_piece(registry, board, hovered_entity);
             } else {
-                systems::place_piece(registry, board, hovered_entity, imgui_layer->can_undo);
+                systems::place_piece(registry, board, hovered_entity);
             }
         } else if (state.phase == Phase::MovePieces) {
             if (state.should_take_piece) {
@@ -301,6 +302,10 @@ void GameLayer::end() {
     }
 
     options::save_options_to_file(options);
+
+    if (options.save_on_exit) {
+        save_load::save_game(registry, save_load::gather_entities(board, camera, nodes, pieces));
+    }
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {
@@ -323,6 +328,39 @@ void GameLayer::set_textures_quality(int quality) {
     } else {
         assert(false);
     }
+}
+
+void GameLayer::load_game() {
+    registry.clear();
+
+    save_load::Entities entities;
+    save_load::load_game(registry, entities);
+
+    save_load::reset_entities(entities, &board, &camera, nodes, pieces);
+
+    rebuild_board_after_load();
+    rebuild_camera_after_load();
+    for (int i = 0; i < 9; i++) {
+        rebuild_piece_after_load(pieces[i], assets->white_piece_mesh, storage->white_piece_diffuse_texture);
+    }
+    for (int i = 9; i < 18; i++) {
+        rebuild_piece_after_load(pieces[i], assets->black_piece_mesh, storage->black_piece_diffuse_texture);
+    }
+    for (int i = 0; i < 24; i++) {
+        rebuild_node_after_load(nodes[i]);
+    }
+
+    build_board_paint();
+    build_skybox();
+    build_directional_light();
+#ifndef NDEBUG
+    build_origin();
+#endif
+    build_turn_indicator();
+
+    systems::projection_matrix(registry, (float) application->data.width, (float) application->data.height);
+
+    SPDLOG_INFO("Loaded game");
 }
 
 Rc<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size, entt::entity entity) {
@@ -458,6 +496,7 @@ void GameLayer::build_skybox() {
 void GameLayer::build_piece(int id, Piece type, Rc<model::Mesh<FullVertex>> mesh,
                             Rc<Texture> diffuse_texture, const glm::vec3& position) {
     entt::entity piece = registry.create();
+    pieces[id] = piece;
 
     Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, piece);
 
@@ -488,7 +527,9 @@ void GameLayer::build_directional_light() {
     transform.scale = 0.3f;
 
     registry.emplace<LightComponent>(directional_light, glm::vec3(0.15f), glm::vec3(0.8f), glm::vec3(1.0f));
+#ifndef NDEBUG
     registry.emplace<QuadTextureComponent>(directional_light, storage->light_texture);
+#endif
 
     SPDLOG_DEBUG("Built directional light entity {}", directional_light);
 }
@@ -504,8 +545,8 @@ void GameLayer::build_origin() {
 #endif
 
 void GameLayer::build_node(int index, const glm::vec3& position) {
-    nodes[index] = registry.create();
-    entt::entity node = nodes[index];
+    entt::entity node = registry.create();
+    nodes[index] = node;
 
     Rc<Buffer> vertices = Buffer::create(assets->node_mesh->vertices.data(),
                                          assets->node_mesh->vertices.size() * sizeof(glm::vec3));
@@ -553,4 +594,54 @@ void GameLayer::build_turn_indicator() {
     registry.emplace<TurnIndicatorComponent>(turn_indicator);
 
     SPDLOG_DEBUG("Built turn indicator entity {}", turn_indicator);
+}
+
+void GameLayer::rebuild_board_after_load() {
+    Rc<VertexArray> vertex_array = create_entity_vertex_array(assets->board_mesh, board);
+
+    registry.emplace<MeshComponent>(board, vertex_array, assets->board_mesh->indices.size());
+    registry.emplace<MaterialComponent>(board, glm::vec3(0.25f), 8.0f);
+    registry.emplace<ShadowComponent>(board);
+}
+
+void GameLayer::rebuild_camera_after_load() {
+    registry.emplace<CameraMoveComponent>(camera);
+}
+
+void GameLayer::rebuild_piece_after_load(entt::entity piece, Rc<model::Mesh<FullVertex>> mesh,
+                                         Rc<Texture> diffuse_texture) {
+    Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, piece);
+
+    registry.emplace<MeshComponent>(piece, vertex_array, mesh->indices.size());
+    registry.emplace<MaterialComponent>(piece, glm::vec3(0.25f), 8.0f);
+    registry.emplace<PieceTextureComponent>(piece, diffuse_texture);
+    registry.emplace<OutlineComponent>(piece, storage->outline_shader, glm::vec3(1.0f, 0.0f, 0.0f));
+    registry.emplace<ShadowComponent>(piece);
+
+    registry.emplace<MoveComponent>(piece);
+}
+
+void GameLayer::rebuild_node_after_load(entt::entity node) {
+    Rc<Buffer> vertices = Buffer::create(assets->node_mesh->vertices.data(),
+                                         assets->node_mesh->vertices.size() * sizeof(glm::vec3));
+
+    Rc<Buffer> ids = create_ids_buffer(assets->node_mesh->vertices.size(), node);
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+    BufferLayout layout2;
+    layout2.add(1, BufferLayout::Type::Int, 1);
+
+    Rc<Buffer> index_buffer = Buffer::create_index(assets->node_mesh->indices.data(),
+                                                   assets->node_mesh->indices.size() * sizeof(unsigned int));
+
+    Rc<VertexArray> vertex_array = VertexArray::create();
+    index_buffer->bind();
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(ids, layout2);
+    vertex_array->hold_index_buffer(index_buffer);
+
+    VertexArray::unbind();
+
+    registry.emplace<MeshComponent>(node, vertex_array, assets->node_mesh->indices.size());
 }

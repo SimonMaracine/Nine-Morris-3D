@@ -5,6 +5,7 @@ namespace options {
         int texture_quality = 0;
         int samples = 2;
         bool vsync = true;
+        bool save_on_exit = true;
     };
 
     void load_options_from_file(Options& options);

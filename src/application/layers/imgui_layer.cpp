@@ -10,6 +10,7 @@
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
 #include "other/logging.h"
+#include "other/save_load.h"
 
 void ImGuiLayer::on_attach() {
     imgui_start();
@@ -138,6 +139,13 @@ void ImGuiLayer::imgui_update(float dt) {
                 game_layer->restart();
                 can_undo = false;
             }
+            if (ImGui::MenuItem("Load Game", nullptr, false)) {
+                game_layer->load_game();
+            }
+            if (ImGui::MenuItem("Save Game", nullptr, false)) {
+                save_load::save_game(game_layer->registry, save_load::gather_entities(game_layer->board,
+                    game_layer->camera, game_layer->nodes, game_layer->pieces));
+            }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 systems::undo(game_layer->registry, game_layer->board);
 
@@ -164,6 +172,13 @@ void ImGuiLayer::imgui_update(float dt) {
                     application->window->set_vsync(0);
 
                     SPDLOG_INFO("VSync disabled");
+                }
+            }
+            if (ImGui::MenuItem("Save On Exit", nullptr, &game_layer->options.save_on_exit)) {
+                if (game_layer->options.save_on_exit) {
+                    SPDLOG_INFO("The game will be saved on exit");
+                } else {
+                    SPDLOG_INFO("The game will not be saved on exit");
                 }
             }
             if (ImGui::BeginMenu("Anti-Aliasing", true)) {
@@ -250,6 +265,10 @@ void ImGuiLayer::imgui_update(float dt) {
     }
 
     auto& state = game_layer->registry.get<GameStateComponent>(game_layer->board);
+
+    if (state.not_placed_pieces_count < 18) {
+        can_undo = true;
+    }
 
     if (state.phase == Phase::GameOver) {
         ImGui::OpenPopup("Game Over");
