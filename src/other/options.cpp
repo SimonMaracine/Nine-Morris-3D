@@ -40,14 +40,16 @@ namespace options {
 
         delete[] buffer;
 
-        int vsync;
-        int samples;
         int texture_quality;
+        int samples;
+        bool vsync;
+        bool save_on_exit;
 
         try {
-            vsync = object.at("vsync").get<bool>();
-            samples = object.at("samples").get<int>();
             texture_quality = object.at("texture_quality").get<int>();
+            samples = object.at("samples").get<int>();
+            vsync = object.at("vsync").get<bool>();
+            save_on_exit = object.at("save_on_exit").get<bool>();
         } catch (json::out_of_range& e) {
             spdlog::error("{}", e.what());
             return;
@@ -71,6 +73,7 @@ namespace options {
         options.vsync = vsync;
         options.samples = samples;
         options.texture_quality = texture_quality;
+        options.save_on_exit = save_on_exit;
 
         SPDLOG_INFO("Loaded options from file '{}'", OPTIONS_FILE);
     }
@@ -79,10 +82,11 @@ namespace options {
         std::ofstream file = std::ofstream(OPTIONS_FILE, std::ios::out | std::ios::trunc);
 
         json object;
-        object["vsync"] = options.vsync;
-        object["samples"] = options.samples;
         object["texture_quality"] = options.texture_quality;
-        
+        object["samples"] = options.samples;
+        object["vsync"] = options.vsync;
+        object["save_on_exit"] = options.save_on_exit;
+
         file << std::setw(4) << object;
         file.close();
 

@@ -292,7 +292,10 @@ void GameLayer::end() {
     }
 
     options::save_options_to_file(options);
-    save_load::save_game(registry);
+
+    if (options.save_on_exit) {
+        save_load::save_game(registry);
+    }
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {

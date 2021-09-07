@@ -142,6 +142,9 @@ void ImGuiLayer::imgui_update(float dt) {
             if (ImGui::MenuItem("Load Game", nullptr, false)) {
                 game_layer->load_game();
             }
+            if (ImGui::MenuItem("Save Game", nullptr, false)) {
+                save_load::save_game(game_layer->registry);
+            }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 systems::undo(game_layer->registry, game_layer->board);
 
@@ -168,6 +171,13 @@ void ImGuiLayer::imgui_update(float dt) {
                     application->window->set_vsync(0);
 
                     SPDLOG_INFO("VSync disabled");
+                }
+            }
+            if (ImGui::MenuItem("Save On Exit", nullptr, &game_layer->options.save_on_exit)) {
+                if (game_layer->options.save_on_exit) {
+                    SPDLOG_INFO("The game will be saved on exit");
+                } else {
+                    SPDLOG_INFO("The game will not be saved on exit");
                 }
             }
             if (ImGui::BeginMenu("Anti-Aliasing", true)) {

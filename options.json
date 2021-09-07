@@ -1,5 +1,6 @@
 {
     "samples": 2,
+    "save_on_exit": true,
     "texture_quality": 0,
     "vsync": true
 }
