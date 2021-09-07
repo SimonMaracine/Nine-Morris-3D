@@ -10,6 +10,7 @@
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
 #include "other/logging.h"
+#include "other/save_load.h"
 
 void ImGuiLayer::on_attach() {
     imgui_start();
@@ -30,6 +31,7 @@ void ImGuiLayer::on_update(float dt) {
 }
 
 void ImGuiLayer::on_draw() {
+
 }
 
 void ImGuiLayer::on_event(events::Event& event) {
@@ -138,7 +140,7 @@ void ImGuiLayer::imgui_update(float dt) {
                 can_undo = false;
             }
             if (ImGui::MenuItem("Load Game", nullptr, false)) {
-                
+                game_layer->load_game();
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 systems::undo(game_layer->registry, game_layer->board);

@@ -19,8 +19,8 @@ struct TransformComponent {
 };
 
 struct CameraComponent {
-    CameraComponent(const glm::mat4& projection_matrix, const glm::vec3& point,
-                    float distance_to_point)
+    CameraComponent() = default;
+    CameraComponent(const glm::mat4& projection_matrix, const glm::vec3& point, float distance_to_point)
         : projection_matrix(projection_matrix), point(point),
           distance_to_point(distance_to_point) {}
 
