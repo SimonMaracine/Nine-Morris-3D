@@ -267,6 +267,10 @@ void ImGuiLayer::imgui_update(float dt) {
     auto& state = game_layer->registry.get<GameStateComponent>(game_layer->board);
     auto& moves_history = game_layer->registry.get<MovesHistoryComponent>(game_layer->board);
 
+    if (state.not_placed_pieces_count < 18) {
+        can_undo = true;
+    }
+
     if (state.phase == Phase::GameOver) {
         ImGui::OpenPopup("Game Over");
 

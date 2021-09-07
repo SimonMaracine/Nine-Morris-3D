@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <array>
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
@@ -132,14 +133,14 @@ struct GameStateComponent {
     int not_placed_pieces_count = 18;
     bool should_take_piece = false;
 
-    entt::entity nodes[24];
+    std::array<entt::entity, 24> nodes;
 
     entt::entity pressed_node = entt::null;
     entt::entity pressed_piece = entt::null;
 
     entt::entity selected_piece = entt::null;
 
-    bool can_jump[2] = { false, false };
+    std::array<bool, 2> can_jump = { false, false };
 
     int turns_without_mills = 0;
     ThreefoldRepetitionHistory repetition_history;
@@ -148,22 +149,22 @@ struct GameStateComponent {
 namespace undo {
     struct PlacedPiece {
         GameStateComponent state;
-        NodeComponent nodes[24];
-        PieceComponent pieces[18];  // Some of these will remain uninitialized
-        TransformComponent transforms[18];
+        std::array<NodeComponent, 24> nodes;
+        std::array<PieceComponent, 18> pieces;  // Some of these will remain uninitialized
+        std::array<TransformComponent, 18> transforms;
     };
 
     struct MovedPiece {
         GameStateComponent state;
-        NodeComponent nodes[24];
-        PieceComponent pieces[18];  // Some of these will remain uninitialized
-        TransformComponent transforms[18];
+        std::array<NodeComponent, 24> nodes;
+        std::array<PieceComponent, 18> pieces;  // Some of these will remain uninitialized
+        std::array<TransformComponent, 18> transforms;
     };
 
     struct TakenPiece {
         GameStateComponent state;
-        NodeComponent nodes[24];
-        PieceComponent pieces[18];  // Some of these will remain uninitialized
+        std::array<NodeComponent, 24> nodes;
+        std::array<PieceComponent, 18> pieces;  // Some of these will remain uninitialized
         PieceComponent removed_piece;
         entt::entity removed_piece_entity;
         TransformComponent transform;
@@ -193,7 +194,7 @@ struct MovesHistoryComponent {
 };
 
 namespace systems {
-    void place_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo);
+    void place_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void move_pieces(entt::registry& registry, float dt);
     void take_piece(entt::registry& registry, entt::entity board, entt::entity hovered);
     void select_piece(entt::registry& registry, entt::entity board, entt::entity hovered);

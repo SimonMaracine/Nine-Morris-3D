@@ -636,7 +636,7 @@ static void remember_position_and_check_repetition(entt::registry& registry, ent
     state.repetition_history.ones.push_back(current_position);
 }
 
-void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered, bool& can_undo) {
+void systems::place_piece(entt::registry& registry, entt::entity board, entt::entity hovered) {
     auto& state = STATE(board);
 
     auto view = registry.view<TransformComponent, NodeComponent>();
@@ -689,8 +689,6 @@ void systems::place_piece(entt::registry& registry, entt::entity board, entt::en
 
                 SPDLOG_INFO("Phase 2");
             }
-
-            can_undo = true;
 
             break;
         }

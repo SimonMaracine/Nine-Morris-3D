@@ -39,7 +39,7 @@ void GameLayer::on_detach() {
 }
 
 void GameLayer::on_bind_layers() {
-    imgui_layer = get_layer<ImGuiLayer>(2);
+    
 }
 
 void GameLayer::on_update(float dt) {
@@ -164,7 +164,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
             if (state.should_take_piece) {
                 systems::take_piece(registry, board, hovered_entity);
             } else {
-                systems::place_piece(registry, board, hovered_entity, imgui_layer->can_undo);
+                systems::place_piece(registry, board, hovered_entity);
             }
         } else if (state.phase == Phase::MovePieces) {
             if (state.should_take_piece) {

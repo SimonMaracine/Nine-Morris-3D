@@ -84,6 +84,4 @@ public:
     entt::entity pieces[18];
 
     entt::entity hovered_entity = entt::null;
-
-    ImGuiLayer* imgui_layer;
 };
