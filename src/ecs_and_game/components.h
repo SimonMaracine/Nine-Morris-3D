@@ -79,8 +79,7 @@ struct OutlineComponent {
 struct LightComponent {
     LightComponent(const glm::vec3& ambient_color, const glm::vec3& diffuse_color,
                    const glm::vec3& specular_color)
-        : ambient_color(ambient_color), diffuse_color(diffuse_color),
-          specular_color(specular_color) {}
+        : ambient_color(ambient_color), diffuse_color(diffuse_color), specular_color(specular_color) {}
 
     glm::vec3 ambient_color;
     glm::vec3 diffuse_color;

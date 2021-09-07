@@ -139,10 +139,10 @@ void ImGuiLayer::imgui_update(float dt) {
                 game_layer->restart();
                 can_undo = false;
             }
-            if (ImGui::MenuItem("Load Game", nullptr, false)) {
+            if (ImGui::MenuItem("Load Last", nullptr, false)) {
                 game_layer->load_game();
             }
-            if (ImGui::MenuItem("Save Game", nullptr, false)) {
+            if (ImGui::MenuItem("Save Last", nullptr, false)) {
                 save_load::save_game(game_layer->registry, save_load::gather_entities(game_layer->board,
                     game_layer->camera, game_layer->nodes, game_layer->pieces));
             }

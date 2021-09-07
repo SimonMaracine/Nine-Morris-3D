@@ -39,7 +39,7 @@ void GameLayer::on_detach() {
 }
 
 void GameLayer::on_bind_layers() {
-    
+
 }
 
 void GameLayer::on_update(float dt) {
@@ -52,10 +52,8 @@ void GameLayer::on_update(float dt) {
     }
 
     systems::camera(registry, mouse_wheel, dx, dy, dt);
-#ifndef NDEBUG
-    systems::lighting_move(registry, dt);
-#endif
     systems::move_pieces(registry, dt);
+    // systems::lighting_move(registry, dt);
     // systems::node_move(registry, dt, camera);
 
     mouse_wheel = 0.0f;
