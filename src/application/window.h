@@ -6,7 +6,7 @@ struct GLFWwindow;
 
 class Window {
 public:
-    Window(int width, int height, ApplicationData* data);
+    Window(ApplicationData* data);
     ~Window();
 
     void update() const;

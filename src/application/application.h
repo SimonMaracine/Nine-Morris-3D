@@ -2,20 +2,12 @@
 
 #include <memory>
 #include <vector>
-
-#include <entt/entt.hpp>
+#include <string>
 
 #include "application/application_data.h"
 #include "application/events.h"
 #include "application/window.h"
-#include "opengl/renderer/shader.h"
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/buffer.h"
-#include "opengl/renderer/framebuffer.h"
-#include "opengl/renderer/renderer.h"
-#include "other/model.h"
-#include "other/loader.h"
-#include "ecs_and_game/game.h"
+#include "other/asset_manager.h"
 
 constexpr int VERSION_MAJOR = 0;
 constexpr int VERSION_MINOR = 1;
@@ -25,7 +17,7 @@ class Layer;
 
 class Application {
 public:
-    Application(int width, int height);
+    Application(int width, int height, const std::string& title);
     ~Application();
 
     void run();
@@ -33,10 +25,12 @@ public:
 
     float update_frame_counter();
     void push_layer(Layer* layer);
+    void add_asset(unsigned int id, const std::string& file_path);
 
     bool running = true;
     double fps = 0.0;
     ApplicationData data;
+    AssetManager asset_manager;
     std::shared_ptr<Window> window = nullptr;
 private:
     bool on_window_closed(events::WindowClosedEvent& event);

@@ -5,13 +5,15 @@
 #include "application/layer.h"
 #include "application/window.h"
 #include "application/events.h"
+#include "opengl/renderer/renderer.h"
 
-Application::Application(int width, int height) {
-    window = std::make_shared<Window>(width, height, &data);
-
+Application::Application(int width, int height, const std::string& title) {
     data.width = width;
     data.height = height;
+    data.title = title;
     data.event_function = BIND(Application::on_event);
+
+    window = std::make_shared<Window>(&data);
 }
 
 Application::~Application() {
@@ -88,6 +90,10 @@ float Application::update_frame_counter() {
 void Application::push_layer(Layer* layer) {
     layer->on_attach();
     layer_stack.push_back(layer);
+}
+
+void Application::add_asset(unsigned int id, const std::string& file_path) {
+    asset_manager.define_asset(id, file_path);
 }
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {

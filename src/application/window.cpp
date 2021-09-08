@@ -8,11 +8,15 @@
 #include "application/events.h"
 #include "other/logging.h"
 
-Window::Window(int width, int height, ApplicationData* data) {
+Window::Window(ApplicationData* data) {
     if (!glfwInit()) {
         spdlog::critical("Could not initialize GLFW");
         std::exit(1);
     }
+
+    glfwSetErrorCallback([](int error, const char* description) {
+        spdlog::critical("[ID: {}] {}", error, description);
+    });
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -27,7 +31,7 @@ Window::Window(int width, int height, ApplicationData* data) {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif
 
-    window = glfwCreateWindow(width, height, "Nine Morris 3D", nullptr, nullptr);
+    window = glfwCreateWindow(data->width, data->height, data->title.c_str(), nullptr, nullptr);
     if (!window) {
         spdlog::critical("Could not create window");
         std::exit(1);

@@ -39,6 +39,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/loader.cpp"
     "src/other/options.cpp"
     "src/other/save_load.cpp"
+    "src/other/asset_manager.cpp"
     "src/ecs_and_game/systems.cpp"
     "src/ecs_and_game/game.cpp"
     "dependencies/Glad/src/glad.c"
