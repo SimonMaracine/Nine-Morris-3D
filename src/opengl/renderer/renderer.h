@@ -47,8 +47,10 @@ namespace renderer {
         Rc<Shader> quad2d_shader = nullptr;
         Rc<Shader> quad3d_shader = nullptr;
 
+#ifndef NDEBUG
         Rc<Texture> light_texture = nullptr;
-        Rc<Texture> loading_texture = nullptr;
+#endif
+        // Rc<Texture> loading_texture = nullptr;
 
         glm::mat4 orthographic_projection_matrix;
 

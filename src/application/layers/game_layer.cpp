@@ -193,7 +193,7 @@ bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
 }
 
 void GameLayer::start() {
-    logging::init();
+    logging::init();  // TODO this should move to application
 #ifndef NDEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
 #endif
@@ -201,7 +201,7 @@ void GameLayer::start() {
     input::init(application->window->get_handle());
     options::load_options_from_file(options);
     storage = renderer::init(application->data.width, application->data.height, options.samples);
-    loader.start_loading_thread(options.texture_quality);
+    // loader.start_loading_thread(options.texture_quality);
     application->window->set_vsync(options.vsync);
 
     auto [version_major, version_minor] = debug_opengl::get_version();

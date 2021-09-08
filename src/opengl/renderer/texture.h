@@ -7,17 +7,7 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-class TextureData {
-public:
-	TextureData(const std::string& file_path, bool flip);
-	~TextureData();
-
-	stbi_uc* data = nullptr;
-	int width;
-	int height;
-	int channels;
-	std::string name;
-};
+#include "other/texture_data.h"
 
 class Texture {
 public:

@@ -25,7 +25,7 @@ public:
 
     float update_frame_counter();
     void push_layer(Layer* layer);
-    void add_asset(unsigned int id, const std::string& file_path);
+    void add_asset(unsigned int id, AssetType type, const std::string& file_path);
 
     bool running = true;
     double fps = 0.0;

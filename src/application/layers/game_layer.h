@@ -76,8 +76,8 @@ public:
     options::Options options;
 
     renderer::Storage* storage = nullptr;
-    std::shared_ptr<Assets> assets = nullptr;
-    Loader loader;
+    // std::shared_ptr<Assets> assets = nullptr;
+    // Loader loader;
 
     entt::registry registry;
     entt::entity board = entt::null;

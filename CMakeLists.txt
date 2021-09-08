@@ -36,6 +36,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/opengl/renderer/framebuffer.cpp"
     "src/other/logging.cpp"
     "src/other/model.cpp"
+    "src/other/texture_data.cpp"
     "src/other/loader.cpp"
     "src/other/options.cpp"
     "src/other/save_load.cpp"

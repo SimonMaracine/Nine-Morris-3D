@@ -19,6 +19,8 @@ public:
     virtual void on_draw() override;
     virtual void on_event(events::Event& event) override;
 
+    Loader loader = Loader(application->asset_manager);
+
     GameLayer* game_layer;
     ImGuiLayer* imgui_layer;
     GuiLayer* gui_layer;

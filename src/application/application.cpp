@@ -6,6 +6,7 @@
 #include "application/window.h"
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
+#include "other/asset_manager.h"
 
 Application::Application(int width, int height, const std::string& title) {
     data.width = width;
@@ -92,8 +93,8 @@ void Application::push_layer(Layer* layer) {
     layer_stack.push_back(layer);
 }
 
-void Application::add_asset(unsigned int id, const std::string& file_path) {
-    asset_manager.define_asset(id, file_path);
+void Application::add_asset(unsigned int id,  AssetType type, const std::string& file_path) {
+    asset_manager.define_asset(id, type, file_path);
 }
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {
