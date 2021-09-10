@@ -8,13 +8,11 @@
 
 using namespace model;
 
-// class Loader;
-
-
 enum class AssetType {
-    FullModel,
-    PositionModel,
-    TextureData,
+    Mesh,
+    MeshP,
+    Texture,
+    TextureFlipped,
     Sound
 };
 
@@ -30,8 +28,12 @@ public:
 
     void define_asset(unsigned int id, AssetType type, const std::string& file_path);
 
-    template<typename T>
-    Rc<T> get(unsigned int id);
+    std::string get_file_path(unsigned int id);
+
+    Rc<Mesh<Vertex>> get_mesh(unsigned int id);
+    Rc<Mesh<VertexP>> get_mesh_p(unsigned int id);
+    Rc<TextureData> get_texture(unsigned int id);
+    Rc<TextureData> get_texture_flipped(unsigned int id);
 
     void load_now(unsigned int id, AssetType type);
     void drop(unsigned int id, AssetType type);
@@ -41,10 +43,11 @@ public:
 
     // TODO sounds, music ...
 private:
-    struct Container {
-        std::unordered_map<unsigned int, Rc<Mesh<FullVertex>>> full_meshes;
-        std::unordered_map<unsigned int, Rc<Mesh<PositionVertex>>> position_meshes;
-        std::unordered_map<unsigned int, Rc<TextureData>> texture_datas;
+    struct Container {  // TODO maybe not needed
+        std::unordered_map<unsigned int, Rc<Mesh<Vertex>>> meshes;
+        std::unordered_map<unsigned int, Rc<Mesh<VertexP>>> meshes_p;
+        std::unordered_map<unsigned int, Rc<TextureData>> textures;
+        std::unordered_map<unsigned int, Rc<TextureData>> textures_flipped;
     };
 
     std::unordered_map<unsigned int, Asset> asset_declarations;

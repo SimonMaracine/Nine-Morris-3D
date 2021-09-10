@@ -1,12 +1,17 @@
 #include <functional>
 #include <memory>
+#include <cassert>
 
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/window.h"
 #include "application/events.h"
+#include "application/scene.h"
+#include "application/input.h"
 #include "opengl/renderer/renderer.h"
+#include "opengl/debug_opengl.h"
 #include "other/asset_manager.h"
+#include "other/logging.h"
 
 Application::Application(int width, int height, const std::string& title) {
     data.width = width;
@@ -14,19 +19,45 @@ Application::Application(int width, int height, const std::string& title) {
     data.title = title;
     data.event_function = BIND(Application::on_event);
 
+    logging::init();
     window = std::make_shared<Window>(&data);
+
+#ifndef NDEBUG
+    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
+#endif
+    input::init(window->get_handle());
+    debug_opengl::maybe_init_debugging();
+
+    auto [version_major, version_minor] = debug_opengl::get_version();
+    if (!(version_major == 4 && version_minor >= 3)) {
+        spdlog::critical("Graphics card must support at minimum OpenGL 4.3");
+        std::exit(1);
+    }
+
+    storage = renderer::init(data.width, data.height);
 }
 
 Application::~Application() {
-    for (unsigned int i = 0; i < layer_stack.size(); i++) {
-        layer_stack[i]->on_detach();
-        delete layer_stack[i];
+    for (unsigned int j = 0; j < scenes.size(); j++) {
+        for (unsigned int i = 0; i < scenes[j]->layer_stack.size(); i++) {
+            delete scenes[j]->layer_stack[i];
+        }
+        delete scenes[j];
     }
+
+    renderer::terminate();
 }
 
 void Application::run() {
-    for (unsigned int i = 0; i < layer_stack.size(); i++) {
-        layer_stack[i]->on_bind_layers();
+    for (unsigned int j = 0; j < scenes.size(); j++) {
+        for (unsigned int i = 0; i < scenes[j]->layer_stack.size(); i++) {
+            scenes[j]->layer_stack[i]->on_bind_layers();
+        }
+    }
+
+    current_scene->on_enter();
+    for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
+        current_scene->layer_stack[i]->on_attach();
     }
 
     float dt;
@@ -34,15 +65,64 @@ void Application::run() {
     while (running) {
         dt = update_frame_counter();
 
-        for (unsigned int i = 0; i < layer_stack.size(); i++) {
-            if (layer_stack[i]->active) {
-                layer_stack[i]->on_update(dt);
-                layer_stack[i]->on_draw();
+        for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
+            if (current_scene->layer_stack[i]->active) {
+                current_scene->layer_stack[i]->on_update(dt);
+                current_scene->layer_stack[i]->on_draw();
             }
+        }
+
+        if (changed_scene) {
+            for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
+                current_scene->layer_stack[i]->on_detach();
+            }
+            current_scene->on_exit();
+
+            current_scene = to_scene;
+
+            current_scene->on_enter();
+            for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
+                current_scene->layer_stack[i]->on_attach();
+            }
+
+            changed_scene = false;
         }
 
         window->update();
     }
+
+    for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
+        current_scene->layer_stack[i]->on_detach();
+    }
+    current_scene->on_exit();
+}
+
+void Application::add_scene(Scene* scene) {
+    scenes.push_back(scene);
+}
+
+void Application::set_starting_scene(Scene* scene) {
+    current_scene = scene;
+}
+
+void Application::change_scene(unsigned int id) {
+    for (Scene* scene : scenes) {
+        if (scene->id == id) {
+            to_scene = scene;
+            changed_scene = true;
+            return;
+        }
+    }
+
+    assert(false);
+}
+
+void Application::push_layer(Layer* layer, Scene* scene) {
+    scene->layer_stack.push_back(layer);
+}
+
+void Application::add_asset(unsigned int id, AssetType type, const std::string& file_path) {
+    asset_manager.define_asset(id, type, file_path);
 }
 
 void Application::on_event(events::Event& event) {
@@ -52,13 +132,13 @@ void Application::on_event(events::Event& event) {
     dispatcher.dispatch<WindowClosedEvent>(WindowClosed, BIND(Application::on_window_closed));
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(Application::on_window_resized));
 
-    for (int i = layer_stack.size() - 1; i >= 0; i--) {
+    for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
         if (event.handled) {
             break;
         }
 
-        if (layer_stack[i]->active) {
-            layer_stack[i]->on_event(event);
+        if (current_scene->layer_stack[i]->active) {
+            current_scene->layer_stack[i]->on_event(event);
         }
     }
 }
@@ -86,15 +166,6 @@ float Application::update_frame_counter() {
     double delta_time = std::min(elapsed_seconds, MAX_DT);
 
     return (float) delta_time;
-}
-
-void Application::push_layer(Layer* layer) {
-    layer->on_attach();
-    layer_stack.push_back(layer);
-}
-
-void Application::add_asset(unsigned int id,  AssetType type, const std::string& file_path) {
-    asset_manager.define_asset(id, type, file_path);
 }
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {

@@ -9,13 +9,13 @@
 
 Buffer::Buffer(GLuint buffer, Type type)
         : buffer(buffer), type(type) {
-    SPDLOG_DEBUG("Created vertex buffer {}", buffer);
+    SPDLOG_DEBUG("Created buffer {}", buffer);
 }
 
 Buffer::~Buffer() {
     glDeleteBuffers(1, &buffer);
 
-    SPDLOG_DEBUG("Deleted vertex buffer {}", buffer);
+    SPDLOG_DEBUG("Deleted buffer {}", buffer);
 }
 
 std::shared_ptr<Buffer> Buffer::create(std::size_t size) {

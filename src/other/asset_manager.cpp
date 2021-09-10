@@ -13,23 +13,50 @@ void AssetManager::define_asset(unsigned int id, AssetType type, const std::stri
     asset_declarations[id] = { type, file_path };
 }
 
-template<typename T>
-Rc<T> AssetManager::get(unsigned int id) {
-    for (const std::pair<unsigned int, Rc<Mesh<FullVertex>>>& pair : all_assets.full_meshes) {
+std::string AssetManager::get_file_path(unsigned int id) {
+    assert(asset_declarations.find(id) != asset_declarations.end());
+
+    const Asset& asset = asset_declarations[id];
+    return asset.file_path;
+}
+
+Rc<Mesh<Vertex>> AssetManager::get_mesh(unsigned int id) {
+    for (const std::pair<unsigned int, Rc<Mesh<Vertex>>>& pair : all_assets.meshes) {
         if (pair.first == id) {
-            return (Rc<T>) pair.second;
+            return pair.second;
         }
     }
 
-    for (const std::pair<unsigned int, Rc<Mesh<PositionVertex>>>& pair : all_assets.position_meshes) {
+    assert(false);
+    return nullptr;
+}
+
+Rc<Mesh<VertexP>> AssetManager::get_mesh_p(unsigned int id) {
+    for (const std::pair<unsigned int, Rc<Mesh<VertexP>>>& pair : all_assets.meshes_p) {
         if (pair.first == id) {
-            return (Rc<T>) pair.second;
+            return pair.second;
         }
     }
 
-    for (const std::pair<unsigned int, Rc<TextureData>>& pair : all_assets.texture_datas) {
+    assert(false);
+    return nullptr;
+}
+
+Rc<TextureData> AssetManager::get_texture(unsigned int id) {
+    for (const std::pair<unsigned int, Rc<TextureData>>& pair : all_assets.textures) {
         if (pair.first == id) {
-            return (Rc<T>) pair.second;
+            return pair.second;
+        }
+    }
+
+    assert(false);
+    return nullptr;
+}
+
+Rc<TextureData> AssetManager::get_texture_flipped(unsigned int id) {
+    for (const std::pair<unsigned int, Rc<TextureData>>& pair : all_assets.textures_flipped) {
+        if (pair.first == id) {
+            return pair.second;
         }
     }
 
@@ -41,36 +68,47 @@ void AssetManager::load_now(unsigned int id, AssetType type) {
     using namespace model;
 
     switch (type) {
-        case AssetType::FullModel: {
-            assert(all_assets.full_meshes.find(id) == all_assets.full_meshes.end());
+        case AssetType::Mesh: {
+            assert(all_assets.meshes.find(id) == all_assets.meshes.end());
 
             const Asset& asset = asset_declarations[id];
             assert(asset.type == type);
 
-            Rc<Mesh<FullVertex>> mesh = load_model_full(asset.file_path);
-            all_assets.full_meshes[id] = mesh;
+            Rc<Mesh<Vertex>> mesh = load_model(asset.file_path);
+            all_assets.meshes[id] = mesh;
 
             break;
         }
-        case AssetType::PositionModel: {
-            assert(all_assets.position_meshes.find(id) == all_assets.position_meshes.end());
+        case AssetType::MeshP: {
+            assert(all_assets.meshes_p.find(id) == all_assets.meshes_p.end());
 
             const Asset& asset = asset_declarations[id];
             assert(asset.type == type);
 
-            Rc<Mesh<PositionVertex>> mesh = load_model_position(asset.file_path);
-            all_assets.position_meshes[id] = mesh;
+            Rc<Mesh<VertexP>> mesh = load_model_position(asset.file_path);
+            all_assets.meshes_p[id] = mesh;
 
             break;
         }
-        case AssetType::TextureData: {
-            assert(all_assets.texture_datas.find(id) == all_assets.texture_datas.end());
+        case AssetType::Texture: {
+            assert(all_assets.textures.find(id) == all_assets.textures.end());
 
             const Asset& asset = asset_declarations[id];
             assert(asset.type == type);
 
-            Rc<TextureData> texture_data = std::make_shared<TextureData>(asset.file_path, true);
-            all_assets.texture_datas[id] = texture_data;
+            Rc<TextureData> texture = std::make_shared<TextureData>(asset.file_path, false);
+            all_assets.textures[id] = texture;
+
+            break;
+        }
+        case AssetType::TextureFlipped: {
+            assert(all_assets.textures_flipped.find(id) == all_assets.textures_flipped.end());
+
+            const Asset& asset = asset_declarations[id];
+            assert(asset.type == type);
+
+            Rc<TextureData> texture = std::make_shared<TextureData>(asset.file_path, true);
+            all_assets.textures_flipped[id] = texture;
 
             break;
         }
@@ -84,16 +122,28 @@ void AssetManager::load_now(unsigned int id, AssetType type) {
 
 void AssetManager::drop(unsigned int id, AssetType type) {
     switch (type) {
-        case AssetType::FullModel:
-            all_assets.full_meshes.erase(id);
+        case AssetType::Mesh:
+            assert(all_assets.meshes.find(id) != all_assets.meshes.end());
+
+            all_assets.meshes.erase(id);
 
             break;
-        case AssetType::PositionModel:
-            all_assets.position_meshes.erase(id);
+        case AssetType::MeshP:
+            assert(all_assets.meshes_p.find(id) != all_assets.meshes_p.end());
+
+            all_assets.meshes_p.erase(id);
 
             break;
-        case AssetType::TextureData:
-            all_assets.texture_datas.erase(id);
+        case AssetType::Texture:
+            assert(all_assets.textures.find(id) != all_assets.textures.end());
+
+            all_assets.textures.erase(id);
+
+            break;
+        case AssetType::TextureFlipped:
+            assert(all_assets.textures_flipped.find(id) != all_assets.textures_flipped.end());
+
+            all_assets.textures_flipped.erase(id);
 
             break;
         case AssetType::Sound:

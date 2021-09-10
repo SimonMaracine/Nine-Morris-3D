@@ -2,9 +2,9 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 
-#include "application/layers/imgui_layer.h"
-#include "application/layers/game_layer.h"
-#include "application/layers/gui_layer.h"
+#include "application/scenes/game/game_layer.h"
+#include "application/scenes/game/imgui_layer.h"
+#include "application/scenes/game/gui_layer.h"
 #include "application/application.h"
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
@@ -14,7 +14,6 @@
 
 void ImGuiLayer::on_attach() {
     imgui_start();
-    active = false;
 }
 
 void ImGuiLayer::on_detach() {
@@ -22,8 +21,8 @@ void ImGuiLayer::on_detach() {
 }
 
 void ImGuiLayer::on_bind_layers() {
-    game_layer = get_layer<GameLayer>(0);
-    gui_layer = get_layer<GuiLayer>(1);
+    game_layer = get_layer<GameLayer>(0, scene);
+    gui_layer = get_layer<GuiLayer>(1, scene);
 }
 
 void ImGuiLayer::on_update(float dt) {
@@ -118,12 +117,12 @@ void ImGuiLayer::imgui_start() {
     colors[ImGuiCol_HeaderHovered] = DEFAULT_BROWN;
 
     ImGui_ImplOpenGL3_Init("#version 430 core");
-    ImGui_ImplGlfw_InitForOpenGL(application->window->get_handle(), false);
+    ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
 }
 
 void ImGuiLayer::imgui_update(float dt) {
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(application->data.width, application->data.height);
+    io.DisplaySize = ImVec2(app->data.width, app->data.height);
     io.DeltaTime = dt;
 
     ImGui_ImplGlfw_NewFrame();
@@ -142,58 +141,58 @@ void ImGuiLayer::imgui_update(float dt) {
             if (ImGui::MenuItem("Load Last", nullptr, false)) {
                 game_layer->load_game();
             }
-            if (ImGui::MenuItem("Save Last", nullptr, false)) {
-                save_load::save_game(game_layer->registry, save_load::gather_entities(game_layer->board,
-                    game_layer->camera, game_layer->nodes, game_layer->pieces));
+            if (ImGui::MenuItem("Save", nullptr, false)) {
+                save_load::save_game(scene->registry, save_load::gather_entities(scene->board,
+                    scene->camera, scene->nodes, scene->pieces));
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
-                systems::undo(game_layer->registry, game_layer->board);
+                systems::undo(scene->registry, scene->board);
 
-                auto& state = game_layer->registry.get<GameStateComponent>(game_layer->board);
+                auto& state = scene->registry.get<GameStateComponent>(scene->board);
 
                 if (state.not_placed_pieces_count == 18) {
                     can_undo = false;
                 }
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
-                application->running = false;
+                app->running = false;
             }
 
             ImGui::EndMenu();
             HOVERING_GUI;
         }
         if (ImGui::BeginMenu("Options")) {
-            if (ImGui::MenuItem("VSync", nullptr, &game_layer->options.vsync)) {
-                if (game_layer->options.vsync) {
-                    application->window->set_vsync(1);
+            if (ImGui::MenuItem("VSync", nullptr, &scene->options.vsync)) {
+                if (scene->options.vsync) {
+                    app->window->set_vsync(1);
 
                     SPDLOG_INFO("VSync enabled");
                 } else {
-                    application->window->set_vsync(0);
+                    app->window->set_vsync(0);
 
                     SPDLOG_INFO("VSync disabled");
                 }
             }
-            if (ImGui::MenuItem("Save On Exit", nullptr, &game_layer->options.save_on_exit)) {
-                if (game_layer->options.save_on_exit) {
+            if (ImGui::MenuItem("Save On Exit", nullptr, &scene->options.save_on_exit)) {
+                if (scene->options.save_on_exit) {
                     SPDLOG_INFO("The game will be saved on exit");
                 } else {
                     SPDLOG_INFO("The game will not be saved on exit");
                 }
             }
             if (ImGui::BeginMenu("Anti-Aliasing", true)) {
-                if (ImGui::RadioButton("No Anti-Aliasing", &game_layer->options.samples, 1)) {
-                    game_layer->set_scene_framebuffer(game_layer->options.samples);
+                if (ImGui::RadioButton("No Anti-Aliasing", &scene->options.samples, 1)) {
+                    game_layer->set_scene_framebuffer(scene->options.samples);
 
                     SPDLOG_INFO("Anti-aliasing disabled");
                 }
-                if (ImGui::RadioButton("2x", &game_layer->options.samples, 2)) {
-                    game_layer->set_scene_framebuffer(game_layer->options.samples);
+                if (ImGui::RadioButton("2x", &scene->options.samples, 2)) {
+                    game_layer->set_scene_framebuffer(scene->options.samples);
 
                     SPDLOG_INFO("2x anti-aliasing");
                 }
-                if (ImGui::RadioButton("4x", &game_layer->options.samples, 4)) {
-                    game_layer->set_scene_framebuffer(game_layer->options.samples);
+                if (ImGui::RadioButton("4x", &scene->options.samples, 4)) {
+                    game_layer->set_scene_framebuffer(scene->options.samples);
 
                     SPDLOG_INFO("4x anti-aliasing");
                 }
@@ -201,13 +200,13 @@ void ImGuiLayer::imgui_update(float dt) {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Texture Quality", true)) {
-                if (ImGui::RadioButton("High", &game_layer->options.texture_quality, 0)) {
-                    game_layer->set_textures_quality(game_layer->options.texture_quality);
+                if (ImGui::RadioButton("High", &scene->options.texture_quality, 0)) {
+                    game_layer->set_textures_quality(scene->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to high quality");
                 }
-                if (ImGui::RadioButton("Normal", &game_layer->options.texture_quality, 1)) {
-                    game_layer->set_textures_quality(game_layer->options.texture_quality);
+                if (ImGui::RadioButton("Normal", &scene->options.texture_quality, 1)) {
+                    game_layer->set_textures_quality(scene->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to normal quality");
                 }
@@ -264,7 +263,7 @@ void ImGuiLayer::imgui_update(float dt) {
         gui_layer->active = false;
     }
 
-    auto& state = game_layer->registry.get<GameStateComponent>(game_layer->board);
+    auto& state = scene->registry.get<GameStateComponent>(scene->board);
 
     if (state.not_placed_pieces_count < 18) {
         can_undo = true;
@@ -319,10 +318,10 @@ void ImGuiLayer::imgui_update(float dt) {
     }
 
 #ifndef NDEBUG
-    auto& moves_history = game_layer->registry.get<MovesHistoryComponent>(game_layer->board);
+    auto& moves_history = scene->registry.get<MovesHistoryComponent>(scene->board);
 
     ImGui::Begin("Debug");
-    ImGui::Text("FPS: %f", application->fps);
+    ImGui::Text("FPS: %f", app->fps);
     ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
     ImGui::Text("White pieces: %d", state.white_pieces_count);
     ImGui::Text("Black pieces: %d", state.black_pieces_count);

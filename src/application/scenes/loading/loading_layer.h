@@ -1,6 +1,8 @@
 #pragma once
 
 #include "application/layer.h"
+#include "application/scenes/loading/loading_scene.h"
+#include "other/loader.h"
 
 class GameLayer;
 class ImGuiLayer;
@@ -8,8 +10,8 @@ class GuiLayer;
 
 class LoadingLayer : public Layer {
 public:
-    LoadingLayer(unsigned int id, Application* application)
-        : Layer(id, application) {};
+    LoadingLayer(unsigned int id, Application* application, LoadingScene* scene)
+        : Layer(id, application), scene(scene) {};
     virtual ~LoadingLayer() = default;
 
     virtual void on_attach() override;
@@ -19,9 +21,7 @@ public:
     virtual void on_draw() override;
     virtual void on_event(events::Event& event) override;
 
-    Loader loader = Loader(application->asset_manager);
+    Loader loader = Loader(app->asset_manager);
 
-    GameLayer* game_layer;
-    ImGuiLayer* imgui_layer;
-    GuiLayer* gui_layer;
+    LoadingScene* scene;
 };

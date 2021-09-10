@@ -17,7 +17,7 @@
 namespace renderer {
     static Storage* storage = new Storage;
 
-    Storage* init(int width, int height, int samples) {
+    Storage* init(int width, int height) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_CULL_FACE);
@@ -72,7 +72,7 @@ namespace renderer {
         storage->skybox_shader = Shader::create("data/shaders/cubemap.vert",
                                                 "data/shaders/cubemap.frag");
 
-        storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+        storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, 2, 2);
         storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
         storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate, width, height, 1, 2);
 
@@ -144,8 +144,6 @@ namespace renderer {
         storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);
 #endif
 
-        // storage->loading_texture = Texture::create("data/textures/loading/loading.png", false);
-
         storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) width, 0.0f, (float) height);
 
         return storage;
@@ -167,28 +165,33 @@ namespace renderer {
         glClear(buffers);
     }
 
-    void draw_screen_quad() {
+    void draw_screen_quad(GLuint texture) {
         glDisable(GL_DEPTH_TEST);
 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        storage->screen_quad_shader->bind();
+        storage->screen_quad_shader->set_uniform_int("u_screen_texture", 0);
         storage->screen_quad_vertex_array->bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glEnable(GL_DEPTH_TEST);
     }
 
-    void draw_loading() {
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_STENCIL_TEST);
-
-        storage->screen_quad_shader->bind();
-        storage->screen_quad_shader->set_uniform_int("u_screen_texture", 0);
-        storage->screen_quad_vertex_array->bind();
-
-        storage->loading_texture->bind(0);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        glEnable(GL_STENCIL_TEST);
+    void enable_depth() {
         glEnable(GL_DEPTH_TEST);
+    }
+
+    void disable_depth() {
+        glDisable(GL_DEPTH_TEST);
+    }
+
+    void enable_stencil() {
+        glEnable(GL_STENCIL_TEST);
+    }
+
+    void disable_stencil() {
+        glDisable(GL_STENCIL_TEST);
     }
 
 #ifndef NDEBUG

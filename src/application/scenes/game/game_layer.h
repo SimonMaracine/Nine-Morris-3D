@@ -5,6 +5,7 @@
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/events.h"
+#include "application/scenes/game/game_scene.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/buffer.h"
 #include "opengl/renderer/renderer.h"
@@ -19,8 +20,8 @@ class ImGuiLayer;
 
 class GameLayer : public Layer {
 public:
-    GameLayer(unsigned int id, Application* application)
-        : Layer(id, application) {};
+    GameLayer(unsigned int id, Application* application, GameScene* scene)
+        : Layer(id, application), scene(scene) {};
     virtual ~GameLayer() = default;
 
     virtual void on_attach() override;
@@ -46,13 +47,13 @@ public:
     void load_game();
 
     static Rc<Buffer> create_ids_buffer(unsigned int vertices_size, entt::entity entity);
-    static Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<FullVertex>> mesh, entt::entity entity);
+    static Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<Vertex>> mesh, entt::entity entity);
 
     void build_board();
     void build_board_paint();
     void build_camera();
     void build_skybox();
-    void build_piece(int id, Piece type, Rc<model::Mesh<FullVertex>> mesh,
+    void build_piece(int id, Piece type, Rc<model::Mesh<Vertex>> mesh,
                      Rc<Texture> diffuse_texture, const glm::vec3& position);
     void build_directional_light();
 #ifndef NDEBUG
@@ -63,7 +64,7 @@ public:
 
     void rebuild_board_after_load();
     void rebuild_camera_after_load();
-    void rebuild_piece_after_load(entt::entity piece, Rc<model::Mesh<FullVertex>> mesh,
+    void rebuild_piece_after_load(entt::entity piece, Rc<model::Mesh<Vertex>> mesh,
                                   Rc<Texture> diffuse_texture);
     void rebuild_node_after_load(entt::entity node);
 
@@ -73,17 +74,5 @@ public:
     float last_mouse_x = 0.0f;
     float last_mouse_y = 0.0f;
 
-    options::Options options;
-
-    renderer::Storage* storage = nullptr;
-    // std::shared_ptr<Assets> assets = nullptr;
-    // Loader loader;
-
-    entt::registry registry;
-    entt::entity board = entt::null;
-    entt::entity camera = entt::null;
-    entt::entity nodes[24];
-    entt::entity pieces[18];
-
-    entt::entity hovered_entity = entt::null;
+    GameScene* scene;
 };

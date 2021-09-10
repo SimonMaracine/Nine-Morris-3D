@@ -47,13 +47,11 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipm
 
     if (channels == 3) {
         glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGB8, width, height);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB,
-                        GL_UNSIGNED_BYTE, data);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
         LOG_ALLOCATION(width * height * 4);
     } else if (channels == 4) {
         glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA,
-                        GL_UNSIGNED_BYTE, data);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
         LOG_ALLOCATION(width * height * 4);
     } else {
         spdlog::critical("Texture has {} channels", channels);

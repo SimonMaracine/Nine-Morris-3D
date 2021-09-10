@@ -50,7 +50,6 @@ namespace renderer {
 #ifndef NDEBUG
         Rc<Texture> light_texture = nullptr;
 #endif
-        // Rc<Texture> loading_texture = nullptr;
 
         glm::mat4 orthographic_projection_matrix;
 
@@ -62,15 +61,19 @@ namespace renderer {
         Rc<Texture3D> skybox_texture = nullptr;
         Rc<Texture> white_indicator_texture = nullptr;
         Rc<Texture> black_indicator_texture = nullptr;
+        Rc<Texture> loading_texture = nullptr;
     };
 
-    Storage* init(int width, int height, int samples);
+    Storage* init(int width, int height);
     void terminate();
     void set_viewport(GLint width, GLint height);
     void set_clear_color(GLfloat red, GLfloat green, GLfloat blue);
     void clear(int buffers);
-    void draw_screen_quad();
-    void draw_loading();
+    void draw_screen_quad(GLuint texture);
+    void enable_depth();
+    void disable_depth();
+    void enable_stencil();
+    void disable_stencil();
 #ifndef NDEBUG
     void draw_origin();
 #endif

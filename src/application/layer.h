@@ -4,13 +4,14 @@
 
 #include "application/events.h"
 #include "application/application.h"
+#include "application/scene.h"
 
 class Application;
 
 class Layer {
 public:
     Layer(unsigned int id, Application* application)
-        : application(application), id(id) {}
+        : app(application), id(id) {}
     virtual ~Layer() = default;
 
     virtual void on_attach() {}
@@ -23,10 +24,10 @@ public:
     bool active = true;
 protected:
     template<typename T>
-    T* get_layer(unsigned int id) {
-        for (unsigned int i = 0; i < application->layer_stack.size(); i++) {
-            if (application->layer_stack[i]->id == id) {
-                return (T*) application->layer_stack[i];
+    T* get_layer(unsigned int id, Scene* scene) const {
+        for (unsigned int i = 0; i < scene->layer_stack.size(); i++) {
+            if (scene->layer_stack[i]->id == id) {
+                return (T*) scene->layer_stack[i];
             }
         }
 
@@ -34,7 +35,7 @@ protected:
         return nullptr;
     }
 
-    Application* application;
+    Application* app;
 private:
     unsigned int id;
 };

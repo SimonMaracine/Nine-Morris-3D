@@ -22,6 +22,8 @@ public:
 
     void bind(GLenum slot) const;
     static void unbind();
+
+	GLuint get_id() const { return texture; }
 private:
     GLuint texture;
 	int width, height;

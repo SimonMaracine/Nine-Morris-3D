@@ -11,7 +11,7 @@
 #include "other/logging.h"
 
 namespace model {
-    std::shared_ptr<Mesh<FullVertex>> load_model_full(const std::string& file_path) {
+    std::shared_ptr<Mesh<Vertex>> load_model(const std::string& file_path) {
         SPDLOG_DEBUG("Loading model '{}'...", file_path.c_str());
 
         Assimp::Importer importer;
@@ -28,11 +28,11 @@ namespace model {
         const aiNode* collection = root_node->mChildren[0];
         const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-        std::vector<FullVertex> vertices;
+        std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-            FullVertex vertex;
+            Vertex vertex;
 
             glm::vec3 position;
             position.x = mesh->mVertices[i].x;
@@ -61,10 +61,10 @@ namespace model {
             }
         }
 
-        return std::make_shared<Mesh<FullVertex>>(vertices, indices);
+        return std::make_shared<Mesh<Vertex>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<PositionVertex>> load_model_position(const std::string& file_path) {
+    std::shared_ptr<Mesh<VertexP>> load_model_position(const std::string& file_path) {
         SPDLOG_DEBUG("Loading model '{}'...", file_path.c_str());
 
         Assimp::Importer importer;
@@ -81,11 +81,11 @@ namespace model {
         const aiNode* collection = root_node->mChildren[0];
         const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-        std::vector<PositionVertex> vertices;
+        std::vector<VertexP> vertices;
         std::vector<unsigned int> indices;
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-            PositionVertex vertex;
+            VertexP vertex;
 
             glm::vec3 position;
             position.x = mesh->mVertices[i].x;
@@ -103,6 +103,6 @@ namespace model {
             }
         }
 
-        return std::make_shared<Mesh<PositionVertex>>(vertices, indices);
+        return std::make_shared<Mesh<VertexP>>(vertices, indices);
     }
 }

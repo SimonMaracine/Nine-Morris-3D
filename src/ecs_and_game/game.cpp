@@ -8,7 +8,7 @@
 
 #include "ecs_and_game/game.h"
 #include "ecs_and_game/components.h"
-#include "application/layers/game_layer.h"
+#include "application/scenes/game/game_layer.h"
 #include "other/logging.h"
 #include "other/loader.h"
 

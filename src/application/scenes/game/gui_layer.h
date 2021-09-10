@@ -1,13 +1,14 @@
 #pragma once
 
 #include "application/layer.h"
+#include "application/scenes/game/game_scene.h"
 
 class GameLayer;
 
 class GuiLayer : public Layer {
 public:
-    GuiLayer(unsigned int id, Application* application)
-        : Layer(id, application) {};
+    GuiLayer(unsigned int id, Application* application, GameScene* scene)
+        : Layer(id, application), scene(scene) {};
     virtual ~GuiLayer() = default;
 
     virtual void on_attach() override;
@@ -27,8 +28,7 @@ public:
     void imgui_update(float dt);
     void imgui_end();
 
-    bool hovering_gui = false;
-    bool can_undo = false;
+    GameScene* scene;
 
     GameLayer* game_layer;
 };
