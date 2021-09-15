@@ -8,13 +8,6 @@
 #include "other/model.h"
 #include "other/logging.h"
 
-// std::shared_ptr<Assets> Loader::get_assets() {
-//     loading_thread.join();
-//     std::shared_ptr<Assets> copy = assets;
-//     assets = nullptr;
-//     return copy;
-// }
-
 bool Loader::done_loading() {
     return loaded.load();
 }

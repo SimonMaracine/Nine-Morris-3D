@@ -4,11 +4,18 @@
 #include <utility>
 
 #ifndef NDEBUG
-    #define LOG_ALLOCATION(bytes) \
-        if (!stop_counting_bytes_allocated_gpu) { \
-            SPDLOG_DEBUG("GPU: Allocated {} bytes", (bytes)); \
-            approximately_bytes_allocated_gpu += (bytes); \
-        }
+    #ifdef PRINT_GPU_RAM_ALLOCATED
+        #define LOG_ALLOCATION(bytes) \
+            if (!stop_counting_bytes_allocated_gpu) { \
+                SPDLOG_DEBUG("GPU: Allocated {} bytes", (bytes)); \
+                approximately_bytes_allocated_gpu += (bytes); \
+            }
+    #else
+        #define LOG_ALLOCATION(bytes) \
+            if (!stop_counting_bytes_allocated_gpu) { \
+                approximately_bytes_allocated_gpu += (bytes); \
+            }
+    #endif
 
     #define STOP_ALLOCATION_LOG \
         stop_counting_bytes_allocated_gpu = true; \

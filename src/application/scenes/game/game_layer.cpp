@@ -45,7 +45,7 @@ void GameLayer::on_bind_layers() {
 void GameLayer::on_update(float dt) {
     static bool loaded = false;
 
-    if (!loaded) {
+    if (!loaded) {  // TODO move to attach
         start_after_load();
         loaded = true;
     }

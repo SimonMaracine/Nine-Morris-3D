@@ -1,4 +1,5 @@
 #include <string>
+#include <cassert>
 
 #include <stb_image.h>
 
@@ -21,6 +22,8 @@ TextureData::TextureData(const std::string& file_path, bool flip) {
 }
 
 TextureData::~TextureData() {
+    assert(data != nullptr);
+
     stbi_image_free(data);
 
     SPDLOG_DEBUG("Freed texture memory '{}'", name.c_str());
