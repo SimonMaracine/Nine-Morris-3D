@@ -17,10 +17,10 @@ std::thread& Loader::get_thread() {
 }
 
 void Loader::start_loading_thread(std::unordered_map<unsigned int, AssetManager::Asset>& required) {
+    SPDLOG_INFO("Loading assets from separate thread...");
+
     this->required = required;
     loading_thread = std::thread(&Loader::load, this);
-
-    // SPDLOG_INFO("Loading assets from thread {}...", loading_thread.get_id());  // TODO weird
 }
 
 void Loader::load() {
