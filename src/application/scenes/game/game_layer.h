@@ -37,10 +37,7 @@ public:
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
 
-    void start();
-    void start_after_load();
     void restart();
-    void end();
 
     void set_scene_framebuffer(int samples);
     void set_textures_quality(int quality);

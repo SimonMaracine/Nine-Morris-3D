@@ -31,11 +31,82 @@
 #include "other/save_load.h"
 
 void GameLayer::on_attach() {
-    start();
+    options::load_options_from_file(scene->options);
+    app->window->set_vsync(scene->options.vsync);
+
+    app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
+            app->data.width, app->data.height, scene->options.samples, 2);
+
+    build_camera();
+    build_directional_light();
+#ifndef NDEBUG
+    build_origin();
+#endif
+
+    srand(time(nullptr));
+
+    build_skybox();
+
+    if (scene->options.texture_quality == 0) {
+        app->storage->white_piece_diffuse_texture = Texture::create(app->asset_manager.get_texture_flipped(12), true, -1.5f);
+        app->storage->black_piece_diffuse_texture = Texture::create(app->asset_manager.get_texture_flipped(14), true, -1.5f);
+    } else {
+        app->storage->white_piece_diffuse_texture = Texture::create(app->asset_manager.get_texture_flipped(13), true, -1.5f);
+        app->storage->black_piece_diffuse_texture = Texture::create(app->asset_manager.get_texture_flipped(15), true, -1.5f);
+    }
+
+    for (int i = 0; i < 9; i++) {
+        build_piece(i, Piece::White, app->asset_manager.get_mesh(3), app->storage->white_piece_diffuse_texture,
+                    glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
+    }
+
+    for (int i = 9; i < 18; i++) {
+        build_piece(i, Piece::Black, app->asset_manager.get_mesh(4), app->storage->black_piece_diffuse_texture,
+                    glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
+    }
+
+    for (int i = 0; i < 24; i++) {
+        build_node(i, NODE_POSITIONS[i]);
+    }
+
+    build_board();
+    build_board_paint();
+    build_turn_indicator();
+
+    if (scene->options.texture_quality == 0) {
+        app->asset_manager.drop(5, AssetType::TextureFlipped);
+        app->asset_manager.drop(7, AssetType::TextureFlipped);
+        app->asset_manager.drop(12, AssetType::TextureFlipped);
+        app->asset_manager.drop(14, AssetType::TextureFlipped);
+    } else {
+        app->asset_manager.drop(6, AssetType::TextureFlipped);
+        app->asset_manager.drop(8, AssetType::TextureFlipped);
+        app->asset_manager.drop(13, AssetType::TextureFlipped);
+        app->asset_manager.drop(15, AssetType::TextureFlipped);
+    }
+
+    app->asset_manager.drop(9, AssetType::TextureFlipped);
+    app->asset_manager.drop(10, AssetType::TextureFlipped);
+    app->asset_manager.drop(16, AssetType::Texture);
+    app->asset_manager.drop(17, AssetType::Texture);
+    app->asset_manager.drop(18, AssetType::Texture);
+    app->asset_manager.drop(19, AssetType::Texture);
+    app->asset_manager.drop(20, AssetType::Texture);
+    app->asset_manager.drop(21, AssetType::Texture);
+
+    SPDLOG_INFO("Finished initializing program");
+    STOP_ALLOCATION_LOG;
 }
 
 void GameLayer::on_detach() {
-    end();
+    SPDLOG_INFO("Closing program");
+
+    options::save_options_to_file(scene->options);
+
+    if (scene->options.save_on_exit) {
+        save_load::save_game(scene->registry,
+                save_load::gather_entities(scene->board, scene->camera, scene->nodes, scene->pieces));
+    }
 }
 
 void GameLayer::on_bind_layers() {
@@ -43,13 +114,6 @@ void GameLayer::on_bind_layers() {
 }
 
 void GameLayer::on_update(float dt) {
-    static bool loaded = false;
-
-    if (!loaded) {  // TODO move to attach
-        start_after_load();
-        loaded = true;
-    }
-
     systems::camera(scene->registry, mouse_wheel, dx, dy, dt);
     systems::move_pieces(scene->registry, dt);
     // systems::lighting_move(scene->registry, dt);
@@ -188,80 +252,6 @@ bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
     return false;
 }
 
-void GameLayer::start() {
-    options::load_options_from_file(scene->options);  // TODO maybe move to game_scene
-    app->window->set_vsync(scene->options.vsync);
-
-    app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
-            app->data.width, app->data.height, scene->options.samples, 2);
-
-    build_camera();
-    build_directional_light();
-#ifndef NDEBUG
-    build_origin();
-#endif
-
-    srand(time(nullptr));
-
-    SPDLOG_INFO("Finished initializing the first part of the program");
-}
-
-void GameLayer::start_after_load() {
-    SPDLOG_INFO("Done loading assets; initializing the rest of the game...");
-
-    build_skybox();
-
-    if (scene->options.texture_quality == 0) {
-        app->storage->white_piece_diffuse_texture = Texture::create(app->asset_manager.get_texture_flipped(12), true, -1.5f);
-        app->storage->black_piece_diffuse_texture = Texture::create(app->asset_manager.get_texture_flipped(14), true, -1.5f);
-    } else {
-        app->storage->white_piece_diffuse_texture = Texture::create(app->asset_manager.get_texture_flipped(13), true, -1.5f);
-        app->storage->black_piece_diffuse_texture = Texture::create(app->asset_manager.get_texture_flipped(15), true, -1.5f);
-    }
-
-    for (int i = 0; i < 9; i++) {
-        build_piece(i, Piece::White, app->asset_manager.get_mesh(3), app->storage->white_piece_diffuse_texture,
-                    glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
-    }
-
-    for (int i = 9; i < 18; i++) {
-        build_piece(i, Piece::Black, app->asset_manager.get_mesh(4), app->storage->black_piece_diffuse_texture,
-                    glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
-    }
-
-    for (int i = 0; i < 24; i++) {
-        build_node(i, NODE_POSITIONS[i]);
-    }
-
-    build_board();
-    build_board_paint();
-    build_turn_indicator();
-
-    if (scene->options.texture_quality == 0) {
-        app->asset_manager.drop(5, AssetType::TextureFlipped);
-        app->asset_manager.drop(7, AssetType::TextureFlipped);
-        app->asset_manager.drop(12, AssetType::TextureFlipped);
-        app->asset_manager.drop(14, AssetType::TextureFlipped);
-    } else {
-        app->asset_manager.drop(6, AssetType::TextureFlipped);
-        app->asset_manager.drop(8, AssetType::TextureFlipped);
-        app->asset_manager.drop(13, AssetType::TextureFlipped);
-        app->asset_manager.drop(15, AssetType::TextureFlipped);
-    }
-
-    app->asset_manager.drop(9, AssetType::TextureFlipped);
-    app->asset_manager.drop(10, AssetType::TextureFlipped);
-    app->asset_manager.drop(16, AssetType::Texture);
-    app->asset_manager.drop(17, AssetType::Texture);
-    app->asset_manager.drop(18, AssetType::Texture);
-    app->asset_manager.drop(19, AssetType::Texture);
-    app->asset_manager.drop(20, AssetType::Texture);
-    app->asset_manager.drop(21, AssetType::Texture);
-
-    SPDLOG_INFO("Finished initializing program");
-    STOP_ALLOCATION_LOG;
-}
-
 void GameLayer::restart() {
     scene->registry.clear();
 
@@ -291,17 +281,6 @@ void GameLayer::restart() {
     build_turn_indicator();
 
     SPDLOG_INFO("Restarted game");
-}
-
-void GameLayer::end() {
-    SPDLOG_INFO("Closing program");
-
-    options::save_options_to_file(scene->options);
-
-    if (scene->options.save_on_exit) {
-        save_load::save_game(scene->registry,
-                save_load::gather_entities(scene->board, scene->camera, scene->nodes, scene->pieces));
-    }
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {

@@ -9,10 +9,11 @@
 #include "other/logging.h"
 
 void GuiLayer::on_attach() {
-    
+
 }
 
 void GuiLayer::on_detach() {
+    
 }
 
 void GuiLayer::on_bind_layers() {

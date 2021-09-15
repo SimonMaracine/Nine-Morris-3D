@@ -13,83 +13,6 @@
 #include "other/save_load.h"
 
 void ImGuiLayer::on_attach() {
-    imgui_start();
-}
-
-void ImGuiLayer::on_detach() {
-    imgui_end();
-}
-
-void ImGuiLayer::on_bind_layers() {
-    game_layer = get_layer<GameLayer>(0, scene);
-    gui_layer = get_layer<GuiLayer>(1, scene);
-}
-
-void ImGuiLayer::on_update(float dt) {
-    imgui_update(dt);
-}
-
-void ImGuiLayer::on_draw() {
-
-}
-
-void ImGuiLayer::on_event(events::Event& event) {
-    using namespace events;
-
-    Dispatcher dispatcher = Dispatcher(event);
-
-    dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(ImGuiLayer::on_mouse_scrolled));
-    dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(ImGuiLayer::on_mouse_moved));
-    dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(ImGuiLayer::on_mouse_button_pressed));
-    dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(ImGuiLayer::on_mouse_button_released));
-    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(ImGuiLayer::on_window_resized));
-}
-
-bool ImGuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseWheel = event.scroll;
-
-    if (hovering_gui)
-        return true;
-    else
-        return false;
-}
-
-bool ImGuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
-
-    if (hovering_gui)
-        return true;
-    else
-        return false;
-}
-
-bool ImGuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.button] = true;
-
-    if (hovering_gui)
-        return true;
-    else
-        return false;
-}
-
-bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.button] = false;
-
-    if (hovering_gui)
-        return true;
-    else
-        return false;
-}
-
-bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    return false;
-}
-
-void ImGuiLayer::imgui_start() {
     ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
@@ -120,7 +43,18 @@ void ImGuiLayer::imgui_start() {
     ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
 }
 
-void ImGuiLayer::imgui_update(float dt) {
+void ImGuiLayer::on_detach() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
+
+void ImGuiLayer::on_bind_layers() {
+    game_layer = get_layer<GameLayer>(0, scene);
+    gui_layer = get_layer<GuiLayer>(1, scene);
+}
+
+void ImGuiLayer::on_update(float dt) {
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2(app->data.width, app->data.height);
     io.DeltaTime = dt;
@@ -340,8 +274,62 @@ void ImGuiLayer::imgui_update(float dt) {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGuiLayer::imgui_end() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+void ImGuiLayer::on_draw() {
+
+}
+
+void ImGuiLayer::on_event(events::Event& event) {
+    using namespace events;
+
+    Dispatcher dispatcher = Dispatcher(event);
+
+    dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(ImGuiLayer::on_mouse_scrolled));
+    dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(ImGuiLayer::on_mouse_moved));
+    dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(ImGuiLayer::on_mouse_button_pressed));
+    dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(ImGuiLayer::on_mouse_button_released));
+    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(ImGuiLayer::on_window_resized));
+}
+
+bool ImGuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseWheel = event.scroll;
+
+    if (hovering_gui)
+        return true;
+    else
+        return false;
+}
+
+bool ImGuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
+
+    if (hovering_gui)
+        return true;
+    else
+        return false;
+}
+
+bool ImGuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[event.button] = true;
+
+    if (hovering_gui)
+        return true;
+    else
+        return false;
+}
+
+bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[event.button] = false;
+
+    if (hovering_gui)
+        return true;
+    else
+        return false;
+}
+
+bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
+    return false;
 }
