@@ -2,6 +2,7 @@
 
 #include "application/layer.h"
 #include "application/scenes/loading/loading_scene.h"
+#include "application/events.h"
 #include "other/loader.h"
 
 class GameLayer;
@@ -20,6 +21,8 @@ public:
     virtual void on_update(float dt) override;
     virtual void on_draw() override;
     virtual void on_event(events::Event& event) override;
+
+    bool on_window_resized(events::WindowResizedEvent& event);
 
     Loader loader = Loader(app->asset_manager);
 

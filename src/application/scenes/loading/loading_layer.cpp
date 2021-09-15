@@ -1,7 +1,10 @@
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "application/scenes/loading/loading_layer.h"
 #include "application/scenes/game/game_layer.h"
 #include "application/scenes/game/imgui_layer.h"
 #include "application/scenes/game/gui_layer.h"
+#include "ecs_and_game/systems.h"
 
 void LoadingLayer::on_attach() {
     app->asset_manager.load_now(11, AssetType::TextureFlipped);
@@ -40,7 +43,7 @@ void LoadingLayer::on_attach() {
 
 void LoadingLayer::on_detach() {
     SPDLOG_INFO("Done loading assets; initializing the rest of the game...");
-    
+
     if (loader.get_thread().joinable()) {
         loader.get_thread().detach();
     }
@@ -64,5 +67,19 @@ void LoadingLayer::on_draw() {
 }
 
 void LoadingLayer::on_event(events::Event& event) {
+    using namespace events;
 
+    Dispatcher dispatcher = Dispatcher(event);
+    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(LoadingLayer::on_window_resized));
 }
+
+bool LoadingLayer::on_window_resized(events::WindowResizedEvent& event) {
+    app->storage->scene_framebuffer->resize(event.width, event.height);
+    app->storage->intermediate_framebuffer->resize(event.width, event.height);
+    systems::projection_matrix(scene->registry, (float) event.width, (float) event.height);
+    app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
+
+    return false;
+}
+
+

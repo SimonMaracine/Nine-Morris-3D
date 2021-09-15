@@ -1,6 +1,7 @@
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "application/scenes/game/game_layer.h"
 #include "application/scenes/game/imgui_layer.h"
@@ -9,6 +10,7 @@
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
+#include "ecs_and_game/systems.h"
 #include "other/logging.h"
 #include "other/save_load.h"
 
@@ -331,5 +333,10 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 }
 
 bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
+    app->storage->scene_framebuffer->resize(event.width, event.height);
+    app->storage->intermediate_framebuffer->resize(event.width, event.height);
+    systems::projection_matrix(scene->registry, (float) event.width, (float) event.height);
+    app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
+
     return false;
 }
