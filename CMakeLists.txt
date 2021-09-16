@@ -14,7 +14,7 @@ set(CMAKE_DEBUG_POSTFIX "")
 
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
-set(ASSIMP_INSTALL_PDB OFF)  # TODO Should check this on MSVC
+set(ASSIMP_INSTALL_PDB OFF)
 set(ASSIMP_NO_EXPORT ON)
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
@@ -62,10 +62,16 @@ add_executable(${EXECUTABLE_NAME}
     "extern/imgui/backends/imgui_impl_glfw.cpp")
 
 # Enable warnings
-target_compile_options(${EXECUTABLE_NAME} PUBLIC
-    -Wall -Wextra
-    -Wno-unused-parameter -Wno-missing-field-initializers -Wno-type-limits
-    -Wno-parentheses)
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    target_compile_options(${EXECUTABLE_NAME} PUBLIC
+        -Wall -Wextra
+        -Wno-unused-parameter -Wno-missing-field-initializers -Wno-type-limits
+        -Wno-parentheses)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    target_compile_options(${EXECUTABLE_NAME} PUBLIC -Wall)
+else()
+    message(FATAL_ERROR "Compiler is not GCC or MSVC")
+endif()
 
 # Use C++17
 target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
@@ -99,8 +105,13 @@ target_link_directories(${EXECUTABLE_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
 
 # Add all libraries
-target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-    spdlog assimp glfw3 X11)
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    target_link_libraries(${EXECUTABLE_NAME} PUBLIC
+        spdlog assimp glfw3 X11)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    target_link_libraries(${EXECUTABLE_NAME} PUBLIC
+        spdlog assimp glfw3)
+endif()
 
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC "${CMAKE_DL_LIBS}")
 
