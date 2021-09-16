@@ -12,33 +12,28 @@ using json = nlohmann::json;
 
 namespace options {
     void load_options_from_file(Options& options) {
-        std::ifstream file = std::ifstream(OPTIONS_FILE, std::ios::in | std::ios::ate);
+        std::ifstream file = std::ifstream(OPTIONS_FILE, std::ios::in);
 
         if (!file.is_open()) {
             spdlog::error("Could not open options file '{}'", OPTIONS_FILE);
             return;
         }
 
-        std::size_t size = (std::size_t) file.tellg();
-        char* buffer = new char[size + 1];
-
-        file.seekg(0, std::ios::beg);
-        file.read(buffer, size);
-        file.close();
-
-        buffer[size] = 0;
-
         json object;
 
-        try {
-            object = json::parse(buffer);
-        } catch (json::parse_error& e) {
-            spdlog::error("{}", e.what());
-            delete[] buffer;
-            return;
+        std::string contents, line;
+
+        while (std::getline(file, line)) {
+            contents += line;
+            contents += '\n';
         }
 
-        delete[] buffer;
+        try {
+            object = json::parse(contents.c_str());
+        } catch (json::parse_error& e) {
+            spdlog::error("{}", e.what());
+            return;
+        }
 
         int texture_quality;
         int samples;
