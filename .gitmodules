@@ -19,6 +19,3 @@
 [submodule "extern/json"]
 	path = extern/json
 	url = https://github.com/nlohmann/json.git
-[submodule "scripts/extern/cereal"]
-	path = scripts/extern/cereal
-	url = https://github.com/USCiLab/cereal.git
