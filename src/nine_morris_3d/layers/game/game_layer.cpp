@@ -448,7 +448,7 @@ void GameLayer::build_camera() {
     transform.rotation = glm::vec3(47.0f, 0.0f, 0.0f);
 
     scene->registry.emplace<CameraComponent>(scene->camera,
-        glm::perspective(glm::radians(45.0f), 1024.0f / 576.0f, 0.1f, 70.0f),
+        glm::perspective(glm::radians(45.0f), (float) app->data.width / (float) app->data.height, 0.1f, 70.0f),
         glm::vec3(0.0f), 8.0f);
     scene->registry.emplace<CameraMoveComponent>(scene->camera);
 
