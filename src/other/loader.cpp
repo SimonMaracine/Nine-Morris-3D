@@ -16,7 +16,7 @@ std::thread& Loader::get_thread() {
     return loading_thread;
 }
 
-void Loader::start_loading_thread(std::unordered_map<unsigned int, AssetManager::Asset>& required) {
+void Loader::start_loading_thread(const std::unordered_map<unsigned int, AssetManager::Asset>& required) {
     SPDLOG_INFO("Loading assets from separate thread...");
 
     this->required = required;

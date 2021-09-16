@@ -1,10 +1,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "application/scenes/loading/loading_layer.h"
-#include "application/scenes/game/game_layer.h"
-#include "application/scenes/game/imgui_layer.h"
-#include "application/scenes/game/gui_layer.h"
-#include "ecs_and_game/systems.h"
+#include "nine_morris_3d/layers/loading/loading_layer.h"
+#include "nine_morris_3d/layers/game/game_layer.h"
+#include "nine_morris_3d/layers/game/imgui_layer.h"
+#include "nine_morris_3d/layers/game/gui_layer.h"
+#include "ecs/systems.h"
 
 void LoadingLayer::on_attach() {
     app->asset_manager.load_now(11, AssetType::TextureFlipped);

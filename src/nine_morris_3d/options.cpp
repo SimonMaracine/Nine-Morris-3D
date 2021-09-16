@@ -3,8 +3,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "other/options.h"
 #include "other/logging.h"
+#include "nine_morris_3d/options.h"
 
 #define OPTIONS_FILE "options.json"
 

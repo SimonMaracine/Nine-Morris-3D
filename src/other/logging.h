@@ -1,5 +1,6 @@
 #pragma once
 
+// Include spdlog to have acces to logging
 #include <spdlog/spdlog.h>
 
 namespace logging {

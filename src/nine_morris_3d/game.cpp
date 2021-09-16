@@ -6,11 +6,11 @@
 
 #include <entt/entt.hpp>
 
-#include "ecs_and_game/game.h"
-#include "ecs_and_game/components.h"
-#include "application/scenes/game/game_layer.h"
+#include "ecs/components.h"
 #include "other/logging.h"
 #include "other/loader.h"
+#include "nine_morris_3d/game.h"
+#include "nine_morris_3d/layers/game/game_layer.h"
 
 constexpr int windmills[16][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },

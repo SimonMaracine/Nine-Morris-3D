@@ -5,14 +5,14 @@
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/events.h"
-#include "application/scenes/game/game_scene.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/buffer.h"
 #include "opengl/renderer/renderer.h"
-#include "ecs_and_game/game.h"
 #include "other/model.h"
 #include "other/loader.h"
-#include "other/options.h"
+#include "nine_morris_3d/scenes/game/game_scene.h"
+#include "nine_morris_3d/game.h"
+#include "nine_morris_3d/options.h"
 
 #define LIGHT_POSITION glm::vec3(-11.0f, 13.0f, -15.0f)
 

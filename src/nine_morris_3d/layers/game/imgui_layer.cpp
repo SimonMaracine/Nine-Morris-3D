@@ -3,16 +3,16 @@
 #include <backends/imgui_impl_glfw.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "application/scenes/game/game_layer.h"
-#include "application/scenes/game/imgui_layer.h"
-#include "application/scenes/game/gui_layer.h"
 #include "application/application.h"
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
-#include "ecs_and_game/systems.h"
+#include "ecs/systems.h"
 #include "other/logging.h"
-#include "other/save_load.h"
+#include "nine_morris_3d/layers/game/game_layer.h"
+#include "nine_morris_3d/layers/game/imgui_layer.h"
+#include "nine_morris_3d/layers/game/gui_layer.h"
+#include "nine_morris_3d/save_load.h"
 
 void ImGuiLayer::on_attach() {
     ImGui::CreateContext();

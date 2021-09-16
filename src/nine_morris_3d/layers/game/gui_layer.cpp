@@ -1,19 +1,19 @@
 
-#include "application/scenes/game/gui_layer.h"
-#include "application/scenes/game/game_layer.h"
 #include "application/application.h"
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
-#include "ecs_and_game/systems.h"
+#include "ecs/systems.h"
 #include "other/logging.h"
+#include "nine_morris_3d/layers/game/gui_layer.h"
+#include "nine_morris_3d/layers/game/game_layer.h"
 
 void GuiLayer::on_attach() {
 
 }
 
 void GuiLayer::on_detach() {
-    
+
 }
 
 void GuiLayer::on_bind_layers() {

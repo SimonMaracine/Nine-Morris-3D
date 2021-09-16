@@ -49,6 +49,8 @@ Application::~Application() {
 }
 
 void Application::run() {
+    assert(current_scene != nullptr);
+
     for (unsigned int j = 0; j < scenes.size(); j++) {
         for (unsigned int i = 0; i < scenes[j]->layer_stack.size(); i++) {
             scenes[j]->layer_stack[i]->on_bind_layers();

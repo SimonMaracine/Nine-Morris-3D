@@ -1,7 +1,7 @@
 #pragma once
 
 #include "application/scene.h"
-#include "other/options.h"
+#include "nine_morris_3d/options.h"
 
 class GameScene : public Scene {
 public:

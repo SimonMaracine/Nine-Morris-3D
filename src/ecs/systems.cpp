@@ -4,12 +4,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "ecs_and_game/systems.h"
-#include "ecs_and_game/components.h"
-#include "ecs_and_game/game.h"
+#include "ecs/systems.h"
+#include "ecs/components.h"
 #include "application/input.h"
 #include "opengl/renderer/renderer.h"
 #include "other/logging.h"
+#include "nine_morris_3d/game.h"
 
 void systems::load_projection_view(entt::registry& registry, entt::entity camera_entity) {
     auto& camera = CAMERA(camera_entity);

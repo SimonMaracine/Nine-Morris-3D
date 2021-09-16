@@ -7,8 +7,8 @@
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
-#include "ecs_and_game/components.h"
 #include "opengl/renderer/renderer.h"
+#include "ecs/components.h"
 #include "other/loader.h"
 
 #define PIECE(entity) registry.get<PieceComponent>(entity)

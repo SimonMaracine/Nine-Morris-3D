@@ -1,4 +1,4 @@
-#include "application/scenes/game/game_scene.h"
+#include "nine_morris_3d/scenes/game/game_scene.h"
 
 void GameScene::on_enter() {
 

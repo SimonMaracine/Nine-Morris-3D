@@ -1,7 +1,7 @@
 #pragma once
 
 #include "application/layer.h"
-#include "application/scenes/game/game_scene.h"
+#include "nine_morris_3d/scenes/game/game_scene.h"
 
 class GameLayer;
 class GuiLayer;

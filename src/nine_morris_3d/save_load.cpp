@@ -8,10 +8,10 @@
 #include <cereal/types/vector.hpp>
 #include <cereal/types/array.hpp>
 
-#include "other/save_load.h"
-#include "ecs_and_game/components.h"
-#include "ecs_and_game/game.h"
+#include "ecs/components.h"
 #include "other/logging.h"
+#include "nine_morris_3d/save_load.h"
+#include "nine_morris_3d/game.h"
 
 #define SAVE_GAME_FILE "last_game.dat"
 #define SAVE_ENTITIES_FILE "last_game_entities.dat"

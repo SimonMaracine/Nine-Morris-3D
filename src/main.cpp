@@ -1,10 +1,10 @@
 #include "application/application.h"
-#include "application/scenes/game/game_scene.h"
-#include "application/scenes/game/game_layer.h"
-#include "application/scenes/game/imgui_layer.h"
-#include "application/scenes/game/gui_layer.h"
-#include "application/scenes/loading/loading_scene.h"
-#include "application/scenes/loading/loading_layer.h"
+#include "nine_morris_3d/scenes/game/game_scene.h"
+#include "nine_morris_3d/layers/game/game_layer.h"
+#include "nine_morris_3d/layers/game/imgui_layer.h"
+#include "nine_morris_3d/layers/game/gui_layer.h"
+#include "nine_morris_3d/scenes/loading/loading_scene.h"
+#include "nine_morris_3d/layers/loading/loading_layer.h"
 #include "other/asset_manager.h"
 
 int main() {

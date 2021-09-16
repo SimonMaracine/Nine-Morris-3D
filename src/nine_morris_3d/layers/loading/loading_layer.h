@@ -1,9 +1,9 @@
 #pragma once
 
 #include "application/layer.h"
-#include "application/scenes/loading/loading_scene.h"
 #include "application/events.h"
 #include "other/loader.h"
+#include "nine_morris_3d/scenes/loading/loading_scene.h"
 
 class GameLayer;
 class ImGuiLayer;

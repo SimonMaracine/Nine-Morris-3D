@@ -44,7 +44,7 @@ private:
     bool on_window_resized(events::WindowResizedEvent& event);
 
     std::vector<Scene*> scenes;
-    Scene* current_scene;
+    Scene* current_scene = nullptr;
 
     bool changed_scene = false;
     Scene* to_scene;

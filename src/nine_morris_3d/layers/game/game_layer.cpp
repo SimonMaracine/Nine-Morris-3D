@@ -9,8 +9,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "application/scenes/game/game_layer.h"
-#include "application/scenes/game/imgui_layer.h"
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/window.h"
@@ -21,14 +19,16 @@
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/buffer.h"
-#include "ecs_and_game/components.h"
-#include "ecs_and_game/systems.h"
-#include "ecs_and_game/game.h"
+#include "ecs/components.h"
+#include "ecs/systems.h"
 #include "other/model.h"
 #include "other/loader.h"
 #include "other/logging.h"
-#include "other/options.h"
-#include "other/save_load.h"
+#include "nine_morris_3d/layers/game/game_layer.h"
+#include "nine_morris_3d/layers/game/imgui_layer.h"
+#include "nine_morris_3d/game.h"
+#include "nine_morris_3d/options.h"
+#include "nine_morris_3d/save_load.h"
 
 void GameLayer::on_attach() {
     options::load_options_from_file(scene->options);
