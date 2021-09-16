@@ -2,16 +2,22 @@ cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-set(EXECUTABLE_NAME "Nine-Morris-3D")
+set(EXECUTABLE_NAME Nine-Morris-3D)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-set(ASSIMP_BUILD_TESTS OFF)
 set(BUILD_SHARED_LIBS OFF)
+set(INJECT_DEBUG_POSTFIX OFF)  # This doesn't seem to work
+set(CMAKE_DEBUG_POSTFIX "")
+
+set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 set(ASSIMP_INSTALL_PDB OFF)  # TODO Should check this on MSVC
+set(ASSIMP_NO_EXPORT ON)
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
+set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 
 project("Nine Morris 3D"
     VERSION 0.1.0
@@ -66,11 +72,11 @@ target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
 add_subdirectory(extern/spdlog)
-add_subdirectory(extern/Assimp)
 add_subdirectory(extern/entt)
 add_subdirectory(extern/glm)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/json)
+add_subdirectory(extern/Assimp)
 
 # Add all include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
