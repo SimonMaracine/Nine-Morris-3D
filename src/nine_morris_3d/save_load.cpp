@@ -1,4 +1,5 @@
 #include <fstream>
+#include <stdio.h>
 
 #include <glm/glm.hpp>
 #include <entt/entt.hpp>
@@ -97,6 +98,16 @@ namespace glm {
 }
 
 namespace save_load {
+    static bool file_exists(const std::string& file_path) {
+        FILE* file = fopen(file_path.c_str(), "r");
+        if (file) {
+            fclose(file);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     Entities gather_entities(entt::entity board, entt::entity camera, entt::entity* nodes, entt::entity* pieces) {
         Entities entities;
 
@@ -179,5 +190,15 @@ namespace save_load {
         }
 
         SPDLOG_INFO("Loaded game from files '{}' and '{}'", SAVE_GAME_FILE, SAVE_ENTITIES_FILE);
+    }
+
+    bool save_files_exist() {
+        if (file_exists(SAVE_GAME_FILE) && file_exists(SAVE_ENTITIES_FILE)) {
+            return true;
+        } else {
+            SPDLOG_ERROR("Save files are either missing or are inaccessible: '{}', '{}'",
+                    SAVE_GAME_FILE, SAVE_ENTITIES_FILE);
+            return false;
+        }
     }
 }

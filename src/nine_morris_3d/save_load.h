@@ -24,4 +24,6 @@ namespace save_load {
 
     void save_game(const entt::registry& registry, const Entities& entities);
     void load_game(entt::registry& registry, Entities& entities);
+
+    bool save_files_exist();
 }

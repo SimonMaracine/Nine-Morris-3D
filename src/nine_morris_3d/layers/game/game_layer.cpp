@@ -306,6 +306,10 @@ void GameLayer::set_textures_quality(int quality) {
 }
 
 void GameLayer::load_game() {
+    if (!save_load::save_files_exist()) {
+        return;
+    }
+
     scene->registry.clear();
 
     save_load::Entities entities;
