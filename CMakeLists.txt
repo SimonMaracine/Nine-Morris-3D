@@ -99,10 +99,31 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/json/single_include")
 
 # Add all link directories
-target_link_directories(${EXECUTABLE_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-    "${CMAKE_SOURCE_DIR}/build/extern/Assmip/bin"
-    "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build/extern/Assmip/bin"
+            "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+    elseif(CMAKE_BUILD_TYPE MATCHES Release)
+        target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/Assmip/bin"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
+    endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build/extern/Assmip/bin"
+            "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+    elseif(CMAKE_BUILD_TYPE MATCHES Release)
+        target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/Assmip/bin"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
+    endif()
+endif()
 
 # Add all libraries
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
