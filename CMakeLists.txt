@@ -68,7 +68,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
         -Wno-unused-parameter -Wno-missing-field-initializers -Wno-type-limits
         -Wno-parentheses)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_compile_options(${EXECUTABLE_NAME} PUBLIC -Wall)
+    # target_compile_options(${EXECUTABLE_NAME} PUBLIC -Wall)
 else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
@@ -99,30 +99,16 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/json/single_include")
 
 # Add all link directories
-if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
-        target_link_directories(${EXECUTABLE_NAME} PUBLIC
-            "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-            "${CMAKE_SOURCE_DIR}/build/extern/Assmip/bin"
-            "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
-    elseif(CMAKE_BUILD_TYPE MATCHES Release)
-        target_link_directories(${EXECUTABLE_NAME} PUBLIC
-            "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-            "${CMAKE_SOURCE_DIR}/build-release/extern/Assmip/bin"
-            "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
-    endif()
-elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
-        target_link_directories(${EXECUTABLE_NAME} PUBLIC
-            "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-            "${CMAKE_SOURCE_DIR}/build/extern/Assmip/bin"
-            "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
-    elseif(CMAKE_BUILD_TYPE MATCHES Release)
-        target_link_directories(${EXECUTABLE_NAME} PUBLIC
-            "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-            "${CMAKE_SOURCE_DIR}/build-release/extern/Assmip/bin"
-            "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
-    endif()
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    target_link_directories(${EXECUTABLE_NAME} PUBLIC
+        "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+        "${CMAKE_SOURCE_DIR}/build/extern/Assimp/bin"
+        "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+    target_link_directories(${EXECUTABLE_NAME} PUBLIC
+        "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+        "${CMAKE_SOURCE_DIR}/build-release/extern/Assimp/bin"
+        "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
 endif()
 
 # Add all libraries
@@ -135,6 +121,20 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
 endif()
 
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC "${CMAKE_DL_LIBS}")
+
+if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
+        set_property(TARGET spdlog PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
+        set_property(TARGET assimp PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
+        set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
+    elseif(CMAKE_BUILD_TYPE MATCHES Release)
+        set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
+        set_property(TARGET spdlog PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
+        set_property(TARGET assimp PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
+        set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
+    endif()
+endif()
 
 # Add some defines
 if(CMAKE_BUILD_TYPE MATCHES Debug)
