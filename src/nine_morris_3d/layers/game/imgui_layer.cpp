@@ -185,7 +185,7 @@ void ImGuiLayer::on_update(float dt) {
 
     if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
-        ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+        ImGui::Text("Version %d.%d.%d - Demo", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
         ImGui::Separator();
         ImGui::Text("All programming by:");
         ImGui::Text(u8"Simon Teodor Mărăcine - simonmaracine@gmail.com");
@@ -272,6 +272,11 @@ void ImGuiLayer::on_update(float dt) {
     ImGui::Text("History size (take): %lu", moves_history.taken_pieces.size());
     ImGui::End();
 #endif
+
+    ImGui::Begin("Info");
+    ImGui::Text("FPS: %f", app->fps);
+    ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
+    ImGui::End();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -22,9 +22,8 @@ Application::Application(int width, int height, const std::string& title) {
     logging::init();
     window = std::make_shared<Window>(&data);
 
-#ifndef NDEBUG
-    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
-#endif
+    logging::log_opengl_and_dependencies_info(logging::LogTarget::File);
+
     input::init(window->get_handle());
     debug_opengl::maybe_init_debugging();
 
