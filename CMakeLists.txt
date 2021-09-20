@@ -73,6 +73,11 @@ else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
 
+# Fix encoding on Windows
+if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    target_compile_options(${EXECUTABLE_NAME} PUBLIC /utf-8)
+endif()
+
 # Use C++17
 target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
