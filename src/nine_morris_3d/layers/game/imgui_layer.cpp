@@ -21,15 +21,16 @@ void ImGuiLayer::on_attach() {
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
-    ImFontAtlas::GlyphRangesBuilder builder;
+    ImFontGlyphRangesBuilder builder;
     builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
     builder.AddText(u8"ă");
 
-    ImVector<ImWchar>* ranges = new ImVector<ImWchar>;
-    builder.BuildRanges(ranges);
+    ImVector<ImWchar> ranges;
+    builder.BuildRanges(&ranges);
 
     io.FontDefault = io.Fonts->AddFontFromFileTTF("data/fonts/OpenSans-Semibold.ttf", 20.0f,
-        nullptr, ranges->Data);
+            nullptr, ranges.Data);
+    io.Fonts->Build();
 
     ImVec4* colors = ImGui::GetStyle().Colors;
     colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
