@@ -14,9 +14,11 @@ Window::Window(ApplicationData* data) {
         std::exit(1);
     }
 
+#ifndef NDEBUG
     glfwSetErrorCallback([](int error, const char* description) {
         spdlog::critical("[ID: {}] {}", error, description);
     });
+#endif
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
