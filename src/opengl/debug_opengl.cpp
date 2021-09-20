@@ -54,6 +54,7 @@ bool stop_counting_bytes_allocated_gpu = false;
 #endif
 
 namespace debug_opengl {
+#if 0
     static const std::string parse_version(int version) {
         int major, minor, patch;
         int numbers[5];
@@ -73,6 +74,7 @@ namespace debug_opengl {
 
         return std::string(str);
     }
+#endif
 
 #ifndef NDEBUG
     static void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
@@ -229,14 +231,14 @@ namespace debug_opengl {
         }
         {
             char line[50];
-            const char* version = parse_version(SPDLOG_VERSION).c_str();
-            sprintf(line, "spdlog version: %s\n", version);
+            sprintf(line, "spdlog version: %d.%d.%d\n", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR,
+                    SPDLOG_VER_PATCH);
             output.append(line);
         }
         {
             char line[50];
-            sprintf(line, "EnTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR,
-                    ENTT_VERSION_MINOR, ENTT_VERSION_PATCH);
+            sprintf(line, "EnTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR, ENTT_VERSION_MINOR,
+                    ENTT_VERSION_PATCH);
             output.append(line);
         }
         {
