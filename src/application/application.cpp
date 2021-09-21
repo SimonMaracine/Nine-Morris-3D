@@ -76,7 +76,7 @@ void Application::run() {
         }
 
         if (changed_scene) {
-            for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
+            for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
                 current_scene->layer_stack[i]->on_detach();
             }
             current_scene->on_exit();
@@ -94,7 +94,7 @@ void Application::run() {
         window->update();
     }
 
-    for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
+    for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
         current_scene->layer_stack[i]->on_detach();
     }
     current_scene->on_exit();
