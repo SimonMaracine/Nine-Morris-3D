@@ -56,7 +56,7 @@ GLuint Framebuffer::get_depth_attachment() const {
 
 void Framebuffer::resize(int width, int height) {
     if (width < 1 || height < 1 || width > 8192 || height > 8192) {
-        SPDLOG_ERROR("Attempted to rezize framebuffer to [ {}, {} ]", width, height);
+        SPDLOG_ERROR("Attempted to resize framebuffer to [ {}, {} ]", width, height);
         return;
     }
     this->width = width;

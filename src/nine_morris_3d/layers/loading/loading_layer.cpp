@@ -74,7 +74,9 @@ void LoadingLayer::on_event(events::Event& event) {
 }
 
 bool LoadingLayer::on_window_resized(events::WindowResizedEvent& event) {
-    app->storage->scene_framebuffer->resize(event.width, event.height);
+    if (app->storage->scene_framebuffer) {
+        app->storage->scene_framebuffer->resize(event.width, event.height);
+    }
     app->storage->intermediate_framebuffer->resize(event.width, event.height);
     systems::projection_matrix(scene->registry, (float) event.width, (float) event.height);
     app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
