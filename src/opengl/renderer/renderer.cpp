@@ -72,7 +72,6 @@ namespace renderer {
         storage->skybox_shader = Shader::create("data/shaders/cubemap.vert",
                                                 "data/shaders/cubemap.frag");
 
-        storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, 2, 2);
         storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
         storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate, width, height, 1, 2);
 
