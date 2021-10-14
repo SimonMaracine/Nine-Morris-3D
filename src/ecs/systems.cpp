@@ -111,7 +111,7 @@ void systems::camera(entt::registry& registry, float mouse_wheel, float dx, floa
         transform.position.z = camera.point.z - offset_z;
         transform.position.y = camera.point.y + vertical_distance;
 
-        yaw = 180 - camera.angle_around_point;
+        yaw = 180.0f - camera.angle_around_point;
 
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::rotate(matrix, glm::radians(pitch), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -335,7 +335,7 @@ void systems::turn_indicator(entt::registry& registry, float width, float height
     for (entt::entity entity : view) {
         auto& transform = view.get<TransformComponent>(entity);
 
-        transform.position = glm::vec3(width - 90, height - 115, 0.0f);
+        transform.position = glm::vec3(width - 90.0f, height - 115.0f, 0.0f);
     }
 }
 
