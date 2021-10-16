@@ -11,7 +11,7 @@ TextureData::TextureData(const std::string& file_path, bool flip) {
 
     stbi_set_flip_vertically_on_load((int) flip);
 
-    data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
+    data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
     if (!data) {
         spdlog::critical("Could not load texture '{}'", file_path.c_str());

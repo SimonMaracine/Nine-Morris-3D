@@ -36,12 +36,12 @@ int main() {
     application->add_asset(14, AssetType::TextureFlipped, "data/textures/piece/black_piece.png");
     application->add_asset(15, AssetType::TextureFlipped, "data/textures/piece/black_piece-small.png");
 
-    application->add_asset(16, AssetType::Texture, "data/textures/skybox/right.jpg");
-    application->add_asset(17, AssetType::Texture, "data/textures/skybox/left.jpg");
-    application->add_asset(18, AssetType::Texture, "data/textures/skybox/top.jpg");
-    application->add_asset(19, AssetType::Texture, "data/textures/skybox/bottom.jpg");
-    application->add_asset(20, AssetType::Texture, "data/textures/skybox/front.jpg");
-    application->add_asset(21, AssetType::Texture, "data/textures/skybox/back.jpg");
+    application->add_asset(16, AssetType::Texture, "data/textures/skybox/forest/right.png");
+    application->add_asset(17, AssetType::Texture, "data/textures/skybox/forest/left.png");
+    application->add_asset(18, AssetType::Texture, "data/textures/skybox/forest/top.png");
+    application->add_asset(19, AssetType::Texture, "data/textures/skybox/forest/bottom.png");
+    application->add_asset(20, AssetType::Texture, "data/textures/skybox/forest/front.png");
+    application->add_asset(21, AssetType::Texture, "data/textures/skybox/forest/back.png");
 
     GameScene* game_scene = new GameScene(0);
     LoadingScene* loading_scene = new LoadingScene(1);

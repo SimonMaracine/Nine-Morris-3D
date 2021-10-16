@@ -179,8 +179,8 @@ std::shared_ptr<Texture3D> Texture3D::create(std::array<std::shared_ptr<TextureD
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     for (int i = 0; i < 6; i++) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB8, data[i]->width,
-                     data[i]->height, 0, GL_RGB, GL_UNSIGNED_BYTE, data[i]->data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, data[i]->width,
+                     data[i]->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data);
         LOG_ALLOCATION(data[i]->width * data[i]->height * 4);
     }
 
