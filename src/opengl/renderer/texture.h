@@ -35,7 +35,7 @@ public:
     ~Texture3D();
 
     static std::shared_ptr<Texture3D> create(const char** file_paths);
-	static std::shared_ptr<Texture3D> create(std::array<std::shared_ptr<TextureData>, 6> data);
+	static std::shared_ptr<Texture3D> create(const std::array<std::shared_ptr<TextureData>, 6>& data);
 
     void bind(GLenum slot) const;
     static void unbind();

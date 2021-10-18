@@ -23,7 +23,6 @@ constexpr GLenum parameters[] = {
     GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
     GL_MAX_TEXTURE_IMAGE_UNITS,
     GL_MAX_TEXTURE_SIZE,
-    GL_MAX_VARYING_FLOATS,
     GL_MAX_VERTEX_ATTRIBS,
     GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
     GL_MAX_VERTEX_UNIFORM_COMPONENTS,
@@ -39,13 +38,12 @@ const char* names[] = {
     "GL_MAX_FRAGMENT_UNIFORM_COMPONENTS",
     "GL_MAX_TEXTURE_IMAGE_UNITS",
     "GL_MAX_TEXTURE_SIZE",
-    "GL_MAX_VARYING_FLOATS",
     "GL_MAX_VERTEX_ATTRIBS",
     "GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS",
     "GL_MAX_VERTEX_UNIFORM_COMPONENTS",
     "GL_MAX_TEXTURE_LOD_BIAS",
     "GL_MAX_VIEWPORT_DIMS",
-    "GL_STEREO",
+    "GL_STEREO"
 };
 
 #ifndef NDEBUG
@@ -170,7 +168,7 @@ namespace debug_opengl {
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** OpenGL Context Parameters ***\n");
 
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i <= 9; i++) {
             GLint result;
             glGetIntegerv(parameters[i], &result);
 
@@ -180,18 +178,18 @@ namespace debug_opengl {
         }
         {
             GLint result[2];
-            glGetIntegerv(parameters[11], result);
+            glGetIntegerv(parameters[10], result);
 
             char line[100];
-            sprintf(line, "%s %i %i\n", names[11], result[0], result[1]);
+            sprintf(line, "%s %i %i\n", names[10], result[0], result[1]);
             output.append(line);
         }
         {
             GLboolean result;
-            glGetBooleanv(parameters[12], &result);
+            glGetBooleanv(parameters[11], &result);
 
             char line[100];
-            sprintf(line, "%s %u\n", names[12], (unsigned int) result);
+            sprintf(line, "%s %u\n", names[11], (unsigned int) result);
             output.append(line);
         }
 

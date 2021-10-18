@@ -134,8 +134,8 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -148,7 +148,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
     for (int i = 0; i < 6; i++) {
         SPDLOG_DEBUG("Loading texture '{}'...", file_paths[i]);
 
-        data = stbi_load(file_paths[i], &width, &height, &channels, 3);  // TODO make this flexible
+        data = stbi_load(file_paths[i], &width, &height, &channels, 4);
 
         if (!data) {
             spdlog::critical("Could not load texture '{}'", file_paths[i]);
@@ -156,7 +156,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
         }
 
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                     0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                     0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         LOG_ALLOCATION(width * height * 4);
 
         stbi_image_free(data);
@@ -167,13 +167,13 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
     return std::make_shared<Texture3D>(texture);
 }
 
-std::shared_ptr<Texture3D> Texture3D::create(std::array<std::shared_ptr<TextureData>, 6> data) {
+std::shared_ptr<Texture3D> Texture3D::create(const std::array<std::shared_ptr<TextureData>, 6>& data) {
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
