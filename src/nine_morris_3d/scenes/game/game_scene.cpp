@@ -1,9 +1,237 @@
+#include <vector>
+#include <array>
+#include <memory>
+#include <stdlib.h>
+#include <time.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "opengl/renderer/vertex_array.h"
+#include "opengl/renderer/buffer.h"
+#include "opengl/renderer/texture.h"
+#include "opengl/renderer/buffer_layout.h"
+#include "opengl/debug_opengl.h"
+#include "other/texture_data.h"
+#include "other/assets.h"
+#include "other/logging.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
+#include "nine_morris_3d/board.h"
 
 void GameScene::on_enter() {
+    srand(time(nullptr));
 
+    if (!app->storage->white_piece_diffuse_texture) {
+        app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture, true, -1.5f);
+        app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture, true, -1.5f);
+    }
+
+    for (unsigned int i = 0; i < 9; i++) {
+        build_piece(i, Piece::Type::White, app->assets_load->white_piece_mesh,
+                app->storage->white_piece_diffuse_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
+    }
+    for (unsigned int i = 9; i < 18; i++) {
+        build_piece(i, Piece::Type::Black, app->assets_load->black_piece_mesh,
+                app->storage->black_piece_diffuse_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
+    }
+
+    for (unsigned int i = 0; i < 24; i++) {
+        build_node(i, NODE_POSITIONS[i]);
+    }
+
+    build_board();
+    build_board_paint();
+    build_camera();
+    build_skybox();
+
+    // Free the memory
+    app->assets_load = nullptr;
+
+    SPDLOG_DEBUG("Finished initializing game");
+    STOP_ALLOCATION_LOG();
 }
 
 void GameScene::on_exit() {
 
+}
+
+Rc<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size, unsigned int id) {
+    std::vector<unsigned int> array;
+    array.resize(vertices_size);
+    for (unsigned int i = 0; i < array.size(); i++) {
+        array[i] = id;
+    }
+    Rc<Buffer> buffer = Buffer::create(array.data(), array.size() * sizeof(unsigned int));
+
+    return buffer;
+}
+
+Rc<VertexArray> GameScene::create_entity_vertex_array(Rc<model::Mesh<model::Vertex>> mesh, unsigned int id) {
+    Rc<Buffer> vertices = Buffer::create(mesh->vertices.data(), mesh->vertices.size() * sizeof(model::Vertex));
+
+    Rc<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+    layout.add(1, BufferLayout::Type::Float, 2);
+    layout.add(2, BufferLayout::Type::Float, 3);
+
+    BufferLayout layout2;
+    layout2.add(3, BufferLayout::Type::Int, 1);
+
+    Rc<Buffer> index_buffer = Buffer::create_index(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
+
+    Rc<VertexArray> vertex_array = VertexArray::create();
+    index_buffer->bind();
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(ids, layout2);
+    vertex_array->hold_index_buffer(index_buffer);
+
+    VertexArray::unbind();
+
+    return vertex_array;
+}
+
+void GameScene::build_board() {
+    unsigned int id = Hoverable::generate_id();
+    board = Board(id);
+
+    app->storage->board_vertex_array = create_entity_vertex_array(app->assets_load->board_mesh, id);
+
+    if (!app->storage->board_diffuse_texture) {
+        app->storage->board_diffuse_texture = Texture::create(app->assets_load->board_texture, true, -2.0f);
+    }
+
+    board.scale = 20.0f;
+    board.vertex_array = app->storage->board_vertex_array;
+    board.index_count = app->assets_load->board_mesh->indices.size();
+    board.diffuse_texture = app->storage->board_diffuse_texture;
+    board.specular_color = glm::vec3(0.25f);
+    board.shininess = 8.0f;
+}
+
+void GameScene::build_board_paint() {
+    Rc<Buffer> vertices = Buffer::create(app->assets_load->board_paint_mesh->vertices.data(),
+            app->assets_load->board_paint_mesh->indices.size() * sizeof(model::Vertex));
+
+    Rc<VertexArray> vertex_array = VertexArray::create();
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+    layout.add(1, BufferLayout::Type::Float, 2);
+    layout.add(2, BufferLayout::Type::Float, 3);
+
+    Rc<Buffer> index_buffer = Buffer::create(app->assets_load->board_paint_mesh->indices.data(),
+            app->assets_load->board_paint_mesh->indices.size() * sizeof(unsigned int));
+
+    index_buffer->bind();
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->hold_index_buffer(index_buffer);
+
+    VertexArray::unbind();
+
+    app->storage->board_paint_vertex_array = vertex_array;
+
+    if (!app->storage->board_paint_texture) {
+        app->storage->board_paint_texture = Texture::create(app->assets_load->board_paint_texture, true, -1.0f);
+    }
+
+    board.paint.position = glm::vec3(0.0f, 0.062f, 0.0f);
+    board.paint.scale = 20.0f;
+    board.paint.vertex_array = vertex_array;
+    board.paint.index_count = app->assets_load->board_paint_mesh->indices.size();
+    board.paint.diffuse_texture = app->storage->board_paint_texture;
+    board.paint.specular_color = glm::vec3(0.25f);
+    board.paint.shininess = 8.0f;
+}
+
+void GameScene::build_piece(unsigned int index, Piece::Type type, Rc<model::Mesh<model::Vertex>> mesh,
+        Rc<Texture> texture, const glm::vec3& position) {
+    unsigned int id = Hoverable::generate_id();
+    std::shared_ptr<Piece> piece = std::make_shared<Piece>(id, type);
+    pieces[index] = piece;
+
+    Rc<VertexArray> vertex_array = create_entity_vertex_array(mesh, id);
+
+    int random_rotation = rand() % 360;
+
+    app->storage->piece_vertex_arrays[index] = vertex_array;
+
+    piece->position = position;
+    piece->rotation = glm::vec3(0.0f, glm::radians((float) random_rotation), 0.0f);
+    piece->scale = 20.0f;
+    piece->vertex_array = vertex_array;
+    piece->index_count = mesh->indices.size();
+    piece->diffuse_texture = texture;
+    piece->specular_color = glm::vec3(0.25f);
+    piece->shininess = 8.0f;
+    piece->select_color = glm::vec3(1.0f, 0.0f, 0.0f);
+    piece->hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
+}
+
+void GameScene::build_node(unsigned int index, const glm::vec3& position) {
+    unsigned int id = Hoverable::generate_id();
+    Node node = Node(id);
+    nodes[index] = node;
+
+    Rc<Buffer> vertices = Buffer::create(app->assets_load->node_mesh->vertices.data(),
+            app->assets_load->node_mesh->vertices.size() * sizeof(glm::vec3));
+
+    Rc<Buffer> ids = create_ids_buffer(app->assets_load->node_mesh->vertices.size(), id);
+
+    Rc<VertexArray> vertex_array = VertexArray::create();
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+    BufferLayout layout2;
+    layout.add(1, BufferLayout::Type::Int, 1);
+
+    Rc<Buffer> index_buffer = Buffer::create(app->assets_load->node_mesh->indices.data(),
+            app->assets_load->node_mesh->indices.size() * sizeof(unsigned int));
+
+    index_buffer->bind();
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(ids, layout2);
+    vertex_array->hold_index_buffer(index_buffer);
+
+    VertexArray::unbind();
+
+    app->storage->node_vertex_arrays[index] = vertex_array;
+
+    node.position = position;
+    node.scale = 20.0f;
+}
+
+void GameScene::build_camera() {
+    camera.pitch = 47.0f;
+    camera.projection_matrix = glm::perspective(glm::radians(45.0f), (float) app->data.width / (float) app->data.height, 0.1f, 70.0f);
+    camera.point = glm::vec3(0.0f);
+    camera.distance_to_point = 8.0f;
+}
+
+void GameScene::build_skybox() {
+    Rc<Buffer> vertices = Buffer::create(skybox_points, sizeof(skybox_points));
+
+    Rc<VertexArray> vertex_array = VertexArray::create();
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+
+    vertex_array->add_buffer(vertices, layout);
+
+    VertexArray::unbind();
+
+    app->storage->skybox_vertex_array = vertex_array;
+
+    if (!app->storage->skybox_texture) {
+        std::array<Rc<TextureData>, 6> data = {
+            app->assets_load->skybox_px_texture,
+            app->assets_load->skybox_nx_texture,
+            app->assets_load->skybox_py_texture,
+            app->assets_load->skybox_ny_texture,
+            app->assets_load->skybox_pz_texture,
+            app->assets_load->skybox_nz_texture
+        };
+        app->storage->skybox_texture = Texture3D::create(data);
+    }
 }

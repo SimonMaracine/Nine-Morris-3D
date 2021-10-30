@@ -13,6 +13,7 @@
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/framebuffer.h"
+#include "other/assets.h"
 
 namespace renderer {
     static Storage* storage = new Storage;
@@ -72,6 +73,17 @@ namespace renderer {
         storage->skybox_shader = Shader::create("data/shaders/cubemap.vert",
                                                 "data/shaders/cubemap.frag");
 
+        storage->quad2d_shader = Shader::create("data/shaders/quad2d.vert",
+                                                "data/shaders/quad2d.frag");
+
+        storage->quad3d_shader = Shader::create("data/shaders/quad3d.vert",
+                                                "data/shaders/quad3d.frag");
+
+#ifndef NDEBUG
+        storage->origin_shader = Shader::create("data/shaders/origin.vert",
+                                                "data/shaders/origin.frag");
+#endif
+
         storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
         storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate, width, height, 1, 2);
 
@@ -85,12 +97,12 @@ namespace renderer {
                  1.0f, -1.0f,    1.0f, 0.0f
             };
 
-            storage->screen_quad_vertex_buffer = Buffer::create(screen_quad_vertices, sizeof(screen_quad_vertices));
+            Rc<Buffer> buffer = Buffer::create(screen_quad_vertices, sizeof(screen_quad_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
             storage->screen_quad_vertex_array = VertexArray::create();
-            storage->screen_quad_vertex_array->add_buffer(storage->screen_quad_vertex_buffer, layout);
+            storage->screen_quad_vertex_array->add_buffer(buffer, layout);
 
             VertexArray::unbind();
         }
@@ -105,18 +117,17 @@ namespace renderer {
                 1.0f, 0.0f
             };
 
-            storage->quad2d_vertex_buffer = Buffer::create(quad2d_vertices, sizeof(quad2d_vertices));
+            Rc<Buffer> buffer = Buffer::create(quad2d_vertices, sizeof(quad2d_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             storage->quad2d_vertex_array = VertexArray::create();
-            storage->quad2d_vertex_array->add_buffer(storage->quad2d_vertex_buffer, layout);
+            storage->quad2d_vertex_array->add_buffer(buffer, layout);
 
             VertexArray::unbind();
         }
 
+#ifndef NDEBUG
         {
-            storage->origin_shader = Shader::create("data/shaders/origin.vert",
-                                                    "data/shaders/origin.frag");
             float origin_vertices[] = {
                 -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
                  20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
@@ -125,19 +136,18 @@ namespace renderer {
                   0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
                   0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
             };
-            storage->origin_vertex_buffer = Buffer::create(origin_vertices, sizeof(origin_vertices));
+            Rc<Buffer> buffer = Buffer::create(origin_vertices, sizeof(origin_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 3);
             layout.add(1, BufferLayout::Type::Float, 3);
             storage->origin_vertex_array = VertexArray::create();
-            storage->origin_vertex_array->add_buffer(storage->origin_vertex_buffer, layout);
+            storage->origin_vertex_array->add_buffer(buffer, layout);
+
+            VertexArray::unbind();
         }
 
-        storage->quad2d_shader = Shader::create("data/shaders/quad2d.vert",
-                                                "data/shaders/quad2d.frag");
-
-        storage->quad3d_shader = Shader::create("data/shaders/quad3d.vert",
-                                                "data/shaders/quad3d.frag");
+        storage->loading_texture = Texture::create(assets::LOADING_TEXTURE, true);
+#endif
 
 #ifndef NDEBUG
         storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);

@@ -10,7 +10,7 @@
 #include <assimp/version.h>
 #include <glm/glm.hpp>
 #include <spdlog/version.h>
-#include <entt/entt.hpp>
+// #include <entt/entt.hpp>
 #include <nlohmann/json.hpp>
 #include <cereal/version.hpp>
 
@@ -237,12 +237,12 @@ namespace debug_opengl {
                     SPDLOG_VER_PATCH);
             output.append(line);
         }
-        {
-            char line[100];
-            sprintf(line, "EnTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR, ENTT_VERSION_MINOR,
-                    ENTT_VERSION_PATCH);
-            output.append(line);
-        }
+        // {
+        //     char line[100];
+        //     sprintf(line, "EnTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR, ENTT_VERSION_MINOR,
+        //             ENTT_VERSION_PATCH);
+        //     output.append(line);
+        // }
         {
             char line[100];
             sprintf(line, "json version: %d.%d.%d\n", NLOHMANN_JSON_VERSION_MAJOR,

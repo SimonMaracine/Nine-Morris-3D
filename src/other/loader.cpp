@@ -6,7 +6,9 @@
 
 #include "other/loader.h"
 #include "other/model.h"
+#include "other/texture_data.h"
 #include "other/logging.h"
+#include "other/assets.h"
 
 bool Loader::done_loading() {
     return loaded.load();
@@ -16,49 +18,32 @@ std::thread& Loader::get_thread() {
     return loading_thread;
 }
 
-void Loader::start_loading_thread(const std::unordered_map<unsigned int, AssetManager::Asset>& required) {
+void Loader::start_loading_thread() {
     SPDLOG_INFO("Loading assets from separate thread...");
 
-    this->required = required;
     loading_thread = std::thread(&Loader::load, this);
 }
 
 void Loader::load() {
     using namespace model;
 
-    for (const std::pair<unsigned int, AssetManager::Asset>& pair : required) {
-        switch (pair.second.type) {
-            case AssetType::Mesh: {
-                Rc<Mesh<Vertex>> mesh = load_model(pair.second.file_path);
-                asset_manager.all_assets.meshes[pair.first] = mesh;
-
-                break;
-            }
-            case AssetType::MeshP: {
-                Rc<Mesh<VertexP>> mesh = load_model_position(pair.second.file_path);
-                asset_manager.all_assets.meshes_p[pair.first] = mesh;
-
-                break;
-            }
-            case AssetType::Texture: {
-                Rc<TextureData> texture = std::make_shared<TextureData>(pair.second.file_path, false);
-                asset_manager.all_assets.textures[pair.first] = texture;
-
-                break;
-            }
-            case AssetType::TextureFlipped: {
-                Rc<TextureData> texture = std::make_shared<TextureData>(pair.second.file_path, true);
-                asset_manager.all_assets.textures_flipped[pair.first] = texture;
-
-                break;
-            }
-            case AssetType::Sound: {
-                assert(false);
-
-                break;
-            }
-        }
-    }
+    assets_load->board_mesh = load_model(assets::BOARD_MESH);
+    assets_load->board_paint_mesh = load_model(assets::BOARD_PAINT_MESH);
+    assets_load->node_mesh = load_model_position(assets::NODE_MESH);;
+    assets_load->white_piece_mesh = load_model(assets::WHITE_PIECE_MESH);
+    assets_load->black_piece_mesh = load_model(assets::BLACK_PIECE_MESH);
+    assets_load->board_texture = std::make_shared<TextureData>(assets::BOARD_TEXTURE, true);
+    assets_load->board_paint_texture = std::make_shared<TextureData>(assets::BOARD_PAINT_TEXTURE, true);
+    assets_load->white_piece_texture = std::make_shared<TextureData>(assets::WHITE_PIECE_TEXTURE, true);
+    assets_load->black_piece_texture = std::make_shared<TextureData>(assets::BLACK_PIECE_TEXTURE, true);
+    assets_load->white_indicator_texture = std::make_shared<TextureData>(assets::WHITE_INDICATOR_TEXTURE, true);
+    assets_load->black_indicator_texture = std::make_shared<TextureData>(assets::BLACK_PIECE_TEXTURE, true);
+    assets_load->skybox_px_texture = std::make_shared<TextureData>(assets::SKYBOX_PX_TEXTURE, false);
+    assets_load->skybox_nx_texture = std::make_shared<TextureData>(assets::SKYBOX_NX_TEXTURE, false);
+    assets_load->skybox_py_texture = std::make_shared<TextureData>(assets::SKYBOX_PY_TEXTURE, false);
+    assets_load->skybox_ny_texture = std::make_shared<TextureData>(assets::SKYBOX_NY_TEXTURE, false);
+    assets_load->skybox_pz_texture = std::make_shared<TextureData>(assets::SKYBOX_PZ_TEXTURE, false);
+    assets_load->skybox_nz_texture = std::make_shared<TextureData>(assets::SKYBOX_NZ_TEXTURE, false);
 
     loaded.store(true);
 }

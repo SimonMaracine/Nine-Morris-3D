@@ -1,6 +1,6 @@
 #pragma once
 
-#include <entt/entt.hpp>
+// #include <entt/entt.hpp>
 
 #include "application/application.h"
 #include "application/layer.h"
@@ -14,7 +14,7 @@
 #include "nine_morris_3d/game.h"
 #include "nine_morris_3d/options.h"
 
-#define LIGHT_POSITION glm::vec3(-11.0f, 13.0f, -15.0f)
+// #define LIGHT_POSITION glm::vec3(-11.0f, 13.0f, -15.0f)
 
 class ImGuiLayer;
 
@@ -40,30 +40,30 @@ public:
     void restart();
 
     void set_scene_framebuffer(int samples);
-    void set_textures_quality(int quality);
+    // void set_textures_quality(int quality);
     void load_game();
 
-    static Rc<Buffer> create_ids_buffer(unsigned int vertices_size, entt::entity entity);
-    static Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<Vertex>> mesh, entt::entity entity);
+//     static Rc<Buffer> create_ids_buffer(unsigned int vertices_size, entt::entity entity);
+//     static Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<Vertex>> mesh, entt::entity entity);
 
-    void build_board();
-    void build_board_paint();
-    void build_camera();
-    void build_skybox();
-    void build_piece(int id, Piece type, Rc<model::Mesh<Vertex>> mesh,
-                     Rc<Texture> diffuse_texture, const glm::vec3& position);
-    void build_directional_light();
-#ifndef NDEBUG
-    void build_origin();
-#endif
-    void build_node(int index, const glm::vec3& position);
-    void build_turn_indicator();
+//     void build_board();
+//     void build_board_paint();
+//     void build_camera();
+//     void build_skybox();
+//     void build_piece(int id, Piece type, Rc<model::Mesh<Vertex>> mesh,
+//                      Rc<Texture> diffuse_texture, const glm::vec3& position);
+//     void build_directional_light();
+// #ifndef NDEBUG
+//     void build_origin();
+// #endif
+//     void build_node(int index, const glm::vec3& position);
+//     void build_turn_indicator();
 
-    void rebuild_board_after_load();
-    void rebuild_camera_after_load();
-    void rebuild_piece_after_load(entt::entity piece, Rc<model::Mesh<Vertex>> mesh,
-                                  Rc<Texture> diffuse_texture);
-    void rebuild_node_after_load(entt::entity node);
+//     void rebuild_board_after_load();
+//     void rebuild_camera_after_load();
+//     void rebuild_piece_after_load(entt::entity piece, Rc<model::Mesh<Vertex>> mesh,
+//                                   Rc<Texture> diffuse_texture);
+//     void rebuild_node_after_load(entt::entity node);
 
     float mouse_wheel = 0.0f;
     float dx = 0.0f;

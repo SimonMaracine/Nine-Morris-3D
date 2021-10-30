@@ -7,7 +7,7 @@
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
-#include "ecs/systems.h"
+// #include "ecs/systems.h"
 #include "other/logging.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
@@ -79,17 +79,17 @@ void ImGuiLayer::on_update(float dt) {
                 game_layer->load_game();
             }
             if (ImGui::MenuItem("Save", nullptr, false)) {
-                save_load::save_game(scene->registry, save_load::gather_entities(scene->board,
-                    scene->camera, scene->nodes, scene->pieces));
+                // save_load::save_game(scene->registry, save_load::gather_entities(scene->board,  // TODO this
+                //     scene->camera, scene->nodes, scene->pieces));
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
-                systems::undo(scene->registry, scene->board);
+                // systems::undo(scene->registry, scene->board);
 
-                auto& state = scene->registry.get<GameStateComponent>(scene->board);
+                // // auto& state = scene->registry.get<GameStateComponent>(scene->board);
 
-                if (state.not_placed_pieces_count == 18) {
-                    can_undo = false;
-                }
+                // if (state.not_placed_pieces_count == 18) {
+                //     can_undo = false;
+                // }
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
                 app->running = false;
@@ -138,12 +138,12 @@ void ImGuiLayer::on_update(float dt) {
             }
             if (ImGui::BeginMenu("Texture Quality", true)) {
                 if (ImGui::RadioButton("High", &scene->options.texture_quality, 0)) {
-                    game_layer->set_textures_quality(scene->options.texture_quality);
+                    // game_layer->set_textures_quality(scene->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to high quality");
                 }
                 if (ImGui::RadioButton("Normal", &scene->options.texture_quality, 1)) {
-                    game_layer->set_textures_quality(scene->options.texture_quality);
+                    // game_layer->set_textures_quality(scene->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to normal quality");
                 }
@@ -200,77 +200,77 @@ void ImGuiLayer::on_update(float dt) {
         gui_layer->active = false;
     }
 
-    auto& state = scene->registry.get<GameStateComponent>(scene->board);
+    // auto& state = scene->registry.get<GameStateComponent>(scene->board);
 
-    if (state.not_placed_pieces_count < 18) {
-        can_undo = true;
-    }
+    // if (state.not_placed_pieces_count < 18) {  // TODO this
+    //     can_undo = true;
+    // }
 
-    if (state.phase == Phase::GameOver) {
-        ImGui::OpenPopup("Game Over");
+    // if (state.phase == Phase::GameOver) {
+    //     ImGui::OpenPopup("Game Over");
 
-        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        ImGuiStyle& style = ImGui::GetStyle();
-        style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+    //     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    //     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    //     ImGuiStyle& style = ImGui::GetStyle();
+    //     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
 
-        if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            switch (state.ending) {
-                case Ending::WinnerWhite: {
-                    const char* message = "White player wins!";
-                    float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize(message).x;
-                    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                    ImGui::Text("%s", message);
-                    break;
-                }
-                case Ending::WinnerBlack: {
-                    const char* message = "Black player wins!";
-                    float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize(message).x;
-                    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                    ImGui::Text("%s", message);
-                    break;
-                }
-                case Ending::TieBetweenBothPlayers: {
-                    const char* message = "Tie between both players!";
-                    float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize(message).x;
-                    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                    ImGui::Text("%s", message);
-                    break;
-                }
-                case Ending::None:
-                    assert(false);
-            }
+    //     if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    //         switch (state.ending) {
+    //             case Ending::WinnerWhite: {
+    //                 const char* message = "White player wins!";
+    //                 float window_width = ImGui::GetWindowSize().x;
+    //                 float text_width = ImGui::CalcTextSize(message).x;
+    //                 ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+    //                 ImGui::Text("%s", message);
+    //                 break;
+    //             }
+    //             case Ending::WinnerBlack: {
+    //                 const char* message = "Black player wins!";
+    //                 float window_width = ImGui::GetWindowSize().x;
+    //                 float text_width = ImGui::CalcTextSize(message).x;
+    //                 ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+    //                 ImGui::Text("%s", message);
+    //                 break;
+    //             }
+    //             case Ending::TieBetweenBothPlayers: {
+    //                 const char* message = "Tie between both players!";
+    //                 float window_width = ImGui::GetWindowSize().x;
+    //                 float text_width = ImGui::CalcTextSize(message).x;
+    //                 ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+    //                 ImGui::Text("%s", message);
+    //                 break;
+    //             }
+    //             case Ending::None:
+    //                 assert(false);
+    //         }
 
-            if (ImGui::Button("Ok", ImVec2(200, 0))) {
-                ImGui::CloseCurrentPopup();
-                state.phase = Phase::None;
-            }
+    //         if (ImGui::Button("Ok", ImVec2(200, 0))) {
+    //             ImGui::CloseCurrentPopup();
+    //             state.phase = Phase::None;
+    //         }
 
-            ImGui::EndPopup();
-            HOVERING_GUI;
-        }
-    }
+    //         ImGui::EndPopup();
+    //         HOVERING_GUI;
+    //     }
+    // }
 
 #ifndef NDEBUG
-    auto& moves_history = scene->registry.get<MovesHistoryComponent>(scene->board);
+    // auto& moves_history = scene->registry.get<MovesHistoryComponent>(scene->board);
 
-    ImGui::Begin("Debug");
-    ImGui::Text("FPS: %f", app->fps);
-    ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
-    ImGui::Text("White pieces: %d", state.white_pieces_count);
-    ImGui::Text("Black pieces: %d", state.black_pieces_count);
-    ImGui::Text("Not placed pieces: %d", state.not_placed_pieces_count);
-    ImGui::Text("Phase: %d", (int) state.phase);
-    ImGui::Text("Turn: %s", state.turn == Player::White ? "white" : "black");
-    ImGui::Text("Should take piece: %s", state.should_take_piece ? "true" : "false");
-    ImGui::Text("Turns without mills: %d", state.turns_without_mills);
-    ImGui::Text("History size (place): %lu", moves_history.placed_pieces.size());
-    ImGui::Text("History size (move): %lu", moves_history.moved_pieces.size());
-    ImGui::Text("History size (take): %lu", moves_history.taken_pieces.size());
-    ImGui::End();
+    // ImGui::Begin("Debug");  // TODO this
+    // ImGui::Text("FPS: %f", app->fps);
+    // ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
+    // ImGui::Text("White pieces: %d", state.white_pieces_count);
+    // ImGui::Text("Black pieces: %d", state.black_pieces_count);
+    // ImGui::Text("Not placed pieces: %d", state.not_placed_pieces_count);
+    // ImGui::Text("Phase: %d", (int) state.phase);
+    // ImGui::Text("Turn: %s", state.turn == Player::White ? "white" : "black");
+    // ImGui::Text("Should take piece: %s", state.should_take_piece ? "true" : "false");
+    // ImGui::Text("Turns without mills: %d", state.turns_without_mills);
+    // ImGui::Text("History size (place): %lu", moves_history.placed_pieces.size());
+    // ImGui::Text("History size (move): %lu", moves_history.moved_pieces.size());
+    // ImGui::Text("History size (take): %lu", moves_history.taken_pieces.size());
+    // ImGui::End();
 #endif
 
     ImGui::Render();
@@ -336,7 +336,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
     app->storage->scene_framebuffer->resize(event.width, event.height);
     app->storage->intermediate_framebuffer->resize(event.width, event.height);
-    systems::projection_matrix(scene->registry, (float) event.width, (float) event.height);
+    // systems::projection_matrix(scene->registry, (float) event.width, (float) event.height);  // TODO this
     app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
 
     return false;

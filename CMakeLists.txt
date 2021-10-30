@@ -37,6 +37,9 @@ add_executable(${EXECUTABLE_NAME}
     "src/nine_morris_3d/options.cpp"
     "src/nine_morris_3d/save_load.cpp"
     "src/nine_morris_3d/game.cpp"
+    "src/nine_morris_3d/piece.cpp"
+    "src/nine_morris_3d/node.cpp"
+    "src/nine_morris_3d/board.cpp"
     "src/opengl/debug_opengl.cpp"
     "src/opengl/renderer/vertex_array.cpp"
     "src/opengl/renderer/buffer.cpp"
@@ -45,13 +48,13 @@ add_executable(${EXECUTABLE_NAME}
     "src/opengl/renderer/renderer.cpp"
     "src/opengl/renderer/texture.cpp"
     "src/opengl/renderer/framebuffer.cpp"
+    "src/opengl/renderer/camera.cpp"
     "src/other/logging.cpp"
     "src/other/model.cpp"
     "src/other/texture_data.cpp"
     "src/other/loader.cpp"
-    "src/other/asset_manager.cpp"
-    "src/ecs/systems.cpp"
-    "dependencies/Glad/src/glad.c"
+    "src/other/assets.cpp"
+    "dependencies/glad/src/glad.c"
     "dependencies/stb_image/stb_image.c"
     "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_demo.cpp"
@@ -83,7 +86,6 @@ target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
 add_subdirectory(extern/spdlog)
-add_subdirectory(extern/entt)
 add_subdirectory(extern/glm)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/json)
@@ -92,12 +94,11 @@ add_subdirectory(extern/Assimp)
 # Add all include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
 target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
-    "${CMAKE_SOURCE_DIR}/dependencies/Glad/include"
+    "${CMAKE_SOURCE_DIR}/dependencies/glad/include"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/dependencies/cereal/include"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/Assimp/include"
-    "${CMAKE_SOURCE_DIR}/extern/entt/single_include"
     "${CMAKE_SOURCE_DIR}/extern/glm"
     "${CMAKE_SOURCE_DIR}/extern/glfw/include"
     "${CMAKE_SOURCE_DIR}/extern/imgui"
@@ -149,7 +150,7 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message("Building in RELEASE mode")
     target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
-        SPDLOG_ACTIVE_LEVEL=6 NDEBUG ENTT_DISABLE_ASSERT)
+        SPDLOG_ACTIVE_LEVEL=6 NDEBUG)
 endif()
 
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)

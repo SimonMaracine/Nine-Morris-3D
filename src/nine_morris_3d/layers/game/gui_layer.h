@@ -24,10 +24,6 @@ public:
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
 
-    void imgui_start();
-    void imgui_update(float dt);
-    void imgui_end();
-
     GameScene* scene;
 
     GameLayer* game_layer;

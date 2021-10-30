@@ -24,7 +24,7 @@ public:
 
     bool on_window_resized(events::WindowResizedEvent& event);
 
-    Loader loader = Loader(app->asset_manager);
+    Loader loader = Loader(app->assets_load);
 
     LoadingScene* scene;
 };

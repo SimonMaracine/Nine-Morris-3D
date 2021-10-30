@@ -3,7 +3,7 @@
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
-#include "ecs/systems.h"
+// #include "ecs/systems.h"
 #include "other/logging.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
@@ -21,11 +21,11 @@ void GuiLayer::on_bind_layers() {
 }
 
 void GuiLayer::on_update(float dt) {
-    systems::turn_indicator(scene->registry, app->data.width, app->data.height);
+    // systems::turn_indicator(scene->registry, app->data.width, app->data.height);
 }
 
 void GuiLayer::on_draw() {
-    systems::turn_indicator_render(scene->registry, scene->board, app->storage);
+    // systems::turn_indicator_render(scene->registry, scene->board, app->storage);
 }
 
 void GuiLayer::on_event(events::Event& event) {

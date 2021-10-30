@@ -10,7 +10,6 @@
 #include "application/input.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/debug_opengl.h"
-#include "other/asset_manager.h"
 #include "other/logging.h"
 
 Application::Application(int width, int height, const std::string& title) {
@@ -36,6 +35,7 @@ Application::Application(int width, int height, const std::string& title) {
     }
 
     storage = renderer::init(data.width, data.height);
+    assets_load = std::make_shared<AssetsLoad>();
 }
 
 Application::~Application() {
@@ -124,9 +124,9 @@ void Application::push_layer(Layer* layer, Scene* scene) {
     scene->layer_stack.push_back(layer);
 }
 
-void Application::add_asset(unsigned int id, AssetType type, const std::string& file_path) {
-    asset_manager.define_asset(id, type, file_path);
-}
+// void Application::add_asset(unsigned int id, AssetType type, const std::string& file_path) {
+//     asset_manager.define_asset(id, type, file_path);
+// }
 
 void Application::on_event(events::Event& event) {
     using namespace events;

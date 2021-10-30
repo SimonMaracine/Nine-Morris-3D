@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <array>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -19,49 +20,55 @@ namespace renderer {
     };
 
     struct Storage {
-        Rc<Buffer> uniform_buffer = nullptr;
+        Rc<Buffer> uniform_buffer;
 
-        Rc<Shader> board_shader = nullptr;
-        Rc<Shader> board_paint_shader = nullptr;
-        Rc<Shader> piece_shader = nullptr;
-        Rc<Shader> shadow_shader = nullptr;
-        Rc<Shader> screen_quad_shader = nullptr;
-        Rc<Shader> outline_shader = nullptr;
-        Rc<Shader> node_shader = nullptr;
-        Rc<Shader> skybox_shader = nullptr;
-
-        Rc<Framebuffer> scene_framebuffer = nullptr;
-        Rc<Framebuffer> depth_map_framebuffer = nullptr;
-        Rc<Framebuffer> intermediate_framebuffer = nullptr;
-
-        Rc<VertexArray> screen_quad_vertex_array = nullptr;
-        Rc<Buffer> screen_quad_vertex_buffer = nullptr;
-
-        Rc<VertexArray> quad2d_vertex_array = nullptr;
-        Rc<Buffer> quad2d_vertex_buffer = nullptr;
-
-        Rc<Shader> origin_shader = nullptr;
-        Rc<VertexArray> origin_vertex_array = nullptr;
-        Rc<Buffer> origin_vertex_buffer = nullptr;
-
-        Rc<Shader> quad2d_shader = nullptr;
-        Rc<Shader> quad3d_shader = nullptr;
+        Rc<Shader> board_shader;
+        Rc<Shader> board_paint_shader;
+        Rc<Shader> piece_shader;
+        Rc<Shader> shadow_shader;
+        Rc<Shader> screen_quad_shader;
+        Rc<Shader> outline_shader;
+        Rc<Shader> node_shader;
+        Rc<Shader> skybox_shader;
+        Rc<Shader> quad2d_shader;
+        Rc<Shader> quad3d_shader;
 
 #ifndef NDEBUG
-        Rc<Texture> light_texture = nullptr;
+        Rc<Shader> origin_shader;
 #endif
 
-        glm::mat4 orthographic_projection_matrix;
+        Rc<Framebuffer> scene_framebuffer;
+        Rc<Framebuffer> depth_map_framebuffer;
+        Rc<Framebuffer> intermediate_framebuffer;
 
-        Rc<Texture> board_diffuse_texture = nullptr;
-        Rc<Texture> board_paint_texture = nullptr;
-        Rc<Texture> white_piece_diffuse_texture = nullptr;
-        Rc<Texture> black_piece_diffuse_texture = nullptr;
-        Rc<VertexArray> skybox_vertex_array = nullptr;
-        Rc<Texture3D> skybox_texture = nullptr;
-        Rc<Texture> white_indicator_texture = nullptr;
-        Rc<Texture> black_indicator_texture = nullptr;
-        Rc<Texture> loading_texture = nullptr;
+        Rc<VertexArray> screen_quad_vertex_array;
+        Rc<VertexArray> quad2d_vertex_array;
+
+#ifndef NDEBUG
+        Rc<VertexArray> origin_vertex_array;
+#endif
+
+        // TODO store them here?
+        Rc<Texture> board_diffuse_texture;
+        Rc<Texture> board_paint_texture;
+        Rc<Texture> white_piece_diffuse_texture;
+        Rc<Texture> black_piece_diffuse_texture;
+        Rc<Texture3D> skybox_texture;
+        Rc<Texture> white_indicator_texture;
+        Rc<Texture> black_indicator_texture;
+        Rc<Texture> loading_texture;
+
+#ifndef NDEBUG
+        Rc<Texture> light_texture;
+#endif
+
+        Rc<VertexArray> board_vertex_array;
+        Rc<VertexArray> board_paint_vertex_array;
+        std::array<Rc<VertexArray>, 18> piece_vertex_arrays;
+        std::array<Rc<VertexArray>, 24> node_vertex_arrays;
+        Rc<VertexArray> skybox_vertex_array;
+
+        glm::mat4 orthographic_projection_matrix;
     };
 
     Storage* init(int width, int height);

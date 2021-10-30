@@ -17,7 +17,7 @@
             }
     #endif
 
-    #define STOP_ALLOCATION_LOG \
+    #define STOP_ALLOCATION_LOG() \
         stop_counting_bytes_allocated_gpu = true; \
         SPDLOG_DEBUG("GPU: Stop counting memory allocated"); \
         SPDLOG_DEBUG("GPU: {} total bytes allocated", approximately_bytes_allocated_gpu);
