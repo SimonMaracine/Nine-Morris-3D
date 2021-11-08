@@ -2,7 +2,7 @@
 
 #define HOVERABLE_NULL 0
 
-class Hoverable {
+class Hoverable {  // TODO maybe refactor
 public:
     Hoverable(unsigned int id) : id(id) {}
     virtual ~Hoverable() = default;

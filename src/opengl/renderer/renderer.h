@@ -11,6 +11,7 @@
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/framebuffer.h"
+#include "nine_morris_3d/hoverable.h"
 
 namespace renderer {
     enum {
@@ -69,12 +70,16 @@ namespace renderer {
         Rc<VertexArray> skybox_vertex_array;
 
         glm::mat4 orthographic_projection_matrix;
+
+        unsigned int board_id = HOVERABLE_NULL;
+        unsigned int pieces_id[18] = { HOVERABLE_NULL };
+        unsigned int nodes_id[24] = { HOVERABLE_NULL };
     };
 
-    Storage* init(int width, int height);
+    Storage* initialize(int width, int height);
     void terminate();
-    void set_viewport(GLint width, GLint height);
-    void set_clear_color(GLfloat red, GLfloat green, GLfloat blue);
+    void set_viewport(int width, int height);
+    void set_clear_color(float red, float green, float blue);
     void clear(int buffers);
     void draw_screen_quad(GLuint texture);
     void enable_depth();

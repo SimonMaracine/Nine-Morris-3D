@@ -3,7 +3,7 @@
 namespace input {
     static GLFWwindow* window_ptr = nullptr;
 
-    void init(GLFWwindow* window) {
+    void initialize(GLFWwindow* window) {
         window_ptr = window;
     }
 

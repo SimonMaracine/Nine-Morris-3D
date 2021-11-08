@@ -18,7 +18,7 @@
 namespace renderer {
     static Storage* storage = new Storage;
 
-    Storage* init(int width, int height) {
+    Storage* initialize(int width, int height) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_CULL_FACE);
@@ -162,11 +162,11 @@ namespace renderer {
         delete storage;
     }
 
-    void set_viewport(GLint width, GLint height) {
+    void set_viewport(int width, int height) {
         glViewport(0, 0, width, height);
     }
 
-    void set_clear_color(GLfloat red, GLfloat green, GLfloat blue) {
+    void set_clear_color(float red, float green, float blue) {
         glClearColor(red, green, blue, 1.0f);
     }
 

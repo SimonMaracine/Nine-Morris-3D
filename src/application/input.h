@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 
 namespace input {
-    void init(GLFWwindow* window);
+    void initialize(GLFWwindow* window);
     bool is_key_pressed(int key);
     bool is_mouse_button_pressed(int button);
     int get_mouse_x();

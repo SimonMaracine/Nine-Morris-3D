@@ -34,7 +34,8 @@ void GameLayer::on_attach() {
     options::load_options_from_file(scene->options);
     app->window->set_vsync(scene->options.vsync);
 
-
+    app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
+            app->data.width, app->data.height, scene->options.samples, 2);
 }
 
 void GameLayer::on_detach() {
@@ -47,6 +48,7 @@ void GameLayer::on_bind_layers() {
 }
 
 void GameLayer::on_update(float dt) {
+    // TODO camera update, pieces move
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -54,7 +56,53 @@ void GameLayer::on_update(float dt) {
 }
 
 void GameLayer::on_draw() {
+    glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);
+    glm::mat4 view = glm::lookAt(scene->light.position / 4.0f,
+            glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 light_space_matrix = projection * view;
+    app->storage->shadow_shader->bind();
+    app->storage->shadow_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+
+    app->storage->depth_map_framebuffer->bind();
+
+    renderer::clear(renderer::Depth);
+    renderer::set_viewport(2048, 2048);
+
+    // TODO render to depth buffer
+
+    app->storage->scene_framebuffer->bind();
+
+    renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
+    renderer::set_viewport(app->data.width, app->data.height);
+    renderer::set_stencil_mask_zero();
+
+    app->storage->board_shader->bind();
+    app->storage->board_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    app->storage->board_shader->set_uniform_int("u_shadow_map", 1);
+    app->storage->board_paint_shader->bind();
+    app->storage->board_paint_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    app->storage->board_paint_shader->set_uniform_int("u_shadow_map", 1);
+    app->storage->piece_shader->bind();
+    app->storage->piece_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    app->storage->piece_shader->set_uniform_int("u_shadow_map", 1);
+    renderer::bind_texture(app->storage->depth_map_framebuffer->get_depth_attachment(), 1);
+
+    // TODO load projections, render everything
+
+    Framebuffer::resolve_framebuffer(app->storage->scene_framebuffer->get_id(),
+            app->storage->intermediate_framebuffer->get_id(),
+            app->data.width, app->data.height);
+
+    app->storage->intermediate_framebuffer->bind();
+
+    int x = input::get_mouse_x();
+    int y = app->data.height - input::get_mouse_y();
+    scene->hovered_entity = app->storage->intermediate_framebuffer->read_pixel(1, x, y);
+
+    Framebuffer::bind_default();
+
     renderer::clear(renderer::Color);
+    renderer::draw_screen_quad(app->storage->intermediate_framebuffer->get_color_attachment(0));
 }
 
 void GameLayer::on_event(events::Event& event) {

@@ -11,6 +11,7 @@
 #include "opengl/renderer/buffer.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/skybox.h"
+#include "opengl/renderer/light.h"
 #include "other/model.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
@@ -35,6 +36,7 @@ public:
     void build_node(unsigned int index, const glm::vec3& position);
     void build_camera();
     void build_skybox();
+    void build_light();
 
     options::Options options;
 
@@ -50,6 +52,7 @@ public:
     std::array<Node, 24> nodes;
     Camera camera;
     Skybox skybox;
+    Light light;
 
     Hoverable hovered_entity = HOVERABLE_NULL;
 };

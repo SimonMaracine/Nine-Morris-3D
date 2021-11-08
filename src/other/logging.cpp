@@ -11,7 +11,7 @@
 SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
 
 namespace logging {
-    void init() {
+    void initialize() {
         spdlog::set_pattern("%^[%l] [thread %t] [%H:%M:%S]%$ %v");
         spdlog::set_level(spdlog::level::trace);
     }

@@ -18,13 +18,13 @@ Application::Application(int width, int height, const std::string& title) {
     data.title = title;
     data.event_function = BIND(Application::on_event);
 
-    logging::init();
+    logging::initialize();
     window = std::make_shared<Window>(&data);
 
 #ifndef NDEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
 #endif
-    input::init(window->get_handle());
+    input::initialize(window->get_handle());
     debug_opengl::maybe_init_debugging();
 
     auto [version_major, version_minor] = debug_opengl::get_version();
@@ -34,7 +34,7 @@ Application::Application(int width, int height, const std::string& title) {
         std::exit(1);
     }
 
-    storage = renderer::init(data.width, data.height);
+    storage = renderer::initialize(data.width, data.height);
     assets_load = std::make_shared<AssetsLoad>();
 }
 

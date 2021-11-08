@@ -8,6 +8,6 @@ namespace logging {
         None, Console, File
     };
 
-    void init();
+    void initialize();
     void log_opengl_and_dependencies_info(LogTarget target);
 }
