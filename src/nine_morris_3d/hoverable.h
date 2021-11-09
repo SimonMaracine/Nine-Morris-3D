@@ -1,17 +1,9 @@
 #pragma once
 
-#define HOVERABLE_NULL 0
+#define HOVERABLE_NULL 0u
 
-class Hoverable {  // TODO maybe refactor
-public:
-    Hoverable(unsigned int id) : id(id) {}
-    virtual ~Hoverable() = default;
+namespace hoverable {
+    typedef unsigned int Id;
 
-    static unsigned int generate_id() {
-        static unsigned int id = 0;
-        id++;
-        return id;
-    }
-protected:
-    unsigned int id;
-};
+    Id generate_id();
+}

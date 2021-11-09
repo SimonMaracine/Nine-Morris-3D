@@ -4,21 +4,24 @@
 
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/texture.h"
-#include "nine_morris_3d/node.h"
 #include "nine_morris_3d/hoverable.h"
+
+class Node;
 
 constexpr float PIECE_Y_POSITION = 0.135f;
 constexpr float PIECE_MOVE_SPEED = 1.5f;
 
-class Piece : public Hoverable {
+class Piece {
 public:
     enum class Type {
         White,
         Black
     };
 
-    Piece(unsigned int id, Type type);
+    Piece(hoverable::Id id, Type type);
     ~Piece() = default;
+
+    hoverable::Id id;
 
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);

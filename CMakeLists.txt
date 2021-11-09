@@ -40,6 +40,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/nine_morris_3d/piece.cpp"
     "src/nine_morris_3d/node.cpp"
     "src/nine_morris_3d/board.cpp"
+    "src/nine_morris_3d/hoverable.cpp"
     "src/opengl/debug_opengl.cpp"
     "src/opengl/renderer/vertex_array.cpp"
     "src/opengl/renderer/buffer.cpp"

@@ -6,6 +6,7 @@
 
 #include "opengl/renderer/vertex_array.h"
 #include "nine_morris_3d/hoverable.h"
+#include "nine_morris_3d/piece.h"
 
 constexpr float NODE_Y_POSITION = 0.063f;
 
@@ -36,11 +37,13 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
-class Node : public Hoverable {
+class Node {
 public:
-    Node() : Hoverable(HOVERABLE_NULL) {}
-    Node(unsigned int id);
+    Node() : id(HOVERABLE_NULL) {}
+    Node(hoverable::Id id);
     ~Node() = default;
+
+    hoverable::Id id;
 
     glm::vec3 position = glm::vec3(0.0f);
     static float scale;
@@ -48,7 +51,7 @@ public:
     Rc<VertexArray> vertex_array;
     static int index_count;
 
-    // std::shared_ptr<Piece> piece = nullptr;
+    std::shared_ptr<Piece> piece = nullptr;
 
     // int id;  // Dunno
 };

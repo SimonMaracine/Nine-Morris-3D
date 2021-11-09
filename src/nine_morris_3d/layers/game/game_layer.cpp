@@ -97,7 +97,7 @@ void GameLayer::on_draw() {
 
     int x = input::get_mouse_x();
     int y = app->data.height - input::get_mouse_y();
-    scene->hovered_entity = app->storage->intermediate_framebuffer->read_pixel(1, x, y);
+    scene->hovered_id = app->storage->intermediate_framebuffer->read_pixel(1, x, y);
 
     Framebuffer::bind_default();
 
@@ -134,6 +134,8 @@ bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 
 bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
     // systems::press(scene->registry, scene->board, scene->hovered_entity);
+    // TODO this segfaults (for now)
+    scene->board.press(scene->hovered_id);
 
     return false;
 }
@@ -141,24 +143,25 @@ bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) 
 bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
     // auto& state = scene->registry.get<GameStateComponent>(scene->board);
 
-    // if (event.button == MOUSE_BUTTON_LEFT) {  // TODO fill the holes
-    //     if (state.phase == Phase::PlacePieces) {
-    //         if (state.should_take_piece) {
-    //             // systems::take_piece(scene->registry, scene->board, scene->hovered_entity);
-    //         } else {
-    //             // systems::place_piece(scene->registry, scene->board, scene->hovered_entity);
-    //         }
-    //     } else if (state.phase == Phase::MovePieces) {
-    //         if (state.should_take_piece) {
-    //             // systems::take_piece(scene->registry, scene->board, scene->hovered_entity);
-    //         } else {
-    //             // systems::select_piece(scene->registry, scene->board, scene->hovered_entity);
-    //             // systems::put_piece(scene->registry, scene->board, scene->hovered_entity);
-    //         }
-    //     }
+    if (event.button == MOUSE_BUTTON_LEFT) {
+        if (scene->board.phase == Board::Phase::PlacePieces) {
+            if (scene->board.should_take_piece) {
+                // systems::take_piece(scene->registry, scene->board, scene->hovered_entity);
+            } else {
+                // systems::place_piece(scene->registry, scene->board, scene->hovered_entity);
+            }
+        } else if (scene->board.phase == Board::Phase::MovePieces) {
+            if (scene->board.should_take_piece) {
+                // systems::take_piece(scene->registry, scene->board, scene->hovered_entity);
+            } else {
+                // systems::select_piece(scene->registry, scene->board, scene->hovered_entity);
+                // systems::put_piece(scene->registry, scene->board, scene->hovered_entity);
+            }
+        }
 
-    //     // systems::release(scene->registry, scene->board);
-    // }
+        // systems::release(scene->registry, scene->board);
+        scene->board.release(scene->hovered_id);
+    }
 
     return false;
 }

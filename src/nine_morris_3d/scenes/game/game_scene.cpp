@@ -95,7 +95,7 @@ Rc<VertexArray> GameScene::create_entity_vertex_array(Rc<model::Mesh<model::Vert
 
 void GameScene::build_board() {
     if (!app->storage->board_vertex_array) {
-        unsigned int id = Hoverable::generate_id();
+        hoverable::Id id = hoverable::generate_id();
         app->storage->board_id = id;
 
         app->storage->board_vertex_array = create_entity_vertex_array(app->assets_load->board_mesh, id);
@@ -159,33 +159,33 @@ void GameScene::build_board_paint() {
 void GameScene::build_piece(unsigned int index, Piece::Type type, Rc<model::Mesh<model::Vertex>> mesh,
         Rc<Texture> texture, const glm::vec3& position) {
     if (!app->storage->piece_vertex_arrays[index]) {
-        unsigned int id = Hoverable::generate_id();
+        hoverable::Id id = hoverable::generate_id();
         app->storage->pieces_id[index] = id;
 
         app->storage->piece_vertex_arrays[index] = create_entity_vertex_array(mesh, id);
     }
 
-    pieces[index] = std::make_shared<Piece>(app->storage->pieces_id[index], type);
+    board.pieces[index] = std::make_shared<Piece>(app->storage->pieces_id[index], type);
 
     int random_rotation = rand() % 360;
 
-    pieces[index]->position = position;
-    pieces[index]->rotation = glm::vec3(0.0f, glm::radians((float) random_rotation), 0.0f);
-    pieces[index]->scale = 20.0f;
-    pieces[index]->vertex_array = app->storage->piece_vertex_arrays[index];
-    pieces[index]->index_count = mesh->indices.size();
-    pieces[index]->diffuse_texture = texture;
-    pieces[index]->specular_color = glm::vec3(0.25f);
-    pieces[index]->shininess = 8.0f;
-    pieces[index]->select_color = glm::vec3(1.0f, 0.0f, 0.0f);
-    pieces[index]->hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
+    board.pieces[index]->position = position;
+    board.pieces[index]->rotation = glm::vec3(0.0f, glm::radians((float) random_rotation), 0.0f);
+    board.pieces[index]->scale = 20.0f;
+    board.pieces[index]->vertex_array = app->storage->piece_vertex_arrays[index];
+    board.pieces[index]->index_count = mesh->indices.size();
+    board.pieces[index]->diffuse_texture = texture;
+    board.pieces[index]->specular_color = glm::vec3(0.25f);
+    board.pieces[index]->shininess = 8.0f;
+    board.pieces[index]->select_color = glm::vec3(1.0f, 0.0f, 0.0f);
+    board.pieces[index]->hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
 
     SPDLOG_DEBUG("Built piece {}", index);
 }
 
 void GameScene::build_node(unsigned int index, const glm::vec3& position) {
     if (!app->storage->node_vertex_arrays[index]) {
-        unsigned int id = Hoverable::generate_id();
+        hoverable::Id id = hoverable::generate_id();
         app->storage->nodes_id[index] = id;
 
         Rc<Buffer> vertices = Buffer::create(app->assets_load->node_mesh->vertices.data(),
@@ -213,10 +213,10 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
         app->storage->node_vertex_arrays[index] = vertex_array;
     }
 
-    nodes[index] = Node(app->storage->nodes_id[index]);
+    board.nodes[index] = Node(app->storage->nodes_id[index]);
 
-    nodes[index].position = position;
-    nodes[index].scale = 20.0f;
+    board.nodes[index].position = position;
+    board.nodes[index].scale = 20.0f;
 
     SPDLOG_DEBUG("Built node {}", index);
 }

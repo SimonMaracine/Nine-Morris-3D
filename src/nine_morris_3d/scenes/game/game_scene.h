@@ -48,11 +48,11 @@ public:
     // entt::entity hovered_entity = entt::null;
 
     Board board;
-    std::array<std::shared_ptr<Piece>, 18> pieces;
-    std::array<Node, 24> nodes;
+    // std::array<std::shared_ptr<Piece>, 18> pieces;
+    // std::array<Node, 24> nodes;
     Camera camera;
     Skybox skybox;
     Light light;
 
-    Hoverable hovered_entity = HOVERABLE_NULL;
+    hoverable::Id hovered_id = HOVERABLE_NULL;
 };
