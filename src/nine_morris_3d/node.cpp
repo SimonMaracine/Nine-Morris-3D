@@ -3,9 +3,7 @@
 #include "nine_morris_3d/node.h"
 #include "nine_morris_3d/hoverable.h"
 
-Node::Node(hoverable::Id id) : id(id) {
+Node::Node(hoverable::Id id, unsigned int index)
+    : id(id), index(index) {
 
 }
-
-float Node::scale = 1.0f;
-int Node::index_count = 0;

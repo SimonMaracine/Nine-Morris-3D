@@ -39,19 +39,19 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
 
 class Node {
 public:
-    Node() : id(HOVERABLE_NULL) {}
-    Node(hoverable::Id id);
+    Node() = default;
+    Node(hoverable::Id id, unsigned int index);
     ~Node() = default;
 
     hoverable::Id id;
 
-    glm::vec3 position = glm::vec3(0.0f);
-    static float scale;
+    glm::vec3 position;
+    float scale;
 
     Rc<VertexArray> vertex_array;
-    static int index_count;
+    int index_count;
 
     std::shared_ptr<Piece> piece = nullptr;
 
-    // int id;  // Dunno
+    unsigned int index;  // From 0 to 23, needed for easier coping with these
 };

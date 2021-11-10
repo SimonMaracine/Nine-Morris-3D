@@ -15,8 +15,8 @@
 constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40 + 1;
 
 struct ThreefoldRepetitionHistory {
-    std::vector<std::array<std::shared_ptr<Piece>, 24>> ones;
-    std::vector<std::array<std::shared_ptr<Piece>, 24>> twos;
+    std::vector<std::array<Piece::Type, 24>> ones;
+    std::vector<std::array<Piece::Type, 24>> twos;
 };
 
 struct BoardPaint {
@@ -24,7 +24,7 @@ struct BoardPaint {
     float scale;
 
     Rc<VertexArray> vertex_array;
-    static int index_count;
+    int index_count;
     Rc<Texture> diffuse_texture;
 
     glm::vec3 specular_color;
@@ -56,20 +56,25 @@ public:
     Board(hoverable::Id id);
     ~Board() = default;
 
+    void place_piece(hoverable::Id hovered_id);
+    void move_pieces(float dt);
+    void take_piece(hoverable::Id hovered_id);
+    void select_piece(hoverable::Id hovered_id);
+    void put_piece(hoverable::Id hovered_id);
     void press(hoverable::Id hovered_id);
     void release(hoverable::Id hovered_id);
-    void place_piece(hoverable::Id hovered_id);
+    void undo();
 
     hoverable::Id id;
 
-    static float scale;
+    float scale;
 
     Rc<VertexArray> vertex_array;
-    static int index_count;
+    int index_count;
     Rc<Texture> diffuse_texture;
 
-    static glm::vec3 specular_color;
-    static float shininess;
+    glm::vec3 specular_color;
+    float shininess;
 
     std::array<Node, 24> nodes;
     std::array<std::shared_ptr<Piece>, 18> pieces;
@@ -84,8 +89,8 @@ public:
     bool should_take_piece = false;
 
     Node* hovered_node = nullptr;
-    Piece* hovered_piece = nullptr;
-    Piece* selected_piece = nullptr;
+    std::shared_ptr<Piece> hovered_piece = nullptr;
+    std::shared_ptr<Piece> selected_piece = nullptr;
 
     std::array<bool, 2> can_jump = { false, false };
 
@@ -97,11 +102,18 @@ private:
     std::shared_ptr<Piece> place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node);
     void take_raise_piece(Piece* piece);
     void set_pieces_show_outline(Piece::Type type, bool show);
-    void game_over(Board::Ending ending, Piece::Type type_to_hide);
+    void game_over(Ending ending, Piece::Type type_to_hide);
     void switch_turn();
     bool is_windmill_made(Node* node, Piece::Type type);
     void set_pieces_to_take(Piece::Type type, bool take);
     unsigned int number_of_pieces_in_windmills(Piece::Type type);
+    void unselect_other_pieces(Piece* currently_selected_piece);
+    void update_outlines();
+    bool can_go(Node* source_node, Node* destination_node);
+    void check_player_number_of_pieces(Player player);
+    bool check_player_blocked(Player player);
+    std::array<Piece::Type, 24> get_position();
+    void remember_position_and_check_repetition();
 };
 
 // TODO undo

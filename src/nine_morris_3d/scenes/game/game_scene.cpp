@@ -213,7 +213,7 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
         app->storage->node_vertex_arrays[index] = vertex_array;
     }
 
-    board.nodes[index] = Node(app->storage->nodes_id[index]);
+    board.nodes[index] = Node(app->storage->nodes_id[index], index);
 
     board.nodes[index].position = position;
     board.nodes[index].scale = 20.0f;

@@ -13,9 +13,10 @@ constexpr float PIECE_MOVE_SPEED = 1.5f;
 
 class Piece {
 public:
-    enum class Type {
+    enum Type {
         White,
-        Black
+        Black,
+        None
     };
 
     Piece(hoverable::Id id, Type type);
@@ -23,9 +24,9 @@ public:
 
     hoverable::Id id;
 
-    glm::vec3 position = glm::vec3(0.0f);
-    glm::vec3 rotation = glm::vec3(0.0f);
-    static float scale;
+    glm::vec3 position;
+    glm::vec3 rotation;
+    float scale;
 
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 target = glm::vec3(0.0f);
@@ -34,14 +35,14 @@ public:
     glm::vec3 distance_to_travel = glm::vec3(0.0f);
 
     Rc<VertexArray> vertex_array;
-    static int index_count;
+    int index_count;
     Rc<Texture> diffuse_texture;
 
-    static glm::vec3 specular_color;
-    static float shininess;
+    glm::vec3 specular_color;
+    float shininess;
 
-    static glm::vec3 select_color;
-    static glm::vec3 hover_color;
+    glm::vec3 select_color;
+    glm::vec3 hover_color;
 
     Type type;
     bool in_use = false;
@@ -51,6 +52,8 @@ public:
     bool to_take = false;
     bool pending_remove = false;
     bool selected = false;
+
+    bool active = true;  // Not active pieces simply don't exist in the game, only in memory
 
     // int id;  // Hmmm
 };
