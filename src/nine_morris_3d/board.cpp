@@ -9,9 +9,9 @@
 #include "nine_morris_3d/hoverable.h"
 #include "other/logging.h"
 
-#define GET_ACTIVE_PIECES \
-    std::vector<std::shared_ptr<Piece>> active_pieces; \
-    std::copy_if(pieces.begin(), pieces.end(), std::back_inserter(active_pieces), [](std::shared_ptr<Piece> piece) { \
+#define GET_ACTIVE_PIECES(result) \
+    std::vector<std::shared_ptr<Piece>> result; \
+    std::copy_if(pieces.begin(), pieces.end(), std::back_inserter(result), [](std::shared_ptr<Piece> piece) { \
         return piece->active; \
     });
 
@@ -79,7 +79,7 @@ void Board::place_piece(hoverable::Id hovered_id) {
 }
 
 void Board::move_pieces(float dt) {
-    GET_ACTIVE_PIECES
+    GET_ACTIVE_PIECES(active_pieces)
 
     for (auto piece : active_pieces) {
         if (piece->should_move) {
@@ -168,8 +168,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
     }
 
     // Do this even if it may be not needed
-    if (phase == Phase::PlacePieces && not_placed_pieces_count == 0 &&
-            !should_take_piece) {
+    if (phase == Phase::PlacePieces && not_placed_pieces_count == 0 && !should_take_piece) {
         phase = Phase::MovePieces;
         update_outlines();
         SPDLOG_INFO("Phase 2");
@@ -177,7 +176,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
 }
 
 void Board::select_piece(hoverable::Id hovered_id) {
-    GET_ACTIVE_PIECES
+    GET_ACTIVE_PIECES(active_pieces)
 
     for (auto piece : active_pieces) {
         if (piece->id == hovered_id) {
@@ -257,7 +256,7 @@ void Board::press(hoverable::Id hovered_id) {
         }
     }
 
-    GET_ACTIVE_PIECES
+    GET_ACTIVE_PIECES(active_pieces)
 
     for (auto piece : active_pieces) {
         if (piece->id == hovered_id) {
@@ -276,7 +275,7 @@ void Board::undo() {
 }
 
 std::shared_ptr<Piece> Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node) {
-    GET_ACTIVE_PIECES
+    GET_ACTIVE_PIECES(active_pieces)
 
     for (auto piece : active_pieces) {
         if (!piece->in_use && piece->type == type) {
@@ -313,7 +312,7 @@ void Board::take_raise_piece(Piece* piece) {
 }
 
 void Board::set_pieces_show_outline(Piece::Type type, bool show) {
-    GET_ACTIVE_PIECES
+    GET_ACTIVE_PIECES(active_pieces)
 
     for (auto piece : active_pieces) {
         if (piece->type == type) {
@@ -351,11 +350,7 @@ void Board::switch_turn() {
                     TURN_IS_WHITE_SO(Piece::White, Piece::Black));
         }
 
-        if (turn == Player::White) {
-            turn = Player::Black;
-        } else {
-            turn = Player::White;
-        }
+        turn = TURN_IS_WHITE_SO(Player::Black, Player::White);
     }
 }
 
@@ -384,7 +379,7 @@ bool Board::is_windmill_made(Node* node, Piece::Type type) {
 }
 
 void Board::set_pieces_to_take(Piece::Type type, bool take) {
-    GET_ACTIVE_PIECES
+    GET_ACTIVE_PIECES(active_pieces)
 
     for (auto piece : active_pieces) {
         if (piece->type == type) {
@@ -434,7 +429,7 @@ unsigned int Board::number_of_pieces_in_windmills(Piece::Type type) {
 }
 
 void Board::unselect_other_pieces(Piece* currently_selected_piece) {  // TODO see what is better
-    GET_ACTIVE_PIECES
+    GET_ACTIVE_PIECES(active_pieces)
 
     for (auto piece : active_pieces) {
         if (piece.get() == currently_selected_piece) {
@@ -480,7 +475,8 @@ bool Board::can_go(Node* source_node, Node* destination_node) {
                 return true;
             break;
         case 4:
-            if (destination_node->index == 1 || destination_node->index == 3 || destination_node->index == 5 || destination_node->index == 7)
+            if (destination_node->index == 1 || destination_node->index == 3 || destination_node->index == 5 ||
+                    destination_node->index == 7)
                 return true;
             break;
         case 5:
@@ -504,7 +500,8 @@ bool Board::can_go(Node* source_node, Node* destination_node) {
                 return true;
             break;
         case 10:
-            if (destination_node->index == 3 || destination_node->index == 9 || destination_node->index == 11 || destination_node->index == 18)
+            if (destination_node->index == 3 || destination_node->index == 9 || destination_node->index == 11 ||
+                    destination_node->index == 18)
                 return true;
             break;
         case 11:
@@ -516,7 +513,8 @@ bool Board::can_go(Node* source_node, Node* destination_node) {
                 return true;
             break;
         case 13:
-            if (destination_node->index == 5 || destination_node->index == 12 || destination_node->index == 14 || destination_node->index == 20)
+            if (destination_node->index == 5 || destination_node->index == 12 || destination_node->index == 14 ||
+                    destination_node->index == 20)
                 return true;
             break;
         case 14:
@@ -540,7 +538,8 @@ bool Board::can_go(Node* source_node, Node* destination_node) {
                 return true;
             break;
         case 19:
-            if (destination_node->index == 16 || destination_node->index == 18 || destination_node->index == 20 || destination_node->index == 22)
+            if (destination_node->index == 16 || destination_node->index == 18 || destination_node->index == 20 ||
+                    destination_node->index == 22)
                 return true;
             break;
         case 20:
@@ -597,7 +596,7 @@ bool Board::check_player_blocked(Player player) {
         return false;
     }
 
-    GET_ACTIVE_PIECES
+    GET_ACTIVE_PIECES(active_pieces)
 
     for (auto piece : active_pieces) {
         if (piece->type == type && !piece->pending_remove && piece->in_use) {
@@ -833,7 +832,7 @@ void Board::remember_position_and_check_repetition() {
 
     for (const std::array<Piece::Type, 24>& position : repetition_history.twos) {
         if (position == current_position) {
-            game_over(Ending::TieBetweenBothPlayers, turn == Player::White ? Piece::White : Piece::Black);
+            game_over(Ending::TieBetweenBothPlayers, TURN_IS_WHITE_SO(Piece::White, Piece::Black));
             return;
         }
     }

@@ -5,7 +5,9 @@ layout (location = 1) in vec3 a_color;
 
 out vec3 v_color;
 
-uniform mat4 u_projection_view_matrix;
+uniform Matrices {
+    mat4 u_projection_view_matrix;
+};
 
 void main() {
     v_color = a_color;

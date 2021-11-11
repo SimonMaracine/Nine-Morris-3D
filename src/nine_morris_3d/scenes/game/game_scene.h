@@ -26,8 +26,8 @@ public:
     virtual void on_enter() override;
     virtual void on_exit() override;
 
-    Rc<Buffer> create_ids_buffer(unsigned int vertices_size, unsigned int id);  // TODO rework buffers
-    Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<model::Vertex>> mesh, unsigned int id);
+    Rc<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);  // TODO rework buffers
+    Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<model::Vertex>> mesh, hoverable::Id id);
 
     void build_board();
     void build_board_paint();

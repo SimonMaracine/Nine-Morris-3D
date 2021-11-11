@@ -14,6 +14,13 @@
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/save_load.h"
 
+#define RESET_HOVERING_GUI hovering_gui = false
+#define HOVERING_GUI hovering_gui = true
+
+#define DEFAULT_BROWN ImVec4(0.6f, 0.35f, 0.12f, 1.0f)
+#define DARK_BROWN ImVec4(0.4f, 0.25f, 0.10f, 1.0f)
+#define LIGHT_BROWN ImVec4(0.68f, 0.42f, 0.12f, 1.0f)
+
 void ImGuiLayer::on_attach() {
     ImGui::CreateContext();
 
@@ -337,6 +344,7 @@ bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
     app->storage->scene_framebuffer->resize(event.width, event.height);
     app->storage->intermediate_framebuffer->resize(event.width, event.height);
     // systems::projection_matrix(scene->registry, (float) event.width, (float) event.height);  // TODO this
+    scene->camera.update_projection((float) event.width, (float) event.height);
     app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
 
     return false;

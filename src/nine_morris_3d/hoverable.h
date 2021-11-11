@@ -1,9 +1,9 @@
 #pragma once
 
-#define HOVERABLE_NULL 0u
+#define HOVERABLE_NULL 0
 
 namespace hoverable {
-    typedef unsigned int Id;
+    typedef int Id;
 
     Id generate_id();
 }

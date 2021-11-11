@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <stdlib.h>
 #include <time.h>
 
@@ -26,7 +27,8 @@
 #include "other/logging.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
-#include "nine_morris_3d/game.h"
+// #include "nine_morris_3d/game.h"
+#include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/save_load.h"
 
@@ -48,7 +50,8 @@ void GameLayer::on_bind_layers() {
 }
 
 void GameLayer::on_update(float dt) {
-    // TODO camera update, pieces move
+    scene->camera.update(mouse_wheel, dx, dy, dt);
+    scene->board.move_pieces(dt);
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -56,10 +59,10 @@ void GameLayer::on_update(float dt) {
 }
 
 void GameLayer::on_draw() {
-    glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);
-    glm::mat4 view = glm::lookAt(scene->light.position / 4.0f,
+    const glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);  // TODO put these in a function
+    const glm::mat4 view = glm::lookAt(scene->light.position / 4.0f,
             glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 light_space_matrix = projection * view;
+    const glm::mat4 light_space_matrix = projection * view;
     app->storage->shadow_shader->bind();
     app->storage->shadow_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
 
@@ -68,7 +71,7 @@ void GameLayer::on_draw() {
     renderer::clear(renderer::Depth);
     renderer::set_viewport(2048, 2048);
 
-    // TODO render to depth buffer
+    render_to_depth();
 
     app->storage->scene_framebuffer->bind();
 
@@ -76,7 +79,7 @@ void GameLayer::on_draw() {
     renderer::set_viewport(app->data.width, app->data.height);
     renderer::set_stencil_mask_zero();
 
-    app->storage->board_shader->bind();
+    app->storage->board_shader->bind();  // TODO put these in a function
     app->storage->board_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
     app->storage->board_shader->set_uniform_int("u_shadow_map", 1);
     app->storage->board_paint_shader->bind();
@@ -87,17 +90,29 @@ void GameLayer::on_draw() {
     app->storage->piece_shader->set_uniform_int("u_shadow_map", 1);
     renderer::bind_texture(app->storage->depth_map_framebuffer->get_depth_attachment(), 1);
 
-    // TODO load projections, render everything
+    renderer::load_projection_view(scene->camera.projection_view_matrix);
+    render_skybox();
+    setup_light();  // TODO should be once in setup
+    setup_board();  // TODO should be once in setup
+    renderer::draw_board(scene->board);
+    setup_board_paint();  // TODO should be once in setup
+    renderer::draw_board_paint(scene->board.paint);
+    setup_pieces();  // TODO should be once in setup
+    render_pieces();
+    render_nodes();
+#ifndef NDEBUG
+    renderer::draw_origin();
+#endif
 
     Framebuffer::resolve_framebuffer(app->storage->scene_framebuffer->get_id(),
-            app->storage->intermediate_framebuffer->get_id(),
-            app->data.width, app->data.height);
+            app->storage->intermediate_framebuffer->get_id(), app->data.width, app->data.height);
 
     app->storage->intermediate_framebuffer->bind();
 
-    int x = input::get_mouse_x();
-    int y = app->data.height - input::get_mouse_y();
+    const int x = input::get_mouse_x();
+    const int y = app->data.height - input::get_mouse_y();
     scene->hovered_id = app->storage->intermediate_framebuffer->read_pixel(1, x, y);
+    SPDLOG_DEBUG("Hovered ID: {}", scene->hovered_id);
 
     Framebuffer::bind_default();
 
@@ -134,7 +149,6 @@ bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 
 bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
     // systems::press(scene->registry, scene->board, scene->hovered_entity);
-    // TODO this segfaults (for now)
     scene->board.press(scene->hovered_id);
 
     return false;
@@ -147,15 +161,20 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
         if (scene->board.phase == Board::Phase::PlacePieces) {
             if (scene->board.should_take_piece) {
                 // systems::take_piece(scene->registry, scene->board, scene->hovered_entity);
+                scene->board.take_piece(scene->hovered_id);
             } else {
                 // systems::place_piece(scene->registry, scene->board, scene->hovered_entity);
+                scene->board.place_piece(scene->hovered_id);
             }
         } else if (scene->board.phase == Board::Phase::MovePieces) {
             if (scene->board.should_take_piece) {
                 // systems::take_piece(scene->registry, scene->board, scene->hovered_entity);
+                scene->board.take_piece(scene->hovered_id);
             } else {
                 // systems::select_piece(scene->registry, scene->board, scene->hovered_entity);
                 // systems::put_piece(scene->registry, scene->board, scene->hovered_entity);
+                scene->board.select_piece(scene->hovered_id);
+                scene->board.put_piece(scene->hovered_id);
             }
         }
 
@@ -170,9 +189,116 @@ bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
     app->storage->scene_framebuffer->resize(event.width, event.height);
     app->storage->intermediate_framebuffer->resize(event.width, event.height);
     // systems::projection_matrix(scene->registry, (float) event.width, (float) event.height);  // TODO this
+    scene->camera.update_projection((float) event.width, (float) event.height);
     app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
 
     return false;
+}
+
+void GameLayer::render_skybox() {
+    const glm::mat4& projection_matrix = scene->camera.projection_matrix;
+    const glm::mat4 view_matrix = glm::mat4(glm::mat3(scene->camera.view_matrix));
+
+    renderer::draw_skybox(projection_matrix * view_matrix);
+}
+
+void GameLayer::setup_light() {
+    app->storage->board_shader->bind();
+    app->storage->board_shader->set_uniform_vec3("u_light.position", scene->light.position);
+    app->storage->board_shader->set_uniform_vec3("u_light.ambient", scene->light.ambient_color);
+    app->storage->board_shader->set_uniform_vec3("u_light.diffuse", scene->light.diffuse_color);
+    app->storage->board_shader->set_uniform_vec3("u_light.specular", scene->light.specular_color);
+    app->storage->board_shader->set_uniform_vec3("u_view_position", scene->camera.position);
+
+    app->storage->board_paint_shader->bind();
+    app->storage->board_paint_shader->set_uniform_vec3("u_light.position", scene->light.position);
+    app->storage->board_paint_shader->set_uniform_vec3("u_light.ambient", scene->light.ambient_color);
+    app->storage->board_paint_shader->set_uniform_vec3("u_light.diffuse", scene->light.diffuse_color);
+    app->storage->board_paint_shader->set_uniform_vec3("u_light.specular", scene->light.specular_color);
+    app->storage->board_paint_shader->set_uniform_vec3("u_view_position", scene->camera.position);
+
+    app->storage->piece_shader->bind();
+    app->storage->piece_shader->set_uniform_vec3("u_light.position", scene->light.position);
+    app->storage->piece_shader->set_uniform_vec3("u_light.ambient", scene->light.ambient_color);
+    app->storage->piece_shader->set_uniform_vec3("u_light.diffuse", scene->light.diffuse_color);
+    app->storage->piece_shader->set_uniform_vec3("u_light.specular", scene->light.specular_color);
+    app->storage->piece_shader->set_uniform_vec3("u_view_position", scene->camera.position);
+}
+
+void GameLayer::setup_board() {
+    app->storage->board_shader->bind();
+    app->storage->board_shader->set_uniform_int("u_material.diffuse", 0);
+    app->storage->board_shader->set_uniform_vec3("u_material.specular", scene->board.specular_color);
+    app->storage->board_shader->set_uniform_float("u_material.shininess", scene->board.shininess);
+}
+
+void GameLayer::setup_board_paint() {
+    app->storage->board_paint_shader->bind();
+    app->storage->board_paint_shader->set_uniform_int("u_material.diffuse", 0);
+    app->storage->board_paint_shader->set_uniform_vec3("u_material.specular", scene->board.paint.specular_color);
+    app->storage->board_paint_shader->set_uniform_float("u_material.shininess", scene->board.paint.shininess);
+}
+
+void GameLayer::setup_pieces() {
+    app->storage->piece_shader->bind();
+    app->storage->piece_shader->set_uniform_int("u_material.diffuse", 0);
+    app->storage->piece_shader->set_uniform_vec3("u_material.specular", scene->board.pieces[0]->specular_color);  // TODO think about a better way
+    app->storage->piece_shader->set_uniform_float("u_material.shininess", scene->board.pieces[0]->shininess);
+}
+
+void GameLayer::render_pieces() {
+    constexpr auto copy = [](std::shared_ptr<Piece> piece) {
+        return piece->active;
+    };
+    const auto sort = [this](std::shared_ptr<Piece> lhs, std::shared_ptr<Piece> rhs) {
+        float distance1 = glm::length(scene->camera.position - lhs->position);
+        float distance2 = glm::length(scene->camera.position - rhs->position);
+        return distance1 > distance2;
+    };
+
+    std::vector<std::shared_ptr<Piece>> active_pieces;
+    std::copy_if(scene->board.pieces.begin(), scene->board.pieces.end(), std::back_inserter(active_pieces), copy);
+    std::sort(active_pieces.begin(), active_pieces.end(), sort);
+
+    for (auto piece : active_pieces) {
+        if (piece->selected) {
+            renderer::draw_piece_with_outline(piece, piece->select_color);
+        } else if (piece->show_outline && piece->id == scene->hovered_id && piece->in_use && !piece->pending_remove) {
+            renderer::draw_piece_with_outline(piece, piece->hover_color);
+        } else if (piece->to_take && piece->id == scene->hovered_id && piece->in_use) {
+            renderer::draw_piece(piece, glm::vec3(0.9f, 0.1f, 0.1f));
+        } else {
+            renderer::draw_piece(piece, glm::vec3(1.0f, 1.0f, 1.0f));
+        }
+    }
+}
+
+void GameLayer::render_nodes() {
+    for (Node& node : scene->board.nodes) {
+        if (node.id == scene->hovered_id && scene->board.phase != Board::Phase::None &&
+                scene->board.phase != Board::Phase::GameOver) {
+            renderer::draw_node(node, glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+        } else {
+            renderer::draw_node(node, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+        }
+    }
+}
+
+void GameLayer::render_to_depth() {
+    renderer::draw_to_depth(glm::vec3(0.0f), glm::vec3(0.0f), scene->board.scale, scene->board.vertex_array,
+            scene->board.index_count);
+
+    constexpr auto copy = [](std::shared_ptr<Piece> piece) {
+        return piece->active;
+    };
+
+    std::vector<std::shared_ptr<Piece>> active_pieces;
+    std::copy_if(scene->board.pieces.begin(), scene->board.pieces.end(), std::back_inserter(active_pieces), copy);
+
+    for (auto piece : active_pieces) {
+        renderer::draw_to_depth(piece->position, piece->rotation, piece->scale, piece->vertex_array,
+                piece->index_count);
+    }
 }
 
 void GameLayer::restart() {
@@ -182,8 +308,8 @@ void GameLayer::restart() {
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {
-    int width = app->data.width;
-    int height = app->data.height;
+    const int width = app->data.width;
+    const int height = app->data.height;
     app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
 }
 

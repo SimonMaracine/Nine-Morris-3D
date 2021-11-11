@@ -11,7 +11,7 @@
 #include "other/model.h"
 #include "other/loader.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
-#include "nine_morris_3d/game.h"
+// #include "nine_morris_3d/game.h"
 #include "nine_morris_3d/options.h"
 
 // #define LIGHT_POSITION glm::vec3(-11.0f, 13.0f, -15.0f)
@@ -36,6 +36,15 @@ public:
     bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
+
+    void render_skybox();
+    void setup_light();
+    void setup_board();
+    void setup_board_paint();
+    void setup_pieces();
+    void render_pieces();
+    void render_nodes();
+    void render_to_depth();
 
     void restart();
 

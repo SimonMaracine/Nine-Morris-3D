@@ -2,11 +2,18 @@
 
 #include <glm/glm.hpp>
 
+constexpr float FOV = 45.0f;
+constexpr float NEAR = 0.1f;
+constexpr float FAR = 70.0f;
+
 class Camera {
 public:
     Camera() = default;
     Camera(const glm::mat4& projection_matrix, const glm::vec3& point, float distance_to_point);
     ~Camera() = default;
+
+    void update(float mouse_wheel, float dx, float dy, float dt);
+    void update_projection(float width, float height);
 
     glm::vec3 position = glm::vec3(0.0f);
     float pitch = 0.0f;

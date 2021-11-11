@@ -12,6 +12,7 @@
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/framebuffer.h"
 #include "nine_morris_3d/hoverable.h"
+#include "nine_morris_3d/board.h"
 
 namespace renderer {
     enum {
@@ -49,7 +50,6 @@ namespace renderer {
         Rc<VertexArray> origin_vertex_array;
 #endif
 
-        // TODO store them here?
         Rc<Texture> board_diffuse_texture;
         Rc<Texture> board_paint_texture;
         Rc<Texture> white_piece_diffuse_texture;
@@ -71,9 +71,9 @@ namespace renderer {
 
         glm::mat4 orthographic_projection_matrix;
 
-        unsigned int board_id = HOVERABLE_NULL;
-        unsigned int pieces_id[18] = { HOVERABLE_NULL };
-        unsigned int nodes_id[24] = { HOVERABLE_NULL };
+        hoverable::Id board_id = HOVERABLE_NULL;
+        hoverable::Id pieces_id[18] = { HOVERABLE_NULL };
+        hoverable::Id nodes_id[24] = { HOVERABLE_NULL };
     };
 
     Storage* initialize(int width, int height);
@@ -95,53 +95,12 @@ namespace renderer {
     void set_stencil_mask_zero();
     void load_projection_view(const glm::mat4& matrix);
 
-    void draw_board(const glm::vec3& position,
-                    const glm::vec3& rotation,
-                    float scale,
-                    Rc<VertexArray> vertex_array,
-                    const glm::vec3& specular_color,
-                    float shininess,
-                    GLuint index_count);
-
-    void draw_board_paint(const glm::vec3& position,
-                          const glm::vec3& rotation,
-                          float scale,
-                          Rc<VertexArray> vertex_array,
-                          const glm::vec3& specular_color,
-                          float shininess,
-                          GLuint index_count);
-
-    void draw_piece(const glm::vec3& position,
-                    const glm::vec3& rotation,
-                    float scale,
-                    Rc<VertexArray> vertex_array,
-                    Rc<Texture> diffuse_texture,
-                    const glm::vec3& specular_color,
-                    float shininess,
-                    GLuint index_count,
-                    const glm::vec3& tint_color);
-
-    void draw_piece_outline(const glm::vec3& position,
-                            const glm::vec3& rotation,
-                            float scale,
-                            Rc<VertexArray> vertex_array,
-                            Rc<Texture> diffuse_texture,
-                            const glm::vec3& specular_color,
-                            float shininess,
-                            GLuint index_count,
-                            const glm::vec3& outline_color);
-
-    void draw_skybox(const glm::mat4& view_projection_matrix);
-
-    void draw_node(const glm::vec3& position,
-                   float scale,
-                   Rc<VertexArray> vertex_array,
-                   const glm::vec4& color,
-                   GLuint index_count);
-
-    void draw_to_depth(const glm::vec3& position,
-                       const glm::vec3& rotation,
-                       float scale,
-                       Rc<VertexArray> vertex_array,
-                       GLuint index_count);
+    void draw_board(const Board& board);
+    void draw_board_paint(const BoardPaint& board_paint);
+    void draw_piece(std::shared_ptr<Piece> piece, const glm::vec3& tint_color);
+    void draw_piece_with_outline(std::shared_ptr<Piece> piece, const glm::vec3& outline_color);
+    void draw_skybox(const glm::mat4& projection_view_matrix);
+    void draw_node(const Node& node, const glm::vec4& color);
+    void draw_to_depth(const glm::vec3& position, const glm::vec3& rotation, float scale,
+            Rc<VertexArray> vertex_array, int index_count);
 }

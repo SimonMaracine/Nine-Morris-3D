@@ -6,13 +6,6 @@
 class GameLayer;
 class GuiLayer;
 
-#define RESET_HOVERING_GUI hovering_gui = false
-#define HOVERING_GUI hovering_gui = true
-
-#define DEFAULT_BROWN ImVec4(0.6f, 0.35f, 0.12f, 1.0f)
-#define DARK_BROWN ImVec4(0.4f, 0.25f, 0.10f, 1.0f)
-#define LIGHT_BROWN ImVec4(0.68f, 0.42f, 0.12f, 1.0f)
-
 class ImGuiLayer : public Layer {
 public:
     ImGuiLayer(unsigned int id, Application* application, GameScene* scene)

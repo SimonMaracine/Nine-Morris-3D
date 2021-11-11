@@ -21,6 +21,8 @@
 void GameScene::on_enter() {
     srand(time(nullptr));
 
+    build_board();
+
     if (!app->storage->white_piece_diffuse_texture) {
         app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture, true, -1.5f);
         app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture, true, -1.5f);
@@ -39,7 +41,6 @@ void GameScene::on_enter() {
         build_node(i, NODE_POSITIONS[i]);
     }
 
-    build_board();
     build_board_paint();
     build_camera();
     build_skybox();
@@ -56,18 +57,18 @@ void GameScene::on_exit() {
 
 }
 
-Rc<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size, unsigned int id) {
-    std::vector<unsigned int> array;
+Rc<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size, hoverable::Id id) {
+    std::vector<int> array;
     array.resize(vertices_size);
     for (unsigned int i = 0; i < array.size(); i++) {
-        array[i] = id;
+        array[i] = (int) id;
     }
-    Rc<Buffer> buffer = Buffer::create(array.data(), array.size() * sizeof(unsigned int));
+    Rc<Buffer> buffer = Buffer::create(array.data(), array.size() * sizeof(int));
 
     return buffer;
 }
 
-Rc<VertexArray> GameScene::create_entity_vertex_array(Rc<model::Mesh<model::Vertex>> mesh, unsigned int id) {
+Rc<VertexArray> GameScene::create_entity_vertex_array(Rc<model::Mesh<model::Vertex>> mesh, hoverable::Id id) {
     Rc<Buffer> vertices = Buffer::create(mesh->vertices.data(), mesh->vertices.size() * sizeof(model::Vertex));
 
     Rc<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
@@ -80,13 +81,13 @@ Rc<VertexArray> GameScene::create_entity_vertex_array(Rc<model::Mesh<model::Vert
     BufferLayout layout2;
     layout2.add(3, BufferLayout::Type::Int, 1);
 
-    Rc<Buffer> index_buffer = Buffer::create_index(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
+    Rc<Buffer> indices = Buffer::create_index(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
 
     Rc<VertexArray> vertex_array = VertexArray::create();
-    index_buffer->bind();
+    indices->bind();
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_buffer(ids, layout2);
-    vertex_array->hold_index_buffer(index_buffer);
+    vertex_array->hold_index_buffer(indices);
 
     VertexArray::unbind();
 
@@ -120,7 +121,7 @@ void GameScene::build_board() {
 void GameScene::build_board_paint() {
     if (!app->storage->board_paint_vertex_array) {
         Rc<Buffer> vertices = Buffer::create(app->assets_load->board_paint_mesh->vertices.data(),
-            app->assets_load->board_paint_mesh->indices.size() * sizeof(model::Vertex));
+                app->assets_load->board_paint_mesh->vertices.size() * sizeof(model::Vertex));
 
         Rc<VertexArray> vertex_array = VertexArray::create();
 
@@ -129,12 +130,12 @@ void GameScene::build_board_paint() {
         layout.add(1, BufferLayout::Type::Float, 2);
         layout.add(2, BufferLayout::Type::Float, 3);
 
-        Rc<Buffer> index_buffer = Buffer::create(app->assets_load->board_paint_mesh->indices.data(),
+        Rc<Buffer> indices = Buffer::create_index(app->assets_load->board_paint_mesh->indices.data(),
                 app->assets_load->board_paint_mesh->indices.size() * sizeof(unsigned int));
 
-        index_buffer->bind();
+        indices->bind();
         vertex_array->add_buffer(vertices, layout);
-        vertex_array->hold_index_buffer(index_buffer);
+        vertex_array->hold_index_buffer(indices);
 
         VertexArray::unbind();
 
@@ -189,7 +190,7 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
         app->storage->nodes_id[index] = id;
 
         Rc<Buffer> vertices = Buffer::create(app->assets_load->node_mesh->vertices.data(),
-                app->assets_load->node_mesh->vertices.size() * sizeof(glm::vec3));
+                app->assets_load->node_mesh->vertices.size() * sizeof(model::VertexP));
 
         Rc<Buffer> ids = create_ids_buffer(app->assets_load->node_mesh->vertices.size(), id);
 
@@ -200,13 +201,13 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
         BufferLayout layout2;
         layout.add(1, BufferLayout::Type::Int, 1);
 
-        Rc<Buffer> index_buffer = Buffer::create(app->assets_load->node_mesh->indices.data(),
+        Rc<Buffer> indices = Buffer::create_index(app->assets_load->node_mesh->indices.data(),
                 app->assets_load->node_mesh->indices.size() * sizeof(unsigned int));
 
-        index_buffer->bind();
+        indices->bind();
         vertex_array->add_buffer(vertices, layout);
         vertex_array->add_buffer(ids, layout2);
-        vertex_array->hold_index_buffer(index_buffer);
+        vertex_array->hold_index_buffer(indices);
 
         VertexArray::unbind();
 
@@ -217,23 +218,25 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
 
     board.nodes[index].position = position;
     board.nodes[index].scale = 20.0f;
+    board.nodes[index].vertex_array = app->storage->node_vertex_arrays[index];
+    board.nodes[index].index_count = app->assets_load->node_mesh->indices.size();
 
     SPDLOG_DEBUG("Built node {}", index);
 }
 
 void GameScene::build_camera() {
     camera.pitch = 47.0f;
-    camera.projection_matrix = glm::perspective(glm::radians(45.0f),
-            (float) app->data.width / (float) app->data.height, 0.1f, 70.0f);
+    camera.projection_matrix = glm::perspective(glm::radians(FOV),
+            (float) app->data.width / (float) app->data.height, NEAR, FAR);
     camera.point = glm::vec3(0.0f);
     camera.distance_to_point = 8.0f;
 
     SPDLOG_DEBUG("Built camera");
 }
 
-void GameScene::build_skybox() {
+void GameScene::build_skybox() {  // TODO is a skybox object even needed? 
     if (!app->storage->skybox_vertex_array) {
-        Rc<Buffer> vertices = Buffer::create(skybox_points, sizeof(skybox_points));
+        Rc<Buffer> vertices = Buffer::create(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
 
         Rc<VertexArray> vertex_array = VertexArray::create();
 

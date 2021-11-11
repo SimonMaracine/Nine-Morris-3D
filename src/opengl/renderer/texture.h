@@ -46,7 +46,7 @@ private:
 template<typename T>
 using Rc = std::shared_ptr<T>;
 
-constexpr float skybox_points[] = {
+constexpr float SKYBOX_VERTICES[] = {
     -5.0f,  5.0f, -5.0f,
 	-5.0f, -5.0f, -5.0f,
 	 5.0f, -5.0f, -5.0f,

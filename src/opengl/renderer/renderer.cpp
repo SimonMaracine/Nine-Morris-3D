@@ -13,10 +13,11 @@
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/framebuffer.h"
+#include "nine_morris_3d/board.h"
 #include "other/assets.h"
 
 namespace renderer {
-    static Storage* storage = new Storage;
+    static Storage* storage = nullptr;
 
     Storage* initialize(int width, int height) {
         glEnable(GL_BLEND);
@@ -28,9 +29,11 @@ namespace renderer {
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+        storage = new Storage;
+
         storage->uniform_buffer = Buffer::create_uniform(nullptr, sizeof(glm::mat4));
         const char* block_name = "Matrices";
-        const char* uniforms[] = {
+        const char* uniforms[1] = {
             "u_projection_view_matrix"
         };
 
@@ -81,7 +84,10 @@ namespace renderer {
 
 #ifndef NDEBUG
         storage->origin_shader = Shader::create("data/shaders/origin.vert",
-                                                "data/shaders/origin.frag");
+                                                "data/shaders/origin.frag",
+                                                block_name,
+                                                uniforms, 1,
+                                                storage->uniform_buffer);
 #endif
 
         storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
@@ -205,6 +211,7 @@ namespace renderer {
 
 #ifndef NDEBUG
     void draw_origin() {
+        storage->origin_shader->bind();
         storage->origin_vertex_array->bind();
         glDrawArrays(GL_LINES, 0, 6);
     }
@@ -254,124 +261,73 @@ namespace renderer {
         glStencilMask(0x00);
     }
 
-    void load_projection_view(const glm::mat4& matrix) {
+    void load_projection_view(const glm::mat4& projection_view) {
         constexpr std::size_t size = sizeof(glm::mat4);
         float* buffer[size];
-        memcpy(buffer, glm::value_ptr(matrix), size);
+        memcpy(buffer, glm::value_ptr(projection_view), size);
         storage->uniform_buffer->update_data(buffer, size);
     }
 
-    void draw_board(const glm::vec3& position,
-                    const glm::vec3& rotation,
-                    float scale,
-                    Rc<VertexArray> vertex_array,
-                    const glm::vec3& specular_color,
-                    float shininess,
-                    GLuint index_count) {
+    void draw_board(const Board& board) {
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, position);
-        matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+        matrix = glm::scale(matrix, glm::vec3(board.scale, board.scale, board.scale));
 
         storage->board_shader->bind();
-        storage->board_shader->set_uniform_int("u_material.diffuse", 0);
-        storage->board_shader->set_uniform_vec3("u_material.specular", specular_color);
-        storage->board_shader->set_uniform_float("u_material.shininess", shininess);
-
         storage->board_shader->set_uniform_matrix("u_model_matrix", matrix);
 
-        vertex_array->bind();
-        storage->board_diffuse_texture->bind(0);
-        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+        board.vertex_array->bind();
+        board.diffuse_texture->bind(0);
+        glDrawElements(GL_TRIANGLES, board.index_count, GL_UNSIGNED_INT, nullptr);
     }
 
-    void draw_board_paint(const glm::vec3& position,
-                          const glm::vec3& rotation,
-                          float scale,
-                          Rc<VertexArray> vertex_array,
-                          const glm::vec3& specular_color,
-                          float shininess,
-                          GLuint index_count) {
+    void draw_board_paint(const BoardPaint& board_paint) {
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, position);
-        matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+        matrix = glm::translate(matrix, board_paint.position);
+        matrix = glm::scale(matrix, glm::vec3(board_paint.scale, board_paint.scale, board_paint.scale));
 
         storage->board_paint_shader->bind();
-        storage->board_paint_shader->set_uniform_int("u_material.diffuse", 0);
-        storage->board_paint_shader->set_uniform_vec3("u_material.specular", specular_color);
-        storage->board_paint_shader->set_uniform_float("u_material.shininess", shininess);
-
         storage->board_paint_shader->set_uniform_matrix("u_model_matrix", matrix);
 
-        vertex_array->bind();
-        storage->board_paint_texture->bind(0);
-        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+        board_paint.vertex_array->bind();
+        board_paint.diffuse_texture->bind(0);
+        glDrawElements(GL_TRIANGLES, board_paint.index_count, GL_UNSIGNED_INT, nullptr);
     }
 
-    void draw_piece(const glm::vec3& position,
-                    const glm::vec3& rotation,
-                    float scale,
-                    Rc<VertexArray> vertex_array,
-                    Rc<Texture> diffuse_texture,
-                    const glm::vec3& specular_color,
-                    float shininess,
-                    GLuint index_count,
-                    const glm::vec3& tint_color) {
+    void draw_piece(std::shared_ptr<Piece> piece, const glm::vec3& tint_color) {
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, position);
-        matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+        matrix = glm::translate(matrix, piece->position);
+        matrix = glm::rotate(matrix, piece->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, piece->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, piece->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(piece->scale, piece->scale, piece->scale));
 
         storage->piece_shader->bind();
-        storage->piece_shader->set_uniform_int("u_material.diffuse", 0);
-        storage->piece_shader->set_uniform_vec3("u_material.specular", specular_color);
-        storage->piece_shader->set_uniform_float("u_material.shininess", shininess);
+        storage->piece_shader->set_uniform_matrix("u_model_matrix", matrix);
         storage->piece_shader->set_uniform_vec3("u_tint_color", tint_color);
 
-        storage->piece_shader->set_uniform_matrix("u_model_matrix", matrix);
-
-        vertex_array->bind();
-        diffuse_texture->bind(0);
-        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+        piece->vertex_array->bind();
+        piece->diffuse_texture->bind(0);
+        glDrawElements(GL_TRIANGLES, piece->index_count, GL_UNSIGNED_INT, nullptr);
     }
 
-    void draw_piece_outline(const glm::vec3& position,
-                            const glm::vec3& rotation,
-                            float scale,
-                            Rc<VertexArray> vertex_array,
-                            Rc<Texture> diffuse_texture,
-                            const glm::vec3& specular_color,
-                            float shininess,
-                            GLuint index_count,
-                            const glm::vec3& outline_color) {
+    void draw_piece_with_outline(std::shared_ptr<Piece> piece, const glm::vec3& outline_color) {
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
 
         {
             glm::mat4 matrix = glm::mat4(1.0f);
-            matrix = glm::translate(matrix, position);
-            matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+            matrix = glm::translate(matrix, piece->position);
+            matrix = glm::rotate(matrix, piece->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            matrix = glm::rotate(matrix, piece->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            matrix = glm::rotate(matrix, piece->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            matrix = glm::scale(matrix, glm::vec3(piece->scale, piece->scale, piece->scale));
 
             storage->piece_shader->bind();
-            storage->piece_shader->set_uniform_int("u_material.diffuse", 0);
-            storage->piece_shader->set_uniform_vec3("u_material.specular", specular_color);
-            storage->piece_shader->set_uniform_float("u_material.shininess", shininess);
-
             storage->piece_shader->set_uniform_matrix("u_model_matrix", matrix);
 
-            vertex_array->bind();
-            diffuse_texture->bind(0);
-            glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+            piece->vertex_array->bind();
+            piece->diffuse_texture->bind(0);
+            glDrawElements(GL_TRIANGLES, piece->index_count, GL_UNSIGNED_INT, nullptr);
         }
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -379,20 +335,21 @@ namespace renderer {
         glDisable(GL_DEPTH_TEST);
 
         {
-            constexpr float size = 3.6f;
+            constexpr float SIZE = 3.6f;
 
             glm::mat4 matrix = glm::mat4(1.0f);
-            matrix = glm::translate(matrix, position);
-            matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            matrix = glm::rotate(matrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            matrix = glm::rotate(matrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix = glm::scale(matrix, glm::vec3(scale + size, scale + size, scale + size));
+            matrix = glm::translate(matrix, piece->position);
+            matrix = glm::rotate(matrix, piece->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            matrix = glm::rotate(matrix, piece->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            matrix = glm::rotate(matrix, piece->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            matrix = glm::scale(matrix, glm::vec3(piece->scale + SIZE, piece->scale + SIZE,
+                    piece->scale + SIZE));
 
             storage->outline_shader->bind();
             storage->outline_shader->set_uniform_vec3("u_color", outline_color);
             storage->outline_shader->set_uniform_matrix("u_model_matrix", matrix);
 
-            glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+            glDrawElements(GL_TRIANGLES, piece->index_count, GL_UNSIGNED_INT, nullptr);
         }
 
         glStencilMask(0xFF);
@@ -400,12 +357,12 @@ namespace renderer {
         glEnable(GL_DEPTH_TEST);
     }
 
-    void draw_skybox(const glm::mat4& view_projection_matrix) {
+    void draw_skybox(const glm::mat4& projection_view_matrix) {
         glDepthMask(GL_FALSE);
 
         storage->skybox_shader->bind();
         storage->skybox_shader->set_uniform_int("u_skybox", 0);
-        storage->skybox_shader->set_uniform_matrix("u_projection_view_matrix", view_projection_matrix);
+        storage->skybox_shader->set_uniform_matrix("u_projection_view_matrix", projection_view_matrix);
 
         storage->skybox_vertex_array->bind();
         storage->skybox_texture->bind(0);
@@ -414,32 +371,25 @@ namespace renderer {
         glDepthMask(GL_TRUE);
     }
 
-    void draw_node(const glm::vec3& position,
-                   float scale,
-                   Rc<VertexArray> vertex_array,
-                   const glm::vec4& color,
-                   GLuint index_count) {
+    void draw_node(const Node& node, const glm::vec4& color) {
         glCullFace(GL_FRONT);
 
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, position);
-        matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+        matrix = glm::translate(matrix, node.position);
+        matrix = glm::scale(matrix, glm::vec3(node.scale, node.scale, node.scale));
 
         storage->node_shader->bind();
-        storage->node_shader->set_uniform_vec4("u_color", color);
         storage->node_shader->set_uniform_matrix("u_model_matrix", matrix);
+        storage->node_shader->set_uniform_vec4("u_color", color);
 
-        vertex_array->bind();
-        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+        node.vertex_array->bind();
+        glDrawElements(GL_TRIANGLES, node.index_count, GL_UNSIGNED_INT, nullptr);
 
         glCullFace(GL_BACK);
     }
 
-    void draw_to_depth(const glm::vec3& position,
-                       const glm::vec3& rotation,
-                       float scale,
-                       Rc<VertexArray> vertex_array,
-                       GLuint index_count) {
+    void draw_to_depth(const glm::vec3& position, const glm::vec3& rotation, float scale,
+                       Rc<VertexArray> vertex_array, int index_count) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);
         matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
