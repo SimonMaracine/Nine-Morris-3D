@@ -268,6 +268,14 @@ namespace renderer {
         storage->uniform_buffer->update_data(buffer, size);
     }
 
+    void disable_output_to_red(unsigned int index) {
+        glColorMaski(index, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+    }
+
+    void enable_output_to_red(unsigned int index) {
+        glColorMaski(index, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    }
+
     void draw_board(const Board& board) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::scale(matrix, glm::vec3(board.scale, board.scale, board.scale));

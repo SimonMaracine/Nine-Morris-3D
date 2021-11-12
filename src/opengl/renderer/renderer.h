@@ -91,6 +91,8 @@ namespace renderer {
     void bind_texture(GLuint texture, GLenum slot);
     void set_stencil_mask_zero();
     void load_projection_view(const glm::mat4& matrix);
+    void disable_output_to_red(unsigned int index);
+    void enable_output_to_red(unsigned int index);
 
     void draw_board(const Board& board);
     void draw_board_paint(const BoardPaint& board_paint);

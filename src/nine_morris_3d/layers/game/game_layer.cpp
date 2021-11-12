@@ -96,13 +96,15 @@ void GameLayer::on_draw() {
     setup_board();  // TODO should be once in setup
     renderer::draw_board(scene->board);
     setup_board_paint();  // TODO should be once in setup
-    renderer::draw_board_paint(scene->board.paint);
     setup_pieces();  // TODO should be once in setup
     render_pieces();
-    render_nodes();
+    renderer::disable_output_to_red(1);
+    renderer::draw_board_paint(scene->board.paint);
 #ifndef NDEBUG
     renderer::draw_origin();
 #endif
+    renderer::enable_output_to_red(1);
+    render_nodes();
 
     Framebuffer::resolve_framebuffer(app->storage->scene_framebuffer->get_id(),
             app->storage->intermediate_framebuffer->get_id(), app->data.width, app->data.height);
