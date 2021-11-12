@@ -5,43 +5,12 @@
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/scenes/loading/loading_scene.h"
 #include "nine_morris_3d/layers/loading/loading_layer.h"
-// #include "other/asset_manager.h"
 
 int main() {
     constexpr int width = 1024;
     constexpr int height = 576;
 
     Application* application = new Application(width, height, "Nine Morris 3D");
-
-    // application->add_asset(0, AssetType::Mesh, "data/models/board/board.obj");
-    // application->add_asset(1, AssetType::Mesh, "data/models/board/board_paint.obj");
-
-    // application->add_asset(2, AssetType::MeshP, "data/models/node/node.obj");
-
-    // application->add_asset(3, AssetType::Mesh, "data/models/piece/white_piece.obj");
-    // application->add_asset(4, AssetType::Mesh, "data/models/piece/black_piece.obj");
-
-    // application->add_asset(5, AssetType::TextureFlipped, "data/textures/board/board_wood.png");
-    // application->add_asset(6, AssetType::TextureFlipped, "data/textures/board/board_wood-small.png");
-    // application->add_asset(7, AssetType::TextureFlipped, "data/textures/board/board_paint.png");
-    // application->add_asset(8, AssetType::TextureFlipped, "data/textures/board/board_paint-small.png");
-
-    // application->add_asset(9, AssetType::TextureFlipped, "data/textures/indicator/white_indicator.png");
-    // application->add_asset(10, AssetType::TextureFlipped, "data/textures/indicator/black_indicator.png");
-
-    // application->add_asset(11, AssetType::TextureFlipped, "data/textures/loading/loading.png");
-
-    // application->add_asset(12, AssetType::TextureFlipped, "data/textures/piece/white_piece.png");
-    // application->add_asset(13, AssetType::TextureFlipped, "data/textures/piece/white_piece-small.png");
-    // application->add_asset(14, AssetType::TextureFlipped, "data/textures/piece/black_piece.png");
-    // application->add_asset(15, AssetType::TextureFlipped, "data/textures/piece/black_piece-small.png");
-
-    // application->add_asset(16, AssetType::Texture, "data/textures/skybox/field/px.png");
-    // application->add_asset(17, AssetType::Texture, "data/textures/skybox/field/nx.png");
-    // application->add_asset(18, AssetType::Texture, "data/textures/skybox/field/py.png");
-    // application->add_asset(19, AssetType::Texture, "data/textures/skybox/field/ny.png");
-    // application->add_asset(20, AssetType::Texture, "data/textures/skybox/field/pz.png");
-    // application->add_asset(21, AssetType::Texture, "data/textures/skybox/field/nz.png");
 
     GameScene* game_scene = new GameScene(0, application);
     LoadingScene* loading_scene = new LoadingScene(1, application);

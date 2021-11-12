@@ -83,9 +83,9 @@ public:
     Player turn = Player::White;
     Ending ending = Ending::None;
 
-    unsigned int white_pieces_count = 0;
+    unsigned int white_pieces_count = 0;  // Number of pieces on the board
     unsigned int black_pieces_count = 0;
-    unsigned int not_placed_pieces_count = 0;
+    unsigned int not_placed_pieces_count = 18;
     bool should_take_piece = false;
 
     Node* hovered_node = nullptr;

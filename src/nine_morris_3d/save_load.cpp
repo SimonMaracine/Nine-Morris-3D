@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 #include <glm/glm.hpp>
-// #include <entt/entt.hpp>
 #include <nlohmann/json.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/unordered_map.hpp>
@@ -12,7 +11,6 @@
 #include "ecs/components.h"
 #include "other/logging.h"
 #include "nine_morris_3d/save_load.h"
-#include "nine_morris_3d/game.h"
 
 #define SAVE_GAME_FILE "last_game.dat"
 #define SAVE_ENTITIES_FILE "last_game_entities.dat"

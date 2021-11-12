@@ -4,7 +4,6 @@
 #include <atomic>
 #include <unordered_map>
 
-// #include "other/asset_manager.h"
 #include "opengl/renderer/renderer.h"
 #include "other/model.h"
 #include "other/texture_data.h"

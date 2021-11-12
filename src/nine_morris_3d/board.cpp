@@ -66,6 +66,7 @@ void Board::place_piece(hoverable::Id hovered_id) {
                 update_outlines();
 
                 if (check_player_blocked(turn)) {
+                    SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
                     game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
                             TURN_IS_WHITE_SO(Piece::White, Piece::Black));
                 }
@@ -127,6 +128,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                         check_player_number_of_pieces(turn);
 
                         if (check_player_blocked(turn)) {
+                            SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
                             game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
                                     TURN_IS_WHITE_SO(Piece::White, Piece::Black));
                         }
@@ -154,6 +156,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                         check_player_number_of_pieces(turn);
 
                         if (check_player_blocked(turn)) {
+                            SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
                             game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
                                     TURN_IS_WHITE_SO(Piece::White, Piece::Black));
                         }
@@ -191,19 +194,22 @@ void Board::select_piece(hoverable::Id hovered_id) {
                     piece->selected = false;
                 }
             }
+
+            break;
         }
     }
 }
 
 void Board::put_piece(hoverable::Id hovered_id) {
-    if (selected_piece != nullptr) {
+    if (selected_piece != nullptr) {  // Do anything only if there is a selected piece
         for (Node& node : nodes) {
             if (node.id == hovered_id && can_go(selected_piece->node, &node)) {
+                assert(node.piece == nullptr);
                 // TODO remember move
 
-                selected_piece->target.x = selected_piece->position.x;
+                selected_piece->target.x = node.position.x;
                 selected_piece->target.y = PIECE_Y_POSITION;
-                selected_piece->target.z = selected_piece->position.z;
+                selected_piece->target.z = node.position.z;
 
                 selected_piece->velocity = (selected_piece->target - selected_piece->position) * PIECE_MOVE_SPEED;
                 selected_piece->distance_to_travel = selected_piece->target - selected_piece->position;
@@ -218,7 +224,7 @@ void Board::put_piece(hoverable::Id hovered_id) {
                 selected_piece = nullptr;
 
                 if (is_windmill_made(&node, TURN_IS_WHITE_SO(Piece::White, Piece::Black))) {
-                    SPDLOG_DEBUG("Windmill made");
+                    SPDLOG_DEBUG("Windmill is made");
 
                     should_take_piece = true;
 
@@ -236,6 +242,7 @@ void Board::put_piece(hoverable::Id hovered_id) {
                     update_outlines();
 
                     if (check_player_blocked(turn)) {
+                        SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
                         game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
                                 TURN_IS_WHITE_SO(Piece::White, Piece::Black));
                     }
@@ -281,7 +288,7 @@ std::shared_ptr<Piece> Board::place_new_piece(Piece::Type type, float x_pos, flo
         if (!piece->in_use && piece->type == type) {
             piece->target.x = x_pos;
             piece->target.y = PIECE_Y_POSITION;
-            piece->target.x = z_pos;
+            piece->target.z = z_pos;
 
             piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
             piece->distance_to_travel = piece->target - piece->position;
@@ -346,12 +353,13 @@ void Board::switch_turn() {
         turns_without_mills++;
 
         if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
+            SPDLOG_INFO("The max amount of turns without mills has been hit");
             game_over(Ending::TieBetweenBothPlayers,
                     TURN_IS_WHITE_SO(Piece::White, Piece::Black));
         }
-
-        turn = TURN_IS_WHITE_SO(Player::Black, Player::White);
     }
+
+    turn = TURN_IS_WHITE_SO(Player::Black, Player::White);
 }
 
 bool Board::is_windmill_made(Node* node, Piece::Type type) {
@@ -432,7 +440,7 @@ void Board::unselect_other_pieces(Piece* currently_selected_piece) {  // TODO se
     GET_ACTIVE_PIECES(active_pieces)
 
     for (auto piece : active_pieces) {
-        if (piece.get() == currently_selected_piece) {
+        if (piece.get() != currently_selected_piece) {
             piece->selected = false;
         }
     }
@@ -566,19 +574,23 @@ bool Board::can_go(Node* source_node, Node* destination_node) {
 void Board::check_player_number_of_pieces(Player player) {
     if (phase == Phase::MovePieces) {  // TODO this seems dodgy
         if (player == Player::White) {
-            SPDLOG_DEBUG("Checking white player");
+            SPDLOG_DEBUG("Checking white player number of pieces");
 
             if (white_pieces_count == 3) {
                 can_jump[(int) player] = true;
+                SPDLOG_INFO("White player can jump");
             } else if (white_pieces_count == 2) {
+                SPDLOG_INFO("White player has only 2 pieces");
                 game_over(Ending::WinnerBlack, Piece::White);
             }
         } else {
-            SPDLOG_DEBUG("Checking black player");
+            SPDLOG_DEBUG("Checking black player number of pieces");
 
-            if (white_pieces_count == 3) {
+            if (black_pieces_count == 3) {
                 can_jump[(int) player] = true;
-            } else if (white_pieces_count == 2) {
+                SPDLOG_INFO("Black player can jump");
+            } else if (black_pieces_count == 2) {
+                SPDLOG_INFO("Black player has only 2 pieces");
                 game_over(Ending::WinnerWhite, Piece::Black);
             }
         }
@@ -832,6 +844,7 @@ void Board::remember_position_and_check_repetition() {
 
     for (const std::array<Piece::Type, 24>& position : repetition_history.twos) {
         if (position == current_position) {
+            SPDLOG_INFO("Threefold repetition");
             game_over(Ending::TieBetweenBothPlayers, TURN_IS_WHITE_SO(Piece::White, Piece::Black));
             return;
         }

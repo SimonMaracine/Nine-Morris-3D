@@ -40,16 +40,7 @@ public:
 
     options::Options options;
 
-    // entt::entity board = entt::null;
-    // entt::entity camera = entt::null;
-    // entt::entity nodes[24];
-    // entt::entity pieces[18];
-
-    // entt::entity hovered_entity = entt::null;
-
     Board board;
-    // std::array<std::shared_ptr<Piece>, 18> pieces;
-    // std::array<Node, 24> nodes;
     Camera camera;
     Skybox skybox;
     Light light;
