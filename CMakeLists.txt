@@ -89,7 +89,7 @@ add_subdirectory(extern/spdlog)
 add_subdirectory(extern/glm)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/json)
-add_subdirectory(extern/Assimp)
+add_subdirectory(extern/assimp)
 
 # Add all include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")

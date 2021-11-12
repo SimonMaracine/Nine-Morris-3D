@@ -4,7 +4,6 @@
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
-#include "ecs/systems.h"
 
 void LoadingLayer::on_attach() {
     loader.start_loading_thread();

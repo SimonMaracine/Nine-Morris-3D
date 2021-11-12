@@ -8,7 +8,6 @@
 #include <cereal/types/vector.hpp>
 #include <cereal/types/array.hpp>
 
-#include "ecs/components.h"
 #include "other/logging.h"
 #include "nine_morris_3d/save_load.h"
 

@@ -46,7 +46,7 @@ void Board::place_piece(hoverable::Id hovered_id) {
             not_placed_pieces_count--;
 
             if (is_windmill_made(&node, TURN_IS_WHITE_SO(Piece::White, Piece::Black))) {
-                SPDLOG_DEBUG("Windmill made");
+                SPDLOG_DEBUG("Windmill is made");
 
                 should_take_piece = true;
 
