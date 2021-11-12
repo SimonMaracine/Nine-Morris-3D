@@ -199,7 +199,7 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
         BufferLayout layout2;
-        layout.add(1, BufferLayout::Type::Int, 1);
+        layout2.add(1, BufferLayout::Type::Int, 1);
 
         Rc<Buffer> indices = Buffer::create_index(app->assets_load->node_mesh->indices.data(),
                 app->assets_load->node_mesh->indices.size() * sizeof(unsigned int));
@@ -234,7 +234,7 @@ void GameScene::build_camera() {
     SPDLOG_DEBUG("Built camera");
 }
 
-void GameScene::build_skybox() {  // TODO is a skybox object even needed? 
+void GameScene::build_skybox() {  // TODO is a skybox object even needed?
     if (!app->storage->skybox_vertex_array) {
         Rc<Buffer> vertices = Buffer::create(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
 

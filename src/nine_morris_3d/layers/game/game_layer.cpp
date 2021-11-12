@@ -41,7 +41,7 @@ void GameLayer::on_attach() {
 }
 
 void GameLayer::on_detach() {
-    SPDLOG_INFO("Closing program");
+    SPDLOG_INFO("Closing game");
 
 }
 

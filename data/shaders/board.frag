@@ -84,7 +84,6 @@ vec3 calculate_light(Material material, Light light, vec3 texture_colors,
 
 void main() {
     vec3 texture_colors = vec3(texture(u_material.diffuse, v_texture_coordinate));
-
     vec3 total_light = calculate_light(u_material, u_light, texture_colors, v_fragment_position_light_space);
 
     // Add everything up

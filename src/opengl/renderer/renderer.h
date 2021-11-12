@@ -34,7 +34,6 @@ namespace renderer {
         Rc<Shader> skybox_shader;
         Rc<Shader> quad2d_shader;
         Rc<Shader> quad3d_shader;
-
 #ifndef NDEBUG
         Rc<Shader> origin_shader;
 #endif
@@ -45,7 +44,6 @@ namespace renderer {
 
         Rc<VertexArray> screen_quad_vertex_array;
         Rc<VertexArray> quad2d_vertex_array;
-
 #ifndef NDEBUG
         Rc<VertexArray> origin_vertex_array;
 #endif
@@ -58,7 +56,6 @@ namespace renderer {
         Rc<Texture> white_indicator_texture;
         Rc<Texture> black_indicator_texture;
         Rc<Texture> loading_texture;
-
 #ifndef NDEBUG
         Rc<Texture> light_texture;
 #endif

@@ -5,7 +5,7 @@ in vec3 v_normal;
 in vec3 v_fragment_position;
 in vec4 v_fragment_position_light_space;
 
-out vec4 fragment_color;
+layout (location = 0) out vec4 fragment_color;
 
 uniform vec3 u_view_position;
 uniform sampler2D u_shadow_map;
@@ -82,8 +82,6 @@ vec4 calculate_light(Material material, Light light, vec4 texture_colors,
 
 void main() {
     vec4 texture_colors = texture(u_material.diffuse, v_texture_coordinate);
-
     vec4 total_light = calculate_light(u_material, u_light, texture_colors, v_fragment_position_light_space);
-
     fragment_color = total_light;
 }
