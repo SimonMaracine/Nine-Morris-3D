@@ -2,8 +2,6 @@
 
 #include <vector>
 
-// #include <entt/entt.hpp>
-
 class Application;
 class Layer;
 
@@ -15,8 +13,6 @@ public:
 
     virtual void on_enter() {}
     virtual void on_exit() {}
-
-    // entt::registry registry;
 protected:
     Application* app;
 private:

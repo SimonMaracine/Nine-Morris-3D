@@ -113,7 +113,7 @@ Window::Window(ApplicationData* data) {
         data->event_function(event);
     });
 
-    atexit(glfwTerminate);
+    atexit(glfwTerminate);  // TODO rework this
 }
 
 Window::~Window() {

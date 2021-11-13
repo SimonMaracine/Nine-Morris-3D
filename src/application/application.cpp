@@ -124,10 +124,6 @@ void Application::push_layer(Layer* layer, Scene* scene) {
     scene->layer_stack.push_back(layer);
 }
 
-// void Application::add_asset(unsigned int id, AssetType type, const std::string& file_path) {
-//     asset_manager.define_asset(id, type, file_path);
-// }
-
 void Application::on_event(events::Event& event) {
     using namespace events;
 

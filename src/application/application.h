@@ -28,12 +28,10 @@ public:
     void set_starting_scene(Scene* scene);
     void change_scene(unsigned int id);
     void push_layer(Layer* layer, Scene* scene);
-    // void add_asset(unsigned int id, AssetType type, const std::string& file_path);
 
     bool running = true;
     double fps = 0.0;
     ApplicationData data;
-    // AssetManager asset_manager;
     std::shared_ptr<AssetsLoad> assets_load;
     std::shared_ptr<Window> window;
     renderer::Storage* storage;
