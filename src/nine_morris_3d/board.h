@@ -85,14 +85,15 @@ public:
 
     unsigned int white_pieces_count = 0;  // Number of pieces on the board
     unsigned int black_pieces_count = 0;
-    unsigned int not_placed_pieces_count = 18;
+    unsigned int not_placed_white_pieces_count = 9;  // Number of pieces floating
+    unsigned int not_placed_black_pieces_count = 9;
     bool should_take_piece = false;
 
     Node* hovered_node = nullptr;
     std::shared_ptr<Piece> hovered_piece = nullptr;
     std::shared_ptr<Piece> selected_piece = nullptr;
 
-    std::array<bool, 2> can_jump = { false, false };
+    std::array<bool, 2> can_jump = { false, false };  // White first and black second
 
     unsigned int turns_without_mills = 0;
     ThreefoldRepetitionHistory repetition_history;
@@ -100,7 +101,7 @@ public:
     BoardPaint paint;
 private:
     std::shared_ptr<Piece> place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node);
-    void take_raise_piece(Piece* piece);
+    void take_and_raise_piece(Piece* piece);
     void set_pieces_show_outline(Piece::Type type, bool show);
     void game_over(Ending ending, Piece::Type type_to_hide);
     void switch_turn();
@@ -114,6 +115,7 @@ private:
     bool check_player_blocked(Player player);
     std::array<Piece::Type, 24> get_position();
     void remember_position_and_check_repetition();
+    unsigned int not_placed_pieces_count();
 };
 
 // TODO undo

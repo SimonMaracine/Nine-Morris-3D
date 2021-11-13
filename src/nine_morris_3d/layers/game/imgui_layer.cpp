@@ -207,9 +207,9 @@ void ImGuiLayer::on_update(float dt) {
         gui_layer->active = false;
     }
 
-    if (scene->board.not_placed_pieces_count < 18) {
-        can_undo = true;
-    }
+    // if (scene->board.not_placed_pieces_count() < 18) {
+    //     can_undo = true;
+    // }
 
     if (scene->board.phase == Board::Phase::GameOver) {
         ImGui::OpenPopup("Game Over");
@@ -265,7 +265,10 @@ void ImGuiLayer::on_update(float dt) {
     ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
     ImGui::Text("White pieces: %u", scene->board.white_pieces_count);
     ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
-    ImGui::Text("Not placed pieces: %u", scene->board.not_placed_pieces_count);
+    ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
+    ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
+    ImGui::Text("White can jump: %s", scene->board.can_jump[0] ? "true" : "false");
+    ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
     ImGui::Text("Phase: %d", (int) scene->board.phase);
     ImGui::Text("Turn: %s", scene->board.turn == Board::Player::White ? "white" : "black");
     ImGui::Text("Should take piece: %s", scene->board.should_take_piece ? "true" : "false");

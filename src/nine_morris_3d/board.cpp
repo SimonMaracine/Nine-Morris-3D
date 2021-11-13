@@ -38,15 +38,15 @@ void Board::place_piece(hoverable::Id hovered_id) {
             if (turn == Player::White) {
                 node.piece = place_new_piece(Piece::White, position.x, position.z, &node);
                 white_pieces_count++;
+                not_placed_white_pieces_count--;
             } else {
                 node.piece = place_new_piece(Piece::Black, position.x, position.z, &node);
                 black_pieces_count++;
+                not_placed_black_pieces_count--;
             }
 
-            not_placed_pieces_count--;
-
             if (is_windmill_made(&node, TURN_IS_WHITE_SO(Piece::White, Piece::Black))) {
-                SPDLOG_DEBUG("Windmill is made");
+                SPDLOG_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
                 should_take_piece = true;
 
@@ -58,10 +58,11 @@ void Board::place_piece(hoverable::Id hovered_id) {
 
                 turns_without_mills = 0;
             } else {
+                check_player_number_of_pieces(turn);
                 switch_turn();
             }
 
-            if (not_placed_pieces_count == 0 && !should_take_piece) {
+            if (not_placed_pieces_count() == 0 && !should_take_piece) {
                 phase = Phase::MovePieces;
                 update_outlines();
 
@@ -117,15 +118,15 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
                         // TODO remember take
 
-                        take_raise_piece(node.piece.get());
+                        take_and_raise_piece(node.piece.get());
                         node.piece = nullptr;
-                        switch_turn();
-                        update_outlines();
                         should_take_piece = false;
                         set_pieces_to_take(Piece::Black, false);
                         black_pieces_count--;
-
-                        check_player_number_of_pieces(turn);
+                        check_player_number_of_pieces(Player::White);
+                        check_player_number_of_pieces(Player::Black);
+                        switch_turn();
+                        update_outlines();
 
                         if (check_player_blocked(turn)) {
                             SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
@@ -145,15 +146,15 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
                         // TODO remember take
 
-                        take_raise_piece(node.piece.get());
+                        take_and_raise_piece(node.piece.get());
                         node.piece = nullptr;
-                        switch_turn();
-                        update_outlines();
                         should_take_piece = false;
                         set_pieces_to_take(Piece::White, false);
                         white_pieces_count--;
-
-                        check_player_number_of_pieces(turn);
+                        check_player_number_of_pieces(Player::White);
+                        check_player_number_of_pieces(Player::Black);
+                        switch_turn();
+                        update_outlines();
 
                         if (check_player_blocked(turn)) {
                             SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
@@ -170,8 +171,8 @@ void Board::take_piece(hoverable::Id hovered_id) {
         }
     }
 
-    // Do this even if it may be not needed
-    if (phase == Phase::PlacePieces && not_placed_pieces_count == 0 && !should_take_piece) {
+    // Do this even if it may not be needed
+    if (phase == Phase::PlacePieces && not_placed_pieces_count() == 0 && !should_take_piece) {
         phase = Phase::MovePieces;
         update_outlines();
         SPDLOG_INFO("Phase 2");
@@ -224,7 +225,7 @@ void Board::put_piece(hoverable::Id hovered_id) {
                 selected_piece = nullptr;
 
                 if (is_windmill_made(&node, TURN_IS_WHITE_SO(Piece::White, Piece::Black))) {
-                    SPDLOG_DEBUG("Windmill is made");
+                    SPDLOG_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
                     should_take_piece = true;
 
@@ -238,6 +239,8 @@ void Board::put_piece(hoverable::Id hovered_id) {
 
                     turns_without_mills = 0;
                 } else {
+                    check_player_number_of_pieces(Player::White);
+                    check_player_number_of_pieces(Player::Black);
                     switch_turn();
                     update_outlines();
 
@@ -305,7 +308,7 @@ std::shared_ptr<Piece> Board::place_new_piece(Piece::Type type, float x_pos, flo
     return nullptr;
 }
 
-void Board::take_raise_piece(Piece* piece) {
+void Board::take_and_raise_piece(Piece* piece) {
     piece->target.x = piece->position.x;
     piece->target.y = PIECE_Y_POSITION + 1.5f;
     piece->target.z = piece->position.z;
@@ -572,27 +575,25 @@ bool Board::can_go(Node* source_node, Node* destination_node) {
 }
 
 void Board::check_player_number_of_pieces(Player player) {
-    if (phase == Phase::MovePieces) {  // TODO this seems dodgy
-        if (player == Player::White) {
-            SPDLOG_DEBUG("Checking white player number of pieces");
+    if (player == Player::White) {
+        SPDLOG_DEBUG("Checking white player number of pieces");
 
-            if (white_pieces_count == 3) {
-                can_jump[(int) player] = true;
-                SPDLOG_INFO("White player can jump");
-            } else if (white_pieces_count == 2) {
-                SPDLOG_INFO("White player has only 2 pieces");
-                game_over(Ending::WinnerBlack, Piece::White);
-            }
-        } else {
-            SPDLOG_DEBUG("Checking black player number of pieces");
+        if (white_pieces_count + not_placed_white_pieces_count == 3) {
+            can_jump[(int) player] = true;
+            SPDLOG_INFO("White player can jump");
+        } else if (white_pieces_count + not_placed_white_pieces_count == 2) {
+            SPDLOG_INFO("White player has only 2 pieces");
+            game_over(Ending::WinnerBlack, Piece::White);
+        }
+    } else {
+        SPDLOG_DEBUG("Checking black player number of pieces");
 
-            if (black_pieces_count == 3) {
-                can_jump[(int) player] = true;
-                SPDLOG_INFO("Black player can jump");
-            } else if (black_pieces_count == 2) {
-                SPDLOG_INFO("Black player has only 2 pieces");
-                game_over(Ending::WinnerWhite, Piece::Black);
-            }
+        if (black_pieces_count + not_placed_black_pieces_count == 3) {
+            can_jump[(int) player] = true;
+            SPDLOG_INFO("Black player can jump");
+        } else if (black_pieces_count + not_placed_black_pieces_count == 2) {
+            SPDLOG_INFO("Black player has only 2 pieces");
+            game_over(Ending::WinnerWhite, Piece::Black);
         }
     }
 }
@@ -860,4 +861,8 @@ void Board::remember_position_and_check_repetition() {
     }
 
     repetition_history.ones.push_back(current_position);
+}
+
+unsigned int Board::not_placed_pieces_count() {
+    return not_placed_white_pieces_count + not_placed_black_pieces_count;
 }
