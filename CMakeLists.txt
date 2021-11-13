@@ -91,6 +91,8 @@ add_subdirectory(extern/glfw)
 add_subdirectory(extern/json)
 add_subdirectory(extern/assimp)
 
+add_dependencies(${EXECUTABLE_NAME} glfw)  # This is necessary for some reason
+
 # Add all include directories
 target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
 target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
