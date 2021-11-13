@@ -98,7 +98,7 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/dependencies/cereal/include"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
-    "${CMAKE_SOURCE_DIR}/extern/Assimp/include"
+    "${CMAKE_SOURCE_DIR}/extern/assimp/include"
     "${CMAKE_SOURCE_DIR}/extern/glm"
     "${CMAKE_SOURCE_DIR}/extern/glfw/include"
     "${CMAKE_SOURCE_DIR}/extern/imgui"
@@ -108,12 +108,12 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_directories(${EXECUTABLE_NAME} PUBLIC
         "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-        "${CMAKE_SOURCE_DIR}/build/extern/Assimp/bin"
+        "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
         "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     target_link_directories(${EXECUTABLE_NAME} PUBLIC
         "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-        "${CMAKE_SOURCE_DIR}/build-release/extern/Assimp/bin"
+        "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
         "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
 endif()
 
