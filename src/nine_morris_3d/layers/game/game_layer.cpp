@@ -1,5 +1,4 @@
 #include <functional>
-#include <memory>
 #include <vector>
 #include <algorithm>
 #include <array>
@@ -229,25 +228,29 @@ void GameLayer::setup_board_paint() {
 void GameLayer::setup_pieces() {
     app->storage->piece_shader->bind();
     app->storage->piece_shader->set_uniform_int("u_material.diffuse", 0);
-    app->storage->piece_shader->set_uniform_vec3("u_material.specular", scene->board.pieces[0]->specular_color);  // TODO think about a better way
-    app->storage->piece_shader->set_uniform_float("u_material.shininess", scene->board.pieces[0]->shininess);
+    app->storage->piece_shader->set_uniform_vec3("u_material.specular", scene->board.pieces[0].specular_color);  // TODO think about a better way
+    app->storage->piece_shader->set_uniform_float("u_material.shininess", scene->board.pieces[0].shininess);
 }
 
 void GameLayer::render_pieces() {
-    constexpr auto copy = [](std::shared_ptr<Piece> piece) {
+    constexpr auto copy = [](Piece* piece) {
         return piece->active;
     };
-    const auto sort = [this](std::shared_ptr<Piece> lhs, std::shared_ptr<Piece> rhs) {
+    const auto sort = [this](Piece* lhs, Piece* rhs) {
         float distance1 = glm::length(scene->camera.position - lhs->position);
         float distance2 = glm::length(scene->camera.position - rhs->position);
         return distance1 > distance2;
     };
 
-    std::vector<std::shared_ptr<Piece>> active_pieces;
-    std::copy_if(scene->board.pieces.begin(), scene->board.pieces.end(), std::back_inserter(active_pieces), copy);
+    std::array<Piece*, 18> pointer_pieces;
+    for (unsigned int i = 0; i < 18; i++) {
+        pointer_pieces[i] = &scene->board.pieces[i];
+    }
+    std::vector<Piece*> active_pieces;
+    std::copy_if(pointer_pieces.begin(), pointer_pieces.end(), std::back_inserter(active_pieces), copy);
     std::sort(active_pieces.begin(), active_pieces.end(), sort);
 
-    for (auto piece : active_pieces) {
+    for (Piece* piece : active_pieces) {
         if (piece->selected) {
             renderer::draw_piece_with_outline(piece, piece->select_color);
         } else if (piece->show_outline && piece->id == scene->hovered_id && piece->in_use && !piece->pending_remove) {
@@ -275,14 +278,18 @@ void GameLayer::render_to_depth() {
     renderer::draw_to_depth(glm::vec3(0.0f), glm::vec3(0.0f), scene->board.scale, scene->board.vertex_array,
             scene->board.index_count);
 
-    constexpr auto copy = [](std::shared_ptr<Piece> piece) {
+    constexpr auto copy = [](Piece* piece) {
         return piece->active;
     };
 
-    std::vector<std::shared_ptr<Piece>> active_pieces;
-    std::copy_if(scene->board.pieces.begin(), scene->board.pieces.end(), std::back_inserter(active_pieces), copy);
+    std::array<Piece*, 18> pointer_pieces;
+    for (unsigned int i = 0; i < 18; i++) {
+        pointer_pieces[i] = &scene->board.pieces[i];
+    }
+    std::vector<Piece*> active_pieces;
+    std::copy_if(pointer_pieces.begin(), pointer_pieces.end(), std::back_inserter(active_pieces), copy);
 
-    for (auto piece : active_pieces) {
+    for (Piece* piece : active_pieces) {
         renderer::draw_to_depth(piece->position, piece->rotation, piece->scale, piece->vertex_array,
                 piece->index_count);
     }

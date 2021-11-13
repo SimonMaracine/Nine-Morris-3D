@@ -278,8 +278,8 @@ void ImGuiLayer::on_update(float dt) {
     // ImGui::Text("History size (take): %lu", scene->board.moves_history.taken_pieces.size());
     ImGui::Text("Hovered ID: %d", scene->hovered_id);
     ImGui::Text("Hovered node: %p", scene->board.hovered_node);
-    ImGui::Text("Hovered piece: %p", scene->board.hovered_piece.get());
-    ImGui::Text("Selected piece: %p", scene->board.selected_piece.get());
+    ImGui::Text("Hovered piece: %p", scene->board.hovered_piece);
+    ImGui::Text("Selected piece: %p", scene->board.selected_piece);
     ImGui::End();
 #endif
 

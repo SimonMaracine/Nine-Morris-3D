@@ -10,8 +10,12 @@
 #include "other/logging.h"
 
 #define GET_ACTIVE_PIECES(result) \
-    std::vector<std::shared_ptr<Piece>> result; \
-    std::copy_if(pieces.begin(), pieces.end(), std::back_inserter(result), [](std::shared_ptr<Piece> piece) { \
+    std::array<Piece*, 18> pointer_pieces; \
+    for (unsigned int i = 0; i < 18; i++) { \
+        pointer_pieces[i] = &pieces[i]; \
+    } \
+    std::vector<Piece*> result; \
+    std::copy_if(pointer_pieces.begin(), pointer_pieces.end(), std::back_inserter(result), [](Piece* piece) { \
         return piece->active; \
     });
 
@@ -83,7 +87,7 @@ void Board::place_piece(hoverable::Id hovered_id) {
 void Board::move_pieces(float dt) {
     GET_ACTIVE_PIECES(active_pieces)
 
-    for (auto piece : active_pieces) {
+    for (Piece* piece : active_pieces) {
         if (piece->should_move) {
             if (piece->distance_travelled < glm::length(piece->distance_to_travel)) {
                 glm::vec3 velocity = piece->velocity * dt;
@@ -118,7 +122,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
                         // TODO remember take
 
-                        take_and_raise_piece(node.piece.get());
+                        take_and_raise_piece(node.piece);
                         node.piece = nullptr;
                         should_take_piece = false;
                         set_pieces_to_take(Piece::Black, false);
@@ -146,7 +150,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
                         // TODO remember take
 
-                        take_and_raise_piece(node.piece.get());
+                        take_and_raise_piece(node.piece);
                         node.piece = nullptr;
                         should_take_piece = false;
                         set_pieces_to_take(Piece::White, false);
@@ -182,14 +186,14 @@ void Board::take_piece(hoverable::Id hovered_id) {
 void Board::select_piece(hoverable::Id hovered_id) {
     GET_ACTIVE_PIECES(active_pieces)
 
-    for (auto piece : active_pieces) {
+    for (Piece* piece : active_pieces) {
         if (piece->id == hovered_id) {
             if (turn == Player::White && piece->type == Piece::White ||
                     turn == Player::Black && piece->type == Piece::Black) {
                 if (!piece->selected && !piece->pending_remove) {
                     selected_piece = piece;
                     piece->selected = true;
-                    unselect_other_pieces(piece.get());
+                    unselect_other_pieces(piece);
                 } else {
                     selected_piece = nullptr;
                     piece->selected = false;
@@ -268,7 +272,7 @@ void Board::press(hoverable::Id hovered_id) {
 
     GET_ACTIVE_PIECES(active_pieces)
 
-    for (auto piece : active_pieces) {
+    for (Piece* piece : active_pieces) {
         if (piece->id == hovered_id) {
             hovered_piece = piece;
         }
@@ -284,10 +288,10 @@ void Board::undo() {
     // TODO this
 }
 
-std::shared_ptr<Piece> Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node) {
+Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node) {
     GET_ACTIVE_PIECES(active_pieces)
 
-    for (auto piece : active_pieces) {
+    for (Piece* piece : active_pieces) {
         if (!piece->in_use && piece->type == type) {
             piece->target.x = x_pos;
             piece->target.y = PIECE_Y_POSITION;
@@ -324,7 +328,7 @@ void Board::take_and_raise_piece(Piece* piece) {
 void Board::set_pieces_show_outline(Piece::Type type, bool show) {
     GET_ACTIVE_PIECES(active_pieces)
 
-    for (auto piece : active_pieces) {
+    for (Piece* piece : active_pieces) {
         if (piece->type == type) {
             piece->show_outline = show;
         }
@@ -374,9 +378,9 @@ bool Board::is_windmill_made(Node* node, Piece::Type type) {
         Node& node3 = nodes[mill[2]];
 
         if (node1.piece != nullptr && node2.piece != nullptr && node3.piece != nullptr) {
-            Piece* piece1 = node1.piece.get();
-            Piece* piece2 = node2.piece.get();
-            Piece* piece3 = node3.piece.get();
+            Piece* piece1 = node1.piece;
+            Piece* piece2 = node2.piece;
+            Piece* piece3 = node3.piece;
 
             if (piece1->type == type && piece2->type == type && piece3->type == type) {
                 if (piece1->node == node || piece2->node == node || piece3->node == node) {
@@ -392,7 +396,7 @@ bool Board::is_windmill_made(Node* node, Piece::Type type) {
 void Board::set_pieces_to_take(Piece::Type type, bool take) {
     GET_ACTIVE_PIECES(active_pieces)
 
-    for (auto piece : active_pieces) {
+    for (Piece* piece : active_pieces) {
         if (piece->type == type) {
             piece->to_take = take;
         }
@@ -400,7 +404,7 @@ void Board::set_pieces_to_take(Piece::Type type, bool take) {
 }
 
 unsigned int Board::number_of_pieces_in_windmills(Piece::Type type) {
-    std::vector<std::shared_ptr<Piece>> pieces_inside_mills;
+    std::vector<Piece*> pieces_inside_mills;
 
     for (unsigned int i = 0; i < 16; i++) {
         const unsigned int* mill = WINDMILLS[i];
@@ -410,12 +414,12 @@ unsigned int Board::number_of_pieces_in_windmills(Piece::Type type) {
         Node& node3 = nodes[mill[2]];
 
         if (node1.piece != nullptr && node2.piece != nullptr && node3.piece != nullptr) {
-            Piece* piece1 = node1.piece.get();
-            Piece* piece2 = node2.piece.get();
-            Piece* piece3 = node3.piece.get();
+            Piece* piece1 = node1.piece;
+            Piece* piece2 = node2.piece;
+            Piece* piece3 = node3.piece;
 
             if (piece1->type == type && piece2->type == type && piece3->type == type) {
-                std::vector<std::shared_ptr<Piece>>::iterator it;
+                std::vector<Piece*>::iterator it;
 
                 it = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), node1.piece);
                 if (it == pieces_inside_mills.end()) {
@@ -439,11 +443,11 @@ unsigned int Board::number_of_pieces_in_windmills(Piece::Type type) {
     return pieces_inside_mills.size();
 }
 
-void Board::unselect_other_pieces(Piece* currently_selected_piece) {  // TODO see what is better
+void Board::unselect_other_pieces(Piece* currently_selected_piece) {
     GET_ACTIVE_PIECES(active_pieces)
 
-    for (auto piece : active_pieces) {
-        if (piece.get() != currently_selected_piece) {
+    for (Piece* piece : active_pieces) {
+        if (piece != currently_selected_piece) {
             piece->selected = false;
         }
     }
@@ -611,7 +615,7 @@ bool Board::check_player_blocked(Player player) {
 
     GET_ACTIVE_PIECES(active_pieces)
 
-    for (auto piece : active_pieces) {
+    for (Piece* piece : active_pieces) {
         if (piece->type == type && !piece->pending_remove && piece->in_use) {
             at_least_one_piece = true;
 
@@ -830,7 +834,7 @@ std::array<Piece::Type, 24> Board::get_position() {
         Node& node = nodes[i];
 
         if (node.piece != nullptr) {
-            Piece* piece = node.piece.get();
+            Piece* piece = node.piece;
             position[i] = piece->type;
         } else {
             position[i] = Piece::None;

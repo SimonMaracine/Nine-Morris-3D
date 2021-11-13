@@ -19,6 +19,7 @@ public:
         None
     };
 
+    Piece() = default;
     Piece(hoverable::Id id, Type type);
     ~Piece() = default;
 

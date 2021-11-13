@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <glm/glm.hpp>
 
 #include "opengl/renderer/vertex_array.h"
@@ -51,7 +49,7 @@ public:
     Rc<VertexArray> vertex_array;
     int index_count;
 
-    std::shared_ptr<Piece> piece = nullptr;
+    Piece* piece = nullptr;
 
     unsigned int index;  // From 0 to 23, needed for easier coping with these
 };

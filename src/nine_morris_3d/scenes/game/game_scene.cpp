@@ -166,20 +166,20 @@ void GameScene::build_piece(unsigned int index, Piece::Type type, Rc<model::Mesh
         app->storage->piece_vertex_arrays[index] = create_entity_vertex_array(mesh, id);
     }
 
-    board.pieces[index] = std::make_shared<Piece>(app->storage->pieces_id[index], type);
+    board.pieces[index] = Piece(app->storage->pieces_id[index], type);
 
     int random_rotation = rand() % 360;
 
-    board.pieces[index]->position = position;
-    board.pieces[index]->rotation = glm::vec3(0.0f, glm::radians((float) random_rotation), 0.0f);
-    board.pieces[index]->scale = 20.0f;
-    board.pieces[index]->vertex_array = app->storage->piece_vertex_arrays[index];
-    board.pieces[index]->index_count = mesh->indices.size();
-    board.pieces[index]->diffuse_texture = texture;
-    board.pieces[index]->specular_color = glm::vec3(0.25f);
-    board.pieces[index]->shininess = 8.0f;
-    board.pieces[index]->select_color = glm::vec3(1.0f, 0.0f, 0.0f);
-    board.pieces[index]->hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
+    board.pieces[index].position = position;
+    board.pieces[index].rotation = glm::vec3(0.0f, glm::radians((float) random_rotation), 0.0f);
+    board.pieces[index].scale = 20.0f;
+    board.pieces[index].vertex_array = app->storage->piece_vertex_arrays[index];
+    board.pieces[index].index_count = mesh->indices.size();
+    board.pieces[index].diffuse_texture = texture;
+    board.pieces[index].specular_color = glm::vec3(0.25f);
+    board.pieces[index].shininess = 8.0f;
+    board.pieces[index].select_color = glm::vec3(1.0f, 0.0f, 0.0f);
+    board.pieces[index].hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
 
     SPDLOG_DEBUG("Built piece {}", index);
 }

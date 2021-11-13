@@ -2,7 +2,6 @@
 
 #include <array>
 #include <vector>
-#include <memory>
 
 #include <glm/glm.hpp>
 
@@ -77,7 +76,7 @@ public:
     float shininess;
 
     std::array<Node, 24> nodes;
-    std::array<std::shared_ptr<Piece>, 18> pieces;
+    std::array<Piece, 18> pieces;
 
     Phase phase = Phase::PlacePieces;
     Player turn = Player::White;
@@ -90,8 +89,8 @@ public:
     bool should_take_piece = false;
 
     Node* hovered_node = nullptr;
-    std::shared_ptr<Piece> hovered_piece = nullptr;
-    std::shared_ptr<Piece> selected_piece = nullptr;
+    Piece* hovered_piece = nullptr;
+    Piece* selected_piece = nullptr;
 
     std::array<bool, 2> can_jump = { false, false };  // White first and black second
 
@@ -100,7 +99,7 @@ public:
 
     BoardPaint paint;
 private:
-    std::shared_ptr<Piece> place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node);
+    Piece* place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);
     void set_pieces_show_outline(Piece::Type type, bool show);
     void game_over(Ending ending, Piece::Type type_to_hide);
