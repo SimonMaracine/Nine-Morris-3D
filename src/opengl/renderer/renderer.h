@@ -21,7 +21,7 @@ namespace renderer {
     };
 
     struct Storage {
-        Rc<Buffer> uniform_buffer;
+        Rc<UniformBuffer> uniform_buffer;
 
         Rc<Shader> board_shader;
         Rc<Shader> board_paint_shader;

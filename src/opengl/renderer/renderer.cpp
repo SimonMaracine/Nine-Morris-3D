@@ -31,7 +31,7 @@ namespace renderer {
 
         storage = new Storage;
 
-        storage->uniform_buffer = Buffer::create_uniform(nullptr, sizeof(glm::mat4));
+        storage->uniform_buffer = UniformBuffer::create(nullptr, sizeof(glm::mat4));
         const char* block_name = "Matrices";
         const char* uniforms[1] = {
             "u_projection_view_matrix"

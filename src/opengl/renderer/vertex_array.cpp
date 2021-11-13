@@ -38,7 +38,6 @@ void VertexArray::unbind() {
 void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout) {
     assert(layout.elements.size() > 0);
 
-    glBindVertexArray(array);  // TODO be careful with these
     glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
 
     std::size_t offset = 0;
@@ -67,6 +66,7 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout&
     buffers.push_back(buffer);
 }
 
-void VertexArray::hold_index_buffer(std::shared_ptr<Buffer> index_buffer) {  // TODO make this better
-    buffers.push_back(index_buffer);
+void VertexArray::add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer) {
+    index_buffer->bind();
+    this->index_buffer = index_buffer;
 }

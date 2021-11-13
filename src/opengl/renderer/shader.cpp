@@ -46,7 +46,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
                                        const char* block_name,
                                        const char** uniforms,
                                        int uniforms_count,
-                                       std::shared_ptr<Buffer> uniform_buffer) {
+                                       std::shared_ptr<UniformBuffer> uniform_buffer) {
     GLuint vertex_shader = compile_shader(vertex_source, GL_VERTEX_SHADER);
     GLuint fragment_shader = compile_shader(fragment_source, GL_FRAGMENT_SHADER);
 

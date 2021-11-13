@@ -81,13 +81,12 @@ Rc<VertexArray> GameScene::create_entity_vertex_array(Rc<model::Mesh<model::Vert
     BufferLayout layout2;
     layout2.add(3, BufferLayout::Type::Int, 1);
 
-    Rc<Buffer> indices = Buffer::create_index(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
+    Rc<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
 
     Rc<VertexArray> vertex_array = VertexArray::create();
-    indices->bind();
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_buffer(ids, layout2);
-    vertex_array->hold_index_buffer(indices);
+    vertex_array->add_index_buffer(indices);
 
     VertexArray::unbind();
 
@@ -130,12 +129,11 @@ void GameScene::build_board_paint() {
         layout.add(1, BufferLayout::Type::Float, 2);
         layout.add(2, BufferLayout::Type::Float, 3);
 
-        Rc<Buffer> indices = Buffer::create_index(app->assets_load->board_paint_mesh->indices.data(),
+        Rc<IndexBuffer> indices = IndexBuffer::create(app->assets_load->board_paint_mesh->indices.data(),
                 app->assets_load->board_paint_mesh->indices.size() * sizeof(unsigned int));
 
-        indices->bind();
         vertex_array->add_buffer(vertices, layout);
-        vertex_array->hold_index_buffer(indices);
+        vertex_array->add_index_buffer(indices);
 
         VertexArray::unbind();
 
@@ -201,13 +199,12 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
         BufferLayout layout2;
         layout2.add(1, BufferLayout::Type::Int, 1);
 
-        Rc<Buffer> indices = Buffer::create_index(app->assets_load->node_mesh->indices.data(),
+        Rc<IndexBuffer> indices = IndexBuffer::create(app->assets_load->node_mesh->indices.data(),
                 app->assets_load->node_mesh->indices.size() * sizeof(unsigned int));
 
-        indices->bind();
         vertex_array->add_buffer(vertices, layout);
         vertex_array->add_buffer(ids, layout2);
-        vertex_array->hold_index_buffer(indices);
+        vertex_array->add_index_buffer(indices);
 
         VertexArray::unbind();
 

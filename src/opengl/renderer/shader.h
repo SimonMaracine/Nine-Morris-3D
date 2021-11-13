@@ -20,7 +20,7 @@ public:
                                           const char* block_name,
                                           const char** uniforms,
                                           int uniforms_count,
-                                          std::shared_ptr<Buffer> uniform_buffer);
+                                          std::shared_ptr<UniformBuffer> uniform_buffer);
 
     void bind() const;
     static void unbind();
