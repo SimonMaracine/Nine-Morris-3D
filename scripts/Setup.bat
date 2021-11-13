@@ -1,4 +1,4 @@
 ECHO OFF
 cd ..\build
-cmake ..
+cmake .. -A x64
 cd ..\scripts
