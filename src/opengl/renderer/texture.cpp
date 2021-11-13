@@ -26,7 +26,7 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipm
     stbi_set_flip_vertically_on_load(1);
 
     int width, height, channels;
-    stbi_uc* data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
+    stbi_uc* data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
     if (!data) {
         spdlog::critical("Could not load texture '{}'", file_path.c_str());
@@ -45,18 +45,9 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipm
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    if (channels == 3) {
-        glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGB8, width, height);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
-        LOG_ALLOCATION(width * height * 4);
-    } else if (channels == 4) {
-        glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        LOG_ALLOCATION(width * height * 4);
-    } else {
-        spdlog::critical("Texture has {} channels", channels);
-        std::exit(1);
-    }
+    glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    LOG_ALLOCATION(width * height * 4);
 
     if (mipmapping) {
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -85,20 +76,10 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool
 
     assert(data->data != nullptr);
 
-    if (data->channels == 3) {
-        glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGB8, data->width, data->height);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGB,
-                        GL_UNSIGNED_BYTE, data->data);
-        LOG_ALLOCATION(data->width * data->height * 4);
-    } else if (data->channels == 4) {
-        glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, data->width, data->height);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA,
-                        GL_UNSIGNED_BYTE, data->data);
-        LOG_ALLOCATION(data->width * data->height * 4);
-    } else {
-        spdlog::critical("Texture has {} channels", data->channels);
-        std::exit(1);
-    }
+    glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, data->width, data->height);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA,
+                    GL_UNSIGNED_BYTE, data->data);
+    LOG_ALLOCATION(data->width * data->height * 4);
 
     if (mipmapping) {
         glGenerateMipmap(GL_TEXTURE_2D);
