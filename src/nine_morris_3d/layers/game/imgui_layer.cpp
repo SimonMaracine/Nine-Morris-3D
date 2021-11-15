@@ -28,6 +28,9 @@ void ImGuiLayer::on_attach() {
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+#ifdef NDEBUG
+    io.IniFilename = nullptr;
+#endif
 
     ImFontGlyphRangesBuilder builder;
     builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
