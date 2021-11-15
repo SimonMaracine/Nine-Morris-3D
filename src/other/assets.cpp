@@ -1,5 +1,4 @@
 #include <string>
-#include <string.h>
 
 #include "other/assets.h"
 

@@ -54,6 +54,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/texture_data.cpp"
     "src/other/loader.cpp"
     "src/other/assets.cpp"
+    "src/other/user_data.cpp"
     "dependencies/glad/src/glad.c"
     "dependencies/stb_image/stb_image.c"
     "extern/imgui/imgui_draw.cpp"

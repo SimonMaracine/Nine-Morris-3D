@@ -47,6 +47,7 @@ void GameLayer::on_attach() {
 void GameLayer::on_detach() {
     SPDLOG_INFO("Closing game");
 
+    options::save_options_to_file(scene->options);
 }
 
 void GameLayer::on_bind_layers() {
