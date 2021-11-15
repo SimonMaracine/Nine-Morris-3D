@@ -48,9 +48,6 @@ void GameScene::on_enter() {
 
     // Free the memory
     app->assets_load = nullptr;
-
-    SPDLOG_DEBUG("Finished initializing game");
-    STOP_ALLOCATION_LOG();
 }
 
 void GameScene::on_exit() {

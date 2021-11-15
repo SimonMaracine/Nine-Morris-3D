@@ -39,6 +39,9 @@ void GameLayer::on_attach() {
     setup_board();
     setup_board_paint();
     setup_pieces();
+
+    SPDLOG_DEBUG("Finished initializing game");
+    STOP_ALLOCATION_LOG();
 }
 
 void GameLayer::on_detach() {
@@ -256,7 +259,7 @@ void GameLayer::render_pieces() {
         } else if (piece->show_outline && piece->id == scene->hovered_id && piece->in_use && !piece->pending_remove) {
             renderer::draw_piece_with_outline(piece, piece->hover_color);
         } else if (piece->to_take && piece->id == scene->hovered_id && piece->in_use) {
-            renderer::draw_piece(piece, glm::vec3(0.9f, 0.1f, 0.1f));
+            renderer::draw_piece(piece, glm::vec3(1.0f, 0.2f, 0.2f));
         } else {
             renderer::draw_piece(piece, glm::vec3(1.0f, 1.0f, 1.0f));
         }

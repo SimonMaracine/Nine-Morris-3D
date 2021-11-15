@@ -27,23 +27,23 @@ void Loader::start_loading_thread() {
 void Loader::load() {
     using namespace model;
 
-    assets_load->board_mesh = load_model(assets::BOARD_MESH);
-    assets_load->board_paint_mesh = load_model(assets::BOARD_PAINT_MESH);
-    assets_load->node_mesh = load_model_position(assets::NODE_MESH);;
-    assets_load->white_piece_mesh = load_model(assets::WHITE_PIECE_MESH);
-    assets_load->black_piece_mesh = load_model(assets::BLACK_PIECE_MESH);
-    assets_load->board_texture = std::make_shared<TextureData>(assets::BOARD_TEXTURE, true);
-    assets_load->board_paint_texture = std::make_shared<TextureData>(assets::BOARD_PAINT_TEXTURE, true);
-    assets_load->white_piece_texture = std::make_shared<TextureData>(assets::WHITE_PIECE_TEXTURE, true);
-    assets_load->black_piece_texture = std::make_shared<TextureData>(assets::BLACK_PIECE_TEXTURE, true);
-    assets_load->white_indicator_texture = std::make_shared<TextureData>(assets::WHITE_INDICATOR_TEXTURE, true);
-    assets_load->black_indicator_texture = std::make_shared<TextureData>(assets::BLACK_PIECE_TEXTURE, true);
-    assets_load->skybox_px_texture = std::make_shared<TextureData>(assets::SKYBOX_PX_TEXTURE, false);
-    assets_load->skybox_nx_texture = std::make_shared<TextureData>(assets::SKYBOX_NX_TEXTURE, false);
-    assets_load->skybox_py_texture = std::make_shared<TextureData>(assets::SKYBOX_PY_TEXTURE, false);
-    assets_load->skybox_ny_texture = std::make_shared<TextureData>(assets::SKYBOX_NY_TEXTURE, false);
-    assets_load->skybox_pz_texture = std::make_shared<TextureData>(assets::SKYBOX_PZ_TEXTURE, false);
-    assets_load->skybox_nz_texture = std::make_shared<TextureData>(assets::SKYBOX_NZ_TEXTURE, false);
+    assets_load->board_mesh = load_model(assets::path(assets::BOARD_MESH));
+    assets_load->board_paint_mesh = load_model(assets::path(assets::BOARD_PAINT_MESH));
+    assets_load->node_mesh = load_model_position(assets::path(assets::NODE_MESH));
+    assets_load->white_piece_mesh = load_model(assets::path(assets::WHITE_PIECE_MESH));
+    assets_load->black_piece_mesh = load_model(assets::path(assets::BLACK_PIECE_MESH));
+    assets_load->board_texture = std::make_shared<TextureData>(assets::path(assets::BOARD_TEXTURE), true);
+    assets_load->board_paint_texture = std::make_shared<TextureData>(assets::path(assets::BOARD_PAINT_TEXTURE), true);
+    assets_load->white_piece_texture = std::make_shared<TextureData>(assets::path(assets::WHITE_PIECE_TEXTURE), true);
+    assets_load->black_piece_texture = std::make_shared<TextureData>(assets::path(assets::BLACK_PIECE_TEXTURE), true);
+    assets_load->white_indicator_texture = std::make_shared<TextureData>(assets::path(assets::WHITE_INDICATOR_TEXTURE), true);
+    assets_load->black_indicator_texture = std::make_shared<TextureData>(assets::path(assets::BLACK_INDICATOR_TEXTURE), true);
+    assets_load->skybox_px_texture = std::make_shared<TextureData>(assets::path(assets::SKYBOX_PX_TEXTURE), false);
+    assets_load->skybox_nx_texture = std::make_shared<TextureData>(assets::path(assets::SKYBOX_NX_TEXTURE), false);
+    assets_load->skybox_py_texture = std::make_shared<TextureData>(assets::path(assets::SKYBOX_PY_TEXTURE), false);
+    assets_load->skybox_ny_texture = std::make_shared<TextureData>(assets::path(assets::SKYBOX_NY_TEXTURE), false);
+    assets_load->skybox_pz_texture = std::make_shared<TextureData>(assets::path(assets::SKYBOX_PZ_TEXTURE), false);
+    assets_load->skybox_nz_texture = std::make_shared<TextureData>(assets::path(assets::SKYBOX_NZ_TEXTURE), false);
 
     loaded.store(true);
 }

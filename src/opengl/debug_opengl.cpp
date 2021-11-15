@@ -75,7 +75,7 @@ namespace debug_opengl {
 
 #ifndef NDEBUG
     static void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
-                               GLsizei length, const GLchar* message, const void* userParam) {
+            GLsizei length, const GLchar* message, const void* userParam) {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
                 spdlog::critical("Debug Message:");
@@ -207,6 +207,8 @@ namespace debug_opengl {
             sprintf(line, "MSVC version: %d\n", _MSC_VER);
             output.append(line);
         }
+#else
+    #error "GCC or MSVC must be used (for now)"
 #endif
         {
             char line[100];

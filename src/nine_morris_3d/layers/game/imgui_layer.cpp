@@ -8,6 +8,7 @@
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
 #include "other/logging.h"
+#include "other/assets.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
@@ -35,7 +36,7 @@ void ImGuiLayer::on_attach() {
     ImVector<ImWchar> ranges;
     builder.BuildRanges(&ranges);
 
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("data/fonts/OpenSans-Semibold.ttf", 20.0f,
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 20.0f,
             nullptr, ranges.Data);
     io.Fonts->Build();
 

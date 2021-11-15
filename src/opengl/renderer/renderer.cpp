@@ -37,57 +37,79 @@ namespace renderer {
             "u_projection_view_matrix"
         };
 
-        storage->board_shader = Shader::create("data/shaders/board.vert",
-                                               "data/shaders/board.frag",
-                                               block_name,
-                                               uniforms, 1,
-                                               storage->uniform_buffer);
+        storage->board_shader = Shader::create(
+            assets::path(assets::BOARD_VERTEX_SHADER),
+            assets::path(assets::BOARD_FRAGMENT_SHADER),
+            block_name,
+            uniforms, 1,
+            storage->uniform_buffer
+        );
 
-        storage->board_paint_shader = Shader::create("data/shaders/board_paint.vert",
-                                                     "data/shaders/board_paint.frag",
-                                                     block_name,
-                                                     uniforms, 1,
-                                                     storage->uniform_buffer);
+        storage->board_paint_shader = Shader::create(
+            assets::path(assets::BOARD_PAINT_VERTEX_SHADER),
+            assets::path(assets::BOARD_PAINT_FRAGMENT_SHADER),
+            block_name,
+            uniforms, 1,
+            storage->uniform_buffer
+        );
 
-        storage->piece_shader = Shader::create("data/shaders/piece.vert",
-                                               "data/shaders/piece.frag",
-                                               block_name,
-                                               uniforms, 1,
-                                               storage->uniform_buffer);
+        storage->piece_shader = Shader::create(
+            assets::path(assets::PIECE_VERTEX_SHADER),
+            assets::path(assets::PIECE_FRAGMENT_SHADER),
+            block_name,
+            uniforms, 1,
+            storage->uniform_buffer
+        );
 
-        storage->shadow_shader = Shader::create("data/shaders/shadow.vert",
-                                                "data/shaders/shadow.frag");
+        storage->shadow_shader = Shader::create(
+            assets::path(assets::SHADOW_VERTEX_SHADER),
+            assets::path(assets::SHADOW_FRAGMENT_SHADER)
+        );
 
-        storage->screen_quad_shader = Shader::create("data/shaders/screen_quad.vert",
-                                                     "data/shaders/screen_quad.frag");
+        storage->screen_quad_shader = Shader::create(
+            assets::path(assets::SCREEN_QUAD_VERTEX_SHADER),
+            assets::path(assets::SCREEN_QUAD_FRAGMENT_SHADER)
+        );
 
-        storage->outline_shader = Shader::create("data/shaders/outline.vert",
-                                                 "data/shaders/outline.frag",
-                                                 block_name,
-                                                 uniforms, 1,
-                                                 storage->uniform_buffer);
+        storage->outline_shader = Shader::create(
+            assets::path(assets::OUTLINE_VERTEX_SHADER),
+            assets::path(assets::OUTLINE_FRAGMENT_SHADER),
+            block_name,
+            uniforms, 1,
+            storage->uniform_buffer
+        );
 
-        storage->node_shader = Shader::create("data/shaders/node.vert",
-                                              "data/shaders/node.frag",
-                                              block_name,
-                                              uniforms, 1,
-                                              storage->uniform_buffer);
+        storage->node_shader = Shader::create(
+            assets::path(assets::NODE_VERTEX_SHADER),
+            assets::path(assets::NODE_FRAGMENT_SHADER),
+            block_name,
+            uniforms, 1,
+            storage->uniform_buffer
+        );
 
-        storage->skybox_shader = Shader::create("data/shaders/cubemap.vert",
-                                                "data/shaders/cubemap.frag");
+        storage->skybox_shader = Shader::create(
+            assets::path(assets::SKYBOX_VERTEX_SHADER),
+            assets::path(assets::SKYBOX_FRAGMENT_SHADER)
+        );
 
-        storage->quad2d_shader = Shader::create("data/shaders/quad2d.vert",
-                                                "data/shaders/quad2d.frag");
+        storage->quad2d_shader = Shader::create(
+            assets::path(assets::QUAD2D_VERTEX_SHADER),
+            assets::path(assets::QUAD2D_FRAGMENT_SHADER)
+        );
 
-        storage->quad3d_shader = Shader::create("data/shaders/quad3d.vert",
-                                                "data/shaders/quad3d.frag");
+        storage->quad3d_shader = Shader::create(
+            assets::path(assets::QUAD3D_VERTEX_SHADER),
+            assets::path(assets::QUAD3D_FRAGMENT_SHADER)
+        );
 
 #ifndef NDEBUG
-        storage->origin_shader = Shader::create("data/shaders/origin.vert",
-                                                "data/shaders/origin.frag",
-                                                block_name,
-                                                uniforms, 1,
-                                                storage->uniform_buffer);
+        storage->origin_shader = Shader::create(
+            assets::path(assets::ORIGIN_VERTEX_SHADER),
+            assets::path(assets::ORIGIN_FRAGMENT_SHADER),
+            block_name,
+            uniforms, 1,
+            storage->uniform_buffer
+        );
 #endif
 
         storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
@@ -151,12 +173,12 @@ namespace renderer {
 
             VertexArray::unbind();
         }
-
-        storage->loading_texture = Texture::create(assets::LOADING_TEXTURE, true);
 #endif
 
+        storage->loading_texture = Texture::create(assets::path(assets::LOADING_TEXTURE), true);
+
 #ifndef NDEBUG
-        storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);
+        storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);  // TODO see what to do with this
 #endif
 
         storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) width, 0.0f, (float) height);
@@ -397,7 +419,7 @@ namespace renderer {
     }
 
     void draw_to_depth(const glm::vec3& position, const glm::vec3& rotation, float scale,
-                       Rc<VertexArray> vertex_array, int index_count) {
+            Rc<VertexArray> vertex_array, int index_count) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);
         matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));

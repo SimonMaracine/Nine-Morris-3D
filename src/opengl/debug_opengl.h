@@ -26,7 +26,7 @@ extern unsigned long long approximately_bytes_allocated_gpu;
 extern bool stop_counting_bytes_allocated_gpu;
 #else
     #define LOG_ALLOCATION(bytes) ((void) 0)
-    #define STOP_ALLOCATION_LOG ((void) 0)
+    #define STOP_ALLOCATION_LOG() ((void) 0)
 #endif
 
 namespace debug_opengl {
