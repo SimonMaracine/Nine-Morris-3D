@@ -1,5 +1,4 @@
 #include <string>
-#include <string.h>
 
 #if defined(__GNUG__)
     #include <pwd.h>

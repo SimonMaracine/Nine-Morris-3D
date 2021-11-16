@@ -9,16 +9,14 @@ namespace assets {
         return std::string(file_path);
 #else
     #if defined(__GNUG__)
-        char full_path[128];
-        full_path[0] = 0;
-        strcat(full_path, "/usr/share/ninemorris3d/");
-        strcat(full_path, file_path);
-        return std::string(full_path);
+        std::string path = "/usr/share/ninemorris3d/";
+        path.append(file_path);
+        return path;
     #elif defined(_MSC_VER)
         // Just use relative path
         return std::string(file_path)
     #else
-         #error "GCC or MSVC must be used (for now)"
+        #error "GCC or MSVC must be used (for now)"
     #endif
 #endif
     }

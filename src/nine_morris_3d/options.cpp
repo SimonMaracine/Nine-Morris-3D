@@ -12,13 +12,30 @@
 using json = nlohmann::json;
 
 namespace options {
-    void load_options_from_file(Options& options) {
-        std::string path = user_data::get_user_data_path() + "/" + OPTIONS_FILE;
+    static std::string path(const char* file) {
+#ifndef NDEBUG
+        // Use relative path for both operating systems
+        return std::string(file);
+#else
+    #if defined(__GNUG__)
+        std::string path = user_data::get_user_data_path() + "/" + file;
+        return path;
+    #elif defined(_MSC_VER)
+        // TODO implement this
+        return std::string("");
+    #else
+        #error "GCC or MSVC must be used (for now)"
+    #endif
+#endif
+    }
 
-        std::ifstream file = std::ifstream(path, std::ios::in);
+    void load_options_from_file(Options& options) {
+        std::string file_path = path(OPTIONS_FILE);
+
+        std::ifstream file = std::ifstream(file_path, std::ios::in);
 
         if (!file.is_open()) {
-            spdlog::error("Could not open options file '{}'", path.c_str());
+            spdlog::error("Could not open options file '{}'", file_path.c_str());
             return;
         }
 
@@ -73,16 +90,16 @@ namespace options {
         options.vsync = vsync;
         options.save_on_exit = save_on_exit;
 
-        SPDLOG_INFO("Loaded options from file '{}'", OPTIONS_FILE);
+        SPDLOG_INFO("Loaded options from file '{}'", file_path.c_str());
     }
 
     void save_options_to_file(const Options& options) {
-        std::string path = user_data::get_user_data_path() + "/" + OPTIONS_FILE;
+        std::string file_path = path(OPTIONS_FILE);
 
-        std::ofstream file = std::ofstream(path.c_str(), std::ios::out | std::ios::trunc);
+        std::ofstream file = std::ofstream(file_path.c_str(), std::ios::out | std::ios::trunc);
 
         if (!file.is_open()) {
-            spdlog::error("Could not open options file '{}' for writing", path.c_str());
+            spdlog::error("Could not open options file '{}' for writing", file_path.c_str());
 
             if (!user_data::user_data_directory_exists()) {
                 spdlog::info("User data folder missing; creating one...");
@@ -106,29 +123,29 @@ namespace options {
         file << std::setw(4) << object;
         file.close();
 
-        SPDLOG_INFO("Saved options to file '{}'", path.c_str());
+        SPDLOG_INFO("Saved options to file '{}'", file_path.c_str());
     }
 
     void create_options_file() {
-        std::string path = user_data::get_user_data_path() + "/" + OPTIONS_FILE;
+        std::string file_path = path(OPTIONS_FILE);
 
-        std::ofstream file = std::ofstream(path.c_str(), std::ios::out);
+        std::ofstream file = std::ofstream(file_path.c_str(), std::ios::out);
 
         if (!file.is_open()) {
-            spdlog::error("Could not open options file '{}' for writing", path.c_str());
+            spdlog::error("Could not open options file '{}' for writing", file_path.c_str());
             return;
         }
 
         file << (
             "{\n"
-                "\"samples\": 2,\n"
-                "\"save_on_exit\": true,\n"
-                "\"vsync\": true\n"
-            "{"
+            "    \"samples\": 2,\n"
+            "    \"save_on_exit\": true,\n"
+            "    \"vsync\": true\n"
+            "}"
         );
 
         file.close();
 
-        SPDLOG_INFO("Created options file '{}'", path.c_str());
+        SPDLOG_INFO("Created options file '{}'", file_path.c_str());
     }
 }
