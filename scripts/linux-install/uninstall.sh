@@ -34,5 +34,5 @@ check_failure "Removed /home/$(logname)/.$APP_NAME"
 if [ "$error" == true ]; then
     echo "Uninstallation not successful. There were errors. Check $HELP."
 else
-    echo "Done. Please send feedback to simonmaracine@gmail.com, if you didn't like the game."
+    echo "Done. Please send feedback to simonmara.dev@gmail.com, if you didn't like the game."
 fi

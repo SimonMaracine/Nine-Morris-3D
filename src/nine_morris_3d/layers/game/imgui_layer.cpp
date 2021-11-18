@@ -199,7 +199,7 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
         ImGui::Separator();
         ImGui::Text("All programming by:");
-        ImGui::Text(u8"Simon Teodor Mărăcine - simonmaracine@gmail.com");
+        ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
 
         if (ImGui::Button("Ok", ImVec2(430, 0))) {
             ImGui::CloseCurrentPopup();
