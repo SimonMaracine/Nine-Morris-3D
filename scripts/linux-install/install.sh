@@ -4,6 +4,7 @@
 
 APP_NAME="ninemorris3d"
 EXECUTABLE_NAME="Nine-Morris-3D"
+HELP="HELP.txt"
 
 EXECUTABLE_DESTINATION_FOLDER="/usr/games"
 DATA_DESTINATION_FOLDER="/usr/share/$APP_NAME"
@@ -11,7 +12,7 @@ SHORTCUT_FOLDER="/usr/share/applications"
 
 function check_failure() {
     if [ $? != 0 ]; then
-        echo "Error. Stop installation. Check HELP.txt."
+        echo "Error. Stop installation. Check $HELP."
         exit 1
     fi
 }
@@ -47,5 +48,9 @@ echo "Created shortcut $SHORTCUT_FOLDER/$APP_NAME.desktop"
 cp $current_dir/uninstall.sh $DATA_DESTINATION_FOLDER/uninstall.sh
 check_failure
 echo "Copied $current_dir/uninstall.sh to $DATA_DESTINATION_FOLDER/uninstall.sh"
+
+cp $current_dir/$HELP $DATA_DESTINATION_FOLDER/$HELP
+check_failure
+echo "Copied $current_dir/$HELP to $DATA_DESTINATION_FOLDER/$HELP"
 
 echo "Done. Have a nice day. :)"

@@ -1,0 +1,12 @@
+To install the game, just open the terminal into the game directory "Nine-Morris-3D-vX.Y.Z"
+and run the install.sh script with sudo.
+
+You can find a copy of this HELP.txt file in /usr/share/ninemorris3d after install.
+
+Make sure that you don't delete any of the files that come in that directory.
+
+If you want to uninstall the game, run uninstall.sh with sudo. If you don't have the uninstall.sh
+script anymore, don't worry, you can find a copy of it in /usr/share/ninemorris3d.
+
+If you have any questions, don't hesitate to send them to "simonmaracine@gmail.com". I answer as
+quickly as possible.
