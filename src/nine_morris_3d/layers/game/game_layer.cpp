@@ -137,7 +137,9 @@ bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 }
 
 bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
-    scene->board.press(scene->hovered_id);
+    if (event.button == MOUSE_BUTTON_LEFT) {
+        scene->board.press(scene->hovered_id);
+    }
 
     return false;
 }
