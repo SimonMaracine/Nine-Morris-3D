@@ -1,4 +1,5 @@
 #include <fstream>
+#include <exception>
 #include <iomanip>
 
 #include <nlohmann/json.hpp>
@@ -30,7 +31,13 @@ namespace options {
     }
 
     void load_options_from_file(Options& options) {
-        std::string file_path = path(OPTIONS_FILE);
+        std::string file_path;
+        try {
+            file_path = path(OPTIONS_FILE);
+        } catch (const std::runtime_error& e) {
+            spdlog::error("{}", e.what());
+            return;
+        }
 
         std::ifstream file = std::ifstream(file_path, std::ios::in);
 
@@ -50,7 +57,7 @@ namespace options {
 
         try {
             object = json::parse(contents.c_str());
-        } catch (json::parse_error& e) {
+        } catch (const json::parse_error& e) {
             spdlog::error("{}", e.what());
             return;
         }
@@ -65,13 +72,13 @@ namespace options {
             samples = object.at("samples").get<int>();
             vsync = object.at("vsync").get<bool>();
             save_on_exit = object.at("save_on_exit").get<bool>();
-        } catch (json::out_of_range& e) {
+        } catch (const json::out_of_range& e) {
             spdlog::error("{}", e.what());
             return;
-        } catch (json::type_error& e) {
+        } catch (const json::type_error& e) {
             spdlog::error("{}", e.what());
             return;
-        } catch (json::exception& e) {
+        } catch (const json::exception& e) {
             spdlog::error("{}", e.what());
             return;
         }
@@ -94,20 +101,40 @@ namespace options {
     }
 
     void save_options_to_file(const Options& options) {
-        std::string file_path = path(OPTIONS_FILE);
+        std::string file_path;
+        try {
+            file_path = path(OPTIONS_FILE);
+        } catch (const std::runtime_error& e) {
+            spdlog::error("{}", e.what());
+            return;
+        }
 
         std::ofstream file = std::ofstream(file_path.c_str(), std::ios::out | std::ios::trunc);
 
         if (!file.is_open()) {
             spdlog::error("Could not open options file '{}' for writing", file_path.c_str());
 
-            if (!user_data::user_data_directory_exists()) {
+            bool user_data_directory;
+
+            try {
+                user_data_directory = user_data::user_data_directory_exists();
+            } catch (const std::runtime_error& e) {
+                spdlog::error("{}", e.what());
+                return;
+            }
+
+            if (!user_data_directory) {
                 spdlog::info("User data folder missing; creating one...");
 
-                if (!user_data::create_user_data_directory()) {
-                    spdlog::error("Could not create user data directory");
-                } else {
-                    create_options_file();
+                try {
+                    if (!user_data::create_user_data_directory()) {
+                        spdlog::error("Could not create user data directory");
+                    } else {
+                        create_options_file();
+                    }
+                } catch (const std::runtime_error& e) {
+                    spdlog::error("{}", e.what());
+                    return;
                 }
             }
 
@@ -127,7 +154,13 @@ namespace options {
     }
 
     void create_options_file() {
-        std::string file_path = path(OPTIONS_FILE);
+        std::string file_path;
+        try {
+            file_path = path(OPTIONS_FILE);
+        } catch (const std::runtime_error& e) {
+            spdlog::error("{}", e.what());
+            return;
+        }
 
         std::ofstream file = std::ofstream(file_path.c_str(), std::ios::out);
 

@@ -1,5 +1,6 @@
 #include <fstream>
 #include <string>
+#include <exception>
 
 #include <spdlog/spdlog.h>
 
@@ -39,7 +40,13 @@ namespace logging {
         const std::string contents = debug_opengl::get_info();
 
         if (target == LogTarget::File) {
-            std::string file_path = path(LOG_FILE);
+            std::string file_path;
+            try {
+                file_path = path(LOG_FILE);
+            } catch (const std::runtime_error& e) {
+                spdlog::error("{}", e.what());
+                return;
+            }
 
             std::ofstream file = std::ofstream(file_path, std::ios::out | std::ios::trunc);
             file << contents.c_str();
