@@ -20,6 +20,8 @@
     });
 
 #define TURN_IS_WHITE_SO(_true, _false) turn == Player::White ? _true : _false
+#define WAIT_FOR_NEXT_MOVE() next_move = false
+#define CAN_MAKE_MOVE() next_move = true
 
 constexpr unsigned int WINDMILLS[16][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
@@ -28,14 +30,16 @@ constexpr unsigned int WINDMILLS[16][3] = {
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-Board::Board(hoverable::Id id) : id(id) {
+Board::Board(hoverable::Id id, std::vector<Board>* board_state_history)
+    : id(id), state_history(board_state_history) {
 
 }
 
 void Board::place_piece(hoverable::Id hovered_id) {
     for (Node& node : nodes) {
         if (node.id == hovered_id && (&node) == hovered_node && node.piece == nullptr) {
-            // TODO remember place
+            remember_state();
+            WAIT_FOR_NEXT_MOVE();
 
             const glm::vec3& position = node.position;
 
@@ -104,9 +108,11 @@ void Board::move_pieces(float dt) {
                 piece->distance_to_travel = glm::vec3(0.0f);
 
                 // Remove piece if set to remove
-                if (piece->pending_remove) {  // TODO something dodgy here
+                if (piece->pending_remove) {
                     piece->active = false;
                 }
+
+                CAN_MAKE_MOVE();
             }
         }
     }
@@ -120,7 +126,8 @@ void Board::take_piece(hoverable::Id hovered_id) {
                         node.piece->type == Piece::Black) {
                     if (!is_windmill_made(&node, Piece::Black) ||
                             number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
-                        // TODO remember take
+                        remember_state();
+                        WAIT_FOR_NEXT_MOVE();
 
                         take_and_raise_piece(node.piece);
                         node.piece = nullptr;
@@ -148,7 +155,8 @@ void Board::take_piece(hoverable::Id hovered_id) {
                         node.piece->type == Piece::White) {
                     if (!is_windmill_made(&node, Piece::White) ||
                             number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
-                        // TODO remember take
+                        remember_state();
+                        WAIT_FOR_NEXT_MOVE();
 
                         take_and_raise_piece(node.piece);
                         node.piece = nullptr;
@@ -179,6 +187,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
     if (phase == Phase::PlacePieces && not_placed_pieces_count() == 0 && !should_take_piece) {
         phase = Phase::MovePieces;
         update_outlines();
+
         SPDLOG_INFO("Phase 2");
     }
 }
@@ -210,7 +219,8 @@ void Board::put_piece(hoverable::Id hovered_id) {
         for (Node& node : nodes) {
             if (node.id == hovered_id && can_go(selected_piece->node, &node)) {
                 assert(node.piece == nullptr);
-                // TODO remember move
+                remember_state();
+                WAIT_FOR_NEXT_MOVE();
 
                 selected_piece->target.x = node.position.x;
                 selected_piece->target.y = PIECE_Y_POSITION;
@@ -285,7 +295,28 @@ void Board::release(hoverable::Id hovered_id) {
 }
 
 void Board::undo() {
-    // TODO this
+    assert(state_history->size() > 0);
+
+    *this = state_history->back();
+
+    // Quickly fix these
+    hovered_node = nullptr;
+    hovered_piece = nullptr;
+    selected_piece = nullptr;
+
+    GET_ACTIVE_PIECES(active_pieces)
+
+    for (Piece* piece : active_pieces) {
+        piece->selected = false;
+    }
+
+    state_history->pop_back();
+
+    SPDLOG_DEBUG("Popped a state and undid move");
+}
+
+unsigned int Board::not_placed_pieces_count() {
+    return not_placed_white_pieces_count + not_placed_black_pieces_count;
 }
 
 Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node) {
@@ -867,6 +898,8 @@ void Board::remember_position_and_check_repetition() {
     repetition_history.ones.push_back(current_position);
 }
 
-unsigned int Board::not_placed_pieces_count() {
-    return not_placed_white_pieces_count + not_placed_black_pieces_count;
+void Board::remember_state() {
+    state_history->push_back(*this);
+
+    SPDLOG_DEBUG("Pushed a new state");
 }

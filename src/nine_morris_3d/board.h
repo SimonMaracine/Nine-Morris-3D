@@ -52,7 +52,7 @@ public:
     };
 
     Board() : id(HOVERABLE_NULL) {}
-    Board(hoverable::Id id);
+    Board(hoverable::Id id, std::vector<Board>* board_state_history);
     ~Board() = default;
 
     void place_piece(hoverable::Id hovered_id);
@@ -63,6 +63,7 @@ public:
     void press(hoverable::Id hovered_id);
     void release(hoverable::Id hovered_id);
     void undo();
+    unsigned int not_placed_pieces_count();
 
     hoverable::Id id;
 
@@ -98,6 +99,9 @@ public:
     ThreefoldRepetitionHistory repetition_history;
 
     BoardPaint paint;
+
+    std::vector<Board>* state_history;
+    bool next_move = true;
 private:
     Piece* place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);
@@ -114,7 +118,5 @@ private:
     bool check_player_blocked(Player player);
     std::array<Piece::Type, 24> get_position();
     void remember_position_and_check_repetition();
-    unsigned int not_placed_pieces_count();
+    void remember_state();
 };
-
-// TODO undo

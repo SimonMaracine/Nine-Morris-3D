@@ -15,8 +15,8 @@
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/board.h"
 
-#define RESET_HOVERING_GUI hovering_gui = false
-#define HOVERING_GUI hovering_gui = true
+#define RESET_HOVERING_GUI() hovering_gui = false
+#define HOVERING_GUI() hovering_gui = true
 
 #define DEFAULT_BROWN ImVec4(0.6f, 0.35f, 0.12f, 1.0f)
 #define DARK_BROWN ImVec4(0.4f, 0.25f, 0.10f, 1.0f)
@@ -78,7 +78,7 @@ void ImGuiLayer::on_update(float dt) {
     ImGui::NewFrame();
 
     bool about = false;
-    RESET_HOVERING_GUI;
+    RESET_HOVERING_GUI();
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
@@ -94,20 +94,21 @@ void ImGuiLayer::on_update(float dt) {
                 //     scene->camera, scene->nodes, scene->pieces));
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
+                scene->board.undo();
                 // systems::undo(scene->registry, scene->board);
 
                 // // auto& state = scene->registry.get<GameStateComponent>(scene->board);
 
-                // if (state.not_placed_pieces_count == 18) {
-                //     can_undo = false;
-                // }
+                if (scene->board.not_placed_pieces_count() == 18) {
+                    can_undo = false;
+                }
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
                 app->running = false;
             }
 
             ImGui::EndMenu();
-            HOVERING_GUI;
+            HOVERING_GUI();
         }
         if (ImGui::BeginMenu("Options")) {
             if (ImGui::MenuItem("VSync", nullptr, &scene->options.vsync)) {
@@ -163,7 +164,7 @@ void ImGuiLayer::on_update(float dt) {
             }
 
             ImGui::EndMenu();
-            HOVERING_GUI;
+            HOVERING_GUI();
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About", nullptr, false)) {
@@ -176,7 +177,7 @@ void ImGuiLayer::on_update(float dt) {
             }
 
             ImGui::EndMenu();
-            HOVERING_GUI;
+            HOVERING_GUI();
         }
 
         ImGui::EndMainMenuBar();
@@ -206,14 +207,14 @@ void ImGuiLayer::on_update(float dt) {
         }
 
         ImGui::EndPopup();
-        HOVERING_GUI;
+        HOVERING_GUI();
         game_layer->active = false;
         gui_layer->active = false;
     }
 
-    // if (scene->board.not_placed_pieces_count() < 18) {
-    //     can_undo = true;
-    // }
+    if (scene->board.not_placed_pieces_count() < 18) {
+        can_undo = true;
+    }
 
     if (scene->board.phase == Board::Phase::GameOver) {
         ImGui::OpenPopup("Game Over");
@@ -259,7 +260,7 @@ void ImGuiLayer::on_update(float dt) {
             }
 
             ImGui::EndPopup();
-            HOVERING_GUI;
+            HOVERING_GUI();
         }
     }
 
@@ -284,6 +285,7 @@ void ImGuiLayer::on_update(float dt) {
     ImGui::Text("Hovered node: %p", scene->board.hovered_node);
     ImGui::Text("Hovered piece: %p", scene->board.hovered_piece);
     ImGui::Text("Selected piece: %p", scene->board.selected_piece);
+    ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
     ImGui::End();
 #endif
 

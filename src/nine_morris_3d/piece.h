@@ -9,7 +9,7 @@
 class Node;
 
 constexpr float PIECE_Y_POSITION = 0.135f;
-constexpr float PIECE_MOVE_SPEED = 1.5f;
+constexpr float PIECE_MOVE_SPEED = 2.6f;
 
 class Piece {
 public:

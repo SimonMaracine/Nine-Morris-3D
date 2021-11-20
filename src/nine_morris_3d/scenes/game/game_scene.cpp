@@ -102,7 +102,7 @@ void GameScene::build_board() {
         app->storage->board_diffuse_texture = Texture::create(app->assets_load->board_texture, true, -2.0f);
     }
 
-    board = Board(app->storage->board_id);
+    board = Board(app->storage->board_id, &board_state_history);
 
     board.scale = 20.0f;
     board.vertex_array = app->storage->board_vertex_array;

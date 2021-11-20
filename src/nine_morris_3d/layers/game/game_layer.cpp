@@ -138,7 +138,9 @@ bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 
 bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
     if (event.button == MOUSE_BUTTON_LEFT) {
-        scene->board.press(scene->hovered_id);
+        if (scene->board.next_move) {
+            scene->board.press(scene->hovered_id);
+        }
     }
 
     return false;
@@ -146,22 +148,24 @@ bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) 
 
 bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
     if (event.button == MOUSE_BUTTON_LEFT) {
-        if (scene->board.phase == Board::Phase::PlacePieces) {
-            if (scene->board.should_take_piece) {
-                scene->board.take_piece(scene->hovered_id);
-            } else {
-                scene->board.place_piece(scene->hovered_id);
+        if (scene->board.next_move) {
+            if (scene->board.phase == Board::Phase::PlacePieces) {
+                if (scene->board.should_take_piece) {
+                    scene->board.take_piece(scene->hovered_id);
+                } else {
+                    scene->board.place_piece(scene->hovered_id);
+                }
+            } else if (scene->board.phase == Board::Phase::MovePieces) {
+                if (scene->board.should_take_piece) {
+                    scene->board.take_piece(scene->hovered_id);
+                } else {
+                    scene->board.select_piece(scene->hovered_id);
+                    scene->board.put_piece(scene->hovered_id);
+                }
             }
-        } else if (scene->board.phase == Board::Phase::MovePieces) {
-            if (scene->board.should_take_piece) {
-                scene->board.take_piece(scene->hovered_id);
-            } else {
-                scene->board.select_piece(scene->hovered_id);
-                scene->board.put_piece(scene->hovered_id);
-            }
-        }
 
-        scene->board.release(scene->hovered_id);
+            scene->board.release(scene->hovered_id);
+        }
     }
 
     return false;
