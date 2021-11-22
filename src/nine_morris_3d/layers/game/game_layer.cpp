@@ -40,12 +40,12 @@ void GameLayer::on_attach() {
     setup_board_paint();
     setup_pieces();
 
-    SPDLOG_DEBUG("Finished initializing game");
+    // It's ok to be called multiple times
     STOP_ALLOCATION_LOG();
 }
 
 void GameLayer::on_detach() {
-    SPDLOG_INFO("Closing game");
+    
 
     options::save_options_to_file(scene->options);
 }

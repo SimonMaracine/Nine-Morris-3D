@@ -11,6 +11,7 @@
 #include "opengl/renderer/buffer.h"
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/buffer_layout.h"
+#include "opengl/renderer/camera.h"
 #include "opengl/debug_opengl.h"
 #include "other/texture_data.h"
 #include "other/assets.h"
@@ -19,6 +20,8 @@
 #include "nine_morris_3d/board.h"
 
 void GameScene::on_enter() {
+    SPDLOG_DEBUG("Enter game scene");
+
     srand(time(nullptr));
 
     build_board();
@@ -51,7 +54,9 @@ void GameScene::on_enter() {
 }
 
 void GameScene::on_exit() {
+    SPDLOG_DEBUG("Exit game scene");
 
+    board_state_history.clear();
 }
 
 Rc<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size, hoverable::Id id) {
@@ -219,11 +224,12 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
 }
 
 void GameScene::build_camera() {
-    camera.pitch = 47.0f;
-    camera.projection_matrix = glm::perspective(glm::radians(FOV),
-            (float) app->data.width / (float) app->data.height, NEAR, FAR);
-    camera.point = glm::vec3(0.0f);
-    camera.distance_to_point = 8.0f;
+    camera = Camera(
+        47.0f,
+        glm::perspective(glm::radians(FOV), (float) app->data.width / (float) app->data.height, NEAR, FAR),
+        glm::vec3(0.0f),
+        8.0f
+    );
 
     SPDLOG_DEBUG("Built camera");
 }

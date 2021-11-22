@@ -83,8 +83,10 @@ void ImGuiLayer::on_update(float dt) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
-                game_layer->restart();
-                can_undo = false;
+                // game_layer->restart();
+                // can_undo = false;
+                app->assets_load = std::make_shared<AssetsLoad>();
+                app->change_scene(1);
             }
             if (ImGui::MenuItem("Load Last", nullptr, false)) {
                 game_layer->load_game();

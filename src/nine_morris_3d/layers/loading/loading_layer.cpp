@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "nine_morris_3d/layers/loading/loading_layer.h"
@@ -6,14 +8,15 @@
 #include "nine_morris_3d/layers/game/gui_layer.h"
 
 void LoadingLayer::on_attach() {
-    loader.start_loading_thread();
+    loader = std::make_unique<Loader>(app->assets_load);
+    loader->start_loading_thread();
 }
 
 void LoadingLayer::on_detach() {
     SPDLOG_INFO("Done loading assets; initializing the rest of the game...");
 
-    if (loader.get_thread().joinable()) {
-        loader.get_thread().detach();
+    if (loader->get_thread().joinable()) {
+        loader->get_thread().detach();
     }
 }
 
@@ -22,7 +25,7 @@ void LoadingLayer::on_bind_layers() {
 }
 
 void LoadingLayer::on_update(float dt) {
-    if (loader.done_loading()) {
+    if (loader->done_loading()) {
         app->change_scene(0);
     }
 }

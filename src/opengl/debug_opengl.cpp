@@ -46,7 +46,7 @@ const char* names[] = {
 };
 
 #ifndef NDEBUG
-unsigned long long approximately_bytes_allocated_gpu = 0;
+unsigned long long bytes_allocated_gpu = 0;
 bool stop_counting_bytes_allocated_gpu = false;
 #endif
 
@@ -135,7 +135,7 @@ namespace debug_opengl {
     }
 #endif
 
-    void maybe_init_debugging() {
+    void maybe_initialize_debugging() {
 #ifndef NDEBUG
         glDebugMessageCallback(error_callback, nullptr);
         glEnable(GL_DEBUG_OUTPUT);

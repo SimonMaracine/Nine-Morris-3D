@@ -45,7 +45,7 @@ public:
     Camera camera;
     Skybox skybox;
     Light light;
-    std::vector<Board> board_state_history;  // TODO this should be cleared on reset
+    std::vector<Board> board_state_history;
 
     hoverable::Id hovered_id = HOVERABLE_NULL;
 };

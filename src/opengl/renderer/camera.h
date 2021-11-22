@@ -9,7 +9,7 @@ constexpr float FAR = 70.0f;
 class Camera {
 public:
     Camera() = default;
-    Camera(const glm::mat4& projection_matrix, const glm::vec3& point, float distance_to_point);
+    Camera(float pitch, const glm::mat4& projection_matrix, const glm::vec3& point, float distance_to_point);
     ~Camera() = default;
 
     void update(float mouse_wheel, float dx, float dy, float dt);

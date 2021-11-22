@@ -1,13 +1,11 @@
 #pragma once
 
+#include <memory>
+
 #include "application/layer.h"
 #include "application/events.h"
 #include "other/loader.h"
 #include "nine_morris_3d/scenes/loading/loading_scene.h"
-
-class GameLayer;
-class ImGuiLayer;
-class GuiLayer;
 
 class LoadingLayer : public Layer {
 public:
@@ -24,7 +22,7 @@ public:
 
     bool on_window_resized(events::WindowResizedEvent& event);
 
-    Loader loader = Loader(app->assets_load);
+    std::unique_ptr<Loader> loader;
 
     LoadingScene* scene;
 };

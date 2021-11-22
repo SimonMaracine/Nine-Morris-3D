@@ -25,7 +25,7 @@ Application::Application(int width, int height, const std::string& title) {
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
 #endif
     input::initialize(window->get_handle());
-    debug_opengl::maybe_init_debugging();
+    debug_opengl::maybe_initialize_debugging();
 
     auto [version_major, version_minor] = debug_opengl::get_version();
     if (!(version_major == 4 && version_minor >= 3)) {
@@ -63,6 +63,8 @@ void Application::run() {
         current_scene->layer_stack[i]->on_attach();
     }
 
+    SPDLOG_INFO("Initialized game");
+
     float dt;
 
     while (running) {
@@ -93,6 +95,8 @@ void Application::run() {
 
         window->update();
     }
+
+    SPDLOG_INFO("Closing game");
 
     for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
         current_scene->layer_stack[i]->on_detach();
