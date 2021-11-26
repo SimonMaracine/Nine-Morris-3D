@@ -28,8 +28,8 @@ check_failure "Removed $DATA_DESTINATION_FOLDER/"
 rm -f $SHORTCUT_FOLDER/$APP_NAME.desktop
 check_failure "Removed $SHORTCUT_FOLDER/$APP_NAME.desktop"
 
-rm -rf /home/$(logname)/.$APP_NAME
-check_failure "Removed /home/$(logname)/.$APP_NAME"
+rm -rf ${HOME}/.$APP_NAME
+check_failure "Removed ${HOME}/.$APP_NAME"
 
 if [ "$error" == true ]; then
     echo "Uninstallation not successful. There were errors. Check $HELP."
