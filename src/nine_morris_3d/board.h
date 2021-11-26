@@ -51,7 +51,7 @@ public:
         TieBetweenBothPlayers
     };
 
-    Board() : id(HOVERABLE_NULL) {}
+    Board() : id(hoverable::null) {}
     Board(hoverable::Id id, std::vector<Board>* board_state_history);
     ~Board() = default;
 

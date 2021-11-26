@@ -323,12 +323,6 @@ void GameLayer::setup_shadows() {
     app->storage->piece_shader->set_uniform_int("u_shadow_map", 1);
 }
 
-void GameLayer::restart() {
-
-
-    SPDLOG_INFO("Restarted game");
-}
-
 void GameLayer::set_scene_framebuffer(int samples) {
     const int width = app->data.width;
     const int height = app->data.height;

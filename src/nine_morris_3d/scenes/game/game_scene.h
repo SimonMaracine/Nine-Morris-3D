@@ -47,5 +47,5 @@ public:
     Light light;
     std::vector<Board> board_state_history;
 
-    hoverable::Id hovered_id = HOVERABLE_NULL;
+    hoverable::Id hovered_id = hoverable::null;
 };

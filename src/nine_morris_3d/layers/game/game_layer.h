@@ -9,9 +9,6 @@
 #include "other/model.h"
 #include "other/loader.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
-#include "nine_morris_3d/options.h"
-
-class ImGuiLayer;
 
 class GameLayer : public Layer {
 public:
@@ -42,8 +39,6 @@ public:
     void render_nodes();
     void render_to_depth();
     void setup_shadows();
-
-    void restart();
 
     void set_scene_framebuffer(int samples);
     // void set_textures_quality(int quality);

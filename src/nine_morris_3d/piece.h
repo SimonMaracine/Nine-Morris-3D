@@ -48,6 +48,7 @@ public:
     Type type;
     bool in_use = false;
     Node* node = nullptr;  // Reference to the node where it sits on
+    hoverable::Id node_id = hoverable::null;
 
     bool show_outline = false;
     bool to_take = false;

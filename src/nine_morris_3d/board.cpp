@@ -45,10 +45,12 @@ void Board::place_piece(hoverable::Id hovered_id) {
 
             if (turn == Player::White) {
                 node.piece = place_new_piece(Piece::White, position.x, position.z, &node);
+                node.piece_id = node.piece->id;
                 white_pieces_count++;
                 not_placed_white_pieces_count--;
             } else {
                 node.piece = place_new_piece(Piece::Black, position.x, position.z, &node);
+                node.piece_id = node.piece->id;
                 black_pieces_count++;
                 not_placed_black_pieces_count--;
             }
@@ -131,6 +133,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
 
                         take_and_raise_piece(node.piece);
                         node.piece = nullptr;
+                        node.piece_id = hoverable::null;
                         should_take_piece = false;
                         set_pieces_to_take(Piece::Black, false);
                         black_pieces_count--;
@@ -160,6 +163,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
 
                         take_and_raise_piece(node.piece);
                         node.piece = nullptr;
+                        node.piece_id = hoverable::null;
                         should_take_piece = false;
                         set_pieces_to_take(Piece::White, false);
                         white_pieces_count--;
@@ -233,9 +237,12 @@ void Board::put_piece(hoverable::Id hovered_id) {
                 // Reset all of these
                 Node* previous_node = selected_piece->node;
                 previous_node->piece = nullptr;
+                previous_node->piece_id = hoverable::null;
                 selected_piece->node = &node;
+                selected_piece->node_id = node.id;
                 selected_piece->selected = false;
                 node.piece = selected_piece;
+                node.piece_id = selected_piece->id;
                 selected_piece = nullptr;
 
                 if (is_windmill_made(&node, TURN_IS_WHITE_SO(Piece::White, Piece::Black))) {
@@ -334,6 +341,7 @@ Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* 
 
             piece->in_use = true;
             piece->node = node;
+            piece->node_id = node->id;
 
             return piece;
         }
@@ -353,6 +361,7 @@ void Board::take_and_raise_piece(Piece* piece) {
     piece->should_move = true;
 
     piece->node = nullptr;
+    piece->node_id = hoverable::null;
     piece->pending_remove = true;
 }
 
@@ -404,14 +413,14 @@ bool Board::is_windmill_made(Node* node, Piece::Type type) {
     for (unsigned int i = 0; i < 16; i++) {
         const unsigned int* mill = WINDMILLS[i];
 
-        Node& node1 = nodes[mill[0]];
-        Node& node2 = nodes[mill[1]];
-        Node& node3 = nodes[mill[2]];
+        const Node& node1 = nodes[mill[0]];
+        const Node& node2 = nodes[mill[1]];
+        const Node& node3 = nodes[mill[2]];
 
         if (node1.piece != nullptr && node2.piece != nullptr && node3.piece != nullptr) {
-            Piece* piece1 = node1.piece;
-            Piece* piece2 = node2.piece;
-            Piece* piece3 = node3.piece;
+            const Piece* piece1 = node1.piece;
+            const Piece* piece2 = node2.piece;
+            const Piece* piece3 = node3.piece;
 
             if (piece1->type == type && piece2->type == type && piece3->type == type) {
                 if (piece1->node == node || piece2->node == node || piece3->node == node) {
@@ -440,9 +449,9 @@ unsigned int Board::number_of_pieces_in_windmills(Piece::Type type) {
     for (unsigned int i = 0; i < 16; i++) {
         const unsigned int* mill = WINDMILLS[i];
 
-        Node& node1 = nodes[mill[0]];
-        Node& node2 = nodes[mill[1]];
-        Node& node3 = nodes[mill[2]];
+        const Node& node1 = nodes[mill[0]];
+        const Node& node2 = nodes[mill[1]];
+        const Node& node3 = nodes[mill[2]];
 
         if (node1.piece != nullptr && node2.piece != nullptr && node3.piece != nullptr) {
             Piece* piece1 = node1.piece;

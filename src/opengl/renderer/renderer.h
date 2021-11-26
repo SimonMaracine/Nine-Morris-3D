@@ -67,9 +67,9 @@ namespace renderer {
 
         glm::mat4 orthographic_projection_matrix;
 
-        hoverable::Id board_id = HOVERABLE_NULL;
-        hoverable::Id pieces_id[18] = { HOVERABLE_NULL };
-        hoverable::Id nodes_id[24] = { HOVERABLE_NULL };
+        hoverable::Id board_id = hoverable::null;
+        hoverable::Id pieces_id[18] = { hoverable::null };
+        hoverable::Id nodes_id[24] = { hoverable::null };
     };
 
     Storage* initialize(int width, int height);

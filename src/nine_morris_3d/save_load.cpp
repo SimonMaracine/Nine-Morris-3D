@@ -2,19 +2,19 @@
 #include <stdio.h>
 
 #include <glm/glm.hpp>
-#include <nlohmann/json.hpp>
 #include <cereal/archives/binary.hpp>
-#include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/array.hpp>
 
-#include "other/logging.h"
 #include "nine_morris_3d/save_load.h"
+#include "nine_morris_3d/board.h"
+#include "nine_morris_3d/piece.h"
+#include "nine_morris_3d/node.h"
+#include "opengl/renderer/camera.h"
+#include "other/logging.h"
 
 #define SAVE_GAME_FILE "last_game.dat"
-#define SAVE_ENTITIES_FILE "last_game_entities.dat"
-
-// using json = nlohmann::json;
+// #define SAVE_ENTITIES_FILE "last_game_entities.dat"
 
 // template<typename Archive>
 // void serialize(Archive& archive, MovesHistoryComponent& moves_history) {
@@ -79,123 +79,139 @@
 //     archive(repetition_history.ones, repetition_history.twos);
 // }
 
-// namespace glm {
-//     template<typename Archive>
-//     void serialize(Archive& archive, vec3& vector) {
-//         archive(vector.x, vector.y, vector.z);
-//     }
+template<typename Archive>
+void serialize(Archive& archive, Board& board) {
+    archive(board.id, board.scale, board.index_count,
+            board.specular_color, board.shininess, board.nodes, board.pieces, board.phase,
+            board.turn, board.ending, board.white_pieces_count, board.black_pieces_count,
+            board.not_placed_white_pieces_count, board.not_placed_black_pieces_count,
+            board.should_take_piece,
+            board.can_jump, board.turns_without_mills, board.repetition_history, board.paint,
+            board.next_move);
+}
 
-//     template<typename Archive>
-//     void serialize(Archive& archive, glm::mat4& matrix) {
-//         archive(matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
-//             matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
-//             matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
-//             matrix[3][0], matrix[3][1], matrix[3][2], matrix[3][3]);
-//     }
-// }
+template<typename Archive>
+void serialize(Archive& archive, BoardPaint& paint) {
+    archive(paint.position, paint.scale, paint.index_count,
+            paint.specular_color, paint.shininess);
+}
 
-// namespace save_load {
-//     static bool file_exists(const std::string& file_path) {
-//         FILE* file = fopen(file_path.c_str(), "r");
-//         if (file) {
-//             fclose(file);
-//             return true;
-//         } else {
-//             return false;
-//         }
-//     }
+template<typename Archive>
+void serialize(Archive& archive, ThreefoldRepetitionHistory& repetition_history) {
+    archive(repetition_history.ones, repetition_history.twos);
+}
 
-//     Entities gather_entities(entt::entity board, entt::entity camera, entt::entity* nodes, entt::entity* pieces) {
-//         Entities entities;
+template<typename Archive>
+void serialize(Archive& archive, Piece& piece) {
+    archive(piece.id, piece.position, piece.rotation, piece.scale, piece.velocity, piece.target,
+            piece.should_move, piece.distance_travelled, piece.distance_to_travel,
+            piece.index_count, piece.specular_color, piece.shininess, piece.select_color,
+            piece.hover_color, piece.type, piece.in_use, piece.node_id, piece.show_outline,
+            piece.to_take, piece.pending_remove, piece.selected, piece.active);
+}
 
-//         entities.board = board;
-//         entities.camera = camera;
-//         for (int i = 0; i < 24; i++) {
-//             entities.nodes[i] = nodes[i];
-//         }
-//         for (int i = 0; i < 18; i++) {
-//             entities.pieces[i] = pieces[i];
-//         }
+template<typename Archive>
+void serialize(Archive& archive, Node& node) {
+    archive(node.id, node.position, node.scale, node.index_count, node.piece_id, node.index);
+}
 
-//         return entities;
-//     }
+template<typename Archive>
+void serialize(Archive& archive, Camera& camera) {
+    archive(camera.position, camera.pitch, camera.yaw, camera.view_matrix, camera.projection_matrix,
+            camera.projection_view_matrix, camera.point, camera.distance_to_point, camera.angle_around_point,
+            camera.x_velocity, camera.y_velocity, camera.zoom_velocity);
+}
 
-//     void reset_entities(const Entities& entities, entt::entity* board, entt::entity* camera, entt::entity* nodes, entt::entity* pieces) {
-//         *board = entities.board;
-//         *camera = entities.camera;
-//         for (int i = 0; i < 24; i++) {
-//             nodes[i] = entities.nodes[i];
-//         }
-//         for (int i = 0; i < 18; i++) {
-//             pieces[i] = entities.pieces[i];
-//         }
-//     }
+namespace glm {
+    template<typename Archive>
+    void serialize(Archive& archive, vec3& vector) {
+        archive(vector.x, vector.y, vector.z);
+    }
 
-//     void save_game(const entt::registry& registry, const Entities& entities) {
-//         {
-//             std::ofstream file = std::ofstream(SAVE_GAME_FILE, std::ios::out | std::ios::binary | std::ios::trunc);
+    template<typename Archive>
+    void serialize(Archive& archive, mat4& matrix) {
+        archive(matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+                matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+                matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
+                matrix[3][0], matrix[3][1], matrix[3][2], matrix[3][3]);
+    }
+}
 
-//             cereal::BinaryOutputArchive output{file};
-//             entt::snapshot{registry}.entities(output).component<MovesHistoryComponent,
-//                 GameStateComponent, NodeComponent, PieceComponent, InactiveTag,
-//                 TransformComponent, CameraComponent>(output);
+namespace save_load {
+    static bool file_exists(const std::string& file_path) {
+        FILE* file = fopen(file_path.c_str(), "r");
+        if (file) {
+            fclose(file);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-//             file.close();
-//         }
+    // Entities gather_entities(entt::entity board, entt::entity camera, entt::entity* nodes, entt::entity* pieces) {
+    //     Entities entities;
 
-//         {
-//             std::ofstream file = std::ofstream(SAVE_ENTITIES_FILE, std::ios::out | std::ios::binary | std::ios::trunc);
+    //     entities.board = board;
+    //     entities.camera = camera;
+    //     for (int i = 0; i < 24; i++) {
+    //         entities.nodes[i] = nodes[i];
+    //     }
+    //     for (int i = 0; i < 18; i++) {
+    //         entities.pieces[i] = pieces[i];
+    //     }
 
-//             cereal::BinaryOutputArchive output{file};
-//             output(entities);
+    //     return entities;
+    // }
 
-//             file.close();
-//         }
+    // void reset_entities(const Entities& entities, entt::entity* board, entt::entity* camera, entt::entity* nodes, entt::entity* pieces) {
+    //     *board = entities.board;
+    //     *camera = entities.camera;
+    //     for (int i = 0; i < 24; i++) {
+    //         nodes[i] = entities.nodes[i];
+    //     }
+    //     for (int i = 0; i < 18; i++) {
+    //         pieces[i] = entities.pieces[i];
+    //     }
+    // }
 
-//         SPDLOG_INFO("Saved game to files '{}' and '{}'", SAVE_GAME_FILE, SAVE_ENTITIES_FILE);
-//     }
+    void save_game(const GameState& game_state) {
+        std::ofstream file = std::ofstream(SAVE_GAME_FILE, std::ios::out | std::ios::binary | std::ios::trunc);
 
-//     void load_game(entt::registry& registry, Entities& entities) {
-//         {
-//             std::ifstream file = std::ifstream(SAVE_GAME_FILE, std::ios::in | std::ios::binary);
+        if (!file.is_open()) {
+            spdlog::error("Could not open the last game file for writing '{}'", SAVE_GAME_FILE);
+            return;
+        }
 
-//             if (!file.is_open()) {
-//                 spdlog::error("Could not open the save game file '{}'", SAVE_GAME_FILE);
-//                 return;
-//             }
+        cereal::BinaryOutputArchive output{file};
+        output(game_state);
 
-//             cereal::BinaryInputArchive input{file};
-//             entt::snapshot_loader{registry}.entities(input).component<MovesHistoryComponent,
-//                 GameStateComponent, NodeComponent, PieceComponent, InactiveTag,
-//                 TransformComponent, CameraComponent>(input).orphans();
+        file.close();
 
-//             file.close();
-//         }
+        SPDLOG_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
+    }
 
-//         {
-//             std::ifstream file = std::ifstream(SAVE_ENTITIES_FILE, std::ios::in | std::ios::binary);
+    void load_game(GameState& game_state) {
+        std::ifstream file = std::ifstream(SAVE_GAME_FILE, std::ios::in | std::ios::binary);
 
-//             if (!file.is_open()) {
-//                 spdlog::error("Could not open the save entities file '{}'", SAVE_ENTITIES_FILE);
-//                 return;
-//             }
+        if (!file.is_open()) {
+            spdlog::error("Could not open the last game file '{}'", SAVE_GAME_FILE);
+            return;
+        }
 
-//             cereal::BinaryInputArchive input{file};
-//             input(entities);
+        cereal::BinaryInputArchive input{file};
+        input(game_state);
 
-//             file.close();
-//         }
+        file.close();
 
-//         SPDLOG_INFO("Loaded game from files '{}' and '{}'", SAVE_GAME_FILE, SAVE_ENTITIES_FILE);
-//     }
+        SPDLOG_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
+    }
 
-//     bool save_files_exist() {
-//         if (file_exists(SAVE_GAME_FILE) && file_exists(SAVE_ENTITIES_FILE)) {
-//             return true;
-//         } else {
-//             SPDLOG_ERROR("Save files are either missing or are inaccessible: '{}', '{}'",
-//                     SAVE_GAME_FILE, SAVE_ENTITIES_FILE);
-//             return false;
-//         }
-//     }
-// }
+    bool save_files_exist() {
+        if (file_exists(SAVE_GAME_FILE)) {
+            return true;
+        } else {
+            SPDLOG_ERROR("Save file is either missing or is inaccessible: '{}'", SAVE_GAME_FILE);
+            return false;
+        }
+    }
+}

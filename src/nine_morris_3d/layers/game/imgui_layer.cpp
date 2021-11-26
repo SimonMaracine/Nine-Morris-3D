@@ -55,6 +55,9 @@ void ImGuiLayer::on_attach() {
 
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
+
+    // This needs to be resetted
+    can_undo = false;
 }
 
 void ImGuiLayer::on_detach() {
@@ -83,23 +86,24 @@ void ImGuiLayer::on_update(float dt) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
-                // game_layer->restart();
-                // can_undo = false;
                 app->assets_load = std::make_shared<AssetsLoad>();
                 app->change_scene(1);
+
+                SPDLOG_INFO("Restarting game");
             }
             if (ImGui::MenuItem("Load Last", nullptr, false)) {
                 game_layer->load_game();
             }
             if (ImGui::MenuItem("Save", nullptr, false)) {
-                // save_load::save_game(scene->registry, save_load::gather_entities(scene->board,  // TODO this
-                //     scene->camera, scene->nodes, scene->pieces));
+                save_load::GameState state;
+                state.board = scene->board;
+                state.camera = scene->camera;
+                state.board_state_history = scene->board_state_history;
+
+                save_load::save_game(state);
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 scene->board.undo();
-                // systems::undo(scene->registry, scene->board);
-
-                // // auto& state = scene->registry.get<GameStateComponent>(scene->board);
 
                 if (scene->board.not_placed_pieces_count() == 18) {
                     can_undo = false;
@@ -280,9 +284,7 @@ void ImGuiLayer::on_update(float dt) {
     ImGui::Text("Turn: %s", scene->board.turn == Board::Player::White ? "white" : "black");
     ImGui::Text("Should take piece: %s", scene->board.should_take_piece ? "true" : "false");
     ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
-    // ImGui::Text("History size (place): %lu", scene->board.moves_history.placed_pieces.size());
-    // ImGui::Text("History size (move): %lu", scene->board.moves_history.moved_pieces.size());
-    // ImGui::Text("History size (take): %lu", scene->board.moves_history.taken_pieces.size());
+    ImGui::Text("History size: %lu", scene->board.state_history->size());
     ImGui::Text("Hovered ID: %d", scene->hovered_id);
     ImGui::Text("Hovered node: %p", scene->board.hovered_node);
     ImGui::Text("Hovered piece: %p", scene->board.hovered_piece);
