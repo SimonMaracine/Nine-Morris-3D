@@ -9,13 +9,13 @@
 
 ## Windows release
 
-### Visual Studio Code
+#### Visual Studio Code
     mkdir build-release  
     cd build-release  
     cmake .. -D CMAKE_BUILD_TYPE=Release -A x64  
     cmake --build . --config Release
 
-### Visual Studio
+#### Visual Studio
     cmake . -D CMAKE_BUILD_TYPE=Release -A x64  
 
 ## Linux debug
@@ -28,12 +28,12 @@
 
 ## Windows debug
 
-### Visual Studio Code
+#### Visual Studio Code
     mkdir build  
     cd scripts  
     Setup.bat  
     Build.bat  
     :: Run.bat
 
-### Visual Studio
+#### Visual Studio
     cmake . -D CMAKE_BUILD_TYPE=Debug -A x64  
