@@ -304,7 +304,7 @@ void Board::release(hoverable::Id hovered_id) {
 void Board::undo() {
     assert(state_history->size() > 0);
 
-    *this = state_history->back();
+    *this = state_history->back();  // TODO whole copy not good
 
     // Quickly fix these
     hovered_node = nullptr;

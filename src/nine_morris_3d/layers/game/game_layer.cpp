@@ -334,6 +334,52 @@ void GameLayer::set_scene_framebuffer(int samples) {
 // }
 
 void GameLayer::load_game() {
+    save_load::GameState state;
+    save_load::load_game(state);
+
+    scene->camera = state.camera;
+
+    scene->board_state_history = state.board_state_history;
+
+    Board& board = scene->board;
+    board.id = state.board.id;
+    board.scale = state.board.scale;
+    board.index_count = state.board.index_count;
+    board.specular_color = state.board.specular_color;
+    board.shininess = state.board.shininess;
+
+    for (unsigned int i = 0; i < 24; i++) {
+        Node& node = scene->board.nodes[i];
+
+        node.id = state.board.nodes[i].id;
+        node.position = state.board.nodes[i].position;
+        node.scale = state.board.nodes[i].scale;
+        node.index_count = state.board.nodes[i].index_count;
+        // TODO piece pointer
+        node.piece_id = state.board.nodes[i].piece_id;
+        node.index = state.board.nodes[i].index;
+    }
+
+    // TODO pieces
+    board.pieces = state.board.pieces;
+
+    board.phase = state.board.phase;
+    board.turn = state.board.turn;
+    board.ending = state.board.ending;
+    board.white_pieces_count = state.board.white_pieces_count;
+    board.black_pieces_count = state.board.black_pieces_count;
+    board.not_placed_white_pieces_count = state.board.not_placed_white_pieces_count;
+    board.not_placed_black_pieces_count = state.board.not_placed_black_pieces_count;
+    board.should_take_piece = state.board.should_take_piece;
+    board.selected_piece = nullptr;
+    board.can_jump = state.board.can_jump;
+    board.turns_without_mills = state.board.turns_without_mills;
+    board.repetition_history = state.board.repetition_history;
+    board.paint = state.board.paint;
+    board.next_move = state.board.next_move;
+    
+
+
 
     SPDLOG_INFO("Loaded game");
 }

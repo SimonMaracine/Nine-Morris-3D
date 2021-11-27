@@ -79,21 +79,26 @@
 //     archive(repetition_history.ones, repetition_history.twos);
 // }
 
+/*
+Unserialized variables:
+    vertex_array, diffuse_texture, hovered_node, hovered_piece, selected_piece, state_history
+*/
 template<typename Archive>
 void serialize(Archive& archive, Board& board) {
-    archive(board.id, board.scale, board.index_count,
-            board.specular_color, board.shininess, board.nodes, board.pieces, board.phase,
-            board.turn, board.ending, board.white_pieces_count, board.black_pieces_count,
-            board.not_placed_white_pieces_count, board.not_placed_black_pieces_count,
-            board.should_take_piece,
-            board.can_jump, board.turns_without_mills, board.repetition_history, board.paint,
-            board.next_move);
+    archive(board.id, board.scale, board.index_count, board.specular_color, board.shininess,
+            board.nodes, board.pieces, board.phase, board.turn, board.ending, board.white_pieces_count,
+            board.black_pieces_count, board.not_placed_white_pieces_count,
+            board.not_placed_black_pieces_count, board.should_take_piece, board.can_jump,
+            board.turns_without_mills, board.repetition_history, board.paint, board.next_move);
 }
 
+/*
+Unserialized variables:
+    vertex_array, diffuse_texture
+*/
 template<typename Archive>
 void serialize(Archive& archive, BoardPaint& paint) {
-    archive(paint.position, paint.scale, paint.index_count,
-            paint.specular_color, paint.shininess);
+    archive(paint.position, paint.scale, paint.index_count, paint.specular_color, paint.shininess);
 }
 
 template<typename Archive>
@@ -101,6 +106,10 @@ void serialize(Archive& archive, ThreefoldRepetitionHistory& repetition_history)
     archive(repetition_history.ones, repetition_history.twos);
 }
 
+/*
+Unserialized variables:
+    vertex_array, diffuse_texture, node
+*/
 template<typename Archive>
 void serialize(Archive& archive, Piece& piece) {
     archive(piece.id, piece.position, piece.rotation, piece.scale, piece.velocity, piece.target,
@@ -110,6 +119,10 @@ void serialize(Archive& archive, Piece& piece) {
             piece.to_take, piece.pending_remove, piece.selected, piece.active);
 }
 
+/*
+Unserialized variables:
+    vertex_array, piece
+*/
 template<typename Archive>
 void serialize(Archive& archive, Node& node) {
     archive(node.id, node.position, node.scale, node.index_count, node.piece_id, node.index);
@@ -118,8 +131,8 @@ void serialize(Archive& archive, Node& node) {
 template<typename Archive>
 void serialize(Archive& archive, Camera& camera) {
     archive(camera.position, camera.pitch, camera.yaw, camera.view_matrix, camera.projection_matrix,
-            camera.projection_view_matrix, camera.point, camera.distance_to_point, camera.angle_around_point,
-            camera.x_velocity, camera.y_velocity, camera.zoom_velocity);
+            camera.projection_view_matrix, camera.point, camera.distance_to_point,
+            camera.angle_around_point, camera.x_velocity, camera.y_velocity, camera.zoom_velocity);
 }
 
 namespace glm {
