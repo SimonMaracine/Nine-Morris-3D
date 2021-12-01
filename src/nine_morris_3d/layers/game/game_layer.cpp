@@ -355,13 +355,46 @@ void GameLayer::load_game() {
         node.position = state.board.nodes[i].position;
         node.scale = state.board.nodes[i].scale;
         node.index_count = state.board.nodes[i].index_count;
-        // TODO piece pointer
         node.piece_id = state.board.nodes[i].piece_id;
+        for (Piece& piece : state.board.pieces) {
+            if (piece.id == node.piece_id) {
+                node.piece = &piece;
+            }
+        }
         node.index = state.board.nodes[i].index;
     }
 
-    // TODO pieces
-    board.pieces = state.board.pieces;
+    for (unsigned int i = 0; i < 18; i++) {
+        Piece& piece = scene->board.pieces[i];
+
+        piece.id = state.board.pieces[i].id;
+        piece.position = state.board.pieces[i].position;
+        piece.rotation = state.board.pieces[i].rotation;
+        piece.scale = state.board.pieces[i].scale;
+        piece.velocity = state.board.pieces[i].velocity;
+        piece.target = state.board.pieces[i].target;
+        piece.should_move = state.board.pieces[i].should_move;
+        piece.distance_travelled = state.board.pieces[i].distance_travelled;
+        piece.distance_to_travel = state.board.pieces[i].distance_to_travel;
+        piece.index_count = state.board.pieces[i].index_count;
+        piece.specular_color = state.board.pieces[i].specular_color;
+        piece.shininess = state.board.pieces[i].shininess;
+        piece.select_color = state.board.pieces[i].select_color;
+        piece.hover_color = state.board.pieces[i].hover_color;
+        piece.type = state.board.pieces[i].type;
+        piece.in_use = state.board.pieces[i].in_use;
+        piece.node_id = state.board.pieces[i].node_id;
+        for (Node& node : board.nodes) {
+            if (node.id == piece.node_id) {
+                piece.node = &node;
+            }
+        }
+        piece.show_outline = state.board.pieces[i].show_outline;
+        piece.to_take = state.board.pieces[i].to_take;
+        piece.pending_remove = false;
+        piece.selected = false;
+        piece.active = state.board.pieces[i].active;
+    }
 
     board.phase = state.board.phase;
     board.turn = state.board.turn;
@@ -375,11 +408,15 @@ void GameLayer::load_game() {
     board.can_jump = state.board.can_jump;
     board.turns_without_mills = state.board.turns_without_mills;
     board.repetition_history = state.board.repetition_history;
-    board.paint = state.board.paint;
-    board.next_move = state.board.next_move;
     
+    board.paint.position = state.board.paint.position;
+    board.paint.scale = state.board.paint.scale;
+    board.paint.index_count = state.board.paint.index_count;
+    board.paint.specular_color = state.board.paint.specular_color;
+    board.paint.shininess = state.board.paint.shininess;
 
-
+    board.next_move = state.board.next_move;
+    board.state_history = &scene->board_state_history;
 
     SPDLOG_INFO("Loaded game");
 }

@@ -31,8 +31,13 @@ constexpr unsigned int WINDMILLS[16][3] = {
 };
 
 Board::Board(hoverable::Id id, std::vector<Board>* board_state_history)
-    : id(id), state_history(board_state_history) {
+        : id(id), state_history(board_state_history) {
 
+}
+
+Board::Board(const Board& other) {  // TODO delete this
+    SPDLOG_DEBUG("Board copy constructor");
+    *this = other;
 }
 
 void Board::place_piece(hoverable::Id hovered_id) {
@@ -319,7 +324,7 @@ void Board::undo() {
 
     state_history->pop_back();
 
-    SPDLOG_DEBUG("Popped a state and undid move");
+    SPDLOG_DEBUG("Popped state and undid move");
 }
 
 unsigned int Board::not_placed_pieces_count() {
@@ -910,5 +915,5 @@ void Board::remember_position_and_check_repetition() {
 void Board::remember_state() {
     state_history->push_back(*this);
 
-    SPDLOG_DEBUG("Pushed a new state");
+    SPDLOG_DEBUG("Pushed new state");
 }

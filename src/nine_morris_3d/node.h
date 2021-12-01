@@ -49,8 +49,8 @@ public:
     Rc<VertexArray> vertex_array;
     int index_count;
 
-    Piece* piece = nullptr;
     hoverable::Id piece_id = hoverable::null;
+    Piece* piece = nullptr;
 
     unsigned int index;  // From 0 to 23, needed for easier coping with these
 };

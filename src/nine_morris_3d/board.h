@@ -53,6 +53,7 @@ public:
 
     Board() : id(hoverable::null) {}
     Board(hoverable::Id id, std::vector<Board>* board_state_history);
+    Board(const Board& other);
     ~Board() = default;
 
     void place_piece(hoverable::Id hovered_id);
