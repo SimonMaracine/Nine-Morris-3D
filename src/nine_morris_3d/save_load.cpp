@@ -14,70 +14,6 @@
 #include "other/logging.h"
 
 #define SAVE_GAME_FILE "last_game.dat"
-// #define SAVE_ENTITIES_FILE "last_game_entities.dat"
-
-// template<typename Archive>
-// void serialize(Archive& archive, MovesHistoryComponent& moves_history) {
-//     archive(moves_history.moves, moves_history.placed_pieces, moves_history.moved_pieces,
-//         moves_history.taken_pieces);
-// }
-
-// template<typename Archive>
-// void serialize(Archive& archive, GameStateComponent& state) {
-//     archive(state.phase, state.turn, state.ending, state.white_pieces_count, state.black_pieces_count,
-//         state.not_placed_pieces_count, state.should_take_piece, state.nodes, state.pressed_node,
-//         state.pressed_piece, state.selected_piece, state.can_jump, state.turns_without_mills,
-//         state.repetition_history);
-// }
-
-// template<typename Archive>
-// void serialize(Archive& archive, NodeComponent& node) {
-//     archive(node.id, node.piece);
-// }
-
-// template<typename Archive>
-// void serialize(Archive& archive, PieceComponent& piece) {
-//     archive(piece.id, piece.type, piece.in_use, piece.node, piece.show_outline, piece.to_take,
-//         piece.pending_remove, piece.selected);
-// }
-
-// template<typename Archive>
-// void serialize(Archive& archive, InactiveTag& inactive_tag) {
-//     archive(inactive_tag.inactive);
-// }
-
-// template<typename Archive>
-// void serialize(Archive& archive, TransformComponent& transform) {
-//     archive(transform.position, transform.rotation, transform.scale);
-// }
-
-// template<typename Archive>
-// void serialize(Archive& archive, CameraComponent& camera) {
-//     archive(camera.point, camera.distance_to_point, camera.angle_around_point);
-// }
-
-// namespace undo {
-//     template<typename Archive>
-//     void serialize(Archive& archive, PlacedPiece& placed_piece) {
-//         archive(placed_piece.state, placed_piece.nodes, placed_piece.pieces, placed_piece.transforms);
-//     }
-
-//     template<typename Archive>
-//     void serialize(Archive& archive, MovedPiece& moved_piece) {
-//         archive(moved_piece.state, moved_piece.nodes, moved_piece.pieces, moved_piece.transforms);
-//     }
-
-//     template<typename Archive>
-//     void serialize(Archive& archive, TakenPiece& taken_piece) {
-//         archive(taken_piece.state, taken_piece.nodes, taken_piece.pieces, taken_piece.removed_piece,
-//             taken_piece.removed_piece_entity, taken_piece.transform);
-//     }
-// }
-
-// template<typename Archive>
-// void serialize(Archive& archive, ThreefoldRepetitionHistory& repetition_history) {
-//     archive(repetition_history.ones, repetition_history.twos);
-// }
 
 /*
 Unserialized variables:
@@ -160,32 +96,6 @@ namespace save_load {
             return false;
         }
     }
-
-    // Entities gather_entities(entt::entity board, entt::entity camera, entt::entity* nodes, entt::entity* pieces) {
-    //     Entities entities;
-
-    //     entities.board = board;
-    //     entities.camera = camera;
-    //     for (int i = 0; i < 24; i++) {
-    //         entities.nodes[i] = nodes[i];
-    //     }
-    //     for (int i = 0; i < 18; i++) {
-    //         entities.pieces[i] = pieces[i];
-    //     }
-
-    //     return entities;
-    // }
-
-    // void reset_entities(const Entities& entities, entt::entity* board, entt::entity* camera, entt::entity* nodes, entt::entity* pieces) {
-    //     *board = entities.board;
-    //     *camera = entities.camera;
-    //     for (int i = 0; i < 24; i++) {
-    //         nodes[i] = entities.nodes[i];
-    //     }
-    //     for (int i = 0; i < 18; i++) {
-    //         pieces[i] = entities.pieces[i];
-    //     }
-    // }
 
     void save_game(const GameState& game_state) {
         std::ofstream file = std::ofstream(SAVE_GAME_FILE, std::ios::out | std::ios::binary | std::ios::trunc);

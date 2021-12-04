@@ -356,6 +356,7 @@ void GameLayer::load_game() {
         node.scale = state.board.nodes[i].scale;
         node.index_count = state.board.nodes[i].index_count;
         node.piece_id = state.board.nodes[i].piece_id;
+        node.piece = nullptr;  // It must be NULL, if the ids don't match
         for (Piece& piece : state.board.pieces) {
             if (piece.id == node.piece_id) {
                 node.piece = &piece;
@@ -384,7 +385,8 @@ void GameLayer::load_game() {
         piece.type = state.board.pieces[i].type;
         piece.in_use = state.board.pieces[i].in_use;
         piece.node_id = state.board.pieces[i].node_id;
-        for (Node& node : board.nodes) {
+        piece.node = nullptr;  // It must be NULL, if the ids don't match
+        for (Node& node : state.board.nodes) {
             if (node.id == piece.node_id) {
                 piece.node = &node;
             }

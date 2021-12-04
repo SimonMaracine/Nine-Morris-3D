@@ -46,7 +46,7 @@ public:
     glm::vec3 hover_color;
 
     Type type;
-    bool in_use = false;
+    bool in_use = false;  // Is on the board
     hoverable::Id node_id = hoverable::null;
     Node* node = nullptr;  // Reference to the node where it sits on
 

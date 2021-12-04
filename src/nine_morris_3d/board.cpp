@@ -133,6 +133,9 @@ void Board::take_piece(hoverable::Id hovered_id) {
                         node.piece->type == Piece::Black) {
                     if (!is_windmill_made(&node, Piece::Black) ||
                             number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
+                        assert(node.piece->active);
+                        assert(node.piece->in_use);
+
                         remember_state();
                         WAIT_FOR_NEXT_MOVE();
 
@@ -146,6 +149,8 @@ void Board::take_piece(hoverable::Id hovered_id) {
                         check_player_number_of_pieces(Player::Black);
                         switch_turn();
                         update_outlines();
+
+                        SPDLOG_DEBUG("Black piece {} taken", hovered_id);
 
                         if (check_player_blocked(turn)) {
                             SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
@@ -163,6 +168,9 @@ void Board::take_piece(hoverable::Id hovered_id) {
                         node.piece->type == Piece::White) {
                     if (!is_windmill_made(&node, Piece::White) ||
                             number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
+                        assert(node.piece->active);
+                        assert(node.piece->in_use);
+
                         remember_state();
                         WAIT_FOR_NEXT_MOVE();
 
@@ -176,6 +184,8 @@ void Board::take_piece(hoverable::Id hovered_id) {
                         check_player_number_of_pieces(Player::Black);
                         switch_turn();
                         update_outlines();
+
+                        SPDLOG_DEBUG("White piece {} taken", hovered_id);
 
                         if (check_player_blocked(turn)) {
                             SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
@@ -309,18 +319,91 @@ void Board::release(hoverable::Id hovered_id) {
 void Board::undo() {
     assert(state_history->size() > 0);
 
-    *this = state_history->back();  // TODO whole copy not good
+    Board& state = state_history->back();
+
+    id = state.id;
+    scale = state.scale;
+    index_count = state.index_count;
+    specular_color = state.specular_color;
+    shininess = state.shininess;
+
+    for (unsigned int i = 0; i < 24; i++) {
+        Node& node = nodes[i];
+
+        node.id = state.nodes[i].id;
+        node.position = state.nodes[i].position;
+        node.scale = state.nodes[i].scale;
+        node.index_count = state.nodes[i].index_count;
+        node.piece_id = state.nodes[i].piece_id;
+        node.piece = nullptr;  // It must be NULL, if the ids don't match
+        for (Piece& piece : pieces) {
+            if (piece.id == node.piece_id) {
+                node.piece = &piece;
+                break;
+            }
+        }
+        node.index = state.nodes[i].index;
+    }
+
+    for (unsigned int i = 0; i < 18; i++) {
+        Piece& piece = pieces[i];
+
+        piece.id = state.pieces[i].id;
+        piece.position = state.pieces[i].position;
+        piece.rotation = state.pieces[i].rotation;
+        piece.scale = state.pieces[i].scale;
+        piece.velocity = state.pieces[i].velocity;
+        piece.target = state.pieces[i].target;
+        piece.should_move = state.pieces[i].should_move;
+        piece.distance_travelled = state.pieces[i].distance_travelled;
+        piece.distance_to_travel = state.pieces[i].distance_to_travel;
+        piece.index_count = state.pieces[i].index_count;
+        piece.specular_color = state.pieces[i].specular_color;
+        piece.shininess = state.pieces[i].shininess;
+        piece.select_color = state.pieces[i].select_color;
+        piece.hover_color = state.pieces[i].hover_color;
+        piece.type = state.pieces[i].type;
+        piece.in_use = state.pieces[i].in_use;
+        piece.node_id = state.pieces[i].node_id;
+        piece.node = nullptr;  // It must be NULL, if the ids don't match
+        for (Node& node : nodes) {
+            if (node.id == piece.node_id) {
+                piece.node = &node;
+                break;
+            }
+        }
+        piece.show_outline = state.pieces[i].show_outline;
+        piece.to_take = state.pieces[i].to_take;
+        piece.pending_remove = false;
+        piece.selected = false;
+        piece.active = state.pieces[i].active;
+    }
+
+    phase = state.phase;
+    turn = state.turn;
+    ending = state.ending;
+    white_pieces_count = state.white_pieces_count;
+    black_pieces_count = state.black_pieces_count;
+    not_placed_white_pieces_count = state.not_placed_white_pieces_count;
+    not_placed_black_pieces_count = state.not_placed_black_pieces_count;
+    should_take_piece = state.should_take_piece;
+    can_jump = state.can_jump;
+    turns_without_mills = state.turns_without_mills;
+    repetition_history = state.repetition_history;
+
+    paint.position = state.paint.position;
+    paint.scale = state.paint.scale;
+    paint.index_count = state.paint.index_count;
+    paint.specular_color = state.paint.specular_color;
+    paint.shininess = state.paint.shininess;
+
+    next_move = state.next_move;
+    state_history = state.state_history;
 
     // Quickly fix these
     hovered_node = nullptr;
     hovered_piece = nullptr;
     selected_piece = nullptr;
-
-    GET_ACTIVE_PIECES(active_pieces)
-
-    for (Piece* piece : active_pieces) {
-        piece->selected = false;
-    }
 
     state_history->pop_back();
 
