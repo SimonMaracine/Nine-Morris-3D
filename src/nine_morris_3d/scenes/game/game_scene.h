@@ -45,7 +45,7 @@ public:
     Camera camera;
     Skybox skybox;
     Light light;
-    std::vector<Board> board_state_history;
+    std::shared_ptr<std::vector<Board>> board_state_history;
 
     hoverable::Id hovered_id = hoverable::null;
 };

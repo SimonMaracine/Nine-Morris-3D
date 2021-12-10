@@ -24,6 +24,8 @@ void GameScene::on_enter() {
 
     srand(time(nullptr));
 
+    board_state_history = std::make_shared<std::vector<Board>>();
+
     build_board();
 
     if (!app->storage->white_piece_diffuse_texture) {
@@ -55,8 +57,6 @@ void GameScene::on_enter() {
 
 void GameScene::on_exit() {
     SPDLOG_DEBUG("Exit game scene");
-
-    board_state_history.clear();
 }
 
 Rc<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size, hoverable::Id id) {
@@ -107,7 +107,7 @@ void GameScene::build_board() {
         app->storage->board_diffuse_texture = Texture::create(app->assets_load->board_texture, true, -2.0f);
     }
 
-    board = Board(app->storage->board_id, &board_state_history);
+    board = Board(app->storage->board_id, board_state_history);
 
     board.scale = 20.0f;
     board.vertex_array = app->storage->board_vertex_array;

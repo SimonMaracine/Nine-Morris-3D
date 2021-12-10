@@ -339,8 +339,6 @@ void GameLayer::load_game() {
 
     scene->camera = state.camera;
 
-    scene->board_state_history = state.board_state_history;
-
     Board& board = scene->board;
     board.id = state.board.id;
     board.scale = state.board.scale;
@@ -349,7 +347,7 @@ void GameLayer::load_game() {
     board.shininess = state.board.shininess;
 
     for (unsigned int i = 0; i < 24; i++) {
-        Node& node = scene->board.nodes[i];
+        Node& node = board.nodes[i];
 
         node.id = state.board.nodes[i].id;
         node.position = state.board.nodes[i].position;
@@ -357,16 +355,16 @@ void GameLayer::load_game() {
         node.index_count = state.board.nodes[i].index_count;
         node.piece_id = state.board.nodes[i].piece_id;
         node.piece = nullptr;  // It must be NULL, if the ids don't match
-        for (Piece& piece : state.board.pieces) {
-            if (piece.id == node.piece_id) {
-                node.piece = &piece;
+        for (unsigned int i = 0; i < 18; i++) {  // Assign correct addresses
+            if (state.board.pieces[i].id == node.piece_id) {
+                node.piece = &board.pieces[i];
             }
         }
         node.index = state.board.nodes[i].index;
     }
 
     for (unsigned int i = 0; i < 18; i++) {
-        Piece& piece = scene->board.pieces[i];
+        Piece& piece = board.pieces[i];
 
         piece.id = state.board.pieces[i].id;
         piece.position = state.board.pieces[i].position;
@@ -386,7 +384,8 @@ void GameLayer::load_game() {
         piece.in_use = state.board.pieces[i].in_use;
         piece.node_id = state.board.pieces[i].node_id;
         piece.node = nullptr;  // It must be NULL, if the ids don't match
-        for (Node& node : state.board.nodes) {
+        // Assign correct addresses; use only board as nodes have already been assigned
+        for (Node& node : board.nodes) {
             if (node.id == piece.node_id) {
                 piece.node = &node;
             }
@@ -417,8 +416,8 @@ void GameLayer::load_game() {
     board.paint.specular_color = state.board.paint.specular_color;
     board.paint.shininess = state.board.paint.shininess;
 
+    board.state_history = state.board.state_history;
     board.next_move = state.board.next_move;
-    board.state_history = &scene->board_state_history;
 
     SPDLOG_INFO("Loaded game");
 }

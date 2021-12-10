@@ -5,6 +5,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/array.hpp>
+#include <cereal/types/memory.hpp>
 
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/board.h"
@@ -17,7 +18,7 @@
 
 /*
 Unserialized variables:
-    vertex_array, diffuse_texture, hovered_node, hovered_piece, selected_piece, state_history
+    vertex_array, diffuse_texture, hovered_node, hovered_piece, selected_piece
 */
 template<typename Archive>
 void serialize(Archive& archive, Board& board) {
@@ -25,7 +26,8 @@ void serialize(Archive& archive, Board& board) {
             board.nodes, board.pieces, board.phase, board.turn, board.ending, board.white_pieces_count,
             board.black_pieces_count, board.not_placed_white_pieces_count,
             board.not_placed_black_pieces_count, board.should_take_piece, board.can_jump,
-            board.turns_without_mills, board.repetition_history, board.paint, board.next_move);
+            board.turns_without_mills, board.repetition_history, board.paint, board.state_history,
+            board.next_move);
 }
 
 /*

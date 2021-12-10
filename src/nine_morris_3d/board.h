@@ -2,6 +2,7 @@
 
 #include <array>
 #include <vector>
+#include <memory>
 
 #include <glm/glm.hpp>
 
@@ -52,8 +53,7 @@ public:
     };
 
     Board() : id(hoverable::null) {}
-    Board(hoverable::Id id, std::vector<Board>* board_state_history);
-    Board(const Board& other);
+    Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history);
     ~Board() = default;
 
     void place_piece(hoverable::Id hovered_id);
@@ -101,7 +101,7 @@ public:
 
     BoardPaint paint;
 
-    std::vector<Board>* state_history;
+    std::shared_ptr<std::vector<Board>> state_history;
     bool next_move = true;
 private:
     Piece* place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node);

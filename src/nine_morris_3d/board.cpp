@@ -30,14 +30,9 @@ constexpr unsigned int WINDMILLS[16][3] = {
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-Board::Board(hoverable::Id id, std::vector<Board>* board_state_history)
+Board::Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history)
         : id(id), state_history(board_state_history) {
 
-}
-
-Board::Board(const Board& other) {  // TODO delete this
-    SPDLOG_DEBUG("Board copy constructor");
-    *this = other;
 }
 
 void Board::place_piece(hoverable::Id hovered_id) {
@@ -126,88 +121,90 @@ void Board::move_pieces(float dt) {
 }
 
 void Board::take_piece(hoverable::Id hovered_id) {
-    for (Node& node : nodes) {
-        if (node.piece != nullptr) {
-            if (turn == Player::White) {
-                if (node.piece->id == hovered_id && hovered_piece->id == hovered_id &&
-                        node.piece->type == Piece::Black) {
-                    if (!is_windmill_made(&node, Piece::Black) ||
-                            number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
-                        assert(node.piece->active);
-                        assert(node.piece->in_use);
+    if (hovered_piece != nullptr) {  // Do anything only if there is a hovered piece
+        for (Node& node : nodes) {
+            if (node.piece != nullptr) {
+                if (turn == Player::White) {
+                    if (node.piece->id == hovered_id && hovered_piece->id == hovered_id &&
+                            node.piece->type == Piece::Black) {
+                        if (!is_windmill_made(&node, Piece::Black) ||
+                                number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
+                            assert(node.piece->active);
+                            assert(node.piece->in_use);
 
-                        remember_state();
-                        WAIT_FOR_NEXT_MOVE();
+                            remember_state();
+                            WAIT_FOR_NEXT_MOVE();
 
-                        take_and_raise_piece(node.piece);
-                        node.piece = nullptr;
-                        node.piece_id = hoverable::null;
-                        should_take_piece = false;
-                        set_pieces_to_take(Piece::Black, false);
-                        black_pieces_count--;
-                        check_player_number_of_pieces(Player::White);
-                        check_player_number_of_pieces(Player::Black);
-                        switch_turn();
-                        update_outlines();
+                            take_and_raise_piece(node.piece);
+                            node.piece = nullptr;
+                            node.piece_id = hoverable::null;
+                            should_take_piece = false;
+                            set_pieces_to_take(Piece::Black, false);
+                            black_pieces_count--;
+                            check_player_number_of_pieces(Player::White);
+                            check_player_number_of_pieces(Player::Black);
+                            switch_turn();
+                            update_outlines();
 
-                        SPDLOG_DEBUG("Black piece {} taken", hovered_id);
+                            SPDLOG_DEBUG("Black piece {} taken", hovered_id);
 
-                        if (check_player_blocked(turn)) {
-                            SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
-                            game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
-                                    TURN_IS_WHITE_SO(Piece::White, Piece::Black));
+                            if (check_player_blocked(turn)) {
+                                SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+                                game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
+                                        TURN_IS_WHITE_SO(Piece::White, Piece::Black));
+                            }
+                        } else {
+                            SPDLOG_DEBUG("Cannot take piece from windmill");
                         }
-                    } else {
-                        SPDLOG_DEBUG("Cannot take piece from windmill");
+
+                        break;
                     }
+                } else {
+                    if (node.piece->id == hovered_id && hovered_piece->id == hovered_id &&
+                            node.piece->type == Piece::White) {
+                        if (!is_windmill_made(&node, Piece::White) ||
+                                number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
+                            assert(node.piece->active);
+                            assert(node.piece->in_use);
 
-                    break;
-                }
-            } else {
-                if (node.piece->id == hovered_id && hovered_piece->id == hovered_id &&
-                        node.piece->type == Piece::White) {
-                    if (!is_windmill_made(&node, Piece::White) ||
-                            number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
-                        assert(node.piece->active);
-                        assert(node.piece->in_use);
+                            remember_state();
+                            WAIT_FOR_NEXT_MOVE();
 
-                        remember_state();
-                        WAIT_FOR_NEXT_MOVE();
+                            take_and_raise_piece(node.piece);
+                            node.piece = nullptr;
+                            node.piece_id = hoverable::null;
+                            should_take_piece = false;
+                            set_pieces_to_take(Piece::White, false);
+                            white_pieces_count--;
+                            check_player_number_of_pieces(Player::White);
+                            check_player_number_of_pieces(Player::Black);
+                            switch_turn();
+                            update_outlines();
 
-                        take_and_raise_piece(node.piece);
-                        node.piece = nullptr;
-                        node.piece_id = hoverable::null;
-                        should_take_piece = false;
-                        set_pieces_to_take(Piece::White, false);
-                        white_pieces_count--;
-                        check_player_number_of_pieces(Player::White);
-                        check_player_number_of_pieces(Player::Black);
-                        switch_turn();
-                        update_outlines();
+                            SPDLOG_DEBUG("White piece {} taken", hovered_id);
 
-                        SPDLOG_DEBUG("White piece {} taken", hovered_id);
-
-                        if (check_player_blocked(turn)) {
-                            SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
-                            game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
-                                    TURN_IS_WHITE_SO(Piece::White, Piece::Black));
+                            if (check_player_blocked(turn)) {
+                                SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+                                game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
+                                        TURN_IS_WHITE_SO(Piece::White, Piece::Black));
+                            }
+                        } else {
+                            SPDLOG_DEBUG("Cannot take piece from windmill");
                         }
-                    } else {
-                        SPDLOG_DEBUG("Cannot take piece from windmill");
-                    }
 
-                    break;
+                        break;
+                    }
                 }
             }
         }
-    }
 
-    // Do this even if it may not be needed
-    if (phase == Phase::PlacePieces && not_placed_pieces_count() == 0 && !should_take_piece) {
-        phase = Phase::MovePieces;
-        update_outlines();
+        // Do this even if it may not be needed
+        if (phase == Phase::PlacePieces && not_placed_pieces_count() == 0 && !should_take_piece) {
+            phase = Phase::MovePieces;
+            update_outlines();
 
-        SPDLOG_INFO("Phase 2");
+            SPDLOG_INFO("Phase 2");
+        }
     }
 }
 
@@ -397,8 +394,8 @@ void Board::undo() {
     paint.specular_color = state.paint.specular_color;
     paint.shininess = state.paint.shininess;
 
-    next_move = state.next_move;
     state_history = state.state_history;
+    next_move = state.next_move;
 
     // Quickly fix these
     hovered_node = nullptr;

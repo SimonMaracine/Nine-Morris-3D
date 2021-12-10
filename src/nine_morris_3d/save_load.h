@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "opengl/renderer/camera.h"
 #include "nine_morris_3d/board.h"
@@ -9,11 +10,10 @@ namespace save_load {
     struct GameState {
         Board board;
         Camera camera;
-        std::vector<Board> board_state_history;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(board, camera, board_state_history);
+            archive(board, camera);
         }
     };
 
