@@ -8,6 +8,10 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
+if(NOT VSCODE)
+    set(VSCODE OFF)
+endif()
+
 set(BUILD_SHARED_LIBS OFF)
 set(INJECT_DEBUG_POSTFIX OFF)  # This doesn't seem to work
 set(CMAKE_DEBUG_POSTFIX "")
@@ -108,16 +112,44 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/json/single_include")
 
 # Add all link directories
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    target_link_directories(${EXECUTABLE_NAME} PUBLIC
-        "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-        "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
-        "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
-elseif(CMAKE_BUILD_TYPE MATCHES Release)
-    target_link_directories(${EXECUTABLE_NAME} PUBLIC
-        "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-        "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
-        "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
+            "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+    elseif(CMAKE_BUILD_TYPE MATCHES Release)
+        target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
+    endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    if(VSCODE MATCHES ON)
+        if(CMAKE_BUILD_TYPE MATCHES Debug)
+            target_link_directories(${EXECUTABLE_NAME} PUBLIC
+                "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+        elseif(CMAKE_BUILD_TYPE MATCHES Release)
+            target_link_directories(${EXECUTABLE_NAME} PUBLIC
+                "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
+        endif()
+    elseif(VSCODE MATCHES OFF)
+        if(CMAKE_BUILD_TYPE MATCHES Debug)
+            target_link_directories(${EXECUTABLE_NAME} PUBLIC
+                "${CMAKE_SOURCE_DIR}/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/extern/glfw/src")
+        elseif(CMAKE_BUILD_TYPE MATCHES Release)
+            target_link_directories(${EXECUTABLE_NAME} PUBLIC
+                "${CMAKE_SOURCE_DIR}/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/extern/glfw/src")
+        endif()
+    endif()
 endif()
 
 # Add all libraries
@@ -157,3 +189,12 @@ elseif(CMAKE_BUILD_TYPE MATCHES Release)
 endif()
 
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
+
+# See what is setting up on Windows
+if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    if(VSCODE MATCHES ON)
+        message("Windows build NOT using Visual Studio")
+    elseif(VSCODE MATCHES OFF)
+        message("Windows build using Visual Studio")
+    endif()
+endif()

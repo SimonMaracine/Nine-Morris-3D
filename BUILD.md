@@ -12,11 +12,11 @@
 #### Visual Studio Code
     mkdir build-release  
     cd build-release  
-    cmake .. -D CMAKE_BUILD_TYPE=Release -A x64  
+    cmake .. -D CMAKE_BUILD_TYPE=Release -D VSCODE=ON -A x64  
     cmake --build . --config Release
 
 #### Visual Studio
-    cmake . -D CMAKE_BUILD_TYPE=Release -A x64  
+    cmake . -D CMAKE_BUILD_TYPE=Release -D VSCODE=OFF -A x64  
 
 ## Linux debug
 
@@ -36,4 +36,4 @@
     :: Run.bat
 
 #### Visual Studio
-    cmake . -D CMAKE_BUILD_TYPE=Debug -A x64  
+    cmake . -D CMAKE_BUILD_TYPE=Debug -D VSCODE=OFF -A x64  
