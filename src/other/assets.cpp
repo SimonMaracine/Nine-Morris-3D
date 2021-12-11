@@ -14,7 +14,7 @@ namespace assets {
         return path;
     #elif defined(_MSC_VER)
         // Just use relative path
-        return std::string(file_path)
+        return std::string(file_path);
     #else
         #error "GCC or MSVC must be used (for now)"
     #endif
