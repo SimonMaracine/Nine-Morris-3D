@@ -18,6 +18,7 @@
 #include "other/logging.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/save_load.h"
 
 void GameScene::on_enter() {
     SPDLOG_DEBUG("Enter game scene");
@@ -57,6 +58,16 @@ void GameScene::on_enter() {
 
 void GameScene::on_exit() {
     SPDLOG_DEBUG("Exit game scene");
+
+    if (options.save_on_exit && !app->running) {
+        board.finalize_pieces_state();
+
+        save_load::GameState state;
+        state.board = board;
+        state.camera = camera;
+
+        save_load::save_game(state);
+    }
 }
 
 Rc<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size, hoverable::Id id) {

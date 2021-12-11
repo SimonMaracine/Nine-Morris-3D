@@ -65,6 +65,7 @@ public:
     void release(hoverable::Id hovered_id);
     void undo();
     unsigned int not_placed_pieces_count();
+    void finalize_pieces_state();
 
     hoverable::Id id;
 
@@ -102,7 +103,7 @@ public:
     BoardPaint paint;
 
     std::shared_ptr<std::vector<Board>> state_history;
-    bool next_move = true;
+    bool next_move = true;  // It is false when any piece is in air and true otherwise
 private:
     Piece* place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);
@@ -120,4 +121,5 @@ private:
     std::array<Piece::Type, 24> get_position();
     void remember_position_and_check_repetition();
     void remember_state();
+    void arrive_at_node(Piece* piece);
 };

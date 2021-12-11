@@ -92,9 +92,13 @@ void ImGuiLayer::on_update(float dt) {
                 SPDLOG_INFO("Restarting game");
             }
             if (ImGui::MenuItem("Load Last", nullptr, false)) {
+                scene->board.finalize_pieces_state();
+
                 game_layer->load_game();
             }
             if (ImGui::MenuItem("Save", nullptr, false)) {
+                scene->board.finalize_pieces_state();
+
                 save_load::GameState state;
                 state.board = scene->board;
                 state.camera = scene->camera;

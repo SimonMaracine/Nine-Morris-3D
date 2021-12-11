@@ -100,21 +100,7 @@ void Board::move_pieces(float dt) {
                 piece->position += velocity;
                 piece->distance_travelled += glm::length(velocity);
             } else {
-                piece->position = piece->target;
-
-                // Reset all these variables
-                piece->should_move = false;
-                piece->velocity = glm::vec3(0.0f);
-                piece->target = glm::vec3(0.0f);
-                piece->distance_travelled = 0.0f;
-                piece->distance_to_travel = glm::vec3(0.0f);
-
-                // Remove piece if set to remove
-                if (piece->pending_remove) {
-                    piece->active = false;
-                }
-
-                CAN_MAKE_MOVE();
+                arrive_at_node(piece);
             }
         }
     }
@@ -409,6 +395,16 @@ void Board::undo() {
 
 unsigned int Board::not_placed_pieces_count() {
     return not_placed_white_pieces_count + not_placed_black_pieces_count;
+}
+
+void Board::finalize_pieces_state() {
+    GET_ACTIVE_PIECES(active_pieces)
+
+    for (Piece* piece : active_pieces) {
+        if (piece->should_move) {
+            arrive_at_node(piece);
+        }
+    }
 }
 
 Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node) {
@@ -996,4 +992,22 @@ void Board::remember_state() {
     state_history->push_back(*this);
 
     SPDLOG_DEBUG("Pushed new state");
+}
+
+void Board::arrive_at_node(Piece* piece) {
+    piece->position = piece->target;
+
+    // Reset all these variables
+    piece->should_move = false;
+    piece->velocity = glm::vec3(0.0f);
+    piece->target = glm::vec3(0.0f);
+    piece->distance_travelled = 0.0f;
+    piece->distance_to_travel = glm::vec3(0.0f);
+
+    // Remove piece if set to remove
+    if (piece->pending_remove) {
+        piece->active = false;
+    }
+
+    CAN_MAKE_MOVE();
 }
