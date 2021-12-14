@@ -27,6 +27,7 @@ public:
 
     bool hovering_gui = false;
     bool can_undo = false;
+    bool show_info = false;
 
     GameScene* scene;
 

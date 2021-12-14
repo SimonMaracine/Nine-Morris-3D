@@ -27,7 +27,7 @@ Application::Application(int width, int height, const std::string& title) {
     input::initialize(window->get_handle());
     debug_opengl::maybe_initialize_debugging();
 
-    auto [version_major, version_minor] = debug_opengl::get_version();
+    auto [version_major, version_minor] = debug_opengl::get_version_numbers();
     if (!(version_major == 4 && version_minor >= 3)) {
         spdlog::critical("Graphics card must support at minimum OpenGL 4.3 (it has {}.{})",
                 version_major, version_minor);

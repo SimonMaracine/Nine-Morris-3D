@@ -5,6 +5,7 @@
 
 #include "application/application.h"
 #include "application/events.h"
+#include "opengl/debug_opengl.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/framebuffer.h"
 #include "other/logging.h"
@@ -171,6 +172,13 @@ void ImGuiLayer::on_update(float dt) {
 
                 ImGui::EndMenu();
             }
+            if (ImGui::MenuItem("Show Info", nullptr, &show_info)) {
+                if (show_info) {
+                    SPDLOG_INFO("Show info");
+                } else {
+                    SPDLOG_INFO("Hide info");
+                }
+            }
 
             ImGui::EndMenu();
             HOVERING_GUI();
@@ -271,6 +279,17 @@ void ImGuiLayer::on_update(float dt) {
             ImGui::EndPopup();
             HOVERING_GUI();
         }
+    }
+
+    if (show_info) {
+        ImGui::Font
+        ImGui::Begin("Info");
+        ImGui::Text("FPS: %f", app->fps);
+        ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
+        ImGui::Text("GLSL: %s", debug_opengl::get_glsl_version());
+        ImGui::Text("Vendor: %s", debug_opengl::get_vendor());
+        ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
+        ImGui::End();
     }
 
 #ifndef NDEBUG

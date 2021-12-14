@@ -141,7 +141,7 @@ namespace debug_opengl {
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION,
-                              0, nullptr, GL_FALSE);
+                0, nullptr, GL_FALSE);
         spdlog::info("OpenGL message callback is set");
 #endif
     }
@@ -254,11 +254,27 @@ namespace debug_opengl {
         return output;
     }
 
-    const std::pair<int, int> get_version() {
+    const std::pair<int, int> get_version_numbers() {
         int major, minor;
         glGetIntegerv(GL_MAJOR_VERSION, &major);
         glGetIntegerv(GL_MINOR_VERSION, &minor);
 
         return std::make_pair(major, minor);
+    }
+
+    const unsigned char* get_opengl_version() {
+        return glGetString(GL_VERSION);
+    }
+
+    const unsigned char* get_glsl_version() {
+        return glGetString(GL_SHADING_LANGUAGE_VERSION);
+    }
+
+    const unsigned char* get_vendor() {
+        return glGetString(GL_VENDOR);
+    }
+
+    const unsigned char* get_renderer() {
+        return glGetString(GL_RENDERER);
     }
 }

@@ -34,5 +34,9 @@ extern bool stop_counting_bytes_allocated_gpu;
 namespace debug_opengl {
     void maybe_initialize_debugging();
     const std::string get_info();
-    const std::pair<int, int> get_version();
+    const std::pair<int, int> get_version_numbers();
+    const unsigned char* get_opengl_version();
+    const unsigned char* get_glsl_version();
+    const unsigned char* get_vendor();
+    const unsigned char* get_renderer();
 }
