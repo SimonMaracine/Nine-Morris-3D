@@ -6,7 +6,8 @@
     #include <unistd.h>
     #include <sys/stat.h>
 #elif defined(_MSC_VER)
-    // TODO Windows API
+    #include <Windows.h>
+    #include <Lmcons.h>
 #else
     #error "GCC or MSVC must be used (for now)"
 #endif
@@ -17,7 +18,7 @@
 
 namespace user_data {
 #if defined(__GNUG__)
-    std::string get_username() {
+    const std::string get_username() {
         uid_t uid = geteuid();
         struct passwd* pw = getpwuid(uid);
 
@@ -28,16 +29,16 @@ namespace user_data {
         return std::string(pw->pw_name);
     }
 
-    std::string get_user_data_path() {
-        std::string username = get_username();
-        std::string path = "/home/" + username + "/" + APP_NAME;
+    const std::string get_user_data_path() {
+        const std::string username = get_username();
+        const std::string path = "/home/" + username + "/" + APP_NAME;
 
         return path;
     }
 
     bool user_data_directory_exists() {
-        std::string username = get_username();
-        std::string path = "/home/" + username + "/" + APP_NAME;
+        const std::string username = get_username();
+        const std::string path = "/home/" + username + "/" + APP_NAME;
 
         struct stat sb;
 
@@ -49,8 +50,8 @@ namespace user_data {
     }
 
     bool create_user_data_directory() {
-        std::string username = get_username();
-        std::string path = "/home/" + username + "/" + APP_NAME;
+        const std::string username = get_username();
+        const std::string path = "/home/" + username + "/" + APP_NAME;
 
         if (mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < 0) {
             return false;
@@ -59,13 +60,19 @@ namespace user_data {
         }
     }
 #elif defined(_MSC_VER)
-    // TODO implement these
+    const std::string get_username() {
+        char username[UNLEN + 1];
+        DWORD whatever = UNLEN + 1;
+        bool success = GetUserName(username, &whatever);
 
-    std::string get_username() {
-        return std::string();
+        if (!success) {
+            throw std::runtime_error("Could not get username");
+        }
+
+        return std::string(username);
     }
 
-    std::string get_user_data_path() {
+    const std::string get_user_data_path() {  // TODO C:\Users\[USERNAME]\AppData\Roaming
         return std::string();
     }
 

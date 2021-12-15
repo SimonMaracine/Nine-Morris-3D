@@ -1,18 +1,24 @@
 [submodule "extern/glfw"]
 	path = extern/glfw
 	url = https://github.com/SimonMaracine/glfw/
+	ignore = dirty
 [submodule "extern/imgui"]
 	path = extern/imgui
 	url = https://github.com/SimonMaracine/imgui
+	ignore = dirty
 [submodule "extern/assimp"]
 	path = extern/assimp
 	url = https://github.com/SimonMaracine/assimp.git
+	ignore = dirty
 [submodule "extern/glm"]
 	path = extern/glm
 	url = https://github.com/SimonMaracine/glm.git
+	ignore = dirty
 [submodule "extern/spdlog"]
 	path = extern/spdlog
 	url = https://github.com/SimonMaracine/spdlog.git
+	ignore = dirty
 [submodule "extern/json"]
 	path = extern/json
 	url = https://github.com/SimonMaracine/json.git
+	ignore = dirty

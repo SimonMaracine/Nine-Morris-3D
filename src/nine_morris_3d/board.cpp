@@ -31,7 +31,7 @@ constexpr unsigned int WINDMILLS[16][3] = {
 };
 
 Board::Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history)
-        : id(id), state_history(board_state_history) {
+    : id(id), state_history(board_state_history) {
 
 }
 
