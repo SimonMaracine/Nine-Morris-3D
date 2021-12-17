@@ -2,6 +2,8 @@
 
 #include "other/assets.h"
 
+#define APP_NAME_LINUX "ninemorris3d"
+
 namespace assets {
     std::string path(const char* file_path) {
 #ifndef NDEBUG
@@ -9,7 +11,7 @@ namespace assets {
         return std::string(file_path);
 #else
     #if defined(__GNUG__)
-        std::string path = "/usr/share/ninemorris3d/";
+        std::string path = "/usr/share/" + APP_NAME_LINUX + "/";
         path.append(file_path);
         return path;
     #elif defined(_MSC_VER)

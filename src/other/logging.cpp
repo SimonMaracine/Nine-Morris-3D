@@ -9,6 +9,7 @@
 #include "other/user_data.h"
 
 #define LOG_FILE "log.txt"
+#define APP_NAME_WINDOWS "NineMorris3D"
 
 /* SPDLOG_TRACE, SPDLOG_DEBUG, SPDLOG_INFO,
 SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
@@ -20,11 +21,11 @@ namespace logging {
         return std::string(file);
 #else
     #if defined(__GNUG__)
-        std::string path = user_data::get_user_data_path() + "/" + file;
+        std::string path = user_data::get_user_data_path() + "/" + file + "/";
         return path;
     #elif defined(_MSC_VER)
-        // TODO implement this
-        return std::string("");
+        std::string path = "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + APP_NAME_WINDOWS + "\\" + LOG_FILE;
+        return path;
     #else
         #error "GCC or MSVC must be used (for now)"
     #endif

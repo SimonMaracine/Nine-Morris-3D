@@ -282,7 +282,6 @@ void ImGuiLayer::on_update(float dt) {
     }
 
     if (show_info) {
-        ImGui::Font
         ImGui::Begin("Info");
         ImGui::Text("FPS: %f", app->fps);
         ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());

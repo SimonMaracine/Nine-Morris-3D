@@ -19,11 +19,11 @@ namespace options {
         return std::string(file);
 #else
     #if defined(__GNUG__)
-        std::string path = user_data::get_user_data_path() + "/" + file;
+        std::string path = user_data::get_user_data_path() + "/" + file + "/";
         return path;
     #elif defined(_MSC_VER)
-        // TODO implement this
-        return std::string("");
+        std::string path = user_data::get_user_data_path() + "\\" + file;
+        return path;
     #else
         #error "GCC or MSVC must be used (for now)"
     #endif
