@@ -17,6 +17,7 @@
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/hoverable.h"
+#include "nine_morris_3d/turn_indicator.h"
 
 class GameScene : public Scene {
 public:
@@ -38,6 +39,7 @@ public:
     void build_camera();
     void build_skybox();
     void build_light();
+    void build_turn_indicator();
 
     options::Options options;
 
@@ -45,6 +47,7 @@ public:
     Camera camera;
     Skybox skybox;
     Light light;
+    TurnIndicator turn_indicator;
     std::shared_ptr<std::vector<Board>> board_state_history;
 
     hoverable::Id hovered_id = hoverable::null;

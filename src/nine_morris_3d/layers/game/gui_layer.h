@@ -24,6 +24,8 @@ public:
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
 
+    void render_turn_indicator();
+
     GameScene* scene;
 
     GameLayer* game_layer;

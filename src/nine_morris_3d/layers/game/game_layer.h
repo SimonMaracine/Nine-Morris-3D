@@ -39,6 +39,7 @@ public:
     void render_nodes();
     void render_to_depth();
     void setup_shadows();
+    void setup_quad2d_projection();
 
     void set_scene_framebuffer(int samples);
     // void set_textures_quality(int quality);

@@ -20,11 +20,11 @@ void GuiLayer::on_bind_layers() {
 }
 
 void GuiLayer::on_update(float dt) {
-    // systems::turn_indicator(scene->registry, app->data.width, app->data.height);
+    scene->turn_indicator.update(app->data.width, app->data.height);
 }
 
 void GuiLayer::on_draw() {
-    // systems::turn_indicator_render(scene->registry, scene->board, app->storage);
+    render_turn_indicator();
 }
 
 void GuiLayer::on_event(events::Event& event) {
@@ -57,4 +57,14 @@ bool GuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event)
 
 bool GuiLayer::on_window_resized(events::WindowResizedEvent& event) {
     return false;
+}
+
+void GuiLayer::render_turn_indicator() {
+    if (scene->board.turn == Board::Player::White) {
+        renderer::draw_quad_2d(scene->turn_indicator.position, scene->turn_indicator.scale,
+                app->storage->white_indicator_texture);
+    } else {
+        renderer::draw_quad_2d(scene->turn_indicator.position, scene->turn_indicator.scale,
+                app->storage->black_indicator_texture);
+    }
 }

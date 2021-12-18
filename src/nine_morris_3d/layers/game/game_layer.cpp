@@ -45,8 +45,6 @@ void GameLayer::on_attach() {
 }
 
 void GameLayer::on_detach() {
-    
-
     options::save_options_to_file(scene->options);
 }
 
@@ -176,6 +174,7 @@ bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
     app->storage->intermediate_framebuffer->resize(event.width, event.height);
     scene->camera.update_projection((float) event.width, (float) event.height);
     app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
+    setup_quad2d_projection();
 
     return false;
 }
@@ -321,6 +320,12 @@ void GameLayer::setup_shadows() {
     app->storage->piece_shader->bind();
     app->storage->piece_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
     app->storage->piece_shader->set_uniform_int("u_shadow_map", 1);
+}
+
+void GameLayer::setup_quad2d_projection() {
+    app->storage->quad2d_shader->bind();
+    app->storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
+            app->storage->orthographic_projection_matrix);
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {

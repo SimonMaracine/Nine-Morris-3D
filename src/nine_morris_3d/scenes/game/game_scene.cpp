@@ -51,6 +51,7 @@ void GameScene::on_enter() {
     build_camera();
     build_skybox();
     build_light();
+    build_turn_indicator();
 
     // Free the memory
     app->assets_load = nullptr;
@@ -283,4 +284,16 @@ void GameScene::build_light() {
     light.specular_color = glm::vec3(1.0f);
 
     SPDLOG_DEBUG("Built light");
+}
+
+void GameScene::build_turn_indicator() {
+    if (!app->storage->white_indicator_texture) {
+        app->storage->white_indicator_texture = Texture::create(app->assets_load->white_indicator_texture, false);
+        app->storage->black_indicator_texture = Texture::create(app->assets_load->black_indicator_texture, false);
+    }
+
+    turn_indicator.position = glm::vec3((float) (app->data.width - 90), (float) (app->data.height - 115), 0.0f);
+    turn_indicator.scale = 1.0f;
+
+    SPDLOG_DEBUG("Built turn indicator");
 }

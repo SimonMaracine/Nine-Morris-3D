@@ -2,7 +2,6 @@
 
 #include <thread>
 #include <atomic>
-#include <unordered_map>
 
 #include "opengl/renderer/renderer.h"
 #include "other/model.h"
