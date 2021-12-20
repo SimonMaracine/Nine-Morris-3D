@@ -23,11 +23,11 @@ public:
     Piece(hoverable::Id id, Type type);
     ~Piece() = default;
 
-    hoverable::Id id;
+    hoverable::Id id = hoverable::null;
 
-    glm::vec3 position;
-    glm::vec3 rotation;
-    float scale;
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
+    float scale = 0.0f;
 
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 target = glm::vec3(0.0f);
@@ -36,16 +36,16 @@ public:
     glm::vec3 distance_to_travel = glm::vec3(0.0f);
 
     Rc<VertexArray> vertex_array;
-    int index_count;
+    int index_count = 0;
     Rc<Texture> diffuse_texture;
 
-    glm::vec3 specular_color;
-    float shininess;
+    glm::vec3 specular_color = glm::vec3(0.0f);
+    float shininess = 0.0f;
 
-    glm::vec3 select_color;
-    glm::vec3 hover_color;
+    glm::vec3 select_color = glm::vec3(0.0f);
+    glm::vec3 hover_color = glm::vec3(0.0f);
 
-    Type type;
+    Type type = Type::None;
     bool in_use = false;  // true, if it is on the board
     hoverable::Id node_id = hoverable::null;
     Node* node = nullptr;  // Reference to the node where it sits on

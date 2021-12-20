@@ -24,5 +24,5 @@ public:
 
     std::unique_ptr<Loader> loader;
 
-    LoadingScene* scene;
+    LoadingScene* scene = nullptr;
 };

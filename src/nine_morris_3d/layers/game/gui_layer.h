@@ -26,7 +26,6 @@ public:
 
     void render_turn_indicator();
 
-    GameScene* scene;
-
-    GameLayer* game_layer;
+    GameScene* scene = nullptr;
+    GameLayer* game_layer = nullptr;
 };

@@ -156,10 +156,10 @@ endif()
 # Add all libraries
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-        spdlog assimp glfw3 X11)
+        spdlog assimp glfw X11)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-        spdlog assimp glfw3)
+        spdlog assimp glfw)
 endif()
 
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC "${CMAKE_DL_LIBS}")

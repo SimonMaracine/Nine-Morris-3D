@@ -8,13 +8,13 @@
 
 namespace model {
     struct VertexP {
-        glm::vec3 position;
+        glm::vec3 position = glm::vec3(0.0f);
     };
 
     struct Vertex {
-        glm::vec3 position;
-        glm::vec2 texture_coordinate;
-        glm::vec3 normal;
+        glm::vec3 position = glm::vec3(0.0f);
+        glm::vec2 texture_coordinate = glm::vec2(0.0f);
+        glm::vec3 normal = glm::vec3(0.0f);
     };
 
     template<typename V>

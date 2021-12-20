@@ -39,6 +39,7 @@ void GameLayer::on_attach() {
     setup_board();
     setup_board_paint();
     setup_pieces();
+    setup_quad2d_projection();
 
     // It's ok to be called multiple times
     STOP_ALLOCATION_LOG();

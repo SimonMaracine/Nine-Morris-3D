@@ -29,8 +29,7 @@ public:
     bool can_undo = false;
     bool show_info = false;
 
-    GameScene* scene;
-
-    GameLayer* game_layer;
-    GuiLayer* gui_layer;
+    GameScene* scene = nullptr;
+    GameLayer* game_layer = nullptr;
+    GuiLayer* gui_layer = nullptr;
 };

@@ -41,16 +41,16 @@ public:
     Node(hoverable::Id id, unsigned int index);
     ~Node() = default;
 
-    hoverable::Id id;
+    hoverable::Id id = hoverable::null;
 
-    glm::vec3 position;
-    float scale;
+    glm::vec3 position = glm::vec3(0.0f);
+    float scale = 0.0f;
 
     Rc<VertexArray> vertex_array;
-    int index_count;
+    int index_count = 0;
 
     hoverable::Id piece_id = hoverable::null;
     Piece* piece = nullptr;
 
-    unsigned int index;  // From 0 to 23, needed for easier coping with these
+    unsigned int index = 0;  // From 0 to 23, needed for easier coping with these
 };

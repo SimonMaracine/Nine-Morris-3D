@@ -9,6 +9,6 @@ public:
 
     void update(int width, int height);
 
-    glm::vec3 position;
-    float scale;
+    glm::vec3 position = glm::vec3(0.0f);
+    float scale = 0.0f;
 };

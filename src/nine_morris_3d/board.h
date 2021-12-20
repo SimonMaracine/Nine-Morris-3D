@@ -20,15 +20,15 @@ struct ThreefoldRepetitionHistory {
 };
 
 struct BoardPaint {
-    glm::vec3 position;
-    float scale;
+    glm::vec3 position = glm::vec3(0.0f);
+    float scale = 0.0f;
 
     Rc<VertexArray> vertex_array;
-    int index_count;
+    int index_count = 0;
     Rc<Texture> diffuse_texture;
 
-    glm::vec3 specular_color;
-    float shininess;
+    glm::vec3 specular_color = glm::vec3(0.0f);
+    float shininess = 0.0f;
 };
 
 class Board {
@@ -67,16 +67,16 @@ public:
     unsigned int not_placed_pieces_count();
     void finalize_pieces_state();
 
-    hoverable::Id id;
+    hoverable::Id id = hoverable::null;
 
-    float scale;
+    float scale = 0.0f;
 
     Rc<VertexArray> vertex_array;
-    int index_count;
+    int index_count = 0;
     Rc<Texture> diffuse_texture;
 
     glm::vec3 specular_color;
-    float shininess;
+    float shininess = 0.0f;
 
     std::array<Node, 24> nodes;
     std::array<Piece, 18> pieces;

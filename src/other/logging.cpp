@@ -40,20 +40,29 @@ namespace logging {
     void log_opengl_and_dependencies_info(LogTarget target) {
         const std::string contents = debug_opengl::get_info();
 
-        if (target == LogTarget::File) {
-            std::string file_path;
-            try {
-                file_path = path(LOG_FILE);
-            } catch (const std::runtime_error& e) {
-                spdlog::error("{}", e.what());
-                return;
-            }
+        switch (target) {
+            case LogTarget::File: {
+                std::string file_path;
+                try {
+                    file_path = path(LOG_FILE);
+                } catch (const std::runtime_error& e) {
+                    spdlog::error("{}", e.what());
+                    break;
+                }
 
-            std::ofstream file = std::ofstream(file_path, std::ios::out | std::ios::trunc);
-            file << contents.c_str();
-            file.close();
-        } else if (target == LogTarget::Console) {
-            spdlog::info("{}", contents.c_str());
+                std::ofstream file = std::ofstream(file_path, std::ios::out | std::ios::trunc);
+                file << contents.c_str();  // TODO check if it is open
+                file.close();
+
+                break;
+            }
+            case LogTarget::Console:
+                spdlog::info("{}", contents.c_str());
+
+                break;
+            case LogTarget::None:
+                // Do nothing
+                break;
         }
     }
 }

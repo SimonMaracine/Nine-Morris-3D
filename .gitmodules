@@ -1,10 +1,10 @@
 [submodule "extern/glfw"]
 	path = extern/glfw
-	url = https://github.com/SimonMaracine/glfw/
+	url = https://github.com/SimonMaracine/glfw.git
 	ignore = dirty
 [submodule "extern/imgui"]
 	path = extern/imgui
-	url = https://github.com/SimonMaracine/imgui
+	url = https://github.com/SimonMaracine/imgui.git
 	ignore = dirty
 [submodule "extern/assimp"]
 	path = extern/assimp

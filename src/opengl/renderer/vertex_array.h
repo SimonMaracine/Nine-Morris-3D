@@ -23,7 +23,7 @@ public:
 private:
     GLuint array;
 
-    // This just to hold a strong reference to the buffers
+    // This is just to hold a strong reference to the buffers
     std::vector<std::shared_ptr<Buffer>> buffers;
     std::shared_ptr<IndexBuffer> index_buffer;
 };

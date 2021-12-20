@@ -51,5 +51,5 @@ public:
     float last_mouse_x = 0.0f;
     float last_mouse_y = 0.0f;
 
-    GameScene* scene;
+    GameScene* scene = nullptr;
 };
