@@ -4,8 +4,9 @@
 
 #include "application/layer.h"
 #include "application/events.h"
-#include "other/loader.h"
+#include "other/texture_data.h"
 #include "nine_morris_3d/scenes/loading/loading_scene.h"
+#include "nine_morris_3d/assets_load.h"
 
 class LoadingLayer : public Layer {
 public:
@@ -22,7 +23,7 @@ public:
 
     bool on_window_resized(events::WindowResizedEvent& event);
 
-    std::unique_ptr<Loader> loader;
+    std::unique_ptr<Loader<AssetsLoad>> loader;
 
     LoadingScene* scene = nullptr;
 };

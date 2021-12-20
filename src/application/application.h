@@ -9,6 +9,7 @@
 #include "application/window.h"
 #include "opengl/renderer/renderer.h"
 #include "other/loader.h"
+#include "nine_morris_3d/assets_load.h"
 
 constexpr int VERSION_MAJOR = 0;
 constexpr int VERSION_MINOR = 1;

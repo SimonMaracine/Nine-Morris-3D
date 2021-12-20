@@ -2,13 +2,16 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "application/events.h"
+#include "opengl/renderer/renderer.h"
+#include "other/loader.h"
 #include "nine_morris_3d/layers/loading/loading_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 
 void LoadingLayer::on_attach() {
-    loader = std::make_unique<Loader>(app->assets_load);
+    loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, load_assets);
     loader->start_loading_thread();
 }
 
