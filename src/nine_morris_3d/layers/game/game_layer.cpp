@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
+#include <string>
 #include <stdlib.h>
 #include <time.h>
 
@@ -335,9 +336,43 @@ void GameLayer::set_scene_framebuffer(int samples) {
     app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
 }
 
-// void GameLayer::set_textures_quality(int quality) {
+void GameLayer::set_textures_quality(std::string quality) {
+    if (quality == "normal") {
+        app->storage->board_diffuse_texture = Texture::create(app->assets_load->board_texture, true, -2.0f);
+        scene->board.diffuse_texture = app->storage->board_diffuse_texture;
 
-// }
+        app->storage->board_paint_diffuse_texture = Texture::create(app->assets_load->board_paint_diffuse_texture, true, -2.0f);
+        scene->board.paint.diffuse_texture = app->storage->board_paint_diffuse_texture;
+
+        app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture, true, -1.5f);
+        app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture, true, -1.5f);
+        for (Piece& piece : scene->board.pieces) {
+            if (piece.type == Piece::Type::White) {
+                piece.diffuse_texture = app->storage->white_piece_diffuse_texture;
+            } else {
+                piece.diffuse_texture = app->storage->black_piece_diffuse_texture;
+            }
+        }
+    } else if (quality == "low") {
+        app->storage->board_diffuse_texture = Texture::create(app->assets_load->board_texture_small, true, -2.0f);
+        scene->board.diffuse_texture = app->storage->board_diffuse_texture;
+
+        app->storage->board_paint_diffuse_texture = Texture::create(app->assets_load->board_paint_diffuse_texture_small, true, -2.0f);
+        scene->board.paint.diffuse_texture = app->storage->board_paint_diffuse_texture;
+
+        app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture_small, true, -1.5f);
+        app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture_small, true, -1.5f);
+        for (Piece& piece : scene->board.pieces) {
+            if (piece.type == Piece::Type::White) {
+                piece.diffuse_texture = app->storage->white_piece_diffuse_texture;
+            } else {
+                piece.diffuse_texture = app->storage->black_piece_diffuse_texture;
+            }
+        }
+    } else {
+        assert(false);
+    }
+}
 
 void GameLayer::load_game() {
     save_load::GameState state;

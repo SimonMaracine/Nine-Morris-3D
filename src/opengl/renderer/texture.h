@@ -26,7 +26,7 @@ public:
 	GLuint get_id() const { return texture; }
 private:
     GLuint texture;
-	int width, height;
+	int width = 0, height = 0;
 };
 
 class Texture3D {

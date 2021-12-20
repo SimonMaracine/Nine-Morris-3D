@@ -17,9 +17,13 @@ struct AssetsLoad {
     Rc<Mesh<Vertex>> white_piece_mesh;
     Rc<Mesh<Vertex>> black_piece_mesh;
     Rc<TextureData> board_texture;
-    Rc<TextureData> board_paint_texture;
+    Rc<TextureData> board_texture_small;
+    Rc<TextureData> board_paint_diffuse_texture;
+    Rc<TextureData> board_paint_diffuse_texture_small;
     Rc<TextureData> white_piece_texture;
+    Rc<TextureData> white_piece_texture_small;
     Rc<TextureData> black_piece_texture;
+    Rc<TextureData> black_piece_texture_small;
     Rc<TextureData> white_indicator_texture;
     Rc<TextureData> black_indicator_texture;
     Rc<TextureData> skybox_px_texture;

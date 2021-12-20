@@ -11,7 +11,6 @@
 #include "opengl/renderer/camera.h"
 #include "opengl/renderer/buffer.h"
 #include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/skybox.h"
 #include "opengl/renderer/light.h"
 #include "other/model.h"
 #include "nine_morris_3d/options.h"
@@ -45,7 +44,6 @@ public:
 
     Board board;
     Camera camera;
-    Skybox skybox;
     Light light;
     TurnIndicator turn_indicator;
     std::shared_ptr<std::vector<Board>> board_state_history;

@@ -28,7 +28,7 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
     zoom += zoom_velocity;
 
     // Limit zoom
-    zoom = std::max(zoom, 5.0f);
+    zoom = std::max(zoom, 0.0f);  // 5.0f
     zoom = std::min(zoom, 30.0f);
 
     if (input::is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)) {

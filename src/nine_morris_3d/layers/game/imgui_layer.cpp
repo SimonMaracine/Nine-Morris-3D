@@ -159,15 +159,18 @@ void ImGuiLayer::on_update(float dt) {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Texture Quality", true)) {
-                if (ImGui::RadioButton("High", &scene->options.texture_quality, 0)) {
-                    // game_layer->set_textures_quality(scene->options.texture_quality);
-
-                    SPDLOG_INFO("Textures set to high quality");
-                }
-                if (ImGui::RadioButton("Normal", &scene->options.texture_quality, 1)) {
-                    // game_layer->set_textures_quality(scene->options.texture_quality);
+                static int quality;
+                if (ImGui::RadioButton("Normal", &quality, 0)) {
+                    scene->options.texture_quality = "normal";
+                    game_layer->set_textures_quality(scene->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to normal quality");
+                }
+                if (ImGui::RadioButton("Low", &quality, 1)) {
+                    scene->options.texture_quality = "low";
+                    game_layer->set_textures_quality(scene->options.texture_quality);
+
+                    SPDLOG_INFO("Textures set to low quality");
                 }
 
                 ImGui::EndMenu();

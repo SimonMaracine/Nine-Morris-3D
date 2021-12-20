@@ -48,7 +48,7 @@ namespace renderer {
 #endif
 
         Rc<Texture> board_diffuse_texture;
-        Rc<Texture> board_paint_texture;
+        Rc<Texture> board_paint_diffuse_texture;
         Rc<Texture> white_piece_diffuse_texture;
         Rc<Texture> black_piece_diffuse_texture;
         Rc<Texture3D> skybox_texture;

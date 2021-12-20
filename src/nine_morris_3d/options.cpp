@@ -1,6 +1,7 @@
 #include <fstream>
 #include <exception>
 #include <iomanip>
+#include <string>
 
 #include <nlohmann/json.hpp>
 
@@ -62,13 +63,13 @@ namespace options {
             return;
         }
 
-        // int texture_quality;
+        std::string texture_quality;
         int samples;
         bool vsync;
         bool save_on_exit;
 
         try {
-            // texture_quality = object.at("texture_quality").get<int>();
+            texture_quality = object.at("texture_quality").get<std::string>();
             samples = object.at("samples").get<int>();
             vsync = object.at("vsync").get<bool>();
             save_on_exit = object.at("save_on_exit").get<bool>();
@@ -83,16 +84,16 @@ namespace options {
             return;
         }
 
-        if (samples < 1 || samples > 4) {
+        if (samples != 1 && samples != 2 && samples != 4) {
             spdlog::error("Options file is wrong: samples");
             return;
         }
-        // if (!(texture_quality == 0 || texture_quality == 1)) {
-        //     spdlog::error("Options file is wrong: texture_quality");
-        //     return;
-        // }
+        if (texture_quality != "normal" && texture_quality != "low") {
+            spdlog::error("Options file is wrong: texture_quality");
+            return;
+        }
 
-        // options.texture_quality = texture_quality;
+        options.texture_quality = texture_quality;
         options.samples = samples;
         options.vsync = vsync;
         options.save_on_exit = save_on_exit;
@@ -142,7 +143,7 @@ namespace options {
         }
 
         json object;
-        // object["texture_quality"] = options.texture_quality;
+        object["texture_quality"] = options.texture_quality;
         object["samples"] = options.samples;
         object["vsync"] = options.vsync;
         object["save_on_exit"] = options.save_on_exit;

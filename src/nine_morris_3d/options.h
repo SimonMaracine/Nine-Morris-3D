@@ -1,8 +1,10 @@
 #pragma once
 
+#include <string>
+
 namespace options {
     struct Options {
-        int texture_quality = 0;
+        std::string texture_quality = "normal";
         int samples = 2;
         bool vsync = true;
         bool save_on_exit = true;

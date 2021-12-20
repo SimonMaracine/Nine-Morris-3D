@@ -33,9 +33,13 @@ void Loader::load() {
     assets_load->white_piece_mesh = load_model(assets::path(assets::WHITE_PIECE_MESH));
     assets_load->black_piece_mesh = load_model(assets::path(assets::BLACK_PIECE_MESH));
     assets_load->board_texture = std::make_shared<TextureData>(assets::path(assets::BOARD_TEXTURE), true);
-    assets_load->board_paint_texture = std::make_shared<TextureData>(assets::path(assets::BOARD_PAINT_TEXTURE), true);
+    assets_load->board_texture_small = std::make_shared<TextureData>(assets::path(assets::BOARD_TEXTURE_SMALL), true);
+    assets_load->board_paint_diffuse_texture = std::make_shared<TextureData>(assets::path(assets::BOARD_PAINT_TEXTURE), true);
+    assets_load->board_paint_diffuse_texture_small = std::make_shared<TextureData>(assets::path(assets::BOARD_PAINT_TEXTURE_SMALL), true);
     assets_load->white_piece_texture = std::make_shared<TextureData>(assets::path(assets::WHITE_PIECE_TEXTURE), true);
+    assets_load->white_piece_texture_small = std::make_shared<TextureData>(assets::path(assets::WHITE_PIECE_TEXTURE_SMALL), true);
     assets_load->black_piece_texture = std::make_shared<TextureData>(assets::path(assets::BLACK_PIECE_TEXTURE), true);
+    assets_load->black_piece_texture_small = std::make_shared<TextureData>(assets::path(assets::BLACK_PIECE_TEXTURE_SMALL), true);
     assets_load->white_indicator_texture = std::make_shared<TextureData>(assets::path(assets::WHITE_INDICATOR_TEXTURE), true);
     assets_load->black_indicator_texture = std::make_shared<TextureData>(assets::path(assets::BLACK_INDICATOR_TEXTURE), true);
     assets_load->skybox_px_texture = std::make_shared<TextureData>(assets::path(assets::SKYBOX_PX_TEXTURE), false);

@@ -11,13 +11,17 @@ namespace assets {
     extern const char* WHITE_PIECE_MESH;
     extern const char* BLACK_PIECE_MESH;
     extern const char* BOARD_TEXTURE;
+    extern const char* BOARD_TEXTURE_SMALL;
     extern const char* BOARD_PAINT_TEXTURE;
+    extern const char* BOARD_PAINT_TEXTURE_SMALL;
     extern const char* WHITE_INDICATOR_TEXTURE;
     extern const char* BLACK_INDICATOR_TEXTURE;
     extern const char* LOADING_TEXTURE;
     extern const char* OPEN_SANS_FONT;
     extern const char* WHITE_PIECE_TEXTURE;
+    extern const char* WHITE_PIECE_TEXTURE_SMALL;
     extern const char* BLACK_PIECE_TEXTURE;
+    extern const char* BLACK_PIECE_TEXTURE_SMALL;
     extern const char* SKYBOX_PX_TEXTURE;
     extern const char* SKYBOX_NX_TEXTURE;
     extern const char* SKYBOX_PY_TEXTURE;

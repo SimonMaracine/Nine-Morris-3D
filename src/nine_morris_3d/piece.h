@@ -56,6 +56,4 @@ public:
     bool selected = false;
 
     bool active = true;  // Not active pieces simply don't exist in the game, only in memory
-
-    // int id;  // TODO maybe not needed 
 };

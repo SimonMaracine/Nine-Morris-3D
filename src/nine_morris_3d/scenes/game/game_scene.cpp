@@ -27,19 +27,19 @@ void GameScene::on_enter() {
 
     board_state_history = std::make_shared<std::vector<Board>>();
 
-    build_board();
+    build_board();  // FIXME
 
-    if (!app->storage->white_piece_diffuse_texture) {
+    if (!app->storage->white_piece_diffuse_texture) {  // FIXME
         app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture, true, -1.5f);
         app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture, true, -1.5f);
     }
 
     for (unsigned int i = 0; i < 9; i++) {
-        build_piece(i, Piece::Type::White, app->assets_load->white_piece_mesh,
+        build_piece(i, Piece::Type::White, app->assets_load->white_piece_mesh,  // FIXME
                 app->storage->white_piece_diffuse_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
     }
     for (unsigned int i = 9; i < 18; i++) {
-        build_piece(i, Piece::Type::Black, app->assets_load->black_piece_mesh,
+        build_piece(i, Piece::Type::Black, app->assets_load->black_piece_mesh,  // FIXME
                 app->storage->black_piece_diffuse_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
@@ -47,14 +47,14 @@ void GameScene::on_enter() {
         build_node(i, NODE_POSITIONS[i]);
     }
 
-    build_board_paint();
+    build_board_paint();  // FIXME
     build_camera();
     build_skybox();
     build_light();
     build_turn_indicator();
 
     // Free the memory
-    app->assets_load = nullptr;
+    // app->assets_load = nullptr;
 }
 
 void GameScene::on_exit() {
@@ -154,15 +154,15 @@ void GameScene::build_board_paint() {
         app->storage->board_paint_vertex_array = vertex_array;
     }
 
-    if (!app->storage->board_paint_texture) {
-        app->storage->board_paint_texture = Texture::create(app->assets_load->board_paint_texture, true, -1.0f);
+    if (!app->storage->board_paint_diffuse_texture) {
+        app->storage->board_paint_diffuse_texture = Texture::create(app->assets_load->board_paint_diffuse_texture, true, -1.0f);
     }
 
     board.paint.position = glm::vec3(0.0f, 0.062f, 0.0f);
     board.paint.scale = 20.0f;
     board.paint.vertex_array = app->storage->board_paint_vertex_array;
     board.paint.index_count = app->assets_load->board_paint_mesh->indices.size();
-    board.paint.diffuse_texture = app->storage->board_paint_texture;
+    board.paint.diffuse_texture = app->storage->board_paint_diffuse_texture;
     board.paint.specular_color = glm::vec3(0.25f);
     board.paint.shininess = 8.0f;
 
