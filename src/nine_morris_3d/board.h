@@ -75,7 +75,7 @@ public:
     int index_count = 0;
     Rc<Texture> diffuse_texture;
 
-    glm::vec3 specular_color;
+    glm::vec3 specular_color = glm::vec3(0.0f);
     float shininess = 0.0f;
 
     std::array<Node, 24> nodes;

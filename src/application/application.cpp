@@ -131,7 +131,7 @@ void Application::push_layer(Layer* layer, Scene* scene) {
 void Application::on_event(events::Event& event) {
     using namespace events;
 
-    Dispatcher dispatcher = Dispatcher(event);
+    Dispatcher dispatcher (event);
     dispatcher.dispatch<WindowClosedEvent>(WindowClosed, BIND(Application::on_window_closed));
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(Application::on_window_resized));
 

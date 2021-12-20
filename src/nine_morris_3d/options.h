@@ -7,7 +7,7 @@ namespace options {
     static constexpr const char* LOW = "low";
 
     struct Options {
-        std::string texture_quality = NORMAL;
+        std::string texture_quality = NORMAL;  // These are default values
         int samples = 2;
         bool vsync = true;
         bool save_on_exit = true;

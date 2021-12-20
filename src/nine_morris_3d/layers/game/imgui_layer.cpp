@@ -162,7 +162,7 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::BeginMenu("Texture Quality", true)) {
                 static int quality = scene->options.texture_quality == options::NORMAL ? 0 : 1;
                 if (ImGui::RadioButton("Normal", &quality, 0)) {
-                    scene->options.texture_quality =options::NORMAL;
+                    scene->options.texture_quality = options::NORMAL;
                     game_layer->set_textures_quality(scene->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to normal quality");
