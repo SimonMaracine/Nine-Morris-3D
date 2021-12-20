@@ -65,7 +65,7 @@ void Application::run() {
 
     SPDLOG_INFO("Initialized game");
 
-    float dt;
+    float dt = 0.0f;
 
     while (running) {
         dt = update_frame_counter();

@@ -34,7 +34,7 @@ public:
     ApplicationData data;
     std::shared_ptr<AssetsLoad> assets_load;
     std::shared_ptr<Window> window;
-    renderer::Storage* storage;
+    renderer::Storage* storage = nullptr;
 private:
     void on_event(events::Event& event);
     float update_frame_counter();
@@ -46,7 +46,7 @@ private:
     Scene* current_scene = nullptr;
 
     bool changed_scene = false;
-    Scene* to_scene;
+    Scene* to_scene = nullptr;
 
     friend class Layer;
 };

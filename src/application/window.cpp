@@ -52,14 +52,14 @@ Window::Window(ApplicationData* data) {
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
         ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
 
-        events::WindowClosedEvent event = events::WindowClosedEvent();
+        events::WindowClosedEvent event;
         data->event_function(event);
     });
 
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
         ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
 
-        events::WindowResizedEvent event = events::WindowResizedEvent(width, height);
+        events::WindowResizedEvent event (width, height);
         data->width = width;
         data->height = height;
         data->event_function(event);
@@ -70,17 +70,17 @@ Window::Window(ApplicationData* data) {
 
         switch (action) {
             case GLFW_PRESS: {
-                events::KeyPressedEvent event = events::KeyPressedEvent(key);
+                events::KeyPressedEvent event (key);
                 data->event_function(event);
                 break;
             }
             case GLFW_RELEASE: {
-                events::KeyReleasedEvent event = events::KeyReleasedEvent(key);
+                events::KeyReleasedEvent event (key);
                 data->event_function(event);
                 break;
             }
             case GLFW_REPEAT: {
-                events::KeyPressedEvent event = events::KeyPressedEvent(key);
+                events::KeyPressedEvent event (key);
                 data->event_function(event);
                 break;
             }
@@ -91,10 +91,10 @@ Window::Window(ApplicationData* data) {
         ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
 
         if (action == GLFW_PRESS) {
-            events::MouseButtonPressedEvent event = events::MouseButtonPressedEvent(button);
+            events::MouseButtonPressedEvent event (button);
             data->event_function(event);
         } else if (action == GLFW_RELEASE) {
-            events::MouseButtonReleasedEvent event = events::MouseButtonReleasedEvent(button);
+            events::MouseButtonReleasedEvent event (button);
             data->event_function(event);
         }
     });
@@ -102,14 +102,14 @@ Window::Window(ApplicationData* data) {
     glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
         ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
 
-        events::MouseScrolledEvent event = events::MouseScrolledEvent((float) yoffset);
+        events::MouseScrolledEvent event ((float) yoffset);
         data->event_function(event);
     });
 
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
         ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
 
-        events::MouseMovedEvent event = events::MouseMovedEvent((float) xpos, (float) ypos);
+        events::MouseMovedEvent event ((float) xpos, (float) ypos);
         data->event_function(event);
     });
 

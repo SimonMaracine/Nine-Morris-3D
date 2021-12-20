@@ -16,5 +16,5 @@ public:
 
     void set_vsync(int interval) const;
 private:
-    GLFWwindow* window;
+    GLFWwindow* window = nullptr;
 };

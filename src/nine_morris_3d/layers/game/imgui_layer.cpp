@@ -325,7 +325,7 @@ void ImGuiLayer::on_draw() {
 void ImGuiLayer::on_event(events::Event& event) {
     using namespace events;
 
-    Dispatcher dispatcher = Dispatcher(event);
+    Dispatcher dispatcher (event);
 
     dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(ImGuiLayer::on_mouse_scrolled));
     dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(ImGuiLayer::on_mouse_moved));

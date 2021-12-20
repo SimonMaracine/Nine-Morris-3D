@@ -14,9 +14,9 @@ public:
     virtual void on_enter() {}
     virtual void on_exit() {}
 protected:
-    Application* app;
+    Application* app = nullptr;
 private:
-    unsigned int id;
+    unsigned int id = 0;
     std::vector<Layer*> layer_stack;
 
     friend class Application;

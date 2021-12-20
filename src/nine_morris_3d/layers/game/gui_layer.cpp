@@ -30,7 +30,7 @@ void GuiLayer::on_draw() {
 void GuiLayer::on_event(events::Event& event) {
     using namespace events;
 
-    Dispatcher dispatcher = Dispatcher(event);
+    Dispatcher dispatcher (event);
 
     dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(GuiLayer::on_mouse_scrolled));
     dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(GuiLayer::on_mouse_moved));

@@ -111,7 +111,7 @@ void GameLayer::on_draw() {
 void GameLayer::on_event(events::Event& event) {
     using namespace events;
 
-    Dispatcher dispatcher = Dispatcher(event);
+    Dispatcher dispatcher (event);
 
     dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(GameLayer::on_mouse_scrolled));
     dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(GameLayer::on_mouse_moved));
@@ -182,7 +182,7 @@ bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
 
 void GameLayer::render_skybox() {
     const glm::mat4& projection_matrix = scene->camera.projection_matrix;
-    const glm::mat4 view_matrix = glm::mat4(glm::mat3(scene->camera.view_matrix));
+    const glm::mat4 view_matrix (glm::mat3(scene->camera.view_matrix));
 
     renderer::draw_skybox(projection_matrix * view_matrix);
 }

@@ -15,7 +15,7 @@
 SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
 
 namespace logging {
-    static std::string path(const char* file) {
+    static std::string path(const char* file) {  // Throws exception
 #ifndef NDEBUG
         // Use relative path for both operating systems
         return std::string(file);
@@ -51,7 +51,13 @@ namespace logging {
                 }
 
                 std::ofstream file = std::ofstream(file_path, std::ios::out | std::ios::trunc);
-                file << contents.c_str();  // TODO check if it is open
+
+                if (!file.is_open()) {
+                    spdlog::error("Could not open file '{}' for writing", file_path.c_str());
+                    break;
+                }
+
+                file << contents.c_str();
                 file.close();
 
                 break;

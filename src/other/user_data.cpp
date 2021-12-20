@@ -30,14 +30,14 @@ namespace user_data {
         return std::string(pw->pw_name);
     }
 
-    const std::string get_user_data_path() {
+    const std::string get_user_data_path() {  // Throws exception
         const std::string username = get_username();
         const std::string path = "/home/" + username + "/" + APP_NAME_LINUX;
 
         return path;
     }
 
-    bool user_data_directory_exists() {
+    bool user_data_directory_exists() {  // Throws exception
         const std::string username = get_username();
         const std::string path = "/home/" + username + "/" + APP_NAME_LINUX;
 
@@ -50,7 +50,7 @@ namespace user_data {
         }
     }
 
-    bool create_user_data_directory() {
+    bool create_user_data_directory() {  // Throws exception
         const std::string username = get_username();
         const std::string path = "/home/" + username + "/" + APP_NAME_LINUX;
 
@@ -73,14 +73,14 @@ namespace user_data {
         return std::string(username);
     }
 
-    const std::string get_user_data_path() {
+    const std::string get_user_data_path() {  // Throws exception
         const std::string username = get_username();
         const std::string path = "C:\\Users\\" + username + "\\AppData\\Roaming\\" + APP_NAME_WINDOWS;
 
         return path;
     }
 
-    bool user_data_directory_exists() {
+    bool user_data_directory_exists() {  // Throws exception
         const std::string username = get_username();
         const std::string path = "C:\\Users\\" + username + "\\AppData\\Roaming\\" + APP_NAME_WINDOWS;
 
@@ -101,7 +101,7 @@ namespace user_data {
         }
     }
 
-    bool create_user_data_directory() {
+    bool create_user_data_directory() {  // Throws exception
         const std::string username = get_username();
         const std::string path = "C:\\Users\\" + username + "\\AppData\\Roaming\\" + APP_NAME_WINDOWS;
 

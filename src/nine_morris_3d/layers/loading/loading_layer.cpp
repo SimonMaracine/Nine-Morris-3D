@@ -40,7 +40,7 @@ void LoadingLayer::on_draw() {
 void LoadingLayer::on_event(events::Event& event) {
     using namespace events;
 
-    Dispatcher dispatcher = Dispatcher(event);
+    Dispatcher dispatcher (event);
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(LoadingLayer::on_window_resized));
 }
 

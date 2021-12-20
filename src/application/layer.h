@@ -35,7 +35,7 @@ protected:
         return nullptr;
     }
 
-    Application* app;
+    Application* app = nullptr;
 private:
-    unsigned int id;
+    unsigned int id = 0;
 };
