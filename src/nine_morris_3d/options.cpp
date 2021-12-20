@@ -88,7 +88,7 @@ namespace options {
             spdlog::error("Options file is wrong: samples");
             return;
         }
-        if (texture_quality != "normal" && texture_quality != "low") {
+        if (texture_quality != NORMAL && texture_quality != LOW) {
             spdlog::error("Options file is wrong: texture_quality");
             return;
         }

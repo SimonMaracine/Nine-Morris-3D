@@ -1,6 +1,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <cassert>
 #include <stdlib.h>
 #include <time.h>
 
@@ -27,19 +28,26 @@ void GameScene::on_enter() {
 
     board_state_history = std::make_shared<std::vector<Board>>();
 
-    build_board();  // FIXME
+    build_board();
 
-    if (!app->storage->white_piece_diffuse_texture) {  // FIXME
-        app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture, true, -1.5f);
-        app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture, true, -1.5f);
+    if (!app->storage->white_piece_diffuse_texture) {
+        if (options.texture_quality == options::NORMAL) {
+            app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture, true, -1.5f);
+            app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture, true, -1.5f);
+        } else if (options.texture_quality == options::LOW) {
+            app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture_small, true, -1.5f);
+            app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture_small, true, -1.5f);
+        } else {
+            assert(false);
+        }
     }
 
     for (unsigned int i = 0; i < 9; i++) {
-        build_piece(i, Piece::Type::White, app->assets_load->white_piece_mesh,  // FIXME
+        build_piece(i, Piece::Type::White, app->assets_load->white_piece_mesh,
                 app->storage->white_piece_diffuse_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
     }
     for (unsigned int i = 9; i < 18; i++) {
-        build_piece(i, Piece::Type::Black, app->assets_load->black_piece_mesh,  // FIXME
+        build_piece(i, Piece::Type::Black, app->assets_load->black_piece_mesh,
                 app->storage->black_piece_diffuse_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
@@ -47,14 +55,14 @@ void GameScene::on_enter() {
         build_node(i, NODE_POSITIONS[i]);
     }
 
-    build_board_paint();  // FIXME
+    build_board_paint();
     build_camera();
     build_skybox();
     build_light();
     build_turn_indicator();
 
     // Free the memory
-    // app->assets_load = nullptr;
+    // app->assets_load = nullptr;  // TODO don't
 }
 
 void GameScene::on_exit() {
@@ -116,7 +124,14 @@ void GameScene::build_board() {
     }
 
     if (!app->storage->board_diffuse_texture) {
-        app->storage->board_diffuse_texture = Texture::create(app->assets_load->board_texture, true, -2.0f);
+        if (options.texture_quality == options::NORMAL) {
+            app->storage->board_diffuse_texture = Texture::create(app->assets_load->board_texture, true, -2.0f);
+        } else if (options.texture_quality == options::LOW) {
+            app->storage->board_diffuse_texture =
+                    Texture::create(app->assets_load->board_texture_small, true, -2.0f);
+        } else {
+            assert(false);
+        }
     }
 
     board = Board(app->storage->board_id, board_state_history);
@@ -155,7 +170,15 @@ void GameScene::build_board_paint() {
     }
 
     if (!app->storage->board_paint_diffuse_texture) {
-        app->storage->board_paint_diffuse_texture = Texture::create(app->assets_load->board_paint_diffuse_texture, true, -1.0f);
+        if (options.texture_quality == options::NORMAL) {
+            app->storage->board_paint_diffuse_texture =
+                    Texture::create(app->assets_load->board_paint_diffuse_texture, true, -1.0f);
+        } else if (options.texture_quality == options::LOW) {
+            app->storage->board_paint_diffuse_texture =
+                    Texture::create(app->assets_load->board_paint_diffuse_texture_small, true, -1.0f);
+        } else {
+            assert(false);
+        }
     }
 
     board.paint.position = glm::vec3(0.0f, 0.062f, 0.0f);
@@ -246,7 +269,7 @@ void GameScene::build_camera() {
     SPDLOG_DEBUG("Built camera");
 }
 
-void GameScene::build_skybox() {  // TODO is a skybox object even needed?
+void GameScene::build_skybox() {
     if (!app->storage->skybox_vertex_array) {
         Rc<Buffer> vertices = Buffer::create(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
 

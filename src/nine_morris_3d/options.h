@@ -3,8 +3,11 @@
 #include <string>
 
 namespace options {
+    static constexpr const char* NORMAL = "normal";
+    static constexpr const char* LOW = "low";
+
     struct Options {
-        std::string texture_quality = "normal";
+        std::string texture_quality = NORMAL;
         int samples = 2;
         bool vsync = true;
         bool save_on_exit = true;
