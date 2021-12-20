@@ -100,10 +100,10 @@ namespace save_load {
     }
 
     void save_game(const GameState& game_state) {
-        std::ofstream file = std::ofstream(SAVE_GAME_FILE, std::ios::out | std::ios::binary | std::ios::trunc);
+        std::ofstream file (SAVE_GAME_FILE, std::ios::out | std::ios::binary | std::ios::trunc);
 
         if (!file.is_open()) {
-            spdlog::error("Could not open the last game file for writing '{}'", SAVE_GAME_FILE);
+            spdlog::error("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
             return;
         }
 
@@ -116,7 +116,7 @@ namespace save_load {
     }
 
     void load_game(GameState& game_state) {
-        std::ifstream file = std::ifstream(SAVE_GAME_FILE, std::ios::in | std::ios::binary);
+        std::ifstream file (SAVE_GAME_FILE, std::ios::in | std::ios::binary);
 
         if (!file.is_open()) {
             spdlog::error("Could not open the last game file '{}'", SAVE_GAME_FILE);

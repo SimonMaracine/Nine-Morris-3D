@@ -13,7 +13,7 @@
 using json = nlohmann::json;
 
 namespace options {
-    static std::string path(const char* file) {
+    static std::string path(const char* file) {  // Throws exception
 #ifndef NDEBUG
         // Use relative path for both operating systems
         return std::string(file);
@@ -39,7 +39,7 @@ namespace options {
             return;
         }
 
-        std::ifstream file = std::ifstream(file_path, std::ios::in);
+        std::ifstream file (file_path, std::ios::in);
 
         if (!file.is_open()) {
             spdlog::error("Could not open options file '{}'", file_path.c_str());
@@ -109,7 +109,7 @@ namespace options {
             return;
         }
 
-        std::ofstream file = std::ofstream(file_path.c_str(), std::ios::out | std::ios::trunc);
+        std::ofstream file (file_path.c_str(), std::ios::out | std::ios::trunc);
 
         if (!file.is_open()) {
             spdlog::error("Could not open options file '{}' for writing", file_path.c_str());
@@ -162,7 +162,7 @@ namespace options {
             return;
         }
 
-        std::ofstream file = std::ofstream(file_path.c_str(), std::ios::out);
+        std::ofstream file (file_path.c_str(), std::ios::out);
 
         if (!file.is_open()) {
             spdlog::error("Could not open options file '{}' for writing", file_path.c_str());

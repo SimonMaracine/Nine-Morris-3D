@@ -50,7 +50,7 @@ namespace logging {
                     break;
                 }
 
-                std::ofstream file = std::ofstream(file_path, std::ios::out | std::ios::trunc);
+                std::ofstream file (file_path, std::ios::out | std::ios::trunc);
 
                 if (!file.is_open()) {
                     spdlog::error("Could not open file '{}' for writing", file_path.c_str());
