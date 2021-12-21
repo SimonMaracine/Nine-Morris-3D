@@ -1,4 +1,5 @@
 #include <memory>
+#include <cassert>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -9,9 +10,17 @@
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
+#include "nine_morris_3d/options.h"
 
 void LoadingLayer::on_attach() {
-    loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, load_assets);
+    if (scene->options.texture_quality == options::NORMAL) {
+        loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::load_assets);    
+    } else if (scene->options.texture_quality == options::LOW) {
+        loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::load_assets_low_tex);
+    } else {
+        assert(false);
+    }
+
     loader->start_loading_thread();
 }
 

@@ -30,4 +30,7 @@ struct AssetsLoad {
     Rc<TextureData> skybox_nz_texture;
 };
 
-void load_assets(Loader<AssetsLoad>* loader);
+namespace assets_load {
+    void load_assets(Loader<AssetsLoad>* loader);
+    void load_assets_low_tex(Loader<AssetsLoad>* loader);
+}

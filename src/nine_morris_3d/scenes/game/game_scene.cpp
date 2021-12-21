@@ -20,9 +20,12 @@
 #include "nine_morris_3d/scenes/game/game_scene.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/save_load.h"
+#include "nine_morris_3d/options.h"
 
 void GameScene::on_enter() {
     SPDLOG_DEBUG("Enter game scene");
+
+    options::load_options_from_file(options);
 
     srand(time(nullptr));
 

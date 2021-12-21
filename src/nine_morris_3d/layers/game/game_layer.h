@@ -44,7 +44,7 @@ public:
     void setup_quad2d_projection();
 
     void set_scene_framebuffer(int samples);
-    void set_textures_quality(std::string quality);
+    void set_textures_quality(const std::string& quality);
     void load_game();
 
     float mouse_wheel = 0.0f;

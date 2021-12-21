@@ -30,7 +30,6 @@
 #include "nine_morris_3d/save_load.h"
 
 void GameLayer::on_attach() {
-    options::load_options_from_file(scene->options);
     app->window->set_vsync(scene->options.vsync);
 
     app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
@@ -336,7 +335,7 @@ void GameLayer::set_scene_framebuffer(int samples) {
     app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
 }
 
-void GameLayer::set_textures_quality(std::string quality) {
+void GameLayer::set_textures_quality(const std::string& quality) {  // FIXME this has to load and unload accordingly
     if (quality == "normal") {
         app->storage->board_diffuse_texture = Texture::create(app->assets_load->board_texture, true, -2.0f);
         scene->board.diffuse_texture = app->storage->board_diffuse_texture;
