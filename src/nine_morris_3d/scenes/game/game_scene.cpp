@@ -33,13 +33,13 @@ void GameScene::on_enter() {
 
     build_board();
 
-    if (!app->storage->white_piece_diffuse_texture) {
+    if (!app->storage->white_piece_diff_texture) {
         if (options.texture_quality == options::NORMAL) {
-            app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture, true, -1.5f);
-            app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture, true, -1.5f);
+            app->storage->white_piece_diff_texture = Texture::create(app->assets_load->white_piece_diff_texture, true, -1.5f);
+            app->storage->black_piece_diff_texture = Texture::create(app->assets_load->black_piece_diff_texture, true, -1.5f);
         } else if (options.texture_quality == options::LOW) {
-            app->storage->white_piece_diffuse_texture = Texture::create(app->assets_load->white_piece_texture_small, true, -1.5f);
-            app->storage->black_piece_diffuse_texture = Texture::create(app->assets_load->black_piece_texture_small, true, -1.5f);
+            app->storage->white_piece_diff_texture = Texture::create(app->assets_load->white_piece_diff_texture_small, true, -1.5f);
+            app->storage->black_piece_diff_texture = Texture::create(app->assets_load->black_piece_diff_texture_small, true, -1.5f);
         } else {
             assert(false);
         }
@@ -47,11 +47,11 @@ void GameScene::on_enter() {
 
     for (unsigned int i = 0; i < 9; i++) {
         build_piece(i, Piece::Type::White, app->assets_load->white_piece_mesh,
-                app->storage->white_piece_diffuse_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
+                app->storage->white_piece_diff_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
     }
     for (unsigned int i = 9; i < 18; i++) {
         build_piece(i, Piece::Type::Black, app->assets_load->black_piece_mesh,
-                app->storage->black_piece_diffuse_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
+                app->storage->black_piece_diff_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
     }
 
     for (unsigned int i = 0; i < 24; i++) {
@@ -126,12 +126,12 @@ void GameScene::build_board() {
         app->storage->board_vertex_array = create_entity_vertex_array(app->assets_load->board_mesh, id);
     }
 
-    if (!app->storage->board_diffuse_texture) {
+    if (!app->storage->board_diff_texture) {
         if (options.texture_quality == options::NORMAL) {
-            app->storage->board_diffuse_texture = Texture::create(app->assets_load->board_texture, true, -2.0f);
+            app->storage->board_diff_texture = Texture::create(app->assets_load->board_diff_texture, true, -2.0f);
         } else if (options.texture_quality == options::LOW) {
-            app->storage->board_diffuse_texture =
-                    Texture::create(app->assets_load->board_texture_small, true, -2.0f);
+            app->storage->board_diff_texture =
+                    Texture::create(app->assets_load->board_diff_texture_small, true, -2.0f);
         } else {
             assert(false);
         }
@@ -142,7 +142,7 @@ void GameScene::build_board() {
     board.scale = 20.0f;
     board.vertex_array = app->storage->board_vertex_array;
     board.index_count = app->assets_load->board_mesh->indices.size();
-    board.diffuse_texture = app->storage->board_diffuse_texture;
+    board.diffuse_texture = app->storage->board_diff_texture;
     board.specular_color = glm::vec3(0.25f);
     board.shininess = 8.0f;
 
@@ -172,13 +172,13 @@ void GameScene::build_board_paint() {
         app->storage->board_paint_vertex_array = vertex_array;
     }
 
-    if (!app->storage->board_paint_diffuse_texture) {
+    if (!app->storage->board_paint_diff_texture) {
         if (options.texture_quality == options::NORMAL) {
-            app->storage->board_paint_diffuse_texture =
-                    Texture::create(app->assets_load->board_paint_diffuse_texture, true, -1.0f);
+            app->storage->board_paint_diff_texture =
+                    Texture::create(app->assets_load->board_paint_diff_texture, true, -1.0f);
         } else if (options.texture_quality == options::LOW) {
-            app->storage->board_paint_diffuse_texture =
-                    Texture::create(app->assets_load->board_paint_diffuse_texture_small, true, -1.0f);
+            app->storage->board_paint_diff_texture =
+                    Texture::create(app->assets_load->board_paint_diff_texture_small, true, -1.0f);
         } else {
             assert(false);
         }
@@ -188,7 +188,7 @@ void GameScene::build_board_paint() {
     board.paint.scale = 20.0f;
     board.paint.vertex_array = app->storage->board_paint_vertex_array;
     board.paint.index_count = app->assets_load->board_paint_mesh->indices.size();
-    board.paint.diffuse_texture = app->storage->board_paint_diffuse_texture;
+    board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
     board.paint.specular_color = glm::vec3(0.25f);
     board.paint.shininess = 8.0f;
 

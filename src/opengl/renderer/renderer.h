@@ -47,10 +47,10 @@ namespace renderer {
         Rc<VertexArray> origin_vertex_array;
 #endif
 
-        Rc<Texture> board_diffuse_texture;
-        Rc<Texture> board_paint_diffuse_texture;
-        Rc<Texture> white_piece_diffuse_texture;
-        Rc<Texture> black_piece_diffuse_texture;
+        Rc<Texture> board_diff_texture;
+        Rc<Texture> board_paint_diff_texture;
+        Rc<Texture> white_piece_diff_texture;
+        Rc<Texture> black_piece_diff_texture;
         Rc<Texture3D> skybox_texture;
         Rc<Texture> white_indicator_texture;
         Rc<Texture> black_indicator_texture;

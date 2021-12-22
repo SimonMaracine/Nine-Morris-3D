@@ -47,14 +47,14 @@ namespace options {
             return;
         }
 
-        json object;
-
         std::string contents, line;
 
         while (std::getline(file, line)) {
             contents += line;
             contents += '\n';
         }
+
+        json object;
 
         try {
             object = json::parse(contents.c_str());

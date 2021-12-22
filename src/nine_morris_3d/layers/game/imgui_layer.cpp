@@ -16,6 +16,7 @@
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/assets_load.h"
 
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
@@ -162,14 +163,14 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::BeginMenu("Texture Quality", true)) {
                 static int quality = scene->options.texture_quality == options::NORMAL ? 0 : 1;
                 if (ImGui::RadioButton("Normal", &quality, 0)) {
+                    game_layer->set_textures_quality(options::NORMAL);
                     scene->options.texture_quality = options::NORMAL;
-                    game_layer->set_textures_quality(scene->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to normal quality");
                 }
                 if (ImGui::RadioButton("Low", &quality, 1)) {
+                    game_layer->set_textures_quality(options::LOW);
                     scene->options.texture_quality = options::LOW;
-                    game_layer->set_textures_quality(scene->options.texture_quality);
 
                     SPDLOG_INFO("Textures set to low quality");
                 }
