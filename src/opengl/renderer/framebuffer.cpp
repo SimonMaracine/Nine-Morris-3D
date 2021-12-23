@@ -8,8 +8,8 @@
 #include "other/logging.h"
 
 Framebuffer::Framebuffer(Type type, int width, int height, int samples, int color_attachment_count)
-        : type(type), width(width), height(height), samples(samples),
-          color_attachment_count(color_attachment_count) {
+    : type(type), width(width), height(height), samples(samples),
+      color_attachment_count(color_attachment_count) {
     build();
 
     SPDLOG_DEBUG("Created framebuffer {}", framebuffer);

@@ -11,7 +11,7 @@
 #include "other/logging.h"
 
 Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader)
-        : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader) {
+    : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader) {
     SPDLOG_DEBUG("Created shader {}", program);
 }
 

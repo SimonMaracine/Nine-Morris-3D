@@ -9,7 +9,8 @@
 #include "opengl/renderer/buffer_layout.h"
 #include "other/logging.h"
 
-VertexArray::VertexArray(GLuint array) : array(array) {
+VertexArray::VertexArray(GLuint array)
+    : array(array) {
     SPDLOG_DEBUG("Created vertex array {}", array);
 }
 
@@ -67,6 +68,6 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout&
 }
 
 void VertexArray::add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer) {
-    index_buffer->bind();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer->buffer);
     this->index_buffer = index_buffer;
 }

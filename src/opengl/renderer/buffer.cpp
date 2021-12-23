@@ -8,7 +8,7 @@
 #include "other/logging.h"
 
 Buffer::Buffer(GLuint buffer)
-        : buffer(buffer) {
+    : buffer(buffer) {
     SPDLOG_DEBUG("Created buffer {}", buffer);
 }
 
@@ -53,7 +53,7 @@ void Buffer::update_data(const void* data, std::size_t size) const {
 // --- Index buffer
 
 IndexBuffer::IndexBuffer(GLuint buffer)
-        : buffer(buffer) {
+    : buffer(buffer) {
     SPDLOG_DEBUG("Created index buffer {}", buffer);
 }
 
@@ -84,7 +84,7 @@ void IndexBuffer::unbind() {
 // --- Uniform buffer
 
 UniformBuffer::UniformBuffer(GLuint buffer)
-        : buffer(buffer) {
+    : buffer(buffer) {
     SPDLOG_DEBUG("Created uniform buffer {}", buffer);
 }
 

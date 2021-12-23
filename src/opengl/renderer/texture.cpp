@@ -10,7 +10,7 @@
 #include "other/logging.h"
 
 Texture::Texture(GLuint texture, int width, int height)
-        : texture(texture), width(width), height(height) {
+    : texture(texture), width(width), height(height) {
     SPDLOG_DEBUG("Created texture {}", texture);
 }
 
@@ -78,7 +78,7 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool
 
     glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, data->width, data->height);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA,
-                    GL_UNSIGNED_BYTE, data->data);
+            GL_UNSIGNED_BYTE, data->data);
     LOG_ALLOCATION(data->width * data->height * 4);
 
     if (mipmapping) {
@@ -136,8 +136,8 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
             std::exit(1);
         }
 
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                     0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, width, height,
+                0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         LOG_ALLOCATION(width * height * 4);
 
         stbi_image_free(data);
@@ -161,7 +161,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const std::array<std::shared_ptr<Te
 
     for (int i = 0; i < 6; i++) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, data[i]->width,
-                     data[i]->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data);
+                data[i]->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data);
         LOG_ALLOCATION(data[i]->width * data[i]->height * 4);
     }
 

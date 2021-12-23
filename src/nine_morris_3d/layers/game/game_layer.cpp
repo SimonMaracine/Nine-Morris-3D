@@ -346,14 +346,14 @@ void GameLayer::set_textures_quality(const std::string& quality) {
     }
 
     if (quality == options::NORMAL) {
-        app->assets_load->board_diff_texture = std::make_shared<TextureData>(path(BOARD_TEXTURE), true);
-        app->assets_load->board_paint_diff_texture = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE), true);
-        app->assets_load->white_piece_diff_texture = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE), true);
-        app->assets_load->black_piece_diff_texture = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE), true);
         app->assets_load->board_diff_texture_small = nullptr;
         app->assets_load->board_paint_diff_texture_small = nullptr;
         app->assets_load->white_piece_diff_texture_small = nullptr;
         app->assets_load->black_piece_diff_texture_small = nullptr;
+        app->assets_load->board_diff_texture = std::make_shared<TextureData>(path(BOARD_TEXTURE), true);
+        app->assets_load->board_paint_diff_texture = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE), true);
+        app->assets_load->white_piece_diff_texture = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE), true);
+        app->assets_load->black_piece_diff_texture = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE), true);
 
         app->storage->board_diff_texture = Texture::create(app->assets_load->board_diff_texture, true, -2.0f);
         scene->board.diffuse_texture = app->storage->board_diff_texture;
@@ -371,14 +371,14 @@ void GameLayer::set_textures_quality(const std::string& quality) {
             }
         }
     } else if (quality == options::LOW) {
-        app->assets_load->board_diff_texture_small = std::make_shared<TextureData>(path(BOARD_TEXTURE_SMALL), true);
-        app->assets_load->board_paint_diff_texture_small = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE_SMALL), true);
-        app->assets_load->white_piece_diff_texture_small = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE_SMALL), true);
-        app->assets_load->black_piece_diff_texture_small = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE_SMALL), true);
         app->assets_load->board_diff_texture = nullptr;
         app->assets_load->board_paint_diff_texture = nullptr;
         app->assets_load->white_piece_diff_texture = nullptr;
         app->assets_load->black_piece_diff_texture = nullptr;
+        app->assets_load->board_diff_texture_small = std::make_shared<TextureData>(path(BOARD_TEXTURE_SMALL), true);
+        app->assets_load->board_paint_diff_texture_small = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE_SMALL), true);
+        app->assets_load->white_piece_diff_texture_small = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE_SMALL), true);
+        app->assets_load->black_piece_diff_texture_small = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE_SMALL), true);     
 
         app->storage->board_diff_texture = Texture::create(app->assets_load->board_diff_texture_small, true, -2.0f);
         scene->board.diffuse_texture = app->storage->board_diff_texture;
