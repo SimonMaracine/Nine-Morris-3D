@@ -16,7 +16,6 @@
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
-#include "nine_morris_3d/assets_load.h"
 
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
@@ -89,8 +88,7 @@ void ImGuiLayer::on_update(float dt) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
-                app->assets_load = std::make_shared<AssetsLoad>();
-                app->change_scene(1);
+                app->change_scene(0);
 
                 SPDLOG_INFO("Restarting game");
             }

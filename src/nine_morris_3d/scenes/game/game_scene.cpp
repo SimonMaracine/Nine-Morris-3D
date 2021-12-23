@@ -63,9 +63,6 @@ void GameScene::on_enter() {
     build_skybox();
     build_light();
     build_turn_indicator();
-
-    // Free the memory
-    // app->assets_load = nullptr;  // TODO don't
 }
 
 void GameScene::on_exit() {
