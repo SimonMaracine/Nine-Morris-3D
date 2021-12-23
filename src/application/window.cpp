@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -38,6 +36,8 @@ Window::Window(ApplicationData* data) {
         spdlog::critical("Could not create window");
         std::exit(1);
     }
+
+    SPDLOG_INFO("Initialized GLFW and window");
 
     glfwMakeContextCurrent(window);
 
@@ -112,12 +112,13 @@ Window::Window(ApplicationData* data) {
         events::MouseMovedEvent event ((float) xpos, (float) ypos);
         data->event_function(event);
     });
-
-    atexit(glfwTerminate);  // TODO rework this
 }
 
 Window::~Window() {
     glfwDestroyWindow(window);
+    glfwTerminate();
+
+    SPDLOG_INFO("Terminated GLFW and destroyed window");
 }
 
 void Window::update() const {
