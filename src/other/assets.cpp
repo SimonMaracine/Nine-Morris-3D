@@ -34,8 +34,8 @@ namespace assets {
     const char* BOARD_PAINT_TEXTURE_SMALL = "data/textures/board/board_paint-small.png";
     const char* WHITE_INDICATOR_TEXTURE = "data/textures/indicator/white_indicator.png";
     const char* BLACK_INDICATOR_TEXTURE = "data/textures/indicator/black_indicator.png";
-    const char* LOADING_TEXTURE = "data/textures/loading/loading.png";
-    const char* OPEN_SANS_FONT = "data/fonts/OpenSans-Semibold.ttf";
+    const char* SPLASH_SCREEN_TEXTURE = "data/textures/splash_screen/splash_screen.png";
+    const char* OPEN_SANS_FONT = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
     const char* WHITE_PIECE_TEXTURE = "data/textures/piece/white_piece.png";
     const char* WHITE_PIECE_TEXTURE_SMALL = "data/textures/piece/white_piece-small.png";
     const char* BLACK_PIECE_TEXTURE = "data/textures/piece/black_piece.png";

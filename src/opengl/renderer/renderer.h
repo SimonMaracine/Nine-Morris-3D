@@ -54,7 +54,7 @@ namespace renderer {
         Rc<Texture3D> skybox_texture;
         Rc<Texture> white_indicator_texture;
         Rc<Texture> black_indicator_texture;
-        Rc<Texture> loading_texture;
+        Rc<Texture> splash_screen_texture;
 #ifndef NDEBUG
         Rc<Texture> light_texture;
 #endif

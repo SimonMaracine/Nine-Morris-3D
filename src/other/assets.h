@@ -16,7 +16,7 @@ namespace assets {
     extern const char* BOARD_PAINT_TEXTURE_SMALL;
     extern const char* WHITE_INDICATOR_TEXTURE;
     extern const char* BLACK_INDICATOR_TEXTURE;
-    extern const char* LOADING_TEXTURE;
+    extern const char* SPLASH_SCREEN_TEXTURE;
     extern const char* OPEN_SANS_FONT;
     extern const char* WHITE_PIECE_TEXTURE;
     extern const char* WHITE_PIECE_TEXTURE_SMALL;

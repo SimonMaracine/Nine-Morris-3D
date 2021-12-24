@@ -175,7 +175,7 @@ namespace renderer {
         }
 #endif
 
-        storage->loading_texture = Texture::create(assets::path(assets::LOADING_TEXTURE), true);
+        storage->splash_screen_texture = Texture::create(assets::path(assets::SPLASH_SCREEN_TEXTURE), true);
 
 #ifndef NDEBUG
         storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);  // TODO see what to do with this
