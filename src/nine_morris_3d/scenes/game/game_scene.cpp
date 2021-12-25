@@ -140,8 +140,8 @@ void GameScene::build_board() {
     board.vertex_array = app->storage->board_vertex_array;
     board.index_count = app->assets_load->board_mesh->indices.size();
     board.diffuse_texture = app->storage->board_diff_texture;
-    board.specular_color = glm::vec3(0.25f);
-    board.shininess = 8.0f;
+    board.specular_color = glm::vec3(0.2f);
+    board.shininess = 4.0f;
 
     SPDLOG_DEBUG("Built board");
 }
@@ -186,8 +186,8 @@ void GameScene::build_board_paint() {
     board.paint.vertex_array = app->storage->board_paint_vertex_array;
     board.paint.index_count = app->assets_load->board_paint_mesh->indices.size();
     board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
-    board.paint.specular_color = glm::vec3(0.25f);
-    board.paint.shininess = 8.0f;
+    board.paint.specular_color = glm::vec3(0.2f);
+    board.paint.shininess = 4.0f;
 
     SPDLOG_DEBUG("Built board paint");
 }
@@ -211,8 +211,8 @@ void GameScene::build_piece(unsigned int index, Piece::Type type, Rc<model::Mesh
     board.pieces[index].vertex_array = app->storage->piece_vertex_arrays[index];
     board.pieces[index].index_count = mesh->indices.size();
     board.pieces[index].diffuse_texture = texture;
-    board.pieces[index].specular_color = glm::vec3(0.25f);
-    board.pieces[index].shininess = 8.0f;
+    board.pieces[index].specular_color = glm::vec3(0.2f);
+    board.pieces[index].shininess = 4.0f;
     board.pieces[index].select_color = glm::vec3(1.0f, 0.0f, 0.0f);
     board.pieces[index].hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
 
@@ -302,8 +302,8 @@ void GameScene::build_skybox() {
 
 void GameScene::build_light() {
     light.position = glm::vec3(-11.0f, 13.0f, -15.0f);
-    light.ambient_color = glm::vec3(0.15f);
-    light.diffuse_color = glm::vec3(0.8f);
+    light.ambient_color = glm::vec3(0.3f);
+    light.diffuse_color = glm::vec3(1.0f);
     light.specular_color = glm::vec3(1.0f);
 
     SPDLOG_DEBUG("Built light");
