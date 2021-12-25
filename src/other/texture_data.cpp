@@ -18,7 +18,7 @@ TextureData::TextureData(const std::string& file_path, bool flip) {
         std::exit(1);
     }
 
-    name = file_path;
+    this->file_path = file_path;
 }
 
 TextureData::~TextureData() {
@@ -26,5 +26,5 @@ TextureData::~TextureData() {
 
     stbi_image_free(data);
 
-    SPDLOG_DEBUG("Freed texture memory '{}'", name.c_str());
+    SPDLOG_DEBUG("Freed texture memory '{}'", file_path.c_str());
 }

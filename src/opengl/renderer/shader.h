@@ -10,7 +10,7 @@
 
 class Shader {
 public:
-    Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader);
+    Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name);
     ~Shader();
 
     static std::shared_ptr<Shader> create(const std::string& vertex_source,
@@ -36,10 +36,13 @@ private:
     static GLuint compile_shader(const std::string& source_path, GLenum type);
     static void check_compilation(GLuint shader, GLenum type);
     static void check_linking(GLuint program);
+    static std::string get_name(const std::string& vertex_source, const std::string& fragment_source);
 
     GLuint program;
     GLuint vertex_shader;
     GLuint fragment_shader;
+
+    std::string name;
 };
 
 template<typename T>

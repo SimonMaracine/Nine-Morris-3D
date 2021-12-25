@@ -10,9 +10,9 @@
 #include "opengl/renderer/buffer.h"
 #include "other/logging.h"
 
-Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader)
-    : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader) {
-    SPDLOG_DEBUG("Created shader {}", program);
+Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name)
+    : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader), name(name) {
+    SPDLOG_DEBUG("Created shader {} ({})", program, name.c_str());
 }
 
 Shader::~Shader() {
@@ -22,7 +22,7 @@ Shader::~Shader() {
     glDeleteShader(fragment_shader);
     glDeleteProgram(program);
 
-    SPDLOG_DEBUG("Deleted shader {}", program);
+    SPDLOG_DEBUG("Deleted shader {} ({})", program, name.c_str());
 }
 
 std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
@@ -38,7 +38,9 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
 
     check_linking(program);
 
-    return std::make_shared<Shader>(program, vertex_shader, fragment_shader);
+    std::string name = get_name(vertex_source, fragment_source);
+
+    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name);
 }
 
 std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
@@ -69,7 +71,9 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
     glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &buffer_size);
     glBindBufferBase(GL_UNIFORM_BUFFER, block_index, uniform_buffer->buffer);
 
-    return std::make_shared<Shader>(program, vertex_shader, fragment_shader);
+    std::string name = get_name(vertex_source, fragment_source);
+
+    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name);
 }
 
 void Shader::bind() const {
@@ -187,4 +191,16 @@ void Shader::check_linking(GLuint program) {
 
         std::exit(1);
     }
+}
+
+std::string Shader::get_name(const std::string& vertex_source, const std::string& fragment_source) {
+    size_t last_slash_v = vertex_source.find_last_of("/");
+    assert(last_slash_v != std::string::npos);
+    const std::string vertex = vertex_source.substr(last_slash_v + 1);
+
+    size_t last_slash_f = fragment_source.find_last_of("/");
+    assert(last_slash_f != std::string::npos);
+    const std::string fragment = fragment_source.substr(last_slash_f + 1);
+
+    return vertex + " & " + fragment;
 }

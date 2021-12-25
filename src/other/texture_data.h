@@ -13,5 +13,5 @@ public:
 	int width = 0;
 	int height = 0;
 	int channels = 0;
-	std::string name;
+	std::string file_path;
 };

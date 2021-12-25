@@ -11,7 +11,7 @@
 
 class Texture {
 public:
-    Texture(GLuint texture, int width, int height);
+    Texture(GLuint texture, int width, int height, const std::string& name);
     ~Texture();
 
     static std::shared_ptr<Texture> create(const std::string& file_path, bool mipmapping, float bias = 0.0f);
@@ -27,11 +27,13 @@ public:
 private:
     GLuint texture;
 	int width = 0, height = 0;
+
+	std::string name;
 };
 
 class Texture3D {
 public:
-    Texture3D(GLuint texture);
+    Texture3D(GLuint texture, const std::string& name);
     ~Texture3D();
 
     static std::shared_ptr<Texture3D> create(const char** file_paths);
@@ -41,6 +43,8 @@ public:
     static void unbind();
 private:
     GLuint texture;
+
+	std::string name;
 };
 
 template<typename T>

@@ -172,6 +172,7 @@ namespace options {
 
         file << (
             "{\n"
+            "    \"texture_quality\": \"normal\",\n"
             "    \"samples\": 2,\n"
             "    \"save_on_exit\": true,\n"
             "    \"vsync\": true\n"

@@ -41,7 +41,7 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout&
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
 
-    std::size_t offset = 0;
+    size_t offset = 0;
 
     for (unsigned int i = 0; i < layout.elements.size(); i++) {
         const VertexElement& element = layout.elements[i];
