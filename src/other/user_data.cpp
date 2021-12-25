@@ -32,14 +32,14 @@ namespace user_data {
 
     const std::string get_user_data_path() {  // Throws exception
         const std::string username = get_username();
-        const std::string path = "/home/" + username + "/" + APP_NAME_LINUX;
+        const std::string path = "/home/" + username + "/" + APP_NAME_LINUX + "/";
 
         return path;
     }
 
     bool user_data_directory_exists() {  // Throws exception
         const std::string username = get_username();
-        const std::string path = "/home/" + username + "/" + APP_NAME_LINUX;
+        const std::string path = "/home/" + username + "/" + APP_NAME_LINUX + "/";
 
         struct stat sb;
 
@@ -52,7 +52,7 @@ namespace user_data {
 
     bool create_user_data_directory() {  // Throws exception
         const std::string username = get_username();
-        const std::string path = "/home/" + username + "/" + APP_NAME_LINUX;
+        const std::string path = "/home/" + username + "/" + APP_NAME_LINUX + "/";
 
         if (mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < 0) {
             return false;

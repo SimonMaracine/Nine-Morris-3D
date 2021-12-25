@@ -135,13 +135,13 @@ void Texture::unbind() {
 
 Texture3D::Texture3D(GLuint texture, const std::string& name)
     : texture(texture), name(name) {
-    SPDLOG_DEBUG("Created 3D texture {}", texture);
+    SPDLOG_DEBUG("Created 3D texture {} ({})", texture, name.c_str());
 }
 
 Texture3D::~Texture3D() {
     glDeleteTextures(1, &texture);
 
-    SPDLOG_DEBUG("Deleted 3D texture {}", texture);
+    SPDLOG_DEBUG("Deleted 3D texture {} ({})", texture, name.c_str());
 }
 
 std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {

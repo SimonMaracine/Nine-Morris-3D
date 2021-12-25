@@ -1,4 +1,6 @@
 #include <fstream>
+#include <string>
+#include <exception>
 #include <stdio.h>
 
 #include <glm/glm.hpp>
@@ -13,6 +15,7 @@
 #include "nine_morris_3d/node.h"
 #include "opengl/renderer/camera.h"
 #include "other/logging.h"
+#include "other/user_data.h"
 
 #define SAVE_GAME_FILE "last_game.dat"
 
@@ -89,6 +92,23 @@ namespace glm {
 }
 
 namespace save_load {
+    static std::string path(const char* file) {  // Throws exception
+#ifndef NDEBUG
+        // Use relative path for both operating systems
+        return std::string(file);
+#else
+    #if defined(__GNUG__)
+        std::string path = user_data::get_user_data_path() + "/" + file + "/";
+        return path;
+    #elif defined(_MSC_VER)
+        std::string path = user_data::get_user_data_path() + "\\" + file;
+        return path;
+    #else
+        #error "GCC or MSVC must be used (for now)"
+    #endif
+#endif
+    }
+
     static bool file_exists(const std::string& file_path) {
         FILE* file = fopen(file_path.c_str(), "r");
         if (file) {
@@ -100,7 +120,15 @@ namespace save_load {
     }
 
     void save_game(const GameState& game_state) {
-        std::ofstream file (SAVE_GAME_FILE, std::ios::out | std::ios::binary | std::ios::trunc);
+        std::string file_path;
+        try {
+            file_path = path(SAVE_GAME_FILE);
+        } catch (const std::runtime_error& e) {
+            spdlog::error("{}", e.what());
+            return;
+        }
+
+        std::ofstream file (file_path, std::ios::out | std::ios::binary | std::ios::trunc);
 
         if (!file.is_open()) {
             spdlog::error("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
@@ -116,7 +144,15 @@ namespace save_load {
     }
 
     void load_game(GameState& game_state) {
-        std::ifstream file (SAVE_GAME_FILE, std::ios::in | std::ios::binary);
+        std::string file_path;
+        try {
+            file_path = path(SAVE_GAME_FILE);
+        } catch (const std::runtime_error& e) {
+            spdlog::error("{}", e.what());
+            return;
+        }
+
+        std::ifstream file (file_path, std::ios::in | std::ios::binary);
 
         if (!file.is_open()) {
             spdlog::error("Could not open the last game file '{}'", SAVE_GAME_FILE);
