@@ -368,10 +368,7 @@ bool ImGuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
 
-    if (hovering_gui)
-        return true;
-    else
-        return false;
+    return false;
 }
 
 bool ImGuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
