@@ -14,9 +14,21 @@
 
 void LoadingLayer::on_attach() {
     if (scene->options.texture_quality == options::NORMAL) {
-        loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::load_assets);    
+        if (scene->options.skybox == options::FIELD) {
+            loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::field);
+        } else if (scene->options.skybox == options::AUTUMN) {
+            loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::autumn);
+        } else {
+            assert(false);
+        }
     } else if (scene->options.texture_quality == options::LOW) {
-        loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::load_assets_low_tex);
+        if (scene->options.skybox == options::FIELD) {
+            loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::field_low_tex);
+        } else if (scene->options.skybox == options::AUTUMN) {
+            loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::autumn_low_tex);
+        } else {
+            assert(false);
+        }
     } else {
         assert(false);
     }

@@ -45,6 +45,7 @@ public:
 
     void set_scene_framebuffer(int samples);
     void set_textures_quality(const std::string& quality);
+    void set_skybox(const std::string& skybox);
     void load_game();
 
     float mouse_wheel = 0.0f;

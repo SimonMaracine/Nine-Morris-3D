@@ -67,12 +67,14 @@ namespace options {
         int samples;
         bool vsync;
         bool save_on_exit;
+        std::string skybox;
 
         try {
             texture_quality = object.at("texture_quality").get<std::string>();
             samples = object.at("samples").get<int>();
             vsync = object.at("vsync").get<bool>();
             save_on_exit = object.at("save_on_exit").get<bool>();
+            skybox = object.at("skybox").get<std::string>();
         } catch (const json::out_of_range& e) {
             spdlog::error("{}", e.what());
             return;
@@ -97,6 +99,7 @@ namespace options {
         options.samples = samples;
         options.vsync = vsync;
         options.save_on_exit = save_on_exit;
+        options.skybox = skybox;
 
         SPDLOG_INFO("Loaded options from file '{}'", file_path.c_str());
     }
@@ -147,6 +150,7 @@ namespace options {
         object["samples"] = options.samples;
         object["vsync"] = options.vsync;
         object["save_on_exit"] = options.save_on_exit;
+        object["skybox"] = options.skybox;
 
         file << std::setw(4) << object;
         file.close();
@@ -170,14 +174,15 @@ namespace options {
             return;
         }
 
-        file << (
-            "{\n"
-            "    \"texture_quality\": \"normal\",\n"
-            "    \"samples\": 2,\n"
-            "    \"save_on_exit\": true,\n"
-            "    \"vsync\": true\n"
-            "}"
-        );
+        Options options;
+        json object;
+        object["texture_quality"] = options.texture_quality;
+        object["samples"] = options.samples;
+        object["vsync"] = options.vsync;
+        object["save_on_exit"] = options.save_on_exit;
+        object["skybox"] = options.skybox;
+
+        file << object.dump(4);
 
         file.close();
 

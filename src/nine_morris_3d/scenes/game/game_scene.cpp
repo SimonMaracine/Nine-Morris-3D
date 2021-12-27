@@ -123,12 +123,13 @@ void GameScene::build_board() {
         app->storage->board_vertex_array = create_entity_vertex_array(app->assets_load->board_mesh, id);
     }
 
-    if (!app->storage->board_diff_texture) {
+    if (!app->storage->board_wood_diff_texture) {
         if (options.texture_quality == options::NORMAL) {
-            app->storage->board_diff_texture = Texture::create(app->assets_load->board_diff_texture, true, -2.0f);
+            app->storage->board_wood_diff_texture =
+                    Texture::create(app->assets_load->board_wood_diff_texture, true, -2.0f);
         } else if (options.texture_quality == options::LOW) {
-            app->storage->board_diff_texture =
-                    Texture::create(app->assets_load->board_diff_texture_small, true, -2.0f);
+            app->storage->board_wood_diff_texture =
+                    Texture::create(app->assets_load->board_wood_diff_texture_small, true, -2.0f);
         } else {
             assert(false);
         }
@@ -139,7 +140,7 @@ void GameScene::build_board() {
     board.scale = 20.0f;
     board.vertex_array = app->storage->board_vertex_array;
     board.index_count = app->assets_load->board_mesh->indices.size();
-    board.diffuse_texture = app->storage->board_diff_texture;
+    board.diffuse_texture = app->storage->board_wood_diff_texture;
     board.specular_color = glm::vec3(0.2f);
     board.shininess = 4.0f;
 
@@ -286,14 +287,30 @@ void GameScene::build_skybox() {
     }
 
     if (!app->storage->skybox_texture) {
-        std::array<Rc<TextureData>, 6> data = {
-            app->assets_load->skybox_px_texture,
-            app->assets_load->skybox_nx_texture,
-            app->assets_load->skybox_py_texture,
-            app->assets_load->skybox_ny_texture,
-            app->assets_load->skybox_pz_texture,
-            app->assets_load->skybox_nz_texture
-        };
+        std::array<Rc<TextureData>, 6> data;
+
+        if (options.texture_quality == options::NORMAL) {
+            data = {
+                app->assets_load->skybox_px_texture,
+                app->assets_load->skybox_nx_texture,
+                app->assets_load->skybox_py_texture,
+                app->assets_load->skybox_ny_texture,
+                app->assets_load->skybox_pz_texture,
+                app->assets_load->skybox_nz_texture
+            };
+        } else if (options.texture_quality == options::LOW) {
+            data = {
+                app->assets_load->skybox_px_texture_small,
+                app->assets_load->skybox_nx_texture_small,
+                app->assets_load->skybox_py_texture_small,
+                app->assets_load->skybox_ny_texture_small,
+                app->assets_load->skybox_pz_texture_small,
+                app->assets_load->skybox_nz_texture_small
+            };
+        } else {
+            assert(false);
+        }
+
         app->storage->skybox_texture = Texture3D::create(data);
     }
 

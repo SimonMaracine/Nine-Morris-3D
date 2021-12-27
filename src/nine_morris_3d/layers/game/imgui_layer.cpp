@@ -164,13 +164,30 @@ void ImGuiLayer::on_update(float dt) {
                     game_layer->set_textures_quality(options::NORMAL);
                     scene->options.texture_quality = options::NORMAL;
 
-                    SPDLOG_INFO("Textures set to normal quality");
+                    SPDLOG_INFO("Textures set to {} quality", options::NORMAL);
                 }
                 if (ImGui::RadioButton("Low", &quality, 1)) {
                     game_layer->set_textures_quality(options::LOW);
                     scene->options.texture_quality = options::LOW;
 
-                    SPDLOG_INFO("Textures set to low quality");
+                    SPDLOG_INFO("Textures set to {} quality", options::LOW);
+                }
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Skybox", true)) {
+                static int skybox = scene->options.skybox == options::FIELD ? 0 : 1;
+                if (ImGui::RadioButton("Field", &skybox, 0)) {
+                    game_layer->set_skybox(options::FIELD);
+                    scene->options.skybox = options::FIELD;
+
+                    SPDLOG_INFO("Skybox set to {}", options::FIELD);
+                }
+                if (ImGui::RadioButton("Autumn", &skybox, 1)) {
+                    game_layer->set_skybox(options::AUTUMN);
+                    scene->options.skybox = options::AUTUMN;
+
+                    SPDLOG_INFO("Skybox set to {}", options::AUTUMN);
                 }
 
                 ImGui::EndMenu();

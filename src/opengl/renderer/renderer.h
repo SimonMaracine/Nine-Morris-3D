@@ -47,7 +47,7 @@ namespace renderer {
         Rc<VertexArray> origin_vertex_array;
 #endif
 
-        Rc<Texture> board_diff_texture;
+        Rc<Texture> board_wood_diff_texture;
         Rc<Texture> board_paint_diff_texture;
         Rc<Texture> white_piece_diff_texture;
         Rc<Texture> black_piece_diff_texture;
