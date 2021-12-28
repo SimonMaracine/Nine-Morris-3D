@@ -53,11 +53,13 @@ void GameLayer::on_detach() {
 }
 
 void GameLayer::on_bind_layers() {
-
+    imgui_layer = get_layer<ImGuiLayer>(2, scene);
 }
 
 void GameLayer::on_update(float dt) {
-    scene->camera.update(mouse_wheel, dx, dy, dt);
+    if (!imgui_layer->hovering_gui) {
+        scene->camera.update(mouse_wheel, dx, dy, dt);
+    }
     scene->board.move_pieces(dt);
 
     mouse_wheel = 0.0f;
@@ -104,8 +106,8 @@ void GameLayer::on_draw() {
 
     app->storage->intermediate_framebuffer->bind();
 
-    const int x = input::get_mouse_x();
-    const int y = app->data.height - input::get_mouse_y();
+    const int x = (int) input::get_mouse_x();
+    const int y = app->data.height - (int) input::get_mouse_y();
     scene->hovered_id = app->storage->intermediate_framebuffer->read_pixel(1, x, y);
 
     Framebuffer::bind_default();

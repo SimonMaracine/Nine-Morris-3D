@@ -1,3 +1,5 @@
+#include <utility>
+
 #include <GLFW/glfw3.h>
 
 namespace input {
@@ -15,17 +17,24 @@ namespace input {
         return glfwGetMouseButton(window_ptr, button) == GLFW_PRESS;
     }
 
-    int get_mouse_x() {
+    float get_mouse_x() {
         double x, y;
         glfwGetCursorPos(window_ptr, &x, &y);
 
-        return (int) x;
+        return (float) x;
     }
 
-    int get_mouse_y() {
+    float get_mouse_y() {
         double x, y;
         glfwGetCursorPos(window_ptr, &x, &y);
 
-        return (int) y;
+        return (float) y;
+    }
+
+    const std::pair<float, float> get_mouse() {
+        double x, y;
+        glfwGetCursorPos(window_ptr, &x, &y);
+
+        return std::pair<float, float>(x, y);
     }
 }

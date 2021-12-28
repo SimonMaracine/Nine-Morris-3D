@@ -12,6 +12,8 @@
 #include "other/loader.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
 
+class ImGuiLayer;
+
 class GameLayer : public Layer {
 public:
     GameLayer(unsigned int id, Application* application, GameScene* scene)
@@ -56,4 +58,6 @@ public:
     float last_mouse_y = 0.0f;
 
     GameScene* scene = nullptr;
+
+    ImGuiLayer* imgui_layer = nullptr;
 };

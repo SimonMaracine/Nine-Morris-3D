@@ -63,7 +63,8 @@ namespace events {
 
     class KeyPressedEvent : public Event {
     public:
-        KeyPressedEvent(int key) : key(key) {}
+        KeyPressedEvent(int key)
+            : key(key) {}
 
         virtual EventType get_type() override {
             return KeyPressed;
@@ -78,7 +79,8 @@ namespace events {
 
     class KeyReleasedEvent : public Event {
     public:
-        KeyReleasedEvent(int key) : key(key) {}
+        KeyReleasedEvent(int key)
+            : key(key) {}
 
         virtual EventType get_type() override {
             return KeyReleased;
@@ -93,7 +95,8 @@ namespace events {
 
     class MouseButtonPressedEvent : public Event {
     public:
-        MouseButtonPressedEvent(int button) : button(button) {}
+        MouseButtonPressedEvent(int button)
+            : button(button) {}
 
         virtual EventType get_type() override {
             return MouseButtonPressed;
@@ -108,7 +111,8 @@ namespace events {
 
     class MouseButtonReleasedEvent : public Event {
     public:
-        MouseButtonReleasedEvent(int button) : button(button) {}
+        MouseButtonReleasedEvent(int button)
+            : button(button) {}
 
         virtual EventType get_type() override {
             return MouseButtonReleased;
@@ -123,7 +127,8 @@ namespace events {
 
     class MouseScrolledEvent : public Event {
     public:
-        MouseScrolledEvent(float scroll) : scroll(scroll) {}
+        MouseScrolledEvent(float scroll)
+            : scroll(scroll) {}
 
         virtual EventType get_type() override {
             return MouseScrolled;

@@ -1,13 +1,16 @@
 #pragma once
 
+#include <utility>
+
 #include <GLFW/glfw3.h>
 
 namespace input {
     void initialize(GLFWwindow* window);
     bool is_key_pressed(int key);
     bool is_mouse_button_pressed(int button);
-    int get_mouse_x();
-    int get_mouse_y();
+    float get_mouse_x();
+    float get_mouse_y();
+    const std::pair<float, float> get_mouse();
 }
 
 #define KEY_SPACE              32
