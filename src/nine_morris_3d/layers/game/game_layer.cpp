@@ -99,7 +99,9 @@ void GameLayer::on_draw() {
     render_nodes();
     render_pieces();
 
+#ifndef NDEBUG
     renderer::draw_quad_3d(scene->light.position, 1.0f, app->storage->light_texture);
+#endif
 
     Framebuffer::resolve_framebuffer(app->storage->scene_framebuffer->get_id(),
             app->storage->intermediate_framebuffer->get_id(), app->data.width, app->data.height);
