@@ -13,6 +13,7 @@
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/buffer_layout.h"
 #include "opengl/renderer/camera.h"
+#include "opengl/renderer/light.h"
 #include "opengl/debug_opengl.h"
 #include "other/texture_data.h"
 #include "other/assets.h"
@@ -30,7 +31,6 @@ void GameScene::on_enter() {
     srand(time(nullptr));
 
     board_state_history = std::make_shared<std::vector<Board>>();
-
     build_board();
 
     if (!app->storage->white_piece_diff_texture) {
@@ -318,10 +318,13 @@ void GameScene::build_skybox() {
 }
 
 void GameScene::build_light() {
-    light.position = glm::vec3(-11.0f, 13.0f, -15.0f);
-    light.ambient_color = glm::vec3(0.3f);
-    light.diffuse_color = glm::vec3(1.0f);
-    light.specular_color = glm::vec3(1.0f);
+    if (options.skybox == options::FIELD) {
+        light = LIGHT_FIELD;
+    } else if (options.skybox == options::AUTUMN) {
+        light = LIGHT_AUTUMN;
+    } else {
+        assert(false);
+    }
 
     SPDLOG_DEBUG("Built light");
 }

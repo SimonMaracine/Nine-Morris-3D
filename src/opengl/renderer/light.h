@@ -16,3 +16,6 @@ public:
     glm::vec3 diffuse_color = glm::vec3(0.0f);
     glm::vec3 specular_color = glm::vec3(0.0f);
 };
+
+extern const Light LIGHT_FIELD;
+extern const Light LIGHT_AUTUMN;

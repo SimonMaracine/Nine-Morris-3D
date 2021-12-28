@@ -332,6 +332,21 @@ void ImGuiLayer::on_update(float dt) {
     ImGui::Text("Selected piece: %p", scene->board.selected_piece);
     ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
     ImGui::End();
+
+    ImGui::Begin("Debug Settings");
+    if (ImGui::SliderFloat3("Light position", (float*) &scene->light.position, -30.0f, 30.0f)) {
+        game_layer->setup_light();
+    }
+    if (ImGui::SliderFloat3("Light ambient color", (float*) &scene->light.ambient_color, 0.0f, 1.0f)) {
+        game_layer->setup_light();
+    }
+    if (ImGui::SliderFloat3("Light diffuse color", (float*) &scene->light.diffuse_color, 0.0f, 1.0f)) {
+        game_layer->setup_light();
+    }
+    if (ImGui::SliderFloat3("Light specular color", (float*) &scene->light.specular_color, 0.0f, 1.0f)) {
+        game_layer->setup_light();
+    }
+    ImGui::End();
 #endif
 
     ImGui::Render();

@@ -20,6 +20,7 @@
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/buffer.h"
+#include "opengl/renderer/light.h"
 #include "other/model.h"
 #include "other/loader.h"
 #include "other/logging.h"
@@ -66,6 +67,7 @@ void GameLayer::on_update(float dt) {
 
 void GameLayer::on_draw() {
     setup_shadows();
+    setup_quad3d_projection_view();
 
     app->storage->depth_map_framebuffer->bind();
 
@@ -94,6 +96,8 @@ void GameLayer::on_draw() {
     renderer::enable_output_to_red(1);
     render_nodes();
     render_pieces();
+
+    renderer::draw_quad_3d(scene->light.position, 1.0f, app->storage->light_texture);
 
     Framebuffer::resolve_framebuffer(app->storage->scene_framebuffer->get_id(),
             app->storage->intermediate_framebuffer->get_id(), app->data.width, app->data.height);
@@ -245,10 +249,10 @@ void GameLayer::setup_pieces() {
 }
 
 void GameLayer::render_pieces() {
-    constexpr auto copy = [](Piece* piece) {
+    constexpr auto copy = [](const Piece* piece) {
         return piece->active;
     };
-    const auto sort = [this](Piece* lhs, Piece* rhs) {
+    const auto sort = [this](const Piece* lhs, const Piece* rhs) {
         float distance1 = glm::length(scene->camera.position - lhs->position);
         float distance2 = glm::length(scene->camera.position - rhs->position);
         return distance1 > distance2;
@@ -290,7 +294,7 @@ void GameLayer::render_to_depth() {
     renderer::draw_to_depth(glm::vec3(0.0f), glm::vec3(0.0f), scene->board.scale, scene->board.vertex_array,
             scene->board.index_count);
 
-    constexpr auto copy = [](Piece* piece) {
+    constexpr auto copy = [](const Piece* piece) {
         return piece->active;
     };
 
@@ -329,6 +333,12 @@ void GameLayer::setup_quad2d_projection() {
     app->storage->quad2d_shader->bind();
     app->storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
             app->storage->orthographic_projection_matrix);
+}
+
+void GameLayer::setup_quad3d_projection_view() {
+    app->storage->quad3d_shader->bind();
+    app->storage->quad3d_shader->set_uniform_matrix("u_projection_matrix", scene->camera.projection_matrix);
+    app->storage->quad3d_shader->set_uniform_matrix("u_view_matrix", scene->camera.view_matrix);
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {
@@ -514,6 +524,9 @@ void GameLayer::set_skybox(const std::string& skybox) {
         } else {
             assert(false);
         }
+
+        scene->light = LIGHT_FIELD;
+        setup_light();
     } else if (skybox == options::AUTUMN) {
         if (scene->options.texture_quality == options::NORMAL) {
             app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
@@ -552,6 +565,9 @@ void GameLayer::set_skybox(const std::string& skybox) {
         } else {
             assert(false);
         }
+
+        scene->light = LIGHT_AUTUMN;
+        setup_light();
     } else {
         assert(false);
     }

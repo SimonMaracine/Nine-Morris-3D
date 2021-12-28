@@ -15,7 +15,7 @@
         pointer_pieces[i] = &pieces[i]; \
     } \
     std::vector<Piece*> result; \
-    std::copy_if(pointer_pieces.begin(), pointer_pieces.end(), std::back_inserter(result), [](Piece* piece) { \
+    std::copy_if(pointer_pieces.begin(), pointer_pieces.end(), std::back_inserter(result), [](const Piece* piece) { \
         return piece->active; \
     });
 

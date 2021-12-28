@@ -55,6 +55,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/opengl/renderer/texture.cpp"
     "src/opengl/renderer/framebuffer.cpp"
     "src/opengl/renderer/camera.cpp"
+    "src/opengl/renderer/light.cpp"
     "src/other/logging.cpp"
     "src/other/model.cpp"
     "src/other/texture_data.cpp"
