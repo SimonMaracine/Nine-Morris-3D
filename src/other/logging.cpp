@@ -26,7 +26,7 @@ namespace logging {
         return std::string(file);
 #else
     #if defined(__GNUG__)
-        std::string path = user_data::get_user_data_path() + "/" + file + "/";
+        std::string path = user_data::get_user_data_path() + file;
         return path;
     #elif defined(_MSC_VER)
         std::string path = "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + APP_NAME_WINDOWS + "\\" + LOG_FILE;

@@ -98,7 +98,7 @@ namespace save_load {
         return std::string(file);
 #else
     #if defined(__GNUG__)
-        std::string path = user_data::get_user_data_path() + "/" + file + "/";
+        std::string path = user_data::get_user_data_path() + file;
         return path;
     #elif defined(_MSC_VER)
         std::string path = user_data::get_user_data_path() + "\\" + file;
@@ -143,20 +143,16 @@ namespace save_load {
         SPDLOG_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
     }
 
-    void load_game(GameState& game_state) {
+    void load_game(GameState& game_state) {  // Throws exception
         std::string file_path;
-        try {
-            file_path = path(SAVE_GAME_FILE);
-        } catch (const std::runtime_error& e) {
-            REL_ERROR("{}", e.what());
-            return;
-        }
+        file_path = path(SAVE_GAME_FILE);
 
         std::ifstream file (file_path, std::ios::in | std::ios::binary);
 
         if (!file.is_open()) {
-            REL_ERROR("Could not open the last game file '{}'", SAVE_GAME_FILE);
-            return;
+            std::string message = "Could not open the last game file ";
+            message.append("'").append(SAVE_GAME_FILE).append("'");
+            throw std::runtime_error(message);
         }
 
         cereal::BinaryInputArchive input{file};

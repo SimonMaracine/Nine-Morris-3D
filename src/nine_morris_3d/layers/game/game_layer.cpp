@@ -4,6 +4,7 @@
 #include <array>
 #include <iterator>
 #include <string>
+#include <exception>
 #include <stdlib.h>
 #include <time.h>
 
@@ -579,7 +580,13 @@ void GameLayer::set_skybox(const std::string& skybox) {
 
 void GameLayer::load_game() {
     save_load::GameState state;
-    save_load::load_game(state);
+    try {
+        save_load::load_game(state);
+    } catch (const std::exception& e) {
+        REL_ERROR("{}", e.what());
+        REL_ERROR("Could not load game");
+        return;
+    }
 
     scene->camera = state.camera;
 

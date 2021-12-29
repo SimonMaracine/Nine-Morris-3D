@@ -20,7 +20,7 @@ namespace options {
         return std::string(file);
 #else
     #if defined(__GNUG__)
-        std::string path = user_data::get_user_data_path() + "/" + file + "/";
+        std::string path = user_data::get_user_data_path() + file;
         return path;
     #elif defined(_MSC_VER)
         std::string path = user_data::get_user_data_path() + "\\" + file;
