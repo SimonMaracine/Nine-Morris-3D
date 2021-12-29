@@ -8,13 +8,13 @@
 
 Window::Window(ApplicationData* data) {
     if (!glfwInit()) {
-        spdlog::critical("Could not initialize GLFW");
+        REL_CRITICAL("Could not initialize GLFW");
         std::exit(1);
     }
 
 #ifndef NDEBUG
     glfwSetErrorCallback([](int error, const char* description) {
-        spdlog::critical("[ID: {}] {}", error, description);
+        REL_CRITICAL("[ID: {}] {}", error, description);
     });
 #endif
 
@@ -26,14 +26,14 @@ Window::Window(ApplicationData* data) {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 #ifndef NDEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-    spdlog::info("Using OpenGL debug context");
+    REL_INFO("Using OpenGL debug context");
 #else
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif
 
     window = glfwCreateWindow(data->width, data->height, data->title.c_str(), nullptr, nullptr);
     if (!window) {
-        spdlog::critical("Could not create window");
+        REL_CRITICAL("Could not create window");
         std::exit(1);
     }
 
@@ -42,7 +42,7 @@ Window::Window(ApplicationData* data) {
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-        spdlog::critical("Could not initialize GLAD");
+        REL_CRITICAL("Could not initialize GLAD");
         std::exit(1);
     }
 

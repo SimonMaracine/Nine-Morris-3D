@@ -56,7 +56,7 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout&
                                        layout.stride, (GLvoid*) offset);
                 break;
             default:
-                spdlog::critical("Unknown element type");
+                REL_CRITICAL("Unknown element type");
                 std::exit(1);
         }
 

@@ -124,14 +124,14 @@ namespace save_load {
         try {
             file_path = path(SAVE_GAME_FILE);
         } catch (const std::runtime_error& e) {
-            spdlog::error("{}", e.what());
+            REL_ERROR("{}", e.what());
             return;
         }
 
         std::ofstream file (file_path, std::ios::out | std::ios::binary | std::ios::trunc);
 
         if (!file.is_open()) {
-            spdlog::error("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
+            REL_ERROR("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
             return;
         }
 
@@ -148,14 +148,14 @@ namespace save_load {
         try {
             file_path = path(SAVE_GAME_FILE);
         } catch (const std::runtime_error& e) {
-            spdlog::error("{}", e.what());
+            REL_ERROR("{}", e.what());
             return;
         }
 
         std::ifstream file (file_path, std::ios::in | std::ios::binary);
 
         if (!file.is_open()) {
-            spdlog::error("Could not open the last game file '{}'", SAVE_GAME_FILE);
+            REL_ERROR("Could not open the last game file '{}'", SAVE_GAME_FILE);
             return;
         }
 

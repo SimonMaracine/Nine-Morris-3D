@@ -18,8 +18,8 @@ namespace model {
         const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure);
 
         if (!scene) {
-            spdlog::critical("Could not load model '{}'", file_path.c_str());
-            spdlog::critical(importer.GetErrorString());
+            REL_CRITICAL("Could not load model '{}'", file_path.c_str());
+            REL_CRITICAL(importer.GetErrorString());
             std::exit(1);
         }
 
@@ -71,8 +71,8 @@ namespace model {
         const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure);
 
         if (!scene) {
-            spdlog::critical("Could not load model '{}'", file_path.c_str());
-            spdlog::critical(importer.GetErrorString());
+            REL_CRITICAL("Could not load model '{}'", file_path.c_str());
+            REL_CRITICAL(importer.GetErrorString());
             std::exit(1);
         }
 

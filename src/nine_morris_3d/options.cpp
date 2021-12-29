@@ -36,14 +36,14 @@ namespace options {
         try {
             file_path = path(OPTIONS_FILE);
         } catch (const std::runtime_error& e) {
-            spdlog::error("{}", e.what());
+            REL_ERROR("{}", e.what());
             return;
         }
 
         std::ifstream file (file_path, std::ios::in);
 
         if (!file.is_open()) {
-            spdlog::error("Could not open options file '{}'", file_path.c_str());
+            REL_ERROR("Could not open options file '{}'", file_path.c_str());
             return;
         }
 
@@ -59,7 +59,7 @@ namespace options {
         try {
             object = json::parse(contents.c_str());
         } catch (const json::parse_error& e) {
-            spdlog::error("{}", e.what());
+            REL_ERROR("{}", e.what());
             return;
         }
 
@@ -76,22 +76,22 @@ namespace options {
             save_on_exit = object.at("save_on_exit").get<bool>();
             skybox = object.at("skybox").get<std::string>();
         } catch (const json::out_of_range& e) {
-            spdlog::error("{}", e.what());
+            REL_ERROR("{}", e.what());
             return;
         } catch (const json::type_error& e) {
-            spdlog::error("{}", e.what());
+            REL_ERROR("{}", e.what());
             return;
         } catch (const json::exception& e) {
-            spdlog::error("{}", e.what());
+            REL_ERROR("{}", e.what());
             return;
         }
 
         if (samples != 1 && samples != 2 && samples != 4) {
-            spdlog::error("Options file is wrong: samples");
+            REL_ERROR("Options file is wrong: samples");
             return;
         }
         if (texture_quality != NORMAL && texture_quality != LOW) {
-            spdlog::error("Options file is wrong: texture_quality");
+            REL_ERROR("Options file is wrong: texture_quality");
             return;
         }
 
@@ -109,35 +109,35 @@ namespace options {
         try {
             file_path = path(OPTIONS_FILE);
         } catch (const std::runtime_error& e) {
-            spdlog::error("{}", e.what());
+            REL_ERROR("{}", e.what());
             return;
         }
 
         std::ofstream file (file_path.c_str(), std::ios::out | std::ios::trunc);
 
         if (!file.is_open()) {
-            spdlog::error("Could not open options file '{}' for writing", file_path.c_str());
+            REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
 
             bool user_data_directory;
 
             try {
                 user_data_directory = user_data::user_data_directory_exists();
             } catch (const std::runtime_error& e) {
-                spdlog::error("{}", e.what());
+                REL_ERROR("{}", e.what());
                 return;
             }
 
             if (!user_data_directory) {
-                spdlog::info("User data folder missing; creating one...");
+                REL_INFO("User data folder missing; creating one...");
 
                 try {
                     if (!user_data::create_user_data_directory()) {
-                        spdlog::error("Could not create user data directory");
+                        REL_ERROR("Could not create user data directory");
                     } else {
                         create_options_file();
                     }
                 } catch (const std::runtime_error& e) {
-                    spdlog::error("{}", e.what());
+                    REL_ERROR("{}", e.what());
                     return;
                 }
             }
@@ -163,14 +163,14 @@ namespace options {
         try {
             file_path = path(OPTIONS_FILE);
         } catch (const std::runtime_error& e) {
-            spdlog::error("{}", e.what());
+            REL_ERROR("{}", e.what());
             return;
         }
 
         std::ofstream file (file_path.c_str(), std::ios::out);
 
         if (!file.is_open()) {
-            spdlog::error("Could not open options file '{}' for writing", file_path.c_str());
+            REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
             return;
         }
 

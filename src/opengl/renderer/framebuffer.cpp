@@ -205,7 +205,7 @@ void Framebuffer::build() {
     }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        spdlog::critical("Framebuffer {} is incomplete", framebuffer);
+        REL_CRITICAL("Framebuffer {} is incomplete", framebuffer);
         std::exit(1);
     }
 

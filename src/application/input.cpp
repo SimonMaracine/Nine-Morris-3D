@@ -35,6 +35,6 @@ namespace input {
         double x, y;
         glfwGetCursorPos(window_ptr, &x, &y);
 
-        return std::pair<float, float>(x, y);
+        return std::make_pair<float, float>(x, y);
     }
 }

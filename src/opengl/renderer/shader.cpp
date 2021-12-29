@@ -63,7 +63,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
     // Set up uniform buffer
     GLuint block_index = glGetUniformBlockIndex(program, block_name);
     if (block_index == GL_INVALID_INDEX) {
-        spdlog::critical("Invalid block index");
+        REL_CRITICAL("Invalid block index");
         std::exit(1);
     }
 
@@ -128,7 +128,7 @@ GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {
             source.append(line).append("\n");
         }
     } else {
-        spdlog::critical("Could not open file '{}'", source_path.c_str());
+        REL_CRITICAL("Could not open file '{}'", source_path.c_str());
         std::exit(1);
     }
     file.close();
@@ -158,12 +158,12 @@ void Shader::check_compilation(GLuint shader, GLenum type) {
         }
 
         if (log_length == 0) {
-            spdlog::critical("{} shader compilation error with no message", t);
+            REL_CRITICAL("{} shader compilation error with no message", t);
         } else {
             char* log_message = new char[log_length];
             glGetShaderInfoLog(shader, log_length, nullptr, log_message);
 
-            spdlog::critical("{} shader compilation error\n{}", t, log_message);
+            REL_CRITICAL("{} shader compilation error\n{}", t, log_message);
             delete[] log_message;
         }
 
@@ -180,12 +180,12 @@ void Shader::check_linking(GLuint program) {
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
         if (log_length == 0) {
-            spdlog::critical("Shader linking error with no message");
+            REL_CRITICAL("Shader linking error with no message");
         } else {
             char* log_message = new char[log_length];
             glGetProgramInfoLog(program, log_length, nullptr, log_message);
 
-            spdlog::critical("Shader linking error\n{}", log_message);
+            REL_CRITICAL("Shader linking error\n{}", log_message);
             delete[] log_message;
         }
 

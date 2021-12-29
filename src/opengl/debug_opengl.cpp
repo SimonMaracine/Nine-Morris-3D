@@ -78,7 +78,7 @@ namespace debug_opengl {
             GLsizei length, const GLchar* message, const void* userParam) {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                spdlog::critical("Debug Message:");
+                REL_CRITICAL("Debug Message:");
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
                 switch (id) {
@@ -89,10 +89,10 @@ namespace debug_opengl {
                     case 7:
                         return;  // Ignore these warnings
                 }
-                spdlog::warn("Debug Message:");
+                REL_WARN("Debug Message:");
                 break;
             case GL_DEBUG_SEVERITY_LOW:
-                spdlog::warn("Debug Message:");
+                REL_WARN("Debug Message:");
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 assert(false);
@@ -123,11 +123,11 @@ namespace debug_opengl {
 
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                spdlog::critical("(ID: {}) {}", id, message);
+                REL_CRITICAL("(ID: {}) {}", id, message);
                 std::exit(1);
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:
-                spdlog::warn("(ID: {}) {}", id, message);
+                REL_WARN("(ID: {}) {}", id, message);
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 assert(false);
@@ -142,7 +142,7 @@ namespace debug_opengl {
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION,
                 0, nullptr, GL_FALSE);
-        spdlog::info("OpenGL message callback is set");
+        REL_INFO("OpenGL message callback is set");
 #endif
     }
 
