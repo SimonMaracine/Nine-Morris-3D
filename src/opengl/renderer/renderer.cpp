@@ -323,7 +323,7 @@ namespace renderer {
         glDrawElements(GL_TRIANGLES, board_paint.index_count, GL_UNSIGNED_INT, nullptr);
     }
 
-    void draw_piece(Piece* piece, const glm::vec3& tint_color) {
+    void draw_piece(const Piece* piece, const glm::vec3& tint_color) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, piece->position);
         matrix = glm::rotate(matrix, piece->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -340,7 +340,7 @@ namespace renderer {
         glDrawElements(GL_TRIANGLES, piece->index_count, GL_UNSIGNED_INT, nullptr);
     }
 
-    void draw_piece_with_outline(Piece* piece, const glm::vec3& outline_color) {
+    void draw_piece_with_outline(const Piece* piece, const glm::vec3& outline_color) {
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
 

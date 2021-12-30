@@ -14,6 +14,8 @@
 #define INFO_FILE "info.txt"
 #define APP_NAME_WINDOWS "NineMorris3D"
 
+#define LOG_PATTERN "%^[%l] [th %t] [%H:%M:%S]%$ %v"
+
 /* SPDLOG_TRACE, SPDLOG_DEBUG, SPDLOG_INFO,
 SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
 
@@ -38,7 +40,7 @@ namespace logging {
     }
 
     void initialize() {
-        spdlog::set_pattern("%^[%l] [thread %t] [%H:%M:%S]%$ %v");
+        spdlog::set_pattern(LOG_PATTERN);
         spdlog::set_level(spdlog::level::trace);
 
         std::string file_path;
@@ -47,7 +49,7 @@ namespace logging {
         } catch (const std::runtime_error& e) {            
             release_logger = spdlog::stdout_color_mt("Release Logger Fallback");
 
-            release_logger->set_pattern("%^[%l] [thread %t] [%H:%M:%S]%$ %v");
+            release_logger->set_pattern(LOG_PATTERN);
             release_logger->set_level(spdlog::level::trace);
 
             spdlog::error("Using fallback logger");
@@ -59,14 +61,14 @@ namespace logging {
         } catch (const spdlog::spdlog_ex& e) {
             release_logger = spdlog::stdout_color_mt("Release Logger Fallback");
 
-            release_logger->set_pattern("%^[%l] [thread %t] [%H:%M:%S]%$ %v");
+            release_logger->set_pattern(LOG_PATTERN);
             release_logger->set_level(spdlog::level::trace);
 
             spdlog::error("Using fallback logger: {}", e.what());
             return;
         }
 
-        release_logger->set_pattern("%^[%l] [thread %t] [%H:%M:%S]%$ %v");
+        release_logger->set_pattern(LOG_PATTERN);
         release_logger->set_level(spdlog::level::trace);
     }
 

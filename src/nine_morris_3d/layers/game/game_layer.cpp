@@ -258,8 +258,8 @@ void GameLayer::render_pieces() {
         return piece->active;
     };
     const auto sort = [this](const Piece* lhs, const Piece* rhs) {
-        float distance1 = glm::length(scene->camera.position - lhs->position);
-        float distance2 = glm::length(scene->camera.position - rhs->position);
+        const float distance1 = glm::length(scene->camera.position - lhs->position);
+        const float distance2 = glm::length(scene->camera.position - rhs->position);
         return distance1 > distance2;
     };
 
@@ -271,7 +271,7 @@ void GameLayer::render_pieces() {
     std::copy_if(pointer_pieces.begin(), pointer_pieces.end(), std::back_inserter(active_pieces), copy);
     std::sort(active_pieces.begin(), active_pieces.end(), sort);
 
-    for (Piece* piece : active_pieces) {
+    for (const Piece* piece : active_pieces) {
         if (piece->selected) {
             renderer::draw_piece_with_outline(piece, piece->select_color);
         } else if (piece->show_outline && piece->id == scene->hovered_id && piece->in_use && !piece->pending_remove) {

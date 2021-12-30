@@ -119,7 +119,7 @@ GLint Shader::get_uniform_location(const std::string& name) const {
 }
 
 GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {
-    std::ifstream file = std::ifstream(source_path.c_str(), std::ifstream::in);
+    std::ifstream file (source_path.c_str(), std::ifstream::in);
     std::string source;
 
     if (file.is_open()) {

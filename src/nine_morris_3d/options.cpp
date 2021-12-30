@@ -183,7 +183,6 @@ namespace options {
         object["skybox"] = options.skybox;
 
         file << object.dump(4);
-
         file.close();
 
         SPDLOG_INFO("Created options file '{}'", file_path.c_str());
