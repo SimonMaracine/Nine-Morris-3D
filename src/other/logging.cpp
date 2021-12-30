@@ -41,8 +41,6 @@ namespace logging {
         spdlog::set_pattern("%^[%l] [thread %t] [%H:%M:%S]%$ %v");
         spdlog::set_level(spdlog::level::trace);
 
-        // This function doesn't handle logger creation exceptions
-
         std::string file_path;
         try {
             file_path = path(LOG_FILE);
@@ -52,11 +50,21 @@ namespace logging {
             release_logger->set_pattern("%^[%l] [thread %t] [%H:%M:%S]%$ %v");
             release_logger->set_level(spdlog::level::trace);
 
-            REL_ERROR("Using fallback logger");
+            spdlog::error("Using fallback logger");
             return;
         }
 
-        release_logger = spdlog::basic_logger_mt("Release Logger", file_path, true);
+        try {
+            release_logger = spdlog::basic_logger_mt("Release Logger", file_path, false);
+        } catch (const spdlog::spdlog_ex& e) {
+            release_logger = spdlog::stdout_color_mt("Release Logger Fallback");
+
+            release_logger->set_pattern("%^[%l] [thread %t] [%H:%M:%S]%$ %v");
+            release_logger->set_level(spdlog::level::trace);
+
+            spdlog::error("Using fallback logger: {}", e.what());
+            return;
+        }
 
         release_logger->set_pattern("%^[%l] [thread %t] [%H:%M:%S]%$ %v");
         release_logger->set_level(spdlog::level::trace);
