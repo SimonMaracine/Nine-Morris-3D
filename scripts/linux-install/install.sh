@@ -47,6 +47,8 @@ copy_icon 128x128
 copy_icon 64x64
 copy_icon 32x32
 
+gtk-update-icon-cache -f $ICONS_FOLDER
+
 # Shortcut
 touch $SHORTCUT_FOLDER/$SHORTCUT
 check_failure
