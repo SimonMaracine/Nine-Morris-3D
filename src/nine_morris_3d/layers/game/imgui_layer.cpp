@@ -55,18 +55,26 @@ void ImGuiLayer::on_attach() {
     colors[ImGuiCol_Header] = DARK_BROWN;
     colors[ImGuiCol_HeaderHovered] = DEFAULT_BROWN;
 
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 8;
+    style.WindowRounding = 8;
+    style.ChildRounding = 8;
+    style.PopupRounding = 8;
+
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
-
-    // This needs to be resetted
-    can_undo = false;
-    // TODO maybe reset other variables
 }
 
 void ImGuiLayer::on_detach() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
+    // These need to be resetted
+    hovering_gui = false;
+    can_undo = false;
+    show_info = false;
+    about_mode = false;
 }
 
 void ImGuiLayer::on_bind_layers() {
@@ -83,7 +91,6 @@ void ImGuiLayer::on_update(float dt) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
-    // bool about = false;
     RESET_HOVERING_GUI();
 
     if (ImGui::BeginMainMenuBar()) {
