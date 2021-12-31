@@ -1,10 +1,33 @@
+#include <string>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb_image.h>
 
 #include "application/window.h"
 #include "application/application_data.h"
 #include "application/events.h"
 #include "other/logging.h"
+
+#define APP_NAME_LINUX "ninemorris3d"
+
+static std::string path(const char* file_path) {
+#ifndef NDEBUG
+      // Use relative path for both operating systems
+      return std::string(file_path);
+#else
+    #if defined(__GNUG__)
+      std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/";
+      path.append(file_path);
+      return path;
+    #elif defined(_MSC_VER)
+      // Just use relative path
+      return std::string(file_path);
+    #else
+        #error "GCC or MSVC must be used (for now)"
+    #endif
+#endif
+}
 
 Window::Window(ApplicationData* data) {
     if (!glfwInit()) {
@@ -32,12 +55,12 @@ Window::Window(ApplicationData* data) {
 #endif
 
     window = glfwCreateWindow(data->width, data->height, data->title.c_str(), nullptr, nullptr);
-    if (!window) {
+    if (window == nullptr) {
         REL_CRITICAL("Could not create window");
         std::exit(1);
     }
 
-    SPDLOG_INFO("Initialized GLFW and window");
+    SPDLOG_INFO("Initialized GLFW and created window");
 
     glfwMakeContextCurrent(window);
 
@@ -112,6 +135,23 @@ Window::Window(ApplicationData* data) {
         events::MouseMovedEvent event ((float) xpos, (float) ypos);
         data->event_function(event);
     });
+
+    Icon icons[5] = {
+        Icon(path("data/icons/512x512/ninemorris3d.png")),
+        Icon(path("data/icons/256x256/ninemorris3d.png")),
+        Icon(path("data/icons/128x128/ninemorris3d.png")),
+        Icon(path("data/icons/64x64/ninemorris3d.png")),
+        Icon(path("data/icons/32x32/ninemorris3d.png"))
+    };
+
+    GLFWimage glfw_icons[5];
+    glfw_icons[0] = icons[0].get_data();
+    glfw_icons[1] = icons[1].get_data();
+    glfw_icons[2] = icons[2].get_data();
+    glfw_icons[3] = icons[3].get_data();
+    glfw_icons[4] = icons[4].get_data();
+
+    glfwSetWindowIcon(window, 5, glfw_icons);
 }
 
 Window::~Window() {
@@ -130,10 +170,40 @@ GLFWwindow* Window::get_handle() const {
     return window;
 }
 
+double Window::get_time() const {
+    return glfwGetTime();
+}
+
 void Window::set_vsync(int interval) const {
     glfwSwapInterval(interval);
 }
 
-double Window::get_time() const {
-    return glfwGetTime();
+// --- Icon
+
+Icon::Icon(const std::string& file_path) {
+    data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
+
+    if (data == nullptr) {
+        REL_CRITICAL("Could not load icon '{}'", file_path.c_str());
+        std::exit(1);
+    }
+
+    this->file_path = file_path;
+
+    SPDLOG_INFO("Loaded icon data '{}'", file_path.c_str());
+}
+
+Icon::~Icon() {
+    stbi_image_free(data);
+
+    SPDLOG_INFO("Freed icon data '{}'", file_path.c_str());
+}
+
+GLFWimage Icon::get_data() const {
+    GLFWimage image;
+    image.width = width;
+    image.height = height;
+    image.pixels = data;
+
+    return image;
 }

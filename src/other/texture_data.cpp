@@ -13,7 +13,7 @@ TextureData::TextureData(const std::string& file_path, bool flip) {
 
     data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
-    if (!data) {
+    if (data == nullptr) {
         REL_CRITICAL("Could not load texture '{}'", file_path.c_str());
         std::exit(1);
     }

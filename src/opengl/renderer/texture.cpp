@@ -55,7 +55,7 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipm
     int width, height, channels;
     stbi_uc* data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
-    if (!data) {
+    if (data == nullptr) {
         REL_CRITICAL("Could not load texture '{}'", file_path.c_str());
         std::exit(1);
     }
@@ -165,7 +165,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
 
         data = stbi_load(file_paths[i], &width, &height, &channels, 4);
 
-        if (!data) {
+        if (data == nullptr) {
             REL_CRITICAL("Could not load texture '{}'", file_paths[i]);
             std::exit(1);
         }
