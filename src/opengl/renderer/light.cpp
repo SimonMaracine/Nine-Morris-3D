@@ -3,7 +3,7 @@
 #include "opengl/renderer/light.h"
 
 const Light LIGHT_FIELD = {
-    glm::vec3(-15.1f, 14.5f, -3.7f),
+    glm::vec3(-15.1f, 11.8f, 9.1f),
     glm::vec3(0.3f),
     glm::vec3(1.0f),
     glm::vec3(1.0f)

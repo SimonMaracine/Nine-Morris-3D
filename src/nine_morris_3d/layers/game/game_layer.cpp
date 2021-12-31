@@ -20,6 +20,7 @@
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/vertex_array.h"
+#include "opengl/renderer/framebuffer.h"
 #include "opengl/renderer/buffer.h"
 #include "opengl/renderer/light.h"
 #include "other/model.h"

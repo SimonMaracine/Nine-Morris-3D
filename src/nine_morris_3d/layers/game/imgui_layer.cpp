@@ -221,8 +221,6 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::EndMainMenuBar();
     }
 
-    SPDLOG_DEBUG("{}", about_mode);
-
     if (about_mode) {
         ImGui::OpenPopup("About Nine Morris 3D");
 
