@@ -60,6 +60,7 @@ void ImGuiLayer::on_attach() {
 
     // This needs to be resetted
     can_undo = false;
+    // TODO maybe reset other variables
 }
 
 void ImGuiLayer::on_detach() {
@@ -82,7 +83,7 @@ void ImGuiLayer::on_update(float dt) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
-    bool about = false;
+    // bool about = false;
     RESET_HOVERING_GUI();
 
     if (ImGui::BeginMainMenuBar()) {
@@ -205,7 +206,7 @@ void ImGuiLayer::on_update(float dt) {
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About", nullptr, false)) {
-                about = true;
+                about_mode = true;
             }
             if (ImGui::MenuItem("Log Info", nullptr, false)) {
                 logging::log_opengl_and_dependencies_info(logging::LogTarget::File);
@@ -220,33 +221,39 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::EndMainMenuBar();
     }
 
-    if (about) {
+    SPDLOG_DEBUG("{}", about_mode);
+
+    if (about_mode) {
         ImGui::OpenPopup("About Nine Morris 3D");
 
         ImVec2 center = ImGui::GetMainViewport()->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
         ImGuiStyle& style = ImGui::GetStyle();
         style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+
+        if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            renderer::draw_screen_quad(app->storage->splash_screen_texture->get_id());
+
+            ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
+            ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+            ImGui::Separator();
+            ImGui::Text("All programming by:");
+            ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
+
+            if (ImGui::Button("Ok", ImVec2(430, 0))) {
+                ImGui::CloseCurrentPopup();
+                about_mode = false;
+            }
+
+            ImGui::EndPopup();
+
+            HOVERING_GUI();
+            game_layer->active = false;
+            gui_layer->active = false;
+        }
     } else {
         game_layer->active = true;
         gui_layer->active = true;
-    }
-
-    if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
-        ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
-        ImGui::Separator();
-        ImGui::Text("All programming by:");
-        ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
-
-        if (ImGui::Button("Ok", ImVec2(430, 0))) {
-            ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::EndPopup();
-        HOVERING_GUI();
-        game_layer->active = false;
-        gui_layer->active = false;
     }
 
     if (scene->board.not_placed_pieces_count() < 18) {
@@ -265,24 +272,24 @@ void ImGuiLayer::on_update(float dt) {
             switch (scene->board.ending) {
                 case Board::Ending::WinnerWhite: {
                     const char* message = "White player wins!";
-                    float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize(message).x;
+                    const float window_width = ImGui::GetWindowSize().x;
+                    const float text_width = ImGui::CalcTextSize(message).x;
                     ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
                     ImGui::Text("%s", message);
                     break;
                 }
                 case Board::Ending::WinnerBlack: {
                     const char* message = "Black player wins!";
-                    float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize(message).x;
+                    const float window_width = ImGui::GetWindowSize().x;
+                    const float text_width = ImGui::CalcTextSize(message).x;
                     ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
                     ImGui::Text("%s", message);
                     break;
                 }
                 case Board::Ending::TieBetweenBothPlayers: {
                     const char* message = "Tie between both players!";
-                    float window_width = ImGui::GetWindowSize().x;
-                    float text_width = ImGui::CalcTextSize(message).x;
+                    const float window_width = ImGui::GetWindowSize().x;
+                    const float text_width = ImGui::CalcTextSize(message).x;
                     ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
                     ImGui::Text("%s", message);
                     break;
@@ -301,7 +308,7 @@ void ImGuiLayer::on_update(float dt) {
         }
     }
 
-    if (show_info) {
+    if (show_info && !about_mode) {
         ImGui::Begin("Info");
         ImGui::Text("FPS: %f", app->fps);
         ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
@@ -312,41 +319,43 @@ void ImGuiLayer::on_update(float dt) {
     }
 
 #ifndef NDEBUG
-    ImGui::Begin("Debug");
-    ImGui::Text("FPS: %f", app->fps);
-    ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
-    ImGui::Text("White pieces: %u", scene->board.white_pieces_count);
-    ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
-    ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
-    ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
-    ImGui::Text("White can jump: %s", scene->board.can_jump[0] ? "true" : "false");
-    ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
-    ImGui::Text("Phase: %d", (int) scene->board.phase);
-    ImGui::Text("Turn: %s", scene->board.turn == Board::Player::White ? "white" : "black");
-    ImGui::Text("Should take piece: %s", scene->board.should_take_piece ? "true" : "false");
-    ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
-    ImGui::Text("History size: %lu", scene->board.state_history->size());
-    ImGui::Text("Hovered ID: %d", scene->hovered_id);
-    ImGui::Text("Hovered node: %p", scene->board.hovered_node);
-    ImGui::Text("Hovered piece: %p", scene->board.hovered_piece);
-    ImGui::Text("Selected piece: %p", scene->board.selected_piece);
-    ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
-    ImGui::End();
+    if (!about_mode) {
+        ImGui::Begin("Debug");
+        ImGui::Text("FPS: %f", app->fps);
+        ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
+        ImGui::Text("White pieces: %u", scene->board.white_pieces_count);
+        ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
+        ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
+        ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
+        ImGui::Text("White can jump: %s", scene->board.can_jump[0] ? "true" : "false");
+        ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
+        ImGui::Text("Phase: %d", (int) scene->board.phase);
+        ImGui::Text("Turn: %s", scene->board.turn == Board::Player::White ? "white" : "black");
+        ImGui::Text("Should take piece: %s", scene->board.should_take_piece ? "true" : "false");
+        ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
+        ImGui::Text("History size: %lu", scene->board.state_history->size());
+        ImGui::Text("Hovered ID: %d", scene->hovered_id);
+        ImGui::Text("Hovered node: %p", scene->board.hovered_node);
+        ImGui::Text("Hovered piece: %p", scene->board.hovered_piece);
+        ImGui::Text("Selected piece: %p", scene->board.selected_piece);
+        ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
+        ImGui::End();
 
-    ImGui::Begin("Debug Settings");
-    if (ImGui::SliderFloat3("Light position", (float*) &scene->light.position, -30.0f, 30.0f)) {
-        game_layer->setup_light();
+        ImGui::Begin("Debug Settings");
+        if (ImGui::SliderFloat3("Light position", (float*) &scene->light.position, -30.0f, 30.0f)) {
+            game_layer->setup_light();
+        }
+        if (ImGui::SliderFloat3("Light ambient color", (float*) &scene->light.ambient_color, 0.0f, 1.0f)) {
+            game_layer->setup_light();
+        }
+        if (ImGui::SliderFloat3("Light diffuse color", (float*) &scene->light.diffuse_color, 0.0f, 1.0f)) {
+            game_layer->setup_light();
+        }
+        if (ImGui::SliderFloat3("Light specular color", (float*) &scene->light.specular_color, 0.0f, 1.0f)) {
+            game_layer->setup_light();
+        }
+        ImGui::End();
     }
-    if (ImGui::SliderFloat3("Light ambient color", (float*) &scene->light.ambient_color, 0.0f, 1.0f)) {
-        game_layer->setup_light();
-    }
-    if (ImGui::SliderFloat3("Light diffuse color", (float*) &scene->light.diffuse_color, 0.0f, 1.0f)) {
-        game_layer->setup_light();
-    }
-    if (ImGui::SliderFloat3("Light specular color", (float*) &scene->light.specular_color, 0.0f, 1.0f)) {
-        game_layer->setup_light();
-    }
-    ImGui::End();
 #endif
 
     ImGui::Render();
