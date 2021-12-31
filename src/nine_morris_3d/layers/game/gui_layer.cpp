@@ -1,4 +1,3 @@
-
 #include "application/application.h"
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"

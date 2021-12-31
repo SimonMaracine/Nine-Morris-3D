@@ -68,6 +68,8 @@ void GameScene::on_enter() {
 void GameScene::on_exit() {
     SPDLOG_DEBUG("Exit game scene");
 
+    options::save_options_to_file(options);
+
     if (options.save_on_exit && !app->running) {
         board.finalize_pieces_state();
 
