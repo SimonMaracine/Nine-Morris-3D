@@ -30,6 +30,8 @@ void ImGuiLayer::on_attach() {
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
+    io.ConfigWindowsResizeFromEdges = false;
 #ifdef NDEBUG
     io.IniFilename = nullptr;
 #endif
