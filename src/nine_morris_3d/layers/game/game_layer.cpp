@@ -622,7 +622,7 @@ void GameLayer::load_game() {
         piece.position = state.board.pieces[i].position;
         piece.rotation = state.board.pieces[i].rotation;
         piece.scale = state.board.pieces[i].scale;
-        piece.velocity = state.board.pieces[i].velocity;
+        // piece.velocity = state.board.pieces[i].velocity;
         piece.target = state.board.pieces[i].target;
         piece.should_move = state.board.pieces[i].should_move;
         piece.distance_travelled = state.board.pieces[i].distance_travelled;

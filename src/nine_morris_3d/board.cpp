@@ -30,6 +30,10 @@ constexpr unsigned int WINDMILLS[16][3] = {
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
+static float map(float x, float in_min, float in_max, float out_min, float out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 Board::Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history)
     : id(id), state_history(board_state_history) {
 
@@ -94,14 +98,20 @@ void Board::move_pieces(float dt) {
     GET_ACTIVE_PIECES(active_pieces)
 
     for (Piece* piece : active_pieces) {
+        // if (piece->should_move) {
+        //     if (piece->distance_travelled < glm::length(piece->distance_to_travel)) {
+        //         glm::vec3 velocity = piece->velocity * dt;
+        //         piece->position += velocity;
+        //         piece->distance_travelled += glm::length(velocity);
+        //     } else {
+        //         arrive_at_node(piece);
+        //     }
+        // }
+
         if (piece->should_move) {
-            if (piece->distance_travelled < glm::length(piece->distance_to_travel)) {
-                glm::vec3 velocity = piece->velocity * dt;
-                piece->position += velocity;
-                piece->distance_travelled += glm::length(velocity);
-            } else {
-                arrive_at_node(piece);
-            }
+            piece->distance_travelled += PIECE_MOVE_SPEED * dt;
+
+            
         }
     }
 }
@@ -228,7 +238,7 @@ void Board::put_piece(hoverable::Id hovered_id) {
                 selected_piece->target.y = PIECE_Y_POSITION;
                 selected_piece->target.z = node.position.z;
 
-                selected_piece->velocity = (selected_piece->target - selected_piece->position) * PIECE_MOVE_SPEED;
+                // selected_piece->velocity = (selected_piece->target - selected_piece->position) * PIECE_MOVE_SPEED;
                 selected_piece->distance_to_travel = selected_piece->target - selected_piece->position;
                 selected_piece->should_move = true;
 
@@ -335,7 +345,7 @@ void Board::undo() {
         piece.position = state.pieces[i].position;
         piece.rotation = state.pieces[i].rotation;
         piece.scale = state.pieces[i].scale;
-        piece.velocity = state.pieces[i].velocity;
+        // piece.velocity = state.pieces[i].velocity;
         piece.target = state.pieces[i].target;
         piece.should_move = state.pieces[i].should_move;
         piece.distance_travelled = state.pieces[i].distance_travelled;
@@ -416,7 +426,7 @@ Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* 
             piece->target.y = PIECE_Y_POSITION;
             piece->target.z = z_pos;
 
-            piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
+            // piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
             piece->distance_to_travel = piece->target - piece->position;
             piece->should_move = true;
 
@@ -437,7 +447,7 @@ void Board::take_and_raise_piece(Piece* piece) {
     piece->target.y = PIECE_Y_POSITION + 1.5f;
     piece->target.z = piece->position.z;
 
-    piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
+    // piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
     piece->distance_to_travel = piece->target - piece->position;
     piece->should_move = true;
 
@@ -999,7 +1009,7 @@ void Board::arrive_at_node(Piece* piece) {
 
     // Reset all these variables
     piece->should_move = false;
-    piece->velocity = glm::vec3(0.0f);
+    // piece->velocity = glm::vec3(0.0f);
     piece->target = glm::vec3(0.0f);
     piece->distance_travelled = 0.0f;
     piece->distance_to_travel = glm::vec3(0.0f);

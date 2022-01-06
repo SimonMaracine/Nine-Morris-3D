@@ -29,10 +29,10 @@ public:
     glm::vec3 rotation = glm::vec3(0.0f);
     float scale = 0.0f;
 
-    glm::vec3 velocity = glm::vec3(0.0f);
+    // glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 target = glm::vec3(0.0f);
     bool should_move = false;
-    float distance_travelled = 0.0f;
+    float distance_travelled = 0.0f;  // From 0.0 to 1.0
     glm::vec3 distance_to_travel = glm::vec3(0.0f);
 
     Rc<VertexArray> vertex_array;
