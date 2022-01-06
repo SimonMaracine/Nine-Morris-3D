@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -10,6 +11,7 @@
 #include "opengl/renderer/shader.h"
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/framebuffer.h"
+#include "opengl/renderer/font.h"
 #include "nine_morris_3d/hoverable.h"
 #include "nine_morris_3d/board.h"
 
@@ -92,6 +94,7 @@ namespace renderer {
     void load_projection_view(const glm::mat4& matrix);
     void disable_output_to_red(unsigned int index);
     void enable_output_to_red(unsigned int index);
+    void draw_string(const std::string& string, const glm::vec2& position, Rc<Font> font);
 
     void draw_board(const Board& board);
     void draw_board_paint(const BoardPaint& board_paint);

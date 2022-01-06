@@ -1,11 +1,13 @@
 #include <memory>
 #include <iostream>
+#include <string>
 #include <string.h>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <stb_truetype.h>
 
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/vertex_array.h"
@@ -296,6 +298,18 @@ namespace renderer {
 
     void enable_output_to_red(unsigned int index) {
         glColorMaski(index, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    }
+
+    void draw_string(const std::string& string, const glm::vec2& position, Rc<Font> font) {
+        for (unsigned char character : string) {
+            stbtt_aligned_quad quad;
+            stbtt_GetBakedQuad(font->get_chars(), font->get_bitmap_size(), font->get_bitmap_size(),
+                    character, &position.x, &position.y, &quad, 1);
+
+            
+
+
+        }
     }
 
     void draw_board(const Board& board) {

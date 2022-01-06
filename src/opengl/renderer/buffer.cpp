@@ -18,7 +18,7 @@ Buffer::~Buffer() {
     SPDLOG_DEBUG("Deleted buffer {}", buffer);
 }
 
-std::shared_ptr<Buffer> Buffer::create(std::size_t size) {
+std::shared_ptr<Buffer> Buffer::create(size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -28,7 +28,7 @@ std::shared_ptr<Buffer> Buffer::create(std::size_t size) {
     return std::make_shared<Buffer>(buffer);
 }
 
-std::shared_ptr<Buffer> Buffer::create(const void* data, std::size_t size) {
+std::shared_ptr<Buffer> Buffer::create(const void* data, size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -46,8 +46,8 @@ void Buffer::unbind() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Buffer::update_data(const void* data, std::size_t size) const {
-    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+void Buffer::update_data(const void* data, size_t size) const {
+    glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
 }
 
 // --- Index buffer
@@ -63,7 +63,7 @@ IndexBuffer::~IndexBuffer() {
     SPDLOG_DEBUG("Deleted index buffer {}", buffer);
 }
 
-std::shared_ptr<IndexBuffer> IndexBuffer::create(const unsigned int* data, std::size_t size) {
+std::shared_ptr<IndexBuffer> IndexBuffer::create(const unsigned int* data, size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
@@ -94,7 +94,7 @@ UniformBuffer::~UniformBuffer() {
     SPDLOG_DEBUG("Deleted uniform buffer {}", buffer);
 }
 
-std::shared_ptr<UniformBuffer> UniformBuffer::create(const void* data, std::size_t size) {
+std::shared_ptr<UniformBuffer> UniformBuffer::create(const void* data, size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_UNIFORM_BUFFER, buffer);
@@ -112,6 +112,6 @@ void UniformBuffer::unbind() {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void UniformBuffer::update_data(const void* data, std::size_t size) const {
+void UniformBuffer::update_data(const void* data, size_t size) const {
     glBufferData(GL_UNIFORM_BUFFER, size, data, GL_STATIC_DRAW);
 }

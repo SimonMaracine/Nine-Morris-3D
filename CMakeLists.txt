@@ -56,6 +56,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/opengl/renderer/framebuffer.cpp"
     "src/opengl/renderer/camera.cpp"
     "src/opengl/renderer/light.cpp"
+    "src/opengl/renderer/font.cpp"
     "src/other/logging.cpp"
     "src/other/model.cpp"
     "src/other/texture_data.cpp"
@@ -63,6 +64,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/user_data.cpp"
     "dependencies/glad/src/glad.c"
     "dependencies/stb_image/stb_image.c"
+    "dependencies/stb_truetype/stb_truetype.c"
     "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_demo.cpp"
     "extern/imgui/imgui_tables.cpp"
@@ -105,6 +107,7 @@ target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
 target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/glad/include"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_truetype"
     "${CMAKE_SOURCE_DIR}/dependencies/cereal/include"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/assimp/include"
