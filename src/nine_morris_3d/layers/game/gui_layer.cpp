@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "application/application.h"
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
@@ -7,7 +9,7 @@
 #include "nine_morris_3d/layers/game/game_layer.h"
 
 void GuiLayer::on_attach() {
-
+    font = std::make_shared<Font>("data/fonts/OpenSans/OpenSans-Regular.ttf", 32.0f, 256);
 }
 
 void GuiLayer::on_detach() {
@@ -15,7 +17,7 @@ void GuiLayer::on_detach() {
 }
 
 void GuiLayer::on_bind_layers() {
-    game_layer = get_layer<GameLayer>(0, scene);
+
 }
 
 void GuiLayer::on_update(float dt) {
@@ -24,6 +26,8 @@ void GuiLayer::on_update(float dt) {
 
 void GuiLayer::on_draw() {
     render_turn_indicator();
+
+    renderer::draw_string("Simon", glm::vec2(0.0f, 0.0f), font);
 }
 
 void GuiLayer::on_event(events::Event& event) {

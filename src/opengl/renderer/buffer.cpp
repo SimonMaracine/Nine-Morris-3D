@@ -22,7 +22,7 @@ std::shared_ptr<Buffer> Buffer::create(size_t size) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
     LOG_ALLOCATION(size);
 
     return std::make_shared<Buffer>(buffer);

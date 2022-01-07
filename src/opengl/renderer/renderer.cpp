@@ -16,6 +16,7 @@
 #include "opengl/renderer/texture.h"
 #include "opengl/renderer/framebuffer.h"
 #include "nine_morris_3d/board.h"
+#include "other/logging.h"
 #include "other/assets.h"
 
 namespace renderer {
@@ -113,6 +114,11 @@ namespace renderer {
             storage->uniform_buffer
         );
 #endif
+
+        storage->text_shader = Shader::create(
+            "data/shaders/text.vert",
+            "data/shaders/text.frag"
+        );
 
         storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
         storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate, width, height, 1, 2);
@@ -300,16 +306,70 @@ namespace renderer {
         glColorMaski(index, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 
-    void draw_string(const std::string& string, const glm::vec2& position, Rc<Font> font) {
+    void draw_string(const std::string& string, const glm::vec2& position, std::shared_ptr<Font> font) {
+        glm::vec2 temp = position;
+
+        std::vector<float> buffer;
+        buffer.reserve(sizeof(float) * 256);
+
         for (unsigned char character : string) {
             stbtt_aligned_quad quad;
             stbtt_GetBakedQuad(font->get_chars(), font->get_bitmap_size(), font->get_bitmap_size(),
-                    character, &position.x, &position.y, &quad, 1);
+                    character - 32, &temp.x, &temp.y, &quad, 1);
 
-            
+            SPDLOG_DEBUG("Char: {}", character);
+            SPDLOG_DEBUG("x0: {}, y0: {}", quad.x0, quad.y0);
+            SPDLOG_DEBUG("x1: {}, y0: {}", quad.x1, quad.y0);
+            SPDLOG_DEBUG("x1: {}, y1: {}", quad.x1, quad.y1);
+            SPDLOG_DEBUG("x0: {}, y1: {}", quad.x0, quad.y1);
 
+            SPDLOG_DEBUG("s0: {}, t0: {}", quad.s0, quad.t0);
+            SPDLOG_DEBUG("s1: {}, t0: {}", quad.s1, quad.t0);
+            SPDLOG_DEBUG("s1: {}, t1: {}", quad.s1, quad.t1);
+            SPDLOG_DEBUG("s0: {}, t1: {}", quad.s0, quad.t1);
 
+            // quad.x0, quad.y1, quad.s0, quad.t1,
+            // quad.x0, quad.y0, quad.s0, quad.t0,
+            // quad.x1, quad.y1, quad.s1, quad.t1,
+            // quad.x1, quad.y1, quad.s1, quad.t1,
+            // quad.x0, quad.y0, quad.s0, quad.t0,
+            // quad.x1, quad.y0, quad.s1, quad.t0
+
+            buffer.push_back(quad.x0);
+            buffer.push_back(quad.y1);
+            buffer.push_back(quad.s0);
+            buffer.push_back(quad.t1);
+            buffer.push_back(quad.x0);
+            buffer.push_back(quad.y0);
+            buffer.push_back(quad.s0);
+            buffer.push_back(quad.t0);
+            buffer.push_back(quad.x1);
+            buffer.push_back(quad.y1);
+            buffer.push_back(quad.s1);
+            buffer.push_back(quad.t1);
+            buffer.push_back(quad.x1);
+            buffer.push_back(quad.y1);
+            buffer.push_back(quad.s1);
+            buffer.push_back(quad.t1);
+            buffer.push_back(quad.x0);
+            buffer.push_back(quad.y0);
+            buffer.push_back(quad.s0);
+            buffer.push_back(quad.t0);
+            buffer.push_back(quad.x1);
+            buffer.push_back(quad.y0);
+            buffer.push_back(quad.s1);
+            buffer.push_back(quad.t0);
         }
+
+        font->update_data(buffer.data(), sizeof(float) * buffer.size());
+
+        storage->text_shader->bind();
+        storage->text_shader->set_uniform_int("u_bitmap", 0);  // TODO this shouldn't be set every frame
+        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);
+
+        font->get_vertex_array()->bind();
+        bind_texture(font->get_texture(), 0);
+        glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
     }
 
     void draw_board(const Board& board) {
@@ -405,7 +465,7 @@ namespace renderer {
         glDepthMask(GL_FALSE);
 
         storage->skybox_shader->bind();
-        storage->skybox_shader->set_uniform_int("u_skybox", 0);
+        storage->skybox_shader->set_uniform_int("u_skybox", 0);  // TODO this shouldn't be set every frame
         storage->skybox_shader->set_uniform_matrix("u_projection_view_matrix", projection_view_matrix);
 
         storage->skybox_vertex_array->bind();

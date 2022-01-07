@@ -1,22 +1,32 @@
 #include <string>
 #include <fstream>
+#include <vector>
+#include <iterator>
 
 #include <stb_truetype.h>
 #include <glad/glad.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "opengl/renderer/temp_stb_image_write.h"
+
 #include "opengl/renderer/font.h"
+#include "opengl/renderer/buffer.h"
+#include "opengl/renderer/vertex_array.h"
 #include "opengl/debug_opengl.h"
 #include "other/logging.h"
 
 Font::Font(const std::string& file_path, float size, unsigned int bitmap_size)
     : bitmap_size(bitmap_size) {
-    const unsigned char* file_data = get_file_data(file_path);
+    const char* file_data = get_file_data(file_path);
 
-    bitmap = new unsigned char[bitmap_size * bitmap_size];
+    unsigned char* bitmap = new unsigned char[bitmap_size * bitmap_size];
 
-    stbtt_BakeFontBitmap(file_data, 0, size, bitmap, bitmap_size, bitmap_size, 32, 96, character_data);
+    stbtt_BakeFontBitmap(*((const unsigned char**) (&file_data)), 0, size, bitmap, bitmap_size, bitmap_size, 32, 96, character_data);
 
-    
+    delete[] file_data;
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -31,14 +41,32 @@ Font::Font(const std::string& file_path, float size, unsigned int bitmap_size)
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+    if (!stbi_write_png("bitmap_test.png", bitmap_size, bitmap_size, 1, bitmap, 0)) {
+        SPDLOG_CRITICAL("Failed to create png");
+        std::exit(1);
+    }
+
     delete[] bitmap;
+
+    buffer = Buffer::create(1);
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 2);
+    layout.add(1, BufferLayout::Type::Float, 2);
+
+    vertex_array = VertexArray::create();
+    vertex_array->add_buffer(buffer, layout);
+
+    VertexArray::unbind();
 }
 
 Font::~Font() {
-    glDeleteTextures(1, texture)
+    glDeleteTextures(1, &texture);
 }
 
-const unsigned char* Font::get_file_data(const std::string& file_path) {
+const char* Font::get_file_data(const std::string& file_path) {
     std::ifstream file (file_path, std::ios::in | std::ios::binary);
 
     if (!file.is_open()) {
@@ -46,7 +74,18 @@ const unsigned char* Font::get_file_data(const std::string& file_path) {
         std::exit(1);
     }
 
-    // TODO implement this
+    file.seekg(0, file.end);
+    int length = file.tellg();
+    file.seekg(0, file.beg);
 
-    return nullptr;
+    char* buffer = new char[length];
+    file.read(buffer, length);
+
+    return buffer;
+}
+
+void Font::update_data(const float* data, size_t size) {
+    buffer->bind();
+    buffer->update_data(data, size);
+    vertex_count = size / sizeof(float);
 }

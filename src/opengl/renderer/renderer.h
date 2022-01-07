@@ -2,6 +2,7 @@
 
 #include <array>
 #include <string>
+#include <memory>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -38,6 +39,7 @@ namespace renderer {
 #ifndef NDEBUG
         Rc<Shader> origin_shader;
 #endif
+        Rc<Shader> text_shader;
 
         Rc<Framebuffer> scene_framebuffer;
         Rc<Framebuffer> depth_map_framebuffer;
@@ -94,7 +96,7 @@ namespace renderer {
     void load_projection_view(const glm::mat4& matrix);
     void disable_output_to_red(unsigned int index);
     void enable_output_to_red(unsigned int index);
-    void draw_string(const std::string& string, const glm::vec2& position, Rc<Font> font);
+    void draw_string(const std::string& string, const glm::vec2& position, std::shared_ptr<Font> font);
 
     void draw_board(const Board& board);
     void draw_board_paint(const BoardPaint& board_paint);

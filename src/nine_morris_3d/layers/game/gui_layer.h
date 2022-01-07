@@ -1,6 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include "application/layer.h"
+#include "opengl/renderer/font.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
 
 class GameLayer;
@@ -26,6 +29,7 @@ public:
 
     void render_turn_indicator();
 
+    std::shared_ptr<Font> font;
+
     GameScene* scene = nullptr;
-    GameLayer* game_layer = nullptr;
 };

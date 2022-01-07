@@ -259,8 +259,8 @@ void ImGuiLayer::on_update(float dt) {
             gui_layer->active = false;
         }
     } else {
-        game_layer->active = true;
-        gui_layer->active = true;
+        // game_layer->active = true;  // TODO this breaks other code
+        // gui_layer->active = true;
     }
 
     if (scene->board.not_placed_pieces_count() < 18) {
