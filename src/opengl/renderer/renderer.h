@@ -70,6 +70,7 @@ namespace renderer {
         Rc<VertexArray> skybox_vertex_array;
 
         glm::mat4 orthographic_projection_matrix;
+        glm::mat4 upside_down_ortho_projection_matrix;
 
         hoverable::Id board_id = hoverable::null;
         hoverable::Id pieces_id[18] = { hoverable::null };
@@ -96,7 +97,8 @@ namespace renderer {
     void load_projection_view(const glm::mat4& matrix);
     void disable_output_to_red(unsigned int index);
     void enable_output_to_red(unsigned int index);
-    void draw_string(const std::string& string, const glm::vec2& position, std::shared_ptr<Font> font);
+    void draw_string(const std::string& string, const glm::vec2& position, const glm::vec3& color,
+                std::shared_ptr<Font> font);
 
     void draw_board(const Board& board);
     void draw_board_paint(const BoardPaint& board_paint);

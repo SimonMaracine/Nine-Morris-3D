@@ -25,7 +25,7 @@ Font::Font(const std::string& file_path, float size, unsigned int bitmap_size)
 
     delete[] file_data;
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -41,7 +41,7 @@ Font::Font(const std::string& file_path, float size, unsigned int bitmap_size)
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    // glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
     if (!stbi_write_png("bitmap_test.png", bitmap_size, bitmap_size, 1, bitmap, 0)) {
         SPDLOG_CRITICAL("Failed to create png");

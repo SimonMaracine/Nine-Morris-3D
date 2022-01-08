@@ -1,5 +1,8 @@
 #include <memory>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "application/application.h"
 #include "application/events.h"
 #include "opengl/renderer/renderer.h"
@@ -9,7 +12,10 @@
 #include "nine_morris_3d/layers/game/game_layer.h"
 
 void GuiLayer::on_attach() {
-    font = std::make_shared<Font>("data/fonts/OpenSans/OpenSans-Regular.ttf", 32.0f, 256);
+    setup_quad2d_projection();
+
+    font = std::make_shared<Font>("data/fonts/OpenSans/OpenSans-Regular.ttf", 50.0f, 256);
+    font2 = std::make_shared<Font>("data/fonts/FH-GoodDogPlain-WTT/GOODDP__.TTF", 60.0f, 512);
 }
 
 void GuiLayer::on_detach() {
@@ -27,7 +33,9 @@ void GuiLayer::on_update(float dt) {
 void GuiLayer::on_draw() {
     render_turn_indicator();
 
-    renderer::draw_string("Simon", glm::vec2(0.0f, 0.0f), font);
+    renderer::draw_string("This is a sample of text.", glm::vec2(200.0f, 200.0f), glm::vec3(0.8f, 0.8f, 1.0f), font);
+    // renderer::draw_string("Denisa is lovely", glm::vec2(100.0f, 100.0f), glm::vec3(0.8f, 0.0f, 0.8f), font2);
+    renderer::draw_string("Finally doing some font rendering :D", glm::vec2(10.0f, 10.0f), glm::vec3(1.0f, 1.0f, 1.0f), font2);
 }
 
 void GuiLayer::on_event(events::Event& event) {
@@ -59,7 +67,17 @@ bool GuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event)
 }
 
 bool GuiLayer::on_window_resized(events::WindowResizedEvent& event) {
+    app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
+    app->storage->upside_down_ortho_projection_matrix = glm::ortho(0.0f, (float) event.width, (float) event.height, 0.0f);
+    setup_quad2d_projection();
+
     return false;
+}
+
+void GuiLayer::setup_quad2d_projection() {
+    app->storage->quad2d_shader->bind();
+    app->storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
+            app->storage->orthographic_projection_matrix);
 }
 
 void GuiLayer::render_turn_indicator() {

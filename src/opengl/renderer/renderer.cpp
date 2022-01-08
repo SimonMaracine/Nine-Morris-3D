@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <stb_truetype.h>
 
+#include "application/application.h"
 #include "opengl/renderer/renderer.h"
 #include "opengl/renderer/vertex_array.h"
 #include "opengl/renderer/buffer.h"
@@ -190,6 +191,7 @@ namespace renderer {
 #endif
 
         storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) width, 0.0f, (float) height);
+        storage->upside_down_ortho_projection_matrix = glm::ortho(0.0f, (float) width, (float) height, 0.0f);
 
         return storage;
     }
@@ -306,70 +308,69 @@ namespace renderer {
         glColorMaski(index, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 
-    void draw_string(const std::string& string, const glm::vec2& position, std::shared_ptr<Font> font) {
-        glm::vec2 temp = position;
+    void draw_string(const std::string& string, const glm::vec2& position, const glm::vec3& color,
+            std::shared_ptr<Font> font) {
+        glm::vec2 mut_position = position;
+        mut_position.y = Application::get_height() - mut_position.y;
 
-        std::vector<float> buffer;
-        buffer.reserve(sizeof(float) * 256);
+        const size_t SIZE = sizeof(float) * string.length() * 24;
+
+        float* buffer = new float[SIZE];
+        unsigned int index = 0;
 
         for (unsigned char character : string) {
             stbtt_aligned_quad quad;
             stbtt_GetBakedQuad(font->get_chars(), font->get_bitmap_size(), font->get_bitmap_size(),
-                    character - 32, &temp.x, &temp.y, &quad, 1);
+                    character - 32, &mut_position.x, &mut_position.y, &quad, 1);
 
-            SPDLOG_DEBUG("Char: {}", character);
-            SPDLOG_DEBUG("x0: {}, y0: {}", quad.x0, quad.y0);
-            SPDLOG_DEBUG("x1: {}, y0: {}", quad.x1, quad.y0);
-            SPDLOG_DEBUG("x1: {}, y1: {}", quad.x1, quad.y1);
-            SPDLOG_DEBUG("x0: {}, y1: {}", quad.x0, quad.y1);
+            buffer[index++] = quad.x0;
+            buffer[index++] = quad.y1;
+            buffer[index++] = quad.s0;
+            buffer[index++] = quad.t1;
 
-            SPDLOG_DEBUG("s0: {}, t0: {}", quad.s0, quad.t0);
-            SPDLOG_DEBUG("s1: {}, t0: {}", quad.s1, quad.t0);
-            SPDLOG_DEBUG("s1: {}, t1: {}", quad.s1, quad.t1);
-            SPDLOG_DEBUG("s0: {}, t1: {}", quad.s0, quad.t1);
+            buffer[index++] = quad.x0;
+            buffer[index++] = quad.y0;
+            buffer[index++] = quad.s0;
+            buffer[index++] = quad.t0;
 
-            // quad.x0, quad.y1, quad.s0, quad.t1,
-            // quad.x0, quad.y0, quad.s0, quad.t0,
-            // quad.x1, quad.y1, quad.s1, quad.t1,
-            // quad.x1, quad.y1, quad.s1, quad.t1,
-            // quad.x0, quad.y0, quad.s0, quad.t0,
-            // quad.x1, quad.y0, quad.s1, quad.t0
+            buffer[index++] = quad.x1;
+            buffer[index++] = quad.y1;
+            buffer[index++] = quad.s1;
+            buffer[index++] = quad.t1;
 
-            buffer.push_back(quad.x0);
-            buffer.push_back(quad.y1);
-            buffer.push_back(quad.s0);
-            buffer.push_back(quad.t1);
-            buffer.push_back(quad.x0);
-            buffer.push_back(quad.y0);
-            buffer.push_back(quad.s0);
-            buffer.push_back(quad.t0);
-            buffer.push_back(quad.x1);
-            buffer.push_back(quad.y1);
-            buffer.push_back(quad.s1);
-            buffer.push_back(quad.t1);
-            buffer.push_back(quad.x1);
-            buffer.push_back(quad.y1);
-            buffer.push_back(quad.s1);
-            buffer.push_back(quad.t1);
-            buffer.push_back(quad.x0);
-            buffer.push_back(quad.y0);
-            buffer.push_back(quad.s0);
-            buffer.push_back(quad.t0);
-            buffer.push_back(quad.x1);
-            buffer.push_back(quad.y0);
-            buffer.push_back(quad.s1);
-            buffer.push_back(quad.t0);
+            buffer[index++] = quad.x1;
+            buffer[index++] = quad.y1;
+            buffer[index++] = quad.s1;
+            buffer[index++] = quad.t1;
+
+            buffer[index++] = quad.x0;
+            buffer[index++] = quad.y0;
+            buffer[index++] = quad.s0;
+            buffer[index++] = quad.t0;
+
+            buffer[index++] = quad.x1;
+            buffer[index++] = quad.y0;
+            buffer[index++] = quad.s1;
+            buffer[index++] = quad.t0;
         }
 
-        font->update_data(buffer.data(), sizeof(float) * buffer.size());
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+
+        font->update_data(buffer, SIZE);
+        delete[] buffer;
 
         storage->text_shader->bind();
+        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->upside_down_ortho_projection_matrix);
         storage->text_shader->set_uniform_int("u_bitmap", 0);  // TODO this shouldn't be set every frame
-        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);
+        storage->text_shader->set_uniform_vec3("u_color", color);
 
         font->get_vertex_array()->bind();
         bind_texture(font->get_texture(), 0);
         glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
+
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
     }
 
     void draw_board(const Board& board) {
@@ -450,8 +451,8 @@ namespace renderer {
                     piece->scale + SIZE));
 
             storage->outline_shader->bind();
-            storage->outline_shader->set_uniform_vec3("u_color", outline_color);
             storage->outline_shader->set_uniform_matrix("u_model_matrix", matrix);
+            storage->outline_shader->set_uniform_vec3("u_color", outline_color);
 
             glDrawElements(GL_TRIANGLES, piece->index_count, GL_UNSIGNED_INT, nullptr);
         }
@@ -465,8 +466,8 @@ namespace renderer {
         glDepthMask(GL_FALSE);
 
         storage->skybox_shader->bind();
-        storage->skybox_shader->set_uniform_int("u_skybox", 0);  // TODO this shouldn't be set every frame
         storage->skybox_shader->set_uniform_matrix("u_projection_view_matrix", projection_view_matrix);
+        storage->skybox_shader->set_uniform_int("u_skybox", 0);  // TODO this shouldn't be set every frame
 
         storage->skybox_vertex_array->bind();
         storage->skybox_texture->bind(0);

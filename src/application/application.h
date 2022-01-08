@@ -30,6 +30,9 @@ public:
     void change_scene(unsigned int id);
     void push_layer(Layer* layer, Scene* scene);
 
+    static int get_width();
+    static int get_height();
+
     bool running = true;
     double fps = 0.0;
     ApplicationData data;
@@ -48,6 +51,9 @@ private:
 
     bool changed_scene = false;
     Scene* to_scene = nullptr;
+
+    static int* width;
+    static int* height;
 
     friend class Layer;
 };

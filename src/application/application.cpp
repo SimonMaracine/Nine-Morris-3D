@@ -18,6 +18,9 @@ Application::Application(int width, int height, const std::string& title) {
     data.title = title;
     data.event_function = BIND(Application::on_event);
 
+    Application::width = &data.width;
+    Application::height = &data.height;
+
     logging::initialize();
     window = std::make_shared<Window>(&data);
 
@@ -146,6 +149,14 @@ void Application::on_event(events::Event& event) {
     }
 }
 
+int Application::get_width() {
+    return *width;
+}
+
+int Application::get_height() {
+    return *height;
+}
+
 float Application::update_frame_counter() {
     constexpr double MAX_DT = 1.0 / 20.0;
 
@@ -182,3 +193,6 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
 
     return false;
 }
+
+int* Application::width = nullptr;
+int* Application::height = nullptr;

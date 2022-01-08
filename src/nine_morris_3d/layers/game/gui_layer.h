@@ -27,9 +27,11 @@ public:
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
 
+    void setup_quad2d_projection();
     void render_turn_indicator();
 
     std::shared_ptr<Font> font;
+    std::shared_ptr<Font> font2;
 
     GameScene* scene = nullptr;
 };
