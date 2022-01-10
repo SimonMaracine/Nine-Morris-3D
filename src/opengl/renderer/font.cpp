@@ -4,10 +4,8 @@
 #include <iterator>
 
 #include <stb_truetype.h>
+#include <stb_image_write.h>
 #include <glad/glad.h>
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "opengl/renderer/temp_stb_image_write.h"
 
 #include "opengl/renderer/font.h"
 #include "opengl/renderer/buffer.h"
@@ -21,7 +19,7 @@ Font::Font(const std::string& file_path, float size, unsigned int bitmap_size)
 
     unsigned char* bitmap = new unsigned char[bitmap_size * bitmap_size];
 
-    stbtt_BakeFontBitmap(*((const unsigned char**) (&file_data)), 0, size, bitmap, bitmap_size, bitmap_size, 32, 96, character_data);
+    stbtt_BakeFontBitmap((const unsigned char*) file_data, 0, size, bitmap, bitmap_size, bitmap_size, 32, 96, character_data);
 
     delete[] file_data;
 

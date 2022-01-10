@@ -294,10 +294,10 @@ namespace renderer {
     }
 
     void load_projection_view(const glm::mat4& projection_view) {
-        constexpr std::size_t size = sizeof(glm::mat4);
-        float* buffer[size];
-        memcpy(buffer, glm::value_ptr(projection_view), size);
-        storage->uniform_buffer->update_data(buffer, size);
+        constexpr size_t SIZE = sizeof(glm::mat4);
+        float* buffer[SIZE];
+        memcpy(buffer, glm::value_ptr(projection_view), SIZE);
+        storage->uniform_buffer->update_data(buffer, SIZE);
     }
 
     void disable_output_to_red(unsigned int index) {
