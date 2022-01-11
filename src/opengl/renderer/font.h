@@ -2,6 +2,7 @@
 
 #include <string>
 #include <memory>
+#include <unordered_map>
 
 #include <stb_truetype.h>
 #include <glad/glad.h>
@@ -10,22 +11,49 @@
 
 class Font {
 public:
-    Font(const std::string& file_path, float size, unsigned int bitmap_size);
+    Font(const std::string& file_path, float size, int padding, unsigned char onedge_value,
+            int pixel_dist_scale, int bitmap_size);
     ~Font();
 
     void update_data(const float* data, size_t size);
 
-    const stbtt_bakedchar* get_chars() const { return character_data; }
+    const stbtt_fontinfo* get_info() const { return &info; }
     unsigned int get_bitmap_size() const { return bitmap_size; }
 
     const VertexArray* get_vertex_array() const { return vertex_array.get(); }
     GLuint get_texture() const { return texture; }
     unsigned int get_vertex_count() const { return vertex_count; }
 private:
-    static const char* get_file_data(const std::string& file_path);
+    void begin_baking();
+    void bake_characters(int begin_codepoint, int end_codepoint);
+    void bake_character(int codepoint);
+    void end_baking();
 
-    stbtt_bakedchar character_data[96];  // ASCII 32..126 is 95 glyphs
-    unsigned int bitmap_size = 0;
+    static const char* get_file_data(const std::string& file_path);
+    static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsigned char* glyph,
+        int width, int height, int dest_x, int dest_y, float* s0, float* t0, float* s1, float* t1);
+
+    struct BakeContext {
+        int x = 0, y = 0;
+        int max_row_height = 0;
+        unsigned char* bitmap = nullptr;
+    } bake_context;
+
+    struct Glyph {
+        float s0, t0, s1, t1;
+        int xoff, yoff, xadvance;
+    };
+
+    std::unordered_map<int, Glyph> glyphs;
+
+    stbtt_fontinfo info;
+    const char* font_file_buffer = nullptr;
+    int bitmap_size = 0;
+    int padding = 0;
+    unsigned char onedge_value = 0;
+    int pixel_dist_scale = 0;
+    float sf = 0.0f;
+
     GLuint texture = 0;
     Rc<VertexArray> vertex_array;
     Rc<Buffer> buffer;
