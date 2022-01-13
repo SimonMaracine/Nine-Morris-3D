@@ -323,7 +323,7 @@ namespace renderer {
             const float x0 = (float) (x + glyph.xoff);
             const float y0 = (float) -(glyph.height - glyph.yoff);
             const float x1 = (float) (x + glyph.xoff + glyph.width);
-            const float y1 = (float) (-(glyph.height - glyph.yoff) + glyph.height);
+            const float y1 = (float) glyph.yoff;
 
             buffer[buffer_index++] = x0;
             buffer[buffer_index++] = y1;
@@ -389,17 +389,17 @@ namespace renderer {
         }
 
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, glm::vec3(position.x, Application::get_height() - position.y - 50.0f, 0.0f));
+        matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
         matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
 
-        glCullFace(GL_FRONT);
+        glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
 
         font->update_data(buffer, SIZE);
         delete[] buffer;
 
         storage->text_shader->bind();
-        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->upside_down_ortho_projection_matrix);
+        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);
         storage->text_shader->set_uniform_matrix("u_transformation_matrix", matrix);
         storage->text_shader->set_uniform_int("u_bitmap", 0);  // TODO this shouldn't be set every frame
         storage->text_shader->set_uniform_vec3("u_color", color);
@@ -408,7 +408,7 @@ namespace renderer {
         bind_texture(font->get_texture(), 0);
         glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
 
-        glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
 

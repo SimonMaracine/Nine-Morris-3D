@@ -32,6 +32,7 @@ public:
 
     std::shared_ptr<Font> font;
     std::shared_ptr<Font> font2;
+    float text_scale = 1.0f;
 
     GameScene* scene = nullptr;
 };

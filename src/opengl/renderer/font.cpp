@@ -106,6 +106,8 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         gl.yoff = (int) std::roundf((ascent + y1) * sf);
         gl.xadvance = (int) std::roundf(advance_width * sf);
 
+        assert(glyphs.count(codepoint) == 0);
+
         glyphs[codepoint] = gl;
     }
 }
@@ -147,6 +149,8 @@ void Font::bake_character(int codepoint) {
     gl.xoff = (int) std::roundf(left_side_bearing * sf);
     gl.yoff = (int) std::roundf((ascent + y1) * sf);
     gl.xadvance = (int) std::roundf(advance_width * sf);
+
+    assert(glyphs.count(codepoint) == 0);
 
     glyphs[codepoint] = gl;
 }
