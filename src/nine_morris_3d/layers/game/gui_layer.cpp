@@ -42,10 +42,11 @@ void GuiLayer::on_update(float dt) {
 void GuiLayer::on_draw() {
     render_turn_indicator();
 
-    renderer::draw_string("This is a sample of text.", glm::vec2(200.0f, 200.0f), 1, glm::vec3(0.8f, 0.8f, 1.0f), font);
-    renderer::draw_string("Denisa is lovely", glm::vec2(100.0f, 100.0f), 1, glm::vec3(0.8f, 0.0f, 0.8f), font2);
-    renderer::draw_string("Finally doing some font rendering :D", glm::vec2(10.0f, 10.0f), 1, glm::vec3(1.0f, 1.0f, 1.0f), font2);
-    renderer::draw_string("I will write unknown characters: cămară.", glm::vec2(10.0f, 400.0f), 1, glm::vec3(0.0f, 1.0f, 1.0f), font);
+    // renderer::draw_string("This is a sample of text.", glm::vec2(200.0f, 200.0f), 1, glm::vec3(0.8f, 0.8f, 1.0f), font);
+    // renderer::draw_string("Denisa is lovely", glm::vec2(100.0f, 100.0f), 1, glm::vec3(0.8f, 0.0f, 0.8f), font2);
+    // renderer::draw_string("Finally doing some font rendering :D", glm::vec2(10.0f, 10.0f), 1, glm::vec3(1.0f, 1.0f, 1.0f), font2);
+    // renderer::draw_string("I will write unknown characters: cămară.", glm::vec2(10.0f, 400.0f), 1, glm::vec3(0.0f, 1.0f, 1.0f), font);
+    renderer::draw_string("This is a sample of text.", glm::vec2(0.0f, 20.0f), 1.5f, glm::vec3(1.0f, 1.0f, 1.0f), font2);
 }
 
 void GuiLayer::on_event(events::Event& event) {

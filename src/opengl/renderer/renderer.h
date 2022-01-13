@@ -97,7 +97,7 @@ namespace renderer {
     void load_projection_view(const glm::mat4& matrix);
     void disable_output_to_red(unsigned int index);
     void enable_output_to_red(unsigned int index);
-    void draw_string(const std::string& string, const glm::vec2& position, unsigned int scale,
+    void draw_string(const std::string& string, const glm::vec2& position, float scale,
                 const glm::vec3& color, std::shared_ptr<Font> font);
 
     void draw_board(const Board& board);

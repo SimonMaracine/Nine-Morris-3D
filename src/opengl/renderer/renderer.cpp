@@ -308,103 +308,98 @@ namespace renderer {
         glColorMaski(index, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 
-    void draw_string(const std::string& string, const glm::vec2& position, unsigned int scale,
+    void draw_string(const std::string& string, const glm::vec2& position, float scale,
             const glm::vec3& color, std::shared_ptr<Font> font) {
-        // glm::vec2 mut_position = position;
-        // mut_position.y = Application::get_height() - mut_position.y;
-
         const size_t SIZE = sizeof(float) * string.length() * 24;
 
         float* buffer = new float[SIZE];
         unsigned int buffer_index = 0;
 
-        unsigned int x = 0;
+        int x = 0;
 
         for (unsigned char character : string) {
             const Font::Glyph& glyph = font->get_glyphs()[character];
 
-            // x0: x + glyph.xoff
-            // y0: glyph.yoff
-            // x1: x + glyph.xoff + glyph.width
-            // y1: glyph.height - glyph.yoff
-            // s0: glyph.s0
-            // st: glyph.t0
-            // s1: glyph.s1
-            // t1: glyph.t1
+            const float x0 = (float) (x + glyph.xoff);
+            const float y0 = (float) -(glyph.height - glyph.yoff);
+            const float x1 = (float) (x + glyph.xoff + glyph.width);
+            const float y1 = (float) (-(glyph.height - glyph.yoff) + glyph.height);
 
-            buffer[buffer_index++] = x + glyph.xoff;
-            buffer[buffer_index++] = glyph.height - glyph.yoff;
+            buffer[buffer_index++] = x0;
+            buffer[buffer_index++] = y1;
             buffer[buffer_index++] = glyph.s0;
             buffer[buffer_index++] = glyph.t1;
 
-            buffer[buffer_index++] = x + glyph.xoff;
-            buffer[buffer_index++] = glyph.yoff;
+            buffer[buffer_index++] = x0;
+            buffer[buffer_index++] = y0;
             buffer[buffer_index++] = glyph.s0;
             buffer[buffer_index++] = glyph.t0;
 
-            buffer[buffer_index++] = x + glyph.xoff + glyph.width;
-            buffer[buffer_index++] = glyph.height - glyph.yoff;
+            buffer[buffer_index++] = x1;
+            buffer[buffer_index++] = y1;
             buffer[buffer_index++] = glyph.s1;
             buffer[buffer_index++] = glyph.t1;
 
-            buffer[buffer_index++] = x + glyph.xoff + glyph.width;
-            buffer[buffer_index++] = glyph.height - glyph.yoff;
+            buffer[buffer_index++] = x1;
+            buffer[buffer_index++] = y1;
             buffer[buffer_index++] = glyph.s1;
             buffer[buffer_index++] = glyph.t1;
 
-            buffer[buffer_index++] = x + glyph.xoff;
-            buffer[buffer_index++] = glyph.yoff;
+            buffer[buffer_index++] = x0;
+            buffer[buffer_index++] = y0;
             buffer[buffer_index++] = glyph.s0;
             buffer[buffer_index++] = glyph.t0;
 
-            buffer[buffer_index++] = x + glyph.xoff + glyph.width;
-            buffer[buffer_index++] = glyph.yoff;
+            buffer[buffer_index++] = x1;
+            buffer[buffer_index++] = y0;
             buffer[buffer_index++] = glyph.s1;
             buffer[buffer_index++] = glyph.t0;
 
-            // buffer[index++] = quad.x0;
-            // buffer[index++] = quad.y1;
-            // buffer[index++] = quad.s0;
-            // buffer[index++] = quad.t1;
+            x += glyph.xadvance;
 
-            // buffer[index++] = quad.x0;
-            // buffer[index++] = quad.y0;
-            // buffer[index++] = quad.s0;
-            // buffer[index++] = quad.t0;
+            // buffer[buffer_index++] = x0;
+            // buffer[buffer_index++] = y1;
+            // buffer[buffer_index++] = glyph.s0;
+            // buffer[buffer_index++] = glyph.t1;
 
-            // buffer[index++] = quad.x1;
-            // buffer[index++] = quad.y1;
-            // buffer[index++] = quad.s1;
-            // buffer[index++] = quad.t1;
+            // buffer[buffer_index++] = x0;
+            // buffer[buffer_index++] = y0;
+            // buffer[buffer_index++] = glyph.s0;
+            // buffer[buffer_index++] = glyph.t0;
 
-            // buffer[index++] = quad.x1;
-            // buffer[index++] = quad.y1;
-            // buffer[index++] = quad.s1;
-            // buffer[index++] = quad.t1;
+            // buffer[buffer_index++] = x1;
+            // buffer[buffer_index++] = y1;
+            // buffer[buffer_index++] = glyph.s1;
+            // buffer[buffer_index++] = glyph.t1;
 
-            // buffer[index++] = quad.x0;
-            // buffer[index++] = quad.y0;
-            // buffer[index++] = quad.s0;
-            // buffer[index++] = quad.t0;
+            // buffer[buffer_index++] = x1;
+            // buffer[buffer_index++] = y1;
+            // buffer[buffer_index++] = glyph.s1;
+            // buffer[buffer_index++] = glyph.t1;
 
-            // buffer[index++] = quad.x1;
-            // buffer[index++] = quad.y0;
-            // buffer[index++] = quad.s1;
-            // buffer[index++] = quad.t0;
+            // buffer[buffer_index++] = x0;
+            // buffer[buffer_index++] = y0;
+            // buffer[buffer_index++] = glyph.s0;
+            // buffer[buffer_index++] = glyph.t0;
+
+            // buffer[buffer_index++] = x1;
+            // buffer[buffer_index++] = y0;
+            // buffer[buffer_index++] = glyph.s1;
+            // buffer[buffer_index++] = glyph.t0;
         }
 
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
-        matrix = glm::scale(matrix, glm::vec3((float) scale, (float) scale, 1.0f));
+        matrix = glm::translate(matrix, glm::vec3(position.x, Application::get_height() - position.y - 50.0f, 0.0f));
+        matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
 
-        glDisable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
         glDisable(GL_DEPTH_TEST);
 
         font->update_data(buffer, SIZE);
         delete[] buffer;
 
         storage->text_shader->bind();
-        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);
+        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->upside_down_ortho_projection_matrix);
         storage->text_shader->set_uniform_matrix("u_transformation_matrix", matrix);
         storage->text_shader->set_uniform_int("u_bitmap", 0);  // TODO this shouldn't be set every frame
         storage->text_shader->set_uniform_vec3("u_color", color);
@@ -413,7 +408,7 @@ namespace renderer {
         bind_texture(font->get_texture(), 0);
         glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
 
-        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
     }
 

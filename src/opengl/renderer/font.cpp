@@ -4,6 +4,7 @@
 #include <iterator>
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <string.h>
 
 #include <stb_truetype.h>
@@ -101,9 +102,9 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         gl.t1 = t1;
         gl.width = width;
         gl.height = height;
-        gl.xoff = left_side_bearing * sf;
-        gl.yoff = (ascent + y1) * sf;
-        gl.xadvance = advance_width * sf;
+        gl.xoff = (int) std::roundf(left_side_bearing * sf);
+        gl.yoff = (int) std::roundf((ascent + y1) * sf);
+        gl.xadvance = (int) std::roundf(advance_width * sf);
 
         glyphs[codepoint] = gl;
     }
@@ -143,9 +144,9 @@ void Font::bake_character(int codepoint) {
     gl.t0 = t0;
     gl.s1 = s1;
     gl.t1 = t1;
-    gl.xoff = left_side_bearing * sf;
-    gl.yoff = (ascent + y1) * sf;
-    gl.xadvance = advance_width * sf;
+    gl.xoff = (int) std::roundf(left_side_bearing * sf);
+    gl.yoff = (int) std::roundf((ascent + y1) * sf);
+    gl.xadvance = (int) std::roundf(advance_width * sf);
 
     glyphs[codepoint] = gl;
 }
