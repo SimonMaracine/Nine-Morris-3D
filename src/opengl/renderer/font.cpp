@@ -66,15 +66,15 @@ void Font::begin_baking() {
 }
 
 void Font::bake_characters(int begin_codepoint, int end_codepoint) {
-    int ascent;
-    stbtt_GetFontVMetrics(&info, &ascent, nullptr, nullptr);
+    int descent;
+    stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
     for (int codepoint = begin_codepoint; codepoint <= end_codepoint; codepoint++) {
         int advance_width, left_side_bearing;
         stbtt_GetCodepointHMetrics(&info, codepoint, &advance_width, &left_side_bearing);
 
-        int x1, y1, x2, y2;
-        stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, &x1, &y1, &x2, &y2);  // TODO don't retreive all
+        int y0;
+        stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
         int width = 0, height = 0;  // Assume 0, because glyph can be NULL
         unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, onedge_value,
@@ -103,7 +103,7 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         gl.width = width;
         gl.height = height;
         gl.xoff = (int) std::roundf(left_side_bearing * sf);
-        gl.yoff = (int) std::roundf((ascent + y1) * sf);
+        gl.yoff = (int) std::roundf(-descent * sf - y0);
         gl.xadvance = (int) std::roundf(advance_width * sf);
 
         assert(glyphs.count(codepoint) == 0);
@@ -113,14 +113,14 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
 }
 
 void Font::bake_character(int codepoint) {
-    int ascent;
-    stbtt_GetFontVMetrics(&info, &ascent, nullptr, nullptr);
+    int descent;
+    stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
     int advance_width, left_side_bearing;
-    stbtt_GetCodepointHMetrics(&info, codepoint, &advance_width, &left_side_bearing);
+        stbtt_GetCodepointHMetrics(&info, codepoint, &advance_width, &left_side_bearing);
 
-    int x1, y1, x2, y2;
-    stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, &x1, &y1, &x2, &y2);
+    int y0;
+    stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
     int width = 0, height = 0;  // Assume 0, because glyph can be NULL
     unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, onedge_value,
@@ -146,8 +146,10 @@ void Font::bake_character(int codepoint) {
     gl.t0 = t0;
     gl.s1 = s1;
     gl.t1 = t1;
+    gl.width = width;
+    gl.height = height;
     gl.xoff = (int) std::roundf(left_side_bearing * sf);
-    gl.yoff = (int) std::roundf((ascent + y1) * sf);
+    gl.yoff = (int) std::roundf(-descent * sf - y0);
     gl.xadvance = (int) std::roundf(advance_width * sf);
 
     assert(glyphs.count(codepoint) == 0);

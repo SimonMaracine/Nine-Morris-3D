@@ -1,6 +1,7 @@
 #include <memory>
 #include <iostream>
 #include <string>
+#include <exception>
 #include <string.h>
 
 #include <glad/glad.h>
@@ -318,74 +319,50 @@ namespace renderer {
         int x = 0;
 
         for (unsigned char character : string) {
-            const Font::Glyph& glyph = font->get_glyphs()[character];
+            const Font::Glyph* glyph;
 
-            const float x0 = (float) (x + glyph.xoff);
-            const float y0 = (float) -(glyph.height - glyph.yoff);
-            const float x1 = (float) (x + glyph.xoff + glyph.width);
-            const float y1 = (float) glyph.yoff;
+            try {
+                glyph = &font->get_glyphs().at(character);
+            } catch (const std::out_of_range&) {
+                glyph = &font->get_glyphs()[127];
+            }
+
+            const float x0 = (float) (x + glyph->xoff);
+            const float y0 = (float) -(glyph->height - glyph->yoff);
+            const float x1 = (float) (x + glyph->xoff + glyph->width);
+            const float y1 = (float) glyph->yoff;
 
             buffer[buffer_index++] = x0;
             buffer[buffer_index++] = y1;
-            buffer[buffer_index++] = glyph.s0;
-            buffer[buffer_index++] = glyph.t0;
+            buffer[buffer_index++] = glyph->s0;
+            buffer[buffer_index++] = glyph->t0;
 
             buffer[buffer_index++] = x0;
             buffer[buffer_index++] = y0;
-            buffer[buffer_index++] = glyph.s0;
-            buffer[buffer_index++] = glyph.t1;
+            buffer[buffer_index++] = glyph->s0;
+            buffer[buffer_index++] = glyph->t1;
 
             buffer[buffer_index++] = x1;
             buffer[buffer_index++] = y1;
-            buffer[buffer_index++] = glyph.s1;
-            buffer[buffer_index++] = glyph.t0;
+            buffer[buffer_index++] = glyph->s1;
+            buffer[buffer_index++] = glyph->t0;
 
             buffer[buffer_index++] = x1;
             buffer[buffer_index++] = y1;
-            buffer[buffer_index++] = glyph.s1;
-            buffer[buffer_index++] = glyph.t0;
+            buffer[buffer_index++] = glyph->s1;
+            buffer[buffer_index++] = glyph->t0;
 
             buffer[buffer_index++] = x0;
             buffer[buffer_index++] = y0;
-            buffer[buffer_index++] = glyph.s0;
-            buffer[buffer_index++] = glyph.t1;
+            buffer[buffer_index++] = glyph->s0;
+            buffer[buffer_index++] = glyph->t1;
 
             buffer[buffer_index++] = x1;
             buffer[buffer_index++] = y0;
-            buffer[buffer_index++] = glyph.s1;
-            buffer[buffer_index++] = glyph.t1;
+            buffer[buffer_index++] = glyph->s1;
+            buffer[buffer_index++] = glyph->t1;
 
-            x += glyph.xadvance;
-
-            // buffer[buffer_index++] = x0;
-            // buffer[buffer_index++] = y1;
-            // buffer[buffer_index++] = glyph.s0;
-            // buffer[buffer_index++] = glyph.t1;
-
-            // buffer[buffer_index++] = x0;
-            // buffer[buffer_index++] = y0;
-            // buffer[buffer_index++] = glyph.s0;
-            // buffer[buffer_index++] = glyph.t0;
-
-            // buffer[buffer_index++] = x1;
-            // buffer[buffer_index++] = y1;
-            // buffer[buffer_index++] = glyph.s1;
-            // buffer[buffer_index++] = glyph.t1;
-
-            // buffer[buffer_index++] = x1;
-            // buffer[buffer_index++] = y1;
-            // buffer[buffer_index++] = glyph.s1;
-            // buffer[buffer_index++] = glyph.t1;
-
-            // buffer[buffer_index++] = x0;
-            // buffer[buffer_index++] = y0;
-            // buffer[buffer_index++] = glyph.s0;
-            // buffer[buffer_index++] = glyph.t0;
-
-            // buffer[buffer_index++] = x1;
-            // buffer[buffer_index++] = y0;
-            // buffer[buffer_index++] = glyph.s1;
-            // buffer[buffer_index++] = glyph.t0;
+            x += glyph->xadvance;
         }
 
         glm::mat4 matrix = glm::mat4(1.0f);
