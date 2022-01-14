@@ -328,32 +328,32 @@ namespace renderer {
             buffer[buffer_index++] = x0;
             buffer[buffer_index++] = y1;
             buffer[buffer_index++] = glyph.s0;
-            buffer[buffer_index++] = glyph.t1;
+            buffer[buffer_index++] = glyph.t0;
 
             buffer[buffer_index++] = x0;
             buffer[buffer_index++] = y0;
             buffer[buffer_index++] = glyph.s0;
-            buffer[buffer_index++] = glyph.t0;
-
-            buffer[buffer_index++] = x1;
-            buffer[buffer_index++] = y1;
-            buffer[buffer_index++] = glyph.s1;
             buffer[buffer_index++] = glyph.t1;
 
             buffer[buffer_index++] = x1;
             buffer[buffer_index++] = y1;
             buffer[buffer_index++] = glyph.s1;
-            buffer[buffer_index++] = glyph.t1;
+            buffer[buffer_index++] = glyph.t0;
+
+            buffer[buffer_index++] = x1;
+            buffer[buffer_index++] = y1;
+            buffer[buffer_index++] = glyph.s1;
+            buffer[buffer_index++] = glyph.t0;
 
             buffer[buffer_index++] = x0;
             buffer[buffer_index++] = y0;
             buffer[buffer_index++] = glyph.s0;
-            buffer[buffer_index++] = glyph.t0;
+            buffer[buffer_index++] = glyph.t1;
 
             buffer[buffer_index++] = x1;
             buffer[buffer_index++] = y0;
             buffer[buffer_index++] = glyph.s1;
-            buffer[buffer_index++] = glyph.t0;
+            buffer[buffer_index++] = glyph.t1;
 
             x += glyph.xadvance;
 
