@@ -45,8 +45,8 @@ void GuiLayer::on_draw() {
     renderer::draw_string("This is a sample of text. And two  spaces.", glm::vec2(200.0f, 200.0f), 1.0f, glm::vec3(0.8f, 0.8f, 1.0f), font);
     renderer::draw_string("How lovely", glm::vec2(100.0f, 100.0f), 1, glm::vec3(0.8f, 0.0f, 0.8f), font2);
     renderer::draw_string("Finally doing some font rendering :D", glm::vec2(10.0f, 10.0f), 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), font2);
-    // renderer::draw_string("I will write unknown characters: cămară.", glm::vec2(10.0f, 400.0f), 1.0f, glm::vec3(0.0f, 1.0f, 1.0f), font);
-    renderer::draw_string("The headaches were worth it.", glm::vec2(10.0f, 400.0f), 1.0f, glm::vec3(0.0f, 1.0f, 1.0f), font);
+    renderer::draw_string("I will write unknown characters: cămară.", glm::vec2(10.0f, 400.0f), 1.0f, glm::vec3(0.0f, 1.0f, 1.0f), font);
+    // renderer::draw_string("The headaches were worth it.", glm::vec2(10.0f, 400.0f), 1.0f, glm::vec3(0.0f, 1.0f, 1.0f), font);
 }
 
 void GuiLayer::on_event(events::Event& event) {

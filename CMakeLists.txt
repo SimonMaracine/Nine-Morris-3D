@@ -100,6 +100,7 @@ add_subdirectory(extern/glm)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/json)
 add_subdirectory(extern/assimp)
+add_subdirectory(extern/utfcpp)
 
 add_dependencies(${EXECUTABLE_NAME} glfw)  # This is necessary for some reason
 
@@ -116,7 +117,8 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/glm"
     "${CMAKE_SOURCE_DIR}/extern/glfw/include"
     "${CMAKE_SOURCE_DIR}/extern/imgui"
-    "${CMAKE_SOURCE_DIR}/extern/json/single_include")
+    "${CMAKE_SOURCE_DIR}/extern/json/single_include"
+    "${CMAKE_SOURCE_DIR}/extern/utfcpp/source")
 
 # Add all link directories
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)

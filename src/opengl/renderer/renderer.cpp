@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <stb_truetype.h>
+#include <utf8.h>
 
 #include "application/application.h"
 #include "opengl/renderer/renderer.h"
@@ -311,14 +312,16 @@ namespace renderer {
 
     void draw_string(const std::string& string, const glm::vec2& position, float scale,
             const glm::vec3& color, std::shared_ptr<Font> font) {
-        const size_t SIZE = sizeof(float) * string.length() * 24;
+        std::u16string utf16_string = utf8::utf8to16(string);
+
+        const size_t SIZE = sizeof(float) * utf16_string.length() * 24;
 
         float* buffer = new float[SIZE];
         unsigned int buffer_index = 0;
 
         int x = 0;
 
-        for (unsigned char character : string) {
+        for (char16_t character : utf16_string) {
             const Font::Glyph* glyph;
 
             try {
