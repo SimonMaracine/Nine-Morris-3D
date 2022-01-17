@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "application/layer.h"
-#include "opengl/renderer/font.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
 
 class GameLayer;
@@ -29,10 +28,6 @@ public:
 
     void setup_quad2d_projection();
     void render_turn_indicator();
-
-    std::shared_ptr<Font> font;
-    std::shared_ptr<Font> font2;
-    float text_scale = 1.0f;
 
     GameScene* scene = nullptr;
 };

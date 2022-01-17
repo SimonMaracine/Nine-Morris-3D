@@ -13,18 +13,6 @@
 
 void GuiLayer::on_attach() {
     setup_quad2d_projection();
-
-    font = std::make_shared<Font>("data/fonts/OpenSans/OpenSans-Regular.ttf", 50.0f, 5, 180, 36, 512);
-
-    font->begin_baking();
-    font->bake_characters(32, 127);
-    font->end_baking();
-
-    font2 = std::make_shared<Font>("data/fonts/FH-GoodDogPlain-WTT/GOODDP__.TTF", 50.0f, 5, 180, 40, 512);
-
-    font2->begin_baking();
-    font2->bake_characters(32, 127);
-    font2->end_baking();
 }
 
 void GuiLayer::on_detach() {
@@ -42,11 +30,7 @@ void GuiLayer::on_update(float dt) {
 void GuiLayer::on_draw() {
     render_turn_indicator();
 
-    renderer::draw_string("This is a sample of text. And two  spaces.", glm::vec2(200.0f, 200.0f), 1.0f, glm::vec3(0.8f, 0.8f, 1.0f), font);
-    renderer::draw_string("How lovely", glm::vec2(100.0f, 100.0f), 1, glm::vec3(0.8f, 0.0f, 0.8f), font2);
-    renderer::draw_string("Finally doing some font rendering :D", glm::vec2(10.0f, 10.0f), 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), font2);
-    renderer::draw_string("I will write unknown characters: cămară.", glm::vec2(10.0f, 400.0f), 1.0f, glm::vec3(0.0f, 1.0f, 1.0f), font);
-    // renderer::draw_string("The headaches were worth it.", glm::vec2(10.0f, 400.0f), 1.0f, glm::vec3(0.0f, 1.0f, 1.0f), font);
+    renderer::draw_string("Hello, world!", glm::vec2(100.0f, 100.0f), 1.0f, glm::vec3(1.0f), app->storage->good_dog_plain_font);
 }
 
 void GuiLayer::on_event(events::Event& event) {
@@ -79,7 +63,6 @@ bool GuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event)
 
 bool GuiLayer::on_window_resized(events::WindowResizedEvent& event) {
     app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
-    app->storage->upside_down_ortho_projection_matrix = glm::ortho(0.0f, (float) event.width, (float) event.height, 0.0f);
     setup_quad2d_projection();
 
     return false;

@@ -193,7 +193,13 @@ namespace renderer {
 #endif
 
         storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) width, 0.0f, (float) height);
-        storage->upside_down_ortho_projection_matrix = glm::ortho(0.0f, (float) width, (float) height, 0.0f);
+
+        storage->good_dog_plain_font = std::make_shared<Font>(assets::path(assets::GOOD_DOG_PLAIN_FONT),
+                50.0f, 5, 180, 40, 512);
+
+        storage->good_dog_plain_font->begin_baking();  // TODO maybe move part of texture baking to thread
+        storage->good_dog_plain_font->bake_characters(32, 127);
+        storage->good_dog_plain_font->end_baking();
 
         return storage;
     }
@@ -251,11 +257,11 @@ namespace renderer {
     }
 #endif
 
-    void draw_quad_2d(const glm::vec3& position, float scale, Rc<Texture> texture) {
+    void draw_quad_2d(const glm::vec2& position, float scale, Rc<Texture> texture) {
         glDisable(GL_DEPTH_TEST);
 
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, position);
+        matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
         matrix = glm::scale(matrix, glm::vec3(texture->get_width(), texture->get_height(), 1.0f));
         matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
 
@@ -312,7 +318,7 @@ namespace renderer {
 
     void draw_string(const std::string& string, const glm::vec2& position, float scale,
             const glm::vec3& color, std::shared_ptr<Font> font) {
-        std::u16string utf16_string = utf8::utf8to16(string);
+        const std::u16string utf16_string = utf8::utf8to16(string);
 
         const size_t SIZE = sizeof(float) * utf16_string.length() * 24;
 
@@ -372,7 +378,6 @@ namespace renderer {
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
         matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
 
-        glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
 
         font->update_data(buffer, SIZE);
@@ -388,7 +393,6 @@ namespace renderer {
         bind_texture(font->get_texture(), 0);
         glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
 
-        glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
 

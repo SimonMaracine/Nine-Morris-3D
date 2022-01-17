@@ -361,7 +361,6 @@ void ImGuiLayer::on_update(float dt) {
         if (ImGui::SliderFloat3("Light specular color", (float*) &scene->light.specular_color, 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
-        ImGui::SliderFloat("Text scale", &gui_layer->text_scale, 0.0f, 4.0f);
         ImGui::End();
     }
 #endif

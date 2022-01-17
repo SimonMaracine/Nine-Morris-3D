@@ -70,11 +70,12 @@ namespace renderer {
         Rc<VertexArray> skybox_vertex_array;
 
         glm::mat4 orthographic_projection_matrix;
-        glm::mat4 upside_down_ortho_projection_matrix;
 
         hoverable::Id board_id = hoverable::null;
         hoverable::Id pieces_id[18] = { hoverable::null };
         hoverable::Id nodes_id[24] = { hoverable::null };
+
+        std::shared_ptr<Font> good_dog_plain_font;
     };
 
     Storage* initialize(int width, int height);
@@ -90,7 +91,7 @@ namespace renderer {
 #ifndef NDEBUG
     void draw_origin();
 #endif
-    void draw_quad_2d(const glm::vec3& position, float scale, Rc<Texture> texture);
+    void draw_quad_2d(const glm::vec2& position, float scale, Rc<Texture> texture);
     void draw_quad_3d(const glm::vec3& position, float scale, Rc<Texture> texture);
     void bind_texture(GLuint texture, GLenum slot);
     void set_stencil_mask_zero();
