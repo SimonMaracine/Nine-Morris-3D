@@ -239,6 +239,10 @@ void ImGuiLayer::on_update(float dt) {
         style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
 
         if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            HOVERING_GUI();
+            game_layer->active = false;
+            gui_layer->active = false;
+
             renderer::draw_screen_quad(app->storage->splash_screen_texture->get_id());
 
             ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
@@ -250,17 +254,13 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::Button("Ok", ImVec2(430, 0))) {
                 ImGui::CloseCurrentPopup();
                 about_mode = false;
+
+                game_layer->active = true;
+                gui_layer->active = true;
             }
 
             ImGui::EndPopup();
-
-            HOVERING_GUI();
-            game_layer->active = false;
-            gui_layer->active = false;
         }
-    } else {
-        // game_layer->active = true;  // TODO this breaks other code
-        // gui_layer->active = true;
     }
 
     if (scene->board.not_placed_pieces_count() < 18) {
