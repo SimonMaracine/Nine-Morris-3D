@@ -40,7 +40,7 @@ namespace options {
             return;
         }
 
-        std::ifstream file (file_path, std::ios::in);
+        std::ifstream file (file_path);
 
         if (!file.is_open()) {
             REL_ERROR("Could not open options file '{}'", file_path.c_str());
@@ -113,7 +113,7 @@ namespace options {
             return;
         }
 
-        std::ofstream file (file_path.c_str(), std::ios::out | std::ios::trunc);
+        std::ofstream file (file_path.c_str(), std::ios::trunc);
 
         if (!file.is_open()) {
             REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
@@ -153,7 +153,6 @@ namespace options {
         object["skybox"] = options.skybox;
 
         file << std::setw(4) << object;
-        file.close();
 
         SPDLOG_INFO("Saved options to file '{}'", file_path.c_str());
     }
@@ -167,7 +166,7 @@ namespace options {
             return;
         }
 
-        std::ofstream file (file_path.c_str(), std::ios::out);
+        std::ofstream file (file_path.c_str());
 
         if (!file.is_open()) {
             REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
@@ -183,7 +182,6 @@ namespace options {
         object["skybox"] = options.skybox;
 
         file << object.dump(4);
-        file.close();
 
         SPDLOG_INFO("Created options file '{}'", file_path.c_str());
     }

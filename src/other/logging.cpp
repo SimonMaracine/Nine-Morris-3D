@@ -85,7 +85,7 @@ namespace logging {
                     break;
                 }
 
-                std::ofstream file (file_path, std::ios::out | std::ios::trunc);
+                std::ofstream file (file_path, std::ios::trunc);
 
                 if (!file.is_open()) {
                     REL_ERROR("Could not open file '{}' for writing", file_path.c_str());
@@ -93,7 +93,6 @@ namespace logging {
                 }
 
                 file << contents.c_str();
-                file.close();
 
                 break;
             }
