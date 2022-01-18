@@ -58,6 +58,8 @@ void LoadingLayer::on_draw() {
     renderer::clear(renderer::Color);
     renderer::disable_stencil();
     renderer::draw_screen_quad(app->storage->splash_screen_texture->get_id());
+    renderer::draw_string("Loading...", glm::vec2(Application::get_width() - 200.0f, 20.0f), 1.2f,
+            glm::vec3(0.9f), app->storage->good_dog_plain_font);
     renderer::enable_stencil();
 }
 

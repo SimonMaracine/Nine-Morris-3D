@@ -257,6 +257,7 @@ void ImGuiLayer::on_update(float dt) {
 
                 game_layer->active = true;
                 gui_layer->active = true;
+                gui_layer->setup_quad2d_projection();
             }
 
             ImGui::EndPopup();
