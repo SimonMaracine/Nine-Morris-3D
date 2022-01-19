@@ -1,4 +1,7 @@
 #include <memory>
+#include <string>
+#include <algorithm>
+#include <string.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -25,12 +28,12 @@ void GuiLayer::on_bind_layers() {
 
 void GuiLayer::on_update(float dt) {
     scene->turn_indicator.update(app->data.width, app->data.height);
+    scene->timer.update(app->window->get_time());
 }
 
 void GuiLayer::on_draw() {
     render_turn_indicator();
-
-    renderer::draw_string("Hello, world!", glm::vec2(100.0f, 100.0f), 1.0f, glm::vec3(1.0f), app->storage->good_dog_plain_font);
+    render_timer();
 }
 
 void GuiLayer::on_event(events::Event& event) {
@@ -82,4 +85,20 @@ void GuiLayer::render_turn_indicator() {
         renderer::draw_quad_2d(scene->turn_indicator.position, scene->turn_indicator.scale,
                 app->storage->black_indicator_texture);
     }
+}
+
+void GuiLayer::render_timer() {
+    const unsigned int minutes = scene->timer.get_time_seconds() / 60;
+    const unsigned int seconds = scene->timer.get_time_seconds() % 60;    
+
+    char time[8];
+    sprintf(time, "%.2u:%.2u", minutes, seconds);
+
+    int width, height;
+    app->storage->good_dog_plain_font->get_string_size(time, 1.5f, &width, &height);
+
+    const float x_pos = Application::get_width() / 2 - width / 2 - 8;
+    const float y_pos = Application::get_height() - height - 50;
+
+    renderer::draw_string(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f), app->storage->good_dog_plain_font);
 }

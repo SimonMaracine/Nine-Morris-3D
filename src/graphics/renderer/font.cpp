@@ -10,6 +10,7 @@
 #include <stb_truetype.h>
 #include <stb_image_write.h>
 #include <glad/glad.h>
+#include <utf8.h>
 
 #include "graphics/renderer/font.h"
 #include "graphics/renderer/buffer.h"
@@ -183,6 +184,90 @@ void Font::end_baking() {
     delete[] bake_context.bitmap;
 
     SPDLOG_DEBUG("End baking font {}", name.c_str());
+}
+
+void Font::render(const std::string& string, size_t* out_size, float** out_buffer) {
+    const std::u16string utf16_string = utf8::utf8to16(string);
+
+    const size_t SIZE = sizeof(float) * utf16_string.length() * 24;
+
+    float* buffer = new float[SIZE];
+    unsigned int buffer_index = 0;
+
+    int x = 0;
+
+    for (char16_t character : utf16_string) {
+        const Font::Glyph* glyph;
+
+        try {
+            glyph = &get_glyphs().at(character);
+        } catch (const std::out_of_range&) {
+            glyph = &get_glyphs()[127];
+        }
+
+        const float x0 = (float) (x + glyph->xoff);
+        const float y0 = (float) -(glyph->height - glyph->yoff);
+        const float x1 = (float) (x + glyph->xoff + glyph->width);
+        const float y1 = (float) glyph->yoff;
+
+        buffer[buffer_index++] = x0;
+        buffer[buffer_index++] = y1;
+        buffer[buffer_index++] = glyph->s0;
+        buffer[buffer_index++] = glyph->t0;
+
+        buffer[buffer_index++] = x0;
+        buffer[buffer_index++] = y0;
+        buffer[buffer_index++] = glyph->s0;
+        buffer[buffer_index++] = glyph->t1;
+
+        buffer[buffer_index++] = x1;
+        buffer[buffer_index++] = y1;
+        buffer[buffer_index++] = glyph->s1;
+        buffer[buffer_index++] = glyph->t0;
+
+        buffer[buffer_index++] = x1;
+        buffer[buffer_index++] = y1;
+        buffer[buffer_index++] = glyph->s1;
+        buffer[buffer_index++] = glyph->t0;
+
+        buffer[buffer_index++] = x0;
+        buffer[buffer_index++] = y0;
+        buffer[buffer_index++] = glyph->s0;
+        buffer[buffer_index++] = glyph->t1;
+
+        buffer[buffer_index++] = x1;
+        buffer[buffer_index++] = y0;
+        buffer[buffer_index++] = glyph->s1;
+        buffer[buffer_index++] = glyph->t1;
+
+        x += glyph->xadvance;
+    }
+
+    *out_size = SIZE;
+    *out_buffer = buffer;
+}
+
+void Font::get_string_size(const std::string& string, float scale, int* out_width, int* out_height) {
+    const std::u16string utf16_string = utf8::utf8to16(string);
+
+    int x = 0;
+    *out_height = 0;
+
+    for (char16_t character : utf16_string) {
+        const Font::Glyph* glyph;
+
+        try {
+            glyph = &get_glyphs().at(character);
+        } catch (const std::out_of_range&) {
+            glyph = &get_glyphs()[127];
+        }
+
+        x += glyph->xadvance;
+
+        *out_height = std::max(*out_height, (int) roundf(glyph->yoff * scale));
+    }
+
+    *out_width = (int) roundf((x + 2) * scale);
 }
 
 const char* Font::get_file_data(const std::string& file_path) {

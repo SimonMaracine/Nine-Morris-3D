@@ -17,6 +17,7 @@
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/hoverable.h"
 #include "nine_morris_3d/turn_indicator.h"
+#include "nine_morris_3d/timer.h"
 
 class GameScene : public Scene {
 public:
@@ -47,6 +48,7 @@ public:
     Light light;
     TurnIndicator turn_indicator;
     std::shared_ptr<std::vector<Board>> board_state_history;
+    Timer timer;
 
     hoverable::Id hovered_id = hoverable::null;
 };

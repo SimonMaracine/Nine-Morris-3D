@@ -34,6 +34,9 @@ public:
     void bake_characters(int begin_codepoint, int end_codepoint);
     void bake_character(int codepoint);
     void end_baking();
+
+    void render(const std::string& string, size_t* out_size, float** out_buffer);
+    void get_string_size(const std::string& string, float scale, int* out_width, int* out_height);
 private:
     static const char* get_file_data(const std::string& file_path);
     static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsigned char* glyph,

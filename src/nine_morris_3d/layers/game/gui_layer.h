@@ -28,6 +28,7 @@ public:
 
     void setup_quad2d_projection();
     void render_turn_indicator();
+    void render_timer();
 
     GameScene* scene = nullptr;
 };

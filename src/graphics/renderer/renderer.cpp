@@ -9,7 +9,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <stb_truetype.h>
-#include <utf8.h>
 
 #include "application/application.h"
 #include "graphics/renderer/renderer.h"
@@ -318,61 +317,9 @@ namespace renderer {
 
     void draw_string(const std::string& string, const glm::vec2& position, float scale,
             const glm::vec3& color, std::shared_ptr<Font> font) {
-        const std::u16string utf16_string = utf8::utf8to16(string);
-
-        const size_t SIZE = sizeof(float) * utf16_string.length() * 24;
-
-        float* buffer = new float[SIZE];
-        unsigned int buffer_index = 0;
-
-        int x = 0;
-
-        for (char16_t character : utf16_string) {
-            const Font::Glyph* glyph;
-
-            try {
-                glyph = &font->get_glyphs().at(character);
-            } catch (const std::out_of_range&) {
-                glyph = &font->get_glyphs()[127];
-            }
-
-            const float x0 = (float) (x + glyph->xoff);
-            const float y0 = (float) -(glyph->height - glyph->yoff);
-            const float x1 = (float) (x + glyph->xoff + glyph->width);
-            const float y1 = (float) glyph->yoff;
-
-            buffer[buffer_index++] = x0;
-            buffer[buffer_index++] = y1;
-            buffer[buffer_index++] = glyph->s0;
-            buffer[buffer_index++] = glyph->t0;
-
-            buffer[buffer_index++] = x0;
-            buffer[buffer_index++] = y0;
-            buffer[buffer_index++] = glyph->s0;
-            buffer[buffer_index++] = glyph->t1;
-
-            buffer[buffer_index++] = x1;
-            buffer[buffer_index++] = y1;
-            buffer[buffer_index++] = glyph->s1;
-            buffer[buffer_index++] = glyph->t0;
-
-            buffer[buffer_index++] = x1;
-            buffer[buffer_index++] = y1;
-            buffer[buffer_index++] = glyph->s1;
-            buffer[buffer_index++] = glyph->t0;
-
-            buffer[buffer_index++] = x0;
-            buffer[buffer_index++] = y0;
-            buffer[buffer_index++] = glyph->s0;
-            buffer[buffer_index++] = glyph->t1;
-
-            buffer[buffer_index++] = x1;
-            buffer[buffer_index++] = y0;
-            buffer[buffer_index++] = glyph->s1;
-            buffer[buffer_index++] = glyph->t1;
-
-            x += glyph->xadvance;
-        }
+        size_t size;
+        float* buffer;
+        font->render(string, &size, &buffer);
 
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
@@ -380,7 +327,7 @@ namespace renderer {
 
         glDisable(GL_DEPTH_TEST);
 
-        font->update_data(buffer, SIZE);
+        font->update_data(buffer, size);
         delete[] buffer;
 
         storage->text_shader->bind();

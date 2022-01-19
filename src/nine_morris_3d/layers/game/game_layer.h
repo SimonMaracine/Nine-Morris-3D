@@ -56,6 +56,8 @@ public:
     float last_mouse_x = 0.0f;
     float last_mouse_y = 0.0f;
 
+    bool first_move = false;
+
     GameScene* scene = nullptr;
 
     ImGuiLayer* imgui_layer = nullptr;

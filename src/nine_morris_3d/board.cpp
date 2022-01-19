@@ -35,7 +35,9 @@ Board::Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_h
 
 }
 
-void Board::place_piece(hoverable::Id hovered_id) {
+bool Board::place_piece(hoverable::Id hovered_id) {
+    bool placed = false;
+
     for (Node& node : nodes) {
         if (node.id == hovered_id && (&node) == hovered_node && node.piece == nullptr) {
             remember_state();
@@ -85,9 +87,12 @@ void Board::place_piece(hoverable::Id hovered_id) {
                 SPDLOG_INFO("Phase 2");
             }
 
+            placed = true;
             break;
         }
     }
+
+    return placed;
 }
 
 void Board::move_pieces(float dt) {
@@ -106,7 +111,9 @@ void Board::move_pieces(float dt) {
     }
 }
 
-void Board::take_piece(hoverable::Id hovered_id) {
+bool Board::take_piece(hoverable::Id hovered_id) {
+    bool taked = false;
+
     if (hovered_piece != nullptr) {  // Do anything only if there is a hovered piece
         for (Node& node : nodes) {
             if (node.piece != nullptr) {
@@ -143,6 +150,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             SPDLOG_DEBUG("Cannot take piece from windmill");
                         }
 
+                        taked = true;
                         break;
                     }
                 } else {
@@ -178,6 +186,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             SPDLOG_DEBUG("Cannot take piece from windmill");
                         }
 
+                        taked = true;
                         break;
                     }
                 }
@@ -192,6 +201,8 @@ void Board::take_piece(hoverable::Id hovered_id) {
             SPDLOG_INFO("Phase 2");
         }
     }
+
+    return taked;
 }
 
 void Board::select_piece(hoverable::Id hovered_id) {
@@ -216,7 +227,9 @@ void Board::select_piece(hoverable::Id hovered_id) {
     }
 }
 
-void Board::put_piece(hoverable::Id hovered_id) {
+bool Board::put_piece(hoverable::Id hovered_id) {
+    bool put = false;
+
     if (selected_piece != nullptr) {  // Do anything only if there is a selected piece
         for (Node& node : nodes) {
             if (node.id == hovered_id && can_go(selected_piece->node, &node)) {
@@ -272,10 +285,13 @@ void Board::put_piece(hoverable::Id hovered_id) {
                     remember_position_and_check_repetition();
                 }
 
+                put = true;
                 break;
             }
         }
     }
+
+    return put;
 }
 
 void Board::press(hoverable::Id hovered_id) {

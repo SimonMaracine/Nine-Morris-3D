@@ -10,10 +10,11 @@ namespace save_load {
     struct GameState {
         Board board;
         Camera camera;
+        unsigned int time;  // In deciseconds
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(board, camera);
+            archive(board, camera, time);
         }
     };
 

@@ -56,11 +56,11 @@ public:
     Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history);
     ~Board() = default;
 
-    void place_piece(hoverable::Id hovered_id);
+    bool place_piece(hoverable::Id hovered_id);
     void move_pieces(float dt);
-    void take_piece(hoverable::Id hovered_id);
+    bool take_piece(hoverable::Id hovered_id);
     void select_piece(hoverable::Id hovered_id);
-    void put_piece(hoverable::Id hovered_id);
+    bool put_piece(hoverable::Id hovered_id);
     void press(hoverable::Id hovered_id);
     void release(hoverable::Id hovered_id);
     void undo();

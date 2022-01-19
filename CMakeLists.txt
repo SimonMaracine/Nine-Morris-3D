@@ -46,6 +46,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/nine_morris_3d/board.cpp"
     "src/nine_morris_3d/hoverable.cpp"
     "src/nine_morris_3d/turn_indicator.cpp"
+    "src/nine_morris_3d/timer.cpp"
     "src/graphics/debug_opengl.cpp"
     "src/graphics/renderer/vertex_array.cpp"
     "src/graphics/renderer/buffer.cpp"

@@ -76,9 +76,13 @@ void GameScene::on_exit() {
         save_load::GameState state;
         state.board = board;
         state.camera = camera;
+        state.time = timer.get_time_raw();
 
         save_load::save_game(state);
     }
+
+    timer.stop();
+    timer.set_time(0);
 }
 
 Rc<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size, hoverable::Id id) {

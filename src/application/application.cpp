@@ -164,8 +164,8 @@ float Application::update_frame_counter() {
     static int frame_count = 0;
     static double total_time = 0.0;
 
-    double current_seconds = window->get_time();
-    double elapsed_seconds = current_seconds - previous_seconds;
+    const double current_seconds = window->get_time();
+    const double elapsed_seconds = current_seconds - previous_seconds;
     previous_seconds = current_seconds;
 
     total_time += elapsed_seconds;
@@ -177,7 +177,7 @@ float Application::update_frame_counter() {
     }
     frame_count++;
 
-    double delta_time = std::min(elapsed_seconds, MAX_DT);
+    const double delta_time = std::min(elapsed_seconds, MAX_DT);
 
     return (float) delta_time;
 }

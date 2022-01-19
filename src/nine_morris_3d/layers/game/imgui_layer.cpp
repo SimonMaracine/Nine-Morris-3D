@@ -113,6 +113,7 @@ void ImGuiLayer::on_update(float dt) {
                 save_load::GameState state;
                 state.board = scene->board;
                 state.camera = scene->camera;
+                state.time = scene->timer.get_time_raw();
 
                 save_load::save_game(state);
             }

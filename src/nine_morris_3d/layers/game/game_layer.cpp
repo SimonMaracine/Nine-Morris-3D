@@ -50,7 +50,7 @@ void GameLayer::on_attach() {
 }
 
 void GameLayer::on_detach() {
-
+    first_move = false;
 }
 
 void GameLayer::on_bind_layers() {
@@ -161,17 +161,41 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
         if (scene->board.next_move) {
             if (scene->board.phase == Board::Phase::PlacePieces) {
                 if (scene->board.should_take_piece) {
-                    scene->board.take_piece(scene->hovered_id);
+                    bool taked = scene->board.take_piece(scene->hovered_id);
+
+                    if (taked && !first_move) {
+                        scene->timer.start();
+                        first_move = true;
+                    }
                 } else {
-                    scene->board.place_piece(scene->hovered_id);
+                    bool placed = scene->board.place_piece(scene->hovered_id);
+
+                    if (placed && !first_move) {
+                        scene->timer.start();
+                        first_move = true;
+                    }
                 }
             } else if (scene->board.phase == Board::Phase::MovePieces) {
                 if (scene->board.should_take_piece) {
-                    scene->board.take_piece(scene->hovered_id);
+                    bool taked = scene->board.take_piece(scene->hovered_id);
+
+                    if (taked && !first_move) {
+                        scene->timer.start();
+                        first_move = true;
+                    }
                 } else {
                     scene->board.select_piece(scene->hovered_id);
-                    scene->board.put_piece(scene->hovered_id);
+                    bool put = scene->board.put_piece(scene->hovered_id);
+
+                    if (put && !first_move) {
+                        scene->timer.start();
+                        first_move = true;
+                    }
                 }
+            }
+
+            if (scene->board.phase == Board::Phase::GameOver) {
+                scene->timer.stop();
             }
 
             scene->board.release(scene->hovered_id);
@@ -661,6 +685,10 @@ void GameLayer::load_game() {
 
     board.state_history = state.board.state_history;
     board.next_move = state.board.next_move;
+
+    scene->timer.stop();
+    scene->timer.set_time(state.time);
+    first_move = false;
 
     SPDLOG_INFO("Loaded game");
 }
