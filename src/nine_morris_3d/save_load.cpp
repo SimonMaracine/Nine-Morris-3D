@@ -13,7 +13,7 @@
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/node.h"
-#include "opengl/renderer/camera.h"
+#include "graphics/renderer/camera.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 

@@ -7,7 +7,7 @@
 #include "application/application_data.h"
 #include "application/events.h"
 #include "application/window.h"
-#include "opengl/renderer/renderer.h"
+#include "graphics/renderer/renderer.h"
 #include "other/loader.h"
 #include "nine_morris_3d/assets_load.h"
 

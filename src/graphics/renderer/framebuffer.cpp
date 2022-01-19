@@ -3,8 +3,8 @@
 
 #include <glad/glad.h>
 
-#include "opengl/renderer/framebuffer.h"
-#include "opengl/debug_opengl.h"
+#include "graphics/renderer/framebuffer.h"
+#include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
 Framebuffer::Framebuffer(Type type, int width, int height, int samples, int color_attachment_count)

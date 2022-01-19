@@ -7,12 +7,12 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/buffer.h"
-#include "opengl/renderer/shader.h"
-#include "opengl/renderer/texture.h"
-#include "opengl/renderer/framebuffer.h"
-#include "opengl/renderer/font.h"
+#include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/shader.h"
+#include "graphics/renderer/texture.h"
+#include "graphics/renderer/framebuffer.h"
+#include "graphics/renderer/font.h"
 #include "nine_morris_3d/hoverable.h"
 #include "nine_morris_3d/board.h"
 

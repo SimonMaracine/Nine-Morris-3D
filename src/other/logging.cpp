@@ -6,7 +6,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "opengl/debug_opengl.h"
+#include "graphics/debug_opengl.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 

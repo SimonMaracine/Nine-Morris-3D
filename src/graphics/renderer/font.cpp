@@ -11,10 +11,10 @@
 #include <stb_image_write.h>
 #include <glad/glad.h>
 
-#include "opengl/renderer/font.h"
-#include "opengl/renderer/buffer.h"
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/debug_opengl.h"
+#include "graphics/renderer/font.h"
+#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/vertex_array.h"
+#include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
 Font::Font(const std::string& file_path, float size, int padding, unsigned char onedge_value,

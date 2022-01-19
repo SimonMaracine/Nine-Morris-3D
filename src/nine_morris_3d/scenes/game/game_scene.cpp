@@ -8,13 +8,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/buffer.h"
-#include "opengl/renderer/texture.h"
-#include "opengl/renderer/buffer_layout.h"
-#include "opengl/renderer/camera.h"
-#include "opengl/renderer/light.h"
-#include "opengl/debug_opengl.h"
+#include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/texture.h"
+#include "graphics/renderer/buffer_layout.h"
+#include "graphics/renderer/camera.h"
+#include "graphics/renderer/light.h"
+#include "graphics/debug_opengl.h"
 #include "other/texture_data.h"
 #include "other/assets.h"
 #include "other/logging.h"

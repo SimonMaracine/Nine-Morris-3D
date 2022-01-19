@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 
-#include "opengl/renderer/camera.h"
+#include "graphics/renderer/camera.h"
 #include "nine_morris_3d/board.h"
 
 namespace save_load {

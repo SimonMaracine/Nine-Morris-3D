@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "opengl/renderer/buffer_layout.h"
+#include "graphics/renderer/buffer_layout.h"
 #include "other/logging.h"
 
 std::size_t VertexElement::get_size(GLenum type) {

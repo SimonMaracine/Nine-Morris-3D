@@ -8,8 +8,8 @@
 #include "application/events.h"
 #include "application/scene.h"
 #include "application/input.h"
-#include "opengl/renderer/renderer.h"
-#include "opengl/debug_opengl.h"
+#include "graphics/renderer/renderer.h"
+#include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
 Application::Application(int width, int height, const std::string& title) {

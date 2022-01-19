@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "opengl/renderer/camera.h"
+#include "graphics/renderer/camera.h"
 #include "application/input.h"
 
 Camera::Camera(float pitch, const glm::mat4& projection_matrix, const glm::vec3& point, float distance_to_point)

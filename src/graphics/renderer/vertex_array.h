@@ -5,8 +5,8 @@
 
 #include <glad/glad.h>
 
-#include "opengl/renderer/buffer.h"
-#include "opengl/renderer/buffer_layout.h"
+#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/buffer_layout.h"
 
 class VertexArray {
 public:

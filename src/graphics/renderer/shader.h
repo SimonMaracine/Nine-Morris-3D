@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include "opengl/renderer/buffer.h"
+#include "graphics/renderer/buffer.h"
 
 class Shader {
 public:

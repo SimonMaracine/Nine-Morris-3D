@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/texture.h"
+#include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/texture.h"
 #include "nine_morris_3d/hoverable.h"
 
 class Node;

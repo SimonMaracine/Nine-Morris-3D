@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "application/events.h"
-#include "opengl/renderer/renderer.h"
+#include "graphics/renderer/renderer.h"
 #include "other/loader.h"
 #include "nine_morris_3d/layers/loading/loading_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"

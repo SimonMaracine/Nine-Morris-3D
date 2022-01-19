@@ -5,8 +5,8 @@
 
 #include "application/application.h"
 #include "application/events.h"
-#include "opengl/renderer/renderer.h"
-#include "opengl/renderer/framebuffer.h"
+#include "graphics/renderer/renderer.h"
+#include "graphics/renderer/framebuffer.h"
 #include "other/logging.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"

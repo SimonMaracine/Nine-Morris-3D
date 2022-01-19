@@ -6,8 +6,8 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "opengl/renderer/shader.h"
-#include "opengl/renderer/buffer.h"
+#include "graphics/renderer/shader.h"
+#include "graphics/renderer/buffer.h"
 #include "other/logging.h"
 
 Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name)

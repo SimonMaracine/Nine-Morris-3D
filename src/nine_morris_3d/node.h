@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "opengl/renderer/vertex_array.h"
+#include "graphics/renderer/vertex_array.h"
 #include "nine_morris_3d/hoverable.h"
 #include "nine_morris_3d/piece.h"
 

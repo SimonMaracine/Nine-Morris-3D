@@ -1,6 +1,6 @@
 #include <glm/glm.hpp>
 
-#include "opengl/renderer/light.h"
+#include "graphics/renderer/light.h"
 
 const Light LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
