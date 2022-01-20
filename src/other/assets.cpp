@@ -91,4 +91,6 @@ namespace assets {
     const char* ORIGIN_VERTEX_SHADER = "data/shaders/origin.vert";
     const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/origin.frag";
 #endif
+    const char* TEXT_VERTEX_SHADER = "data/shaders/text.vert";
+    const char* TEXT_FRAGMENT_SHADER = "data/shaders/text.frag";
 }

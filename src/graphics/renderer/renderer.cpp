@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <exception>
+#include <array>
 #include <string.h>
 
 #include <glad/glad.h>
@@ -38,89 +39,193 @@ namespace renderer {
 
         storage->uniform_buffer = UniformBuffer::create(nullptr, sizeof(glm::mat4));
         const char* block_name = "Matrices";
-        const char* uniforms[1] = {
-            "u_projection_view_matrix"
-        };
 
-        storage->board_shader = Shader::create(
-            assets::path(assets::BOARD_VERTEX_SHADER),
-            assets::path(assets::BOARD_FRAGMENT_SHADER),
-            block_name,
-            uniforms, 1,
-            storage->uniform_buffer
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_model_matrix",
+                "u_light_space_matrix",
+                "u_view_position",
+                "u_shadow_map",
+                "u_material.diffuse",
+                "u_material.specular",
+                "u_material.shininess",
+                "u_light.position",
+                "u_light.ambient",
+                "u_light.diffuse",
+                "u_light.specular"
+            };
+            storage->board_shader = Shader::create(
+                assets::path(assets::BOARD_VERTEX_SHADER),
+                assets::path(assets::BOARD_FRAGMENT_SHADER),
+                uniforms,
+                block_name, 1,
+                storage->uniform_buffer
+            );
+        }
 
-        storage->board_paint_shader = Shader::create(
-            assets::path(assets::BOARD_PAINT_VERTEX_SHADER),
-            assets::path(assets::BOARD_PAINT_FRAGMENT_SHADER),
-            block_name,
-            uniforms, 1,
-            storage->uniform_buffer
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_model_matrix",
+                "u_light_space_matrix",
+                "u_view_position",
+                "u_shadow_map",
+                "u_material.diffuse",
+                "u_material.specular",
+                "u_material.shininess",
+                "u_light.position",
+                "u_light.ambient",
+                "u_light.diffuse",
+                "u_light.specular"
+            };
+            storage->board_paint_shader = Shader::create(
+                assets::path(assets::BOARD_PAINT_VERTEX_SHADER),
+                assets::path(assets::BOARD_PAINT_FRAGMENT_SHADER),
+                uniforms,
+                block_name, 1,
+                storage->uniform_buffer
+            );
+        }
 
-        storage->piece_shader = Shader::create(
-            assets::path(assets::PIECE_VERTEX_SHADER),
-            assets::path(assets::PIECE_FRAGMENT_SHADER),
-            block_name,
-            uniforms, 1,
-            storage->uniform_buffer
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_model_matrix",
+                "u_light_space_matrix",
+                "u_view_position",
+                "u_tint_color",
+                "u_shadow_map",
+                "u_material.diffuse",
+                "u_material.specular",
+                "u_material.shininess",
+                "u_light.position",
+                "u_light.ambient",
+                "u_light.diffuse",
+                "u_light.specular"
+            };
+            storage->piece_shader = Shader::create(
+                assets::path(assets::PIECE_VERTEX_SHADER),
+                assets::path(assets::PIECE_FRAGMENT_SHADER),
+                uniforms,
+                block_name, 1,
+                storage->uniform_buffer
+            );
+        }
 
-        storage->shadow_shader = Shader::create(
-            assets::path(assets::SHADOW_VERTEX_SHADER),
-            assets::path(assets::SHADOW_FRAGMENT_SHADER)
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_model_matrix",
+                "u_light_space_matrix"
+            };
+            storage->shadow_shader = Shader::create(
+                assets::path(assets::SHADOW_VERTEX_SHADER),
+                assets::path(assets::SHADOW_FRAGMENT_SHADER),
+                uniforms
+            );
+        }
 
-        storage->screen_quad_shader = Shader::create(
-            assets::path(assets::SCREEN_QUAD_VERTEX_SHADER),
-            assets::path(assets::SCREEN_QUAD_FRAGMENT_SHADER)
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_screen_texture"
+            };
+            storage->screen_quad_shader = Shader::create(
+                assets::path(assets::SCREEN_QUAD_VERTEX_SHADER),
+                assets::path(assets::SCREEN_QUAD_FRAGMENT_SHADER),
+                uniforms
+            );
+        }
 
-        storage->outline_shader = Shader::create(
-            assets::path(assets::OUTLINE_VERTEX_SHADER),
-            assets::path(assets::OUTLINE_FRAGMENT_SHADER),
-            block_name,
-            uniforms, 1,
-            storage->uniform_buffer
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_model_matrix",
+                "u_color"
+            };
+            storage->outline_shader = Shader::create(
+                assets::path(assets::OUTLINE_VERTEX_SHADER),
+                assets::path(assets::OUTLINE_FRAGMENT_SHADER),
+                uniforms,
+                block_name, 1,
+                storage->uniform_buffer
+            );
+        }
 
-        storage->node_shader = Shader::create(
-            assets::path(assets::NODE_VERTEX_SHADER),
-            assets::path(assets::NODE_FRAGMENT_SHADER),
-            block_name,
-            uniforms, 1,
-            storage->uniform_buffer
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_model_matrix",
+                "u_color"
+            };
+            storage->node_shader = Shader::create(
+                assets::path(assets::NODE_VERTEX_SHADER),
+                assets::path(assets::NODE_FRAGMENT_SHADER),
+                uniforms,
+                block_name, 1,
+                storage->uniform_buffer
+            );
+        }
 
-        storage->skybox_shader = Shader::create(
-            assets::path(assets::SKYBOX_VERTEX_SHADER),
-            assets::path(assets::SKYBOX_FRAGMENT_SHADER)
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_projection_view_matrix",
+                "u_skybox"
+            };
+            storage->skybox_shader = Shader::create(
+                assets::path(assets::SKYBOX_VERTEX_SHADER),
+                assets::path(assets::SKYBOX_FRAGMENT_SHADER),
+                uniforms
+            );
+        }
 
-        storage->quad2d_shader = Shader::create(
-            assets::path(assets::QUAD2D_VERTEX_SHADER),
-            assets::path(assets::QUAD2D_FRAGMENT_SHADER)
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_model_matrix",
+                "u_projection_matrix",
+                "u_texture"
+            };
+            storage->quad2d_shader = Shader::create(
+                assets::path(assets::QUAD2D_VERTEX_SHADER),
+                assets::path(assets::QUAD2D_FRAGMENT_SHADER),
+                uniforms
+            );
+        }
 
-        storage->quad3d_shader = Shader::create(
-            assets::path(assets::QUAD3D_VERTEX_SHADER),
-            assets::path(assets::QUAD3D_FRAGMENT_SHADER)
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_model_matrix",
+                "u_view_matrix",
+                "u_projection_matrix",
+                "u_texture"
+            };
+            storage->quad3d_shader = Shader::create(
+                assets::path(assets::QUAD3D_VERTEX_SHADER),
+                assets::path(assets::QUAD3D_FRAGMENT_SHADER),
+                uniforms
+            );
+        }
 
 #ifndef NDEBUG
-        storage->origin_shader = Shader::create(
-            assets::path(assets::ORIGIN_VERTEX_SHADER),
-            assets::path(assets::ORIGIN_FRAGMENT_SHADER),
-            block_name,
-            uniforms, 1,
-            storage->uniform_buffer
-        );
+        {
+            const std::vector<std::string> uniforms;
+            storage->origin_shader = Shader::create(
+                assets::path(assets::ORIGIN_VERTEX_SHADER),
+                assets::path(assets::ORIGIN_FRAGMENT_SHADER),
+                uniforms,
+                block_name, 1,
+                storage->uniform_buffer
+            );
+        }
 #endif
 
-        storage->text_shader = Shader::create(
-            "data/shaders/text.vert",
-            "data/shaders/text.frag"
-        );
+        {
+            const std::vector<std::string> uniforms = {
+                "u_model_matrix",
+                "u_projection_matrix",
+                "u_bitmap",
+                "u_color"
+            };
+            storage->text_shader = Shader::create(
+                assets::path(assets::TEXT_VERTEX_SHADER),
+                assets::path(assets::TEXT_FRAGMENT_SHADER),
+                uniforms
+            );
+        }
 
         storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
         storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate, width, height, 1, 2);
@@ -342,7 +447,7 @@ namespace renderer {
 
         storage->text_shader->bind();
         storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);
-        storage->text_shader->set_uniform_matrix("u_transformation_matrix", matrix);
+        storage->text_shader->set_uniform_matrix("u_model_matrix", matrix);
         storage->text_shader->set_uniform_vec3("u_color", color);
 
         font->get_vertex_array()->bind();

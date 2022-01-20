@@ -73,4 +73,6 @@ namespace assets {
     extern const char* ORIGIN_VERTEX_SHADER;
     extern const char* ORIGIN_FRAGMENT_SHADER;
 #endif
+    extern const char* TEXT_VERTEX_SHADER;
+    extern const char* TEXT_FRAGMENT_SHADER;
 }

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -10,8 +11,18 @@
 #include "graphics/renderer/buffer.h"
 #include "other/logging.h"
 
-Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name)
+Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name,
+        const std::vector<std::string>& uniforms)
     : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader), name(name) {
+    for (const std::string& uniform : uniforms) {
+        GLint location = glGetUniformLocation(program, uniform.c_str());
+        if (location == -1) {
+            SPDLOG_ERROR("Uniform variable '{}' in program '{}' not found", name.c_str(), name.c_str());
+            continue;
+        }
+        cache[uniform] = location;
+    }
+
     SPDLOG_DEBUG("Created shader {} ({})", program, name.c_str());
 }
 
@@ -26,7 +37,8 @@ Shader::~Shader() {
 }
 
 std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
-                                       const std::string& fragment_source) {
+                                       const std::string& fragment_source,
+                                       const std::vector<std::string>& uniforms) {
     GLuint vertex_shader = compile_shader(vertex_source, GL_VERTEX_SHADER);
     GLuint fragment_shader = compile_shader(fragment_source, GL_FRAGMENT_SHADER);
 
@@ -40,13 +52,13 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
 
     std::string name = get_name(vertex_source, fragment_source);
 
-    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name);
+    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms);
 }
 
 std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
                                        const std::string& fragment_source,
+                                       const std::vector<std::string>& uniforms,
                                        const char* block_name,
-                                       const char** uniforms,
                                        int uniforms_count,
                                        std::shared_ptr<UniformBuffer> uniform_buffer) {
     GLuint vertex_shader = compile_shader(vertex_source, GL_VERTEX_SHADER);
@@ -66,14 +78,11 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
         REL_CRITICAL("Invalid block index");
         std::exit(1);
     }
-
-    GLint buffer_size;  // TODO this is not used
-    glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &buffer_size);
     glBindBufferBase(GL_UNIFORM_BUFFER, block_index, uniform_buffer->buffer);
 
     std::string name = get_name(vertex_source, fragment_source);
 
-    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name);
+    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms);
 }
 
 void Shader::bind() const {
@@ -110,16 +119,11 @@ void Shader::set_uniform_float(const std::string& name, float value) const {
 }
 
 GLint Shader::get_uniform_location(const std::string& name) const {
-    GLint location = glGetUniformLocation(program, name.c_str());
-    if (location == -1) {
-        SPDLOG_WARN("Uniform variable '{}' not found", name.c_str());
-    }
-
-    return location;
+    return cache[name];
 }
 
 GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {
-    std::ifstream file (source_path.c_str(), std::ifstream::in);
+    std::ifstream file (source_path);
     std::string source;
 
     if (file.is_open()) {

@@ -2,6 +2,8 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -10,15 +12,17 @@
 
 class Shader {
 public:
-    Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name);
+    Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name,
+            const std::vector<std::string>& uniforms);
     ~Shader();
 
     static std::shared_ptr<Shader> create(const std::string& vertex_source,
-                                          const std::string& fragment_source);
+                                          const std::string& fragment_source,
+                                          const std::vector<std::string>& uniforms);
     static std::shared_ptr<Shader> create(const std::string& vertex_source,
                                           const std::string& fragment_source,
+                                          const std::vector<std::string>& uniforms,
                                           const char* block_name,
-                                          const char** uniforms,
                                           int uniforms_count,
                                           std::shared_ptr<UniformBuffer> uniform_buffer);
 
@@ -43,6 +47,8 @@ private:
     GLuint fragment_shader;
 
     std::string name;
+
+    mutable std::unordered_map<std::string, GLint> cache;
 };
 
 template<typename T>
