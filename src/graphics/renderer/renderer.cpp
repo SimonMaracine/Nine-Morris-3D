@@ -200,6 +200,19 @@ namespace renderer {
         storage->good_dog_plain_font->bake_characters(32, 127);
         storage->good_dog_plain_font->end_baking();
 
+        // Setup uniforms for these shaders for rendering
+        storage->screen_quad_shader->bind();
+        storage->screen_quad_shader->set_uniform_int("u_screen_texture", 0);
+        storage->quad2d_shader->bind();
+        storage->quad2d_shader->set_uniform_int("u_texture", 0);
+        storage->quad3d_shader->bind();
+        storage->quad3d_shader->set_uniform_int("u_texture", 0);
+        storage->text_shader->bind();
+        storage->text_shader->set_uniform_int("u_bitmap", 0);
+        storage->skybox_shader->bind();
+        storage->skybox_shader->set_uniform_int("u_skybox", 0);
+        Shader::unbind();
+
         return storage;
     }
 
@@ -225,7 +238,6 @@ namespace renderer {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         storage->screen_quad_shader->bind();
-        storage->screen_quad_shader->set_uniform_int("u_screen_texture", 0);
         storage->screen_quad_vertex_array->bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -266,7 +278,6 @@ namespace renderer {
 
         storage->quad2d_shader->bind();
         storage->quad2d_shader->set_uniform_matrix("u_model_matrix", matrix);
-        storage->quad2d_shader->set_uniform_int("u_texture", 0);
 
         texture->bind(0);
 
@@ -283,7 +294,6 @@ namespace renderer {
 
         storage->quad3d_shader->bind();
         storage->quad3d_shader->set_uniform_matrix("u_model_matrix", matrix);
-        storage->quad3d_shader->set_uniform_int("u_texture", 0);
 
         texture->bind(0);
 
@@ -333,7 +343,6 @@ namespace renderer {
         storage->text_shader->bind();
         storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);
         storage->text_shader->set_uniform_matrix("u_transformation_matrix", matrix);
-        storage->text_shader->set_uniform_int("u_bitmap", 0);  // TODO this shouldn't be set every frame
         storage->text_shader->set_uniform_vec3("u_color", color);
 
         font->get_vertex_array()->bind();
@@ -437,7 +446,6 @@ namespace renderer {
 
         storage->skybox_shader->bind();
         storage->skybox_shader->set_uniform_matrix("u_projection_view_matrix", projection_view_matrix);
-        storage->skybox_shader->set_uniform_int("u_skybox", 0);  // TODO this shouldn't be set every frame
 
         storage->skybox_vertex_array->bind();
         storage->skybox_texture->bind(0);

@@ -34,6 +34,8 @@ void LoadingLayer::on_attach() {
     }
 
     loader->start_loading_thread();
+
+    renderer::disable_stencil();
 }
 
 void LoadingLayer::on_detach() {
@@ -42,6 +44,8 @@ void LoadingLayer::on_detach() {
     if (loader->get_thread().joinable()) {
         loader->get_thread().detach();
     }
+
+    renderer::enable_stencil();
 }
 
 void LoadingLayer::on_bind_layers() {
@@ -56,11 +60,9 @@ void LoadingLayer::on_update(float dt) {
 
 void LoadingLayer::on_draw() {
     renderer::clear(renderer::Color);
-    renderer::disable_stencil();
     renderer::draw_screen_quad(app->storage->splash_screen_texture->get_id());
     renderer::draw_string("Loading...", glm::vec2(Application::get_width() - 200.0f, 20.0f), 1.2f,
             glm::vec3(0.9f), app->storage->good_dog_plain_font);
-    renderer::enable_stencil();
 }
 
 void LoadingLayer::on_event(events::Event& event) {
