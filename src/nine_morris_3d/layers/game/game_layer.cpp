@@ -36,6 +36,7 @@
 
 void GameLayer::on_attach() {
     app->window->set_vsync(scene->options.vsync);
+    app->window->set_custom_cursor(scene->options.custom_cursor);
 
     app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
             app->data.width, app->data.height, scene->options.samples, 2);

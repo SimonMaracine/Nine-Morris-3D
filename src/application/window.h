@@ -8,6 +8,7 @@
 
 struct GLFWwindow;
 struct GLFWimage;
+struct GLFWcursor;
 
 class Window {
 public:
@@ -20,8 +21,10 @@ public:
     double get_time() const;
 
     void set_vsync(int interval) const;
+    void set_custom_cursor(bool custom) const;
 private:
     GLFWwindow* window = nullptr;
+    GLFWcursor* cursor = nullptr;
 };
 
 class Icon {

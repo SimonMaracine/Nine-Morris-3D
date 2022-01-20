@@ -152,10 +152,13 @@ Window::Window(ApplicationData* data) {
     glfw_icons[4] = icons[4].get_data();
 
     glfwSetWindowIcon(window, 5, glfw_icons);
+
+    cursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
 }
 
 Window::~Window() {
     glfwDestroyWindow(window);
+    glfwDestroyCursor(cursor);
     glfwTerminate();
 
     SPDLOG_INFO("Terminated GLFW and destroyed window");
@@ -176,6 +179,10 @@ double Window::get_time() const {
 
 void Window::set_vsync(int interval) const {
     glfwSwapInterval(interval);
+}
+
+void Window::set_custom_cursor(bool custom) const {
+    glfwSetCursor(window, custom ? cursor : nullptr);
 }
 
 // --- Icon

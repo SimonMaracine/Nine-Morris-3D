@@ -32,6 +32,7 @@ void ImGuiLayer::on_attach() {
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigWindowsResizeFromEdges = false;
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 #ifdef NDEBUG
     io.IniFilename = nullptr;
 #endif
@@ -134,11 +135,11 @@ void ImGuiLayer::on_update(float dt) {
         if (ImGui::BeginMenu("Options")) {
             if (ImGui::MenuItem("VSync", nullptr, &scene->options.vsync)) {
                 if (scene->options.vsync) {
-                    app->window->set_vsync(1);
+                    app->window->set_vsync(scene->options.vsync);
 
                     SPDLOG_INFO("VSync enabled");
                 } else {
-                    app->window->set_vsync(0);
+                    app->window->set_vsync(scene->options.vsync);
 
                     SPDLOG_INFO("VSync disabled");
                 }
@@ -208,6 +209,17 @@ void ImGuiLayer::on_update(float dt) {
                     SPDLOG_INFO("Show info");
                 } else {
                     SPDLOG_INFO("Hide info");
+                }
+            }
+            if (ImGui::MenuItem("Custom Cursor", nullptr, &scene->options.custom_cursor)) {
+                if (scene->options.custom_cursor) {
+                    app->window->set_custom_cursor(scene->options.custom_cursor);
+
+                    SPDLOG_INFO("Set custom cursor");
+                } else {
+                    app->window->set_custom_cursor(scene->options.custom_cursor);
+
+                    SPDLOG_INFO("Set default cursor");
                 }
             }
 
