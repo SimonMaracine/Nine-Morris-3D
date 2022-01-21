@@ -30,6 +30,7 @@ public:
     void set_starting_scene(Scene* scene);
     void change_scene(unsigned int id);
     void push_layer(Layer* layer, Scene* scene);
+    void purge_framebuffers();
 
     static int get_width();
     static int get_height();
@@ -40,7 +41,7 @@ public:
     std::shared_ptr<AssetsLoad> assets_load;
     std::shared_ptr<Window> window;
     renderer::Storage* storage = nullptr;
-    std::vector<Rc<Framebuffer>> framebuffers;
+    std::vector<std::weak_ptr<Framebuffer>> framebuffers;
 private:
     void on_event(events::Event& event);
     float update_frame_counter();

@@ -12,7 +12,7 @@
 class LoadingLayer : public Layer {
 public:
     LoadingLayer(unsigned int id, Application* application, LoadingScene* scene)
-        : Layer(id, application), scene(scene) {};
+        : Layer(id, application), scene(scene) {}
     virtual ~LoadingLayer() = default;
 
     virtual void on_attach() override;

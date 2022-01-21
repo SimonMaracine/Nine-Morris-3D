@@ -39,7 +39,9 @@ void GameLayer::on_attach() {
     app->window->set_custom_cursor(scene->options.custom_cursor);
 
     app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
-            app->data.width, app->data.height, scene->options.samples, 2);
+            app->data.width, app->data.height, scene->options.samples, 2, true);
+    app->purge_framebuffers();
+    app->framebuffers.push_back(app->storage->scene_framebuffer);
 
     setup_light();
     setup_board();
@@ -207,8 +209,6 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 }
 
 bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
-    app->storage->scene_framebuffer->resize(event.width, event.height);
-    app->storage->intermediate_framebuffer->resize(event.width, event.height);
     scene->camera.update_projection((float) event.width, (float) event.height);
 
     return false;
@@ -366,7 +366,10 @@ void GameLayer::setup_quad3d_projection_view() {
 void GameLayer::set_scene_framebuffer(int samples) {
     const int width = app->data.width;
     const int height = app->data.height;
-    app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+    app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
+            width, height, samples, 2, true);
+    app->purge_framebuffers();
+    app->framebuffers.push_back(app->storage->scene_framebuffer);
 }
 
 void GameLayer::set_textures_quality(const std::string& quality) {

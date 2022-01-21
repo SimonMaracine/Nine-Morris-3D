@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+// #include <glm/gtc/matrix_transform.hpp>
 
 #include "application/application.h"
 #include "application/events.h"
@@ -15,7 +15,7 @@
 #include "nine_morris_3d/layers/game/game_layer.h"
 
 void GuiLayer::on_attach() {
-    setup_quad2d_projection();
+
 }
 
 void GuiLayer::on_detach() {
@@ -65,16 +65,7 @@ bool GuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event)
 }
 
 bool GuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
-    setup_quad2d_projection();
-
     return false;
-}
-
-void GuiLayer::setup_quad2d_projection() {
-    app->storage->quad2d_shader->bind();
-    app->storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
-            app->storage->orthographic_projection_matrix);
 }
 
 void GuiLayer::render_turn_indicator() {

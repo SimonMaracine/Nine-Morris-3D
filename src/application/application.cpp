@@ -2,6 +2,8 @@
 #include <memory>
 #include <cassert>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/window.h"
@@ -131,6 +133,14 @@ void Application::push_layer(Layer* layer, Scene* scene) {
     scene->layer_stack.push_back(layer);
 }
 
+void Application::purge_framebuffers() {
+    for (auto iter = framebuffers.rbegin(); iter != framebuffers.rend(); iter++) {
+        if (!(*iter).lock() || iter->expired()) {
+            framebuffers.erase(std::next(iter).base());
+        }
+    }
+}
+
 void Application::on_event(events::Event& event) {
     using namespace events;
 
@@ -190,6 +200,22 @@ bool Application::on_window_closed(events::WindowClosedEvent& event) {
 
 bool Application::on_window_resized(events::WindowResizedEvent& event) {
     renderer::set_viewport(event.width, event.height);
+
+    for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
+        std::shared_ptr<Framebuffer> frame = framebuffer.lock();
+        if (frame) {
+            if (frame->resizable) {
+                frame->resize(event.width, event.height);
+            }
+        }
+    }
+
+    storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f,
+            (float) event.height);
+
+    storage->quad2d_shader->bind();
+    storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
+            storage->orthographic_projection_matrix);
 
     return false;
 }

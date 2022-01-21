@@ -7,7 +7,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include "application/application.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/shader.h"
@@ -16,6 +15,8 @@
 #include "graphics/renderer/font.h"
 #include "nine_morris_3d/hoverable.h"
 #include "nine_morris_3d/board.h"
+
+class Application;
 
 namespace renderer {
     enum {

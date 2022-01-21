@@ -256,13 +256,24 @@ void ImGuiLayer::on_update(float dt) {
             game_layer->active = false;
             gui_layer->active = false;
 
-            // renderer::draw_screen_quad(app->storage->splash_screen_texture->get_id());
+            float width;
+            float height;
+            float x_pos;
+            float y_pos;
 
-            float width = app->get_width();
-            float height = app->get_height();
-            renderer::draw_quad_2d(glm::vec2(0.0f), glm::vec2(width, height), app->storage->splash_screen_texture);
+            if ((float) app->get_width() / (float) app->get_height() >= 16.0f / 9.0f) {
+                width = app->get_width();
+                height = app->get_width() * (9.0f / 16.0f);
+                x_pos = 0.0f;
+                y_pos = (app->get_height() - height) / 2.0f;
+            } else {
+                height = app->get_height();
+                width = app->get_height() * (16.0f / 9.0f);
+                x_pos = (app->get_width() - width) / 2.0f;
+                y_pos = 0.0f;
+            }
 
-            SPDLOG_DEBUG("{}, {}", width, height);
+            renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
             ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
             ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
@@ -276,7 +287,6 @@ void ImGuiLayer::on_update(float dt) {
 
                 game_layer->active = true;
                 gui_layer->active = true;
-                gui_layer->setup_quad2d_projection();
             }
 
             ImGui::EndPopup();
@@ -443,10 +453,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 }
 
 bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    app->storage->scene_framebuffer->resize(event.width, event.height);
-    app->storage->intermediate_framebuffer->resize(event.width, event.height);
     scene->camera.update_projection((float) event.width, (float) event.height);
-    app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
 
     return false;
 }

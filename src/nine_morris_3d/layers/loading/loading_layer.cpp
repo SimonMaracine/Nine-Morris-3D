@@ -1,8 +1,6 @@
 #include <memory>
 #include <cassert>
 
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
 #include "other/loader.h"
@@ -60,9 +58,28 @@ void LoadingLayer::on_update(float dt) {
 
 void LoadingLayer::on_draw() {
     renderer::clear(renderer::Color);
-    renderer::draw_screen_quad(app->storage->splash_screen_texture->get_id());
+
+    float width;
+    float height;
+    float x_pos;
+    float y_pos;
+
+    if ((float) app->get_width() / (float) app->get_height() >= 16.0f / 9.0f) {
+        width = app->get_width();
+        height = app->get_width() * (9.0f / 16.0f);
+        x_pos = 0.0f;
+        y_pos = (app->get_height() - height) / 2.0f;
+    } else {
+        height = app->get_height();
+        width = app->get_height() * (16.0f / 9.0f);
+        x_pos = (app->get_width() - width) / 2.0f;
+        y_pos = 0.0f;
+    }
+
+    renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
+
     renderer::draw_string("Loading...", glm::vec2(Application::get_width() - 200.0f, 20.0f), 1.2f,
-            glm::vec3(0.9f), app->storage->good_dog_plain_font);
+            glm::vec3(0.82f), app->storage->good_dog_plain_font);
 }
 
 void LoadingLayer::on_event(events::Event& event) {
@@ -73,11 +90,5 @@ void LoadingLayer::on_event(events::Event& event) {
 }
 
 bool LoadingLayer::on_window_resized(events::WindowResizedEvent& event) {
-    if (app->storage->scene_framebuffer) {
-        app->storage->scene_framebuffer->resize(event.width, event.height);
-    }
-    app->storage->intermediate_framebuffer->resize(event.width, event.height);
-    app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
-
     return false;
 }

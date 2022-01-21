@@ -7,9 +7,10 @@
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
-Framebuffer::Framebuffer(Type type, int width, int height, int samples, int color_attachment_count)
+Framebuffer::Framebuffer(Type type, int width, int height, int samples,
+        int color_attachment_count, bool resizable)
     : type(type), width(width), height(height), samples(samples),
-      color_attachment_count(color_attachment_count) {
+      color_attachment_count(color_attachment_count), resizable(resizable) {
     build();
 
     SPDLOG_DEBUG("Created framebuffer {}", framebuffer);
@@ -32,8 +33,9 @@ Framebuffer::~Framebuffer() {
 }
 
 std::shared_ptr<Framebuffer> Framebuffer::create(Type type, int width, int height, int samples,
-                                                 int color_attachments_count) {
-    return std::make_shared<Framebuffer>(type, width, height, samples, color_attachments_count);
+        int color_attachments_count, bool resizable) {
+    return std::make_shared<Framebuffer>(type, width, height, samples,
+            color_attachments_count, resizable);
 }
 
 void Framebuffer::bind() const {

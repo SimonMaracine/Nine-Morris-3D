@@ -227,11 +227,16 @@ namespace renderer {
             );
         }
 
-        storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
-        storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate,
-                app->data.width, app->data.height, 1, 2);
+        // FIXME make a function for this
+        storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap,
+                2048, 2048, 1, 0, false);
+        app->purge_framebuffers();
+        app->framebuffers.push_back(storage->depth_map_framebuffer);
 
-        app->
+        storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate,
+                app->data.width, app->data.height, 1, 2, true);  // TODO refactor framebuffers
+        app->purge_framebuffers();
+        app->framebuffers.push_back(storage->intermediate_framebuffer);
 
         {
             float screen_quad_vertices[] = {
@@ -299,7 +304,7 @@ namespace renderer {
         storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);  // TODO see what to do with this
 #endif
 
-        storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) width, 0.0f, (float) height);
+        storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) app->data.width, 0.0f, (float) app->data.height);
 
         storage->good_dog_plain_font = std::make_shared<Font>(assets::path(assets::GOOD_DOG_PLAIN_FONT),
                 50.0f, 5, 180, 40, 512);
@@ -313,6 +318,8 @@ namespace renderer {
         storage->screen_quad_shader->set_uniform_int("u_screen_texture", 0);
         storage->quad2d_shader->bind();
         storage->quad2d_shader->set_uniform_int("u_texture", 0);
+        storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
+                storage->orthographic_projection_matrix);
         storage->quad3d_shader->bind();
         storage->quad3d_shader->set_uniform_int("u_texture", 0);
         storage->text_shader->bind();

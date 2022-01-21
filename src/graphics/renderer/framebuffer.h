@@ -11,11 +11,12 @@ public:
         Scene, Intermediate, DepthMap
     };
 
-    Framebuffer(Type type, int width, int height, int samples, int color_attachment_count);
+    Framebuffer(Type type, int width, int height, int samples, int color_attachment_count,
+            bool resizable);
     ~Framebuffer();
 
     static std::shared_ptr<Framebuffer> create(Type type, int width, int height, int samples,
-                                               int color_attachment_count);
+                                               int color_attachment_count, bool resizable);
 
     void bind() const;
     static void bind_default();
@@ -30,6 +31,9 @@ public:
 
     static void resolve_framebuffer(GLuint read_framebuffer, GLuint draw_framebuffer,
                                     int width, int height);
+
+    bool resizable = false;  // TODO move to private
+    // FIXME refactor framebuffers
 private:
     void build();
 

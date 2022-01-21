@@ -17,7 +17,7 @@ class ImGuiLayer;
 class GameLayer : public Layer {
 public:
     GameLayer(unsigned int id, Application* application, GameScene* scene)
-        : Layer(id, application), scene(scene) {};
+        : Layer(id, application), scene(scene) {}
     virtual ~GameLayer() = default;
 
     virtual void on_attach() override;
