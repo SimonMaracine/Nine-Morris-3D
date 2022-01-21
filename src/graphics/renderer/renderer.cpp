@@ -25,7 +25,7 @@
 namespace renderer {
     static Storage* storage = nullptr;
 
-    Storage* initialize(int width, int height) {
+    Storage* initialize(Application* app) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_CULL_FACE);
@@ -228,7 +228,10 @@ namespace renderer {
         }
 
         storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap, 2048, 2048, 1, 0);
-        storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate, width, height, 1, 2);
+        storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate,
+                app->data.width, app->data.height, 1, 2);
+
+        app->
 
         {
             float screen_quad_vertices[] = {
@@ -373,19 +376,36 @@ namespace renderer {
     }
 #endif
 
-    void draw_quad_2d(const glm::vec2& position, float scale, Rc<Texture> texture) {
+    void draw_quad_2d(const glm::vec2& position, float additional_scale, Rc<Texture> texture) {
         glDisable(GL_DEPTH_TEST);
 
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
         matrix = glm::scale(matrix, glm::vec3(texture->get_width(), texture->get_height(), 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(additional_scale, additional_scale, 1.0f));
 
         storage->quad2d_shader->bind();
         storage->quad2d_shader->set_uniform_matrix("u_model_matrix", matrix);
 
         texture->bind(0);
 
+        storage->quad2d_vertex_array->bind();
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    void draw_quad_2d(const glm::vec2& position, const glm::vec2& scale, Rc<Texture> texture) {
+        glDisable(GL_DEPTH_TEST);
+
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
+        matrix = glm::scale(matrix, glm::vec3(scale.x, scale.y, 1.0f));
+
+        storage->quad2d_shader->bind();
+        storage->quad2d_shader->set_uniform_matrix("u_model_matrix", matrix);
+
+        texture->bind(0);
         storage->quad2d_vertex_array->bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);
 

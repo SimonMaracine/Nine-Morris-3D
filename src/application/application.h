@@ -8,6 +8,7 @@
 #include "application/events.h"
 #include "application/window.h"
 #include "graphics/renderer/renderer.h"
+#include "graphics/renderer/framebuffer.h"
 #include "other/loader.h"
 #include "nine_morris_3d/assets_load.h"
 
@@ -39,6 +40,7 @@ public:
     std::shared_ptr<AssetsLoad> assets_load;
     std::shared_ptr<Window> window;
     renderer::Storage* storage = nullptr;
+    std::vector<Rc<Framebuffer>> framebuffers;
 private:
     void on_event(events::Event& event);
     float update_frame_counter();

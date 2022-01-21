@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include "application/application.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/shader.h"
@@ -78,7 +79,7 @@ namespace renderer {
         std::shared_ptr<Font> good_dog_plain_font;
     };
 
-    Storage* initialize(int width, int height);
+    Storage* initialize(Application* app);
     void terminate();
     void set_viewport(int width, int height);
     void set_clear_color(float red, float green, float blue);
@@ -91,7 +92,8 @@ namespace renderer {
 #ifndef NDEBUG
     void draw_origin();
 #endif
-    void draw_quad_2d(const glm::vec2& position, float scale, Rc<Texture> texture);
+    void draw_quad_2d(const glm::vec2& position, float additional_scale, Rc<Texture> texture);
+    void draw_quad_2d(const glm::vec2& position, const glm::vec2& scale, Rc<Texture> texture);
     void draw_quad_3d(const glm::vec3& position, float scale, Rc<Texture> texture);
     void bind_texture(GLuint texture, GLenum slot);
     void set_stencil_mask_zero();

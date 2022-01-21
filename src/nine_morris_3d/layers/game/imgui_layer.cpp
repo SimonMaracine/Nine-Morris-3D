@@ -96,7 +96,7 @@ void ImGuiLayer::on_update(float dt) {
 
     RESET_HOVERING_GUI();
 
-    if (ImGui::BeginMainMenuBar()) {
+    if (!about_mode && ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
                 app->change_scene(0);
@@ -256,7 +256,13 @@ void ImGuiLayer::on_update(float dt) {
             game_layer->active = false;
             gui_layer->active = false;
 
-            renderer::draw_screen_quad(app->storage->splash_screen_texture->get_id());
+            // renderer::draw_screen_quad(app->storage->splash_screen_texture->get_id());
+
+            float width = app->get_width();
+            float height = app->get_height();
+            renderer::draw_quad_2d(glm::vec2(0.0f), glm::vec2(width, height), app->storage->splash_screen_texture);
+
+            SPDLOG_DEBUG("{}, {}", width, height);
 
             ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
             ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);

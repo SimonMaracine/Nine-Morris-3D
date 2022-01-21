@@ -37,7 +37,7 @@ Application::Application(int width, int height, const std::string& title) {
         std::exit(1);
     }
 
-    storage = renderer::initialize(data.width, data.height);
+    storage = renderer::initialize(this);
     assets_load = std::make_shared<AssetsLoad>();
 }
 
