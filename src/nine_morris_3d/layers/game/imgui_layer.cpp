@@ -3,7 +3,6 @@
 #include <backends/imgui_impl_glfw.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "application/application.h"
 #include "application/events.h"
 #include "graphics/debug_opengl.h"
 #include "graphics/renderer/renderer.h"
@@ -265,11 +264,11 @@ void ImGuiLayer::on_update(float dt) {
                 width = app->get_width();
                 height = app->get_width() * (9.0f / 16.0f);
                 x_pos = 0.0f;
-                y_pos = (app->get_height() - height) / 2.0f;
+                y_pos = (height - app->get_height()) / -2.0f;
             } else {
                 height = app->get_height();
                 width = app->get_height() * (16.0f / 9.0f);
-                x_pos = (app->get_width() - width) / 2.0f;
+                x_pos = (width - app->get_width()) / -2.0f;
                 y_pos = 0.0f;
             }
 
