@@ -78,17 +78,10 @@ void LoadingLayer::on_draw() {
 
     renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
-    renderer::draw_string("Loading...", glm::vec2(Application::get_width() - 200.0f, 20.0f), 1.2f,
-            glm::vec3(0.82f), app->storage->good_dog_plain_font);
+    renderer::draw_string("Loading...", glm::vec2(app->get_width() - 200.0f, 20.0f), 1.2f,
+            glm::vec3(0.81f), app->storage->good_dog_plain_font);
 }
 
 void LoadingLayer::on_event(events::Event& event) {
-    using namespace events;
 
-    Dispatcher dispatcher (event);
-    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(LoadingLayer::on_window_resized));
-}
-
-bool LoadingLayer::on_window_resized(events::WindowResizedEvent& event) {
-    return false;
 }

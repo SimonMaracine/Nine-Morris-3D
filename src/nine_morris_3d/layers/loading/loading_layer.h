@@ -22,8 +22,6 @@ public:
     virtual void on_draw() override;
     virtual void on_event(events::Event& event) override;
 
-    bool on_window_resized(events::WindowResizedEvent& event);
-
     std::unique_ptr<Loader<AssetsLoad>> loader;
 
     LoadingScene* scene = nullptr;

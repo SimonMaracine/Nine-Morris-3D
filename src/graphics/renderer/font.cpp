@@ -18,9 +18,9 @@
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
-Font::Font(const std::string& file_path, float size, int padding, unsigned char onedge_value,
+Font::Font(const std::string& file_path, float size, int padding, unsigned char on_edge_value,
         int pixel_dist_scale, int bitmap_size)
-    : bitmap_size(bitmap_size), padding(padding), onedge_value(onedge_value),
+    : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value),
       pixel_dist_scale(pixel_dist_scale) {
     font_file_buffer = get_file_data(file_path);
 
@@ -78,7 +78,7 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
         int width = 0, height = 0;  // Assume 0, because glyph can be NULL
-        unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, onedge_value,
+        unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, on_edge_value,
                 (float) pixel_dist_scale, &width, &height, nullptr, nullptr);
 
         if (bake_context.x + width > bitmap_size) {
@@ -124,7 +124,7 @@ void Font::bake_character(int codepoint) {
     stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
     int width = 0, height = 0;  // Assume 0, because glyph can be NULL
-    unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, onedge_value,
+    unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, on_edge_value,
             (float) pixel_dist_scale, &width, &height, nullptr, nullptr);
 
     if (bake_context.x + width > bitmap_size) {

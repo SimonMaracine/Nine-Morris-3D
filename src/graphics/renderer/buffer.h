@@ -57,6 +57,3 @@ private:
     friend class VertexArray;
     friend class Shader;
 };
-
-template<typename T>
-using Rc = std::shared_ptr<T>;

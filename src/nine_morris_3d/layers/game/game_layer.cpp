@@ -430,7 +430,7 @@ void GameLayer::set_textures_quality(const std::string& quality) {
             }
         }
 
-        const std::array<Rc<TextureData>, 6> data = {
+        const std::array<std::shared_ptr<TextureData>, 6> data = {
             app->assets_load->skybox_px_texture,
             app->assets_load->skybox_nx_texture,
             app->assets_load->skybox_py_texture,
@@ -488,7 +488,7 @@ void GameLayer::set_textures_quality(const std::string& quality) {
             }
         }
 
-        const std::array<Rc<TextureData>, 6> data = {
+        const std::array<std::shared_ptr<TextureData>, 6> data = {
             app->assets_load->skybox_px_texture_small,
             app->assets_load->skybox_nx_texture_small,
             app->assets_load->skybox_py_texture_small,
@@ -520,7 +520,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
             app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
 
-            const std::array<Rc<TextureData>, 6> data = {
+            const std::array<std::shared_ptr<TextureData>, 6> data = {
                 app->assets_load->skybox_px_texture,
                 app->assets_load->skybox_nx_texture,
                 app->assets_load->skybox_py_texture,
@@ -537,7 +537,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
             app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
 
-            const std::array<Rc<TextureData>, 6> data = {
+            const std::array<std::shared_ptr<TextureData>, 6> data = {
                 app->assets_load->skybox_px_texture_small,
                 app->assets_load->skybox_nx_texture_small,
                 app->assets_load->skybox_py_texture_small,
@@ -561,7 +561,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE), false);
             app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE), false);
 
-            const std::array<Rc<TextureData>, 6> data = {
+            const std::array<std::shared_ptr<TextureData>, 6> data = {
                 app->assets_load->skybox_px_texture,
                 app->assets_load->skybox_nx_texture,
                 app->assets_load->skybox_py_texture,
@@ -578,7 +578,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
             app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
 
-            const std::array<Rc<TextureData>, 6> data = {
+            const std::array<std::shared_ptr<TextureData>, 6> data = {
                 app->assets_load->skybox_px_texture_small,
                 app->assets_load->skybox_nx_texture_small,
                 app->assets_load->skybox_py_texture_small,

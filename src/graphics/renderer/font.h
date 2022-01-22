@@ -17,7 +17,7 @@ public:
         int xoff, yoff, xadvance;
     };
 
-    Font(const std::string& file_path, float size, int padding, unsigned char onedge_value,
+    Font(const std::string& file_path, float size, int padding, unsigned char on_edge_value,
             int pixel_dist_scale, int bitmap_size);
     ~Font();
 
@@ -55,14 +55,14 @@ private:
     const char* font_file_buffer = nullptr;
     int bitmap_size = 0;
     int padding = 0;
-    unsigned char onedge_value = 0;
+    unsigned char on_edge_value = 0;
     int pixel_dist_scale = 0;
     float sf = 0.0f;
 
     std::string name;
 
     GLuint texture = 0;
-    Rc<VertexArray> vertex_array;
-    Rc<Buffer> buffer;
+    std::shared_ptr<VertexArray> vertex_array;
+    std::shared_ptr<Buffer> buffer;
     unsigned int vertex_count = 0;
 };

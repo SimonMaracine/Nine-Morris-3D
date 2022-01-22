@@ -26,50 +26,50 @@ namespace renderer {
     };
 
     struct Storage {
-        Rc<UniformBuffer> uniform_buffer;
+        std::shared_ptr<UniformBuffer> uniform_buffer;
 
-        Rc<Shader> board_shader;
-        Rc<Shader> board_paint_shader;
-        Rc<Shader> piece_shader;
-        Rc<Shader> shadow_shader;
-        Rc<Shader> screen_quad_shader;
-        Rc<Shader> outline_shader;
-        Rc<Shader> node_shader;
-        Rc<Shader> skybox_shader;
-        Rc<Shader> quad2d_shader;
-        Rc<Shader> quad3d_shader;
+        std::shared_ptr<Shader> board_shader;
+        std::shared_ptr<Shader> board_paint_shader;
+        std::shared_ptr<Shader> piece_shader;
+        std::shared_ptr<Shader> shadow_shader;
+        std::shared_ptr<Shader> screen_quad_shader;
+        std::shared_ptr<Shader> outline_shader;
+        std::shared_ptr<Shader> node_shader;
+        std::shared_ptr<Shader> skybox_shader;
+        std::shared_ptr<Shader> quad2d_shader;
+        std::shared_ptr<Shader> quad3d_shader;
 #ifndef NDEBUG
-        Rc<Shader> origin_shader;
+        std::shared_ptr<Shader> origin_shader;
 #endif
-        Rc<Shader> text_shader;
+        std::shared_ptr<Shader> text_shader;
 
-        Rc<Framebuffer> scene_framebuffer;
-        Rc<Framebuffer> depth_map_framebuffer;
-        Rc<Framebuffer> intermediate_framebuffer;
+        std::shared_ptr<Framebuffer> scene_framebuffer;
+        std::shared_ptr<Framebuffer> depth_map_framebuffer;
+        std::shared_ptr<Framebuffer> intermediate_framebuffer;
 
-        Rc<VertexArray> screen_quad_vertex_array;
-        Rc<VertexArray> quad2d_vertex_array;
+        std::shared_ptr<VertexArray> screen_quad_vertex_array;
+        std::shared_ptr<VertexArray> quad2d_vertex_array;
 #ifndef NDEBUG
-        Rc<VertexArray> origin_vertex_array;
-#endif
-
-        Rc<Texture> board_wood_diff_texture;
-        Rc<Texture> board_paint_diff_texture;
-        Rc<Texture> white_piece_diff_texture;
-        Rc<Texture> black_piece_diff_texture;
-        Rc<Texture3D> skybox_texture;
-        Rc<Texture> white_indicator_texture;
-        Rc<Texture> black_indicator_texture;
-        Rc<Texture> splash_screen_texture;
-#ifndef NDEBUG
-        Rc<Texture> light_texture;
+        std::shared_ptr<VertexArray> origin_vertex_array;
 #endif
 
-        Rc<VertexArray> board_vertex_array;
-        Rc<VertexArray> board_paint_vertex_array;
-        std::array<Rc<VertexArray>, 18> piece_vertex_arrays;
-        std::array<Rc<VertexArray>, 24> node_vertex_arrays;
-        Rc<VertexArray> skybox_vertex_array;
+        std::shared_ptr<Texture> board_wood_diff_texture;
+        std::shared_ptr<Texture> board_paint_diff_texture;
+        std::shared_ptr<Texture> white_piece_diff_texture;
+        std::shared_ptr<Texture> black_piece_diff_texture;
+        std::shared_ptr<Texture3D> skybox_texture;
+        std::shared_ptr<Texture> white_indicator_texture;
+        std::shared_ptr<Texture> black_indicator_texture;
+        std::shared_ptr<Texture> splash_screen_texture;
+#ifndef NDEBUG
+        std::shared_ptr<Texture> light_texture;
+#endif
+
+        std::shared_ptr<VertexArray> board_vertex_array;
+        std::shared_ptr<VertexArray> board_paint_vertex_array;
+        std::array<std::shared_ptr<VertexArray>, 18> piece_vertex_arrays;
+        std::array<std::shared_ptr<VertexArray>, 24> node_vertex_arrays;
+        std::shared_ptr<VertexArray> skybox_vertex_array;
 
         glm::mat4 orthographic_projection_matrix;
 
@@ -93,9 +93,9 @@ namespace renderer {
 #ifndef NDEBUG
     void draw_origin();
 #endif
-    void draw_quad_2d(const glm::vec2& position, float additional_scale, Rc<Texture> texture);
-    void draw_quad_2d(const glm::vec2& position, const glm::vec2& scale, Rc<Texture> texture);
-    void draw_quad_3d(const glm::vec3& position, float scale, Rc<Texture> texture);
+    void draw_quad_2d(const glm::vec2& position, float additional_scale, std::shared_ptr<Texture> texture);
+    void draw_quad_2d(const glm::vec2& position, const glm::vec2& scale, std::shared_ptr<Texture> texture);
+    void draw_quad_3d(const glm::vec3& position, float scale, std::shared_ptr<Texture> texture);
     void bind_texture(GLuint texture, GLenum slot);
     void set_stencil_mask_zero();
     void load_projection_view(const glm::mat4& matrix);
@@ -111,5 +111,5 @@ namespace renderer {
     void draw_skybox(const glm::mat4& projection_view_matrix);
     void draw_node(const Node& node, const glm::vec4& color);
     void draw_to_depth(const glm::vec3& position, const glm::vec3& rotation, float scale,
-            Rc<VertexArray> vertex_array, int index_count);
+            std::shared_ptr<VertexArray> vertex_array, int index_count);
 }

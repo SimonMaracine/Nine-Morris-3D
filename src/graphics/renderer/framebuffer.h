@@ -46,6 +46,3 @@ private:
     std::array<GLuint, 4> color_attachments = { 0, 0, 0, 0 };
     GLuint depth_attachment = 0;
 };
-
-template<typename T>
-using Rc = std::shared_ptr<T>;

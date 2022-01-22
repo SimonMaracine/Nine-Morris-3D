@@ -34,8 +34,8 @@ public:
     void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void purge_framebuffers();
 
-    static int get_width();
-    static int get_height();
+    int get_width() const;
+    int get_height() const;
 
     bool running = true;
     double fps = 0.0;
@@ -57,9 +57,6 @@ private:
     Scene* to_scene = nullptr;
 
     std::vector<std::weak_ptr<Framebuffer>> framebuffers;
-
-    static int* width;
-    static int* height;
 
     friend class Layer;
 };

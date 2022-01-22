@@ -20,9 +20,6 @@ Application::Application(int width, int height, const std::string& title) {
     data.title = title;
     data.event_function = BIND(Application::on_event);
 
-    Application::width = &data.width;
-    Application::height = &data.height;
-
     logging::initialize();
     window = std::make_shared<Window>(&data);
 
@@ -139,7 +136,7 @@ void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
 
 void Application::purge_framebuffers() {
     for (auto iter = framebuffers.rbegin(); iter != framebuffers.rend(); iter++) {
-        if (iter->lock() == nullptr || iter->expired()) {
+        if (iter->expired()) {
             framebuffers.erase(std::next(iter).base());
         }
     }
@@ -163,12 +160,12 @@ void Application::on_event(events::Event& event) {
     }
 }
 
-int Application::get_width() {
-    return *width;
+int Application::get_width() const {
+    return data.width;
 }
 
-int Application::get_height() {
-    return *height;
+int Application::get_height() const {
+    return data.height;
 }
 
 float Application::update_frame_counter() {
@@ -223,6 +220,3 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
 
     return false;
 }
-
-int* Application::width = nullptr;
-int* Application::height = nullptr;

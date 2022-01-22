@@ -27,6 +27,3 @@ private:
     std::vector<std::shared_ptr<Buffer>> buffers;
     std::shared_ptr<IndexBuffer> index_buffer;
 };
-
-template<typename T>
-using Rc = std::shared_ptr<T>;

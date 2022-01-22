@@ -50,6 +50,3 @@ private:
 
     mutable std::unordered_map<std::string, GLint> cache;
 };
-
-template<typename T>
-using Rc = std::shared_ptr<T>;

@@ -247,7 +247,7 @@ namespace renderer {
                  1.0f, -1.0f,    1.0f, 0.0f
             };
 
-            Rc<Buffer> buffer = Buffer::create(screen_quad_vertices, sizeof(screen_quad_vertices));
+            std::shared_ptr<Buffer> buffer = Buffer::create(screen_quad_vertices, sizeof(screen_quad_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             layout.add(1, BufferLayout::Type::Float, 2);
@@ -267,7 +267,7 @@ namespace renderer {
                 1.0f, 0.0f
             };
 
-            Rc<Buffer> buffer = Buffer::create(quad2d_vertices, sizeof(quad2d_vertices));
+            std::shared_ptr<Buffer> buffer = Buffer::create(quad2d_vertices, sizeof(quad2d_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 2);
             storage->quad2d_vertex_array = VertexArray::create();
@@ -286,7 +286,7 @@ namespace renderer {
                   0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
                   0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
             };
-            Rc<Buffer> buffer = Buffer::create(origin_vertices, sizeof(origin_vertices));
+            std::shared_ptr<Buffer> buffer = Buffer::create(origin_vertices, sizeof(origin_vertices));
             BufferLayout layout;
             layout.add(0, BufferLayout::Type::Float, 3);
             layout.add(1, BufferLayout::Type::Float, 3);
@@ -382,7 +382,7 @@ namespace renderer {
     }
 #endif
 
-    void draw_quad_2d(const glm::vec2& position, float additional_scale, Rc<Texture> texture) {
+    void draw_quad_2d(const glm::vec2& position, float additional_scale, std::shared_ptr<Texture> texture) {
         glDisable(GL_DEPTH_TEST);
 
         glm::mat4 matrix = glm::mat4(1.0f);
@@ -401,7 +401,7 @@ namespace renderer {
         glEnable(GL_DEPTH_TEST);
     }
 
-    void draw_quad_2d(const glm::vec2& position, const glm::vec2& scale, Rc<Texture> texture) {
+    void draw_quad_2d(const glm::vec2& position, const glm::vec2& scale, std::shared_ptr<Texture> texture) {
         glDisable(GL_DEPTH_TEST);
 
         glm::mat4 matrix = glm::mat4(1.0f);
@@ -418,7 +418,7 @@ namespace renderer {
         glEnable(GL_DEPTH_TEST);
     }
 
-    void draw_quad_3d(const glm::vec3& position, float scale, Rc<Texture> texture) {
+    void draw_quad_3d(const glm::vec3& position, float scale, std::shared_ptr<Texture> texture) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);
         matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
@@ -466,15 +466,15 @@ namespace renderer {
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
         matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
 
-        glDisable(GL_DEPTH_TEST);
-
         font->update_data(buffer, size);
         delete[] buffer;
 
         storage->text_shader->bind();
-        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);
+        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);  // TODO this doesn't need to be done everytime
         storage->text_shader->set_uniform_matrix("u_model_matrix", matrix);
         storage->text_shader->set_uniform_vec3("u_color", color);
+
+        glDisable(GL_DEPTH_TEST);
 
         font->get_vertex_array()->bind();
         bind_texture(font->get_texture(), 0);
@@ -603,7 +603,7 @@ namespace renderer {
     }
 
     void draw_to_depth(const glm::vec3& position, const glm::vec3& rotation, float scale,
-            Rc<VertexArray> vertex_array, int index_count) {
+            std::shared_ptr<VertexArray> vertex_array, int index_count) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, position);
         matrix = glm::rotate(matrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));

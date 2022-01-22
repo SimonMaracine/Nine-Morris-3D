@@ -44,8 +44,8 @@ void ImGuiLayer::on_attach() {
     ImVector<ImWchar> ranges;
     builder.BuildRanges(&ranges);
 
-    io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 20.0f,
-            nullptr, ranges.Data);
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(),
+            20.0f, nullptr, ranges.Data);
     io.Fonts->Build();
 
     ImVec4* colors = ImGui::GetStyle().Colors;
@@ -419,10 +419,7 @@ bool ImGuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheel = event.scroll;
 
-    if (hovering_gui)
-        return true;
-    else
-        return false;
+    return hovering_gui;
 }
 
 bool ImGuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
@@ -436,20 +433,14 @@ bool ImGuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event)
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[event.button] = true;
 
-    if (hovering_gui)
-        return true;
-    else
-        return false;
+    return hovering_gui;
 }
 
 bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[event.button] = false;
 
-    if (hovering_gui)
-        return true;
-    else
-        return false;
+    return hovering_gui;
 }
 
 bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {

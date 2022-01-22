@@ -20,12 +20,6 @@ public:
     virtual void on_draw() override;
     virtual void on_event(events::Event& event) override;
 
-    bool on_mouse_scrolled(events::MouseScrolledEvent& event);
-    bool on_mouse_moved(events::MouseMovedEvent& event);
-    bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
-    bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
-    bool on_window_resized(events::WindowResizedEvent& event);
-
     void render_turn_indicator();
     void render_timer();
 
