@@ -133,9 +133,13 @@ void Application::push_layer(Layer* layer, Scene* scene) {
     scene->layer_stack.push_back(layer);
 }
 
+void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
+    framebuffers.push_back(framebuffer);
+}
+
 void Application::purge_framebuffers() {
     for (auto iter = framebuffers.rbegin(); iter != framebuffers.rend(); iter++) {
-        if (!(*iter).lock() || iter->expired()) {
+        if (iter->lock() == nullptr || iter->expired()) {
             framebuffers.erase(std::next(iter).base());
         }
     }

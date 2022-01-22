@@ -227,16 +227,15 @@ namespace renderer {
             );
         }
 
-        // FIXME make a function for this
         storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap,
                 2048, 2048, 1, 0, false);
         app->purge_framebuffers();
-        app->framebuffers.push_back(storage->depth_map_framebuffer);
+        app->add_framebuffer(storage->depth_map_framebuffer);
 
         storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate,
                 app->data.width, app->data.height, 1, 2, true);  // TODO refactor framebuffers
         app->purge_framebuffers();
-        app->framebuffers.push_back(storage->intermediate_framebuffer);
+        app->add_framebuffer(storage->intermediate_framebuffer);
 
         {
             float screen_quad_vertices[] = {

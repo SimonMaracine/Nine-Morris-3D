@@ -41,7 +41,7 @@ void GameLayer::on_attach() {
     app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
             app->data.width, app->data.height, scene->options.samples, 2, true);
     app->purge_framebuffers();
-    app->framebuffers.push_back(app->storage->scene_framebuffer);
+    app->add_framebuffer(app->storage->scene_framebuffer);
 
     setup_light();
     setup_board();
@@ -369,7 +369,7 @@ void GameLayer::set_scene_framebuffer(int samples) {
     app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
             width, height, samples, 2, true);
     app->purge_framebuffers();
-    app->framebuffers.push_back(app->storage->scene_framebuffer);
+    app->add_framebuffer(app->storage->scene_framebuffer);
 }
 
 void GameLayer::set_textures_quality(const std::string& quality) {
