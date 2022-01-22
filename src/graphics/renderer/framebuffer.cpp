@@ -7,35 +7,41 @@
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
-Framebuffer::Framebuffer(Type type, int width, int height, int samples,
-        int color_attachment_count, bool resizable)
-    : type(type), width(width), height(height), samples(samples),
-      color_attachment_count(color_attachment_count), resizable(resizable) {
+static GLenum target(bool multisampled) {
+    return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+}
+
+static void attach_color_texture() {
+    
+}
+
+static void attach_color_renderbuffer() {
+    
+}
+
+static void attach_depth_texture() {
+    
+}
+
+static void attach_depth_renderbuffer() {
+    
+}
+
+Framebuffer::Framebuffer(const FramebufferSpecification& specification)
+    : specification(specification) {
     build();
 
     SPDLOG_DEBUG("Created framebuffer {}", framebuffer);
 }
 
 Framebuffer::~Framebuffer() {
-    glDeleteTextures(color_attachments.size(), color_attachments.data());
-    switch (type) {
-        case Type::Scene:
-        case Type::Intermediate:
-            glDeleteRenderbuffers(1, &depth_attachment);
-            break;
-        case Type::DepthMap:
-            glDeleteTextures(1, &depth_attachment);
-            break;
-    }
-    glDeleteFramebuffers(1, &framebuffer);
+    // TODO implement
 
     SPDLOG_DEBUG("Deleted framebuffer {}", framebuffer);
 }
 
-std::shared_ptr<Framebuffer> Framebuffer::create(Type type, int width, int height, int samples,
-        int color_attachments_count, bool resizable) {
-    return std::make_shared<Framebuffer>(type, width, height, samples,
-            color_attachments_count, resizable);
+std::shared_ptr<Framebuffer> Framebuffer::create(const FramebufferSpecification& specification) {
+    return std::make_shared<Framebuffer>(specification);
 }
 
 void Framebuffer::bind() const {
@@ -58,16 +64,17 @@ GLuint Framebuffer::get_depth_attachment() const {
 
 void Framebuffer::resize(int width, int height) {
     if (width < 1 || height < 1 || width > 8192 || height > 8192) {
-        SPDLOG_ERROR("Attempted to resize framebuffer to [ {}, {} ]", width, height);
+        SPDLOG_ERROR("Attempted to resize framebuffer to [{}, {}]", width, height);
         return;
     }
-    this->width = width;
-    this->height = height;
+
+    this->specification.width = width;
+    this->specification.height = height;
 
     build();
 }
 
-int Framebuffer::read_pixel(unsigned int attachment_index, int x, int y) const {
+int Framebuffer::read_pixel_red_integer(unsigned int attachment_index, int x, int y) const {
     assert(attachment_index < color_attachments.size());
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -77,29 +84,124 @@ int Framebuffer::read_pixel(unsigned int attachment_index, int x, int y) const {
     return pixel;
 }
 
-void Framebuffer::clear_red_integer_attachment(int index, int value) const {
+void Framebuffer::clear_red_integer_attachment(int index, int value) const {  // TODO is this even used?
     assert(index < (int) color_attachments.size());
 
     glClearBufferiv(GL_COLOR, index, &value);
 }
 
-void Framebuffer::resolve_framebuffer(GLuint read_framebuffer, GLuint draw_framebuffer,
-                                      int width, int height) {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, read_framebuffer);
+void Framebuffer::resolve_framebuffer(GLuint draw_framebuffer, int width, int height) {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
 
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    for (unsigned int i = 0; i < color_attachment_count; i++) {  // TODO this needs testing
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    }
+}        
 
-    glReadBuffer(GL_COLOR_ATTACHMENT1);
-    glDrawBuffer(GL_COLOR_ATTACHMENT1);
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+void Framebuffer::build() {
+
 }
 
-static GLenum target(bool multisampled) {
-    return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+// ---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
+
+// Framebuffer::Framebuffer(Type type, int width, int height, int samples,
+//         int color_attachment_count, bool resizable)
+//     : type(type), width(width), height(height), samples(samples),
+//       color_attachment_count(color_attachment_count), resizable(resizable) {
+//     build();
+
+//     SPDLOG_DEBUG("Created framebuffer {}", framebuffer);
+// }
+
+Framebuffer::~Framebuffer() {
+    glDeleteTextures(color_attachments.size(), color_attachments.data());
+    switch (type) {
+        case Type::Scene:
+        case Type::Intermediate:
+            glDeleteRenderbuffers(1, &depth_attachment);
+            break;
+        case Type::DepthMap:
+            glDeleteTextures(1, &depth_attachment);
+            break;
+    }
+    glDeleteFramebuffers(1, &framebuffer);
+
+    SPDLOG_DEBUG("Deleted framebuffer {}", framebuffer);
 }
+
+// std::shared_ptr<Framebuffer> Framebuffer::create(Type type, int width, int height, int samples,
+//         int color_attachments_count, bool resizable) {
+//     return std::make_shared<Framebuffer>(type, width, height, samples,
+//             color_attachments_count, resizable);
+// }
+
+// void Framebuffer::bind() const {
+//     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+// }
+
+// void Framebuffer::bind_default() {
+//     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+// }
+
+// GLuint Framebuffer::get_color_attachment(unsigned int index) const {
+//     assert(index < color_attachments.size());
+
+//     return color_attachments[index];
+// }
+
+// GLuint Framebuffer::get_depth_attachment() const {
+//     return depth_attachment;
+// }
+
+// void Framebuffer::resize(int width, int height) {
+//     if (width < 1 || height < 1 || width > 8192 || height > 8192) {
+//         SPDLOG_ERROR("Attempted to resize framebuffer to [ {}, {} ]", width, height);
+//         return;
+//     }
+//     this->width = width;
+//     this->height = height;
+
+//     build();
+// }
+
+// int Framebuffer::read_pixel(unsigned int attachment_index, int x, int y) const {
+//     assert(attachment_index < color_attachments.size());
+
+//     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
+//     int pixel;
+//     glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixel);
+
+//     return pixel;
+// }
+
+// void Framebuffer::clear_red_integer_attachment(int index, int value) const {
+//     assert(index < (int) color_attachments.size());
+
+//     glClearBufferiv(GL_COLOR, index, &value);
+// }
+
+// void Framebuffer::resolve_framebuffer(GLuint read_framebuffer, GLuint draw_framebuffer,
+//                                       int width, int height) {
+//     glBindFramebuffer(GL_READ_FRAMEBUFFER, read_framebuffer);
+//     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
+
+//     glReadBuffer(GL_COLOR_ATTACHMENT0);
+//     glDrawBuffer(GL_COLOR_ATTACHMENT0);
+//     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+//     glReadBuffer(GL_COLOR_ATTACHMENT1);
+//     glDrawBuffer(GL_COLOR_ATTACHMENT1);
+//     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+// }
+
+// static GLenum target(bool multisampled) {
+//     return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+// }
 
 static void attach_color_texture(GLuint texture, int samples, GLenum internal_format, GLenum format,
                                  int width, int height, unsigned int index) {
