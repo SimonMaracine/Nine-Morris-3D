@@ -204,8 +204,8 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
 
     for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
         std::shared_ptr<Framebuffer> frame = framebuffer.lock();
-        if (frame) {
-            if (frame->resizable) {
+        if (frame != nullptr) {
+            if (frame->get_specification().resizable) {
                 frame->resize(event.width, event.height);
             }
         }

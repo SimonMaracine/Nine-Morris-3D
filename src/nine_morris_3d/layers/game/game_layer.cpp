@@ -38,10 +38,24 @@ void GameLayer::on_attach() {
     app->window->set_vsync(scene->options.vsync);
     app->window->set_custom_cursor(scene->options.custom_cursor);
 
-    app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
-            app->data.width, app->data.height, scene->options.samples, 2, true);
-    app->purge_framebuffers();
-    app->add_framebuffer(app->storage->scene_framebuffer);
+    {
+        FramebufferSpecification specification;
+        specification.width = app->data.width;
+        specification.height = app->data.height;
+        specification.samples = scene->options.samples;
+        specification.color_attachments = {
+            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
+            Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+        };
+        specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
+                AttachmentType::Renderbuffer);
+        specification.enable_depth_attachment = true;
+
+        app->storage->scene_framebuffer = Framebuffer::create(specification);
+
+        app->purge_framebuffers();
+        app->add_framebuffer(app->storage->scene_framebuffer);
+    }
 
     setup_light();
     setup_board();
@@ -107,14 +121,14 @@ void GameLayer::on_draw() {
     renderer::draw_quad_3d(scene->light.position, 1.0f, app->storage->light_texture);
 #endif
 
-    Framebuffer::resolve_framebuffer(app->storage->scene_framebuffer->get_id(),
-            app->storage->intermediate_framebuffer->get_id(), app->data.width, app->data.height);
+    app->storage->scene_framebuffer->resolve_framebuffer(app->storage->intermediate_framebuffer->get_id(),
+            app->data.width, app->data.height);
 
     app->storage->intermediate_framebuffer->bind();
 
     const int x = (int) input::get_mouse_x();
     const int y = app->data.height - (int) input::get_mouse_y();
-    scene->hovered_id = app->storage->intermediate_framebuffer->read_pixel(1, x, y);
+    scene->hovered_id = app->storage->intermediate_framebuffer->read_pixel_red_integer(1, x, y);
 
     Framebuffer::bind_default();
 
@@ -364,10 +378,20 @@ void GameLayer::setup_quad3d_projection_view() {
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {
-    const int width = app->data.width;
-    const int height = app->data.height;
-    app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
-            width, height, samples, 2, true);
+    FramebufferSpecification specification;
+    specification.width = app->data.width;
+    specification.height = app->data.height;
+    specification.samples = scene->options.samples;
+    specification.color_attachments = {
+        Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
+        Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+    };
+    specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
+            AttachmentType::Renderbuffer);
+    specification.enable_depth_attachment = true;
+
+    app->storage->scene_framebuffer = Framebuffer::create(specification);
+
     app->purge_framebuffers();
     app->add_framebuffer(app->storage->scene_framebuffer);
 }

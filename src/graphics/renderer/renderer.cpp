@@ -227,15 +227,38 @@ namespace renderer {
             );
         }
 
-        storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap,
-                2048, 2048, 1, 0, false);
-        app->purge_framebuffers();
-        app->add_framebuffer(storage->depth_map_framebuffer);
+        {
+            FramebufferSpecification specification;
+            specification.width = 2048;
+            specification.height = 2048;
+            specification.depth_attachment = Attachment(AttachmentFormat::DEPTH32,
+                    AttachmentType::Texture);
+            specification.enable_depth_attachment = true;
+            specification.resizable = false;
 
-        storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate,
-                app->data.width, app->data.height, 1, 2, true);  // TODO refactor framebuffers
-        app->purge_framebuffers();
-        app->add_framebuffer(storage->intermediate_framebuffer);
+            storage->depth_map_framebuffer = Framebuffer::create(specification);
+
+            app->purge_framebuffers();
+            app->add_framebuffer(storage->depth_map_framebuffer);
+        }
+        
+        {
+            FramebufferSpecification specification;
+            specification.width = app->data.width;
+            specification.height = app->data.height;
+            specification.color_attachments = {
+                Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
+                Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+            };
+            specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
+                    AttachmentType::Renderbuffer);
+            specification.enable_depth_attachment = true;
+
+            storage->intermediate_framebuffer = Framebuffer::create(specification);
+
+            app->purge_framebuffers();
+            app->add_framebuffer(storage->intermediate_framebuffer);
+        }
 
         {
             float screen_quad_vertices[] = {
