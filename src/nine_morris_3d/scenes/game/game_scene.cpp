@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "application/app.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/texture.h"
@@ -26,18 +27,16 @@
 void GameScene::on_enter() {
     SPDLOG_DEBUG("Enter game scene");
 
-    options::load_options_from_file(options);
-
     srand(time(nullptr));
 
     board_state_history = std::make_shared<std::vector<Board>>();
     build_board();
 
     if (!app->storage->white_piece_diff_texture) {
-        if (options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->storage->white_piece_diff_texture = Texture::create(app->assets_load->white_piece_diff_texture, true, -1.5f);
             app->storage->black_piece_diff_texture = Texture::create(app->assets_load->black_piece_diff_texture, true, -1.5f);
-        } else if (options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->storage->white_piece_diff_texture = Texture::create(app->assets_load->white_piece_diff_texture_small, true, -1.5f);
             app->storage->black_piece_diff_texture = Texture::create(app->assets_load->black_piece_diff_texture_small, true, -1.5f);
         } else {
@@ -68,9 +67,9 @@ void GameScene::on_enter() {
 void GameScene::on_exit() {
     SPDLOG_DEBUG("Exit game scene");
 
-    options::save_options_to_file(options);
+    options::save_options_to_file(app->options);
 
-    if (options.save_on_exit && !app->running) {
+    if (app->options.save_on_exit && !app->running) {
         board.finalize_pieces_state();
 
         save_load::GameState state;
@@ -129,10 +128,10 @@ void GameScene::build_board() {
     }
 
     if (!app->storage->board_wood_diff_texture) {
-        if (options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->storage->board_wood_diff_texture =
                     Texture::create(app->assets_load->board_wood_diff_texture, true, -2.0f);
-        } else if (options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->storage->board_wood_diff_texture =
                     Texture::create(app->assets_load->board_wood_diff_texture_small, true, -2.0f);
         } else {
@@ -176,10 +175,10 @@ void GameScene::build_board_paint() {
     }
 
     if (!app->storage->board_paint_diff_texture) {
-        if (options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->storage->board_paint_diff_texture =
                     Texture::create(app->assets_load->board_paint_diff_texture, true, -1.0f);
-        } else if (options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->storage->board_paint_diff_texture =
                     Texture::create(app->assets_load->board_paint_diff_texture_small, true, -1.0f);
         } else {
@@ -294,7 +293,7 @@ void GameScene::build_skybox() {
     if (!app->storage->skybox_texture) {
         std::array<Rc<TextureData>, 6> data;
 
-        if (options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             data = {
                 app->assets_load->skybox_px_texture,
                 app->assets_load->skybox_nx_texture,
@@ -303,7 +302,7 @@ void GameScene::build_skybox() {
                 app->assets_load->skybox_pz_texture,
                 app->assets_load->skybox_nz_texture
             };
-        } else if (options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             data = {
                 app->assets_load->skybox_px_texture_small,
                 app->assets_load->skybox_nx_texture_small,
@@ -323,9 +322,9 @@ void GameScene::build_skybox() {
 }
 
 void GameScene::build_light() {
-    if (options.skybox == options::FIELD) {
+    if (app->options.skybox == options::FIELD) {
         light = LIGHT_FIELD;
-    } else if (options.skybox == options::AUTUMN) {
+    } else if (app->options.skybox == options::AUTUMN) {
         light = LIGHT_AUTUMN;
     } else {
         assert(false);

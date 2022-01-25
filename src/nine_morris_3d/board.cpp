@@ -5,6 +5,7 @@
 #include <cassert>
 #include <iterator>
 
+#include "application/app.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/hoverable.h"
 #include "other/logging.h"
@@ -61,6 +62,7 @@ bool Board::place_piece(hoverable::Id hovered_id) {
                 SPDLOG_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
                 should_take_piece = true;
+                update_cursor();
 
                 if (turn == Player::White) {
                     set_pieces_to_take(Piece::Black, true);
@@ -132,6 +134,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                             node.piece = nullptr;
                             node.piece_id = hoverable::null;
                             should_take_piece = false;
+                            update_cursor();
                             set_pieces_to_take(Piece::Black, false);
                             black_pieces_count--;
                             check_player_number_of_pieces(Player::White);
@@ -168,6 +171,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                             node.piece = nullptr;
                             node.piece_id = hoverable::null;
                             should_take_piece = false;
+                            update_cursor();
                             set_pieces_to_take(Piece::White, false);
                             white_pieces_count--;
                             check_player_number_of_pieces(Player::White);
@@ -260,6 +264,7 @@ bool Board::put_piece(hoverable::Id hovered_id) {
                     SPDLOG_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
                     should_take_piece = true;
+                    update_cursor();
 
                     if (turn == Player::White) {
                         set_pieces_to_take(Piece::Black, true);
@@ -407,6 +412,8 @@ void Board::undo() {
     state_history->pop_back();
 
     SPDLOG_DEBUG("Popped state and undid move");
+
+    update_cursor();
 }
 
 unsigned int Board::not_placed_pieces_count() {
@@ -1026,4 +1033,14 @@ void Board::arrive_at_node(Piece* piece) {
     }
 
     CAN_MAKE_MOVE();
+}
+
+void Board::update_cursor() {
+    if (app->options.custom_cursor) {
+        if (should_take_piece) {
+            app->window->set_custom_cursor(CustomCursor::Cross);
+        } else {
+            app->window->set_custom_cursor(CustomCursor::Arrow);
+        }
+    }
 }

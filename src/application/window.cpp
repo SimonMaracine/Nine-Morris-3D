@@ -136,12 +136,12 @@ Window::Window(ApplicationData* data) {
         data->event_function(event);
     });
 
-    Icon icons[5] = {
-        Icon(path("data/icons/512x512/ninemorris3d.png")),
-        Icon(path("data/icons/256x256/ninemorris3d.png")),
-        Icon(path("data/icons/128x128/ninemorris3d.png")),
-        Icon(path("data/icons/64x64/ninemorris3d.png")),
-        Icon(path("data/icons/32x32/ninemorris3d.png"))
+    IconImage icons[5] = {
+        IconImage(path("data/icons/512x512/ninemorris3d.png")),
+        IconImage(path("data/icons/256x256/ninemorris3d.png")),
+        IconImage(path("data/icons/128x128/ninemorris3d.png")),
+        IconImage(path("data/icons/64x64/ninemorris3d.png")),
+        IconImage(path("data/icons/32x32/ninemorris3d.png"))
     };
 
     GLFWimage glfw_icons[5];
@@ -153,12 +153,30 @@ Window::Window(ApplicationData* data) {
 
     glfwSetWindowIcon(window, 5, glfw_icons);
 
-    cursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+    IconImage cursors[2] = {
+        IconImage(path("data/cursors/arrow.png")),
+        IconImage(path("data/cursors/cross.png"))
+    };
+
+    GLFWimage glfw_cursors[2];
+    glfw_cursors[0] = cursors[0].get_data();
+    glfw_cursors[1] = cursors[1].get_data();
+
+    arrow_cursor = glfwCreateCursor(&glfw_cursors[0], 4, 1);
+    if (arrow_cursor == nullptr) {
+        REL_ERROR("Could not create custom cursor");
+    }
+
+    cross_cursor = glfwCreateCursor(&glfw_cursors[1], 8, 8);
+    if (cross_cursor == nullptr) {
+        REL_ERROR("Could not create custom cursor");
+    }
 }
 
 Window::~Window() {
     glfwDestroyWindow(window);
-    glfwDestroyCursor(cursor);
+    glfwDestroyCursor(arrow_cursor);
+    glfwDestroyCursor(cross_cursor);
     glfwTerminate();
 
     SPDLOG_INFO("Terminated GLFW and destroyed window");
@@ -181,32 +199,42 @@ void Window::set_vsync(int interval) const {
     glfwSwapInterval(interval);
 }
 
-void Window::set_custom_cursor(bool custom) const {
-    glfwSetCursor(window, custom ? cursor : nullptr);
+void Window::set_custom_cursor(CustomCursor cursor) const {
+    switch (cursor) {
+        case CustomCursor::None:
+            glfwSetCursor(window, nullptr);
+            break;
+        case CustomCursor::Arrow:
+            glfwSetCursor(window, arrow_cursor);
+            break;
+        case CustomCursor::Cross:
+            glfwSetCursor(window, cross_cursor);
+            break;
+    }
 }
 
-// --- Icon
+// --- IconImage
 
-Icon::Icon(const std::string& file_path) {
+IconImage::IconImage(const std::string& file_path) {
     data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load icon '{}'", file_path.c_str());
+        REL_CRITICAL("Could not load icon image '{}'", file_path.c_str());
         std::exit(1);
     }
 
     this->file_path = file_path;
 
-    SPDLOG_INFO("Loaded icon data '{}'", file_path.c_str());
+    SPDLOG_INFO("Loaded icon image data '{}'", file_path.c_str());
 }
 
-Icon::~Icon() {
+IconImage::~IconImage() {
     stbi_image_free(data);
 
-    SPDLOG_INFO("Freed icon data '{}'", file_path.c_str());
+    SPDLOG_INFO("Freed icon image data '{}'", file_path.c_str());
 }
 
-GLFWimage Icon::get_data() const {
+GLFWimage IconImage::get_data() const {
     GLFWimage image;
     image.width = width;
     image.height = height;

@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "application/application.h"
+#include "application/app.h"
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"

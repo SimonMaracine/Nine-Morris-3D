@@ -9,8 +9,8 @@ class GameLayer;
 
 class GuiLayer : public Layer {
 public:
-    GuiLayer(unsigned int id, Application* application, GameScene* scene)
-        : Layer(id, application), scene(scene) {}
+    GuiLayer(unsigned int id, GameScene* scene)
+        : Layer(id), scene(scene) {}
     virtual ~GuiLayer() = default;
 
     virtual void on_attach() override;

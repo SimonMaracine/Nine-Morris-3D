@@ -10,8 +10,8 @@ class Application;
 
 class Layer {
 public:
-    Layer(unsigned int id, Application* application)
-        : app(application), id(id) {}
+    Layer(unsigned int id)
+        : id(id) {}
     virtual ~Layer() = default;
 
     virtual void on_attach() {}
@@ -34,8 +34,6 @@ protected:
         assert(false);
         return nullptr;
     }
-
-    Application* app = nullptr;
 private:
     unsigned int id = 0;
 };

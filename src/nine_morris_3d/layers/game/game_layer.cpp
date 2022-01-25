@@ -12,6 +12,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "application/application.h"
+#include "application/app.h"
 #include "application/layer.h"
 #include "application/window.h"
 #include "application/events.h"
@@ -35,14 +36,14 @@
 #include "nine_morris_3d/save_load.h"
 
 void GameLayer::on_attach() {
-    app->window->set_vsync(scene->options.vsync);
-    app->window->set_custom_cursor(scene->options.custom_cursor);
+    app->window->set_vsync(app->options.vsync);
+    app->window->set_custom_cursor(app->options.custom_cursor ? CustomCursor::Arrow : CustomCursor::None);
 
     {
         FramebufferSpecification specification;
         specification.width = app->data.width;
         specification.height = app->data.height;
-        specification.samples = scene->options.samples;
+        specification.samples = app->options.samples;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
@@ -381,7 +382,7 @@ void GameLayer::set_scene_framebuffer(int samples) {
     FramebufferSpecification specification;
     specification.width = app->data.width;
     specification.height = app->data.height;
-    specification.samples = scene->options.samples;
+    specification.samples = app->options.samples;
     specification.color_attachments = {
         Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
         Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
@@ -401,7 +402,7 @@ void GameLayer::set_textures_quality(const std::string& quality) {
 
     // quality is the new option; options.texture_quality is not set yet
 
-    if (quality == scene->options.texture_quality) {
+    if (quality == app->options.texture_quality) {
         return;
     }
 
@@ -420,14 +421,14 @@ void GameLayer::set_textures_quality(const std::string& quality) {
         app->assets_load->board_paint_diff_texture = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE), true);
         app->assets_load->white_piece_diff_texture = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE), true);
         app->assets_load->black_piece_diff_texture = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE), true);
-        if (scene->options.skybox == options::FIELD) {
+        if (app->options.skybox == options::FIELD) {
             app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE), false);
             app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE), false);
             app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE), false);
             app->assets_load->skybox_ny_texture = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE), false);
             app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
             app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
-        } else if (scene->options.skybox == options::AUTUMN) {
+        } else if (app->options.skybox == options::AUTUMN) {
             app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
             app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE), false);
             app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE), false);
@@ -478,14 +479,14 @@ void GameLayer::set_textures_quality(const std::string& quality) {
         app->assets_load->board_paint_diff_texture_small = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE_SMALL), true);
         app->assets_load->white_piece_diff_texture_small = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE_SMALL), true);
         app->assets_load->black_piece_diff_texture_small = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE_SMALL), true);
-        if (scene->options.skybox == options::FIELD) {
+        if (app->options.skybox == options::FIELD) {
             app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
             app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
             app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
             app->assets_load->skybox_ny_texture_small = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE_SMALL), false);
             app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
             app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
-        } else if (scene->options.skybox == options::AUTUMN) {
+        } else if (app->options.skybox == options::AUTUMN) {
             app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
             app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
             app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
@@ -531,12 +532,12 @@ void GameLayer::set_skybox(const std::string& skybox) {
 
     // skybox is the new option; options.skybox is not set yet
 
-    if (skybox == scene->options.skybox) {
+    if (skybox == app->options.skybox) {
         return;
     }
 
     if (skybox == options::FIELD) {
-        if (scene->options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE), false);
             app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE), false);
             app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE), false);
@@ -553,7 +554,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_load->skybox_nz_texture
             };
             app->storage->skybox_texture = Texture3D::create(data);
-        } else if (scene->options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
             app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
             app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
@@ -577,7 +578,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
         scene->light = LIGHT_FIELD;
         setup_light();
     } else if (skybox == options::AUTUMN) {
-        if (scene->options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
             app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE), false);
             app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE), false);
@@ -594,7 +595,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_load->skybox_nz_texture
             };
             app->storage->skybox_texture = Texture3D::create(data);
-        } else if (scene->options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
             app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
             app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
@@ -717,6 +718,8 @@ void GameLayer::load_game() {
     scene->timer.stop();
     scene->timer.set_time(state.time);
     first_move = false;
+
+    scene->board.update_cursor();
 
     SPDLOG_INFO("Loaded game");
 }

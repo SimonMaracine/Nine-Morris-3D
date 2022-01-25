@@ -66,6 +66,7 @@ public:
     void undo();
     unsigned int not_placed_pieces_count();
     void finalize_pieces_state();
+    void update_cursor();
 
     hoverable::Id id = hoverable::null;
 

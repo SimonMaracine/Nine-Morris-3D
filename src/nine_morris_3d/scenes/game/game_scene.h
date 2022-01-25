@@ -21,8 +21,8 @@
 
 class GameScene : public Scene {
 public:
-    GameScene(unsigned int id, Application* application)
-        : Scene(id, application) {}
+    GameScene(unsigned int id)
+        : Scene(id) {}
     virtual ~GameScene() = default;
 
     virtual void on_enter() override;
@@ -40,8 +40,6 @@ public:
     void build_skybox();
     void build_light();
     void build_turn_indicator();
-
-    options::Options options;
 
     Board board;
     Camera camera;

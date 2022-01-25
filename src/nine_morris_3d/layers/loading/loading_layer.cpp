@@ -1,6 +1,7 @@
 #include <memory>
 #include <cassert>
 
+#include "application/app.h"
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
 #include "other/loader.h"
@@ -11,18 +12,18 @@
 #include "nine_morris_3d/options.h"
 
 void LoadingLayer::on_attach() {
-    if (scene->options.texture_quality == options::NORMAL) {
-        if (scene->options.skybox == options::FIELD) {
+    if (app->options.texture_quality == options::NORMAL) {
+        if (app->options.skybox == options::FIELD) {
             loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::field);
-        } else if (scene->options.skybox == options::AUTUMN) {
+        } else if (app->options.skybox == options::AUTUMN) {
             loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::autumn);
         } else {
             assert(false);
         }
-    } else if (scene->options.texture_quality == options::LOW) {
-        if (scene->options.skybox == options::FIELD) {
+    } else if (app->options.texture_quality == options::LOW) {
+        if (app->options.skybox == options::FIELD) {
             loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::field_low_tex);
-        } else if (scene->options.skybox == options::AUTUMN) {
+        } else if (app->options.skybox == options::AUTUMN) {
             loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::autumn_low_tex);
         } else {
             assert(false);

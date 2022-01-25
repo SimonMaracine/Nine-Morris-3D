@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "application/application.h"
+#include "application/app.h"
 #include "application/events.h"
 #include "graphics/debug_opengl.h"
 #include "graphics/renderer/renderer.h"
@@ -133,37 +134,37 @@ void ImGuiLayer::on_update(float dt) {
             HOVERING_GUI();
         }
         if (ImGui::BeginMenu("Options")) {
-            if (ImGui::MenuItem("VSync", nullptr, &scene->options.vsync)) {
-                if (scene->options.vsync) {
-                    app->window->set_vsync(scene->options.vsync);
+            if (ImGui::MenuItem("VSync", nullptr, &app->options.vsync)) {
+                if (app->options.vsync) {
+                    app->window->set_vsync(app->options.vsync);
 
                     SPDLOG_INFO("VSync enabled");
                 } else {
-                    app->window->set_vsync(scene->options.vsync);
+                    app->window->set_vsync(app->options.vsync);
 
                     SPDLOG_INFO("VSync disabled");
                 }
             }
-            if (ImGui::MenuItem("Save On Exit", nullptr, &scene->options.save_on_exit)) {
-                if (scene->options.save_on_exit) {
+            if (ImGui::MenuItem("Save On Exit", nullptr, &app->options.save_on_exit)) {
+                if (app->options.save_on_exit) {
                     SPDLOG_INFO("The game will be saved on exit");
                 } else {
                     SPDLOG_INFO("The game will not be saved on exit");
                 }
             }
             if (ImGui::BeginMenu("Anti-Aliasing", true)) {
-                if (ImGui::RadioButton("No Anti-Aliasing", &scene->options.samples, 1)) {
-                    game_layer->set_scene_framebuffer(scene->options.samples);
+                if (ImGui::RadioButton("No Anti-Aliasing", &app->options.samples, 1)) {
+                    game_layer->set_scene_framebuffer(app->options.samples);
 
                     SPDLOG_INFO("Anti-aliasing disabled");
                 }
-                if (ImGui::RadioButton("2x", &scene->options.samples, 2)) {
-                    game_layer->set_scene_framebuffer(scene->options.samples);
+                if (ImGui::RadioButton("2x", &app->options.samples, 2)) {
+                    game_layer->set_scene_framebuffer(app->options.samples);
 
                     SPDLOG_INFO("2x anti-aliasing");
                 }
-                if (ImGui::RadioButton("4x", &scene->options.samples, 4)) {
-                    game_layer->set_scene_framebuffer(scene->options.samples);
+                if (ImGui::RadioButton("4x", &app->options.samples, 4)) {
+                    game_layer->set_scene_framebuffer(app->options.samples);
 
                     SPDLOG_INFO("4x anti-aliasing");
                 }
@@ -171,16 +172,16 @@ void ImGuiLayer::on_update(float dt) {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Texture Quality", true)) {
-                static int quality = scene->options.texture_quality == options::NORMAL ? 0 : 1;
+                static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
                 if (ImGui::RadioButton("Normal", &quality, 0)) {
                     game_layer->set_textures_quality(options::NORMAL);
-                    scene->options.texture_quality = options::NORMAL;
+                    app->options.texture_quality = options::NORMAL;
 
                     SPDLOG_INFO("Textures set to {} quality", options::NORMAL);
                 }
                 if (ImGui::RadioButton("Low", &quality, 1)) {
                     game_layer->set_textures_quality(options::LOW);
-                    scene->options.texture_quality = options::LOW;
+                    app->options.texture_quality = options::LOW;
 
                     SPDLOG_INFO("Textures set to {} quality", options::LOW);
                 }
@@ -188,16 +189,16 @@ void ImGuiLayer::on_update(float dt) {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Skybox", true)) {
-                static int skybox = scene->options.skybox == options::FIELD ? 0 : 1;
+                static int skybox = app->options.skybox == options::FIELD ? 0 : 1;
                 if (ImGui::RadioButton("Field", &skybox, 0)) {
                     game_layer->set_skybox(options::FIELD);
-                    scene->options.skybox = options::FIELD;
+                    app->options.skybox = options::FIELD;
 
                     SPDLOG_INFO("Skybox set to {}", options::FIELD);
                 }
                 if (ImGui::RadioButton("Autumn", &skybox, 1)) {
                     game_layer->set_skybox(options::AUTUMN);
-                    scene->options.skybox = options::AUTUMN;
+                    app->options.skybox = options::AUTUMN;
 
                     SPDLOG_INFO("Skybox set to {}", options::AUTUMN);
                 }
@@ -211,13 +212,17 @@ void ImGuiLayer::on_update(float dt) {
                     SPDLOG_INFO("Hide info");
                 }
             }
-            if (ImGui::MenuItem("Custom Cursor", nullptr, &scene->options.custom_cursor)) {
-                if (scene->options.custom_cursor) {
-                    app->window->set_custom_cursor(scene->options.custom_cursor);
+            if (ImGui::MenuItem("Custom Cursor", nullptr, &app->options.custom_cursor)) {
+                if (app->options.custom_cursor) {
+                    if (scene->board.should_take_piece) {
+                        app->window->set_custom_cursor(CustomCursor::Cross);
+                    } else {
+                        app->window->set_custom_cursor(CustomCursor::Arrow);
+                    }
 
                     SPDLOG_INFO("Set custom cursor");
                 } else {
-                    app->window->set_custom_cursor(scene->options.custom_cursor);
+                    app->window->set_custom_cursor(CustomCursor::None);
 
                     SPDLOG_INFO("Set default cursor");
                 }

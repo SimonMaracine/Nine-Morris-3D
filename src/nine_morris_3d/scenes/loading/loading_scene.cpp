@@ -4,8 +4,6 @@
 
 void LoadingScene::on_enter() {
     SPDLOG_DEBUG("Enter loading scene");
-
-    options::load_options_from_file(options);
 }
 
 void LoadingScene::on_exit() {
