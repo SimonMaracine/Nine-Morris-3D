@@ -47,6 +47,7 @@ void ImGuiLayer::on_attach() {
 
     io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(),
             20.0f, nullptr, ranges.Data);
+    info_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 16.0f);
     io.Fonts->Build();
 
     ImVec4* colors = ImGui::GetStyle().Colors;
@@ -351,6 +352,7 @@ void ImGuiLayer::on_update(float dt) {
     }
 
     if (show_info && !about_mode) {
+        ImGui::PushFont(info_font);
         ImGui::Begin("Info");
         ImGui::Text("FPS: %f", app->fps);
         ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
@@ -358,6 +360,7 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::Text("Vendor: %s", debug_opengl::get_vendor());
         ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
         ImGui::End();
+        ImGui::PopFont();
     }
 
 #ifndef NDEBUG

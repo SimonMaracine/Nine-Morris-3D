@@ -1,5 +1,7 @@
 #pragma once
 
+#include <imgui.h>
+
 #include "application/layer.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
 
@@ -29,6 +31,8 @@ public:
     bool can_undo = false;
     bool show_info = false;
     bool about_mode = false;
+
+    ImFont* info_font;
 
     GameScene* scene = nullptr;
     GameLayer* game_layer = nullptr;
