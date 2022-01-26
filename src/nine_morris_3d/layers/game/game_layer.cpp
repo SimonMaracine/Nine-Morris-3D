@@ -127,8 +127,8 @@ void GameLayer::on_draw() {
 
     app->storage->intermediate_framebuffer->bind();
 
-    const int x = (int) input::get_mouse_x();
-    const int y = app->data.height - (int) input::get_mouse_y();
+    const int x = static_cast<int>(input::get_mouse_x());
+    const int y = app->data.height - static_cast<int>(input::get_mouse_y());
     scene->hovered_id = app->storage->intermediate_framebuffer->read_pixel_red_integer(1, x, y);
 
     Framebuffer::bind_default();
@@ -224,7 +224,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 }
 
 bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
-    scene->camera.update_projection((float) event.width, (float) event.height);
+    scene->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
     return false;
 }

@@ -27,7 +27,7 @@ protected:
     T* get_layer(unsigned int id, Scene* scene) const {
         for (unsigned int i = 0; i < scene->layer_stack.size(); i++) {
             if (scene->layer_stack[i]->id == id) {
-                return (T*) scene->layer_stack[i];
+                return static_cast<T*>(scene->layer_stack[i]);  // TODO shouldn't compile
             }
         }
 

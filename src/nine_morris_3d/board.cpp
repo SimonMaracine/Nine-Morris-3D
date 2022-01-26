@@ -612,7 +612,7 @@ void Board::update_outlines() {
 bool Board::can_go(Node* source_node, Node* destination_node) {
     assert(source_node != destination_node);
 
-    if (can_jump[(int) turn]) {
+    if (can_jump[static_cast<int>(turn)]) {
         return true;
     }
 
@@ -727,7 +727,7 @@ void Board::check_player_number_of_pieces(Player player) {
         SPDLOG_DEBUG("Checking white player number of pieces");
 
         if (white_pieces_count + not_placed_white_pieces_count == 3) {
-            can_jump[(int) player] = true;
+            can_jump[static_cast<int>(player)] = true;
             SPDLOG_INFO("White player can jump");
         } else if (white_pieces_count + not_placed_white_pieces_count == 2) {
             SPDLOG_INFO("White player has only 2 pieces");
@@ -737,7 +737,7 @@ void Board::check_player_number_of_pieces(Player player) {
         SPDLOG_DEBUG("Checking black player number of pieces");
 
         if (black_pieces_count + not_placed_black_pieces_count == 3) {
-            can_jump[(int) player] = true;
+            can_jump[static_cast<int>(player)] = true;
             SPDLOG_INFO("Black player can jump");
         } else if (black_pieces_count + not_placed_black_pieces_count == 2) {
             SPDLOG_INFO("Black player has only 2 pieces");
@@ -753,7 +753,7 @@ bool Board::check_player_blocked(Player player) {
     bool at_least_one_piece = false;
     Piece::Type type = player == Player::White ? Piece::White : Piece::Black;
 
-    if (can_jump[(int) player]) {
+    if (can_jump[static_cast<int>(player)]) {
         return false;
     }
 

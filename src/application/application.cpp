@@ -192,7 +192,7 @@ float Application::update_frame_counter() {
     total_time += elapsed_seconds;
 
     if (total_time > 0.25) {
-        fps = (double) frame_count / total_time;
+        fps = static_cast<double>(frame_count) / total_time;
         frame_count = 0;
         total_time = 0.0;
     }
@@ -200,7 +200,7 @@ float Application::update_frame_counter() {
 
     const double delta_time = std::min(elapsed_seconds, MAX_DT);
 
-    return (float) delta_time;
+    return static_cast<float>(delta_time);
 }
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {
@@ -221,11 +221,15 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
         }
     }
 
-    storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f,
-            (float) event.height);
+    storage->orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
+            static_cast<float>(event.height));
 
     storage->quad2d_shader->bind();
     storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
+            storage->orthographic_projection_matrix);
+
+    storage->text_shader->bind();
+    storage->text_shader->set_uniform_matrix("u_projection_matrix",
             storage->orthographic_projection_matrix);
 
     return false;

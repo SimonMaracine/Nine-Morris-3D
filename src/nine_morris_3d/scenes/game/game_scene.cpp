@@ -90,7 +90,7 @@ std::shared_ptr<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size,
     std::vector<int> array;
     array.resize(vertices_size);
     for (unsigned int i = 0; i < array.size(); i++) {
-        array[i] = (int) id;
+        array[i] = static_cast<int>(id);
     }
     std::shared_ptr<Buffer> buffer = Buffer::create(array.data(), array.size() * sizeof(int));
 
@@ -217,7 +217,7 @@ void GameScene::build_piece(unsigned int index, Piece::Type type, std::shared_pt
     int random_rotation = rand() % 360;
 
     board.pieces[index].position = position;
-    board.pieces[index].rotation = glm::vec3(0.0f, glm::radians((float) random_rotation), 0.0f);
+    board.pieces[index].rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(random_rotation)), 0.0f);
     board.pieces[index].scale = 20.0f;
     board.pieces[index].vertex_array = app->storage->piece_vertex_arrays[index];
     board.pieces[index].index_count = mesh->indices.size();
@@ -272,7 +272,7 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
 void GameScene::build_camera() {
     camera = Camera(
         47.0f,
-        glm::perspective(glm::radians(FOV), (float) app->data.width / (float) app->data.height, NEAR, FAR),
+        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR),
         glm::vec3(0.0f),
         8.0f
     );
@@ -345,7 +345,8 @@ void GameScene::build_turn_indicator() {
         app->storage->black_indicator_texture = Texture::create(app->assets_load->black_indicator_texture, false);
     }
 
-    turn_indicator.position = glm::vec3((float) (app->data.width - 90), (float) (app->data.height - 115), 0.0f);
+    turn_indicator.position = glm::vec3(static_cast<float>(app->data.width - 90),
+            static_cast<float>(app->data.height - 115), 0.0f);
     turn_indicator.scale = 1.0f;
 
     SPDLOG_DEBUG("Built turn indicator");

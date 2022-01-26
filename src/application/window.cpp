@@ -73,14 +73,14 @@ Window::Window(ApplicationData* data) {
     glfwSetWindowUserPointer(window, data);
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         events::WindowClosedEvent event;
         data->event_function(event);
     });
 
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         events::WindowResizedEvent event (width, height);
         data->width = width;
@@ -89,7 +89,7 @@ Window::Window(ApplicationData* data) {
     });
 
     glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         switch (action) {
             case GLFW_PRESS: {
@@ -111,7 +111,7 @@ Window::Window(ApplicationData* data) {
     });
 
     glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         if (action == GLFW_PRESS) {
             events::MouseButtonPressedEvent event (button);
@@ -123,16 +123,16 @@ Window::Window(ApplicationData* data) {
     });
 
     glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        events::MouseScrolledEvent event ((float) yoffset);
+        events::MouseScrolledEvent event (static_cast<float>(yoffset));
         data->event_function(event);
     });
 
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        events::MouseMovedEvent event ((float) xpos, (float) ypos);
+        events::MouseMovedEvent event (static_cast<float>(xpos), static_cast<float>(ypos));
         data->event_function(event);
     });
 

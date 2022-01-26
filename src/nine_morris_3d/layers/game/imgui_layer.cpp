@@ -281,7 +281,7 @@ void ImGuiLayer::on_update(float dt) {
             float x_pos;
             float y_pos;
 
-            if ((float) app->get_width() / (float) app->get_height() >= 16.0f / 9.0f) {
+            if (static_cast<float>(app->get_width()) / static_cast<float>(app->get_height()) > 16.0f / 9.0f) {
                 width = app->get_width();
                 height = app->get_width() * (9.0f / 16.0f);
                 x_pos = 0.0f;
@@ -402,23 +402,21 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::End();
 
         ImGui::Begin("Debug Settings");
-        if (ImGui::SliderFloat3("Light position", (float*) &scene->light.position, -30.0f, 30.0f)) {
+        if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&scene->light.position), -30.0f, 30.0f)) {
             game_layer->setup_light();
         }
-        if (ImGui::SliderFloat3("Light ambient color", (float*) &scene->light.ambient_color, 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&scene->light.ambient_color), 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
-        if (ImGui::SliderFloat3("Light diffuse color", (float*) &scene->light.diffuse_color, 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&scene->light.diffuse_color), 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
-        if (ImGui::SliderFloat3("Light specular color", (float*) &scene->light.specular_color, 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&scene->light.specular_color), 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
         ImGui::End();
     }
 #endif
-
-    ImGui::ShowDemoWindow();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -469,7 +467,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 }
 
 bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    scene->camera.update_projection((float) event.width, (float) event.height);
+    scene->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
     return false;
 }

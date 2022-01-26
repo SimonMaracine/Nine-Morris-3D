@@ -98,7 +98,7 @@ std::shared_ptr<UniformBuffer> UniformBuffer::create(const void* data, size_t si
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_UNIFORM_BUFFER, buffer);
-    glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);
     LOG_ALLOCATION(size);
 
     return std::make_shared<UniformBuffer>(buffer);
@@ -113,5 +113,5 @@ void UniformBuffer::unbind() {
 }
 
 void UniformBuffer::update_data(const void* data, size_t size) const {
-    glBufferData(GL_UNIFORM_BUFFER, size, data, GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);
 }

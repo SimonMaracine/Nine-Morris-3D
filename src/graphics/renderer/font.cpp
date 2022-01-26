@@ -79,7 +79,7 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
 
         int width = 0, height = 0;  // Assume 0, because glyph can be NULL
         unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, on_edge_value,
-                (float) pixel_dist_scale, &width, &height, nullptr, nullptr);
+                static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr);
 
         if (bake_context.x + width > bitmap_size) {
             bake_context.y += bake_context.max_row_height;
@@ -103,9 +103,9 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         gl.t1 = t1;
         gl.width = width;
         gl.height = height;
-        gl.xoff = (int) std::roundf(left_side_bearing * sf);
-        gl.yoff = (int) std::roundf(-descent * sf - y0);
-        gl.xadvance = (int) std::roundf(advance_width * sf);
+        gl.xoff = static_cast<int>(std::roundf(left_side_bearing * sf));
+        gl.yoff = static_cast<int>(std::roundf(-descent * sf - y0));
+        gl.xadvance = static_cast<int>(std::roundf(advance_width * sf));
 
         assert(glyphs.count(codepoint) == 0);
 
@@ -125,7 +125,7 @@ void Font::bake_character(int codepoint) {
 
     int width = 0, height = 0;  // Assume 0, because glyph can be NULL
     unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, on_edge_value,
-            (float) pixel_dist_scale, &width, &height, nullptr, nullptr);
+            static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr);
 
     if (bake_context.x + width > bitmap_size) {
         bake_context.y += bake_context.max_row_height;
@@ -149,9 +149,9 @@ void Font::bake_character(int codepoint) {
     gl.t1 = t1;
     gl.width = width;
     gl.height = height;
-    gl.xoff = (int) std::roundf(left_side_bearing * sf);
-    gl.yoff = (int) std::roundf(-descent * sf - y0);
-    gl.xadvance = (int) std::roundf(advance_width * sf);
+    gl.xoff = static_cast<int>(std::roundf(left_side_bearing * sf));
+    gl.yoff = static_cast<int>(std::roundf(-descent * sf - y0));
+    gl.xadvance = static_cast<int>(std::roundf(advance_width * sf));
 
     assert(glyphs.count(codepoint) == 0);
 
@@ -205,10 +205,10 @@ void Font::render(const std::string& string, size_t* out_size, float** out_buffe
             glyph = &get_glyphs()[127];
         }
 
-        const float x0 = (float) (x + glyph->xoff);
-        const float y0 = (float) -(glyph->height - glyph->yoff);
-        const float x1 = (float) (x + glyph->xoff + glyph->width);
-        const float y1 = (float) glyph->yoff;
+        const float x0 = static_cast<float>(x + glyph->xoff);
+        const float y0 = -static_cast<float>(glyph->height - glyph->yoff);
+        const float x1 = static_cast<float>(x + glyph->xoff + glyph->width);
+        const float y1 = static_cast<float>(glyph->yoff);
 
         buffer[buffer_index++] = x0;
         buffer[buffer_index++] = y1;
@@ -264,10 +264,10 @@ void Font::get_string_size(const std::string& string, float scale, int* out_widt
 
         x += glyph->xadvance;
 
-        *out_height = std::max(*out_height, (int) roundf(glyph->yoff * scale));
+        *out_height = std::max(*out_height, static_cast<int>(roundf(glyph->yoff * scale)));
     }
 
-    *out_width = (int) roundf((x + 2) * scale);
+    *out_width = static_cast<int>(roundf((x + 2) * scale));
 }
 
 const char* Font::get_file_data(const std::string& file_path) {
@@ -299,10 +299,10 @@ void Font::blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsi
         }
     }
 
-    *s0 = (float) dest_x / (float) dest_width;
-    *t0 = (float) dest_y / (float) dest_height;
-    *s1 = (float) (dest_x + width) / (float) dest_width;
-    *t1 = (float) (dest_y + height) / (float) dest_height;
+    *s0 = static_cast<float>(dest_x) / static_cast<float>(dest_width);
+    *t0 = static_cast<float>(dest_y) / static_cast<float>(dest_height);
+    *s1 = static_cast<float>(dest_x + width) / static_cast<float>(dest_width);
+    *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
 }
 
 std::string Font::get_name(const std::string& file_path) {

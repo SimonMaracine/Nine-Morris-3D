@@ -326,7 +326,8 @@ namespace renderer {
         storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);  // TODO see what to do with this
 #endif
 
-        storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) app->data.width, 0.0f, (float) app->data.height);
+        storage->orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(app->data.width),
+                0.0f, static_cast<float>(app->data.height));
 
         storage->good_dog_plain_font = std::make_shared<Font>(assets::path(assets::GOOD_DOG_PLAIN_FONT),
                 50.0f, 5, 180, 40, 512);
@@ -346,6 +347,8 @@ namespace renderer {
         storage->quad3d_shader->set_uniform_int("u_texture", 0);
         storage->text_shader->bind();
         storage->text_shader->set_uniform_int("u_bitmap", 0);
+        storage->text_shader->set_uniform_matrix("u_projection_matrix",
+                storage->orthographic_projection_matrix);
         storage->skybox_shader->bind();
         storage->skybox_shader->set_uniform_int("u_skybox", 0);
         Shader::unbind();
@@ -493,7 +496,6 @@ namespace renderer {
         delete[] buffer;
 
         storage->text_shader->bind();
-        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);  // TODO this doesn't need to be done everytime
         storage->text_shader->set_uniform_matrix("u_model_matrix", matrix);
         storage->text_shader->set_uniform_vec3("u_color", color);
 
