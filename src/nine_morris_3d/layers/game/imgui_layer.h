@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <imgui.h>
 
 #include "application/layer.h"
@@ -31,6 +33,7 @@ public:
     bool can_undo = false;
     bool show_info = false;
     bool about_mode = false;
+    std::string last_save_date;
 
     ImFont* info_font = nullptr;
 

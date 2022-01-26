@@ -28,13 +28,14 @@ public:
     virtual void on_enter() override;
     virtual void on_exit() override;
 
-    Rc<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
-    Rc<VertexArray> create_entity_vertex_array(Rc<model::Mesh<model::Vertex>> mesh, hoverable::Id id);
+    std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
+    std::shared_ptr<VertexArray> create_entity_vertex_array(std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+            hoverable::Id id);
 
     void build_board();
     void build_board_paint();
-    void build_piece(unsigned int index, Piece::Type type, Rc<model::Mesh<model::Vertex>> mesh,
-            Rc<Texture> texture, const glm::vec3& position);
+    void build_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+            std::shared_ptr<Texture> texture, const glm::vec3& position);
     void build_node(unsigned int index, const glm::vec3& position);
     void build_camera();
     void build_skybox();

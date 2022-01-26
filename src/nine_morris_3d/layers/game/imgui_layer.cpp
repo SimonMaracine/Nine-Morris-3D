@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
@@ -68,6 +70,10 @@ void ImGuiLayer::on_attach() {
 
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
+
+    save_load::GameState state;
+    save_load::load_game(state);
+    last_save_date = std::move(state.date);
 }
 
 void ImGuiLayer::on_detach() {
@@ -110,6 +116,9 @@ void ImGuiLayer::on_update(float dt) {
 
                 game_layer->load_game();
             }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("%s", last_save_date.c_str());
+            }
             if (ImGui::MenuItem("Save", nullptr, false)) {
                 scene->board.finalize_pieces_state();
 
@@ -118,7 +127,12 @@ void ImGuiLayer::on_update(float dt) {
                 state.camera = scene->camera;
                 state.time = scene->timer.get_time_raw();
 
+                const time_t current = time(nullptr);
+                state.date = ctime(&current);
+
                 save_load::save_game(state);
+
+                last_save_date = state.date;
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 scene->board.undo();
@@ -361,6 +375,7 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
         ImGui::End();
         ImGui::PopFont();
+        HOVERING_GUI();
     }
 
 #ifndef NDEBUG
@@ -402,6 +417,8 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::End();
     }
 #endif
+
+    ImGui::ShowDemoWindow();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

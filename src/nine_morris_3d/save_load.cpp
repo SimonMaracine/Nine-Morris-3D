@@ -153,8 +153,13 @@ namespace save_load {
             throw std::runtime_error(message);
         }
 
-        cereal::BinaryInputArchive input{file};
-        input(game_state);
+        try {
+            cereal::BinaryInputArchive input{file};
+            input(game_state);
+        } catch (const cereal::Exception& e) {
+            REL_ERROR("Error reading save game file: {}", e.what());
+            return;
+        }
 
         SPDLOG_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
     }

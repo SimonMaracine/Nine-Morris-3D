@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 #include "graphics/renderer/camera.h"
 #include "nine_morris_3d/board.h"
@@ -10,11 +11,12 @@ namespace save_load {
     struct GameState {
         Board board;
         Camera camera;
-        unsigned int time;  // In deciseconds
+        unsigned int time = 0;  // In deciseconds
+        std::string date;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(board, camera, time);
+            archive(board, camera, time, date);
         }
     };
 
