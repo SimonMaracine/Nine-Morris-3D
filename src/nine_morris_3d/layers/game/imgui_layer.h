@@ -32,7 +32,7 @@ public:
     bool show_info = false;
     bool about_mode = false;
 
-    ImFont* info_font;
+    ImFont* info_font = nullptr;
 
     GameScene* scene = nullptr;
     GameLayer* game_layer = nullptr;
