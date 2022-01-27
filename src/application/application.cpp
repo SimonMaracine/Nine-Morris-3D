@@ -2,15 +2,20 @@
 #include <memory>
 #include <cassert>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/window.h"
 #include "application/events.h"
 #include "application/scene.h"
 #include "application/input.h"
-#include "opengl/renderer/renderer.h"
-#include "opengl/debug_opengl.h"
+#include "graphics/renderer/renderer.h"
+#include "graphics/debug_opengl.h"
 #include "other/logging.h"
+
+// Global reference to application
+Application* app = nullptr;
 
 Application::Application(int width, int height, const std::string& title) {
     data.width = width;
@@ -34,8 +39,9 @@ Application::Application(int width, int height, const std::string& title) {
         std::exit(1);
     }
 
-    storage = renderer::initialize(data.width, data.height);
+    storage = renderer::initialize(this);
     assets_load = std::make_shared<AssetsLoad>();
+    options::load_options_from_file(options);
 }
 
 Application::~Application() {
@@ -49,8 +55,14 @@ Application::~Application() {
     renderer::terminate();
 }
 
+void Application::set_pointer(Application* instance) {
+    assert(app == nullptr);
+    app = instance;
+}
+
 void Application::run() {
     assert(current_scene != nullptr);
+    assert(app != nullptr);
 
     for (unsigned int j = 0; j < scenes.size(); j++) {
         for (unsigned int i = 0; i < scenes[j]->layer_stack.size(); i++) {
@@ -128,6 +140,18 @@ void Application::push_layer(Layer* layer, Scene* scene) {
     scene->layer_stack.push_back(layer);
 }
 
+void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
+    framebuffers.push_back(framebuffer);
+}
+
+void Application::purge_framebuffers() {
+    for (auto iter = framebuffers.rbegin(); iter != framebuffers.rend(); iter++) {
+        if (iter->expired()) {
+            framebuffers.erase(std::next(iter).base());
+        }
+    }
+}
+
 void Application::on_event(events::Event& event) {
     using namespace events;
 
@@ -146,6 +170,14 @@ void Application::on_event(events::Event& event) {
     }
 }
 
+int Application::get_width() const {
+    return data.width;
+}
+
+int Application::get_height() const {
+    return data.height;
+}
+
 float Application::update_frame_counter() {
     constexpr double MAX_DT = 1.0 / 20.0;
 
@@ -153,22 +185,22 @@ float Application::update_frame_counter() {
     static int frame_count = 0;
     static double total_time = 0.0;
 
-    double current_seconds = window->get_time();
-    double elapsed_seconds = current_seconds - previous_seconds;
+    const double current_seconds = window->get_time();
+    const double elapsed_seconds = current_seconds - previous_seconds;
     previous_seconds = current_seconds;
 
     total_time += elapsed_seconds;
 
     if (total_time > 0.25) {
-        fps = (double) frame_count / total_time;
+        fps = static_cast<double>(frame_count) / total_time;
         frame_count = 0;
         total_time = 0.0;
     }
     frame_count++;
 
-    double delta_time = std::min(elapsed_seconds, MAX_DT);
+    const double delta_time = std::min(elapsed_seconds, MAX_DT);
 
-    return (float) delta_time;
+    return static_cast<float>(delta_time);
 }
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {
@@ -179,6 +211,26 @@ bool Application::on_window_closed(events::WindowClosedEvent& event) {
 
 bool Application::on_window_resized(events::WindowResizedEvent& event) {
     renderer::set_viewport(event.width, event.height);
+
+    for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
+        std::shared_ptr<Framebuffer> frame = framebuffer.lock();
+        if (frame != nullptr) {
+            if (frame->get_specification().resizable) {
+                frame->resize(event.width, event.height);
+            }
+        }
+    }
+
+    storage->orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
+            static_cast<float>(event.height));
+
+    storage->quad2d_shader->bind();
+    storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
+            storage->orthographic_projection_matrix);
+
+    storage->text_shader->bind();
+    storage->text_shader->set_uniform_matrix("u_projection_matrix",
+            storage->orthographic_projection_matrix);
 
     return false;
 }

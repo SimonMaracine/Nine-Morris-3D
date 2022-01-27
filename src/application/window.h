@@ -8,6 +8,13 @@
 
 struct GLFWwindow;
 struct GLFWimage;
+struct GLFWcursor;
+
+enum class CustomCursor {
+    None,
+    Arrow,
+    Cross
+};
 
 class Window {
 public:
@@ -20,14 +27,19 @@ public:
     double get_time() const;
 
     void set_vsync(int interval) const;
+    void set_custom_cursor(CustomCursor cursor) const;
 private:
     GLFWwindow* window = nullptr;
+    GLFWcursor* arrow_cursor = nullptr;
+    GLFWcursor* cross_cursor = nullptr;
+
+    CustomCursor cursor = CustomCursor::Arrow;
 };
 
-class Icon {
+class IconImage {
 public:
-    Icon(const std::string& file_path);
-    ~Icon();
+    IconImage(const std::string& file_path);
+    ~IconImage();
 
     GLFWimage get_data() const;
 private:

@@ -10,8 +10,8 @@ class Application;
 
 class Layer {
 public:
-    Layer(unsigned int id, Application* application)
-        : app(application), id(id) {}
+    Layer(unsigned int id)
+        : id(id) {}
     virtual ~Layer() = default;
 
     virtual void on_attach() {}
@@ -27,15 +27,13 @@ protected:
     T* get_layer(unsigned int id, Scene* scene) const {
         for (unsigned int i = 0; i < scene->layer_stack.size(); i++) {
             if (scene->layer_stack[i]->id == id) {
-                return (T*) scene->layer_stack[i];
+                return static_cast<T*>(scene->layer_stack[i]);  // TODO shouldn't compile
             }
         }
 
         assert(false);
         return nullptr;
     }
-
-    Application* app = nullptr;
 private:
     unsigned int id = 0;
 };

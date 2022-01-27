@@ -40,7 +40,7 @@ namespace options {
             return;
         }
 
-        std::ifstream file (file_path, std::ios::in);
+        std::ifstream file (file_path);
 
         if (!file.is_open()) {
             REL_ERROR("Could not open options file '{}'", file_path.c_str());
@@ -68,6 +68,7 @@ namespace options {
         bool vsync;
         bool save_on_exit;
         std::string skybox;
+        bool custom_cursor;
 
         try {
             texture_quality = object.at("texture_quality").get<std::string>();
@@ -75,6 +76,7 @@ namespace options {
             vsync = object.at("vsync").get<bool>();
             save_on_exit = object.at("save_on_exit").get<bool>();
             skybox = object.at("skybox").get<std::string>();
+            custom_cursor = object.at("custom_cursor").get<bool>();
         } catch (const json::out_of_range& e) {
             REL_ERROR("{}", e.what());
             return;
@@ -100,6 +102,7 @@ namespace options {
         options.vsync = vsync;
         options.save_on_exit = save_on_exit;
         options.skybox = skybox;
+        options.custom_cursor = custom_cursor;
 
         SPDLOG_INFO("Loaded options from file '{}'", file_path.c_str());
     }
@@ -113,7 +116,7 @@ namespace options {
             return;
         }
 
-        std::ofstream file (file_path.c_str(), std::ios::out | std::ios::trunc);
+        std::ofstream file (file_path.c_str(), std::ios::trunc);
 
         if (!file.is_open()) {
             REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
@@ -151,9 +154,9 @@ namespace options {
         object["vsync"] = options.vsync;
         object["save_on_exit"] = options.save_on_exit;
         object["skybox"] = options.skybox;
+        object["custom_cursor"] = options.custom_cursor;
 
         file << std::setw(4) << object;
-        file.close();
 
         SPDLOG_INFO("Saved options to file '{}'", file_path.c_str());
     }
@@ -167,7 +170,7 @@ namespace options {
             return;
         }
 
-        std::ofstream file (file_path.c_str(), std::ios::out);
+        std::ofstream file (file_path.c_str());
 
         if (!file.is_open()) {
             REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
@@ -181,9 +184,9 @@ namespace options {
         object["vsync"] = options.vsync;
         object["save_on_exit"] = options.save_on_exit;
         object["skybox"] = options.skybox;
+        object["custom_cursor"] = options.custom_cursor;
 
         file << object.dump(4);
-        file.close();
 
         SPDLOG_INFO("Created options file '{}'", file_path.c_str());
     }

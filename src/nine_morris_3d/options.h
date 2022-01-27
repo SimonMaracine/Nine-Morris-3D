@@ -15,6 +15,7 @@ namespace options {
         bool vsync = true;
         bool save_on_exit = true;
         std::string skybox = FIELD;
+        bool custom_cursor = true;
     };
 
     void load_options_from_file(Options& options);

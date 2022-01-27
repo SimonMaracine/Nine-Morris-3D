@@ -6,8 +6,8 @@
 
 #include <glm/glm.hpp>
 
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/texture.h"
+#include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/texture.h"
 #include "nine_morris_3d/node.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/hoverable.h"
@@ -23,9 +23,9 @@ struct BoardPaint {
     glm::vec3 position = glm::vec3(0.0f);
     float scale = 0.0f;
 
-    Rc<VertexArray> vertex_array;
+    std::shared_ptr<VertexArray> vertex_array;
     int index_count = 0;
-    Rc<Texture> diffuse_texture;
+    std::shared_ptr<Texture> diffuse_texture;
 
     glm::vec3 specular_color = glm::vec3(0.0f);
     float shininess = 0.0f;
@@ -56,24 +56,25 @@ public:
     Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history);
     ~Board() = default;
 
-    void place_piece(hoverable::Id hovered_id);
+    bool place_piece(hoverable::Id hovered_id);
     void move_pieces(float dt);
-    void take_piece(hoverable::Id hovered_id);
+    bool take_piece(hoverable::Id hovered_id);
     void select_piece(hoverable::Id hovered_id);
-    void put_piece(hoverable::Id hovered_id);
+    bool put_piece(hoverable::Id hovered_id);
     void press(hoverable::Id hovered_id);
     void release(hoverable::Id hovered_id);
     void undo();
     unsigned int not_placed_pieces_count();
     void finalize_pieces_state();
+    void update_cursor();
 
     hoverable::Id id = hoverable::null;
 
     float scale = 0.0f;
 
-    Rc<VertexArray> vertex_array;
+    std::shared_ptr<VertexArray> vertex_array;
     int index_count = 0;
-    Rc<Texture> diffuse_texture;
+    std::shared_ptr<Texture> diffuse_texture;
 
     glm::vec3 specular_color = glm::vec3(0.0f);
     float shininess = 0.0f;

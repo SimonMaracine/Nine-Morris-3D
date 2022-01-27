@@ -5,6 +5,7 @@
 #include <cassert>
 #include <iterator>
 
+#include "application/app.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/hoverable.h"
 #include "other/logging.h"
@@ -39,7 +40,9 @@ Board::Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_h
 
 }
 
-void Board::place_piece(hoverable::Id hovered_id) {
+bool Board::place_piece(hoverable::Id hovered_id) {
+    bool placed = false;
+
     for (Node& node : nodes) {
         if (node.id == hovered_id && (&node) == hovered_node && node.piece == nullptr) {
             remember_state();
@@ -63,6 +66,7 @@ void Board::place_piece(hoverable::Id hovered_id) {
                 SPDLOG_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
                 should_take_piece = true;
+                update_cursor();
 
                 if (turn == Player::White) {
                     set_pieces_to_take(Piece::Black, true);
@@ -89,9 +93,12 @@ void Board::place_piece(hoverable::Id hovered_id) {
                 SPDLOG_INFO("Phase 2");
             }
 
+            placed = true;
             break;
         }
     }
+
+    return placed;
 }
 
 void Board::move_pieces(float dt) {
@@ -116,7 +123,9 @@ void Board::move_pieces(float dt) {
     }
 }
 
-void Board::take_piece(hoverable::Id hovered_id) {
+bool Board::take_piece(hoverable::Id hovered_id) {
+    bool taked = false;
+
     if (hovered_piece != nullptr) {  // Do anything only if there is a hovered piece
         for (Node& node : nodes) {
             if (node.piece != nullptr) {
@@ -135,6 +144,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             node.piece = nullptr;
                             node.piece_id = hoverable::null;
                             should_take_piece = false;
+                            update_cursor();
                             set_pieces_to_take(Piece::Black, false);
                             black_pieces_count--;
                             check_player_number_of_pieces(Player::White);
@@ -153,6 +163,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             SPDLOG_DEBUG("Cannot take piece from windmill");
                         }
 
+                        taked = true;
                         break;
                     }
                 } else {
@@ -170,6 +181,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             node.piece = nullptr;
                             node.piece_id = hoverable::null;
                             should_take_piece = false;
+                            update_cursor();
                             set_pieces_to_take(Piece::White, false);
                             white_pieces_count--;
                             check_player_number_of_pieces(Player::White);
@@ -188,6 +200,7 @@ void Board::take_piece(hoverable::Id hovered_id) {
                             SPDLOG_DEBUG("Cannot take piece from windmill");
                         }
 
+                        taked = true;
                         break;
                     }
                 }
@@ -202,6 +215,8 @@ void Board::take_piece(hoverable::Id hovered_id) {
             SPDLOG_INFO("Phase 2");
         }
     }
+
+    return taked;
 }
 
 void Board::select_piece(hoverable::Id hovered_id) {
@@ -226,7 +241,9 @@ void Board::select_piece(hoverable::Id hovered_id) {
     }
 }
 
-void Board::put_piece(hoverable::Id hovered_id) {
+bool Board::put_piece(hoverable::Id hovered_id) {
+    bool put = false;
+
     if (selected_piece != nullptr) {  // Do anything only if there is a selected piece
         for (Node& node : nodes) {
             if (node.id == hovered_id && can_go(selected_piece->node, &node)) {
@@ -257,6 +274,7 @@ void Board::put_piece(hoverable::Id hovered_id) {
                     SPDLOG_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
                     should_take_piece = true;
+                    update_cursor();
 
                     if (turn == Player::White) {
                         set_pieces_to_take(Piece::Black, true);
@@ -282,10 +300,13 @@ void Board::put_piece(hoverable::Id hovered_id) {
                     remember_position_and_check_repetition();
                 }
 
+                put = true;
                 break;
             }
         }
     }
+
+    return put;
 }
 
 void Board::press(hoverable::Id hovered_id) {
@@ -401,6 +422,8 @@ void Board::undo() {
     state_history->pop_back();
 
     SPDLOG_DEBUG("Popped state and undid move");
+
+    update_cursor();
 }
 
 unsigned int Board::not_placed_pieces_count() {
@@ -599,7 +622,7 @@ void Board::update_outlines() {
 bool Board::can_go(Node* source_node, Node* destination_node) {
     assert(source_node != destination_node);
 
-    if (can_jump[(int) turn]) {
+    if (can_jump[static_cast<int>(turn)]) {
         return true;
     }
 
@@ -714,7 +737,7 @@ void Board::check_player_number_of_pieces(Player player) {
         SPDLOG_DEBUG("Checking white player number of pieces");
 
         if (white_pieces_count + not_placed_white_pieces_count == 3) {
-            can_jump[(int) player] = true;
+            can_jump[static_cast<int>(player)] = true;
             SPDLOG_INFO("White player can jump");
         } else if (white_pieces_count + not_placed_white_pieces_count == 2) {
             SPDLOG_INFO("White player has only 2 pieces");
@@ -724,7 +747,7 @@ void Board::check_player_number_of_pieces(Player player) {
         SPDLOG_DEBUG("Checking black player number of pieces");
 
         if (black_pieces_count + not_placed_black_pieces_count == 3) {
-            can_jump[(int) player] = true;
+            can_jump[static_cast<int>(player)] = true;
             SPDLOG_INFO("Black player can jump");
         } else if (black_pieces_count + not_placed_black_pieces_count == 2) {
             SPDLOG_INFO("Black player has only 2 pieces");
@@ -740,7 +763,7 @@ bool Board::check_player_blocked(Player player) {
     bool at_least_one_piece = false;
     Piece::Type type = player == Player::White ? Piece::White : Piece::Black;
 
-    if (can_jump[(int) player]) {
+    if (can_jump[static_cast<int>(player)]) {
         return false;
     }
 
@@ -1020,4 +1043,14 @@ void Board::arrive_at_node(Piece* piece) {
     }
 
     CAN_MAKE_MOVE();
+}
+
+void Board::update_cursor() {
+    if (app->options.custom_cursor) {
+        if (should_take_piece) {
+            app->window->set_custom_cursor(CustomCursor::Cross);
+        } else {
+            app->window->set_custom_cursor(CustomCursor::Arrow);
+        }
+    }
 }

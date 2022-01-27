@@ -11,8 +11,8 @@
 
 class LoadingLayer : public Layer {
 public:
-    LoadingLayer(unsigned int id, Application* application, LoadingScene* scene)
-        : Layer(id, application), scene(scene) {};
+    LoadingLayer(unsigned int id, LoadingScene* scene)
+        : Layer(id), scene(scene) {}
     virtual ~LoadingLayer() = default;
 
     virtual void on_attach() override;
@@ -21,8 +21,6 @@ public:
     virtual void on_update(float dt) override;
     virtual void on_draw() override;
     virtual void on_event(events::Event& event) override;
-
-    bool on_window_resized(events::WindowResizedEvent& event);
 
     std::unique_ptr<Loader<AssetsLoad>> loader;
 

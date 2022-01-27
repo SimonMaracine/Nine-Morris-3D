@@ -5,8 +5,8 @@
 
 #include <glad/glad.h>
 
-#include "opengl/renderer/buffer.h"
-#include "opengl/renderer/buffer_layout.h"
+#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/buffer_layout.h"
 
 class VertexArray {
 public:
@@ -27,6 +27,3 @@ private:
     std::vector<std::shared_ptr<Buffer>> buffers;
     std::shared_ptr<IndexBuffer> index_buffer;
 };
-
-template<typename T>
-using Rc = std::shared_ptr<T>;

@@ -21,14 +21,14 @@ namespace input {
         double x, y;
         glfwGetCursorPos(window_ptr, &x, &y);
 
-        return (float) x;
+        return static_cast<float>(x);
     }
 
     float get_mouse_y() {
         double x, y;
         glfwGetCursorPos(window_ptr, &x, &y);
 
-        return (float) y;
+        return static_cast<float>(y);
     }
 
     const std::pair<float, float> get_mouse() {

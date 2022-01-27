@@ -193,7 +193,7 @@ namespace debug_opengl {
         }
 
         //////////////////////////////////////////////////////////////////////////////////
-        output.append("\n*** Dependencies Versions ***\n");
+        output.append("\n*** Dependencies And Versions ***\n");
 
 #if defined(__GNUG__)
         {
@@ -248,6 +248,31 @@ namespace debug_opengl {
             char line[100];
             sprintf(line, "cereal version: %d.%d.%d\n", CEREAL_VERSION_MAJOR,
                     CEREAL_VERSION_MINOR, CEREAL_VERSION_PATCH);
+            output.append(line);
+        }
+        {
+            char line[100];
+            sprintf(line, "glad\n");
+            output.append(line);
+        }
+        {
+            char line[100];
+            sprintf(line, "stb_image\n");
+            output.append(line);
+        }
+        {   
+            char line[100];
+            sprintf(line, "stb_image_write\n");
+            output.append(line);
+        }
+        {   
+            char line[100];
+            sprintf(line, "stb_truetype\n");
+            output.append(line);
+        }
+        {
+            char line[100];
+            sprintf(line, "utfcpp\n");
             output.append(line);
         }
 

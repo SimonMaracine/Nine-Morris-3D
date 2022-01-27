@@ -1,7 +1,15 @@
+#include <memory>
+#include <string>
+#include <algorithm>
+#include <string.h>
+
+#include <glm/glm.hpp>
+
 #include "application/application.h"
+#include "application/app.h"
 #include "application/events.h"
-#include "opengl/renderer/renderer.h"
-#include "opengl/renderer/framebuffer.h"
+#include "graphics/renderer/renderer.h"
+#include "graphics/renderer/framebuffer.h"
 #include "other/logging.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
@@ -15,47 +23,21 @@ void GuiLayer::on_detach() {
 }
 
 void GuiLayer::on_bind_layers() {
-    game_layer = get_layer<GameLayer>(0, scene);
+
 }
 
 void GuiLayer::on_update(float dt) {
     scene->turn_indicator.update(app->data.width, app->data.height);
+    scene->timer.update(app->window->get_time());
 }
 
 void GuiLayer::on_draw() {
     render_turn_indicator();
+    render_timer();
 }
 
 void GuiLayer::on_event(events::Event& event) {
-    using namespace events;
 
-    Dispatcher dispatcher (event);
-
-    dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(GuiLayer::on_mouse_scrolled));
-    dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(GuiLayer::on_mouse_moved));
-    dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(GuiLayer::on_mouse_button_pressed));
-    dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(GuiLayer::on_mouse_button_released));
-    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(GuiLayer::on_window_resized));
-}
-
-bool GuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
-    return false;
-}
-
-bool GuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
-    return false;
-}
-
-bool GuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
-    return false;
-}
-
-bool GuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
-    return false;
-}
-
-bool GuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    return false;
 }
 
 void GuiLayer::render_turn_indicator() {
@@ -66,4 +48,20 @@ void GuiLayer::render_turn_indicator() {
         renderer::draw_quad_2d(scene->turn_indicator.position, scene->turn_indicator.scale,
                 app->storage->black_indicator_texture);
     }
+}
+
+void GuiLayer::render_timer() {
+    const unsigned int minutes = scene->timer.get_time_seconds() / 60;
+    const unsigned int seconds = scene->timer.get_time_seconds() % 60;    
+
+    char time[8];
+    sprintf(time, "%.2u:%.2u", minutes, seconds);
+
+    int width, height;
+    app->storage->good_dog_plain_font->get_string_size(time, 1.5f, &width, &height);
+
+    const float x_pos = app->data.width / 2 - width / 2 - 8;
+    const float y_pos = app->data.height - height - 50;
+
+    renderer::draw_string(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f), app->storage->good_dog_plain_font);
 }

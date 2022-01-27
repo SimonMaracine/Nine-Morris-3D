@@ -6,7 +6,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "opengl/debug_opengl.h"
+#include "graphics/debug_opengl.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 
@@ -85,7 +85,7 @@ namespace logging {
                     break;
                 }
 
-                std::ofstream file (file_path, std::ios::out | std::ios::trunc);
+                std::ofstream file (file_path, std::ios::trunc);
 
                 if (!file.is_open()) {
                     REL_ERROR("Could not open file '{}' for writing", file_path.c_str());
@@ -93,7 +93,6 @@ namespace logging {
                 }
 
                 file << contents.c_str();
-                file.close();
 
                 break;
             }

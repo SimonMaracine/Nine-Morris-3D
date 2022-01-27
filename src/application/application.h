@@ -7,9 +7,11 @@
 #include "application/application_data.h"
 #include "application/events.h"
 #include "application/window.h"
-#include "opengl/renderer/renderer.h"
+#include "graphics/renderer/renderer.h"
+#include "graphics/renderer/framebuffer.h"
 #include "other/loader.h"
 #include "nine_morris_3d/assets_load.h"
+#include "nine_morris_3d/options.h"
 
 constexpr int VERSION_MAJOR = 0;
 constexpr int VERSION_MINOR = 1;
@@ -23,6 +25,8 @@ public:
     Application(int width, int height, const std::string& title);
     ~Application();
 
+    static void set_pointer(Application* instance);
+
     void run();
 
     void add_scene(Scene* scene);
@@ -30,12 +34,19 @@ public:
     void change_scene(unsigned int id);
     void push_layer(Layer* layer, Scene* scene);
 
+    void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
+    void purge_framebuffers();
+
+    int get_width() const;
+    int get_height() const;
+
     bool running = true;
     double fps = 0.0;
     ApplicationData data;
     std::shared_ptr<AssetsLoad> assets_load;
     std::shared_ptr<Window> window;
     renderer::Storage* storage = nullptr;
+    options::Options options;
 private:
     void on_event(events::Event& event);
     float update_frame_counter();
@@ -48,6 +59,8 @@ private:
 
     bool changed_scene = false;
     Scene* to_scene = nullptr;
+
+    std::vector<std::weak_ptr<Framebuffer>> framebuffers;
 
     friend class Layer;
 };

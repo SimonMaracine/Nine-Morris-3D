@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/texture.h"
+#include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/texture.h"
 #include "nine_morris_3d/hoverable.h"
 
 class Node;
@@ -35,9 +35,9 @@ public:
     float distance_travelled = 0.0f;  // From 0.0 to 1.0
     glm::vec3 distance_to_travel = glm::vec3(0.0f);
 
-    Rc<VertexArray> vertex_array;
+    std::shared_ptr<VertexArray> vertex_array;
     int index_count = 0;
-    Rc<Texture> diffuse_texture;
+    std::shared_ptr<Texture> diffuse_texture;
 
     glm::vec3 specular_color = glm::vec3(0.0f);
     float shininess = 0.0f;

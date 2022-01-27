@@ -9,7 +9,7 @@
 TextureData::TextureData(const std::string& file_path, bool flip) {
     SPDLOG_DEBUG("Loading texture '{}'...", file_path.c_str());
 
-    stbi_set_flip_vertically_on_load((int) flip);
+    stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
     data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 

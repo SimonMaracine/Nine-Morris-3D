@@ -46,16 +46,18 @@ add_executable(${EXECUTABLE_NAME}
     "src/nine_morris_3d/board.cpp"
     "src/nine_morris_3d/hoverable.cpp"
     "src/nine_morris_3d/turn_indicator.cpp"
-    "src/opengl/debug_opengl.cpp"
-    "src/opengl/renderer/vertex_array.cpp"
-    "src/opengl/renderer/buffer.cpp"
-    "src/opengl/renderer/buffer_layout.cpp"
-    "src/opengl/renderer/shader.cpp"
-    "src/opengl/renderer/renderer.cpp"
-    "src/opengl/renderer/texture.cpp"
-    "src/opengl/renderer/framebuffer.cpp"
-    "src/opengl/renderer/camera.cpp"
-    "src/opengl/renderer/light.cpp"
+    "src/nine_morris_3d/timer.cpp"
+    "src/graphics/debug_opengl.cpp"
+    "src/graphics/renderer/vertex_array.cpp"
+    "src/graphics/renderer/buffer.cpp"
+    "src/graphics/renderer/buffer_layout.cpp"
+    "src/graphics/renderer/shader.cpp"
+    "src/graphics/renderer/renderer.cpp"
+    "src/graphics/renderer/texture.cpp"
+    "src/graphics/renderer/framebuffer.cpp"
+    "src/graphics/renderer/camera.cpp"
+    "src/graphics/renderer/light.cpp"
+    "src/graphics/renderer/font.cpp"
     "src/other/logging.cpp"
     "src/other/model.cpp"
     "src/other/texture_data.cpp"
@@ -63,6 +65,8 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/user_data.cpp"
     "dependencies/glad/src/glad.c"
     "dependencies/stb_image/stb_image.c"
+    "dependencies/stb_truetype/stb_truetype.c"
+    "dependencies/stb_image_write/stb_image_write.c"
     "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_demo.cpp"
     "extern/imgui/imgui_tables.cpp"
@@ -97,6 +101,7 @@ add_subdirectory(extern/glm)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/json)
 add_subdirectory(extern/assimp)
+add_subdirectory(extern/utfcpp)
 
 add_dependencies(${EXECUTABLE_NAME} glfw)  # This is necessary for some reason
 
@@ -105,13 +110,16 @@ target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
 target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/glad/include"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_truetype"
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_image_write"
     "${CMAKE_SOURCE_DIR}/dependencies/cereal/include"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/assimp/include"
     "${CMAKE_SOURCE_DIR}/extern/glm"
     "${CMAKE_SOURCE_DIR}/extern/glfw/include"
     "${CMAKE_SOURCE_DIR}/extern/imgui"
-    "${CMAKE_SOURCE_DIR}/extern/json/single_include")
+    "${CMAKE_SOURCE_DIR}/extern/json/single_include"
+    "${CMAKE_SOURCE_DIR}/extern/utfcpp/source")
 
 # Add all link directories
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)

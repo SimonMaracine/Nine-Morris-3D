@@ -22,6 +22,7 @@ namespace assets {
     extern const char* BLACK_INDICATOR_TEXTURE;
     extern const char* SPLASH_SCREEN_TEXTURE;
     extern const char* OPEN_SANS_FONT;
+    extern const char* GOOD_DOG_PLAIN_FONT;
 
     extern const char* FIELD_PX_TEXTURE;
     extern const char* FIELD_NX_TEXTURE;
@@ -72,4 +73,6 @@ namespace assets {
     extern const char* ORIGIN_VERTEX_SHADER;
     extern const char* ORIGIN_FRAGMENT_SHADER;
 #endif
+    extern const char* TEXT_VERTEX_SHADER;
+    extern const char* TEXT_FRAGMENT_SHADER;
 }

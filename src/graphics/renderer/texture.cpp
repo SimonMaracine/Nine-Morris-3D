@@ -7,8 +7,8 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include "opengl/renderer/texture.h"
-#include "opengl/debug_opengl.h"
+#include "graphics/renderer/texture.h"
+#include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
 static std::string get_name(const std::string& file_path) {

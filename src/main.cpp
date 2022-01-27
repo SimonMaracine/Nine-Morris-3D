@@ -11,17 +11,18 @@ int main() {
     constexpr int height = 576;
 
     Application* application = new Application(width, height, "Nine Morris 3D");
+    Application::set_pointer(application);
 
-    GameScene* game_scene = new GameScene(0, application);
-    LoadingScene* loading_scene = new LoadingScene(1, application);
+    GameScene* game_scene = new GameScene(0);
+    LoadingScene* loading_scene = new LoadingScene(1);
 
     application->add_scene(game_scene);
-    application->push_layer(new GameLayer(0, application, game_scene), game_scene);
-    application->push_layer(new GuiLayer(1, application, game_scene), game_scene);
-    application->push_layer(new ImGuiLayer(2, application, game_scene), game_scene);
+    application->push_layer(new GameLayer(0, game_scene), game_scene);
+    application->push_layer(new GuiLayer(1, game_scene), game_scene);
+    application->push_layer(new ImGuiLayer(2, game_scene), game_scene);
 
     application->add_scene(loading_scene);
-    application->push_layer(new LoadingLayer(0, application, loading_scene), loading_scene);
+    application->push_layer(new LoadingLayer(0, loading_scene), loading_scene);
 
     application->set_starting_scene(loading_scene);
     application->run();

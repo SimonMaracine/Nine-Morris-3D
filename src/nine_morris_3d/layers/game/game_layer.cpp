@@ -12,17 +12,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "application/application.h"
+#include "application/app.h"
 #include "application/layer.h"
 #include "application/window.h"
 #include "application/events.h"
 #include "application/input.h"
-#include "opengl/debug_opengl.h"
-#include "opengl/renderer/renderer.h"
-#include "opengl/renderer/texture.h"
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/framebuffer.h"
-#include "opengl/renderer/buffer.h"
-#include "opengl/renderer/light.h"
+#include "graphics/debug_opengl.h"
+#include "graphics/renderer/renderer.h"
+#include "graphics/renderer/texture.h"
+#include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/framebuffer.h"
+#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/light.h"
 #include "other/model.h"
 #include "other/loader.h"
 #include "other/logging.h"
@@ -35,23 +36,39 @@
 #include "nine_morris_3d/save_load.h"
 
 void GameLayer::on_attach() {
-    app->window->set_vsync(scene->options.vsync);
+    app->window->set_vsync(app->options.vsync);
+    app->window->set_custom_cursor(app->options.custom_cursor ? CustomCursor::Arrow : CustomCursor::None);
 
-    app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene,
-            app->data.width, app->data.height, scene->options.samples, 2);
+    {
+        FramebufferSpecification specification;
+        specification.width = app->data.width;
+        specification.height = app->data.height;
+        specification.samples = app->options.samples;
+        specification.color_attachments = {
+            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
+            Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+        };
+        specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
+                AttachmentType::Renderbuffer);
+        specification.enable_depth_attachment = true;
+
+        app->storage->scene_framebuffer = Framebuffer::create(specification);
+
+        app->purge_framebuffers();
+        app->add_framebuffer(app->storage->scene_framebuffer);
+    }
 
     setup_light();
     setup_board();
     setup_board_paint();
     setup_pieces();
-    setup_quad2d_projection();
 
     // It's ok to be called multiple times
     STOP_ALLOCATION_LOG();
 }
 
 void GameLayer::on_detach() {
-
+    first_move = false;
 }
 
 void GameLayer::on_bind_layers() {
@@ -105,14 +122,14 @@ void GameLayer::on_draw() {
     renderer::draw_quad_3d(scene->light.position, 1.0f, app->storage->light_texture);
 #endif
 
-    Framebuffer::resolve_framebuffer(app->storage->scene_framebuffer->get_id(),
-            app->storage->intermediate_framebuffer->get_id(), app->data.width, app->data.height);
+    app->storage->scene_framebuffer->resolve_framebuffer(app->storage->intermediate_framebuffer->get_id(),
+            app->data.width, app->data.height);
 
     app->storage->intermediate_framebuffer->bind();
 
-    const int x = (int) input::get_mouse_x();
-    const int y = app->data.height - (int) input::get_mouse_y();
-    scene->hovered_id = app->storage->intermediate_framebuffer->read_pixel(1, x, y);
+    const int x = static_cast<int>(input::get_mouse_x());
+    const int y = app->data.height - static_cast<int>(input::get_mouse_y());
+    scene->hovered_id = app->storage->intermediate_framebuffer->read_pixel_red_integer(1, x, y);
 
     Framebuffer::bind_default();
 
@@ -162,17 +179,41 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
         if (scene->board.next_move) {
             if (scene->board.phase == Board::Phase::PlacePieces) {
                 if (scene->board.should_take_piece) {
-                    scene->board.take_piece(scene->hovered_id);
+                    bool taked = scene->board.take_piece(scene->hovered_id);
+
+                    if (taked && !first_move) {
+                        scene->timer.start();
+                        first_move = true;
+                    }
                 } else {
-                    scene->board.place_piece(scene->hovered_id);
+                    bool placed = scene->board.place_piece(scene->hovered_id);
+
+                    if (placed && !first_move) {
+                        scene->timer.start();
+                        first_move = true;
+                    }
                 }
             } else if (scene->board.phase == Board::Phase::MovePieces) {
                 if (scene->board.should_take_piece) {
-                    scene->board.take_piece(scene->hovered_id);
+                    bool taked = scene->board.take_piece(scene->hovered_id);
+
+                    if (taked && !first_move) {
+                        scene->timer.start();
+                        first_move = true;
+                    }
                 } else {
                     scene->board.select_piece(scene->hovered_id);
-                    scene->board.put_piece(scene->hovered_id);
+                    bool put = scene->board.put_piece(scene->hovered_id);
+
+                    if (put && !first_move) {
+                        scene->timer.start();
+                        first_move = true;
+                    }
                 }
+            }
+
+            if (scene->board.phase == Board::Phase::GameOver) {
+                scene->timer.stop();
             }
 
             scene->board.release(scene->hovered_id);
@@ -183,11 +224,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 }
 
 bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
-    app->storage->scene_framebuffer->resize(event.width, event.height);
-    app->storage->intermediate_framebuffer->resize(event.width, event.height);
-    scene->camera.update_projection((float) event.width, (float) event.height);
-    app->storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f, (float) event.height);
-    setup_quad2d_projection();
+    scene->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
     return false;
 }
@@ -335,12 +372,6 @@ void GameLayer::setup_shadows() {
     app->storage->piece_shader->set_uniform_int("u_shadow_map", 1);
 }
 
-void GameLayer::setup_quad2d_projection() {
-    app->storage->quad2d_shader->bind();
-    app->storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
-            app->storage->orthographic_projection_matrix);
-}
-
 void GameLayer::setup_quad3d_projection_view() {
     app->storage->quad3d_shader->bind();
     app->storage->quad3d_shader->set_uniform_matrix("u_projection_matrix", scene->camera.projection_matrix);
@@ -348,9 +379,22 @@ void GameLayer::setup_quad3d_projection_view() {
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {
-    const int width = app->data.width;
-    const int height = app->data.height;
-    app->storage->scene_framebuffer = Framebuffer::create(Framebuffer::Type::Scene, width, height, samples, 2);
+    FramebufferSpecification specification;
+    specification.width = app->data.width;
+    specification.height = app->data.height;
+    specification.samples = app->options.samples;
+    specification.color_attachments = {
+        Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
+        Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+    };
+    specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
+            AttachmentType::Renderbuffer);
+    specification.enable_depth_attachment = true;
+
+    app->storage->scene_framebuffer = Framebuffer::create(specification);
+
+    app->purge_framebuffers();
+    app->add_framebuffer(app->storage->scene_framebuffer);
 }
 
 void GameLayer::set_textures_quality(const std::string& quality) {
@@ -358,7 +402,7 @@ void GameLayer::set_textures_quality(const std::string& quality) {
 
     // quality is the new option; options.texture_quality is not set yet
 
-    if (quality == scene->options.texture_quality) {
+    if (quality == app->options.texture_quality) {
         return;
     }
 
@@ -377,14 +421,14 @@ void GameLayer::set_textures_quality(const std::string& quality) {
         app->assets_load->board_paint_diff_texture = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE), true);
         app->assets_load->white_piece_diff_texture = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE), true);
         app->assets_load->black_piece_diff_texture = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE), true);
-        if (scene->options.skybox == options::FIELD) {
+        if (app->options.skybox == options::FIELD) {
             app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE), false);
             app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE), false);
             app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE), false);
             app->assets_load->skybox_ny_texture = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE), false);
             app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
             app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
-        } else if (scene->options.skybox == options::AUTUMN) {
+        } else if (app->options.skybox == options::AUTUMN) {
             app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
             app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE), false);
             app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE), false);
@@ -411,7 +455,7 @@ void GameLayer::set_textures_quality(const std::string& quality) {
             }
         }
 
-        const std::array<Rc<TextureData>, 6> data = {
+        const std::array<std::shared_ptr<TextureData>, 6> data = {
             app->assets_load->skybox_px_texture,
             app->assets_load->skybox_nx_texture,
             app->assets_load->skybox_py_texture,
@@ -435,14 +479,14 @@ void GameLayer::set_textures_quality(const std::string& quality) {
         app->assets_load->board_paint_diff_texture_small = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE_SMALL), true);
         app->assets_load->white_piece_diff_texture_small = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE_SMALL), true);
         app->assets_load->black_piece_diff_texture_small = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE_SMALL), true);
-        if (scene->options.skybox == options::FIELD) {
+        if (app->options.skybox == options::FIELD) {
             app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
             app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
             app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
             app->assets_load->skybox_ny_texture_small = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE_SMALL), false);
             app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
             app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
-        } else if (scene->options.skybox == options::AUTUMN) {
+        } else if (app->options.skybox == options::AUTUMN) {
             app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
             app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
             app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
@@ -469,7 +513,7 @@ void GameLayer::set_textures_quality(const std::string& quality) {
             }
         }
 
-        const std::array<Rc<TextureData>, 6> data = {
+        const std::array<std::shared_ptr<TextureData>, 6> data = {
             app->assets_load->skybox_px_texture_small,
             app->assets_load->skybox_nx_texture_small,
             app->assets_load->skybox_py_texture_small,
@@ -488,12 +532,12 @@ void GameLayer::set_skybox(const std::string& skybox) {
 
     // skybox is the new option; options.skybox is not set yet
 
-    if (skybox == scene->options.skybox) {
+    if (skybox == app->options.skybox) {
         return;
     }
 
     if (skybox == options::FIELD) {
-        if (scene->options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE), false);
             app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE), false);
             app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE), false);
@@ -501,7 +545,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
             app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
 
-            const std::array<Rc<TextureData>, 6> data = {
+            const std::array<std::shared_ptr<TextureData>, 6> data = {
                 app->assets_load->skybox_px_texture,
                 app->assets_load->skybox_nx_texture,
                 app->assets_load->skybox_py_texture,
@@ -510,7 +554,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_load->skybox_nz_texture
             };
             app->storage->skybox_texture = Texture3D::create(data);
-        } else if (scene->options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
             app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
             app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
@@ -518,7 +562,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
             app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
 
-            const std::array<Rc<TextureData>, 6> data = {
+            const std::array<std::shared_ptr<TextureData>, 6> data = {
                 app->assets_load->skybox_px_texture_small,
                 app->assets_load->skybox_nx_texture_small,
                 app->assets_load->skybox_py_texture_small,
@@ -534,7 +578,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
         scene->light = LIGHT_FIELD;
         setup_light();
     } else if (skybox == options::AUTUMN) {
-        if (scene->options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
             app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE), false);
             app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE), false);
@@ -542,7 +586,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE), false);
             app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE), false);
 
-            const std::array<Rc<TextureData>, 6> data = {
+            const std::array<std::shared_ptr<TextureData>, 6> data = {
                 app->assets_load->skybox_px_texture,
                 app->assets_load->skybox_nx_texture,
                 app->assets_load->skybox_py_texture,
@@ -551,7 +595,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_load->skybox_nz_texture
             };
             app->storage->skybox_texture = Texture3D::create(data);
-        } else if (scene->options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
             app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
             app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
@@ -559,7 +603,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
             app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
 
-            const std::array<Rc<TextureData>, 6> data = {
+            const std::array<std::shared_ptr<TextureData>, 6> data = {
                 app->assets_load->skybox_px_texture_small,
                 app->assets_load->skybox_nx_texture_small,
                 app->assets_load->skybox_py_texture_small,
@@ -670,6 +714,12 @@ void GameLayer::load_game() {
 
     board.state_history = state.board.state_history;
     board.next_move = state.board.next_move;
+
+    scene->timer.stop();
+    scene->timer.set_time(state.time);
+    first_move = false;
+
+    scene->board.update_cursor();
 
     SPDLOG_INFO("Loaded game");
 }

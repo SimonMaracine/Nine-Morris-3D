@@ -5,9 +5,9 @@
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/events.h"
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/buffer.h"
-#include "opengl/renderer/renderer.h"
+#include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/renderer.h"
 #include "other/model.h"
 #include "other/loader.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
@@ -16,8 +16,8 @@ class ImGuiLayer;
 
 class GameLayer : public Layer {
 public:
-    GameLayer(unsigned int id, Application* application, GameScene* scene)
-        : Layer(id, application), scene(scene) {};
+    GameLayer(unsigned int id, GameScene* scene)
+        : Layer(id), scene(scene) {}
     virtual ~GameLayer() = default;
 
     virtual void on_attach() override;
@@ -43,7 +43,6 @@ public:
     void render_nodes();
     void render_to_depth();
     void setup_shadows();
-    void setup_quad2d_projection();
     void setup_quad3d_projection_view();
 
     void set_scene_framebuffer(int samples);
@@ -56,6 +55,8 @@ public:
     float dy = 0.0f;
     float last_mouse_x = 0.0f;
     float last_mouse_y = 0.0f;
+
+    bool first_move = false;
 
     GameScene* scene = nullptr;
 

@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "opengl/renderer/vertex_array.h"
+#include "graphics/renderer/vertex_array.h"
 #include "nine_morris_3d/hoverable.h"
 #include "nine_morris_3d/piece.h"
 
@@ -46,7 +46,7 @@ public:
     glm::vec3 position = glm::vec3(0.0f);
     float scale = 0.0f;
 
-    Rc<VertexArray> vertex_array;
+    std::shared_ptr<VertexArray> vertex_array;
     int index_count = 0;
 
     hoverable::Id piece_id = hoverable::null;

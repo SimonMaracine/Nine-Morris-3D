@@ -40,6 +40,7 @@ namespace assets {
     const char* BLACK_INDICATOR_TEXTURE = "data/textures/indicator/black_indicator.png";
     const char* SPLASH_SCREEN_TEXTURE = "data/textures/splash_screen/splash_screen.png";
     const char* OPEN_SANS_FONT = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
+    const char* GOOD_DOG_PLAIN_FONT = "data/fonts/FH-GoodDogPlain-WTT/GOODDP__.TTF";
 
     const char* FIELD_PX_TEXTURE = "data/textures/skybox/field/px.png";
     const char* FIELD_NX_TEXTURE = "data/textures/skybox/field/nx.png";
@@ -90,4 +91,6 @@ namespace assets {
     const char* ORIGIN_VERTEX_SHADER = "data/shaders/origin.vert";
     const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/origin.frag";
 #endif
+    const char* TEXT_VERTEX_SHADER = "data/shaders/text.vert";
+    const char* TEXT_FRAGMENT_SHADER = "data/shaders/text.frag";
 }

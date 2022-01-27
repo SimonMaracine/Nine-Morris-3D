@@ -13,7 +13,7 @@
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/node.h"
-#include "opengl/renderer/camera.h"
+#include "graphics/renderer/camera.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 
@@ -128,7 +128,7 @@ namespace save_load {
             return;
         }
 
-        std::ofstream file (file_path, std::ios::out | std::ios::binary | std::ios::trunc);
+        std::ofstream file (file_path, std::ios::binary | std::ios::trunc);
 
         if (!file.is_open()) {
             REL_ERROR("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
@@ -138,8 +138,6 @@ namespace save_load {
         cereal::BinaryOutputArchive output{file};
         output(game_state);
 
-        file.close();
-
         SPDLOG_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
     }
 
@@ -147,7 +145,7 @@ namespace save_load {
         std::string file_path;
         file_path = path(SAVE_GAME_FILE);
 
-        std::ifstream file (file_path, std::ios::in | std::ios::binary);
+        std::ifstream file (file_path, std::ios::binary);
 
         if (!file.is_open()) {
             std::string message = "Could not open the last game file ";
@@ -155,10 +153,13 @@ namespace save_load {
             throw std::runtime_error(message);
         }
 
-        cereal::BinaryInputArchive input{file};
-        input(game_state);
-
-        file.close();
+        try {
+            cereal::BinaryInputArchive input{file};
+            input(game_state);
+        } catch (const cereal::Exception& e) {
+            REL_ERROR("Error reading save game file: {}", e.what());
+            return;
+        }
 
         SPDLOG_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
     }

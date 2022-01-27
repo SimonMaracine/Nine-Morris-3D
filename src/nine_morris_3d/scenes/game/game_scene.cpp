@@ -8,13 +8,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "opengl/renderer/vertex_array.h"
-#include "opengl/renderer/buffer.h"
-#include "opengl/renderer/texture.h"
-#include "opengl/renderer/buffer_layout.h"
-#include "opengl/renderer/camera.h"
-#include "opengl/renderer/light.h"
-#include "opengl/debug_opengl.h"
+#include "application/app.h"
+#include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/texture.h"
+#include "graphics/renderer/buffer_layout.h"
+#include "graphics/renderer/camera.h"
+#include "graphics/renderer/light.h"
+#include "graphics/debug_opengl.h"
 #include "other/texture_data.h"
 #include "other/assets.h"
 #include "other/logging.h"
@@ -26,18 +27,16 @@
 void GameScene::on_enter() {
     SPDLOG_DEBUG("Enter game scene");
 
-    options::load_options_from_file(options);
-
     srand(time(nullptr));
 
     board_state_history = std::make_shared<std::vector<Board>>();
     build_board();
 
     if (!app->storage->white_piece_diff_texture) {
-        if (options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->storage->white_piece_diff_texture = Texture::create(app->assets_load->white_piece_diff_texture, true, -1.5f);
             app->storage->black_piece_diff_texture = Texture::create(app->assets_load->black_piece_diff_texture, true, -1.5f);
-        } else if (options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->storage->white_piece_diff_texture = Texture::create(app->assets_load->white_piece_diff_texture_small, true, -1.5f);
             app->storage->black_piece_diff_texture = Texture::create(app->assets_load->black_piece_diff_texture_small, true, -1.5f);
         } else {
@@ -68,34 +67,42 @@ void GameScene::on_enter() {
 void GameScene::on_exit() {
     SPDLOG_DEBUG("Exit game scene");
 
-    options::save_options_to_file(options);
+    options::save_options_to_file(app->options);
 
-    if (options.save_on_exit && !app->running) {
+    if (app->options.save_on_exit && !app->running) {
         board.finalize_pieces_state();
 
         save_load::GameState state;
         state.board = board;
         state.camera = camera;
+        state.time = timer.get_time_raw();
+
+        const time_t current = time(nullptr);
+        state.date = ctime(&current);
 
         save_load::save_game(state);
     }
+
+    timer = Timer();
 }
 
-Rc<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size, hoverable::Id id) {
+std::shared_ptr<Buffer> GameScene::create_ids_buffer(unsigned int vertices_size, hoverable::Id id) {
     std::vector<int> array;
     array.resize(vertices_size);
     for (unsigned int i = 0; i < array.size(); i++) {
-        array[i] = (int) id;
+        array[i] = static_cast<int>(id);
     }
-    Rc<Buffer> buffer = Buffer::create(array.data(), array.size() * sizeof(int));
+    std::shared_ptr<Buffer> buffer = Buffer::create(array.data(), array.size() * sizeof(int));
 
     return buffer;
 }
 
-Rc<VertexArray> GameScene::create_entity_vertex_array(Rc<model::Mesh<model::Vertex>> mesh, hoverable::Id id) {
-    Rc<Buffer> vertices = Buffer::create(mesh->vertices.data(), mesh->vertices.size() * sizeof(model::Vertex));
+std::shared_ptr<VertexArray> GameScene::create_entity_vertex_array(std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+        hoverable::Id id) {
+    std::shared_ptr<Buffer> vertices = Buffer::create(mesh->vertices.data(),
+            mesh->vertices.size() * sizeof(model::Vertex));
 
-    Rc<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
+    std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
@@ -105,9 +112,10 @@ Rc<VertexArray> GameScene::create_entity_vertex_array(Rc<model::Mesh<model::Vert
     BufferLayout layout2;
     layout2.add(3, BufferLayout::Type::Int, 1);
 
-    Rc<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
+    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(),
+            mesh->indices.size() * sizeof(unsigned int));
 
-    Rc<VertexArray> vertex_array = VertexArray::create();
+    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_buffer(ids, layout2);
     vertex_array->add_index_buffer(indices);
@@ -126,10 +134,10 @@ void GameScene::build_board() {
     }
 
     if (!app->storage->board_wood_diff_texture) {
-        if (options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->storage->board_wood_diff_texture =
                     Texture::create(app->assets_load->board_wood_diff_texture, true, -2.0f);
-        } else if (options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->storage->board_wood_diff_texture =
                     Texture::create(app->assets_load->board_wood_diff_texture_small, true, -2.0f);
         } else {
@@ -151,17 +159,17 @@ void GameScene::build_board() {
 
 void GameScene::build_board_paint() {
     if (!app->storage->board_paint_vertex_array) {
-        Rc<Buffer> vertices = Buffer::create(app->assets_load->board_paint_mesh->vertices.data(),
+        std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_load->board_paint_mesh->vertices.data(),
                 app->assets_load->board_paint_mesh->vertices.size() * sizeof(model::Vertex));
 
-        Rc<VertexArray> vertex_array = VertexArray::create();
+        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
 
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
         layout.add(1, BufferLayout::Type::Float, 2);
         layout.add(2, BufferLayout::Type::Float, 3);
 
-        Rc<IndexBuffer> indices = IndexBuffer::create(app->assets_load->board_paint_mesh->indices.data(),
+        std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_load->board_paint_mesh->indices.data(),
                 app->assets_load->board_paint_mesh->indices.size() * sizeof(unsigned int));
 
         vertex_array->add_buffer(vertices, layout);
@@ -173,10 +181,10 @@ void GameScene::build_board_paint() {
     }
 
     if (!app->storage->board_paint_diff_texture) {
-        if (options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             app->storage->board_paint_diff_texture =
                     Texture::create(app->assets_load->board_paint_diff_texture, true, -1.0f);
-        } else if (options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             app->storage->board_paint_diff_texture =
                     Texture::create(app->assets_load->board_paint_diff_texture_small, true, -1.0f);
         } else {
@@ -195,8 +203,8 @@ void GameScene::build_board_paint() {
     SPDLOG_DEBUG("Built board paint");
 }
 
-void GameScene::build_piece(unsigned int index, Piece::Type type, Rc<model::Mesh<model::Vertex>> mesh,
-        Rc<Texture> texture, const glm::vec3& position) {
+void GameScene::build_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+        std::shared_ptr<Texture> texture, const glm::vec3& position) {
     if (!app->storage->piece_vertex_arrays[index]) {
         hoverable::Id id = hoverable::generate_id();
         app->storage->pieces_id[index] = id;
@@ -209,7 +217,7 @@ void GameScene::build_piece(unsigned int index, Piece::Type type, Rc<model::Mesh
     int random_rotation = rand() % 360;
 
     board.pieces[index].position = position;
-    board.pieces[index].rotation = glm::vec3(0.0f, glm::radians((float) random_rotation), 0.0f);
+    board.pieces[index].rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(random_rotation)), 0.0f);
     board.pieces[index].scale = 20.0f;
     board.pieces[index].vertex_array = app->storage->piece_vertex_arrays[index];
     board.pieces[index].index_count = mesh->indices.size();
@@ -227,19 +235,19 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
         hoverable::Id id = hoverable::generate_id();
         app->storage->nodes_id[index] = id;
 
-        Rc<Buffer> vertices = Buffer::create(app->assets_load->node_mesh->vertices.data(),
+        std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_load->node_mesh->vertices.data(),
                 app->assets_load->node_mesh->vertices.size() * sizeof(model::VertexP));
 
-        Rc<Buffer> ids = create_ids_buffer(app->assets_load->node_mesh->vertices.size(), id);
+        std::shared_ptr<Buffer> ids = create_ids_buffer(app->assets_load->node_mesh->vertices.size(), id);
 
-        Rc<VertexArray> vertex_array = VertexArray::create();
+        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
 
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
         BufferLayout layout2;
         layout2.add(1, BufferLayout::Type::Int, 1);
 
-        Rc<IndexBuffer> indices = IndexBuffer::create(app->assets_load->node_mesh->indices.data(),
+        std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_load->node_mesh->indices.data(),
                 app->assets_load->node_mesh->indices.size() * sizeof(unsigned int));
 
         vertex_array->add_buffer(vertices, layout);
@@ -264,7 +272,7 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
 void GameScene::build_camera() {
     camera = Camera(
         47.0f,
-        glm::perspective(glm::radians(FOV), (float) app->data.width / (float) app->data.height, NEAR, FAR),
+        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR),
         glm::vec3(0.0f),
         8.0f
     );
@@ -274,9 +282,9 @@ void GameScene::build_camera() {
 
 void GameScene::build_skybox() {
     if (!app->storage->skybox_vertex_array) {
-        Rc<Buffer> vertices = Buffer::create(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
+        std::shared_ptr<Buffer> vertices = Buffer::create(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
 
-        Rc<VertexArray> vertex_array = VertexArray::create();
+        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
 
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
@@ -289,9 +297,9 @@ void GameScene::build_skybox() {
     }
 
     if (!app->storage->skybox_texture) {
-        std::array<Rc<TextureData>, 6> data;
+        std::array<std::shared_ptr<TextureData>, 6> data;
 
-        if (options.texture_quality == options::NORMAL) {
+        if (app->options.texture_quality == options::NORMAL) {
             data = {
                 app->assets_load->skybox_px_texture,
                 app->assets_load->skybox_nx_texture,
@@ -300,7 +308,7 @@ void GameScene::build_skybox() {
                 app->assets_load->skybox_pz_texture,
                 app->assets_load->skybox_nz_texture
             };
-        } else if (options.texture_quality == options::LOW) {
+        } else if (app->options.texture_quality == options::LOW) {
             data = {
                 app->assets_load->skybox_px_texture_small,
                 app->assets_load->skybox_nx_texture_small,
@@ -320,9 +328,9 @@ void GameScene::build_skybox() {
 }
 
 void GameScene::build_light() {
-    if (options.skybox == options::FIELD) {
+    if (app->options.skybox == options::FIELD) {
         light = LIGHT_FIELD;
-    } else if (options.skybox == options::AUTUMN) {
+    } else if (app->options.skybox == options::AUTUMN) {
         light = LIGHT_AUTUMN;
     } else {
         assert(false);
@@ -337,7 +345,8 @@ void GameScene::build_turn_indicator() {
         app->storage->black_indicator_texture = Texture::create(app->assets_load->black_indicator_texture, false);
     }
 
-    turn_indicator.position = glm::vec3((float) (app->data.width - 90), (float) (app->data.height - 115), 0.0f);
+    turn_indicator.position = glm::vec3(static_cast<float>(app->data.width - 90),
+            static_cast<float>(app->data.height - 115), 0.0f);
     turn_indicator.scale = 1.0f;
 
     SPDLOG_DEBUG("Built turn indicator");

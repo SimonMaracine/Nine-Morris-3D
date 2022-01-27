@@ -73,14 +73,14 @@ Window::Window(ApplicationData* data) {
     glfwSetWindowUserPointer(window, data);
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         events::WindowClosedEvent event;
         data->event_function(event);
     });
 
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         events::WindowResizedEvent event (width, height);
         data->width = width;
@@ -89,7 +89,7 @@ Window::Window(ApplicationData* data) {
     });
 
     glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         switch (action) {
             case GLFW_PRESS: {
@@ -111,7 +111,7 @@ Window::Window(ApplicationData* data) {
     });
 
     glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         if (action == GLFW_PRESS) {
             events::MouseButtonPressedEvent event (button);
@@ -123,25 +123,25 @@ Window::Window(ApplicationData* data) {
     });
 
     glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        events::MouseScrolledEvent event ((float) yoffset);
+        events::MouseScrolledEvent event (static_cast<float>(yoffset));
         data->event_function(event);
     });
 
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-        ApplicationData* data = (ApplicationData*) glfwGetWindowUserPointer(window);
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        events::MouseMovedEvent event ((float) xpos, (float) ypos);
+        events::MouseMovedEvent event (static_cast<float>(xpos), static_cast<float>(ypos));
         data->event_function(event);
     });
 
-    Icon icons[5] = {
-        Icon(path("data/icons/512x512/ninemorris3d.png")),
-        Icon(path("data/icons/256x256/ninemorris3d.png")),
-        Icon(path("data/icons/128x128/ninemorris3d.png")),
-        Icon(path("data/icons/64x64/ninemorris3d.png")),
-        Icon(path("data/icons/32x32/ninemorris3d.png"))
+    IconImage icons[5] = {
+        IconImage(path("data/icons/512x512/ninemorris3d.png")),
+        IconImage(path("data/icons/256x256/ninemorris3d.png")),
+        IconImage(path("data/icons/128x128/ninemorris3d.png")),
+        IconImage(path("data/icons/64x64/ninemorris3d.png")),
+        IconImage(path("data/icons/32x32/ninemorris3d.png"))
     };
 
     GLFWimage glfw_icons[5];
@@ -152,10 +152,31 @@ Window::Window(ApplicationData* data) {
     glfw_icons[4] = icons[4].get_data();
 
     glfwSetWindowIcon(window, 5, glfw_icons);
+
+    IconImage cursors[2] = {
+        IconImage(path("data/cursors/arrow.png")),
+        IconImage(path("data/cursors/cross.png"))
+    };
+
+    GLFWimage glfw_cursors[2];
+    glfw_cursors[0] = cursors[0].get_data();
+    glfw_cursors[1] = cursors[1].get_data();
+
+    arrow_cursor = glfwCreateCursor(&glfw_cursors[0], 4, 1);
+    if (arrow_cursor == nullptr) {
+        REL_ERROR("Could not create custom cursor");
+    }
+
+    cross_cursor = glfwCreateCursor(&glfw_cursors[1], 8, 8);
+    if (cross_cursor == nullptr) {
+        REL_ERROR("Could not create custom cursor");
+    }
 }
 
 Window::~Window() {
     glfwDestroyWindow(window);
+    glfwDestroyCursor(arrow_cursor);
+    glfwDestroyCursor(cross_cursor);
     glfwTerminate();
 
     SPDLOG_INFO("Terminated GLFW and destroyed window");
@@ -178,28 +199,42 @@ void Window::set_vsync(int interval) const {
     glfwSwapInterval(interval);
 }
 
-// --- Icon
+void Window::set_custom_cursor(CustomCursor cursor) const {
+    switch (cursor) {
+        case CustomCursor::None:
+            glfwSetCursor(window, nullptr);
+            break;
+        case CustomCursor::Arrow:
+            glfwSetCursor(window, arrow_cursor);
+            break;
+        case CustomCursor::Cross:
+            glfwSetCursor(window, cross_cursor);
+            break;
+    }
+}
 
-Icon::Icon(const std::string& file_path) {
+// --- IconImage
+
+IconImage::IconImage(const std::string& file_path) {
     data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load icon '{}'", file_path.c_str());
+        REL_CRITICAL("Could not load icon image '{}'", file_path.c_str());
         std::exit(1);
     }
 
     this->file_path = file_path;
 
-    SPDLOG_INFO("Loaded icon data '{}'", file_path.c_str());
+    SPDLOG_INFO("Loaded icon image data '{}'", file_path.c_str());
 }
 
-Icon::~Icon() {
+IconImage::~IconImage() {
     stbi_image_free(data);
 
-    SPDLOG_INFO("Freed icon data '{}'", file_path.c_str());
+    SPDLOG_INFO("Freed icon image data '{}'", file_path.c_str());
 }
 
-GLFWimage Icon::get_data() const {
+GLFWimage IconImage::get_data() const {
     GLFWimage image;
     image.width = width;
     image.height = height;

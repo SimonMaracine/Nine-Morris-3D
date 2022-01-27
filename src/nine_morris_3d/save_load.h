@@ -2,18 +2,21 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
-#include "opengl/renderer/camera.h"
+#include "graphics/renderer/camera.h"
 #include "nine_morris_3d/board.h"
 
 namespace save_load {
     struct GameState {
         Board board;
         Camera camera;
+        unsigned int time = 0;  // In deciseconds
+        std::string date;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(board, camera);
+            archive(board, camera, time, date);
         }
     };
 
