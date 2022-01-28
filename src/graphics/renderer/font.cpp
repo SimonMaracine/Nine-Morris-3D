@@ -10,6 +10,8 @@
 #include <stb_truetype.h>
 #include <stb_image_write.h>
 #include <glad/glad.h>
+
+#define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
 #include "graphics/renderer/font.h"
