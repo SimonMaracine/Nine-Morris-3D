@@ -45,11 +45,11 @@ Application::Application(int width, int height, const std::string& title) {
 }
 
 Application::~Application() {
-    for (unsigned int j = 0; j < scenes.size(); j++) {
-        for (unsigned int i = 0; i < scenes[j]->layer_stack.size(); i++) {
-            delete scenes[j]->layer_stack[i];
+    for (Scene* scene : scenes) {
+        for (Layer* layer : scene->layer_stack) {
+            delete layer;
         }
-        delete scenes[j];
+        delete scene;
     }
 
     renderer::terminate();
@@ -64,15 +64,15 @@ void Application::run() {
     assert(current_scene != nullptr);
     assert(app != nullptr);
 
-    for (unsigned int j = 0; j < scenes.size(); j++) {
-        for (unsigned int i = 0; i < scenes[j]->layer_stack.size(); i++) {
-            scenes[j]->layer_stack[i]->on_bind_layers();
+    for (Scene* scene : scenes) {
+        for (Layer* layer : scene->layer_stack) {
+            layer->on_bind_layers();
         }
     }
 
     current_scene->on_enter();
-    for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
-        current_scene->layer_stack[i]->on_attach();
+    for (Layer* layer : current_scene->layer_stack) {
+        layer->on_attach();
     }
 
     SPDLOG_INFO("Initialized game");
@@ -82,24 +82,25 @@ void Application::run() {
     while (running) {
         dt = update_frame_counter();
 
-        for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
-            if (current_scene->layer_stack[i]->active) {
-                current_scene->layer_stack[i]->on_update(dt);
-                current_scene->layer_stack[i]->on_draw();
+        for (Layer* layer : current_scene->layer_stack) {
+            if (layer->active) {
+                layer->on_update(dt);
+                layer->on_draw();
             }
         }
 
         if (changed_scene) {
-            for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
-                current_scene->layer_stack[i]->on_detach();
+            for (auto iter = current_scene->layer_stack.rbegin();
+                    iter != current_scene->layer_stack.rend(); iter++) {
+                (*iter)->on_detach();
             }
             current_scene->on_exit();
 
             current_scene = to_scene;
 
             current_scene->on_enter();
-            for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
-                current_scene->layer_stack[i]->on_attach();
+            for (Layer* layer : current_scene->layer_stack) {
+                layer->on_attach();
             }
 
             changed_scene = false;
@@ -110,8 +111,9 @@ void Application::run() {
 
     SPDLOG_INFO("Closing game");
 
-    for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
-        current_scene->layer_stack[i]->on_detach();
+    for (auto iter = current_scene->layer_stack.rbegin();
+            iter != current_scene->layer_stack.rend(); iter++) {
+        (*iter)->on_detach();
     }
     current_scene->on_exit();
 }
@@ -147,7 +149,7 @@ void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
 void Application::purge_framebuffers() {
     for (auto iter = framebuffers.rbegin(); iter != framebuffers.rend(); iter++) {
         if (iter->expired()) {
-            framebuffers.erase(std::next(iter).base());
+            iter = decltype(iter)(framebuffers.erase(std::next(iter).base()));
         }
     }
 }
@@ -159,13 +161,14 @@ void Application::on_event(events::Event& event) {
     dispatcher.dispatch<WindowClosedEvent>(WindowClosed, BIND(Application::on_window_closed));
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(Application::on_window_resized));
 
-    for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
+    for (auto iter = current_scene->layer_stack.rbegin();
+            iter != current_scene->layer_stack.rend(); iter++) {
         if (event.handled) {
             break;
         }
 
-        if (current_scene->layer_stack[i]->active) {
-            current_scene->layer_stack[i]->on_event(event);
+        if ((*iter)->active) {
+            (*iter)->on_event(event);
         }
     }
 }
