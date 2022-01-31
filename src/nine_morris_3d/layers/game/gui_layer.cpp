@@ -63,5 +63,5 @@ void GuiLayer::render_timer() {
     const float x_pos = app->data.width / 2 - width / 2 - 8;
     const float y_pos = app->data.height - height - 50;
 
-    renderer::draw_string(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f), app->storage->good_dog_plain_font);
+    renderer::draw_string_with_shadows(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f), app->storage->good_dog_plain_font);
 }

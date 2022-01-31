@@ -218,7 +218,9 @@ namespace renderer {
                 "u_model_matrix",
                 "u_projection_matrix",
                 "u_bitmap",
-                "u_color"
+                "u_color",
+                "u_border_width",
+                "u_offset"
             };
             storage->text_shader = Shader::create(
                 assets::path(assets::TEXT_VERTEX_SHADER),
@@ -498,6 +500,8 @@ namespace renderer {
         storage->text_shader->bind();
         storage->text_shader->set_uniform_matrix("u_model_matrix", matrix);
         storage->text_shader->set_uniform_vec3("u_color", color);
+        storage->text_shader->set_uniform_float("u_border_width", 0.0f);
+        storage->text_shader->set_uniform_vec2("u_offset", glm::vec2(0.0f, 0.0f));
 
         glDisable(GL_DEPTH_TEST);
 
@@ -506,6 +510,34 @@ namespace renderer {
         glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
 
         glEnable(GL_DEPTH_TEST);
+    }
+
+    void draw_string_with_shadows(const std::string& string, const glm::vec2& position, float scale,
+                const glm::vec3& color, std::shared_ptr<Font> font) {
+        size_t size;
+        float* buffer;
+        font->render(string, &size, &buffer);
+
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
+        matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
+
+        font->update_data(buffer, size);
+        delete[] buffer;
+
+        storage->text_shader->bind();
+        storage->text_shader->set_uniform_matrix("u_model_matrix", matrix);
+        storage->text_shader->set_uniform_vec3("u_color", color);
+        storage->text_shader->set_uniform_float("u_border_width", 0.3f);
+        storage->text_shader->set_uniform_vec2("u_offset", glm::vec2(-0.003f, -0.003f));
+
+        glDisable(GL_DEPTH_TEST);
+
+        font->get_vertex_array()->bind();
+        bind_texture(font->get_texture(), 0);
+        glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
+
+        glEnable(GL_DEPTH_TEST);  
     }
 
     void draw_board(const Board& board) {

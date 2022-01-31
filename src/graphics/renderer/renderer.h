@@ -103,7 +103,8 @@ namespace renderer {
     void enable_output_to_red(unsigned int index);
     void draw_string(const std::string& string, const glm::vec2& position, float scale,
                 const glm::vec3& color, std::shared_ptr<Font> font);
-
+    void draw_string_with_shadows(const std::string& string, const glm::vec2& position, float scale,
+                const glm::vec3& color, std::shared_ptr<Font> font);
     void draw_board(const Board& board);
     void draw_board_paint(const BoardPaint& board_paint);
     void draw_piece(const Piece* piece, const glm::vec3& tint_color);
