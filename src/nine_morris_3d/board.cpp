@@ -5,6 +5,8 @@
 #include <cassert>
 #include <iterator>
 
+#include <glm/glm.hpp>
+
 #include "application/app.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/hoverable.h"
@@ -116,9 +118,36 @@ void Board::move_pieces(float dt) {
         // }
 
         if (piece->should_move) {
-            piece->distance_travelled += PIECE_MOVE_SPEED * dt;
+            // piece->fake_velocity += piece->acceleration;
+            // piece->fake_position += piece->fake_velocity;
+
+            // const float y_offset = map(glm::length(piece->target - piece->fake_position), glm::length(piece->target - piece->initial_position), 0.0f, 0.001f, -0.002f);
+            // SPDLOG_DEBUG("{} = map({}, {}, {}, ...)", y_offset, glm::length(piece->target - piece->fake_position), glm::length(piece->target - piece->initial_position), 0.0f);
+            // piece->acceleration += glm::vec3(0.0f, y_offset, 0.0f);
+
+            // piece->distance_travelled += glm::length(piece->position - piece->initial_position);
+
+            if (!piece->reached_parabolic_target) {
+                piece->position += (piece->parabolic_target - piece->position) * 3.0f * dt;
+            } else {
+                piece->position += (piece->target - piece->position) * 3.0f * dt;
+            }
+
+            if (!piece->reached_parabolic_target && glm::length(piece->parabolic_target - piece->position) < 0.01f) {
+                piece->reached_parabolic_target = true;
+                piece->position = piece->parabolic_target;
+            }
 
             
+
+            // piece->velocity += piece->acceleration;
+            // piece->position += piece->velocity;
+            // piece->acceleration = glm::vec3(0.0f);
+
+            if (glm::length(piece->target - piece->position) < 0.01f) {
+                piece->should_move = false;
+                piece->position = piece->target;
+            }
         }
     }
 }
@@ -256,7 +285,7 @@ bool Board::put_piece(hoverable::Id hovered_id) {
                 selected_piece->target.z = node.position.z;
 
                 // selected_piece->velocity = (selected_piece->target - selected_piece->position) * PIECE_MOVE_SPEED;
-                selected_piece->distance_to_travel = selected_piece->target - selected_piece->position;
+                // selected_piece->distance_to_travel = selected_piece->target - selected_piece->position;
                 selected_piece->should_move = true;
 
                 // Reset all of these
@@ -370,7 +399,7 @@ void Board::undo() {
         piece.target = state.pieces[i].target;
         piece.should_move = state.pieces[i].should_move;
         piece.distance_travelled = state.pieces[i].distance_travelled;
-        piece.distance_to_travel = state.pieces[i].distance_to_travel;
+        // piece.distance_to_travel = state.pieces[i].distance_to_travel;
         piece.index_count = state.pieces[i].index_count;
         piece.specular_color = state.pieces[i].specular_color;
         piece.shininess = state.pieces[i].shininess;
@@ -450,7 +479,15 @@ Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* 
             piece->target.z = z_pos;
 
             // piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
-            piece->distance_to_travel = piece->target - piece->position;
+            // piece->distance_to_travel = piece->target - piece->position;
+            // piece->acceleration = (piece->target - piece->position) * 0.01f;
+
+            glm::vec3 U = (piece->target - piece->position);
+            glm::vec3 perp_vec = glm::vec3(1.0f, 0.0f, 1.0f);
+            perp_vec.y = (U.x - U.z) / U.y;
+
+            piece->parabolic_target = piece->position + (piece->target - piece->position) / 2.0f + glm::normalize(perp_vec) * -1.5f;
+            piece->initial_position = piece->position;
             piece->should_move = true;
 
             piece->in_use = true;
@@ -471,7 +508,7 @@ void Board::take_and_raise_piece(Piece* piece) {
     piece->target.z = piece->position.z;
 
     // piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
-    piece->distance_to_travel = piece->target - piece->position;
+    // piece->distance_to_travel = piece->target - piece->position;
     piece->should_move = true;
 
     piece->node = nullptr;

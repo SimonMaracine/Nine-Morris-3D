@@ -670,7 +670,7 @@ void GameLayer::load_game() {
         piece.target = state.board.pieces[i].target;
         piece.should_move = state.board.pieces[i].should_move;
         piece.distance_travelled = state.board.pieces[i].distance_travelled;
-        piece.distance_to_travel = state.board.pieces[i].distance_to_travel;
+        // piece.distance_to_travel = state.board.pieces[i].distance_to_travel;
         piece.index_count = state.board.pieces[i].index_count;
         piece.specular_color = state.board.pieces[i].specular_color;
         piece.shininess = state.board.pieces[i].shininess;
