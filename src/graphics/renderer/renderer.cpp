@@ -235,7 +235,7 @@ namespace renderer {
             specification.height = 2048;
             specification.depth_attachment = Attachment(AttachmentFormat::DEPTH32,
                     AttachmentType::Texture);
-            specification.enable_depth_attachment = true;
+            specification.white_border_for_depth_texture = true;
             specification.resizable = false;
 
             storage->depth_map_framebuffer = Framebuffer::create(specification);
@@ -243,7 +243,7 @@ namespace renderer {
             app->purge_framebuffers();
             app->add_framebuffer(storage->depth_map_framebuffer);
         }
-        
+
         {
             FramebufferSpecification specification;
             specification.width = app->data.width;
@@ -254,7 +254,6 @@ namespace renderer {
             };
             specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
                     AttachmentType::Renderbuffer);
-            specification.enable_depth_attachment = true;
 
             storage->intermediate_framebuffer = Framebuffer::create(specification);
 

@@ -50,7 +50,6 @@ void GameLayer::on_attach() {
         };
         specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
                 AttachmentType::Renderbuffer);
-        specification.enable_depth_attachment = true;
 
         app->storage->scene_framebuffer = Framebuffer::create(specification);
 
@@ -389,7 +388,6 @@ void GameLayer::set_scene_framebuffer(int samples) {
     };
     specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
             AttachmentType::Renderbuffer);
-    specification.enable_depth_attachment = true;
 
     app->storage->scene_framebuffer = Framebuffer::create(specification);
 

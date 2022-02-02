@@ -12,6 +12,11 @@ static GLenum target(bool multisampled) {
     return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 }
 
+static bool depth_attachment_present(const FramebufferSpecification& specification) {
+    return specification.depth_attachment.format != AttachmentFormat::None &&
+            specification.depth_attachment.type != AttachmentType::None;
+}
+
 static void attach_color_texture(GLuint texture, int samples, GLenum internal_format,
         GLenum format, int width, int height, unsigned int index) {
     bool multisampled = samples > 1;
@@ -100,6 +105,9 @@ Framebuffer::Framebuffer(const FramebufferSpecification& specification)
 Framebuffer::~Framebuffer() {
     for (unsigned int i = 0; i < specification.color_attachments.size(); i++) {
         switch (specification.color_attachments[i].type) {
+            case AttachmentType::None:
+                assert(false);
+                break;
             case AttachmentType::Texture:
                 glDeleteTextures(1, &color_attachments[i]);
                 break;
@@ -109,8 +117,11 @@ Framebuffer::~Framebuffer() {
         }
     }
 
-    if (specification.enable_depth_attachment) {
+    if (depth_attachment_present(specification)) {
         switch (specification.depth_attachment.type) {
+            case AttachmentType::None:
+                assert(false);
+                break;
             case AttachmentType::Texture:
                 glDeleteTextures(1, &depth_attachment);
                 break;
@@ -126,6 +137,13 @@ Framebuffer::~Framebuffer() {
 }
 
 std::shared_ptr<Framebuffer> Framebuffer::create(const FramebufferSpecification& specification) {
+    assert(specification.samples == 1 || specification.samples == 2 || specification.samples == 4);
+    if (specification.white_border_for_depth_texture) {
+        assert(specification.depth_attachment.format != AttachmentFormat::None);
+        assert(specification.depth_attachment.type == AttachmentType::Texture);
+    }
+    assert(specification.width > 0 && specification.height > 0);
+
     return std::make_shared<Framebuffer>(specification);
 }
 
@@ -191,6 +209,9 @@ void Framebuffer::build() {
     if (framebuffer != 0) {
         for (unsigned int i = 0; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
+                case AttachmentType::None:
+                    assert(false);
+                    break;
                 case AttachmentType::Texture:
                     glDeleteTextures(1, &color_attachments[i]);
                     break;
@@ -200,8 +221,11 @@ void Framebuffer::build() {
             }
         }
 
-        if (specification.enable_depth_attachment) {
+        if (depth_attachment_present(specification)) {
             switch (specification.depth_attachment.type) {
+                case AttachmentType::None:
+                    assert(false);
+                    break;
                 case AttachmentType::Texture:
                     glDeleteTextures(1, &depth_attachment);
                     break;
@@ -226,12 +250,18 @@ void Framebuffer::build() {
 
     for (unsigned int i = 0; i < specification.color_attachments.size(); i++) {
         switch (specification.color_attachments[i].type) {
+            case AttachmentType::None:
+                assert(false);
+                break;
             case AttachmentType::Texture: {
                 GLuint texture;
                 glGenTextures(1, &texture);
                 glBindTexture(target(multisampled), texture);
 
                 switch (specification.color_attachments[i].format) {
+                    case AttachmentFormat::None:
+                        assert(false);
+                        break;
                     case AttachmentFormat::RGBA8:
                         attach_color_texture(texture, specification.samples, GL_RGBA8, GL_RGBA,
                                 specification.width, specification.height, i);
@@ -257,6 +287,9 @@ void Framebuffer::build() {
                 glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
                 switch (specification.color_attachments[i].format) {
+                    case AttachmentFormat::None:
+                        assert(false);
+                        break;
                     case AttachmentFormat::RGBA8:
                         attach_color_renderbuffer(renderbuffer, specification.samples, GL_RGBA8,
                                 specification.width, specification.height, i);
@@ -279,14 +312,20 @@ void Framebuffer::build() {
         }
     }
 
-    if (specification.enable_depth_attachment) {
+    if (depth_attachment_present(specification)) {
         switch (specification.depth_attachment.type) {
+            case AttachmentType::None:
+                assert(false);
+                break;
             case AttachmentType::Texture: {
                 GLuint texture;
                 glGenTextures(1, &texture);
                 glBindTexture(target(multisampled), texture);
 
                 switch (specification.depth_attachment.format) {
+                    case AttachmentFormat::None:
+                        assert(false);
+                        break;
                     case AttachmentFormat::DEPTH24_STENCIL8:
                         attach_depth_texture(texture, specification.samples, GL_DEPTH24_STENCIL8,
                                 GL_DEPTH_STENCIL, GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
@@ -314,6 +353,9 @@ void Framebuffer::build() {
                 glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
                 switch (specification.depth_attachment.format) {
+                    case AttachmentFormat::None:
+                        assert(false);
+                        break;
                     case AttachmentFormat::DEPTH24_STENCIL8:
                         attach_depth_renderbuffer(renderbuffer, specification.samples,
                                 GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT,
@@ -339,8 +381,10 @@ void Framebuffer::build() {
     }
     
     if (color_attachments.size() > 1) {
-        GLenum attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-                                  GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+        assert(color_attachments.size() <= 4);
+
+        const GLenum attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+                                        GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
         glDrawBuffers(color_attachments.size(), attachments);
     } else if (color_attachments.empty()) {
         glDrawBuffer(GL_NONE);

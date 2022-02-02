@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 
 enum class AttachmentFormat {
+    None,
     RGBA8,
     RED_I,
     DEPTH24_STENCIL8,
@@ -13,6 +14,7 @@ enum class AttachmentFormat {
 };
 
 enum class AttachmentType {
+    None,
     Texture,
     Renderbuffer
 };
@@ -21,8 +23,8 @@ struct Attachment {
     Attachment() = default;
     Attachment(AttachmentFormat format, AttachmentType type)
         : format(format), type(type) {}
-    AttachmentFormat format;
-    AttachmentType type;
+    AttachmentFormat format = AttachmentFormat::None;
+    AttachmentType type = AttachmentType::None;
 };
 
 struct FramebufferSpecification {
@@ -33,7 +35,6 @@ struct FramebufferSpecification {
     std::vector<Attachment> color_attachments;
     Attachment depth_attachment;
 
-    bool enable_depth_attachment = false;
     int samples = 1;
     bool resizable = true;
     bool white_border_for_depth_texture = false;
