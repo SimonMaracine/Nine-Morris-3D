@@ -123,4 +123,7 @@ private:
     void remember_position_and_check_repetition();
     void remember_state();
     void arrive_at_node(Piece* piece);
+    void prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity);
+    void prepare_piece_for_threestep_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity,
+            const glm::vec3& target0, const glm::vec3& target1);
 };

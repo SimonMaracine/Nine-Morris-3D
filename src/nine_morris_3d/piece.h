@@ -9,7 +9,10 @@
 class Node;
 
 constexpr float PIECE_Y_POSITION = 0.135f;
-constexpr float PIECE_MOVE_SPEED = 2.6f;
+constexpr float PIECE_BASE_VELOCITY = 0.3f;
+constexpr float PIECE_VARIABLE_VELOCITY = 8.0f;
+constexpr float PIECE_THREESTEP_HEIGHT = 0.4f;
+constexpr float PIECE_RAISE_HEIGHT = 1.3f;
 
 class Piece {
 public:
@@ -17,6 +20,12 @@ public:
         White,
         Black,
         None
+    };
+
+    enum class MovementType {
+        None,
+        Linear,
+        ThreeStep
     };
 
     Piece() = default;
@@ -29,11 +38,17 @@ public:
     glm::vec3 rotation = glm::vec3(0.0f);
     float scale = 0.0f;
 
-    glm::vec3 velocity = glm::vec3(0.0f);
-    glm::vec3 target = glm::vec3(0.0f);
+    struct Movement {
+        MovementType type = MovementType::None;
+        glm::vec3 velocity = glm::vec3(0.0f);
+        glm::vec3 target = glm::vec3(0.0f);
+        glm::vec3 target0 = glm::vec3(0.0f);
+        glm::vec3 target1 = glm::vec3(0.0f);
+        bool reached_target0 = false;
+        bool reached_target1 = false;
+    } movement;
+
     bool should_move = false;
-    float distance_travelled = 0.0f;
-    glm::vec3 distance_to_travel = glm::vec3(0.0f);
 
     std::shared_ptr<VertexArray> vertex_array;
     int index_count = 0;
