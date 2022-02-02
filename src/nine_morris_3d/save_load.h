@@ -12,7 +12,7 @@ namespace save_load {
         Board board;
         Camera camera;
         unsigned int time = 0;  // In deciseconds
-        std::string date;
+        std::string date = "No Last Date";
 
         template<typename Archive>
         void serialize(Archive& archive) {

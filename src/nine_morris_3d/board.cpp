@@ -33,10 +33,6 @@ constexpr unsigned int WINDMILLS[16][3] = {
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-static float map(float x, float in_min, float in_max, float out_min, float out_max) {
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
 Board::Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history)
     : id(id), state_history(board_state_history) {
 
@@ -107,48 +103,53 @@ void Board::move_pieces(float dt) {
     GET_ACTIVE_PIECES(active_pieces)
 
     for (Piece* piece : active_pieces) {
-        // if (piece->should_move) {
-        //     if (piece->distance_travelled < glm::length(piece->distance_to_travel)) {
-        //         glm::vec3 velocity = piece->velocity * dt;
-        //         piece->position += velocity;
-        //         piece->distance_travelled += glm::length(velocity);
-        //     } else {
-        //         arrive_at_node(piece);
-        //     }
-        // }
-
         if (piece->should_move) {
-            // piece->fake_velocity += piece->acceleration;
-            piece->fake_position += piece->fake_velocity * dt * 0.05f;
+            switch (piece->movement.type) {
+                case Piece::MovementType::None:
+                    assert(false);
+                    break;
+                case Piece::MovementType::Linear: {
+                    piece->position += piece->movement.velocity * dt + (piece->movement.target - piece->position)
+                            * PIECE_VARIABLE_VELOCITY * dt;
 
-            // const float y_offset = map(glm::length(piece->target - piece->fake_position), glm::length(piece->target - piece->initial_position), 0.0f, 0.001f, -0.002f);
-            // SPDLOG_DEBUG("{} = map({}, {}, {}, ...)", y_offset, glm::length(piece->target - piece->fake_position), glm::length(piece->target - piece->initial_position), 0.0f);
-            // piece->acceleration += glm::vec3(0.0f, y_offset, 0.0f);
+                    if (glm::length(piece->movement.target - piece->position) < 0.01f) {
+                        arrive_at_node(piece);
+                    }
 
-            // piece->distance_travelled += glm::length(piece->position - piece->initial_position);
+                    break;
+                }
+                case Piece::MovementType::ThreeStep: {
+                    if (!piece->movement.reached_target0) {
+                        piece->position += piece->movement.velocity * dt + (piece->movement.target0 - piece->position)
+                                * PIECE_VARIABLE_VELOCITY * dt;
+                    } else if (!piece->movement.reached_target1) {
+                        piece->position += piece->movement.velocity * dt + (piece->movement.target1 - piece->position)
+                                * PIECE_VARIABLE_VELOCITY * dt;
+                    } else {
+                        piece->position += piece->movement.velocity * dt + (piece->movement.target - piece->position)
+                                * PIECE_VARIABLE_VELOCITY * dt;
+                    }
 
-            // if (!piece->reached_parabolic_target) {
-            //     piece->position += (piece->parabolic_target - piece->position) * 3.0f * dt;
-            // } else {
-            //     piece->position += (piece->target - piece->position) * 3.0f * dt;
-            // }
+                    if (!piece->movement.reached_target0 &&
+                            glm::length(piece->movement.target0 - piece->position) < 0.01f) {
+                        piece->movement.reached_target0 = true;
+                        piece->position = piece->movement.target0;
+                        piece->movement.velocity = glm::normalize(piece->movement.target1 - piece->position)
+                                * PIECE_BASE_VELOCITY;
+                    } else if (!piece->movement.reached_target1 &&
+                            glm::length(piece->movement.target1 - piece->position) < 0.01f) {
+                        piece->movement.reached_target1 = true;
+                        piece->position = piece->movement.target1;
+                        piece->movement.velocity = glm::normalize(piece->movement.target - piece->position)
+                                * PIECE_BASE_VELOCITY;
+                    }
 
-            // if (!piece->reached_parabolic_target && glm::length(piece->parabolic_target - piece->position) < 0.01f) {
-            //     piece->reached_parabolic_target = true;
-            //     piece->position = piece->parabolic_target;
-            // }
+                    if (glm::length(piece->movement.target - piece->position) < 0.01f) {
+                        arrive_at_node(piece);
+                    }
 
-            piece->position += piece->velocity * dt * 0.05f;
-            piece->position.y = piece->initial_position.y + glm::sin(piece->curve_position) * 1.1f;
-            piece->curve_position = map(glm::length(piece->target - piece->fake_position), glm::length(piece->target - piece->initial_position), 0.0f, 0.0f, 3.14169);
-
-            // piece->velocity += piece->acceleration;
-            // piece->position += piece->velocity;
-            // piece->acceleration = glm::vec3(0.0f);
-
-            if (glm::length(piece->target - piece->position) < 0.1f) {
-                piece->should_move = false;
-                piece->position = piece->target;
+                    break;
+                }
             }
         }
     }
@@ -282,13 +283,25 @@ bool Board::put_piece(hoverable::Id hovered_id) {
                 remember_state();
                 WAIT_FOR_NEXT_MOVE();
 
-                selected_piece->target.x = node.position.x;
-                selected_piece->target.y = PIECE_Y_POSITION;
-                selected_piece->target.z = node.position.z;
+                if (selected_piece->type == Piece::White && can_jump[static_cast<int>(Piece::White)] ||
+                        selected_piece->type == Piece::Black && can_jump[static_cast<int>(Piece::Black)]) {
+                    const glm::vec3 target = glm::vec3(node.position.x, PIECE_Y_POSITION, node.position.z);
+                    const glm::vec3 target0 = selected_piece->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+                    const glm::vec3 target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+                    const glm::vec3 velocity = glm::normalize(target0 - selected_piece->position)
+                            * PIECE_BASE_VELOCITY;
 
-                // selected_piece->velocity = (selected_piece->target - selected_piece->position) * PIECE_MOVE_SPEED;
-                // selected_piece->distance_to_travel = selected_piece->target - selected_piece->position;
-                selected_piece->should_move = true;
+                    prepare_piece_for_threestep_move(selected_piece, target, velocity, target0, target1);
+                } else {
+                    const glm::vec3 target = glm::vec3(node.position.x, PIECE_Y_POSITION, node.position.z);
+
+                    prepare_piece_for_linear_move(
+                        selected_piece,
+                        target,
+                        glm::normalize(target - selected_piece->position)
+                            * PIECE_BASE_VELOCITY
+                    );
+                }
 
                 // Reset all of these
                 Node* previous_node = selected_piece->node;
@@ -397,11 +410,14 @@ void Board::undo() {
         piece.position = state.pieces[i].position;
         piece.rotation = state.pieces[i].rotation;
         piece.scale = state.pieces[i].scale;
-        // piece.velocity = state.pieces[i].velocity;
-        piece.target = state.pieces[i].target;
+        piece.movement.type = state.pieces[i].movement.type;
+        piece.movement.velocity = state.pieces[i].movement.velocity;
+        piece.movement.target = state.pieces[i].movement.target;
+        piece.movement.target0 = state.pieces[i].movement.target0;
+        piece.movement.target1 = state.pieces[i].movement.target1;
+        piece.movement.reached_target0 = state.pieces[i].movement.reached_target0;
+        piece.movement.reached_target1 = state.pieces[i].movement.reached_target1;
         piece.should_move = state.pieces[i].should_move;
-        piece.distance_travelled = state.pieces[i].distance_travelled;
-        // piece.distance_to_travel = state.pieces[i].distance_to_travel;
         piece.index_count = state.pieces[i].index_count;
         piece.specular_color = state.pieces[i].specular_color;
         piece.shininess = state.pieces[i].shininess;
@@ -471,29 +487,28 @@ void Board::finalize_pieces_state() {
     }
 }
 
+void Board::update_cursor() {
+    if (app->options.custom_cursor) {
+        if (should_take_piece) {
+            app->window->set_custom_cursor(CustomCursor::Cross);
+        } else {
+            app->window->set_custom_cursor(CustomCursor::Arrow);
+        }
+    }
+}
+
 Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node) {
     GET_ACTIVE_PIECES(active_pieces)
 
     for (Piece* piece : active_pieces) {
         if (!piece->in_use && piece->type == type) {
-            piece->target.x = x_pos;
-            piece->target.y = PIECE_Y_POSITION;
-            piece->target.z = z_pos;
+            const glm::vec3 target = glm::vec3(x_pos, PIECE_Y_POSITION, z_pos);
+            const glm::vec3 target0 = piece->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+            const glm::vec3 target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+            const glm::vec3 velocity = glm::normalize(target0 - piece->position)
+                    * PIECE_BASE_VELOCITY;
 
-            piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
-
-            piece->fake_position = piece->position;
-            piece->fake_velocity = piece->velocity;
-            // piece->distance_to_travel = piece->target - piece->position;
-            // piece->acceleration = (piece->target - piece->position) * 0.01f;
-
-            // glm::vec3 U = piece->target - piece->position;
-            // glm::vec3 perp_vec = glm::vec3(1.0f, 0.0f, 1.0f);
-            // perp_vec.y = (U.x - U.z) / U.y;
-
-            // piece->parabolic_target = piece->position + (piece->target - piece->position) / 2.0f + glm::normalize(perp_vec) * -1.5f;
-            piece->initial_position = piece->position;
-            piece->should_move = true;
+            prepare_piece_for_threestep_move(piece, target, velocity, target0, target1);
 
             piece->in_use = true;
             piece->node = node;
@@ -508,13 +523,11 @@ Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* 
 }
 
 void Board::take_and_raise_piece(Piece* piece) {
-    piece->target.x = piece->position.x;
-    piece->target.y = PIECE_Y_POSITION + 1.5f;
-    piece->target.z = piece->position.z;
-
-    // piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
-    // piece->distance_to_travel = piece->target - piece->position;
-    piece->should_move = true;
+    prepare_piece_for_linear_move(
+        piece,
+        glm::vec3(piece->position.x, PIECE_Y_POSITION + PIECE_RAISE_HEIGHT, piece->position.z),
+        glm::vec3(0.0f)
+    );
 
     piece->node = nullptr;
     piece->node_id = hoverable::null;
@@ -1070,14 +1083,11 @@ void Board::remember_state() {
 }
 
 void Board::arrive_at_node(Piece* piece) {
-    piece->position = piece->target;
+    piece->position = piece->movement.target;
 
-    // Reset all these variables
+    // Reset all these movement variables
     piece->should_move = false;
-    // piece->velocity = glm::vec3(0.0f);
-    piece->target = glm::vec3(0.0f);
-    piece->distance_travelled = 0.0f;
-    piece->distance_to_travel = glm::vec3(0.0f);
+    memset(&piece->movement, 0, sizeof(Piece::Movement));
 
     // Remove piece if set to remove
     if (piece->pending_remove) {
@@ -1087,12 +1097,23 @@ void Board::arrive_at_node(Piece* piece) {
     CAN_MAKE_MOVE();
 }
 
-void Board::update_cursor() {
-    if (app->options.custom_cursor) {
-        if (should_take_piece) {
-            app->window->set_custom_cursor(CustomCursor::Cross);
-        } else {
-            app->window->set_custom_cursor(CustomCursor::Arrow);
-        }
-    }
+void Board::prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity) {
+    piece->movement.target = target;
+
+    piece->movement.velocity = velocity;
+
+    piece->movement.type = Piece::MovementType::Linear;
+    piece->should_move = true;
+}
+
+void Board::prepare_piece_for_threestep_move(Piece* piece, const glm::vec3& target,
+        const glm::vec3& velocity, const glm::vec3& target0, const glm::vec3& target1) {
+    piece->movement.target = target;
+
+    piece->movement.velocity = velocity;
+    piece->movement.target0 = target0;
+    piece->movement.target1 = target1;
+
+    piece->movement.type = Piece::MovementType::ThreeStep;
+    piece->should_move = true;
 }

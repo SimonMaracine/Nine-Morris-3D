@@ -53,11 +53,16 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Piece& piece) {
-    archive(piece.id, piece.position, piece.rotation, piece.scale, piece.velocity, piece.target,
-            piece.should_move, piece.distance_travelled, piece.distance_to_travel,
+    archive(piece.id, piece.position, piece.rotation, piece.scale, piece.movement, piece.should_move,
             piece.index_count, piece.specular_color, piece.shininess, piece.select_color,
             piece.hover_color, piece.type, piece.in_use, piece.node_id, piece.show_outline,
             piece.to_take, piece.pending_remove, piece.selected, piece.active);
+}
+
+template<typename Archive>
+void serialize(Archive& archive, Piece::Movement& movement) {
+    archive(movement.type, movement.velocity, movement.target, movement.target0, movement.target1,
+            movement.reached_target0, movement.reached_target1);
 }
 
 /*

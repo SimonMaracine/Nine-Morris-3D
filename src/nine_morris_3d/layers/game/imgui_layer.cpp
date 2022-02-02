@@ -72,7 +72,12 @@ void ImGuiLayer::on_attach() {
     ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
 
     save_load::GameState state;
-    save_load::load_game(state);
+    try {
+        save_load::load_game(state);
+    } catch (const std::exception& e) {
+        REL_ERROR("{}", e.what());
+        REL_ERROR("Could not load game");
+    }
     last_save_date = std::move(state.date);
 }
 
