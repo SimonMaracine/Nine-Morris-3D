@@ -378,6 +378,10 @@ void GameLayer::setup_quad3d_projection_view() {
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {
+    if (app->storage->scene_framebuffer->get_specification().samples == samples) {
+        return;
+    }
+
     FramebufferSpecification specification;
     specification.width = app->data.width;
     specification.height = app->data.height;
