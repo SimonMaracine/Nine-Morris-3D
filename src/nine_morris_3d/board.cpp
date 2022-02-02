@@ -119,7 +119,7 @@ void Board::move_pieces(float dt) {
 
         if (piece->should_move) {
             // piece->fake_velocity += piece->acceleration;
-            // piece->fake_position += piece->fake_velocity;
+            piece->fake_position += piece->fake_velocity * dt * 0.05f;
 
             // const float y_offset = map(glm::length(piece->target - piece->fake_position), glm::length(piece->target - piece->initial_position), 0.0f, 0.001f, -0.002f);
             // SPDLOG_DEBUG("{} = map({}, {}, {}, ...)", y_offset, glm::length(piece->target - piece->fake_position), glm::length(piece->target - piece->initial_position), 0.0f);
@@ -127,24 +127,26 @@ void Board::move_pieces(float dt) {
 
             // piece->distance_travelled += glm::length(piece->position - piece->initial_position);
 
-            if (!piece->reached_parabolic_target) {
-                piece->position += (piece->parabolic_target - piece->position) * 3.0f * dt;
-            } else {
-                piece->position += (piece->target - piece->position) * 3.0f * dt;
-            }
+            // if (!piece->reached_parabolic_target) {
+            //     piece->position += (piece->parabolic_target - piece->position) * 3.0f * dt;
+            // } else {
+            //     piece->position += (piece->target - piece->position) * 3.0f * dt;
+            // }
 
-            if (!piece->reached_parabolic_target && glm::length(piece->parabolic_target - piece->position) < 0.01f) {
-                piece->reached_parabolic_target = true;
-                piece->position = piece->parabolic_target;
-            }
+            // if (!piece->reached_parabolic_target && glm::length(piece->parabolic_target - piece->position) < 0.01f) {
+            //     piece->reached_parabolic_target = true;
+            //     piece->position = piece->parabolic_target;
+            // }
 
-            
+            piece->position += piece->velocity * dt * 0.05f;
+            piece->position.y = piece->initial_position.y + glm::sin(piece->curve_position) * 1.1f;
+            piece->curve_position = map(glm::length(piece->target - piece->fake_position), glm::length(piece->target - piece->initial_position), 0.0f, 0.0f, 3.14169);
 
             // piece->velocity += piece->acceleration;
             // piece->position += piece->velocity;
             // piece->acceleration = glm::vec3(0.0f);
 
-            if (glm::length(piece->target - piece->position) < 0.01f) {
+            if (glm::length(piece->target - piece->position) < 0.1f) {
                 piece->should_move = false;
                 piece->position = piece->target;
             }
@@ -478,15 +480,18 @@ Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* 
             piece->target.y = PIECE_Y_POSITION;
             piece->target.z = z_pos;
 
-            // piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
+            piece->velocity = (piece->target - piece->position) * PIECE_MOVE_SPEED;
+
+            piece->fake_position = piece->position;
+            piece->fake_velocity = piece->velocity;
             // piece->distance_to_travel = piece->target - piece->position;
             // piece->acceleration = (piece->target - piece->position) * 0.01f;
 
-            glm::vec3 U = (piece->target - piece->position);
-            glm::vec3 perp_vec = glm::vec3(1.0f, 0.0f, 1.0f);
-            perp_vec.y = (U.x - U.z) / U.y;
+            // glm::vec3 U = piece->target - piece->position;
+            // glm::vec3 perp_vec = glm::vec3(1.0f, 0.0f, 1.0f);
+            // perp_vec.y = (U.x - U.z) / U.y;
 
-            piece->parabolic_target = piece->position + (piece->target - piece->position) / 2.0f + glm::normalize(perp_vec) * -1.5f;
+            // piece->parabolic_target = piece->position + (piece->target - piece->position) / 2.0f + glm::normalize(perp_vec) * -1.5f;
             piece->initial_position = piece->position;
             piece->should_move = true;
 

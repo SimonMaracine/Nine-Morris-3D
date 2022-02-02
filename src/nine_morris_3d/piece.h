@@ -34,10 +34,11 @@ public:
 
     glm::vec3 target = glm::vec3(0.0f);
     glm::vec3 initial_position = glm::vec3(0.0f);
-    glm::vec3 parabolic_target = glm::vec3(0.0f);
-    bool reached_parabolic_target = false;
-    // glm::vec3 fake_position = glm::vec3(0.0f);
-    // glm::vec3 fake_velocity = glm::vec3(0.0f);
+    // glm::vec3 parabolic_target = glm::vec3(0.0f);
+    // bool reached_parabolic_target = false;
+    float curve_position = 0.0f;  // Between 0 and pi
+    glm::vec3 fake_position = glm::vec3(0.0f);
+    glm::vec3 fake_velocity = glm::vec3(0.0f);
 
     bool should_move = false;
     float distance_travelled = 0.0f;  // From 0.0 to 1.0
