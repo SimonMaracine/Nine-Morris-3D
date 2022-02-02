@@ -629,7 +629,7 @@ void GameLayer::load_game() {
     save_load::GameState state;
     try {
         save_load::load_game(state);
-    } catch (const std::exception& e) {
+    } catch (const std::runtime_error& e) {
         REL_ERROR("{}", e.what());
         REL_ERROR("Could not load game");
         return;

@@ -394,7 +394,7 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
         ImGui::Text("White can jump: %s", scene->board.can_jump[0] ? "true" : "false");
         ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
-        ImGui::Text("Phase: %d", (int) scene->board.phase);
+        ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
         ImGui::Text("Turn: %s", scene->board.turn == Board::Player::White ? "white" : "black");
         ImGui::Text("Should take piece: %s", scene->board.should_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);

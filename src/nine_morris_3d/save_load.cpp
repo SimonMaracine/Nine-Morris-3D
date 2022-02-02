@@ -137,6 +137,18 @@ namespace save_load {
 
         if (!file.is_open()) {
             REL_ERROR("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
+
+            try {
+                if (!user_data::create_user_data_directory()) {
+                    REL_ERROR("Could not recreate user data directory");
+                } else {
+                    REL_INFO("Recreated user data directory");
+                }
+            } catch (const std::runtime_error& e) {
+                REL_ERROR("{}", e.what());
+                return;
+            }
+
             return;
         }
 
