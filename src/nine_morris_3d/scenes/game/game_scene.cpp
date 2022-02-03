@@ -25,7 +25,7 @@
 #include "nine_morris_3d/options.h"
 
 void GameScene::on_enter() {
-    SPDLOG_DEBUG("Enter game scene");
+    DEB_DEBUG("Enter game scene");
 
     srand(time(nullptr));
 
@@ -65,7 +65,7 @@ void GameScene::on_enter() {
 }
 
 void GameScene::on_exit() {
-    SPDLOG_DEBUG("Exit game scene");
+    DEB_DEBUG("Exit game scene");
 
     options::save_options_to_file(app->options);
 
@@ -154,7 +154,7 @@ void GameScene::build_board() {
     board.specular_color = glm::vec3(0.2f);
     board.shininess = 4.0f;
 
-    SPDLOG_DEBUG("Built board");
+    DEB_DEBUG("Built board");
 }
 
 void GameScene::build_board_paint() {
@@ -200,7 +200,7 @@ void GameScene::build_board_paint() {
     board.paint.specular_color = glm::vec3(0.2f);
     board.paint.shininess = 4.0f;
 
-    SPDLOG_DEBUG("Built board paint");
+    DEB_DEBUG("Built board paint");
 }
 
 void GameScene::build_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
@@ -227,7 +227,7 @@ void GameScene::build_piece(unsigned int index, Piece::Type type, std::shared_pt
     board.pieces[index].select_color = glm::vec3(1.0f, 0.0f, 0.0f);
     board.pieces[index].hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
 
-    SPDLOG_DEBUG("Built piece {}", index);
+    DEB_DEBUG("Built piece {}", index);
 }
 
 void GameScene::build_node(unsigned int index, const glm::vec3& position) {
@@ -266,7 +266,7 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
     board.nodes[index].vertex_array = app->storage->node_vertex_arrays[index];
     board.nodes[index].index_count = app->assets_load->node_mesh->indices.size();
 
-    SPDLOG_DEBUG("Built node {}", index);
+    DEB_DEBUG("Built node {}", index);
 }
 
 void GameScene::build_camera() {
@@ -277,7 +277,7 @@ void GameScene::build_camera() {
         8.0f
     );
 
-    SPDLOG_DEBUG("Built camera");
+    DEB_DEBUG("Built camera");
 }
 
 void GameScene::build_skybox() {
@@ -324,7 +324,7 @@ void GameScene::build_skybox() {
         app->storage->skybox_texture = Texture3D::create(data);
     }
 
-    SPDLOG_DEBUG("Built skybox");
+    DEB_DEBUG("Built skybox");
 }
 
 void GameScene::build_light() {
@@ -336,7 +336,7 @@ void GameScene::build_light() {
         assert(false);
     }
 
-    SPDLOG_DEBUG("Built light");
+    DEB_DEBUG("Built light");
 }
 
 void GameScene::build_turn_indicator() {
@@ -349,5 +349,5 @@ void GameScene::build_turn_indicator() {
             static_cast<float>(app->data.height - 115), 0.0f);
     turn_indicator.scale = 1.0f;
 
-    SPDLOG_DEBUG("Built turn indicator");
+    DEB_DEBUG("Built turn indicator");
 }

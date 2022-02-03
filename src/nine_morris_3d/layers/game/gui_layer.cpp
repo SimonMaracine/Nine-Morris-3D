@@ -12,7 +12,6 @@
 #include "graphics/renderer/framebuffer.h"
 #include "other/logging.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
-#include "nine_morris_3d/layers/game/game_layer.h"
 
 void GuiLayer::on_attach() {
 
@@ -54,7 +53,7 @@ void GuiLayer::render_timer() {
     const unsigned int minutes = scene->timer.get_time_seconds() / 60;
     const unsigned int seconds = scene->timer.get_time_seconds() % 60;    
 
-    char time[8];
+    char time[32];
     sprintf(time, "%.2u:%.2u", minutes, seconds);
 
     int width, height;

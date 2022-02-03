@@ -17,8 +17,7 @@ static std::string path(const char* file_path) {
       return std::string(file_path);
 #else
     #if defined(__GNUG__)
-      std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/";
-      path.append(file_path);
+      std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
       return path;
     #elif defined(_MSC_VER)
       // Just use relative path
@@ -31,13 +30,13 @@ static std::string path(const char* file_path) {
 
 Window::Window(ApplicationData* data) {
     if (!glfwInit()) {
-        REL_CRITICAL("Could not initialize GLFW");
+        REL_CRITICAL("Could not initialize GLFW, exiting...");
         std::exit(1);
     }
 
 #ifndef NDEBUG
     glfwSetErrorCallback([](int error, const char* description) {
-        REL_CRITICAL("[ID: {}] {}", error, description);
+        DEB_CRITICAL("[ID: {}] {}", error, description);
     });
 #endif
 
@@ -49,14 +48,14 @@ Window::Window(ApplicationData* data) {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 #ifndef NDEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-    REL_INFO("Using OpenGL debug context");
+    DEB_INFO("Using OpenGL debug context");
 #else
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif
 
     window = glfwCreateWindow(data->width, data->height, data->title.c_str(), nullptr, nullptr);
     if (window == nullptr) {
-        REL_CRITICAL("Could not create window");
+        REL_CRITICAL("Could not create window, exiting...");
         std::exit(1);
     }
 
@@ -65,7 +64,7 @@ Window::Window(ApplicationData* data) {
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-        REL_CRITICAL("Could not initialize GLAD");
+        REL_CRITICAL("Could not initialize GLAD, exiting...");
         std::exit(1);
     }
 
@@ -219,7 +218,7 @@ IconImage::IconImage(const std::string& file_path) {
     data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load icon image '{}'", file_path.c_str());
+        REL_CRITICAL("Could not load icon image '{}', exiting...", file_path.c_str());
         std::exit(1);
     }
 

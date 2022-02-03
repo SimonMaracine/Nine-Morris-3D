@@ -18,7 +18,7 @@ namespace model {
         const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure);
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}'", file_path.c_str());
+            REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());
             REL_CRITICAL(importer.GetErrorString());
             std::exit(1);
         }
@@ -71,7 +71,7 @@ namespace model {
         const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure);
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}'", file_path.c_str());
+            REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());
             REL_CRITICAL(importer.GetErrorString());
             std::exit(1);
         }
