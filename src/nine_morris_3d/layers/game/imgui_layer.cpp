@@ -419,6 +419,46 @@ void ImGuiLayer::on_update(float dt) {
             game_layer->setup_light();
         }
         ImGui::End();
+
+        // If you recompile shaders, uniforms that are set only once need to be reuploaded
+        ImGui::Begin("Shaders");
+        if (ImGui::Button("board_paint")) {
+            app->storage->board_paint_shader->recompile();
+        }
+        if (ImGui::Button("board")) {
+            app->storage->board_shader->recompile();
+        }
+        if (ImGui::Button("node")) {
+            app->storage->node_shader->recompile();
+        }
+        if (ImGui::Button("origin")) {
+            app->storage->origin_shader->recompile();
+        }
+        if (ImGui::Button("outline")) {
+            app->storage->outline_shader->recompile();
+        }
+        if (ImGui::Button("piece")) {
+            app->storage->piece_shader->recompile();
+        }
+        if (ImGui::Button("quad2d")) {
+            app->storage->quad2d_shader->recompile();
+        }
+        if (ImGui::Button("quad3d")) {
+            app->storage->quad3d_shader->recompile();
+        }
+        if (ImGui::Button("screen_quad")) {
+            app->storage->screen_quad_shader->recompile();
+        }
+        if (ImGui::Button("shadow")) {
+            app->storage->shadow_shader->recompile();
+        }
+        if (ImGui::Button("skybox")) {
+            app->storage->skybox_shader->recompile();
+        }
+        if (ImGui::Button("text")) {
+            app->storage->text_shader->recompile();
+        }
+        ImGui::End();
     }
 #endif
 

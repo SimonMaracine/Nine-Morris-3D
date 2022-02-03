@@ -19,7 +19,7 @@
 
 namespace user_data {
 #if defined(__GNUG__)
-    const std::string get_username() {
+    const std::string get_username() {  // Throws exception
         uid_t uid = geteuid();
         struct passwd* pw = getpwuid(uid);
 
@@ -61,7 +61,7 @@ namespace user_data {
         }
     }
 #elif defined(_MSC_VER)
-    const std::string get_username() {
+    const std::string get_username() {  // Throws exception
         char username[UNLEN + 1];
         DWORD whatever = UNLEN + 1;
         bool success = GetUserName(username, &whatever);

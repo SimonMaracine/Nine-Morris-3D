@@ -12,9 +12,18 @@
 #include "graphics/renderer/buffer.h"
 #include "other/logging.h"
 
+#define DELETE_SHADER(program, vertex_shader, fragment_shader) \
+    glDetachShader(program, vertex_shader); \
+    glDetachShader(program, fragment_shader); \
+    glDeleteShader(vertex_shader); \
+    glDeleteShader(fragment_shader); \
+    glDeleteProgram(program);
+
 Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name,
-        const std::vector<std::string>& uniforms)
-    : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader), name(name) {
+        const std::vector<std::string>& uniforms, const std::string& vertex_source_path,
+        const std::string& fragment_source_path)
+    : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader), name(name),
+      vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path) {
     for (const std::string& uniform : uniforms) {
         GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
@@ -28,20 +37,15 @@ Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, con
 }
 
 Shader::~Shader() {
-    glDetachShader(program, vertex_shader);
-    glDetachShader(program, fragment_shader);
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-    glDeleteProgram(program);
+    DELETE_SHADER(program, vertex_shader, fragment_shader);
 
     DEB_DEBUG("Deleted shader {} ({})", program, name.c_str());
 }
 
-std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
-                                       const std::string& fragment_source,
-                                       const std::vector<std::string>& uniforms) {
-    GLuint vertex_shader = compile_shader(vertex_source, GL_VERTEX_SHADER);
-    GLuint fragment_shader = compile_shader(fragment_source, GL_FRAGMENT_SHADER);
+std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
+            const std::string& fragment_source_path, const std::vector<std::string>& uniforms) {
+    GLuint vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
+    GLuint fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
 
     GLuint program = glCreateProgram();
     glAttachShader(program, vertex_shader);
@@ -49,21 +53,29 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
     glLinkProgram(program);
     glValidateProgram(program);
 
-    check_linking(program);
+    if (!check_linking(program)) {
+        REL_CRITICAL("Exiting...");
+        std::exit(1);
+    }
 
-    std::string name = get_name(vertex_source, fragment_source);
+    std::string name = get_name(vertex_source_path, fragment_source_path);
 
-    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms);
+    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
+            vertex_source_path, fragment_source_path);
 }
 
-std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
-                                       const std::string& fragment_source,
-                                       const std::vector<std::string>& uniforms,
-                                       const char* block_name,
-                                       int uniforms_count,
-                                       std::shared_ptr<UniformBuffer> uniform_buffer) {
-    GLuint vertex_shader = compile_shader(vertex_source, GL_VERTEX_SHADER);
-    GLuint fragment_shader = compile_shader(fragment_source, GL_FRAGMENT_SHADER);
+std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
+            const std::string& fragment_source_path, const std::vector<std::string>& uniforms,
+            const char* block_name, int uniforms_count, std::shared_ptr<UniformBuffer> uniform_buffer) {
+    GLuint vertex_shader;
+    GLuint fragment_shader;
+    try {
+        vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
+        fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
+    } catch (const std::runtime_error& e) {
+        REL_CRITICAL("{}, exiting...", e.what());
+        std::exit(1);
+    }
 
     GLuint program = glCreateProgram();
     glAttachShader(program, vertex_shader);
@@ -71,19 +83,23 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
     glLinkProgram(program);
     glValidateProgram(program);
 
-    check_linking(program);
+    if (!check_linking(program)) {
+        REL_CRITICAL("Exiting...");
+        std::exit(1);
+    }
 
     // Set up uniform buffer
     GLuint block_index = glGetUniformBlockIndex(program, block_name);
     if (block_index == GL_INVALID_INDEX) {
-        REL_CRITICAL("Invalid block index");
+        REL_CRITICAL("Invalid block index, exiting...");
         std::exit(1);
     }
     glBindBufferBase(GL_UNIFORM_BUFFER, block_index, uniform_buffer->buffer);
 
-    std::string name = get_name(vertex_source, fragment_source);
+    std::string name = get_name(vertex_source_path, fragment_source_path);
 
-    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms);
+    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
+            vertex_source_path, fragment_source_path);
 }
 
 void Shader::bind() const {
@@ -124,6 +140,38 @@ void Shader::set_uniform_float(const std::string& name, float value) const {
     glUniform1f(location, value);
 }
 
+void Shader::recompile() {
+    GLuint new_vertex_shader;
+    GLuint new_fragment_shader;
+    try {
+        new_vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
+        new_fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
+    } catch (const std::runtime_error&) {
+        DEB_ERROR("Abort recompiling");
+        return;
+    }
+
+    GLuint new_program = glCreateProgram();
+    glAttachShader(new_program, new_vertex_shader);
+    glAttachShader(new_program, new_fragment_shader);
+    glLinkProgram(new_program);
+    glValidateProgram(new_program);
+
+    if (!check_linking(new_program)) {
+        DEB_ERROR("Abort recompiling");
+        DELETE_SHADER(new_program, new_vertex_shader, new_fragment_shader);
+        return;
+    }
+
+    DELETE_SHADER(program, vertex_shader, fragment_shader);
+
+    DEB_DEBUG("Recompiled old shader {} to new shader {} ({})", program, new_program, name.c_str());
+
+    program = new_program;
+    vertex_shader = new_vertex_shader;
+    fragment_shader = new_fragment_shader;
+}
+
 GLint Shader::get_uniform_location(const std::string& name) const {
 #ifdef NDEBUG
     return cache[name];
@@ -131,13 +179,14 @@ GLint Shader::get_uniform_location(const std::string& name) const {
     try {
         return cache.at(name);
     } catch (const std::out_of_range&) {
-        DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}'", name.c_str(), this->name.c_str());
+        DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}', exiting...", name.c_str(),
+                this->name.c_str());
         std::exit(1);
     }
 #endif
 }
 
-GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {
+GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {  // Throws exception
     std::ifstream file (source_path);
     std::string source;
 
@@ -147,7 +196,7 @@ GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {
             source.append(line).append("\n");
         }
     } else {
-        REL_CRITICAL("Could not open file '{}'", source_path.c_str());
+        REL_CRITICAL("Could not open file '{}', exiting...", source_path.c_str());
         std::exit(1);
     }
     file.close();
@@ -157,12 +206,14 @@ GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {
     glShaderSource(shader, 1, &s, nullptr);
     glCompileShader(shader);
 
-    check_compilation(shader, type);
+    if (!check_compilation(shader, type)) {
+        throw std::runtime_error("Shader compilation error");
+    }
 
     return shader;
 }
 
-void Shader::check_compilation(GLuint shader, GLenum type) {
+bool Shader::check_compilation(GLuint shader, GLenum type) {
     GLint compile_status;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 
@@ -186,11 +237,13 @@ void Shader::check_compilation(GLuint shader, GLenum type) {
             delete[] log_message;
         }
 
-        std::exit(1);
+        return false;
     }
+
+    return true;
 }
 
-void Shader::check_linking(GLuint program) {
+bool Shader::check_linking(GLuint program) {
     GLint link_status;
     glGetProgramiv(program, GL_LINK_STATUS, &link_status);
 
@@ -208,8 +261,10 @@ void Shader::check_linking(GLuint program) {
             delete[] log_message;
         }
 
-        std::exit(1);
+        return false;
     }
+
+    return true;
 }
 
 std::string Shader::get_name(const std::string& vertex_source, const std::string& fragment_source) {
