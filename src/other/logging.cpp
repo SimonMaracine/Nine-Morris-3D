@@ -70,6 +70,7 @@ namespace logging {
 
         release_logger->set_pattern(LOG_PATTERN);
         release_logger->set_level(spdlog::level::trace);
+        release_logger->flush_on(spdlog::level::info);
     }
 
     void log_opengl_and_dependencies_info(LogTarget target) {
