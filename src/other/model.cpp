@@ -12,7 +12,7 @@
 
 namespace model {
     std::shared_ptr<Mesh<Vertex>> load_model(const std::string& file_path) {
-        SPDLOG_DEBUG("Loading model '{}'...", file_path.c_str());
+        DEB_DEBUG("Loading model '{}'...", file_path.c_str());
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure);
@@ -65,7 +65,7 @@ namespace model {
     }
 
     std::shared_ptr<Mesh<VertexP>> load_model_position(const std::string& file_path) {
-        SPDLOG_DEBUG("Loading model '{}'...", file_path.c_str());
+        DEB_DEBUG("Loading model '{}'...", file_path.c_str());
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure);

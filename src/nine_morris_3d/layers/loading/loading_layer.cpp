@@ -38,7 +38,7 @@ void LoadingLayer::on_attach() {
 }
 
 void LoadingLayer::on_detach() {
-    SPDLOG_INFO("Done loading assets; initializing the rest of the game...");
+    DEB_INFO("Done loading assets; initializing the rest of the game...");
 
     if (loader->get_thread().joinable()) {
         loader->get_thread().detach();

@@ -9,13 +9,13 @@
 
 Buffer::Buffer(GLuint buffer)
     : buffer(buffer) {
-    SPDLOG_DEBUG("Created buffer {}", buffer);
+    DEB_DEBUG("Created buffer {}", buffer);
 }
 
 Buffer::~Buffer() {
     glDeleteBuffers(1, &buffer);
 
-    SPDLOG_DEBUG("Deleted buffer {}", buffer);
+    DEB_DEBUG("Deleted buffer {}", buffer);
 }
 
 std::shared_ptr<Buffer> Buffer::create(size_t size) {
@@ -54,13 +54,13 @@ void Buffer::update_data(const void* data, size_t size) const {
 
 IndexBuffer::IndexBuffer(GLuint buffer)
     : buffer(buffer) {
-    SPDLOG_DEBUG("Created index buffer {}", buffer);
+    DEB_DEBUG("Created index buffer {}", buffer);
 }
 
 IndexBuffer::~IndexBuffer() {
     glDeleteBuffers(1, &buffer);
 
-    SPDLOG_DEBUG("Deleted index buffer {}", buffer);
+    DEB_DEBUG("Deleted index buffer {}", buffer);
 }
 
 std::shared_ptr<IndexBuffer> IndexBuffer::create(const unsigned int* data, size_t size) {
@@ -85,13 +85,13 @@ void IndexBuffer::unbind() {
 
 UniformBuffer::UniformBuffer(GLuint buffer)
     : buffer(buffer) {
-    SPDLOG_DEBUG("Created uniform buffer {}", buffer);
+    DEB_DEBUG("Created uniform buffer {}", buffer);
 }
 
 UniformBuffer::~UniformBuffer() {
     glDeleteBuffers(1, &buffer);
 
-    SPDLOG_DEBUG("Deleted uniform buffer {}", buffer);
+    DEB_DEBUG("Deleted uniform buffer {}", buffer);
 }
 
 std::shared_ptr<UniformBuffer> UniformBuffer::create(const void* data, size_t size) {

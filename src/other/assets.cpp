@@ -11,8 +11,7 @@ namespace assets {
         return std::string(file_path);
 #else
     #if defined(__GNUG__)
-        std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/";
-        path.append(file_path);
+        std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
         return path;
     #elif defined(_MSC_VER)
         // Just use relative path

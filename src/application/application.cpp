@@ -75,7 +75,7 @@ void Application::run() {
         layer->on_attach();
     }
 
-    SPDLOG_INFO("Initialized game");
+    DEB_INFO("Initialized game");
 
     float dt = 0.0f;
 
@@ -109,7 +109,7 @@ void Application::run() {
         window->update();
     }
 
-    SPDLOG_INFO("Closing game");
+    DEB_INFO("Closing game");
 
     for (auto iter = current_scene->layer_stack.rbegin();
             iter != current_scene->layer_stack.rend(); iter++) {

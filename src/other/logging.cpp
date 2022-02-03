@@ -47,24 +47,24 @@ namespace logging {
         try {
             file_path = path(LOG_FILE);
         } catch (const std::runtime_error& e) {            
-            release_logger = spdlog::stdout_color_mt("Release Logger Fallback");
+            release_logger = spdlog::stdout_color_mt("Release Logger Fallback (Console)");
 
             release_logger->set_pattern(LOG_PATTERN);
             release_logger->set_level(spdlog::level::trace);
 
-            spdlog::error("Using fallback logger");
+            spdlog::error("Using fallback logger (console)");
             return;
         }
 
         try {
-            release_logger = spdlog::basic_logger_mt("Release Logger", file_path, false);
+            release_logger = spdlog::basic_logger_mt("Release Logger (File)", file_path, false);
         } catch (const spdlog::spdlog_ex& e) {
-            release_logger = spdlog::stdout_color_mt("Release Logger Fallback");
+            release_logger = spdlog::stdout_color_mt("Release Logger Fallback (Console)");
 
             release_logger->set_pattern(LOG_PATTERN);
             release_logger->set_level(spdlog::level::trace);
 
-            spdlog::error("Using fallback logger: {}", e.what());
+            spdlog::error("Using fallback logger (console): {}", e.what());
             return;
         }
 

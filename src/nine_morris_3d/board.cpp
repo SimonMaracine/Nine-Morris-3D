@@ -61,7 +61,7 @@ bool Board::place_piece(hoverable::Id hovered_id) {
             }
 
             if (is_windmill_made(&node, TURN_IS_WHITE_SO(Piece::White, Piece::Black))) {
-                SPDLOG_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
+                DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
                 should_take_piece = true;
                 update_cursor();
@@ -83,12 +83,12 @@ bool Board::place_piece(hoverable::Id hovered_id) {
                 update_outlines();
 
                 if (check_player_blocked(turn)) {
-                    SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+                    DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
                     game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
                             TURN_IS_WHITE_SO(Piece::White, Piece::Black));
                 }
 
-                SPDLOG_INFO("Phase 2");
+                DEB_INFO("Phase 2");
             }
 
             placed = true;
@@ -184,15 +184,15 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                             switch_turn();
                             update_outlines();
 
-                            SPDLOG_DEBUG("Black piece {} taken", hovered_id);
+                            DEB_DEBUG("Black piece {} taken", hovered_id);
 
                             if (check_player_blocked(turn)) {
-                                SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+                                DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
                                 game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
                                         TURN_IS_WHITE_SO(Piece::White, Piece::Black));
                             }
                         } else {
-                            SPDLOG_DEBUG("Cannot take piece from windmill");
+                            DEB_DEBUG("Cannot take piece from windmill");
                         }
 
                         taked = true;
@@ -221,15 +221,15 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                             switch_turn();
                             update_outlines();
 
-                            SPDLOG_DEBUG("White piece {} taken", hovered_id);
+                            DEB_DEBUG("White piece {} taken", hovered_id);
 
                             if (check_player_blocked(turn)) {
-                                SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+                                DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
                                 game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
                                         TURN_IS_WHITE_SO(Piece::White, Piece::Black));
                             }
                         } else {
-                            SPDLOG_DEBUG("Cannot take piece from windmill");
+                            DEB_DEBUG("Cannot take piece from windmill");
                         }
 
                         taked = true;
@@ -244,7 +244,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
             phase = Phase::MovePieces;
             update_outlines();
 
-            SPDLOG_INFO("Phase 2");
+            DEB_INFO("Phase 2");
         }
     }
 
@@ -315,7 +315,7 @@ bool Board::put_piece(hoverable::Id hovered_id) {
                 selected_piece = nullptr;
 
                 if (is_windmill_made(&node, TURN_IS_WHITE_SO(Piece::White, Piece::Black))) {
-                    SPDLOG_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
+                    DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
                     should_take_piece = true;
                     update_cursor();
@@ -336,7 +336,7 @@ bool Board::put_piece(hoverable::Id hovered_id) {
                     update_outlines();
 
                     if (check_player_blocked(turn)) {
-                        SPDLOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+                        DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
                         game_over(TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
                                 TURN_IS_WHITE_SO(Piece::White, Piece::Black));
                     }
@@ -468,7 +468,7 @@ void Board::undo() {
 
     state_history->pop_back();
 
-    SPDLOG_DEBUG("Popped state and undid move");
+    DEB_DEBUG("Popped state and undid move");
 
     update_cursor();
 }
@@ -551,13 +551,13 @@ void Board::game_over(Ending ending, Piece::Type type_to_hide) {
 
     switch (ending) {
         case Ending::WinnerWhite:
-            SPDLOG_INFO("Game over, white wins");
+            DEB_INFO("Game over, white wins");
             break;
         case Ending::WinnerBlack:
-            SPDLOG_INFO("Game over, black wins");
+            DEB_INFO("Game over, black wins");
             break;
         case Ending::TieBetweenBothPlayers:
-            SPDLOG_INFO("Game over, tie between both players");
+            DEB_INFO("Game over, tie between both players");
             break;
         default:
             assert(false);
@@ -569,7 +569,7 @@ void Board::switch_turn() {
         turns_without_mills++;
 
         if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
-            SPDLOG_INFO("The max amount of turns without mills has been hit");
+            DEB_INFO("The max amount of turns without mills has been hit");
             game_over(Ending::TieBetweenBothPlayers,
                     TURN_IS_WHITE_SO(Piece::White, Piece::Black));
         }
@@ -646,7 +646,7 @@ unsigned int Board::number_of_pieces_in_windmills(Piece::Type type) {
         }
     }
 
-    SPDLOG_DEBUG("Number of {} pieces in mills: {}", type == Piece::White ? "white" : "black",
+    DEB_DEBUG("Number of {} pieces in mills: {}", type == Piece::White ? "white" : "black",
             pieces_inside_mills.size());
 
     return pieces_inside_mills.size();
@@ -789,30 +789,30 @@ bool Board::can_go(Node* source_node, Node* destination_node) {
 
 void Board::check_player_number_of_pieces(Player player) {
     if (player == Player::White) {
-        SPDLOG_DEBUG("Checking white player number of pieces");
+        DEB_DEBUG("Checking white player number of pieces");
 
         if (white_pieces_count + not_placed_white_pieces_count == 3) {
             can_jump[static_cast<int>(player)] = true;
-            SPDLOG_INFO("White player can jump");
+            DEB_INFO("White player can jump");
         } else if (white_pieces_count + not_placed_white_pieces_count == 2) {
-            SPDLOG_INFO("White player has only 2 pieces");
+            DEB_INFO("White player has only 2 pieces");
             game_over(Ending::WinnerBlack, Piece::White);
         }
     } else {
-        SPDLOG_DEBUG("Checking black player number of pieces");
+        DEB_DEBUG("Checking black player number of pieces");
 
         if (black_pieces_count + not_placed_black_pieces_count == 3) {
             can_jump[static_cast<int>(player)] = true;
-            SPDLOG_INFO("Black player can jump");
+            DEB_INFO("Black player can jump");
         } else if (black_pieces_count + not_placed_black_pieces_count == 2) {
-            SPDLOG_INFO("Black player has only 2 pieces");
+            DEB_INFO("Black player has only 2 pieces");
             game_over(Ending::WinnerWhite, Piece::Black);
         }
     }
 }
 
 bool Board::check_player_blocked(Player player) {
-    SPDLOG_DEBUG("{} player is checked if is blocked",
+    DEB_DEBUG("{} player is checked if is blocked",
             player == Player::White ? "White" : "Black");
 
     bool at_least_one_piece = false;
@@ -1058,7 +1058,7 @@ void Board::remember_position_and_check_repetition() {
 
     for (const std::array<Piece::Type, 24>& position : repetition_history.twos) {
         if (position == current_position) {
-            SPDLOG_INFO("Threefold repetition");
+            DEB_INFO("Threefold repetition");
             game_over(Ending::TieBetweenBothPlayers, TURN_IS_WHITE_SO(Piece::White, Piece::Black));
             return;
         }
@@ -1079,7 +1079,7 @@ void Board::remember_position_and_check_repetition() {
 void Board::remember_state() {
     state_history->push_back(*this);
 
-    SPDLOG_DEBUG("Pushed new state");
+    DEB_DEBUG("Pushed new state");
 }
 
 void Board::arrive_at_node(Piece* piece) {

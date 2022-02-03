@@ -114,7 +114,7 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
                 app->change_scene(0);
 
-                SPDLOG_INFO("Restarting game");
+                DEB_INFO("Restarting game");
             }
             if (ImGui::MenuItem("Load Last", nullptr, false)) {
                 scene->board.finalize_pieces_state();
@@ -158,35 +158,35 @@ void ImGuiLayer::on_update(float dt) {
                 if (app->options.vsync) {
                     app->window->set_vsync(app->options.vsync);
 
-                    SPDLOG_INFO("VSync enabled");
+                    DEB_INFO("VSync enabled");
                 } else {
                     app->window->set_vsync(app->options.vsync);
 
-                    SPDLOG_INFO("VSync disabled");
+                    DEB_INFO("VSync disabled");
                 }
             }
             if (ImGui::MenuItem("Save On Exit", nullptr, &app->options.save_on_exit)) {
                 if (app->options.save_on_exit) {
-                    SPDLOG_INFO("The game will be saved on exit");
+                    DEB_INFO("The game will be saved on exit");
                 } else {
-                    SPDLOG_INFO("The game will not be saved on exit");
+                    DEB_INFO("The game will not be saved on exit");
                 }
             }
             if (ImGui::BeginMenu("Anti-Aliasing", true)) {
                 if (ImGui::RadioButton("No Anti-Aliasing", &app->options.samples, 1)) {
                     game_layer->set_scene_framebuffer(app->options.samples);
 
-                    SPDLOG_INFO("Anti-aliasing disabled");
+                    DEB_INFO("Anti-aliasing disabled");
                 }
                 if (ImGui::RadioButton("2x", &app->options.samples, 2)) {
                     game_layer->set_scene_framebuffer(app->options.samples);
 
-                    SPDLOG_INFO("2x anti-aliasing");
+                    DEB_INFO("2x anti-aliasing");
                 }
                 if (ImGui::RadioButton("4x", &app->options.samples, 4)) {
                     game_layer->set_scene_framebuffer(app->options.samples);
 
-                    SPDLOG_INFO("4x anti-aliasing");
+                    DEB_INFO("4x anti-aliasing");
                 }
 
                 ImGui::EndMenu();
@@ -197,13 +197,13 @@ void ImGuiLayer::on_update(float dt) {
                     game_layer->set_textures_quality(options::NORMAL);
                     app->options.texture_quality = options::NORMAL;
 
-                    SPDLOG_INFO("Textures set to {} quality", options::NORMAL);
+                    DEB_INFO("Textures set to {} quality", options::NORMAL);
                 }
                 if (ImGui::RadioButton("Low", &quality, 1)) {
                     game_layer->set_textures_quality(options::LOW);
                     app->options.texture_quality = options::LOW;
 
-                    SPDLOG_INFO("Textures set to {} quality", options::LOW);
+                    DEB_INFO("Textures set to {} quality", options::LOW);
                 }
 
                 ImGui::EndMenu();
@@ -214,22 +214,22 @@ void ImGuiLayer::on_update(float dt) {
                     game_layer->set_skybox(options::FIELD);
                     app->options.skybox = options::FIELD;
 
-                    SPDLOG_INFO("Skybox set to {}", options::FIELD);
+                    DEB_INFO("Skybox set to {}", options::FIELD);
                 }
                 if (ImGui::RadioButton("Autumn", &skybox, 1)) {
                     game_layer->set_skybox(options::AUTUMN);
                     app->options.skybox = options::AUTUMN;
 
-                    SPDLOG_INFO("Skybox set to {}", options::AUTUMN);
+                    DEB_INFO("Skybox set to {}", options::AUTUMN);
                 }
 
                 ImGui::EndMenu();
             }
             if (ImGui::MenuItem("Show Info", nullptr, &show_info)) {
                 if (show_info) {
-                    SPDLOG_INFO("Show info");
+                    DEB_INFO("Show info");
                 } else {
-                    SPDLOG_INFO("Hide info");
+                    DEB_INFO("Hide info");
                 }
             }
             if (ImGui::MenuItem("Custom Cursor", nullptr, &app->options.custom_cursor)) {
@@ -240,11 +240,11 @@ void ImGuiLayer::on_update(float dt) {
                         app->window->set_custom_cursor(CustomCursor::Arrow);
                     }
 
-                    SPDLOG_INFO("Set custom cursor");
+                    DEB_INFO("Set custom cursor");
                 } else {
                     app->window->set_custom_cursor(CustomCursor::None);
 
-                    SPDLOG_INFO("Set default cursor");
+                    DEB_INFO("Set default cursor");
                 }
             }
 
@@ -258,7 +258,7 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::MenuItem("Log Info", nullptr, false)) {
                 logging::log_opengl_and_dependencies_info(logging::LogTarget::File);
 
-                SPDLOG_INFO("Logged OpenGL and dependencies info");
+                DEB_INFO("Logged OpenGL and dependencies info");
             }
 
             ImGui::EndMenu();

@@ -20,13 +20,13 @@ void Timer::update(double time) {
 void Timer::start() {
     running = true;
 
-    SPDLOG_DEBUG("Started timer");
+    DEB_DEBUG("Started timer");
 }
 
 void Timer::stop() {
     running = false;
 
-    SPDLOG_DEBUG("Stopped timer");
+    DEB_DEBUG("Stopped timer");
 }
 
 unsigned int Timer::get_time_seconds() const {

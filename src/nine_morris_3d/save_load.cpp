@@ -155,7 +155,7 @@ namespace save_load {
         cereal::BinaryOutputArchive output{file};
         output(game_state);
 
-        SPDLOG_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
+        DEB_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
     }
 
     void load_game(GameState& game_state) {  // Throws exception
@@ -178,14 +178,14 @@ namespace save_load {
             return;
         }
 
-        SPDLOG_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
+        DEB_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
     }
 
     bool save_files_exist() {
         if (file_exists(SAVE_GAME_FILE)) {
             return true;
         } else {
-            SPDLOG_ERROR("Save file is either missing or is inaccessible: '{}'", SAVE_GAME_FILE);
+            DEB_ERROR("Save file is either missing or is inaccessible: '{}'", SAVE_GAME_FILE);
             return false;
         }
     }

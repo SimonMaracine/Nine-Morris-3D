@@ -60,7 +60,7 @@ Window::Window(ApplicationData* data) {
         std::exit(1);
     }
 
-    SPDLOG_INFO("Initialized GLFW and created window");
+    DEB_INFO("Initialized GLFW and created window");
 
     glfwMakeContextCurrent(window);
 
@@ -179,7 +179,7 @@ Window::~Window() {
     glfwDestroyCursor(cross_cursor);
     glfwTerminate();
 
-    SPDLOG_INFO("Terminated GLFW and destroyed window");
+    DEB_INFO("Terminated GLFW and destroyed window");
 }
 
 void Window::update() const {
@@ -225,13 +225,13 @@ IconImage::IconImage(const std::string& file_path) {
 
     this->file_path = file_path;
 
-    SPDLOG_INFO("Loaded icon image data '{}'", file_path.c_str());
+    DEB_INFO("Loaded icon image data '{}'", file_path.c_str());
 }
 
 IconImage::~IconImage() {
     stbi_image_free(data);
 
-    SPDLOG_INFO("Freed icon image data '{}'", file_path.c_str());
+    DEB_INFO("Freed icon image data '{}'", file_path.c_str());
 }
 
 GLFWimage IconImage::get_data() const {

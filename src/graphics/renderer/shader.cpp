@@ -18,13 +18,13 @@ Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, con
     for (const std::string& uniform : uniforms) {
         GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
-            SPDLOG_ERROR("Uniform variable '{}' in shader '{}' not found", name.c_str(), name.c_str());
+            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", name.c_str(), name.c_str());
             continue;
         }
         cache[uniform] = location;
     }
 
-    SPDLOG_DEBUG("Created shader {} ({})", program, name.c_str());
+    DEB_DEBUG("Created shader {} ({})", program, name.c_str());
 }
 
 Shader::~Shader() {
@@ -34,7 +34,7 @@ Shader::~Shader() {
     glDeleteShader(fragment_shader);
     glDeleteProgram(program);
 
-    SPDLOG_DEBUG("Deleted shader {} ({})", program, name.c_str());
+    DEB_DEBUG("Deleted shader {} ({})", program, name.c_str());
 }
 
 std::shared_ptr<Shader> Shader::create(const std::string& vertex_source,
@@ -131,7 +131,7 @@ GLint Shader::get_uniform_location(const std::string& name) const {
     try {
         return cache.at(name);
     } catch (const std::out_of_range&) {
-        SPDLOG_CRITICAL("Uniform variable '{}' unspecified for shader '{}'", name.c_str(), this->name.c_str());
+        DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}'", name.c_str(), this->name.c_str());
         std::exit(1);
     }
 #endif

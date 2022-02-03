@@ -104,7 +104,7 @@ namespace options {
         options.skybox = skybox;
         options.custom_cursor = custom_cursor;
 
-        SPDLOG_INFO("Loaded options from file '{}'", file_path.c_str());
+        DEB_INFO("Loaded options from file '{}'", file_path.c_str());
     }
 
     void save_options_to_file(const Options& options) {
@@ -158,7 +158,7 @@ namespace options {
 
         file << std::setw(4) << object;
 
-        SPDLOG_INFO("Saved options to file '{}'", file_path.c_str());
+        DEB_INFO("Saved options to file '{}'", file_path.c_str());
     }
 
     void create_options_file() {
@@ -188,6 +188,6 @@ namespace options {
 
         file << object.dump(4);
 
-        SPDLOG_INFO("Created options file '{}'", file_path.c_str());
+        DEB_INFO("Created options file '{}'", file_path.c_str());
     }
 }

@@ -726,5 +726,5 @@ void GameLayer::load_game() {
 
     scene->board.update_cursor();
 
-    SPDLOG_INFO("Loaded game");
+    DEB_INFO("Loaded game");
 }

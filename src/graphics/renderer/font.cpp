@@ -45,7 +45,7 @@ Font::Font(const std::string& file_path, float size, int padding, unsigned char 
 
     name = get_name(file_path);
 
-    SPDLOG_DEBUG("Loaded font '{}'", file_path.c_str());
+    DEB_DEBUG("Loaded font '{}'", file_path.c_str());
 }
 
 Font::~Font() {
@@ -60,7 +60,7 @@ void Font::update_data(const float* data, size_t size) {
 }
 
 void Font::begin_baking() {
-    SPDLOG_DEBUG("Begin baking font {}", name.c_str());
+    DEB_DEBUG("Begin baking font {}", name.c_str());
 
     glDeleteTextures(1, &texture);
     memset(&bake_context, 0, sizeof(BakeContext));
@@ -178,14 +178,14 @@ void Font::end_baking() {
 #ifndef NDEBUG
     std::string file_name = "bitmap_" + name + ".png";
     if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
-        SPDLOG_CRITICAL("Failed to create png");
+        DEB_CRITICAL("Failed to create png");
         std::exit(1);
     }
 #endif
 
     delete[] bake_context.bitmap;
 
-    SPDLOG_DEBUG("End baking font {}", name.c_str());
+    DEB_DEBUG("End baking font {}", name.c_str());
 }
 
 void Font::render(const std::string& string, size_t* out_size, float** out_buffer) {

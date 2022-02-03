@@ -99,7 +99,7 @@ Framebuffer::Framebuffer(const FramebufferSpecification& specification)
     : specification(specification) {
     build();
 
-    SPDLOG_DEBUG("Created framebuffer {}", framebuffer);
+    DEB_DEBUG("Created framebuffer {}", framebuffer);
 }
 
 Framebuffer::~Framebuffer() {
@@ -133,7 +133,7 @@ Framebuffer::~Framebuffer() {
 
     glDeleteFramebuffers(1, &framebuffer);
 
-    SPDLOG_DEBUG("Deleted framebuffer {}", framebuffer);
+    DEB_DEBUG("Deleted framebuffer {}", framebuffer);
 }
 
 std::shared_ptr<Framebuffer> Framebuffer::create(const FramebufferSpecification& specification) {
@@ -167,7 +167,7 @@ GLuint Framebuffer::get_depth_attachment() const {
 
 void Framebuffer::resize(int width, int height) {
     if (width < 1 || height < 1 || width > 8192 || height > 8192) {
-        SPDLOG_ERROR("Attempted to resize framebuffer to [{}, {}]", width, height);
+        DEB_ERROR("Attempted to resize framebuffer to [{}, {}]", width, height);
         return;
     }
 
@@ -271,7 +271,7 @@ void Framebuffer::build() {
                                 specification.width, specification.height, i);
                         break;
                     default:
-                        SPDLOG_CRITICAL("Wrong attachment format");
+                        DEB_CRITICAL("Wrong attachment format");
                         std::exit(1);
                         break;
                 }
@@ -299,7 +299,7 @@ void Framebuffer::build() {
                                 specification.width, specification.height, i);
                         break;
                     default:
-                        SPDLOG_CRITICAL("Wrong attachment format");
+                        DEB_CRITICAL("Wrong attachment format");
                         std::exit(1);
                         break;
                 }
@@ -337,7 +337,7 @@ void Framebuffer::build() {
                                 specification.height, specification.white_border_for_depth_texture);
                         break;
                     default:
-                        SPDLOG_CRITICAL("Wrong attachment format");
+                        DEB_CRITICAL("Wrong attachment format");
                         std::exit(1);
                         break;
                 }
@@ -367,7 +367,7 @@ void Framebuffer::build() {
                                 specification.width, specification.height);
                         break;
                     default:
-                        SPDLOG_CRITICAL("Wrong attachment format");
+                        DEB_CRITICAL("Wrong attachment format");
                         std::exit(1);
                         break;
                 }

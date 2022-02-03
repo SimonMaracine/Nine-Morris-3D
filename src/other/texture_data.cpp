@@ -7,7 +7,7 @@
 #include "other/logging.h"
 
 TextureData::TextureData(const std::string& file_path, bool flip) {
-    SPDLOG_DEBUG("Loading texture '{}'...", file_path.c_str());
+    DEB_DEBUG("Loading texture '{}'...", file_path.c_str());
 
     stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
@@ -26,5 +26,5 @@ TextureData::~TextureData() {
 
     stbi_image_free(data);
 
-    SPDLOG_DEBUG("Freed texture memory '{}'", file_path.c_str());
+    DEB_DEBUG("Freed texture memory '{}'", file_path.c_str());
 }

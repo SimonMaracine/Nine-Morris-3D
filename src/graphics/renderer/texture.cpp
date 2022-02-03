@@ -38,17 +38,17 @@ static std::string get_name_texture3d(const char* file_path) {
 
 Texture::Texture(GLuint texture, int width, int height, const std::string& name)
     : texture(texture), width(width), height(height), name(name) {
-    SPDLOG_DEBUG("Created texture {} ({})", texture, name.c_str());
+    DEB_DEBUG("Created texture {} ({})", texture, name.c_str());
 }
 
 Texture::~Texture() {
     glDeleteTextures(1, &texture);
 
-    SPDLOG_DEBUG("Deleted texture {} ({})", texture, name.c_str());
+    DEB_DEBUG("Deleted texture {} ({})", texture, name.c_str());
 }
 
 std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipmapping, float bias) {
-    SPDLOG_DEBUG("Loading texture '{}'...", file_path.c_str());
+    DEB_DEBUG("Loading texture '{}'...", file_path.c_str());
 
     stbi_set_flip_vertically_on_load(1);
 
@@ -135,13 +135,13 @@ void Texture::unbind() {
 
 Texture3D::Texture3D(GLuint texture, const std::string& name)
     : texture(texture), name(name) {
-    SPDLOG_DEBUG("Created 3D texture {} ({})", texture, name.c_str());
+    DEB_DEBUG("Created 3D texture {} ({})", texture, name.c_str());
 }
 
 Texture3D::~Texture3D() {
     glDeleteTextures(1, &texture);
 
-    SPDLOG_DEBUG("Deleted 3D texture {} ({})", texture, name.c_str());
+    DEB_DEBUG("Deleted 3D texture {} ({})", texture, name.c_str());
 }
 
 std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
@@ -161,7 +161,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
     stbi_uc* data;
 
     for (unsigned int i = 0; i < 6; i++) {
-        SPDLOG_DEBUG("Loading texture '{}'...", file_paths[i]);
+        DEB_DEBUG("Loading texture '{}'...", file_paths[i]);
 
         data = stbi_load(file_paths[i], &width, &height, &channels, 4);
 

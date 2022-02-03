@@ -11,13 +11,13 @@
 
 VertexArray::VertexArray(GLuint array)
     : array(array) {
-    SPDLOG_DEBUG("Created vertex array {}", array);
+    DEB_DEBUG("Created vertex array {}", array);
 }
 
 VertexArray::~VertexArray() {
     glDeleteVertexArrays(1, &array);
 
-    SPDLOG_DEBUG("Deleted vertex array {}", array);
+    DEB_DEBUG("Deleted vertex array {}", array);
 }
 
 std::shared_ptr<VertexArray> VertexArray::create() {

@@ -19,6 +19,12 @@
     #define REL_CRITICAL(...) spdlog::critical(__VA_ARGS__)
 #endif
 
+#define DEB_DEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
+#define DEB_INFO(...) SPDLOG_INFO(__VA_ARGS__)
+#define DEB_WARN(...) SPDLOG_WARN(__VA_ARGS__)
+#define DEB_ERROR(...) SPDLOG_ERROR(__VA_ARGS__)
+#define DEB_CRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+
 namespace logging {
     extern std::shared_ptr<spdlog::logger> release_logger;
 
