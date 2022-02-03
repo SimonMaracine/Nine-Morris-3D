@@ -380,7 +380,6 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
         ImGui::End();
         ImGui::PopFont();
-        HOVERING_GUI();
     }
 
 #ifndef NDEBUG
