@@ -247,6 +247,18 @@ void ImGuiLayer::on_update(float dt) {
                     DEB_INFO("Set default cursor");
                 }
             }
+            if (ImGui::BeginMenu("Camera Sensitivity", true)) {
+                ImGui::PushItemWidth(100.0f);
+                if (ImGui::SliderFloat("", &app->options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
+                    scene->camera.sensitivity = app->options.sensitivity;
+
+                    DEB_INFO("Changed camera sensitivity to {}", scene->camera.sensitivity);
+                }
+                ImGui::PopItemWidth();
+
+                ImGui::EndMenu();
+                HOVERING_GUI();
+            }
 
             ImGui::EndMenu();
             HOVERING_GUI();

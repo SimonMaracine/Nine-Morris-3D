@@ -69,6 +69,7 @@ namespace options {
         bool save_on_exit;
         std::string skybox;
         bool custom_cursor;
+        float sensitivity;
 
         try {
             texture_quality = object.at("texture_quality").get<std::string>();
@@ -77,6 +78,7 @@ namespace options {
             save_on_exit = object.at("save_on_exit").get<bool>();
             skybox = object.at("skybox").get<std::string>();
             custom_cursor = object.at("custom_cursor").get<bool>();
+            sensitivity = object.at("sensitivity").get<float>();
         } catch (const json::out_of_range& e) {
             REL_ERROR("{}", e.what());
             return;
@@ -97,12 +99,18 @@ namespace options {
             return;
         }
 
+        if (sensitivity < 0.5f || sensitivity > 2.0f) {
+            REL_ERROR("Options file is wrong: sensitivity");
+            return;
+        }
+
         options.texture_quality = texture_quality;
         options.samples = samples;
         options.vsync = vsync;
         options.save_on_exit = save_on_exit;
         options.skybox = skybox;
         options.custom_cursor = custom_cursor;
+        options.sensitivity = sensitivity;
 
         DEB_INFO("Loaded options from file '{}'", file_path.c_str());
     }
@@ -155,6 +163,7 @@ namespace options {
         object["save_on_exit"] = options.save_on_exit;
         object["skybox"] = options.skybox;
         object["custom_cursor"] = options.custom_cursor;
+        object["sensitivity"] = options.sensitivity;
 
         file << std::setw(4) << object;
 
@@ -185,6 +194,7 @@ namespace options {
         object["save_on_exit"] = options.save_on_exit;
         object["skybox"] = options.skybox;
         object["custom_cursor"] = options.custom_cursor;
+        object["sensitivity"] = options.sensitivity;
 
         file << object.dump(4);
 

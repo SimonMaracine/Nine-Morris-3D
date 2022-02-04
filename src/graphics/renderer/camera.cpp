@@ -7,8 +7,10 @@
 #include "application/input.h"
 #include "other/logging.h"
 
-Camera::Camera(float pitch, const glm::vec3& point, float distance_to_point, const glm::mat4& projection_matrix)
-    : pitch(pitch), point(point), distance_to_point(distance_to_point), projection_matrix(projection_matrix) {
+Camera::Camera(float pitch, const glm::vec3& point, float distance_to_point, const glm::mat4& projection_matrix,
+        float sensitivity)
+    : pitch(pitch), point(point), distance_to_point(distance_to_point), projection_matrix(projection_matrix),
+      sensitivity(sensitivity) {
 
 }
 
@@ -28,7 +30,7 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
         zoom_velocity += ZOOM_SPEED;
     }
 
-    zoom += zoom_velocity * dt;
+    zoom += zoom_velocity * sensitivity * dt;
 
     // Limit zoom
     zoom = std::max(zoom, 5.0f);
@@ -51,8 +53,8 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
         x_velocity += MOVE_SPEED;
     }
 
-    pitch += y_velocity * dt;
-    angle_around_point += x_velocity * dt;
+    pitch += y_velocity * sensitivity * dt;
+    angle_around_point += x_velocity * sensitivity * dt;
 
     // Limit pitch
     pitch = std::min(pitch, 90.0f);

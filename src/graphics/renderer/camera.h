@@ -9,7 +9,8 @@ constexpr float FAR = 70.0f;
 class Camera {
 public:
     Camera() = default;
-    Camera(float pitch, const glm::vec3& point, float distance_to_point, const glm::mat4& projection_matrix);
+    Camera(float pitch, const glm::vec3& point, float distance_to_point, const glm::mat4& projection_matrix,
+            float sensitivity);
     ~Camera() = default;
 
     void update(float mouse_wheel, float dx, float dy, float dt);
@@ -32,4 +33,6 @@ public:
     float x_velocity = 0.0f;
     float y_velocity = 0.0f;
     float zoom_velocity = 0.0f;
+
+    float sensitivity = 1.0f;  // From 0.5 to 2.0
 };

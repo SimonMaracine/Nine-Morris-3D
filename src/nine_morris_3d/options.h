@@ -10,12 +10,14 @@ namespace options {
     static constexpr const char* AUTUMN = "autumn";
 
     struct Options {
-        std::string texture_quality = NORMAL;  // These are default values
+        // These are default values
+        std::string texture_quality = NORMAL;
         int samples = 2;
         bool vsync = true;
         bool save_on_exit = true;
         std::string skybox = FIELD;
         bool custom_cursor = true;
+        float sensitivity = 1.0f;
     };
 
     void load_options_from_file(Options& options);

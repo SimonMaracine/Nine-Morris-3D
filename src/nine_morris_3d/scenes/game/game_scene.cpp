@@ -274,7 +274,8 @@ void GameScene::build_camera() {
         47.0f,
         glm::vec3(0.0f),
         8.0f,
-        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
+        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR),
+        app->options.sensitivity
     );
 
     DEB_DEBUG("Built camera");
