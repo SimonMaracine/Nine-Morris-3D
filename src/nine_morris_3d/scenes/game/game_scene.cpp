@@ -272,9 +272,9 @@ void GameScene::build_node(unsigned int index, const glm::vec3& position) {
 void GameScene::build_camera() {
     camera = Camera(
         47.0f,
-        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR),
         glm::vec3(0.0f),
-        8.0f
+        8.0f,
+        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
     );
 
     DEB_DEBUG("Built camera");

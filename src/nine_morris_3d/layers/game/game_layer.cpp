@@ -85,6 +85,12 @@ void GameLayer::on_update(float dt) {
     dy = 0.0f;
 }
 
+void GameLayer::on_fixed_update() {
+    if (!imgui_layer->hovering_gui) {
+        scene->camera.update_friction();
+    }
+}
+
 void GameLayer::on_draw() {
     setup_shadows();
     setup_quad3d_projection_view();

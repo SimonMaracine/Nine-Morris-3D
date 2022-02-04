@@ -24,6 +24,7 @@ public:
     virtual void on_detach() override;
     virtual void on_bind_layers() override;
     virtual void on_update(float dt) override;
+    virtual void on_fixed_update() override;
     virtual void on_draw() override;
     virtual void on_event(events::Event& event) override;
 

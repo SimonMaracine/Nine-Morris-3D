@@ -50,6 +50,7 @@ public:
 private:
     void on_event(events::Event& event);
     float update_frame_counter();
+    unsigned int calculate_fixed_update();
 
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);

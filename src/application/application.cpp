@@ -77,13 +77,15 @@ void Application::run() {
 
     DEB_INFO("Initialized game");
 
-    float dt = 0.0f;
-
     while (running) {
-        dt = update_frame_counter();
+        float dt = update_frame_counter();
+        unsigned int fixed_updates = calculate_fixed_update();
 
         for (Layer* layer : current_scene->layer_stack) {
             if (layer->active) {
+                for (unsigned int i = 0; i < fixed_updates; i++) {
+                    layer->on_fixed_update();
+                }
                 layer->on_update(dt);
                 layer->on_draw();
             }
@@ -204,6 +206,32 @@ float Application::update_frame_counter() {
     const double delta_time = std::min(elapsed_seconds, MAX_DT);
 
     return static_cast<float>(delta_time);
+}
+
+unsigned int Application::calculate_fixed_update() {
+    constexpr double FIXED_DT = 1.0 / 50.0;
+
+    static double previous_seconds = window->get_time();
+    static double total_time = 0.0;
+
+    const double current_seconds = window->get_time();
+    const double elapsed_seconds = current_seconds - previous_seconds;
+    previous_seconds = current_seconds;
+
+    total_time += elapsed_seconds;
+
+    unsigned int updates = 0;
+
+    while (true) {
+        if (total_time > FIXED_DT) {
+            total_time -= FIXED_DT;
+            updates++;
+        } else {
+            break;
+        }
+    }
+
+    return updates;
 }
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {
