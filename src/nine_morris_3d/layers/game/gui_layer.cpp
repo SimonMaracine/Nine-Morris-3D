@@ -13,18 +13,6 @@
 #include "other/logging.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 
-void GuiLayer::on_attach() {
-
-}
-
-void GuiLayer::on_detach() {
-
-}
-
-void GuiLayer::on_bind_layers() {
-
-}
-
 void GuiLayer::on_update(float dt) {
     scene->turn_indicator.update(app->data.width, app->data.height);
     scene->timer.update(app->window->get_time());
@@ -33,10 +21,6 @@ void GuiLayer::on_update(float dt) {
 void GuiLayer::on_draw() {
     render_turn_indicator();
     render_timer();
-}
-
-void GuiLayer::on_event(events::Event& event) {
-
 }
 
 void GuiLayer::render_turn_indicator() {

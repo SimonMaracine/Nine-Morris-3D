@@ -466,10 +466,6 @@ void ImGuiLayer::on_update(float dt) {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGuiLayer::on_draw() {
-
-}
-
 void ImGuiLayer::on_event(events::Event& event) {
     using namespace events;
 

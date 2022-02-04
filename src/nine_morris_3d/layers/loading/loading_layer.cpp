@@ -47,10 +47,6 @@ void LoadingLayer::on_detach() {
     renderer::enable_stencil();
 }
 
-void LoadingLayer::on_bind_layers() {
-
-}
-
 void LoadingLayer::on_update(float dt) {
     if (loader->done_loading()) {
         app->change_scene(0);
