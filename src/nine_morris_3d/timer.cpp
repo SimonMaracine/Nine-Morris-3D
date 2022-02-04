@@ -10,15 +10,20 @@ void Timer::update(double time) {
 
         total_time += elapsed_time;
 
-        if (total_time > 0.1) {
-            this->time++;
-            total_time = 0.0;
+        while (true) {
+            if (total_time > 0.1) {
+                total_time -= 0.1;
+                this->time++;
+            } else {
+                break;
+            }
         }
     }
 }
 
-void Timer::start() {
+void Timer::start(double time) {
     running = true;
+    last_time = time;
 
     DEB_DEBUG("Started timer");
 }

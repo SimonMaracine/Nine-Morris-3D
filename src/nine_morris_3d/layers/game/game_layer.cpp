@@ -187,14 +187,14 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                     bool taked = scene->board.take_piece(scene->hovered_id);
 
                     if (taked && !first_move) {
-                        scene->timer.start();
+                        scene->timer.start(app->window->get_time());
                         first_move = true;
                     }
                 } else {
                     bool placed = scene->board.place_piece(scene->hovered_id);
 
                     if (placed && !first_move) {
-                        scene->timer.start();
+                        scene->timer.start(app->window->get_time());
                         first_move = true;
                     }
                 }
@@ -203,7 +203,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                     bool taked = scene->board.take_piece(scene->hovered_id);
 
                     if (taked && !first_move) {
-                        scene->timer.start();
+                        scene->timer.start(app->window->get_time());
                         first_move = true;
                     }
                 } else {
@@ -211,7 +211,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                     bool put = scene->board.put_piece(scene->hovered_id);
 
                     if (put && !first_move) {
-                        scene->timer.start();
+                        scene->timer.start(app->window->get_time());
                         first_move = true;
                     }
                 }
