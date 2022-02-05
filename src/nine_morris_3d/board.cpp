@@ -112,7 +112,7 @@ void Board::move_pieces(float dt) {
                     piece->position += piece->movement.velocity * dt + (piece->movement.target - piece->position)
                             * PIECE_VARIABLE_VELOCITY * dt;
 
-                    if (glm::length(piece->movement.target - piece->position) < 0.01f) {
+                    if (glm::length(piece->movement.target - piece->position) < 0.03f) {
                         arrive_at_node(piece);
                     }
 
@@ -131,20 +131,20 @@ void Board::move_pieces(float dt) {
                     }
 
                     if (!piece->movement.reached_target0 &&
-                            glm::length(piece->movement.target0 - piece->position) < 0.01f) {
+                            glm::length(piece->movement.target0 - piece->position) < 0.03f) {
                         piece->movement.reached_target0 = true;
                         piece->position = piece->movement.target0;
                         piece->movement.velocity = glm::normalize(piece->movement.target1 - piece->position)
                                 * PIECE_BASE_VELOCITY;
                     } else if (!piece->movement.reached_target1 &&
-                            glm::length(piece->movement.target1 - piece->position) < 0.01f) {
+                            glm::length(piece->movement.target1 - piece->position) < 0.03f) {
                         piece->movement.reached_target1 = true;
                         piece->position = piece->movement.target1;
                         piece->movement.velocity = glm::normalize(piece->movement.target - piece->position)
                                 * PIECE_BASE_VELOCITY;
                     }
 
-                    if (glm::length(piece->movement.target - piece->position) < 0.01f) {
+                    if (glm::length(piece->movement.target - piece->position) < 0.03f) {
                         arrive_at_node(piece);
                     }
 

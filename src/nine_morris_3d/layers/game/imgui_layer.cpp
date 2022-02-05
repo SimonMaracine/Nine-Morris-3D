@@ -154,16 +154,71 @@ void ImGuiLayer::on_update(float dt) {
             HOVERING_GUI();
         }
         if (ImGui::BeginMenu("Options")) {
-            if (ImGui::MenuItem("VSync", nullptr, &app->options.vsync)) {
-                if (app->options.vsync) {
-                    app->window->set_vsync(app->options.vsync);
+            if (ImGui::BeginMenu("Graphics")) {
+                if (ImGui::MenuItem("VSync", nullptr, &app->options.vsync)) {
+                    if (app->options.vsync) {
+                        app->window->set_vsync(app->options.vsync);
 
-                    DEB_INFO("VSync enabled");
-                } else {
-                    app->window->set_vsync(app->options.vsync);
+                        DEB_INFO("VSync enabled");
+                    } else {
+                        app->window->set_vsync(app->options.vsync);
 
-                    DEB_INFO("VSync disabled");
+                        DEB_INFO("VSync disabled");
+                    }
                 }
+                if (ImGui::BeginMenu("Anti-Aliasing", true)) {
+                    if (ImGui::RadioButton("No Anti-Aliasing", &app->options.samples, 1)) {
+                        game_layer->set_scene_framebuffer(app->options.samples);
+
+                        DEB_INFO("Anti-aliasing disabled");
+                    }
+                    if (ImGui::RadioButton("2x", &app->options.samples, 2)) {
+                        game_layer->set_scene_framebuffer(app->options.samples);
+
+                        DEB_INFO("2x anti-aliasing");
+                    }
+                    if (ImGui::RadioButton("4x", &app->options.samples, 4)) {
+                        game_layer->set_scene_framebuffer(app->options.samples);
+
+                        DEB_INFO("4x anti-aliasing");
+                    }
+
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Texture Quality", true)) {
+                    static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
+                    if (ImGui::RadioButton("Normal", &quality, 0)) {
+                        game_layer->set_textures_quality(options::NORMAL);
+                        app->options.texture_quality = options::NORMAL;
+
+                        DEB_INFO("Textures set to {} quality", options::NORMAL);
+                    }
+                    if (ImGui::RadioButton("Low", &quality, 1)) {
+                        game_layer->set_textures_quality(options::LOW);
+                        app->options.texture_quality = options::LOW;
+
+                        DEB_INFO("Textures set to {} quality", options::LOW);
+                    }
+
+                    ImGui::EndMenu();
+                }
+                if (ImGui::MenuItem("Custom Cursor", nullptr, &app->options.custom_cursor)) {
+                    if (app->options.custom_cursor) {
+                        if (scene->board.should_take_piece) {
+                            app->window->set_custom_cursor(CustomCursor::Cross);
+                        } else {
+                            app->window->set_custom_cursor(CustomCursor::Arrow);
+                        }
+
+                        DEB_INFO("Set custom cursor");
+                    } else {
+                        app->window->set_custom_cursor(CustomCursor::None);
+
+                        DEB_INFO("Set default cursor");
+                    }
+                }
+
+                ImGui::EndMenu();
             }
             if (ImGui::MenuItem("Save On Exit", nullptr, &app->options.save_on_exit)) {
                 if (app->options.save_on_exit) {
@@ -171,42 +226,6 @@ void ImGuiLayer::on_update(float dt) {
                 } else {
                     DEB_INFO("The game will not be saved on exit");
                 }
-            }
-            if (ImGui::BeginMenu("Anti-Aliasing", true)) {
-                if (ImGui::RadioButton("No Anti-Aliasing", &app->options.samples, 1)) {
-                    game_layer->set_scene_framebuffer(app->options.samples);
-
-                    DEB_INFO("Anti-aliasing disabled");
-                }
-                if (ImGui::RadioButton("2x", &app->options.samples, 2)) {
-                    game_layer->set_scene_framebuffer(app->options.samples);
-
-                    DEB_INFO("2x anti-aliasing");
-                }
-                if (ImGui::RadioButton("4x", &app->options.samples, 4)) {
-                    game_layer->set_scene_framebuffer(app->options.samples);
-
-                    DEB_INFO("4x anti-aliasing");
-                }
-
-                ImGui::EndMenu();
-            }
-            if (ImGui::BeginMenu("Texture Quality", true)) {
-                static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
-                if (ImGui::RadioButton("Normal", &quality, 0)) {
-                    game_layer->set_textures_quality(options::NORMAL);
-                    app->options.texture_quality = options::NORMAL;
-
-                    DEB_INFO("Textures set to {} quality", options::NORMAL);
-                }
-                if (ImGui::RadioButton("Low", &quality, 1)) {
-                    game_layer->set_textures_quality(options::LOW);
-                    app->options.texture_quality = options::LOW;
-
-                    DEB_INFO("Textures set to {} quality", options::LOW);
-                }
-
-                ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Skybox", true)) {
                 static int skybox = app->options.skybox == options::FIELD ? 0 : 1;
@@ -230,21 +249,6 @@ void ImGuiLayer::on_update(float dt) {
                     DEB_INFO("Show info");
                 } else {
                     DEB_INFO("Hide info");
-                }
-            }
-            if (ImGui::MenuItem("Custom Cursor", nullptr, &app->options.custom_cursor)) {
-                if (app->options.custom_cursor) {
-                    if (scene->board.should_take_piece) {
-                        app->window->set_custom_cursor(CustomCursor::Cross);
-                    } else {
-                        app->window->set_custom_cursor(CustomCursor::Arrow);
-                    }
-
-                    DEB_INFO("Set custom cursor");
-                } else {
-                    app->window->set_custom_cursor(CustomCursor::None);
-
-                    DEB_INFO("Set default cursor");
                 }
             }
             if (ImGui::BeginMenu("Camera Sensitivity", true)) {
