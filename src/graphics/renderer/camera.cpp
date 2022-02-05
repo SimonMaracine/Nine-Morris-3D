@@ -7,11 +7,10 @@
 #include "application/input.h"
 #include "other/logging.h"
 
-Camera::Camera(float pitch, const glm::vec3& point, float distance_to_point, const glm::mat4& projection_matrix,
-        float sensitivity)
-    : pitch(pitch), point(point), distance_to_point(distance_to_point), projection_matrix(projection_matrix),
-      sensitivity(sensitivity) {
-
+Camera::Camera(float sensitivity, float pitch, const glm::vec3& point, float distance_to_point,
+        const glm::mat4& projection_matrix)
+    : sensitivity(sensitivity), pitch(pitch), point(point), distance_to_point(distance_to_point),
+      projection_matrix(projection_matrix) {
 }
 
 void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
@@ -93,4 +92,8 @@ void Camera::update_friction() {
 void Camera::update_projection(float width, float height) {
     projection_matrix = glm::perspective(glm::radians(FOV), width / height, NEAR, FAR);
     projection_view_matrix = projection_matrix * view_matrix;
+}
+
+void Camera::set_position(const glm::vec3& position) {
+
 }

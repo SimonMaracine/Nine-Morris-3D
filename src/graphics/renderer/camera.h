@@ -9,14 +9,27 @@ constexpr float FAR = 70.0f;
 class Camera {
 public:
     Camera() = default;
-    Camera(float pitch, const glm::vec3& point, float distance_to_point, const glm::mat4& projection_matrix,
-            float sensitivity);
+    Camera(float sensitivity, float pitch, const glm::vec3& point, float distance_to_point,
+            const glm::mat4& projection_matrix);
     ~Camera() = default;
 
     void update(float mouse_wheel, float dx, float dy, float dt);
     void update_friction();
     void update_projection(float width, float height);
+    void set_position(const glm::vec3& position);
 
+    const glm::vec3& get_position() const { return position; }
+    float get_pitch() const { return pitch; }
+    float get_yaw() const { return yaw; }
+    const glm::vec3& get_point() const { return point; }
+    float get_distance_to_point() const { return distance_to_point; }
+    float get_angle_around_point() const { return angle_around_point; }
+    const glm::mat4& get_view_matrix() const { return view_matrix; }
+    const glm::mat4& get_projection_matrix() const { return projection_matrix; }
+    const glm::mat4& get_projection_view_matrix() const { return projection_view_matrix; }
+
+    float sensitivity = 1.0f;  // From 0.5 to 2.0
+private:
     glm::vec3 position = glm::vec3(0.0f);
 
     float pitch = 0.0f;
@@ -34,5 +47,6 @@ public:
     float y_velocity = 0.0f;
     float zoom_velocity = 0.0f;
 
-    float sensitivity = 1.0f;  // From 0.5 to 2.0
+    template<typename Archive>
+    friend void serialize(Archive& archive, Camera& camera);
 };

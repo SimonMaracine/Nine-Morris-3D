@@ -76,9 +76,10 @@ void serialize(Archive& archive, Node& node) {
 
 template<typename Archive>
 void serialize(Archive& archive, Camera& camera) {
-    archive(camera.position, camera.pitch, camera.yaw, camera.view_matrix, camera.projection_matrix,
-            camera.projection_view_matrix, camera.point, camera.distance_to_point,
-            camera.angle_around_point, camera.x_velocity, camera.y_velocity, camera.zoom_velocity);
+    archive(camera.sensitivity, camera.position, camera.pitch, camera.yaw, camera.view_matrix,
+            camera.projection_matrix, camera.projection_view_matrix, camera.point,
+            camera.distance_to_point, camera.angle_around_point, camera.x_velocity,
+            camera.y_velocity, camera.zoom_velocity);
 }
 
 namespace glm {

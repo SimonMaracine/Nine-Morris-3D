@@ -110,7 +110,7 @@ void GameLayer::on_draw() {
 
     renderer::bind_texture(app->storage->depth_map_framebuffer->get_depth_attachment(), 1);
 
-    renderer::load_projection_view(scene->camera.projection_view_matrix);
+    renderer::load_projection_view(scene->camera.get_projection_view_matrix());
     setup_camera();
     render_skybox();
     renderer::draw_board(scene->board);
@@ -235,8 +235,8 @@ bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
 }
 
 void GameLayer::render_skybox() {
-    const glm::mat4& projection_matrix = scene->camera.projection_matrix;
-    const glm::mat4 view_matrix (glm::mat3(scene->camera.view_matrix));
+    const glm::mat4& projection_matrix = scene->camera.get_projection_matrix();
+    const glm::mat4 view_matrix = glm::mat4(glm::mat3(scene->camera.get_view_matrix()));
 
     renderer::draw_skybox(projection_matrix * view_matrix);
 }
@@ -247,32 +247,32 @@ void GameLayer::setup_light() {
     app->storage->board_shader->set_uniform_vec3("u_light.ambient", scene->light.ambient_color);
     app->storage->board_shader->set_uniform_vec3("u_light.diffuse", scene->light.diffuse_color);
     app->storage->board_shader->set_uniform_vec3("u_light.specular", scene->light.specular_color);
-    app->storage->board_shader->set_uniform_vec3("u_view_position", scene->camera.position);
+    app->storage->board_shader->set_uniform_vec3("u_view_position", scene->camera.get_position());
 
     app->storage->board_paint_shader->bind();
     app->storage->board_paint_shader->set_uniform_vec3("u_light.position", scene->light.position);
     app->storage->board_paint_shader->set_uniform_vec3("u_light.ambient", scene->light.ambient_color);
     app->storage->board_paint_shader->set_uniform_vec3("u_light.diffuse", scene->light.diffuse_color);
     app->storage->board_paint_shader->set_uniform_vec3("u_light.specular", scene->light.specular_color);
-    app->storage->board_paint_shader->set_uniform_vec3("u_view_position", scene->camera.position);
+    app->storage->board_paint_shader->set_uniform_vec3("u_view_position", scene->camera.get_position());
 
     app->storage->piece_shader->bind();
     app->storage->piece_shader->set_uniform_vec3("u_light.position", scene->light.position);
     app->storage->piece_shader->set_uniform_vec3("u_light.ambient", scene->light.ambient_color);
     app->storage->piece_shader->set_uniform_vec3("u_light.diffuse", scene->light.diffuse_color);
     app->storage->piece_shader->set_uniform_vec3("u_light.specular", scene->light.specular_color);
-    app->storage->piece_shader->set_uniform_vec3("u_view_position", scene->camera.position);
+    app->storage->piece_shader->set_uniform_vec3("u_view_position", scene->camera.get_position());
 }
 
 void GameLayer::setup_camera() {
     app->storage->board_shader->bind();
-    app->storage->board_shader->set_uniform_vec3("u_view_position", scene->camera.position);
+    app->storage->board_shader->set_uniform_vec3("u_view_position", scene->camera.get_position());
 
     app->storage->board_paint_shader->bind();
-    app->storage->board_paint_shader->set_uniform_vec3("u_view_position", scene->camera.position);
+    app->storage->board_paint_shader->set_uniform_vec3("u_view_position", scene->camera.get_position());
 
     app->storage->piece_shader->bind();
-    app->storage->piece_shader->set_uniform_vec3("u_view_position", scene->camera.position);
+    app->storage->piece_shader->set_uniform_vec3("u_view_position", scene->camera.get_position());
 }
 
 void GameLayer::setup_board() {
@@ -301,8 +301,8 @@ void GameLayer::render_pieces() {
         return piece->active;
     };
     const auto sort = [this](const Piece* lhs, const Piece* rhs) {
-        const float distance1 = glm::length(scene->camera.position - lhs->position);
-        const float distance2 = glm::length(scene->camera.position - rhs->position);
+        const float distance1 = glm::length(scene->camera.get_position() - lhs->position);
+        const float distance2 = glm::length(scene->camera.get_position() - rhs->position);
         return distance1 > distance2;
     };
 
@@ -379,8 +379,8 @@ void GameLayer::setup_shadows() {
 
 void GameLayer::setup_quad3d_projection_view() {
     app->storage->quad3d_shader->bind();
-    app->storage->quad3d_shader->set_uniform_matrix("u_projection_matrix", scene->camera.projection_matrix);
-    app->storage->quad3d_shader->set_uniform_matrix("u_view_matrix", scene->camera.view_matrix);
+    app->storage->quad3d_shader->set_uniform_matrix("u_projection_matrix", scene->camera.get_projection_matrix());
+    app->storage->quad3d_shader->set_uniform_matrix("u_view_matrix", scene->camera.get_view_matrix());
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {
