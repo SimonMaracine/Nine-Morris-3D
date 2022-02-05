@@ -166,8 +166,7 @@ namespace save_load {
         std::ifstream file (file_path, std::ios::binary);
 
         if (!file.is_open()) {
-            std::string message = "Could not open the last game file ";
-            message.append("'").append(SAVE_GAME_FILE).append("'");
+            std::string message = "Could not open last save game file '" + std::string(SAVE_GAME_FILE) + "'";
             throw std::runtime_error(message);
         }
 
@@ -175,18 +174,31 @@ namespace save_load {
             cereal::BinaryInputArchive input{file};
             input(game_state);
         } catch (const cereal::Exception& e) {
-            REL_ERROR("Error reading save game file: {}", e.what());
+            REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
+            delete_save_file(SAVE_GAME_FILE);
             return;
+        } catch (const std::exception& e) {
+            REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
+            delete_save_file(SAVE_GAME_FILE);
+            throw;
         }
 
         DEB_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
+    }
+
+    void delete_save_file(const std::string& file_path) {
+        if (remove(file_path.c_str()) != 0) {
+            REL_INFO("Could not delete save game file '{}'", file_path.c_str());
+        } else {
+            DEB_INFO("Deleted save game file '{}'", file_path.c_str());
+        }
     }
 
     bool save_files_exist() {
         if (file_exists(SAVE_GAME_FILE)) {
             return true;
         } else {
-            DEB_ERROR("Save file is either missing or is inaccessible: '{}'", SAVE_GAME_FILE);
+            DEB_ERROR("Save game file is either missing or is inaccessible: '{}'", SAVE_GAME_FILE);
             return false;
         }
     }

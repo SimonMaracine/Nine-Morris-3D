@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <memory>
 #include <string>
 
 #include "graphics/renderer/camera.h"
@@ -23,5 +21,6 @@ namespace save_load {
     void save_game(const GameState& game_state);
     void load_game(GameState& game_state);
 
+    void delete_save_file(const std::string& file_path);
     bool save_files_exist();
 }

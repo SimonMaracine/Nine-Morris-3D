@@ -124,7 +124,7 @@ namespace options {
             return;
         }
 
-        std::ofstream file (file_path.c_str(), std::ios::trunc);
+        std::ofstream file (file_path, std::ios::trunc);
 
         if (!file.is_open()) {
             REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
@@ -179,7 +179,7 @@ namespace options {
             return;
         }
 
-        std::ofstream file (file_path.c_str());
+        std::ofstream file (file_path);
 
         if (!file.is_open()) {
             REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
