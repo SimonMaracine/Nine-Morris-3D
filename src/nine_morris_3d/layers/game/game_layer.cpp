@@ -83,6 +83,12 @@ void GameLayer::on_update(float dt) {
     mouse_wheel = 0.0f;
     dx = 0.0f;
     dy = 0.0f;
+
+    if (input::is_key_pressed(KEY_Q)) {
+        scene->camera.set_position(last_camera_position);
+    } else if (input::is_key_pressed(KEY_C)) {
+        last_camera_position = scene->camera.get_position();
+    }
 }
 
 void GameLayer::on_fixed_update() {

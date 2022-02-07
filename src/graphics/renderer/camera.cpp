@@ -95,5 +95,22 @@ void Camera::update_projection(float width, float height) {
 }
 
 void Camera::set_position(const glm::vec3& position) {
+    this->position = position;
 
+    // Calculate distance to point
+    distance_to_point = glm::length(position - point);
+
+    // Calculate matrices
+    view_matrix = glm::lookAt(position, point, glm::vec3(0.0f, 1.0f, 0.0f));
+    projection_view_matrix = projection_matrix * view_matrix;
+
+    // Calculate yaw, pitch and angle_around_point
+    const glm::vec3 direction = glm::vec3(glm::inverse(view_matrix)[2]);
+    // const glm::vec3 direction = glm::vec3(view_matrix[2]);
+    yaw = glm::degrees(glm::atan(-direction.z, direction.x));
+    pitch = glm::degrees(glm::asin(direction.y));
+
+    angle_around_point = 180.0f - yaw;
+
+    DEB_DEBUG("Pitch: {}, Yaw: {}, Angle around point: {}", pitch, yaw, angle_around_point);
 }

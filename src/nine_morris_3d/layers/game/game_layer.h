@@ -59,6 +59,8 @@ public:
 
     bool first_move = false;
 
+    glm::vec3 last_camera_position = glm::vec3(0.0f);
+
     GameScene* scene = nullptr;
 
     ImGuiLayer* imgui_layer = nullptr;

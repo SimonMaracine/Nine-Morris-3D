@@ -475,6 +475,13 @@ void ImGuiLayer::on_update(float dt) {
             app->storage->text_shader->recompile();
         }
         ImGui::End();
+
+        ImGui::Begin("Camera Debug");
+        ImGui::Text("Pitch: %f", scene->camera.get_pitch());
+        ImGui::Text("Yaw: %f", scene->camera.get_yaw());
+        ImGui::Text("Angle around point: %f", scene->camera.get_angle_around_point());
+        ImGui::Text("Distance to point: %f", scene->camera.get_distance_to_point());
+        ImGui::End();
     }
 #endif
 
