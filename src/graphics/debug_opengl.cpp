@@ -142,7 +142,7 @@ namespace debug_opengl {
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION,
                 0, nullptr, GL_FALSE);
-        REL_INFO("OpenGL message callback is set");
+        DEB_INFO("OpenGL message callback is set");
 #endif
     }
 
@@ -153,7 +153,7 @@ namespace debug_opengl {
         output.append("\n*** OpenGL Version And Driver Information ***\n");
 
         {
-            char line[100];  // 100 should be enough
+            char line[128];  // 128 should be enough
             sprintf(line, "OpenGL version: %s\n", glGetString(GL_VERSION));
             output.append(line);
             sprintf(line, "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
@@ -171,7 +171,7 @@ namespace debug_opengl {
             GLint result;
             glGetIntegerv(parameters[i], &result);
 
-            char line[100];
+            char line[128];
             sprintf(line, "%s %i\n", names[i], result);
             output.append(line);
         }
@@ -179,7 +179,7 @@ namespace debug_opengl {
             GLint result[2];
             glGetIntegerv(parameters[10], result);
 
-            char line[100];
+            char line[128];
             sprintf(line, "%s %i %i\n", names[10], result[0], result[1]);
             output.append(line);
         }
@@ -187,7 +187,7 @@ namespace debug_opengl {
             GLboolean result;
             glGetBooleanv(parameters[11], &result);
 
-            char line[100];
+            char line[128];
             sprintf(line, "%s %u\n", names[11], (unsigned int) result);
             output.append(line);
         }
@@ -197,13 +197,13 @@ namespace debug_opengl {
 
 #if defined(__GNUG__)
         {
-            char line[100];
+            char line[128];
             sprintf(line, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
             output.append(line);
         }
 #elif defined(_MSC_VER)
         {
-            char line[100];
+            char line[128];
             sprintf(line, "MSVC version: %d\n", _MSC_VER);
             output.append(line);
         }
@@ -211,67 +211,67 @@ namespace debug_opengl {
     #error "GCC or MSVC must be used (for now)"
 #endif
         {
-            char line[100];
+            char line[128];
             sprintf(line, "GLFW version: %s\n", glfwGetVersionString());
             output.append(line);
         }
         {
-            char line[100];
+            char line[128];
             sprintf(line, "Dear ImGui version: %s\n", ImGui::GetVersion());
             output.append(line);
         }
         {
-            char line[100];
+            char line[128];
             sprintf(line, "Assimp version: %d.%d.%d\n", aiGetVersionMajor(),
                     aiGetVersionMinor(), aiGetVersionPatch());
             output.append(line);
         }
         {
-            char line[100];
+            char line[128];
             sprintf(line, "GLM version: %d.%d.%d\n", GLM_VERSION_MAJOR, GLM_VERSION_MINOR,
                     GLM_VERSION_PATCH);
             output.append(line);
         }
         {
-            char line[100];
+            char line[128];
             sprintf(line, "spdlog version: %d.%d.%d\n", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR,
                     SPDLOG_VER_PATCH);
             output.append(line);
         }
         {
-            char line[100];
+            char line[128];
             sprintf(line, "json version: %d.%d.%d\n", NLOHMANN_JSON_VERSION_MAJOR,
                     NLOHMANN_JSON_VERSION_MINOR, NLOHMANN_JSON_VERSION_PATCH);
             output.append(line);
         }
         {
-            char line[100];
+            char line[128];
             sprintf(line, "cereal version: %d.%d.%d\n", CEREAL_VERSION_MAJOR,
                     CEREAL_VERSION_MINOR, CEREAL_VERSION_PATCH);
             output.append(line);
         }
         {
-            char line[100];
+            char line[128];
             sprintf(line, "glad\n");
             output.append(line);
         }
         {
-            char line[100];
+            char line[128];
             sprintf(line, "stb_image\n");
             output.append(line);
         }
         {   
-            char line[100];
+            char line[128];
             sprintf(line, "stb_image_write\n");
             output.append(line);
         }
         {   
-            char line[100];
+            char line[128];
             sprintf(line, "stb_truetype\n");
             output.append(line);
         }
         {
-            char line[100];
+            char line[128];
             sprintf(line, "utfcpp\n");
             output.append(line);
         }
