@@ -477,6 +477,7 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::End();
 
         ImGui::Begin("Camera Debug");
+        ImGui::Text("Position: %f, %f, %f", scene->camera.get_position().x, scene->camera.get_position().y, scene->camera.get_position().z);
         ImGui::Text("Pitch: %f", scene->camera.get_pitch());
         ImGui::Text("Yaw: %f", scene->camera.get_yaw());
         ImGui::Text("Angle around point: %f", scene->camera.get_angle_around_point());
