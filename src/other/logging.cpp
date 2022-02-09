@@ -1,6 +1,6 @@
 #include <fstream>
 #include <string>
-#include <exception>
+#include <stdexcept>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>

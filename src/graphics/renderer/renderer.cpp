@@ -1,7 +1,7 @@
 #include <memory>
 #include <iostream>
 #include <string>
-#include <exception>
+#include <stdexcept>
 #include <array>
 #include <string.h>
 

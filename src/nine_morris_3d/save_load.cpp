@@ -1,6 +1,6 @@
 #include <fstream>
 #include <string>
-#include <exception>
+#include <stdexcept>
 #include <stdio.h>
 
 #include <glm/glm.hpp>

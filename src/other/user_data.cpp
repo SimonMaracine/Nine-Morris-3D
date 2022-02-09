@@ -1,5 +1,5 @@
 #include <string>
-#include <exception>
+#include <stdexcept>
 
 #if defined(__GNUG__)
     #include <pwd.h>

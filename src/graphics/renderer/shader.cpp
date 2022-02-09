@@ -3,7 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include <exception>
+#include <stdexcept>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>

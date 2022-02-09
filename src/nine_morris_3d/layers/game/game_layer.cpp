@@ -4,7 +4,7 @@
 #include <array>
 #include <iterator>
 #include <string>
-#include <exception>
+#include <stdexcept>
 #include <stdlib.h>
 #include <time.h>
 
