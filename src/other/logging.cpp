@@ -12,7 +12,6 @@
 
 #define LOG_FILE "log.txt"
 #define INFO_FILE "info.txt"
-#define APP_NAME_WINDOWS "NineMorris3D"
 
 #define LOG_PATTERN "%^[%l] [th %t] [%H:%M:%S]%$ %v"
 
@@ -28,7 +27,7 @@ namespace logging {
         return std::string(file);
 #else
     #if defined(__GNUG__)
-        std::string path = user_data::get_user_data_path() + file;
+        std::string path = user_data::get_user_data_directory_path() + file;
         return path;
     #elif defined(_MSC_VER)
         std::string path = "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + APP_NAME_WINDOWS + "\\" + file;

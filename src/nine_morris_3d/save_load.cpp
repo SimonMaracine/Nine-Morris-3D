@@ -104,10 +104,10 @@ namespace save_load {
         return std::string(file);
 #else
     #if defined(__GNUG__)
-        std::string path = user_data::get_user_data_path() + file;
+        std::string path = user_data::get_user_data_directory_path() + file;
         return path;
     #elif defined(_MSC_VER)
-        std::string path = user_data::get_user_data_path() + "\\" + file;
+        std::string path = user_data::get_user_data_directory_path() + "\\" + file;
         return path;
     #else
         #error "GCC or MSVC must be used (for now)"
@@ -125,7 +125,7 @@ namespace save_load {
         }
     }
 
-    void save_game(const GameState& game_state) {
+    void save_game_to_file(const GameState& game_state) {
         std::string file_path;
         try {
             file_path = path(SAVE_GAME_FILE);
@@ -159,7 +159,7 @@ namespace save_load {
         DEB_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
     }
 
-    void load_game(GameState& game_state) {  // Throws exception
+    void load_game_from_file(GameState& game_state) {  // Throws exception
         std::string file_path;
         file_path = path(SAVE_GAME_FILE);
 
@@ -175,18 +175,18 @@ namespace save_load {
             input(game_state);
         } catch (const cereal::Exception& e) {
             REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
-            delete_save_file(SAVE_GAME_FILE);
+            delete_save_game_file(SAVE_GAME_FILE);
             return;
         } catch (const std::exception& e) {
             REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
-            delete_save_file(SAVE_GAME_FILE);
+            delete_save_game_file(SAVE_GAME_FILE);
             throw;
         }
 
         DEB_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
     }
 
-    void delete_save_file(const std::string& file_path) {
+    void delete_save_game_file(const std::string& file_path) {
         if (remove(file_path.c_str()) != 0) {
             REL_INFO("Could not delete save game file '{}'", file_path.c_str());
         } else {

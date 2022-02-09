@@ -67,7 +67,23 @@ void GameScene::on_enter() {
 void GameScene::on_exit() {
     DEB_DEBUG("Exit game scene");
 
-    options::save_options_to_file(app->options);
+    try {
+        options::save_options_to_file(app->options);
+    } catch (const options::OptionsFileNotOpenError& e) {
+        REL_ERROR("{}", e.what());
+
+        options::handle_options_file_not_open_error();
+    } catch (const options::OptionsFileError& e) {
+        REL_ERROR("{}", e.what());
+
+        try {
+            options::create_options_file();
+        } catch (const options::OptionsFileNotOpenError& e) {
+            REL_ERROR("{}", e.what());
+        } catch (const options::OptionsFileError& e) {
+            REL_ERROR("{}", e.what());
+        }
+    }
 
     if (app->options.save_on_exit && !app->running) {
         board.finalize_pieces_state();
@@ -80,7 +96,7 @@ void GameScene::on_exit() {
         const time_t current = time(nullptr);
         state.date = ctime(&current);
 
-        save_load::save_game(state);
+        save_load::save_game_to_file(state);  // TODO refactor
     }
 
     timer = Timer();

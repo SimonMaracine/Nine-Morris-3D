@@ -8,8 +8,7 @@
 #include "application/application_data.h"
 #include "application/events.h"
 #include "other/logging.h"
-
-#define APP_NAME_LINUX "ninemorris3d"
+#include "other/user_data.h"
 
 static std::string path(const char* file_path) {
 #ifndef NDEBUG

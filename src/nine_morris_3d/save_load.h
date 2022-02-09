@@ -18,9 +18,9 @@ namespace save_load {
         }
     };
 
-    void save_game(const GameState& game_state);
-    void load_game(GameState& game_state);
+    void save_game_to_file(const GameState& game_state);
+    void load_game_from_file(GameState& game_state);
 
-    void delete_save_file(const std::string& file_path);
+    void delete_save_game_file(const std::string& file_path);
     bool save_files_exist();
 }

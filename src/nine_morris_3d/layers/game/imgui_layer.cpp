@@ -73,7 +73,7 @@ void ImGuiLayer::on_attach() {
 
     save_load::GameState state;
     try {
-        save_load::load_game(state);
+        save_load::load_game_from_file(state);  // TODO refactor
     } catch (const std::exception& e) {
         REL_ERROR("{}", e.what());
         REL_ERROR("Could not load game");
@@ -135,7 +135,7 @@ void ImGuiLayer::on_update(float dt) {
                 const time_t current = time(nullptr);
                 state.date = ctime(&current);
 
-                save_load::save_game(state);
+                save_load::save_game_to_file(state);  // TODO refactor
 
                 last_save_date = state.date;
             }

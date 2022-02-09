@@ -1,8 +1,7 @@
 #include <string>
 
 #include "other/assets.h"
-
-#define APP_NAME_LINUX "ninemorris3d"
+#include "other/user_data.h"
 
 namespace assets {
     std::string path(const char* file_path) {

@@ -12,10 +12,8 @@
     #error "GCC or MSVC must be used (for now)"
 #endif
 
+#include "other/user_data.h"
 #include "other/logging.h"
-
-#define APP_NAME_LINUX ".ninemorris3d"
-#define APP_NAME_WINDOWS "NineMorris3D"
 
 namespace user_data {
 #if defined(__GNUG__)
@@ -30,16 +28,16 @@ namespace user_data {
         return std::string(pw->pw_name);
     }
 
-    const std::string get_user_data_path() {  // Throws exception
+    const std::string get_user_data_directory_path() {  // Throws exception
         const std::string username = get_username();
-        const std::string path = "/home/" + username + "/" + APP_NAME_LINUX + "/";
+        const std::string path = "/home/" + username + "/." + APP_NAME_LINUX + "/";
 
         return path;
     }
 
     bool user_data_directory_exists() {  // Throws exception
         const std::string username = get_username();
-        const std::string path = "/home/" + username + "/" + APP_NAME_LINUX + "/";
+        const std::string path = "/home/" + username + "/." + APP_NAME_LINUX + "/";
 
         struct stat sb;
 
@@ -52,7 +50,7 @@ namespace user_data {
 
     bool create_user_data_directory() {  // Throws exception
         const std::string username = get_username();
-        const std::string path = "/home/" + username + "/" + APP_NAME_LINUX + "/";
+        const std::string path = "/home/" + username + "/." + APP_NAME_LINUX + "/";
 
         if (mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < 0) {
             return false;
@@ -73,7 +71,7 @@ namespace user_data {
         return std::string(username);
     }
 
-    const std::string get_user_data_path() {  // Throws exception
+    const std::string get_user_data_directory_path() {  // Throws exception
         const std::string username = get_username();
         const std::string path = "C:\\Users\\" + username + "\\AppData\\Roaming\\" + APP_NAME_WINDOWS;
 
