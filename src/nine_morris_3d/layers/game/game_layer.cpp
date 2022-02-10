@@ -648,7 +648,7 @@ void GameLayer::load_game() {
         REL_ERROR("Could not load game");
         return;
     } catch (const save_load::SaveFileError& e) {
-        REL_ERROR("{}", e.what());
+        REL_ERROR("{}", e.what());  // TODO maybe delete file
         REL_ERROR("Could not load game");
         return;
     }

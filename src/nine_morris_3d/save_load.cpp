@@ -114,40 +114,17 @@ namespace save_load {
 #endif
     }
 
-    static bool file_exists(const std::string& file_path) {
-        FILE* file = fopen(file_path.c_str(), "r");
-        if (file) {
-            fclose(file);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     void save_game_to_file(const GameState& game_state) {  // Throws exception
         std::string file_path;
         try {
             file_path = path(SAVE_GAME_FILE);
         } catch (const user_data::UserNameError& e) {
-            // REL_ERROR("{}", e.what());
             throw SaveFileError(e.what());
         }
 
         std::ofstream file (file_path, std::ios::binary | std::ios::trunc);
 
         if (!file.is_open()) {
-            // REL_ERROR("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
-
-            // try {
-            //     if (!user_data::create_user_data_directory()) {
-            //         REL_ERROR("Could not recreate user data directory");
-            //     } else {
-            //         REL_INFO("Recreated user data directory");
-            //     }
-            // } catch (const std::runtime_error& e) {
-            //     REL_ERROR("{}", e.what());
-            //     return;
-            // }
             std::string message = "Could not open last save game file '" + std::string(SAVE_GAME_FILE)
                     + "' for writing";
             throw SaveFileNotOpenError(message);
@@ -182,12 +159,8 @@ namespace save_load {
             cereal::BinaryInputArchive input {file};
             input(game_state);
         } catch (const cereal::Exception& e) {
-            // REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
-            // delete_save_game_file(SAVE_GAME_FILE);
             throw SaveFileError(e.what());
         } catch (const std::exception& e) {
-            // REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
-            // delete_save_game_file(SAVE_GAME_FILE);
             throw SaveFileError(e.what());
         }
 

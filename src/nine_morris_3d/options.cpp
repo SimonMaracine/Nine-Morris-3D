@@ -34,39 +34,12 @@ namespace options {
         try {
             file_path = path(OPTIONS_FILE);
         } catch (const user_data::UserNameError& e) {
-            // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         }
 
         std::ofstream file (file_path, std::ios::trunc);
 
         if (!file.is_open()) {
-            // REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
-
-            // bool user_data_directory;
-
-            // try {
-            //     user_data_directory = user_data::user_data_directory_exists();
-            // } catch (const std::runtime_error& e) {
-            //     REL_ERROR("{}", e.what());
-            //     return;
-            // }
-
-            // if (!user_data_directory) {
-            //     REL_INFO("User data folder missing; creating one...");
-
-            //     try {
-            //         if (!user_data::create_user_data_directory()) {
-            //             REL_ERROR("Could not create user data directory");
-            //         } else {
-            //             create_options_file();
-            //         }
-            //     } catch (const std::runtime_error& e) {
-            //         REL_ERROR("{}", e.what());
-            //         return;
-            //     }
-            // }
-
             std::string message = "Could not open options file '" + file_path + "' for writing";
             throw OptionsFileNotOpenError(message);
         }
@@ -90,14 +63,12 @@ namespace options {
         try {
             file_path = path(OPTIONS_FILE);
         } catch (const user_data::UserNameError& e) {
-            // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         }
 
         std::ifstream file (file_path);
 
         if (!file.is_open()) {
-            // REL_ERROR("Could not open options file '{}'", file_path.c_str());
             std::string message = "Could not open options file '" + file_path + "'";
             throw OptionsFileNotOpenError(message);
         }
@@ -114,7 +85,6 @@ namespace options {
         try {
             object = json::parse(contents.c_str());
         } catch (const json::parse_error& e) {
-            // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         }
 
@@ -135,33 +105,26 @@ namespace options {
             custom_cursor = object.at("custom_cursor").get<bool>();
             sensitivity = object.at("sensitivity").get<float>();
         } catch (const json::out_of_range& e) {
-            // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         } catch (const json::type_error& e) {
-            // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         } catch (const json::exception& e) {
-            // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         }
 
         if (texture_quality != NORMAL && texture_quality != LOW) {
-            // REL_ERROR("Options file is wrong: texture_quality");
             throw OptionsFileError("Options file is invalid: texture_quality");
         }
 
         if (samples != 1 && samples != 2 && samples != 4) {
-            // REL_ERROR("Options file is wrong: samples");
             throw OptionsFileError("Options file is invalid: samples");
         }
 
         if (skybox != FIELD && skybox != AUTUMN) {
-            // REL_ERROR("Options file is wrong: skybox");
             throw OptionsFileError("Options file is invalid: skybox");
         }
 
         if (sensitivity < 0.5f || sensitivity > 2.0f) {
-            // REL_ERROR("Options file is wrong: sensitivity");
             throw OptionsFileError("Options file is invalid: sensitivity");
         }
 
@@ -181,14 +144,12 @@ namespace options {
         try {
             file_path = path(OPTIONS_FILE);
         } catch (const user_data::UserNameError& e) {
-            // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         }
 
         std::ofstream file (file_path);
 
         if (!file.is_open()) {
-            // REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
             std::string message = "Could not open options file '" + file_path + "' for writing";
             throw OptionsFileNotOpenError(message);
         }
