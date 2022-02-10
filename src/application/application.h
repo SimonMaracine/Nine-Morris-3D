@@ -9,9 +9,9 @@
 #include "application/window.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
-#include "other/loader.h"
 #include "nine_morris_3d/assets_load.h"
 #include "nine_morris_3d/options.h"
+#include "other/loader.h"
 
 constexpr int VERSION_MAJOR = 0;
 constexpr int VERSION_MINOR = 1;

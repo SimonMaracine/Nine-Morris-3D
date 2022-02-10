@@ -4,12 +4,12 @@
 #include "application/app.h"
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
-#include "other/loader.h"
 #include "nine_morris_3d/layers/loading/loading_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/options.h"
+#include "other/loader.h"
 
 void LoadingLayer::on_attach() {
     if (app->options.texture_quality == options::NORMAL) {

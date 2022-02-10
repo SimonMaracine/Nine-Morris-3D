@@ -261,10 +261,10 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
     renderer::set_viewport(event.width, event.height);
 
     for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
-        std::shared_ptr<Framebuffer> frame = framebuffer.lock();
-        if (frame != nullptr) {
-            if (frame->get_specification().resizable) {
-                frame->resize(event.width, event.height);
+        std::shared_ptr<Framebuffer> fb = framebuffer.lock();
+        if (fb != nullptr) {
+            if (fb->get_specification().resizable) {
+                fb->resize(event.width, event.height);
             }
         }
     }

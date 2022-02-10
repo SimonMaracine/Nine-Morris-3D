@@ -4,10 +4,10 @@
 
 #include "application/layer.h"
 #include "application/events.h"
-#include "other/texture_data.h"
-#include "other/loader.h"
 #include "nine_morris_3d/scenes/loading/loading_scene.h"
 #include "nine_morris_3d/assets_load.h"
+#include "other/texture_data.h"
+#include "other/loader.h"
 
 class LoadingLayer : public Layer {
 public:

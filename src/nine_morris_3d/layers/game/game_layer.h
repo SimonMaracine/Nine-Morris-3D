@@ -8,9 +8,9 @@
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/renderer.h"
+#include "nine_morris_3d/scenes/game/game_scene.h"
 #include "other/model.h"
 #include "other/loader.h"
-#include "nine_morris_3d/scenes/game/game_scene.h"
 
 class ImGuiLayer;
 

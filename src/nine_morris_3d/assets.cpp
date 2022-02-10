@@ -1,7 +1,7 @@
 #include <string>
 
 #include "application/platform.h"
-#include "other/assets.h"
+#include "nine_morris_3d/assets.h"
 #include "other/user_data.h"
 
 namespace assets {

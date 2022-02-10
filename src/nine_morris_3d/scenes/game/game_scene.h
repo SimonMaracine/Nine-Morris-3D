@@ -12,12 +12,12 @@
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/light.h"
-#include "other/model.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/hoverable.h"
 #include "nine_morris_3d/turn_indicator.h"
 #include "nine_morris_3d/timer.h"
+#include "other/model.h"
 
 class GameScene : public Scene {
 public:

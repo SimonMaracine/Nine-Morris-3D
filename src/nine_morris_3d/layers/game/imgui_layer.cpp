@@ -12,14 +12,14 @@
 #include "graphics/debug_opengl.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
-#include "other/logging.h"
-#include "other/assets.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/assets.h"
+#include "other/logging.h"
 
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true

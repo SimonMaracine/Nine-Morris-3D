@@ -10,11 +10,11 @@
 #include <cereal/types/memory.hpp>
 
 #include "application/platform.h"
+#include "graphics/renderer/camera.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/node.h"
-#include "graphics/renderer/camera.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 

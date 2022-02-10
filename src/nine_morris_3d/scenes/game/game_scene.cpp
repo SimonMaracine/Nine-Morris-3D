@@ -16,13 +16,13 @@
 #include "graphics/renderer/camera.h"
 #include "graphics/renderer/light.h"
 #include "graphics/debug_opengl.h"
-#include "other/texture_data.h"
-#include "other/assets.h"
-#include "other/logging.h"
 #include "nine_morris_3d/scenes/game/game_scene.h"
+#include "nine_morris_3d/assets.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/options.h"
+#include "other/texture_data.h"
+#include "other/logging.h"
 
 void GameScene::on_enter() {
     DEB_DEBUG("Enter game scene");

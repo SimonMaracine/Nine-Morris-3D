@@ -1,6 +1,6 @@
-#include "other/logging.h"
 #include "nine_morris_3d/scenes/loading/loading_scene.h"
 #include "nine_morris_3d/options.h"
+#include "other/logging.h"
 
 void LoadingScene::on_enter() {
     DEB_DEBUG("Enter loading scene");

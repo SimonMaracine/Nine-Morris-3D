@@ -10,8 +10,8 @@
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
-#include "other/logging.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
+#include "other/logging.h"
 
 void GuiLayer::on_update(float dt) {
     scene->turn_indicator.update(app->data.width, app->data.height);

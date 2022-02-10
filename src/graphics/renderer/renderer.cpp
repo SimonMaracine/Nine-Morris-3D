@@ -20,8 +20,8 @@
 #include "graphics/renderer/texture.h"
 #include "graphics/renderer/framebuffer.h"
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/assets.h"
 #include "other/logging.h"
-#include "other/assets.h"
 
 namespace renderer {
     static Storage* storage = nullptr;

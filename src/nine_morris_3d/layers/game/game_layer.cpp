@@ -25,16 +25,16 @@
 #include "graphics/renderer/framebuffer.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/light.h"
-#include "other/model.h"
-#include "other/loader.h"
-#include "other/logging.h"
-#include "other/assets.h"
-#include "other/texture_data.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/save_load.h"
+#include "nine_morris_3d/assets.h"
+#include "other/model.h"
+#include "other/loader.h"
+#include "other/logging.h"
+#include "other/texture_data.h"
 
 void GameLayer::on_attach() {
     app->window->set_vsync(app->options.vsync);
