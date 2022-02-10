@@ -7,22 +7,21 @@
 #include "application/window.h"
 #include "application/application_data.h"
 #include "application/events.h"
+#include "application/platform.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 
 static std::string path(const char* file_path) {
-#ifndef NDEBUG
+#if defined(NINE_MORRIS_3D_DEBUG)
       // Use relative path for both operating systems
       return std::string(file_path);
-#else
-    #if defined(__GNUG__)
+#elif defined(NINE_MORRIS_3D_RELEASE)
+    #if defined(NINE_MORRIS_3D_LINUX)
       std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
       return path;
-    #elif defined(_MSC_VER)
+    #elif defined(NINE_MORRIS_3D_WINDOWS)
       // Just use relative path
       return std::string(file_path);
-    #else
-        #error "GCC or MSVC must be used (for now)"
     #endif
 #endif
 }
@@ -33,7 +32,7 @@ Window::Window(ApplicationData* data) {
         std::exit(1);
     }
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     glfwSetErrorCallback([](int error, const char* description) {
         DEB_CRITICAL("[ID: {}] {}", error, description);
     });
@@ -45,7 +44,7 @@ Window::Window(ApplicationData* data) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
     DEB_INFO("Using OpenGL debug context");
 #else

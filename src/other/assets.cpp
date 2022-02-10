@@ -1,22 +1,21 @@
 #include <string>
 
+#include "application/platform.h"
 #include "other/assets.h"
 #include "other/user_data.h"
 
 namespace assets {
     std::string path(const char* file_path) {
-#ifndef NDEBUG
+#if defined(NINE_MORRIS_3D_DEBUG)
         // Use relative path for both operating systems
         return std::string(file_path);
-#else
-    #if defined(__GNUG__)
+#elif defined(NINE_MORRIS_3D_RELEASE)
+    #if defined(NINE_MORRIS_3D_LINUX)
         std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
         return path;
-    #elif defined(_MSC_VER)
+    #elif defined(NINE_MORRIS_3D_WINDOWS)
         // Just use relative path
         return std::string(file_path);
-    #else
-        #error "GCC or MSVC must be used (for now)"
     #endif
 #endif
     }
@@ -85,7 +84,7 @@ namespace assets {
     const char* QUAD2D_FRAGMENT_SHADER = "data/shaders/quad2d.frag";
     const char* QUAD3D_VERTEX_SHADER = "data/shaders/quad3d.vert";
     const char* QUAD3D_FRAGMENT_SHADER = "data/shaders/quad3d.frag";
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     const char* ORIGIN_VERTEX_SHADER = "data/shaders/origin.vert";
     const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/origin.frag";
 #endif

@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include "application/platform.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/shader.h"
@@ -38,7 +39,7 @@ namespace renderer {
         std::shared_ptr<Shader> skybox_shader;
         std::shared_ptr<Shader> quad2d_shader;
         std::shared_ptr<Shader> quad3d_shader;
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         std::shared_ptr<Shader> origin_shader;
 #endif
         std::shared_ptr<Shader> text_shader;
@@ -49,7 +50,7 @@ namespace renderer {
 
         std::shared_ptr<VertexArray> screen_quad_vertex_array;
         std::shared_ptr<VertexArray> quad2d_vertex_array;
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         std::shared_ptr<VertexArray> origin_vertex_array;
 #endif
 
@@ -61,7 +62,7 @@ namespace renderer {
         std::shared_ptr<Texture> white_indicator_texture;
         std::shared_ptr<Texture> black_indicator_texture;
         std::shared_ptr<Texture> splash_screen_texture;
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         std::shared_ptr<Texture> light_texture;
 #endif
 
@@ -90,7 +91,7 @@ namespace renderer {
     void disable_depth();
     void enable_stencil();
     void disable_stencil();
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     void draw_origin();
 #endif
     void draw_quad_2d(const glm::vec2& position, float additional_scale, std::shared_ptr<Texture> texture);

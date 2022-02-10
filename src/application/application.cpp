@@ -26,7 +26,7 @@ Application::Application(int width, int height, const std::string& title) {
     logging::initialize();
     window = std::make_shared<Window>(&data);
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
 #endif
     input::initialize(window->get_handle());

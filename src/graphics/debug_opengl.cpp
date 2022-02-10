@@ -13,6 +13,7 @@
 #include <nlohmann/json.hpp>
 #include <cereal/version.hpp>
 
+#include "application/platform.h"
 #include "other/logging.h"
 
 constexpr GLenum parameters[] = {
@@ -45,7 +46,7 @@ const char* names[] = {
     "GL_STEREO"
 };
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
 unsigned long long bytes_allocated_gpu = 0;
 bool stop_counting_bytes_allocated_gpu = false;
 #endif
@@ -73,7 +74,7 @@ namespace debug_opengl {
     }
 #endif
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     static void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
             GLsizei length, const GLchar* message, const void* userParam) {
         switch (severity) {
@@ -136,7 +137,7 @@ namespace debug_opengl {
 #endif
 
     void maybe_initialize_debugging() {
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         glDebugMessageCallback(error_callback, nullptr);
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -195,20 +196,18 @@ namespace debug_opengl {
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** Dependencies And Versions ***\n");
 
-#if defined(__GNUG__)
+#if defined(NINE_MORRIS_3D_LINUX)
         {
             char line[128];
             sprintf(line, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
             output.append(line);
         }
-#elif defined(_MSC_VER)
+#elif defined(NINE_MORRIS_3D_WINDOWS)
         {
             char line[128];
             sprintf(line, "MSVC version: %d\n", _MSC_VER);
             output.append(line);
         }
-#else
-    #error "GCC or MSVC must be used (for now)"
 #endif
         {
             char line[128];

@@ -9,6 +9,7 @@
 #include <cereal/types/array.hpp>
 #include <cereal/types/memory.hpp>
 
+#include "application/platform.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/piece.h"
@@ -99,18 +100,16 @@ namespace glm {
 
 namespace save_load {
     static std::string path(const char* file) {  // Throws exception
-#ifndef NDEBUG
+#if defined(NINE_MORRIS_3D_DEBUG)
         // Use relative path for both operating systems
         return std::string(file);
-#else
-    #if defined(__GNUG__)
+#elif defined(NINE_MORRIS_3D_RELEASE)
+    #if defined(NINE_MORRIS_3D_LINUX)
         std::string path = user_data::get_user_data_directory_path() + file;
         return path;
-    #elif defined(_MSC_VER)
+    #elif defined(NINE_MORRIS_3D_WINDOWS)
         std::string path = user_data::get_user_data_directory_path() + "\\" + file;
         return path;
-    #else
-        #error "GCC or MSVC must be used (for now)"
     #endif
 #endif
     }

@@ -6,6 +6,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include "application/platform.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 #include "other/user_data.h"
@@ -22,18 +23,16 @@ namespace logging {
     std::shared_ptr<spdlog::logger> release_logger;
 
     static std::string path(const char* file) {  // Throws exception
-#ifndef NDEBUG
+#if defined(NINE_MORRIS_3D_DEBUG)
         // Use relative path for both operating systems
         return std::string(file);
-#else
-    #if defined(__GNUG__)
+#elif defined(NINE_MORRIS_3D_RELEASE)
+    #if defined(NINE_MORRIS_3D_LINUX)
         std::string path = user_data::get_user_data_directory_path() + file;
         return path;
-    #elif defined(_MSC_VER)
+    #elif defined(NINE_MORRIS_3D_WINDOWS)
         std::string path = "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + APP_NAME_WINDOWS + "\\" + file;
         return path;
-    #else
-        #error "GCC or MSVC must be used (for now)"
     #endif
 #endif
     }

@@ -17,6 +17,7 @@
 #include "application/window.h"
 #include "application/events.h"
 #include "application/input.h"
+#include "application/platform.h"
 #include "graphics/debug_opengl.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/texture.h"
@@ -122,14 +123,14 @@ void GameLayer::on_draw() {
     renderer::draw_board(scene->board);
     renderer::disable_output_to_red(1);
     renderer::draw_board_paint(scene->board.paint);
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     renderer::draw_origin();
 #endif
     renderer::enable_output_to_red(1);
     render_nodes();
     render_pieces();
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     renderer::draw_quad_3d(scene->light.position, 1.0f, app->storage->light_texture);
 #endif
 

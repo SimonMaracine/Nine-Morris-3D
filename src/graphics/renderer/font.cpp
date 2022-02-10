@@ -14,6 +14,7 @@
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
+#include "application/platform.h"
 #include "graphics/renderer/font.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/vertex_array.h"
@@ -175,7 +176,7 @@ void Font::end_baking() {
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     std::string file_name = "bitmap_" + name + ".png";
     if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
         DEB_CRITICAL("Failed to create png");

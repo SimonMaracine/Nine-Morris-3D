@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "application/platform.h"
+
 namespace assets {
     std::string path(const char* file_path);
 
@@ -69,7 +71,7 @@ namespace assets {
     extern const char* QUAD2D_FRAGMENT_SHADER;
     extern const char* QUAD3D_VERTEX_SHADER;
     extern const char* QUAD3D_FRAGMENT_SHADER;
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     extern const char* ORIGIN_VERTEX_SHADER;
     extern const char* ORIGIN_FRAGMENT_SHADER;
 #endif

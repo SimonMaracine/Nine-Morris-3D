@@ -8,6 +8,7 @@
 #include "application/application.h"
 #include "application/app.h"
 #include "application/events.h"
+#include "application/platform.h"
 #include "graphics/debug_opengl.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
@@ -36,7 +37,7 @@ void ImGuiLayer::on_attach() {
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigWindowsResizeFromEdges = false;
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-#ifdef NDEBUG
+#ifdef NINE_MORRIS_3D_RELEASE
     io.IniFilename = nullptr;
 #endif
 
@@ -398,7 +399,7 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::PopFont();
     }
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     if (!about_mode) {
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %f", app->fps);

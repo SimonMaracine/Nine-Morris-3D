@@ -8,6 +8,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "application/platform.h"
 #include "graphics/renderer/shader.h"
 #include "graphics/renderer/buffer.h"
 #include "other/logging.h"
@@ -173,9 +174,9 @@ void Shader::recompile() {
 }
 
 GLint Shader::get_uniform_location(const std::string& name) const {
-#ifdef NDEBUG
+#if defined(NINE_MORRIS_3D_RELEASE)
     return cache[name];
-#else
+#elif defined(NINE_MORRIS_3D_DEBUG)
     try {
         return cache.at(name);
     } catch (const std::out_of_range&) {

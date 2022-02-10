@@ -12,6 +12,7 @@
 #include <stb_truetype.h>
 
 #include "application/application.h"
+#include "application/platform.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
@@ -200,7 +201,7 @@ namespace renderer {
             );
         }
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         {
             const std::vector<std::string> uniforms;
             storage->origin_shader = Shader::create(
@@ -300,7 +301,7 @@ namespace renderer {
             VertexArray::unbind();
         }
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         {
             float origin_vertices[] = {
                 -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
@@ -323,7 +324,7 @@ namespace renderer {
 
         storage->splash_screen_texture = Texture::create(assets::path(assets::SPLASH_SCREEN_TEXTURE), true);
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);  // TODO see what to do with this
 #endif
 
@@ -401,7 +402,7 @@ namespace renderer {
         glDisable(GL_STENCIL_TEST);
     }
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     void draw_origin() {
         storage->origin_shader->bind();
         storage->origin_vertex_array->bind();

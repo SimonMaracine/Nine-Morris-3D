@@ -1,22 +1,22 @@
 #include <string>
 #include <stdexcept>
 
-#if defined(__GNUG__)
+#include "application/platform.h"
+
+#if defined(NINE_MORRIS_3D_LINUX)
     #include <pwd.h>
     #include <unistd.h>
     #include <sys/stat.h>
-#elif defined(_MSC_VER)
+#elif defined(NINE_MORRIS_3D_WINDOWS)
     #include <Windows.h>
     #include <Lmcons.h>
-#else
-    #error "GCC or MSVC must be used (for now)"
 #endif
 
 #include "other/user_data.h"
 #include "other/logging.h"
 
 namespace user_data {
-#if defined(__GNUG__)
+#if defined(NINE_MORRIS_3D_LINUX)
     const std::string get_username() {  // Throws exception
         uid_t uid = geteuid();
         struct passwd* pw = getpwuid(uid);
@@ -58,7 +58,7 @@ namespace user_data {
             return true;
         }
     }
-#elif defined(_MSC_VER)
+#elif defined(NINE_MORRIS_3D_WINDOWS)
     const std::string get_username() {  // Throws exception
         char username[UNLEN + 1];
         DWORD whatever = UNLEN + 1;

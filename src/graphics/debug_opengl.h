@@ -3,7 +3,9 @@
 #include <string>
 #include <utility>
 
-#ifndef NDEBUG
+#include "application/platform.h"
+
+#if defined(NINE_MORRIS_3D_DEBUG)
     #ifdef PRINT_GPU_RAM_ALLOCATED
         #define LOG_ALLOCATION(bytes) \
             if (!stop_counting_bytes_allocated_gpu) { \
@@ -26,7 +28,7 @@
 
 extern unsigned long long bytes_allocated_gpu;
 extern bool stop_counting_bytes_allocated_gpu;
-#else
+#elif defined(NINE_MORRIS_3D_RELEASE)
     #define LOG_ALLOCATION(bytes) ((void) 0)
     #define STOP_ALLOCATION_LOG() ((void) 0)
 #endif
