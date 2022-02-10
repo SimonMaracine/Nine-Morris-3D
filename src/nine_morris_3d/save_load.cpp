@@ -124,62 +124,71 @@ namespace save_load {
         }
     }
 
-    void save_game_to_file(const GameState& game_state) {
+    void save_game_to_file(const GameState& game_state) {  // Throws exception
         std::string file_path;
         try {
             file_path = path(SAVE_GAME_FILE);
-        } catch (const std::runtime_error& e) {
-            REL_ERROR("{}", e.what());
-            return;
+        } catch (const user_data::UserNameError& e) {
+            // REL_ERROR("{}", e.what());
+            throw SaveFileError(e.what());
         }
 
         std::ofstream file (file_path, std::ios::binary | std::ios::trunc);
 
         if (!file.is_open()) {
-            REL_ERROR("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
+            // REL_ERROR("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
 
-            try {
-                if (!user_data::create_user_data_directory()) {
-                    REL_ERROR("Could not recreate user data directory");
-                } else {
-                    REL_INFO("Recreated user data directory");
-                }
-            } catch (const std::runtime_error& e) {
-                REL_ERROR("{}", e.what());
-                return;
-            }
-
-            return;
+            // try {
+            //     if (!user_data::create_user_data_directory()) {
+            //         REL_ERROR("Could not recreate user data directory");
+            //     } else {
+            //         REL_INFO("Recreated user data directory");
+            //     }
+            // } catch (const std::runtime_error& e) {
+            //     REL_ERROR("{}", e.what());
+            //     return;
+            // }
+            std::string message = "Could not open last save game file '" + std::string(SAVE_GAME_FILE)
+                    + "' for writing";
+            throw SaveFileNotOpenError(message);
         }
 
-        cereal::BinaryOutputArchive output{file};
-        output(game_state);
+        try {
+            cereal::BinaryOutputArchive output {file};
+            output(game_state);
+        } catch (const std::exception& e) {  // Just to be sure...
+            throw SaveFileError(e.what());
+        }
 
         DEB_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
     }
 
     void load_game_from_file(GameState& game_state) {  // Throws exception
         std::string file_path;
-        file_path = path(SAVE_GAME_FILE);
+        try {
+            file_path = path(SAVE_GAME_FILE);
+        } catch (const user_data::UserNameError& e) {
+            throw SaveFileError(e.what());
+        }
 
         std::ifstream file (file_path, std::ios::binary);
 
         if (!file.is_open()) {
             std::string message = "Could not open last save game file '" + std::string(SAVE_GAME_FILE) + "'";
-            throw std::runtime_error(message);
+            throw SaveFileNotOpenError(message);
         }
 
         try {
-            cereal::BinaryInputArchive input{file};
+            cereal::BinaryInputArchive input {file};
             input(game_state);
         } catch (const cereal::Exception& e) {
-            REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
-            delete_save_game_file(SAVE_GAME_FILE);
-            return;
+            // REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
+            // delete_save_game_file(SAVE_GAME_FILE);
+            throw SaveFileError(e.what());
         } catch (const std::exception& e) {
-            REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
-            delete_save_game_file(SAVE_GAME_FILE);
-            throw;
+            // REL_ERROR("Error reading save game file: {}, deleting it...", e.what());
+            // delete_save_game_file(SAVE_GAME_FILE);
+            throw SaveFileError(e.what());
         }
 
         DEB_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
@@ -189,7 +198,7 @@ namespace save_load {
         if (remove(file_path.c_str()) != 0) {
             REL_INFO("Could not delete save game file '{}'", file_path.c_str());
         } else {
-            DEB_INFO("Deleted save game file '{}'", file_path.c_str());
+            REL_INFO("Deleted save game file '{}'", file_path.c_str());
         }
     }
 
@@ -199,6 +208,32 @@ namespace save_load {
         } else {
             DEB_ERROR("Save game file is either missing or is inaccessible: '{}'", SAVE_GAME_FILE);
             return false;
+        }
+    }
+
+    void handle_save_game_file_not_open_error() {
+        bool user_data_directory;
+
+        try {
+            user_data_directory = user_data::user_data_directory_exists();
+        } catch (const user_data::UserNameError& e) {
+            REL_ERROR("{}", e.what());
+            return;
+        }
+
+        if (!user_data_directory) {
+            REL_INFO("User data folder missing; creating one...");
+
+            try {
+                bool success = user_data::create_user_data_directory();
+                if (!success) {
+                    REL_ERROR("Could not create user data directory");
+                    return;
+                }
+            } catch (const user_data::UserNameError& e) {
+                REL_ERROR("{}", e.what());
+                return;
+            }
         }
     }
 }

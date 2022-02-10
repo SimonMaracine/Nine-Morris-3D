@@ -14,11 +14,15 @@ namespace options {
     public:
         OptionsFileError(const std::string& message)
             : std::runtime_error(message) {}
+        OptionsFileError(const char* message)
+            : std::runtime_error(message) {}
     };
 
     class OptionsFileNotOpenError : public OptionsFileError {
     public:
         OptionsFileNotOpenError(const std::string& message)
+            : OptionsFileError(message) {}
+        OptionsFileNotOpenError(const char* message)
             : OptionsFileError(message) {}
     };
 

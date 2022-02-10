@@ -6,6 +6,22 @@
 #include "nine_morris_3d/board.h"
 
 namespace save_load {
+    class SaveFileError : public std::runtime_error {
+    public:
+        SaveFileError(const std::string& message)
+            : std::runtime_error(message) {}
+        SaveFileError(const char* message)
+            : std::runtime_error(message) {}
+    };
+
+    class SaveFileNotOpenError : public SaveFileError {
+    public:
+        SaveFileNotOpenError(const std::string& message)
+            : SaveFileError(message) {}
+        SaveFileNotOpenError(const char* message)
+            : SaveFileError(message) {}
+    };
+
     struct GameState {
         Board board;
         Camera camera;
@@ -23,4 +39,5 @@ namespace save_load {
 
     void delete_save_game_file(const std::string& file_path);
     bool save_files_exist();
+    void handle_save_game_file_not_open_error();
 }

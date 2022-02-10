@@ -46,7 +46,6 @@ Application::Application(int width, int height, const std::string& title) {
         options::load_options_from_file(options);
     } catch (const options::OptionsFileNotOpenError& e) {
         REL_ERROR("{}", e.what());
-
         options::handle_options_file_not_open_error();
     } catch (const options::OptionsFileError& e) {
         REL_ERROR("{}", e.what());

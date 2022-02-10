@@ -1,5 +1,4 @@
 #include <string>
-#include <stdexcept>
 
 #include "application/platform.h"
 
@@ -22,7 +21,7 @@ namespace user_data {
         struct passwd* pw = getpwuid(uid);
 
         if (pw == nullptr) {
-            throw std::runtime_error("Could not get username");
+            throw UserNameError("Could not get username");
         }
 
         return std::string(pw->pw_name);
@@ -65,7 +64,7 @@ namespace user_data {
         bool success = GetUserName(username, &whatever);
 
         if (!success) {
-            throw std::runtime_error("Could not get username");
+            throw UserNameError("Could not get username");
         }
 
         return std::string(username);

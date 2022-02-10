@@ -1,6 +1,5 @@
 #include <fstream>
 #include <string>
-#include <stdexcept>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -44,7 +43,7 @@ namespace logging {
         std::string file_path;
         try {
             file_path = path(LOG_FILE);
-        } catch (const std::runtime_error& e) {            
+        } catch (const user_data::UserNameError& e) {            
             release_logger = spdlog::stdout_color_mt("Release Logger Fallback (Console)");
 
             release_logger->set_pattern(LOG_PATTERN);
@@ -79,8 +78,9 @@ namespace logging {
                 std::string file_path;
                 try {
                     file_path = path(INFO_FILE);
-                } catch (const std::runtime_error& e) {
+                } catch (const user_data::UserNameError& e) {
                     REL_ERROR("{}", e.what());
+                    REL_ERROR("Could not create info file");
                     break;
                 }
 

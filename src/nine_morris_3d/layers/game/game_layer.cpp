@@ -641,8 +641,13 @@ void GameLayer::set_skybox(const std::string& skybox) {
 void GameLayer::load_game() {
     save_load::GameState state;
     try {
-        save_load::load_game_from_file(state);  // TODO refactor
-    } catch (const std::runtime_error& e) {
+        save_load::load_game_from_file(state);
+    } catch (const save_load::SaveFileNotOpenError& e) {
+        REL_ERROR("{}", e.what());
+        save_load::handle_save_game_file_not_open_error();
+        REL_ERROR("Could not load game");
+        return;
+    } catch (const save_load::SaveFileError& e) {
         REL_ERROR("{}", e.what());
         REL_ERROR("Could not load game");
         return;

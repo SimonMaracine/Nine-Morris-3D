@@ -1,5 +1,4 @@
 #include <fstream>
-#include <stdexcept>
 #include <iomanip>
 #include <string>
 
@@ -34,7 +33,7 @@ namespace options {
         std::string file_path;
         try {
             file_path = path(OPTIONS_FILE);
-        } catch (const std::runtime_error& e) {
+        } catch (const user_data::UserNameError& e) {
             // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         }
@@ -68,7 +67,7 @@ namespace options {
             //     }
             // }
 
-            const std::string message = "Could not open options file '" + file_path + "' for writing";
+            std::string message = "Could not open options file '" + file_path + "' for writing";
             throw OptionsFileNotOpenError(message);
         }
 
@@ -90,7 +89,7 @@ namespace options {
         std::string file_path;
         try {
             file_path = path(OPTIONS_FILE);
-        } catch (const std::runtime_error& e) {
+        } catch (const user_data::UserNameError& e) {
             // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         }
@@ -99,7 +98,7 @@ namespace options {
 
         if (!file.is_open()) {
             // REL_ERROR("Could not open options file '{}'", file_path.c_str());
-            const std::string message = "Could not open options file '" + file_path + "'";
+            std::string message = "Could not open options file '" + file_path + "'";
             throw OptionsFileNotOpenError(message);
         }
 
@@ -181,7 +180,7 @@ namespace options {
         std::string file_path;
         try {
             file_path = path(OPTIONS_FILE);
-        } catch (const std::runtime_error& e) {
+        } catch (const user_data::UserNameError& e) {
             // REL_ERROR("{}", e.what());
             throw OptionsFileError(e.what());
         }
@@ -190,7 +189,7 @@ namespace options {
 
         if (!file.is_open()) {
             // REL_ERROR("Could not open options file '{}' for writing", file_path.c_str());
-            const std::string message = "Could not open options file '" + file_path + "' for writing";
+            std::string message = "Could not open options file '" + file_path + "' for writing";
             throw OptionsFileNotOpenError(message);
         }
 
@@ -214,7 +213,7 @@ namespace options {
 
         try {
             user_data_directory = user_data::user_data_directory_exists();
-        } catch (const std::runtime_error& e) {
+        } catch (const user_data::UserNameError& e) {
             REL_ERROR("{}", e.what());
             return;
         }
@@ -227,6 +226,8 @@ namespace options {
                 if (success) {
                     try {
                         create_options_file();
+
+                        REL_INFO("Recreated options file");
                     } catch (const OptionsFileNotOpenError& e) {
                         REL_ERROR("{}", e.what());
                         return;
@@ -238,7 +239,7 @@ namespace options {
                     REL_ERROR("Could not create user data directory");
                     return;
                 }
-            } catch (const std::runtime_error& e) {
+            } catch (const user_data::UserNameError& e) {
                 REL_ERROR("{}", e.what());
                 return;
             }

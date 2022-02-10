@@ -71,7 +71,6 @@ void GameScene::on_exit() {
         options::save_options_to_file(app->options);
     } catch (const options::OptionsFileNotOpenError& e) {
         REL_ERROR("{}", e.what());
-
         options::handle_options_file_not_open_error();
     } catch (const options::OptionsFileError& e) {
         REL_ERROR("{}", e.what());
@@ -96,7 +95,16 @@ void GameScene::on_exit() {
         const time_t current = time(nullptr);
         state.date = ctime(&current);
 
-        save_load::save_game_to_file(state);  // TODO refactor
+        try {
+            save_load::save_game_to_file(state);
+        } catch (save_load::SaveFileNotOpenError& e) {
+            REL_ERROR("{}", e.what());
+            save_load::handle_save_game_file_not_open_error();
+            REL_ERROR("Could not save game");
+        } catch (save_load::SaveFileError& e) {
+            REL_ERROR("{}", e.what());
+            REL_ERROR("Could not save game");
+        }
     }
 
     timer = Timer();
