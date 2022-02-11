@@ -180,7 +180,7 @@ void ImGuiLayer::on_update(float dt) {
                         DEB_INFO("VSync disabled");
                     }
                 }
-                if (ImGui::BeginMenu("Anti-Aliasing", true)) {
+                if (ImGui::BeginMenu("Anti-Aliasing")) {
                     if (ImGui::RadioButton("No Anti-Aliasing", &app->options.samples, 1)) {
                         game_layer->set_scene_framebuffer(app->options.samples);
 
@@ -199,7 +199,7 @@ void ImGuiLayer::on_update(float dt) {
 
                     ImGui::EndMenu();
                 }
-                if (ImGui::BeginMenu("Texture Quality", true)) {
+                if (ImGui::BeginMenu("Texture Quality")) {
                     static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
                     if (ImGui::RadioButton("Normal", &quality, 0)) {
                         game_layer->set_textures_quality(options::NORMAL);
@@ -241,7 +241,7 @@ void ImGuiLayer::on_update(float dt) {
                     DEB_INFO("The game will not be saved on exit");
                 }
             }
-            if (ImGui::BeginMenu("Skybox", true)) {
+            if (ImGui::BeginMenu("Skybox")) {
                 static int skybox = app->options.skybox == options::FIELD ? 0 : 1;
                 if (ImGui::RadioButton("Field", &skybox, 0)) {
                     game_layer->set_skybox(options::FIELD);
@@ -265,9 +265,9 @@ void ImGuiLayer::on_update(float dt) {
                     DEB_INFO("Hide info");
                 }
             }
-            if (ImGui::BeginMenu("Camera Sensitivity", true)) {
+            if (ImGui::BeginMenu("Camera Sensitivity")) {
                 ImGui::PushItemWidth(100.0f);
-                if (ImGui::SliderFloat("", &app->options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
+                if (ImGui::SliderFloat("##", &app->options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
                     game_layer->camera.sensitivity = app->options.sensitivity;
 
                     DEB_INFO("Changed camera sensitivity to {}", game_layer->camera.sensitivity);
