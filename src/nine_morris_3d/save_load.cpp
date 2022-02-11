@@ -175,15 +175,6 @@ namespace save_load {
         }
     }
 
-    bool save_files_exist() {
-        if (file_exists(SAVE_GAME_FILE)) {
-            return true;
-        } else {
-            DEB_ERROR("Save game file is either missing or is inaccessible: '{}'", SAVE_GAME_FILE);
-            return false;
-        }
-    }
-
     void handle_save_game_file_not_open_error() {
         bool user_data_directory;
 
