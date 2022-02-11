@@ -8,7 +8,7 @@
 
 using namespace model;
 
-struct AssetsLoad {
+struct AssetsData {
     std::shared_ptr<Mesh<Vertex>> board_mesh;
     std::shared_ptr<Mesh<Vertex>> board_paint_mesh;
     std::shared_ptr<Mesh<VertexP>> node_mesh;
@@ -38,10 +38,10 @@ struct AssetsLoad {
     std::shared_ptr<TextureData> skybox_nz_texture_small;
 };
 
-namespace assets_load {
-    void field(Loader<AssetsLoad>* loader);
-    void field_low_tex(Loader<AssetsLoad>* loader);
+namespace assets_data {
+    void field(Loader<AssetsData>* loader);
+    void field_low_tex(Loader<AssetsData>* loader);
 
-    void autumn(Loader<AssetsLoad>* loader);
-    void autumn_low_tex(Loader<AssetsLoad>* loader);
+    void autumn(Loader<AssetsData>* loader);
+    void autumn_low_tex(Loader<AssetsData>* loader);
 }

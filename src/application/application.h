@@ -9,7 +9,7 @@
 #include "application/window.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
-#include "nine_morris_3d/assets_load.h"
+#include "nine_morris_3d/assets_data.h"
 #include "nine_morris_3d/options.h"
 #include "other/loader.h"
 
@@ -43,7 +43,7 @@ public:
     bool running = true;
     double fps = 0.0;
     ApplicationData data;
-    std::shared_ptr<AssetsLoad> assets_load;
+    std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
     renderer::Storage* storage = nullptr;
     options::Options options;

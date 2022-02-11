@@ -40,7 +40,7 @@ Application::Application(int width, int height, const std::string& title) {
     }
 
     storage = renderer::initialize(this);
-    assets_load = std::make_shared<AssetsLoad>();
+    assets_data = std::make_shared<AssetsData>();
 
     try {
         options::load_options_from_file(options);

@@ -14,17 +14,17 @@
 void LoadingLayer::on_attach() {
     if (app->options.texture_quality == options::NORMAL) {
         if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::field);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field);
         } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::autumn);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn);
         } else {
             assert(false);
         }
     } else if (app->options.texture_quality == options::LOW) {
         if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::field_low_tex);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_low_tex);
         } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::autumn_low_tex);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_low_tex);
         } else {
             assert(false);
         }

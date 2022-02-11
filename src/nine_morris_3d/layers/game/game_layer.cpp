@@ -422,46 +422,46 @@ void GameLayer::set_textures_quality(const std::string& quality) {
     }
 
     if (quality == options::NORMAL) {
-        app->assets_load->board_wood_diff_texture_small = nullptr;
-        app->assets_load->board_paint_diff_texture_small = nullptr;
-        app->assets_load->white_piece_diff_texture_small = nullptr;
-        app->assets_load->black_piece_diff_texture_small = nullptr;
-        app->assets_load->skybox_px_texture_small = nullptr;
-        app->assets_load->skybox_nx_texture_small = nullptr;
-        app->assets_load->skybox_py_texture_small = nullptr;
-        app->assets_load->skybox_ny_texture_small = nullptr;
-        app->assets_load->skybox_pz_texture_small = nullptr;
-        app->assets_load->skybox_nz_texture_small = nullptr;
-        app->assets_load->board_wood_diff_texture = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE), true);
-        app->assets_load->board_paint_diff_texture = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE), true);
-        app->assets_load->white_piece_diff_texture = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE), true);
-        app->assets_load->black_piece_diff_texture = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE), true);
+        app->assets_data->board_wood_diff_texture_small = nullptr;
+        app->assets_data->board_paint_diff_texture_small = nullptr;
+        app->assets_data->white_piece_diff_texture_small = nullptr;
+        app->assets_data->black_piece_diff_texture_small = nullptr;
+        app->assets_data->skybox_px_texture_small = nullptr;
+        app->assets_data->skybox_nx_texture_small = nullptr;
+        app->assets_data->skybox_py_texture_small = nullptr;
+        app->assets_data->skybox_ny_texture_small = nullptr;
+        app->assets_data->skybox_pz_texture_small = nullptr;
+        app->assets_data->skybox_nz_texture_small = nullptr;
+        app->assets_data->board_wood_diff_texture = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE), true);
+        app->assets_data->board_paint_diff_texture = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE), true);
+        app->assets_data->white_piece_diff_texture = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE), true);
+        app->assets_data->black_piece_diff_texture = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE), true);
         if (app->options.skybox == options::FIELD) {
-            app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE), false);
-            app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE), false);
-            app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE), false);
-            app->assets_load->skybox_ny_texture = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE), false);
-            app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
-            app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
+            app->assets_data->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE), false);
+            app->assets_data->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE), false);
+            app->assets_data->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE), false);
+            app->assets_data->skybox_ny_texture = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE), false);
+            app->assets_data->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
+            app->assets_data->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
         } else if (app->options.skybox == options::AUTUMN) {
-            app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
-            app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE), false);
-            app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE), false);
-            app->assets_load->skybox_ny_texture = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE), false);
-            app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE), false);
-            app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE), false);
+            app->assets_data->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
+            app->assets_data->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE), false);
+            app->assets_data->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE), false);
+            app->assets_data->skybox_ny_texture = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE), false);
+            app->assets_data->skybox_pz_texture = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE), false);
+            app->assets_data->skybox_nz_texture = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE), false);
         } else {
             assert(false);
         }
 
-        app->storage->board_wood_diff_texture = Texture::create(app->assets_load->board_wood_diff_texture, true, -2.0f);
+        app->storage->board_wood_diff_texture = Texture::create(app->assets_data->board_wood_diff_texture, true, -2.0f);
         scene->board.diffuse_texture = app->storage->board_wood_diff_texture;
 
-        app->storage->board_paint_diff_texture = Texture::create(app->assets_load->board_paint_diff_texture, true, -2.0f);
+        app->storage->board_paint_diff_texture = Texture::create(app->assets_data->board_paint_diff_texture, true, -2.0f);
         scene->board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
 
-        app->storage->white_piece_diff_texture = Texture::create(app->assets_load->white_piece_diff_texture, true, -1.5f);
-        app->storage->black_piece_diff_texture = Texture::create(app->assets_load->black_piece_diff_texture, true, -1.5f);
+        app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture, true, -1.5f);
+        app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture, true, -1.5f);
         for (Piece& piece : scene->board.pieces) {
             if (piece.type == Piece::Type::White) {
                 piece.diffuse_texture = app->storage->white_piece_diff_texture;
@@ -471,55 +471,55 @@ void GameLayer::set_textures_quality(const std::string& quality) {
         }
 
         const std::array<std::shared_ptr<TextureData>, 6> data = {
-            app->assets_load->skybox_px_texture,
-            app->assets_load->skybox_nx_texture,
-            app->assets_load->skybox_py_texture,
-            app->assets_load->skybox_ny_texture,
-            app->assets_load->skybox_pz_texture,
-            app->assets_load->skybox_nz_texture
+            app->assets_data->skybox_px_texture,
+            app->assets_data->skybox_nx_texture,
+            app->assets_data->skybox_py_texture,
+            app->assets_data->skybox_ny_texture,
+            app->assets_data->skybox_pz_texture,
+            app->assets_data->skybox_nz_texture
         };
         app->storage->skybox_texture = Texture3D::create(data);
     } else if (quality == options::LOW) {
-        app->assets_load->board_wood_diff_texture = nullptr;
-        app->assets_load->board_paint_diff_texture = nullptr;
-        app->assets_load->white_piece_diff_texture = nullptr;
-        app->assets_load->black_piece_diff_texture = nullptr;
-        app->assets_load->skybox_px_texture = nullptr;
-        app->assets_load->skybox_nx_texture = nullptr;
-        app->assets_load->skybox_py_texture = nullptr;
-        app->assets_load->skybox_ny_texture = nullptr;
-        app->assets_load->skybox_pz_texture = nullptr;
-        app->assets_load->skybox_nz_texture = nullptr;
-        app->assets_load->board_wood_diff_texture_small = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE_SMALL), true);
-        app->assets_load->board_paint_diff_texture_small = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE_SMALL), true);
-        app->assets_load->white_piece_diff_texture_small = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE_SMALL), true);
-        app->assets_load->black_piece_diff_texture_small = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE_SMALL), true);
+        app->assets_data->board_wood_diff_texture = nullptr;
+        app->assets_data->board_paint_diff_texture = nullptr;
+        app->assets_data->white_piece_diff_texture = nullptr;
+        app->assets_data->black_piece_diff_texture = nullptr;
+        app->assets_data->skybox_px_texture = nullptr;
+        app->assets_data->skybox_nx_texture = nullptr;
+        app->assets_data->skybox_py_texture = nullptr;
+        app->assets_data->skybox_ny_texture = nullptr;
+        app->assets_data->skybox_pz_texture = nullptr;
+        app->assets_data->skybox_nz_texture = nullptr;
+        app->assets_data->board_wood_diff_texture_small = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE_SMALL), true);
+        app->assets_data->board_paint_diff_texture_small = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE_SMALL), true);
+        app->assets_data->white_piece_diff_texture_small = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE_SMALL), true);
+        app->assets_data->black_piece_diff_texture_small = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE_SMALL), true);
         if (app->options.skybox == options::FIELD) {
-            app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
-            app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
-            app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
-            app->assets_load->skybox_ny_texture_small = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE_SMALL), false);
-            app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
-            app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_ny_texture_small = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
         } else if (app->options.skybox == options::AUTUMN) {
-            app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
-            app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
-            app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
-            app->assets_load->skybox_ny_texture_small = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE_SMALL), false);
-            app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
-            app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_ny_texture_small = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_pz_texture_small = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nz_texture_small = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
         } else {
             assert(false);
         }
 
-        app->storage->board_wood_diff_texture = Texture::create(app->assets_load->board_wood_diff_texture_small, true, -2.0f);
+        app->storage->board_wood_diff_texture = Texture::create(app->assets_data->board_wood_diff_texture_small, true, -2.0f);
         scene->board.diffuse_texture = app->storage->board_wood_diff_texture;
 
-        app->storage->board_paint_diff_texture = Texture::create(app->assets_load->board_paint_diff_texture_small, true, -2.0f);
+        app->storage->board_paint_diff_texture = Texture::create(app->assets_data->board_paint_diff_texture_small, true, -2.0f);
         scene->board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
 
-        app->storage->white_piece_diff_texture = Texture::create(app->assets_load->white_piece_diff_texture_small, true, -1.5f);
-        app->storage->black_piece_diff_texture = Texture::create(app->assets_load->black_piece_diff_texture_small, true, -1.5f);
+        app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture_small, true, -1.5f);
+        app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture_small, true, -1.5f);
         for (Piece& piece : scene->board.pieces) {
             if (piece.type == Piece::Type::White) {
                 piece.diffuse_texture = app->storage->white_piece_diff_texture;
@@ -529,12 +529,12 @@ void GameLayer::set_textures_quality(const std::string& quality) {
         }
 
         const std::array<std::shared_ptr<TextureData>, 6> data = {
-            app->assets_load->skybox_px_texture_small,
-            app->assets_load->skybox_nx_texture_small,
-            app->assets_load->skybox_py_texture_small,
-            app->assets_load->skybox_ny_texture_small,
-            app->assets_load->skybox_pz_texture_small,
-            app->assets_load->skybox_nz_texture_small
+            app->assets_data->skybox_px_texture_small,
+            app->assets_data->skybox_nx_texture_small,
+            app->assets_data->skybox_py_texture_small,
+            app->assets_data->skybox_ny_texture_small,
+            app->assets_data->skybox_pz_texture_small,
+            app->assets_data->skybox_nz_texture_small
         };
         app->storage->skybox_texture = Texture3D::create(data);
     } else {
@@ -553,37 +553,37 @@ void GameLayer::set_skybox(const std::string& skybox) {
 
     if (skybox == options::FIELD) {
         if (app->options.texture_quality == options::NORMAL) {
-            app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE), false);
-            app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE), false);
-            app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE), false);
-            app->assets_load->skybox_ny_texture = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE), false);
-            app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
-            app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
+            app->assets_data->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE), false);
+            app->assets_data->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE), false);
+            app->assets_data->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE), false);
+            app->assets_data->skybox_ny_texture = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE), false);
+            app->assets_data->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
+            app->assets_data->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
 
             const std::array<std::shared_ptr<TextureData>, 6> data = {
-                app->assets_load->skybox_px_texture,
-                app->assets_load->skybox_nx_texture,
-                app->assets_load->skybox_py_texture,
-                app->assets_load->skybox_ny_texture,
-                app->assets_load->skybox_pz_texture,
-                app->assets_load->skybox_nz_texture
+                app->assets_data->skybox_px_texture,
+                app->assets_data->skybox_nx_texture,
+                app->assets_data->skybox_py_texture,
+                app->assets_data->skybox_ny_texture,
+                app->assets_data->skybox_pz_texture,
+                app->assets_data->skybox_nz_texture
             };
             app->storage->skybox_texture = Texture3D::create(data);
         } else if (app->options.texture_quality == options::LOW) {
-            app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
-            app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
-            app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
-            app->assets_load->skybox_ny_texture_small = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE_SMALL), false);
-            app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
-            app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_ny_texture_small = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
 
             const std::array<std::shared_ptr<TextureData>, 6> data = {
-                app->assets_load->skybox_px_texture_small,
-                app->assets_load->skybox_nx_texture_small,
-                app->assets_load->skybox_py_texture_small,
-                app->assets_load->skybox_ny_texture_small,
-                app->assets_load->skybox_pz_texture_small,
-                app->assets_load->skybox_nz_texture_small
+                app->assets_data->skybox_px_texture_small,
+                app->assets_data->skybox_nx_texture_small,
+                app->assets_data->skybox_py_texture_small,
+                app->assets_data->skybox_ny_texture_small,
+                app->assets_data->skybox_pz_texture_small,
+                app->assets_data->skybox_nz_texture_small
             };
             app->storage->skybox_texture = Texture3D::create(data);
         } else {
@@ -594,37 +594,37 @@ void GameLayer::set_skybox(const std::string& skybox) {
         setup_light();
     } else if (skybox == options::AUTUMN) {
         if (app->options.texture_quality == options::NORMAL) {
-            app->assets_load->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
-            app->assets_load->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE), false);
-            app->assets_load->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE), false);
-            app->assets_load->skybox_ny_texture = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE), false);
-            app->assets_load->skybox_pz_texture = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE), false);
-            app->assets_load->skybox_nz_texture = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE), false);
+            app->assets_data->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
+            app->assets_data->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE), false);
+            app->assets_data->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE), false);
+            app->assets_data->skybox_ny_texture = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE), false);
+            app->assets_data->skybox_pz_texture = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE), false);
+            app->assets_data->skybox_nz_texture = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE), false);
 
             const std::array<std::shared_ptr<TextureData>, 6> data = {
-                app->assets_load->skybox_px_texture,
-                app->assets_load->skybox_nx_texture,
-                app->assets_load->skybox_py_texture,
-                app->assets_load->skybox_ny_texture,
-                app->assets_load->skybox_pz_texture,
-                app->assets_load->skybox_nz_texture
+                app->assets_data->skybox_px_texture,
+                app->assets_data->skybox_nx_texture,
+                app->assets_data->skybox_py_texture,
+                app->assets_data->skybox_ny_texture,
+                app->assets_data->skybox_pz_texture,
+                app->assets_data->skybox_nz_texture
             };
             app->storage->skybox_texture = Texture3D::create(data);
         } else if (app->options.texture_quality == options::LOW) {
-            app->assets_load->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
-            app->assets_load->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
-            app->assets_load->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
-            app->assets_load->skybox_ny_texture_small = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE_SMALL), false);
-            app->assets_load->skybox_pz_texture_small = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
-            app->assets_load->skybox_nz_texture_small = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_ny_texture_small = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_pz_texture_small = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nz_texture_small = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
 
             const std::array<std::shared_ptr<TextureData>, 6> data = {
-                app->assets_load->skybox_px_texture_small,
-                app->assets_load->skybox_nx_texture_small,
-                app->assets_load->skybox_py_texture_small,
-                app->assets_load->skybox_ny_texture_small,
-                app->assets_load->skybox_pz_texture_small,
-                app->assets_load->skybox_nz_texture_small
+                app->assets_data->skybox_px_texture_small,
+                app->assets_data->skybox_nx_texture_small,
+                app->assets_data->skybox_py_texture_small,
+                app->assets_data->skybox_ny_texture_small,
+                app->assets_data->skybox_pz_texture_small,
+                app->assets_data->skybox_nz_texture_small
             };
             app->storage->skybox_texture = Texture3D::create(data);
         } else {

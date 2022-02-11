@@ -1,11 +1,11 @@
-#include "nine_morris_3d/assets_load.h"
+#include "nine_morris_3d/assets_data.h"
 #include "nine_morris_3d/assets.h"
 #include "other/model.h"
 #include "other/texture_data.h"
 #include "other/loader.h"
 
-namespace assets_load {
-    void field(Loader<AssetsLoad>* loader) {
+namespace assets_data {
+    void field(Loader<AssetsData>* loader) {
         using namespace model;
         using namespace assets;
 
@@ -30,7 +30,7 @@ namespace assets_load {
         loader->set_done();
     }
 
-    void field_low_tex(Loader<AssetsLoad>* loader) {
+    void field_low_tex(Loader<AssetsData>* loader) {
         using namespace model;
         using namespace assets;
 
@@ -55,7 +55,7 @@ namespace assets_load {
         loader->set_done();
     }
 
-    void autumn(Loader<AssetsLoad>* loader) {
+    void autumn(Loader<AssetsData>* loader) {
         using namespace model;
         using namespace assets;
 
@@ -80,7 +80,7 @@ namespace assets_load {
         loader->set_done();
     }
 
-    void autumn_low_tex(Loader<AssetsLoad>* loader) {
+    void autumn_low_tex(Loader<AssetsData>* loader) {
         using namespace model;
         using namespace assets;
 

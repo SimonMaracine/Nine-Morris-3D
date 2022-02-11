@@ -40,7 +40,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/nine_morris_3d/layers/loading/loading_layer.cpp"
     "src/nine_morris_3d/options.cpp"
     "src/nine_morris_3d/save_load.cpp"
-    "src/nine_morris_3d/assets_load.cpp"
+    "src/nine_morris_3d/assets_data.cpp"
     "src/nine_morris_3d/piece.cpp"
     "src/nine_morris_3d/node.cpp"
     "src/nine_morris_3d/board.cpp"
