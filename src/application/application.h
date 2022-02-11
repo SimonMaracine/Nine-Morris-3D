@@ -31,8 +31,7 @@ public:
 
     void add_scene(Scene* scene);
     void set_starting_scene(Scene* scene);
-    void change_scene(unsigned int id);
-    void push_layer(Layer* layer, Scene* scene);
+    void change_scene(const std::string& id);
 
     void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void purge_framebuffers();
@@ -52,11 +51,15 @@ private:
     float update_frame_counter();
     unsigned int calculate_fixed_update();
 
+    void push_layer(Layer* layer);
+    void pop_layer(Layer* layer);
+
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
 
     std::vector<Scene*> scenes;
     Scene* current_scene = nullptr;
+    std::vector<Layer*> layer_stack;
 
     bool changed_scene = false;
     Scene* to_scene = nullptr;

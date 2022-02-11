@@ -1,19 +1,19 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 #include <imgui.h>
 
 #include "application/layer.h"
-#include "nine_morris_3d/scenes/game/game_scene.h"
 
 class GameLayer;
 class GuiLayer;
 
 class ImGuiLayer : public Layer {
 public:
-    ImGuiLayer(unsigned int id, GameScene* scene)
-        : Layer(id), scene(scene) {}
+    ImGuiLayer(std::string&& id)
+        : Layer(std::move(id)) {}
     virtual ~ImGuiLayer() = default;
 
     virtual void on_attach() override;
@@ -36,7 +36,6 @@ public:
 
     ImFont* info_font = nullptr;
 
-    GameScene* scene = nullptr;
     GameLayer* game_layer = nullptr;
     GuiLayer* gui_layer = nullptr;
 };

@@ -49,7 +49,7 @@ void LoadingLayer::on_detach() {
 
 void LoadingLayer::on_update(float dt) {
     if (loader->done_loading()) {
-        app->change_scene(0);
+        app->change_scene("game");
     }
 }
 
@@ -77,8 +77,4 @@ void LoadingLayer::on_draw() {
 
     renderer::draw_string_with_shadows("Loading...", glm::vec2(app->get_width() - 200.0f, 20.0f), 1.2f,
             glm::vec3(0.81f), app->storage->good_dog_plain_font);
-}
-
-void LoadingLayer::on_event(events::Event& event) {
-
 }

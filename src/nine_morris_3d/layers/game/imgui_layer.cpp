@@ -99,8 +99,8 @@ void ImGuiLayer::on_detach() {
 }
 
 void ImGuiLayer::on_bind_layers() {
-    game_layer = get_layer<GameLayer>(0, scene);
-    gui_layer = get_layer<GuiLayer>(1, scene);
+    game_layer = get_layer<GameLayer>("game");
+    gui_layer = get_layer<GuiLayer>("gui");
 }
 
 void ImGuiLayer::on_update(float dt) {
@@ -117,12 +117,12 @@ void ImGuiLayer::on_update(float dt) {
     if (!about_mode && ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
-                app->change_scene(0);
+                app->change_scene("game");
 
                 DEB_INFO("Restarting game");
             }
             if (ImGui::MenuItem("Load Last", nullptr, false)) {
-                scene->board.finalize_pieces_state();
+                game_layer->board.finalize_pieces_state();
 
                 game_layer->load_game();
             }
@@ -130,12 +130,12 @@ void ImGuiLayer::on_update(float dt) {
                 ImGui::SetTooltip("%s", last_save_date.c_str());
             }
             if (ImGui::MenuItem("Save", nullptr, false)) {
-                scene->board.finalize_pieces_state();
+                game_layer->board.finalize_pieces_state();
 
                 save_load::GameState state;
-                state.board = scene->board;
-                state.camera = scene->camera;
-                state.time = scene->timer.get_time_raw();
+                state.board = game_layer->board;
+                state.camera = game_layer->camera;
+                state.time = gui_layer->timer.get_time_raw();
 
                 const time_t current = time(nullptr);
                 state.date = ctime(&current);
@@ -154,9 +154,9 @@ void ImGuiLayer::on_update(float dt) {
                 last_save_date = state.date;
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
-                scene->board.undo();
+                game_layer->board.undo();
 
-                if (scene->board.not_placed_pieces_count() == 18) {
+                if (game_layer->board.not_placed_pieces_count() == 18) {
                     can_undo = false;
                 }
             }
@@ -218,7 +218,7 @@ void ImGuiLayer::on_update(float dt) {
                 }
                 if (ImGui::MenuItem("Custom Cursor", nullptr, &app->options.custom_cursor)) {
                     if (app->options.custom_cursor) {
-                        if (scene->board.should_take_piece) {
+                        if (game_layer->board.should_take_piece) {
                             app->window->set_custom_cursor(CustomCursor::Cross);
                         } else {
                             app->window->set_custom_cursor(CustomCursor::Arrow);
@@ -268,9 +268,9 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::BeginMenu("Camera Sensitivity", true)) {
                 ImGui::PushItemWidth(100.0f);
                 if (ImGui::SliderFloat("", &app->options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
-                    scene->camera.sensitivity = app->options.sensitivity;
+                    game_layer->camera.sensitivity = app->options.sensitivity;
 
-                    DEB_INFO("Changed camera sensitivity to {}", scene->camera.sensitivity);
+                    DEB_INFO("Changed camera sensitivity to {}", game_layer->camera.sensitivity);
                 }
                 ImGui::PopItemWidth();
 
@@ -348,11 +348,11 @@ void ImGuiLayer::on_update(float dt) {
         }
     }
 
-    if (scene->board.not_placed_pieces_count() < 18) {
+    if (game_layer->board.not_placed_pieces_count() < 18) {
         can_undo = true;
     }
 
-    if (scene->board.phase == Board::Phase::GameOver) {
+    if (game_layer->board.phase == Board::Phase::GameOver) {
         ImGui::OpenPopup("Game Over");
 
         ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -361,7 +361,7 @@ void ImGuiLayer::on_update(float dt) {
         style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
 
         if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            switch (scene->board.ending) {
+            switch (game_layer->board.ending) {
                 case Board::Ending::WinnerWhite: {
                     const char* message = "White player wins!";
                     const float window_width = ImGui::GetWindowSize().x;
@@ -392,7 +392,7 @@ void ImGuiLayer::on_update(float dt) {
 
             if (ImGui::Button("Ok", ImVec2(200, 0))) {
                 ImGui::CloseCurrentPopup();
-                scene->board.phase = Board::Phase::None;
+                game_layer->board.phase = Board::Phase::None;
             }
 
             ImGui::EndPopup();
@@ -417,35 +417,35 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %f", app->fps);
         ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
-        ImGui::Text("White pieces: %u", scene->board.white_pieces_count);
-        ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
-        ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
-        ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
-        ImGui::Text("White can jump: %s", scene->board.can_jump[0] ? "true" : "false");
-        ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
-        ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
-        ImGui::Text("Turn: %s", scene->board.turn == Board::Player::White ? "white" : "black");
-        ImGui::Text("Should take piece: %s", scene->board.should_take_piece ? "true" : "false");
-        ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
-        ImGui::Text("History size: %lu", scene->board.state_history->size());
-        ImGui::Text("Hovered ID: %d", scene->hovered_id);
-        ImGui::Text("Hovered node: %p", scene->board.hovered_node);
-        ImGui::Text("Hovered piece: %p", scene->board.hovered_piece);
-        ImGui::Text("Selected piece: %p", scene->board.selected_piece);
-        ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
+        ImGui::Text("White pieces: %u", game_layer->board.white_pieces_count);
+        ImGui::Text("Black pieces: %u", game_layer->board.black_pieces_count);
+        ImGui::Text("Not placed white pieces: %u", game_layer->board.not_placed_white_pieces_count);
+        ImGui::Text("Not placed black pieces: %u", game_layer->board.not_placed_black_pieces_count);
+        ImGui::Text("White can jump: %s", game_layer->board.can_jump[0] ? "true" : "false");
+        ImGui::Text("Black can jump: %s", game_layer->board.can_jump[1] ? "true" : "false");
+        ImGui::Text("Phase: %d", static_cast<int>(game_layer->board.phase));
+        ImGui::Text("Turn: %s", game_layer->board.turn == Board::Player::White ? "white" : "black");
+        ImGui::Text("Should take piece: %s", game_layer->board.should_take_piece ? "true" : "false");
+        ImGui::Text("Turns without mills: %u", game_layer->board.turns_without_mills);
+        ImGui::Text("History size: %lu", game_layer->board.state_history->size());
+        ImGui::Text("Hovered ID: %d", game_layer->hovered_id);
+        ImGui::Text("Hovered node: %p", game_layer->board.hovered_node);
+        ImGui::Text("Hovered piece: %p", game_layer->board.hovered_piece);
+        ImGui::Text("Selected piece: %p", game_layer->board.selected_piece);
+        ImGui::Text("Next move: %s", game_layer->board.next_move ? "true" : "false");
         ImGui::End();
 
         ImGui::Begin("Debug Settings");
-        if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&scene->light.position), -30.0f, 30.0f)) {
+        if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&game_layer->light.position), -30.0f, 30.0f)) {
             game_layer->setup_light();
         }
-        if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&scene->light.ambient_color), 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&game_layer->light.ambient_color), 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
-        if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&scene->light.diffuse_color), 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&game_layer->light.diffuse_color), 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
-        if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&scene->light.specular_color), 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&game_layer->light.specular_color), 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
         ImGui::End();
@@ -491,11 +491,11 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::End();
 
         ImGui::Begin("Camera Debug");
-        ImGui::Text("Position: %f, %f, %f", scene->camera.get_position().x, scene->camera.get_position().y, scene->camera.get_position().z);
-        ImGui::Text("Pitch: %f", scene->camera.get_pitch());
-        ImGui::Text("Yaw: %f", scene->camera.get_yaw());
-        ImGui::Text("Angle around point: %f", scene->camera.get_angle_around_point());
-        ImGui::Text("Distance to point: %f", scene->camera.get_distance_to_point());
+        ImGui::Text("Position: %f, %f, %f", game_layer->camera.get_position().x, game_layer->camera.get_position().y, game_layer->camera.get_position().z);
+        ImGui::Text("Pitch: %f", game_layer->camera.get_pitch());
+        ImGui::Text("Yaw: %f", game_layer->camera.get_yaw());
+        ImGui::Text("Angle around point: %f", game_layer->camera.get_angle_around_point());
+        ImGui::Text("Distance to point: %f", game_layer->camera.get_distance_to_point());
         ImGui::End();
     }
 #endif
@@ -545,7 +545,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 }
 
 bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    scene->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
+    game_layer->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
     return false;
 }

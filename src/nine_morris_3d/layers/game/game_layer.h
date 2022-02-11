@@ -1,23 +1,26 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/events.h"
+#include "graphics/renderer/renderer.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
-#include "graphics/renderer/renderer.h"
-#include "nine_morris_3d/scenes/game/game_scene.h"
+#include "graphics/renderer/camera.h"
+#include "graphics/renderer/light.h"
 #include "other/model.h"
 #include "other/loader.h"
 
 class ImGuiLayer;
+class GuiLayer;
 
 class GameLayer : public Layer {
 public:
-    GameLayer(unsigned int id, GameScene* scene)
-        : Layer(id), scene(scene) {}
+    GameLayer(std::string&& id)
+        : Layer(std::move(id)) {}
     virtual ~GameLayer() = default;
 
     virtual void on_attach() override;
@@ -33,6 +36,20 @@ public:
     bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
+
+    std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
+    std::shared_ptr<VertexArray> create_entity_vertex_array(std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+            hoverable::Id id);
+
+    void build_board();
+    void build_board_paint();
+    void build_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+            std::shared_ptr<Texture> texture, const glm::vec3& position);
+    void build_node(unsigned int index, const glm::vec3& position);
+    void build_camera();
+    void build_skybox();
+    void build_light();
+    void build_turn_indicator();
 
     void render_skybox();
     void setup_light();
@@ -51,6 +68,13 @@ public:
     void set_skybox(const std::string& skybox);
     void load_game();
 
+    Board board;
+    Camera camera;
+    Light light;
+    std::shared_ptr<std::vector<Board>> board_state_history;
+
+    hoverable::Id hovered_id = hoverable::null;
+
     float mouse_wheel = 0.0f;
     float dx = 0.0f;
     float dy = 0.0f;
@@ -61,7 +85,6 @@ public:
 
     glm::vec3 last_camera_position = glm::vec3(0.0f);
 
-    GameScene* scene = nullptr;
-
     ImGuiLayer* imgui_layer = nullptr;
+    GuiLayer* gui_layer = nullptr;
 };

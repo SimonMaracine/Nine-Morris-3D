@@ -1,21 +1,24 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include <utility>
 
 class Application;
 class Layer;
 
 class Scene {
 public:
-    Scene(unsigned int id)
-        : id(id) {}
-    virtual ~Scene() = default;
+    Scene(std::string&& id)
+        : id(std::move(id)) {}
+    ~Scene() = default;
 
-    virtual void on_enter() {}
-    virtual void on_exit() {}
+    void add_layer(Layer* layer) {
+        layers_in_order.push_back(layer);
+    }
 private:
-    unsigned int id = 0;
-    std::vector<Layer*> layer_stack;
+    std::string id;
+    std::vector<Layer*> layers_in_order;
 
     friend class Application;
     friend class Layer;

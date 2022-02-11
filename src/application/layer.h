@@ -1,17 +1,18 @@
 #pragma once
 
 #include <cassert>
+#include <string>
+#include <utility>
 
 #include "application/events.h"
 #include "application/application.h"
+#include "application/app.h"
 #include "application/scene.h"
-
-class Application;
 
 class Layer {
 public:
-    Layer(unsigned int id)
-        : id(id) {}
+    Layer(std::string&& id)
+        : id(std::move(id)) {}
     virtual ~Layer() = default;
 
     virtual void on_attach() {}
@@ -25,10 +26,12 @@ public:
     bool active = true;
 protected:
     template<typename T>
-    T* get_layer(unsigned int id, Scene* scene) const {
-        for (unsigned int i = 0; i < scene->layer_stack.size(); i++) {
-            if (scene->layer_stack[i]->id == id) {
-                return static_cast<T*>(scene->layer_stack[i]);
+    T* get_layer(const std::string& id) const {
+        for (Scene* scene : app->scenes) {
+            for (Layer* layer : scene->layers_in_order) {
+                if (layer->id == id) {
+                    return static_cast<T*>(layer);
+                }
             }
         }
 
@@ -36,5 +39,5 @@ protected:
         return nullptr;
     }
 private:
-    unsigned int id = 0;
+    std::string id;
 };

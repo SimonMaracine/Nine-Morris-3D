@@ -1,6 +1,8 @@
 #include <functional>
 #include <memory>
 #include <cassert>
+#include <algorithm>
+#include <string>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -62,7 +64,7 @@ Application::Application(int width, int height, const std::string& title) {
 
 Application::~Application() {
     for (Scene* scene : scenes) {
-        for (Layer* layer : scene->layer_stack) {
+        for (Layer* layer : scene->layers_in_order) {
             delete layer;
         }
         delete scene;
@@ -81,14 +83,13 @@ void Application::run() {
     assert(app != nullptr);
 
     for (Scene* scene : scenes) {
-        for (Layer* layer : scene->layer_stack) {
+        for (Layer* layer : scene->layers_in_order) {
             layer->on_bind_layers();
         }
     }
 
-    current_scene->on_enter();
-    for (Layer* layer : current_scene->layer_stack) {
-        layer->on_attach();
+    for (Layer* layer : current_scene->layers_in_order) {
+        push_layer(layer);
     }
 
     DEB_INFO("Initialized game");
@@ -97,7 +98,7 @@ void Application::run() {
         float dt = update_frame_counter();
         unsigned int fixed_updates = calculate_fixed_update();
 
-        for (Layer* layer : current_scene->layer_stack) {
+        for (Layer* layer : layer_stack) {
             if (layer->active) {
                 for (unsigned int i = 0; i < fixed_updates; i++) {
                     layer->on_fixed_update();
@@ -108,17 +109,15 @@ void Application::run() {
         }
 
         if (changed_scene) {
-            for (auto iter = current_scene->layer_stack.rbegin();
-                    iter != current_scene->layer_stack.rend(); iter++) {
-                (*iter)->on_detach();
+            for (auto iter = current_scene->layers_in_order.rbegin();
+                    iter != current_scene->layers_in_order.rend(); iter++) {
+                pop_layer(*iter);
             }
-            current_scene->on_exit();
 
             current_scene = to_scene;
 
-            current_scene->on_enter();
-            for (Layer* layer : current_scene->layer_stack) {
-                layer->on_attach();
+            for (Layer* layer : current_scene->layers_in_order) {
+                push_layer(layer);
             }
 
             changed_scene = false;
@@ -129,11 +128,9 @@ void Application::run() {
 
     DEB_INFO("Closing game");
 
-    for (auto iter = current_scene->layer_stack.rbegin();
-            iter != current_scene->layer_stack.rend(); iter++) {
-        (*iter)->on_detach();
+    for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
+        pop_layer(*iter);
     }
-    current_scene->on_exit();
 }
 
 void Application::add_scene(Scene* scene) {
@@ -144,7 +141,7 @@ void Application::set_starting_scene(Scene* scene) {
     current_scene = scene;
 }
 
-void Application::change_scene(unsigned int id) {
+void Application::change_scene(const std::string& id) {
     for (Scene* scene : scenes) {
         if (scene->id == id) {
             to_scene = scene;
@@ -154,10 +151,6 @@ void Application::change_scene(unsigned int id) {
     }
 
     assert(false);
-}
-
-void Application::push_layer(Layer* layer, Scene* scene) {
-    scene->layer_stack.push_back(layer);
 }
 
 void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
@@ -179,8 +172,7 @@ void Application::on_event(events::Event& event) {
     dispatcher.dispatch<WindowClosedEvent>(WindowClosed, BIND(Application::on_window_closed));
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(Application::on_window_resized));
 
-    for (auto iter = current_scene->layer_stack.rbegin();
-            iter != current_scene->layer_stack.rend(); iter++) {
+    for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
         if (event.handled) {
             break;
         }
@@ -248,6 +240,17 @@ unsigned int Application::calculate_fixed_update() {
     }
 
     return updates;
+}
+
+void Application::push_layer(Layer* layer) {
+    layer_stack.push_back(layer);
+    layer->on_attach();
+}
+
+void Application::pop_layer(Layer* layer) {
+    layer->on_detach();
+    auto iter = std::find(layer_stack.begin(), layer_stack.end(), layer);
+    layer_stack.erase(iter);
 }
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {

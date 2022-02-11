@@ -1,21 +1,29 @@
 #pragma once
 
-#include <memory>
+#include <string>
+#include <utility>
 
 #include "application/layer.h"
-#include "nine_morris_3d/scenes/game/game_scene.h"
+#include "nine_morris_3d/turn_indicator.h"
+#include "nine_morris_3d/timer.h"
+
+class GameLayer;
 
 class GuiLayer : public Layer {
 public:
-    GuiLayer(unsigned int id, GameScene* scene)
-        : Layer(id), scene(scene) {}
+    GuiLayer(std::string&& id)
+        : Layer(std::move(id)) {}
     virtual ~GuiLayer() = default;
 
+    virtual void on_bind_layers() override;
     virtual void on_update(float dt) override;
     virtual void on_draw() override;
 
     void render_turn_indicator();
     void render_timer();
 
-    GameScene* scene = nullptr;
+    TurnIndicator turn_indicator;
+    Timer timer;
+
+    GameLayer* game_layer = nullptr;
 };
