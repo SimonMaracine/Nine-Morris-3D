@@ -1,20 +1,25 @@
+#include <time.h>
+
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "application/application.h"
+#include "application/app.h"
 #include "application/events.h"
+#include "application/platform.h"
 #include "graphics/debug_opengl.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
-#include "other/logging.h"
-#include "other/assets.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/assets.h"
+#include "other/logging.h"
 
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
@@ -32,7 +37,7 @@ void ImGuiLayer::on_attach() {
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigWindowsResizeFromEdges = false;
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-#ifdef NDEBUG
+#ifdef NINE_MORRIS_3D_RELEASE
     io.IniFilename = nullptr;
 #endif
 
@@ -45,6 +50,7 @@ void ImGuiLayer::on_attach() {
 
     io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(),
             20.0f, nullptr, ranges.Data);
+    info_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 16.0f);
     io.Fonts->Build();
 
     ImVec4* colors = ImGui::GetStyle().Colors;
@@ -65,6 +71,19 @@ void ImGuiLayer::on_attach() {
 
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
+
+    save_load::GameState state;
+    try {
+        save_load::load_game_from_file(state);
+    } catch (const save_load::SaveFileNotOpenError& e) {
+        REL_ERROR("{}", e.what());
+        save_load::handle_save_game_file_not_open_error();
+        REL_ERROR("Could not load game");
+    } catch (const save_load::SaveFileError& e) {
+        REL_ERROR("{}", e.what());  // TODO maybe delete file
+        REL_ERROR("Could not load game");
+    }
+    last_save_date = std::move(state.date);
 }
 
 void ImGuiLayer::on_detach() {
@@ -100,12 +119,15 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
                 app->change_scene(0);
 
-                SPDLOG_INFO("Restarting game");
+                DEB_INFO("Restarting game");
             }
             if (ImGui::MenuItem("Load Last", nullptr, false)) {
                 scene->board.finalize_pieces_state();
 
                 game_layer->load_game();
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("%s", last_save_date.c_str());
             }
             if (ImGui::MenuItem("Save", nullptr, false)) {
                 scene->board.finalize_pieces_state();
@@ -115,7 +137,21 @@ void ImGuiLayer::on_update(float dt) {
                 state.camera = scene->camera;
                 state.time = scene->timer.get_time_raw();
 
-                save_load::save_game(state);
+                const time_t current = time(nullptr);
+                state.date = ctime(&current);
+
+                try {
+                    save_load::save_game_to_file(state);
+                } catch (save_load::SaveFileNotOpenError& e) {
+                    REL_ERROR("{}", e.what());
+                    save_load::handle_save_game_file_not_open_error();
+                    REL_ERROR("Could not save game");
+                } catch (save_load::SaveFileError& e) {
+                    REL_ERROR("{}", e.what());
+                    REL_ERROR("Could not save game");
+                }
+
+                last_save_date = state.date;
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 scene->board.undo();
@@ -132,94 +168,114 @@ void ImGuiLayer::on_update(float dt) {
             HOVERING_GUI();
         }
         if (ImGui::BeginMenu("Options")) {
-            if (ImGui::MenuItem("VSync", nullptr, &scene->options.vsync)) {
-                if (scene->options.vsync) {
-                    app->window->set_vsync(scene->options.vsync);
+            if (ImGui::BeginMenu("Graphics")) {
+                if (ImGui::MenuItem("VSync", nullptr, &app->options.vsync)) {
+                    if (app->options.vsync) {
+                        app->window->set_vsync(app->options.vsync);
 
-                    SPDLOG_INFO("VSync enabled");
-                } else {
-                    app->window->set_vsync(scene->options.vsync);
+                        DEB_INFO("VSync enabled");
+                    } else {
+                        app->window->set_vsync(app->options.vsync);
 
-                    SPDLOG_INFO("VSync disabled");
+                        DEB_INFO("VSync disabled");
+                    }
                 }
-            }
-            if (ImGui::MenuItem("Save On Exit", nullptr, &scene->options.save_on_exit)) {
-                if (scene->options.save_on_exit) {
-                    SPDLOG_INFO("The game will be saved on exit");
-                } else {
-                    SPDLOG_INFO("The game will not be saved on exit");
-                }
-            }
-            if (ImGui::BeginMenu("Anti-Aliasing", true)) {
-                if (ImGui::RadioButton("No Anti-Aliasing", &scene->options.samples, 1)) {
-                    game_layer->set_scene_framebuffer(scene->options.samples);
+                if (ImGui::BeginMenu("Anti-Aliasing", true)) {
+                    if (ImGui::RadioButton("No Anti-Aliasing", &app->options.samples, 1)) {
+                        game_layer->set_scene_framebuffer(app->options.samples);
 
-                    SPDLOG_INFO("Anti-aliasing disabled");
-                }
-                if (ImGui::RadioButton("2x", &scene->options.samples, 2)) {
-                    game_layer->set_scene_framebuffer(scene->options.samples);
+                        DEB_INFO("Anti-aliasing disabled");
+                    }
+                    if (ImGui::RadioButton("2x", &app->options.samples, 2)) {
+                        game_layer->set_scene_framebuffer(app->options.samples);
 
-                    SPDLOG_INFO("2x anti-aliasing");
-                }
-                if (ImGui::RadioButton("4x", &scene->options.samples, 4)) {
-                    game_layer->set_scene_framebuffer(scene->options.samples);
+                        DEB_INFO("2x anti-aliasing");
+                    }
+                    if (ImGui::RadioButton("4x", &app->options.samples, 4)) {
+                        game_layer->set_scene_framebuffer(app->options.samples);
 
-                    SPDLOG_INFO("4x anti-aliasing");
+                        DEB_INFO("4x anti-aliasing");
+                    }
+
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Texture Quality", true)) {
+                    static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
+                    if (ImGui::RadioButton("Normal", &quality, 0)) {
+                        game_layer->set_textures_quality(options::NORMAL);
+                        app->options.texture_quality = options::NORMAL;
+
+                        DEB_INFO("Textures set to {} quality", options::NORMAL);
+                    }
+                    if (ImGui::RadioButton("Low", &quality, 1)) {
+                        game_layer->set_textures_quality(options::LOW);
+                        app->options.texture_quality = options::LOW;
+
+                        DEB_INFO("Textures set to {} quality", options::LOW);
+                    }
+
+                    ImGui::EndMenu();
+                }
+                if (ImGui::MenuItem("Custom Cursor", nullptr, &app->options.custom_cursor)) {
+                    if (app->options.custom_cursor) {
+                        if (scene->board.should_take_piece) {
+                            app->window->set_custom_cursor(CustomCursor::Cross);
+                        } else {
+                            app->window->set_custom_cursor(CustomCursor::Arrow);
+                        }
+
+                        DEB_INFO("Set custom cursor");
+                    } else {
+                        app->window->set_custom_cursor(CustomCursor::None);
+
+                        DEB_INFO("Set default cursor");
+                    }
                 }
 
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Texture Quality", true)) {
-                static int quality = scene->options.texture_quality == options::NORMAL ? 0 : 1;
-                if (ImGui::RadioButton("Normal", &quality, 0)) {
-                    game_layer->set_textures_quality(options::NORMAL);
-                    scene->options.texture_quality = options::NORMAL;
-
-                    SPDLOG_INFO("Textures set to {} quality", options::NORMAL);
+            if (ImGui::MenuItem("Save On Exit", nullptr, &app->options.save_on_exit)) {
+                if (app->options.save_on_exit) {
+                    DEB_INFO("The game will be saved on exit");
+                } else {
+                    DEB_INFO("The game will not be saved on exit");
                 }
-                if (ImGui::RadioButton("Low", &quality, 1)) {
-                    game_layer->set_textures_quality(options::LOW);
-                    scene->options.texture_quality = options::LOW;
-
-                    SPDLOG_INFO("Textures set to {} quality", options::LOW);
-                }
-
-                ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Skybox", true)) {
-                static int skybox = scene->options.skybox == options::FIELD ? 0 : 1;
+                static int skybox = app->options.skybox == options::FIELD ? 0 : 1;
                 if (ImGui::RadioButton("Field", &skybox, 0)) {
                     game_layer->set_skybox(options::FIELD);
-                    scene->options.skybox = options::FIELD;
+                    app->options.skybox = options::FIELD;
 
-                    SPDLOG_INFO("Skybox set to {}", options::FIELD);
+                    DEB_INFO("Skybox set to {}", options::FIELD);
                 }
                 if (ImGui::RadioButton("Autumn", &skybox, 1)) {
                     game_layer->set_skybox(options::AUTUMN);
-                    scene->options.skybox = options::AUTUMN;
+                    app->options.skybox = options::AUTUMN;
 
-                    SPDLOG_INFO("Skybox set to {}", options::AUTUMN);
+                    DEB_INFO("Skybox set to {}", options::AUTUMN);
                 }
 
                 ImGui::EndMenu();
             }
             if (ImGui::MenuItem("Show Info", nullptr, &show_info)) {
                 if (show_info) {
-                    SPDLOG_INFO("Show info");
+                    DEB_INFO("Show info");
                 } else {
-                    SPDLOG_INFO("Hide info");
+                    DEB_INFO("Hide info");
                 }
             }
-            if (ImGui::MenuItem("Custom Cursor", nullptr, &scene->options.custom_cursor)) {
-                if (scene->options.custom_cursor) {
-                    app->window->set_custom_cursor(scene->options.custom_cursor);
+            if (ImGui::BeginMenu("Camera Sensitivity", true)) {
+                ImGui::PushItemWidth(100.0f);
+                if (ImGui::SliderFloat("", &app->options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
+                    scene->camera.sensitivity = app->options.sensitivity;
 
-                    SPDLOG_INFO("Set custom cursor");
-                } else {
-                    app->window->set_custom_cursor(scene->options.custom_cursor);
-
-                    SPDLOG_INFO("Set default cursor");
+                    DEB_INFO("Changed camera sensitivity to {}", scene->camera.sensitivity);
                 }
+                ImGui::PopItemWidth();
+
+                ImGui::EndMenu();
+                HOVERING_GUI();
             }
 
             ImGui::EndMenu();
@@ -232,7 +288,7 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::MenuItem("Log Info", nullptr, false)) {
                 logging::log_opengl_and_dependencies_info(logging::LogTarget::File);
 
-                SPDLOG_INFO("Logged OpenGL and dependencies info");
+                DEB_INFO("Logged OpenGL and dependencies info");
             }
 
             ImGui::EndMenu();
@@ -260,7 +316,7 @@ void ImGuiLayer::on_update(float dt) {
             float x_pos;
             float y_pos;
 
-            if ((float) app->get_width() / (float) app->get_height() >= 16.0f / 9.0f) {
+            if (static_cast<float>(app->get_width()) / static_cast<float>(app->get_height()) > 16.0f / 9.0f) {
                 width = app->get_width();
                 height = app->get_width() * (9.0f / 16.0f);
                 x_pos = 0.0f;
@@ -345,6 +401,7 @@ void ImGuiLayer::on_update(float dt) {
     }
 
     if (show_info && !about_mode) {
+        ImGui::PushFont(info_font);
         ImGui::Begin("Info");
         ImGui::Text("FPS: %f", app->fps);
         ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
@@ -352,9 +409,10 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::Text("Vendor: %s", debug_opengl::get_vendor());
         ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
         ImGui::End();
+        ImGui::PopFont();
     }
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     if (!about_mode) {
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %f", app->fps);
@@ -365,7 +423,7 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
         ImGui::Text("White can jump: %s", scene->board.can_jump[0] ? "true" : "false");
         ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
-        ImGui::Text("Phase: %d", (int) scene->board.phase);
+        ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
         ImGui::Text("Turn: %s", scene->board.turn == Board::Player::White ? "white" : "black");
         ImGui::Text("Should take piece: %s", scene->board.should_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
@@ -378,28 +436,72 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::End();
 
         ImGui::Begin("Debug Settings");
-        if (ImGui::SliderFloat3("Light position", (float*) &scene->light.position, -30.0f, 30.0f)) {
+        if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&scene->light.position), -30.0f, 30.0f)) {
             game_layer->setup_light();
         }
-        if (ImGui::SliderFloat3("Light ambient color", (float*) &scene->light.ambient_color, 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&scene->light.ambient_color), 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
-        if (ImGui::SliderFloat3("Light diffuse color", (float*) &scene->light.diffuse_color, 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&scene->light.diffuse_color), 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
-        if (ImGui::SliderFloat3("Light specular color", (float*) &scene->light.specular_color, 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&scene->light.specular_color), 0.0f, 1.0f)) {
             game_layer->setup_light();
         }
+        ImGui::End();
+
+        // If you recompile shaders, uniforms that are set only once need to be reuploaded
+        ImGui::Begin("Shaders");
+        if (ImGui::Button("board_paint")) {
+            app->storage->board_paint_shader->recompile();
+        }
+        if (ImGui::Button("board")) {
+            app->storage->board_shader->recompile();
+        }
+        if (ImGui::Button("node")) {
+            app->storage->node_shader->recompile();
+        }
+        if (ImGui::Button("origin")) {
+            app->storage->origin_shader->recompile();
+        }
+        if (ImGui::Button("outline")) {
+            app->storage->outline_shader->recompile();
+        }
+        if (ImGui::Button("piece")) {
+            app->storage->piece_shader->recompile();
+        }
+        if (ImGui::Button("quad2d")) {
+            app->storage->quad2d_shader->recompile();
+        }
+        if (ImGui::Button("quad3d")) {
+            app->storage->quad3d_shader->recompile();
+        }
+        if (ImGui::Button("screen_quad")) {
+            app->storage->screen_quad_shader->recompile();
+        }
+        if (ImGui::Button("shadow")) {
+            app->storage->shadow_shader->recompile();
+        }
+        if (ImGui::Button("skybox")) {
+            app->storage->skybox_shader->recompile();
+        }
+        if (ImGui::Button("text")) {
+            app->storage->text_shader->recompile();
+        }
+        ImGui::End();
+
+        ImGui::Begin("Camera Debug");
+        ImGui::Text("Position: %f, %f, %f", scene->camera.get_position().x, scene->camera.get_position().y, scene->camera.get_position().z);
+        ImGui::Text("Pitch: %f", scene->camera.get_pitch());
+        ImGui::Text("Yaw: %f", scene->camera.get_yaw());
+        ImGui::Text("Angle around point: %f", scene->camera.get_angle_around_point());
+        ImGui::Text("Distance to point: %f", scene->camera.get_distance_to_point());
         ImGui::End();
     }
 #endif
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-void ImGuiLayer::on_draw() {
-
 }
 
 void ImGuiLayer::on_event(events::Event& event) {
@@ -443,7 +545,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 }
 
 bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    scene->camera.update_projection((float) event.width, (float) event.height);
+    scene->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
     return false;
 }

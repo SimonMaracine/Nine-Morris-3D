@@ -29,6 +29,3 @@ namespace model {
     std::shared_ptr<Mesh<Vertex>> load_model(const std::string& file_path);
     std::shared_ptr<Mesh<VertexP>> load_model_position(const std::string& file_path);
 }
-
-template<typename T>
-using Rc = std::shared_ptr<T>;

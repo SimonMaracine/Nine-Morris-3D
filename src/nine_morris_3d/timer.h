@@ -6,7 +6,7 @@ public:
     ~Timer() = default;
 
     void update(double time);
-    void start();
+    void start(double time);
     void stop();
     unsigned int get_time_seconds() const;
     unsigned int get_time_raw() const;

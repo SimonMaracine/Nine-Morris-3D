@@ -7,14 +7,14 @@
 #include "other/logging.h"
 
 TextureData::TextureData(const std::string& file_path, bool flip) {
-    SPDLOG_DEBUG("Loading texture '{}'...", file_path.c_str());
+    DEB_DEBUG("Loading texture '{}'...", file_path.c_str());
 
-    stbi_set_flip_vertically_on_load((int) flip);
+    stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
     data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture '{}'", file_path.c_str());
+        REL_CRITICAL("Could not load texture '{}', exiting...", file_path.c_str());
         std::exit(1);
     }
 
@@ -26,5 +26,5 @@ TextureData::~TextureData() {
 
     stbi_image_free(data);
 
-    SPDLOG_DEBUG("Freed texture memory '{}'", file_path.c_str());
+    DEB_DEBUG("Freed texture memory '{}'", file_path.c_str());
 }

@@ -6,24 +6,12 @@
 #include <glm/glm.hpp>
 
 #include "application/application.h"
+#include "application/app.h"
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
-#include "other/logging.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
-#include "nine_morris_3d/layers/game/game_layer.h"
-
-void GuiLayer::on_attach() {
-
-}
-
-void GuiLayer::on_detach() {
-
-}
-
-void GuiLayer::on_bind_layers() {
-
-}
+#include "other/logging.h"
 
 void GuiLayer::on_update(float dt) {
     scene->turn_indicator.update(app->data.width, app->data.height);
@@ -33,10 +21,6 @@ void GuiLayer::on_update(float dt) {
 void GuiLayer::on_draw() {
     render_turn_indicator();
     render_timer();
-}
-
-void GuiLayer::on_event(events::Event& event) {
-
 }
 
 void GuiLayer::render_turn_indicator() {
@@ -53,7 +37,7 @@ void GuiLayer::render_timer() {
     const unsigned int minutes = scene->timer.get_time_seconds() / 60;
     const unsigned int seconds = scene->timer.get_time_seconds() % 60;    
 
-    char time[8];
+    char time[32];
     sprintf(time, "%.2u:%.2u", minutes, seconds);
 
     int width, height;
@@ -62,5 +46,5 @@ void GuiLayer::render_timer() {
     const float x_pos = app->data.width / 2 - width / 2 - 8;
     const float y_pos = app->data.height - height - 50;
 
-    renderer::draw_string(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f), app->storage->good_dog_plain_font);
+    renderer::draw_string_with_shadows(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f), app->storage->good_dog_plain_font);
 }

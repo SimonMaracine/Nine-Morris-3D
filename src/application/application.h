@@ -9,8 +9,9 @@
 #include "application/window.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
-#include "other/loader.h"
 #include "nine_morris_3d/assets_load.h"
+#include "nine_morris_3d/options.h"
+#include "other/loader.h"
 
 constexpr int VERSION_MAJOR = 0;
 constexpr int VERSION_MINOR = 1;
@@ -23,6 +24,8 @@ class Application {
 public:
     Application(int width, int height, const std::string& title);
     ~Application();
+
+    static void set_pointer(Application* instance);
 
     void run();
 
@@ -43,9 +46,11 @@ public:
     std::shared_ptr<AssetsLoad> assets_load;
     std::shared_ptr<Window> window;
     renderer::Storage* storage = nullptr;
+    options::Options options;
 private:
     void on_event(events::Event& event);
     float update_frame_counter();
+    unsigned int calculate_fixed_update();
 
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);

@@ -8,22 +8,23 @@
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/renderer.h"
+#include "nine_morris_3d/scenes/game/game_scene.h"
 #include "other/model.h"
 #include "other/loader.h"
-#include "nine_morris_3d/scenes/game/game_scene.h"
 
 class ImGuiLayer;
 
 class GameLayer : public Layer {
 public:
-    GameLayer(unsigned int id, Application* application, GameScene* scene)
-        : Layer(id, application), scene(scene) {}
+    GameLayer(unsigned int id, GameScene* scene)
+        : Layer(id), scene(scene) {}
     virtual ~GameLayer() = default;
 
     virtual void on_attach() override;
     virtual void on_detach() override;
     virtual void on_bind_layers() override;
     virtual void on_update(float dt) override;
+    virtual void on_fixed_update() override;
     virtual void on_draw() override;
     virtual void on_event(events::Event& event) override;
 
@@ -57,6 +58,8 @@ public:
     float last_mouse_y = 0.0f;
 
     bool first_move = false;
+
+    glm::vec3 last_camera_position = glm::vec3(0.0f);
 
     GameScene* scene = nullptr;
 

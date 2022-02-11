@@ -1,18 +1,17 @@
 #include <fstream>
 #include <string>
-#include <exception>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include "application/platform.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 
 #define LOG_FILE "log.txt"
 #define INFO_FILE "info.txt"
-#define APP_NAME_WINDOWS "NineMorris3D"
 
 #define LOG_PATTERN "%^[%l] [th %t] [%H:%M:%S]%$ %v"
 
@@ -23,18 +22,16 @@ namespace logging {
     std::shared_ptr<spdlog::logger> release_logger;
 
     static std::string path(const char* file) {  // Throws exception
-#ifndef NDEBUG
+#if defined(NINE_MORRIS_3D_DEBUG)
         // Use relative path for both operating systems
         return std::string(file);
-#else
-    #if defined(__GNUG__)
-        std::string path = user_data::get_user_data_path() + file;
+#elif defined(NINE_MORRIS_3D_RELEASE)
+    #if defined(NINE_MORRIS_3D_LINUX)
+        std::string path = user_data::get_user_data_directory_path() + file;
         return path;
-    #elif defined(_MSC_VER)
-        std::string path = "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + APP_NAME_WINDOWS + "\\" + LOG_FILE;
+    #elif defined(NINE_MORRIS_3D_WINDOWS)
+        std::string path = "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + APP_NAME_WINDOWS + "\\" + file;
         return path;
-    #else
-        #error "GCC or MSVC must be used (for now)"
     #endif
 #endif
     }
@@ -46,30 +43,31 @@ namespace logging {
         std::string file_path;
         try {
             file_path = path(LOG_FILE);
-        } catch (const std::runtime_error& e) {            
-            release_logger = spdlog::stdout_color_mt("Release Logger Fallback");
+        } catch (const user_data::UserNameError& e) {            
+            release_logger = spdlog::stdout_color_mt("Release Logger Fallback (Console)");
 
             release_logger->set_pattern(LOG_PATTERN);
             release_logger->set_level(spdlog::level::trace);
 
-            spdlog::error("Using fallback logger");
+            spdlog::error("Using fallback logger (console)");
             return;
         }
 
         try {
-            release_logger = spdlog::basic_logger_mt("Release Logger", file_path, false);
+            release_logger = spdlog::basic_logger_mt("Release Logger (File)", file_path, false);
         } catch (const spdlog::spdlog_ex& e) {
-            release_logger = spdlog::stdout_color_mt("Release Logger Fallback");
+            release_logger = spdlog::stdout_color_mt("Release Logger Fallback (Console)");
 
             release_logger->set_pattern(LOG_PATTERN);
             release_logger->set_level(spdlog::level::trace);
 
-            spdlog::error("Using fallback logger: {}", e.what());
+            spdlog::error("Using fallback logger (console): {}", e.what());
             return;
         }
 
         release_logger->set_pattern(LOG_PATTERN);
         release_logger->set_level(spdlog::level::trace);
+        release_logger->flush_on(spdlog::level::info);
     }
 
     void log_opengl_and_dependencies_info(LogTarget target) {
@@ -80,8 +78,9 @@ namespace logging {
                 std::string file_path;
                 try {
                     file_path = path(INFO_FILE);
-                } catch (const std::runtime_error& e) {
+                } catch (const user_data::UserNameError& e) {
                     REL_ERROR("{}", e.what());
+                    REL_ERROR("Could not create info file");
                     break;
                 }
 

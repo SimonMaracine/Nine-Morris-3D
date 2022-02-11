@@ -1,6 +1,6 @@
 #include <fstream>
 #include <string>
-#include <exception>
+#include <stdexcept>
 #include <stdio.h>
 
 #include <glm/glm.hpp>
@@ -9,11 +9,12 @@
 #include <cereal/types/array.hpp>
 #include <cereal/types/memory.hpp>
 
+#include "application/platform.h"
+#include "graphics/renderer/camera.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/node.h"
-#include "graphics/renderer/camera.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 
@@ -53,11 +54,16 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Piece& piece) {
-    archive(piece.id, piece.position, piece.rotation, piece.scale, piece.velocity, piece.target,
-            piece.should_move, piece.distance_travelled, piece.distance_to_travel,
+    archive(piece.id, piece.position, piece.rotation, piece.scale, piece.movement, piece.should_move,
             piece.index_count, piece.specular_color, piece.shininess, piece.select_color,
             piece.hover_color, piece.type, piece.in_use, piece.node_id, piece.show_outline,
             piece.to_take, piece.pending_remove, piece.selected, piece.active);
+}
+
+template<typename Archive>
+void serialize(Archive& archive, Piece::Movement& movement) {
+    archive(movement.type, movement.velocity, movement.target, movement.target0, movement.target1,
+            movement.reached_target0, movement.reached_target1);
 }
 
 /*
@@ -71,9 +77,10 @@ void serialize(Archive& archive, Node& node) {
 
 template<typename Archive>
 void serialize(Archive& archive, Camera& camera) {
-    archive(camera.position, camera.pitch, camera.yaw, camera.view_matrix, camera.projection_matrix,
-            camera.projection_view_matrix, camera.point, camera.distance_to_point,
-            camera.angle_around_point, camera.x_velocity, camera.y_velocity, camera.zoom_velocity);
+    archive(camera.sensitivity, camera.position, camera.pitch, camera.yaw, camera.view_matrix,
+            camera.projection_matrix, camera.projection_view_matrix, camera.point,
+            camera.distance_to_point, camera.angle_around_point, camera.x_velocity,
+            camera.y_velocity, camera.zoom_velocity);
 }
 
 namespace glm {
@@ -93,78 +100,113 @@ namespace glm {
 
 namespace save_load {
     static std::string path(const char* file) {  // Throws exception
-#ifndef NDEBUG
+#if defined(NINE_MORRIS_3D_DEBUG)
         // Use relative path for both operating systems
         return std::string(file);
-#else
-    #if defined(__GNUG__)
-        std::string path = user_data::get_user_data_path() + file;
+#elif defined(NINE_MORRIS_3D_RELEASE)
+    #if defined(NINE_MORRIS_3D_LINUX)
+        std::string path = user_data::get_user_data_directory_path() + file;
         return path;
-    #elif defined(_MSC_VER)
-        std::string path = user_data::get_user_data_path() + "\\" + file;
+    #elif defined(NINE_MORRIS_3D_WINDOWS)
+        std::string path = user_data::get_user_data_directory_path() + "\\" + file;
         return path;
-    #else
-        #error "GCC or MSVC must be used (for now)"
     #endif
 #endif
     }
 
-    static bool file_exists(const std::string& file_path) {
-        FILE* file = fopen(file_path.c_str(), "r");
-        if (file) {
-            fclose(file);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    void save_game(const GameState& game_state) {
+    void save_game_to_file(const GameState& game_state) {  // Throws exception
         std::string file_path;
         try {
             file_path = path(SAVE_GAME_FILE);
-        } catch (const std::runtime_error& e) {
-            REL_ERROR("{}", e.what());
-            return;
+        } catch (const user_data::UserNameError& e) {
+            throw SaveFileError(e.what());
         }
 
         std::ofstream file (file_path, std::ios::binary | std::ios::trunc);
 
         if (!file.is_open()) {
-            REL_ERROR("Could not open the last game file '{}' for writing", SAVE_GAME_FILE);
-            return;
+            std::string message = "Could not open last save game file '" + std::string(SAVE_GAME_FILE)
+                    + "' for writing";
+            throw SaveFileNotOpenError(message);
         }
 
-        cereal::BinaryOutputArchive output{file};
-        output(game_state);
+        try {
+            cereal::BinaryOutputArchive output {file};
+            output(game_state);
+        } catch (const std::exception& e) {  // Just to be sure...
+            throw SaveFileError(e.what());
+        }
 
-        SPDLOG_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
+        DEB_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
     }
 
-    void load_game(GameState& game_state) {  // Throws exception
+    void load_game_from_file(GameState& game_state) {  // Throws exception
         std::string file_path;
-        file_path = path(SAVE_GAME_FILE);
+        try {
+            file_path = path(SAVE_GAME_FILE);
+        } catch (const user_data::UserNameError& e) {
+            throw SaveFileError(e.what());
+        }
 
         std::ifstream file (file_path, std::ios::binary);
 
         if (!file.is_open()) {
-            std::string message = "Could not open the last game file ";
-            message.append("'").append(SAVE_GAME_FILE).append("'");
-            throw std::runtime_error(message);
+            std::string message = "Could not open last save game file '" + std::string(SAVE_GAME_FILE) + "'";
+            throw SaveFileNotOpenError(message);
         }
 
-        cereal::BinaryInputArchive input{file};
-        input(game_state);
+        try {
+            cereal::BinaryInputArchive input {file};
+            input(game_state);
+        } catch (const cereal::Exception& e) {
+            throw SaveFileError(e.what());
+        } catch (const std::exception& e) {
+            throw SaveFileError(e.what());
+        }
 
-        SPDLOG_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
+        DEB_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
+    }
+
+    void delete_save_game_file(const std::string& file_path) {
+        if (remove(file_path.c_str()) != 0) {
+            REL_INFO("Could not delete save game file '{}'", file_path.c_str());
+        } else {
+            REL_INFO("Deleted save game file '{}'", file_path.c_str());
+        }
     }
 
     bool save_files_exist() {
         if (file_exists(SAVE_GAME_FILE)) {
             return true;
         } else {
-            SPDLOG_ERROR("Save file is either missing or is inaccessible: '{}'", SAVE_GAME_FILE);
+            DEB_ERROR("Save game file is either missing or is inaccessible: '{}'", SAVE_GAME_FILE);
             return false;
+        }
+    }
+
+    void handle_save_game_file_not_open_error() {
+        bool user_data_directory;
+
+        try {
+            user_data_directory = user_data::user_data_directory_exists();
+        } catch (const user_data::UserNameError& e) {
+            REL_ERROR("{}", e.what());
+            return;
+        }
+
+        if (!user_data_directory) {
+            REL_INFO("User data folder missing; creating one...");
+
+            try {
+                bool success = user_data::create_user_data_directory();
+                if (!success) {
+                    REL_ERROR("Could not create user data directory");
+                    return;
+                }
+            } catch (const user_data::UserNameError& e) {
+                REL_ERROR("{}", e.what());
+                return;
+            }
         }
     }
 }

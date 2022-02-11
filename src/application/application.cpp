@@ -14,6 +14,9 @@
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
+// Global reference to application
+Application* app = nullptr;
+
 Application::Application(int width, int height, const std::string& title) {
     data.width = width;
     data.height = height;
@@ -23,7 +26,7 @@ Application::Application(int width, int height, const std::string& title) {
     logging::initialize();
     window = std::make_shared<Window>(&data);
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
 #endif
     input::initialize(window->get_handle());
@@ -38,58 +41,84 @@ Application::Application(int width, int height, const std::string& title) {
 
     storage = renderer::initialize(this);
     assets_load = std::make_shared<AssetsLoad>();
+
+    try {
+        options::load_options_from_file(options);
+    } catch (const options::OptionsFileNotOpenError& e) {
+        REL_ERROR("{}", e.what());
+        options::handle_options_file_not_open_error();
+    } catch (const options::OptionsFileError& e) {
+        REL_ERROR("{}", e.what());
+
+        try {
+            options::create_options_file();
+        } catch (const options::OptionsFileNotOpenError& e) {
+            REL_ERROR("{}", e.what());
+        } catch (const options::OptionsFileError& e) {
+            REL_ERROR("{}", e.what());
+        }
+    }
 }
 
 Application::~Application() {
-    for (unsigned int j = 0; j < scenes.size(); j++) {
-        for (unsigned int i = 0; i < scenes[j]->layer_stack.size(); i++) {
-            delete scenes[j]->layer_stack[i];
+    for (Scene* scene : scenes) {
+        for (Layer* layer : scene->layer_stack) {
+            delete layer;
         }
-        delete scenes[j];
+        delete scene;
     }
 
     renderer::terminate();
 }
 
+void Application::set_pointer(Application* instance) {
+    assert(app == nullptr);
+    app = instance;
+}
+
 void Application::run() {
     assert(current_scene != nullptr);
+    assert(app != nullptr);
 
-    for (unsigned int j = 0; j < scenes.size(); j++) {
-        for (unsigned int i = 0; i < scenes[j]->layer_stack.size(); i++) {
-            scenes[j]->layer_stack[i]->on_bind_layers();
+    for (Scene* scene : scenes) {
+        for (Layer* layer : scene->layer_stack) {
+            layer->on_bind_layers();
         }
     }
 
     current_scene->on_enter();
-    for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
-        current_scene->layer_stack[i]->on_attach();
+    for (Layer* layer : current_scene->layer_stack) {
+        layer->on_attach();
     }
 
-    SPDLOG_INFO("Initialized game");
-
-    float dt = 0.0f;
+    DEB_INFO("Initialized game");
 
     while (running) {
-        dt = update_frame_counter();
+        float dt = update_frame_counter();
+        unsigned int fixed_updates = calculate_fixed_update();
 
-        for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
-            if (current_scene->layer_stack[i]->active) {
-                current_scene->layer_stack[i]->on_update(dt);
-                current_scene->layer_stack[i]->on_draw();
+        for (Layer* layer : current_scene->layer_stack) {
+            if (layer->active) {
+                for (unsigned int i = 0; i < fixed_updates; i++) {
+                    layer->on_fixed_update();
+                }
+                layer->on_update(dt);
+                layer->on_draw();
             }
         }
 
         if (changed_scene) {
-            for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
-                current_scene->layer_stack[i]->on_detach();
+            for (auto iter = current_scene->layer_stack.rbegin();
+                    iter != current_scene->layer_stack.rend(); iter++) {
+                (*iter)->on_detach();
             }
             current_scene->on_exit();
 
             current_scene = to_scene;
 
             current_scene->on_enter();
-            for (unsigned int i = 0; i < current_scene->layer_stack.size(); i++) {
-                current_scene->layer_stack[i]->on_attach();
+            for (Layer* layer : current_scene->layer_stack) {
+                layer->on_attach();
             }
 
             changed_scene = false;
@@ -98,10 +127,11 @@ void Application::run() {
         window->update();
     }
 
-    SPDLOG_INFO("Closing game");
+    DEB_INFO("Closing game");
 
-    for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
-        current_scene->layer_stack[i]->on_detach();
+    for (auto iter = current_scene->layer_stack.rbegin();
+            iter != current_scene->layer_stack.rend(); iter++) {
+        (*iter)->on_detach();
     }
     current_scene->on_exit();
 }
@@ -137,7 +167,7 @@ void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
 void Application::purge_framebuffers() {
     for (auto iter = framebuffers.rbegin(); iter != framebuffers.rend(); iter++) {
         if (iter->expired()) {
-            framebuffers.erase(std::next(iter).base());
+            iter = decltype(iter)(framebuffers.erase(std::next(iter).base()));
         }
     }
 }
@@ -149,13 +179,14 @@ void Application::on_event(events::Event& event) {
     dispatcher.dispatch<WindowClosedEvent>(WindowClosed, BIND(Application::on_window_closed));
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(Application::on_window_resized));
 
-    for (int i = current_scene->layer_stack.size() - 1; i >= 0; i--) {
+    for (auto iter = current_scene->layer_stack.rbegin();
+            iter != current_scene->layer_stack.rend(); iter++) {
         if (event.handled) {
             break;
         }
 
-        if (current_scene->layer_stack[i]->active) {
-            current_scene->layer_stack[i]->on_event(event);
+        if ((*iter)->active) {
+            (*iter)->on_event(event);
         }
     }
 }
@@ -182,7 +213,7 @@ float Application::update_frame_counter() {
     total_time += elapsed_seconds;
 
     if (total_time > 0.25) {
-        fps = (double) frame_count / total_time;
+        fps = static_cast<double>(frame_count) / total_time;
         frame_count = 0;
         total_time = 0.0;
     }
@@ -190,7 +221,33 @@ float Application::update_frame_counter() {
 
     const double delta_time = std::min(elapsed_seconds, MAX_DT);
 
-    return (float) delta_time;
+    return static_cast<float>(delta_time);
+}
+
+unsigned int Application::calculate_fixed_update() {
+    constexpr double FIXED_DT = 1.0 / 50.0;
+
+    static double previous_seconds = window->get_time();
+    static double total_time = 0.0;
+
+    const double current_seconds = window->get_time();
+    const double elapsed_seconds = current_seconds - previous_seconds;
+    previous_seconds = current_seconds;
+
+    total_time += elapsed_seconds;
+
+    unsigned int updates = 0;
+
+    while (true) {
+        if (total_time > FIXED_DT) {
+            total_time -= FIXED_DT;
+            updates++;
+        } else {
+            break;
+        }
+    }
+
+    return updates;
 }
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {
@@ -203,19 +260,23 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
     renderer::set_viewport(event.width, event.height);
 
     for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
-        std::shared_ptr<Framebuffer> frame = framebuffer.lock();
-        if (frame) {
-            if (frame->resizable) {
-                frame->resize(event.width, event.height);
+        std::shared_ptr<Framebuffer> fb = framebuffer.lock();
+        if (fb != nullptr) {
+            if (fb->get_specification().resizable) {
+                fb->resize(event.width, event.height);
             }
         }
     }
 
-    storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) event.width, 0.0f,
-            (float) event.height);
+    storage->orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
+            static_cast<float>(event.height));
 
     storage->quad2d_shader->bind();
     storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
+            storage->orthographic_projection_matrix);
+
+    storage->text_shader->bind();
+    storage->text_shader->set_uniform_matrix("u_projection_matrix",
             storage->orthographic_projection_matrix);
 
     return false;

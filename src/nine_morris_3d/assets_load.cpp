@@ -1,8 +1,8 @@
 #include "nine_morris_3d/assets_load.h"
+#include "nine_morris_3d/assets.h"
 #include "other/model.h"
 #include "other/texture_data.h"
 #include "other/loader.h"
-#include "other/assets.h"
 
 namespace assets_load {
     void field(Loader<AssetsLoad>* loader) {

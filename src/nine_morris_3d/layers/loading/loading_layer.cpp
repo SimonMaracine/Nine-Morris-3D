@@ -1,28 +1,29 @@
 #include <memory>
 #include <cassert>
 
+#include "application/app.h"
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
-#include "other/loader.h"
 #include "nine_morris_3d/layers/loading/loading_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/options.h"
+#include "other/loader.h"
 
 void LoadingLayer::on_attach() {
-    if (scene->options.texture_quality == options::NORMAL) {
-        if (scene->options.skybox == options::FIELD) {
+    if (app->options.texture_quality == options::NORMAL) {
+        if (app->options.skybox == options::FIELD) {
             loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::field);
-        } else if (scene->options.skybox == options::AUTUMN) {
+        } else if (app->options.skybox == options::AUTUMN) {
             loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::autumn);
         } else {
             assert(false);
         }
-    } else if (scene->options.texture_quality == options::LOW) {
-        if (scene->options.skybox == options::FIELD) {
+    } else if (app->options.texture_quality == options::LOW) {
+        if (app->options.skybox == options::FIELD) {
             loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::field_low_tex);
-        } else if (scene->options.skybox == options::AUTUMN) {
+        } else if (app->options.skybox == options::AUTUMN) {
             loader = std::make_unique<Loader<AssetsLoad>>(app->assets_load, assets_load::autumn_low_tex);
         } else {
             assert(false);
@@ -37,17 +38,13 @@ void LoadingLayer::on_attach() {
 }
 
 void LoadingLayer::on_detach() {
-    SPDLOG_INFO("Done loading assets; initializing the rest of the game...");
+    DEB_INFO("Done loading assets; initializing the rest of the game...");
 
     if (loader->get_thread().joinable()) {
         loader->get_thread().detach();
     }
 
     renderer::enable_stencil();
-}
-
-void LoadingLayer::on_bind_layers() {
-
 }
 
 void LoadingLayer::on_update(float dt) {
@@ -64,7 +61,7 @@ void LoadingLayer::on_draw() {
     float x_pos;
     float y_pos;
 
-    if ((float) app->get_width() / (float) app->get_height() >= 16.0f / 9.0f) {
+    if (static_cast<float>(app->get_width()) / static_cast<float>(app->get_height()) > 16.0f / 9.0f) {
         width = app->get_width();
         height = app->get_width() * (9.0f / 16.0f);
         x_pos = 0.0f;
@@ -78,7 +75,7 @@ void LoadingLayer::on_draw() {
 
     renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
-    renderer::draw_string("Loading...", glm::vec2(app->get_width() - 200.0f, 20.0f), 1.2f,
+    renderer::draw_string_with_shadows("Loading...", glm::vec2(app->get_width() - 200.0f, 20.0f), 1.2f,
             glm::vec3(0.81f), app->storage->good_dog_plain_font);
 }
 

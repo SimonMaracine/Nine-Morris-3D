@@ -1,7 +1,7 @@
 #include <memory>
 #include <iostream>
 #include <string>
-#include <exception>
+#include <stdexcept>
 #include <array>
 #include <string.h>
 
@@ -12,6 +12,7 @@
 #include <stb_truetype.h>
 
 #include "application/application.h"
+#include "application/platform.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
@@ -19,8 +20,8 @@
 #include "graphics/renderer/texture.h"
 #include "graphics/renderer/framebuffer.h"
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/assets.h"
 #include "other/logging.h"
-#include "other/assets.h"
 
 namespace renderer {
     static Storage* storage = nullptr;
@@ -200,7 +201,7 @@ namespace renderer {
             );
         }
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         {
             const std::vector<std::string> uniforms;
             storage->origin_shader = Shader::create(
@@ -218,7 +219,9 @@ namespace renderer {
                 "u_model_matrix",
                 "u_projection_matrix",
                 "u_bitmap",
-                "u_color"
+                "u_color",
+                "u_border_width",
+                "u_offset"
             };
             storage->text_shader = Shader::create(
                 assets::path(assets::TEXT_VERTEX_SHADER),
@@ -227,15 +230,37 @@ namespace renderer {
             );
         }
 
-        storage->depth_map_framebuffer = Framebuffer::create(Framebuffer::Type::DepthMap,
-                2048, 2048, 1, 0, false);
-        app->purge_framebuffers();
-        app->add_framebuffer(storage->depth_map_framebuffer);
+        {
+            FramebufferSpecification specification;
+            specification.width = 2048;
+            specification.height = 2048;
+            specification.depth_attachment = Attachment(AttachmentFormat::DEPTH32,
+                    AttachmentType::Texture);
+            specification.white_border_for_depth_texture = true;
+            specification.resizable = false;
 
-        storage->intermediate_framebuffer = Framebuffer::create(Framebuffer::Type::Intermediate,
-                app->data.width, app->data.height, 1, 2, true);  // TODO refactor framebuffers
-        app->purge_framebuffers();
-        app->add_framebuffer(storage->intermediate_framebuffer);
+            storage->depth_map_framebuffer = Framebuffer::create(specification);
+
+            app->purge_framebuffers();
+            app->add_framebuffer(storage->depth_map_framebuffer);
+        }
+
+        {
+            FramebufferSpecification specification;
+            specification.width = app->data.width;
+            specification.height = app->data.height;
+            specification.color_attachments = {
+                Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
+                Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+            };
+            specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
+                    AttachmentType::Renderbuffer);
+
+            storage->intermediate_framebuffer = Framebuffer::create(specification);
+
+            app->purge_framebuffers();
+            app->add_framebuffer(storage->intermediate_framebuffer);
+        }
 
         {
             float screen_quad_vertices[] = {
@@ -276,7 +301,7 @@ namespace renderer {
             VertexArray::unbind();
         }
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         {
             float origin_vertices[] = {
                 -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
@@ -299,11 +324,12 @@ namespace renderer {
 
         storage->splash_screen_texture = Texture::create(assets::path(assets::SPLASH_SCREEN_TEXTURE), true);
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
         storage->light_texture = Texture::create("data/textures/light_bulb/light.png", false);  // TODO see what to do with this
 #endif
 
-        storage->orthographic_projection_matrix = glm::ortho(0.0f, (float) app->data.width, 0.0f, (float) app->data.height);
+        storage->orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(app->data.width),
+                0.0f, static_cast<float>(app->data.height));
 
         storage->good_dog_plain_font = std::make_shared<Font>(assets::path(assets::GOOD_DOG_PLAIN_FONT),
                 50.0f, 5, 180, 40, 512);
@@ -323,6 +349,8 @@ namespace renderer {
         storage->quad3d_shader->set_uniform_int("u_texture", 0);
         storage->text_shader->bind();
         storage->text_shader->set_uniform_int("u_bitmap", 0);
+        storage->text_shader->set_uniform_matrix("u_projection_matrix",
+                storage->orthographic_projection_matrix);
         storage->skybox_shader->bind();
         storage->skybox_shader->set_uniform_int("u_skybox", 0);
         Shader::unbind();
@@ -374,7 +402,7 @@ namespace renderer {
         glDisable(GL_STENCIL_TEST);
     }
 
-#ifndef NDEBUG
+#ifdef NINE_MORRIS_3D_DEBUG
     void draw_origin() {
         storage->origin_shader->bind();
         storage->origin_vertex_array->bind();
@@ -470,9 +498,10 @@ namespace renderer {
         delete[] buffer;
 
         storage->text_shader->bind();
-        storage->text_shader->set_uniform_matrix("u_projection_matrix", storage->orthographic_projection_matrix);  // TODO this doesn't need to be done everytime
         storage->text_shader->set_uniform_matrix("u_model_matrix", matrix);
         storage->text_shader->set_uniform_vec3("u_color", color);
+        storage->text_shader->set_uniform_float("u_border_width", 0.0f);
+        storage->text_shader->set_uniform_vec2("u_offset", glm::vec2(0.0f, 0.0f));
 
         glDisable(GL_DEPTH_TEST);
 
@@ -481,6 +510,34 @@ namespace renderer {
         glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
 
         glEnable(GL_DEPTH_TEST);
+    }
+
+    void draw_string_with_shadows(const std::string& string, const glm::vec2& position, float scale,
+                const glm::vec3& color, std::shared_ptr<Font> font) {
+        size_t size;
+        float* buffer;
+        font->render(string, &size, &buffer);
+
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
+        matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
+
+        font->update_data(buffer, size);
+        delete[] buffer;
+
+        storage->text_shader->bind();
+        storage->text_shader->set_uniform_matrix("u_model_matrix", matrix);
+        storage->text_shader->set_uniform_vec3("u_color", color);
+        storage->text_shader->set_uniform_float("u_border_width", 0.3f);
+        storage->text_shader->set_uniform_vec2("u_offset", glm::vec2(-0.003f, -0.003f));
+
+        glDisable(GL_DEPTH_TEST);
+
+        font->get_vertex_array()->bind();
+        bind_texture(font->get_texture(), 0);
+        glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
+
+        glEnable(GL_DEPTH_TEST);  
     }
 
     void draw_board(const Board& board) {
