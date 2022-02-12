@@ -5,11 +5,10 @@
 
 #include <glm/glm.hpp>
 
-#include "application/application.h"
-#include "application/app.h"
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
+#include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "other/logging.h"

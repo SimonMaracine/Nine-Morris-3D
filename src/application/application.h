@@ -10,23 +10,16 @@
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer.h"
 #include "nine_morris_3d/assets_data.h"
-#include "nine_morris_3d/options.h"
 #include "other/loader.h"
-
-constexpr int VERSION_MAJOR = 0;
-constexpr int VERSION_MINOR = 1;
-constexpr int VERSION_PATCH = 0;
 
 class Layer;
 class Scene;
 
 class Application {
-public:
+protected:
     Application(int width, int height, const std::string& title);
-    ~Application();
-
-    static void set_pointer(Application* instance);
-
+    virtual ~Application();
+public:
     void run();
 
     void add_scene(Scene* scene);
@@ -48,7 +41,6 @@ public:
     std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
     renderer::Storage* storage = nullptr;
-    options::Options options;
 private:
     void on_event(events::Event& event);
     float update_frame_counter();

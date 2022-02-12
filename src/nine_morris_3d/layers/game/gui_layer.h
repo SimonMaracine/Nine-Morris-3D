@@ -11,8 +11,8 @@ class GameLayer;
 
 class GuiLayer : public Layer {
 public:
-    GuiLayer(std::string&& id)
-        : Layer(std::move(id)) {}
+    GuiLayer(std::string&& id, Application* app)
+        : Layer(std::move(id), app) {}
     virtual ~GuiLayer() = default;
 
     virtual void on_bind_layers() override;

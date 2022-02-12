@@ -3,7 +3,6 @@
 #include <string>
 #include <utility>
 
-#include "application/application.h"
 #include "application/layer.h"
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
@@ -19,8 +18,8 @@ class GuiLayer;
 
 class GameLayer : public Layer {
 public:
-    GameLayer(std::string&& id)
-        : Layer(std::move(id)) {}
+    GameLayer(std::string&& id, Application* app)
+        : Layer(std::move(id), app) {}
     virtual ~GameLayer() = default;
 
     virtual void on_attach() override;

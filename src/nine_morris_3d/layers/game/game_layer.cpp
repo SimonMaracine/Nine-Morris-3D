@@ -12,8 +12,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "application/application.h"
-#include "application/app.h"
 #include "application/layer.h"
 #include "application/window.h"
 #include "application/events.h"
@@ -30,6 +28,7 @@
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/light.h"
 #include "graphics/renderer/camera.h"
+#include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"

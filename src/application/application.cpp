@@ -16,9 +16,6 @@
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
-// Global reference to application
-Application* app = nullptr;
-
 Application::Application(int width, int height, const std::string& title) {
     data.width = width;
     data.height = height;
@@ -43,23 +40,6 @@ Application::Application(int width, int height, const std::string& title) {
 
     storage = renderer::initialize(this);
     assets_data = std::make_shared<AssetsData>();
-
-    try {
-        options::load_options_from_file(options);
-    } catch (const options::OptionsFileNotOpenError& e) {
-        REL_ERROR("{}", e.what());
-        options::handle_options_file_not_open_error();
-    } catch (const options::OptionsFileError& e) {
-        REL_ERROR("{}", e.what());
-
-        try {
-            options::create_options_file();
-        } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("{}", e.what());
-        } catch (const options::OptionsFileError& e) {
-            REL_ERROR("{}", e.what());
-        }
-    }
 }
 
 Application::~Application() {
@@ -73,14 +53,8 @@ Application::~Application() {
     renderer::terminate();
 }
 
-void Application::set_pointer(Application* instance) {
-    assert(app == nullptr);
-    app = instance;
-}
-
 void Application::run() {
     assert(current_scene != nullptr);
-    assert(app != nullptr);
 
     for (Scene* scene : scenes) {
         for (Layer* layer : scene->layers_in_order) {

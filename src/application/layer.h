@@ -4,15 +4,14 @@
 #include <string>
 #include <utility>
 
-#include "application/events.h"
 #include "application/application.h"
-#include "application/app.h"
+#include "application/events.h"
 #include "application/scene.h"
 
 class Layer {
 public:
-    Layer(std::string&& id)
-        : id(std::move(id)) {}
+    Layer(std::string&& id, Application* application)
+        : id(std::move(id)), application(application) {}
     virtual ~Layer() = default;
 
     virtual void on_attach() {}
@@ -27,7 +26,7 @@ public:
 protected:
     template<typename T>
     T* get_layer(const std::string& id) const {
-        for (Scene* scene : app->scenes) {
+        for (Scene* scene : application->scenes) {
             for (Layer* layer : scene->layers_in_order) {
                 if (layer->id == id) {
                     return static_cast<T*>(layer);
@@ -40,4 +39,5 @@ protected:
     }
 private:
     std::string id;
+    Application* application = nullptr;
 };

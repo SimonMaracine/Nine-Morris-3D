@@ -7,7 +7,7 @@
 
 #include <glm/glm.hpp>
 
-#include "application/app.h"
+#include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/hoverable.h"
 #include "other/logging.h"

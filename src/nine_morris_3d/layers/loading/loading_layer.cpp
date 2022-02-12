@@ -1,9 +1,9 @@
 #include <memory>
 #include <cassert>
 
-#include "application/app.h"
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
+#include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/loading/loading_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
