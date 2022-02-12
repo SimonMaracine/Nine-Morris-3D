@@ -39,6 +39,9 @@ public:
     int get_width() const;
     int get_height() const;
 
+    // This needs to be called whenever a layer is set active or not, so that it gets processed
+    void remake_active_layers();
+
     bool running = true;
     double fps = 0.0;
     ApplicationData data;
@@ -59,7 +62,8 @@ private:
 
     std::vector<Scene*> scenes;
     Scene* current_scene = nullptr;
-    std::vector<Layer*> layer_stack;
+    std::vector<Layer*> layer_stack;  // Stores all layers in the current scene
+    std::vector<Layer*> active_layer_stack;  // Only active layers in current scene
 
     bool changed_scene = false;
     Scene* to_scene = nullptr;

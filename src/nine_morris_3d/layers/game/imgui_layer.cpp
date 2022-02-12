@@ -310,6 +310,7 @@ void ImGuiLayer::on_update(float dt) {
             HOVERING_GUI();
             game_layer->active = false;
             gui_layer->active = false;
+            app->remake_active_layers();
 
             float width;
             float height;
@@ -342,6 +343,7 @@ void ImGuiLayer::on_update(float dt) {
 
                 game_layer->active = true;
                 gui_layer->active = true;
+                app->remake_active_layers();
             }
 
             ImGui::EndPopup();

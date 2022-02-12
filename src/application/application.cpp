@@ -98,19 +98,18 @@ void Application::run() {
         float dt = update_frame_counter();
         unsigned int fixed_updates = calculate_fixed_update();
 
-        for (Layer* layer : layer_stack) {
-            if (layer->active) {
-                for (unsigned int i = 0; i < fixed_updates; i++) {
-                    layer->on_fixed_update();
-                }
-                layer->on_update(dt);
-                layer->on_draw();
+        for (Layer* layer : active_layer_stack) {
+            for (unsigned int i = 0; i < fixed_updates; i++) {
+                layer->on_fixed_update();
             }
+            layer->on_update(dt);
+            layer->on_draw();
         }
 
         if (changed_scene) {
-            for (auto iter = current_scene->layers_in_order.rbegin();
-                    iter != current_scene->layers_in_order.rend(); iter++) {
+            active_layer_stack.clear();
+
+            for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
                 pop_layer(*iter);
             }
 
@@ -165,6 +164,24 @@ void Application::purge_framebuffers() {
     }
 }
 
+int Application::get_width() const {
+    return data.width;
+}
+
+int Application::get_height() const {
+    return data.height;
+}
+
+void Application::remake_active_layers() {
+    active_layer_stack.clear();
+
+    for (Layer* layer : layer_stack) {
+        if (layer->active) {
+            active_layer_stack.push_back(layer);
+        }
+    }
+}
+
 void Application::on_event(events::Event& event) {
     using namespace events;
 
@@ -172,23 +189,13 @@ void Application::on_event(events::Event& event) {
     dispatcher.dispatch<WindowClosedEvent>(WindowClosed, BIND(Application::on_window_closed));
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(Application::on_window_resized));
 
-    for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
+    for (auto iter = active_layer_stack.rbegin(); iter != active_layer_stack.rend(); iter++) {
         if (event.handled) {
             break;
         }
 
-        if ((*iter)->active) {
-            (*iter)->on_event(event);
-        }
+        (*iter)->on_event(event);
     }
-}
-
-int Application::get_width() const {
-    return data.width;
-}
-
-int Application::get_height() const {
-    return data.height;
 }
 
 float Application::update_frame_counter() {
@@ -244,6 +251,7 @@ unsigned int Application::calculate_fixed_update() {
 
 void Application::push_layer(Layer* layer) {
     layer_stack.push_back(layer);
+    active_layer_stack.push_back(layer);
     layer->on_attach();
 }
 
@@ -251,6 +259,7 @@ void Application::pop_layer(Layer* layer) {
     layer->on_detach();
     auto iter = std::find(layer_stack.begin(), layer_stack.end(), layer);
     layer_stack.erase(iter);
+    layer->active = true;
 }
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {
