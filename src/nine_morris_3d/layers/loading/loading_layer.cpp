@@ -61,20 +61,20 @@ void LoadingLayer::on_draw() {
     float x_pos;
     float y_pos;
 
-    if (static_cast<float>(app->get_width()) / static_cast<float>(app->get_height()) > 16.0f / 9.0f) {
-        width = app->get_width();
-        height = app->get_width() * (9.0f / 16.0f);
+    if (static_cast<float>(app->data.width) / static_cast<float>(app->data.height) > 16.0f / 9.0f) {
+        width = app->data.width;
+        height = app->data.width * (9.0f / 16.0f);
         x_pos = 0.0f;
-        y_pos = (height - app->get_height()) / -2.0f;
+        y_pos = (height - app->data.height) / -2.0f;
     } else {
-        height = app->get_height();
-        width = app->get_height() * (16.0f / 9.0f);
-        x_pos = (width - app->get_width()) / -2.0f;
+        height = app->data.height;
+        width = app->data.height * (16.0f / 9.0f);
+        x_pos = (width - app->data.width) / -2.0f;
         y_pos = 0.0f;
     }
 
     renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
-    renderer::draw_string_with_shadows("Loading...", glm::vec2(app->get_width() - 200.0f, 20.0f), 1.2f,
+    renderer::draw_string_with_shadows("Loading...", glm::vec2(app->data.height - 200.0f, 20.0f), 1.2f,
             glm::vec3(0.81f), app->storage->good_dog_plain_font);
 }

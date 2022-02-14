@@ -138,15 +138,7 @@ void Application::purge_framebuffers() {
     }
 }
 
-int Application::get_width() const {
-    return data.width;
-}
-
-int Application::get_height() const {
-    return data.height;
-}
-
-void Application::remake_active_layers() {
+void Application::update_active_layers() {
     active_layer_stack.clear();
 
     for (Layer* layer : layer_stack) {

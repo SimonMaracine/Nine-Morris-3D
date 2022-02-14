@@ -309,22 +309,22 @@ void ImGuiLayer::on_update(float dt) {
             HOVERING_GUI();
             game_layer->active = false;
             gui_layer->active = false;
-            app->remake_active_layers();
+            app->update_active_layers();
 
             float width;
             float height;
             float x_pos;
             float y_pos;
 
-            if (static_cast<float>(app->get_width()) / static_cast<float>(app->get_height()) > 16.0f / 9.0f) {
-                width = app->get_width();
-                height = app->get_width() * (9.0f / 16.0f);
+            if (static_cast<float>(app->data.width) / static_cast<float>(app->data.height) > 16.0f / 9.0f) {
+                width = app->data.width;
+                height = app->data.width * (9.0f / 16.0f);
                 x_pos = 0.0f;
-                y_pos = (height - app->get_height()) / -2.0f;
+                y_pos = (height - app->data.height) / -2.0f;
             } else {
-                height = app->get_height();
-                width = app->get_height() * (16.0f / 9.0f);
-                x_pos = (width - app->get_width()) / -2.0f;
+                height = app->data.height;
+                width = app->data.height * (16.0f / 9.0f);
+                x_pos = (width - app->data.width) / -2.0f;
                 y_pos = 0.0f;
             }
 
@@ -342,7 +342,7 @@ void ImGuiLayer::on_update(float dt) {
 
                 game_layer->active = true;
                 gui_layer->active = true;
-                app->remake_active_layers();
+                app->update_active_layers();
             }
 
             ImGui::EndPopup();

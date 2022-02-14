@@ -29,11 +29,8 @@ public:
     void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void purge_framebuffers();
 
-    int get_width() const;
-    int get_height() const;
-
     // This needs to be called whenever a layer is set active or not, so that it gets processed
-    void remake_active_layers();
+    void update_active_layers();
 
     bool running = true;
     double fps = 0.0;
