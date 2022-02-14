@@ -28,6 +28,10 @@ public:
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
 
+    void draw_game_over();
+    void draw_about_screen();
+    void draw_debug(float dt);
+
     bool hovering_gui = false;
     bool can_undo = false;
     bool show_info = false;
@@ -35,6 +39,7 @@ public:
     std::string last_save_date;
 
     ImFont* info_font = nullptr;
+    ImFont* windows_font = nullptr;
 
     GameLayer* game_layer = nullptr;
     GuiLayer* gui_layer = nullptr;

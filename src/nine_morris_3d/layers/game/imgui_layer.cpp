@@ -1,3 +1,4 @@
+#include <utility>
 #include <time.h>
 
 #include <imgui.h>
@@ -47,9 +48,10 @@ void ImGuiLayer::on_attach() {
     ImVector<ImWchar> ranges;
     builder.BuildRanges(&ranges);
 
-    io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(),
-            20.0f, nullptr, ranges.Data);
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 20.0f);
     info_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 16.0f);
+    windows_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 24.0f,
+            nullptr, ranges.Data);
     io.Fonts->Build();
 
     ImVec4* colors = ImGui::GetStyle().Colors;
@@ -63,6 +65,7 @@ void ImGuiLayer::on_attach() {
     colors[ImGuiCol_HeaderHovered] = DEFAULT_BROWN;
 
     ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
     style.FrameRounding = 8;
     style.WindowRounding = 8;
     style.ChildRounding = 8;
@@ -298,55 +301,7 @@ void ImGuiLayer::on_update(float dt) {
     }
 
     if (about_mode) {
-        ImGui::OpenPopup("About Nine Morris 3D");
-
-        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        ImGuiStyle& style = ImGui::GetStyle();
-        style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-
-        if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            HOVERING_GUI();
-            game_layer->active = false;
-            gui_layer->active = false;
-            app->update_active_layers();
-
-            float width;
-            float height;
-            float x_pos;
-            float y_pos;
-
-            if (static_cast<float>(app->data.width) / static_cast<float>(app->data.height) > 16.0f / 9.0f) {
-                width = app->data.width;
-                height = app->data.width * (9.0f / 16.0f);
-                x_pos = 0.0f;
-                y_pos = (height - app->data.height) / -2.0f;
-            } else {
-                height = app->data.height;
-                width = app->data.height * (16.0f / 9.0f);
-                x_pos = (width - app->data.width) / -2.0f;
-                y_pos = 0.0f;
-            }
-
-            renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
-
-            ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
-            ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
-            ImGui::Separator();
-            ImGui::Text("All programming by:");
-            ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
-
-            if (ImGui::Button("Ok", ImVec2(430, 0))) {
-                ImGui::CloseCurrentPopup();
-                about_mode = false;
-
-                game_layer->active = true;
-                gui_layer->active = true;
-                app->update_active_layers();
-            }
-
-            ImGui::EndPopup();
-        }
+        draw_about_screen();
     }
 
     if (game_layer->board.not_placed_pieces_count() < 18) {
@@ -354,51 +309,7 @@ void ImGuiLayer::on_update(float dt) {
     }
 
     if (game_layer->board.phase == Board::Phase::GameOver) {
-        ImGui::OpenPopup("Game Over");
-
-        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        ImGuiStyle& style = ImGui::GetStyle();
-        style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-
-        if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            switch (game_layer->board.ending) {
-                case Board::Ending::WinnerWhite: {
-                    const char* message = "White player wins!";
-                    const float window_width = ImGui::GetWindowSize().x;
-                    const float text_width = ImGui::CalcTextSize(message).x;
-                    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                    ImGui::Text("%s", message);
-                    break;
-                }
-                case Board::Ending::WinnerBlack: {
-                    const char* message = "Black player wins!";
-                    const float window_width = ImGui::GetWindowSize().x;
-                    const float text_width = ImGui::CalcTextSize(message).x;
-                    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                    ImGui::Text("%s", message);
-                    break;
-                }
-                case Board::Ending::TieBetweenBothPlayers: {
-                    const char* message = "Tie between both players!";
-                    const float window_width = ImGui::GetWindowSize().x;
-                    const float text_width = ImGui::CalcTextSize(message).x;
-                    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                    ImGui::Text("%s", message);
-                    break;
-                }
-                case Board::Ending::None:
-                    assert(false);
-            }
-
-            if (ImGui::Button("Ok", ImVec2(200, 0))) {
-                ImGui::CloseCurrentPopup();
-                game_layer->board.phase = Board::Phase::None;
-            }
-
-            ImGui::EndPopup();
-            HOVERING_GUI();
-        }
+        draw_game_over();
     }
 
     if (show_info && !about_mode) {
@@ -414,6 +325,170 @@ void ImGuiLayer::on_update(float dt) {
     }
 
 #ifdef NINE_MORRIS_3D_DEBUG
+    draw_debug(dt);
+#endif
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void ImGuiLayer::on_event(events::Event& event) {
+    using namespace events;
+
+    Dispatcher dispatcher (event);
+
+    dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(ImGuiLayer::on_mouse_scrolled));
+    dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(ImGuiLayer::on_mouse_moved));
+    dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(ImGuiLayer::on_mouse_button_pressed));
+    dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(ImGuiLayer::on_mouse_button_released));
+    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(ImGuiLayer::on_window_resized));
+}
+
+bool ImGuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseWheel = event.scroll;
+
+    return hovering_gui;
+}
+
+bool ImGuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
+
+    return false;
+}
+
+bool ImGuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[event.button] = true;
+
+    return hovering_gui;
+}
+
+bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[event.button] = false;
+
+    return hovering_gui;
+}
+
+bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
+    game_layer->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
+
+    return false;
+}
+
+void ImGuiLayer::draw_game_over() {
+    ImGui::PushFont(windows_font);
+    ImGui::OpenPopup("Game Over");
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_NoResize
+            | ImGuiWindowFlags_AlwaysAutoResize)) {
+        switch (game_layer->board.ending) {
+            case Board::Ending::WinnerWhite: {
+                const char* message = "White player wins!";
+                const float window_width = ImGui::GetWindowSize().x;
+                const float text_width = ImGui::CalcTextSize(message).x;
+                ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+                ImGui::Text("%s", message);
+                break;
+            }
+            case Board::Ending::WinnerBlack: {
+                const char* message = "Black player wins!";
+                const float window_width = ImGui::GetWindowSize().x;
+                const float text_width = ImGui::CalcTextSize(message).x;
+                ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+                ImGui::Text("%s", message);
+                break;
+            }
+            case Board::Ending::TieBetweenBothPlayers: {
+                const char* message = "Tie between both players!";
+                const float window_width = ImGui::GetWindowSize().x;
+                const float text_width = ImGui::CalcTextSize(message).x;
+                ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+                ImGui::Text("%s", message);
+                break;
+            }
+            case Board::Ending::None:
+                assert(false);
+        }
+
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        const float window_width = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
+        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
+            ImGui::CloseCurrentPopup();
+            game_layer->board.phase = Board::Phase::None;
+        }
+
+        ImGui::EndPopup();
+        HOVERING_GUI();
+    }
+    ImGui::PopFont();
+}
+
+void ImGuiLayer::draw_about_screen() {
+    ImGui::PushFont(windows_font);
+    ImGui::OpenPopup("About Nine Morris 3D");
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_NoResize
+            | ImGuiWindowFlags_AlwaysAutoResize)) {
+        HOVERING_GUI();
+        game_layer->active = false;
+        gui_layer->active = false;
+        app->update_active_layers();
+
+        float width;
+        float height;
+        float x_pos;
+        float y_pos;
+
+        if (static_cast<float>(app->data.width) / static_cast<float>(app->data.height) > 16.0f / 9.0f) {
+            width = app->data.width;
+            height = app->data.width * (9.0f / 16.0f);
+            x_pos = 0.0f;
+            y_pos = (height - app->data.height) / -2.0f;
+        } else {
+            height = app->data.height;
+            width = app->data.height * (16.0f / 9.0f);
+            x_pos = (width - app->data.width) / -2.0f;
+            y_pos = 0.0f;
+        }
+
+        renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
+
+        ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
+        ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+        ImGui::Separator();
+        ImGui::Text("All programming by:");
+        ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
+
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        const float window_width = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
+        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
+            ImGui::CloseCurrentPopup();
+            about_mode = false;
+
+            game_layer->active = true;
+            gui_layer->active = true;
+            app->update_active_layers();
+        }
+
+        ImGui::EndPopup();
+    }
+    ImGui::PopFont();
+}
+
+void ImGuiLayer::draw_debug(float dt) {
     if (!about_mode) {
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %f", app->fps);
@@ -499,54 +574,4 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::Text("Distance to point: %f", game_layer->camera.get_distance_to_point());
         ImGui::End();
     }
-#endif
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-void ImGuiLayer::on_event(events::Event& event) {
-    using namespace events;
-
-    Dispatcher dispatcher (event);
-
-    dispatcher.dispatch<MouseScrolledEvent>(MouseScrolled, BIND(ImGuiLayer::on_mouse_scrolled));
-    dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(ImGuiLayer::on_mouse_moved));
-    dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(ImGuiLayer::on_mouse_button_pressed));
-    dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(ImGuiLayer::on_mouse_button_released));
-    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(ImGuiLayer::on_window_resized));
-}
-
-bool ImGuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseWheel = event.scroll;
-
-    return hovering_gui;
-}
-
-bool ImGuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
-
-    return false;
-}
-
-bool ImGuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.button] = true;
-
-    return hovering_gui;
-}
-
-bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.button] = false;
-
-    return hovering_gui;
-}
-
-bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    game_layer->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
-
-    return false;
 }
