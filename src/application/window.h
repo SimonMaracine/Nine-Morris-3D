@@ -1,13 +1,12 @@
 #pragma once
 
-#include <string>
-
-#include <stb_image.h>
+#include <vector>
+#include <memory>
 
 #include "application/application_data.h"
+#include "application/icon_image.h"
 
 struct GLFWwindow;
-struct GLFWimage;
 struct GLFWcursor;
 
 enum class CustomCursor {
@@ -27,6 +26,7 @@ public:
     double get_time() const;
 
     void set_vsync(int interval) const;
+    void set_icons(const std::vector<std::unique_ptr<IconImage>>& icons);
     void set_custom_cursor(CustomCursor cursor) const;
 private:
     GLFWwindow* window = nullptr;
@@ -36,15 +36,3 @@ private:
     CustomCursor cursor = CustomCursor::Arrow;
 };
 
-class IconImage {
-public:
-    IconImage(const std::string& file_path);
-    ~IconImage();
-
-    GLFWimage get_data() const;
-private:
-    int width = 0, height = 0, channels = 0;
-    stbi_uc* data = nullptr;
-
-    std::string file_path;
-};

@@ -32,6 +32,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/application/application.cpp"
     "src/application/input.cpp"
     "src/application/window.cpp"
+    "src/application/icon_image.cpp"
     "src/graphics/debug_opengl.cpp"
     "src/graphics/renderer/vertex_array.cpp"
     "src/graphics/renderer/buffer.cpp"

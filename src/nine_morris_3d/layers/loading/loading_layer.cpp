@@ -75,6 +75,6 @@ void LoadingLayer::on_draw() {
 
     renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
-    renderer::draw_string_with_shadows("Loading...", glm::vec2(app->data.height - 200.0f, 20.0f), 1.2f,
+    renderer::draw_string_with_shadows("Loading...", glm::vec2(app->data.width - 200.0f, 20.0f), 1.2f,
             glm::vec3(0.81f), app->storage->good_dog_plain_font);
 }

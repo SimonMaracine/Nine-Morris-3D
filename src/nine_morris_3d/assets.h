@@ -77,4 +77,10 @@ namespace assets {
 #endif
     extern const char* TEXT_VERTEX_SHADER;
     extern const char* TEXT_FRAGMENT_SHADER;
+
+    extern const char* ICON_512;
+    extern const char* ICON_256;
+    extern const char* ICON_128;
+    extern const char* ICON_64;
+    extern const char* ICON_32;
 }

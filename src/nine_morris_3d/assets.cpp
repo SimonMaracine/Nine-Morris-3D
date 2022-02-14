@@ -90,4 +90,10 @@ namespace assets {
 #endif
     const char* TEXT_VERTEX_SHADER = "data/shaders/text.vert";
     const char* TEXT_FRAGMENT_SHADER = "data/shaders/text.frag";
+
+    const char* ICON_512 = "data/icons/512x512/ninemorris3d.png";
+    const char* ICON_256 = "data/icons/256x256/ninemorris3d.png";
+    const char* ICON_128 = "data/icons/128x128/ninemorris3d.png";
+    const char* ICON_64 = "data/icons/64x64/ninemorris3d.png";
+    const char* ICON_32 = "data/icons/32x32/ninemorris3d.png";
 }

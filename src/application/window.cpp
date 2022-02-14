@@ -1,4 +1,6 @@
 #include <string>
+#include <vector>
+#include <memory>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -9,22 +11,22 @@
 #include "application/events.h"
 #include "application/platform.h"
 #include "other/logging.h"
-#include "other/user_data.h"
+#include "nine_morris_3d/assets.h"
 
-static std::string path(const char* file_path) {
-#if defined(NINE_MORRIS_3D_DEBUG)
-      // Use relative path for both operating systems
-      return std::string(file_path);
-#elif defined(NINE_MORRIS_3D_RELEASE)
-    #if defined(NINE_MORRIS_3D_LINUX)
-      std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
-      return path;
-    #elif defined(NINE_MORRIS_3D_WINDOWS)
-      // Just use relative path
-      return std::string(file_path);
-    #endif
-#endif
-}
+// static std::string path(const char* file_path) {
+// #if defined(NINE_MORRIS_3D_DEBUG)
+//       // Use relative path for both operating systems
+//       return std::string(file_path);
+// #elif defined(NINE_MORRIS_3D_RELEASE)
+//     #if defined(NINE_MORRIS_3D_LINUX)
+//       std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
+//       return path;
+//     #elif defined(NINE_MORRIS_3D_WINDOWS)
+//       // Just use relative path
+//       return std::string(file_path);
+//     #endif
+// #endif
+// }
 
 Window::Window(ApplicationData* data) {
     if (!glfwInit()) {
@@ -133,26 +135,26 @@ Window::Window(ApplicationData* data) {
         data->event_function(event);
     });
 
-    IconImage icons[5] = {
-        IconImage(path("data/icons/512x512/ninemorris3d.png")),
-        IconImage(path("data/icons/256x256/ninemorris3d.png")),
-        IconImage(path("data/icons/128x128/ninemorris3d.png")),
-        IconImage(path("data/icons/64x64/ninemorris3d.png")),
-        IconImage(path("data/icons/32x32/ninemorris3d.png"))
-    };
+    // IconImage icons[5] = {
+    //     IconImage(path("data/icons/512x512/ninemorris3d.png")),
+    //     IconImage(path("data/icons/256x256/ninemorris3d.png")),
+    //     IconImage(path("data/icons/128x128/ninemorris3d.png")),
+    //     IconImage(path("data/icons/64x64/ninemorris3d.png")),
+    //     IconImage(path("data/icons/32x32/ninemorris3d.png"))
+    // };
 
-    GLFWimage glfw_icons[5];
-    glfw_icons[0] = icons[0].get_data();
-    glfw_icons[1] = icons[1].get_data();
-    glfw_icons[2] = icons[2].get_data();
-    glfw_icons[3] = icons[3].get_data();
-    glfw_icons[4] = icons[4].get_data();
+    // GLFWimage glfw_icons[5];
+    // glfw_icons[0] = icons[0].get_data();
+    // glfw_icons[1] = icons[1].get_data();
+    // glfw_icons[2] = icons[2].get_data();
+    // glfw_icons[3] = icons[3].get_data();
+    // glfw_icons[4] = icons[4].get_data();
 
-    glfwSetWindowIcon(window, 5, glfw_icons);
+    // glfwSetWindowIcon(window, 5, glfw_icons);
 
     IconImage cursors[2] = {
-        IconImage(path("data/cursors/arrow.png")),
-        IconImage(path("data/cursors/cross.png"))
+        IconImage(assets::path("data/cursors/arrow.png")),
+        IconImage(assets::path("data/cursors/cross.png"))
     };
 
     GLFWimage glfw_cursors[2];
@@ -196,6 +198,17 @@ void Window::set_vsync(int interval) const {
     glfwSwapInterval(interval);
 }
 
+void Window::set_icons(const std::vector<std::unique_ptr<IconImage>>& icons) {
+    std::vector<GLFWimage> glfw_icons;
+    glfw_icons.resize(icons.size());
+
+    for (unsigned int i = 0; i < icons.size(); i++) {
+        glfw_icons[i] = icons[i]->get_data();
+    }
+
+    glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
+}
+
 void Window::set_custom_cursor(CustomCursor cursor) const {
     switch (cursor) {
         case CustomCursor::None:
@@ -208,34 +221,4 @@ void Window::set_custom_cursor(CustomCursor cursor) const {
             glfwSetCursor(window, cross_cursor);
             break;
     }
-}
-
-// --- IconImage
-
-IconImage::IconImage(const std::string& file_path) {
-    data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
-
-    if (data == nullptr) {
-        REL_CRITICAL("Could not load icon image '{}', exiting...", file_path.c_str());
-        std::exit(1);
-    }
-
-    this->file_path = file_path;
-
-    DEB_INFO("Loaded icon image data '{}'", file_path.c_str());
-}
-
-IconImage::~IconImage() {
-    stbi_image_free(data);
-
-    DEB_INFO("Freed icon image data '{}'", file_path.c_str());
-}
-
-GLFWimage IconImage::get_data() const {
-    GLFWimage image;
-    image.width = width;
-    image.height = height;
-    image.pixels = data;
-
-    return image;
 }
