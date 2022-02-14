@@ -73,16 +73,18 @@ add_executable(${EXECUTABLE_NAME}
     "extern/imgui/imgui_widgets.cpp"
     "extern/imgui/imgui.cpp"
     "extern/imgui/backends/imgui_impl_opengl3.cpp"
-    "extern/imgui/backends/imgui_impl_glfw.cpp")
+    "extern/imgui/backends/imgui_impl_glfw.cpp"
+)
 
 # Enable warnings
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_compile_options(${EXECUTABLE_NAME} PUBLIC
         -Wall -Wextra
-        -Wno-unused-parameter -Wno-missing-field-initializers -Wno-type-limits
-        -Wno-parentheses)
+        -Wno-unused-parameter -Wno-parentheses -Wno-type-limits
+    )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     # target_compile_options(${EXECUTABLE_NAME} PUBLIC -Wall)
+    # TODO Fix this
 else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
@@ -119,45 +121,46 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/glfw/include"
     "${CMAKE_SOURCE_DIR}/extern/imgui"
     "${CMAKE_SOURCE_DIR}/extern/json/single_include"
-    "${CMAKE_SOURCE_DIR}/extern/utfcpp/source")
+    "${CMAKE_SOURCE_DIR}/extern/utfcpp/source"
+)
 
 # Add all link directories
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         target_link_directories(${EXECUTABLE_NAME} PUBLIC
-            "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-            "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
-            "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+                "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
     elseif(CMAKE_BUILD_TYPE MATCHES Release)
         target_link_directories(${EXECUTABLE_NAME} PUBLIC
-            "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-            "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
-            "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
+                "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
     endif()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     if(VSCODE MATCHES ON)
         if(CMAKE_BUILD_TYPE MATCHES Debug)
             target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-                "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
-                "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+                    "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+                    "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
+                    "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
         elseif(CMAKE_BUILD_TYPE MATCHES Release)
             target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-                "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
-                "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
+                    "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+                    "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
+                    "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
         endif()
     elseif(VSCODE MATCHES OFF)
         if(CMAKE_BUILD_TYPE MATCHES Debug)
             target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                "${CMAKE_SOURCE_DIR}/extern/spdlog"
-                "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
-                "${CMAKE_SOURCE_DIR}/extern/glfw/src")
+                    "${CMAKE_SOURCE_DIR}/extern/spdlog"
+                    "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
+                    "${CMAKE_SOURCE_DIR}/extern/glfw/src")
         elseif(CMAKE_BUILD_TYPE MATCHES Release)
             target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                "${CMAKE_SOURCE_DIR}/extern/spdlog"
-                "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
-                "${CMAKE_SOURCE_DIR}/extern/glfw/src")
+                    "${CMAKE_SOURCE_DIR}/extern/spdlog"
+                    "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
+                    "${CMAKE_SOURCE_DIR}/extern/glfw/src")
         endif()
     endif()
 endif()

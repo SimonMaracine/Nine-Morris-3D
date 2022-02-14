@@ -83,4 +83,7 @@ namespace assets {
     extern const char* ICON_128;
     extern const char* ICON_64;
     extern const char* ICON_32;
+
+    extern const char* ARROW_CURSOR;
+    extern const char* CROSS_CURSOR;
 }

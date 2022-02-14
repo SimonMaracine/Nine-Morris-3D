@@ -29,14 +29,19 @@ NineMorris3D::NineMorris3D()
         }
     }
 
+    using namespace assets;
+
     std::vector<std::unique_ptr<IconImage>> icons;
-    icons.push_back(std::make_unique<IconImage>(assets::path(assets::ICON_512)));
-    icons.push_back(std::make_unique<IconImage>(assets::path(assets::ICON_256)));
-    icons.push_back(std::make_unique<IconImage>(assets::path(assets::ICON_128)));
-    icons.push_back(std::make_unique<IconImage>(assets::path(assets::ICON_64)));
-    icons.push_back(std::make_unique<IconImage>(assets::path(assets::ICON_32)));
+    icons.push_back(std::make_unique<IconImage>(path(ICON_512)));
+    icons.push_back(std::make_unique<IconImage>(path(ICON_256)));
+    icons.push_back(std::make_unique<IconImage>(path(ICON_128)));
+    icons.push_back(std::make_unique<IconImage>(path(ICON_64)));
+    icons.push_back(std::make_unique<IconImage>(path(ICON_32)));
 
     window->set_icons(icons);
+
+    arrow_cursor = window->add_cursor(std::make_unique<IconImage>(path(ARROW_CURSOR)), 4, 1);
+    cross_cursor = window->add_cursor(std::make_unique<IconImage>(path(CROSS_CURSOR)), 8, 8);
 }
 
 void NineMorris3D::set_app_pointer(NineMorris3D* instance) {

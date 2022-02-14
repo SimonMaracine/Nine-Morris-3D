@@ -490,9 +490,9 @@ void Board::finalize_pieces_state() {
 void Board::update_cursor() {
     if (app->options.custom_cursor) {
         if (should_take_piece) {
-            app->window->set_custom_cursor(CustomCursor::Cross);
+            app->window->set_cursor(app->cross_cursor);
         } else {
-            app->window->set_custom_cursor(CustomCursor::Arrow);
+            app->window->set_cursor(app->arrow_cursor);
         }
     }
 }

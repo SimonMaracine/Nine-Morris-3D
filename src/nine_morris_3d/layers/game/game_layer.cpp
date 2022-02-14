@@ -80,7 +80,7 @@ void GameLayer::on_attach() {
     build_turn_indicator();
 
     app->window->set_vsync(app->options.vsync);
-    app->window->set_custom_cursor(app->options.custom_cursor ? CustomCursor::Arrow : CustomCursor::None);
+    app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
     {
         FramebufferSpecification specification;

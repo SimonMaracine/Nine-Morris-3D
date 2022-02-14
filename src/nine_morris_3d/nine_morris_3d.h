@@ -14,6 +14,8 @@ public:
     static void set_app_pointer(NineMorris3D* instance);
 
     options::Options options;
+    unsigned int arrow_cursor = 0;
+    unsigned int cross_cursor = 0;
 };
 
 extern NineMorris3D* app;

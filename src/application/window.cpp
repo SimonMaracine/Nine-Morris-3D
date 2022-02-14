@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <stdexcept>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -11,22 +12,6 @@
 #include "application/events.h"
 #include "application/platform.h"
 #include "other/logging.h"
-#include "nine_morris_3d/assets.h"
-
-// static std::string path(const char* file_path) {
-// #if defined(NINE_MORRIS_3D_DEBUG)
-//       // Use relative path for both operating systems
-//       return std::string(file_path);
-// #elif defined(NINE_MORRIS_3D_RELEASE)
-//     #if defined(NINE_MORRIS_3D_LINUX)
-//       std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
-//       return path;
-//     #elif defined(NINE_MORRIS_3D_WINDOWS)
-//       // Just use relative path
-//       return std::string(file_path);
-//     #endif
-// #endif
-// }
 
 Window::Window(ApplicationData* data) {
     if (!glfwInit()) {
@@ -134,48 +119,13 @@ Window::Window(ApplicationData* data) {
         events::MouseMovedEvent event (static_cast<float>(xpos), static_cast<float>(ypos));
         data->event_function(event);
     });
-
-    // IconImage icons[5] = {
-    //     IconImage(path("data/icons/512x512/ninemorris3d.png")),
-    //     IconImage(path("data/icons/256x256/ninemorris3d.png")),
-    //     IconImage(path("data/icons/128x128/ninemorris3d.png")),
-    //     IconImage(path("data/icons/64x64/ninemorris3d.png")),
-    //     IconImage(path("data/icons/32x32/ninemorris3d.png"))
-    // };
-
-    // GLFWimage glfw_icons[5];
-    // glfw_icons[0] = icons[0].get_data();
-    // glfw_icons[1] = icons[1].get_data();
-    // glfw_icons[2] = icons[2].get_data();
-    // glfw_icons[3] = icons[3].get_data();
-    // glfw_icons[4] = icons[4].get_data();
-
-    // glfwSetWindowIcon(window, 5, glfw_icons);
-
-    IconImage cursors[2] = {
-        IconImage(assets::path("data/cursors/arrow.png")),
-        IconImage(assets::path("data/cursors/cross.png"))
-    };
-
-    GLFWimage glfw_cursors[2];
-    glfw_cursors[0] = cursors[0].get_data();
-    glfw_cursors[1] = cursors[1].get_data();
-
-    arrow_cursor = glfwCreateCursor(&glfw_cursors[0], 4, 1);
-    if (arrow_cursor == nullptr) {
-        REL_ERROR("Could not create custom cursor");
-    }
-
-    cross_cursor = glfwCreateCursor(&glfw_cursors[1], 8, 8);
-    if (cross_cursor == nullptr) {
-        REL_ERROR("Could not create custom cursor");
-    }
 }
 
 Window::~Window() {
     glfwDestroyWindow(window);
-    glfwDestroyCursor(arrow_cursor);
-    glfwDestroyCursor(cross_cursor);
+    for (const std::pair<unsigned int, GLFWcursor*>& pair : cursors) {
+        glfwDestroyCursor(pair.second);
+    }
     glfwTerminate();
 
     DEB_INFO("Terminated GLFW and destroyed window");
@@ -198,7 +148,7 @@ void Window::set_vsync(int interval) const {
     glfwSwapInterval(interval);
 }
 
-void Window::set_icons(const std::vector<std::unique_ptr<IconImage>>& icons) {
+void Window::set_icons(const std::vector<std::unique_ptr<IconImage>>& icons) const {
     std::vector<GLFWimage> glfw_icons;
     glfw_icons.resize(icons.size());
 
@@ -209,16 +159,37 @@ void Window::set_icons(const std::vector<std::unique_ptr<IconImage>>& icons) {
     glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
 }
 
-void Window::set_custom_cursor(CustomCursor cursor) const {
-    switch (cursor) {
-        case CustomCursor::None:
-            glfwSetCursor(window, nullptr);
-            break;
-        case CustomCursor::Arrow:
-            glfwSetCursor(window, arrow_cursor);
-            break;
-        case CustomCursor::Cross:
-            glfwSetCursor(window, cross_cursor);
-            break;
+unsigned int Window::add_cursor(std::unique_ptr<IconImage> cursor, int x_hotspot, int y_hotspot) {
+    GLFWimage data = cursor->get_data();
+
+    GLFWcursor* glfw_cursor = glfwCreateCursor(&data, x_hotspot, y_hotspot);
+    if (glfw_cursor == nullptr) {
+        REL_ERROR("Could not create custom cursor '{}'", cursor->get_file_path().c_str());
     }
+
+    static unsigned int id = 0;
+
+    cursors[++id] = glfw_cursor;
+    return id;
+}
+
+void Window::set_cursor(unsigned int handle) const {
+    if (handle == 0) {
+        glfwSetCursor(window, nullptr);
+        return;
+    }
+
+#if defined(NINE_MORRIS_3D_DEBUG)
+    GLFWcursor* cursor;
+    try {
+        cursor = cursors.at(handle);
+    } catch (const std::out_of_range&) {
+        DEB_CRITICAL("Invalid handle: {}", handle);
+        std::exit(1);
+    }
+    glfwSetCursor(window, cursor);
+#elif defined(NINE_MORRIS_3D_RELEASE)
+    GLFWcursor* cursor = cursors[handle];
+    glfwSetCursor(window, cursor);
+#endif
 }

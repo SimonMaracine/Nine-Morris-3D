@@ -96,4 +96,7 @@ namespace assets {
     const char* ICON_128 = "data/icons/128x128/ninemorris3d.png";
     const char* ICON_64 = "data/icons/64x64/ninemorris3d.png";
     const char* ICON_32 = "data/icons/32x32/ninemorris3d.png";
+
+    const char* ARROW_CURSOR = "data/cursors/arrow.png";
+    const char* CROSS_CURSOR = "data/cursors/cross.png";
 }

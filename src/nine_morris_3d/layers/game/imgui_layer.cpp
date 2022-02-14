@@ -218,14 +218,14 @@ void ImGuiLayer::on_update(float dt) {
                 if (ImGui::MenuItem("Custom Cursor", nullptr, &app->options.custom_cursor)) {
                     if (app->options.custom_cursor) {
                         if (game_layer->board.should_take_piece) {
-                            app->window->set_custom_cursor(CustomCursor::Cross);
+                            app->window->set_cursor(app->cross_cursor);
                         } else {
-                            app->window->set_custom_cursor(CustomCursor::Arrow);
+                            app->window->set_cursor(app->arrow_cursor);
                         }
 
                         DEB_INFO("Set custom cursor");
                     } else {
-                        app->window->set_custom_cursor(CustomCursor::None);
+                        app->window->set_cursor(0);
 
                         DEB_INFO("Set default cursor");
                     }
