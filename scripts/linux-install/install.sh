@@ -35,8 +35,8 @@ check_failure
 echo "Copied $current_dir/$EXECUTABLE_NAME to $EXECUTABLE_DESTINATION_FOLDER/$EXECUTABLE_NAME"
 
 # Data folder
-mkdir -p $DATA_DESTINATION_FOLDER/
-cp -r $current_dir/data/ $DATA_DESTINATION_FOLDER/data/
+mkdir -p $DATA_DESTINATION_FOLDER/data
+cp -r --no-target-directory $current_dir/data/ $DATA_DESTINATION_FOLDER/data/
 check_failure
 echo "Copied $current_dir/data/ to $DATA_DESTINATION_FOLDER/data/"
 
