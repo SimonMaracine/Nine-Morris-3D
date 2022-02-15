@@ -461,9 +461,17 @@ void ImGuiLayer::draw_about_screen() {
     if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_NoResize
             | ImGuiWindowFlags_AlwaysAutoResize)) {
         HOVERING_GUI();
-        game_layer->active = false;
-        gui_layer->active = false;
-        app->update_active_layers();
+
+        static bool deactivated = false;
+        if (!deactivated) {
+            game_layer->active = false;
+            gui_layer->active = false;
+            app->update_active_layers();
+
+            gui_layer->timer.stop();
+
+            deactivated = true;
+        }
 
         float width;
         float height;
@@ -497,10 +505,13 @@ void ImGuiLayer::draw_about_screen() {
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
             about_mode = false;
+            deactivated = false;
 
             game_layer->active = true;
             gui_layer->active = true;
             app->update_active_layers();
+
+            gui_layer->timer.start(app->window->get_time());
         }
 
         ImGui::EndPopup();
