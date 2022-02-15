@@ -34,6 +34,7 @@ public:
     bool on_mouse_moved(events::MouseMovedEvent& event);
     bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
+    bool on_key_released(events::KeyReleasedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
 
     std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
@@ -82,7 +83,7 @@ public:
 
     bool first_move = false;
 
-    glm::vec3 last_camera_position = glm::vec3(0.0f);
+    glm::vec3 default_camera_position = glm::vec3(0.0f);
 
     ImGuiLayer* imgui_layer = nullptr;
     GuiLayer* gui_layer = nullptr;

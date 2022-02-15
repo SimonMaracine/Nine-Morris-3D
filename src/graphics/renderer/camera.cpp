@@ -11,6 +11,7 @@ Camera::Camera(float sensitivity, float pitch, const glm::vec3& point, float dis
         const glm::mat4& projection_matrix)
     : sensitivity(sensitivity), pitch(pitch), point(point), distance_to_point(distance_to_point),
       projection_matrix(projection_matrix) {
+    update(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void Camera::update(float mouse_wheel, float dx, float dy, float dt) {

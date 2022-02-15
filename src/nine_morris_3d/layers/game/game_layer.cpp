@@ -93,6 +93,8 @@ void GameLayer::on_attach() {
     build_light();
     build_turn_indicator();
 
+    default_camera_position = camera.get_position();
+
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
@@ -183,12 +185,6 @@ void GameLayer::on_update(float dt) {
     mouse_wheel = 0.0f;
     dx = 0.0f;
     dy = 0.0f;
-
-    if (input::is_key_pressed(KEY_Q)) {
-        camera.set_position(last_camera_position);
-    } else if (input::is_key_pressed(KEY_C)) {
-        last_camera_position = camera.get_position();
-    }
 }
 
 void GameLayer::on_fixed_update() {
@@ -257,6 +253,7 @@ void GameLayer::on_event(events::Event& event) {
     dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(GameLayer::on_mouse_moved));
     dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(GameLayer::on_mouse_button_pressed));
     dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(GameLayer::on_mouse_button_released));
+    dispatcher.dispatch<KeyReleasedEvent>(KeyReleased, BIND(GameLayer::on_key_released));
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(GameLayer::on_window_resized));
 }
 
@@ -329,6 +326,14 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
             board.release(hovered_id);
         }
+    }
+
+    return false;
+}
+
+bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
+    if (event.key == KEY_SPACE) {
+        camera.set_position(default_camera_position);
     }
 
     return false;
