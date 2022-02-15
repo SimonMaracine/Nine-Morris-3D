@@ -13,7 +13,8 @@
 #define LOG_FILE "log.txt"
 #define INFO_FILE "info.txt"
 
-#define LOG_PATTERN "%^[%l] [th %t] [%H:%M:%S]%$ %v"
+#define LOG_PATTERN_DEBUG "%^[%l] [th %t] [%H:%M:%S]%$ %v"
+#define LOG_PATTERN_RELEASE "%^[%l] [th %t] [%c]%$ %v"
 
 /* SPDLOG_TRACE, SPDLOG_DEBUG, SPDLOG_INFO,
 SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
@@ -37,7 +38,7 @@ namespace logging {
     }
 
     void initialize() {
-        spdlog::set_pattern(LOG_PATTERN);
+        spdlog::set_pattern(LOG_PATTERN_DEBUG);
         spdlog::set_level(spdlog::level::trace);
 
         std::string file_path;
@@ -46,7 +47,7 @@ namespace logging {
         } catch (const user_data::UserNameError& e) {            
             release_logger = spdlog::stdout_color_mt("Release Logger Fallback (Console)");
 
-            release_logger->set_pattern(LOG_PATTERN);
+            release_logger->set_pattern(LOG_PATTERN_RELEASE);
             release_logger->set_level(spdlog::level::trace);
 
             spdlog::error("Using fallback logger (console)");
@@ -58,14 +59,14 @@ namespace logging {
         } catch (const spdlog::spdlog_ex& e) {
             release_logger = spdlog::stdout_color_mt("Release Logger Fallback (Console)");
 
-            release_logger->set_pattern(LOG_PATTERN);
+            release_logger->set_pattern(LOG_PATTERN_RELEASE);
             release_logger->set_level(spdlog::level::trace);
 
             spdlog::error("Using fallback logger (console): {}", e.what());
             return;
         }
 
-        release_logger->set_pattern(LOG_PATTERN);
+        release_logger->set_pattern(LOG_PATTERN_RELEASE);
         release_logger->set_level(spdlog::level::trace);
         release_logger->flush_on(spdlog::level::info);
     }
