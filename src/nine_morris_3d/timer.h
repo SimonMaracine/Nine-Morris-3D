@@ -8,6 +8,7 @@ public:
     void update(double time);
     void start(double time);
     void stop();
+    void reset_last_time(double time);
     unsigned int get_time_seconds() const;
     unsigned int get_time_raw() const;
     void get_time_formatted(char* formatted_time) const;  // 32 bytes is ok

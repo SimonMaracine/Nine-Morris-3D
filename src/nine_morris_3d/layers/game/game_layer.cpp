@@ -334,6 +334,10 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
         camera.set_position(default_camera_position);
+    } else if (event.key == KEY_G) {
+        DEB_DEBUG("WHAAAAT");
+        board.phase = Board::Phase::GameOver;
+        board.ending = Board::Ending::WinnerWhite;
     }
 
     return false;

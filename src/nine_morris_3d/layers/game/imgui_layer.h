@@ -29,6 +29,7 @@ public:
     bool on_window_resized(events::WindowResizedEvent& event);
 
     void draw_game_over();
+    void draw_game_over_message(const char* message);
     void draw_about_screen();
     void draw_debug(float dt);
 

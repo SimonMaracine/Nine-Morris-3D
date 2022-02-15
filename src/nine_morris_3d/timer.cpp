@@ -36,6 +36,10 @@ void Timer::stop() {
     DEB_DEBUG("Stopped timer");
 }
 
+void Timer::reset_last_time(double time) {
+    last_time = time;
+}
+
 unsigned int Timer::get_time_seconds() const {
     return time / 10;
 }

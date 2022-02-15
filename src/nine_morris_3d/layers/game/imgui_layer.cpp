@@ -400,26 +400,17 @@ void ImGuiLayer::draw_game_over() {
         switch (game_layer->board.ending) {
             case Board::Ending::WinnerWhite: {
                 const char* message = "White player wins!";
-                const float window_width = ImGui::GetWindowSize().x;
-                const float text_width = ImGui::CalcTextSize(message).x;
-                ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                ImGui::Text("%s", message);
+                draw_game_over_message(message);
                 break;
             }
             case Board::Ending::WinnerBlack: {
                 const char* message = "Black player wins!";
-                const float window_width = ImGui::GetWindowSize().x;
-                const float text_width = ImGui::CalcTextSize(message).x;
-                ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                ImGui::Text("%s", message);
+                draw_game_over_message(message);
                 break;
             }
             case Board::Ending::TieBetweenBothPlayers: {
                 const char* message = "Tie between both players!";
-                const float window_width = ImGui::GetWindowSize().x;
-                const float text_width = ImGui::CalcTextSize(message).x;
-                ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-                ImGui::Text("%s", message);
+                draw_game_over_message(message);
                 break;
             }
             case Board::Ending::None:
@@ -451,6 +442,17 @@ void ImGuiLayer::draw_game_over() {
     ImGui::PopFont();
 }
 
+void ImGuiLayer::draw_game_over_message(const char* message) {
+    ImGui::Dummy(ImVec2(20.0f, 0.0f)); ImGui::SameLine();
+
+    const float window_width = ImGui::GetWindowSize().x;
+    const float text_width = ImGui::CalcTextSize(message).x;
+    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+    ImGui::Text("%s", message); ImGui::SameLine();
+
+    ImGui::Dummy(ImVec2(20.0f, 0.0f));
+}
+
 void ImGuiLayer::draw_about_screen() {
     ImGui::PushFont(windows_font);
     ImGui::OpenPopup("About Nine Morris 3D");
@@ -467,8 +469,6 @@ void ImGuiLayer::draw_about_screen() {
             game_layer->active = false;
             gui_layer->active = false;
             app->update_active_layers();
-
-            gui_layer->timer.stop();
 
             deactivated = true;
         }
@@ -511,7 +511,7 @@ void ImGuiLayer::draw_about_screen() {
             gui_layer->active = true;
             app->update_active_layers();
 
-            gui_layer->timer.start(app->window->get_time());
+            gui_layer->timer.reset_last_time(app->window->get_time());
         }
 
         ImGui::EndPopup();
