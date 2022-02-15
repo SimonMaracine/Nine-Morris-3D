@@ -57,3 +57,22 @@ private:
     friend class VertexArray;
     friend class Shader;
 };
+
+class PixelBuffer {
+public:
+    PixelBuffer(GLuint buffer);
+    ~PixelBuffer();
+
+    static std::shared_ptr<PixelBuffer> create(size_t size);
+    static std::shared_ptr<PixelBuffer> create(const void* data, size_t size);
+
+    void bind() const;
+    static void unbind();
+
+    void update_data(const void* data, size_t size) const;
+private:
+    GLuint buffer;
+
+    friend class VertexArray;
+    friend class Shader;
+};

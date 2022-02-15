@@ -3,8 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "graphics/renderer/camera.h"
 #include "application/input.h"
+#include "graphics/renderer/camera.h"
 #include "other/logging.h"
 
 Camera::Camera(float sensitivity, float pitch, const glm::vec3& point, float distance_to_point,
