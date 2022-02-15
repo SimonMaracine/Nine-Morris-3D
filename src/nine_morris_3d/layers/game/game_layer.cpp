@@ -174,6 +174,9 @@ void GameLayer::on_update(float dt) {
         camera.set_position(last_camera_position);
     } else if (input::is_key_pressed(KEY_C)) {
         last_camera_position = camera.get_position();
+    } else if (input::is_key_pressed(KEY_G)) {
+        board.phase = Board::Phase::GameOver;
+        board.ending = Board::Ending::TieBetweenBothPlayers;
     }
 }
 

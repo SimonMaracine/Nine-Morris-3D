@@ -1,5 +1,6 @@
 #include <utility>
 #include <time.h>
+#include <string.h>
 
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -416,9 +417,19 @@ void ImGuiLayer::draw_game_over() {
                 assert(false);
         }
 
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
         const float window_width = ImGui::GetWindowSize().x;
+
+        char time[32];
+        gui_layer->timer.get_time_formatted(time);
+        char time_label[64];
+        sprintf(time_label, "Time: %s", time);
+
+        const float text_width = ImGui::CalcTextSize(time_label).x;
+        ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+        ImGui::Text("%s", time_label);
+
+        ImGui::Dummy(ImVec2(0.0f, 8.0f));
+
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
@@ -470,7 +481,7 @@ void ImGuiLayer::draw_about_screen() {
         ImGui::Text("All programming by:");
         ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
 
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+        ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
         const float window_width = ImGui::GetWindowSize().x;
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);

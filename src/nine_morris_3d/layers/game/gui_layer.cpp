@@ -1,7 +1,6 @@
 #include <memory>
 #include <string>
 #include <algorithm>
-#include <string.h>
 
 #include <glm/glm.hpp>
 
@@ -38,11 +37,8 @@ void GuiLayer::render_turn_indicator() {
 }
 
 void GuiLayer::render_timer() {
-    const unsigned int minutes = timer.get_time_seconds() / 60;
-    const unsigned int seconds = timer.get_time_seconds() % 60;    
-
     char time[32];
-    sprintf(time, "%.2u:%.2u", minutes, seconds);
+    timer.get_time_formatted(time);
 
     int width, height;
     app->storage->good_dog_plain_font->get_string_size(time, 1.5f, &width, &height);
@@ -50,5 +46,6 @@ void GuiLayer::render_timer() {
     const float x_pos = app->data.width / 2 - width / 2 - 8;
     const float y_pos = app->data.height - height - 50;
 
-    renderer::draw_string_with_shadows(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f), app->storage->good_dog_plain_font);
+    renderer::draw_string_with_shadows(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f),
+            app->storage->good_dog_plain_font);
 }

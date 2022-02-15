@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "nine_morris_3d/timer.h"
 #include "other/logging.h"
 
@@ -40,6 +42,13 @@ unsigned int Timer::get_time_seconds() const {
 
 unsigned int Timer::get_time_raw() const {
     return time;
+}
+
+void Timer::get_time_formatted(char* formatted_time) const {
+    const unsigned int minutes = get_time_seconds() / 60;
+    const unsigned int seconds = get_time_seconds() % 60;    
+
+    sprintf(formatted_time, "%.2u:%.2u", minutes, seconds);
 }
 
 void Timer::set_time(unsigned int time) {
