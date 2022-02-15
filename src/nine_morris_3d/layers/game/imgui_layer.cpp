@@ -25,9 +25,11 @@
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
 
-#define DEFAULT_BROWN ImVec4(0.6f, 0.35f, 0.12f, 1.0f)
+#define DEFAULT_BROWN ImVec4(0.647f, 0.4f, 0.212f, 1.0f)
 #define DARK_BROWN ImVec4(0.4f, 0.25f, 0.10f, 1.0f)
-#define LIGHT_BROWN ImVec4(0.68f, 0.42f, 0.12f, 1.0f)
+#define LIGHT_BROWN ImVec4(0.68f, 0.48f, 0.22f, 1.0f)
+#define BEIGE ImVec4(0.961f, 0.875f, 0.733f, 1.0f)
+#define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
 
 void ImGuiLayer::on_attach() {
     ImGui::CreateContext();
@@ -59,11 +61,17 @@ void ImGuiLayer::on_attach() {
     colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
     colors[ImGuiCol_TitleBgActive] = DEFAULT_BROWN;
     colors[ImGuiCol_FrameBg] = DEFAULT_BROWN;
+    colors[ImGuiCol_FrameBgHovered] = DARK_BROWN;
+    colors[ImGuiCol_FrameBgActive] = LIGHT_BROWN;
     colors[ImGuiCol_Button] = DARK_BROWN;
     colors[ImGuiCol_ButtonHovered] = DEFAULT_BROWN;
     colors[ImGuiCol_ButtonActive] = LIGHT_BROWN;
     colors[ImGuiCol_Header] = DARK_BROWN;
     colors[ImGuiCol_HeaderHovered] = DEFAULT_BROWN;
+    colors[ImGuiCol_HeaderActive] = LIGHT_BROWN;
+    colors[ImGuiCol_CheckMark] = BEIGE;
+    colors[ImGuiCol_SliderGrab] = LIGHT_GRAY_BLUE;
+    colors[ImGuiCol_SliderGrabActive] = LIGHT_GRAY_BLUE;
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
@@ -71,6 +79,7 @@ void ImGuiLayer::on_attach() {
     style.WindowRounding = 8;
     style.ChildRounding = 8;
     style.PopupRounding = 8;
+    style.GrabRounding = 8;
 
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
