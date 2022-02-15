@@ -17,6 +17,7 @@ public:
     void update_friction();
     void update_projection(float width, float height);
     void set_position(const glm::vec3& position);
+    void go_towards_position(const glm::vec3& position);
 
     const glm::vec3& get_position() const { return position; }
     float get_pitch() const { return pitch; }
@@ -46,6 +47,18 @@ private:
     float x_velocity = 0.0f;
     float y_velocity = 0.0f;
     float zoom_velocity = 0.0f;
+
+    bool auto_move_zoom = false;
+    float target_distance_to_point = 0.0f;
+    float auto_zoom_velocity = 0.0f;
+
+    bool auto_move_x = false;
+    float target_angle_around_point = 0.0f;
+    float auto_x_velocity = 0.0f;
+
+    bool auto_move_y = false;
+    float target_pitch = 0.0f;
+    float auto_y_velocity = 0.0f;
 
     template<typename Archive>
     friend void serialize(Archive& archive, Camera& camera);

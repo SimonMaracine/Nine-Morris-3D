@@ -333,7 +333,8 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
-        camera.set_position(default_camera_position);
+        // camera.set_position(default_camera_position);
+        camera.go_towards_position(default_camera_position);
     }
 
     return false;
