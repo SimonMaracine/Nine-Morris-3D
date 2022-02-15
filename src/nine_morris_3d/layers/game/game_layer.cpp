@@ -158,7 +158,7 @@ void GameLayer::on_detach() {
             save_load::save_game_to_file(state);
         } catch (save_load::SaveFileNotOpenError& e) {
             REL_ERROR("{}", e.what());
-            save_load::handle_save_game_file_not_open_error();
+            save_load::handle_save_file_not_open_error();
             REL_ERROR("Could not save game");
         } catch (save_load::SaveFileError& e) {
             REL_ERROR("{}", e.what());
@@ -334,10 +334,6 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
         camera.set_position(default_camera_position);
-    } else if (event.key == KEY_G) {
-        DEB_DEBUG("WHAAAAT");
-        board.phase = Board::Phase::GameOver;
-        board.ending = Board::Ending::WinnerWhite;
     }
 
     return false;
@@ -1019,7 +1015,7 @@ void GameLayer::load_game() {
         save_load::load_game_from_file(state);
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_ERROR("{}", e.what());
-        save_load::handle_save_game_file_not_open_error();
+        save_load::handle_save_file_not_open_error();
         REL_ERROR("Could not load game");
         return;
     } catch (const save_load::SaveFileError& e) {

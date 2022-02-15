@@ -175,7 +175,7 @@ namespace save_load {
         }
     }
 
-    void handle_save_game_file_not_open_error() {
+    void handle_save_file_not_open_error() {
         bool user_data_directory;
 
         try {

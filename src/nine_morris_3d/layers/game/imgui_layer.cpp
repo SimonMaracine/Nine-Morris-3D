@@ -89,7 +89,7 @@ void ImGuiLayer::on_attach() {
         save_load::load_game_from_file(state);
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_ERROR("{}", e.what());
-        save_load::handle_save_game_file_not_open_error();
+        save_load::handle_save_file_not_open_error();
         REL_ERROR("Could not load game");
     } catch (const save_load::SaveFileError& e) {
         REL_ERROR("{}", e.what());  // TODO maybe delete file
@@ -156,7 +156,7 @@ void ImGuiLayer::on_update(float dt) {
                     save_load::save_game_to_file(state);
                 } catch (save_load::SaveFileNotOpenError& e) {
                     REL_ERROR("{}", e.what());
-                    save_load::handle_save_game_file_not_open_error();
+                    save_load::handle_save_file_not_open_error();
                     REL_ERROR("Could not save game");
                 } catch (save_load::SaveFileError& e) {
                     REL_ERROR("{}", e.what());

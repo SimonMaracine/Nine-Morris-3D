@@ -38,5 +38,5 @@ namespace save_load {
     void load_game_from_file(GameState& game_state);
 
     void delete_save_game_file(const std::string& file_path);  // TODO use this, or delete it
-    void handle_save_game_file_not_open_error();
+    void handle_save_file_not_open_error();
 }
