@@ -42,6 +42,20 @@
 #include "other/logging.h"
 #include "other/texture_data.h"
 
+const Light LIGHT_FIELD = {
+    glm::vec3(5.7f, 8.4f, 12.4f),
+    glm::vec3(0.3f),
+    glm::vec3(1.0f),
+    glm::vec3(1.0f)
+};
+
+const Light LIGHT_AUTUMN = {
+    glm::vec3(-4.4f, 11.0f, 6.4f),
+    glm::vec3(0.15f),
+    glm::vec3(0.9f),
+    glm::vec3(0.9f)
+};
+
 void GameLayer::on_attach() {
     srand(time(nullptr));
 
@@ -174,9 +188,6 @@ void GameLayer::on_update(float dt) {
         camera.set_position(last_camera_position);
     } else if (input::is_key_pressed(KEY_C)) {
         last_camera_position = camera.get_position();
-    } else if (input::is_key_pressed(KEY_G)) {
-        board.phase = Board::Phase::GameOver;
-        board.ending = Board::Ending::TieBetweenBothPlayers;
     }
 }
 

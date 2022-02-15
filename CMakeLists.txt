@@ -42,7 +42,6 @@ add_executable(${EXECUTABLE_NAME}
     "src/graphics/renderer/texture.cpp"
     "src/graphics/renderer/framebuffer.cpp"
     "src/graphics/renderer/camera.cpp"
-    "src/graphics/renderer/light.cpp"
     "src/graphics/renderer/font.cpp"
     "src/nine_morris_3d/nine_morris_3d.cpp"
     "src/nine_morris_3d/layers/game/game_layer.cpp"
