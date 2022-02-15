@@ -519,6 +519,7 @@ void ImGuiLayer::draw_about_screen() {
     ImGui::PopFont();
 }
 
+#ifdef NINE_MORRIS_3D_DEBUG
 void ImGuiLayer::draw_debug(float dt) {
     if (!about_mode) {
         ImGui::Begin("Debug");
@@ -606,3 +607,4 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::End();
     }
 }
+#endif

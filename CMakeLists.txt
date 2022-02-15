@@ -25,7 +25,8 @@ set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 
 project("Nine Morris 3D"
     VERSION 0.1.0
-    LANGUAGES C CXX)
+    LANGUAGES C CXX
+)
 
 add_executable(${EXECUTABLE_NAME}
     "src/main.cpp"
@@ -167,10 +168,10 @@ endif()
 # Add all libraries
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-        spdlog assimp glfw X11)
+            spdlog assimp glfw X11)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-        spdlog assimp glfw)
+            spdlog assimp glfw)
 endif()
 
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC "${CMAKE_DL_LIBS}")
@@ -193,11 +194,11 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("Building in DEBUG mode")
     target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
-        SPDLOG_ACTIVE_LEVEL=0)  # PRINT_GPU_RAM_ALLOCATED
+            SPDLOG_ACTIVE_LEVEL=0)  # PRINT_GPU_RAM_ALLOCATED
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message("Building in RELEASE mode")
     target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
-        SPDLOG_ACTIVE_LEVEL=6 NDEBUG)
+            SPDLOG_ACTIVE_LEVEL=0 NDEBUG)
 endif()
 
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)

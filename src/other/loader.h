@@ -22,7 +22,7 @@ public:
     }
 
     void start_loading_thread() {
-        SPDLOG_INFO("Loading assets from separate thread...");
+        DEB_INFO("Loading assets from separate thread...");
 
         loading_thread = std::thread(load_function, this);
     }

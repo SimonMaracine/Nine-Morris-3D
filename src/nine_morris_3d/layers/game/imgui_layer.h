@@ -6,6 +6,7 @@
 #include <imgui.h>
 
 #include "application/layer.h"
+#include "application/platform.h"
 
 class GameLayer;
 class GuiLayer;
@@ -31,7 +32,10 @@ public:
     void draw_game_over();
     void draw_game_over_message(const char* message);
     void draw_about_screen();
+
+#ifdef NINE_MORRIS_3D_DEBUG
     void draw_debug(float dt);
+#endif
 
     bool hovering_gui = false;
     bool can_undo = false;

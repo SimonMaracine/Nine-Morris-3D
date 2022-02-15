@@ -173,7 +173,7 @@ unsigned int Window::add_cursor(std::unique_ptr<IconImage> cursor, int x_hotspot
     return id;
 }
 
-void Window::set_cursor(unsigned int handle) const {
+void Window::set_cursor(unsigned int handle) {
     if (handle == 0) {
         glfwSetCursor(window, nullptr);
         return;

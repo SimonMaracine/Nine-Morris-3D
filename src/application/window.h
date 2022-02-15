@@ -23,7 +23,7 @@ public:
     void set_vsync(int interval) const;
     void set_icons(const std::vector<std::unique_ptr<IconImage>>& icons) const;  // TODO rework this
     unsigned int add_cursor(std::unique_ptr<IconImage> cursor, int x_hotspot, int y_hotspot);
-    void set_cursor(unsigned int handle) const;
+    void set_cursor(unsigned int handle);
 private:
     GLFWwindow* window = nullptr;
 
