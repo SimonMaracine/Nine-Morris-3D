@@ -31,6 +31,14 @@ public:
 
     float sensitivity = 1.0f;  // From 0.5 to 2.0
 private:
+    void go_towards_position_x(const glm::vec3& position, const glm::vec3& direction);
+    void go_towards_position_y(const glm::vec3& position, const glm::vec3& direction);
+    void go_towards_position_zoom(const glm::vec3& position);
+
+    void calculate_auto_angle_around_point(float dt);
+    void calculate_auto_pitch(float dt);
+    void calculate_auto_distance_to_point(float dt);
+
     glm::vec3 position = glm::vec3(0.0f);
 
     float pitch = 0.0f;
@@ -48,6 +56,7 @@ private:
     float y_velocity = 0.0f;
     float zoom_velocity = 0.0f;
 
+    // Interpolated movement stuff
     bool auto_move_x = false;
     float target_angle_around_point = 0.0f;
     float auto_x_velocity = 0.0f;
@@ -62,6 +71,9 @@ private:
     float target_distance_to_point = 0.0f;
     float auto_zoom_velocity = 0.0f;    
     float virtual_distance_to_point = 0.0f;
+
+    glm::vec3 cached_towards_position = glm::vec3(0.0f);
+    bool dont_auto_call_go_towards_position = false;
 
     template<typename Archive>
     friend void serialize(Archive& archive, Camera& camera);
