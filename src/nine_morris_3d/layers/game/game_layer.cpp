@@ -93,8 +93,6 @@ void GameLayer::on_attach() {
     build_light();
     build_turn_indicator();
 
-    default_camera_position = camera.get_position();
-
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
@@ -120,6 +118,8 @@ void GameLayer::on_attach() {
     setup_board();
     setup_board_paint();
     setup_pieces();
+
+    camera.go_towards_position(default_camera_position);
 
     // It's ok to be called multiple times
     STOP_ALLOCATION_LOG();
@@ -534,6 +534,16 @@ void GameLayer::build_camera() {
         47.0f,
         glm::vec3(0.0f),
         8.0f,
+        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
+    );
+
+    default_camera_position = camera.get_position();
+
+    camera = Camera(
+        app->options.sensitivity,
+        47.0f,
+        glm::vec3(0.0f),
+        8.7f,
         glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
     );
 
