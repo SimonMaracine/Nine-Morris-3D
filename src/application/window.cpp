@@ -149,19 +149,8 @@ double Window::get_time() const {
     return glfwGetTime();
 }
 
-void Window::set_vsync(int interval) const {
+void Window::set_vsync(int interval) {
     glfwSwapInterval(interval);
-}
-
-void Window::set_icons(const std::vector<std::unique_ptr<IconImage>>& icons) const {
-    std::vector<GLFWimage> glfw_icons;
-    glfw_icons.resize(icons.size());
-
-    for (unsigned int i = 0; i < icons.size(); i++) {
-        glfw_icons[i] = icons[i]->get_data();
-    }
-
-    glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
 }
 
 unsigned int Window::add_cursor(std::unique_ptr<IconImage> cursor, int x_hotspot, int y_hotspot) {
