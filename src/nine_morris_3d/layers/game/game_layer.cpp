@@ -46,14 +46,14 @@ const Light LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
     glm::vec3(0.3f),
     glm::vec3(1.0f),
-    glm::vec3(1.0f)
+    glm::vec3(0.9f)
 };
 
 const Light LIGHT_AUTUMN = {
     glm::vec3(-4.4f, 11.0f, 6.4f),
     glm::vec3(0.15f),
     glm::vec3(0.9f),
-    glm::vec3(0.9f)
+    glm::vec3(0.85f)
 };
 
 void GameLayer::on_attach() {
@@ -333,7 +333,6 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
-        // camera.set_position(default_camera_position);
         camera.go_towards_position(default_camera_position);
     }
 

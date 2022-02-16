@@ -80,10 +80,11 @@ void serialize(Archive& archive, Camera& camera) {
     archive(camera.sensitivity, camera.position, camera.pitch, camera.yaw, camera.view_matrix,
             camera.projection_matrix, camera.projection_view_matrix, camera.point,
             camera.distance_to_point, camera.angle_around_point, camera.x_velocity,
-            camera.y_velocity, camera.zoom_velocity, auto_move_x, target_angle_around_point,
-            auto_x_velocity, virtual_angle_around_point, auto_move_y, target_pitch, auto_y_velocity,
-            virtual_pitch, auto_move_zoom, target_distance_to_point, auto_zoom_velocity,
-            virtual_distance_to_point, cached_towards_position, dont_auto_call_go_towards_position);
+            camera.y_velocity, camera.zoom_velocity, camera.auto_move_x, camera.target_angle_around_point,
+            camera.auto_x_velocity, camera.virtual_angle_around_point, camera.auto_move_y,
+            camera.target_pitch, camera.auto_y_velocity, camera.virtual_pitch, camera.auto_move_zoom,
+            camera.target_distance_to_point, camera.auto_zoom_velocity, camera.virtual_distance_to_point,
+            camera.cached_towards_position, camera.dont_auto_call_go_towards_position);
 }
 
 namespace glm {

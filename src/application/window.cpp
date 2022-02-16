@@ -97,12 +97,17 @@ Window::Window(ApplicationData* data) {
     glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        if (action == GLFW_PRESS) {
-            events::MouseButtonPressedEvent event (button);
-            data->event_function(event);
-        } else if (action == GLFW_RELEASE) {
-            events::MouseButtonReleasedEvent event (button);
-            data->event_function(event);
+        switch (action) {
+            case GLFW_PRESS: {
+                events::MouseButtonPressedEvent event (button);
+                data->event_function(event);
+                break;
+            }
+            case GLFW_RELEASE: {
+                events::MouseButtonReleasedEvent event (button);
+                data->event_function(event);
+                break;
+            }       
         }
     });
 
