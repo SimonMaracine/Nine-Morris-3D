@@ -14,6 +14,22 @@ constexpr float Y_VARIABLE_VELOCITY = 6.0f;
 constexpr float X_BASE_VELOCITY = 0.09f;
 constexpr float X_VARIABLE_VELOCITY = 6.0f;
 
+static float calculate_angle_velocity(float target_angle, float angle) {
+    float result = target_angle - static_cast<float>(static_cast<int>(angle) % 360);
+
+    if (result > 0.0f) {
+        if (result > 180.0f) {
+            result = -(360.0f - result);
+        }
+    } else {
+        if (-result > 180.0f) {
+            result = 360.0f + result;
+        }
+    }
+
+    return result;
+}
+
 Camera::Camera(float sensitivity, float pitch, const glm::vec3& point, float distance_to_point,
         const glm::mat4& projection_matrix)
     : sensitivity(sensitivity), pitch(pitch), point(point), distance_to_point(distance_to_point),
@@ -39,12 +55,14 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
 
     zoom += zoom_velocity * sensitivity * dt;
 
+    // Calculate automatic distance to point movement
     if (auto_move_zoom) {
-        zoom += auto_zoom_velocity * dt + (target_distance_to_point - distance_to_point)
+        zoom += auto_zoom_velocity * dt + (target_distance_to_point - virtual_distance_to_point)
                 * ZOOM_VARIABLE_VELOCITY * dt;
+        virtual_distance_to_point += auto_zoom_velocity * dt
+                + (target_distance_to_point - virtual_distance_to_point) * ZOOM_VARIABLE_VELOCITY * dt;
     }
-    if (auto_move_zoom && glm::abs(target_distance_to_point - distance_to_point) < 0.05f) {
-        distance_to_point = target_distance_to_point;
+    if (auto_move_zoom && glm::abs(target_distance_to_point - virtual_distance_to_point) < 0.05f) {
         auto_zoom_velocity = 0.0f;
         auto_move_zoom = false;
     }
@@ -73,21 +91,26 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
     pitch += y_velocity * sensitivity * dt;
     angle_around_point += x_velocity * sensitivity * dt;
 
-    // if (auto_move_y) {
-    //     pitch += auto_y_velocity * dt + (target_pitch - pitch) * Y_VARIABLE_VELOCITY * dt;
-    // }
-    // if (auto_move_y && glm::abs(target_pitch - pitch) < 0.05f) {
-    //     pitch = target_pitch;
-    //     auto_y_velocity = 0.0f;
-    //     auto_move_y = false;
-    // }
-
-    if (auto_move_x) {
-        angle_around_point += auto_x_velocity * dt + (target_angle_around_point - angle_around_point)
-                * X_VARIABLE_VELOCITY * dt;
+    // Calculate automatic pitch movement
+    if (auto_move_y) {
+        pitch += auto_y_velocity * dt + (target_pitch - virtual_pitch) * Y_VARIABLE_VELOCITY * dt;
+        virtual_pitch += auto_y_velocity * dt + (target_pitch - virtual_pitch) * Y_VARIABLE_VELOCITY * dt;
     }
-    if (auto_move_x && glm::abs(target_angle_around_point - angle_around_point) < 0.05f) {
-        angle_around_point = target_angle_around_point;
+    if (auto_move_y && glm::abs(target_pitch - virtual_pitch) < 0.05f) {
+        // pitch = target_pitch;
+        auto_y_velocity = 0.0f;
+        auto_move_y = false;
+    }
+
+    // Calculate automatic angle around point movement
+    float angle = calculate_angle_velocity(target_angle_around_point, virtual_angle_around_point);
+    if (auto_move_x) {
+        angle_around_point += auto_x_velocity * dt + angle * X_VARIABLE_VELOCITY * dt;
+        virtual_angle_around_point += auto_x_velocity * dt + angle * X_VARIABLE_VELOCITY * dt;
+    }
+    angle = calculate_angle_velocity(target_angle_around_point, virtual_angle_around_point);
+    if (auto_move_x && glm::abs(angle) < 0.05f) {
+        // virtual_angle_around_point = target_angle_around_point;
         auto_x_velocity = 0.0f;
         auto_move_x = false;
     }
@@ -149,21 +172,30 @@ void Camera::set_position(const glm::vec3& position) {
 }
 
 void Camera::go_towards_position(const glm::vec3& position) {
-    // target_distance_to_point = glm::length(position - point);
-    // auto_zoom_velocity = (target_distance_to_point - distance_to_point) * ZOOM_BASE_VELOCITY;
-    // auto_move_zoom = true;
+    // Calculate distance to point velocity
+    target_distance_to_point = glm::length(position - point);
+    auto_zoom_velocity = (target_distance_to_point - distance_to_point) * ZOOM_BASE_VELOCITY;
+    auto_move_zoom = true;
+    virtual_distance_to_point = distance_to_point;
 
     const glm::mat4 view = glm::lookAt(position, point - position, glm::vec3(0.0f, 1.0f, 0.0f));
     const glm::vec3 direction = glm::vec3(glm::transpose(view)[2]);
 
-    // target_pitch = glm::degrees(glm::asin(direction.y));
-    // auto_y_velocity = (target_pitch - pitch) * Y_BASE_VELOCITY;
-    // auto_move_y = true;
+    // Calculate pitch velocity
+    target_pitch = glm::degrees(glm::asin(direction.y));
+    auto_y_velocity = (target_pitch - pitch) * Y_BASE_VELOCITY;
+    auto_move_y = true;
+    virtual_pitch = pitch;
 
-    target_angle_around_point = static_cast<int>(180.0f - glm::degrees(glm::atan(-direction.x, direction.z))) % 360;
+    // Calculate angle around point velocity
+    target_angle_around_point = static_cast<float>(
+        static_cast<int>(180.0f - glm::degrees(glm::atan(-direction.x, direction.z))) % 360
+    );
     if (target_angle_around_point < 0.0f) {
         target_angle_around_point += 360.0f;
     }
-    auto_x_velocity = (target_angle_around_point - angle_around_point) * X_BASE_VELOCITY;
+    const float angle = calculate_angle_velocity(target_angle_around_point, angle_around_point);
+    auto_x_velocity = angle * X_BASE_VELOCITY;
     auto_move_x = true;
+    virtual_angle_around_point = angle_around_point;
 }
