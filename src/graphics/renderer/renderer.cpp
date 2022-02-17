@@ -41,6 +41,8 @@ namespace renderer {
         storage->uniform_buffer = UniformBuffer::create(nullptr, sizeof(glm::mat4));
         const char* block_name = "Matrices";
 
+        storage->pixel_buffer = PixelBuffer::create(sizeof(int));
+
         {
             const std::vector<std::string> uniforms = {
                 "u_model_matrix",

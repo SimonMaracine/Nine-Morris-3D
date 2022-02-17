@@ -121,6 +121,8 @@ void GameLayer::on_attach() {
 
     camera.go_towards_position(default_camera_position);
 
+    app->storage->pixel_buffer->bind();
+
     // It's ok to be called multiple times
     STOP_ALLOCATION_LOG();
 }
@@ -169,6 +171,8 @@ void GameLayer::on_detach() {
     gui_layer->timer = Timer();
 
     first_move = false;
+
+    PixelBuffer::unbind();
 }
 
 void GameLayer::on_bind_layers() {
@@ -236,12 +240,25 @@ void GameLayer::on_draw() {
 
     const int x = static_cast<int>(input::get_mouse_x());
     const int y = app->data.height - static_cast<int>(input::get_mouse_y());
-    hovered_id = app->storage->intermediate_framebuffer->read_pixel_red_integer(1, x, y);
+    // hovered_id = app->storage->intermediate_framebuffer->read_pixel_red_integer(1, x, y);
+    if ((app->frames + 30) % 60 == 0) {
+        // DEB_DEBUG("READING PIXELS");
+        app->storage->intermediate_framebuffer->read_pixel_red_integer_pbo(1, x, y);
+    }
 
     Framebuffer::bind_default();
 
     renderer::clear(renderer::Color);
     renderer::draw_screen_quad(app->storage->intermediate_framebuffer->get_color_attachment(0));
+
+    if (app->frames % 60 == 0) {
+        // DEB_DEBUG("MAPPING BUFFER");
+        app->storage->pixel_buffer->map_data();
+        int* data;
+        app->storage->pixel_buffer->get_data<int>(&data);
+        hovered_id = *data;
+        app->storage->pixel_buffer->unmap_data();
+    }
 }
 
 void GameLayer::on_event(events::Event& event) {

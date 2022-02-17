@@ -57,6 +57,7 @@ public:
 
     void resize(int width, int height);
     int read_pixel_red_integer(unsigned int attachment_index, int x, int y) const;
+    void read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y) const;
     void clear_red_integer_attachment(int index, int value) const;
 
     void resolve_framebuffer(GLuint draw_framebuffer, int width, int height);

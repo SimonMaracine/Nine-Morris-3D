@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <cstddef>
+#include <cassert>
 
 #include <glad/glad.h>
 
@@ -64,14 +65,21 @@ public:
     ~PixelBuffer();
 
     static std::shared_ptr<PixelBuffer> create(size_t size);
-    static std::shared_ptr<PixelBuffer> create(const void* data, size_t size);
 
     void bind() const;
     static void unbind();
 
-    void update_data(const void* data, size_t size) const;
+    void map_data();
+
+    template<typename T>
+    void get_data(T** data_out) {
+        *data_out = static_cast<T*>(data);
+    }
+
+    void unmap_data();
 private:
     GLuint buffer;
+    void* data = nullptr;
 
     friend class VertexArray;
     friend class Shader;

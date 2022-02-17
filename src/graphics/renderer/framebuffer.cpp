@@ -187,6 +187,13 @@ int Framebuffer::read_pixel_red_integer(unsigned int attachment_index, int x, in
     return pixel;
 }
 
+void Framebuffer::read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y) const {
+    assert(attachment_index < color_attachments.size());
+
+    glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
+    glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, nullptr);
+}
+
 void Framebuffer::clear_red_integer_attachment(int index, int value) const {  // TODO is this even used?
     assert(index < (int) color_attachments.size());
 
@@ -263,7 +270,7 @@ void Framebuffer::build() {
                         assert(false);
                         break;
                     case AttachmentFormat::RGBA8:
-                        attach_color_texture(texture, specification.samples, GL_RGBA8, GL_RGBA,
+                        attach_color_texture(texture, specification.samples, GL_RGBA8, GL_BGRA,
                                 specification.width, specification.height, i);
                         break;
                     case AttachmentFormat::RED_I:
