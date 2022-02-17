@@ -18,7 +18,7 @@ public:
 
     void update_data(const void* data, size_t size) const;
 private:
-    GLuint buffer;
+    GLuint buffer = 0;
 
     friend class VertexArray;
     friend class Shader;
@@ -34,7 +34,7 @@ public:
     void bind() const;
     static void unbind();
 private:
-    GLuint buffer;
+    GLuint buffer = 0;
 
     friend class VertexArray;
     friend class Shader;
@@ -52,7 +52,7 @@ public:
 
     void update_data(const void* data, size_t size) const;
 private:
-    GLuint buffer;
+    GLuint buffer = 0;
 
     friend class VertexArray;
     friend class Shader;
@@ -71,7 +71,7 @@ public:
 
     void update_data(const void* data, size_t size) const;
 private:
-    GLuint buffer;
+    GLuint buffer = 0;
 
     friend class VertexArray;
     friend class Shader;

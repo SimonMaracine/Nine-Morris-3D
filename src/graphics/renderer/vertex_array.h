@@ -21,7 +21,7 @@ public:
     void add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout);
     void add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer);
 private:
-    GLuint array;
+    GLuint array = 0;
 
     // This is just to hold a strong reference to the buffers
     std::vector<std::shared_ptr<Buffer>> buffers;

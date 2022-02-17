@@ -25,7 +25,7 @@ public:
 
 	GLuint get_id() const { return texture; }
 private:
-    GLuint texture;
+    GLuint texture = 0;
 	int width = 0, height = 0;
 
 	std::string name;
@@ -42,7 +42,7 @@ public:
     void bind(GLenum slot) const;
     static void unbind();
 private:
-    GLuint texture;
+    GLuint texture = 0;
 
 	std::string name;
 };
