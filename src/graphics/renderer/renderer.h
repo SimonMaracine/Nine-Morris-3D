@@ -28,7 +28,7 @@ namespace renderer {
 
     struct Storage {
         std::shared_ptr<UniformBuffer> uniform_buffer;
-        std::shared_ptr<PixelBuffer> pixel_buffer;
+        std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
 
         std::shared_ptr<Shader> board_shader;
         std::shared_ptr<Shader> board_paint_shader;

@@ -10,6 +10,7 @@
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/camera.h"
 #include "graphics/renderer/light.h"
+#include "graphics/renderer/framebuffer_reader.h"
 #include "other/model.h"
 #include "other/loader.h"
 
@@ -84,6 +85,8 @@ public:
     bool first_move = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
+
+    FramebufferReader<4> reader;
 
     ImGuiLayer* imgui_layer = nullptr;
     GuiLayer* gui_layer = nullptr;

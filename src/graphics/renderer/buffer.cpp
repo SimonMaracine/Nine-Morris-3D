@@ -134,6 +134,7 @@ std::shared_ptr<PixelBuffer> PixelBuffer::create(size_t size) {
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
     glBufferData(GL_PIXEL_PACK_BUFFER, size, nullptr, GL_DYNAMIC_READ);
+    glClearBufferData(GL_PIXEL_PACK_BUFFER, GL_R32I, GL_RED_INTEGER, GL_INT, (void*) 0);
     LOG_ALLOCATION(size);
 
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
@@ -152,7 +153,7 @@ void PixelBuffer::unbind() {
 void PixelBuffer::map_data() {
     data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 
-    if (data == nullptr) {
+    if (data == nullptr) {  // FIXME handle this
         assert(false);
     }
 }
@@ -160,7 +161,7 @@ void PixelBuffer::map_data() {
 void PixelBuffer::unmap_data() {
     GLboolean success = glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 
-    if (success == GL_FALSE) {
+    if (success == GL_FALSE) {  // FIXME handle this
         assert(false);
     }
 }
