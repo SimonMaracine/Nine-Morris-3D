@@ -288,8 +288,7 @@ bool Board::put_piece(hoverable::Id hovered_id) {
                     const glm::vec3 target = glm::vec3(node.position.x, PIECE_Y_POSITION, node.position.z);
                     const glm::vec3 target0 = selected_piece->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
                     const glm::vec3 target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
-                    const glm::vec3 velocity = glm::normalize(target0 - selected_piece->position)
-                            * PIECE_BASE_VELOCITY;
+                    const glm::vec3 velocity = glm::normalize(target0 - selected_piece->position) * PIECE_BASE_VELOCITY;
 
                     prepare_piece_for_threestep_move(selected_piece, target, velocity, target0, target1);
                 } else {

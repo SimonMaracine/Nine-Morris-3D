@@ -46,14 +46,14 @@ const Light LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
     glm::vec3(0.3f),
     glm::vec3(1.0f),
-    glm::vec3(1.0f)
+    glm::vec3(0.9f)
 };
 
 const Light LIGHT_AUTUMN = {
     glm::vec3(-4.4f, 11.0f, 6.4f),
     glm::vec3(0.15f),
     glm::vec3(0.9f),
-    glm::vec3(0.9f)
+    glm::vec3(0.85f)
 };
 
 void GameLayer::on_attach() {
@@ -93,8 +93,6 @@ void GameLayer::on_attach() {
     build_light();
     build_turn_indicator();
 
-    default_camera_position = camera.get_position();
-
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
@@ -120,6 +118,8 @@ void GameLayer::on_attach() {
     setup_board();
     setup_board_paint();
     setup_pieces();
+
+    camera.go_towards_position(default_camera_position);
 
     // It's ok to be called multiple times
     STOP_ALLOCATION_LOG();
@@ -333,7 +333,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
-        camera.set_position(default_camera_position);
+        camera.go_towards_position(default_camera_position);
     }
 
     return false;
@@ -534,6 +534,16 @@ void GameLayer::build_camera() {
         47.0f,
         glm::vec3(0.0f),
         8.0f,
+        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
+    );
+
+    default_camera_position = camera.get_position();
+
+    camera = Camera(
+        app->options.sensitivity,
+        47.0f,
+        glm::vec3(0.0f),
+        8.7f,
         glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
     );
 
