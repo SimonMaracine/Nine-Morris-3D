@@ -79,21 +79,11 @@ namespace debug_opengl {
             GLsizei length, const GLchar* message, const void* userParam) {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                REL_CRITICAL("Debug Message:");
+                std::cout << "OpenGL Debug Message:" << std::endl;
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
-                switch (id) {
-                    case 14:
-                    case 13:
-                    case 10:
-                    case 9:
-                    case 7:
-                        return;  // Ignore these warnings
-                }
-                REL_WARN("Debug Message:");
-                break;
             case GL_DEBUG_SEVERITY_LOW:
-                REL_WARN("Debug Message:");
+                std::cout << "OpenGL Debug Message:" << std::endl;
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 assert(false);

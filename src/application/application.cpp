@@ -171,6 +171,8 @@ float Application::update_frame_counter() {
     static int frame_count = 0;
     static double total_time = 0.0;
 
+    frames++;
+
     const double current_seconds = window->get_time();
     const double elapsed_seconds = current_seconds - previous_seconds;
     previous_seconds = current_seconds;

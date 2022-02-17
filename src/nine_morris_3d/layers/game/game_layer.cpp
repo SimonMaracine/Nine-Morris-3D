@@ -46,14 +46,14 @@ const Light LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
     glm::vec3(0.3f),
     glm::vec3(1.0f),
-    glm::vec3(1.0f)
+    glm::vec3(0.9f)
 };
 
 const Light LIGHT_AUTUMN = {
     glm::vec3(-4.4f, 11.0f, 6.4f),
     glm::vec3(0.15f),
     glm::vec3(0.9f),
-    glm::vec3(0.9f)
+    glm::vec3(0.85f)
 };
 
 void GameLayer::on_attach() {
@@ -93,8 +93,6 @@ void GameLayer::on_attach() {
     build_light();
     build_turn_indicator();
 
-    default_camera_position = camera.get_position();
-
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
@@ -120,6 +118,10 @@ void GameLayer::on_attach() {
     setup_board();
     setup_board_paint();
     setup_pieces();
+
+    camera.go_towards_position(default_camera_position);
+
+    app->storage->pixel_buffer->bind();
 
     // It's ok to be called multiple times
     STOP_ALLOCATION_LOG();
@@ -169,6 +171,8 @@ void GameLayer::on_detach() {
     gui_layer->timer = Timer();
 
     first_move = false;
+
+    PixelBuffer::unbind();
 }
 
 void GameLayer::on_bind_layers() {
@@ -236,12 +240,25 @@ void GameLayer::on_draw() {
 
     const int x = static_cast<int>(input::get_mouse_x());
     const int y = app->data.height - static_cast<int>(input::get_mouse_y());
-    hovered_id = app->storage->intermediate_framebuffer->read_pixel_red_integer(1, x, y);
+    // hovered_id = app->storage->intermediate_framebuffer->read_pixel_red_integer(1, x, y);
+    if ((app->frames + 30) % 60 == 0) {
+        // DEB_DEBUG("READING PIXELS");
+        app->storage->intermediate_framebuffer->read_pixel_red_integer_pbo(1, x, y);
+    }
 
     Framebuffer::bind_default();
 
     renderer::clear(renderer::Color);
     renderer::draw_screen_quad(app->storage->intermediate_framebuffer->get_color_attachment(0));
+
+    if (app->frames % 60 == 0) {
+        // DEB_DEBUG("MAPPING BUFFER");
+        app->storage->pixel_buffer->map_data();
+        int* data;
+        app->storage->pixel_buffer->get_data<int>(&data);
+        hovered_id = *data;
+        app->storage->pixel_buffer->unmap_data();
+    }
 }
 
 void GameLayer::on_event(events::Event& event) {
@@ -333,7 +350,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
-        camera.set_position(default_camera_position);
+        camera.go_towards_position(default_camera_position);
     }
 
     return false;
@@ -534,6 +551,16 @@ void GameLayer::build_camera() {
         47.0f,
         glm::vec3(0.0f),
         8.0f,
+        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
+    );
+
+    default_camera_position = camera.get_position();
+
+    camera = Camera(
+        app->options.sensitivity,
+        47.0f,
+        glm::vec3(0.0f),
+        8.7f,
         glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
     );
 

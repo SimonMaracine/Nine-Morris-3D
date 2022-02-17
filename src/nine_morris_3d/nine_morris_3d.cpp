@@ -31,14 +31,15 @@ NineMorris3D::NineMorris3D()
 
     using namespace assets;
 
-    std::vector<std::unique_ptr<IconImage>> icons;
-    icons.push_back(std::make_unique<IconImage>(path(ICON_512)));
-    icons.push_back(std::make_unique<IconImage>(path(ICON_256)));
-    icons.push_back(std::make_unique<IconImage>(path(ICON_128)));
-    icons.push_back(std::make_unique<IconImage>(path(ICON_64)));
-    icons.push_back(std::make_unique<IconImage>(path(ICON_32)));
+    std::array<std::unique_ptr<IconImage>, 5> icons = {
+        std::make_unique<IconImage>(path(ICON_512)),
+        std::make_unique<IconImage>(path(ICON_256)),
+        std::make_unique<IconImage>(path(ICON_128)),
+        std::make_unique<IconImage>(path(ICON_64)),
+        std::make_unique<IconImage>(path(ICON_32))
+    };
 
-    window->set_icons(icons);
+    window->set_icons<5>(icons);
 
     arrow_cursor = window->add_cursor(std::make_unique<IconImage>(path(ARROW_CURSOR)), 4, 1);
     cross_cursor = window->add_cursor(std::make_unique<IconImage>(path(CROSS_CURSOR)), 8, 8);

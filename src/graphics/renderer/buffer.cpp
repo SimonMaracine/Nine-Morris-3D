@@ -115,3 +115,52 @@ void UniformBuffer::unbind() {
 void UniformBuffer::update_data(const void* data, size_t size) const {
     glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);
 }
+
+// --- Pixel buffer
+
+PixelBuffer::PixelBuffer(GLuint buffer)
+    : buffer(buffer) {
+    DEB_DEBUG("Created pixel buffer {}", buffer);
+}
+
+PixelBuffer::~PixelBuffer() {
+    glDeleteBuffers(1, &buffer);
+
+    DEB_DEBUG("Deleted pixel buffer {}", buffer);
+}
+
+std::shared_ptr<PixelBuffer> PixelBuffer::create(size_t size) {
+    GLuint buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
+    glBufferData(GL_PIXEL_PACK_BUFFER, size, nullptr, GL_DYNAMIC_READ);
+    LOG_ALLOCATION(size);
+
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+
+    return std::make_shared<PixelBuffer>(buffer);
+}
+
+void PixelBuffer::bind() const {
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
+}
+
+void PixelBuffer::unbind() {
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+}
+
+void PixelBuffer::map_data() {
+    data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+
+    if (data == nullptr) {
+        assert(false);
+    }
+}
+
+void PixelBuffer::unmap_data() {
+    GLboolean success = glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+
+    if (success == GL_FALSE) {
+        assert(false);
+    }
+}

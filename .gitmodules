@@ -5,7 +5,7 @@
 [submodule "extern/imgui"]
 	path = extern/imgui
 	url = https://github.com/SimonMaracine/imgui.git
-	ignore = dirty
+	ignore = all
 [submodule "extern/assimp"]
 	path = extern/assimp
 	url = https://github.com/SimonMaracine/assimp.git

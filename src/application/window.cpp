@@ -97,12 +97,17 @@ Window::Window(ApplicationData* data) {
     glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        if (action == GLFW_PRESS) {
-            events::MouseButtonPressedEvent event (button);
-            data->event_function(event);
-        } else if (action == GLFW_RELEASE) {
-            events::MouseButtonReleasedEvent event (button);
-            data->event_function(event);
+        switch (action) {
+            case GLFW_PRESS: {
+                events::MouseButtonPressedEvent event (button);
+                data->event_function(event);
+                break;
+            }
+            case GLFW_RELEASE: {
+                events::MouseButtonReleasedEvent event (button);
+                data->event_function(event);
+                break;
+            }       
         }
     });
 
@@ -144,19 +149,8 @@ double Window::get_time() const {
     return glfwGetTime();
 }
 
-void Window::set_vsync(int interval) const {
+void Window::set_vsync(int interval) {
     glfwSwapInterval(interval);
-}
-
-void Window::set_icons(const std::vector<std::unique_ptr<IconImage>>& icons) const {
-    std::vector<GLFWimage> glfw_icons;
-    glfw_icons.resize(icons.size());
-
-    for (unsigned int i = 0; i < icons.size(); i++) {
-        glfw_icons[i] = icons[i]->get_data();
-    }
-
-    glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
 }
 
 unsigned int Window::add_cursor(std::unique_ptr<IconImage> cursor, int x_hotspot, int y_hotspot) {
