@@ -122,7 +122,7 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool
     return std::make_shared<Texture>(texture, data->width, data->height, name);
 }
 
-void Texture::bind(GLenum slot) const {
+void Texture::bind(GLenum slot) {
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, texture);
 }
@@ -208,7 +208,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const std::array<std::shared_ptr<Te
     return std::make_shared<Texture3D>(texture, name);
 }
 
-void Texture3D::bind(GLenum slot) const {
+void Texture3D::bind(GLenum slot) {
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 }

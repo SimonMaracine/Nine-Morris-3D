@@ -28,7 +28,7 @@ std::shared_ptr<VertexArray> VertexArray::create() {
     return std::make_shared<VertexArray>(array);
 }
 
-void VertexArray::bind() const {
+void VertexArray::bind() {
     glBindVertexArray(array);
 }
 
@@ -49,11 +49,11 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout&
         switch (element.type) {
             case GL_FLOAT:
                 glVertexAttribPointer(element.index, element.size, element.type, GL_FALSE,
-                                      layout.stride, (GLvoid*) offset);
+                        layout.stride, (GLvoid*) offset);
                 break;
             case GL_INT:
                 glVertexAttribIPointer(element.index, element.size, element.type,
-                                       layout.stride, (GLvoid*) offset);
+                        layout.stride, (GLvoid*) offset);
                 break;
             default:
                 REL_CRITICAL("Unknown element type");

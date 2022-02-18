@@ -24,11 +24,11 @@ public:
     void update_data(const float* data, size_t size);
 
     std::unordered_map<int, Glyph>& get_glyphs() { return glyphs; }
-    unsigned int get_bitmap_size() const { return bitmap_size; }
+    unsigned int get_bitmap_size() { return bitmap_size; }
 
-    const VertexArray* get_vertex_array() const { return vertex_array.get(); }
-    GLuint get_texture() const { return texture; }
-    unsigned int get_vertex_count() const { return vertex_count; }
+    VertexArray* get_vertex_array() { return vertex_array.get(); }
+    GLuint get_texture() { return texture; }
+    unsigned int get_vertex_count() { return vertex_count; }
 
     void begin_baking();
     void bake_characters(int begin_codepoint, int end_codepoint);

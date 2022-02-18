@@ -147,7 +147,7 @@ std::shared_ptr<Framebuffer> Framebuffer::create(const FramebufferSpecification&
     return std::make_shared<Framebuffer>(specification);
 }
 
-void Framebuffer::bind() const {
+void Framebuffer::bind() {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 }
 
@@ -155,13 +155,13 @@ void Framebuffer::bind_default() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-GLuint Framebuffer::get_color_attachment(unsigned int index) const {
+GLuint Framebuffer::get_color_attachment(unsigned int index) {
     assert(index < color_attachments.size());
 
     return color_attachments[index];
 }
 
-GLuint Framebuffer::get_depth_attachment() const {
+GLuint Framebuffer::get_depth_attachment() {
     return depth_attachment;
 }
 
@@ -177,7 +177,7 @@ void Framebuffer::resize(int width, int height) {
     build();
 }
 
-int Framebuffer::read_pixel_red_integer(unsigned int attachment_index, int x, int y) const {
+int Framebuffer::read_pixel_red_integer(unsigned int attachment_index, int x, int y) {
     assert(attachment_index < color_attachments.size());
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -187,14 +187,14 @@ int Framebuffer::read_pixel_red_integer(unsigned int attachment_index, int x, in
     return pixel;
 }
 
-void Framebuffer::read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y) const {
+void Framebuffer::read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y) {
     assert(attachment_index < color_attachments.size());
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
     glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, nullptr);
 }
 
-void Framebuffer::clear_red_integer_attachment(int index, int value) const {  // TODO is this even used?
+void Framebuffer::clear_red_integer_attachment(int index, int value) {  // TODO is this even used?
     assert(index < (int) color_attachments.size());
 
     glClearBufferiv(GL_COLOR, index, &value);

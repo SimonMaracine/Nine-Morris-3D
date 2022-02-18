@@ -17,13 +17,13 @@ public:
     static std::shared_ptr<Texture> create(const std::string& file_path, bool mipmapping, float bias = 0.0f);
 	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, bool mipmapping, float bias = 0.0f);
 
-	int get_width() const { return width; }
-	int get_height() const { return height; }
+	int get_width() { return width; }
+	int get_height() { return height; }
 
-    void bind(GLenum slot) const;
+    void bind(GLenum slot);
     static void unbind();
 
-	GLuint get_id() const { return texture; }
+	GLuint get_id() { return texture; }
 private:
     GLuint texture = 0;
 	int width = 0, height = 0;
@@ -39,7 +39,7 @@ public:
     static std::shared_ptr<Texture3D> create(const char** file_paths);
 	static std::shared_ptr<Texture3D> create(const std::array<std::shared_ptr<TextureData>, 6>& data);
 
-    void bind(GLenum slot) const;
+    void bind(GLenum slot);
     static void unbind();
 private:
     GLuint texture = 0;

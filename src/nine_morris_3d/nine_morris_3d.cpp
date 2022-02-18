@@ -31,7 +31,7 @@ NineMorris3D::NineMorris3D()
 
     using namespace assets;
 
-    std::array<std::unique_ptr<IconImage>, 5> icons = {
+    const std::array<std::unique_ptr<IconImage>, 5> icons = {
         std::make_unique<IconImage>(path(ICON_512)),
         std::make_unique<IconImage>(path(ICON_256)),
         std::make_unique<IconImage>(path(ICON_128)),

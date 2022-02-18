@@ -15,7 +15,7 @@ public:
 
     static std::shared_ptr<VertexArray> create();
 
-    void bind() const;
+    void bind();
     static void unbind();
 
     void add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout);

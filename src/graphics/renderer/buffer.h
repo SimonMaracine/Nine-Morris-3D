@@ -14,10 +14,10 @@ public:
     static std::shared_ptr<Buffer> create(size_t size);
     static std::shared_ptr<Buffer> create(const void* data, size_t size);
 
-    void bind() const;
+    void bind();
     static void unbind();
 
-    void update_data(const void* data, size_t size) const;
+    void update_data(const void* data, size_t size);
 private:
     GLuint buffer = 0;
 
@@ -32,7 +32,7 @@ public:
 
     static std::shared_ptr<IndexBuffer> create(const unsigned int* data, size_t size);
 
-    void bind() const;
+    void bind();
     static void unbind();
 private:
     GLuint buffer = 0;
@@ -48,10 +48,10 @@ public:
 
     static std::shared_ptr<UniformBuffer> create(const void* data, size_t size);
 
-    void bind() const;
+    void bind();
     static void unbind();
 
-    void update_data(const void* data, size_t size) const;
+    void update_data(const void* data, size_t size);
 private:
     GLuint buffer = 0;
 
@@ -61,12 +61,12 @@ private:
 
 class PixelBuffer {
 public:
-    PixelBuffer(GLuint buffer);
+    PixelBuffer(GLuint buffer, size_t size);
     ~PixelBuffer();
 
     static std::shared_ptr<PixelBuffer> create(size_t size);
 
-    void bind() const;
+    void bind();
     static void unbind();
 
     void map_data();
@@ -80,6 +80,7 @@ public:
 private:
     GLuint buffer = 0;
     void* data = nullptr;
+    char* dummy_data = nullptr;
 
     friend class VertexArray;
     friend class Shader;

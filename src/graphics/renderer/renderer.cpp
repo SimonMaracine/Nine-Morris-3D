@@ -39,6 +39,7 @@ namespace renderer {
         storage = new Storage;
 
         storage->uniform_buffer = UniformBuffer::create(nullptr, sizeof(glm::mat4));
+        storage->uniform_buffer->bind();
         const char* block_name = "Matrices";
 
         storage->pixel_buffers = {

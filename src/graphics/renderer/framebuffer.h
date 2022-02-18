@@ -47,18 +47,18 @@ public:
 
     static std::shared_ptr<Framebuffer> create(const FramebufferSpecification& specification);
 
-    void bind() const;
+    void bind();
     static void bind_default();
 
-    GLuint get_color_attachment(unsigned int index) const;
-    GLuint get_depth_attachment() const;
-    GLuint get_id() const { return framebuffer; }
-    const FramebufferSpecification& get_specification() const { return specification; }
+    GLuint get_color_attachment(unsigned int index);
+    GLuint get_depth_attachment();
+    GLuint get_id() { return framebuffer; }
+    const FramebufferSpecification& get_specification() { return specification; }
 
     void resize(int width, int height);
-    int read_pixel_red_integer(unsigned int attachment_index, int x, int y) const;
-    void read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y) const;
-    void clear_red_integer_attachment(int index, int value) const;
+    int read_pixel_red_integer(unsigned int attachment_index, int x, int y);
+    void read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y);
+    void clear_red_integer_attachment(int index, int value);
 
     void resolve_framebuffer(GLuint draw_framebuffer, int width, int height);
 private:

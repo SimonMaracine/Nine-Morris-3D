@@ -247,7 +247,7 @@ void GameLayer::on_draw() {
     renderer::clear(renderer::Color);
     renderer::draw_screen_quad(app->storage->intermediate_framebuffer->get_color_attachment(0));
 
-    int* data;
+    int* data = nullptr;
     reader.get<int>(&data);
     hovered_id = *data;
 }
