@@ -239,7 +239,6 @@ void GameLayer::on_draw() {
 
     const int x = static_cast<int>(input::get_mouse_x());
     const int y = app->data.height - static_cast<int>(input::get_mouse_y());
-    // hovered_id = app->storage->intermediate_framebuffer->read_pixel_red_integer(1, x, y);
     reader.read(1, x, y);
 
     Framebuffer::bind_default();
@@ -247,7 +246,7 @@ void GameLayer::on_draw() {
     renderer::clear(renderer::Color);
     renderer::draw_screen_quad(app->storage->intermediate_framebuffer->get_color_attachment(0));
 
-    int* data = nullptr;
+    int* data;
     reader.get<int>(&data);
     hovered_id = *data;
 }
