@@ -22,7 +22,6 @@ private:
     GLuint buffer = 0;
 
     friend class VertexArray;
-    friend class Shader;
 };
 
 class IndexBuffer {
@@ -38,7 +37,6 @@ private:
     GLuint buffer = 0;
 
     friend class VertexArray;
-    friend class Shader;
 };
 
 class UniformBuffer {
@@ -55,7 +53,6 @@ public:
 private:
     GLuint buffer = 0;
 
-    friend class VertexArray;
     friend class Shader;
 };
 
@@ -81,7 +78,4 @@ private:
     GLuint buffer = 0;
     void* data = nullptr;
     char* dummy_data = nullptr;
-
-    friend class VertexArray;
-    friend class Shader;
 };
