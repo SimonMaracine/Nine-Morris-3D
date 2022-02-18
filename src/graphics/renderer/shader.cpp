@@ -103,7 +103,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
             vertex_source_path, fragment_source_path);
 }
 
-void Shader::bind() const {
+void Shader::bind() {
     glUseProgram(program);
 }
 
@@ -111,32 +111,32 @@ void Shader::unbind() {
     glUseProgram(0);
 }
 
-void Shader::set_uniform_matrix(const std::string& name, const glm::mat4& matrix) const {
+void Shader::set_uniform_matrix(const std::string& name, const glm::mat4& matrix) {
     GLint location = get_uniform_location(name);
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::set_uniform_int(const std::string& name, int value) const {
+void Shader::set_uniform_int(const std::string& name, int value) {
     GLint location = get_uniform_location(name);
     glUniform1i(location, value);
 }
 
-void Shader::set_uniform_vec2(const std::string& name, const glm::vec2& vector) const {
+void Shader::set_uniform_vec2(const std::string& name, const glm::vec2& vector) {
     GLint location = get_uniform_location(name);
     glUniform2f(location, vector.x, vector.y);
 }
 
-void Shader::set_uniform_vec3(const std::string& name, const glm::vec3& vector) const {
+void Shader::set_uniform_vec3(const std::string& name, const glm::vec3& vector) {
     GLint location = get_uniform_location(name);
     glUniform3f(location, vector.x, vector.y, vector.z);
 }
 
-void Shader::set_uniform_vec4(const std::string& name, const glm::vec4& vector) const {
+void Shader::set_uniform_vec4(const std::string& name, const glm::vec4& vector) {
     GLint location = get_uniform_location(name);
     glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
 }
 
-void Shader::set_uniform_float(const std::string& name, float value) const {
+void Shader::set_uniform_float(const std::string& name, float value) {
     GLint location = get_uniform_location(name);
     glUniform1f(location, value);
 }
@@ -173,7 +173,7 @@ void Shader::recompile() {
     fragment_shader = new_fragment_shader;
 }
 
-GLint Shader::get_uniform_location(const std::string& name) const {
+GLint Shader::get_uniform_location(const std::string& name) {
 #if defined(NINE_MORRIS_3D_RELEASE)
     return cache[name];
 #elif defined(NINE_MORRIS_3D_DEBUG)

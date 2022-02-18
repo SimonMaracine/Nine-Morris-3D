@@ -23,19 +23,19 @@ public:
             const std::string& fragment_source, const std::vector<std::string>& uniforms,
             const char* block_name, int uniforms_count, std::shared_ptr<UniformBuffer> uniform_buffer);
 
-    void bind() const;
+    void bind();
     static void unbind();
 
-    void set_uniform_matrix(const std::string& name, const glm::mat4& matrix) const;
-    void set_uniform_int(const std::string& name, int value) const;
-    void set_uniform_vec2(const std::string& name, const glm::vec2& vector) const;
-    void set_uniform_vec3(const std::string& name, const glm::vec3& vector) const;
-    void set_uniform_vec4(const std::string& name, const glm::vec4& vector) const;
-    void set_uniform_float(const std::string& name, float value) const;
+    void set_uniform_matrix(const std::string& name, const glm::mat4& matrix);
+    void set_uniform_int(const std::string& name, int value);
+    void set_uniform_vec2(const std::string& name, const glm::vec2& vector);
+    void set_uniform_vec3(const std::string& name, const glm::vec3& vector);
+    void set_uniform_vec4(const std::string& name, const glm::vec4& vector);
+    void set_uniform_float(const std::string& name, float value);
 
     void recompile();
 private:
-    GLint get_uniform_location(const std::string& name) const;
+    GLint get_uniform_location(const std::string& name);
 
     static GLuint compile_shader(const std::string& source_path, GLenum type);
     static bool check_compilation(GLuint shader, GLenum type);
@@ -48,7 +48,7 @@ private:
 
     std::string name;
 
-    mutable std::unordered_map<std::string, GLint> cache;
+    std::unordered_map<std::string, GLint> cache;
 
     // Keep these for hot-reloading functionality
     std::string vertex_source_path;
