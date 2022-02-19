@@ -83,8 +83,8 @@ void Application::run() {
         if (changed_scene) {
             active_layer_stack.clear();
 
-            for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
-                pop_layer(*iter);
+            for (int i = layer_stack.size() - 1; i >= 0; i--) {
+                pop_layer(layer_stack[i]);
             }
 
             current_scene = to_scene;
@@ -101,8 +101,8 @@ void Application::run() {
 
     DEB_INFO("Closing game");
 
-    for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
-        pop_layer(*iter);
+    for (int i = layer_stack.size() - 1; i >= 0; i--) {
+        pop_layer(layer_stack[i]);
     }
 }
 
@@ -225,8 +225,7 @@ void Application::push_layer(Layer* layer) {
 
 void Application::pop_layer(Layer* layer) {
     layer->on_detach();
-    auto iter = std::find(layer_stack.begin(), layer_stack.end(), layer);
-    layer_stack.erase(iter);
+    layer_stack.pop_back();
     layer->active = true;
 }
 
