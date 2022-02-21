@@ -52,6 +52,8 @@ Font::Font(const std::string& file_path, float size, int padding, unsigned char 
 Font::~Font() {
     glDeleteTextures(1, &texture);
     delete[] font_file_buffer;
+
+    DEB_DEBUG("Unloaded font '{}'", name.c_str());
 }
 
 void Font::update_data(const float* data, size_t size) {
@@ -61,7 +63,7 @@ void Font::update_data(const float* data, size_t size) {
 }
 
 void Font::begin_baking() {
-    DEB_DEBUG("Begin baking font {}", name.c_str());
+    DEB_DEBUG("Begin baking font '{}'", name.c_str());
 
     glDeleteTextures(1, &texture);
     memset(&bake_context, 0, sizeof(BakeContext));
@@ -186,7 +188,7 @@ void Font::end_baking() {
 
     delete[] bake_context.bitmap;
 
-    DEB_DEBUG("End baking font {}", name.c_str());
+    DEB_DEBUG("End baking font '{}'", name.c_str());
 }
 
 void Font::render(const std::string& string, size_t* out_size, float** out_buffer) {
@@ -274,7 +276,7 @@ void Font::get_string_size(const std::string& string, float scale, int* out_widt
 }
 
 const char* Font::get_file_data(const std::string& file_path) {
-    std::ifstream file (file_path, std::ios::in | std::ios::binary);
+    std::ifstream file (file_path, std::ios::binary);
 
     if (!file.is_open()) {
         REL_CRITICAL("Could not open file '{}' for reading", file_path.c_str());

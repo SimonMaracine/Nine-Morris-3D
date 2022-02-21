@@ -9,6 +9,10 @@
 
 #include "graphics/renderer/vertex_array.h"
 
+/**
+ * This represents a font. Can be used by the renderer to draw text with this font.
+ * Wrap it in smart pointers.
+ */
 class Font {
 public:
     struct Glyph {
@@ -30,12 +34,16 @@ public:
     GLuint get_texture() { return texture; }
     unsigned int get_vertex_count() { return vertex_count; }
 
+    // Baking API
     void begin_baking();
     void bake_characters(int begin_codepoint, int end_codepoint);
     void bake_character(int codepoint);
     void end_baking();
 
+    // Call render to get the buffer of data used in the end by OpenGL
     void render(const std::string& string, size_t* out_size, float** out_buffer);
+
+    // Get width and height of a line of text
     void get_string_size(const std::string& string, float scale, int* out_width, int* out_height);
 private:
     static const char* get_file_data(const std::string& file_path);

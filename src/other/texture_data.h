@@ -4,6 +4,10 @@
 
 #include <stb_image.h>
 
+/**
+ * Object representing raw texture data.
+ * Pass this to OpenGL texture objects.
+ */
 class TextureData {
 public:
 	TextureData(const std::string& file_path, bool flip);

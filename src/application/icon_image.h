@@ -6,6 +6,10 @@
 
 struct GLFWimage;
 
+/**
+ * Class representing an image. To be used for icons and cursors.
+ * Wrap it inside smart pointers.
+ */
 class IconImage {
 public:
     IconImage(const std::string& file_path);

@@ -136,16 +136,16 @@ Window::~Window() {
     DEB_INFO("Terminated GLFW and destroyed window");
 }
 
-void Window::update() const {
+void Window::update() {
     glfwPollEvents();
     glfwSwapBuffers(window);
 }
 
-GLFWwindow* Window::get_handle() const {
+GLFWwindow* Window::get_handle() {
     return window;
 }
 
-double Window::get_time() const {
+double Window::get_time() {
     return glfwGetTime();
 }
 

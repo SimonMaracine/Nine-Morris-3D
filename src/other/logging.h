@@ -6,6 +6,12 @@
 
 #include "application/platform.h"
 
+/**
+ * This is the logging API.
+ * Use DEB_ macros for messages to be printed only in debug mode.
+ * Use REL_ macros for messages to be printed both in debug and release mode.
+ */
+
 #if defined(NINE_MORRIS_3D_RELEASE)
     #define DEB_DEBUG(...) ((void) 0)
     #define DEB_INFO(...) ((void) 0)

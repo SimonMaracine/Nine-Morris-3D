@@ -1,5 +1,8 @@
 #pragma once
 
+/**
+ * Include platform.h whenever there is conditional code regarding platform and build mode.
+ */
 #if defined(__linux__)
     #if defined(__GNUG__)
         #define NINE_MORRIS_3D_LINUX

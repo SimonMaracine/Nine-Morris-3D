@@ -15,26 +15,34 @@
 class Layer;
 class Scene;
 
+/**
+ * Abstract main class of the game. Contains all the data the game can have.
+ * To be derived from another class and instantiated in main().
+*/
 class Application {
 protected:
     Application(int width, int height, const std::string& title);
     virtual ~Application();
 public:
+    // Call this to run the application, after all layers and scenes have been defined
     void run();
 
+    // Scene management functions
     void add_scene(Scene* scene);
     void set_starting_scene(Scene* scene);
     void change_scene(const std::string& id);
 
+    // Framebuffer management functions
     void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void purge_framebuffers();
 
     // This needs to be called whenever a layer is set active or not, so that it gets processed
     void update_active_layers();
 
+    // Public variables accessible by all the code.
     bool running = true;
     double fps = 0.0;
-    unsigned int frames = 0;
+    unsigned int frames = 0;  // TODO remove this, if not needed
     ApplicationData data;
     std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
@@ -44,12 +52,14 @@ private:
     float update_frame_counter();
     unsigned int calculate_fixed_update();
 
+    // These implement scenes in the game
     void push_layer(Layer* layer);
     void pop_layer(Layer* layer);
 
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
 
+    // Data for the layer and scene system
     std::vector<Scene*> scenes;
     Scene* current_scene = nullptr;
     std::vector<Layer*> layer_stack;  // Stores all layers in the current scene
@@ -58,6 +68,7 @@ private:
     bool changed_scene = false;
     Scene* to_scene = nullptr;
 
+    // Keep track of all framebuffers to resize them, if needed
     std::vector<std::weak_ptr<Framebuffer>> framebuffers;
 
     friend class Layer;

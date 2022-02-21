@@ -8,6 +8,10 @@
 #include "application/events.h"
 #include "application/scene.h"
 
+/**
+ * Abstract class representing a part of a scene.
+ * Subclass this and implement all the game logic there.
+ */
 class Layer {
 public:
     Layer(std::string&& id, Application* application)

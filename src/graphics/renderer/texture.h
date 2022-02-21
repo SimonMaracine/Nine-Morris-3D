@@ -9,6 +9,9 @@
 
 #include "other/texture_data.h"
 
+/**
+ * These represent OpenGL textures in video memory.
+ */
 class Texture {
 public:
     Texture(GLuint texture, int width, int height, const std::string& name);

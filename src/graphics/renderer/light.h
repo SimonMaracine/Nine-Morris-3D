@@ -2,6 +2,9 @@
 
 #include <glm/glm.hpp>
 
+/**
+ * This represents a directional light in the scene.
+ */
 class Light {
 public:
     Light() = default;

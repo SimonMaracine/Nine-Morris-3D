@@ -9,6 +9,10 @@ namespace events {
         MouseButtonPressed, MouseButtonReleased, MouseScrolled, MouseMoved
     };
 
+    /**
+     * Abstract event class. Every event derives this class.
+     * Used in on_event() in application.
+     */
     class Event {
     public:
         virtual EventType get_type() = 0;
@@ -17,6 +21,9 @@ namespace events {
         bool handled = false;
     };
 
+    /**
+     * Use this class to dispatch events to functions.
+     */
     class Dispatcher {
     public:
         Dispatcher(Event& event)

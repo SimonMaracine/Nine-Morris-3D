@@ -6,6 +6,11 @@
 
 #include "other/logging.h"
 
+/**
+ * Objects of this class load assets in a separate thread.
+ * Pass a struct with the assets and a function to load them.
+ * Stack allocate objects of this class.
+ */
 template<typename Assets>
 class Loader {
 public:

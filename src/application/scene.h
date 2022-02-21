@@ -7,6 +7,10 @@
 class Application;
 class Layer;
 
+/**
+ * Class representing a scene and containing all the layers in that scene.
+ * Add layers to scenes and add scenes to application. Currrent scene must be set before run().
+ */
 class Scene {
 public:
     Scene(std::string&& id)

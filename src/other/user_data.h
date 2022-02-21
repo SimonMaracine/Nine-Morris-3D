@@ -6,6 +6,9 @@
 #define APP_NAME_LINUX "ninemorris3d"
 #define APP_NAME_WINDOWS "NineMorris3D"
 
+/**
+ * These are functions for getting platform specific username and user directories.
+ */
 namespace user_data {
     class UserNameError : public std::runtime_error {
     public:

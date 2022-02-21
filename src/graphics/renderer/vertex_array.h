@@ -8,6 +8,9 @@
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/buffer_layout.h"
 
+/**
+ * This represents OpenGL vertex arrays, structures that keep track of buffers and their layout.
+ */
 class VertexArray {
 public:
     VertexArray(GLuint array);
@@ -23,7 +26,7 @@ public:
 private:
     GLuint array = 0;
 
-    // This is just to hold a strong reference to the buffers
+    // These are just to hold a strong reference to the buffers
     std::vector<std::shared_ptr<Buffer>> buffers;
     std::shared_ptr<IndexBuffer> index_buffer;
 };

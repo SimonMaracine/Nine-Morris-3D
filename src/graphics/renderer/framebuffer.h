@@ -27,11 +27,14 @@ struct Attachment {
     AttachmentType type = AttachmentType::None;
 };
 
+/**
+ * Stack allocate this and pass it to framebuffers.
+ */
 struct FramebufferSpecification {
     // Must be specified
     int width, height;
 
-    // At least one of these must be specified
+    // At least one of these two must be specified
     std::vector<Attachment> color_attachments;
     Attachment depth_attachment;
 
@@ -40,6 +43,9 @@ struct FramebufferSpecification {
     bool white_border_for_depth_texture = false;
 };
 
+/**
+ * This represents OpenGL framebuffers. Instantiate objects with specifications.
+ */
 class Framebuffer {
 public:
     Framebuffer(const FramebufferSpecification& specification);
@@ -55,11 +61,16 @@ public:
     GLuint get_id() { return framebuffer; }
     const FramebufferSpecification& get_specification() { return specification; }
 
+    // Usually called by application
     void resize(int width, int height);
+
+    // Read pixels
     int read_pixel_red_integer(unsigned int attachment_index, int x, int y);
     void read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y);
+
     void clear_red_integer_attachment(int index, int value);
 
+    // Resolve this to draw_framebuffer
     void resolve_framebuffer(GLuint draw_framebuffer, int width, int height);
 private:
     void build();

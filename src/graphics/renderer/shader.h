@@ -10,6 +10,9 @@
 
 #include "graphics/renderer/buffer.h"
 
+/**
+ * This represents OpenGL shader programs.
+ */
 class Shader {
 public:
     Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name,
@@ -33,6 +36,7 @@ public:
     void set_uniform_vec4(const std::string& name, const glm::vec4& vector);
     void set_uniform_float(const std::string& name, float value);
 
+    // Make sure to reupload any uniforms that need to after calling this function
     void recompile();
 private:
     GLint get_uniform_location(const std::string& name);
@@ -48,6 +52,7 @@ private:
 
     std::string name;
 
+    // Uniforms cache
     std::unordered_map<std::string, GLint> cache;
 
     // Keep these for hot-reloading functionality

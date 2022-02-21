@@ -13,9 +13,13 @@ public:
             const glm::mat4& projection_matrix);
     ~Camera() = default;
 
+    // Call these every frame
     void update(float mouse_wheel, float dx, float dy, float dt);
     void update_friction();
+
     void update_projection(float width, float height);
+
+    // Directly set this position and linearly interpolate to this position respectively
     void set_position(const glm::vec3& position);
     void go_towards_position(const glm::vec3& position);
 

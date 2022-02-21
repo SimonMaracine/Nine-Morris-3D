@@ -10,16 +10,21 @@
 #include "application/application_data.h"
 #include "application/icon_image.h"
 
+/**
+ * This represents the game window.
+ */
 class Window {
 public:
     Window(ApplicationData* data);
     ~Window();
 
-    void update() const;
+    // Call this to swap buffers and update events
+    void update();
 
-    GLFWwindow* get_handle() const;
-    double get_time() const;
+    GLFWwindow* get_handle();
+    double get_time();
 
+    // VSync, cursor and icon API
     void set_vsync(int interval);
     unsigned int add_cursor(std::unique_ptr<IconImage> cursor, int x_hotspot, int y_hotspot);
     void set_cursor(unsigned int handle);
