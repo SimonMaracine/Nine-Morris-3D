@@ -70,7 +70,7 @@ public:
     void load_game();
 
     Board board;
-    Camera camera;
+    // Camera camera;
     Light light;
     std::shared_ptr<std::vector<Board>> board_state_history;
 

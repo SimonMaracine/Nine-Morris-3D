@@ -4,7 +4,7 @@
 
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/texture.h"
-#include "nine_morris_3d/hoverable.h"
+#include "graphics/renderer/hoverable.h"
 
 class Node;
 

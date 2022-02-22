@@ -14,7 +14,7 @@
 #include "graphics/renderer/texture.h"
 #include "graphics/renderer/framebuffer.h"
 #include "graphics/renderer/font.h"
-#include "nine_morris_3d/hoverable.h"
+#include "graphics/renderer/hoverable.h"
 #include "nine_morris_3d/board.h"
 
 class Application;

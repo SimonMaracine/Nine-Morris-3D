@@ -6,11 +6,12 @@
 
 #include <glm/glm.hpp>
 
+#include "graphics/renderer/new_renderer.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/texture.h"
+#include "graphics/renderer/hoverable.h"
 #include "nine_morris_3d/node.h"
 #include "nine_morris_3d/piece.h"
-#include "nine_morris_3d/hoverable.h"
 
 constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40 + 1;
 
@@ -70,14 +71,16 @@ public:
 
     hoverable::Id id = hoverable::null;
 
-    float scale = 0.0f;
+    // float scale = 0.0f;
 
-    std::shared_ptr<VertexArray> vertex_array;
-    int index_count = 0;
-    std::shared_ptr<Texture> diffuse_texture;
+    // std::shared_ptr<VertexArray> vertex_array;
+    // int index_count = 0;
+    // std::shared_ptr<Texture> diffuse_texture;
 
-    glm::vec3 specular_color = glm::vec3(0.0f);
-    float shininess = 0.0f;
+    Renderer::Model model;
+
+    // glm::vec3 specular_color = glm::vec3(0.0f);
+    // float shininess = 0.0f;
 
     std::array<Node, 24> nodes;
     std::array<Piece, 18> pieces;

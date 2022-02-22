@@ -18,7 +18,7 @@
 #include "application/input.h"
 #include "application/platform.h"
 #include "graphics/debug_opengl.h"
-#include "graphics/renderer/renderer.h"
+// #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/buffer_layout.h"
@@ -63,66 +63,68 @@ void GameLayer::on_attach() {
     board_state_history = std::make_shared<std::vector<Board>>();
     build_board();
 
-    if (!app->storage->white_piece_diff_texture) {
-        if (app->options.texture_quality == options::NORMAL) {
-            app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture, true, -1.5f);
-            app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture, true, -1.5f);
-        } else if (app->options.texture_quality == options::LOW) {
-            app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture_small, true, -1.5f);
-            app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture_small, true, -1.5f);
-        } else {
-            assert(false);
-        }
-    }
+    // if (!app->storage->white_piece_diff_texture) {
+    //     if (app->options.texture_quality == options::NORMAL) {
+    //         app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture, true, -1.5f);
+    //         app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture, true, -1.5f);
+    //     } else if (app->options.texture_quality == options::LOW) {
+    //         app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture_small, true, -1.5f);
+    //         app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture_small, true, -1.5f);
+    //     } else {
+    //         assert(false);
+    //     }
+    // }
 
-    for (unsigned int i = 0; i < 9; i++) {
-        build_piece(i, Piece::Type::White, app->assets_data->white_piece_mesh,
-                app->storage->white_piece_diff_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
-    }
-    for (unsigned int i = 9; i < 18; i++) {
-        build_piece(i, Piece::Type::Black, app->assets_data->black_piece_mesh,
-                app->storage->black_piece_diff_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
-    }
+    // for (unsigned int i = 0; i < 9; i++) {
+    //     build_piece(i, Piece::Type::White, app->assets_data->white_piece_mesh,
+    //             app->storage->white_piece_diff_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
+    // }
+    // for (unsigned int i = 9; i < 18; i++) {
+    //     build_piece(i, Piece::Type::Black, app->assets_data->black_piece_mesh,
+    //             app->storage->black_piece_diff_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
+    // }
 
-    for (unsigned int i = 0; i < 24; i++) {
-        build_node(i, NODE_POSITIONS[i]);
-    }
+    // for (unsigned int i = 0; i < 24; i++) {
+    //     build_node(i, NODE_POSITIONS[i]);
+    // }
 
-    build_board_paint();
+    // build_board_paint();
     build_camera();
     build_skybox();
     build_light();
-    build_turn_indicator();
+    // build_turn_indicator();
 
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
-    {
-        FramebufferSpecification specification;
-        specification.width = app->data.width;
-        specification.height = app->data.height;
-        specification.samples = app->options.samples;
-        specification.color_attachments = {
-            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
-            Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
-        };
-        specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
-                AttachmentType::Renderbuffer);
+    // {
+    //     FramebufferSpecification specification;
+    //     specification.width = app->data.width;
+    //     specification.height = app->data.height;
+    //     specification.samples = app->options.samples;
+    //     specification.color_attachments = {
+    //         Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
+    //         Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+    //     };
+    //     specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
+    //             AttachmentType::Renderbuffer);
 
-        app->storage->scene_framebuffer = Framebuffer::create(specification);
+    //     // app->storage->scene_framebuffer = Framebuffer::create(specification);
 
-        app->purge_framebuffers();
-        app->add_framebuffer(app->storage->scene_framebuffer);
-    }
+    //     // app->purge_framebuffers();
+    //     // app->add_framebuffer(app->storage->scene_framebuffer);
+
+    //     app->renderer->set_scene_framebuffer(Framebuffer::create(specification));
+    // }
 
     setup_light();
     setup_board();
-    setup_board_paint();
-    setup_pieces();
+    // setup_board_paint();
+    // setup_pieces();
 
-    camera.go_towards_position(default_camera_position);
+    app->camera.go_towards_position(default_camera_position);
 
-    reader = FramebufferReader<4>(app->storage->pixel_buffers, app->storage->intermediate_framebuffer);
+    // reader = FramebufferReader<4>(app->storage->pixel_buffers, app->storage->intermediate_framebuffer);
 
     // It's ok to be called multiple times
     STOP_ALLOCATION_LOG();
@@ -151,7 +153,7 @@ void GameLayer::on_detach() {
 
         save_load::GameState state;
         state.board = board;
-        state.camera = camera;
+        // state.app->camera = app->camera;
         state.time = gui_layer->timer.get_time_raw();
 
         const time_t current = time(nullptr);
@@ -181,7 +183,7 @@ void GameLayer::on_bind_layers() {
 
 void GameLayer::on_update(float dt) {
     if (!imgui_layer->hovering_gui) {
-        camera.update(mouse_wheel, dx, dy, dt);
+        app->camera.update(mouse_wheel, dx, dy, dt);
     }
     board.move_pieces(dt);
 
@@ -192,63 +194,63 @@ void GameLayer::on_update(float dt) {
 
 void GameLayer::on_fixed_update() {
     if (!imgui_layer->hovering_gui) {
-        camera.update_friction();
+        app->camera.update_friction();
     }
 }
 
 void GameLayer::on_draw() {
-    setup_shadows();
-    setup_quad3d_projection_view();
+//     setup_shadows();
+//     setup_quad3d_projection_view();
 
-    app->storage->depth_map_framebuffer->bind();
+//     app->storage->depth_map_framebuffer->bind();
 
-    renderer::clear(renderer::Depth);
-    renderer::set_viewport(2048, 2048);
+//     renderer::clear(renderer::Depth);
+//     renderer::set_viewport(2048, 2048);
 
-    render_to_depth();
+//     render_to_depth();
 
-    app->storage->scene_framebuffer->bind();
+//     app->storage->scene_framebuffer->bind();
 
-    renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
-    renderer::set_viewport(app->data.width, app->data.height);
-    renderer::set_stencil_mask_zero();
+//     renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
+//     renderer::set_viewport(app->data.width, app->data.height);
+//     renderer::set_stencil_mask_zero();
 
-    renderer::bind_texture(app->storage->depth_map_framebuffer->get_depth_attachment(), 1);
+//     renderer::bind_texture(app->storage->depth_map_framebuffer->get_depth_attachment(), 1);
 
-    renderer::load_projection_view(camera.get_projection_view_matrix());
+//     renderer::load_projection_view(app->camera.get_projection_view_matrix());
     setup_camera();
-    render_skybox();
-    renderer::draw_board(board);
-    renderer::disable_output_to_red(1);
-    renderer::draw_board_paint(board.paint);
-#ifdef NINE_MORRIS_3D_DEBUG
-    renderer::draw_origin();
-#endif
-    renderer::enable_output_to_red(1);
-    render_nodes();
-    render_pieces();
+//     render_skybox();
+//     renderer::draw_board(board);
+//     renderer::disable_output_to_red(1);
+//     renderer::draw_board_paint(board.paint);
+// #ifdef NINE_MORRIS_3D_DEBUG
+//     renderer::draw_origin();
+// #endif
+//     renderer::enable_output_to_red(1);
+//     render_nodes();
+//     render_pieces();
 
-#ifdef NINE_MORRIS_3D_DEBUG
-    renderer::draw_quad_3d(light.position, 1.0f, app->storage->light_texture);
-#endif
+// #ifdef NINE_MORRIS_3D_DEBUG
+//     renderer::draw_quad_3d(light.position, 1.0f, app->storage->light_texture);
+// #endif
 
-    app->storage->scene_framebuffer->resolve_framebuffer(app->storage->intermediate_framebuffer->get_id(),
-            app->data.width, app->data.height);
+//     app->storage->scene_framebuffer->resolve_framebuffer(app->storage->intermediate_framebuffer->get_id(),
+//             app->data.width, app->data.height);
 
-    app->storage->intermediate_framebuffer->bind();
+//     app->storage->intermediate_framebuffer->bind();
 
-    const int x = static_cast<int>(input::get_mouse_x());
-    const int y = app->data.height - static_cast<int>(input::get_mouse_y());
-    reader.read(1, x, y);
+//     const int x = static_cast<int>(input::get_mouse_x());
+//     const int y = app->data.height - static_cast<int>(input::get_mouse_y());
+//     reader.read(1, x, y);
 
-    Framebuffer::bind_default();
+//     Framebuffer::bind_default();
 
-    renderer::clear(renderer::Color);
-    renderer::draw_screen_quad(app->storage->intermediate_framebuffer->get_color_attachment(0));
+//     renderer::clear(renderer::Color);
+//     renderer::draw_screen_quad(app->storage->intermediate_framebuffer->get_color_attachment(0));
 
-    int* data;
-    reader.get<int>(&data);
-    hovered_id = *data;
+//     int* data;
+//     reader.get<int>(&data);
+//     hovered_id = *data;
 }
 
 void GameLayer::on_event(events::Event& event) {
@@ -280,11 +282,11 @@ bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 }
 
 bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
-    if (event.button == MOUSE_BUTTON_LEFT) {
-        if (board.next_move) {
-            board.press(hovered_id);
-        }
-    }
+    // if (event.button == MOUSE_BUTTON_LEFT) {
+    //     if (board.next_move) {
+    //         board.press(hovered_id);
+    //     }
+    // }
 
     return false;
 }
@@ -340,14 +342,14 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
-        camera.go_towards_position(default_camera_position);
+        // app->camera.go_towards_position(default_app->camera_position);
     }
 
     return false;
 }
 
 bool GameLayer::on_window_resized(events::WindowResizedEvent& event) {
-    camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
+    // app->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
     return false;
 }
@@ -392,151 +394,212 @@ std::shared_ptr<VertexArray> GameLayer::create_entity_vertex_array(std::shared_p
 }
 
 void GameLayer::build_board() {
-    if (!app->storage->board_vertex_array) {
-        hoverable::Id id = hoverable::generate_id();
-        app->storage->board_id = id;
+    // if (!app->storage->board_vertex_array) {
+        // id = hoverable::generate_id();
+    //     app->storage->board_id = id;
 
-        app->storage->board_vertex_array = create_entity_vertex_array(app->assets_data->board_mesh, id);
-    }
+        // std::shared_ptr<VertexArray> vertex_array = create_entity_vertex_array(app->assets_data->board_mesh, id);
+    // }
 
-    if (!app->storage->board_wood_diff_texture) {
+    // if (!app->storage->board_wood_diff_texture) {
+    //     if (app->options.texture_quality == options::NORMAL) {
+    //         app->storage->board_wood_diff_texture =
+    //                 Texture::create(app->assets_data->board_wood_diff_texture, true, -2.0f);
+    //     } else if (app->options.texture_quality == options::LOW) {
+    //         app->storage->board_wood_diff_texture =
+    //                 Texture::create(app->assets_data->board_wood_diff_texture_small, true, -2.0f);
+    //     } else {
+    //         assert(false);
+    //     }
+    // }
+
+    if (!app->render_data.loaded_board) {
+        app->render_data.board_id = hoverable::generate_id();
+
+        app->render_data.board_vertex_array = create_entity_vertex_array(app->assets_data->board_mesh,
+                app->render_data.board_id);
+
+        {
+            const std::vector<std::string> uniforms = {
+                "u_projection_view_matrix",  // TODO maybe remove this
+                "u_model_matrix",
+                "u_light_space_matrix",
+                "u_view_position",
+                "u_shadow_map",
+                "u_material.diffuse",
+                "u_material.specular",
+                "u_material.shininess",
+                "u_light.position",
+                "u_light.ambient",
+                "u_light.diffuse",
+                "u_light.specular"
+            };
+            app->render_data.board_shader = Shader::create(
+                assets::path(assets::BOARD_VERTEX_SHADER),
+                assets::path(assets::BOARD_FRAGMENT_SHADER),
+                uniforms
+                // block_name, 1,
+                // storage->uniform_buffer
+            );
+        }
+
         if (app->options.texture_quality == options::NORMAL) {
-            app->storage->board_wood_diff_texture =
-                    Texture::create(app->assets_data->board_wood_diff_texture, true, -2.0f);
+            app->render_data.board_diffuse_texture = Texture::create(
+                app->assets_data->board_wood_diff_texture,
+                true,
+                -2.0f
+            );
         } else if (app->options.texture_quality == options::LOW) {
-            app->storage->board_wood_diff_texture =
-                    Texture::create(app->assets_data->board_wood_diff_texture_small, true, -2.0f);
+            app->render_data.board_diffuse_texture = Texture::create(
+                app->assets_data->board_wood_diff_texture_small,
+                true,
+                -2.0f
+            );
         } else {
             assert(false);
         }
+
+        app->render_data.loaded_board = true;
     }
 
-    board = Board(app->storage->board_id, board_state_history);
+    Renderer::Model model;
+    model.vertex_array = app->render_data.board_vertex_array;
+    model.index_count = app->assets_data->board_mesh->indices.size();
+    model.shader = app->render_data.board_shader;
+    model.diffuse_texture = app->render_data.board_diffuse_texture;
+    model.scale = 20.0f;
+    model.specular_color = glm::vec3(0.2f);
+    model.shininess = 4.0f;
 
-    board.scale = 20.0f;
-    board.vertex_array = app->storage->board_vertex_array;
-    board.index_count = app->assets_data->board_mesh->indices.size();
-    board.diffuse_texture = app->storage->board_wood_diff_texture;
-    board.specular_color = glm::vec3(0.2f);
-    board.shininess = 4.0f;
+    board = Board(app->render_data.board_id, board_state_history);
+    board.model = model;
+
+    app->renderer->add_model(board.model, false, false, false);
+
+    // board.scale = 20.0f;
+    // board.vertex_array = app->storage->board_vertex_array;
+    // board.index_count = app->assets_data->board_mesh->indices.size();
+    // board.diffuse_texture = app->storage->board_wood_diff_texture;
+    // board.specular_color = glm::vec3(0.2f);
+    // board.shininess = 4.0f;
 
     DEB_DEBUG("Built board");
 }
 
 void GameLayer::build_board_paint() {
-    if (!app->storage->board_paint_vertex_array) {
-        std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->board_paint_mesh->vertices.data(),
-                app->assets_data->board_paint_mesh->vertices.size() * sizeof(model::Vertex));
+    // if (!app->storage->board_paint_vertex_array) {
+    //     std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->board_paint_mesh->vertices.data(),
+    //             app->assets_data->board_paint_mesh->vertices.size() * sizeof(model::Vertex));
 
-        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    //     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
 
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Type::Float, 3);
-        layout.add(1, BufferLayout::Type::Float, 2);
-        layout.add(2, BufferLayout::Type::Float, 3);
+    //     BufferLayout layout;
+    //     layout.add(0, BufferLayout::Type::Float, 3);
+    //     layout.add(1, BufferLayout::Type::Float, 2);
+    //     layout.add(2, BufferLayout::Type::Float, 3);
 
-        std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->board_paint_mesh->indices.data(),
-                app->assets_data->board_paint_mesh->indices.size() * sizeof(unsigned int));
+    //     std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->board_paint_mesh->indices.data(),
+    //             app->assets_data->board_paint_mesh->indices.size() * sizeof(unsigned int));
 
-        vertex_array->add_buffer(vertices, layout);
-        vertex_array->add_index_buffer(indices);
+    //     vertex_array->add_buffer(vertices, layout);
+    //     vertex_array->add_index_buffer(indices);
 
-        VertexArray::unbind();
+    //     VertexArray::unbind();
 
-        app->storage->board_paint_vertex_array = vertex_array;
-    }
+    //     app->storage->board_paint_vertex_array = vertex_array;
+    // }
 
-    if (!app->storage->board_paint_diff_texture) {
-        if (app->options.texture_quality == options::NORMAL) {
-            app->storage->board_paint_diff_texture =
-                    Texture::create(app->assets_data->board_paint_diff_texture, true, -1.0f);
-        } else if (app->options.texture_quality == options::LOW) {
-            app->storage->board_paint_diff_texture =
-                    Texture::create(app->assets_data->board_paint_diff_texture_small, true, -1.0f);
-        } else {
-            assert(false);
-        }
-    }
+    // if (!app->storage->board_paint_diff_texture) {
+    //     if (app->options.texture_quality == options::NORMAL) {
+    //         app->storage->board_paint_diff_texture =
+    //                 Texture::create(app->assets_data->board_paint_diff_texture, true, -1.0f);
+    //     } else if (app->options.texture_quality == options::LOW) {
+    //         app->storage->board_paint_diff_texture =
+    //                 Texture::create(app->assets_data->board_paint_diff_texture_small, true, -1.0f);
+    //     } else {
+    //         assert(false);
+    //     }
+    // }
 
-    board.paint.position = glm::vec3(0.0f, 0.062f, 0.0f);
-    board.paint.scale = 20.0f;
-    board.paint.vertex_array = app->storage->board_paint_vertex_array;
-    board.paint.index_count = app->assets_data->board_paint_mesh->indices.size();
-    board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
-    board.paint.specular_color = glm::vec3(0.2f);
-    board.paint.shininess = 4.0f;
+    // board.paint.position = glm::vec3(0.0f, 0.062f, 0.0f);
+    // board.paint.scale = 20.0f;
+    // board.paint.vertex_array = app->storage->board_paint_vertex_array;
+    // board.paint.index_count = app->assets_data->board_paint_mesh->indices.size();
+    // board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
+    // board.paint.specular_color = glm::vec3(0.2f);
+    // board.paint.shininess = 4.0f;
 
     DEB_DEBUG("Built board paint");
 }
 
 void GameLayer::build_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
         std::shared_ptr<Texture> texture, const glm::vec3& position) {
-    if (!app->storage->piece_vertex_arrays[index]) {
-        hoverable::Id id = hoverable::generate_id();
-        app->storage->pieces_id[index] = id;
+    // if (!app->storage->piece_vertex_arrays[index]) {
+    //     hoverable::Id id = hoverable::generate_id();
+    //     app->storage->pieces_id[index] = id;
 
-        app->storage->piece_vertex_arrays[index] = create_entity_vertex_array(mesh, id);
-    }
+    //     app->storage->piece_vertex_arrays[index] = create_entity_vertex_array(mesh, id);
+    // }
 
-    board.pieces[index] = Piece(app->storage->pieces_id[index], type);
+    // board.pieces[index] = Piece(app->storage->pieces_id[index], type);
 
-    int random_rotation = rand() % 360;
+    // int random_rotation = rand() % 360;
 
-    board.pieces[index].position = position;
-    board.pieces[index].rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(random_rotation)), 0.0f);
-    board.pieces[index].scale = 20.0f;
-    board.pieces[index].vertex_array = app->storage->piece_vertex_arrays[index];
-    board.pieces[index].index_count = mesh->indices.size();
-    board.pieces[index].diffuse_texture = texture;
-    board.pieces[index].specular_color = glm::vec3(0.2f);
-    board.pieces[index].shininess = 4.0f;
-    board.pieces[index].select_color = glm::vec3(1.0f, 0.0f, 0.0f);
-    board.pieces[index].hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
+    // board.pieces[index].position = position;
+    // board.pieces[index].rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(random_rotation)), 0.0f);
+    // board.pieces[index].scale = 20.0f;
+    // board.pieces[index].vertex_array = app->storage->piece_vertex_arrays[index];
+    // board.pieces[index].index_count = mesh->indices.size();
+    // board.pieces[index].diffuse_texture = texture;
+    // board.pieces[index].specular_color = glm::vec3(0.2f);
+    // board.pieces[index].shininess = 4.0f;
+    // board.pieces[index].select_color = glm::vec3(1.0f, 0.0f, 0.0f);
+    // board.pieces[index].hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
 
     DEB_DEBUG("Built piece {}", index);
 }
 
 void GameLayer::build_node(unsigned int index, const glm::vec3& position) {
-    if (!app->storage->node_vertex_arrays[index]) {
-        hoverable::Id id = hoverable::generate_id();
-        app->storage->nodes_id[index] = id;
+    // if (!app->storage->node_vertex_arrays[index]) {
+    //     hoverable::Id id = hoverable::generate_id();
+    //     app->storage->nodes_id[index] = id;
 
-        std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->node_mesh->vertices.data(),
-                app->assets_data->node_mesh->vertices.size() * sizeof(model::VertexP));
+    //     std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->node_mesh->vertices.data(),
+    //             app->assets_data->node_mesh->vertices.size() * sizeof(model::VertexP));
 
-        std::shared_ptr<Buffer> ids = create_ids_buffer(app->assets_data->node_mesh->vertices.size(), id);
+    //     std::shared_ptr<Buffer> ids = create_ids_buffer(app->assets_data->node_mesh->vertices.size(), id);
 
-        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    //     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
 
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Type::Float, 3);
-        BufferLayout layout2;
-        layout2.add(1, BufferLayout::Type::Int, 1);
+    //     BufferLayout layout;
+    //     layout.add(0, BufferLayout::Type::Float, 3);
+    //     BufferLayout layout2;
+    //     layout2.add(1, BufferLayout::Type::Int, 1);
 
-        std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->node_mesh->indices.data(),
-                app->assets_data->node_mesh->indices.size() * sizeof(unsigned int));
+    //     std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->node_mesh->indices.data(),
+    //             app->assets_data->node_mesh->indices.size() * sizeof(unsigned int));
 
-        vertex_array->add_buffer(vertices, layout);
-        vertex_array->add_buffer(ids, layout2);
-        vertex_array->add_index_buffer(indices);
+    //     vertex_array->add_buffer(vertices, layout);
+    //     vertex_array->add_buffer(ids, layout2);
+    //     vertex_array->add_index_buffer(indices);
 
-        VertexArray::unbind();
+    //     VertexArray::unbind();
 
-        app->storage->node_vertex_arrays[index] = vertex_array;
-    }
+    //     app->storage->node_vertex_arrays[index] = vertex_array;
+    // }
 
-    board.nodes[index] = Node(app->storage->nodes_id[index], index);
+    // board.nodes[index] = Node(app->storage->nodes_id[index], index);
 
-    board.nodes[index].position = position;
-    board.nodes[index].scale = 20.0f;
-    board.nodes[index].vertex_array = app->storage->node_vertex_arrays[index];
-    board.nodes[index].index_count = app->assets_data->node_mesh->indices.size();
+    // board.nodes[index].position = position;
+    // board.nodes[index].scale = 20.0f;
+    // board.nodes[index].vertex_array = app->storage->node_vertex_arrays[index];
+    // board.nodes[index].index_count = app->assets_data->node_mesh->indices.size();
 
     DEB_DEBUG("Built node {}", index);
 }
 
 void GameLayer::build_camera() {
-    camera = Camera(
+    app->camera = Camera(
         app->options.sensitivity,
         47.0f,
         glm::vec3(0.0f),
@@ -544,9 +607,9 @@ void GameLayer::build_camera() {
         glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
     );
 
-    default_camera_position = camera.get_position();
+    default_camera_position = app->camera.get_position();
 
-    camera = Camera(
+    app->camera = Camera(
         app->options.sensitivity,
         47.0f,
         glm::vec3(0.0f),
@@ -558,48 +621,47 @@ void GameLayer::build_camera() {
 }
 
 void GameLayer::build_skybox() {
-    if (!app->storage->skybox_vertex_array) {
-        std::shared_ptr<Buffer> vertices = Buffer::create(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
+    // if (!app->storage->skybox_vertex_array) {
+    //     std::shared_ptr<Buffer> vertices = Buffer::create(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
 
-        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    //     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
 
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Type::Float, 3);
+    //     BufferLayout layout;
+    //     layout.add(0, BufferLayout::Type::Float, 3);
 
-        vertex_array->add_buffer(vertices, layout);
+    //     vertex_array->add_buffer(vertices, layout);
 
-        VertexArray::unbind();
+    //     VertexArray::unbind();
 
-        app->storage->skybox_vertex_array = vertex_array;
+    //     app->storage->skybox_vertex_array = vertex_array;
+    // }
+
+    // if (!app->storage->skybox_texture) {
+    std::array<std::shared_ptr<TextureData>, 6> data;
+
+    if (app->options.texture_quality == options::NORMAL) {
+        data = {
+            app->assets_data->skybox_px_texture,
+            app->assets_data->skybox_nx_texture,
+            app->assets_data->skybox_py_texture,
+            app->assets_data->skybox_ny_texture,
+            app->assets_data->skybox_pz_texture,
+            app->assets_data->skybox_nz_texture
+        };
+    } else if (app->options.texture_quality == options::LOW) {
+        data = {
+            app->assets_data->skybox_px_texture_small,
+            app->assets_data->skybox_nx_texture_small,
+            app->assets_data->skybox_py_texture_small,
+            app->assets_data->skybox_ny_texture_small,
+            app->assets_data->skybox_pz_texture_small,
+            app->assets_data->skybox_nz_texture_small
+        };
+    } else {
+        assert(false);
     }
 
-    if (!app->storage->skybox_texture) {
-        std::array<std::shared_ptr<TextureData>, 6> data;
-
-        if (app->options.texture_quality == options::NORMAL) {
-            data = {
-                app->assets_data->skybox_px_texture,
-                app->assets_data->skybox_nx_texture,
-                app->assets_data->skybox_py_texture,
-                app->assets_data->skybox_ny_texture,
-                app->assets_data->skybox_pz_texture,
-                app->assets_data->skybox_nz_texture
-            };
-        } else if (app->options.texture_quality == options::LOW) {
-            data = {
-                app->assets_data->skybox_px_texture_small,
-                app->assets_data->skybox_nx_texture_small,
-                app->assets_data->skybox_py_texture_small,
-                app->assets_data->skybox_ny_texture_small,
-                app->assets_data->skybox_pz_texture_small,
-                app->assets_data->skybox_nz_texture_small
-            };
-        } else {
-            assert(false);
-        }
-
-        app->storage->skybox_texture = Texture3D::create(data);
-    }
+    app->renderer->set_skybox(Texture3D::create(data));  // FIXME only if not already made
 
     DEB_DEBUG("Built skybox");
 }
@@ -617,78 +679,78 @@ void GameLayer::build_light() {
 }
 
 void GameLayer::build_turn_indicator() {
-    if (!app->storage->white_indicator_texture) {
-        app->storage->white_indicator_texture = Texture::create(app->assets_data->white_indicator_texture, false);
-        app->storage->black_indicator_texture = Texture::create(app->assets_data->black_indicator_texture, false);
-    }
+    // if (!app->storage->white_indicator_texture) {
+    //     app->storage->white_indicator_texture = Texture::create(app->assets_data->white_indicator_texture, false);
+    //     app->storage->black_indicator_texture = Texture::create(app->assets_data->black_indicator_texture, false);
+    // }
 
-    gui_layer->turn_indicator.position = glm::vec3(static_cast<float>(app->data.width - 90),
-            static_cast<float>(app->data.height - 115), 0.0f);
-    gui_layer->turn_indicator.scale = 1.0f;
+    // gui_layer->turn_indicator.position = glm::vec3(static_cast<float>(app->data.width - 90),
+    //         static_cast<float>(app->data.height - 115), 0.0f);
+    // gui_layer->turn_indicator.scale = 1.0f;
 
     DEB_DEBUG("Built turn indicator");
 }
 
 void GameLayer::render_skybox() {
-    const glm::mat4& projection_matrix = camera.get_projection_matrix();
-    const glm::mat4 view_matrix = glm::mat4(glm::mat3(camera.get_view_matrix()));
+    // const glm::mat4& projection_matrix = app->camera.get_projection_matrix();
+    // const glm::mat4 view_matrix = glm::mat4(glm::mat3(app->camera.get_view_matrix()));
 
-    renderer::draw_skybox(projection_matrix * view_matrix);
+    // renderer::draw_skybox(projection_matrix * view_matrix);
 }
 
 void GameLayer::setup_light() {
-    app->storage->board_shader->bind();
-    app->storage->board_shader->set_uniform_vec3("u_light.position", light.position);
-    app->storage->board_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
-    app->storage->board_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-    app->storage->board_shader->set_uniform_vec3("u_light.specular", light.specular_color);
-    app->storage->board_shader->set_uniform_vec3("u_view_position", camera.get_position());
+    app->render_data.board_shader->bind();
+    app->render_data.board_shader->set_uniform_vec3("u_light.position", light.position);
+    app->render_data.board_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+    app->render_data.board_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+    app->render_data.board_shader->set_uniform_vec3("u_light.specular", light.specular_color);
+    app->render_data.board_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
 
-    app->storage->board_paint_shader->bind();
-    app->storage->board_paint_shader->set_uniform_vec3("u_light.position", light.position);
-    app->storage->board_paint_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
-    app->storage->board_paint_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-    app->storage->board_paint_shader->set_uniform_vec3("u_light.specular", light.specular_color);
-    app->storage->board_paint_shader->set_uniform_vec3("u_view_position", camera.get_position());
+    // app->storage->board_paint_shader->bind();
+    // app->storage->board_paint_shader->set_uniform_vec3("u_light.position", light.position);
+    // app->storage->board_paint_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+    // app->storage->board_paint_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+    // app->storage->board_paint_shader->set_uniform_vec3("u_light.specular", light.specular_color);
+    // app->storage->board_paint_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
 
-    app->storage->piece_shader->bind();
-    app->storage->piece_shader->set_uniform_vec3("u_light.position", light.position);
-    app->storage->piece_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
-    app->storage->piece_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-    app->storage->piece_shader->set_uniform_vec3("u_light.specular", light.specular_color);
-    app->storage->piece_shader->set_uniform_vec3("u_view_position", camera.get_position());
+    // app->storage->piece_shader->bind();
+    // app->storage->piece_shader->set_uniform_vec3("u_light.position", light.position);
+    // app->storage->piece_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+    // app->storage->piece_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+    // app->storage->piece_shader->set_uniform_vec3("u_light.specular", light.specular_color);
+    // app->storage->piece_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
 }
 
 void GameLayer::setup_camera() {
-    app->storage->board_shader->bind();
-    app->storage->board_shader->set_uniform_vec3("u_view_position", camera.get_position());
+    app->render_data.board_shader->bind();
+    app->render_data.board_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
 
-    app->storage->board_paint_shader->bind();
-    app->storage->board_paint_shader->set_uniform_vec3("u_view_position", camera.get_position());
+    // app->storage->board_paint_shader->bind();
+    // app->storage->board_paint_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
 
-    app->storage->piece_shader->bind();
-    app->storage->piece_shader->set_uniform_vec3("u_view_position", camera.get_position());
+    // app->storage->piece_shader->bind();
+    // app->storage->piece_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
 }
 
 void GameLayer::setup_board() {
-    app->storage->board_shader->bind();
-    app->storage->board_shader->set_uniform_int("u_material.diffuse", 0);
-    app->storage->board_shader->set_uniform_vec3("u_material.specular", board.specular_color);
-    app->storage->board_shader->set_uniform_float("u_material.shininess", board.shininess);
+    app->render_data.board_shader->bind();
+    app->render_data.board_shader->set_uniform_int("u_material.diffuse", 0);
+    app->render_data.board_shader->set_uniform_vec3("u_material.specular", board.model.specular_color);
+    app->render_data.board_shader->set_uniform_float("u_material.shininess", board.model.shininess);
 }
 
 void GameLayer::setup_board_paint() {
-    app->storage->board_paint_shader->bind();
-    app->storage->board_paint_shader->set_uniform_int("u_material.diffuse", 0);
-    app->storage->board_paint_shader->set_uniform_vec3("u_material.specular", board.paint.specular_color);
-    app->storage->board_paint_shader->set_uniform_float("u_material.shininess", board.paint.shininess);
+    // app->storage->board_paint_shader->bind();
+    // app->storage->board_paint_shader->set_uniform_int("u_material.diffuse", 0);
+    // app->storage->board_paint_shader->set_uniform_vec3("u_material.specular", board.paint.specular_color);
+    // app->storage->board_paint_shader->set_uniform_float("u_material.shininess", board.paint.shininess);
 }
 
 void GameLayer::setup_pieces() {
-    app->storage->piece_shader->bind();
-    app->storage->piece_shader->set_uniform_int("u_material.diffuse", 0);
-    app->storage->piece_shader->set_uniform_vec3("u_material.specular", board.pieces[0].specular_color);  // TODO think about a better way
-    app->storage->piece_shader->set_uniform_float("u_material.shininess", board.pieces[0].shininess);
+    // app->storage->piece_shader->bind();
+    // app->storage->piece_shader->set_uniform_int("u_material.diffuse", 0);
+    // app->storage->piece_shader->set_uniform_vec3("u_material.specular", board.pieces[0].specular_color);  // TODO think about a better way
+    // app->storage->piece_shader->set_uniform_float("u_material.shininess", board.pieces[0].shininess);
 }
 
 void GameLayer::render_pieces() {
@@ -696,8 +758,8 @@ void GameLayer::render_pieces() {
         return piece->active;
     };
     const auto sort = [this](const Piece* lhs, const Piece* rhs) {
-        const float distance1 = glm::length(camera.get_position() - lhs->position);
-        const float distance2 = glm::length(camera.get_position() - rhs->position);
+        const float distance1 = glm::length(app->camera.get_position() - lhs->position);
+        const float distance2 = glm::length(app->camera.get_position() - rhs->position);
         return distance1 > distance2;
     };
 
@@ -711,13 +773,13 @@ void GameLayer::render_pieces() {
 
     for (const Piece* piece : active_pieces) {
         if (piece->selected) {
-            renderer::draw_piece_with_outline(piece, piece->select_color);
+            // renderer::draw_piece_with_outline(piece, piece->select_color);
         } else if (piece->show_outline && piece->id == hovered_id && piece->in_use && !piece->pending_remove) {
-            renderer::draw_piece_with_outline(piece, piece->hover_color);
+            // renderer::draw_piece_with_outline(piece, piece->hover_color);
         } else if (piece->to_take && piece->id == hovered_id && piece->in_use) {
-            renderer::draw_piece(piece, glm::vec3(1.0f, 0.2f, 0.2f));
+            // renderer::draw_piece(piece, glm::vec3(1.0f, 0.2f, 0.2f));
         } else {
-            renderer::draw_piece(piece, glm::vec3(1.0f, 1.0f, 1.0f));
+            // renderer::draw_piece(piece, glm::vec3(1.0f, 1.0f, 1.0f));
         }
     }
 }
@@ -726,16 +788,16 @@ void GameLayer::render_nodes() {
     for (Node& node : board.nodes) {
         if (node.id == hovered_id && board.phase != Board::Phase::None &&
                 board.phase != Board::Phase::GameOver) {
-            renderer::draw_node(node, glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+            // renderer::draw_node(node, glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
         } else {
-            renderer::draw_node(node, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+            // renderer::draw_node(node, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
         }
     }
 }
 
 void GameLayer::render_to_depth() {
-    renderer::draw_to_depth(glm::vec3(0.0f), glm::vec3(0.0f), board.scale, board.vertex_array,
-            board.index_count);
+    // renderer::draw_to_depth(glm::vec3(0.0f), glm::vec3(0.0f), board.scale, board.vertex_array,
+    //         board.index_count);
 
     constexpr auto copy = [](const Piece* piece) {
         return piece->active;
@@ -749,8 +811,8 @@ void GameLayer::render_to_depth() {
     std::copy_if(pointer_pieces.begin(), pointer_pieces.end(), std::back_inserter(active_pieces), copy);
 
     for (Piece* piece : active_pieces) {
-        renderer::draw_to_depth(piece->position, piece->rotation, piece->scale, piece->vertex_array,
-                piece->index_count);
+        // renderer::draw_to_depth(piece->position, piece->rotation, piece->scale, piece->vertex_array,
+        //         piece->index_count);
     }
 }
 
@@ -759,45 +821,45 @@ void GameLayer::setup_shadows() {
     const glm::mat4 view = glm::lookAt(light.position / 4.0f,
             glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     const glm::mat4 light_space_matrix = projection * view;
-    app->storage->shadow_shader->bind();
-    app->storage->shadow_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
-    app->storage->board_shader->bind();
-    app->storage->board_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
-    app->storage->board_shader->set_uniform_int("u_shadow_map", 1);
-    app->storage->board_paint_shader->bind();
-    app->storage->board_paint_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
-    app->storage->board_paint_shader->set_uniform_int("u_shadow_map", 1);
-    app->storage->piece_shader->bind();
-    app->storage->piece_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
-    app->storage->piece_shader->set_uniform_int("u_shadow_map", 1);
+    // app->storage->shadow_shader->bind();
+    // app->storage->shadow_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    // app->storage->board_shader->bind();
+    // app->storage->board_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    // app->storage->board_shader->set_uniform_int("u_shadow_map", 1);
+    // app->storage->board_paint_shader->bind();
+    // app->storage->board_paint_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    // app->storage->board_paint_shader->set_uniform_int("u_shadow_map", 1);
+    // app->storage->piece_shader->bind();
+    // app->storage->piece_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
+    // app->storage->piece_shader->set_uniform_int("u_shadow_map", 1);
 }
 
 void GameLayer::setup_quad3d_projection_view() {
-    app->storage->quad3d_shader->bind();
-    app->storage->quad3d_shader->set_uniform_matrix("u_projection_matrix", camera.get_projection_matrix());
-    app->storage->quad3d_shader->set_uniform_matrix("u_view_matrix", camera.get_view_matrix());
+    // app->storage->quad3d_shader->bind();
+    // app->storage->quad3d_shader->set_uniform_matrix("u_projection_matrix", app->camera.get_projection_matrix());
+    // app->storage->quad3d_shader->set_uniform_matrix("u_view_matrix", app->camera.get_view_matrix());
 }
 
 void GameLayer::set_scene_framebuffer(int samples) {
-    if (app->storage->scene_framebuffer->get_specification().samples == samples) {
-        return;
-    }
+    // if (app->storage->scene_framebuffer->get_specification().samples == samples) {
+    //     return;
+    // }
 
-    FramebufferSpecification specification;
-    specification.width = app->data.width;
-    specification.height = app->data.height;
-    specification.samples = app->options.samples;
-    specification.color_attachments = {
-        Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
-        Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
-    };
-    specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
-            AttachmentType::Renderbuffer);
+    // FramebufferSpecification specification;
+    // specification.width = app->data.width;
+    // specification.height = app->data.height;
+    // specification.samples = app->options.samples;
+    // specification.color_attachments = {
+    //     Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
+    //     Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+    // };
+    // specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
+    //         AttachmentType::Renderbuffer);
 
-    app->storage->scene_framebuffer = Framebuffer::create(specification);
+    // app->storage->scene_framebuffer = Framebuffer::create(specification);
 
-    app->purge_framebuffers();
-    app->add_framebuffer(app->storage->scene_framebuffer);
+    // app->purge_framebuffers();
+    // app->add_framebuffer(app->storage->scene_framebuffer);
 }
 
 void GameLayer::set_textures_quality(const std::string& quality) {
@@ -842,19 +904,19 @@ void GameLayer::set_textures_quality(const std::string& quality) {
             assert(false);
         }
 
-        app->storage->board_wood_diff_texture = Texture::create(app->assets_data->board_wood_diff_texture, true, -2.0f);
-        board.diffuse_texture = app->storage->board_wood_diff_texture;
+        // app->storage->board_wood_diff_texture = Texture::create(app->assets_data->board_wood_diff_texture, true, -2.0f);
+        // board.diffuse_texture = app->storage->board_wood_diff_texture;
 
-        app->storage->board_paint_diff_texture = Texture::create(app->assets_data->board_paint_diff_texture, true, -2.0f);
-        board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
+        // app->storage->board_paint_diff_texture = Texture::create(app->assets_data->board_paint_diff_texture, true, -2.0f);
+        // board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
 
-        app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture, true, -1.5f);
-        app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture, true, -1.5f);
+        // app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture, true, -1.5f);
+        // app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture, true, -1.5f);
         for (Piece& piece : board.pieces) {
             if (piece.type == Piece::Type::White) {
-                piece.diffuse_texture = app->storage->white_piece_diff_texture;
+                // piece.diffuse_texture = app->storage->white_piece_diff_texture;
             } else {
-                piece.diffuse_texture = app->storage->black_piece_diff_texture;
+                // piece.diffuse_texture = app->storage->black_piece_diff_texture;
             }
         }
 
@@ -866,7 +928,7 @@ void GameLayer::set_textures_quality(const std::string& quality) {
             app->assets_data->skybox_pz_texture,
             app->assets_data->skybox_nz_texture
         };
-        app->storage->skybox_texture = Texture3D::create(data);
+        // app->storage->skybox_texture = Texture3D::create(data);
     } else if (quality == options::LOW) {
         app->assets_data->board_wood_diff_texture = nullptr;
         app->assets_data->board_paint_diff_texture = nullptr;
@@ -900,19 +962,19 @@ void GameLayer::set_textures_quality(const std::string& quality) {
             assert(false);
         }
 
-        app->storage->board_wood_diff_texture = Texture::create(app->assets_data->board_wood_diff_texture_small, true, -2.0f);
-        board.diffuse_texture = app->storage->board_wood_diff_texture;
+        // app->storage->board_wood_diff_texture = Texture::create(app->assets_data->board_wood_diff_texture_small, true, -2.0f);
+        // board.diffuse_texture = app->storage->board_wood_diff_texture;
 
-        app->storage->board_paint_diff_texture = Texture::create(app->assets_data->board_paint_diff_texture_small, true, -2.0f);
-        board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
+        // app->storage->board_paint_diff_texture = Texture::create(app->assets_data->board_paint_diff_texture_small, true, -2.0f);
+        // board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
 
-        app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture_small, true, -1.5f);
-        app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture_small, true, -1.5f);
+        // app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture_small, true, -1.5f);
+        // app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture_small, true, -1.5f);
         for (Piece& piece : board.pieces) {
             if (piece.type == Piece::Type::White) {
-                piece.diffuse_texture = app->storage->white_piece_diff_texture;
+                // piece.diffuse_texture = app->storage->white_piece_diff_texture;
             } else {
-                piece.diffuse_texture = app->storage->black_piece_diff_texture;
+                // piece.diffuse_texture = app->storage->black_piece_diff_texture;
             }
         }
 
@@ -924,7 +986,7 @@ void GameLayer::set_textures_quality(const std::string& quality) {
             app->assets_data->skybox_pz_texture_small,
             app->assets_data->skybox_nz_texture_small
         };
-        app->storage->skybox_texture = Texture3D::create(data);
+        // app->storage->skybox_texture = Texture3D::create(data);
     } else {
         assert(false);
     }
@@ -956,7 +1018,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_data->skybox_pz_texture,
                 app->assets_data->skybox_nz_texture
             };
-            app->storage->skybox_texture = Texture3D::create(data);
+            // app->storage->skybox_texture = Texture3D::create(data);
         } else if (app->options.texture_quality == options::LOW) {
             app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
             app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
@@ -973,13 +1035,13 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_data->skybox_pz_texture_small,
                 app->assets_data->skybox_nz_texture_small
             };
-            app->storage->skybox_texture = Texture3D::create(data);
+            // app->storage->skybox_texture = Texture3D::create(data);
         } else {
             assert(false);
         }
 
         light = LIGHT_FIELD;
-        setup_light();
+        // setup_light();
     } else if (skybox == options::AUTUMN) {
         if (app->options.texture_quality == options::NORMAL) {
             app->assets_data->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
@@ -997,7 +1059,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_data->skybox_pz_texture,
                 app->assets_data->skybox_nz_texture
             };
-            app->storage->skybox_texture = Texture3D::create(data);
+            // app->storage->skybox_texture = Texture3D::create(data);
         } else if (app->options.texture_quality == options::LOW) {
             app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
             app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
@@ -1014,13 +1076,13 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_data->skybox_pz_texture_small,
                 app->assets_data->skybox_nz_texture_small
             };
-            app->storage->skybox_texture = Texture3D::create(data);
+            // app->storage->skybox_texture = Texture3D::create(data);
         } else {
             assert(false);
         }
 
         light = LIGHT_AUTUMN;
-        setup_light();
+        // setup_light();
     } else {
         assert(false);
     }
@@ -1041,14 +1103,14 @@ void GameLayer::load_game() {
         return;
     }
 
-    camera = state.camera;
+    app->camera = state.camera;
 
     // Board& board = board;
     board.id = state.board.id;
-    board.scale = state.board.scale;
-    board.index_count = state.board.index_count;
-    board.specular_color = state.board.specular_color;
-    board.shininess = state.board.shininess;
+    // board.scale = state.board.scale;
+    // board.index_count = state.board.index_count;
+    // board.specular_color = state.board.specular_color;
+    // board.shininess = state.board.shininess;
 
     for (unsigned int i = 0; i < 24; i++) {
         Node& node = board.nodes[i];

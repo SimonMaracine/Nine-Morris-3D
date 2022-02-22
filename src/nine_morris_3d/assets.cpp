@@ -70,26 +70,26 @@ namespace assets {
     const char* BOARD_PAINT_FRAGMENT_SHADER = "data/shaders/board_paint.frag";
     const char* PIECE_VERTEX_SHADER = "data/shaders/piece.vert";
     const char* PIECE_FRAGMENT_SHADER = "data/shaders/piece.frag";
-    const char* SHADOW_VERTEX_SHADER = "data/shaders/shadow.vert";
-    const char* SHADOW_FRAGMENT_SHADER = "data/shaders/shadow.frag";
-    const char* SCREEN_QUAD_VERTEX_SHADER = "data/shaders/screen_quad.vert";
-    const char* SCREEN_QUAD_FRAGMENT_SHADER = "data/shaders/screen_quad.frag";
-    const char* OUTLINE_VERTEX_SHADER = "data/shaders/outline.vert";
-    const char* OUTLINE_FRAGMENT_SHADER = "data/shaders/outline.frag";
+    // const char* SHADOW_VERTEX_SHADER = "data/shaders/shadow.vert";
+    // const char* SHADOW_FRAGMENT_SHADER = "data/shaders/shadow.frag";
+    // const char* SCREEN_QUAD_VERTEX_SHADER = "data/shaders/screen_quad.vert";
+    // const char* SCREEN_QUAD_FRAGMENT_SHADER = "data/shaders/screen_quad.frag";
+    // const char* OUTLINE_VERTEX_SHADER = "data/shaders/outline.vert";
+    // const char* OUTLINE_FRAGMENT_SHADER = "data/shaders/outline.frag";
     const char* NODE_VERTEX_SHADER = "data/shaders/node.vert";
     const char* NODE_FRAGMENT_SHADER = "data/shaders/node.frag";
-    const char* SKYBOX_VERTEX_SHADER = "data/shaders/skybox.vert";
-    const char* SKYBOX_FRAGMENT_SHADER = "data/shaders/skybox.frag";
-    const char* QUAD2D_VERTEX_SHADER = "data/shaders/quad2d.vert";
-    const char* QUAD2D_FRAGMENT_SHADER = "data/shaders/quad2d.frag";
-    const char* QUAD3D_VERTEX_SHADER = "data/shaders/quad3d.vert";
-    const char* QUAD3D_FRAGMENT_SHADER = "data/shaders/quad3d.frag";
-#ifdef NINE_MORRIS_3D_DEBUG
-    const char* ORIGIN_VERTEX_SHADER = "data/shaders/origin.vert";
-    const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/origin.frag";
-#endif
-    const char* TEXT_VERTEX_SHADER = "data/shaders/text.vert";
-    const char* TEXT_FRAGMENT_SHADER = "data/shaders/text.frag";
+//     const char* SKYBOX_VERTEX_SHADER = "data/shaders/skybox.vert";
+//     const char* SKYBOX_FRAGMENT_SHADER = "data/shaders/skybox.frag";
+//     const char* QUAD2D_VERTEX_SHADER = "data/shaders/quad2d.vert";
+//     const char* QUAD2D_FRAGMENT_SHADER = "data/shaders/quad2d.frag";
+//     const char* QUAD3D_VERTEX_SHADER = "data/shaders/quad3d.vert";
+//     const char* QUAD3D_FRAGMENT_SHADER = "data/shaders/quad3d.frag";
+// #ifdef NINE_MORRIS_3D_DEBUG
+//     const char* ORIGIN_VERTEX_SHADER = "data/shaders/origin.vert";
+//     const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/origin.frag";
+// #endif
+//     const char* TEXT_VERTEX_SHADER = "data/shaders/text.vert";
+//     const char* TEXT_FRAGMENT_SHADER = "data/shaders/text.frag";
 
     const char* ICON_512 = "data/icons/512x512/ninemorris3d.png";
     const char* ICON_256 = "data/icons/256x256/ninemorris3d.png";

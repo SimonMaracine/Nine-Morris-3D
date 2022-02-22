@@ -2,7 +2,7 @@
 #include <cassert>
 
 #include "application/events.h"
-#include "graphics/renderer/renderer.h"
+// #include "graphics/renderer/renderer.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/loading/loading_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
@@ -34,7 +34,7 @@ void LoadingLayer::on_attach() {
 
     loader->start_loading_thread();
 
-    renderer::disable_stencil();
+    // renderer::disable_stencil();
 }
 
 void LoadingLayer::on_detach() {
@@ -44,7 +44,7 @@ void LoadingLayer::on_detach() {
         loader->get_thread().detach();
     }
 
-    renderer::enable_stencil();
+    // renderer::enable_stencil();
 }
 
 void LoadingLayer::on_update(float dt) {
@@ -54,7 +54,7 @@ void LoadingLayer::on_update(float dt) {
 }
 
 void LoadingLayer::on_draw() {
-    renderer::clear(renderer::Color);
+    // renderer::clear(renderer::Color);
 
     float width;
     float height;
@@ -73,8 +73,8 @@ void LoadingLayer::on_draw() {
         y_pos = 0.0f;
     }
 
-    renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
+    // renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
-    renderer::draw_string_with_shadows("Loading...", glm::vec2(app->data.width - 200.0f, 20.0f), 1.2f,
-            glm::vec3(0.81f), app->storage->good_dog_plain_font);
+    // renderer::draw_string_with_shadows("Loading...", glm::vec2(app->data.width - 200.0f, 20.0f), 1.2f,
+    //         glm::vec3(0.81f), app->storage->good_dog_plain_font);
 }

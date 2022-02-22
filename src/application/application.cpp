@@ -12,7 +12,7 @@
 #include "application/events.h"
 #include "application/scene.h"
 #include "application/input.h"
-#include "graphics/renderer/renderer.h"
+#include "graphics/renderer/new_renderer.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
@@ -38,7 +38,8 @@ Application::Application(int width, int height, const std::string& title) {
         std::exit(1);
     }
 
-    storage = renderer::initialize(this);
+    // storage = renderer::initialize(this);
+    renderer = std::make_unique<Renderer>(this);
     assets_data = std::make_shared<AssetsData>();
 }
 
@@ -50,7 +51,7 @@ Application::~Application() {
         delete scene;
     }
 
-    renderer::terminate();
+    // renderer::terminate();
 }
 
 void Application::run() {
@@ -77,8 +78,11 @@ void Application::run() {
                 layer->on_fixed_update();
             }
             layer->on_update(dt);
-            layer->on_draw();
+            layer->on_draw();  // TODO maybe get rid of on_draw and keep only on_update
         }
+
+        renderer->render();
+        window->update();
 
         if (changed_scene) {
             active_layer_stack.clear();
@@ -95,8 +99,6 @@ void Application::run() {
 
             changed_scene = false;
         }
-
-        window->update();
     }
 
     DEB_INFO("Closing game");
@@ -237,7 +239,7 @@ bool Application::on_window_closed(events::WindowClosedEvent& event) {
 }
 
 bool Application::on_window_resized(events::WindowResizedEvent& event) {
-    renderer::set_viewport(event.width, event.height);
+    renderer->set_viewport(event.width, event.height);
 
     for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
         std::shared_ptr<Framebuffer> fb = framebuffer.lock();
@@ -248,16 +250,16 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
         }
     }
 
-    storage->orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
+    renderer->storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
             static_cast<float>(event.height));
 
-    storage->quad2d_shader->bind();
-    storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
-            storage->orthographic_projection_matrix);
+    renderer->storage.quad2d_shader->bind();
+    renderer->storage.quad2d_shader->set_uniform_matrix("u_projection_matrix",
+            renderer->storage.orthographic_projection_matrix);
 
-    storage->text_shader->bind();
-    storage->text_shader->set_uniform_matrix("u_projection_matrix",
-            storage->orthographic_projection_matrix);
+    renderer->storage.text_shader->bind();
+    renderer->storage.text_shader->set_uniform_matrix("u_projection_matrix",
+            renderer->storage.orthographic_projection_matrix);
 
     return false;
 }

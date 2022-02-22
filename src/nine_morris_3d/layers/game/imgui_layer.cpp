@@ -146,7 +146,7 @@ void ImGuiLayer::on_update(float dt) {
 
                 save_load::GameState state;
                 state.board = game_layer->board;
-                state.camera = game_layer->camera;
+                // state.camera = game_layer->camera;
                 state.time = gui_layer->timer.get_time_raw();
 
                 const time_t current = time(nullptr);
@@ -280,9 +280,9 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::BeginMenu("Camera Sensitivity")) {
                 ImGui::PushItemWidth(100.0f);
                 if (ImGui::SliderFloat("##", &app->options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
-                    game_layer->camera.sensitivity = app->options.sensitivity;
+                    // game_layer->camera.sensitivity = app->options.sensitivity;
 
-                    DEB_INFO("Changed camera sensitivity to {}", game_layer->camera.sensitivity);
+                    // DEB_INFO("Changed camera sensitivity to {}", game_layer->camera.sensitivity);
                 }
                 ImGui::PopItemWidth();
 
@@ -383,7 +383,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 }
 
 bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    game_layer->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
+    // game_layer->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
     return false;
 }
@@ -490,7 +490,7 @@ void ImGuiLayer::draw_about_screen() {
             y_pos = 0.0f;
         }
 
-        renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
+        // renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
         ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
         ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
@@ -535,7 +535,7 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Turn: %s", game_layer->board.turn == Board::Player::White ? "white" : "black");
         ImGui::Text("Should take piece: %s", game_layer->board.should_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", game_layer->board.turns_without_mills);
-        ImGui::Text("History size: %lu", game_layer->board.state_history->size());
+        // ImGui::Text("History size: %lu", game_layer->board.state_history->size());
         ImGui::Text("Hovered ID: %d", game_layer->hovered_id);
         ImGui::Text("Hovered node: %p", game_layer->board.hovered_node);
         ImGui::Text("Hovered piece: %p", game_layer->board.hovered_piece);
@@ -561,49 +561,49 @@ void ImGuiLayer::draw_debug(float dt) {
         // If you recompile shaders, uniforms that are set only once need to be reuploaded
         ImGui::Begin("Shaders");
         if (ImGui::Button("board_paint")) {
-            app->storage->board_paint_shader->recompile();
+            // app->storage->board_paint_shader->recompile();
         }
         if (ImGui::Button("board")) {
-            app->storage->board_shader->recompile();
+            // app->storage->board_shader->recompile();
         }
         if (ImGui::Button("node")) {
-            app->storage->node_shader->recompile();
+            // app->storage->node_shader->recompile();
         }
         if (ImGui::Button("origin")) {
-            app->storage->origin_shader->recompile();
+            // app->storage->origin_shader->recompile();
         }
         if (ImGui::Button("outline")) {
-            app->storage->outline_shader->recompile();
+            // app->storage->outline_shader->recompile();
         }
         if (ImGui::Button("piece")) {
-            app->storage->piece_shader->recompile();
+            // app->storage->piece_shader->recompile();
         }
         if (ImGui::Button("quad2d")) {
-            app->storage->quad2d_shader->recompile();
+            // app->storage->quad2d_shader->recompile();
         }
         if (ImGui::Button("quad3d")) {
-            app->storage->quad3d_shader->recompile();
+            // app->storage->quad3d_shader->recompile();
         }
         if (ImGui::Button("screen_quad")) {
-            app->storage->screen_quad_shader->recompile();
+            // app->storage->screen_quad_shader->recompile();
         }
         if (ImGui::Button("shadow")) {
-            app->storage->shadow_shader->recompile();
+            // app->storage->shadow_shader->recompile();
         }
         if (ImGui::Button("skybox")) {
-            app->storage->skybox_shader->recompile();
+            // app->storage->skybox_shader->recompile();
         }
         if (ImGui::Button("text")) {
-            app->storage->text_shader->recompile();
+            // app->storage->text_shader->recompile();
         }
         ImGui::End();
 
         ImGui::Begin("Camera Debug");
-        ImGui::Text("Position: %f, %f, %f", game_layer->camera.get_position().x, game_layer->camera.get_position().y, game_layer->camera.get_position().z);
-        ImGui::Text("Pitch: %f", game_layer->camera.get_pitch());
-        ImGui::Text("Yaw: %f", game_layer->camera.get_yaw());
-        ImGui::Text("Angle around point: %f", game_layer->camera.get_angle_around_point());
-        ImGui::Text("Distance to point: %f", game_layer->camera.get_distance_to_point());
+        // ImGui::Text("Position: %f, %f, %f", game_layer->camera.get_position().x, game_layer->camera.get_position().y, game_layer->camera.get_position().z);
+        // ImGui::Text("Pitch: %f", game_layer->camera.get_pitch());
+        // ImGui::Text("Yaw: %f", game_layer->camera.get_yaw());
+        // ImGui::Text("Angle around point: %f", game_layer->camera.get_angle_around_point());
+        // ImGui::Text("Distance to point: %f", game_layer->camera.get_distance_to_point());
         ImGui::End();
     }
 }

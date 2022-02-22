@@ -7,9 +7,9 @@
 
 #include <glm/glm.hpp>
 
+#include "graphics/renderer/hoverable.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/board.h"
-#include "nine_morris_3d/hoverable.h"
 #include "other/logging.h"
 
 #define GET_ACTIVE_PIECES(result) \
@@ -379,10 +379,10 @@ void Board::undo() {
     Board& state = state_history->back();
 
     id = state.id;
-    scale = state.scale;
-    index_count = state.index_count;
-    specular_color = state.specular_color;
-    shininess = state.shininess;
+    // scale = state.scale;
+    // index_count = state.index_count;
+    // specular_color = state.specular_color;
+    // shininess = state.shininess;
 
     for (unsigned int i = 0; i < 24; i++) {
         Node& node = nodes[i];

@@ -7,7 +7,7 @@
 #include "application/application_data.h"
 #include "application/events.h"
 #include "application/window.h"
-#include "graphics/renderer/renderer.h"
+#include "graphics/renderer/new_renderer.h"
 #include "graphics/renderer/framebuffer.h"
 #include "nine_morris_3d/assets_data.h"
 #include "other/loader.h"
@@ -38,7 +38,9 @@ public:
     ApplicationData data;
     std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
-    renderer::Storage* storage = nullptr;
+    // renderer::Storage* storage = nullptr;
+    std::unique_ptr<Renderer> renderer;
+    Camera camera;
 private:
     void on_event(events::Event& event);
     float update_frame_counter();

@@ -26,7 +26,7 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Board& board) {
-    archive(board.id, board.scale, board.index_count, board.specular_color, board.shininess,
+    archive(board.id, /*board.scale, board.index_count, board.specular_color, board.shininess,*/
             board.nodes, board.pieces, board.phase, board.turn, board.ending, board.white_pieces_count,
             board.black_pieces_count, board.not_placed_white_pieces_count,
             board.not_placed_black_pieces_count, board.should_take_piece, board.can_jump,
