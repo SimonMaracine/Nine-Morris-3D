@@ -277,7 +277,7 @@ void Renderer::render() {
         draw_skybox();    
     }
 
-    for (const auto& [id, model] : storage.models_diffuse_texture) {
+    for (const auto& [id, model] : models_diffuse_texture) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -314,27 +314,27 @@ unsigned int Renderer::add_model(Model& model, bool with_tint_color, bool with_o
     model.id = ++id;
 
     if (!with_tint_color) {
-        storage.models_diffuse_texture[id] = &model;
+        models_diffuse_texture[id] = &model;
     } else {
-        storage.models_diffuse_texture_tint_color[id] = &model;
+        models_diffuse_texture_tint_color[id] = &model;
     }
 
     if (with_outline) {
-        storage.models_outline[id] = &model;
+        models_outline[id] = &model;
     }
 
     if (with_shadows) {
-        storage.models_shadow[id] = &model;
+        models_shadow[id] = &model;
     }
 
     return id;
 }
 
 void Renderer::remove_model(unsigned int handle) {
-    storage.models_diffuse_texture.erase(handle);
-    storage.models_diffuse_texture_tint_color.erase(handle);
-    storage.models_outline.erase(handle);
-    storage.models_shadow.erase(handle);
+    models_diffuse_texture.erase(handle);
+    models_diffuse_texture_tint_color.erase(handle);
+    models_outline.erase(handle);
+    models_shadow.erase(handle);
 }
 
 void Renderer::set_viewport(int width, int height) {

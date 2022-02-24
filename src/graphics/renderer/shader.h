@@ -22,6 +22,7 @@ public:
     static std::shared_ptr<Shader> create(const std::string& vertex_source,
             const std::string& fragment_source, const std::vector<std::string>& uniforms,
             const char* block_name, int uniforms_count, std::shared_ptr<UniformBuffer> uniform_buffer);
+    // TODO rework uniform buffers
 
     void bind();
     static void unbind();

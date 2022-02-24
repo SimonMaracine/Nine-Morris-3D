@@ -102,13 +102,13 @@ private:
         std::shared_ptr<Framebuffer> intermediate_framebuffer;
 
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
-
-        // Ordered maps of pointers to models
-        std::map<unsigned int, Model*> models_diffuse_texture;
-        std::map<unsigned int, Model*> models_diffuse_texture_tint_color;
-        std::map<unsigned int, Model*> models_outline;
-        std::map<unsigned int, Model*> models_shadow;
     } storage;
+
+    // Ordered maps of pointers to models
+    std::map<unsigned int, Model*> models_diffuse_texture;
+    std::map<unsigned int, Model*> models_diffuse_texture_tint_color;
+    std::map<unsigned int, Model*> models_outline;
+    std::map<unsigned int, Model*> models_shadow;
 
     const char* SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert";
     const char* SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag";
@@ -129,8 +129,10 @@ private:
     const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";
 #endif
 
+    // Cache for the projection-view matrix
     glm::mat4 projection_view_matrix = glm::mat4(1.0f);
 
+    // Reference to application
     Application* app = nullptr;
 
     friend class Application;
