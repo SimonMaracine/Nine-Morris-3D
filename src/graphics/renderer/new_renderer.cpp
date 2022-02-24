@@ -239,8 +239,8 @@ Renderer::Renderer(Application* app)
 
     {
         FramebufferSpecification specification;
-        specification.width = app->data.width;
-        specification.height = app->data.height;
+        specification.width = app->app_data.width;
+        specification.height = app->app_data.height;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
@@ -254,8 +254,8 @@ Renderer::Renderer(Application* app)
         app->add_framebuffer(storage.intermediate_framebuffer);
     }
 
-    storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(app->data.width),
-                0.0f, static_cast<float>(app->data.height));
+    storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(app->app_data.width),
+                0.0f, static_cast<float>(app->app_data.height));
 
     DEB_INFO("Initialized renderer");
 }
@@ -270,14 +270,14 @@ void Renderer::render() {
     storage.scene_framebuffer->bind();
 
     clear(Color | Depth | Stencil);
-    set_viewport(app->data.width, app->data.height);
+    set_viewport(app->app_data.width, app->app_data.height);
     // set_stencil_mask_zero();
 
     if (storage.skybox_texture != nullptr) {
         draw_skybox();    
     }
 
-    for (const auto& [id, model] : models_diffuse_texture) {
+    for (const auto& [id, model] : models) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -285,12 +285,19 @@ void Renderer::render() {
         matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
 
-        model->shader->bind();
-        model->shader->set_uniform_matrix("u_model_matrix", matrix);
-        model->shader->set_uniform_matrix("u_projection_view_matrix", app->camera.get_projection_view_matrix());
+        model->material->get_shader()->bind();  // Optimize this (maybe by using uniform buffers)
+        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
+        model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+        model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
+
+        model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
+        model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
+        model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+        model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
 
         model->vertex_array->bind();
-        model->diffuse_texture->bind(0);
+        model->material->bind();
+        // model->diffuse_texture->bind(0);
 
         glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
     }
@@ -300,7 +307,7 @@ void Renderer::render() {
 #endif
 
     storage.scene_framebuffer->resolve_framebuffer(storage.intermediate_framebuffer->get_id(),
-            app->data.width, app->data.height);
+            app->app_data.width, app->app_data.height);
 
     Framebuffer::bind_default();
 
@@ -314,9 +321,9 @@ unsigned int Renderer::add_model(Model& model, bool with_tint_color, bool with_o
     model.id = ++id;
 
     if (!with_tint_color) {
-        models_diffuse_texture[id] = &model;
+        models[id] = &model;
     } else {
-        models_diffuse_texture_tint_color[id] = &model;
+        models_tint_color[id] = &model;
     }
 
     if (with_outline) {
@@ -331,8 +338,8 @@ unsigned int Renderer::add_model(Model& model, bool with_tint_color, bool with_o
 }
 
 void Renderer::remove_model(unsigned int handle) {
-    models_diffuse_texture.erase(handle);
-    models_diffuse_texture_tint_color.erase(handle);
+    models.erase(handle);
+    models_tint_color.erase(handle);
     models_outline.erase(handle);
     models_shadow.erase(handle);
 }
@@ -375,7 +382,7 @@ void Renderer::draw_screen_quad(GLuint texture) {
 #ifdef NINE_MORRIS_3D_DEBUG
 void Renderer::draw_origin() {
     storage.origin_shader->bind();
-    storage.origin_shader->set_uniform_matrix("u_projection_view_matrix", projection_view_matrix);
+    storage.origin_shader->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
 
     storage.origin_vertex_array->bind();
 
@@ -388,7 +395,7 @@ void Renderer::draw_skybox() {
     const glm::mat4 view = glm::mat4(glm::mat3(app->camera.get_view_matrix()));
 
     storage.skybox_shader->bind();
-    storage.skybox_shader->set_uniform_matrix("u_projection_view_matrix", projection * view);
+    storage.skybox_shader->set_uniform_mat4("u_projection_view_matrix", projection * view);
 
     storage.skybox_vertex_array->bind();
     storage.skybox_texture->bind(0);

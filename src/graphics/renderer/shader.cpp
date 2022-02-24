@@ -111,7 +111,7 @@ void Shader::unbind() {
     glUseProgram(0);
 }
 
-void Shader::set_uniform_matrix(const std::string& name, const glm::mat4& matrix) {
+void Shader::set_uniform_mat4(const std::string& name, const glm::mat4& matrix) {
     GLint location = get_uniform_location(name);
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
@@ -119,6 +119,11 @@ void Shader::set_uniform_matrix(const std::string& name, const glm::mat4& matrix
 void Shader::set_uniform_int(const std::string& name, int value) {
     GLint location = get_uniform_location(name);
     glUniform1i(location, value);
+}
+
+void Shader::set_uniform_float(const std::string& name, float value) {
+    GLint location = get_uniform_location(name);
+    glUniform1f(location, value);
 }
 
 void Shader::set_uniform_vec2(const std::string& name, const glm::vec2& vector) {
@@ -134,11 +139,6 @@ void Shader::set_uniform_vec3(const std::string& name, const glm::vec3& vector) 
 void Shader::set_uniform_vec4(const std::string& name, const glm::vec4& vector) {
     GLint location = get_uniform_location(name);
     glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
-}
-
-void Shader::set_uniform_float(const std::string& name, float value) {
-    GLint location = get_uniform_location(name);
-    glUniform1f(location, value);
 }
 
 void Shader::recompile() {

@@ -16,6 +16,8 @@
 #include "graphics/renderer/framebuffer.h"
 #include "graphics/renderer/font.h"
 #include "graphics/renderer/camera.h"
+#include "graphics/renderer/material.h"
+#include "graphics/renderer/light.h"
 
 class Application;
 
@@ -25,19 +27,20 @@ public:
     public:
         std::shared_ptr<VertexArray> vertex_array;
         int index_count = 0;
-        std::shared_ptr<Shader> shader;
-        std::shared_ptr<Texture> diffuse_texture;
-        std::shared_ptr<Texture> normal_texture;
+        // std::shared_ptr<Shader> shader;
+        std::shared_ptr<MaterialInstance> material;
+        // std::shared_ptr<Texture> diffuse_texture;
+        // std::shared_ptr<Texture> normal_texture;
 
         glm::vec3 position = glm::vec3(0.0f);
         glm::vec3 rotation = glm::vec3(0.0f);
         float scale = 1.0f;
 
-        glm::vec3 tint_color = glm::vec3(0.0f);
-        glm::vec3 outline_color = glm::vec3(0.0f);
+        // glm::vec3 tint_color = glm::vec3(0.0f);
+        // glm::vec3 outline_color = glm::vec3(0.0f);
 
-        glm::vec3 specular_color = glm::vec3(0.0f);
-        float shininess = 0.0f;
+        // glm::vec3 specular_color = glm::vec3(0.0f);
+        // float shininess = 0.0f;
     private:
         unsigned int id = 0;  // TODO Don't know if needed
 
@@ -67,6 +70,8 @@ public:
     void set_clear_color(float red, float green, float blue);
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void set_skybox(std::shared_ptr<Texture3D> texture);
+
+    DirectionalLight light;
 private:
     void clear(int buffers);
     void draw_screen_quad(GLuint texture);
@@ -105,8 +110,8 @@ private:
     } storage;
 
     // Ordered maps of pointers to models
-    std::map<unsigned int, Model*> models_diffuse_texture;
-    std::map<unsigned int, Model*> models_diffuse_texture_tint_color;
+    std::map<unsigned int, Model*> models;
+    std::map<unsigned int, Model*> models_tint_color;
     std::map<unsigned int, Model*> models_outline;
     std::map<unsigned int, Model*> models_shadow;
 

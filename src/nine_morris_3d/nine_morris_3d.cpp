@@ -38,7 +38,7 @@ NineMorris3D::NineMorris3D()
 
     using namespace assets;
 
-    // Load and set iconds
+    // Load and set icons
     const std::array<std::unique_ptr<IconImage>, 5> icons = {
         std::make_unique<IconImage>(path(ICON_512)),
         std::make_unique<IconImage>(path(ICON_256)),
@@ -56,8 +56,8 @@ NineMorris3D::NineMorris3D()
     // Setup scene framebuffer
     {
         FramebufferSpecification specification;
-        specification.width = data.width;
-        specification.height = data.height;
+        specification.width = app_data.width;
+        specification.height = app_data.height;
         specification.samples = options.samples;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),

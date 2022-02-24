@@ -35,7 +35,7 @@ public:
     bool running = true;
     double fps = 0.0;
     unsigned int frames = 0;
-    ApplicationData data;
+    ApplicationData app_data;
     std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
     // renderer::Storage* storage = nullptr;

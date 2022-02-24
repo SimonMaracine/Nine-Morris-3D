@@ -61,15 +61,15 @@ void LoadingLayer::on_draw() {
     float x_pos;
     float y_pos;
 
-    if (static_cast<float>(app->data.width) / static_cast<float>(app->data.height) > 16.0f / 9.0f) {
-        width = app->data.width;
-        height = app->data.width * (9.0f / 16.0f);
+    if (static_cast<float>(app->app_data.width) / app->app_data.height > 16.0f / 9.0f) {
+        width = app->app_data.width;
+        height = app->app_data.width * (9.0f / 16.0f);
         x_pos = 0.0f;
-        y_pos = (height - app->data.height) / -2.0f;
+        y_pos = (height - app->app_data.height) / -2.0f;
     } else {
-        height = app->data.height;
-        width = app->data.height * (16.0f / 9.0f);
-        x_pos = (width - app->data.width) / -2.0f;
+        height = app->app_data.height;
+        width = app->app_data.height * (16.0f / 9.0f);
+        x_pos = (width - app->app_data.width) / -2.0f;
         y_pos = 0.0f;
     }
 

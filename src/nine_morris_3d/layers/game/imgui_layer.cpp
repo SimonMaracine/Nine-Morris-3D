@@ -117,7 +117,7 @@ void ImGuiLayer::on_bind_layers() {
 
 void ImGuiLayer::on_update(float dt) {
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(app->data.width, app->data.height);
+    io.DisplaySize = ImVec2(app->app_data.width, app->app_data.height);
     io.DeltaTime = dt;
 
     ImGui_ImplGlfw_NewFrame();
@@ -478,15 +478,15 @@ void ImGuiLayer::draw_about_screen() {
         float x_pos;
         float y_pos;
 
-        if (static_cast<float>(app->data.width) / static_cast<float>(app->data.height) > 16.0f / 9.0f) {
-            width = app->data.width;
-            height = app->data.width * (9.0f / 16.0f);
+        if (static_cast<float>(app->app_data.width) / app->app_data.height > 16.0f / 9.0f) {
+            width = app->app_data.width;
+            height = app->app_data.width * (9.0f / 16.0f);
             x_pos = 0.0f;
-            y_pos = (height - app->data.height) / -2.0f;
+            y_pos = (height - app->app_data.height) / -2.0f;
         } else {
-            height = app->data.height;
-            width = app->data.height * (16.0f / 9.0f);
-            x_pos = (width - app->data.width) / -2.0f;
+            height = app->app_data.height;
+            width = app->app_data.height * (16.0f / 9.0f);
+            x_pos = (width - app->app_data.width) / -2.0f;
             y_pos = 0.0f;
         }
 
@@ -544,18 +544,18 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::End();
 
         ImGui::Begin("Debug Settings");
-        if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&game_layer->light.position), -30.0f, 30.0f)) {
-            game_layer->setup_light();
-        }
-        if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&game_layer->light.ambient_color), 0.0f, 1.0f)) {
-            game_layer->setup_light();
-        }
-        if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&game_layer->light.diffuse_color), 0.0f, 1.0f)) {
-            game_layer->setup_light();
-        }
-        if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&game_layer->light.specular_color), 0.0f, 1.0f)) {
-            game_layer->setup_light();
-        }
+        // if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&game_layer->light.position), -30.0f, 30.0f)) {
+        //     game_layer->setup_light();
+        // }
+        // if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&game_layer->light.ambient_color), 0.0f, 1.0f)) {
+        //     game_layer->setup_light();
+        // }
+        // if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&game_layer->light.diffuse_color), 0.0f, 1.0f)) {
+        //     game_layer->setup_light();
+        // }
+        // if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&game_layer->light.specular_color), 0.0f, 1.0f)) {
+        //     game_layer->setup_light();
+        // }
         ImGui::End();
 
         // If you recompile shaders, uniforms that are set only once need to be reuploaded

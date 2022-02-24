@@ -1,11 +1,14 @@
 #pragma once
 
+#include <memory>
+
 #include "application/application.h"
 #include "graphics/renderer/hoverable.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/shader.h"
 #include "graphics/renderer/texture.h"
+#include "graphics/renderer/material.h"
 #include "nine_morris_3d/options.h"
 #include "other/model.h"
 
@@ -29,7 +32,10 @@ public:
         std::shared_ptr<VertexArray> board_vertex_array;
         std::shared_ptr<Shader> board_shader;
         std::shared_ptr<Texture> board_diffuse_texture;
-    } render_data;
+
+        std::shared_ptr<Material> board_material;
+        std::shared_ptr<MaterialInstance> board_material_instance;
+    } data;
 };
 
 extern NineMorris3D* app;

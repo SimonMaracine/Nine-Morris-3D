@@ -46,6 +46,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/graphics/renderer/camera.cpp"
     "src/graphics/renderer/font.cpp"
     "src/graphics/renderer/hoverable.cpp"
+    "src/graphics/renderer/material.cpp"
     "src/nine_morris_3d/nine_morris_3d.cpp"
     "src/nine_morris_3d/layers/game/game_layer.cpp"
     "src/nine_morris_3d/layers/game/imgui_layer.cpp"

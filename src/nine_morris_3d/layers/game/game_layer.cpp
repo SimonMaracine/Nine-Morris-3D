@@ -43,14 +43,14 @@
 #include "other/logging.h"
 #include "other/texture_data.h"
 
-const Light LIGHT_FIELD = {
+const DirectionalLight LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
     glm::vec3(0.3f),
     glm::vec3(1.0f),
     glm::vec3(0.9f)
 };
 
-const Light LIGHT_AUTUMN = {
+const DirectionalLight LIGHT_AUTUMN = {
     glm::vec3(-4.4f, 11.0f, 6.4f),
     glm::vec3(0.15f),
     glm::vec3(0.9f),
@@ -89,9 +89,9 @@ void GameLayer::on_attach() {
     // }
 
     // build_board_paint();
-    build_camera();
-    build_skybox();
-    build_light();
+    set_camera();
+    set_skybox();
+    set_light();
     // build_turn_indicator();
 
     app->window->set_vsync(app->options.vsync);
@@ -117,8 +117,8 @@ void GameLayer::on_attach() {
     //     app->renderer->set_scene_framebuffer(Framebuffer::create(specification));
     // }
 
-    setup_light();
-    setup_board();
+    // setup_light();
+    // setup_board();
     // setup_board_paint();
     // setup_pieces();
 
@@ -342,7 +342,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
-        // app->camera.go_towards_position(default_app->camera_position);
+        app->camera.go_towards_position(default_camera_position);
     }
 
     return false;
@@ -413,11 +413,11 @@ void GameLayer::build_board() {
     //     }
     // }
 
-    if (!app->render_data.loaded_board) {
-        app->render_data.board_id = hoverable::generate_id();
+    if (!app->data.loaded_board) {
+        app->data.board_id = hoverable::generate_id();
 
-        app->render_data.board_vertex_array = create_entity_vertex_array(app->assets_data->board_mesh,
-                app->render_data.board_id);
+        app->data.board_vertex_array = create_entity_vertex_array(app->assets_data->board_mesh,
+                app->data.board_id);
 
         {
             const std::vector<std::string> uniforms = {
@@ -434,45 +434,49 @@ void GameLayer::build_board() {
                 "u_light.diffuse",
                 "u_light.specular"
             };
-            app->render_data.board_shader = Shader::create(
+            app->data.board_shader = Shader::create(
                 assets::path(assets::BOARD_VERTEX_SHADER),
                 assets::path(assets::BOARD_FRAGMENT_SHADER),
                 uniforms
-                // block_name, 1,
+                // block_name, 1,  // TODO and use this again
                 // storage->uniform_buffer
             );
         }
 
         if (app->options.texture_quality == options::NORMAL) {
-            app->render_data.board_diffuse_texture = Texture::create(
-                app->assets_data->board_wood_diff_texture,
-                true,
-                -2.0f
+            app->data.board_diffuse_texture = Texture::create(
+                app->assets_data->board_wood_diff_texture, true, -2.0f
             );
         } else if (app->options.texture_quality == options::LOW) {
-            app->render_data.board_diffuse_texture = Texture::create(
-                app->assets_data->board_wood_diff_texture_small,
-                true,
-                -2.0f
+            app->data.board_diffuse_texture = Texture::create(
+                app->assets_data->board_wood_diff_texture_small, true, -2.0f
             );
         } else {
             assert(false);
         }
 
-        app->render_data.loaded_board = true;
+        app->data.board_material = std::make_shared<Material>(app->data.board_shader);
+        app->data.board_material->add_texture("u_material.diffuse", app->data.board_diffuse_texture, 0);
+        app->data.board_material->add_variable(Material::UniformType::Vec3, "u_material.specular");
+        app->data.board_material->add_variable(Material::UniformType::Float, "u_material.shininess");
+
+        app->data.board_material_instance = MaterialInstance::make(app->data.board_material);
+        app->data.board_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
+        app->data.board_material_instance->set_float("u_material.shininess", 4.0f);
+
+        app->data.loaded_board = true;
     }
 
-    Renderer::Model model;
-    model.vertex_array = app->render_data.board_vertex_array;
-    model.index_count = app->assets_data->board_mesh->indices.size();
-    model.shader = app->render_data.board_shader;
-    model.diffuse_texture = app->render_data.board_diffuse_texture;
-    model.scale = 20.0f;
-    model.specular_color = glm::vec3(0.2f);
-    model.shininess = 4.0f;
-
-    board = Board(app->render_data.board_id, board_state_history);
-    board.model = model;
+    board = Board(app->data.board_id, board_state_history);
+    
+    board.model.vertex_array = app->data.board_vertex_array;
+    board.model.index_count = app->assets_data->board_mesh->indices.size();
+    // model.shader = app->data.board_shader;
+    // model.diffuse_texture = app->data.board_diffuse_texture;
+    board.model.scale = 20.0f;
+    // model.specular_color = glm::vec3(0.2f);
+    // model.shininess = 4.0f;
+    board.model.material = app->data.board_material_instance;
 
     app->renderer->add_model(board.model, false, false, false);
 
@@ -598,13 +602,15 @@ void GameLayer::build_node(unsigned int index, const glm::vec3& position) {
     DEB_DEBUG("Built node {}", index);
 }
 
-void GameLayer::build_camera() {
+void GameLayer::set_camera() {
     app->camera = Camera(
         app->options.sensitivity,
         47.0f,
         glm::vec3(0.0f),
         8.0f,
-        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
+        glm::perspective(
+            glm::radians(FOV), static_cast<float>(app->app_data.width) / app->app_data.height, NEAR, FAR
+        )
     );
 
     default_camera_position = app->camera.get_position();
@@ -614,13 +620,15 @@ void GameLayer::build_camera() {
         47.0f,
         glm::vec3(0.0f),
         8.7f,
-        glm::perspective(glm::radians(FOV), static_cast<float>(app->data.width) / app->data.height, NEAR, FAR)
+        glm::perspective(
+            glm::radians(FOV), static_cast<float>(app->app_data.width) / app->app_data.height, NEAR, FAR
+        )
     );
 
-    DEB_DEBUG("Built camera");
+    DEB_DEBUG("Set camera");
 }
 
-void GameLayer::build_skybox() {
+void GameLayer::set_skybox() {
     // if (!app->storage->skybox_vertex_array) {
     //     std::shared_ptr<Buffer> vertices = Buffer::create(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
 
@@ -666,16 +674,16 @@ void GameLayer::build_skybox() {
     DEB_DEBUG("Built skybox");
 }
 
-void GameLayer::build_light() {
+void GameLayer::set_light() {
     if (app->options.skybox == options::FIELD) {
-        light = LIGHT_FIELD;
+        app->renderer->light = LIGHT_FIELD;
     } else if (app->options.skybox == options::AUTUMN) {
-        light = LIGHT_AUTUMN;
+        app->renderer->light = LIGHT_AUTUMN;
     } else {
         assert(false);
     }
 
-    DEB_DEBUG("Built light");
+    DEB_DEBUG("Set light");
 }
 
 void GameLayer::build_turn_indicator() {
@@ -699,12 +707,12 @@ void GameLayer::render_skybox() {
 }
 
 void GameLayer::setup_light() {
-    app->render_data.board_shader->bind();
-    app->render_data.board_shader->set_uniform_vec3("u_light.position", light.position);
-    app->render_data.board_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
-    app->render_data.board_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-    app->render_data.board_shader->set_uniform_vec3("u_light.specular", light.specular_color);
-    app->render_data.board_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
+    // app->data.board_shader->bind();
+    // app->data.board_shader->set_uniform_vec3("u_light.position", light.position);
+    // app->data.board_shader->set_uniform_vec3("u_light.ambient", light.ambient_color);
+    // app->data.board_shader->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+    // app->data.board_shader->set_uniform_vec3("u_light.specular", light.specular_color);
+    // app->data.board_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
 
     // app->storage->board_paint_shader->bind();
     // app->storage->board_paint_shader->set_uniform_vec3("u_light.position", light.position);
@@ -722,8 +730,8 @@ void GameLayer::setup_light() {
 }
 
 void GameLayer::setup_camera() {
-    app->render_data.board_shader->bind();
-    app->render_data.board_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
+    // app->data.board_shader->bind();
+    // app->data.board_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
 
     // app->storage->board_paint_shader->bind();
     // app->storage->board_paint_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
@@ -733,10 +741,10 @@ void GameLayer::setup_camera() {
 }
 
 void GameLayer::setup_board() {
-    app->render_data.board_shader->bind();
-    app->render_data.board_shader->set_uniform_int("u_material.diffuse", 0);
-    app->render_data.board_shader->set_uniform_vec3("u_material.specular", board.model.specular_color);
-    app->render_data.board_shader->set_uniform_float("u_material.shininess", board.model.shininess);
+    // app->data.board_shader->bind();
+    // app->data.board_shader->set_uniform_int("u_material.diffuse", 0);
+    // app->data.board_shader->set_uniform_vec3("u_material.specular", board.model.specular_color);
+    // app->data.board_shader->set_uniform_float("u_material.shininess", board.model.shininess);
 }
 
 void GameLayer::setup_board_paint() {
@@ -817,10 +825,11 @@ void GameLayer::render_to_depth() {
 }
 
 void GameLayer::setup_shadows() {
-    const glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);
-    const glm::mat4 view = glm::lookAt(light.position / 4.0f,
-            glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    const glm::mat4 light_space_matrix = projection * view;
+    // const glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);
+    // const glm::mat4 view = glm::lookAt(light.position / 4.0f,
+            // glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    // const glm::mat4 light_space_matrix = projection * view;
+
     // app->storage->shadow_shader->bind();
     // app->storage->shadow_shader->set_uniform_matrix("u_light_space_matrix", light_space_matrix);
     // app->storage->board_shader->bind();
@@ -1040,7 +1049,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             assert(false);
         }
 
-        light = LIGHT_FIELD;
+        app->renderer->light = LIGHT_FIELD;
         // setup_light();
     } else if (skybox == options::AUTUMN) {
         if (app->options.texture_quality == options::NORMAL) {
@@ -1081,7 +1090,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
             assert(false);
         }
 
-        light = LIGHT_AUTUMN;
+        app->renderer->light = LIGHT_AUTUMN;
         // setup_light();
     } else {
         assert(false);

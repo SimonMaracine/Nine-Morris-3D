@@ -17,13 +17,13 @@
 #include "other/logging.h"
 
 Application::Application(int width, int height, const std::string& title) {
-    data.width = width;
-    data.height = height;
-    data.title = title;
-    data.event_function = BIND(Application::on_event);
+    app_data.width = width;
+    app_data.height = height;
+    app_data.title = title;
+    app_data.event_function = BIND(Application::on_event);
 
     logging::initialize();
-    window = std::make_shared<Window>(&data);
+    window = std::make_shared<Window>(&app_data);
 
 #ifdef NINE_MORRIS_3D_DEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
@@ -253,12 +253,12 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
     renderer->storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
             static_cast<float>(event.height));
 
-    renderer->storage.quad2d_shader->bind();
-    renderer->storage.quad2d_shader->set_uniform_matrix("u_projection_matrix",
+    renderer->storage.quad2d_shader->bind();  // TODO optimize
+    renderer->storage.quad2d_shader->set_uniform_mat4("u_projection_matrix",
             renderer->storage.orthographic_projection_matrix);
 
     renderer->storage.text_shader->bind();
-    renderer->storage.text_shader->set_uniform_matrix("u_projection_matrix",
+    renderer->storage.text_shader->set_uniform_mat4("u_projection_matrix",
             renderer->storage.orthographic_projection_matrix);
 
     return false;

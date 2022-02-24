@@ -27,14 +27,16 @@ public:
     void bind();
     static void unbind();
 
-    void set_uniform_matrix(const std::string& name, const glm::mat4& matrix);
+    void set_uniform_mat4(const std::string& name, const glm::mat4& matrix);
     void set_uniform_int(const std::string& name, int value);
+    void set_uniform_float(const std::string& name, float value);
     void set_uniform_vec2(const std::string& name, const glm::vec2& vector);
     void set_uniform_vec3(const std::string& name, const glm::vec3& vector);
     void set_uniform_vec4(const std::string& name, const glm::vec4& vector);
-    void set_uniform_float(const std::string& name, float value);
 
     void recompile();
+
+    std::string& get_name() { return name; }
 private:
     GLint get_uniform_location(const std::string& name);
 

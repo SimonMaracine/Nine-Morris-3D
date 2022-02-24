@@ -17,7 +17,7 @@ void GuiLayer::on_bind_layers() {
 }
 
 void GuiLayer::on_update(float dt) {
-    turn_indicator.update(app->data.width, app->data.height);
+    turn_indicator.update(app->app_data.width, app->app_data.height);
     timer.update(app->window->get_time());
 }
 
@@ -43,8 +43,8 @@ void GuiLayer::render_timer() {
     int width, height;
     // app->storage->good_dog_plain_font->get_string_size(time, 1.5f, &width, &height);
 
-    const float x_pos = app->data.width / 2 - width / 2 - 8;
-    const float y_pos = app->data.height - height - 50;
+    const float x_pos = app->app_data.width / 2 - width / 2 - 8;
+    const float y_pos = app->app_data.height - height - 50;
 
     // renderer::draw_string_with_shadows(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f),
     //         app->storage->good_dog_plain_font);

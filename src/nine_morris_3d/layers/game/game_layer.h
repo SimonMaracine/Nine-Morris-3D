@@ -8,8 +8,6 @@
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
-#include "graphics/renderer/camera.h"
-#include "graphics/renderer/light.h"
 #include "graphics/renderer/framebuffer_reader.h"
 #include "other/model.h"
 #include "other/loader.h"
@@ -47,10 +45,10 @@ public:
     void build_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
             std::shared_ptr<Texture> texture, const glm::vec3& position);
     void build_node(unsigned int index, const glm::vec3& position);
-    void build_camera();
-    void build_skybox();
-    void build_light();
     void build_turn_indicator();
+    void set_skybox();
+    void set_light();
+    void set_camera();
 
     void render_skybox();
     void setup_light();
@@ -71,7 +69,7 @@ public:
 
     Board board;
     // Camera camera;
-    Light light;
+    // Light light;
     std::shared_ptr<std::vector<Board>> board_state_history;
 
     hoverable::Id hovered_id = hoverable::null;
