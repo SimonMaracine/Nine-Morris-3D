@@ -62,6 +62,7 @@ void GameLayer::on_attach() {
 
     board_state_history = std::make_shared<std::vector<Board>>();
     setup_board();
+    setup_board_paint();
 
     setup_pieces();
     setup_nodes();
@@ -449,8 +450,6 @@ void GameLayer::setup_board() {
         app->data.board_material_instance->set_texture("u_material.diffuse", app->data.board_diffuse_texture, 0);
         app->data.board_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
         app->data.board_material_instance->set_float("u_material.shininess", 4.0f);
-
-        app->data.loaded_board = true;
     }
 
     board = Board(app->data.board_id, board_state_history);
@@ -473,51 +472,90 @@ void GameLayer::setup_board() {
     // board.specular_color = glm::vec3(0.2f);
     // board.shininess = 4.0f;
 
+    app->data.loaded_board = true;
+
     DEB_DEBUG("Built board");
 }
 
-void GameLayer::build_board_paint() {
-    // if (!app->storage->board_paint_vertex_array) {
-    //     std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->board_paint_mesh->vertices.data(),
-    //             app->assets_data->board_paint_mesh->vertices.size() * sizeof(model::Vertex));
+void GameLayer::setup_board_paint() {
+    if (!app->data.loaded_board_paint) {
+        const std::vector<std::string> uniforms = {
+            "u_projection_view_matrix",
+            "u_model_matrix",
+            "u_light_space_matrix",
+            "u_view_position",
+            "u_shadow_map",
+            "u_material.diffuse",
+            "u_material.specular",
+            "u_material.shininess",
+            "u_light.position",
+            "u_light.ambient",
+            "u_light.diffuse",
+            "u_light.specular"
+        };
+        app->data.board_paint_shader = Shader::create(
+            assets::path(assets::BOARD_PAINT_VERTEX_SHADER),
+            assets::path(assets::BOARD_PAINT_FRAGMENT_SHADER),
+            uniforms
+            // block_name, 1,  // TODO this
+            // storage->uniform_buffer
+        );
 
-    //     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+        std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->board_paint_mesh->vertices.data(),
+                app->assets_data->board_paint_mesh->vertices.size() * sizeof(mesh::Vertex));
 
-    //     BufferLayout layout;
-    //     layout.add(0, BufferLayout::Type::Float, 3);
-    //     layout.add(1, BufferLayout::Type::Float, 2);
-    //     layout.add(2, BufferLayout::Type::Float, 3);
+        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
 
-    //     std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->board_paint_mesh->indices.data(),
-    //             app->assets_data->board_paint_mesh->indices.size() * sizeof(unsigned int));
+        BufferLayout layout;
+        layout.add(0, BufferLayout::Type::Float, 3);
+        layout.add(1, BufferLayout::Type::Float, 2);
+        layout.add(2, BufferLayout::Type::Float, 3);
 
-    //     vertex_array->add_buffer(vertices, layout);
-    //     vertex_array->add_index_buffer(indices);
+        std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->board_paint_mesh->indices.data(),
+                app->assets_data->board_paint_mesh->indices.size() * sizeof(unsigned int));
 
-    //     VertexArray::unbind();
+        vertex_array->add_buffer(vertices, layout);
+        vertex_array->add_index_buffer(indices);
 
-    //     app->storage->board_paint_vertex_array = vertex_array;
-    // }
+        VertexArray::unbind();
 
-    // if (!app->storage->board_paint_diff_texture) {
-    //     if (app->options.texture_quality == options::NORMAL) {
-    //         app->storage->board_paint_diff_texture =
-    //                 Texture::create(app->assets_data->board_paint_diff_texture, true, -1.0f);
-    //     } else if (app->options.texture_quality == options::LOW) {
-    //         app->storage->board_paint_diff_texture =
-    //                 Texture::create(app->assets_data->board_paint_diff_texture_small, true, -1.0f);
-    //     } else {
-    //         assert(false);
-    //     }
-    // }
+        app->data.board_paint_vertex_array = vertex_array;
 
-    // board.paint.position = glm::vec3(0.0f, 0.062f, 0.0f);
-    // board.paint.scale = 20.0f;
-    // board.paint.vertex_array = app->storage->board_paint_vertex_array;
-    // board.paint.index_count = app->assets_data->board_paint_mesh->indices.size();
+        if (app->options.texture_quality == options::NORMAL) {
+            app->data.board_paint_diffuse_texture = Texture::create(
+                app->assets_data->board_paint_diff_texture, true, -1.0f
+            );
+        } else if (app->options.texture_quality == options::LOW) {
+            app->data.board_paint_diffuse_texture = Texture::create(
+                app->assets_data->board_paint_diff_texture_small, true, -1.0f
+            );
+        } else {
+            assert(false);
+        }
+
+        app->data.paint_material = std::make_shared<Material>(app->data.board_paint_shader);
+        app->data.paint_material->add_texture("u_material.diffuse");
+        app->data.paint_material->add_variable(Material::UniformType::Vec3, "u_material.specular");
+        app->data.paint_material->add_variable(Material::UniformType::Float, "u_material.shininess");
+
+        app->data.board_paint_material_instance = MaterialInstance::make(app->data.paint_material);
+        app->data.board_paint_material_instance->set_texture("u_material.diffuse", app->data.board_paint_diffuse_texture, 0);
+        app->data.board_paint_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
+        app->data.board_paint_material_instance->set_float("u_material.shininess", 4.0f);
+    }
+
+    board.paint_model.vertex_array = app->data.board_paint_vertex_array;
+    board.paint_model.index_count = app->assets_data->board_paint_mesh->indices.size();
+    board.paint_model.position = glm::vec3(0.0f, 0.062f, 0.0f);
+    board.paint_model.scale = 20.0f;
     // board.paint.diffuse_texture = app->storage->board_paint_diff_texture;
     // board.paint.specular_color = glm::vec3(0.2f);
     // board.paint.shininess = 4.0f;
+    board.paint_model.material = app->data.board_paint_material_instance;
+
+    app->renderer->add_model(board.paint_model, 0);
+
+    app->data.loaded_board_paint = true;
 
     DEB_DEBUG("Built board paint");
 }
@@ -847,12 +885,12 @@ void GameLayer::setup_camera() {
     // app->data.board_shader->set_uniform_float("u_material.shininess", board.model.shininess);
 // }
 
-void GameLayer::setup_board_paint() {
+// void GameLayer::setup_board_paint() {
     // app->storage->board_paint_shader->bind();
     // app->storage->board_paint_shader->set_uniform_int("u_material.diffuse", 0);
     // app->storage->board_paint_shader->set_uniform_vec3("u_material.specular", board.paint.specular_color);
     // app->storage->board_paint_shader->set_uniform_float("u_material.shininess", board.paint.shininess);
-}
+// }
 
 // void GameLayer::setup_pieces() {
     // app->storage->piece_shader->bind();
@@ -1288,11 +1326,11 @@ void GameLayer::load_game() {
     board.turns_without_mills = state.board.turns_without_mills;
     board.repetition_history = state.board.repetition_history;
     
-    board.paint.position = state.board.paint.position;
-    board.paint.scale = state.board.paint.scale;
-    board.paint.index_count = state.board.paint.index_count;
-    board.paint.specular_color = state.board.paint.specular_color;
-    board.paint.shininess = state.board.paint.shininess;
+    // board.paint.position = state.board.paint.position;
+    // board.paint.scale = state.board.paint.scale;
+    // board.paint.index_count = state.board.paint.index_count;
+    // board.paint.specular_color = state.board.paint.specular_color;
+    // board.paint.shininess = state.board.paint.shininess;
 
     board.state_history = state.board.state_history;
     board.next_move = state.board.next_move;

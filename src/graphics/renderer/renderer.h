@@ -108,7 +108,7 @@ namespace renderer {
     void draw_string_with_shadows(const std::string& string, const glm::vec2& position, float scale,
                 const glm::vec3& color, std::shared_ptr<Font> font);
     void draw_board(const Board& board);
-    void draw_board_paint(const BoardPaint& board_paint);
+//     void draw_board_paint(const BoardPaint& board_paint);
     void draw_piece(const Piece* piece, const glm::vec3& tint_color);
     void draw_piece_with_outline(const Piece* piece, const glm::vec3& outline_color);
     void draw_skybox(const glm::mat4& projection_view_matrix);

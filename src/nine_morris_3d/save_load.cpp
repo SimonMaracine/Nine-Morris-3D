@@ -30,7 +30,7 @@ void serialize(Archive& archive, Board& board) {
             board.nodes, board.pieces, board.phase, board.turn, board.ending, board.white_pieces_count,
             board.black_pieces_count, board.not_placed_white_pieces_count,
             board.not_placed_black_pieces_count, board.should_take_piece, board.can_jump,
-            board.turns_without_mills, board.repetition_history, board.paint, board.state_history,
+            board.turns_without_mills, board.repetition_history, /*board.paint,*/ board.state_history,
             board.next_move);
 }
 
@@ -38,10 +38,10 @@ void serialize(Archive& archive, Board& board) {
 Unserialized variables:
     vertex_array, diffuse_texture
 */
-template<typename Archive>
-void serialize(Archive& archive, BoardPaint& paint) {
-    archive(paint.position, paint.scale, paint.index_count, paint.specular_color, paint.shininess);
-}
+// template<typename Archive>
+// void serialize(Archive& archive, BoardPaint& paint) {
+//     archive(paint.position, paint.scale, paint.index_count, paint.specular_color, paint.shininess);
+// }
 
 template<typename Archive>
 void serialize(Archive& archive, ThreefoldRepetitionHistory& repetition_history) {

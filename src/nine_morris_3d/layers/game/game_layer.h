@@ -41,7 +41,7 @@ public:
             hoverable::Id id);
 
     void setup_board();
-    void build_board_paint();
+    void setup_board_paint();
     void setup_pieces();
     void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
             std::shared_ptr<Texture> texture, const glm::vec3& position);
@@ -56,7 +56,7 @@ public:
     void setup_light();
     void setup_camera();
     // void setup_board();
-    void setup_board_paint();
+    // void setup_board_paint();
     // void setup_pieces();
     void render_pieces();
     void render_nodes();

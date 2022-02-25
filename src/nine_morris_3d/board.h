@@ -20,17 +20,18 @@ struct ThreefoldRepetitionHistory {
     std::vector<std::array<Piece::Type, 24>> twos;
 };
 
-struct BoardPaint {
-    glm::vec3 position = glm::vec3(0.0f);
-    float scale = 0.0f;
+// struct BoardPaint {
+    // glm::vec3 position = glm::vec3(0.0f);
+    // float scale = 0.0f;
 
-    std::shared_ptr<VertexArray> vertex_array;
-    int index_count = 0;
-    std::shared_ptr<Texture> diffuse_texture;
+    // std::shared_ptr<VertexArray> vertex_array;
 
-    glm::vec3 specular_color = glm::vec3(0.0f);
-    float shininess = 0.0f;
-};
+    // int index_count = 0;
+    // std::shared_ptr<Texture> diffuse_texture;
+
+    // glm::vec3 specular_color = glm::vec3(0.0f);
+    // float shininess = 0.0f;
+// };
 
 class Board {
 public:
@@ -78,6 +79,7 @@ public:
     // std::shared_ptr<Texture> diffuse_texture;
 
     Renderer::Model model;
+    Renderer::Model paint_model;
 
     // glm::vec3 specular_color = glm::vec3(0.0f);
     // float shininess = 0.0f;
@@ -104,7 +106,7 @@ public:
     unsigned int turns_without_mills = 0;
     ThreefoldRepetitionHistory repetition_history;
 
-    BoardPaint paint;
+    // BoardPaint paint;
 
     std::shared_ptr<std::vector<Board>> state_history;
     bool next_move = true;  // It is false when any piece is in air and true otherwise

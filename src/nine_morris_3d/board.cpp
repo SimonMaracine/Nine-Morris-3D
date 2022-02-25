@@ -450,11 +450,11 @@ void Board::undo() {
     turns_without_mills = state.turns_without_mills;
     repetition_history = state.repetition_history;
 
-    paint.position = state.paint.position;
-    paint.scale = state.paint.scale;
-    paint.index_count = state.paint.index_count;
-    paint.specular_color = state.paint.specular_color;
-    paint.shininess = state.paint.shininess;
+    // paint.position = state.paint.position;
+    // paint.scale = state.paint.scale;
+    // paint.index_count = state.paint.index_count;
+    // paint.specular_color = state.paint.specular_color;
+    // paint.shininess = state.paint.shininess;
 
     state_history = state.state_history;
     next_move = state.next_move;
