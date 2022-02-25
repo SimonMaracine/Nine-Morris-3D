@@ -62,7 +62,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/nine_morris_3d/timer.cpp"
     "src/nine_morris_3d/assets.cpp"
     "src/other/logging.cpp"
-    "src/other/model.cpp"
+    "src/other/mesh.cpp"
     "src/other/texture_data.cpp"
     "src/other/user_data.cpp"
     "dependencies/glad/src/glad.c"

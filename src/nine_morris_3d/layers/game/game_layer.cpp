@@ -38,7 +38,7 @@
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/assets.h"
-#include "other/model.h"
+#include "other/mesh.h"
 #include "other/loader.h"
 #include "other/logging.h"
 #include "other/texture_data.h"
@@ -64,10 +64,7 @@ void GameLayer::on_attach() {
     setup_board();
 
     setup_pieces();
-
-    // for (unsigned int i = 0; i < 24; i++) {
-    //     build_node(i, NODE_POSITIONS[i]);
-    // }
+    setup_nodes();
 
     // build_board_paint();
     set_camera();
@@ -326,6 +323,15 @@ bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
         app->camera.go_towards_position(default_camera_position);
     }
 
+    static bool black = true;
+    black = !black;
+
+    if (black) {
+        app->data.node_material_instance->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    } else {
+        app->data.node_material_instance->set_vec4("u_color", glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+    }
+
     return false;
 }
 
@@ -346,10 +352,10 @@ std::shared_ptr<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size,
     return buffer;
 }
 
-std::shared_ptr<VertexArray> GameLayer::create_entity_vertex_array(std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+std::shared_ptr<VertexArray> GameLayer::create_entity_vertex_array(std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
         hoverable::Id id) {
     std::shared_ptr<Buffer> vertices = Buffer::create(mesh->vertices.data(),
-            mesh->vertices.size() * sizeof(model::Vertex));
+            mesh->vertices.size() * sizeof(mesh::Vertex));
 
     std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
 
@@ -395,34 +401,32 @@ void GameLayer::setup_board() {
     // }
 
     if (!app->data.loaded_board) {
+        const std::vector<std::string> uniforms = {
+            "u_projection_view_matrix",  // TODO maybe remove this
+            "u_model_matrix",
+            "u_light_space_matrix",
+            "u_view_position",
+            "u_shadow_map",
+            "u_material.diffuse",
+            "u_material.specular",
+            "u_material.shininess",
+            "u_light.position",
+            "u_light.ambient",
+            "u_light.diffuse",
+            "u_light.specular"
+        };
+        app->data.board_shader = Shader::create(
+            assets::path(assets::BOARD_VERTEX_SHADER),
+            assets::path(assets::BOARD_FRAGMENT_SHADER),
+            uniforms
+            // block_name, 1,  // TODO and use this again
+            // storage->uniform_buffer
+        );
+
         app->data.board_id = hoverable::generate_id();
 
         app->data.board_vertex_array = create_entity_vertex_array(app->assets_data->board_mesh,
                 app->data.board_id);
-
-        {
-            const std::vector<std::string> uniforms = {
-                "u_projection_view_matrix",  // TODO maybe remove this
-                "u_model_matrix",
-                "u_light_space_matrix",
-                "u_view_position",
-                "u_shadow_map",
-                "u_material.diffuse",
-                "u_material.specular",
-                "u_material.shininess",
-                "u_light.position",
-                "u_light.ambient",
-                "u_light.diffuse",
-                "u_light.specular"
-            };
-            app->data.board_shader = Shader::create(
-                assets::path(assets::BOARD_VERTEX_SHADER),
-                assets::path(assets::BOARD_FRAGMENT_SHADER),
-                uniforms
-                // block_name, 1,  // TODO and use this again
-                // storage->uniform_buffer
-            );
-        }
 
         if (app->options.texture_quality == options::NORMAL) {
             app->data.board_diffuse_texture = Texture::create(
@@ -593,7 +597,7 @@ void GameLayer::setup_pieces() {
     app->data.loaded_pieces = true;
 }
 
-void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
         std::shared_ptr<Texture> texture, const glm::vec3& position) {
     if (!app->data.loaded_pieces) {
         hoverable::Id id = hoverable::generate_id();
@@ -627,41 +631,73 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
     DEB_DEBUG("Built piece {}", index);
 }
 
-void GameLayer::build_node(unsigned int index, const glm::vec3& position) {
-    // if (!app->storage->node_vertex_arrays[index]) {
-    //     hoverable::Id id = hoverable::generate_id();
-    //     app->storage->nodes_id[index] = id;
+void GameLayer::setup_nodes() {
+    if (!app->data.loaded_nodes) {
+        const std::vector<std::string> uniforms = {
+            "u_projection_view_matrix",
+            "u_model_matrix",
+            "u_color"
+        };
+        app->data.node_shader = Shader::create(
+            assets::path(assets::NODE_VERTEX_SHADER),
+            assets::path(assets::NODE_FRAGMENT_SHADER),
+            uniforms
+            // block_name, 1,  // TODO use uniform buffers
+            // storage->uniform_buffer
+        );
 
-    //     std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->node_mesh->vertices.data(),
-    //             app->assets_data->node_mesh->vertices.size() * sizeof(model::VertexP));
+        app->data.basic_material = std::make_shared<Material>(app->data.node_shader);
+        app->data.basic_material->add_variable(Material::UniformType::Vec4, "u_color");
 
-    //     std::shared_ptr<Buffer> ids = create_ids_buffer(app->assets_data->node_mesh->vertices.size(), id);
+        app->data.node_material_instance = MaterialInstance::make(app->data.basic_material);
+        app->data.node_material_instance->set_vec4("u_color", glm::vec4(0.0, 0.0, 0.0f, 1.0f));
+    }
 
-    //     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+    for (unsigned int i = 0; i < 24; i++) {
+        setup_node(i, NODE_POSITIONS[i]);
+    }
 
-    //     BufferLayout layout;
-    //     layout.add(0, BufferLayout::Type::Float, 3);
-    //     BufferLayout layout2;
-    //     layout2.add(1, BufferLayout::Type::Int, 1);
+    app->data.loaded_nodes = true;
+}
 
-    //     std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->node_mesh->indices.data(),
-    //             app->assets_data->node_mesh->indices.size() * sizeof(unsigned int));
+void GameLayer::setup_node(unsigned int index, const glm::vec3& position) {
+    if (!app->data.loaded_nodes) {
+        hoverable::Id id = hoverable::generate_id();
+        app->data.nodes_id[index] = id;
 
-    //     vertex_array->add_buffer(vertices, layout);
-    //     vertex_array->add_buffer(ids, layout2);
-    //     vertex_array->add_index_buffer(indices);
+        std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->node_mesh->vertices.data(),
+                app->assets_data->node_mesh->vertices.size() * sizeof(mesh::VertexP));
 
-    //     VertexArray::unbind();
+        std::shared_ptr<Buffer> ids = create_ids_buffer(app->assets_data->node_mesh->vertices.size(), id);
 
-    //     app->storage->node_vertex_arrays[index] = vertex_array;
-    // }
+        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
 
-    // board.nodes[index] = Node(app->storage->nodes_id[index], index);
+        BufferLayout layout;
+        layout.add(0, BufferLayout::Type::Float, 3);
+        BufferLayout layout2;
+        layout2.add(1, BufferLayout::Type::Int, 1);
 
-    // board.nodes[index].position = position;
-    // board.nodes[index].scale = 20.0f;
-    // board.nodes[index].vertex_array = app->storage->node_vertex_arrays[index];
-    // board.nodes[index].index_count = app->assets_data->node_mesh->indices.size();
+        std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->node_mesh->indices.data(),
+                app->assets_data->node_mesh->indices.size() * sizeof(unsigned int));
+
+        vertex_array->add_buffer(vertices, layout);
+        vertex_array->add_buffer(ids, layout2);
+        vertex_array->add_index_buffer(indices);
+
+        VertexArray::unbind();
+
+        app->data.node_vertex_arrays[index] = vertex_array;
+    }
+
+    board.nodes[index] = Node(app->data.nodes_id[index], index);
+
+    board.nodes[index].model.vertex_array = app->data.node_vertex_arrays[index];
+    board.nodes[index].model.index_count = app->assets_data->node_mesh->indices.size();
+    board.nodes[index].model.position = position;
+    board.nodes[index].model.scale = 20.0f;
+    board.nodes[index].model.material = app->data.node_material_instance;
+
+    app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting);
 
     DEB_DEBUG("Built node {}", index);
 }
@@ -1189,9 +1225,9 @@ void GameLayer::load_game() {
         Node& node = board.nodes[i];
 
         node.id = state.board.nodes[i].id;
-        node.position = state.board.nodes[i].position;
-        node.scale = state.board.nodes[i].scale;
-        node.index_count = state.board.nodes[i].index_count;
+        node.model.position = state.board.nodes[i].model.position;
+        node.model.scale = state.board.nodes[i].model.scale;
+        // node.model.index_count = state.board.nodes[i].model.index_count;
         node.piece_id = state.board.nodes[i].piece_id;
         node.piece = nullptr;  // It must be NULL, if the ids don't match
         for (unsigned int i = 0; i < 18; i++) {  // Assign correct addresses

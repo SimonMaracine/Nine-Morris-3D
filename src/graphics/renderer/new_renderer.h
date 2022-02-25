@@ -54,8 +54,9 @@ public:
     };
 
     enum {
-        WithOutline = 0b0001,
-        WithShadows = 0b0010
+        NoLighting = 0b0001,
+        WithOutline = 0b0010,
+        WithShadow = 0b0100
     };
 
     Renderer(Application* app);
@@ -116,6 +117,7 @@ private:
 
     // Ordered maps of pointers to models
     std::map<unsigned int, Model*> models;
+    std::map<unsigned int, Model*> models_no_lighting;
     std::map<unsigned int, Model*> models_outline;
     std::map<unsigned int, Model*> models_shadow;
 

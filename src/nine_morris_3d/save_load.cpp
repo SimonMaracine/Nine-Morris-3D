@@ -72,7 +72,7 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Node& node) {
-    archive(node.id, node.position, node.scale, node.index_count, node.piece_id, node.index);
+    archive(node.id, /*node.position, node.scale, node.index_count,*/ node.piece_id, node.index);
 }
 
 template<typename Archive>

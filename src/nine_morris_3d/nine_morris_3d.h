@@ -10,7 +10,7 @@
 #include "graphics/renderer/texture.h"
 #include "graphics/renderer/material.h"
 #include "nine_morris_3d/options.h"
-#include "other/model.h"
+#include "other/mesh.h"
 
 constexpr int VERSION_MAJOR = 0;
 constexpr int VERSION_MINOR = 1;
@@ -46,6 +46,14 @@ public:
         std::shared_ptr<Material> tinted_wood_material;
         std::shared_ptr<MaterialInstance> white_piece_material_instance;
         std::shared_ptr<MaterialInstance> black_piece_material_instance;
+
+        bool loaded_nodes = false;
+        hoverable::Id nodes_id[24];
+        std::shared_ptr<VertexArray> node_vertex_arrays[24];
+        std::shared_ptr<Shader> node_shader;
+
+        std::shared_ptr<Material> basic_material;
+        std::shared_ptr<MaterialInstance> node_material_instance;
     } data;
 };
 

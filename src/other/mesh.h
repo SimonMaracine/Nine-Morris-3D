@@ -6,7 +6,7 @@
 
 #include <glm/glm.hpp>
 
-namespace model {
+namespace mesh {
     struct VertexP {
         glm::vec3 position = glm::vec3(0.0f);
     };
@@ -26,6 +26,6 @@ namespace model {
         std::vector<unsigned int> indices;
     };
 
-    std::shared_ptr<Mesh<Vertex>> load_model(const std::string& file_path);
-    std::shared_ptr<Mesh<VertexP>> load_model_position(const std::string& file_path);
+    std::shared_ptr<Mesh<Vertex>> load_model(const std::string& file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<VertexP>> load_model_position(const std::string& file_path, bool flip_winding_order = false);
 }

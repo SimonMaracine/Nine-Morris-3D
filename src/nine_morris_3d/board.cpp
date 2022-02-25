@@ -46,7 +46,7 @@ bool Board::place_piece(hoverable::Id hovered_id) {
             remember_state();
             WAIT_FOR_NEXT_MOVE();
 
-            const glm::vec3& position = node.position;
+            const glm::vec3& position = node.model.position;
 
             if (turn == Player::White) {
                 node.piece = place_new_piece(Piece::White, position.x, position.z, &node);
@@ -285,14 +285,14 @@ bool Board::put_piece(hoverable::Id hovered_id) {
 
                 if (selected_piece->type == Piece::White && can_jump[static_cast<int>(Piece::White)] ||
                         selected_piece->type == Piece::Black && can_jump[static_cast<int>(Piece::Black)]) {
-                    const glm::vec3 target = glm::vec3(node.position.x, PIECE_Y_POSITION, node.position.z);
+                    const glm::vec3 target = glm::vec3(node.model.position.x, PIECE_Y_POSITION, node.model.position.z);
                     const glm::vec3 target0 = selected_piece->model.position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
                     const glm::vec3 target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
                     const glm::vec3 velocity = glm::normalize(target0 - selected_piece->model.position) * PIECE_BASE_VELOCITY;
 
                     prepare_piece_for_threestep_move(selected_piece, target, velocity, target0, target1);
                 } else {
-                    const glm::vec3 target = glm::vec3(node.position.x, PIECE_Y_POSITION, node.position.z);
+                    const glm::vec3 target = glm::vec3(node.model.position.x, PIECE_Y_POSITION, node.model.position.z);
 
                     prepare_piece_for_linear_move(
                         selected_piece,
@@ -387,9 +387,9 @@ void Board::undo() {
         Node& node = nodes[i];
 
         node.id = state.nodes[i].id;
-        node.position = state.nodes[i].position;
-        node.scale = state.nodes[i].scale;
-        node.index_count = state.nodes[i].index_count;
+        node.model.position = state.nodes[i].model.position;
+        node.model.scale = state.nodes[i].model.scale;
+        // node.index_count = state.nodes[i].index_count;
         node.piece_id = state.nodes[i].piece_id;
         node.piece = nullptr;  // It must be NULL, if the ids don't match
         for (Piece& piece : pieces) {

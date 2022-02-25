@@ -9,7 +9,7 @@
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/framebuffer_reader.h"
-#include "other/model.h"
+#include "other/mesh.h"
 #include "other/loader.h"
 
 class ImGuiLayer;
@@ -37,15 +37,16 @@ public:
     bool on_window_resized(events::WindowResizedEvent& event);
 
     std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
-    std::shared_ptr<VertexArray> create_entity_vertex_array(std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+    std::shared_ptr<VertexArray> create_entity_vertex_array(std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
             hoverable::Id id);
 
     void setup_board();
     void build_board_paint();
     void setup_pieces();
-    void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+    void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
             std::shared_ptr<Texture> texture, const glm::vec3& position);
-    void build_node(unsigned int index, const glm::vec3& position);
+    void setup_nodes();
+    void setup_node(unsigned int index, const glm::vec3& position);
     void build_turn_indicator();
     void set_skybox();
     void set_light();

@@ -302,6 +302,24 @@ void Renderer::render() {
         glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
     }
 
+    for (const auto& [id, model] : models_no_lighting) {
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, model->position);
+        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+
+        model->material->get_shader()->bind();
+        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
+        model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+
+        model->vertex_array->bind();
+        model->material->bind();
+
+        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+    }
+
 #ifdef NINE_MORRIS_3D_DEBUG
     draw_origin();
 #endif
@@ -318,18 +336,23 @@ void Renderer::render() {
 unsigned int Renderer::add_model(Model& model, int options) {
     static unsigned int id = 0;
 
-    const bool with_outline = options & 1 << 0;
-    const bool with_shadows = options & 1 << 1;
+    const bool no_lighting = options & (1 << 0);
+    const bool with_outline = options & (1 << 1);
+    const bool with_shadow = options & (1 << 2);
 
     model.id = ++id;
 
-    models[id] = &model;
+    if (!no_lighting) {
+        models[id] = &model;
+    } else {
+        models_no_lighting[id] = &model;
+    }
 
     if (with_outline) {
         models_outline[id] = &model;
     }
 
-    if (with_shadows) {
+    if (with_shadow) {
         models_shadow[id] = &model;
     }
 
@@ -338,6 +361,7 @@ unsigned int Renderer::add_model(Model& model, int options) {
 
 void Renderer::remove_model(unsigned int handle) {
     models.erase(handle);
+    models_no_lighting.erase(handle);
     models_outline.erase(handle);
     models_shadow.erase(handle);
 }
