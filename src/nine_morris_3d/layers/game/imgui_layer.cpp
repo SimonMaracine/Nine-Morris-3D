@@ -32,17 +32,59 @@
 #define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
 
 void ImGuiLayer::on_attach() {
-    ImGui::CreateContext();
+//     ImGui::CreateContext();
+
+//     ImGuiIO& io = ImGui::GetIO();
+//     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+//     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+//     io.ConfigWindowsMoveFromTitleBarOnly = true;
+//     io.ConfigWindowsResizeFromEdges = false;
+//     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+// #ifdef NINE_MORRIS_3D_RELEASE
+//     io.IniFilename = nullptr;
+// #endif
+
+//     ImFontGlyphRangesBuilder builder;
+//     builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+//     builder.AddText(u8"ă");
+
+//     ImVector<ImWchar> ranges;
+//     builder.BuildRanges(&ranges);
+
+//     io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 20.0f);
+//     info_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 16.0f);
+//     windows_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 24.0f,
+//             nullptr, ranges.Data);
+//     io.Fonts->Build();
+
+//     ImVec4* colors = ImGui::GetStyle().Colors;
+//     colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
+//     colors[ImGuiCol_TitleBgActive] = DEFAULT_BROWN;
+//     colors[ImGuiCol_FrameBg] = DEFAULT_BROWN;
+//     colors[ImGuiCol_FrameBgHovered] = DARK_BROWN;
+//     colors[ImGuiCol_FrameBgActive] = LIGHT_BROWN;
+//     colors[ImGuiCol_Button] = DARK_BROWN;
+//     colors[ImGuiCol_ButtonHovered] = DEFAULT_BROWN;
+//     colors[ImGuiCol_ButtonActive] = LIGHT_BROWN;
+//     colors[ImGuiCol_Header] = DARK_BROWN;
+//     colors[ImGuiCol_HeaderHovered] = DEFAULT_BROWN;
+//     colors[ImGuiCol_HeaderActive] = LIGHT_BROWN;
+//     colors[ImGuiCol_CheckMark] = BEIGE;
+//     colors[ImGuiCol_SliderGrab] = LIGHT_GRAY_BLUE;
+//     colors[ImGuiCol_SliderGrabActive] = LIGHT_GRAY_BLUE;
+
+//     ImGuiStyle& style = ImGui::GetStyle();
+//     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+//     style.FrameRounding = 8;
+//     style.WindowRounding = 8;
+//     style.ChildRounding = 8;
+//     style.PopupRounding = 8;
+//     style.GrabRounding = 8;
+
+//     ImGui_ImplOpenGL3_Init("#version 430 core");
+//     ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
 
     ImGuiIO& io = ImGui::GetIO();
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-    io.ConfigWindowsMoveFromTitleBarOnly = true;
-    io.ConfigWindowsResizeFromEdges = false;
-    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-#ifdef NINE_MORRIS_3D_RELEASE
-    io.IniFilename = nullptr;
-#endif
 
     ImFontGlyphRangesBuilder builder;
     builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
@@ -81,9 +123,6 @@ void ImGuiLayer::on_attach() {
     style.PopupRounding = 8;
     style.GrabRounding = 8;
 
-    ImGui_ImplOpenGL3_Init("#version 430 core");
-    ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
-
     save_load::GameState state;
     try {
         save_load::load_game_from_file(state);
@@ -99,9 +138,9 @@ void ImGuiLayer::on_attach() {
 }
 
 void ImGuiLayer::on_detach() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    // ImGui_ImplOpenGL3_Shutdown();
+    // ImGui_ImplGlfw_Shutdown();
+    // ImGui::DestroyContext();
 
     // These need to be resetted
     hovering_gui = false;
@@ -280,9 +319,9 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::BeginMenu("Camera Sensitivity")) {
                 ImGui::PushItemWidth(100.0f);
                 if (ImGui::SliderFloat("##", &app->options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
-                    // game_layer->camera.sensitivity = app->options.sensitivity;
+                    app->camera.sensitivity = app->options.sensitivity;
 
-                    // DEB_INFO("Changed camera sensitivity to {}", game_layer->camera.sensitivity);
+                    DEB_INFO("Changed camera sensitivity to {}", app->camera.sensitivity);
                 }
                 ImGui::PopItemWidth();
 
@@ -337,6 +376,8 @@ void ImGuiLayer::on_update(float dt) {
 #ifdef NINE_MORRIS_3D_DEBUG
     draw_debug(dt);
 #endif
+
+    ImGui::EndFrame();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -535,7 +576,7 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Turn: %s", game_layer->board.turn == Board::Player::White ? "white" : "black");
         ImGui::Text("Should take piece: %s", game_layer->board.should_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", game_layer->board.turns_without_mills);
-        // ImGui::Text("History size: %lu", game_layer->board.state_history->size());
+        ImGui::Text("History size: %lu", game_layer->board.state_history->size());
         ImGui::Text("Hovered ID: %d", game_layer->hovered_id);
         ImGui::Text("Hovered node: %p", game_layer->board.hovered_node);
         ImGui::Text("Hovered piece: %p", game_layer->board.hovered_piece);

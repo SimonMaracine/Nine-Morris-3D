@@ -63,8 +63,18 @@ void Application::run() {
         }
     }
 
+    for (Scene* scene : scenes) {
+        for (Layer* layer : scene->overlays_in_order) {
+            layer->on_bind_layers();
+        }
+    }
+
     for (Layer* layer : current_scene->layers_in_order) {
         push_layer(layer);
+    }
+
+    for (Layer* layer : current_scene->overlays_in_order) {
+        push_overlay(layer);
     }
 
     DEB_INFO("Initialized game");
@@ -82,10 +92,23 @@ void Application::run() {
         }
 
         renderer->render();
+
+        for (Layer* layer : active_overlay_stack) {
+            for (unsigned int i = 0; i < fixed_updates; i++) {
+                layer->on_fixed_update();
+            }
+            layer->on_update(dt);
+            layer->on_draw();  // TODO maybe get rid of on_draw and keep only on_update
+        }
+
         window->update();
 
         if (changed_scene) {
             active_layer_stack.clear();
+
+            for (auto iter = overlay_stack.rbegin(); iter != overlay_stack.rend(); iter++) {
+                pop_overlay(*iter);
+            }
 
             for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
                 pop_layer(*iter);
@@ -97,11 +120,19 @@ void Application::run() {
                 push_layer(layer);
             }
 
+            for (Layer* layer : current_scene->overlays_in_order) {
+                push_overlay(layer);
+            }
+
             changed_scene = false;
         }
     }
 
     DEB_INFO("Closing game");
+
+    for (auto iter = overlay_stack.rbegin(); iter != overlay_stack.rend(); iter++) {
+        pop_overlay(*iter);
+    }
 
     for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
         pop_layer(*iter);
@@ -231,6 +262,20 @@ void Application::pop_layer(Layer* layer) {
     layer_stack.erase(iter);
     layer->active = true;
 }
+
+void Application::push_overlay(Layer* layer) {
+    overlay_stack.push_back(layer);
+    active_overlay_stack.push_back(layer);
+    layer->on_attach();
+}
+
+void Application::pop_overlay(Layer* layer) {
+    layer->on_detach();
+    auto iter = std::find(overlay_stack.begin(), overlay_stack.end(), layer);
+    overlay_stack.erase(iter);
+    layer->active = true;
+}
+
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {
     running = false;

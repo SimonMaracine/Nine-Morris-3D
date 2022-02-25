@@ -32,6 +32,12 @@ protected:
                     return static_cast<T*>(layer);
                 }
             }
+
+            for (Layer* layer : scene->overlays_in_order) {
+                if (layer->id == id) {
+                    return static_cast<T*>(layer);
+                }
+            }
         }
 
         assert(false);

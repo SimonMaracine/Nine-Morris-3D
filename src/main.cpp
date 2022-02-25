@@ -10,8 +10,8 @@ int main() {
 
     Scene* game_scene = new Scene("game");
     game_scene->add_layer(new GameLayer("game", application));
-    game_scene->add_layer(new GuiLayer("gui", application));
-    game_scene->add_layer(new ImGuiLayer("imgui", application));
+    game_scene->add_overlay(new GuiLayer("gui", application));
+    game_scene->add_overlay(new ImGuiLayer("imgui", application));
     application->add_scene(game_scene);
 
     Scene* loading_scene = new Scene("loading");

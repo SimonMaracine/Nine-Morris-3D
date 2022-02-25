@@ -2,6 +2,10 @@
 #include <memory>
 #include <string>
 
+#include <imgui.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_glfw.h>
+
 #include "application/icon_image.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
@@ -69,8 +73,27 @@ NineMorris3D::NineMorris3D()
         renderer->set_scene_framebuffer(Framebuffer::create(specification));
     }
 
+    // Setup ImGui
+    ImGui::CreateContext();
 
-    
+    ImGuiIO& io = ImGui::GetIO();
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
+    io.ConfigWindowsResizeFromEdges = false;
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+#ifdef NINE_MORRIS_3D_RELEASE
+    io.IniFilename = nullptr;
+#endif
+
+    ImGui_ImplOpenGL3_Init("#version 430 core");
+    ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
+}
+
+NineMorris3D::~NineMorris3D() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void NineMorris3D::set_app_pointer(NineMorris3D* instance) {

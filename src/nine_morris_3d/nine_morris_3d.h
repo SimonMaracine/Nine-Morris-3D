@@ -19,6 +19,7 @@ constexpr int VERSION_PATCH = 0;
 class NineMorris3D : public Application {
 public:
     NineMorris3D();
+    virtual ~NineMorris3D();
 
     static void set_app_pointer(NineMorris3D* instance);
 

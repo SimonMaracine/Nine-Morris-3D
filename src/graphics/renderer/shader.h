@@ -36,7 +36,7 @@ public:
 
     void recompile();
 
-    std::string& get_name() { return name; }
+    const std::string& get_name() { return name; }
 private:
     GLint get_uniform_location(const std::string& name);
 
