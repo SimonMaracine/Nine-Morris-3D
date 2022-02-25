@@ -54,9 +54,9 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Piece& piece) {
-    archive(piece.id, piece.position, piece.rotation, piece.scale, piece.movement, piece.should_move,
-            piece.index_count, piece.specular_color, piece.shininess, piece.select_color,
-            piece.hover_color, piece.type, piece.in_use, piece.node_id, piece.show_outline,
+    archive(piece.id, /*piece.position, piece.rotation, piece.scale,*/ piece.movement, piece.should_move,
+            /*piece.index_count, piece.specular_color, piece.shininess, piece.select_color,
+            piece.hover_color,*/ piece.type, piece.in_use, piece.node_id, piece.show_outline,
             piece.to_take, piece.pending_remove, piece.selected, piece.active);
 }
 

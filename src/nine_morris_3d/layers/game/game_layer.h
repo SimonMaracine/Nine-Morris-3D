@@ -40,9 +40,10 @@ public:
     std::shared_ptr<VertexArray> create_entity_vertex_array(std::shared_ptr<model::Mesh<model::Vertex>> mesh,
             hoverable::Id id);
 
-    void build_board();
+    void setup_board();
     void build_board_paint();
-    void build_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+    void setup_pieces();
+    void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
             std::shared_ptr<Texture> texture, const glm::vec3& position);
     void build_node(unsigned int index, const glm::vec3& position);
     void build_turn_indicator();
@@ -53,9 +54,9 @@ public:
     void render_skybox();
     void setup_light();
     void setup_camera();
-    void setup_board();
+    // void setup_board();
     void setup_board_paint();
-    void setup_pieces();
+    // void setup_pieces();
     void render_pieces();
     void render_nodes();
     void render_to_depth();

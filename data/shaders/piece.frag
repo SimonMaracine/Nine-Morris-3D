@@ -10,13 +10,14 @@ layout (location = 0) out vec4 fragment_color;
 layout (location = 1) out int entity_id;
 
 uniform vec3 u_view_position;
-uniform vec3 u_tint_color;
+// uniform vec3 u_tint_color;
 uniform sampler2D u_shadow_map;
 
 struct Material {
     sampler2D diffuse;
     vec3 specular;
     float shininess;
+    vec3 tint;
 };
 
 uniform Material u_material;
@@ -90,7 +91,7 @@ void main() {
                                        v_fragment_position_light_space);
 
     // Add everything up
-    vec4 result_fragment = vec4(total_light * u_tint_color, 1.0);
+    vec4 result_fragment = vec4(total_light * u_material.tint, 1.0);
 
     fragment_color = result_fragment;
     entity_id = v_entity_id;

@@ -250,6 +250,8 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
         }
     }
 
+    camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
+
     renderer->storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
             static_cast<float>(event.height));
 

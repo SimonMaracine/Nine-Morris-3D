@@ -53,12 +53,17 @@ public:
         Stencil = GL_STENCIL_BUFFER_BIT
     };
 
+    enum {
+        WithOutline = 0b0001,
+        WithShadows = 0b0010
+    };
+
     Renderer(Application* app);
     ~Renderer();
 
     void render();
 
-    unsigned int add_model(Model& model, bool with_tint_color, bool with_outline, bool with_shadows);
+    unsigned int add_model(Model& model, int options);
     void remove_model(unsigned int handle);
 
     // unsigned int add_instancing_group();
@@ -111,7 +116,6 @@ private:
 
     // Ordered maps of pointers to models
     std::map<unsigned int, Model*> models;
-    std::map<unsigned int, Model*> models_tint_color;
     std::map<unsigned int, Model*> models_outline;
     std::map<unsigned int, Model*> models_shadow;
 

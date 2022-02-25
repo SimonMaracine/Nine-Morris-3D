@@ -61,28 +61,9 @@ void GameLayer::on_attach() {
     srand(time(nullptr));
 
     board_state_history = std::make_shared<std::vector<Board>>();
-    build_board();
+    setup_board();
 
-    // if (!app->storage->white_piece_diff_texture) {
-    //     if (app->options.texture_quality == options::NORMAL) {
-    //         app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture, true, -1.5f);
-    //         app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture, true, -1.5f);
-    //     } else if (app->options.texture_quality == options::LOW) {
-    //         app->storage->white_piece_diff_texture = Texture::create(app->assets_data->white_piece_diff_texture_small, true, -1.5f);
-    //         app->storage->black_piece_diff_texture = Texture::create(app->assets_data->black_piece_diff_texture_small, true, -1.5f);
-    //     } else {
-    //         assert(false);
-    //     }
-    // }
-
-    // for (unsigned int i = 0; i < 9; i++) {
-    //     build_piece(i, Piece::Type::White, app->assets_data->white_piece_mesh,
-    //             app->storage->white_piece_diff_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
-    // }
-    // for (unsigned int i = 9; i < 18; i++) {
-    //     build_piece(i, Piece::Type::Black, app->assets_data->black_piece_mesh,
-    //             app->storage->black_piece_diff_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
-    // }
+    setup_pieces();
 
     // for (unsigned int i = 0; i < 24; i++) {
     //     build_node(i, NODE_POSITIONS[i]);
@@ -393,7 +374,7 @@ std::shared_ptr<VertexArray> GameLayer::create_entity_vertex_array(std::shared_p
     return vertex_array;
 }
 
-void GameLayer::build_board() {
+void GameLayer::setup_board() {
     // if (!app->storage->board_vertex_array) {
         // id = hoverable::generate_id();
     //     app->storage->board_id = id;
@@ -479,7 +460,7 @@ void GameLayer::build_board() {
     // model.shininess = 4.0f;
     board.model.material = app->data.board_material_instance;
 
-    app->renderer->add_model(board.model, false, false, false);
+    app->renderer->add_model(board.model, 0);
 
     // board.scale = 20.0f;
     // board.vertex_array = app->storage->board_vertex_array;
@@ -537,29 +518,111 @@ void GameLayer::build_board_paint() {
     DEB_DEBUG("Built board paint");
 }
 
-void GameLayer::build_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
+void GameLayer::setup_pieces() {
+    if (!app->data.loaded_pieces) {
+        const std::vector<std::string> uniforms = {
+            "u_projection_view_matrix",
+            "u_model_matrix",
+            "u_light_space_matrix",
+            "u_view_position",
+            // "u_tint_color",
+            "u_shadow_map",
+            "u_material.diffuse",
+            "u_material.specular",
+            "u_material.shininess",
+            "u_material.tint",
+            "u_light.position",
+            "u_light.ambient",
+            "u_light.diffuse",
+            "u_light.specular"
+        };
+        app->data.piece_shader = Shader::create(
+            assets::path(assets::PIECE_VERTEX_SHADER),
+            assets::path(assets::PIECE_FRAGMENT_SHADER),
+            uniforms
+            // block_name, 1,  // TODO use uniform buffers
+            // storage->uniform_buffer
+        );
+
+        if (app->options.texture_quality == options::NORMAL) {
+            app->data.white_piece_diffuse_texture = Texture::create(
+                app->assets_data->white_piece_diff_texture, true, -1.5f
+            );
+            app->data.black_piece_diffuse_texture = Texture::create(
+                app->assets_data->black_piece_diff_texture, true, -1.5f
+            );
+        } else if (app->options.texture_quality == options::LOW) {
+            app->data.white_piece_diffuse_texture = Texture::create(
+                app->assets_data->white_piece_diff_texture_small, true, -1.5f
+            );
+            app->data.black_piece_diffuse_texture = Texture::create(
+                app->assets_data->black_piece_diff_texture_small, true, -1.5f
+            );
+        } else {
+            assert(false);
+        }
+
+        app->data.tinted_wood_material = std::make_shared<Material>(app->data.piece_shader);
+        app->data.tinted_wood_material->add_texture("u_material.diffuse");
+        app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.specular");
+        app->data.tinted_wood_material->add_variable(Material::UniformType::Float, "u_material.shininess");
+        app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
+
+        app->data.white_piece_material_instance = MaterialInstance::make(app->data.tinted_wood_material);
+        app->data.white_piece_material_instance->set_texture("u_material.diffuse", app->data.white_piece_diffuse_texture, 0);
+        app->data.white_piece_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
+        app->data.white_piece_material_instance->set_float("u_material.shininess", 4.0f);
+        app->data.white_piece_material_instance->set_vec3("u_material.tint", glm::vec3(1.0f));  // TODO use 1.0f, 0.2f, 0.2f
+
+        app->data.black_piece_material_instance = MaterialInstance::make(app->data.tinted_wood_material);
+        app->data.black_piece_material_instance->set_texture("u_material.diffuse", app->data.black_piece_diffuse_texture, 0);
+        app->data.black_piece_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
+        app->data.black_piece_material_instance->set_float("u_material.shininess", 4.0f);
+        app->data.black_piece_material_instance->set_vec3("u_material.tint", glm::vec3(1.0f));
+    }
+
+    for (unsigned int i = 0; i < 9; i++) {
+        setup_piece(i, Piece::Type::White, app->assets_data->white_piece_mesh,
+                app->data.white_piece_diffuse_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
+    }
+    for (unsigned int i = 9; i < 18; i++) {
+        setup_piece(i, Piece::Type::Black, app->assets_data->black_piece_mesh,
+                app->data.black_piece_diffuse_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
+    }
+
+    app->data.loaded_pieces = true;
+}
+
+void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<model::Mesh<model::Vertex>> mesh,
         std::shared_ptr<Texture> texture, const glm::vec3& position) {
-    // if (!app->storage->piece_vertex_arrays[index]) {
-    //     hoverable::Id id = hoverable::generate_id();
-    //     app->storage->pieces_id[index] = id;
+    if (!app->data.loaded_pieces) {
+        hoverable::Id id = hoverable::generate_id();
+        app->data.pieces_id[index] = id;
 
-    //     app->storage->piece_vertex_arrays[index] = create_entity_vertex_array(mesh, id);
-    // }
+        app->data.piece_vertex_arrays[index] = create_entity_vertex_array(mesh, id);
+    }
 
-    // board.pieces[index] = Piece(app->storage->pieces_id[index], type);
+    board.pieces[index] = Piece(app->data.pieces_id[index], type);
 
-    // int random_rotation = rand() % 360;
+    int random_rotation = rand() % 360;
 
-    // board.pieces[index].position = position;
-    // board.pieces[index].rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(random_rotation)), 0.0f);
-    // board.pieces[index].scale = 20.0f;
-    // board.pieces[index].vertex_array = app->storage->piece_vertex_arrays[index];
-    // board.pieces[index].index_count = mesh->indices.size();
-    // board.pieces[index].diffuse_texture = texture;
+    board.pieces[index].model.vertex_array = app->data.piece_vertex_arrays[index];
+    board.pieces[index].model.index_count = mesh->indices.size();
+    board.pieces[index].model.position = position;
+    board.pieces[index].model.rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(random_rotation)), 0.0f);
+    board.pieces[index].model.scale = 20.0f;
+    // board.pieces[index].model.diffuse_texture = texture;
     // board.pieces[index].specular_color = glm::vec3(0.2f);
     // board.pieces[index].shininess = 4.0f;
     // board.pieces[index].select_color = glm::vec3(1.0f, 0.0f, 0.0f);
     // board.pieces[index].hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
+    if (type == Piece::Type::White) {
+        board.pieces[index].model.material = app->data.white_piece_material_instance;
+    } else {
+        board.pieces[index].model.material = app->data.black_piece_material_instance;
+    }
+
+    app->renderer->add_model(board.pieces[index].model, 0);
 
     DEB_DEBUG("Built piece {}", index);
 }
@@ -741,12 +804,12 @@ void GameLayer::setup_camera() {
     // app->storage->piece_shader->set_uniform_vec3("u_view_position", app->camera.get_position());
 }
 
-void GameLayer::setup_board() {
+// void GameLayer::setup_board() {
     // app->data.board_shader->bind();
     // app->data.board_shader->set_uniform_int("u_material.diffuse", 0);
     // app->data.board_shader->set_uniform_vec3("u_material.specular", board.model.specular_color);
     // app->data.board_shader->set_uniform_float("u_material.shininess", board.model.shininess);
-}
+// }
 
 void GameLayer::setup_board_paint() {
     // app->storage->board_paint_shader->bind();
@@ -755,20 +818,20 @@ void GameLayer::setup_board_paint() {
     // app->storage->board_paint_shader->set_uniform_float("u_material.shininess", board.paint.shininess);
 }
 
-void GameLayer::setup_pieces() {
+// void GameLayer::setup_pieces() {
     // app->storage->piece_shader->bind();
     // app->storage->piece_shader->set_uniform_int("u_material.diffuse", 0);
     // app->storage->piece_shader->set_uniform_vec3("u_material.specular", board.pieces[0].specular_color);  // TODO think about a better way
     // app->storage->piece_shader->set_uniform_float("u_material.shininess", board.pieces[0].shininess);
-}
+// }
 
 void GameLayer::render_pieces() {
     constexpr auto copy = [](const Piece* piece) {
         return piece->active;
     };
     const auto sort = [this](const Piece* lhs, const Piece* rhs) {
-        const float distance1 = glm::length(app->camera.get_position() - lhs->position);
-        const float distance2 = glm::length(app->camera.get_position() - rhs->position);
+        const float distance1 = glm::length(app->camera.get_position() - lhs->model.position);
+        const float distance2 = glm::length(app->camera.get_position() - rhs->model.position);
         return distance1 > distance2;
     };
 
@@ -1143,9 +1206,9 @@ void GameLayer::load_game() {
         Piece& piece = board.pieces[i];
 
         piece.id = state.board.pieces[i].id;
-        piece.position = state.board.pieces[i].position;
-        piece.rotation = state.board.pieces[i].rotation;
-        piece.scale = state.board.pieces[i].scale;
+        piece.model.position = state.board.pieces[i].model.position;
+        piece.model.rotation = state.board.pieces[i].model.rotation;
+        piece.model.scale = state.board.pieces[i].model.scale;
         piece.movement.type = state.board.pieces[i].movement.type;
         piece.movement.velocity = state.board.pieces[i].movement.velocity;
         piece.movement.target = state.board.pieces[i].movement.target;
@@ -1154,11 +1217,11 @@ void GameLayer::load_game() {
         piece.movement.reached_target0 = state.board.pieces[i].movement.reached_target0;
         piece.movement.reached_target1 = state.board.pieces[i].movement.reached_target1;
         piece.should_move = state.board.pieces[i].should_move;
-        piece.index_count = state.board.pieces[i].index_count;
-        piece.specular_color = state.board.pieces[i].specular_color;
-        piece.shininess = state.board.pieces[i].shininess;
-        piece.select_color = state.board.pieces[i].select_color;
-        piece.hover_color = state.board.pieces[i].hover_color;
+        // piece.index_count = state.board.pieces[i].index_count;
+        // piece.specular_color = state.board.pieces[i].specular_color;
+        // piece.shininess = state.board.pieces[i].shininess;
+        // piece.select_color = state.board.pieces[i].select_color;
+        // piece.hover_color = state.board.pieces[i].hover_color;
         piece.type = state.board.pieces[i].type;
         piece.in_use = state.board.pieces[i].in_use;
         piece.node_id = state.board.pieces[i].node_id;

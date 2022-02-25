@@ -12,9 +12,9 @@ out vec3 v_fragment_position;
 out vec4 v_fragment_position_light_space;
 
 uniform mat4 u_model_matrix;
-uniform Matrices {
-    mat4 u_projection_view_matrix;
-};
+// uniform Matrices {
+    uniform mat4 u_projection_view_matrix;
+// };
 
 uniform mat4 u_light_space_matrix;
 

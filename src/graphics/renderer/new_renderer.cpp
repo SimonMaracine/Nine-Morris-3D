@@ -315,16 +315,15 @@ void Renderer::render() {
     draw_screen_quad(storage.intermediate_framebuffer->get_color_attachment(0));
 }
 
-unsigned int Renderer::add_model(Model& model, bool with_tint_color, bool with_outline, bool with_shadows) {
+unsigned int Renderer::add_model(Model& model, int options) {
     static unsigned int id = 0;
+
+    const bool with_outline = options & 1 << 0;
+    const bool with_shadows = options & 1 << 1;
 
     model.id = ++id;
 
-    if (!with_tint_color) {
-        models[id] = &model;
-    } else {
-        models_tint_color[id] = &model;
-    }
+    models[id] = &model;
 
     if (with_outline) {
         models_outline[id] = &model;
@@ -339,7 +338,6 @@ unsigned int Renderer::add_model(Model& model, bool with_tint_color, bool with_o
 
 void Renderer::remove_model(unsigned int handle) {
     models.erase(handle);
-    models_tint_color.erase(handle);
     models_outline.erase(handle);
     models_shadow.erase(handle);
 }
