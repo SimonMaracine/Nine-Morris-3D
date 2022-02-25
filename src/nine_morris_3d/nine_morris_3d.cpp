@@ -69,9 +69,8 @@ NineMorris3D::NineMorris3D()
         renderer->set_scene_framebuffer(Framebuffer::create(specification));
     }
 
+
     
-
-
 }
 
 void NineMorris3D::set_app_pointer(NineMorris3D* instance) {

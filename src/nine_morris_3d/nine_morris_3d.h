@@ -33,7 +33,7 @@ public:
         std::shared_ptr<Shader> board_shader;
         std::shared_ptr<Texture> board_diffuse_texture;
 
-        std::shared_ptr<Material> board_material;
+        std::shared_ptr<Material> wood_material;
         std::shared_ptr<MaterialInstance> board_material_instance;
     } data;
 };

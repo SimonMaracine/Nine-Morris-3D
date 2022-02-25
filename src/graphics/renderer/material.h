@@ -21,7 +21,7 @@ public:
     ~Material();
 
     void add_variable(UniformType type, const std::string& name);
-    void add_texture(const std::string& name, std::shared_ptr<Texture> texture, int unit);
+    void add_texture(const std::string& name);
 private:
     std::shared_ptr<Shader> shader;
 
@@ -52,6 +52,7 @@ public:
     void set_vec2(const std::string& name, const glm::vec2& vector);
     void set_vec3(const std::string& name, const glm::vec3& vector);
     void set_vec4(const std::string& name, const glm::vec4& vector);
+    void set_texture(const std::string& name, std::shared_ptr<Texture> texture, int unit);
 
     std::shared_ptr<Shader> get_shader() { return material->shader; }
 private:

@@ -218,7 +218,7 @@ void GameLayer::on_draw() {
 //     renderer::bind_texture(app->storage->depth_map_framebuffer->get_depth_attachment(), 1);
 
 //     renderer::load_projection_view(app->camera.get_projection_view_matrix());
-    setup_camera();
+    // setup_camera();
 //     render_skybox();
 //     renderer::draw_board(board);
 //     renderer::disable_output_to_red(1);
@@ -455,12 +455,13 @@ void GameLayer::build_board() {
             assert(false);
         }
 
-        app->data.board_material = std::make_shared<Material>(app->data.board_shader);
-        app->data.board_material->add_texture("u_material.diffuse", app->data.board_diffuse_texture, 0);
-        app->data.board_material->add_variable(Material::UniformType::Vec3, "u_material.specular");
-        app->data.board_material->add_variable(Material::UniformType::Float, "u_material.shininess");
+        app->data.wood_material = std::make_shared<Material>(app->data.board_shader);
+        app->data.wood_material->add_texture("u_material.diffuse");
+        app->data.wood_material->add_variable(Material::UniformType::Vec3, "u_material.specular");
+        app->data.wood_material->add_variable(Material::UniformType::Float, "u_material.shininess");
 
-        app->data.board_material_instance = MaterialInstance::make(app->data.board_material);
+        app->data.board_material_instance = MaterialInstance::make(app->data.wood_material);
+        app->data.board_material_instance->set_texture("u_material.diffuse", app->data.board_diffuse_texture, 0);
         app->data.board_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
         app->data.board_material_instance->set_float("u_material.shininess", 4.0f);
 

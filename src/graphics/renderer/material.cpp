@@ -55,8 +55,8 @@ void Material::add_variable(UniformType type, const std::string& name) {
     }
 }
 
-void Material::add_texture(const std::string& name, std::shared_ptr<Texture> texture, int unit) {
-    textures[name] = std::make_pair(unit, texture);
+void Material::add_texture(const std::string& name) {
+    textures[name] = std::make_pair(0, nullptr);
 }
 
 // --- Material instance
@@ -103,8 +103,9 @@ void MaterialInstance::bind() {
 
     // Bind any textures
     for (auto& [name, pair] : material->textures) {
-        material->shader->set_uniform_int(name, pair.first);
-        pair.second->bind(pair.first);
+        auto& [unit, texture] = pair;
+        material->shader->set_uniform_int(name, unit);
+        texture->bind(unit);
     }
 }
 
@@ -130,4 +131,8 @@ void MaterialInstance::set_vec3(const std::string& name, const glm::vec3& vector
 
 void MaterialInstance::set_vec4(const std::string& name, const glm::vec4& vector) {
     material->uniforms_vec4[name] = vector;
+}
+
+void MaterialInstance::set_texture(const std::string& name, std::shared_ptr<Texture> texture, int unit) {
+    material->textures[name] = std::make_pair(unit, texture);
 }
