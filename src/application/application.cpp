@@ -45,6 +45,9 @@ Application::Application(int width, int height, const std::string& title) {
 
 Application::~Application() {
     for (Scene* scene : scenes) {
+        for (Layer* layer : scene->overlays_in_order) {
+            delete layer;
+        }
         for (Layer* layer : scene->layers_in_order) {
             delete layer;
         }
@@ -173,10 +176,17 @@ void Application::purge_framebuffers() {
 
 void Application::update_active_layers() {
     active_layer_stack.clear();
+    active_overlay_stack.clear();
 
     for (Layer* layer : layer_stack) {
         if (layer->active) {
             active_layer_stack.push_back(layer);
+        }
+    }
+
+    for (Layer* layer : overlay_stack) {
+        if (layer->active) {
+            active_overlay_stack.push_back(layer);
         }
     }
 }
@@ -188,9 +198,17 @@ void Application::on_event(events::Event& event) {
     dispatcher.dispatch<WindowClosedEvent>(WindowClosed, BIND(Application::on_window_closed));
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(Application::on_window_resized));
 
+    for (auto iter = active_overlay_stack.rbegin(); iter != active_overlay_stack.rend(); iter++) {
+        if (event.handled) {
+            return;
+        }
+
+        (*iter)->on_event(event);
+    }
+
     for (auto iter = active_layer_stack.rbegin(); iter != active_layer_stack.rend(); iter++) {
         if (event.handled) {
-            break;
+            return;
         }
 
         (*iter)->on_event(event);
