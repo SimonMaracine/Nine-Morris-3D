@@ -285,7 +285,7 @@ void Renderer::render() {
         matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
 
-        model->material->get_shader()->bind();  // Optimize this (maybe by using uniform buffers)
+        model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
         model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
         model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
         model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
@@ -321,7 +321,9 @@ void Renderer::render() {
     }
 
 #ifdef NINE_MORRIS_3D_DEBUG
-    draw_origin();
+    if (origin) {
+        draw_origin();
+    }
 #endif
 
     storage.scene_framebuffer->resolve_framebuffer(storage.intermediate_framebuffer->get_id(),
@@ -339,6 +341,7 @@ unsigned int Renderer::add_model(Model& model, int options) {
     const bool no_lighting = options & (1 << 0);
     const bool with_outline = options & (1 << 1);
     const bool with_shadow = options & (1 << 2);
+    const bool hoverable = options & (1 << 3);
 
     model.id = ++id;
 
@@ -354,6 +357,10 @@ unsigned int Renderer::add_model(Model& model, int options) {
 
     if (with_shadow) {
         models_shadow[id] = &model;
+    }
+
+    if (hoverable) {
+
     }
 
     return id;

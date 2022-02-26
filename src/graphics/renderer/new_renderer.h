@@ -56,7 +56,8 @@ public:
     enum {
         NoLighting = 0b0001,
         WithOutline = 0b0010,
-        WithShadow = 0b0100
+        WithShadow = 0b0100,
+        Hoverable = 0b1000
     };
 
     Renderer(Application* app);
@@ -64,7 +65,7 @@ public:
 
     void render();
 
-    unsigned int add_model(Model& model, int options);
+    unsigned int add_model(Model& model, int options = 0);
     void remove_model(unsigned int handle);
 
     // unsigned int add_instancing_group();
@@ -78,6 +79,7 @@ public:
     void set_skybox(std::shared_ptr<Texture3D> texture);
 
     DirectionalLight light;
+    bool origin = false;  // This does nothing in release mode
 private:
     void clear(int buffers);
     void draw_screen_quad(GLuint texture);

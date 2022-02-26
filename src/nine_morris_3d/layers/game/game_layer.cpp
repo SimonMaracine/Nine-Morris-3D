@@ -76,6 +76,8 @@ void GameLayer::on_attach() {
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
+    app->renderer->origin = true;
+
     // {
     //     FramebufferSpecification specification;
     //     specification.width = app->data.width;
@@ -149,6 +151,8 @@ void GameLayer::on_detach() {
             REL_ERROR("Could not save game");
         }
     }
+
+    app->renderer->origin = false;
 
     gui_layer->timer = Timer();
 
@@ -463,7 +467,7 @@ void GameLayer::setup_board() {
     // model.shininess = 4.0f;
     board.model.material = app->data.board_material_instance;
 
-    app->renderer->add_model(board.model, 0);
+    app->renderer->add_model(board.model);
 
     // board.scale = 20.0f;
     // board.vertex_array = app->storage->board_vertex_array;
@@ -553,7 +557,7 @@ void GameLayer::setup_board_paint() {
     // board.paint.shininess = 4.0f;
     board.paint_model.material = app->data.board_paint_material_instance;
 
-    app->renderer->add_model(board.paint_model, 0);
+    app->renderer->add_model(board.paint_model);
 
     app->data.loaded_board_paint = true;
 
@@ -664,7 +668,7 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
         board.pieces[index].model.material = app->data.black_piece_material_instance;
     }
 
-    app->renderer->add_model(board.pieces[index].model, 0);
+    app->renderer->add_model(board.pieces[index].model);
 
     DEB_DEBUG("Built piece {}", index);
 }
@@ -1165,7 +1169,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_data->skybox_pz_texture,
                 app->assets_data->skybox_nz_texture
             };
-            // app->storage->skybox_texture = Texture3D::create(data);
+            app->renderer->set_skybox(Texture3D::create(data));
         } else if (app->options.texture_quality == options::LOW) {
             app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
             app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
@@ -1182,7 +1186,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_data->skybox_pz_texture_small,
                 app->assets_data->skybox_nz_texture_small
             };
-            // app->storage->skybox_texture = Texture3D::create(data);
+            app->renderer->set_skybox(Texture3D::create(data));
         } else {
             assert(false);
         }
@@ -1206,7 +1210,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_data->skybox_pz_texture,
                 app->assets_data->skybox_nz_texture
             };
-            // app->storage->skybox_texture = Texture3D::create(data);
+            app->renderer->set_skybox(Texture3D::create(data));
         } else if (app->options.texture_quality == options::LOW) {
             app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
             app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
@@ -1223,7 +1227,7 @@ void GameLayer::set_skybox(const std::string& skybox) {
                 app->assets_data->skybox_pz_texture_small,
                 app->assets_data->skybox_nz_texture_small
             };
-            // app->storage->skybox_texture = Texture3D::create(data);
+            app->renderer->set_skybox(Texture3D::create(data));
         } else {
             assert(false);
         }
