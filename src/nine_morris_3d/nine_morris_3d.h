@@ -45,8 +45,7 @@ public:
         std::shared_ptr<Texture> black_piece_diffuse_texture;
 
         std::shared_ptr<Material> tinted_wood_material;
-        std::shared_ptr<MaterialInstance> white_piece_material_instance;
-        std::shared_ptr<MaterialInstance> black_piece_material_instance;
+        std::shared_ptr<MaterialInstance> piece_material_instances[18];
 
         bool loaded_nodes = false;
         hoverable::Id nodes_id[24];

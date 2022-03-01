@@ -504,6 +504,34 @@ void Board::update_nodes(hoverable::Id hovered_id) {
     }
 }
 
+void Board::update_pieces(hoverable::Id hovered_id) {
+    GET_ACTIVE_PIECES(active_pieces);
+
+    for (Piece* piece : active_pieces) {
+        if (piece->selected) {
+            piece->model.outline_color = glm::vec3(1.0f, 0.0f, 0.0f);
+
+            app->renderer->remove_model(piece->model.handle);
+            app->renderer->add_model(piece->model, Renderer::Hoverable | Renderer::WithOutline);
+        } else if (piece->show_outline && piece->id == hovered_id && piece->in_use && !piece->pending_remove) {
+            piece->model.outline_color = glm::vec3(1.0f, 0.5f, 0.0f);
+
+            app->renderer->remove_model(piece->model.handle);
+            app->renderer->add_model(piece->model, Renderer::Hoverable | Renderer::WithOutline);
+        } else if (piece->to_take && piece->id == hovered_id && piece->in_use) {
+            piece->model.material->set_vec3("u_material.tint", glm::vec3(1.0f, 0.2f, 0.2f));
+
+            app->renderer->remove_model(piece->model.handle);
+            app->renderer->add_model(piece->model, Renderer::Hoverable);
+        } else {
+            piece->model.material->set_vec3("u_material.tint", glm::vec3(1.0f, 1.0f, 1.0f));
+
+            app->renderer->remove_model(piece->model.handle);
+            app->renderer->add_model(piece->model, Renderer::Hoverable);
+        }
+    }
+}
+
 Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node) {
     GET_ACTIVE_PIECES(active_pieces)
 

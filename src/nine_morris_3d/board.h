@@ -70,6 +70,7 @@ public:
     void finalize_pieces_state();
     void update_cursor();
     void update_nodes(hoverable::Id hovered_id);
+    void update_pieces(hoverable::Id hovered_id);
 
     // hoverable::Id id = hoverable::null;
 

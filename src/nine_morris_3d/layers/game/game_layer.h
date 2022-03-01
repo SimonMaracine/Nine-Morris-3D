@@ -86,7 +86,7 @@ public:
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
 
-    FramebufferReader<4> reader;
+    // FramebufferReader<4> reader;
 
     ImGuiLayer* imgui_layer = nullptr;
     GuiLayer* gui_layer = nullptr;

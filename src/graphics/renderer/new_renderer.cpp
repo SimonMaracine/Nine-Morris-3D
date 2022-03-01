@@ -41,9 +41,9 @@ Renderer::Renderer(Application* app)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_STENCIL_TEST);
-    // glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    // glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     {
@@ -110,6 +110,7 @@ Renderer::Renderer(Application* app)
 
     {
         const std::vector<std::string> uniforms = {
+            "u_projection_view_matrix",
             "u_model_matrix",
             "u_color"
         };
@@ -282,7 +283,9 @@ void Renderer::render() {
 
     clear(Color | Depth | Stencil);
     set_viewport(app->app_data.width, app->app_data.height);
-    // set_stencil_mask_zero();
+
+    // Set to 0, because we are also rendering objects with outline later
+    glStencilMask(0x00);
 
     if (storage.skybox_texture != nullptr) {
         draw_skybox();    
@@ -384,6 +387,68 @@ void Renderer::render() {
         glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
     }
 
+    // Render models with outline
+    // 
+
+    for (const auto& [id, model] : models_outline) {
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+
+        {
+            glm::mat4 matrix = glm::mat4(1.0f);
+            matrix = glm::translate(matrix, model->position);
+            matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+
+            model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
+            model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
+            model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+            model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
+
+            model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
+            model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
+            model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+            model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
+
+            model->vertex_array->bind();
+            model->material->bind();
+
+            glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+        }
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+
+        {
+            constexpr float SIZE = 3.6f;
+
+            glm::mat4 matrix = glm::mat4(1.0f);
+            matrix = glm::translate(matrix, model->position);
+            matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            matrix = glm::scale(matrix, glm::vec3(model->scale + SIZE, model->scale + SIZE,
+                    model->scale + SIZE));
+
+            storage.outline_shader->bind();
+            storage.outline_shader->set_uniform_mat4("u_model_matrix", matrix);
+            storage.outline_shader->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+            storage.outline_shader->set_uniform_vec3("u_color", model->outline_color);
+
+            // Render without output to red
+            glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+            glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+            glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        }
+
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glEnable(GL_DEPTH_TEST);
+    }
+
 #ifdef NINE_MORRIS_3D_DEBUG
     if (origin) {
         draw_origin();
@@ -409,7 +474,7 @@ void Renderer::render() {
     hovered_id = *data;
 }
 
-unsigned int Renderer::add_model(Model& model, int options) {
+void Renderer::add_model(Model& model, int options) {
     static unsigned int id = 0;
 
     const bool no_lighting = options & (1 << 0);
@@ -417,7 +482,7 @@ unsigned int Renderer::add_model(Model& model, int options) {
     const bool with_shadow = options & (1 << 2);
     const bool hoverable = options & (1 << 3);
 
-    model.id = ++id;
+    model.handle = ++id;
 
     if (hoverable) {
         if (!no_lighting) {
@@ -440,8 +505,6 @@ unsigned int Renderer::add_model(Model& model, int options) {
     if (with_shadow) {
         models_shadow[id] = &model;
     }    
-
-    return id;
 }
 
 void Renderer::remove_model(unsigned int handle) {

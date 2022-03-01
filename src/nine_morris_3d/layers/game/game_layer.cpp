@@ -170,6 +170,7 @@ void GameLayer::on_update(float dt) {
     }
     board.move_pieces(dt);
     board.update_nodes(app->renderer->get_hovered_id());
+    board.update_pieces(app->renderer->get_hovered_id());
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -625,18 +626,6 @@ void GameLayer::setup_pieces() {
         app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.specular");
         app->data.tinted_wood_material->add_variable(Material::UniformType::Float, "u_material.shininess");
         app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
-
-        app->data.white_piece_material_instance = MaterialInstance::make(app->data.tinted_wood_material);
-        app->data.white_piece_material_instance->set_texture("u_material.diffuse", app->data.white_piece_diffuse_texture, 0);
-        app->data.white_piece_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
-        app->data.white_piece_material_instance->set_float("u_material.shininess", 4.0f);
-        app->data.white_piece_material_instance->set_vec3("u_material.tint", glm::vec3(1.0f));  // TODO use 1.0f, 0.2f, 0.2f
-
-        app->data.black_piece_material_instance = MaterialInstance::make(app->data.tinted_wood_material);
-        app->data.black_piece_material_instance->set_texture("u_material.diffuse", app->data.black_piece_diffuse_texture, 0);
-        app->data.black_piece_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
-        app->data.black_piece_material_instance->set_float("u_material.shininess", 4.0f);
-        app->data.black_piece_material_instance->set_vec3("u_material.tint", glm::vec3(1.0f));
     }
 
     for (unsigned int i = 0; i < 9; i++) {
@@ -681,6 +670,20 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
         VertexArray::unbind();
 
         app->data.piece_vertex_arrays[index] = vertex_array;
+
+        if (type == Piece::Type::White) {
+            app->data.piece_material_instances[index] = MaterialInstance::make(app->data.tinted_wood_material);
+            app->data.piece_material_instances[index]->set_texture("u_material.diffuse", app->data.white_piece_diffuse_texture, 0);
+            app->data.piece_material_instances[index]->set_vec3("u_material.specular", glm::vec3(0.2f));
+            app->data.piece_material_instances[index]->set_float("u_material.shininess", 4.0f);
+            app->data.piece_material_instances[index]->set_vec3("u_material.tint", glm::vec3(1.0f));  // TODO use 1.0f, 0.2f, 0.2f
+        } else {
+            app->data.piece_material_instances[index] = MaterialInstance::make(app->data.tinted_wood_material);
+            app->data.piece_material_instances[index]->set_texture("u_material.diffuse", app->data.black_piece_diffuse_texture, 0);
+            app->data.piece_material_instances[index]->set_vec3("u_material.specular", glm::vec3(0.2f));
+            app->data.piece_material_instances[index]->set_float("u_material.shininess", 4.0f);
+            app->data.piece_material_instances[index]->set_vec3("u_material.tint", glm::vec3(1.0f));
+        }
     }
 
     board.pieces[index] = Piece(app->data.pieces_id[index], type);
@@ -697,11 +700,7 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
     // board.pieces[index].shininess = 4.0f;
     // board.pieces[index].select_color = glm::vec3(1.0f, 0.0f, 0.0f);
     // board.pieces[index].hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
-    if (type == Piece::Type::White) {
-        board.pieces[index].model.material = app->data.white_piece_material_instance;
-    } else {
-        board.pieces[index].model.material = app->data.black_piece_material_instance;
-    }
+    board.pieces[index].model.material = app->data.piece_material_instances[index];
 
     app->renderer->add_model(board.pieces[index].model, Renderer::Hoverable);
 

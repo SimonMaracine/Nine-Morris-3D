@@ -25,8 +25,7 @@ class Application;
 
 class Renderer {
 public:
-    class Model {
-    public:
+    struct Model {
         std::shared_ptr<VertexArray> vertex_array;
         int index_count = 0;
         // std::shared_ptr<Shader> shader;
@@ -39,14 +38,14 @@ public:
         float scale = 1.0f;
 
         // glm::vec3 tint_color = glm::vec3(0.0f);
-        // glm::vec3 outline_color = glm::vec3(0.0f);
+
+        // To be used with outline rendering
+        glm::vec3 outline_color = glm::vec3(0.0f);
 
         // glm::vec3 specular_color = glm::vec3(0.0f);
         // float shininess = 0.0f;
-    private:
-        unsigned int id = 0;  // TODO Don't know if needed
 
-        friend class Renderer;
+        unsigned int handle = 0;
     };
 
     enum {
@@ -67,7 +66,7 @@ public:
 
     void render();
 
-    unsigned int add_model(Model& model, int options = 0);
+    void add_model(Model& model, int options = 0);
     void remove_model(unsigned int handle);
 
     // unsigned int add_instancing_group();
