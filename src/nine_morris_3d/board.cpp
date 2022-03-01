@@ -366,7 +366,7 @@ void Board::press(hoverable::Id hovered_id) {
     }
 }
 
-void Board::release(hoverable::Id hovered_id) {
+void Board::release() {
     hovered_node = nullptr;
     hovered_piece = nullptr;
 }
@@ -490,6 +490,16 @@ void Board::update_cursor() {
             app->window->set_cursor(app->cross_cursor);
         } else {
             app->window->set_cursor(app->arrow_cursor);
+        }
+    }
+}
+
+void Board::update_nodes(hoverable::Id hovered_id) {
+    for (Node& node : nodes) {
+        if (node.id == hovered_id && phase != Board::Phase::None && phase != Board::Phase::GameOver) {
+            node.model.material->set_vec4("u_color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+        } else {
+            node.model.material->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
         }
     }
 }

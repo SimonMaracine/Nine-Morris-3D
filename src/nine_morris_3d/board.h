@@ -64,11 +64,12 @@ public:
     void select_piece(hoverable::Id hovered_id);
     bool put_piece(hoverable::Id hovered_id);
     void press(hoverable::Id hovered_id);
-    void release(hoverable::Id hovered_id);
+    void release();
     void undo();
     unsigned int not_placed_pieces_count();
     void finalize_pieces_state();
     void update_cursor();
+    void update_nodes(hoverable::Id hovered_id);
 
     // hoverable::Id id = hoverable::null;
 

@@ -54,7 +54,7 @@ public:
         std::shared_ptr<Shader> node_shader;
 
         std::shared_ptr<Material> basic_material;
-        std::shared_ptr<MaterialInstance> node_material_instance;
+        std::shared_ptr<MaterialInstance> node_material_instances[24];
 
         bool loaded_board_paint = false;
         hoverable::Id board_paint_id = hoverable::null;

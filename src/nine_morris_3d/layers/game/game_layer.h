@@ -37,8 +37,8 @@ public:
     bool on_window_resized(events::WindowResizedEvent& event);
 
     std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
-    std::shared_ptr<VertexArray> create_entity_vertex_array(std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
-            hoverable::Id id);
+    // std::shared_ptr<VertexArray> create_entity_vertex_array(std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
+    //         hoverable::Id id);
 
     void setup_board();
     void setup_board_paint();
@@ -74,7 +74,7 @@ public:
     // Light light;
     std::shared_ptr<std::vector<Board>> board_state_history;
 
-    hoverable::Id hovered_id = hoverable::null;
+    // hoverable::Id hovered_id = hoverable::null;
 
     float mouse_wheel = 0.0f;
     float dx = 0.0f;

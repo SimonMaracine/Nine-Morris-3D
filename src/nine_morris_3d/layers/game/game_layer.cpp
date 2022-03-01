@@ -169,6 +169,7 @@ void GameLayer::on_update(float dt) {
         app->camera.update(mouse_wheel, dx, dy, dt);
     }
     board.move_pieces(dt);
+    board.update_nodes(app->renderer->get_hovered_id());
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -265,11 +266,11 @@ bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 }
 
 bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
-    // if (event.button == MOUSE_BUTTON_LEFT) {
-    //     if (board.next_move) {
-    //         board.press(hovered_id);
-    //     }
-    // }
+    if (event.button == MOUSE_BUTTON_LEFT) {
+        if (board.next_move) {
+            board.press(app->renderer->get_hovered_id());
+        }
+    }
 
     return false;
 }
@@ -279,14 +280,14 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
         if (board.next_move) {
             if (board.phase == Board::Phase::PlacePieces) {
                 if (board.should_take_piece) {
-                    bool taked = board.take_piece(hovered_id);
+                    bool taked = board.take_piece(app->renderer->get_hovered_id());
 
                     if (taked && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
                         first_move = true;
                     }
                 } else {
-                    bool placed = board.place_piece(hovered_id);
+                    bool placed = board.place_piece(app->renderer->get_hovered_id());
 
                     if (placed && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
@@ -295,15 +296,15 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                 }
             } else if (board.phase == Board::Phase::MovePieces) {
                 if (board.should_take_piece) {
-                    bool taked = board.take_piece(hovered_id);
+                    bool taked = board.take_piece(app->renderer->get_hovered_id());
 
                     if (taked && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
                         first_move = true;
                     }
                 } else {
-                    board.select_piece(hovered_id);
-                    bool put = board.put_piece(hovered_id);
+                    board.select_piece(app->renderer->get_hovered_id());
+                    bool put = board.put_piece(app->renderer->get_hovered_id());
 
                     if (put && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
@@ -316,7 +317,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                 gui_layer->timer.stop();
             }
 
-            board.release(hovered_id);
+            board.release();
         }
     }
 
@@ -326,15 +327,6 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
         app->camera.go_towards_position(default_camera_position);
-    }
-
-    static bool black = true;
-    black = !black;
-
-    if (black) {
-        app->data.node_material_instance->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-    } else {
-        app->data.node_material_instance->set_vec4("u_color", glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
     }
 
     return false;
@@ -357,33 +349,33 @@ std::shared_ptr<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size,
     return buffer;
 }
 
-std::shared_ptr<VertexArray> GameLayer::create_entity_vertex_array(std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
-        hoverable::Id id) {
-    std::shared_ptr<Buffer> vertices = Buffer::create(mesh->vertices.data(),
-            mesh->vertices.size() * sizeof(mesh::Vertex));
+// std::shared_ptr<VertexArray> GameLayer::create_entity_vertex_array(std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
+//         hoverable::Id id) {
+//     std::shared_ptr<Buffer> vertices = Buffer::create(mesh->vertices.data(),
+//             mesh->vertices.size() * sizeof(mesh::Vertex));
 
-    std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
+//     std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
 
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Type::Float, 3);
-    layout.add(1, BufferLayout::Type::Float, 2);
-    layout.add(2, BufferLayout::Type::Float, 3);
+//     BufferLayout layout;
+//     layout.add(0, BufferLayout::Type::Float, 3);
+//     layout.add(1, BufferLayout::Type::Float, 2);
+//     layout.add(2, BufferLayout::Type::Float, 3);
 
-    BufferLayout layout2;
-    layout2.add(3, BufferLayout::Type::Int, 1);
+//     BufferLayout layout2;
+//     layout2.add(3, BufferLayout::Type::Int, 1);
 
-    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(),
-            mesh->indices.size() * sizeof(unsigned int));
+//     std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(),
+//             mesh->indices.size() * sizeof(unsigned int));
 
-    std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
-    vertex_array->add_buffer(vertices, layout);
-    vertex_array->add_buffer(ids, layout2);
-    vertex_array->add_index_buffer(indices);
+//     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+//     vertex_array->add_buffer(vertices, layout);
+//     vertex_array->add_buffer(ids, layout2);
+//     vertex_array->add_index_buffer(indices);
 
-    VertexArray::unbind();
+//     VertexArray::unbind();
 
-    return vertex_array;
-}
+//     return vertex_array;
+// }
 
 void GameLayer::setup_board() {
     // if (!app->storage->board_vertex_array) {
@@ -733,9 +725,6 @@ void GameLayer::setup_nodes() {
 
         app->data.basic_material = std::make_shared<Material>(app->data.node_shader);
         app->data.basic_material->add_variable(Material::UniformType::Vec4, "u_color");
-
-        app->data.node_material_instance = MaterialInstance::make(app->data.basic_material);
-        app->data.node_material_instance->set_vec4("u_color", glm::vec4(0.0, 0.0, 0.0f, 1.0f));
     }
 
     for (unsigned int i = 0; i < 24; i++) {
@@ -772,6 +761,9 @@ void GameLayer::setup_node(unsigned int index, const glm::vec3& position) {
         VertexArray::unbind();
 
         app->data.node_vertex_arrays[index] = vertex_array;
+
+        app->data.node_material_instances[index] = MaterialInstance::make(app->data.basic_material);
+        app->data.node_material_instances[index]->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
     }
 
     board.nodes[index] = Node(app->data.nodes_id[index], index);
@@ -780,7 +772,7 @@ void GameLayer::setup_node(unsigned int index, const glm::vec3& position) {
     board.nodes[index].model.index_count = app->assets_data->node_mesh->indices.size();
     board.nodes[index].model.position = position;
     board.nodes[index].model.scale = 20.0f;
-    board.nodes[index].model.material = app->data.node_material_instance;
+    board.nodes[index].model.material = app->data.node_material_instances[index];
 
     app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting | Renderer::Hoverable);
 
@@ -965,26 +957,26 @@ void GameLayer::render_pieces() {
     std::sort(active_pieces.begin(), active_pieces.end(), sort);
 
     for (const Piece* piece : active_pieces) {
-        if (piece->selected) {
+        // if (piece->selected) {
             // renderer::draw_piece_with_outline(piece, piece->select_color);
-        } else if (piece->show_outline && piece->id == hovered_id && piece->in_use && !piece->pending_remove) {
+        // } else if (piece->show_outline && piece->id == hovered_id && piece->in_use && !piece->pending_remove) {
             // renderer::draw_piece_with_outline(piece, piece->hover_color);
-        } else if (piece->to_take && piece->id == hovered_id && piece->in_use) {
+        // } else if (piece->to_take && piece->id == hovered_id && piece->in_use) {
             // renderer::draw_piece(piece, glm::vec3(1.0f, 0.2f, 0.2f));
-        } else {
+        // } else {
             // renderer::draw_piece(piece, glm::vec3(1.0f, 1.0f, 1.0f));
-        }
+        // }
     }
 }
 
 void GameLayer::render_nodes() {
     for (Node& node : board.nodes) {
-        if (node.id == hovered_id && board.phase != Board::Phase::None &&
-                board.phase != Board::Phase::GameOver) {
+        // if (node.id == hovered_id && board.phase != Board::Phase::None &&
+                // board.phase != Board::Phase::GameOver) {
             // renderer::draw_node(node, glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
-        } else {
+        // } else {
             // renderer::draw_node(node, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-        }
+        // }
     }
 }
 
