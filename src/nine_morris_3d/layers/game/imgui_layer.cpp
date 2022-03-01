@@ -577,7 +577,7 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Should take piece: %s", game_layer->board.should_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", game_layer->board.turns_without_mills);
         ImGui::Text("History size: %lu", game_layer->board.state_history->size());
-        ImGui::Text("Hovered ID: %d", game_layer->hovered_id);
+        ImGui::Text("Hovered ID: %d", app->renderer->get_hovered_id());
         ImGui::Text("Hovered node: %p", game_layer->board.hovered_node);
         ImGui::Text("Hovered piece: %p", game_layer->board.hovered_piece);
         ImGui::Text("Selected piece: %p", game_layer->board.selected_piece);

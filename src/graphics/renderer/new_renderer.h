@@ -14,10 +14,12 @@
 #include "graphics/renderer/shader.h"
 #include "graphics/renderer/texture.h"
 #include "graphics/renderer/framebuffer.h"
+#include "graphics/renderer/framebuffer_reader.h"
 #include "graphics/renderer/font.h"
 #include "graphics/renderer/camera.h"
 #include "graphics/renderer/material.h"
 #include "graphics/renderer/light.h"
+#include "graphics/renderer/hoverable.h"
 
 class Application;
 
@@ -78,6 +80,8 @@ public:
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void set_skybox(std::shared_ptr<Texture3D> texture);
 
+    hoverable::Id get_hovered_id() { return hovered_id; }
+
     DirectionalLight light;
     bool origin = false;  // This does nothing in release mode
 private:
@@ -114,14 +118,21 @@ private:
         std::shared_ptr<Framebuffer> depth_map_framebuffer;
         std::shared_ptr<Framebuffer> intermediate_framebuffer;
 
+        std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
+
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
     } storage;
 
     // Ordered maps of pointers to models
     std::map<unsigned int, Model*> models;
     std::map<unsigned int, Model*> models_no_lighting;
+    std::map<unsigned int, Model*> models_hoverable;
+    std::map<unsigned int, Model*> models_no_lighting_hoverable;
     std::map<unsigned int, Model*> models_outline;
     std::map<unsigned int, Model*> models_shadow;
+
+    hoverable::Id hovered_id = hoverable::null;
+    FramebufferReader<4> reader;
 
     const char* SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert";
     const char* SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag";

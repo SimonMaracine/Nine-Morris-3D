@@ -428,10 +428,30 @@ void GameLayer::setup_board() {
             // storage->uniform_buffer
         );
 
-        app->data.board_id = hoverable::generate_id();
+        // app->data.board_id = hoverable::generate_id();
 
-        app->data.board_vertex_array = create_entity_vertex_array(app->assets_data->board_mesh,
-                app->data.board_id);
+        // app->data.board_vertex_array = create_entity_vertex_array(app->assets_data->board_mesh,
+        //         app->data.board_id);
+
+        std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->board_mesh->vertices.data(),
+                app->assets_data->board_mesh->vertices.size() * sizeof(mesh::Vertex));
+
+        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+
+        BufferLayout layout;
+        layout.add(0, BufferLayout::Type::Float, 3);
+        layout.add(1, BufferLayout::Type::Float, 2);
+        layout.add(2, BufferLayout::Type::Float, 3);
+
+        std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->board_mesh->indices.data(),
+                app->assets_data->board_mesh->indices.size() * sizeof(unsigned int));
+
+        vertex_array->add_buffer(vertices, layout);
+        vertex_array->add_index_buffer(indices);
+
+        VertexArray::unbind();
+
+        app->data.board_vertex_array = vertex_array;
 
         if (app->options.texture_quality == options::NORMAL) {
             app->data.board_diffuse_texture = Texture::create(
@@ -456,8 +476,8 @@ void GameLayer::setup_board() {
         app->data.board_material_instance->set_float("u_material.shininess", 4.0f);
     }
 
-    board = Board(app->data.board_id, board_state_history);
-    
+    board = Board(board_state_history);
+
     board.model.vertex_array = app->data.board_vertex_array;
     board.model.index_count = app->assets_data->board_mesh->indices.size();
     // model.shader = app->data.board_shader;
@@ -645,7 +665,30 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
         hoverable::Id id = hoverable::generate_id();
         app->data.pieces_id[index] = id;
 
-        app->data.piece_vertex_arrays[index] = create_entity_vertex_array(mesh, id);
+        std::shared_ptr<Buffer> vertices = Buffer::create(mesh->vertices.data(),
+            mesh->vertices.size() * sizeof(mesh::Vertex));
+
+        std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
+
+        BufferLayout layout;
+        layout.add(0, BufferLayout::Type::Float, 3);
+        layout.add(1, BufferLayout::Type::Float, 2);
+        layout.add(2, BufferLayout::Type::Float, 3);
+
+        BufferLayout layout2;
+        layout2.add(3, BufferLayout::Type::Int, 1);
+
+        std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(),
+                mesh->indices.size() * sizeof(unsigned int));
+
+        std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
+        vertex_array->add_buffer(vertices, layout);
+        vertex_array->add_buffer(ids, layout2);
+        vertex_array->add_index_buffer(indices);
+
+        VertexArray::unbind();
+
+        app->data.piece_vertex_arrays[index] = vertex_array;
     }
 
     board.pieces[index] = Piece(app->data.pieces_id[index], type);
@@ -668,7 +711,7 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
         board.pieces[index].model.material = app->data.black_piece_material_instance;
     }
 
-    app->renderer->add_model(board.pieces[index].model);
+    app->renderer->add_model(board.pieces[index].model, Renderer::Hoverable);
 
     DEB_DEBUG("Built piece {}", index);
 }
@@ -739,7 +782,7 @@ void GameLayer::setup_node(unsigned int index, const glm::vec3& position) {
     board.nodes[index].model.scale = 20.0f;
     board.nodes[index].model.material = app->data.node_material_instance;
 
-    app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting);
+    app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting | Renderer::Hoverable);
 
     DEB_DEBUG("Built node {}", index);
 }
@@ -1257,7 +1300,7 @@ void GameLayer::load_game() {
     app->camera = state.camera;
 
     // Board& board = board;
-    board.id = state.board.id;
+    // board.id = state.board.id;
     // board.scale = state.board.scale;
     // board.index_count = state.board.index_count;
     // board.specular_color = state.board.specular_color;

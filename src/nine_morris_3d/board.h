@@ -54,8 +54,8 @@ public:
         TieBetweenBothPlayers
     };
 
-    Board() : id(hoverable::null) {}
-    Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history);
+    Board() = default;
+    Board(std::shared_ptr<std::vector<Board>> board_state_history);
     ~Board() = default;
 
     bool place_piece(hoverable::Id hovered_id);
@@ -70,7 +70,7 @@ public:
     void finalize_pieces_state();
     void update_cursor();
 
-    hoverable::Id id = hoverable::null;
+    // hoverable::Id id = hoverable::null;
 
     // float scale = 0.0f;
 

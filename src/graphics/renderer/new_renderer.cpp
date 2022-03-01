@@ -10,12 +10,14 @@
 
 #include "application/application.h"
 #include "application/platform.h"
+#include "application/input.h"
 #include "graphics/renderer/new_renderer.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/buffer.h"
 #include "graphics/renderer/shader.h"
 #include "graphics/renderer/texture.h"
 #include "graphics/renderer/framebuffer.h"
+#include "graphics/renderer/framebuffer_reader.h"
 #include "other/logging.h"
 
 std::string path(const char* file_path) {  // FIXME not very dry
@@ -254,8 +256,17 @@ Renderer::Renderer(Application* app)
         app->add_framebuffer(storage.intermediate_framebuffer);
     }
 
+    storage.pixel_buffers = {
+        PixelBuffer::create(sizeof(int)),
+        PixelBuffer::create(sizeof(int)),
+        PixelBuffer::create(sizeof(int)),
+        PixelBuffer::create(sizeof(int))
+    };
+
     storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(app->app_data.width),
                 0.0f, static_cast<float>(app->app_data.height));
+
+    reader = FramebufferReader<4>(storage.pixel_buffers, storage.intermediate_framebuffer);
 
     DEB_INFO("Initialized renderer");
 }
@@ -277,6 +288,10 @@ void Renderer::render() {
         draw_skybox();    
     }
 
+    // Disable output to red for attachment 1
+    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    // Render normal models
     for (const auto& [id, model] : models) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
@@ -302,7 +317,56 @@ void Renderer::render() {
         glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
     }
 
+    // Render models without lighting
     for (const auto& [id, model] : models_no_lighting) {
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, model->position);
+        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+
+        model->material->get_shader()->bind();
+        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
+        model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+
+        model->vertex_array->bind();
+        model->material->bind();
+
+        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+    }
+
+    // Re-enable output to red
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    // Render normal hoverable models
+    for (const auto& [id, model] : models_hoverable) {
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, model->position);
+        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+
+        model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
+        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
+        model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+        model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
+
+        model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
+        model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
+        model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+        model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
+
+        model->vertex_array->bind();
+        model->material->bind();
+        // model->diffuse_texture->bind(0);
+
+        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+    }
+
+    // Render hoverable models without lighting
+    for (const auto& [id, model] : models_no_lighting_hoverable) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -329,10 +393,20 @@ void Renderer::render() {
     storage.scene_framebuffer->resolve_framebuffer(storage.intermediate_framebuffer->get_id(),
             app->app_data.width, app->app_data.height);
 
+    storage.intermediate_framebuffer->bind();
+
+    const int x = static_cast<int>(input::get_mouse_x());
+    const int y = app->app_data.height - static_cast<int>(input::get_mouse_y());
+    reader.read(1, x, y);
+
     Framebuffer::bind_default();
 
     clear(Color);
     draw_screen_quad(storage.intermediate_framebuffer->get_color_attachment(0));
+
+    int* data;
+    reader.get<int>(&data);
+    hovered_id = *data;
 }
 
 unsigned int Renderer::add_model(Model& model, int options) {
@@ -345,10 +419,18 @@ unsigned int Renderer::add_model(Model& model, int options) {
 
     model.id = ++id;
 
-    if (!no_lighting) {
-        models[id] = &model;
+    if (hoverable) {
+        if (!no_lighting) {
+            models_hoverable[id] = &model;
+        } else {
+            models_no_lighting_hoverable[id] = &model;
+        }
     } else {
-        models_no_lighting[id] = &model;
+        if (!no_lighting) {
+            models[id] = &model;
+        } else {
+            models_no_lighting[id] = &model;
+        }
     }
 
     if (with_outline) {
@@ -357,11 +439,7 @@ unsigned int Renderer::add_model(Model& model, int options) {
 
     if (with_shadow) {
         models_shadow[id] = &model;
-    }
-
-    if (hoverable) {
-
-    }
+    }    
 
     return id;
 }
@@ -369,6 +447,8 @@ unsigned int Renderer::add_model(Model& model, int options) {
 void Renderer::remove_model(unsigned int handle) {
     models.erase(handle);
     models_no_lighting.erase(handle);
+    models_hoverable.erase(handle);
+    models_no_lighting_hoverable.erase(handle);
     models_outline.erase(handle);
     models_shadow.erase(handle);
 }

@@ -7,9 +7,8 @@
 
 #include <glm/glm.hpp>
 
-#include "graphics/renderer/hoverable.h"
-#include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/nine_morris_3d.h"
 #include "other/logging.h"
 
 #define GET_ACTIVE_PIECES(result) \
@@ -33,8 +32,8 @@ constexpr unsigned int WINDMILLS[16][3] = {
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-Board::Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history)
-    : id(id), state_history(board_state_history) {
+Board::Board(std::shared_ptr<std::vector<Board>> board_state_history)
+    : state_history(board_state_history) {
 
 }
 
@@ -377,7 +376,7 @@ void Board::undo() {
 
     Board& state = state_history->back();
 
-    id = state.id;
+    // id = state.id;
     // scale = state.scale;
     // index_count = state.index_count;
     // specular_color = state.specular_color;

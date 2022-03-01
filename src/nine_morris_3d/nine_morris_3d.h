@@ -29,7 +29,7 @@ public:
 
     struct RenderData {
         bool loaded_board = false;
-        hoverable::Id board_id = hoverable::null;
+        // hoverable::Id board_id = hoverable::null;
         std::shared_ptr<VertexArray> board_vertex_array;
         std::shared_ptr<Shader> board_shader;
         std::shared_ptr<Texture> board_diffuse_texture;
