@@ -438,6 +438,8 @@ void ImGuiLayer::draw_game_over() {
 
     if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_NoResize
             | ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Dummy(ImVec2(0.0f, 4.0f));
+
         switch (game_layer->board.ending) {
             case Board::Ending::WinnerWhite: {
                 const char* message = "White player wins!";
@@ -539,7 +541,7 @@ void ImGuiLayer::draw_about_screen() {
         ImGui::Text("All programming by:");
         ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
 
-        ImGui::Dummy(ImVec2(0.0f, 8.0f));
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         const float window_width = ImGui::GetWindowSize().x;
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);

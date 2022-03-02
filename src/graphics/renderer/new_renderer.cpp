@@ -42,7 +42,7 @@ Renderer::Renderer(Application* app)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -279,12 +279,39 @@ Renderer::~Renderer() {
 void Renderer::render() {
     projection_view_matrix = app->camera.get_projection_view_matrix();
 
+    setup_shadows();
+    storage.depth_map_framebuffer->bind();
+
+    clear(Depth);
+    set_viewport(2048, 2048);
+
+    // Render objects with shadows to depth buffer
+    for (const auto& [id, model] : models_cast_shadow) {
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, model->position);
+        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+
+        storage.shadow_shader->bind();
+        storage.shadow_shader->set_uniform_mat4("u_model_matrix", matrix);
+
+        model->vertex_array->bind();
+
+        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+    }
+
     storage.scene_framebuffer->bind();
 
     clear(Color | Depth | Stencil);
     set_viewport(app->app_data.width, app->app_data.height);
 
-    // Set to 0, because we are also rendering objects with outline later
+    // Bind shadow map for use in shadow rendering
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, storage.depth_map_framebuffer->get_depth_attachment());
+
+    // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
 
     if (storage.skybox_texture != nullptr) {
@@ -443,7 +470,8 @@ void Renderer::add_model(Model& model, int options) {
 
     const bool no_lighting = options & static_cast<int>(NoLighting);
     const bool with_outline = options & static_cast<int>(WithOutline);
-    const bool with_shadow = options & static_cast<int>(WithShadow);
+    const bool cast_shadow = options & static_cast<int>(CastShadow);
+    const bool has_shadow = options & static_cast<int>(HasShadow);
 
     model.handle = ++id;
 
@@ -457,15 +485,20 @@ void Renderer::add_model(Model& model, int options) {
         models_outline[id] = &model;
     }
 
-    if (with_shadow) {
-        models_shadow[id] = &model;
-    }    
+    if (cast_shadow) {
+        models_cast_shadow[id] = &model;
+    }
+
+    if (has_shadow) {
+        models_has_shadow[id] = &model;
+    }
 }
 
 void Renderer::remove_model(unsigned int handle) {
     models.erase(handle);
     models_outline.erase(handle);
-    models_shadow.erase(handle);
+    models_cast_shadow.erase(handle);
+    models_has_shadow.erase(handle);
 }
 
 void Renderer::set_viewport(int width, int height) {
@@ -527,4 +560,20 @@ void Renderer::draw_skybox() {
     glDepthMask(GL_FALSE);
     glDrawArrays(GL_TRIANGLES, 0, 36);  // TODO maybe improve
     glDepthMask(GL_TRUE);
+}
+
+void Renderer::setup_shadows() {
+    const glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);  // TODO maybe redo this stuff
+    const glm::mat4 view = glm::lookAt(light.position / 4.0f,
+            glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    const glm::mat4 light_space_matrix = projection * view;
+
+    storage.shadow_shader->bind();
+    storage.shadow_shader->set_uniform_mat4("u_light_space_matrix", light_space_matrix);
+
+    for (const auto& [id, model] : models_has_shadow) {
+        model->material->get_shader()->bind();
+        model->material->get_shader()->set_uniform_mat4("u_light_space_matrix", light_space_matrix);
+        model->material->get_shader()->set_uniform_int("u_shadow_map", 2);
+    }
 }

@@ -482,7 +482,7 @@ void GameLayer::setup_board() {
     // model.shininess = 4.0f;
     board.model.material = app->data.board_material_instance;
 
-    app->renderer->add_model(board.model);
+    app->renderer->add_model(board.model, Renderer::CastShadow | Renderer::HasShadow);
 
     // board.scale = 20.0f;
     // board.vertex_array = app->storage->board_vertex_array;
@@ -572,7 +572,7 @@ void GameLayer::setup_board_paint() {
     // board.paint.shininess = 4.0f;
     board.paint_model.material = app->data.board_paint_material_instance;
 
-    app->renderer->add_model(board.paint_model);
+    app->renderer->add_model(board.paint_model, Renderer::HasShadow);
 
     app->data.loaded_board_paint = true;
 
@@ -704,7 +704,7 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
     // board.pieces[index].hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
     board.pieces[index].model.material = app->data.piece_material_instances[index];
 
-    app->renderer->add_model(board.pieces[index].model, Renderer::WithOutline);
+    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow | Renderer::HasShadow);
 
     DEB_DEBUG("Built piece {}", index);
 }

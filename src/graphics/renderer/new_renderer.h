@@ -57,8 +57,8 @@ public:
     enum {
         NoLighting = 1 << 0,
         WithOutline = 1 << 1,
-        WithShadow = 1 << 2
-        // Hoverable = 0b1000
+        CastShadow = 1 << 2,
+        HasShadow = 1 << 3,
     };
 
     Renderer(Application* app);
@@ -88,6 +88,7 @@ private:
     void draw_screen_quad(GLuint texture);
     void draw_origin();
     void draw_skybox();
+    void setup_shadows();
 
     struct Storage {
         std::shared_ptr<Shader> skybox_shader;
@@ -125,10 +126,9 @@ private:
     // Ordered maps of pointers to models
     std::map<unsigned int, Model*> models;
     std::map<unsigned int, Model*> models_no_lighting;
-    // std::map<unsigned int, Model*> models_hoverable;
-    // std::map<unsigned int, Model*> models_no_lighting_hoverable;
     std::map<unsigned int, Model*> models_outline;
-    std::map<unsigned int, Model*> models_shadow;
+    std::map<unsigned int, Model*> models_cast_shadow;
+    std::map<unsigned int, Model*> models_has_shadow;
 
     hoverable::Id hovered_id = hoverable::null;
     FramebufferReader<4> reader;
