@@ -28,22 +28,14 @@ public:
     struct Model {
         std::shared_ptr<VertexArray> vertex_array;
         int index_count = 0;
-        // std::shared_ptr<Shader> shader;
         std::shared_ptr<MaterialInstance> material;
-        // std::shared_ptr<Texture> diffuse_texture;
-        // std::shared_ptr<Texture> normal_texture;
 
         glm::vec3 position = glm::vec3(0.0f);
         glm::vec3 rotation = glm::vec3(0.0f);
         float scale = 1.0f;
 
-        // glm::vec3 tint_color = glm::vec3(0.0f);
-
         // To be used with outline rendering
         glm::vec3 outline_color = glm::vec3(0.0f);
-
-        // glm::vec3 specular_color = glm::vec3(0.0f);
-        // float shininess = 0.0f;
 
         unsigned int handle = 0;
     };

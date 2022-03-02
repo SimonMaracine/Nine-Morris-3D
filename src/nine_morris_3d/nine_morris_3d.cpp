@@ -1,6 +1,8 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -39,6 +41,8 @@ NineMorris3D::NineMorris3D()
             REL_ERROR("{}", e.what());
         }
     }
+
+    srand(time(nullptr));
 
     using namespace assets;
 

@@ -34,11 +34,8 @@ public:
     bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
     bool on_key_released(events::KeyReleasedEvent& event);
-    bool on_window_resized(events::WindowResizedEvent& event);
 
     std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
-    // std::shared_ptr<VertexArray> create_entity_vertex_array(std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
-    //         hoverable::Id id);
 
     void setup_board();
     void setup_board_paint();
@@ -52,29 +49,13 @@ public:
     void set_light();
     void set_camera();
 
-    void render_skybox();
-    void setup_light();
-    void setup_camera();
-    // void setup_board();
-    // void setup_board_paint();
-    // void setup_pieces();
-    void render_pieces();
-    void render_nodes();
-    void render_to_depth();
-    void setup_shadows();
-    void setup_quad3d_projection_view();
-
     void set_scene_framebuffer(int samples);
     void set_textures_quality(const std::string& quality);
     void set_skybox(const std::string& skybox);
     void load_game();
 
     Board board;
-    // Camera camera;
-    // Light light;
     std::shared_ptr<std::vector<Board>> board_state_history;
-
-    // hoverable::Id hovered_id = hoverable::null;
 
     float mouse_wheel = 0.0f;
     float dx = 0.0f;
@@ -85,8 +66,6 @@ public:
     bool first_move = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
-
-    // FramebufferReader<4> reader;
 
     ImGuiLayer* imgui_layer = nullptr;
     GuiLayer* gui_layer = nullptr;

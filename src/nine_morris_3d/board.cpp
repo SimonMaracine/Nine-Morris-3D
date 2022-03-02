@@ -505,7 +505,7 @@ void Board::update_nodes(hoverable::Id hovered_id) {
 }
 
 void Board::update_pieces(hoverable::Id hovered_id) {
-    GET_ACTIVE_PIECES(active_pieces);
+    GET_ACTIVE_PIECES(active_pieces)
 
     for (Piece* piece : active_pieces) {
         if (piece->selected) {

@@ -543,7 +543,9 @@ void Renderer::draw_origin() {
 
     storage.origin_vertex_array->bind();
 
+    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDrawArrays(GL_LINES, 0, 6);
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 #endif
 
