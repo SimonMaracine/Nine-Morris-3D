@@ -512,22 +512,22 @@ void Board::update_pieces(hoverable::Id hovered_id) {
             piece->model.outline_color = glm::vec3(1.0f, 0.0f, 0.0f);
 
             app->renderer->remove_model(piece->model.handle);
-            app->renderer->add_model(piece->model, Renderer::Hoverable | Renderer::WithOutline);
+            app->renderer->add_model(piece->model, Renderer::WithOutline);
         } else if (piece->show_outline && piece->id == hovered_id && piece->in_use && !piece->pending_remove) {
             piece->model.outline_color = glm::vec3(1.0f, 0.5f, 0.0f);
 
             app->renderer->remove_model(piece->model.handle);
-            app->renderer->add_model(piece->model, Renderer::Hoverable | Renderer::WithOutline);
+            app->renderer->add_model(piece->model, Renderer::WithOutline);
         } else if (piece->to_take && piece->id == hovered_id && piece->in_use) {
             piece->model.material->set_vec3("u_material.tint", glm::vec3(1.0f, 0.2f, 0.2f));
 
             app->renderer->remove_model(piece->model.handle);
-            app->renderer->add_model(piece->model, Renderer::Hoverable);
+            app->renderer->add_model(piece->model);
         } else {
             piece->model.material->set_vec3("u_material.tint", glm::vec3(1.0f, 1.0f, 1.0f));
 
             app->renderer->remove_model(piece->model.handle);
-            app->renderer->add_model(piece->model, Renderer::Hoverable);
+            app->renderer->add_model(piece->model);
         }
     }
 }

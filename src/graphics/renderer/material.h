@@ -16,7 +16,11 @@ public:
         Mat4, Int, Vec2, Vec3, Vec4, Float
     };
 
-    Material(std::shared_ptr<Shader> shader);
+    enum {
+        Hoverable = 1 << 0
+    };
+
+    Material(std::shared_ptr<Shader> shader, int flags = 0);
     Material(std::shared_ptr<Material> material);
     ~Material();
 
@@ -33,6 +37,8 @@ private:
     std::unordered_map<std::string, glm::vec4> uniforms_vec4;
 
     std::unordered_map<std::string, std::pair<int, std::shared_ptr<Texture>>> textures;
+
+    int flags = 0;
 
     friend class MaterialInstance;
 };
@@ -55,6 +61,8 @@ public:
     void set_texture(const std::string& name, std::shared_ptr<Texture> texture, int unit);
 
     std::shared_ptr<Shader> get_shader() { return material->shader; }
+
+    bool is_hoverable() { return material->flags & static_cast<int>(Material::Hoverable); }
 private:
     std::unique_ptr<Material> material;
 };

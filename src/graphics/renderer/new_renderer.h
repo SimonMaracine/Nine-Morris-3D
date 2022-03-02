@@ -55,10 +55,10 @@ public:
     };
 
     enum {
-        NoLighting = 0b0001,
-        WithOutline = 0b0010,
-        WithShadow = 0b0100,
-        Hoverable = 0b1000
+        NoLighting = 1 << 0,
+        WithOutline = 1 << 1,
+        WithShadow = 1 << 2
+        // Hoverable = 0b1000
     };
 
     Renderer(Application* app);
@@ -125,8 +125,8 @@ private:
     // Ordered maps of pointers to models
     std::map<unsigned int, Model*> models;
     std::map<unsigned int, Model*> models_no_lighting;
-    std::map<unsigned int, Model*> models_hoverable;
-    std::map<unsigned int, Model*> models_no_lighting_hoverable;
+    // std::map<unsigned int, Model*> models_hoverable;
+    // std::map<unsigned int, Model*> models_no_lighting_hoverable;
     std::map<unsigned int, Model*> models_outline;
     std::map<unsigned int, Model*> models_shadow;
 

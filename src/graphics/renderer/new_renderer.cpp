@@ -288,11 +288,8 @@ void Renderer::render() {
     glStencilMask(0x00);
 
     if (storage.skybox_texture != nullptr) {
-        draw_skybox();    
+        draw_skybox();
     }
-
-    // Disable output to red for attachment 1
-    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     // Render normal models
     for (const auto& [id, model] : models) {
@@ -315,7 +312,12 @@ void Renderer::render() {
 
         model->vertex_array->bind();
         model->material->bind();
-        // model->diffuse_texture->bind(0);
+
+        if (model->material->is_hoverable()) {
+            glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        } else {
+            glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+        }
 
         glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
     }
@@ -336,60 +338,16 @@ void Renderer::render() {
         model->vertex_array->bind();
         model->material->bind();
 
-        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
-    }
-
-    // Re-enable output to red
-    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-    // Render normal hoverable models
-    for (const auto& [id, model] : models_hoverable) {
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, model->position);
-        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
-
-        model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
-        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
-        model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
-        model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
-
-        model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
-        model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
-        model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-        model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
-
-        model->vertex_array->bind();
-        model->material->bind();
-        // model->diffuse_texture->bind(0);
-
-        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
-    }
-
-    // Render hoverable models without lighting
-    for (const auto& [id, model] : models_no_lighting_hoverable) {
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, model->position);
-        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
-
-        model->material->get_shader()->bind();
-        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
-        model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
-
-        model->vertex_array->bind();
-        model->material->bind();
+        if (model->material->is_hoverable()) {
+            glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        } else {
+            glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+        }
 
         glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
     }
 
     // Render models with outline
-    // 
-
     for (const auto& [id, model] : models_outline) {
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
@@ -414,6 +372,12 @@ void Renderer::render() {
 
             model->vertex_array->bind();
             model->material->bind();
+
+            if (model->material->is_hoverable()) {
+                glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+            } else {
+                glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+            }
 
             glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
         }
@@ -445,7 +409,7 @@ void Renderer::render() {
         }
 
         glStencilMask(0xFF);
-        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glEnable(GL_DEPTH_TEST);
     }
 
@@ -477,28 +441,19 @@ void Renderer::render() {
 void Renderer::add_model(Model& model, int options) {
     static unsigned int id = 0;
 
-    const bool no_lighting = options & (1 << 0);
-    const bool with_outline = options & (1 << 1);
-    const bool with_shadow = options & (1 << 2);
-    const bool hoverable = options & (1 << 3);
+    const bool no_lighting = options & static_cast<int>(NoLighting);
+    const bool with_outline = options & static_cast<int>(WithOutline);
+    const bool with_shadow = options & static_cast<int>(WithShadow);
 
     model.handle = ++id;
 
-    if (hoverable) {
-        if (!no_lighting) {
-            models_hoverable[id] = &model;
+    if (!with_outline) {
+        if (no_lighting) {
+            models_no_lighting[id] = &model;
         } else {
-            models_no_lighting_hoverable[id] = &model;
+            models[id] = &model;
         }
     } else {
-        if (!no_lighting) {
-            models[id] = &model;
-        } else {
-            models_no_lighting[id] = &model;
-        }
-    }
-
-    if (with_outline) {
         models_outline[id] = &model;
     }
 
@@ -509,9 +464,6 @@ void Renderer::add_model(Model& model, int options) {
 
 void Renderer::remove_model(unsigned int handle) {
     models.erase(handle);
-    models_no_lighting.erase(handle);
-    models_hoverable.erase(handle);
-    models_no_lighting_hoverable.erase(handle);
     models_outline.erase(handle);
     models_shadow.erase(handle);
 }

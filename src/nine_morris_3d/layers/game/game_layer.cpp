@@ -58,7 +58,7 @@ const DirectionalLight LIGHT_AUTUMN = {
 };
 
 void GameLayer::on_attach() {
-    srand(time(nullptr));
+    srand(time(nullptr));  // TODO move this to NineMorris3D
 
     board_state_history = std::make_shared<std::vector<Board>>();
     setup_board();
@@ -104,6 +104,8 @@ void GameLayer::on_attach() {
     // setup_pieces();
 
     app->camera.go_towards_position(default_camera_position);
+
+    // board.phase = Board::Phase::MovePieces;
 
     // reader = FramebufferReader<4>(app->storage->pixel_buffers, app->storage->intermediate_framebuffer);
 
@@ -621,7 +623,7 @@ void GameLayer::setup_pieces() {
             assert(false);
         }
 
-        app->data.tinted_wood_material = std::make_shared<Material>(app->data.piece_shader);
+        app->data.tinted_wood_material = std::make_shared<Material>(app->data.piece_shader, Material::Hoverable);
         app->data.tinted_wood_material->add_texture("u_material.diffuse");
         app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.specular");
         app->data.tinted_wood_material->add_variable(Material::UniformType::Float, "u_material.shininess");
@@ -702,7 +704,7 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
     // board.pieces[index].hover_color = glm::vec3(1.0f, 0.5f, 0.0f);
     board.pieces[index].model.material = app->data.piece_material_instances[index];
 
-    app->renderer->add_model(board.pieces[index].model, Renderer::Hoverable);
+    app->renderer->add_model(board.pieces[index].model, Renderer::WithOutline);
 
     DEB_DEBUG("Built piece {}", index);
 }
@@ -722,7 +724,7 @@ void GameLayer::setup_nodes() {
             // storage->uniform_buffer
         );
 
-        app->data.basic_material = std::make_shared<Material>(app->data.node_shader);
+        app->data.basic_material = std::make_shared<Material>(app->data.node_shader, Material::Hoverable);
         app->data.basic_material->add_variable(Material::UniformType::Vec4, "u_color");
     }
 
@@ -773,7 +775,7 @@ void GameLayer::setup_node(unsigned int index, const glm::vec3& position) {
     board.nodes[index].model.scale = 20.0f;
     board.nodes[index].model.material = app->data.node_material_instances[index];
 
-    app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting | Renderer::Hoverable);
+    app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting);
 
     DEB_DEBUG("Built node {}", index);
 }

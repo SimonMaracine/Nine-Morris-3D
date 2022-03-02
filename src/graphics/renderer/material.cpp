@@ -9,8 +9,8 @@
 #include "graphics/renderer/shader.h"
 #include "other/logging.h"
 
-Material::Material(std::shared_ptr<Shader> shader)
-    : shader(shader) {
+Material::Material(std::shared_ptr<Shader> shader, int flags)
+    : shader(shader), flags(flags) {
     DEB_DEBUG("Created material with shader: {}", shader->get_name());
 }
 
@@ -23,6 +23,7 @@ Material::Material(std::shared_ptr<Material> material) {
     uniforms_vec3 = material->uniforms_vec3;
     uniforms_vec4 = material->uniforms_vec4;
     textures = material->textures;
+    flags = material->flags;
 }
 
 Material::~Material() {
