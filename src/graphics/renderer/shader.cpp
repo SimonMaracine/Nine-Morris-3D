@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 #include <stdexcept>
+#include <cassert>
+#include <string.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -19,6 +21,22 @@
     glDeleteShader(vertex_shader); \
     glDeleteShader(fragment_shader); \
     glDeleteProgram(program);
+
+#define CASE(_enum, count, type) case _enum: size = count * sizeof(type); break;
+
+static size_t type_size(GLenum type) {
+    size_t size;
+
+    switch (type) {
+        CASE(GL_FLOAT_VEC3, 3, GLfloat)
+        CASE(GL_FLOAT_MAT4, 16, GLfloat)
+        default:
+            REL_CRITICAL("Unknown type: {}, exiting...", type);
+            exit(1);
+    }
+
+    return size;
+}
 
 Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name,
         const std::vector<std::string>& uniforms, const std::string& vertex_source_path,
@@ -67,7 +85,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
 
 std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
             const std::string& fragment_source_path, const std::vector<std::string>& uniforms,
-            const char* block_name, int uniforms_count, std::shared_ptr<UniformBuffer> uniform_buffer) {
+            const std::vector<UniformBlockSpecification>& uniform_blocks) {
     GLuint vertex_shader;
     GLuint fragment_shader;
     try {
@@ -89,13 +107,55 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
         std::exit(1);
     }
 
-    // Set up uniform buffer
-    GLuint block_index = glGetUniformBlockIndex(program, block_name);
-    if (block_index == GL_INVALID_INDEX) {
-        REL_CRITICAL("Invalid block index, exiting...");
-        std::exit(1);
+    for (const UniformBlockSpecification& block : uniform_blocks) {
+        GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
+
+        if (block_index == GL_INVALID_INDEX) {
+            REL_CRITICAL("Invalid block index, exiting...");
+            std::exit(1);  // TODO remove "std::""
+        }
+
+        GLint block_size;
+        glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
+
+        block.uniform_buffer->data = new char[block_size];
+        block.uniform_buffer->size = block_size;
+
+        // char field_names[16][64];  // Max 16 fields in uniform block for now
+
+        assert(block.field_count <= 16);
+
+        // for (unsigned int i = 0; i < block.field_names.size(); i++) {
+        //     strcpy(field_names[i], block.field_names[i].c_str());
+        // }
+
+        GLuint indices[16];
+        GLint offsets[16];
+        GLint sizes[16];
+        GLint types[16];
+
+        glGetUniformIndices(program, block.field_count, block.field_names, indices);
+
+        for (unsigned int i = 0; i < block.field_count; i++) {
+            if (indices[i] == GL_INVALID_INDEX) {
+                REL_CRITICAL("Invalid field index, exiting...");
+                exit(1);
+            }
+        }
+
+        glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_OFFSET, offsets);
+        glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
+        glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
+
+        for (unsigned int i = 0; i < block.field_count; i++) {
+            block.uniform_buffer->fields[i] = {
+                static_cast<size_t>(offsets[i]),
+                static_cast<size_t>(sizes[i]) * type_size(types[i])
+            };
+        }
+
+        glBindBufferBase(GL_UNIFORM_BUFFER, block_index, block.uniform_buffer->buffer);  // TODO max uniform buffer bindings
     }
-    glBindBufferBase(GL_UNIFORM_BUFFER, block_index, uniform_buffer->buffer);
 
     std::string name = get_name(vertex_source_path, fragment_source_path);
 

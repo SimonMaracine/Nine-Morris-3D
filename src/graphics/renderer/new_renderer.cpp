@@ -46,6 +46,18 @@ Renderer::Renderer(Application* app)
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    storage.projection_view_uniform_buffer = UniformBuffer::create();
+    storage.light_uniform_buffer = UniformBuffer::create();
+
+    const char* projection_view_fields[] = {
+        "u_projection_view_matrix"
+    };
+
+    storage.projection_view_uniform_block.block_name = "ProjectionView";
+    storage.projection_view_uniform_block.field_count = 1;
+    storage.projection_view_uniform_block.field_names = projection_view_fields;
+    storage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;
+
     {
         const std::vector<std::string> uniforms = {
             "u_projection_view_matrix",
@@ -110,14 +122,15 @@ Renderer::Renderer(Application* app)
 
     {
         const std::vector<std::string> uniforms = {
-            "u_projection_view_matrix",
+            // "u_projection_view_matrix",
             "u_model_matrix",
             "u_color"
         };
         storage.outline_shader = Shader::create(
             path(OUTLINE_VERTEX_SHADER),
             path(OUTLINE_FRAGMENT_SHADER),
-            uniforms
+            uniforms,
+            { storage.projection_view_uniform_block }
             // block_name, 1,
             // storage.uniform_buffer
         );
@@ -265,7 +278,7 @@ Renderer::Renderer(Application* app)
     };
 
     storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(app->app_data.width),
-                0.0f, static_cast<float>(app->app_data.height));
+            0.0f, static_cast<float>(app->app_data.height));
 
     reader = FramebufferReader<4>(storage.pixel_buffers, storage.intermediate_framebuffer);
 
@@ -278,6 +291,17 @@ Renderer::~Renderer() {
 
 void Renderer::render() {
     projection_view_matrix = app->camera.get_projection_view_matrix();
+
+    storage.projection_view_uniform_buffer->set(&projection_view_matrix, 0);  // TODO data and index made by me
+    storage.projection_view_uniform_buffer->bind();
+    storage.projection_view_uniform_buffer->upload_data();
+
+    // storage.light_uniform_buffer->set(&light.position, 0);
+    // storage.light_uniform_buffer->set(&light.ambient_color, 1);
+    // storage.light_uniform_buffer->set(&light.diffuse_color, 2);
+    // storage.light_uniform_buffer->set(&light.specular_color, 3);
+    // storage.light_uniform_buffer->bind();
+    // storage.light_uniform_buffer->upload_data();
 
     setup_shadows();
     storage.depth_map_framebuffer->bind();
@@ -329,7 +353,7 @@ void Renderer::render() {
 
         model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
         model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
-        model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+        // model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
         model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
 
         model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
@@ -360,7 +384,7 @@ void Renderer::render() {
 
         model->material->get_shader()->bind();
         model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
-        model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+        // model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
 
         model->vertex_array->bind();
         model->material->bind();
@@ -389,7 +413,7 @@ void Renderer::render() {
 
             model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
             model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
-            model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+            // model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
             model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
 
             model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
@@ -426,7 +450,7 @@ void Renderer::render() {
 
             storage.outline_shader->bind();
             storage.outline_shader->set_uniform_mat4("u_model_matrix", matrix);
-            storage.outline_shader->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+            // storage.outline_shader->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
             storage.outline_shader->set_uniform_vec3("u_color", model->outline_color);
 
             // Render without output to red

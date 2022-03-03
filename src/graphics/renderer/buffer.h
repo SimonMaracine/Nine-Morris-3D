@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <cstddef>
-#include <cassert>
+#include <unordered_map>
 
 #include <glad/glad.h>
 
@@ -44,14 +44,23 @@ public:
     UniformBuffer(GLuint buffer);
     ~UniformBuffer();
 
-    static std::shared_ptr<UniformBuffer> create(const void* data, size_t size);
+    static std::shared_ptr<UniformBuffer> create();
 
     void bind();
     static void unbind();
 
-    void update_data(const void* data, size_t size);
+    void set(void* data, unsigned field_index);
+    void upload_data();
 private:
+    struct UniformBlockField {
+        size_t offset, size;
+    };
+
     GLuint buffer = 0;
+    char* data = nullptr;
+    size_t size = 0;
+
+    std::unordered_map<unsigned int, UniformBlockField> fields;
 
     friend class Shader;
 };

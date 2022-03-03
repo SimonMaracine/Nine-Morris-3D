@@ -10,6 +10,13 @@
 
 #include "graphics/renderer/buffer.h"
 
+struct UniformBlockSpecification {
+    std::string block_name;
+    unsigned int field_count;
+    const char** field_names;
+    std::shared_ptr<UniformBuffer> uniform_buffer;
+};
+
 class Shader {
 public:
     Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name,
@@ -19,10 +26,9 @@ public:
 
     static std::shared_ptr<Shader> create(const std::string& vertex_source_path,
             const std::string& fragment_source_path, const std::vector<std::string>& uniforms);
-    static std::shared_ptr<Shader> create(const std::string& vertex_source,
-            const std::string& fragment_source, const std::vector<std::string>& uniforms,
-            const char* block_name, int uniforms_count, std::shared_ptr<UniformBuffer> uniform_buffer);
-    // TODO rework uniform buffers
+    static std::shared_ptr<Shader> create(const std::string& vertex_source_path,
+            const std::string& fragment_source_path, const std::vector<std::string>& uniforms,
+            const std::vector<UniformBlockSpecification>& uniform_blocks);
 
     void bind();
     static void unbind();
@@ -34,7 +40,7 @@ public:
     void set_uniform_vec3(const std::string& name, const glm::vec3& vector);
     void set_uniform_vec4(const std::string& name, const glm::vec4& vector);
 
-    void recompile();
+    void recompile();  // FIXME this should update the uniform indices!!!
 
     const std::string& get_name() { return name; }
 private:

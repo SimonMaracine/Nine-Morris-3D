@@ -313,7 +313,7 @@ std::shared_ptr<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size,
 void GameLayer::setup_board() {
     if (!app->data.loaded_board) {
         const std::vector<std::string> uniforms = {
-            "u_projection_view_matrix",  // TODO maybe remove this
+            // "u_projection_view_matrix",  // TODO maybe remove this
             "u_model_matrix",
             "u_light_space_matrix",
             "u_view_position",
@@ -329,7 +329,8 @@ void GameLayer::setup_board() {
         app->data.board_shader = Shader::create(
             assets::path(assets::BOARD_VERTEX_SHADER),
             assets::path(assets::BOARD_FRAGMENT_SHADER),
-            uniforms
+            uniforms,
+            { app->renderer->get_projection_view_uniform_block() }
             // block_name, 1,  // TODO and use this again
             // storage->uniform_buffer
         );
@@ -394,7 +395,7 @@ void GameLayer::setup_board() {
 void GameLayer::setup_board_paint() {
     if (!app->data.loaded_board_paint) {
         const std::vector<std::string> uniforms = {
-            "u_projection_view_matrix",
+            // "u_projection_view_matrix",
             "u_model_matrix",
             "u_light_space_matrix",
             "u_view_position",
@@ -410,7 +411,8 @@ void GameLayer::setup_board_paint() {
         app->data.board_paint_shader = Shader::create(
             assets::path(assets::BOARD_PAINT_VERTEX_SHADER),
             assets::path(assets::BOARD_PAINT_FRAGMENT_SHADER),
-            uniforms
+            uniforms,
+            { app->renderer->get_projection_view_uniform_block() }
             // block_name, 1,  // TODO this
             // storage->uniform_buffer
         );
@@ -474,7 +476,7 @@ void GameLayer::setup_board_paint() {
 void GameLayer::setup_pieces() {
     if (!app->data.loaded_pieces) {
         const std::vector<std::string> uniforms = {
-            "u_projection_view_matrix",
+            // "u_projection_view_matrix",
             "u_model_matrix",
             "u_light_space_matrix",
             "u_view_position",
@@ -491,7 +493,8 @@ void GameLayer::setup_pieces() {
         app->data.piece_shader = Shader::create(
             assets::path(assets::PIECE_VERTEX_SHADER),
             assets::path(assets::PIECE_FRAGMENT_SHADER),
-            uniforms
+            uniforms,
+            { app->renderer->get_projection_view_uniform_block() }
             // block_name, 1,  // TODO use uniform buffers
             // storage->uniform_buffer
         );
@@ -598,14 +601,15 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
 void GameLayer::setup_nodes() {
     if (!app->data.loaded_nodes) {
         const std::vector<std::string> uniforms = {
-            "u_projection_view_matrix",
+            // "u_projection_view_matrix",
             "u_model_matrix",
             "u_color"
         };
         app->data.node_shader = Shader::create(
             assets::path(assets::NODE_VERTEX_SHADER),
             assets::path(assets::NODE_FRAGMENT_SHADER),
-            uniforms
+            uniforms,
+            { app->renderer->get_projection_view_uniform_block() }
             // block_name, 1,  // TODO use uniform buffers
             // storage->uniform_buffer
         );
