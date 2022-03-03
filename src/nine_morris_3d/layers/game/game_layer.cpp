@@ -313,26 +313,27 @@ std::shared_ptr<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size,
 void GameLayer::setup_board() {
     if (!app->data.loaded_board) {
         const std::vector<std::string> uniforms = {
-            // "u_projection_view_matrix",  // TODO maybe remove this
             "u_model_matrix",
             "u_light_space_matrix",
-            "u_view_position",
+            // "u_view_position",
             "u_shadow_map",
             "u_material.diffuse",
             "u_material.specular",
-            "u_material.shininess",
-            "u_light.position",
-            "u_light.ambient",
-            "u_light.diffuse",
-            "u_light.specular"
+            "u_material.shininess"
+            // "u_light.position",
+            // "u_light.ambient",
+            // "u_light.diffuse",
+            // "u_light.specular"
+        };
+        const std::vector<UniformBlockSpecification> uniform_blocks = {
+            app->renderer->get_projection_view_uniform_block(),
+            app->renderer->get_light_uniform_block()
         };
         app->data.board_shader = Shader::create(
             assets::path(assets::BOARD_VERTEX_SHADER),
             assets::path(assets::BOARD_FRAGMENT_SHADER),
             uniforms,
-            { app->renderer->get_projection_view_uniform_block() }
-            // block_name, 1,  // TODO and use this again
-            // storage->uniform_buffer
+            uniform_blocks
         );
 
         std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->board_mesh->vertices.data(),
@@ -398,23 +399,25 @@ void GameLayer::setup_board_paint() {
             // "u_projection_view_matrix",
             "u_model_matrix",
             "u_light_space_matrix",
-            "u_view_position",
+            // "u_view_position",
             "u_shadow_map",
             "u_material.diffuse",
             "u_material.specular",
-            "u_material.shininess",
-            "u_light.position",
-            "u_light.ambient",
-            "u_light.diffuse",
-            "u_light.specular"
+            "u_material.shininess"
+            // "u_light.position",
+            // "u_light.ambient",
+            // "u_light.diffuse",
+            // "u_light.specular"
+        };
+        const std::vector<UniformBlockSpecification> uniform_blocks = {
+            app->renderer->get_projection_view_uniform_block(),
+            app->renderer->get_light_uniform_block()
         };
         app->data.board_paint_shader = Shader::create(
             assets::path(assets::BOARD_PAINT_VERTEX_SHADER),
             assets::path(assets::BOARD_PAINT_FRAGMENT_SHADER),
             uniforms,
-            { app->renderer->get_projection_view_uniform_block() }
-            // block_name, 1,  // TODO this
-            // storage->uniform_buffer
+            uniform_blocks
         );
 
         std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->board_paint_mesh->vertices.data(),
@@ -479,24 +482,26 @@ void GameLayer::setup_pieces() {
             // "u_projection_view_matrix",
             "u_model_matrix",
             "u_light_space_matrix",
-            "u_view_position",
+            // "u_view_position",
             "u_shadow_map",
             "u_material.diffuse",
             "u_material.specular",
             "u_material.shininess",
-            "u_material.tint",
-            "u_light.position",
-            "u_light.ambient",
-            "u_light.diffuse",
-            "u_light.specular"
+            "u_material.tint"
+            // "u_light.position",
+            // "u_light.ambient",
+            // "u_light.diffuse",
+            // "u_light.specular"
+        };
+        const std::vector<UniformBlockSpecification> uniform_blocks = {
+            app->renderer->get_projection_view_uniform_block(),
+            app->renderer->get_light_uniform_block()
         };
         app->data.piece_shader = Shader::create(
             assets::path(assets::PIECE_VERTEX_SHADER),
             assets::path(assets::PIECE_FRAGMENT_SHADER),
             uniforms,
-            { app->renderer->get_projection_view_uniform_block() }
-            // block_name, 1,  // TODO use uniform buffers
-            // storage->uniform_buffer
+            uniform_blocks
         );
 
         if (app->options.texture_quality == options::NORMAL) {
@@ -610,8 +615,6 @@ void GameLayer::setup_nodes() {
             assets::path(assets::NODE_FRAGMENT_SHADER),
             uniforms,
             { app->renderer->get_projection_view_uniform_block() }
-            // block_name, 1,  // TODO use uniform buffers
-            // storage->uniform_buffer
         );
 
         app->data.basic_material = std::make_shared<Material>(app->data.node_shader, Material::Hoverable);

@@ -20,6 +20,18 @@
 #include "graphics/renderer/framebuffer_reader.h"
 #include "other/logging.h"
 
+const char* projection_view_block_fields[] = {
+    "u_projection_view_matrix"
+};
+
+const char* light_block_fields[] = {
+    "u_light_position",
+    "u_light_ambient",
+    "u_light_diffuse",
+    "u_light_specular",
+    "u_view_position"
+};
+
 std::string path(const char* file_path) {  // FIXME not very dry
 #if defined(NINE_MORRIS_3D_DEBUG)
     // Use relative path for both operating systems
@@ -49,14 +61,15 @@ Renderer::Renderer(Application* app)
     storage.projection_view_uniform_buffer = UniformBuffer::create();
     storage.light_uniform_buffer = UniformBuffer::create();
 
-    const char* projection_view_fields[] = {
-        "u_projection_view_matrix"
-    };
-
     storage.projection_view_uniform_block.block_name = "ProjectionView";
     storage.projection_view_uniform_block.field_count = 1;
-    storage.projection_view_uniform_block.field_names = projection_view_fields;
+    storage.projection_view_uniform_block.field_names = projection_view_block_fields;
     storage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;
+
+    storage.light_uniform_block.block_name = "Light";
+    storage.light_uniform_block.field_count = 5;
+    storage.light_uniform_block.field_names = light_block_fields;
+    storage.light_uniform_block.uniform_buffer = storage.light_uniform_buffer;
 
     {
         const std::vector<std::string> uniforms = {
@@ -131,8 +144,6 @@ Renderer::Renderer(Application* app)
             path(OUTLINE_FRAGMENT_SHADER),
             uniforms,
             { storage.projection_view_uniform_block }
-            // block_name, 1,
-            // storage.uniform_buffer
         );
     }
 
@@ -292,16 +303,17 @@ Renderer::~Renderer() {
 void Renderer::render() {
     projection_view_matrix = app->camera.get_projection_view_matrix();
 
-    storage.projection_view_uniform_buffer->set(&projection_view_matrix, 0);  // TODO data and index made by me
+    storage.projection_view_uniform_buffer->set(&projection_view_matrix, 0);
     storage.projection_view_uniform_buffer->bind();
     storage.projection_view_uniform_buffer->upload_data();
 
-    // storage.light_uniform_buffer->set(&light.position, 0);
-    // storage.light_uniform_buffer->set(&light.ambient_color, 1);
-    // storage.light_uniform_buffer->set(&light.diffuse_color, 2);
-    // storage.light_uniform_buffer->set(&light.specular_color, 3);
-    // storage.light_uniform_buffer->bind();
-    // storage.light_uniform_buffer->upload_data();
+    storage.light_uniform_buffer->set(&light.position, 0);
+    storage.light_uniform_buffer->set(&light.ambient_color, 1);
+    storage.light_uniform_buffer->set(&light.diffuse_color, 2);
+    storage.light_uniform_buffer->set(&light.specular_color, 3);
+    storage.light_uniform_buffer->set(&app->camera.get_position(), 4);
+    storage.light_uniform_buffer->bind();
+    storage.light_uniform_buffer->upload_data();
 
     setup_shadows();
     storage.depth_map_framebuffer->bind();
@@ -354,12 +366,12 @@ void Renderer::render() {
         model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
         model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
         // model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
-        model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
+        // model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
 
-        model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
-        model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
-        model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-        model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
+        // model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
+        // model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
+        // model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+        // model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
 
         model->vertex_array->bind();
         model->material->bind();
@@ -414,12 +426,12 @@ void Renderer::render() {
             model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
             model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
             // model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
-            model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
+            // model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
 
-            model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
-            model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
-            model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-            model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
+            // model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
+            // model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
+            // model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
+            // model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
 
             model->vertex_array->bind();
             model->material->bind();

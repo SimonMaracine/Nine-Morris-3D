@@ -120,7 +120,7 @@ void UniformBuffer::unbind() {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void UniformBuffer::set(void* field_data, unsigned field_index) {
+void UniformBuffer::set(const void* field_data, unsigned field_index) {
     memcpy(data + fields[field_index].offset, field_data, fields[field_index].size);
 }
 

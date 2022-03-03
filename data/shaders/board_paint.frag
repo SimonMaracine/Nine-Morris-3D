@@ -7,7 +7,6 @@ in vec4 v_fragment_position_light_space;
 
 layout (location = 0) out vec4 fragment_color;
 
-uniform vec3 u_view_position;
 uniform sampler2D u_shadow_map;
 
 struct Material {
@@ -18,15 +17,13 @@ struct Material {
 
 uniform Material u_material;
 
-struct Light {
-    vec3 position;
-
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+uniform Light {
+    vec3 u_light_position;
+    vec3 u_light_ambient;
+    vec3 u_light_diffuse;
+    vec3 u_light_specular;
+    vec3 u_view_position;
 };
-
-uniform Light u_light;
 
 float calculate_shadow(vec4 fragment_position_light_space, vec3 normal, vec3 light_direction) {
     vec3 projection_coordinates = fragment_position_light_space.xyz / fragment_position_light_space.w;
@@ -54,24 +51,25 @@ float calculate_shadow(vec4 fragment_position_light_space, vec3 normal, vec3 lig
     return shadow;
 }
 
-vec4 calculate_light(Material material, Light light, vec4 texture_colors,
-                     vec4 fragment_position_light_space) {
+vec4 calculate_light(Material material, vec3 light_position, vec3 light_ambient,
+        vec3 light_diffuse, vec3 light_specular, vec3 view_position,
+        vec4 texture_colors, vec4 fragment_position_light_space) {
     // Ambient light
-    vec4 ambient_light = texture_colors * vec4(light.ambient, 1.0);
+    vec4 ambient_light = texture_colors * vec4(light_ambient, 1.0);
 
     // Diffuse light
     vec3 normal = normalize(v_normal);
-    vec3 light_direction = normalize(light.position - v_fragment_position);
+    vec3 light_direction = normalize(light_position - v_fragment_position);
 
     float diffuse_strength = max(dot(normal, light_direction), 0.0);
-    vec4 diffuse_light = diffuse_strength * texture_colors * vec4(light.diffuse, 1.0);
+    vec4 diffuse_light = diffuse_strength * texture_colors * vec4(light_diffuse, 1.0);
 
     // Specular light
-    vec3 view_direction = normalize(u_view_position - v_fragment_position);
+    vec3 view_direction = normalize(view_position - v_fragment_position);
     vec3 reflect_direction = reflect(-light_direction, normal);
 
     float specular_strength = pow(max(dot(view_direction, reflect_direction), 0.0), material.shininess);
-    vec4 specular_light = vec4(material.specular, 0.0) * specular_strength * vec4(light.specular, 0.0);
+    vec4 specular_light = vec4(material.specular, 0.0) * specular_strength * vec4(light_specular, 0.0);
 
     // Calculate shadow and final result
     float shadow = calculate_shadow(fragment_position_light_space, normal, light_direction);
@@ -82,6 +80,11 @@ vec4 calculate_light(Material material, Light light, vec4 texture_colors,
 
 void main() {
     vec4 texture_colors = texture(u_material.diffuse, v_texture_coordinate);
-    vec4 total_light = calculate_light(u_material, u_light, texture_colors, v_fragment_position_light_space);
+
+    vec4 total_light = calculate_light(
+        u_material, u_light_position, u_light_ambient, u_light_diffuse, u_light_specular,
+        u_view_position, texture_colors, v_fragment_position_light_space
+    );
+
     fragment_color = total_light;
 }

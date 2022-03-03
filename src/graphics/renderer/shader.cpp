@@ -107,12 +107,12 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
         std::exit(1);
     }
 
-    for (const UniformBlockSpecification& block : uniform_blocks) {
+    for (const UniformBlockSpecification& block : uniform_blocks) {  // FIXME skip this part, if buffer already contains the data
         GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
 
         if (block_index == GL_INVALID_INDEX) {
             REL_CRITICAL("Invalid block index, exiting...");
-            std::exit(1);  // TODO remove "std::""
+            std::exit(1);  // TODO remove "std::"
         }
 
         GLint block_size;
@@ -121,13 +121,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
         block.uniform_buffer->data = new char[block_size];
         block.uniform_buffer->size = block_size;
 
-        // char field_names[16][64];  // Max 16 fields in uniform block for now
-
         assert(block.field_count <= 16);
-
-        // for (unsigned int i = 0; i < block.field_names.size(); i++) {
-        //     strcpy(field_names[i], block.field_names[i].c_str());
-        // }
 
         GLuint indices[16];
         GLint offsets[16];

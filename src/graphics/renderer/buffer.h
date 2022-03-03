@@ -49,7 +49,7 @@ public:
     void bind();
     static void unbind();
 
-    void set(void* data, unsigned field_index);
+    void set(const void* data, unsigned field_index);
     void upload_data();
 private:
     struct UniformBlockField {

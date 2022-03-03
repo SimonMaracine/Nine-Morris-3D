@@ -72,8 +72,8 @@ public:
     void set_skybox(std::shared_ptr<Texture3D> texture);
 
     hoverable::Id get_hovered_id() { return hovered_id; }
-    UniformBlockSpecification& get_projection_view_uniform_block()
-            { return storage.projection_view_uniform_block; }
+    UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
+    UniformBlockSpecification& get_light_uniform_block() { return storage.light_uniform_block; }
 
     DirectionalLight light;
     bool origin = false;  // This does nothing in release mode
@@ -89,6 +89,7 @@ private:
         std::shared_ptr<UniformBuffer> light_uniform_buffer;
 
         UniformBlockSpecification projection_view_uniform_block;
+        UniformBlockSpecification light_uniform_block;
 
         std::shared_ptr<Shader> skybox_shader;
         std::shared_ptr<Shader> quad2d_shader;
