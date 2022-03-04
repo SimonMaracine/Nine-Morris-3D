@@ -7,20 +7,21 @@
 #include <assimp/postprocess.h>
 #include <glm/glm.hpp>
 
-#include "other/model.h"
+#include "other/mesh.h"
 #include "other/logging.h"
 
-namespace model {
-    std::shared_ptr<Mesh<Vertex>> load_model(const std::string& file_path) {
+namespace mesh {
+    std::shared_ptr<Mesh<Vertex>> load_model(const std::string& file_path, bool flip_winding_order) {
         DEB_DEBUG("Loading model '{}'...", file_path.c_str());
 
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure);
+        const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure |
+                (flip_winding_order ? aiProcess_FlipWindingOrder : 0));
 
         if (!scene) {
             REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());
             REL_CRITICAL(importer.GetErrorString());
-            std::exit(1);
+            exit(1);
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -64,16 +65,17 @@ namespace model {
         return std::make_shared<Mesh<Vertex>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VertexP>> load_model_position(const std::string& file_path) {
+    std::shared_ptr<Mesh<VertexP>> load_model_position(const std::string& file_path, bool flip_winding_order) {
         DEB_DEBUG("Loading model '{}'...", file_path.c_str());
 
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure);
+        const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure |
+                (flip_winding_order ? aiProcess_FlipWindingOrder : 0));
 
         if (!scene) {
             REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());
             REL_CRITICAL(importer.GetErrorString());
-            std::exit(1);
+            exit(1);
         }
 
         const aiNode* root_node = scene->mRootNode;

@@ -6,11 +6,12 @@
 
 #include <glm/glm.hpp>
 
+#include "graphics/renderer/new_renderer.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/texture.h"
+#include "graphics/renderer/hoverable.h"
 #include "nine_morris_3d/node.h"
 #include "nine_morris_3d/piece.h"
-#include "nine_morris_3d/hoverable.h"
 
 constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40 + 1;
 
@@ -19,17 +20,18 @@ struct ThreefoldRepetitionHistory {
     std::vector<std::array<Piece::Type, 24>> twos;
 };
 
-struct BoardPaint {
-    glm::vec3 position = glm::vec3(0.0f);
-    float scale = 0.0f;
+// struct BoardPaint {
+    // glm::vec3 position = glm::vec3(0.0f);
+    // float scale = 0.0f;
 
-    std::shared_ptr<VertexArray> vertex_array;
-    int index_count = 0;
-    std::shared_ptr<Texture> diffuse_texture;
+    // std::shared_ptr<VertexArray> vertex_array;
 
-    glm::vec3 specular_color = glm::vec3(0.0f);
-    float shininess = 0.0f;
-};
+    // int index_count = 0;
+    // std::shared_ptr<Texture> diffuse_texture;
+
+    // glm::vec3 specular_color = glm::vec3(0.0f);
+    // float shininess = 0.0f;
+// };
 
 class Board {
 public:
@@ -52,8 +54,8 @@ public:
         TieBetweenBothPlayers
     };
 
-    Board() : id(hoverable::null) {}
-    Board(hoverable::Id id, std::shared_ptr<std::vector<Board>> board_state_history);
+    Board() = default;
+    Board(std::shared_ptr<std::vector<Board>> board_state_history);
     ~Board() = default;
 
     bool place_piece(hoverable::Id hovered_id);
@@ -62,22 +64,27 @@ public:
     void select_piece(hoverable::Id hovered_id);
     bool put_piece(hoverable::Id hovered_id);
     void press(hoverable::Id hovered_id);
-    void release(hoverable::Id hovered_id);
+    void release();
     void undo();
     unsigned int not_placed_pieces_count();
     void finalize_pieces_state();
     void update_cursor();
+    void update_nodes(hoverable::Id hovered_id);
+    void update_pieces(hoverable::Id hovered_id);
 
-    hoverable::Id id = hoverable::null;
+    // hoverable::Id id = hoverable::null;
 
-    float scale = 0.0f;
+    // float scale = 0.0f;
 
-    std::shared_ptr<VertexArray> vertex_array;
-    int index_count = 0;
-    std::shared_ptr<Texture> diffuse_texture;
+    // std::shared_ptr<VertexArray> vertex_array;
+    // int index_count = 0;
+    // std::shared_ptr<Texture> diffuse_texture;
 
-    glm::vec3 specular_color = glm::vec3(0.0f);
-    float shininess = 0.0f;
+    Renderer::Model model;
+    Renderer::Model paint_model;
+
+    // glm::vec3 specular_color = glm::vec3(0.0f);
+    // float shininess = 0.0f;
 
     std::array<Node, 24> nodes;
     std::array<Piece, 18> pieces;
@@ -101,7 +108,7 @@ public:
     unsigned int turns_without_mills = 0;
     ThreefoldRepetitionHistory repetition_history;
 
-    BoardPaint paint;
+    // BoardPaint paint;
 
     std::shared_ptr<std::vector<Board>> state_history;
     bool next_move = true;  // It is false when any piece is in air and true otherwise

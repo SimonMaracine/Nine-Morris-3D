@@ -16,7 +16,7 @@
 Window::Window(ApplicationData* data) {
     if (!glfwInit()) {
         REL_CRITICAL("Could not initialize GLFW, exiting...");
-        std::exit(1);
+        exit(1);
     }
 
 #ifdef NINE_MORRIS_3D_DEBUG
@@ -41,7 +41,7 @@ Window::Window(ApplicationData* data) {
     window = glfwCreateWindow(data->width, data->height, data->title.c_str(), nullptr, nullptr);
     if (window == nullptr) {
         REL_CRITICAL("Could not create window, exiting...");
-        std::exit(1);
+        exit(1);
     }
 
     DEB_INFO("Initialized GLFW and created window");
@@ -50,7 +50,7 @@ Window::Window(ApplicationData* data) {
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         REL_CRITICAL("Could not initialize GLAD, exiting...");
-        std::exit(1);
+        exit(1);
     }
 
     glfwSwapInterval(1);
@@ -178,8 +178,8 @@ void Window::set_cursor(unsigned int handle) {
     try {
         cursor = cursors.at(handle);
     } catch (const std::out_of_range&) {
-        DEB_CRITICAL("Invalid handle: {}", handle);
-        std::exit(1);
+        DEB_CRITICAL("Invalid handle: {}, exiting...", handle);
+        exit(1);
     }
     glfwSetCursor(window, cursor);
 #elif defined(NINE_MORRIS_3D_RELEASE)

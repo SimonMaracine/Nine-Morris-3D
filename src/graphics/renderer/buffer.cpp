@@ -98,16 +98,15 @@ UniformBuffer::UniformBuffer(GLuint buffer)
 UniformBuffer::~UniformBuffer() {
     glDeleteBuffers(1, &buffer);
 
+    delete[] data;
+
     DEB_DEBUG("Deleted uniform buffer {}", buffer);
 }
 
-std::shared_ptr<UniformBuffer> UniformBuffer::create(const void* data, size_t size) {
+std::shared_ptr<UniformBuffer> UniformBuffer::create() {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_UNIFORM_BUFFER, buffer);
-    glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);
-    LOG_ALLOCATION(size);
-
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     return std::make_shared<UniformBuffer>(buffer);
@@ -121,8 +120,12 @@ void UniformBuffer::unbind() {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void UniformBuffer::update_data(const void* data, size_t size) {
-    glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);
+void UniformBuffer::set(const void* field_data, unsigned field_index) {
+    memcpy(data + fields[field_index].offset, field_data, fields[field_index].size);
+}
+
+void UniformBuffer::upload_data() {
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
 }
 
 // --- Pixel buffer

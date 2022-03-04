@@ -2,11 +2,11 @@
 
 #include <memory>
 
-#include "other/model.h"
+#include "other/mesh.h"
 #include "other/texture_data.h"
 #include "other/loader.h"
 
-using namespace model;
+using namespace mesh;
 
 struct AssetsData {
     std::shared_ptr<Mesh<Vertex>> board_mesh;

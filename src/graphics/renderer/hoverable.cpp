@@ -1,4 +1,4 @@
-#include "nine_morris_3d/hoverable.h"
+#include "graphics/renderer/hoverable.h"
 
 namespace hoverable {
     Id generate_id() {

@@ -1,17 +1,17 @@
 #include "nine_morris_3d/assets_data.h"
 #include "nine_morris_3d/assets.h"
-#include "other/model.h"
+#include "other/mesh.h"
 #include "other/texture_data.h"
 #include "other/loader.h"
 
 namespace assets_data {
     void field(Loader<AssetsData>* loader) {
-        using namespace model;
+        using namespace mesh;
         using namespace assets;
 
         loader->get()->board_mesh = load_model(path(BOARD_MESH));
         loader->get()->board_paint_mesh = load_model(path(BOARD_PAINT_MESH));
-        loader->get()->node_mesh = load_model_position(path(NODE_MESH));
+        loader->get()->node_mesh = load_model_position(path(NODE_MESH), true);
         loader->get()->white_piece_mesh = load_model(path(WHITE_PIECE_MESH));
         loader->get()->black_piece_mesh = load_model(path(BLACK_PIECE_MESH));
         loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE), true);
@@ -31,12 +31,12 @@ namespace assets_data {
     }
 
     void field_low_tex(Loader<AssetsData>* loader) {
-        using namespace model;
+        using namespace mesh;
         using namespace assets;
 
         loader->get()->board_mesh = load_model(path(BOARD_MESH));
         loader->get()->board_paint_mesh = load_model(path(BOARD_PAINT_MESH));
-        loader->get()->node_mesh = load_model_position(path(NODE_MESH));
+        loader->get()->node_mesh = load_model_position(path(NODE_MESH), true);
         loader->get()->white_piece_mesh = load_model(path(WHITE_PIECE_MESH));
         loader->get()->black_piece_mesh = load_model(path(BLACK_PIECE_MESH));
         loader->get()->board_wood_diff_texture_small = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE_SMALL), true);
@@ -56,12 +56,12 @@ namespace assets_data {
     }
 
     void autumn(Loader<AssetsData>* loader) {
-        using namespace model;
+        using namespace mesh;
         using namespace assets;
 
         loader->get()->board_mesh = load_model(path(BOARD_MESH));
         loader->get()->board_paint_mesh = load_model(path(BOARD_PAINT_MESH));
-        loader->get()->node_mesh = load_model_position(path(NODE_MESH));
+        loader->get()->node_mesh = load_model_position(path(NODE_MESH), true);
         loader->get()->white_piece_mesh = load_model(path(WHITE_PIECE_MESH));
         loader->get()->black_piece_mesh = load_model(path(BLACK_PIECE_MESH));
         loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE), true);
@@ -81,12 +81,12 @@ namespace assets_data {
     }
 
     void autumn_low_tex(Loader<AssetsData>* loader) {
-        using namespace model;
+        using namespace mesh;
         using namespace assets;
 
         loader->get()->board_mesh = load_model(path(BOARD_MESH));
         loader->get()->board_paint_mesh = load_model(path(BOARD_PAINT_MESH));
-        loader->get()->node_mesh = load_model_position(path(NODE_MESH));
+        loader->get()->node_mesh = load_model_position(path(NODE_MESH), true);
         loader->get()->white_piece_mesh = load_model(path(WHITE_PIECE_MESH));
         loader->get()->black_piece_mesh = load_model(path(BLACK_PIECE_MESH));
         loader->get()->board_wood_diff_texture_small = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE_SMALL), true);

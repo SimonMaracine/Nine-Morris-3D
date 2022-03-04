@@ -12,8 +12,8 @@ std::size_t VertexElement::get_size(GLenum type) {
         case GL_INT:
             return sizeof(GLint);
         default:
-            REL_CRITICAL("Type {} is not supported", type);
-            std::exit(1);
+            REL_CRITICAL("Type {} is not supported, exiting...", type);
+            exit(1);
     }
 }
 
@@ -28,8 +28,8 @@ void BufferLayout::add(GLuint index, Type type, GLint size) {
             gl_type = GL_INT;
             break;
         default:
-            REL_CRITICAL("Unrecognized type");
-            std::exit(1);
+            REL_CRITICAL("Unrecognized type, exiting...");
+            exit(1);
     }
 
     elements.push_back({ index, gl_type, size });

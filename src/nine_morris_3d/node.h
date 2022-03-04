@@ -3,7 +3,8 @@
 #include <glm/glm.hpp>
 
 #include "graphics/renderer/vertex_array.h"
-#include "nine_morris_3d/hoverable.h"
+#include "graphics/renderer/hoverable.h"
+#include "graphics/renderer/new_renderer.h"
 #include "nine_morris_3d/piece.h"
 
 constexpr float NODE_Y_POSITION = 0.063f;
@@ -43,11 +44,13 @@ public:
 
     hoverable::Id id = hoverable::null;
 
-    glm::vec3 position = glm::vec3(0.0f);
-    float scale = 0.0f;
+    // glm::vec3 position = glm::vec3(0.0f);
+    // float scale = 0.0f;
 
-    std::shared_ptr<VertexArray> vertex_array;
-    int index_count = 0;
+    // std::shared_ptr<VertexArray> vertex_array;
+    // int index_count = 0;
+
+    Renderer::Model model;
 
     hoverable::Id piece_id = hoverable::null;
     Piece* piece = nullptr;

@@ -10,6 +10,14 @@
 
 #include "graphics/renderer/buffer.h"
 
+struct UniformBlockSpecification {
+    std::string block_name;
+    unsigned int field_count;
+    const char** field_names;
+    std::shared_ptr<UniformBuffer> uniform_buffer;
+    GLuint binding_index;
+};
+
 /**
  * This represents OpenGL shader programs.
  */
@@ -22,22 +30,28 @@ public:
 
     static std::shared_ptr<Shader> create(const std::string& vertex_source_path,
             const std::string& fragment_source_path, const std::vector<std::string>& uniforms);
-    static std::shared_ptr<Shader> create(const std::string& vertex_source,
-            const std::string& fragment_source, const std::vector<std::string>& uniforms,
-            const char* block_name, int uniforms_count, std::shared_ptr<UniformBuffer> uniform_buffer);
+    static std::shared_ptr<Shader> create(const std::string& vertex_source_path,
+            const std::string& fragment_source_path, const std::vector<std::string>& uniforms,
+            const std::vector<UniformBlockSpecification>& uniform_blocks);
 
     void bind();
     static void unbind();
 
-    void set_uniform_matrix(const std::string& name, const glm::mat4& matrix);
+    void set_uniform_mat4(const std::string& name, const glm::mat4& matrix);
     void set_uniform_int(const std::string& name, int value);
+    void set_uniform_float(const std::string& name, float value);
     void set_uniform_vec2(const std::string& name, const glm::vec2& vector);
     void set_uniform_vec3(const std::string& name, const glm::vec3& vector);
     void set_uniform_vec4(const std::string& name, const glm::vec4& vector);
-    void set_uniform_float(const std::string& name, float value);
 
+<<<<<<< HEAD
     // Make sure to reupload any uniforms that need to after calling this function
     void recompile();
+=======
+    void recompile();  // FIXME this should update the uniform indices!!!
+
+    const std::string& get_name() { return name; }
+>>>>>>> ref-rendering
 private:
     GLint get_uniform_location(const std::string& name);
 

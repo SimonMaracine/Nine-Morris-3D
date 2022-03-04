@@ -26,11 +26,11 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Board& board) {
-    archive(board.id, board.scale, board.index_count, board.specular_color, board.shininess,
+    archive(/*board.id, board.scale, board.index_count, board.specular_color, board.shininess,*/
             board.nodes, board.pieces, board.phase, board.turn, board.ending, board.white_pieces_count,
             board.black_pieces_count, board.not_placed_white_pieces_count,
             board.not_placed_black_pieces_count, board.should_take_piece, board.can_jump,
-            board.turns_without_mills, board.repetition_history, board.paint, board.state_history,
+            board.turns_without_mills, board.repetition_history, /*board.paint,*/ board.state_history,
             board.next_move);
 }
 
@@ -38,10 +38,10 @@ void serialize(Archive& archive, Board& board) {
 Unserialized variables:
     vertex_array, diffuse_texture
 */
-template<typename Archive>
-void serialize(Archive& archive, BoardPaint& paint) {
-    archive(paint.position, paint.scale, paint.index_count, paint.specular_color, paint.shininess);
-}
+// template<typename Archive>
+// void serialize(Archive& archive, BoardPaint& paint) {
+//     archive(paint.position, paint.scale, paint.index_count, paint.specular_color, paint.shininess);
+// }
 
 template<typename Archive>
 void serialize(Archive& archive, ThreefoldRepetitionHistory& repetition_history) {
@@ -54,9 +54,9 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Piece& piece) {
-    archive(piece.id, piece.position, piece.rotation, piece.scale, piece.movement, piece.should_move,
-            piece.index_count, piece.specular_color, piece.shininess, piece.select_color,
-            piece.hover_color, piece.type, piece.in_use, piece.node_id, piece.show_outline,
+    archive(piece.id, /*piece.position, piece.rotation, piece.scale,*/ piece.movement, piece.should_move,
+            /*piece.index_count, piece.specular_color, piece.shininess, piece.select_color,
+            piece.hover_color,*/ piece.type, piece.in_use, piece.node_id, piece.show_outline,
             piece.to_take, piece.pending_remove, piece.selected, piece.active);
 }
 
@@ -72,7 +72,7 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Node& node) {
-    archive(node.id, node.position, node.scale, node.index_count, node.piece_id, node.index);
+    archive(node.id, /*node.position, node.scale, node.index_count,*/ node.piece_id, node.index);
 }
 
 template<typename Archive>

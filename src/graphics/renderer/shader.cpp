@@ -4,11 +4,14 @@
 #include <memory>
 #include <vector>
 #include <stdexcept>
+#include <cassert>
+#include <string.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "application/platform.h"
+#include "graphics/debug_opengl.h"
 #include "graphics/renderer/shader.h"
 #include "graphics/renderer/buffer.h"
 #include "other/logging.h"
@@ -20,6 +23,22 @@
     glDeleteShader(fragment_shader); \
     glDeleteProgram(program);
 
+#define CASE(_enum, count, type) case _enum: size = count * sizeof(type); break;
+
+static size_t type_size(GLenum type) {
+    size_t size;
+
+    switch (type) {
+        CASE(GL_FLOAT_VEC3, 3, GLfloat)
+        CASE(GL_FLOAT_MAT4, 16, GLfloat)
+        default:
+            REL_CRITICAL("Unknown type: {}, exiting...", type);
+            exit(1);
+    }
+
+    return size;
+}
+
 Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name,
         const std::vector<std::string>& uniforms, const std::string& vertex_source_path,
         const std::string& fragment_source_path)
@@ -28,7 +47,7 @@ Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, con
     for (const std::string& uniform : uniforms) {
         GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
-            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", name.c_str(), name.c_str());
+            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name.c_str());
             continue;
         }
         cache[uniform] = location;
@@ -56,7 +75,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
 
     if (!check_linking(program)) {
         REL_CRITICAL("Exiting...");
-        std::exit(1);
+        exit(1);
     }
 
     std::string name = get_name(vertex_source_path, fragment_source_path);
@@ -67,7 +86,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
 
 std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
             const std::string& fragment_source_path, const std::vector<std::string>& uniforms,
-            const char* block_name, int uniforms_count, std::shared_ptr<UniformBuffer> uniform_buffer) {
+            const std::vector<UniformBlockSpecification>& uniform_blocks) {
     GLuint vertex_shader;
     GLuint fragment_shader;
     try {
@@ -75,7 +94,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
         fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
     } catch (const std::runtime_error& e) {
         REL_CRITICAL("{}, exiting...", e.what());
-        std::exit(1);
+        exit(1);
     }
 
     GLuint program = glCreateProgram();
@@ -86,16 +105,61 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
 
     if (!check_linking(program)) {
         REL_CRITICAL("Exiting...");
-        std::exit(1);
+        exit(1);
     }
 
-    // Set up uniform buffer
-    GLuint block_index = glGetUniformBlockIndex(program, block_name);
-    if (block_index == GL_INVALID_INDEX) {
-        REL_CRITICAL("Invalid block index, exiting...");
-        std::exit(1);
+    for (const UniformBlockSpecification& block : uniform_blocks) {
+        GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
+
+        if (block_index == GL_INVALID_INDEX) {
+            REL_CRITICAL("Invalid block index, exiting...");
+            exit(1);
+        }
+
+        if (!block.uniform_buffer->configured) {
+            GLint block_size;
+            glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
+
+            block.uniform_buffer->data = new char[block_size];
+            block.uniform_buffer->size = block_size;
+
+            glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
+            glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
+            LOG_ALLOCATION(block_size);
+            glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+            assert(block.field_count <= 16);
+
+            GLuint indices[16];
+            GLint offsets[16];
+            GLint sizes[16];
+            GLint types[16];
+
+            glGetUniformIndices(program, block.field_count, block.field_names, indices);
+
+            for (unsigned int i = 0; i < block.field_count; i++) {
+                if (indices[i] == GL_INVALID_INDEX) {
+                    REL_CRITICAL("Invalid field index, exiting...");
+                    exit(1);
+                }
+            }
+
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_OFFSET, offsets);
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
+
+            for (unsigned int i = 0; i < block.field_count; i++) {
+                block.uniform_buffer->fields[i] = {
+                    static_cast<size_t>(offsets[i]),
+                    static_cast<size_t>(sizes[i]) * type_size(types[i])
+                };
+            }
+
+            block.uniform_buffer->configured = true;
+        }
+
+        glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);  // TODO max uniform buffer bindings
     }
-    glBindBufferBase(GL_UNIFORM_BUFFER, block_index, uniform_buffer->buffer);
 
     std::string name = get_name(vertex_source_path, fragment_source_path);
 
@@ -111,7 +175,7 @@ void Shader::unbind() {
     glUseProgram(0);
 }
 
-void Shader::set_uniform_matrix(const std::string& name, const glm::mat4& matrix) {
+void Shader::set_uniform_mat4(const std::string& name, const glm::mat4& matrix) {
     GLint location = get_uniform_location(name);
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
@@ -119,6 +183,11 @@ void Shader::set_uniform_matrix(const std::string& name, const glm::mat4& matrix
 void Shader::set_uniform_int(const std::string& name, int value) {
     GLint location = get_uniform_location(name);
     glUniform1i(location, value);
+}
+
+void Shader::set_uniform_float(const std::string& name, float value) {
+    GLint location = get_uniform_location(name);
+    glUniform1f(location, value);
 }
 
 void Shader::set_uniform_vec2(const std::string& name, const glm::vec2& vector) {
@@ -134,11 +203,6 @@ void Shader::set_uniform_vec3(const std::string& name, const glm::vec3& vector) 
 void Shader::set_uniform_vec4(const std::string& name, const glm::vec4& vector) {
     GLint location = get_uniform_location(name);
     glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
-}
-
-void Shader::set_uniform_float(const std::string& name, float value) {
-    GLint location = get_uniform_location(name);
-    glUniform1f(location, value);
 }
 
 void Shader::recompile() {
@@ -182,7 +246,7 @@ GLint Shader::get_uniform_location(const std::string& name) {
     } catch (const std::out_of_range&) {
         DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}', exiting...", name.c_str(),
                 this->name.c_str());
-        std::exit(1);
+        exit(1);
     }
 #endif
 }
@@ -198,7 +262,7 @@ GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {  //
         }
     } else {
         REL_CRITICAL("Could not open file '{}', exiting...", source_path.c_str());
-        std::exit(1);
+        exit(1);
     }
     file.close();
 

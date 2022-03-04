@@ -278,9 +278,8 @@ void Framebuffer::build() {
                                 specification.width, specification.height, i);
                         break;
                     default:
-                        DEB_CRITICAL("Wrong attachment format");
-                        std::exit(1);
-                        break;
+                        DEB_CRITICAL("Wrong attachment format, exiting...");
+                        exit(1);
                 }
 
                 color_attachments[i] = texture;
@@ -306,9 +305,8 @@ void Framebuffer::build() {
                                 specification.width, specification.height, i);
                         break;
                     default:
-                        DEB_CRITICAL("Wrong attachment format");
-                        std::exit(1);
-                        break;
+                        DEB_CRITICAL("Wrong attachment format, exiting...");
+                        exit(1);
                 }
 
                 color_attachments[i] = renderbuffer;
@@ -344,9 +342,8 @@ void Framebuffer::build() {
                                 specification.height, specification.white_border_for_depth_texture);
                         break;
                     default:
-                        DEB_CRITICAL("Wrong attachment format");
-                        std::exit(1);
-                        break;
+                        DEB_CRITICAL("Wrong attachment format, exiting...");
+                        exit(1);
                 }
 
                 depth_attachment = texture;
@@ -374,9 +371,8 @@ void Framebuffer::build() {
                                 specification.width, specification.height);
                         break;
                     default:
-                        DEB_CRITICAL("Wrong attachment format");
-                        std::exit(1);
-                        break;
+                        DEB_CRITICAL("Wrong attachment format, exiting...");
+                        exit(1);
                 }
 
                 depth_attachment = renderbuffer;
@@ -399,8 +395,8 @@ void Framebuffer::build() {
     }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        REL_CRITICAL("Framebuffer {} is incomplete", framebuffer);
-        std::exit(1);
+        REL_CRITICAL("Framebuffer {} is incomplete, exiting...", framebuffer);
+        exit(1);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);   

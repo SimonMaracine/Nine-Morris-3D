@@ -56,8 +56,8 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout&
                         layout.stride, (GLvoid*) offset);
                 break;
             default:
-                REL_CRITICAL("Unknown element type");
-                std::exit(1);
+                REL_CRITICAL("Unknown element type, exiting...");
+                exit(1);
         }
 
         glEnableVertexAttribArray(element.index);

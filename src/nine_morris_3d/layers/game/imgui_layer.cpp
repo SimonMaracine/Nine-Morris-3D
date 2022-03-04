@@ -32,7 +32,31 @@
 #define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
 
 void ImGuiLayer::on_attach() {
-    ImGui::CreateContext();
+    save_load::GameState state;
+    try {
+        save_load::load_game_from_file(state);
+    } catch (const save_load::SaveFileNotOpenError& e) {
+        REL_ERROR("{}", e.what());
+        save_load::handle_save_file_not_open_error();
+        REL_ERROR("Could not load game");
+    } catch (const save_load::SaveFileError& e) {
+        REL_ERROR("{}", e.what());  // TODO maybe delete file
+        REL_ERROR("Could not load game");
+    }
+    last_save_date = std::move(state.date);
+}
+
+void ImGuiLayer::on_detach() {
+    // These need to be resetted
+    hovering_gui = false;
+    can_undo = false;
+    show_info = false;
+    about_mode = false;
+}
+
+void ImGuiLayer::on_awake() {
+    game_layer = get_layer<GameLayer>("game");
+    gui_layer = get_layer<GuiLayer>("gui");
 
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
@@ -80,44 +104,11 @@ void ImGuiLayer::on_attach() {
     style.ChildRounding = 8;
     style.PopupRounding = 8;
     style.GrabRounding = 8;
-
-    ImGui_ImplOpenGL3_Init("#version 430 core");
-    ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
-
-    save_load::GameState state;
-    try {
-        save_load::load_game_from_file(state);
-    } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_ERROR("{}", e.what());
-        save_load::handle_save_file_not_open_error();
-        REL_ERROR("Could not load game");
-    } catch (const save_load::SaveFileError& e) {
-        REL_ERROR("{}", e.what());  // TODO maybe delete file
-        REL_ERROR("Could not load game");
-    }
-    last_save_date = std::move(state.date);
-}
-
-void ImGuiLayer::on_detach() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    // These need to be resetted
-    hovering_gui = false;
-    can_undo = false;
-    show_info = false;
-    about_mode = false;
-}
-
-void ImGuiLayer::on_bind_layers() {
-    game_layer = get_layer<GameLayer>("game");
-    gui_layer = get_layer<GuiLayer>("gui");
 }
 
 void ImGuiLayer::on_update(float dt) {
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(app->data.width, app->data.height);
+    io.DisplaySize = ImVec2(app->app_data.width, app->app_data.height);
     io.DeltaTime = dt;
 
     ImGui_ImplGlfw_NewFrame();
@@ -146,7 +137,7 @@ void ImGuiLayer::on_update(float dt) {
 
                 save_load::GameState state;
                 state.board = game_layer->board;
-                state.camera = game_layer->camera;
+                // state.camera = game_layer->camera;
                 state.time = gui_layer->timer.get_time_raw();
 
                 const time_t current = time(nullptr);
@@ -280,9 +271,9 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::BeginMenu("Camera Sensitivity")) {
                 ImGui::PushItemWidth(100.0f);
                 if (ImGui::SliderFloat("##", &app->options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
-                    game_layer->camera.sensitivity = app->options.sensitivity;
+                    app->camera.sensitivity = app->options.sensitivity;
 
-                    DEB_INFO("Changed camera sensitivity to {}", game_layer->camera.sensitivity);
+                    DEB_INFO("Changed camera sensitivity to {}", app->camera.sensitivity);
                 }
                 ImGui::PopItemWidth();
 
@@ -338,6 +329,8 @@ void ImGuiLayer::on_update(float dt) {
     draw_debug(dt);
 #endif
 
+    ImGui::EndFrame();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -351,7 +344,6 @@ void ImGuiLayer::on_event(events::Event& event) {
     dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(ImGuiLayer::on_mouse_moved));
     dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(ImGuiLayer::on_mouse_button_pressed));
     dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(ImGuiLayer::on_mouse_button_released));
-    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(ImGuiLayer::on_window_resized));
 }
 
 bool ImGuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
@@ -382,12 +374,6 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
     return hovering_gui;
 }
 
-bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    game_layer->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
-
-    return false;
-}
-
 void ImGuiLayer::draw_game_over() {
     ImGui::PushFont(windows_font);
     ImGui::OpenPopup("Game Over");
@@ -397,6 +383,8 @@ void ImGuiLayer::draw_game_over() {
 
     if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_NoResize
             | ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Dummy(ImVec2(0.0f, 4.0f));
+
         switch (game_layer->board.ending) {
             case Board::Ending::WinnerWhite: {
                 const char* message = "White player wins!";
@@ -478,19 +466,19 @@ void ImGuiLayer::draw_about_screen() {
         float x_pos;
         float y_pos;
 
-        if (static_cast<float>(app->data.width) / static_cast<float>(app->data.height) > 16.0f / 9.0f) {
-            width = app->data.width;
-            height = app->data.width * (9.0f / 16.0f);
+        if (static_cast<float>(app->app_data.width) / app->app_data.height > 16.0f / 9.0f) {
+            width = app->app_data.width;
+            height = app->app_data.width * (9.0f / 16.0f);
             x_pos = 0.0f;
-            y_pos = (height - app->data.height) / -2.0f;
+            y_pos = (height - app->app_data.height) / -2.0f;
         } else {
-            height = app->data.height;
-            width = app->data.height * (16.0f / 9.0f);
-            x_pos = (width - app->data.width) / -2.0f;
+            height = app->app_data.height;
+            width = app->app_data.height * (16.0f / 9.0f);
+            x_pos = (width - app->app_data.width) / -2.0f;
             y_pos = 0.0f;
         }
 
-        renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
+        // renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
         ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
         ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
@@ -498,7 +486,7 @@ void ImGuiLayer::draw_about_screen() {
         ImGui::Text("All programming by:");
         ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
 
-        ImGui::Dummy(ImVec2(0.0f, 8.0f));
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         const float window_width = ImGui::GetWindowSize().x;
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
@@ -536,7 +524,7 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Should take piece: %s", game_layer->board.should_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", game_layer->board.turns_without_mills);
         ImGui::Text("History size: %lu", game_layer->board.state_history->size());
-        ImGui::Text("Hovered ID: %d", game_layer->hovered_id);
+        ImGui::Text("Hovered ID: %d", app->renderer->get_hovered_id());
         ImGui::Text("Hovered node: %p", game_layer->board.hovered_node);
         ImGui::Text("Hovered piece: %p", game_layer->board.hovered_piece);
         ImGui::Text("Selected piece: %p", game_layer->board.selected_piece);
@@ -544,66 +532,66 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::End();
 
         ImGui::Begin("Debug Settings");
-        if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&game_layer->light.position), -30.0f, 30.0f)) {
-            game_layer->setup_light();
-        }
-        if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&game_layer->light.ambient_color), 0.0f, 1.0f)) {
-            game_layer->setup_light();
-        }
-        if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&game_layer->light.diffuse_color), 0.0f, 1.0f)) {
-            game_layer->setup_light();
-        }
-        if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&game_layer->light.specular_color), 0.0f, 1.0f)) {
-            game_layer->setup_light();
-        }
+        // if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&game_layer->light.position), -30.0f, 30.0f)) {
+        //     game_layer->setup_light();
+        // }
+        // if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&game_layer->light.ambient_color), 0.0f, 1.0f)) {
+        //     game_layer->setup_light();
+        // }
+        // if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&game_layer->light.diffuse_color), 0.0f, 1.0f)) {
+        //     game_layer->setup_light();
+        // }
+        // if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&game_layer->light.specular_color), 0.0f, 1.0f)) {
+        //     game_layer->setup_light();
+        // }
         ImGui::End();
 
         // If you recompile shaders, uniforms that are set only once need to be reuploaded
         ImGui::Begin("Shaders");
         if (ImGui::Button("board_paint")) {
-            app->storage->board_paint_shader->recompile();
+            // app->storage->board_paint_shader->recompile();
         }
         if (ImGui::Button("board")) {
-            app->storage->board_shader->recompile();
+            // app->storage->board_shader->recompile();
         }
         if (ImGui::Button("node")) {
-            app->storage->node_shader->recompile();
+            // app->storage->node_shader->recompile();
         }
         if (ImGui::Button("origin")) {
-            app->storage->origin_shader->recompile();
+            // app->storage->origin_shader->recompile();
         }
         if (ImGui::Button("outline")) {
-            app->storage->outline_shader->recompile();
+            // app->storage->outline_shader->recompile();
         }
         if (ImGui::Button("piece")) {
-            app->storage->piece_shader->recompile();
+            // app->storage->piece_shader->recompile();
         }
         if (ImGui::Button("quad2d")) {
-            app->storage->quad2d_shader->recompile();
+            // app->storage->quad2d_shader->recompile();
         }
         if (ImGui::Button("quad3d")) {
-            app->storage->quad3d_shader->recompile();
+            // app->storage->quad3d_shader->recompile();
         }
         if (ImGui::Button("screen_quad")) {
-            app->storage->screen_quad_shader->recompile();
+            // app->storage->screen_quad_shader->recompile();
         }
         if (ImGui::Button("shadow")) {
-            app->storage->shadow_shader->recompile();
+            // app->storage->shadow_shader->recompile();
         }
         if (ImGui::Button("skybox")) {
-            app->storage->skybox_shader->recompile();
+            // app->storage->skybox_shader->recompile();
         }
         if (ImGui::Button("text")) {
-            app->storage->text_shader->recompile();
+            // app->storage->text_shader->recompile();
         }
         ImGui::End();
 
         ImGui::Begin("Camera Debug");
-        ImGui::Text("Position: %f, %f, %f", game_layer->camera.get_position().x, game_layer->camera.get_position().y, game_layer->camera.get_position().z);
-        ImGui::Text("Pitch: %f", game_layer->camera.get_pitch());
-        ImGui::Text("Yaw: %f", game_layer->camera.get_yaw());
-        ImGui::Text("Angle around point: %f", game_layer->camera.get_angle_around_point());
-        ImGui::Text("Distance to point: %f", game_layer->camera.get_distance_to_point());
+        // ImGui::Text("Position: %f, %f, %f", game_layer->camera.get_position().x, game_layer->camera.get_position().y, game_layer->camera.get_position().z);
+        // ImGui::Text("Pitch: %f", game_layer->camera.get_pitch());
+        // ImGui::Text("Yaw: %f", game_layer->camera.get_yaw());
+        // ImGui::Text("Angle around point: %f", game_layer->camera.get_angle_around_point());
+        // ImGui::Text("Distance to point: %f", game_layer->camera.get_distance_to_point());
         ImGui::End();
     }
 }

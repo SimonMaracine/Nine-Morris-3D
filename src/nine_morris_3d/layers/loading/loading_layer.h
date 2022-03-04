@@ -19,7 +19,6 @@ public:
     virtual void on_attach() override;
     virtual void on_detach() override;
     virtual void on_update(float dt) override;
-    virtual void on_draw() override;
 
     std::unique_ptr<Loader<AssetsData>> loader;
 };

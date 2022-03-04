@@ -9,27 +9,24 @@ in vec4 v_fragment_position_light_space;
 layout (location = 0) out vec4 fragment_color;
 layout (location = 1) out int entity_id;
 
-uniform vec3 u_view_position;
-uniform vec3 u_tint_color;
 uniform sampler2D u_shadow_map;
 
 struct Material {
     sampler2D diffuse;
     vec3 specular;
     float shininess;
+    vec3 tint;
 };
 
 uniform Material u_material;
 
-struct Light {
-    vec3 position;
-  
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+layout (binding = 1) uniform Light {
+    vec3 u_light_position;
+    vec3 u_light_ambient;
+    vec3 u_light_diffuse;
+    vec3 u_light_specular;
+    vec3 u_view_position;
 };
-
-uniform Light u_light;
 
 float calculate_shadow(vec4 fragment_position_light_space, vec3 normal, vec3 light_direction) {
     vec3 projection_coordinates = fragment_position_light_space.xyz / fragment_position_light_space.w;
@@ -57,24 +54,25 @@ float calculate_shadow(vec4 fragment_position_light_space, vec3 normal, vec3 lig
     return shadow;
 }
 
-vec3 calculate_light(Material material, Light light, vec3 texture_colors,
-                     vec4 fragment_position_light_space) {
+vec3 calculate_light(Material material, vec3 light_position, vec3 light_ambient,
+        vec3 light_diffuse, vec3 light_specular, vec3 view_position,
+        vec3 texture_colors, vec4 fragment_position_light_space) {
     // Ambient light
-    vec3 ambient_light = texture_colors * light.ambient;
+    vec3 ambient_light = texture_colors * light_ambient;
 
     // Diffuse light
     vec3 normal = normalize(v_normal);
-    vec3 light_direction = normalize(light.position - v_fragment_position);
+    vec3 light_direction = normalize(light_position - v_fragment_position);
 
     float diffuse_strength = max(dot(normal, light_direction), 0.0);
-    vec3 diffuse_light = diffuse_strength * texture_colors * light.diffuse;
+    vec3 diffuse_light = diffuse_strength * texture_colors * light_diffuse;
 
     // Specular light
-    vec3 view_direction = normalize(u_view_position - v_fragment_position);
+    vec3 view_direction = normalize(view_position - v_fragment_position);
     vec3 reflect_direction = reflect(-light_direction, normal);
 
     float specular_strength = pow(max(dot(view_direction, reflect_direction), 0.0), material.shininess);
-    vec3 specular_light = material.specular * specular_strength * light.specular;
+    vec3 specular_light = material.specular * specular_strength * light_specular;
 
     // Calculate shadow and final result
     float shadow = calculate_shadow(fragment_position_light_space, normal, light_direction);
@@ -86,11 +84,12 @@ vec3 calculate_light(Material material, Light light, vec3 texture_colors,
 void main() {
     vec3 texture_colors = vec3(texture(u_material.diffuse, v_texture_coordinate));
 
-    vec3 total_light = calculate_light(u_material, u_light, texture_colors,
-                                       v_fragment_position_light_space);
+    vec3 total_light = calculate_light(
+        u_material, u_light_position, u_light_ambient, u_light_diffuse, u_light_specular,
+        u_view_position, texture_colors, v_fragment_position_light_space
+    );
 
-    // Add everything up
-    vec4 result_fragment = vec4(total_light * u_tint_color, 1.0);
+    vec4 result_fragment = vec4(total_light * u_material.tint, 1.0);
 
     fragment_color = result_fragment;
     entity_id = v_entity_id;

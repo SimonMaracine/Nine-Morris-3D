@@ -7,7 +7,7 @@
 #include "application/application_data.h"
 #include "application/events.h"
 #include "application/window.h"
-#include "graphics/renderer/renderer.h"
+#include "graphics/renderer/new_renderer.h"
 #include "graphics/renderer/framebuffer.h"
 #include "nine_morris_3d/assets_data.h"
 #include "other/loader.h"
@@ -46,7 +46,8 @@ public:
     ApplicationData data;
     std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
-    renderer::Storage* storage = nullptr;
+    std::unique_ptr<Renderer> renderer;
+    Camera camera;
 private:
     void on_event(events::Event& event);
     float update_frame_counter();
@@ -55,6 +56,8 @@ private:
     // These implement scenes in the game
     void push_layer(Layer* layer);
     void pop_layer(Layer* layer);
+    void push_overlay(Layer* layer);
+    void pop_overlay(Layer* layer);
 
     bool on_window_closed(events::WindowClosedEvent& event);
     bool on_window_resized(events::WindowResizedEvent& event);
@@ -62,8 +65,11 @@ private:
     // Data for the layer and scene system
     std::vector<Scene*> scenes;
     Scene* current_scene = nullptr;
-    std::vector<Layer*> layer_stack;  // Stores all layers in the current scene
+
+    std::vector<Layer*> layer_stack;  // Stores all normal layers in the current scene
+    std::vector<Layer*> overlay_stack;  // Layers that are updated only after 3D rendering
     std::vector<Layer*> active_layer_stack;  // Only active layers in current scene
+    std::vector<Layer*> active_overlay_stack;
 
     bool changed_scene = false;
     Scene* to_scene = nullptr;

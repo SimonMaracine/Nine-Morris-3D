@@ -12,18 +12,18 @@
 #include "application/events.h"
 #include "application/scene.h"
 #include "application/input.h"
-#include "graphics/renderer/renderer.h"
+#include "graphics/renderer/new_renderer.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
 Application::Application(int width, int height, const std::string& title) {
-    data.width = width;
-    data.height = height;
-    data.title = title;
-    data.event_function = BIND(Application::on_event);
+    app_data.width = width;
+    app_data.height = height;
+    app_data.title = title;
+    app_data.event_function = BIND(Application::on_event);
 
     logging::initialize();
-    window = std::make_shared<Window>(&data);
+    window = std::make_shared<Window>(&app_data);
 
 #ifdef NINE_MORRIS_3D_DEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
@@ -35,22 +35,23 @@ Application::Application(int width, int height, const std::string& title) {
     if (!(version_major == 4 && version_minor >= 3)) {
         REL_CRITICAL("Graphics card must support at minimum OpenGL 4.3 (it has {}.{})",
                 version_major, version_minor);
-        std::exit(1);
+        exit(1);
     }
 
-    storage = renderer::initialize(this);
+    renderer = std::make_unique<Renderer>(this);
     assets_data = std::make_shared<AssetsData>();
 }
 
 Application::~Application() {
     for (Scene* scene : scenes) {
+        for (Layer* layer : scene->overlays_in_order) {
+            delete layer;
+        }
         for (Layer* layer : scene->layers_in_order) {
             delete layer;
         }
         delete scene;
     }
-
-    renderer::terminate();
 }
 
 void Application::run() {
@@ -58,12 +59,22 @@ void Application::run() {
 
     for (Scene* scene : scenes) {
         for (Layer* layer : scene->layers_in_order) {
-            layer->on_bind_layers();
+            layer->on_awake();
+        }
+    }
+
+    for (Scene* scene : scenes) {
+        for (Layer* layer : scene->overlays_in_order) {
+            layer->on_awake();
         }
     }
 
     for (Layer* layer : current_scene->layers_in_order) {
         push_layer(layer);
+    }
+
+    for (Layer* layer : current_scene->overlays_in_order) {
+        push_overlay(layer);
     }
 
     DEB_INFO("Initialized game");
@@ -77,11 +88,26 @@ void Application::run() {
                 layer->on_fixed_update();
             }
             layer->on_update(dt);
-            layer->on_draw();
         }
+
+        renderer->render();
+
+        for (Layer* layer : active_overlay_stack) {
+            for (unsigned int i = 0; i < fixed_updates; i++) {
+                layer->on_fixed_update();
+            }
+            layer->on_update(dt);
+        }
+
+        window->update();
 
         if (changed_scene) {
             active_layer_stack.clear();
+            active_overlay_stack.clear();
+
+            for (auto iter = overlay_stack.rbegin(); iter != overlay_stack.rend(); iter++) {
+                pop_overlay(*iter);
+            }
 
             for (int i = layer_stack.size() - 1; i >= 0; i--) {
                 pop_layer(layer_stack[i]);
@@ -93,16 +119,22 @@ void Application::run() {
                 push_layer(layer);
             }
 
+            for (Layer* layer : current_scene->overlays_in_order) {
+                push_overlay(layer);
+            }
+
             changed_scene = false;
         }
-
-        window->update();
     }
 
     DEB_INFO("Closing game");
 
-    for (int i = layer_stack.size() - 1; i >= 0; i--) {
-        pop_layer(layer_stack[i]);
+    for (auto iter = overlay_stack.rbegin(); iter != overlay_stack.rend(); iter++) {
+        pop_overlay(*iter);
+    }
+
+    for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
+        pop_layer(*iter);
     }
 }
 
@@ -140,10 +172,17 @@ void Application::purge_framebuffers() {
 
 void Application::update_active_layers() {
     active_layer_stack.clear();
+    active_overlay_stack.clear();
 
     for (Layer* layer : layer_stack) {
         if (layer->active) {
             active_layer_stack.push_back(layer);
+        }
+    }
+
+    for (Layer* layer : overlay_stack) {
+        if (layer->active) {
+            active_overlay_stack.push_back(layer);
         }
     }
 }
@@ -155,9 +194,17 @@ void Application::on_event(events::Event& event) {
     dispatcher.dispatch<WindowClosedEvent>(WindowClosed, BIND(Application::on_window_closed));
     dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(Application::on_window_resized));
 
+    for (auto iter = active_overlay_stack.rbegin(); iter != active_overlay_stack.rend(); iter++) {
+        if (event.handled) {
+            return;
+        }
+
+        (*iter)->on_event(event);
+    }
+
     for (auto iter = active_layer_stack.rbegin(); iter != active_layer_stack.rend(); iter++) {
         if (event.handled) {
-            break;
+            return;
         }
 
         (*iter)->on_event(event);
@@ -229,6 +276,20 @@ void Application::pop_layer(Layer* layer) {
     layer->active = true;
 }
 
+void Application::push_overlay(Layer* layer) {
+    overlay_stack.push_back(layer);
+    active_overlay_stack.push_back(layer);
+    layer->on_attach();
+}
+
+void Application::pop_overlay(Layer* layer) {
+    layer->on_detach();
+    auto iter = std::find(overlay_stack.begin(), overlay_stack.end(), layer);
+    overlay_stack.erase(iter);
+    layer->active = true;
+}
+
+
 bool Application::on_window_closed(events::WindowClosedEvent& event) {
     running = false;
 
@@ -236,7 +297,7 @@ bool Application::on_window_closed(events::WindowClosedEvent& event) {
 }
 
 bool Application::on_window_resized(events::WindowResizedEvent& event) {
-    renderer::set_viewport(event.width, event.height);
+    renderer->set_viewport(event.width, event.height);
 
     for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
         std::shared_ptr<Framebuffer> fb = framebuffer.lock();
@@ -247,16 +308,18 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
         }
     }
 
-    storage->orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
+    camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
+
+    renderer->storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
             static_cast<float>(event.height));
 
-    storage->quad2d_shader->bind();
-    storage->quad2d_shader->set_uniform_matrix("u_projection_matrix",
-            storage->orthographic_projection_matrix);
+    renderer->storage.quad2d_shader->bind();  // TODO optimize maybe
+    renderer->storage.quad2d_shader->set_uniform_mat4("u_projection_matrix",
+            renderer->storage.orthographic_projection_matrix);
 
-    storage->text_shader->bind();
-    storage->text_shader->set_uniform_matrix("u_projection_matrix",
-            storage->orthographic_projection_matrix);
+    renderer->storage.text_shader->bind();
+    renderer->storage.text_shader->set_uniform_mat4("u_projection_matrix",
+            renderer->storage.orthographic_projection_matrix);
 
     return false;
 }
