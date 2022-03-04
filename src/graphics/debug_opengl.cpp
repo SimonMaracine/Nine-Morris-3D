@@ -115,7 +115,7 @@ namespace debug_opengl {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
                 REL_CRITICAL("(ID: {}) {}", id, message);
-                std::exit(1);
+                exit(1);
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:
                 REL_WARN("(ID: {}) {}", id, message);

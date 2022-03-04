@@ -35,7 +35,7 @@ Application::Application(int width, int height, const std::string& title) {
     if (!(version_major == 4 && version_minor >= 3)) {
         REL_CRITICAL("Graphics card must support at minimum OpenGL 4.3 (it has {}.{})",
                 version_major, version_minor);
-        std::exit(1);
+        exit(1);
     }
 
     // storage = renderer::initialize(this);

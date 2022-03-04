@@ -28,8 +28,8 @@ Font::Font(const std::string& file_path, float size, int padding, unsigned char 
     font_file_buffer = get_file_data(file_path);
 
     if (!stbtt_InitFont(&info, (unsigned char*) font_file_buffer, 0)) {
-        REL_CRITICAL("Could not load font '{}'", file_path.c_str());
-        std::exit(1);
+        REL_CRITICAL("Could not load font '{}', exiting...", file_path.c_str());
+        exit(1);
     }
     sf = stbtt_ScaleForPixelHeight(&info, size);
 
@@ -179,8 +179,8 @@ void Font::end_baking() {
 #ifdef NINE_MORRIS_3D_DEBUG
     std::string file_name = "bitmap_" + name + ".png";
     if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
-        DEB_CRITICAL("Failed to create png");
-        std::exit(1);
+        DEB_CRITICAL("Failed to create png, exiting...");
+        exit(1);
     }
 #endif
 
@@ -277,8 +277,8 @@ const char* Font::get_file_data(const std::string& file_path) {
     std::ifstream file (file_path, std::ios::in | std::ios::binary);
 
     if (!file.is_open()) {
-        REL_CRITICAL("Could not open file '{}' for reading", file_path.c_str());
-        std::exit(1);
+        REL_CRITICAL("Could not open file '{}' for reading, exiting...", file_path.c_str());
+        exit(1);
     }
 
     file.seekg(0, file.end);

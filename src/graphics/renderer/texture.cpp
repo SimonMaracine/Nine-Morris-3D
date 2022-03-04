@@ -56,8 +56,8 @@ std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipm
     stbi_uc* data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture '{}'", file_path.c_str());
-        std::exit(1);
+        REL_CRITICAL("Could not load texture '{}', exiting...", file_path.c_str());
+        exit(1);
     }
 
     GLuint texture;
@@ -166,8 +166,8 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
         data = stbi_load(file_paths[i], &width, &height, &channels, 4);
 
         if (data == nullptr) {
-            REL_CRITICAL("Could not load texture '{}'", file_paths[i]);
-            std::exit(1);
+            REL_CRITICAL("Could not load texture '{}', exiting...", file_paths[i]);
+            exit(1);
         }
 
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, width, height,

@@ -13,7 +13,7 @@ IconImage::IconImage(const std::string& file_path) {
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load icon image '{}', exiting...", file_path.c_str());
-        std::exit(1);
+        exit(1);
     }
 
     this->file_path = file_path;

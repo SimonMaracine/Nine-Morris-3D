@@ -15,7 +15,7 @@ TextureData::TextureData(const std::string& file_path, bool flip) {
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load texture '{}', exiting...", file_path.c_str());
-        std::exit(1);
+        exit(1);
     }
 
     this->file_path = file_path;

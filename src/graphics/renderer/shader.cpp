@@ -75,7 +75,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
 
     if (!check_linking(program)) {
         REL_CRITICAL("Exiting...");
-        std::exit(1);
+        exit(1);
     }
 
     std::string name = get_name(vertex_source_path, fragment_source_path);
@@ -94,7 +94,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
         fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
     } catch (const std::runtime_error& e) {
         REL_CRITICAL("{}, exiting...", e.what());
-        std::exit(1);
+        exit(1);
     }
 
     GLuint program = glCreateProgram();
@@ -105,7 +105,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
 
     if (!check_linking(program)) {
         REL_CRITICAL("Exiting...");
-        std::exit(1);
+        exit(1);
     }
 
     for (const UniformBlockSpecification& block : uniform_blocks) {
@@ -113,7 +113,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
 
         if (block_index == GL_INVALID_INDEX) {
             REL_CRITICAL("Invalid block index, exiting...");
-            std::exit(1);  // TODO remove "std::"
+            exit(1);
         }
 
         if (!block.uniform_buffer->configured) {
@@ -246,7 +246,7 @@ GLint Shader::get_uniform_location(const std::string& name) {
     } catch (const std::out_of_range&) {
         DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}', exiting...", name.c_str(),
                 this->name.c_str());
-        std::exit(1);
+        exit(1);
     }
 #endif
 }
@@ -262,7 +262,7 @@ GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {  //
         }
     } else {
         REL_CRITICAL("Could not open file '{}', exiting...", source_path.c_str());
-        std::exit(1);
+        exit(1);
     }
     file.close();
 

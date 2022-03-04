@@ -21,7 +21,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());
             REL_CRITICAL(importer.GetErrorString());
-            std::exit(1);
+            exit(1);
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -75,7 +75,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());
             REL_CRITICAL(importer.GetErrorString());
-            std::exit(1);
+            exit(1);
         }
 
         const aiNode* root_node = scene->mRootNode;
