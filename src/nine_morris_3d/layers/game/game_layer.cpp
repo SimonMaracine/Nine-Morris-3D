@@ -887,25 +887,25 @@ void GameLayer::build_turn_indicator() {
 // }
 
 void GameLayer::set_scene_framebuffer(int samples) {
-    // if (app->storage->scene_framebuffer->get_specification().samples == samples) {
-    //     return;
-    // }
+    if (app->renderer->get_scene_framebuffer()->get_specification().samples == samples) {
+        return;
+    }
 
-    // FramebufferSpecification specification;
-    // specification.width = app->data.width;
-    // specification.height = app->data.height;
-    // specification.samples = app->options.samples;
-    // specification.color_attachments = {
-    //     Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
-    //     Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
-    // };
-    // specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
-    //         AttachmentType::Renderbuffer);
+    FramebufferSpecification specification;
+    specification.width = app->app_data.width;
+    specification.height = app->app_data.height;
+    specification.samples = app->options.samples;
+    specification.color_attachments = {
+        Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
+        Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+    };
+    specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
+            AttachmentType::Renderbuffer);
 
-    // app->storage->scene_framebuffer = Framebuffer::create(specification);
+    app->renderer->set_scene_framebuffer(Framebuffer::create(specification));
 
-    // app->purge_framebuffers();
-    // app->add_framebuffer(app->storage->scene_framebuffer);
+    app->purge_framebuffers();
+    app->add_framebuffer(app->renderer->get_scene_framebuffer());
 }
 
 void GameLayer::set_textures_quality(const std::string& quality) {

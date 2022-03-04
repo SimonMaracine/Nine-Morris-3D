@@ -38,7 +38,6 @@ Application::Application(int width, int height, const std::string& title) {
         exit(1);
     }
 
-    // storage = renderer::initialize(this);
     renderer = std::make_unique<Renderer>(this);
     assets_data = std::make_shared<AssetsData>();
 }
@@ -53,8 +52,6 @@ Application::~Application() {
         }
         delete scene;
     }
-
-    // renderer::terminate();
 }
 
 void Application::run() {
@@ -318,7 +315,7 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
     renderer->storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
             static_cast<float>(event.height));
 
-    renderer->storage.quad2d_shader->bind();  // TODO optimize
+    renderer->storage.quad2d_shader->bind();  // TODO optimize maybe
     renderer->storage.quad2d_shader->set_uniform_mat4("u_projection_matrix",
             renderer->storage.orthographic_projection_matrix);
 

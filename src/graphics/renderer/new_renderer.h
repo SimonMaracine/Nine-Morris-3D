@@ -75,6 +75,7 @@ public:
     UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
     UniformBlockSpecification& get_light_uniform_block() { return storage.light_uniform_block; }
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
+    std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
 
     DirectionalLight light;
     bool origin = false;  // This does nothing in release mode
