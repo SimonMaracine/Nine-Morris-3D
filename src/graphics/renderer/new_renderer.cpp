@@ -32,6 +32,10 @@ const char* light_block_fields[] = {
     "u_view_position"
 };
 
+const char* light_space_block_fields[] = {
+    "u_light_space_matrix"
+};
+
 std::string path(const char* file_path) {  // FIXME not very dry
 #if defined(NINE_MORRIS_3D_DEBUG)
     // Use relative path for both operating systems
@@ -60,6 +64,7 @@ Renderer::Renderer(Application* app)
 
     storage.projection_view_uniform_buffer = UniformBuffer::create();
     storage.light_uniform_buffer = UniformBuffer::create();
+    storage.light_space_uniform_buffer = UniformBuffer::create();
 
     storage.projection_view_uniform_block.block_name = "ProjectionView";
     storage.projection_view_uniform_block.field_count = 1;
@@ -72,6 +77,12 @@ Renderer::Renderer(Application* app)
     storage.light_uniform_block.field_names = light_block_fields;
     storage.light_uniform_block.uniform_buffer = storage.light_uniform_buffer;
     storage.light_uniform_block.binding_index = 1;
+
+    storage.light_space_uniform_block.block_name = "LightSpace";
+    storage.light_space_uniform_block.field_count = 1;
+    storage.light_space_uniform_block.field_names = light_space_block_fields;
+    storage.light_space_uniform_block.uniform_buffer = storage.light_space_uniform_buffer;
+    storage.light_space_uniform_block.binding_index = 2;
 
     {
         const std::vector<std::string> uniforms = {
@@ -125,19 +136,18 @@ Renderer::Renderer(Application* app)
 
     {
         const std::vector<std::string> uniforms = {
-            "u_model_matrix",
-            "u_light_space_matrix"
+            "u_model_matrix"
         };
         storage.shadow_shader = Shader::create(
             path(SHADOW_VERTEX_SHADER),
             path(SHADOW_FRAGMENT_SHADER),
-            uniforms
+            uniforms,
+            { storage.light_space_uniform_block }
         );
     }
 
     {
         const std::vector<std::string> uniforms = {
-            // "u_projection_view_matrix",
             "u_model_matrix",
             "u_color"
         };
@@ -277,7 +287,7 @@ Renderer::Renderer(Application* app)
         specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
                 AttachmentType::Renderbuffer);
 
-        storage.intermediate_framebuffer = Framebuffer::create(specification);  // TODO don't know
+        storage.intermediate_framebuffer = Framebuffer::create(specification);
 
         app->purge_framebuffers();
         app->add_framebuffer(storage.intermediate_framebuffer);
@@ -365,18 +375,10 @@ void Renderer::render() {
         matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
 
-        model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
-        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
-        // model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
-        // model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
-
-        // model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
-        // model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
-        // model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-        // model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
-
         model->vertex_array->bind();
         model->material->bind();
+
+        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
 
         if (model->material->is_hoverable()) {
             glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -396,12 +398,10 @@ void Renderer::render() {
         matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
 
-        model->material->get_shader()->bind();
-        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
-        // model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
-
         model->vertex_array->bind();
         model->material->bind();
+
+        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
 
         if (model->material->is_hoverable()) {
             glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -425,18 +425,10 @@ void Renderer::render() {
             matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
             matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
 
-            model->material->get_shader()->bind();  // TODO Optimize this (maybe by using uniform buffers)
-            model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
-            // model->material->get_shader()->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
-            // model->material->get_shader()->set_uniform_vec3("u_view_position", app->camera.get_position());
-
-            // model->material->get_shader()->set_uniform_vec3("u_light.position", light.position);
-            // model->material->get_shader()->set_uniform_vec3("u_light.ambient", light.ambient_color);
-            // model->material->get_shader()->set_uniform_vec3("u_light.diffuse", light.diffuse_color);
-            // model->material->get_shader()->set_uniform_vec3("u_light.specular", light.specular_color);
-
             model->vertex_array->bind();
             model->material->bind();
+
+            model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
 
             if (model->material->is_hoverable()) {
                 glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -464,7 +456,6 @@ void Renderer::render() {
 
             storage.outline_shader->bind();
             storage.outline_shader->set_uniform_mat4("u_model_matrix", matrix);
-            // storage.outline_shader->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
             storage.outline_shader->set_uniform_vec3("u_color", model->outline_color);
 
             // Render without output to red
@@ -608,12 +599,12 @@ void Renderer::setup_shadows() {
             glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     const glm::mat4 light_space_matrix = projection * view;
 
-    storage.shadow_shader->bind();
-    storage.shadow_shader->set_uniform_mat4("u_light_space_matrix", light_space_matrix);
+    storage.light_space_uniform_buffer->set(&light_space_matrix, 0);
+    storage.light_space_uniform_buffer->bind();
+    storage.light_space_uniform_buffer->upload_data();
 
     for (const auto& [id, model] : models_has_shadow) {
         model->material->get_shader()->bind();
-        model->material->get_shader()->set_uniform_mat4("u_light_space_matrix", light_space_matrix);
         model->material->get_shader()->set_uniform_int("u_shadow_map", 2);
     }
 }

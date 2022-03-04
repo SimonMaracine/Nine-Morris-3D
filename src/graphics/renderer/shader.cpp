@@ -11,6 +11,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "application/platform.h"
+#include "graphics/debug_opengl.h"
 #include "graphics/renderer/shader.h"
 #include "graphics/renderer/buffer.h"
 #include "other/logging.h"
@@ -46,7 +47,7 @@ Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, con
     for (const std::string& uniform : uniforms) {
         GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
-            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", name.c_str(), name.c_str());
+            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name.c_str());
             continue;
         }
         cache[uniform] = location;
@@ -121,6 +122,11 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
 
             block.uniform_buffer->data = new char[block_size];
             block.uniform_buffer->size = block_size;
+
+            glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
+            glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
+            LOG_ALLOCATION(block_size);
+            glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
             assert(block.field_count <= 16);
 

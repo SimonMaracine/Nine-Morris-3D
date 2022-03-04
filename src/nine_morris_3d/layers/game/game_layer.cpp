@@ -314,20 +314,15 @@ void GameLayer::setup_board() {
     if (!app->data.loaded_board) {
         const std::vector<std::string> uniforms = {
             "u_model_matrix",
-            "u_light_space_matrix",
-            // "u_view_position",
             "u_shadow_map",
             "u_material.diffuse",
             "u_material.specular",
             "u_material.shininess"
-            // "u_light.position",
-            // "u_light.ambient",
-            // "u_light.diffuse",
-            // "u_light.specular"
         };
         const std::vector<UniformBlockSpecification> uniform_blocks = {
             app->renderer->get_projection_view_uniform_block(),
-            app->renderer->get_light_uniform_block()
+            app->renderer->get_light_uniform_block(),
+            app->renderer->get_light_space_uniform_block()
         };
         app->data.board_shader = Shader::create(
             assets::path(assets::BOARD_VERTEX_SHADER),
@@ -396,22 +391,16 @@ void GameLayer::setup_board() {
 void GameLayer::setup_board_paint() {
     if (!app->data.loaded_board_paint) {
         const std::vector<std::string> uniforms = {
-            // "u_projection_view_matrix",
             "u_model_matrix",
-            "u_light_space_matrix",
-            // "u_view_position",
             "u_shadow_map",
             "u_material.diffuse",
             "u_material.specular",
             "u_material.shininess"
-            // "u_light.position",
-            // "u_light.ambient",
-            // "u_light.diffuse",
-            // "u_light.specular"
         };
         const std::vector<UniformBlockSpecification> uniform_blocks = {
             app->renderer->get_projection_view_uniform_block(),
-            app->renderer->get_light_uniform_block()
+            app->renderer->get_light_uniform_block(),
+            app->renderer->get_light_space_uniform_block()
         };
         app->data.board_paint_shader = Shader::create(
             assets::path(assets::BOARD_PAINT_VERTEX_SHADER),
@@ -479,23 +468,17 @@ void GameLayer::setup_board_paint() {
 void GameLayer::setup_pieces() {
     if (!app->data.loaded_pieces) {
         const std::vector<std::string> uniforms = {
-            // "u_projection_view_matrix",
             "u_model_matrix",
-            "u_light_space_matrix",
-            // "u_view_position",
             "u_shadow_map",
             "u_material.diffuse",
             "u_material.specular",
             "u_material.shininess",
             "u_material.tint"
-            // "u_light.position",
-            // "u_light.ambient",
-            // "u_light.diffuse",
-            // "u_light.specular"
         };
         const std::vector<UniformBlockSpecification> uniform_blocks = {
             app->renderer->get_projection_view_uniform_block(),
-            app->renderer->get_light_uniform_block()
+            app->renderer->get_light_uniform_block(),
+            app->renderer->get_light_space_uniform_block()
         };
         app->data.piece_shader = Shader::create(
             assets::path(assets::PIECE_VERTEX_SHADER),
@@ -606,7 +589,6 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
 void GameLayer::setup_nodes() {
     if (!app->data.loaded_nodes) {
         const std::vector<std::string> uniforms = {
-            // "u_projection_view_matrix",
             "u_model_matrix",
             "u_color"
         };

@@ -125,7 +125,7 @@ void UniformBuffer::set(const void* field_data, unsigned field_index) {
 }
 
 void UniformBuffer::upload_data() {
-    glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);  // TODO see what is best
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
 }
 
 // --- Pixel buffer

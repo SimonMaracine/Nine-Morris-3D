@@ -15,7 +15,9 @@ layout (binding = 0) uniform ProjectionView {
     mat4 u_projection_view_matrix;
 };
 
-uniform mat4 u_light_space_matrix;
+layout (binding = 2) uniform LightSpace {
+    mat4 u_light_space_matrix;
+};
 
 void main() {
     v_texture_coordinate = a_texture_coordinate;
