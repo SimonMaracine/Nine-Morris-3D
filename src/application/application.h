@@ -43,7 +43,7 @@ public:
     bool running = true;
     double fps = 0.0;
     unsigned int frames = 0;  // TODO remove this, if not needed
-    ApplicationData data;
+    ApplicationData app_data;
     std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;

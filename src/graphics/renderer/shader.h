@@ -44,14 +44,10 @@ public:
     void set_uniform_vec3(const std::string& name, const glm::vec3& vector);
     void set_uniform_vec4(const std::string& name, const glm::vec4& vector);
 
-<<<<<<< HEAD
     // Make sure to reupload any uniforms that need to after calling this function
-    void recompile();
-=======
     void recompile();  // FIXME this should update the uniform indices!!!
 
     const std::string& get_name() { return name; }
->>>>>>> ref-rendering
 private:
     GLint get_uniform_location(const std::string& name);
 
