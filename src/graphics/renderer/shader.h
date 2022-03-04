@@ -15,6 +15,7 @@ struct UniformBlockSpecification {
     unsigned int field_count;
     const char** field_names;
     std::shared_ptr<UniformBuffer> uniform_buffer;
+    GLuint binding_index;
 };
 
 class Shader {

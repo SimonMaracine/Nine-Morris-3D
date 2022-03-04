@@ -7,7 +7,7 @@ out flat int v_entity_id;
 
 uniform mat4 u_model_matrix;
 
-uniform ProjectionView {
+layout (binding = 0) uniform ProjectionView {
     mat4 u_projection_view_matrix;
 };
 

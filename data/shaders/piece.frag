@@ -20,7 +20,7 @@ struct Material {
 
 uniform Material u_material;
 
-uniform Light {
+layout (binding = 1) uniform Light {
     vec3 u_light_position;
     vec3 u_light_ambient;
     vec3 u_light_diffuse;

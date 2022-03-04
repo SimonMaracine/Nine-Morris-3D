@@ -65,11 +65,13 @@ Renderer::Renderer(Application* app)
     storage.projection_view_uniform_block.field_count = 1;
     storage.projection_view_uniform_block.field_names = projection_view_block_fields;
     storage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;
+    storage.projection_view_uniform_block.binding_index = 0;
 
     storage.light_uniform_block.block_name = "Light";
     storage.light_uniform_block.field_count = 5;
     storage.light_uniform_block.field_names = light_block_fields;
     storage.light_uniform_block.uniform_buffer = storage.light_uniform_buffer;
+    storage.light_uniform_block.binding_index = 1;
 
     {
         const std::vector<std::string> uniforms = {

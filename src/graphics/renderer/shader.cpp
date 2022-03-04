@@ -107,7 +107,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
         std::exit(1);
     }
 
-    for (const UniformBlockSpecification& block : uniform_blocks) {  // FIXME skip this part, if buffer already contains the data
+    for (const UniformBlockSpecification& block : uniform_blocks) {
         GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
 
         if (block_index == GL_INVALID_INDEX) {
@@ -115,40 +115,44 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
             std::exit(1);  // TODO remove "std::"
         }
 
-        GLint block_size;
-        glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
+        if (!block.uniform_buffer->configured) {
+            GLint block_size;
+            glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
 
-        block.uniform_buffer->data = new char[block_size];
-        block.uniform_buffer->size = block_size;
+            block.uniform_buffer->data = new char[block_size];
+            block.uniform_buffer->size = block_size;
 
-        assert(block.field_count <= 16);
+            assert(block.field_count <= 16);
 
-        GLuint indices[16];
-        GLint offsets[16];
-        GLint sizes[16];
-        GLint types[16];
+            GLuint indices[16];
+            GLint offsets[16];
+            GLint sizes[16];
+            GLint types[16];
 
-        glGetUniformIndices(program, block.field_count, block.field_names, indices);
+            glGetUniformIndices(program, block.field_count, block.field_names, indices);
 
-        for (unsigned int i = 0; i < block.field_count; i++) {
-            if (indices[i] == GL_INVALID_INDEX) {
-                REL_CRITICAL("Invalid field index, exiting...");
-                exit(1);
+            for (unsigned int i = 0; i < block.field_count; i++) {
+                if (indices[i] == GL_INVALID_INDEX) {
+                    REL_CRITICAL("Invalid field index, exiting...");
+                    exit(1);
+                }
             }
+
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_OFFSET, offsets);
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
+
+            for (unsigned int i = 0; i < block.field_count; i++) {
+                block.uniform_buffer->fields[i] = {
+                    static_cast<size_t>(offsets[i]),
+                    static_cast<size_t>(sizes[i]) * type_size(types[i])
+                };
+            }
+
+            block.uniform_buffer->configured = true;
         }
 
-        glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_OFFSET, offsets);
-        glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
-        glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
-
-        for (unsigned int i = 0; i < block.field_count; i++) {
-            block.uniform_buffer->fields[i] = {
-                static_cast<size_t>(offsets[i]),
-                static_cast<size_t>(sizes[i]) * type_size(types[i])
-            };
-        }
-
-        glBindBufferBase(GL_UNIFORM_BUFFER, block_index, block.uniform_buffer->buffer);  // TODO max uniform buffer bindings
+        glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);  // TODO max uniform buffer bindings
     }
 
     std::string name = get_name(vertex_source_path, fragment_source_path);

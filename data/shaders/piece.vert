@@ -13,7 +13,7 @@ out vec4 v_fragment_position_light_space;
 
 uniform mat4 u_model_matrix;
 
-uniform ProjectionView {
+layout (binding = 0) uniform ProjectionView {
     mat4 u_projection_view_matrix;
 };
 

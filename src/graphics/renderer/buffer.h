@@ -57,10 +57,13 @@ private:
     };
 
     GLuint buffer = 0;
+
     char* data = nullptr;
     size_t size = 0;
 
     std::unordered_map<unsigned int, UniformBlockField> fields;
+
+    bool configured = false;
 
     friend class Shader;
 };
