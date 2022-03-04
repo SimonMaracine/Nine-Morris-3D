@@ -126,7 +126,7 @@ void GameLayer::on_detach() {
     first_move = false;
 }
 
-void GameLayer::on_bind_layers() {
+void GameLayer::on_awake() {  // TODO use this maybe
     imgui_layer = get_layer<ImGuiLayer>("imgui");
     gui_layer = get_layer<GuiLayer>("gui");
 }

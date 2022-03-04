@@ -32,59 +32,41 @@
 #define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
 
 void ImGuiLayer::on_attach() {
-//     ImGui::CreateContext();
+    save_load::GameState state;
+    try {
+        save_load::load_game_from_file(state);
+    } catch (const save_load::SaveFileNotOpenError& e) {
+        REL_ERROR("{}", e.what());
+        save_load::handle_save_file_not_open_error();
+        REL_ERROR("Could not load game");
+    } catch (const save_load::SaveFileError& e) {
+        REL_ERROR("{}", e.what());  // TODO maybe delete file
+        REL_ERROR("Could not load game");
+    }
+    last_save_date = std::move(state.date);
+}
 
-//     ImGuiIO& io = ImGui::GetIO();
-//     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-//     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-//     io.ConfigWindowsMoveFromTitleBarOnly = true;
-//     io.ConfigWindowsResizeFromEdges = false;
-//     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-// #ifdef NINE_MORRIS_3D_RELEASE
-//     io.IniFilename = nullptr;
-// #endif
+void ImGuiLayer::on_detach() {
+    // These need to be resetted
+    hovering_gui = false;
+    can_undo = false;
+    show_info = false;
+    about_mode = false;
+}
 
-//     ImFontGlyphRangesBuilder builder;
-//     builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-//     builder.AddText(u8"ă");
-
-//     ImVector<ImWchar> ranges;
-//     builder.BuildRanges(&ranges);
-
-//     io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 20.0f);
-//     info_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 16.0f);
-//     windows_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 24.0f,
-//             nullptr, ranges.Data);
-//     io.Fonts->Build();
-
-//     ImVec4* colors = ImGui::GetStyle().Colors;
-//     colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
-//     colors[ImGuiCol_TitleBgActive] = DEFAULT_BROWN;
-//     colors[ImGuiCol_FrameBg] = DEFAULT_BROWN;
-//     colors[ImGuiCol_FrameBgHovered] = DARK_BROWN;
-//     colors[ImGuiCol_FrameBgActive] = LIGHT_BROWN;
-//     colors[ImGuiCol_Button] = DARK_BROWN;
-//     colors[ImGuiCol_ButtonHovered] = DEFAULT_BROWN;
-//     colors[ImGuiCol_ButtonActive] = LIGHT_BROWN;
-//     colors[ImGuiCol_Header] = DARK_BROWN;
-//     colors[ImGuiCol_HeaderHovered] = DEFAULT_BROWN;
-//     colors[ImGuiCol_HeaderActive] = LIGHT_BROWN;
-//     colors[ImGuiCol_CheckMark] = BEIGE;
-//     colors[ImGuiCol_SliderGrab] = LIGHT_GRAY_BLUE;
-//     colors[ImGuiCol_SliderGrabActive] = LIGHT_GRAY_BLUE;
-
-//     ImGuiStyle& style = ImGui::GetStyle();
-//     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-//     style.FrameRounding = 8;
-//     style.WindowRounding = 8;
-//     style.ChildRounding = 8;
-//     style.PopupRounding = 8;
-//     style.GrabRounding = 8;
-
-//     ImGui_ImplOpenGL3_Init("#version 430 core");
-//     ImGui_ImplGlfw_InitForOpenGL(app->window->get_handle(), false);
+void ImGuiLayer::on_awake() {
+    game_layer = get_layer<GameLayer>("game");
+    gui_layer = get_layer<GuiLayer>("gui");
 
     ImGuiIO& io = ImGui::GetIO();
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
+    io.ConfigWindowsResizeFromEdges = false;
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+#ifdef NINE_MORRIS_3D_RELEASE
+    io.IniFilename = nullptr;
+#endif
 
     ImFontGlyphRangesBuilder builder;
     builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
@@ -122,36 +104,6 @@ void ImGuiLayer::on_attach() {
     style.ChildRounding = 8;
     style.PopupRounding = 8;
     style.GrabRounding = 8;
-
-    save_load::GameState state;
-    try {
-        save_load::load_game_from_file(state);
-    } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_ERROR("{}", e.what());
-        save_load::handle_save_file_not_open_error();
-        REL_ERROR("Could not load game");
-    } catch (const save_load::SaveFileError& e) {
-        REL_ERROR("{}", e.what());  // TODO maybe delete file
-        REL_ERROR("Could not load game");
-    }
-    last_save_date = std::move(state.date);
-}
-
-void ImGuiLayer::on_detach() {
-    // ImGui_ImplOpenGL3_Shutdown();
-    // ImGui_ImplGlfw_Shutdown();
-    // ImGui::DestroyContext();
-
-    // These need to be resetted
-    hovering_gui = false;
-    can_undo = false;
-    show_info = false;
-    about_mode = false;
-}
-
-void ImGuiLayer::on_bind_layers() {
-    game_layer = get_layer<GameLayer>("game");
-    gui_layer = get_layer<GuiLayer>("gui");
 }
 
 void ImGuiLayer::on_update(float dt) {
@@ -392,7 +344,6 @@ void ImGuiLayer::on_event(events::Event& event) {
     dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(ImGuiLayer::on_mouse_moved));
     dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(ImGuiLayer::on_mouse_button_pressed));
     dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(ImGuiLayer::on_mouse_button_released));
-    dispatcher.dispatch<WindowResizedEvent>(WindowResized, BIND(ImGuiLayer::on_window_resized));
 }
 
 bool ImGuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
@@ -421,12 +372,6 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
     io.MouseDown[event.button] = false;
 
     return hovering_gui;
-}
-
-bool ImGuiLayer::on_window_resized(events::WindowResizedEvent& event) {
-    // game_layer->camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
-
-    return false;
 }
 
 void ImGuiLayer::draw_game_over() {

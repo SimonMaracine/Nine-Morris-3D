@@ -14,13 +14,13 @@ public:
         : id(std::move(id)), application(application) {}
     virtual ~Layer() = default;
 
-    virtual void on_attach() {}
-    virtual void on_detach() {}
-    virtual void on_bind_layers() {}
-    virtual void on_update(float dt) {}
-    virtual void on_fixed_update() {}
+    virtual void on_attach() {}  // Called when the layer is attached
+    virtual void on_detach() {}  // Called when the layer is detached
+    virtual void on_awake() {}  // Called once opon application initialization
+    virtual void on_update(float dt) {}  // Called every frame
+    virtual void on_fixed_update() {}  // Called once every 50 milliseconds
     virtual void on_draw() {}
-    virtual void on_event(events::Event& event) {}
+    virtual void on_event(events::Event& event) {}  // Called on every event
 
     bool active = true;
 protected:

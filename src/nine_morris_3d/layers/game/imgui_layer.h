@@ -19,7 +19,7 @@ public:
 
     virtual void on_attach() override;
     virtual void on_detach() override;
-    virtual void on_bind_layers() override;
+    virtual void on_awake() override;
     virtual void on_update(float dt) override;
     virtual void on_event(events::Event& event) override;
 
@@ -27,7 +27,6 @@ public:
     bool on_mouse_moved(events::MouseMovedEvent& event);
     bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
-    bool on_window_resized(events::WindowResizedEvent& event);
 
     void draw_game_over();
     void draw_game_over_message(const char* message);

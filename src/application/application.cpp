@@ -59,13 +59,13 @@ void Application::run() {
 
     for (Scene* scene : scenes) {
         for (Layer* layer : scene->layers_in_order) {
-            layer->on_bind_layers();
+            layer->on_awake();
         }
     }
 
     for (Scene* scene : scenes) {
         for (Layer* layer : scene->overlays_in_order) {
-            layer->on_bind_layers();
+            layer->on_awake();
         }
     }
 
@@ -105,6 +105,7 @@ void Application::run() {
 
         if (changed_scene) {
             active_layer_stack.clear();
+            active_overlay_stack.clear();
 
             for (auto iter = overlay_stack.rbegin(); iter != overlay_stack.rend(); iter++) {
                 pop_overlay(*iter);

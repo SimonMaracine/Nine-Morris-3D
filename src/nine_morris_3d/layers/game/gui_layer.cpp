@@ -12,7 +12,7 @@
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "other/logging.h"
 
-void GuiLayer::on_bind_layers() {
+void GuiLayer::on_awake() {
     game_layer = get_layer<GameLayer>("game");
 }
 

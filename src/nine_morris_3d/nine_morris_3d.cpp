@@ -77,18 +77,8 @@ NineMorris3D::NineMorris3D()
         renderer->set_scene_framebuffer(Framebuffer::create(specification));
     }
 
-    // Setup ImGui
+    // Initialize ImGui
     ImGui::CreateContext();
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-    io.ConfigWindowsMoveFromTitleBarOnly = true;
-    io.ConfigWindowsResizeFromEdges = false;
-    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-#ifdef NINE_MORRIS_3D_RELEASE
-    io.IniFilename = nullptr;
-#endif
 
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
