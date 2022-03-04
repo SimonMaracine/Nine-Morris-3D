@@ -150,7 +150,7 @@ void GameLayer::on_fixed_update() {
     }
 }
 
-void GameLayer::on_draw() {
+// void GameLayer::on_draw() {
 //     setup_shadows();
 //     setup_quad3d_projection_view();
 
@@ -203,7 +203,7 @@ void GameLayer::on_draw() {
 //     int* data;
 //     reader.get<int>(&data);
 //     hovered_id = *data;
-}
+// }
 
 void GameLayer::on_event(events::Event& event) {
     using namespace events;

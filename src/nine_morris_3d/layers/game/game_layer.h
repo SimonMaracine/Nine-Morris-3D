@@ -26,7 +26,6 @@ public:
     virtual void on_awake() override;
     virtual void on_update(float dt) override;
     virtual void on_fixed_update() override;
-    virtual void on_draw() override;
     virtual void on_event(events::Event& event) override;
 
     bool on_mouse_scrolled(events::MouseScrolledEvent& event);

@@ -21,10 +21,10 @@ void GuiLayer::on_update(float dt) {
     timer.update(app->window->get_time());
 }
 
-void GuiLayer::on_draw() {
-    render_turn_indicator();
-    render_timer();
-}
+// void GuiLayer::on_draw() {
+//     render_turn_indicator();
+//     render_timer();
+// }
 
 void GuiLayer::render_turn_indicator() {
     if (game_layer->board.turn == Board::Player::White) {

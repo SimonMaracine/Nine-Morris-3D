@@ -17,7 +17,6 @@ public:
 
     virtual void on_awake() override;
     virtual void on_update(float dt) override;
-    virtual void on_draw() override;
 
     void render_turn_indicator();
     void render_timer();

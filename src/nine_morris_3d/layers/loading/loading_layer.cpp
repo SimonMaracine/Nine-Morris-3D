@@ -53,28 +53,28 @@ void LoadingLayer::on_update(float dt) {
     }
 }
 
-void LoadingLayer::on_draw() {
+// void LoadingLayer::on_draw() {
     // renderer::clear(renderer::Color);
 
-    float width;
-    float height;
-    float x_pos;
-    float y_pos;
+    // float width;
+    // float height;
+    // float x_pos;
+    // float y_pos;
 
-    if (static_cast<float>(app->app_data.width) / app->app_data.height > 16.0f / 9.0f) {
-        width = app->app_data.width;
-        height = app->app_data.width * (9.0f / 16.0f);
-        x_pos = 0.0f;
-        y_pos = (height - app->app_data.height) / -2.0f;
-    } else {
-        height = app->app_data.height;
-        width = app->app_data.height * (16.0f / 9.0f);
-        x_pos = (width - app->app_data.width) / -2.0f;
-        y_pos = 0.0f;
-    }
+    // if (static_cast<float>(app->app_data.width) / app->app_data.height > 16.0f / 9.0f) {
+    //     width = app->app_data.width;
+    //     height = app->app_data.width * (9.0f / 16.0f);
+    //     x_pos = 0.0f;
+    //     y_pos = (height - app->app_data.height) / -2.0f;
+    // } else {
+    //     height = app->app_data.height;
+    //     width = app->app_data.height * (16.0f / 9.0f);
+    //     x_pos = (width - app->app_data.width) / -2.0f;
+    //     y_pos = 0.0f;
+    // }
 
     // renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
     // renderer::draw_string_with_shadows("Loading...", glm::vec2(app->data.width - 200.0f, 20.0f), 1.2f,
     //         glm::vec3(0.81f), app->storage->good_dog_plain_font);
-}
+// }

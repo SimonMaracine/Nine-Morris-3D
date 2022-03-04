@@ -88,7 +88,6 @@ void Application::run() {
                 layer->on_fixed_update();
             }
             layer->on_update(dt);
-            layer->on_draw();  // TODO maybe get rid of on_draw and keep only on_update
         }
 
         renderer->render();
@@ -98,7 +97,6 @@ void Application::run() {
                 layer->on_fixed_update();
             }
             layer->on_update(dt);
-            layer->on_draw();  // TODO maybe get rid of on_draw and keep only on_update
         }
 
         window->update();

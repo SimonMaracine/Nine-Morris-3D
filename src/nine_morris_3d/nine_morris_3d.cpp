@@ -79,7 +79,6 @@ NineMorris3D::NineMorris3D()
 
     // Initialize ImGui
     ImGui::CreateContext();
-
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
 }

@@ -38,7 +38,6 @@ public:
     ApplicationData app_data;
     std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
-    // renderer::Storage* storage = nullptr;
     std::unique_ptr<Renderer> renderer;
     Camera camera;
 private:
