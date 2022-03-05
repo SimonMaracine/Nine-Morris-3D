@@ -63,6 +63,9 @@ public:
 
         std::shared_ptr<Material> paint_material;
         std::shared_ptr<MaterialInstance> board_paint_material_instance;
+
+        bool loaded_turn_indicator = false;
+        std::shared_ptr<Texture> turn_indicator_texture;
     } data;
 };
 

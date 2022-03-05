@@ -1,13 +1,84 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <glm/glm.hpp>
 
 #include "graphics/renderer/shader.h"
 #include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/texture.h"
+#include "graphics/renderer/font.h"
 
 class Application;
+class GuiRenderer;
+
+namespace gui {
+    class Widget {
+    public:
+        Widget(std::shared_ptr<Widget> parent);
+        virtual ~Widget() = default;
+
+        virtual void render() = 0;
+
+        void set(unsigned int row, unsigned int column, unsigned int row_span = 1, unsigned int column_span = 1,
+                const glm::ivec2& padd_x = glm::ivec2(0), const glm::ivec2& padd_y = glm::ivec2(0));
+
+        const glm::vec2& get_position() { return position; }
+        const glm::vec2& get_size() { return size; }
+    protected:
+        glm::vec2 position = glm::vec2(0.0f);
+        glm::vec2 size = glm::vec2(0.0f);  // Width-height
+        bool visible = true;
+        std::shared_ptr<Widget> parent;
+        unsigned int row = 0;
+        unsigned int column = 0;
+        unsigned int row_span = 1;
+        unsigned int column_span = 1;
+        glm::ivec2 padd_x = glm::ivec2(0);  // Left-right
+        glm::ivec2 padd_y = glm::ivec2(0);  // Top-bottom
+
+        static Application* app;
+
+        friend class ::Application;
+        friend class ::GuiRenderer;
+    };
+
+    class Frame : public Widget {
+    public:
+        Frame(std::shared_ptr<Frame> parent, unsigned int rows, unsigned int columns);
+        virtual ~Frame() = default;
+
+        virtual void render() override;
+
+        void add(std::shared_ptr<Widget> widget);
+    private:
+        std::vector<std::shared_ptr<Widget>> children;
+        unsigned int rows = 0;
+        unsigned int columns = 0;
+        bool base = false;
+    };
+
+    class Image : public Widget {
+    public:
+        Image(std::shared_ptr<Frame> parent, std::shared_ptr<Texture> texture);
+        virtual ~Image() = default;
+
+        virtual void render() override;
+    public:
+        std::shared_ptr<Texture> texture;
+    };
+
+    class Text : public Widget {
+    public:
+        Text(std::shared_ptr<Frame> parent, std::shared_ptr<Font> font);
+        virtual ~Text() = default;
+
+        virtual void render() override;
+    public:
+        std::shared_ptr<Font> font;
+    };
+}
 
 class GuiRenderer {
 public:
@@ -15,6 +86,8 @@ public:
     ~GuiRenderer();
 
     void render();
+
+    std::shared_ptr<gui::Frame> get_main_frame() { return main_frame; }
 private:
     struct Storage {
         std::shared_ptr<Shader> quad2d_shader;
@@ -25,6 +98,8 @@ private:
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
     } storage;
 
+    std::shared_ptr<gui::Frame> main_frame;
+
     const char* QUAD2D_VERTEX_SHADER = "data/shaders/internal/quad2d.vert";
     const char* QUAD2D_FRAGMENT_SHADER = "data/shaders/internal/quad2d.frag";
     const char* TEXT_VERTEX_SHADER = "data/shaders/internal/text.vert";
@@ -34,4 +109,8 @@ private:
     Application* app = nullptr;
 
     friend class Application;
+    friend class gui::Widget;
+    friend class gui::Image;
+    friend class gui::Text;
+    friend class gui::Frame;
 };

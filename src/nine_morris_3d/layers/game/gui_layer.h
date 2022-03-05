@@ -15,6 +15,7 @@ public:
         : Layer(std::move(id), app) {}
     virtual ~GuiLayer() = default;
 
+    virtual void on_attach() override;
     virtual void on_awake() override;
     virtual void on_update(float dt) override;
 

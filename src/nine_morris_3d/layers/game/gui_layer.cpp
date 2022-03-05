@@ -6,11 +6,24 @@
 
 #include "application/events.h"
 #include "graphics/renderer/renderer.h"
+#include "graphics/renderer/gui_renderer.h"
 #include "graphics/renderer/framebuffer.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "other/logging.h"
+
+void GuiLayer::on_attach() {
+    app->data.turn_indicator_texture = Texture::create(app->assets_data->white_indicator_texture, false);
+    app->data.loaded_turn_indicator = true;  // TODO refactor using on_awake
+
+    std::shared_ptr<gui::Image> image_test = std::make_shared<gui::Image>(
+        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
+    );
+    app->gui_renderer->get_main_frame()->add(image_test);
+
+
+}
 
 void GuiLayer::on_awake() {
     game_layer = get_layer<GameLayer>("game");
