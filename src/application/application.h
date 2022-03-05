@@ -8,6 +8,7 @@
 #include "application/events.h"
 #include "application/window.h"
 #include "graphics/renderer/new_renderer.h"
+#include "graphics/renderer/gui_renderer.h"
 #include "graphics/renderer/framebuffer.h"
 #include "nine_morris_3d/assets_data.h"
 #include "other/loader.h"
@@ -47,6 +48,7 @@ public:
     std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
+    std::unique_ptr<GuiRenderer> gui_renderer;
     Camera camera;
 private:
     void on_event(events::Event& event);

@@ -4,7 +4,6 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <stb_truetype.h>
 
@@ -36,7 +35,7 @@ const char* light_space_block_fields[] = {
     "u_light_space_matrix"
 };
 
-std::string path(const char* file_path) {  // FIXME not very dry
+static std::string path(const char* file_path) {  // FIXME not very dry
 #if defined(NINE_MORRIS_3D_DEBUG)
     // Use relative path for both operating systems
     return std::string(file_path);
@@ -49,7 +48,7 @@ std::string path(const char* file_path) {  // FIXME not very dry
     return std::string(file_path);
     #endif
 #endif
-    }
+}
 
 Renderer::Renderer(Application* app)
     : app(app) {
@@ -92,19 +91,6 @@ Renderer::Renderer(Application* app)
         storage.skybox_shader = Shader::create(
             path(SKYBOX_VERTEX_SHADER),
             path(SKYBOX_FRAGMENT_SHADER),
-            uniforms
-        );
-    }
-
-    {
-        const std::vector<std::string> uniforms = {
-            "u_model_matrix",
-            "u_projection_matrix",
-            "u_texture"
-        };
-        storage.quad2d_shader = Shader::create(
-            path(QUAD2D_VERTEX_SHADER),
-            path(QUAD2D_FRAGMENT_SHADER),
             uniforms
         );
     }
@@ -159,22 +145,6 @@ Renderer::Renderer(Application* app)
         );
     }
 
-    {
-        const std::vector<std::string> uniforms = {
-            "u_model_matrix",
-            "u_projection_matrix",
-            "u_bitmap",
-            "u_color",
-            "u_border_width",
-            "u_offset"
-        };
-        storage.text_shader = Shader::create(
-            path(TEXT_VERTEX_SHADER),
-            path(TEXT_FRAGMENT_SHADER),
-            uniforms
-        );
-    }
-
 #ifdef NINE_MORRIS_3D_DEBUG
     {
         const std::vector<std::string> uniforms = {
@@ -194,25 +164,6 @@ Renderer::Renderer(Application* app)
         layout.add(0, BufferLayout::Type::Float, 3);
         storage.skybox_vertex_array = VertexArray::create();
         storage.skybox_vertex_array->add_buffer(buffer, layout);
-
-        VertexArray::unbind();
-    }
-
-    {
-        float quad2d_vertices[] = {
-            0.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 1.0f,
-            1.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 0.0f
-        };
-
-        std::shared_ptr<Buffer> buffer = Buffer::create(quad2d_vertices, sizeof(quad2d_vertices));
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Type::Float, 2);
-        storage.quad2d_vertex_array = VertexArray::create();
-        storage.quad2d_vertex_array->add_buffer(buffer, layout);
 
         VertexArray::unbind();
     }
@@ -299,9 +250,6 @@ Renderer::Renderer(Application* app)
         PixelBuffer::create(sizeof(int)),
         PixelBuffer::create(sizeof(int))
     };
-
-    storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(app->app_data.width),
-            0.0f, static_cast<float>(app->app_data.height));
 
     reader = FramebufferReader<4>(storage.pixel_buffers, storage.intermediate_framebuffer);
 

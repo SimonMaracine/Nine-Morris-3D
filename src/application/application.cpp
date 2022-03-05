@@ -13,6 +13,7 @@
 #include "application/scene.h"
 #include "application/input.h"
 #include "graphics/renderer/new_renderer.h"
+#include "graphics/renderer/gui_renderer.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
@@ -39,6 +40,7 @@ Application::Application(int width, int height, const std::string& title) {
     }
 
     renderer = std::make_unique<Renderer>(this);
+    gui_renderer = std::make_unique<GuiRenderer>(this);
     assets_data = std::make_shared<AssetsData>();
 }
 
@@ -98,6 +100,8 @@ void Application::run() {
             }
             layer->on_update(dt);
         }
+
+        gui_renderer->render();
 
         window->update();
 
@@ -310,16 +314,18 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
 
     camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
-    renderer->storage.orthographic_projection_matrix = glm::ortho(0.0f, static_cast<float>(event.width), 0.0f,
-            static_cast<float>(event.height));
+    gui_renderer->storage.orthographic_projection_matrix = glm::ortho(
+        0.0f, static_cast<float>(event.width),
+        0.0f, static_cast<float>(event.height)
+    );
 
-    renderer->storage.quad2d_shader->bind();  // TODO optimize maybe
-    renderer->storage.quad2d_shader->set_uniform_mat4("u_projection_matrix",
-            renderer->storage.orthographic_projection_matrix);
+    gui_renderer->storage.quad2d_shader->bind();  // TODO optimize maybe
+    gui_renderer->storage.quad2d_shader->set_uniform_mat4("u_projection_matrix",
+            gui_renderer->storage.orthographic_projection_matrix);
 
-    renderer->storage.text_shader->bind();
-    renderer->storage.text_shader->set_uniform_mat4("u_projection_matrix",
-            renderer->storage.orthographic_projection_matrix);
+    gui_renderer->storage.text_shader->bind();
+    gui_renderer->storage.text_shader->set_uniform_mat4("u_projection_matrix",
+            gui_renderer->storage.orthographic_projection_matrix);
 
     return false;
 }

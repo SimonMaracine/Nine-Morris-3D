@@ -96,18 +96,16 @@ private:
         UniformBlockSpecification light_space_uniform_block;
 
         std::shared_ptr<Shader> skybox_shader;
-        std::shared_ptr<Shader> quad2d_shader;
+        
         std::shared_ptr<Shader> screen_quad_shader;
         std::shared_ptr<Shader> quad3d_shader;
         std::shared_ptr<Shader> shadow_shader;
         std::shared_ptr<Shader> outline_shader;
-        std::shared_ptr<Shader> text_shader;
 #ifdef NINE_MORRIS_3D_DEBUG
         std::shared_ptr<Shader> origin_shader;
 #endif
 
         std::shared_ptr<VertexArray> skybox_vertex_array;
-        std::shared_ptr<VertexArray> quad2d_vertex_array;
         std::shared_ptr<VertexArray> screen_quad_vertex_array;
 #ifdef NINE_MORRIS_3D_DEBUG
         std::shared_ptr<VertexArray> origin_vertex_array;
@@ -123,8 +121,6 @@ private:
         std::shared_ptr<Framebuffer> intermediate_framebuffer;
 
         std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
-
-        glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
     } storage;
 
     // Ordered maps of pointers to models
@@ -145,12 +141,8 @@ private:
     const char* OUTLINE_FRAGMENT_SHADER = "data/shaders/internal/outline.frag";
     const char* SKYBOX_VERTEX_SHADER = "data/shaders/internal/skybox.vert";
     const char* SKYBOX_FRAGMENT_SHADER = "data/shaders/internal/skybox.frag";
-    const char* QUAD2D_VERTEX_SHADER = "data/shaders/internal/quad2d.vert";
-    const char* QUAD2D_FRAGMENT_SHADER = "data/shaders/internal/quad2d.frag";
     const char* QUAD3D_VERTEX_SHADER = "data/shaders/internal/quad3d.vert";
     const char* QUAD3D_FRAGMENT_SHADER = "data/shaders/internal/quad3d.frag";
-    const char* TEXT_VERTEX_SHADER = "data/shaders/internal/text.vert";
-    const char* TEXT_FRAGMENT_SHADER = "data/shaders/internal/text.frag";
 #ifdef NINE_MORRIS_3D_DEBUG
     const char* ORIGIN_VERTEX_SHADER = "data/shaders/internal/origin.vert";
     const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";
