@@ -15,7 +15,7 @@ int main() {
     application->add_scene(game_scene);
 
     Scene* loading_scene = new Scene("loading");
-    loading_scene->add_layer(new LoadingLayer("loading", application));
+    loading_scene->add_overlay(new LoadingLayer("loading", application));
     application->add_scene(loading_scene);
 
     application->set_starting_scene(loading_scene);

@@ -20,7 +20,7 @@ void GuiLayer::on_attach() {
     std::shared_ptr<gui::Image> image_test = std::make_shared<gui::Image>(
         app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
     );
-    app->gui_renderer->get_main_frame()->add(image_test);
+    app->gui_renderer->get_main_frame()->add(image_test, 0, 0);
 
 
 }

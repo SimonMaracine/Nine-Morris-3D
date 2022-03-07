@@ -1,8 +1,9 @@
 #include <memory>
 #include <cassert>
 
+#include <glm/glm.hpp>
+
 #include "application/events.h"
-// #include "graphics/renderer/renderer.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/loading/loading_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
@@ -33,8 +34,6 @@ void LoadingLayer::on_attach() {
     }
 
     loader->start_loading_thread();
-
-    // renderer::disable_stencil();
 }
 
 void LoadingLayer::on_detach() {
@@ -43,11 +42,29 @@ void LoadingLayer::on_detach() {
     if (loader->get_thread().joinable()) {
         loader->get_thread().detach();
     }
-
-    // renderer::enable_stencil();
 }
 
 void LoadingLayer::on_update(float dt) {
+    float width;
+    float height;
+    float x_pos;
+    float y_pos;
+
+    if (static_cast<float>(app->app_data.width) / app->app_data.height > 16.0f / 9.0f) {
+        width = app->app_data.width;
+        height = app->app_data.width * (9.0f / 16.0f);
+        x_pos = 0.0f;
+        y_pos = (height - app->app_data.height) / -2.0f;
+    } else {
+        height = app->app_data.height;
+        width = app->app_data.height * (16.0f / 9.0f);
+        x_pos = (width - app->app_data.width) / -2.0f;
+        y_pos = 0.0f;
+    }
+
+    app->gui_renderer->im_draw_quad(glm::vec2(x_pos, y_pos), glm::vec2(width, height),
+            app->data.splash_screen_texture);
+
     if (loader->done_loading()) {
         app->change_scene("game");
     }

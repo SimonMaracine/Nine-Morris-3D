@@ -14,6 +14,12 @@ class Application;
 class GuiRenderer;
 
 namespace gui {
+    enum Sticky {
+        None,
+        N, S, E, W,
+        NE, NW, SE, SW
+    };
+
     class Widget {
     public:
         Widget(std::shared_ptr<Widget> parent);
@@ -21,8 +27,10 @@ namespace gui {
 
         virtual void render() = 0;
 
-        void set(unsigned int row, unsigned int column, unsigned int row_span = 1, unsigned int column_span = 1,
-                const glm::ivec2& padd_x = glm::ivec2(0), const glm::ivec2& padd_y = glm::ivec2(0));
+        Widget* set(unsigned int row, unsigned int column);
+        Widget* span(unsigned int row_span, unsigned int column_span);
+        Widget* padd(const glm::ivec2& padd_x, const glm::ivec2& padd_y);
+        Widget* stick(Sticky sticky);
 
         const glm::vec2& get_position() { return position; }
         const glm::vec2& get_size() { return size; }
@@ -30,13 +38,14 @@ namespace gui {
         glm::vec2 position = glm::vec2(0.0f);
         glm::vec2 size = glm::vec2(0.0f);  // Width-height
         bool visible = true;
-        std::shared_ptr<Widget> parent;
+        std::weak_ptr<Widget> parent;
         unsigned int row = 0;
         unsigned int column = 0;
         unsigned int row_span = 1;
         unsigned int column_span = 1;
         glm::ivec2 padd_x = glm::ivec2(0);  // Left-right
         glm::ivec2 padd_y = glm::ivec2(0);  // Top-bottom
+        Sticky sticky = None;
 
         static Application* app;
 
@@ -51,7 +60,10 @@ namespace gui {
 
         virtual void render() override;
 
-        void add(std::shared_ptr<Widget> widget);
+        void add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,
+                unsigned int row_span = 1, unsigned int column_span = 1,
+                const glm::ivec2& padd_x = glm::ivec2(0), const glm::ivec2& padd_y = glm::ivec2(0),
+                Sticky sticky = None);
     private:
         std::vector<std::shared_ptr<Widget>> children;
         unsigned int rows = 0;
@@ -86,6 +98,9 @@ public:
     ~GuiRenderer();
 
     void render();
+
+    void im_draw_quad(const glm::vec2& position, const glm::vec2& scale,
+            std::shared_ptr<Texture> texture);
 
     std::shared_ptr<gui::Frame> get_main_frame() { return main_frame; }
 private:

@@ -253,6 +253,10 @@ Renderer::Renderer(Application* app)
 
     reader = FramebufferReader<4>(storage.pixel_buffers, storage.intermediate_framebuffer);
 
+    // Setup uniform variables
+    storage.screen_quad_shader->bind();
+    storage.screen_quad_shader->set_uniform_int("u_screen_texture", 0);
+
     DEB_INFO("Initialized renderer");
 }
 

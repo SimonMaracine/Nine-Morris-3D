@@ -21,14 +21,27 @@ namespace gui {
 
     }
 
-    void Widget::set(unsigned int row, unsigned int column, unsigned int row_span, unsigned int column_span,
-            const glm::ivec2& padd_x, const glm::ivec2& padd_y) {
+    Widget* Widget::set(unsigned int row, unsigned int column) {
         this->row = row;
         this->column = column;
+        return this;
+    }
+
+    Widget* Widget::span(unsigned int row_span, unsigned int column_span) {
         this->row_span = row_span;
         this->column_span = column_span;
+        return this;
+    }
+
+    Widget* Widget::padd(const glm::ivec2& padd_x, const glm::ivec2& padd_y) {
         this->padd_x = padd_x;
         this->padd_y = padd_y;
+        return this;
+    }
+
+    Widget* Widget::stick(Sticky sticky) {
+        this->sticky = sticky;
+        return this;
     }
 
     Application* Widget::app = nullptr;
@@ -79,7 +92,10 @@ namespace gui {
         }
     }
 
-    void Frame::add(std::shared_ptr<Widget> widget) {
+    void Frame::add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,
+            unsigned int row_span, unsigned int column_span, const glm::ivec2& padd_x,
+            const glm::ivec2& padd_y, Sticky sticky) {
+        widget->set(row, column)->span(row_span, column_span)->padd(padd_x, padd_y)->stick(sticky);
         children.push_back(widget);
     }
 }
@@ -177,5 +193,22 @@ void GuiRenderer::render() {
 
     main_frame->render();
 
+    glEnable(GL_DEPTH_TEST);
+}
+
+void GuiRenderer::im_draw_quad(const glm::vec2& position, const glm::vec2& scale,
+            std::shared_ptr<Texture> texture) {
+    glm::mat4 matrix = glm::mat4(1.0f);
+    matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
+    matrix = glm::scale(matrix, glm::vec3(scale.x, scale.y, 1.0f));
+
+    storage.quad2d_shader->bind();
+    storage.quad2d_shader->set_uniform_mat4("u_model_matrix", matrix);
+
+    texture->bind(0);
+    storage.quad2d_vertex_array->bind();
+
+    glDisable(GL_DEPTH_TEST);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     glEnable(GL_DEPTH_TEST);
 }

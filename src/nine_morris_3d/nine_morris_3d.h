@@ -28,8 +28,9 @@ public:
     unsigned int cross_cursor = 0;
 
     struct RenderData {
+        std::shared_ptr<Texture> splash_screen_texture;
+
         bool loaded_board = false;
-        // hoverable::Id board_id = hoverable::null;
         std::shared_ptr<VertexArray> board_vertex_array;
         std::shared_ptr<Shader> board_shader;
         std::shared_ptr<Texture> board_diffuse_texture;
