@@ -30,8 +30,8 @@ void GuiLayer::on_awake() {
 }
 
 void GuiLayer::on_update(float dt) {
-    turn_indicator.update(app->app_data.width, app->app_data.height);
-    timer.update(app->window->get_time());
+    // turn_indicator.update(app->app_data.width, app->app_data.height);
+    // timer.update(app->window->get_time());
 }
 
 // void GuiLayer::on_draw() {

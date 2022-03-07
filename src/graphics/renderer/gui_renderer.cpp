@@ -1,6 +1,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_set>
+#include <algorithm>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -75,8 +77,8 @@ namespace gui {
 
     }
 
-    Frame::Frame(std::shared_ptr<Frame> parent, unsigned int rows, unsigned int columns)
-        : Widget(parent), rows(rows), columns(columns) {
+    Frame::Frame(std::shared_ptr<Frame> parent)
+        : Widget(parent) {
         if (parent == nullptr) {
             base = true;
             size.x = app->app_data.width;
@@ -87,9 +89,154 @@ namespace gui {
     }
 
     void Frame::render() {
-        for (std::shared_ptr<Widget> widget : children) {
-            widget->render();
+        // for (std::shared_ptr<Widget> widget : children) {
+        //     widget->render();
+        // }
+
+        std::vector<Cell> cells;
+
+        // Calculate number of rows and columns
+        {
+            std::unordered_set<unsigned int> row_indices;
+            std::unordered_set<unsigned int> column_indices;
+
+            for (std::shared_ptr<Widget> widget : children) {
+                row_indices.insert(widget->row);
+                column_indices.insert(widget->column);
+            }
+
+            rows = row_indices.size();
+            columns = column_indices.size();
         }
+
+        // Calculate normal size of cells
+        for (std::shared_ptr<Widget> widget : children) {
+            cells.push_back({
+                widget,
+                glm::ivec2(
+                    widget->padd_x.x + widget->size.x + widget->padd_x.y,
+                    widget->padd_y.x + widget->size.y + widget->padd_y.y
+                )
+            });
+        }
+
+        // Calculate normal width and height of cells together
+        unsigned int normal_cells_width = 0;
+        unsigned int normal_cells_height = 0;
+
+        for (Cell& cell : cells) {
+            normal_cells_width += cell.size.x;
+            normal_cells_height += cell.size.y;
+        }
+
+        // Calculate actual width of each cell
+        if (normal_cells_width > size.x) {
+            // Width of all cells together is higher than the width of frame
+            // All cells will get equal amount of width
+            int WIDTH = normal_cells_width / rows;
+            int REMAINING = normal_cells_width % rows;
+
+            for (Cell& cell : cells) {
+                cell.size.x = WIDTH;
+            }
+            cells[0].size.x += REMAINING;
+        } else {
+            // There is more space than needed
+            // All cells will get an equal amount of additional width
+            int ADD_WIDTH = (size.x - normal_cells_width) / rows;
+            int ADD_REMAINING = (size.x - normal_cells_width) % rows;
+
+            for (Cell& cell : cells) {
+                cell.size.x += ADD_WIDTH;
+            }
+            cells[0].size.x += ADD_REMAINING;
+        }
+
+        // Calculate actual height of each cell
+        if (normal_cells_height > size.y) {
+            // Height of all cells together is higher than the height of frame
+            // All cells will get equal amount of height
+            int HEIGHT = normal_cells_height / columns;
+            int REMAINING = normal_cells_height % columns;
+
+            for (Cell& cell : cells) {
+                cell.size.y = HEIGHT;
+            }
+            cells[0].size.y += REMAINING;
+        } else {
+            // There is more space than needed
+            // All cells will get an equal amount of additional height
+            int ADD_HEIGHT = (size.y - normal_cells_height) / columns;
+            int ADD_REMAINING = (size.y - normal_cells_height) % columns;
+
+            for (Cell& cell : cells) {
+                cell.size.y += ADD_HEIGHT;
+            }
+            cells[0].size.y += ADD_REMAINING;
+        }
+
+        // Reorganize the cells in a matrix
+        std::vector<std::vector<Cell>> matrix;
+
+        std::stable_sort(cells.begin(), cells.end(), [&cells](const Cell& lhs, const Cell& rhs) {
+            if (lhs.widget->column < rhs.widget->column) {
+                if (lhs.widget->row < rhs.widget->row) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        });
+
+        for (unsigned int i = 0; i < rows; i++) {
+            matrix.push_back(std::vector<Cell>());
+
+            for (unsigned int j = 0; j < columns; j++) {
+                for (const Cell& cell : cells) {
+                    // matrix[i].push_back({
+
+                    // });
+
+                    // if (cell.widget->row)
+                }
+            }
+        }
+
+        // Finish setting the size for each cell
+        if (rows > 1) {
+            // Iterate every column
+            // for ()
+        }
+
+        // Calculate position of each widget in its cell
+        for (auto& [widget, size] : cells) {
+            switch (widget->sticky) {
+                case None:  // Center the widget both ways
+
+                    break;
+                case N:
+                    break;
+                case S:
+                    break;
+                case E:
+                    break;
+                case W:
+                    break;
+                case NE:
+                    break;
+                case NW:
+                    break;
+                case SE:
+                    break;
+                case SW:
+                    break;
+            }
+        }
+
+
+
     }
 
     void Frame::add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,
@@ -179,7 +326,7 @@ GuiRenderer::GuiRenderer(Application* app)
     gui::Widget::app = app;
 
     // Initialize main frame
-    main_frame = std::make_shared<gui::Frame>(nullptr, 1, 1);
+    main_frame = std::make_shared<gui::Frame>(nullptr);
 
     DEB_INFO("Initialized GUI renderer");
 }

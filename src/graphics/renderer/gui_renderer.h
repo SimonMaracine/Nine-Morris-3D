@@ -32,13 +32,22 @@ namespace gui {
         Widget* padd(const glm::ivec2& padd_x, const glm::ivec2& padd_y);
         Widget* stick(Sticky sticky);
 
-        const glm::vec2& get_position() { return position; }
-        const glm::vec2& get_size() { return size; }
+        const glm::ivec2& get_position() { return position; }
+        const glm::ivec2& get_size() { return size; }
+        bool get_visible() { return visible; }
+        unsigned int get_row() { return row; }
+        unsigned int get_column() { return column; }
+        unsigned int get_row_span() { return row_span; }
+        unsigned int get_column_span() { return column_span; }
+        const glm::ivec2& get_padd_x() { return padd_x; }
+        const glm::ivec2& get_padd_y() { return padd_y; }
+        Sticky get_sticky() { return sticky; }
     protected:
-        glm::vec2 position = glm::vec2(0.0f);
-        glm::vec2 size = glm::vec2(0.0f);  // Width-height
-        bool visible = true;
         std::weak_ptr<Widget> parent;
+
+        glm::ivec2 position = glm::ivec2(0);
+        glm::ivec2 size = glm::ivec2(0);  // Width-height
+        bool visible = true;
         unsigned int row = 0;
         unsigned int column = 0;
         unsigned int row_span = 1;
@@ -51,11 +60,12 @@ namespace gui {
 
         friend class ::Application;
         friend class ::GuiRenderer;
+        friend class Frame;
     };
 
     class Frame : public Widget {
     public:
-        Frame(std::shared_ptr<Frame> parent, unsigned int rows, unsigned int columns);
+        Frame(std::shared_ptr<Frame> parent);
         virtual ~Frame() = default;
 
         virtual void render() override;
@@ -65,8 +75,13 @@ namespace gui {
                 const glm::ivec2& padd_x = glm::ivec2(0), const glm::ivec2& padd_y = glm::ivec2(0),
                 Sticky sticky = None);
     private:
+        struct Cell {
+            std::shared_ptr<Widget> widget;
+            glm::ivec2 size = glm::ivec2(0);
+        };
+
         std::vector<std::shared_ptr<Widget>> children;
-        unsigned int rows = 0;
+        unsigned int rows = 0;  // Start with 0
         unsigned int columns = 0;
         bool base = false;
     };
