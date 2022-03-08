@@ -78,6 +78,7 @@ namespace gui {
         struct Cell {
             std::shared_ptr<Widget> widget;
             glm::ivec2 size = glm::ivec2(0);
+            glm::ivec2 position = glm::ivec2(0);
         };
 
         std::vector<std::shared_ptr<Widget>> children;

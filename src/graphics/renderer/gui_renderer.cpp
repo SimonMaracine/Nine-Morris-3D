@@ -214,6 +214,11 @@ namespace gui {
             }
         }
 
+        // Calculate position of each cell in the grid
+        for (Cell& cell : cells) {
+
+        }
+
         // Calculate position of each widget in its cell
         for (Cell& cell : cells) {
             switch (cell.widget->sticky) {
