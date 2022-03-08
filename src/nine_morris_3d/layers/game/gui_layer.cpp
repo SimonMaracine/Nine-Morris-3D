@@ -17,10 +17,30 @@ void GuiLayer::on_attach() {
     app->data.turn_indicator_texture = Texture::create(app->assets_data->white_indicator_texture, false);
     app->data.loaded_turn_indicator = true;  // TODO refactor using on_awake
 
+    std::shared_ptr<gui::Image> image_test2 = std::make_shared<gui::Image>(
+        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
+    );
+    app->gui_renderer->get_main_frame()->add(image_test2, 1, 0);
     std::shared_ptr<gui::Image> image_test = std::make_shared<gui::Image>(
         app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
     );
     app->gui_renderer->get_main_frame()->add(image_test, 0, 0);
+    std::shared_ptr<gui::Image> image_test3 = std::make_shared<gui::Image>(
+        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
+    );
+    app->gui_renderer->get_main_frame()->add(image_test3, 0, 1);
+    std::shared_ptr<gui::Image> image_test4 = std::make_shared<gui::Image>(
+        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
+    );
+    app->gui_renderer->get_main_frame()->add(image_test4, 1, 1);
+    std::shared_ptr<gui::Image> image_test5 = std::make_shared<gui::Image>(
+        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
+    );
+    app->gui_renderer->get_main_frame()->add(image_test5, 0, 2);
+    std::shared_ptr<gui::Image> image_test6 = std::make_shared<gui::Image>(
+        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
+    );
+    app->gui_renderer->get_main_frame()->add(image_test6, 1, 2);
 
 
 }

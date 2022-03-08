@@ -105,6 +105,14 @@ namespace gui {
     public:
         std::shared_ptr<Font> font;
     };
+
+    class Dummy : public Widget {
+    public:
+        Dummy(std::shared_ptr<Frame> parent);
+        virtual ~Dummy() = default;
+
+        virtual void render() override;
+    };
 }
 
 class GuiRenderer {

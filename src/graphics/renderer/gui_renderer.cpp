@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_set>
 #include <algorithm>
+#include <cassert>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -48,35 +49,6 @@ namespace gui {
 
     Application* Widget::app = nullptr;
 
-    Image::Image(std::shared_ptr<Frame> parent, std::shared_ptr<Texture> texture)
-        : Widget(parent), texture(texture) {
-        size.x = texture->get_width();
-        size.y = texture->get_height();
-    }
-
-    void Image::render() {
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
-        matrix = glm::scale(matrix, glm::vec3(size, 1.0f));
-
-        app->gui_renderer->storage.quad2d_shader->bind();
-        app->gui_renderer->storage.quad2d_shader->set_uniform_mat4("u_model_matrix", matrix);
-
-        texture->bind(0);
-        app->gui_renderer->storage.quad2d_vertex_array->bind();
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
-
-    Text::Text(std::shared_ptr<Frame> parent, std::shared_ptr<Font> font)
-        : Widget(parent), font(font) {
-
-    }
-
-    void Text::render() {
-
-    }
-
     Frame::Frame(std::shared_ptr<Frame> parent)
         : Widget(parent) {
         if (parent == nullptr) {
@@ -93,6 +65,11 @@ namespace gui {
         //     widget->render();
         // }
 
+        // Exit early, if there are no children
+        if (children.empty()) {
+            return;
+        }
+
         std::vector<Cell> cells;
 
         // Calculate number of rows and columns
@@ -107,6 +84,9 @@ namespace gui {
 
             rows = row_indices.size();
             columns = column_indices.size();
+
+            assert(rows > 0);
+            assert(columns > 0);
         }
 
         // Calculate normal size of cells
@@ -128,6 +108,9 @@ namespace gui {
             normal_cells_width += cell.size.x;
             normal_cells_height += cell.size.y;
         }
+
+        assert(normal_cells_width > 0);
+        assert(normal_cells_height > 0);
 
         // Calculate actual width of each cell
         if (normal_cells_width > size.x) {
@@ -175,44 +158,65 @@ namespace gui {
             cells[0].size.y += ADD_REMAINING;
         }
 
-        // Reorganize the cells in a matrix
-        std::vector<std::vector<Cell>> matrix;
-
-        std::stable_sort(cells.begin(), cells.end(), [&cells](const Cell& lhs, const Cell& rhs) {
-            if (lhs.widget->column < rhs.widget->column) {
-                if (lhs.widget->row < rhs.widget->row) {
+        // Sort cells
+        std::stable_sort(cells.begin(), cells.end(), [](const Cell& lhs, const Cell& rhs) {
+            if (lhs.widget->row < rhs.widget->row) {
+                return true;
+            } else if (lhs.widget->row > rhs.widget->row) {
+                return false;
+            } else {
+                if (lhs.widget->column < rhs.widget->column) {
                     return true;
+                } else if (lhs.widget->column > rhs.widget->column) {
+                    return false;
                 } else {
                     return false;
                 }
-            } else {
-                return false;
             }
         });
 
-        for (unsigned int i = 0; i < rows; i++) {
-            matrix.push_back(std::vector<Cell>());
+        // Figure out if there are missing cells and act accordingly
+        if (cells.size() != rows * columns) {
+            REL_CRITICAL("There are missing cells; please fill them with gui::Dummy widgets");
+            exit(1);
+        }
 
+        // Finish setting the size for each cell
+        // For each column, set the width as the max of the cells' width
+        if (rows > 1) {
+            // Iterate every column
             for (unsigned int j = 0; j < columns; j++) {
-                for (const Cell& cell : cells) {
-                    // matrix[i].push_back({
+                int max_width = 0;
 
-                    // });
+                for (unsigned int i = 0; i < cells.size(); i += columns) {
+                    max_width = std::max(cells[i + j].widget->size.x, max_width);
+                }
 
-                    // if (cell.widget->row)
+                for (unsigned int i = 0; i < cells.size(); i += columns) {
+                    cells[i + j].widget->size.x = max_width;
                 }
             }
         }
 
-        // Finish setting the size for each cell
-        if (rows > 1) {
-            // Iterate every column
-            // for ()
+        // For each row, set the height as the max of the cells' height
+        if (columns > 1) {
+            // Iterate every row
+            for (unsigned int j = 0; j < rows; j++) {
+                int max_height = 0;
+
+                for (unsigned int i = 0; i < cells.size(); i += rows) {
+                    max_height = std::max(cells[i + j].widget->size.y, max_height);
+                }
+
+                for (unsigned int i = 0; i < cells.size(); i += rows) {
+                    cells[i + j].widget->size.y = max_height;
+                }
+            }
         }
 
         // Calculate position of each widget in its cell
-        for (auto& [widget, size] : cells) {
-            switch (widget->sticky) {
+        for (Cell& cell : cells) {
+            switch (cell.widget->sticky) {
                 case None:  // Center the widget both ways
 
                     break;
@@ -245,6 +249,42 @@ namespace gui {
         widget->set(row, column)->span(row_span, column_span)->padd(padd_x, padd_y)->stick(sticky);
         children.push_back(widget);
     }
+
+    Image::Image(std::shared_ptr<Frame> parent, std::shared_ptr<Texture> texture)
+        : Widget(parent), texture(texture) {
+        size.x = texture->get_width();
+        size.y = texture->get_height();
+    }
+
+    void Image::render() {
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
+        matrix = glm::scale(matrix, glm::vec3(size, 1.0f));
+
+        app->gui_renderer->storage.quad2d_shader->bind();
+        app->gui_renderer->storage.quad2d_shader->set_uniform_mat4("u_model_matrix", matrix);
+
+        texture->bind(0);
+        app->gui_renderer->storage.quad2d_vertex_array->bind();
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
+    Text::Text(std::shared_ptr<Frame> parent, std::shared_ptr<Font> font)
+        : Widget(parent), font(font) {
+
+    }
+
+    void Text::render() {
+
+    }
+
+    Dummy::Dummy(std::shared_ptr<Frame> parent)
+        : Widget(parent) {
+
+    }
+
+    void Dummy::render() {}  // Do nothing
 }
 
 static std::string path(const char* file_path) {  // FIXME NOT DRY AAAAAHHH
