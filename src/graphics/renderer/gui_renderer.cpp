@@ -55,16 +55,13 @@ namespace gui {
             base = true;
             size.x = app->app_data.width;
             size.y = app->app_data.height;
+            // Position remains (0, 0)
         }
 
         // TODO initialize width, height and position
     }
 
     void Frame::render() {
-        // for (std::shared_ptr<Widget> widget : children) {
-        //     widget->render();
-        // }
-
         // Exit early, if there are no children
         if (children.empty()) {
             return;
@@ -89,7 +86,7 @@ namespace gui {
             assert(columns > 0);
         }
 
-        // Calculate normal size of cells
+        // Calculate normal size of each cell
         for (std::shared_ptr<Widget> widget : children) {
             cells.push_back({
                 widget,
@@ -98,64 +95,6 @@ namespace gui {
                     widget->padd_y.x + widget->size.y + widget->padd_y.y
                 )
             });
-        }
-
-        // Calculate normal width and height of cells together
-        unsigned int normal_cells_width = 0;
-        unsigned int normal_cells_height = 0;
-
-        for (Cell& cell : cells) {
-            normal_cells_width += cell.size.x;
-            normal_cells_height += cell.size.y;
-        }
-
-        assert(normal_cells_width > 0);
-        assert(normal_cells_height > 0);
-
-        // Calculate actual width of each cell
-        if (normal_cells_width > size.x) {
-            // Width of all cells together is higher than the width of frame
-            // All cells will get equal amount of width
-            int WIDTH = normal_cells_width / rows;
-            int REMAINING = normal_cells_width % rows;
-
-            for (Cell& cell : cells) {
-                cell.size.x = WIDTH;
-            }
-            cells[0].size.x += REMAINING;
-        } else {
-            // There is more space than needed
-            // All cells will get an equal amount of additional width
-            int ADD_WIDTH = (size.x - normal_cells_width) / rows;
-            int ADD_REMAINING = (size.x - normal_cells_width) % rows;
-
-            for (Cell& cell : cells) {
-                cell.size.x += ADD_WIDTH;
-            }
-            cells[0].size.x += ADD_REMAINING;
-        }
-
-        // Calculate actual height of each cell
-        if (normal_cells_height > size.y) {
-            // Height of all cells together is higher than the height of frame
-            // All cells will get equal amount of height
-            int HEIGHT = normal_cells_height / columns;
-            int REMAINING = normal_cells_height % columns;
-
-            for (Cell& cell : cells) {
-                cell.size.y = HEIGHT;
-            }
-            cells[0].size.y += REMAINING;
-        } else {
-            // There is more space than needed
-            // All cells will get an equal amount of additional height
-            int ADD_HEIGHT = (size.y - normal_cells_height) / columns;
-            int ADD_REMAINING = (size.y - normal_cells_height) % columns;
-
-            for (Cell& cell : cells) {
-                cell.size.y += ADD_HEIGHT;
-            }
-            cells[0].size.y += ADD_REMAINING;
         }
 
         // Sort cells
@@ -179,6 +118,69 @@ namespace gui {
         if (cells.size() != rows * columns) {
             REL_CRITICAL("There are missing cells; please fill them with gui::Dummy widgets");
             exit(1);
+        }
+
+        // Calculate normal width and height of cells together
+        int normal_cells_width = 0;
+        int normal_cells_height = 0;
+
+        {
+            for (unsigned int i = 0; i < cells.size() / rows; i++) {
+                normal_cells_width += cells[i].size.x;
+            }
+
+            for (unsigned int i = 0; i < cells.size(); i += columns) {
+                normal_cells_height += cells[i].size.y;
+            }
+
+            assert(normal_cells_width > 0);
+            assert(normal_cells_height > 0);
+        }
+
+        // Calculate actual width of each cell
+        if (normal_cells_width > size.x) {
+            // Width of all cells together is higher than the width of frame
+            // All cells will get equal amount of width
+            const int WIDTH = normal_cells_width / columns;
+            const int REMAINING = normal_cells_width % columns;
+
+            for (Cell& cell : cells) {
+                cell.size.x = WIDTH;
+            }
+            cells[0].size.x += REMAINING;
+        } else {
+            // There is more space than needed
+            // All cells will get an equal amount of additional width
+            const int ADD_WIDTH = (size.x - normal_cells_width) / columns;
+            const int ADD_REMAINING = (size.x - normal_cells_width) % columns;
+
+            for (Cell& cell : cells) {
+                cell.size.x += ADD_WIDTH;
+            }
+            cells[0].size.x += ADD_REMAINING;
+        }
+
+        // Calculate actual height of each cell
+        if (normal_cells_height > size.y) {
+            // Height of all cells together is higher than the height of frame
+            // All cells will get equal amount of height
+            const int HEIGHT = normal_cells_height / rows;
+            const int REMAINING = normal_cells_height % rows;
+
+            for (Cell& cell : cells) {
+                cell.size.y = HEIGHT;
+            }
+            cells[0].size.y += REMAINING;
+        } else {
+            // There is more space than needed
+            // All cells will get an equal amount of additional height
+            const int ADD_HEIGHT = (size.y - normal_cells_height) / rows;
+            const int ADD_REMAINING = (size.y - normal_cells_height) % rows;
+
+            for (Cell& cell : cells) {
+                cell.size.y += ADD_HEIGHT;
+            }
+            cells[0].size.y += ADD_REMAINING;
         }
 
         // Finish setting the size for each cell
@@ -215,15 +217,44 @@ namespace gui {
         }
 
         // Calculate position of each cell in the grid
-        for (Cell& cell : cells) {
+        {
+            int position_x = 0;
+            unsigned int x_index = 0;
 
+            int position_y = 0;
+            unsigned int y_index = 0;
+
+            for (Cell& cell : cells) {
+                // x position
+                cell.position.x = position_x;
+                position_x += cell.size.x;
+
+                x_index++;
+
+                if (x_index == columns - 1) {
+                    position_x = 0;
+                    x_index = 0;
+                }
+
+                // y position
+                if (y_index % rows == 0) {
+                    position_y += cell.size.y;
+                }
+
+                cell.position.y = size.y - position_y;
+
+                y_index++;
+            }
         }
 
         // Calculate position of each widget in its cell
         for (Cell& cell : cells) {
             switch (cell.widget->sticky) {
                 case None:  // Center the widget both ways
-
+                    cell.widget->position.x = cell.position.x + cell.size.x / 2
+                            - cell.widget->size.x / 2;
+                    cell.widget->position.y = cell.position.y + cell.size.y / 2
+                        - cell.widget->size.y / 2;
                     break;
                 case N:
                     break;
@@ -244,8 +275,10 @@ namespace gui {
             }
         }
 
-
-
+        // Render the children
+        for (std::shared_ptr<Widget> widget : children) {
+            widget->render();
+        }
     }
 
     void Frame::add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,
