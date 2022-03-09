@@ -86,7 +86,7 @@ namespace gui {
             assert(columns > 0);
         }
 
-        // Calculate normal size of each cell
+        // Create cells and calculate normal size of each cell
         for (std::shared_ptr<Widget> widget : children) {
             cells.push_back({
                 widget,
@@ -125,62 +125,94 @@ namespace gui {
         int normal_cells_height = 0;
 
         {
-            for (unsigned int i = 0; i < cells.size() / rows; i++) {
-                normal_cells_width += cells[i].size.x;
+            {
+                std::vector<int> row_widths;
+
+                for (unsigned int j = 0; j < rows; j++) {
+                    int row_width = 0;
+                    for (unsigned int i = 0; i < cells.size() / rows; i++) {
+                        row_width += cells[i + j * columns].size.x;
+                    }
+
+                    assert(row_width > 0);
+
+                    row_widths.push_back(row_width);
+                }
+
+                // Get max width of each row
+                for (int width : row_widths) {
+                    normal_cells_width = std::max(normal_cells_width, width);
+                }
             }
 
-            for (unsigned int i = 0; i < cells.size(); i += columns) {
-                normal_cells_height += cells[i].size.y;
+            {
+                std::vector<int> column_heights;
+
+                for (unsigned int j = 0; j < columns; j++) {
+                    int column_height = 0;
+                    for (unsigned int i = 0; i < cells.size(); i += columns) {
+                        column_height += cells[i + j].size.y;
+                    }
+
+                    assert(column_height > 0);
+
+                    column_heights.push_back(column_height);
+                }
+
+                // Get max height of each column
+                for (int height : column_heights) {
+                    normal_cells_height = std::max(normal_cells_height, height);
+                }
             }
 
             assert(normal_cells_width > 0);
             assert(normal_cells_height > 0);
         }
 
-        // Calculate actual width of each cell
+        // Use the additional width to fill the width for each cell or share all the width equally
         if (normal_cells_width > size.x) {
             // Width of all cells together is higher than the width of frame
             // All cells will get equal amount of width
             const int WIDTH = normal_cells_width / columns;
-            const int REMAINING = normal_cells_width % columns;
+            // const int REMAINING = normal_cells_width % columns;
 
             for (Cell& cell : cells) {
                 cell.size.x = WIDTH;
             }
-            cells[0].size.x += REMAINING;
+            // cells[0].size.x += REMAINING;
         } else {
             // There is more space than needed
             // All cells will get an equal amount of additional width
             const int ADD_WIDTH = (size.x - normal_cells_width) / columns;
-            const int ADD_REMAINING = (size.x - normal_cells_width) % columns;
+            // const int ADD_REMAINING = (size.x - normal_cells_width) % columns;
 
             for (Cell& cell : cells) {
                 cell.size.x += ADD_WIDTH;
             }
-            cells[0].size.x += ADD_REMAINING;
+            // cells[0].size.x += ADD_REMAINING;
         }
 
-        // Calculate actual height of each cell
+        // Use the additional height to fill the height for each cell or share all the height equally
         if (normal_cells_height > size.y) {
             // Height of all cells together is higher than the height of frame
             // All cells will get equal amount of height
             const int HEIGHT = normal_cells_height / rows;
-            const int REMAINING = normal_cells_height % rows;
+            // const int REMAINING = normal_cells_height % rows;
 
             for (Cell& cell : cells) {
                 cell.size.y = HEIGHT;
             }
-            cells[0].size.y += REMAINING;
+            // cells[0].size.y += REMAINING;
         } else {
             // There is more space than needed
             // All cells will get an equal amount of additional height
             const int ADD_HEIGHT = (size.y - normal_cells_height) / rows;
-            const int ADD_REMAINING = (size.y - normal_cells_height) % rows;
+            // const int ADD_REMAINING = (size.y - normal_cells_height) % rows;
 
             for (Cell& cell : cells) {
                 cell.size.y += ADD_HEIGHT;
             }
-            cells[0].size.y += ADD_REMAINING;
+            // cells[0].size.y += ADD_REMAINING;
         }
 
         // Finish setting the size for each cell
@@ -190,12 +222,12 @@ namespace gui {
             for (unsigned int j = 0; j < columns; j++) {
                 int max_width = 0;
 
-                for (unsigned int i = 0; i < cells.size(); i += columns) {
-                    max_width = std::max(cells[i + j].widget->size.x, max_width);
+                for (unsigned int i = 0; i < rows; i++) {
+                    max_width = std::max(cells[j + i * rows].size.x, max_width);
                 }
 
-                for (unsigned int i = 0; i < cells.size(); i += columns) {
-                    cells[i + j].widget->size.x = max_width;
+                for (unsigned int i = 0; i < rows; i++) {
+                    cells[j + i * rows].size.x = max_width;
                 }
             }
         }
@@ -206,12 +238,12 @@ namespace gui {
             for (unsigned int j = 0; j < rows; j++) {
                 int max_height = 0;
 
-                for (unsigned int i = 0; i < cells.size(); i += rows) {
-                    max_height = std::max(cells[i + j].widget->size.y, max_height);
+                for (unsigned int i = 0; i < columns; i++) {
+                    max_height = std::max(cells[i + j * columns].size.y, max_height);
                 }
 
-                for (unsigned int i = 0; i < cells.size(); i += rows) {
-                    cells[i + j].widget->size.y = max_height;
+                for (unsigned int i = 0; i < columns; i++) {
+                    cells[i + j * columns].size.y = max_height;
                 }
             }
         }
@@ -231,13 +263,13 @@ namespace gui {
 
                 x_index++;
 
-                if (x_index == columns - 1) {
+                if (x_index == columns) {
                     position_x = 0;
                     x_index = 0;
                 }
 
                 // y position
-                if (y_index % rows == 0) {
+                if (y_index % columns == 0) {
                     position_y += cell.size.y;
                 }
 
