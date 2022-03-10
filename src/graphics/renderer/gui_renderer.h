@@ -5,6 +5,7 @@
 
 #include <glm/glm.hpp>
 
+#include "application/events.h"
 #include "graphics/renderer/shader.h"
 #include "graphics/renderer/vertex_array.h"
 #include "graphics/renderer/texture.h"
@@ -70,6 +71,8 @@ namespace gui {
 
         virtual void render() override;
 
+        void on_window_resized(events::WindowResizedEvent& event);
+
         void add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,
                 unsigned int row_span = 1, unsigned int column_span = 1,
                 const glm::ivec2& padd_x = glm::ivec2(0), const glm::ivec2& padd_y = glm::ivec2(0),
@@ -125,6 +128,8 @@ public:
 
     void im_draw_quad(const glm::vec2& position, const glm::vec2& scale,
             std::shared_ptr<Texture> texture);
+
+    void on_window_resized(events::WindowResizedEvent& event);
 
     std::shared_ptr<gui::Frame> get_main_frame() { return main_frame; }
 private:

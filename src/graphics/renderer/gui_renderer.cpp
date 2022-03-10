@@ -174,22 +174,18 @@ namespace gui {
             // Width of all cells together is higher than the width of frame
             // All cells will get equal amount of width
             const int WIDTH = normal_cells_width / columns;
-            // const int REMAINING = normal_cells_width % columns;
 
             for (Cell& cell : cells) {
                 cell.size.x = WIDTH;
             }
-            // cells[0].size.x += REMAINING;
         } else {
             // There is more space than needed
             // All cells will get an equal amount of additional width
             const int ADD_WIDTH = (size.x - normal_cells_width) / columns;
-            // const int ADD_REMAINING = (size.x - normal_cells_width) % columns;
 
             for (Cell& cell : cells) {
                 cell.size.x += ADD_WIDTH;
             }
-            // cells[0].size.x += ADD_REMAINING;
         }
 
         // Use the additional height to fill the height for each cell or share all the height equally
@@ -197,22 +193,18 @@ namespace gui {
             // Height of all cells together is higher than the height of frame
             // All cells will get equal amount of height
             const int HEIGHT = normal_cells_height / rows;
-            // const int REMAINING = normal_cells_height % rows;
 
             for (Cell& cell : cells) {
                 cell.size.y = HEIGHT;
             }
-            // cells[0].size.y += REMAINING;
         } else {
             // There is more space than needed
             // All cells will get an equal amount of additional height
             const int ADD_HEIGHT = (size.y - normal_cells_height) / rows;
-            // const int ADD_REMAINING = (size.y - normal_cells_height) % rows;
 
             for (Cell& cell : cells) {
                 cell.size.y += ADD_HEIGHT;
             }
-            // cells[0].size.y += ADD_REMAINING;
         }
 
         // Finish setting the size for each cell
@@ -286,7 +278,7 @@ namespace gui {
                     cell.widget->position.x = cell.position.x + cell.size.x / 2
                             - cell.widget->size.x / 2;
                     cell.widget->position.y = cell.position.y + cell.size.y / 2
-                        - cell.widget->size.y / 2;
+                            - cell.widget->size.y / 2;
                     break;
                 case N:
                     break;
@@ -311,6 +303,16 @@ namespace gui {
         for (std::shared_ptr<Widget> widget : children) {
             widget->render();
         }
+    }
+
+    void Frame::on_window_resized(events::WindowResizedEvent& event) {
+        if (base) {
+            size.x = event.width;
+            size.y = event.height;
+            return;
+        }
+
+
     }
 
     void Frame::add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,
@@ -468,4 +470,19 @@ void GuiRenderer::im_draw_quad(const glm::vec2& position, const glm::vec2& scale
     glDisable(GL_DEPTH_TEST);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glEnable(GL_DEPTH_TEST);
+}
+
+void GuiRenderer::on_window_resized(events::WindowResizedEvent& event) {
+    storage.orthographic_projection_matrix = glm::ortho(
+        0.0f, static_cast<float>(event.width),
+        0.0f, static_cast<float>(event.height)
+    );
+
+    storage.quad2d_shader->bind();  // TODO optimize maybe
+    storage.quad2d_shader->set_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
+
+    storage.text_shader->bind();
+    storage.text_shader->set_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
+
+    main_frame->on_window_resized(event);
 }

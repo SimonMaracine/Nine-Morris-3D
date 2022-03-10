@@ -4,8 +4,6 @@
 #include <algorithm>
 #include <string>
 
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/window.h"
@@ -314,18 +312,7 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
 
     camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
-    gui_renderer->storage.orthographic_projection_matrix = glm::ortho(
-        0.0f, static_cast<float>(event.width),
-        0.0f, static_cast<float>(event.height)
-    );
-
-    gui_renderer->storage.quad2d_shader->bind();  // TODO optimize maybe
-    gui_renderer->storage.quad2d_shader->set_uniform_mat4("u_projection_matrix",
-            gui_renderer->storage.orthographic_projection_matrix);
-
-    gui_renderer->storage.text_shader->bind();
-    gui_renderer->storage.text_shader->set_uniform_mat4("u_projection_matrix",
-            gui_renderer->storage.orthographic_projection_matrix);
+    gui_renderer->on_window_resized(event);
 
     return false;
 }
