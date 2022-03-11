@@ -14,8 +14,13 @@
 #include "other/logging.h"
 
 void GuiLayer::on_attach() {
-    app->data.turn_indicator_texture = Texture::create(app->assets_data->white_indicator_texture, false);
-    app->data.loaded_turn_indicator = true;  // TODO refactor using on_awake
+    if (!app->data.loaded_turn_indicator) {
+        app->data.turn_indicator_texture = Texture::create(
+            app->assets_data->white_indicator_texture,
+            false
+        );
+        app->data.loaded_turn_indicator = true;  // TODO refactor using on_awake
+    }
 
     std::shared_ptr<gui::Image> image_test2 = std::make_shared<gui::Image>(
         app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
@@ -24,7 +29,7 @@ void GuiLayer::on_attach() {
     std::shared_ptr<gui::Image> image_test = std::make_shared<gui::Image>(
         app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
     );
-    app->gui_renderer->get_main_frame()->add(image_test, 0, 0);
+    app->gui_renderer->get_main_frame()->add(image_test, 0, 0, 1, 1, glm::ivec2(0), glm::ivec2(40, 0));
     std::shared_ptr<gui::Image> image_test3 = std::make_shared<gui::Image>(
         app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
     );

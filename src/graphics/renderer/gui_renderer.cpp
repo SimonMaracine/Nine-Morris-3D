@@ -86,14 +86,16 @@ namespace gui {
             assert(columns > 0);
         }
 
-        // Create cells and calculate normal size of each cell
+        // Create cells and calculate normal size for each cell
         for (std::shared_ptr<Widget> widget : children) {
             cells.push_back({
                 widget,
                 glm::ivec2(
                     widget->padd_x.x + widget->size.x + widget->padd_x.y,
                     widget->padd_y.x + widget->size.y + widget->padd_y.y
-                )
+                    // widget->size.x, widget->size.y
+                ),
+                glm::ivec2(0)
             });
         }
 
@@ -169,46 +171,45 @@ namespace gui {
             assert(normal_cells_height > 0);
         }
 
-        // Use the additional width to fill the width for each cell or share all the width equally
-        if (normal_cells_width > size.x) {
-            // Width of all cells together is higher than the width of frame
-            // All cells will get equal amount of width
-            const int WIDTH = normal_cells_width / columns;
-
-            for (Cell& cell : cells) {
-                cell.size.x = WIDTH;
-            }
-        } else {
-            // There is more space than needed
+        // Use the additional width to fill the width for each cell,
+        // If there is more space than needed
+        if (normal_cells_width < size.x) {
             // All cells will get an equal amount of additional width
-            const int ADD_WIDTH = (size.x - normal_cells_width) / columns;
+            const int ADDITIONAL_WIDTH = (size.x - normal_cells_width) / columns;
 
             for (Cell& cell : cells) {
-                cell.size.x += ADD_WIDTH;
+                cell.size.x += ADDITIONAL_WIDTH;
             }
         }
 
-        // Use the additional height to fill the height for each cell or share all the height equally
-        if (normal_cells_height > size.y) {
-            // Height of all cells together is higher than the height of frame
-            // All cells will get equal amount of height
-            const int HEIGHT = normal_cells_height / rows;
-
-            for (Cell& cell : cells) {
-                cell.size.y = HEIGHT;
-            }
-        } else {
-            // There is more space than needed
+        // Use the additional height to fill the height for each cell,
+        // If there is more space than needed
+        if (normal_cells_height < size.y) {
             // All cells will get an equal amount of additional height
-            const int ADD_HEIGHT = (size.y - normal_cells_height) / rows;
+            const int ADDITIONAL_HEIGHT = (size.y - normal_cells_height) / rows;
 
             for (Cell& cell : cells) {
-                cell.size.y += ADD_HEIGHT;
+                cell.size.y += ADDITIONAL_HEIGHT;
             }
+        }
+
+        // Calculate width and height considering padding
+        {
+            // for (Cell& cell : cells) {
+            //     cell.size.x = std::max(
+            //         cell.size.x,
+            //         cell.widget->padd_x.x + cell.widget->size.x + cell.widget->padd_x.y
+            //     );
+
+            //     cell.size.y = std::max(
+            //         cell.size.y,
+            //         cell.widget->padd_y.x + cell.widget->size.y + cell.widget->padd_y.y
+            //     );
+            // }
         }
 
         // Finish setting the size for each cell
-        // For each column, set the width as the max of the cells' width
+        // For each column, set the width as the max width of the cells
         if (rows > 1) {
             // Iterate every column
             for (unsigned int j = 0; j < columns; j++) {
@@ -224,7 +225,7 @@ namespace gui {
             }
         }
 
-        // For each row, set the height as the max of the cells' height
+        // For each row, set the height as the max height of the cells
         if (columns > 1) {
             // Iterate every row
             for (unsigned int j = 0; j < rows; j++) {
@@ -235,7 +236,7 @@ namespace gui {
                 }
 
                 for (unsigned int i = 0; i < columns; i++) {
-                    cells[i + j * columns].size.y = max_height;
+                    cells[i + j * columns].size.y = max_height;  // TODO don't reset size, if 
                 }
             }
         }
@@ -277,10 +278,23 @@ namespace gui {
                 case None:  // Center the widget both ways
                     cell.widget->position.x = cell.position.x + cell.size.x / 2
                             - cell.widget->size.x / 2;
-                    cell.widget->position.y = cell.position.y + cell.size.y / 2
+
+                    if ((cell.size.y - cell.widget->size.y) / 2 < cell.widget->padd_y.x
+                            || (cell.size.y - cell.widget->size.y) / 2 < cell.widget->padd_y.y) {
+                        cell.widget->position.y = cell.position.y
+                            - cell.widget->padd_y.x + cell.widget->padd_y.y;
+                        DEB_DEBUG("LESS");
+                    } else {
+                        cell.widget->position.y = cell.position.y + cell.size.y / 2
                             - cell.widget->size.y / 2;
+                        DEB_DEBUG("GOOD");
+                    }
                     break;
                 case N:
+                    cell.widget->position.x = cell.position.x + cell.size.x / 2
+                            - cell.widget->size.x / 2;
+                    cell.widget->position.y = cell.position.y + cell.size.y
+                            - cell.widget->size.y;
                     break;
                 case S:
                     break;
@@ -297,6 +311,20 @@ namespace gui {
                 case SW:
                     break;
             }
+        }
+
+        for (Cell& cell : cells) {  // TODO remove
+            glm::mat4 matrix = glm::mat4(1.0f);
+            matrix = glm::translate(matrix, glm::vec3(cell.position, 0.0f));
+            matrix = glm::scale(matrix, glm::vec3(cell.size.x, cell.size.y, 1.0f));
+
+            app->gui_renderer->storage.quad2d_shader->bind();
+            app->gui_renderer->storage.quad2d_shader->set_uniform_mat4("u_model_matrix", matrix);
+
+            app->gui_renderer->FrameTextureTest->bind(0);
+            app->gui_renderer->storage.quad2d_vertex_array->bind();
+
+            glDrawArrays(GL_TRIANGLES, 0, 6);
         }
 
         // Render the children
@@ -439,6 +467,8 @@ GuiRenderer::GuiRenderer(Application* app)
 
     // Initialize main frame
     main_frame = std::make_shared<gui::Frame>(nullptr);
+
+    FrameTextureTest = Texture::create("data/frame.png", false);
 
     DEB_INFO("Initialized GUI renderer");
 }
