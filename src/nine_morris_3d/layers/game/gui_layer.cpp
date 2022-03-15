@@ -29,7 +29,7 @@ void GuiLayer::on_attach() {
     std::shared_ptr<gui::Image> image_test = std::make_shared<gui::Image>(
         app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
     );
-    app->gui_renderer->get_main_frame()->add(image_test, 0, 0, 1, 1, glm::ivec2(0), glm::ivec2(40, 0));
+    app->gui_renderer->get_main_frame()->add(image_test, 0, 0, 1, 1, glm::ivec2(0, 50), glm::ivec2(70, 0), gui::None);
     std::shared_ptr<gui::Image> image_test3 = std::make_shared<gui::Image>(
         app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
     );

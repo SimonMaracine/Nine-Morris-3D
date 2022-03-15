@@ -93,7 +93,6 @@ namespace gui {
                 glm::ivec2(
                     widget->padd_x.x + widget->size.x + widget->padd_x.y,
                     widget->padd_y.x + widget->size.y + widget->padd_y.y
-                    // widget->size.x, widget->size.y
                 ),
                 glm::ivec2(0)
             });
@@ -194,7 +193,7 @@ namespace gui {
         }
 
         // Calculate width and height considering padding
-        {
+        // {
             // for (Cell& cell : cells) {
             //     cell.size.x = std::max(
             //         cell.size.x,
@@ -206,7 +205,7 @@ namespace gui {
             //         cell.widget->padd_y.x + cell.widget->size.y + cell.widget->padd_y.y
             //     );
             // }
-        }
+        // }
 
         // Finish setting the size for each cell
         // For each column, set the width as the max width of the cells
@@ -216,11 +215,11 @@ namespace gui {
                 int max_width = 0;
 
                 for (unsigned int i = 0; i < rows; i++) {
-                    max_width = std::max(cells[j + i * rows].size.x, max_width);
+                    max_width = std::max(cells[j + i * columns].size.x, max_width);
                 }
 
                 for (unsigned int i = 0; i < rows; i++) {
-                    cells[j + i * rows].size.x = max_width;
+                    cells[j + i * columns].size.x = max_width;
                 }
             }
         }
@@ -279,36 +278,49 @@ namespace gui {
                     cell.widget->position.x = cell.position.x + cell.size.x / 2
                             - cell.widget->size.x / 2;
 
-                    if ((cell.size.y - cell.widget->size.y) / 2 < cell.widget->padd_y.x
-                            || (cell.size.y - cell.widget->size.y) / 2 < cell.widget->padd_y.y) {
-                        cell.widget->position.y = cell.position.y
-                            - cell.widget->padd_y.x + cell.widget->padd_y.y;
-                        DEB_DEBUG("LESS");
-                    } else {
-                        cell.widget->position.y = cell.position.y + cell.size.y / 2
+                    cell.widget->position.y = cell.position.y + cell.size.y / 2
                             - cell.widget->size.y / 2;
-                        DEB_DEBUG("GOOD");
-                    }
                     break;
                 case N:
                     cell.widget->position.x = cell.position.x + cell.size.x / 2
                             - cell.widget->size.x / 2;
                     cell.widget->position.y = cell.position.y + cell.size.y
-                            - cell.widget->size.y;
+                            - cell.widget->size.y - cell.widget->padd_y.x;
                     break;
                 case S:
+                    cell.widget->position.x = cell.position.x + cell.size.x / 2
+                            - cell.widget->size.x / 2;
+                    cell.widget->position.y = cell.position.y + cell.widget->padd_y.y;
                     break;
                 case E:
+                    cell.widget->position.x = cell.position.x + cell.size.x
+                            - cell.widget->size.x - cell.widget->padd_x.y;
+                    cell.widget->position.y = cell.position.y + cell.size.y / 2
+                            - cell.widget->size.y / 2;
                     break;
                 case W:
+                    cell.widget->position.x = cell.position.x + cell.widget->padd_x.x;
+                    cell.widget->position.y = cell.position.y + cell.size.y / 2
+                            - cell.widget->size.y / 2;
                     break;
                 case NE:
+                    cell.widget->position.x = cell.position.x + cell.size.x
+                            - cell.widget->size.x - cell.widget->padd_x.y;
+                    cell.widget->position.y = cell.position.y + cell.size.y
+                            - cell.widget->size.y - cell.widget->padd_y.x;
                     break;
                 case NW:
+                    cell.widget->position.x = cell.position.x + cell.widget->padd_x.x;
+                    cell.widget->position.y = cell.position.y + cell.size.y
+                            - cell.widget->size.y - cell.widget->padd_y.x;
                     break;
                 case SE:
+                    cell.widget->position.x = cell.position.x + cell.widget->padd_x.x;
+                    cell.widget->position.y = cell.position.y + cell.widget->padd_y.y;
                     break;
                 case SW:
+                    cell.widget->position.x = cell.position.x + cell.widget->padd_x.x;
+                    cell.widget->position.y = cell.position.y + cell.widget->padd_y.y;
                     break;
             }
         }
