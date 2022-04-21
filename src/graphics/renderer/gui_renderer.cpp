@@ -277,7 +277,6 @@ namespace gui {
                 case None:  // Center the widget both ways
                     cell.widget->position.x = cell.position.x + cell.size.x / 2
                             - cell.widget->size.x / 2;
-
                     cell.widget->position.y = cell.position.y + cell.size.y / 2
                             - cell.widget->size.y / 2;
                     break;
@@ -325,19 +324,19 @@ namespace gui {
             }
         }
 
-        for (Cell& cell : cells) {  // TODO remove
-            glm::mat4 matrix = glm::mat4(1.0f);
-            matrix = glm::translate(matrix, glm::vec3(cell.position, 0.0f));
-            matrix = glm::scale(matrix, glm::vec3(cell.size.x, cell.size.y, 1.0f));
+        // for (Cell& cell : cells) {  // TODO remove
+        //     glm::mat4 matrix = glm::mat4(1.0f);
+        //     matrix = glm::translate(matrix, glm::vec3(cell.position, 0.0f));
+        //     matrix = glm::scale(matrix, glm::vec3(cell.size.x, cell.size.y, 1.0f));
 
-            app->gui_renderer->storage.quad2d_shader->bind();
-            app->gui_renderer->storage.quad2d_shader->set_uniform_mat4("u_model_matrix", matrix);
+        //     app->gui_renderer->storage.quad2d_shader->bind();
+        //     app->gui_renderer->storage.quad2d_shader->set_uniform_mat4("u_model_matrix", matrix);
 
-            app->gui_renderer->FrameTextureTest->bind(0);
-            app->gui_renderer->storage.quad2d_vertex_array->bind();
+        //     app->gui_renderer->FrameTextureTest->bind(0);
+        //     app->gui_renderer->storage.quad2d_vertex_array->bind();
 
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-        }
+        //     glDrawArrays(GL_TRIANGLES, 0, 6);
+        // }
 
         // Render the children
         for (std::shared_ptr<Widget> widget : children) {
@@ -480,7 +479,7 @@ GuiRenderer::GuiRenderer(Application* app)
     // Initialize main frame
     main_frame = std::make_shared<gui::Frame>(nullptr);
 
-    FrameTextureTest = Texture::create("data/frame.png", false);
+    // FrameTextureTest = Texture::create("data/frame.png", false);
 
     DEB_INFO("Initialized GUI renderer");
 }

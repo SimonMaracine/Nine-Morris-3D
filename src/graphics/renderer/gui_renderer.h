@@ -143,7 +143,7 @@ private:
     } storage;
 
     std::shared_ptr<gui::Frame> main_frame;
-    std::shared_ptr<Texture> FrameTextureTest;  // TODO remove
+    // std::shared_ptr<Texture> FrameTextureTest;  // TODO remove
 
     const char* QUAD2D_VERTEX_SHADER = "data/shaders/internal/quad2d.vert";
     const char* QUAD2D_FRAGMENT_SHADER = "data/shaders/internal/quad2d.frag";
