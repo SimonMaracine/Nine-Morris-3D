@@ -196,7 +196,7 @@ void Font::render(const std::string& string, size_t* out_size, float** out_buffe
 
     const size_t SIZE = sizeof(float) * utf16_string.length() * 24;
 
-    float* buffer = new float[SIZE];  // FIXME Don't allocate here, but outside
+    float* buffer = new float[SIZE];
     unsigned int buffer_index = 0;
 
     int x = 0;

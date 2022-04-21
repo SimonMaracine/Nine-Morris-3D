@@ -503,7 +503,7 @@ namespace renderer {
         matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
 
         font->update_data(buffer, size);
-        delete[] buffer;  // TODO refactor and improve this
+        delete[] buffer;
 
         storage->text_shader->bind();
         storage->text_shader->set_uniform_matrix("u_model_matrix", matrix);

@@ -36,7 +36,7 @@ namespace gui {
         return this;
     }
 
-    Widget* Widget::padd(const glm::ivec2& padd_x, const glm::ivec2& padd_y) {
+    Widget* Widget::padd(glm::ivec2 padd_x, glm::ivec2 padd_y) {
         this->padd_x = padd_x;
         this->padd_y = padd_y;
         return this;
@@ -57,8 +57,6 @@ namespace gui {
             size.y = app->app_data.height;
             // Position remains (0, 0)
         }
-
-        // TODO initialize width, height and position
     }
 
     void Frame::render() {
@@ -191,21 +189,6 @@ namespace gui {
                 cell.size.y += ADDITIONAL_HEIGHT;
             }
         }
-
-        // Calculate width and height considering padding
-        // {
-            // for (Cell& cell : cells) {
-            //     cell.size.x = std::max(
-            //         cell.size.x,
-            //         cell.widget->padd_x.x + cell.widget->size.x + cell.widget->padd_x.y
-            //     );
-
-            //     cell.size.y = std::max(
-            //         cell.size.y,
-            //         cell.widget->padd_y.x + cell.widget->size.y + cell.widget->padd_y.y
-            //     );
-            // }
-        // }
 
         // Finish setting the size for each cell
         // For each column, set the width as the max width of the cells
@@ -351,12 +334,12 @@ namespace gui {
             return;
         }
 
-
+        assert(false);
     }
 
     void Frame::add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,
-            unsigned int row_span, unsigned int column_span, const glm::ivec2& padd_x,
-            const glm::ivec2& padd_y, Sticky sticky) {
+            unsigned int row_span, unsigned int column_span, glm::ivec2 padd_x,
+            glm::ivec2 padd_y, Sticky sticky) {
         widget->set(row, column)->span(row_span, column_span)->padd(padd_x, padd_y)->stick(sticky);
         children.push_back(widget);
     }
@@ -381,18 +364,70 @@ namespace gui {
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
-    Text::Text(std::shared_ptr<Frame> parent, std::shared_ptr<Font> font)
-        : Widget(parent), font(font) {
+    void Image::set_image(std::shared_ptr<Texture> texture) {
+        this->texture = texture;
+        size.x = texture->get_width();
+        size.y = texture->get_height();
+    }
 
+    Text::Text(std::shared_ptr<Frame> parent, std::shared_ptr<Font> font, std::string_view text,
+                float scale, const glm::vec3& color)
+        : Widget(parent), font(font), text(text), scale(scale), color(color) {
+        font->get_string_size(static_cast<std::string>(text), scale, &size.x, &size.y);  // TODO use string_view
     }
 
     void Text::render() {
+        size_t size;
+        float* buffer;
+        font->render(text, &size, &buffer);
 
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
+        matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
+
+        font->update_data(buffer, size);
+        delete[] buffer;
+
+        app->gui_renderer->storage.text_shader->bind();
+        app->gui_renderer->storage.text_shader->set_uniform_mat4("u_model_matrix", matrix);
+        app->gui_renderer->storage.text_shader->set_uniform_vec3("u_color", color);
+        if (!with_shadows) {
+            app->gui_renderer->storage.text_shader->set_uniform_float("u_border_width", 0.0f);
+            app->gui_renderer->storage.text_shader->set_uniform_vec2("u_offset", glm::vec2(0.0f, 0.0f));
+        } else {
+            app->gui_renderer->storage.text_shader->set_uniform_float("u_border_width", 0.3f);
+            app->gui_renderer->storage.text_shader->set_uniform_vec2("u_offset", glm::vec2(-0.003f, -0.003f));
+        }
+
+        font->get_vertex_array()->bind();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, font->get_texture());
+
+        glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
+    }
+
+    void Text::set_text(std::string_view text) {
+        this->text = text;
+        font->get_string_size(static_cast<std::string>(text), scale, &size.x, &size.y);
+    }
+
+    void Text::set_scale(float scale) {
+        this->scale = scale;
+        font->get_string_size(static_cast<std::string>(text), scale, &size.x, &size.y);
+    }
+
+    void Text::set_color(const glm::vec3& color) {
+        this->color = color;
+    }
+
+    void Text::set_shadows(bool enable) {
+        with_shadows = enable;
     }
 
     Dummy::Dummy(std::shared_ptr<Frame> parent)
         : Widget(parent) {
-
+        size.x = 1;
+        size.y = 1;
     }
 
     void Dummy::render() {}  // Do nothing
@@ -473,13 +508,16 @@ GuiRenderer::GuiRenderer(Application* app)
     storage.quad2d_shader->set_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
     storage.quad2d_shader->set_uniform_int("u_texture", 0);
 
+    storage.text_shader->bind();
+    storage.text_shader->set_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
+
     // Set renderer pointer to widgets
     gui::Widget::app = app;
 
     // Initialize main frame
     main_frame = std::make_shared<gui::Frame>(nullptr);
 
-    // FrameTextureTest = Texture::create("data/frame.png", false);
+    FrameTextureTest = Texture::create("data/frame.png", false);
 
     DEB_INFO("Initialized GUI renderer");
 }

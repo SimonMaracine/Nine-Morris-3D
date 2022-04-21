@@ -9,6 +9,7 @@
 #include "graphics/renderer/shader.h"
 #include "graphics/renderer/texture.h"
 #include "graphics/renderer/material.h"
+#include "graphics/renderer/font.h"
 #include "nine_morris_3d/options.h"
 #include "other/mesh.h"
 
@@ -29,6 +30,7 @@ public:
 
     struct RenderData {
         std::shared_ptr<Texture> splash_screen_texture;
+        std::shared_ptr<Font> good_dog_plain_font;
 
         bool loaded_board = false;
         std::shared_ptr<VertexArray> board_vertex_array;
@@ -66,7 +68,8 @@ public:
         std::shared_ptr<MaterialInstance> board_paint_material_instance;
 
         bool loaded_turn_indicator = false;
-        std::shared_ptr<Texture> turn_indicator_texture;
+        std::shared_ptr<Texture> white_indicator_texture;
+        std::shared_ptr<Texture> black_indicator_texture;
     } data;
 };
 

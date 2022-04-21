@@ -40,7 +40,7 @@ public:
     void bake_character(int codepoint);
     void end_baking();
 
-    // Call render to get the buffer of data used in the end by OpenGL
+    // Call render to get the buffer of data used in the end by OpenGL; pointer returned needs to be deleted
     void render(const std::string& string, size_t* out_size, float** out_buffer);
 
     // Get width and height of a line of text

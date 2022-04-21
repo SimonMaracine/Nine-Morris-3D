@@ -15,39 +15,37 @@
 
 void GuiLayer::on_attach() {
     if (!app->data.loaded_turn_indicator) {
-        app->data.turn_indicator_texture = Texture::create(
+        app->data.white_indicator_texture = Texture::create(
             app->assets_data->white_indicator_texture,
+            false
+        );
+        app->data.black_indicator_texture = Texture::create(
+            app->assets_data->black_indicator_texture,
             false
         );
         app->data.loaded_turn_indicator = true;  // TODO refactor using on_awake
     }
 
-    std::shared_ptr<gui::Image> image_test2 = std::make_shared<gui::Image>(
-        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
+    std::shared_ptr<gui::Dummy> placeholder = std::make_shared<gui::Dummy>(
+        app->gui_renderer->get_main_frame()
     );
-    app->gui_renderer->get_main_frame()->add(image_test2, 1, 0);
-    std::shared_ptr<gui::Image> image_test = std::make_shared<gui::Image>(
-        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
-    );
-    app->gui_renderer->get_main_frame()->add(image_test, 0, 0, 1, 1, glm::ivec2(0, 50), glm::ivec2(70, 0), gui::None);
-    std::shared_ptr<gui::Image> image_test3 = std::make_shared<gui::Image>(
-        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
-    );
-    app->gui_renderer->get_main_frame()->add(image_test3, 0, 1);
-    std::shared_ptr<gui::Image> image_test4 = std::make_shared<gui::Image>(
-        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
-    );
-    app->gui_renderer->get_main_frame()->add(image_test4, 1, 1);
-    std::shared_ptr<gui::Image> image_test5 = std::make_shared<gui::Image>(
-        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
-    );
-    app->gui_renderer->get_main_frame()->add(image_test5, 0, 2);
-    std::shared_ptr<gui::Image> image_test6 = std::make_shared<gui::Image>(
-        app->gui_renderer->get_main_frame(), app->data.turn_indicator_texture
-    );
-    app->gui_renderer->get_main_frame()->add(image_test6, 1, 2);
+    app->gui_renderer->get_main_frame()->add(placeholder, 0, 0);
 
+    turn_indicator = std::make_shared<gui::Image>(
+        app->gui_renderer->get_main_frame(), app->data.white_indicator_texture
+    );
+    app->gui_renderer->get_main_frame()->add(turn_indicator, 0, 2);
 
+    timer_text = std::make_shared<gui::Text>(
+        app->gui_renderer->get_main_frame(), app->data.good_dog_plain_font,
+        "00:00", 1.5f, glm::vec3(0.9f)
+    );
+    app->gui_renderer->get_main_frame()->add(timer_text, 0, 1);
+
+    placeholder->padd(glm::vec2(45, 45), glm::vec2(0, 0));
+    turn_indicator->stick(gui::Sticky::NE)->padd(glm::vec2(0, 30), glm::vec2(60, 0));
+    timer_text->stick(gui::Sticky::N)->padd(glm::vec2(0, 0), glm::vec2(60, 0));
+    timer_text->set_shadows(true);
 }
 
 void GuiLayer::on_awake() {
@@ -55,35 +53,15 @@ void GuiLayer::on_awake() {
 }
 
 void GuiLayer::on_update(float dt) {
-    // turn_indicator.update(app->app_data.width, app->app_data.height);
-    // timer.update(app->window->get_time());
-}
+    timer.update(app->window->get_time());
 
-// void GuiLayer::on_draw() {
-//     render_turn_indicator();
-//     render_timer();
-// }
-
-void GuiLayer::render_turn_indicator() {
-    if (game_layer->board.turn == Board::Player::White) {
-        // renderer::draw_quad_2d(turn_indicator.position, turn_indicator.scale,
-        //         app->storage->white_indicator_texture);
-    } else {
-        // renderer::draw_quad_2d(turn_indicator.position, turn_indicator.scale,
-        //         app->storage->black_indicator_texture);
-    }
-}
-
-void GuiLayer::render_timer() {
     char time[32];
     timer.get_time_formatted(time);
+    timer_text->set_text(time);
 
-    int width, height;
-    // app->storage->good_dog_plain_font->get_string_size(time, 1.5f, &width, &height);
-
-    const float x_pos = app->app_data.width / 2 - width / 2 - 8;
-    const float y_pos = app->app_data.height - height - 50;
-
-    // renderer::draw_string_with_shadows(time, glm::vec2(x_pos, y_pos), 1.5f, glm::vec3(0.9f),
-    //         app->storage->good_dog_plain_font);
+    if (game_layer->board.turn == Board::Player::White) {
+        turn_indicator->set_image(app->data.white_indicator_texture);
+    } else {
+        turn_indicator->set_image(app->data.black_indicator_texture);
+    }
 }
