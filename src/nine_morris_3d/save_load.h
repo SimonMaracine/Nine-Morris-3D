@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <stdexcept>
 
 #include "graphics/renderer/camera.h"
 #include "nine_morris_3d/board.h"

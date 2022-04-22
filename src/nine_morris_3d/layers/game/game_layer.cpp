@@ -247,9 +247,9 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
         if (board.next_move) {
             if (board.phase == Board::Phase::PlacePieces) {
                 if (board.should_take_piece) {
-                    bool taked = board.take_piece(app->renderer->get_hovered_id());
+                    bool took = board.take_piece(app->renderer->get_hovered_id());
 
-                    if (taked && !first_move) {
+                    if (took && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
                         first_move = true;
                     }
@@ -263,9 +263,9 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                 }
             } else if (board.phase == Board::Phase::MovePieces) {
                 if (board.should_take_piece) {
-                    bool taked = board.take_piece(app->renderer->get_hovered_id());
+                    bool took = board.take_piece(app->renderer->get_hovered_id());
 
-                    if (taked && !first_move) {
+                    if (took && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
                         first_move = true;
                     }
@@ -560,7 +560,7 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
             app->data.piece_material_instances[index]->set_texture("u_material.diffuse", app->data.white_piece_diffuse_texture, 0);
             app->data.piece_material_instances[index]->set_vec3("u_material.specular", glm::vec3(0.2f));
             app->data.piece_material_instances[index]->set_float("u_material.shininess", 4.0f);
-            app->data.piece_material_instances[index]->set_vec3("u_material.tint", glm::vec3(1.0f));  // TODO use 1.0f, 0.2f, 0.2f
+            app->data.piece_material_instances[index]->set_vec3("u_material.tint", glm::vec3(1.0f));
         } else {
             app->data.piece_material_instances[index] = MaterialInstance::make(app->data.tinted_wood_material);
             app->data.piece_material_instances[index]->set_texture("u_material.diffuse", app->data.black_piece_diffuse_texture, 0);
@@ -1149,25 +1149,35 @@ void GameLayer::load_game() {
 
     app->camera = state.camera;
 
-    // Board& board = board;
-    // board.id = state.board.id;
-    // board.scale = state.board.scale;
-    // board.index_count = state.board.index_count;
-    // board.specular_color = state.board.specular_color;
-    // board.shininess = state.board.shininess;
+    Renderer::Model& model = board.model;
+    model.index_count = state.board.model.index_count;
+    model.position = state.board.model.position;
+    model.rotation  = state.board.model.rotation;
+    model.scale = state.board.model.scale;
+    model.outline_color = state.board.model.outline_color;
+
+    Renderer::Model& paint_model = board.paint_model;
+    paint_model.index_count = state.board.paint_model.index_count;
+    paint_model.position = state.board.paint_model.position;
+    paint_model.rotation  = state.board.paint_model.rotation;
+    paint_model.scale = state.board.paint_model.scale;
+    paint_model.outline_color = state.board.paint_model.outline_color;
 
     for (unsigned int i = 0; i < 24; i++) {
         Node& node = board.nodes[i];
-
         node.id = state.board.nodes[i].id;
+        node.model.index_count = state.board.nodes[i].model.index_count;
         node.model.position = state.board.nodes[i].model.position;
+        node.model.rotation  = state.board.nodes[i].model.rotation;
         node.model.scale = state.board.nodes[i].model.scale;
-        // node.model.index_count = state.board.nodes[i].model.index_count;
+        node.model.outline_color = state.board.nodes[i].model.outline_color;
         node.piece_id = state.board.nodes[i].piece_id;
         node.piece = nullptr;  // It must be NULL, if the ids don't match
-        for (unsigned int i = 0; i < 18; i++) {  // Assign correct addresses
+        // Assign correct addresses
+        for (unsigned int i = 0; i < 18; i++) {
             if (state.board.pieces[i].id == node.piece_id) {
                 node.piece = &board.pieces[i];
+                break;
             }
         }
         node.index = state.board.nodes[i].index;
@@ -1175,11 +1185,12 @@ void GameLayer::load_game() {
 
     for (unsigned int i = 0; i < 18; i++) {
         Piece& piece = board.pieces[i];
-
         piece.id = state.board.pieces[i].id;
+        piece.model.index_count = state.board.pieces[i].model.index_count;
         piece.model.position = state.board.pieces[i].model.position;
-        piece.model.rotation = state.board.pieces[i].model.rotation;
+        piece.model.rotation  = state.board.pieces[i].model.rotation;
         piece.model.scale = state.board.pieces[i].model.scale;
+        piece.model.outline_color = state.board.pieces[i].model.outline_color;
         piece.movement.type = state.board.pieces[i].movement.type;
         piece.movement.velocity = state.board.pieces[i].movement.velocity;
         piece.movement.target = state.board.pieces[i].movement.target;
@@ -1188,11 +1199,6 @@ void GameLayer::load_game() {
         piece.movement.reached_target0 = state.board.pieces[i].movement.reached_target0;
         piece.movement.reached_target1 = state.board.pieces[i].movement.reached_target1;
         piece.should_move = state.board.pieces[i].should_move;
-        // piece.index_count = state.board.pieces[i].index_count;
-        // piece.specular_color = state.board.pieces[i].specular_color;
-        // piece.shininess = state.board.pieces[i].shininess;
-        // piece.select_color = state.board.pieces[i].select_color;
-        // piece.hover_color = state.board.pieces[i].hover_color;
         piece.type = state.board.pieces[i].type;
         piece.in_use = state.board.pieces[i].in_use;
         piece.node_id = state.board.pieces[i].node_id;
@@ -1201,6 +1207,7 @@ void GameLayer::load_game() {
         for (Node& node : board.nodes) {
             if (node.id == piece.node_id) {
                 piece.node = &node;
+                break;
             }
         }
         piece.show_outline = state.board.pieces[i].show_outline;
@@ -1218,17 +1225,12 @@ void GameLayer::load_game() {
     board.not_placed_white_pieces_count = state.board.not_placed_white_pieces_count;
     board.not_placed_black_pieces_count = state.board.not_placed_black_pieces_count;
     board.should_take_piece = state.board.should_take_piece;
+    board.hovered_node = nullptr;
+    board.hovered_piece = nullptr;
     board.selected_piece = nullptr;
     board.can_jump = state.board.can_jump;
     board.turns_without_mills = state.board.turns_without_mills;
     board.repetition_history = state.board.repetition_history;
-    
-    // board.paint.position = state.board.paint.position;
-    // board.paint.scale = state.board.paint.scale;
-    // board.paint.index_count = state.board.paint.index_count;
-    // board.paint.specular_color = state.board.paint.specular_color;
-    // board.paint.shininess = state.board.paint.shininess;
-
     board.state_history = state.board.state_history;
     board.next_move = state.board.next_move;
 

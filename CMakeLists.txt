@@ -58,7 +58,6 @@ add_executable(${EXECUTABLE_NAME}
     "src/nine_morris_3d/piece.cpp"
     "src/nine_morris_3d/node.cpp"
     "src/nine_morris_3d/board.cpp"
-    "src/nine_morris_3d/turn_indicator.cpp"
     "src/nine_morris_3d/timer.cpp"
     "src/nine_morris_3d/assets.cpp"
     "src/other/logging.cpp"

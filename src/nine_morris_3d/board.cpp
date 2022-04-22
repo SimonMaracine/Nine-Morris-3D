@@ -376,21 +376,29 @@ void Board::undo() {
 
     Board& state = state_history->back();
 
-    // id = state.id;
-    // scale = state.scale;
-    // index_count = state.index_count;
-    // specular_color = state.specular_color;
-    // shininess = state.shininess;
+    model.index_count = state.model.index_count;
+    model.position = state.model.position;
+    model.rotation  = state.model.rotation;
+    model.scale = state.model.scale;
+    model.outline_color = state.model.outline_color;
+
+    paint_model.index_count = state.paint_model.index_count;
+    paint_model.position = state.paint_model.position;
+    paint_model.rotation  = state.paint_model.rotation;
+    paint_model.scale = state.paint_model.scale;
+    paint_model.outline_color = state.paint_model.outline_color;
 
     for (unsigned int i = 0; i < 24; i++) {
         Node& node = nodes[i];
-
         node.id = state.nodes[i].id;
+        node.model.index_count = state.nodes[i].model.index_count;
         node.model.position = state.nodes[i].model.position;
+        node.model.rotation  = state.nodes[i].model.rotation;
         node.model.scale = state.nodes[i].model.scale;
-        // node.index_count = state.nodes[i].index_count;
+        node.model.outline_color = state.nodes[i].model.outline_color;
         node.piece_id = state.nodes[i].piece_id;
         node.piece = nullptr;  // It must be NULL, if the ids don't match
+        // Assign correct addresses
         for (Piece& piece : pieces) {
             if (piece.id == node.piece_id) {
                 node.piece = &piece;
@@ -402,11 +410,12 @@ void Board::undo() {
 
     for (unsigned int i = 0; i < 18; i++) {
         Piece& piece = pieces[i];
-
         piece.id = state.pieces[i].id;
+        piece.model.index_count = state.pieces[i].model.index_count;
         piece.model.position = state.pieces[i].model.position;
-        piece.model.rotation = state.pieces[i].model.rotation;
+        piece.model.rotation  = state.pieces[i].model.rotation;
         piece.model.scale = state.pieces[i].model.scale;
+        piece.model.outline_color = state.pieces[i].model.outline_color;
         piece.movement.type = state.pieces[i].movement.type;
         piece.movement.velocity = state.pieces[i].movement.velocity;
         piece.movement.target = state.pieces[i].movement.target;
@@ -415,15 +424,11 @@ void Board::undo() {
         piece.movement.reached_target0 = state.pieces[i].movement.reached_target0;
         piece.movement.reached_target1 = state.pieces[i].movement.reached_target1;
         piece.should_move = state.pieces[i].should_move;
-        // piece.index_count = state.pieces[i].index_count;
-        // piece.specular_color = state.pieces[i].specular_color;
-        // piece.shininess = state.pieces[i].shininess;
-        // piece.select_color = state.pieces[i].select_color;
-        // piece.hover_color = state.pieces[i].hover_color;
         piece.type = state.pieces[i].type;
         piece.in_use = state.pieces[i].in_use;
         piece.node_id = state.pieces[i].node_id;
         piece.node = nullptr;  // It must be NULL, if the ids don't match
+        // Assign correct addresses
         for (Node& node : nodes) {
             if (node.id == piece.node_id) {
                 piece.node = &node;
@@ -445,23 +450,14 @@ void Board::undo() {
     not_placed_white_pieces_count = state.not_placed_white_pieces_count;
     not_placed_black_pieces_count = state.not_placed_black_pieces_count;
     should_take_piece = state.should_take_piece;
-    can_jump = state.can_jump;
-    turns_without_mills = state.turns_without_mills;
-    repetition_history = state.repetition_history;
-
-    // paint.position = state.paint.position;
-    // paint.scale = state.paint.scale;
-    // paint.index_count = state.paint.index_count;
-    // paint.specular_color = state.paint.specular_color;
-    // paint.shininess = state.paint.shininess;
-
-    state_history = state.state_history;
-    next_move = state.next_move;
-
-    // Quickly fix these
     hovered_node = nullptr;
     hovered_piece = nullptr;
     selected_piece = nullptr;
+    can_jump = state.can_jump;
+    turns_without_mills = state.turns_without_mills;
+    repetition_history = state.repetition_history;
+    state_history = state.state_history;
+    next_move = state.next_move;
 
     state_history->pop_back();
 
@@ -504,7 +500,7 @@ void Board::update_nodes(hoverable::Id hovered_id) {
     }
 }
 
-void Board::update_pieces(hoverable::Id hovered_id) {
+void Board::update_pieces(hoverable::Id hovered_id) {  // TODO refactor this
     GET_ACTIVE_PIECES(active_pieces)
 
     for (Piece* piece : active_pieces) {

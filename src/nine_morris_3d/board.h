@@ -7,8 +7,6 @@
 #include <glm/glm.hpp>
 
 #include "graphics/renderer/new_renderer.h"
-#include "graphics/renderer/vertex_array.h"
-#include "graphics/renderer/texture.h"
 #include "graphics/renderer/hoverable.h"
 #include "nine_morris_3d/node.h"
 #include "nine_morris_3d/piece.h"
@@ -19,19 +17,6 @@ struct ThreefoldRepetitionHistory {
     std::vector<std::array<Piece::Type, 24>> ones;
     std::vector<std::array<Piece::Type, 24>> twos;
 };
-
-// struct BoardPaint {
-    // glm::vec3 position = glm::vec3(0.0f);
-    // float scale = 0.0f;
-
-    // std::shared_ptr<VertexArray> vertex_array;
-
-    // int index_count = 0;
-    // std::shared_ptr<Texture> diffuse_texture;
-
-    // glm::vec3 specular_color = glm::vec3(0.0f);
-    // float shininess = 0.0f;
-// };
 
 class Board {
 public:
@@ -72,19 +57,8 @@ public:
     void update_nodes(hoverable::Id hovered_id);
     void update_pieces(hoverable::Id hovered_id);
 
-    // hoverable::Id id = hoverable::null;
-
-    // float scale = 0.0f;
-
-    // std::shared_ptr<VertexArray> vertex_array;
-    // int index_count = 0;
-    // std::shared_ptr<Texture> diffuse_texture;
-
     Renderer::Model model;
     Renderer::Model paint_model;
-
-    // glm::vec3 specular_color = glm::vec3(0.0f);
-    // float shininess = 0.0f;
 
     std::array<Node, 24> nodes;
     std::array<Piece, 18> pieces;
@@ -107,8 +81,6 @@ public:
 
     unsigned int turns_without_mills = 0;
     ThreefoldRepetitionHistory repetition_history;
-
-    // BoardPaint paint;
 
     std::shared_ptr<std::vector<Board>> state_history;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
