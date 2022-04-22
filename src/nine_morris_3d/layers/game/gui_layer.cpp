@@ -27,24 +27,24 @@ void GuiLayer::on_attach() {
     }
 
     std::shared_ptr<gui::Dummy> placeholder = std::make_shared<gui::Dummy>(
-        app->gui_renderer->get_main_frame()
+        app->gui_renderer->get_frame()
     );
-    app->gui_renderer->get_main_frame()->add(placeholder, 0, 0);
+    app->gui_renderer->get_frame()->add(placeholder, 0, 0);
 
     turn_indicator = std::make_shared<gui::Image>(
-        app->gui_renderer->get_main_frame(), app->data.white_indicator_texture
+        app->gui_renderer->get_frame(), app->data.white_indicator_texture
     );
-    app->gui_renderer->get_main_frame()->add(turn_indicator, 0, 2);
+    app->gui_renderer->get_frame()->add(turn_indicator, 0, 2);
 
     timer_text = std::make_shared<gui::Text>(
-        app->gui_renderer->get_main_frame(), app->data.good_dog_plain_font,
+        app->gui_renderer->get_frame(), app->data.good_dog_plain_font,
         "00:00", 1.5f, glm::vec3(0.9f)
     );
-    app->gui_renderer->get_main_frame()->add(timer_text, 0, 1);
+    app->gui_renderer->get_frame()->add(timer_text, 0, 1);
 
-    placeholder->padd(glm::vec2(45, 45), glm::vec2(0, 0));
-    turn_indicator->stick(gui::Sticky::NE)->padd(glm::vec2(0, 30), glm::vec2(60, 0));
-    timer_text->stick(gui::Sticky::N)->padd(glm::vec2(0, 0), glm::vec2(60, 0));
+    placeholder->padd(glm::ivec2(45, 45), glm::ivec2(0, 0));
+    turn_indicator->stick(gui::Sticky::NE)->padd(glm::ivec2(0, 30), glm::ivec2(60, 0));
+    timer_text->stick(gui::Sticky::N)->padd(glm::ivec2(0, 0), glm::ivec2(60, 0));
     timer_text->set_shadows(true);
 }
 

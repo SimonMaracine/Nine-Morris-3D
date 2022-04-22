@@ -4,7 +4,6 @@
 #include <utility>
 
 #include "application/layer.h"
-// #include "nine_morris_3d/turn_indicator.h"
 #include "nine_morris_3d/timer.h"
 
 class GameLayer;
@@ -22,7 +21,6 @@ public:
     void render_turn_indicator();
     void render_timer();
 
-    // TurnIndicator turn_indicator;
     Timer timer;
 
     std::shared_ptr<gui::Image> turn_indicator;

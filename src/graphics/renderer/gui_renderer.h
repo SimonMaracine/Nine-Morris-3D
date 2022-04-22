@@ -79,6 +79,8 @@ namespace gui {
                 unsigned int row_span = 1, unsigned int column_span = 1,
                 glm::ivec2 padd_x = glm::ivec2(0), glm::ivec2 padd_y = glm::ivec2(0),
                 Sticky sticky = None);
+
+        void clear();
     private:
         struct Cell {
             std::shared_ptr<Widget> widget;
@@ -145,7 +147,7 @@ public:
 
     void on_window_resized(events::WindowResizedEvent& event);
 
-    std::shared_ptr<gui::Frame> get_main_frame() { return main_frame; }
+    std::shared_ptr<gui::Frame> get_frame() { return main_frame; }
 private:
     struct Storage {
         std::shared_ptr<Shader> quad2d_shader;

@@ -297,7 +297,8 @@ namespace gui {
                             - cell.widget->size.y - cell.widget->padd_y.x;
                     break;
                 case SE:
-                    cell.widget->position.x = cell.position.x + cell.widget->padd_x.x;
+                    cell.widget->position.x = cell.position.x + cell.size.x
+                            - cell.widget->size.x - cell.widget->padd_x.y;
                     cell.widget->position.y = cell.position.y + cell.widget->padd_y.y;
                     break;
                 case SW:
@@ -342,6 +343,10 @@ namespace gui {
             glm::ivec2 padd_y, Sticky sticky) {
         widget->set(row, column)->span(row_span, column_span)->padd(padd_x, padd_y)->stick(sticky);
         children.push_back(widget);
+    }
+
+    void Frame::clear() {
+        children.clear();
     }
 
     Image::Image(std::shared_ptr<Frame> parent, std::shared_ptr<Texture> texture)
