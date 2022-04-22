@@ -15,6 +15,7 @@ public:
     virtual ~GuiLayer() = default;
 
     virtual void on_attach() override;
+    virtual void on_detach() override;
     virtual void on_awake() override;
     virtual void on_update(float dt) override;
 

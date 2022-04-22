@@ -48,6 +48,10 @@ void GuiLayer::on_attach() {
     timer_text->set_shadows(true);
 }
 
+void GuiLayer::on_detach() {
+    app->gui_renderer->get_frame()->clear();
+}
+
 void GuiLayer::on_awake() {
     game_layer = get_layer<GameLayer>("game");
 }
