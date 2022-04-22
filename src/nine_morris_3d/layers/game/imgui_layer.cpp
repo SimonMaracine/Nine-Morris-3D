@@ -137,7 +137,7 @@ void ImGuiLayer::on_update(float dt) {
 
                 save_load::GameState state;
                 state.board = game_layer->board;
-                // state.camera = game_layer->camera;
+                state.camera = app->camera;
                 state.time = gui_layer->timer.get_time_raw();
 
                 const time_t current = time(nullptr);
@@ -460,25 +460,6 @@ void ImGuiLayer::draw_about_screen() {
 
             deactivated = true;
         }
-
-        float width;
-        float height;
-        float x_pos;
-        float y_pos;
-
-        if (static_cast<float>(app->app_data.width) / app->app_data.height > 16.0f / 9.0f) {
-            width = app->app_data.width;
-            height = app->app_data.width * (9.0f / 16.0f);
-            x_pos = 0.0f;
-            y_pos = (height - app->app_data.height) / -2.0f;
-        } else {
-            height = app->app_data.height;
-            width = app->app_data.height * (16.0f / 9.0f);
-            x_pos = (width - app->app_data.width) / -2.0f;
-            y_pos = 0.0f;
-        }
-
-        // renderer::draw_quad_2d(glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->storage->splash_screen_texture);
 
         ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
         ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
