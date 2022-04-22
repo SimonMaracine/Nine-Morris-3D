@@ -155,7 +155,7 @@ void Board::move_pieces(float dt) {
 }
 
 bool Board::take_piece(hoverable::Id hovered_id) {
-    bool taked = false;
+    bool took = false;
 
     if (hovered_piece != nullptr) {  // Do anything only if there is a hovered piece
         for (Node& node : nodes) {
@@ -194,7 +194,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                             DEB_DEBUG("Cannot take piece from windmill");
                         }
 
-                        taked = true;
+                        took = true;
                         break;
                     }
                 } else {
@@ -231,7 +231,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                             DEB_DEBUG("Cannot take piece from windmill");
                         }
 
-                        taked = true;
+                        took = true;
                         break;
                     }
                 }
@@ -247,7 +247,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
         }
     }
 
-    return taked;
+    return took;
 }
 
 void Board::select_piece(hoverable::Id hovered_id) {
