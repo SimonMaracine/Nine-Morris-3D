@@ -60,6 +60,7 @@ public:
 
     void add_model(Model& model, int options = 0);
     void remove_model(unsigned int handle);
+    void update_model(Model& model, int options = 0);
 
     // unsigned int add_instancing_group();
     // void remove_instancing_group();
@@ -85,6 +86,7 @@ private:
     void draw_origin();
     void draw_skybox();
     void setup_shadows();
+    void check_hovered_id(int x, int y);
 
     struct Storage {
         std::shared_ptr<UniformBuffer> projection_view_uniform_buffer;

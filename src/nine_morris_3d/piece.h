@@ -58,4 +58,6 @@ public:
     bool selected = false;
 
     bool active = true;  // Not active pieces simply don't exist in the game, only in memory
+
+    bool renderer_with_outline = false;
 };

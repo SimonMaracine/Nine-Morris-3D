@@ -444,6 +444,8 @@ void Renderer::render() {
     int* data;
     reader.get<int>(&data);
     hovered_id = *data;
+
+    check_hovered_id(x, y);
 }
 
 void Renderer::add_model(Model& model, int options) {
@@ -477,9 +479,37 @@ void Renderer::add_model(Model& model, int options) {
 
 void Renderer::remove_model(unsigned int handle) {
     models.erase(handle);
+    models_no_lighting.erase(handle);
     models_outline.erase(handle);
     models_cast_shadow.erase(handle);
     models_has_shadow.erase(handle);
+}
+
+void Renderer::update_model(Model& model, int options) {
+    remove_model(model.handle);
+
+    const bool no_lighting = options & static_cast<int>(NoLighting);
+    const bool with_outline = options & static_cast<int>(WithOutline);
+    const bool cast_shadow = options & static_cast<int>(CastShadow);
+    const bool has_shadow = options & static_cast<int>(HasShadow);
+
+    if (!with_outline) {
+        if (no_lighting) {
+            models_no_lighting[model.handle] = &model;
+        } else {
+            models[model.handle] = &model;
+        }
+    } else {
+        models_outline[model.handle] = &model;
+    }
+
+    if (cast_shadow) {
+        models_cast_shadow[model.handle] = &model;
+    }
+
+    if (has_shadow) {
+        models_has_shadow[model.handle] = &model;
+    }
 }
 
 void Renderer::set_viewport(int width, int height) {
@@ -558,5 +588,11 @@ void Renderer::setup_shadows() {
     for (const auto& [id, model] : models_has_shadow) {
         model->material->get_shader()->bind();
         model->material->get_shader()->set_uniform_int("u_shadow_map", 2);
+    }
+}
+
+void Renderer::check_hovered_id(int x, int y) {
+    if (x > app->app_data.width || x < 0 || y > app->app_data.height || y < 0) {
+        hovered_id = hoverable::null;
     }
 }

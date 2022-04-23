@@ -53,7 +53,7 @@ template<typename Archive>
 void serialize(Archive& archive, Piece& piece) {
     archive(piece.id, piece.model, piece.movement, piece.should_move, piece.type, piece.in_use,
             piece.node_id, piece.show_outline, piece.to_take, piece.pending_remove, piece.selected,
-            piece.active);
+            piece.active, piece.renderer_with_outline);
 }
 
 template<typename Archive>
