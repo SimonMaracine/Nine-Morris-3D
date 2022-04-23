@@ -286,7 +286,7 @@ void Renderer::render() {
     set_viewport(2048, 2048);
 
     // Render objects with shadows to depth buffer
-    for (const auto& [id, model] : models_cast_shadow) {
+    for (const auto [id, model] : models_cast_shadow) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -319,7 +319,7 @@ void Renderer::render() {
     }
 
     // Render normal models
-    for (const auto& [id, model] : models) {
+    for (const auto [id, model] : models) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -342,7 +342,7 @@ void Renderer::render() {
     }
 
     // Render models without lighting
-    for (const auto& [id, model] : models_no_lighting) {
+    for (const auto [id, model] : models_no_lighting) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -365,7 +365,7 @@ void Renderer::render() {
     }
 
     // Render models with outline
-    for (const auto& [id, model] : models_outline) {
+    for (const auto [id, model] : models_outline) {
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
 
@@ -475,6 +475,8 @@ void Renderer::add_model(Model& model, int options) {
     if (has_shadow) {
         models_has_shadow[id] = &model;
     }
+
+    DEB_WARN("ADDED MODEL");
 }
 
 void Renderer::remove_model(unsigned int handle) {
@@ -510,6 +512,14 @@ void Renderer::update_model(Model& model, int options) {
     if (has_shadow) {
         models_has_shadow[model.handle] = &model;
     }
+}
+
+void Renderer::clear_models() {
+    models.clear();
+    models_no_lighting.clear();
+    models_outline.clear();
+    models_cast_shadow.clear();
+    models_has_shadow.clear();
 }
 
 void Renderer::set_viewport(int width, int height) {

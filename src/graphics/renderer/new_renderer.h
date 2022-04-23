@@ -67,6 +67,8 @@ public:
     // unsigned int add_instanced(unsigned int group_handle);
     // void remove_instanced(unsigned int group_handle, unsigned int handle);
 
+    void clear_models();
+
     void set_viewport(int width, int height);
     void set_clear_color(float red, float green, float blue);
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);

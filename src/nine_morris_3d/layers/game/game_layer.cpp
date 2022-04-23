@@ -120,6 +120,7 @@ void GameLayer::on_detach() {
     }
 
     app->renderer->origin = false;
+    app->renderer->clear_models();
 
     gui_layer->timer = Timer();
 
