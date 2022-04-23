@@ -3,8 +3,6 @@
 #include <string.h>
 
 #include <imgui.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <backends/imgui_impl_glfw.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "application/events.h"
@@ -110,10 +108,6 @@ void ImGuiLayer::on_update(float dt) {
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2(app->app_data.width, app->app_data.height);
     io.DeltaTime = dt;
-
-    ImGui_ImplGlfw_NewFrame();
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui::NewFrame();
 
     RESET_HOVERING_GUI();
 
@@ -328,11 +322,6 @@ void ImGuiLayer::on_update(float dt) {
 #ifdef NINE_MORRIS_3D_DEBUG
     draw_debug(dt);
 #endif
-
-    ImGui::EndFrame();
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void ImGuiLayer::on_event(events::Event& event) {
@@ -423,6 +412,8 @@ void ImGuiLayer::draw_game_over() {
             ImGui::CloseCurrentPopup();
             game_layer->board.phase = Board::Phase::None;
         }
+
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         ImGui::EndPopup();
         HOVERING_GUI();

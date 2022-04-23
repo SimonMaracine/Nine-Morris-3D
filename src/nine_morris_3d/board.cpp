@@ -378,13 +378,13 @@ void Board::undo() {
 
     model.index_count = state.model.index_count;
     model.position = state.model.position;
-    model.rotation  = state.model.rotation;
+    model.rotation = state.model.rotation;
     model.scale = state.model.scale;
     model.outline_color = state.model.outline_color;
 
     paint_model.index_count = state.paint_model.index_count;
     paint_model.position = state.paint_model.position;
-    paint_model.rotation  = state.paint_model.rotation;
+    paint_model.rotation = state.paint_model.rotation;
     paint_model.scale = state.paint_model.scale;
     paint_model.outline_color = state.paint_model.outline_color;
 
@@ -393,7 +393,7 @@ void Board::undo() {
         node.id = state.nodes[i].id;
         node.model.index_count = state.nodes[i].model.index_count;
         node.model.position = state.nodes[i].model.position;
-        node.model.rotation  = state.nodes[i].model.rotation;
+        node.model.rotation = state.nodes[i].model.rotation;
         node.model.scale = state.nodes[i].model.scale;
         node.model.outline_color = state.nodes[i].model.outline_color;
         node.piece_id = state.nodes[i].piece_id;
@@ -413,7 +413,7 @@ void Board::undo() {
         piece.id = state.pieces[i].id;
         piece.model.index_count = state.pieces[i].model.index_count;
         piece.model.position = state.pieces[i].model.position;
-        piece.model.rotation  = state.pieces[i].model.rotation;
+        piece.model.rotation = state.pieces[i].model.rotation;
         piece.model.scale = state.pieces[i].model.scale;
         piece.model.outline_color = state.pieces[i].model.outline_color;
         piece.movement.type = state.pieces[i].movement.type;

@@ -4,6 +4,10 @@
 #include <algorithm>
 #include <string>
 
+#include <imgui.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_glfw.h>
+
 #include "application/application.h"
 #include "application/layer.h"
 #include "application/window.h"
@@ -92,6 +96,10 @@ void Application::run() {
 
         renderer->render();
 
+        ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui::NewFrame();
+
         for (Layer* layer : active_overlay_stack) {
             for (unsigned int i = 0; i < fixed_updates; i++) {
                 layer->on_fixed_update();
@@ -100,6 +108,10 @@ void Application::run() {
         }
 
         gui_renderer->render();
+
+        ImGui::EndFrame();
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         window->update();
 

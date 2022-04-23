@@ -1152,14 +1152,14 @@ void GameLayer::load_game() {
     Renderer::Model& model = board.model;
     model.index_count = state.board.model.index_count;
     model.position = state.board.model.position;
-    model.rotation  = state.board.model.rotation;
+    model.rotation = state.board.model.rotation;
     model.scale = state.board.model.scale;
     model.outline_color = state.board.model.outline_color;
 
     Renderer::Model& paint_model = board.paint_model;
     paint_model.index_count = state.board.paint_model.index_count;
     paint_model.position = state.board.paint_model.position;
-    paint_model.rotation  = state.board.paint_model.rotation;
+    paint_model.rotation = state.board.paint_model.rotation;
     paint_model.scale = state.board.paint_model.scale;
     paint_model.outline_color = state.board.paint_model.outline_color;
 
@@ -1168,7 +1168,7 @@ void GameLayer::load_game() {
         node.id = state.board.nodes[i].id;
         node.model.index_count = state.board.nodes[i].model.index_count;
         node.model.position = state.board.nodes[i].model.position;
-        node.model.rotation  = state.board.nodes[i].model.rotation;
+        node.model.rotation = state.board.nodes[i].model.rotation;
         node.model.scale = state.board.nodes[i].model.scale;
         node.model.outline_color = state.board.nodes[i].model.outline_color;
         node.piece_id = state.board.nodes[i].piece_id;
@@ -1188,7 +1188,7 @@ void GameLayer::load_game() {
         piece.id = state.board.pieces[i].id;
         piece.model.index_count = state.board.pieces[i].model.index_count;
         piece.model.position = state.board.pieces[i].model.position;
-        piece.model.rotation  = state.board.pieces[i].model.rotation;
+        piece.model.rotation = state.board.pieces[i].model.rotation;
         piece.model.scale = state.board.pieces[i].model.scale;
         piece.model.outline_color = state.board.pieces[i].model.outline_color;
         piece.movement.type = state.board.pieces[i].movement.type;
@@ -1240,5 +1240,5 @@ void GameLayer::load_game() {
 
     board.update_cursor();
 
-    DEB_INFO("Loaded game");
+    DEB_INFO("Done loading game");
 }

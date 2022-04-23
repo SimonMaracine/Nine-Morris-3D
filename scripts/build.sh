@@ -1,5 +1,7 @@
 #! /bin/bash
 
+clear
+
 threads=$(grep -c ^processor /proc/cpuinfo)
 
 cd ../build
