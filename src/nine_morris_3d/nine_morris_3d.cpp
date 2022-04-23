@@ -84,7 +84,7 @@ NineMorris3D::NineMorris3D()
     // Load splash screen
     data.splash_screen_texture = Texture::create(assets::path(assets::SPLASH_SCREEN_TEXTURE), true);
 
-    // Load an create this font
+    // Load and create this font
     data.good_dog_plain_font = std::make_shared<Font>(path(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
     data.good_dog_plain_font->begin_baking();  // TODO maybe move part of texture baking to thread
     data.good_dog_plain_font->bake_characters(32, 127);

@@ -19,6 +19,8 @@
 #include "graphics/renderer/opengl/framebuffer.h"
 #include "other/logging.h"
 
+#define IGNORE(variable) ((void) variable)
+
 const char* projection_view_block_fields[] = {
     "u_projection_view_matrix"
 };
@@ -287,6 +289,7 @@ void Renderer::render() {
 
     // Render objects with shadows to depth buffer
     for (const auto [id, model] : models_cast_shadow) {
+        IGNORE(id);
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -320,6 +323,7 @@ void Renderer::render() {
 
     // Render normal models
     for (const auto [id, model] : models) {
+        IGNORE(id);
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -343,6 +347,7 @@ void Renderer::render() {
 
     // Render models without lighting
     for (const auto [id, model] : models_no_lighting) {
+        IGNORE(id);
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -366,6 +371,7 @@ void Renderer::render() {
 
     // Render models with outline
     for (const auto [id, model] : models_outline) {
+        IGNORE(id);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
 
@@ -596,6 +602,7 @@ void Renderer::setup_shadows() {
     storage.light_space_uniform_buffer->upload_data();
 
     for (const auto& [id, model] : models_has_shadow) {
+        IGNORE(id);
         model->material->get_shader()->bind();
         model->material->get_shader()->set_uniform_int("u_shadow_map", 2);
     }

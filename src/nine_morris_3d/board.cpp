@@ -21,7 +21,7 @@
         return piece->active; \
     });
 
-#define TURN_IS_WHITE_SO(_true, _false) turn == Player::White ? _true : _false
+#define TURN_IS_WHITE_SO(_true, _false) (turn == Player::White ? _true : _false)
 #define WAIT_FOR_NEXT_MOVE() next_move = false
 #define CAN_MAKE_MOVE() next_move = true
 
