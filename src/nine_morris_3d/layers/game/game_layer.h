@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 #include <utility>
 
 #include "application/layer.h"
@@ -50,8 +50,8 @@ public:
     void set_camera();
 
     void set_scene_framebuffer(int samples);
-    void set_textures_quality(const std::string& quality);
-    void set_skybox(const std::string& skybox);
+    void set_textures_quality(std::string_view quality);
+    void set_skybox(std::string_view skybox);
     void load_game();
 
     Board board;

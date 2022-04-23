@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "application/application.h"
@@ -28,7 +29,7 @@ public:
     bool active = true;
 protected:
     template<typename T>
-    T* get_layer(const std::string& id) const {
+    T* get_layer(std::string_view id) const {
         for (Scene* scene : application->scenes) {
             for (Layer* layer : scene->layers_in_order) {
                 if (layer->id == id) {

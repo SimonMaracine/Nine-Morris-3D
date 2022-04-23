@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 #include <vector>
 #include <memory>
 
@@ -30,6 +30,6 @@ namespace mesh {
         std::vector<unsigned int> indices;
     };
 
-    std::shared_ptr<Mesh<Vertex>> load_model(const std::string& file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VertexP>> load_model_position(const std::string& file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<Vertex>> load_model(std::string_view file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<VertexP>> load_model_position(std::string_view file_path, bool flip_winding_order = false);
 }

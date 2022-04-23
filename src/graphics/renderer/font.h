@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <memory>
 #include <unordered_map>
 
@@ -21,7 +22,7 @@ public:
         int xoff, yoff, xadvance;
     };
 
-    Font(const std::string& file_path, float size, int padding, unsigned char on_edge_value,
+    Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
             int pixel_dist_scale, int bitmap_size);
     ~Font();
 
@@ -41,15 +42,15 @@ public:
     void end_baking();
 
     // Call render to get the buffer of data used in the end by OpenGL; pointer returned needs to be deleted
-    void render(const std::string& string, size_t* out_size, float** out_buffer);
+    void render(std::string_view string, size_t* out_size, float** out_buffer);
 
     // Get width and height of a line of text
-    void get_string_size(const std::string& string, float scale, int* out_width, int* out_height);
+    void get_string_size(std::string_view string, float scale, int* out_width, int* out_height);
 private:
-    static const char* get_file_data(const std::string& file_path);
+    static const char* get_file_data(std::string_view file_path);
     static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsigned char* glyph,
         int width, int height, int dest_x, int dest_y, float* s0, float* t0, float* s1, float* t1);
-    static std::string get_name(const std::string& file_path);
+    static std::string get_name(std::string_view file_path);
 
     struct BakeContext {
         int x = 0, y = 0;

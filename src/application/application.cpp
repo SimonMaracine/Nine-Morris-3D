@@ -2,7 +2,7 @@
 #include <memory>
 #include <cassert>
 #include <algorithm>
-#include <string>
+#include <string_view>
 
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -19,7 +19,7 @@
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
-Application::Application(int width, int height, const std::string& title) {
+Application::Application(int width, int height, std::string_view title) {
     app_data.width = width;
     app_data.height = height;
     app_data.title = title;
@@ -160,7 +160,7 @@ void Application::set_starting_scene(Scene* scene) {
     current_scene = scene;
 }
 
-void Application::change_scene(const std::string& id) {
+void Application::change_scene(std::string_view id) {
     for (Scene* scene : scenes) {
         if (scene->id == id) {
             to_scene = scene;

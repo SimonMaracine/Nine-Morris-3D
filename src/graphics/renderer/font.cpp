@@ -1,4 +1,4 @@
-#include <string>
+#include <string_view>
 #include <fstream>
 #include <vector>
 #include <iterator>
@@ -21,14 +21,14 @@
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
-Font::Font(const std::string& file_path, float size, int padding, unsigned char on_edge_value,
+Font::Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
         int pixel_dist_scale, int bitmap_size)
     : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value),
       pixel_dist_scale(pixel_dist_scale) {
     font_file_buffer = get_file_data(file_path);
 
     if (!stbtt_InitFont(&info, (unsigned char*) font_file_buffer, 0)) {
-        REL_CRITICAL("Could not load font '{}', exiting...", file_path.c_str());
+        REL_CRITICAL("Could not load font '{}', exiting...", file_path.data());
         exit(1);
     }
     sf = stbtt_ScaleForPixelHeight(&info, size);
@@ -46,7 +46,7 @@ Font::Font(const std::string& file_path, float size, int padding, unsigned char 
 
     name = get_name(file_path);
 
-    DEB_DEBUG("Loaded font '{}'", file_path.c_str());
+    DEB_DEBUG("Loaded font '{}'", file_path.data());
 }
 
 Font::~Font() {
@@ -191,7 +191,7 @@ void Font::end_baking() {
     DEB_DEBUG("End baking font '{}'", name.c_str());
 }
 
-void Font::render(const std::string& string, size_t* out_size, float** out_buffer) {
+void Font::render(std::string_view string, size_t* out_size, float** out_buffer) {
     const std::u16string utf16_string = utf8::utf8to16(string);
 
     const size_t SIZE = sizeof(float) * utf16_string.length() * 24;
@@ -252,7 +252,7 @@ void Font::render(const std::string& string, size_t* out_size, float** out_buffe
     *out_buffer = buffer;
 }
 
-void Font::get_string_size(const std::string& string, float scale, int* out_width, int* out_height) {
+void Font::get_string_size(std::string_view string, float scale, int* out_width, int* out_height) {
     const std::u16string utf16_string = utf8::utf8to16(string);
 
     int x = 0;
@@ -275,11 +275,11 @@ void Font::get_string_size(const std::string& string, float scale, int* out_widt
     *out_width = static_cast<int>(roundf((x + 2) * scale));
 }
 
-const char* Font::get_file_data(const std::string& file_path) {
-    std::ifstream file (file_path, std::ios::binary);
+const char* Font::get_file_data(std::string_view file_path) {
+    std::ifstream file (std::string(file_path), std::ios::binary);
 
     if (!file.is_open()) {
-        REL_CRITICAL("Could not open file '{}' for reading, exiting...", file_path.c_str());
+        REL_CRITICAL("Could not open file '{}' for reading, exiting...", file_path.data());
         exit(1);
     }
 
@@ -310,11 +310,11 @@ void Font::blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsi
     *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
 }
 
-std::string Font::get_name(const std::string& file_path) {
+std::string Font::get_name(std::string_view file_path) {
     std::vector<std::string> tokens;
 
     char copy[256];
-    strcpy(copy, file_path.c_str());
+    strcpy(copy, file_path.data());
 
     char* token = strtok(copy, "/.");
 

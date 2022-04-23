@@ -167,11 +167,11 @@ namespace save_load {
         DEB_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
     }
 
-    void delete_save_game_file(const std::string& file_path) {
-        if (remove(file_path.c_str()) != 0) {
-            REL_INFO("Could not delete save game file '{}'", file_path.c_str());
+    void delete_save_game_file(std::string_view file_path) {
+        if (remove(file_path.data()) != 0) {
+            REL_INFO("Could not delete save game file '{}'", file_path.data());
         } else {
-            REL_INFO("Deleted save game file '{}'", file_path.c_str());
+            REL_INFO("Deleted save game file '{}'", file_path.data());
         }
     }
 

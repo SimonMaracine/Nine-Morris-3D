@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <string>
+#include <string_view>
 #include <vector>
 
 #include "application/application_data.h"
@@ -22,7 +22,7 @@ class Scene;
 */
 class Application {
 protected:
-    Application(int width, int height, const std::string& title);
+    Application(int width, int height, std::string_view title);
     virtual ~Application();
 public:
     // Call this to run the application, after all layers and scenes have been defined
@@ -31,7 +31,7 @@ public:
     // Scene management functions
     void add_scene(Scene* scene);
     void set_starting_scene(Scene* scene);
-    void change_scene(const std::string& id);
+    void change_scene(std::string_view id);
 
     // Framebuffer management functions
     void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);

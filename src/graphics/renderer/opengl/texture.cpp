@@ -1,5 +1,5 @@
 #include <memory>
-#include <string>
+#include <string_view>
 #include <cassert>
 #include <vector>
 #include <string.h>
@@ -11,11 +11,11 @@
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 
-static std::string get_name(const std::string& file_path) {
+static std::string get_name(std::string_view file_path) {
     size_t last_slash = file_path.find_last_of("/");
     assert(last_slash != std::string::npos);
 
-    return file_path.substr(last_slash + 1);
+    return std::string(file_path.substr(last_slash + 1));
 }
 
 static std::string get_name_texture3d(const char* file_path) {
@@ -36,9 +36,9 @@ static std::string get_name_texture3d(const char* file_path) {
     return tokens[tokens.size() - 2];  // It's ok
 }
 
-Texture::Texture(GLuint texture, int width, int height, const std::string& name)
+Texture::Texture(GLuint texture, int width, int height, std::string_view name)
     : texture(texture), width(width), height(height), name(name) {
-    DEB_DEBUG("Created texture {} ({})", texture, name.c_str());
+    DEB_DEBUG("Created texture {} ({})", texture, name.data());
 }
 
 Texture::~Texture() {
@@ -47,16 +47,16 @@ Texture::~Texture() {
     DEB_DEBUG("Deleted texture {} ({})", texture, name.c_str());
 }
 
-std::shared_ptr<Texture> Texture::create(const std::string& file_path, bool mipmapping, float bias) {
-    DEB_DEBUG("Loading texture '{}'...", file_path.c_str());
+std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmapping, float bias) {
+    DEB_DEBUG("Loading texture '{}'...", file_path.data());
 
     stbi_set_flip_vertically_on_load(1);
 
     int width, height, channels;
-    stbi_uc* data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
+    stbi_uc* data = stbi_load(file_path.data(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture '{}', exiting...", file_path.c_str());
+        REL_CRITICAL("Could not load texture '{}', exiting...", file_path.data());
         exit(1);
     }
 
@@ -133,9 +133,9 @@ void Texture::unbind() {
 
 // --- 3D texture
 
-Texture3D::Texture3D(GLuint texture, const std::string& name)
+Texture3D::Texture3D(GLuint texture, std::string_view name)
     : texture(texture), name(name) {
-    DEB_DEBUG("Created 3D texture {} ({})", texture, name.c_str());
+    DEB_DEBUG("Created 3D texture {} ({})", texture, name.data());
 }
 
 Texture3D::~Texture3D() {

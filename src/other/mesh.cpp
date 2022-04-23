@@ -1,4 +1,5 @@
 #include <string>
+#include <string_view>
 #include <vector>
 #include <memory>
 
@@ -11,15 +12,15 @@
 #include "other/logging.h"
 
 namespace mesh {
-    std::shared_ptr<Mesh<Vertex>> load_model(const std::string& file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading model '{}'...", file_path.c_str());
+    std::shared_ptr<Mesh<Vertex>> load_model(std::string_view file_path, bool flip_winding_order) {
+        DEB_DEBUG("Loading model '{}'...", file_path.data());
 
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure |
+        const aiScene* scene = importer.ReadFile(std::string(file_path), aiProcess_ValidateDataStructure |
                 (flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)));
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());
+            REL_CRITICAL("Could not load model '{}', exiting...", file_path.data());
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
@@ -65,15 +66,15 @@ namespace mesh {
         return std::make_shared<Mesh<Vertex>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VertexP>> load_model_position(const std::string& file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading model '{}'...", file_path.c_str());
+    std::shared_ptr<Mesh<VertexP>> load_model_position(std::string_view file_path, bool flip_winding_order) {
+        DEB_DEBUG("Loading model '{}'...", file_path.data());
 
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure |
+        const aiScene* scene = importer.ReadFile(std::string(file_path), aiProcess_ValidateDataStructure |
                 (flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)));
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());
+            REL_CRITICAL("Could not load model '{}', exiting...", file_path.data());
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }

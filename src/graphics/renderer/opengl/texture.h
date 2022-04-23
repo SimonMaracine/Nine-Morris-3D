@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <string>
+#include <string_view>
 #include <array>
 
 #include <glad/glad.h>
@@ -14,10 +14,10 @@
  */
 class Texture {
 public:
-    Texture(GLuint texture, int width, int height, const std::string& name);
+    Texture(GLuint texture, int width, int height, std::string_view name);
     ~Texture();
 
-    static std::shared_ptr<Texture> create(const std::string& file_path, bool mipmapping, float bias = 0.0f);
+    static std::shared_ptr<Texture> create(std::string_view file_path, bool mipmapping, float bias = 0.0f);
 	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, bool mipmapping, float bias = 0.0f);
 
 	int get_width() { return width; }
@@ -36,7 +36,7 @@ private:
 
 class Texture3D {
 public:
-    Texture3D(GLuint texture, const std::string& name);
+    Texture3D(GLuint texture, std::string_view name);
     ~Texture3D();
 
     static std::shared_ptr<Texture3D> create(const char** file_paths);

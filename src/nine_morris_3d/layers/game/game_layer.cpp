@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
-#include <string>
+#include <string_view>
 #include <stdexcept>
 #include <memory>
 #include <stdlib.h>
@@ -909,7 +909,7 @@ void GameLayer::set_scene_framebuffer(int samples) {
     app->add_framebuffer(app->renderer->get_scene_framebuffer());
 }
 
-void GameLayer::set_textures_quality(const std::string& quality) {
+void GameLayer::set_textures_quality(std::string_view quality) {
     using namespace assets;
 
     // quality is the new option; options.texture_quality is not set yet
@@ -1039,7 +1039,7 @@ void GameLayer::set_textures_quality(const std::string& quality) {
     }
 }
 
-void GameLayer::set_skybox(const std::string& skybox) {
+void GameLayer::set_skybox(std::string_view skybox) {
     using namespace assets;
 
     // skybox is the new option; options.skybox is not set yet

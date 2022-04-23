@@ -1,4 +1,5 @@
 #include <string>
+#include <string_view>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -39,21 +40,21 @@ static size_t type_size(GLenum type) {
     return size;
 }
 
-Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, const std::string& name,
-        const std::vector<std::string>& uniforms, const std::string& vertex_source_path,
-        const std::string& fragment_source_path)
+Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, std::string_view name,
+        const std::vector<std::string>& uniforms, std::string_view vertex_source_path,
+        std::string_view fragment_source_path)
     : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader), name(name),
       vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path) {
     for (const std::string& uniform : uniforms) {
         GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
-            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name.c_str());
+            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name.data());
             continue;
         }
         cache[uniform] = location;
     }
 
-    DEB_DEBUG("Created shader {} ({})", program, name.c_str());
+    DEB_DEBUG("Created shader {} ({})", program, name.data());
 }
 
 Shader::~Shader() {
@@ -62,8 +63,8 @@ Shader::~Shader() {
     DEB_DEBUG("Deleted shader {} ({})", program, name.c_str());
 }
 
-std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
-            const std::string& fragment_source_path, const std::vector<std::string>& uniforms) {
+std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
+            std::string_view fragment_source_path, const std::vector<std::string>& uniforms) {
     GLuint vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
     GLuint fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
 
@@ -84,8 +85,8 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
             vertex_source_path, fragment_source_path);
 }
 
-std::shared_ptr<Shader> Shader::create(const std::string& vertex_source_path,
-            const std::string& fragment_source_path, const std::vector<std::string>& uniforms,
+std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
+            std::string_view fragment_source_path, const std::vector<std::string>& uniforms,
             const std::vector<UniformBlockSpecification>& uniform_blocks) {
     GLuint vertex_shader;
     GLuint fragment_shader;
@@ -175,32 +176,32 @@ void Shader::unbind() {
     glUseProgram(0);
 }
 
-void Shader::set_uniform_mat4(const std::string& name, const glm::mat4& matrix) {
+void Shader::set_uniform_mat4(std::string_view name, const glm::mat4& matrix) {
     GLint location = get_uniform_location(name);
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::set_uniform_int(const std::string& name, int value) {
+void Shader::set_uniform_int(std::string_view name, int value) {
     GLint location = get_uniform_location(name);
     glUniform1i(location, value);
 }
 
-void Shader::set_uniform_float(const std::string& name, float value) {
+void Shader::set_uniform_float(std::string_view name, float value) {
     GLint location = get_uniform_location(name);
     glUniform1f(location, value);
 }
 
-void Shader::set_uniform_vec2(const std::string& name, const glm::vec2& vector) {
+void Shader::set_uniform_vec2(std::string_view name, const glm::vec2& vector) {
     GLint location = get_uniform_location(name);
     glUniform2f(location, vector.x, vector.y);
 }
 
-void Shader::set_uniform_vec3(const std::string& name, const glm::vec3& vector) {
+void Shader::set_uniform_vec3(std::string_view name, const glm::vec3& vector) {
     GLint location = get_uniform_location(name);
     glUniform3f(location, vector.x, vector.y, vector.z);
 }
 
-void Shader::set_uniform_vec4(const std::string& name, const glm::vec4& vector) {
+void Shader::set_uniform_vec4(std::string_view name, const glm::vec4& vector) {
     GLint location = get_uniform_location(name);
     glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
 }
@@ -237,22 +238,22 @@ void Shader::recompile() {
     fragment_shader = new_fragment_shader;
 }
 
-GLint Shader::get_uniform_location(const std::string& name) {
+GLint Shader::get_uniform_location(std::string_view name) {
 #if defined(NINE_MORRIS_3D_RELEASE)
     return cache[name];
 #elif defined(NINE_MORRIS_3D_DEBUG)
     try {
-        return cache.at(name);
+        return cache.at(std::string(name));
     } catch (const std::out_of_range&) {
-        DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}', exiting...", name.c_str(),
-                this->name.c_str());
+        DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}', exiting...", name.data(),
+                this->name.data());
         exit(1);
     }
 #endif
 }
 
-GLuint Shader::compile_shader(const std::string& source_path, GLenum type) noexcept(false) {
-    std::ifstream file (source_path);
+GLuint Shader::compile_shader(std::string_view source_path, GLenum type) noexcept(false) {
+    std::ifstream file {std::string(source_path)};
     std::string source;
 
     if (file.is_open()) {
@@ -261,7 +262,7 @@ GLuint Shader::compile_shader(const std::string& source_path, GLenum type) noexc
             source.append(line).append("\n");
         }
     } else {
-        REL_CRITICAL("Could not open file '{}', exiting...", source_path.c_str());
+        REL_CRITICAL("Could not open file '{}', exiting...", source_path.data());
         exit(1);
     }
     file.close();
@@ -332,14 +333,14 @@ bool Shader::check_linking(GLuint program) {
     return true;
 }
 
-std::string Shader::get_name(const std::string& vertex_source, const std::string& fragment_source) {
+std::string Shader::get_name(std::string_view vertex_source, std::string_view fragment_source) {
     size_t last_slash_v = vertex_source.find_last_of("/");
     assert(last_slash_v != std::string::npos);
-    const std::string vertex = vertex_source.substr(last_slash_v + 1);
+    const std::string vertex = std::string(vertex_source.substr(last_slash_v + 1));
 
     size_t last_slash_f = fragment_source.find_last_of("/");
     assert(last_slash_f != std::string::npos);
-    const std::string fragment = fragment_source.substr(last_slash_f + 1);
+    const std::string fragment = std::string(fragment_source.substr(last_slash_f + 1));
 
     return vertex + " & " + fragment;
 }

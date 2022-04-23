@@ -1,5 +1,5 @@
 #include <memory>
-#include <string>
+#include <string_view>
 #include <cassert>
 #include <utility>
 
@@ -30,25 +30,25 @@ Material::~Material() {
     DEB_DEBUG("Deleted material from shader: {}", shader->get_name());
 }
 
-void Material::add_variable(UniformType type, const std::string& name) {
+void Material::add_variable(UniformType type, std::string_view name) {
     switch (type) {
         case UniformType::Mat4:
-            uniforms_mat4[name] = glm::mat4(1.0f);
+            uniforms_mat4[std::string(name)] = glm::mat4(1.0f);
             break;
         case UniformType::Int:
-            uniforms_int[name] = 0;
+            uniforms_int[std::string(name)] = 0;
             break;
         case UniformType::Float:
-            uniforms_float[name] = 0.0f;
+            uniforms_float[std::string(name)] = 0.0f;
             break;
         case UniformType::Vec2:
-            uniforms_vec2[name] = glm::vec2(0.0f);
+            uniforms_vec2[std::string(name)] = glm::vec2(0.0f);
             break;
         case UniformType::Vec3:
-            uniforms_vec3[name] = glm::vec3(0.0f);
+            uniforms_vec3[std::string(name)] = glm::vec3(0.0f);
             break;
         case UniformType::Vec4:
-            uniforms_vec4[name] = glm::vec4(0.0f);
+            uniforms_vec4[std::string(name)] = glm::vec4(0.0f);
             break;
         default:
             assert(false);
@@ -56,8 +56,8 @@ void Material::add_variable(UniformType type, const std::string& name) {
     }
 }
 
-void Material::add_texture(const std::string& name) {
-    textures[name] = std::make_pair(0, nullptr);
+void Material::add_texture(std::string_view name) {
+    textures[std::string(name)] = std::make_pair(0, nullptr);
 }
 
 // --- Material instance
@@ -110,30 +110,30 @@ void MaterialInstance::bind() {
     }
 }
 
-void MaterialInstance::set_mat4(const std::string& name, const glm::mat4& matrix) {
-    material->uniforms_mat4[name] = matrix;
+void MaterialInstance::set_mat4(std::string_view name, const glm::mat4& matrix) {
+    material->uniforms_mat4[std::string(name)] = matrix;
 }
 
-void MaterialInstance::set_int(const std::string& name, int value) {
-    material->uniforms_int[name] = value;
+void MaterialInstance::set_int(std::string_view name, int value) {
+    material->uniforms_int[std::string(name)] = value;
 }
 
-void MaterialInstance::set_float(const std::string& name, float value) {
-    material->uniforms_float[name] = value;
+void MaterialInstance::set_float(std::string_view name, float value) {
+    material->uniforms_float[std::string(name)] = value;
 }
 
-void MaterialInstance::set_vec2(const std::string& name, const glm::vec2& vector) {
-    material->uniforms_vec2[name] = vector;
+void MaterialInstance::set_vec2(std::string_view name, const glm::vec2& vector) {
+    material->uniforms_vec2[std::string(name)] = vector;
 }
 
-void MaterialInstance::set_vec3(const std::string& name, const glm::vec3& vector) {
-    material->uniforms_vec3[name] = vector;
+void MaterialInstance::set_vec3(std::string_view name, const glm::vec3& vector) {
+    material->uniforms_vec3[std::string(name)] = vector;
 }
 
-void MaterialInstance::set_vec4(const std::string& name, const glm::vec4& vector) {
-    material->uniforms_vec4[name] = vector;
+void MaterialInstance::set_vec4(std::string_view name, const glm::vec4& vector) {
+    material->uniforms_vec4[std::string(name)] = vector;
 }
 
-void MaterialInstance::set_texture(const std::string& name, std::shared_ptr<Texture> texture, int unit) {
-    material->textures[name] = std::make_pair(unit, texture);
+void MaterialInstance::set_texture(std::string_view name, std::shared_ptr<Texture> texture, int unit) {
+    material->textures[std::string(name)] = std::make_pair(unit, texture);
 }

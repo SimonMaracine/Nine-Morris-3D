@@ -378,7 +378,7 @@ namespace gui {
     Text::Text(std::shared_ptr<Frame> parent, std::shared_ptr<Font> font, std::string_view text,
                 float scale, const glm::vec3& color)
         : Widget(parent), font(font), text(text), scale(scale), color(color) {
-        font->get_string_size(static_cast<std::string>(text), scale, &size.x, &size.y);  // TODO use string_view
+        font->get_string_size(text, scale, &size.x, &size.y);
     }
 
     void Text::render() {
@@ -413,12 +413,12 @@ namespace gui {
 
     void Text::set_text(std::string_view text) {
         this->text = text;
-        font->get_string_size(static_cast<std::string>(text), scale, &size.x, &size.y);
+        font->get_string_size(text, scale, &size.x, &size.y);
     }
 
     void Text::set_scale(float scale) {
         this->scale = scale;
-        font->get_string_size(static_cast<std::string>(text), scale, &size.x, &size.y);
+        font->get_string_size(text, scale, &size.x, &size.y);
     }
 
     void Text::set_color(const glm::vec3& color) {

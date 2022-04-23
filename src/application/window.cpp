@@ -1,4 +1,3 @@
-#include <string>
 #include <vector>
 #include <memory>
 #include <stdexcept>
@@ -158,7 +157,7 @@ unsigned int Window::add_cursor(std::unique_ptr<IconImage> cursor, int x_hotspot
 
     GLFWcursor* glfw_cursor = glfwCreateCursor(&data, x_hotspot, y_hotspot);
     if (glfw_cursor == nullptr) {
-        REL_ERROR("Could not create custom cursor '{}'", cursor->get_file_path().c_str());
+        REL_ERROR("Could not create custom cursor '{}'", cursor->get_file_path().data());
     }
 
     static unsigned int id = 0;
