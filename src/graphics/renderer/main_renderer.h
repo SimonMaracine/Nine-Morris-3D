@@ -9,17 +9,17 @@
 #include <glm/glm.hpp>
 
 #include "application/platform.h"
-#include "graphics/renderer/vertex_array.h"
-#include "graphics/renderer/buffer.h"
-#include "graphics/renderer/shader.h"
-#include "graphics/renderer/texture.h"
-#include "graphics/renderer/framebuffer.h"
 #include "graphics/renderer/framebuffer_reader.h"
 #include "graphics/renderer/font.h"
 #include "graphics/renderer/camera.h"
 #include "graphics/renderer/material.h"
 #include "graphics/renderer/light.h"
 #include "graphics/renderer/hoverable.h"
+#include "graphics/renderer/opengl/vertex_array.h"
+#include "graphics/renderer/opengl/buffer.h"
+#include "graphics/renderer/opengl/shader.h"
+#include "graphics/renderer/opengl/texture.h"
+#include "graphics/renderer/opengl/framebuffer.h"
 
 class Application;
 

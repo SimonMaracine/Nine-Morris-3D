@@ -7,8 +7,8 @@
 
 #include <glm/glm.hpp>
 
-#include "graphics/renderer/shader.h"
-#include "graphics/renderer/texture.h"
+#include "graphics/renderer/opengl/shader.h"
+#include "graphics/renderer/opengl/texture.h"
 
 class Material {
 public:

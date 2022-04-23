@@ -9,12 +9,12 @@
 #include <backends/imgui_impl_glfw.h>
 
 #include "application/icon_image.h"
-#include "graphics/renderer/vertex_array.h"
-#include "graphics/renderer/buffer.h"
 #include "graphics/renderer/buffer_layout.h"
-#include "graphics/renderer/texture.h"
-#include "graphics/renderer/vertex_array.h"
-#include "graphics/renderer/framebuffer.h"
+#include "graphics/renderer/opengl/vertex_array.h"
+#include "graphics/renderer/opengl/buffer.h"
+#include "graphics/renderer/opengl/texture.h"
+#include "graphics/renderer/opengl/vertex_array.h"
+#include "graphics/renderer/opengl/framebuffer.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/assets.h"

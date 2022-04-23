@@ -8,7 +8,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/opengl/buffer.h"
 
 struct UniformBlockSpecification {
     std::string block_name;

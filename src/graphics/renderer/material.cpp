@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "graphics/renderer/material.h"
-#include "graphics/renderer/shader.h"
+#include "graphics/renderer/opengl/shader.h"
 #include "other/logging.h"
 
 Material::Material(std::shared_ptr<Shader> shader, int flags)

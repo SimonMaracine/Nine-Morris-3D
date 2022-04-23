@@ -7,7 +7,7 @@
 #include <stb_truetype.h>
 #include <glad/glad.h>
 
-#include "graphics/renderer/vertex_array.h"
+#include "graphics/renderer/opengl/vertex_array.h"
 
 /**
  * This represents a font. Can be used by the renderer to draw text with this font.

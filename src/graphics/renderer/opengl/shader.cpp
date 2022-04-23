@@ -12,8 +12,8 @@
 
 #include "application/platform.h"
 #include "graphics/debug_opengl.h"
-#include "graphics/renderer/shader.h"
-#include "graphics/renderer/buffer.h"
+#include "graphics/renderer/opengl/shader.h"
+#include "graphics/renderer/opengl/buffer.h"
 #include "other/logging.h"
 
 #define DELETE_SHADER(program, vertex_shader, fragment_shader) \

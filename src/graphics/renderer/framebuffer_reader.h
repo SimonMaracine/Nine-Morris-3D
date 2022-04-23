@@ -3,8 +3,8 @@
 #include <array>
 #include <memory>
 
-#include "graphics/renderer/buffer.h"
-#include "graphics/renderer/framebuffer.h"
+#include "graphics/renderer/opengl/buffer.h"
+#include "graphics/renderer/opengl/framebuffer.h"
 
 /**
  * Use this to asynchronously read pixels from a framebuffer.

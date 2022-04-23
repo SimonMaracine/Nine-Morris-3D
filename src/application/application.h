@@ -7,9 +7,9 @@
 #include "application/application_data.h"
 #include "application/events.h"
 #include "application/window.h"
-#include "graphics/renderer/new_renderer.h"
+#include "graphics/renderer/main_renderer.h"
 #include "graphics/renderer/gui_renderer.h"
-#include "graphics/renderer/framebuffer.h"
+#include "graphics/renderer/opengl/framebuffer.h"
 #include "nine_morris_3d/assets_data.h"
 #include "other/loader.h"
 

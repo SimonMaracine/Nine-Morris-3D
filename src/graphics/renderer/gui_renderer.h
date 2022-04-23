@@ -8,10 +8,10 @@
 #include <glm/glm.hpp>
 
 #include "application/events.h"
-#include "graphics/renderer/shader.h"
-#include "graphics/renderer/vertex_array.h"
-#include "graphics/renderer/texture.h"
 #include "graphics/renderer/font.h"
+#include "graphics/renderer/opengl/shader.h"
+#include "graphics/renderer/opengl/vertex_array.h"
+#include "graphics/renderer/opengl/texture.h"
 
 class Application;
 class GuiRenderer;

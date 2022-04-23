@@ -16,7 +16,7 @@ namespace mesh {
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure |
-                (flip_winding_order ? aiProcess_FlipWindingOrder : 0));
+                (flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)));
 
         if (!scene) {
             REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());
@@ -70,7 +70,7 @@ namespace mesh {
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(file_path, aiProcess_ValidateDataStructure |
-                (flip_winding_order ? aiProcess_FlipWindingOrder : 0));
+                (flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)));
 
         if (!scene) {
             REL_CRITICAL("Could not load model '{}', exiting...", file_path.c_str());

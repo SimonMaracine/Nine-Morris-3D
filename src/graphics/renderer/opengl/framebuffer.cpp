@@ -4,7 +4,7 @@
 
 #include <glad/glad.h>
 
-#include "graphics/renderer/framebuffer.h"
+#include "graphics/renderer/opengl/framebuffer.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
 

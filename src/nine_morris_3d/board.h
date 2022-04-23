@@ -6,7 +6,7 @@
 
 #include <glm/glm.hpp>
 
-#include "graphics/renderer/new_renderer.h"
+#include "graphics/renderer/main_renderer.h"
 #include "graphics/renderer/hoverable.h"
 #include "nine_morris_3d/node.h"
 #include "nine_morris_3d/piece.h"

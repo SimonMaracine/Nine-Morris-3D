@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "graphics/renderer/main_renderer.h"
 #include "graphics/renderer/hoverable.h"
-#include "graphics/renderer/new_renderer.h"
 
 class Node;
 

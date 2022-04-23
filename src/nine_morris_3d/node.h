@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "graphics/renderer/main_renderer.h"
 #include "graphics/renderer/hoverable.h"
-#include "graphics/renderer/new_renderer.h"
 #include "nine_morris_3d/piece.h"
 
 constexpr float NODE_Y_POSITION = 0.063f;

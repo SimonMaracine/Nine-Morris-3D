@@ -4,9 +4,9 @@
 
 #include <glad/glad.h>
 
-#include "graphics/renderer/vertex_array.h"
-#include "graphics/renderer/buffer.h"
 #include "graphics/renderer/buffer_layout.h"
+#include "graphics/renderer/opengl/vertex_array.h"
+#include "graphics/renderer/opengl/buffer.h"
 #include "other/logging.h"
 
 VertexArray::VertexArray(GLuint array)

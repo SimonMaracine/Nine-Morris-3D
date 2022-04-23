@@ -5,8 +5,8 @@
 
 #include <glad/glad.h>
 
-#include "graphics/renderer/buffer.h"
 #include "graphics/renderer/buffer_layout.h"
+#include "graphics/renderer/opengl/buffer.h"
 
 /**
  * This represents OpenGL vertex arrays, structures that keep track of buffers and their layout.

@@ -8,8 +8,6 @@
 #include "application/events.h"
 #include "application/platform.h"
 #include "graphics/debug_opengl.h"
-#include "graphics/renderer/renderer.h"
-#include "graphics/renderer/framebuffer.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"

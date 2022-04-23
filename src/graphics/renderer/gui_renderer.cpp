@@ -10,12 +10,12 @@
 
 #include "application/application.h"
 #include "graphics/renderer/gui_renderer.h"
-#include "graphics/renderer/shader.h"
-#include "graphics/renderer/vertex_array.h"
-#include "graphics/renderer/buffer.h"
-#include "graphics/renderer/buffer_layout.h"
-#include "graphics/renderer/texture.h"
 #include "graphics/renderer/font.h"
+#include "graphics/renderer/buffer_layout.h"
+#include "graphics/renderer/opengl/shader.h"
+#include "graphics/renderer/opengl/vertex_array.h"
+#include "graphics/renderer/opengl/buffer.h"
+#include "graphics/renderer/opengl/texture.h"
 #include "other/logging.h"
 
 namespace gui {

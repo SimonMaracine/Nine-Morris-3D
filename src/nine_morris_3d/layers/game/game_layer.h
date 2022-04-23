@@ -5,10 +5,11 @@
 
 #include "application/layer.h"
 #include "application/events.h"
-#include "graphics/renderer/renderer.h"
-#include "graphics/renderer/vertex_array.h"
-#include "graphics/renderer/buffer.h"
 #include "graphics/renderer/framebuffer_reader.h"
+#include "graphics/renderer/opengl/vertex_array.h"
+#include "graphics/renderer/opengl/buffer.h"
+#include "nine_morris_3d/piece.h"
+#include "nine_morris_3d/board.h"
 #include "other/mesh.h"
 #include "other/loader.h"
 
