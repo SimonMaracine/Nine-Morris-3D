@@ -24,7 +24,7 @@ namespace logging {
     static std::shared_ptr<spdlog::logger> release_logger;
     static std::shared_ptr<spdlog::logger> debug_logger;
 
-    static std::string path(const char* file) {  // Throws exception
+    static std::string path(const char* file) noexcept(false) {
 #if defined(NINE_MORRIS_3D_DEBUG)
         // Use relative path for both operating systems
         return std::string(file);

@@ -16,7 +16,7 @@
 
 namespace user_data {
 #if defined(NINE_MORRIS_3D_LINUX)
-    const std::string get_username() {  // Throws exception
+    const std::string get_username() noexcept(false) {
         uid_t uid = geteuid();
         struct passwd* pw = getpwuid(uid);
 
@@ -27,14 +27,14 @@ namespace user_data {
         return std::string(pw->pw_name);
     }
 
-    const std::string get_user_data_directory_path() {  // Throws exception
+    const std::string get_user_data_directory_path() noexcept(false) {
         const std::string username = get_username();
         const std::string path = "/home/" + username + "/." + APP_NAME_LINUX + "/";
 
         return path;
     }
 
-    bool user_data_directory_exists() {  // Throws exception
+    bool user_data_directory_exists() noexcept(false) {
         const std::string username = get_username();
         const std::string path = "/home/" + username + "/." + APP_NAME_LINUX + "/";
 
@@ -47,7 +47,7 @@ namespace user_data {
         }
     }
 
-    bool create_user_data_directory() {  // Throws exception
+    bool create_user_data_directory() noexcept(false) {
         const std::string username = get_username();
         const std::string path = "/home/" + username + "/." + APP_NAME_LINUX + "/";
 
@@ -58,7 +58,7 @@ namespace user_data {
         }
     }
 #elif defined(NINE_MORRIS_3D_WINDOWS)
-    const std::string get_username() {  // Throws exception
+    const std::string get_username() noexcept(false) {
         char username[UNLEN + 1];
         DWORD whatever = UNLEN + 1;
         bool success = GetUserName(username, &whatever);
@@ -70,14 +70,14 @@ namespace user_data {
         return std::string(username);
     }
 
-    const std::string get_user_data_directory_path() {  // Throws exception
+    const std::string get_user_data_directory_path() noexcept(false) {
         const std::string username = get_username();
         const std::string path = "C:\\Users\\" + username + "\\AppData\\Roaming\\" + APP_NAME_WINDOWS;
 
         return path;
     }
 
-    bool user_data_directory_exists() {  // Throws exception
+    bool user_data_directory_exists() noexcept(false) {
         const std::string username = get_username();
         const std::string path = "C:\\Users\\" + username + "\\AppData\\Roaming\\" + APP_NAME_WINDOWS;
 
@@ -98,7 +98,7 @@ namespace user_data {
         }
     }
 
-    bool create_user_data_directory() {  // Throws exception
+    bool create_user_data_directory() noexcept(false) {
         const std::string username = get_username();
         const std::string path = "C:\\Users\\" + username + "\\AppData\\Roaming\\" + APP_NAME_WINDOWS;
 

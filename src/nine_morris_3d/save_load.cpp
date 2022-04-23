@@ -99,7 +99,7 @@ namespace glm {
 }
 
 namespace save_load {
-    static std::string path(const char* file) {  // Throws exception
+    static std::string path(const char* file) noexcept(false) {
 #if defined(NINE_MORRIS_3D_DEBUG)
         // Use relative path for both operating systems
         return std::string(file);
@@ -114,7 +114,7 @@ namespace save_load {
 #endif
     }
 
-    void save_game_to_file(const GameState& game_state) {  // Throws exception
+    void save_game_to_file(const GameState& game_state) noexcept(false) {
         std::string file_path;
         try {
             file_path = path(SAVE_GAME_FILE);
@@ -140,7 +140,7 @@ namespace save_load {
         DEB_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
     }
 
-    void load_game_from_file(GameState& game_state) {  // Throws exception
+    void load_game_from_file(GameState& game_state) noexcept(false) {
         std::string file_path;
         try {
             file_path = path(SAVE_GAME_FILE);

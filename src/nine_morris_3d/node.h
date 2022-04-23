@@ -38,7 +38,8 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
 class Node {
 public:
     Node() = default;
-    Node(hoverable::Id id, unsigned int index);
+    Node(hoverable::Id id, unsigned int index)
+        : id(id), index(index) {}
     ~Node() = default;
 
     hoverable::Id id = hoverable::null;

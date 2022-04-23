@@ -28,7 +28,8 @@ public:
     };
 
     Piece() = default;
-    Piece(hoverable::Id id, Type type);
+    Piece(hoverable::Id id, Type type)
+        : id(id), type(type) {}
     ~Piece() = default;
 
     hoverable::Id id = hoverable::null;

@@ -14,7 +14,7 @@
 using json = nlohmann::json;
 
 namespace options {
-    static std::string path(const char* file) {  // Throws exception
+    static std::string path(const char* file) noexcept(false) {
 #if defined(NINE_MORRIS_3D_DEBUG)
         // Use relative path for both operating systems
         return std::string(file);
@@ -29,7 +29,7 @@ namespace options {
 #endif
     }
 
-    void save_options_to_file(const Options& options) {  // Throws exception
+    void save_options_to_file(const Options& options) noexcept(false) {
         std::string file_path;
         try {
             file_path = path(OPTIONS_FILE);
@@ -58,7 +58,7 @@ namespace options {
         DEB_INFO("Saved options to file '{}'", file_path.c_str());
     }
 
-    void load_options_from_file(Options& options) {  // Throws exception
+    void load_options_from_file(Options& options) noexcept(false) {
         std::string file_path;
         try {
             file_path = path(OPTIONS_FILE);
@@ -139,7 +139,7 @@ namespace options {
         DEB_INFO("Loaded options from file '{}'", file_path.c_str());
     }
 
-    void create_options_file() {  // Throws exception
+    void create_options_file() noexcept(false) {
         std::string file_path;
         try {
             file_path = path(OPTIONS_FILE);

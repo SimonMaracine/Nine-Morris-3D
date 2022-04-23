@@ -18,8 +18,8 @@ namespace user_data {
             : std::runtime_error(message) {}
     };
 
-    const std::string get_username();
-    const std::string get_user_data_directory_path();
-    bool user_data_directory_exists();
-    bool create_user_data_directory();
+    const std::string get_username() noexcept(false);
+    const std::string get_user_data_directory_path() noexcept(false);
+    bool user_data_directory_exists() noexcept(false);
+    bool create_user_data_directory() noexcept(false);
 }

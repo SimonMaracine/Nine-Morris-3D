@@ -51,7 +51,7 @@ public:
 private:
     GLint get_uniform_location(const std::string& name);
 
-    static GLuint compile_shader(const std::string& source_path, GLenum type);
+    static GLuint compile_shader(const std::string& source_path, GLenum type) noexcept(false);
     static bool check_compilation(GLuint shader, GLenum type);
     static bool check_linking(GLuint program);
     static std::string get_name(const std::string& vertex_source, const std::string& fragment_source);

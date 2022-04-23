@@ -37,9 +37,9 @@ namespace options {
         float sensitivity = 1.0f;
     };
 
-    void save_options_to_file(const Options& options);
-    void load_options_from_file(Options& options);
+    void save_options_to_file(const Options& options) noexcept(false);
+    void load_options_from_file(Options& options) noexcept(false);
 
-    void create_options_file();
+    void create_options_file() noexcept(false);
     void handle_options_file_not_open_error();
 }

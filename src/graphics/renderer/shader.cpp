@@ -251,7 +251,7 @@ GLint Shader::get_uniform_location(const std::string& name) {
 #endif
 }
 
-GLuint Shader::compile_shader(const std::string& source_path, GLenum type) {  // Throws exception
+GLuint Shader::compile_shader(const std::string& source_path, GLenum type) noexcept(false) {
     std::ifstream file (source_path);
     std::string source;
 
