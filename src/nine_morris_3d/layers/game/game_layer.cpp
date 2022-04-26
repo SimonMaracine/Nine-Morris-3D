@@ -64,8 +64,6 @@ void GameLayer::on_attach() {
     setup_nodes();
 
     setup_camera();
-    setup_skybox();
-    setup_light();
 
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
@@ -135,6 +133,9 @@ void GameLayer::on_awake() {
     prepare_board_paint();
     prepare_pieces();
     prepare_nodes();
+
+    setup_skybox();
+    setup_light();
 }
 
 void GameLayer::on_update(float dt) {
@@ -663,7 +664,7 @@ void GameLayer::setup_skybox() {
         assert(false);
     }
 
-    app->renderer->set_skybox(Texture3D::create(data));  // FIXME only if not already made
+    app->renderer->set_skybox(Texture3D::create(data));
 
     DEB_DEBUG("Setup skybox");
 }
