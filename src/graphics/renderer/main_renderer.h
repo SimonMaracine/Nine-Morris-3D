@@ -79,6 +79,15 @@ public:
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
     std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
 
+#ifdef NINE_MORRIS_3D_DEBUG
+    std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }
+#endif
+    std::shared_ptr<Shader> get_outline_shader() { return storage.outline_shader; }
+    std::shared_ptr<Shader> get_quad3d_shader() { return storage.quad3d_shader; }
+    std::shared_ptr<Shader> get_screen_quad_shader() { return storage.screen_quad_shader; }
+    std::shared_ptr<Shader> get_shadow_shader() { return storage.shadow_shader; }
+    std::shared_ptr<Shader> get_skybox_shader() { return storage.skybox_shader; }
+
     DirectionalLight light;
     bool origin = false;  // This does nothing in release mode
 private:
@@ -99,7 +108,6 @@ private:
         UniformBlockSpecification light_space_uniform_block;
 
         std::shared_ptr<Shader> skybox_shader;
-        
         std::shared_ptr<Shader> screen_quad_shader;
         std::shared_ptr<Shader> quad3d_shader;
         std::shared_ptr<Shader> shadow_shader;

@@ -148,6 +148,9 @@ public:
     void on_window_resized(events::WindowResizedEvent& event);
 
     std::shared_ptr<gui::Frame> get_frame() { return main_frame; }
+
+    std::shared_ptr<Shader> get_quad2d_shader() { return storage.quad2d_shader; }
+    std::shared_ptr<Shader> get_text_shader() { return storage.text_shader; }
 private:
     struct Storage {
         std::shared_ptr<Shader> quad2d_shader;

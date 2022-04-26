@@ -489,66 +489,63 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::End();
 
         ImGui::Begin("Debug Settings");
-        // if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&game_layer->light.position), -30.0f, 30.0f)) {
-        //     game_layer->setup_light();
-        // }
-        // if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&game_layer->light.ambient_color), 0.0f, 1.0f)) {
-        //     game_layer->setup_light();
-        // }
-        // if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&game_layer->light.diffuse_color), 0.0f, 1.0f)) {
-        //     game_layer->setup_light();
-        // }
-        // if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&game_layer->light.specular_color), 0.0f, 1.0f)) {
-        //     game_layer->setup_light();
-        // }
+        if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&app->renderer->light.position),
+                -30.0f, 30.0f)) {}
+        if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color),
+                0.0f, 1.0f)) {}
+        if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color),
+                0.0f, 1.0f)) {}
+        if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color),
+                0.0f, 1.0f)) {}
         ImGui::End();
 
         // If you recompile shaders, uniforms that are set only once need to be reuploaded
         ImGui::Begin("Shaders");
         if (ImGui::Button("board_paint")) {
-            // app->storage->board_paint_shader->recompile();
+            app->data.board_paint_shader->recompile();
         }
         if (ImGui::Button("board")) {
-            // app->storage->board_shader->recompile();
+            app->data.board_shader->recompile();
         }
         if (ImGui::Button("node")) {
-            // app->storage->node_shader->recompile();
+            app->data.node_shader->recompile();
         }
         if (ImGui::Button("origin")) {
-            // app->storage->origin_shader->recompile();
+            app->renderer->get_origin_shader()->recompile();
         }
         if (ImGui::Button("outline")) {
-            // app->storage->outline_shader->recompile();
+            app->renderer->get_outline_shader()->recompile();
         }
         if (ImGui::Button("piece")) {
-            // app->storage->piece_shader->recompile();
+            app->data.piece_shader->recompile();
         }
         if (ImGui::Button("quad2d")) {
-            // app->storage->quad2d_shader->recompile();
+            app->gui_renderer->get_quad2d_shader()->recompile();
         }
         if (ImGui::Button("quad3d")) {
-            // app->storage->quad3d_shader->recompile();
+            app->renderer->get_quad3d_shader()->recompile();
         }
         if (ImGui::Button("screen_quad")) {
-            // app->storage->screen_quad_shader->recompile();
+            app->renderer->get_screen_quad_shader()->recompile();
         }
         if (ImGui::Button("shadow")) {
-            // app->storage->shadow_shader->recompile();
+            app->renderer->get_shadow_shader()->recompile();
         }
         if (ImGui::Button("skybox")) {
-            // app->storage->skybox_shader->recompile();
+            app->renderer->get_skybox_shader()->recompile();
         }
         if (ImGui::Button("text")) {
-            // app->storage->text_shader->recompile();
+            app->gui_renderer->get_text_shader()->recompile();
         }
         ImGui::End();
 
         ImGui::Begin("Camera Debug");
-        // ImGui::Text("Position: %f, %f, %f", game_layer->camera.get_position().x, game_layer->camera.get_position().y, game_layer->camera.get_position().z);
-        // ImGui::Text("Pitch: %f", game_layer->camera.get_pitch());
-        // ImGui::Text("Yaw: %f", game_layer->camera.get_yaw());
-        // ImGui::Text("Angle around point: %f", game_layer->camera.get_angle_around_point());
-        // ImGui::Text("Distance to point: %f", game_layer->camera.get_distance_to_point());
+        ImGui::Text("Position: %f, %f, %f", app->camera.get_position().x, app->camera.get_position().y,
+                app->camera.get_position().z);
+        ImGui::Text("Pitch: %f", app->camera.get_pitch());
+        ImGui::Text("Yaw: %f", app->camera.get_yaw());
+        ImGui::Text("Angle around point: %f", app->camera.get_angle_around_point());
+        ImGui::Text("Distance to point: %f", app->camera.get_distance_to_point());
         ImGui::End();
     }
 }
