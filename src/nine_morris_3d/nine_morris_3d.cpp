@@ -76,13 +76,26 @@ NineMorris3D::NineMorris3D()
         renderer->set_scene_framebuffer(Framebuffer::create(specification));
     }
 
-    // Initialize ImGui
+    // Initialize and setup ImGui
     ImGui::CreateContext();
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
 
+    ImGuiIO& io = ImGui::GetIO();
+    ImFontGlyphRangesBuilder builder;
+    builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+    builder.AddText(u8"ă");
+    ImVector<ImWchar> ranges;
+    builder.BuildRanges(&ranges);
+
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 20.0f);
+    data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 16.0f);
+    data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 24.0f,
+            nullptr, ranges.Data);
+    io.Fonts->Build();
+
     // Load splash screen
-    data.splash_screen_texture = Texture::create(assets::path(assets::SPLASH_SCREEN_TEXTURE), true);
+    data.splash_screen_texture = Texture::create(path(SPLASH_SCREEN_TEXTURE), true);
 
     // Load and create this font
     data.good_dog_plain_font = std::make_shared<Font>(path(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);

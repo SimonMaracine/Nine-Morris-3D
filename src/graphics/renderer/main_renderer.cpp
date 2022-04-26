@@ -481,8 +481,6 @@ void Renderer::add_model(Model& model, int options) {
     if (has_shadow) {
         models_has_shadow[id] = &model;
     }
-
-    DEB_WARN("ADDED MODEL");
 }
 
 void Renderer::remove_model(unsigned int handle) {

@@ -151,61 +151,6 @@ void GameLayer::on_fixed_update() {
     }
 }
 
-// void GameLayer::on_draw() {
-//     setup_shadows();
-//     setup_quad3d_projection_view();
-
-//     app->storage->depth_map_framebuffer->bind();
-
-//     renderer::clear(renderer::Depth);
-//     renderer::set_viewport(2048, 2048);
-
-//     render_to_depth();
-
-//     app->storage->scene_framebuffer->bind();
-
-//     renderer::clear(renderer::Color | renderer::Depth | renderer::Stencil);
-//     renderer::set_viewport(app->data.width, app->data.height);
-//     renderer::set_stencil_mask_zero();
-
-//     renderer::bind_texture(app->storage->depth_map_framebuffer->get_depth_attachment(), 1);
-
-//     renderer::load_projection_view(app->camera.get_projection_view_matrix());
-    // setup_camera();
-//     render_skybox();
-//     renderer::draw_board(board);
-//     renderer::disable_output_to_red(1);
-//     renderer::draw_board_paint(board.paint);
-// #ifdef NINE_MORRIS_3D_DEBUG
-//     renderer::draw_origin();
-// #endif
-//     renderer::enable_output_to_red(1);
-//     render_nodes();
-//     render_pieces();
-
-// #ifdef NINE_MORRIS_3D_DEBUG
-//     renderer::draw_quad_3d(light.position, 1.0f, app->storage->light_texture);
-// #endif
-
-//     app->storage->scene_framebuffer->resolve_framebuffer(app->storage->intermediate_framebuffer->get_id(),
-//             app->data.width, app->data.height);
-
-//     app->storage->intermediate_framebuffer->bind();
-
-//     const int x = static_cast<int>(input::get_mouse_x());
-//     const int y = app->data.height - static_cast<int>(input::get_mouse_y());
-//     reader.read(1, x, y);
-
-//     Framebuffer::bind_default();
-
-//     renderer::clear(renderer::Color);
-//     renderer::draw_screen_quad(app->storage->intermediate_framebuffer->get_color_attachment(0));
-
-//     int* data;
-//     reader.get<int>(&data);
-//     hovered_id = *data;
-// }
-
 void GameLayer::on_event(events::Event& event) {
     using namespace events;
 

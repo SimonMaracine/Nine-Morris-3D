@@ -42,9 +42,6 @@ public:
     bool about_mode = false;
     std::string last_save_date;
 
-    ImFont* info_font = nullptr;
-    ImFont* windows_font = nullptr;
-
     GameLayer* game_layer = nullptr;
     GuiLayer* gui_layer = nullptr;
 };

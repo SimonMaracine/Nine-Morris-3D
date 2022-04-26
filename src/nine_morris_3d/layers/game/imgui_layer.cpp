@@ -64,19 +64,6 @@ void ImGuiLayer::on_awake() {
     io.IniFilename = nullptr;
 #endif
 
-    ImFontGlyphRangesBuilder builder;
-    builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-    builder.AddText(u8"ă");
-
-    ImVector<ImWchar> ranges;
-    builder.BuildRanges(&ranges);
-
-    io.FontDefault = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 20.0f);
-    info_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 16.0f);
-    windows_font = io.Fonts->AddFontFromFileTTF(assets::path(assets::OPEN_SANS_FONT).c_str(), 24.0f,
-            nullptr, ranges.Data);
-    io.Fonts->Build();
-
     ImVec4* colors = ImGui::GetStyle().Colors;
     colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
     colors[ImGuiCol_TitleBgActive] = DEFAULT_BROWN;
@@ -306,7 +293,7 @@ void ImGuiLayer::on_update(float dt) {
     }
 
     if (show_info && !about_mode) {
-        ImGui::PushFont(info_font);
+        ImGui::PushFont(app->data.imgui_info_font);
         ImGui::Begin("Info");
         ImGui::Text("FPS: %f", app->fps);
         ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
@@ -362,7 +349,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 }
 
 void ImGuiLayer::draw_game_over() {
-    ImGui::PushFont(windows_font);
+    ImGui::PushFont(app->data.imgui_windows_font);
     ImGui::OpenPopup("Game Over");
 
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -431,7 +418,7 @@ void ImGuiLayer::draw_game_over_message(const char* message) {
 }
 
 void ImGuiLayer::draw_about_screen() {
-    ImGui::PushFont(windows_font);
+    ImGui::PushFont(app->data.imgui_windows_font);
     ImGui::OpenPopup("About Nine Morris 3D");
 
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();

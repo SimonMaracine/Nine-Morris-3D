@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <imgui.h>
+
 #include "application/application.h"
 #include "graphics/renderer/hoverable.h"
 #include "graphics/renderer/material.h"
@@ -31,6 +33,9 @@ public:
     struct RenderData {
         std::shared_ptr<Texture> splash_screen_texture;
         std::shared_ptr<Font> good_dog_plain_font;
+
+        ImFont* imgui_info_font = nullptr;
+        ImFont* imgui_windows_font = nullptr;
 
         bool loaded_board = false;
         std::shared_ptr<VertexArray> board_vertex_array;

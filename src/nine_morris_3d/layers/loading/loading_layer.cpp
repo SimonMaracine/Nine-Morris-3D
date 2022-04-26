@@ -42,6 +42,7 @@ void LoadingLayer::on_attach() {
     );
     app->gui_renderer->get_frame()->add(loading_text, 0, 0);
     loading_text->stick(gui::Sticky::SE)->padd(glm::ivec2(0, 25), glm::ivec2(0, 20));
+    loading_text->set_shadows(true);
 }
 
 void LoadingLayer::on_detach() {

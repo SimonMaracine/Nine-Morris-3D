@@ -61,18 +61,6 @@ Application::~Application() {
 void Application::run() {
     assert(current_scene != nullptr);
 
-    for (Scene* scene : scenes) {
-        for (Layer* layer : scene->layers_in_order) {
-            layer->on_awake();
-        }
-    }
-
-    for (Scene* scene : scenes) {
-        for (Layer* layer : scene->overlays_in_order) {
-            layer->on_awake();
-        }
-    }
-
     for (Layer* layer : current_scene->layers_in_order) {
         push_layer(layer);
     }
@@ -84,8 +72,8 @@ void Application::run() {
     DEB_INFO("Initialized game");
 
     while (running) {
-        float dt = update_frame_counter();
-        unsigned int fixed_updates = calculate_fixed_update();
+        const float dt = update_frame_counter();
+        const unsigned int fixed_updates = calculate_fixed_update();
 
         for (Layer* layer : active_layer_stack) {
             for (unsigned int i = 0; i < fixed_updates; i++) {
@@ -115,40 +103,19 @@ void Application::run() {
 
         window->update();
 
-        if (changed_scene) {
-            active_layer_stack.clear();
-            active_overlay_stack.clear();
-
-            for (auto iter = overlay_stack.rbegin(); iter != overlay_stack.rend(); iter++) {
-                pop_overlay(*iter);
-            }
-
-            for (int i = layer_stack.size() - 1; i >= 0; i--) {
-                pop_layer(layer_stack[i]);
-            }
-
-            current_scene = to_scene;
-
-            for (Layer* layer : current_scene->layers_in_order) {
-                push_layer(layer);
-            }
-
-            for (Layer* layer : current_scene->overlays_in_order) {
-                push_overlay(layer);
-            }
-
-            changed_scene = false;
-        }
+        check_changed_scene();
     }
 
     DEB_INFO("Closing game");
 
-    for (auto iter = overlay_stack.rbegin(); iter != overlay_stack.rend(); iter++) {
-        pop_overlay(*iter);
+    const size_t overlay_stack_size = _overlay_stack.size();
+    for (size_t i = 0; i < overlay_stack_size; i++) {
+        pop_overlay();
     }
 
-    for (auto iter = layer_stack.rbegin(); iter != layer_stack.rend(); iter++) {
-        pop_layer(*iter);
+    const size_t layer_stack_size = _layer_stack.size();
+    for (size_t i = 0; i < layer_stack_size; i++) {
+        pop_layer();
     }
 }
 
@@ -188,13 +155,13 @@ void Application::update_active_layers() {
     active_layer_stack.clear();
     active_overlay_stack.clear();
 
-    for (Layer* layer : layer_stack) {
+    for (Layer* layer : _layer_stack) {
         if (layer->active) {
             active_layer_stack.push_back(layer);
         }
     }
 
-    for (Layer* layer : overlay_stack) {
+    for (Layer* layer : _overlay_stack) {
         if (layer->active) {
             active_overlay_stack.push_back(layer);
         }
@@ -278,31 +245,72 @@ unsigned int Application::calculate_fixed_update() {
     return updates;
 }
 
+void Application::check_changed_scene() {
+    if (changed_scene) {
+        active_layer_stack.clear();
+        active_overlay_stack.clear();
+
+        const size_t overlay_stack_size = _overlay_stack.size();
+        for (unsigned int i = 0; i < overlay_stack_size; i++) {
+            pop_overlay();
+        }
+
+        const size_t layer_stack_size = _layer_stack.size();
+        for (unsigned int i = 0; i < layer_stack_size; i++) {
+            pop_layer();
+        }
+
+        current_scene = to_scene;
+
+        for (Layer* layer : current_scene->layers_in_order) {
+            push_layer(layer);
+        }
+
+        for (Layer* layer : current_scene->overlays_in_order) {
+            push_overlay(layer);
+        }
+
+        changed_scene = false;
+    }
+}
+
 void Application::push_layer(Layer* layer) {
-    layer_stack.push_back(layer);
+    _layer_stack.push_back(layer);
     active_layer_stack.push_back(layer);
+
+    if (!layer->on_awake_called) {
+        layer->on_awake();
+        layer->on_awake_called = true;
+    }
     layer->on_attach();
 }
 
-void Application::pop_layer(Layer* layer) {
+void Application::pop_layer() {
+    Layer* layer = _layer_stack.back();
     layer->on_detach();
-    layer_stack.pop_back();
     layer->active = true;
+
+    _layer_stack.pop_back();
 }
 
 void Application::push_overlay(Layer* layer) {
-    overlay_stack.push_back(layer);
+    _overlay_stack.push_back(layer);
     active_overlay_stack.push_back(layer);
+
+    if (!layer->on_awake_called) {
+        layer->on_awake();
+        layer->on_awake_called = true;
+    }
     layer->on_attach();
 }
 
-void Application::pop_overlay(Layer* layer) {
+void Application::pop_overlay() {
+    Layer* layer = _overlay_stack.back();
     layer->on_detach();
-    auto iter = std::find(overlay_stack.begin(), overlay_stack.end(), layer);
-    overlay_stack.erase(iter);
     layer->active = true;
-}
 
+    _overlay_stack.pop_back();
+}
 
 bool Application::on_window_closed(events::WindowClosedEvent& event) {
     running = false;
