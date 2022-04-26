@@ -37,7 +37,6 @@ public:
         ImFont* imgui_info_font = nullptr;
         ImFont* imgui_windows_font = nullptr;
 
-        bool loaded_board = false;
         std::shared_ptr<VertexArray> board_vertex_array;
         std::shared_ptr<Shader> board_shader;
         std::shared_ptr<Texture> board_diffuse_texture;
@@ -45,7 +44,6 @@ public:
         std::shared_ptr<Material> wood_material;
         std::shared_ptr<MaterialInstance> board_material_instance;
 
-        bool loaded_pieces = false;
         hoverable::Id pieces_id[18];
         std::shared_ptr<VertexArray> piece_vertex_arrays[18];
         std::shared_ptr<Shader> piece_shader;
@@ -55,7 +53,6 @@ public:
         std::shared_ptr<Material> tinted_wood_material;
         std::shared_ptr<MaterialInstance> piece_material_instances[18];
 
-        bool loaded_nodes = false;
         hoverable::Id nodes_id[24];
         std::shared_ptr<VertexArray> node_vertex_arrays[24];
         std::shared_ptr<Shader> node_shader;
@@ -63,7 +60,6 @@ public:
         std::shared_ptr<Material> basic_material;
         std::shared_ptr<MaterialInstance> node_material_instances[24];
 
-        bool loaded_board_paint = false;
         hoverable::Id board_paint_id = hoverable::null;
         std::shared_ptr<VertexArray> board_paint_vertex_array;
         std::shared_ptr<Shader> board_paint_shader;
@@ -72,7 +68,6 @@ public:
         std::shared_ptr<Material> paint_material;
         std::shared_ptr<MaterialInstance> board_paint_material_instance;
 
-        bool loaded_turn_indicator = false;
         std::shared_ptr<Texture> white_indicator_texture;
         std::shared_ptr<Texture> black_indicator_texture;
     } data;

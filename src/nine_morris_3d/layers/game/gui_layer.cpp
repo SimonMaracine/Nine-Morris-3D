@@ -11,18 +11,6 @@
 #include "other/logging.h"
 
 void GuiLayer::on_attach() {
-    if (!app->data.loaded_turn_indicator) {
-        app->data.white_indicator_texture = Texture::create(
-            app->assets_data->white_indicator_texture,
-            false
-        );
-        app->data.black_indicator_texture = Texture::create(
-            app->assets_data->black_indicator_texture,
-            false
-        );
-        app->data.loaded_turn_indicator = true;  // TODO refactor using on_awake
-    }
-
     std::shared_ptr<gui::Dummy> placeholder = std::make_shared<gui::Dummy>(
         app->gui_renderer->get_frame()
     );
@@ -51,6 +39,15 @@ void GuiLayer::on_detach() {
 
 void GuiLayer::on_awake() {
     game_layer = get_layer<GameLayer>("game");
+
+    app->data.white_indicator_texture = Texture::create(
+        app->assets_data->white_indicator_texture,
+        false
+    );
+    app->data.black_indicator_texture = Texture::create(
+        app->assets_data->black_indicator_texture,
+        false
+    );
 }
 
 void GuiLayer::on_update(float dt) {

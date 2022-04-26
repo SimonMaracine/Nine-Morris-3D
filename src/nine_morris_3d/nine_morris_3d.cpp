@@ -46,15 +46,17 @@ NineMorris3D::NineMorris3D()
     using namespace assets;
 
     // Load and set icons
-    const std::array<std::unique_ptr<IconImage>, 5> icons = {
-        std::make_unique<IconImage>(path(ICON_512)),
-        std::make_unique<IconImage>(path(ICON_256)),
-        std::make_unique<IconImage>(path(ICON_128)),
-        std::make_unique<IconImage>(path(ICON_64)),
-        std::make_unique<IconImage>(path(ICON_32))
-    };
+    {
+        const std::array<std::unique_ptr<IconImage>, 5> icons = {
+            std::make_unique<IconImage>(path(ICON_512)),
+            std::make_unique<IconImage>(path(ICON_256)),
+            std::make_unique<IconImage>(path(ICON_128)),
+            std::make_unique<IconImage>(path(ICON_64)),
+            std::make_unique<IconImage>(path(ICON_32))
+        };
 
-    window->set_icons<5>(icons);
+        window->set_icons<5>(icons);
+    }
 
     // Load and set cursors
     arrow_cursor = window->add_cursor(std::make_unique<IconImage>(path(ARROW_CURSOR)), 4, 1);
@@ -81,18 +83,20 @@ NineMorris3D::NineMorris3D()
     ImGui_ImplOpenGL3_Init("#version 430 core");
     ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
 
-    ImGuiIO& io = ImGui::GetIO();
-    ImFontGlyphRangesBuilder builder;
-    builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-    builder.AddText(u8"ă");
-    ImVector<ImWchar> ranges;
-    builder.BuildRanges(&ranges);
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        ImFontGlyphRangesBuilder builder;
+        builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+        builder.AddText(u8"ă");
+        ImVector<ImWchar> ranges;
+        builder.BuildRanges(&ranges);
 
-    io.FontDefault = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 20.0f);
-    data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 16.0f);
-    data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 24.0f,
-            nullptr, ranges.Data);
-    io.Fonts->Build();
+        io.FontDefault = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 20.0f);
+        data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 16.0f);
+        data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 24.0f,
+                nullptr, ranges.Data);
+        io.Fonts->Build();
+    }
 
     // Load splash screen
     data.splash_screen_texture = Texture::create(path(SPLASH_SCREEN_TEXTURE), true);
