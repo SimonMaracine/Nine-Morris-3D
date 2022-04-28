@@ -44,7 +44,8 @@ Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, std
         const std::vector<std::string>& uniforms, std::string_view vertex_source_path,
         std::string_view fragment_source_path)
     : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader), name(name),
-      vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path) {
+      vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path),
+      uniforms(uniforms) {
     for (const std::string& uniform : uniforms) {
         GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
@@ -64,7 +65,7 @@ Shader::~Shader() {
 }
 
 std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
-            std::string_view fragment_source_path, const std::vector<std::string>& uniforms) {
+        std::string_view fragment_source_path, const std::vector<std::string>& uniforms) {
     GLuint vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
     GLuint fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
 
@@ -86,8 +87,8 @@ std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
 }
 
 std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
-            std::string_view fragment_source_path, const std::vector<std::string>& uniforms,
-            const std::vector<UniformBlockSpecification>& uniform_blocks) {
+        std::string_view fragment_source_path, const std::vector<std::string>& uniforms,
+        const std::vector<UniformBlockSpecification>& uniform_blocks) {
     GLuint vertex_shader;
     GLuint fragment_shader;
     try {
@@ -191,7 +192,7 @@ void Shader::set_uniform_float(std::string_view name, float value) {
     glUniform1f(location, value);
 }
 
-void Shader::set_uniform_vec2(std::string_view name, const glm::vec2& vector) {
+void Shader::set_uniform_vec2(std::string_view name, glm::vec2 vector) {
     GLint location = get_uniform_location(name);
     glUniform2f(location, vector.x, vector.y);
 }
@@ -229,6 +230,16 @@ void Shader::recompile() {
         return;
     }
 
+    uniforms.clear();
+    for (const std::string& uniform : uniforms) {
+        GLint location = glGetUniformLocation(program, uniform.c_str());
+        if (location == -1) {
+            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name.data());
+            continue;
+        }
+        cache[uniform] = location;
+    }
+
     DELETE_SHADER(program, vertex_shader, fragment_shader);
 
     DEB_DEBUG("Recompiled old shader {} to new shader {} ({})", program, new_program, name.c_str());
@@ -240,7 +251,7 @@ void Shader::recompile() {
 
 GLint Shader::get_uniform_location(std::string_view name) {
 #if defined(NINE_MORRIS_3D_RELEASE)
-    return cache[name];
+    return cache[std::string(name)];
 #elif defined(NINE_MORRIS_3D_DEBUG)
     try {
         return cache.at(std::string(name));

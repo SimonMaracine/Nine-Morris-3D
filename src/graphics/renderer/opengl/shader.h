@@ -40,12 +40,12 @@ public:
     void set_uniform_mat4(std::string_view name, const glm::mat4& matrix);
     void set_uniform_int(std::string_view name, int value);
     void set_uniform_float(std::string_view name, float value);
-    void set_uniform_vec2(std::string_view name, const glm::vec2& vector);
+    void set_uniform_vec2(std::string_view name, glm::vec2 vector);
     void set_uniform_vec3(std::string_view name, const glm::vec3& vector);
     void set_uniform_vec4(std::string_view name, const glm::vec4& vector);
 
     // Make sure to reupload any uniforms that need to after calling this function
-    void recompile();  // FIXME this should update the uniform indices!!!
+    void recompile();
 
     std::string_view get_name() { return name; }
 private:
@@ -68,4 +68,5 @@ private:
     // Keep these for hot-reloading functionality
     std::string vertex_source_path;
     std::string fragment_source_path;
+    std::vector<std::string> uniforms;
 };
