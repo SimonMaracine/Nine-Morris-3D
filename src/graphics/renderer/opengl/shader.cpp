@@ -5,7 +5,6 @@
 #include <memory>
 #include <vector>
 #include <stdexcept>
-#include <cassert>
 #include <string.h>
 
 #include <glad/glad.h>
@@ -16,6 +15,7 @@
 #include "graphics/renderer/opengl/shader.h"
 #include "graphics/renderer/opengl/buffer.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 #define DELETE_SHADER(program, vertex_shader, fragment_shader) \
     glDetachShader(program, vertex_shader); \
@@ -24,7 +24,7 @@
     glDeleteShader(fragment_shader); \
     glDeleteProgram(program);
 
-#define CASE(_enum, count, type) case _enum: size = count * sizeof(type); break;
+#define CASE(_enum, count, type) case _enum: size = (count) * sizeof(type); break;
 
 static size_t type_size(GLenum type) {
     size_t size;
@@ -130,7 +130,7 @@ std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
             LOG_ALLOCATION(block_size);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-            assert(block.field_count <= 16);
+            ASSERT(block.field_count <= 16, "Maximum 16 fields for now");
 
             GLuint indices[16];
             GLint offsets[16];
@@ -346,11 +346,11 @@ bool Shader::check_linking(GLuint program) {
 
 std::string Shader::get_name(std::string_view vertex_source, std::string_view fragment_source) {
     size_t last_slash_v = vertex_source.find_last_of("/");
-    assert(last_slash_v != std::string::npos);
+    ASSERT(last_slash_v != std::string::npos, "Could not find slash");
     const std::string vertex = std::string(vertex_source.substr(last_slash_v + 1));
 
     size_t last_slash_f = fragment_source.find_last_of("/");
-    assert(last_slash_f != std::string::npos);
+    ASSERT(last_slash_f != std::string::npos, "Could not find slash");
     const std::string fragment = std::string(fragment_source.substr(last_slash_f + 1));
 
     return vertex + " & " + fragment;

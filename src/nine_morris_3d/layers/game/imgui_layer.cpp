@@ -17,6 +17,7 @@
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/assets.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
@@ -376,7 +377,7 @@ void ImGuiLayer::draw_game_over() {
                 break;
             }
             case Board::Ending::None:
-                assert(false);
+                ASSERT(false, "Ending cannot be 'None'");
         }
 
         const float window_width = ImGui::GetWindowSize().x;

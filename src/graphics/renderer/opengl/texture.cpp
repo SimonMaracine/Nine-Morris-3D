@@ -1,6 +1,5 @@
 #include <memory>
 #include <string_view>
-#include <cassert>
 #include <vector>
 #include <string.h>
 
@@ -10,10 +9,11 @@
 #include "graphics/renderer/opengl/texture.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 static std::string get_name(std::string_view file_path) {
     size_t last_slash = file_path.find_last_of("/");
-    assert(last_slash != std::string::npos);
+    ASSERT(last_slash != std::string::npos, "Could not find slash");
 
     return std::string(file_path.substr(last_slash + 1));
 }
@@ -31,7 +31,7 @@ static std::string get_name_texture3d(const char* file_path) {
         token = strtok(nullptr, "/");
     }
 
-    assert(tokens.size() >= 2);
+    ASSERT(tokens.size() >= 2, "Invalid file path name");
 
     return tokens[tokens.size() - 2];  // It's ok
 }
@@ -103,7 +103,7 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    assert(data->data != nullptr);
+    ASSERT(data->data != nullptr, "No data");
 
     glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, data->width, data->height);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA,

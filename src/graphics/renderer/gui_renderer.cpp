@@ -3,7 +3,6 @@
 #include <vector>
 #include <unordered_set>
 #include <algorithm>
-#include <cassert>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -17,6 +16,7 @@
 #include "graphics/renderer/opengl/buffer.h"
 #include "graphics/renderer/opengl/texture.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 namespace gui {
     Widget::Widget(std::shared_ptr<Widget> parent)
@@ -80,8 +80,8 @@ namespace gui {
             rows = row_indices.size();
             columns = column_indices.size();
 
-            assert(rows > 0);
-            assert(columns > 0);
+            ASSERT(rows > 0, "There cannot be 0 rows");
+            ASSERT(columns > 0, "There cannot be 0 columns");
         }
 
         // Create cells and calculate normal size for each cell
@@ -96,7 +96,7 @@ namespace gui {
             });
         }
 
-        // Sort cells
+        // Sort cells to process them later
         std::stable_sort(cells.begin(), cells.end(), [](const Cell& lhs, const Cell& rhs) {
             if (lhs.widget->row < rhs.widget->row) {
                 return true;
@@ -133,7 +133,7 @@ namespace gui {
                         row_width += cells[i + j * columns].size.x;
                     }
 
-                    assert(row_width > 0);
+                    ASSERT(row_width > 0, "Width must be not 0");
 
                     row_widths.push_back(row_width);
                 }
@@ -153,7 +153,7 @@ namespace gui {
                         column_height += cells[i + j].size.y;
                     }
 
-                    assert(column_height > 0);
+                    ASSERT(column_height > 0, "Height must be not 0");
 
                     column_heights.push_back(column_height);
                 }
@@ -164,8 +164,8 @@ namespace gui {
                 }
             }
 
-            assert(normal_cells_width > 0);
-            assert(normal_cells_height > 0);
+            ASSERT(normal_cells_width > 0, "Width must be not 0");
+            ASSERT(normal_cells_height > 0, "Height must be not 0");
         }
 
         // Use the additional width to fill the width for each cell,
@@ -321,7 +321,7 @@ namespace gui {
             return;
         }
 
-        assert(false);
+        ASSERT(false, "Currently only the base frame widget is supported");
     }
 
     void Frame::add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,

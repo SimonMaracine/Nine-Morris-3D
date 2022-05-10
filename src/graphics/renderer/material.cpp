@@ -1,6 +1,5 @@
 #include <memory>
 #include <string_view>
-#include <cassert>
 #include <utility>
 
 #include <glm/glm.hpp>
@@ -8,6 +7,7 @@
 #include "graphics/renderer/material.h"
 #include "graphics/renderer/opengl/shader.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 Material::Material(std::shared_ptr<Shader> shader, int flags)
     : shader(shader), flags(flags) {
@@ -51,7 +51,7 @@ void Material::add_variable(UniformType type, std::string_view name) {
             uniforms_vec4[std::string(name)] = glm::vec4(0.0f);
             break;
         default:
-            assert(false);
+            ASSERT(false, "Unknown uniform type");
             break;
     }
 }

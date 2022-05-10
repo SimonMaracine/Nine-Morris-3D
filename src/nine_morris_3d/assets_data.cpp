@@ -27,7 +27,7 @@ namespace assets_data {
         loader->get()->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
         loader->get()->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
 
-        loader->set_done();
+        loader->set_done();  // TODO figure out a better way
     }
 
     void field_low_tex(Loader<AssetsData>* loader) {

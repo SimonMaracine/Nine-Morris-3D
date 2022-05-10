@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -8,6 +7,7 @@
 #include "application/application.h"
 #include "application/events.h"
 #include "application/scene.h"
+#include "other/assert.h"
 
 /**
  * Abstract class representing a part of a scene.
@@ -44,7 +44,7 @@ protected:
             }
         }
 
-        assert(false);
+        ASSERT(false, "Layer not found");
         return nullptr;
     }
 private:

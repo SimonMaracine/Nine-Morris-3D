@@ -38,8 +38,9 @@
 #include "nine_morris_3d/assets.h"
 #include "other/mesh.h"
 #include "other/loader.h"
-#include "other/logging.h"
 #include "other/texture_data.h"
+#include "other/logging.h"
+#include "other/assert.h"
 
 const DirectionalLight LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
@@ -311,7 +312,7 @@ void GameLayer::prepare_board() {
             app->assets_data->board_wood_diff_texture_small, true, -2.0f
         );
     } else {
-        assert(false);
+        ASSERT(false, "Invalid texture quality");
     }
 
     app->data.wood_material = std::make_shared<Material>(app->data.board_shader);
@@ -374,7 +375,7 @@ void GameLayer::prepare_board_paint() {
             app->assets_data->board_paint_diff_texture_small, true, -1.0f
         );
     } else {
-        assert(false);
+        ASSERT(false, "Invalid texture quality");
     }
 
     app->data.paint_material = std::make_shared<Material>(app->data.board_paint_shader);
@@ -424,7 +425,7 @@ void GameLayer::prepare_pieces() {
             app->assets_data->black_piece_diff_texture_small, true, -1.5f
         );
     } else {
-        assert(false);
+        ASSERT(false, "Invalid texture quality");
     }
 
     app->data.tinted_wood_material = std::make_shared<Material>(app->data.piece_shader, Material::Hoverable);
@@ -661,7 +662,7 @@ void GameLayer::setup_skybox() {
             app->assets_data->skybox_nz_texture_small
         };
     } else {
-        assert(false);
+        ASSERT(false, "Invalid texture quality");
     }
 
     app->renderer->set_skybox(Texture3D::create(data));
@@ -675,7 +676,7 @@ void GameLayer::setup_light() {
     } else if (app->options.skybox == options::AUTUMN) {
         app->renderer->light = LIGHT_AUTUMN;
     } else {
-        assert(false);
+        ASSERT(false, "Invalid skybox");
     }
 
     DEB_DEBUG("Setup light");
@@ -742,7 +743,7 @@ void GameLayer::set_textures_quality(std::string_view quality) {
             app->assets_data->skybox_pz_texture = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE), false);
             app->assets_data->skybox_nz_texture = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE), false);
         } else {
-            assert(false);
+            ASSERT(false, "Invalid skybox");
         }
 
         app->data.board_diffuse_texture = Texture::create(
@@ -816,7 +817,7 @@ void GameLayer::set_textures_quality(std::string_view quality) {
             app->assets_data->skybox_pz_texture_small = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
             app->assets_data->skybox_nz_texture_small = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
         } else {
-            assert(false);
+            ASSERT(false, "Invalid skybox");
         }
 
         app->data.board_diffuse_texture = Texture::create(
@@ -861,7 +862,7 @@ void GameLayer::set_textures_quality(std::string_view quality) {
         };
         app->renderer->set_skybox(Texture3D::create(data));
     } else {
-        assert(false);
+        ASSERT(false, "Invalid texture quality");
     }
 }
 
@@ -910,7 +911,7 @@ void GameLayer::set_skybox(std::string_view skybox) {
             };
             app->renderer->set_skybox(Texture3D::create(data));
         } else {
-            assert(false);
+            ASSERT(false, "Invalid texture quality");
         }
 
         app->renderer->light = LIGHT_FIELD;
@@ -950,12 +951,12 @@ void GameLayer::set_skybox(std::string_view skybox) {
             };
             app->renderer->set_skybox(Texture3D::create(data));
         } else {
-            assert(false);
+            ASSERT(false, "Invalid texture quality");
         }
 
         app->renderer->light = LIGHT_AUTUMN;
     } else {
-        assert(false);
+        ASSERT(false, "Invalid skybox");
     }
 }
 

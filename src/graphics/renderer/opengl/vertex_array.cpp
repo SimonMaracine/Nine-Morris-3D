@@ -1,6 +1,5 @@
 #include <memory>
 #include <cstddef>
-#include <cassert>
 
 #include <glad/glad.h>
 
@@ -8,6 +7,7 @@
 #include "graphics/renderer/opengl/vertex_array.h"
 #include "graphics/renderer/opengl/buffer.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 VertexArray::VertexArray(GLuint array)
     : array(array) {
@@ -37,7 +37,7 @@ void VertexArray::unbind() {
 }
 
 void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout) {
-    assert(layout.elements.size() > 0);
+    ASSERT(layout.elements.size() > 0, "Invalid layout");
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
 

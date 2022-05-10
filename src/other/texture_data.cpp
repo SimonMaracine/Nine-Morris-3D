@@ -1,10 +1,10 @@
 #include <string_view>
-#include <cassert>
 
 #include <stb_image.h>
 
 #include "other/texture_data.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 TextureData::TextureData(std::string_view file_path, bool flip) {
     DEB_DEBUG("Loading texture '{}'...", file_path.data());
@@ -22,7 +22,7 @@ TextureData::TextureData(std::string_view file_path, bool flip) {
 }
 
 TextureData::~TextureData() {
-    assert(data != nullptr);
+    ASSERT(data != nullptr, "No data");
 
     stbi_image_free(data);
 

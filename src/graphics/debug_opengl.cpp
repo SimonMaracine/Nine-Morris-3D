@@ -15,6 +15,7 @@
 
 #include "application/platform.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 constexpr GLenum parameters[] = {
     GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
@@ -86,7 +87,7 @@ namespace debug_opengl {
                 std::cout << "OpenGL Debug Message:" << std::endl;
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
-                assert(false);
+                ASSERT(false, "This should have been disabled");
         }
 
         switch (source) {
@@ -121,7 +122,7 @@ namespace debug_opengl {
                 REL_WARN("(ID: {}) {}", id, message);
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
-                assert(false);
+                ASSERT(false, "This should have been disabled");
         }
     }
 #endif

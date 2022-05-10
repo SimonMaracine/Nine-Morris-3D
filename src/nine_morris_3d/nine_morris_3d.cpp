@@ -18,6 +18,7 @@
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/assets.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 // Global reference to application
 NineMorris3D* app = nullptr;
@@ -115,6 +116,6 @@ NineMorris3D::~NineMorris3D() {
 }
 
 void NineMorris3D::set_app_pointer(NineMorris3D* instance) {
-    assert(app == nullptr);
+    ASSERT(app == nullptr, "App cannot be set twice");
     app = instance;
 }

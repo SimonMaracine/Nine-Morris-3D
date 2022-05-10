@@ -3,7 +3,6 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <string.h>
 
@@ -20,6 +19,7 @@
 #include "graphics/renderer/opengl/vertex_array.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 Font::Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
         int pixel_dist_scale, int bitmap_size)
@@ -112,7 +112,7 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         gl.yoff = static_cast<int>(std::roundf(-descent * sf - y0));
         gl.xadvance = static_cast<int>(std::roundf(advance_width * sf));
 
-        assert(glyphs.count(codepoint) == 0);
+        ASSERT(glyphs.count(codepoint) == 0, "There should be only one of each glyph");
 
         glyphs[codepoint] = gl;
     }
@@ -158,7 +158,7 @@ void Font::bake_character(int codepoint) {
     gl.yoff = static_cast<int>(std::roundf(-descent * sf - y0));
     gl.xadvance = static_cast<int>(std::roundf(advance_width * sf));
 
-    assert(glyphs.count(codepoint) == 0);
+    ASSERT(glyphs.count(codepoint) == 0, "There should be only one of each glyph");
 
     glyphs[codepoint] = gl;
 }
@@ -323,7 +323,7 @@ std::string Font::get_name(std::string_view file_path) {
         token = strtok(nullptr, "/.");
     }
 
-    assert(tokens.size() >= 2);
+    ASSERT(tokens.size() >= 2, "Invalid file name");
 
     return tokens[tokens.size() - 2];  // It's ok
 }

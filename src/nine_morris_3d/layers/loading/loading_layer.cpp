@@ -1,5 +1,4 @@
 #include <memory>
-#include <cassert>
 
 #include <glm/glm.hpp>
 
@@ -12,6 +11,7 @@
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/options.h"
 #include "other/loader.h"
+#include "other/assert.h"
 
 void LoadingLayer::on_attach() {
     if (app->options.texture_quality == options::NORMAL) {
@@ -20,7 +20,7 @@ void LoadingLayer::on_attach() {
         } else if (app->options.skybox == options::AUTUMN) {
             loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn);
         } else {
-            assert(false);
+            ASSERT(false, "Invalid texture quality");
         }
     } else if (app->options.texture_quality == options::LOW) {
         if (app->options.skybox == options::FIELD) {
@@ -28,10 +28,10 @@ void LoadingLayer::on_attach() {
         } else if (app->options.skybox == options::AUTUMN) {
             loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_low_tex);
         } else {
-            assert(false);
+            ASSERT(false, "Invalid texture quality");
         }
     } else {
-        assert(false);
+        ASSERT(false, "Invalid skybox");
     }
 
     loader->start_loading_thread();

@@ -1,6 +1,5 @@
 #include <functional>
 #include <memory>
-#include <cassert>
 #include <algorithm>
 #include <string_view>
 
@@ -18,6 +17,7 @@
 #include "graphics/renderer/gui_renderer.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 Application::Application(int width, int height, std::string_view title) {
     app_data.width = width;
@@ -59,7 +59,7 @@ Application::~Application() {
 }
 
 void Application::run() {
-    assert(current_scene != nullptr);
+    ASSERT(current_scene != nullptr, "Starting scene not set");
 
     for (Layer* layer : current_scene->layers_in_order) {
         push_layer(layer);
@@ -136,7 +136,7 @@ void Application::change_scene(std::string_view id) {
         }
     }
 
-    assert(false);
+    ASSERT(false, "Scene not found");
 }
 
 void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {

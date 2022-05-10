@@ -1,5 +1,4 @@
 #include <memory>
-#include <cassert>
 #include <algorithm>
 
 #include <glad/glad.h>
@@ -7,6 +6,7 @@
 #include "graphics/renderer/opengl/framebuffer.h"
 #include "graphics/debug_opengl.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 static GLenum target(bool multisampled) {
     return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
@@ -19,7 +19,7 @@ static bool depth_attachment_present(const FramebufferSpecification& specificati
 
 static void attach_color_texture(GLuint texture, int samples, GLenum internal_format,
         GLenum format, int width, int height, unsigned int index) {
-    bool multisampled = samples > 1;
+    const bool multisampled = samples > 1;
 
     if (multisampled) {
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format,
@@ -41,7 +41,7 @@ static void attach_color_texture(GLuint texture, int samples, GLenum internal_fo
 
 static void attach_depth_texture(GLuint texture, int samples, GLenum internal_format,
         GLenum format, GLenum attachment, int width, int height, bool white_border) {
-    bool multisampled = samples > 1;
+    const bool multisampled = samples > 1;
 
     if (multisampled) {
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format,
@@ -68,7 +68,7 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
 
 static void attach_color_renderbuffer(GLuint renderbuffer, int samples, GLenum internal_format,
         int width, int height, unsigned int index) {
-    bool multisampled = samples > 1;
+    const bool multisampled = samples > 1;
 
     if (multisampled) {
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
@@ -83,7 +83,7 @@ static void attach_color_renderbuffer(GLuint renderbuffer, int samples, GLenum i
 
 static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum internal_format,
         GLenum attachment, int width, int height) {
-    bool multisampled = samples > 1;
+    const bool multisampled = samples > 1;
 
     if (multisampled) {
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
@@ -106,7 +106,7 @@ Framebuffer::~Framebuffer() {
     for (unsigned int i = 0; i < specification.color_attachments.size(); i++) {
         switch (specification.color_attachments[i].type) {
             case AttachmentType::None:
-                assert(false);
+                ASSERT(false, "Attachment type 'None' is invalid");
                 break;
             case AttachmentType::Texture:
                 glDeleteTextures(1, &color_attachments[i]);
@@ -120,7 +120,7 @@ Framebuffer::~Framebuffer() {
     if (depth_attachment_present(specification)) {
         switch (specification.depth_attachment.type) {
             case AttachmentType::None:
-                assert(false);
+                ASSERT(false, "Attachment type 'None' is invalid");
                 break;
             case AttachmentType::Texture:
                 glDeleteTextures(1, &depth_attachment);
@@ -137,12 +137,13 @@ Framebuffer::~Framebuffer() {
 }
 
 std::shared_ptr<Framebuffer> Framebuffer::create(const FramebufferSpecification& specification) {
-    assert(specification.samples == 1 || specification.samples == 2 || specification.samples == 4);
+    ASSERT(specification.samples == 1 || specification.samples == 2 || specification.samples == 4,
+            "Invalid sample size");
     if (specification.white_border_for_depth_texture) {
-        assert(specification.depth_attachment.format != AttachmentFormat::None);
-        assert(specification.depth_attachment.type == AttachmentType::Texture);
+        ASSERT(specification.depth_attachment.format != AttachmentFormat::None, "Invalid configuration");
+        ASSERT(specification.depth_attachment.type == AttachmentType::Texture, "Invalid configuration");
     }
-    assert(specification.width > 0 && specification.height > 0);
+    ASSERT(specification.width > 0 && specification.height > 0, "Invalid size");
 
     return std::make_shared<Framebuffer>(specification);
 }
@@ -156,7 +157,7 @@ void Framebuffer::bind_default() {
 }
 
 GLuint Framebuffer::get_color_attachment(unsigned int index) {
-    assert(index < color_attachments.size());
+    ASSERT(index < color_attachments.size(), "Invalid color attachment");
 
     return color_attachments[index];
 }
@@ -178,7 +179,7 @@ void Framebuffer::resize(int width, int height) {
 }
 
 int Framebuffer::read_pixel_red_integer(unsigned int attachment_index, int x, int y) {
-    assert(attachment_index < color_attachments.size());
+    ASSERT(attachment_index < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
     int pixel;
@@ -188,14 +189,14 @@ int Framebuffer::read_pixel_red_integer(unsigned int attachment_index, int x, in
 }
 
 void Framebuffer::read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y) {
-    assert(attachment_index < color_attachments.size());
+    ASSERT(attachment_index < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
     glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, nullptr);
 }
 
 void Framebuffer::clear_red_integer_attachment(int index, int value) {  // TODO is this even used?
-    assert(index < (int) color_attachments.size());
+    ASSERT((size_t) index < color_attachments.size(), "Invalid color attachment");
 
     glClearBufferiv(GL_COLOR, index, &value);
 }
@@ -217,7 +218,7 @@ void Framebuffer::build() {
         for (unsigned int i = 0; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
-                    assert(false);
+                    ASSERT(false, "Attachment type 'None' is invalid");
                     break;
                 case AttachmentType::Texture:
                     glDeleteTextures(1, &color_attachments[i]);
@@ -231,7 +232,7 @@ void Framebuffer::build() {
         if (depth_attachment_present(specification)) {
             switch (specification.depth_attachment.type) {
                 case AttachmentType::None:
-                    assert(false);
+                    ASSERT(false, "Attachment type 'None' is invalid");
                     break;
                 case AttachmentType::Texture:
                     glDeleteTextures(1, &depth_attachment);
@@ -248,17 +249,18 @@ void Framebuffer::build() {
         depth_attachment = 0;
     }
 
+    // Then create a new framebuffer
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-    bool multisampled = specification.samples > 1;
+    const bool multisampled = specification.samples > 1;
 
     color_attachments.resize(specification.color_attachments.size());
 
     for (unsigned int i = 0; i < specification.color_attachments.size(); i++) {
         switch (specification.color_attachments[i].type) {
             case AttachmentType::None:
-                assert(false);
+                ASSERT(false, "Attachment type 'None' is invalid");
                 break;
             case AttachmentType::Texture: {
                 GLuint texture;
@@ -267,7 +269,7 @@ void Framebuffer::build() {
 
                 switch (specification.color_attachments[i].format) {
                     case AttachmentFormat::None:
-                        assert(false);
+                        ASSERT(false, "Attachment format 'None' is invalid");
                         break;
                     case AttachmentFormat::RGBA8:
                         attach_color_texture(texture, specification.samples, GL_RGBA8, GL_BGRA,
@@ -278,7 +280,7 @@ void Framebuffer::build() {
                                 specification.width, specification.height, i);
                         break;
                     default:
-                        DEB_CRITICAL("Wrong attachment format, exiting...");
+                        REL_CRITICAL("Wrong attachment format, exiting...");
                         exit(1);
                 }
 
@@ -294,7 +296,7 @@ void Framebuffer::build() {
 
                 switch (specification.color_attachments[i].format) {
                     case AttachmentFormat::None:
-                        assert(false);
+                        ASSERT(false, "Attachment format 'None' is invalid");
                         break;
                     case AttachmentFormat::RGBA8:
                         attach_color_renderbuffer(renderbuffer, specification.samples, GL_RGBA8,
@@ -305,7 +307,7 @@ void Framebuffer::build() {
                                 specification.width, specification.height, i);
                         break;
                     default:
-                        DEB_CRITICAL("Wrong attachment format, exiting...");
+                        REL_CRITICAL("Wrong attachment format, exiting...");
                         exit(1);
                 }
 
@@ -320,7 +322,7 @@ void Framebuffer::build() {
     if (depth_attachment_present(specification)) {
         switch (specification.depth_attachment.type) {
             case AttachmentType::None:
-                assert(false);
+                ASSERT(false, "Attachment type 'None' is invalid");
                 break;
             case AttachmentType::Texture: {
                 GLuint texture;
@@ -329,7 +331,7 @@ void Framebuffer::build() {
 
                 switch (specification.depth_attachment.format) {
                     case AttachmentFormat::None:
-                        assert(false);
+                        ASSERT(false, "Attachment format 'None' is invalid");
                         break;
                     case AttachmentFormat::DEPTH24_STENCIL8:
                         attach_depth_texture(texture, specification.samples, GL_DEPTH24_STENCIL8,
@@ -342,7 +344,7 @@ void Framebuffer::build() {
                                 specification.height, specification.white_border_for_depth_texture);
                         break;
                     default:
-                        DEB_CRITICAL("Wrong attachment format, exiting...");
+                        REL_CRITICAL("Wrong attachment format, exiting...");
                         exit(1);
                 }
 
@@ -358,7 +360,7 @@ void Framebuffer::build() {
 
                 switch (specification.depth_attachment.format) {
                     case AttachmentFormat::None:
-                        assert(false);
+                        ASSERT(false, "Attachment format 'None' is invalid");
                         break;
                     case AttachmentFormat::DEPTH24_STENCIL8:
                         attach_depth_renderbuffer(renderbuffer, specification.samples,
@@ -371,7 +373,7 @@ void Framebuffer::build() {
                                 specification.width, specification.height);
                         break;
                     default:
-                        DEB_CRITICAL("Wrong attachment format, exiting...");
+                        REL_CRITICAL("Wrong attachment format, exiting...");
                         exit(1);
                 }
 
@@ -382,9 +384,9 @@ void Framebuffer::build() {
             }   
         }
     }
-    
+
     if (color_attachments.size() > 1) {
-        assert(color_attachments.size() <= 4);
+        ASSERT(color_attachments.size() <= 4, "Currently there can be maximum 4 color attachments");
 
         const GLenum attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
                                         GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };

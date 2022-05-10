@@ -10,6 +10,7 @@
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 #define GET_ACTIVE_PIECES(result) \
     std::array<Piece*, 18> pointer_pieces; \
@@ -105,7 +106,7 @@ void Board::move_pieces(float dt) {
         if (piece->should_move) {
             switch (piece->movement.type) {
                 case Piece::MovementType::None:
-                    assert(false);
+                    ASSERT(false, "Movement type 'None' is invalid");
                     break;
                 case Piece::MovementType::Linear: {
                     piece->model.position += piece->movement.velocity * dt + (piece->movement.target - piece->model.position)
@@ -165,8 +166,8 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                             node.piece->type == Piece::Black) {
                         if (!is_windmill_made(&node, Piece::Black) ||
                                 number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
-                            assert(node.piece->active);
-                            assert(node.piece->in_use);
+                            ASSERT(node.piece->active, "Piece must be active in the scene");
+                            ASSERT(node.piece->in_use, "Piece must be in use");
 
                             remember_state();
                             WAIT_FOR_NEXT_MOVE();
@@ -202,8 +203,8 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                             node.piece->type == Piece::White) {
                         if (!is_windmill_made(&node, Piece::White) ||
                                 number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
-                            assert(node.piece->active);
-                            assert(node.piece->in_use);
+                            ASSERT(node.piece->active, "Piece must be active in the scene");
+                            ASSERT(node.piece->in_use, "Piece must be in use");
 
                             remember_state();
                             WAIT_FOR_NEXT_MOVE();
@@ -278,7 +279,7 @@ bool Board::put_piece(hoverable::Id hovered_id) {
     if (selected_piece != nullptr) {  // Do anything only if there is a selected piece
         for (Node& node : nodes) {
             if (node.id == hovered_id && can_go(selected_piece->node, &node)) {
-                assert(node.piece == nullptr);
+                ASSERT(node.piece == nullptr, "Piece must be not null");
                 remember_state();
                 WAIT_FOR_NEXT_MOVE();
 
@@ -372,7 +373,7 @@ void Board::release() {
 }
 
 void Board::undo() {
-    assert(state_history->size() > 0);
+    ASSERT(state_history->size() > 0, "History is empty");
 
     Board& state = state_history->back();
 
@@ -549,7 +550,7 @@ Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* 
         }
     }
 
-    assert(false);
+    ASSERT(false, "Couldn't find a piece");
     return nullptr;
 }
 
@@ -591,7 +592,7 @@ void Board::game_over(Ending ending, Piece::Type type_to_hide) {
             DEB_INFO("Game over, tie between both players");
             break;
         default:
-            assert(false);
+            ASSERT(false, "Invalid ending");
     }
 }
 
@@ -706,7 +707,7 @@ void Board::update_outlines() {
 }
 
 bool Board::can_go(Node* source_node, Node* destination_node) {
-    assert(source_node != destination_node);
+    ASSERT(source_node != destination_node, "Source must be different than destination");
 
     if (can_jump[static_cast<int>(turn)]) {
         return true;
