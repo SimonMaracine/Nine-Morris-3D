@@ -847,30 +847,25 @@ void GameLayer::set_skybox(std::string_view skybox) {
     if (skybox == options::FIELD) {
         if (app->options.texture_quality == options::NORMAL) {
             loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_skybox);
-            loader->start_loading_thread();
-            changed_skybox = true;
         } else if (app->options.texture_quality == options::LOW) {
             loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_low_tex_skybox);
-            loader->start_loading_thread();
-            changed_skybox = true;
         } else {
             ASSERT(false, "Invalid texture quality");
         }
     } else if (skybox == options::AUTUMN) {
         if (app->options.texture_quality == options::NORMAL) {
             loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_skybox);
-            loader->start_loading_thread();
-            changed_skybox = true;
         } else if (app->options.texture_quality == options::LOW) {
             loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_low_tex_skybox);
-            loader->start_loading_thread();
-            changed_skybox = true;
         } else {
             ASSERT(false, "Invalid texture quality");
         }
     } else {
         ASSERT(false, "Invalid skybox");
     }
+
+    loader->start_loading_thread();
+    changed_skybox = true;
 }
 
 void GameLayer::load_game() {
