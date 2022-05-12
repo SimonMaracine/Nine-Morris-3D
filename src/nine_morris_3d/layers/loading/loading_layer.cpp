@@ -16,17 +16,17 @@
 void LoadingLayer::on_attach() {
     if (app->options.texture_quality == options::NORMAL) {
         if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_all);
         } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_all);
         } else {
             ASSERT(false, "Invalid texture quality");
         }
     } else if (app->options.texture_quality == options::LOW) {
         if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_low_tex);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_low_tex_all);
         } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_low_tex);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_low_tex_all);
         } else {
             ASSERT(false, "Invalid texture quality");
         }
@@ -51,6 +51,8 @@ void LoadingLayer::on_detach() {
     if (loader->get_thread().joinable()) {
         loader->get_thread().detach();
     }
+
+    loader = nullptr;
 
     app->gui_renderer->get_frame()->clear();
 }

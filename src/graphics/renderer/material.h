@@ -55,7 +55,7 @@ public:
     void set_mat4(std::string_view name, const glm::mat4& matrix);
     void set_int(std::string_view name, int value);
     void set_float(std::string_view name, float value);
-    void set_vec2(std::string_view name, const glm::vec2& vector);
+    void set_vec2(std::string_view name, glm::vec2 vector);
     void set_vec3(std::string_view name, const glm::vec3& vector);
     void set_vec4(std::string_view name, const glm::vec4& vector);
     void set_texture(std::string_view name, std::shared_ptr<Texture> texture, int unit);

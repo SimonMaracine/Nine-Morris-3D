@@ -186,13 +186,11 @@ void ImGuiLayer::on_update(float dt) {
                     static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
                     if (ImGui::RadioButton("Normal", &quality, 0)) {
                         game_layer->set_textures_quality(options::NORMAL);
-                        app->options.texture_quality = options::NORMAL;
 
                         DEB_INFO("Textures set to {} quality", options::NORMAL);
                     }
                     if (ImGui::RadioButton("Low", &quality, 1)) {
                         game_layer->set_textures_quality(options::LOW);
-                        app->options.texture_quality = options::LOW;
 
                         DEB_INFO("Textures set to {} quality", options::LOW);
                     }
@@ -228,13 +226,11 @@ void ImGuiLayer::on_update(float dt) {
                 static int skybox = app->options.skybox == options::FIELD ? 0 : 1;
                 if (ImGui::RadioButton("Field", &skybox, 0)) {
                     game_layer->set_skybox(options::FIELD);
-                    app->options.skybox = options::FIELD;
 
                     DEB_INFO("Skybox set to {}", options::FIELD);
                 }
                 if (ImGui::RadioButton("Autumn", &skybox, 1)) {
                     game_layer->set_skybox(options::AUTUMN);
-                    app->options.skybox = options::AUTUMN;
 
                     DEB_INFO("Skybox set to {}", options::AUTUMN);
                 }

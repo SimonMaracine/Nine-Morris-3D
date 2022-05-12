@@ -122,7 +122,7 @@ void MaterialInstance::set_float(std::string_view name, float value) {
     material->uniforms_float[std::string(name)] = value;
 }
 
-void MaterialInstance::set_vec2(std::string_view name, const glm::vec2& vector) {
+void MaterialInstance::set_vec2(std::string_view name, glm::vec2 vector) {
     material->uniforms_vec2[std::string(name)] = vector;
 }
 

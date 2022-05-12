@@ -9,7 +9,7 @@
 /**
  * Objects of this class load assets in a separate thread.
  * Pass a struct with the assets and a function to load them.
- * Stack allocate objects of this class.
+ * Wrap objects of this class with smart pointers.
  */
 template<typename Assets>
 class Loader {
@@ -27,7 +27,7 @@ public:
     }
 
     void start_loading_thread() {
-        DEB_INFO("Loading assets from separate thread...");
+        DEB_INFO("Loading some assets from separate thread...");
 
         loading_thread = std::thread(load_function, this);
     }

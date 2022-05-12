@@ -75,6 +75,9 @@ public:
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
 
+    std::unique_ptr<Loader<AssetsData>> loader;
+    bool changed_skybox = false;
+
     ImGuiLayer* imgui_layer = nullptr;
     GuiLayer* gui_layer = nullptr;
 };

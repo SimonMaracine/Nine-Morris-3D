@@ -150,6 +150,34 @@ void GameLayer::on_update(float dt) {
     mouse_wheel = 0.0f;
     dx = 0.0f;
     dy = 0.0f;
+
+    if (changed_skybox && loader->done_loading()) {  // Short-circuit optimization
+        const std::array<std::shared_ptr<TextureData>, 6> data = {
+            app->assets_data->skybox_px_texture,
+            app->assets_data->skybox_nx_texture,
+            app->assets_data->skybox_py_texture,
+            app->assets_data->skybox_ny_texture,
+            app->assets_data->skybox_pz_texture,
+            app->assets_data->skybox_nz_texture
+        };
+        app->renderer->set_skybox(Texture3D::create(data));
+
+        if (app->options.skybox == options::FIELD) {
+            app->renderer->light = LIGHT_FIELD;
+        } else if (app->options.skybox == options::AUTUMN) {
+            app->renderer->light = LIGHT_AUTUMN;
+        } else {
+            ASSERT(false, "Invalid skybox");
+        }
+
+        changed_skybox = false;
+
+        if (loader->get_thread().joinable()) {
+            loader->get_thread().detach();
+        }
+
+        loader = nullptr;
+    }
 }
 
 void GameLayer::on_fixed_update() {
@@ -303,17 +331,9 @@ void GameLayer::prepare_board() {
 
     app->data.board_vertex_array = vertex_array;
 
-    if (app->options.texture_quality == options::NORMAL) {
-        app->data.board_diffuse_texture = Texture::create(
-            app->assets_data->board_wood_diff_texture, true, -2.0f
-        );
-    } else if (app->options.texture_quality == options::LOW) {
-        app->data.board_diffuse_texture = Texture::create(
-            app->assets_data->board_wood_diff_texture_small, true, -2.0f
-        );
-    } else {
-        ASSERT(false, "Invalid texture quality");
-    }
+    app->data.board_diffuse_texture = Texture::create(
+        app->assets_data->board_wood_diff_texture, true, -2.0f
+    );
 
     app->data.wood_material = std::make_shared<Material>(app->data.board_shader);
     app->data.wood_material->add_texture("u_material.diffuse");
@@ -366,17 +386,9 @@ void GameLayer::prepare_board_paint() {
 
     app->data.board_paint_vertex_array = vertex_array;
 
-    if (app->options.texture_quality == options::NORMAL) {
-        app->data.board_paint_diffuse_texture = Texture::create(
-            app->assets_data->board_paint_diff_texture, true, -1.0f
-        );
-    } else if (app->options.texture_quality == options::LOW) {
-        app->data.board_paint_diffuse_texture = Texture::create(
-            app->assets_data->board_paint_diff_texture_small, true, -1.0f
-        );
-    } else {
-        ASSERT(false, "Invalid texture quality");
-    }
+    app->data.board_paint_diffuse_texture = Texture::create(
+        app->assets_data->board_paint_diff_texture, true, -1.0f
+    );
 
     app->data.paint_material = std::make_shared<Material>(app->data.board_paint_shader);
     app->data.paint_material->add_texture("u_material.diffuse");
@@ -410,23 +422,12 @@ void GameLayer::prepare_pieces() {
         uniform_blocks
     );
 
-    if (app->options.texture_quality == options::NORMAL) {
-        app->data.white_piece_diffuse_texture = Texture::create(
-            app->assets_data->white_piece_diff_texture, true, -1.5f
-        );
-        app->data.black_piece_diffuse_texture = Texture::create(
-            app->assets_data->black_piece_diff_texture, true, -1.5f
-        );
-    } else if (app->options.texture_quality == options::LOW) {
-        app->data.white_piece_diffuse_texture = Texture::create(
-            app->assets_data->white_piece_diff_texture_small, true, -1.5f
-        );
-        app->data.black_piece_diffuse_texture = Texture::create(
-            app->assets_data->black_piece_diff_texture_small, true, -1.5f
-        );
-    } else {
-        ASSERT(false, "Invalid texture quality");
-    }
+    app->data.white_piece_diffuse_texture = Texture::create(
+        app->assets_data->white_piece_diff_texture, true, -1.5f
+    );
+    app->data.black_piece_diffuse_texture = Texture::create(
+        app->assets_data->black_piece_diff_texture, true, -1.5f
+    );
 
     app->data.tinted_wood_material = std::make_shared<Material>(app->data.piece_shader, Material::Hoverable);
     app->data.tinted_wood_material->add_texture("u_material.diffuse");
@@ -641,30 +642,14 @@ void GameLayer::setup_camera() {
 }
 
 void GameLayer::setup_skybox() {
-    std::array<std::shared_ptr<TextureData>, 6> data;
-
-    if (app->options.texture_quality == options::NORMAL) {
-        data = {
-            app->assets_data->skybox_px_texture,
-            app->assets_data->skybox_nx_texture,
-            app->assets_data->skybox_py_texture,
-            app->assets_data->skybox_ny_texture,
-            app->assets_data->skybox_pz_texture,
-            app->assets_data->skybox_nz_texture
-        };
-    } else if (app->options.texture_quality == options::LOW) {
-        data = {
-            app->assets_data->skybox_px_texture_small,
-            app->assets_data->skybox_nx_texture_small,
-            app->assets_data->skybox_py_texture_small,
-            app->assets_data->skybox_ny_texture_small,
-            app->assets_data->skybox_pz_texture_small,
-            app->assets_data->skybox_nz_texture_small
-        };
-    } else {
-        ASSERT(false, "Invalid texture quality");
-    }
-
+    std::array<std::shared_ptr<TextureData>, 6> data = {
+        app->assets_data->skybox_px_texture,
+        app->assets_data->skybox_nx_texture,
+        app->assets_data->skybox_py_texture,
+        app->assets_data->skybox_ny_texture,
+        app->assets_data->skybox_pz_texture,
+        app->assets_data->skybox_nz_texture
+    };
     app->renderer->set_skybox(Texture3D::create(data));
 
     DEB_DEBUG("Setup skybox");
@@ -713,17 +698,9 @@ void GameLayer::set_textures_quality(std::string_view quality) {
         return;
     }
 
+    app->options.texture_quality = quality;
+
     if (quality == options::NORMAL) {
-        app->assets_data->board_wood_diff_texture_small = nullptr;
-        app->assets_data->board_paint_diff_texture_small = nullptr;
-        app->assets_data->white_piece_diff_texture_small = nullptr;
-        app->assets_data->black_piece_diff_texture_small = nullptr;
-        app->assets_data->skybox_px_texture_small = nullptr;
-        app->assets_data->skybox_nx_texture_small = nullptr;
-        app->assets_data->skybox_py_texture_small = nullptr;
-        app->assets_data->skybox_ny_texture_small = nullptr;
-        app->assets_data->skybox_pz_texture_small = nullptr;
-        app->assets_data->skybox_nz_texture_small = nullptr;
         app->assets_data->board_wood_diff_texture = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE), true);
         app->assets_data->board_paint_diff_texture = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE), true);
         app->assets_data->white_piece_diff_texture = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE), true);
@@ -788,45 +765,35 @@ void GameLayer::set_textures_quality(std::string_view quality) {
         };
         app->renderer->set_skybox(Texture3D::create(data));
     } else if (quality == options::LOW) {
-        app->assets_data->board_wood_diff_texture = nullptr;
-        app->assets_data->board_paint_diff_texture = nullptr;
-        app->assets_data->white_piece_diff_texture = nullptr;
-        app->assets_data->black_piece_diff_texture = nullptr;
-        app->assets_data->skybox_px_texture = nullptr;
-        app->assets_data->skybox_nx_texture = nullptr;
-        app->assets_data->skybox_py_texture = nullptr;
-        app->assets_data->skybox_ny_texture = nullptr;
-        app->assets_data->skybox_pz_texture = nullptr;
-        app->assets_data->skybox_nz_texture = nullptr;
-        app->assets_data->board_wood_diff_texture_small = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE_SMALL), true);
-        app->assets_data->board_paint_diff_texture_small = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE_SMALL), true);
-        app->assets_data->white_piece_diff_texture_small = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE_SMALL), true);
-        app->assets_data->black_piece_diff_texture_small = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE_SMALL), true);
+        app->assets_data->board_wood_diff_texture = std::make_shared<TextureData>(path(BOARD_WOOD_TEXTURE_SMALL), true);
+        app->assets_data->board_paint_diff_texture = std::make_shared<TextureData>(path(BOARD_PAINT_TEXTURE_SMALL), true);
+        app->assets_data->white_piece_diff_texture = std::make_shared<TextureData>(path(WHITE_PIECE_TEXTURE_SMALL), true);
+        app->assets_data->black_piece_diff_texture = std::make_shared<TextureData>(path(BLACK_PIECE_TEXTURE_SMALL), true);
         if (app->options.skybox == options::FIELD) {
-            app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
-            app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
-            app->assets_data->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
-            app->assets_data->skybox_ny_texture_small = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE_SMALL), false);
-            app->assets_data->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
-            app->assets_data->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_ny_texture = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
         } else if (app->options.skybox == options::AUTUMN) {
-            app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
-            app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
-            app->assets_data->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
-            app->assets_data->skybox_ny_texture_small = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE_SMALL), false);
-            app->assets_data->skybox_pz_texture_small = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
-            app->assets_data->skybox_nz_texture_small = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
+            app->assets_data->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_ny_texture = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE_SMALL), false);
+            app->assets_data->skybox_pz_texture = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
+            app->assets_data->skybox_nz_texture = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
         } else {
             ASSERT(false, "Invalid skybox");
         }
 
         app->data.board_diffuse_texture = Texture::create(
-            app->assets_data->board_wood_diff_texture_small, true, -2.0f
+            app->assets_data->board_wood_diff_texture, true, -2.0f
         );
         app->data.board_material_instance->set_texture("u_material.diffuse", app->data.board_diffuse_texture, 0);
 
         app->data.board_paint_diffuse_texture = Texture::create(
-            app->assets_data->board_paint_diff_texture_small, true, -1.0f
+            app->assets_data->board_paint_diff_texture, true, -1.0f
         );
         app->data.board_paint_material_instance->set_texture(
             "u_material.diffuse",
@@ -834,10 +801,10 @@ void GameLayer::set_textures_quality(std::string_view quality) {
         );
 
         app->data.white_piece_diffuse_texture = Texture::create(
-            app->assets_data->white_piece_diff_texture_small, true, -1.5f
+            app->assets_data->white_piece_diff_texture, true, -1.5f
         );
         app->data.black_piece_diffuse_texture = Texture::create(
-            app->assets_data->black_piece_diff_texture_small, true, -1.5f
+            app->assets_data->black_piece_diff_texture, true, -1.5f
         );
         for (unsigned int i = 0; i < 9; i++) {
             app->data.piece_material_instances[i]->set_texture(
@@ -853,12 +820,12 @@ void GameLayer::set_textures_quality(std::string_view quality) {
         }
 
         const std::array<std::shared_ptr<TextureData>, 6> data = {
-            app->assets_data->skybox_px_texture_small,
-            app->assets_data->skybox_nx_texture_small,
-            app->assets_data->skybox_py_texture_small,
-            app->assets_data->skybox_ny_texture_small,
-            app->assets_data->skybox_pz_texture_small,
-            app->assets_data->skybox_nz_texture_small
+            app->assets_data->skybox_px_texture,
+            app->assets_data->skybox_nx_texture,
+            app->assets_data->skybox_py_texture,
+            app->assets_data->skybox_ny_texture,
+            app->assets_data->skybox_pz_texture,
+            app->assets_data->skybox_nz_texture
         };
         app->renderer->set_skybox(Texture3D::create(data));
     } else {
@@ -875,86 +842,32 @@ void GameLayer::set_skybox(std::string_view skybox) {
         return;
     }
 
+    app->options.skybox = skybox;
+
     if (skybox == options::FIELD) {
         if (app->options.texture_quality == options::NORMAL) {
-            app->assets_data->skybox_px_texture = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE), false);
-            app->assets_data->skybox_nx_texture = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE), false);
-            app->assets_data->skybox_py_texture = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE), false);
-            app->assets_data->skybox_ny_texture = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE), false);
-            app->assets_data->skybox_pz_texture = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE), false);
-            app->assets_data->skybox_nz_texture = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE), false);
-
-            const std::array<std::shared_ptr<TextureData>, 6> data = {
-                app->assets_data->skybox_px_texture,
-                app->assets_data->skybox_nx_texture,
-                app->assets_data->skybox_py_texture,
-                app->assets_data->skybox_ny_texture,
-                app->assets_data->skybox_pz_texture,
-                app->assets_data->skybox_nz_texture
-            };
-            app->renderer->set_skybox(Texture3D::create(data));
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_skybox);
+            loader->start_loading_thread();
+            changed_skybox = true;
         } else if (app->options.texture_quality == options::LOW) {
-            app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(FIELD_PX_TEXTURE_SMALL), false);
-            app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(FIELD_NX_TEXTURE_SMALL), false);
-            app->assets_data->skybox_py_texture_small = std::make_shared<TextureData>(path(FIELD_PY_TEXTURE_SMALL), false);
-            app->assets_data->skybox_ny_texture_small = std::make_shared<TextureData>(path(FIELD_NY_TEXTURE_SMALL), false);
-            app->assets_data->skybox_pz_texture_small = std::make_shared<TextureData>(path(FIELD_PZ_TEXTURE_SMALL), false);
-            app->assets_data->skybox_nz_texture_small = std::make_shared<TextureData>(path(FIELD_NZ_TEXTURE_SMALL), false);
-
-            const std::array<std::shared_ptr<TextureData>, 6> data = {
-                app->assets_data->skybox_px_texture_small,
-                app->assets_data->skybox_nx_texture_small,
-                app->assets_data->skybox_py_texture_small,
-                app->assets_data->skybox_ny_texture_small,
-                app->assets_data->skybox_pz_texture_small,
-                app->assets_data->skybox_nz_texture_small
-            };
-            app->renderer->set_skybox(Texture3D::create(data));
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_low_tex_skybox);
+            loader->start_loading_thread();
+            changed_skybox = true;
         } else {
             ASSERT(false, "Invalid texture quality");
         }
-
-        app->renderer->light = LIGHT_FIELD;
     } else if (skybox == options::AUTUMN) {
         if (app->options.texture_quality == options::NORMAL) {
-            app->assets_data->skybox_px_texture = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE), false);
-            app->assets_data->skybox_nx_texture = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE), false);
-            app->assets_data->skybox_py_texture = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE), false);
-            app->assets_data->skybox_ny_texture = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE), false);
-            app->assets_data->skybox_pz_texture = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE), false);
-            app->assets_data->skybox_nz_texture = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE), false);
-
-            const std::array<std::shared_ptr<TextureData>, 6> data = {
-                app->assets_data->skybox_px_texture,
-                app->assets_data->skybox_nx_texture,
-                app->assets_data->skybox_py_texture,
-                app->assets_data->skybox_ny_texture,
-                app->assets_data->skybox_pz_texture,
-                app->assets_data->skybox_nz_texture
-            };
-            app->renderer->set_skybox(Texture3D::create(data));
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_skybox);
+            loader->start_loading_thread();
+            changed_skybox = true;
         } else if (app->options.texture_quality == options::LOW) {
-            app->assets_data->skybox_px_texture_small = std::make_shared<TextureData>(path(AUTUMN_PX_TEXTURE_SMALL), false);
-            app->assets_data->skybox_nx_texture_small = std::make_shared<TextureData>(path(AUTUMN_NX_TEXTURE_SMALL), false);
-            app->assets_data->skybox_py_texture_small = std::make_shared<TextureData>(path(AUTUMN_PY_TEXTURE_SMALL), false);
-            app->assets_data->skybox_ny_texture_small = std::make_shared<TextureData>(path(AUTUMN_NY_TEXTURE_SMALL), false);
-            app->assets_data->skybox_pz_texture_small = std::make_shared<TextureData>(path(AUTUMN_PZ_TEXTURE_SMALL), false);
-            app->assets_data->skybox_nz_texture_small = std::make_shared<TextureData>(path(AUTUMN_NZ_TEXTURE_SMALL), false);
-
-            const std::array<std::shared_ptr<TextureData>, 6> data = {
-                app->assets_data->skybox_px_texture_small,
-                app->assets_data->skybox_nx_texture_small,
-                app->assets_data->skybox_py_texture_small,
-                app->assets_data->skybox_ny_texture_small,
-                app->assets_data->skybox_pz_texture_small,
-                app->assets_data->skybox_nz_texture_small
-            };
-            app->renderer->set_skybox(Texture3D::create(data));
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_low_tex_skybox);
+            loader->start_loading_thread();
+            changed_skybox = true;
         } else {
             ASSERT(false, "Invalid texture quality");
         }
-
-        app->renderer->light = LIGHT_AUTUMN;
     } else {
         ASSERT(false, "Invalid skybox");
     }
