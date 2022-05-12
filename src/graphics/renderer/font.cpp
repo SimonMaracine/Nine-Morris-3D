@@ -298,7 +298,7 @@ void Font::blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsi
     if (glyph != nullptr) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                int index = (y + dest_y) * dest_width + (x + dest_x);
+                const int index = (y + dest_y) * dest_width + (x + dest_x);
                 dest[index] = glyph[y * width + x];
             }
         }

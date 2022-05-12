@@ -108,11 +108,11 @@ void GameLayer::on_detach() {
 
         try {
             save_load::save_game_to_file(state);
-        } catch (save_load::SaveFileNotOpenError& e) {
+        } catch (const save_load::SaveFileNotOpenError& e) {
             REL_ERROR("{}", e.what());
             save_load::handle_save_file_not_open_error();
             REL_ERROR("Could not save game");
-        } catch (save_load::SaveFileError& e) {
+        } catch (const save_load::SaveFileError& e) {
             REL_ERROR("{}", e.what());
             REL_ERROR("Could not save game");
         }

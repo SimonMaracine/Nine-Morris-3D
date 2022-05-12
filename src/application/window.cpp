@@ -127,8 +127,8 @@ Window::Window(ApplicationData* data) {
 
 Window::~Window() {
     glfwDestroyWindow(window);
-    for (const std::pair<unsigned int, GLFWcursor*>& pair : cursors) {
-        glfwDestroyCursor(pair.second);
+    for (const std::pair<unsigned int, GLFWcursor*>& cursor : cursors) {
+        glfwDestroyCursor(cursor.second);
     }
     glfwTerminate();
 

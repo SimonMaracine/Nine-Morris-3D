@@ -11,8 +11,13 @@
 #include "other/logging.h"
 #include "other/user_data.h"
 
-#define LOG_FILE "log.txt"
-#define INFO_FILE "info.txt"
+#if defined(NINE_MORRIS_3D_LINUX)
+    #define LOG_FILE "log.txt"
+    #define INFO_FILE "info.txt"
+#elif defined(NINE_MORRIS_3D_WINDOWS)
+    #define LOG_FILE "ninemorris3d_log.txt"
+    #define INFO_FILE "ninemorris3d_info.txt"
+#endif
 
 #define LOG_PATTERN_DEBUG "%^[%l] [th %t] [%H:%M:%S]%$ %v"
 #define LOG_PATTERN_RELEASE "%^[%l] [th %t] [%!:%#] [%c]%$ %v"
