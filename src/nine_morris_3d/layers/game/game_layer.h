@@ -58,10 +58,14 @@ public:
     void setup_camera();
 
     void set_scene_framebuffer(int samples);
-    void set_textures_quality(std::string_view quality);
+    void set_texture_quality(std::string_view quality);
     void set_skybox(std::string_view skybox);
-    void load_game();
 
+    void actually_change_texture_quality();
+    void actually_change_skybox();
+
+    void load_game();
+    
     Board board;
     std::shared_ptr<std::vector<Board>> board_state_history;
 
@@ -77,6 +81,7 @@ public:
 
     std::unique_ptr<Loader<AssetsData>> loader;
     bool changed_skybox = false;
+    bool changed_texture_quality = false;
 
     ImGuiLayer* imgui_layer = nullptr;
     GuiLayer* gui_layer = nullptr;

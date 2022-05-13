@@ -185,12 +185,12 @@ void ImGuiLayer::on_update(float dt) {
                 if (ImGui::BeginMenu("Texture Quality")) {
                     static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
                     if (ImGui::RadioButton("Normal", &quality, 0)) {
-                        game_layer->set_textures_quality(options::NORMAL);
+                        game_layer->set_texture_quality(options::NORMAL);
 
                         DEB_INFO("Textures set to {} quality", options::NORMAL);
                     }
                     if (ImGui::RadioButton("Low", &quality, 1)) {
-                        game_layer->set_textures_quality(options::LOW);
+                        game_layer->set_texture_quality(options::LOW);
 
                         DEB_INFO("Textures set to {} quality", options::LOW);
                     }

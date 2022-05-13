@@ -40,4 +40,10 @@ namespace assets_data {
 
     void autumn_skybox(Loader<AssetsData>* loader);
     void autumn_low_tex_skybox(Loader<AssetsData>* loader);
+
+    void field_texture(Loader<AssetsData>* loader);
+    void field_low_tex_texture(Loader<AssetsData>* loader);
+
+    void autumn_texture(Loader<AssetsData>* loader);
+    void autumn_low_tex_texture(Loader<AssetsData>* loader);
 }
