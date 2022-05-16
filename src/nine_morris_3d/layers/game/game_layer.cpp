@@ -95,7 +95,7 @@ void GameLayer::on_detach() {
         }
     }
 
-    if (app->options.save_on_exit && !app->running) {
+    if (app->options.save_on_exit && !app->running && first_move) {
         board.finalize_pieces_state();
 
         save_load::GameState state;
@@ -226,14 +226,14 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
         if (board.next_move) {
             if (board.phase == Board::Phase::PlacePieces) {
                 if (board.should_take_piece) {
-                    bool took = board.take_piece(app->renderer->get_hovered_id());
+                    const bool took = board.take_piece(app->renderer->get_hovered_id());
 
                     if (took && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
                         first_move = true;
                     }
                 } else {
-                    bool placed = board.place_piece(app->renderer->get_hovered_id());
+                    const bool placed = board.place_piece(app->renderer->get_hovered_id());
 
                     if (placed && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
@@ -242,7 +242,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                 }
             } else if (board.phase == Board::Phase::MovePieces) {
                 if (board.should_take_piece) {
-                    bool took = board.take_piece(app->renderer->get_hovered_id());
+                    const bool took = board.take_piece(app->renderer->get_hovered_id());
 
                     if (took && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
@@ -250,7 +250,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                     }
                 } else {
                     board.select_piece(app->renderer->get_hovered_id());
-                    bool put = board.put_piece(app->renderer->get_hovered_id());
+                    const bool put = board.put_piece(app->renderer->get_hovered_id());
 
                     if (put && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
@@ -937,6 +937,7 @@ void GameLayer::load_game() {
     board.state_history = state.board.state_history;
     board.next_move = state.board.next_move;
 
+    // Reset pieces' models
     for (Piece& piece : board.pieces) {
         app->renderer->remove_model(piece.model.handle);
 

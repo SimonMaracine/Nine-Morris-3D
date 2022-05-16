@@ -483,6 +483,7 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Hovered piece: %p", game_layer->board.hovered_piece);
         ImGui::Text("Selected piece: %p", game_layer->board.selected_piece);
         ImGui::Text("Next move: %s", game_layer->board.next_move ? "true" : "false");
+        ImGui::Text("Game started: %s", game_layer->first_move ? "true" : "false");
         ImGui::End();
 
         ImGui::Begin("Debug Settings");

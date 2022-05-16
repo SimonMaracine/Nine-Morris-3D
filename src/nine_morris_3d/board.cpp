@@ -458,6 +458,7 @@ void Board::undo() {
     state_history = state.state_history;
     next_move = state.next_move;
 
+    // Reset pieces' models
     for (Piece& piece : pieces) {
         app->renderer->remove_model(piece.model.handle);
 
