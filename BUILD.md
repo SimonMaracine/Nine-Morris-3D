@@ -20,7 +20,6 @@
 
 ## Linux debug
 
-    mkdir build  
     cd scripts  
     setup.sh  
     build.sh  
@@ -29,7 +28,6 @@
 ## Windows debug
 
 #### Visual Studio Code
-    mkdir build  
     cd scripts  
     Setup.bat  
     Build.bat  
