@@ -937,6 +937,14 @@ void GameLayer::load_game() {
     board.state_history = state.board.state_history;
     board.next_move = state.board.next_move;
 
+    for (Piece& piece : board.pieces) {
+        app->renderer->remove_model(piece.model.handle);
+
+        if (piece.active) {
+            app->renderer->add_model(piece.model, Renderer::CastShadow | Renderer::HasShadow);
+        }
+    }
+
     gui_layer->timer.stop();
     gui_layer->timer.set_time(state.time);
     first_move = false;

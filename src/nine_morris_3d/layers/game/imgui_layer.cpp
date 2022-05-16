@@ -134,7 +134,7 @@ void ImGuiLayer::on_update(float dt) {
                     REL_ERROR("Could not save game");
                 }
 
-                last_save_date = state.date;
+                last_save_date = std::move(state.date);
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 game_layer->board.undo();
