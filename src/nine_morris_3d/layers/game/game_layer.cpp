@@ -69,7 +69,9 @@ void GameLayer::on_attach() {
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
+#ifdef NINE_MORRIS_3D_DEBUG
     app->renderer->origin = true;
+#endif
 
     app->camera.go_towards_position(default_camera_position);
 
@@ -118,7 +120,10 @@ void GameLayer::on_detach() {
         }
     }
 
+#ifdef NINE_MORRIS_3D_DEBUG
     app->renderer->origin = false;
+#endif
+
     app->renderer->clear_models();
 
     gui_layer->timer = Timer();
