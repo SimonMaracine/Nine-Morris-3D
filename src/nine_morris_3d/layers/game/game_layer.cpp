@@ -42,14 +42,14 @@
 #include "other/logging.h"
 #include "other/assert.h"
 
-const DirectionalLight LIGHT_FIELD = {
+constexpr DirectionalLight LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
     glm::vec3(0.3f),
     glm::vec3(1.0f),
     glm::vec3(0.9f)
 };
 
-const DirectionalLight LIGHT_AUTUMN = {
+constexpr DirectionalLight LIGHT_AUTUMN = {
     glm::vec3(-4.4f, 11.0f, 6.4f),
     glm::vec3(0.15f),
     glm::vec3(0.9f),
@@ -295,14 +295,14 @@ std::shared_ptr<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size,
 }
 
 void GameLayer::prepare_board() {
-    const std::vector<std::string> uniforms = {
+    std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_shadow_map",
         "u_material.diffuse",
         "u_material.specular",
         "u_material.shininess"
     };
-    const std::vector<UniformBlockSpecification> uniform_blocks = {
+    std::vector<UniformBlockSpecification> uniform_blocks = {
         app->renderer->get_projection_view_uniform_block(),
         app->renderer->get_light_uniform_block(),
         app->renderer->get_light_space_uniform_block()
@@ -350,14 +350,14 @@ void GameLayer::prepare_board() {
 }
 
 void GameLayer::prepare_board_paint() {
-    const std::vector<std::string> uniforms = {
+    std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_shadow_map",
         "u_material.diffuse",
         "u_material.specular",
         "u_material.shininess"
     };
-    const std::vector<UniformBlockSpecification> uniform_blocks = {
+    std::vector<UniformBlockSpecification> uniform_blocks = {
         app->renderer->get_projection_view_uniform_block(),
         app->renderer->get_light_uniform_block(),
         app->renderer->get_light_space_uniform_block()
@@ -405,7 +405,7 @@ void GameLayer::prepare_board_paint() {
 }
 
 void GameLayer::prepare_pieces() {
-    const std::vector<std::string> uniforms = {
+    std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_shadow_map",
         "u_material.diffuse",
@@ -413,7 +413,7 @@ void GameLayer::prepare_pieces() {
         "u_material.shininess",
         "u_material.tint"
     };
-    const std::vector<UniformBlockSpecification> uniform_blocks = {
+    std::vector<UniformBlockSpecification> uniform_blocks = {
         app->renderer->get_projection_view_uniform_block(),
         app->renderer->get_light_uniform_block(),
         app->renderer->get_light_space_uniform_block()
@@ -494,7 +494,7 @@ void GameLayer::prepare_piece(unsigned int index, Piece::Type type, std::shared_
 }
 
 void GameLayer::prepare_nodes() {
-    const std::vector<std::string> uniforms = {
+    std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_color"
     };
@@ -809,7 +809,7 @@ void GameLayer::actually_change_texture_quality() {
         );
     }
 
-    const std::array<std::shared_ptr<TextureData>, 6> data = {
+    std::array<std::shared_ptr<TextureData>, 6> data = {
         app->assets_data->skybox_px_texture,
         app->assets_data->skybox_nx_texture,
         app->assets_data->skybox_py_texture,
@@ -821,7 +821,7 @@ void GameLayer::actually_change_texture_quality() {
 }
 
 void GameLayer::actually_change_skybox() {
-    const std::array<std::shared_ptr<TextureData>, 6> data = {
+    std::array<std::shared_ptr<TextureData>, 6> data = {
         app->assets_data->skybox_px_texture,
         app->assets_data->skybox_nx_texture,
         app->assets_data->skybox_py_texture,

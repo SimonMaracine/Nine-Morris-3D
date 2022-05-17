@@ -86,7 +86,7 @@ Renderer::Renderer(Application* app)
     storage.light_space_uniform_block.binding_index = 2;
 
     {
-        const std::vector<std::string> uniforms = {
+        std::vector<std::string> uniforms = {
             "u_projection_view_matrix",
             "u_skybox"
         };
@@ -98,7 +98,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        const std::vector<std::string> uniforms = {
+        std::vector<std::string> uniforms = {
             "u_screen_texture"
         };
         storage.screen_quad_shader = Shader::create(
@@ -109,7 +109,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        const std::vector<std::string> uniforms = {
+        std::vector<std::string> uniforms = {
             "u_model_matrix",
             "u_view_matrix",
             "u_projection_matrix",
@@ -123,7 +123,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        const std::vector<std::string> uniforms = {
+        std::vector<std::string> uniforms = {
             "u_model_matrix"
         };
         storage.shadow_shader = Shader::create(
@@ -135,7 +135,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        const std::vector<std::string> uniforms = {
+        std::vector<std::string> uniforms = {
             "u_model_matrix",
             "u_color"
         };
@@ -149,7 +149,7 @@ Renderer::Renderer(Application* app)
 
 #ifdef NINE_MORRIS_3D_DEBUG
     {
-        const std::vector<std::string> uniforms = {
+        std::vector<std::string> uniforms = {
             "u_projection_view_matrix"
         };
         storage.origin_shader = Shader::create(
