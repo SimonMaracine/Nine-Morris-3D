@@ -6,6 +6,7 @@
 #include "application/input.h"
 #include "graphics/renderer/camera.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 constexpr float ZOOM_BASE_VELOCITY = 0.03f;
 constexpr float ZOOM_VARIABLE_VELOCITY = 5.0f;
@@ -40,17 +41,17 @@ Camera::Camera(float sensitivity, float pitch, const glm::vec3& point, float dis
 }
 
 void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
-    constexpr float MOVE_SPEED = 50.0f;
-    constexpr float MOVE_SPEED_MOUSE = MOVE_SPEED * 0.3f;
-    constexpr float ZOOM_SPEED = 9.0f;
-    constexpr float ZOOM_SPEED_WHEEL = ZOOM_SPEED * 1.25f;
+    constexpr float MOVE_SPEED = 3200.0f;
+    constexpr float MOVE_SPEED_MOUSE = MOVE_SPEED * 0.0039f;
+    constexpr float ZOOM_SPEED = 576.0f;
+    constexpr float ZOOM_SPEED_WHEEL = ZOOM_SPEED * 0.01953f;
 
     zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_wheel;
 
     if (input::is_key_pressed(KEY_R)) {
-        zoom_velocity -= ZOOM_SPEED;
+        zoom_velocity -= ZOOM_SPEED * dt;
     } else if (input::is_key_pressed(KEY_F)) {
-        zoom_velocity += ZOOM_SPEED;
+        zoom_velocity += ZOOM_SPEED * dt;
     }
 
     distance_to_point += zoom_velocity * sensitivity * dt;
@@ -68,15 +69,15 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
     }
 
     if (input::is_key_pressed(KEY_W)) {
-        y_velocity += MOVE_SPEED;
+        y_velocity += MOVE_SPEED * dt;
     } else if (input::is_key_pressed(KEY_S)) {
-        y_velocity -= MOVE_SPEED;
+        y_velocity -= MOVE_SPEED * dt;
     }
 
     if (input::is_key_pressed(KEY_A)) {
-        x_velocity -= MOVE_SPEED;
+        x_velocity -= MOVE_SPEED * dt;
     } else if (input::is_key_pressed(KEY_D)) {
-        x_velocity += MOVE_SPEED;
+        x_velocity += MOVE_SPEED * dt;
     }
 
     pitch += y_velocity * sensitivity * dt;
@@ -164,11 +165,15 @@ void Camera::go_towards_position(const glm::vec3& position) {
 void Camera::go_towards_position_x(const glm::vec3& position, const glm::vec3& direction) {
     float integer_angle;
     const float fract = glm::modf(180.0f - glm::degrees(glm::atan(-direction.x, direction.z)), integer_angle);
+
     target_angle_around_point = static_cast<float>(static_cast<int>(integer_angle) % 360) - fract;
+
     if (target_angle_around_point < 0.0f) {
         target_angle_around_point += 360.0f;
     }
+
     const float angle = calculate_angle_velocity(target_angle_around_point, angle_around_point);
+
     auto_x_velocity = angle * X_BASE_VELOCITY;
     auto_move_x = true;
     virtual_angle_around_point = angle_around_point;
@@ -177,6 +182,7 @@ void Camera::go_towards_position_x(const glm::vec3& position, const glm::vec3& d
 
 void Camera::go_towards_position_y(const glm::vec3& position, const glm::vec3& direction) {
     target_pitch = glm::degrees(glm::asin(direction.y));
+
     auto_y_velocity = (target_pitch - pitch) * Y_BASE_VELOCITY;
     auto_move_y = true;
     virtual_pitch = pitch;
@@ -185,6 +191,7 @@ void Camera::go_towards_position_y(const glm::vec3& position, const glm::vec3& d
 
 void Camera::go_towards_position_zoom(const glm::vec3& position) {
     target_distance_to_point = glm::length(position - point);
+
     auto_zoom_velocity = (target_distance_to_point - distance_to_point) * ZOOM_BASE_VELOCITY;
     auto_move_zoom = true;
     virtual_distance_to_point = distance_to_point;
@@ -196,13 +203,16 @@ void Camera::calculate_auto_angle_around_point(float dt) {
         auto_move_x = false;
         dont_auto_call_go_towards_position = true;
     }
+
     if (auto_move_x) {
         const float angle = calculate_angle_velocity(target_angle_around_point, virtual_angle_around_point);
         const float delta = auto_x_velocity * dt + angle * X_VARIABLE_VELOCITY * dt;
         angle_around_point += delta;
         virtual_angle_around_point += delta;
     }
+
     const float angle = calculate_angle_velocity(target_angle_around_point, virtual_angle_around_point);
+
     if (auto_move_x && glm::abs(angle) < 0.02f) {
         angle_around_point = target_angle_around_point;
         auto_move_x = false;
@@ -218,11 +228,13 @@ void Camera::calculate_auto_pitch(float dt) {
         auto_move_y = false;
         dont_auto_call_go_towards_position = true;
     }
+
     if (auto_move_y) {
         const float delta = auto_y_velocity * dt + (target_pitch - virtual_pitch) * Y_VARIABLE_VELOCITY * dt;
         pitch += delta;
         virtual_pitch += delta;
     }
+
     if (auto_move_y && glm::abs(target_pitch - virtual_pitch) < 0.02f) {
         pitch = target_pitch;
         auto_move_y = false;
@@ -238,12 +250,14 @@ void Camera::calculate_auto_distance_to_point(float dt) {
         auto_move_zoom = false;
         dont_auto_call_go_towards_position = true;
     }
+
     if (auto_move_zoom) {
         const float delta = auto_zoom_velocity * dt + (target_distance_to_point - virtual_distance_to_point)
                 * ZOOM_VARIABLE_VELOCITY * dt;
         distance_to_point += delta;
         virtual_distance_to_point += delta;
     }
+
     if (auto_move_zoom && glm::abs(target_distance_to_point - virtual_distance_to_point) < 0.02f) {
         distance_to_point = target_distance_to_point;
         auto_move_zoom = false;
