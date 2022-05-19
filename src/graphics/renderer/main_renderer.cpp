@@ -244,7 +244,7 @@ Renderer::Renderer(Application* app)
 
     // Setup uniform variables
     storage.screen_quad_shader->bind();
-    storage.screen_quad_shader->set_uniform_int("u_screen_texture", 0);
+    storage.screen_quad_shader->upload_uniform_int("u_screen_texture", 0);
 
     DEB_INFO("Initialized renderer");
 }
@@ -285,7 +285,7 @@ void Renderer::render() {
         matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
 
         storage.shadow_shader->bind();
-        storage.shadow_shader->set_uniform_mat4("u_model_matrix", matrix);
+        storage.shadow_shader->upload_uniform_mat4("u_model_matrix", matrix);
 
         model->vertex_array->bind();
 
@@ -321,7 +321,7 @@ void Renderer::render() {
         model->vertex_array->bind();
         model->material->bind();
 
-        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
+        model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
 
         if (model->material->is_hoverable()) {
             glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -345,7 +345,7 @@ void Renderer::render() {
         model->vertex_array->bind();
         model->material->bind();
 
-        model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
+        model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
 
         if (model->material->is_hoverable()) {
             glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -373,7 +373,7 @@ void Renderer::render() {
             model->vertex_array->bind();
             model->material->bind();
 
-            model->material->get_shader()->set_uniform_mat4("u_model_matrix", matrix);
+            model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
 
             if (model->material->is_hoverable()) {
                 glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -400,8 +400,8 @@ void Renderer::render() {
                     model->scale + SIZE));
 
             storage.outline_shader->bind();
-            storage.outline_shader->set_uniform_mat4("u_model_matrix", matrix);
-            storage.outline_shader->set_uniform_vec3("u_color", model->outline_color);
+            storage.outline_shader->upload_uniform_mat4("u_model_matrix", matrix);
+            storage.outline_shader->upload_uniform_vec3("u_color", model->outline_color);
 
             // Render without output to red
             glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -569,7 +569,7 @@ void Renderer::draw_screen_quad(GLuint texture) {
 #ifdef NINE_MORRIS_3D_DEBUG
 void Renderer::draw_origin() {
     storage.origin_shader->bind();
-    storage.origin_shader->set_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+    storage.origin_shader->upload_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
 
     storage.origin_vertex_array->bind();
 
@@ -584,7 +584,7 @@ void Renderer::draw_skybox() {
     const glm::mat4 view = glm::mat4(glm::mat3(app->camera.get_view_matrix()));
 
     storage.skybox_shader->bind();
-    storage.skybox_shader->set_uniform_mat4("u_projection_view_matrix", projection * view);
+    storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix", projection * view);
 
     storage.skybox_vertex_array->bind();
     storage.skybox_texture->bind(0);
@@ -607,7 +607,7 @@ void Renderer::setup_shadows() {
     for (const auto& [id, model] : models_has_shadow) {
         IGNORE(id);
         model->material->get_shader()->bind();
-        model->material->get_shader()->set_uniform_int("u_shadow_map", 2);
+        model->material->get_shader()->upload_uniform_int("u_shadow_map", 2);
     }
 }
 

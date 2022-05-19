@@ -177,33 +177,33 @@ void Shader::unbind() {
     glUseProgram(0);
 }
 
-void Shader::set_uniform_mat4(std::string_view name, const glm::mat4& matrix) {
-    GLint location = get_uniform_location(name);
+void Shader::upload_uniform_mat4(std::string_view name, const glm::mat4& matrix) {
+    const GLint location = get_uniform_location(name);
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::set_uniform_int(std::string_view name, int value) {
-    GLint location = get_uniform_location(name);
+void Shader::upload_uniform_int(std::string_view name, int value) {
+    const GLint location = get_uniform_location(name);
     glUniform1i(location, value);
 }
 
-void Shader::set_uniform_float(std::string_view name, float value) {
-    GLint location = get_uniform_location(name);
+void Shader::upload_uniform_float(std::string_view name, float value) {
+    const GLint location = get_uniform_location(name);
     glUniform1f(location, value);
 }
 
-void Shader::set_uniform_vec2(std::string_view name, glm::vec2 vector) {
-    GLint location = get_uniform_location(name);
+void Shader::upload_uniform_vec2(std::string_view name, glm::vec2 vector) {
+    const GLint location = get_uniform_location(name);
     glUniform2f(location, vector.x, vector.y);
 }
 
-void Shader::set_uniform_vec3(std::string_view name, const glm::vec3& vector) {
-    GLint location = get_uniform_location(name);
+void Shader::upload_uniform_vec3(std::string_view name, const glm::vec3& vector) {
+    const GLint location = get_uniform_location(name);
     glUniform3f(location, vector.x, vector.y, vector.z);
 }
 
-void Shader::set_uniform_vec4(std::string_view name, const glm::vec4& vector) {
-    GLint location = get_uniform_location(name);
+void Shader::upload_uniform_vec4(std::string_view name, const glm::vec4& vector) {
+    const GLint location = get_uniform_location(name);
     glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
 }
 

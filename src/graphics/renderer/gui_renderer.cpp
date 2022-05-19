@@ -347,7 +347,7 @@ namespace gui {
         matrix = glm::scale(matrix, glm::vec3(size, 1.0f));
 
         app->gui_renderer->storage.quad2d_shader->bind();
-        app->gui_renderer->storage.quad2d_shader->set_uniform_mat4("u_model_matrix", matrix);
+        app->gui_renderer->storage.quad2d_shader->upload_uniform_mat4("u_model_matrix", matrix);
 
         texture->bind(0);
         app->gui_renderer->storage.quad2d_vertex_array->bind();
@@ -380,14 +380,14 @@ namespace gui {
         delete[] buffer;
 
         app->gui_renderer->storage.text_shader->bind();
-        app->gui_renderer->storage.text_shader->set_uniform_mat4("u_model_matrix", matrix);
-        app->gui_renderer->storage.text_shader->set_uniform_vec3("u_color", color);
+        app->gui_renderer->storage.text_shader->upload_uniform_mat4("u_model_matrix", matrix);
+        app->gui_renderer->storage.text_shader->upload_uniform_vec3("u_color", color);
         if (!with_shadows) {
-            app->gui_renderer->storage.text_shader->set_uniform_float("u_border_width", 0.0f);
-            app->gui_renderer->storage.text_shader->set_uniform_vec2("u_offset", glm::vec2(0.0f, 0.0f));
+            app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width", 0.0f);
+            app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset", glm::vec2(0.0f, 0.0f));
         } else {
-            app->gui_renderer->storage.text_shader->set_uniform_float("u_border_width", 0.3f);
-            app->gui_renderer->storage.text_shader->set_uniform_vec2("u_offset", glm::vec2(-0.003f, -0.003f));
+            app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width", 0.3f);
+            app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset", glm::vec2(-0.003f, -0.003f));
         }
 
         font->get_vertex_array()->bind();
@@ -496,11 +496,11 @@ GuiRenderer::GuiRenderer(Application* app)
 
     // Setup uniform variables
     storage.quad2d_shader->bind();
-    storage.quad2d_shader->set_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
-    storage.quad2d_shader->set_uniform_int("u_texture", 0);
+    storage.quad2d_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
+    storage.quad2d_shader->upload_uniform_int("u_texture", 0);
 
     storage.text_shader->bind();
-    storage.text_shader->set_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
+    storage.text_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
 
     // Set renderer pointer to widgets
     gui::Widget::app = app;
@@ -530,7 +530,7 @@ void GuiRenderer::im_draw_quad(const glm::vec2& position, const glm::vec2& scale
     matrix = glm::scale(matrix, glm::vec3(scale.x, scale.y, 1.0f));
 
     storage.quad2d_shader->bind();
-    storage.quad2d_shader->set_uniform_mat4("u_model_matrix", matrix);
+    storage.quad2d_shader->upload_uniform_mat4("u_model_matrix", matrix);
 
     texture->bind(0);
     storage.quad2d_vertex_array->bind();
@@ -547,10 +547,10 @@ void GuiRenderer::on_window_resized(events::WindowResizedEvent& event) {
     );
 
     storage.quad2d_shader->bind();  // TODO optimize maybe
-    storage.quad2d_shader->set_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
+    storage.quad2d_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
 
     storage.text_shader->bind();
-    storage.text_shader->set_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
+    storage.text_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
 
     main_frame->on_window_resized(event);
 }

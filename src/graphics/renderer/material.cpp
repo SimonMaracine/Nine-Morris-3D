@@ -79,33 +79,33 @@ void MaterialInstance::bind() {
     material->shader->bind();
 
     for (const auto& [name, matrix] : material->uniforms_mat4) {
-        material->shader->set_uniform_mat4(name, matrix);
+        material->shader->upload_uniform_mat4(name, matrix);
     }
 
     for (const auto& [name, value] : material->uniforms_int) {
-        material->shader->set_uniform_int(name, value);
+        material->shader->upload_uniform_int(name, value);
     }
 
     for (const auto& [name, value] : material->uniforms_float) {
-        material->shader->set_uniform_float(name, value);
+        material->shader->upload_uniform_float(name, value);
     }
 
     for (const auto& [name, vector] : material->uniforms_vec2) {
-        material->shader->set_uniform_vec2(name, vector);
+        material->shader->upload_uniform_vec2(name, vector);
     }
 
     for (const auto& [name, vector] : material->uniforms_vec3) {
-        material->shader->set_uniform_vec3(name, vector);
+        material->shader->upload_uniform_vec3(name, vector);
     }
 
     for (const auto& [name, vector] : material->uniforms_vec4) {
-        material->shader->set_uniform_vec4(name, vector);
+        material->shader->upload_uniform_vec4(name, vector);
     }
 
     // Bind any textures
     for (auto& [name, pair] : material->textures) {
         auto& [unit, texture] = pair;
-        material->shader->set_uniform_int(name, unit);
+        material->shader->upload_uniform_int(name, unit);
         texture->bind(unit);
     }
 }
