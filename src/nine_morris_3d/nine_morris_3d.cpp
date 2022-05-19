@@ -79,6 +79,9 @@ NineMorris3D::NineMorris3D()
         renderer->set_scene_framebuffer(Framebuffer::create(specification));
     }
 
+    // Setup depth map framebuffer
+    renderer->set_depth_map_framebuffer(options.texture_quality == options::NORMAL ? 4096 : 2048);
+
     // Initialize and setup ImGui
     ImGui::CreateContext();
     ImGui_ImplOpenGL3_Init("#version 430 core");

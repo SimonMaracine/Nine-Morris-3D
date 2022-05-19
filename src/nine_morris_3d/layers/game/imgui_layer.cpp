@@ -186,11 +186,13 @@ void ImGuiLayer::on_update(float dt) {
                     static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
                     if (ImGui::RadioButton("Normal", &quality, 0)) {
                         game_layer->set_texture_quality(options::NORMAL);
+                        app->renderer->set_depth_map_framebuffer(4096);
 
                         DEB_INFO("Textures set to {} quality", options::NORMAL);
                     }
                     if (ImGui::RadioButton("Low", &quality, 1)) {
                         game_layer->set_texture_quality(options::LOW);
+                        app->renderer->set_depth_map_framebuffer(2048);
 
                         DEB_INFO("Textures set to {} quality", options::LOW);
                     }

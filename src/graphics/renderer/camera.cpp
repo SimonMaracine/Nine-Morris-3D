@@ -6,7 +6,6 @@
 #include "application/input.h"
 #include "graphics/renderer/camera.h"
 #include "other/logging.h"
-#include "other/assert.h"
 
 constexpr float ZOOM_BASE_VELOCITY = 0.03f;
 constexpr float ZOOM_VARIABLE_VELOCITY = 5.0f;

@@ -18,6 +18,7 @@
 #include "graphics/renderer/opengl/texture.h"
 #include "graphics/renderer/opengl/framebuffer.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 #define IGNORE(variable) ((void) variable)
 
@@ -217,20 +218,6 @@ Renderer::Renderer(Application* app)
 
     {
         FramebufferSpecification specification;
-        specification.width = 2048;
-        specification.height = 2048;
-        specification.depth_attachment = Attachment(AttachmentFormat::DEPTH32, AttachmentType::Texture);
-        specification.white_border_for_depth_texture = true;
-        specification.resizable = false;
-
-        storage.depth_map_framebuffer = Framebuffer::create(specification);
-
-        app->purge_framebuffers();
-        app->add_framebuffer(storage.depth_map_framebuffer);
-    }
-
-    {
-        FramebufferSpecification specification;
         specification.width = app->app_data.width;
         specification.height = app->app_data.height;
         specification.color_attachments = {
@@ -285,7 +272,7 @@ void Renderer::render() {
     storage.depth_map_framebuffer->bind();
 
     clear(Depth);
-    set_viewport(2048, 2048);
+    set_viewport(shadow_map_size, shadow_map_size);
 
     // Render objects with shadows to depth buffer
     for (const auto [id, model] : models_cast_shadow) {
@@ -543,6 +530,24 @@ void Renderer::set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
 
 void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
     storage.skybox_texture = texture;
+}
+
+void Renderer::set_depth_map_framebuffer(int size) {
+    ASSERT(size > 0, "Shadow map size must be greater than 0");
+
+    shadow_map_size = size;
+
+    FramebufferSpecification specification;
+    specification.width = shadow_map_size;
+    specification.height = shadow_map_size;
+    specification.depth_attachment = Attachment(AttachmentFormat::DEPTH32, AttachmentType::Texture);
+    specification.white_border_for_depth_texture = true;
+    specification.resizable = false;
+
+    storage.depth_map_framebuffer = Framebuffer::create(specification);
+
+    app->purge_framebuffers();
+    app->add_framebuffer(storage.depth_map_framebuffer);
 }
 
 void Renderer::clear(int buffers) {

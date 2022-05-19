@@ -72,6 +72,7 @@ public:
     void set_clear_color(float red, float green, float blue);
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void set_skybox(std::shared_ptr<Texture3D> texture);
+    void set_depth_map_framebuffer(int size);
 
     hoverable::Id get_hovered_id() { return hovered_id; }
     UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
@@ -143,6 +144,8 @@ private:
 
     hoverable::Id hovered_id = hoverable::null;
     FramebufferReader<4> reader;
+
+    int shadow_map_size = 4096;
 
     const char* SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert";
     const char* SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag";

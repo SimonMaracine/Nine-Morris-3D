@@ -2,6 +2,7 @@
 #include <memory>
 #include <algorithm>
 #include <string_view>
+#include <vector>
 
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -144,9 +145,20 @@ void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
 }
 
 void Application::purge_framebuffers() {
-    for (auto iter = framebuffers.rbegin(); iter != framebuffers.rend(); iter++) {
-        if (iter->expired()) {
-            iter = decltype(iter)(framebuffers.erase(std::next(iter).base()));
+    std::vector<size_t> indices;
+
+    for (size_t i = 0; i < framebuffers.size(); i++) {
+        if (framebuffers[i].expired()) {
+            indices.push_back(i);
+        }
+    }
+
+    for (long i = framebuffers.size() - 1; i >= 0; i--) {
+        for (size_t index : indices) {
+            if (static_cast<long>(index) == i) {
+                framebuffers.erase(std::next(framebuffers.begin(), index));
+                break;
+            }
         }
     }
 }
@@ -251,12 +263,12 @@ void Application::check_changed_scene() {
         active_overlay_stack.clear();
 
         const size_t overlay_stack_size = _overlay_stack.size();
-        for (unsigned int i = 0; i < overlay_stack_size; i++) {
+        for (size_t i = 0; i < overlay_stack_size; i++) {
             pop_overlay();
         }
 
         const size_t layer_stack_size = _layer_stack.size();
-        for (unsigned int i = 0; i < layer_stack_size; i++) {
+        for (size_t i = 0; i < layer_stack_size; i++) {
             pop_layer();
         }
 
