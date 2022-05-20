@@ -29,7 +29,7 @@ public:
     void update_data(const float* data, size_t size);
 
     std::unordered_map<int, Glyph>& get_glyphs() { return glyphs; }
-    unsigned int get_bitmap_size() { return bitmap_size; }
+    unsigned int get_bitmap_size() { return static_cast<unsigned int>(bitmap_size); }
 
     VertexArray* get_vertex_array() { return vertex_array.get(); }
     GLuint get_texture() { return texture; }

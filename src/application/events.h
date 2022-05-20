@@ -15,6 +15,9 @@ namespace events {
      */
     class Event {
     public:
+        Event() = default;
+        virtual ~Event() = default;
+
         virtual EventType get_type() = 0;
         virtual const char* to_string() = 0;
 
@@ -42,6 +45,7 @@ namespace events {
     class WindowClosedEvent : public Event {
     public:
         WindowClosedEvent() = default;
+        virtual ~WindowClosedEvent() = default;
 
         virtual EventType get_type() override {
             return WindowClosed;
@@ -56,6 +60,7 @@ namespace events {
     public:
         WindowResizedEvent(int width, int height)
             : width(width), height(height) {}
+        virtual ~WindowResizedEvent() = default;
 
         virtual EventType get_type() override {
             return WindowResized;
@@ -72,6 +77,7 @@ namespace events {
     public:
         KeyPressedEvent(int key)
             : key(key) {}
+        virtual ~KeyPressedEvent() = default;
 
         virtual EventType get_type() override {
             return KeyPressed;
@@ -88,6 +94,7 @@ namespace events {
     public:
         KeyReleasedEvent(int key)
             : key(key) {}
+        virtual ~KeyReleasedEvent() = default;
 
         virtual EventType get_type() override {
             return KeyReleased;
@@ -104,6 +111,7 @@ namespace events {
     public:
         MouseButtonPressedEvent(int button)
             : button(button) {}
+        virtual ~MouseButtonPressedEvent() = default;
 
         virtual EventType get_type() override {
             return MouseButtonPressed;
@@ -120,6 +128,7 @@ namespace events {
     public:
         MouseButtonReleasedEvent(int button)
             : button(button) {}
+        virtual ~MouseButtonReleasedEvent() = default;
 
         virtual EventType get_type() override {
             return MouseButtonReleased;
@@ -136,6 +145,7 @@ namespace events {
     public:
         MouseScrolledEvent(float scroll)
             : scroll(scroll) {}
+        virtual ~MouseScrolledEvent() = default;
 
         virtual EventType get_type() override {
             return MouseScrolled;
@@ -152,6 +162,7 @@ namespace events {
     public:
         MouseMovedEvent(float mouse_x, float mouse_y)
             : mouse_x(mouse_x), mouse_y(mouse_y) {}
+        virtual ~MouseMovedEvent() = default;
 
         virtual EventType get_type() override {
             return MouseMoved;
