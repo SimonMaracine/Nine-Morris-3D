@@ -44,16 +44,16 @@
 
 constexpr DirectionalLight LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
-    glm::vec3(0.3f),
-    glm::vec3(1.0f),
+    glm::vec3(0.4f),
+    glm::vec3(0.88f),
     glm::vec3(0.9f)
 };
 
 constexpr DirectionalLight LIGHT_AUTUMN = {
     glm::vec3(-4.4f, 11.0f, 6.4f),
-    glm::vec3(0.15f),
-    glm::vec3(0.9f),
-    glm::vec3(0.85f)
+    glm::vec3(0.32f),
+    glm::vec3(0.82f),
+    glm::vec3(0.82f)
 };
 
 void GameLayer::on_attach() {

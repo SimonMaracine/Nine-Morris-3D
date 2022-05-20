@@ -20,7 +20,7 @@ Window::Window(ApplicationData* data) {
 
 #ifdef NINE_MORRIS_3D_DEBUG
     glfwSetErrorCallback([](int error, const char* description) {
-        DEB_CRITICAL("[ID: {}] {}", error, description);
+        DEB_CRITICAL("[GLFW Error Callback: {}] {}", error, description);
     });
 #endif
 
