@@ -18,7 +18,6 @@
 #include "application/platform.h"
 #include "graphics/debug_opengl.h"
 #include "graphics/renderer/buffer_layout.h"
-#include "graphics/renderer/framebuffer_reader.h"
 #include "graphics/renderer/light.h"
 #include "graphics/renderer/camera.h"
 #include "graphics/renderer/opengl/vertex_array.h"

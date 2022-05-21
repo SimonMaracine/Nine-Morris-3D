@@ -127,7 +127,7 @@ std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
 
             glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
             glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
-            LOG_ALLOCATION(block_size);
+            LOG_ALLOCATION(block_size)
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
             ASSERT(block.field_count <= 16, "Maximum 16 fields for now");

@@ -32,7 +32,7 @@ static void attach_color_texture(GLuint texture, int samples, GLenum internal_fo
 
         glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format,
                 GL_UNSIGNED_BYTE, nullptr);
-        LOG_ALLOCATION(width * height * 4);
+        LOG_ALLOCATION(width * height * 4)
     }
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
@@ -59,7 +59,7 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
 
         glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format,
                 GL_UNSIGNED_BYTE, nullptr);
-        LOG_ALLOCATION(width * height * 4);
+        LOG_ALLOCATION(width * height * 4)
     }
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, target(multisampled),
@@ -74,7 +74,7 @@ static void attach_color_renderbuffer(GLuint renderbuffer, int samples, GLenum i
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
     } else {
         glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
-        LOG_ALLOCATION(width * height * 4);
+        LOG_ALLOCATION(width * height * 4)
     }
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER,
@@ -89,7 +89,7 @@ static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum i
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
     } else {
         glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
-        LOG_ALLOCATION(width * height * 4);
+        LOG_ALLOCATION(width * height * 4)
     }
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderbuffer);

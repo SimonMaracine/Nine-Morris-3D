@@ -174,7 +174,7 @@ void Font::end_baking() {
 
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, bitmap_size, bitmap_size);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bitmap_size, bitmap_size, GL_RED, GL_UNSIGNED_BYTE, bake_context.bitmap);
-    LOG_ALLOCATION(bitmap_size * bitmap_size * 4);
+    LOG_ALLOCATION(bitmap_size * bitmap_size * 4)
 
     glBindTexture(GL_TEXTURE_2D, 0);
 

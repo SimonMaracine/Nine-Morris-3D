@@ -14,6 +14,7 @@
 #include "application/events.h"
 #include "application/scene.h"
 #include "application/input.h"
+#include "application/extensions.h"
 #include "graphics/renderer/main_renderer.h"
 #include "graphics/renderer/gui_renderer.h"
 #include "graphics/debug_opengl.h"
@@ -36,10 +37,12 @@ Application::Application(int width, int height, std::string_view title) {
     debug_opengl::maybe_initialize_debugging();
 
     auto [version_major, version_minor] = debug_opengl::get_version_numbers();
-    if (!(version_major == 4 && version_minor >= 3)) {
-        REL_CRITICAL("Graphics card must support at minimum OpenGL 4.3 (it has {}.{})",
-                version_major, version_minor);
-        exit(1);
+    DEB_INFO("Using OpenGL version {}.{}", version_major, version_minor);
+
+    if (extensions::extension_supported(extensions::AnisotropicFiltering)) {
+        DEB_INFO("Anisotropic filtering is supported");
+    } else {
+        DEB_INFO("Anisotropic filtering is NOT supported");
     }
 
     renderer = std::make_unique<Renderer>(this);

@@ -24,7 +24,7 @@ std::shared_ptr<Buffer> Buffer::create(size_t size) {
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
-    LOG_ALLOCATION(size);
+    LOG_ALLOCATION(size)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -36,7 +36,7 @@ std::shared_ptr<Buffer> Buffer::create(const void* data, size_t size) {
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-    LOG_ALLOCATION(size);
+    LOG_ALLOCATION(size)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -73,7 +73,7 @@ std::shared_ptr<IndexBuffer> IndexBuffer::create(const unsigned int* data, size_
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-    LOG_ALLOCATION(size);
+    LOG_ALLOCATION(size)
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
@@ -153,7 +153,7 @@ std::shared_ptr<PixelBuffer> PixelBuffer::create(size_t size) {
     glBufferData(GL_PIXEL_PACK_BUFFER, size, nullptr, GL_STREAM_READ);
     const int value = 0;
     glClearBufferData(GL_PIXEL_PACK_BUFFER, GL_R32I, GL_RED_INTEGER, GL_INT, &value);
-    LOG_ALLOCATION(size);
+    LOG_ALLOCATION(size)
 
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
