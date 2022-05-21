@@ -41,12 +41,10 @@ void GuiLayer::on_awake() {
     game_layer = get_layer<GameLayer>("game");
 
     app->data.white_indicator_texture = Texture::create(
-        app->assets_data->white_indicator_texture,
-        false
+        app->assets_data->white_indicator_texture, false
     );
     app->data.black_indicator_texture = Texture::create(
-        app->assets_data->black_indicator_texture,
-        false
+        app->assets_data->black_indicator_texture, false
     );
 }
 

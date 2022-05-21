@@ -110,7 +110,7 @@ namespace logging {
                 std::ofstream file (file_path, std::ios::trunc);
 
                 if (!file.is_open()) {
-                    REL_ERROR("Could not open file '{}' for writing", file_path.c_str());
+                    REL_ERROR("Could not open file '{}' for writing", file_path);
                     break;
                 }
 
@@ -119,7 +119,7 @@ namespace logging {
                 break;
             }
             case LogTarget::Console:
-                REL_INFO("{}", contents.c_str());
+                REL_INFO("{}", contents);
 
                 break;
             case LogTarget::None:

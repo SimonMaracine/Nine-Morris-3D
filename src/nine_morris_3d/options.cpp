@@ -47,6 +47,7 @@ namespace options {
         json object;
         object["texture_quality"] = options.texture_quality;
         object["samples"] = options.samples;
+        object["anisotropic_filtering"] = options.anisotropic_filtering;
         object["vsync"] = options.vsync;
         object["save_on_exit"] = options.save_on_exit;
         object["skybox"] = options.skybox;
@@ -55,7 +56,7 @@ namespace options {
 
         file << std::setw(4) << object;
 
-        DEB_INFO("Saved options to file '{}'", file_path.c_str());
+        DEB_INFO("Saved options to file '{}'", file_path);
     }
 
     void load_options_from_file(Options& options) noexcept(false) {
@@ -83,13 +84,14 @@ namespace options {
         json object;
 
         try {
-            object = json::parse(contents.c_str());
+            object = json::parse(contents);
         } catch (const json::parse_error& e) {
             throw OptionsFileError(e.what());
         }
 
         std::string texture_quality;
         int samples;
+        int anisotropic_filtering;
         bool vsync;
         bool save_on_exit;
         std::string skybox;
@@ -99,6 +101,7 @@ namespace options {
         try {
             texture_quality = object.at("texture_quality").get<std::string>();
             samples = object.at("samples").get<int>();
+            anisotropic_filtering = object.at("anisotropic_filtering").get<int>();
             vsync = object.at("vsync").get<bool>();
             save_on_exit = object.at("save_on_exit").get<bool>();
             skybox = object.at("skybox").get<std::string>();
@@ -120,6 +123,10 @@ namespace options {
             throw OptionsFileError("Options file is invalid: samples");
         }
 
+        if (anisotropic_filtering != 0 && anisotropic_filtering != 4 && anisotropic_filtering != 8) {
+            throw OptionsFileError("Options file is invalid: anisotropic_filtering");
+        }
+
         if (skybox != FIELD && skybox != AUTUMN) {
             throw OptionsFileError("Options file is invalid: skybox");
         }
@@ -130,13 +137,14 @@ namespace options {
 
         options.texture_quality = texture_quality;
         options.samples = samples;
+        options.anisotropic_filtering = anisotropic_filtering;
         options.vsync = vsync;
         options.save_on_exit = save_on_exit;
         options.skybox = skybox;
         options.custom_cursor = custom_cursor;
         options.sensitivity = sensitivity;
 
-        DEB_INFO("Loaded options from file '{}'", file_path.c_str());
+        DEB_INFO("Loaded options from file '{}'", file_path);
     }
 
     void create_options_file() noexcept(false) {
@@ -158,6 +166,7 @@ namespace options {
         json object;
         object["texture_quality"] = options.texture_quality;
         object["samples"] = options.samples;
+        object["anisotropic_filtering"] = options.anisotropic_filtering;
         object["vsync"] = options.vsync;
         object["save_on_exit"] = options.save_on_exit;
         object["skybox"] = options.skybox;
@@ -166,7 +175,7 @@ namespace options {
 
         file << object.dump(4);
 
-        DEB_INFO("Created options file '{}'", file_path.c_str());
+        DEB_INFO("Created options file '{}'", file_path);
     }
 
     void handle_options_file_not_open_error() {

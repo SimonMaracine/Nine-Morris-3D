@@ -30,6 +30,7 @@ namespace options {
         // These are default values
         std::string texture_quality = NORMAL;
         int samples = 2;
+        int anisotropic_filtering = 4;
         bool vsync = true;
         bool save_on_exit = true;
         std::string skybox = FIELD;

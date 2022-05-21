@@ -45,6 +45,8 @@ public:
     void prepare_nodes();
     void prepare_node(unsigned int index, const glm::vec3& position);
 
+    void resetup_textures();
+
     void setup_board();
     void setup_board_paint();
     void setup_pieces();

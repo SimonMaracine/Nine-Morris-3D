@@ -38,20 +38,23 @@ static std::string get_name_texture3d(const char* file_path) {
     return tokens[tokens.size() - 2];  // It's ok
 }
 
-static void configure_mipmapping(bool mipmapping, float bias, bool anisotropic_filtering) {
+static void configure_mipmapping(bool mipmapping, float bias, int anisotropic_filtering) {
     if (mipmapping) {
-        if (anisotropic_filtering) {
+        const bool anisotropic_filtering_enabled =
+                anisotropic_filtering != 0 && extensions::extension_supported(extensions::AnisotropicFiltering);
+
+        if (anisotropic_filtering_enabled) {
             bias = 0.0f;
         }
 
         glGenerateMipmap(GL_TEXTURE_2D);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
 
-        if (anisotropic_filtering) {
+        if (anisotropic_filtering_enabled) {
             float max_amount;
             glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_amount);
 
-            const float amount = std::min(4.0f, max_amount);
+            const float amount = std::min(static_cast<float>(anisotropic_filtering), max_amount);
 
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
         }
@@ -60,17 +63,17 @@ static void configure_mipmapping(bool mipmapping, float bias, bool anisotropic_f
 
 Texture::Texture(GLuint texture, int width, int height, std::string_view name)
     : texture(texture), width(width), height(height), name(name) {
-    DEB_DEBUG("Created texture {} ({})", texture, name.data());
+    DEB_DEBUG("Created texture {} ({})", texture, name);
 }
 
 Texture::~Texture() {
     glDeleteTextures(1, &texture);
 
-    DEB_DEBUG("Deleted texture {} ({})", texture, name.c_str());
+    DEB_DEBUG("Deleted texture {} ({})", texture, name);
 }
 
-std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmapping, float bias) {
-    DEB_DEBUG("Loading texture '{}'...", file_path.data());
+std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmapping, float bias, int anisotropic_filtering) {
+    DEB_DEBUG("Loading texture '{}'...", file_path);
 
     stbi_set_flip_vertically_on_load(1);
 
@@ -78,7 +81,7 @@ std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmap
     stbi_uc* data = stbi_load(file_path.data(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture '{}', exiting...", file_path.data());
+        REL_CRITICAL("Could not load texture '{}', exiting...", file_path);
         exit(1);
     }
 
@@ -95,7 +98,7 @@ std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmap
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
     LOG_ALLOCATION(width * height * 4)
 
-    configure_mipmapping(mipmapping, bias, extensions::extension_supported(extensions::AnisotropicFiltering));
+    configure_mipmapping(mipmapping, bias, anisotropic_filtering);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -106,7 +109,7 @@ std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmap
     return std::make_shared<Texture>(texture, width, height, name);
 }
 
-std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool mipmapping, float bias) {
+std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool mipmapping, float bias, int anisotropic_filtering) {
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -119,11 +122,10 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool
     ASSERT(data->data != nullptr, "No data");
 
     glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, data->width, data->height);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA,
-            GL_UNSIGNED_BYTE, data->data);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA, GL_UNSIGNED_BYTE, data->data);
     LOG_ALLOCATION(data->width * data->height * 4)
 
-    configure_mipmapping(mipmapping, bias, extensions::extension_supported(extensions::AnisotropicFiltering));
+    configure_mipmapping(mipmapping, bias, anisotropic_filtering);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -145,13 +147,13 @@ void Texture::unbind() {
 
 Texture3D::Texture3D(GLuint texture, std::string_view name)
     : texture(texture), name(name) {
-    DEB_DEBUG("Created 3D texture {} ({})", texture, name.data());
+    DEB_DEBUG("Created 3D texture {} ({})", texture, name);
 }
 
 Texture3D::~Texture3D() {
     glDeleteTextures(1, &texture);
 
-    DEB_DEBUG("Deleted 3D texture {} ({})", texture, name.c_str());
+    DEB_DEBUG("Deleted 3D texture {} ({})", texture, name);
 }
 
 std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {

@@ -334,7 +334,7 @@ void GameLayer::prepare_board() {
     app->data.board_vertex_array = vertex_array;
 
     app->data.board_diffuse_texture = Texture::create(
-        app->assets_data->board_wood_diff_texture, true, -2.0f
+        app->assets_data->board_wood_diff_texture, true, -2.0f, app->options.anisotropic_filtering
     );
 
     app->data.wood_material = std::make_shared<Material>(app->data.board_shader);
@@ -389,7 +389,7 @@ void GameLayer::prepare_board_paint() {
     app->data.board_paint_vertex_array = vertex_array;
 
     app->data.board_paint_diffuse_texture = Texture::create(
-        app->assets_data->board_paint_diff_texture, true, -1.0f
+        app->assets_data->board_paint_diff_texture, true, -1.0f, app->options.anisotropic_filtering
     );
 
     app->data.paint_material = std::make_shared<Material>(app->data.board_paint_shader);
@@ -425,10 +425,10 @@ void GameLayer::prepare_pieces() {
     );
 
     app->data.white_piece_diffuse_texture = Texture::create(
-        app->assets_data->white_piece_diff_texture, true, -1.5f
+        app->assets_data->white_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
     );
     app->data.black_piece_diffuse_texture = Texture::create(
-        app->assets_data->black_piece_diff_texture, true, -1.5f
+        app->assets_data->black_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
     );
 
     app->data.tinted_wood_material = std::make_shared<Material>(app->data.piece_shader, Material::Hoverable);
@@ -541,6 +541,42 @@ void GameLayer::prepare_node(unsigned int index, const glm::vec3& position) {
 
     app->data.node_material_instances[index] = MaterialInstance::make(app->data.basic_material);
     app->data.node_material_instances[index]->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+}
+
+void GameLayer::resetup_textures() {
+    app->data.board_diffuse_texture = Texture::create(
+        app->assets_data->board_wood_diff_texture, true, -2.0f, app->options.anisotropic_filtering
+    );
+     app->data.board_material_instance->set_texture(
+        "u_material.diffuse", app->data.board_diffuse_texture, 0
+    );
+
+    app->data.board_paint_diffuse_texture = Texture::create(
+        app->assets_data->board_paint_diff_texture, true, -1.0f, app->options.anisotropic_filtering
+    );
+    app->data.board_paint_material_instance->set_texture(
+        "u_material.diffuse",
+        app->data.board_paint_diffuse_texture, 0
+    );
+
+    app->data.white_piece_diffuse_texture = Texture::create(
+        app->assets_data->white_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
+    );
+    app->data.black_piece_diffuse_texture = Texture::create(
+        app->assets_data->black_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
+    );
+    for (unsigned int i = 0; i < 9; i++) {
+        app->data.piece_material_instances[i]->set_texture(
+            "u_material.diffuse",
+            app->data.white_piece_diffuse_texture, 0
+        );
+    }
+    for (unsigned int i = 9; i < 18; i++) {
+        app->data.piece_material_instances[i]->set_texture(
+            "u_material.diffuse",
+            app->data.black_piece_diffuse_texture, 0
+        );
+    }
 }
 
 void GameLayer::setup_board() {
@@ -775,14 +811,14 @@ void GameLayer::set_skybox(std::string_view skybox) {
 
 void GameLayer::actually_change_texture_quality() {
     app->data.board_diffuse_texture = Texture::create(
-        app->assets_data->board_wood_diff_texture, true, -2.0f
+        app->assets_data->board_wood_diff_texture, true, -2.0f, app->options.anisotropic_filtering
     );
     app->data.board_material_instance->set_texture(
         "u_material.diffuse", app->data.board_diffuse_texture, 0
     );
 
     app->data.board_paint_diffuse_texture = Texture::create(
-        app->assets_data->board_paint_diff_texture, true, -1.0f
+        app->assets_data->board_paint_diff_texture, true, -1.0f, app->options.anisotropic_filtering
     );
     app->data.board_paint_material_instance->set_texture(
         "u_material.diffuse",
@@ -790,10 +826,10 @@ void GameLayer::actually_change_texture_quality() {
     );
 
     app->data.white_piece_diffuse_texture = Texture::create(
-        app->assets_data->white_piece_diff_texture, true, -1.5f
+        app->assets_data->white_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
     );
     app->data.black_piece_diffuse_texture = Texture::create(
-        app->assets_data->black_piece_diff_texture, true, -1.5f
+        app->assets_data->black_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
     );
     for (unsigned int i = 0; i < 9; i++) {
         app->data.piece_material_instances[i]->set_texture(

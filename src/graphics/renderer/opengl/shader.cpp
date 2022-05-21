@@ -47,21 +47,21 @@ Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, std
       vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path),
       uniforms(uniforms) {
     for (const std::string& uniform : uniforms) {
-        GLint location = glGetUniformLocation(program, uniform.c_str());
+        const GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
-            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name.data());
+            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name);
             continue;
         }
         cache[uniform] = location;
     }
 
-    DEB_DEBUG("Created shader {} ({})", program, name.data());
+    DEB_DEBUG("Created shader {} ({})", program, name);
 }
 
 Shader::~Shader() {
     DELETE_SHADER(program, vertex_shader, fragment_shader);
 
-    DEB_DEBUG("Deleted shader {} ({})", program, name.c_str());
+    DEB_DEBUG("Deleted shader {} ({})", program, name);
 }
 
 std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
@@ -111,7 +111,7 @@ std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
     }
 
     for (const UniformBlockSpecification& block : uniform_blocks) {
-        GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
+        const GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
 
         if (block_index == GL_INVALID_INDEX) {
             REL_CRITICAL("Invalid block index, exiting...");
@@ -232,9 +232,9 @@ void Shader::recompile() {
 
     uniforms.clear();
     for (const std::string& uniform : uniforms) {
-        GLint location = glGetUniformLocation(program, uniform.c_str());
+        const GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
-            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name.data());
+            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name);
             continue;
         }
         cache[uniform] = location;
@@ -242,7 +242,7 @@ void Shader::recompile() {
 
     DELETE_SHADER(program, vertex_shader, fragment_shader);
 
-    DEB_DEBUG("Recompiled old shader {} to new shader {} ({})", program, new_program, name.c_str());
+    DEB_DEBUG("Recompiled old shader {} to new shader {} ({})", program, new_program, name);
 
     program = new_program;
     vertex_shader = new_vertex_shader;
@@ -256,8 +256,7 @@ GLint Shader::get_uniform_location(std::string_view name) {
     try {
         return cache.at(std::string(name));
     } catch (const std::out_of_range&) {
-        DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}', exiting...", name.data(),
-                this->name.data());
+        DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}', exiting...", name.data(), this->name);
         exit(1);
     }
 #endif
@@ -273,7 +272,7 @@ GLuint Shader::compile_shader(std::string_view source_path, GLenum type) noexcep
             source.append(line).append("\n");
         }
     } else {
-        REL_CRITICAL("Could not open file '{}', exiting...", source_path.data());
+        REL_CRITICAL("Could not open file '{}', exiting...", source_path);
         exit(1);
     }
     file.close();

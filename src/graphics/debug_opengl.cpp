@@ -14,6 +14,7 @@
 #include <cereal/version.hpp>
 
 #include "application/platform.h"
+#include "application/extensions.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
@@ -183,6 +184,14 @@ namespace debug_opengl {
             sprintf(line, "%s %u\n", names[11], (unsigned int) result);
             output.append(line);
         }
+
+        //////////////////////////////////////////////////////////////////////////////////
+        output.append("\n*** OpenGL Extensions ***\n");
+
+        char line[128];
+        sprintf(line, "GL_EXT_texture_filter_anisotropic is supported: %s\n",
+                extensions::extension_supported(extensions::AnisotropicFiltering) ? "true" : "false");
+        output.append(line);
 
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** Dependencies And Versions ***\n");

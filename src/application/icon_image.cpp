@@ -12,19 +12,19 @@ IconImage::IconImage(std::string_view file_path) {
     data = stbi_load(file_path.data(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load icon image '{}', exiting...", file_path.data());
+        REL_CRITICAL("Could not load icon image '{}', exiting...", file_path);
         exit(1);
     }
 
     this->file_path = file_path;
 
-    DEB_INFO("Loaded icon image data '{}'", file_path.data());
+    DEB_INFO("Loaded icon image data '{}'", file_path);
 }
 
 IconImage::~IconImage() {
     stbi_image_free(data);
 
-    DEB_INFO("Freed icon image data '{}'", file_path.c_str());
+    DEB_INFO("Freed icon image data '{}'", file_path);
 }
 
 GLFWimage IconImage::get_data() const {

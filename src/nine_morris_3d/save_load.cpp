@@ -169,9 +169,9 @@ namespace save_load {
 
     void delete_save_game_file(std::string_view file_path) {
         if (remove(file_path.data()) != 0) {
-            REL_INFO("Could not delete save game file '{}'", file_path.data());
+            REL_INFO("Could not delete save game file '{}'", file_path);
         } else {
-            REL_INFO("Deleted save game file '{}'", file_path.data());
+            REL_INFO("Deleted save game file '{}'", file_path);
         }
     }
 

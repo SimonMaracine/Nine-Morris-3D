@@ -164,7 +164,7 @@ void ImGuiLayer::on_update(float dt) {
                     }
                 }
                 if (ImGui::BeginMenu("Anti-Aliasing")) {
-                    if (ImGui::RadioButton("No Anti-Aliasing", &app->options.samples, 1)) {
+                    if (ImGui::RadioButton("Off", &app->options.samples, 1)) {
                         game_layer->set_scene_framebuffer(app->options.samples);
 
                         DEB_INFO("Anti-aliasing disabled");
@@ -195,6 +195,25 @@ void ImGuiLayer::on_update(float dt) {
                         app->renderer->set_depth_map_framebuffer(2048);
 
                         DEB_INFO("Textures set to {} quality", options::LOW);
+                    }
+
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Anisotropic Filtering")) {
+                    if (ImGui::RadioButton("Off", &app->options.anisotropic_filtering, 0)) {
+                        game_layer->resetup_textures();
+
+                        DEB_INFO("Anisotropic filtering disabled");
+                    }
+                    if (ImGui::RadioButton("4x", &app->options.anisotropic_filtering, 4)) {
+                        game_layer->resetup_textures();
+
+                        DEB_INFO("4x Anisotropic filtering");
+                    }
+                    if (ImGui::RadioButton("8x", &app->options.anisotropic_filtering, 8)) {
+                        game_layer->resetup_textures();
+
+                        DEB_INFO("8x Anisotropic filtering");
                     }
 
                     ImGui::EndMenu();

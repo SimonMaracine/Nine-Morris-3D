@@ -17,8 +17,10 @@ public:
     Texture(GLuint texture, int width, int height, std::string_view name);
     ~Texture();
 
-    static std::shared_ptr<Texture> create(std::string_view file_path, bool mipmapping, float bias = 0.0f);
-	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, bool mipmapping, float bias = 0.0f);
+    static std::shared_ptr<Texture> create(std::string_view file_path, bool mipmapping,
+			float bias = 0.0f, int anisotropic_filtering = 0);
+	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, bool mipmapping,
+			float bias = 0.0f, int anisotropic_filtering = 0);
 
 	int get_width() { return width; }
 	int get_height() { return height; }

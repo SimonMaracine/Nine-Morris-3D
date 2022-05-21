@@ -28,7 +28,7 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
     font_file_buffer = get_file_data(file_path);
 
     if (!stbtt_InitFont(&info, (unsigned char*) font_file_buffer, 0)) {
-        REL_CRITICAL("Could not load font '{}', exiting...", file_path.data());
+        REL_CRITICAL("Could not load font '{}', exiting...", file_path);
         exit(1);
     }
     sf = stbtt_ScaleForPixelHeight(&info, size);
@@ -46,14 +46,14 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
 
     name = get_name(file_path);
 
-    DEB_DEBUG("Loaded font '{}'", file_path.data());
+    DEB_DEBUG("Loaded font '{}'", file_path);
 }
 
 Font::~Font() {
     glDeleteTextures(1, &texture);
     delete[] font_file_buffer;
 
-    DEB_DEBUG("Unloaded font '{}'", name.c_str());
+    DEB_DEBUG("Unloaded font '{}'", name);
 }
 
 void Font::update_data(const float* data, size_t size) {
@@ -63,7 +63,7 @@ void Font::update_data(const float* data, size_t size) {
 }
 
 void Font::begin_baking() {
-    DEB_DEBUG("Begin baking font '{}'", name.c_str());
+    DEB_DEBUG("Begin baking font '{}'", name);
 
     glDeleteTextures(1, &texture);
     memset(&bake_context, 0, sizeof(BakeContext));
@@ -188,7 +188,7 @@ void Font::end_baking() {
 
     delete[] bake_context.bitmap;
 
-    DEB_DEBUG("End baking font '{}'", name.c_str());
+    DEB_DEBUG("End baking font '{}'", name);
 }
 
 void Font::render(std::string_view string, size_t* out_size, float** out_buffer) {
@@ -279,7 +279,7 @@ const char* Font::get_file_data(std::string_view file_path) {
     std::ifstream file (std::string(file_path), std::ios::binary);
 
     if (!file.is_open()) {
-        REL_CRITICAL("Could not open file '{}' for reading, exiting...", file_path.data());
+        REL_CRITICAL("Could not open file '{}' for reading, exiting...", file_path);
         exit(1);
     }
 

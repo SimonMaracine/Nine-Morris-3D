@@ -13,14 +13,14 @@
 
 namespace mesh {
     std::shared_ptr<Mesh<Vertex>> load_model(std::string_view file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading model '{}'...", file_path.data());
+        DEB_DEBUG("Loading model '{}'...", file_path);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(std::string(file_path), aiProcess_ValidateDataStructure |
                 (flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)));
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path.data());
+            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
@@ -67,14 +67,14 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh<VertexP>> load_model_position(std::string_view file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading model '{}'...", file_path.data());
+        DEB_DEBUG("Loading model '{}'...", file_path);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(std::string(file_path), aiProcess_ValidateDataStructure |
                 (flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)));
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path.data());
+            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
