@@ -17,6 +17,7 @@
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/assets.h"
+#include "nine_morris_3d/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
@@ -49,19 +50,19 @@ NineMorris3D::NineMorris3D()
     // Load and set icons
     {
         std::array<std::unique_ptr<IconImage>, 5> icons = {
-            std::make_unique<IconImage>(path(ICON_512)),
-            std::make_unique<IconImage>(path(ICON_256)),
-            std::make_unique<IconImage>(path(ICON_128)),
-            std::make_unique<IconImage>(path(ICON_64)),
-            std::make_unique<IconImage>(path(ICON_32))
+            std::make_unique<IconImage>(paths::path_for_assets(ICON_512)),
+            std::make_unique<IconImage>(paths::path_for_assets(ICON_256)),
+            std::make_unique<IconImage>(paths::path_for_assets(ICON_128)),
+            std::make_unique<IconImage>(paths::path_for_assets(ICON_64)),
+            std::make_unique<IconImage>(paths::path_for_assets(ICON_32))
         };
 
         window->set_icons<5>(icons);
     }
 
     // Load and set cursors
-    arrow_cursor = window->add_cursor(std::make_unique<IconImage>(path(ARROW_CURSOR)), 4, 1);
-    cross_cursor = window->add_cursor(std::make_unique<IconImage>(path(CROSS_CURSOR)), 8, 8);
+    arrow_cursor = window->add_cursor(std::make_unique<IconImage>(paths::path_for_assets(ARROW_CURSOR)), 4, 1);
+    cross_cursor = window->add_cursor(std::make_unique<IconImage>(paths::path_for_assets(CROSS_CURSOR)), 8, 8);
 
     // Setup scene framebuffer
     {
@@ -95,18 +96,18 @@ NineMorris3D::NineMorris3D()
         ImVector<ImWchar> ranges;
         builder.BuildRanges(&ranges);
 
-        io.FontDefault = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 20.0f);
-        data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 16.0f);
-        data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path(OPEN_SANS_FONT).c_str(), 24.0f,
+        io.FontDefault = io.Fonts->AddFontFromFileTTF(paths::path_for_assets(OPEN_SANS_FONT).c_str(), 20.0f);
+        data.imgui_info_font = io.Fonts->AddFontFromFileTTF(paths::path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
+        data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(paths::path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f,
                 nullptr, ranges.Data);
         io.Fonts->Build();
     }
 
     // Load splash screen
-    data.splash_screen_texture = Texture::create(path(SPLASH_SCREEN_TEXTURE), true);
+    data.splash_screen_texture = Texture::create(paths::path_for_assets(SPLASH_SCREEN_TEXTURE), true);
 
     // Load and create this font
-    data.good_dog_plain_font = std::make_shared<Font>(path(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
+    data.good_dog_plain_font = std::make_shared<Font>(paths::path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
     data.good_dog_plain_font->begin_baking();  // TODO maybe move part of texture baking to thread
     data.good_dog_plain_font->bake_characters(32, 127);
     data.good_dog_plain_font->end_baking();

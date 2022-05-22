@@ -31,7 +31,7 @@ namespace input {
         return static_cast<float>(y);
     }
 
-    const std::pair<float, float> get_mouse() {
+    std::pair<float, float> get_mouse() {
         double x, y;
         glfwGetCursorPos(window_ptr, &x, &y);
 

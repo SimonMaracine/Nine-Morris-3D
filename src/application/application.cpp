@@ -17,6 +17,7 @@
 #include "graphics/renderer/main_renderer.h"
 #include "graphics/renderer/gui_renderer.h"
 #include "graphics/debug_opengl.h"
+#include "nine_morris_3d/nine_morris_3d.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
@@ -26,11 +27,11 @@ Application::Application(int width, int height, std::string_view title) {
     app_data.title = title;
     app_data.event_function = BIND(Application::on_event);
 
-    logging::initialize();
+    logging::initialize(LOG_FILE);
     window = std::make_shared<Window>(&app_data);
 
 #ifdef NINE_MORRIS_3D_DEBUG
-    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console);
+    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console, INFO_FILE);
 #endif
     input::initialize(window->get_handle());
     debug_opengl::maybe_initialize_debugging();

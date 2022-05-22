@@ -17,6 +17,7 @@
 #include "graphics/renderer/opengl/shader.h"
 #include "graphics/renderer/opengl/texture.h"
 #include "graphics/renderer/opengl/framebuffer.h"
+#include "nine_morris_3d/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
@@ -37,21 +38,6 @@ const char* light_block_fields[] = {
 const char* light_space_block_fields[] = {
     "u_light_space_matrix"
 };
-
-static std::string path(const char* file_path) {  // FIXME not very dry
-#if defined(NINE_MORRIS_3D_DEBUG)
-    // Use relative path for both operating systems
-    return std::string(file_path);
-#elif defined(NINE_MORRIS_3D_RELEASE)
-    #if defined(NINE_MORRIS_3D_LINUX)
-    std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
-    return path;
-    #elif defined(NINE_MORRIS_3D_WINDOWS)
-    // Just use relative path
-    return std::string(file_path);
-    #endif
-#endif
-}
 
 Renderer::Renderer(Application* app)
     : app(app) {
@@ -92,8 +78,8 @@ Renderer::Renderer(Application* app)
             "u_skybox"
         };
         storage.skybox_shader = Shader::create(
-            path(SKYBOX_VERTEX_SHADER),
-            path(SKYBOX_FRAGMENT_SHADER),
+            paths::path_for_assets(SKYBOX_VERTEX_SHADER),
+            paths::path_for_assets(SKYBOX_FRAGMENT_SHADER),
             uniforms
         );
     }
@@ -103,8 +89,8 @@ Renderer::Renderer(Application* app)
             "u_screen_texture"
         };
         storage.screen_quad_shader = Shader::create(
-            path(SCREEN_QUAD_VERTEX_SHADER),
-            path(SCREEN_QUAD_FRAGMENT_SHADER),
+            paths::path_for_assets(SCREEN_QUAD_VERTEX_SHADER),
+            paths::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER),
             uniforms
         );
     }
@@ -117,8 +103,8 @@ Renderer::Renderer(Application* app)
             "u_texture"
         };
         storage.quad3d_shader = Shader::create(
-            path(QUAD3D_VERTEX_SHADER),
-            path(QUAD3D_FRAGMENT_SHADER),
+            paths::path_for_assets(QUAD3D_VERTEX_SHADER),
+            paths::path_for_assets(QUAD3D_FRAGMENT_SHADER),
             uniforms
         );
     }
@@ -128,8 +114,8 @@ Renderer::Renderer(Application* app)
             "u_model_matrix"
         };
         storage.shadow_shader = Shader::create(
-            path(SHADOW_VERTEX_SHADER),
-            path(SHADOW_FRAGMENT_SHADER),
+            paths::path_for_assets(SHADOW_VERTEX_SHADER),
+            paths::path_for_assets(SHADOW_FRAGMENT_SHADER),
             uniforms,
             { storage.light_space_uniform_block }
         );
@@ -141,8 +127,8 @@ Renderer::Renderer(Application* app)
             "u_color"
         };
         storage.outline_shader = Shader::create(
-            path(OUTLINE_VERTEX_SHADER),
-            path(OUTLINE_FRAGMENT_SHADER),
+            paths::path_for_assets(OUTLINE_VERTEX_SHADER),
+            paths::path_for_assets(OUTLINE_FRAGMENT_SHADER),
             uniforms,
             { storage.projection_view_uniform_block }
         );
@@ -154,8 +140,8 @@ Renderer::Renderer(Application* app)
             "u_projection_view_matrix"
         };
         storage.origin_shader = Shader::create(
-            path(ORIGIN_VERTEX_SHADER),
-            path(ORIGIN_FRAGMENT_SHADER),
+            paths::path_for_assets(ORIGIN_VERTEX_SHADER),
+            paths::path_for_assets(ORIGIN_FRAGMENT_SHADER),
             uniforms
         );
     }

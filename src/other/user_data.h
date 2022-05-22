@@ -3,9 +3,6 @@
 #include <string>
 #include <stdexcept>
 
-#define APP_NAME_LINUX "ninemorris3d"
-#define APP_NAME_WINDOWS "NineMorris3D"
-
 /**
  * These are functions for getting platform specific username and user directories.
  */
@@ -18,8 +15,8 @@ namespace user_data {
             : std::runtime_error(message) {}
     };
 
-    const std::string get_username() noexcept(false);
-    const std::string get_user_data_directory_path() noexcept(false);
-    bool user_data_directory_exists() noexcept(false);
-    bool create_user_data_directory() noexcept(false);
+    std::string get_username() noexcept(false);
+    std::string get_user_data_directory_path(const char* app_name) noexcept(false);
+    bool user_data_directory_exists(const char* app_name) noexcept(false);
+    bool create_user_data_directory(const char* app_name) noexcept(false);
 }

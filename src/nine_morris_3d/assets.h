@@ -1,10 +1,6 @@
 #pragma once
 
-#include <string>
-
 namespace assets {
-    std::string path(const char* file_path);
-
     extern const char* BOARD_MESH;
     extern const char* BOARD_PAINT_MESH;
     extern const char* NODE_MESH;

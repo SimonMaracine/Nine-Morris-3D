@@ -1,25 +1,4 @@
-#include <string>
-
-#include "application/platform.h"
-#include "nine_morris_3d/assets.h"
-#include "other/user_data.h"
-
 namespace assets {
-    std::string path(const char* file_path) {
-#if defined(NINE_MORRIS_3D_DEBUG)
-        // Use relative path for both operating systems
-        return std::string(file_path);
-#elif defined(NINE_MORRIS_3D_RELEASE)
-    #if defined(NINE_MORRIS_3D_LINUX)
-        std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
-        return path;
-    #elif defined(NINE_MORRIS_3D_WINDOWS)
-        // Just use relative path
-        return std::string(file_path);
-    #endif
-#endif
-    }
-
     const char* BOARD_MESH = "data/models/board/board.obj";
     const char* BOARD_PAINT_MESH = "data/models/board/board_paint.obj";
     const char* NODE_MESH = "data/models/node/node.obj";

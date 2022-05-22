@@ -141,7 +141,7 @@ namespace debug_opengl {
 #endif
     }
 
-    const std::string get_info() {
+    std::string get_info() {
         std::string output;
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -282,7 +282,7 @@ namespace debug_opengl {
         return output;
     }
 
-    const std::pair<int, int> get_version_numbers() {
+    std::pair<int, int> get_version_numbers() {
         int major, minor;
         glGetIntegerv(GL_MAJOR_VERSION, &major);
         glGetIntegerv(GL_MINOR_VERSION, &minor);

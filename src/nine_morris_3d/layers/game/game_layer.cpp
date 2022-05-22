@@ -34,6 +34,7 @@
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/assets.h"
+#include "nine_morris_3d/paths.h"
 #include "other/mesh.h"
 #include "other/loader.h"
 #include "other/texture_data.h"
@@ -303,8 +304,8 @@ void GameLayer::prepare_board() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_shader = Shader::create(
-        assets::path(assets::BOARD_VERTEX_SHADER),
-        assets::path(assets::BOARD_FRAGMENT_SHADER),
+        paths::path_for_assets(assets::BOARD_VERTEX_SHADER),
+        paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER),
         uniforms,
         uniform_blocks
     );
@@ -358,8 +359,8 @@ void GameLayer::prepare_board_paint() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_paint_shader = Shader::create(
-        assets::path(assets::BOARD_PAINT_VERTEX_SHADER),
-        assets::path(assets::BOARD_PAINT_FRAGMENT_SHADER),
+        paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER),
+        paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER),
         uniforms,
         uniform_blocks
     );
@@ -414,8 +415,8 @@ void GameLayer::prepare_pieces() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.piece_shader = Shader::create(
-        assets::path(assets::PIECE_VERTEX_SHADER),
-        assets::path(assets::PIECE_FRAGMENT_SHADER),
+        paths::path_for_assets(assets::PIECE_VERTEX_SHADER),
+        paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER),
         uniforms,
         uniform_blocks
     );
@@ -494,8 +495,8 @@ void GameLayer::prepare_nodes() {
         "u_color"
     };
     app->data.node_shader = Shader::create(
-        assets::path(assets::NODE_VERTEX_SHADER),
-        assets::path(assets::NODE_FRAGMENT_SHADER),
+        paths::path_for_assets(assets::NODE_VERTEX_SHADER),
+        paths::path_for_assets(assets::NODE_FRAGMENT_SHADER),
         uniforms,
         { app->renderer->get_projection_view_uniform_block() }
     );

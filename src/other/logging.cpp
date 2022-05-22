@@ -8,16 +8,9 @@
 
 #include "application/platform.h"
 #include "graphics/debug_opengl.h"
-#include "other/logging.h"
+#include "nine_morris_3d/paths.h"
 #include "other/user_data.h"
-
-#if defined(NINE_MORRIS_3D_LINUX)
-    #define LOG_FILE "log.txt"
-    #define INFO_FILE "info.txt"
-#elif defined(NINE_MORRIS_3D_WINDOWS)
-    #define LOG_FILE "ninemorris3d_log.txt"
-    #define INFO_FILE "ninemorris3d_info.txt"
-#endif
+#include "other/logging.h"
 
 #define LOG_PATTERN_DEBUG "%^[%l] [th %t] [%H:%M:%S]%$ %v"
 #define LOG_PATTERN_RELEASE "%^[%l] [th %t] [%!:%#] [%c]%$ %v"
@@ -29,21 +22,6 @@ namespace logging {
     static std::shared_ptr<spdlog::logger> release_logger;
     static std::shared_ptr<spdlog::logger> debug_logger;
 
-    static std::string path(const char* file) noexcept(false) {
-#if defined(NINE_MORRIS_3D_DEBUG)
-        // Use relative path for both operating systems
-        return std::string(file);
-#elif defined(NINE_MORRIS_3D_RELEASE)
-    #if defined(NINE_MORRIS_3D_LINUX)
-        std::string path = user_data::get_user_data_directory_path() + file;
-        return path;
-    #elif defined(NINE_MORRIS_3D_WINDOWS)
-        std::string path = "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + APP_NAME_WINDOWS + "\\" + file;
-        return path;
-    #endif
-#endif
-    }
-
     static void set_global_logger() {
 #if defined(NINE_MORRIS_3D_DEBUG)
         spdlog::set_default_logger(debug_logger);
@@ -52,7 +30,7 @@ namespace logging {
 #endif
     }
 
-    void initialize() {
+    void initialize(const char* log_file) {
         // Initialize debug logger
         debug_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
         debug_logger->set_pattern(LOG_PATTERN_DEBUG);
@@ -60,7 +38,7 @@ namespace logging {
 
         std::string file_path;
         try {
-            file_path = path(LOG_FILE);
+            file_path = paths::path_for_logs(log_file);
         } catch (const user_data::UserNameError& e) {            
             release_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
             release_logger->set_pattern(LOG_PATTERN_RELEASE);
@@ -93,14 +71,14 @@ namespace logging {
         set_global_logger();
     }
 
-    void log_opengl_and_dependencies_info(LogTarget target) {
+    void log_opengl_and_dependencies_info(LogTarget target, const char* info_file) {
         const std::string contents = debug_opengl::get_info();
 
         switch (target) {
             case LogTarget::File: {
                 std::string file_path;
                 try {
-                    file_path = path(INFO_FILE);
+                    file_path = paths::path_for_logs(info_file);
                 } catch (const user_data::UserNameError& e) {
                     REL_ERROR("{}", e.what());
                     REL_ERROR("Could not create info file");

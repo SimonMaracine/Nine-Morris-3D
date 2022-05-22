@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 
+#include "application/platform.h"
 #include "application/application.h"
 #include "graphics/renderer/hoverable.h"
 #include "graphics/renderer/material.h"
@@ -15,9 +16,23 @@
 #include "nine_morris_3d/options.h"
 #include "other/mesh.h"
 
-constexpr int VERSION_MAJOR = 0;
-constexpr int VERSION_MINOR = 1;
-constexpr int VERSION_PATCH = 0;
+#if defined(NINE_MORRIS_3D_LINUX)
+    #define APP_NAME "ninemorris3d"
+#elif defined(NINE_MORRIS_3D_WINDOWS)
+    #define APP_NAME "NineMorris3D"
+#endif
+
+#if defined(NINE_MORRIS_3D_LINUX)
+    #define LOG_FILE "log.txt"
+    #define INFO_FILE "info.txt"
+#elif defined(NINE_MORRIS_3D_WINDOWS)
+    #define LOG_FILE "ninemorris3d_log.txt"
+    #define INFO_FILE "ninemorris3d_info.txt"
+#endif
+
+constexpr unsigned int VERSION_MAJOR = 0;
+constexpr unsigned int VERSION_MINOR = 1;
+constexpr unsigned int VERSION_PATCH = 0;
 
 class NineMorris3D : public Application {
 public:

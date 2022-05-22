@@ -59,6 +59,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/nine_morris_3d/board.cpp"
     "src/nine_morris_3d/timer.cpp"
     "src/nine_morris_3d/assets.cpp"
+    "src/nine_morris_3d/paths.cpp"
     "src/other/logging.cpp"
     "src/other/mesh.cpp"
     "src/other/texture_data.cpp"

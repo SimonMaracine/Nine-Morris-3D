@@ -10,7 +10,7 @@ namespace input {
     bool is_mouse_button_pressed(int button);
     float get_mouse_x();
     float get_mouse_y();
-    const std::pair<float, float> get_mouse();
+    std::pair<float, float> get_mouse();
 }
 
 #define KEY_SPACE              32

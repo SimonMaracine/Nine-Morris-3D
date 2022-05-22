@@ -1,4 +1,5 @@
 #include <utility>
+#include <string>
 #include <time.h>
 #include <string.h>
 
@@ -12,10 +13,12 @@
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
+#include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/assets.h"
+#include "nine_morris_3d/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
@@ -27,6 +30,8 @@
 #define LIGHT_BROWN ImVec4(0.68f, 0.48f, 0.22f, 1.0f)
 #define BEIGE ImVec4(0.961f, 0.875f, 0.733f, 1.0f)
 #define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
+
+const std::string INFO_FILE_PATH = paths::path_for_logs(INFO_FILE);
 
 void ImGuiLayer::on_attach() {
     save_load::GameState state;
@@ -187,17 +192,18 @@ void ImGuiLayer::on_update(float dt) {
                 }
                 if (ImGui::BeginMenu("Texture Quality")) {
                     static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
-                    if (ImGui::RadioButton("Normal", &quality, 0)) {
-                        game_layer->set_texture_quality(options::NORMAL);
-                        app->renderer->set_depth_map_framebuffer(4096);
 
-                        DEB_INFO("Textures set to {} quality", options::NORMAL);
-                    }
                     if (ImGui::RadioButton("Low", &quality, 1)) {
                         game_layer->set_texture_quality(options::LOW);
                         app->renderer->set_depth_map_framebuffer(2048);
 
                         DEB_INFO("Textures set to {} quality", options::LOW);
+                    }
+                    if (ImGui::RadioButton("Normal", &quality, 0)) {
+                        game_layer->set_texture_quality(options::NORMAL);
+                        app->renderer->set_depth_map_framebuffer(4096);
+
+                        DEB_INFO("Textures set to {} quality", options::NORMAL);
                     }
 
                     ImGui::EndMenu();
@@ -248,6 +254,7 @@ void ImGuiLayer::on_update(float dt) {
             }
             if (ImGui::BeginMenu("Skybox")) {
                 static int skybox = app->options.skybox == options::FIELD ? 0 : 1;
+
                 if (ImGui::RadioButton("Field", &skybox, 0)) {
                     game_layer->set_skybox(options::FIELD);
 
@@ -289,9 +296,12 @@ void ImGuiLayer::on_update(float dt) {
                 about_mode = true;
             }
             if (ImGui::MenuItem("Log Info", nullptr, false)) {
-                logging::log_opengl_and_dependencies_info(logging::LogTarget::File);
+                logging::log_opengl_and_dependencies_info(logging::LogTarget::File, INFO_FILE);
 
                 DEB_INFO("Logged OpenGL and dependencies info");
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("%s", INFO_FILE_PATH.c_str());
             }
 
             ImGui::EndMenu();
@@ -459,7 +469,7 @@ void ImGuiLayer::draw_about_screen() {
         }
 
         ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
-        ImGui::Text("Version %d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+        ImGui::Text("Version %u.%u.%u", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
         ImGui::Separator();
         ImGui::Text("All programming by:");
         ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");

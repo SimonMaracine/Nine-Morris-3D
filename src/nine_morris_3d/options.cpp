@@ -5,7 +5,9 @@
 #include <nlohmann/json.hpp>
 
 #include "application/platform.h"
+#include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/options.h"
+#include "nine_morris_3d/paths.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 
@@ -14,25 +16,10 @@
 using json = nlohmann::json;
 
 namespace options {
-    static std::string path(const char* file) noexcept(false) {
-#if defined(NINE_MORRIS_3D_DEBUG)
-        // Use relative path for both operating systems
-        return std::string(file);
-#elif defined(NINE_MORRIS_3D_RELEASE)
-    #if defined(NINE_MORRIS_3D_LINUX)
-        std::string path = user_data::get_user_data_directory_path() + file;
-        return path;
-    #elif defined(NINE_MORRIS_3D_WINDOWS)
-        std::string path = user_data::get_user_data_directory_path() + "\\" + file;
-        return path;
-    #endif
-#endif
-    }
-
     void save_options_to_file(const Options& options) noexcept(false) {
         std::string file_path;
         try {
-            file_path = path(OPTIONS_FILE);
+            file_path = paths::path_for_save_and_options(OPTIONS_FILE);
         } catch (const user_data::UserNameError& e) {
             throw OptionsFileError(e.what());
         }
@@ -62,7 +49,7 @@ namespace options {
     void load_options_from_file(Options& options) noexcept(false) {
         std::string file_path;
         try {
-            file_path = path(OPTIONS_FILE);
+            file_path = paths::path_for_save_and_options(OPTIONS_FILE);
         } catch (const user_data::UserNameError& e) {
             throw OptionsFileError(e.what());
         }
@@ -150,7 +137,7 @@ namespace options {
     void create_options_file() noexcept(false) {
         std::string file_path;
         try {
-            file_path = path(OPTIONS_FILE);
+            file_path = paths::path_for_save_and_options(OPTIONS_FILE);
         } catch (const user_data::UserNameError& e) {
             throw OptionsFileError(e.what());
         }
@@ -182,7 +169,7 @@ namespace options {
         bool user_data_directory;
 
         try {
-            user_data_directory = user_data::user_data_directory_exists();
+            user_data_directory = user_data::user_data_directory_exists(APP_NAME);
         } catch (const user_data::UserNameError& e) {
             REL_ERROR("{}", e.what());
             return;
@@ -192,7 +179,7 @@ namespace options {
             REL_INFO("User data folder missing; creating one...");
 
             try {
-                bool success = user_data::create_user_data_directory();
+                bool success = user_data::create_user_data_directory(APP_NAME);
                 if (success) {
                     try {
                         create_options_file();

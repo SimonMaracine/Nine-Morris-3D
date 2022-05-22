@@ -15,14 +15,13 @@
 #include "graphics/renderer/opengl/vertex_array.h"
 #include "graphics/renderer/opengl/buffer.h"
 #include "graphics/renderer/opengl/texture.h"
+#include "nine_morris_3d/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
 namespace gui {
     Widget::Widget(std::shared_ptr<Widget> parent)
-        : parent(parent) {
-
-    }
+        : parent(parent) {}
 
     Widget* Widget::set(unsigned int row, unsigned int column) {
         this->row = row;
@@ -424,21 +423,6 @@ namespace gui {
     void Dummy::render() {}  // Do nothing
 }
 
-static std::string path(const char* file_path) {  // FIXME NOT DRY AAAAAHHH
-#if defined(NINE_MORRIS_3D_DEBUG)
-    // Use relative path for both operating systems
-    return std::string(file_path);
-#elif defined(NINE_MORRIS_3D_RELEASE)
-    #if defined(NINE_MORRIS_3D_LINUX)
-    std::string path = std::string("/usr/share/") + APP_NAME_LINUX + "/" + file_path;
-    return path;
-    #elif defined(NINE_MORRIS_3D_WINDOWS)
-    // Just use relative path
-    return std::string(file_path);
-    #endif
-#endif
-}
-
 GuiRenderer::GuiRenderer(Application* app)
     : app(app) {
     {
@@ -448,8 +432,8 @@ GuiRenderer::GuiRenderer(Application* app)
             "u_texture"
         };
         storage.quad2d_shader = Shader::create(
-            path(QUAD2D_VERTEX_SHADER),
-            path(QUAD2D_FRAGMENT_SHADER),
+            paths::path_for_assets(QUAD2D_VERTEX_SHADER),
+            paths::path_for_assets(QUAD2D_FRAGMENT_SHADER),
             uniforms
         );
     }
@@ -464,8 +448,8 @@ GuiRenderer::GuiRenderer(Application* app)
             "u_offset"
         };
         storage.text_shader = Shader::create(
-            path(TEXT_VERTEX_SHADER),
-            path(TEXT_FRAGMENT_SHADER),
+            paths::path_for_assets(TEXT_VERTEX_SHADER),
+            paths::path_for_assets(TEXT_FRAGMENT_SHADER),
             uniforms
         );
     }

@@ -13,10 +13,12 @@
 #include "graphics/renderer/main_renderer.h"
 #include "graphics/renderer/camera.h"
 #include "graphics/renderer/material.h"
+#include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/node.h"
+#include "nine_morris_3d/paths.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 
@@ -99,25 +101,10 @@ namespace glm {
 }
 
 namespace save_load {
-    static std::string path(const char* file) noexcept(false) {
-#if defined(NINE_MORRIS_3D_DEBUG)
-        // Use relative path for both operating systems
-        return std::string(file);
-#elif defined(NINE_MORRIS_3D_RELEASE)
-    #if defined(NINE_MORRIS_3D_LINUX)
-        std::string path = user_data::get_user_data_directory_path() + file;
-        return path;
-    #elif defined(NINE_MORRIS_3D_WINDOWS)
-        std::string path = user_data::get_user_data_directory_path() + "\\" + file;
-        return path;
-    #endif
-#endif
-    }
-
     void save_game_to_file(const GameState& game_state) noexcept(false) {
         std::string file_path;
         try {
-            file_path = path(SAVE_GAME_FILE);
+            file_path = paths::path_for_save_and_options(SAVE_GAME_FILE);
         } catch (const user_data::UserNameError& e) {
             throw SaveFileError(e.what());
         }
@@ -143,7 +130,7 @@ namespace save_load {
     void load_game_from_file(GameState& game_state) noexcept(false) {
         std::string file_path;
         try {
-            file_path = path(SAVE_GAME_FILE);
+            file_path = paths::path_for_save_and_options(SAVE_GAME_FILE);
         } catch (const user_data::UserNameError& e) {
             throw SaveFileError(e.what());
         }
@@ -179,7 +166,7 @@ namespace save_load {
         bool user_data_directory;
 
         try {
-            user_data_directory = user_data::user_data_directory_exists();
+            user_data_directory = user_data::user_data_directory_exists(APP_NAME);
         } catch (const user_data::UserNameError& e) {
             REL_ERROR("{}", e.what());
             return;
@@ -189,7 +176,7 @@ namespace save_load {
             REL_INFO("User data folder missing; creating one...");
 
             try {
-                bool success = user_data::create_user_data_directory();
+                bool success = user_data::create_user_data_directory(APP_NAME);
                 if (!success) {
                     REL_ERROR("Could not create user data directory");
                     return;

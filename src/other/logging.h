@@ -37,6 +37,6 @@ namespace logging {
         None, Console, File
     };
 
-    void initialize();
-    void log_opengl_and_dependencies_info(LogTarget target);
+    void initialize(const char* log_file);
+    void log_opengl_and_dependencies_info(LogTarget target, const char* info_file);
 }
