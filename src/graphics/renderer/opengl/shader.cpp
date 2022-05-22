@@ -160,7 +160,7 @@ std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
             block.uniform_buffer->configured = true;
         }
 
-        glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);  // TODO max uniform buffer bindings
+        glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
     }
 
     std::string name = get_name(vertex_source_path, fragment_source_path);

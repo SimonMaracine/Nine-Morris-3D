@@ -14,10 +14,10 @@
 #include <utf8.h>
 
 #include "application/platform.h"
+#include "graphics/debug_opengl.h"
 #include "graphics/renderer/font.h"
 #include "graphics/renderer/opengl/buffer.h"
 #include "graphics/renderer/opengl/vertex_array.h"
-#include "graphics/debug_opengl.h"
 #include "other/logging.h"
 #include "other/assert.h"
 

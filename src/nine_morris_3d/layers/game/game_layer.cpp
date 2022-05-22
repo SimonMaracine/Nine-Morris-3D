@@ -16,7 +16,6 @@
 #include "application/events.h"
 #include "application/input.h"
 #include "application/platform.h"
-#include "graphics/debug_opengl.h"
 #include "graphics/renderer/buffer_layout.h"
 #include "graphics/renderer/light.h"
 #include "graphics/renderer/camera.h"
@@ -73,9 +72,6 @@ void GameLayer::on_attach() {
 #endif
 
     app->camera.go_towards_position(default_camera_position);
-
-    // It's ok to be called multiple times
-    STOP_ALLOCATION_LOG();
 }
 
 void GameLayer::on_detach() {

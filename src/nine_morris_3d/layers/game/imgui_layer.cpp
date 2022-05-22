@@ -88,6 +88,9 @@ void ImGuiLayer::on_awake() {
     style.ChildRounding = 8;
     style.PopupRounding = 8;
     style.GrabRounding = 8;
+
+    // It's ok to be called multiple times
+    LOG_TOTAL_GPU_MEMORY_ALLOCATED();
 }
 
 void ImGuiLayer::on_update(float dt) {
@@ -507,14 +510,14 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Game started: %s", game_layer->first_move ? "true" : "false");
         ImGui::End();
 
-        ImGui::Begin("Debug Settings");
-        if (ImGui::SliderFloat3("Light position", reinterpret_cast<float*>(&app->renderer->light.position),
+        ImGui::Begin("Light Settings");
+        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position),
                 -30.0f, 30.0f)) {}
-        if (ImGui::SliderFloat3("Light ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color),
+        if (ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color),
                 0.0f, 1.0f)) {}
-        if (ImGui::SliderFloat3("Light diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color),
+        if (ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color),
                 0.0f, 1.0f)) {}
-        if (ImGui::SliderFloat3("Light specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color),
+        if (ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color),
                 0.0f, 1.0f)) {}
         ImGui::End();
 

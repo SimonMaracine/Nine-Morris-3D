@@ -4,8 +4,8 @@
 
 #include <glad/glad.h>
 
-#include "graphics/renderer/opengl/buffer.h"
 #include "graphics/debug_opengl.h"
+#include "graphics/renderer/opengl/buffer.h"
 #include "other/logging.h"
 
 Buffer::Buffer(GLuint buffer)

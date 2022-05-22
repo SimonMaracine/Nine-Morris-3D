@@ -3,8 +3,8 @@
 
 #include <glad/glad.h>
 
-#include "graphics/renderer/opengl/framebuffer.h"
 #include "graphics/debug_opengl.h"
+#include "graphics/renderer/opengl/framebuffer.h"
 #include "other/logging.h"
 #include "other/assert.h"
 

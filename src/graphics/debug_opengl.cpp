@@ -15,6 +15,7 @@
 
 #include "application/platform.h"
 #include "application/extensions.h"
+#include "graphics/debug_opengl.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
@@ -29,6 +30,7 @@ constexpr GLenum parameters[] = {
     GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
     GL_MAX_VERTEX_UNIFORM_COMPONENTS,
     GL_MAX_TEXTURE_LOD_BIAS,
+    GL_MAX_UNIFORM_BUFFER_BINDINGS,
     GL_MAX_VIEWPORT_DIMS,
     GL_STEREO
 };
@@ -44,13 +46,13 @@ const char* names[] = {
     "GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS",
     "GL_MAX_VERTEX_UNIFORM_COMPONENTS",
     "GL_MAX_TEXTURE_LOD_BIAS",
+    "GL_MAX_UNIFORM_BUFFER_BINDINGS",
     "GL_MAX_VIEWPORT_DIMS",
     "GL_STEREO"
 };
 
 #ifdef NINE_MORRIS_3D_DEBUG
-unsigned long long bytes_allocated_gpu = 0;
-bool stop_counting_bytes_allocated_gpu = false;
+    GpuMemoryCounter _gpu_mem_counter;
 #endif
 
 namespace debug_opengl {
@@ -160,7 +162,9 @@ namespace debug_opengl {
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** OpenGL Context Parameters ***\n");
 
-        for (int i = 0; i <= 9; i++) {
+        unsigned int parameter_index = 10;
+
+        for (unsigned int i = 0; i <= parameter_index; i++) {
             GLint result;
             glGetIntegerv(parameters[i], &result);
 
@@ -170,18 +174,18 @@ namespace debug_opengl {
         }
         {
             GLint result[2];
-            glGetIntegerv(parameters[10], result);
+            glGetIntegerv(parameters[++parameter_index], result);
 
             char line[128];
-            sprintf(line, "%s %i %i\n", names[10], result[0], result[1]);
+            sprintf(line, "%s %i %i\n", names[parameter_index], result[0], result[1]);
             output.append(line);
         }
         {
             GLboolean result;
-            glGetBooleanv(parameters[11], &result);
+            glGetBooleanv(parameters[++parameter_index], &result);
 
             char line[128];
-            sprintf(line, "%s %u\n", names[11], (unsigned int) result);
+            sprintf(line, "%s %u\n", names[parameter_index], (unsigned int) result);
             output.append(line);
         }
 

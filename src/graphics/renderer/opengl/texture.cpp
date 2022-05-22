@@ -8,8 +8,8 @@
 #include <stb_image.h>
 
 #include "application/extensions.h"
-#include "graphics/renderer/opengl/texture.h"
 #include "graphics/debug_opengl.h"
+#include "graphics/renderer/opengl/texture.h"
 #include "other/logging.h"
 #include "other/assert.h"
 

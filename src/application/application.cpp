@@ -14,7 +14,6 @@
 #include "application/events.h"
 #include "application/scene.h"
 #include "application/input.h"
-#include "application/extensions.h"
 #include "graphics/renderer/main_renderer.h"
 #include "graphics/renderer/gui_renderer.h"
 #include "graphics/debug_opengl.h"
@@ -38,12 +37,6 @@ Application::Application(int width, int height, std::string_view title) {
 
     auto [version_major, version_minor] = debug_opengl::get_version_numbers();
     DEB_INFO("Using OpenGL version {}.{}", version_major, version_minor);
-
-    if (extensions::extension_supported(extensions::AnisotropicFiltering)) {
-        DEB_INFO("Anisotropic filtering is supported");
-    } else {
-        DEB_INFO("Anisotropic filtering is NOT supported");
-    }
 
     renderer = std::make_unique<Renderer>(this);
     gui_renderer = std::make_unique<GuiRenderer>(this);

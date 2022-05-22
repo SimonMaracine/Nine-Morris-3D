@@ -9,29 +9,33 @@
 #if defined(NINE_MORRIS_3D_DEBUG)
     #ifdef PRINT_GPU_RAM_ALLOCATED
         #define LOG_ALLOCATION(bytes) \
-            if (!stop_counting_bytes_allocated_gpu) { \
+            if (!_gpu_mem_counter.stopped) { \
                 DEB_DEBUG("GPU: Allocated {} bytes ({} MiB)", (bytes), (bytes) / 1049000.0f); \
-                bytes_allocated_gpu += (bytes); \
+                _gpu_mem_counter.bytes_allocated += (bytes); \
             }
     #else
         #define LOG_ALLOCATION(bytes) \
-            if (!stop_counting_bytes_allocated_gpu) { \
-                bytes_allocated_gpu += (bytes); \
+            if (!_gpu_mem_counter.stopped) { \
+                _gpu_mem_counter.bytes_allocated += (bytes); \
             }
     #endif
 
-    #define STOP_ALLOCATION_LOG() \
-        if (!stop_counting_bytes_allocated_gpu) { \
-            DEB_INFO("GPU: Stop counting memory allocated"); \
-            DEB_INFO("GPU: {} total bytes allocated ({} MiB)", bytes_allocated_gpu, bytes_allocated_gpu / 1049000.0f); \
-        } \
-        stop_counting_bytes_allocated_gpu = true;
+    #define LOG_TOTAL_GPU_MEMORY_ALLOCATED() \
+        if (!_gpu_mem_counter.stopped) { \
+            DEB_INFO("GPU: {} total bytes in use ({} MiB)", _gpu_mem_counter.bytes_allocated, \
+                    _gpu_mem_counter.bytes_allocated / 1049000.0f); \
+            _gpu_mem_counter.stopped = true; \
+        }
 
-extern unsigned long long bytes_allocated_gpu;
-extern bool stop_counting_bytes_allocated_gpu;
+    struct GpuMemoryCounter {
+        unsigned long long bytes_allocated = 0;
+        bool stopped = false;
+    };
+
+    extern GpuMemoryCounter _gpu_mem_counter;
 #elif defined(NINE_MORRIS_3D_RELEASE)
     #define LOG_ALLOCATION(bytes) ((void) 0)
-    #define STOP_ALLOCATION_LOG() ((void) 0)
+    #define LOG_TOTAL_GPU_MEMORY_ALLOCATED() ((void) 0)
 #endif
 
 namespace debug_opengl {
