@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(EXECUTABLE_NAME Nine-Morris-3D)
+set(C_GLAD_STB c-glad-stb)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -64,10 +65,6 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/mesh.cpp"
     "src/other/texture_data.cpp"
     "src/other/user_data.cpp"
-    "dependencies/glad/src/glad.c"
-    "dependencies/stb_image/stb_image.c"
-    "dependencies/stb_truetype/stb_truetype.c"
-    "dependencies/stb_image_write/stb_image_write.c"
     "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_demo.cpp"
     "extern/imgui/imgui_tables.cpp"
@@ -75,6 +72,13 @@ add_executable(${EXECUTABLE_NAME}
     "extern/imgui/imgui.cpp"
     "extern/imgui/backends/imgui_impl_opengl3.cpp"
     "extern/imgui/backends/imgui_impl_glfw.cpp"
+)
+
+add_library(${C_GLAD_STB} STATIC
+    "dependencies/glad/src/glad.c"
+    "dependencies/stb_image/stb_image.c"
+    "dependencies/stb_truetype/stb_truetype.c"
+    "dependencies/stb_image_write/stb_image_write.c"
 )
 
 # Enable warnings
@@ -98,6 +102,34 @@ endif()
 # Use C++17
 target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+
+# PCH
+target_precompile_headers(${EXECUTABLE_NAME} PRIVATE
+    "<iostream>"
+    "<string>"
+    "<vector>"
+    "<memory>"
+    "<array>"
+    "<algorithm>"
+    "<stdexcept>"
+    "<utility>"
+    "<fstream>"
+    "<unordered_map>"
+    "<map>"
+    "<cstddef>"
+    "<functional>"
+    "<string_view>"
+    "<cmath>"
+    "<iterator>"
+    "<unordered_set>"
+    "<iomanip>"
+    "<thread>"
+    "<atomic>"
+    "<string.h>"
+    "<stdlib.h>"
+    "<time.h>"
+    "<stdio.h>"
+)
 
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/glm)
@@ -123,6 +155,13 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/imgui"
     "${CMAKE_SOURCE_DIR}/extern/json/single_include"
     "${CMAKE_SOURCE_DIR}/extern/utfcpp/source"
+)
+
+target_include_directories(${C_GLAD_STB} SYSTEM PUBLIC
+    "${CMAKE_SOURCE_DIR}/dependencies/glad/include"
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_truetype"
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_image_write"
 )
 
 # Add all link directories
@@ -176,6 +215,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
 endif()
 
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC "${CMAKE_DL_LIBS}")
+target_link_libraries(${EXECUTABLE_NAME} PUBLIC ${C_GLAD_STB})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     if(CMAKE_BUILD_TYPE MATCHES Debug)

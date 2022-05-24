@@ -31,6 +31,7 @@ namespace events {
     public:
         Dispatcher(Event& event)
             : event(event) {}
+        ~Dispatcher() = default;
 
         template<typename E, typename F>
         void dispatch(EventType type, const F& function) {

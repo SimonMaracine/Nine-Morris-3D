@@ -2,7 +2,6 @@
 #include <array>
 #include <vector>
 #include <algorithm>
-#include <cassert>
 #include <iterator>
 
 #include <glm/glm.hpp>

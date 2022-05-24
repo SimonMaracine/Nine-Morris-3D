@@ -1,7 +1,6 @@
 #include <string>
 #include <utility>
 #include <iostream>
-#include <cassert>
 #include <stdio.h>
 
 #include <glad/glad.h>
