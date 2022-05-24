@@ -1,5 +1,3 @@
-// #include <utility>
-
 #include <GLFW/glfw3.h>
 
 namespace input {

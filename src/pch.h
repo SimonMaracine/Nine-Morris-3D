@@ -1,0 +1,27 @@
+#pragma once
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <memory>
+#include <array>
+#include <algorithm>
+#include <stdexcept>
+#include <utility>
+#include <fstream>
+#include <unordered_map>
+#include <map>
+#include <cstddef>
+#include <functional>
+#include <string_view>
+#include <cmath>
+#include <iterator>
+#include <unordered_set>
+#include <iomanip>
+#include <thread>
+#include <atomic>
+#include <cassert>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>

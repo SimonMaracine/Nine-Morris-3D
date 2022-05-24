@@ -1,10 +1,5 @@
 #pragma once
 
-#include <string>
-#include <string_view>
-#include <memory>
-#include <unordered_map>
-
 #include <stb_truetype.h>
 #include <glad/glad.h>
 

@@ -1,9 +1,3 @@
-#include <memory>
-#include <string_view>
-#include <vector>
-#include <algorithm>
-#include <string.h>
-
 #include <glad/glad.h>
 #include <stb_image.h>
 

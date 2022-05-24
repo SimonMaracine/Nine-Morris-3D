@@ -1,7 +1,3 @@
-#include <memory>
-#include <string_view>
-#include <utility>
-
 #include <glm/glm.hpp>
 
 #include "graphics/renderer/material.h"

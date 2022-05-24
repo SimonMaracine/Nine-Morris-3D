@@ -1,5 +1,3 @@
-#include <string.h>
-
 #include "nine_morris_3d/timer.h"
 #include "other/logging.h"
 

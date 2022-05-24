@@ -1,11 +1,3 @@
-#include <string_view>
-#include <fstream>
-#include <vector>
-#include <iterator>
-#include <algorithm>
-#include <cmath>
-#include <string.h>
-
 #include <stb_truetype.h>
 #include <stb_image_write.h>
 #include <glad/glad.h>

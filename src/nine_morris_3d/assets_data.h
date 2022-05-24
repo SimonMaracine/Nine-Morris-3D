@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "other/mesh.h"
 #include "other/texture_data.h"
 #include "other/loader.h"

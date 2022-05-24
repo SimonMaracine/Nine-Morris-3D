@@ -1,10 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <string_view>
-#include <unordered_map>
-#include <utility>
-
 #include <glm/glm.hpp>
 
 #include "graphics/renderer/opengl/shader.h"

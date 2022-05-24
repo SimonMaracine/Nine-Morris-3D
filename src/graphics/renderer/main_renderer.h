@@ -1,9 +1,5 @@
 #pragma once
 
-#include <array>
-#include <memory>
-#include <map>
-
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 

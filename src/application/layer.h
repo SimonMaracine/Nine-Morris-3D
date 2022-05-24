@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string>
-#include <string_view>
-#include <utility>
-
 #include "application/application.h"
 #include "application/events.h"
 #include "application/scene.h"

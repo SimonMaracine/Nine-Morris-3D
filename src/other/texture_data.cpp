@@ -1,5 +1,3 @@
-#include <string_view>
-
 #include <stb_image.h>
 
 #include "other/texture_data.h"

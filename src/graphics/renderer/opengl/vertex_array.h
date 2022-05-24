@@ -1,8 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include <glad/glad.h>
 
 #include "graphics/renderer/buffer_layout.h"

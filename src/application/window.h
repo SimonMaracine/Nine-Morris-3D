@@ -1,9 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <unordered_map>
-#include <memory>
-
 #include <glad/glad.h>  // Include glad just to make everything compile
 #include <GLFW/glfw3.h>
 

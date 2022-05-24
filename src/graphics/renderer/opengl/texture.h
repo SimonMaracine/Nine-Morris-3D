@@ -1,9 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <string_view>
-#include <array>
-
 #include <glad/glad.h>
 #include <stb_image.h>
 

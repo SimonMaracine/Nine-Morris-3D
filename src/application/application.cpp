@@ -1,9 +1,3 @@
-#include <functional>
-#include <memory>
-#include <algorithm>
-#include <string_view>
-#include <vector>
-
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>

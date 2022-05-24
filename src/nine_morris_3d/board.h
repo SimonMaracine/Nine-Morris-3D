@@ -1,9 +1,5 @@
 #pragma once
 
-#include <array>
-#include <vector>
-#include <memory>
-
 #include <glm/glm.hpp>
 
 #include "graphics/renderer/main_renderer.h"

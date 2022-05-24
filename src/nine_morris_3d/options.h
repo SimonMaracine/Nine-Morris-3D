@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <stdexcept>
-
 namespace options {
     static constexpr const char* NORMAL = "normal";
     static constexpr const char* LOW = "low";

@@ -1,9 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <cstddef>
-#include <unordered_map>
-
 #include <glad/glad.h>
 
 /**

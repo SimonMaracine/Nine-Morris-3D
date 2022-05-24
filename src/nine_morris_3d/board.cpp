@@ -1,9 +1,3 @@
-#include <memory>
-#include <array>
-#include <vector>
-#include <algorithm>
-#include <iterator>
-
 #include <glm/glm.hpp>
 
 #include "nine_morris_3d/board.h"

@@ -1,13 +1,3 @@
-#include <functional>
-#include <vector>
-#include <algorithm>
-#include <array>
-#include <iterator>
-#include <string_view>
-#include <stdexcept>
-#include <memory>
-#include <stdlib.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 

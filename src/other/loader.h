@@ -1,9 +1,5 @@
 #pragma once
 
-#include <thread>
-#include <atomic>
-#include <functional>
-
 #include "other/logging.h"
 
 /**

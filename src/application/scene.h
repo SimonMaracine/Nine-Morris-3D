@@ -1,9 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <utility>
-
 class Application;
 class Layer;
 

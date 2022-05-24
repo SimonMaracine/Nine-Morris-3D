@@ -104,32 +104,7 @@ target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
 # PCH
-target_precompile_headers(${EXECUTABLE_NAME} PRIVATE
-    "<iostream>"
-    "<string>"
-    "<vector>"
-    "<memory>"
-    "<array>"
-    "<algorithm>"
-    "<stdexcept>"
-    "<utility>"
-    "<fstream>"
-    "<unordered_map>"
-    "<map>"
-    "<cstddef>"
-    "<functional>"
-    "<string_view>"
-    "<cmath>"
-    "<iterator>"
-    "<unordered_set>"
-    "<iomanip>"
-    "<thread>"
-    "<atomic>"
-    "<string.h>"
-    "<stdlib.h>"
-    "<time.h>"
-    "<stdio.h>"
-)
+target_precompile_headers(${EXECUTABLE_NAME} PRIVATE src/pch.h)
 
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/glm)

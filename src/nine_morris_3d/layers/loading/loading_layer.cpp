@@ -1,5 +1,3 @@
-#include <memory>
-
 #include <glm/glm.hpp>
 
 #include "application/events.h"

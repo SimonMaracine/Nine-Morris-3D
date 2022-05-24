@@ -1,8 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <cstddef>
-
 #include <glad/glad.h>
 
 struct VertexElement {

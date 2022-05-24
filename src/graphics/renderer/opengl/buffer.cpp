@@ -1,7 +1,3 @@
-#include <memory>
-#include <cstddef>
-#include <string.h>
-
 #include <glad/glad.h>
 
 #include "graphics/debug_opengl.h"

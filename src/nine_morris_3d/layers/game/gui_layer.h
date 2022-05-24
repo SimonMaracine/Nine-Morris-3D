@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <utility>
-
 #include "application/layer.h"
 #include "nine_morris_3d/timer.h"
 

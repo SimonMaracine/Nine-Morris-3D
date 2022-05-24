@@ -1,8 +1,3 @@
-#include <string>
-#include <utility>
-#include <iostream>
-#include <stdio.h>
-
 #include <glad/glad.h>
 #include <imgui.h>
 #include <GLFW/glfw3.h>

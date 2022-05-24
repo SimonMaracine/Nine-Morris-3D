@@ -1,7 +1,3 @@
-#include <fstream>
-#include <iomanip>
-#include <string>
-
 #include <nlohmann/json.hpp>
 
 #include "application/platform.h"

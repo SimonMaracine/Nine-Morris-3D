@@ -1,5 +1,3 @@
-#include <string>
-
 #include "application/platform.h"
 
 #if defined(NINE_MORRIS_3D_LINUX)

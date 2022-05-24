@@ -1,5 +1,3 @@
-#include <string_view>
-
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
 

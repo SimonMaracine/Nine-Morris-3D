@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string>
-#include <memory>
-#include <utility>
-
 #include "application/layer.h"
 #include "application/events.h"
 #include "nine_morris_3d/assets_data.h"

@@ -1,5 +1,3 @@
-#include <string>
-
 #include "application/platform.h"
 #include "nine_morris_3d/paths.h"
 #include "nine_morris_3d/nine_morris_3d.h"

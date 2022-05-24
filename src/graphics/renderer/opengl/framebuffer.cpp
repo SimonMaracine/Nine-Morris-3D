@@ -1,6 +1,3 @@
-#include <memory>
-#include <algorithm>
-
 #include <glad/glad.h>
 
 #include "graphics/debug_opengl.h"

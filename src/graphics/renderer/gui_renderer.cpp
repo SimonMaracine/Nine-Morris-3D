@@ -1,9 +1,3 @@
-#include <memory>
-#include <string>
-#include <vector>
-#include <unordered_set>
-#include <algorithm>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <array>
-#include <memory>
-
 #include "graphics/renderer/opengl/buffer.h"
 #include "graphics/renderer/opengl/framebuffer.h"
 

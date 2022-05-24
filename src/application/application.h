@@ -1,9 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <string_view>
-#include <vector>
-
 #include "application/application_data.h"
 #include "application/events.h"
 #include "application/window.h"

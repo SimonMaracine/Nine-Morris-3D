@@ -1,8 +1,3 @@
-#include <string>
-#include <string_view>
-#include <vector>
-#include <memory>
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>

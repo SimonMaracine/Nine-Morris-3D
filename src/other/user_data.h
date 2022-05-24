@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <stdexcept>
-
 /**
  * These are functions for getting platform specific username and user directories.
  */

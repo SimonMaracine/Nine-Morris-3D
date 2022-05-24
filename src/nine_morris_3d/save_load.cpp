@@ -1,8 +1,3 @@
-#include <fstream>
-#include <string>
-#include <stdexcept>
-#include <stdio.h>
-
 #include <glm/glm.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/vector.hpp>
