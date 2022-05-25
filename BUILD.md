@@ -17,6 +17,7 @@
 
 #### Visual Studio
     cmake . -D CMAKE_BUILD_TYPE=Release -D VSCODE=OFF -A x64  
+    :: Open in Visual Studio and build from there
 
 ## Linux debug
 
@@ -35,3 +36,4 @@
 
 #### Visual Studio
     cmake . -D CMAKE_BUILD_TYPE=Debug -D VSCODE=OFF -A x64  
+    :: Open in Visual Studio and build from there
