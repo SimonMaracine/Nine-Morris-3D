@@ -29,6 +29,55 @@ project("Nine Morris 3D"
     LANGUAGES C CXX
 )
 
+set(HEADERS_FOR_WINDOWS
+    "src/pch.h"
+    "src/application/application.h"
+    "src/application/application_data.h"
+    "src/application/events.h"
+    "src/application/input.h"
+    "src/application/layer.h"
+    "src/application/platform.h"
+    "src/application/scene.h"
+    "src/application/window.h"
+    "src/application/icon_image.h"
+    "src/application/extensions.h"
+    "src/graphics/debug_opengl.h"
+    "src/graphics/renderer/main_renderer.h"
+    "src/graphics/renderer/gui_renderer.h"
+    "src/graphics/renderer/buffer_layout.h"
+    "src/graphics/renderer/camera.h"
+    "src/graphics/renderer/font.h"
+    "src/graphics/renderer/framebuffer_reader.h"
+    "src/graphics/renderer/hoverable.h"
+    "src/graphics/renderer/light.h"
+    "src/graphics/renderer/material.h"
+    "src/graphics/renderer/opengl/vertex_array.h"
+    "src/graphics/renderer/opengl/buffer.h"
+    "src/graphics/renderer/opengl/shader.h"
+    "src/graphics/renderer/opengl/texture.h"
+    "src/graphics/renderer/opengl/framebuffer.h"
+    "src/nine_morris_3d/nine_morris_3d.h"
+    "src/nine_morris_3d/layers/game/game_layer.h"
+    "src/nine_morris_3d/layers/game/imgui_layer.h"
+    "src/nine_morris_3d/layers/game/gui_layer.h"
+    "src/nine_morris_3d/layers/loading/loading_layer.h"
+    "src/nine_morris_3d/options.h"
+    "src/nine_morris_3d/save_load.h"
+    "src/nine_morris_3d/assets_data.h"
+    "src/nine_morris_3d/board.h"
+    "src/nine_morris_3d/node.h"
+    "src/nine_morris_3d/piece.h"
+    "src/nine_morris_3d/timer.h"
+    "src/nine_morris_3d/assets.h"
+    "src/nine_morris_3d/paths.h"
+    "src/other/assert.h"
+    "src/other/loader.h"
+    "src/other/logging.h"
+    "src/other/mesh.h"
+    "src/other/texture_data.h"
+    "src/other/user_data.h"
+)
+
 add_executable(${EXECUTABLE_NAME}
     "src/main.cpp"
     "src/application/application.cpp"
@@ -72,6 +121,7 @@ add_executable(${EXECUTABLE_NAME}
     "extern/imgui/imgui.cpp"
     "extern/imgui/backends/imgui_impl_opengl3.cpp"
     "extern/imgui/backends/imgui_impl_glfw.cpp"
+    ${HEADERS_FOR_WINDOWS}
 )
 
 add_library(${C_GLAD_STB} STATIC
@@ -143,39 +193,45 @@ target_include_directories(${C_GLAD_STB} SYSTEM PUBLIC
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-                "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
-                "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+            "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
+            "${CMAKE_SOURCE_DIR}/build/extern/glfw/src"
+        )
     elseif(CMAKE_BUILD_TYPE MATCHES Release)
         target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-                "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
-                "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
+            "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src"
+        )
     endif()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     if(VSCODE MATCHES ON)
         if(CMAKE_BUILD_TYPE MATCHES Debug)
             target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                    "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-                    "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
-                    "${CMAKE_SOURCE_DIR}/build/extern/glfw/src")
+                "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/build/extern/glfw/src"
+            )
         elseif(CMAKE_BUILD_TYPE MATCHES Release)
             target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                    "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-                    "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
-                    "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src")
+                "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src"
+            )
         endif()
     elseif(VSCODE MATCHES OFF)
         if(CMAKE_BUILD_TYPE MATCHES Debug)
             target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                    "${CMAKE_SOURCE_DIR}/extern/spdlog"
-                    "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
-                    "${CMAKE_SOURCE_DIR}/extern/glfw/src")
+                "${CMAKE_SOURCE_DIR}/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/extern/glfw/src"
+            )
         elseif(CMAKE_BUILD_TYPE MATCHES Release)
             target_link_directories(${EXECUTABLE_NAME} PUBLIC
-                    "${CMAKE_SOURCE_DIR}/extern/spdlog"
-                    "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
-                    "${CMAKE_SOURCE_DIR}/extern/glfw/src")
+                "${CMAKE_SOURCE_DIR}/extern/spdlog"
+                "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
+                "${CMAKE_SOURCE_DIR}/extern/glfw/src"
+            )
         endif()
     endif()
 endif()
@@ -183,10 +239,12 @@ endif()
 # Add all libraries
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-            spdlog assimp glfw X11)
+        spdlog assimp glfw X11
+    )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-            spdlog assimp glfw)
+        spdlog assimp glfw
+    )
 endif()
 
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC "${CMAKE_DL_LIBS}")
@@ -198,11 +256,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
         set_property(TARGET spdlog PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
         set_property(TARGET assimp PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
         set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
+        set_property(TARGET ${C_GLAD_STB} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
     elseif(CMAKE_BUILD_TYPE MATCHES Release)
         set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
         set_property(TARGET spdlog PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
         set_property(TARGET assimp PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
         set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
+        set_property(TARGET ${C_GLAD_STB} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
     endif()
 endif()
 
@@ -210,11 +270,13 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("Building in DEBUG mode")
     target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
-            SPDLOG_ACTIVE_LEVEL=0)  # PRINT_GPU_RAM_ALLOCATED
+        SPDLOG_ACTIVE_LEVEL=0  # PRINT_GPU_RAM_ALLOCATED
+    )
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message("Building in RELEASE mode")
     target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
-            SPDLOG_ACTIVE_LEVEL=0 NDEBUG)
+        SPDLOG_ACTIVE_LEVEL=0 NDEBUG
+    )
 endif()
 
 target_compile_definitions(${EXECUTABLE_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
