@@ -6,6 +6,7 @@
 #include <spdlog/version.h>
 #include <nlohmann/json.hpp>
 #include <cereal/version.hpp>
+#include <cppblowfish.h>
 
 #include "application/platform.h"
 #include "application/extensions.h"
@@ -245,6 +246,12 @@ namespace debug_opengl {
             char line[128];
             sprintf(line, "cereal version: %d.%d.%d\n", CEREAL_VERSION_MAJOR,
                     CEREAL_VERSION_MINOR, CEREAL_VERSION_PATCH);
+            output.append(line);
+        }
+        {
+            char line[128];
+            sprintf(line, "cppblowfish version: %d.%d.%d\n", CPPBLOWFISH_VERSION_MAJOR,
+                    CPPBLOWFISH_VERSION_MINOR, CPPBLOWFISH_VERSION_PATCH);
             output.append(line);
         }
         {

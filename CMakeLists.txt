@@ -5,11 +5,11 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 set(EXECUTABLE_NAME Nine-Morris-3D)
 set(C_GLAD_STB c-glad-stb)
 
-if(NOT CMAKE_BUILD_TYPE)
+if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-if(NOT VSCODE)
+if(NOT DEFINED VSCODE)
     set(VSCODE OFF)
 endif()
 
@@ -23,6 +23,7 @@ set(ASSIMP_INSTALL_PDB OFF)
 set(ASSIMP_NO_EXPORT ON)
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
+set(CPPBLOWFISH_BUILD_TESTS OFF)
 
 project("Nine Morris 3D"
     VERSION 0.1.0
@@ -162,6 +163,7 @@ add_subdirectory(extern/glfw)
 add_subdirectory(extern/json)
 add_subdirectory(extern/assimp)
 add_subdirectory(extern/utfcpp)
+add_subdirectory(extern/cppblowfish)
 
 add_dependencies(${EXECUTABLE_NAME} glfw)  # This is necessary for some reason
 
@@ -180,6 +182,7 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/imgui"
     "${CMAKE_SOURCE_DIR}/extern/json/single_include"
     "${CMAKE_SOURCE_DIR}/extern/utfcpp/source"
+    "${CMAKE_SOURCE_DIR}/extern/cppblowfish/include"
 )
 
 target_include_directories(${C_GLAD_STB} SYSTEM PUBLIC
@@ -239,11 +242,11 @@ endif()
 # Add all libraries
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-        spdlog assimp glfw X11
+        spdlog assimp glfw cppblowfish X11
     )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-        spdlog assimp glfw
+        spdlog assimp glfw cppblowfish
     )
 endif()
 
