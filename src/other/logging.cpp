@@ -15,56 +15,49 @@
 SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
 
 namespace logging {
-    static std::shared_ptr<spdlog::logger> release_logger;
-    static std::shared_ptr<spdlog::logger> debug_logger;
-
-    static void set_global_logger() {
-#if defined(NINE_MORRIS_3D_DEBUG)
-        spdlog::set_default_logger(debug_logger);
-#elif defined(NINE_MORRIS_3D_RELEASE)
-        spdlog::set_default_logger(release_logger);
-#endif
-    }
+    static std::shared_ptr<spdlog::logger> global_logger;
 
     void initialize(const char* log_file) {
-        // Initialize debug logger
-        debug_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
-        debug_logger->set_pattern(LOG_PATTERN_DEBUG);
-        debug_logger->set_level(spdlog::level::trace);
+#if defined(NINE_MORRIS_3D_DEBUG)
+        global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
+        global_logger->set_pattern(LOG_PATTERN_DEBUG);
+        global_logger->set_level(spdlog::level::trace);
 
+        spdlog::set_default_logger(global_logger);
+#elif defined(NINE_MORRIS_3D_RELEASE)
         std::string file_path;
         try {
             file_path = paths::path_for_logs(log_file);
         } catch (const user_data::UserNameError& e) {            
-            release_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
-            release_logger->set_pattern(LOG_PATTERN_RELEASE);
-            release_logger->set_level(spdlog::level::trace);
+            global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
+            global_logger->set_pattern(LOG_PATTERN_RELEASE);
+            global_logger->set_level(spdlog::level::trace);
 
             spdlog::error("Using fallback logger (console)");
 
-            set_global_logger();
+            spdlog::set_default_logger(global_logger);
             return;
         }
 
-        // Initialize release logger
         try {
-            release_logger = spdlog::basic_logger_mt("Release Logger [File]", file_path, false);
+            global_logger = spdlog::basic_logger_mt("Release Logger [File]", file_path, false);
         } catch (const spdlog::spdlog_ex& e) {
-            release_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
-            release_logger->set_pattern(LOG_PATTERN_RELEASE);
-            release_logger->set_level(spdlog::level::trace);
+            global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
+            global_logger->set_pattern(LOG_PATTERN_RELEASE);
+            global_logger->set_level(spdlog::level::trace);
 
             spdlog::error("Using fallback logger (console): {}", e.what());
 
-            set_global_logger();
+            spdlog::set_default_logger(global_logger);
             return;
         }
 
-        release_logger->set_pattern(LOG_PATTERN_RELEASE);
-        release_logger->set_level(spdlog::level::trace);
-        release_logger->flush_on(spdlog::level::info);
+        global_logger->set_pattern(LOG_PATTERN_RELEASE);
+        global_logger->set_level(spdlog::level::trace);
+        global_logger->flush_on(spdlog::level::info);
 
-        set_global_logger();
+        spdlog::set_default_logger(global_logger);
+#endif
     }
 
     void log_opengl_and_dependencies_info(LogTarget target, const char* info_file) {
@@ -88,7 +81,7 @@ namespace logging {
                     break;
                 }
 
-                file << contents.c_str();
+                file << contents;
 
                 break;
             }

@@ -1,3 +1,4 @@
+#include "application/scene.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
