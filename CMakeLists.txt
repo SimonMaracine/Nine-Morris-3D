@@ -155,7 +155,7 @@ target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
 # PCH
-target_precompile_headers(${EXECUTABLE_NAME} PRIVATE src/pch.h)
+target_precompile_headers(${EXECUTABLE_NAME} PRIVATE "src/pch.h")
 
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/glm)

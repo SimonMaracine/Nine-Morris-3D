@@ -3,7 +3,7 @@
 /.vscode
 /build
 /build-release
-/data/textures/old
+/encrypter-helper/build
 log.txt
 info.txt
 ninemorris3d_log.txt
@@ -12,9 +12,9 @@ imgui.ini
 *.blend1
 Nine-Morris-3D
 Nine-Morris-3D.exe
-last_game.dat
 options.json
 bitmap_*.png
+*.dat
 
 /.vs
 CMakeCache.txt
