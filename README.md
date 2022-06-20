@@ -11,3 +11,22 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has thre
 - Strategy
 - Indie
 - 3D
+
+### Exporting on Linux:
+- Create a new folder called "Nine-Morris-3D-vX.Y.Z-Linux"
+- Copy the executable from build-release/
+- Make sure that all assets are encrypted
+- Copy the data directory filtering the unwanted files (keep only encrypted assets)
+- Copy HELP_LINUX.txt
+- Copy install.sh and uninstall.sh from scripts/linux-install/
+
+### Exporting on Windows:
+- Create a new folder called "Nine-Morris-3D"
+- Copy the executable from build-release/
+- Make sure that all assets are encrypted
+- Copy the data directory filtering the unwanted files (keep only encrypted assets)
+- Create the NSIS installer called "Nine-Morris-3D-vX.Y.Z-Windows" using the Nine-Morris-3D folder
+
+### Where to update the version:
+- CMakeLists.txt
+- nine_morris_3d.h

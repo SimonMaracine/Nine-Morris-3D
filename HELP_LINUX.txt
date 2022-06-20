@@ -1,4 +1,4 @@
-To install the game, just open the terminal into the game directory "Nine-Morris-3D-vX.Y.Z"
+To install the game, just open the terminal into the game directory "Nine-Morris-3D-vX.Y.Z-Linux"
 and run the install.sh script with sudo.
 
 You can find a copy of this HELP_LINUX.txt file in /usr/share/ninemorris3d after install.
