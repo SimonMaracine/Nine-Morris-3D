@@ -107,9 +107,9 @@ namespace save_load {
         std::ofstream file (file_path, std::ios::binary | std::ios::trunc);
 
         if (!file.is_open()) {
-            std::string message = "Could not open last save game file '" + std::string(SAVE_GAME_FILE)
-                    + "' for writing";
-            throw SaveFileNotOpenError(message);
+            throw SaveFileNotOpenError(
+                "Could not open last save game file '" + std::string(SAVE_GAME_FILE) + "' for writing"
+            );
         }
 
         try {
@@ -133,8 +133,9 @@ namespace save_load {
         std::ifstream file (file_path, std::ios::binary);
 
         if (!file.is_open()) {
-            std::string message = "Could not open last save game file '" + std::string(SAVE_GAME_FILE) + "'";
-            throw SaveFileNotOpenError(message);
+            throw SaveFileNotOpenError(
+                "Could not open last save game file '" + std::string(SAVE_GAME_FILE) + "'"
+            );
         }
 
         try {

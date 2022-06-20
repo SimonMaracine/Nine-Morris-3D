@@ -23,11 +23,13 @@ namespace options {
         std::ofstream file (file_path, std::ios::trunc);
 
         if (!file.is_open()) {
-            std::string message = "Could not open options file '" + file_path + "' for writing";
-            throw OptionsFileNotOpenError(message);
+            throw OptionsFileNotOpenError(
+                "Could not open options file '" + file_path + "' for writing"
+            );
         }
 
         json object;
+
         object["texture_quality"] = options.texture_quality;
         object["samples"] = options.samples;
         object["anisotropic_filtering"] = options.anisotropic_filtering;
@@ -53,8 +55,9 @@ namespace options {
         std::ifstream file (file_path);
 
         if (!file.is_open()) {
-            std::string message = "Could not open options file '" + file_path + "'";
-            throw OptionsFileNotOpenError(message);
+            throw OptionsFileNotOpenError(
+                "Could not open options file '" + file_path + "'"
+            );
         }
 
         std::string contents, line;
@@ -72,24 +75,17 @@ namespace options {
             throw OptionsFileError(e.what());
         }
 
-        std::string texture_quality;
-        int samples;
-        int anisotropic_filtering;
-        bool vsync;
-        bool save_on_exit;
-        std::string skybox;
-        bool custom_cursor;
-        float sensitivity;
+        Options options_file;
 
         try {
-            texture_quality = object.at("texture_quality").get<std::string>();
-            samples = object.at("samples").get<int>();
-            anisotropic_filtering = object.at("anisotropic_filtering").get<int>();
-            vsync = object.at("vsync").get<bool>();
-            save_on_exit = object.at("save_on_exit").get<bool>();
-            skybox = object.at("skybox").get<std::string>();
-            custom_cursor = object.at("custom_cursor").get<bool>();
-            sensitivity = object.at("sensitivity").get<float>();
+            options_file.texture_quality = object.at("texture_quality").get<std::string>();
+            options_file.samples = object.at("samples").get<int>();
+            options_file.anisotropic_filtering = object.at("anisotropic_filtering").get<int>();
+            options_file.vsync = object.at("vsync").get<bool>();
+            options_file.save_on_exit = object.at("save_on_exit").get<bool>();
+            options_file.skybox = object.at("skybox").get<std::string>();
+            options_file.custom_cursor = object.at("custom_cursor").get<bool>();
+            options_file.sensitivity = object.at("sensitivity").get<float>();
         } catch (const json::out_of_range& e) {
             throw OptionsFileError(e.what());
         } catch (const json::type_error& e) {
@@ -98,34 +94,35 @@ namespace options {
             throw OptionsFileError(e.what());
         }
 
-        if (texture_quality != NORMAL && texture_quality != LOW) {
+        if (options_file.texture_quality != NORMAL && options_file.texture_quality != LOW) {
             throw OptionsFileError("Options file is invalid: texture_quality");
         }
 
-        if (samples != 1 && samples != 2 && samples != 4) {
+        if (options_file.samples != 1 && options_file.samples != 2 && options_file.samples != 4) {
             throw OptionsFileError("Options file is invalid: samples");
         }
 
-        if (anisotropic_filtering != 0 && anisotropic_filtering != 4 && anisotropic_filtering != 8) {
+        if (options_file.anisotropic_filtering != 0 && options_file.anisotropic_filtering != 4
+                && options_file.anisotropic_filtering != 8) {
             throw OptionsFileError("Options file is invalid: anisotropic_filtering");
         }
 
-        if (skybox != FIELD && skybox != AUTUMN) {
+        if (options_file.skybox != FIELD && options_file.skybox != AUTUMN) {
             throw OptionsFileError("Options file is invalid: skybox");
         }
 
-        if (sensitivity < 0.5f || sensitivity > 2.0f) {
+        if (options_file.sensitivity < 0.5f || options_file.sensitivity > 2.0f) {
             throw OptionsFileError("Options file is invalid: sensitivity");
         }
 
-        options.texture_quality = texture_quality;
-        options.samples = samples;
-        options.anisotropic_filtering = anisotropic_filtering;
-        options.vsync = vsync;
-        options.save_on_exit = save_on_exit;
-        options.skybox = skybox;
-        options.custom_cursor = custom_cursor;
-        options.sensitivity = sensitivity;
+        options.texture_quality = std::move(options_file.texture_quality);
+        options.samples = options_file.samples;
+        options.anisotropic_filtering = options_file.anisotropic_filtering;
+        options.vsync = options_file.vsync;
+        options.save_on_exit = options_file.save_on_exit;
+        options.skybox = std::move(options_file.skybox);
+        options.custom_cursor = options_file.custom_cursor;
+        options.sensitivity = options_file.sensitivity;
 
         DEB_INFO("Loaded options from file '{}'", file_path);
     }
@@ -138,15 +135,17 @@ namespace options {
             throw OptionsFileError(e.what());
         }
 
-        std::ofstream file (file_path);
+        std::ofstream file (file_path, std::ios::trunc);
 
         if (!file.is_open()) {
-            std::string message = "Could not open options file '" + file_path + "' for writing";
-            throw OptionsFileNotOpenError(message);
+            throw OptionsFileNotOpenError(
+                "Could not open options file '" + file_path + "' for writing"
+            );
         }
 
         Options options;
         json object;
+
         object["texture_quality"] = options.texture_quality;
         object["samples"] = options.samples;
         object["anisotropic_filtering"] = options.anisotropic_filtering;
