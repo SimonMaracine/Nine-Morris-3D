@@ -356,7 +356,7 @@ namespace gui {
     }
 
     Text::Text(std::shared_ptr<Frame> parent, std::shared_ptr<Font> font, std::string_view text,
-                float scale, const glm::vec3& color)
+            float scale, const glm::vec3& color)
         : Widget(parent), font(font), text(text), scale(scale), color(color) {
         font->get_string_size(text, scale, &size.x, &size.y);
     }
@@ -506,8 +506,7 @@ void GuiRenderer::render() {
     glEnable(GL_DEPTH_TEST);
 }
 
-void GuiRenderer::im_draw_quad(const glm::vec2& position, const glm::vec2& scale,
-            std::shared_ptr<Texture> texture) {
+void GuiRenderer::im_draw_quad(glm::vec2 position, glm::vec2 scale, std::shared_ptr<Texture> texture) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
     matrix = glm::scale(matrix, glm::vec3(scale.x, scale.y, 1.0f));

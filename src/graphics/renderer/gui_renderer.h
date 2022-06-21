@@ -136,10 +136,7 @@ public:
     ~GuiRenderer();
 
     void render();
-
-    void im_draw_quad(const glm::vec2& position, const glm::vec2& scale,
-            std::shared_ptr<Texture> texture);
-
+    void im_draw_quad(glm::vec2 position, glm::vec2 scale, std::shared_ptr<Texture> texture);
     void on_window_resized(events::WindowResizedEvent& event);
 
     std::shared_ptr<gui::Frame> get_frame() { return main_frame; }

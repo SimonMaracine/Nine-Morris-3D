@@ -20,11 +20,11 @@
 
 #define IGNORE(variable) ((void) variable)
 
-const char* projection_view_block_fields[] = {
+static const char* projection_view_block_fields[] = {
     "u_projection_view_matrix"
 };
 
-const char* light_block_fields[] = {
+static const char* light_block_fields[] = {
     "u_light_position",
     "u_light_ambient",
     "u_light_diffuse",
@@ -32,7 +32,7 @@ const char* light_block_fields[] = {
     "u_view_position"
 };
 
-const char* light_space_block_fields[] = {
+static const char* light_space_block_fields[] = {
     "u_light_space_matrix"
 };
 
@@ -234,6 +234,9 @@ Renderer::Renderer(Application* app)
     storage.screen_quad_shader->bind();
     storage.screen_quad_shader->upload_uniform_int("u_screen_texture", 0);
 
+    storage.quad3d_shader->bind();
+    storage.quad3d_shader->upload_uniform_int("u_texture", 0);
+
     DEB_INFO("Initialized renderer");
 }
 
@@ -242,8 +245,7 @@ Renderer::~Renderer() {
 }
 
 void Renderer::render() {
-    projection_view_matrix = app->camera.get_projection_view_matrix();
-
+    const glm::mat4& projection_view_matrix = app->camera.get_projection_view_matrix();
     storage.projection_view_uniform_buffer->set(&projection_view_matrix, 0);
     storage.projection_view_uniform_buffer->bind();
     storage.projection_view_uniform_buffer->upload_data();
@@ -406,6 +408,8 @@ void Renderer::render() {
     if (origin) {
         draw_origin();
     }
+
+    im_draw_quad(light.position, 1.0f, storage.light_bulb_texture);
 #endif
 
     storage.scene_framebuffer->resolve_framebuffer(storage.intermediate_framebuffer->get_id(),
@@ -427,6 +431,22 @@ void Renderer::render() {
     hovered_id = *data;
 
     check_hovered_id(x, y);
+}
+
+void Renderer::im_draw_quad(const glm::vec3& position, float scale, std::shared_ptr<Texture> texture) {
+    glm::mat4 matrix = glm::mat4(1.0f);
+    matrix = glm::translate(matrix, position);
+    matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
+
+    storage.quad3d_shader->bind();
+    storage.quad3d_shader->upload_uniform_mat4("u_model_matrix", matrix);
+    storage.quad3d_shader->upload_uniform_mat4("u_view_matrix", app->camera.get_view_matrix());
+    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", app->camera.get_projection_matrix());
+
+    texture->bind(0);
+    storage.screen_quad_vertex_array->bind();
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::add_model(Model& model, int options) {
@@ -557,7 +577,7 @@ void Renderer::draw_screen_quad(GLuint texture) {
 #ifdef NINE_MORRIS_3D_DEBUG
 void Renderer::draw_origin() {
     storage.origin_shader->bind();
-    storage.origin_shader->upload_uniform_mat4("u_projection_view_matrix", projection_view_matrix);
+    storage.origin_shader->upload_uniform_mat4("u_projection_view_matrix", app->camera.get_projection_view_matrix());
 
     storage.origin_vertex_array->bind();
 

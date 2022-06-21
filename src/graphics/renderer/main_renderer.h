@@ -52,6 +52,7 @@ public:
     ~Renderer();
 
     void render();
+    void im_draw_quad(const glm::vec3& position, float scale, std::shared_ptr<Texture> texture);
 
     void add_model(Model& model, int options = 0);
     void remove_model(unsigned int handle);
@@ -158,9 +159,6 @@ private:
     std::string ORIGIN_VERTEX_SHADER = "data/shaders/internal/origin.vert";
     std::string ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";
 #endif
-
-    // Cache for the projection-view matrix
-    glm::mat4 projection_view_matrix = glm::mat4(1.0f);
 
     // Reference to application
     Application* app = nullptr;
