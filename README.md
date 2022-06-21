@@ -22,12 +22,15 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has thre
 - Archive the **_Nine-Morris-3D-vX.Y.Z-Linux_** folder
 
 ### Exporting on Windows:
-- Create a new folder called **_Nine-Morris-3D_**
-- Copy the executable from build-release/
+- Create a new folder called whatever
+- Copy the executable from Release/
 - Make sure that all assets are encrypted
 - Copy the data directory filtering the unwanted files (keep only encrypted assets)
-- Create the NSIS installer called **_Nine-Morris-3D-vX.Y.Z-Windows_** using the **_Nine-Morris-3D_** folder
+- Copy installer.nsi from scripts/windows-install/
+- Create the NSIS installer called **_Nine-Morris-3D-vX.Y.Z-Windows_** using the **_installer.nsi_** script
 
 ### Where to update the version:
 - CMakeLists.txt
 - nine_morris_3d.h
+- install.sh
+- installer.nsi
