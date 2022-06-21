@@ -12,12 +12,6 @@ function encrypt() {
 encrypt cursors/arrow.png
 encrypt cursors/cross.png
 
-encrypt icons/32x32/ninemorris3d.png
-encrypt icons/64x64/ninemorris3d.png
-encrypt icons/128x128/ninemorris3d.png
-encrypt icons/256x256/ninemorris3d.png
-encrypt icons/512x512/ninemorris3d.png
-
 encrypt models/board/board.obj
 encrypt models/board/board_paint.obj
 encrypt models/node/node.obj

@@ -67,7 +67,7 @@ namespace assets {
 #ifdef NINE_MORRIS_3D_RELEASE
         static const char* PREFIX = ".dat";
 
-        static constexpr std::array<std::string*, 55> assets = {
+        static constexpr std::array<std::string*, 50> assets = {
             &BOARD_MESH,
             &BOARD_PAINT_MESH,
             &NODE_MESH,
@@ -116,11 +116,6 @@ namespace assets {
             &PIECE_FRAGMENT_SHADER,
             &NODE_VERTEX_SHADER,
             &NODE_FRAGMENT_SHADER,
-            &ICON_512,
-            &ICON_256,
-            &ICON_128,
-            &ICON_64,
-            &ICON_32,
             &ARROW_CURSOR,
             &CROSS_CURSOR
         };
