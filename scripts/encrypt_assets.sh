@@ -1,7 +1,7 @@
 #! /bin/bash
 
 KEY="data/models/board/board.objS"
-ENCRYPTER="../encrypter-helper/encrypter-helper"
+ENCRYPTER="../encrypter-helper/encrypter"
 DATA="../data"
 SUFFIX=".dat"
 
