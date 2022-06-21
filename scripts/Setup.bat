@@ -1,4 +1,4 @@
-ECHO OFF
+echo off
 
 cd ..
 if not exist build (

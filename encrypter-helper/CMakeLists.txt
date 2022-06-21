@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(EXECUTABLE_NAME "encrypter-helper")
+set(EXECUTABLE_NAME "encrypter")
 set(CPPBLOWFISH_BUILD_TESTS OFF)
 
 project("encrypter-helper" LANGUAGES CXX)

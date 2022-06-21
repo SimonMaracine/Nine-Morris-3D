@@ -25,6 +25,8 @@
 [submodule "extern/utfcpp"]
 	path = extern/utfcpp
 	url = https://github.com/SimonMaracine/utfcpp.git
+	ignore = dirty
 [submodule "extern/cppblowfish"]
 	path = extern/cppblowfish
 	url = https://github.com/SimonMaracine/cppblowfish.git
+	ignore = dirty
