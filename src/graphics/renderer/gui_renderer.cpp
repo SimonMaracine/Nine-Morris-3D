@@ -12,6 +12,7 @@
 #include "nine_morris_3d/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
+#include "other/encryption.h"
 
 namespace gui {
     Widget::Widget(std::shared_ptr<Widget> parent)
@@ -419,6 +420,10 @@ namespace gui {
 
 GuiRenderer::GuiRenderer(Application* app)
     : app(app) {
+    maybe_initialize_assets();
+
+    using namespace encryption;
+
     {
         const std::vector<std::string> uniforms = {
             "u_model_matrix",
@@ -426,8 +431,8 @@ GuiRenderer::GuiRenderer(Application* app)
             "u_texture"
         };
         storage.quad2d_shader = Shader::create(
-            paths::path_for_assets(QUAD2D_VERTEX_SHADER),
-            paths::path_for_assets(QUAD2D_FRAGMENT_SHADER),
+            convert(paths::path_for_assets(QUAD2D_VERTEX_SHADER)),
+            convert(paths::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -442,8 +447,8 @@ GuiRenderer::GuiRenderer(Application* app)
             "u_offset"
         };
         storage.text_shader = Shader::create(
-            paths::path_for_assets(TEXT_VERTEX_SHADER),
-            paths::path_for_assets(TEXT_FRAGMENT_SHADER),
+            convert(paths::path_for_assets(TEXT_VERTEX_SHADER)),
+            convert(paths::path_for_assets(TEXT_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -531,4 +536,21 @@ void GuiRenderer::on_window_resized(events::WindowResizedEvent& event) {
     storage.text_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
 
     main_frame->on_window_resized(event);
+}
+
+void GuiRenderer::maybe_initialize_assets() {
+#ifdef NINE_MORRIS_3D_RELEASE
+    static const char* PREFIX = ".dat";
+
+    static const std::array<std::string*, 4> assets = { 
+        &QUAD2D_VERTEX_SHADER,
+        &QUAD2D_FRAGMENT_SHADER,
+        &TEXT_VERTEX_SHADER,
+        &TEXT_FRAGMENT_SHADER
+    };
+
+    for (std::string* asset : assets) {
+        *asset += PREFIX;
+    }
+#endif
 }

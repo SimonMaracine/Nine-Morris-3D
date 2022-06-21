@@ -147,6 +147,8 @@ public:
     std::shared_ptr<Shader> get_quad2d_shader() { return storage.quad2d_shader; }
     std::shared_ptr<Shader> get_text_shader() { return storage.text_shader; }
 private:
+    void maybe_initialize_assets();
+
     struct Storage {
         std::shared_ptr<Shader> quad2d_shader;
         std::shared_ptr<Shader> text_shader;
@@ -158,10 +160,10 @@ private:
 
     std::shared_ptr<gui::Frame> main_frame;
 
-    const char* QUAD2D_VERTEX_SHADER = "data/shaders/internal/quad2d.vert";
-    const char* QUAD2D_FRAGMENT_SHADER = "data/shaders/internal/quad2d.frag";
-    const char* TEXT_VERTEX_SHADER = "data/shaders/internal/text.vert";
-    const char* TEXT_FRAGMENT_SHADER = "data/shaders/internal/text.frag";
+    std::string QUAD2D_VERTEX_SHADER = "data/shaders/internal/quad2d.vert";
+    std::string QUAD2D_FRAGMENT_SHADER = "data/shaders/internal/quad2d.frag";
+    std::string TEXT_VERTEX_SHADER = "data/shaders/internal/text.vert";
+    std::string TEXT_FRAGMENT_SHADER = "data/shaders/internal/text.frag";
 
     // Reference to application
     Application* app = nullptr;

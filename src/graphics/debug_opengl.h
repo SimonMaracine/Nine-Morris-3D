@@ -31,8 +31,8 @@
 
     extern GpuMemoryCounter _gpu_mem_counter;
 #elif defined(NINE_MORRIS_3D_RELEASE)
-    #define LOG_ALLOCATION(bytes) ((void) 0)
-    #define LOG_TOTAL_GPU_MEMORY_ALLOCATED() ((void) 0)
+    #define LOG_ALLOCATION(bytes) (void) 0;
+    #define LOG_TOTAL_GPU_MEMORY_ALLOCATED() (void) 0;
 #endif
 
 namespace debug_opengl {

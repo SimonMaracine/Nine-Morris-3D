@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <cppblowfish.h>
 
 #include "application/platform.h"
 #include "graphics/debug_opengl.h"
@@ -7,6 +8,7 @@
 #include "graphics/renderer/opengl/buffer.h"
 #include "other/logging.h"
 #include "other/assert.h"
+#include "other/encryption.h"
 
 #define DELETE_SHADER(program, vertex_shader, fragment_shader) \
     glDetachShader(program, vertex_shader); \
@@ -57,8 +59,15 @@ Shader::~Shader() {
 
 std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
         std::string_view fragment_source_path, const std::vector<std::string>& uniforms) {
-    GLuint vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
-    GLuint fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
+    GLuint vertex_shader;
+    GLuint fragment_shader;
+    try {
+        vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
+        fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
+    } catch (const std::runtime_error& e) {
+        REL_CRITICAL("{}, exiting...", e.what());
+        exit(1);
+    }
 
     GLuint program = glCreateProgram();
     glAttachShader(program, vertex_shader);
@@ -158,6 +167,124 @@ std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
 
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
             vertex_source_path, fragment_source_path);
+}
+
+std::shared_ptr<Shader> Shader::create(const encryption::EncryptedFile& vertex_source_path,
+            const encryption::EncryptedFile& fragment_source_path, const std::vector<std::string>& uniforms) {
+    cppblowfish::Buffer buffer_vertex = encryption::load_file(vertex_source_path);
+    cppblowfish::Buffer buffer_fragment = encryption::load_file(fragment_source_path);
+
+    GLuint vertex_shader;
+    GLuint fragment_shader;
+    try {
+        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER);
+        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER);
+    } catch (const std::runtime_error& e) {
+        REL_CRITICAL("{}, exiting...", e.what());
+        exit(1);
+    }
+
+    GLuint program = glCreateProgram();
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    if (!check_linking(program)) {
+        REL_CRITICAL("Exiting...");
+        exit(1);
+    }
+
+    std::string name = get_name(vertex_source_path.get(), fragment_source_path.get());
+
+    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
+            vertex_source_path.get(), fragment_source_path.get());
+}
+
+std::shared_ptr<Shader> Shader::create(const encryption::EncryptedFile& vertex_source_path,
+        const encryption::EncryptedFile& fragment_source_path, const std::vector<std::string>& uniforms,
+        const std::vector<UniformBlockSpecification>& uniform_blocks) {
+    cppblowfish::Buffer buffer_vertex = encryption::load_file(vertex_source_path);
+    cppblowfish::Buffer buffer_fragment = encryption::load_file(fragment_source_path);
+
+    GLuint vertex_shader;
+    GLuint fragment_shader;
+    try {
+        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER);
+        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER);
+    } catch (const std::runtime_error& e) {
+        REL_CRITICAL("{}, exiting...", e.what());
+        exit(1);
+    }
+
+    GLuint program = glCreateProgram();
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    if (!check_linking(program)) {
+        REL_CRITICAL("Exiting...");
+        exit(1);
+    }
+
+    for (const UniformBlockSpecification& block : uniform_blocks) {
+        const GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
+
+        if (block_index == GL_INVALID_INDEX) {
+            REL_CRITICAL("Invalid block index, exiting...");
+            exit(1);
+        }
+
+        if (!block.uniform_buffer->configured) {
+            GLint block_size;
+            glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
+
+            block.uniform_buffer->data = new char[block_size];
+            block.uniform_buffer->size = block_size;
+
+            glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
+            glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
+            LOG_ALLOCATION(block_size)
+            glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+            ASSERT(block.field_count <= 16, "Maximum 16 fields for now");
+
+            GLuint indices[16];
+            GLint offsets[16];
+            GLint sizes[16];
+            GLint types[16];
+
+            glGetUniformIndices(program, block.field_count, block.field_names, indices);
+
+            for (unsigned int i = 0; i < block.field_count; i++) {
+                if (indices[i] == GL_INVALID_INDEX) {
+                    REL_CRITICAL("Invalid field index, exiting...");
+                    exit(1);
+                }
+            }
+
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_OFFSET, offsets);
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
+
+            for (unsigned int i = 0; i < block.field_count; i++) {
+                block.uniform_buffer->fields[i] = {
+                    static_cast<size_t>(offsets[i]),
+                    static_cast<size_t>(sizes[i]) * type_size(types[i])
+                };
+            }
+
+            block.uniform_buffer->configured = true;
+        }
+
+        glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
+    }
+
+    std::string name = get_name(vertex_source_path.get(), fragment_source_path.get());
+
+    return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
+            vertex_source_path.get(), fragment_source_path.get());
 }
 
 void Shader::bind() {
@@ -271,6 +398,21 @@ GLuint Shader::compile_shader(std::string_view source_path, GLenum type) noexcep
     GLuint shader = glCreateShader(type);
     const char* s = source.c_str();
     glShaderSource(shader, 1, &s, nullptr);
+    glCompileShader(shader);
+
+    if (!check_compilation(shader, type)) {
+        throw std::runtime_error("Shader compilation error");
+    }
+
+    return shader;
+}
+
+GLuint Shader::compile_shader(const cppblowfish::Buffer& source_buffer, GLenum type) noexcept(false) {
+    GLuint shader = glCreateShader(type);
+    const int length = source_buffer.size() - source_buffer.padding();
+    char* source = reinterpret_cast<char*>(source_buffer.get());
+    const char* const s = const_cast<const char* const>(source);
+    glShaderSource(shader, 1, &s, &length);
     glCompileShader(shader);
 
     if (!check_compilation(shader, type)) {

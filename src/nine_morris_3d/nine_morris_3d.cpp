@@ -2,7 +2,7 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 
-#include "application/icon_image.h"
+#include "application/platform.h"
 #include "graphics/renderer/buffer_layout.h"
 #include "graphics/renderer/opengl/vertex_array.h"
 #include "graphics/renderer/opengl/buffer.h"
@@ -13,8 +13,10 @@
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/assets.h"
 #include "nine_morris_3d/paths.h"
+#include "other/texture_data.h"
 #include "other/logging.h"
 #include "other/assert.h"
+#include "other/encryption.h"
 
 // Global reference to application
 NineMorris3D* app = nullptr;
@@ -40,24 +42,27 @@ NineMorris3D::NineMorris3D()
 
     srand(time(nullptr));
 
+    assets::maybe_initialize_assets();
+
     using namespace assets;
+    using namespace encryption;
 
     // Load and set icons
     {
-        std::array<std::unique_ptr<IconImage>, 5> icons = {
-            std::make_unique<IconImage>(paths::path_for_assets(ICON_512)),
-            std::make_unique<IconImage>(paths::path_for_assets(ICON_256)),
-            std::make_unique<IconImage>(paths::path_for_assets(ICON_128)),
-            std::make_unique<IconImage>(paths::path_for_assets(ICON_64)),
-            std::make_unique<IconImage>(paths::path_for_assets(ICON_32))
+        std::array<std::unique_ptr<TextureData>, 5> icons = {
+            std::make_unique<TextureData>(convert(paths::path_for_assets(ICON_512)), false),
+            std::make_unique<TextureData>(convert(paths::path_for_assets(ICON_256)), false),
+            std::make_unique<TextureData>(convert(paths::path_for_assets(ICON_128)), false),
+            std::make_unique<TextureData>(convert(paths::path_for_assets(ICON_64)), false),
+            std::make_unique<TextureData>(convert(paths::path_for_assets(ICON_32)), false)
         };
 
         window->set_icons<5>(icons);
     }
 
     // Load and set cursors
-    arrow_cursor = window->add_cursor(std::make_unique<IconImage>(paths::path_for_assets(ARROW_CURSOR)), 4, 1);
-    cross_cursor = window->add_cursor(std::make_unique<IconImage>(paths::path_for_assets(CROSS_CURSOR)), 8, 8);
+    arrow_cursor = window->add_cursor(std::make_unique<TextureData>(convert(paths::path_for_assets(ARROW_CURSOR)), false), 4, 1);
+    cross_cursor = window->add_cursor(std::make_unique<TextureData>(convert(paths::path_for_assets(CROSS_CURSOR)), false), 8, 8);
 
     // Setup scene framebuffer
     {
@@ -69,8 +74,9 @@ NineMorris3D::NineMorris3D()
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
         };
-        specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
-                AttachmentType::Renderbuffer);
+        specification.depth_attachment = Attachment(
+            AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
+        );
 
         renderer->set_scene_framebuffer(Framebuffer::create(specification));
     }
@@ -99,7 +105,7 @@ NineMorris3D::NineMorris3D()
     }
 
     // Load splash screen
-    data.splash_screen_texture = Texture::create(paths::path_for_assets(SPLASH_SCREEN_TEXTURE), true);
+    data.splash_screen_texture = Texture::create(convert(paths::path_for_assets(SPLASH_SCREEN_TEXTURE)), true);
 
     // Load and create this font
     data.good_dog_plain_font = std::make_shared<Font>(paths::path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);

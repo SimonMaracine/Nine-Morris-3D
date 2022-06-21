@@ -16,6 +16,7 @@
 #include "nine_morris_3d/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
+#include "other/encryption.h"
 
 #define IGNORE(variable) ((void) variable)
 
@@ -68,14 +69,18 @@ Renderer::Renderer(Application* app)
     storage.light_space_uniform_block.uniform_buffer = storage.light_space_uniform_buffer;
     storage.light_space_uniform_block.binding_index = 2;
 
+    maybe_initialize_assets();
+
+    using namespace encryption;
+
     {
         std::vector<std::string> uniforms = {
             "u_projection_view_matrix",
             "u_skybox"
         };
         storage.skybox_shader = Shader::create(
-            paths::path_for_assets(SKYBOX_VERTEX_SHADER),
-            paths::path_for_assets(SKYBOX_FRAGMENT_SHADER),
+            convert(paths::path_for_assets(SKYBOX_VERTEX_SHADER)),
+            convert(paths::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -85,8 +90,8 @@ Renderer::Renderer(Application* app)
             "u_screen_texture"
         };
         storage.screen_quad_shader = Shader::create(
-            paths::path_for_assets(SCREEN_QUAD_VERTEX_SHADER),
-            paths::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER),
+            convert(paths::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
+            convert(paths::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -99,8 +104,8 @@ Renderer::Renderer(Application* app)
             "u_texture"
         };
         storage.quad3d_shader = Shader::create(
-            paths::path_for_assets(QUAD3D_VERTEX_SHADER),
-            paths::path_for_assets(QUAD3D_FRAGMENT_SHADER),
+            convert(paths::path_for_assets(QUAD3D_VERTEX_SHADER)),
+            convert(paths::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -110,8 +115,8 @@ Renderer::Renderer(Application* app)
             "u_model_matrix"
         };
         storage.shadow_shader = Shader::create(
-            paths::path_for_assets(SHADOW_VERTEX_SHADER),
-            paths::path_for_assets(SHADOW_FRAGMENT_SHADER),
+            convert(paths::path_for_assets(SHADOW_VERTEX_SHADER)),
+            convert(paths::path_for_assets(SHADOW_FRAGMENT_SHADER)),
             uniforms,
             { storage.light_space_uniform_block }
         );
@@ -123,8 +128,8 @@ Renderer::Renderer(Application* app)
             "u_color"
         };
         storage.outline_shader = Shader::create(
-            paths::path_for_assets(OUTLINE_VERTEX_SHADER),
-            paths::path_for_assets(OUTLINE_FRAGMENT_SHADER),
+            convert(paths::path_for_assets(OUTLINE_VERTEX_SHADER)),
+            convert(paths::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
             uniforms,
             { storage.projection_view_uniform_block }
         );
@@ -206,8 +211,9 @@ Renderer::Renderer(Application* app)
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
         };
-        specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
-                AttachmentType::Renderbuffer);
+        specification.depth_attachment = Attachment(
+            AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
+        );
 
         storage.intermediate_framebuffer = Framebuffer::create(specification);
 
@@ -597,4 +603,27 @@ void Renderer::check_hovered_id(int x, int y) {
     if (x > app->app_data.width || x < 0 || y > app->app_data.height || y < 0) {
         hovered_id = hoverable::null;
     }
+}
+
+void Renderer::maybe_initialize_assets() {
+#ifdef NINE_MORRIS_3D_RELEASE
+    static const char* PREFIX = ".dat";
+
+    static const std::array<std::string*, 10> assets = { 
+        &SHADOW_VERTEX_SHADER,
+        &SHADOW_FRAGMENT_SHADER,
+        &SCREEN_QUAD_VERTEX_SHADER,
+        &SCREEN_QUAD_FRAGMENT_SHADER,
+        &OUTLINE_VERTEX_SHADER,
+        &OUTLINE_FRAGMENT_SHADER,
+        &SKYBOX_VERTEX_SHADER,
+        &SKYBOX_FRAGMENT_SHADER,
+        &QUAD3D_VERTEX_SHADER,
+        &QUAD3D_FRAGMENT_SHADER
+    };
+
+    for (std::string* asset : assets) {
+        *asset += PREFIX;
+    }
+#endif
 }

@@ -94,6 +94,7 @@ private:
     void draw_skybox();
     void setup_shadows();
     void check_hovered_id(int x, int y);
+    void maybe_initialize_assets();
 
     struct Storage {
         std::shared_ptr<UniformBuffer> projection_view_uniform_buffer;
@@ -143,19 +144,19 @@ private:
 
     int shadow_map_size = 4096;
 
-    const char* SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert";
-    const char* SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag";
-    const char* SCREEN_QUAD_VERTEX_SHADER = "data/shaders/internal/screen_quad.vert";
-    const char* SCREEN_QUAD_FRAGMENT_SHADER = "data/shaders/internal/screen_quad.frag";
-    const char* OUTLINE_VERTEX_SHADER = "data/shaders/internal/outline.vert";
-    const char* OUTLINE_FRAGMENT_SHADER = "data/shaders/internal/outline.frag";
-    const char* SKYBOX_VERTEX_SHADER = "data/shaders/internal/skybox.vert";
-    const char* SKYBOX_FRAGMENT_SHADER = "data/shaders/internal/skybox.frag";
-    const char* QUAD3D_VERTEX_SHADER = "data/shaders/internal/quad3d.vert";
-    const char* QUAD3D_FRAGMENT_SHADER = "data/shaders/internal/quad3d.frag";
+    std::string SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert";
+    std::string SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag";
+    std::string SCREEN_QUAD_VERTEX_SHADER = "data/shaders/internal/screen_quad.vert";
+    std::string SCREEN_QUAD_FRAGMENT_SHADER = "data/shaders/internal/screen_quad.frag";
+    std::string OUTLINE_VERTEX_SHADER = "data/shaders/internal/outline.vert";
+    std::string OUTLINE_FRAGMENT_SHADER = "data/shaders/internal/outline.frag";
+    std::string SKYBOX_VERTEX_SHADER = "data/shaders/internal/skybox.vert";
+    std::string SKYBOX_FRAGMENT_SHADER = "data/shaders/internal/skybox.frag";
+    std::string QUAD3D_VERTEX_SHADER = "data/shaders/internal/quad3d.vert";
+    std::string QUAD3D_FRAGMENT_SHADER = "data/shaders/internal/quad3d.frag";
 #ifdef NINE_MORRIS_3D_DEBUG
-    const char* ORIGIN_VERTEX_SHADER = "data/shaders/internal/origin.vert";
-    const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";
+    std::string ORIGIN_VERTEX_SHADER = "data/shaders/internal/origin.vert";
+    std::string ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";
 #endif
 
     // Cache for the projection-view matrix

@@ -40,7 +40,6 @@ set(HEADERS_FOR_WINDOWS
     "src/application/platform.h"
     "src/application/scene.h"
     "src/application/window.h"
-    "src/application/icon_image.h"
     "src/application/extensions.h"
     "src/graphics/debug_opengl.h"
     "src/graphics/renderer/main_renderer.h"
@@ -77,6 +76,7 @@ set(HEADERS_FOR_WINDOWS
     "src/other/mesh.h"
     "src/other/texture_data.h"
     "src/other/user_data.h"
+    "src/other/encryption.h"
 )
 
 add_executable(${EXECUTABLE_NAME}
@@ -84,7 +84,6 @@ add_executable(${EXECUTABLE_NAME}
     "src/application/application.cpp"
     "src/application/input.cpp"
     "src/application/window.cpp"
-    "src/application/icon_image.cpp"
     "src/application/extensions.cpp"
     "src/graphics/debug_opengl.cpp"
     "src/graphics/renderer/main_renderer.cpp"
@@ -115,6 +114,7 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/mesh.cpp"
     "src/other/texture_data.cpp"
     "src/other/user_data.cpp"
+    "src/other/encryption.cpp"
     "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_demo.cpp"
     "extern/imgui/imgui_tables.cpp"

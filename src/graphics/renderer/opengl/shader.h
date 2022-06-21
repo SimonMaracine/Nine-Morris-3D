@@ -2,8 +2,10 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <cppblowfish.h>
 
 #include "graphics/renderer/opengl/buffer.h"
+#include "other/encryption.h"
 
 struct UniformBlockSpecification {
     std::string block_name;
@@ -28,6 +30,11 @@ public:
     static std::shared_ptr<Shader> create(std::string_view vertex_source_path,
             std::string_view fragment_source_path, const std::vector<std::string>& uniforms,
             const std::vector<UniformBlockSpecification>& uniform_blocks);
+    static std::shared_ptr<Shader> create(const encryption::EncryptedFile& vertex_source_path,
+            const encryption::EncryptedFile& fragment_source_path, const std::vector<std::string>& uniforms);
+    static std::shared_ptr<Shader> create(const encryption::EncryptedFile& vertex_source_path,
+            const encryption::EncryptedFile& fragment_source_path, const std::vector<std::string>& uniforms,
+            const std::vector<UniformBlockSpecification>& uniform_blocks);
 
     void bind();
     static void unbind();
@@ -47,6 +54,7 @@ private:
     GLint get_uniform_location(std::string_view name);
 
     static GLuint compile_shader(std::string_view source_path, GLenum type) noexcept(false);
+    static GLuint compile_shader(const cppblowfish::Buffer& source_buffer, GLenum type) noexcept(false);
     static bool check_compilation(GLuint shader, GLenum type);
     static bool check_linking(GLuint program);
     static std::string get_name(std::string_view vertex_source, std::string_view fragment_source);

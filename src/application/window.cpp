@@ -148,8 +148,8 @@ void Window::set_vsync(int interval) {
     glfwSwapInterval(interval);
 }
 
-unsigned int Window::add_cursor(std::unique_ptr<IconImage> cursor, int x_hotspot, int y_hotspot) {
-    GLFWimage data = cursor->get_data();
+unsigned int Window::add_cursor(std::unique_ptr<TextureData> cursor, int x_hotspot, int y_hotspot) {
+    GLFWimage data = cursor->get_data_glfw();
 
     GLFWcursor* glfw_cursor = glfwCreateCursor(&data, x_hotspot, y_hotspot);
     if (glfw_cursor == nullptr) {

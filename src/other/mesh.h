@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "other/encryption.h"
+
 /**
  * This is the model loading API.
  * Load positions, texture coodrdinates and normals or load just positions.
@@ -28,4 +30,6 @@ namespace mesh {
 
     std::shared_ptr<Mesh<Vertex>> load_model(std::string_view file_path, bool flip_winding_order = false);
     std::shared_ptr<Mesh<VertexP>> load_model_position(std::string_view file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<Vertex>> load_model(const encryption::EncryptedFile& file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<VertexP>> load_model_position(const encryption::EncryptedFile& file_path, bool flip_winding_order = false);
 }

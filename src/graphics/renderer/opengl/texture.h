@@ -4,6 +4,7 @@
 #include <stb_image.h>
 
 #include "other/texture_data.h"
+#include "other/encryption.h"
 
 /**
  * These represent OpenGL textures in video memory.
@@ -14,6 +15,8 @@ public:
     ~Texture();
 
     static std::shared_ptr<Texture> create(std::string_view file_path, bool mipmapping,
+			float bias = 0.0f, int anisotropic_filtering = 0);
+	static std::shared_ptr<Texture> create(const encryption::EncryptedFile& file_path, bool mipmapping,
 			float bias = 0.0f, int anisotropic_filtering = 0);
 	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, bool mipmapping,
 			float bias = 0.0f, int anisotropic_filtering = 0);
@@ -37,7 +40,7 @@ public:
     Texture3D(GLuint texture, std::string_view name);
     ~Texture3D();
 
-    static std::shared_ptr<Texture3D> create(const char** file_paths);
+    static std::shared_ptr<Texture3D> create(const char** file_paths);  // Don't need encrypted version
 	static std::shared_ptr<Texture3D> create(const std::array<std::shared_ptr<TextureData>, 6>& data);
 
     void bind(GLenum slot);

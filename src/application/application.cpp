@@ -14,6 +14,7 @@
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "other/logging.h"
 #include "other/assert.h"
+#include "other/encryption.h"
 
 Application::Application(int width, int height, std::string_view title) {
     app_data.width = width;
@@ -29,9 +30,10 @@ Application::Application(int width, int height, std::string_view title) {
 #endif
     input::initialize(window->get_handle());
     debug_opengl::maybe_initialize_debugging();
+    encryption::initialize();
 
     auto [version_major, version_minor] = debug_opengl::get_version_numbers();
-    DEB_INFO("Using OpenGL version {}.{}", version_major, version_minor);
+    REL_INFO("Using OpenGL version {}.{}", version_major, version_minor);
 
     renderer = std::make_unique<Renderer>(this);
     gui_renderer = std::make_unique<GuiRenderer>(this);

@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "application/application_data.h"
-#include "application/icon_image.h"
+#include "other/texture_data.h"
 
 /**
  * This represents the game window.
@@ -22,15 +22,15 @@ public:
 
     // VSync, cursor and icon API
     void set_vsync(int interval);
-    unsigned int add_cursor(std::unique_ptr<IconImage> cursor, int x_hotspot, int y_hotspot);
+    unsigned int add_cursor(std::unique_ptr<TextureData> cursor, int x_hotspot, int y_hotspot);
     void set_cursor(unsigned int handle);
 
     template<unsigned int Count>
-    void set_icons(const std::array<std::unique_ptr<IconImage>, Count>& icons) {
+    void set_icons(const std::array<std::unique_ptr<TextureData>, Count>& icons) {
         std::array<GLFWimage, Count> glfw_icons;
 
         for (unsigned int i = 0; i < icons.size(); i++) {
-            glfw_icons[i] = icons[i]->get_data();
+            glfw_icons[i] = icons[i]->get_data_glfw();
         }
 
         glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());

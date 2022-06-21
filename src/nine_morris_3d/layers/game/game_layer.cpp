@@ -30,6 +30,9 @@
 #include "other/texture_data.h"
 #include "other/logging.h"
 #include "other/assert.h"
+#include "other/encryption.h"
+
+using namespace encryption;
 
 constexpr DirectionalLight LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
@@ -294,8 +297,8 @@ void GameLayer::prepare_board() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_shader = Shader::create(
-        paths::path_for_assets(assets::BOARD_VERTEX_SHADER),
-        paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER),
+        convert(paths::path_for_assets(assets::BOARD_VERTEX_SHADER)),
+        convert(paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -349,8 +352,8 @@ void GameLayer::prepare_board_paint() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_paint_shader = Shader::create(
-        paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER),
-        paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER),
+        convert(paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
+        convert(paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -405,8 +408,8 @@ void GameLayer::prepare_pieces() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.piece_shader = Shader::create(
-        paths::path_for_assets(assets::PIECE_VERTEX_SHADER),
-        paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER),
+        convert(paths::path_for_assets(assets::PIECE_VERTEX_SHADER)),
+        convert(paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -485,8 +488,8 @@ void GameLayer::prepare_nodes() {
         "u_color"
     };
     app->data.node_shader = Shader::create(
-        paths::path_for_assets(assets::NODE_VERTEX_SHADER),
-        paths::path_for_assets(assets::NODE_FRAGMENT_SHADER),
+        convert(paths::path_for_assets(assets::NODE_VERTEX_SHADER)),
+        convert(paths::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         uniforms,
         { app->renderer->get_projection_view_uniform_block() }
     );
@@ -705,8 +708,9 @@ void GameLayer::set_scene_framebuffer(int samples) {
         Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
         Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
     };
-    specification.depth_attachment = Attachment(AttachmentFormat::DEPTH24_STENCIL8,
-            AttachmentType::Renderbuffer);
+    specification.depth_attachment = Attachment(
+        AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
+    );
 
     app->renderer->set_scene_framebuffer(Framebuffer::create(specification));
 

@@ -63,5 +63,5 @@ int main(int argc, char** argv) {
     write_file(output_file, buffer, cipher.size() + cppblowfish::BUFFER_OFFSET);
     delete[] buffer;
 
-    std::cout << "Succesfully written cipher to '" << output_file << "'" << std::endl;
+    std::cout << "Successfully written cipher to '" << output_file << "'" << std::endl;
 }

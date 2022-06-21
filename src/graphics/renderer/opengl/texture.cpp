@@ -1,11 +1,13 @@
 #include <glad/glad.h>
 #include <stb_image.h>
+#include <cppblowfish.h>
 
 #include "application/extensions.h"
 #include "graphics/debug_opengl.h"
 #include "graphics/renderer/opengl/texture.h"
 #include "other/logging.h"
 #include "other/assert.h"
+#include "other/encryption.h"
 
 static std::string get_name(std::string_view file_path) {
     size_t last_slash = file_path.find_last_of("/");
@@ -99,6 +101,45 @@ std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmap
     stbi_image_free(data);
 
     std::string name = get_name(file_path);
+
+    return std::make_shared<Texture>(texture, width, height, name);
+}
+
+std::shared_ptr<Texture> Texture::create(const encryption::EncryptedFile& file_path, bool mipmapping, float bias, int anisotropic_filtering) {
+    DEB_DEBUG("Loading texture '{}'...", file_path.get());
+
+    cppblowfish::Buffer buffer = encryption::load_file(file_path);
+
+    stbi_set_flip_vertically_on_load(1);
+
+    int width, height, channels;
+    stbi_uc* data = stbi_load_from_memory(buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, 4);
+
+    if (data == nullptr) {
+        REL_CRITICAL("Could not load texture '{}', exiting...", file_path.get());
+        exit(1);
+    }
+
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmapping ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    LOG_ALLOCATION(width * height * 4)
+
+    configure_mipmapping(mipmapping, bias, anisotropic_filtering);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    stbi_image_free(data);
+
+    std::string name = get_name(file_path.get());
 
     return std::make_shared<Texture>(texture, width, height, name);
 }
