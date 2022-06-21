@@ -24,7 +24,7 @@ namespace save_load {
         Board board;
         Camera camera;
         unsigned int time = 0;  // In deciseconds
-        std::string date = "No Last Date";
+        std::string date = "No Last Game";
 
         template<typename Archive>
         void serialize(Archive& archive) {

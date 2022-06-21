@@ -37,7 +37,7 @@ public:
     bool can_undo = false;
     bool show_info = false;
     bool about_mode = false;
-    std::string last_save_date;
+    std::string last_save_game_date;
 
     GameLayer* game_layer = nullptr;
     GuiLayer* gui_layer = nullptr;

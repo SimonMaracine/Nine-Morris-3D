@@ -40,7 +40,7 @@ void ImGuiLayer::on_attach() {
         REL_ERROR("{}", e.what());  // TODO maybe delete file
         REL_ERROR("Could not load game");
     }
-    last_save_date = std::move(state.date);
+    last_save_game_date = std::move(state.date);
 }
 
 void ImGuiLayer::on_detach() {
@@ -113,7 +113,7 @@ void ImGuiLayer::on_update(float dt) {
                 game_layer->load_game();
             }
             if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("%s", last_save_date.c_str());
+                ImGui::SetTooltip("%s", last_save_game_date.c_str());
             }
             if (ImGui::MenuItem("Save", nullptr, false)) {
                 game_layer->board.finalize_pieces_state();
@@ -137,7 +137,7 @@ void ImGuiLayer::on_update(float dt) {
                     REL_ERROR("Could not save game");
                 }
 
-                last_save_date = std::move(state.date);
+                last_save_game_date = std::move(state.date);
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 game_layer->board.undo();
