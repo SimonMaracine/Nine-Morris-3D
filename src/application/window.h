@@ -32,8 +32,6 @@ public:
 
         glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
     }
-
-    void set_size()
 private:
     GLFWwindow* window = nullptr;
 
