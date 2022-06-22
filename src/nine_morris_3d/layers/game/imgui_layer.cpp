@@ -34,12 +34,12 @@ void ImGuiLayer::on_attach() {
     try {
         save_load::load_game_from_file(state);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_ERROR("{}", e.what());
+        REL_WARN("{}", e.what());
         save_load::handle_save_file_not_open_error();
-        REL_ERROR("Could not load game");
+        REL_WARN("Could not load game");
     } catch (const save_load::SaveFileError& e) {
-        REL_ERROR("{}", e.what());  // TODO maybe delete file
-        REL_ERROR("Could not load game");
+        REL_WARN("{}", e.what());  // TODO maybe delete file
+        REL_WARN("Could not load game");
     }
     last_save_game_date = std::move(state.date);
     DEB_INFO("Last save game checked");
@@ -517,7 +517,7 @@ void ImGuiLayer::draw_could_not_load_game() {
         ImGui::Text("Could not load last game.");
         ImGui::Text("The save game file is either missing or is corrupted.");
         ImGui::Separator();
-        ImGui::Text("%s.", SAVE_GAME_FILE_PATH.c_str());
+        ImGui::Text("%s", SAVE_GAME_FILE_PATH.c_str());
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
