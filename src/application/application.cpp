@@ -55,6 +55,8 @@ Application::~Application() {
 void Application::run() {
     ASSERT(current_scene != nullptr, "Starting scene not set");
 
+    DEB_INFO("Starting game");
+
     for (Layer* layer : current_scene->layers_in_order) {
         push_layer(layer);
     }
@@ -63,7 +65,7 @@ void Application::run() {
         push_overlay(layer);
     }
 
-    DEB_INFO("Initialized game");
+    DEB_INFO("Initialized game, entering main loop");
 
     while (running) {
         const float dt = update_frame_counter();
