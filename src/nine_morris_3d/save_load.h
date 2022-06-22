@@ -4,6 +4,9 @@
 #include "nine_morris_3d/board.h"
 
 namespace save_load {
+    static constexpr const char* SAVE_GAME_FILE = "last_game.dat";
+    static constexpr const char* NO_LAST_GAME = "No Last Game";
+
     class SaveFileError : public std::runtime_error {
     public:
         SaveFileError(const std::string& message)
@@ -24,7 +27,7 @@ namespace save_load {
         Board board;
         Camera camera;
         unsigned int time = 0;  // In deciseconds
-        std::string date = "No Last Game";
+        std::string date = NO_LAST_GAME;
 
         template<typename Archive>
         void serialize(Archive& archive) {

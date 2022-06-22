@@ -17,8 +17,6 @@
 #include "other/logging.h"
 #include "other/user_data.h"
 
-#define SAVE_GAME_FILE "last_game.dat"
-
 /*
 Unserialized variables:
     vertex_array, material, handle

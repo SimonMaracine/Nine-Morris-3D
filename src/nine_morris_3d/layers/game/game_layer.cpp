@@ -867,6 +867,11 @@ void GameLayer::actually_change_skybox() {
 }
 
 void GameLayer::load_game() {
+    if (imgui_layer->last_save_game_date == save_load::NO_LAST_GAME) {
+        imgui_layer->show_no_last_game = true;
+        return;
+    }
+
     save_load::GameState state;
     try {
         save_load::load_game_from_file(state);
@@ -874,10 +879,12 @@ void GameLayer::load_game() {
         REL_ERROR("{}", e.what());
         save_load::handle_save_file_not_open_error();
         REL_ERROR("Could not load game");
+        imgui_layer->show_could_not_load_game = true;
         return;
     } catch (const save_load::SaveFileError& e) {
         REL_ERROR("{}", e.what());  // TODO maybe delete file
         REL_ERROR("Could not load game");
+        imgui_layer->show_could_not_load_game = true;
         return;
     }
 

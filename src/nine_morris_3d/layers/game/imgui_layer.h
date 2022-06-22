@@ -27,7 +27,9 @@ public:
 
     void draw_game_over();
     void draw_game_over_message(const char* message);
-    void draw_about_screen();
+    void draw_about();
+    void draw_could_not_load_game();
+    void draw_no_last_game();
 
 #ifdef NINE_MORRIS_3D_DEBUG
     void draw_debug(float dt);
@@ -36,7 +38,9 @@ public:
     bool hovering_gui = false;
     bool can_undo = false;
     bool show_info = false;
-    bool about_mode = false;
+    bool show_about = false;
+    bool show_could_not_load_game = false;
+    bool show_no_last_game = false;
     std::string last_save_game_date;
 
     GameLayer* game_layer = nullptr;

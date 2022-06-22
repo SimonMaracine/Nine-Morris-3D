@@ -26,7 +26,8 @@
 #define BEIGE ImVec4(0.961f, 0.875f, 0.733f, 1.0f)
 #define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
 
-const std::string INFO_FILE_PATH = paths::path_for_logs(INFO_FILE);
+static const std::string INFO_FILE_PATH = paths::path_for_logs(INFO_FILE);
+static const std::string SAVE_GAME_FILE_PATH = paths::path_for_save_and_options(save_load::SAVE_GAME_FILE);
 
 void ImGuiLayer::on_attach() {
     save_load::GameState state;
@@ -41,6 +42,7 @@ void ImGuiLayer::on_attach() {
         REL_ERROR("Could not load game");
     }
     last_save_game_date = std::move(state.date);
+    DEB_INFO("Last save game checked");
 }
 
 void ImGuiLayer::on_detach() {
@@ -48,7 +50,7 @@ void ImGuiLayer::on_detach() {
     hovering_gui = false;
     can_undo = false;
     show_info = false;
-    about_mode = false;
+    show_about = false;
 }
 
 void ImGuiLayer::on_awake() {
@@ -100,7 +102,7 @@ void ImGuiLayer::on_update(float dt) {
 
     RESET_HOVERING_GUI();
 
-    if (!about_mode && ImGui::BeginMainMenuBar()) {
+    if (!show_about && ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false)) {
                 app->change_scene("game");
@@ -288,7 +290,7 @@ void ImGuiLayer::on_update(float dt) {
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About", nullptr, false)) {
-                about_mode = true;
+                show_about = true;
             }
             if (ImGui::MenuItem("Log Info", nullptr, false)) {
                 logging::log_opengl_and_dependencies_info(logging::LogTarget::File, INFO_FILE);
@@ -306,19 +308,21 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::EndMainMenuBar();
     }
 
-    if (about_mode) {
-        draw_about_screen();
+    if (show_about) {
+        draw_about();
+    } else if (show_could_not_load_game) {
+        draw_could_not_load_game();
+    } else if (show_no_last_game) {
+        draw_no_last_game();
+    } else if (game_layer->board.phase == Board::Phase::GameOver) {
+        draw_game_over();
     }
 
     if (game_layer->board.not_placed_pieces_count() < 18) {
         can_undo = true;
     }
 
-    if (game_layer->board.phase == Board::Phase::GameOver) {
-        draw_game_over();
-    }
-
-    if (show_info && !about_mode) {
+    if (show_info && !show_about) {
         ImGui::PushFont(app->data.imgui_info_font);
         ImGui::Begin("Info");
         ImGui::Text("FPS: %f", app->fps);
@@ -443,7 +447,7 @@ void ImGuiLayer::draw_game_over_message(const char* message) {
     ImGui::Dummy(ImVec2(20.0f, 0.0f));
 }
 
-void ImGuiLayer::draw_about_screen() {
+void ImGuiLayer::draw_about() {
     ImGui::PushFont(app->data.imgui_windows_font);
     ImGui::OpenPopup("About Nine Morris 3D");
 
@@ -475,7 +479,96 @@ void ImGuiLayer::draw_about_screen() {
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
-            about_mode = false;
+            show_about = false;
+            deactivated = false;
+
+            game_layer->active = true;
+            gui_layer->active = true;
+            app->update_active_layers();
+
+            gui_layer->timer.reset_last_time(app->window->get_time());
+        }
+
+        ImGui::EndPopup();
+    }
+    ImGui::PopFont();
+}
+
+void ImGuiLayer::draw_could_not_load_game() {
+    ImGui::PushFont(app->data.imgui_windows_font);
+    ImGui::OpenPopup("Error Loading Game");
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Error Loading Game", nullptr, ImGuiWindowFlags_NoResize
+            | ImGuiWindowFlags_AlwaysAutoResize)) {
+        HOVERING_GUI();
+
+        static bool deactivated = false;
+        if (!deactivated) {
+            game_layer->active = false;
+            gui_layer->active = false;
+            app->update_active_layers();
+
+            deactivated = true;
+        }
+
+        ImGui::Text("Could not load last game.");
+        ImGui::Text("The save game file is either missing or is corrupted.");
+        ImGui::Separator();
+        ImGui::Text("%s.", SAVE_GAME_FILE_PATH.c_str());
+
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+        const float window_width = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
+        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
+            ImGui::CloseCurrentPopup();
+            show_could_not_load_game = false;
+            deactivated = false;
+
+            game_layer->active = true;
+            gui_layer->active = true;
+            app->update_active_layers();
+
+            gui_layer->timer.reset_last_time(app->window->get_time());
+        }
+
+        ImGui::EndPopup();
+    }
+    ImGui::PopFont();
+}
+
+void ImGuiLayer::draw_no_last_game() {
+    ImGui::PushFont(app->data.imgui_windows_font);
+    ImGui::OpenPopup("No Last Game");
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("No Last Game", nullptr, ImGuiWindowFlags_NoResize
+            | ImGuiWindowFlags_AlwaysAutoResize)) {
+        HOVERING_GUI();
+
+        static bool deactivated = false;
+        if (!deactivated) {
+            game_layer->active = false;
+            gui_layer->active = false;
+            app->update_active_layers();
+
+            deactivated = true;
+        }
+
+        ImGui::Text("There is no last game saved.");
+
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+        const float window_width = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
+        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
+            ImGui::CloseCurrentPopup();
+            show_no_last_game = false;
             deactivated = false;
 
             game_layer->active = true;
@@ -492,7 +585,7 @@ void ImGuiLayer::draw_about_screen() {
 
 #ifdef NINE_MORRIS_3D_DEBUG
 void ImGuiLayer::draw_debug(float dt) {
-    if (!about_mode) {
+    if (!show_about) {
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %f", app->fps);
         ImGui::Text("Frame time (ms): %f", dt * 1000.0f);
