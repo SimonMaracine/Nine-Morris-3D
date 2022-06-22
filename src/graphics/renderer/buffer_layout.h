@@ -10,9 +10,6 @@ struct VertexElement {
     static size_t get_size(GLenum type);
 };
 
-/**
- * Use this to define vertex arrays.
- */
 struct BufferLayout {
     std::vector<VertexElement> elements;
     GLsizei stride = 0;

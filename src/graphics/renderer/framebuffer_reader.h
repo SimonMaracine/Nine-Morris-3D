@@ -3,11 +3,6 @@
 #include "graphics/renderer/opengl/buffer.h"
 #include "graphics/renderer/opengl/framebuffer.h"
 
-/**
- * Use this to asynchronously read pixels from a framebuffer.
- * Pass the array of pixel buffers and the number of them.
- * Stack allocate objects of this class.
- */
 template<unsigned int BufferCount>
 class FramebufferReader {
 public:

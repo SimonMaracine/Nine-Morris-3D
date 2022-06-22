@@ -24,9 +24,6 @@ struct Attachment {
     AttachmentType type = AttachmentType::None;
 };
 
-/**
- * Stack allocate this and pass it to framebuffers.
- */
 struct FramebufferSpecification {
     // Must be specified
     int width, height;
@@ -40,9 +37,6 @@ struct FramebufferSpecification {
     bool white_border_for_depth_texture = false;
 };
 
-/**
- * This represents OpenGL framebuffers. Instantiate objects with specifications.
- */
 class Framebuffer {
 public:
     Framebuffer(const FramebufferSpecification& specification);

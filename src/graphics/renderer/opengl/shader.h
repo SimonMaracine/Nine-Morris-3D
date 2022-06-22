@@ -15,9 +15,6 @@ struct UniformBlockSpecification {
     GLuint binding_index;
 };
 
-/**
- * This represents OpenGL shader programs.
- */
 class Shader {
 public:
     Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, std::string_view name,

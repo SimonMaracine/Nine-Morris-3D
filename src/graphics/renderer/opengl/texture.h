@@ -6,9 +6,6 @@
 #include "other/texture_data.h"
 #include "other/encryption.h"
 
-/**
- * These represent OpenGL textures in video memory.
- */
 class Texture {
 public:
     Texture(GLuint texture, int width, int height, std::string_view name);

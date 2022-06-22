@@ -12,10 +12,6 @@
 class Layer;
 class Scene;
 
-/**
- * Abstract main class of the game. Contains all the data the game can have.
- * To be derived from another class and instantiated in main().
-*/
 class Application {
 protected:
     Application(int width, int height, std::string_view title);

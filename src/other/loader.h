@@ -5,7 +5,6 @@
 /**
  * Objects of this class load assets in a separate thread.
  * Pass a struct with the assets and a function to load them.
- * Wrap objects of this class with smart pointers.
  */
 template<typename Assets>
 class Loader {

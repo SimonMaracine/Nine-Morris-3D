@@ -6,10 +6,6 @@
 
 struct GLFWimage;
 
-/**
- * Object representing raw texture data.
- * Pass this to OpenGL texture objects.
- */
 class TextureData {
 public:
 	TextureData(std::string_view file_path, bool flip);

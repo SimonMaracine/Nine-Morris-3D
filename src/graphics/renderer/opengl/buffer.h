@@ -2,9 +2,6 @@
 
 #include <glad/glad.h>
 
-/**
- * These represent OpenGL buffers in video memory.
- */
 class Buffer {
 public:
     Buffer(GLuint buffer);

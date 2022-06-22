@@ -11,7 +11,7 @@ namespace events {
 
     /**
      * Abstract event class. Every event derives this class.
-     * Used in on_event() in application.
+     * Used in on_event() in Application.
      */
     class Event {
     public:

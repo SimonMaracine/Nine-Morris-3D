@@ -30,7 +30,7 @@ constexpr GLenum parameters[] = {
     GL_STEREO
 };
 
-const char* names[] = {
+static const char* names[] = {
     "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS",
     "GL_MAX_CUBE_MAP_TEXTURE_SIZE",
     "GL_MAX_DRAW_BUFFERS",

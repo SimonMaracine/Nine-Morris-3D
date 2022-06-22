@@ -50,6 +50,7 @@ Window::Window(ApplicationData* data) {
 
     glfwSwapInterval(1);
     glfwSetWindowUserPointer(window, data);
+    glfwSetWindowSizeLimits(window, 512, 288, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));

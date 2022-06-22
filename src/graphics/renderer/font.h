@@ -5,10 +5,6 @@
 
 #include "graphics/renderer/opengl/vertex_array.h"
 
-/**
- * This represents a font. Can be used by the renderer to draw text with this font.
- * Wrap it in smart pointers.
- */
 class Font {
 public:
     struct Glyph {

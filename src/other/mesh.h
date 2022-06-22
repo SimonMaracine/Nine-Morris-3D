@@ -4,10 +4,6 @@
 
 #include "other/encryption.h"
 
-/**
- * This is the model loading API.
- * Load positions, texture coodrdinates and normals or load just positions.
- */
 namespace mesh {
     struct VertexP {
         glm::vec3 position = glm::vec3(0.0f);

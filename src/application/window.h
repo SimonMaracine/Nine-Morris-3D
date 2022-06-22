@@ -6,9 +6,6 @@
 #include "application/application_data.h"
 #include "other/texture_data.h"
 
-/**
- * This represents the game window.
- */
 class Window {
 public:
     Window(ApplicationData* data);
@@ -35,6 +32,8 @@ public:
 
         glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
     }
+
+    void set_size()
 private:
     GLFWwindow* window = nullptr;
 
