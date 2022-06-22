@@ -188,15 +188,15 @@ void ImGuiLayer::on_update(float dt) {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Texture Quality")) {
-                    static int quality = app->options.texture_quality == options::NORMAL ? 0 : 1;
+                    static int dummy = get_texture_quality_option(app->options.texture_quality);
 
-                    if (ImGui::RadioButton("Low", &quality, 1)) {
+                    if (ImGui::RadioButton("Low", &dummy, 0)) {
                         game_layer->set_texture_quality(options::LOW);
                         app->renderer->set_depth_map_framebuffer(2048);
 
                         DEB_INFO("Textures set to {} quality", options::LOW);
                     }
-                    if (ImGui::RadioButton("Normal", &quality, 0)) {
+                    if (ImGui::RadioButton("Normal", &dummy, 1)) {
                         game_layer->set_texture_quality(options::NORMAL);
                         app->renderer->set_depth_map_framebuffer(4096);
 
@@ -250,14 +250,14 @@ void ImGuiLayer::on_update(float dt) {
                 }
             }
             if (ImGui::BeginMenu("Skybox")) {
-                static int skybox = app->options.skybox == options::FIELD ? 0 : 1;
+                static int dummy = get_skybox_option(app->options.skybox);
 
-                if (ImGui::RadioButton("Field", &skybox, 0)) {
+                if (ImGui::RadioButton("Field", &dummy, 0)) {
                     game_layer->set_skybox(options::FIELD);
 
                     DEB_INFO("Skybox set to {}", options::FIELD);
                 }
-                if (ImGui::RadioButton("Autumn", &skybox, 1)) {
+                if (ImGui::RadioButton("Autumn", &dummy, 1)) {
                     game_layer->set_skybox(options::AUTUMN);
 
                     DEB_INFO("Skybox set to {}", options::AUTUMN);
@@ -283,6 +283,21 @@ void ImGuiLayer::on_update(float dt) {
 
                 ImGui::EndMenu();
                 HOVERING_GUI();
+            }
+            if (ImGui::BeginMenu("User Interface")) {
+                if (ImGui::MenuItem("Hide Timer", nullptr, &app->options.hide_timer)) {
+                    if (app->options.hide_timer) {
+                        app->gui_renderer->remove_widget(gui_layer->timer_text);
+
+                        DEB_INFO("Hide timer");
+                    } else {
+                        app->gui_renderer->add_widget(gui_layer->timer_text);
+
+                        DEB_INFO("Show timer");
+                    }
+                }
+
+                ImGui::EndMenu();
             }
 
             ImGui::EndMenu();
@@ -670,3 +685,25 @@ void ImGuiLayer::draw_debug(float dt) {
     }
 }
 #endif
+
+int ImGuiLayer::get_texture_quality_option(std::string_view option) {
+    if (option == options::LOW) {
+        return 0;
+    } else if (option == options::NORMAL) {
+        return 1;
+    }
+
+    ASSERT(false, "Invalid option");
+    return -1;
+}
+
+int ImGuiLayer::get_skybox_option(std::string_view option) {
+    if (option == options::FIELD) {
+        return 0;
+    } else if (option == options::AUTUMN) {
+        return 1;
+    }
+
+    ASSERT(false, "Invalid option");
+    return -1;
+}

@@ -35,6 +35,9 @@ public:
     void draw_debug(float dt);
 #endif
 
+    int get_texture_quality_option(std::string_view option);
+    int get_skybox_option(std::string_view option);
+
     bool hovering_gui = false;
     bool can_undo = false;
     bool show_info = false;

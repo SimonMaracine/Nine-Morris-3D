@@ -33,6 +33,7 @@ namespace options {
         std::string skybox = FIELD;
         bool custom_cursor = true;
         float sensitivity = 1.0f;
+        bool hide_timer = false;
     };
 
     void save_options_to_file(const Options& options) noexcept(false);

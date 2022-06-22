@@ -36,8 +36,6 @@ namespace gui {
         glm::ivec2 get_position() { return position; }
         glm::ivec2 get_size() { return size; }
         Sticky get_sticky() { return sticky; }
-
-        bool visible = true;
     protected:
         glm::ivec2 position = glm::ivec2(0);  // Relative to bottom-left
         glm::ivec2 size = glm::ivec2(0);  // Width-height
@@ -108,6 +106,7 @@ public:
     void on_window_resized(events::WindowResizedEvent& event);
 
     void add_widget(std::shared_ptr<gui::Widget> widget);
+    void remove_widget(std::shared_ptr<gui::Widget> widget);
     void clear();
 
     std::shared_ptr<Shader> get_quad2d_shader() { return storage.quad2d_shader; }

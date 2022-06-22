@@ -206,9 +206,6 @@ GuiRenderer::GuiRenderer(Application* app)
     // Set renderer pointer to widgets
     gui::Widget::app = app;
 
-    // Initialize main frame
-    // main_frame = std::make_shared<gui::Frame>(nullptr);
-
     DEB_INFO("Initialized GUI renderer");
 }
 
@@ -219,14 +216,8 @@ GuiRenderer::~GuiRenderer() {
 void GuiRenderer::render() {
     glDisable(GL_DEPTH_TEST);
 
-    // main_frame->render();
-
     for (size_t i = 0; i < widgets.size(); i++) {
         gui::Widget* widget = widgets[i].get();
-
-        if (!widget->visible) {
-            continue;
-        }
 
         const int WINDOW_WIDTH = app->app_data.width;
         const int WINDOW_HEIGHT = app->app_data.height;
@@ -342,7 +333,21 @@ void GuiRenderer::on_window_resized(events::WindowResizedEvent& event) {
 }
 
 void GuiRenderer::add_widget(std::shared_ptr<gui::Widget> widget) {
-    widgets.push_back(widget);
+    auto iter = std::find(widgets.begin(), widgets.end(), widget);
+
+    if (iter == widgets.end()) {
+        widgets.push_back(widget);
+    } else {
+        DEB_WARN("Widget alreay present");
+    }
+}
+
+void GuiRenderer::remove_widget(std::shared_ptr<gui::Widget> widget) {
+    auto iter = std::find(widgets.begin(), widgets.end(), widget);
+
+    if (iter != widgets.end()) {
+        widgets.erase(iter);
+    }
 }
 
 void GuiRenderer::clear() {

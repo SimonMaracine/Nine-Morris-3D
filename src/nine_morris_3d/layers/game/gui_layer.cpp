@@ -19,7 +19,10 @@ void GuiLayer::on_attach() {
     timer_text->offset(60, gui::Relative::Top);
     timer_text->scale(0.6f, 1.4f, 512, 1850);
     timer_text->set_shadows(true);
-    app->gui_renderer->add_widget(timer_text);
+
+    if (!app->options.hide_timer) {
+        app->gui_renderer->add_widget(timer_text);
+    }
 }
 
 void GuiLayer::on_detach() {
