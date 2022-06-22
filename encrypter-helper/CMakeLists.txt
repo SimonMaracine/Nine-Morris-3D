@@ -11,3 +11,7 @@ add_subdirectory("../extern/cppblowfish" build)
 
 target_include_directories(${EXECUTABLE_NAME} PRIVATE "../extern/cppblowfish/include")
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE cppblowfish)
+
+add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${EXECUTABLE_NAME} "../${EXECUTABLE_NAME}"
+)
