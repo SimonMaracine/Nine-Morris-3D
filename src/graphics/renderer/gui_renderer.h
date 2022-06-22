@@ -12,86 +12,62 @@ class Application;
 class GuiRenderer;
 
 namespace gui {
-    enum Sticky {
-        None,
+    enum class Sticky {
+        Center,
         N, S, E, W,
         NE, NW, SE, SW
     };
 
+    enum class Relative {
+        Left, Right, Top, Bottom
+    };
+
     class Widget {
     public:
-        Widget(std::shared_ptr<Widget> parent);
+        Widget() = default;
         virtual ~Widget() = default;
 
         virtual void render() = 0;
 
-        Widget* set(unsigned int row, unsigned int column);
-        Widget* span(unsigned int row_span, unsigned int column_span);
-        Widget* padd(glm::ivec2 padd_x, glm::ivec2 padd_y);
+        Widget* offset(unsigned int offset, Relative relative);
         Widget* stick(Sticky sticky);
+        Widget* scale(float min_scale, float max_scale, int min_bound, int max_bound);
 
         glm::ivec2 get_position() { return position; }
         glm::ivec2 get_size() { return size; }
-        bool get_visible() { return visible; }
-        unsigned int get_row() { return row; }
-        unsigned int get_column() { return column; }
-        unsigned int get_row_span() { return row_span; }
-        unsigned int get_column_span() { return column_span; }
-        glm::ivec2 get_padd_x() { return padd_x; }
-        glm::ivec2 get_padd_y() { return padd_y; }
         Sticky get_sticky() { return sticky; }
-    protected:
-        std::weak_ptr<Widget> parent;
 
-        glm::ivec2 position = glm::ivec2(0);
-        glm::ivec2 size = glm::ivec2(0);  // Width-height
         bool visible = true;
-        unsigned int row = 0;
-        unsigned int column = 0;
-        unsigned int row_span = 1;
-        unsigned int column_span = 1;
-        glm::ivec2 padd_x = glm::ivec2(0);  // Left-right
-        glm::ivec2 padd_y = glm::ivec2(0);  // Top-bottom
-        Sticky sticky = None;
+    protected:
+        glm::ivec2 position = glm::ivec2(0);  // Relative to bottom-left
+        glm::ivec2 size = glm::ivec2(0);  // Width-height
+
+        struct {
+            unsigned int left = 0;
+            unsigned int right = 0;
+            unsigned int top = 0;
+            unsigned int bottom = 0;
+        } offset_parameters;
+
+        struct {
+            float min_scale = 1.0f;
+            float max_scale = 1.0f;
+            int min_bound = 0;
+            int max_bound = 0;
+            float current_scale = 1.0f;
+        } scale_parameters;
+
+        Sticky sticky = Sticky::Center;
 
         static Application* app;
 
         friend class ::Application;
         friend class ::GuiRenderer;
-        friend class Frame;
-    };
-
-    class Frame : public Widget {
-    public:
-        Frame(std::shared_ptr<Frame> parent);
-        virtual ~Frame() = default;
-
-        virtual void render() override;
-
-        void on_window_resized(events::WindowResizedEvent& event);
-
-        void add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,
-                unsigned int row_span = 1, unsigned int column_span = 1,
-                glm::ivec2 padd_x = glm::ivec2(0), glm::ivec2 padd_y = glm::ivec2(0),
-                Sticky sticky = None);
-
-        void clear();
-    private:
-        struct Cell {
-            std::shared_ptr<Widget> widget;
-            glm::ivec2 size = glm::ivec2(0);
-            glm::ivec2 position = glm::ivec2(0);
-        };
-
-        std::vector<std::shared_ptr<Widget>> children;
-        unsigned int rows = 0;  // Start with 0
-        unsigned int columns = 0;
-        bool base = false;
     };
 
     class Image : public Widget {
     public:
-        Image(std::shared_ptr<Frame> parent, std::shared_ptr<Texture> texture);
+        Image(std::shared_ptr<Texture> texture);
         virtual ~Image() = default;
 
         virtual void render() override;
@@ -103,30 +79,22 @@ namespace gui {
 
     class Text : public Widget {
     public:
-        Text(std::shared_ptr<Frame> parent, std::shared_ptr<Font> font, std::string_view text,
-                float scale = 1.0f, const glm::vec3& color = glm::vec3(1.0f));
+        Text(std::shared_ptr<Font> font, std::string_view text, float text_scale = 1.0f,
+                const glm::vec3& color = glm::vec3(1.0f));
         virtual ~Text() = default;
 
         virtual void render() override;
 
         void set_text(std::string_view text);
-        void set_scale(float scale);
+        void set_scale(float text_scale);
         void set_color(const glm::vec3& color);
         void set_shadows(bool enable);
     private:
         std::shared_ptr<Font> font;
         std::string text;
-        float scale = 1.0f;
+        float text_scale = 1.0f;
         glm::vec3 color = glm::vec3(0.0f);
         bool with_shadows = false;
-    };
-
-    class Dummy : public Widget {
-    public:
-        Dummy(std::shared_ptr<Frame> parent);
-        virtual ~Dummy() = default;
-
-        virtual void render() override;
     };
 }
 
@@ -139,7 +107,8 @@ public:
     void im_draw_quad(glm::vec2 position, glm::vec2 scale, std::shared_ptr<Texture> texture);
     void on_window_resized(events::WindowResizedEvent& event);
 
-    std::shared_ptr<gui::Frame> get_frame() { return main_frame; }
+    void add_widget(std::shared_ptr<gui::Widget> widget);
+    void clear();
 
     std::shared_ptr<Shader> get_quad2d_shader() { return storage.quad2d_shader; }
     std::shared_ptr<Shader> get_text_shader() { return storage.text_shader; }
@@ -155,7 +124,7 @@ private:
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
     } storage;
 
-    std::shared_ptr<gui::Frame> main_frame;
+    std::vector<std::shared_ptr<gui::Widget>> widgets;
 
     std::string QUAD2D_VERTEX_SHADER = "data/shaders/internal/quad2d.vert";
     std::string QUAD2D_FRAGMENT_SHADER = "data/shaders/internal/quad2d.frag";
@@ -169,5 +138,4 @@ private:
     friend class gui::Widget;
     friend class gui::Image;
     friend class gui::Text;
-    friend class gui::Frame;
 };

@@ -35,12 +35,12 @@ void LoadingLayer::on_attach() {
     loader->start_loading_thread();
 
     std::shared_ptr<gui::Text> loading_text = std::make_shared<gui::Text>(
-        app->gui_renderer->get_frame(), app->data.good_dog_plain_font,
-        "Loading...", 1.2f, glm::vec3(0.81f)
+        app->data.good_dog_plain_font, "Loading...", 1.2f, glm::vec3(0.81f)
     );
-    app->gui_renderer->get_frame()->add(loading_text, 0, 0);
-    loading_text->stick(gui::Sticky::SE)->padd(glm::ivec2(0, 25), glm::ivec2(0, 20));
+    loading_text->stick(gui::Sticky::SE);
+    loading_text->offset(22, gui::Relative::Right)->offset(20, gui::Relative::Bottom);
     loading_text->set_shadows(true);
+    app->gui_renderer->add_widget(loading_text);
 }
 
 void LoadingLayer::on_detach() {
@@ -52,7 +52,7 @@ void LoadingLayer::on_detach() {
 
     loader = nullptr;
 
-    app->gui_renderer->get_frame()->clear();
+    app->gui_renderer->clear();
 }
 
 void LoadingLayer::on_update(float dt) {

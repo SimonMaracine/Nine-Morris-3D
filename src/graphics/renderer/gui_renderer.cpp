@@ -14,323 +14,49 @@
 #include "other/assert.h"
 #include "other/encryption.h"
 
+static float map(float x, float in_min, float in_max, float out_min, float out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 namespace gui {
-    Widget::Widget(std::shared_ptr<Widget> parent)
-        : parent(parent) {}
+    Widget* Widget::offset(unsigned int offset, Relative relative) {
+        switch (relative) {
+            case Relative::Left:
+                offset_parameters.left = offset;
+                break;
+            case Relative::Right:
+                offset_parameters.right = offset;
+                break;
+            case Relative::Top:
+                offset_parameters.top = offset;
+                break;
+            case Relative::Bottom:
+                offset_parameters.bottom = offset;
+                break;
+        }
 
-    Widget* Widget::set(unsigned int row, unsigned int column) {
-        this->row = row;
-        this->column = column;
-        return this;
-    }
-
-    Widget* Widget::span(unsigned int row_span, unsigned int column_span) {
-        this->row_span = row_span;
-        this->column_span = column_span;
-        return this;
-    }
-
-    Widget* Widget::padd(glm::ivec2 padd_x, glm::ivec2 padd_y) {
-        this->padd_x = padd_x;
-        this->padd_y = padd_y;
         return this;
     }
 
     Widget* Widget::stick(Sticky sticky) {
         this->sticky = sticky;
+
+        return this;
+    }
+
+    Widget* Widget::scale(float min_scale, float max_scale, int min_bound, int max_bound) {
+        scale_parameters.min_scale = min_scale;
+        scale_parameters.max_scale = max_scale;
+        scale_parameters.min_bound = min_bound;
+        scale_parameters.max_bound = max_bound;
+
         return this;
     }
 
     Application* Widget::app = nullptr;
 
-    Frame::Frame(std::shared_ptr<Frame> parent)
-        : Widget(parent) {
-        if (parent == nullptr) {
-            base = true;
-            size.x = app->app_data.width;
-            size.y = app->app_data.height;
-            // Position remains (0, 0)
-        }
-    }
-
-    void Frame::render() {
-        // Exit early, if there are no children
-        if (children.empty()) {
-            return;
-        }
-
-        std::vector<Cell> cells;
-
-        // Calculate number of rows and columns
-        {
-            std::unordered_set<unsigned int> row_indices;
-            std::unordered_set<unsigned int> column_indices;
-
-            for (std::shared_ptr<Widget> widget : children) {
-                row_indices.insert(widget->row);
-                column_indices.insert(widget->column);
-            }
-
-            rows = row_indices.size();
-            columns = column_indices.size();
-
-            ASSERT(rows > 0, "There cannot be 0 rows");
-            ASSERT(columns > 0, "There cannot be 0 columns");
-        }
-
-        // Create cells and calculate normal size for each cell
-        for (std::shared_ptr<Widget> widget : children) {
-            cells.push_back({
-                widget,
-                glm::ivec2(
-                    widget->padd_x.x + widget->size.x + widget->padd_x.y,
-                    widget->padd_y.x + widget->size.y + widget->padd_y.y
-                ),
-                glm::ivec2(0)
-            });
-        }
-
-        // Sort cells to process them later
-        std::stable_sort(cells.begin(), cells.end(), [](const Cell& lhs, const Cell& rhs) {
-            if (lhs.widget->row < rhs.widget->row) {
-                return true;
-            } else if (lhs.widget->row > rhs.widget->row) {
-                return false;
-            } else {
-                if (lhs.widget->column < rhs.widget->column) {
-                    return true;
-                } else if (lhs.widget->column > rhs.widget->column) {
-                    return false;
-                } else {
-                    return false;
-                }
-            }
-        });
-
-        // Figure out if there are missing cells and act accordingly
-        if (cells.size() != rows * columns) {
-            REL_CRITICAL("There are missing cells; please fill them with gui::Dummy widgets");
-            exit(1);
-        }
-
-        // Calculate normal width and height of cells together
-        int normal_cells_width = 0;
-        int normal_cells_height = 0;
-
-        {
-            {
-                std::vector<int> row_widths;
-
-                for (unsigned int j = 0; j < rows; j++) {
-                    int row_width = 0;
-                    for (unsigned int i = 0; i < cells.size() / rows; i++) {
-                        row_width += cells[i + j * columns].size.x;
-                    }
-
-                    ASSERT(row_width > 0, "Width must be not 0");
-
-                    row_widths.push_back(row_width);
-                }
-
-                // Get max width of each row
-                for (int width : row_widths) {
-                    normal_cells_width = std::max(normal_cells_width, width);
-                }
-            }
-
-            {
-                std::vector<int> column_heights;
-
-                for (unsigned int j = 0; j < columns; j++) {
-                    int column_height = 0;
-                    for (unsigned int i = 0; i < cells.size(); i += columns) {
-                        column_height += cells[i + j].size.y;
-                    }
-
-                    ASSERT(column_height > 0, "Height must be not 0");
-
-                    column_heights.push_back(column_height);
-                }
-
-                // Get max height of each column
-                for (int height : column_heights) {
-                    normal_cells_height = std::max(normal_cells_height, height);
-                }
-            }
-
-            ASSERT(normal_cells_width > 0, "Width must be not 0");
-            ASSERT(normal_cells_height > 0, "Height must be not 0");
-        }
-
-        // Use the additional width to fill the width for each cell,
-        // If there is more space than needed
-        if (normal_cells_width < size.x) {
-            // All cells will get an equal amount of additional width
-            const int ADDITIONAL_WIDTH = (size.x - normal_cells_width) / columns;
-
-            for (Cell& cell : cells) {
-                cell.size.x += ADDITIONAL_WIDTH;
-            }
-        }
-
-        // Use the additional height to fill the height for each cell,
-        // If there is more space than needed
-        if (normal_cells_height < size.y) {
-            // All cells will get an equal amount of additional height
-            const int ADDITIONAL_HEIGHT = (size.y - normal_cells_height) / rows;
-
-            for (Cell& cell : cells) {
-                cell.size.y += ADDITIONAL_HEIGHT;
-            }
-        }
-
-        // Finish setting the size for each cell
-        // For each column, set the width as the max width of the cells
-        if (rows > 1) {
-            // Iterate every column
-            for (unsigned int j = 0; j < columns; j++) {
-                int max_width = 0;
-
-                for (unsigned int i = 0; i < rows; i++) {
-                    max_width = std::max(cells[j + i * columns].size.x, max_width);
-                }
-
-                for (unsigned int i = 0; i < rows; i++) {
-                    cells[j + i * columns].size.x = max_width;
-                }
-            }
-        }
-
-        // For each row, set the height as the max height of the cells
-        if (columns > 1) {
-            // Iterate every row
-            for (unsigned int j = 0; j < rows; j++) {
-                int max_height = 0;
-
-                for (unsigned int i = 0; i < columns; i++) {
-                    max_height = std::max(cells[i + j * columns].size.y, max_height);
-                }
-
-                for (unsigned int i = 0; i < columns; i++) {
-                    cells[i + j * columns].size.y = max_height;
-                }
-            }
-        }
-
-        // Calculate position of each cell in the grid
-        {
-            int position_x = 0;
-            unsigned int x_index = 0;
-
-            int position_y = 0;
-            unsigned int y_index = 0;
-
-            for (Cell& cell : cells) {
-                // x position
-                cell.position.x = position_x;
-                position_x += cell.size.x;
-
-                x_index++;
-
-                if (x_index == columns) {
-                    position_x = 0;
-                    x_index = 0;
-                }
-
-                // y position
-                if (y_index % columns == 0) {
-                    position_y += cell.size.y;
-                }
-
-                cell.position.y = size.y - position_y;
-
-                y_index++;
-            }
-        }
-
-        // Calculate position of each widget in its cell
-        for (Cell& cell : cells) {
-            switch (cell.widget->sticky) {
-                case None:  // Center the widget both ways
-                    cell.widget->position.x = cell.position.x + cell.size.x / 2
-                            - cell.widget->size.x / 2;
-                    cell.widget->position.y = cell.position.y + cell.size.y / 2
-                            - cell.widget->size.y / 2;
-                    break;
-                case N:
-                    cell.widget->position.x = cell.position.x + cell.size.x / 2
-                            - cell.widget->size.x / 2;
-                    cell.widget->position.y = cell.position.y + cell.size.y
-                            - cell.widget->size.y - cell.widget->padd_y.x;
-                    break;
-                case S:
-                    cell.widget->position.x = cell.position.x + cell.size.x / 2
-                            - cell.widget->size.x / 2;
-                    cell.widget->position.y = cell.position.y + cell.widget->padd_y.y;
-                    break;
-                case E:
-                    cell.widget->position.x = cell.position.x + cell.size.x
-                            - cell.widget->size.x - cell.widget->padd_x.y;
-                    cell.widget->position.y = cell.position.y + cell.size.y / 2
-                            - cell.widget->size.y / 2;
-                    break;
-                case W:
-                    cell.widget->position.x = cell.position.x + cell.widget->padd_x.x;
-                    cell.widget->position.y = cell.position.y + cell.size.y / 2
-                            - cell.widget->size.y / 2;
-                    break;
-                case NE:
-                    cell.widget->position.x = cell.position.x + cell.size.x
-                            - cell.widget->size.x - cell.widget->padd_x.y;
-                    cell.widget->position.y = cell.position.y + cell.size.y
-                            - cell.widget->size.y - cell.widget->padd_y.x;
-                    break;
-                case NW:
-                    cell.widget->position.x = cell.position.x + cell.widget->padd_x.x;
-                    cell.widget->position.y = cell.position.y + cell.size.y
-                            - cell.widget->size.y - cell.widget->padd_y.x;
-                    break;
-                case SE:
-                    cell.widget->position.x = cell.position.x + cell.size.x
-                            - cell.widget->size.x - cell.widget->padd_x.y;
-                    cell.widget->position.y = cell.position.y + cell.widget->padd_y.y;
-                    break;
-                case SW:
-                    cell.widget->position.x = cell.position.x + cell.widget->padd_x.x;
-                    cell.widget->position.y = cell.position.y + cell.widget->padd_y.y;
-                    break;
-            }
-        }
-
-        // Render the children
-        for (std::shared_ptr<Widget> widget : children) {
-            widget->render();
-        }
-    }
-
-    void Frame::on_window_resized(events::WindowResizedEvent& event) {
-        if (base) {
-            size.x = event.width;
-            size.y = event.height;
-            return;
-        }
-
-        ASSERT(false, "Currently only the base frame widget is supported");
-    }
-
-    void Frame::add(std::shared_ptr<Widget> widget, unsigned int row, unsigned int column,
-            unsigned int row_span, unsigned int column_span, glm::ivec2 padd_x,
-            glm::ivec2 padd_y, Sticky sticky) {
-        widget->set(row, column)->span(row_span, column_span)->padd(padd_x, padd_y)->stick(sticky);
-        children.push_back(widget);
-    }
-
-    void Frame::clear() {
-        children.clear();
-    }
-
-    Image::Image(std::shared_ptr<Frame> parent, std::shared_ptr<Texture> texture)
-        : Widget(parent), texture(texture) {
+    Image::Image(std::shared_ptr<Texture> texture)
+        : texture(texture) {
         size.x = texture->get_width();
         size.y = texture->get_height();
     }
@@ -338,7 +64,7 @@ namespace gui {
     void Image::render() {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
-        matrix = glm::scale(matrix, glm::vec3(size, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(static_cast<glm::vec2>(size) * scale_parameters.current_scale, 1.0f));
 
         app->gui_renderer->storage.quad2d_shader->bind();
         app->gui_renderer->storage.quad2d_shader->upload_uniform_mat4("u_model_matrix", matrix);
@@ -355,10 +81,9 @@ namespace gui {
         size.y = texture->get_height();
     }
 
-    Text::Text(std::shared_ptr<Frame> parent, std::shared_ptr<Font> font, std::string_view text,
-            float scale, const glm::vec3& color)
-        : Widget(parent), font(font), text(text), scale(scale), color(color) {
-        font->get_string_size(text, scale, &size.x, &size.y);
+    Text::Text(std::shared_ptr<Font> font, std::string_view text, float text_scale, const glm::vec3& color)
+        : font(font), text(text), text_scale(text_scale), color(color) {
+        font->get_string_size(text, text_scale, &size.x, &size.y);
     }
 
     void Text::render() {
@@ -368,7 +93,8 @@ namespace gui {
 
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
-        matrix = glm::scale(matrix, glm::vec3(scale, scale, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(text_scale, text_scale, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(scale_parameters.current_scale, scale_parameters.current_scale, 1.0f));
 
         font->update_data(buffer, size);
         delete[] buffer;
@@ -393,12 +119,12 @@ namespace gui {
 
     void Text::set_text(std::string_view text) {
         this->text = text;
-        font->get_string_size(text, scale, &size.x, &size.y);
+        font->get_string_size(text, text_scale, &size.x, &size.y);
     }
 
-    void Text::set_scale(float scale) {
-        this->scale = scale;
-        font->get_string_size(text, scale, &size.x, &size.y);
+    void Text::set_scale(float text_scale) {
+        this->text_scale = text_scale;
+        font->get_string_size(text, text_scale, &size.x, &size.y);
     }
 
     void Text::set_color(const glm::vec3& color) {
@@ -408,14 +134,6 @@ namespace gui {
     void Text::set_shadows(bool enable) {
         with_shadows = enable;
     }
-
-    Dummy::Dummy(std::shared_ptr<Frame> parent)
-        : Widget(parent) {
-        size.x = 1;
-        size.y = 1;
-    }
-
-    void Dummy::render() {}  // Do nothing
 }
 
 GuiRenderer::GuiRenderer(Application* app)
@@ -489,7 +207,7 @@ GuiRenderer::GuiRenderer(Application* app)
     gui::Widget::app = app;
 
     // Initialize main frame
-    main_frame = std::make_shared<gui::Frame>(nullptr);
+    // main_frame = std::make_shared<gui::Frame>(nullptr);
 
     DEB_INFO("Initialized GUI renderer");
 }
@@ -501,7 +219,95 @@ GuiRenderer::~GuiRenderer() {
 void GuiRenderer::render() {
     glDisable(GL_DEPTH_TEST);
 
-    main_frame->render();
+    // main_frame->render();
+
+    for (size_t i = 0; i < widgets.size(); i++) {
+        gui::Widget* widget = widgets[i].get();
+
+        if (!widget->visible) {
+            continue;
+        }
+
+        const int WINDOW_WIDTH = app->app_data.width;
+        const int WINDOW_HEIGHT = app->app_data.height;
+
+        if (widget->scale_parameters.min_bound != 0 && widget->scale_parameters.max_bound != 0) {
+            if (WINDOW_WIDTH <= widget->scale_parameters.min_bound) {
+                widget->scale_parameters.current_scale = widget->scale_parameters.min_scale;
+            } else if (WINDOW_WIDTH >= widget->scale_parameters.max_bound) {
+                widget->scale_parameters.current_scale = widget->scale_parameters.max_scale;
+            } else {
+                widget->scale_parameters.current_scale = map(
+                    WINDOW_WIDTH,
+                    widget->scale_parameters.min_bound,
+                    widget->scale_parameters.max_bound,
+                    widget->scale_parameters.min_scale,
+                    widget->scale_parameters.max_scale
+                );
+            }
+        }
+
+        const float SCALE = widget->scale_parameters.current_scale;
+
+        switch (widget->sticky) {
+            case gui::Sticky::Center:
+                widget->position = glm::ivec2(
+                    WINDOW_WIDTH / 2 - widget->size.x * SCALE / 2,
+                    WINDOW_HEIGHT / 2 - widget->size.y * SCALE / 2
+                );
+                break;
+            case gui::Sticky::N:
+                widget->position = glm::ivec2(
+                    WINDOW_WIDTH / 2 - widget->size.x * SCALE / 2,
+                    WINDOW_HEIGHT - widget->size.y * SCALE - widget->offset_parameters.top
+                );
+                break;
+            case gui::Sticky::S:
+                widget->position = glm::ivec2(
+                    WINDOW_WIDTH / 2 - widget->size.x * SCALE / 2,
+                    widget->offset_parameters.bottom
+                );
+                break;
+            case gui::Sticky::E:
+                widget->position = glm::ivec2(
+                    WINDOW_WIDTH - widget->size.x * SCALE - widget->offset_parameters.right,
+                    WINDOW_HEIGHT / 2 - widget->size.x * SCALE / 2
+                );
+                break;
+            case gui::Sticky::W:
+                widget->position = glm::ivec2(
+                    widget->offset_parameters.left,
+                    WINDOW_HEIGHT / 2 - widget->size.x * SCALE / 2
+                );
+                break;
+            case gui::Sticky::NE:
+                widget->position = glm::ivec2(
+                    WINDOW_WIDTH - widget->size.x * SCALE - widget->offset_parameters.right,
+                    WINDOW_HEIGHT - widget->size.y * SCALE - widget->offset_parameters.top
+                );
+                break;
+            case gui::Sticky::NW:
+                widget->position = glm::ivec2(
+                    widget->offset_parameters.left,
+                    WINDOW_HEIGHT - widget->size.y * SCALE - widget->offset_parameters.top
+                );
+                break;
+            case gui::Sticky::SE:
+                widget->position = glm::ivec2(
+                    WINDOW_WIDTH - widget->size.x * SCALE - widget->offset_parameters.right,
+                    widget->offset_parameters.bottom
+                );
+                break;
+            case gui::Sticky::SW:
+                widget->position = glm::ivec2(
+                    widget->offset_parameters.left,
+                    widget->offset_parameters.bottom
+                );
+                break;
+        }
+
+        widget->render();
+    }
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -533,8 +339,14 @@ void GuiRenderer::on_window_resized(events::WindowResizedEvent& event) {
 
     storage.text_shader->bind();
     storage.text_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
+}
 
-    main_frame->on_window_resized(event);
+void GuiRenderer::add_widget(std::shared_ptr<gui::Widget> widget) {
+    widgets.push_back(widget);
+}
+
+void GuiRenderer::clear() {
+    widgets.clear();
 }
 
 void GuiRenderer::maybe_initialize_assets() {
