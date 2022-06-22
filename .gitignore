@@ -17,6 +17,7 @@ bitmap_*.png
 *.dat
 encrypter
 encrypter.exe
+/data-filtered
 
 /.vs
 CMakeCache.txt

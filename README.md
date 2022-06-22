@@ -16,7 +16,8 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has thre
 - Create a new folder called **_Nine-Morris-3D-vX.Y.Z-Linux_**
 - Copy the executable from build-release/
 - Make sure that all assets are encrypted
-- Copy the data directory filtering the unwanted files (keep only encrypted assets)
+- Use filter_assets.py to create the data folder filtered
+- Copy the newly created data directory and rename it from **_data-filtered_** to **_data_**
 - Copy HELP_LINUX.txt
 - Copy install.sh and uninstall.sh from scripts/linux-install/
 - Archive the **_Nine-Morris-3D-vX.Y.Z-Linux_** folder
@@ -25,7 +26,8 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has thre
 - Create a new folder called whatever
 - Copy the executable from Release/
 - Make sure that all assets are encrypted
-- Copy the data directory filtering the unwanted files (keep only encrypted assets)
+- Use filter_assets.py to create the data folder filtered
+- Copy the newly created data directory and rename it from **_data-filtered_** to **_data_**
 - Copy installer.nsi from scripts/windows-install/
 - Create the NSIS installer called **_Nine-Morris-3D-vX.Y.Z-Windows_** using the **_installer.nsi_** script
 
