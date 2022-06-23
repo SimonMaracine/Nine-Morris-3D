@@ -46,10 +46,7 @@ void LoadingLayer::on_attach() {
 void LoadingLayer::on_detach() {
     DEB_INFO("Done loading assets; initializing the rest of the game...");
 
-    if (loader->get_thread().joinable()) {
-        loader->get_thread().detach();
-    }
-
+    loader->get_thread().join();
     loader = nullptr;
 
     app->gui_renderer->clear();

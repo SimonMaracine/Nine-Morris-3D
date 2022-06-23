@@ -118,6 +118,10 @@ void GameLayer::on_detach() {
     gui_layer->timer = Timer();
 
     first_move = false;
+
+    if (loader != nullptr) {
+        loader->get_thread().join();
+    }
 }
 
 void GameLayer::on_awake() {
@@ -151,10 +155,7 @@ void GameLayer::on_update(float dt) {
 
         changed_skybox = false;
 
-        if (loader->get_thread().joinable()) {
-            loader->get_thread().detach();
-        }
-
+        loader->get_thread().join();
         loader = nullptr;
     }
 
@@ -164,10 +165,7 @@ void GameLayer::on_update(float dt) {
 
         changed_texture_quality = false;
 
-        if (loader->get_thread().joinable()) {
-            loader->get_thread().detach();
-        }
-
+        loader->get_thread().join();
         loader = nullptr;
     }
 }
@@ -467,7 +465,7 @@ void GameLayer::prepare_piece(unsigned int index, Piece::Type type, std::shared_
 
     app->data.piece_vertex_arrays[index] = vertex_array;
 
-    if (type == Piece::Type::White) {
+    if (type == Piece::Type::White) {  // TODO see if branch is really needed
         app->data.piece_material_instances[index] = MaterialInstance::make(app->data.tinted_wood_material);
         app->data.piece_material_instances[index]->set_texture("u_material.diffuse", texture, 0);
         app->data.piece_material_instances[index]->set_vec3("u_material.specular", glm::vec3(0.2f));
