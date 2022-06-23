@@ -16,6 +16,7 @@
 #include "nine_morris_3d/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
+#include "other/user_data.h"
 
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
@@ -25,9 +26,6 @@
 #define LIGHT_BROWN ImVec4(0.68f, 0.48f, 0.22f, 1.0f)
 #define BEIGE ImVec4(0.961f, 0.875f, 0.733f, 1.0f)
 #define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
-
-static const std::string INFO_FILE_PATH = paths::path_for_logs(INFO_FILE);
-static const std::string SAVE_GAME_FILE_PATH = paths::path_for_save_and_options(save_load::SAVE_GAME_FILE);
 
 void ImGuiLayer::on_attach() {
     save_load::GameState state;
@@ -42,7 +40,17 @@ void ImGuiLayer::on_attach() {
         REL_WARN("Could not load game");
     }
     last_save_game_date = std::move(state.date);
-    DEB_INFO("Last save game checked");
+    DEB_INFO("Checked last saved game");
+
+    try {
+        info_file_path = paths::path_for_logs(INFO_FILE);
+        save_game_file_path = paths::path_for_save_and_options(save_load::SAVE_GAME_FILE);
+    } catch (const user_data::UserNameError& e) {
+        REL_ERROR("{}", e.what());
+
+        info_file_path = INFO_FILE;
+        save_game_file_path = save_load::SAVE_GAME_FILE;
+    }
 }
 
 void ImGuiLayer::on_detach() {
@@ -51,6 +59,8 @@ void ImGuiLayer::on_detach() {
     can_undo = false;
     show_info = false;
     show_about = false;
+    show_could_not_load_game = false;
+    show_no_last_game = false;
 }
 
 void ImGuiLayer::on_awake() {
@@ -313,7 +323,7 @@ void ImGuiLayer::on_update(float dt) {
                 DEB_INFO("Logged OpenGL and dependencies info");
             }
             if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("%s", INFO_FILE_PATH.c_str());
+                ImGui::SetTooltip("%s", info_file_path.c_str());
             }
 
             ImGui::EndMenu();
@@ -532,7 +542,7 @@ void ImGuiLayer::draw_could_not_load_game() {
         ImGui::Text("Could not load last game.");
         ImGui::Text("The save game file is either missing or is corrupted.");
         ImGui::Separator();
-        ImGui::Text("%s", SAVE_GAME_FILE_PATH.c_str());
+        ImGui::Text("%s", save_game_file_path.c_str());
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 

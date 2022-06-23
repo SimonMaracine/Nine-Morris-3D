@@ -46,6 +46,9 @@ public:
     bool show_no_last_game = false;
     std::string last_save_game_date;
 
+    std::string info_file_path;
+    std::string save_game_file_path;
+
     GameLayer* game_layer = nullptr;
     GuiLayer* gui_layer = nullptr;
 };
