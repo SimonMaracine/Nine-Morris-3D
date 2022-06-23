@@ -18,12 +18,12 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(0.889f, NODE_Y_POSITION, 0.898f),    // 6
     glm::vec3(0.001f, NODE_Y_POSITION, 0.906f),    // 7
     glm::vec3(-0.930f, NODE_Y_POSITION, 0.892f),   // 8
-    glm::vec3(2.058f, NODE_Y_POSITION, 0.041f),    // 9
-    glm::vec3(1.481f, NODE_Y_POSITION, 0.035f),    // 10
-    glm::vec3(0.894f, NODE_Y_POSITION, 0.036f),    // 11
-    glm::vec3(-0.934f, NODE_Y_POSITION, 0.060f),   // 12
-    glm::vec3(-1.508f, NODE_Y_POSITION, 0.060f),   // 13
-    glm::vec3(-2.083f, NODE_Y_POSITION, 0.057f),   // 14
+    glm::vec3(2.058f, NODE_Y_POSITION, 0.031f),    // 9
+    glm::vec3(1.481f, NODE_Y_POSITION, 0.025f),    // 10
+    glm::vec3(0.894f, NODE_Y_POSITION, 0.026f),    // 11
+    glm::vec3(-0.934f, NODE_Y_POSITION, 0.050f),   // 12
+    glm::vec3(-1.508f, NODE_Y_POSITION, 0.050f),   // 13
+    glm::vec3(-2.083f, NODE_Y_POSITION, 0.047f),   // 14
     glm::vec3(0.882f, NODE_Y_POSITION, -0.894f),   // 15
     glm::vec3(0.011f, NODE_Y_POSITION, -0.900f),   // 16
     glm::vec3(-0.930f, NODE_Y_POSITION, -0.890f),  // 17
