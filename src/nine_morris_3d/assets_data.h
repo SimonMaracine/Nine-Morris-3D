@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nine_morris_3d/options.h"
 #include "other/mesh.h"
 #include "other/texture_data.h"
 #include "other/loader.h"
@@ -27,33 +28,8 @@ struct AssetsData {
 };
 
 namespace assets_data {
-    void all_field(Loader<AssetsData>* loader);
-    void all_field_small(Loader<AssetsData>* loader);
-
-    void all_autumn(Loader<AssetsData>* loader);
-    void all_autumn_small(Loader<AssetsData>* loader);
-
-    // ---
-
-    void skybox_field(Loader<AssetsData>* loader);
-    void skybox_field_small(Loader<AssetsData>* loader);
-
-    void skybox_autumn(Loader<AssetsData>* loader);
-    void skybox_autumn_small(Loader<AssetsData>* loader);
-
-    // ---
-
-    void texture_quality_field(Loader<AssetsData>* loader);
-    void texture_quality_field_small(Loader<AssetsData>* loader);
-
-    void texture_quality_autumn(Loader<AssetsData>* loader);
-    void texture_quality_autumn_small(Loader<AssetsData>* loader);
-
-    // ---
-
-    void non_labeled_board_texture(Loader<AssetsData>* loader);
-    void non_labeled_board_texture_small(Loader<AssetsData>* loader);
-
-    void labeled_board_texture(Loader<AssetsData>* loader);
-    void labeled_board_texture_small(Loader<AssetsData>* loader);
+    void all_start(Loader<AssetsData, options::Options>* loader, options::Options options);
+    void skybox(Loader<AssetsData, options::Options>* loader, options::Options options);
+    void texture_quality(Loader<AssetsData, options::Options>* loader, options::Options options);
+    void board_texture(Loader<AssetsData, options::Options>* loader, options::Options options);
 }

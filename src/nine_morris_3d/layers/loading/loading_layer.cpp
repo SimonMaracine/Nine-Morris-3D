@@ -12,27 +12,8 @@
 #include "other/assert.h"
 
 void LoadingLayer::on_attach() {
-    if (app->options.texture_quality == options::NORMAL) {
-        if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::all_field);
-        } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::all_autumn);
-        } else {
-            ASSERT(false, "Invalid texture quality");
-        }
-    } else if (app->options.texture_quality == options::LOW) {
-        if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::all_field_small);
-        } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::all_autumn_small);
-        } else {
-            ASSERT(false, "Invalid texture quality");
-        }
-    } else {
-        ASSERT(false, "Invalid skybox");
-    }
-
-    loader->start_loading_thread();
+    loader = std::make_unique<Loader<AssetsData, options::Options>>(app->assets_data, assets_data::all_start);
+    loader->start_loading_thread(app->options);
 
     std::shared_ptr<gui::Text> loading_text = std::make_shared<gui::Text>(
         app->data.good_dog_plain_font, "Loading...", 1.2f, glm::vec3(0.81f)

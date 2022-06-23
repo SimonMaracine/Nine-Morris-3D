@@ -743,28 +743,10 @@ void GameLayer::set_texture_quality(std::string_view quality) {
 
     app->options.texture_quality = quality;
 
-    if (quality == options::NORMAL) {
-        if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::texture_quality_field);
-        } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::texture_quality_autumn);
-        } else {
-            ASSERT(false, "Invalid skybox");
-        }
-    } else if (quality == options::LOW) {
-        if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::texture_quality_field_small);
-        } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::texture_quality_autumn_small);
-        } else {
-            ASSERT(false, "Invalid skybox");
-        }
-    } else {
-        ASSERT(false, "Invalid texture quality");
-    }
+    loader = std::make_unique<Loader<AssetsData, options::Options>>(app->assets_data, assets_data::texture_quality);
+    loader->start_loading_thread(app->options);
 
     changed_texture_quality = true;
-    loader->start_loading_thread();
 }
 
 void GameLayer::set_skybox(std::string_view skybox) {
@@ -784,27 +766,9 @@ void GameLayer::set_skybox(std::string_view skybox) {
 
     app->options.skybox = skybox;
 
-    if (skybox == options::FIELD) {
-        if (app->options.texture_quality == options::NORMAL) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::skybox_field);
-        } else if (app->options.texture_quality == options::LOW) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::skybox_field_small);
-        } else {
-            ASSERT(false, "Invalid texture quality");
-        }
-    } else if (skybox == options::AUTUMN) {
-        if (app->options.texture_quality == options::NORMAL) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::skybox_autumn);
-        } else if (app->options.texture_quality == options::LOW) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::skybox_autumn_small);
-        } else {
-            ASSERT(false, "Invalid texture quality");
-        }
-    } else {
-        ASSERT(false, "Invalid skybox");
-    }
+    loader = std::make_unique<Loader<AssetsData, options::Options>>(app->assets_data, assets_data::skybox);
+    loader->start_loading_thread(app->options);
 
-    loader->start_loading_thread();
     changed_skybox = true;
 }
 
@@ -825,25 +789,9 @@ void GameLayer::set_labeled_board_texture(bool labeled_board) {
 
     app->options.labeled_board = labeled_board;
 
-    if (labeled_board) {
-        if (app->options.texture_quality == options::NORMAL) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::labeled_board_texture);
-        } else if (app->options.texture_quality == options::LOW) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::labeled_board_texture_small);
-        } else {
-            ASSERT(false, "Invalid texture quality");
-        }
-    } else {
-        if (app->options.texture_quality == options::NORMAL) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::non_labeled_board_texture);
-        } else if (app->options.texture_quality == options::LOW) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::non_labeled_board_texture_small);
-        } else {
-            ASSERT(false, "Invalid texture quality");
-        }
-    }
+    loader = std::make_unique<Loader<AssetsData, options::Options>>(app->assets_data, assets_data::board_texture);
+    loader->start_loading_thread(app->options);
 
-    loader->start_loading_thread();
     changed_board_texture = true;
 }
 

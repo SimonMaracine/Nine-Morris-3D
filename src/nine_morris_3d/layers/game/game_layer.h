@@ -7,6 +7,7 @@
 #include "graphics/renderer/opengl/buffer.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/options.h"
 #include "other/mesh.h"
 #include "other/loader.h"
 
@@ -80,7 +81,8 @@ public:
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
 
-    std::unique_ptr<Loader<AssetsData>> loader;
+    std::unique_ptr<Loader<AssetsData, options::Options>> loader;
+
     bool changed_skybox = false;
     bool changed_texture_quality = false;
     bool changed_board_texture = false;

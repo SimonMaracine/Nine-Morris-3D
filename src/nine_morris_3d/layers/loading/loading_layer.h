@@ -2,6 +2,7 @@
 
 #include "application/layer.h"
 #include "nine_morris_3d/assets_data.h"
+#include "nine_morris_3d/options.h"
 #include "other/loader.h"
 
 class LoadingLayer : public Layer {
@@ -14,5 +15,5 @@ public:
     virtual void on_detach() override;
     virtual void on_update(float dt) override;
 
-    std::unique_ptr<Loader<AssetsData>> loader;
+    std::unique_ptr<Loader<AssetsData, options::Options>> loader;
 };

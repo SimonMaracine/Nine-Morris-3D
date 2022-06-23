@@ -6,10 +6,12 @@
  * Objects of this class load assets in a separate thread.
  * Pass a struct with the assets and a function to load them.
  */
-template<typename Assets>
+template<typename Assets, typename... Args>
 class Loader {
 public:
-    Loader(std::shared_ptr<Assets> assets, const std::function<void(Loader<Assets>*)>& load_function)
+    using FunctionType = std::function<void(Loader<Assets, Args...>*, Args...)>;
+
+    Loader(std::shared_ptr<Assets> assets, const FunctionType& load_function)
         : assets(assets), load_function(load_function) {}
     ~Loader() = default;
 
@@ -21,10 +23,10 @@ public:
         return loading_thread;
     }
 
-    void start_loading_thread() {
+    void start_loading_thread(Args... args) {
         DEB_INFO("Loading some assets from separate thread...");
 
-        loading_thread = std::thread(load_function, this);
+        loading_thread = std::thread(load_function, this, args...);
     }
 
     void set_done() {
@@ -36,7 +38,7 @@ public:
     }
 private:
     std::shared_ptr<Assets> assets;
-    std::function<void(Loader<Assets>*)> load_function;
+    FunctionType load_function;
     std::thread loading_thread;
     std::atomic<bool> loaded = false;
 };
