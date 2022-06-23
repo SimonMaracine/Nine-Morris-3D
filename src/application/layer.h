@@ -11,8 +11,8 @@
  */
 class Layer {
 public:
-    Layer(std::string&& id, Application* application)
-        : id(std::move(id)), application(application) {}
+    Layer(const std::string& id, Application* application)
+        : id(id), application(application) {}
     virtual ~Layer() = default;
 
     virtual void on_attach() {}  // Called when the layer is attached

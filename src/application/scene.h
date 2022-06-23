@@ -8,8 +8,8 @@ class Layer;
  */
 class Scene {
 public:
-    Scene(std::string&& id)
-        : id(std::move(id)) {}
+    Scene(const std::string& id)
+        : id(id) {}
     ~Scene() = default;
 
     void add_layer(Layer* layer) {

@@ -28,8 +28,8 @@ struct AssetsData {
 };
 
 namespace assets_data {
-    void all_start(Loader<AssetsData, options::Options>* loader, options::Options options);
-    void skybox(Loader<AssetsData, options::Options>* loader, options::Options options);
-    void texture_quality(Loader<AssetsData, options::Options>* loader, options::Options options);
-    void board_texture(Loader<AssetsData, options::Options>* loader, options::Options options);
+    void all_start(Loader<AssetsData, options::Options>* loader, const options::Options& options);
+    void skybox(Loader<AssetsData, options::Options>* loader, const options::Options& options);
+    void texture_quality(Loader<AssetsData, options::Options>* loader, const options::Options& options);
+    void board_texture(Loader<AssetsData, options::Options>* loader, const options::Options& options);
 }

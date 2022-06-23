@@ -7,8 +7,8 @@
 
 class LoadingLayer : public Layer {
 public:
-    LoadingLayer(std::string&& id, Application* app)
-        : Layer(std::move(id), app) {}
+    LoadingLayer(const std::string& id, Application* app)
+        : Layer(id, app) {}
     virtual ~LoadingLayer() = default;
 
     virtual void on_attach() override;

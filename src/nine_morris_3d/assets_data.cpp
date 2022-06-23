@@ -13,7 +13,7 @@ using namespace paths;
 using namespace encryption;
 
 namespace assets_data {
-    void all_start(Loader<AssetsData, options::Options>* loader, options::Options options) {
+    void all_start(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
         loader->get()->board_mesh = load_model(convert(path_for_assets(BOARD_MESH)));
         loader->get()->board_paint_mesh = load_model(convert(path_for_assets(BOARD_PAINT_MESH)));
         loader->get()->node_mesh = load_model_position(convert(path_for_assets(NODE_MESH)), true);
@@ -80,7 +80,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void skybox(Loader<AssetsData, options::Options>* loader, options::Options options) {
+    void skybox(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
         if (options.texture_quality == options::NORMAL) {
             if (options.skybox == options::FIELD) {
                 loader->get()->skybox_px_texture = std::make_shared<TextureData>(convert(path_for_assets(FIELD_PX_TEXTURE)), false);
@@ -118,7 +118,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void texture_quality(Loader<AssetsData, options::Options>* loader, options::Options options) {
+    void texture_quality(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
         if (options.texture_quality == options::NORMAL) {
             loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_TEXTURE)), true);
             loader->get()->white_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_PIECE_TEXTURE)), true);
@@ -176,7 +176,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void board_texture(Loader<AssetsData, options::Options>* loader, options::Options options) {
+    void board_texture(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
         if (options.texture_quality == options::NORMAL) {
             if (options.labeled_board) {
                 loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_TEXTURE)), true);

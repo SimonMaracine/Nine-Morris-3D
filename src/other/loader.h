@@ -9,7 +9,7 @@
 template<typename Assets, typename... Args>
 class Loader {
 public:
-    using FunctionType = std::function<void(Loader<Assets, Args...>*, Args...)>;
+    using FunctionType = std::function<void(Loader<Assets, Args...>*, const Args&...)>;
 
     Loader(std::shared_ptr<Assets> assets, const FunctionType& load_function)
         : assets(assets), load_function(load_function) {}
@@ -23,7 +23,7 @@ public:
         return loading_thread;
     }
 
-    void start_loading_thread(Args... args) {
+    void start_loading_thread(const Args&... args) {
         DEB_INFO("Loading some assets from separate thread...");
 
         loading_thread = std::thread(load_function, this, args...);

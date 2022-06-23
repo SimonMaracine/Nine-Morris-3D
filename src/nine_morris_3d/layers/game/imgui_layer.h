@@ -10,8 +10,8 @@ class GuiLayer;
 
 class ImGuiLayer : public Layer {
 public:
-    ImGuiLayer(std::string&& id, Application* app)
-        : Layer(std::move(id), app) {}
+    ImGuiLayer(const std::string& id, Application* app)
+        : Layer(id, app) {}
     virtual ~ImGuiLayer() = default;
 
     virtual void on_attach() override;

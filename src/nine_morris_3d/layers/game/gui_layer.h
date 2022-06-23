@@ -7,8 +7,8 @@ class GameLayer;
 
 class GuiLayer : public Layer {
 public:
-    GuiLayer(std::string&& id, Application* app)
-        : Layer(std::move(id), app) {}
+    GuiLayer(const std::string& id, Application* app)
+        : Layer(id, app) {}
     virtual ~GuiLayer() = default;
 
     virtual void on_attach() override;
