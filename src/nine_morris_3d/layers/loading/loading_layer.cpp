@@ -14,17 +14,17 @@
 void LoadingLayer::on_attach() {
     if (app->options.texture_quality == options::NORMAL) {
         if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_all);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::all_field);
         } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_all);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::all_autumn);
         } else {
             ASSERT(false, "Invalid texture quality");
         }
     } else if (app->options.texture_quality == options::LOW) {
         if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_low_tex_all);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::all_field_small);
         } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_low_tex_all);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::all_autumn_small);
         } else {
             ASSERT(false, "Invalid texture quality");
         }

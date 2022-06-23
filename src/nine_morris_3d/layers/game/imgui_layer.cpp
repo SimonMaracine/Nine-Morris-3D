@@ -196,6 +196,7 @@ void ImGuiLayer::on_update(float dt) {
                     }
 
                     ImGui::EndMenu();
+                    HOVERING_GUI();
                 }
                 if (ImGui::BeginMenu("Texture Quality")) {
                     static int dummy = get_texture_quality_option(app->options.texture_quality);
@@ -214,6 +215,7 @@ void ImGuiLayer::on_update(float dt) {
                     }
 
                     ImGui::EndMenu();
+                    HOVERING_GUI();
                 }
                 if (ImGui::BeginMenu("Anisotropic Filtering")) {
                     if (ImGui::RadioButton("Off", &app->options.anisotropic_filtering, 0)) {
@@ -233,6 +235,7 @@ void ImGuiLayer::on_update(float dt) {
                     }
 
                     ImGui::EndMenu();
+                    HOVERING_GUI();
                 }
                 if (ImGui::MenuItem("Custom Cursor", nullptr, &app->options.custom_cursor)) {
                     if (app->options.custom_cursor) {
@@ -251,6 +254,7 @@ void ImGuiLayer::on_update(float dt) {
                 }
 
                 ImGui::EndMenu();
+                HOVERING_GUI();
             }
             if (ImGui::MenuItem("Save On Exit", nullptr, &app->options.save_on_exit)) {
                 if (app->options.save_on_exit) {
@@ -274,6 +278,7 @@ void ImGuiLayer::on_update(float dt) {
                 }
 
                 ImGui::EndMenu();
+                HOVERING_GUI();
             }
             if (ImGui::MenuItem("Show Info", nullptr, &show_info)) {
                 if (show_info) {
@@ -308,6 +313,20 @@ void ImGuiLayer::on_update(float dt) {
                 }
 
                 ImGui::EndMenu();
+                HOVERING_GUI();
+            }
+            static bool labeled_board = app->options.labeled_board;
+
+            if (ImGui::MenuItem("Labeled Board", nullptr, &labeled_board)) {
+                if (labeled_board) {
+                    game_layer->set_labeled_board_texture(labeled_board);
+
+                    DEB_INFO("Labeled board");
+                } else {
+                    game_layer->set_labeled_board_texture(labeled_board);
+
+                    DEB_INFO("Non-labeled board");
+                }
             }
 
             ImGui::EndMenu();

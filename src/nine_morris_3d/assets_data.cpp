@@ -12,7 +12,7 @@ using namespace paths;
 using namespace encryption;
 
 namespace assets_data {
-    void field_all(Loader<AssetsData>* loader) {
+    void all_field(Loader<AssetsData>* loader) {
         loader->get()->board_mesh = load_model(convert(path_for_assets(BOARD_MESH)));
         loader->get()->board_paint_mesh = load_model(convert(path_for_assets(BOARD_PAINT_MESH)));
         loader->get()->node_mesh = load_model_position(convert(path_for_assets(NODE_MESH)), true);
@@ -37,7 +37,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void field_low_tex_all(Loader<AssetsData>* loader) {
+    void all_field_small(Loader<AssetsData>* loader) {
         loader->get()->board_mesh = load_model(convert(path_for_assets(BOARD_MESH)));
         loader->get()->board_paint_mesh = load_model(convert(path_for_assets(BOARD_PAINT_MESH)));
         loader->get()->node_mesh = load_model_position(convert(path_for_assets(NODE_MESH)), true);
@@ -62,7 +62,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void autumn_all(Loader<AssetsData>* loader) {
+    void all_autumn(Loader<AssetsData>* loader) {
         loader->get()->board_mesh = load_model(convert(path_for_assets(BOARD_MESH)));
         loader->get()->board_paint_mesh = load_model(convert(path_for_assets(BOARD_PAINT_MESH)));
         loader->get()->node_mesh = load_model_position(convert(path_for_assets(NODE_MESH)), true);
@@ -87,7 +87,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void autumn_low_tex_all(Loader<AssetsData>* loader) {
+    void all_autumn_small(Loader<AssetsData>* loader) {
         loader->get()->board_mesh = load_model(convert(path_for_assets(BOARD_MESH)));
         loader->get()->board_paint_mesh = load_model(convert(path_for_assets(BOARD_PAINT_MESH)));
         loader->get()->node_mesh = load_model_position(convert(path_for_assets(NODE_MESH)), true);
@@ -112,7 +112,9 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void field_skybox(Loader<AssetsData>* loader) {
+    // ---
+
+    void skybox_field(Loader<AssetsData>* loader) {
         loader->get()->skybox_px_texture = std::make_shared<TextureData>(convert(path_for_assets(FIELD_PX_TEXTURE)), false);
         loader->get()->skybox_nx_texture = std::make_shared<TextureData>(convert(path_for_assets(FIELD_NX_TEXTURE)), false);
         loader->get()->skybox_py_texture = std::make_shared<TextureData>(convert(path_for_assets(FIELD_PY_TEXTURE)), false);
@@ -123,7 +125,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void field_low_tex_skybox(Loader<AssetsData>* loader) {
+    void skybox_field_small(Loader<AssetsData>* loader) {
         loader->get()->skybox_px_texture = std::make_shared<TextureData>(convert(path_for_assets(FIELD_PX_TEXTURE_SMALL)), false);
         loader->get()->skybox_nx_texture = std::make_shared<TextureData>(convert(path_for_assets(FIELD_NX_TEXTURE_SMALL)), false);
         loader->get()->skybox_py_texture = std::make_shared<TextureData>(convert(path_for_assets(FIELD_PY_TEXTURE_SMALL)), false);
@@ -134,7 +136,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void autumn_skybox(Loader<AssetsData>* loader) {
+    void skybox_autumn(Loader<AssetsData>* loader) {
         loader->get()->skybox_px_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_PX_TEXTURE)), false);
         loader->get()->skybox_nx_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_NX_TEXTURE)), false);
         loader->get()->skybox_py_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_PY_TEXTURE)), false);
@@ -145,7 +147,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void autumn_low_tex_skybox(Loader<AssetsData>* loader) {
+    void skybox_autumn_small(Loader<AssetsData>* loader) {
         loader->get()->skybox_px_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_PX_TEXTURE_SMALL)), false);
         loader->get()->skybox_nx_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_NX_TEXTURE_SMALL)), false);
         loader->get()->skybox_py_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_PY_TEXTURE_SMALL)), false);
@@ -156,7 +158,9 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void field_texture(Loader<AssetsData>* loader) {
+    // ---
+
+    void texture_quality_field(Loader<AssetsData>* loader) {
         loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_TEXTURE)), true);
         loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE)), true);
         loader->get()->white_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_PIECE_TEXTURE)), true);
@@ -172,7 +176,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void field_low_tex_texture(Loader<AssetsData>* loader) {
+    void texture_quality_field_small(Loader<AssetsData>* loader) {
         loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_TEXTURE_SMALL)), true);
         loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE_SMALL)), true);
         loader->get()->white_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_PIECE_TEXTURE_SMALL)), true);
@@ -188,7 +192,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void autumn_texture(Loader<AssetsData>* loader) {
+    void texture_quality_autumn(Loader<AssetsData>* loader) {
         loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_TEXTURE)), true);
         loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE)), true);
         loader->get()->white_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_PIECE_TEXTURE)), true);
@@ -204,7 +208,7 @@ namespace assets_data {
         loader->set_done();
     }
 
-    void autumn_low_tex_texture(Loader<AssetsData>* loader) {
+    void texture_quality_autumn_small(Loader<AssetsData>* loader) {
         loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_TEXTURE_SMALL)), true);
         loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE_SMALL)), true);
         loader->get()->white_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_PIECE_TEXTURE_SMALL)), true);
@@ -216,6 +220,32 @@ namespace assets_data {
         loader->get()->skybox_ny_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_NY_TEXTURE_SMALL)), false);
         loader->get()->skybox_pz_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_PZ_TEXTURE_SMALL)), false);
         loader->get()->skybox_nz_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_NZ_TEXTURE_SMALL)), false);
+
+        loader->set_done();
+    }
+
+    // ---
+
+    void non_labeled_board_texture(Loader<AssetsData>* loader) {
+        loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE)), true);
+
+        loader->set_done();
+    }
+
+    void non_labeled_board_texture_small(Loader<AssetsData>* loader) {
+        loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE_SMALL)), true);
+
+        loader->set_done();
+    }
+
+    void labeled_board_texture(Loader<AssetsData>* loader) {
+        loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_TEXTURE)), true);
+
+        loader->set_done();
+    }
+
+    void labeled_board_texture_small(Loader<AssetsData>* loader) {
+        loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_TEXTURE_SMALL)), true);
 
         loader->set_done();
     }

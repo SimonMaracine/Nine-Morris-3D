@@ -168,6 +168,16 @@ void GameLayer::on_update(float dt) {
         loader->get_thread().join();
         loader = nullptr;
     }
+
+    // Short-circuit optimization
+    if (changed_board_texture && loader->done_loading()) {
+        actually_change_board_texture();
+
+        changed_board_texture = false;
+
+        loader->get_thread().join();
+        loader = nullptr;
+    }
 }
 
 void GameLayer::on_fixed_update() {
@@ -726,7 +736,7 @@ void GameLayer::set_texture_quality(std::string_view quality) {
     }
 
     // Don't do anything, if there are assets already loading
-    if (changed_skybox || changed_texture_quality) {
+    if (changed_skybox || changed_texture_quality || changed_board_texture) {
         DEB_WARN("Assets already loading");
         return;
     }
@@ -735,17 +745,17 @@ void GameLayer::set_texture_quality(std::string_view quality) {
 
     if (quality == options::NORMAL) {
         if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_texture);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::texture_quality_field);
         } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_texture);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::texture_quality_autumn);
         } else {
             ASSERT(false, "Invalid skybox");
         }
     } else if (quality == options::LOW) {
         if (app->options.skybox == options::FIELD) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_low_tex_texture);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::texture_quality_field_small);
         } else if (app->options.skybox == options::AUTUMN) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_low_tex_texture);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::texture_quality_autumn_small);
         } else {
             ASSERT(false, "Invalid skybox");
         }
@@ -767,7 +777,7 @@ void GameLayer::set_skybox(std::string_view skybox) {
     }
 
     // Don't do anything, if there are assets already loading
-    if (changed_skybox || changed_texture_quality) {
+    if (changed_skybox || changed_texture_quality || changed_board_texture) {
         DEB_WARN("Assets already loading");
         return;
     }
@@ -776,17 +786,17 @@ void GameLayer::set_skybox(std::string_view skybox) {
 
     if (skybox == options::FIELD) {
         if (app->options.texture_quality == options::NORMAL) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_skybox);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::skybox_field);
         } else if (app->options.texture_quality == options::LOW) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::field_low_tex_skybox);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::skybox_field_small);
         } else {
             ASSERT(false, "Invalid texture quality");
         }
     } else if (skybox == options::AUTUMN) {
         if (app->options.texture_quality == options::NORMAL) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_skybox);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::skybox_autumn);
         } else if (app->options.texture_quality == options::LOW) {
-            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::autumn_low_tex_skybox);
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::skybox_autumn_small);
         } else {
             ASSERT(false, "Invalid texture quality");
         }
@@ -796,6 +806,45 @@ void GameLayer::set_skybox(std::string_view skybox) {
 
     loader->start_loading_thread();
     changed_skybox = true;
+}
+
+void GameLayer::set_labeled_board_texture(bool labeled_board) {
+    using namespace assets;
+
+    // labeled_board is the new option; options.labeled_board is not set yet
+
+    if (labeled_board == app->options.labeled_board) {
+        return;
+    }
+
+    // Don't do anything, if there are assets already loading
+    if (changed_skybox || changed_texture_quality || changed_board_texture) {
+        DEB_WARN("Assets already loading");
+        return;
+    }
+
+    app->options.labeled_board = labeled_board;
+
+    if (labeled_board) {
+        if (app->options.texture_quality == options::NORMAL) {
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::labeled_board_texture);
+        } else if (app->options.texture_quality == options::LOW) {
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::labeled_board_texture_small);
+        } else {
+            ASSERT(false, "Invalid texture quality");
+        }
+    } else {
+        if (app->options.texture_quality == options::NORMAL) {
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::non_labeled_board_texture);
+        } else if (app->options.texture_quality == options::LOW) {
+            loader = std::make_unique<Loader<AssetsData>>(app->assets_data, assets_data::non_labeled_board_texture_small);
+        } else {
+            ASSERT(false, "Invalid texture quality");
+        }
+    }
+
+    loader->start_loading_thread();
+    changed_board_texture = true;
 }
 
 void GameLayer::actually_change_texture_quality() {
@@ -862,6 +911,16 @@ void GameLayer::actually_change_skybox() {
     } else {
         ASSERT(false, "Invalid skybox");
     }
+}
+
+void GameLayer::actually_change_board_texture() {
+    app->data.board_paint_diffuse_texture = Texture::create(
+        app->assets_data->board_paint_diff_texture, true, -1.0f, app->options.anisotropic_filtering
+    );
+    app->data.board_paint_material_instance->set_texture(
+        "u_material.diffuse",
+        app->data.board_paint_diffuse_texture, 0
+    );
 }
 
 void GameLayer::load_game() {

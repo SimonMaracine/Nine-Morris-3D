@@ -39,6 +39,7 @@ namespace options {
         object["custom_cursor"] = options.custom_cursor;
         object["sensitivity"] = options.sensitivity;
         object["hide_timer"] = options.hide_timer;
+        object["labeled_board"] = options.labeled_board;
 
         file << std::setw(4) << object;
 
@@ -88,6 +89,7 @@ namespace options {
             options_file.custom_cursor = object.at("custom_cursor").get<bool>();
             options_file.sensitivity = object.at("sensitivity").get<float>();
             options_file.hide_timer = object.at("hide_timer").get<bool>();
+            options_file.labeled_board = object.at("labeled_board").get<bool>();
         } catch (const json::out_of_range& e) {
             throw OptionsFileError(e.what());
         } catch (const json::type_error& e) {
@@ -126,6 +128,7 @@ namespace options {
         options.custom_cursor = options_file.custom_cursor;
         options.sensitivity = options_file.sensitivity;
         options.hide_timer = options_file.hide_timer;
+        options.labeled_board = options_file.labeled_board;
 
         DEB_INFO("Loaded options from file '{}'", file_path);
     }
@@ -158,6 +161,7 @@ namespace options {
         object["custom_cursor"] = options.custom_cursor;
         object["sensitivity"] = options.sensitivity;
         object["hide_timer"] = options.hide_timer;
+        object["labeled_board"] = options.labeled_board;
 
         file << object.dump(4);
 

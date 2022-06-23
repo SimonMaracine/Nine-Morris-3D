@@ -27,21 +27,33 @@ struct AssetsData {
 };
 
 namespace assets_data {
-    void field_all(Loader<AssetsData>* loader);
-    void field_low_tex_all(Loader<AssetsData>* loader);
+    void all_field(Loader<AssetsData>* loader);
+    void all_field_small(Loader<AssetsData>* loader);
 
-    void autumn_all(Loader<AssetsData>* loader);
-    void autumn_low_tex_all(Loader<AssetsData>* loader);
+    void all_autumn(Loader<AssetsData>* loader);
+    void all_autumn_small(Loader<AssetsData>* loader);
 
-    void field_skybox(Loader<AssetsData>* loader);
-    void field_low_tex_skybox(Loader<AssetsData>* loader);
+    // ---
 
-    void autumn_skybox(Loader<AssetsData>* loader);
-    void autumn_low_tex_skybox(Loader<AssetsData>* loader);
+    void skybox_field(Loader<AssetsData>* loader);
+    void skybox_field_small(Loader<AssetsData>* loader);
 
-    void field_texture(Loader<AssetsData>* loader);
-    void field_low_tex_texture(Loader<AssetsData>* loader);
+    void skybox_autumn(Loader<AssetsData>* loader);
+    void skybox_autumn_small(Loader<AssetsData>* loader);
 
-    void autumn_texture(Loader<AssetsData>* loader);
-    void autumn_low_tex_texture(Loader<AssetsData>* loader);
+    // ---
+
+    void texture_quality_field(Loader<AssetsData>* loader);
+    void texture_quality_field_small(Loader<AssetsData>* loader);
+
+    void texture_quality_autumn(Loader<AssetsData>* loader);
+    void texture_quality_autumn_small(Loader<AssetsData>* loader);
+
+    // ---
+
+    void non_labeled_board_texture(Loader<AssetsData>* loader);
+    void non_labeled_board_texture_small(Loader<AssetsData>* loader);
+
+    void labeled_board_texture(Loader<AssetsData>* loader);
+    void labeled_board_texture_small(Loader<AssetsData>* loader);
 }

@@ -17,10 +17,10 @@ struct ThreefoldRepetitionHistory {
 class Board {
 public:
     enum class Phase {
+        None,
         PlacePieces = 1,
         MovePieces = 2,
-        GameOver,
-        None
+        GameOver
     };
 
     enum class Player {
