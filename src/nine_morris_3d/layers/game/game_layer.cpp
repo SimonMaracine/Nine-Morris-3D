@@ -593,7 +593,7 @@ void GameLayer::setup_board() {
 void GameLayer::setup_board_paint() {
     board.paint_model.vertex_array = app->data.board_paint_vertex_array;
     board.paint_model.index_count = app->assets_data->board_paint_mesh->indices.size();
-    board.paint_model.position = glm::vec3(0.0f, 0.062f, 0.0f);
+    board.paint_model.position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
     board.paint_model.scale = 20.0f;
     board.paint_model.material = app->data.board_paint_material_instance;
 

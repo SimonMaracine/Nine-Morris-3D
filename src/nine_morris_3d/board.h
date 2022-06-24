@@ -2,12 +2,13 @@
 
 #include <glm/glm.hpp>
 
-#include "graphics/renderer/main_renderer.h"
+#include "graphics/renderer/renderer.h"
 #include "graphics/renderer/hoverable.h"
 #include "nine_morris_3d/node.h"
 #include "nine_morris_3d/piece.h"
 
 constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40 + 1;
+constexpr float PAINT_Y_POSITION = 0.062f;
 
 struct ThreefoldRepetitionHistory {
     std::vector<std::array<Piece::Type, 24>> ones;
@@ -36,7 +37,8 @@ public:
     };
 
     Board() = default;
-    Board(std::shared_ptr<std::vector<Board>> board_state_history);
+    Board(std::shared_ptr<std::vector<Board>> board_state_history)
+        : state_history(board_state_history) {}
     ~Board() = default;
 
     bool place_piece(hoverable::Id hovered_id);
@@ -99,6 +101,6 @@ private:
     void remember_state();
     void arrive_at_node(Piece* piece);
     void prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity);
-    void prepare_piece_for_threestep_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity,
+    void prepare_piece_for_three_step_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity,
             const glm::vec3& target0, const glm::vec3& target1);
 };

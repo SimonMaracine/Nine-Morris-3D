@@ -26,9 +26,6 @@ constexpr unsigned int WINDMILLS[16][3] = {
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-Board::Board(std::shared_ptr<std::vector<Board>> board_state_history)
-    : state_history(board_state_history) {}
-
 bool Board::place_piece(hoverable::Id hovered_id) {
     bool placed = false;
 
@@ -281,7 +278,7 @@ bool Board::put_piece(hoverable::Id hovered_id) {
                     const glm::vec3 target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
                     const glm::vec3 velocity = glm::normalize(target0 - selected_piece->model.position) * PIECE_BASE_VELOCITY;
 
-                    prepare_piece_for_threestep_move(selected_piece, target, velocity, target0, target1);
+                    prepare_piece_for_three_step_move(selected_piece, target, velocity, target0, target1);
                 } else {
                     const glm::vec3 target = glm::vec3(node.model.position.x, PIECE_Y_POSITION, node.model.position.z);
 
@@ -540,7 +537,7 @@ Piece* Board::place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* 
             const glm::vec3 velocity = glm::normalize(target0 - piece->model.position)
                     * PIECE_BASE_VELOCITY;
 
-            prepare_piece_for_threestep_move(piece, target, velocity, target0, target1);
+            prepare_piece_for_three_step_move(piece, target, velocity, target0, target1);
 
             piece->in_use = true;
             piece->node = node;
@@ -1139,7 +1136,7 @@ void Board::prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target,
     piece->should_move = true;
 }
 
-void Board::prepare_piece_for_threestep_move(Piece* piece, const glm::vec3& target,
+void Board::prepare_piece_for_three_step_move(Piece* piece, const glm::vec3& target,
         const glm::vec3& velocity, const glm::vec3& target0, const glm::vec3& target1) {
     piece->movement.target = target;
 

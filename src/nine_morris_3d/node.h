@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "graphics/renderer/main_renderer.h"
+#include "graphics/renderer/renderer.h"
 #include "graphics/renderer/hoverable.h"
 #include "nine_morris_3d/piece.h"
 
@@ -35,19 +35,17 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
-class Node {
-public:
+struct Node {
     Node() = default;
     Node(hoverable::Id id, unsigned int index)
         : id(id), index(index) {}
-    ~Node() = default;
 
     hoverable::Id id = hoverable::null;
 
     Renderer::Model model;
 
     hoverable::Id piece_id = hoverable::null;
-    Piece* piece = nullptr;
+    Piece* piece = nullptr;  // Reference to the piece that sits on this node
 
     unsigned int index = 0;  // From 0 to 23, needed for easier coping with these
 };

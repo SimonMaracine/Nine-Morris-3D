@@ -8,7 +8,7 @@
 #include "application/events.h"
 #include "application/scene.h"
 #include "application/input.h"
-#include "graphics/renderer/main_renderer.h"
+#include "graphics/renderer/renderer.h"
 #include "graphics/renderer/gui_renderer.h"
 #include "graphics/debug_opengl.h"
 #include "nine_morris_3d/nine_morris_3d.h"

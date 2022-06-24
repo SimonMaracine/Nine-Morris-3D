@@ -5,7 +5,7 @@
 #include <cereal/types/memory.hpp>
 
 #include "application/platform.h"
-#include "graphics/renderer/main_renderer.h"
+#include "graphics/renderer/renderer.h"
 #include "graphics/renderer/camera.h"
 #include "graphics/renderer/material.h"
 #include "nine_morris_3d/nine_morris_3d.h"

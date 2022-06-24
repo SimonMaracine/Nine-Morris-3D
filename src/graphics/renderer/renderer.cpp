@@ -6,7 +6,7 @@
 #include "application/application.h"
 #include "application/platform.h"
 #include "application/input.h"
-#include "graphics/renderer/main_renderer.h"
+#include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer_reader.h"
 #include "graphics/renderer/opengl/vertex_array.h"
 #include "graphics/renderer/opengl/buffer.h"
