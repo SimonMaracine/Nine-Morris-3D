@@ -15,8 +15,8 @@ constexpr float PIECE_RAISE_HEIGHT = 1.3f;
 
 struct Piece {
     enum Type {
-        White,
-        Black,
+        White = 0,
+        Black = 1,
         None
     };
 

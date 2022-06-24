@@ -252,7 +252,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                     }
                 } else {
                     board.select_piece(app->renderer->get_hovered_id());
-                    const bool put = board.put_piece(app->renderer->get_hovered_id());
+                    const bool put = board.put_down_piece(app->renderer->get_hovered_id());
 
                     if (put && !first_move) {
                         gui_layer->timer.start(app->window->get_time());
@@ -275,6 +275,12 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == KEY_SPACE) {
         app->camera.go_towards_position(default_camera_position);
+    }
+
+    if (event.key == KEY_L) {
+        board.phase = Board::Phase::GameOver;
+        board.ending = Board::Ending::WinnerWhite;
+        board.ending_message = "Hello, world!";
     }
 
     return false;
@@ -966,6 +972,7 @@ void GameLayer::load_game() {
     board.phase = state.board.phase;
     board.turn = state.board.turn;
     board.ending = state.board.ending;
+    board.ending_message = std::move(state.board.ending_message);
     board.white_pieces_count = state.board.white_pieces_count;
     board.black_pieces_count = state.board.black_pieces_count;
     board.not_placed_white_pieces_count = state.board.not_placed_white_pieces_count;

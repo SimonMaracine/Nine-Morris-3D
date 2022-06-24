@@ -7,15 +7,11 @@
 #include "nine_morris_3d/node.h"
 #include "nine_morris_3d/piece.h"
 
-constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40 + 1;
+constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
 constexpr float PAINT_Y_POSITION = 0.062f;
 
-struct ThreefoldRepetitionHistory {
-    std::vector<std::array<Piece::Type, 24>> ones;
-    std::vector<std::array<Piece::Type, 24>> twos;
-};
-
 class Board {
+    using GamePosition = std::array<Piece::Type, 24>;
 public:
     enum class Phase {
         None,
@@ -45,7 +41,7 @@ public:
     void move_pieces(float dt);
     bool take_piece(hoverable::Id hovered_id);
     void select_piece(hoverable::Id hovered_id);
-    bool put_piece(hoverable::Id hovered_id);
+    bool put_down_piece(hoverable::Id hovered_id);
     void press(hoverable::Id hovered_id);
     void release();
     void undo();
@@ -54,6 +50,7 @@ public:
     void update_cursor();
     void update_nodes(hoverable::Id hovered_id);
     void update_pieces(hoverable::Id hovered_id);
+    std::string_view get_ending_message();
 
     Renderer::Model model;
     Renderer::Model paint_model;
@@ -64,6 +61,8 @@ public:
     Phase phase = Phase::PlacePieces;
     Player turn = Player::White;
     Ending ending = Ending::None;
+
+    std::string ending_message;
 
     unsigned int white_pieces_count = 0;  // Number of pieces on the board
     unsigned int black_pieces_count = 0;
@@ -78,15 +77,33 @@ public:
     std::array<bool, 2> can_jump = { false, false };  // White first and black second
 
     unsigned int turns_without_mills = 0;
-    ThreefoldRepetitionHistory repetition_history;
+
+    struct ThreefoldRepetitionHistory {
+        struct PositionPlusInfo {
+            bool operator==(const PositionPlusInfo& other) const {
+                return (
+                    position == other.position &&
+                    piece_id == other.piece_id &&
+                    node_id == other.node_id
+                );
+            }
+
+            GamePosition position;
+            hoverable::Id piece_id;
+            hoverable::Id node_id;
+        };
+
+        std::vector<PositionPlusInfo> ones;
+        std::vector<PositionPlusInfo> twos;
+    } repetition_history;
 
     std::shared_ptr<std::vector<Board>> state_history;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
 private:
-    Piece* place_new_piece(Piece::Type type, float x_pos, float z_pos, Node* node);
+    Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);
     void set_pieces_show_outline(Piece::Type type, bool show);
-    void game_over(Ending ending, Piece::Type type_to_hide);
+    void game_over(Ending ending, Piece::Type type_to_hide, std::string_view ending_message);
     void switch_turn();
     bool is_windmill_made(Node* node, Piece::Type type);
     void set_pieces_to_take(Piece::Type type, bool take);
@@ -97,7 +114,7 @@ private:
     void check_player_number_of_pieces(Player player);
     bool check_player_blocked(Player player);
     std::array<Piece::Type, 24> get_position();
-    void remember_position_and_check_repetition();
+    void remember_position_and_check_repetition(Piece* piece, Node* node);
     void remember_state();
     void arrive_at_node(Piece* piece);
     void prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity);

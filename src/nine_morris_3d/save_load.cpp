@@ -3,6 +3,7 @@
 #include <cereal/types/vector.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/memory.hpp>
+#include <cereal/types/string.hpp>
 
 #include "application/platform.h"
 #include "graphics/renderer/renderer.h"
@@ -28,16 +29,23 @@ void serialize(Archive& archive, Renderer::Model& model) {
 
 template<typename Archive>
 void serialize(Archive& archive, Board& board) {
-    archive(board.model, board.paint_model, board.nodes, board.pieces, board.phase, board.turn,
-            board.ending, board.white_pieces_count, board.black_pieces_count,
-            board.not_placed_white_pieces_count, board.not_placed_black_pieces_count,
-            board.should_take_piece, board.can_jump, board.turns_without_mills, board.repetition_history,
-            board.state_history, board.next_move);
+    archive(
+        board.model, board.paint_model, board.nodes, board.pieces, board.phase, board.turn,
+        board.ending, board.ending_message, board.white_pieces_count, board.black_pieces_count,
+        board.not_placed_white_pieces_count, board.not_placed_black_pieces_count,
+        board.should_take_piece, board.can_jump, board.turns_without_mills, board.repetition_history,
+        board.state_history, board.next_move
+    );
 }
 
 template<typename Archive>
-void serialize(Archive& archive, ThreefoldRepetitionHistory& repetition_history) {
+void serialize(Archive& archive, Board::ThreefoldRepetitionHistory& repetition_history) {
     archive(repetition_history.ones, repetition_history.twos);
+}
+
+template<typename Archive>
+void serialize(Archive& archive, Board::ThreefoldRepetitionHistory::PositionPlusInfo& position_plus_info) {
+    archive(position_plus_info.position, position_plus_info.piece_id, position_plus_info.node_id);
 }
 
 /*
@@ -46,15 +54,19 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Piece& piece) {
-    archive(piece.id, piece.model, piece.movement, piece.should_move, piece.type, piece.in_use,
-            piece.node_id, piece.show_outline, piece.to_take, piece.pending_remove, piece.selected,
-            piece.active, piece.renderer_with_outline);
+    archive(
+        piece.id, piece.model, piece.movement, piece.should_move, piece.type, piece.in_use,
+        piece.node_id, piece.show_outline, piece.to_take, piece.pending_remove, piece.selected,
+        piece.active, piece.renderer_with_outline
+    );
 }
 
 template<typename Archive>
 void serialize(Archive& archive, Piece::Movement& movement) {
-    archive(movement.type, movement.velocity, movement.target, movement.target0, movement.target1,
-            movement.reached_target0, movement.reached_target1);
+    archive(
+        movement.type, movement.velocity, movement.target, movement.target0, movement.target1,
+        movement.reached_target0, movement.reached_target1
+    );
 }
 
 /*
@@ -68,14 +80,16 @@ void serialize(Archive& archive, Node& node) {
 
 template<typename Archive>
 void serialize(Archive& archive, Camera& camera) {
-    archive(camera.sensitivity, camera.position, camera.pitch, camera.yaw, camera.view_matrix,
-            camera.projection_matrix, camera.projection_view_matrix, camera.point,
-            camera.distance_to_point, camera.angle_around_point, camera.x_velocity,
-            camera.y_velocity, camera.zoom_velocity, camera.auto_move_x, camera.target_angle_around_point,
-            camera.auto_x_velocity, camera.virtual_angle_around_point, camera.auto_move_y,
-            camera.target_pitch, camera.auto_y_velocity, camera.virtual_pitch, camera.auto_move_zoom,
-            camera.target_distance_to_point, camera.auto_zoom_velocity, camera.virtual_distance_to_point,
-            camera.cached_towards_position, camera.dont_auto_call_go_towards_position);
+    archive(
+        camera.sensitivity, camera.position, camera.pitch, camera.yaw, camera.view_matrix,
+        camera.projection_matrix, camera.projection_view_matrix, camera.point,
+        camera.distance_to_point, camera.angle_around_point, camera.x_velocity,
+        camera.y_velocity, camera.zoom_velocity, camera.auto_move_x, camera.target_angle_around_point,
+        camera.auto_x_velocity, camera.virtual_angle_around_point, camera.auto_move_y,
+        camera.target_pitch, camera.auto_y_velocity, camera.virtual_pitch, camera.auto_move_zoom,
+        camera.target_distance_to_point, camera.auto_zoom_velocity, camera.virtual_distance_to_point,
+        camera.cached_towards_position, camera.dont_auto_call_go_towards_position
+    );
 }
 
 namespace glm {
@@ -86,10 +100,12 @@ namespace glm {
 
     template<typename Archive>
     void serialize(Archive& archive, mat4& matrix) {
-        archive(matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
-                matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
-                matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
-                matrix[3][0], matrix[3][1], matrix[3][2], matrix[3][3]);
+        archive(
+            matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+            matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+            matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
+            matrix[3][0], matrix[3][1], matrix[3][2], matrix[3][3]
+        );
     }
 }
 

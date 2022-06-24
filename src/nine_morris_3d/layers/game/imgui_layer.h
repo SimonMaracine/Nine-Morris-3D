@@ -26,7 +26,7 @@ public:
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
 
     void draw_game_over();
-    void draw_game_over_message(const char* message);
+    void draw_game_over_message(const char* message1, std::string_view message2);
     void draw_about();
     void draw_could_not_load_game();
     void draw_no_last_game();

@@ -5,7 +5,6 @@
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
-#include "other/logging.h"
 
 void GuiLayer::on_attach() {
     turn_indicator = std::make_shared<gui::Image>(app->data.white_indicator_texture);

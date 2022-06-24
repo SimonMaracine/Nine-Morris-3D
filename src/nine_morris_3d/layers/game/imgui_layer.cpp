@@ -435,23 +435,26 @@ void ImGuiLayer::draw_game_over() {
 
         switch (game_layer->board.ending) {
             case Board::Ending::WinnerWhite: {
-                const char* message = "White player wins!";
-                draw_game_over_message(message);
+                const char* message1 = "White player wins!";
+                draw_game_over_message(message1, game_layer->board.get_ending_message());
                 break;
             }
             case Board::Ending::WinnerBlack: {
-                const char* message = "Black player wins!";
-                draw_game_over_message(message);
+                const char* message1 = "Black player wins!";
+                draw_game_over_message(message1, game_layer->board.get_ending_message());
                 break;
             }
             case Board::Ending::TieBetweenBothPlayers: {
-                const char* message = "Tie between both players!";
-                draw_game_over_message(message);
+                const char* message1 = "Tie between both players!";
+                draw_game_over_message(message1, game_layer->board.get_ending_message());
                 break;
             }
             case Board::Ending::None:
                 ASSERT(false, "Ending cannot be 'None'");
         }
+
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         const float window_width = ImGui::GetWindowSize().x;
 
@@ -480,15 +483,23 @@ void ImGuiLayer::draw_game_over() {
     ImGui::PopFont();
 }
 
-void ImGuiLayer::draw_game_over_message(const char* message) {
+void ImGuiLayer::draw_game_over_message(const char* message1, std::string_view message2) {
     ImGui::Dummy(ImVec2(20.0f, 0.0f)); ImGui::SameLine();
 
     const float window_width = ImGui::GetWindowSize().x;
-    const float text_width = ImGui::CalcTextSize(message).x;
-    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-    ImGui::Text("%s", message); ImGui::SameLine();
+    float text_width;
 
+    text_width = ImGui::CalcTextSize(message1).x;
+    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+    ImGui::Text("%s", message1); ImGui::SameLine();
     ImGui::Dummy(ImVec2(20.0f, 0.0f));
+
+    text_width = ImGui::CalcTextSize(message2.data()).x;
+    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+    ImGui::Text("%s", message2.data()); ImGui::SameLine();
+    ImGui::Dummy(ImVec2(20.0f, 0.0f));
+
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 }
 
 void ImGuiLayer::draw_about() {
