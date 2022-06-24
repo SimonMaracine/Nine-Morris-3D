@@ -49,7 +49,8 @@ constexpr DirectionalLight LIGHT_AUTUMN = {
 };
 
 void GameLayer::on_attach() {
-    board_state_history = std::make_shared<std::vector<Board>>();
+    undo_board_state_history = std::make_shared<std::vector<Board>>();
+    redo_board_state_history = std::make_shared<std::vector<Board>>();
     setup_board();
     setup_board_paint();
 
@@ -94,7 +95,8 @@ void GameLayer::on_detach() {
         state.camera = app->camera;
         state.time = gui_layer->timer.get_time_raw();
 
-        const time_t current = time(nullptr);
+        time_t current;
+        time(&current);
         state.date = ctime(&current);
 
         try {
@@ -584,7 +586,7 @@ void GameLayer::resetup_textures() {
 }
 
 void GameLayer::setup_board() {
-    board = Board(board_state_history);
+    board = Board(undo_board_state_history, redo_board_state_history);
 
     board.model.vertex_array = app->data.board_vertex_array;
     board.model.index_count = app->assets_data->board_mesh->indices.size();
@@ -984,7 +986,8 @@ void GameLayer::load_game() {
     board.can_jump = state.board.can_jump;
     board.turns_without_mills = state.board.turns_without_mills;
     board.repetition_history = state.board.repetition_history;
-    board.state_history = state.board.state_history;
+    board.undo_state_history = state.board.undo_state_history;
+    board.redo_state_history = state.board.redo_state_history;
     board.next_move = state.board.next_move;
 
     // Reset pieces' models

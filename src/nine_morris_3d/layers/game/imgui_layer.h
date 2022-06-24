@@ -40,6 +40,7 @@ public:
 
     bool hovering_gui = false;
     bool can_undo = false;
+    bool can_redo = false;
     bool show_info = false;
     bool show_about = false;
     bool show_could_not_load_game = false;

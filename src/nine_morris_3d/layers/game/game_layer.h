@@ -69,7 +69,8 @@ public:
     void load_game();
     
     Board board;
-    std::shared_ptr<std::vector<Board>> board_state_history;
+    std::shared_ptr<std::vector<Board>> undo_board_state_history;  // TODO rethink all of this
+    std::shared_ptr<std::vector<Board>> redo_board_state_history;
 
     float mouse_wheel = 0.0f;
     float dx = 0.0f;

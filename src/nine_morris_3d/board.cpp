@@ -409,11 +409,11 @@ void Board::release() {
 }
 
 bool Board::undo() {
-    ASSERT(state_history->size() > 0, "History is empty");
+    ASSERT(undo_state_history->size() > 0, "Undo history is empty");
 
     const bool undo_game_over = phase == Phase::None;
 
-    Board& state = state_history->back();
+    Board& state = undo_state_history->back();
 
     model.index_count = state.model.index_count;
     model.position = state.model.position;
@@ -496,7 +496,7 @@ bool Board::undo() {
     can_jump = state.can_jump;
     turns_without_mills = state.turns_without_mills;
     repetition_history = state.repetition_history;
-    state_history = state.state_history;
+    undo_state_history = state.undo_state_history;
     next_move = state.next_move;
 
     // Reset pieces' models
@@ -508,13 +508,124 @@ bool Board::undo() {
         }
     }
 
-    state_history->pop_back();
+    redo_state_history->push_back(undo_state_history->back());
+    undo_state_history->pop_back();
 
-    DEB_DEBUG("Popped state and undid move");
+    DEB_DEBUG("Popped state off of undo stack and undid move");
 
     update_cursor();
 
     return undo_game_over;
+}
+
+bool Board::redo() {
+    ASSERT(redo_state_history->size() > 0, "Redo history is empty");
+
+    // const bool undo_game_over = phase == Phase::None;
+
+    Board& state = redo_state_history->back();
+
+    model.index_count = state.model.index_count;
+    model.position = state.model.position;
+    model.rotation = state.model.rotation;
+    model.scale = state.model.scale;
+    model.outline_color = state.model.outline_color;
+
+    paint_model.index_count = state.paint_model.index_count;
+    paint_model.position = state.paint_model.position;
+    paint_model.rotation = state.paint_model.rotation;
+    paint_model.scale = state.paint_model.scale;
+    paint_model.outline_color = state.paint_model.outline_color;
+
+    for (unsigned int i = 0; i < 24; i++) {
+        Node& node = nodes[i];
+        node.id = state.nodes[i].id;
+        node.model.index_count = state.nodes[i].model.index_count;
+        node.model.position = state.nodes[i].model.position;
+        node.model.rotation = state.nodes[i].model.rotation;
+        node.model.scale = state.nodes[i].model.scale;
+        node.model.outline_color = state.nodes[i].model.outline_color;
+        node.piece_id = state.nodes[i].piece_id;
+        node.piece = nullptr;  // It must be NULL, if the ids don't match
+        // Assign correct addresses
+        for (Piece& piece : pieces) {
+            if (piece.id == node.piece_id) {
+                node.piece = &piece;
+                break;
+            }
+        }
+        node.index = state.nodes[i].index;
+    }
+
+    for (unsigned int i = 0; i < 18; i++) {
+        Piece& piece = pieces[i];
+        piece.id = state.pieces[i].id;
+        piece.model.index_count = state.pieces[i].model.index_count;
+        piece.model.position = state.pieces[i].model.position;
+        piece.model.rotation = state.pieces[i].model.rotation;
+        piece.model.scale = state.pieces[i].model.scale;
+        piece.model.outline_color = state.pieces[i].model.outline_color;
+        piece.movement.type = state.pieces[i].movement.type;
+        piece.movement.velocity = state.pieces[i].movement.velocity;
+        piece.movement.target = state.pieces[i].movement.target;
+        piece.movement.target0 = state.pieces[i].movement.target0;
+        piece.movement.target1 = state.pieces[i].movement.target1;
+        piece.movement.reached_target0 = state.pieces[i].movement.reached_target0;
+        piece.movement.reached_target1 = state.pieces[i].movement.reached_target1;
+        piece.should_move = state.pieces[i].should_move;
+        piece.type = state.pieces[i].type;
+        piece.in_use = state.pieces[i].in_use;
+        piece.node_id = state.pieces[i].node_id;
+        piece.node = nullptr;  // It must be NULL, if the ids don't match
+        // Assign correct addresses
+        for (Node& node : nodes) {
+            if (node.id == piece.node_id) {
+                piece.node = &node;
+                break;
+            }
+        }
+        piece.show_outline = state.pieces[i].show_outline;
+        piece.to_take = state.pieces[i].to_take;
+        piece.pending_remove = false;
+        piece.selected = false;
+        piece.active = state.pieces[i].active;
+    }
+
+    phase = state.phase;
+    turn = state.turn;
+    ending = state.ending;
+    ending_message = std::move(state.ending_message);
+    white_pieces_count = state.white_pieces_count;
+    black_pieces_count = state.black_pieces_count;
+    not_placed_white_pieces_count = state.not_placed_white_pieces_count;
+    not_placed_black_pieces_count = state.not_placed_black_pieces_count;
+    should_take_piece = state.should_take_piece;
+    hovered_node = nullptr;
+    hovered_piece = nullptr;
+    selected_piece = nullptr;
+    can_jump = state.can_jump;
+    turns_without_mills = state.turns_without_mills;
+    repetition_history = state.repetition_history;
+    undo_state_history = state.undo_state_history;
+    next_move = state.next_move;
+
+    // Reset pieces' models
+    for (Piece& piece : pieces) {
+        app->renderer->remove_model(piece.model.handle);
+
+        if (piece.active) {
+            app->renderer->add_model(piece.model, Renderer::CastShadow | Renderer::HasShadow);
+        }
+    }
+
+    undo_state_history->push_back(redo_state_history->back());
+    redo_state_history->pop_back();
+
+    DEB_DEBUG("Popped state off of redo stack and redid move");
+
+    update_cursor();
+
+    return false;
 }
 
 unsigned int Board::not_placed_pieces_count() {
@@ -1202,7 +1313,8 @@ void Board::remember_position_and_check_repetition(Piece* piece, Node* node) {
 }
 
 void Board::remember_state() {
-    state_history->push_back(*this);
+    undo_state_history->push_back(*this);
+    redo_state_history->clear();
 
     DEB_DEBUG("Pushed new state");
 }

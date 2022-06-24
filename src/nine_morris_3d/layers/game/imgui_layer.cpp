@@ -42,6 +42,10 @@ void ImGuiLayer::on_attach() {
     last_save_game_date = std::move(state.date);
     DEB_INFO("Checked last saved game");
 
+    if (last_save_game_date == "") {  // TODO delete this later maybe
+        DEB_ERROR("last_save_game_date is empty");
+    }
+
     try {
         info_file_path = paths::path_for_logs(INFO_FILE);
         save_game_file_path = paths::path_for_saved_data(save_load::SAVE_GAME_FILE);
@@ -57,6 +61,7 @@ void ImGuiLayer::on_detach() {
     // These need to be resetted
     hovering_gui = false;
     can_undo = false;
+    can_redo = false;
     show_info = false;
     show_about = false;
     show_could_not_load_game = false;
@@ -135,7 +140,8 @@ void ImGuiLayer::on_update(float dt) {
                 state.camera = app->camera;
                 state.time = gui_layer->timer.get_time_raw();
 
-                const time_t current = time(nullptr);
+                time_t current;
+                time(&current);
                 state.date = ctime(&current);
 
                 try {
@@ -150,17 +156,32 @@ void ImGuiLayer::on_update(float dt) {
                 }
 
                 last_save_game_date = std::move(state.date);
+
+                if (last_save_game_date == "") {  // TODO delete this later maybe
+                    DEB_ERROR("last_save_game_date is empty");
+                }
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 const bool undid_game_over = game_layer->board.undo();
 
-                if (game_layer->board.not_placed_pieces_count() == 18) {
+                if (game_layer->board.undo_state_history->empty()) {
                     can_undo = false;
                 }
 
                 if (undid_game_over) {
                     gui_layer->timer.start(app->window->get_time());
                 }
+            }
+            if (ImGui::MenuItem("Redo", nullptr, false, can_redo)) {
+                game_layer->board.redo();
+
+                if (game_layer->board.redo_state_history->empty()) {
+                    can_redo = false;
+                }
+
+                // if (undid_game_over) {
+                //     gui_layer->timer.start(app->window->get_time());
+                // }
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
                 app->running = false;
@@ -366,8 +387,12 @@ void ImGuiLayer::on_update(float dt) {
         draw_game_over();
     }
 
-    if (game_layer->board.not_placed_pieces_count() < 18) {
+    if (game_layer->board.undo_state_history->size() > 0) {
         can_undo = true;
+    }
+
+    if (game_layer->board.redo_state_history->size() > 0) {
+        can_redo = true;
     }
 
     if (show_info && !show_about) {
@@ -658,7 +683,8 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Turn: %s", game_layer->board.turn == Board::Player::White ? "white" : "black");
         ImGui::Text("Should take piece: %s", game_layer->board.should_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", game_layer->board.turns_without_mills);
-        ImGui::Text("History size: %lu", game_layer->board.state_history->size());
+        ImGui::Text("Undo history size: %lu", game_layer->board.undo_state_history->size());
+        ImGui::Text("Redo history size: %lu", game_layer->board.redo_state_history->size());
         ImGui::Text("Hovered ID: %d", app->renderer->get_hovered_id());
         ImGui::Text("Hovered node: %p", game_layer->board.hovered_node);
         ImGui::Text("Hovered piece: %p", game_layer->board.hovered_piece);

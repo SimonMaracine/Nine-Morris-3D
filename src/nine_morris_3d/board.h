@@ -33,8 +33,10 @@ public:
     };
 
     Board() = default;
-    Board(std::shared_ptr<std::vector<Board>> board_state_history)
-        : state_history(board_state_history) {}
+    Board(std::shared_ptr<std::vector<Board>> undo_board_state_history,
+            std::shared_ptr<std::vector<Board>> redo_board_state_history)
+        : undo_state_history(undo_board_state_history),
+          redo_state_history(redo_board_state_history) {}
     ~Board() = default;
 
     bool place_piece(hoverable::Id hovered_id);
@@ -45,6 +47,7 @@ public:
     void press(hoverable::Id hovered_id);
     void release();
     bool undo();
+    bool redo();
     unsigned int not_placed_pieces_count();
     void finalize_pieces_state();
     void update_cursor();
@@ -97,7 +100,8 @@ public:
         std::vector<PositionPlusInfo> twos;
     } repetition_history;
 
-    std::shared_ptr<std::vector<Board>> state_history;
+    std::shared_ptr<std::vector<Board>> undo_state_history;
+    std::shared_ptr<std::vector<Board>> redo_state_history;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);
@@ -113,7 +117,7 @@ private:
     bool can_go(Node* source_node, Node* destination_node);
     void check_player_number_of_pieces(Player player);
     bool check_player_blocked(Player player);
-    std::array<Piece::Type, 24> get_position();
+    GamePosition get_position();
     void remember_position_and_check_repetition(Piece* piece, Node* node);
     void remember_state();
     void arrive_at_node(Piece* piece);
