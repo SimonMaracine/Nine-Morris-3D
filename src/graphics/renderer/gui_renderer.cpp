@@ -223,13 +223,13 @@ void GuiRenderer::render() {
         const int WINDOW_HEIGHT = app->app_data.height;
 
         if (widget->scale_parameters.min_bound != 0 && widget->scale_parameters.max_bound != 0) {
-            if (WINDOW_WIDTH <= widget->scale_parameters.min_bound) {
+            if (WINDOW_HEIGHT <= widget->scale_parameters.min_bound) {
                 widget->scale_parameters.current_scale = widget->scale_parameters.min_scale;
-            } else if (WINDOW_WIDTH >= widget->scale_parameters.max_bound) {
+            } else if (WINDOW_HEIGHT >= widget->scale_parameters.max_bound) {
                 widget->scale_parameters.current_scale = widget->scale_parameters.max_scale;
             } else {
                 widget->scale_parameters.current_scale = map(
-                    WINDOW_WIDTH,
+                    WINDOW_HEIGHT,
                     widget->scale_parameters.min_bound,
                     widget->scale_parameters.max_bound,
                     widget->scale_parameters.min_scale,
