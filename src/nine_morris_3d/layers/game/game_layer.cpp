@@ -230,14 +230,14 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                 if (board.should_take_piece) {
                     const bool took = board.take_piece(app->renderer->get_hovered_id());
 
-                    if (took && !first_move) {
+                    if (took && !first_move && !gui_layer->timer.get_running()) {
                         gui_layer->timer.start(app->window->get_time());
                         first_move = true;
                     }
                 } else {
                     const bool placed = board.place_piece(app->renderer->get_hovered_id());
 
-                    if (placed && !first_move) {
+                    if (placed && !first_move && !gui_layer->timer.get_running()) {
                         gui_layer->timer.start(app->window->get_time());
                         first_move = true;
                     }
@@ -246,7 +246,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                 if (board.should_take_piece) {
                     const bool took = board.take_piece(app->renderer->get_hovered_id());
 
-                    if (took && !first_move) {
+                    if (took && !first_move && !gui_layer->timer.get_running()) {
                         gui_layer->timer.start(app->window->get_time());
                         first_move = true;
                     }
@@ -254,7 +254,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                     board.select_piece(app->renderer->get_hovered_id());
                     const bool put = board.put_down_piece(app->renderer->get_hovered_id());
 
-                    if (put && !first_move) {
+                    if (put && !first_move && !gui_layer->timer.get_running()) {
                         gui_layer->timer.start(app->window->get_time());
                         first_move = true;
                     }

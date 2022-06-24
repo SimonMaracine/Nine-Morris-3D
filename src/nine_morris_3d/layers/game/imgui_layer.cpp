@@ -152,10 +152,14 @@ void ImGuiLayer::on_update(float dt) {
                 last_save_game_date = std::move(state.date);
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
-                game_layer->board.undo();
+                const bool undid_game_over = game_layer->board.undo();
 
                 if (game_layer->board.not_placed_pieces_count() == 18) {
                     can_undo = false;
+                }
+
+                if (undid_game_over) {
+                    gui_layer->timer.start(app->window->get_time());
                 }
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {

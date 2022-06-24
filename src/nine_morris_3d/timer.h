@@ -11,6 +11,7 @@ public:
     void reset_last_time(double time);
     unsigned int get_time_seconds() const;
     unsigned int get_time_raw() const;
+    bool get_running() const;
     void get_time_formatted(char* formatted_time) const;  // 32 bytes is ok
     void set_time(unsigned int time);
 private:

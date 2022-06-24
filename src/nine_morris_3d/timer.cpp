@@ -1,5 +1,6 @@
 #include "nine_morris_3d/timer.h"
 #include "other/logging.h"
+#include "other/assert.h"
 
 void Timer::update(double time) {
     static double total_time = 0.0;
@@ -22,6 +23,8 @@ void Timer::update(double time) {
 }
 
 void Timer::start(double time) {
+    ASSERT(!running, "Cannot start, if it is already running");
+
     running = true;
     last_time = time;
 
@@ -44,6 +47,10 @@ unsigned int Timer::get_time_seconds() const {
 
 unsigned int Timer::get_time_raw() const {
     return time;
+}
+
+bool Timer::get_running() const {
+    return running;
 }
 
 void Timer::get_time_formatted(char* formatted_time) const {

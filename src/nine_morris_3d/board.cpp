@@ -408,8 +408,10 @@ void Board::release() {
     hovered_piece = nullptr;
 }
 
-void Board::undo() {
+bool Board::undo() {
     ASSERT(state_history->size() > 0, "History is empty");
+
+    const bool undo_game_over = phase == Phase::None;
 
     Board& state = state_history->back();
 
@@ -511,6 +513,8 @@ void Board::undo() {
     DEB_DEBUG("Popped state and undid move");
 
     update_cursor();
+
+    return undo_game_over;
 }
 
 unsigned int Board::not_placed_pieces_count() {

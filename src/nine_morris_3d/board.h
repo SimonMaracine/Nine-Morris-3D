@@ -44,7 +44,7 @@ public:
     bool put_down_piece(hoverable::Id hovered_id);
     void press(hoverable::Id hovered_id);
     void release();
-    void undo();
+    bool undo();
     unsigned int not_placed_pieces_count();
     void finalize_pieces_state();
     void update_cursor();
