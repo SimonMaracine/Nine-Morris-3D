@@ -13,7 +13,7 @@
 #include "graphics/renderer/opengl/shader.h"
 #include "graphics/renderer/opengl/texture.h"
 #include "graphics/renderer/opengl/framebuffer.h"
-#include "nine_morris_3d/paths.h"
+#include "other/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
 #include "other/encryption.h"
@@ -135,7 +135,7 @@ Renderer::Renderer(Application* app)
         );
     }
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     {
         std::vector<std::string> uniforms = {
             "u_projection_view_matrix"
@@ -178,7 +178,7 @@ Renderer::Renderer(Application* app)
         VertexArray::unbind();
     }
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     {
         float origin_vertices[] = {
             -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
@@ -199,7 +199,7 @@ Renderer::Renderer(Application* app)
     }
 #endif
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     storage.light_bulb_texture = Texture::create("data/textures/internal/light_bulb/light_bulb.png", false);
 #endif
 
@@ -404,7 +404,7 @@ void Renderer::render() {
         glEnable(GL_DEPTH_TEST);
     }
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     if (origin) {
         draw_origin();
     }
@@ -574,7 +574,7 @@ void Renderer::draw_screen_quad(GLuint texture) {
     glEnable(GL_DEPTH_TEST);
 }
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
 void Renderer::draw_origin() {
     storage.origin_shader->bind();
     storage.origin_shader->upload_uniform_mat4("u_projection_view_matrix", app->camera.get_projection_view_matrix());
@@ -626,7 +626,7 @@ void Renderer::check_hovered_id(int x, int y) {
 }
 
 void Renderer::maybe_initialize_assets() {
-#ifdef NINE_MORRIS_3D_RELEASE
+#ifdef PLATFORM_GAME_RELEASE
     static const char* PREFIX = ".dat";
 
     static const std::array<std::string*, 10> assets = { 

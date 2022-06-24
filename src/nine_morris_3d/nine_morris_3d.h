@@ -12,18 +12,19 @@
 #include "graphics/renderer/opengl/shader.h"
 #include "graphics/renderer/opengl/texture.h"
 #include "nine_morris_3d/options.h"
+#include "nine_morris_3d/assets_data.h"
 #include "other/mesh.h"
 
-#if defined(NINE_MORRIS_3D_LINUX)
+#if defined(PLATFORM_GAME_LINUX)
     #define APP_NAME "ninemorris3d"
-#elif defined(NINE_MORRIS_3D_WINDOWS)
+#elif defined(PLATFORM_GAME_WINDOWS)
     #define APP_NAME "NineMorris3D"
 #endif
 
-#if defined(NINE_MORRIS_3D_LINUX)
+#if defined(PLATFORM_GAME_LINUX)
     #define LOG_FILE "log.txt"
     #define INFO_FILE "info.txt"
-#elif defined(NINE_MORRIS_3D_WINDOWS)
+#elif defined(PLATFORM_GAME_WINDOWS)
     #define LOG_FILE "ninemorris3d_log.txt"
     #define INFO_FILE "ninemorris3d_info.txt"
 #endif
@@ -34,7 +35,7 @@ constexpr unsigned int VERSION_PATCH = 0;
 
 class NineMorris3D : public Application {
 public:
-    NineMorris3D();
+    NineMorris3D(std::string_view info_file, std::string_view log_file, std::string_view application_name);
     virtual ~NineMorris3D();
 
     static void set_app_pointer(NineMorris3D* instance);
@@ -42,6 +43,8 @@ public:
     options::Options options;
     unsigned int arrow_cursor = 0;
     unsigned int cross_cursor = 0;
+
+    std::shared_ptr<AssetsData> assets_data;
 
     struct RenderData {
         std::shared_ptr<Texture> splash_screen_texture;

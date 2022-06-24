@@ -77,7 +77,7 @@ public:
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
     std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }
 #endif
     std::shared_ptr<Shader> get_outline_shader() { return storage.outline_shader; }
@@ -111,18 +111,18 @@ private:
         std::shared_ptr<Shader> quad3d_shader;
         std::shared_ptr<Shader> shadow_shader;
         std::shared_ptr<Shader> outline_shader;
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
         std::shared_ptr<Shader> origin_shader;
 #endif
 
         std::shared_ptr<VertexArray> skybox_vertex_array;
         std::shared_ptr<VertexArray> screen_quad_vertex_array;
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
         std::shared_ptr<VertexArray> origin_vertex_array;
 #endif
 
         std::shared_ptr<Texture3D> skybox_texture;
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
         std::shared_ptr<Texture> light_bulb_texture;
 #endif
 
@@ -155,7 +155,7 @@ private:
     std::string SKYBOX_FRAGMENT_SHADER = "data/shaders/internal/skybox.frag";
     std::string QUAD3D_VERTEX_SHADER = "data/shaders/internal/quad3d.vert";
     std::string QUAD3D_FRAGMENT_SHADER = "data/shaders/internal/quad3d.frag";
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     std::string ORIGIN_VERTEX_SHADER = "data/shaders/internal/origin.vert";
     std::string ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";
 #endif

@@ -6,7 +6,6 @@
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/gui_renderer.h"
 #include "graphics/renderer/opengl/framebuffer.h"
-#include "nine_morris_3d/assets_data.h"
 #include "other/loader.h"
 
 class Layer;
@@ -14,7 +13,8 @@ class Scene;
 
 class Application {
 protected:
-    Application(int width, int height, std::string_view title);
+    Application(int width, int height, std::string_view title, std::string_view info_file,
+            std::string_view log_file, std::string_view application_name);
     virtual ~Application();
 public:
     // Call this to run the application, after all layers and scenes have been defined
@@ -37,7 +37,6 @@ public:
     double fps = 0.0;
     unsigned int frames = 0;  // TODO remove this, if not needed
     ApplicationData app_data;
-    std::shared_ptr<AssetsData> assets_data;
     std::shared_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;

@@ -19,9 +19,9 @@ namespace encryption {
     void initialize();
     cppblowfish::Buffer load_file(const EncryptedFile& file_path);
 
-#if defined(NINE_MORRIS_3D_DEBUG)
+#if defined(PLATFORM_GAME_DEBUG)
     std::string convert(std::string_view file_path);
-#elif defined(NINE_MORRIS_3D_RELEASE)
+#elif defined(PLATFORM_GAME_RELEASE)
     EncryptedFile convert(std::string_view file_path);
 #endif
 }

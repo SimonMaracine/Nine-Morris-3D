@@ -3,7 +3,7 @@
 #include "application/platform.h"
 #include "other/logging.h"
 
-#if defined(NINE_MORRIS_3D_DEBUG)
+#if defined(PLATFORM_GAME_DEBUG)
     #ifdef PRINT_GPU_RAM_ALLOCATED
         #define LOG_ALLOCATION(bytes) \
             if (!_gpu_mem_counter.stopped) { \
@@ -30,7 +30,7 @@
     };
 
     extern GpuMemoryCounter _gpu_mem_counter;
-#elif defined(NINE_MORRIS_3D_RELEASE)
+#elif defined(PLATFORM_GAME_RELEASE)
     #define LOG_ALLOCATION(bytes) (void) 0;
     #define LOG_TOTAL_GPU_MEMORY_ALLOCATED() (void) 0;
 #endif

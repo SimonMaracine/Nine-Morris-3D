@@ -11,13 +11,13 @@
  * Messages in debug mode are logged in the console and in release mode in a log file (with console as fallback).
  */
 
-#if defined(NINE_MORRIS_3D_RELEASE)
+#if defined(PLATFORM_GAME_RELEASE)
     #define DEB_DEBUG(...) ((void) 0)
     #define DEB_INFO(...) ((void) 0)
     #define DEB_WARN(...) ((void) 0)
     #define DEB_ERROR(...) ((void) 0)
     #define DEB_CRITICAL(...) ((void) 0)
-#elif defined(NINE_MORRIS_3D_DEBUG)
+#elif defined(PLATFORM_GAME_DEBUG)
     #define DEB_DEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
     #define DEB_INFO(...) SPDLOG_INFO(__VA_ARGS__)
     #define DEB_WARN(...) SPDLOG_WARN(__VA_ARGS__)
@@ -36,6 +36,6 @@ namespace logging {
         None, Console, File
     };
 
-    void initialize(const char* log_file);
-    void log_opengl_and_dependencies_info(LogTarget target, const char* info_file);
+    void initialize(std::string_view log_file);
+    void log_opengl_and_dependencies_info(LogTarget target, std::string_view info_file);
 }

@@ -13,7 +13,7 @@
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/node.h"
-#include "nine_morris_3d/paths.h"
+#include "other/paths.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 
@@ -97,7 +97,7 @@ namespace save_load {
     void save_game_to_file(const GameState& game_state) noexcept(false) {
         std::string file_path;
         try {
-            file_path = paths::path_for_save_and_options(SAVE_GAME_FILE);
+            file_path = paths::path_for_saved_data(SAVE_GAME_FILE);
         } catch (const user_data::UserNameError& e) {
             throw SaveFileError(e.what());
         }
@@ -123,7 +123,7 @@ namespace save_load {
     void load_game_from_file(GameState& game_state) noexcept(false) {
         std::string file_path;
         try {
-            file_path = paths::path_for_save_and_options(SAVE_GAME_FILE);
+            file_path = paths::path_for_saved_data(SAVE_GAME_FILE);
         } catch (const user_data::UserNameError& e) {
             throw SaveFileError(e.what());
         }

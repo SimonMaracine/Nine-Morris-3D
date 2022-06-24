@@ -31,7 +31,7 @@ public:
     void draw_could_not_load_game();
     void draw_no_last_game();
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     void draw_debug(float dt);
 #endif
 

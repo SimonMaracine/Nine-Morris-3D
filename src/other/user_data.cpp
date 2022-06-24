@@ -1,10 +1,10 @@
 #include "application/platform.h"
 
-#if defined(NINE_MORRIS_3D_LINUX)
+#if defined(PLATFORM_GAME_LINUX)
     #include <pwd.h>
     #include <unistd.h>
     #include <sys/stat.h>
-#elif defined(NINE_MORRIS_3D_WINDOWS)
+#elif defined(PLATFORM_GAME_WINDOWS)
     #include <Windows.h>
     #include <Lmcons.h>
 #endif
@@ -13,8 +13,8 @@
 #include "other/logging.h"
 
 namespace user_data {
-#if defined(NINE_MORRIS_3D_LINUX)
-    #define DIRECTORY_PATH(username, app_name) ("/home/" + username + "/." + app_name + "/")
+#if defined(PLATFORM_GAME_LINUX)
+    #define DIRECTORY_PATH(username, app_name) ("/home/" + (username) + "/." + (app_name) + "/")
 
     std::string get_username() noexcept(false) {
         uid_t uid = geteuid();
@@ -27,16 +27,16 @@ namespace user_data {
         return std::string(pw->pw_name);
     }
 
-    std::string get_user_data_directory_path(const char* app_name) noexcept(false) {
+    std::string get_user_data_directory_path(std::string_view application_name) noexcept(false) {
         const std::string username = get_username();
-        const std::string path = DIRECTORY_PATH(username, app_name);
+        const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         return path;
     }
 
-    bool user_data_directory_exists(const char* app_name) noexcept(false) {
+    bool user_data_directory_exists(std::string_view application_name) noexcept(false) {
         const std::string username = get_username();
-        const std::string path = DIRECTORY_PATH(username, app_name);
+        const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         struct stat sb;
 
@@ -47,9 +47,9 @@ namespace user_data {
         }
     }
 
-    bool create_user_data_directory(const char* app_name) noexcept(false) {
+    bool create_user_data_directory(std::string_view application_name) noexcept(false) {
         const std::string username = get_username();
-        const std::string path = DIRECTORY_PATH(username, app_name);
+        const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         if (mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < 0) {
             return false;
@@ -57,8 +57,8 @@ namespace user_data {
             return true;
         }
     }
-#elif defined(NINE_MORRIS_3D_WINDOWS)
-    #define DIRECTORY_PATH(username, app_name) ("C:\\Users\\" + username + "\\AppData\\Roaming\\" + app_name + "\\")
+#elif defined(PLATFORM_GAME_WINDOWS)
+    #define DIRECTORY_PATH(username, app_name) ("C:\\Users\\" + (username) + "\\AppData\\Roaming\\" + (app_name) + "\\")
 
     std::string get_username() noexcept(false) {
         char username[UNLEN + 1];
@@ -72,16 +72,16 @@ namespace user_data {
         return std::string(username);
     }
 
-    std::string get_user_data_directory_path(const char* app_name) noexcept(false) {
+    std::string get_user_data_directory_path(std::string_view application_name) noexcept(false) {
         const std::string username = get_username();
-        const std::string path = DIRECTORY_PATH(username, app_name);
+        const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         return path;
     }
 
-    bool user_data_directory_exists(const char* app_name) noexcept(false) {
+    bool user_data_directory_exists(std::string_view application_name) noexcept(false) {
         const std::string username = get_username();
-        const std::string path = DIRECTORY_PATH(username, app_name);
+        const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         WIN32_FIND_DATA find_data;
         HANDLE find_handle = FindFirstFile(path.c_str(), &find_data);
@@ -100,9 +100,9 @@ namespace user_data {
         }
     }
 
-    bool create_user_data_directory(const char* app_name) noexcept(false) {
+    bool create_user_data_directory(std::string_view application_name) noexcept(false) {
         const std::string username = get_username();
-        const std::string path = DIRECTORY_PATH(username, app_name);
+        const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         bool success = CreateDirectory(path.c_str(), nullptr);
 

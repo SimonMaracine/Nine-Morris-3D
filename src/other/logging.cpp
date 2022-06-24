@@ -4,7 +4,7 @@
 
 #include "application/platform.h"
 #include "graphics/debug_opengl.h"
-#include "nine_morris_3d/paths.h"
+#include "other/paths.h"
 #include "other/user_data.h"
 #include "other/logging.h"
 
@@ -17,14 +17,14 @@ SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
 namespace logging {
     static std::shared_ptr<spdlog::logger> global_logger;
 
-    void initialize(const char* log_file) {
-#if defined(NINE_MORRIS_3D_DEBUG)
+    void initialize(std::string_view log_file) {
+#if defined(PLATFORM_GAME_DEBUG)
         global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
         global_logger->set_pattern(LOG_PATTERN_DEBUG);
         global_logger->set_level(spdlog::level::trace);
 
         spdlog::set_default_logger(global_logger);
-#elif defined(NINE_MORRIS_3D_RELEASE)
+#elif defined(PLATFORM_GAME_RELEASE)
         std::string file_path;
         try {
             file_path = paths::path_for_logs(log_file);
@@ -60,7 +60,7 @@ namespace logging {
 #endif
     }
 
-    void log_opengl_and_dependencies_info(LogTarget target, const char* info_file) {
+    void log_opengl_and_dependencies_info(LogTarget target, std::string_view info_file) {
         const std::string contents = debug_opengl::get_info();
 
         switch (target) {

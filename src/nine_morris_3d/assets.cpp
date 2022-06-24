@@ -68,7 +68,7 @@ namespace assets {
     std::string CROSS_CURSOR = "data/cursors/cross.png";
 
     void maybe_initialize_assets() {
-#ifdef NINE_MORRIS_3D_RELEASE
+#ifdef PLATFORM_GAME_RELEASE
         static const char* PREFIX = ".dat";
 
         static constexpr std::array<std::string*, 50> assets = {

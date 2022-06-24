@@ -1,7 +1,7 @@
 #include "nine_morris_3d/assets_data.h"
 #include "nine_morris_3d/assets.h"
-#include "nine_morris_3d/paths.h"
 #include "nine_morris_3d/options.h"
+#include "other/paths.h"
 #include "other/mesh.h"
 #include "other/texture_data.h"
 #include "other/loader.h"

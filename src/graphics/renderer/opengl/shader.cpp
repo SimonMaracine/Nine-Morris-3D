@@ -368,9 +368,9 @@ void Shader::recompile() {
 }
 
 GLint Shader::get_uniform_location(std::string_view name) {
-#if defined(NINE_MORRIS_3D_RELEASE)
+#if defined(PLATFORM_GAME_RELEASE)
     return cache[std::string(name)];
-#elif defined(NINE_MORRIS_3D_DEBUG)
+#elif defined(PLATFORM_GAME_DEBUG)
     try {
         return cache.at(std::string(name));
     } catch (const std::out_of_range&) {

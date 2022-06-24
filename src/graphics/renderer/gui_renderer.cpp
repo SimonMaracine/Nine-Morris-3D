@@ -9,7 +9,7 @@
 #include "graphics/renderer/opengl/vertex_array.h"
 #include "graphics/renderer/opengl/buffer.h"
 #include "graphics/renderer/opengl/texture.h"
-#include "nine_morris_3d/paths.h"
+#include "other/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
 #include "other/encryption.h"
@@ -355,7 +355,7 @@ void GuiRenderer::clear() {
 }
 
 void GuiRenderer::maybe_initialize_assets() {
-#ifdef NINE_MORRIS_3D_RELEASE
+#ifdef PLATFORM_GAME_RELEASE
     static const char* PREFIX = ".dat";
 
     static const std::array<std::string*, 4> assets = { 

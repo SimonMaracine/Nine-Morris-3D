@@ -170,7 +170,7 @@ void Font::end_baking() {
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     std::string file_name = "bitmap_" + name + ".png";
     if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
         DEB_CRITICAL("Failed to create png, exiting...");

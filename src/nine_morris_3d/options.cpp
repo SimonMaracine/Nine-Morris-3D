@@ -3,7 +3,7 @@
 #include "application/platform.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/options.h"
-#include "nine_morris_3d/paths.h"
+#include "other/paths.h"
 #include "other/logging.h"
 #include "other/user_data.h"
 
@@ -15,7 +15,7 @@ namespace options {
     void save_options_to_file(const Options& options) noexcept(false) {
         std::string file_path;
         try {
-            file_path = paths::path_for_save_and_options(OPTIONS_FILE);
+            file_path = paths::path_for_saved_data(OPTIONS_FILE);
         } catch (const user_data::UserNameError& e) {
             throw OptionsFileError(e.what());
         }
@@ -49,7 +49,7 @@ namespace options {
     void load_options_from_file(Options& options) noexcept(false) {
         std::string file_path;
         try {
-            file_path = paths::path_for_save_and_options(OPTIONS_FILE);
+            file_path = paths::path_for_saved_data(OPTIONS_FILE);
         } catch (const user_data::UserNameError& e) {
             throw OptionsFileError(e.what());
         }
@@ -136,7 +136,7 @@ namespace options {
     void create_options_file() noexcept(false) {
         std::string file_path;
         try {
-            file_path = paths::path_for_save_and_options(OPTIONS_FILE);
+            file_path = paths::path_for_saved_data(OPTIONS_FILE);
         } catch (const user_data::UserNameError& e) {
             throw OptionsFileError(e.what());
         }

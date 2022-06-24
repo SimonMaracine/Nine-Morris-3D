@@ -11,22 +11,24 @@
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/gui_renderer.h"
 #include "graphics/debug_opengl.h"
-#include "nine_morris_3d/nine_morris_3d.h"
 #include "other/logging.h"
 #include "other/assert.h"
 #include "other/encryption.h"
+#include "other/paths.h"
 
-Application::Application(int width, int height, std::string_view title) {
+Application::Application(int width, int height, std::string_view title, std::string_view info_file,
+        std::string_view log_file, std::string_view application_name) {
     app_data.width = width;
     app_data.height = height;
     app_data.title = title;
     app_data.event_function = BIND(Application::on_event);
 
-    logging::initialize(LOG_FILE);
+    paths::initialize(application_name);
+    logging::initialize(log_file);
     window = std::make_shared<Window>(&app_data);
 
-#ifdef NINE_MORRIS_3D_DEBUG
-    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console, INFO_FILE);
+#ifdef PLATFORM_GAME_DEBUG
+    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console, info_file);
 #endif
     input::initialize(window->get_handle());
     debug_opengl::maybe_initialize_debugging();
@@ -37,7 +39,6 @@ Application::Application(int width, int height, std::string_view title) {
 
     renderer = std::make_unique<Renderer>(this);
     gui_renderer = std::make_unique<GuiRenderer>(this);
-    assets_data = std::make_shared<AssetsData>();
 }
 
 Application::~Application() {

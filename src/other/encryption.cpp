@@ -37,11 +37,11 @@ namespace encryption {
         return buffer;
     }
 
-#if defined(NINE_MORRIS_3D_DEBUG)
+#if defined(PLATFORM_GAME_DEBUG)
     std::string convert(std::string_view file_path) {
         return std::string(file_path);
     }
-#elif defined(NINE_MORRIS_3D_RELEASE)
+#elif defined(PLATFORM_GAME_RELEASE)
     EncryptedFile convert(std::string_view file_path) {
         return EncryptedFile(file_path);
     }

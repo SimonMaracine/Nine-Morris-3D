@@ -6,7 +6,7 @@
 #include "nine_morris_3d/layers/loading/loading_layer.h"
 
 int main() {
-    NineMorris3D* application = new NineMorris3D();
+    NineMorris3D* application = new NineMorris3D(INFO_FILE, LOG_FILE, APP_NAME);
     NineMorris3D::set_app_pointer(application);
 
     Scene* game_scene = new Scene("game");

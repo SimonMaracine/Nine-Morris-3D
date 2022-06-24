@@ -10,7 +10,7 @@ namespace user_data {
     };
 
     std::string get_username() noexcept(false);
-    std::string get_user_data_directory_path(const char* app_name) noexcept(false);
-    bool user_data_directory_exists(const char* app_name) noexcept(false);
-    bool create_user_data_directory(const char* app_name) noexcept(false);
+    std::string get_user_data_directory_path(std::string_view application_name) noexcept(false);
+    bool user_data_directory_exists(std::string_view application_name) noexcept(false);
+    bool create_user_data_directory(std::string_view application_name) noexcept(false);
 }

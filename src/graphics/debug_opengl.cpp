@@ -46,7 +46,7 @@ static const char* names[] = {
     "GL_STEREO"
 };
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     GpuMemoryCounter _gpu_mem_counter;
 #endif
 
@@ -73,7 +73,7 @@ namespace debug_opengl {
     }
 #endif
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     static void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
             GLsizei length, const GLchar* message, const void* userParam) {
         switch (severity) {
@@ -126,7 +126,7 @@ namespace debug_opengl {
 #endif
 
     void maybe_initialize_debugging() {
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
         glDebugMessageCallback(error_callback, nullptr);
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -195,13 +195,13 @@ namespace debug_opengl {
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** Dependencies And Versions ***\n");
 
-#if defined(NINE_MORRIS_3D_LINUX)
+#if defined(PLATFORM_GAME_LINUX)
         {
             char line[128];
             sprintf(line, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
             output.append(line);
         }
-#elif defined(NINE_MORRIS_3D_WINDOWS)
+#elif defined(PLATFORM_GAME_WINDOWS)
         {
             char line[128];
             sprintf(line, "MSVC version: %d\n", _MSC_VER);

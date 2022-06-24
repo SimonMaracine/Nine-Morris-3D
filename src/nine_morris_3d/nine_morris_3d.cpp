@@ -12,7 +12,8 @@
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/assets.h"
-#include "nine_morris_3d/paths.h"
+#include "nine_morris_3d/assets_data.h"
+#include "other/paths.h"
 #include "other/texture_data.h"
 #include "other/logging.h"
 #include "other/assert.h"
@@ -21,8 +22,8 @@
 // Global reference to application
 NineMorris3D* app = nullptr;
 
-NineMorris3D::NineMorris3D()
-    : Application(1024, 576, "Nine Morris 3D") {
+NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file, std::string_view application_name)
+    : Application(1024, 576, "Nine Morris 3D", info_file, log_file, application_name) {
     try {
         options::load_options_from_file(options);
     } catch (const options::OptionsFileNotOpenError& e) {
@@ -113,6 +114,8 @@ NineMorris3D::NineMorris3D()
     data.good_dog_plain_font->begin_baking();  // TODO maybe move part of texture baking to thread
     data.good_dog_plain_font->bake_characters(32, 127);
     data.good_dog_plain_font->end_baking();
+
+    assets_data = std::make_shared<AssetsData>();
 }
 
 NineMorris3D::~NineMorris3D() {

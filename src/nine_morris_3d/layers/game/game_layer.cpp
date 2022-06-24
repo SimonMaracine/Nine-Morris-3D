@@ -24,7 +24,7 @@
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/assets.h"
-#include "nine_morris_3d/paths.h"
+#include "other/paths.h"
 #include "other/mesh.h"
 #include "other/loader.h"
 #include "other/texture_data.h"
@@ -61,7 +61,7 @@ void GameLayer::on_attach() {
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = true;
 #endif
 
@@ -109,7 +109,7 @@ void GameLayer::on_detach() {
         }
     }
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = false;
 #endif
 

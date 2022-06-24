@@ -13,7 +13,7 @@
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/assets.h"
-#include "nine_morris_3d/paths.h"
+#include "other/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
 #include "other/user_data.h"
@@ -44,7 +44,7 @@ void ImGuiLayer::on_attach() {
 
     try {
         info_file_path = paths::path_for_logs(INFO_FILE);
-        save_game_file_path = paths::path_for_save_and_options(save_load::SAVE_GAME_FILE);
+        save_game_file_path = paths::path_for_saved_data(save_load::SAVE_GAME_FILE);
     } catch (const user_data::UserNameError& e) {
         REL_ERROR("{}", e.what());
 
@@ -73,7 +73,7 @@ void ImGuiLayer::on_awake() {
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigWindowsResizeFromEdges = false;
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-#ifdef NINE_MORRIS_3D_RELEASE
+#ifdef PLATFORM_GAME_RELEASE
     io.IniFilename = nullptr;
 #endif
 
@@ -378,7 +378,7 @@ void ImGuiLayer::on_update(float dt) {
         ImGui::PopFont();
     }
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
     draw_debug(dt);
 #endif
 }
@@ -627,7 +627,7 @@ void ImGuiLayer::draw_no_last_game() {
     ImGui::PopFont();
 }
 
-#ifdef NINE_MORRIS_3D_DEBUG
+#ifdef PLATFORM_GAME_DEBUG
 void ImGuiLayer::draw_debug(float dt) {
     if (!show_about) {
         ImGui::Begin("Debug");
