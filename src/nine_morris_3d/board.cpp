@@ -67,28 +67,28 @@ bool Board::place_piece(hoverable::Id hovered_id) {
             } else {
                 check_player_number_of_pieces(turn);
                 switch_turn();
-            }
 
-            if (not_placed_pieces_count() == 0 && !should_take_piece) {
-                phase = Phase::MovePieces;
-                update_outlines();
+                if (not_placed_pieces_count() == 0) {
+                    phase = Phase::MovePieces;
+                    update_outlines();
 
-                if (check_player_blocked(turn)) {
-                    DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+                    DEB_INFO("Phase 2");
 
-                    FORMATTED_MESSAGE(
-                        message, 64, "%s player has blocked %s player.",
-                        TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
-                    )
+                    if (check_player_blocked(turn)) {
+                        DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
-                    game_over(
-                        TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
-                        TURN_IS_WHITE_SO(Piece::White, Piece::Black),
-                        message
-                    );
+                        FORMATTED_MESSAGE(
+                            message, 64, "%s player has blocked %s player.",
+                            TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
+                        )
+
+                        game_over(
+                            TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
+                            TURN_IS_WHITE_SO(Piece::White, Piece::Black),
+                            message
+                        );
+                    }
                 }
-
-                DEB_INFO("Phase 2");
             }
 
             placed = true;
@@ -258,7 +258,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
         }
 
         // Do this even if it may not be needed
-        if (phase == Phase::PlacePieces && not_placed_pieces_count() == 0 && !should_take_piece) {
+        if (not_placed_pieces_count() == 0 && !should_take_piece) {
             phase = Phase::MovePieces;
             update_outlines();
 
