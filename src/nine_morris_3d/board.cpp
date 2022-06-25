@@ -74,7 +74,7 @@ bool Board::place_piece(hoverable::Id hovered_id) {
 
                     DEB_INFO("Phase 2");
 
-                    if (check_player_blocked(turn)) {
+                    if (is_player_blocked(turn)) {
                         DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
                         FORMATTED_MESSAGE(
@@ -179,14 +179,14 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                             update_cursor();
                             set_pieces_to_take(Piece::Black, false);
                             black_pieces_count--;
-                            check_player_number_of_pieces(Player::White);
                             check_player_number_of_pieces(Player::Black);
+                            check_player_number_of_pieces(Player::White);
                             switch_turn();
                             update_outlines();
 
                             DEB_DEBUG("Black piece {} taken", hovered_id);
 
-                            if (check_player_blocked(turn)) {
+                            if (is_player_blocked(turn)) {
                                 DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
                                 FORMATTED_MESSAGE(
@@ -232,7 +232,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
 
                             DEB_DEBUG("White piece {} taken", hovered_id);
 
-                            if (check_player_blocked(turn)) {
+                            if (is_player_blocked(turn)) {
                                 DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
                                 FORMATTED_MESSAGE(
@@ -258,7 +258,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
         }
 
         // Do this even if it may not be needed
-        if (not_placed_pieces_count() == 0 && !should_take_piece) {
+        if (not_placed_pieces_count() == 0 && !should_take_piece && phase != Phase::GameOver) {
             phase = Phase::MovePieces;
             update_outlines();
 
@@ -360,7 +360,7 @@ bool Board::put_down_piece(hoverable::Id hovered_id) {
                     switch_turn();
                     update_outlines();
 
-                    if (check_player_blocked(turn)) {
+                    if (is_player_blocked(turn)) {
                         DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
                         FORMATTED_MESSAGE(
@@ -409,10 +409,11 @@ void Board::release() {
 }
 
 bool Board::undo() {
-    ASSERT(undo_state_history->size() > 0, "Undo history is empty");
+    ASSERT(!undo_state_history->empty(), "Undo history must not be empty");
 
     const bool undo_game_over = phase == Phase::None;
 
+    Board previous_state = *this;
     Board& state = undo_state_history->back();
 
     model.index_count = state.model.index_count;
@@ -436,7 +437,7 @@ bool Board::undo() {
         node.model.scale = state.nodes[i].model.scale;
         node.model.outline_color = state.nodes[i].model.outline_color;
         node.piece_id = state.nodes[i].piece_id;
-        node.piece = nullptr;  // It must be NULL, if the ids don't match
+        node.piece = nullptr;  // It must be null, if the ids don't match
         // Assign correct addresses
         for (Piece& piece : pieces) {
             if (piece.id == node.piece_id) {
@@ -466,7 +467,7 @@ bool Board::undo() {
         piece.type = state.pieces[i].type;
         piece.in_use = state.pieces[i].in_use;
         piece.node_id = state.pieces[i].node_id;
-        piece.node = nullptr;  // It must be NULL, if the ids don't match
+        piece.node = nullptr;  // It must be null, if the ids don't match
         // Assign correct addresses
         for (Node& node : nodes) {
             if (node.id == piece.node_id) {
@@ -495,8 +496,8 @@ bool Board::undo() {
     selected_piece = nullptr;
     can_jump = state.can_jump;
     turns_without_mills = state.turns_without_mills;
-    repetition_history = state.repetition_history;
-    undo_state_history = state.undo_state_history;
+    // repetition_history = state.repetition_history;
+    // undo_state_history = state.undo_state_history;
     next_move = state.next_move;
 
     // Reset pieces' models
@@ -508,8 +509,8 @@ bool Board::undo() {
         }
     }
 
-    redo_state_history->push_back(undo_state_history->back());
     undo_state_history->pop_back();
+    redo_state_history->push_back(previous_state);
 
     DEB_DEBUG("Popped state off of undo stack and undid move");
 
@@ -519,10 +520,9 @@ bool Board::undo() {
 }
 
 bool Board::redo() {
-    ASSERT(redo_state_history->size() > 0, "Redo history is empty");
+    ASSERT(!redo_state_history->empty(), "Redo history must not be empty");
 
-    // const bool undo_game_over = phase == Phase::None;
-
+    Board previous_state = *this;
     Board& state = redo_state_history->back();
 
     model.index_count = state.model.index_count;
@@ -546,7 +546,7 @@ bool Board::redo() {
         node.model.scale = state.nodes[i].model.scale;
         node.model.outline_color = state.nodes[i].model.outline_color;
         node.piece_id = state.nodes[i].piece_id;
-        node.piece = nullptr;  // It must be NULL, if the ids don't match
+        node.piece = nullptr;  // It must be null, if the ids don't match
         // Assign correct addresses
         for (Piece& piece : pieces) {
             if (piece.id == node.piece_id) {
@@ -576,7 +576,7 @@ bool Board::redo() {
         piece.type = state.pieces[i].type;
         piece.in_use = state.pieces[i].in_use;
         piece.node_id = state.pieces[i].node_id;
-        piece.node = nullptr;  // It must be NULL, if the ids don't match
+        piece.node = nullptr;  // It must be null, if the ids don't match
         // Assign correct addresses
         for (Node& node : nodes) {
             if (node.id == piece.node_id) {
@@ -605,8 +605,8 @@ bool Board::redo() {
     selected_piece = nullptr;
     can_jump = state.can_jump;
     turns_without_mills = state.turns_without_mills;
-    repetition_history = state.repetition_history;
-    undo_state_history = state.undo_state_history;
+    // repetition_history = state.repetition_history;
+    // undo_state_history = state.undo_state_history;
     next_move = state.next_move;
 
     // Reset pieces' models
@@ -618,14 +618,14 @@ bool Board::redo() {
         }
     }
 
-    undo_state_history->push_back(redo_state_history->back());
     redo_state_history->pop_back();
+    undo_state_history->push_back(previous_state);
 
     DEB_DEBUG("Popped state off of redo stack and redid move");
 
     update_cursor();
 
-    return false;
+    return phase == Phase::None;
 }
 
 unsigned int Board::not_placed_pieces_count() {
@@ -654,7 +654,8 @@ void Board::update_cursor() {
 
 void Board::update_nodes(hoverable::Id hovered_id) {
     for (Node& node : nodes) {
-        if (node.id == hovered_id && phase != Board::Phase::None && phase != Board::Phase::GameOver) {
+        if (node.id == hovered_id && phase != Board::Phase::None && phase != Board::Phase::GameOver
+                && !should_take_piece) {
             node.model.material->set_vec4("u_color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
         } else {
             node.model.material->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -1030,7 +1031,7 @@ void Board::check_player_number_of_pieces(Player player) {
     }
 }
 
-bool Board::check_player_blocked(Player player) {
+bool Board::is_player_blocked(Player player) {
     DEB_DEBUG("{} player is checked if is blocked",
             player == Player::White ? "White" : "Black");
 

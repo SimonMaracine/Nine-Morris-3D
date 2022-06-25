@@ -116,7 +116,7 @@ private:
     void update_outlines();
     bool can_go(Node* source_node, Node* destination_node);
     void check_player_number_of_pieces(Player player);
-    bool check_player_blocked(Player player);
+    bool is_player_blocked(Player player);
     GamePosition get_position();
     void remember_position_and_check_repetition(Piece* piece, Node* node);
     void remember_state();

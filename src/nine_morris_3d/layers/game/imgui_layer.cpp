@@ -173,15 +173,15 @@ void ImGuiLayer::on_update(float dt) {
                 }
             }
             if (ImGui::MenuItem("Redo", nullptr, false, can_redo)) {
-                game_layer->board.redo();
+                const bool redid_game_over = game_layer->board.redo();
 
                 if (game_layer->board.redo_state_history->empty()) {
                     can_redo = false;
                 }
 
-                // if (undid_game_over) {
-                //     gui_layer->timer.start(app->window->get_time());
-                // }
+                if (redid_game_over) {
+                    gui_layer->timer.stop();
+                }
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
                 app->running = false;

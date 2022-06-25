@@ -267,6 +267,10 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                 gui_layer->timer.stop();
             }
 
+            if (board.redo_state_history->empty()) {
+                imgui_layer->can_redo = false;
+            }
+
             board.release();
         }
     }
@@ -926,7 +930,7 @@ void GameLayer::load_game() {
         node.model.scale = state.board.nodes[i].model.scale;
         node.model.outline_color = state.board.nodes[i].model.outline_color;
         node.piece_id = state.board.nodes[i].piece_id;
-        node.piece = nullptr;  // It must be NULL, if the ids don't match
+        node.piece = nullptr;  // It must be null, if the ids don't match
         // Assign correct addresses
         for (unsigned int i = 0; i < 18; i++) {
             if (state.board.pieces[i].id == node.piece_id) {
@@ -956,7 +960,7 @@ void GameLayer::load_game() {
         piece.type = state.board.pieces[i].type;
         piece.in_use = state.board.pieces[i].in_use;
         piece.node_id = state.board.pieces[i].node_id;
-        piece.node = nullptr;  // It must be NULL, if the ids don't match
+        piece.node = nullptr;  // It must be null, if the ids don't match
         // Assign correct addresses; use only board as nodes have already been assigned
         for (Node& node : board.nodes) {
             if (node.id == piece.node_id) {

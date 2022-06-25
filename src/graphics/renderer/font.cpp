@@ -74,7 +74,7 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         int y0;
         stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
-        int width = 0, height = 0;  // Assume 0, because glyph can be NULL
+        int width = 0, height = 0;  // Assume 0, because glyph can be null
         unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, on_edge_value,
                 static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr);
 
@@ -120,7 +120,7 @@ void Font::bake_character(int codepoint) {
     int y0;
     stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
-    int width = 0, height = 0;  // Assume 0, because glyph can be NULL
+    int width = 0, height = 0;  // Assume 0, because glyph can be null
     unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, on_edge_value,
             static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr);
 
