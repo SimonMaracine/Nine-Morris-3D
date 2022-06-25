@@ -3,6 +3,7 @@
 
 #include "application/events.h"
 #include "application/platform.h"
+#include "application/input.h"
 #include "graphics/debug_opengl.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
@@ -397,7 +398,7 @@ void ImGuiLayer::on_update(float dt) {
 
     if (show_info && !show_about) {
         ImGui::PushFont(app->data.imgui_info_font);
-        ImGui::Begin("Info");
+        ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoCollapse);
         ImGui::Text("FPS: %f", app->fps);
         ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
         ImGui::Text("GLSL: %s", debug_opengl::get_glsl_version());
@@ -421,6 +422,7 @@ void ImGuiLayer::on_event(events::Event& event) {
     dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(ImGuiLayer::on_mouse_moved));
     dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(ImGuiLayer::on_mouse_button_pressed));
     dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(ImGuiLayer::on_mouse_button_released));
+    dispatcher.dispatch<KeyPressedEvent>(KeyPressed, BIND(ImGuiLayer::on_key_pressed));
 }
 
 bool ImGuiLayer::on_mouse_scrolled(events::MouseScrolledEvent& event) {
@@ -439,16 +441,36 @@ bool ImGuiLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 
 bool ImGuiLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.button] = true;
+    io.MouseDown[static_cast<int>(event.button)] = true;
 
     return hovering_gui;
 }
 
 bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.button] = false;
+    io.MouseDown[static_cast<int>(event.button)] = false;
 
     return hovering_gui;
+}
+
+// TODO think about to include this or not
+bool ImGuiLayer::on_key_pressed(events::KeyPressedEvent& event) {
+    if (event.repeat) {
+        return true;
+    }
+
+    if (event.control) {
+        switch (event.key) {
+            case input::Key::Z:
+                break;
+            case input::Key::Y:
+                break;
+            default:
+                break;
+        }
+    }
+
+    return true;
 }
 
 void ImGuiLayer::draw_game_over() {

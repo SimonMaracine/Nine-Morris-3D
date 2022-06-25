@@ -1,5 +1,7 @@
 #pragma once
 
+#include "application/input.h"
+
 #define BIND(function) std::bind(&function, this, std::placeholders::_1)
 
 namespace events {
@@ -76,8 +78,8 @@ namespace events {
 
     class KeyPressedEvent : public Event {
     public:
-        KeyPressedEvent(int key)
-            : key(key) {}
+        KeyPressedEvent(input::Key key, bool repeat, bool control)
+            : key(key), repeat(repeat), control(control) {}
         virtual ~KeyPressedEvent() = default;
 
         virtual EventType get_type() override {
@@ -88,12 +90,14 @@ namespace events {
             return "KeyPressed";
         }
 
-        int key;
+        input::Key key;
+        bool repeat;
+        bool control;
     };
 
     class KeyReleasedEvent : public Event {
     public:
-        KeyReleasedEvent(int key)
+        KeyReleasedEvent(input::Key key)
             : key(key) {}
         virtual ~KeyReleasedEvent() = default;
 
@@ -105,12 +109,12 @@ namespace events {
             return "KeyReleased";
         }
 
-        int key;
+        input::Key key;
     };
 
     class MouseButtonPressedEvent : public Event {
     public:
-        MouseButtonPressedEvent(int button)
+        MouseButtonPressedEvent(input::MouseButton button)
             : button(button) {}
         virtual ~MouseButtonPressedEvent() = default;
 
@@ -122,12 +126,12 @@ namespace events {
             return "MouseButtonPressed";
         }
 
-        int button;
+        input::MouseButton button;
     };
 
     class MouseButtonReleasedEvent : public Event {
     public:
-        MouseButtonReleasedEvent(int button)
+        MouseButtonReleasedEvent(input::MouseButton button)
             : button(button) {}
         virtual ~MouseButtonReleasedEvent() = default;
 
@@ -139,7 +143,7 @@ namespace events {
             return "MouseButtonReleased";
         }
 
-        int button;
+        input::MouseButton button;
     };
 
     class MouseScrolledEvent : public Event {

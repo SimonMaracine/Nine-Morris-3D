@@ -6,6 +6,7 @@
 #include "application/application_data.h"
 #include "application/events.h"
 #include "application/platform.h"
+#include "application/input.h"
 #include "other/logging.h"
 
 Window::Window(ApplicationData* data) {
@@ -73,17 +74,17 @@ Window::Window(ApplicationData* data) {
 
         switch (action) {
             case GLFW_PRESS: {
-                events::KeyPressedEvent event (key);
+                events::KeyPressedEvent event (static_cast<input::Key>(key), false, mods & GLFW_MOD_CONTROL);
                 data->event_function(event);
                 break;
             }
             case GLFW_RELEASE: {
-                events::KeyReleasedEvent event (key);
+                events::KeyReleasedEvent event (static_cast<input::Key>(key));
                 data->event_function(event);
                 break;
             }
             case GLFW_REPEAT: {
-                events::KeyPressedEvent event (key);
+                events::KeyPressedEvent event (static_cast<input::Key>(key), true, mods & GLFW_MOD_CONTROL);
                 data->event_function(event);
                 break;
             }
@@ -95,12 +96,12 @@ Window::Window(ApplicationData* data) {
 
         switch (action) {
             case GLFW_PRESS: {
-                events::MouseButtonPressedEvent event (button);
+                events::MouseButtonPressedEvent event (static_cast<input::MouseButton>(button));
                 data->event_function(event);
                 break;
             }
             case GLFW_RELEASE: {
-                events::MouseButtonReleasedEvent event (button);
+                events::MouseButtonReleasedEvent event (static_cast<input::MouseButton>(button));
                 data->event_function(event);
                 break;
             }       

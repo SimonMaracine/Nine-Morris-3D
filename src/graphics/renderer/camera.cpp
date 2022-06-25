@@ -45,9 +45,9 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
 
     zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_wheel;
 
-    if (input::is_key_pressed(KEY_R)) {
+    if (input::is_key_pressed(input::Key::R)) {
         zoom_velocity -= ZOOM_SPEED * dt;
-    } else if (input::is_key_pressed(KEY_F)) {
+    } else if (input::is_key_pressed(input::Key::F)) {
         zoom_velocity += ZOOM_SPEED * dt;
     }
 
@@ -60,20 +60,20 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
     distance_to_point = std::max(distance_to_point, 5.0f);
     distance_to_point = std::min(distance_to_point, 30.0f);
 
-    if (input::is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)) {
+    if (input::is_mouse_button_pressed(input::MouseButton::RIGHT)) {
         y_velocity -= MOVE_SPEED_MOUSE * dy;
         x_velocity += MOVE_SPEED_MOUSE * dx;
     }
 
-    if (input::is_key_pressed(KEY_W)) {
+    if (input::is_key_pressed(input::Key::W)) {
         y_velocity += MOVE_SPEED * dt;
-    } else if (input::is_key_pressed(KEY_S)) {
+    } else if (input::is_key_pressed(input::Key::S)) {
         y_velocity -= MOVE_SPEED * dt;
     }
 
-    if (input::is_key_pressed(KEY_A)) {
+    if (input::is_key_pressed(input::Key::A)) {
         x_velocity -= MOVE_SPEED * dt;
-    } else if (input::is_key_pressed(KEY_D)) {
+    } else if (input::is_key_pressed(input::Key::D)) {
         x_velocity += MOVE_SPEED * dt;
     }
 

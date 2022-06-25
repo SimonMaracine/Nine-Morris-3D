@@ -214,7 +214,7 @@ bool GameLayer::on_mouse_moved(events::MouseMovedEvent& event) {
 }
 
 bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) {
-    if (event.button == MOUSE_BUTTON_LEFT) {
+    if (event.button == input::MouseButton::LEFT) {
         if (board.next_move) {
             board.press(app->renderer->get_hovered_id());
         }
@@ -224,7 +224,7 @@ bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) 
 }
 
 bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
-    if (event.button == MOUSE_BUTTON_LEFT) {
+    if (event.button == input::MouseButton::LEFT) {
         if (board.next_move) {
             if (board.phase == Board::Phase::PlacePieces) {
                 if (board.should_take_piece) {
@@ -277,14 +277,8 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 }
 
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
-    if (event.key == KEY_SPACE) {
+    if (event.key == input::Key::SPACE) {
         app->camera.go_towards_position(default_camera_position);
-    }
-
-    if (event.key == KEY_L) {
-        board.phase = Board::Phase::GameOver;
-        board.ending = Board::Ending::WinnerWhite;
-        board.ending_message = "Hello, world!";
     }
 
     return false;
