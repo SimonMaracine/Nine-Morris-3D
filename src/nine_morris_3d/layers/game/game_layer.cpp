@@ -49,8 +49,6 @@ constexpr DirectionalLight LIGHT_AUTUMN = {
 };
 
 void GameLayer::on_attach() {
-    undo_board_state_history = std::make_shared<std::vector<Board>>();
-    redo_board_state_history = std::make_shared<std::vector<Board>>();
     setup_board();
     setup_board_paint();
 
@@ -590,7 +588,7 @@ void GameLayer::resetup_textures() {
 }
 
 void GameLayer::setup_board() {
-    board = Board(undo_board_state_history, redo_board_state_history);
+    board = Board();
 
     board.model.vertex_array = app->data.board_vertex_array;
     board.model.index_count = app->assets_data->board_mesh->indices.size();

@@ -33,10 +33,6 @@ public:
     };
 
     Board() = default;
-    Board(std::shared_ptr<std::vector<Board>> undo_board_state_history,
-            std::shared_ptr<std::vector<Board>> redo_board_state_history)
-        : undo_state_history(undo_board_state_history),
-          redo_state_history(redo_board_state_history) {}
     ~Board() = default;
 
     bool place_piece(hoverable::Id hovered_id);
@@ -100,8 +96,8 @@ public:
         std::vector<PositionPlusInfo> twos;
     } repetition_history;
 
-    std::shared_ptr<std::vector<Board>> undo_state_history;
-    std::shared_ptr<std::vector<Board>> redo_state_history;
+    std::shared_ptr<std::vector<Board>> undo_state_history = std::make_shared<std::vector<Board>>();
+    std::shared_ptr<std::vector<Board>> redo_state_history = std::make_shared<std::vector<Board>>();
     bool next_move = true;  // It is false when any piece is in air and true otherwise
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);
