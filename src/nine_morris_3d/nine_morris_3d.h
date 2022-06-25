@@ -66,6 +66,7 @@ public:
         std::shared_ptr<Shader> piece_shader;
         std::shared_ptr<Texture> white_piece_diffuse_texture;
         std::shared_ptr<Texture> black_piece_diffuse_texture;
+        std::shared_ptr<Texture> piece_normal_texture;
 
         std::shared_ptr<Material> tinted_wood_material;
         std::shared_ptr<MaterialInstance> piece_material_instances[18];
@@ -81,6 +82,7 @@ public:
         std::shared_ptr<VertexArray> board_paint_vertex_array;
         std::shared_ptr<Shader> board_paint_shader;
         std::shared_ptr<Texture> board_paint_diffuse_texture;
+        std::shared_ptr<Texture> board_paint_normal_texture;
 
         std::shared_ptr<Material> paint_material;
         std::shared_ptr<MaterialInstance> board_paint_material_instance;

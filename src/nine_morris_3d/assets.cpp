@@ -10,17 +10,18 @@ namespace assets {
     std::string BOARD_WOOD_DIFFUSE_TEXTURE = "data/textures/board/board_wood.png";
     std::string BOARD_PAINT_DIFFUSE_TEXTURE = "data/textures/board/board_paint.png";
     std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE = "data/textures/board/board_paint_labeled.png";
-    std::string WHITE_PIECE_TEXTURE = "data/textures/piece/white_piece.png";
-    std::string BLACK_PIECE_TEXTURE = "data/textures/piece/black_piece.png";
+    std::string WHITE_PIECE_DIFFUSE_TEXTURE = "data/textures/piece/white_piece.png";
+    std::string BLACK_PIECE_DIFFUSE_TEXTURE = "data/textures/piece/black_piece.png";
     std::string BOARD_WOOD_DIFFUSE_TEXTURE_SMALL = "data/textures/board/board_wood-small.png";
     std::string BOARD_PAINT_DIFFUSE_TEXTURE_SMALL = "data/textures/board/board_paint-small.png";
     std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL = "data/textures/board/board_paint_labeled-small.png";
-    std::string WHITE_PIECE_TEXTURE_SMALL = "data/textures/piece/white_piece-small.png";
-    std::string BLACK_PIECE_TEXTURE_SMALL = "data/textures/piece/black_piece-small.png";
+    std::string WHITE_PIECE_DIFFUSE_TEXTURE_SMALL = "data/textures/piece/white_piece-small.png";
+    std::string BLACK_PIECE_DIFFUSE_TEXTURE_SMALL = "data/textures/piece/black_piece-small.png";
     std::string WHITE_INDICATOR_TEXTURE = "data/textures/indicator/white_indicator.png";
     std::string BLACK_INDICATOR_TEXTURE = "data/textures/indicator/black_indicator.png";
     std::string SPLASH_SCREEN_TEXTURE = "data/textures/splash_screen/splash_screen.png";
-    std::string BOARD_WOOD_NORMAL_TEXTURE = "data/textures/board/board_wood_normal.png";
+    std::string BOARD_NORMAL_TEXTURE = "data/textures/board/board_normal.png";
+    std::string PIECE_NORMAL_TEXTURE = "data/textures/piece/piece_normal.png";
 
     std::string OPEN_SANS_FONT = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
     std::string GOOD_DOG_PLAIN_FONT = "data/fonts/FH-GoodDogPlain-WTT/GOODDP__.TTF";
@@ -80,12 +81,12 @@ namespace assets {
             &BLACK_PIECE_MESH,
             &BOARD_WOOD_TEXTURE,
             &BOARD_PAINT_DIFFUSE_TEXTURE,
-            &WHITE_PIECE_TEXTURE,
-            &BLACK_PIECE_TEXTURE,
+            &WHITE_PIECE_DIFFUSE_TEXTURE,
+            &BLACK_PIECE_DIFFUSE_TEXTURE,
             &BOARD_WOOD_DIFFUSE_TEXTURE_SMALL,
             &BOARD_PAINT_DIFFUSE_TEXTURE_SMALL,
-            &WHITE_PIECE_TEXTURE_SMALL,
-            &BLACK_PIECE_TEXTURE_SMALL,
+            &WHITE_PIECE_DIFFUSE_TEXTURE_SMALL,
+            &BLACK_PIECE_DIFFUSE_TEXTURE_SMALL,
             &WHITE_INDICATOR_TEXTURE,
             &BLACK_INDICATOR_TEXTURE,
             &SPLASH_SCREEN_TEXTURE,

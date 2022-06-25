@@ -6,8 +6,7 @@ layout (location = 2) in vec3 a_normal;
 layout (location = 3) in vec3 a_tangent;
 
 out vec2 v_texture_coordinate;
-// out vec3 v_normal;
-out vec3 v_fragment_position;
+out vec3 v_fragment_position_tangent;
 out vec4 v_fragment_position_light_space;
 out vec3 v_light_position_tangent;
 out vec3 v_view_position_tangent;
@@ -29,7 +28,6 @@ layout (binding = 3) uniform LightSpace {
 
 void main() {
     v_texture_coordinate = a_texture_coordinate;
-    // v_normal = mat3(u_model_matrix) * a_normal;
 
     vec3 bitangent = cross(a_normal, a_tangent);
 
@@ -39,10 +37,10 @@ void main() {
     mat3 TBN = mat3(T, B, N);
     TBN = transpose(TBN);
 
-    v_fragment_position = TBN * vec3(u_model_matrix * vec4(a_position, 1.0));
+    vec3 v_fragment_position = vec3(u_model_matrix * vec4(a_position, 1.0));
 
+    v_fragment_position_tangent = TBN * v_fragment_position;
     v_fragment_position_light_space = u_light_space_matrix * vec4(v_fragment_position, 1.0);
-
     v_light_position_tangent = TBN * u_light_position;
     v_view_position_tangent = TBN * u_view_position;
 

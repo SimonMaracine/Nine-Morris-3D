@@ -25,11 +25,9 @@ static const char* projection_view_block_fields[] = {
 };
 
 static const char* light_block_fields[] = {
-    // "u_light_position",
     "u_light_ambient",
     "u_light_diffuse",
     "u_light_specular"
-    // "u_view_position"
 };
 
 static const char* light_view_position_block_fields[] = {
@@ -621,7 +619,7 @@ void Renderer::draw_skybox() {
 }
 
 void Renderer::setup_shadows() {
-    const glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);  // TODO maybe redo this stuff
+    const glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);  // TODO redo this stuff
     const glm::mat4 view = glm::lookAt(light.position / 4.0f,
             glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     const glm::mat4 light_space_matrix = projection * view;

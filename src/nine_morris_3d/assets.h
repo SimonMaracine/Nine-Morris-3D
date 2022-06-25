@@ -12,17 +12,18 @@ namespace assets {
     extern std::string BOARD_WOOD_DIFFUSE_TEXTURE;
     extern std::string BOARD_PAINT_DIFFUSE_TEXTURE;
     extern std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE;
-    extern std::string WHITE_PIECE_TEXTURE;
-    extern std::string BLACK_PIECE_TEXTURE;
+    extern std::string WHITE_PIECE_DIFFUSE_TEXTURE;
+    extern std::string BLACK_PIECE_DIFFUSE_TEXTURE;
     extern std::string BOARD_WOOD_DIFFUSE_TEXTURE_SMALL;
     extern std::string BOARD_PAINT_DIFFUSE_TEXTURE_SMALL;
     extern std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL;
-    extern std::string WHITE_PIECE_TEXTURE_SMALL;
-    extern std::string BLACK_PIECE_TEXTURE_SMALL;
+    extern std::string WHITE_PIECE_DIFFUSE_TEXTURE_SMALL;
+    extern std::string BLACK_PIECE_DIFFUSE_TEXTURE_SMALL;
     extern std::string WHITE_INDICATOR_TEXTURE;
     extern std::string BLACK_INDICATOR_TEXTURE;
     extern std::string SPLASH_SCREEN_TEXTURE;
-    extern std::string BOARD_WOOD_NORMAL_TEXTURE;
+    extern std::string BOARD_NORMAL_TEXTURE;
+    extern std::string PIECE_NORMAL_TEXTURE;
 
     extern std::string OPEN_SANS_FONT;
     extern std::string GOOD_DOG_PLAIN_FONT;

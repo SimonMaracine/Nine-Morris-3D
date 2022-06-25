@@ -1,7 +1,6 @@
 #version 430 core
 
 in vec2 v_texture_coordinate;
-// in vec3 v_normal;
 in vec3 v_fragment_position;
 in vec4 v_fragment_position_light_space;
 in vec3 v_light_position_tangent;
@@ -15,17 +14,15 @@ struct Material {
     sampler2D diffuse;
     vec3 specular;
     float shininess;
-    sampler2D normal;  
+    sampler2D normal;
 };
 
 uniform Material u_material;
 
 layout (binding = 1) uniform Light {
-    // vec3 u_light_position;
     vec3 u_light_ambient;
     vec3 u_light_diffuse;
     vec3 u_light_specular;
-    // vec3 u_view_position;
 };
 
 float calculate_shadow(vec4 fragment_position_light_space, vec3 normal, vec3 light_direction) {
@@ -48,8 +45,9 @@ float calculate_shadow(vec4 fragment_position_light_space, vec3 normal, vec3 lig
 
     shadow /= 9.0;
 
-    if (projection_coordinates.z > 1.0)
+    if (projection_coordinates.z > 1.0) {
         shadow = 0.0;
+    }
 
     return shadow;
 }
@@ -61,7 +59,6 @@ vec3 calculate_light(Material material, vec3 light_position, vec3 light_ambient,
     vec3 ambient_light = texture_colors * light_ambient;
 
     // Diffuse light
-    // vec3 normal = normalize(v_normal);
     vec3 normal = normalize(texture(material.normal, v_texture_coordinate).rgb * 2.0 - 1.0);
     vec3 light_direction = normalize(light_position - v_fragment_position);
 
@@ -86,9 +83,8 @@ void main() {
     vec3 texture_colors = vec3(texture(u_material.diffuse, v_texture_coordinate));
 
     vec3 total_light = calculate_light(
-        u_material, v_light_position_tangent, u_light_ambient,
-        u_light_diffuse, u_light_specular, v_view_position_tangent, texture_colors,
-        v_fragment_position_light_space
+        u_material, v_light_position_tangent, u_light_ambient, u_light_diffuse, u_light_specular,
+        v_view_position_tangent, texture_colors, v_fragment_position_light_space
     );
 
     fragment_color = vec4(total_light, 1.0);

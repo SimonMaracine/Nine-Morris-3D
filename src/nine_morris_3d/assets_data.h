@@ -9,15 +9,16 @@ using namespace mesh;
 
 struct AssetsData {
     std::shared_ptr<Mesh<VPTNT>> board_mesh;
-    std::shared_ptr<Mesh<VPTN>> board_paint_mesh;
+    std::shared_ptr<Mesh<VPTNT>> board_paint_mesh;
     std::shared_ptr<Mesh<VP>> node_mesh;
-    std::shared_ptr<Mesh<VPTN>> white_piece_mesh;
-    std::shared_ptr<Mesh<VPTN>> black_piece_mesh;
+    std::shared_ptr<Mesh<VPTNT>> white_piece_mesh;
+    std::shared_ptr<Mesh<VPTNT>> black_piece_mesh;
     std::shared_ptr<TextureData> board_wood_diff_texture;
     std::shared_ptr<TextureData> board_paint_diff_texture;
     std::shared_ptr<TextureData> black_piece_diff_texture;
     std::shared_ptr<TextureData> white_piece_diff_texture;
-    std::shared_ptr<TextureData> board_wood_norm_texture;
+    std::shared_ptr<TextureData> board_norm_texture;
+    std::shared_ptr<TextureData> piece_norm_texture;
     std::shared_ptr<TextureData> white_indicator_texture;
     std::shared_ptr<TextureData> black_indicator_texture;
     std::shared_ptr<TextureData> skybox_px_texture;

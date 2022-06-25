@@ -343,7 +343,7 @@ void GameLayer::prepare_board() {
     );
 
     app->data.board_normal_texture = Texture::create(
-        app->assets_data->board_wood_norm_texture, true, -2.0f, app->options.anisotropic_filtering
+        app->assets_data->board_norm_texture, true, -2.0f, app->options.anisotropic_filtering
     );
 
     app->data.wood_material = std::make_shared<Material>(app->data.board_shader);
@@ -365,7 +365,8 @@ void GameLayer::prepare_board_paint() {
         "u_shadow_map",
         "u_material.diffuse",
         "u_material.specular",
-        "u_material.shininess"
+        "u_material.shininess",
+        "u_material.normal"
     };
     std::vector<UniformBlockSpecification> uniform_blocks = {
         app->renderer->get_projection_view_uniform_block(),
@@ -381,7 +382,7 @@ void GameLayer::prepare_board_paint() {
     );
 
     std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->board_paint_mesh->vertices.data(),
-            app->assets_data->board_paint_mesh->vertices.size() * sizeof(mesh::VPTN));
+            app->assets_data->board_paint_mesh->vertices.size() * sizeof(mesh::VPTNT));
 
     std::shared_ptr<VertexArray> vertex_array = VertexArray::create();
 
@@ -389,6 +390,7 @@ void GameLayer::prepare_board_paint() {
     layout.add(0, BufferLayout::Type::Float, 3);
     layout.add(1, BufferLayout::Type::Float, 2);
     layout.add(2, BufferLayout::Type::Float, 3);
+    layout.add(3, BufferLayout::Type::Float, 3);
 
     std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->board_paint_mesh->indices.data(),
             app->assets_data->board_paint_mesh->indices.size() * sizeof(unsigned int));
@@ -404,15 +406,21 @@ void GameLayer::prepare_board_paint() {
         app->assets_data->board_paint_diff_texture, true, -1.0f, app->options.anisotropic_filtering
     );
 
+    app->data.board_paint_normal_texture = Texture::create(
+        app->assets_data->board_norm_texture, true, -1.0f, app->options.anisotropic_filtering
+    );
+
     app->data.paint_material = std::make_shared<Material>(app->data.board_paint_shader);
     app->data.paint_material->add_texture("u_material.diffuse");
     app->data.paint_material->add_variable(Material::UniformType::Vec3, "u_material.specular");
     app->data.paint_material->add_variable(Material::UniformType::Float, "u_material.shininess");
+    app->data.paint_material->add_texture("u_material.normal");
 
     app->data.board_paint_material_instance = MaterialInstance::make(app->data.paint_material);
     app->data.board_paint_material_instance->set_texture("u_material.diffuse", app->data.board_paint_diffuse_texture, 0);
     app->data.board_paint_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
     app->data.board_paint_material_instance->set_float("u_material.shininess", 4.0f);
+    app->data.board_paint_material_instance->set_texture("u_material.normal", app->data.board_paint_normal_texture, 1);
 }
 
 void GameLayer::prepare_pieces() {
@@ -422,6 +430,7 @@ void GameLayer::prepare_pieces() {
         "u_material.diffuse",
         "u_material.specular",
         "u_material.shininess",
+        "u_material.normal",
         "u_material.tint"
     };
     std::vector<UniformBlockSpecification> uniform_blocks = {
@@ -443,11 +452,15 @@ void GameLayer::prepare_pieces() {
     app->data.black_piece_diffuse_texture = Texture::create(
         app->assets_data->black_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
     );
+    app->data.piece_normal_texture = Texture::create(
+        app->assets_data->piece_norm_texture, true, -1.5f, app->options.anisotropic_filtering
+    );
 
     app->data.tinted_wood_material = std::make_shared<Material>(app->data.piece_shader, Material::Hoverable);
     app->data.tinted_wood_material->add_texture("u_material.diffuse");
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.specular");
     app->data.tinted_wood_material->add_variable(Material::UniformType::Float, "u_material.shininess");
+    app->data.tinted_wood_material->add_texture("u_material.normal");
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
 
     for (unsigned int i = 0; i < 9; i++) {
@@ -460,13 +473,13 @@ void GameLayer::prepare_pieces() {
     }
 }
 
-void GameLayer::prepare_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::VPTN>> mesh,
-        std::shared_ptr<Texture> texture, const glm::vec3& position) {
+void GameLayer::prepare_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::VPTNT>> mesh,
+        std::shared_ptr<Texture> diffuse_texture, const glm::vec3& position) {
     hoverable::Id id = hoverable::generate_id();
     app->data.pieces_id[index] = id;
 
     std::shared_ptr<Buffer> vertices = Buffer::create(mesh->vertices.data(),
-        mesh->vertices.size() * sizeof(mesh::VPTN));
+        mesh->vertices.size() * sizeof(mesh::VPTNT));
 
     std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
 
@@ -474,9 +487,10 @@ void GameLayer::prepare_piece(unsigned int index, Piece::Type type, std::shared_
     layout.add(0, BufferLayout::Type::Float, 3);
     layout.add(1, BufferLayout::Type::Float, 2);
     layout.add(2, BufferLayout::Type::Float, 3);
+    layout.add(3, BufferLayout::Type::Float, 3);
 
     BufferLayout layout2;
-    layout2.add(3, BufferLayout::Type::Int, 1);
+    layout2.add(4, BufferLayout::Type::Int, 1);
 
     std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(),
             mesh->indices.size() * sizeof(unsigned int));
@@ -492,15 +506,17 @@ void GameLayer::prepare_piece(unsigned int index, Piece::Type type, std::shared_
 
     if (type == Piece::Type::White) {  // TODO see if branch is really needed
         app->data.piece_material_instances[index] = MaterialInstance::make(app->data.tinted_wood_material);
-        app->data.piece_material_instances[index]->set_texture("u_material.diffuse", texture, 0);
+        app->data.piece_material_instances[index]->set_texture("u_material.diffuse", diffuse_texture, 0);
         app->data.piece_material_instances[index]->set_vec3("u_material.specular", glm::vec3(0.2f));
         app->data.piece_material_instances[index]->set_float("u_material.shininess", 4.0f);
+        app->data.piece_material_instances[index]->set_texture("u_material.normal", app->data.piece_normal_texture, 1);
         app->data.piece_material_instances[index]->set_vec3("u_material.tint", glm::vec3(1.0f));
     } else {
         app->data.piece_material_instances[index] = MaterialInstance::make(app->data.tinted_wood_material);
-        app->data.piece_material_instances[index]->set_texture("u_material.diffuse", texture, 0);
+        app->data.piece_material_instances[index]->set_texture("u_material.diffuse", diffuse_texture, 0);
         app->data.piece_material_instances[index]->set_vec3("u_material.specular", glm::vec3(0.2f));
         app->data.piece_material_instances[index]->set_float("u_material.shininess", 4.0f);
+        app->data.piece_material_instances[index]->set_texture("u_material.normal", app->data.piece_normal_texture, 1);
         app->data.piece_material_instances[index]->set_vec3("u_material.tint", glm::vec3(1.0f));
     }
 }
@@ -612,24 +628,28 @@ void GameLayer::setup_board_paint() {
     board.paint_model.scale = 20.0f;
     board.paint_model.material = app->data.board_paint_material_instance;
 
-    // app->renderer->add_model(board.paint_model, Renderer::HasShadow);
+    app->renderer->add_model(board.paint_model, Renderer::HasShadow);
 
     DEB_DEBUG("Built board paint");
 }
 
 void GameLayer::setup_pieces() {
     for (unsigned int i = 0; i < 9; i++) {
-        setup_piece(i, Piece::Type::White, app->assets_data->white_piece_mesh,
-                app->data.white_piece_diffuse_texture, glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f));
+        setup_piece(
+            i, Piece::Type::White, app->assets_data->white_piece_mesh,
+            glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f)
+        );
     }
     for (unsigned int i = 9; i < 18; i++) {
-        setup_piece(i, Piece::Type::Black, app->assets_data->black_piece_mesh,
-                app->data.black_piece_diffuse_texture, glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f));
+        setup_piece(
+            i, Piece::Type::Black, app->assets_data->black_piece_mesh,
+            glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f)
+        );
     }
 }
 
-void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::VPTN>> mesh,
-        std::shared_ptr<Texture> texture, const glm::vec3& position) {
+void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::VPTNT>> mesh,
+        const glm::vec3& position) {
     board.pieces[index] = Piece(app->data.pieces_id[index], type);
 
     int random_rotation = rand() % 360;
@@ -641,7 +661,7 @@ void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_pt
     board.pieces[index].model.scale = 20.0f;
     board.pieces[index].model.material = app->data.piece_material_instances[index];
 
-    // app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow | Renderer::HasShadow);
+    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow | Renderer::HasShadow);
 
     DEB_DEBUG("Built piece {}", index);
 }
@@ -661,7 +681,7 @@ void GameLayer::setup_node(unsigned int index, const glm::vec3& position) {
     board.nodes[index].model.scale = 20.0f;
     board.nodes[index].model.material = app->data.node_material_instances[index];
 
-    // app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting);
+    app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting);
 
     DEB_DEBUG("Built node {}", index);
 }

@@ -1,0 +1,41 @@
+#version 430 core
+
+layout (location = 0) in vec3 a_position;
+layout (location = 1) in vec2 a_texture_coordinate;
+layout (location = 2) in vec3 a_normal;
+
+out vec2 v_texture_coordinate;
+out vec3 v_normal;
+out vec3 v_fragment_position;
+out vec4 v_fragment_position_light_space;
+out vec3 v_light_position_tangent;
+out vec3 v_view_position_tangent;
+
+uniform mat4 u_model_matrix;
+
+layout (binding = 0) uniform ProjectionView {
+    mat4 u_projection_view_matrix;
+};
+
+layout (binding = 2) uniform LightViewPosition {
+    vec3 u_light_position;
+    vec3 u_view_position;
+};
+
+layout (binding = 3) uniform LightSpace {
+    mat4 u_light_space_matrix;
+};
+
+void main() {
+    v_texture_coordinate = a_texture_coordinate;
+    v_normal = mat3(u_model_matrix) * a_normal;
+
+    v_fragment_position = vec3(u_model_matrix * vec4(a_position, 1.0));
+
+    v_fragment_position_light_space = u_light_space_matrix * vec4(v_fragment_position, 1.0);
+
+    v_light_position_tangent = u_light_position;
+    v_view_position_tangent = u_view_position;
+
+    gl_Position = u_projection_view_matrix * u_model_matrix * vec4(a_position, 1.0);
+}
