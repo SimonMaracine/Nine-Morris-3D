@@ -25,10 +25,15 @@ static const char* projection_view_block_fields[] = {
 };
 
 static const char* light_block_fields[] = {
-    "u_light_position",
+    // "u_light_position",
     "u_light_ambient",
     "u_light_diffuse",
-    "u_light_specular",
+    "u_light_specular"
+    // "u_view_position"
+};
+
+static const char* light_view_position_block_fields[] = {
+    "u_light_position",
     "u_view_position"
 };
 
@@ -49,6 +54,7 @@ Renderer::Renderer(Application* app)
 
     storage.projection_view_uniform_buffer = UniformBuffer::create();
     storage.light_uniform_buffer = UniformBuffer::create();
+    storage.light_view_position_uniform_buffer = UniformBuffer::create();
     storage.light_space_uniform_buffer = UniformBuffer::create();
 
     storage.projection_view_uniform_block.block_name = "ProjectionView";
@@ -58,16 +64,22 @@ Renderer::Renderer(Application* app)
     storage.projection_view_uniform_block.binding_index = 0;
 
     storage.light_uniform_block.block_name = "Light";
-    storage.light_uniform_block.field_count = 5;
+    storage.light_uniform_block.field_count = 3;
     storage.light_uniform_block.field_names = light_block_fields;
     storage.light_uniform_block.uniform_buffer = storage.light_uniform_buffer;
     storage.light_uniform_block.binding_index = 1;
+
+    storage.light_view_position_uniform_block.block_name = "LightViewPosition";
+    storage.light_view_position_uniform_block.field_count = 2;
+    storage.light_view_position_uniform_block.field_names = light_view_position_block_fields;
+    storage.light_view_position_uniform_block.uniform_buffer = storage.light_view_position_uniform_buffer;
+    storage.light_view_position_uniform_block.binding_index = 2;
 
     storage.light_space_uniform_block.block_name = "LightSpace";
     storage.light_space_uniform_block.field_count = 1;
     storage.light_space_uniform_block.field_names = light_space_block_fields;
     storage.light_space_uniform_block.uniform_buffer = storage.light_space_uniform_buffer;
-    storage.light_space_uniform_block.binding_index = 2;
+    storage.light_space_uniform_block.binding_index = 3;
 
     maybe_initialize_assets();
 
@@ -246,17 +258,23 @@ Renderer::~Renderer() {
 
 void Renderer::render() {
     const glm::mat4& projection_view_matrix = app->camera.get_projection_view_matrix();
+
     storage.projection_view_uniform_buffer->set(&projection_view_matrix, 0);
     storage.projection_view_uniform_buffer->bind();
     storage.projection_view_uniform_buffer->upload_data();
 
-    storage.light_uniform_buffer->set(&light.position, 0);
-    storage.light_uniform_buffer->set(&light.ambient_color, 1);
-    storage.light_uniform_buffer->set(&light.diffuse_color, 2);
-    storage.light_uniform_buffer->set(&light.specular_color, 3);
-    storage.light_uniform_buffer->set(&app->camera.get_position(), 4);
+    // storage.light_uniform_buffer->set(&light.position, 0);
+    storage.light_uniform_buffer->set(&light.ambient_color, 0);
+    storage.light_uniform_buffer->set(&light.diffuse_color, 1);
+    storage.light_uniform_buffer->set(&light.specular_color, 2);
+    // storage.light_uniform_buffer->set(&app->camera.get_position(), 4);
     storage.light_uniform_buffer->bind();
     storage.light_uniform_buffer->upload_data();
+
+    storage.light_view_position_uniform_buffer->set(&light.position, 0);
+    storage.light_view_position_uniform_buffer->set(&app->camera.get_position(), 1);
+    storage.light_view_position_uniform_buffer->bind();
+    storage.light_view_position_uniform_buffer->upload_data();
 
     setup_shadows();
     storage.depth_map_framebuffer->bind();

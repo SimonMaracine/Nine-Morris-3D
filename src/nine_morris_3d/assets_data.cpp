@@ -14,24 +14,25 @@ using namespace encryption;
 
 namespace assets_data {
     void all_start(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
-        loader->get()->board_mesh = load_model(convert(path_for_assets(BOARD_MESH)));
-        loader->get()->board_paint_mesh = load_model(convert(path_for_assets(BOARD_PAINT_MESH)));
-        loader->get()->node_mesh = load_model_position(convert(path_for_assets(NODE_MESH)), true);
-        loader->get()->white_piece_mesh = load_model(convert(path_for_assets(WHITE_PIECE_MESH)));
-        loader->get()->black_piece_mesh = load_model(convert(path_for_assets(BLACK_PIECE_MESH)));
+        loader->get()->board_mesh = load_model_VPTNT(convert(path_for_assets(BOARD_MESH)));
+        loader->get()->board_paint_mesh = load_model_VPTN(convert(path_for_assets(BOARD_PAINT_MESH)));
+        loader->get()->node_mesh = load_model_VP(convert(path_for_assets(NODE_MESH)), true);
+        loader->get()->white_piece_mesh = load_model_VPTN(convert(path_for_assets(WHITE_PIECE_MESH)));
+        loader->get()->black_piece_mesh = load_model_VPTN(convert(path_for_assets(BLACK_PIECE_MESH)));
 
         loader->get()->white_indicator_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_INDICATOR_TEXTURE)), true);
         loader->get()->black_indicator_texture = std::make_shared<TextureData>(convert(path_for_assets(BLACK_INDICATOR_TEXTURE)), true);
 
         if (options.texture_quality == options::NORMAL) {
-            loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_TEXTURE)), true);
+            loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_DIFFUSE_TEXTURE)), true);
             loader->get()->white_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_PIECE_TEXTURE)), true);
             loader->get()->black_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BLACK_PIECE_TEXTURE)), true);
+            loader->get()->board_wood_norm_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_NORMAL_TEXTURE)), true);
 
             if (options.labeled_board) {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_TEXTURE)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE)), true);
             } else {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE)), true);
             }
 
             if (options.skybox == options::FIELD) {
@@ -50,14 +51,14 @@ namespace assets_data {
                 loader->get()->skybox_nz_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_NZ_TEXTURE)), false);
             }
         } else if (options.texture_quality == options::LOW) {
-            loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_TEXTURE_SMALL)), true);
+            loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_DIFFUSE_TEXTURE_SMALL)), true);
             loader->get()->white_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_PIECE_TEXTURE_SMALL)), true);
             loader->get()->black_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BLACK_PIECE_TEXTURE_SMALL)), true);
 
             if (options.labeled_board) {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_TEXTURE_SMALL)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
             } else {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE_SMALL)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
             }
 
             if (options.skybox == options::FIELD) {
@@ -120,14 +121,14 @@ namespace assets_data {
 
     void texture_quality(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
         if (options.texture_quality == options::NORMAL) {
-            loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_TEXTURE)), true);
+            loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_DIFFUSE_TEXTURE)), true);
             loader->get()->white_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_PIECE_TEXTURE)), true);
             loader->get()->black_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BLACK_PIECE_TEXTURE)), true);
 
             if (options.labeled_board) {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_TEXTURE)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE)), true);
             } else {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE)), true);
             }
 
             if (options.skybox == options::FIELD) {
@@ -146,14 +147,14 @@ namespace assets_data {
                 loader->get()->skybox_nz_texture = std::make_shared<TextureData>(convert(path_for_assets(AUTUMN_NZ_TEXTURE)), false);
             }
         } else if (options.texture_quality == options::LOW) {
-            loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_TEXTURE_SMALL)), true);
+            loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_WOOD_DIFFUSE_TEXTURE_SMALL)), true);
             loader->get()->white_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(WHITE_PIECE_TEXTURE_SMALL)), true);
             loader->get()->black_piece_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BLACK_PIECE_TEXTURE_SMALL)), true);
 
             if (options.labeled_board) {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_TEXTURE_SMALL)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
             } else {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE_SMALL)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
             }
 
             if (options.skybox == options::FIELD) {
@@ -179,15 +180,15 @@ namespace assets_data {
     void board_texture(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
         if (options.texture_quality == options::NORMAL) {
             if (options.labeled_board) {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_TEXTURE)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE)), true);
             } else {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE)), true);
             }
         } else if (options.texture_quality == options::LOW) {
             if (options.labeled_board) {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_TEXTURE_SMALL)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
             } else {
-                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_TEXTURE_SMALL)), true);
+                loader->get()->board_paint_diff_texture = std::make_shared<TextureData>(convert(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
             }
         }
 

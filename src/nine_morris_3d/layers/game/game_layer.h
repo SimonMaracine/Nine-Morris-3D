@@ -38,7 +38,7 @@ public:
     void prepare_board();
     void prepare_board_paint();
     void prepare_pieces();
-    void prepare_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
+    void prepare_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::VPTN>> mesh,
         std::shared_ptr<Texture> texture, const glm::vec3& position);
     void prepare_nodes();
     void prepare_node(unsigned int index, const glm::vec3& position);
@@ -48,7 +48,7 @@ public:
     void setup_board();
     void setup_board_paint();
     void setup_pieces();
-    void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::Vertex>> mesh,
+    void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::VPTN>> mesh,
             std::shared_ptr<Texture> texture, const glm::vec3& position);
     void setup_nodes();
     void setup_node(unsigned int index, const glm::vec3& position);
