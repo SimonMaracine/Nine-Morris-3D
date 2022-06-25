@@ -35,6 +35,8 @@ public:
     Board() = default;
     ~Board() = default;
 
+    void copy_smart(const Board& other, bool state_history_inclusive);
+
     bool place_piece(hoverable::Id hovered_id);
     void move_pieces(float dt);
     bool take_piece(hoverable::Id hovered_id);
