@@ -34,9 +34,7 @@ void main() {
     v_entity_id = a_entity_id;
 
     v_fragment_position = vec3(u_model_matrix * vec4(a_position, 1.0));
-
     v_fragment_position_light_space = u_light_space_matrix * vec4(v_fragment_position, 1.0);
-
     v_light_position_tangent = u_light_position;
     v_view_position_tangent = u_view_position;
 

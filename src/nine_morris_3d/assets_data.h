@@ -8,11 +8,17 @@
 using namespace mesh;
 
 struct AssetsData {
-    std::shared_ptr<Mesh<VPTNT>> board_mesh;
-    std::shared_ptr<Mesh<VPTNT>> board_paint_mesh;
     std::shared_ptr<Mesh<VP>> node_mesh;
+    std::shared_ptr<Mesh<VPTNT>> board_wood_mesh;
+    std::shared_ptr<Mesh<VPTNT>> board_paint_mesh;
     std::shared_ptr<Mesh<VPTNT>> white_piece_mesh;
     std::shared_ptr<Mesh<VPTNT>> black_piece_mesh;
+
+    std::shared_ptr<Mesh<VPTN>> board_wood_no_normal_mesh;
+    std::shared_ptr<Mesh<VPTN>> board_paint_no_normal_mesh;
+    std::shared_ptr<Mesh<VPTN>> white_piece_no_normal_mesh;
+    std::shared_ptr<Mesh<VPTN>> black_piece_no_normal_mesh;
+
     std::shared_ptr<TextureData> board_wood_diff_texture;
     std::shared_ptr<TextureData> board_paint_diff_texture;
     std::shared_ptr<TextureData> black_piece_diff_texture;
@@ -21,6 +27,7 @@ struct AssetsData {
     std::shared_ptr<TextureData> piece_norm_texture;
     std::shared_ptr<TextureData> white_indicator_texture;
     std::shared_ptr<TextureData> black_indicator_texture;
+
     std::shared_ptr<TextureData> skybox_px_texture;
     std::shared_ptr<TextureData> skybox_nx_texture;
     std::shared_ptr<TextureData> skybox_py_texture;
@@ -33,5 +40,6 @@ namespace assets_data {
     void all_start(Loader<AssetsData, options::Options>* loader, const options::Options& options);
     void skybox(Loader<AssetsData, options::Options>* loader, const options::Options& options);
     void texture_quality(Loader<AssetsData, options::Options>* loader, const options::Options& options);
-    void board_texture(Loader<AssetsData, options::Options>* loader, const options::Options& options);
+    void board_paint_texture(Loader<AssetsData, options::Options>* loader, const options::Options& options);
+    void normal_mapping(Loader<AssetsData, options::Options>* loader, const options::Options& options);
 }

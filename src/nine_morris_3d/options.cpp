@@ -40,6 +40,7 @@ namespace options {
         object["sensitivity"] = options.sensitivity;
         object["hide_timer"] = options.hide_timer;
         object["labeled_board"] = options.labeled_board;
+        object["normal_mapping"] = options.normal_mapping;
 
         file << std::setw(4) << object;
 
@@ -90,6 +91,7 @@ namespace options {
             options_file.sensitivity = object.at("sensitivity").get<float>();
             options_file.hide_timer = object.at("hide_timer").get<bool>();
             options_file.labeled_board = object.at("labeled_board").get<bool>();
+            options_file.normal_mapping= object.at("normal_mapping").get<bool>();
         } catch (const json::out_of_range& e) {
             throw OptionsFileError(e.what());
         } catch (const json::type_error& e) {
@@ -129,6 +131,7 @@ namespace options {
         options.sensitivity = options_file.sensitivity;
         options.hide_timer = options_file.hide_timer;
         options.labeled_board = options_file.labeled_board;
+        options.normal_mapping = options_file.normal_mapping;
 
         DEB_INFO("Loaded options from file '{}'", file_path);
     }
@@ -162,6 +165,7 @@ namespace options {
         object["sensitivity"] = options.sensitivity;
         object["hide_timer"] = options.hide_timer;
         object["labeled_board"] = options.labeled_board;
+        object["normal_mapping"] = options.normal_mapping;
 
         file << object.dump(4);
 

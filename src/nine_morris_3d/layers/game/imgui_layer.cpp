@@ -278,6 +278,18 @@ void ImGuiLayer::on_update(float dt) {
                         DEB_INFO("Set default cursor");
                     }
                 }
+                static bool normal_mapping = app->options.normal_mapping;
+                if (ImGui::MenuItem("Normal Mapping", nullptr, &normal_mapping)) {
+                    if (normal_mapping) {
+                        game_layer->set_normal_mapping(normal_mapping);
+
+                        DEB_INFO("Normal mapping enabled");
+                    } else {
+                        game_layer->set_normal_mapping(normal_mapping);
+
+                        DEB_INFO("Normal mapping disabled");
+                    }
+                }
 
                 ImGui::EndMenu();
                 HOVERING_GUI();
@@ -732,7 +744,7 @@ void ImGuiLayer::draw_debug(float dt) {
             app->data.board_paint_shader->recompile();
         }
         if (ImGui::Button("board")) {
-            app->data.board_shader->recompile();
+            app->data.board_wood_shader->recompile();
         }
         if (ImGui::Button("node")) {
             app->data.node_shader->recompile();

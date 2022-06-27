@@ -11,6 +11,8 @@
 #include "other/mesh.h"
 #include "other/loader.h"
 
+using namespace mesh;
+
 class ImGuiLayer;
 class GuiLayer;
 
@@ -38,8 +40,15 @@ public:
     void prepare_board();
     void prepare_board_paint();
     void prepare_pieces();
-    void prepare_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::VPTNT>> mesh,
-        std::shared_ptr<Texture> diffuse_texture, const glm::vec3& position);
+    void prepare_piece(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
+            std::shared_ptr<Texture> diffuse_texture);
+
+    void prepare_board_no_normal();
+    void prepare_board_paint_no_normal();
+    void prepare_pieces_no_normal();
+    void prepare_piece_no_normal(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
+            std::shared_ptr<Texture> diffuse_texture);
+
     void prepare_nodes();
     void prepare_node(unsigned int index, const glm::vec3& position);
 
@@ -48,8 +57,13 @@ public:
     void setup_board();
     void setup_board_paint();
     void setup_pieces();
-    void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<mesh::Mesh<mesh::VPTNT>> mesh,
-            const glm::vec3& position);
+    void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh);
+
+    void setup_board_no_normal();
+    void setup_board_paint_no_normal();
+    void setup_pieces_no_normal();
+    void setup_piece_no_normal(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh);
+
     void setup_nodes();
     void setup_node(unsigned int index, const glm::vec3& position);
 
@@ -61,10 +75,12 @@ public:
     void set_texture_quality(std::string_view quality);
     void set_skybox(std::string_view skybox);
     void set_labeled_board_texture(bool labeled_board);
+    void set_normal_mapping(bool normal_mapping);
 
     void actually_change_texture_quality();
     void actually_change_skybox();
-    void actually_change_board_texture();
+    void actually_change_labeled_board_texture();
+    void actually_change_normal_mapping();
 
     void load_game();
     
@@ -84,7 +100,8 @@ public:
 
     bool changed_skybox = false;
     bool changed_texture_quality = false;
-    bool changed_board_texture = false;
+    bool changed_labeled_board_texture = false;
+    bool changed_normal_mapping = false;
 
     ImGuiLayer* imgui_layer = nullptr;
     GuiLayer* gui_layer = nullptr;

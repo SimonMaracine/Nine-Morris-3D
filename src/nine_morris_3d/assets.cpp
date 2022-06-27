@@ -1,7 +1,7 @@
 #include "application/platform.h"
 
 namespace assets {
-    std::string BOARD_MESH = "data/models/board/board.obj";
+    std::string BOARD_WOOD_MESH = "data/models/board/board.obj";
     std::string BOARD_PAINT_MESH = "data/models/board/board_paint.obj";
     std::string NODE_MESH = "data/models/node/node.obj";
     std::string WHITE_PIECE_MESH = "data/models/piece/white_piece.obj";
@@ -10,18 +10,22 @@ namespace assets {
     std::string BOARD_WOOD_DIFFUSE_TEXTURE = "data/textures/board/board_wood.png";
     std::string BOARD_PAINT_DIFFUSE_TEXTURE = "data/textures/board/board_paint.png";
     std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE = "data/textures/board/board_paint_labeled.png";
+    std::string BOARD_NORMAL_TEXTURE = "data/textures/board/board_normal.png";
+    std::string PIECE_NORMAL_TEXTURE = "data/textures/piece/piece_normal.png";
     std::string WHITE_PIECE_DIFFUSE_TEXTURE = "data/textures/piece/white_piece.png";
     std::string BLACK_PIECE_DIFFUSE_TEXTURE = "data/textures/piece/black_piece.png";
+
     std::string BOARD_WOOD_DIFFUSE_TEXTURE_SMALL = "data/textures/board/board_wood-small.png";
     std::string BOARD_PAINT_DIFFUSE_TEXTURE_SMALL = "data/textures/board/board_paint-small.png";
     std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL = "data/textures/board/board_paint_labeled-small.png";
+    std::string BOARD_NORMAL_TEXTURE_SMALL = "data/textures/board/board_normal-small.png";
+    std::string PIECE_NORMAL_TEXTURE_SMALL = "data/textures/piece/piece_normal-small.png";
     std::string WHITE_PIECE_DIFFUSE_TEXTURE_SMALL = "data/textures/piece/white_piece-small.png";
     std::string BLACK_PIECE_DIFFUSE_TEXTURE_SMALL = "data/textures/piece/black_piece-small.png";
+
     std::string WHITE_INDICATOR_TEXTURE = "data/textures/indicator/white_indicator.png";
     std::string BLACK_INDICATOR_TEXTURE = "data/textures/indicator/black_indicator.png";
     std::string SPLASH_SCREEN_TEXTURE = "data/textures/splash_screen/splash_screen.png";
-    std::string BOARD_NORMAL_TEXTURE = "data/textures/board/board_normal.png";
-    std::string PIECE_NORMAL_TEXTURE = "data/textures/piece/piece_normal.png";
 
     std::string OPEN_SANS_FONT = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
     std::string GOOD_DOG_PLAIN_FONT = "data/fonts/FH-GoodDogPlain-WTT/GOODDP__.TTF";
@@ -59,6 +63,12 @@ namespace assets {
     std::string PIECE_FRAGMENT_SHADER = "data/shaders/piece.frag";
     std::string NODE_VERTEX_SHADER = "data/shaders/node.vert";
     std::string NODE_FRAGMENT_SHADER = "data/shaders/node.frag";
+    std::string BOARD_NO_NORMAL_VERTEX_SHADER = "data/shaders/board_no_normal.vert";
+    std::string BOARD_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/board_no_normal.frag";
+    std::string BOARD_PAINT_NO_NORMAL_VERTEX_SHADER = "data/shaders/board_paint_no_normal.vert";
+    std::string BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/board_paint_no_normal.frag";
+    std::string PIECE_NO_NORMAL_VERTEX_SHADER = "data/shaders/piece_no_normal.vert";
+    std::string PIECE_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/piece_no_normal.frag";
 
     std::string ICON_512 = "data/icons/512x512/ninemorris3d.png";
     std::string ICON_256 = "data/icons/256x256/ninemorris3d.png";
@@ -74,7 +84,7 @@ namespace assets {
         static const char* PREFIX = ".dat";
 
         static constexpr std::array<std::string*, 50> assets = {
-            &BOARD_MESH,
+            &BOARD_WOOD_MESH,
             &BOARD_PAINT_MESH,
             &NODE_MESH,
             &WHITE_PIECE_MESH,

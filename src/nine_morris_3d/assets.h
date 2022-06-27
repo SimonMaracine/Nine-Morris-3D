@@ -3,7 +3,7 @@
 namespace assets {
     void maybe_initialize_assets();
 
-    extern std::string BOARD_MESH;
+    extern std::string BOARD_WOOD_MESH;
     extern std::string BOARD_PAINT_MESH;
     extern std::string NODE_MESH;
     extern std::string WHITE_PIECE_MESH;
@@ -12,18 +12,22 @@ namespace assets {
     extern std::string BOARD_WOOD_DIFFUSE_TEXTURE;
     extern std::string BOARD_PAINT_DIFFUSE_TEXTURE;
     extern std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE;
+    extern std::string BOARD_NORMAL_TEXTURE;
+    extern std::string PIECE_NORMAL_TEXTURE;
     extern std::string WHITE_PIECE_DIFFUSE_TEXTURE;
     extern std::string BLACK_PIECE_DIFFUSE_TEXTURE;
+
     extern std::string BOARD_WOOD_DIFFUSE_TEXTURE_SMALL;
     extern std::string BOARD_PAINT_DIFFUSE_TEXTURE_SMALL;
     extern std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL;
+    extern std::string BOARD_NORMAL_TEXTURE_SMALL;
+    extern std::string PIECE_NORMAL_TEXTURE_SMALL;
     extern std::string WHITE_PIECE_DIFFUSE_TEXTURE_SMALL;
     extern std::string BLACK_PIECE_DIFFUSE_TEXTURE_SMALL;
+
     extern std::string WHITE_INDICATOR_TEXTURE;
     extern std::string BLACK_INDICATOR_TEXTURE;
     extern std::string SPLASH_SCREEN_TEXTURE;
-    extern std::string BOARD_NORMAL_TEXTURE;
-    extern std::string PIECE_NORMAL_TEXTURE;
 
     extern std::string OPEN_SANS_FONT;
     extern std::string GOOD_DOG_PLAIN_FONT;
@@ -61,6 +65,12 @@ namespace assets {
     extern std::string PIECE_FRAGMENT_SHADER;
     extern std::string NODE_VERTEX_SHADER;
     extern std::string NODE_FRAGMENT_SHADER;
+    extern std::string BOARD_NO_NORMAL_VERTEX_SHADER;
+    extern std::string BOARD_NO_NORMAL_FRAGMENT_SHADER;
+    extern std::string BOARD_PAINT_NO_NORMAL_VERTEX_SHADER;
+    extern std::string BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER;
+    extern std::string PIECE_NO_NORMAL_VERTEX_SHADER;
+    extern std::string PIECE_NO_NORMAL_FRAGMENT_SHADER;
 
     extern std::string ICON_512;
     extern std::string ICON_256;

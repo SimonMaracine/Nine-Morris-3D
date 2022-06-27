@@ -20,11 +20,9 @@ struct Material {
 uniform Material u_material;
 
 layout (binding = 1) uniform Light {
-    // vec3 u_light_position;
     vec3 u_light_ambient;
     vec3 u_light_diffuse;
     vec3 u_light_specular;
-    // vec3 u_view_position;
 };
 
 float calculate_shadow(vec4 fragment_position_light_space, vec3 normal, vec3 light_direction) {

@@ -53,13 +53,14 @@ public:
         ImFont* imgui_info_font = nullptr;
         ImFont* imgui_windows_font = nullptr;
 
-        std::shared_ptr<VertexArray> board_vertex_array;
-        std::shared_ptr<Shader> board_shader;
-        std::shared_ptr<Texture> board_diffuse_texture;
         std::shared_ptr<Texture> board_normal_texture;
 
+        std::shared_ptr<VertexArray> board_wood_vertex_array;
+        std::shared_ptr<Shader> board_wood_shader;
+        std::shared_ptr<Texture> board_wood_diffuse_texture;
+
         std::shared_ptr<Material> wood_material;
-        std::shared_ptr<MaterialInstance> board_material_instance;
+        std::shared_ptr<MaterialInstance> board_wood_material_instance;
 
         hoverable::Id pieces_id[18];
         std::shared_ptr<VertexArray> piece_vertex_arrays[18];
@@ -82,7 +83,6 @@ public:
         std::shared_ptr<VertexArray> board_paint_vertex_array;
         std::shared_ptr<Shader> board_paint_shader;
         std::shared_ptr<Texture> board_paint_diffuse_texture;
-        std::shared_ptr<Texture> board_paint_normal_texture;
 
         std::shared_ptr<Material> paint_material;
         std::shared_ptr<MaterialInstance> board_paint_material_instance;
