@@ -26,21 +26,26 @@ layout (binding = 3) uniform LightSpace {
     mat4 u_light_space_matrix;
 };
 
+mat3 compute_TBN(mat4 model_matrix, vec3 normal, vec3 tangent) {
+    const vec3 bitangent = cross(normal, tangent);
+
+    const vec3 T = normalize(vec3(model_matrix * vec4(tangent, 0.0)));
+    const vec3 B = normalize(vec3(model_matrix * vec4(bitangent, 0.0)));
+    const vec3 N = normalize(vec3(model_matrix * vec4(normal, 0.0)));
+
+    return mat3(T, B, N);
+}
+
 void main() {
     v_texture_coordinate = a_texture_coordinate;
 
-    vec3 bitangent = cross(a_normal, a_tangent);
-
-    vec3 T = normalize(vec3(u_model_matrix * vec4(a_tangent, 0.0)));
-    vec3 B = normalize(vec3(u_model_matrix * vec4(bitangent, 0.0)));
-    vec3 N = normalize(vec3(u_model_matrix * vec4(a_normal, 0.0)));
-    mat3 TBN = mat3(T, B, N);
+    mat3 TBN = compute_TBN(u_model_matrix, a_normal, a_tangent);
     TBN = transpose(TBN);
 
-    vec3 v_fragment_position = vec3(u_model_matrix * vec4(a_position, 1.0));
+    const vec3 fragment_position = vec3(u_model_matrix * vec4(a_position, 1.0));
 
-    v_fragment_position_tangent = TBN * v_fragment_position;
-    v_fragment_position_light_space = u_light_space_matrix * vec4(v_fragment_position, 1.0);
+    v_fragment_position_tangent = TBN * fragment_position;
+    v_fragment_position_light_space = u_light_space_matrix * vec4(fragment_position, 1.0);
     v_light_position_tangent = TBN * u_light_position;
     v_view_position_tangent = TBN * u_view_position;
 
