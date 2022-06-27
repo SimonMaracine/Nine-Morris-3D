@@ -7,21 +7,21 @@ namespace assets {
     std::string WHITE_PIECE_MESH = "data/models/piece/white_piece.obj";
     std::string BLACK_PIECE_MESH = "data/models/piece/black_piece.obj";
 
-    std::string BOARD_WOOD_DIFFUSE_TEXTURE = "data/textures/board/board_wood.png";
-    std::string BOARD_PAINT_DIFFUSE_TEXTURE = "data/textures/board/board_paint.png";
-    std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE = "data/textures/board/board_paint_labeled.png";
+    std::string BOARD_WOOD_DIFFUSE_TEXTURE = "data/textures/board/wood/board_wood.png";
+    std::string BOARD_PAINT_DIFFUSE_TEXTURE = "data/textures/board/paint/board_paint.png";
+    std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE = "data/textures/board/paint/board_paint_labeled.png";
     std::string BOARD_NORMAL_TEXTURE = "data/textures/board/board_normal.png";
     std::string PIECE_NORMAL_TEXTURE = "data/textures/piece/piece_normal.png";
-    std::string WHITE_PIECE_DIFFUSE_TEXTURE = "data/textures/piece/white_piece.png";
-    std::string BLACK_PIECE_DIFFUSE_TEXTURE = "data/textures/piece/black_piece.png";
+    std::string WHITE_PIECE_DIFFUSE_TEXTURE = "data/textures/piece/white/white_piece.png";
+    std::string BLACK_PIECE_DIFFUSE_TEXTURE = "data/textures/piece/black/black_piece.png";
 
-    std::string BOARD_WOOD_DIFFUSE_TEXTURE_SMALL = "data/textures/board/board_wood-small.png";
-    std::string BOARD_PAINT_DIFFUSE_TEXTURE_SMALL = "data/textures/board/board_paint-small.png";
-    std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL = "data/textures/board/board_paint_labeled-small.png";
+    std::string BOARD_WOOD_DIFFUSE_TEXTURE_SMALL = "data/textures/board/wood/board_wood-small.png";
+    std::string BOARD_PAINT_DIFFUSE_TEXTURE_SMALL = "data/textures/board/paint/board_paint-small.png";
+    std::string LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL = "data/textures/board/paint/board_paint_labeled-small.png";
     std::string BOARD_NORMAL_TEXTURE_SMALL = "data/textures/board/board_normal-small.png";
     std::string PIECE_NORMAL_TEXTURE_SMALL = "data/textures/piece/piece_normal-small.png";
-    std::string WHITE_PIECE_DIFFUSE_TEXTURE_SMALL = "data/textures/piece/white_piece-small.png";
-    std::string BLACK_PIECE_DIFFUSE_TEXTURE_SMALL = "data/textures/piece/black_piece-small.png";
+    std::string WHITE_PIECE_DIFFUSE_TEXTURE_SMALL = "data/textures/piece/white/white_piece-small.png";
+    std::string BLACK_PIECE_DIFFUSE_TEXTURE_SMALL = "data/textures/piece/black/black_piece-small.png";
 
     std::string WHITE_INDICATOR_TEXTURE = "data/textures/indicator/white_indicator.png";
     std::string BLACK_INDICATOR_TEXTURE = "data/textures/indicator/black_indicator.png";
@@ -55,20 +55,20 @@ namespace assets {
     std::string AUTUMN_PZ_TEXTURE_SMALL = "data/textures/skybox/autumn/pz-small.png";
     std::string AUTUMN_NZ_TEXTURE_SMALL = "data/textures/skybox/autumn/nz-small.png";
 
-    std::string BOARD_VERTEX_SHADER = "data/shaders/board.vert";
-    std::string BOARD_FRAGMENT_SHADER = "data/shaders/board.frag";
-    std::string BOARD_PAINT_VERTEX_SHADER = "data/shaders/board_paint.vert";
-    std::string BOARD_PAINT_FRAGMENT_SHADER = "data/shaders/board_paint.frag";
-    std::string PIECE_VERTEX_SHADER = "data/shaders/piece.vert";
-    std::string PIECE_FRAGMENT_SHADER = "data/shaders/piece.frag";
-    std::string NODE_VERTEX_SHADER = "data/shaders/node.vert";
-    std::string NODE_FRAGMENT_SHADER = "data/shaders/node.frag";
-    std::string BOARD_NO_NORMAL_VERTEX_SHADER = "data/shaders/board_no_normal.vert";
-    std::string BOARD_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/board_no_normal.frag";
-    std::string BOARD_PAINT_NO_NORMAL_VERTEX_SHADER = "data/shaders/board_paint_no_normal.vert";
-    std::string BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/board_paint_no_normal.frag";
-    std::string PIECE_NO_NORMAL_VERTEX_SHADER = "data/shaders/piece_no_normal.vert";
-    std::string PIECE_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/piece_no_normal.frag";
+    std::string BOARD_VERTEX_SHADER = "data/shaders/board/board.vert";
+    std::string BOARD_FRAGMENT_SHADER = "data/shaders/board/board.frag";
+    std::string BOARD_PAINT_VERTEX_SHADER = "data/shaders/board/board_paint.vert";
+    std::string BOARD_PAINT_FRAGMENT_SHADER = "data/shaders/board/board_paint.frag";
+    std::string PIECE_VERTEX_SHADER = "data/shaders/piece/piece.vert";
+    std::string PIECE_FRAGMENT_SHADER = "data/shaders/piece/piece.frag";
+    std::string NODE_VERTEX_SHADER = "data/shaders/node/node.vert";
+    std::string NODE_FRAGMENT_SHADER = "data/shaders/node/node.frag";
+    std::string BOARD_NO_NORMAL_VERTEX_SHADER = "data/shaders/board/board_no_normal.vert";
+    std::string BOARD_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/board/board_no_normal.frag";
+    std::string BOARD_PAINT_NO_NORMAL_VERTEX_SHADER = "data/shaders/board/board_paint_no_normal.vert";
+    std::string BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/board/board_paint_no_normal.frag";
+    std::string PIECE_NO_NORMAL_VERTEX_SHADER = "data/shaders/piece/piece_no_normal.vert";
+    std::string PIECE_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/piece/piece_no_normal.frag";
 
     std::string ICON_512 = "data/icons/512x512/ninemorris3d.png";
     std::string ICON_256 = "data/icons/256x256/ninemorris3d.png";
@@ -76,8 +76,8 @@ namespace assets {
     std::string ICON_64 = "data/icons/64x64/ninemorris3d.png";
     std::string ICON_32 = "data/icons/32x32/ninemorris3d.png";
 
-    std::string ARROW_CURSOR = "data/cursors/arrow.png";
-    std::string CROSS_CURSOR = "data/cursors/cross.png";
+    std::string ARROW_CURSOR = "data/cursors/arrow/arrow.png";
+    std::string CROSS_CURSOR = "data/cursors/cross/cross.png";
 
     void maybe_initialize_assets() {
 #ifdef PLATFORM_GAME_RELEASE

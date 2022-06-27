@@ -9,8 +9,8 @@ function encrypt() {
     $ENCRYPTER $DATA/$1 $DATA/$1$SUFFIX $KEY
 }
 
-encrypt cursors/arrow.png
-encrypt cursors/cross.png
+encrypt cursors/arrow/arrow.png
+encrypt cursors/cross/cross.png
 
 encrypt models/board/board.obj
 encrypt models/board/board_paint.obj
@@ -34,27 +34,31 @@ encrypt shaders/internal/skybox.vert
 encrypt shaders/internal/skybox.frag
 encrypt shaders/internal/text.vert
 encrypt shaders/internal/text.frag
-encrypt shaders/board_paint.vert
-encrypt shaders/board_paint.frag
-encrypt shaders/board.vert
-encrypt shaders/board.frag
-encrypt shaders/node.vert
-encrypt shaders/node.frag
-encrypt shaders/piece.vert
-encrypt shaders/piece.frag
+encrypt shaders/board/board_paint.vert
+encrypt shaders/board/board_paint.frag
+encrypt shaders/board/board.vert
+encrypt shaders/board/board.frag
+encrypt shaders/node/node.vert
+encrypt shaders/node/node.frag
+encrypt shaders/piece/piece.vert
+encrypt shaders/piece/piece.frag
 
 encrypt textures/board/board_normal.png
-encrypt textures/board/board_paint.png
-encrypt textures/board/board_paint-small.png
-encrypt textures/board/board_wood.png
-encrypt textures/board/board_wood-small.png
+encrypt textures/board/board_normal-small.png
+encrypt textures/board/paint/board_paint.png
+encrypt textures/board/paint/board_paint-small.png
+encrypt textures/board/paint/board_paint_labeled.png
+encrypt textures/board/paint/board_paint_labeled-small.png
+encrypt textures/board/wood/board_wood.png
+encrypt textures/board/wood/board_wood-small.png
 encrypt textures/indicator/white_indicator.png
 encrypt textures/indicator/black_indicator.png
 encrypt textures/piece/piece_normal.png
-encrypt textures/piece/white_piece.png
-encrypt textures/piece/white_piece-small.png
-encrypt textures/piece/black_piece.png
-encrypt textures/piece/black_piece-small.png
+encrypt textures/piece/piece_normal-small.png
+encrypt textures/piece/white/white_piece.png
+encrypt textures/piece/white/white_piece-small.png
+encrypt textures/piece/black/black_piece.png
+encrypt textures/piece/black/black_piece-small.png
 encrypt textures/skybox/autumn/nx.png
 encrypt textures/skybox/autumn/nx-small.png
 encrypt textures/skybox/autumn/ny.png

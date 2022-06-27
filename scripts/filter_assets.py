@@ -33,6 +33,7 @@ def visit_directory(directory: str):
 
 if __name__ == "__main__":
     os.chdir("..")
+    print("Copying...")
     dir_util.copy_tree(DATA, DATA_FILTERED)
     visit_directory(DATA_FILTERED)
     print("Done")
