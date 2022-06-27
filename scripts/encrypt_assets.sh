@@ -38,10 +38,16 @@ encrypt shaders/board/board_paint.vert
 encrypt shaders/board/board_paint.frag
 encrypt shaders/board/board.vert
 encrypt shaders/board/board.frag
+encrypt shaders/board/board_paint_no_normal.vert
+encrypt shaders/board/board_paint_no_normal.frag
+encrypt shaders/board/board_no_normal.vert
+encrypt shaders/board/board_no_normal.frag
 encrypt shaders/node/node.vert
 encrypt shaders/node/node.frag
 encrypt shaders/piece/piece.vert
 encrypt shaders/piece/piece.frag
+encrypt shaders/piece/piece_no_normal.vert
+encrypt shaders/piece/piece_no_normal.frag
 
 encrypt textures/board/board_normal.png
 encrypt textures/board/board_normal-small.png
