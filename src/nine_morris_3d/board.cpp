@@ -246,9 +246,9 @@ void Board::move_pieces(float dt) {
 bool Board::take_piece(hoverable::Id hovered_id) {
     bool took = false;
 
-    GET_ACTIVE_PIECES(active_pieces)
-
     if (hovered_piece != nullptr) {  // Do anything only if there is a hovered piece
+        GET_ACTIVE_PIECES(active_pieces)
+
         for (Piece* piece : active_pieces) {
             if (turn == Player::White) {
                 if (piece->id == hovered_id && hovered_piece->id == hovered_id &&
