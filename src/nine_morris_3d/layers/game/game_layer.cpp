@@ -1314,7 +1314,7 @@ void GameLayer::load_game() {
 
     app->camera = state.camera;
 
-    board.copy_smart(state.board, true);
+    Board::copy_smart(board, state.board, true);
 
     // Reset pieces' models
     for (Piece& piece : board.pieces) {

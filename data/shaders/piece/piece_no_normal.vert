@@ -10,8 +10,8 @@ out vec3 v_normal;
 out flat int v_entity_id;
 out vec3 v_fragment_position;
 out vec4 v_fragment_position_light_space;
-out vec3 v_light_position_tangent;
-out vec3 v_view_position_tangent;
+out vec3 v_light_position;
+out vec3 v_view_position;
 
 uniform mat4 u_model_matrix;
 
@@ -35,8 +35,8 @@ void main() {
 
     v_fragment_position = vec3(u_model_matrix * vec4(a_position, 1.0));
     v_fragment_position_light_space = u_light_space_matrix * vec4(v_fragment_position, 1.0);
-    v_light_position_tangent = u_light_position;
-    v_view_position_tangent = u_view_position;
+    v_light_position = u_light_position;
+    v_view_position = u_view_position;
 
     gl_Position = u_projection_view_matrix * u_model_matrix * vec4(a_position, 1.0);
 }

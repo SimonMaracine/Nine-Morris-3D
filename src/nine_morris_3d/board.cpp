@@ -31,93 +31,93 @@ constexpr unsigned int WINDMILLS[16][3] = {
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-void Board::copy_smart(const Board& other, bool state_history_inclusive) {
-    model.index_count = other.model.index_count;
-    model.position = other.model.position;
-    model.rotation = other.model.rotation;
-    model.scale = other.model.scale;
-    model.outline_color = other.model.outline_color;
+void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusive) {
+    to.model.index_count = from.model.index_count;
+    to.model.position = from.model.position;
+    to.model.rotation = from.model.rotation;
+    to.model.scale = from.model.scale;
+    to.model.outline_color = from.model.outline_color;
 
-    paint_model.index_count = other.paint_model.index_count;
-    paint_model.position = other.paint_model.position;
-    paint_model.rotation = other.paint_model.rotation;
-    paint_model.scale = other.paint_model.scale;
-    paint_model.outline_color = other.paint_model.outline_color;
+    to.paint_model.index_count = from.paint_model.index_count;
+    to.paint_model.position = from.paint_model.position;
+    to.paint_model.rotation = from.paint_model.rotation;
+    to.paint_model.scale = from.paint_model.scale;
+    to.paint_model.outline_color = from.paint_model.outline_color;
 
     for (unsigned int i = 0; i < 24; i++) {
-        Node& node = nodes[i];
-        node.id = other.nodes[i].id;
-        node.model.index_count = other.nodes[i].model.index_count;
-        node.model.position = other.nodes[i].model.position;
-        node.model.rotation = other.nodes[i].model.rotation;
-        node.model.scale = other.nodes[i].model.scale;
-        node.model.outline_color = other.nodes[i].model.outline_color;
-        node.piece_id = other.nodes[i].piece_id;
+        Node& node = to.nodes[i];
+        node.id = from.nodes[i].id;
+        node.model.index_count = from.nodes[i].model.index_count;
+        node.model.position = from.nodes[i].model.position;
+        node.model.rotation = from.nodes[i].model.rotation;
+        node.model.scale = from.nodes[i].model.scale;
+        node.model.outline_color = from.nodes[i].model.outline_color;
+        node.piece_id = from.nodes[i].piece_id;
         node.piece = nullptr;  // It must be null, if the ids don't match
         // Assign correct addresses
-        for (Piece& piece : const_cast<Board&>(other).pieces) {
+        for (Piece& piece : const_cast<Board&>(from).pieces) {
             if (piece.id == node.piece_id) {
                 node.piece = &piece;
                 break;
             }
         }
-        node.index = other.nodes[i].index;
+        node.index = from.nodes[i].index;
     }
 
     for (unsigned int i = 0; i < 18; i++) {
-        Piece& piece = pieces[i];
-        piece.id = other.pieces[i].id;
-        piece.model.index_count = other.pieces[i].model.index_count;
-        piece.model.position = other.pieces[i].model.position;
-        piece.model.rotation = other.pieces[i].model.rotation;
-        piece.model.scale = other.pieces[i].model.scale;
-        piece.model.outline_color = other.pieces[i].model.outline_color;
-        piece.movement.type = other.pieces[i].movement.type;
-        piece.movement.velocity = other.pieces[i].movement.velocity;
-        piece.movement.target = other.pieces[i].movement.target;
-        piece.movement.target0 = other.pieces[i].movement.target0;
-        piece.movement.target1 = other.pieces[i].movement.target1;
-        piece.movement.reached_target0 = other.pieces[i].movement.reached_target0;
-        piece.movement.reached_target1 = other.pieces[i].movement.reached_target1;
-        piece.should_move = other.pieces[i].should_move;
-        piece.type = other.pieces[i].type;
-        piece.in_use = other.pieces[i].in_use;
-        piece.node_id = other.pieces[i].node_id;
+        Piece& piece = to.pieces[i];
+        piece.id = from.pieces[i].id;
+        piece.model.index_count = from.pieces[i].model.index_count;
+        piece.model.position = from.pieces[i].model.position;
+        piece.model.rotation = from.pieces[i].model.rotation;
+        piece.model.scale = from.pieces[i].model.scale;
+        piece.model.outline_color = from.pieces[i].model.outline_color;
+        piece.movement.type = from.pieces[i].movement.type;
+        piece.movement.velocity = from.pieces[i].movement.velocity;
+        piece.movement.target = from.pieces[i].movement.target;
+        piece.movement.target0 = from.pieces[i].movement.target0;
+        piece.movement.target1 = from.pieces[i].movement.target1;
+        piece.movement.reached_target0 = from.pieces[i].movement.reached_target0;
+        piece.movement.reached_target1 = from.pieces[i].movement.reached_target1;
+        piece.should_move = from.pieces[i].should_move;
+        piece.type = from.pieces[i].type;
+        piece.in_use = from.pieces[i].in_use;
+        piece.node_id = from.pieces[i].node_id;
         piece.node = nullptr;  // It must be null, if the ids don't match
         // Assign correct addresses; use only this as nodes have already been assigned
-        for (Node& node : nodes) {
+        for (Node& node : to.nodes) {
             if (node.id == piece.node_id) {
                 piece.node = &node;
                 break;
             }
         }
-        piece.show_outline = other.pieces[i].show_outline;
-        piece.to_take = other.pieces[i].to_take;
+        piece.show_outline = from.pieces[i].show_outline;
+        piece.to_take = from.pieces[i].to_take;
         piece.pending_remove = false;
         piece.selected = false;
-        piece.active = other.pieces[i].active;
+        piece.active = from.pieces[i].active;
     }
 
-    phase = other.phase;
-    turn = other.turn;
-    ending = other.ending;
-    ending_message = other.ending_message;
-    white_pieces_count = other.white_pieces_count;
-    black_pieces_count = other.black_pieces_count;
-    not_placed_white_pieces_count = other.not_placed_white_pieces_count;
-    not_placed_black_pieces_count = other.not_placed_black_pieces_count;
-    should_take_piece = other.should_take_piece;
-    hovered_node = nullptr;
-    hovered_piece = nullptr;
-    selected_piece = nullptr;
-    can_jump = other.can_jump;
-    turns_without_mills = other.turns_without_mills;
-    repetition_history = other.repetition_history;
+    to.phase = from.phase;
+    to.turn = from.turn;
+    to.ending = from.ending;
+    to.ending_message = from.ending_message;
+    to.white_pieces_count = from.white_pieces_count;
+    to.black_pieces_count = from.black_pieces_count;
+    to.not_placed_white_pieces_count = from.not_placed_white_pieces_count;
+    to.not_placed_black_pieces_count = from.not_placed_black_pieces_count;
+    to.should_take_piece = from.should_take_piece;
+    to.hovered_node = nullptr;
+    to.hovered_piece = nullptr;
+    to.selected_piece = nullptr;
+    to.can_jump = from.can_jump;
+    to.turns_without_mills = from.turns_without_mills;
+    to.repetition_history = from.repetition_history;
     if (state_history_inclusive) {
-        undo_state_history = other.undo_state_history;
-        redo_state_history = other.redo_state_history;
+        to.undo_state_history = from.undo_state_history;
+        to.redo_state_history = from.redo_state_history;
     }
-    next_move = other.next_move;
+    to.next_move = from.next_move;
 }
 
 bool Board::place_piece(hoverable::Id hovered_id) {
@@ -505,7 +505,7 @@ bool Board::undo() {
     Board previous_state = *this;
     Board& state_board = undo_state_history->back();
 
-    copy_smart(state_board, false);
+    copy_smart(*this, state_board, false);
 
     // Reset pieces' models
     for (Piece& piece : pieces) {
@@ -532,7 +532,7 @@ bool Board::redo() {
     Board previous_state = *this;
     Board& state_board = redo_state_history->back();
 
-    copy_smart(state_board, false);
+    copy_smart(*this, state_board, false);
 
     // Reset pieces' models
     for (Piece& piece : pieces) {

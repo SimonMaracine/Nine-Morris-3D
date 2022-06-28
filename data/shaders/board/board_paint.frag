@@ -66,6 +66,7 @@ vec4 calculate_light(
         vec4 texture_colors,
         vec3 fragment_position,
         vec4 fragment_position_light_space,
+        sampler2D shadow_map,
         vec2 texture_coordinate) {
     // Ambient light
     const vec4 ambient_light = texture_colors * vec4(light_ambient, 1.0);
@@ -85,7 +86,7 @@ vec4 calculate_light(
     const vec4 specular_light = vec4(material.specular, 0.0) * specular_strength * vec4(light_specular, 0.0);
 
     // Calculate shadow and final result
-    const float shadow = calculate_shadow(fragment_position_light_space, normal, light_direction, u_shadow_map);
+    const float shadow = calculate_shadow(fragment_position_light_space, normal, light_direction, shadow_map);
     const vec4 result = ambient_light + (diffuse_light + specular_light) * (1.0 - shadow);
 
     return result;
@@ -95,9 +96,10 @@ void main() {
     const vec4 texture_colors = texture(u_material.diffuse, v_texture_coordinate);
 
     const vec4 total_light = calculate_light(
-        u_material, v_light_position_tangent, u_light_ambient, u_light_diffuse,
-        u_light_specular, v_view_position_tangent, texture_colors, 
-        v_fragment_position_tangent, v_fragment_position_light_space, v_texture_coordinate
+        u_material, v_light_position_tangent, u_light_ambient,
+        u_light_diffuse, u_light_specular, v_view_position_tangent,
+        texture_colors, v_fragment_position_tangent, v_fragment_position_light_space,
+        u_shadow_map, v_texture_coordinate
     );
 
     fragment_color = total_light;
