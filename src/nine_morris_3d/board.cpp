@@ -109,8 +109,6 @@ void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusiv
             }
         }
     }
-
-    // Assign correct addresses; use 'to', as nodes have already been assigned
     for (Piece& piece : to.pieces) {
         for (Node& node : to.nodes) {
             if (piece.node_id == node.id) {
@@ -248,101 +246,99 @@ void Board::move_pieces(float dt) {
 bool Board::take_piece(hoverable::Id hovered_id) {
     bool took = false;
 
+    GET_ACTIVE_PIECES(active_pieces)
+
     if (hovered_piece != nullptr) {  // Do anything only if there is a hovered piece
-        for (Node& node : nodes) {
-            if (node.piece != nullptr) {
-                if (turn == Player::White) {
-                    if (node.piece->id == hovered_id && hovered_piece->id == hovered_id &&
-                            node.piece->type == Piece::Black) {
-                        if (!is_windmill_made(&node, Piece::Black) ||
-                                number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
-                            ASSERT(node.piece->active, "Piece must be active in the scene");
-                            ASSERT(node.piece->in_use, "Piece must be in use");
+        for (Piece* piece : active_pieces) {
+            if (turn == Player::White) {
+                if (piece->id == hovered_id && hovered_piece->id == hovered_id &&
+                        piece->type == Piece::Black) {
+                    if (!is_windmill_made(piece->node, Piece::Black) ||
+                            number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
+                        ASSERT(piece->in_use, "Piece must be in use");
 
-                            remember_state();
-                            WAIT_FOR_NEXT_MOVE();
+                        remember_state();
+                        WAIT_FOR_NEXT_MOVE();
 
-                            take_and_raise_piece(node.piece);
-                            node.piece = nullptr;
-                            node.piece_id = hoverable::null;
-                            should_take_piece = false;
-                            update_cursor();
-                            set_pieces_to_take(Piece::Black, false);
-                            black_pieces_count--;
-                            check_player_number_of_pieces(Player::Black);
-                            check_player_number_of_pieces(Player::White);
-                            switch_turn();
-                            update_outlines();
+                        piece->node->piece = nullptr;
+                        piece->node->piece_id = hoverable::null;
+                        take_and_raise_piece(piece);
+                        should_take_piece = false;
+                        update_cursor();
+                        set_pieces_to_take(Piece::Black, false);
+                        black_pieces_count--;
+                        check_player_number_of_pieces(Player::Black);
+                        check_player_number_of_pieces(Player::White);
+                        switch_turn();
+                        update_outlines();
 
-                            DEB_DEBUG("Black piece {} taken", hovered_id);
+                        DEB_DEBUG("Black piece {} taken", hovered_id);
 
-                            if (is_player_blocked(turn)) {
-                                DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+                        if (is_player_blocked(turn)) {
+                            DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
-                                FORMATTED_MESSAGE(
-                                    message, 64, "%s player has blocked %s player.",
-                                    TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("White", "Black")
-                                )
+                            FORMATTED_MESSAGE(
+                                message, 64, "%s player has blocked %s player.",
+                                TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("White", "Black")
+                            )
 
-                                game_over(
-                                    TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
-                                    TURN_IS_WHITE_SO(Piece::White, Piece::Black),
-                                    message
-                                );
-                            }
-                        } else {
-                            DEB_DEBUG("Cannot take piece from windmill");
+                            game_over(
+                                TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
+                                TURN_IS_WHITE_SO(Piece::White, Piece::Black),
+                                message
+                            );
                         }
-
-                        took = true;
-                        break;
+                    } else {
+                        DEB_DEBUG("Cannot take piece from windmill");
                     }
-                } else {
-                    if (node.piece->id == hovered_id && hovered_piece->id == hovered_id &&
-                            node.piece->type == Piece::White) {
-                        if (!is_windmill_made(&node, Piece::White) ||
-                                number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
-                            ASSERT(node.piece->active, "Piece must be active in the scene");
-                            ASSERT(node.piece->in_use, "Piece must be in use");
 
-                            remember_state();
-                            WAIT_FOR_NEXT_MOVE();
+                    took = true;
+                    break;
+                }
+            } else {
+                if (piece->id == hovered_id && hovered_piece->id == hovered_id &&
+                        piece->type == Piece::White) {
+                    if (!is_windmill_made(piece->node, Piece::White) ||
+                            number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
+                        ASSERT(piece->in_use, "Piece must be in use");
 
-                            take_and_raise_piece(node.piece);
-                            node.piece = nullptr;
-                            node.piece_id = hoverable::null;
-                            should_take_piece = false;
-                            update_cursor();
-                            set_pieces_to_take(Piece::White, false);
-                            white_pieces_count--;
-                            check_player_number_of_pieces(Player::White);
-                            check_player_number_of_pieces(Player::Black);
-                            switch_turn();
-                            update_outlines();
+                        remember_state();
+                        WAIT_FOR_NEXT_MOVE();
 
-                            DEB_DEBUG("White piece {} taken", hovered_id);
+                        piece->node->piece = nullptr;
+                        piece->node->piece_id = hoverable::null;
+                        take_and_raise_piece(piece);
+                        should_take_piece = false;
+                        update_cursor();
+                        set_pieces_to_take(Piece::White, false);
+                        white_pieces_count--;
+                        check_player_number_of_pieces(Player::White);
+                        check_player_number_of_pieces(Player::Black);
+                        switch_turn();
+                        update_outlines();
 
-                            if (is_player_blocked(turn)) {
-                                DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+                        DEB_DEBUG("White piece {} taken", hovered_id);
 
-                                FORMATTED_MESSAGE(
-                                    message, 64, "%s player has blocked %s player.",
-                                    TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
-                                )
+                        if (is_player_blocked(turn)) {
+                            DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
-                                game_over(
-                                    TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
-                                    TURN_IS_WHITE_SO(Piece::White, Piece::Black),
-                                    message
-                                );
-                            }
-                        } else {
-                            DEB_DEBUG("Cannot take piece from windmill");
+                            FORMATTED_MESSAGE(
+                                message, 64, "%s player has blocked %s player.",
+                                TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
+                            )
+
+                            game_over(
+                                TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
+                                TURN_IS_WHITE_SO(Piece::White, Piece::Black),
+                                message
+                            );
                         }
-
-                        took = true;
-                        break;
+                    } else {
+                        DEB_DEBUG("Cannot take piece from windmill");
                     }
+
+                    took = true;
+                    break;
                 }
             }
         }
