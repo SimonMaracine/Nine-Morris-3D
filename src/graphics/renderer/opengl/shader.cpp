@@ -57,13 +57,17 @@ Shader::~Shader() {
     DEB_DEBUG("Deleted shader {} ({})", program, name);
 }
 
-std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
-        std::string_view fragment_source_path, const std::vector<std::string>& uniforms) {
+std::shared_ptr<Shader> Shader::create(
+        std::string_view vertex_source_path,
+        std::string_view fragment_source_path,
+        const std::vector<std::string>& uniforms) {
+    const std::string name = get_name(vertex_source_path, fragment_source_path);
+
     GLuint vertex_shader;
     GLuint fragment_shader;
     try {
-        vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
-        fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
+        vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
+        fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
     } catch (const std::runtime_error& e) {
         REL_CRITICAL("{}, exiting...", e.what());
         exit(1);
@@ -75,25 +79,27 @@ std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
     glLinkProgram(program);
     glValidateProgram(program);
 
-    if (!check_linking(program)) {
+    if (!check_linking(program, name)) {
         REL_CRITICAL("Exiting...");
         exit(1);
     }
-
-    std::string name = get_name(vertex_source_path, fragment_source_path);
 
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
             vertex_source_path, fragment_source_path);
 }
 
-std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
-        std::string_view fragment_source_path, const std::vector<std::string>& uniforms,
+std::shared_ptr<Shader> Shader::create(
+        std::string_view vertex_source_path,
+        std::string_view fragment_source_path,
+        const std::vector<std::string>& uniforms,
         const std::vector<UniformBlockSpecification>& uniform_blocks) {
+    const std::string name = get_name(vertex_source_path, fragment_source_path);
+
     GLuint vertex_shader;
     GLuint fragment_shader;
     try {
-        vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
-        fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
+        vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
+        fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
     } catch (const std::runtime_error& e) {
         REL_CRITICAL("{}, exiting...", e.what());
         exit(1);
@@ -105,7 +111,7 @@ std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
     glLinkProgram(program);
     glValidateProgram(program);
 
-    if (!check_linking(program)) {
+    if (!check_linking(program, name)) {
         REL_CRITICAL("Exiting...");
         exit(1);
     }
@@ -163,22 +169,24 @@ std::shared_ptr<Shader> Shader::create(std::string_view vertex_source_path,
         glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
     }
 
-    std::string name = get_name(vertex_source_path, fragment_source_path);
-
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
             vertex_source_path, fragment_source_path);
 }
 
-std::shared_ptr<Shader> Shader::create(const encryption::EncryptedFile& vertex_source_path,
-            const encryption::EncryptedFile& fragment_source_path, const std::vector<std::string>& uniforms) {
+std::shared_ptr<Shader> Shader::create(
+            const encryption::EncryptedFile& vertex_source_path,
+            const encryption::EncryptedFile& fragment_source_path,
+            const std::vector<std::string>& uniforms) {
+    const std::string name = get_name(vertex_source_path.get(), fragment_source_path.get());
+
     cppblowfish::Buffer buffer_vertex = encryption::load_file(vertex_source_path);
     cppblowfish::Buffer buffer_fragment = encryption::load_file(fragment_source_path);
 
     GLuint vertex_shader;
     GLuint fragment_shader;
     try {
-        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER);
-        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER);
+        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);
+        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
     } catch (const std::runtime_error& e) {
         REL_CRITICAL("{}, exiting...", e.what());
         exit(1);
@@ -190,28 +198,30 @@ std::shared_ptr<Shader> Shader::create(const encryption::EncryptedFile& vertex_s
     glLinkProgram(program);
     glValidateProgram(program);
 
-    if (!check_linking(program)) {
+    if (!check_linking(program, name)) {
         REL_CRITICAL("Exiting...");
         exit(1);
     }
-
-    std::string name = get_name(vertex_source_path.get(), fragment_source_path.get());
 
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
             vertex_source_path.get(), fragment_source_path.get());
 }
 
-std::shared_ptr<Shader> Shader::create(const encryption::EncryptedFile& vertex_source_path,
-        const encryption::EncryptedFile& fragment_source_path, const std::vector<std::string>& uniforms,
+std::shared_ptr<Shader> Shader::create(
+        const encryption::EncryptedFile& vertex_source_path,
+        const encryption::EncryptedFile& fragment_source_path,
+        const std::vector<std::string>& uniforms,
         const std::vector<UniformBlockSpecification>& uniform_blocks) {
+    const std::string name = get_name(vertex_source_path.get(), fragment_source_path.get());
+
     cppblowfish::Buffer buffer_vertex = encryption::load_file(vertex_source_path);
     cppblowfish::Buffer buffer_fragment = encryption::load_file(fragment_source_path);
 
     GLuint vertex_shader;
     GLuint fragment_shader;
     try {
-        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER);
-        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER);
+        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);
+        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
     } catch (const std::runtime_error& e) {
         REL_CRITICAL("{}, exiting...", e.what());
         exit(1);
@@ -223,7 +233,7 @@ std::shared_ptr<Shader> Shader::create(const encryption::EncryptedFile& vertex_s
     glLinkProgram(program);
     glValidateProgram(program);
 
-    if (!check_linking(program)) {
+    if (!check_linking(program, name)) {
         REL_CRITICAL("Exiting...");
         exit(1);
     }
@@ -280,8 +290,6 @@ std::shared_ptr<Shader> Shader::create(const encryption::EncryptedFile& vertex_s
 
         glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
     }
-
-    std::string name = get_name(vertex_source_path.get(), fragment_source_path.get());
 
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
             vertex_source_path.get(), fragment_source_path.get());
@@ -329,8 +337,8 @@ void Shader::recompile() {
     GLuint new_vertex_shader;
     GLuint new_fragment_shader;
     try {
-        new_vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER);
-        new_fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER);
+        new_vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
+        new_fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
     } catch (const std::runtime_error&) {
         DEB_ERROR("Abort recompiling");
         return;
@@ -342,7 +350,7 @@ void Shader::recompile() {
     glLinkProgram(new_program);
     glValidateProgram(new_program);
 
-    if (!check_linking(new_program)) {
+    if (!check_linking(new_program, name)) {
         DEB_ERROR("Abort recompiling");
         DELETE_SHADER(new_program, new_vertex_shader, new_fragment_shader);
         return;
@@ -380,7 +388,7 @@ GLint Shader::get_uniform_location(std::string_view name) {
 #endif
 }
 
-GLuint Shader::compile_shader(std::string_view source_path, GLenum type) noexcept(false) {
+GLuint Shader::compile_shader(std::string_view source_path, GLenum type, std::string_view name) noexcept(false) {
     std::ifstream file {std::string(source_path)};
     std::string source;
 
@@ -400,14 +408,14 @@ GLuint Shader::compile_shader(std::string_view source_path, GLenum type) noexcep
     glShaderSource(shader, 1, &s, nullptr);
     glCompileShader(shader);
 
-    if (!check_compilation(shader, type)) {
+    if (!check_compilation(shader, type, name)) {
         throw std::runtime_error("Shader compilation error");
     }
 
     return shader;
 }
 
-GLuint Shader::compile_shader(const cppblowfish::Buffer& source_buffer, GLenum type) noexcept(false) {
+GLuint Shader::compile_shader(const cppblowfish::Buffer& source_buffer, GLenum type, std::string_view name) noexcept(false) {
     GLuint shader = glCreateShader(type);
     const int length = source_buffer.size() - source_buffer.padding();
     char* source = reinterpret_cast<char*>(source_buffer.get());
@@ -415,14 +423,14 @@ GLuint Shader::compile_shader(const cppblowfish::Buffer& source_buffer, GLenum t
     glShaderSource(shader, 1, &s, &length);
     glCompileShader(shader);
 
-    if (!check_compilation(shader, type)) {
+    if (!check_compilation(shader, type, name)) {
         throw std::runtime_error("Shader compilation error");
     }
 
     return shader;
 }
 
-bool Shader::check_compilation(GLuint shader, GLenum type) {
+bool Shader::check_compilation(GLuint shader, GLenum type, std::string_view name) noexcept(false) {
     GLint compile_status;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 
@@ -437,12 +445,12 @@ bool Shader::check_compilation(GLuint shader, GLenum type) {
         }
 
         if (log_length == 0) {
-            REL_CRITICAL("{} shader compilation error with no message", t);
+            REL_CRITICAL("{} shader compilation error with no message in shader '{}'", t, name);
         } else {
             char* log_message = new char[log_length];
             glGetShaderInfoLog(shader, log_length, nullptr, log_message);
 
-            REL_CRITICAL("{} shader compilation error\n{}", t, log_message);
+            REL_CRITICAL("{} shader compilation error in shader '{}'\n{}", t, name, log_message);
             delete[] log_message;
         }
 
@@ -452,7 +460,7 @@ bool Shader::check_compilation(GLuint shader, GLenum type) {
     return true;
 }
 
-bool Shader::check_linking(GLuint program) {
+bool Shader::check_linking(GLuint program, std::string_view name) {
     GLint link_status;
     glGetProgramiv(program, GL_LINK_STATUS, &link_status);
 
@@ -461,12 +469,12 @@ bool Shader::check_linking(GLuint program) {
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
         if (log_length == 0) {
-            REL_CRITICAL("Shader linking error with no message");
+            REL_CRITICAL("Shader linking error with no message in shader '{}'", name);
         } else {
             char* log_message = new char[log_length];
             glGetProgramInfoLog(program, log_length, nullptr, log_message);
 
-            REL_CRITICAL("Shader linking error\n{}", log_message);
+            REL_CRITICAL("Shader linking error in shader '{}'\n{}", name, log_message);
             delete[] log_message;
         }
 
