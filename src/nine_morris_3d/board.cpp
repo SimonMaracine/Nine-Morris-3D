@@ -53,14 +53,7 @@ void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusiv
         node.model.scale = from.nodes[i].model.scale;
         node.model.outline_color = from.nodes[i].model.outline_color;
         node.piece_id = from.nodes[i].piece_id;
-        node.piece = nullptr;  // It must be null, if the ids don't match
-        // Assign correct addresses
-        for (Piece& piece : const_cast<Board&>(from).pieces) {
-            if (piece.id == node.piece_id) {
-                node.piece = &piece;
-                break;
-            }
-        }
+        node.piece = nullptr;
         node.index = from.nodes[i].index;
     }
 
@@ -72,30 +65,18 @@ void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusiv
         piece.model.rotation = from.pieces[i].model.rotation;
         piece.model.scale = from.pieces[i].model.scale;
         piece.model.outline_color = from.pieces[i].model.outline_color;
-        piece.movement.type = from.pieces[i].movement.type;
-        piece.movement.velocity = from.pieces[i].movement.velocity;
-        piece.movement.target = from.pieces[i].movement.target;
-        piece.movement.target0 = from.pieces[i].movement.target0;
-        piece.movement.target1 = from.pieces[i].movement.target1;
-        piece.movement.reached_target0 = from.pieces[i].movement.reached_target0;
-        piece.movement.reached_target1 = from.pieces[i].movement.reached_target1;
+        piece.movement = from.pieces[i].movement;
         piece.should_move = from.pieces[i].should_move;
         piece.type = from.pieces[i].type;
         piece.in_use = from.pieces[i].in_use;
         piece.node_id = from.pieces[i].node_id;
-        piece.node = nullptr;  // It must be null, if the ids don't match
-        // Assign correct addresses; use only this as nodes have already been assigned
-        for (Node& node : to.nodes) {
-            if (node.id == piece.node_id) {
-                piece.node = &node;
-                break;
-            }
-        }
+        piece.node = nullptr;
         piece.show_outline = from.pieces[i].show_outline;
         piece.to_take = from.pieces[i].to_take;
         piece.pending_remove = false;
         piece.selected = false;
         piece.active = from.pieces[i].active;
+        piece.renderer_with_outline =from.pieces[i].renderer_with_outline;
     }
 
     to.phase = from.phase;
@@ -117,7 +98,27 @@ void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusiv
         to.undo_state_history = from.undo_state_history;
         to.redo_state_history = from.redo_state_history;
     }
-    to.next_move = from.next_move;
+    to.next_move = true;
+
+    // Assign correct addresses
+    for (Node& node : to.nodes) {
+        for (Piece& piece : to.pieces) {
+            if (node.piece_id == piece.id) {
+                node.piece = &piece;
+                break;
+            }
+        }
+    }
+
+    // Assign correct addresses; use 'to', as nodes have already been assigned
+    for (Piece& piece : to.pieces) {
+        for (Node& node : to.nodes) {
+            if (piece.node_id == node.id) {
+                piece.node = &node;
+                break;
+            }
+        }
+    }
 }
 
 bool Board::place_piece(hoverable::Id hovered_id) {
@@ -500,6 +501,11 @@ void Board::release() {
 bool Board::undo() {
     ASSERT(!undo_state_history->empty(), "Undo history must not be empty");
 
+    if (!next_move) {
+        DEB_WARN("Cannot do anything when pieces are in air");
+        return false;
+    }
+
     const bool undo_game_over = phase == Phase::None;
 
     Board previous_state = *this;
@@ -528,6 +534,11 @@ bool Board::undo() {
 
 bool Board::redo() {
     ASSERT(!redo_state_history->empty(), "Redo history must not be empty");
+
+    if (!next_move) {
+        DEB_WARN("Cannot do anything when pieces are in air");
+        return false;
+    }
 
     Board previous_state = *this;
     Board& state_board = redo_state_history->back();
@@ -1254,6 +1265,7 @@ void Board::arrive_at_node(Piece* piece) {
 
     // Remove piece if set to remove
     if (piece->pending_remove) {
+        piece->pending_remove = false;
         piece->active = false;
         app->renderer->remove_model(piece->model.handle);
     }

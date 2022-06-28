@@ -182,7 +182,7 @@ void ImGuiLayer::on_update(float dt) {
 
                 if (redid_game_over) {
                     gui_layer->timer.stop();
-                    game_layer->board.phase = Board::Phase::GameOver;  // Hack to fix a bug
+                    game_layer->board.phase = Board::Phase::GameOver;
                 }
             }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
