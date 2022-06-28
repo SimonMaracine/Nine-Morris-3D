@@ -428,6 +428,11 @@ void Renderer::render() {
     im_draw_quad(light.position, 1.0f, storage.light_bulb_texture);
 #endif
 
+    for (const auto [id, quad] : quads) {
+        IGNORE(id);
+        im_draw_quad(quad->position, quad->scale, quad->texture);  // TODO refactor
+    }
+
     storage.scene_framebuffer->resolve_framebuffer(storage.intermediate_framebuffer->get_id(),
             app->app_data.width, app->app_data.height);
 
@@ -527,6 +532,18 @@ void Renderer::update_model(Model& model, int options) {
     if (has_shadow) {
         models_has_shadow[model.handle] = &model;
     }
+}
+
+void Renderer::add_quad(Quad& quad) {
+    static unsigned int id = 0;
+
+    quad.handle = ++id;
+
+    quads[id] = &quad;
+}
+
+void Renderer::remove_quad(unsigned int handle) {
+    quads.erase(handle);
 }
 
 void Renderer::clear_models() {

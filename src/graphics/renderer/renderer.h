@@ -35,6 +35,15 @@ public:
         unsigned int handle = 0;
     };
 
+    struct Quad {
+        std::shared_ptr<Texture> texture;
+    
+        glm::vec3 position = glm::vec3(0.0f);
+        float scale = 1.0f;
+
+        unsigned int handle = 0;
+    };
+
     enum {
         Color = GL_COLOR_BUFFER_BIT,
         Depth = GL_DEPTH_BUFFER_BIT,
@@ -57,6 +66,9 @@ public:
     void add_model(Model& model, int options = 0);
     void remove_model(unsigned int handle);
     void update_model(Model& model, int options = 0);
+
+    void add_quad(Quad& quad);
+    void remove_quad(unsigned int handle);
 
     // unsigned int add_instancing_group();
     // void remove_instancing_group();
@@ -142,6 +154,7 @@ private:
     std::map<unsigned int, Model*> models_outline;
     std::map<unsigned int, Model*> models_cast_shadow;
     std::map<unsigned int, Model*> models_has_shadow;
+    std::map<unsigned int, Quad*> quads;
 
     hoverable::Id hovered_id = hoverable::null;
     FramebufferReader<4> reader;

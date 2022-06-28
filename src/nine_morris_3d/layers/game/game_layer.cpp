@@ -79,6 +79,9 @@ void GameLayer::on_attach() {
 
     setup_camera();
 
+
+    app->renderer->add_quad(keyboard.quad);
+
     app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
@@ -318,6 +321,16 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == input::Key::SPACE) {
         app->camera.go_towards_position(default_camera_position);
+    } else if (event.key == input::Key::UP) {
+        keyboard.move(KeyboardControls::Direction::Up);
+    } else if (event.key == input::Key::DOWN) {
+        keyboard.move(KeyboardControls::Direction::Down);
+    } else if (event.key == input::Key::LEFT) {
+        keyboard.move(KeyboardControls::Direction::Left);
+    } else if (event.key == input::Key::RIGHT) {
+        keyboard.move(KeyboardControls::Direction::Right);
+    } else if (event.key == input::Key::ENTER) {
+        keyboard.release();
     }
 
     return false;

@@ -8,6 +8,7 @@
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/options.h"
+#include "nine_morris_3d/keyboard_controls.h"
 #include "other/mesh.h"
 #include "other/loader.h"
 
@@ -85,6 +86,7 @@ public:
     void load_game();
     
     Board board;
+    KeyboardControls keyboard {board};
 
     float mouse_wheel = 0.0f;
     float dx = 0.0f;

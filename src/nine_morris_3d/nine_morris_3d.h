@@ -48,13 +48,15 @@ public:
 
     struct RenderData {
         std::shared_ptr<Texture> splash_screen_texture;
+        std::shared_ptr<Texture> keyboard_controls_texture;
         std::shared_ptr<Font> good_dog_plain_font;
 
         ImFont* imgui_info_font = nullptr;
         ImFont* imgui_windows_font = nullptr;
 
         std::shared_ptr<Texture> board_normal_texture;
-
+        std::shared_ptr<Texture> piece_normal_texture;
+    
         std::shared_ptr<VertexArray> board_wood_vertex_array;
         std::shared_ptr<Shader> board_wood_shader;
         std::shared_ptr<Texture> board_wood_diffuse_texture;
@@ -66,8 +68,7 @@ public:
         std::shared_ptr<VertexArray> piece_vertex_arrays[18];
         std::shared_ptr<Shader> piece_shader;
         std::shared_ptr<Texture> white_piece_diffuse_texture;
-        std::shared_ptr<Texture> black_piece_diffuse_texture;
-        std::shared_ptr<Texture> piece_normal_texture;
+        std::shared_ptr<Texture> black_piece_diffuse_texture;    
 
         std::shared_ptr<Material> tinted_wood_material;
         std::shared_ptr<MaterialInstance> piece_material_instances[18];
