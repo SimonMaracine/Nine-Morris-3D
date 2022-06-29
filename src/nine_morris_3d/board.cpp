@@ -119,6 +119,11 @@ void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusiv
     }
 }
 
+void Board::initialize_state_history() {
+    undo_state_history = std::make_shared<std::vector<Board>>();
+    redo_state_history = std::make_shared<std::vector<Board>>();
+}
+
 bool Board::place_piece(hoverable::Id hovered_id) {
     bool placed = false;
 

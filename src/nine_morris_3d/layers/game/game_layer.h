@@ -85,7 +85,7 @@ public:
     void actually_change_normal_mapping();
 
     void load_game();
-    
+
     Board board;
     KeyboardControls keyboard;
 

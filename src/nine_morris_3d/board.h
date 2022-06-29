@@ -36,6 +36,7 @@ public:
     ~Board() = default;
 
     static void copy_smart(Board& to, const Board& from, bool state_history_inclusive);
+    void initialize_state_history();
 
     bool place_piece(hoverable::Id hovered_id);
     void move_pieces(float dt);
@@ -98,8 +99,8 @@ public:
         std::vector<PositionPlusInfo> twos;
     } repetition_history;
 
-    std::shared_ptr<std::vector<Board>> undo_state_history = std::make_shared<std::vector<Board>>();
-    std::shared_ptr<std::vector<Board>> redo_state_history = std::make_shared<std::vector<Board>>();
+    std::shared_ptr<std::vector<Board>> undo_state_history;
+    std::shared_ptr<std::vector<Board>> redo_state_history;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);

@@ -51,6 +51,8 @@ constexpr DirectionalLight LIGHT_AUTUMN = {
 
 void GameLayer::on_attach() {
     board = Board();
+    board.initialize_state_history();
+
     for (unsigned int i = 0; i < 9; i++) {
         board.pieces[i] = Piece(app->data.pieces_id[i], Piece::Type::White);
         board.pieces[i].model.position = glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f);
