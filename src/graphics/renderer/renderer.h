@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "application/platform.h"
+#include "application/events.h"
 #include "graphics/renderer/framebuffer_reader.h"
 #include "graphics/renderer/font.h"
 #include "graphics/renderer/camera.h"
@@ -61,7 +62,7 @@ public:
     ~Renderer();
 
     void render();
-    void im_draw_quad(const glm::vec3& position, float scale, std::shared_ptr<Texture> texture);
+    void on_window_resized(events::WindowResizedEvent& event);
 
     void add_model(Model& model, int options = 0);
     void remove_model(unsigned int handle);
@@ -82,6 +83,7 @@ public:
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void set_skybox(std::shared_ptr<Texture3D> texture);
     void set_depth_map_framebuffer(int size);
+    void set_light(const DirectionalLight& light);
 
     hoverable::Id get_hovered_id() { return hovered_id; }
     UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
@@ -89,6 +91,7 @@ public:
     UniformBlockSpecification& get_light_view_position_uniform_block() { return storage.light_view_position_uniform_block; }
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
     std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
+    DirectionalLight& get_light() { return light; }
 
 #ifdef PLATFORM_GAME_DEBUG
     std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }
@@ -99,7 +102,6 @@ public:
     std::shared_ptr<Shader> get_shadow_shader() { return storage.shadow_shader; }
     std::shared_ptr<Shader> get_skybox_shader() { return storage.skybox_shader; }
 
-    DirectionalLight light;
     bool origin = false;  // This does nothing in release mode
 private:
     void clear(int buffers);
@@ -131,14 +133,16 @@ private:
 #endif
 
         std::shared_ptr<VertexArray> skybox_vertex_array;
-        std::shared_ptr<VertexArray> screen_quad_vertex_array;
+        std::shared_ptr<VertexArray> quad_vertex_array;
 #ifdef PLATFORM_GAME_DEBUG
         std::shared_ptr<VertexArray> origin_vertex_array;
 #endif
 
         std::shared_ptr<Texture3D> skybox_texture;
+
 #ifdef PLATFORM_GAME_DEBUG
         std::shared_ptr<Texture> light_bulb_texture;
+        Quad light_bulb_quad;
 #endif
 
         std::shared_ptr<Framebuffer> scene_framebuffer;
@@ -147,6 +151,8 @@ private:
 
         std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
     } storage;
+
+    DirectionalLight light;
 
     // Ordered maps of pointers to models
     std::map<unsigned int, Model*> models;

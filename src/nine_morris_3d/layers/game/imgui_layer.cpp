@@ -729,13 +729,15 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::End();
 
         ImGui::Begin("Light Settings");
-        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position),
-                -30.0f, 30.0f)) {}
-        if (ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color),
+        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->get_light().position),
+                -30.0f, 30.0f)) {
+            app->renderer->set_light(app->renderer->get_light());
+        }
+        if (ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->get_light().ambient_color),
                 0.0f, 1.0f)) {}
-        if (ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color),
+        if (ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->get_light().diffuse_color),
                 0.0f, 1.0f)) {}
-        if (ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color),
+        if (ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->get_light().specular_color),
                 0.0f, 1.0f)) {}
         ImGui::End();
 

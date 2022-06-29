@@ -78,10 +78,10 @@ void GameLayer::on_attach() {
     setup_nodes();
     setup_camera();
 
-    app->renderer->add_quad(keyboard.quad);
+    keyboard = KeyboardControls(&board);
 
-    app->window->set_vsync(app->options.vsync);
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
+    app->renderer->add_quad(keyboard.quad);
 
 #ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = true;
@@ -266,39 +266,26 @@ bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) 
 bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
     if (event.button == input::MouseButton::LEFT) {
         if (board.next_move) {
+            bool did = false;
+
             if (board.phase == Board::Phase::PlacePieces) {
                 if (board.should_take_piece) {
-                    const bool took = board.take_piece(app->renderer->get_hovered_id());
-
-                    if (took && !first_move && !gui_layer->timer.get_running()) {
-                        gui_layer->timer.start(app->window->get_time());
-                        first_move = true;
-                    }
+                    did = board.take_piece(app->renderer->get_hovered_id());
                 } else {
-                    const bool placed = board.place_piece(app->renderer->get_hovered_id());
-
-                    if (placed && !first_move && !gui_layer->timer.get_running()) {
-                        gui_layer->timer.start(app->window->get_time());
-                        first_move = true;
-                    }
+                    did = board.place_piece(app->renderer->get_hovered_id());
                 }
             } else if (board.phase == Board::Phase::MovePieces) {
                 if (board.should_take_piece) {
-                    const bool took = board.take_piece(app->renderer->get_hovered_id());
-
-                    if (took && !first_move && !gui_layer->timer.get_running()) {
-                        gui_layer->timer.start(app->window->get_time());
-                        first_move = true;
-                    }
+                    did = board.take_piece(app->renderer->get_hovered_id());
                 } else {
                     board.select_piece(app->renderer->get_hovered_id());
-                    const bool put = board.put_down_piece(app->renderer->get_hovered_id());
-
-                    if (put && !first_move && !gui_layer->timer.get_running()) {
-                        gui_layer->timer.start(app->window->get_time());
-                        first_move = true;
-                    }
+                    did = board.put_down_piece(app->renderer->get_hovered_id());
                 }
+            }
+
+            if (did && !first_move && !gui_layer->timer.get_running()) {
+                gui_layer->timer.start(app->window->get_time());
+                first_move = true;
             }
 
             if (board.phase == Board::Phase::GameOver) {
@@ -338,7 +325,24 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
         );
         keyboard.move(direction);
     } else if (event.key == input::Key::ENTER) {
-        keyboard.press();
+        if (board.next_move) {
+            const bool did = keyboard.press(first_move);
+
+            if (did && !first_move && !gui_layer->timer.get_running()) {
+                gui_layer->timer.start(app->window->get_time());
+                first_move = true;
+            }
+
+            if (board.phase == Board::Phase::GameOver) {
+                gui_layer->timer.stop();
+            }
+
+            if (board.redo_state_history->empty()) {
+                imgui_layer->can_redo = false;
+            }
+
+            board.release();
+        }
     }
 
     return false;
@@ -1030,7 +1034,10 @@ void GameLayer::setup_camera() {
         glm::vec3(0.0f),
         8.0f,
         glm::perspective(
-            glm::radians(FOV), static_cast<float>(app->app_data.width) / app->app_data.height, NEAR, FAR
+            glm::radians(FOV),
+            static_cast<float>(app->app_data.width) / app->app_data.height,
+            NEAR,
+            FAR
         )
     );
 
@@ -1042,7 +1049,10 @@ void GameLayer::setup_camera() {
         glm::vec3(0.0f),
         8.7f,
         glm::perspective(
-            glm::radians(FOV), static_cast<float>(app->app_data.width) / app->app_data.height, NEAR, FAR
+            glm::radians(FOV),
+            static_cast<float>(app->app_data.width) / app->app_data.height,
+            NEAR,
+            FAR
         )
     );
 
@@ -1065,9 +1075,9 @@ void GameLayer::setup_skybox() {
 
 void GameLayer::setup_light() {
     if (app->options.skybox == options::FIELD) {
-        app->renderer->light = LIGHT_FIELD;
+        app->renderer->set_light(LIGHT_FIELD);
     } else if (app->options.skybox == options::AUTUMN) {
-        app->renderer->light = LIGHT_AUTUMN;
+        app->renderer->set_light(LIGHT_AUTUMN);
     } else {
         ASSERT(false, "Invalid skybox");
     }
@@ -1275,9 +1285,9 @@ void GameLayer::actually_change_skybox() {
     app->renderer->set_skybox(Texture3D::create(data));
 
     if (app->options.skybox == options::FIELD) {
-        app->renderer->light = LIGHT_FIELD;
+        app->renderer->set_light(LIGHT_FIELD);
     } else if (app->options.skybox == options::AUTUMN) {
-        app->renderer->light = LIGHT_AUTUMN;
+        app->renderer->set_light(LIGHT_AUTUMN);
     } else {
         ASSERT(false, "Invalid skybox");
     }

@@ -41,6 +41,8 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         }
     }
 
+    window->set_vsync(options.vsync);
+
     srand(time(nullptr));
 
     assets::maybe_initialize_assets();

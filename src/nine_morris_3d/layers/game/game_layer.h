@@ -87,7 +87,7 @@ public:
     void load_game();
     
     Board board;
-    KeyboardControls keyboard {board};
+    KeyboardControls keyboard;
 
     float mouse_wheel = 0.0f;
     float dx = 0.0f;

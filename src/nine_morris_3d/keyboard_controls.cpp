@@ -17,10 +17,10 @@ static constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Right, KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down }
 };
 
-KeyboardControls::KeyboardControls(Board& board)
+KeyboardControls::KeyboardControls(Board* board)
     : board(board) {
     for (size_t i = 0; i < 24; i++) {
-        nodes[i] = KeyboardControls::Node(i);
+        nodes[i] = KNode(i);
     }
 
     nodes[0].neighbors(nullptr, &nodes[9], nullptr, &nodes[1]);
@@ -82,8 +82,30 @@ void KeyboardControls::move(Direction direction) {
     quad.position = POSITION(current_node->index);
 }
 
-void KeyboardControls::press() {
-    DEB_INFO("Pressed");
+bool KeyboardControls::press(bool& first_move) {
+    const Node& node = board->nodes[current_node->index];
+    const hoverable::Id hovered_id = node.piece == nullptr ? node.id : node.piece->id;
+
+    bool did = false;
+
+    board->press(hovered_id);
+
+    if (board->phase == Board::Phase::PlacePieces) {
+        if (board->should_take_piece) {
+            did = board->take_piece(hovered_id);
+        } else {
+            did = board->place_piece(hovered_id);
+        }
+    } else if (board->phase == Board::Phase::MovePieces) {
+        if (board->should_take_piece) {
+            did = board->take_piece(hovered_id);
+        } else {
+            board->select_piece(hovered_id);
+            did = board->put_down_piece(hovered_id);
+        }
+    }
+
+    return did;
 }
 
 KeyboardControls::Direction KeyboardControls::calculate(Direction original_direction, float camera_angle) {
