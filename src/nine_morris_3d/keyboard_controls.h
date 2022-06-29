@@ -9,13 +9,17 @@ public:
     ~KeyboardControls() = default;
 
     enum class Direction {
-        Up, Down, Left, Right
+        Up = 0,
+        Left = 1,
+        Down = 2,
+        Right = 3
     };
 
     void render();
     void move(Direction direction);
     void press();
-    void release();
+
+    static Direction calculate(Direction original_direction, float camera_angle); 
 
     Renderer::Quad quad;
 private:

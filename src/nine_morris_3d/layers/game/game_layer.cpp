@@ -76,9 +76,7 @@ void GameLayer::on_attach() {
     }
 
     setup_nodes();
-
     setup_camera();
-
 
     app->renderer->add_quad(keyboard.quad);
 
@@ -164,7 +162,6 @@ void GameLayer::on_awake() {
     }
 
     prepare_nodes();
-
     setup_skybox();
     setup_light();
 }
@@ -237,6 +234,7 @@ void GameLayer::on_event(events::Event& event) {
     dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(GameLayer::on_mouse_moved));
     dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(GameLayer::on_mouse_button_pressed));
     dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(GameLayer::on_mouse_button_released));
+    dispatcher.dispatch<KeyPressedEvent>(KeyPressed, BIND(GameLayer::on_key_pressed));
     dispatcher.dispatch<KeyReleasedEvent>(KeyReleased, BIND(GameLayer::on_key_released));
 }
 
@@ -318,20 +316,38 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
     return false;
 }
 
+bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
+    if (event.key == input::Key::UP) {
+        const KeyboardControls::Direction direction = KeyboardControls::calculate(
+            KeyboardControls::Direction::Up, app->camera.get_angle_around_point()
+        );
+        keyboard.move(direction);
+    } else if (event.key == input::Key::DOWN) {
+        const KeyboardControls::Direction direction = KeyboardControls::calculate(
+            KeyboardControls::Direction::Down, app->camera.get_angle_around_point()
+        );
+        keyboard.move(direction);
+    } else if (event.key == input::Key::LEFT) {
+        const KeyboardControls::Direction direction = KeyboardControls::calculate(
+            KeyboardControls::Direction::Left, app->camera.get_angle_around_point()
+        );
+        keyboard.move(direction);
+    } else if (event.key == input::Key::RIGHT) {
+        const KeyboardControls::Direction direction = KeyboardControls::calculate(
+            KeyboardControls::Direction::Right, app->camera.get_angle_around_point()
+        );
+        keyboard.move(direction);
+    } else if (event.key == input::Key::ENTER) {
+        keyboard.press();
+    }
+
+    return false;
+}
+
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == input::Key::SPACE) {
         app->camera.go_towards_position(default_camera_position);
-    } else if (event.key == input::Key::UP) {
-        keyboard.move(KeyboardControls::Direction::Up);
-    } else if (event.key == input::Key::DOWN) {
-        keyboard.move(KeyboardControls::Direction::Down);
-    } else if (event.key == input::Key::LEFT) {
-        keyboard.move(KeyboardControls::Direction::Left);
-    } else if (event.key == input::Key::RIGHT) {
-        keyboard.move(KeyboardControls::Direction::Right);
-    } else if (event.key == input::Key::ENTER) {
-        keyboard.release();
-    }
+    } 
 
     return false;
 }

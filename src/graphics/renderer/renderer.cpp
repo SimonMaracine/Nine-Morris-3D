@@ -552,6 +552,7 @@ void Renderer::clear_models() {
     models_outline.clear();
     models_cast_shadow.clear();
     models_has_shadow.clear();
+    quads.clear();
 }
 
 void Renderer::set_viewport(int width, int height) {

@@ -469,7 +469,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 // TODO think about to include this or not
 bool ImGuiLayer::on_key_pressed(events::KeyPressedEvent& event) {
     if (event.repeat) {
-        return true;
+        return false;
     }
 
     if (event.control) {
@@ -483,7 +483,7 @@ bool ImGuiLayer::on_key_pressed(events::KeyPressedEvent& event) {
         }
     }
 
-    return true;
+    return false;
 }
 
 void ImGuiLayer::draw_game_over() {

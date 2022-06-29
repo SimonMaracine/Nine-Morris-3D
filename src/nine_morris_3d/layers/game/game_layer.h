@@ -34,6 +34,7 @@ public:
     bool on_mouse_moved(events::MouseMovedEvent& event);
     bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
+    bool on_key_pressed(events::KeyPressedEvent& event);
     bool on_key_released(events::KeyReleasedEvent& event);
 
     std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
