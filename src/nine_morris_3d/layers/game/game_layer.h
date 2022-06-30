@@ -87,6 +87,7 @@ public:
     void load_game();
 
     Board board;
+    StateHistory state_history;
     KeyboardControls keyboard;
 
     float mouse_wheel = 0.0f;

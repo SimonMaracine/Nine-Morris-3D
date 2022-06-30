@@ -50,8 +50,8 @@ constexpr DirectionalLight LIGHT_AUTUMN = {
 };
 
 void GameLayer::on_attach() {
-    board = Board();
-    board.initialize_state_history();
+    state_history = StateHistory();
+    board = Board(state_history);
 
     for (unsigned int i = 0; i < 9; i++) {
         board.pieces[i] = Piece(app->data.pieces_id[i], Piece::Type::White);
@@ -82,7 +82,7 @@ void GameLayer::on_attach() {
 
     keyboard = KeyboardControls(&board);
 
-    app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
+     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
     app->renderer->add_quad(keyboard.quad);
 
 #ifdef PLATFORM_GAME_DEBUG

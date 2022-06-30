@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.20)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(EXECUTABLE_NAME Nine-Morris-3D)
-set(C_GLAD_STB c-glad-stb)
+set(GLAD_STB glad-stb)
+set(MY_IMGUI my-imgui)
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -117,6 +118,17 @@ add_executable(${EXECUTABLE_NAME}
     "src/other/texture_data.cpp"
     "src/other/user_data.cpp"
     "src/other/encryption.cpp"
+    ${HEADERS_FOR_WINDOWS}
+)
+
+add_library(${GLAD_STB} STATIC
+    "dependencies/glad/src/glad.c"
+    "dependencies/stb_image/stb_image.c"
+    "dependencies/stb_truetype/stb_truetype.c"
+    "dependencies/stb_image_write/stb_image_write.c"
+)
+
+add_library(${MY_IMGUI} STATIC
     "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_demo.cpp"
     "extern/imgui/imgui_tables.cpp"
@@ -124,36 +136,28 @@ add_executable(${EXECUTABLE_NAME}
     "extern/imgui/imgui.cpp"
     "extern/imgui/backends/imgui_impl_opengl3.cpp"
     "extern/imgui/backends/imgui_impl_glfw.cpp"
-    ${HEADERS_FOR_WINDOWS}
-)
-
-add_library(${C_GLAD_STB} STATIC
-    "dependencies/glad/src/glad.c"
-    "dependencies/stb_image/stb_image.c"
-    "dependencies/stb_truetype/stb_truetype.c"
-    "dependencies/stb_image_write/stb_image_write.c"
 )
 
 # Enable warnings
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-    target_compile_options(${EXECUTABLE_NAME} PUBLIC
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE
         -Wall -Wextra
         -Wno-unused-parameter -Wno-parentheses -Wno-type-limits
     )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    # target_compile_options(${EXECUTABLE_NAME} PUBLIC -Wall)
-    # TODO Fix this
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE /w)
+    string(REGEX REPLACE "/W[1-3]" "/W0" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
 
 # Fix encoding on Windows
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_compile_options(${EXECUTABLE_NAME} PUBLIC /utf-8)
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE /utf-8)
 endif()
 
 # Use C++17
-target_compile_features(${EXECUTABLE_NAME} PUBLIC cxx_std_17)
+target_compile_features(${EXECUTABLE_NAME} PRIVATE cxx_std_17)
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
 # PCH
@@ -170,8 +174,8 @@ add_subdirectory(extern/cppblowfish)
 add_dependencies(${EXECUTABLE_NAME} glfw)  # This is necessary for some reason
 
 # Add all include directories
-target_include_directories(${EXECUTABLE_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src")
-target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
+target_include_directories(${EXECUTABLE_NAME} SYSTEM PRIVATE "${CMAKE_SOURCE_DIR}/src")
+target_include_directories(${EXECUTABLE_NAME} SYSTEM PRIVATE
     "${CMAKE_SOURCE_DIR}/dependencies/glad/include"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_truetype"
@@ -187,23 +191,28 @@ target_include_directories(${EXECUTABLE_NAME} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/cppblowfish/include"
 )
 
-target_include_directories(${C_GLAD_STB} SYSTEM PUBLIC
+target_include_directories(${GLAD_STB} SYSTEM PRIVATE
     "${CMAKE_SOURCE_DIR}/dependencies/glad/include"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_truetype"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image_write"
 )
 
+target_include_directories(${MY_IMGUI} SYSTEM PRIVATE
+    "${CMAKE_SOURCE_DIR}/extern/imgui"
+    "${CMAKE_SOURCE_DIR}/extern/glfw/include"
+)
+
 # Add all link directories
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
-        target_link_directories(${EXECUTABLE_NAME} PUBLIC
+        target_link_directories(${EXECUTABLE_NAME} PRIVATE
             "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
             "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
             "${CMAKE_SOURCE_DIR}/build/extern/glfw/src"
         )
     elseif(CMAKE_BUILD_TYPE MATCHES Release)
-        target_link_directories(${EXECUTABLE_NAME} PUBLIC
+        target_link_directories(${EXECUTABLE_NAME} PRIVATE
             "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
             "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
             "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src"
@@ -212,13 +221,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     if(VSCODE MATCHES ON)
         if(CMAKE_BUILD_TYPE MATCHES Debug)
-            target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            target_link_directories(${EXECUTABLE_NAME} PRIVATE
                 "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
                 "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
                 "${CMAKE_SOURCE_DIR}/build/extern/glfw/src"
             )
         elseif(CMAKE_BUILD_TYPE MATCHES Release)
-            target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            target_link_directories(${EXECUTABLE_NAME} PRIVATE
                 "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
                 "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
                 "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src"
@@ -226,13 +235,13 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
         endif()
     elseif(VSCODE MATCHES OFF)
         if(CMAKE_BUILD_TYPE MATCHES Debug)
-            target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            target_link_directories(${EXECUTABLE_NAME} PRIVATE
                 "${CMAKE_SOURCE_DIR}/extern/spdlog"
                 "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
                 "${CMAKE_SOURCE_DIR}/extern/glfw/src"
             )
         elseif(CMAKE_BUILD_TYPE MATCHES Release)
-            target_link_directories(${EXECUTABLE_NAME} PUBLIC
+            target_link_directories(${EXECUTABLE_NAME} PRIVATE
                 "${CMAKE_SOURCE_DIR}/extern/spdlog"
                 "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
                 "${CMAKE_SOURCE_DIR}/extern/glfw/src"
@@ -243,17 +252,18 @@ endif()
 
 # Add all libraries
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-    target_link_libraries(${EXECUTABLE_NAME} PUBLIC
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE
         spdlog assimp glfw cppblowfish X11
     )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_link_libraries(${EXECUTABLE_NAME} PUBLIC
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE
         spdlog assimp glfw cppblowfish
     )
 endif()
 
-target_link_libraries(${EXECUTABLE_NAME} PUBLIC "${CMAKE_DL_LIBS}")
-target_link_libraries(${EXECUTABLE_NAME} PUBLIC ${C_GLAD_STB})
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE "${CMAKE_DL_LIBS}")
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE ${GLAD_STB})
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE ${MY_IMGUI})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
@@ -262,31 +272,33 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
         set_property(TARGET assimp PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
         set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
         set_property(TARGET cppblowfish PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
-        set_property(TARGET ${C_GLAD_STB} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
+        set_property(TARGET ${GLAD_STB} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
+        set_property(TARGET ${MY_IMGUI} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
     elseif(CMAKE_BUILD_TYPE MATCHES Release)
         set_property(TARGET ${EXECUTABLE_NAME} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
         set_property(TARGET spdlog PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
         set_property(TARGET assimp PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
         set_property(TARGET glfw PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
         set_property(TARGET cppblowfish PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
-        set_property(TARGET ${C_GLAD_STB} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
+        set_property(TARGET ${GLAD_STB} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
+        set_property(TARGET ${MY_IMGUI} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded)
     endif()
 endif()
 
 # Add some defines
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("Building in DEBUG mode")
-    target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
+    target_compile_definitions(${EXECUTABLE_NAME} PRIVATE
         SPDLOG_ACTIVE_LEVEL=0  # PRINT_GPU_RAM_ALLOCATED
     )
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message("Building in RELEASE mode")
-    target_compile_definitions(${EXECUTABLE_NAME} PUBLIC
+    target_compile_definitions(${EXECUTABLE_NAME} PRIVATE
         SPDLOG_ACTIVE_LEVEL=0 NDEBUG
     )
 endif()
 
-target_compile_definitions(${EXECUTABLE_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
+target_compile_definitions(${EXECUTABLE_NAME} PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 # See what is setting up on Windows
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)

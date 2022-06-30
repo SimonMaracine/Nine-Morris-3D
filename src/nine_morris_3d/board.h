@@ -10,6 +10,8 @@
 constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
 constexpr float PAINT_Y_POSITION = 0.062f;
 
+struct StateHistory;
+
 class Board {
     using GamePosition = std::array<Piece::Type, 24>;
 public:
@@ -33,10 +35,10 @@ public:
     };
 
     Board() = default;
+    Board(StateHistory& state_history);
     ~Board() = default;
 
     static void copy_smart(Board& to, const Board& from, bool state_history_inclusive);
-    void initialize_state_history();
 
     bool place_piece(hoverable::Id hovered_id);
     void move_pieces(float dt);
@@ -99,8 +101,8 @@ public:
         std::vector<PositionPlusInfo> twos;
     } repetition_history;
 
-    std::shared_ptr<std::vector<Board>> undo_state_history;
-    std::shared_ptr<std::vector<Board>> redo_state_history;
+    std::vector<Board>* undo_state_history;
+    std::vector<Board>* redo_state_history;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);
@@ -123,4 +125,9 @@ private:
     void prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity);
     void prepare_piece_for_three_step_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity,
             const glm::vec3& target0, const glm::vec3& target1);
+};
+
+struct StateHistory {
+    std::vector<Board> undo_state_history;
+    std::vector<Board> redo_state_history;
 };

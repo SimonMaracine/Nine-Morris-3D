@@ -28,10 +28,11 @@ namespace save_load {
         Camera camera;
         unsigned int time = 0;  // In deciseconds
         std::string date = NO_LAST_GAME;
+        StateHistory state_history;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(board, camera, time, date);
+            archive(board, camera, time, date, state_history);
         }
     };
 
