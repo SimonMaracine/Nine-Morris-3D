@@ -19,7 +19,7 @@ class GuiLayer;
 
 class GameLayer : public Layer {
 public:
-    GameLayer(const std::string& id, Application* app)
+    GameLayer(std::string_view id, Application* app)
         : Layer(id, app) {}
     virtual ~GameLayer() = default;
 
@@ -37,37 +37,37 @@ public:
     bool on_key_pressed(events::KeyPressedEvent& event);
     bool on_key_released(events::KeyReleasedEvent& event);
 
-    std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
+    std::shared_ptr<Buffer> create_ids_buffer(size_t vertices_size, hoverable::Id id);
 
     void prepare_board();
     void prepare_board_paint();
     void prepare_pieces();
-    void prepare_piece(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
+    void prepare_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
             std::shared_ptr<Texture> diffuse_texture);
 
     void prepare_board_no_normal();
     void prepare_board_paint_no_normal();
     void prepare_pieces_no_normal();
-    void prepare_piece_no_normal(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
+    void prepare_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
             std::shared_ptr<Texture> diffuse_texture);
 
     void prepare_nodes();
-    void prepare_node(unsigned int index, const glm::vec3& position);
+    void prepare_node(size_t index, const glm::vec3& position);
 
     void resetup_textures();
 
     void setup_board();
     void setup_board_paint();
     void setup_pieces();
-    void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh);
+    void setup_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh);
 
     void setup_board_no_normal();
     void setup_board_paint_no_normal();
     void setup_pieces_no_normal();
-    void setup_piece_no_normal(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh);
+    void setup_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh);
 
     void setup_nodes();
-    void setup_node(unsigned int index, const glm::vec3& position);
+    void setup_node(size_t index, const glm::vec3& position);
 
     void setup_skybox();
     void setup_light();

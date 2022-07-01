@@ -100,7 +100,7 @@ Framebuffer::Framebuffer(const FramebufferSpecification& specification)
 }
 
 Framebuffer::~Framebuffer() {
-    for (unsigned int i = 0; i < specification.color_attachments.size(); i++) {
+    for (size_t i = 0; i < specification.color_attachments.size(); i++) {
         switch (specification.color_attachments[i].type) {
             case AttachmentType::None:
                 ASSERT(false, "Attachment type 'None' is invalid");
@@ -202,7 +202,7 @@ void Framebuffer::resolve_framebuffer(GLuint draw_framebuffer, int width, int he
     glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
 
-    for (unsigned int i = 0; i < color_attachments.size(); i++) {
+    for (size_t i = 0; i < color_attachments.size(); i++) {
         glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
         glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -212,7 +212,7 @@ void Framebuffer::resolve_framebuffer(GLuint draw_framebuffer, int width, int he
 void Framebuffer::build() {
     // Delete old framebuffer first
     if (framebuffer != 0) {
-        for (unsigned int i = 0; i < specification.color_attachments.size(); i++) {
+        for (size_t i = 0; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
                     ASSERT(false, "Attachment type 'None' is invalid");
@@ -254,7 +254,7 @@ void Framebuffer::build() {
 
     color_attachments.resize(specification.color_attachments.size());
 
-    for (unsigned int i = 0; i < specification.color_attachments.size(); i++) {
+    for (size_t i = 0; i < specification.color_attachments.size(); i++) {
         switch (specification.color_attachments[i].type) {
             case AttachmentType::None:
                 ASSERT(false, "Attachment type 'None' is invalid");

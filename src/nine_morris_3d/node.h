@@ -37,7 +37,7 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
 
 struct Node {
     Node() = default;
-    Node(hoverable::Id id, unsigned int index)
+    Node(hoverable::Id id, size_t index)
         : id(id), index(index) {}
 
     hoverable::Id id = hoverable::null;
@@ -47,5 +47,5 @@ struct Node {
     hoverable::Id piece_id = hoverable::null;
     Piece* piece = nullptr;  // Reference to the piece that sits on this node
 
-    unsigned int index = 0;  // From 0 to 23, needed for easier coping with these
+    size_t index = 0;  // From 0 to 23, needed for easier coping with these
 };

@@ -4,13 +4,14 @@
 
 #include "application/layer.h"
 #include "application/platform.h"
+#include "nine_morris_3d/save_load.h"
 
 class GameLayer;
 class GuiLayer;
 
 class ImGuiLayer : public Layer {
 public:
-    ImGuiLayer(const std::string& id, Application* app)
+    ImGuiLayer(std::string_view id, Application* app)
         : Layer(id, app) {}
     virtual ~ImGuiLayer() = default;
 
@@ -46,7 +47,7 @@ public:
     bool show_about = false;
     bool show_could_not_load_game = false;
     bool show_no_last_game = false;
-    std::string last_save_game_date;
+    std::string last_save_game_date = save_load::NO_LAST_GAME;
 
     std::string info_file_path;
     std::string save_game_file_path;

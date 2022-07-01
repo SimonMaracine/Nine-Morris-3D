@@ -7,7 +7,7 @@
 
 class LoadingLayer : public Layer {
 public:
-    LoadingLayer(const std::string& id, Application* app)
+    LoadingLayer(std::string_view id, Application* app)
         : Layer(id, app) {}
     virtual ~LoadingLayer() = default;
 

@@ -7,7 +7,7 @@
 
 #define GET_ACTIVE_PIECES(result) \
     std::array<Piece*, 18> pointer_pieces; \
-    for (unsigned int i = 0; i < 18; i++) { \
+    for (size_t i = 0; i < 18; i++) { \
         pointer_pieces[i] = &pieces[i]; \
     } \
     std::vector<Piece*> result; \
@@ -49,7 +49,7 @@ void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusiv
     to.paint_model.scale = from.paint_model.scale;
     to.paint_model.outline_color = from.paint_model.outline_color;
 
-    for (unsigned int i = 0; i < 24; i++) {
+    for (size_t i = 0; i < 24; i++) {
         Node& node = to.nodes[i];
         node.id = from.nodes[i].id;
         node.model.index_count = from.nodes[i].model.index_count;
@@ -62,7 +62,7 @@ void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusiv
         node.index = from.nodes[i].index;
     }
 
-    for (unsigned int i = 0; i < 18; i++) {
+    for (size_t i = 0; i < 18; i++) {
         Piece& piece = to.pieces[i];
         piece.id = from.pieces[i].id;
         piece.model.index_count = from.pieces[i].model.index_count;
@@ -724,7 +724,7 @@ void Board::switch_turn() {
 }
 
 bool Board::is_windmill_made(Node* node, Piece::Type type) {
-    for (unsigned int i = 0; i < 16; i++) {
+    for (size_t i = 0; i < 16; i++) {
         const unsigned int* mill = WINDMILLS[i];
 
         const Node& node1 = nodes[mill[0]];
@@ -760,7 +760,7 @@ void Board::set_pieces_to_take(Piece::Type type, bool take) {
 unsigned int Board::number_of_pieces_in_windmills(Piece::Type type) {
     std::vector<Piece*> pieces_inside_mills;
 
-    for (unsigned int i = 0; i < 16; i++) {
+    for (size_t i = 0; i < 16; i++) {
         const unsigned int* mill = WINDMILLS[i];
 
         const Node& node1 = nodes[mill[0]];
@@ -1196,7 +1196,7 @@ bool Board::is_player_blocked(Player player) {
 Board::GamePosition Board::get_position() {
     GamePosition position;
 
-    for (unsigned int i = 0; i < 24; i++) {
+    for (size_t i = 0; i < 24; i++) {
         Node& node = nodes[i];
 
         if (node.piece != nullptr) {

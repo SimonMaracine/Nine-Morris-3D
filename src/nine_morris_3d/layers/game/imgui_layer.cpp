@@ -43,10 +43,6 @@ void ImGuiLayer::on_attach() {
     last_save_game_date = std::move(state.date);
     DEB_INFO("Checked last saved game");
 
-    if (last_save_game_date == "") {  // TODO delete this later maybe
-        DEB_ERROR("last_save_game_date is empty");
-    }
-
     try {
         info_file_path = paths::path_for_logs(INFO_FILE);
         save_game_file_path = paths::path_for_saved_data(save_load::SAVE_GAME_FILE);
@@ -157,10 +153,6 @@ void ImGuiLayer::on_update(float dt) {
                 }
 
                 last_save_game_date = std::move(state.date);
-
-                if (last_save_game_date == "") {  // TODO delete this later maybe
-                    DEB_ERROR("last_save_game_date is empty");
-                }
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 const bool undid_game_over = game_layer->board.undo();

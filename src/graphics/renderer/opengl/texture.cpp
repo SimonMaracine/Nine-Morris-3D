@@ -207,7 +207,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
     int width, height, channels;
     stbi_uc* data;
 
-    for (unsigned int i = 0; i < 6; i++) {
+    for (size_t i = 0; i < 6; i++) {
         DEB_DEBUG("Loading texture '{}'...", file_paths[i]);
 
         data = stbi_load(file_paths[i], &width, &height, &channels, 4);
@@ -242,7 +242,7 @@ std::shared_ptr<Texture3D> Texture3D::create(const std::array<std::shared_ptr<Te
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    for (unsigned int i = 0; i < 6; i++) {
+    for (size_t i = 0; i < 6; i++) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, data[i]->width,
                 data[i]->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data);
         LOG_ALLOCATION(data[i]->width * data[i]->height * 4)

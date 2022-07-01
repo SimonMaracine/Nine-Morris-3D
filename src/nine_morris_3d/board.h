@@ -13,8 +13,9 @@ constexpr float PAINT_Y_POSITION = 0.062f;
 struct StateHistory;
 
 class Board {
-    using GamePosition = std::array<Piece::Type, 24>;
 public:
+    using GamePosition = std::array<Piece::Type, 24>;
+
     enum class Phase {
         None,
         PlacePieces = 1,
