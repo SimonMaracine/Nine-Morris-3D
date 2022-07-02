@@ -743,7 +743,7 @@ void GameLayer::prepare_piece_no_normal(unsigned int index, Piece::Type type, st
     layout.add(2, BufferLayout::Type::Float, 3);
 
     BufferLayout layout2;
-    layout2.add(4, BufferLayout::Type::Int, 1);
+    layout2.add(3, BufferLayout::Type::Int, 1);
 
     std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(),
             mesh->indices.size() * sizeof(unsigned int));
