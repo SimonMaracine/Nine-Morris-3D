@@ -16,7 +16,7 @@ public:
         Right = 3
     };
 
-    void render();
+    void initialize();
     void move(Direction direction);
     bool press(bool& first_move);
 
@@ -36,7 +36,7 @@ private:
             neighbor_right = right;
         }
 
-        size_t index;
+        size_t index = 0;
         KNode* neighbor_up = nullptr;
         KNode* neighbor_down = nullptr;
         KNode* neighbor_left = nullptr;

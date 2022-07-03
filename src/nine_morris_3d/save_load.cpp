@@ -33,7 +33,8 @@ void serialize(Archive& archive, Board& board) {
         board.model, board.paint_model, board.nodes, board.pieces, board.phase, board.turn,
         board.ending, board.ending_message, board.white_pieces_count, board.black_pieces_count,
         board.not_placed_white_pieces_count, board.not_placed_black_pieces_count,
-        board.should_take_piece, board.can_jump, board.turns_without_mills, board.repetition_history, board.next_move
+        board.should_take_piece, board.can_jump, board.turns_without_mills,
+        board.repetition_history, board.next_move
     );
 }
 

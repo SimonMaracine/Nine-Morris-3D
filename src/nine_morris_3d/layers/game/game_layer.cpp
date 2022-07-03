@@ -81,6 +81,7 @@ void GameLayer::on_attach() {
     setup_camera();
 
     keyboard = KeyboardControls(&board);
+    keyboard.initialize();
 
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
     app->renderer->add_quad(keyboard.quad);

@@ -102,8 +102,8 @@ public:
         std::vector<PositionPlusInfo> twos;
     } repetition_history;
 
-    std::vector<Board>* undo_state_history;
-    std::vector<Board>* redo_state_history;
+    std::vector<Board>* undo_state_history = nullptr;
+    std::vector<Board>* redo_state_history = nullptr;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);

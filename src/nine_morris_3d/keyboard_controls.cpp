@@ -23,6 +23,12 @@ KeyboardControls::KeyboardControls(Board* board)
         nodes[i] = KNode(i);
     }
 
+    quad.position = POSITION(0);
+    quad.scale = 0.3f;
+    quad.texture = app->data.keyboard_controls_texture;
+}
+
+void KeyboardControls::initialize() {
     nodes[0].neighbors(nullptr, &nodes[9], nullptr, &nodes[1]);
     nodes[1].neighbors(nullptr, &nodes[4], &nodes[0], &nodes[2]);
     nodes[2].neighbors(nullptr, &nodes[14], &nodes[1], nullptr);
@@ -49,10 +55,6 @@ KeyboardControls::KeyboardControls(Board* board)
     nodes[23].neighbors(&nodes[14], nullptr, &nodes[22], nullptr);
 
     current_node = &nodes[0];
-
-    quad.position = POSITION(current_node->index);
-    quad.scale = 0.3f;
-    quad.texture = app->data.keyboard_controls_texture;
 }
 
 void KeyboardControls::move(Direction direction) {
