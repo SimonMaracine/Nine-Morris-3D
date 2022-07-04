@@ -54,7 +54,7 @@ touch $SHORTCUT_FOLDER/$SHORTCUT
 check_failure
 cat << EOF > $SHORTCUT_FOLDER/$SHORTCUT
 [Desktop Entry]
-Version=0.1.0
+Version=0.2.0
 Terminal=false
 Exec=$EXECUTABLE_NAME
 Icon=$APP_NAME

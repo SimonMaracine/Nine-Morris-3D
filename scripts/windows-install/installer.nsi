@@ -5,7 +5,7 @@
 ;General
 
   Name "NineMorris3D"
-  OutFile "Nine-Morris-3D-vX.Y.Z-Windows.exe"
+  OutFile "Nine-Morris-3D-v0.2.0-Windows.exe"
   Unicode True
 
   ;Default installation folder

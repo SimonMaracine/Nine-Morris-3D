@@ -30,7 +30,7 @@
 #endif
 
 constexpr unsigned int VERSION_MAJOR = 0;
-constexpr unsigned int VERSION_MINOR = 1;
+constexpr unsigned int VERSION_MINOR = 2;
 constexpr unsigned int VERSION_PATCH = 0;
 
 class NineMorris3D : public Application {
