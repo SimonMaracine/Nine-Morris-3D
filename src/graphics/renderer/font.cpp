@@ -305,8 +305,8 @@ void Font::blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsi
 std::string Font::get_name(std::string_view file_path) {
     std::vector<std::string> tokens;
 
-    char copy[256];
-    strcpy(copy, file_path.data());
+    char copy[512];
+    strncpy(copy, file_path.data(), 512);
 
     char* token = strtok(copy, "/.");
 

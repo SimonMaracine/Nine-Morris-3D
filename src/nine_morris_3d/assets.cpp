@@ -85,23 +85,35 @@ namespace assets {
 #ifdef PLATFORM_GAME_RELEASE
         static const char* PREFIX = ".dat";
 
-        static constexpr std::array<std::string*, 50> assets = {
+        static constexpr std::array<std::string*, 64> assets = {
             &BOARD_WOOD_MESH,
             &BOARD_PAINT_MESH,
             &NODE_MESH,
             &WHITE_PIECE_MESH,
             &BLACK_PIECE_MESH,
+
             &BOARD_WOOD_DIFFUSE_TEXTURE,
             &BOARD_PAINT_DIFFUSE_TEXTURE,
+            &LABELED_BOARD_PAINT_DIFFUSE_TEXTURE,
+            &BOARD_NORMAL_TEXTURE,
+            &PIECE_NORMAL_TEXTURE,
             &WHITE_PIECE_DIFFUSE_TEXTURE,
             &BLACK_PIECE_DIFFUSE_TEXTURE,
+
             &BOARD_WOOD_DIFFUSE_TEXTURE_SMALL,
             &BOARD_PAINT_DIFFUSE_TEXTURE_SMALL,
+            &LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL,
+            &BOARD_NORMAL_TEXTURE_SMALL,
+            &PIECE_NORMAL_TEXTURE_SMALL,
             &WHITE_PIECE_DIFFUSE_TEXTURE_SMALL,
             &BLACK_PIECE_DIFFUSE_TEXTURE_SMALL,
+
             &WHITE_INDICATOR_TEXTURE,
             &BLACK_INDICATOR_TEXTURE,
             &SPLASH_SCREEN_TEXTURE,
+            &KEYBOARD_CONTROLS_TEXTURE,
+            &KEYBOARD_CONTROLS_TEXTURE_CROSS,
+
             &FIELD_PX_TEXTURE,
             &FIELD_NX_TEXTURE,
             &FIELD_PY_TEXTURE,
@@ -126,6 +138,7 @@ namespace assets {
             &AUTUMN_NY_TEXTURE_SMALL,
             &AUTUMN_PZ_TEXTURE_SMALL,
             &AUTUMN_NZ_TEXTURE_SMALL,
+
             &BOARD_VERTEX_SHADER,
             &BOARD_FRAGMENT_SHADER,
             &BOARD_PAINT_VERTEX_SHADER,
@@ -134,6 +147,13 @@ namespace assets {
             &PIECE_FRAGMENT_SHADER,
             &NODE_VERTEX_SHADER,
             &NODE_FRAGMENT_SHADER,
+            &BOARD_NO_NORMAL_VERTEX_SHADER,
+            &BOARD_NO_NORMAL_FRAGMENT_SHADER,
+            &BOARD_PAINT_NO_NORMAL_VERTEX_SHADER,
+            &BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER,
+            &PIECE_NO_NORMAL_VERTEX_SHADER,
+            &PIECE_NO_NORMAL_FRAGMENT_SHADER,
+
             &ARROW_CURSOR,
             &CROSS_CURSOR
         };
