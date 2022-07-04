@@ -65,8 +65,8 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     }
 
     // Load and set cursors
-    arrow_cursor = window->add_cursor(std::make_unique<TextureData>(convert(path_for_assets(ARROW_CURSOR)), false), 4, 1);
-    cross_cursor = window->add_cursor(std::make_unique<TextureData>(convert(path_for_assets(CROSS_CURSOR)), false), 8, 8);
+    arrow_cursor = window->add_cursor(std::make_unique<TextureData>(encr(path_for_assets(ARROW_CURSOR)), false), 4, 1);
+    cross_cursor = window->add_cursor(std::make_unique<TextureData>(encr(path_for_assets(CROSS_CURSOR)), false), 8, 8);
 
     // Setup scene framebuffer
     {
@@ -109,8 +109,9 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     }
 
     // Load splash screen and keyboard controls
-    data.splash_screen_texture = Texture::create(convert(path_for_assets(SPLASH_SCREEN_TEXTURE)), true);
-    data.keyboard_controls_texture = Texture::create(convert(path_for_assets(KEYBOARD_CONTROLS_TEXTURE)), true);
+    data.splash_screen_texture = Texture::create(encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), true);
+    data.keyboard_controls_texture = Texture::create(encr(path_for_assets(KEYBOARD_CONTROLS_TEXTURE)), true);
+    data.keyboard_controls_texture_cross = Texture::create(encr(path_for_assets(KEYBOARD_CONTROLS_TEXTURE_CROSS)), true);
 
     // Load and create this font
     data.good_dog_plain_font = std::make_shared<Font>(path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);

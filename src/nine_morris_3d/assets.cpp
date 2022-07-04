@@ -27,6 +27,7 @@ namespace assets {
     std::string BLACK_INDICATOR_TEXTURE = "data/textures/indicator/black_indicator.png";
     std::string SPLASH_SCREEN_TEXTURE = "data/textures/splash_screen/splash_screen.png";
     std::string KEYBOARD_CONTROLS_TEXTURE = "data/textures/keyboard_controls/keyboard_controls.png";
+    std::string KEYBOARD_CONTROLS_TEXTURE_CROSS = "data/textures/keyboard_controls/keyboard_controls_cross.png";
 
     std::string OPEN_SANS_FONT = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
     std::string GOOD_DOG_PLAIN_FONT = "data/fonts/FH-GoodDogPlain-WTT/GOODDP__.TTF";

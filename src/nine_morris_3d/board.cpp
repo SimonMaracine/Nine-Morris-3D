@@ -2,6 +2,7 @@
 
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/nine_morris_3d.h"
+#include "nine_morris_3d/keyboard_controls.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
@@ -583,8 +584,16 @@ void Board::update_cursor() {
     if (app->options.custom_cursor) {
         if (should_take_piece) {
             app->window->set_cursor(app->cross_cursor);
+
+            if (keyboard != nullptr) {
+                keyboard->quad.texture = app->data.keyboard_controls_texture_cross;
+            }
         } else {
             app->window->set_cursor(app->arrow_cursor);
+
+            if (keyboard != nullptr) {
+                keyboard->quad.texture = app->data.keyboard_controls_texture;
+            }
         }
     }
 }

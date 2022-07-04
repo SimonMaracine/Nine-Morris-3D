@@ -90,8 +90,8 @@ Renderer::Renderer(Application* app)
             "u_skybox"
         };
         storage.skybox_shader = Shader::create(
-            convert(paths::path_for_assets(SKYBOX_VERTEX_SHADER)),
-            convert(paths::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(SKYBOX_VERTEX_SHADER)),
+            encr(paths::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -101,8 +101,8 @@ Renderer::Renderer(Application* app)
             "u_screen_texture"
         };
         storage.screen_quad_shader = Shader::create(
-            convert(paths::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
-            convert(paths::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
+            encr(paths::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -115,8 +115,8 @@ Renderer::Renderer(Application* app)
             "u_texture"
         };
         storage.quad3d_shader = Shader::create(
-            convert(paths::path_for_assets(QUAD3D_VERTEX_SHADER)),
-            convert(paths::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(QUAD3D_VERTEX_SHADER)),
+            encr(paths::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -126,8 +126,8 @@ Renderer::Renderer(Application* app)
             "u_model_matrix"
         };
         storage.shadow_shader = Shader::create(
-            convert(paths::path_for_assets(SHADOW_VERTEX_SHADER)),
-            convert(paths::path_for_assets(SHADOW_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(SHADOW_VERTEX_SHADER)),
+            encr(paths::path_for_assets(SHADOW_FRAGMENT_SHADER)),
             uniforms,
             { storage.light_space_uniform_block }
         );
@@ -139,8 +139,8 @@ Renderer::Renderer(Application* app)
             "u_color"
         };
         storage.outline_shader = Shader::create(
-            convert(paths::path_for_assets(OUTLINE_VERTEX_SHADER)),
-            convert(paths::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(OUTLINE_VERTEX_SHADER)),
+            encr(paths::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
             uniforms,
             { storage.projection_view_uniform_block }
         );
@@ -549,7 +549,7 @@ void Renderer::remove_quad(unsigned int handle) {
     quads.erase(handle);
 }
 
-void Renderer::clear_models() {
+void Renderer::clear() {
     models.clear();
     models_no_lighting.clear();
     models_outline.clear();

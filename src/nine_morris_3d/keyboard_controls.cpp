@@ -7,7 +7,7 @@
 #include "other/logging.h"
 #include "other/assert.h"
 
-#define Y_POSITION 0.8f
+#define Y_POSITION 0.47f
 #define POSITION(index) glm::vec3(NODE_POSITIONS[index].x, Y_POSITION, NODE_POSITIONS[index].z)
 
 static constexpr KeyboardControls::Direction NEXT[4][4] = {
@@ -19,16 +19,19 @@ static constexpr KeyboardControls::Direction NEXT[4][4] = {
 
 KeyboardControls::KeyboardControls(Board* board)
     : board(board) {
+
     for (size_t i = 0; i < 24; i++) {
         nodes[i] = KNode(i);
     }
 
     quad.position = POSITION(0);
-    quad.scale = 0.3f;
-    quad.texture = app->data.keyboard_controls_texture;
+    quad.scale = 0.14f;
+    quad.texture = board->should_take_piece ? app->data.keyboard_controls_texture_cross : app->data.keyboard_controls_texture;
 }
 
 void KeyboardControls::initialize() {
+    board->keyboard = this;
+
     nodes[0].neighbors(nullptr, &nodes[9], nullptr, &nodes[1]);
     nodes[1].neighbors(nullptr, &nodes[4], &nodes[0], &nodes[2]);
     nodes[2].neighbors(nullptr, &nodes[14], &nodes[1], nullptr);

@@ -11,6 +11,7 @@ constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
 constexpr float PAINT_Y_POSITION = 0.062f;
 
 struct StateHistory;
+class KeyboardControls;
 
 class Board {
 public:
@@ -104,6 +105,7 @@ public:
 
     std::vector<Board>* undo_state_history = nullptr;
     std::vector<Board>* redo_state_history = nullptr;
+    KeyboardControls* keyboard = nullptr;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);

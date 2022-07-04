@@ -97,6 +97,7 @@ public:
     float last_mouse_y = 0.0f;
 
     bool first_move = false;
+    bool show_keyboard_controls = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
 

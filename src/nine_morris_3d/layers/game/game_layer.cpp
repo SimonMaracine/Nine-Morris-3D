@@ -84,7 +84,6 @@ void GameLayer::on_attach() {
     keyboard.initialize();
 
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
-    app->renderer->add_quad(keyboard.quad);
 
 #ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = true;
@@ -139,7 +138,7 @@ void GameLayer::on_detach() {
     app->renderer->origin = false;
 #endif
 
-    app->renderer->clear_models();
+    app->renderer->clear();
 
     gui_layer->timer = Timer();
 
@@ -301,53 +300,91 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
             board.release();
         }
+
+        if (show_keyboard_controls) {
+            app->renderer->remove_quad(keyboard.quad.handle);
+            show_keyboard_controls = false;
+        }
     }
 
     return false;
 }
 
 bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
+    switch (event.key) {
+        case input::Key::UP:
+        case input::Key::DOWN:
+        case input::Key::LEFT:
+        case input::Key::RIGHT:
+        case input::Key::ENTER:
+            if (!show_keyboard_controls) {
+                app->renderer->add_quad(keyboard.quad);
+                show_keyboard_controls = true;
+                return false;
+            }
+        default:
+            break;
+    }
+
     using KB = KeyboardControls;
 
-    if (event.key == input::Key::UP) {
-        const KB::Direction direction = KB::calculate(
-            KB::Direction::Up, app->camera.get_angle_around_point()
-        );
-        keyboard.move(direction);
-    } else if (event.key == input::Key::DOWN) {
-        const KB::Direction direction = KB::calculate(
-            KB::Direction::Down, app->camera.get_angle_around_point()
-        );
-        keyboard.move(direction);
-    } else if (event.key == input::Key::LEFT) {
-        const KB::Direction direction = KB::calculate(
-            KB::Direction::Left, app->camera.get_angle_around_point()
-        );
-        keyboard.move(direction);
-    } else if (event.key == input::Key::RIGHT) {
-        const KB::Direction direction = KB::calculate(
-            KB::Direction::Right, app->camera.get_angle_around_point()
-        );
-        keyboard.move(direction);
-    } else if (event.key == input::Key::ENTER) {
-        if (board.next_move) {
-            const bool did = keyboard.press(first_move);
-
-            if (did && !first_move && !gui_layer->timer.get_running()) {
-                gui_layer->timer.start(app->window->get_time());
-                first_move = true;
-            }
-
-            if (board.phase == Board::Phase::GameOver) {
-                gui_layer->timer.stop();
-            }
-
-            if (board.redo_state_history->empty()) {
-                imgui_layer->can_redo = false;
-            }
-
-            board.release();
+    switch (event.key) {
+        case input::Key::UP: {
+            const KB::Direction direction = KB::calculate(
+                KB::Direction::Up, app->camera.get_angle_around_point()
+            );
+            keyboard.move(direction);
+            
+            break;
         }
+        case input::Key::DOWN: {
+            const KB::Direction direction = KB::calculate(
+                KB::Direction::Down, app->camera.get_angle_around_point()
+            );
+            keyboard.move(direction);
+
+            break;
+        }
+        case input::Key::LEFT: {
+            const KB::Direction direction = KB::calculate(
+                KB::Direction::Left, app->camera.get_angle_around_point()
+            );
+            keyboard.move(direction);
+
+            break;
+        }
+        case input::Key::RIGHT: {
+            const KB::Direction direction = KB::calculate(
+                KB::Direction::Right, app->camera.get_angle_around_point()
+            );
+            keyboard.move(direction);
+
+            break;
+        }
+        case input::Key::ENTER: {
+            if (board.next_move) {
+                const bool did = keyboard.press(first_move);
+
+                if (did && !first_move && !gui_layer->timer.get_running()) {
+                    gui_layer->timer.start(app->window->get_time());
+                    first_move = true;
+                }
+
+                if (board.phase == Board::Phase::GameOver) {
+                    gui_layer->timer.stop();  // FIXME this at the end
+                }
+
+                if (board.redo_state_history->empty()) {
+                    imgui_layer->can_redo = false;
+                }
+
+                board.release();
+            }
+
+            break;
+        }
+        default:
+            break;
     }
 
     return false;
@@ -388,8 +425,8 @@ void GameLayer::prepare_board() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_wood_shader = Shader::create(
-        convert(paths::path_for_assets(assets::BOARD_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -454,8 +491,8 @@ void GameLayer::prepare_board_paint() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_paint_shader = Shader::create(
-        convert(paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -517,8 +554,8 @@ void GameLayer::prepare_pieces() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.piece_shader = Shader::create(
-        convert(paths::path_for_assets(assets::PIECE_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::PIECE_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -615,8 +652,8 @@ void GameLayer::prepare_board_no_normal() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_wood_shader = Shader::create(
-        convert(paths::path_for_assets(assets::BOARD_NO_NORMAL_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::BOARD_NO_NORMAL_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_NO_NORMAL_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_NO_NORMAL_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -673,8 +710,8 @@ void GameLayer::prepare_board_paint_no_normal() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_paint_shader = Shader::create(
-        convert(paths::path_for_assets(assets::BOARD_PAINT_NO_NORMAL_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_PAINT_NO_NORMAL_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -732,8 +769,8 @@ void GameLayer::prepare_pieces_no_normal() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.piece_shader = Shader::create(
-        convert(paths::path_for_assets(assets::PIECE_NO_NORMAL_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::PIECE_NO_NORMAL_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::PIECE_NO_NORMAL_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::PIECE_NO_NORMAL_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -814,8 +851,8 @@ void GameLayer::prepare_nodes() {
         "u_color"
     };
     app->data.node_shader = Shader::create(
-        convert(paths::path_for_assets(assets::NODE_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::NODE_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         uniforms,
         { app->renderer->get_projection_view_uniform_block() }
     );

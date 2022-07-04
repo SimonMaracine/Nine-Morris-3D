@@ -49,6 +49,7 @@ public:
     struct RenderData {
         std::shared_ptr<Texture> splash_screen_texture;
         std::shared_ptr<Texture> keyboard_controls_texture;
+        std::shared_ptr<Texture> keyboard_controls_texture_cross;
         std::shared_ptr<Font> good_dog_plain_font;
 
         ImFont* imgui_info_font = nullptr;

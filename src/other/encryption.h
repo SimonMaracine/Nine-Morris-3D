@@ -20,8 +20,8 @@ namespace encryption {
     cppblowfish::Buffer load_file(const EncryptedFile& file_path);
 
 #if defined(PLATFORM_GAME_DEBUG)
-    std::string convert(std::string_view file_path);
+    std::string encr(std::string_view file_path);
 #elif defined(PLATFORM_GAME_RELEASE)
-    EncryptedFile convert(std::string_view file_path);
+    EncryptedFile encr(std::string_view file_path);
 #endif
 }
