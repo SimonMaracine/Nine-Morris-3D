@@ -91,7 +91,7 @@ namespace assets {
             &NODE_MESH,
             &WHITE_PIECE_MESH,
             &BLACK_PIECE_MESH,
-            &BOARD_WOOD_TEXTURE,
+            &BOARD_WOOD_DIFFUSE_TEXTURE,
             &BOARD_PAINT_DIFFUSE_TEXTURE,
             &WHITE_PIECE_DIFFUSE_TEXTURE,
             &BLACK_PIECE_DIFFUSE_TEXTURE,
