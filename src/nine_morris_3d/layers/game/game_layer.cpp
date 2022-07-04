@@ -1394,8 +1394,10 @@ void GameLayer::load_game() {
     }
 
     app->camera = state.camera;
+    state_history.undo_state_history = std::move(state.state_history.undo_state_history);
+    state_history.redo_state_history = std::move(state.state_history.redo_state_history);
 
-    Board::copy_smart(board, state.board, true);
+    Board::copy_smart(board, state.board, &state_history);
 
     // Reset pieces' models
     for (Piece& piece : board.pieces) {

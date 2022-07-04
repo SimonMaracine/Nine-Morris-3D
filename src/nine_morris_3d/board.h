@@ -40,7 +40,7 @@ public:
     Board(StateHistory& state_history);
     ~Board() = default;
 
-    static void copy_smart(Board& to, const Board& from, bool state_history_inclusive);
+    static void copy_smart(Board& to, const Board& from, StateHistory* state_history);
 
     bool place_piece(hoverable::Id hovered_id);
     void move_pieces(float dt);

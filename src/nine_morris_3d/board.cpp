@@ -37,7 +37,7 @@ Board::Board(StateHistory& state_history) {
     redo_state_history = &state_history.redo_state_history;
 }
 
-void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusive) {
+void Board::copy_smart(Board& to, const Board& from, StateHistory* state_history) {
     to.model.index_count = from.model.index_count;
     to.model.position = from.model.position;
     to.model.rotation = from.model.rotation;
@@ -100,9 +100,9 @@ void Board::copy_smart(Board& to, const Board& from, bool state_history_inclusiv
     to.can_jump = from.can_jump;
     to.turns_without_mills = from.turns_without_mills;
     to.repetition_history = from.repetition_history;
-    if (state_history_inclusive) {
-        to.undo_state_history = from.undo_state_history;
-        to.redo_state_history = from.redo_state_history;
+    if (state_history != nullptr) {
+        to.undo_state_history = &state_history->undo_state_history;
+        to.redo_state_history = &state_history->redo_state_history;
     }
     to.next_move = true;
 
@@ -513,7 +513,7 @@ bool Board::undo() {
     Board previous_state = *this;
     Board& state_board = undo_state_history->back();
 
-    copy_smart(*this, state_board, false);
+    copy_smart(*this, state_board, nullptr);
 
     // Reset pieces' models
     for (Piece& piece : pieces) {
