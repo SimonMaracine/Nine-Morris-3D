@@ -11,7 +11,7 @@
  */
 class Layer {
 public:
-    Layer(const std::string& id, Application* application)
+    Layer(std::string_view id, Application* application)
         : id(id), application(application) {}
     virtual ~Layer() = default;
 

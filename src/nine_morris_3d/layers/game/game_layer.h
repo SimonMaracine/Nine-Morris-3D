@@ -8,6 +8,7 @@
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/options.h"
+#include "nine_morris_3d/keyboard_controls.h"
 #include "other/mesh.h"
 #include "other/loader.h"
 
@@ -18,7 +19,7 @@ class GuiLayer;
 
 class GameLayer : public Layer {
 public:
-    GameLayer(const std::string& id, Application* app)
+    GameLayer(std::string_view id, Application* app)
         : Layer(id, app) {}
     virtual ~GameLayer() = default;
 
@@ -33,39 +34,40 @@ public:
     bool on_mouse_moved(events::MouseMovedEvent& event);
     bool on_mouse_button_pressed(events::MouseButtonPressedEvent& event);
     bool on_mouse_button_released(events::MouseButtonReleasedEvent& event);
+    bool on_key_pressed(events::KeyPressedEvent& event);
     bool on_key_released(events::KeyReleasedEvent& event);
 
-    std::shared_ptr<Buffer> create_ids_buffer(unsigned int vertices_size, hoverable::Id id);
+    std::shared_ptr<Buffer> create_ids_buffer(size_t vertices_size, hoverable::Id id);
 
     void prepare_board();
     void prepare_board_paint();
     void prepare_pieces();
-    void prepare_piece(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
+    void prepare_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
             std::shared_ptr<Texture> diffuse_texture);
 
     void prepare_board_no_normal();
     void prepare_board_paint_no_normal();
     void prepare_pieces_no_normal();
-    void prepare_piece_no_normal(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
+    void prepare_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
             std::shared_ptr<Texture> diffuse_texture);
 
     void prepare_nodes();
-    void prepare_node(unsigned int index, const glm::vec3& position);
+    void prepare_node(size_t index, const glm::vec3& position);
 
     void resetup_textures();
 
     void setup_board();
     void setup_board_paint();
     void setup_pieces();
-    void setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh);
+    void setup_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh);
 
     void setup_board_no_normal();
     void setup_board_paint_no_normal();
     void setup_pieces_no_normal();
-    void setup_piece_no_normal(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh);
+    void setup_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh);
 
     void setup_nodes();
-    void setup_node(unsigned int index, const glm::vec3& position);
+    void setup_node(size_t index, const glm::vec3& position);
 
     void setup_skybox();
     void setup_light();
@@ -83,8 +85,10 @@ public:
     void actually_change_normal_mapping();
 
     void load_game();
-    
+
     Board board;
+    StateHistory state_history;
+    KeyboardControls keyboard;
 
     float mouse_wheel = 0.0f;
     float dx = 0.0f;
@@ -93,6 +97,7 @@ public:
     float last_mouse_y = 0.0f;
 
     bool first_move = false;
+    bool show_keyboard_controls = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
 

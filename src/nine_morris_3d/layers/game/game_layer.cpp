@@ -50,18 +50,20 @@ constexpr DirectionalLight LIGHT_AUTUMN = {
 };
 
 void GameLayer::on_attach() {
-    board = Board();
-    for (unsigned int i = 0; i < 9; i++) {
+    state_history = StateHistory();
+    board = Board(state_history);
+
+    for (size_t i = 0; i < 9; i++) {
         board.pieces[i] = Piece(app->data.pieces_id[i], Piece::Type::White);
         board.pieces[i].model.position = glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f);
         board.pieces[i].model.rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(rand() % 360)), 0.0f);
     }
-    for (unsigned int i = 9; i < 18; i++) {
+    for (size_t i = 9; i < 18; i++) {
         board.pieces[i] = Piece(app->data.pieces_id[i], Piece::Type::Black);
         board.pieces[i].model.position = glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f);
         board.pieces[i].model.rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(rand() % 360)), 0.0f);
     }
-    for (unsigned int i = 0; i < 24; i++) {
+    for (size_t i = 0; i < 24; i++) {
         board.nodes[i] = Node(app->data.nodes_id[i], i);
     }
 
@@ -76,10 +78,11 @@ void GameLayer::on_attach() {
     }
 
     setup_nodes();
-
     setup_camera();
 
-    app->window->set_vsync(app->options.vsync);
+    keyboard = KeyboardControls(&board);
+    keyboard.initialize();
+
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
 #ifdef PLATFORM_GAME_DEBUG
@@ -135,7 +138,7 @@ void GameLayer::on_detach() {
     app->renderer->origin = false;
 #endif
 
-    app->renderer->clear_models();
+    app->renderer->clear();
 
     gui_layer->timer = Timer();
 
@@ -161,7 +164,6 @@ void GameLayer::on_awake() {
     }
 
     prepare_nodes();
-
     setup_skybox();
     setup_light();
 }
@@ -234,6 +236,7 @@ void GameLayer::on_event(events::Event& event) {
     dispatcher.dispatch<MouseMovedEvent>(MouseMoved, BIND(GameLayer::on_mouse_moved));
     dispatcher.dispatch<MouseButtonPressedEvent>(MouseButtonPressed, BIND(GameLayer::on_mouse_button_pressed));
     dispatcher.dispatch<MouseButtonReleasedEvent>(MouseButtonReleased, BIND(GameLayer::on_mouse_button_released));
+    dispatcher.dispatch<KeyPressedEvent>(KeyPressed, BIND(GameLayer::on_key_pressed));
     dispatcher.dispatch<KeyReleasedEvent>(KeyReleased, BIND(GameLayer::on_key_released));
 }
 
@@ -265,39 +268,26 @@ bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) 
 bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
     if (event.button == input::MouseButton::LEFT) {
         if (board.next_move) {
+            bool did = false;
+
             if (board.phase == Board::Phase::PlacePieces) {
                 if (board.should_take_piece) {
-                    const bool took = board.take_piece(app->renderer->get_hovered_id());
-
-                    if (took && !first_move && !gui_layer->timer.get_running()) {
-                        gui_layer->timer.start(app->window->get_time());
-                        first_move = true;
-                    }
+                    did = board.take_piece(app->renderer->get_hovered_id());
                 } else {
-                    const bool placed = board.place_piece(app->renderer->get_hovered_id());
-
-                    if (placed && !first_move && !gui_layer->timer.get_running()) {
-                        gui_layer->timer.start(app->window->get_time());
-                        first_move = true;
-                    }
+                    did = board.place_piece(app->renderer->get_hovered_id());
                 }
             } else if (board.phase == Board::Phase::MovePieces) {
                 if (board.should_take_piece) {
-                    const bool took = board.take_piece(app->renderer->get_hovered_id());
-
-                    if (took && !first_move && !gui_layer->timer.get_running()) {
-                        gui_layer->timer.start(app->window->get_time());
-                        first_move = true;
-                    }
+                    did = board.take_piece(app->renderer->get_hovered_id());
                 } else {
                     board.select_piece(app->renderer->get_hovered_id());
-                    const bool put = board.put_down_piece(app->renderer->get_hovered_id());
-
-                    if (put && !first_move && !gui_layer->timer.get_running()) {
-                        gui_layer->timer.start(app->window->get_time());
-                        first_move = true;
-                    }
+                    did = board.put_down_piece(app->renderer->get_hovered_id());
                 }
+            }
+
+            if (did && !first_move && !gui_layer->timer.get_running()) {
+                gui_layer->timer.start(app->window->get_time());
+                first_move = true;
             }
 
             if (board.phase == Board::Phase::GameOver) {
@@ -310,6 +300,91 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 
             board.release();
         }
+
+        if (show_keyboard_controls) {
+            app->renderer->remove_quad(keyboard.quad.handle);
+            show_keyboard_controls = false;
+        }
+    }
+
+    return false;
+}
+
+bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
+    switch (event.key) {
+        case input::Key::UP:
+        case input::Key::DOWN:
+        case input::Key::LEFT:
+        case input::Key::RIGHT:
+        case input::Key::ENTER:
+            if (!show_keyboard_controls) {
+                app->renderer->add_quad(keyboard.quad);
+                show_keyboard_controls = true;
+                return false;
+            }
+        default:
+            break;
+    }
+
+    using KB = KeyboardControls;
+
+    switch (event.key) {
+        case input::Key::UP: {
+            const KB::Direction direction = KB::calculate(
+                KB::Direction::Up, app->camera.get_angle_around_point()
+            );
+            keyboard.move(direction);
+            
+            break;
+        }
+        case input::Key::DOWN: {
+            const KB::Direction direction = KB::calculate(
+                KB::Direction::Down, app->camera.get_angle_around_point()
+            );
+            keyboard.move(direction);
+
+            break;
+        }
+        case input::Key::LEFT: {
+            const KB::Direction direction = KB::calculate(
+                KB::Direction::Left, app->camera.get_angle_around_point()
+            );
+            keyboard.move(direction);
+
+            break;
+        }
+        case input::Key::RIGHT: {
+            const KB::Direction direction = KB::calculate(
+                KB::Direction::Right, app->camera.get_angle_around_point()
+            );
+            keyboard.move(direction);
+
+            break;
+        }
+        case input::Key::ENTER: {
+            if (board.next_move) {
+                const bool did = keyboard.press(first_move);
+
+                if (did && !first_move && !gui_layer->timer.get_running()) {
+                    gui_layer->timer.start(app->window->get_time());
+                    first_move = true;
+                }
+
+                if (board.phase == Board::Phase::GameOver) {
+                    gui_layer->timer.stop();  // FIXME this at the end
+                }
+
+                if (board.redo_state_history->empty()) {
+                    imgui_layer->can_redo = false;
+                }
+
+                board.release();
+            }
+
+            break;
+        }
+        default:
+            break;
     }
 
     return false;
@@ -318,15 +393,15 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
 bool GameLayer::on_key_released(events::KeyReleasedEvent& event) {
     if (event.key == input::Key::SPACE) {
         app->camera.go_towards_position(default_camera_position);
-    }
+    } 
 
     return false;
 }
 
-std::shared_ptr<Buffer> GameLayer::create_ids_buffer(unsigned int vertices_size, hoverable::Id id) {
+std::shared_ptr<Buffer> GameLayer::create_ids_buffer(size_t vertices_size, hoverable::Id id) {
     std::vector<int> array;
     array.resize(vertices_size);
-    for (unsigned int i = 0; i < array.size(); i++) {
+    for (size_t i = 0; i < array.size(); i++) {
         array[i] = static_cast<int>(id);
     }
     std::shared_ptr<Buffer> buffer = Buffer::create(array.data(), array.size() * sizeof(int));
@@ -350,8 +425,8 @@ void GameLayer::prepare_board() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_wood_shader = Shader::create(
-        convert(paths::path_for_assets(assets::BOARD_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -416,8 +491,8 @@ void GameLayer::prepare_board_paint() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_paint_shader = Shader::create(
-        convert(paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -479,8 +554,8 @@ void GameLayer::prepare_pieces() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.piece_shader = Shader::create(
-        convert(paths::path_for_assets(assets::PIECE_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::PIECE_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -502,13 +577,13 @@ void GameLayer::prepare_pieces() {
     app->data.tinted_wood_material->add_texture("u_material.normal");
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
 
-    for (unsigned int i = 0; i < 9; i++) {
+    for (size_t i = 0; i < 9; i++) {
         prepare_piece(
             i, Piece::Type::White, app->assets_data->white_piece_mesh,
             app->data.white_piece_diffuse_texture
         );
     }
-    for (unsigned int i = 9; i < 18; i++) {
+    for (size_t i = 9; i < 18; i++) {
         prepare_piece(
             i, Piece::Type::Black, app->assets_data->black_piece_mesh,
             app->data.black_piece_diffuse_texture
@@ -516,7 +591,7 @@ void GameLayer::prepare_pieces() {
     }
 }
 
-void GameLayer::prepare_piece(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
+void GameLayer::prepare_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
         std::shared_ptr<Texture> diffuse_texture) {
     hoverable::Id id = hoverable::generate_id();
     app->data.pieces_id[index] = id;
@@ -577,8 +652,8 @@ void GameLayer::prepare_board_no_normal() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_wood_shader = Shader::create(
-        convert(paths::path_for_assets(assets::BOARD_NO_NORMAL_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::BOARD_NO_NORMAL_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_NO_NORMAL_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_NO_NORMAL_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -635,8 +710,8 @@ void GameLayer::prepare_board_paint_no_normal() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.board_paint_shader = Shader::create(
-        convert(paths::path_for_assets(assets::BOARD_PAINT_NO_NORMAL_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_PAINT_NO_NORMAL_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -694,8 +769,8 @@ void GameLayer::prepare_pieces_no_normal() {
         app->renderer->get_light_space_uniform_block()
     };
     app->data.piece_shader = Shader::create(
-        convert(paths::path_for_assets(assets::PIECE_NO_NORMAL_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::PIECE_NO_NORMAL_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::PIECE_NO_NORMAL_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::PIECE_NO_NORMAL_FRAGMENT_SHADER)),
         uniforms,
         uniform_blocks
     );
@@ -713,13 +788,13 @@ void GameLayer::prepare_pieces_no_normal() {
     app->data.tinted_wood_material->add_variable(Material::UniformType::Float, "u_material.shininess");
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
 
-    for (unsigned int i = 0; i < 9; i++) {
+    for (size_t i = 0; i < 9; i++) {
         prepare_piece_no_normal(
             i, Piece::Type::White, app->assets_data->white_piece_no_normal_mesh,
             app->data.white_piece_diffuse_texture
         );
     }
-    for (unsigned int i = 9; i < 18; i++) {
+    for (size_t i = 9; i < 18; i++) {
         prepare_piece_no_normal(
             i, Piece::Type::Black, app->assets_data->black_piece_no_normal_mesh,
             app->data.black_piece_diffuse_texture
@@ -727,7 +802,7 @@ void GameLayer::prepare_pieces_no_normal() {
     }
 }
 
-void GameLayer::prepare_piece_no_normal(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
+void GameLayer::prepare_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
         std::shared_ptr<Texture> diffuse_texture) {
     hoverable::Id id = hoverable::generate_id();
     app->data.pieces_id[index] = id;
@@ -776,8 +851,8 @@ void GameLayer::prepare_nodes() {
         "u_color"
     };
     app->data.node_shader = Shader::create(
-        convert(paths::path_for_assets(assets::NODE_VERTEX_SHADER)),
-        convert(paths::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
+        encr(paths::path_for_assets(assets::NODE_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         uniforms,
         { app->renderer->get_projection_view_uniform_block() }
     );
@@ -785,12 +860,12 @@ void GameLayer::prepare_nodes() {
     app->data.basic_material = std::make_shared<Material>(app->data.node_shader, Material::Hoverable);
     app->data.basic_material->add_variable(Material::UniformType::Vec4, "u_color");
 
-    for (unsigned int i = 0; i < 24; i++) {
+    for (size_t i = 0; i < 24; i++) {
         prepare_node(i, NODE_POSITIONS[i]);
     }
 }
 
-void GameLayer::prepare_node(unsigned int index, const glm::vec3& position) {
+void GameLayer::prepare_node(size_t index, const glm::vec3& position) {
     hoverable::Id id = hoverable::generate_id();
     app->data.nodes_id[index] = id;
 
@@ -841,13 +916,13 @@ void GameLayer::resetup_textures() {
     app->data.black_piece_diffuse_texture = Texture::create(
         app->assets_data->black_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
     );
-    for (unsigned int i = 0; i < 9; i++) {
+    for (size_t i = 0; i < 9; i++) {
         app->data.piece_material_instances[i]->set_texture(
             "u_material.diffuse",
             app->data.white_piece_diffuse_texture, 0
         );
     }
-    for (unsigned int i = 9; i < 18; i++) {
+    for (size_t i = 9; i < 18; i++) {
         app->data.piece_material_instances[i]->set_texture(
             "u_material.diffuse",
             app->data.black_piece_diffuse_texture, 0
@@ -867,13 +942,13 @@ void GameLayer::resetup_textures() {
         app->data.piece_normal_texture = Texture::create(
             app->assets_data->piece_norm_texture, true, -1.5f, app->options.anisotropic_filtering
         );
-        for (unsigned int i = 0; i < 9; i++) {
+        for (size_t i = 0; i < 9; i++) {
             app->data.piece_material_instances[i]->set_texture(
                 "u_material.normal",
                 app->data.piece_normal_texture, 1
             );
         }
-        for (unsigned int i = 9; i < 18; i++) {
+        for (size_t i = 9; i < 18; i++) {
             app->data.piece_material_instances[i]->set_texture(
                 "u_material.normal",
                 app->data.piece_normal_texture, 1
@@ -906,19 +981,19 @@ void GameLayer::setup_board_paint() {
 }
 
 void GameLayer::setup_pieces() {
-    for (unsigned int i = 0; i < 9; i++) {
+    for (size_t i = 0; i < 9; i++) {
         setup_piece(
             i, Piece::Type::White, app->assets_data->white_piece_mesh
         );
     }
-    for (unsigned int i = 9; i < 18; i++) {
+    for (size_t i = 9; i < 18; i++) {
         setup_piece(
             i, Piece::Type::Black, app->assets_data->black_piece_mesh
         );
     }
 }
 
-void GameLayer::setup_piece(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh) {
+void GameLayer::setup_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh) {
     board.pieces[index].model.vertex_array = app->data.piece_vertex_arrays[index];
     board.pieces[index].model.index_count = mesh->indices.size();
     board.pieces[index].model.scale = 20.0f;
@@ -953,19 +1028,19 @@ void GameLayer::setup_board_paint_no_normal() {
 }
 
 void GameLayer::setup_pieces_no_normal() {
-    for (unsigned int i = 0; i < 9; i++) {
+    for (size_t i = 0; i < 9; i++) {
         setup_piece_no_normal(
             i, Piece::Type::White, app->assets_data->white_piece_no_normal_mesh
         );
     }
-    for (unsigned int i = 9; i < 18; i++) {
+    for (size_t i = 9; i < 18; i++) {
         setup_piece_no_normal(
             i, Piece::Type::Black, app->assets_data->black_piece_no_normal_mesh
         );
     }
 }
 
-void GameLayer::setup_piece_no_normal(unsigned int index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh) {
+void GameLayer::setup_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh) {
     board.pieces[index].model.vertex_array = app->data.piece_vertex_arrays[index];
     board.pieces[index].model.index_count = mesh->indices.size();
     board.pieces[index].model.scale = 20.0f;
@@ -977,12 +1052,12 @@ void GameLayer::setup_piece_no_normal(unsigned int index, Piece::Type type, std:
 }
 
 void GameLayer::setup_nodes() {
-    for (unsigned int i = 0; i < 24; i++) {
+    for (size_t i = 0; i < 24; i++) {
         setup_node(i, NODE_POSITIONS[i]);
     }
 }
 
-void GameLayer::setup_node(unsigned int index, const glm::vec3& position) {
+void GameLayer::setup_node(size_t index, const glm::vec3& position) {
     board.nodes[index].model.vertex_array = app->data.node_vertex_arrays[index];
     board.nodes[index].model.index_count = app->assets_data->node_mesh->indices.size();
     board.nodes[index].model.position = position;
@@ -1001,7 +1076,10 @@ void GameLayer::setup_camera() {
         glm::vec3(0.0f),
         8.0f,
         glm::perspective(
-            glm::radians(FOV), static_cast<float>(app->app_data.width) / app->app_data.height, NEAR, FAR
+            glm::radians(FOV),
+            static_cast<float>(app->app_data.width) / app->app_data.height,
+            NEAR,
+            FAR
         )
     );
 
@@ -1013,7 +1091,10 @@ void GameLayer::setup_camera() {
         glm::vec3(0.0f),
         8.7f,
         glm::perspective(
-            glm::radians(FOV), static_cast<float>(app->app_data.width) / app->app_data.height, NEAR, FAR
+            glm::radians(FOV),
+            static_cast<float>(app->app_data.width) / app->app_data.height,
+            NEAR,
+            FAR
         )
     );
 
@@ -1036,9 +1117,9 @@ void GameLayer::setup_skybox() {
 
 void GameLayer::setup_light() {
     if (app->options.skybox == options::FIELD) {
-        app->renderer->light = LIGHT_FIELD;
+        app->renderer->set_light(LIGHT_FIELD);
     } else if (app->options.skybox == options::AUTUMN) {
-        app->renderer->light = LIGHT_AUTUMN;
+        app->renderer->set_light(LIGHT_AUTUMN);
     } else {
         ASSERT(false, "Invalid skybox");
     }
@@ -1183,13 +1264,13 @@ void GameLayer::actually_change_texture_quality() {
     app->data.black_piece_diffuse_texture = Texture::create(
         app->assets_data->black_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
     );
-    for (unsigned int i = 0; i < 9; i++) {
+    for (size_t i = 0; i < 9; i++) {
         app->data.piece_material_instances[i]->set_texture(
             "u_material.diffuse",
             app->data.white_piece_diffuse_texture, 0
         );
     }
-    for (unsigned int i = 9; i < 18; i++) {
+    for (size_t i = 9; i < 18; i++) {
         app->data.piece_material_instances[i]->set_texture(
             "u_material.diffuse",
             app->data.black_piece_diffuse_texture, 0
@@ -1209,13 +1290,13 @@ void GameLayer::actually_change_texture_quality() {
         app->data.piece_normal_texture = Texture::create(
             app->assets_data->piece_norm_texture, true, -1.5f, app->options.anisotropic_filtering
         );
-        for (unsigned int i = 0; i < 9; i++) {
+        for (size_t i = 0; i < 9; i++) {
             app->data.piece_material_instances[i]->set_texture(
                 "u_material.normal",
                 app->data.board_normal_texture, 1
             );
         }
-        for (unsigned int i = 9; i < 18; i++) {
+        for (size_t i = 9; i < 18; i++) {
             app->data.piece_material_instances[i]->set_texture(
                 "u_material.normal",
                 app->data.board_normal_texture, 1
@@ -1246,9 +1327,9 @@ void GameLayer::actually_change_skybox() {
     app->renderer->set_skybox(Texture3D::create(data));
 
     if (app->options.skybox == options::FIELD) {
-        app->renderer->light = LIGHT_FIELD;
+        app->renderer->set_light(LIGHT_FIELD);
     } else if (app->options.skybox == options::AUTUMN) {
-        app->renderer->light = LIGHT_AUTUMN;
+        app->renderer->set_light(LIGHT_AUTUMN);
     } else {
         ASSERT(false, "Invalid skybox");
     }
@@ -1267,7 +1348,7 @@ void GameLayer::actually_change_labeled_board_texture() {
 void GameLayer::actually_change_normal_mapping() {
     app->renderer->remove_model(board.model.handle);
     app->renderer->remove_model(board.paint_model.handle);
-    for (unsigned int i = 0; i < 18; i++) {
+    for (size_t i = 0; i < 18; i++) {
         app->renderer->remove_model(board.pieces[i].model.handle);
     }
 

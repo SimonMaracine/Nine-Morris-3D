@@ -26,7 +26,7 @@ public:
     void set_icons(const std::array<std::unique_ptr<TextureData>, Count>& icons) {
         std::array<GLFWimage, Count> glfw_icons;
 
-        for (unsigned int i = 0; i < icons.size(); i++) {
+        for (size_t i = 0; i < icons.size(); i++) {
             glfw_icons[i] = icons[i]->get_data_glfw();
         }
 

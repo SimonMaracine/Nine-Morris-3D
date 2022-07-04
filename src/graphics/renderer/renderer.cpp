@@ -5,6 +5,7 @@
 
 #include "application/application.h"
 #include "application/platform.h"
+#include "application/events.h"
 #include "application/input.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer_reader.h"
@@ -89,8 +90,8 @@ Renderer::Renderer(Application* app)
             "u_skybox"
         };
         storage.skybox_shader = Shader::create(
-            convert(paths::path_for_assets(SKYBOX_VERTEX_SHADER)),
-            convert(paths::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(SKYBOX_VERTEX_SHADER)),
+            encr(paths::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -100,8 +101,8 @@ Renderer::Renderer(Application* app)
             "u_screen_texture"
         };
         storage.screen_quad_shader = Shader::create(
-            convert(paths::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
-            convert(paths::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
+            encr(paths::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -114,8 +115,8 @@ Renderer::Renderer(Application* app)
             "u_texture"
         };
         storage.quad3d_shader = Shader::create(
-            convert(paths::path_for_assets(QUAD3D_VERTEX_SHADER)),
-            convert(paths::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(QUAD3D_VERTEX_SHADER)),
+            encr(paths::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -125,8 +126,8 @@ Renderer::Renderer(Application* app)
             "u_model_matrix"
         };
         storage.shadow_shader = Shader::create(
-            convert(paths::path_for_assets(SHADOW_VERTEX_SHADER)),
-            convert(paths::path_for_assets(SHADOW_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(SHADOW_VERTEX_SHADER)),
+            encr(paths::path_for_assets(SHADOW_FRAGMENT_SHADER)),
             uniforms,
             { storage.light_space_uniform_block }
         );
@@ -138,8 +139,8 @@ Renderer::Renderer(Application* app)
             "u_color"
         };
         storage.outline_shader = Shader::create(
-            convert(paths::path_for_assets(OUTLINE_VERTEX_SHADER)),
-            convert(paths::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(OUTLINE_VERTEX_SHADER)),
+            encr(paths::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
             uniforms,
             { storage.projection_view_uniform_block }
         );
@@ -182,8 +183,8 @@ Renderer::Renderer(Application* app)
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 2);
         layout.add(1, BufferLayout::Type::Float, 2);
-        storage.screen_quad_vertex_array = VertexArray::create();
-        storage.screen_quad_vertex_array->add_buffer(buffer, layout);
+        storage.quad_vertex_array = VertexArray::create();
+        storage.quad_vertex_array->add_buffer(buffer, layout);
 
         VertexArray::unbind();
     }
@@ -211,6 +212,9 @@ Renderer::Renderer(Application* app)
 
 #ifdef PLATFORM_GAME_DEBUG
     storage.light_bulb_texture = Texture::create("data/textures/internal/light_bulb/light_bulb.png", false);
+
+    storage.light_bulb_quad.texture = storage.light_bulb_texture;
+    add_quad(storage.light_bulb_quad);
 #endif
 
     {
@@ -261,11 +265,9 @@ void Renderer::render() {
     storage.projection_view_uniform_buffer->bind();
     storage.projection_view_uniform_buffer->upload_data();
 
-    // storage.light_uniform_buffer->set(&light.position, 0);
     storage.light_uniform_buffer->set(&light.ambient_color, 0);
     storage.light_uniform_buffer->set(&light.diffuse_color, 1);
     storage.light_uniform_buffer->set(&light.specular_color, 2);
-    // storage.light_uniform_buffer->set(&app->camera.get_position(), 4);
     storage.light_uniform_buffer->bind();
     storage.light_uniform_buffer->upload_data();
 
@@ -424,9 +426,26 @@ void Renderer::render() {
     if (origin) {
         draw_origin();
     }
-
-    im_draw_quad(light.position, 1.0f, storage.light_bulb_texture);
 #endif
+
+    // Render quads
+    storage.quad3d_shader->bind();
+    storage.quad3d_shader->upload_uniform_mat4("u_view_matrix", app->camera.get_view_matrix());
+    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", app->camera.get_projection_matrix());
+
+    for (const auto [id, quad] : quads) {
+        IGNORE(id);
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, quad->position);
+        matrix = glm::scale(matrix, glm::vec3(quad->scale, quad->scale, quad->scale));
+
+        storage.quad3d_shader->upload_uniform_mat4("u_model_matrix", matrix);
+
+        quad->texture->bind(0);
+        storage.quad_vertex_array->bind();
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
 
     storage.scene_framebuffer->resolve_framebuffer(storage.intermediate_framebuffer->get_id(),
             app->app_data.width, app->app_data.height);
@@ -449,20 +468,9 @@ void Renderer::render() {
     check_hovered_id(x, y);
 }
 
-void Renderer::im_draw_quad(const glm::vec3& position, float scale, std::shared_ptr<Texture> texture) {
-    glm::mat4 matrix = glm::mat4(1.0f);
-    matrix = glm::translate(matrix, position);
-    matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
-
+void Renderer::on_window_resized(events::WindowResizedEvent& event) {
     storage.quad3d_shader->bind();
-    storage.quad3d_shader->upload_uniform_mat4("u_model_matrix", matrix);
-    storage.quad3d_shader->upload_uniform_mat4("u_view_matrix", app->camera.get_view_matrix());
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", app->camera.get_projection_matrix());
-
-    texture->bind(0);
-    storage.screen_quad_vertex_array->bind();
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::add_model(Model& model, int options) {
@@ -529,12 +537,30 @@ void Renderer::update_model(Model& model, int options) {
     }
 }
 
-void Renderer::clear_models() {
+void Renderer::add_quad(Quad& quad) {
+    static unsigned int id = 0;
+
+    quad.handle = ++id;
+
+    quads[id] = &quad;
+}
+
+void Renderer::remove_quad(unsigned int handle) {
+    quads.erase(handle);
+}
+
+void Renderer::clear() {
     models.clear();
     models_no_lighting.clear();
     models_outline.clear();
     models_cast_shadow.clear();
     models_has_shadow.clear();
+
+    quads.clear();
+
+#ifdef PLATFORM_GAME_DEBUG
+    add_quad(storage.light_bulb_quad);
+#endif
 }
 
 void Renderer::set_viewport(int width, int height) {
@@ -574,13 +600,21 @@ void Renderer::set_depth_map_framebuffer(int size) {
     app->add_framebuffer(storage.depth_map_framebuffer);
 }
 
+void Renderer::set_light(const DirectionalLight& light) {
+    this->light = light;
+
+#ifdef PLATFORM_GAME_DEBUG
+    storage.light_bulb_quad.position = this->light.position;
+#endif
+}
+
 void Renderer::clear(int buffers) {
     glClear(buffers);
 }
 
 void Renderer::draw_screen_quad(GLuint texture) {
     storage.screen_quad_shader->bind();
-    storage.screen_quad_vertex_array->bind();
+    storage.quad_vertex_array->bind();
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);

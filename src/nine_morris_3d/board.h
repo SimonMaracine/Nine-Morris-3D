@@ -10,9 +10,13 @@
 constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
 constexpr float PAINT_Y_POSITION = 0.062f;
 
+struct StateHistory;
+class KeyboardControls;
+
 class Board {
-    using GamePosition = std::array<Piece::Type, 24>;
 public:
+    using GamePosition = std::array<Piece::Type, 24>;
+
     enum class Phase {
         None,
         PlacePieces = 1,
@@ -33,6 +37,7 @@ public:
     };
 
     Board() = default;
+    Board(StateHistory& state_history);
     ~Board() = default;
 
     static void copy_smart(Board& to, const Board& from, bool state_history_inclusive);
@@ -98,8 +103,9 @@ public:
         std::vector<PositionPlusInfo> twos;
     } repetition_history;
 
-    std::shared_ptr<std::vector<Board>> undo_state_history = std::make_shared<std::vector<Board>>();
-    std::shared_ptr<std::vector<Board>> redo_state_history = std::make_shared<std::vector<Board>>();
+    std::vector<Board>* undo_state_history = nullptr;
+    std::vector<Board>* redo_state_history = nullptr;
+    KeyboardControls* keyboard = nullptr;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);
@@ -122,4 +128,9 @@ private:
     void prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity);
     void prepare_piece_for_three_step_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity,
             const glm::vec3& target0, const glm::vec3& target1);
+};
+
+struct StateHistory {
+    std::vector<Board> undo_state_history;
+    std::vector<Board> redo_state_history;
 };

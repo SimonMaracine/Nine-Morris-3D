@@ -7,7 +7,7 @@ class GameLayer;
 
 class GuiLayer : public Layer {
 public:
-    GuiLayer(const std::string& id, Application* app)
+    GuiLayer(std::string_view id, Application* app)
         : Layer(id, app) {}
     virtual ~GuiLayer() = default;
 

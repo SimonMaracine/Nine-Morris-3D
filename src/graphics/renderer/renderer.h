@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "application/platform.h"
+#include "application/events.h"
 #include "graphics/renderer/framebuffer_reader.h"
 #include "graphics/renderer/font.h"
 #include "graphics/renderer/camera.h"
@@ -35,6 +36,15 @@ public:
         unsigned int handle = 0;
     };
 
+    struct Quad {
+        std::shared_ptr<Texture> texture;
+    
+        glm::vec3 position = glm::vec3(0.0f);
+        float scale = 1.0f;
+
+        unsigned int handle = 0;
+    };
+
     enum {
         Color = GL_COLOR_BUFFER_BIT,
         Depth = GL_DEPTH_BUFFER_BIT,
@@ -52,24 +62,28 @@ public:
     ~Renderer();
 
     void render();
-    void im_draw_quad(const glm::vec3& position, float scale, std::shared_ptr<Texture> texture);
+    void on_window_resized(events::WindowResizedEvent& event);
 
     void add_model(Model& model, int options = 0);
     void remove_model(unsigned int handle);
     void update_model(Model& model, int options = 0);
+
+    void add_quad(Quad& quad);
+    void remove_quad(unsigned int handle);
 
     // unsigned int add_instancing_group();
     // void remove_instancing_group();
     // unsigned int add_instanced(unsigned int group_handle);
     // void remove_instanced(unsigned int group_handle, unsigned int handle);
 
-    void clear_models();
+    void clear();
 
     void set_viewport(int width, int height);
     void set_clear_color(float red, float green, float blue);
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void set_skybox(std::shared_ptr<Texture3D> texture);
     void set_depth_map_framebuffer(int size);
+    void set_light(const DirectionalLight& light);
 
     hoverable::Id get_hovered_id() { return hovered_id; }
     UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
@@ -77,6 +91,7 @@ public:
     UniformBlockSpecification& get_light_view_position_uniform_block() { return storage.light_view_position_uniform_block; }
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
     std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
+    DirectionalLight& get_light() { return light; }
 
 #ifdef PLATFORM_GAME_DEBUG
     std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }
@@ -87,7 +102,6 @@ public:
     std::shared_ptr<Shader> get_shadow_shader() { return storage.shadow_shader; }
     std::shared_ptr<Shader> get_skybox_shader() { return storage.skybox_shader; }
 
-    DirectionalLight light;
     bool origin = false;  // This does nothing in release mode
 private:
     void clear(int buffers);
@@ -119,14 +133,16 @@ private:
 #endif
 
         std::shared_ptr<VertexArray> skybox_vertex_array;
-        std::shared_ptr<VertexArray> screen_quad_vertex_array;
+        std::shared_ptr<VertexArray> quad_vertex_array;
 #ifdef PLATFORM_GAME_DEBUG
         std::shared_ptr<VertexArray> origin_vertex_array;
 #endif
 
         std::shared_ptr<Texture3D> skybox_texture;
+
 #ifdef PLATFORM_GAME_DEBUG
         std::shared_ptr<Texture> light_bulb_texture;
+        Quad light_bulb_quad;
 #endif
 
         std::shared_ptr<Framebuffer> scene_framebuffer;
@@ -136,12 +152,15 @@ private:
         std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
     } storage;
 
+    DirectionalLight light;
+
     // Ordered maps of pointers to models
     std::map<unsigned int, Model*> models;
     std::map<unsigned int, Model*> models_no_lighting;
     std::map<unsigned int, Model*> models_outline;
     std::map<unsigned int, Model*> models_cast_shadow;
     std::map<unsigned int, Model*> models_has_shadow;
+    std::map<unsigned int, Quad*> quads;
 
     hoverable::Id hovered_id = hoverable::null;
     FramebufferReader<4> reader;

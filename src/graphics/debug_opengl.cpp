@@ -157,9 +157,9 @@ namespace debug_opengl {
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** OpenGL Context Parameters ***\n");
 
-        unsigned int parameter_index = 10;
+        size_t parameter_index = 10;
 
-        for (unsigned int i = 0; i <= parameter_index; i++) {
+        for (size_t i = 0; i <= parameter_index; i++) {
             GLint result;
             glGetIntegerv(parameters[i], &result);
 
@@ -180,7 +180,7 @@ namespace debug_opengl {
             glGetBooleanv(parameters[++parameter_index], &result);
 
             char line[128];
-            sprintf(line, "%s %u\n", names[parameter_index], (unsigned int) result);
+            sprintf(line, "%s %u\n", names[parameter_index], static_cast<unsigned int>(result));
             output.append(line);
         }
 

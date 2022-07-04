@@ -91,5 +91,7 @@ encrypt(r"textures\skybox\field\py-small.png")
 encrypt(r"textures\skybox\field\pz.png")
 encrypt(r"textures\skybox\field\pz-small.png")
 encrypt(r"textures\splash_screen\splash_screen.png")
+encrypt(r"textures\keyboard_controls\keyboard_controls.png")
+encrypt(r"textures\keyboard_controls\keyboard_controls_cross.png")
 
 print("Done")

@@ -340,6 +340,7 @@ bool Application::on_window_resized(events::WindowResizedEvent& event) {
 
     camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 
+    renderer->on_window_resized(event);
     gui_renderer->on_window_resized(event);
 
     return false;

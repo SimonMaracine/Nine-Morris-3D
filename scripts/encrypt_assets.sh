@@ -90,5 +90,7 @@ encrypt textures/skybox/field/py-small.png
 encrypt textures/skybox/field/pz.png
 encrypt textures/skybox/field/pz-small.png
 encrypt textures/splash_screen/splash_screen.png
+encrypt textures/keyboard_controls/keyboard_controls.png
+encrypt textures/keyboard_controls/keyboard_controls_cross.png
 
 echo "Done"

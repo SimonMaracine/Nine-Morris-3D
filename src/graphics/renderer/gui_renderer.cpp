@@ -149,8 +149,8 @@ GuiRenderer::GuiRenderer(Application* app)
             "u_texture"
         };
         storage.quad2d_shader = Shader::create(
-            convert(paths::path_for_assets(QUAD2D_VERTEX_SHADER)),
-            convert(paths::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(QUAD2D_VERTEX_SHADER)),
+            encr(paths::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
             uniforms
         );
     }
@@ -165,8 +165,8 @@ GuiRenderer::GuiRenderer(Application* app)
             "u_offset"
         };
         storage.text_shader = Shader::create(
-            convert(paths::path_for_assets(TEXT_VERTEX_SHADER)),
-            convert(paths::path_for_assets(TEXT_FRAGMENT_SHADER)),
+            encr(paths::path_for_assets(TEXT_VERTEX_SHADER)),
+            encr(paths::path_for_assets(TEXT_FRAGMENT_SHADER)),
             uniforms
         );
     }

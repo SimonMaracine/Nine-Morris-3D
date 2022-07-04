@@ -43,10 +43,6 @@ void ImGuiLayer::on_attach() {
     last_save_game_date = std::move(state.date);
     DEB_INFO("Checked last saved game");
 
-    if (last_save_game_date == "") {  // TODO delete this later maybe
-        DEB_ERROR("last_save_game_date is empty");
-    }
-
     try {
         info_file_path = paths::path_for_logs(INFO_FILE);
         save_game_file_path = paths::path_for_saved_data(save_load::SAVE_GAME_FILE);
@@ -157,10 +153,6 @@ void ImGuiLayer::on_update(float dt) {
                 }
 
                 last_save_game_date = std::move(state.date);
-
-                if (last_save_game_date == "") {  // TODO delete this later maybe
-                    DEB_ERROR("last_save_game_date is empty");
-                }
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 const bool undid_game_over = game_layer->board.undo();
@@ -469,7 +461,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 // TODO think about to include this or not
 bool ImGuiLayer::on_key_pressed(events::KeyPressedEvent& event) {
     if (event.repeat) {
-        return true;
+        return false;
     }
 
     if (event.control) {
@@ -483,7 +475,7 @@ bool ImGuiLayer::on_key_pressed(events::KeyPressedEvent& event) {
         }
     }
 
-    return true;
+    return false;
 }
 
 void ImGuiLayer::draw_game_over() {
@@ -729,13 +721,15 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::End();
 
         ImGui::Begin("Light Settings");
-        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position),
-                -30.0f, 30.0f)) {}
-        if (ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color),
+        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->get_light().position),
+                -30.0f, 30.0f)) {
+            app->renderer->set_light(app->renderer->get_light());
+        }
+        if (ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->get_light().ambient_color),
                 0.0f, 1.0f)) {}
-        if (ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color),
+        if (ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->get_light().diffuse_color),
                 0.0f, 1.0f)) {}
-        if (ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color),
+        if (ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->get_light().specular_color),
                 0.0f, 1.0f)) {}
         ImGui::End();
 
