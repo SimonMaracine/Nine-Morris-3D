@@ -39,36 +39,38 @@ public:
 
     std::shared_ptr<Buffer> create_ids_buffer(size_t vertices_size, hoverable::Id id);
 
-    void prepare_board();
-    void prepare_board_paint();
-    void prepare_pieces();
-    void prepare_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
+    void initialize_rendering_board();
+    void initialize_rendering_board_paint();
+    void initialize_rendering_pieces();
+    void initialize_rendering_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
             std::shared_ptr<Texture> diffuse_texture);
 
-    void prepare_board_no_normal();
-    void prepare_board_paint_no_normal();
-    void prepare_pieces_no_normal();
-    void prepare_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
+    void initialize_rendering_board_no_normal();
+    void initialize_rendering_board_paint_no_normal();
+    void initialize_rendering_pieces_no_normal();
+    void initialize_rendering_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
             std::shared_ptr<Texture> diffuse_texture);
 
-    void prepare_nodes();
-    void prepare_node(size_t index, const glm::vec3& position);
+    void initialize_rendering_nodes();
+    void initialize_rendering_node(size_t index, const glm::vec3& position);
 
     void resetup_textures();
 
-    void setup_board();
-    void setup_board_paint();
-    void setup_pieces();
-    void setup_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh);
+    void setup_model_board();
+    void setup_model_board_paint();
+    void setup_model_pieces();
+    void setup_model_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh);
 
-    void setup_board_no_normal();
-    void setup_board_paint_no_normal();
-    void setup_pieces_no_normal();
-    void setup_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh);
+    void setup_model_board_no_normal();
+    void setup_model_board_paint_no_normal();
+    void setup_model_pieces_no_normal();
+    void setup_model_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh);
 
-    void setup_nodes();
-    void setup_node(size_t index, const glm::vec3& position);
+    void setup_model_nodes();
+    void setup_model_node(size_t index, const glm::vec3& position);
 
+    void setup_entities_board();
+    void setup_ids_board();
     void setup_skybox();
     void setup_light();
     void setup_camera();

@@ -3,6 +3,7 @@
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/keyboard_controls.h"
+#include "nine_morris_3d/constants.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
@@ -52,20 +53,20 @@ void Board::copy_smart(Board& to, const Board& from, StateHistory* state_history
 
     for (size_t i = 0; i < 24; i++) {
         Node& node = to.nodes[i];
-        node.id = from.nodes[i].id;
+        // node.id = from.nodes[i].id;
         node.model.index_count = from.nodes[i].model.index_count;
         node.model.position = from.nodes[i].model.position;
         node.model.rotation = from.nodes[i].model.rotation;
         node.model.scale = from.nodes[i].model.scale;
         node.model.outline_color = from.nodes[i].model.outline_color;
-        node.piece_id = from.nodes[i].piece_id;
+        node.piece_index = from.nodes[i].piece_index;
         node.piece = nullptr;
         node.index = from.nodes[i].index;
     }
 
     for (size_t i = 0; i < 18; i++) {
         Piece& piece = to.pieces[i];
-        piece.id = from.pieces[i].id;
+        // piece.id = from.pieces[i].id;
         piece.model.index_count = from.pieces[i].model.index_count;
         piece.model.position = from.pieces[i].model.position;
         piece.model.rotation = from.pieces[i].model.rotation;
@@ -75,7 +76,7 @@ void Board::copy_smart(Board& to, const Board& from, StateHistory* state_history
         piece.should_move = from.pieces[i].should_move;
         piece.type = from.pieces[i].type;
         piece.in_use = from.pieces[i].in_use;
-        piece.node_id = from.pieces[i].node_id;
+        piece.node_index = from.pieces[i].node_index;
         piece.node = nullptr;
         piece.show_outline = from.pieces[i].show_outline;
         piece.to_take = from.pieces[i].to_take;
@@ -109,7 +110,7 @@ void Board::copy_smart(Board& to, const Board& from, StateHistory* state_history
     // Assign correct addresses
     for (Node& node : to.nodes) {
         for (Piece& piece : to.pieces) {
-            if (node.piece_id == piece.id) {
+            if (node.piece_index == piece.index) {
                 node.piece = &piece;
                 break;
             }
@@ -117,11 +118,21 @@ void Board::copy_smart(Board& to, const Board& from, StateHistory* state_history
     }
     for (Piece& piece : to.pieces) {
         for (Node& node : to.nodes) {
-            if (piece.node_id == node.id) {
+            if (piece.node_index == node.index) {
                 piece.node = &node;
                 break;
             }
         }
+    }
+
+    // Assign correct ids
+    for (size_t i = 0; i < 24; i++) {
+        Node& node = to.nodes[i];
+        node.id = app->data.nodes_id[i];
+    }
+    for (size_t i = 0; i < 18; i++) {
+        Piece& piece = to.pieces[i];
+        piece.id = app->data.pieces_id[i];
     }
 }
 
@@ -137,12 +148,12 @@ bool Board::place_piece(hoverable::Id hovered_id) {
 
             if (turn == Player::White) {
                 node.piece = new_piece_to_place(Piece::White, position.x, position.z, &node);
-                node.piece_id = node.piece->id;
+                node.piece_index = node.piece->index;
                 white_pieces_count++;
                 not_placed_white_pieces_count--;
             } else {
                 node.piece = new_piece_to_place(Piece::Black, position.x, position.z, &node);
-                node.piece_id = node.piece->id;
+                node.piece_index = node.piece->index;
                 black_pieces_count++;
                 not_placed_black_pieces_count--;
             }
@@ -267,7 +278,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                         WAIT_FOR_NEXT_MOVE();
 
                         piece->node->piece = nullptr;
-                        piece->node->piece_id = hoverable::null;
+                        piece->node->piece_index = INVALID_PIECE_INDEX;
                         take_and_raise_piece(piece);
                         should_take_piece = false;
                         update_cursor();
@@ -312,7 +323,7 @@ bool Board::take_piece(hoverable::Id hovered_id) {
                         WAIT_FOR_NEXT_MOVE();
 
                         piece->node->piece = nullptr;
-                        piece->node->piece_id = hoverable::null;
+                        piece->node->piece_index = INVALID_PIECE_INDEX;
                         take_and_raise_piece(piece);
                         should_take_piece = false;
                         update_cursor();
@@ -418,14 +429,14 @@ bool Board::put_down_piece(hoverable::Id hovered_id) {
                 // Reset all of these
                 Node* previous_node = selected_piece->node;
                 previous_node->piece = nullptr;
-                previous_node->piece_id = hoverable::null;
+                previous_node->piece_index = INVALID_PIECE_INDEX;
 
                 node_from = selected_piece->node;
                 selected_piece->node = &node;
-                selected_piece->node_id = node.id;
+                selected_piece->node_index = node.index;
                 selected_piece->selected = false;
                 node.piece = selected_piece;
-                node.piece_id = selected_piece->id;
+                node.piece_index = selected_piece->index;
 
                 piece_put = selected_piece;
                 selected_piece = nullptr;
@@ -658,7 +669,7 @@ Piece* Board::new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Nod
 
             piece->in_use = true;
             piece->node = node;
-            piece->node_id = node->id;
+            piece->node_index = node->index;
 
             return piece;
         }
@@ -676,7 +687,7 @@ void Board::take_and_raise_piece(Piece* piece) {
     );
 
     piece->node = nullptr;
-    piece->node_id = hoverable::null;
+    piece->node_index = INVALID_NODE_INDEX;
     piece->pending_remove = true;
 }
 
@@ -1224,7 +1235,7 @@ void Board::remember_position_and_check_repetition(Piece* piece, Node* node) {
     ASSERT(piece != nullptr, "Piece must not be null");
     ASSERT(node != nullptr, "Node must not be null");
 
-    const Position current_position = { get_position(), piece->id, node->id };
+    const Position current_position = { get_position(), piece->index, node->index };
 
     for (const Position& position : repetition_history.twos) {
         if (position == current_position) {

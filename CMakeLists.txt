@@ -71,6 +71,7 @@ set(HEADERS_FOR_WINDOWS
     "src/nine_morris_3d/timer.h"
     "src/nine_morris_3d/assets.h"
     "src/nine_morris_3d/keyboard_controls.h"
+    "src/nine_morris_3d/constants.h"
     "src/other/paths.h"
     "src/other/assert.h"
     "src/other/loader.h"

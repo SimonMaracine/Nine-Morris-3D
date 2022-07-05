@@ -6,9 +6,7 @@
 #include "graphics/renderer/hoverable.h"
 #include "nine_morris_3d/node.h"
 #include "nine_morris_3d/piece.h"
-
-constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
-constexpr float PAINT_Y_POSITION = 0.062f;
+#include "nine_morris_3d/constants.h"
 
 struct StateHistory;
 class KeyboardControls;
@@ -89,14 +87,14 @@ public:
             bool operator==(const PositionPlusInfo& other) const {
                 return (
                     position == other.position &&
-                    piece_id == other.piece_id &&
-                    node_id == other.node_id
+                    piece_index == other.piece_index &&
+                    node_index == other.node_index
                 );
             }
 
             GamePosition position;
-            hoverable::Id piece_id;
-            hoverable::Id node_id;
+            size_t piece_index;
+            size_t node_index;
         };
 
         std::vector<PositionPlusInfo> ones;

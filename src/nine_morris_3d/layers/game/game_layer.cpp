@@ -32,6 +32,9 @@
 #include "other/assert.h"
 #include "other/encryption.h"
 
+#define WHITE_PIECE_POSITION(i) glm::vec3(-4.0f, 0.3f, -2.0f + (i) * 0.5f)
+#define BLACK_PIECE_POSITION(i) glm::vec3(4.0f, 0.3f, -2.0f + ((i) - 9) * 0.5f)
+
 using namespace encryption;
 using namespace mesh;
 
@@ -53,31 +56,19 @@ void GameLayer::on_attach() {
     state_history = StateHistory();
     board = Board(state_history);
 
-    for (size_t i = 0; i < 9; i++) {
-        board.pieces[i] = Piece(app->data.pieces_id[i], Piece::Type::White);
-        board.pieces[i].model.position = glm::vec3(-4.0f, 0.3f, -2.0f + i * 0.5f);
-        board.pieces[i].model.rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(rand() % 360)), 0.0f);
-    }
-    for (size_t i = 9; i < 18; i++) {
-        board.pieces[i] = Piece(app->data.pieces_id[i], Piece::Type::Black);
-        board.pieces[i].model.position = glm::vec3(4.0f, 0.3f, -2.0f + (i - 9) * 0.5f);
-        board.pieces[i].model.rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(rand() % 360)), 0.0f);
-    }
-    for (size_t i = 0; i < 24; i++) {
-        board.nodes[i] = Node(app->data.nodes_id[i], i);
-    }
+    setup_entities_board();
 
     if (app->options.normal_mapping) {
-        setup_board();
-        setup_board_paint();
-        setup_pieces();
+        setup_model_board();
+        setup_model_board_paint();
+        setup_model_pieces();
     } else {
-        setup_board_no_normal();
-        setup_board_paint_no_normal();
-        setup_pieces_no_normal();
+        setup_model_board_no_normal();
+        setup_model_board_paint_no_normal();
+        setup_model_pieces_no_normal();
     }
 
-    setup_nodes();
+    setup_model_nodes();
     setup_camera();
 
     keyboard = KeyboardControls(&board);
@@ -154,16 +145,16 @@ void GameLayer::on_awake() {
     gui_layer = get_layer<GuiLayer>("gui");
 
     if (app->options.normal_mapping) {
-        prepare_board();
-        prepare_board_paint();
-        prepare_pieces();
+        initialize_rendering_board();
+        initialize_rendering_board_paint();
+        initialize_rendering_pieces();
     } else {
-        prepare_board_no_normal();
-        prepare_board_paint_no_normal();
-        prepare_pieces_no_normal();
+        initialize_rendering_board_no_normal();
+        initialize_rendering_board_paint_no_normal();
+        initialize_rendering_pieces_no_normal();
     }
 
-    prepare_nodes();
+    initialize_rendering_nodes();
     setup_skybox();
     setup_light();
 }
@@ -409,7 +400,7 @@ std::shared_ptr<Buffer> GameLayer::create_ids_buffer(size_t vertices_size, hover
     return buffer;
 }
 
-void GameLayer::prepare_board() {
+void GameLayer::initialize_rendering_board() {
     std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_shadow_map",
@@ -475,7 +466,7 @@ void GameLayer::prepare_board() {
     app->data.board_wood_material_instance->set_texture("u_material.normal", app->data.board_normal_texture, 1);
 }
 
-void GameLayer::prepare_board_paint() {
+void GameLayer::initialize_rendering_board_paint() {
     std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_shadow_map",
@@ -537,7 +528,7 @@ void GameLayer::prepare_board_paint() {
     app->data.board_paint_material_instance->set_texture("u_material.normal", app->data.board_normal_texture, 1);
 }
 
-void GameLayer::prepare_pieces() {
+void GameLayer::initialize_rendering_pieces() {
     std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_shadow_map",
@@ -578,20 +569,20 @@ void GameLayer::prepare_pieces() {
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
 
     for (size_t i = 0; i < 9; i++) {
-        prepare_piece(
+        initialize_rendering_piece(
             i, Piece::Type::White, app->assets_data->white_piece_mesh,
             app->data.white_piece_diffuse_texture
         );
     }
     for (size_t i = 9; i < 18; i++) {
-        prepare_piece(
+        initialize_rendering_piece(
             i, Piece::Type::Black, app->assets_data->black_piece_mesh,
             app->data.black_piece_diffuse_texture
         );
     }
 }
 
-void GameLayer::prepare_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
+void GameLayer::initialize_rendering_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
         std::shared_ptr<Texture> diffuse_texture) {
     hoverable::Id id = hoverable::generate_id();
     app->data.pieces_id[index] = id;
@@ -637,7 +628,7 @@ void GameLayer::prepare_piece(size_t index, Piece::Type type, std::shared_ptr<Me
     }
 }
 
-void GameLayer::prepare_board_no_normal() {
+void GameLayer::initialize_rendering_board_no_normal() {
     std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_shadow_map",
@@ -695,7 +686,7 @@ void GameLayer::prepare_board_no_normal() {
     app->data.board_wood_material_instance->set_float("u_material.shininess", 4.0f);
 }
 
-void GameLayer::prepare_board_paint_no_normal() {
+void GameLayer::initialize_rendering_board_paint_no_normal() {
     std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_shadow_map",
@@ -753,7 +744,7 @@ void GameLayer::prepare_board_paint_no_normal() {
     app->data.board_paint_material_instance->set_float("u_material.shininess", 4.0f);
 }
 
-void GameLayer::prepare_pieces_no_normal() {
+void GameLayer::initialize_rendering_pieces_no_normal() {
     std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_shadow_map",
@@ -789,20 +780,20 @@ void GameLayer::prepare_pieces_no_normal() {
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
 
     for (size_t i = 0; i < 9; i++) {
-        prepare_piece_no_normal(
+        initialize_rendering_piece_no_normal(
             i, Piece::Type::White, app->assets_data->white_piece_no_normal_mesh,
             app->data.white_piece_diffuse_texture
         );
     }
     for (size_t i = 9; i < 18; i++) {
-        prepare_piece_no_normal(
+        initialize_rendering_piece_no_normal(
             i, Piece::Type::Black, app->assets_data->black_piece_no_normal_mesh,
             app->data.black_piece_diffuse_texture
         );
     }
 }
 
-void GameLayer::prepare_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
+void GameLayer::initialize_rendering_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
         std::shared_ptr<Texture> diffuse_texture) {
     hoverable::Id id = hoverable::generate_id();
     app->data.pieces_id[index] = id;
@@ -845,7 +836,7 @@ void GameLayer::prepare_piece_no_normal(size_t index, Piece::Type type, std::sha
     }       
 }
 
-void GameLayer::prepare_nodes() {
+void GameLayer::initialize_rendering_nodes() {
     std::vector<std::string> uniforms = {
         "u_model_matrix",
         "u_color"
@@ -861,11 +852,11 @@ void GameLayer::prepare_nodes() {
     app->data.basic_material->add_variable(Material::UniformType::Vec4, "u_color");
 
     for (size_t i = 0; i < 24; i++) {
-        prepare_node(i, NODE_POSITIONS[i]);
+        initialize_rendering_node(i, NODE_POSITIONS[i]);
     }
 }
 
-void GameLayer::prepare_node(size_t index, const glm::vec3& position) {
+void GameLayer::initialize_rendering_node(size_t index, const glm::vec3& position) {
     hoverable::Id id = hoverable::generate_id();
     app->data.nodes_id[index] = id;
 
@@ -878,6 +869,7 @@ void GameLayer::prepare_node(size_t index, const glm::vec3& position) {
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
+
     BufferLayout layout2;
     layout2.add(1, BufferLayout::Type::Int, 1);
 
@@ -957,7 +949,7 @@ void GameLayer::resetup_textures() {
     }
 }
 
-void GameLayer::setup_board() {
+void GameLayer::setup_model_board() {
     board.model.vertex_array = app->data.board_wood_vertex_array;
     board.model.index_count = app->assets_data->board_wood_mesh->indices.size();
     board.model.scale = 20.0f;
@@ -965,10 +957,10 @@ void GameLayer::setup_board() {
 
     app->renderer->add_model(board.model, Renderer::CastShadow | Renderer::HasShadow);
 
-    DEB_DEBUG("Built board");
+    DEB_DEBUG("Setup model board");
 }
 
-void GameLayer::setup_board_paint() {
+void GameLayer::setup_model_board_paint() {
     board.paint_model.vertex_array = app->data.board_paint_vertex_array;
     board.paint_model.index_count = app->assets_data->board_paint_mesh->indices.size();
     board.paint_model.position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
@@ -977,23 +969,23 @@ void GameLayer::setup_board_paint() {
 
     app->renderer->add_model(board.paint_model, Renderer::HasShadow);
 
-    DEB_DEBUG("Built board paint");
+    DEB_DEBUG("Setup model board paint");
 }
 
-void GameLayer::setup_pieces() {
+void GameLayer::setup_model_pieces() {
     for (size_t i = 0; i < 9; i++) {
-        setup_piece(
+        setup_model_piece(
             i, Piece::Type::White, app->assets_data->white_piece_mesh
         );
     }
     for (size_t i = 9; i < 18; i++) {
-        setup_piece(
+        setup_model_piece(
             i, Piece::Type::Black, app->assets_data->black_piece_mesh
         );
     }
 }
 
-void GameLayer::setup_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh) {
+void GameLayer::setup_model_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh) {
     board.pieces[index].model.vertex_array = app->data.piece_vertex_arrays[index];
     board.pieces[index].model.index_count = mesh->indices.size();
     board.pieces[index].model.scale = 20.0f;
@@ -1001,10 +993,10 @@ void GameLayer::setup_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh
 
     app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow | Renderer::HasShadow);
 
-    DEB_DEBUG("Built piece {}", index);
+    DEB_DEBUG("Setup model piece {}", index);
 }
 
-void GameLayer::setup_board_no_normal() {
+void GameLayer::setup_model_board_no_normal() {
     board.model.vertex_array = app->data.board_wood_vertex_array;
     board.model.index_count = app->assets_data->board_wood_no_normal_mesh->indices.size();
     board.model.scale = 20.0f;
@@ -1012,10 +1004,10 @@ void GameLayer::setup_board_no_normal() {
 
     app->renderer->add_model(board.model, Renderer::CastShadow | Renderer::HasShadow);
 
-    DEB_DEBUG("Built board");
+    DEB_DEBUG("Setup model board");
 }
 
-void GameLayer::setup_board_paint_no_normal() {
+void GameLayer::setup_model_board_paint_no_normal() {
     board.paint_model.vertex_array = app->data.board_paint_vertex_array;
     board.paint_model.index_count = app->assets_data->board_paint_no_normal_mesh->indices.size();
     board.paint_model.position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
@@ -1024,23 +1016,23 @@ void GameLayer::setup_board_paint_no_normal() {
 
     app->renderer->add_model(board.paint_model, Renderer::HasShadow);
 
-    DEB_DEBUG("Built board paint");
+    DEB_DEBUG("Setup model board paint");
 }
 
-void GameLayer::setup_pieces_no_normal() {
+void GameLayer::setup_model_pieces_no_normal() {
     for (size_t i = 0; i < 9; i++) {
-        setup_piece_no_normal(
+        setup_model_piece_no_normal(
             i, Piece::Type::White, app->assets_data->white_piece_no_normal_mesh
         );
     }
     for (size_t i = 9; i < 18; i++) {
-        setup_piece_no_normal(
+        setup_model_piece_no_normal(
             i, Piece::Type::Black, app->assets_data->black_piece_no_normal_mesh
         );
     }
 }
 
-void GameLayer::setup_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh) {
+void GameLayer::setup_model_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh) {
     board.pieces[index].model.vertex_array = app->data.piece_vertex_arrays[index];
     board.pieces[index].model.index_count = mesh->indices.size();
     board.pieces[index].model.scale = 20.0f;
@@ -1048,16 +1040,16 @@ void GameLayer::setup_piece_no_normal(size_t index, Piece::Type type, std::share
 
     app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow | Renderer::HasShadow);
 
-    DEB_DEBUG("Built piece {}", index);
+    DEB_DEBUG("Setup model piece {}", index);
 }
 
-void GameLayer::setup_nodes() {
+void GameLayer::setup_model_nodes() {
     for (size_t i = 0; i < 24; i++) {
-        setup_node(i, NODE_POSITIONS[i]);
+        setup_model_node(i, NODE_POSITIONS[i]);
     }
 }
 
-void GameLayer::setup_node(size_t index, const glm::vec3& position) {
+void GameLayer::setup_model_node(size_t index, const glm::vec3& position) {
     board.nodes[index].model.vertex_array = app->data.node_vertex_arrays[index];
     board.nodes[index].model.index_count = app->assets_data->node_mesh->indices.size();
     board.nodes[index].model.position = position;
@@ -1066,7 +1058,7 @@ void GameLayer::setup_node(size_t index, const glm::vec3& position) {
 
     app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting);
 
-    DEB_DEBUG("Built node {}", index);
+    DEB_DEBUG("Setup model node {}", index);
 }
 
 void GameLayer::setup_camera() {
@@ -1099,6 +1091,34 @@ void GameLayer::setup_camera() {
     );
 
     DEB_DEBUG("Setup camera");
+}
+
+void GameLayer::setup_entities_board() {
+    for (size_t i = 0; i < 9; i++) {
+        board.pieces[i] = Piece(app->data.pieces_id[i], Piece::Type::White, i);
+        board.pieces[i].model.position = WHITE_PIECE_POSITION(i);
+        board.pieces[i].model.rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(rand() % 360)), 0.0f);
+    }
+    for (size_t i = 9; i < 18; i++) {
+        board.pieces[i] = Piece(app->data.pieces_id[i], Piece::Type::Black, i);
+        board.pieces[i].model.position = BLACK_PIECE_POSITION(i);
+        board.pieces[i].model.rotation = glm::vec3(0.0f, glm::radians(static_cast<float>(rand() % 360)), 0.0f);
+    }
+    for (size_t i = 0; i < 24; i++) {
+        board.nodes[i] = Node(app->data.nodes_id[i], i);
+    }
+}
+
+void GameLayer::setup_ids_board() {
+    for (size_t i = 0; i < 9; i++) {
+        board.pieces[i].id = app->data.pieces_id[i];
+    }
+    for (size_t i = 9; i < 18; i++) {
+        board.pieces[i].id = app->data.pieces_id[i];
+    }
+    for (size_t i = 0; i < 24; i++) {
+        board.nodes[i].id = app->data.nodes_id[i];
+    }
 }
 
 void GameLayer::setup_skybox() {
@@ -1346,6 +1366,7 @@ void GameLayer::actually_change_labeled_board_texture() {
 }
 
 void GameLayer::actually_change_normal_mapping() {
+    // Remove these models, they will be added back immediately
     app->renderer->remove_model(board.model.handle);
     app->renderer->remove_model(board.paint_model.handle);
     for (size_t i = 0; i < 18; i++) {
@@ -1353,22 +1374,31 @@ void GameLayer::actually_change_normal_mapping() {
     }
 
     if (app->options.normal_mapping) {
-        prepare_board();
-        prepare_board_paint();
-        prepare_pieces();
+        initialize_rendering_board();
+        initialize_rendering_board_paint();
+        initialize_rendering_pieces();
 
-        setup_board();
-        setup_board_paint();
-        setup_pieces();
+        setup_model_board();
+        setup_model_board_paint();
+        setup_model_pieces();
     } else {
-        prepare_board_no_normal();
-        prepare_board_paint_no_normal();
-        prepare_pieces_no_normal();
+        initialize_rendering_board_no_normal();
+        initialize_rendering_board_paint_no_normal();
+        initialize_rendering_pieces_no_normal();
 
-        setup_board_no_normal();
-        setup_board_paint_no_normal();
-        setup_pieces_no_normal();
+        setup_model_board_no_normal();
+        setup_model_board_paint_no_normal();
+        setup_model_pieces_no_normal();
     }
+
+    // Remove inactive pieces that were added previously
+    for (size_t i = 0; i < 18; i++) {
+        if (!board.pieces[i].active) {
+            app->renderer->remove_model(board.pieces[i].model.handle);
+        }
+    }
+
+    setup_ids_board();
 }
 
 void GameLayer::load_game() {

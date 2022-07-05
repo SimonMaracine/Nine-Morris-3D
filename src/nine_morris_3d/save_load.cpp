@@ -45,7 +45,7 @@ void serialize(Archive& archive, Board::ThreefoldRepetitionHistory& repetition_h
 
 template<typename Archive>
 void serialize(Archive& archive, Board::ThreefoldRepetitionHistory::PositionPlusInfo& position_plus_info) {
-    archive(position_plus_info.position, position_plus_info.piece_id, position_plus_info.node_id);
+    archive(position_plus_info.position, position_plus_info.piece_index, position_plus_info.node_index);
 }
 
 template<typename Archive>
@@ -61,8 +61,8 @@ template<typename Archive>
 void serialize(Archive& archive, Piece& piece) {
     archive(
         piece.id, piece.model, piece.movement, piece.should_move, piece.type, piece.in_use,
-        piece.node_id, piece.show_outline, piece.to_take, piece.pending_remove, piece.selected,
-        piece.active, piece.renderer_with_outline
+        piece.node_index, piece.index, piece.show_outline, piece.to_take, piece.pending_remove,
+        piece.selected, piece.active, piece.renderer_with_outline
     );
 }
 
@@ -80,7 +80,7 @@ Unserialized variables:
 */
 template<typename Archive>
 void serialize(Archive& archive, Node& node) {
-    archive(node.id, node.model, node.piece_id, node.index);
+    archive(node.id, node.model, node.piece_index, node.index);
 }
 
 template<typename Archive>

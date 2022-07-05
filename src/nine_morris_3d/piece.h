@@ -4,14 +4,9 @@
 
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/hoverable.h"
+#include "nine_morris_3d/constants.h"
 
 struct Node;
-
-constexpr float PIECE_Y_POSITION = 0.135f;
-constexpr float PIECE_BASE_VELOCITY = 0.3f;
-constexpr float PIECE_VARIABLE_VELOCITY = 10.0f;
-constexpr float PIECE_THREESTEP_HEIGHT = 0.4f;
-constexpr float PIECE_RAISE_HEIGHT = 1.3f;
 
 struct Piece {
     enum Type {
@@ -27,8 +22,8 @@ struct Piece {
     };
 
     Piece() = default;
-    Piece(hoverable::Id id, Type type)
-        : id(id), type(type) {}
+    Piece(hoverable::Id id, Type type, size_t index)
+        : id(id), type(type), index(index) {}
 
     hoverable::Id id = hoverable::null;
 
@@ -48,8 +43,10 @@ struct Piece {
 
     Type type = Type::None;
     bool in_use = false;  // true, if it is on the board
-    hoverable::Id node_id = hoverable::null;
+    size_t node_index = INVALID_NODE_INDEX;
     Node* node = nullptr;  // Reference to the node where it sits on
+
+    size_t index = INVALID_PIECE_INDEX;  // From 0 to 17, needed for easier coping with these
 
     bool show_outline = false;
     bool to_take = false;
