@@ -89,6 +89,8 @@ Section "Uninstall"
 
   RMDir /r "$DOCUMENTS\NineMorris3D"
 
+  RMDir /r "$APPDATA\NineMorris3D"
+
   !insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
 
   Delete "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk"

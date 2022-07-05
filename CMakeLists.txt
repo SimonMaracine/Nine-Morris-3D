@@ -81,7 +81,14 @@ set(HEADERS_FOR_WINDOWS
     "src/other/encryption.h"
 )
 
-add_executable(${EXECUTABLE_NAME}
+# Add WIN32 option for Windows
+if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    if(CMAKE_BUILD_TYPE MATCHES Release)
+        set(NO_CONSOLE WIN32)
+    endif()
+endif()
+
+add_executable(${EXECUTABLE_NAME} ${NO_CONSOLE}
     "src/main.cpp"
     "src/application/application.cpp"
     "src/application/input.cpp"
@@ -121,6 +128,13 @@ add_executable(${EXECUTABLE_NAME}
     ${HEADERS_FOR_WINDOWS}
 )
 
+# On Windows tell linker to use main instead of WinMain
+if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+    target_link_options(${EXECUTABLE_NAME} PRIVATE
+        /entry:mainCRTStartup
+    )
+endif()
+
 add_library(${GLAD_STB} STATIC
     "dependencies/glad/src/glad.c"
     "dependencies/stb_image/stb_image.c"
@@ -145,7 +159,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
         -Wno-unused-parameter -Wno-parentheses -Wno-type-limits
     )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_compile_options(${EXECUTABLE_NAME} PRIVATE /w)
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE /w)  # FIXME
     string(REGEX REPLACE "/W[1-3]" "/W0" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
