@@ -545,7 +545,7 @@ bool Board::redo() {
     Board previous_state = *this;
     Board& state_board = redo_state_history->back();
 
-    copy_smart(*this, state_board, false);
+    copy_smart(*this, state_board, nullptr);
 
     // Reset pieces' models
     for (Piece& piece : pieces) {

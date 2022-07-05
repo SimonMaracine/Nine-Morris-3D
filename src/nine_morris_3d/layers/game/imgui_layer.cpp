@@ -141,6 +141,11 @@ void ImGuiLayer::on_update(float dt) {
                 time(&current);
                 state.date = ctime(&current);
 
+                state.state_history = {
+                    game_layer->state_history.undo_state_history,
+                    game_layer->state_history.redo_state_history
+                };
+
                 try {
                     save_load::save_game_to_file(state);
                 } catch (const save_load::SaveFileNotOpenError& e) {
