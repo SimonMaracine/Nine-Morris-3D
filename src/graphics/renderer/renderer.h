@@ -105,6 +105,16 @@ public:
     std::shared_ptr<Shader> get_skybox_shader() { return storage.skybox_shader; }
 
     bool origin = false;  // This does nothing in release mode
+
+    struct LightSpace {
+        float left = 0.0f;
+        float right = 0.0f;
+        float bottom = 0.0f;
+        float top = 0.0f;
+        float near = 1.0f;
+        float far = 1.0f;
+        float light_divisor = 1.0f;
+    } light_space;
 private:
     void clear(int buffers);
     void draw_screen_quad(GLuint texture);

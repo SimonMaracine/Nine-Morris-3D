@@ -730,12 +730,12 @@ void ImGuiLayer::draw_debug(float dt) {
                 -30.0f, 30.0f)) {
             app->renderer->set_light(app->renderer->get_light());
         }
-        if (ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->get_light().ambient_color),
-                0.0f, 1.0f)) {}
-        if (ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->get_light().diffuse_color),
-                0.0f, 1.0f)) {}
-        if (ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->get_light().specular_color),
-                0.0f, 1.0f)) {}
+        ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->get_light().ambient_color),
+                0.0f, 1.0f);
+        ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->get_light().diffuse_color),
+                0.0f, 1.0f);
+        ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->get_light().specular_color),
+                0.0f, 1.0f);
         ImGui::End();
 
         // If you recompile shaders, uniforms that are set only once need to be reuploaded
@@ -785,6 +785,16 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Yaw: %f", app->camera.get_yaw());
         ImGui::Text("Angle around point: %f", app->camera.get_angle_around_point());
         ImGui::Text("Distance to point: %f", app->camera.get_distance_to_point());
+        ImGui::End();
+
+        ImGui::Begin("Light Space Matrix");
+        ImGui::SliderFloat("Left", &app->renderer->light_space.left, -10.0f, 10.0f);
+        ImGui::SliderFloat("Right", &app->renderer->light_space.right, -10.0f, 10.0f);
+        ImGui::SliderFloat("Bottom", &app->renderer->light_space.bottom, -10.0f, 10.0f);
+        ImGui::SliderFloat("Top", &app->renderer->light_space.top, -10.0f, 10.0f);
+        ImGui::SliderFloat("Near", &app->renderer->light_space.near, 0.1f, 2.0f);
+        ImGui::SliderFloat("Far", &app->renderer->light_space.far, 2.0f, 50.0f);
+        ImGui::SliderFloat("Light divisor", &app->renderer->light_space.light_divisor, 1.0f, 10.0f);
         ImGui::End();
     }
 }

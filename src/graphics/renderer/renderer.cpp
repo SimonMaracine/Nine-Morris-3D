@@ -668,9 +668,16 @@ void Renderer::draw_skybox() {
 }
 
 void Renderer::setup_shadows() {
-    const glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);  // TODO redo this stuff
+    const glm::mat4 projection = glm::ortho(
+        light_space.left,
+        light_space.right,
+        light_space.bottom,
+        light_space.top,
+        light_space.near,
+        light_space.far
+    );
     const glm::mat4 view = glm::lookAt(
-        light.position / 4.0f,
+        light.position / light_space.light_divisor,
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)
     );

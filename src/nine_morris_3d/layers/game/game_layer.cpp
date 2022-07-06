@@ -6,6 +6,7 @@
 #include "application/events.h"
 #include "application/input.h"
 #include "application/platform.h"
+#include "graphics/renderer/renderer.h"
 #include "graphics/renderer/buffer_layout.h"
 #include "graphics/renderer/light.h"
 #include "graphics/renderer/camera.h"
@@ -32,8 +33,8 @@
 #include "other/assert.h"
 #include "other/encryption.h"
 
-#define WHITE_PIECE_POSITION(i) glm::vec3(-4.0f, 0.3f, -2.0f + (i) * 0.5f)
-#define BLACK_PIECE_POSITION(i) glm::vec3(4.0f, 0.3f, -2.0f + ((i) - 9) * 0.5f)
+#define WHITE_PIECE_POSITION(i) glm::vec3(-4.0f, 0.3f, -2.0f + (i) * 0.49f)
+#define BLACK_PIECE_POSITION(i) glm::vec3(4.0f, 0.3f, -2.0f + ((i) - 9) * 0.49f)
 
 using namespace encryption;
 using namespace mesh;
@@ -45,11 +46,25 @@ constexpr DirectionalLight LIGHT_FIELD = {
     glm::vec3(0.9f)
 };
 
+constexpr Renderer::LightSpace SHADOWS_FIELD = {
+    -4.7f, 4.7f,
+    -1.9f, 2.76f,
+    1.0f, 9.0f,
+    3.1f
+};
+
 constexpr DirectionalLight LIGHT_AUTUMN = {
     glm::vec3(-4.4f, 11.0f, 6.4f),
     glm::vec3(0.32f),
     glm::vec3(0.82f),
     glm::vec3(0.82f)
+};
+
+constexpr Renderer::LightSpace SHADOWS_AUTUMN = {
+    -4.66f, 4.66f,
+    -3.24f, 4.29f,
+    1.0f, 9.0f,
+    3.1f
 };
 
 void GameLayer::on_attach() {
@@ -1145,8 +1160,10 @@ void GameLayer::setup_skybox() {
 void GameLayer::setup_light() {
     if (app->options.skybox == options::FIELD) {
         app->renderer->set_light(LIGHT_FIELD);
+        app->renderer->light_space = SHADOWS_FIELD;
     } else if (app->options.skybox == options::AUTUMN) {
         app->renderer->set_light(LIGHT_AUTUMN);
+        app->renderer->light_space = SHADOWS_AUTUMN;
     } else {
         ASSERT(false, "Invalid skybox");
     }
@@ -1353,13 +1370,7 @@ void GameLayer::actually_change_skybox() {
     };
     app->renderer->set_skybox(Texture3D::create(data));
 
-    if (app->options.skybox == options::FIELD) {
-        app->renderer->set_light(LIGHT_FIELD);
-    } else if (app->options.skybox == options::AUTUMN) {
-        app->renderer->set_light(LIGHT_AUTUMN);
-    } else {
-        ASSERT(false, "Invalid skybox");
-    }
+    setup_light();
 }
 
 void GameLayer::actually_change_labeled_board_texture() {
