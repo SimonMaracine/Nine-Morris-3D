@@ -421,6 +421,7 @@ void GameLayer::initialize_rendering_board() {
         uniforms,
         uniform_blocks
     );
+    app->renderer->setup_shader(app->data.board_wood_shader);
 
     std::shared_ptr<Buffer> vertices = Buffer::create(
         app->assets_data->board_wood_mesh->vertices.data(),
@@ -487,6 +488,7 @@ void GameLayer::initialize_rendering_board_paint() {
         uniforms,
         uniform_blocks
     );
+    app->renderer->setup_shader(app->data.board_paint_shader);
 
     std::shared_ptr<Buffer> vertices = Buffer::create(
         app->assets_data->board_paint_mesh->vertices.data(),
@@ -550,6 +552,7 @@ void GameLayer::initialize_rendering_pieces() {
         uniforms,
         uniform_blocks
     );
+    app->renderer->setup_shader(app->data.piece_shader);
 
     app->data.white_piece_diffuse_texture = Texture::create(
         app->assets_data->white_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
@@ -648,6 +651,7 @@ void GameLayer::initialize_rendering_board_no_normal() {
         uniforms,
         uniform_blocks
     );
+    app->renderer->setup_shader(app->data.board_wood_shader);
 
     std::shared_ptr<Buffer> vertices = Buffer::create(
         app->assets_data->board_wood_no_normal_mesh->vertices.data(),
@@ -706,6 +710,7 @@ void GameLayer::initialize_rendering_board_paint_no_normal() {
         uniforms,
         uniform_blocks
     );
+    app->renderer->setup_shader(app->data.board_paint_shader);
 
     std::shared_ptr<Buffer> vertices = Buffer::create(
         app->assets_data->board_paint_no_normal_mesh->vertices.data(),
@@ -765,6 +770,7 @@ void GameLayer::initialize_rendering_pieces_no_normal() {
         uniforms,
         uniform_blocks
     );
+    app->renderer->setup_shader(app->data.piece_shader);
 
     app->data.white_piece_diffuse_texture = Texture::create(
         app->assets_data->white_piece_diff_texture, true, -1.5f, app->options.anisotropic_filtering
@@ -847,6 +853,7 @@ void GameLayer::initialize_rendering_nodes() {
         uniforms,
         { app->renderer->get_projection_view_uniform_block() }
     );
+    app->renderer->setup_shader(app->data.node_shader);
 
     app->data.basic_material = std::make_shared<Material>(app->data.node_shader, Material::Hoverable);
     app->data.basic_material->add_variable(Material::UniformType::Vec4, "u_color");

@@ -385,8 +385,10 @@ void Framebuffer::build() {
     if (color_attachments.size() > 1) {
         ASSERT(color_attachments.size() <= 4, "Currently there can be maximum 4 color attachments");
 
-        const GLenum attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-                                        GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+        constexpr GLenum attachments[4] = {
+            GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+            GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+        };
         glDrawBuffers(color_attachments.size(), attachments);
     } else if (color_attachments.empty()) {
         glDrawBuffer(GL_NONE);

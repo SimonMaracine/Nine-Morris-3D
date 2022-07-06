@@ -33,8 +33,13 @@ static size_t type_size(GLenum type) {
     return size;
 }
 
-Shader::Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, std::string_view name,
-        const std::vector<std::string>& uniforms, std::string_view vertex_source_path,
+Shader::Shader(
+        GLuint program,
+        GLuint vertex_shader,
+        GLuint fragment_shader,
+        std::string_view name,
+        const std::vector<std::string>& uniforms,
+        std::string_view vertex_source_path,
         std::string_view fragment_source_path)
     : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader), name(name),
       vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path),

@@ -76,6 +76,8 @@ public:
     // unsigned int add_instanced(unsigned int group_handle);
     // void remove_instanced(unsigned int group_handle, unsigned int handle);
 
+    void setup_shader(std::shared_ptr<Shader> shader);
+
     void clear();
 
     void set_viewport(int width, int height);

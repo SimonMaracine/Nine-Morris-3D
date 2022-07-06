@@ -17,9 +17,14 @@ struct UniformBlockSpecification {
 
 class Shader {
 public:
-    Shader(GLuint program, GLuint vertex_shader, GLuint fragment_shader, std::string_view name,
-            const std::vector<std::string>& uniforms, std::string_view vertex_source_path,
-            std::string_view fragment_source_path);
+    Shader(
+        GLuint program,
+        GLuint vertex_shader,
+        GLuint fragment_shader,
+        std::string_view name,
+        const std::vector<std::string>& uniforms,
+        std::string_view vertex_source_path,
+        std::string_view fragment_source_path);
     ~Shader();
 
     static std::shared_ptr<Shader> create(
@@ -55,6 +60,7 @@ public:
     void recompile();
 
     std::string_view get_name() { return name; }
+    std::vector<std::string>& get_uniforms() { return uniforms; }
 private:
     GLint get_uniform_location(std::string_view name);
 

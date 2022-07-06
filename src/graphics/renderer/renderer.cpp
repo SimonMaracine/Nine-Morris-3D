@@ -40,6 +40,8 @@ static const char* light_space_block_fields[] = {
     "u_light_space_matrix"
 };
 
+constexpr int SHADOW_MAP_UNIT = 2;
+
 Renderer::Renderer(Application* app)
     : app(app) {
     glEnable(GL_BLEND);
@@ -283,6 +285,8 @@ void Renderer::render() {
     set_viewport(shadow_map_size, shadow_map_size);
 
     // Render objects with shadows to depth buffer
+    storage.shadow_shader->bind();
+
     for (const auto [id, model] : models_cast_shadow) {
         IGNORE(id);
         glm::mat4 matrix = glm::mat4(1.0f);
@@ -292,7 +296,6 @@ void Renderer::render() {
         matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
 
-        storage.shadow_shader->bind();
         storage.shadow_shader->upload_uniform_mat4("u_model_matrix", matrix);
 
         model->vertex_array->bind();
@@ -306,7 +309,7 @@ void Renderer::render() {
     set_viewport(app->app_data.width, app->app_data.height);
 
     // Bind shadow map for use in shadow rendering
-    glActiveTexture(GL_TEXTURE2);
+    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
     glBindTexture(GL_TEXTURE_2D, storage.depth_map_framebuffer->get_depth_attachment());
 
     // Set to zero, because we are also rendering objects with outline later
@@ -404,8 +407,7 @@ void Renderer::render() {
             matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
             matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
             matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix = glm::scale(matrix, glm::vec3(model->scale + SIZE, model->scale + SIZE,
-                    model->scale + SIZE));
+            matrix = glm::scale(matrix, glm::vec3(model->scale + SIZE, model->scale + SIZE, model->scale + SIZE));
 
             storage.outline_shader->bind();
             storage.outline_shader->upload_uniform_mat4("u_model_matrix", matrix);
@@ -447,17 +449,20 @@ void Renderer::render() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
+    // Blit the scene texture result to an intermediate texture resolving anti-aliasing
     storage.scene_framebuffer->resolve_framebuffer(storage.intermediate_framebuffer->get_id(),
             app->app_data.width, app->app_data.height);
 
     storage.intermediate_framebuffer->bind();
 
+    // Read the texture for mouse picking
     const int x = static_cast<int>(input::get_mouse_x());
     const int y = app->app_data.height - static_cast<int>(input::get_mouse_y());
     reader.read(1, x, y);
 
     Framebuffer::bind_default();
 
+    // Draw the result to the screen
     clear(Color);
     draw_screen_quad(storage.intermediate_framebuffer->get_color_attachment(0));
 
@@ -608,6 +613,16 @@ void Renderer::set_light(const DirectionalLight& light) {
 #endif
 }
 
+void Renderer::setup_shader(std::shared_ptr<Shader> shader) {
+    const std::vector<std::string>& uniforms = shader->get_uniforms();
+
+    if (std::find(uniforms.begin(), uniforms.end(), "u_shadow_map") != uniforms.end()) {
+        shader->bind();
+        shader->upload_uniform_int("u_shadow_map", SHADOW_MAP_UNIT);
+        Shader::unbind();
+    }
+}
+
 void Renderer::clear(int buffers) {
     glClear(buffers);
 }
@@ -654,19 +669,16 @@ void Renderer::draw_skybox() {
 
 void Renderer::setup_shadows() {
     const glm::mat4 projection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 1.0f, 9.0f);  // TODO redo this stuff
-    const glm::mat4 view = glm::lookAt(light.position / 4.0f,
-            glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    const glm::mat4 view = glm::lookAt(
+        light.position / 4.0f,
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f)
+    );
     const glm::mat4 light_space_matrix = projection * view;
 
     storage.light_space_uniform_buffer->set(&light_space_matrix, 0);
     storage.light_space_uniform_buffer->bind();
     storage.light_space_uniform_buffer->upload_data();
-
-    for (const auto& [id, model] : models_has_shadow) {
-        IGNORE(id);
-        model->material->get_shader()->bind();
-        model->material->get_shader()->upload_uniform_int("u_shadow_map", 2);
-    }
 }
 
 void Renderer::check_hovered_id(int x, int y) {
