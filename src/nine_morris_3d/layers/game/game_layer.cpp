@@ -623,8 +623,10 @@ void GameLayer::initialize_rendering_piece(size_t index, Piece::Type type, std::
     hoverable::Id id = hoverable::generate_id();
     app->data.pieces_id[index] = id;
 
-    std::shared_ptr<Buffer> vertices = Buffer::create(mesh->vertices.data(),
-        mesh->vertices.size() * sizeof(VPTNT));
+    std::shared_ptr<Buffer> vertices = Buffer::create(
+        mesh->vertices.data(),
+        mesh->vertices.size() * sizeof(VPTNT)
+    );
 
     std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
 
@@ -855,8 +857,10 @@ void GameLayer::initialize_rendering_piece_no_normal(size_t index, Piece::Type t
     hoverable::Id id = hoverable::generate_id();
     app->data.pieces_id[index] = id;
 
-    std::shared_ptr<Buffer> vertices = Buffer::create(mesh->vertices.data(),
-        mesh->vertices.size() * sizeof(VPTN));
+    std::shared_ptr<Buffer> vertices = Buffer::create(
+        mesh->vertices.data(),
+        mesh->vertices.size() * sizeof(VPTN)
+    );
 
     std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
 
@@ -918,8 +922,10 @@ void GameLayer::initialize_rendering_node(size_t index, const glm::vec3& positio
     hoverable::Id id = hoverable::generate_id();
     app->data.nodes_id[index] = id;
 
-    std::shared_ptr<Buffer> vertices = Buffer::create(app->assets_data->node_mesh->vertices.data(),
-            app->assets_data->node_mesh->vertices.size() * sizeof(VP));
+    std::shared_ptr<Buffer> vertices = Buffer::create(
+        app->assets_data->node_mesh->vertices.data(),
+        app->assets_data->node_mesh->vertices.size() * sizeof(VP)
+    );
 
     std::shared_ptr<Buffer> ids = create_ids_buffer(app->assets_data->node_mesh->vertices.size(), id);
 

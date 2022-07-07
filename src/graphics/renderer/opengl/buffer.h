@@ -2,13 +2,19 @@
 
 #include <glad/glad.h>
 
+enum class DrawHint {
+    Static = GL_STATIC_DRAW,
+    Dynamic = GL_DYNAMIC_DRAW,
+    Stream = GL_STREAM_DRAW
+};
+
 class Buffer {
 public:
-    Buffer(GLuint buffer);
+    Buffer(GLuint buffer, DrawHint hint);
     ~Buffer();
 
-    static std::shared_ptr<Buffer> create(size_t size);
-    static std::shared_ptr<Buffer> create(const void* data, size_t size);
+    static std::shared_ptr<Buffer> create(size_t size, DrawHint hint = DrawHint::Static);
+    static std::shared_ptr<Buffer> create(const void* data, size_t size, DrawHint hint = DrawHint::Static);
 
     void bind();
     static void unbind();
@@ -16,6 +22,7 @@ public:
     void update_data(const void* data, size_t size);
 private:
     GLuint buffer = 0;
+    DrawHint draw_hint = DrawHint::Static;
 
     friend class VertexArray;
 };

@@ -91,13 +91,13 @@ namespace gui {
         float* buffer;
         font->render(text, &size, &buffer);
 
+        font->update_data(buffer, size);
+        delete[] buffer;
+
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
         matrix = glm::scale(matrix, glm::vec3(text_scale, text_scale, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(scale_parameters.current_scale, scale_parameters.current_scale, 1.0f));
-
-        font->update_data(buffer, size);
-        delete[] buffer;
 
         app->gui_renderer->storage.text_shader->bind();
         app->gui_renderer->storage.text_shader->upload_uniform_mat4("u_model_matrix", matrix);

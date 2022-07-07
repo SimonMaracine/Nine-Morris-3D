@@ -4,8 +4,8 @@
 #include "graphics/renderer/opengl/buffer.h"
 #include "other/logging.h"
 
-Buffer::Buffer(GLuint buffer)
-    : buffer(buffer) {
+Buffer::Buffer(GLuint buffer, DrawHint hint)
+    : buffer(buffer), draw_hint(hint) {
     DEB_DEBUG("Created buffer {}", buffer);
 }
 
@@ -15,28 +15,28 @@ Buffer::~Buffer() {
     DEB_DEBUG("Deleted buffer {}", buffer);
 }
 
-std::shared_ptr<Buffer> Buffer::create(size_t size) {
+std::shared_ptr<Buffer> Buffer::create(size_t size, DrawHint hint) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, nullptr, static_cast<int>(hint));
     LOG_ALLOCATION(size)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    return std::make_shared<Buffer>(buffer);
+    return std::make_shared<Buffer>(buffer, hint);
 }
 
-std::shared_ptr<Buffer> Buffer::create(const void* data, size_t size) {
+std::shared_ptr<Buffer> Buffer::create(const void* data, size_t size, DrawHint hint) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(hint));
     LOG_ALLOCATION(size)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    return std::make_shared<Buffer>(buffer);
+    return std::make_shared<Buffer>(buffer, hint);
 }
 
 void Buffer::bind() {
@@ -48,7 +48,7 @@ void Buffer::unbind() {
 }
 
 void Buffer::update_data(const void* data, size_t size) {
-    glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(draw_hint));
 }
 
 // --- Index buffer
