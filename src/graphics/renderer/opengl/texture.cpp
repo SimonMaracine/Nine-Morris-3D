@@ -34,10 +34,12 @@ static std::string get_name_texture3d(const char* file_path) {
     return tokens[tokens.size() - 2];  // It's ok
 }
 
-static void configure_mipmapping(bool mipmapping, float bias, int anisotropic_filtering) {
-    if (mipmapping) {
-        const bool anisotropic_filtering_enabled =
-                anisotropic_filtering != 0 && extensions::extension_supported(extensions::AnisotropicFiltering);
+static void configure_mipmapping(const TextureSpecification& specification) {
+    if (specification.mipmapping) {
+        const bool anisotropic_filtering_enabled = specification.anisotropic_filtering != 0
+                && extensions::extension_supported(extensions::AnisotropicFiltering);
+
+        float bias = specification.bias;
 
         if (anisotropic_filtering_enabled) {
             bias = 0.0f;
@@ -50,11 +52,26 @@ static void configure_mipmapping(bool mipmapping, float bias, int anisotropic_fi
             float max_amount;
             glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_amount);
 
-            const float amount = std::min(static_cast<float>(anisotropic_filtering), max_amount);
+            const float amount = std::min(static_cast<float>(specification.anisotropic_filtering), max_amount);
 
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
         }
     }
+}
+
+static void configure_filter_and_wrap(const TextureSpecification& specification) {
+    if (specification.mipmapping) {
+        ASSERT(specification.min_filter == Filter::None, "Filter must be None");
+    } else {
+        ASSERT(specification.min_filter != Filter::None, "Filter must not be None");
+    }
+
+    const GLint min_filter = specification.mipmapping ? GL_LINEAR_MIPMAP_LINEAR : static_cast<int>(specification.min_filter);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<int>(specification.mag_filter));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 Texture::Texture(GLuint texture, int width, int height, std::string_view name)
@@ -68,7 +85,7 @@ Texture::~Texture() {
     DEB_DEBUG("Deleted texture {} ({})", texture, name);
 }
 
-std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmapping, float bias, int anisotropic_filtering) {
+std::shared_ptr<Texture> Texture::create(std::string_view file_path, const TextureSpecification& specification) {
     DEB_DEBUG("Loading texture '{}'...", file_path);
 
     stbi_set_flip_vertically_on_load(1);
@@ -85,16 +102,13 @@ std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmap
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmapping ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    configure_filter_and_wrap(specification);
 
     glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
     LOG_ALLOCATION(width * height * 4)
 
-    configure_mipmapping(mipmapping, bias, anisotropic_filtering);
+    configure_mipmapping(specification);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -105,7 +119,7 @@ std::shared_ptr<Texture> Texture::create(std::string_view file_path, bool mipmap
     return std::make_shared<Texture>(texture, width, height, name);
 }
 
-std::shared_ptr<Texture> Texture::create(const encryption::EncryptedFile& file_path, bool mipmapping, float bias, int anisotropic_filtering) {
+std::shared_ptr<Texture> Texture::create(const encryption::EncryptedFile& file_path, const TextureSpecification& specification) {
     DEB_DEBUG("Loading texture '{}'...", file_path.get());
 
     cppblowfish::Buffer buffer = encryption::load_file(file_path);
@@ -124,16 +138,13 @@ std::shared_ptr<Texture> Texture::create(const encryption::EncryptedFile& file_p
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmapping ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    configure_filter_and_wrap(specification);
 
     glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
     LOG_ALLOCATION(width * height * 4)
 
-    configure_mipmapping(mipmapping, bias, anisotropic_filtering);
+    configure_mipmapping(specification);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -144,15 +155,12 @@ std::shared_ptr<Texture> Texture::create(const encryption::EncryptedFile& file_p
     return std::make_shared<Texture>(texture, width, height, name);
 }
 
-std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool mipmapping, float bias, int anisotropic_filtering) {
+std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, const TextureSpecification& specification) {
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmapping ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    configure_filter_and_wrap(specification);
 
     ASSERT(data->data != nullptr, "No data");
 
@@ -160,7 +168,7 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, bool
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA, GL_UNSIGNED_BYTE, data->data);
     LOG_ALLOCATION(data->width * data->height * 4)
 
-    configure_mipmapping(mipmapping, bias, anisotropic_filtering);
+    configure_mipmapping(specification);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 

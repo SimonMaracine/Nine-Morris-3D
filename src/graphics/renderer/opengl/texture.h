@@ -6,17 +6,30 @@
 #include "other/texture_data.h"
 #include "other/encryption.h"
 
+enum class Filter {
+	None = 0,
+	Linear = GL_LINEAR,
+	Nearest = GL_NEAREST
+};
+
+struct TextureSpecification {
+	Filter min_filter = Filter::None;
+	Filter mag_filter = Filter::None;
+
+	// Mipmapping is off by default
+	bool mipmapping = false;
+	float bias = 0.0f;
+	int anisotropic_filtering = 0;
+};
+
 class Texture {
 public:
     Texture(GLuint texture, int width, int height, std::string_view name);
     ~Texture();
 
-    static std::shared_ptr<Texture> create(std::string_view file_path, bool mipmapping,
-			float bias = 0.0f, int anisotropic_filtering = 0);
-	static std::shared_ptr<Texture> create(const encryption::EncryptedFile& file_path, bool mipmapping,
-			float bias = 0.0f, int anisotropic_filtering = 0);
-	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, bool mipmapping,
-			float bias = 0.0f, int anisotropic_filtering = 0);
+    static std::shared_ptr<Texture> create(std::string_view file_path, const TextureSpecification& specification);
+	static std::shared_ptr<Texture> create(const encryption::EncryptedFile& file_path, const TextureSpecification& specification);
+	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
 
 	int get_width() { return width; }
 	int get_height() { return height; }

@@ -213,7 +213,11 @@ Renderer::Renderer(Application* app)
 #endif
 
 #ifdef PLATFORM_GAME_DEBUG
-    storage.light_bulb_texture = Texture::create("data/textures/internal/light_bulb/light_bulb.png", false);
+    TextureSpecification specification;
+    specification.min_filter = Filter::Linear;
+    specification.mag_filter = Filter::Linear;
+
+    storage.light_bulb_texture = Texture::create("data/textures/internal/light_bulb/light_bulb.png", specification);
 
     storage.light_bulb_quad.texture = storage.light_bulb_texture;
     add_quad(storage.light_bulb_quad);

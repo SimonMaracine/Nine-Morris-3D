@@ -31,11 +31,15 @@ void GuiLayer::on_detach() {
 void GuiLayer::on_awake() {
     game_layer = get_layer<GameLayer>("game");
 
+    TextureSpecification specification;
+    specification.min_filter = Filter::Linear;
+    specification.mag_filter = Filter::Linear;
+
     app->data.white_indicator_texture = Texture::create(
-        app->assets_data->white_indicator_texture, false
+        app->assets_data->white_indicator_texture, specification
     );
     app->data.black_indicator_texture = Texture::create(
-        app->assets_data->black_indicator_texture, false
+        app->assets_data->black_indicator_texture, specification
     );
 }
 
