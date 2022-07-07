@@ -611,8 +611,10 @@ void Board::update_cursor() {
 
 void Board::update_nodes(hoverable::Id hovered_id) {
     for (Node& node : nodes) {
-        if (node.id == hovered_id && phase != Board::Phase::None && phase != Board::Phase::GameOver
-                && !should_take_piece) {
+        const bool highlight = node.id == hovered_id && phase == Phase::PlacePieces && !should_take_piece
+                || node.id == hovered_id && phase == Phase::MovePieces && selected_piece != nullptr && !should_take_piece;
+
+        if (highlight) {
             node.model.material->set_vec4("u_color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
         } else {
             node.model.material->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
