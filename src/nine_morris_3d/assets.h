@@ -27,9 +27,10 @@ namespace assets {
 
     extern std::string WHITE_INDICATOR_TEXTURE;
     extern std::string BLACK_INDICATOR_TEXTURE;
-    extern std::string SPLASH_SCREEN_TEXTURE;
+    extern std::string WAIT_INDICATOR_TEXTURE;
     extern std::string KEYBOARD_CONTROLS_TEXTURE;
-    extern std::string KEYBOARD_CONTROLS_TEXTURE_CROSS;
+    extern std::string KEYBOARD_CONTROLS_CROSS_TEXTURE;
+    extern std::string SPLASH_SCREEN_TEXTURE;
 
     extern std::string OPEN_SANS_FONT;
     extern std::string GOOD_DOG_PLAIN_FONT;

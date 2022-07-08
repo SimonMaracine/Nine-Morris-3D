@@ -36,3 +36,4 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has thre
 - nine_morris_3d.h
 - install.sh
 - installer.nsi
+- README.txt

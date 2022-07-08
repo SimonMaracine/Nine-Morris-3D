@@ -25,8 +25,12 @@ struct AssetsData {
     std::shared_ptr<TextureData> white_piece_diff_texture;
     std::shared_ptr<TextureData> board_norm_texture;
     std::shared_ptr<TextureData> piece_norm_texture;
+
     std::shared_ptr<TextureData> white_indicator_texture;
     std::shared_ptr<TextureData> black_indicator_texture;
+    std::shared_ptr<TextureData> wait_indicator_texture;
+    std::shared_ptr<TextureData> keyboard_controls_texture;
+    std::shared_ptr<TextureData> keyboard_controls_cross_texture;
 
     std::shared_ptr<TextureData> skybox_px_texture;
     std::shared_ptr<TextureData> skybox_nx_texture;

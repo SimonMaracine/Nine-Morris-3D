@@ -26,7 +26,7 @@ KeyboardControls::KeyboardControls(Board* board)
 
     quad.position = POSITION(0);
     quad.scale = 0.14f;
-    quad.texture = board->should_take_piece ? app->data.keyboard_controls_texture_cross : app->data.keyboard_controls_texture;
+    quad.texture = board->should_take_piece ? app->data.keyboard_controls_cross_texture : app->data.keyboard_controls_texture;
 }
 
 void KeyboardControls::initialize() {

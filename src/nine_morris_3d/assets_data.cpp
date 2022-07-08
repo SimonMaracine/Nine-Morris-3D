@@ -30,6 +30,9 @@ namespace assets_data {
 
         loader->get()->white_indicator_texture = std::make_shared<TextureData>(encr(path_for_assets(WHITE_INDICATOR_TEXTURE)), true);
         loader->get()->black_indicator_texture = std::make_shared<TextureData>(encr(path_for_assets(BLACK_INDICATOR_TEXTURE)), true);
+        loader->get()->wait_indicator_texture = std::make_shared<TextureData>(encr(path_for_assets(WAIT_INDICATOR_TEXTURE)), true);
+        loader->get()->keyboard_controls_texture = std::make_shared<TextureData>(encr(path_for_assets(KEYBOARD_CONTROLS_TEXTURE)), true);
+        loader->get()->keyboard_controls_cross_texture = std::make_shared<TextureData>(encr(path_for_assets(KEYBOARD_CONTROLS_CROSS_TEXTURE)), true);
 
         if (options.texture_quality == options::NORMAL) {
             loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(encr(path_for_assets(BOARD_WOOD_DIFFUSE_TEXTURE)), true);

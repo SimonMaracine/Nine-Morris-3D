@@ -16,13 +16,12 @@ public:
     virtual void on_awake() override;
     virtual void on_update(float dt) override;
 
-    void render_turn_indicator();
-    void render_timer();
-
     Timer timer;
+    bool show_wait_indicator = false;
 
     std::shared_ptr<gui::Image> turn_indicator;
     std::shared_ptr<gui::Text> timer_text;
+    std::shared_ptr<gui::Image> wait_indicator;
 
     GameLayer* game_layer = nullptr;
 };

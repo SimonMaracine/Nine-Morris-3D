@@ -595,7 +595,7 @@ void Board::update_cursor() {
             app->window->set_cursor(app->cross_cursor);
 
             if (keyboard != nullptr) {
-                keyboard->quad.texture = app->data.keyboard_controls_texture_cross;
+                keyboard->quad.texture = app->data.keyboard_controls_cross_texture;
             }
         } else {
             app->window->set_cursor(app->arrow_cursor);

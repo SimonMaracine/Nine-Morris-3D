@@ -172,6 +172,13 @@ void GameLayer::on_awake() {
     initialize_rendering_nodes();
     setup_skybox();
     setup_light();
+
+    TextureSpecification specification;
+    specification.min_filter = Filter::Linear;
+    specification.mag_filter = Filter::Linear;
+
+    app->data.keyboard_controls_texture = Texture::create(app->assets_data->keyboard_controls_texture, specification);
+    app->data.keyboard_controls_cross_texture = Texture::create(app->assets_data->keyboard_controls_cross_texture, specification);
 }
 
 void GameLayer::on_update(float dt) {

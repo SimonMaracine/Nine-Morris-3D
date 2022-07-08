@@ -108,14 +108,12 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         io.Fonts->Build();
     }
 
-    // Load splash screen and keyboard controls
+    // Load splash screen
     TextureSpecification specification;
     specification.min_filter = Filter::Linear;
     specification.mag_filter = Filter::Linear;
 
     data.splash_screen_texture = Texture::create(encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
-    data.keyboard_controls_texture = Texture::create(encr(path_for_assets(KEYBOARD_CONTROLS_TEXTURE)), specification);
-    data.keyboard_controls_texture_cross = Texture::create(encr(path_for_assets(KEYBOARD_CONTROLS_TEXTURE_CROSS)), specification);
 
     // Load and create this font
     data.good_dog_plain_font = std::make_shared<Font>(path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);

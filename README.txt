@@ -1,0 +1,38 @@
+  _   _ _              __  __                 _       ____  _____  
+ | \ | (_)            |  \/  |               (_)     |___ \|  __ \ 
+ |  \| |_ _ __   ___  | \  / | ___  _ __ _ __ _ ___    __) | |  | |
+ | . ` | | '_ \ / _ \ | |\/| |/ _ \| '__| '__| / __|  |__ <| |  | |
+ | |\  | | | | |  __/ | |  | | (_) | |  | |  | \__ \  ___) | |__| |
+ |_| \_|_|_| |_|\___| |_|  |_|\___/|_|  |_|  |_|___/ |____/|_____/ 
+
+ VERSION 0.2.0
+
+ Thank you for downloading Nine Morris 3D! A lot of effort was put in the making of this game. I hope
+ that you like it. :)
+ If you find any bugs or you have a suggestion, please contact me at simonmara.dev@gmail.com.
+
+----------------------------------------------------------------------------------------------------
+
+SOME CREDITS:
+
+Hourglass icon:
+    https://www.flaticon.com/free-icons/hourglass
+
+Normal texture:
+    https://www.goodtextures.com/image/19816/wood-plain-04-normal
+
+Fonts:
+    See "data/fonts/" directory.
+
+Skyboxes:
+    https://polyhaven.com/hdris
+
+----------------------------------------------------------------------------------------------------
+
+TOOLS I USED:
+
+Code editing: Visual Studio Code, Visual Studio
+Graphics: GIMP, Blender, https://matheowis.github.io/HDRI-to-CubeMap/
+Audio:
+Workflow: Git, CMake
+Other: NSIS, Trello

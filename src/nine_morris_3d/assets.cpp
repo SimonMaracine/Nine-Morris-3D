@@ -25,9 +25,10 @@ namespace assets {
 
     std::string WHITE_INDICATOR_TEXTURE = "data/textures/indicator/white_indicator.png";
     std::string BLACK_INDICATOR_TEXTURE = "data/textures/indicator/black_indicator.png";
-    std::string SPLASH_SCREEN_TEXTURE = "data/textures/splash_screen/splash_screen.png";
+    std::string WAIT_INDICATOR_TEXTURE = "data/textures/indicator/wait_indicator.png";
     std::string KEYBOARD_CONTROLS_TEXTURE = "data/textures/keyboard_controls/keyboard_controls.png";
-    std::string KEYBOARD_CONTROLS_TEXTURE_CROSS = "data/textures/keyboard_controls/keyboard_controls_cross.png";
+    std::string KEYBOARD_CONTROLS_CROSS_TEXTURE = "data/textures/keyboard_controls/keyboard_controls_cross.png";
+    std::string SPLASH_SCREEN_TEXTURE = "data/textures/splash_screen/splash_screen.png";
 
     std::string OPEN_SANS_FONT = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
     std::string GOOD_DOG_PLAIN_FONT = "data/fonts/FH-GoodDogPlain-WTT/GOODDP__.TTF";
@@ -85,7 +86,7 @@ namespace assets {
 #ifdef PLATFORM_GAME_RELEASE
         static const char* PREFIX = ".dat";
 
-        static constexpr std::array<std::string*, 64> assets = {
+        static constexpr std::array<std::string*, 65> assets = {
             &BOARD_WOOD_MESH,
             &BOARD_PAINT_MESH,
             &NODE_MESH,
@@ -110,9 +111,10 @@ namespace assets {
 
             &WHITE_INDICATOR_TEXTURE,
             &BLACK_INDICATOR_TEXTURE,
-            &SPLASH_SCREEN_TEXTURE,
+            &WAIT_INDICATOR_TEXTURE,
             &KEYBOARD_CONTROLS_TEXTURE,
-            &KEYBOARD_CONTROLS_TEXTURE_CROSS,
+            &KEYBOARD_CONTROLS_CROSS_TEXTURE,
+            &SPLASH_SCREEN_TEXTURE,
 
             &FIELD_PX_TEXTURE,
             &FIELD_NX_TEXTURE,
