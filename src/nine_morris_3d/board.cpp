@@ -53,7 +53,6 @@ void Board::copy_smart(Board& to, const Board& from, StateHistory* state_history
 
     for (size_t i = 0; i < 24; i++) {
         Node& node = to.nodes[i];
-        // node.id = from.nodes[i].id;
         node.model.index_count = from.nodes[i].model.index_count;
         node.model.position = from.nodes[i].model.position;
         node.model.rotation = from.nodes[i].model.rotation;
@@ -66,7 +65,6 @@ void Board::copy_smart(Board& to, const Board& from, StateHistory* state_history
 
     for (size_t i = 0; i < 18; i++) {
         Piece& piece = to.pieces[i];
-        // piece.id = from.pieces[i].id;
         piece.model.index_count = from.pieces[i].model.index_count;
         piece.model.position = from.pieces[i].model.position;
         piece.model.rotation = from.pieces[i].model.rotation;

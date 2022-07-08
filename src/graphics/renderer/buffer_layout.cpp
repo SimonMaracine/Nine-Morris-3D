@@ -3,7 +3,7 @@
 #include "graphics/renderer/buffer_layout.h"
 #include "other/logging.h"
 
-std::size_t VertexElement::get_size(GLenum type) {
+size_t VertexElement::get_size(GLenum type) {
     switch (type) {
         case GL_FLOAT:
             return sizeof(GLfloat);

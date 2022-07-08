@@ -443,7 +443,10 @@ void GameLayer::initialize_rendering_board() {
         app->assets_data->board_wood_mesh->vertices.size() * sizeof(VPTNT)
     );
 
-    app->data.board_wood_vertex_array = VertexArray::create();
+    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(
+        app->assets_data->board_wood_mesh->indices.data(),
+        app->assets_data->board_wood_mesh->indices.size() * sizeof(unsigned int)
+    );
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
@@ -451,11 +454,7 @@ void GameLayer::initialize_rendering_board() {
     layout.add(2, BufferLayout::Type::Float, 3);
     layout.add(3, BufferLayout::Type::Float, 3);
 
-    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(
-        app->assets_data->board_wood_mesh->indices.data(),
-        app->assets_data->board_wood_mesh->indices.size() * sizeof(unsigned int)
-    );
-
+    app->data.board_wood_vertex_array = VertexArray::create();
     app->data.board_wood_vertex_array->add_buffer(vertices, layout);
     app->data.board_wood_vertex_array->add_index_buffer(indices);
 
@@ -516,19 +515,18 @@ void GameLayer::initialize_rendering_board_paint() {
         app->assets_data->board_paint_mesh->vertices.size() * sizeof(VPTNT)
     );
 
-    app->data.board_paint_vertex_array = VertexArray::create();
+    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(
+        app->assets_data->board_paint_mesh->indices.data(),
+        app->assets_data->board_paint_mesh->indices.size() * sizeof(unsigned int)
+    );
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     layout.add(1, BufferLayout::Type::Float, 2);
     layout.add(2, BufferLayout::Type::Float, 3);
     layout.add(3, BufferLayout::Type::Float, 3);
-
-    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(
-        app->assets_data->board_paint_mesh->indices.data(),
-        app->assets_data->board_paint_mesh->indices.size() * sizeof(unsigned int)
-    );
-
+    
+    app->data.board_paint_vertex_array = VertexArray::create();
     app->data.board_paint_vertex_array->add_buffer(vertices, layout);
     app->data.board_paint_vertex_array->add_index_buffer(indices);
 
@@ -604,29 +602,44 @@ void GameLayer::initialize_rendering_pieces() {
     app->data.tinted_wood_material->add_texture("u_material.normal");
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
 
+    std::shared_ptr<Buffer> white_piece_vertices = Buffer::create(
+        app->assets_data->white_piece_mesh->vertices.data(),
+        app->assets_data->white_piece_mesh->vertices.size() * sizeof(VPTNT)
+    );
+
+    std::shared_ptr<IndexBuffer> white_piece_indices = IndexBuffer::create(
+        app->assets_data->white_piece_mesh->indices.data(),
+        app->assets_data->white_piece_mesh->indices.size() * sizeof(unsigned int)
+    );
+
+    std::shared_ptr<Buffer> black_piece_vertices = Buffer::create(
+        app->assets_data->black_piece_mesh->vertices.data(),
+        app->assets_data->black_piece_mesh->vertices.size() * sizeof(VPTNT)
+    );
+
+    std::shared_ptr<IndexBuffer> black_piece_indices = IndexBuffer::create(
+        app->assets_data->black_piece_mesh->indices.data(),
+        app->assets_data->black_piece_mesh->indices.size() * sizeof(unsigned int)
+    );
+
     for (size_t i = 0; i < 9; i++) {
         initialize_rendering_piece(
             i, Piece::Type::White, app->assets_data->white_piece_mesh,
-            app->data.white_piece_diffuse_texture
+            app->data.white_piece_diffuse_texture, white_piece_vertices, white_piece_indices
         );
     }
     for (size_t i = 9; i < 18; i++) {
         initialize_rendering_piece(
             i, Piece::Type::Black, app->assets_data->black_piece_mesh,
-            app->data.black_piece_diffuse_texture
+            app->data.black_piece_diffuse_texture, black_piece_vertices, black_piece_indices
         );
     }
 }
 
 void GameLayer::initialize_rendering_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
-        std::shared_ptr<Texture> diffuse_texture) {
+        std::shared_ptr<Texture> diffuse_texture, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices) {
     hoverable::Id id = hoverable::generate_id();
     app->data.pieces_id[index] = id;
-
-    std::shared_ptr<Buffer> vertices = Buffer::create(
-        mesh->vertices.data(),
-        mesh->vertices.size() * sizeof(VPTNT)
-    );
 
     std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
 
@@ -638,9 +651,6 @@ void GameLayer::initialize_rendering_piece(size_t index, Piece::Type type, std::
 
     BufferLayout layout2;
     layout2.add(4, BufferLayout::Type::Int, 1);
-
-    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(),
-            mesh->indices.size() * sizeof(unsigned int));
 
     app->data.piece_vertex_arrays[index] = VertexArray::create();
     app->data.piece_vertex_arrays[index]->add_buffer(vertices, layout);
@@ -693,18 +703,17 @@ void GameLayer::initialize_rendering_board_no_normal() {
         app->assets_data->board_wood_no_normal_mesh->vertices.size() * sizeof(VPTN)
     );
 
-    app->data.board_wood_vertex_array = VertexArray::create();
-
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Type::Float, 3);
-    layout.add(1, BufferLayout::Type::Float, 2);
-    layout.add(2, BufferLayout::Type::Float, 3);
-
     std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(
         app->assets_data->board_wood_no_normal_mesh->indices.data(),
         app->assets_data->board_wood_no_normal_mesh->indices.size() * sizeof(unsigned int)
     );
 
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Type::Float, 3);
+    layout.add(1, BufferLayout::Type::Float, 2);
+    layout.add(2, BufferLayout::Type::Float, 3);
+    
+    app->data.board_wood_vertex_array = VertexArray::create();
     app->data.board_wood_vertex_array->add_buffer(vertices, layout);
     app->data.board_wood_vertex_array->add_index_buffer(indices);
 
@@ -758,18 +767,17 @@ void GameLayer::initialize_rendering_board_paint_no_normal() {
         app->assets_data->board_paint_no_normal_mesh->vertices.size() * sizeof(VPTN)
     );
 
-    app->data.board_paint_vertex_array = VertexArray::create();
+    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(
+        app->assets_data->board_paint_no_normal_mesh->indices.data(),
+        app->assets_data->board_paint_no_normal_mesh->indices.size() * sizeof(unsigned int)
+    );
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
     layout.add(1, BufferLayout::Type::Float, 2);
     layout.add(2, BufferLayout::Type::Float, 3);
 
-    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(
-        app->assets_data->board_paint_no_normal_mesh->indices.data(),
-        app->assets_data->board_paint_no_normal_mesh->indices.size() * sizeof(unsigned int)
-    );
-
+    app->data.board_paint_vertex_array = VertexArray::create();
     app->data.board_paint_vertex_array->add_buffer(vertices, layout);
     app->data.board_paint_vertex_array->add_index_buffer(indices);
 
@@ -838,29 +846,44 @@ void GameLayer::initialize_rendering_pieces_no_normal() {
     app->data.tinted_wood_material->add_variable(Material::UniformType::Float, "u_material.shininess");
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
 
+    std::shared_ptr<Buffer> white_piece_vertices = Buffer::create(
+        app->assets_data->white_piece_mesh->vertices.data(),
+        app->assets_data->white_piece_mesh->vertices.size() * sizeof(VPTNT)
+    );
+
+    std::shared_ptr<IndexBuffer> white_piece_indices = IndexBuffer::create(
+        app->assets_data->white_piece_mesh->indices.data(),
+        app->assets_data->white_piece_mesh->indices.size() * sizeof(unsigned int)
+    );
+
+    std::shared_ptr<Buffer> black_piece_vertices = Buffer::create(
+        app->assets_data->black_piece_mesh->vertices.data(),
+        app->assets_data->black_piece_mesh->vertices.size() * sizeof(VPTNT)
+    );
+
+    std::shared_ptr<IndexBuffer> black_piece_indices = IndexBuffer::create(
+        app->assets_data->black_piece_mesh->indices.data(),
+        app->assets_data->black_piece_mesh->indices.size() * sizeof(unsigned int)
+    );
+
     for (size_t i = 0; i < 9; i++) {
         initialize_rendering_piece_no_normal(
             i, Piece::Type::White, app->assets_data->white_piece_no_normal_mesh,
-            app->data.white_piece_diffuse_texture
+            app->data.white_piece_diffuse_texture, white_piece_vertices, white_piece_indices
         );
     }
     for (size_t i = 9; i < 18; i++) {
         initialize_rendering_piece_no_normal(
             i, Piece::Type::Black, app->assets_data->black_piece_no_normal_mesh,
-            app->data.black_piece_diffuse_texture
+            app->data.black_piece_diffuse_texture, black_piece_vertices, black_piece_indices
         );
     }
 }
 
 void GameLayer::initialize_rendering_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
-        std::shared_ptr<Texture> diffuse_texture) {
+        std::shared_ptr<Texture> diffuse_texture, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices) {
     hoverable::Id id = hoverable::generate_id();
-    app->data.pieces_id[index] = id;
-
-    std::shared_ptr<Buffer> vertices = Buffer::create(
-        mesh->vertices.data(),
-        mesh->vertices.size() * sizeof(VPTN)
-    );
+    app->data.pieces_id[index] = id; 
 
     std::shared_ptr<Buffer> ids = create_ids_buffer(mesh->vertices.size(), id);
 
@@ -871,9 +894,6 @@ void GameLayer::initialize_rendering_piece_no_normal(size_t index, Piece::Type t
 
     BufferLayout layout2;
     layout2.add(3, BufferLayout::Type::Int, 1);
-
-    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(mesh->indices.data(),
-            mesh->indices.size() * sizeof(unsigned int));
 
     app->data.piece_vertex_arrays[index] = VertexArray::create();
     app->data.piece_vertex_arrays[index]->add_buffer(vertices, layout);
@@ -913,33 +933,34 @@ void GameLayer::initialize_rendering_nodes() {
     app->data.basic_material = std::make_shared<Material>(app->data.node_shader, Material::Hoverable);
     app->data.basic_material->add_variable(Material::UniformType::Vec4, "u_color");
 
-    for (size_t i = 0; i < 24; i++) {
-        initialize_rendering_node(i, NODE_POSITIONS[i]);
-    }
-}
-
-void GameLayer::initialize_rendering_node(size_t index, const glm::vec3& position) {
-    hoverable::Id id = hoverable::generate_id();
-    app->data.nodes_id[index] = id;
-
     std::shared_ptr<Buffer> vertices = Buffer::create(
         app->assets_data->node_mesh->vertices.data(),
         app->assets_data->node_mesh->vertices.size() * sizeof(VP)
     );
 
-    std::shared_ptr<Buffer> ids = create_ids_buffer(app->assets_data->node_mesh->vertices.size(), id);
+    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(
+        app->assets_data->node_mesh->indices.data(),
+        app->assets_data->node_mesh->indices.size() * sizeof(unsigned int)
+    );
 
-    app->data.node_vertex_arrays[index] = VertexArray::create();
+    for (size_t i = 0; i < 24; i++) {
+        initialize_rendering_node(i, vertices, indices);
+    }
+}
+
+void GameLayer::initialize_rendering_node(size_t index, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices) {
+    hoverable::Id id = hoverable::generate_id();
+    app->data.nodes_id[index] = id;
+
+    std::shared_ptr<Buffer> ids = create_ids_buffer(app->assets_data->node_mesh->vertices.size(), id);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 3);
 
     BufferLayout layout2;
     layout2.add(1, BufferLayout::Type::Int, 1);
-
-    std::shared_ptr<IndexBuffer> indices = IndexBuffer::create(app->assets_data->node_mesh->indices.data(),
-            app->assets_data->node_mesh->indices.size() * sizeof(unsigned int));
-
+    
+    app->data.node_vertex_arrays[index] = VertexArray::create();
     app->data.node_vertex_arrays[index]->add_buffer(vertices, layout);
     app->data.node_vertex_arrays[index]->add_buffer(ids, layout2);
     app->data.node_vertex_arrays[index]->add_index_buffer(indices);
@@ -1136,7 +1157,7 @@ void GameLayer::setup_model_node(size_t index, const glm::vec3& position) {
     board.nodes[index].model.scale = 20.0f;
     board.nodes[index].model.material = app->data.node_material_instances[index];
 
-    app->renderer->add_model(board.nodes[index].model, Renderer::NoLighting);
+    app->renderer->add_model(board.nodes[index].model);
 
     DEB_DEBUG("Setup model node {}", index);
 }

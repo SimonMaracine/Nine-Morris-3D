@@ -52,10 +52,9 @@ public:
     };
 
     enum {
-        NoLighting = 1 << 0,
-        WithOutline = 1 << 1,
-        CastShadow = 1 << 2,
-        HasShadow = 1 << 3,
+        WithOutline = 1 << 0,
+        CastShadow = 1 << 1,
+        HasShadow = 1 << 2,
     };
 
     Renderer(Application* app);
@@ -70,11 +69,6 @@ public:
 
     void add_quad(Quad& quad);
     void remove_quad(unsigned int handle);
-
-    // unsigned int add_instancing_group();
-    // void remove_instancing_group();
-    // unsigned int add_instanced(unsigned int group_handle);
-    // void remove_instanced(unsigned int group_handle, unsigned int handle);
 
     void setup_shader(std::shared_ptr<Shader> shader);
 
@@ -166,9 +160,8 @@ private:
 
     DirectionalLight light;
 
-    // Ordered maps of pointers to models
+    // Ordered maps of pointers to models and quads
     std::map<unsigned int, Model*> models;
-    std::map<unsigned int, Model*> models_no_lighting;
     std::map<unsigned int, Model*> models_outline;
     std::map<unsigned int, Model*> models_cast_shadow;
     std::map<unsigned int, Model*> models_has_shadow;

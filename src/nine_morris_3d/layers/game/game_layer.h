@@ -43,16 +43,16 @@ public:
     void initialize_rendering_board_paint();
     void initialize_rendering_pieces();
     void initialize_rendering_piece(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTNT>> mesh,
-            std::shared_ptr<Texture> diffuse_texture);
+            std::shared_ptr<Texture> diffuse_texture, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices);
 
     void initialize_rendering_board_no_normal();
     void initialize_rendering_board_paint_no_normal();
     void initialize_rendering_pieces_no_normal();
     void initialize_rendering_piece_no_normal(size_t index, Piece::Type type, std::shared_ptr<Mesh<VPTN>> mesh,
-            std::shared_ptr<Texture> diffuse_texture);
+            std::shared_ptr<Texture> diffuse_texture, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices);
 
     void initialize_rendering_nodes();
-    void initialize_rendering_node(size_t index, const glm::vec3& position);
+    void initialize_rendering_node(size_t index, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices);
 
     void resetup_textures();
 

@@ -291,8 +291,8 @@ void Renderer::render() {
     // Render objects with shadows to depth buffer
     storage.shadow_shader->bind();
 
-    for (const auto [id, model] : models_cast_shadow) {
-        IGNORE(id);
+    for (const auto [handle, model] : models_cast_shadow) {
+        IGNORE(handle);
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -324,32 +324,8 @@ void Renderer::render() {
     }
 
     // Render normal models
-    for (const auto [id, model] : models) {
-        IGNORE(id);
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, model->position);
-        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
-
-        model->vertex_array->bind();
-        model->material->bind();
-
-        model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
-
-        if (model->material->is_hoverable()) {
-            glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        } else {
-            glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-        }
-
-        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
-    }
-
-    // Render models without lighting
-    for (const auto [id, model] : models_no_lighting) {
-        IGNORE(id);
+    for (const auto [handle, model] : models) {
+        IGNORE(handle);
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -372,8 +348,8 @@ void Renderer::render() {
     }
 
     // Render models with outline
-    for (const auto [id, model] : models_outline) {
-        IGNORE(id);
+    for (const auto [handle, model] : models_outline) {
+        IGNORE(handle);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
 
@@ -439,8 +415,8 @@ void Renderer::render() {
     storage.quad3d_shader->upload_uniform_mat4("u_view_matrix", app->camera.get_view_matrix());
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", app->camera.get_projection_matrix());
 
-    for (const auto [id, quad] : quads) {
-        IGNORE(id);
+    for (const auto [handle, quad] : quads) {
+        IGNORE(handle);
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, quad->position);
         matrix = glm::scale(matrix, glm::vec3(quad->scale, quad->scale, quad->scale));
@@ -483,37 +459,31 @@ void Renderer::on_window_resized(events::WindowResizedEvent& event) {
 }
 
 void Renderer::add_model(Model& model, int options) {
-    static unsigned int id = 0;
+    static unsigned int handle = 0;
 
-    const bool no_lighting = options & static_cast<int>(NoLighting);
     const bool with_outline = options & static_cast<int>(WithOutline);
     const bool cast_shadow = options & static_cast<int>(CastShadow);
     const bool has_shadow = options & static_cast<int>(HasShadow);
 
-    model.handle = ++id;
+    model.handle = ++handle;
 
     if (!with_outline) {
-        if (no_lighting) {
-            models_no_lighting[id] = &model;
-        } else {
-            models[id] = &model;
-        }
+        models[handle] = &model;
     } else {
-        models_outline[id] = &model;
+        models_outline[handle] = &model;
     }
 
     if (cast_shadow) {
-        models_cast_shadow[id] = &model;
+        models_cast_shadow[handle] = &model;
     }
 
     if (has_shadow) {
-        models_has_shadow[id] = &model;
+        models_has_shadow[handle] = &model;
     }
 }
 
 void Renderer::remove_model(unsigned int handle) {
     models.erase(handle);
-    models_no_lighting.erase(handle);
     models_outline.erase(handle);
     models_cast_shadow.erase(handle);
     models_has_shadow.erase(handle);
@@ -522,17 +492,12 @@ void Renderer::remove_model(unsigned int handle) {
 void Renderer::update_model(Model& model, int options) {
     remove_model(model.handle);
 
-    const bool no_lighting = options & static_cast<int>(NoLighting);
     const bool with_outline = options & static_cast<int>(WithOutline);
     const bool cast_shadow = options & static_cast<int>(CastShadow);
     const bool has_shadow = options & static_cast<int>(HasShadow);
 
     if (!with_outline) {
-        if (no_lighting) {
-            models_no_lighting[model.handle] = &model;
-        } else {
-            models[model.handle] = &model;
-        }
+        models[model.handle] = &model;
     } else {
         models_outline[model.handle] = &model;
     }
@@ -547,11 +512,11 @@ void Renderer::update_model(Model& model, int options) {
 }
 
 void Renderer::add_quad(Quad& quad) {
-    static unsigned int id = 0;
+    static unsigned int handle = 0;
 
-    quad.handle = ++id;
+    quad.handle = ++handle;
 
-    quads[id] = &quad;
+    quads[handle] = &quad;
 }
 
 void Renderer::remove_quad(unsigned int handle) {
@@ -560,7 +525,6 @@ void Renderer::remove_quad(unsigned int handle) {
 
 void Renderer::clear() {
     models.clear();
-    models_no_lighting.clear();
     models_outline.clear();
     models_cast_shadow.clear();
     models_has_shadow.clear();
