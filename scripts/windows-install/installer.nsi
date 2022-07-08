@@ -48,8 +48,9 @@ Section "Nine Morris 3D (required)" section_game
 
   SetOutPath "$INSTDIR"
 
-  File Nine-Morris-3D.exe
   File /r data
+  File README.txt
+  File Nine-Morris-3D.exe
 
   ;Store installation folder
   WriteRegStr HKCU "Software\NineMorris3D" "" $INSTDIR
@@ -81,6 +82,7 @@ SectionEnd
 Section "Uninstall"
 
   Delete "$INSTDIR\Nine-Morris-3D.exe"
+  Delete "$INSTDIR\README.txt"
   RMDir /r "$INSTDIR\data"
 
   Delete "$INSTDIR\Uninstall.exe"
