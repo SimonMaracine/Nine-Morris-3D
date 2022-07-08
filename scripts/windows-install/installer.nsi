@@ -65,6 +65,8 @@ Section "Nine Morris 3D (required)" section_game
 
   !insertmacro MUI_STARTMENU_WRITE_END
 
+  ExecShell "open" "$INSTDIR\README.txt"
+
 SectionEnd
 
 ;Descriptions
