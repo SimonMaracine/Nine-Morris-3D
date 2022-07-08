@@ -377,7 +377,6 @@ void Renderer::render() {
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
 
         {
             constexpr float SIZE = 3.6f;
@@ -399,9 +398,8 @@ void Renderer::render() {
             glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         }
 
-        glStencilMask(0xFF);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glEnable(GL_DEPTH_TEST);
+        glStencilMask(0xFF);
     }
 
 #ifdef PLATFORM_GAME_DEBUG
