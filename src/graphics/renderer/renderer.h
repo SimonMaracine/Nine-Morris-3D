@@ -56,6 +56,21 @@ public:
         CastShadow = 1 << 1,
     };
 
+    struct PostProcessing {
+        union {
+            struct {
+                std::shared_ptr<Framebuffer> framebuffer;
+                std::shared_ptr<Shader> shader;
+            } normal;
+
+            struct {
+                GLuint framebuffer;
+            } end;
+        };
+
+        bool enabled = true;
+    };
+
     Renderer(Application* app);
     ~Renderer();
 
@@ -70,6 +85,8 @@ public:
     void remove_quad(unsigned int handle);
 
     void setup_shader(std::shared_ptr<Shader> shader);
+    void add_post_processing(const PostProcessing& post_processing);
+    void end_post_processing_list();
 
     void clear();
 
@@ -109,7 +126,7 @@ public:
     } light_space;
 private:
     void clear(int buffers);
-    void draw_screen_quad(GLuint texture);
+    void draw_screen_quad(GLuint texture, std::shared_ptr<Shader> shader);
     void draw_origin();
     void draw_skybox();
     void draw_model(const Model* model);
@@ -157,7 +174,7 @@ private:
         std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
     } storage;
 
-    // Ordered maps of pointers to models and quads
+    // Collections of pointers to models and quads
     std::vector<Model*> models;
     std::vector<Model*> models_outline;
     std::vector<Model*> models_cast_shadow;
@@ -167,6 +184,8 @@ private:
     FramebufferReader<4> reader;
 
     int shadow_map_size = 4096;
+
+    std::vector<PostProcessing> post_processings;
 
     std::string SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert";
     std::string SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag";

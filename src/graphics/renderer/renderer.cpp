@@ -321,11 +321,24 @@ void Renderer::render() {
     const int y = app->app_data.height - static_cast<int>(input::get_mouse_y());
     reader.read(1, x, y);
 
+    // Post-processing step
+    for (const PostProcessing& post_processing : post_processings) {
+        if (!post_processing.enabled) {
+            continue;
+        }
+
+        post_processing.normal.framebuffer->bind();
+        draw_screen_quad(post_processing.normal.framebuffer->get_color_attachment(0), post_processing.normal.shader);
+        post_processing.normal.framebuffer->resolve_framebuffer(
+            
+        );
+    }
+
     Framebuffer::bind_default();
 
     // Draw the result to the screen
     clear(Color);
-    draw_screen_quad(storage.intermediate_framebuffer->get_color_attachment(0));
+    draw_screen_quad(storage.intermediate_framebuffer->get_color_attachment(0), storage.screen_quad_shader);
 
     int* data;
     reader.get<int>(&data);
@@ -453,18 +466,28 @@ void Renderer::setup_shader(std::shared_ptr<Shader> shader) {
     }
 }
 
+void Renderer::add_post_processing(const PostProcessing& post_processing) {
+    post_processings.push_back(post_processing);
+}
+
+void Renderer::end_post_processing_list() {
+    post_processings.push_back({
+
+    });
+}
+
 void Renderer::clear(int buffers) {
     glClear(buffers);
 }
 
-void Renderer::draw_screen_quad(GLuint texture) {
-    storage.screen_quad_shader->bind();
+void Renderer::draw_screen_quad(GLuint texture, std::shared_ptr<Shader> shader) {
+    shader->bind();
     storage.quad_vertex_array->bind();
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);  // TODO move this out
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glEnable(GL_DEPTH_TEST);
 }
