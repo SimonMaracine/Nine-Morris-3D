@@ -289,23 +289,7 @@ void Renderer::render() {
     set_viewport(shadow_map_size, shadow_map_size);
 
     // Render objects with shadows to depth buffer
-    storage.shadow_shader->bind();
-
-    for (const auto [handle, model] : models_cast_shadow) {
-        IGNORE(handle);
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, model->position);
-        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
-
-        storage.shadow_shader->upload_uniform_mat4("u_model_matrix", matrix);
-
-        model->vertex_array->bind();
-
-        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
-    }
+    draw_models_to_depth_buffer();
 
     storage.scene_framebuffer->bind();
 
@@ -323,84 +307,11 @@ void Renderer::render() {
         draw_skybox();
     }
 
-    // Render normal models
-    for (const auto [handle, model] : models) {
-        IGNORE(handle);
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, model->position);
-        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+    // Render all normal models
+    draw_models_normal();
 
-        model->vertex_array->bind();
-        model->material->bind();
-
-        model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
-
-        if (model->material->is_hoverable()) {
-            glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        } else {
-            glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-        }
-
-        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
-    }
-
-    // Render models with outline
-    for (const auto [handle, model] : models_outline) {
-        IGNORE(handle);
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-
-        {
-            glm::mat4 matrix = glm::mat4(1.0f);
-            matrix = glm::translate(matrix, model->position);
-            matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
-
-            model->vertex_array->bind();
-            model->material->bind();
-
-            model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
-
-            if (model->material->is_hoverable()) {
-                glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-            } else {
-                glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-            }
-
-            glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
-        }
-
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-
-        {
-            constexpr float SIZE = 3.6f;
-
-            glm::mat4 matrix = glm::mat4(1.0f);
-            matrix = glm::translate(matrix, model->position);
-            matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix = glm::scale(matrix, glm::vec3(model->scale + SIZE, model->scale + SIZE, model->scale + SIZE));
-
-            storage.outline_shader->bind();
-            storage.outline_shader->upload_uniform_mat4("u_model_matrix", matrix);
-            storage.outline_shader->upload_uniform_vec3("u_color", model->outline_color);
-
-            // Render without output to red
-            glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-            glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
-            glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        }
-
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-    }
+    // Render all models with outline
+    draw_models_with_outline();
 
 #ifdef PLATFORM_GAME_DEBUG
     if (origin) {
@@ -409,27 +320,12 @@ void Renderer::render() {
 #endif
 
     // Render quads
-    storage.quad3d_shader->bind();
-    storage.quad3d_shader->upload_uniform_mat4("u_view_matrix", app->camera.get_view_matrix());
-    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", app->camera.get_projection_matrix());
-
-    for (const auto [handle, quad] : quads) {
-        IGNORE(handle);
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, quad->position);
-        matrix = glm::scale(matrix, glm::vec3(quad->scale, quad->scale, quad->scale));
-
-        storage.quad3d_shader->upload_uniform_mat4("u_model_matrix", matrix);
-
-        quad->texture->bind(0);
-        storage.quad_vertex_array->bind();
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
+    draw_quads();
 
     // Blit the scene texture result to an intermediate texture resolving anti-aliasing
-    storage.scene_framebuffer->resolve_framebuffer(storage.intermediate_framebuffer->get_id(),
-            app->app_data.width, app->app_data.height);
+    storage.scene_framebuffer->resolve_framebuffer(
+        storage.intermediate_framebuffer->get_id(), app->app_data.width, app->app_data.height
+    );
 
     storage.intermediate_framebuffer->bind();
 
@@ -631,6 +527,128 @@ void Renderer::draw_skybox() {
     glDepthMask(GL_FALSE);
     glDrawArrays(GL_TRIANGLES, 0, 36);  // TODO maybe improve
     glDepthMask(GL_TRUE);
+}
+
+void Renderer::draw_models_to_depth_buffer() {
+    storage.shadow_shader->bind();
+
+    for (const auto [handle, model] : models_cast_shadow) {
+        IGNORE(handle);
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, model->position);
+        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+
+        storage.shadow_shader->upload_uniform_mat4("u_model_matrix", matrix);
+
+        model->vertex_array->bind();
+
+        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+    }
+}
+
+void Renderer::draw_models_normal() {
+    for (const auto [handle, model] : models) {
+        IGNORE(handle);
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, model->position);
+        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+
+        model->vertex_array->bind();
+        model->material->bind();
+
+        model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
+
+        if (model->material->is_hoverable()) {
+            glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        } else {
+            glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+        }
+
+        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+    }
+}
+
+void Renderer::draw_models_with_outline() {
+    for (const auto [handle, model] : models_outline) {
+        IGNORE(handle);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+
+        {
+            glm::mat4 matrix = glm::mat4(1.0f);
+            matrix = glm::translate(matrix, model->position);
+            matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+
+            model->vertex_array->bind();
+            model->material->bind();
+
+            model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
+
+            if (model->material->is_hoverable()) {
+                glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+            } else {
+                glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+            }
+
+            glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+        }
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+
+        {
+            constexpr float SIZE = 3.6f;
+
+            glm::mat4 matrix = glm::mat4(1.0f);
+            matrix = glm::translate(matrix, model->position);
+            matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            matrix = glm::scale(matrix, glm::vec3(model->scale + SIZE, model->scale + SIZE, model->scale + SIZE));
+
+            storage.outline_shader->bind();
+            storage.outline_shader->upload_uniform_mat4("u_model_matrix", matrix);
+            storage.outline_shader->upload_uniform_vec3("u_color", model->outline_color);
+
+            // Render without output to red
+            glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+            glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+            glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        }
+
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+    }
+}
+
+void Renderer::draw_quads() {
+    storage.quad3d_shader->bind();
+    storage.quad3d_shader->upload_uniform_mat4("u_view_matrix", app->camera.get_view_matrix());
+    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", app->camera.get_projection_matrix());
+
+    storage.quad_vertex_array->bind();
+
+    for (const auto [handle, quad] : quads) {
+        IGNORE(handle);
+        glm::mat4 matrix = glm::mat4(1.0f);
+        matrix = glm::translate(matrix, quad->position);
+        matrix = glm::scale(matrix, glm::vec3(quad->scale, quad->scale, quad->scale));
+
+        storage.quad3d_shader->upload_uniform_mat4("u_model_matrix", matrix);
+
+        quad->texture->bind(0);
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
 }
 
 void Renderer::setup_shadows() {

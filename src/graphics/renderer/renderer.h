@@ -114,6 +114,10 @@ private:
     void draw_screen_quad(GLuint texture);
     void draw_origin();
     void draw_skybox();
+    void draw_models_to_depth_buffer();
+    void draw_models_normal();
+    void draw_models_with_outline();
+    void draw_quads();
     void setup_shadows();
     void check_hovered_id(int x, int y);
     void maybe_initialize_assets();

@@ -854,23 +854,23 @@ void GameLayer::initialize_rendering_pieces_no_normal() {
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
 
     std::shared_ptr<Buffer> white_piece_vertices = Buffer::create(
-        app->assets_data->white_piece_mesh->vertices.data(),
-        app->assets_data->white_piece_mesh->vertices.size() * sizeof(VPTNT)
+        app->assets_data->white_piece_no_normal_mesh->vertices.data(),
+        app->assets_data->white_piece_no_normal_mesh->vertices.size() * sizeof(VPTNT)
     );
 
     std::shared_ptr<IndexBuffer> white_piece_indices = IndexBuffer::create(
-        app->assets_data->white_piece_mesh->indices.data(),
-        app->assets_data->white_piece_mesh->indices.size() * sizeof(unsigned int)
+        app->assets_data->white_piece_no_normal_mesh->indices.data(),
+        app->assets_data->white_piece_no_normal_mesh->indices.size() * sizeof(unsigned int)
     );
 
     std::shared_ptr<Buffer> black_piece_vertices = Buffer::create(
-        app->assets_data->black_piece_mesh->vertices.data(),
-        app->assets_data->black_piece_mesh->vertices.size() * sizeof(VPTNT)
+        app->assets_data->black_piece_no_normal_mesh->vertices.data(),
+        app->assets_data->black_piece_no_normal_mesh->vertices.size() * sizeof(VPTNT)
     );
 
     std::shared_ptr<IndexBuffer> black_piece_indices = IndexBuffer::create(
-        app->assets_data->black_piece_mesh->indices.data(),
-        app->assets_data->black_piece_mesh->indices.size() * sizeof(unsigned int)
+        app->assets_data->black_piece_no_normal_mesh->indices.data(),
+        app->assets_data->black_piece_no_normal_mesh->indices.size() * sizeof(unsigned int)
     );
 
     for (size_t i = 0; i < 9; i++) {
@@ -1498,6 +1498,9 @@ void GameLayer::actually_change_normal_mapping() {
     for (size_t i = 0; i < 18; i++) {
         app->renderer->remove_model(board.pieces[i].model.handle);
     }
+    for (size_t i = 0; i < 24; i++) {
+        app->renderer->remove_model(board.nodes[i].model.handle);
+    }
 
     if (app->options.normal_mapping) {
         initialize_rendering_board();
@@ -1516,6 +1519,8 @@ void GameLayer::actually_change_normal_mapping() {
         setup_model_board_paint_no_normal();
         setup_model_pieces_no_normal();
     }
+
+    setup_model_nodes();
 
     // Remove inactive pieces that were added previously
     for (size_t i = 0; i < 18; i++) {
