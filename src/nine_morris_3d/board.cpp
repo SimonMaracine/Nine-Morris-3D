@@ -209,7 +209,7 @@ void Board::move_pieces(float dt) {
         if (piece->should_move) {
             switch (piece->movement.type) {
                 case Piece::MovementType::None:
-                    ASSERT(false, "Movement type 'None' is invalid");
+                    ASSERT(false, "Movement type None is invalid");
                     break;
                 case Piece::MovementType::Linear: {
                     piece->model.position += piece->movement.velocity * dt + (piece->movement.target - piece->model.position)

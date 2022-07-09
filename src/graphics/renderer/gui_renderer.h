@@ -7,11 +7,18 @@
 #include "graphics/renderer/opengl/shader.h"
 #include "graphics/renderer/opengl/vertex_array.h"
 #include "graphics/renderer/opengl/texture.h"
+#include "graphics/renderer/opengl/buffer.h"
 
 class Application;
 class GuiRenderer;
 
 namespace gui {
+    enum class WidgetType {
+        None,
+        Image,
+        Text
+    };
+
     enum class Sticky {
         Center,
         N, S, E, W,
@@ -56,6 +63,8 @@ namespace gui {
         } scale_parameters;
 
         Sticky sticky = Sticky::Center;
+
+        WidgetType type = WidgetType::None;
 
         static Application* app;
 
@@ -109,12 +118,21 @@ public:
     void remove_widget(std::shared_ptr<gui::Widget> widget);
     void clear();
 
+    UniformBlockSpecification& get_projection_uniform_block() { return storage.projection_uniform_block; }
+
     std::shared_ptr<Shader> get_quad2d_shader() { return storage.quad2d_shader; }
     std::shared_ptr<Shader> get_text_shader() { return storage.text_shader; }
 private:
+    void prepare_draw_image();
+    void prepare_draw_text();
+    void draw(std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw);
     void maybe_initialize_assets();
 
     struct Storage {
+        std::shared_ptr<UniformBuffer> projection_uniform_buffer;
+
+        UniformBlockSpecification projection_uniform_block;
+
         std::shared_ptr<Shader> quad2d_shader;
         std::shared_ptr<Shader> text_shader;
 

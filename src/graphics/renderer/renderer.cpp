@@ -29,7 +29,7 @@
         } \
     }
 
-static const char* projection_view_block_fields[] = {
+static const char* projection_view_block_fields[] = {  // TODO refactor these (try at least)
     "u_projection_view_matrix"
 };
 
@@ -505,7 +505,7 @@ void Renderer::draw_skybox() {
     storage.skybox_texture->bind(0);
 
     glDepthMask(GL_FALSE);
-    glDrawArrays(GL_TRIANGLES, 0, 36);  // TODO maybe improve
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
 }
 

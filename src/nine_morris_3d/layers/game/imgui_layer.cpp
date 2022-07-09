@@ -511,7 +511,7 @@ void ImGuiLayer::draw_game_over() {
                 break;
             }
             case Board::Ending::None:
-                ASSERT(false, "Ending cannot be 'None'");
+                ASSERT(false, "Ending cannot be None");
         }
 
         ImGui::Separator();

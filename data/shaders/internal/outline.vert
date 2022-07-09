@@ -4,7 +4,7 @@ layout (location = 0) in vec3 a_position;
 
 uniform mat4 u_model_matrix;
 
-uniform ProjectionView {
+layout (binding = 0) uniform ProjectionView {
    mat4 u_projection_view_matrix;
 };
 
