@@ -19,7 +19,15 @@
 #include "other/assert.h"
 #include "other/encryption.h"
 
-#define IGNORE(variable) ((void) variable)
+#define ERASE(vector, search_handle) \
+    { \
+        auto iter = std::find_if(vector.begin(), vector.end(), [search_handle](const Model* quad) { \
+            return quad->handle == (search_handle); \
+        }); \
+        if (iter != vector.end()) { \
+            vector.erase(iter); \
+        } \
+    }
 
 static const char* projection_view_block_fields[] = {
     "u_projection_view_matrix"
@@ -348,30 +356,24 @@ void Renderer::add_model(Model& model, int options) {
 
     const bool with_outline = options & static_cast<int>(WithOutline);
     const bool cast_shadow = options & static_cast<int>(CastShadow);
-    const bool has_shadow = options & static_cast<int>(HasShadow);
 
     model.handle = ++handle;
 
     if (!with_outline) {
-        models[handle] = &model;
+        models.push_back(&model);
     } else {
-        models_outline[handle] = &model;
+        models_outline.push_back(&model);
     }
 
     if (cast_shadow) {
-        models_cast_shadow[handle] = &model;
-    }
-
-    if (has_shadow) {
-        models_has_shadow[handle] = &model;
+        models_cast_shadow.push_back(&model);
     }
 }
 
 void Renderer::remove_model(unsigned int handle) {
-    models.erase(handle);
-    models_outline.erase(handle);
-    models_cast_shadow.erase(handle);
-    models_has_shadow.erase(handle);
+    ERASE(models, handle)
+    ERASE(models_outline, handle)
+    ERASE(models_cast_shadow, handle)
 }
 
 void Renderer::update_model(Model& model, int options) {
@@ -379,20 +381,15 @@ void Renderer::update_model(Model& model, int options) {
 
     const bool with_outline = options & static_cast<int>(WithOutline);
     const bool cast_shadow = options & static_cast<int>(CastShadow);
-    const bool has_shadow = options & static_cast<int>(HasShadow);
 
     if (!with_outline) {
-        models[model.handle] = &model;
+        models.push_back(&model);
     } else {
-        models_outline[model.handle] = &model;
+        models_outline.push_back(&model);
     }
 
     if (cast_shadow) {
-        models_cast_shadow[model.handle] = &model;
-    }
-
-    if (has_shadow) {
-        models_has_shadow[model.handle] = &model;
+        models_cast_shadow.push_back(&model);
     }
 }
 
@@ -418,8 +415,6 @@ void Renderer::clear() {
     models.clear();
     models_outline.clear();
     models_cast_shadow.clear();
-    models_has_shadow.clear();
-
     quads.clear();
 }
 
@@ -514,11 +509,26 @@ void Renderer::draw_skybox() {
     glDepthMask(GL_TRUE);
 }
 
+void Renderer::draw_model(const Model* model) {
+    glm::mat4 matrix = glm::mat4(1.0f);
+    matrix = glm::translate(matrix, model->position);
+    matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+
+    model->vertex_array->bind();
+    model->material->bind();
+
+    model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
+
+    glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+}
+
 void Renderer::draw_models_to_depth_buffer() {
     storage.shadow_shader->bind();
 
-    for (const auto [handle, model] : models_cast_shadow) {
-        IGNORE(handle);
+    for (const Model* model : models_cast_shadow) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);
         matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -535,57 +545,66 @@ void Renderer::draw_models_to_depth_buffer() {
 }
 
 void Renderer::draw_models_normal() {
-    for (const auto [handle, model] : models) {
-        IGNORE(handle);
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, model->position);
-        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
+    static std::vector<Model*> hoverable_models;
+    static std::vector<Model*> non_hoverable_models;
 
-        model->vertex_array->bind();
-        model->material->bind();
+    hoverable_models.clear();
+    non_hoverable_models.clear();
 
-        model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
-
+    std::for_each(models.begin(), models.end(), [&](Model* model) {
         if (model->material->is_hoverable()) {
-            glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+            hoverable_models.push_back(model);
         } else {
-            glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+            non_hoverable_models.push_back(model);
         }
+    });
 
-        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+    for (const Model* model : non_hoverable_models) {
+        draw_model(model);
+    }
+
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    for (const Model* model : hoverable_models) {
+        draw_model(model);
     }
 }
 
 void Renderer::draw_models_with_outline() {
-    for (const auto [handle, model] : models_outline) {
-        IGNORE(handle);
+    static std::vector<Model*> hoverable_models;
+    static std::vector<Model*> non_hoverable_models;
+
+    hoverable_models.clear();
+    non_hoverable_models.clear();
+
+    std::sort(models_outline.begin(), models_outline.end(), [this](const Model* left, const Model* right) {
+        const float distance1 = glm::distance(left->position, app->camera.get_position());
+        const float distance2 = glm::distance(right->position, app->camera.get_position());
+
+        return distance1 < distance2;
+    });
+
+    std::for_each(models_outline.begin(), models_outline.end(), [&](Model* model) {
+        if (model->material->is_hoverable()) {
+            hoverable_models.push_back(model);
+        } else {
+            non_hoverable_models.push_back(model);
+        }
+    });
+
+    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+    _draw_models_with_outline(non_hoverable_models);
+
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    _draw_models_with_outline(hoverable_models);
+}
+
+void Renderer::_draw_models_with_outline(const std::vector<Model*>& submodels) {
+    for (const Model* model : submodels) {
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
 
-        {
-            glm::mat4 matrix = glm::mat4(1.0f);
-            matrix = glm::translate(matrix, model->position);
-            matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix = glm::scale(matrix, glm::vec3(model->scale, model->scale, model->scale));
-
-            model->vertex_array->bind();
-            model->material->bind();
-
-            model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
-
-            if (model->material->is_hoverable()) {
-                glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-            } else {
-                glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-            }
-
-            glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
-        }
+        draw_model(model);
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);

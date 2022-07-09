@@ -54,7 +54,6 @@ public:
     enum {
         WithOutline = 1 << 0,
         CastShadow = 1 << 1,
-        HasShadow = 1 << 2,
     };
 
     Renderer(Application* app);
@@ -113,9 +112,11 @@ private:
     void draw_screen_quad(GLuint texture);
     void draw_origin();
     void draw_skybox();
+    void draw_model(const Model* model);
     void draw_models_to_depth_buffer();
     void draw_models_normal();
     void draw_models_with_outline();
+    void _draw_models_with_outline(const std::vector<Model*>& submodels);
     void draw_quads();
     void setup_shadows();
     void check_hovered_id(int x, int y);
@@ -157,10 +158,9 @@ private:
     } storage;
 
     // Ordered maps of pointers to models and quads
-    std::map<unsigned int, Model*> models;
-    std::map<unsigned int, Model*> models_outline;
-    std::map<unsigned int, Model*> models_cast_shadow;
-    std::map<unsigned int, Model*> models_has_shadow;
+    std::vector<Model*> models;
+    std::vector<Model*> models_outline;
+    std::vector<Model*> models_cast_shadow;
     std::vector<Quad*> quads;
 
     hoverable::Id hovered_id = hoverable::null;

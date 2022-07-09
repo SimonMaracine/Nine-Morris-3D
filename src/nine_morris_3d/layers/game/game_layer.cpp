@@ -1069,7 +1069,7 @@ void GameLayer::setup_model_board() {
     board.model.scale = 20.0f;
     board.model.material = app->data.board_wood_material_instance;
 
-    app->renderer->add_model(board.model, Renderer::CastShadow | Renderer::HasShadow);
+    app->renderer->add_model(board.model, Renderer::CastShadow);
 
     DEB_DEBUG("Setup model board");
 }
@@ -1081,7 +1081,7 @@ void GameLayer::setup_model_board_paint() {
     board.paint_model.scale = 20.0f;
     board.paint_model.material = app->data.board_paint_material_instance;
 
-    app->renderer->add_model(board.paint_model, Renderer::HasShadow);
+    app->renderer->add_model(board.paint_model);
 
     DEB_DEBUG("Setup model board paint");
 }
@@ -1105,7 +1105,7 @@ void GameLayer::setup_model_piece(size_t index, Piece::Type type, std::shared_pt
     board.pieces[index].model.scale = 20.0f;
     board.pieces[index].model.material = app->data.piece_material_instances[index];
 
-    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow | Renderer::HasShadow);
+    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow);
 
     DEB_DEBUG("Setup model piece {}", index);
 }
@@ -1116,7 +1116,7 @@ void GameLayer::setup_model_board_no_normal() {
     board.model.scale = 20.0f;
     board.model.material = app->data.board_wood_material_instance;
 
-    app->renderer->add_model(board.model, Renderer::CastShadow | Renderer::HasShadow);
+    app->renderer->add_model(board.model, Renderer::CastShadow);
 
     DEB_DEBUG("Setup model board");
 }
@@ -1128,7 +1128,7 @@ void GameLayer::setup_model_board_paint_no_normal() {
     board.paint_model.scale = 20.0f;
     board.paint_model.material = app->data.board_paint_material_instance;
 
-    app->renderer->add_model(board.paint_model, Renderer::HasShadow);
+    app->renderer->add_model(board.paint_model);
 
     DEB_DEBUG("Setup model board paint");
 }
@@ -1152,7 +1152,7 @@ void GameLayer::setup_model_piece_no_normal(size_t index, Piece::Type type, std:
     board.pieces[index].model.scale = 20.0f;
     board.pieces[index].model.material = app->data.piece_material_instances[index];
 
-    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow | Renderer::HasShadow);
+    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow);
 
     DEB_DEBUG("Setup model piece {}", index);
 }
@@ -1579,7 +1579,7 @@ void GameLayer::load_game() {
         app->renderer->remove_model(piece.model.handle);
 
         if (piece.active) {
-            app->renderer->add_model(piece.model, Renderer::CastShadow | Renderer::HasShadow);
+            app->renderer->add_model(piece.model, Renderer::CastShadow);
         }
     }
 

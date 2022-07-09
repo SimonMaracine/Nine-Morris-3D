@@ -529,7 +529,7 @@ bool Board::undo() {
         app->renderer->remove_model(piece.model.handle);
 
         if (piece.active) {
-            app->renderer->add_model(piece.model, Renderer::CastShadow | Renderer::HasShadow);
+            app->renderer->add_model(piece.model, Renderer::CastShadow);
         }
     }
 
@@ -561,7 +561,7 @@ bool Board::redo() {
         app->renderer->remove_model(piece.model.handle);
 
         if (piece.active) {
-            app->renderer->add_model(piece.model, Renderer::CastShadow | Renderer::HasShadow);
+            app->renderer->add_model(piece.model, Renderer::CastShadow);
         }
     }
 
@@ -636,12 +636,12 @@ void Board::update_pieces(hoverable::Id hovered_id) {
 
         if (piece->selected || piece->show_outline && piece->id == hovered_id && piece->in_use && !piece->pending_remove) {
             if (!piece->renderer_with_outline) {
-                app->renderer->update_model(piece->model, Renderer::WithOutline | Renderer::CastShadow | Renderer::HasShadow);
+                app->renderer->update_model(piece->model, Renderer::WithOutline | Renderer::CastShadow);
                 piece->renderer_with_outline = true;
             }
         } else {
             if (piece->renderer_with_outline) {
-                app->renderer->update_model(piece->model, Renderer::CastShadow | Renderer::HasShadow);
+                app->renderer->update_model(piece->model, Renderer::CastShadow);
                 piece->renderer_with_outline = false;
             }
         }
