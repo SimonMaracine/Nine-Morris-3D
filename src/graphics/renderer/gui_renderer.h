@@ -118,8 +118,6 @@ public:
     void remove_widget(std::shared_ptr<gui::Widget> widget);
     void clear();
 
-    UniformBlockSpecification& get_projection_uniform_block() { return storage.projection_uniform_block; }
-
     std::shared_ptr<Shader> get_quad2d_shader() { return storage.quad2d_shader; }
     std::shared_ptr<Shader> get_text_shader() { return storage.text_shader; }
 private:

@@ -29,25 +29,6 @@
         } \
     }
 
-static const char* projection_view_block_fields[] = {  // TODO refactor these (try at least)
-    "u_projection_view_matrix"
-};
-
-static const char* light_block_fields[] = {
-    "u_light_ambient",
-    "u_light_diffuse",
-    "u_light_specular"
-};
-
-static const char* light_view_position_block_fields[] = {
-    "u_light_position",
-    "u_view_position"
-};
-
-static const char* light_space_block_fields[] = {
-    "u_light_space_matrix"
-};
-
 constexpr int SHADOW_MAP_UNIT = 2;
 
 Renderer::Renderer(Application* app)
@@ -68,25 +49,32 @@ Renderer::Renderer(Application* app)
 
     storage.projection_view_uniform_block.block_name = "ProjectionView";
     storage.projection_view_uniform_block.field_count = 1;
-    storage.projection_view_uniform_block.field_names = projection_view_block_fields;
+    storage.projection_view_uniform_block.field_names = { "u_projection_view_matrix" };
     storage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;
     storage.projection_view_uniform_block.binding_index = 0;
 
     storage.light_uniform_block.block_name = "Light";
     storage.light_uniform_block.field_count = 3;
-    storage.light_uniform_block.field_names = light_block_fields;
+    storage.light_uniform_block.field_names = {
+        "u_light_ambient",
+        "u_light_diffuse",
+        "u_light_specular"
+    };
     storage.light_uniform_block.uniform_buffer = storage.light_uniform_buffer;
     storage.light_uniform_block.binding_index = 1;
 
     storage.light_view_position_uniform_block.block_name = "LightViewPosition";
     storage.light_view_position_uniform_block.field_count = 2;
-    storage.light_view_position_uniform_block.field_names = light_view_position_block_fields;
+    storage.light_view_position_uniform_block.field_names = {
+        "u_light_position",
+        "u_view_position"
+    };
     storage.light_view_position_uniform_block.uniform_buffer = storage.light_view_position_uniform_buffer;
     storage.light_view_position_uniform_block.binding_index = 2;
 
     storage.light_space_uniform_block.block_name = "LightSpace";
     storage.light_space_uniform_block.field_count = 1;
-    storage.light_space_uniform_block.field_names = light_space_block_fields;
+    storage.light_space_uniform_block.field_names = { "u_light_space_matrix" };
     storage.light_space_uniform_block.uniform_buffer = storage.light_space_uniform_buffer;
     storage.light_space_uniform_block.binding_index = 3;
 

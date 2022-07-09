@@ -121,58 +121,7 @@ std::shared_ptr<Shader> Shader::create(
         exit(1);
     }
 
-    for (const UniformBlockSpecification& block : uniform_blocks) {
-        const GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
-
-        if (block_index == GL_INVALID_INDEX) {
-            REL_CRITICAL("Invalid block index, exiting...");
-            exit(1);
-        }
-
-        if (!block.uniform_buffer->configured) {
-            GLint block_size;
-            glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
-
-            block.uniform_buffer->data = new char[block_size];
-            block.uniform_buffer->size = block_size;
-
-            glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
-            glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
-            LOG_ALLOCATION(block_size)
-            glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-            ASSERT(block.field_count <= 16, "Maximum 16 fields for now");
-
-            GLuint indices[16];
-            GLint offsets[16];
-            GLint sizes[16];
-            GLint types[16];
-
-            glGetUniformIndices(program, block.field_count, block.field_names, indices);
-
-            for (unsigned int i = 0; i < block.field_count; i++) {
-                if (indices[i] == GL_INVALID_INDEX) {
-                    REL_CRITICAL("Invalid field index, exiting...");
-                    exit(1);
-                }
-            }
-
-            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_OFFSET, offsets);
-            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
-            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
-
-            for (unsigned int i = 0; i < block.field_count; i++) {
-                block.uniform_buffer->fields[i] = {
-                    static_cast<size_t>(offsets[i]),
-                    static_cast<size_t>(sizes[i]) * type_size(types[i])
-                };
-            }
-
-            block.uniform_buffer->configured = true;
-        }
-
-        glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
-    }
+    configure_uniform_blocks(program, uniform_blocks);
 
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
             vertex_source_path, fragment_source_path);
@@ -243,58 +192,7 @@ std::shared_ptr<Shader> Shader::create(
         exit(1);
     }
 
-    for (const UniformBlockSpecification& block : uniform_blocks) {
-        const GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
-
-        if (block_index == GL_INVALID_INDEX) {
-            REL_CRITICAL("Invalid block index, exiting...");
-            exit(1);
-        }
-
-        if (!block.uniform_buffer->configured) {
-            GLint block_size;
-            glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
-
-            block.uniform_buffer->data = new char[block_size];
-            block.uniform_buffer->size = block_size;
-
-            glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
-            glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
-            LOG_ALLOCATION(block_size)
-            glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-            ASSERT(block.field_count <= 16, "Maximum 16 fields for now");
-
-            GLuint indices[16];
-            GLint offsets[16];
-            GLint sizes[16];
-            GLint types[16];
-
-            glGetUniformIndices(program, block.field_count, block.field_names, indices);
-
-            for (unsigned int i = 0; i < block.field_count; i++) {
-                if (indices[i] == GL_INVALID_INDEX) {
-                    REL_CRITICAL("Invalid field index, exiting...");
-                    exit(1);
-                }
-            }
-
-            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_OFFSET, offsets);
-            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
-            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
-
-            for (unsigned int i = 0; i < block.field_count; i++) {
-                block.uniform_buffer->fields[i] = {
-                    static_cast<size_t>(offsets[i]),
-                    static_cast<size_t>(sizes[i]) * type_size(types[i])
-                };
-            }
-
-            block.uniform_buffer->configured = true;
-        }
-
-        glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
-    }
+    configure_uniform_blocks(program, uniform_blocks);
 
     return std::make_shared<Shader>(program, vertex_shader, fragment_shader, name, uniforms,
             vertex_source_path.get(), fragment_source_path.get());
@@ -393,6 +291,8 @@ GLint Shader::get_uniform_location(std::string_view name) {
 #endif
 }
 
+
+
 GLuint Shader::compile_shader(std::string_view source_path, GLenum type, std::string_view name) noexcept(false) {
     std::ifstream file {std::string(source_path)};
     std::string source;
@@ -487,6 +387,73 @@ bool Shader::check_linking(GLuint program, std::string_view name) {
     }
 
     return true;
+}
+
+void Shader::configure_uniform_blocks(GLuint program, const std::vector<UniformBlockSpecification>& uniform_blocks) {
+    for (const UniformBlockSpecification& block : uniform_blocks) {
+        const GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
+
+        if (block_index == GL_INVALID_INDEX) {
+            REL_CRITICAL("Invalid block index, exiting...");
+            exit(1);
+        }
+
+        if (!block.uniform_buffer->configured) {
+            GLint block_size;
+            glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
+
+            block.uniform_buffer->data = new char[block_size];
+            block.uniform_buffer->size = block_size;
+
+            glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
+            glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
+            LOG_ALLOCATION(block_size)
+            glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+            ASSERT(block.field_count <= 16, "Maximum 16 fields for now");
+
+            GLuint indices[16];
+            GLint offsets[16];
+            GLint sizes[16];
+            GLint types[16];
+
+            char* field_names[16];
+            for (size_t i = 0; i < block.field_count; i++) {
+                const std::string& name = block.field_names[i];
+
+                field_names[i] = static_cast<char*>(malloc(name.size() + 1));
+                strcpy(field_names[i], name.c_str());
+            }
+
+            glGetUniformIndices(program, block.field_count, const_cast<const char* const*>(field_names), indices);
+
+            for (size_t i = 0; i < block.field_count; i++) {
+                free(field_names[i]);
+            }
+
+            for (unsigned int i = 0; i < block.field_count; i++) {
+                if (indices[i] == GL_INVALID_INDEX) {
+                    REL_CRITICAL("Invalid field index, exiting...");
+                    exit(1);
+                }
+            }
+
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_OFFSET, offsets);
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
+            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
+
+            for (unsigned int i = 0; i < block.field_count; i++) {
+                block.uniform_buffer->fields[i] = {
+                    static_cast<size_t>(offsets[i]),
+                    static_cast<size_t>(sizes[i]) * type_size(types[i])
+                };
+            }
+
+            block.uniform_buffer->configured = true;
+        }
+
+        glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
+    }
 }
 
 std::string Shader::get_name(std::string_view vertex_source, std::string_view fragment_source) {

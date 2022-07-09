@@ -135,17 +135,13 @@ namespace gui {
     }
 }
 
-static const char* projection_block_fields[] = {
-    "u_projection_matrix"
-};
-
 GuiRenderer::GuiRenderer(Application* app)
     : app(app) {
     storage.projection_uniform_buffer = UniformBuffer::create();
 
     storage.projection_uniform_block.block_name = "Projection";
     storage.projection_uniform_block.field_count = 1;
-    storage.projection_uniform_block.field_names = projection_block_fields;
+    storage.projection_uniform_block.field_names = { "u_projection_matrix" };
     storage.projection_uniform_block.uniform_buffer = storage.projection_uniform_buffer;
     storage.projection_uniform_block.binding_index = 4;
 
