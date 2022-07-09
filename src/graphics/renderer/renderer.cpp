@@ -212,17 +212,6 @@ Renderer::Renderer(Application* app)
     }
 #endif
 
-#ifdef PLATFORM_GAME_DEBUG
-    TextureSpecification specification;
-    specification.min_filter = Filter::Linear;
-    specification.mag_filter = Filter::Linear;
-
-    storage.light_bulb_texture = Texture::create("data/textures/internal/light_bulb/light_bulb.png", specification);
-
-    storage.light_bulb_quad.texture = storage.light_bulb_texture;
-    add_quad(storage.light_bulb_quad);
-#endif
-
     {
         FramebufferSpecification specification;
         specification.width = app->app_data.width;
@@ -256,6 +245,8 @@ Renderer::Renderer(Application* app)
 
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_int("u_texture", 0);
+
+    Shader::unbind();
 
     DEB_INFO("Initialized renderer");
 }
@@ -410,11 +401,17 @@ void Renderer::add_quad(Quad& quad) {
 
     quad.handle = ++handle;
 
-    quads[handle] = &quad;
+    quads.push_back(&quad);
 }
 
 void Renderer::remove_quad(unsigned int handle) {
-    quads.erase(handle);
+    auto iter = std::find_if(quads.begin(), quads.end(), [handle](const Quad* quad) {
+        return quad->handle == handle;
+    });
+
+    if (iter != quads.end()) {
+        quads.erase(iter);
+    }
 }
 
 void Renderer::clear() {
@@ -424,10 +421,6 @@ void Renderer::clear() {
     models_has_shadow.clear();
 
     quads.clear();
-
-#ifdef PLATFORM_GAME_DEBUG
-    add_quad(storage.light_bulb_quad);
-#endif
 }
 
 void Renderer::set_viewport(int width, int height) {
@@ -465,14 +458,6 @@ void Renderer::set_depth_map_framebuffer(int size) {
 
     app->purge_framebuffers();
     app->add_framebuffer(storage.depth_map_framebuffer);
-}
-
-void Renderer::set_light(const DirectionalLight& light) {
-    this->light = light;
-
-#ifdef PLATFORM_GAME_DEBUG
-    storage.light_bulb_quad.position = this->light.position;
-#endif
 }
 
 void Renderer::setup_shader(std::shared_ptr<Shader> shader) {
@@ -637,8 +622,14 @@ void Renderer::draw_quads() {
 
     storage.quad_vertex_array->bind();
 
-    for (const auto [handle, quad] : quads) {
-        IGNORE(handle);
+    std::sort(quads.begin(), quads.end(), [this](const Quad* left, const Quad* right) {
+        const float distance1 = glm::distance(left->position, app->camera.get_position());
+        const float distance2 = glm::distance(right->position, app->camera.get_position());
+
+        return distance1 > distance2;
+    });
+
+    for (const Quad* quad : quads) {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, quad->position);
         matrix = glm::scale(matrix, glm::vec3(quad->scale, quad->scale, quad->scale));

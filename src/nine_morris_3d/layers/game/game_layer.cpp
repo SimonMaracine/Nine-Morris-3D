@@ -93,6 +93,7 @@ void GameLayer::on_attach() {
 
 #ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = true;
+    app->renderer->add_quad(light_bulb_quad);
 #endif
 
     app->camera.go_towards_position(default_camera_position);
@@ -179,6 +180,11 @@ void GameLayer::on_awake() {
 
     app->data.keyboard_controls_texture = Texture::create(app->assets_data->keyboard_controls_texture, specification);
     app->data.keyboard_controls_cross_texture = Texture::create(app->assets_data->keyboard_controls_cross_texture, specification);
+
+#ifdef PLATFORM_GAME_DEBUG
+    light_bulb_texture = Texture::create("data/textures/internal/light_bulb/light_bulb.png", specification);
+    light_bulb_quad.texture = light_bulb_texture;
+#endif
 }
 
 void GameLayer::on_update(float dt) {
@@ -1245,11 +1251,19 @@ void GameLayer::setup_skybox() {
 
 void GameLayer::setup_light() {
     if (app->options.skybox == options::FIELD) {
-        app->renderer->set_light(LIGHT_FIELD);
+        app->renderer->light = LIGHT_FIELD;
         app->renderer->light_space = SHADOWS_FIELD;
+
+#ifdef PLATFORM_GAME_DEBUG
+        light_bulb_quad.position = LIGHT_FIELD.position;
+#endif
     } else if (app->options.skybox == options::AUTUMN) {
-        app->renderer->set_light(LIGHT_AUTUMN);
+        app->renderer->light = LIGHT_AUTUMN;
         app->renderer->light_space = SHADOWS_AUTUMN;
+
+#ifdef PLATFORM_GAME_DEBUG
+        light_bulb_quad.position = LIGHT_AUTUMN.position;
+#endif
     } else {
         ASSERT(false, "Invalid skybox");
     }

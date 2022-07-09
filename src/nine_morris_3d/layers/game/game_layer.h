@@ -110,6 +110,11 @@ public:
     bool changed_labeled_board_texture = false;
     bool changed_normal_mapping = false;
 
+#ifdef PLATFORM_GAME_DEBUG
+    std::shared_ptr<Texture> light_bulb_texture;
+    Renderer::Quad light_bulb_quad;
+#endif
+
     ImGuiLayer* imgui_layer = nullptr;
     GuiLayer* gui_layer = nullptr;
 };

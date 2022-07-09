@@ -79,7 +79,6 @@ public:
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void set_skybox(std::shared_ptr<Texture3D> texture);
     void set_depth_map_framebuffer(int size);
-    void set_light(const DirectionalLight& light);
 
     hoverable::Id get_hovered_id() { return hovered_id; }
     UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
@@ -87,7 +86,6 @@ public:
     UniformBlockSpecification& get_light_view_position_uniform_block() { return storage.light_view_position_uniform_block; }
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
     std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
-    DirectionalLight& get_light() { return light; }
 
 #ifdef PLATFORM_GAME_DEBUG
     std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }
@@ -99,6 +97,7 @@ public:
     std::shared_ptr<Shader> get_skybox_shader() { return storage.skybox_shader; }
 
     bool origin = false;  // This does nothing in release mode
+    DirectionalLight light;
 
     struct LightSpace {
         float left = 0.0f;
@@ -150,11 +149,6 @@ private:
 
         std::shared_ptr<Texture3D> skybox_texture;
 
-#ifdef PLATFORM_GAME_DEBUG
-        std::shared_ptr<Texture> light_bulb_texture;
-        Quad light_bulb_quad;
-#endif
-
         std::shared_ptr<Framebuffer> scene_framebuffer;
         std::shared_ptr<Framebuffer> depth_map_framebuffer;
         std::shared_ptr<Framebuffer> intermediate_framebuffer;
@@ -162,14 +156,12 @@ private:
         std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
     } storage;
 
-    DirectionalLight light;
-
     // Ordered maps of pointers to models and quads
     std::map<unsigned int, Model*> models;
     std::map<unsigned int, Model*> models_outline;
     std::map<unsigned int, Model*> models_cast_shadow;
     std::map<unsigned int, Model*> models_has_shadow;
-    std::map<unsigned int, Quad*> quads;
+    std::vector<Quad*> quads;
 
     hoverable::Id hovered_id = hoverable::null;
     FramebufferReader<4> reader;
