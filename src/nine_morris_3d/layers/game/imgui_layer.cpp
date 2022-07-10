@@ -511,7 +511,7 @@ void ImGuiLayer::draw_game_over() {
                 break;
             }
             case Board::Ending::None:
-                ASSERT(false, "Ending cannot be 'None'");
+                ASSERT(false, "Ending cannot be None");
         }
 
         ImGui::Separator();
@@ -726,15 +726,15 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::End();
 
         ImGui::Begin("Light Settings");
-        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->get_light().position),
+        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position),
                 -30.0f, 30.0f)) {
-            app->renderer->set_light(app->renderer->get_light());
+            app->renderer->light = app->renderer->light;
         }
-        ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->get_light().ambient_color),
+        ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color),
                 0.0f, 1.0f);
-        ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->get_light().diffuse_color),
+        ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color),
                 0.0f, 1.0f);
-        ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->get_light().specular_color),
+        ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color),
                 0.0f, 1.0f);
         ImGui::End();
 

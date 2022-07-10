@@ -57,6 +57,7 @@ namespace gui {
 
     Image::Image(std::shared_ptr<Texture> texture)
         : texture(texture) {
+        type = WidgetType::Image;
         size.x = texture->get_width();
         size.y = texture->get_height();
     }
@@ -66,11 +67,9 @@ namespace gui {
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
         matrix = glm::scale(matrix, glm::vec3(static_cast<glm::vec2>(size) * scale_parameters.current_scale, 1.0f));
 
-        app->gui_renderer->storage.quad2d_shader->bind();
         app->gui_renderer->storage.quad2d_shader->upload_uniform_mat4("u_model_matrix", matrix);
 
         texture->bind(0);
-        app->gui_renderer->storage.quad2d_vertex_array->bind();
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
@@ -83,6 +82,7 @@ namespace gui {
 
     Text::Text(std::shared_ptr<Font> font, std::string_view text, float text_scale, const glm::vec3& color)
         : font(font), text(text), text_scale(text_scale), color(color) {
+        type = WidgetType::Text;
         font->get_string_size(text, text_scale, &size.x, &size.y);
     }
 
@@ -99,7 +99,6 @@ namespace gui {
         matrix = glm::scale(matrix, glm::vec3(text_scale, text_scale, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(scale_parameters.current_scale, scale_parameters.current_scale, 1.0f));
 
-        app->gui_renderer->storage.text_shader->bind();
         app->gui_renderer->storage.text_shader->upload_uniform_mat4("u_model_matrix", matrix);
         app->gui_renderer->storage.text_shader->upload_uniform_vec3("u_color", color);
         if (!with_shadows) {
@@ -138,6 +137,14 @@ namespace gui {
 
 GuiRenderer::GuiRenderer(Application* app)
     : app(app) {
+    storage.projection_uniform_buffer = UniformBuffer::create();
+
+    storage.projection_uniform_block.block_name = "Projection";
+    storage.projection_uniform_block.field_count = 1;
+    storage.projection_uniform_block.field_names = { "u_projection_matrix" };
+    storage.projection_uniform_block.uniform_buffer = storage.projection_uniform_buffer;
+    storage.projection_uniform_block.binding_index = 4;
+
     maybe_initialize_assets();
 
     using namespace encryption;
@@ -145,20 +152,19 @@ GuiRenderer::GuiRenderer(Application* app)
     {
         const std::vector<std::string> uniforms = {
             "u_model_matrix",
-            "u_projection_matrix",
             "u_texture"
         };
         storage.quad2d_shader = Shader::create(
             encr(paths::path_for_assets(QUAD2D_VERTEX_SHADER)),
             encr(paths::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
-            uniforms
+            uniforms,
+            { storage.projection_uniform_block }
         );
     }
 
     {
         const std::vector<std::string> uniforms = {
             "u_model_matrix",
-            "u_projection_matrix",
             "u_bitmap",
             "u_color",
             "u_border_width",
@@ -167,7 +173,8 @@ GuiRenderer::GuiRenderer(Application* app)
         storage.text_shader = Shader::create(
             encr(paths::path_for_assets(TEXT_VERTEX_SHADER)),
             encr(paths::path_for_assets(TEXT_FRAGMENT_SHADER)),
-            uniforms
+            uniforms,
+            { storage.projection_uniform_block }
         );
     }
 
@@ -196,12 +203,14 @@ GuiRenderer::GuiRenderer(Application* app)
     );
 
     // Setup uniform variables
+    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
+    storage.projection_uniform_buffer->bind();
+    storage.projection_uniform_buffer->upload_data();
+
     storage.quad2d_shader->bind();
-    storage.quad2d_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
     storage.quad2d_shader->upload_uniform_int("u_texture", 0);
 
-    storage.text_shader->bind();
-    storage.text_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
+    Shader::unbind();
 
     // Set renderer pointer to widgets
     gui::Widget::app = app;
@@ -214,11 +223,94 @@ GuiRenderer::~GuiRenderer() {
 }
 
 void GuiRenderer::render() {
+    static std::vector<gui::Widget*> images;
+    static std::vector<gui::Widget*> texts;
+
+    images.clear();
+    texts.clear();
+
+    std::for_each(widgets.begin(), widgets.end(), [&](const std::shared_ptr<gui::Widget>& widget) {
+        switch (widget->type) {
+            case gui::WidgetType::Image:
+                images.push_back(widget.get());
+                break;
+            case gui::WidgetType::Text:
+                texts.push_back(widget.get());
+                break;
+            case gui::WidgetType::None:
+                ASSERT(false, "Widget type must not be None");
+                break;
+        }
+    });
+
     glDisable(GL_DEPTH_TEST);
+    draw(images, std::bind(&GuiRenderer::prepare_draw_image, this));
+    draw(texts, std::bind(&GuiRenderer::prepare_draw_text, this));
+    glEnable(GL_DEPTH_TEST);
+}
 
-    for (size_t i = 0; i < widgets.size(); i++) {
-        gui::Widget* widget = widgets[i].get();
+void GuiRenderer::im_draw_quad(glm::vec2 position, glm::vec2 scale, std::shared_ptr<Texture> texture) {
+    glm::mat4 matrix = glm::mat4(1.0f);
+    matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
+    matrix = glm::scale(matrix, glm::vec3(scale.x, scale.y, 1.0f));
 
+    storage.quad2d_shader->bind();
+    storage.quad2d_shader->upload_uniform_mat4("u_model_matrix", matrix);
+
+    storage.quad2d_vertex_array->bind();
+    texture->bind(0);
+
+    glDisable(GL_DEPTH_TEST);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glEnable(GL_DEPTH_TEST);
+}
+
+void GuiRenderer::on_window_resized(events::WindowResizedEvent& event) {
+    storage.orthographic_projection_matrix = glm::ortho(
+        0.0f, static_cast<float>(event.width),
+        0.0f, static_cast<float>(event.height)
+    );
+
+    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
+    storage.projection_uniform_buffer->bind();
+    storage.projection_uniform_buffer->upload_data();
+}
+
+void GuiRenderer::add_widget(std::shared_ptr<gui::Widget> widget) {
+    auto iter = std::find(widgets.begin(), widgets.end(), widget);
+
+    if (iter == widgets.end()) {
+        widgets.push_back(widget);
+    } else {
+        DEB_WARN("Widget alreay present");
+    }
+}
+
+void GuiRenderer::remove_widget(std::shared_ptr<gui::Widget> widget) {
+    auto iter = std::find(widgets.begin(), widgets.end(), widget);
+
+    if (iter != widgets.end()) {
+        widgets.erase(iter);
+    }
+}
+
+void GuiRenderer::clear() {
+    widgets.clear();
+}
+
+void GuiRenderer::prepare_draw_image() {
+    app->gui_renderer->storage.quad2d_shader->bind();
+    app->gui_renderer->storage.quad2d_vertex_array->bind();
+}
+
+void GuiRenderer::prepare_draw_text() {
+    app->gui_renderer->storage.text_shader->bind();
+}
+
+void GuiRenderer::draw(std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw) {
+    prepare_draw();
+
+    for (gui::Widget* widget : subwidgets) {
         const int WINDOW_WIDTH = app->app_data.width;
         const int WINDOW_HEIGHT = app->app_data.height;
 
@@ -299,59 +391,6 @@ void GuiRenderer::render() {
 
         widget->render();
     }
-
-    glEnable(GL_DEPTH_TEST);
-}
-
-void GuiRenderer::im_draw_quad(glm::vec2 position, glm::vec2 scale, std::shared_ptr<Texture> texture) {
-    glm::mat4 matrix = glm::mat4(1.0f);
-    matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
-    matrix = glm::scale(matrix, glm::vec3(scale.x, scale.y, 1.0f));
-
-    storage.quad2d_shader->bind();
-    storage.quad2d_shader->upload_uniform_mat4("u_model_matrix", matrix);
-
-    texture->bind(0);
-    storage.quad2d_vertex_array->bind();
-
-    glDisable(GL_DEPTH_TEST);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glEnable(GL_DEPTH_TEST);
-}
-
-void GuiRenderer::on_window_resized(events::WindowResizedEvent& event) {
-    storage.orthographic_projection_matrix = glm::ortho(
-        0.0f, static_cast<float>(event.width),
-        0.0f, static_cast<float>(event.height)
-    );
-
-    storage.quad2d_shader->bind();  // TODO optimize maybe
-    storage.quad2d_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
-
-    storage.text_shader->bind();
-    storage.text_shader->upload_uniform_mat4("u_projection_matrix", storage.orthographic_projection_matrix);
-}
-
-void GuiRenderer::add_widget(std::shared_ptr<gui::Widget> widget) {
-    auto iter = std::find(widgets.begin(), widgets.end(), widget);
-
-    if (iter == widgets.end()) {
-        widgets.push_back(widget);
-    } else {
-        DEB_WARN("Widget alreay present");
-    }
-}
-
-void GuiRenderer::remove_widget(std::shared_ptr<gui::Widget> widget) {
-    auto iter = std::find(widgets.begin(), widgets.end(), widget);
-
-    if (iter != widgets.end()) {
-        widgets.erase(iter);
-    }
-}
-
-void GuiRenderer::clear() {
-    widgets.clear();
 }
 
 void GuiRenderer::maybe_initialize_assets() {

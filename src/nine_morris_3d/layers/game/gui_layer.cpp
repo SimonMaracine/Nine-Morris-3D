@@ -30,8 +30,6 @@ void GuiLayer::on_attach() {
     wait_indicator->stick(gui::Sticky::NE);
     wait_indicator->offset(25, gui::Relative::Right)->offset(55, gui::Relative::Top);
     wait_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
-
-    app->gui_renderer->add_widget(wait_indicator);
 }
 
 void GuiLayer::on_detach() {

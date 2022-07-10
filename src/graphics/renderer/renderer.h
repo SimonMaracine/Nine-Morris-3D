@@ -54,7 +54,21 @@ public:
     enum {
         WithOutline = 1 << 0,
         CastShadow = 1 << 1,
-        HasShadow = 1 << 2,
+    };
+
+    struct PostProcessing {
+        union {
+            struct {
+                std::shared_ptr<Framebuffer> framebuffer;
+                std::shared_ptr<Shader> shader;
+            } normal;
+
+            struct {
+                GLuint framebuffer;
+            } end;
+        };
+
+        bool enabled = true;
     };
 
     Renderer(Application* app);
@@ -71,6 +85,8 @@ public:
     void remove_quad(unsigned int handle);
 
     void setup_shader(std::shared_ptr<Shader> shader);
+    void add_post_processing(const PostProcessing& post_processing);
+    void end_post_processing_list();
 
     void clear();
 
@@ -79,7 +95,6 @@ public:
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void set_skybox(std::shared_ptr<Texture3D> texture);
     void set_depth_map_framebuffer(int size);
-    void set_light(const DirectionalLight& light);
 
     hoverable::Id get_hovered_id() { return hovered_id; }
     UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
@@ -87,7 +102,6 @@ public:
     UniformBlockSpecification& get_light_view_position_uniform_block() { return storage.light_view_position_uniform_block; }
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
     std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
-    DirectionalLight& get_light() { return light; }
 
 #ifdef PLATFORM_GAME_DEBUG
     std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }
@@ -99,6 +113,7 @@ public:
     std::shared_ptr<Shader> get_skybox_shader() { return storage.skybox_shader; }
 
     bool origin = false;  // This does nothing in release mode
+    DirectionalLight light;
 
     struct LightSpace {
         float left = 0.0f;
@@ -111,9 +126,15 @@ public:
     } light_space;
 private:
     void clear(int buffers);
-    void draw_screen_quad(GLuint texture);
+    void draw_screen_quad(GLuint texture, std::shared_ptr<Shader> shader);
     void draw_origin();
     void draw_skybox();
+    void draw_model(const Model* model);
+    void draw_models_to_depth_buffer();
+    void draw_models_normal();
+    void draw_models_with_outline();
+    void _draw_models_with_outline(const std::vector<Model*>& submodels);
+    void draw_quads();
     void setup_shadows();
     void check_hovered_id(int x, int y);
     void maybe_initialize_assets();
@@ -146,11 +167,6 @@ private:
 
         std::shared_ptr<Texture3D> skybox_texture;
 
-#ifdef PLATFORM_GAME_DEBUG
-        std::shared_ptr<Texture> light_bulb_texture;
-        Quad light_bulb_quad;
-#endif
-
         std::shared_ptr<Framebuffer> scene_framebuffer;
         std::shared_ptr<Framebuffer> depth_map_framebuffer;
         std::shared_ptr<Framebuffer> intermediate_framebuffer;
@@ -158,19 +174,18 @@ private:
         std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
     } storage;
 
-    DirectionalLight light;
-
-    // Ordered maps of pointers to models and quads
-    std::map<unsigned int, Model*> models;
-    std::map<unsigned int, Model*> models_outline;
-    std::map<unsigned int, Model*> models_cast_shadow;
-    std::map<unsigned int, Model*> models_has_shadow;
-    std::map<unsigned int, Quad*> quads;
+    // Collections of pointers to models and quads
+    std::vector<Model*> models;
+    std::vector<Model*> models_outline;
+    std::vector<Model*> models_cast_shadow;
+    std::vector<Quad*> quads;
 
     hoverable::Id hovered_id = hoverable::null;
     FramebufferReader<4> reader;
 
     int shadow_map_size = 4096;
+
+    std::vector<PostProcessing> post_processings;
 
     std::string SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert";
     std::string SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag";

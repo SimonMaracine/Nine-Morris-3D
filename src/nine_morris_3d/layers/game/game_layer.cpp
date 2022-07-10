@@ -93,6 +93,7 @@ void GameLayer::on_attach() {
 
 #ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = true;
+    app->renderer->add_quad(light_bulb_quad);
 #endif
 
     app->camera.go_towards_position(default_camera_position);
@@ -179,6 +180,11 @@ void GameLayer::on_awake() {
 
     app->data.keyboard_controls_texture = Texture::create(app->assets_data->keyboard_controls_texture, specification);
     app->data.keyboard_controls_cross_texture = Texture::create(app->assets_data->keyboard_controls_cross_texture, specification);
+
+#ifdef PLATFORM_GAME_DEBUG
+    light_bulb_texture = Texture::create("data/textures/internal/light_bulb/light_bulb.png", specification);
+    light_bulb_quad.texture = light_bulb_texture;
+#endif
 }
 
 void GameLayer::on_update(float dt) {
@@ -854,23 +860,23 @@ void GameLayer::initialize_rendering_pieces_no_normal() {
     app->data.tinted_wood_material->add_variable(Material::UniformType::Vec3, "u_material.tint");
 
     std::shared_ptr<Buffer> white_piece_vertices = Buffer::create(
-        app->assets_data->white_piece_mesh->vertices.data(),
-        app->assets_data->white_piece_mesh->vertices.size() * sizeof(VPTNT)
+        app->assets_data->white_piece_no_normal_mesh->vertices.data(),
+        app->assets_data->white_piece_no_normal_mesh->vertices.size() * sizeof(VPTNT)
     );
 
     std::shared_ptr<IndexBuffer> white_piece_indices = IndexBuffer::create(
-        app->assets_data->white_piece_mesh->indices.data(),
-        app->assets_data->white_piece_mesh->indices.size() * sizeof(unsigned int)
+        app->assets_data->white_piece_no_normal_mesh->indices.data(),
+        app->assets_data->white_piece_no_normal_mesh->indices.size() * sizeof(unsigned int)
     );
 
     std::shared_ptr<Buffer> black_piece_vertices = Buffer::create(
-        app->assets_data->black_piece_mesh->vertices.data(),
-        app->assets_data->black_piece_mesh->vertices.size() * sizeof(VPTNT)
+        app->assets_data->black_piece_no_normal_mesh->vertices.data(),
+        app->assets_data->black_piece_no_normal_mesh->vertices.size() * sizeof(VPTNT)
     );
 
     std::shared_ptr<IndexBuffer> black_piece_indices = IndexBuffer::create(
-        app->assets_data->black_piece_mesh->indices.data(),
-        app->assets_data->black_piece_mesh->indices.size() * sizeof(unsigned int)
+        app->assets_data->black_piece_no_normal_mesh->indices.data(),
+        app->assets_data->black_piece_no_normal_mesh->indices.size() * sizeof(unsigned int)
     );
 
     for (size_t i = 0; i < 9; i++) {
@@ -1063,7 +1069,7 @@ void GameLayer::setup_model_board() {
     board.model.scale = 20.0f;
     board.model.material = app->data.board_wood_material_instance;
 
-    app->renderer->add_model(board.model, Renderer::CastShadow | Renderer::HasShadow);
+    app->renderer->add_model(board.model, Renderer::CastShadow);
 
     DEB_DEBUG("Setup model board");
 }
@@ -1075,7 +1081,7 @@ void GameLayer::setup_model_board_paint() {
     board.paint_model.scale = 20.0f;
     board.paint_model.material = app->data.board_paint_material_instance;
 
-    app->renderer->add_model(board.paint_model, Renderer::HasShadow);
+    app->renderer->add_model(board.paint_model);
 
     DEB_DEBUG("Setup model board paint");
 }
@@ -1099,7 +1105,7 @@ void GameLayer::setup_model_piece(size_t index, Piece::Type type, std::shared_pt
     board.pieces[index].model.scale = 20.0f;
     board.pieces[index].model.material = app->data.piece_material_instances[index];
 
-    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow | Renderer::HasShadow);
+    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow);
 
     DEB_DEBUG("Setup model piece {}", index);
 }
@@ -1110,7 +1116,7 @@ void GameLayer::setup_model_board_no_normal() {
     board.model.scale = 20.0f;
     board.model.material = app->data.board_wood_material_instance;
 
-    app->renderer->add_model(board.model, Renderer::CastShadow | Renderer::HasShadow);
+    app->renderer->add_model(board.model, Renderer::CastShadow);
 
     DEB_DEBUG("Setup model board");
 }
@@ -1122,7 +1128,7 @@ void GameLayer::setup_model_board_paint_no_normal() {
     board.paint_model.scale = 20.0f;
     board.paint_model.material = app->data.board_paint_material_instance;
 
-    app->renderer->add_model(board.paint_model, Renderer::HasShadow);
+    app->renderer->add_model(board.paint_model);
 
     DEB_DEBUG("Setup model board paint");
 }
@@ -1146,7 +1152,7 @@ void GameLayer::setup_model_piece_no_normal(size_t index, Piece::Type type, std:
     board.pieces[index].model.scale = 20.0f;
     board.pieces[index].model.material = app->data.piece_material_instances[index];
 
-    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow | Renderer::HasShadow);
+    app->renderer->add_model(board.pieces[index].model, Renderer::CastShadow);
 
     DEB_DEBUG("Setup model piece {}", index);
 }
@@ -1245,11 +1251,19 @@ void GameLayer::setup_skybox() {
 
 void GameLayer::setup_light() {
     if (app->options.skybox == options::FIELD) {
-        app->renderer->set_light(LIGHT_FIELD);
+        app->renderer->light = LIGHT_FIELD;
         app->renderer->light_space = SHADOWS_FIELD;
+
+#ifdef PLATFORM_GAME_DEBUG
+        light_bulb_quad.position = LIGHT_FIELD.position;
+#endif
     } else if (app->options.skybox == options::AUTUMN) {
-        app->renderer->set_light(LIGHT_AUTUMN);
+        app->renderer->light = LIGHT_AUTUMN;
         app->renderer->light_space = SHADOWS_AUTUMN;
+
+#ifdef PLATFORM_GAME_DEBUG
+        light_bulb_quad.position = LIGHT_AUTUMN.position;
+#endif
     } else {
         ASSERT(false, "Invalid skybox");
     }
@@ -1498,6 +1512,9 @@ void GameLayer::actually_change_normal_mapping() {
     for (size_t i = 0; i < 18; i++) {
         app->renderer->remove_model(board.pieces[i].model.handle);
     }
+    for (size_t i = 0; i < 24; i++) {
+        app->renderer->remove_model(board.nodes[i].model.handle);
+    }
 
     if (app->options.normal_mapping) {
         initialize_rendering_board();
@@ -1516,6 +1533,8 @@ void GameLayer::actually_change_normal_mapping() {
         setup_model_board_paint_no_normal();
         setup_model_pieces_no_normal();
     }
+
+    setup_model_nodes();
 
     // Remove inactive pieces that were added previously
     for (size_t i = 0; i < 18; i++) {
@@ -1560,7 +1579,7 @@ void GameLayer::load_game() {
         app->renderer->remove_model(piece.model.handle);
 
         if (piece.active) {
-            app->renderer->add_model(piece.model, Renderer::CastShadow | Renderer::HasShadow);
+            app->renderer->add_model(piece.model, Renderer::CastShadow);
         }
     }
 
