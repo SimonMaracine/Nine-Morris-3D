@@ -9,6 +9,7 @@
 #include "application/input.h"
 #include "graphics/renderer/renderer.h"
 #include "graphics/renderer/framebuffer_reader.h"
+#include "graphics/renderer/post_processing_step.h"
 #include "graphics/renderer/opengl/vertex_array.h"
 #include "graphics/renderer/opengl/buffer.h"
 #include "graphics/renderer/opengl/shader.h"
@@ -83,25 +84,18 @@ Renderer::Renderer(Application* app)
     using namespace encryption;
 
     {
-        std::vector<std::string> uniforms = {
-            "u_projection_view_matrix",
-            "u_skybox"
-        };
         storage.skybox_shader = Shader::create(
             encr(paths::path_for_assets(SKYBOX_VERTEX_SHADER)),
             encr(paths::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
-            uniforms
+            { "u_projection_view_matrix", "u_skybox" }
         );
     }
 
     {
-        std::vector<std::string> uniforms = {
-            "u_screen_texture"
-        };
         storage.screen_quad_shader = Shader::create(
             encr(paths::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
             encr(paths::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
-            uniforms
+            { "u_screen_texture" }
         );
     }
 
@@ -120,39 +114,29 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        std::vector<std::string> uniforms = {
-            "u_model_matrix"
-        };
         storage.shadow_shader = Shader::create(
             encr(paths::path_for_assets(SHADOW_VERTEX_SHADER)),
             encr(paths::path_for_assets(SHADOW_FRAGMENT_SHADER)),
-            uniforms,
+            { "u_model_matrix" },
             { storage.light_space_uniform_block }
         );
     }
 
     {
-        std::vector<std::string> uniforms = {
-            "u_model_matrix",
-            "u_color"
-        };
         storage.outline_shader = Shader::create(
             encr(paths::path_for_assets(OUTLINE_VERTEX_SHADER)),
             encr(paths::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
-            uniforms,
+            { "u_model_matrix", "u_color" },
             { storage.projection_view_uniform_block }
         );
     }
 
 #ifdef PLATFORM_GAME_DEBUG
     {
-        std::vector<std::string> uniforms = {
-            "u_projection_view_matrix"
-        };
         storage.origin_shader = Shader::create(
             paths::path_for_assets(ORIGIN_VERTEX_SHADER),
             paths::path_for_assets(ORIGIN_FRAGMENT_SHADER),
-            uniforms
+            { "u_projection_view_matrix" }
         );
     }
 #endif
@@ -169,18 +153,17 @@ Renderer::Renderer(Application* app)
 
     {
         float screen_quad_vertices[] = {
-            -1.0f,  1.0f,    0.0f, 1.0f,
-            -1.0f, -1.0f,    0.0f, 0.0f,
-             1.0f,  1.0f,    1.0f, 1.0f,
-             1.0f,  1.0f,    1.0f, 1.0f,
-            -1.0f, -1.0f,    0.0f, 0.0f,
-             1.0f, -1.0f,    1.0f, 0.0f
+            -1.0f,  1.0f,
+            -1.0f, -1.0f,
+             1.0f,  1.0f,
+             1.0f,  1.0f,
+            -1.0f, -1.0f,
+             1.0f, -1.0f,
         };
 
         std::shared_ptr<Buffer> buffer = Buffer::create(screen_quad_vertices, sizeof(screen_quad_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 2);
-        layout.add(1, BufferLayout::Type::Float, 2);
         storage.quad_vertex_array = VertexArray::create();
         storage.quad_vertex_array->add_buffer(buffer, layout);
 
@@ -272,16 +255,16 @@ void Renderer::render() {
     setup_shadows();
     storage.depth_map_framebuffer->bind();
 
-    clear(Depth);
-    set_viewport(shadow_map_size, shadow_map_size);
+    render_helpers::clear(render_helpers::Depth);
+    render_helpers::viewport(shadow_map_size, shadow_map_size);
 
     // Render objects with shadows to depth buffer
     draw_models_to_depth_buffer();
 
     storage.scene_framebuffer->bind();
 
-    clear(Color | Depth | Stencil);
-    set_viewport(app->app_data.width, app->app_data.height);
+    render_helpers::clear(render_helpers::Color | render_helpers::Depth | render_helpers::Stencil);
+    render_helpers::viewport(app->app_data.width, app->app_data.height);
 
     // Bind shadow map for use in shadow rendering
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
@@ -321,24 +304,8 @@ void Renderer::render() {
     const int y = app->app_data.height - static_cast<int>(input::get_mouse_y());
     reader.read(1, x, y);
 
-    // Post-processing step
-    for (const PostProcessing& post_processing : post_processings) {
-        if (!post_processing.enabled) {
-            continue;
-        }
-
-        post_processing.normal.framebuffer->bind();
-        draw_screen_quad(post_processing.normal.framebuffer->get_color_attachment(0), post_processing.normal.shader);
-        post_processing.normal.framebuffer->resolve_framebuffer(
-            
-        );
-    }
-
-    Framebuffer::bind_default();
-
-    // Draw the result to the screen
-    clear(Color);
-    draw_screen_quad(storage.intermediate_framebuffer->get_color_attachment(0), storage.screen_quad_shader);
+    // Do post processing and render the final image to the screen
+    end_rendering();
 
     int* data;
     reader.get<int>(&data);
@@ -419,14 +386,6 @@ void Renderer::clear() {
     quads.clear();
 }
 
-void Renderer::set_viewport(int width, int height) {
-    glViewport(0, 0, width, height);
-}
-
-void Renderer::set_clear_color(float red, float green, float blue) {
-    glClearColor(red, green, blue, 1.0f);
-}
-
 void Renderer::set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
     storage.scene_framebuffer = framebuffer;
 
@@ -466,29 +425,53 @@ void Renderer::setup_shader(std::shared_ptr<Shader> shader) {
     }
 }
 
-void Renderer::add_post_processing(const PostProcessing& post_processing) {
-    post_processings.push_back(post_processing);
+void Renderer::add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step) {
+    post_processing_context.steps.push_back(post_processing_step);
+    post_processing_step->prepare(post_processing_context);
 }
 
-void Renderer::end_post_processing_list() {
-    post_processings.push_back({
-
-    });
-}
-
-void Renderer::clear(int buffers) {
-    glClear(buffers);
-}
-
-void Renderer::draw_screen_quad(GLuint texture, std::shared_ptr<Shader> shader) {
-    shader->bind();
-    storage.quad_vertex_array->bind();
+void Renderer::draw_screen_quad(GLuint texture) {
+    storage.screen_quad_shader->bind();
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
-
-    glDisable(GL_DEPTH_TEST);  // TODO move this out
+    
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Renderer::post_processing() {
+    for (size_t i = 0; i < post_processing_context.steps.size(); i++) {
+        const PostProcessingStep* step = post_processing_context.steps[i].get();
+
+        if (!step->enabled) {
+            continue;
+        }
+
+        const FramebufferSpecification& specification = step->framebuffer->get_specification();
+
+        step->framebuffer->bind();
+        render_helpers::clear(render_helpers::Color);
+        render_helpers::viewport(specification.width, specification.height);
+        step->render(post_processing_context);
+        render_helpers::viewport(app->app_data.width, app->app_data.height);
+
+        post_processing_context.last_framebuffer = step->framebuffer->get_color_attachment(0);
+    }
+}
+
+void Renderer::end_rendering() {
+    storage.quad_vertex_array->bind();
+    post_processing_context.last_framebuffer = storage.intermediate_framebuffer->get_color_attachment(0);
+
+    glDisable(GL_DEPTH_TEST);
+
+    post_processing();
+
+    // Draw the final result to the screen
+    Framebuffer::bind_default();
+    render_helpers::clear(render_helpers::Color);
+    draw_screen_quad(post_processing_context.last_framebuffer);
+
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -720,4 +703,27 @@ void Renderer::maybe_initialize_assets() {
         *asset += PREFIX;
     }
 #endif
+}
+
+namespace render_helpers {
+    void clear(int buffers) {
+        glClear(buffers);
+    }
+
+    void viewport(int width, int height) {
+        glViewport(0, 0, width, height);
+    }
+
+    void clear_color(float red, float green, float blue) {
+        glClearColor(red, green, blue, 1.0f);
+    }
+
+    void bind_texture_2d(GLuint texture, int unit) {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
+
+    void draw_arrays(int count) {
+        glDrawArrays(GL_TRIANGLES, 0, count);
+    }
 }

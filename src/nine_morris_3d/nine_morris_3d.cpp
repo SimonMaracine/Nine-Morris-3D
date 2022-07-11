@@ -3,6 +3,7 @@
 #include <backends/imgui_impl_glfw.h>
 
 #include "application/platform.h"
+#include "graphics/renderer/renderer.h"
 #include "graphics/renderer/buffer_layout.h"
 #include "graphics/renderer/opengl/vertex_array.h"
 #include "graphics/renderer/opengl/buffer.h"
@@ -13,6 +14,9 @@
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/assets.h"
 #include "nine_morris_3d/assets_data.h"
+#include "nine_morris_3d/post_processing/bright_filter.h"
+#include "nine_morris_3d/post_processing/blur.h"
+#include "nine_morris_3d/post_processing/combine.h"
 #include "other/paths.h"
 #include "other/texture_data.h"
 #include "other/logging.h"
@@ -122,6 +126,77 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     data.good_dog_plain_font->end_baking();
 
     assets_data = std::make_shared<AssetsData>();
+
+    // Setup post-processing
+    {
+        FramebufferSpecification specification;
+        specification.width = app_data.width / 2;
+        specification.height = app_data.height / 2;
+        specification.resize_divisor = 2;
+        specification.color_attachments = {
+            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
+        };
+
+        std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
+
+        purge_framebuffers();
+        add_framebuffer(framebuffer);
+
+        std::shared_ptr<Shader> shader = Shader::create(
+            "data/shaders/post_processing/bright_filter.vert",
+            "data/shaders/post_processing/bright_filter.frag",
+            { "u_screen_texture" }
+        );
+
+        renderer->add_post_processing(std::make_shared<BrightFilter>(framebuffer, shader));
+    }
+    {
+        FramebufferSpecification specification;
+        specification.width = app_data.width / 4;
+        specification.height = app_data.height / 4;
+        specification.resize_divisor = 4;
+        specification.color_attachments = {
+            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
+        };
+
+        std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
+
+        purge_framebuffers();
+        add_framebuffer(framebuffer);
+
+        std::shared_ptr<Shader> shader = Shader::create(
+            "data/shaders/post_processing/blur.vert",
+            "data/shaders/post_processing/blur.frag",
+            { "u_screen_texture" }
+        );
+
+        renderer->add_post_processing(std::make_shared<Blur>(framebuffer, shader));
+    }
+    {
+        FramebufferSpecification specification;
+        specification.width = app_data.width;
+        specification.height = app_data.height;
+        specification.color_attachments = {
+            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
+        };
+
+        std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
+
+        purge_framebuffers();
+        add_framebuffer(framebuffer);
+
+        std::shared_ptr<Shader> shader = Shader::create(
+            "data/shaders/post_processing/combine.vert",
+            "data/shaders/post_processing/combine.frag",
+            { "u_screen_texture", "u_bright_texture" }
+        );
+
+        renderer->add_post_processing(std::make_shared<Combine>(
+            framebuffer,
+            shader,
+            renderer->get_intermediate_framebuffer()->get_color_attachment(0)
+        ));
+    }
 }
 
 NineMorris3D::~NineMorris3D() {

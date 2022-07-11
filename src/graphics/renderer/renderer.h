@@ -18,6 +18,12 @@
 #include "graphics/renderer/opengl/framebuffer.h"
 
 class Application;
+class PostProcessingStep;
+
+struct PostProcessingContext {
+    std::vector<std::shared_ptr<PostProcessingStep>> steps;
+    GLuint last_framebuffer = 0;
+};
 
 class Renderer {
 public:
@@ -46,29 +52,8 @@ public:
     };
 
     enum {
-        Color = GL_COLOR_BUFFER_BIT,
-        Depth = GL_DEPTH_BUFFER_BIT,
-        Stencil = GL_STENCIL_BUFFER_BIT
-    };
-
-    enum {
         WithOutline = 1 << 0,
         CastShadow = 1 << 1,
-    };
-
-    struct PostProcessing {
-        union {
-            struct {
-                std::shared_ptr<Framebuffer> framebuffer;
-                std::shared_ptr<Shader> shader;
-            } normal;
-
-            struct {
-                GLuint framebuffer;
-            } end;
-        };
-
-        bool enabled = true;
     };
 
     Renderer(Application* app);
@@ -85,13 +70,10 @@ public:
     void remove_quad(unsigned int handle);
 
     void setup_shader(std::shared_ptr<Shader> shader);
-    void add_post_processing(const PostProcessing& post_processing);
-    void end_post_processing_list();
+    void add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step);
 
     void clear();
 
-    void set_viewport(int width, int height);
-    void set_clear_color(float red, float green, float blue);
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void set_skybox(std::shared_ptr<Texture3D> texture);
     void set_depth_map_framebuffer(int size);
@@ -102,6 +84,7 @@ public:
     UniformBlockSpecification& get_light_view_position_uniform_block() { return storage.light_view_position_uniform_block; }
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
     std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
+    std::shared_ptr<Framebuffer> get_intermediate_framebuffer() { return storage.intermediate_framebuffer; }
 
 #ifdef PLATFORM_GAME_DEBUG
     std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }
@@ -125,8 +108,9 @@ public:
         float light_divisor = 1.0f;
     } light_space;
 private:
-    void clear(int buffers);
-    void draw_screen_quad(GLuint texture, std::shared_ptr<Shader> shader);
+    void draw_screen_quad(GLuint texture);
+    void post_processing();
+    void end_rendering();
     void draw_origin();
     void draw_skybox();
     void draw_model(const Model* model);
@@ -185,7 +169,7 @@ private:
 
     int shadow_map_size = 4096;
 
-    std::vector<PostProcessing> post_processings;
+    PostProcessingContext post_processing_context;
 
     std::string SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert";
     std::string SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag";
@@ -207,3 +191,17 @@ private:
 
     friend class Application;
 };
+
+namespace render_helpers {
+    enum {
+        Color = GL_COLOR_BUFFER_BIT,
+        Depth = GL_DEPTH_BUFFER_BIT,
+        Stencil = GL_STENCIL_BUFFER_BIT
+    };
+
+    void clear(int buffers);
+    void viewport(int width, int height);
+    void clear_color(float red, float green, float blue);
+    void bind_texture_2d(GLuint texture, int unit);
+    void draw_arrays(int count);
+}

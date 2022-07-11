@@ -169,8 +169,8 @@ void Framebuffer::resize(int width, int height) {
         return;
     }
 
-    this->specification.width = width;
-    this->specification.height = height;
+    specification.width = width / specification.resize_divisor;
+    specification.height = height / specification.resize_divisor;
 
     build();
 }

@@ -327,7 +327,7 @@ bool Application::on_window_closed(events::WindowClosedEvent& event) {
 }
 
 bool Application::on_window_resized(events::WindowResizedEvent& event) {
-    renderer->set_viewport(event.width, event.height);
+    render_helpers::viewport(event.width, event.height);
 
     for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
         std::shared_ptr<Framebuffer> fb = framebuffer.lock();

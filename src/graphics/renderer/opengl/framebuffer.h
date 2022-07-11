@@ -34,6 +34,7 @@ struct FramebufferSpecification {
 
     int samples = 1;
     bool resizable = true;
+    unsigned int resize_divisor = 1;
     bool white_border_for_depth_texture = false;
 };
 

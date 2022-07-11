@@ -150,14 +150,10 @@ GuiRenderer::GuiRenderer(Application* app)
     using namespace encryption;
 
     {
-        const std::vector<std::string> uniforms = {
-            "u_model_matrix",
-            "u_texture"
-        };
         storage.quad2d_shader = Shader::create(
             encr(paths::path_for_assets(QUAD2D_VERTEX_SHADER)),
             encr(paths::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
-            uniforms,
+            { "u_model_matrix", "u_texture" },
             { storage.projection_uniform_block }
         );
     }
