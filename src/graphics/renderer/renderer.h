@@ -22,7 +22,9 @@ class PostProcessingStep;
 
 struct PostProcessingContext {
     std::vector<std::shared_ptr<PostProcessingStep>> steps;
-    GLuint last_framebuffer = 0;
+    GLuint last_texture = 0;  // Last texture at any moment in the processing pipline
+    std::vector<GLuint> textures;  // All textures in order
+    GLuint original_texture = 0;
 };
 
 class Renderer {
@@ -79,12 +81,12 @@ public:
     void set_depth_map_framebuffer(int size);
 
     hoverable::Id get_hovered_id() { return hovered_id; }
+    PostProcessingContext& get_post_processing_context() { return post_processing_context; }
     UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
     UniformBlockSpecification& get_light_uniform_block() { return storage.light_uniform_block; }
     UniformBlockSpecification& get_light_view_position_uniform_block() { return storage.light_view_position_uniform_block; }
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
     std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
-    std::shared_ptr<Framebuffer> get_intermediate_framebuffer() { return storage.intermediate_framebuffer; }
 
 #ifdef PLATFORM_GAME_DEBUG
     std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }

@@ -39,6 +39,7 @@ public:
     virtual ~NineMorris3D();
 
     static void set_app_pointer(NineMorris3D* instance);
+    void set_bloom(bool enable);
 
     options::Options options;
     unsigned int arrow_cursor = 0;

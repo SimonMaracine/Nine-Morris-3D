@@ -440,6 +440,9 @@ void Renderer::draw_screen_quad(GLuint texture) {
 }
 
 void Renderer::post_processing() {
+    post_processing_context.original_texture = storage.intermediate_framebuffer->get_color_attachment(0);
+    post_processing_context.textures.clear();
+
     for (size_t i = 0; i < post_processing_context.steps.size(); i++) {
         const PostProcessingStep* step = post_processing_context.steps[i].get();
 
@@ -455,13 +458,14 @@ void Renderer::post_processing() {
         step->render(post_processing_context);
         render_helpers::viewport(app->app_data.width, app->app_data.height);
 
-        post_processing_context.last_framebuffer = step->framebuffer->get_color_attachment(0);
+        post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
+        post_processing_context.textures.push_back(step->framebuffer->get_color_attachment(0));
     }
 }
 
 void Renderer::end_rendering() {
     storage.quad_vertex_array->bind();
-    post_processing_context.last_framebuffer = storage.intermediate_framebuffer->get_color_attachment(0);
+    post_processing_context.last_texture = storage.intermediate_framebuffer->get_color_attachment(0);
 
     glDisable(GL_DEPTH_TEST);
 
@@ -470,7 +474,7 @@ void Renderer::end_rendering() {
     // Draw the final result to the screen
     Framebuffer::bind_default();
     render_helpers::clear(render_helpers::Color);
-    draw_screen_quad(post_processing_context.last_framebuffer);
+    draw_screen_quad(post_processing_context.last_texture);
 
     glEnable(GL_DEPTH_TEST);
 }

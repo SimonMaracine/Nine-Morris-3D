@@ -36,6 +36,7 @@ namespace options {
         bool hide_timer = false;
         bool labeled_board = true;
         bool normal_mapping = true;
+        bool bloom = true;
     };
 
     void save_options_to_file(const Options& options) noexcept(false);

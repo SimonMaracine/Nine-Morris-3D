@@ -150,6 +150,11 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
 
         renderer->add_post_processing(std::make_shared<BrightFilter>(framebuffer, shader));
     }
+    std::shared_ptr<Shader> blur_shader = Shader::create(
+        "data/shaders/post_processing/blur.vert",
+        "data/shaders/post_processing/blur.frag",
+        { "u_screen_texture" }
+    );
     {
         FramebufferSpecification specification;
         specification.width = app_data.width / 4;
@@ -164,13 +169,23 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         purge_framebuffers();
         add_framebuffer(framebuffer);
 
-        std::shared_ptr<Shader> shader = Shader::create(
-            "data/shaders/post_processing/blur.vert",
-            "data/shaders/post_processing/blur.frag",
-            { "u_screen_texture" }
-        );
+        renderer->add_post_processing(std::make_shared<Blur>(framebuffer, blur_shader));
+    }
+    {
+        FramebufferSpecification specification;
+        specification.width = app_data.width / 8;
+        specification.height = app_data.height / 8;
+        specification.resize_divisor = 8;
+        specification.color_attachments = {
+            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
+        };
 
-        renderer->add_post_processing(std::make_shared<Blur>(framebuffer, shader));
+        std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
+
+        purge_framebuffers();
+        add_framebuffer(framebuffer);
+
+        renderer->add_post_processing(std::make_shared<Blur>(framebuffer, blur_shader));
     }
     {
         FramebufferSpecification specification;
@@ -182,20 +197,16 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
 
         std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
 
-        purge_framebuffers();
-        add_framebuffer(framebuffer);
-
         std::shared_ptr<Shader> shader = Shader::create(
             "data/shaders/post_processing/combine.vert",
             "data/shaders/post_processing/combine.frag",
             { "u_screen_texture", "u_bright_texture" }
         );
 
-        renderer->add_post_processing(std::make_shared<Combine>(
-            framebuffer,
-            shader,
-            renderer->get_intermediate_framebuffer()->get_color_attachment(0)
-        ));
+        purge_framebuffers();
+        add_framebuffer(framebuffer);
+
+        renderer->add_post_processing(std::make_shared<Combine>(framebuffer, shader));
     }
 }
 
@@ -208,4 +219,13 @@ NineMorris3D::~NineMorris3D() {
 void NineMorris3D::set_app_pointer(NineMorris3D* instance) {
     ASSERT(app == nullptr, "App cannot be set twice");
     app = instance;
+}
+
+void NineMorris3D::set_bloom(bool enable) {
+    PostProcessingContext& context = renderer->get_post_processing_context();
+
+    for (size_t i = 0; i < context.steps.size(); i++) {
+        PostProcessingStep* step = context.steps[i].get();
+        step->enabled = enable;
+    }
 }

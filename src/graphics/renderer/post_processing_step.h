@@ -12,11 +12,11 @@ public:
 
     virtual void render(const PostProcessingContext& context) const = 0;
     virtual void prepare(const PostProcessingContext& context) const = 0;
+
+    bool enabled = true;
 protected:
     std::shared_ptr<Framebuffer> framebuffer;
     std::shared_ptr<Shader> shader;
-
-    bool enabled = true;
 
     friend class Renderer;
 };

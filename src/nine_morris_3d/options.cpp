@@ -41,6 +41,7 @@ namespace options {
         object["hide_timer"] = options.hide_timer;
         object["labeled_board"] = options.labeled_board;
         object["normal_mapping"] = options.normal_mapping;
+        object["bloom"] = options.bloom;
 
         file << std::setw(4) << object;
 
@@ -91,7 +92,8 @@ namespace options {
             options_file.sensitivity = object.at("sensitivity").get<float>();
             options_file.hide_timer = object.at("hide_timer").get<bool>();
             options_file.labeled_board = object.at("labeled_board").get<bool>();
-            options_file.normal_mapping= object.at("normal_mapping").get<bool>();
+            options_file.normal_mapping = object.at("normal_mapping").get<bool>();
+            options_file.bloom = object.at("bloom").get<bool>();
         } catch (const json::out_of_range& e) {
             throw OptionsFileError(e.what());
         } catch (const json::type_error& e) {
@@ -132,6 +134,7 @@ namespace options {
         options.hide_timer = options_file.hide_timer;
         options.labeled_board = options_file.labeled_board;
         options.normal_mapping = options_file.normal_mapping;
+        options.bloom = options_file.bloom;
 
         DEB_INFO("Loaded options from file '{}'", file_path);
     }
@@ -166,6 +169,7 @@ namespace options {
         object["hide_timer"] = options.hide_timer;
         object["labeled_board"] = options.labeled_board;
         object["normal_mapping"] = options.normal_mapping;
+        object["bloom"] = options.bloom;
 
         file << object.dump(4);
 

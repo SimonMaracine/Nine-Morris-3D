@@ -7,12 +7,10 @@
 
 class Combine : public PostProcessingStep {
 public:
-    Combine(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader, unsigned int screen_texture)
-        : PostProcessingStep(framebuffer, shader), screen_texture(screen_texture) {}
+    Combine(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
+        : PostProcessingStep(framebuffer, shader) {}
     virtual ~Combine() = default;
 
     virtual void render(const PostProcessingContext& context) const override;
     virtual void prepare(const PostProcessingContext& context) const override;
-private:
-    unsigned int screen_texture = 0;
 };

@@ -288,6 +288,17 @@ void ImGuiLayer::on_update(float dt) {
                         DEB_INFO("Normal mapping disabled");
                     }
                 }
+                if (ImGui::MenuItem("Bloom", nullptr, &app->options.bloom)) {
+                    if (app->options.bloom) {
+                        app->set_bloom(app->options.bloom);
+
+                        DEB_INFO("Bloom enabled");
+                    } else {
+                        app->set_bloom(app->options.bloom);
+
+                        DEB_INFO("Bloom disabled");
+                    }
+                }
 
                 ImGui::EndMenu();
                 HOVERING_GUI();

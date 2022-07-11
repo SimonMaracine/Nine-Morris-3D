@@ -4,7 +4,7 @@
 void Blur::render(const PostProcessingContext& context) const {
     shader->bind();
 
-    render_helpers::bind_texture_2d(context.last_framebuffer, 0);
+    render_helpers::bind_texture_2d(context.last_texture, 0);
     render_helpers::draw_arrays(6);
 }
 
