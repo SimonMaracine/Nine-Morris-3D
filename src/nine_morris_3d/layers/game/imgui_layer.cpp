@@ -299,6 +299,18 @@ void ImGuiLayer::on_update(float dt) {
                         DEB_INFO("Bloom disabled");
                     }
                 }
+                if (ImGui::BeginMenu("Bloom Strength")) {
+                    ImGui::PushItemWidth(100.0f);
+                    if (ImGui::SliderFloat("##", &app->options.bloom_strength, 0.1f, 1.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
+                        app->set_bloom_strength(app->options.bloom_strength);
+
+                        DEB_INFO("Changed bloom strength to {}", app->options.bloom_strength);
+                    }
+                    ImGui::PopItemWidth();
+
+                    ImGui::EndMenu();
+                    HOVERING_GUI();
+                }
 
                 ImGui::EndMenu();
                 HOVERING_GUI();

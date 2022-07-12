@@ -148,7 +148,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
             { "u_screen_texture" }
         );
 
-        renderer->add_post_processing(std::make_shared<BrightFilter>(framebuffer, shader));
+        renderer->add_post_processing(std::make_shared<BrightFilter>("bright_filter", framebuffer, shader));
     }
     std::shared_ptr<Shader> blur_shader = Shader::create(
         encr(path_for_assets(BLUR_VERTEX_SHADER)),
@@ -169,7 +169,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         purge_framebuffers();
         add_framebuffer(framebuffer);
 
-        renderer->add_post_processing(std::make_shared<Blur>(framebuffer, blur_shader));
+        renderer->add_post_processing(std::make_shared<Blur>("blur1", framebuffer, blur_shader));
     }
     {
         FramebufferSpecification specification;
@@ -185,7 +185,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         purge_framebuffers();
         add_framebuffer(framebuffer);
 
-        renderer->add_post_processing(std::make_shared<Blur>(framebuffer, blur_shader));
+        renderer->add_post_processing(std::make_shared<Blur>("blur2", framebuffer, blur_shader));
     }
     {
         FramebufferSpecification specification;
@@ -200,13 +200,15 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         std::shared_ptr<Shader> shader = Shader::create(
             encr(path_for_assets(COMBINE_VERTEX_SHADER)),
             encr(path_for_assets(COMBINE_FRAGMENT_SHADER)),
-            { "u_screen_texture", "u_bright_texture" }
+            { "u_screen_texture", "u_bright_texture", "u_strength" }
         );
 
         purge_framebuffers();
         add_framebuffer(framebuffer);
 
-        renderer->add_post_processing(std::make_shared<Combine>(framebuffer, shader));
+        std::shared_ptr<Combine> combine = std::make_shared<Combine>("combine", framebuffer, shader);
+        combine->strength = options.bloom_strength;
+        renderer->add_post_processing(combine);
     }
 }
 
@@ -228,4 +230,17 @@ void NineMorris3D::set_bloom(bool enable) {
         PostProcessingStep* step = context.steps[i].get();
         step->enabled = enable;
     }
+}
+
+void NineMorris3D::set_bloom_strength(float strength) {
+    PostProcessingContext& context = renderer->get_post_processing_context();
+
+    auto iter = std::find_if(context.steps.begin(), context.steps.end(), [](std::shared_ptr<PostProcessingStep> step) {
+        return step->get_id() == "combine";
+    });
+
+    ASSERT(iter != context.steps.end(), "Combine step must exist");
+
+    (*static_cast<Combine*>(iter->get())).strength = strength;
+    (*iter)->prepare(context);
 }

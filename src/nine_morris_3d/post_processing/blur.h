@@ -7,8 +7,8 @@
 
 class Blur : public PostProcessingStep {
 public:
-    Blur(std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
-        : PostProcessingStep(framebuffer, shader) {}
+    Blur(std::string_view id, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
+        : PostProcessingStep(id, framebuffer, shader) {}
     virtual ~Blur() = default;
 
     virtual void render(const PostProcessingContext& context) const override;

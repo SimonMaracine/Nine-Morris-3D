@@ -13,4 +13,5 @@ void Combine::prepare(const PostProcessingContext& context) const {
     shader->bind();
     shader->upload_uniform_int("u_screen_texture", 0);
     shader->upload_uniform_int("u_bright_texture", 1);
+    shader->upload_uniform_float("u_strength", strength);
 }

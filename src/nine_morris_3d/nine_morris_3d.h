@@ -40,6 +40,7 @@ public:
 
     static void set_app_pointer(NineMorris3D* instance);
     void set_bloom(bool enable);
+    void set_bloom_strength(float strength);
 
     options::Options options;
     unsigned int arrow_cursor = 0;

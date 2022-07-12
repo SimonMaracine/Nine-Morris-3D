@@ -42,6 +42,7 @@ namespace options {
         object["labeled_board"] = options.labeled_board;
         object["normal_mapping"] = options.normal_mapping;
         object["bloom"] = options.bloom;
+        object["bloom_strength"] = options.bloom_strength;
 
         file << std::setw(4) << object;
 
@@ -94,6 +95,7 @@ namespace options {
             options_file.labeled_board = object.at("labeled_board").get<bool>();
             options_file.normal_mapping = object.at("normal_mapping").get<bool>();
             options_file.bloom = object.at("bloom").get<bool>();
+            options_file.bloom_strength = object.at("bloom_strength").get<float>();
         } catch (const json::out_of_range& e) {
             throw OptionsFileError(e.what());
         } catch (const json::type_error& e) {
@@ -123,6 +125,10 @@ namespace options {
             throw OptionsFileError("Options file is invalid: sensitivity");
         }
 
+        if (options_file.bloom_strength < 0.1f || options_file.bloom_strength > 1.0f) {
+            throw OptionsFileError("Options file is invalid: bloom_strength");
+        }
+
         options.texture_quality = std::move(options_file.texture_quality);
         options.samples = options_file.samples;
         options.anisotropic_filtering = options_file.anisotropic_filtering;
@@ -135,6 +141,7 @@ namespace options {
         options.labeled_board = options_file.labeled_board;
         options.normal_mapping = options_file.normal_mapping;
         options.bloom = options_file.bloom;
+        options.bloom_strength = options_file.bloom_strength;
 
         DEB_INFO("Loaded options from file '{}'", file_path);
     }
@@ -170,6 +177,7 @@ namespace options {
         object["labeled_board"] = options.labeled_board;
         object["normal_mapping"] = options.normal_mapping;
         object["bloom"] = options.bloom;
+        object["bloom_strength"] = options.bloom_strength;
 
         file << object.dump(4);
 

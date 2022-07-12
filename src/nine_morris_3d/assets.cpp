@@ -73,10 +73,10 @@ namespace assets {
     std::string PIECE_NO_NORMAL_VERTEX_SHADER = "data/shaders/piece/piece_no_normal.vert";
     std::string PIECE_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/piece/piece_no_normal.frag";
 
-    std::string BRIGHT_FILTER_VERTEX_SHADER = "data/shaders/post_processing/blur.vert";
-    std::string BRIGHT_FILTER_FRAGMENT_SHADER = "data/shaders/post_processing/blur.frag";
-    std::string BLUR_VERTEX_SHADER = "data/shaders/post_processing/bright_filter.vert";
-    std::string BLUR_FRAGMENT_SHADER = "data/shaders/post_processing/bright_filter.frag";
+    std::string BRIGHT_FILTER_VERTEX_SHADER = "data/shaders/post_processing/bright_filter.vert";
+    std::string BRIGHT_FILTER_FRAGMENT_SHADER = "data/shaders/post_processing/bright_filter.frag";
+    std::string BLUR_VERTEX_SHADER = "data/shaders/post_processing/blur.vert";
+    std::string BLUR_FRAGMENT_SHADER = "data/shaders/post_processing/blur.frag";
     std::string COMBINE_VERTEX_SHADER = "data/shaders/post_processing/combine.vert";
     std::string COMBINE_FRAGMENT_SHADER = "data/shaders/post_processing/combine.frag";
 

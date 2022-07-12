@@ -441,6 +441,7 @@ void Renderer::draw_screen_quad(GLuint texture) {
 
 void Renderer::post_processing() {
     post_processing_context.original_texture = storage.intermediate_framebuffer->get_color_attachment(0);
+    post_processing_context.last_texture = storage.intermediate_framebuffer->get_color_attachment(0);
     post_processing_context.textures.clear();
 
     for (size_t i = 0; i < post_processing_context.steps.size(); i++) {
@@ -465,7 +466,6 @@ void Renderer::post_processing() {
 
 void Renderer::end_rendering() {
     storage.quad_vertex_array->bind();
-    post_processing_context.last_texture = storage.intermediate_framebuffer->get_color_attachment(0);
 
     glDisable(GL_DEPTH_TEST);
 

@@ -37,6 +37,7 @@ namespace options {
         bool labeled_board = true;
         bool normal_mapping = true;
         bool bloom = true;
+        float bloom_strength = 0.3f;
     };
 
     void save_options_to_file(const Options& options) noexcept(false);
