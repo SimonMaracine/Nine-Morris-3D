@@ -7,7 +7,7 @@ layout (location = 0) out vec4 fragment_color;
 uniform sampler2D u_screen_texture;
 uniform sampler2D u_bright_texture;
 
-const float strength = 0.4;
+const float strength = 0.5;
 
 void main() {
     const vec4 screen_color = texture(u_screen_texture, v_texture_coordinate);

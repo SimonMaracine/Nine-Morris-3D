@@ -75,6 +75,13 @@ namespace assets {
     extern std::string PIECE_NO_NORMAL_VERTEX_SHADER;
     extern std::string PIECE_NO_NORMAL_FRAGMENT_SHADER;
 
+    extern std::string BRIGHT_FILTER_VERTEX_SHADER;
+    extern std::string BRIGHT_FILTER_FRAGMENT_SHADER;
+    extern std::string BLUR_VERTEX_SHADER;
+    extern std::string BLUR_FRAGMENT_SHADER;
+    extern std::string COMBINE_VERTEX_SHADER;
+    extern std::string COMBINE_FRAGMENT_SHADER;
+
     extern std::string ICON_512;
     extern std::string ICON_256;
     extern std::string ICON_128;

@@ -143,16 +143,16 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         add_framebuffer(framebuffer);
 
         std::shared_ptr<Shader> shader = Shader::create(
-            "data/shaders/post_processing/bright_filter.vert",
-            "data/shaders/post_processing/bright_filter.frag",
+            encr(path_for_assets(BRIGHT_FILTER_VERTEX_SHADER)),
+            encr(path_for_assets(BRIGHT_FILTER_FRAGMENT_SHADER)),
             { "u_screen_texture" }
         );
 
         renderer->add_post_processing(std::make_shared<BrightFilter>(framebuffer, shader));
     }
     std::shared_ptr<Shader> blur_shader = Shader::create(
-        "data/shaders/post_processing/blur.vert",
-        "data/shaders/post_processing/blur.frag",
+        encr(path_for_assets(BLUR_VERTEX_SHADER)),
+        encr(path_for_assets(BLUR_FRAGMENT_SHADER)),
         { "u_screen_texture" }
     );
     {
@@ -198,8 +198,8 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
 
         std::shared_ptr<Shader> shader = Shader::create(
-            "data/shaders/post_processing/combine.vert",
-            "data/shaders/post_processing/combine.frag",
+            encr(path_for_assets(COMBINE_VERTEX_SHADER)),
+            encr(path_for_assets(COMBINE_FRAGMENT_SHADER)),
             { "u_screen_texture", "u_bright_texture" }
         );
 

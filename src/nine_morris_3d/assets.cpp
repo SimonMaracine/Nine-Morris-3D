@@ -73,6 +73,13 @@ namespace assets {
     std::string PIECE_NO_NORMAL_VERTEX_SHADER = "data/shaders/piece/piece_no_normal.vert";
     std::string PIECE_NO_NORMAL_FRAGMENT_SHADER = "data/shaders/piece/piece_no_normal.frag";
 
+    std::string BRIGHT_FILTER_VERTEX_SHADER = "data/shaders/post_processing/blur.vert";
+    std::string BRIGHT_FILTER_FRAGMENT_SHADER = "data/shaders/post_processing/blur.frag";
+    std::string BLUR_VERTEX_SHADER = "data/shaders/post_processing/bright_filter.vert";
+    std::string BLUR_FRAGMENT_SHADER = "data/shaders/post_processing/bright_filter.frag";
+    std::string COMBINE_VERTEX_SHADER = "data/shaders/post_processing/combine.vert";
+    std::string COMBINE_FRAGMENT_SHADER = "data/shaders/post_processing/combine.frag";
+
     std::string ICON_512 = "data/icons/512x512/ninemorris3d.png";
     std::string ICON_256 = "data/icons/256x256/ninemorris3d.png";
     std::string ICON_128 = "data/icons/128x128/ninemorris3d.png";
@@ -86,7 +93,7 @@ namespace assets {
 #ifdef PLATFORM_GAME_RELEASE
         static const char* PREFIX = ".dat";
 
-        static constexpr std::array<std::string*, 65> assets = {
+        static constexpr std::array<std::string*, 71> assets = {
             &BOARD_WOOD_MESH,
             &BOARD_PAINT_MESH,
             &NODE_MESH,
@@ -155,6 +162,13 @@ namespace assets {
             &BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER,
             &PIECE_NO_NORMAL_VERTEX_SHADER,
             &PIECE_NO_NORMAL_FRAGMENT_SHADER,
+
+            &BRIGHT_FILTER_VERTEX_SHADER,
+            &BRIGHT_FILTER_FRAGMENT_SHADER,
+            &BLUR_VERTEX_SHADER,
+            &BLUR_FRAGMENT_SHADER,
+            &COMBINE_VERTEX_SHADER,
+            &COMBINE_FRAGMENT_SHADER,
 
             &ARROW_CURSOR,
             &CROSS_CURSOR

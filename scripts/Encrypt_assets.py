@@ -50,6 +50,13 @@ encrypt(r"shaders\piece\piece.frag")
 encrypt(r"shaders\piece\piece_no_normal.vert")
 encrypt(r"shaders\piece\piece_no_normal.frag")
 
+encrypt(r"data\shaders\post_processing\blur.vert")
+encrypt(r"data\shaders\post_processing\blur.frag")
+encrypt(r"data\shaders\post_processing\bright_filter.vert")
+encrypt(r"data\shaders\post_processing\bright_filter.frag")
+encrypt(r"data\shaders\post_processing\combine.vert")
+encrypt(r"data\shaders\post_processing\combine.frag")
+
 encrypt(r"textures\board\board_normal.png")
 encrypt(r"textures\board\board_normal-small.png")
 encrypt(r"textures\board\paint\board_paint.png")
