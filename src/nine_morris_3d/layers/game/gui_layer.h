@@ -18,10 +18,13 @@ public:
 
     Timer timer;
     bool show_wait_indicator = false;
+    bool show_computer_thinking_indicator = false;
 
     std::shared_ptr<gui::Image> turn_indicator;
     std::shared_ptr<gui::Text> timer_text;
     std::shared_ptr<gui::Image> wait_indicator;
+    std::shared_ptr<gui::Image> computer_thinking_indicator;
+    std::shared_ptr<Texture> t;
 
     GameLayer* game_layer = nullptr;
 };

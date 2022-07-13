@@ -18,6 +18,9 @@ SOME CREDITS:
 Hourglass icon:
     https://www.flaticon.com/free-icons/hourglass
 
+Computer icon:
+    https://www.flaticon.com/free-icons/computer
+
 Normal texture:
     https://www.goodtextures.com/image/19816/wood-plain-04-normal
 

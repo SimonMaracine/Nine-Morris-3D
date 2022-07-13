@@ -9,6 +9,8 @@
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/keyboard_controls.h"
+#include "nine_morris_3d/game_context.h"
+#include "nine_morris_3d/minimax/minimax_thread.h"
 #include "other/mesh.h"
 #include "other/loader.h"
 
@@ -91,6 +93,8 @@ public:
     Board board;
     StateHistory state_history;
     KeyboardControls keyboard;
+    GameContext game;
+    MinimaxThread minimax_thread;
 
     float mouse_wheel = 0.0f;
     float dx = 0.0f;

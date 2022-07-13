@@ -6,14 +6,14 @@
 #include "application/input.h"
 #include "graphics/debug_opengl.h"
 #include "nine_morris_3d/nine_morris_3d.h"
-#include "nine_morris_3d/layers/game/game_layer.h"
-#include "nine_morris_3d/layers/game/imgui_layer.h"
-#include "nine_morris_3d/layers/game/gui_layer.h"
-#include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/assets.h"
+#include "nine_morris_3d/game_context.h"
+#include "nine_morris_3d/layers/game/game_layer.h"
+#include "nine_morris_3d/layers/game/imgui_layer.h"
+#include "nine_morris_3d/layers/game/gui_layer.h"
 #include "other/paths.h"
 #include "other/logging.h"
 #include "other/assert.h"
@@ -158,6 +158,43 @@ void ImGuiLayer::on_update(float dt) {
                 }
 
                 last_save_game_date = std::move(state.date);
+            }
+            if (ImGui::BeginMenu("Players")) {
+                if (ImGui::BeginMenu("White")) {
+                    static int option = 0;
+                    if (ImGui::RadioButton("Human", &option, 0)) {
+                        game_layer->game.white_player = GamePlayer::Human;
+
+                        DEB_DEBUG("Set white player to human");
+                    }
+                    if (ImGui::RadioButton("Computer", &option, 1)) {
+                        game_layer->game.white_player = GamePlayer::Computer;
+
+                        DEB_DEBUG("Set white player to computer");
+                    }
+
+                    ImGui::EndMenu();
+                    HOVERING_GUI();
+                }
+                if (ImGui::BeginMenu("Black")) {
+                    static int option = 1;
+                    if (ImGui::RadioButton("Human", &option, 0)) {
+                        game_layer->game.black_player = GamePlayer::Human;
+
+                        DEB_DEBUG("Set black player to human");
+                    }
+                    if (ImGui::RadioButton("Computer", &option, 1)) {
+                        game_layer->game.black_player = GamePlayer::Computer;
+
+                        DEB_DEBUG("Set black player to computer");
+                    }
+
+                    ImGui::EndMenu();
+                    HOVERING_GUI();
+                }
+
+                ImGui::EndMenu();
+                HOVERING_GUI();
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
                 const bool undid_game_over = game_layer->board.undo();
@@ -489,7 +526,7 @@ bool ImGuiLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& even
 // TODO think about to include this or not
 bool ImGuiLayer::on_key_pressed(events::KeyPressedEvent& event) {
     if (event.repeat) {
-        return false;
+        return hovering_gui;
     }
 
     if (event.control) {
@@ -503,7 +540,7 @@ bool ImGuiLayer::on_key_pressed(events::KeyPressedEvent& event) {
         }
     }
 
-    return false;
+    return hovering_gui;
 }
 
 void ImGuiLayer::draw_game_over() {
@@ -746,6 +783,7 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Selected piece: %p", game_layer->board.selected_piece);
         ImGui::Text("Next move: %s", game_layer->board.next_move ? "true" : "false");
         ImGui::Text("Game started: %s", game_layer->first_move ? "true" : "false");
+        ImGui::Text("Game state: %d", game_layer->game.state);
         ImGui::End();
 
         ImGui::Begin("Light Settings");

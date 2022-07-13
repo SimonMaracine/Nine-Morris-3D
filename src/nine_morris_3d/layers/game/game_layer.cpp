@@ -17,14 +17,16 @@
 #include "graphics/renderer/opengl/framebuffer.h"
 #include "graphics/renderer/opengl/buffer.h"
 #include "nine_morris_3d/nine_morris_3d.h"
-#include "nine_morris_3d/layers/game/game_layer.h"
-#include "nine_morris_3d/layers/game/imgui_layer.h"
-#include "nine_morris_3d/layers/game/gui_layer.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/save_load.h"
 #include "nine_morris_3d/assets.h"
+#include "nine_morris_3d/keyboard_controls.h"
+#include "nine_morris_3d/game_context.h"
+#include "nine_morris_3d/layers/game/game_layer.h"
+#include "nine_morris_3d/layers/game/imgui_layer.h"
+#include "nine_morris_3d/layers/game/gui_layer.h"
 #include "other/paths.h"
 #include "other/mesh.h"
 #include "other/loader.h"
@@ -88,6 +90,9 @@ void GameLayer::on_attach() {
 
     keyboard = KeyboardControls(&board);
     keyboard.initialize();
+
+    minimax_thread = MinimaxThread(&board);
+    game = GameContext(&board, &minimax_thread);
 
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
@@ -174,17 +179,19 @@ void GameLayer::on_awake() {
     setup_skybox();
     setup_light();
 
-    TextureSpecification specification;
-    specification.min_filter = Filter::Linear;
-    specification.mag_filter = Filter::Linear;
+    {
+        TextureSpecification specification;
+        specification.min_filter = Filter::Linear;
+        specification.mag_filter = Filter::Linear;
 
-    app->data.keyboard_controls_texture = Texture::create(app->assets_data->keyboard_controls_texture, specification);
-    app->data.keyboard_controls_cross_texture = Texture::create(app->assets_data->keyboard_controls_cross_texture, specification);
+        app->data.keyboard_controls_texture = Texture::create(app->assets_data->keyboard_controls_texture, specification);
+        app->data.keyboard_controls_cross_texture = Texture::create(app->assets_data->keyboard_controls_cross_texture, specification);
 
 #ifdef PLATFORM_GAME_DEBUG
-    light_bulb_texture = Texture::create("data/textures/internal/light_bulb/light_bulb.png", specification);
-    light_bulb_quad.texture = light_bulb_texture;
+        light_bulb_texture = Texture::create("data/textures/internal/light_bulb/light_bulb.png", specification);
+        light_bulb_quad.texture = light_bulb_texture;
 #endif
+    }
 }
 
 void GameLayer::on_update(float dt) {
@@ -194,6 +201,93 @@ void GameLayer::on_update(float dt) {
     board.move_pieces(dt);
     board.update_nodes(app->renderer->get_hovered_id());
     board.update_pieces(app->renderer->get_hovered_id());
+
+    switch (game.state) {
+        case GameState::NextPlayer:
+            switch (board.turn) {
+                case Board::Player::White:
+                    switch (game.white_player) {
+                        case GamePlayer::None:
+                            ASSERT(false, "Player must not be None");
+                            break;
+                        case GamePlayer::Human:
+                            game.state = GameState::HumanBeginMove;
+                            break;
+                        case GamePlayer::Computer:
+                            game.state = GameState::ComputerBeginMove;
+                            break;
+                    }
+                    break;
+                case Board::Player::Black:
+                    switch (game.black_player) {
+                        case GamePlayer::None:
+                            ASSERT(false, "Player must not be None");
+                            break;
+                        case GamePlayer::Human:
+                            game.state = GameState::HumanBeginMove;
+                            break;
+                        case GamePlayer::Computer:
+                            game.state = GameState::ComputerBeginMove;
+                            break;
+                    }
+                    break;
+            }
+            break;
+        case GameState::HumanBeginMove:
+            game.begin_human_move();
+            game.state = GameState::HumanThinkingMove;
+            break;
+        case GameState::HumanThinkingMove:
+            break;
+        case GameState::HumanDoingMove:
+            if (board.next_move) {
+                game.state = GameState::HumanEndMove;
+            }
+            break;
+        case GameState::HumanEndMove:
+            game.end_human_move();
+            game.state = GameState::NextPlayer;
+            break;
+        case GameState::ComputerBeginMove:
+            game.begin_computer_move();
+            game.state = GameState::ComputerThinkingMove;
+            break;
+        case GameState::ComputerThinkingMove:
+            if (!minimax_thread.is_running()) {
+                minimax_thread.join();
+                game.state = GameState::ComputerDoingMove;
+            }
+            break;
+        case GameState::ComputerDoingMove:
+            game.end_computer_move();
+
+            board.get_switched_turn();  // Just flush variable
+
+            if (!first_move && !gui_layer->timer.get_running()) {
+                gui_layer->timer.start(app->window->get_time());
+                first_move = true;
+            }
+
+            if (board.phase == Board::Phase::GameOver) {
+                gui_layer->timer.stop();
+            }
+
+            if (board.redo_state_history->empty()) {
+                imgui_layer->can_redo = false;
+            }
+
+            game.state = GameState::ComputerEndMove;
+            break;
+        case GameState::ComputerEndMove:
+            if (board.next_move) {
+                // if (board.get_switched_turn()) {  // TODO think about this
+                game.state = GameState::NextPlayer;
+                // } else {
+                //     game.state = GameState::ComputerBeginMove;
+                // }
+            }
+            break;
+    }
 
     mouse_wheel = 0.0f;
     dx = 0.0f;
@@ -286,7 +380,7 @@ bool GameLayer::on_mouse_button_pressed(events::MouseButtonPressedEvent& event) 
 
 bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event) {
     if (event.button == input::MouseButton::LEFT) {
-        if (board.next_move) {
+        if (board.next_move && board.is_players_turn) {
             bool did = false;
 
             if (board.phase == Board::Phase::PlacePieces) {
@@ -303,6 +397,21 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                     did = board.put_down_piece(app->renderer->get_hovered_id());
                 }
             }
+
+            if (did) {
+                game.state = GameState::HumanDoingMove;
+            }
+
+            // if (board.get_switched_turn()) {
+            //     switch (board.turn) {
+            //         case Board::Player::White:
+            //             players.end_move(players.black_player);
+            //             break;
+            //         case Board::Player::Black:
+            //             players.end_move(players.white_player);
+            //             break;
+            //     }
+            // }
 
             if (did && !first_move && !gui_layer->timer.get_running()) {
                 gui_layer->timer.start(app->window->get_time());
@@ -381,8 +490,24 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
             break;
         }
         case input::Key::ENTER: {
-            if (board.next_move) {
+            if (board.next_move && board.is_players_turn) {
                 const bool did = keyboard.press(first_move);
+
+                if (did) {
+                    game.state = GameState::HumanDoingMove;
+                }
+
+                // TODO this had its use, but now don't know
+                // if (board.get_switched_turn()) {
+                //     switch (board.turn) {
+                //         case Board::Player::White:
+                //             players.end_move(players.black_player);
+                //             break;
+                //         case Board::Player::Black:
+                //             players.end_move(players.white_player);
+                //             break;
+                //     }
+                // }
 
                 if (did && !first_move && !gui_layer->timer.get_running()) {
                     gui_layer->timer.start(app->window->get_time());
@@ -390,7 +515,7 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
                 }
 
                 if (board.phase == Board::Phase::GameOver) {
-                    gui_layer->timer.stop();  // FIXME this at the end
+                    gui_layer->timer.stop();
                 }
 
                 if (board.redo_state_history->empty()) {

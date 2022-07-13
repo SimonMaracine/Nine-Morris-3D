@@ -48,7 +48,6 @@ void Material::add_variable(UniformType type, std::string_view name) {
             break;
         default:
             ASSERT(false, "Unknown uniform type");
-            break;
     }
 }
 

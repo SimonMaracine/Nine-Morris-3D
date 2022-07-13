@@ -11,10 +11,11 @@
 struct StateHistory;
 class KeyboardControls;
 
+using PosValue = Piece::Type;
+using GamePosition = std::array<Piece::Type, 24>;
+
 class Board {
 public:
-    using GamePosition = std::array<Piece::Type, 24>;
-
     enum class Phase {
         None,
         PlacePieces = 1,
@@ -41,10 +42,13 @@ public:
     static void copy_smart(Board& to, const Board& from, StateHistory* state_history);
 
     bool place_piece(hoverable::Id hovered_id);
-    void move_pieces(float dt);
     bool take_piece(hoverable::Id hovered_id);
-    void select_piece(hoverable::Id hovered_id);
     bool put_down_piece(hoverable::Id hovered_id);
+    void computer_place_piece(size_t node_index);
+    void computer_take_piece(size_t node_index);
+    void computer_put_down_piece(size_t source_node_index, size_t destination_node_index);
+    void move_pieces(float dt);
+    void select_piece(hoverable::Id hovered_id);
     void press(hoverable::Id hovered_id);
     void release();
     bool undo();
@@ -55,6 +59,8 @@ public:
     void update_nodes(hoverable::Id hovered_id);
     void update_pieces(hoverable::Id hovered_id);
     std::string_view get_ending_message();
+    GamePosition get_position();
+    bool get_switched_turn();
 
     Renderer::Model model;
     Renderer::Model paint_model;
@@ -105,6 +111,8 @@ public:
     std::vector<Board>* redo_state_history = nullptr;
     KeyboardControls* keyboard = nullptr;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
+    bool is_players_turn = true;
+    bool switched_turn = false;
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);
@@ -119,7 +127,6 @@ private:
     bool can_go(Node* source_node, Node* destination_node);
     void check_player_number_of_pieces(Player player);
     bool is_player_blocked(Player player);
-    GamePosition get_position();
     void remember_position_and_check_repetition(Piece* piece, Node* node);
     void remember_state();
     void arrive_at_node(Piece* piece);

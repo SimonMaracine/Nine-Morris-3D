@@ -202,62 +202,6 @@ bool Board::place_piece(hoverable::Id hovered_id) {
     return placed;
 }
 
-void Board::move_pieces(float dt) {
-    GET_ACTIVE_PIECES(active_pieces)
-
-    for (Piece* piece : active_pieces) {
-        if (piece->should_move) {
-            switch (piece->movement.type) {
-                case Piece::MovementType::None:
-                    ASSERT(false, "Movement type None is invalid");
-                    break;
-                case Piece::MovementType::Linear: {
-                    piece->model.position += piece->movement.velocity * dt + (piece->movement.target - piece->model.position)
-                            * PIECE_VARIABLE_VELOCITY * dt;
-
-                    if (glm::length(piece->movement.target - piece->model.position) < 0.03f) {
-                        arrive_at_node(piece);
-                    }
-
-                    break;
-                }
-                case Piece::MovementType::ThreeStep: {
-                    if (!piece->movement.reached_target0) {
-                        piece->model.position += piece->movement.velocity * dt + (piece->movement.target0 - piece->model.position)
-                                * PIECE_VARIABLE_VELOCITY * dt;
-                    } else if (!piece->movement.reached_target1) {
-                        piece->model.position += piece->movement.velocity * dt + (piece->movement.target1 - piece->model.position)
-                                * PIECE_VARIABLE_VELOCITY * dt;
-                    } else {
-                        piece->model.position += piece->movement.velocity * dt + (piece->movement.target - piece->model.position)
-                                * PIECE_VARIABLE_VELOCITY * dt;
-                    }
-
-                    if (!piece->movement.reached_target0 &&
-                            glm::length(piece->movement.target0 - piece->model.position) < 0.03f) {
-                        piece->movement.reached_target0 = true;
-                        piece->model.position = piece->movement.target0;
-                        piece->movement.velocity = glm::normalize(piece->movement.target1 - piece->model.position)
-                                * PIECE_BASE_VELOCITY;
-                    } else if (!piece->movement.reached_target1 &&
-                            glm::length(piece->movement.target1 - piece->model.position) < 0.03f) {
-                        piece->movement.reached_target1 = true;
-                        piece->model.position = piece->movement.target1;
-                        piece->movement.velocity = glm::normalize(piece->movement.target - piece->model.position)
-                                * PIECE_BASE_VELOCITY;
-                    }
-
-                    if (glm::length(piece->movement.target - piece->model.position) < 0.03f) {
-                        arrive_at_node(piece);
-                    }
-
-                    break;
-                }
-            }
-        }
-    }
-}
-
 bool Board::take_piece(hoverable::Id hovered_id) {
     bool took = false;
 
@@ -370,28 +314,6 @@ bool Board::take_piece(hoverable::Id hovered_id) {
     return took;
 }
 
-void Board::select_piece(hoverable::Id hovered_id) {
-    GET_ACTIVE_PIECES(active_pieces)
-
-    for (Piece* piece : active_pieces) {
-        if (piece->id == hovered_id) {
-            if (turn == Player::White && piece->type == Piece::White ||
-                    turn == Player::Black && piece->type == Piece::Black) {
-                if (!piece->selected && !piece->pending_remove) {
-                    selected_piece = piece;
-                    piece->selected = true;
-                    unselect_other_pieces(piece);
-                } else {
-                    selected_piece = nullptr;
-                    piece->selected = false;
-                }
-            }
-
-            break;
-        }
-    }
-}
-
 bool Board::put_down_piece(hoverable::Id hovered_id) {
     bool put = false;
 
@@ -486,6 +408,360 @@ bool Board::put_down_piece(hoverable::Id hovered_id) {
     }
 
     return put;
+}
+
+void Board::computer_place_piece(size_t node_index) {
+    for (Node& node : nodes) {
+        if (node.index == node_index) {
+            ASSERT(node.piece == nullptr, "Node must not already have a piece");
+
+            remember_state();
+            WAIT_FOR_NEXT_MOVE();
+
+            const glm::vec3& position = node.model.position;
+
+            if (turn == Player::White) {
+                node.piece = new_piece_to_place(Piece::White, position.x, position.z, &node);
+                node.piece_index = node.piece->index;
+                white_pieces_count++;
+                not_placed_white_pieces_count--;
+            } else {
+                node.piece = new_piece_to_place(Piece::Black, position.x, position.z, &node);
+                node.piece_index = node.piece->index;
+                black_pieces_count++;
+                not_placed_black_pieces_count--;
+            }
+
+            if (is_windmill_made(&node, TURN_IS_WHITE_SO(Piece::White, Piece::Black))) {
+                DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
+
+                should_take_piece = true;
+                update_cursor();
+
+                if (turn == Player::White) {
+                    set_pieces_to_take(Piece::Black, true);
+                } else {
+                    set_pieces_to_take(Piece::White, true);
+                }
+            } else {
+                check_player_number_of_pieces(turn);
+                switch_turn();
+
+                if (not_placed_pieces_count() == 0) {
+                    phase = Phase::MovePieces;
+                    update_outlines();
+
+                    DEB_INFO("Phase 2");
+
+                    if (is_player_blocked(turn)) {
+                        DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+
+                        FORMATTED_MESSAGE(
+                            message, 64, "%s player has blocked %s player.",
+                            TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
+                        )
+
+                        game_over(
+                            TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
+                            TURN_IS_WHITE_SO(Piece::White, Piece::Black),
+                            message
+                        );
+                    }
+                }
+            }
+
+            break;
+        }
+    }
+}
+
+void Board::computer_take_piece(size_t node_index) {
+    GET_ACTIVE_PIECES(active_pieces)
+
+    size_t piece_index = INVALID_PIECE_INDEX;
+    for (Node& node : nodes) {
+        if (node.index == node_index) {
+            piece_index = node.piece_index;
+            break;
+        }
+    }
+    ASSERT(piece_index != INVALID_PIECE_INDEX, "Piece index must be valid");
+
+    for (Piece* piece : active_pieces) {
+        if (turn == Player::White) {
+            if (piece->index == piece_index && piece->type == Piece::Black) {
+                if (!is_windmill_made(piece->node, Piece::Black) ||
+                        number_of_pieces_in_windmills(Piece::Black) == black_pieces_count) {
+                    ASSERT(piece->in_use, "Piece must be in use");
+
+                    remember_state();
+                    WAIT_FOR_NEXT_MOVE();
+
+                    piece->node->piece = nullptr;
+                    piece->node->piece_index = INVALID_PIECE_INDEX;
+                    take_and_raise_piece(piece);
+                    should_take_piece = false;
+                    update_cursor();
+                    set_pieces_to_take(Piece::Black, false);
+                    black_pieces_count--;
+                    check_player_number_of_pieces(Player::Black);
+                    check_player_number_of_pieces(Player::White);
+                    switch_turn();
+                    update_outlines();
+
+                    DEB_DEBUG("Black piece {} taken", piece->id);
+
+                    if (is_player_blocked(turn)) {
+                        DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+
+                        FORMATTED_MESSAGE(
+                            message, 64, "%s player has blocked %s player.",
+                            TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("White", "Black")
+                        )
+
+                        game_over(
+                            TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
+                            TURN_IS_WHITE_SO(Piece::White, Piece::Black),
+                            message
+                        );
+                    }
+                } else {
+                    DEB_DEBUG("Cannot take piece from windmill");
+                }
+
+                break;
+            }
+        } else {
+            if (piece->index == piece_index && piece->type == Piece::White) {
+                if (!is_windmill_made(piece->node, Piece::White) ||
+                        number_of_pieces_in_windmills(Piece::White) == white_pieces_count) {
+                    ASSERT(piece->in_use, "Piece must be in use");
+
+                    remember_state();
+                    WAIT_FOR_NEXT_MOVE();
+
+                    piece->node->piece = nullptr;
+                    piece->node->piece_index = INVALID_PIECE_INDEX;
+                    take_and_raise_piece(piece);
+                    should_take_piece = false;
+                    update_cursor();
+                    set_pieces_to_take(Piece::White, false);
+                    white_pieces_count--;
+                    check_player_number_of_pieces(Player::White);
+                    check_player_number_of_pieces(Player::Black);
+                    switch_turn();
+                    update_outlines();
+
+                    DEB_DEBUG("White piece {} taken", piece->id);
+
+                    if (is_player_blocked(turn)) {
+                        DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+
+                        FORMATTED_MESSAGE(
+                            message, 64, "%s player has blocked %s player.",
+                            TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
+                        )
+
+                        game_over(
+                            TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
+                            TURN_IS_WHITE_SO(Piece::White, Piece::Black),
+                            message
+                        );
+                    }
+                } else {
+                    DEB_DEBUG("Cannot take piece from windmill");
+                }
+
+                break;
+            }
+        }
+    }
+
+    // Do this even if it may not be needed
+    if (not_placed_pieces_count() == 0 && !should_take_piece && phase != Phase::GameOver) {
+        phase = Phase::MovePieces;
+        update_outlines();
+
+        DEB_INFO("Phase 2");
+    }
+}
+
+void Board::computer_put_down_piece(size_t source_node_index, size_t destination_node_index) {
+    ASSERT(source_node_index != destination_node_index, "Source must not equal the destination");
+
+    // Save the selected piece and the node from where it was
+    Piece* piece_put = nullptr;
+    Node* node_from = nullptr;
+
+    Piece* chosen_piece = nullptr;
+    for (Node& node : nodes) {
+        if (node.index == source_node_index) {
+            ASSERT(node.piece != nullptr, "Piece must not be null");
+            chosen_piece = node.piece;
+            break;
+        }
+    }
+
+    for (Node& node : nodes) {
+        if (node.index == destination_node_index && can_go(chosen_piece->node, &node)) {
+            ASSERT(node.piece == nullptr, "Piece must not be null");
+            remember_state();
+            WAIT_FOR_NEXT_MOVE();
+
+            if (chosen_piece->type == Piece::White && can_jump[static_cast<int>(Piece::White)] ||
+                    chosen_piece->type == Piece::Black && can_jump[static_cast<int>(Piece::Black)]) {
+                const glm::vec3 target = glm::vec3(node.model.position.x, PIECE_Y_POSITION, node.model.position.z);
+                const glm::vec3 target0 = chosen_piece->model.position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+                const glm::vec3 target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+                const glm::vec3 velocity = glm::normalize(target0 - chosen_piece->model.position) * PIECE_BASE_VELOCITY;
+
+                prepare_piece_for_three_step_move(chosen_piece, target, velocity, target0, target1);
+            } else {
+                const glm::vec3 target = glm::vec3(node.model.position.x, PIECE_Y_POSITION, node.model.position.z);
+
+                prepare_piece_for_linear_move(
+                    chosen_piece,
+                    target,
+                    glm::normalize(target - chosen_piece->model.position) * PIECE_BASE_VELOCITY
+                );
+            }
+
+            // Reset all of these
+            Node* previous_node = chosen_piece->node;
+            previous_node->piece = nullptr;
+            previous_node->piece_index = INVALID_PIECE_INDEX;
+
+            node_from = chosen_piece->node;
+            chosen_piece->node = &node;
+            chosen_piece->node_index = node.index;
+            chosen_piece->selected = false;
+            node.piece = chosen_piece;
+            node.piece_index = chosen_piece->index;
+
+            piece_put = chosen_piece;
+            chosen_piece = nullptr;
+
+            if (is_windmill_made(&node, TURN_IS_WHITE_SO(Piece::White, Piece::Black))) {
+                DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
+
+                should_take_piece = true;
+                update_cursor();
+
+                if (turn == Player::White) {
+                    set_pieces_to_take(Piece::Black, true);
+                    set_pieces_show_outline(Piece::White, false);
+                } else {
+                    set_pieces_to_take(Piece::White, true);
+                    set_pieces_show_outline(Piece::Black, false);
+                }
+
+                turns_without_mills = 0;
+            } else {
+                check_player_number_of_pieces(Player::White);
+                check_player_number_of_pieces(Player::Black);
+                turns_without_mills++;
+                switch_turn();
+                update_outlines();
+
+                if (is_player_blocked(turn)) {
+                    DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+
+                    FORMATTED_MESSAGE(
+                        message, 64, "%s player has blocked %s player.",
+                        TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
+                    )
+
+                    game_over(
+                        TURN_IS_WHITE_SO(Ending::WinnerBlack, Ending::WinnerWhite),
+                        TURN_IS_WHITE_SO(Piece::White, Piece::Black),
+                        message
+                    );
+                }
+
+                remember_position_and_check_repetition(piece_put, node_from);
+            }
+
+            break;
+        }
+    }
+}
+
+void Board::move_pieces(float dt) {
+    GET_ACTIVE_PIECES(active_pieces)
+
+    for (Piece* piece : active_pieces) {
+        if (piece->should_move) {
+            switch (piece->movement.type) {
+                case Piece::MovementType::None:
+                    ASSERT(false, "Movement type None is invalid");
+                    break;
+                case Piece::MovementType::Linear: {
+                    piece->model.position += piece->movement.velocity * dt + (piece->movement.target - piece->model.position)
+                            * PIECE_VARIABLE_VELOCITY * dt;
+
+                    if (glm::length(piece->movement.target - piece->model.position) < 0.03f) {
+                        arrive_at_node(piece);
+                    }
+
+                    break;
+                }
+                case Piece::MovementType::ThreeStep: {
+                    if (!piece->movement.reached_target0) {
+                        piece->model.position += piece->movement.velocity * dt + (piece->movement.target0 - piece->model.position)
+                                * PIECE_VARIABLE_VELOCITY * dt;
+                    } else if (!piece->movement.reached_target1) {
+                        piece->model.position += piece->movement.velocity * dt + (piece->movement.target1 - piece->model.position)
+                                * PIECE_VARIABLE_VELOCITY * dt;
+                    } else {
+                        piece->model.position += piece->movement.velocity * dt + (piece->movement.target - piece->model.position)
+                                * PIECE_VARIABLE_VELOCITY * dt;
+                    }
+
+                    if (!piece->movement.reached_target0 &&
+                            glm::length(piece->movement.target0 - piece->model.position) < 0.03f) {
+                        piece->movement.reached_target0 = true;
+                        piece->model.position = piece->movement.target0;
+                        piece->movement.velocity = glm::normalize(piece->movement.target1 - piece->model.position)
+                                * PIECE_BASE_VELOCITY;
+                    } else if (!piece->movement.reached_target1 &&
+                            glm::length(piece->movement.target1 - piece->model.position) < 0.03f) {
+                        piece->movement.reached_target1 = true;
+                        piece->model.position = piece->movement.target1;
+                        piece->movement.velocity = glm::normalize(piece->movement.target - piece->model.position)
+                                * PIECE_BASE_VELOCITY;
+                    }
+
+                    if (glm::length(piece->movement.target - piece->model.position) < 0.03f) {
+                        arrive_at_node(piece);
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void Board::select_piece(hoverable::Id hovered_id) {
+    GET_ACTIVE_PIECES(active_pieces)
+
+    for (Piece* piece : active_pieces) {
+        if (piece->id == hovered_id) {
+            if (turn == Player::White && piece->type == Piece::White ||
+                    turn == Player::Black && piece->type == Piece::Black) {
+                if (!piece->selected && !piece->pending_remove) {
+                    selected_piece = piece;
+                    piece->selected = true;
+                    unselect_other_pieces(piece);
+                } else {
+                    selected_piece = nullptr;
+                    piece->selected = false;
+                }
+            }
+
+            break;
+        }
+    }
 }
 
 void Board::press(hoverable::Id hovered_id) {
@@ -654,6 +930,29 @@ std::string_view Board::get_ending_message() {
     return ending_message;
 }
 
+GamePosition Board::get_position() {
+    GamePosition position;
+
+    for (size_t i = 0; i < 24; i++) {
+        const Node& node = nodes[i];
+
+        if (node.piece != nullptr) {
+            position[i] = node.piece->type;
+        } else {
+            position[i] = Piece::None;
+        }
+    }
+
+    return position;
+}
+
+bool Board::get_switched_turn() {
+    const bool swiched = switched_turn;
+    switched_turn = false;
+
+    return swiched;
+}
+
 Piece* Board::new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node) {
     GET_ACTIVE_PIECES(active_pieces)
 
@@ -741,6 +1040,7 @@ void Board::switch_turn() {
     }
 
     turn = TURN_IS_WHITE_SO(Player::Black, Player::White);
+    switched_turn = true;
 }
 
 bool Board::is_windmill_made(Node* node, Piece::Type type) {
@@ -1211,22 +1511,6 @@ bool Board::is_player_blocked(Player player) {
     } else {
         return false;
     }
-}
-
-Board::GamePosition Board::get_position() {
-    GamePosition position;
-
-    for (size_t i = 0; i < 24; i++) {
-        Node& node = nodes[i];
-
-        if (node.piece != nullptr) {
-            position[i] = node.piece->type;
-        } else {
-            position[i] = Piece::None;
-        }
-    }
-
-    return position;
 }
 
 void Board::remember_position_and_check_repetition(Piece* piece, Node* node) {
