@@ -2,6 +2,7 @@
 
 #include "graphics/renderer/camera.h"
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/undo_redo.h"
 
 namespace save_load {
     static constexpr const char* SAVE_GAME_FILE = "last_game.dat";

@@ -4,6 +4,7 @@
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/keyboard_controls.h"
 #include "nine_morris_3d/constants.h"
+#include "nine_morris_3d/undo_redo.h"
 #include "other/logging.h"
 #include "other/assert.h"
 
@@ -33,12 +34,7 @@ constexpr unsigned int WINDMILLS[16][3] = {
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-Board::Board(StateHistory& state_history) {
-    undo_state_history = &state_history.undo_state_history;
-    redo_state_history = &state_history.redo_state_history;
-}
-
-void Board::copy_smart(Board& to, const Board& from, StateHistory* state_history) {
+void Board::copy_smart(Board& to, const Board& from, StateHistory* history) {
     to.model.index_count = from.model.index_count;
     to.model.position = from.model.position;
     to.model.rotation = from.model.rotation;
@@ -99,9 +95,8 @@ void Board::copy_smart(Board& to, const Board& from, StateHistory* state_history
     to.can_jump = from.can_jump;
     to.turns_without_mills = from.turns_without_mills;
     to.repetition_history = from.repetition_history;
-    if (state_history != nullptr) {
-        to.undo_state_history = &state_history->undo_state_history;
-        to.redo_state_history = &state_history->redo_state_history;
+    if (history != nullptr) {
+        to.state_history = history;
     }
     to.next_move = true;
 
@@ -785,72 +780,6 @@ void Board::release() {
     hovered_piece = nullptr;
 }
 
-bool Board::undo() {
-    ASSERT(!undo_state_history->empty(), "Undo history must not be empty");
-
-    if (!next_move) {
-        DEB_WARN("Cannot do anything when pieces are in air");
-        return false;
-    }
-
-    const bool undo_game_over = phase == Phase::None;
-
-    Board previous_state = *this;
-    Board& state_board = undo_state_history->back();
-
-    copy_smart(*this, state_board, nullptr);
-
-    // Reset pieces' models
-    for (Piece& piece : pieces) {
-        app->renderer->remove_model(piece.model.handle);
-
-        if (piece.active) {
-            app->renderer->add_model(piece.model, Renderer::CastShadow);
-        }
-    }
-
-    undo_state_history->pop_back();
-    redo_state_history->push_back(previous_state);
-
-    DEB_DEBUG("Popped state off of undo stack and undid move");
-
-    update_cursor();
-
-    return undo_game_over;
-}
-
-bool Board::redo() {
-    ASSERT(!redo_state_history->empty(), "Redo history must not be empty");
-
-    if (!next_move) {
-        DEB_WARN("Cannot do anything when pieces are in air");
-        return false;
-    }
-
-    Board previous_state = *this;
-    Board& state_board = redo_state_history->back();
-
-    copy_smart(*this, state_board, nullptr);
-
-    // Reset pieces' models
-    for (Piece& piece : pieces) {
-        app->renderer->remove_model(piece.model.handle);
-
-        if (piece.active) {
-            app->renderer->add_model(piece.model, Renderer::CastShadow);
-        }
-    }
-
-    redo_state_history->pop_back();
-    undo_state_history->push_back(previous_state);
-
-    DEB_DEBUG("Popped state off of redo stack and redid move");
-
-    update_cursor();
-
-    return phase == Phase::None;
-}
-
 unsigned int Board::not_placed_pieces_count() {
     return not_placed_white_pieces_count + not_placed_black_pieces_count;
 }
@@ -947,6 +876,10 @@ GamePosition Board::get_position() {
     return position;
 }
 
+void Board::reset_switched_turn() {
+    switched_turn = false;
+}
+
 Piece* Board::new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node) {
     GET_ACTIVE_PIECES(active_pieces)
 
@@ -1034,6 +967,7 @@ void Board::switch_turn() {
     }
 
     turn = TURN_IS_WHITE_SO(Player::Black, Player::White);
+    switched_turn = true;
 }
 
 bool Board::is_windmill_made(Node* node, Piece::Type type) {
@@ -1548,8 +1482,12 @@ void Board::remember_position_and_check_repetition(Piece* piece, Node* node) {
 }
 
 void Board::remember_state() {
-    undo_state_history->push_back(*this);
-    redo_state_history->clear();
+    const StateHistory::Page page = {
+        *this, app->camera, game_context->state
+    };
+
+    state_history->undo.push_back(page);
+    state_history->redo.clear();
 
     DEB_DEBUG("Pushed new state");
 }

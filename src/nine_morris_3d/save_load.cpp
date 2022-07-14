@@ -11,6 +11,7 @@
 #include "graphics/renderer/material.h"
 #include "nine_morris_3d/nine_morris_3d.h"
 #include "nine_morris_3d/save_load.h"
+#include "nine_morris_3d/undo_redo.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/piece.h"
 #include "nine_morris_3d/node.h"
@@ -34,7 +35,7 @@ void serialize(Archive& archive, Board& board) {
         board.ending, board.ending_message, board.white_pieces_count, board.black_pieces_count,
         board.not_placed_white_pieces_count, board.not_placed_black_pieces_count,
         board.should_take_piece, board.can_jump, board.turns_without_mills,
-        board.repetition_history, board.next_move, board.is_players_turn
+        board.repetition_history, board.next_move, board.is_players_turn, board.switched_turn
     );
 }
 
@@ -50,7 +51,12 @@ void serialize(Archive& archive, Board::ThreefoldRepetitionHistory::PositionPlus
 
 template<typename Archive>
 void serialize(Archive& archive, StateHistory& state_history) {
-    archive(state_history.undo_state_history, state_history.redo_state_history);
+    archive(state_history.undo, state_history.redo);
+}
+
+template<typename Archive>
+void serialize(Archive& archive, StateHistory::Page& page) {
+    archive(page.board, page.camera, page.game_state);
 }
 
 /*

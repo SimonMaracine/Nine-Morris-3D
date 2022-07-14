@@ -140,6 +140,11 @@ void Camera::set_position(const glm::vec3& position) {
     yaw = glm::degrees(glm::atan(-direction.x, direction.z));
     pitch = glm::degrees(glm::asin(direction.y));
     angle_around_point = 180.0f - yaw;
+
+    // Stop go_towards_position
+    auto_move_x = false;
+    auto_move_y = false;
+    auto_move_zoom = false;
 }
 
 void Camera::go_towards_position(const glm::vec3& position) {

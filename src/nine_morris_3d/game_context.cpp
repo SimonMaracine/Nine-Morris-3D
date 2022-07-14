@@ -15,6 +15,10 @@ void GameContext::end_human_move() {
 void GameContext::begin_computer_move() {
     // TODO start the appropriate minimax algorithm in thread
 
+    if (board->should_take_piece) {
+        return;  // Do nothing in this case
+    }
+
     minimax_thread->start(minimax_main_game::minimax);
 }
 

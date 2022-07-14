@@ -10,6 +10,7 @@
 
 struct StateHistory;
 class KeyboardControls;
+class GameContext;
 
 using PosValue = Piece::Type;
 using GamePosition = std::array<Piece::Type, 24>;
@@ -36,10 +37,12 @@ public:
     };
 
     Board() = default;
-    Board(StateHistory& state_history);
+    Board(StateHistory* state_history)
+        : state_history(state_history) {}
     ~Board() = default;
 
-    static void copy_smart(Board& to, const Board& from, StateHistory* state_history);
+    static void copy_smart(Board& to, const Board& from, StateHistory* history);
+    void set_game_context(GameContext* game_context) { this->game_context = game_context; }
 
     bool place_piece(hoverable::Id hovered_id);
     bool take_piece(hoverable::Id hovered_id);
@@ -51,8 +54,6 @@ public:
     void select_piece(hoverable::Id hovered_id);
     void press(hoverable::Id hovered_id);
     void release();
-    bool undo();
-    bool redo();
     unsigned int not_placed_pieces_count();
     void finalize_pieces_state();
     void update_cursor();
@@ -60,6 +61,7 @@ public:
     void update_pieces(hoverable::Id hovered_id);
     std::string_view get_ending_message();
     GamePosition get_position();
+    void reset_switched_turn();
 
     Renderer::Model model;
     Renderer::Model paint_model;
@@ -106,11 +108,13 @@ public:
         std::vector<PositionPlusInfo> twos;
     } repetition_history;
 
-    std::vector<Board>* undo_state_history = nullptr;
-    std::vector<Board>* redo_state_history = nullptr;
+    StateHistory* state_history = nullptr;
     KeyboardControls* keyboard = nullptr;
+    GameContext* game_context = nullptr;
+
     bool next_move = true;  // It is false when any piece is in air and true otherwise
     bool is_players_turn = true;
+    bool switched_turn = false;
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);
@@ -131,9 +135,4 @@ private:
     void prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity);
     void prepare_piece_for_three_step_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity,
             const glm::vec3& target0, const glm::vec3& target1);
-};
-
-struct StateHistory {
-    std::vector<Board> undo_state_history;
-    std::vector<Board> redo_state_history;
 };

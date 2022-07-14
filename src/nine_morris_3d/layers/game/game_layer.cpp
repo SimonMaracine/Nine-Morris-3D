@@ -24,6 +24,7 @@
 #include "nine_morris_3d/assets.h"
 #include "nine_morris_3d/keyboard_controls.h"
 #include "nine_morris_3d/game_context.h"
+#include "nine_morris_3d/undo_redo.h"
 #include "nine_morris_3d/layers/game/game_layer.h"
 #include "nine_morris_3d/layers/game/imgui_layer.h"
 #include "nine_morris_3d/layers/game/gui_layer.h"
@@ -71,7 +72,7 @@ constexpr Renderer::LightSpace SHADOWS_AUTUMN = {
 
 void GameLayer::on_attach() {
     state_history = StateHistory();
-    board = Board(state_history);
+    board = Board(&state_history);
 
     setup_entities_board();
 
@@ -93,6 +94,7 @@ void GameLayer::on_attach() {
 
     minimax_thread = MinimaxThread(&board);
     game = GameContext(&board, &minimax_thread);
+    board.set_game_context(&game);
 
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
 
@@ -246,6 +248,32 @@ void GameLayer::on_update(float dt) {
             break;
         case GameState::HumanEndMove:
             game.end_human_move();
+            if (game.both_players_human()) {
+                switch (board.turn) {
+                    case Board::Player::White:
+                        if (board.switched_turn) {
+                            black_camera_position = app->camera.get_position();
+                            board.reset_switched_turn();
+
+                            if (glm::distance(white_camera_position, black_camera_position) > 1.0f) {
+                                ASSERT(white_camera_position != glm::vec3(0.0f), "Position must not be null");
+                                app->camera.go_towards_position(white_camera_position);
+                            }
+                        }
+                        break;
+                    case Board::Player::Black:
+                        if (board.switched_turn) {
+                            white_camera_position = app->camera.get_position();
+                            board.reset_switched_turn();
+
+                            if (glm::distance(white_camera_position, black_camera_position) > 1.0f) {
+                                ASSERT(black_camera_position != glm::vec3(0.0f), "Position must not be null");
+                                app->camera.go_towards_position(black_camera_position);
+                            }
+                        }              
+                        break;
+                }
+            }
             game.state = GameState::MaybeNextPlayer;
             break;
         case GameState::ComputerBeginMove:
@@ -267,7 +295,7 @@ void GameLayer::on_update(float dt) {
                     gui_layer->timer.stop();
                 }
 
-                if (board.redo_state_history->empty()) {
+                if (board.state_history->redo.empty()) {
                     imgui_layer->can_redo = false;
                 }
 
@@ -406,7 +434,7 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                 gui_layer->timer.stop();
             }
 
-            if (board.redo_state_history->empty()) {
+            if (board.state_history->redo.empty()) {
                 imgui_layer->can_redo = false;
             }
         }
@@ -486,7 +514,7 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
                     gui_layer->timer.stop();
                 }
 
-                if (board.redo_state_history->empty()) {
+                if (board.state_history->redo.empty()) {
                     imgui_layer->can_redo = false;
                 }
             }
@@ -1267,32 +1295,30 @@ void GameLayer::setup_model_node(size_t index, const glm::vec3& position) {
 }
 
 void GameLayer::setup_camera() {
+    const glm::mat4 projection = glm::perspective(
+        glm::radians(FOV),
+        static_cast<float>(app->app_data.width) / app->app_data.height,
+        NEAR, FAR
+    );
+
     app->camera = Camera(
         app->options.sensitivity,
         47.0f,
         glm::vec3(0.0f),
         8.0f,
-        glm::perspective(
-            glm::radians(FOV),
-            static_cast<float>(app->app_data.width) / app->app_data.height,
-            NEAR,
-            FAR
-        )
+        projection
     );
 
     default_camera_position = app->camera.get_position();
+    white_camera_position = app->camera.get_position();
+    black_camera_position = app->camera.get_position();
 
     app->camera = Camera(
         app->options.sensitivity,
         47.0f,
         glm::vec3(0.0f),
         8.7f,
-        glm::perspective(
-            glm::radians(FOV),
-            static_cast<float>(app->app_data.width) / app->app_data.height,
-            NEAR,
-            FAR
-        )
+        projection
     );
 
     DEB_DEBUG("Setup camera");
@@ -1637,6 +1663,76 @@ void GameLayer::actually_change_normal_mapping() {
     setup_ids_board();
 }
 
+bool GameLayer::undo() {
+    ASSERT(!state_history.undo.empty(), "Undo history must not be empty");
+
+    if (!board.next_move) {
+        DEB_WARN("Cannot do anything when pieces are in air");
+        return false;
+    }
+
+    const bool undo_game_over = board.phase == Board::Phase::None;
+
+    StateHistory::Page previous_state = { board, app->camera, game.state };
+    StateHistory::Page& state_page = state_history.undo.back();
+
+    Board::copy_smart(board, state_page.board, nullptr);
+    app->camera.set_position(state_page.camera.get_position());
+    game.state = GameState::MaybeNextPlayer;
+
+    // Reset pieces' models
+    for (Piece& piece : board.pieces) {
+        app->renderer->remove_model(piece.model.handle);
+
+        if (piece.active) {
+            app->renderer->add_model(piece.model, Renderer::CastShadow);
+        }
+    }
+
+    state_history.undo.pop_back();
+    state_history.redo.push_back(previous_state);
+
+    DEB_DEBUG("Popped state off of undo stack and undid move");
+
+    board.update_cursor();
+
+    return undo_game_over;
+}
+
+bool GameLayer::redo() {
+    ASSERT(!state_history.redo.empty(), "Redo history must not be empty");
+
+    if (!board.next_move) {
+        DEB_WARN("Cannot do anything when pieces are in air");
+        return false;
+    }
+
+    StateHistory::Page previous_state = { board, app->camera, game.state };
+    StateHistory::Page& state_page = state_history.redo.back();
+
+    Board::copy_smart(board, state_page.board, nullptr);
+    app->camera.set_position(state_page.camera.get_position());
+    game.state = GameState::MaybeNextPlayer;
+
+    // Reset pieces' models
+    for (Piece& piece : board.pieces) {
+        app->renderer->remove_model(piece.model.handle);
+
+        if (piece.active) {
+            app->renderer->add_model(piece.model, Renderer::CastShadow);
+        }
+    }
+
+    state_history.redo.pop_back();
+    state_history.undo.push_back(previous_state);
+
+    DEB_DEBUG("Popped state off of redo stack and redid move");
+
+    board.update_cursor();
+
+    return board.phase == Board::Phase::None;
+}
+
 void GameLayer::load_game() {
     if (imgui_layer->last_save_game_date == save_load::NO_LAST_GAME) {
         imgui_layer->show_no_last_game = true;
@@ -1660,8 +1756,8 @@ void GameLayer::load_game() {
     }
 
     app->camera = state.camera;
-    state_history.undo_state_history = std::move(state.state_history.undo_state_history);
-    state_history.redo_state_history = std::move(state.state_history.redo_state_history);
+    state_history.undo = std::move(state.state_history.undo);
+    state_history.redo = std::move(state.state_history.redo);
 
     Board::copy_smart(board, state.board, &state_history);
 

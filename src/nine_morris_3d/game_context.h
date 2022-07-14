@@ -32,6 +32,7 @@ public:
     void end_computer_move();
 
     void reset_player(GamePlayer player);
+    bool both_players_human() { return white_player == GamePlayer::Human && black_player == GamePlayer::Human; }
 
     GamePlayer white_player = GamePlayer::Human;  // TODO maybe remember players choices
     GamePlayer black_player = GamePlayer::Computer;

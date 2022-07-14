@@ -65,6 +65,7 @@ set(HEADERS_FOR_WINDOWS
     "src/nine_morris_3d/assets.h"
     "src/nine_morris_3d/keyboard_controls.h"
     "src/nine_morris_3d/constants.h"
+    "src/nine_morris_3d/undo_redo.h"
     "src/nine_morris_3d/game_context.h"
     "src/nine_morris_3d/layers/game/game_layer.h"
     "src/nine_morris_3d/layers/game/imgui_layer.h"

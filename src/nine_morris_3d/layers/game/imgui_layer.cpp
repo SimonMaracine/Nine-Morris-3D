@@ -116,6 +116,7 @@ void ImGuiLayer::on_update(float dt) {
 
     if (!show_about && ImGui::BeginMainMenuBar()) {
         const bool can_change = game_layer->game.state == GameState::HumanThinkingMove;
+        // const bool can_undo_redo = game_layer->game
 
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false, can_change)) {
@@ -144,8 +145,8 @@ void ImGuiLayer::on_update(float dt) {
                 state.date = ctime(&current);
 
                 state.state_history = {
-                    game_layer->state_history.undo_state_history,
-                    game_layer->state_history.redo_state_history
+                    game_layer->state_history.undo,
+                    game_layer->state_history.redo
                 };
 
                 try {
@@ -203,9 +204,9 @@ void ImGuiLayer::on_update(float dt) {
                 HOVERING_GUI();
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo && can_change)) {
-                const bool undid_game_over = game_layer->board.undo();
+                const bool undid_game_over = game_layer->undo();
 
-                if (game_layer->board.undo_state_history->empty()) {
+                if (game_layer->board.state_history->undo.empty()) {
                     can_undo = false;
                 }
 
@@ -214,9 +215,9 @@ void ImGuiLayer::on_update(float dt) {
                 }
             }
             if (ImGui::MenuItem("Redo", nullptr, false, can_redo && can_change)) {
-                const bool redid_game_over = game_layer->board.redo();
+                const bool redid_game_over = game_layer->redo();
 
-                if (game_layer->board.redo_state_history->empty()) {
+                if (game_layer->board.state_history->redo.empty()) {
                     can_redo = false;
                 }
 
@@ -464,11 +465,11 @@ void ImGuiLayer::on_update(float dt) {
         draw_game_over();
     }
 
-    if (game_layer->board.undo_state_history->size() > 0) {
+    if (game_layer->board.state_history->undo.size() > 0) {
         can_undo = true;
     }
 
-    if (game_layer->board.redo_state_history->size() > 0) {
+    if (game_layer->board.state_history->redo.size() > 0) {
         can_redo = true;
     }
 
@@ -781,8 +782,8 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Turn: %s", game_layer->board.turn == Board::Player::White ? "white" : "black");
         ImGui::Text("Should take piece: %s", game_layer->board.should_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", game_layer->board.turns_without_mills);
-        ImGui::Text("Undo history size: %lu", game_layer->board.undo_state_history->size());
-        ImGui::Text("Redo history size: %lu", game_layer->board.redo_state_history->size());
+        ImGui::Text("Undo history size: %lu", game_layer->board.state_history->undo.size());
+        ImGui::Text("Redo history size: %lu", game_layer->board.state_history->redo.size());
         ImGui::Text("Hovered ID: %d", app->renderer->get_hovered_id());
         ImGui::Text("Hovered node: %p", game_layer->board.hovered_node);
         ImGui::Text("Hovered piece: %p", game_layer->board.hovered_piece);

@@ -10,6 +10,7 @@
 #include "nine_morris_3d/options.h"
 #include "nine_morris_3d/keyboard_controls.h"
 #include "nine_morris_3d/game_context.h"
+#include "nine_morris_3d/undo_redo.h"
 #include "nine_morris_3d/minimax/minimax_thread.h"
 #include "other/mesh.h"
 #include "other/loader.h"
@@ -88,6 +89,8 @@ public:
     void actually_change_labeled_board_texture();
     void actually_change_normal_mapping();
 
+    bool undo();
+    bool redo();
     void load_game();
 
     Board board;
@@ -106,6 +109,8 @@ public:
     bool show_keyboard_controls = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
+    glm::vec3 white_camera_position = glm::vec3(0.0f);
+    glm::vec3 black_camera_position = glm::vec3(0.0f);
 
     std::unique_ptr<Loader<AssetsData, options::Options>> loader;
 
