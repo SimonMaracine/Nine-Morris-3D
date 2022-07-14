@@ -11,44 +11,27 @@ public:
 
     MinimaxThread& operator=(MinimaxThread&& other);
 
-    struct ResultPlace {
-        size_t node_index = 0;
+    struct Result {
+        size_t place_node_index = 0;
+        size_t take_node_index = 0;
+        size_t put_down_source_node_index = 0;
+        size_t put_down_destination_node_index = 0;
     };
 
-    struct ResultTake {
-        size_t node_index = 0;
-    };
+    using Function = std::function<void(GamePosition, Result&, std::atomic<bool>&)>;
 
-    struct ResultPutDown {
-        size_t source_node_index = 0;
-        size_t destination_node_index = 0;
-    };
-
-    using FunctionPlace = std::function<void(GamePosition, size_t*, std::atomic<bool>&)>;
-    using FunctionTake = std::function<void(GamePosition, size_t*, std::atomic<bool>&)>;
-    using FunctionPutDown = std::function<void(GamePosition, size_t*, size_t*, std::atomic<bool>&)>;
-
-    void start_place(const FunctionPlace& function);
-    void start_take(const FunctionTake& function);
-    void start_put_down(const FunctionPutDown& function);
+    void start(const Function& function);
 
     bool is_running();
     void join();
 
-    const ResultPlace& get_place_result() { return place_result; }
-    const ResultTake& get_take_result() { return take_result; }
-    const ResultPutDown& get_put_down_result() { return put_down_result; }
+    const Result& get_result() { return result; }
 private:
-    void join_threads();
+    void join_thread();
 
-    std::thread thread_place;
-    std::thread thread_take;
-    std::thread thread_put_down;
-    std::atomic<bool> running = false;  // TODO this is dodgy
+    std::thread thread;
+    std::atomic<bool> running = false;
 
-    ResultPlace place_result;
-    ResultTake take_result;
-    ResultPutDown put_down_result;
-
+    Result result;
     Board* board = nullptr;
 };

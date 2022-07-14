@@ -8,7 +8,7 @@ enum class GamePlayer {
 };
 
 enum class GameState {
-    NextPlayer,
+    MaybeNextPlayer,
     HumanBeginMove,
     HumanThinkingMove,
     HumanDoingMove,
@@ -31,9 +31,11 @@ public:
     void begin_computer_move();
     void end_computer_move();
 
+    void reset_player(GamePlayer player);
+
     GamePlayer white_player = GamePlayer::Human;  // TODO maybe remember players choices
     GamePlayer black_player = GamePlayer::Computer;
-    GameState state = GameState::NextPlayer;
+    GameState state = GameState::MaybeNextPlayer;
 private:
     Board* board = nullptr;
     MinimaxThread* minimax_thread = nullptr;

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "nine_morris_3d/board.h"
+#include "nine_morris_3d/minimax/minimax_thread.h"
 
 namespace minimax_main_game {
-    void place(GamePosition position, size_t* node_index, std::atomic<bool>& running);
-    void take(GamePosition position, size_t* node_index, std::atomic<bool>& running);
-    void put_down(GamePosition position, size_t* source_node_index, size_t* destination_node_index, std::atomic<bool>& running);
+    int _minimax();
+    void minimax(GamePosition position, MinimaxThread::Result& result, std::atomic<bool>& running);
 }

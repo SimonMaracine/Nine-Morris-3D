@@ -203,7 +203,7 @@ void GameLayer::on_update(float dt) {
     board.update_pieces(app->renderer->get_hovered_id());
 
     switch (game.state) {
-        case GameState::NextPlayer:
+        case GameState::MaybeNextPlayer:
             switch (board.turn) {
                 case Board::Player::White:
                     switch (game.white_player) {
@@ -246,7 +246,7 @@ void GameLayer::on_update(float dt) {
             break;
         case GameState::HumanEndMove:
             game.end_human_move();
-            game.state = GameState::NextPlayer;
+            game.state = GameState::MaybeNextPlayer;
             break;
         case GameState::ComputerBeginMove:
             game.begin_computer_move();
@@ -255,37 +255,32 @@ void GameLayer::on_update(float dt) {
         case GameState::ComputerThinkingMove:
             if (!minimax_thread.is_running()) {
                 minimax_thread.join();
+
+                game.end_computer_move();
+
+                if (!first_move && !gui_layer->timer.get_running()) {
+                    gui_layer->timer.start(app->window->get_time());
+                    first_move = true;
+                }
+
+                if (board.phase == Board::Phase::GameOver) {
+                    gui_layer->timer.stop();
+                }
+
+                if (board.redo_state_history->empty()) {
+                    imgui_layer->can_redo = false;
+                }
+
                 game.state = GameState::ComputerDoingMove;
             }
             break;
         case GameState::ComputerDoingMove:
-            game.end_computer_move();
-
-            board.get_switched_turn();  // Just flush variable
-
-            if (!first_move && !gui_layer->timer.get_running()) {
-                gui_layer->timer.start(app->window->get_time());
-                first_move = true;
+            if (board.next_move) {
+                game.state = GameState::ComputerEndMove;
             }
-
-            if (board.phase == Board::Phase::GameOver) {
-                gui_layer->timer.stop();
-            }
-
-            if (board.redo_state_history->empty()) {
-                imgui_layer->can_redo = false;
-            }
-
-            game.state = GameState::ComputerEndMove;
             break;
         case GameState::ComputerEndMove:
-            if (board.next_move) {
-                // if (board.get_switched_turn()) {  // TODO think about this
-                game.state = GameState::NextPlayer;
-                // } else {
-                //     game.state = GameState::ComputerBeginMove;
-                // }
-            }
+            game.state = GameState::MaybeNextPlayer;
             break;
     }
 
@@ -402,17 +397,6 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
                 game.state = GameState::HumanDoingMove;
             }
 
-            // if (board.get_switched_turn()) {
-            //     switch (board.turn) {
-            //         case Board::Player::White:
-            //             players.end_move(players.black_player);
-            //             break;
-            //         case Board::Player::Black:
-            //             players.end_move(players.white_player);
-            //             break;
-            //     }
-            // }
-
             if (did && !first_move && !gui_layer->timer.get_running()) {
                 gui_layer->timer.start(app->window->get_time());
                 first_move = true;
@@ -425,9 +409,9 @@ bool GameLayer::on_mouse_button_released(events::MouseButtonReleasedEvent& event
             if (board.redo_state_history->empty()) {
                 imgui_layer->can_redo = false;
             }
-
-            board.release();
         }
+
+        board.release();
 
         if (show_keyboard_controls) {
             app->renderer->remove_quad(keyboard.quad.handle);
@@ -462,7 +446,6 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
                 KB::Direction::Up, app->camera.get_angle_around_point()
             );
             keyboard.move(direction);
-            
             break;
         }
         case input::Key::DOWN: {
@@ -470,7 +453,6 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
                 KB::Direction::Down, app->camera.get_angle_around_point()
             );
             keyboard.move(direction);
-
             break;
         }
         case input::Key::LEFT: {
@@ -478,7 +460,6 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
                 KB::Direction::Left, app->camera.get_angle_around_point()
             );
             keyboard.move(direction);
-
             break;
         }
         case input::Key::RIGHT: {
@@ -486,7 +467,6 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
                 KB::Direction::Right, app->camera.get_angle_around_point()
             );
             keyboard.move(direction);
-
             break;
         }
         case input::Key::ENTER: {
@@ -496,18 +476,6 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
                 if (did) {
                     game.state = GameState::HumanDoingMove;
                 }
-
-                // TODO this had its use, but now don't know
-                // if (board.get_switched_turn()) {
-                //     switch (board.turn) {
-                //         case Board::Player::White:
-                //             players.end_move(players.black_player);
-                //             break;
-                //         case Board::Player::Black:
-                //             players.end_move(players.white_player);
-                //             break;
-                //     }
-                // }
 
                 if (did && !first_move && !gui_layer->timer.get_running()) {
                     gui_layer->timer.start(app->window->get_time());
@@ -521,10 +489,8 @@ bool GameLayer::on_key_pressed(events::KeyPressedEvent& event) {
                 if (board.redo_state_history->empty()) {
                     imgui_layer->can_redo = false;
                 }
-
-                board.release();
             }
-
+            board.release();
             break;
         }
         default:

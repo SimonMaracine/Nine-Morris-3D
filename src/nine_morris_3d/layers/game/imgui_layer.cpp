@@ -115,13 +115,15 @@ void ImGuiLayer::on_update(float dt) {
     RESET_HOVERING_GUI();
 
     if (!show_about && ImGui::BeginMainMenuBar()) {
+        const bool can_change = game_layer->game.state == GameState::HumanThinkingMove;
+
         if (ImGui::BeginMenu("Game")) {
-            if (ImGui::MenuItem("New Game", nullptr, false)) {
+            if (ImGui::MenuItem("New Game", nullptr, false, can_change)) {
                 app->change_scene("game");
 
                 DEB_INFO("Restarting game");
             }
-            if (ImGui::MenuItem("Load Last", nullptr, false)) {
+            if (ImGui::MenuItem("Load Last", nullptr, false, can_change)) {
                 game_layer->board.finalize_pieces_state();
 
                 game_layer->load_game();
@@ -129,7 +131,7 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", last_save_game_date.c_str());
             }
-            if (ImGui::MenuItem("Save", nullptr, false)) {
+            if (ImGui::MenuItem("Save", nullptr, false)) {  // FIXME save and load game context too
                 game_layer->board.finalize_pieces_state();
 
                 save_load::GameState state;
@@ -159,16 +161,18 @@ void ImGuiLayer::on_update(float dt) {
 
                 last_save_game_date = std::move(state.date);
             }
-            if (ImGui::BeginMenu("Players")) {
+            if (ImGui::BeginMenu("Players", can_change)) {
                 if (ImGui::BeginMenu("White")) {
                     static int option = 0;
                     if (ImGui::RadioButton("Human", &option, 0)) {
                         game_layer->game.white_player = GamePlayer::Human;
+                        game_layer->game.reset_player(GamePlayer::Human);
 
                         DEB_DEBUG("Set white player to human");
                     }
                     if (ImGui::RadioButton("Computer", &option, 1)) {
                         game_layer->game.white_player = GamePlayer::Computer;
+                        game_layer->game.reset_player(GamePlayer::Computer);
 
                         DEB_DEBUG("Set white player to computer");
                     }
@@ -180,11 +184,13 @@ void ImGuiLayer::on_update(float dt) {
                     static int option = 1;
                     if (ImGui::RadioButton("Human", &option, 0)) {
                         game_layer->game.black_player = GamePlayer::Human;
+                        game_layer->game.reset_player(GamePlayer::Human);
 
                         DEB_DEBUG("Set black player to human");
                     }
                     if (ImGui::RadioButton("Computer", &option, 1)) {
                         game_layer->game.black_player = GamePlayer::Computer;
+                        game_layer->game.reset_player(GamePlayer::Computer);
 
                         DEB_DEBUG("Set black player to computer");
                     }
@@ -196,7 +202,7 @@ void ImGuiLayer::on_update(float dt) {
                 ImGui::EndMenu();
                 HOVERING_GUI();
             }
-            if (ImGui::MenuItem("Undo", nullptr, false, can_undo)) {
+            if (ImGui::MenuItem("Undo", nullptr, false, can_undo && can_change)) {
                 const bool undid_game_over = game_layer->board.undo();
 
                 if (game_layer->board.undo_state_history->empty()) {
@@ -207,7 +213,7 @@ void ImGuiLayer::on_update(float dt) {
                     gui_layer->timer.start(app->window->get_time());
                 }
             }
-            if (ImGui::MenuItem("Redo", nullptr, false, can_redo)) {
+            if (ImGui::MenuItem("Redo", nullptr, false, can_redo && can_change)) {
                 const bool redid_game_over = game_layer->board.redo();
 
                 if (game_layer->board.redo_state_history->empty()) {
@@ -783,7 +789,42 @@ void ImGuiLayer::draw_debug(float dt) {
         ImGui::Text("Selected piece: %p", game_layer->board.selected_piece);
         ImGui::Text("Next move: %s", game_layer->board.next_move ? "true" : "false");
         ImGui::Text("Game started: %s", game_layer->first_move ? "true" : "false");
-        ImGui::Text("Game state: %d", game_layer->game.state);
+        ImGui::End();
+
+        ImGui::Begin("Game");
+        std::string state;
+        switch (game_layer->game.state) {
+            case GameState::MaybeNextPlayer:
+                state = "MaybeNextPlayer";
+                break;
+            case GameState::HumanBeginMove:
+                state = "HumanBeginMove";
+                break;
+            case GameState::HumanThinkingMove:
+                state = "HumanThinkingMove";
+                break;
+            case GameState::HumanDoingMove:
+                state = "HumanDoingMove";
+                break;
+            case GameState::HumanEndMove:
+                state = "HumanEndMove";
+                break;
+            case GameState::ComputerBeginMove:
+                state = "ComputerBeginMove";
+                break;
+            case GameState::ComputerThinkingMove:
+                state = "ComputerThinkingMove";
+                break;
+            case GameState::ComputerDoingMove:
+                state = "ComputerDoingMove";
+                break;
+            case GameState::ComputerEndMove:
+                state = "ComputerEndMove";
+                break;
+        }
+        ImGui::Text("State: %s", state.c_str());
+        ImGui::Text("White player: %s", game_layer->game.white_player == GamePlayer::Human ? "Human" : "Computer");
+        ImGui::Text("Black player: %s", game_layer->game.black_player == GamePlayer::Human ? "Human" : "Computer");
         ImGui::End();
 
         ImGui::Begin("Light Settings");

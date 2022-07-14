@@ -885,10 +885,11 @@ void Board::update_cursor() {
 
 void Board::update_nodes(hoverable::Id hovered_id) {
     for (Node& node : nodes) {
-        const bool highlight = node.id == hovered_id && phase == Phase::PlacePieces && !should_take_piece
-                || node.id == hovered_id && phase == Phase::MovePieces && selected_piece != nullptr && !should_take_piece;
+        const bool hovered = node.id == hovered_id;
+        const bool highlight = phase == Phase::PlacePieces || phase == Phase::MovePieces && selected_piece != nullptr;
+        const bool permitted = !should_take_piece && is_players_turn;
 
-        if (highlight) {
+        if (hovered && highlight && permitted) {
             node.model.material->set_vec4("u_color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
         } else {
             node.model.material->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -944,13 +945,6 @@ GamePosition Board::get_position() {
     }
 
     return position;
-}
-
-bool Board::get_switched_turn() {
-    const bool swiched = switched_turn;
-    switched_turn = false;
-
-    return swiched;
 }
 
 Piece* Board::new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node) {
@@ -1040,7 +1034,6 @@ void Board::switch_turn() {
     }
 
     turn = TURN_IS_WHITE_SO(Player::Black, Player::White);
-    switched_turn = true;
 }
 
 bool Board::is_windmill_made(Node* node, Piece::Type type) {

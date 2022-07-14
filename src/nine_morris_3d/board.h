@@ -60,7 +60,6 @@ public:
     void update_pieces(hoverable::Id hovered_id);
     std::string_view get_ending_message();
     GamePosition get_position();
-    bool get_switched_turn();
 
     Renderer::Model model;
     Renderer::Model paint_model;
@@ -112,7 +111,6 @@ public:
     KeyboardControls* keyboard = nullptr;
     bool next_move = true;  // It is false when any piece is in air and true otherwise
     bool is_players_turn = true;
-    bool switched_turn = false;
 private:
     Piece* new_piece_to_place(Piece::Type type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);
