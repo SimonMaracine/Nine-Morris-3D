@@ -22,8 +22,8 @@ enum class GameState {
 class GameContext {
 public:
     GameContext() = default;
-    GameContext(Board* board, MinimaxThread* minimax_thread)
-        : board(board), minimax_thread(minimax_thread) {}
+    GameContext(GamePlayer white_player, GamePlayer black_player, Board* board, MinimaxThread* minimax_thread)
+        : white_player(white_player), black_player(black_player), board(board), minimax_thread(minimax_thread) {}
     ~GameContext() = default;
 
     void begin_human_move();
@@ -34,8 +34,8 @@ public:
     void reset_player(GamePlayer player);
     bool both_players_human() { return white_player == GamePlayer::Human && black_player == GamePlayer::Human; }
 
-    GamePlayer white_player = GamePlayer::Human;  // TODO maybe remember players choices
-    GamePlayer black_player = GamePlayer::Computer;
+    GamePlayer white_player = GamePlayer::None;
+    GamePlayer black_player = GamePlayer::None;
     GameState state = GameState::MaybeNextPlayer;
 private:
     Board* board = nullptr;

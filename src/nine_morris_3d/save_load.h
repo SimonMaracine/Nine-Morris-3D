@@ -1,8 +1,11 @@
 #pragma once
 
+#include "glm/glm.hpp"
+
 #include "graphics/renderer/camera.h"
 #include "nine_morris_3d/board.h"
 #include "nine_morris_3d/undo_redo.h"
+#include "nine_morris_3d/game_context.h"
 
 namespace save_load {
     static constexpr const char* SAVE_GAME_FILE = "last_game.dat";
@@ -30,10 +33,18 @@ namespace save_load {
         unsigned int time = 0;  // In deciseconds
         std::string date = NO_LAST_GAME;
         StateHistory state_history;
+        glm::vec3 white_camera_position = glm::vec3(0.0f);
+        glm::vec3 black_camera_position = glm::vec3(0.0f);
+        GamePlayer white_player = GamePlayer::None;
+        GamePlayer black_player = GamePlayer::None;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(board, camera, time, date, state_history);
+            archive(
+                board, camera, time, date, state_history,
+                white_camera_position, black_camera_position,
+                white_player, black_player
+            );
         }
     };
 

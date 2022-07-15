@@ -43,6 +43,8 @@ namespace options {
         object["normal_mapping"] = options.normal_mapping;
         object["bloom"] = options.bloom;
         object["bloom_strength"] = options.bloom_strength;
+        object["white_player"] = options.white_player;
+        object["black_player"] = options.black_player;
 
         file << std::setw(4) << object;
 
@@ -96,6 +98,8 @@ namespace options {
             options_file.normal_mapping = object.at("normal_mapping").get<bool>();
             options_file.bloom = object.at("bloom").get<bool>();
             options_file.bloom_strength = object.at("bloom_strength").get<float>();
+            options_file.white_player = object.at("white_player").get<int>();
+            options_file.black_player = object.at("black_player").get<int>();
         } catch (const json::out_of_range& e) {
             throw OptionsFileError(e.what());
         } catch (const json::type_error& e) {
@@ -129,6 +133,14 @@ namespace options {
             throw OptionsFileError("Options file is invalid: bloom_strength");
         }
 
+        if (options_file.white_player != HUMAN || options_file.white_player != COMPUTER) {
+            throw OptionsFileError("Options file is invalid: white_player");
+        }
+
+        if (options_file.black_player != HUMAN || options_file.black_player != COMPUTER) {
+            throw OptionsFileError("Options file is invalid: black_player");
+        }
+
         options.texture_quality = std::move(options_file.texture_quality);
         options.samples = options_file.samples;
         options.anisotropic_filtering = options_file.anisotropic_filtering;
@@ -142,6 +154,8 @@ namespace options {
         options.normal_mapping = options_file.normal_mapping;
         options.bloom = options_file.bloom;
         options.bloom_strength = options_file.bloom_strength;
+        options.white_player = options_file.white_player;
+        options.black_player = options_file.black_player;
 
         DEB_INFO("Loaded options from file '{}'", file_path);
     }
@@ -178,6 +192,8 @@ namespace options {
         object["normal_mapping"] = options.normal_mapping;
         object["bloom"] = options.bloom;
         object["bloom_strength"] = options.bloom_strength;
+        object["white_player"] = options.white_player;
+        object["black_player"] = options.black_player;
 
         file << object.dump(4);
 

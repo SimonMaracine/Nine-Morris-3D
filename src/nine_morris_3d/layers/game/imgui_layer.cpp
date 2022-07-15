@@ -132,7 +132,7 @@ void ImGuiLayer::on_update(float dt) {
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", last_save_game_date.c_str());
             }
-            if (ImGui::MenuItem("Save", nullptr, false)) {  // FIXME save and load game context too
+            if (ImGui::MenuItem("Save", nullptr, false)) {
                 game_layer->board.finalize_pieces_state();
 
                 save_load::GameState state;
@@ -148,6 +148,11 @@ void ImGuiLayer::on_update(float dt) {
                     game_layer->state_history.undo,
                     game_layer->state_history.redo
                 };
+
+                state.white_camera_position = game_layer->white_camera_position;
+                state.black_camera_position = game_layer->black_camera_position;
+                state.white_player = game_layer->game.white_player;
+                state.black_player = game_layer->game.black_player;
 
                 try {
                     save_load::save_game_to_file(state);

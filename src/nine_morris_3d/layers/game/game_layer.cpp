@@ -93,7 +93,11 @@ void GameLayer::on_attach() {
     keyboard.initialize();
 
     minimax_thread = MinimaxThread(&board);
-    game = GameContext(&board, &minimax_thread);
+    game = GameContext(
+        static_cast<GamePlayer>(app->options.white_player),
+        static_cast<GamePlayer>(app->options.black_player),
+        &board, &minimax_thread
+    );
     board.set_game_context(&game);
 
     app->window->set_cursor(app->options.custom_cursor ? app->arrow_cursor : 0);
@@ -1677,7 +1681,7 @@ bool GameLayer::undo() {
     StateHistory::Page& state_page = state_history.undo.back();
 
     Board::copy_smart(board, state_page.board, nullptr);
-    app->camera.set_position(state_page.camera.get_position());
+    app->camera = state_page.camera;
     game.state = GameState::MaybeNextPlayer;
 
     // Reset pieces' models
@@ -1711,7 +1715,7 @@ bool GameLayer::redo() {
     StateHistory::Page& state_page = state_history.redo.back();
 
     Board::copy_smart(board, state_page.board, nullptr);
-    app->camera.set_position(state_page.camera.get_position());
+    app->camera = state_page.camera;
     game.state = GameState::MaybeNextPlayer;
 
     // Reset pieces' models
@@ -1755,11 +1759,15 @@ void GameLayer::load_game() {
         return;
     }
 
+    Board::copy_smart(board, state.board, &state_history);
     app->camera = state.camera;
+    game.state = GameState::MaybeNextPlayer;
     state_history.undo = std::move(state.state_history.undo);
     state_history.redo = std::move(state.state_history.redo);
-
-    Board::copy_smart(board, state.board, &state_history);
+    white_camera_position = state.white_camera_position;
+    black_camera_position = state.black_camera_position;
+    game.white_player = state.white_player;
+    game.black_player = state.black_player;
 
     // Reset pieces' models
     for (Piece& piece : board.pieces) {

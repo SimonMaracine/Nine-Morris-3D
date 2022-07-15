@@ -1,11 +1,16 @@
 #pragma once
 
+#include "nine_morris_3d/game_context.h"
+
 namespace options {
     static constexpr const char* NORMAL = "normal";
     static constexpr const char* LOW = "low";
 
     static constexpr const char* FIELD = "field";
     static constexpr const char* AUTUMN = "autumn";
+
+    static constexpr int HUMAN = static_cast<int>(GamePlayer::Human);
+    static constexpr int COMPUTER = static_cast<int>(GamePlayer::Computer);
 
     class OptionsFileError : public std::runtime_error {
     public:
@@ -38,6 +43,8 @@ namespace options {
         bool normal_mapping = true;
         bool bloom = true;
         float bloom_strength = 0.3f;
+        int white_player = HUMAN;
+        int black_player = COMPUTER;
     };
 
     void save_options_to_file(const Options& options) noexcept(false);
