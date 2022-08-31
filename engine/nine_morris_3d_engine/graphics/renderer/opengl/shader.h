@@ -37,12 +37,12 @@ public:
             const std::vector<std::string>& uniforms,
             const std::vector<UniformBlockSpecification>& uniform_blocks);
     static std::shared_ptr<Shader> create(
-            const encryption::EncryptedFile& vertex_source_path,
-            const encryption::EncryptedFile& fragment_source_path,
+            encryption::EncryptedFile vertex_source_path,
+            encryption::EncryptedFile fragment_source_path,
             const std::vector<std::string>& uniforms);
     static std::shared_ptr<Shader> create(
-            const encryption::EncryptedFile& vertex_source_path,
-            const encryption::EncryptedFile& fragment_source_path,
+            encryption::EncryptedFile vertex_source_path,
+            encryption::EncryptedFile fragment_source_path,
             const std::vector<std::string>& uniforms,
             const std::vector<UniformBlockSpecification>& uniform_blocks);
 

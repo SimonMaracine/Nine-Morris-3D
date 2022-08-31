@@ -17,7 +17,7 @@ class Scene;
 class Application {
 protected:
     Application(int width, int height, std::string_view title, std::string_view info_file,
-            std::string_view log_file, std::string_view application_name);
+        std::string_view log_file, std::string_view application_name);
     virtual ~Application();  // TODO maybe make not subclassable
 public:
     // Call this to run the application, after all scenes have been defined
@@ -79,7 +79,7 @@ private:
     float delta = 0.0f;
     unsigned int frames = 0;  // TODO remove this, if not needed
 
-    // Data for the layer and scene system
+    // Data for the scene system
     std::vector<Scene*> scenes;
     Scene* current_scene = nullptr;
 
@@ -92,7 +92,7 @@ private:
     Scene* to_scene = nullptr;
 
     // Keep track of all framebuffers to resize them, if needed
-    std::vector<std::weak_ptr<Framebuffer>> framebuffers;
+    std::vector<std::weak_ptr<Framebuffer>> framebuffers;  // TODO this should be in renderer
 
     // Input stuff
     float mouse_wheel = 0.0f;

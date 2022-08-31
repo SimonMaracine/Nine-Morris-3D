@@ -41,7 +41,7 @@ static std::string get_file_path() noexcept(false) {
 void save_options_system(entt::registry& registry) noexcept(false) {
     const std::string file_path = get_file_path();
 
-    std::ofstream file (file_path, std::ios::trunc);  // TODO maybe use brace initialization instead
+    std::ofstream file {file_path, std::ios::trunc};
 
     if (!file.is_open()) {
         throw OptionsFileNotOpenError(
@@ -65,7 +65,7 @@ void save_options_system(entt::registry& registry) noexcept(false) {
 void load_options_system(entt::registry& registry) noexcept(false) {
     const std::string file_path = get_file_path();
 
-    std::ifstream file (file_path);
+    std::ifstream file {file_path};
 
     if (!file.is_open()) {
         throw OptionsFileNotOpenError(
@@ -128,7 +128,7 @@ void load_options_system(entt::registry& registry) noexcept(false) {
 void create_options_file() noexcept(false) {
     const std::string file_path = get_file_path();
 
-    std::ofstream file (file_path, std::ios::trunc);
+    std::ofstream file {file_path, std::ios::trunc};
 
     if (!file.is_open()) {
         throw OptionsFileNotOpenError(

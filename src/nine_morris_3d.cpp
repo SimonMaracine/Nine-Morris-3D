@@ -49,33 +49,32 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     //     }
     // }
 
-    auto options = registry.create();
-    registry.emplace<OptionsComponent>(options);
+    // TODO this is the new one
+    // auto options = registry.create();
+    // registry.emplace<OptionsComponent>(options);
 
-    try {
-        load_options_system(registry);
-    } catch (const OptionsFileNotOpenError& e) {
-        REL_ERROR("{}", e.what());
-        handle_options_file_not_open_error();
-    } catch (const OptionsFileError& e) {
-        REL_ERROR("{}", e.what());
+    // try {
+    //     load_options_system(registry);
+    // } catch (const OptionsFileNotOpenError& e) {
+    //     REL_ERROR("{}", e.what());
+    //     handle_options_file_not_open_error();
+    // } catch (const OptionsFileError& e) {
+    //     REL_ERROR("{}", e.what());
 
-        try {
-            create_options_file();
-        } catch (const OptionsFileNotOpenError& e) {
-            REL_ERROR("{}", e.what());
-        } catch (const OptionsFileError& e) {
-            REL_ERROR("{}", e.what());
-        }
-    }
+    //     try {
+    //         create_options_file();
+    //     } catch (const OptionsFileNotOpenError& e) {
+    //         REL_ERROR("{}", e.what());
+    //     } catch (const OptionsFileError& e) {
+    //         REL_ERROR("{}", e.what());
+    //     }
+    // }
 
-    auto& options_c = registry.get<OptionsComponent>(options);
+    // auto& options_c = registry.get<OptionsComponent>(options);
 
-    window->set_vsync(options_c.vsync);
+    // window->set_vsync(options_c.vsync);
 
     srand(time(nullptr));
-
-    assets::maybe_initialize_assets();
 
     using namespace assets;
     using namespace encryption;
@@ -103,7 +102,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         FramebufferSpecification specification;
         specification.width = app_data.width;
         specification.height = app_data.height;
-        specification.samples = options_c.samples;
+        specification.samples = 2;  // FIXME options_c.samples;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
@@ -116,7 +115,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     }
 
     // Setup depth map framebuffer
-    renderer->set_depth_map_framebuffer(options_c.texture_quality == NORMAL ? 4096 : 2048);
+    renderer->set_depth_map_framebuffer(2048 /*FIXME options_c.texture_quality == NORMAL ? 4096 : 2048*/);
 
     // Initialize and setup ImGui
     ImGui::CreateContext();
@@ -125,6 +124,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
 
     {
         ImGuiIO& io = ImGui::GetIO();
+
         ImFontGlyphRangesBuilder builder;
         builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
         builder.AddText(u8"ă");
@@ -139,17 +139,21 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     }
 
     // Load splash screen
-    TextureSpecification specification;
-    specification.min_filter = Filter::Linear;
-    specification.mag_filter = Filter::Linear;
+    {
+        TextureSpecification specification;
+        specification.min_filter = Filter::Linear;
+        specification.mag_filter = Filter::Linear;
 
-    data.splash_screen_texture = Texture::create(encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+        data.splash_screen_texture = Texture::create(encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+    }
 
     // Load and create this font
-    data.good_dog_plain_font = std::make_shared<Font>(path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
-    data.good_dog_plain_font->begin_baking();  // TODO maybe move part of texture baking to thread
-    data.good_dog_plain_font->bake_characters(32, 127);
-    data.good_dog_plain_font->end_baking();
+    {
+        data.good_dog_plain_font = std::make_shared<Font>(path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
+        data.good_dog_plain_font->begin_baking();  // TODO maybe move part of texture baking to thread
+        data.good_dog_plain_font->bake_characters(32, 127);
+        data.good_dog_plain_font->end_baking();
+    }
 
     assets_data = std::make_shared<AssetsData>();
 
@@ -233,7 +237,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         add_framebuffer(framebuffer);
 
         std::shared_ptr<Combine> combine = std::make_shared<Combine>("combine", framebuffer, shader);
-        combine->strength = options_c.bloom_strength;
+        combine->strength = 0.7f;  // FIXME options_c.bloom_strength;
         renderer->add_post_processing(combine);
     }
 }

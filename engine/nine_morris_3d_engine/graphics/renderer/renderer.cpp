@@ -79,8 +79,6 @@ Renderer::Renderer(Application* app)
     storage.light_space_uniform_block.uniform_buffer = storage.light_space_uniform_buffer;
     storage.light_space_uniform_block.binding_index = 3;
 
-    maybe_initialize_assets();
-
     using namespace encryption;
 
     {
@@ -686,29 +684,6 @@ void Renderer::check_hovered_id(int x, int y) {
     if (x > app->app_data.width || x < 0 || y > app->app_data.height || y < 0) {
         hovered_id = hover::null;
     }
-}
-
-void Renderer::maybe_initialize_assets() {
-#ifdef PLATFORM_GAME_RELEASE
-    static const char* PREFIX = ".dat";
-
-    static const std::array<std::string*, 10> assets = { 
-        &SHADOW_VERTEX_SHADER,
-        &SHADOW_FRAGMENT_SHADER,
-        &SCREEN_QUAD_VERTEX_SHADER,
-        &SCREEN_QUAD_FRAGMENT_SHADER,
-        &OUTLINE_VERTEX_SHADER,
-        &OUTLINE_FRAGMENT_SHADER,
-        &SKYBOX_VERTEX_SHADER,
-        &SKYBOX_FRAGMENT_SHADER,
-        &QUAD3D_VERTEX_SHADER,
-        &QUAD3D_FRAGMENT_SHADER
-    };
-
-    for (std::string* asset : assets) {
-        *asset += PREFIX;
-    }
-#endif
 }
 
 namespace render_helpers {

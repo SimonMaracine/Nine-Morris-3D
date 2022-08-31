@@ -119,8 +119,8 @@ std::shared_ptr<Texture> Texture::create(std::string_view file_path, const Textu
     return std::make_shared<Texture>(texture, width, height, name);
 }
 
-std::shared_ptr<Texture> Texture::create(const encryption::EncryptedFile& file_path, const TextureSpecification& specification) {
-    DEB_DEBUG("Loading texture '{}'...", file_path.get());
+std::shared_ptr<Texture> Texture::create(encryption::EncryptedFile file_path, const TextureSpecification& specification) {
+    DEB_DEBUG("Loading texture '{}'...", file_path);
 
     cppblowfish::Buffer buffer = encryption::load_file(file_path);
 
@@ -130,7 +130,7 @@ std::shared_ptr<Texture> Texture::create(const encryption::EncryptedFile& file_p
     stbi_uc* data = stbi_load_from_memory(buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture '{}', exiting...", file_path.get());
+        REL_CRITICAL("Could not load texture '{}', exiting...", file_path);
         exit(1);
     }
 
@@ -150,7 +150,7 @@ std::shared_ptr<Texture> Texture::create(const encryption::EncryptedFile& file_p
 
     stbi_image_free(data);
 
-    std::string name = get_name(file_path.get());
+    std::string name = get_name(file_path);
 
     return std::make_shared<Texture>(texture, width, height, name);
 }

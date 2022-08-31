@@ -269,7 +269,7 @@ void Font::get_string_size(std::string_view string, float scale, int* out_width,
 }
 
 const char* Font::get_file_data(std::string_view file_path) {
-    std::ifstream file (std::string(file_path), std::ios::binary);
+    std::ifstream file {std::string(file_path), std::ios::binary};
 
     if (!file.is_open()) {
         REL_CRITICAL("Could not open file '{}' for reading, exiting...", file_path);

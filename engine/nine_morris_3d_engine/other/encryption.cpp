@@ -12,11 +12,11 @@ namespace encryption {
         blowfish.initialize(std::string(KEY) + 'S');
     }
 
-    cppblowfish::Buffer load_file(const EncryptedFile& file_path) {
-        std::ifstream file {std::string(file_path.get()), std::ios::binary};
+    cppblowfish::Buffer load_file(EncryptedFile file_path) {
+        std::ifstream file {std::string(file_path), std::ios::binary};
 
         if (!file.is_open()) {
-            REL_CRITICAL("Could not open encrypted file '{}', exiting...", file_path.get());
+            REL_CRITICAL("Could not open encrypted file '{}', exiting...", file_path);
             exit(1);
         }
 
@@ -37,13 +37,13 @@ namespace encryption {
         return buffer;
     }
 
-#if defined(PLATFORM_GAME_DEBUG)
-    std::string encr(std::string_view file_path) {
-        return std::string(file_path);
-    }
-#elif defined(PLATFORM_GAME_RELEASE)
-    EncryptedFile encr(std::string_view file_path) {
-        return EncryptedFile(file_path);
-    }
-#endif
+// #if defined(PLATFORM_GAME_DEBUG)
+//     std::string encr(std::string_view file_path) {
+//         return std::string(file_path);
+//     }
+// #elif defined(PLATFORM_GAME_RELEASE)
+//     EncryptedFile encr(std::string_view file_path) {
+//         return EncryptedFile(file_path);
+//     }
+// #endif
 }

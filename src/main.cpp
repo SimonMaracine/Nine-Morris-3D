@@ -30,6 +30,6 @@ int main() {
     // delete application;
 
     std::unique_ptr<NineMorris3D> application = std::make_unique<NineMorris3D>(INFO_FILE, LOG_FILE, APP_NAME);  // TODO improve initialization
-    application->add_scene(new GameScene(), true);
+    application->add_scene(new GameScene, true);
     application->run();
 }

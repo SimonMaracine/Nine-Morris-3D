@@ -125,7 +125,6 @@ private:
     void prepare_draw_image();
     void prepare_draw_text();
     void draw(std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw);
-    void maybe_initialize_assets();
 
     struct Storage {
         std::shared_ptr<UniformBuffer> projection_uniform_buffer;
@@ -142,10 +141,10 @@ private:
 
     std::vector<std::shared_ptr<gui::Widget>> widgets;
 
-    std::string QUAD2D_VERTEX_SHADER = "data/shaders/internal/quad2d.vert";
-    std::string QUAD2D_FRAGMENT_SHADER = "data/shaders/internal/quad2d.frag";
-    std::string TEXT_VERTEX_SHADER = "data/shaders/internal/text.vert";
-    std::string TEXT_FRAGMENT_SHADER = "data/shaders/internal/text.frag";
+    std::string QUAD2D_VERTEX_SHADER = "data/shaders/internal/quad2d.vert.dat";
+    std::string QUAD2D_FRAGMENT_SHADER = "data/shaders/internal/quad2d.frag.dat";
+    std::string TEXT_VERTEX_SHADER = "data/shaders/internal/text.vert.dat";
+    std::string TEXT_FRAGMENT_SHADER = "data/shaders/internal/text.frag.dat";
 
     // Reference to application
     Application* app = nullptr;

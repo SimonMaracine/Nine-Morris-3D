@@ -28,7 +28,7 @@ public:
     ~Texture();
 
     static std::shared_ptr<Texture> create(std::string_view file_path, const TextureSpecification& specification);
-	static std::shared_ptr<Texture> create(const encryption::EncryptedFile& file_path, const TextureSpecification& specification);
+	static std::shared_ptr<Texture> create(encryption::EncryptedFile file_path, const TextureSpecification& specification);
 	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
 
 	int get_width() { return width; }

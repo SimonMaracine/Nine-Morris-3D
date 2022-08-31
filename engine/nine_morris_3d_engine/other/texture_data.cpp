@@ -22,8 +22,8 @@ TextureData::TextureData(std::string_view file_path, bool flip) {
     this->file_path = file_path;
 }
 
-TextureData::TextureData(const encryption::EncryptedFile& file_path, bool flip) {
-    DEB_DEBUG("Loading texture data '{}'...", file_path.get());
+TextureData::TextureData(encryption::EncryptedFile file_path, bool flip) {
+    DEB_DEBUG("Loading texture data '{}'...", file_path);
 
     cppblowfish::Buffer buffer = encryption::load_file(file_path);
 
@@ -32,11 +32,11 @@ TextureData::TextureData(const encryption::EncryptedFile& file_path, bool flip) 
     data = stbi_load_from_memory(buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture data '{}', exiting...", file_path.get());
+        REL_CRITICAL("Could not load texture data '{}', exiting...", file_path);
         exit(1);
     }
 
-    this->file_path = file_path.get();
+    this->file_path = file_path;
 }
 
 TextureData::~TextureData() {

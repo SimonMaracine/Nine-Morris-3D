@@ -1,6 +1,6 @@
 import subprocess
 
-KEY = "data/models/board/board.objS"
+KEY = "data/models/board/board.obj" + "S"
 ENCRYPTER = r"..\encrypter-helper\encrypter.exe"
 DATA = r"..\data"
 SUFFIX = ".dat"
@@ -19,8 +19,6 @@ encrypt(r"models\node\node.obj")
 encrypt(r"models\piece\white_piece.obj")
 encrypt(r"models\piece\black_piece.obj")
 
-encrypt(r"shaders\internal\origin.vert")
-encrypt(r"shaders\internal\origin.frag")
 encrypt(r"shaders\internal\outline.vert")
 encrypt(r"shaders\internal\outline.frag")
 encrypt(r"shaders\internal\quad2d.vert")
@@ -50,12 +48,12 @@ encrypt(r"shaders\piece\piece.frag")
 encrypt(r"shaders\piece\piece_no_normal.vert")
 encrypt(r"shaders\piece\piece_no_normal.frag")
 
-encrypt(r"data\shaders\post_processing\blur.vert")
-encrypt(r"data\shaders\post_processing\blur.frag")
-encrypt(r"data\shaders\post_processing\bright_filter.vert")
-encrypt(r"data\shaders\post_processing\bright_filter.frag")
-encrypt(r"data\shaders\post_processing\combine.vert")
-encrypt(r"data\shaders\post_processing\combine.frag")
+encrypt(r"shaders\post_processing\blur.vert")
+encrypt(r"shaders\post_processing\blur.frag")
+encrypt(r"shaders\post_processing\bright_filter.vert")
+encrypt(r"shaders\post_processing\bright_filter.frag")
+encrypt(r"shaders\post_processing\combine.vert")
+encrypt(r"shaders\post_processing\combine.frag")
 
 encrypt(r"textures\board\board_normal.png")
 encrypt(r"textures\board\board_normal-small.png")

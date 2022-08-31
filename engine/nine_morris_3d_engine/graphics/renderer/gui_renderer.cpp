@@ -146,8 +146,6 @@ GuiRenderer::GuiRenderer(Application* app)
     storage.projection_uniform_block.uniform_buffer = storage.projection_uniform_buffer;
     storage.projection_uniform_block.binding_index = 4;
 
-    maybe_initialize_assets();
-
     using namespace encryption;
 
     {
@@ -388,21 +386,4 @@ void GuiRenderer::draw(std::vector<gui::Widget*>& subwidgets, const std::functio
 
         widget->render();
     }
-}
-
-void GuiRenderer::maybe_initialize_assets() {
-#ifdef PLATFORM_GAME_RELEASE
-    static const char* PREFIX = ".dat";
-
-    static const std::array<std::string*, 4> assets = { 
-        &QUAD2D_VERTEX_SHADER,
-        &QUAD2D_FRAGMENT_SHADER,
-        &TEXT_VERTEX_SHADER,
-        &TEXT_FRAGMENT_SHADER
-    };
-
-    for (std::string* asset : assets) {
-        *asset += PREFIX;
-    }
-#endif
 }

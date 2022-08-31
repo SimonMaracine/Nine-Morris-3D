@@ -67,8 +67,8 @@ namespace mesh {
         return std::make_shared<Mesh<VPTN>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(const encryption::EncryptedFile& file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading VPTN model '{}'...", file_path.get());
+    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(encryption::EncryptedFile file_path, bool flip_winding_order) {
+        DEB_DEBUG("Loading VPTN model '{}'...", file_path);
 
         cppblowfish::Buffer buffer = encryption::load_file(file_path);
 
@@ -82,7 +82,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path.get());
+            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
@@ -175,8 +175,8 @@ namespace mesh {
         return std::make_shared<Mesh<VP>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VP>> load_model_VP(const encryption::EncryptedFile& file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading VP model '{}'...", file_path.get());
+    std::shared_ptr<Mesh<VP>> load_model_VP(encryption::EncryptedFile file_path, bool flip_winding_order) {
+        DEB_DEBUG("Loading VP model '{}'...", file_path);
 
         cppblowfish::Buffer buffer = encryption::load_file(file_path);
 
@@ -190,7 +190,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path.get());
+            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
@@ -289,8 +289,8 @@ namespace mesh {
         return std::make_shared<Mesh<VPTNT>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(const encryption::EncryptedFile& file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading VPTNT model '{}'...", file_path.get());
+    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(encryption::EncryptedFile file_path, bool flip_winding_order) {
+        DEB_DEBUG("Loading VPTNT model '{}'...", file_path);
 
         cppblowfish::Buffer buffer = encryption::load_file(file_path);
 
@@ -304,7 +304,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path.get());
+            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }

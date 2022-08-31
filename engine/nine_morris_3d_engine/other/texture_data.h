@@ -9,7 +9,7 @@ struct GLFWimage;
 class TextureData {
 public:
 	TextureData(std::string_view file_path, bool flip);
-	TextureData(const encryption::EncryptedFile& file_path, bool flip);
+	TextureData(encryption::EncryptedFile file_path, bool flip);
 	~TextureData();
 
 	GLFWimage get_data_glfw() const;

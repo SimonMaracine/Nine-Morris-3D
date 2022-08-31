@@ -132,10 +132,10 @@ std::shared_ptr<Shader> Shader::create(
 }
 
 std::shared_ptr<Shader> Shader::create(
-        const encryption::EncryptedFile& vertex_source_path,
-        const encryption::EncryptedFile& fragment_source_path,
+        encryption::EncryptedFile vertex_source_path,
+        encryption::EncryptedFile fragment_source_path,
         const std::vector<std::string>& uniforms) {
-    const std::string name = get_name(vertex_source_path.get(), fragment_source_path.get());
+    const std::string name = get_name(vertex_source_path, fragment_source_path);
 
     cppblowfish::Buffer buffer_vertex = encryption::load_file(vertex_source_path);
     cppblowfish::Buffer buffer_fragment = encryption::load_file(fragment_source_path);
@@ -163,16 +163,16 @@ std::shared_ptr<Shader> Shader::create(
 
     return std::make_shared<Shader>(
         program, vertex_shader, fragment_shader, name, uniforms,
-        vertex_source_path.get(), fragment_source_path.get()
+        vertex_source_path, fragment_source_path
     );
 }
 
 std::shared_ptr<Shader> Shader::create(
-        const encryption::EncryptedFile& vertex_source_path,
-        const encryption::EncryptedFile& fragment_source_path,
+        encryption::EncryptedFile vertex_source_path,
+        encryption::EncryptedFile fragment_source_path,
         const std::vector<std::string>& uniforms,
         const std::vector<UniformBlockSpecification>& uniform_blocks) {
-    const std::string name = get_name(vertex_source_path.get(), fragment_source_path.get());
+    const std::string name = get_name(vertex_source_path, fragment_source_path);
 
     cppblowfish::Buffer buffer_vertex = encryption::load_file(vertex_source_path);
     cppblowfish::Buffer buffer_fragment = encryption::load_file(fragment_source_path);
@@ -202,7 +202,7 @@ std::shared_ptr<Shader> Shader::create(
 
     return std::make_shared<Shader>(
         program, vertex_shader, fragment_shader, name, uniforms,
-        vertex_source_path.get(), fragment_source_path.get()
+        vertex_source_path, fragment_source_path
     );
 }
 
@@ -298,8 +298,6 @@ GLint Shader::get_uniform_location(std::string_view name) {
     }
 #endif
 }
-
-
 
 GLuint Shader::compile_shader(std::string_view source_path, GLenum type, std::string_view name) noexcept(false) {
     std::ifstream file {std::string(source_path)};

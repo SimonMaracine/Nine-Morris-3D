@@ -123,7 +123,6 @@ private:
     void draw_quads();
     void setup_shadows();
     void check_hovered_id(int x, int y);
-    void maybe_initialize_assets();
 
     struct Storage {
         std::shared_ptr<UniformBuffer> projection_view_uniform_buffer;
@@ -173,16 +172,16 @@ private:
 
     PostProcessingContext post_processing_context;
 
-    std::string SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert";
-    std::string SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag";
-    std::string SCREEN_QUAD_VERTEX_SHADER = "data/shaders/internal/screen_quad.vert";
-    std::string SCREEN_QUAD_FRAGMENT_SHADER = "data/shaders/internal/screen_quad.frag";
-    std::string OUTLINE_VERTEX_SHADER = "data/shaders/internal/outline.vert";
-    std::string OUTLINE_FRAGMENT_SHADER = "data/shaders/internal/outline.frag";
-    std::string SKYBOX_VERTEX_SHADER = "data/shaders/internal/skybox.vert";
-    std::string SKYBOX_FRAGMENT_SHADER = "data/shaders/internal/skybox.frag";
-    std::string QUAD3D_VERTEX_SHADER = "data/shaders/internal/quad3d.vert";
-    std::string QUAD3D_FRAGMENT_SHADER = "data/shaders/internal/quad3d.frag";
+    std::string SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert.dat";
+    std::string SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag.dat";
+    std::string SCREEN_QUAD_VERTEX_SHADER = "data/shaders/internal/screen_quad.vert.dat";
+    std::string SCREEN_QUAD_FRAGMENT_SHADER = "data/shaders/internal/screen_quad.frag.dat";
+    std::string OUTLINE_VERTEX_SHADER = "data/shaders/internal/outline.vert.dat";
+    std::string OUTLINE_FRAGMENT_SHADER = "data/shaders/internal/outline.frag.dat";
+    std::string SKYBOX_VERTEX_SHADER = "data/shaders/internal/skybox.vert.dat";
+    std::string SKYBOX_FRAGMENT_SHADER = "data/shaders/internal/skybox.frag.dat";
+    std::string QUAD3D_VERTEX_SHADER = "data/shaders/internal/quad3d.vert.dat";
+    std::string QUAD3D_FRAGMENT_SHADER = "data/shaders/internal/quad3d.frag.dat";
 #ifdef PLATFORM_GAME_DEBUG
     std::string ORIGIN_VERTEX_SHADER = "data/shaders/internal/origin.vert";
     std::string ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";

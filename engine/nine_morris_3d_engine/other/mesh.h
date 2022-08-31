@@ -32,11 +32,11 @@ namespace mesh {
     };
 
     std::shared_ptr<Mesh<VPTN>> load_model_VPTN(std::string_view file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(const encryption::EncryptedFile& file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(encryption::EncryptedFile file_path, bool flip_winding_order = false);
 
     std::shared_ptr<Mesh<VP>> load_model_VP(std::string_view file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VP>> load_model_VP(const encryption::EncryptedFile& file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<VP>> load_model_VP(encryption::EncryptedFile file_path, bool flip_winding_order = false);
 
     std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(std::string_view file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(const encryption::EncryptedFile& file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(encryption::EncryptedFile file_path, bool flip_winding_order = false);
 }

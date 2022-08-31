@@ -18,8 +18,6 @@ encrypt models/node/node.obj
 encrypt models/piece/white_piece.obj
 encrypt models/piece/black_piece.obj
 
-encrypt shaders/internal/origin.vert
-encrypt shaders/internal/origin.frag
 encrypt shaders/internal/outline.vert
 encrypt shaders/internal/outline.frag
 encrypt shaders/internal/quad2d.vert
@@ -49,12 +47,12 @@ encrypt shaders/piece/piece.frag
 encrypt shaders/piece/piece_no_normal.vert
 encrypt shaders/piece/piece_no_normal.frag
 
-encrypt data/shaders/post_processing/blur.vert
-encrypt data/shaders/post_processing/blur.frag
-encrypt data/shaders/post_processing/bright_filter.vert
-encrypt data/shaders/post_processing/bright_filter.frag
-encrypt data/shaders/post_processing/combine.vert
-encrypt data/shaders/post_processing/combine.frag
+encrypt shaders/post_processing/blur.vert
+encrypt shaders/post_processing/blur.frag
+encrypt shaders/post_processing/bright_filter.vert
+encrypt shaders/post_processing/bright_filter.frag
+encrypt shaders/post_processing/combine.vert
+encrypt shaders/post_processing/combine.frag
 
 encrypt textures/board/board_normal.png
 encrypt textures/board/board_normal-small.png

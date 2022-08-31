@@ -1,8 +1,6 @@
 #pragma once
 
 namespace assets {
-    void maybe_initialize_assets();
-
     extern std::string BOARD_WOOD_MESH;
     extern std::string BOARD_PAINT_MESH;
     extern std::string NODE_MESH;

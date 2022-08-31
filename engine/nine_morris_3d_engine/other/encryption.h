@@ -7,21 +7,25 @@
 namespace encryption {
     class EncryptedFile {
     public:
-        explicit EncryptedFile(std::string_view file_path)
-            : file_path(std::string(file_path)) {}
+        explicit constexpr EncryptedFile(std::string_view file_path)
+            : file_path(file_path) {}
         ~EncryptedFile() = default;
 
-        std::string_view get() const { return file_path; }
+        operator std::string_view() const { return file_path; }
     private:
-        std::string file_path;
+        std::string_view file_path;
     };
 
     void initialize();
-    cppblowfish::Buffer load_file(const EncryptedFile& file_path);
+    cppblowfish::Buffer load_file(EncryptedFile file_path);
 
-#if defined(PLATFORM_GAME_DEBUG)
-    std::string encr(std::string_view file_path);
-#elif defined(PLATFORM_GAME_RELEASE)
-    EncryptedFile encr(std::string_view file_path);
-#endif
+// #if defined(PLATFORM_GAME_DEBUG)
+//     std::string encr(std::string_view file_path);
+// #elif defined(PLATFORM_GAME_RELEASE)
+//     EncryptedFile encr(std::string_view file_path);
+// #endif
+
+    constexpr EncryptedFile encr(std::string_view file_path) {
+        return EncryptedFile(file_path);
+    }
 }

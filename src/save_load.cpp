@@ -236,7 +236,7 @@ namespace save_load {
             throw SaveFileError(e.what());
         }
 
-        std::ofstream file (file_path, std::ios::binary | std::ios::trunc);
+        std::ofstream file {file_path, std::ios::binary | std::ios::trunc};
 
         if (!file.is_open()) {
             throw SaveFileNotOpenError(
@@ -262,7 +262,7 @@ namespace save_load {
             throw SaveFileError(e.what());
         }
 
-        std::ifstream file (file_path, std::ios::binary);
+        std::ifstream file {file_path, std::ios::binary};
 
         if (!file.is_open()) {
             throw SaveFileNotOpenError(
