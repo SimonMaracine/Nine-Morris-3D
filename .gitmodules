@@ -18,10 +18,6 @@
 	path = extern/spdlog
 	url = https://github.com/SimonMaracine/spdlog.git
 	ignore = dirty
-[submodule "extern/json"]
-	path = extern/json
-	url = https://github.com/SimonMaracine/json.git
-	ignore = dirty
 [submodule "extern/utfcpp"]
 	path = extern/utfcpp
 	url = https://github.com/SimonMaracine/utfcpp.git
@@ -29,4 +25,8 @@
 [submodule "extern/cppblowfish"]
 	path = extern/cppblowfish
 	url = https://github.com/SimonMaracine/cppblowfish.git
+	ignore = dirty
+[submodule "extern/entt"]
+	path = extern/entt
+	url = https://github.com/SimonMaracine/entt.git
 	ignore = dirty
