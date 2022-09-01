@@ -5,6 +5,7 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/application/events.h"
+#include "nine_morris_3d_engine/ecs/internal_components.h"
 #include "nine_morris_3d_engine/graphics/renderer/framebuffer_reader.h"
 #include "nine_morris_3d_engine/graphics/renderer/font.h"
 #include "nine_morris_3d_engine/graphics/renderer/camera.h"
@@ -29,47 +30,11 @@ struct PostProcessingContext {
 
 class Renderer {
 public:
-    struct Model {
-        std::shared_ptr<VertexArray> vertex_array;
-        int index_count = 0;
-        std::shared_ptr<MaterialInstance> material;
-
-        // glm::vec3 position = glm::vec3(0.0f);
-        // glm::vec3 rotation = glm::vec3(0.0f);
-        // float scale = 1.0f;
-
-        // // To be used with outline rendering
-        // glm::vec3 outline_color = glm::vec3(0.0f);
-
-        unsigned int handle = 0;
-    };
-
-    struct Quad {
-        std::shared_ptr<Texture> texture;
-
-        // glm::vec3 position = glm::vec3(0.0f);
-        // float scale = 1.0f;
-
-        unsigned int handle = 0;
-    };
-
-    enum {
-        WithOutline = 1 << 0,
-        CastShadow = 1 << 1,
-    };
-
     Renderer(Application* app);
     ~Renderer();
 
     void render();
     void on_window_resized(const WindowResizedEvent& event);
-
-    void add_model(Model& model, int options = 0);
-    void remove_model(unsigned int handle);
-    void update_model(Model& model, int options = 0);
-
-    void add_quad(Quad& quad);
-    void remove_quad(unsigned int handle);
 
     void setup_shader(std::shared_ptr<Shader> shader);
     void add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step);
@@ -115,16 +80,19 @@ private:
     void end_rendering();
     void draw_origin();
     void draw_skybox();
-    void draw_model(const Model* model);
+    void draw_model(const ModelComponent& model_c, const TransformComponent& transform_c);
+    void draw_model_with_outline(const ModelComponent& model_c, const TransformComponent& transform_c,
+            const OutlineComponent& outline_c);
     void draw_models_to_depth_buffer();
     void draw_models_normal();
     void draw_models_with_outline();
-    void _draw_models_with_outline(const std::vector<Model*>& submodels);
     void draw_quads();
     void setup_shadows();
+    void setup_uniform_buffers();
     void check_hovered_id(int x, int y);
+    void cache_camera();
 
-    struct Storage {
+    struct {
         std::shared_ptr<UniformBuffer> projection_view_uniform_buffer;
         std::shared_ptr<UniformBuffer> light_uniform_buffer;
         std::shared_ptr<UniformBuffer> light_view_position_uniform_buffer;
@@ -159,11 +127,12 @@ private:
         std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
     } storage;
 
-    // Collections of pointers to models and quads
-    std::vector<Model*> models;
-    std::vector<Model*> models_outline;
-    std::vector<Model*> models_cast_shadow;
-    std::vector<Quad*> quads;
+    struct {
+        glm::mat4 projection_matrix = glm::mat4(1.0f);
+        glm::mat4 view_matrix = glm::mat4(1.0f);
+        glm::mat4 projection_view_matrix = glm::mat4(1.0f);
+        glm::vec3 position = glm::vec3(0.0f);
+    } camera_cache;
 
     hover::Id hovered_id = hover::null;
     FramebufferReader<4> reader;

@@ -87,7 +87,7 @@ namespace gui {
     class Text : public Widget {
     public:
         Text(std::shared_ptr<Font> font, std::string_view text, float text_scale = 1.0f,
-                const glm::vec3& color = glm::vec3(1.0f));
+            const glm::vec3& color = glm::vec3(1.0f));
         virtual ~Text() = default;
 
         virtual void render() override;

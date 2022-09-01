@@ -34,23 +34,27 @@ void serialize(Archive& archive, TransformComponent& transform_c) {
     archive(transform_c.position, transform_c.rotation, transform_c.scale);
 }
 
+/*
+Unserialized variables:
+    vertex_array, material
+*/
 template<typename Archive>
 void serialize(Archive& archive, ModelComponent& model_c) {
-    archive(model_c.model);
-}
-
-template<typename Archive>
-void serialize(Archive& archive, QuadComponent& quad_c) {
-    archive(quad_c.quad);
+    archive(model_c.index_count);
 }
 
 /*
 Unserialized variables:
-    renderer
+    texture
 */
 template<typename Archive>
-void serialize(Archive& archive, RenderComponent& render_c) {  // TODO might not work...
-    archive(render_c.options);
+void serialize(Archive& archive, QuadComponent&) {
+    archive();
+}
+
+template<typename Archive>
+void serialize(Archive& archive, RenderComponent&) {  // TODO might not work...
+    archive();
 }
 
 template<typename Archive>
@@ -68,8 +72,7 @@ Unserialized variables:
     gui_renderer
 */
 template<typename Archive>
-void serialize(Archive& archive, GuiRenderComponent& gui_render_c) {  // TODO might not work...
-    static_cast<void>(gui_render_c);
+void serialize(Archive& archive, GuiRenderComponent&) {  // TODO might not work...
     archive();
 }
 
@@ -112,28 +115,9 @@ void serialize(Archive& archive, Camera& camera) {
     );
 }
 
-/*
-Unserialized variables:
-    vertex_array, material, handle
-*/
-template<typename Archive>
-void serialize(Archive& archive, Renderer::Model& model) {  // TODO might not work...
-    archive(model.index_count);
-}
-
 template<typename Archive>
 void serialize(Archive& archive, OutlineComponent& outline_c) {
     archive(outline_c.outline_enabled, outline_c.outline_color);
-}
-
-/*
-Unserialized variables:
-    texture, handle
-*/
-template<typename Archive>
-void serialize(Archive& archive, Renderer::Quad& quad) {  // TODO might not work...
-    static_cast<void>(quad);
-    archive();
 }
 
 template<typename Archive>

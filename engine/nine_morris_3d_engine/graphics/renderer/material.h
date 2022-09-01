@@ -12,7 +12,7 @@ public:
     };
 
     enum {
-        Hoverable = 1 << 0
+        Hoverable = 1 << 0  // FIXME maybe not needed anymore
     };
 
     Material(std::shared_ptr<Shader> shader, int flags = 0);

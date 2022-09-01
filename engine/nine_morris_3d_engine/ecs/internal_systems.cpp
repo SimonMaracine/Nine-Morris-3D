@@ -2,26 +2,6 @@
 #include "nine_morris_3d_engine/ecs/internal_systems.h"
 #include "nine_morris_3d_engine/ecs/internal_components.h"
 
-static void model_render_system_construct(entt::registry& registry, entt::entity entity) {
-    auto [render_c, model_c] = registry.get<RenderComponent, ModelComponent>(entity);
-    render_c.renderer->add_model(model_c.model, render_c.options);
-};
-
-static void model_render_system_destroy(entt::registry& registry, entt::entity entity) {
-    auto [render_c, model_c] = registry.get<RenderComponent, ModelComponent>(entity);
-    render_c.renderer->remove_model(model_c.model.handle);
-};
-
-static void quad_render_system_construct(entt::registry& registry, entt::entity entity) {
-    auto [render_c, quad_c] = registry.get<RenderComponent, QuadComponent>(entity);
-    render_c.renderer->add_quad(quad_c.quad);
-};
-
-static void quad_render_system_destroy(entt::registry& registry, entt::entity entity) {
-    auto [render_c, quad_c] = registry.get<RenderComponent, QuadComponent>(entity);
-    render_c.renderer->remove_quad(quad_c.quad.handle);
-};
-
 static void gui_image_system_construct(entt::registry& registry, entt::entity entity) {
     auto [gui_render_c, gui_image_c] = registry.get<GuiRenderComponent, GuiImageComponent>(entity);
 
@@ -111,17 +91,6 @@ void CameraProjectionSystem::run() {
             static_cast<float>(app->app_data.width), static_cast<float>(app->app_data.height)
         );
     }
-}
-
-void ModelRenderSystem::signal() {
-    registry.on_construct<ModelComponent>().connect<&model_render_system_construct>();
-    registry.on_destroy<ModelComponent>().connect<&model_render_system_destroy>();
-}
-
-
-void QuadRenderSystem::signal() {
-    registry.on_construct<QuadComponent>().connect<&quad_render_system_construct>();
-    registry.on_destroy<QuadComponent>().connect<&quad_render_system_destroy>();
 }
 
 void GuiImageSystem::signal() {

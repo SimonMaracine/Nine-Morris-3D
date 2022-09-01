@@ -25,9 +25,9 @@ void UpdateNodesSystem::run() {
         const bool permitted = !board_c.should_take_piece && board_c.is_players_turn;
 
         if (hovered && highlight && permitted) {
-            model_c.model.material->set_vec4("u_color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+            model_c.material->set_vec4("u_color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
         } else {
-            model_c.model.material->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+            model_c.material->set_vec4("u_color", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
         }
     }
 }

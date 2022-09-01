@@ -7,6 +7,7 @@
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/camera.h"
 #include "nine_morris_3d_engine/graphics/renderer/hover.h"
+#include "nine_morris_3d_engine/graphics/renderer/material.h"
 
 struct TransformComponent {
     glm::vec3 position = glm::vec3(0.0f);
@@ -18,8 +19,12 @@ struct TagComponent {  // TODO maybe not needed
     std::string tag;
 };
 
+struct RenderComponent {};
+
 struct ModelComponent {
-    Renderer::Model model;
+    std::shared_ptr<VertexArray> vertex_array;
+    int index_count = 0;
+    std::shared_ptr<MaterialInstance> material;
 };
 
 struct OutlineComponent {
@@ -27,13 +32,14 @@ struct OutlineComponent {
     glm::vec3 outline_color = glm::vec3(0.0f);
 };
 
-struct QuadComponent {
-    Renderer::Quad quad;
+struct HoverComponent {
+    hover::Id id = hover::null;
 };
 
-struct RenderComponent {
-    Renderer* renderer = nullptr;
-    int options = 0;
+struct CastShadowComponent {};
+
+struct QuadComponent {
+    std::shared_ptr<Texture> texture;
 };
 
 struct GuiImageComponent {
@@ -65,8 +71,4 @@ struct GuiScaleComponent {
 
 struct CameraComponent {
     Camera camera;
-};
-
-struct HoverComponent {
-    hover::Id id = hover::null;
 };
