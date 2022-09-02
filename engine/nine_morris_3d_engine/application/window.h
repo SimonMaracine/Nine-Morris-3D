@@ -28,7 +28,8 @@ public:
         std::array<GLFWimage, Count> glfw_icons;
 
         for (size_t i = 0; i < icons.size(); i++) {
-            glfw_icons[i] = icons[i]->get_data_glfw();
+            Image data = icons[i]->get_data();
+            glfw_icons[i] = *reinterpret_cast<GLFWimage*>(&data);
         }
 
         glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());

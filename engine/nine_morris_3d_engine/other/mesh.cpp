@@ -9,10 +9,10 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 namespace mesh {
-    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(std::string_view file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading VPTN model '{}'...", file_path);
+    std::shared_ptr<Mesh<PTN>> load_model_VPTN(std::string_view file_path, bool flip_winding) {
+        DEB_DEBUG("Loading PTN model '{}'...", file_path);
 
-        const aiPostProcessSteps flip = flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(
@@ -31,11 +31,11 @@ namespace mesh {
         const aiNode* collection = root_node->mChildren[0];
         const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-        std::vector<VPTN> vertices;
+        std::vector<PTN> vertices;
         std::vector<unsigned int> indices;
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-            VPTN vertex;
+            PTN vertex;
 
             glm::vec3 position;
             position.x = mesh->mVertices[i].x;
@@ -64,15 +64,15 @@ namespace mesh {
             }
         }
 
-        return std::make_shared<Mesh<VPTN>>(vertices, indices);
+        return std::make_shared<Mesh<PTN>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(encrypt::EncryptedFile file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading VPTN model '{}'...", file_path);
+    std::shared_ptr<Mesh<PTN>> load_model_PTN(encrypt::EncryptedFile file_path, bool flip_winding) {
+        DEB_DEBUG("Loading PTN model '{}'...", file_path);
 
-        cppblowfish::Buffer buffer = encrypt::load_file(file_path);
+        const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
-        const aiPostProcessSteps flip = flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFileFromMemory(
@@ -92,11 +92,11 @@ namespace mesh {
         const aiNode* collection = root_node->mChildren[0];
         const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-        std::vector<VPTN> vertices;
+        std::vector<PTN> vertices;
         std::vector<unsigned int> indices;
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-            VPTN vertex;
+            PTN vertex;
 
             glm::vec3 position;
             position.x = mesh->mVertices[i].x;
@@ -125,13 +125,13 @@ namespace mesh {
             }
         }
 
-        return std::make_shared<Mesh<VPTN>>(vertices, indices);
+        return std::make_shared<Mesh<PTN>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VP>> load_model_VP(std::string_view file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading VP model '{}'...", file_path);
+    std::shared_ptr<Mesh<P>> load_model_P(std::string_view file_path, bool flip_winding) {
+        DEB_DEBUG("Loading P model '{}'...", file_path);
 
-        const aiPostProcessSteps flip = flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(
@@ -150,11 +150,11 @@ namespace mesh {
         const aiNode* collection = root_node->mChildren[0];
         const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-        std::vector<VP> vertices;
+        std::vector<P> vertices;
         std::vector<unsigned int> indices;
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-            VP vertex;
+            P vertex;
 
             glm::vec3 position;
             position.x = mesh->mVertices[i].x;
@@ -172,15 +172,15 @@ namespace mesh {
             }
         }
 
-        return std::make_shared<Mesh<VP>>(vertices, indices);
+        return std::make_shared<Mesh<P>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VP>> load_model_VP(encrypt::EncryptedFile file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading VP model '{}'...", file_path);
+    std::shared_ptr<Mesh<P>> load_model_P(encrypt::EncryptedFile file_path, bool flip_winding) {
+        DEB_DEBUG("Loading P model '{}'...", file_path);
 
-        cppblowfish::Buffer buffer = encrypt::load_file(file_path);
+        const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
-        const aiPostProcessSteps flip = flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFileFromMemory(
@@ -200,11 +200,11 @@ namespace mesh {
         const aiNode* collection = root_node->mChildren[0];
         const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-        std::vector<VP> vertices;
+        std::vector<P> vertices;
         std::vector<unsigned int> indices;
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-            VP vertex;
+            P vertex;
 
             glm::vec3 position;
             position.x = mesh->mVertices[i].x;
@@ -222,13 +222,13 @@ namespace mesh {
             }
         }
 
-        return std::make_shared<Mesh<VP>>(vertices, indices);
+        return std::make_shared<Mesh<P>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(std::string_view file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading VPTNT model '{}'...", file_path);
+    std::shared_ptr<Mesh<PTNT>> load_model_PTNT(std::string_view file_path, bool flip_winding) {
+        DEB_DEBUG("Loading PTNT model '{}'...", file_path);
 
-        const aiPostProcessSteps flip = flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(
@@ -247,11 +247,11 @@ namespace mesh {
         const aiNode* collection = root_node->mChildren[0];
         const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-        std::vector<VPTNT> vertices;
+        std::vector<PTNT> vertices;
         std::vector<unsigned int> indices;
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-            VPTNT vertex;
+            PTNT vertex;
 
             glm::vec3 position;
             position.x = mesh->mVertices[i].x;
@@ -286,15 +286,15 @@ namespace mesh {
             }
         }
 
-        return std::make_shared<Mesh<VPTNT>>(vertices, indices);
+        return std::make_shared<Mesh<PTNT>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(encrypt::EncryptedFile file_path, bool flip_winding_order) {
-        DEB_DEBUG("Loading VPTNT model '{}'...", file_path);
+    std::shared_ptr<Mesh<PTNT>> load_model_PTNT(encrypt::EncryptedFile file_path, bool flip_winding) {
+        DEB_DEBUG("Loading PTNT model '{}'...", file_path);
 
-        cppblowfish::Buffer buffer = encrypt::load_file(file_path);
+        const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
-        const aiPostProcessSteps flip = flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFileFromMemory(
@@ -314,11 +314,11 @@ namespace mesh {
         const aiNode* collection = root_node->mChildren[0];
         const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-        std::vector<VPTNT> vertices;
+        std::vector<PTNT> vertices;
         std::vector<unsigned int> indices;
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-            VPTNT vertex;
+            PTNT vertex;
 
             glm::vec3 position;
             position.x = mesh->mVertices[i].x;
@@ -353,6 +353,6 @@ namespace mesh {
             }
         }
 
-        return std::make_shared<Mesh<VPTNT>>(vertices, indices);
+        return std::make_shared<Mesh<PTNT>>(vertices, indices);
     }
 }

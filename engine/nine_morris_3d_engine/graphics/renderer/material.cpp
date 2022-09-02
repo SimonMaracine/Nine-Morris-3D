@@ -1,32 +1,21 @@
 #include <glm/glm.hpp>
+#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/graphics/renderer/material.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 
-Material::Material(std::shared_ptr<Shader> shader, int flags)
+Material::Material(entt::resource_handle<Shader> shader, int flags)
     : shader(shader), flags(flags) {
-    DEB_DEBUG("Created material with shader: {}", shader->get_name());
-}
-
-Material::Material(std::shared_ptr<Material> material) {
-    shader = material->shader;
-    uniforms_mat4 = material->uniforms_mat4;
-    uniforms_int = material->uniforms_int;
-    uniforms_float = material->uniforms_float;
-    uniforms_vec2 = material->uniforms_vec2;
-    uniforms_vec3 = material->uniforms_vec3;
-    uniforms_vec4 = material->uniforms_vec4;
-    textures = material->textures;
-    flags = material->flags;
+    DEB_DEBUG("Created material from shader: {} and flags: {}", shader->get_name(), flags);
 }
 
 Material::~Material() {
-    DEB_DEBUG("Deleted material from shader: {}", shader->get_name());
+    DEB_DEBUG("Deleted material from shader: {} and flags: {}", shader->get_name(), flags);
 }
 
-void Material::add_variable(UniformType type, std::string_view name) {
+void Material::add_uniform(UniformType type, std::string_view name) {
     switch (type) {
         case UniformType::Mat4:
             uniforms_mat4[std::string(name)] = glm::mat4(1.0f);
@@ -52,13 +41,22 @@ void Material::add_variable(UniformType type, std::string_view name) {
 }
 
 void Material::add_texture(std::string_view name) {
-    textures[std::string(name)] = std::make_pair(0, nullptr);
+    textures[std::string(name)] = std::make_pair<int, entt::resource_handle<Texture>>(0, {});
 }
 
 // --- Material instance
 
-MaterialInstance::MaterialInstance(std::shared_ptr<Material> material)
-    : material(std::make_unique<Material>(material)) {
+MaterialInstance::MaterialInstance(entt::resource_handle<Material> material) {
+    shader = material->shader;
+    uniforms_mat4 = material->uniforms_mat4;
+    uniforms_int = material->uniforms_int;
+    uniforms_float = material->uniforms_float;
+    uniforms_vec2 = material->uniforms_vec2;
+    uniforms_vec3 = material->uniforms_vec3;
+    uniforms_vec4 = material->uniforms_vec4;
+    textures = material->textures;
+    flags = material->flags;
+
     DEB_DEBUG("Made material instance");
 }
 
@@ -66,69 +64,65 @@ MaterialInstance::~MaterialInstance() {
     DEB_DEBUG("Destroyed material instance");
 }
 
-std::shared_ptr<MaterialInstance> MaterialInstance::make(std::shared_ptr<Material> material) {
-    return std::make_shared<MaterialInstance>(material);
-}
-
 void MaterialInstance::bind() {
-    material->shader->bind();
+    shader->bind();
 
-    for (const auto& [name, matrix] : material->uniforms_mat4) {
-        material->shader->upload_uniform_mat4(name, matrix);
+    for (const auto& [name, matrix] : uniforms_mat4) {
+        shader->upload_uniform_mat4(name, matrix);
     }
 
-    for (const auto& [name, value] : material->uniforms_int) {
-        material->shader->upload_uniform_int(name, value);
+    for (const auto& [name, value] : uniforms_int) {
+        shader->upload_uniform_int(name, value);
     }
 
-    for (const auto& [name, value] : material->uniforms_float) {
-        material->shader->upload_uniform_float(name, value);
+    for (const auto& [name, value] : uniforms_float) {
+        shader->upload_uniform_float(name, value);
     }
 
-    for (const auto& [name, vector] : material->uniforms_vec2) {
-        material->shader->upload_uniform_vec2(name, vector);
+    for (const auto& [name, vector] : uniforms_vec2) {
+        shader->upload_uniform_vec2(name, vector);
     }
 
-    for (const auto& [name, vector] : material->uniforms_vec3) {
-        material->shader->upload_uniform_vec3(name, vector);
+    for (const auto& [name, vector] : uniforms_vec3) {
+        shader->upload_uniform_vec3(name, vector);
     }
 
-    for (const auto& [name, vector] : material->uniforms_vec4) {
-        material->shader->upload_uniform_vec4(name, vector);
+    for (const auto& [name, vector] : uniforms_vec4) {
+        shader->upload_uniform_vec4(name, vector);
     }
 
     // Bind any textures
-    for (auto& [name, pair] : material->textures) {
+    for (auto& [name, pair] : textures) {
         auto& [unit, texture] = pair;
-        material->shader->upload_uniform_int(name, unit);
+        shader->upload_uniform_int(name, unit);
         texture->bind(unit);
     }
 }
 
 void MaterialInstance::set_mat4(std::string_view name, const glm::mat4& matrix) {
-    material->uniforms_mat4[std::string(name)] = matrix;
+    uniforms_mat4[std::string(name)] = matrix;
 }
 
 void MaterialInstance::set_int(std::string_view name, int value) {
-    material->uniforms_int[std::string(name)] = value;
+    uniforms_int[std::string(name)] = value;
 }
 
 void MaterialInstance::set_float(std::string_view name, float value) {
-    material->uniforms_float[std::string(name)] = value;
+    uniforms_float[std::string(name)] = value;
 }
 
 void MaterialInstance::set_vec2(std::string_view name, glm::vec2 vector) {
-    material->uniforms_vec2[std::string(name)] = vector;
+    uniforms_vec2[std::string(name)] = vector;
 }
 
 void MaterialInstance::set_vec3(std::string_view name, const glm::vec3& vector) {
-    material->uniforms_vec3[std::string(name)] = vector;
+    uniforms_vec3[std::string(name)] = vector;
 }
 
 void MaterialInstance::set_vec4(std::string_view name, const glm::vec4& vector) {
-    material->uniforms_vec4[std::string(name)] = vector;
+    uniforms_vec4[std::string(name)] = vector;
 }
 
-void MaterialInstance::set_texture(std::string_view name, std::shared_ptr<Texture> texture, int unit) {
-    material->textures[std::string(name)] = std::make_pair(unit, texture);
+void MaterialInstance::set_texture(std::string_view name, entt::resource_handle<Texture> texture, int unit) {
+    textures[std::string(name)] = std::make_pair(unit, texture);
 }

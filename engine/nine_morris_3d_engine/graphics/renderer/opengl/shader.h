@@ -16,22 +16,12 @@ struct UniformBlockSpecification {
     GLuint binding_index;
 };
 
-struct Sources {
-    std::string_view vertex_path;
-    std::string_view fragment_path;
-};
-
-struct EncryptedSources {
-    encrypt::EncryptedFile vertex_path;
-    encrypt::EncryptedFile fragment_path;
-};
-
 class Shader {
 public:
-    Shader(const Sources& sources, const std::vector<std::string>& uniforms,
-        const std::vector<UniformBlockSpecification>& uniform_blocks = {});
-    Shader(const EncryptedSources& sources, const std::vector<std::string>& uniforms,
-        const std::vector<UniformBlockSpecification>& uniform_blocks = {});
+    Shader(std::string_view vertex_source_path, std::string_view fragment_source_path,
+        const std::vector<std::string>& uniforms, const std::vector<UniformBlockSpecification>& uniform_blocks = {});
+    Shader(encrypt::EncryptedFile vertex_source_path, encrypt::EncryptedFile fragment_source_path,
+        const std::vector<std::string>& uniforms, const std::vector<UniformBlockSpecification>& uniform_blocks = {});
     ~Shader();
 
     void bind();
@@ -48,7 +38,7 @@ public:
     void recompile();
 
     std::string_view get_name() { return name; }
-    std::vector<std::string>& get_uniforms() { return uniforms; }
+    const std::vector<std::string>& get_uniforms() { return uniforms; }
 private:
     GLint get_uniform_location(std::string_view name);
     void check_and_cache_uniforms(const std::vector<std::string>& uniforms);

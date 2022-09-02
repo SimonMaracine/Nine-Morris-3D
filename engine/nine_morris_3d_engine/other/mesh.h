@@ -5,17 +5,17 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 namespace mesh {
-    struct VPTN {
+    struct PTN {
         glm::vec3 position = glm::vec3(0.0f);
         glm::vec2 texture_coordinate = glm::vec2(0.0f);
         glm::vec3 normal = glm::vec3(0.0f);
     };
 
-    struct VP {
+    struct P {
         glm::vec3 position = glm::vec3(0.0f);
     };
 
-    struct VPTNT {
+    struct PTNT {
         glm::vec3 position = glm::vec3(0.0f);
         glm::vec2 texture_coordinate = glm::vec2(0.0f);
         glm::vec3 normal = glm::vec3(0.0f);
@@ -31,12 +31,12 @@ namespace mesh {
         std::vector<unsigned int> indices;
     };
 
-    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(std::string_view file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(encrypt::EncryptedFile file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<PTN>> load_model_PTN(std::string_view file_path, bool flip_winding = false);
+    std::shared_ptr<Mesh<PTN>> load_model_PTN(encrypt::EncryptedFile file_path, bool flip_winding = false);
 
-    std::shared_ptr<Mesh<VP>> load_model_VP(std::string_view file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VP>> load_model_VP(encrypt::EncryptedFile file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<P>> load_model_P(std::string_view file_path, bool flip_winding = false);
+    std::shared_ptr<Mesh<P>> load_model_P(encrypt::EncryptedFile file_path, bool flip_winding = false);
 
-    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(std::string_view file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(encrypt::EncryptedFile file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<PTNT>> load_model_PTNT(std::string_view file_path, bool flip_winding = false);
+    std::shared_ptr<Mesh<PTNT>> load_model_PTNT(encrypt::EncryptedFile file_path, bool flip_winding = false);
 }

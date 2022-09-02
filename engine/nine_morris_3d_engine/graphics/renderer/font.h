@@ -14,7 +14,7 @@ public:
     };
 
     Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
-            int pixel_dist_scale, int bitmap_size);
+        int pixel_dist_scale, int bitmap_size);
     ~Font();
 
     void update_data(const float* data, size_t size);

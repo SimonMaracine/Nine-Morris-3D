@@ -26,13 +26,13 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
     }
     sf = stbtt_ScaleForPixelHeight(&info, size);
 
-    buffer = Buffer::create(1, DrawHint::Stream);
+    buffer = std::make_shared<Buffer>(1, DrawHint::Stream);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Type::Float, 2);
     layout.add(1, BufferLayout::Type::Float, 2);
 
-    vertex_array = VertexArray::create();
+    vertex_array = std::make_shared<VertexArray>();
     vertex_array->add_buffer(buffer, layout);
 
     VertexArray::unbind();
@@ -59,7 +59,7 @@ void Font::begin_baking() {
     DEB_DEBUG("Begin baking font '{}'", name);
 
     glDeleteTextures(1, &texture);
-    memset(&bake_context, 0, sizeof(BakeContext));  // TODO use assignment
+    bake_context = BakeContext {};
     bake_context.bitmap = new unsigned char[sizeof(unsigned char) * bitmap_size * bitmap_size];
     memset(bake_context.bitmap, 0, sizeof(unsigned char) * bitmap_size * bitmap_size);
 }
@@ -172,7 +172,7 @@ void Font::end_baking() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
 #ifdef PLATFORM_GAME_DEBUG
-    std::string file_name = "bitmap_" + name + ".png";
+    const std::string file_name = "bitmap_" + name + ".png";
     if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
         DEB_CRITICAL("Failed to create png, exiting...");
         exit(1);
@@ -291,7 +291,7 @@ void Font::blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsi
     if (glyph != nullptr) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                const int index = (y + dest_y) * dest_width + (x + dest_x);
+                const size_t index = static_cast<size_t>((y + dest_y) * dest_width + (x + dest_x));
                 dest[index] = glyph[y * width + x];
             }
         }

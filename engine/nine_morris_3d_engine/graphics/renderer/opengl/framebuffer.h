@@ -43,8 +43,6 @@ public:
     Framebuffer(const FramebufferSpecification& specification);
     ~Framebuffer();
 
-    static std::shared_ptr<Framebuffer> create(const FramebufferSpecification& specification);
-
     void bind();
     static void bind_default();
 

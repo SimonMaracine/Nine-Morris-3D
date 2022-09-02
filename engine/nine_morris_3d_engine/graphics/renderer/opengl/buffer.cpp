@@ -4,19 +4,8 @@
 #include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
-Buffer::Buffer(GLuint buffer, DrawHint hint)
-    : buffer(buffer), draw_hint(hint) {
-    DEB_DEBUG("Created buffer {}", buffer);
-}
-
-Buffer::~Buffer() {
-    glDeleteBuffers(1, &buffer);
-
-    DEB_DEBUG("Deleted buffer {}", buffer);
-}
-
-std::shared_ptr<Buffer> Buffer::create(size_t size, DrawHint hint) {
-    GLuint buffer;
+Buffer::Buffer(size_t size, DrawHint hint)
+    : hint(hint) {
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, static_cast<int>(hint));
@@ -24,11 +13,11 @@ std::shared_ptr<Buffer> Buffer::create(size_t size, DrawHint hint) {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    return std::make_shared<Buffer>(buffer, hint);
+    DEB_DEBUG("Created buffer {}", buffer);
 }
 
-std::shared_ptr<Buffer> Buffer::create(const void* data, size_t size, DrawHint hint) {
-    GLuint buffer;
+Buffer::Buffer(const void* data, size_t size, DrawHint hint)
+    : hint(hint) {
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(hint));
@@ -36,7 +25,13 @@ std::shared_ptr<Buffer> Buffer::create(const void* data, size_t size, DrawHint h
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    return std::make_shared<Buffer>(buffer, hint);
+    DEB_DEBUG("Created buffer {}", buffer);
+}
+
+Buffer::~Buffer() {
+    glDeleteBuffers(1, &buffer);
+
+    DEB_DEBUG("Deleted buffer {}", buffer);
 }
 
 void Buffer::bind() {
@@ -48,24 +43,12 @@ void Buffer::unbind() {
 }
 
 void Buffer::update_data(const void* data, size_t size) {
-    glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(draw_hint));
+    glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(hint));
 }
 
 // --- Index buffer
 
-IndexBuffer::IndexBuffer(GLuint buffer)
-    : buffer(buffer) {
-    DEB_DEBUG("Created index buffer {}", buffer);
-}
-
-IndexBuffer::~IndexBuffer() {
-    glDeleteBuffers(1, &buffer);
-
-    DEB_DEBUG("Deleted index buffer {}", buffer);
-}
-
-std::shared_ptr<IndexBuffer> IndexBuffer::create(const unsigned int* data, size_t size) {
-    GLuint buffer;
+IndexBuffer::IndexBuffer(const unsigned int* data, size_t size) {
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
@@ -73,7 +56,13 @@ std::shared_ptr<IndexBuffer> IndexBuffer::create(const unsigned int* data, size_
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    return std::make_shared<IndexBuffer>(buffer);
+    DEB_DEBUG("Created index buffer {}", buffer);
+}
+
+IndexBuffer::~IndexBuffer() {
+    glDeleteBuffers(1, &buffer);
+
+    DEB_DEBUG("Deleted index buffer {}", buffer);
 }
 
 void IndexBuffer::bind() {
@@ -86,8 +75,11 @@ void IndexBuffer::unbind() {
 
 // --- Uniform buffer
 
-UniformBuffer::UniformBuffer(GLuint buffer)
-    : buffer(buffer) {
+UniformBuffer::UniformBuffer() {
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
     DEB_DEBUG("Created uniform buffer {}", buffer);
 }
 
@@ -97,15 +89,6 @@ UniformBuffer::~UniformBuffer() {
     delete[] data;
 
     DEB_DEBUG("Deleted uniform buffer {}", buffer);
-}
-
-std::shared_ptr<UniformBuffer> UniformBuffer::create() {
-    GLuint buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_UNIFORM_BUFFER, buffer);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    return std::make_shared<UniformBuffer>(buffer);
 }
 
 void UniformBuffer::bind() {
@@ -126,8 +109,16 @@ void UniformBuffer::upload_data() {
 
 // --- Pixel buffer
 
-PixelBuffer::PixelBuffer(GLuint buffer, size_t size)
-    : buffer(buffer) {
+PixelBuffer::PixelBuffer(size_t size) {
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
+    glBufferData(GL_PIXEL_PACK_BUFFER, size, nullptr, GL_STREAM_READ);
+    const int value = 0;
+    glClearBufferData(GL_PIXEL_PACK_BUFFER, GL_R32I, GL_RED_INTEGER, GL_INT, &value);
+    LOG_ALLOCATION(size)
+
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+
     dummy_data = new char[size];
     memset(dummy_data, 0, size);
 
@@ -140,20 +131,6 @@ PixelBuffer::~PixelBuffer() {
     delete[] dummy_data;
 
     DEB_DEBUG("Deleted pixel buffer {}", buffer);
-}
-
-std::shared_ptr<PixelBuffer> PixelBuffer::create(size_t size) {
-    GLuint buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
-    glBufferData(GL_PIXEL_PACK_BUFFER, size, nullptr, GL_STREAM_READ);
-    const int value = 0;
-    glClearBufferData(GL_PIXEL_PACK_BUFFER, GL_R32I, GL_RED_INTEGER, GL_INT, &value);
-    LOG_ALLOCATION(size)
-
-    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-
-    return std::make_shared<PixelBuffer>(buffer, size);
 }
 
 void PixelBuffer::bind() {

@@ -109,7 +109,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
             AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
         );
 
-        renderer->set_scene_framebuffer(Framebuffer::create(specification));
+        renderer->set_scene_framebuffer(std::make_shared<Framebuffer>(specification));
     }
 
     // Setup depth map framebuffer
@@ -161,23 +161,23 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
         };
 
-        std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
+        std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
         purge_framebuffers();
         add_framebuffer(framebuffer);
 
-        std::shared_ptr<Shader> shader = Shader::create(
+        std::shared_ptr<Shader> shader = std::make_shared<Shader>(
             encr(path_for_assets(BRIGHT_FILTER_VERTEX_SHADER)),
             encr(path_for_assets(BRIGHT_FILTER_FRAGMENT_SHADER)),
-            { "u_screen_texture" }
+            std::vector<std::string> { "u_screen_texture" }
         );
 
         renderer->add_post_processing(std::make_shared<BrightFilter>("bright_filter", framebuffer, shader));
     }
-    std::shared_ptr<Shader> blur_shader = Shader::create(
+    std::shared_ptr<Shader> blur_shader = std::make_shared<Shader>(
         encr(path_for_assets(BLUR_VERTEX_SHADER)),
         encr(path_for_assets(BLUR_FRAGMENT_SHADER)),
-        { "u_screen_texture" }
+        std::vector<std::string> { "u_screen_texture" }
     );
     {
         FramebufferSpecification specification;
@@ -188,7 +188,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
         };
 
-        std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
+        std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
         purge_framebuffers();
         add_framebuffer(framebuffer);
@@ -204,7 +204,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
         };
 
-        std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
+        std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
         purge_framebuffers();
         add_framebuffer(framebuffer);
@@ -219,12 +219,12 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
         };
 
-        std::shared_ptr<Framebuffer> framebuffer = Framebuffer::create(specification);
+        std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
-        std::shared_ptr<Shader> shader = Shader::create(
+        std::shared_ptr<Shader> shader = std::make_shared<Shader>(
             encr(path_for_assets(COMBINE_VERTEX_SHADER)),
             encr(path_for_assets(COMBINE_FRAGMENT_SHADER)),
-            { "u_screen_texture", "u_bright_texture", "u_strength" }
+            std::vector<std::string> { "u_screen_texture", "u_bright_texture", "u_strength" }
         );
 
         purge_framebuffers();

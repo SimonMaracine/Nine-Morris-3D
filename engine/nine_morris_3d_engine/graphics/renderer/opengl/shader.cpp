@@ -33,9 +33,9 @@ static size_t type_size(GLenum type) {
     return size;
 }
 
-Shader::Shader(const Sources& sources, const std::vector<std::string>& uniforms,
-        const std::vector<UniformBlockSpecification>& uniform_blocks)
-    : vertex_source_path(sources.vertex_path), fragment_source_path(sources.fragment_path),
+Shader::Shader(std::string_view vertex_source_path, std::string_view fragment_source_path,
+        const std::vector<std::string>& uniforms, const std::vector<UniformBlockSpecification>& uniform_blocks)
+    : vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path),
       uniforms(uniforms) {
     name = get_name(vertex_source_path, fragment_source_path);    
 
@@ -67,14 +67,14 @@ Shader::Shader(const Sources& sources, const std::vector<std::string>& uniforms,
     DEB_DEBUG("Created shader {} ({})", program, name);
 }
 
-Shader::Shader(const EncryptedSources& sources, const std::vector<std::string>& uniforms,
-        const std::vector<UniformBlockSpecification>& uniform_blocks)
-    : vertex_source_path(sources.vertex_path), fragment_source_path(sources.fragment_path),
+Shader::Shader(encrypt::EncryptedFile vertex_source_path, encrypt::EncryptedFile fragment_source_path,
+        const std::vector<std::string>& uniforms, const std::vector<UniformBlockSpecification>& uniform_blocks)
+    : vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path),
       uniforms(uniforms) {
     name = get_name(vertex_source_path, fragment_source_path);
 
-    cppblowfish::Buffer buffer_vertex = encrypt::load_file(vertex_source_path);
-    cppblowfish::Buffer buffer_fragment = encrypt::load_file(fragment_source_path);
+    const cppblowfish::Buffer buffer_vertex = encrypt::load_file(vertex_source_path);
+    const cppblowfish::Buffer buffer_fragment = encrypt::load_file(fragment_source_path);
 
     try {
         vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);

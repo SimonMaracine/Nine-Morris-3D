@@ -94,6 +94,16 @@ static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum i
 
 Framebuffer::Framebuffer(const FramebufferSpecification& specification)
     : specification(specification) {
+    ASSERT(
+        specification.samples == 1 || specification.samples == 2 || specification.samples == 4,
+        "Invalid sample size"
+    );
+    if (specification.white_border_for_depth_texture) {
+        ASSERT(specification.depth_attachment.format != AttachmentFormat::None, "Invalid configuration");
+        ASSERT(specification.depth_attachment.type == AttachmentType::Texture, "Invalid configuration");
+    }
+    ASSERT(specification.width > 0 && specification.height > 0, "Invalid size");
+
     build();
 
     DEB_DEBUG("Created framebuffer {}", framebuffer);
@@ -131,18 +141,6 @@ Framebuffer::~Framebuffer() {
     glDeleteFramebuffers(1, &framebuffer);
 
     DEB_DEBUG("Deleted framebuffer {}", framebuffer);
-}
-
-std::shared_ptr<Framebuffer> Framebuffer::create(const FramebufferSpecification& specification) {
-    ASSERT(specification.samples == 1 || specification.samples == 2 || specification.samples == 4,
-            "Invalid sample size");
-    if (specification.white_border_for_depth_texture) {
-        ASSERT(specification.depth_attachment.format != AttachmentFormat::None, "Invalid configuration");
-        ASSERT(specification.depth_attachment.type == AttachmentType::Texture, "Invalid configuration");
-    }
-    ASSERT(specification.width > 0 && specification.height > 0, "Invalid size");
-
-    return std::make_shared<Framebuffer>(specification);
 }
 
 void Framebuffer::bind() {

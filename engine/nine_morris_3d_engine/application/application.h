@@ -51,7 +51,7 @@ public:
     std::unique_ptr<GuiRenderer> gui_renderer;
     entt::registry registry;
     entt::dispatcher event_dispatcher;
-    
+    ResourceManager resources;
 private:
     float update_frame_counter();
     unsigned int calculate_fixed_update();

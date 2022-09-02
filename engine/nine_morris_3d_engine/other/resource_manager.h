@@ -42,107 +42,123 @@ struct Texture3DLd : public entt::resource_loader<Texture3DLd, Texture3D> {
 };
 
 struct VertexArrayLd : public entt::resource_loader<VertexArrayLd, VertexArray> {
-    entt::resource_handle<VertexArray> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<VertexArray> load() const {
+        return std::make_shared<VertexArray>();
     }
 };
 
 struct ShaderLd : public entt::resource_loader<ShaderLd, Shader> {
-    entt::resource_handle<Shader> load(const Sources& sources, const std::vector<std::string>& uniforms,
+    entt::resource_handle<Shader> load(
+            std::string_view vertex_source_path,
+            std::string_view fragment_source_path,
+            const std::vector<std::string>& uniforms,
             const std::vector<UniformBlockSpecification>& uniform_blocks = {}) const {
-        return std::make_shared<Shader>(sources, uniforms, uniform_blocks);
+        return std::make_shared<Shader>(vertex_source_path, fragment_source_path, uniforms, uniform_blocks);
     }
 
-    entt::resource_handle<Shader> load(const EncryptedSources& sources, const std::vector<std::string>& uniforms,
+    entt::resource_handle<Shader> load(
+            encrypt::EncryptedFile vertex_source_path,
+            encrypt::EncryptedFile fragment_source_path,
+            const std::vector<std::string>& uniforms,
             const std::vector<UniformBlockSpecification>& uniform_blocks = {}) const {
-        return std::make_shared<Shader>(sources, uniforms, uniform_blocks);
+        return std::make_shared<Shader>(vertex_source_path, fragment_source_path, uniforms, uniform_blocks);
     }
 };
 
 struct BufferLd : public entt::resource_loader<BufferLd, Buffer> {
-    entt::resource_handle<Buffer> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<Buffer> load(size_t size, DrawHint hint = DrawHint::Static) const {
+        return std::make_shared<Buffer>(size, hint);
+    }
+
+    entt::resource_handle<Buffer> load(const void* data, size_t size, DrawHint hint = DrawHint::Static) const {
+        return std::make_shared<Buffer>(data, size, hint);
     }
 };
 
 struct IndexBufferLd : public entt::resource_loader<IndexBufferLd, IndexBuffer> {
-    entt::resource_handle<IndexBuffer> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<IndexBuffer> load(const unsigned int* data, size_t size) const {
+        return std::make_shared<IndexBuffer>(data, size);
     }
 };
 
 struct UniformBufferLd : public entt::resource_loader<UniformBufferLd, UniformBuffer> {
-    entt::resource_handle<UniformBuffer> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<UniformBuffer> load() const {
+        return std::make_shared<UniformBuffer>();
     }
 };
 
 struct PixelBufferLd : public entt::resource_loader<PixelBufferLd, PixelBuffer> {
-    entt::resource_handle<PixelBuffer> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<PixelBuffer> load(size_t size) const {
+        return std::make_shared<PixelBuffer>(size);
     }
 };
 
 struct FramebufferLd : public entt::resource_loader<FramebufferLd, Framebuffer> {
-    entt::resource_handle<Framebuffer> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<Framebuffer> load(const FramebufferSpecification& specification) const {
+        return std::make_shared<Framebuffer>(specification);
     }
 };
 
 struct FontLd : public entt::resource_loader<FontLd, Font> {
-    entt::resource_handle<Font> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<Font> load(
+            std::string_view file_path, float size,
+            int padding, unsigned char on_edge_value,
+            int pixel_dist_scale, int bitmap_size) const {
+        return std::make_shared<Font>(file_path, size, padding, on_edge_value, pixel_dist_scale, bitmap_size);
     }
 };
 
 struct MaterialLd : public entt::resource_loader<MaterialLd, Material> {
-    entt::resource_handle<Material> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<Material> load(entt::resource_handle<Shader> shader, int flags = 0) const {
+        return std::make_shared<Material>(shader, flags);
     }
 };
 
 struct MaterialInstanceLd : public entt::resource_loader<MaterialInstanceLd, MaterialInstance> {
-    entt::resource_handle<MaterialInstance> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<MaterialInstance> load(entt::resource_handle<Material> material) const {
+        return std::make_shared<MaterialInstance>(material);
     }
 };
 
 struct TextureDataLd : public entt::resource_loader<TextureDataLd, TextureData> {
-    entt::resource_handle<TextureData> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+    entt::resource_handle<TextureData> load(std::string_view file_path, bool flip = false) const {
+        return std::make_shared<TextureData>(file_path, flip);
+    }
+
+    entt::resource_handle<TextureData> load(encrypt::EncryptedFile file_path, bool flip = false) const {
+        return std::make_shared<TextureData>(file_path, flip);
     }
 };
 
 using namespace mesh;
 
-struct MeshVPTNTLd : public entt::resource_loader<MeshVPTNTLd, Mesh<VPTNT>> {
-    entt::resource_handle<Mesh<VPTNT>> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+struct MeshPTNTLd : public entt::resource_loader<MeshPTNTLd, Mesh<PTNT>> {
+    entt::resource_handle<Mesh<PTNT>> load(std::string_view file_path, bool flip_winding = false) const {
+        return load_model_PTNT(file_path, flip_winding);
+    }
+
+    entt::resource_handle<Mesh<PTNT>> load(encrypt::EncryptedFile file_path, bool flip_winding = false) const {
+        return load_model_PTNT(file_path, flip_winding);
     }
 };
 
-struct MeshVPTNLd : public entt::resource_loader<MeshVPTNLd, Mesh<VPTN>> {
-    entt::resource_handle<Mesh<VPTN>> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+struct MeshPTNLd : public entt::resource_loader<MeshPTNLd, Mesh<PTN>> {
+    entt::resource_handle<Mesh<PTN>> load(std::string_view file_path, bool flip_winding = false) const {
+        return load_model_PTN(file_path, flip_winding);
+    }
+
+    entt::resource_handle<Mesh<PTN>> load(encrypt::EncryptedFile file_path, bool flip_winding = false) const {
+        return load_model_PTN(file_path, flip_winding);
     }
 };
 
-struct MeshVPLd : public entt::resource_loader<MeshVPLd, Mesh<VP>> {
-    entt::resource_handle<Mesh<VP>> load(int value) const {
-        // return std::make_shared<Texture3D>();
-        return {};
+struct MeshPLd : public entt::resource_loader<MeshPLd, Mesh<P>> {
+    entt::resource_handle<Mesh<P>> load(std::string_view file_path, bool flip_winding = false) const {
+        return load_model_P(file_path, flip_winding);
+    }
+
+    entt::resource_handle<Mesh<P>> load(encrypt::EncryptedFile file_path, bool flip_winding = false) const {
+        return load_model_P(file_path, flip_winding);
     }
 };
 
@@ -162,7 +178,7 @@ struct ResourceManager {
     entt::resource_cache<Material> materials;
     entt::resource_cache<MaterialInstance> material_instances;
     entt::resource_cache<TextureData> texture_data;
-    entt::resource_cache<Mesh<VPTNT>> meshes_vptnt;
-    entt::resource_cache<Mesh<VPTN>> meshes_vptn;
-    entt::resource_cache<Mesh<VP>> meshes_vp;
+    entt::resource_cache<Mesh<PTNT>> meshes_ptnt;
+    entt::resource_cache<Mesh<PTN>> meshes_ptn;
+    entt::resource_cache<Mesh<P>> meshes_p;
 };

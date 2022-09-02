@@ -150,7 +150,7 @@ Window::Window(Application* app)
 
 Window::~Window() {
     glfwDestroyWindow(window);
-    for (const std::pair<unsigned int, GLFWcursor*>& cursor : cursors) {
+    for (const auto& cursor : cursors) {
         glfwDestroyCursor(cursor.second);
     }
     glfwTerminate();
@@ -176,9 +176,12 @@ void Window::set_vsync(int interval) {
 }
 
 unsigned int Window::add_cursor(std::unique_ptr<TextureData> cursor, int x_hotspot, int y_hotspot) {
-    const GLFWimage data = cursor->get_data_glfw();
+    const Image data = cursor->get_data();
 
-    GLFWcursor* glfw_cursor = glfwCreateCursor(&data, x_hotspot, y_hotspot);
+    GLFWcursor* glfw_cursor = glfwCreateCursor(
+        reinterpret_cast<const GLFWimage*>(&data), x_hotspot, y_hotspot
+    );
+
     if (glfw_cursor == nullptr) {
         REL_ERROR("Could not create custom cursor '{}'", cursor->get_file_path());
     }

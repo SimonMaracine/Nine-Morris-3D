@@ -10,11 +10,9 @@ enum class DrawHint {
 
 class Buffer {
 public:
-    Buffer(GLuint buffer, DrawHint hint);
+    Buffer(size_t size, DrawHint hint = DrawHint::Static);
+    Buffer(const void* data, size_t size, DrawHint hint = DrawHint::Static);
     ~Buffer();
-
-    static std::shared_ptr<Buffer> create(size_t size, DrawHint hint = DrawHint::Static);
-    static std::shared_ptr<Buffer> create(const void* data, size_t size, DrawHint hint = DrawHint::Static);
 
     void bind();
     static void unbind();
@@ -22,17 +20,15 @@ public:
     void update_data(const void* data, size_t size);
 private:
     GLuint buffer = 0;
-    DrawHint draw_hint = DrawHint::Static;
+    DrawHint hint = DrawHint::Static;
 
     friend class VertexArray;
 };
 
 class IndexBuffer {
 public:
-    IndexBuffer(GLuint buffer);
+    IndexBuffer(const unsigned int* data, size_t size);
     ~IndexBuffer();
-
-    static std::shared_ptr<IndexBuffer> create(const unsigned int* data, size_t size);
 
     void bind();
     static void unbind();
@@ -44,10 +40,8 @@ private:
 
 class UniformBuffer {
 public:
-    UniformBuffer(GLuint buffer);
+    UniformBuffer();
     ~UniformBuffer();
-
-    static std::shared_ptr<UniformBuffer> create();
 
     void bind();
     static void unbind();
@@ -61,22 +55,20 @@ private:
 
     GLuint buffer = 0;
 
-    char* data = nullptr;
+    char* data = nullptr;  // Allocated externally, deallocated internally!
     size_t size = 0;
 
     std::unordered_map<unsigned int, UniformBlockField> fields;
 
-    bool configured = false;
+    bool configured = false;  // Used externally by shader!
 
     friend class Shader;
 };
 
 class PixelBuffer {
 public:
-    PixelBuffer(GLuint buffer, size_t size);
+    PixelBuffer(size_t size);
     ~PixelBuffer();
-
-    static std::shared_ptr<PixelBuffer> create(size_t size);
 
     void bind();
     static void unbind();

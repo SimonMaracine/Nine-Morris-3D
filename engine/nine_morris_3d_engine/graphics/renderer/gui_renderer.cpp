@@ -138,7 +138,7 @@ namespace gui {
 
 GuiRenderer::GuiRenderer(Application* app)
     : app(app) {
-    storage.projection_uniform_buffer = UniformBuffer::create();
+    storage.projection_uniform_buffer = std::make_shared<UniformBuffer>();
 
     storage.projection_uniform_block.block_name = "Projection";
     storage.projection_uniform_block.field_count = 1;
@@ -149,27 +149,26 @@ GuiRenderer::GuiRenderer(Application* app)
     using namespace encrypt;
 
     {
-        storage.quad2d_shader = Shader::create(
+        storage.quad2d_shader = std::make_shared<Shader>(
             encr(paths::path_for_assets(QUAD2D_VERTEX_SHADER)),
             encr(paths::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
-            { "u_model_matrix", "u_texture" },
-            { storage.projection_uniform_block }
+            std::vector<std::string> { "u_model_matrix", "u_texture" },
+            std::vector { storage.projection_uniform_block }
         );
     }
 
     {
-        const std::vector<std::string> uniforms = {
-            "u_model_matrix",
-            "u_bitmap",
-            "u_color",
-            "u_border_width",
-            "u_offset"
-        };
-        storage.text_shader = Shader::create(
+        storage.text_shader = std::make_shared<Shader>(
             encr(paths::path_for_assets(TEXT_VERTEX_SHADER)),
             encr(paths::path_for_assets(TEXT_FRAGMENT_SHADER)),
-            uniforms,
-            { storage.projection_uniform_block }
+            std::vector<std::string> {
+                "u_model_matrix",
+                "u_bitmap",
+                "u_color",
+                "u_border_width",
+                "u_offset"
+            },
+            std::vector { storage.projection_uniform_block }
         );
     }
 
@@ -183,10 +182,10 @@ GuiRenderer::GuiRenderer(Application* app)
             1.0f, 0.0f
         };
 
-        std::shared_ptr<Buffer> buffer = Buffer::create(quad2d_vertices, sizeof(quad2d_vertices));
+        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 2);
-        storage.quad2d_vertex_array = VertexArray::create();
+        storage.quad2d_vertex_array = std::make_shared<VertexArray>();
         storage.quad2d_vertex_array->add_buffer(buffer, layout);
 
         VertexArray::unbind();
