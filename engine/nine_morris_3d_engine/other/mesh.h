@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 namespace mesh {
     struct VPTN {
@@ -32,11 +32,11 @@ namespace mesh {
     };
 
     std::shared_ptr<Mesh<VPTN>> load_model_VPTN(std::string_view file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(encryption::EncryptedFile file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(encrypt::EncryptedFile file_path, bool flip_winding_order = false);
 
     std::shared_ptr<Mesh<VP>> load_model_VP(std::string_view file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VP>> load_model_VP(encryption::EncryptedFile file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<VP>> load_model_VP(encrypt::EncryptedFile file_path, bool flip_winding_order = false);
 
     std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(std::string_view file_path, bool flip_winding_order = false);
-    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(encryption::EncryptedFile file_path, bool flip_winding_order = false);
+    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(encrypt::EncryptedFile file_path, bool flip_winding_order = false);
 }

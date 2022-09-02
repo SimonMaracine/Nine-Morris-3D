@@ -13,7 +13,7 @@
 #include "nine_morris_3d_engine/other/paths.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 static float map(float x, float in_min, float in_max, float out_min, float out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -146,7 +146,7 @@ GuiRenderer::GuiRenderer(Application* app)
     storage.projection_uniform_block.uniform_buffer = storage.projection_uniform_buffer;
     storage.projection_uniform_block.binding_index = 4;
 
-    using namespace encryption;
+    using namespace encrypt;
 
     {
         storage.quad2d_shader = Shader::create(

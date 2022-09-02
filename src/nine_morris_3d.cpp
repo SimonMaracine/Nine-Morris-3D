@@ -1,6 +1,4 @@
 #include <imgui.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <backends/imgui_impl_glfw.h>
 #include <entt/entt.hpp>
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
@@ -25,7 +23,7 @@
 // #include "other/texture_data.h"
 // #include "other/logging.h"
 // #include "other/assert.h"
-// #include "other/encryption.h"
+// #include "other/encrypt.h"
 
 // Global reference to application
 // NineMorris3D* app = nullptr;
@@ -77,7 +75,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     srand(time(nullptr));
 
     using namespace assets;
-    using namespace encryption;
+    using namespace encrypt;
     using namespace paths;
 
     // Load and set icons
@@ -117,11 +115,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     // Setup depth map framebuffer
     renderer->set_depth_map_framebuffer(2048 /*FIXME options_c.texture_quality == NORMAL ? 4096 : 2048*/);
 
-    // Initialize and setup ImGui
-    ImGui::CreateContext();
-    ImGui_ImplOpenGL3_Init("#version 430 core");
-    ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
-
+    // Setup ImGui
     {
         ImGuiIO& io = ImGui::GetIO();
 
@@ -132,9 +126,9 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         builder.BuildRanges(&ranges);
 
         io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 21.0f);
-        data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
-        data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f,
-                nullptr, ranges.Data);
+        // data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
+        // data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f,
+                // nullptr, ranges.Data);
         io.Fonts->Build();
     }
 
@@ -144,18 +138,18 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
         specification.min_filter = Filter::Linear;
         specification.mag_filter = Filter::Linear;
 
-        data.splash_screen_texture = Texture::create(encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+        // data.splash_screen_texture = Texture::create(encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
     }
 
     // Load and create this font
     {
-        data.good_dog_plain_font = std::make_shared<Font>(path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
-        data.good_dog_plain_font->begin_baking();  // TODO maybe move part of texture baking to thread
-        data.good_dog_plain_font->bake_characters(32, 127);
-        data.good_dog_plain_font->end_baking();
+        // data.good_dog_plain_font = std::make_shared<Font>(path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
+        // data.good_dog_plain_font->begin_baking();  // TODO maybe move part of texture baking to thread
+        // data.good_dog_plain_font->bake_characters(32, 127);
+        // data.good_dog_plain_font->end_baking();
     }
 
-    assets_data = std::make_shared<AssetsData>();
+    // assets_data = std::make_shared<AssetsData>();
 
     // Setup post-processing
     {
@@ -242,16 +236,7 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     }
 }
 
-NineMorris3D::~NineMorris3D() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-}
-
-// void NineMorris3D::set_app_pointer(NineMorris3D* instance) {
-//     ASSERT(app == nullptr, "App cannot be set twice");
-//     app = instance;
-// }
+NineMorris3D::~NineMorris3D() {}
 
 void NineMorris3D::set_bloom(bool enable) {
     PostProcessingContext& context = renderer->get_post_processing_context();

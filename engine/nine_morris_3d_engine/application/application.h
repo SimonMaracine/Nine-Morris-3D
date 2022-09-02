@@ -10,8 +10,8 @@
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/other/loader.h"
+#include "nine_morris_3d_engine/other/resource_manager.h"
 
-// class Layer;
 class Scene;
 
 class Application {
@@ -25,7 +25,6 @@ public:
 
     // Scene management functions
     void add_scene(Scene* scene, bool start = false);
-    // void set_starting_scene(Scene* scene);
     void change_scene(std::string_view name);
 
     // Framebuffer management functions
@@ -34,9 +33,6 @@ public:
 
     // This needs to be called whenever a layer is set active or not, so that it gets processed
     void update_active_layers();
-
-    // Systems
-    // void add_system(std::unique_ptr<System>&& system);
 
     double get_fps() { return fps; }
     float get_delta() { return delta; }
@@ -53,20 +49,13 @@ public:
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
-    // Camera camera;
     entt::registry registry;
     entt::dispatcher event_dispatcher;
+    
 private:
-    // void on_event(events::Event& event);
     float update_frame_counter();
     unsigned int calculate_fixed_update();
     void check_changed_scene();
-
-    // // These implement scenes in the game
-    // void push_layer(Layer* layer);
-    // void pop_layer();
-    // void push_overlay(Layer* layer);
-    // void pop_overlay();
 
     void on_start(Scene* scene);
 
@@ -82,11 +71,6 @@ private:
     // Data for the scene system
     std::vector<Scene*> scenes;
     Scene* current_scene = nullptr;
-
-    // std::vector<Layer*> _layer_stack;  // Stores all normal layers in the current scene
-    // std::vector<Layer*> _overlay_stack;  // Layers that are updated only after 3D rendering
-    // std::vector<Layer*> active_layer_stack;  // Only active layers in current scene
-    // std::vector<Layer*> active_overlay_stack;
 
     bool changed_scene = false;
     Scene* to_scene = nullptr;

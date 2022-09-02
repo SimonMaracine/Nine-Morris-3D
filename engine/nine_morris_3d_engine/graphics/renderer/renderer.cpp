@@ -19,7 +19,7 @@
 #include "nine_morris_3d_engine/other/paths.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 constexpr int SHADOW_MAP_UNIT = 2;
 
@@ -70,7 +70,7 @@ Renderer::Renderer(Application* app)
     storage.light_space_uniform_block.uniform_buffer = storage.light_space_uniform_buffer;
     storage.light_space_uniform_block.binding_index = 3;
 
-    using namespace encryption;
+    using namespace encrypt;
 
     {
         storage.skybox_shader = Shader::create(

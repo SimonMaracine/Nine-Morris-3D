@@ -2,14 +2,14 @@
 
 #include <stb_image.h>
 
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 struct GLFWimage;
 
 class TextureData {
 public:
 	TextureData(std::string_view file_path, bool flip);
-	TextureData(encryption::EncryptedFile file_path, bool flip);
+	TextureData(encrypt::EncryptedFile file_path, bool flip);
 	~TextureData();
 
 	GLFWimage get_data_glfw() const;

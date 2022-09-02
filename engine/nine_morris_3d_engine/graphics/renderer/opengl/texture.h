@@ -2,9 +2,10 @@
 
 #include <glad/glad.h>
 #include <stb_image.h>
+#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/other/texture_data.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 enum class Filter {
 	None = 0,
@@ -24,12 +25,10 @@ struct TextureSpecification {
 
 class Texture {
 public:
-    Texture(GLuint texture, int width, int height, std::string_view name);
+	Texture(std::string_view file_path, const TextureSpecification& specification);
+	Texture(encrypt::EncryptedFile file_path, const TextureSpecification& specification);
+	Texture(entt::resource_handle<TextureData> data, const TextureSpecification& specification);
     ~Texture();
-
-    static std::shared_ptr<Texture> create(std::string_view file_path, const TextureSpecification& specification);
-	static std::shared_ptr<Texture> create(encryption::EncryptedFile file_path, const TextureSpecification& specification);
-	static std::shared_ptr<Texture> create(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
 
 	int get_width() { return width; }
 	int get_height() { return height; }
@@ -47,11 +46,9 @@ private:
 
 class Texture3D {
 public:
-    Texture3D(GLuint texture, std::string_view name);
+	Texture3D(const char** file_paths);  // Don't need encrypted version
+	Texture3D(const std::array<entt::resource_handle<TextureData>, 6>& data);
     ~Texture3D();
-
-    static std::shared_ptr<Texture3D> create(const char** file_paths);  // Don't need encrypted version
-	static std::shared_ptr<Texture3D> create(const std::array<std::shared_ptr<TextureData>, 6>& data);
 
     void bind(GLenum slot);
     static void unbind();

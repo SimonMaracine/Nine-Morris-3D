@@ -1,10 +1,10 @@
 #include <cppblowfish.h>
 
 #include "nine_morris_3d_engine/application/platform.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
-namespace encryption {
+namespace encrypt {
     static const char* KEY = "data/models/board/board.obj";
     static cppblowfish::BlowfishContext blowfish;
 
@@ -36,14 +36,4 @@ namespace encryption {
 
         return buffer;
     }
-
-// #if defined(PLATFORM_GAME_DEBUG)
-//     std::string encr(std::string_view file_path) {
-//         return std::string(file_path);
-//     }
-// #elif defined(PLATFORM_GAME_RELEASE)
-//     EncryptedFile encr(std::string_view file_path) {
-//         return EncryptedFile(file_path);
-//     }
-// #endif
 }

@@ -4,7 +4,7 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 
-namespace encryption {
+namespace encrypt {
     class EncryptedFile {
     public:
         explicit constexpr EncryptedFile(std::string_view file_path)
@@ -18,12 +18,6 @@ namespace encryption {
 
     void initialize();
     cppblowfish::Buffer load_file(EncryptedFile file_path);
-
-// #if defined(PLATFORM_GAME_DEBUG)
-//     std::string encr(std::string_view file_path);
-// #elif defined(PLATFORM_GAME_RELEASE)
-//     EncryptedFile encr(std::string_view file_path);
-// #endif
 
     constexpr EncryptedFile encr(std::string_view file_path) {
         return EncryptedFile(file_path);

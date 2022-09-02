@@ -28,7 +28,7 @@
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/other/assert.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/loader.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/mesh.h"

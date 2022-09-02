@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <stb_image.h>
+#include <entt/entt.hpp>
 #include <cppblowfish.h>
 
 #include "nine_morris_3d_engine/application/extensions.h"
@@ -7,7 +8,7 @@
 #include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 static std::string get_name(std::string_view file_path) {
     size_t last_slash = file_path.find_last_of("/");
@@ -74,23 +75,12 @@ static void configure_filter_and_wrap(const TextureSpecification& specification)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
-Texture::Texture(GLuint texture, int width, int height, std::string_view name)
-    : texture(texture), width(width), height(height), name(name) {
-    DEB_DEBUG("Created texture {} ({})", texture, name);
-}
-
-Texture::~Texture() {
-    glDeleteTextures(1, &texture);
-
-    DEB_DEBUG("Deleted texture {} ({})", texture, name);
-}
-
-std::shared_ptr<Texture> Texture::create(std::string_view file_path, const TextureSpecification& specification) {
+Texture::Texture(std::string_view file_path, const TextureSpecification& specification) {
     DEB_DEBUG("Loading texture '{}'...", file_path);
 
     stbi_set_flip_vertically_on_load(1);
 
-    int width, height, channels;
+    int channels;
     stbi_uc* data = stbi_load(file_path.data(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
@@ -98,7 +88,6 @@ std::shared_ptr<Texture> Texture::create(std::string_view file_path, const Textu
         exit(1);
     }
 
-    GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -114,19 +103,19 @@ std::shared_ptr<Texture> Texture::create(std::string_view file_path, const Textu
 
     stbi_image_free(data);
 
-    std::string name = get_name(file_path);
+    name = get_name(file_path);
 
-    return std::make_shared<Texture>(texture, width, height, name);
+    DEB_DEBUG("Created texture {} ({})", texture, name);
 }
 
-std::shared_ptr<Texture> Texture::create(encryption::EncryptedFile file_path, const TextureSpecification& specification) {
+Texture::Texture(encrypt::EncryptedFile file_path, const TextureSpecification& specification) {
     DEB_DEBUG("Loading texture '{}'...", file_path);
 
-    cppblowfish::Buffer buffer = encryption::load_file(file_path);
+    cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
     stbi_set_flip_vertically_on_load(1);
 
-    int width, height, channels;
+    int channels;
     stbi_uc* data = stbi_load_from_memory(buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
@@ -134,7 +123,6 @@ std::shared_ptr<Texture> Texture::create(encryption::EncryptedFile file_path, co
         exit(1);
     }
 
-    GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -150,13 +138,12 @@ std::shared_ptr<Texture> Texture::create(encryption::EncryptedFile file_path, co
 
     stbi_image_free(data);
 
-    std::string name = get_name(file_path);
+    name = get_name(file_path);
 
-    return std::make_shared<Texture>(texture, width, height, name);
+    DEB_DEBUG("Created texture {} ({})", texture, name);
 }
 
-std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, const TextureSpecification& specification) {
-    GLuint texture;
+Texture::Texture(entt::resource_handle<TextureData> data, const TextureSpecification& specification) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -172,9 +159,17 @@ std::shared_ptr<Texture> Texture::create(std::shared_ptr<TextureData> data, cons
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string name = get_name(data->file_path);
+    width = data->width;
+    height = data->height;
+    name = get_name(data->file_path);
 
-    return std::make_shared<Texture>(texture, data->width, data->height, name);
+    DEB_DEBUG("Created texture {} ({})", texture, name);
+}
+
+Texture::~Texture() {
+    glDeleteTextures(1, &texture);
+
+    DEB_DEBUG("Deleted texture {} ({})", texture, name);
 }
 
 void Texture::bind(GLenum slot) {
@@ -188,19 +183,7 @@ void Texture::unbind() {
 
 // --- 3D texture
 
-Texture3D::Texture3D(GLuint texture, std::string_view name)
-    : texture(texture), name(name) {
-    DEB_DEBUG("Created 3D texture {} ({})", texture, name);
-}
-
-Texture3D::~Texture3D() {
-    glDeleteTextures(1, &texture);
-
-    DEB_DEBUG("Deleted 3D texture {} ({})", texture, name);
-}
-
-std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
-    GLuint texture;
+Texture3D::Texture3D(const char** file_paths) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
@@ -225,8 +208,10 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
             exit(1);
         }
 
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, width, height,
-                0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8,
+            width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data
+        );
         LOG_ALLOCATION(width * height * 4)
 
         stbi_image_free(data);
@@ -234,13 +219,12 @@ std::shared_ptr<Texture3D> Texture3D::create(const char** file_paths) {
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-    std::string name = get_name_texture3d(file_paths[0]);
+    name = get_name_texture3d(file_paths[0]);
 
-    return std::make_shared<Texture3D>(texture, name);
+    DEB_DEBUG("Created 3D texture {} ({})", texture, name);
 }
 
-std::shared_ptr<Texture3D> Texture3D::create(const std::array<std::shared_ptr<TextureData>, 6>& data) {
-    GLuint texture;
+Texture3D::Texture3D(const std::array<entt::resource_handle<TextureData>, 6>& data) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
@@ -251,16 +235,24 @@ std::shared_ptr<Texture3D> Texture3D::create(const std::array<std::shared_ptr<Te
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     for (size_t i = 0; i < 6; i++) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, data[i]->width,
-                data[i]->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data);
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, data[i]->width,
+            data[i]->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data
+        );
         LOG_ALLOCATION(data[i]->width * data[i]->height * 4)
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-    std::string name = get_name_texture3d(data[0]->file_path.c_str());
+    name = get_name_texture3d(data[0]->file_path.c_str());
 
-    return std::make_shared<Texture3D>(texture, name);
+    DEB_DEBUG("Created 3D texture {} ({})", texture, name);
+}
+
+Texture3D::~Texture3D() {
+    glDeleteTextures(1, &texture);
+
+    DEB_DEBUG("Deleted 3D texture {} ({})", texture, name);
 }
 
 void Texture3D::bind(GLenum slot) {

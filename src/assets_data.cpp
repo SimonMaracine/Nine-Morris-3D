@@ -7,12 +7,12 @@
 // #include "other/mesh.h"
 // #include "other/texture_data.h"
 // #include "other/loader.h"
-// #include "other/encryption.h"
+// #include "other/encrypt.h"
 
 using namespace mesh;
 using namespace assets;
 using namespace paths;
-using namespace encryption;
+using namespace encrypt;
 
 namespace assets_data {
     // void all_start(Loader<AssetsData, options::Options>* loader, const options::Options& options) {

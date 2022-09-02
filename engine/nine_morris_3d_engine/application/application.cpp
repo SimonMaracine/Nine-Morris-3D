@@ -14,7 +14,7 @@
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/paths.h"
 
 Application::Application(int width, int height, std::string_view title, std::string_view info_file,
@@ -30,17 +30,21 @@ Application::Application(int width, int height, std::string_view title, std::str
     logging::initialize(log_file);  // TODO move out in main
     window = std::make_unique<Window>(this);
 
+    ImGui::CreateContext();  // TODO make ImGui optional
+    ImGui_ImplOpenGL3_Init("#version 430 core");
+    ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
+
 #ifdef PLATFORM_GAME_DEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console, info_file);
 #endif
     input::initialize(window->get_handle());
     debug_opengl::maybe_initialize_debugging();
-    encryption::initialize();
+    encrypt::initialize();
 
     auto [version_major, version_minor] = debug_opengl::get_version_numbers();
     REL_INFO("Using OpenGL version {}.{}", version_major, version_minor);
 
-    renderer = std::make_unique<Renderer>(this);
+    renderer = std::make_unique<Renderer>(this);  // TODO make rendering optional
     gui_renderer = std::make_unique<GuiRenderer>(this);
 
     event_dispatcher.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(*this);
@@ -55,13 +59,11 @@ Application::Application(int width, int height, std::string_view title, std::str
 }
 
 Application::~Application() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     for (Scene* scene : scenes) {
-        // for (Layer* layer : scene->overlays_in_order) {
-        //     delete layer;
-        // }
-        // for (Layer* layer : scene->layers_in_order) {
-        //     delete layer;
-        // }
         delete scene;
     }
 }
@@ -70,14 +72,6 @@ void Application::run() {
     ASSERT(current_scene != nullptr, "Starting scene not set");
 
     DEB_INFO("Starting game");
-
-    // for (Layer* layer : current_scene->layers_in_order) {
-    //     push_layer(layer);
-    // }
-
-    // for (Layer* layer : current_scene->overlays_in_order) {
-    //     push_overlay(layer);
-    // }
 
     on_start(current_scene);
 
@@ -89,12 +83,6 @@ void Application::run() {
 
         // camera_system(registry, mouse_wheel, dx, dy, dt);  // TODO this should be user called
 
-        // for (Layer* layer : active_layer_stack) {
-        //     for (unsigned int i = 0; i < fixed_updates; i++) {
-        //         layer->on_fixed_update();
-        //     }
-        //     layer->on_update(dt);
-        // }
         for (unsigned int i = 0; i < fixed_updates; i++) {
             current_scene->on_fixed_update(this);
         }
@@ -107,12 +95,6 @@ void Application::run() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
 
-        // for (Layer* layer : active_overlay_stack) {
-        //     for (unsigned int i = 0; i < fixed_updates; i++) {
-        //         layer->on_fixed_update();
-        //     }
-        //     layer->on_update(dt);
-        // }
         current_scene->on_imgui_update(this);
 
         ImGui::EndFrame();
@@ -128,16 +110,6 @@ void Application::run() {
     DEB_INFO("Closing game");
 
     current_scene->on_stop(this);
-
-    // const size_t overlay_stack_size = _overlay_stack.size();
-    // for (size_t i = 0; i < overlay_stack_size; i++) {
-    //     pop_overlay();
-    // }
-
-    // const size_t layer_stack_size = _layer_stack.size();
-    // for (size_t i = 0; i < layer_stack_size; i++) {
-    //     pop_layer();
-    // }
 }
 
 void Application::add_scene(Scene* scene, bool start) {
@@ -148,10 +120,6 @@ void Application::add_scene(Scene* scene, bool start) {
         current_scene = scene;
     }
 }
-
-// void Application::set_starting_scene(Scene* scene) {
-//     current_scene = scene;
-// }
 
 void Application::change_scene(std::string_view name) {
     for (Scene* scene : scenes) {
@@ -187,64 +155,6 @@ void Application::purge_framebuffers() {
         }
     }
 }
-
-// void Application::update_active_layers() {
-//     active_layer_stack.clear();
-//     active_overlay_stack.clear();
-
-//     for (Layer* layer : _layer_stack) {
-//         if (layer->active) {
-//             active_layer_stack.push_back(layer);
-//         }
-//     }
-
-//     for (Layer* layer : _overlay_stack) {
-//         if (layer->active) {
-//             active_overlay_stack.push_back(layer);
-//         }
-//     }
-// }
-
-// void Application::on_event(events::Event& event) {
-//     using namespace events;
-
-//     Dispatcher dispatcher (event);
-
-//     switch (event.get_type()) {
-//         case WindowClosed:
-//             dispatcher.dispatch<WindowClosedEvent>(BIND(Application::on_window_closed));
-//             break;
-//         case WindowResized:
-//             dispatcher.dispatch<WindowResizedEvent>(BIND(Application::on_window_resized));
-//             break;
-//         case MouseScrolled:
-//             dispatcher.dispatch<MouseScrolledEvent>(BIND(Application::on_mouse_scrolled));
-//             break;
-//         case MouseMoved:
-//             dispatcher.dispatch<MouseMovedEvent>(BIND(Application::on_mouse_moved));
-//             break;
-//         default:
-//             break;
-//     }
-
-    // for (auto iter = active_overlay_stack.rbegin(); iter != active_overlay_stack.rend(); iter++) {
-    //     if (event.handled) {
-    //         return;
-    //     }
-
-    //     (*iter)->on_event(event);
-    // }
-
-    // for (auto iter = active_layer_stack.rbegin(); iter != active_layer_stack.rend(); iter++) {
-    //     if (event.handled) {
-    //         return;
-    //     }
-
-    //     (*iter)->on_event(event);
-    // }
-
-//     current_scene->on_event(this, event);
-// }
 
 float Application::update_frame_counter() {
     constexpr double MAX_DT = 1.0 / 20.0;
@@ -301,74 +211,15 @@ unsigned int Application::calculate_fixed_update() {
 
 void Application::check_changed_scene() {
     if (changed_scene) {
-        // active_layer_stack.clear();
-        // active_overlay_stack.clear();
-
-        // const size_t overlay_stack_size = _overlay_stack.size();
-        // for (size_t i = 0; i < overlay_stack_size; i++) {
-        //     pop_overlay();
-        // }
-
-        // const size_t layer_stack_size = _layer_stack.size();
-        // for (size_t i = 0; i < layer_stack_size; i++) {
-        //     pop_layer();
-        // }
-
         current_scene->on_stop(this);
 
         current_scene = to_scene;
 
         on_start(current_scene);
 
-        // for (Layer* layer : current_scene->layers_in_order) {
-        //     push_layer(layer);
-        // }
-
-        // for (Layer* layer : current_scene->overlays_in_order) {
-        //     push_overlay(layer);
-        // }
-
         changed_scene = false;
     }
 }
-
-// void Application::push_layer(Layer* layer) {
-//     _layer_stack.push_back(layer);
-//     active_layer_stack.push_back(layer);
-
-//     if (!layer->on_awake_called) {
-//         layer->on_awake();
-//         layer->on_awake_called = true;
-//     }
-//     layer->on_attach();
-// }
-
-// void Application::pop_layer() {
-//     Layer* layer = _layer_stack.back();
-//     layer->on_detach();
-//     layer->active = true;
-
-//     _layer_stack.pop_back();
-// }
-
-// void Application::push_overlay(Layer* layer) {
-//     _overlay_stack.push_back(layer);
-//     active_overlay_stack.push_back(layer);
-
-//     if (!layer->on_awake_called) {
-//         layer->on_awake();
-//         layer->on_awake_called = true;
-//     }
-//     layer->on_attach();
-// }
-
-// void Application::pop_overlay() {
-//     Layer* layer = _overlay_stack.back();
-//     layer->on_detach();
-//     layer->active = true;
-
-//     _overlay_stack.pop_back();
-// }
 
 void Application::on_start(Scene* scene) {
     if (!scene->on_awake_called) {

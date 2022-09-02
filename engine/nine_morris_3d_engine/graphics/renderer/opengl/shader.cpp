@@ -8,7 +8,7 @@
 #include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 #define DELETE_SHADER(program, vertex_shader, fragment_shader) \
     glDetachShader(program, vertex_shader); \
@@ -33,24 +33,72 @@ static size_t type_size(GLenum type) {
     return size;
 }
 
-Shader::Shader(
-        GLuint program,
-        GLuint vertex_shader,
-        GLuint fragment_shader,
-        std::string_view name,
-        const std::vector<std::string>& uniforms,
-        std::string_view vertex_source_path,
-        std::string_view fragment_source_path)
-    : program(program), vertex_shader(vertex_shader), fragment_shader(fragment_shader), name(name),
-      vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path),
+Shader::Shader(const Sources& sources, const std::vector<std::string>& uniforms,
+        const std::vector<UniformBlockSpecification>& uniform_blocks)
+    : vertex_source_path(sources.vertex_path), fragment_source_path(sources.fragment_path),
       uniforms(uniforms) {
-    for (const std::string& uniform : uniforms) {
-        const GLint location = glGetUniformLocation(program, uniform.c_str());
-        if (location == -1) {
-            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name);
-            continue;
-        }
-        cache[uniform] = location;
+    name = get_name(vertex_source_path, fragment_source_path);    
+
+    try {
+        vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
+        fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
+    } catch (const std::runtime_error& e) {
+        REL_CRITICAL("{}, exiting...", e.what());
+        exit(1);
+    }
+
+    program = glCreateProgram();
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    if (!check_linking(program, name)) {
+        REL_CRITICAL("Exiting...");
+        exit(1);
+    }
+
+    check_and_cache_uniforms(uniforms);
+
+    if (!uniform_blocks.empty()) {
+        configure_uniform_blocks(program, uniform_blocks);
+    }
+
+    DEB_DEBUG("Created shader {} ({})", program, name);
+}
+
+Shader::Shader(const EncryptedSources& sources, const std::vector<std::string>& uniforms,
+        const std::vector<UniformBlockSpecification>& uniform_blocks)
+    : vertex_source_path(sources.vertex_path), fragment_source_path(sources.fragment_path),
+      uniforms(uniforms) {
+    name = get_name(vertex_source_path, fragment_source_path);
+
+    cppblowfish::Buffer buffer_vertex = encrypt::load_file(vertex_source_path);
+    cppblowfish::Buffer buffer_fragment = encrypt::load_file(fragment_source_path);
+
+    try {
+        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);
+        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
+    } catch (const std::runtime_error& e) {
+        REL_CRITICAL("{}, exiting...", e.what());
+        exit(1);
+    }
+
+    program = glCreateProgram();
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    if (!check_linking(program, name)) {
+        REL_CRITICAL("Exiting...");
+        exit(1);
+    }
+
+    check_and_cache_uniforms(uniforms);
+
+    if (!uniform_blocks.empty()) {
+        configure_uniform_blocks(program, uniform_blocks);
     }
 
     DEB_DEBUG("Created shader {} ({})", program, name);
@@ -60,150 +108,6 @@ Shader::~Shader() {
     DELETE_SHADER(program, vertex_shader, fragment_shader);
 
     DEB_DEBUG("Deleted shader {} ({})", program, name);
-}
-
-std::shared_ptr<Shader> Shader::create(
-        std::string_view vertex_source_path,
-        std::string_view fragment_source_path,
-        const std::vector<std::string>& uniforms) {
-    const std::string name = get_name(vertex_source_path, fragment_source_path);
-
-    GLuint vertex_shader;
-    GLuint fragment_shader;
-    try {
-        vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
-        fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
-    } catch (const std::runtime_error& e) {
-        REL_CRITICAL("{}, exiting...", e.what());
-        exit(1);
-    }
-
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
-    glValidateProgram(program);
-
-    if (!check_linking(program, name)) {
-        REL_CRITICAL("Exiting...");
-        exit(1);
-    }
-
-    return std::make_shared<Shader>(
-        program, vertex_shader, fragment_shader, name,
-        uniforms, vertex_source_path, fragment_source_path
-    );
-}
-
-std::shared_ptr<Shader> Shader::create(
-        std::string_view vertex_source_path,
-        std::string_view fragment_source_path,
-        const std::vector<std::string>& uniforms,
-        const std::vector<UniformBlockSpecification>& uniform_blocks) {
-    const std::string name = get_name(vertex_source_path, fragment_source_path);
-
-    GLuint vertex_shader;
-    GLuint fragment_shader;
-    try {
-        vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
-        fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
-    } catch (const std::runtime_error& e) {
-        REL_CRITICAL("{}, exiting...", e.what());
-        exit(1);
-    }
-
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
-    glValidateProgram(program);
-
-    if (!check_linking(program, name)) {
-        REL_CRITICAL("Exiting...");
-        exit(1);
-    }
-
-    configure_uniform_blocks(program, uniform_blocks);
-
-    return std::make_shared<Shader>(
-        program, vertex_shader, fragment_shader, name,
-        uniforms, vertex_source_path, fragment_source_path
-    );
-}
-
-std::shared_ptr<Shader> Shader::create(
-        encryption::EncryptedFile vertex_source_path,
-        encryption::EncryptedFile fragment_source_path,
-        const std::vector<std::string>& uniforms) {
-    const std::string name = get_name(vertex_source_path, fragment_source_path);
-
-    cppblowfish::Buffer buffer_vertex = encryption::load_file(vertex_source_path);
-    cppblowfish::Buffer buffer_fragment = encryption::load_file(fragment_source_path);
-
-    GLuint vertex_shader;
-    GLuint fragment_shader;
-    try {
-        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);
-        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
-    } catch (const std::runtime_error& e) {
-        REL_CRITICAL("{}, exiting...", e.what());
-        exit(1);
-    }
-
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
-    glValidateProgram(program);
-
-    if (!check_linking(program, name)) {
-        REL_CRITICAL("Exiting...");
-        exit(1);
-    }
-
-    return std::make_shared<Shader>(
-        program, vertex_shader, fragment_shader, name, uniforms,
-        vertex_source_path, fragment_source_path
-    );
-}
-
-std::shared_ptr<Shader> Shader::create(
-        encryption::EncryptedFile vertex_source_path,
-        encryption::EncryptedFile fragment_source_path,
-        const std::vector<std::string>& uniforms,
-        const std::vector<UniformBlockSpecification>& uniform_blocks) {
-    const std::string name = get_name(vertex_source_path, fragment_source_path);
-
-    cppblowfish::Buffer buffer_vertex = encryption::load_file(vertex_source_path);
-    cppblowfish::Buffer buffer_fragment = encryption::load_file(fragment_source_path);
-
-    GLuint vertex_shader;
-    GLuint fragment_shader;
-    try {
-        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);
-        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
-    } catch (const std::runtime_error& e) {
-        REL_CRITICAL("{}, exiting...", e.what());
-        exit(1);
-    }
-
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
-    glValidateProgram(program);
-
-    if (!check_linking(program, name)) {
-        REL_CRITICAL("Exiting...");
-        exit(1);
-    }
-
-    configure_uniform_blocks(program, uniform_blocks);
-
-    return std::make_shared<Shader>(
-        program, vertex_shader, fragment_shader, name, uniforms,
-        vertex_source_path, fragment_source_path
-    );
 }
 
 void Shader::bind() {
@@ -297,6 +201,17 @@ GLint Shader::get_uniform_location(std::string_view name) {
         exit(1);
     }
 #endif
+}
+
+void Shader::check_and_cache_uniforms(const std::vector<std::string>& uniforms) {
+    for (const auto& uniform : uniforms) {
+        const GLint location = glGetUniformLocation(program, uniform.c_str());
+        if (location == -1) {
+            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name);
+            continue;
+        }
+        cache[uniform] = location;
+    }
 }
 
 GLuint Shader::compile_shader(std::string_view source_path, GLenum type, std::string_view name) noexcept(false) {

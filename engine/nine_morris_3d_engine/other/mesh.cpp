@@ -6,7 +6,7 @@
 
 #include "nine_morris_3d_engine/other/mesh.h"
 #include "nine_morris_3d_engine/other/logging.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 namespace mesh {
     std::shared_ptr<Mesh<VPTN>> load_model_VPTN(std::string_view file_path, bool flip_winding_order) {
@@ -67,10 +67,10 @@ namespace mesh {
         return std::make_shared<Mesh<VPTN>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(encryption::EncryptedFile file_path, bool flip_winding_order) {
+    std::shared_ptr<Mesh<VPTN>> load_model_VPTN(encrypt::EncryptedFile file_path, bool flip_winding_order) {
         DEB_DEBUG("Loading VPTN model '{}'...", file_path);
 
-        cppblowfish::Buffer buffer = encryption::load_file(file_path);
+        cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
         const aiPostProcessSteps flip = flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -175,10 +175,10 @@ namespace mesh {
         return std::make_shared<Mesh<VP>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VP>> load_model_VP(encryption::EncryptedFile file_path, bool flip_winding_order) {
+    std::shared_ptr<Mesh<VP>> load_model_VP(encrypt::EncryptedFile file_path, bool flip_winding_order) {
         DEB_DEBUG("Loading VP model '{}'...", file_path);
 
-        cppblowfish::Buffer buffer = encryption::load_file(file_path);
+        cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
         const aiPostProcessSteps flip = flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -289,10 +289,10 @@ namespace mesh {
         return std::make_shared<Mesh<VPTNT>>(vertices, indices);
     }
 
-    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(encryption::EncryptedFile file_path, bool flip_winding_order) {
+    std::shared_ptr<Mesh<VPTNT>> load_model_VPTNT(encrypt::EncryptedFile file_path, bool flip_winding_order) {
         DEB_DEBUG("Loading VPTNT model '{}'...", file_path);
 
-        cppblowfish::Buffer buffer = encryption::load_file(file_path);
+        cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
         const aiPostProcessSteps flip = flip_winding_order ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 

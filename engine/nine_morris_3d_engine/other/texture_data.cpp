@@ -5,7 +5,7 @@
 #include "nine_morris_3d_engine/other/texture_data.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 TextureData::TextureData(std::string_view file_path, bool flip) {
     DEB_DEBUG("Loading texture data '{}'...", file_path);
@@ -22,10 +22,10 @@ TextureData::TextureData(std::string_view file_path, bool flip) {
     this->file_path = file_path;
 }
 
-TextureData::TextureData(encryption::EncryptedFile file_path, bool flip) {
+TextureData::TextureData(encrypt::EncryptedFile file_path, bool flip) {
     DEB_DEBUG("Loading texture data '{}'...", file_path);
 
-    cppblowfish::Buffer buffer = encryption::load_file(file_path);
+    cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
     stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 

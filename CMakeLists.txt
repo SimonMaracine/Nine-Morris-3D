@@ -80,13 +80,14 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/graphics/renderer/renderer.h"
     "engine/nine_morris_3d_engine/graphics/debug_opengl.h"
     "engine/nine_morris_3d_engine/other/assert.h"
-    "engine/nine_morris_3d_engine/other/encryption.h"
+    "engine/nine_morris_3d_engine/other/encrypt.h"
     "engine/nine_morris_3d_engine/other/loader.h"
     "engine/nine_morris_3d_engine/other/logging.h"
     "engine/nine_morris_3d_engine/other/mesh.h"
     "engine/nine_morris_3d_engine/other/paths.h"
     "engine/nine_morris_3d_engine/other/texture_data.h"
     "engine/nine_morris_3d_engine/other/user_data.h"
+    "engine/nine_morris_3d_engine/other/resource_manager.h"
     "engine/nine_morris_3d_engine/nine_morris_3d_engine.h"
     "engine/pch.h"  # TODO is it right?
 )
@@ -111,7 +112,7 @@ add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/graphics/renderer/material.cpp"
     "engine/nine_morris_3d_engine/graphics/renderer/renderer.cpp"
     "engine/nine_morris_3d_engine/graphics/debug_opengl.cpp"
-    "engine/nine_morris_3d_engine/other/encryption.cpp"
+    "engine/nine_morris_3d_engine/other/encrypt.cpp"
     "engine/nine_morris_3d_engine/other/logging.cpp"
     "engine/nine_morris_3d_engine/other/mesh.cpp"
     "engine/nine_morris_3d_engine/other/paths.cpp"
@@ -141,12 +142,10 @@ add_library(${MY_IMGUI} STATIC
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_compile_options(${ENGINE} PRIVATE
         -Wall -Wextra
-        -Wno-unused-parameter -Wno-parentheses -Wno-type-limits
     )
 
     target_compile_options(${GAME} PRIVATE
         -Wall -Wextra
-        -Wno-unused-parameter -Wno-parentheses -Wno-type-limits
     )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     target_compile_options(${ENGINE} PRIVATE /w)  # FIXME

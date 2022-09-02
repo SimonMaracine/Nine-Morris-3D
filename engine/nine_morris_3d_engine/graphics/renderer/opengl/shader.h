@@ -3,48 +3,36 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <cppblowfish.h>
+#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
-#include "nine_morris_3d_engine/other/encryption.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 struct UniformBlockSpecification {
     std::string block_name;
     size_t field_count;
     std::vector<std::string> field_names;
-    std::shared_ptr<UniformBuffer> uniform_buffer;
+    entt::resource_handle<UniformBuffer> uniform_buffer;
     GLuint binding_index;
+};
+
+struct Sources {
+    std::string_view vertex_path;
+    std::string_view fragment_path;
+};
+
+struct EncryptedSources {
+    encrypt::EncryptedFile vertex_path;
+    encrypt::EncryptedFile fragment_path;
 };
 
 class Shader {
 public:
-    Shader(
-        GLuint program,
-        GLuint vertex_shader,
-        GLuint fragment_shader,
-        std::string_view name,
-        const std::vector<std::string>& uniforms,
-        std::string_view vertex_source_path,
-        std::string_view fragment_source_path);
+    Shader(const Sources& sources, const std::vector<std::string>& uniforms,
+        const std::vector<UniformBlockSpecification>& uniform_blocks = {});
+    Shader(const EncryptedSources& sources, const std::vector<std::string>& uniforms,
+        const std::vector<UniformBlockSpecification>& uniform_blocks = {});
     ~Shader();
-
-    static std::shared_ptr<Shader> create(
-            std::string_view vertex_source_path,
-            std::string_view fragment_source_path,
-            const std::vector<std::string>& uniforms);
-    static std::shared_ptr<Shader> create(
-            std::string_view vertex_source_path,
-            std::string_view fragment_source_path,
-            const std::vector<std::string>& uniforms,
-            const std::vector<UniformBlockSpecification>& uniform_blocks);
-    static std::shared_ptr<Shader> create(
-            encryption::EncryptedFile vertex_source_path,
-            encryption::EncryptedFile fragment_source_path,
-            const std::vector<std::string>& uniforms);
-    static std::shared_ptr<Shader> create(
-            encryption::EncryptedFile vertex_source_path,
-            encryption::EncryptedFile fragment_source_path,
-            const std::vector<std::string>& uniforms,
-            const std::vector<UniformBlockSpecification>& uniform_blocks);
 
     void bind();
     static void unbind();
@@ -63,6 +51,7 @@ public:
     std::vector<std::string>& get_uniforms() { return uniforms; }
 private:
     GLint get_uniform_location(std::string_view name);
+    void check_and_cache_uniforms(const std::vector<std::string>& uniforms);
 
     static GLuint compile_shader(std::string_view source_path, GLenum type, std::string_view name) noexcept(false);
     static GLuint compile_shader(const cppblowfish::Buffer& source_buffer, GLenum type, std::string_view name) noexcept(false);
