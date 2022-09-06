@@ -36,7 +36,6 @@ public:
     }
 private:
     GLFWwindow* window = nullptr;
-    Application* app = nullptr;
 
     std::unordered_map<unsigned int, GLFWcursor*> cursors;
 };

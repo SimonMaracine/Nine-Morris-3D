@@ -4,7 +4,6 @@
 #include <cereal/types/string.hpp>
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "nine_morris_3d.h"
 #include "game/components/options.h"
 #include "game/systems/options.h"
 #include "save_load.h"
@@ -17,12 +16,13 @@
 template<typename Archive>
 void serialize(Archive& archive, OptionsComponent& options_c) {
     archive(
-        options_c.black_player, options_c.texture_quality, options_c.samples,
-        options_c.anisotropic_filtering, options_c.vsync, options_c.save_on_exit,
-        options_c.skybox, options_c.custom_cursor, options_c.sensitivity,
-        options_c.hide_timer, options_c.labeled_board, options_c.normal_mapping,
-        options_c.bloom, options_c.bloom_strength, options_c.white_player,
-        options_c.black_player
+        options_c.black_player  // FIXME see which fields remain and which not
+        // options_c.texture_quality, options_c.samples,
+        // options_c.anisotropic_filtering, options_c.vsync, options_c.save_on_exit,
+        // options_c.skybox, options_c.custom_cursor, options_c.sensitivity,
+        // options_c.hide_timer, options_c.labeled_board, options_c.normal_mapping,
+        // options_c.bloom, options_c.bloom_strength, options_c.white_player,
+        // options_c.black_player
     );
 }
 
@@ -87,38 +87,40 @@ void load_options_system(entt::registry& registry) noexcept(false) {
         throw save_load::SaveFileError(e.what());
     }
 
-    if (options_c.texture_quality != NORMAL && options_c.texture_quality != LOW) {
-        throw OptionsFileError("Options file is invalid: texture_quality");
-    }
+    // FIXME see which fields remain and which not
 
-    if (options_c.samples != 1 && options_c.samples != 2 && options_c.samples != 4) {
-        throw OptionsFileError("Options file is invalid: samples");
-    }
+    // if (options_c.texture_quality != NORMAL && options_c.texture_quality != LOW) {
+    //     throw OptionsFileError("Options file is invalid: texture_quality");
+    // }
 
-    if (options_c.anisotropic_filtering != 0 && options_c.anisotropic_filtering != 4
-            && options_c.anisotropic_filtering != 8) {
-        throw OptionsFileError("Options file is invalid: anisotropic_filtering");
-    }
+    // if (options_c.samples != 1 && options_c.samples != 2 && options_c.samples != 4) {
+    //     throw OptionsFileError("Options file is invalid: samples");
+    // }
 
-    if (options_c.skybox != FIELD && options_c.skybox != AUTUMN) {
-        throw OptionsFileError("Options file is invalid: skybox");
-    }
+    // if (options_c.anisotropic_filtering != 0 && options_c.anisotropic_filtering != 4
+    //         && options_c.anisotropic_filtering != 8) {
+    //     throw OptionsFileError("Options file is invalid: anisotropic_filtering");
+    // }
 
-    if (options_c.sensitivity < 0.5f || options_c.sensitivity > 2.0f) {
-        throw OptionsFileError("Options file is invalid: sensitivity");
-    }
+    // if (options_c.skybox != FIELD && options_c.skybox != AUTUMN) {
+    //     throw OptionsFileError("Options file is invalid: skybox");
+    // }
 
-    if (options_c.bloom_strength < 0.1f || options_c.bloom_strength > 1.0f) {
-        throw OptionsFileError("Options file is invalid: bloom_strength");
-    }
+    // if (options_c.sensitivity < 0.5f || options_c.sensitivity > 2.0f) {
+    //     throw OptionsFileError("Options file is invalid: sensitivity");
+    // }
 
-    if (options_c.white_player != HUMAN || options_c.white_player != COMPUTER) {
-        throw OptionsFileError("Options file is invalid: white_player");
-    }
+    // if (options_c.bloom_strength < 0.1f || options_c.bloom_strength > 1.0f) {
+    //     throw OptionsFileError("Options file is invalid: bloom_strength");
+    // }
 
-    if (options_c.black_player != HUMAN || options_c.black_player != COMPUTER) {
-        throw OptionsFileError("Options file is invalid: black_player");
-    }
+    // if (options_c.white_player != HUMAN || options_c.white_player != COMPUTER) {
+    //     throw OptionsFileError("Options file is invalid: white_player");
+    // }
+
+    // if (options_c.black_player != HUMAN || options_c.black_player != COMPUTER) {
+    //     throw OptionsFileError("Options file is invalid: black_player");
+    // }
 
     options_c = temporary;
 
@@ -148,11 +150,11 @@ void create_options_file() noexcept(false) {
     DEB_INFO("Created options file '{}'", file_path);
 }
 
-void handle_options_file_not_open_error() {
+void handle_options_file_not_open_error(std::string_view app_name) {
     bool user_data_directory;
 
     try {
-        user_data_directory = user_data::user_data_directory_exists(APP_NAME);
+        user_data_directory = user_data::user_data_directory_exists(app_name);
     } catch (const user_data::UserNameError& e) {
         REL_ERROR("{}", e.what());
         return;
@@ -162,7 +164,7 @@ void handle_options_file_not_open_error() {
         REL_INFO("User data folder missing; creating one...");
 
         try {
-            bool success = user_data::create_user_data_directory(APP_NAME);
+            const bool success = user_data::create_user_data_directory(app_name);
             if (success) {
                 try {
                     create_options_file();

@@ -63,7 +63,7 @@ namespace user_data {
     std::string get_username() noexcept(false) {
         char username[UNLEN + 1];
         DWORD whatever = UNLEN + 1;
-        bool success = GetUserName(username, &whatever);
+        const bool success = GetUserName(username, &whatever);
 
         if (!success) {
             throw UserNameError("Could not get username");
@@ -104,7 +104,7 @@ namespace user_data {
         const std::string username = get_username();
         const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
-        bool success = CreateDirectory(path.c_str(), nullptr);
+        const bool success = CreateDirectory(path.c_str(), nullptr);
 
         return success;
     }

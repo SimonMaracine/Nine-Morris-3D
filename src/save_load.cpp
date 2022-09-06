@@ -274,11 +274,11 @@ namespace save_load {
         }
     }
 
-    void handle_save_file_not_open_error() {
+    void handle_save_file_not_open_error(std::string_view app_name) {
         bool user_data_directory;
 
         try {
-            user_data_directory = user_data::user_data_directory_exists(APP_NAME);
+            user_data_directory = user_data::user_data_directory_exists(app_name);
         } catch (const user_data::UserNameError& e) {
             REL_ERROR("{}", e.what());
             return;
@@ -288,7 +288,7 @@ namespace save_load {
             REL_INFO("User data folder missing; creating one...");
 
             try {
-                bool success = user_data::create_user_data_directory(APP_NAME);
+                const bool success = user_data::create_user_data_directory(app_name);
                 if (!success) {
                     REL_ERROR("Could not create user data directory");
                     return;

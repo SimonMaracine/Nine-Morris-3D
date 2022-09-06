@@ -1,14 +1,21 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-// #include "application/scene.h"
 #include "nine_morris_3d.h"
 #include "scenes/game_scene.h"
-// #include "layers/game/game_layer.h"
-// #include "layers/game/imgui_layer.h"
-// #include "layers/game/gui_layer.h"
-// #include "layers/loading/loading_layer.h"
 
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+#if defined(PLATFORM_GAME_LINUX)
+    #define APP_NAME "ninemorris3d"
+#elif defined(PLATFORM_GAME_WINDOWS)
+    #define APP_NAME "NineMorris3D"
+#endif
+
+#if defined(PLATFORM_GAME_LINUX)
+    #define LOG_FILE "log.txt"
+    #define INFO_FILE "info.txt"
+#elif defined(PLATFORM_GAME_WINDOWS)
+    #define LOG_FILE "ninemorris3d_log.txt"
+    #define INFO_FILE "ninemorris3d_info.txt"
+#endif
 
 int main() {
     // NineMorris3D* application = new NineMorris3D(INFO_FILE, LOG_FILE, APP_NAME);
@@ -29,7 +36,18 @@ int main() {
 
     // delete application;
 
-    std::unique_ptr<NineMorris3D> application = std::make_unique<NineMorris3D>(INFO_FILE, LOG_FILE, APP_NAME);  // TODO improve initialization
+    logging::initialize(LOG_FILE);  // FIXME logging is not really disabled, if this is not called
+
+    auto builder = ApplicationBuilder{}
+        .display_config(1024, 576, "Nine Morris 3D", 512, 288)
+        .file_names_config(APP_NAME, INFO_FILE)
+        .version_config(0, 2, 0)
+        .authors_config({ u8"Simon Mărăcine" })
+        .with(ApplicationBuilder::Renderer::R3D)
+        .with(ApplicationBuilder::Renderer::R2D)
+        .with(ApplicationBuilder::Renderer::RImGui);
+
+    auto application = std::make_unique<NineMorris3D>(builder);
     application->add_scene(new GameScene, true);
     application->run();
 }

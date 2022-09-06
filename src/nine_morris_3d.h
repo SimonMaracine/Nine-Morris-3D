@@ -3,42 +3,12 @@
 #include <imgui.h>
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-// #include "application/platform.h"
-// #include "application/application.h"
-// #include "graphics/renderer/hover.h"
-// #include "graphics/renderer/material.h"
-// #include "graphics/renderer/font.h"
-// #include "graphics/renderer/opengl/vertex_array.h"
-// #include "graphics/renderer/opengl/buffer.h"
-// #include "graphics/renderer/opengl/shader.h"
-// #include "graphics/renderer/opengl/texture.h"
-// #include "options.h"
 #include "assets_data.h"
-// #include "other/mesh.h"
-
-#if defined(PLATFORM_GAME_LINUX)
-    #define APP_NAME "ninemorris3d"
-#elif defined(PLATFORM_GAME_WINDOWS)
-    #define APP_NAME "NineMorris3D"
-#endif
-
-#if defined(PLATFORM_GAME_LINUX)
-    #define LOG_FILE "log.txt"
-    #define INFO_FILE "info.txt"
-#elif defined(PLATFORM_GAME_WINDOWS)
-    #define LOG_FILE "ninemorris3d_log.txt"
-    #define INFO_FILE "ninemorris3d_info.txt"
-#endif
-
-// constexpr unsigned int VERSION_MAJOR = 0;
-// constexpr unsigned int VERSION_MINOR = 2;
-// constexpr unsigned int VERSION_PATCH = 0;
 
 struct NineMorris3D : public Application {
-    NineMorris3D(std::string_view info_file, std::string_view log_file, std::string_view application_name);
+    NineMorris3D(const ApplicationBuilder& builder);
     virtual ~NineMorris3D();
 
-    // static void set_app_pointer(NineMorris3D* instance);
     void set_bloom(bool enable);
     void set_bloom_strength(float strength);
 
@@ -96,5 +66,3 @@ struct NineMorris3D : public Application {
     //     std::shared_ptr<Texture> keyboard_controls_cross_texture;
     // } data;
 };
-
-// extern NineMorris3D* app;

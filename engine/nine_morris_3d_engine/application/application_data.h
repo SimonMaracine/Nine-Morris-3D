@@ -7,10 +7,14 @@ class Application;
 struct ApplicationData {
     int width, height;
     std::string title;
-    std::vector<std::string> authors;  // TODO use this
+    int min_width;
+    int min_height;
+    std::string application_name;
+    std::string info_file_name;
     unsigned int version_major;
     unsigned int version_minor;
     unsigned int version_patch;
+    std::vector<std::string> authors;
+
     Application* app;
-    // std::function<void(events::Event&)> event_function;
 };

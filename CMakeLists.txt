@@ -52,6 +52,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
 endif()
 
 set(ENGINE_HEADERS
+    "engine/nine_morris_3d_engine/application/application_builder.h"
     "engine/nine_morris_3d_engine/application/application_data.h"
     "engine/nine_morris_3d_engine/application/application.h"
     "engine/nine_morris_3d_engine/application/events.h"
@@ -93,6 +94,7 @@ set(ENGINE_HEADERS
 )
 
 add_library(${ENGINE} STATIC
+    "engine/nine_morris_3d_engine/application/application_builder.cpp"
     "engine/nine_morris_3d_engine/application/application.cpp"
     "engine/nine_morris_3d_engine/application/extensions.cpp"
     "engine/nine_morris_3d_engine/application/input.cpp"

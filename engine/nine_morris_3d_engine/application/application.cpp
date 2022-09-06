@@ -8,6 +8,7 @@
 #include "nine_morris_3d_engine/application/events.h"
 #include "nine_morris_3d_engine/application/scene.h"
 #include "nine_morris_3d_engine/application/input.h"
+#include "nine_morris_3d_engine/application/application_builder.h"
 #include "nine_morris_3d_engine/ecs/internal_systems.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
@@ -17,25 +18,38 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/paths.h"
 
-Application::Application(int width, int height, std::string_view title, std::string_view info_file,
-        std::string_view log_file, std::string_view application_name) {
-    app_data.width = width;
-    app_data.height = height;
-    app_data.title = title;
-    // TODO use authors and version
-    app_data.app = this;
-    // app_data.event_function = BIND(Application::on_event);
+Application::Application(const ApplicationBuilder& builder)
+    : builder(builder) {
+    DEB_INFO("Initializing application...");
 
-    paths::initialize(application_name);
-    logging::initialize(log_file);  // TODO move out in main
+    app_data.width = builder.width;
+    app_data.height = builder.height;
+    app_data.title = builder.title;
+    app_data.min_width = builder.min_width;
+    app_data.min_height = builder.min_height;
+    app_data.application_name = builder.application_name;
+    app_data.info_file_name = builder.info_file_name;
+    app_data.authors = builder.authors;
+    app_data.version_major = builder.major;
+    app_data.version_minor = builder.minor;
+    app_data.version_patch = builder.patch;
+    app_data.app = this;
+
+    paths::initialize(builder.application_name);
     window = std::make_unique<Window>(this);
 
-    ImGui::CreateContext();  // TODO make ImGui optional
-    ImGui_ImplOpenGL3_Init("#version 430 core");
-    ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
+    if (builder.renderer_imgui) {
+        DEB_INFO("With renderer ImGui");
+
+        ImGui::CreateContext();  // TODO make ImGui optional
+        ImGui_ImplOpenGL3_Init("#version 430 core");
+        ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
+
+        renderer_imgui = std::bind(&Application::renderer_imgui_functionality, this);        
+    }
 
 #ifdef PLATFORM_GAME_DEBUG
-    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console, info_file);
+    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console, builder.info_file_name);
 #endif
     input::initialize(window->get_handle());
     debug_opengl::maybe_initialize_debugging();
@@ -44,8 +58,19 @@ Application::Application(int width, int height, std::string_view title, std::str
     auto [version_major, version_minor] = debug_opengl::get_version_numbers();
     REL_INFO("Using OpenGL version {}.{}", version_major, version_minor);
 
-    renderer = std::make_unique<Renderer>(this);  // TODO make rendering optional
-    gui_renderer = std::make_unique<GuiRenderer>(this);
+    if (builder.renderer_3d) {
+        DEB_INFO("With renderer 3D");
+
+        renderer = std::make_unique<Renderer>(this);  // TODO make rendering optional
+        renderer_3d = std::bind(&Application::renderer_3d_functionality, this);        
+    }
+    
+    if (builder.renderer_2d) {
+        DEB_INFO("With renderer 2D");
+
+        gui_renderer = std::make_unique<GuiRenderer>(this);
+        renderer_2d = std::bind(&Application::renderer_2d_functionality, this);
+    }
 
     event_dispatcher.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(*this);
     event_dispatcher.sink<WindowResizedEvent>().connect<&Application::on_window_resized>(*this);
@@ -59,9 +84,11 @@ Application::Application(int width, int height, std::string_view title, std::str
 }
 
 Application::~Application() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    if (builder.renderer_imgui) {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+    }
 
     for (Scene* scene : scenes) {
         delete scene;
@@ -71,11 +98,11 @@ Application::~Application() {
 void Application::run() {
     ASSERT(current_scene != nullptr, "Starting scene not set");
 
-    DEB_INFO("Starting game");
+    DEB_INFO("Starting game...");
 
     on_start(current_scene);
 
-    DEB_INFO("Initialized game, entering main loop");
+    DEB_INFO("Initialized game, entering main loop...");
 
     while (running) {
         delta = update_frame_counter();
@@ -88,18 +115,9 @@ void Application::run() {
         }
         current_scene->on_update(this);
 
-        renderer->render();
-        gui_renderer->render();
-
-        ImGui_ImplGlfw_NewFrame();
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui::NewFrame();
-
-        current_scene->on_imgui_update(this);
-
-        ImGui::EndFrame();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        renderer_3d();
+        renderer_2d();
+        renderer_imgui();
 
         event_dispatcher.update();
         window->update();
@@ -131,29 +149,6 @@ void Application::change_scene(std::string_view name) {
     }
 
     ASSERT(false, "Scene not found");
-}
-
-void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
-    framebuffers.push_back(framebuffer);
-}
-
-void Application::purge_framebuffers() {
-    std::vector<size_t> indices;
-
-    for (size_t i = 0; i < framebuffers.size(); i++) {
-        if (framebuffers[i].expired()) {
-            indices.push_back(i);
-        }
-    }
-
-    for (int64_t i = framebuffers.size() - 1; i >= 0; i--) {
-        for (size_t index : indices) {
-            if (static_cast<int64_t>(index) == i) {
-                framebuffers.erase(std::next(framebuffers.begin(), index));
-                break;
-            }
-        }
-    }
 }
 
 float Application::update_frame_counter() {
@@ -221,6 +216,26 @@ void Application::check_changed_scene() {
     }
 }
 
+void Application::renderer_3d_functionality() {
+    renderer->render();
+}
+
+void Application::renderer_2d_functionality() {
+    gui_renderer->render();
+}
+
+void Application::renderer_imgui_functionality() {
+    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+
+    current_scene->on_imgui_update(this);
+
+    ImGui::EndFrame();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 void Application::on_start(Scene* scene) {
     if (!scene->on_awake_called) {
         scene->on_awake(this);
@@ -236,11 +251,13 @@ void Application::on_window_closed(const WindowClosedEvent& event) {
 void Application::on_window_resized(const WindowResizedEvent& event) {
     render_helpers::viewport(event.width, event.height);
 
-    for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
-        std::shared_ptr<Framebuffer> fb = framebuffer.lock();
-        if (fb != nullptr) {
-            if (fb->get_specification().resizable) {
-                fb->resize(event.width, event.height);
+    if (builder.renderer_3d) {
+        for (std::weak_ptr<Framebuffer> framebuffer : renderer->framebuffers) {  // FIXME framebuffers should be independent of renderer 3D
+            std::shared_ptr<Framebuffer> fb = framebuffer.lock();
+            if (fb != nullptr) {
+                if (fb->get_specification().resizable) {
+                    fb->resize(event.width, event.height);
+                }
             }
         }
     }
@@ -248,8 +265,13 @@ void Application::on_window_resized(const WindowResizedEvent& event) {
     // camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
     // camera_projection_system(registry, event.width, event.height);  // TODO this should be user called
 
-    renderer->on_window_resized(event);
-    gui_renderer->on_window_resized(event);
+    if (builder.renderer_3d) {
+        renderer->on_window_resized(event);
+    }
+
+    if (builder.renderer_2d) {
+        gui_renderer->on_window_resized(event);
+    }
 }
 
 void Application::on_mouse_scrolled(const MouseScrolledEvent& event) {

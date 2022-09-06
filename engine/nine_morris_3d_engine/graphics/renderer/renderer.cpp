@@ -193,8 +193,8 @@ Renderer::Renderer(Application* app)
 
         storage.intermediate_framebuffer = std::make_shared<Framebuffer>(specification);
 
-        app->purge_framebuffers();
-        app->add_framebuffer(storage.intermediate_framebuffer);
+        purge_framebuffers();
+        add_framebuffer(storage.intermediate_framebuffer);
     }
 
     storage.pixel_buffers = {
@@ -304,8 +304,8 @@ void Renderer::on_window_resized(const WindowResizedEvent& event) {
 void Renderer::set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
     storage.scene_framebuffer = framebuffer;
 
-    app->purge_framebuffers();
-    app->add_framebuffer(storage.scene_framebuffer);
+    purge_framebuffers();
+    add_framebuffer(storage.scene_framebuffer);
 }
 
 void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
@@ -326,8 +326,31 @@ void Renderer::set_depth_map_framebuffer(int size) {
 
     storage.depth_map_framebuffer = std::make_shared<Framebuffer>(specification);
 
-    app->purge_framebuffers();
-    app->add_framebuffer(storage.depth_map_framebuffer);
+    purge_framebuffers();
+    add_framebuffer(storage.depth_map_framebuffer);
+}
+
+void Renderer::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
+    framebuffers.push_back(framebuffer);
+}
+
+void Renderer::purge_framebuffers() {
+    std::vector<size_t> indices;
+
+    for (size_t i = 0; i < framebuffers.size(); i++) {
+        if (framebuffers[i].expired()) {
+            indices.push_back(i);
+        }
+    }
+
+    for (int64_t i = framebuffers.size() - 1; i >= 0; i--) {
+        for (size_t index : indices) {
+            if (static_cast<int64_t>(index) == i) {
+                framebuffers.erase(std::next(framebuffers.begin(), index));
+                break;
+            }
+        }
+    }
 }
 
 void Renderer::setup_shader(std::shared_ptr<Shader> shader) {

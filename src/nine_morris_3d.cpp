@@ -2,16 +2,7 @@
 #include <entt/entt.hpp>
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-// #include "application/platform.h"
-// #include "graphics/renderer/renderer.h"
-// #include "graphics/renderer/buffer_layout.h"
-// #include "graphics/renderer/opengl/vertex_array.h"
-// #include "graphics/renderer/opengl/buffer.h"
-// #include "graphics/renderer/opengl/texture.h"
-// #include "graphics/renderer/opengl/vertex_array.h"
-// #include "graphics/renderer/opengl/framebuffer.h"
 #include "nine_morris_3d.h"
-// #include "options.h"
 #include "assets.h"
 #include "assets_data.h"
 #include "game/components/options.h"
@@ -19,17 +10,9 @@
 #include "post_processing/bright_filter.h"
 #include "post_processing/blur.h"
 #include "post_processing/combine.h"
-// #include "other/paths.h"
-// #include "other/texture_data.h"
-// #include "other/logging.h"
-// #include "other/assert.h"
-// #include "other/encrypt.h"
 
-// Global reference to application
-// NineMorris3D* app = nullptr;
-
-NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file, std::string_view application_name)
-    : Application(1024, 576, "Nine Morris 3D", info_file, log_file, application_name) {
+NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
+    : Application(builder) {
     // try {
     //     options::load_options_from_file(options);
     // } catch (const options::OptionsFileNotOpenError& e) {
@@ -163,8 +146,8 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
 
         std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
-        purge_framebuffers();
-        add_framebuffer(framebuffer);
+        renderer->purge_framebuffers();
+        renderer->add_framebuffer(framebuffer);
 
         std::shared_ptr<Shader> shader = std::make_shared<Shader>(
             encr(path_for_assets(BRIGHT_FILTER_VERTEX_SHADER)),
@@ -190,8 +173,8 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
 
         std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
-        purge_framebuffers();
-        add_framebuffer(framebuffer);
+        renderer->purge_framebuffers();
+        renderer->add_framebuffer(framebuffer);
 
         renderer->add_post_processing(std::make_shared<Blur>("blur1", framebuffer, blur_shader));
     }
@@ -206,8 +189,8 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
 
         std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
-        purge_framebuffers();
-        add_framebuffer(framebuffer);
+        renderer->purge_framebuffers();
+        renderer->add_framebuffer(framebuffer);
 
         renderer->add_post_processing(std::make_shared<Blur>("blur2", framebuffer, blur_shader));
     }
@@ -227,8 +210,8 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
             std::vector<std::string> { "u_screen_texture", "u_bright_texture", "u_strength" }
         );
 
-        purge_framebuffers();
-        add_framebuffer(framebuffer);
+        renderer->purge_framebuffers();
+        renderer->add_framebuffer(framebuffer);
 
         std::shared_ptr<Combine> combine = std::make_shared<Combine>("combine", framebuffer, shader);
         combine->strength = 0.7f;  // FIXME options_c.bloom_strength;
@@ -236,10 +219,12 @@ NineMorris3D::NineMorris3D(std::string_view info_file, std::string_view log_file
     }
 }
 
-NineMorris3D::~NineMorris3D() {}
+NineMorris3D::~NineMorris3D() {
+
+}
 
 void NineMorris3D::set_bloom(bool enable) {
-    PostProcessingContext& context = renderer->get_post_processing_context();
+    const PostProcessingContext& context = renderer->get_post_processing_context();
 
     for (size_t i = 0; i < context.steps.size(); i++) {
         PostProcessingStep* step = context.steps[i].get();
@@ -248,7 +233,7 @@ void NineMorris3D::set_bloom(bool enable) {
 }
 
 void NineMorris3D::set_bloom_strength(float strength) {
-    PostProcessingContext& context = renderer->get_post_processing_context();
+    const PostProcessingContext& context = renderer->get_post_processing_context();
 
     auto iter = std::find_if(context.steps.begin(), context.steps.end(), [](std::shared_ptr<PostProcessingStep> step) {
         return step->get_id() == "combine";

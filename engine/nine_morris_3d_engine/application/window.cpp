@@ -10,11 +10,7 @@
 #include "nine_morris_3d_engine/application/input.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
-constexpr int MIN_WIDTH = 512;  // TODO maybe make this user made
-constexpr int MIN_HEIGHT = 288;
-
-Window::Window(Application* app)
-    : app(app) {
+Window::Window(Application* app) {
     if (!glfwInit()) {
         REL_CRITICAL("Could not initialize GLFW, exiting...");
         exit(1);
@@ -56,23 +52,19 @@ Window::Window(Application* app)
 
     glfwSwapInterval(1);
     glfwSetWindowUserPointer(window, &app->app_data);
-    glfwSetWindowSizeLimits(window, MIN_WIDTH, MIN_HEIGHT, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    glfwSetWindowSizeLimits(window, app->app_data.min_width, app->app_data.min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        // const WindowClosedEvent event;
-        // data->event_function(event);
         data->app->event_dispatcher.enqueue<WindowClosedEvent>();
     });
 
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        // const WindowResizedEvent event (width, height);
         data->width = width;
         data->height = height;
-        // data->event_function(event);
 
         data->app->event_dispatcher.enqueue<WindowResizedEvent>(width, height);
     });
@@ -82,22 +74,16 @@ Window::Window(Application* app)
 
         switch (action) {
             case GLFW_PRESS: {
-                // const KeyPressedEvent event (static_cast<input::Key>(key), false, mods & GLFW_MOD_CONTROL);
-                // data->event_function(event);
                 data->app->event_dispatcher.enqueue<KeyPressedEvent>(
                     static_cast<input::Key>(key), false, mods & GLFW_MOD_CONTROL
                 );
                 break;
             }
             case GLFW_RELEASE: {
-                // const KeyReleasedEvent event (static_cast<input::Key>(key));
-                // data->event_function(event);
                 data->app->event_dispatcher.enqueue<KeyReleasedEvent>(static_cast<input::Key>(key));
                 break;
             }
             case GLFW_REPEAT: {
-                // const KeyPressedEvent event (static_cast<input::Key>(key), true, mods & GLFW_MOD_CONTROL);
-                // data->event_function(event);
                 data->app->event_dispatcher.enqueue<KeyPressedEvent>(
                     static_cast<input::Key>(key), true, mods & GLFW_MOD_CONTROL
                 );
@@ -111,16 +97,12 @@ Window::Window(Application* app)
 
         switch (action) {
             case GLFW_PRESS: {
-                // const MouseButtonPressedEvent event (static_cast<input::MouseButton>(button));
-                // data->event_function(event);
                 data->app->event_dispatcher.enqueue<MouseButtonPressedEvent>(
                     static_cast<input::MouseButton>(button)
                 );
                 break;
             }
             case GLFW_RELEASE: {
-                // const MouseButtonReleasedEvent event (static_cast<input::MouseButton>(button));
-                // data->event_function(event);
                 data->app->event_dispatcher.enqueue<MouseButtonReleasedEvent>(
                     static_cast<input::MouseButton>(button)
                 );
@@ -132,16 +114,12 @@ Window::Window(Application* app)
     glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        // const MouseScrolledEvent event (static_cast<float>(yoffset));
-        // data->event_function(event);
         data->app->event_dispatcher.enqueue<MouseScrolledEvent>(static_cast<float>(yoffset));
     });
 
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        // const MouseMovedEvent event (static_cast<float>(xpos), static_cast<float>(ypos));
-        // data->event_function(event);
         data->app->event_dispatcher.enqueue<MouseMovedEvent>(
             static_cast<float>(xpos), static_cast<float>(ypos)
         );

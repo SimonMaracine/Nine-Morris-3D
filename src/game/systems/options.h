@@ -22,4 +22,4 @@ void save_options_system(entt::registry& registry) noexcept(false);
 void load_options_system(entt::registry& registry) noexcept(false);
 
 void create_options_file() noexcept(false);
-void handle_options_file_not_open_error();
+void handle_options_file_not_open_error(std::string_view app_name);

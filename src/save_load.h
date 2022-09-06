@@ -50,5 +50,5 @@ namespace save_load {
     void load_game_from_file(SavedGame& saved_game) noexcept(false);
 
     void delete_save_game_file(std::string_view file_path);  // TODO use this, or delete it
-    void handle_save_file_not_open_error();
+    void handle_save_file_not_open_error(std::string_view app_name);
 }

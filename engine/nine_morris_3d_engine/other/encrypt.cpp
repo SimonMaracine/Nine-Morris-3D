@@ -30,9 +30,9 @@ namespace encrypt {
         cppblowfish::Buffer buffer;
         cppblowfish::Buffer cipher = cppblowfish::Buffer::from_whole_data(buff, length);
 
-        blowfish.decrypt(cipher, buffer);
-
         delete[] buff;
+
+        blowfish.decrypt(cipher, buffer);
 
         return buffer;
     }
