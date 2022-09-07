@@ -30,7 +30,7 @@ constexpr GLenum parameters[] = {
     GL_STEREO
 };
 
-static const char* names[] = {
+constexpr const char* names[] = {
     "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS",
     "GL_MAX_CUBE_MAP_TEXTURE_SIZE",
     "GL_MAX_DRAW_BUFFERS",
@@ -236,12 +236,6 @@ namespace debug_opengl {
                     SPDLOG_VER_PATCH);
             output.append(line);
         }
-        // {
-        //     char line[128];
-        //     sprintf(line, "json version: %d.%d.%d\n", NLOHMANN_JSON_VERSION_MAJOR,
-        //             NLOHMANN_JSON_VERSION_MINOR, NLOHMANN_JSON_VERSION_PATCH);
-        //     output.append(line);
-        // }
         {
             char line[128];
             sprintf(line, "cereal version: %d.%d.%d\n", CEREAL_VERSION_MAJOR,

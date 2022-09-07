@@ -36,9 +36,9 @@ int main() {
 
     // delete application;
 
-    logging::initialize(LOG_FILE);  // FIXME logging is not really disabled, if this is not called
+    logging::initialize(LOG_FILE);
 
-    auto builder = ApplicationBuilder{}
+    auto builder = ApplicationBuilder {}
         .display_config(1024, 576, "Nine Morris 3D", 512, 288)
         .file_names_config(APP_NAME, INFO_FILE)
         .version_config(0, 2, 0)

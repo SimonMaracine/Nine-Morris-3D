@@ -45,10 +45,6 @@ public:
     void set_skybox(std::shared_ptr<Texture3D> texture);
     void set_depth_map_framebuffer(int size);
 
-    // Framebuffer management functions
-    void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
-    void purge_framebuffers();
-
     hover::Id get_hovered_id() { return hovered_id; }
     PostProcessingContext& get_post_processing_context() { return post_processing_context; }
     UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
@@ -144,9 +140,6 @@ private:
     int shadow_map_size = 4096;
 
     PostProcessingContext post_processing_context;
-
-    // Keep track of all framebuffers to resize them, if needed
-    std::vector<std::weak_ptr<Framebuffer>> framebuffers;
 
     std::string SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert.dat";
     std::string SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag.dat";

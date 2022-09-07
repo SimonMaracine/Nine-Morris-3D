@@ -35,7 +35,7 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has thre
 
 ### Where to update the version:
 - CMakeLists.txt
-- nine_morris_3d.h
+- main.cpp
 - install.sh
 - installer.nsi
 - README.txt

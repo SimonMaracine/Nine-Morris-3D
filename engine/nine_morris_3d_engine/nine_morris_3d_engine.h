@@ -8,6 +8,7 @@
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/application/scene.h"
 #include "nine_morris_3d_engine/application/window.h"
+#include "nine_morris_3d_engine/application/application_builder.h"
 #include "nine_morris_3d_engine/ecs/internal_components.h"
 #include "nine_morris_3d_engine/ecs/internal_systems.h"
 #include "nine_morris_3d_engine/ecs/system.h"
@@ -35,3 +36,4 @@
 #include "nine_morris_3d_engine/other/paths.h"
 #include "nine_morris_3d_engine/other/texture_data.h"
 #include "nine_morris_3d_engine/other/user_data.h"
+#include "nine_morris_3d_engine/other/resource_manager.h"

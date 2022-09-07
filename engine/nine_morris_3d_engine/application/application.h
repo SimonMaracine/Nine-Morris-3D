@@ -20,12 +20,16 @@ public:
     Application(const ApplicationBuilder& builder);
     virtual ~Application();
 
-    // Call this to run the application, after all scenes have been defined
-    void run();
+    // Call this to run the application, after all scenes have been defined; it can return an exit code
+    int run();
 
     // Scene management functions
     void add_scene(Scene* scene, bool start = false);
     void change_scene(std::string_view name);
+
+    // Framebuffer management functions
+    void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
+    void purge_framebuffers();
 
     double get_fps() { return fps; }
     float get_delta() { return delta; }
@@ -38,6 +42,7 @@ public:
 
     // Public variables accessible by all the code
     bool running = true;
+    int exit_code = 0;
     ApplicationData app_data;
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
@@ -79,9 +84,12 @@ private:
         constexpr void operator()() {}  // Do nothing
     };
 
-    std::function<void()> renderer_3d = DummyFunctor{};
-    std::function<void()> renderer_2d = DummyFunctor{};
-    std::function<void()> renderer_imgui = DummyFunctor{};
+    std::function<void()> renderer_3d = DummyFunctor {};
+    std::function<void()> renderer_2d = DummyFunctor {};
+    std::function<void()> renderer_imgui = DummyFunctor {};
+
+    // Keep track of all framebuffers to resize them, if needed
+    std::vector<std::weak_ptr<Framebuffer>> framebuffers;
 
     // Input stuff
     float mouse_wheel = 0.0f;

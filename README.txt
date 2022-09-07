@@ -9,7 +9,7 @@
 
  Thank you for downloading Nine Morris 3D! A lot of effort was put in the making of this game. I hope
  that you like it. :)
- If you find any bugs or you have a suggestion, please contact me at simonmara.dev@gmail.com.
+ If you find any bugs or have any suggestion, please contact me at simonmara.dev@gmail.com.
 
 ----------------------------------------------------------------------------------------------------
 

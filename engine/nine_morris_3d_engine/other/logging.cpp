@@ -89,8 +89,7 @@ namespace logging {
                 REL_INFO("{}", contents);
                 break;
             case LogTarget::None:
-                // Do nothing
-                break;
+                break;  // Do nothing
         }
     }
 }

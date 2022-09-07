@@ -146,8 +146,8 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
 
         std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
-        renderer->purge_framebuffers();
-        renderer->add_framebuffer(framebuffer);
+        purge_framebuffers();
+        add_framebuffer(framebuffer);
 
         std::shared_ptr<Shader> shader = std::make_shared<Shader>(
             encr(path_for_assets(BRIGHT_FILTER_VERTEX_SHADER)),
@@ -173,8 +173,8 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
 
         std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
-        renderer->purge_framebuffers();
-        renderer->add_framebuffer(framebuffer);
+        purge_framebuffers();
+        add_framebuffer(framebuffer);
 
         renderer->add_post_processing(std::make_shared<Blur>("blur1", framebuffer, blur_shader));
     }
@@ -189,8 +189,8 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
 
         std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>(specification);
 
-        renderer->purge_framebuffers();
-        renderer->add_framebuffer(framebuffer);
+        purge_framebuffers();
+        add_framebuffer(framebuffer);
 
         renderer->add_post_processing(std::make_shared<Blur>("blur2", framebuffer, blur_shader));
     }
@@ -210,8 +210,8 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
             std::vector<std::string> { "u_screen_texture", "u_bright_texture", "u_strength" }
         );
 
-        renderer->purge_framebuffers();
-        renderer->add_framebuffer(framebuffer);
+        purge_framebuffers();
+        add_framebuffer(framebuffer);
 
         std::shared_ptr<Combine> combine = std::make_shared<Combine>("combine", framebuffer, shader);
         combine->strength = 0.7f;  // FIXME options_c.bloom_strength;

@@ -26,7 +26,7 @@
     cd scripts  
     setup.sh  
     build.sh  
-    # run.sh
+    # test.sh
 
 ## Windows debug
 
@@ -34,7 +34,7 @@
     cd scripts  
     Setup.bat  
     Build.bat  
-    :: Run.bat
+    :: Test.bat
 
 #### Visual Studio
     mkdir build  

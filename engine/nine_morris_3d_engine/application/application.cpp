@@ -3,7 +3,6 @@
 #include <backends/imgui_impl_glfw.h>
 
 #include "nine_morris_3d_engine/application/application.h"
-// #include "nine_morris_3d_engine/application/layer.h"
 #include "nine_morris_3d_engine/application/window.h"
 #include "nine_morris_3d_engine/application/events.h"
 #include "nine_morris_3d_engine/application/scene.h"
@@ -41,7 +40,7 @@ Application::Application(const ApplicationBuilder& builder)
     if (builder.renderer_imgui) {
         DEB_INFO("With renderer ImGui");
 
-        ImGui::CreateContext();  // TODO make ImGui optional
+        ImGui::CreateContext();
         ImGui_ImplOpenGL3_Init("#version 430 core");
         ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
 
@@ -61,7 +60,7 @@ Application::Application(const ApplicationBuilder& builder)
     if (builder.renderer_3d) {
         DEB_INFO("With renderer 3D");
 
-        renderer = std::make_unique<Renderer>(this);  // TODO make rendering optional
+        renderer = std::make_unique<Renderer>(this);
         renderer_3d = std::bind(&Application::renderer_3d_functionality, this);        
     }
     
@@ -95,7 +94,7 @@ Application::~Application() {
     }
 }
 
-void Application::run() {
+int Application::run() {
     ASSERT(current_scene != nullptr, "Starting scene not set");
 
     DEB_INFO("Starting game...");
@@ -128,6 +127,8 @@ void Application::run() {
     DEB_INFO("Closing game");
 
     current_scene->on_stop(this);
+
+    return exit_code;
 }
 
 void Application::add_scene(Scene* scene, bool start) {
@@ -149,6 +150,29 @@ void Application::change_scene(std::string_view name) {
     }
 
     ASSERT(false, "Scene not found");
+}
+
+void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
+    framebuffers.push_back(framebuffer);
+}
+
+void Application::purge_framebuffers() {
+    std::vector<size_t> indices;
+
+    for (size_t i = 0; i < framebuffers.size(); i++) {
+        if (framebuffers[i].expired()) {
+            indices.push_back(i);
+        }
+    }
+
+    for (int64_t i = framebuffers.size() - 1; i >= 0; i--) {
+        for (size_t index : indices) {
+            if (static_cast<int64_t>(index) == i) {
+                framebuffers.erase(std::next(framebuffers.begin(), index));
+                break;
+            }
+        }
+    }
 }
 
 float Application::update_frame_counter() {
@@ -251,13 +275,11 @@ void Application::on_window_closed(const WindowClosedEvent& event) {
 void Application::on_window_resized(const WindowResizedEvent& event) {
     render_helpers::viewport(event.width, event.height);
 
-    if (builder.renderer_3d) {
-        for (std::weak_ptr<Framebuffer> framebuffer : renderer->framebuffers) {  // FIXME framebuffers should be independent of renderer 3D
-            std::shared_ptr<Framebuffer> fb = framebuffer.lock();
-            if (fb != nullptr) {
-                if (fb->get_specification().resizable) {
-                    fb->resize(event.width, event.height);
-                }
+    for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
+        std::shared_ptr<Framebuffer> fb = framebuffer.lock();
+        if (fb != nullptr) {
+            if (fb->get_specification().resizable) {
+                fb->resize(event.width, event.height);
             }
         }
     }

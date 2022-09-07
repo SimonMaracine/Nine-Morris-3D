@@ -10,8 +10,10 @@ static GLenum target(bool multisampled) {
 }
 
 static bool depth_attachment_present(const FramebufferSpecification& specification) {
-    return specification.depth_attachment.format != AttachmentFormat::None &&
-            specification.depth_attachment.type != AttachmentType::None;
+    return (
+        specification.depth_attachment.format != AttachmentFormat::None
+        && specification.depth_attachment.type != AttachmentType::None
+    );
 }
 
 static void attach_color_texture(GLuint texture, int samples, GLenum internal_format,
