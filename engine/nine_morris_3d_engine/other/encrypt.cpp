@@ -5,11 +5,10 @@
 #include "nine_morris_3d_engine/other/logging.h"
 
 namespace encrypt {
-    static const char* KEY = "data/models/board/board.obj";
     static cppblowfish::BlowfishContext blowfish;
 
-    void initialize() {
-        blowfish.initialize(std::string(KEY) + 'S');
+    void initialize(std::string_view key) {
+        blowfish.initialize(std::string(key) + 'S');
     }
 
     cppblowfish::Buffer load_file(EncryptedFile file_path) {

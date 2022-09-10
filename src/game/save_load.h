@@ -2,9 +2,8 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/components/board.h"
-#include "game/components/undo_redo_state.h"
-#include "game/components/camera_player_position.h"
+#include "game/board/board.h"
+#include "game/undo_redo_state.h"
 
 namespace save_load {
     static constexpr const char* SAVE_GAME_FILE = "last_game.dat";
@@ -27,15 +26,13 @@ namespace save_load {
     };
 
     struct SavedGame {
-        BoardComponent board_c;
-        CameraComponent camera_c;
+        Board board;
+        Camera camera;
         unsigned int time = 0;  // In deciseconds
         std::string date = NO_LAST_GAME;
-        // StateHistory state_history;
-        UndoRedoStateComponent undo_redo_state_c;
-        // glm::vec3 white_camera_position = glm::vec3(0.0f);
-        // glm::vec3 black_camera_position = glm::vec3(0.0f);
-        CameraPlayerPosition camera_player_position_c;
+        UndoRedoState undo_redo_state;
+        glm::vec3 white_camera_position = glm::vec3(0.0f);
+        glm::vec3 black_camera_position = glm::vec3(0.0f);
         GamePlayer white_player = GamePlayer::None;
         GamePlayer black_player = GamePlayer::None;
     };

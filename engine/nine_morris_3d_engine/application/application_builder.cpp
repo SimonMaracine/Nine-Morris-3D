@@ -33,6 +33,12 @@ ApplicationBuilder& ApplicationBuilder::authors_config(const std::vector<std::st
     return *this;
 }
 
+ApplicationBuilder& ApplicationBuilder::encrypt_key_config(std::string_view encrypt_key) {
+    this->encrypt_key = encrypt_key;
+
+    return *this;
+}
+
 ApplicationBuilder& ApplicationBuilder::with(Renderer renderer) {
     switch (renderer) {
         case Renderer::R3D:

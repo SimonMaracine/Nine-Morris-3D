@@ -20,6 +20,7 @@
 #include <thread>
 #include <atomic>
 #include <cassert>
+#include <optional>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -33,6 +34,7 @@
 #include <cereal/types/memory.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/tuple.hpp>
+#include <cereal/types/optional.hpp>
 
 #include <entt/entt.hpp>
 

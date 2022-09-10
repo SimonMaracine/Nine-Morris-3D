@@ -4,7 +4,7 @@
 
 class BrightFilter : public PostProcessingStep {
 public:
-    BrightFilter(std::string_view id, entt::resource_handle<Framebuffer> framebuffer, entt::resource_handle<Shader> shader)
+    BrightFilter(std::string_view id, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
         : PostProcessingStep(id, framebuffer, shader) {}
     virtual ~BrightFilter() = default;
 

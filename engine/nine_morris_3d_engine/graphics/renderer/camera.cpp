@@ -158,13 +158,13 @@ void Camera::go_towards_position(const glm::vec3& position) {
     const glm::vec3 direction = glm::vec3(glm::transpose(view)[2]);
 
     // Calculate pitch velocity
-    go_towards_position_y(position, direction);
+    go_towards_position_y(direction);
 
     // Calculate angle around point velocity
-    go_towards_position_x(position, direction);
+    go_towards_position_x(direction);
 }
 
-void Camera::go_towards_position_x(const glm::vec3& position, const glm::vec3& direction) {
+void Camera::go_towards_position_x(const glm::vec3& direction) {
     float integer_angle;
     const float fract = glm::modf(180.0f - glm::degrees(glm::atan(-direction.x, direction.z)), integer_angle);
 
@@ -182,7 +182,7 @@ void Camera::go_towards_position_x(const glm::vec3& position, const glm::vec3& d
     x_velocity = 0.0f;
 }
 
-void Camera::go_towards_position_y(const glm::vec3& position, const glm::vec3& direction) {
+void Camera::go_towards_position_y(const glm::vec3& direction) {
     target_pitch = glm::degrees(glm::asin(direction.y));
 
     auto_y_velocity = (target_pitch - pitch) * Y_BASE_VELOCITY;

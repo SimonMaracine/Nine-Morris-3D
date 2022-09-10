@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 #include <stb_image.h>
-#include <entt/entt.hpp>
 #include <cppblowfish.h>
 
 #include "nine_morris_3d_engine/application/extensions.h"
@@ -143,7 +142,7 @@ Texture::Texture(encrypt::EncryptedFile file_path, const TextureSpecification& s
     DEB_DEBUG("Created texture {} ({})", texture, name);
 }
 
-Texture::Texture(entt::resource_handle<TextureData> data, const TextureSpecification& specification) {
+Texture::Texture(std::shared_ptr<TextureData> data, const TextureSpecification& specification) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -224,7 +223,7 @@ Texture3D::Texture3D(const char** file_paths) {
     DEB_DEBUG("Created 3D texture {} ({})", texture, name);
 }
 
-Texture3D::Texture3D(const std::array<entt::resource_handle<TextureData>, 6>& data) {
+Texture3D::Texture3D(const std::array<std::shared_ptr<TextureData>, 6>& data) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 

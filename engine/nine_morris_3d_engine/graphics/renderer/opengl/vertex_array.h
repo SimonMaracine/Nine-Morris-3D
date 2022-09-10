@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/graphics/renderer/buffer_layout.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
@@ -14,8 +13,8 @@ public:
     void bind();
     static void unbind();
 
-    void add_buffer(entt::resource_handle<Buffer> buffer, const BufferLayout& layout);
-    void add_index_buffer(entt::resource_handle<IndexBuffer> index_buffer);
+    void add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout);
+    void add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer);
 private:
     GLuint array = 0;
 

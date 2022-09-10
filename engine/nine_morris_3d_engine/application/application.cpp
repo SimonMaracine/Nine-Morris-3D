@@ -8,7 +8,6 @@
 #include "nine_morris_3d_engine/application/scene.h"
 #include "nine_morris_3d_engine/application/input.h"
 #include "nine_morris_3d_engine/application/application_builder.h"
-#include "nine_morris_3d_engine/ecs/internal_systems.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
@@ -52,7 +51,7 @@ Application::Application(const ApplicationBuilder& builder)
 #endif
     input::initialize(window->get_handle());
     debug_opengl::maybe_initialize_debugging();
-    encrypt::initialize();
+    encrypt::initialize(builder.encrypt_key);
 
     auto [version_major, version_minor] = debug_opengl::get_version_numbers();
     REL_INFO("Using OpenGL version {}.{}", version_major, version_minor);
@@ -60,21 +59,23 @@ Application::Application(const ApplicationBuilder& builder)
     if (builder.renderer_3d) {
         DEB_INFO("With renderer 3D");
 
-        renderer = std::make_unique<Renderer>(this);
+        renderer = std::make_unique<Renderer>();
+        renderer->app = this;
         renderer_3d = std::bind(&Application::renderer_3d_functionality, this);        
     }
     
     if (builder.renderer_2d) {
         DEB_INFO("With renderer 2D");
 
-        gui_renderer = std::make_unique<GuiRenderer>(this);
+        gui_renderer = std::make_unique<GuiRenderer>();
+        gui_renderer->app = this;
         renderer_2d = std::bind(&Application::renderer_2d_functionality, this);
     }
 
-    evt_dispatcher.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(*this);
-    evt_dispatcher.sink<WindowResizedEvent>().connect<&Application::on_window_resized>(*this);
-    evt_dispatcher.sink<MouseScrolledEvent>().connect<&Application::on_mouse_scrolled>(*this);
-    evt_dispatcher.sink<MouseMovedEvent>().connect<&Application::on_mouse_moved>(*this);
+    evt.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(*this);
+    evt.sink<WindowResizedEvent>().connect<&Application::on_window_resized>(*this);
+    evt.sink<MouseScrolledEvent>().connect<&Application::on_mouse_scrolled>(*this);
+    evt.sink<MouseMovedEvent>().connect<&Application::on_mouse_moved>(*this);
 
     // model_render_system(registry);  // TODO replace with the other API
     // quad_render_system(registry);
@@ -89,7 +90,7 @@ Application::~Application() {
         ImGui::DestroyContext();
     }
 
-    for (Scene* scene : scenes) {
+    for (Scene* scene : scenes) {  // TODO maybe use unique_ptr instead
         delete scene;
     }
 }
@@ -99,6 +100,7 @@ int Application::run() {
 
     DEB_INFO("Starting game...");
 
+    prepare_scenes();
     on_start(current_scene);
 
     DEB_INFO("Initialized game, entering main loop...");
@@ -110,15 +112,15 @@ int Application::run() {
         // camera_system(registry, mouse_wheel, dx, dy, dt);  // TODO this should be user called
 
         for (unsigned int i = 0; i < fixed_updates; i++) {
-            current_scene->on_fixed_update(this);
+            current_scene->on_fixed_update();
         }
-        current_scene->on_update(this);
+        current_scene->on_update();
 
         renderer_3d();
         renderer_2d();
         renderer_imgui();
 
-        evt_dispatcher.update();
+        evt.update();
         window->update();
 
         check_changed_scene();
@@ -126,7 +128,7 @@ int Application::run() {
 
     DEB_INFO("Closing game");
 
-    current_scene->on_stop(this);
+    current_scene->on_stop();
 
     return exit_code;
 }
@@ -152,7 +154,7 @@ void Application::change_scene(std::string_view name) {
     ASSERT(false, "Scene not found");
 }
 
-void Application::add_framebuffer(entt::resource_handle<Framebuffer> framebuffer) {
+void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
     framebuffers.push_back(static_cast<std::shared_ptr<Framebuffer>>(framebuffer));
 }
 
@@ -230,7 +232,7 @@ unsigned int Application::calculate_fixed_update() {
 
 void Application::check_changed_scene() {
     if (changed_scene) {
-        current_scene->on_stop(this);
+        current_scene->on_stop();
 
         current_scene = to_scene;
 
@@ -253,22 +255,28 @@ void Application::renderer_imgui_functionality() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
-    current_scene->on_imgui_update(this);
+    current_scene->on_imgui_update();
 
     ImGui::EndFrame();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Application::on_start(Scene* scene) {
-    if (!scene->on_awake_called) {
-        scene->on_awake(this);
-        scene->on_awake_called = true;
+void Application::prepare_scenes() {
+    for (Scene* scene : scenes) {
+        scene->app = this;
     }
-    scene->on_start(this);
 }
 
-void Application::on_window_closed(const WindowClosedEvent& event) {
+void Application::on_start(Scene* scene) {
+    if (!scene->on_awake_called) {
+        scene->on_awake();
+        scene->on_awake_called = true;
+    }
+    scene->on_start();
+}
+
+void Application::on_window_closed(const WindowClosedEvent&) {
     running = false;
 }
 

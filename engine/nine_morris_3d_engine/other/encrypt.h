@@ -4,6 +4,8 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 
+#define ENCR(file_string) (file_string ".dat")
+
 namespace encrypt {
     class EncryptedFile {
     public:
@@ -16,7 +18,7 @@ namespace encrypt {
         std::string_view file_path;
     };
 
-    void initialize();
+    void initialize(std::string_view key);
     cppblowfish::Buffer load_file(EncryptedFile file_path);
 
     constexpr EncryptedFile encr(std::string_view file_path) {

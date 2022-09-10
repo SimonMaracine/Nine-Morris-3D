@@ -7,7 +7,6 @@
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/application/events.h"
 #include "nine_morris_3d_engine/application/input.h"
-#include "nine_morris_3d_engine/ecs/internal_components.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/framebuffer_reader.h"
 #include "nine_morris_3d_engine/graphics/renderer/post_processing_step.h"
@@ -23,8 +22,7 @@
 
 constexpr int SHADOW_MAP_UNIT = 2;
 
-Renderer::Renderer(Application* app)
-    : app(app) {
+Renderer::Renderer() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
@@ -130,7 +128,7 @@ Renderer::Renderer(Application* app)
 #endif
 
     {
-        entt::resource_handle<Buffer> buffer = std::make_shared<Buffer>(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
+        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
         storage.skybox_vertex_array = std::make_shared<VertexArray>();
@@ -149,7 +147,7 @@ Renderer::Renderer(Application* app)
              1.0f, -1.0f,
         };
 
-        entt::resource_handle<Buffer> buffer = std::make_shared<Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
+        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 2);
         storage.quad_vertex_array = std::make_shared<VertexArray>();
@@ -168,7 +166,7 @@ Renderer::Renderer(Application* app)
               0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
               0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
         };
-        entt::resource_handle<Buffer> buffer = std::make_shared<Buffer>(origin_vertices, sizeof(origin_vertices));
+        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(origin_vertices, sizeof(origin_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
         layout.add(1, BufferLayout::Type::Float, 3);
@@ -204,7 +202,7 @@ Renderer::Renderer(Application* app)
         std::make_shared<PixelBuffer>(sizeof(int))
     };
 
-    reader = FramebufferReader<4>(storage.pixel_buffers, storage.intermediate_framebuffer);
+    reader = FramebufferReader<4> {storage.pixel_buffers, storage.intermediate_framebuffer};
 
     // Setup uniform variables
     storage.screen_quad_shader->bind();
@@ -232,10 +230,10 @@ void Renderer::render() {
     render_helpers::clear(render_helpers::Depth);
     render_helpers::viewport(shadow_map_size, shadow_map_size);
 
-    // Sort entities that have a transform
-    app->registry.sort<TransformComponent>([this](const TransformComponent& lhs, const TransformComponent& rhs) {
-        const float distance1 = glm::distance(lhs.position, camera_cache.position);
-        const float distance2 = glm::distance(rhs.position, camera_cache.position);
+    // Sort all models
+    std::sort(models.begin(), models.end(), [this](const std::shared_ptr<Model>& lhs, const std::shared_ptr<Model>& rhs) {
+        const float distance1 = glm::distance(lhs->position, camera_cache.position);
+        const float distance2 = glm::distance(rhs->position, camera_cache.position);
 
         return distance1 < distance2;
     });
@@ -255,12 +253,12 @@ void Renderer::render() {
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
 
-    if (storage.skybox_texture != nullptr) {  // FIXME don't like it!!!
+    if (storage.skybox_texture != nullptr) {
         draw_skybox();
     }
 
     // Render all normal models
-    draw_models_normal();
+    draw_models();
 
     // Render all models with outline
     draw_models_with_outline();
@@ -296,19 +294,70 @@ void Renderer::render() {
     check_hovered_id(x, y);
 }
 
-void Renderer::on_window_resized(const WindowResizedEvent& event) {
-    storage.quad3d_shader->bind();
-    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
+void Renderer::add_model(std::shared_ptr<Model> model) {
+    auto iter = std::find(models.begin(), models.end(), model);
+
+    if (iter == models.end()) {
+        models.push_back(model);
+    } else {
+        DEB_WARN("Model already present");
+    }
 }
 
-void Renderer::set_scene_framebuffer(entt::resource_handle<Framebuffer> framebuffer) {
+void Renderer::remove_model(std::shared_ptr<Model> model) {
+    auto iter = std::find(models.begin(), models.end(), model);
+
+    if (iter != models.end()) {
+        models.erase(iter);
+    }
+}
+
+void Renderer::add_quad(std::shared_ptr<Quad> quad) {
+    auto iter = std::find(quads.begin(), quads.end(), quad);
+
+    if (iter == quads.end()) {
+        quads.push_back(quad);
+    } else {
+        DEB_WARN("Quad already present");
+    }
+}
+
+void Renderer::remove_quad(std::shared_ptr<Quad> quad) {
+    auto iter = std::find(quads.begin(), quads.end(), quad);
+
+    if (iter != quads.end()) {
+        quads.erase(iter);
+    }
+}
+
+void Renderer::clear() {
+    models.clear();
+    quads.clear();
+}
+
+void Renderer::setup_shader(std::shared_ptr<Shader> shader) {
+    const std::vector<std::string>& uniforms = shader->get_uniforms();
+
+    if (std::find(uniforms.begin(), uniforms.end(), "u_shadow_map") != uniforms.end()) {
+        shader->bind();
+        shader->upload_uniform_int("u_shadow_map", SHADOW_MAP_UNIT);
+        Shader::unbind();
+    }
+}
+
+void Renderer::add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step) {
+    post_processing_context.steps.push_back(post_processing_step);
+    post_processing_step->prepare(post_processing_context);
+}
+
+void Renderer::set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
     storage.scene_framebuffer = framebuffer;
 
     app->purge_framebuffers();
     app->add_framebuffer(storage.scene_framebuffer);
 }
 
-void Renderer::set_skybox(entt::resource_handle<Texture3D> texture) {
+void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
     storage.skybox_texture = texture;
 }
 
@@ -330,19 +379,8 @@ void Renderer::set_depth_map_framebuffer(int size) {
     app->add_framebuffer(storage.depth_map_framebuffer);
 }
 
-void Renderer::setup_shader(entt::resource_handle<Shader> shader) {
-    const std::vector<std::string>& uniforms = shader->get_uniforms();
-
-    if (std::find(uniforms.begin(), uniforms.end(), "u_shadow_map") != uniforms.end()) {
-        shader->bind();
-        shader->upload_uniform_int("u_shadow_map", SHADOW_MAP_UNIT);
-        Shader::unbind();
-    }
-}
-
-void Renderer::add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step) {
-    post_processing_context.steps.push_back(post_processing_step);
-    post_processing_step->prepare(post_processing_context);
+void Renderer::set_camera(Camera* camera) {
+    this->camera = camera;
 }
 
 void Renderer::draw_screen_quad(GLuint texture) {
@@ -422,27 +460,27 @@ void Renderer::draw_skybox() {
     glDepthMask(GL_TRUE);
 }
 
-void Renderer::draw_model(const ModelComponent& model_c, const TransformComponent& transform_c) {
+void Renderer::draw_model(const Model* model) {
     glm::mat4 matrix = glm::mat4(1.0f);
-    matrix = glm::translate(matrix, transform_c.position);
-    matrix = glm::rotate(matrix, transform_c.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-    matrix = glm::rotate(matrix, transform_c.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    matrix = glm::rotate(matrix, transform_c.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-    matrix = glm::scale(matrix, transform_c.scale);
+    matrix = glm::translate(matrix, model->position);
+    matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    matrix = glm::scale(matrix, glm::vec3(model->scale));
 
-    model_c.vertex_array->bind();
-    model_c.material->bind();
+    model->vertex_array->bind();
+    model->material->bind();
 
-    model_c.material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
+    model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
 
-    glDrawElements(GL_TRIANGLES, model_c.index_count, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
 }
 
-void Renderer::draw_model_with_outline(const ModelComponent& model_c, const TransformComponent& transform_c, const OutlineComponent& outline_c) {
+void Renderer::draw_model_with_outline(const Model* model) {
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
 
-    draw_model(model_c, transform_c);
+    draw_model(model);
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
@@ -451,19 +489,19 @@ void Renderer::draw_model_with_outline(const ModelComponent& model_c, const Tran
         constexpr float SIZE = 3.6f;
 
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, transform_c.position);
-        matrix = glm::rotate(matrix, transform_c.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, transform_c.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, transform_c.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, transform_c.scale + SIZE);
+        matrix = glm::translate(matrix, model->position);
+        matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(model->scale + SIZE));
 
         storage.outline_shader->bind();
         storage.outline_shader->upload_uniform_mat4("u_model_matrix", matrix);
-        storage.outline_shader->upload_uniform_vec3("u_color", outline_c.outline_color);  // FIXME use outline_enabled or not?
+        storage.outline_shader->upload_uniform_vec3("u_color", model->outline_color.value());  // Should never throw
 
         // Render without output to red
         glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-        glDrawElements(GL_TRIANGLES, model_c.index_count, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
         glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 
@@ -471,40 +509,29 @@ void Renderer::draw_model_with_outline(const ModelComponent& model_c, const Tran
     glStencilMask(0xFF);
 }
 
-void Renderer::draw_models_to_depth_buffer() {
-    storage.shadow_shader->bind();
+void Renderer::draw_models() {
+    static std::vector<const Model*> non_hoverable_models;
+    static std::vector<const Model*> hoverable_models;
 
-    auto view = app->registry.view<RenderComponent, ModelComponent, TransformComponent, CastShadowComponent>();
+    non_hoverable_models.clear();
+    hoverable_models.clear();
 
-    for (auto entity : view) {
-        auto [model_c, transform_c] = view.get<ModelComponent, TransformComponent>(entity);
+    for (size_t i = 0; i < models.size(); i++) {
+        const Model* model = models[i].get();
 
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, transform_c.position);
-        matrix = glm::rotate(matrix, transform_c.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, transform_c.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, transform_c.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, transform_c.scale);
-
-        storage.shadow_shader->upload_uniform_mat4("u_model_matrix", matrix);
-
-        model_c.vertex_array->bind();
-
-        glDrawElements(GL_TRIANGLES, model_c.index_count, GL_UNSIGNED_INT, nullptr);
+        if (model->id.has_value()) {
+            hoverable_models.push_back(model);
+        } else {
+            non_hoverable_models.push_back(model);
+        }
     }
-}
 
-void Renderer::draw_models_normal() {
     // Draw non-hoverable models
     {
         glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        auto view = app->registry.view<RenderComponent, ModelComponent, TransformComponent>();
-
-        for (auto entity : view) {
-            auto [model_c, transform_c] = view.get<ModelComponent, TransformComponent>(entity);
-
-            draw_model(model_c, transform_c);
+        for (const Model* model : non_hoverable_models) {
+            draw_model(model);
         }
     }
 
@@ -512,32 +539,37 @@ void Renderer::draw_models_normal() {
     {
         glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        auto view = app->registry.view<RenderComponent, ModelComponent, TransformComponent, HoverComponent>();
-
-        for (auto entity : view) {
-            auto [model_c, transform_c] = view.get<ModelComponent, TransformComponent>(entity);
-
-            draw_model(model_c, transform_c);
+        for (const Model* model : hoverable_models) {
+            draw_model(model);
         }
     }
 }
 
 void Renderer::draw_models_with_outline() {
+    static std::vector<const Model*> non_hoverable_models;
+    static std::vector<const Model*> hoverable_models;
+
+    non_hoverable_models.clear();
+    hoverable_models.clear();
+
+    for (size_t i = 0; i < models.size(); i++) {
+        const Model* model = models[i].get();
+
+        if (model->outline_color.has_value()) {
+            if (model->id.has_value()) {
+                hoverable_models.push_back(model);
+            } else {
+                non_hoverable_models.push_back(model);
+            }
+        }
+    }
+
     // Draw non-hoverable models
     {
         glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        auto view = app->registry.view<RenderComponent, ModelComponent, TransformComponent, OutlineComponent>();
-        view = view.use<TransformComponent>();  // TODO ???
-
-        for (auto entity : view) {
-            auto [model_c, transform_c, outline_c] = view.get<ModelComponent, TransformComponent, OutlineComponent>(entity);
-
-            if (!outline_c.outline_enabled) {
-                continue;
-            }
-
-            draw_model_with_outline(model_c, transform_c, outline_c);
+        for (const Model* model : non_hoverable_models) {
+            draw_model_with_outline(model);
         }
     }
 
@@ -545,18 +577,32 @@ void Renderer::draw_models_with_outline() {
     {
         glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        auto view = app->registry.view<RenderComponent, ModelComponent, TransformComponent, HoverComponent, OutlineComponent>();
-        view = view.use<TransformComponent>();  // TODO ???
-
-        for (auto entity : view) {
-            auto [model_c, transform_c, outline_c] = view.get<ModelComponent, TransformComponent, OutlineComponent>(entity);
-
-            if (!outline_c.outline_enabled) {
-                continue;
-            }
-
-            draw_model_with_outline(model_c, transform_c, outline_c);
+        for (const Model* model : hoverable_models) {
+            draw_model_with_outline(model);
         }
+    }
+}
+
+void Renderer::draw_models_to_depth_buffer() {
+    storage.shadow_shader->bind();
+
+    for (size_t i = 0; i < models.size(); i++) {
+        const Model* model = models[i].get();
+
+        if (model->cast_shadow) {
+            glm::mat4 matrix = glm::mat4(1.0f);
+            matrix = glm::translate(matrix, model->position);
+            matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            matrix = glm::scale(matrix, glm::vec3(model->scale));
+
+            storage.shadow_shader->upload_uniform_mat4("u_model_matrix", matrix);
+
+            model->vertex_array->bind();
+
+            glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+        }      
     }
 }
 
@@ -567,18 +613,23 @@ void Renderer::draw_quads() {
 
     storage.quad_vertex_array->bind();
 
-    auto view = app->registry.view<RenderComponent, QuadComponent, TransformComponent>();
+    std::sort(quads.begin(), quads.end(), [this](const std::shared_ptr<Quad>& lhs, const std::shared_ptr<Quad>& rhs) {
+        const float distance1 = glm::distance(lhs->position, camera_cache.position);
+        const float distance2 = glm::distance(rhs->position, camera_cache.position);
 
-    for (auto entity : view) {
-        auto [quad_c, transform_c] = view.get<QuadComponent, TransformComponent>(entity);
+        return distance1 > distance2;
+    });
+
+    for (size_t i = 0; i < quads.size(); i++) {
+        const Quad* quad = quads[i].get();
 
         glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, transform_c.position);
-        matrix = glm::scale(matrix, transform_c.scale);
+        matrix = glm::translate(matrix, quad->position);
+        matrix = glm::scale(matrix, glm::vec3(quad->scale));
 
         storage.quad3d_shader->upload_uniform_mat4("u_model_matrix", matrix);
 
-        quad_c.texture->bind(0);
+        quad->texture->bind(0);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
@@ -629,13 +680,19 @@ void Renderer::check_hovered_id(int x, int y) {
 }
 
 void Renderer::cache_camera() {
-    // Use the last camera in the registry
-    app->registry.view<CameraComponent>().each([this](entt::entity, CameraComponent& camera_c) {
-        camera_cache.projection_view_matrix = camera_c.camera.get_projection_view_matrix();
-        camera_cache.view_matrix = camera_c.camera.get_view_matrix();
-        camera_cache.projection_matrix = camera_c.camera.get_projection_matrix();
-        camera_cache.position = camera_c.camera.get_position();
-    });
+    if (camera != nullptr) {
+        camera_cache.projection_matrix = camera->get_projection_matrix();
+        camera_cache.view_matrix = camera->get_view_matrix();
+        camera_cache.projection_view_matrix = camera->get_projection_view_matrix();
+        camera_cache.position = camera->get_position();
+    } else {
+        camera_cache = CameraCache {};
+    }
+}
+
+void Renderer::on_window_resized(const WindowResizedEvent&) {
+    storage.quad3d_shader->bind();
+    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
 }
 
 namespace render_helpers {

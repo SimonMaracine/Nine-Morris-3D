@@ -1,5 +1,4 @@
 #include <glad/glad.h>
-#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/graphics/renderer/buffer_layout.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/vertex_array.h"
@@ -28,7 +27,7 @@ void VertexArray::unbind() {
     glBindVertexArray(0);
 }
 
-void VertexArray::add_buffer(entt::resource_handle<Buffer> buffer, const BufferLayout& layout) {
+void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout) {
     ASSERT(layout.elements.size() > 0, "Invalid layout");
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
@@ -63,7 +62,7 @@ void VertexArray::add_buffer(entt::resource_handle<Buffer> buffer, const BufferL
     // buffers.push_back(buffer);  // FIXME maybe not needed anymore
 }
 
-void VertexArray::add_index_buffer(entt::resource_handle<IndexBuffer> index_buffer) {
+void VertexArray::add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer->buffer);
     // this->index_buffer = index_buffer;
 }

@@ -22,7 +22,7 @@ public:
     std::unordered_map<int, Glyph>& get_glyphs() { return glyphs; }
     unsigned int get_bitmap_size() { return static_cast<unsigned int>(bitmap_size); }
 
-    VertexArray& get_vertex_array() { return vertex_array.get(); }
+    VertexArray& get_vertex_array() { return *vertex_array; }
     GLuint get_texture() { return texture; }
     unsigned int get_vertex_count() { return vertex_count; }
 
@@ -62,7 +62,7 @@ private:
     std::string name;
 
     GLuint texture = 0;
-    entt::resource_handle<VertexArray> vertex_array;
-    entt::resource_handle<Buffer> buffer;
+    std::shared_ptr<VertexArray> vertex_array;
+    std::shared_ptr<Buffer> buffer;
     unsigned int vertex_count = 0;
 };

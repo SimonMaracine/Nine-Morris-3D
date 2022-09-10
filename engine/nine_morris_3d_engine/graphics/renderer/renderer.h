@@ -5,7 +5,6 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/application/events.h"
-#include "nine_morris_3d_engine/ecs/internal_components.h"
 #include "nine_morris_3d_engine/graphics/renderer/framebuffer_reader.h"
 #include "nine_morris_3d_engine/graphics/renderer/font.h"
 #include "nine_morris_3d_engine/graphics/renderer/camera.h"
@@ -17,6 +16,7 @@
 #include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
 
 class Application;
 class PostProcessingStep;
@@ -30,20 +30,47 @@ struct PostProcessingContext {
 
 class Renderer {
 public:
-    Renderer(Application* app);
+    struct Model {
+        glm::vec3 position = glm::vec3(0.0f);
+        glm::vec3 rotation = glm::vec3(0.0f);
+        float scale = 1.0f;
+
+        std::shared_ptr<VertexArray> vertex_array;
+        int index_count = 0;  // TODO maybe put this into IndexBuffer
+        std::shared_ptr<MaterialInstance> material;
+
+        std::optional<glm::vec3> outline_color;
+        std::optional<hover::Id> id;
+        bool cast_shadow = false;
+    };
+
+    struct Quad {
+        glm::vec3 position = glm::vec3(0.0f);
+        float scale = 1.0f;
+
+        std::shared_ptr<Texture> texture;
+    };
+
+    Renderer();
     ~Renderer();
 
     void render();
-    void on_window_resized(const WindowResizedEvent& event);
 
-    void setup_shader(entt::resource_handle<Shader> shader);
-    void add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step);
+    void add_model(std::shared_ptr<Model> model);
+    void remove_model(std::shared_ptr<Model> model);
+
+    void add_quad(std::shared_ptr<Quad> quad);
+    void remove_quad(std::shared_ptr<Quad> quad);
 
     void clear();
 
-    void set_scene_framebuffer(entt::resource_handle<Framebuffer> framebuffer);
-    void set_skybox(entt::resource_handle<Texture3D> texture);
+    void setup_shader(std::shared_ptr<Shader> shader);
+    void add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step);
+
+    void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
+    void set_skybox(std::shared_ptr<Texture3D> texture);
     void set_depth_map_framebuffer(int size);
+    void set_camera(Camera* camera);
 
     hover::Id get_hovered_id() { return hovered_id; }
     PostProcessingContext& get_post_processing_context() { return post_processing_context; }
@@ -51,16 +78,16 @@ public:
     UniformBlockSpecification& get_light_uniform_block() { return storage.light_uniform_block; }
     UniformBlockSpecification& get_light_view_position_uniform_block() { return storage.light_view_position_uniform_block; }
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
-    entt::resource_handle<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
+    std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
 
 #ifdef PLATFORM_GAME_DEBUG
-    entt::resource_handle<Shader> get_origin_shader() { return storage.origin_shader; }
+    std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }
 #endif
-    entt::resource_handle<Shader> get_outline_shader() { return storage.outline_shader; }
-    entt::resource_handle<Shader> get_quad3d_shader() { return storage.quad3d_shader; }
-    entt::resource_handle<Shader> get_screen_quad_shader() { return storage.screen_quad_shader; }
-    entt::resource_handle<Shader> get_shadow_shader() { return storage.shadow_shader; }
-    entt::resource_handle<Shader> get_skybox_shader() { return storage.skybox_shader; }
+    std::shared_ptr<Shader> get_outline_shader() { return storage.outline_shader; }
+    std::shared_ptr<Shader> get_quad3d_shader() { return storage.quad3d_shader; }
+    std::shared_ptr<Shader> get_screen_quad_shader() { return storage.screen_quad_shader; }
+    std::shared_ptr<Shader> get_shadow_shader() { return storage.shadow_shader; }
+    std::shared_ptr<Shader> get_skybox_shader() { return storage.skybox_shader; }
 
     bool origin = false;  // This does nothing in release mode
     DirectionalLight light;
@@ -80,83 +107,86 @@ private:
     void end_rendering();
     void draw_origin();
     void draw_skybox();
-    void draw_model(const ModelComponent& model_c, const TransformComponent& transform_c);
-    void draw_model_with_outline(const ModelComponent& model_c, const TransformComponent& transform_c,
-            const OutlineComponent& outline_c);
-    void draw_models_to_depth_buffer();
-    void draw_models_normal();
+    void draw_model(const Model* model);
+    void draw_model_with_outline(const Model* model);
+    void draw_models();
     void draw_models_with_outline();
+    void draw_models_to_depth_buffer();
     void draw_quads();
     void setup_shadows();
     void setup_uniform_buffers();
     void check_hovered_id(int x, int y);
     void cache_camera();
+    void on_window_resized(const WindowResizedEvent& event);
 
     struct {
-        entt::resource_handle<UniformBuffer> projection_view_uniform_buffer;
-        entt::resource_handle<UniformBuffer> light_uniform_buffer;
-        entt::resource_handle<UniformBuffer> light_view_position_uniform_buffer;
-        entt::resource_handle<UniformBuffer> light_space_uniform_buffer;
+        std::shared_ptr<UniformBuffer> projection_view_uniform_buffer;
+        std::shared_ptr<UniformBuffer> light_uniform_buffer;
+        std::shared_ptr<UniformBuffer> light_view_position_uniform_buffer;
+        std::shared_ptr<UniformBuffer> light_space_uniform_buffer;
 
         UniformBlockSpecification projection_view_uniform_block;
         UniformBlockSpecification light_uniform_block;
         UniformBlockSpecification light_view_position_uniform_block;
         UniformBlockSpecification light_space_uniform_block;
 
-        entt::resource_handle<Shader> skybox_shader;
-        entt::resource_handle<Shader> screen_quad_shader;
-        entt::resource_handle<Shader> quad3d_shader;
-        entt::resource_handle<Shader> shadow_shader;
-        entt::resource_handle<Shader> outline_shader;
+        std::shared_ptr<Shader> skybox_shader;
+        std::shared_ptr<Shader> screen_quad_shader;
+        std::shared_ptr<Shader> quad3d_shader;
+        std::shared_ptr<Shader> shadow_shader;
+        std::shared_ptr<Shader> outline_shader;
 #ifdef PLATFORM_GAME_DEBUG
-        entt::resource_handle<Shader> origin_shader;
+        std::shared_ptr<Shader> origin_shader;
 #endif
 
-        entt::resource_handle<VertexArray> skybox_vertex_array;
-        entt::resource_handle<VertexArray> quad_vertex_array;
+        std::shared_ptr<VertexArray> skybox_vertex_array;
+        std::shared_ptr<VertexArray> quad_vertex_array;
 #ifdef PLATFORM_GAME_DEBUG
-        entt::resource_handle<VertexArray> origin_vertex_array;
+        std::shared_ptr<VertexArray> origin_vertex_array;
 #endif
 
-        entt::resource_handle<Texture3D> skybox_texture;
+        std::shared_ptr<Texture3D> skybox_texture;
 
-        entt::resource_handle<Framebuffer> scene_framebuffer;
-        entt::resource_handle<Framebuffer> depth_map_framebuffer;
-        entt::resource_handle<Framebuffer> intermediate_framebuffer;
+        std::shared_ptr<Framebuffer> scene_framebuffer;
+        std::shared_ptr<Framebuffer> depth_map_framebuffer;
+        std::shared_ptr<Framebuffer> intermediate_framebuffer;
 
-        std::array<entt::resource_handle<PixelBuffer>, 4> pixel_buffers;
+        std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
     } storage;
 
-    struct {
+    struct CameraCache {
         glm::mat4 projection_matrix = glm::mat4(1.0f);
         glm::mat4 view_matrix = glm::mat4(1.0f);
         glm::mat4 projection_view_matrix = glm::mat4(1.0f);
         glm::vec3 position = glm::vec3(0.0f);
     } camera_cache;
 
+    std::vector<std::shared_ptr<Model>> models;
+    std::vector<std::shared_ptr<Quad>> quads;
+
     hover::Id hovered_id = hover::null;
     FramebufferReader<4> reader;
+    Camera* camera = nullptr;  // Don't use this directly
 
     int shadow_map_size = 4096;
 
     PostProcessingContext post_processing_context;
 
-    std::string SHADOW_VERTEX_SHADER = "data/shaders/internal/shadow.vert.dat";
-    std::string SHADOW_FRAGMENT_SHADER = "data/shaders/internal/shadow.frag.dat";
-    std::string SCREEN_QUAD_VERTEX_SHADER = "data/shaders/internal/screen_quad.vert.dat";
-    std::string SCREEN_QUAD_FRAGMENT_SHADER = "data/shaders/internal/screen_quad.frag.dat";
-    std::string OUTLINE_VERTEX_SHADER = "data/shaders/internal/outline.vert.dat";
-    std::string OUTLINE_FRAGMENT_SHADER = "data/shaders/internal/outline.frag.dat";
-    std::string SKYBOX_VERTEX_SHADER = "data/shaders/internal/skybox.vert.dat";
-    std::string SKYBOX_FRAGMENT_SHADER = "data/shaders/internal/skybox.frag.dat";
-    std::string QUAD3D_VERTEX_SHADER = "data/shaders/internal/quad3d.vert.dat";
-    std::string QUAD3D_FRAGMENT_SHADER = "data/shaders/internal/quad3d.frag.dat";
+    const char* SHADOW_VERTEX_SHADER = ENCR("data/shaders/internal/shadow.vert");
+    const char* SHADOW_FRAGMENT_SHADER = ENCR("data/shaders/internal/shadow.frag");
+    const char* SCREEN_QUAD_VERTEX_SHADER = ENCR("data/shaders/internal/screen_quad.vert");
+    const char* SCREEN_QUAD_FRAGMENT_SHADER = ENCR("data/shaders/internal/screen_quad.frag");
+    const char* OUTLINE_VERTEX_SHADER = ENCR("data/shaders/internal/outline.vert");
+    const char* OUTLINE_FRAGMENT_SHADER = ENCR("data/shaders/internal/outline.frag");
+    const char* SKYBOX_VERTEX_SHADER = ENCR("data/shaders/internal/skybox.vert");
+    const char* SKYBOX_FRAGMENT_SHADER = ENCR("data/shaders/internal/skybox.frag");
+    const char* QUAD3D_VERTEX_SHADER = ENCR("data/shaders/internal/quad3d.vert");
+    const char* QUAD3D_FRAGMENT_SHADER = ENCR("data/shaders/internal/quad3d.frag");
 #ifdef PLATFORM_GAME_DEBUG
-    std::string ORIGIN_VERTEX_SHADER = "data/shaders/internal/origin.vert";
-    std::string ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";
+    const char* ORIGIN_VERTEX_SHADER = "data/shaders/internal/origin.vert";
+    const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";
 #endif
 
-    // Reference to application
     Application* app = nullptr;
 
     friend class Application;

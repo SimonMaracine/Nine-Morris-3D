@@ -2,11 +2,11 @@
 
 #include "scenes/loading_scene.h"
 
-void LoadingScene::on_start(Application* app) {
+void LoadingScene::on_start() {
     // TODO loader here
 
     auto loading_text = std::make_shared<gui::Text>(
-        app->res.fonts.handle("good_dog_plain_font"_hs), "Loading...", 1.2f, glm::vec3(0.81f)
+        app->res.fonts["good_dog_plain_font"_hs], "Loading...", 1.2f, glm::vec3(0.81f)
     );
     loading_text->stick(gui::Sticky::SE);
     loading_text->offset(22, gui::Relative::Right)->offset(20, gui::Relative::Bottom);
@@ -14,20 +14,30 @@ void LoadingScene::on_start(Application* app) {
     app->gui_renderer->add_widget(loading_text);
 }
 
-void LoadingScene::on_stop(Application* app) {
+void LoadingScene::on_stop() {
     DEB_INFO("Done loading assets; initializing the rest of the game...");
 
-    // TODO loader jon
+    // TODO loader join
 
     app->gui_renderer->clear();
 }
 
-void LoadingScene::on_update(Application* app) {
-    float width;
-    float height;
-    float x_pos;
-    float y_pos;
+void LoadingScene::on_update() {
+    float width, height, x_pos, y_pos;
+    image_configuration(width, height, x_pos, y_pos);
 
+    app->gui_renderer->im_draw_quad(
+        glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.textures["splash_screen_texture"_hs]
+    );
+
+    // if (loader->done_loading()) {
+    //     app->change_scene("game");
+    // }
+
+    app->change_scene("game");
+}
+
+void LoadingScene::image_configuration(float& width, float& height, float& x_pos, float& y_pos) {
     if (static_cast<float>(app->app_data.width) / app->app_data.height > 16.0f / 9.0f) {
         width = app->app_data.width;
         height = app->app_data.width * (9.0f / 16.0f);
@@ -39,14 +49,4 @@ void LoadingScene::on_update(Application* app) {
         x_pos = (width - app->app_data.width) / -2.0f;
         y_pos = 0.0f;
     }
-
-    app->gui_renderer->im_draw_quad(
-        glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.textures.handle("splash_screen_texture"_hs)
-    );
-
-    // if (loader->done_loading()) {
-    //     app->change_scene("game");
-    // }
-
-    app->change_scene("game");
 }

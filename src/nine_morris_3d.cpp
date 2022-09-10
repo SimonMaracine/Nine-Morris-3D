@@ -1,17 +1,15 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "nine_morris_3d.h"
-#include "assets.h"
-#include "assets_data.h"
-#include "game/components/options.h"
-#include "game/systems/options.h"
+#include "game/assets.h"
+#include "game/assets_data.h"
+#include "game/options.h"
 #include "post_processing/bright_filter.h"
 #include "post_processing/blur.h"
 #include "post_processing/combine.h"
 
 NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
     : Application(builder) {
-    // TODO this is the new one
     // auto options = registry.create();
     // registry.emplace<OptionsComponent>(options);
 
@@ -102,12 +100,14 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
         specification.min_filter = Filter::Linear;
         specification.mag_filter = Filter::Linear;
 
-        res.textures.load<LTexture>("splash_screen_texture"_hs, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+        res.textures.load("splash_screen_texture"_hs, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
     }
 
     // Load and create this font
     {
-        auto font = res.fonts.load<LFont>("good_dog_plain_font"_hs, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
+        res.fonts.load("good_dog_plain_font"_hs, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
+
+        auto font = res.fonts["good_dog_plain_font"_hs];
         font->begin_baking();  // TODO maybe move part of texture baking to thread
         font->bake_characters(32, 127);
         font->end_baking();

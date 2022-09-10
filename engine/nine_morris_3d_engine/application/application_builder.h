@@ -14,6 +14,7 @@ public:
     ApplicationBuilder& file_names_config(std::string_view application_name, std::string_view info_file_name);
     ApplicationBuilder& version_config(unsigned int major, unsigned int minor, unsigned int patch);
     ApplicationBuilder& authors_config(const std::vector<std::string>& authors);
+    ApplicationBuilder& encrypt_key_config(std::string_view encrypt_key);
     ApplicationBuilder& with(Renderer renderer);
 private:
     int width = 800;
@@ -27,6 +28,7 @@ private:
     unsigned int minor = 1;
     unsigned int patch = 0;
     std::vector<std::string> authors;
+    std::string encrypt_key = "Nine Morris 3D Engine";
     bool renderer_3d = false;
     bool renderer_2d = false;
     bool renderer_imgui = false;

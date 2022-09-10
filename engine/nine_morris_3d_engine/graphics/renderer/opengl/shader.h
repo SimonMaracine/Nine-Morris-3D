@@ -3,7 +3,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <cppblowfish.h>
-#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
@@ -12,7 +11,7 @@ struct UniformBlockSpecification {
     std::string block_name;
     size_t field_count;
     std::vector<std::string> field_names;
-    entt::resource_handle<UniformBuffer> uniform_buffer;
+    std::shared_ptr<UniformBuffer> uniform_buffer;
     GLuint binding_index;
 };
 

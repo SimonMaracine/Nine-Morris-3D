@@ -1,6 +1,12 @@
 #pragma once
 
+#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+
 #include "game/constants.h"
+#include "game/piece.h"
+#include "game/node.h"
+#include "game/undo_redo_state.h"
+#include "game/keyboard_controls.h"
 
 struct ThreefoldRepetitionHistory {
     struct PositionPlusInfo {
@@ -21,16 +27,15 @@ struct ThreefoldRepetitionHistory {
     std::vector<PositionPlusInfo> twos;
 };
 
-struct BoardComponent {
-    // Renderer::Model model;
-    // Renderer::Model paint_model;
+struct Board {
+    Board() = default;
+    ~Board() = default;
 
-    // std::array<Node, 24> nodes;
-    // std::array<Piece, 18> pieces;
+    std::shared_ptr<Renderer::Model> model;
+    std::shared_ptr<Renderer::Model> paint_model;
 
-    // Handles to nodes and pieces
-    std::array<entt::entity, 24> nodes;
-    std::array<entt::entity, 18> pieces;
+    std::array<Node, 24> nodes;
+    std::array<Piece, 18> pieces;
 
     BoardPhase phase = BoardPhase::PlacePieces;
     BoardPlayer turn = BoardPlayer::White;
@@ -43,12 +48,9 @@ struct BoardComponent {
     unsigned int not_placed_pieces_count = 18;  // Number of pieces floating
     bool should_take_piece = false;
 
-    // Node* hovered_node = nullptr;
-    // Piece* hovered_piece = nullptr;
-    // Piece* selected_piece = nullptr;
-    entt::entity hovered_node = entt::null;
-    entt::entity hovered_piece = entt::null;
-    entt::entity selected_piece = entt::null;
+    Node* hovered_node = nullptr;
+    Piece* hovered_piece = nullptr;
+    Piece* selected_piece = nullptr;
 
     std::array<bool, 2> can_jump = { false, false };  // White first and black second
 
@@ -56,15 +58,11 @@ struct BoardComponent {
 
     ThreefoldRepetitionHistory repetition_history;
 
-    // StateHistory* state_history = nullptr;
-    // KeyboardControls* keyboard = nullptr;
-    // GameContext* game_context = nullptr;
+    UndoRedoState* undo_redo_state = nullptr;
+    KeyboardControls* keyboard = nullptr;
+    GameContext* game_context = nullptr;
 
-    entt::entity state_history = entt::null;
-    entt::entity keyboard = entt::null;
-    entt::entity game_context = entt::null;
-
-    bool next_move = true;  // It is false when any piece is in air and true otherwise
+    bool next_move = true;  // It is false when any piece is in the air, true otherwise
     bool is_players_turn = true;
     bool switched_turn = false;
 };

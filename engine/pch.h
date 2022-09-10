@@ -20,6 +20,7 @@
 #include <thread>
 #include <atomic>
 #include <cassert>
+#include <optional>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>

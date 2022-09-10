@@ -2,7 +2,6 @@
 
 #include <glad/glad.h>
 #include <stb_image.h>
-#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/other/texture_data.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
@@ -27,7 +26,7 @@ class Texture {
 public:
 	Texture(std::string_view file_path, const TextureSpecification& specification);
 	Texture(encrypt::EncryptedFile file_path, const TextureSpecification& specification);
-	Texture(entt::resource_handle<TextureData> data, const TextureSpecification& specification);
+	Texture(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
     ~Texture();
 
 	int get_width() { return width; }
@@ -47,7 +46,7 @@ private:
 class Texture3D {
 public:
 	Texture3D(const char** file_paths);  // Don't need encrypted version
-	Texture3D(const std::array<entt::resource_handle<TextureData>, 6>& data);
+	Texture3D(const std::array<std::shared_ptr<TextureData>, 6>& data);
     ~Texture3D();
 
     void bind(GLenum slot);

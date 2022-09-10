@@ -4,7 +4,7 @@
 
 class Blur : public PostProcessingStep {
 public:
-    Blur(std::string_view id, entt::resource_handle<Framebuffer> framebuffer, entt::resource_handle<Shader> shader)
+    Blur(std::string_view id, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
         : PostProcessingStep(id, framebuffer, shader) {}
     virtual ~Blur() = default;
 

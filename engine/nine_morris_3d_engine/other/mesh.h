@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/other/encrypt.h"
 
@@ -32,12 +31,12 @@ namespace mesh {
         std::vector<unsigned int> indices;
     };
 
-    entt::resource_handle<Mesh<PTN>> load_model_PTN(std::string_view file_path, bool flip_winding = false);
-    entt::resource_handle<Mesh<PTN>> load_model_PTN(encrypt::EncryptedFile file_path, bool flip_winding = false);
+    std::shared_ptr<Mesh<PTN>> load_model_PTN(std::string_view file_path, bool flip_winding = false);
+    std::shared_ptr<Mesh<PTN>> load_model_PTN(encrypt::EncryptedFile file_path, bool flip_winding = false);
 
-    entt::resource_handle<Mesh<P>> load_model_P(std::string_view file_path, bool flip_winding = false);
-    entt::resource_handle<Mesh<P>> load_model_P(encrypt::EncryptedFile file_path, bool flip_winding = false);
+    std::shared_ptr<Mesh<P>> load_model_P(std::string_view file_path, bool flip_winding = false);
+    std::shared_ptr<Mesh<P>> load_model_P(encrypt::EncryptedFile file_path, bool flip_winding = false);
 
-    entt::resource_handle<Mesh<PTNT>> load_model_PTNT(std::string_view file_path, bool flip_winding = false);
-    entt::resource_handle<Mesh<PTNT>> load_model_PTNT(encrypt::EncryptedFile file_path, bool flip_winding = false);
+    std::shared_ptr<Mesh<PTNT>> load_model_PTNT(std::string_view file_path, bool flip_winding = false);
+    std::shared_ptr<Mesh<PTNT>> load_model_PTNT(encrypt::EncryptedFile file_path, bool flip_winding = false);
 }

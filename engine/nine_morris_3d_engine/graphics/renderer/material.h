@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
@@ -16,13 +15,13 @@ public:
         // FIXME flags here; anything needed?
     };
 
-    Material(entt::resource_handle<Shader> shader, int flags = 0);
+    Material(std::shared_ptr<Shader> shader, int flags = 0);
     ~Material();
 
     void add_uniform(UniformType type, std::string_view name);
     void add_texture(std::string_view name);
 private:
-    entt::resource_handle<Shader> shader;
+    std::shared_ptr<Shader> shader;
 
     std::unordered_map<std::string, glm::mat4> uniforms_mat4;
     std::unordered_map<std::string, int> uniforms_int;
@@ -31,7 +30,7 @@ private:
     std::unordered_map<std::string, glm::vec3> uniforms_vec3;
     std::unordered_map<std::string, glm::vec4> uniforms_vec4;
 
-    std::unordered_map<std::string, std::pair<int, entt::resource_handle<Texture>>> textures;
+    std::unordered_map<std::string, std::pair<int, std::shared_ptr<Texture>>> textures;
 
     int flags = 0;  // FIXME is needed?
 
@@ -40,7 +39,7 @@ private:
 
 class MaterialInstance {
 public:
-    MaterialInstance(entt::resource_handle<Material> material);
+    MaterialInstance(std::shared_ptr<Material> material);
     ~MaterialInstance();
 
     void bind();
@@ -51,11 +50,11 @@ public:
     void set_vec2(std::string_view name, glm::vec2 vector);
     void set_vec3(std::string_view name, const glm::vec3& vector);
     void set_vec4(std::string_view name, const glm::vec4& vector);
-    void set_texture(std::string_view name, entt::resource_handle<Texture> texture, int unit);
+    void set_texture(std::string_view name, std::shared_ptr<Texture> texture, int unit);
 
-    entt::resource_handle<Shader> get_shader() { return shader; }
+    std::shared_ptr<Shader> get_shader() { return shader; }
 private:
-    entt::resource_handle<Shader> shader;
+    std::shared_ptr<Shader> shader;
 
     std::unordered_map<std::string, glm::mat4> uniforms_mat4;
     std::unordered_map<std::string, int> uniforms_int;
@@ -64,7 +63,7 @@ private:
     std::unordered_map<std::string, glm::vec3> uniforms_vec3;
     std::unordered_map<std::string, glm::vec4> uniforms_vec4;
 
-    std::unordered_map<std::string, std::pair<int, entt::resource_handle<Texture>>> textures;
+    std::unordered_map<std::string, std::pair<int, std::shared_ptr<Texture>>> textures;
 
     int flags = 0;  // FIXME is needed?
 };

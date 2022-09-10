@@ -2,8 +2,6 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "assets_data.h"
-
 struct NineMorris3D : public Application {
     NineMorris3D(const ApplicationBuilder& builder);
     virtual ~NineMorris3D();

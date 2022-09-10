@@ -6,7 +6,7 @@ constexpr float FOV = 45.0f;
 constexpr float NEAR = 0.1f;
 constexpr float FAR = 70.0f;
 
-class Camera {
+class Camera {  // TODO maybe refactor camera using quaternions
 public:
     Camera() = default;
     Camera(float sensitivity, float pitch, const glm::vec3& point, float distance_to_point,
@@ -38,8 +38,8 @@ public:
 
     float sensitivity = 1.0f;  // From 0.5 to 2.0
 private:
-    void go_towards_position_x(const glm::vec3& position, const glm::vec3& direction);
-    void go_towards_position_y(const glm::vec3& position, const glm::vec3& direction);
+    void go_towards_position_x(const glm::vec3& direction);
+    void go_towards_position_y(const glm::vec3& direction);
     void go_towards_position_zoom(const glm::vec3& position);
 
     void calculate_auto_angle_around_point(float dt);

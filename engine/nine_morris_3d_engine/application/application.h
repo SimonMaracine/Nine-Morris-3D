@@ -6,11 +6,9 @@
 #include "nine_morris_3d_engine/application/events.h"
 #include "nine_morris_3d_engine/application/window.h"
 #include "nine_morris_3d_engine/application/application_builder.h"
-#include "nine_morris_3d_engine/ecs/system.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
-#include "nine_morris_3d_engine/other/loader.h"
 #include "nine_morris_3d_engine/other/resource_manager.h"
 
 class Scene;
@@ -28,7 +26,7 @@ public:
     void change_scene(std::string_view name);
 
     // Framebuffer management functions
-    void add_framebuffer(entt::resource_handle<Framebuffer> framebuffer);
+    void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void purge_framebuffers();
 
     double get_fps() { return fps; }
@@ -47,8 +45,7 @@ public:
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
-    entt::registry registry;
-    entt::dispatcher evt_dispatcher;
+    entt::dispatcher evt;
     ResourceManager res;
 private:
     float update_frame_counter();
@@ -59,6 +56,7 @@ private:
     void renderer_2d_functionality();
     void renderer_imgui_functionality();
 
+    void prepare_scenes();
     void on_start(Scene* scene);
 
     void on_window_closed(const WindowClosedEvent& event);

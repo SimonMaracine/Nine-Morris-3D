@@ -98,12 +98,4 @@ constexpr size_t INVALID_NODE_INDEX = 24;
 
 constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
 
-constexpr const char* NORMAL = "normal";
-constexpr const char* LOW = "low";
-constexpr const char* FIELD = "field";
-constexpr const char* AUTUMN = "autumn";
-
-constexpr int HUMAN = static_cast<int>(GamePlayer::Human);
-constexpr int COMPUTER = static_cast<int>(GamePlayer::Computer);
-
 using GamePosition = std::array<PieceType, 24>;

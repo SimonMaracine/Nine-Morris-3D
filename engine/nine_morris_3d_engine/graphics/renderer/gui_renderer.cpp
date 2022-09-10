@@ -56,7 +56,7 @@ namespace gui {
 
     Application* Widget::app = nullptr;
 
-    Image::Image(entt::resource_handle<Texture> texture)
+    Image::Image(std::shared_ptr<Texture> texture)
         : texture(texture) {
         type = WidgetType::Image;
         size.x = texture->get_width();
@@ -75,13 +75,13 @@ namespace gui {
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
-    void Image::set_image(entt::resource_handle<Texture> texture) {
+    void Image::set_image(std::shared_ptr<Texture> texture) {
         this->texture = texture;
         size.x = texture->get_width();
         size.y = texture->get_height();
     }
 
-    Text::Text(entt::resource_handle<Font> font, std::string_view text, float text_scale, const glm::vec3& color)
+    Text::Text(std::shared_ptr<Font> font, std::string_view text, float text_scale, const glm::vec3& color)
         : font(font), text(text), text_scale(text_scale), color(color) {
         type = WidgetType::Text;
         font->get_string_size(text, text_scale, &size.x, &size.y);
@@ -136,8 +136,7 @@ namespace gui {
     }
 }
 
-GuiRenderer::GuiRenderer(Application* app)
-    : app(app) {
+GuiRenderer::GuiRenderer() {
     storage.projection_uniform_buffer = std::make_shared<UniformBuffer>();
 
     storage.projection_uniform_block.block_name = "Projection";
@@ -182,7 +181,7 @@ GuiRenderer::GuiRenderer(Application* app)
             1.0f, 0.0f
         };
 
-        entt::resource_handle<Buffer> buffer = std::make_shared<Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
+        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 2);
         storage.quad2d_vertex_array = std::make_shared<VertexArray>();
@@ -243,7 +242,7 @@ void GuiRenderer::render() {
     glEnable(GL_DEPTH_TEST);
 }
 
-void GuiRenderer::im_draw_quad(glm::vec2 position, glm::vec2 scale, entt::resource_handle<Texture> texture) {
+void GuiRenderer::im_draw_quad(glm::vec2 position, glm::vec2 scale, std::shared_ptr<Texture> texture) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
     matrix = glm::scale(matrix, glm::vec3(scale.x, scale.y, 1.0f));
@@ -259,24 +258,13 @@ void GuiRenderer::im_draw_quad(glm::vec2 position, glm::vec2 scale, entt::resour
     glEnable(GL_DEPTH_TEST);
 }
 
-void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
-    storage.orthographic_projection_matrix = glm::ortho(
-        0.0f, static_cast<float>(event.width),
-        0.0f, static_cast<float>(event.height)
-    );
-
-    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
-    storage.projection_uniform_buffer->bind();
-    storage.projection_uniform_buffer->upload_data();
-}
-
 void GuiRenderer::add_widget(std::shared_ptr<gui::Widget> widget) {
     auto iter = std::find(widgets.begin(), widgets.end(), widget);
 
     if (iter == widgets.end()) {
         widgets.push_back(widget);
     } else {
-        DEB_WARN("Widget alreay present");
+        DEB_WARN("Widget already present");
     }
 }
 
@@ -385,4 +373,15 @@ void GuiRenderer::draw(std::vector<gui::Widget*>& subwidgets, const std::functio
 
         widget->render();
     }
+}
+
+void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
+    storage.orthographic_projection_matrix = glm::ortho(
+        0.0f, static_cast<float>(event.width),
+        0.0f, static_cast<float>(event.height)
+    );
+
+    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
+    storage.projection_uniform_buffer->bind();
+    storage.projection_uniform_buffer->upload_data();
 }

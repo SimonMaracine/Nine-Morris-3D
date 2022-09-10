@@ -57,7 +57,7 @@ Window::Window(Application* app) {
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        data->app->evt_dispatcher.enqueue<WindowClosedEvent>();
+        data->app->evt.enqueue<WindowClosedEvent>();
     });
 
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
@@ -66,25 +66,25 @@ Window::Window(Application* app) {
         data->width = width;
         data->height = height;
 
-        data->app->evt_dispatcher.enqueue<WindowResizedEvent>(width, height);
+        data->app->evt.enqueue<WindowResizedEvent>(width, height);
     });
 
-    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int, int action, int mods) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         switch (action) {
             case GLFW_PRESS: {
-                data->app->evt_dispatcher.enqueue<KeyPressedEvent>(
+                data->app->evt.enqueue<KeyPressedEvent>(
                     static_cast<input::Key>(key), false, mods & GLFW_MOD_CONTROL
                 );
                 break;
             }
             case GLFW_RELEASE: {
-                data->app->evt_dispatcher.enqueue<KeyReleasedEvent>(static_cast<input::Key>(key));
+                data->app->evt.enqueue<KeyReleasedEvent>(static_cast<input::Key>(key));
                 break;
             }
             case GLFW_REPEAT: {
-                data->app->evt_dispatcher.enqueue<KeyPressedEvent>(
+                data->app->evt.enqueue<KeyPressedEvent>(
                     static_cast<input::Key>(key), true, mods & GLFW_MOD_CONTROL
                 );
                 break;
@@ -92,18 +92,18 @@ Window::Window(Application* app) {
         }
     });
 
-    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
         switch (action) {
             case GLFW_PRESS: {
-                data->app->evt_dispatcher.enqueue<MouseButtonPressedEvent>(
+                data->app->evt.enqueue<MouseButtonPressedEvent>(
                     static_cast<input::MouseButton>(button)
                 );
                 break;
             }
             case GLFW_RELEASE: {
-                data->app->evt_dispatcher.enqueue<MouseButtonReleasedEvent>(
+                data->app->evt.enqueue<MouseButtonReleasedEvent>(
                     static_cast<input::MouseButton>(button)
                 );
                 break;
@@ -111,16 +111,16 @@ Window::Window(Application* app) {
         }
     });
 
-    glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
+    glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        data->app->evt_dispatcher.enqueue<MouseScrolledEvent>(static_cast<float>(yoffset));
+        data->app->evt.enqueue<MouseScrolledEvent>(static_cast<float>(yoffset));
     });
 
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
 
-        data->app->evt_dispatcher.enqueue<MouseMovedEvent>(
+        data->app->evt.enqueue<MouseMovedEvent>(
             static_cast<float>(xpos), static_cast<float>(ypos)
         );
     });

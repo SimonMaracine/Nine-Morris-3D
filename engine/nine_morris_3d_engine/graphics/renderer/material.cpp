@@ -1,12 +1,11 @@
 #include <glm/glm.hpp>
-#include <entt/entt.hpp>
 
 #include "nine_morris_3d_engine/graphics/renderer/material.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 
-Material::Material(entt::resource_handle<Shader> shader, int flags)
+Material::Material(std::shared_ptr<Shader> shader, int flags)
     : shader(shader), flags(flags) {
     DEB_DEBUG("Created material from shader: {} and flags: {}", shader->get_name(), flags);
 }
@@ -41,12 +40,12 @@ void Material::add_uniform(UniformType type, std::string_view name) {
 }
 
 void Material::add_texture(std::string_view name) {
-    textures[std::string(name)] = std::make_pair<int, entt::resource_handle<Texture>>(0, {});
+    textures[std::string(name)] = std::make_pair<int, std::shared_ptr<Texture>>(0, {});
 }
 
 // --- Material instance
 
-MaterialInstance::MaterialInstance(entt::resource_handle<Material> material) {
+MaterialInstance::MaterialInstance(std::shared_ptr<Material> material) {
     shader = material->shader;
     uniforms_mat4 = material->uniforms_mat4;
     uniforms_int = material->uniforms_int;
@@ -123,6 +122,6 @@ void MaterialInstance::set_vec4(std::string_view name, const glm::vec4& vector) 
     uniforms_vec4[std::string(name)] = vector;
 }
 
-void MaterialInstance::set_texture(std::string_view name, entt::resource_handle<Texture> texture, int unit) {
+void MaterialInstance::set_texture(std::string_view name, std::shared_ptr<Texture> texture, int unit) {
     textures[std::string(name)] = std::make_pair(unit, texture);
 }
