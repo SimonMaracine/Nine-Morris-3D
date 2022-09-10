@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/constants.h"
+#include <game/constants.h>
 
 struct OptionsComponent {
     // std::string texture_quality = NORMAL;

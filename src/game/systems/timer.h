@@ -1,7 +1,5 @@
 #pragma once
 
-#include <entt/entt.hpp>
-
 void timer_update_system(entt::registry& registry, double time);
 void timer_start_system(entt::registry& registry, double time);
 void timer_stop_system(entt::registry& registry);

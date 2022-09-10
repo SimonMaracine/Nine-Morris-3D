@@ -74,19 +74,19 @@ namespace gui {
 
     class Image : public Widget {
     public:
-        Image(std::shared_ptr<Texture> texture);
+        Image(entt::resource_handle<Texture> texture);
         virtual ~Image() = default;
 
         virtual void render() override;
 
-        void set_image(std::shared_ptr<Texture> texture);
+        void set_image(entt::resource_handle<Texture> texture);
     private:
-        std::shared_ptr<Texture> texture;
+        entt::resource_handle<Texture> texture;
     };
 
     class Text : public Widget {
     public:
-        Text(std::shared_ptr<Font> font, std::string_view text, float text_scale = 1.0f,
+        Text(entt::resource_handle<Font> font, std::string_view text, float text_scale = 1.0f,
             const glm::vec3& color = glm::vec3(1.0f));
         virtual ~Text() = default;
 
@@ -97,7 +97,7 @@ namespace gui {
         void set_color(const glm::vec3& color);
         void set_shadows(bool enable);
     private:
-        std::shared_ptr<Font> font;
+        entt::resource_handle<Font> font;
         std::string text;
         float text_scale = 1.0f;
         glm::vec3 color = glm::vec3(0.0f);
@@ -111,7 +111,7 @@ public:
     ~GuiRenderer();
 
     void render();
-    void im_draw_quad(glm::vec2 position, glm::vec2 scale, std::shared_ptr<Texture> texture);
+    void im_draw_quad(glm::vec2 position, glm::vec2 scale, entt::resource_handle<Texture> texture);
     void on_window_resized(const WindowResizedEvent& event);
 
     void add_widget(std::shared_ptr<gui::Widget> widget);
@@ -119,22 +119,22 @@ public:
 
     void clear();
 
-    std::shared_ptr<Shader> get_quad2d_shader() { return storage.quad2d_shader; }
-    std::shared_ptr<Shader> get_text_shader() { return storage.text_shader; }
+    entt::resource_handle<Shader> get_quad2d_shader() { return storage.quad2d_shader; }
+    entt::resource_handle<Shader> get_text_shader() { return storage.text_shader; }
 private:
     void prepare_draw_image();
     void prepare_draw_text();
     void draw(std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw);
 
     struct Storage {
-        std::shared_ptr<UniformBuffer> projection_uniform_buffer;
+        entt::resource_handle<UniformBuffer> projection_uniform_buffer;
 
         UniformBlockSpecification projection_uniform_block;
 
-        std::shared_ptr<Shader> quad2d_shader;
-        std::shared_ptr<Shader> text_shader;
+        entt::resource_handle<Shader> quad2d_shader;
+        entt::resource_handle<Shader> text_shader;
 
-        std::shared_ptr<VertexArray> quad2d_vertex_array;
+        entt::resource_handle<VertexArray> quad2d_vertex_array;
 
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
     } storage;

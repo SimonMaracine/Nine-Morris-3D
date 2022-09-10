@@ -7,8 +7,8 @@ template<size_t BufferCount>
 class FramebufferReader {
 public:
     FramebufferReader() = default;
-    FramebufferReader(const std::array<std::shared_ptr<PixelBuffer>, BufferCount>& buffers,
-            std::shared_ptr<Framebuffer> framebuffer)
+    FramebufferReader(const std::array<entt::resource_handle<PixelBuffer>, BufferCount>& buffers,
+            entt::resource_handle<Framebuffer> framebuffer)
         : buffers(buffers), framebuffer(framebuffer) {
         static_assert(BufferCount > 0);
     }
@@ -34,8 +34,8 @@ public:
         PixelBuffer::unbind();
     }
 private:
-    std::array<std::shared_ptr<PixelBuffer>, BufferCount> buffers;
-    std::shared_ptr<Framebuffer> framebuffer;
+    std::array<entt::resource_handle<PixelBuffer>, BufferCount> buffers;
+    entt::resource_handle<Framebuffer> framebuffer;
     size_t buffer_index = 0;
     size_t next_buffer_index = 0;
 };

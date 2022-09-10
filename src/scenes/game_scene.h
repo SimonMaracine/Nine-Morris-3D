@@ -12,5 +12,4 @@ struct GameScene : public Scene {
     virtual void on_update(Application* app) override;
     virtual void on_fixed_update(Application* app) override;
     virtual void on_imgui_update(Application* app) override;
-    // virtual void on_event(Application* app, events::Event& event) override;
 };

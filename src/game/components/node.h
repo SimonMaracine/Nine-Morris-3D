@@ -1,7 +1,5 @@
 #pragma once
 
-#include <entt/entt.hpp>
-
 #include "game/constants.h"
 
 struct NodeComponent {

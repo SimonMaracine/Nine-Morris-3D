@@ -22,9 +22,9 @@ struct TagComponent {  // TODO maybe not needed
 struct RenderComponent {};
 
 struct ModelComponent {
-    std::shared_ptr<VertexArray> vertex_array;
+    entt::resource_handle<VertexArray> vertex_array;
     int index_count = 0;
-    std::shared_ptr<MaterialInstance> material;
+    entt::resource_handle<MaterialInstance> material;
 };
 
 struct OutlineComponent {

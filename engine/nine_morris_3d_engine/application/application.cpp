@@ -71,10 +71,10 @@ Application::Application(const ApplicationBuilder& builder)
         renderer_2d = std::bind(&Application::renderer_2d_functionality, this);
     }
 
-    event_dispatcher.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(*this);
-    event_dispatcher.sink<WindowResizedEvent>().connect<&Application::on_window_resized>(*this);
-    event_dispatcher.sink<MouseScrolledEvent>().connect<&Application::on_mouse_scrolled>(*this);
-    event_dispatcher.sink<MouseMovedEvent>().connect<&Application::on_mouse_moved>(*this);
+    evt_dispatcher.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(*this);
+    evt_dispatcher.sink<WindowResizedEvent>().connect<&Application::on_window_resized>(*this);
+    evt_dispatcher.sink<MouseScrolledEvent>().connect<&Application::on_mouse_scrolled>(*this);
+    evt_dispatcher.sink<MouseMovedEvent>().connect<&Application::on_mouse_moved>(*this);
 
     // model_render_system(registry);  // TODO replace with the other API
     // quad_render_system(registry);
@@ -118,7 +118,7 @@ int Application::run() {
         renderer_2d();
         renderer_imgui();
 
-        event_dispatcher.update();
+        evt_dispatcher.update();
         window->update();
 
         check_changed_scene();
@@ -152,8 +152,8 @@ void Application::change_scene(std::string_view name) {
     ASSERT(false, "Scene not found");
 }
 
-void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
-    framebuffers.push_back(framebuffer);
+void Application::add_framebuffer(entt::resource_handle<Framebuffer> framebuffer) {
+    framebuffers.push_back(static_cast<std::shared_ptr<Framebuffer>>(framebuffer));
 }
 
 void Application::purge_framebuffers() {

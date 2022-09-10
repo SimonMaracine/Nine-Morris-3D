@@ -28,7 +28,7 @@ public:
     void change_scene(std::string_view name);
 
     // Framebuffer management functions
-    void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
+    void add_framebuffer(entt::resource_handle<Framebuffer> framebuffer);
     void purge_framebuffers();
 
     double get_fps() { return fps; }
@@ -48,8 +48,8 @@ public:
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
     entt::registry registry;
-    entt::dispatcher event_dispatcher;
-    ResourceManager resources;
+    entt::dispatcher evt_dispatcher;
+    ResourceManager res;
 private:
     float update_frame_counter();
     unsigned int calculate_fixed_update();

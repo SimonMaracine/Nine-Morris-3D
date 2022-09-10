@@ -130,7 +130,7 @@ Renderer::Renderer(Application* app)
 #endif
 
     {
-        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
+        entt::resource_handle<Buffer> buffer = std::make_shared<Buffer>(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
         storage.skybox_vertex_array = std::make_shared<VertexArray>();
@@ -149,7 +149,7 @@ Renderer::Renderer(Application* app)
              1.0f, -1.0f,
         };
 
-        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
+        entt::resource_handle<Buffer> buffer = std::make_shared<Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 2);
         storage.quad_vertex_array = std::make_shared<VertexArray>();
@@ -168,7 +168,7 @@ Renderer::Renderer(Application* app)
               0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
               0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
         };
-        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(origin_vertices, sizeof(origin_vertices));
+        entt::resource_handle<Buffer> buffer = std::make_shared<Buffer>(origin_vertices, sizeof(origin_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
         layout.add(1, BufferLayout::Type::Float, 3);
@@ -255,7 +255,7 @@ void Renderer::render() {
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
 
-    if (storage.skybox_texture != nullptr) {
+    if (storage.skybox_texture != nullptr) {  // FIXME don't like it!!!
         draw_skybox();
     }
 
@@ -301,14 +301,14 @@ void Renderer::on_window_resized(const WindowResizedEvent& event) {
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
 }
 
-void Renderer::set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
+void Renderer::set_scene_framebuffer(entt::resource_handle<Framebuffer> framebuffer) {
     storage.scene_framebuffer = framebuffer;
 
     app->purge_framebuffers();
     app->add_framebuffer(storage.scene_framebuffer);
 }
 
-void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
+void Renderer::set_skybox(entt::resource_handle<Texture3D> texture) {
     storage.skybox_texture = texture;
 }
 
@@ -330,7 +330,7 @@ void Renderer::set_depth_map_framebuffer(int size) {
     app->add_framebuffer(storage.depth_map_framebuffer);
 }
 
-void Renderer::setup_shader(std::shared_ptr<Shader> shader) {
+void Renderer::setup_shader(entt::resource_handle<Shader> shader) {
     const std::vector<std::string>& uniforms = shader->get_uniforms();
 
     if (std::find(uniforms.begin(), uniforms.end(), "u_shadow_map") != uniforms.end()) {

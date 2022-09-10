@@ -1,8 +1,5 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <entt/entt.hpp>
-
 #include "game/constants.h"
 
 struct PieceComponent {

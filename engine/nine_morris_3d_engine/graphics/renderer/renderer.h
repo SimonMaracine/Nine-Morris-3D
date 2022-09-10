@@ -36,13 +36,13 @@ public:
     void render();
     void on_window_resized(const WindowResizedEvent& event);
 
-    void setup_shader(std::shared_ptr<Shader> shader);
+    void setup_shader(entt::resource_handle<Shader> shader);
     void add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step);
 
     void clear();
 
-    void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
-    void set_skybox(std::shared_ptr<Texture3D> texture);
+    void set_scene_framebuffer(entt::resource_handle<Framebuffer> framebuffer);
+    void set_skybox(entt::resource_handle<Texture3D> texture);
     void set_depth_map_framebuffer(int size);
 
     hover::Id get_hovered_id() { return hovered_id; }
@@ -51,16 +51,16 @@ public:
     UniformBlockSpecification& get_light_uniform_block() { return storage.light_uniform_block; }
     UniformBlockSpecification& get_light_view_position_uniform_block() { return storage.light_view_position_uniform_block; }
     UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
-    std::shared_ptr<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
+    entt::resource_handle<Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
 
 #ifdef PLATFORM_GAME_DEBUG
-    std::shared_ptr<Shader> get_origin_shader() { return storage.origin_shader; }
+    entt::resource_handle<Shader> get_origin_shader() { return storage.origin_shader; }
 #endif
-    std::shared_ptr<Shader> get_outline_shader() { return storage.outline_shader; }
-    std::shared_ptr<Shader> get_quad3d_shader() { return storage.quad3d_shader; }
-    std::shared_ptr<Shader> get_screen_quad_shader() { return storage.screen_quad_shader; }
-    std::shared_ptr<Shader> get_shadow_shader() { return storage.shadow_shader; }
-    std::shared_ptr<Shader> get_skybox_shader() { return storage.skybox_shader; }
+    entt::resource_handle<Shader> get_outline_shader() { return storage.outline_shader; }
+    entt::resource_handle<Shader> get_quad3d_shader() { return storage.quad3d_shader; }
+    entt::resource_handle<Shader> get_screen_quad_shader() { return storage.screen_quad_shader; }
+    entt::resource_handle<Shader> get_shadow_shader() { return storage.shadow_shader; }
+    entt::resource_handle<Shader> get_skybox_shader() { return storage.skybox_shader; }
 
     bool origin = false;  // This does nothing in release mode
     DirectionalLight light;
@@ -93,38 +93,38 @@ private:
     void cache_camera();
 
     struct {
-        std::shared_ptr<UniformBuffer> projection_view_uniform_buffer;
-        std::shared_ptr<UniformBuffer> light_uniform_buffer;
-        std::shared_ptr<UniformBuffer> light_view_position_uniform_buffer;
-        std::shared_ptr<UniformBuffer> light_space_uniform_buffer;
+        entt::resource_handle<UniformBuffer> projection_view_uniform_buffer;
+        entt::resource_handle<UniformBuffer> light_uniform_buffer;
+        entt::resource_handle<UniformBuffer> light_view_position_uniform_buffer;
+        entt::resource_handle<UniformBuffer> light_space_uniform_buffer;
 
         UniformBlockSpecification projection_view_uniform_block;
         UniformBlockSpecification light_uniform_block;
         UniformBlockSpecification light_view_position_uniform_block;
         UniformBlockSpecification light_space_uniform_block;
 
-        std::shared_ptr<Shader> skybox_shader;
-        std::shared_ptr<Shader> screen_quad_shader;
-        std::shared_ptr<Shader> quad3d_shader;
-        std::shared_ptr<Shader> shadow_shader;
-        std::shared_ptr<Shader> outline_shader;
+        entt::resource_handle<Shader> skybox_shader;
+        entt::resource_handle<Shader> screen_quad_shader;
+        entt::resource_handle<Shader> quad3d_shader;
+        entt::resource_handle<Shader> shadow_shader;
+        entt::resource_handle<Shader> outline_shader;
 #ifdef PLATFORM_GAME_DEBUG
-        std::shared_ptr<Shader> origin_shader;
+        entt::resource_handle<Shader> origin_shader;
 #endif
 
-        std::shared_ptr<VertexArray> skybox_vertex_array;
-        std::shared_ptr<VertexArray> quad_vertex_array;
+        entt::resource_handle<VertexArray> skybox_vertex_array;
+        entt::resource_handle<VertexArray> quad_vertex_array;
 #ifdef PLATFORM_GAME_DEBUG
-        std::shared_ptr<VertexArray> origin_vertex_array;
+        entt::resource_handle<VertexArray> origin_vertex_array;
 #endif
 
-        std::shared_ptr<Texture3D> skybox_texture;
+        entt::resource_handle<Texture3D> skybox_texture;
 
-        std::shared_ptr<Framebuffer> scene_framebuffer;
-        std::shared_ptr<Framebuffer> depth_map_framebuffer;
-        std::shared_ptr<Framebuffer> intermediate_framebuffer;
+        entt::resource_handle<Framebuffer> scene_framebuffer;
+        entt::resource_handle<Framebuffer> depth_map_framebuffer;
+        entt::resource_handle<Framebuffer> intermediate_framebuffer;
 
-        std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
+        std::array<entt::resource_handle<PixelBuffer>, 4> pixel_buffers;
     } storage;
 
     struct {

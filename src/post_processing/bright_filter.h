@@ -2,14 +2,9 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-// #include "graphics/renderer/renderer.h"
-// #include "graphics/renderer/post_processing_step.h"
-// #include "graphics/renderer/opengl/framebuffer.h"
-// #include "graphics/renderer/opengl/shader.h"
-
 class BrightFilter : public PostProcessingStep {
 public:
-    BrightFilter(std::string_view id, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
+    BrightFilter(std::string_view id, entt::resource_handle<Framebuffer> framebuffer, entt::resource_handle<Shader> shader)
         : PostProcessingStep(id, framebuffer, shader) {}
     virtual ~BrightFilter() = default;
 

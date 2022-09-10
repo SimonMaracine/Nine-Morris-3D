@@ -1,7 +1,5 @@
 #pragma once
 
-#include <glm/glm.hpp>
-
 enum class BoardPhase {
     None,
     PlacePieces = 1,

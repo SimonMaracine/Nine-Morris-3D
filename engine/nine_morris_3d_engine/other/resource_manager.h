@@ -14,7 +14,7 @@
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
 
-struct TextureLd : public entt::resource_loader<TextureLd, Texture> {
+struct LTexture : public entt::resource_loader<LTexture, Texture> {
     entt::resource_handle<Texture> load(std::string_view file_path, 
             const TextureSpecification& specification) const {
         return std::make_shared<Texture>(file_path, specification);
@@ -31,7 +31,7 @@ struct TextureLd : public entt::resource_loader<TextureLd, Texture> {
     }
 };
 
-struct Texture3DLd : public entt::resource_loader<Texture3DLd, Texture3D> {
+struct LTexture3D : public entt::resource_loader<LTexture3D, Texture3D> {
     entt::resource_handle<Texture3D> load(const char** file_paths) const {
         return std::make_shared<Texture3D>(file_paths);
     }
@@ -41,13 +41,13 @@ struct Texture3DLd : public entt::resource_loader<Texture3DLd, Texture3D> {
     }
 };
 
-struct VertexArrayLd : public entt::resource_loader<VertexArrayLd, VertexArray> {
+struct LVertexArray : public entt::resource_loader<LVertexArray, VertexArray> {
     entt::resource_handle<VertexArray> load() const {
         return std::make_shared<VertexArray>();
     }
 };
 
-struct ShaderLd : public entt::resource_loader<ShaderLd, Shader> {
+struct LShader : public entt::resource_loader<LShader, Shader> {
     entt::resource_handle<Shader> load(
             std::string_view vertex_source_path,
             std::string_view fragment_source_path,
@@ -65,7 +65,7 @@ struct ShaderLd : public entt::resource_loader<ShaderLd, Shader> {
     }
 };
 
-struct BufferLd : public entt::resource_loader<BufferLd, Buffer> {
+struct LBuffer : public entt::resource_loader<LBuffer, Buffer> {
     entt::resource_handle<Buffer> load(size_t size, DrawHint hint = DrawHint::Static) const {
         return std::make_shared<Buffer>(size, hint);
     }
@@ -75,31 +75,31 @@ struct BufferLd : public entt::resource_loader<BufferLd, Buffer> {
     }
 };
 
-struct IndexBufferLd : public entt::resource_loader<IndexBufferLd, IndexBuffer> {
+struct LIndexBuffer : public entt::resource_loader<LIndexBuffer, IndexBuffer> {
     entt::resource_handle<IndexBuffer> load(const unsigned int* data, size_t size) const {
         return std::make_shared<IndexBuffer>(data, size);
     }
 };
 
-struct UniformBufferLd : public entt::resource_loader<UniformBufferLd, UniformBuffer> {
+struct LUniformBuffer : public entt::resource_loader<LUniformBuffer, UniformBuffer> {
     entt::resource_handle<UniformBuffer> load() const {
         return std::make_shared<UniformBuffer>();
     }
 };
 
-struct PixelBufferLd : public entt::resource_loader<PixelBufferLd, PixelBuffer> {
+struct LPixelBuffer : public entt::resource_loader<LPixelBuffer, PixelBuffer> {
     entt::resource_handle<PixelBuffer> load(size_t size) const {
         return std::make_shared<PixelBuffer>(size);
     }
 };
 
-struct FramebufferLd : public entt::resource_loader<FramebufferLd, Framebuffer> {
+struct LFramebuffer : public entt::resource_loader<LFramebuffer, Framebuffer> {
     entt::resource_handle<Framebuffer> load(const FramebufferSpecification& specification) const {
         return std::make_shared<Framebuffer>(specification);
     }
 };
 
-struct FontLd : public entt::resource_loader<FontLd, Font> {
+struct LFont : public entt::resource_loader<LFont, Font> {
     entt::resource_handle<Font> load(
             std::string_view file_path, float size,
             int padding, unsigned char on_edge_value,
@@ -108,7 +108,7 @@ struct FontLd : public entt::resource_loader<FontLd, Font> {
     }
 };
 
-struct MaterialLd : public entt::resource_loader<MaterialLd, Material> {
+struct LMaterial : public entt::resource_loader<LMaterial, Material> {
     entt::resource_handle<Material> load(entt::resource_handle<Shader> shader, int flags = 0) const {
         return std::make_shared<Material>(shader, flags);
     }
@@ -120,7 +120,7 @@ struct MaterialInstanceLd : public entt::resource_loader<MaterialInstanceLd, Mat
     }
 };
 
-struct TextureDataLd : public entt::resource_loader<TextureDataLd, TextureData> {
+struct LTextureData : public entt::resource_loader<LTextureData, TextureData> {
     entt::resource_handle<TextureData> load(std::string_view file_path, bool flip = false) const {
         return std::make_shared<TextureData>(file_path, flip);
     }
@@ -132,7 +132,7 @@ struct TextureDataLd : public entt::resource_loader<TextureDataLd, TextureData> 
 
 using namespace mesh;
 
-struct MeshPTNTLd : public entt::resource_loader<MeshPTNTLd, Mesh<PTNT>> {
+struct LMeshPTNT : public entt::resource_loader<LMeshPTNT, Mesh<PTNT>> {
     entt::resource_handle<Mesh<PTNT>> load(std::string_view file_path, bool flip_winding = false) const {
         return load_model_PTNT(file_path, flip_winding);
     }
@@ -142,7 +142,7 @@ struct MeshPTNTLd : public entt::resource_loader<MeshPTNTLd, Mesh<PTNT>> {
     }
 };
 
-struct MeshPTNLd : public entt::resource_loader<MeshPTNLd, Mesh<PTN>> {
+struct LMeshPTN : public entt::resource_loader<LMeshPTN, Mesh<PTN>> {
     entt::resource_handle<Mesh<PTN>> load(std::string_view file_path, bool flip_winding = false) const {
         return load_model_PTN(file_path, flip_winding);
     }
@@ -152,7 +152,7 @@ struct MeshPTNLd : public entt::resource_loader<MeshPTNLd, Mesh<PTN>> {
     }
 };
 
-struct MeshPLd : public entt::resource_loader<MeshPLd, Mesh<P>> {
+struct LMeshP : public entt::resource_loader<LMeshP, Mesh<P>> {
     entt::resource_handle<Mesh<P>> load(std::string_view file_path, bool flip_winding = false) const {
         return load_model_P(file_path, flip_winding);
     }

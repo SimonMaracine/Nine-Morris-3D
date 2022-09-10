@@ -3,7 +3,7 @@
 #include "scenes/game_scene.h"
 
 void GameScene::on_start(Application* app) {
-
+    DEB_INFO("Entered game scene");
 }
 
 void GameScene::on_stop(Application* app) {
@@ -25,7 +25,3 @@ void GameScene::on_fixed_update(Application* app) {
 void GameScene::on_imgui_update(Application* app) {
 
 }
-
-// void GameScene::on_event(Application* app, events::Event& event) {
-
-// }

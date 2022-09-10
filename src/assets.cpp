@@ -1,7 +1,5 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-// #include "application/platform.h"
-
 namespace assets {
     std::string BOARD_WOOD_MESH = "data/models/board/board.obj.dat";
     std::string BOARD_PAINT_MESH = "data/models/board/board_paint.obj.dat";

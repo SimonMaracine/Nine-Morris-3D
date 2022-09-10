@@ -1,23 +1,8 @@
-#include <glm/glm.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/array.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/tuple.hpp>
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-// #include "application/platform.h"
-// #include "graphics/renderer/renderer.h"
-// #include "graphics/renderer/camera.h"
-// #include "graphics/renderer/material.h"
 #include "save_load.h"
 #include "nine_morris_3d.h"
-// #include "undo_redo.h"
-// #include "board.h"
-// #include "piece.h"
-// #include "node.h"
-// #include "ecs/internal_components.h"
+
 #include "game/components/piece_move.h"
 #include "game/components/piece.h"
 #include "game/components/node.h"
@@ -25,9 +10,6 @@
 #include "game/components/active.h"
 #include "game/components/undo_redo_state.h"
 #include "game/components/board.h"
-// #include "other/paths.h"
-// #include "other/logging.h"
-// #include "other/user_data.h"
 
 template<typename Archive>
 void serialize(Archive& archive, TransformComponent& transform_c) {

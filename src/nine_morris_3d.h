@@ -1,6 +1,5 @@
 #pragma once
 
-#include <imgui.h>
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "assets_data.h"
@@ -17,6 +16,9 @@ struct NineMorris3D : public Application {
     unsigned int cross_cursor = 0;
 
     // std::shared_ptr<AssetsData> assets_data;
+
+    ImFont* imgui_info_font = nullptr;
+    ImFont* imgui_windows_font = nullptr;
 
     // struct RenderData {
     //     std::shared_ptr<Texture> splash_screen_texture;

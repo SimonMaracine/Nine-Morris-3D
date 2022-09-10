@@ -1,8 +1,5 @@
 #pragma once
 
-#include <entt/entt.hpp>
-#include <glm/glm.hpp>
-
 #include "game/constants.h"
 
 // format is the first argument to __VA_ARGS__

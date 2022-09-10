@@ -1,6 +1,5 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-// #include "graphics/renderer/renderer.h"
 #include "post_processing/blur.h"
 
 void Blur::render(const PostProcessingContext& context) const {

@@ -56,7 +56,7 @@ namespace gui {
 
     Application* Widget::app = nullptr;
 
-    Image::Image(std::shared_ptr<Texture> texture)
+    Image::Image(entt::resource_handle<Texture> texture)
         : texture(texture) {
         type = WidgetType::Image;
         size.x = texture->get_width();
@@ -75,13 +75,13 @@ namespace gui {
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
-    void Image::set_image(std::shared_ptr<Texture> texture) {
+    void Image::set_image(entt::resource_handle<Texture> texture) {
         this->texture = texture;
         size.x = texture->get_width();
         size.y = texture->get_height();
     }
 
-    Text::Text(std::shared_ptr<Font> font, std::string_view text, float text_scale, const glm::vec3& color)
+    Text::Text(entt::resource_handle<Font> font, std::string_view text, float text_scale, const glm::vec3& color)
         : font(font), text(text), text_scale(text_scale), color(color) {
         type = WidgetType::Text;
         font->get_string_size(text, text_scale, &size.x, &size.y);
@@ -110,7 +110,7 @@ namespace gui {
             app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset", glm::vec2(-0.003f, -0.003f));
         }
 
-        font->get_vertex_array()->bind();
+        font->get_vertex_array().bind();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, font->get_texture());
 
@@ -182,7 +182,7 @@ GuiRenderer::GuiRenderer(Application* app)
             1.0f, 0.0f
         };
 
-        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
+        entt::resource_handle<Buffer> buffer = std::make_shared<Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 2);
         storage.quad2d_vertex_array = std::make_shared<VertexArray>();
@@ -243,7 +243,7 @@ void GuiRenderer::render() {
     glEnable(GL_DEPTH_TEST);
 }
 
-void GuiRenderer::im_draw_quad(glm::vec2 position, glm::vec2 scale, std::shared_ptr<Texture> texture) {
+void GuiRenderer::im_draw_quad(glm::vec2 position, glm::vec2 scale, entt::resource_handle<Texture> texture) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
     matrix = glm::scale(matrix, glm::vec3(scale.x, scale.y, 1.0f));

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <entt/entt.hpp>
-
 class OptionsFileError : public std::runtime_error {
 public:
     OptionsFileError(const std::string& message)

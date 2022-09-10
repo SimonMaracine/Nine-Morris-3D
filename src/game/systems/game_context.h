@@ -1,7 +1,5 @@
 // #pragma once
 
-// #include <entt/entt.hpp>
-
 // #include "game/constants.h"
 
 // void begin_human_move_system(entt::registry& registry);

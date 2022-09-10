@@ -2,6 +2,7 @@
 
 #include "nine_morris_3d.h"
 #include "scenes/game_scene.h"
+#include "scenes/loading_scene.h"
 
 #if defined(PLATFORM_GAME_LINUX)
     #define APP_NAME "ninemorris3d"
@@ -48,6 +49,7 @@ int main() {
         .with(ApplicationBuilder::Renderer::RImGui);
 
     auto application = std::make_unique<NineMorris3D>(builder);
-    application->add_scene(new GameScene, true);
+    application->add_scene(new LoadingScene, true);
+    application->add_scene(new GameScene, false);
     application->run();
 }

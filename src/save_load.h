@@ -1,13 +1,7 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-// #include "graphics/renderer/camera.h"
-// #include "board.h"
-// #include "undo_redo.h"
-// #include "game_context.h"
-// #include "ecs/internal_components.h"
 #include "game/components/board.h"
 #include "game/components/undo_redo_state.h"
 #include "game/components/camera_player_position.h"
