@@ -4,7 +4,8 @@
 #include "game/piece.h"
 #include "game/node.h"
 #include "game/undo_redo_state.h"
-#include "game/board/board.h"
+#include "game/boards/generic_board.h"
+#include "game/boards/standard_board.h"
 
 /*
 Unserialized fields:
@@ -67,10 +68,10 @@ void serialize(Archive& archive, Camera& camera) {
 
 /*
 Unserialized fields:
-    hovered_node, hovered_piece, selected_piece, state_history, keyboard, game_context
+    hovered_node, hovered_piece, selected_piece, undo_redo_state, keyboard, game_context
 */
 template<typename Archive>
-void serialize(Archive& archive, Board& board) {
+void serialize(Archive& archive, GenericBoard& board) {
     archive(
         board.model,
         board.paint_model,
@@ -79,17 +80,28 @@ void serialize(Archive& archive, Board& board) {
         board.phase,
         board.turn,
         board.ending,
-        board.ending_message,
-        board.white_pieces_count,
-        board.black_pieces_count,
-        board.not_placed_pieces_count,
-        board.should_take_piece,
+        // board.white_pieces_count,
+        // board.black_pieces_count,
+        // board.not_placed_pieces_count,
+        // board.player_must_take_piece(),
         board.can_jump,
-        board.turns_without_mills,
+        // board.turns_without_mills,
         board.repetition_history,
         board.next_move,
         board.is_players_turn,
         board.switched_turn
+    );
+}
+
+template<typename Archive>
+void serialize(Archive& archive, StandardBoard& board) {
+    archive(
+        cereal::virtual_base_class<GenericBoard>(&board),
+        board.white_pieces_count,
+        board.black_pieces_count,
+        board.not_placed_pieces_count,
+        board.player_must_take_piece(),
+        board.turns_without_mills
     );
 }
 
@@ -105,7 +117,7 @@ void serialize(Archive& archive, ThreefoldRepetitionHistory::PositionPlusInfo& p
 
 template<typename Archive>
 void serialize(Archive& archive, UndoRedoState& undo_redo_state) {
-    archive(undo_redo_state_c.undo, undo_redo_state_c.redo);
+    archive(undo_redo_state.undo, undo_redo_state.redo);
 }
 
 template<typename Archive>
@@ -137,14 +149,14 @@ void serialize(Archive& archive, Piece& piece) {
 template<typename Archive>
 void serialize(Archive& archive, Piece::Movement& movement) {
     archive(
-        piece_move_c.type,
-        piece_move_c.velocity,
-        piece_move_c.target,
-        piece_move_c.target0,
-        piece_move_c.target1,
-        piece_move_c.reached_target0,
-        piece_move_c.reached_target1,
-        piece_move_c.moving
+        movement.type,
+        movement.velocity,
+        movement.target,
+        movement.target0,
+        movement.target1,
+        movement.reached_target0,
+        movement.reached_target1,
+        movement.moving
     );
 }
 
@@ -155,6 +167,11 @@ Unserialized fields:
 template<typename Archive>
 void serialize(Archive& archive, Node& node) {
     archive(node.index, node.model, node.piece_index);
+}
+
+template<typename Archive>
+void serialize(Archive& archive, BoardEnding& board_ending) {
+    archive(board_ending.type, board_ending.message);
 }
 
 namespace glm {

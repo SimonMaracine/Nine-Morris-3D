@@ -136,7 +136,8 @@ namespace gui {
     }
 }
 
-GuiRenderer::GuiRenderer() {
+GuiRenderer::GuiRenderer(Application* app)
+    : app(app) {
     storage.projection_uniform_buffer = std::make_shared<UniformBuffer>();
 
     storage.projection_uniform_block.block_name = "Projection";
@@ -205,7 +206,7 @@ GuiRenderer::GuiRenderer() {
 
     Shader::unbind();
 
-    // Set renderer pointer to widgets
+    // Set application pointer to widgets
     gui::Widget::app = app;
 
     DEB_INFO("Initialized GUI renderer");

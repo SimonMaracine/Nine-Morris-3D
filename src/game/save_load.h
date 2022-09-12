@@ -2,7 +2,7 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/board/board.h"
+#include "game/boards/generic_board.h"
 #include "game/undo_redo_state.h"
 
 namespace save_load {
@@ -26,7 +26,7 @@ namespace save_load {
     };
 
     struct SavedGame {
-        Board board;
+        GenericBoard board;
         Camera camera;
         unsigned int time = 0;  // In deciseconds
         std::string date = NO_LAST_GAME;

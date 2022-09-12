@@ -1,4 +1,5 @@
 #include "minimax/minimax_thread.h"
+#include "game/boards/generic_board.h"
 
 MinimaxThread::~MinimaxThread() {
     join_thread();
@@ -18,7 +19,7 @@ MinimaxThread& MinimaxThread::operator=(MinimaxThread&& other) {
 
 void MinimaxThread::start(const Function& function) {
     running.store(true);
-    memset(&result, 0, sizeof(Result));
+    result = Result {};
 
     thread = std::thread(function, board->get_position(), std::ref(result), std::ref(running));
 }

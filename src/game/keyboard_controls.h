@@ -2,12 +2,12 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/board/board.h"
+#include "game/boards/generic_board.h"
 
 class KeyboardControls {
 public:
     KeyboardControls() = default;
-    KeyboardControls(Board* board);
+    KeyboardControls(GenericBoard* board);
     ~KeyboardControls() = default;
 
     enum class Direction {
@@ -46,5 +46,5 @@ private:
 
     KNode nodes[24];
     KNode* current_node = nullptr;
-    Board* board = nullptr;
+    GenericBoard* board = nullptr;
 };

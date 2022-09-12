@@ -1,6 +1,6 @@
-#include "minimax/main_game/minimax_main_game.h"
+#include "minimax/standard_game/minimax_standard_game.h"
 
-namespace minimax_main_game {
+namespace minimax_standard_game {
     int _minimax() {
         return 0;
     }

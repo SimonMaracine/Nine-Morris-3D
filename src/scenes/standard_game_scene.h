@@ -2,8 +2,8 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-struct GameScene : public Scene {
-    GameScene()
+struct StandardGameScene : public Scene {
+    StandardGameScene()
         : Scene("game") {}
 
     virtual void on_start() override;

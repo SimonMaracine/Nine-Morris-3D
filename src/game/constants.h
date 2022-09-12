@@ -1,5 +1,39 @@
 #pragma once
 
+#define ACTIVE_PIECES(result) \
+    std::vector<Piece*> result; \
+    for (std::optional<Piece>& piece : pieces) { \
+        if (piece.has_value()) { \
+            result.push_back(&piece.value()); \
+        } \
+    }
+
+// format is the first argument to __VA_ARGS__
+#define FORMATTED_MESSAGE(result, size, ...) \
+    char result[size]; \
+    sprintf(result, __VA_ARGS__);
+
+#define TURN_IS_WHITE_SO(_true, _false) (turn == BoardPlayer::White ? (_true) : (_false))
+#define WAIT_FOR_NEXT_MOVE() next_move = false
+#define CAN_MAKE_MOVE() next_move = true
+
+constexpr size_t NINE_MENS_MORRIS_MILLS = 16;
+constexpr size_t WINDMILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
+    { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
+    { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
+    { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
+    { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
+};
+
+constexpr size_t TWELVE_MENS_MORRIS_MILLS = 20;
+constexpr size_t WINDMILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS][3] = {
+    { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
+    { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
+    { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
+    { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
+
+};
+
 enum class BoardPhase {
     None,
     PlacePieces = 1,
@@ -12,11 +46,16 @@ enum class BoardPlayer {
     Black = 1
 };
 
-enum class BoardEnding {
-    None,
-    WinnerWhite,
-    WinnerBlack,
-    TieBetweenBothPlayers
+struct BoardEnding {
+    enum Type {
+        None,
+        WinnerWhite,
+        WinnerBlack,
+        TieBetweenBothPlayers
+    };
+
+    Type type = None;
+    std::string message;
 };
 
 enum class PieceType {

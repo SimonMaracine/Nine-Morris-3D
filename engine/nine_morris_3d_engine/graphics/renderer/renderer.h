@@ -51,7 +51,7 @@ public:
         std::shared_ptr<Texture> texture;
     };
 
-    Renderer();
+    Renderer(Application* app);
     ~Renderer();
 
     void render();

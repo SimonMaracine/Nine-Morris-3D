@@ -1,7 +1,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "nine_morris_3d.h"
-#include "scenes/game_scene.h"
+#include "scenes/standard_game_scene.h"
 #include "scenes/loading_scene.h"
 
 #if defined(PLATFORM_GAME_LINUX)
@@ -22,11 +22,11 @@ int main() {
     // NineMorris3D* application = new NineMorris3D(INFO_FILE, LOG_FILE, APP_NAME);
     // NineMorris3D::set_app_pointer(application);
 
-    // Scene* game_scene = new Scene("game");
-    // game_scene->add_layer(new GameLayer("game", application));
-    // game_scene->add_overlay(new GuiLayer("gui", application));
-    // game_scene->add_overlay(new ImGuiLayer("imgui", application));
-    // application->add_scene(game_scene);
+    // Scene* standard_game_scene = new Scene("game");
+    // standard_game_scene->add_layer(new GameLayer("game", application));
+    // standard_game_scene->add_overlay(new GuiLayer("gui", application));
+    // standard_game_scene->add_overlay(new ImGuiLayer("imgui", application));
+    // application->add_scene(standard_game_scene);
 
     // Scene* loading_scene = new Scene("loading");
     // loading_scene->add_overlay(new LoadingLayer("loading", application));
@@ -44,12 +44,13 @@ int main() {
         .file_names_config(APP_NAME, INFO_FILE)
         .version_config(0, 2, 0)
         .authors_config({ u8"Simon Mărăcine" })
+        .encrypt_key_config("data/models/board/board.obj")
         .with(ApplicationBuilder::Renderer::R3D)
         .with(ApplicationBuilder::Renderer::R2D)
         .with(ApplicationBuilder::Renderer::RImGui);
 
     auto application = std::make_unique<NineMorris3D>(builder);
     application->add_scene(new LoadingScene, true);
-    application->add_scene(new GameScene, false);
+    application->add_scene(new StandardGameScene, false);
     application->run();
 }

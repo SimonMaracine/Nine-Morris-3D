@@ -8,10 +8,10 @@ struct Piece;
 
 struct Node {
     Node() = default;
-    Node(size_t index, hover::Id id)
+    Node(size_t index, hover::Id id)  // FIXME id?
         : index(index) {}
 
-    size_t index = INVALID_NODE_INDEX;  // From 0 to 23, needed for easier coping with these
+    size_t index = INVALID_NODE_INDEX;  // From 0 through 23
 
     std::shared_ptr<Renderer::Model> model;
 

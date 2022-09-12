@@ -108,7 +108,7 @@ namespace gui {
 
 class GuiRenderer {
 public:
-    GuiRenderer();
+    GuiRenderer(Application* app);
     ~GuiRenderer();
 
     void render();

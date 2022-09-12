@@ -22,7 +22,8 @@
 
 constexpr int SHADOW_MAP_UNIT = 2;
 
-Renderer::Renderer() {
+Renderer::Renderer(Application* app)
+    : app(app) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);

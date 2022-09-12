@@ -6,18 +6,18 @@
 
 class PostProcessingStep {
 public:
-    PostProcessingStep(std::string_view id, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
-        : id(id), framebuffer(framebuffer), shader(shader) {}
+    PostProcessingStep(std::string_view name, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
+        : name(name), framebuffer(framebuffer), shader(shader) {}
     virtual ~PostProcessingStep() = default;
 
     virtual void render(const PostProcessingContext& context) const = 0;
     virtual void prepare(const PostProcessingContext& context) const = 0;
 
-    std::string_view get_id() const { return id; }
+    std::string_view get_name() const { return name; }
 
     bool enabled = true;
 protected:
-    std::string id;
+    std::string name;
 
     std::shared_ptr<Framebuffer> framebuffer;
     std::shared_ptr<Shader> shader;

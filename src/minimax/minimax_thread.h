@@ -1,11 +1,13 @@
 #pragma once
 
-#include "game/board/board.h"
+class GenericBoard;
+
+#include "game/constants.h"
 
 class MinimaxThread {
 public:
     MinimaxThread() = default;
-    MinimaxThread(Board* board)
+    MinimaxThread(GenericBoard* board)
         : board(board) {}
     ~MinimaxThread();
 
@@ -33,5 +35,5 @@ private:
     std::atomic<bool> running = false;
 
     Result result;
-    Board* board = nullptr;
+    GenericBoard* board = nullptr;
 };

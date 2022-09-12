@@ -10,31 +10,26 @@
 
 NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
     : Application(builder) {
-    // auto options = registry.create();
-    // registry.emplace<OptionsComponent>(options);
-
-    // try {
-    //     load_options_system(registry);
-    // } catch (const OptionsFileNotOpenError& e) {
-    //     REL_ERROR("{}", e.what());
-    //     handle_options_file_not_open_error();
-    // } catch (const OptionsFileError& e) {
-    //     REL_ERROR("{}", e.what());
-
-    //     try {
-    //         create_options_file();
-    //     } catch (const OptionsFileNotOpenError& e) {
-    //         REL_ERROR("{}", e.what());
-    //     } catch (const OptionsFileError& e) {
-    //         REL_ERROR("{}", e.what());
-    //     }
-    // }
-
-    // auto& options_c = registry.get<OptionsComponent>(options);
-
-    // window->set_vsync(options_c.vsync);
-
     srand(time(nullptr));
+
+    try {
+        options::load_options_from_file(options);
+    } catch (const options::OptionsFileNotOpenError& e) {
+        REL_ERROR("{}", e.what());
+        options::handle_options_file_not_open_error(app_data.application_name);
+    } catch (const options::OptionsFileError& e) {
+        REL_ERROR("{}", e.what());
+
+        try {
+            options::create_options_file();
+        } catch (const options::OptionsFileNotOpenError& e) {
+            REL_ERROR("{}", e.what());
+        } catch (const options::OptionsFileError& e) {
+            REL_ERROR("{}", e.what());
+        }
+    }
+
+    window->set_vsync(options.vsync);
 
     using namespace assets;
     using namespace encrypt;
@@ -62,7 +57,7 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
         FramebufferSpecification specification;
         specification.width = app_data.width;
         specification.height = app_data.height;
-        specification.samples = 2;  // FIXME options_c.samples;
+        specification.samples = options.samples;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
@@ -75,7 +70,7 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
     }
 
     // Setup depth map framebuffer
-    renderer->set_depth_map_framebuffer(2048 /*FIXME options_c.texture_quality == NORMAL ? 4096 : 2048*/);
+    renderer->set_depth_map_framebuffer(2048 /*options.texture_quality == NORMAL ? 4096 : 2048*/);  // FIXME this
 
     // Setup ImGui
     {
@@ -88,9 +83,9 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
         builder.BuildRanges(&ranges);
 
         io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 21.0f);
-        // data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
-        // data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f,
-                // nullptr, ranges.Data);
+        imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
+        imgui_windows_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f,
+                nullptr, ranges.Data);
         io.Fonts->Build();
     }
 
@@ -113,7 +108,7 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
         font->end_baking();
     }
 
-    // assets_data = std::make_shared<AssetsData>();
+    // assets_data = std::make_shared<AssetsData>();  // FIXME this
 
     // Setup post-processing
     {
@@ -195,7 +190,7 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
         add_framebuffer(framebuffer);
 
         auto combine = std::make_shared<Combine>("combine", framebuffer, shader);
-        combine->strength = 0.7f;  // FIXME options_c.bloom_strength;
+        combine->strength = 0.7f;  // FIXME options.bloom_strength;
         renderer->add_post_processing(combine);
     }
 }
@@ -204,25 +199,25 @@ NineMorris3D::~NineMorris3D() {
 
 }
 
-void NineMorris3D::set_bloom(bool enable) {
-    const PostProcessingContext& context = renderer->get_post_processing_context();
+// void NineMorris3D::set_bloom(bool enable) {
+//     const PostProcessingContext& context = renderer->get_post_processing_context();
 
-    for (size_t i = 0; i < context.steps.size(); i++) {
-        PostProcessingStep* step = context.steps[i].get();
-        step->enabled = enable;
-    }
-}
+//     for (size_t i = 0; i < context.steps.size(); i++) {
+//         PostProcessingStep* step = context.steps[i].get();
+//         step->enabled = enable;
+//     }
+// }
 
-void NineMorris3D::set_bloom_strength(float strength) {
-    const PostProcessingContext& context = renderer->get_post_processing_context();
+// void NineMorris3D::set_bloom_strength(float strength) {
+//     const PostProcessingContext& context = renderer->get_post_processing_context();
 
-    auto iter = std::find_if(context.steps.begin(), context.steps.end(),
-            [](const std::shared_ptr<PostProcessingStep>& step) {
-        return step->get_id() == "combine";
-    });
+//     auto iter = std::find_if(context.steps.begin(), context.steps.end(),
+//             [](const std::shared_ptr<PostProcessingStep>& step) {
+//         return step->get_name() == "combine";
+//     });
 
-    ASSERT(iter != context.steps.end(), "Combine step must exist");
+//     ASSERT(iter != context.steps.end(), "Combine step must exist");
 
-    (*static_cast<Combine*>(iter->get())).strength = strength;
-    (*iter)->prepare(context);
-}
+//     (*static_cast<Combine*>(iter->get())).strength = strength;
+//     (*iter)->prepare(context);
+// }

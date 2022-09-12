@@ -1,9 +1,9 @@
 #include "game/keyboard_controls.h"
-#include "game/board/board.h"
+#include "game/boards/generic_board.h"
 #include "game/node.h"
 
 #define Y_POSITION 0.47f
-#define POSITION(index) glm::vec3(NODE_POSITIONS[index].x, Y_POSITION, NODE_POSITIONS[index].z)
+#define POSITION(index) (glm::vec3(NODE_POSITIONS[index].x, Y_POSITION, NODE_POSITIONS[index].z))
 
 constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down, KeyboardControls::Direction::Right },
@@ -12,7 +12,7 @@ constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Right, KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down }
 };
 
-KeyboardControls::KeyboardControls(Board* board)
+KeyboardControls::KeyboardControls(GenericBoard* board)
     : board(board) {
 
     for (size_t i = 0; i < 24; i++) {
@@ -21,7 +21,13 @@ KeyboardControls::KeyboardControls(Board* board)
 
     quad->position = POSITION(0);
     quad->scale = 0.14f;
-    quad->texture = board->should_take_piece ? app->data.keyboard_controls_cross_texture : app->data.keyboard_controls_texture;
+    quad->texture = (
+        board->player_must_take_piece()
+            ?
+            board->app->res.textures["keyboard_controls_cross_texture"_hs]
+            :
+            board->app->res.textures["keyboard_controls_texture"_hs]
+    );
 }
 
 void KeyboardControls::initialize() {
@@ -90,14 +96,14 @@ bool KeyboardControls::press(bool& first_move) {
 
     // board->press(hovered_id);
 
-    // if (board->phase == Board::Phase::PlacePieces) {
-    //     if (board->should_take_piece) {
+    // if (board->phase == GenericBoard::Phase::PlacePieces) {
+    //     if (board->player_must_take_piece()) {
     //         did = board->take_piece(hovered_id);
     //     } else {
     //         did = board->place_piece(hovered_id);
     //     }
-    // } else if (board->phase == Board::Phase::MovePieces) {
-    //     if (board->should_take_piece) {
+    // } else if (board->phase == GenericBoard::Phase::MovePieces) {
+    //     if (board->player_must_take_piece()) {
     //         did = board->take_piece(hovered_id);
     //     } else {
     //         board->select_piece(hovered_id);

@@ -59,16 +59,14 @@ Application::Application(const ApplicationBuilder& builder)
     if (builder.renderer_3d) {
         DEB_INFO("With renderer 3D");
 
-        renderer = std::make_unique<Renderer>();
-        renderer->app = this;
+        renderer = std::make_unique<Renderer>(this);
         renderer_3d = std::bind(&Application::renderer_3d_functionality, this);        
     }
     
     if (builder.renderer_2d) {
         DEB_INFO("With renderer 2D");
 
-        gui_renderer = std::make_unique<GuiRenderer>();
-        gui_renderer->app = this;
+        gui_renderer = std::make_unique<GuiRenderer>(this);
         renderer_2d = std::bind(&Application::renderer_2d_functionality, this);
     }
 

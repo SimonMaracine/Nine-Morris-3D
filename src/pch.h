@@ -35,6 +35,7 @@
 #include <cereal/types/string.hpp>
 #include <cereal/types/tuple.hpp>
 #include <cereal/types/optional.hpp>
+#include <cereal/types/base_class.hpp>
 
 #include <entt/entt.hpp>
 

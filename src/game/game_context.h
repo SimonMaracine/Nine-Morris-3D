@@ -1,12 +1,14 @@
 #pragma once
 
-#include "game/board/board.h"
-#include "minimax/minimax_thread.h"
+#include "game/constants.h"
+
+class GenericBoard;
+class MinimaxThread;
 
 class GameContext {
 public:
     GameContext() = default;
-    GameContext(GamePlayer white_player, GamePlayer black_player, Board* board, MinimaxThread* minimax_thread)
+    GameContext(GamePlayer white_player, GamePlayer black_player, GenericBoard* board, MinimaxThread* minimax_thread)
         : white_player(white_player), black_player(black_player), board(board), minimax_thread(minimax_thread) {}
     ~GameContext() = default;
 
@@ -22,6 +24,6 @@ public:
     GamePlayer black_player = GamePlayer::None;
     GameState state = GameState::MaybeNextPlayer;
 private:
-    Board* board = nullptr;
+    GenericBoard* board = nullptr;
     MinimaxThread* minimax_thread = nullptr;
 };

@@ -1,13 +1,8 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "assets_data.h"
-#include "assets.h"
-// #include "options.h"
-// #include "other/paths.h"
-// #include "other/mesh.h"
-// #include "other/texture_data.h"
-// #include "other/loader.h"
-// #include "other/encrypt.h"
+#include "game/assets_data.h"
+#include "game/assets.h"
+#include "game/options.h"
 
 using namespace mesh;
 using namespace assets;

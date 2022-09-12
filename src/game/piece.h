@@ -8,10 +8,10 @@ struct Node;
 
 struct Piece {
     Piece() = default;
-    Piece(size_t index, PieceType type, hover::Id id)  // FIXME id
+    Piece(size_t index, PieceType type, hover::Id id)  // FIXME id?
         : index(index), type(type) {}
 
-    size_t index = INVALID_PIECE_INDEX;  // From 0 to 17
+    size_t index = INVALID_PIECE_INDEX;  // From 0 through 17
 
     PieceType type = PieceType::None;
     bool in_use = false;  // true, if it is on the board
