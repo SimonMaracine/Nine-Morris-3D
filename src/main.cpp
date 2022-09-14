@@ -1,6 +1,6 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "nine_morris_3d.h"
+#include "game/nine_morris_3d.h"
 #include "scenes/standard_game_scene.h"
 #include "scenes/loading_scene.h"
 
@@ -19,24 +19,6 @@
 #endif
 
 int main() {
-    // NineMorris3D* application = new NineMorris3D(INFO_FILE, LOG_FILE, APP_NAME);
-    // NineMorris3D::set_app_pointer(application);
-
-    // Scene* standard_game_scene = new Scene("game");
-    // standard_game_scene->add_layer(new GameLayer("game", application));
-    // standard_game_scene->add_overlay(new GuiLayer("gui", application));
-    // standard_game_scene->add_overlay(new ImGuiLayer("imgui", application));
-    // application->add_scene(standard_game_scene);
-
-    // Scene* loading_scene = new Scene("loading");
-    // loading_scene->add_overlay(new LoadingLayer("loading", application));
-    // application->add_scene(loading_scene);
-
-    // application->set_starting_scene(loading_scene);
-    // application->run();
-
-    // delete application;
-
     logging::initialize(LOG_FILE);
 
     auto builder = ApplicationBuilder {}

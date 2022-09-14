@@ -1,8 +1,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "nine_morris_3d.h"
+#include "game/nine_morris_3d.h"
 #include "game/assets.h"
-#include "game/assets_data.h"
 #include "game/options.h"
 #include "post_processing/bright_filter.h"
 #include "post_processing/blur.h"
@@ -108,8 +107,6 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
         font->end_baking();
     }
 
-    // assets_data = std::make_shared<AssetsData>();  // FIXME this
-
     // Setup post-processing
     {
         FramebufferSpecification specification;
@@ -198,26 +195,3 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
 NineMorris3D::~NineMorris3D() {
 
 }
-
-// void NineMorris3D::set_bloom(bool enable) {
-//     const PostProcessingContext& context = renderer->get_post_processing_context();
-
-//     for (size_t i = 0; i < context.steps.size(); i++) {
-//         PostProcessingStep* step = context.steps[i].get();
-//         step->enabled = enable;
-//     }
-// }
-
-// void NineMorris3D::set_bloom_strength(float strength) {
-//     const PostProcessingContext& context = renderer->get_post_processing_context();
-
-//     auto iter = std::find_if(context.steps.begin(), context.steps.end(),
-//             [](const std::shared_ptr<PostProcessingStep>& step) {
-//         return step->get_name() == "combine";
-//     });
-
-//     ASSERT(iter != context.steps.end(), "Combine step must exist");
-
-//     (*static_cast<Combine*>(iter->get())).strength = strength;
-//     (*iter)->prepare(context);
-// }

@@ -5,13 +5,12 @@
 #include "nine_morris_3d_engine/application/application_data.h"
 #include "nine_morris_3d_engine/application/events.h"
 #include "nine_morris_3d_engine/application/window.h"
+#include "nine_morris_3d_engine/application/scene.h"
 #include "nine_morris_3d_engine/application/application_builder.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/other/resource_manager.h"
-
-class Scene;
 
 class Application {
 public:
@@ -46,7 +45,7 @@ public:
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
     entt::dispatcher evt;
-    ResourceManager res;
+    Resources res;
 private:
     float update_frame_counter();
     unsigned int calculate_fixed_update();
@@ -96,5 +95,5 @@ private:
     float last_mouse_x = 0.0f;
     float last_mouse_y = 0.0f;
 
-    friend class Layer;
+    friend class Scene;
 };

@@ -16,7 +16,7 @@
 
 using namespace mesh;
 
-struct ResourceManager {
+struct Resources {
     entt::resource_cache<Texture> textures;
     entt::resource_cache<Texture3D> textures_3d;
     entt::resource_cache<VertexArray> vertex_arrays;

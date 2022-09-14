@@ -79,7 +79,7 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/graphics/debug_opengl.h"
     "engine/nine_morris_3d_engine/other/assert.h"
     "engine/nine_morris_3d_engine/other/encrypt.h"
-    "engine/nine_morris_3d_engine/other/loader.h"
+    "engine/nine_morris_3d_engine/other/concurrent_loader.h"
     "engine/nine_morris_3d_engine/other/logging.h"
     "engine/nine_morris_3d_engine/other/mesh.h"
     "engine/nine_morris_3d_engine/other/paths.h"

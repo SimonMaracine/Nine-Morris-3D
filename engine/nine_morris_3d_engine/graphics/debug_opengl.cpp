@@ -4,7 +4,7 @@
 #include <assimp/version.h>
 #include <glm/glm.hpp>
 #include <spdlog/version.h>
-// #include <nlohmann/json.hpp>
+#include <entt/entt.hpp>
 #include <cereal/version.hpp>
 #include <cppblowfish.h>
 
@@ -216,6 +216,12 @@ namespace debug_opengl {
         {
             char line[128];
             sprintf(line, "Dear ImGui version: %s\n", ImGui::GetVersion());
+            output.append(line);
+        }
+        {
+            char line[128];
+            sprintf(line, "EnTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR, ENTT_VERSION_MINOR,
+                    ENTT_VERSION_PATCH);
             output.append(line);
         }
         {

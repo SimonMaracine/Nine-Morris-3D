@@ -5,29 +5,11 @@
 #include "game/constants.h"
 #include "game/piece.h"
 #include "game/node.h"
+#include "game/threefold_repetition_history.h"
 
 struct UndoRedoState;
 class KeyboardControls;
 class GameContext;
-
-struct ThreefoldRepetitionHistory {
-    struct PositionPlusInfo {
-        bool operator==(const PositionPlusInfo& other) const {
-            return (
-                position == other.position &&
-                piece_index == other.piece_index &&
-                node_index == other.node_index
-            );
-        }
-
-        std::array<PieceType, 24> position;
-        size_t piece_index;
-        size_t node_index;
-    };
-
-    std::vector<PositionPlusInfo> ones;
-    std::vector<PositionPlusInfo> twos;
-};
 
 class GenericBoard {
 public:
@@ -36,7 +18,7 @@ public:
         : app(app) {}
     virtual ~GenericBoard() = default;
 
-    virtual bool player_must_take_piece() { return false; };
+    virtual bool player_must_take_piece() { return false; }
 
     GamePosition get_position();
 protected:

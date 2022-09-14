@@ -1,9 +1,12 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "scenes/loading_scene.h"
+#include "game/options.h"
+#include "game/assets_load_functions.h"
 
 void LoadingScene::on_start() {
-    // TODO loader here
+    loader = std::make_unique<ConcurrentLoader<options::Options>>(assets_load_functions::all_start);
+    // loader.value().start_loading_thread(app)
 
     auto loading_text = std::make_shared<gui::Text>(
         app->res.fonts["good_dog_plain_font"_hs], "Loading...", 1.2f, glm::vec3(0.81f)
@@ -24,7 +27,7 @@ void LoadingScene::on_stop() {
 
 void LoadingScene::on_update() {
     float width, height, x_pos, y_pos;
-    image_configuration(width, height, x_pos, y_pos);
+    quad_configuration(width, height, x_pos, y_pos);
 
     app->gui_renderer->im_draw_quad(
         glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.textures["splash_screen_texture"_hs]
@@ -37,7 +40,7 @@ void LoadingScene::on_update() {
     app->change_scene("game");
 }
 
-void LoadingScene::image_configuration(float& width, float& height, float& x_pos, float& y_pos) {
+void LoadingScene::quad_configuration(float& width, float& height, float& x_pos, float& y_pos) {
     if (static_cast<float>(app->app_data.width) / app->app_data.height > 16.0f / 9.0f) {
         width = app->app_data.width;
         height = app->app_data.width * (9.0f / 16.0f);
