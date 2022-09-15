@@ -192,8 +192,8 @@ GuiRenderer::GuiRenderer(Application* app)
     }
 
     storage.orthographic_projection_matrix = glm::ortho(
-        0.0f, static_cast<float>(app->app_data.width),
-        0.0f, static_cast<float>(app->app_data.height)
+        0.0f, static_cast<float>(app->data().width),
+        0.0f, static_cast<float>(app->data().height)
     );
 
     // Setup uniform variables
@@ -294,8 +294,8 @@ void GuiRenderer::draw(std::vector<gui::Widget*>& subwidgets, const std::functio
     prepare_draw();
 
     for (gui::Widget* widget : subwidgets) {
-        const int WINDOW_WIDTH = app->app_data.width;
-        const int WINDOW_HEIGHT = app->app_data.height;
+        const int WINDOW_WIDTH = app->data().width;
+        const int WINDOW_HEIGHT = app->data().height;
 
         if (widget->scale_parameters.min_bound != 0 && widget->scale_parameters.max_bound != 0) {
             if (WINDOW_HEIGHT <= widget->scale_parameters.min_bound) {

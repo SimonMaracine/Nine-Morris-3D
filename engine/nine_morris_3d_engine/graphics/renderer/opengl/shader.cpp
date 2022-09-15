@@ -245,7 +245,7 @@ GLuint Shader::compile_shader(const cppblowfish::Buffer& source_buffer, GLenum t
     GLuint shader = glCreateShader(type);
     const int length = source_buffer.size() - source_buffer.padding();
     char* source = reinterpret_cast<char*>(source_buffer.get());
-    const char* const s = const_cast<const char* const>(source);  // TODO warning
+    const char* s = const_cast<const char*>(source);  // TODO warning
     glShaderSource(shader, 1, &s, &length);
     glCompileShader(shader);
 

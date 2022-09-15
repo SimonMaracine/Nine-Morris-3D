@@ -4,11 +4,10 @@
 
 #include "game/options.h"
 
-struct NineMorris3D : public Application {
-    NineMorris3D(const ApplicationBuilder& builder);
-    virtual ~NineMorris3D();
-
+struct Data {
     options::Options options;
+    Resources res_thread;
+
     unsigned int arrow_cursor = 0;
     unsigned int cross_cursor = 0;
 
@@ -19,3 +18,6 @@ struct NineMorris3D : public Application {
     hover::Id nodes_id[24] = { hover::null };
     hover::Id board_paint_id = hover::null;
 };
+
+void start(Application* app);
+void stop(Application* app);

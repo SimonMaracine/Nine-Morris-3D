@@ -12,11 +12,11 @@ class ConcurrentLoader {
 public:
     using Function = std::function<void(ConcurrentLoader<Args...>&, const Args&...)>;
 
-    ConcurrentLoader(const Function& load_function)
-        : load_function(load_function) {}
+    ConcurrentLoader(Resources& res, const Function& load_function)
+        : res(res), load_function(load_function) {}
     ~ConcurrentLoader() = default;
 
-    bool done_loading() const {
+    bool done_loading() {
         return loaded.load();
     }
 
@@ -31,14 +31,14 @@ public:
     void start_loading_thread(const Args&... args) {
         DEB_INFO("Loading some assets from separate thread...");
 
-        loading_thread = std::thread(load_function, *this, args...);
+        loading_thread = std::thread(load_function, std::ref(*this), args...);
     }
 
     void set_done() {
         loaded.store(true);
     }
 private:
-    Resources res;
+    Resources& res;
     Function load_function;
     std::thread loading_thread;
     std::atomic<bool> loaded = false;

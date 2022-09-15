@@ -14,7 +14,9 @@
 
 class Application {
 public:
-    Application(const ApplicationBuilder& builder);
+    using UserFunction = std::function<void(Application* app)>;
+
+    Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunction& start, const UserFunction& stop);
     virtual ~Application();
 
     // Call this to run the application, after all scenes have been defined; it can return an exit code
@@ -28,6 +30,11 @@ public:
     void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void purge_framebuffers();
 
+    template<typename Data>
+    auto& user_data() { return std::any_cast<Data&>(_user_data); }
+
+    const ApplicationData& data() { return app_data; }
+
     double get_fps() { return fps; }
     float get_delta() { return delta; }
     unsigned int get_frames() { return frames; }
@@ -40,7 +47,6 @@ public:
     // Public variables accessible by all the code
     bool running = true;
     int exit_code = 0;
-    ApplicationData app_data;
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
@@ -64,6 +70,10 @@ private:
     void on_mouse_moved(const MouseMovedEvent& event);
 
     ApplicationBuilder builder;
+    std::any& _user_data;
+    UserFunction start;
+    UserFunction stop;
+    ApplicationData app_data;
 
     double fps = 0.0;
     float delta = 0.0f;
@@ -96,4 +106,5 @@ private:
     float last_mouse_y = 0.0f;
 
     friend class Scene;
+    friend class Window;
 };

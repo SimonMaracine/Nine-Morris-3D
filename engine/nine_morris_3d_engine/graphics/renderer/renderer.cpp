@@ -180,8 +180,8 @@ Renderer::Renderer(Application* app)
 
     {
         FramebufferSpecification specification;
-        specification.width = app->app_data.width;
-        specification.height = app->app_data.height;
+        specification.width = app->data().width;
+        specification.height = app->data().height;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
@@ -245,7 +245,7 @@ void Renderer::render() {
     storage.scene_framebuffer->bind();
 
     render_helpers::clear(render_helpers::Color | render_helpers::Depth | render_helpers::Stencil);
-    render_helpers::viewport(app->app_data.width, app->app_data.height);
+    render_helpers::viewport(app->data().width, app->data().height);
 
     // Bind shadow map for use in shadow rendering
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
@@ -275,14 +275,14 @@ void Renderer::render() {
 
     // Blit the scene texture result to an intermediate texture resolving anti-aliasing
     storage.scene_framebuffer->resolve_framebuffer(
-        storage.intermediate_framebuffer->get_id(), app->app_data.width, app->app_data.height
+        storage.intermediate_framebuffer->get_id(), app->data().width, app->data().height
     );
 
     storage.intermediate_framebuffer->bind();
 
     // Read the texture for mouse picking
     const int x = static_cast<int>(input::get_mouse_x());
-    const int y = app->app_data.height - static_cast<int>(input::get_mouse_y());
+    const int y = app->data().height - static_cast<int>(input::get_mouse_y());
     reader.read(1, x, y);
 
     // Do post processing and render the final image to the screen
@@ -411,7 +411,7 @@ void Renderer::post_processing() {
         render_helpers::clear(render_helpers::Color);
         render_helpers::viewport(specification.width, specification.height);
         step->render(post_processing_context);
-        render_helpers::viewport(app->app_data.width, app->app_data.height);
+        render_helpers::viewport(app->data().width, app->data().height);
 
         post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
         post_processing_context.textures.push_back(step->framebuffer->get_color_attachment(0));
@@ -675,7 +675,7 @@ void Renderer::setup_uniform_buffers() {
 }
 
 void Renderer::check_hovered_id(int x, int y) {
-    if (x > app->app_data.width || x < 0 || y > app->app_data.height || y < 0) {
+    if (x > app->data().width || x < 0 || y > app->data().height || y < 0) {
         hovered_id = hover::null;
     }
 }

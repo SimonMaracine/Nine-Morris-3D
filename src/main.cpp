@@ -31,7 +31,9 @@ int main() {
         .with(ApplicationBuilder::Renderer::R2D)
         .with(ApplicationBuilder::Renderer::RImGui);
 
-    auto application = std::make_unique<NineMorris3D>(builder);
+    auto data = std::make_any<Data>();
+
+    auto application = std::make_unique<Application>(builder, data, start, stop);
     application->add_scene(new LoadingScene, true);
     application->add_scene(new StandardGameScene, false);
     application->run();

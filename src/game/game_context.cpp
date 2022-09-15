@@ -25,7 +25,7 @@ void GameContext::begin_computer_move() {
 }
 
 void GameContext::end_computer_move() {
-    if (board->phase == BoardPhase::PlacePieces) {
+    if (board->phase == BoardPhase::PlacePieces) {  // FIXME this
         if (board->player_must_take_piece()) {
             // board->computer_take_piece(minimax_thread->get_result().take_node_index);
         } else {

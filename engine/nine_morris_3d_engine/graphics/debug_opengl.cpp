@@ -75,7 +75,7 @@ namespace debug_opengl {
 
 #ifdef PLATFORM_GAME_DEBUG
     static void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
-            GLsizei length, const GLchar* message, const void* userParam) {
+            GLsizei, const GLchar* message, const void*) {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
                 std::cout << "OpenGL Debug Message:" << std::endl;

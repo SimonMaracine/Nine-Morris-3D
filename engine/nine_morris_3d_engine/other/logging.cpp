@@ -24,6 +24,8 @@ namespace logging {
         global_logger->set_level(spdlog::level::trace);
 
         spdlog::set_default_logger(global_logger);
+
+        static_cast<void>(log_file);  // Trick the compiler that we do use log_file
 #elif defined(PLATFORM_GAME_RELEASE)
         std::string file_path;
         try {

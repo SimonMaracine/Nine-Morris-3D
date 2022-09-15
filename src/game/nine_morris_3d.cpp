@@ -7,15 +7,18 @@
 #include "post_processing/blur.h"
 #include "post_processing/combine.h"
 
-NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
-    : Application(builder) {
+void start(Application* app) {
+    DEB_INFO("User initializing game");
+
     srand(time(nullptr));
 
+    auto& data = app->user_data<Data>();
+
     try {
-        options::load_options_from_file(options);
+        options::load_options_from_file(data.options);
     } catch (const options::OptionsFileNotOpenError& e) {
         REL_ERROR("{}", e.what());
-        options::handle_options_file_not_open_error(app_data.application_name);
+        options::handle_options_file_not_open_error(app->data().application_name);
     } catch (const options::OptionsFileError& e) {
         REL_ERROR("{}", e.what());
 
@@ -28,7 +31,7 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
         }
     }
 
-    window->set_vsync(options.vsync);
+    app->window->set_vsync(data.options.vsync);
 
     using namespace assets;
     using namespace encrypt;
@@ -44,19 +47,25 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
             std::make_unique<TextureData>(path_for_assets(ICON_32), false)
         };
 
-        window->set_icons<5>(icons);
+        app->window->set_icons<5>(icons);
     }
 
     // Load and set cursors
-    arrow_cursor = window->add_cursor(std::make_unique<TextureData>(encr(path_for_assets(ARROW_CURSOR)), false), 4, 1);
-    cross_cursor = window->add_cursor(std::make_unique<TextureData>(encr(path_for_assets(CROSS_CURSOR)), false), 8, 8);
+    data.arrow_cursor = app->window->add_cursor(
+        std::make_unique<TextureData>(encr(path_for_assets(ARROW_CURSOR)), false),
+        4, 1
+    );
+    data.cross_cursor = app->window->add_cursor(
+        std::make_unique<TextureData>(encr(path_for_assets(CROSS_CURSOR)), false),
+        8, 8
+    );
 
     // Setup scene framebuffer
     {
         FramebufferSpecification specification;
-        specification.width = app_data.width;
-        specification.height = app_data.height;
-        specification.samples = options.samples;
+        specification.width = app->data().width;
+        specification.height = app->data().height;
+        specification.samples = data.options.samples;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
@@ -65,11 +74,11 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
             AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
         );
 
-        renderer->set_scene_framebuffer(std::make_shared<Framebuffer>(specification));
+        app->renderer->set_scene_framebuffer(std::make_shared<Framebuffer>(specification));
     }
 
     // Setup depth map framebuffer
-    renderer->set_depth_map_framebuffer(2048 /*options.texture_quality == NORMAL ? 4096 : 2048*/);  // FIXME this
+    app->renderer->set_depth_map_framebuffer(2048 /*options.texture_quality == NORMAL ? 4096 : 2048*/);  // FIXME this
 
     // Setup ImGui
     {
@@ -82,8 +91,8 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
         builder.BuildRanges(&ranges);
 
         io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 21.0f);
-        imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
-        imgui_windows_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f,
+        data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
+        data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f,
                 nullptr, ranges.Data);
         io.Fonts->Build();
     }
@@ -94,14 +103,14 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
         specification.min_filter = Filter::Linear;
         specification.mag_filter = Filter::Linear;
 
-        res.textures.load("splash_screen_texture"_hs, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+        app->res.textures.load("splash_screen_texture"_hs, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
     }
 
     // Load and create this font
     {
-        res.fonts.load("good_dog_plain_font"_hs, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
+        app->res.fonts.load("good_dog_plain_font"_hs, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
 
-        auto font = res.fonts["good_dog_plain_font"_hs];
+        auto font = app->res.fonts["good_dog_plain_font"_hs];
         font->begin_baking();  // TODO maybe move part of texture baking to thread
         font->bake_characters(32, 127);
         font->end_baking();
@@ -110,8 +119,8 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
     // Setup post-processing
     {
         FramebufferSpecification specification;
-        specification.width = app_data.width / 2;
-        specification.height = app_data.height / 2;
+        specification.width = app->data().width / 2;
+        specification.height = app->data().height / 2;
         specification.resize_divisor = 2;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
@@ -119,8 +128,8 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
 
         auto framebuffer = std::make_shared<Framebuffer>(specification);
 
-        purge_framebuffers();
-        add_framebuffer(framebuffer);
+        app->purge_framebuffers();
+        app->add_framebuffer(framebuffer);
 
         auto shader = std::make_shared<Shader>(
             encr(path_for_assets(BRIGHT_FILTER_VERTEX_SHADER)),
@@ -128,7 +137,7 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
             std::vector<std::string> { "u_screen_texture" }
         );
 
-        renderer->add_post_processing(std::make_shared<BrightFilter>("bright_filter", framebuffer, shader));
+        app->renderer->add_post_processing(std::make_shared<BrightFilter>("bright_filter", framebuffer, shader));
     }
     auto blur_shader = std::make_shared<Shader>(
         encr(path_for_assets(BLUR_VERTEX_SHADER)),
@@ -137,8 +146,8 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
     );
     {
         FramebufferSpecification specification;
-        specification.width = app_data.width / 4;
-        specification.height = app_data.height / 4;
+        specification.width = app->data().width / 4;
+        specification.height = app->data().height / 4;
         specification.resize_divisor = 4;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
@@ -146,15 +155,15 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
 
         auto framebuffer = std::make_shared<Framebuffer>(specification);
 
-        purge_framebuffers();
-        add_framebuffer(framebuffer);
+        app->purge_framebuffers();
+        app->add_framebuffer(framebuffer);
 
-        renderer->add_post_processing(std::make_shared<Blur>("blur1", framebuffer, blur_shader));
+        app->renderer->add_post_processing(std::make_shared<Blur>("blur1", framebuffer, blur_shader));
     }
     {
         FramebufferSpecification specification;
-        specification.width = app_data.width / 8;
-        specification.height = app_data.height / 8;
+        specification.width = app->data().width / 8;
+        specification.height = app->data().height / 8;
         specification.resize_divisor = 8;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
@@ -162,15 +171,15 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
 
         auto framebuffer = std::make_shared<Framebuffer>(specification);
 
-        purge_framebuffers();
-        add_framebuffer(framebuffer);
+        app->purge_framebuffers();
+        app->add_framebuffer(framebuffer);
 
-        renderer->add_post_processing(std::make_shared<Blur>("blur2", framebuffer, blur_shader));
+        app->renderer->add_post_processing(std::make_shared<Blur>("blur2", framebuffer, blur_shader));
     }
     {
         FramebufferSpecification specification;
-        specification.width = app_data.width;
-        specification.height = app_data.height;
+        specification.width = app->data().width;
+        specification.height = app->data().height;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
         };
@@ -183,15 +192,15 @@ NineMorris3D::NineMorris3D(const ApplicationBuilder& builder)
             std::vector<std::string> { "u_screen_texture", "u_bright_texture", "u_strength" }
         );
 
-        purge_framebuffers();
-        add_framebuffer(framebuffer);
+        app->purge_framebuffers();
+        app->add_framebuffer(framebuffer);
 
         auto combine = std::make_shared<Combine>("combine", framebuffer, shader);
         combine->strength = 0.7f;  // FIXME options.bloom_strength;
-        renderer->add_post_processing(combine);
+        app->renderer->add_post_processing(combine);
     }
 }
 
-NineMorris3D::~NineMorris3D() {
-
+void stop(Application*) {
+    DEB_INFO("User finalizing game");
 }

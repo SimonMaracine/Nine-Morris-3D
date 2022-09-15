@@ -16,8 +16,8 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/paths.h"
 
-Application::Application(const ApplicationBuilder& builder)
-    : builder(builder) {
+Application::Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunction& start, const UserFunction& stop)
+    : builder(builder), _user_data(user_data), start(start), stop(stop) {
     DEB_INFO("Initializing application...");
 
     app_data.width = builder.width;
@@ -75,6 +75,8 @@ Application::Application(const ApplicationBuilder& builder)
     evt.sink<MouseScrolledEvent>().connect<&Application::on_mouse_scrolled>(*this);
     evt.sink<MouseMovedEvent>().connect<&Application::on_mouse_moved>(*this);
 
+    start(this);
+
     // model_render_system(registry);  // TODO replace with the other API
     // quad_render_system(registry);
     // gui_image_system(registry);
@@ -82,6 +84,8 @@ Application::Application(const ApplicationBuilder& builder)
 }
 
 Application::~Application() {
+    stop(this);
+
     if (builder.renderer_imgui) {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();

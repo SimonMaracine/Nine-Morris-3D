@@ -9,7 +9,7 @@ void Blur::render(const PostProcessingContext& context) const {
     render_helpers::draw_arrays(6);
 }
 
-void Blur::prepare(const PostProcessingContext& context) const {
+void Blur::prepare(const PostProcessingContext&) const {
     shader->bind();
     shader->upload_uniform_int("u_screen_texture", 0);
 }
