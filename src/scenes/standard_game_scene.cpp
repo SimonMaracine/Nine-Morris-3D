@@ -15,7 +15,7 @@ void StandardGameScene::on_stop() {
 }
 
 void StandardGameScene::on_awake() {
-    imgui_layer.initialize();
+    imgui_layer = ImGuiLayer<StandardGameScene> {app, this};
 
     // It's ok to be called multiple times
     LOG_TOTAL_GPU_MEMORY_ALLOCATED();

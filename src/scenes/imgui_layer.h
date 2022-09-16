@@ -7,10 +7,41 @@
 #include "game/options.h"
 #include "game/constants.h"
 
+#define RESET_HOVERING_GUI() hovering_gui = false
+#define HOVERING_GUI() hovering_gui = true
+
+#define DEFAULT_BROWN ImVec4(0.647f, 0.4f, 0.212f, 1.0f)
+#define DARK_BROWN ImVec4(0.4f, 0.25f, 0.1f, 1.0f)
+#define LIGHT_BROWN ImVec4(0.68f, 0.48f, 0.22f, 1.0f)
+#define BEIGE ImVec4(0.961f, 0.875f, 0.733f, 1.0f)
+#define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
+
+static int get_texture_quality_option(std::string_view option) {
+    // if (option == options::LOW) {
+    //     return 0;
+    // } else if (option == options::NORMAL) {
+    //     return 1;
+    // }
+
+    ASSERT(false, "Invalid option");
+    return -1;
+}
+
+static int get_skybox_option(std::string_view option) {
+    if (option == options::FIELD) {
+        return 0;
+    } else if (option == options::AUTUMN) {
+        return 1;
+    }
+
+    ASSERT(false, "Invalid option");
+    return -1;
+}
+
 template<typename SceneType>
 struct ImGuiLayer {
-    ImGuiLayer(Application* app, SceneType* scene)
-        : app(app), scene(scene) {}
+    ImGuiLayer() = default;
+    ImGuiLayer(Application* app, SceneType* scene);
     ~ImGuiLayer() = default;
 
     void update();
@@ -51,35 +82,47 @@ struct ImGuiLayer {
     std::string save_game_file_path;
 };
 
-#define RESET_HOVERING_GUI() hovering_gui = false
-#define HOVERING_GUI() hovering_gui = true
+template<typename SceneType>
+ImGuiLayer<SceneType>::ImGuiLayer(Application* app, SceneType* scene)
+    : app(app), scene(scene) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
+    io.ConfigWindowsResizeFromEdges = false;
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+#ifdef PLATFORM_GAME_RELEASE
+    io.IniFilename = nullptr;
+#endif
 
-#define DEFAULT_BROWN ImVec4(0.647f, 0.4f, 0.212f, 1.0f)
-#define DARK_BROWN ImVec4(0.4f, 0.25f, 0.1f, 1.0f)
-#define LIGHT_BROWN ImVec4(0.68f, 0.48f, 0.22f, 1.0f)
-#define BEIGE ImVec4(0.961f, 0.875f, 0.733f, 1.0f)
-#define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
+    ImVec4* colors = ImGui::GetStyle().Colors;
+    colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
+    colors[ImGuiCol_TitleBgActive] = DEFAULT_BROWN;
+    colors[ImGuiCol_FrameBg] = DEFAULT_BROWN;
+    colors[ImGuiCol_FrameBgHovered] = DARK_BROWN;
+    colors[ImGuiCol_FrameBgActive] = LIGHT_BROWN;
+    colors[ImGuiCol_Button] = DARK_BROWN;
+    colors[ImGuiCol_ButtonHovered] = DEFAULT_BROWN;
+    colors[ImGuiCol_ButtonActive] = LIGHT_BROWN;
+    colors[ImGuiCol_Header] = DARK_BROWN;
+    colors[ImGuiCol_HeaderHovered] = DEFAULT_BROWN;
+    colors[ImGuiCol_HeaderActive] = LIGHT_BROWN;
+    colors[ImGuiCol_CheckMark] = BEIGE;
+    colors[ImGuiCol_SliderGrab] = LIGHT_GRAY_BLUE;
+    colors[ImGuiCol_SliderGrabActive] = LIGHT_GRAY_BLUE;
 
-static int get_texture_quality_option(std::string_view option) {
-    // if (option == options::LOW) {
-    //     return 0;
-    // } else if (option == options::NORMAL) {
-    //     return 1;
-    // }
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+    style.FrameRounding = 8;
+    style.WindowRounding = 8;
+    style.ChildRounding = 8;
+    style.PopupRounding = 8;
+    style.GrabRounding = 8;
 
-    ASSERT(false, "Invalid option");
-    return -1;
-}
-
-static int get_skybox_option(std::string_view option) {
-    if (option == options::FIELD) {
-        return 0;
-    } else if (option == options::AUTUMN) {
-        return 1;
-    }
-
-    ASSERT(false, "Invalid option");
-    return -1;
+    app->evt.sink<MouseScrolledEvent>().connect<&ImGuiLayer::on_mouse_scrolled>(*this);  // TODO maybe this should be done in on_start
+    app->evt.sink<MouseMovedEvent>().connect<&ImGuiLayer::on_mouse_moved>(*this);
+    app->evt.sink<MouseButtonPressedEvent>().connect<&ImGuiLayer::on_mouse_button_pressed>(*this);
+    app->evt.sink<MouseButtonReleasedEvent>().connect<&ImGuiLayer::on_mouse_button_released>(*this);
 }
 
 template<typename SceneType>
@@ -119,48 +162,6 @@ void ImGuiLayer<SceneType>::reset() {
     show_about = false;
     show_could_not_load_game = false;
     show_no_last_game = false;
-}
-
-template<typename SceneType>
-void ImGuiLayer<SceneType>::initialize() {
-    ImGuiIO& io = ImGui::GetIO();
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-    io.ConfigWindowsMoveFromTitleBarOnly = true;
-    io.ConfigWindowsResizeFromEdges = false;
-    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-#ifdef PLATFORM_GAME_RELEASE
-    io.IniFilename = nullptr;
-#endif
-
-    ImVec4* colors = ImGui::GetStyle().Colors;
-    colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
-    colors[ImGuiCol_TitleBgActive] = DEFAULT_BROWN;
-    colors[ImGuiCol_FrameBg] = DEFAULT_BROWN;
-    colors[ImGuiCol_FrameBgHovered] = DARK_BROWN;
-    colors[ImGuiCol_FrameBgActive] = LIGHT_BROWN;
-    colors[ImGuiCol_Button] = DARK_BROWN;
-    colors[ImGuiCol_ButtonHovered] = DEFAULT_BROWN;
-    colors[ImGuiCol_ButtonActive] = LIGHT_BROWN;
-    colors[ImGuiCol_Header] = DARK_BROWN;
-    colors[ImGuiCol_HeaderHovered] = DEFAULT_BROWN;
-    colors[ImGuiCol_HeaderActive] = LIGHT_BROWN;
-    colors[ImGuiCol_CheckMark] = BEIGE;
-    colors[ImGuiCol_SliderGrab] = LIGHT_GRAY_BLUE;
-    colors[ImGuiCol_SliderGrabActive] = LIGHT_GRAY_BLUE;
-
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-    style.FrameRounding = 8;
-    style.WindowRounding = 8;
-    style.ChildRounding = 8;
-    style.PopupRounding = 8;
-    style.GrabRounding = 8;
-
-    app->evt.sink<MouseScrolledEvent>().connect<&ImGuiLayer::on_mouse_scrolled>(*this);  // TODO maybe this should be done in on_start
-    app->evt.sink<MouseMovedEvent>().connect<&ImGuiLayer::on_mouse_moved>(*this);
-    app->evt.sink<MouseButtonPressedEvent>().connect<&ImGuiLayer::on_mouse_button_pressed>(*this);
-    app->evt.sink<MouseButtonReleasedEvent>().connect<&ImGuiLayer::on_mouse_button_released>(*this);
 }
 
 template<typename SceneType>

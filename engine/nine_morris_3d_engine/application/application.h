@@ -12,7 +12,7 @@
 #include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/other/resource_manager.h"
 
-class Application {
+class Application final {
 public:
     using UserFunction = std::function<void(Application* app)>;
 

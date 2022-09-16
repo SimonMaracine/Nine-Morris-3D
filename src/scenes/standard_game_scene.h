@@ -23,7 +23,7 @@ struct StandardGameScene : public Scene {
     virtual void on_imgui_update() override;
 
     // ImGui
-    ImGuiLayer<StandardGameScene> imgui_layer {app, this};
+    ImGuiLayer<StandardGameScene> imgui_layer;
 
     // Game-related
     Camera camera;
