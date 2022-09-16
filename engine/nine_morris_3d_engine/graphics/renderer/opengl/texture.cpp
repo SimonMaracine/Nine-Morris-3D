@@ -20,7 +20,7 @@ static std::string get_name_texture3d(const char* file_path) {
     std::vector<std::string> tokens;
 
     char copy[512];
-    strncpy(copy, file_path, 512);
+    strncpy(copy, file_path, 512 - 1);
 
     char* token = strtok(copy, "/");
 

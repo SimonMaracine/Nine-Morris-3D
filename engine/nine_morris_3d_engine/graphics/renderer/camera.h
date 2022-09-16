@@ -10,7 +10,7 @@ class Camera {  // TODO maybe refactor camera using quaternions
 public:
     Camera() = default;
     Camera(float sensitivity, float pitch, const glm::vec3& point, float distance_to_point,
-            const glm::mat4& projection_matrix);
+        const glm::mat4& projection_matrix);
     ~Camera() = default;
 
     // Call this every frame

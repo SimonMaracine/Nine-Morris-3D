@@ -59,9 +59,12 @@ void Font::begin_baking() {
     DEB_DEBUG("Begin baking font '{}'", name);
 
     glDeleteTextures(1, &texture);
+
+    const size_t SIZE = sizeof(unsigned char) * bitmap_size * bitmap_size;
+
     bake_context = BakeContext {};
-    bake_context.bitmap = new unsigned char[sizeof(unsigned char) * bitmap_size * bitmap_size];
-    memset(bake_context.bitmap, 0, sizeof(unsigned char) * bitmap_size * bitmap_size);
+    bake_context.bitmap = new unsigned char[SIZE];
+    memset(bake_context.bitmap, 0, SIZE);
 }
 
 void Font::bake_characters(int begin_codepoint, int end_codepoint) {
@@ -116,7 +119,7 @@ void Font::bake_character(int codepoint) {
     stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
     int advance_width, left_side_bearing;
-        stbtt_GetCodepointHMetrics(&info, codepoint, &advance_width, &left_side_bearing);
+    stbtt_GetCodepointHMetrics(&info, codepoint, &advance_width, &left_side_bearing);
 
     int y0;
     stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
@@ -277,7 +280,7 @@ const char* Font::get_file_data(std::string_view file_path) {
     }
 
     file.seekg(0, file.end);
-    int length = file.tellg();
+    const size_t length = file.tellg();
     file.seekg(0, file.beg);
 
     char* buffer = new char[length];
@@ -307,7 +310,7 @@ std::string Font::get_name(std::string_view file_path) {
     std::vector<std::string> tokens;
 
     char copy[512];
-    strncpy(copy, file_path.data(), 512);
+    strncpy(copy, file_path.data(), 512 - 1);
 
     char* token = strtok(copy, "/.");
 

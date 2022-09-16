@@ -83,7 +83,7 @@ void serialize(Archive& archive, GenericBoard& board) {
         // board.white_pieces_count,
         // board.black_pieces_count,
         // board.not_placed_pieces_count,
-        // board.player_must_take_piece(),
+        // board.must_take_piece,
         board.can_jump,
         // board.turns_without_mills,
         board.repetition_history,
@@ -100,7 +100,7 @@ void serialize(Archive& archive, StandardBoard& board) {
         board.white_pieces_count,
         board.black_pieces_count,
         board.not_placed_pieces_count,
-        board.player_must_take_piece(),
+        board.must_take_piece,
         board.turns_without_mills
     );
 }
@@ -200,8 +200,6 @@ namespace save_load {
             saved_game.time,
             saved_game.date,
             saved_game.undo_redo_state,
-            saved_game.white_camera_position,
-            saved_game.black_camera_position,
             saved_game.white_player,
             saved_game.black_player
         );

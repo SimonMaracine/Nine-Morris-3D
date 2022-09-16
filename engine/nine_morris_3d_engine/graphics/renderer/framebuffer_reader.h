@@ -34,6 +34,7 @@ public:
         PixelBuffer::unbind();
     }
 private:
+    // Store references to pixel buffers and framebuffers
     std::array<std::shared_ptr<PixelBuffer>, BufferCount> buffers;
     std::shared_ptr<Framebuffer> framebuffer;
     size_t buffer_index = 0;

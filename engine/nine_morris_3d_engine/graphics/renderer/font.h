@@ -62,6 +62,8 @@ private:
     std::string name;
 
     GLuint texture = 0;
+
+    // // Store references to vertex arrays and buffers 
     std::shared_ptr<VertexArray> vertex_array;
     std::shared_ptr<Buffer> buffer;
     unsigned int vertex_count = 0;

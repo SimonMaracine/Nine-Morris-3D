@@ -31,8 +31,6 @@ namespace save_load {
         unsigned int time = 0;  // In deciseconds
         std::string date = NO_LAST_GAME;
         UndoRedoState undo_redo_state;
-        glm::vec3 white_camera_position = glm::vec3(0.0f);
-        glm::vec3 black_camera_position = glm::vec3(0.0f);
         GamePlayer white_player = GamePlayer::None;
         GamePlayer black_player = GamePlayer::None;
     };

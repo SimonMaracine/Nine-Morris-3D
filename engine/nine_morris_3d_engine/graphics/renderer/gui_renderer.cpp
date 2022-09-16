@@ -182,11 +182,11 @@ GuiRenderer::GuiRenderer(Application* app)
             1.0f, 0.0f
         };
 
-        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
+        storage.quad2d_buffer = std::make_shared<Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 2);
         storage.quad2d_vertex_array = std::make_shared<VertexArray>();
-        storage.quad2d_vertex_array->add_buffer(buffer, layout);
+        storage.quad2d_vertex_array->add_buffer(storage.quad2d_buffer, layout);
 
         VertexArray::unbind();
     }
@@ -237,9 +237,12 @@ void GuiRenderer::render() {
         }
     });
 
+    static auto prepare_draw_image = std::bind(&GuiRenderer::prepare_draw_image, this);
+    static auto prepare_draw_text = std::bind(&GuiRenderer::prepare_draw_text, this);
+
     glDisable(GL_DEPTH_TEST);
-    draw(images, std::bind(&GuiRenderer::prepare_draw_image, this));
-    draw(texts, std::bind(&GuiRenderer::prepare_draw_text, this));
+    draw(images, prepare_draw_image);
+    draw(texts, prepare_draw_text);
     glEnable(GL_DEPTH_TEST);
 }
 

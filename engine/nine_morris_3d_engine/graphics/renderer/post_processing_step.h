@@ -19,6 +19,7 @@ public:
 protected:
     std::string name;
 
+    // Store references to shaders and framebuffers
     std::shared_ptr<Framebuffer> framebuffer;
     std::shared_ptr<Shader> shader;
 

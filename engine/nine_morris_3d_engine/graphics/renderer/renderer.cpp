@@ -129,11 +129,11 @@ Renderer::Renderer(Application* app)
 #endif
 
     {
-        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
+        storage.skybox_buffer = std::make_shared<Buffer>(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
         storage.skybox_vertex_array = std::make_shared<VertexArray>();
-        storage.skybox_vertex_array->add_buffer(buffer, layout);
+        storage.skybox_vertex_array->add_buffer(storage.skybox_buffer, layout);
 
         VertexArray::unbind();
     }
@@ -148,11 +148,11 @@ Renderer::Renderer(Application* app)
              1.0f, -1.0f,
         };
 
-        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
+        storage.quad_buffer = std::make_shared<Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 2);
         storage.quad_vertex_array = std::make_shared<VertexArray>();
-        storage.quad_vertex_array->add_buffer(buffer, layout);
+        storage.quad_vertex_array->add_buffer(storage.quad_buffer, layout);
 
         VertexArray::unbind();
     }
@@ -167,12 +167,12 @@ Renderer::Renderer(Application* app)
               0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
               0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
         };
-        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(origin_vertices, sizeof(origin_vertices));
+        storage.origin_buffer = std::make_shared<Buffer>(origin_vertices, sizeof(origin_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Type::Float, 3);
         layout.add(1, BufferLayout::Type::Float, 3);
         storage.origin_vertex_array = std::make_shared<VertexArray>();
-        storage.origin_vertex_array->add_buffer(buffer, layout);
+        storage.origin_vertex_array->add_buffer(storage.origin_buffer, layout);
 
         VertexArray::unbind();
     }

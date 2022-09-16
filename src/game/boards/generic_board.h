@@ -21,6 +21,16 @@ public:
     virtual bool player_must_take_piece() { return false; }
 
     GamePosition get_position();
+
+    BoardPhase get_phase() { return phase; }
+    void set_phase(BoardPhase phase) { this->phase = phase; }
+    const BoardEnding& get_ending() { return ending; }
+    std::array<bool, 2> get_can_jump() { return can_jump; }
+    BoardPlayer get_turn() { return turn; }
+    Node* get_hovered_node() { return hovered_node; }
+    Piece* get_hovered_piece() { return hovered_piece; }
+    Piece* get_selected_piece() { return selected_piece; }
+    bool get_next_move() { return next_move; }
 protected:
     Piece* new_piece_to_place(PieceType type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);

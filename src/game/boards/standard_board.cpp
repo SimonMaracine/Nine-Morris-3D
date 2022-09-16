@@ -4,7 +4,7 @@
 #include "game/piece.h"
 
 bool StandardBoard::player_must_take_piece() {
-    return player_must_take_piece();
+    return must_take_piece;
 }
 
 void StandardBoard::switch_turn_and_check_turns_without_mills() {

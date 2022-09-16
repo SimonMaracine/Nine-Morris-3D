@@ -11,7 +11,7 @@ using namespace encrypt;
 
 namespace assets_load_functions {
     void all_start(ConcurrentLoader<options::Options>& loader, const options::Options& options) {
-
+        // loader.set_done();
 
         // loader->get()->node_mesh = load_model_VP(encr(path_for_assets(NODE_MESH)), true);
 

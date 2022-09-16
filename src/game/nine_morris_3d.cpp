@@ -74,7 +74,9 @@ void start(Application* app) {
             AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
         );
 
-        app->renderer->set_scene_framebuffer(std::make_shared<Framebuffer>(specification));
+        auto framebuffer = app->res.framebuffers.load("scene_framebuffer"_hs, specification);
+
+        app->renderer->set_scene_framebuffer(framebuffer);
     }
 
     // Setup depth map framebuffer
@@ -108,9 +110,8 @@ void start(Application* app) {
 
     // Load and create this font
     {
-        app->res.fonts.load("good_dog_plain_font"_hs, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
+        auto font = app->res.fonts.load("good_dog_plain_font"_hs, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
 
-        auto font = app->res.fonts["good_dog_plain_font"_hs];
         font->begin_baking();  // TODO maybe move part of texture baking to thread
         font->bake_characters(32, 127);
         font->end_baking();

@@ -140,9 +140,12 @@ private:
 #endif
 
         std::shared_ptr<VertexArray> skybox_vertex_array;
+        std::shared_ptr<Buffer> skybox_buffer;
         std::shared_ptr<VertexArray> quad_vertex_array;
+        std::shared_ptr<Buffer> quad_buffer;
 #ifdef PLATFORM_GAME_DEBUG
         std::shared_ptr<VertexArray> origin_vertex_array;
+        std::shared_ptr<Buffer> origin_buffer;
 #endif
 
         std::shared_ptr<Texture3D> skybox_texture;

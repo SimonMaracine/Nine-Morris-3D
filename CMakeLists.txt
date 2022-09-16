@@ -41,7 +41,6 @@ endif()
 add_executable(${GAME} ${NO_CONSOLE}
     ${GAME_SOURCES}
     ${GAME_HEADERS}
-    "src/pch.h"
 )
 
 # On Windows tell linker to use main instead of WinMain
@@ -87,7 +86,6 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/other/user_data.h"
     "engine/nine_morris_3d_engine/other/resource_manager.h"
     "engine/nine_morris_3d_engine/nine_morris_3d_engine.h"
-    "engine/pch.h"  # TODO is it right?
 )
 
 add_library(${ENGINE} STATIC
