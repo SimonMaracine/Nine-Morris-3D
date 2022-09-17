@@ -1,4 +1,4 @@
-#include "minimax/standard_game/minimax_standard_game.h"
+#include "game/minimax/standard_game/minimax_standard_game.h"
 
 namespace minimax_standard_game {
     int _minimax() {

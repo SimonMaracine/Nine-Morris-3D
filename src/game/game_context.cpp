@@ -3,8 +3,8 @@
 #include "game/game_context.h"
 #include "game/boards/generic_board.h"
 #include "game/constants.h"
-#include "minimax/minimax_thread.h"
-#include "minimax/standard_game/minimax_standard_game.h"
+#include "game/minimax/minimax_thread.h"
+#include "game/minimax/standard_game/minimax_standard_game.h"
 
 void GameContext::begin_human_move() {
     board->is_players_turn = true;

@@ -12,4 +12,6 @@ struct LauncherScene : public Scene {
     virtual void on_imgui_update() override;
 
     void on_window_closed(const WindowClosedEvent& event);
+
+    ImGuiWindowFlags window_flags = 0;
 };

@@ -1,8 +1,8 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/nine_morris_3d.h"
-#include "scenes/standard_game_scene.h"
-#include "scenes/loading_scene.h"
+#include "game/game.h"
+#include "game/scenes/standard_game_scene.h"
+#include "game/scenes/loading_scene.h"
 #include "launcher/launcher_scene.h"
 
 #if defined(PLATFORM_GAME_LINUX)
@@ -49,7 +49,7 @@ int main() {
         return 0;
     }
 
-    auto builder = ApplicationBuilder {}
+    auto game_builder = ApplicationBuilder {}
         .display_config(1024, 576, "Nine Morris 3D", 512, 288)
         .file_names_config(APP_NAME, INFO_FILE)
         .version_config(MAJOR, MINOR, PATCH)
@@ -59,10 +59,10 @@ int main() {
         .with(ApplicationBuilder::Renderer::R2D)
         .with(ApplicationBuilder::Renderer::RImGui);
 
-    auto data = std::make_any<Data>();
+    auto data = std::make_any<game::Data>();
 
-    auto application = std::make_unique<Application>(builder, data, start, stop);
-    application->add_scene(new LoadingScene, true);
-    application->add_scene(new StandardGameScene, false);
-    application->run();
+    auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
+    game->add_scene(new LoadingScene, true);
+    game->add_scene(new StandardGameScene, false);
+    game->run();
 }

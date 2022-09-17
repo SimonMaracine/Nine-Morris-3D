@@ -3,18 +3,13 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "game/save_load.h"
-#include "game/nine_morris_3d.h"
+#include "game/game.h"
 #include "game/options.h"
 #include "game/constants.h"
+#include "imgui_style/colors.h"
 
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
-
-#define DEFAULT_BROWN ImVec4(0.647f, 0.4f, 0.212f, 1.0f)
-#define DARK_BROWN ImVec4(0.4f, 0.25f, 0.1f, 1.0f)
-#define LIGHT_BROWN ImVec4(0.68f, 0.48f, 0.22f, 1.0f)
-#define BEIGE ImVec4(0.961f, 0.875f, 0.733f, 1.0f)
-#define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
 
 static int get_texture_quality_option(std::string_view option) {
     // if (option == options::LOW) {
@@ -75,6 +70,8 @@ struct ImGuiLayer {
 
     std::string info_file_path;
     std::string save_game_file_path;
+
+    ImGuiWindowFlags window_flags = 0;
 };
 
 template<typename SceneType>
@@ -89,6 +86,8 @@ ImGuiLayer<SceneType>::ImGuiLayer(Application* app, SceneType* scene)
 #ifdef PLATFORM_GAME_RELEASE
     io.IniFilename = nullptr;
 #endif
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 
     ImVec4* colors = ImGui::GetStyle().Colors;
     colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
@@ -105,6 +104,9 @@ ImGuiLayer<SceneType>::ImGuiLayer(Application* app, SceneType* scene)
     colors[ImGuiCol_CheckMark] = BEIGE;
     colors[ImGuiCol_SliderGrab] = LIGHT_GRAY_BLUE;
     colors[ImGuiCol_SliderGrabActive] = LIGHT_GRAY_BLUE;
+    colors[ImGuiCol_Tab] = DARK_BROWN;
+    colors[ImGuiCol_TabHovered] = LIGHT_BROWN;
+    colors[ImGuiCol_TabActive] = DEFAULT_BROWN;
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
@@ -156,7 +158,7 @@ void ImGuiLayer<SceneType>::reset() {
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_menu_bar() {
-    auto& data = app->user_data<Data>();
+    auto& data = app->user_data<game::Data>();
 
     RESET_HOVERING_GUI();
 
@@ -505,14 +507,13 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_game_over() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
+    ImGui::PushFont(app->user_data<game::Data>().imgui_windows_font);
     ImGui::OpenPopup("Game Over");
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_NoResize
-            | ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("Game Over", nullptr, window_flags)) {
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
         switch (scene->board.get_ending().type) {
@@ -587,14 +588,13 @@ void ImGuiLayer<SceneType>::draw_game_over_message(std::string_view message1, st
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_about() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
+    ImGui::PushFont(app->user_data<game::Data>().imgui_windows_font);
     ImGui::OpenPopup("About Nine Morris 3D");
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, ImGuiWindowFlags_NoResize
-            | ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, window_flags)) {
         HOVERING_GUI();
 
         // static bool deactivated = false;
@@ -635,14 +635,13 @@ void ImGuiLayer<SceneType>::draw_about() {
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_could_not_load_game() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
+    ImGui::PushFont(app->user_data<game::Data>().imgui_windows_font);
     ImGui::OpenPopup("Error Loading Game");
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Error Loading Game", nullptr, ImGuiWindowFlags_NoResize
-            | ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("Error Loading Game", nullptr, window_flags)) {
         HOVERING_GUI();
 
         // static bool deactivated = false;
@@ -682,14 +681,13 @@ void ImGuiLayer<SceneType>::draw_could_not_load_game() {
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_no_last_game() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
+    ImGui::PushFont(app->user_data<game::Data>().imgui_windows_font);
     ImGui::OpenPopup("No Last Game");
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("No Last Game", nullptr, ImGuiWindowFlags_NoResize
-            | ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("No Last Game", nullptr, window_flags)) {
         HOVERING_GUI();
 
         // static bool deactivated = false;

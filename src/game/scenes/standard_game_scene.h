@@ -2,14 +2,14 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "scenes/imgui_layer.h"
+#include "game/scenes/imgui_layer.h"
 #include "game/boards/standard_board.h"
 #include "game/undo_redo_state.h"
 #include "game/keyboard_controls.h"
 #include "game/game_context.h"
 #include "game/options.h"
 #include "game/timer.h"
-#include "minimax/minimax_thread.h"
+#include "game/minimax/minimax_thread.h"
 
 struct StandardGameScene : public Scene {
     StandardGameScene()

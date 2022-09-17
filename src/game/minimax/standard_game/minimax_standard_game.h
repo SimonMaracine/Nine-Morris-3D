@@ -1,6 +1,6 @@
 #pragma once
 
-#include "minimax/minimax_thread.h"
+#include "game/minimax/minimax_thread.h"
 #include "game/constants.h"
 
 namespace minimax_standard_game {

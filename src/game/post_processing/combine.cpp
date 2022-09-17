@@ -1,6 +1,6 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "post_processing/combine.h"
+#include "game/post_processing/combine.h"
 
 void Combine::render(const PostProcessingContext& context) const {
     shader->bind();

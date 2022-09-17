@@ -1,4 +1,4 @@
-#include "minimax/minimax_thread.h"
+#include "game/minimax/minimax_thread.h"
 #include "game/boards/generic_board.h"
 
 MinimaxThread::~MinimaxThread() {
