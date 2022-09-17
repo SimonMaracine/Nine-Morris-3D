@@ -99,15 +99,6 @@ void start(Application* app) {
         io.Fonts->Build();
     }
 
-    // Load splash screen
-    {
-        TextureSpecification specification;
-        specification.min_filter = Filter::Linear;
-        specification.mag_filter = Filter::Linear;
-
-        app->res.textures.load("splash_screen_texture"_hs, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
-    }
-
     // Load and create this font
     {
         auto font = app->res.fonts.load("good_dog_plain_font"_hs, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);

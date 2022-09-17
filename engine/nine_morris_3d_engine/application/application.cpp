@@ -16,13 +16,14 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/paths.h"
 
-Application::Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunction& start, const UserFunction& stop)
+Application::Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunc& start, const UserFunc& stop)
     : builder(builder), _user_data(user_data), start(start), stop(stop) {
     DEB_INFO("Initializing application...");
 
     app_data.width = builder.width;
     app_data.height = builder.height;
     app_data.title = builder.title;
+    app_data.resizable = builder.resizable;
     app_data.min_width = builder.min_width;
     app_data.min_height = builder.min_height;
     app_data.application_name = builder.application_name;
@@ -44,6 +45,11 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
         ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
 
         renderer_imgui = std::bind(&Application::renderer_imgui_functionality, this);        
+
+        evt.sink<MouseScrolledEvent>().connect<&Application::on_imgui_mouse_scrolled>(*this);
+        evt.sink<MouseMovedEvent>().connect<&Application::on_imgui_mouse_moved>(*this);
+        evt.sink<MouseButtonPressedEvent>().connect<&Application::on_imgui_mouse_button_pressed>(*this);
+        evt.sink<MouseButtonReleasedEvent>().connect<&Application::on_imgui_mouse_button_released>(*this);
     }
 
 #ifdef PLATFORM_GAME_DEBUG
@@ -117,6 +123,8 @@ int Application::run() {
             current_scene->on_fixed_update();
         }
         current_scene->on_update();
+
+        render_helpers::clear(render_helpers::Color);
 
         renderer_3d();
         renderer_2d();
@@ -315,4 +323,29 @@ void Application::on_mouse_moved(const MouseMovedEvent& event) {
     dy = last_mouse_y - event.mouse_y;
     last_mouse_x = event.mouse_x;
     last_mouse_y = event.mouse_y;
+}
+
+
+void Application::on_imgui_mouse_scrolled(const MouseScrolledEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseWheel = event.scroll;
+}
+
+void Application::on_imgui_mouse_moved(const MouseMovedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
+}
+
+void Application::on_imgui_mouse_button_pressed(const MouseButtonPressedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[static_cast<int>(event.button)] = true;
+}
+
+void Application::on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDown[static_cast<int>(event.button)] = false;
+}
+
+std::any dummy_user_data() {
+    return std::make_any<_DummyUserData>();
 }

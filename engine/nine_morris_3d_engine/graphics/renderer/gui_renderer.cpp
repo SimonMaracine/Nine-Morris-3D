@@ -284,6 +284,20 @@ void GuiRenderer::clear() {
     widgets.clear();
 }
 
+void GuiRenderer::quad_center(float& width, float& height, float& x_pos, float& y_pos) {
+    if (static_cast<float>(app->data().width) / app->data().height > 16.0f / 9.0f) {
+        width = app->data().width;
+        height = app->data().width * (9.0f / 16.0f);
+        x_pos = 0.0f;
+        y_pos = (height - app->data().height) / -2.0f;
+    } else {
+        height = app->data().height;
+        width = app->data().height * (16.0f / 9.0f);
+        x_pos = (width - app->data().width) / -2.0f;
+        y_pos = 0.0f;
+    }
+}
+
 void GuiRenderer::prepare_draw_image() {
     app->gui_renderer->storage.quad2d_shader->bind();
     app->gui_renderer->storage.quad2d_vertex_array->bind();

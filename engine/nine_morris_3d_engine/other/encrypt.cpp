@@ -8,7 +8,7 @@ namespace encrypt {
     static cppblowfish::BlowfishContext blowfish;
 
     void initialize(std::string_view key) {
-        blowfish.initialize(std::string(key) + 'S');
+        blowfish = cppblowfish::BlowfishContext {std::string(key) + 'S'};
     }
 
     cppblowfish::Buffer load_file(EncryptedFile file_path) {

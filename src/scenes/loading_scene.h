@@ -12,7 +12,5 @@ struct LoadingScene : public Scene {
     virtual void on_stop() override;
     virtual void on_update() override;
 
-    void quad_configuration(float& width, float& height, float& x_pos, float& y_pos);
-
     std::unique_ptr<ConcurrentLoader<options::Options>> loader;
 };

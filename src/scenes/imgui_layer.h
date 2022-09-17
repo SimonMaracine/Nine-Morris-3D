@@ -59,11 +59,6 @@ struct ImGuiLayer {
     void draw_debug();
 #endif
 
-    void on_mouse_scrolled(const MouseScrolledEvent& event);
-    void on_mouse_moved(const MouseMovedEvent& event);
-    void on_mouse_button_pressed(const MouseButtonPressedEvent& event);
-    void on_mouse_button_released(const MouseButtonReleasedEvent& event);
-
     Application* app = nullptr;
     SceneType* scene = nullptr;
 
@@ -118,11 +113,6 @@ ImGuiLayer<SceneType>::ImGuiLayer(Application* app, SceneType* scene)
     style.ChildRounding = 8;
     style.PopupRounding = 8;
     style.GrabRounding = 8;
-
-    app->evt.sink<MouseScrolledEvent>().connect<&ImGuiLayer::on_mouse_scrolled>(*this);  // TODO maybe this should be done in on_start
-    app->evt.sink<MouseMovedEvent>().connect<&ImGuiLayer::on_mouse_moved>(*this);
-    app->evt.sink<MouseButtonPressedEvent>().connect<&ImGuiLayer::on_mouse_button_pressed>(*this);
-    app->evt.sink<MouseButtonReleasedEvent>().connect<&ImGuiLayer::on_mouse_button_released>(*this);
 }
 
 template<typename SceneType>
@@ -870,27 +860,3 @@ void ImGuiLayer<SceneType>::draw_debug() {
     }
 }
 #endif
-
-template<typename SceneType>
-void ImGuiLayer<SceneType>::on_mouse_scrolled(const MouseScrolledEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseWheel = event.scroll;
-}
-
-template<typename SceneType>
-void ImGuiLayer<SceneType>::on_mouse_moved(const MouseMovedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
-}
-
-template<typename SceneType>
-void ImGuiLayer<SceneType>::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[static_cast<int>(event.button)] = true;
-}
-
-template<typename SceneType>
-void ImGuiLayer<SceneType>::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[static_cast<int>(event.button)] = false;
-}

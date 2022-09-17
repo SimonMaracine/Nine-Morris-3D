@@ -4,6 +4,7 @@
 #include "game/nine_morris_3d.h"
 #include "game/options.h"
 #include "game/assets_load_functions.h"
+#include "game/assets.h"
 
 void LoadingScene::on_start() {
     auto& data = app->user_data<Data>();
@@ -18,6 +19,17 @@ void LoadingScene::on_start() {
     loading_text->offset(22, gui::Relative::Right)->offset(20, gui::Relative::Bottom);
     loading_text->set_shadows(true);
     app->gui_renderer->add_widget(loading_text);
+
+    using namespace assets;
+    using namespace encrypt;
+    using namespace paths;
+
+    // Load splash screen
+    TextureSpecification specification;
+    specification.min_filter = Filter::Linear;
+    specification.mag_filter = Filter::Linear;
+
+    app->res.textures.load("splash_screen_texture"_hs, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
 }
 
 void LoadingScene::on_stop() {
@@ -31,7 +43,7 @@ void LoadingScene::on_stop() {
 
 void LoadingScene::on_update() {
     float width, height, x_pos, y_pos;
-    quad_configuration(width, height, x_pos, y_pos);
+    app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
     app->gui_renderer->im_draw_quad(
         glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.textures["splash_screen_texture"_hs]
@@ -39,19 +51,5 @@ void LoadingScene::on_update() {
 
     if (loader->done_loading()) {
         app->change_scene("game");
-    }
-}
-
-void LoadingScene::quad_configuration(float& width, float& height, float& x_pos, float& y_pos) {
-    if (static_cast<float>(app->data().width) / app->data().height > 16.0f / 9.0f) {
-        width = app->data().width;
-        height = app->data().width * (9.0f / 16.0f);
-        x_pos = 0.0f;
-        y_pos = (height - app->data().height) / -2.0f;
-    } else {
-        height = app->data().height;
-        width = app->data().height * (16.0f / 9.0f);
-        x_pos = (width - app->data().width) / -2.0f;
-        y_pos = 0.0f;
     }
 }

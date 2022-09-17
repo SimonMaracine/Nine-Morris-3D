@@ -7,6 +7,7 @@ class Application;
 struct ApplicationData {
     int width, height;
     std::string title;
+    bool resizable;
     int min_width;
     int min_height;
     std::string application_name;

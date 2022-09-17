@@ -119,6 +119,8 @@ public:
 
     void clear();
 
+    void quad_center(float& width, float& height, float& x_pos, float& y_pos);
+
     std::shared_ptr<Shader> get_quad2d_shader() { return storage.quad2d_shader; }
     std::shared_ptr<Shader> get_text_shader() { return storage.text_shader; }
 private:

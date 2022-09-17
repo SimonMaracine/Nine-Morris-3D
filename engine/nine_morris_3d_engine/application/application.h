@@ -14,9 +14,14 @@
 
 class Application final {
 public:
-    using UserFunction = std::function<void(Application* app)>;
+    using UserFunc = std::function<void(Application* app)>;
 
-    Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunction& start, const UserFunction& stop);
+    struct _DummyUserFunc {
+        constexpr void operator()(Application*) {}  // Do nothing
+    };
+
+    Application(const ApplicationBuilder& builder, std::any& user_data,
+        const UserFunc& start = _DummyUserFunc {}, const UserFunc& stop = _DummyUserFunc {});
     virtual ~Application();
 
     // Call this to run the application, after all scenes have been defined; it can return an exit code
@@ -69,10 +74,15 @@ private:
     void on_mouse_scrolled(const MouseScrolledEvent& event);
     void on_mouse_moved(const MouseMovedEvent& event);
 
+    void on_imgui_mouse_scrolled(const MouseScrolledEvent& event);
+    void on_imgui_mouse_moved(const MouseMovedEvent& event);
+    void on_imgui_mouse_button_pressed(const MouseButtonPressedEvent& event);
+    void on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event);
+
     ApplicationBuilder builder;
     std::any& _user_data;
-    UserFunction start;
-    UserFunction stop;
+    UserFunc start;
+    UserFunc stop;
     ApplicationData app_data;
 
     double fps = 0.0;
@@ -86,14 +96,14 @@ private:
     bool changed_scene = false;
     Scene* to_scene = nullptr;
 
-    // Data for modularity
-    struct DummyFunctor {
+    // Data for modular rendering
+    struct DummyFunction {
         constexpr void operator()() {}  // Do nothing
     };
 
-    std::function<void()> renderer_3d = DummyFunctor {};
-    std::function<void()> renderer_2d = DummyFunctor {};
-    std::function<void()> renderer_imgui = DummyFunctor {};
+    std::function<void()> renderer_3d = DummyFunction {};
+    std::function<void()> renderer_2d = DummyFunction {};
+    std::function<void()> renderer_imgui = DummyFunction {};
 
     // Keep track of all framebuffers to resize them, if needed
     std::vector<std::weak_ptr<Framebuffer>> framebuffers;
@@ -108,3 +118,6 @@ private:
     friend class Scene;
     friend class Window;
 };
+
+struct _DummyUserData {};
+std::any dummy_user_data();
