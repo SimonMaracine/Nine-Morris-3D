@@ -2,14 +2,14 @@
 
 #include "game/scenes/loading_scene.h"
 #include "game/game.h"
-#include "game/options.h"
+#include "game/game_options.h"
 #include "game/assets_load_functions.h"
 #include "game/assets.h"
 
 void LoadingScene::on_start() {
     auto& data = app->user_data<game::Data>();
 
-    loader = std::make_unique<ConcurrentLoader<options::Options>>(data.res_thread, assets_load_functions::all_start);
+    loader = std::make_unique<ConcurrentLoader<game_options::GameOptions>>(data.res_thread, assets_load_functions::all_start);
     loader->start_loading_thread(data.options);
 
     auto loading_text = std::make_shared<gui::Text>(

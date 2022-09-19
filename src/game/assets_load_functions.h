@@ -2,7 +2,7 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/options.h"
+#include "game/game_options.h"
 
 using namespace mesh;
 
@@ -40,7 +40,7 @@ using namespace mesh;
 // };
 
 namespace assets_load_functions {
-    void all_start(ConcurrentLoader<options::Options>& loader, const options::Options& options);
+    void all_start(ConcurrentLoader<game_options::GameOptions>& loader, const game_options::GameOptions& options);
     // void skybox(Loader<AssetsData, options::Options>* loader, const options::Options& options);
     // void texture_quality(Loader<AssetsData, options::Options>* loader, const options::Options& options);
     // void board_paint_texture(Loader<AssetsData, options::Options>* loader, const options::Options& options);

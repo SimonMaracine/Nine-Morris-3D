@@ -4,7 +4,7 @@
 
 #include "game/save_load.h"
 #include "game/game.h"
-#include "game/options.h"
+#include "game/game_options.h"
 #include "game/constants.h"
 #include "imgui_style/colors.h"
 
@@ -23,9 +23,9 @@ static int get_texture_quality_option(std::string_view option) {
 }
 
 static int get_skybox_option(std::string_view option) {
-    if (option == options::FIELD) {
+    if (option == game_options::FIELD) {
         return 0;
-    } else if (option == options::AUTUMN) {
+    } else if (option == game_options::AUTUMN) {
         return 1;
     }
 
@@ -421,12 +421,12 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                 if (ImGui::RadioButton("Field", &dummy, 0)) {
                     // game_layer->set_skybox(options::FIELD);  // FIXME
 
-                    DEB_INFO("Skybox set to {}", options::FIELD);
+                    DEB_INFO("Skybox set to {}", game_options::FIELD);
                 }
                 if (ImGui::RadioButton("Autumn", &dummy, 1)) {
                     // game_layer->set_skybox(options::AUTUMN);  // FIXME
 
-                    DEB_INFO("Skybox set to {}", options::AUTUMN);
+                    DEB_INFO("Skybox set to {}", game_options::AUTUMN);
                 }
 
                 ImGui::EndMenu();

@@ -29,7 +29,6 @@
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/memory.hpp>
@@ -39,7 +38,6 @@
 #include <cereal/types/base_class.hpp>
 
 #include <entt/entt.hpp>
-
 using namespace entt::literals;
 
 #include <glm/glm.hpp>

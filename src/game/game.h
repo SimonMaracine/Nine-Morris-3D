@@ -2,11 +2,13 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/options.h"
+#include "game/game_options.h"
+#include "launcher/launcher_options.h"
 
 namespace game {
     struct Data {
-        options::Options options;
+        launcher_options::LauncherOptions launcher_options;
+        game_options::GameOptions options;
         Resources res_thread;
 
         unsigned int arrow_cursor = 0;

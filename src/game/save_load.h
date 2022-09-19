@@ -6,8 +6,8 @@
 #include "game/undo_redo_state.h"
 
 namespace save_load {
-    static constexpr const char* SAVE_GAME_FILE = "last_game.dat";
-    static constexpr const char* NO_LAST_GAME = "No Last Game";
+    static const char* SAVE_GAME_FILE = "last_game.dat";
+    static const char* NO_LAST_GAME = "No Last Game";
 
     class SaveFileError : public std::runtime_error {
     public:

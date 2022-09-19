@@ -2,10 +2,11 @@
 
 #include "game/game.h"
 #include "game/assets.h"
-#include "game/options.h"
+#include "game/game_options.h"
 #include "game/post_processing/bright_filter.h"
 #include "game/post_processing/blur.h"
 #include "game/post_processing/combine.h"
+#include "options/options.h"
 
 namespace game {
     void start(Application* app) {
@@ -16,15 +17,20 @@ namespace game {
         auto& data = app->user_data<game::Data>();
 
         try {
-            options::load_options_from_file(data.options);
+            options::load_options_from_file<game_options::GameOptions>(
+                data.options, game_options::GAME_OPTIONS_FILE, game_options::validate
+            );
         } catch (const options::OptionsFileNotOpenError& e) {
             REL_ERROR("{}", e.what());
-            options::handle_options_file_not_open_error(app->data().application_name);
+
+            options::handle_options_file_not_open_error<game_options::GameOptions>(
+                game_options::GAME_OPTIONS_FILE, app->data().application_name
+            );
         } catch (const options::OptionsFileError& e) {
             REL_ERROR("{}", e.what());
 
             try {
-                options::create_options_file();
+                options::create_options_file<game_options::GameOptions>(game_options::GAME_OPTIONS_FILE);
             } catch (const options::OptionsFileNotOpenError& e) {
                 REL_ERROR("{}", e.what());
             } catch (const options::OptionsFileError& e) {

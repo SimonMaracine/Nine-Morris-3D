@@ -2,7 +2,7 @@
 
 #include "game/assets_load_functions.h"
 #include "game/assets.h"
-#include "game/options.h"
+#include "game/game_options.h"
 
 using namespace mesh;
 using namespace assets;
@@ -10,7 +10,7 @@ using namespace paths;
 using namespace encrypt;
 
 namespace assets_load_functions {
-    void all_start(ConcurrentLoader<options::Options>& loader, const options::Options& options) {
+    void all_start(ConcurrentLoader<game_options::GameOptions>& loader, const game_options::GameOptions& options) {
         loader.set_done();
 
         // loader->get()->node_mesh = load_model_VP(encr(path_for_assets(NODE_MESH)), true);

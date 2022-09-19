@@ -32,15 +32,16 @@ int main() {
 
     auto launcher_builder = ApplicationBuilder {}
         .display_config(640, 480, "Nine Morris 3D Launcher", true)
+        .file_names_config(APP_NAME, INFO_FILE)
         .version_config(MAJOR, MINOR, PATCH)
         .authors_config(authors)
         .encrypt_key_config(KEY)
         .with(ApplicationBuilder::Renderer::RImGui)
         .with(ApplicationBuilder::Renderer::R2D);
 
-    auto dummy_data = dummy_user_data();
+    auto data = std::make_any<game::Data>();
 
-    auto launcher = std::make_unique<Application>(launcher_builder, dummy_data);
+    auto launcher = std::make_unique<Application>(launcher_builder, data);
     launcher->add_scene(new LauncherScene, true);
     const int code = launcher->run();
     launcher = nullptr;
@@ -50,7 +51,7 @@ int main() {
     }
 
     auto game_builder = ApplicationBuilder {}
-        .display_config(1024, 576, "Nine Morris 3D", 512, 288)
+        .display_config(1024, 576, "Nine Morris 3D", true, 512, 288)
         .file_names_config(APP_NAME, INFO_FILE)
         .version_config(MAJOR, MINOR, PATCH)
         .authors_config(authors)
@@ -58,8 +59,6 @@ int main() {
         .with(ApplicationBuilder::Renderer::R3D)
         .with(ApplicationBuilder::Renderer::R2D)
         .with(ApplicationBuilder::Renderer::RImGui);
-
-    auto data = std::make_any<game::Data>();
 
     auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
     game->add_scene(new LoadingScene, true);

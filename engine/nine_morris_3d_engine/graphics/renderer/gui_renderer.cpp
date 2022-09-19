@@ -237,12 +237,11 @@ void GuiRenderer::render() {
         }
     });
 
-    static auto prepare_draw_image = std::bind(&GuiRenderer::prepare_draw_image, this);
-    static auto prepare_draw_text = std::bind(&GuiRenderer::prepare_draw_text, this);
+    
 
     glDisable(GL_DEPTH_TEST);
-    draw(images, prepare_draw_image);
-    draw(texts, prepare_draw_text);
+    draw(images, std::bind(&GuiRenderer::prepare_draw_image, this));
+    draw(texts, std::bind(&GuiRenderer::prepare_draw_text, this));
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -299,12 +298,12 @@ void GuiRenderer::quad_center(float& width, float& height, float& x_pos, float& 
 }
 
 void GuiRenderer::prepare_draw_image() {
-    app->gui_renderer->storage.quad2d_shader->bind();
-    app->gui_renderer->storage.quad2d_vertex_array->bind();
+    storage.quad2d_shader->bind();
+    storage.quad2d_vertex_array->bind();
 }
 
 void GuiRenderer::prepare_draw_text() {
-    app->gui_renderer->storage.text_shader->bind();
+    storage.text_shader->bind();
 }
 
 void GuiRenderer::draw(std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw) {
