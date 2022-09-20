@@ -3,9 +3,11 @@
 #include <glad/glad.h>  // Include glad just to make everything compile
 #include <GLFW/glfw3.h>
 
+#include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/other/texture_data.h"
 
 class Application;
+class Monitor;
 
 class Window {
 public:
@@ -17,6 +19,7 @@ public:
 
     GLFWwindow* get_handle();
     double get_time();
+    std::vector<Monitor> get_monitors();
 
     // VSync, cursor and icon API
     void set_vsync(int interval);
@@ -35,7 +38,22 @@ public:
         glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
     }
 private:
+    GLFWwindow* create_window(Application* app);
+
     GLFWwindow* window = nullptr;
 
     std::unordered_map<unsigned int, GLFWcursor*> cursors;
+};
+
+class Monitor {
+public:
+    Monitor() = default;
+    ~Monitor() = default;
+
+    std::pair<int, int> get_resolution();
+    const char* get_name();
+private:
+    GLFWmonitor* monitor = nullptr;
+
+    friend class Window;
 };

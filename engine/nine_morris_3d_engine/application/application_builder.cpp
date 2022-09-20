@@ -1,10 +1,12 @@
 #include "nine_morris_3d_engine/application/application_builder.h"
 
 ApplicationBuilder& ApplicationBuilder::display_config(int width, int height, std::string_view title,
-        bool resizable, int min_width, int min_height) {
+        bool fullscreen, bool native_resolution, bool resizable, int min_width, int min_height) {
     this->width = width;
     this->height = height;
     this->title = title;
+    this->fullscreen = fullscreen;
+    this->native_resolution = native_resolution;
     this->resizable = resizable;
     this->min_width = min_width;
     this->min_height = min_height;

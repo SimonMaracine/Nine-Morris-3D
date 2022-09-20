@@ -4,6 +4,7 @@
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/loading_scene.h"
 #include "launcher/launcher_scene.h"
+#include "other/data.h"
 
 #if defined(PLATFORM_GAME_LINUX)
     #define APP_NAME "ninemorris3d"
@@ -31,7 +32,7 @@ int main() {
     logging::initialize(LOG_FILE);
 
     auto launcher_builder = ApplicationBuilder {}
-        .display_config(640, 480, "Nine Morris 3D Launcher", true)
+        .display_config(640, 480, "Nine Morris 3D Launcher", false, false, false)
         .file_names_config(APP_NAME, INFO_FILE)
         .version_config(MAJOR, MINOR, PATCH)
         .authors_config(authors)
@@ -39,7 +40,7 @@ int main() {
         .with(ApplicationBuilder::Renderer::RImGui)
         .with(ApplicationBuilder::Renderer::R2D);
 
-    auto data = std::make_any<game::Data>();
+    auto data = std::make_any<Data>();
 
     auto launcher = std::make_unique<Application>(launcher_builder, data);
     launcher->add_scene(new LauncherScene, true);
@@ -50,8 +51,13 @@ int main() {
         return 0;
     }
 
+    const auto& options = std::any_cast<Data>(data).launcher_options;
+
     auto game_builder = ApplicationBuilder {}
-        .display_config(1024, 576, "Nine Morris 3D", true, 512, 288)
+        .display_config(
+            options.resolution.first, options.resolution.second, "Nine Morris 3D",
+            options.fullscreen, options.native_resolution, true, 512, 288
+        )
         .file_names_config(APP_NAME, INFO_FILE)
         .version_config(MAJOR, MINOR, PATCH)
         .authors_config(authors)

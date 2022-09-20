@@ -2,6 +2,9 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
+#include "other/display_manager.h"
+#include "other/data.h"
+
 struct LauncherScene : public Scene {
     LauncherScene()
         : Scene("launcher_scene") {}
@@ -13,5 +16,10 @@ struct LauncherScene : public Scene {
 
     void on_window_closed(const WindowClosedEvent& event);
 
+    void welcome_page();
+    void graphics_page();
+
     ImGuiWindowFlags window_flags = 0;
+
+    DisplayManager display_manager;
 };

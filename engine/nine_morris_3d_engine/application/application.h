@@ -36,7 +36,7 @@ public:
     void purge_framebuffers();
 
     template<typename Data>
-    auto& user_data() { return std::any_cast<Data&>(_user_data); }
+    Data& user_data() { return std::any_cast<Data&>(_user_data); }
 
     const ApplicationData& data() { return app_data; }
 

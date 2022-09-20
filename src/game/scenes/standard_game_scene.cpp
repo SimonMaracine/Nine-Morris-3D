@@ -2,7 +2,7 @@
 
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/imgui_layer.h"
-#include "game/game.h"
+#include "other/data.h"
 
 void StandardGameScene::on_start() {
     imgui_layer.update();
@@ -55,7 +55,7 @@ void StandardGameScene::on_imgui_update() {
     }
 
     if (imgui_layer.show_info && !imgui_layer.show_about) {
-        ImGui::PushFont(app->user_data<game::Data>().imgui_info_font);
+        ImGui::PushFont(app->user_data<Data>().imgui_info_font);
         ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoCollapse);
         ImGui::Text("FPS: %f", app->get_fps());
         ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());

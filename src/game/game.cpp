@@ -1,12 +1,12 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/game.h"
 #include "game/assets.h"
 #include "game/game_options.h"
 #include "game/post_processing/bright_filter.h"
 #include "game/post_processing/blur.h"
 #include "game/post_processing/combine.h"
 #include "options/options.h"
+#include "other/data.h"
 
 namespace game {
     void start(Application* app) {
@@ -14,7 +14,7 @@ namespace game {
 
         srand(time(nullptr));
 
-        auto& data = app->user_data<game::Data>();
+        auto& data = app->user_data<Data>();
 
         try {
             options::load_options_from_file<game_options::GameOptions>(

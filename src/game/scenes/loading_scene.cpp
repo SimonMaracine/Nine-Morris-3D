@@ -1,13 +1,13 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "game/scenes/loading_scene.h"
-#include "game/game.h"
 #include "game/game_options.h"
 #include "game/assets_load_functions.h"
 #include "game/assets.h"
+#include "other/data.h"
 
 void LoadingScene::on_start() {
-    auto& data = app->user_data<game::Data>();
+    auto& data = app->user_data<Data>();
 
     loader = std::make_unique<ConcurrentLoader<game_options::GameOptions>>(data.res_thread, assets_load_functions::all_start);
     loader->start_loading_thread(data.options);

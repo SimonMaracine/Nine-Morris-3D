@@ -23,6 +23,8 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     app_data.width = builder.width;
     app_data.height = builder.height;
     app_data.title = builder.title;
+    app_data.fullscreen = builder.fullscreen;
+    app_data.native_resolution = builder.native_resolution;
     app_data.resizable = builder.resizable;
     app_data.min_width = builder.min_width;
     app_data.min_height = builder.min_height;
@@ -190,7 +192,7 @@ void Application::purge_framebuffers() {
 float Application::update_frame_counter() {
     constexpr double MAX_DT = 1.0 / 20.0;
 
-    static double previous_seconds = window->get_time();
+    static double previous_seconds = window->get_time();  // FIXME static messes things up
     static int frame_count = 0;
     static double total_time = 0.0;
 
@@ -217,7 +219,7 @@ float Application::update_frame_counter() {
 unsigned int Application::calculate_fixed_update() {
     constexpr double FIXED_DT = 1.0 / 50.0;
 
-    static double previous_seconds = window->get_time();
+    static double previous_seconds = window->get_time();  // FIXME static messes things up
     static double total_time = 0.0;
 
     const double current_seconds = window->get_time();

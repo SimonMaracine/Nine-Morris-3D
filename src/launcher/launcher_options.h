@@ -8,8 +8,9 @@ namespace launcher_options {
 
     struct LauncherOptions {
         // These are default values
-        std::tuple<int, int> resolution = std::make_tuple<int, int>(1024, 576);
         bool fullscreen = false;
+        bool native_resolution = true;
+        std::pair<int, int> resolution = {1024, 576};
         std::string texture_quality = NORMAL;
         bool normal_mapping = true;
         bool bloom = true;
@@ -18,8 +19,9 @@ namespace launcher_options {
         template<typename Archive>
         void serialize(Archive& archive) {
             archive(
-                resolution,
                 fullscreen,
+                native_resolution,
+                resolution,
                 texture_quality,
                 normal_mapping,
                 bloom,
@@ -28,5 +30,5 @@ namespace launcher_options {
         }
     };
 
-    std::tuple<bool, std::string> validate(const LauncherOptions& options);
+    std::pair<bool, std::string> validate(const LauncherOptions& options);
 }

@@ -43,5 +43,5 @@ namespace game_options {
         }
     };
 
-    std::tuple<bool, std::string> validate(const GameOptions& options);
+    std::pair<bool, std::string> validate(const GameOptions& options);
 }

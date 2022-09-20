@@ -32,7 +32,7 @@ namespace options {
     }
 
     template<typename OptionsType>
-    using _Validate = std::function<std::tuple<bool, std::string>(const OptionsType&)>;
+    using _Validate = std::function<std::pair<bool, std::string>(const OptionsType&)>;
 
     template<typename OptionsType>
     void save_options_to_file(const OptionsType& options, std::string_view options_file_name) noexcept(false) {

@@ -1,7 +1,7 @@
 #include "game/game_options.h"
 
 namespace game_options {
-    std::tuple<bool, std::string> validate(const GameOptions& options) {
+    std::pair<bool, std::string> validate(const GameOptions& options) {
         if (options.samples != 1 && options.samples != 2 && options.samples != 4) {
             return {false, "Options file is invalid: samples"};
         }

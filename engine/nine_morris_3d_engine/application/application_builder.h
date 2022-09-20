@@ -10,7 +10,7 @@ public:
     ~ApplicationBuilder() = default;
 
     ApplicationBuilder& display_config(int width, int height, std::string_view title = "Nine Morris 3D Engine",
-        bool resizable = true, int min_width = -1, int min_height = -1);
+        bool fullscreen = false, bool native_resolution = true, bool resizable = true, int min_width = -1, int min_height = -1);
     ApplicationBuilder& file_names_config(std::string_view application_name, std::string_view info_file_name);
     ApplicationBuilder& version_config(unsigned int major, unsigned int minor, unsigned int patch);
     ApplicationBuilder& authors_config(const std::vector<std::string>& authors);
@@ -20,6 +20,8 @@ private:
     int width = 800;
     int height = 600;
     std::string title = "Nine Morris 3D Engine";
+    bool fullscreen = false;
+    bool native_resolution = true;
     bool resizable = true;
     int min_width = -1;
     int min_height = -1;

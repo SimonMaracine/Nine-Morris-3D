@@ -2,23 +2,20 @@
 
 #include "launcher/launcher_scene.h"
 #include "launcher/launcher_options.h"
-#include "game/game.h"
 #include "options/options.h"
 #include "imgui_style/colors.h"
+#include "other/data.h"
+#include "other/display_manager.h"
 
 static const char* SPLASH_SCREEN = ENCR("data/textures/splash_screen/launcher/launcher_splash_screen.png");
 static const char* OPEN_SANS = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
 
-// TODO rework options system a bit
+// There seems to be no better way
 
-constexpr size_t RESOLUTIONS_COUNT = 5;
-static const char* resolutions[RESOLUTIONS_COUNT] = { "512x288", "768x432", "1024x576", "1280x720", "1536x864" };
+static size_t map_resolution_to_index(const std::pair<int, int>& resolution) {
+    constexpr size_t DEFAULT = 2;
 
-constexpr size_t TEXTURE_QUALITIES_COUNT = 2;
-static const char* texture_qualities[TEXTURE_QUALITIES_COUNT] = { "Normal", "Low" };
-
-static size_t map_resolution_to_index(const std::tuple<int, int>& resolution) {
-    switch (std::get<0>(resolution)) {
+    switch (resolution.first) {
         case 512:
             return 0;
         case 768:
@@ -29,12 +26,16 @@ static size_t map_resolution_to_index(const std::tuple<int, int>& resolution) {
             return 3;            
         case 1536:
             return 4;
+        case 1792:
+            return 5;
     }
 
-    return 2;  // Default
+    return DEFAULT;
 }
 
-static std::tuple<int, int> map_index_to_resolution(size_t index) {
+static std::pair<int, int> map_index_to_resolution(size_t index) {
+    constexpr std::pair<int, int> DEFAULT = {1024, 576};
+
     switch (index) {
         case 0:
             return {512, 288};
@@ -46,22 +47,28 @@ static std::tuple<int, int> map_index_to_resolution(size_t index) {
             return {1280, 720};
         case 4:
             return {1536, 864};
+        case 5:
+            return {1792, 1008};
     }
 
-    return {1024, 576};  // Default
+    return DEFAULT;
 }
 
 static size_t map_texture_quality_to_index(std::string_view texture_quality) {
-    if (strcmp(texture_quality.data(), launcher_options::NORMAL) == 0) {
+    constexpr size_t DEFAULT = 0;
+
+    if (texture_quality == std::string(launcher_options::NORMAL)) {
         return 0;
-    } else if (strcmp(texture_quality.data(), launcher_options::LOW) == 0) {
+    } else if (texture_quality == std::string(launcher_options::LOW)) {
         return 1;
     }
 
-    return 0;  // Default
+    return DEFAULT;
 }
 
 static std::string map_index_to_texture_quality(size_t index) {
+    constexpr const char* DEFAULT = launcher_options::NORMAL;
+
     switch (index) {
         case 0:
             return launcher_options::NORMAL;
@@ -69,7 +76,15 @@ static std::string map_index_to_texture_quality(size_t index) {
             return launcher_options::LOW;
     }
 
-    return launcher_options::NORMAL;  // Default
+    return DEFAULT;
+}
+
+static void help_marker(const char* text) {
+    ImGui::TextDisabled("(?)");
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(text);
+    }
 }
 
 void LauncherScene::on_start() {
@@ -135,7 +150,7 @@ void LauncherScene::on_start() {
     // Load options
     using namespace launcher_options;
 
-    auto& data = app->user_data<game::Data>();
+    auto& data = app->user_data<Data>();
 
     try {
         options::load_options_from_file<LauncherOptions>(
@@ -161,13 +176,16 @@ void LauncherScene::on_start() {
 
     // Set events
     app->evt.sink<WindowClosedEvent>().connect<&LauncherScene::on_window_closed>(*this);
+
+    // Initialize display manager
+    display_manager = DisplayManager {app};
 }
 
 void LauncherScene::on_stop() {
     // Save options
     using namespace launcher_options;
 
-    auto& data = app->user_data<game::Data>();
+    auto& data = app->user_data<Data>();
 
     try {
         options::save_options_to_file<LauncherOptions>(data.launcher_options, LAUNCHER_OPTIONS_FILE);
@@ -198,91 +216,21 @@ void LauncherScene::on_imgui_update() {
         glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.textures["splash_screen"_hs]
     );
 
-    auto& data = app->user_data<game::Data>();
-
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     ImGui::Begin("Launcher", nullptr, window_flags);
 
-    if (ImGui::BeginTabBar("Tabs")) {
-        if (ImGui::BeginTabItem("Welcome")) {
-            // FIXME add proper content
-            ImGui::Text("Nine Morris 3D: a nice board game");
-            ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor, app->data().version_patch);
-
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Graphics")) {
-            ImGui::PushItemWidth(150.0f);
-
-            ImGui::Text("Fullscreen"); ImGui::SameLine();
-            ImGui::Checkbox("##Fullscreen", &data.launcher_options.fullscreen);
-
-            ImGui::Text("Resolution"); ImGui::SameLine();
-            static size_t resolution_index = map_resolution_to_index(data.launcher_options.resolution);
-            const char* combo_preview_value = resolutions[resolution_index];
-            if (ImGui::BeginCombo("##Resolution", combo_preview_value)) {
-                for (size_t i = 0; i < RESOLUTIONS_COUNT; i++) {
-                    const bool is_selected = resolution_index == i;
-
-                    if (ImGui::Selectable(resolutions[i], is_selected)) {
-                        resolution_index = i;
-                        data.launcher_options.resolution = map_index_to_resolution(i);
-                    }
-
-                    if (is_selected) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-
-                ImGui::EndCombo();
-            }
-
-            ImGui::Text("Texture Quality"); ImGui::SameLine();
-            static size_t texture_quality_index = map_texture_quality_to_index(data.launcher_options.texture_quality);
-            combo_preview_value = texture_qualities[texture_quality_index];
-            if (ImGui::BeginCombo("##Texture Quality", combo_preview_value)) {
-                for (size_t i = 0; i < 2; i++) {
-                    const bool is_selected = texture_quality_index == i;
-
-                    if (ImGui::Selectable(texture_qualities[i], is_selected)) {
-                        texture_quality_index = i;
-                        data.launcher_options.texture_quality = map_index_to_texture_quality(i);
-                    }
-
-                    if (is_selected) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-
-                ImGui::EndCombo();
-            }
-
-            ImGui::Text("Normal Mapping"); ImGui::SameLine();
-            ImGui::Checkbox("##Normal Mapping", &data.launcher_options.normal_mapping);
-
-            ImGui::Text("Bloom"); ImGui::SameLine();
-            ImGui::Checkbox("##Bloom", &data.launcher_options.bloom);
-
-            ImGui::Text("Bloom Strength"); ImGui::SameLine();
-            ImGui::SliderFloat(
-                "##Bloom Strength", 
-                &data.launcher_options.bloom_strength,
-                0.1f, 1.0f, "%.01f",
-                ImGuiSliderFlags_Logarithmic
-            );
-
-            ImGui::PopItemWidth();
-
-            ImGui::EndTabItem();
-        }
+    if (ImGui::BeginTabBar("tabs")) {
+        welcome_page();
+        graphics_page();
 
         ImGui::EndTabBar();
     }
 
-    ImGui::Dummy(ImVec2(0.0f, 20.0f));
-    ImGui::Dummy(ImVec2(60.0f, 0.0f)); ImGui::SameLine();
+    ImGui::Dummy(ImVec2(0.0f, 25.0f));
+    ImGui::Dummy(ImVec2(85.0f, 0.0f));
+    ImGui::SameLine();
 
     if (ImGui::Button("Play", ImVec2(120.0f, 32.0f))) {
         app->exit_code = 0;
@@ -297,10 +245,99 @@ void LauncherScene::on_imgui_update() {
     }
 
     ImGui::End();
-
-    ImGui::ShowDemoWindow();
 }
 
 void LauncherScene::on_window_closed(const WindowClosedEvent&) {
     app->exit_code = 1;
+}
+
+void LauncherScene::welcome_page() {
+    if (ImGui::BeginTabItem("Welcome")) {
+        // FIXME add proper content
+        ImGui::Text("Nine Morris 3D: a nice board game");
+        ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor,
+                app->data().version_patch);
+
+        ImGui::EndTabItem();
+    }
+}
+
+void LauncherScene::graphics_page() {
+    auto& data = app->user_data<Data>();
+
+    if (ImGui::BeginTabItem("Graphics")) {
+        ImGui::PushItemWidth(165.0f);
+
+        ImGui::Text("Fullscreen"); ImGui::SameLine();
+        ImGui::Checkbox("##Fullscreen", &data.launcher_options.fullscreen);
+        ImGui::SameLine(); help_marker("Window will be displayed on the primary monitor");
+
+        ImGui::Text("Native Resolution"); ImGui::SameLine();
+        ImGui::Checkbox("##Native Resolution", &data.launcher_options.native_resolution);
+        ImGui::SameLine(); help_marker("Window will have the monitor's resolution, instead of the resolution below");
+
+        const char* combo_preview_value = nullptr;
+
+        ImGui::Text("Resolution"); ImGui::SameLine();
+        static size_t resolution_index = map_resolution_to_index(data.launcher_options.resolution);
+        const auto resolutions = display_manager.get_resolutions();
+        combo_preview_value = resolutions[resolution_index];
+
+        if (ImGui::BeginCombo("##Resolution", combo_preview_value)) {
+            for (size_t i = 0; i < resolutions.size(); i++) {
+                const bool is_selected = resolution_index == i;
+
+                if (ImGui::Selectable(resolutions[i], is_selected)) {
+                    resolution_index = i;
+                    data.launcher_options.resolution = map_index_to_resolution(i);
+                }
+
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+
+            ImGui::EndCombo();
+        }
+
+        ImGui::Text("Texture Quality"); ImGui::SameLine();
+        static size_t texture_quality_index = map_texture_quality_to_index(data.launcher_options.texture_quality);
+        const char* texture_qualities[] = { "Normal", "Low" };
+        combo_preview_value = texture_qualities[texture_quality_index];
+
+        if (ImGui::BeginCombo("##Texture Quality", combo_preview_value)) {
+            for (size_t i = 0; i < 2; i++) {
+                const bool is_selected = texture_quality_index == i;
+
+                if (ImGui::Selectable(texture_qualities[i], is_selected)) {
+                    texture_quality_index = i;
+                    data.launcher_options.texture_quality = map_index_to_texture_quality(i);
+                }
+
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+
+            ImGui::EndCombo();
+        }
+
+        ImGui::Text("Normal Mapping"); ImGui::SameLine();
+        ImGui::Checkbox("##Normal Mapping", &data.launcher_options.normal_mapping);
+
+        ImGui::Text("Bloom"); ImGui::SameLine();
+        ImGui::Checkbox("##Bloom", &data.launcher_options.bloom);
+
+        ImGui::Text("Bloom Strength"); ImGui::SameLine();
+        ImGui::SliderFloat(
+            "##Bloom Strength", 
+            &data.launcher_options.bloom_strength,
+            0.1f, 1.0f, "%.01f",
+            ImGuiSliderFlags_Logarithmic
+        );
+
+        ImGui::PopItemWidth();
+
+        ImGui::EndTabItem();
+    }
 }

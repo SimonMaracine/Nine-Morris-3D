@@ -7,6 +7,8 @@ class Application;
 struct ApplicationData {
     int width, height;
     std::string title;
+    bool fullscreen;
+    bool native_resolution;
     bool resizable;
     int min_width;
     int min_height;

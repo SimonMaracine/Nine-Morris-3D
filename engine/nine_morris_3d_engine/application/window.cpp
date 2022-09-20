@@ -35,7 +35,8 @@ Window::Window(Application* app) {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif
 
-    window = glfwCreateWindow(app->app_data.width, app->app_data.height, app->app_data.title.c_str(), nullptr, nullptr);
+    window = create_window(app);
+
     if (window == nullptr) {
         REL_CRITICAL("Could not create window, exiting...");
         exit(1);
@@ -149,6 +150,27 @@ double Window::get_time() {
     return glfwGetTime();
 }
 
+std::vector<Monitor> Window::get_monitors() {
+    int count;
+    GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+    if (monitors == nullptr) {
+        REL_CRITICAL("Could not retrieve monitors, exiting...");
+        exit(1);
+    }
+
+    std::vector<Monitor> result;
+
+    for (int i = 0; i < count; i++) {
+        Monitor monitor;
+        monitor.monitor = monitors[i];
+
+        result.push_back(monitor);
+    }
+
+    return result;
+}
+
 void Window::set_vsync(int interval) {
     glfwSwapInterval(interval);
 }
@@ -189,4 +211,37 @@ void Window::set_cursor(unsigned int handle) {
     GLFWcursor* cursor = cursors[handle];
     glfwSetCursor(window, cursor);
 #endif
+}
+
+GLFWwindow* Window::create_window(Application* app) {
+    GLFWmonitor* primary_monitor = nullptr;
+    int width = 0, height = 0;
+
+    if (app->app_data.fullscreen) {
+        primary_monitor = glfwGetPrimaryMonitor();
+
+        if (app->app_data.native_resolution) {
+            const GLFWvidmode* video_mode = glfwGetVideoMode(primary_monitor);
+            width = video_mode->width;
+            height = video_mode->height;
+        } else {
+            width = app->app_data.width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
+            height = app->app_data.height;
+        }
+    } else {
+        width = app->app_data.width;
+        height = app->app_data.height;
+    }
+
+    return glfwCreateWindow(width, height, app->app_data.title.c_str(), primary_monitor, nullptr);
+}
+
+std::pair<int, int> Monitor::get_resolution() {
+    const GLFWvidmode* video_mode = glfwGetVideoMode(monitor);
+
+    return std::make_pair(video_mode->width, video_mode->height);
+}
+
+const char* Monitor::get_name() {
+    return glfwGetMonitorName(monitor);
 }

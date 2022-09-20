@@ -3,10 +3,10 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "game/save_load.h"
-#include "game/game.h"
 #include "game/game_options.h"
 #include "game/constants.h"
 #include "imgui_style/colors.h"
+#include "other/data.h"
 
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
@@ -158,7 +158,7 @@ void ImGuiLayer<SceneType>::reset() {
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_menu_bar() {
-    auto& data = app->user_data<game::Data>();
+    auto& data = app->user_data<Data>();
 
     RESET_HOVERING_GUI();
 
@@ -507,7 +507,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_game_over() {
-    ImGui::PushFont(app->user_data<game::Data>().imgui_windows_font);
+    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("Game Over");
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -588,7 +588,7 @@ void ImGuiLayer<SceneType>::draw_game_over_message(std::string_view message1, st
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_about() {
-    ImGui::PushFont(app->user_data<game::Data>().imgui_windows_font);
+    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("About Nine Morris 3D");
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -635,7 +635,7 @@ void ImGuiLayer<SceneType>::draw_about() {
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_could_not_load_game() {
-    ImGui::PushFont(app->user_data<game::Data>().imgui_windows_font);
+    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("Error Loading Game");
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -681,7 +681,7 @@ void ImGuiLayer<SceneType>::draw_could_not_load_game() {
 
 template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_no_last_game() {
-    ImGui::PushFont(app->user_data<game::Data>().imgui_windows_font);
+    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("No Last Game");
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
