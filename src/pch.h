@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>

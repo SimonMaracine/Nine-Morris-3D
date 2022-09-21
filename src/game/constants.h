@@ -30,8 +30,8 @@ constexpr size_t WINDMILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
     { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
     { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
-    { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
-
+    { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 },
+    { 0, 3, 6 }, { 2, 5, 8 }, { 15, 18, 21 }, { 17, 20, 23 }
 };
 
 enum class BoardPhase {
@@ -132,8 +132,7 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
-constexpr size_t INVALID_PIECE_INDEX = 18;
-constexpr size_t INVALID_NODE_INDEX = 24;
+constexpr size_t INVALID_INDEX = UINT_MAX;
 
 constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
 

@@ -50,7 +50,7 @@ void GenericBoard::take_and_raise_piece(Piece* piece) {
     );
 
     piece->node = nullptr;
-    piece->node_index = INVALID_NODE_INDEX;
+    piece->node_index = INVALID_INDEX;
     piece->pending_remove = true;
 }
 

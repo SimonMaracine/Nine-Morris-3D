@@ -27,7 +27,7 @@ Window::Window(Application* app) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, app->app_data.resizable ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, app->data().resizable ? GLFW_TRUE : GLFW_FALSE);
 #ifdef PLATFORM_GAME_DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
     DEB_INFO("Using OpenGL debug context");
@@ -52,8 +52,8 @@ Window::Window(Application* app) {
     }
 
     glfwSwapInterval(1);
-    glfwSetWindowUserPointer(window, &app->app_data);
-    glfwSetWindowSizeLimits(window, app->app_data.min_width, app->app_data.min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    glfwSetWindowUserPointer(window, &const_cast<ApplicationData&>(app->data()));
+    glfwSetWindowSizeLimits(window, app->data().min_width, app->data().min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
         ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
@@ -217,23 +217,23 @@ GLFWwindow* Window::create_window(Application* app) {
     GLFWmonitor* primary_monitor = nullptr;
     int width = 0, height = 0;
 
-    if (app->app_data.fullscreen) {
+    if (app->data().fullscreen) {
         primary_monitor = glfwGetPrimaryMonitor();
 
-        if (app->app_data.native_resolution) {
+        if (app->data().native_resolution) {
             const GLFWvidmode* video_mode = glfwGetVideoMode(primary_monitor);
             width = video_mode->width;
             height = video_mode->height;
         } else {
-            width = app->app_data.width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
-            height = app->app_data.height;
+            width = app->data().width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
+            height = app->data().height;
         }
     } else {
-        width = app->app_data.width;
-        height = app->app_data.height;
+        width = app->data().width;
+        height = app->data().height;
     }
 
-    return glfwCreateWindow(width, height, app->app_data.title.c_str(), primary_monitor, nullptr);
+    return glfwCreateWindow(width, height, app->data().title.c_str(), primary_monitor, nullptr);
 }
 
 std::pair<int, int> Monitor::get_resolution() {

@@ -22,6 +22,19 @@ struct StandardGameScene : public Scene {
     virtual void on_fixed_update() override;
     virtual void on_imgui_update() override;
 
+    void on_mouse_button_pressed(const MouseButtonPressedEvent& event);
+    void on_mouse_button_released(const MouseButtonReleasedEvent& event);
+    void on_key_pressed(const KeyPressedEvent& event);
+    void on_key_released(const KeyReleasedEvent& event);
+
+    std::shared_ptr<Buffer> create_ids_buffer(size_t vertices_size, hover::Id id);
+
+    void initialize_rendering_board();
+    void initialize_rendering_board_paint();
+    void initialize_rendering_pieces();
+    void initialize_rendering_piece(size_t index, PieceType type, std::shared_ptr<Mesh<PTNT>> mesh,
+        std::shared_ptr<Texture> diffuse_texture, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices);
+
     // ImGui
     ImGuiLayer<StandardGameScene> imgui_layer;
 
@@ -55,8 +68,8 @@ struct StandardGameScene : public Scene {
     // bool changed_labeled_board_texture = false;
     // bool changed_normal_mapping = false;
 
-// #ifdef PLATFORM_GAME_DEBUG
-//     std::shared_ptr<Texture> light_bulb_texture;
-//     Renderer::Quad light_bulb_quad;
-// #endif
+#ifdef PLATFORM_GAME_DEBUG
+    std::shared_ptr<Texture> light_bulb_texture;
+    std::shared_ptr<Renderer::Quad> light_bulb_quad;
+#endif
 };

@@ -14,7 +14,7 @@ struct BufferLayout {
     std::vector<VertexElement> elements;
     GLsizei stride = 0;
 
-    enum class Type {
+    enum Type {
         Float, Int
     };
 

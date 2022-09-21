@@ -14,24 +14,24 @@ Material::~Material() {
     DEB_DEBUG("Deleted material from shader: {} and flags: {}", shader->get_name(), flags);
 }
 
-void Material::add_uniform(UniformType type, std::string_view name) {
+void Material::add_uniform(Uniform type, std::string_view name) {
     switch (type) {
-        case UniformType::Mat4:
+        case Uniform::Mat4:
             uniforms_mat4[std::string(name)] = glm::mat4(1.0f);
             break;
-        case UniformType::Int:
+        case Uniform::Int:
             uniforms_int[std::string(name)] = 0;
             break;
-        case UniformType::Float:
+        case Uniform::Float:
             uniforms_float[std::string(name)] = 0.0f;
             break;
-        case UniformType::Vec2:
+        case Uniform::Vec2:
             uniforms_vec2[std::string(name)] = glm::vec2(0.0f);
             break;
-        case UniformType::Vec3:
+        case Uniform::Vec3:
             uniforms_vec3[std::string(name)] = glm::vec3(0.0f);
             break;
-        case UniformType::Vec4:
+        case Uniform::Vec4:
             uniforms_vec4[std::string(name)] = glm::vec4(0.0f);
             break;
         default:

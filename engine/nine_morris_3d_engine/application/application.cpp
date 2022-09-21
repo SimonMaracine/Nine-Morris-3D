@@ -20,21 +20,21 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     : builder(builder), _user_data(user_data), start(start), stop(stop) {
     DEB_INFO("Initializing application...");
 
-    app_data.width = builder.width;
-    app_data.height = builder.height;
-    app_data.title = builder.title;
-    app_data.fullscreen = builder.fullscreen;
-    app_data.native_resolution = builder.native_resolution;
-    app_data.resizable = builder.resizable;
-    app_data.min_width = builder.min_width;
-    app_data.min_height = builder.min_height;
-    app_data.application_name = builder.application_name;
-    app_data.info_file_name = builder.info_file_name;
-    app_data.authors = builder.authors;
-    app_data.version_major = builder.major;
-    app_data.version_minor = builder.minor;
-    app_data.version_patch = builder.patch;
-    app_data.app = this;
+    _app_data.width = builder.width;
+    _app_data.height = builder.height;
+    _app_data.title = builder.title;
+    _app_data.fullscreen = builder.fullscreen;
+    _app_data.native_resolution = builder.native_resolution;
+    _app_data.resizable = builder.resizable;
+    _app_data.min_width = builder.min_width;
+    _app_data.min_height = builder.min_height;
+    _app_data.application_name = builder.application_name;
+    _app_data.info_file_name = builder.info_file_name;
+    _app_data.authors = builder.authors;
+    _app_data.version_major = builder.major;
+    _app_data.version_minor = builder.minor;
+    _app_data.version_patch = builder.patch;
+    _app_data.app = this;
 
     paths::initialize(builder.application_name);
     window = std::make_unique<Window>(this);

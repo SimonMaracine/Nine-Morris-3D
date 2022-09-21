@@ -7,7 +7,7 @@
 
 class Material {
 public:
-    enum class UniformType {
+    enum class Uniform {
         Mat4, Int, Float, Vec2, Vec3, Vec4
     };
 
@@ -18,7 +18,7 @@ public:
     Material(std::shared_ptr<Shader> shader, int flags = 0);
     ~Material();
 
-    void add_uniform(UniformType type, std::string_view name);
+    void add_uniform(Uniform type, std::string_view name);
     void add_texture(std::string_view name);
 private:
     std::shared_ptr<Shader> shader;

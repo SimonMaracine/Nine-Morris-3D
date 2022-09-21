@@ -31,6 +31,7 @@ public:
     Piece* get_hovered_piece() { return hovered_piece; }
     Piece* get_selected_piece() { return selected_piece; }
     bool get_next_move() { return next_move; }
+    bool get_is_players_turn() { return is_players_turn; }
 protected:
     Piece* new_piece_to_place(PieceType type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);

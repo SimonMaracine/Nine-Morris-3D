@@ -29,8 +29,8 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
     buffer = std::make_shared<Buffer>(1, DrawHint::Stream);
 
     BufferLayout layout;
-    layout.add(0, BufferLayout::Type::Float, 2);
-    layout.add(1, BufferLayout::Type::Float, 2);
+    layout.add(0, BufferLayout::Float, 2);
+    layout.add(1, BufferLayout::Float, 2);
 
     vertex_array = std::make_shared<VertexArray>();
     vertex_array->add_buffer(buffer, layout);

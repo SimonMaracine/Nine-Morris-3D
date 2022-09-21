@@ -184,7 +184,7 @@ GuiRenderer::GuiRenderer(Application* app)
 
         storage.quad2d_buffer = std::make_shared<Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
         BufferLayout layout;
-        layout.add(0, BufferLayout::Type::Float, 2);
+        layout.add(0, BufferLayout::Float, 2);
         storage.quad2d_vertex_array = std::make_shared<VertexArray>();
         storage.quad2d_vertex_array->add_buffer(storage.quad2d_buffer, layout);
 

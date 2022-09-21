@@ -11,10 +11,10 @@ struct Node {
     Node(size_t index, hover::Id id)  // FIXME id?
         : index(index) {}
 
-    size_t index = INVALID_NODE_INDEX;  // From 0 through 23
+    size_t index = INVALID_INDEX;  // From 0 through 23
 
     std::shared_ptr<Renderer::Model> model;
 
-    size_t piece_index = INVALID_PIECE_INDEX;
+    size_t piece_index = INVALID_INDEX;
     Piece* piece = nullptr;  // Reference to the piece that sits on this node
 };

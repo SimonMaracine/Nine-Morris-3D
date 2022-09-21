@@ -19,10 +19,10 @@ void BufferLayout::add(GLuint index, Type type, GLint size) {
     GLenum gl_type;
 
     switch (type) {
-        case Type::Float:
+        case Float:
             gl_type = GL_FLOAT;
             break;
-        case Type::Int:
+        case Int:
             gl_type = GL_INT;
             break;
         default:

@@ -5,6 +5,7 @@
 #include "game/post_processing/bright_filter.h"
 #include "game/post_processing/blur.h"
 #include "game/post_processing/combine.h"
+#include "launcher/launcher_options.h"
 #include "options/options.h"
 #include "other/data.h"
 
@@ -85,7 +86,7 @@ namespace game {
         }
 
         // Setup depth map framebuffer
-        app->renderer->set_depth_map_framebuffer(2048 /*options.texture_quality == NORMAL ? 4096 : 2048*/);  // FIXME this
+        app->renderer->set_depth_map_framebuffer(data.launcher_options.texture_quality == launcher_options::NORMAL ? 4096 : 2048);
 
         // Setup ImGui fonts
         {
@@ -113,7 +114,7 @@ namespace game {
             font->end_baking();
         }
 
-        // Setup post-processing
+        // Setup post-processing  // FIXME this is optional
         {
             FramebufferSpecification specification;
             specification.width = app->data().width / 2;
@@ -193,7 +194,7 @@ namespace game {
             app->add_framebuffer(framebuffer);
 
             auto combine = std::make_shared<Combine>("combine", framebuffer, shader);
-            combine->strength = 0.7f;  // FIXME options.bloom_strength;
+            combine->strength = data.launcher_options.bloom_strength;
             app->renderer->add_post_processing(combine);
         }
     }

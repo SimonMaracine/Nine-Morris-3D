@@ -11,14 +11,14 @@ struct Piece {
     Piece(size_t index, PieceType type, hover::Id id)  // FIXME id?
         : index(index), type(type) {}
 
-    size_t index = INVALID_PIECE_INDEX;  // From 0 through 17
+    size_t index = INVALID_INDEX;  // From 0 through 17
 
     PieceType type = PieceType::None;
     bool in_use = false;  // true, if it is on the board
 
     std::shared_ptr<Renderer::Model> model;
 
-    size_t node_index = INVALID_NODE_INDEX;
+    size_t node_index = INVALID_INDEX;
     Node* node = nullptr;  // Reference to the node where it sits on
 
     struct Movement {

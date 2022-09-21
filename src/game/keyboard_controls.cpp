@@ -133,5 +133,5 @@ KeyboardControls::Direction KeyboardControls::calculate(Direction original_direc
     }
 
     ASSERT(false, "This shouldn't be reached");
-    return Direction::Up;
+    return {};
 }
