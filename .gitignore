@@ -13,6 +13,7 @@ imgui.ini
 Nine-Morris-3D
 Nine-Morris-3D.exe
 options.json
+launcher_options.json
 bitmap_*.png
 *.dat
 encrypter
