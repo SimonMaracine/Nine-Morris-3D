@@ -31,43 +31,51 @@ int main() {
 
     logging::initialize(LOG_FILE);
 
-    auto launcher_builder = ApplicationBuilder {}
-        .display_config(640, 480, "Nine Morris 3D Launcher", false, false, false)
-        .file_names_config(APP_NAME, INFO_FILE)
-        .version_config(MAJOR, MINOR, PATCH)
-        .authors_config(authors)
-        .encrypt_key_config(KEY)
-        .with(ApplicationBuilder::Renderer::RImGui)
-        .with(ApplicationBuilder::Renderer::R2D);
+    while (true) {
+        int exit_code {};
 
-    auto data = std::make_any<Data>();
+        auto launcher_builder = ApplicationBuilder {}
+            .display_config(640, 480, "Nine Morris 3D Launcher", false, false, false)
+            .file_names_config(APP_NAME, INFO_FILE)
+            .version_config(MAJOR, MINOR, PATCH)
+            .authors_config(authors)
+            .encrypt_key_config(KEY)
+            .with(ApplicationBuilder::Renderer::RImGui)
+            .with(ApplicationBuilder::Renderer::R2D);
 
-    auto launcher = std::make_unique<Application>(launcher_builder, data);
-    launcher->add_scene(new LauncherScene, true);
-    const int code = launcher->run();
-    launcher = nullptr;
+        auto data = std::make_any<Data>();
 
-    if (code == 1) {
-        return 0;
+        auto launcher = std::make_unique<Application>(launcher_builder, data);
+        launcher->add_scene(new LauncherScene, true);
+        exit_code = launcher->run();
+        launcher.reset();
+
+        if (exit_code == 1) {
+            return 0;
+        }
+
+        const auto& options = std::any_cast<Data>(data).launcher_options;
+
+        auto game_builder = ApplicationBuilder {}
+            .display_config(
+                options.resolution.first, options.resolution.second, "Nine Morris 3D",
+                options.fullscreen, options.native_resolution, true, 512, 288
+            )
+            .file_names_config(APP_NAME, INFO_FILE)
+            .version_config(MAJOR, MINOR, PATCH)
+            .authors_config(authors)
+            .encrypt_key_config(KEY)
+            .with(ApplicationBuilder::Renderer::R3D)
+            .with(ApplicationBuilder::Renderer::R2D)
+            .with(ApplicationBuilder::Renderer::RImGui);
+
+        auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
+        game->add_scene(new LoadingScene, true);
+        game->add_scene(new StandardGameScene, false);
+        exit_code = game->run();
+
+        if (exit_code == 0) {
+            return 0;
+        }
     }
-
-    const auto& options = std::any_cast<Data>(data).launcher_options;
-
-    auto game_builder = ApplicationBuilder {}
-        .display_config(
-            options.resolution.first, options.resolution.second, "Nine Morris 3D",
-            options.fullscreen, options.native_resolution, true, 512, 288
-        )
-        .file_names_config(APP_NAME, INFO_FILE)
-        .version_config(MAJOR, MINOR, PATCH)
-        .authors_config(authors)
-        .encrypt_key_config(KEY)
-        .with(ApplicationBuilder::Renderer::R3D)
-        .with(ApplicationBuilder::Renderer::R2D)
-        .with(ApplicationBuilder::Renderer::RImGui);
-
-    auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
-    game->add_scene(new LoadingScene, true);
-    game->add_scene(new StandardGameScene, false);
-    game->run();
 }

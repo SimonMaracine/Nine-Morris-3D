@@ -171,7 +171,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
 
                 DEB_INFO("Restarting game");
             }
-            if (ImGui::MenuItem("Load Last", nullptr, false, can_change)) {
+            if (ImGui::MenuItem("Load Last Game", nullptr, false, can_change)) {
                 // scene->board.finalize_pieces_state();  // FIXME
 
                 // game_layer->load_game();  // FIXME
@@ -179,7 +179,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", last_save_game_date.c_str());
             }
-            if (ImGui::MenuItem("Save", nullptr, false)) {
+            if (ImGui::MenuItem("Save Game", nullptr, false)) {
                 // scene->board.finalize_pieces_state();  // FIXME
 
                 save_load::SavedGame saved_game;
@@ -273,6 +273,10 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                     scene->board.set_phase(BoardPhase::GameOver);
                 }
             }
+            if (ImGui::MenuItem("Exit To Launcher", nullptr, false)) {
+                app->running = false;
+                app->exit_code = 1;
+            }
             if (ImGui::MenuItem("Exit", nullptr, false)) {
                 app->running = false;
             }
@@ -313,25 +317,6 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                     ImGui::EndMenu();
                     HOVERING_GUI();
                 }
-                if (ImGui::BeginMenu("Texture Quality")) {
-                    static int dummy = 0;  // FIXME get_texture_quality_option(data.options.texture_quality);
-
-                    if (ImGui::RadioButton("Low", &dummy, 0)) {
-                        // game_layer->set_texture_quality(options::LOW);  // FIXME
-                        app->renderer->set_depth_map_framebuffer(2048);
-
-                        // DEB_INFO("Textures set to {} quality", options::LOW);  // FIXME
-                    }
-                    if (ImGui::RadioButton("Normal", &dummy, 1)) {
-                        // game_layer->set_texture_quality(options::NORMAL);  // FIXME
-                        app->renderer->set_depth_map_framebuffer(4096);
-
-                        // DEB_INFO("Textures set to {} quality", options::NORMAL);  // FIXME
-                    }
-
-                    ImGui::EndMenu();
-                    HOVERING_GUI();
-                }
                 if (ImGui::BeginMenu("Anisotropic Filtering")) {
                     if (ImGui::RadioButton("Off", &data.options.anisotropic_filtering, 0)) {
                         // game_layer->resetup_textures();  // FIXME
@@ -366,43 +351,6 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
 
                         DEB_INFO("Set default cursor");
                     }
-                }
-                static bool normal_mapping = false;  // FIXME data.options.normal_mapping;
-                if (ImGui::MenuItem("Normal Mapping", nullptr, &normal_mapping)) {
-                    if (normal_mapping) {
-                        // game_layer->set_normal_mapping(normal_mapping);  // FIXME
-
-                        DEB_INFO("Normal mapping enabled");
-                    } else {
-                        // game_layer->set_normal_mapping(normal_mapping);  // FIXME
-
-                        DEB_INFO("Normal mapping disabled");
-                    }
-                }
-                bool foo = false;
-                if (ImGui::MenuItem("Bloom", nullptr, &foo/*&data.options.bloom*/)) {
-                    if (foo/*data.options.bloom*/) {
-                        // app->set_bloom(data.options.bloom);  // FIXME
-
-                        DEB_INFO("Bloom enabled");
-                    } else {
-                        // app->set_bloom(data.options.bloom);  // FIXME
-
-                        DEB_INFO("Bloom disabled");
-                    }
-                }
-                if (ImGui::BeginMenu("Bloom Strength")) {
-                    ImGui::PushItemWidth(100.0f);
-                    float foo = false;
-                    if (ImGui::SliderFloat("##", &foo/*&data.options.bloom_strength*/, 0.1f, 1.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
-                        // app->set_bloom_strength(data.options.bloom_strength);  // FIXME
-
-                        // DEB_INFO("Changed bloom strength to {}", data.options.bloom_strength);  // FIXME
-                    }
-                    ImGui::PopItemWidth();
-
-                    ImGui::EndMenu();
-                    HOVERING_GUI();
                 }
 
                 ImGui::EndMenu();

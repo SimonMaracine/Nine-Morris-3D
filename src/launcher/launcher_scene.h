@@ -17,6 +17,7 @@ struct LauncherScene : public Scene {
     void on_window_closed(const WindowClosedEvent& event);
 
     void welcome_page();
+    void display_page();
     void graphics_page();
 
     ImGuiWindowFlags window_flags = 0;

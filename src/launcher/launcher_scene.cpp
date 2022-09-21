@@ -231,13 +231,14 @@ void LauncherScene::on_imgui_update() {
 
     if (ImGui::BeginTabBar("tabs")) {
         welcome_page();
+        display_page();
         graphics_page();
 
         ImGui::EndTabBar();
     }
 
-    ImGui::Dummy(ImVec2(0.0f, 25.0f));
-    ImGui::Dummy(ImVec2(85.0f, 0.0f));
+    ImGui::Dummy(ImVec2(0.0f, 30.0f));
+    ImGui::Dummy(ImVec2(90.0f, 0.0f));
     ImGui::SameLine();
 
     if (ImGui::Button("Play", ImVec2(120.0f, 32.0f))) {
@@ -270,11 +271,11 @@ void LauncherScene::welcome_page() {
     }
 }
 
-void LauncherScene::graphics_page() {
+void LauncherScene::display_page() {
     auto& data = app->user_data<Data>();
 
-    if (ImGui::BeginTabItem("Graphics")) {
-        ImGui::PushItemWidth(165.0f);
+    if (ImGui::BeginTabItem("Display")) {
+        ImGui::PushItemWidth(170.0f);
 
         ImGui::Text("Fullscreen"); ImGui::SameLine();
         ImGui::Checkbox("##Fullscreen", &data.launcher_options.fullscreen);
@@ -284,12 +285,10 @@ void LauncherScene::graphics_page() {
         ImGui::Checkbox("##Native Resolution", &data.launcher_options.native_resolution);
         ImGui::SameLine(); help_marker("Window will have the monitor's resolution, instead of the resolution below");
 
-        const char* combo_preview_value = nullptr;
-
         ImGui::Text("Resolution"); ImGui::SameLine();
         static size_t resolution_index = map_resolution_to_index(data.launcher_options.resolution);
         const auto resolutions = display_manager.get_resolutions();
-        combo_preview_value = resolutions[resolution_index];
+        const char* combo_preview_value = resolutions[resolution_index];
 
         if (ImGui::BeginCombo("##Resolution", combo_preview_value)) {
             for (size_t i = 0; i < resolutions.size(); i++) {
@@ -308,10 +307,21 @@ void LauncherScene::graphics_page() {
             ImGui::EndCombo();
         }
 
+        ImGui::PopItemWidth();
+        ImGui::EndTabItem();
+    }
+}
+
+void LauncherScene::graphics_page() {
+    auto& data = app->user_data<Data>();
+
+    if (ImGui::BeginTabItem("Graphics")) {
+        ImGui::PushItemWidth(170.0f);
+
         ImGui::Text("Texture Quality"); ImGui::SameLine();
         static size_t texture_quality_index = map_texture_quality_to_index(data.launcher_options.texture_quality);
         const char* texture_qualities[] = { "Normal", "Low" };
-        combo_preview_value = texture_qualities[texture_quality_index];
+        const char* combo_preview_value = texture_qualities[texture_quality_index];
 
         if (ImGui::BeginCombo("##Texture Quality", combo_preview_value)) {
             for (size_t i = 0; i < 2; i++) {
@@ -345,7 +355,6 @@ void LauncherScene::graphics_page() {
         );
 
         ImGui::PopItemWidth();
-
         ImGui::EndTabItem();
     }
 }
