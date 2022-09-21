@@ -115,6 +115,18 @@ private:
     float last_mouse_x = 0.0f;
     float last_mouse_y = 0.0f;
 
+    // Clock variables
+    struct {
+        double previous_seconds = 0.0;
+        int frame_count = 0;
+        double total_time = 0.0;
+    } frame_counter;
+
+    struct {
+        double previous_seconds = 0.0;
+        double total_time = 0.0;
+    } fixed_update;
+
     friend class Scene;
     friend class Window;
 };

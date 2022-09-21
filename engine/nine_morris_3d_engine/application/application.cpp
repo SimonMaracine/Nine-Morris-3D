@@ -83,7 +83,11 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     evt.sink<MouseScrolledEvent>().connect<&Application::on_mouse_scrolled>(*this);
     evt.sink<MouseMovedEvent>().connect<&Application::on_mouse_moved>(*this);
 
+    DEB_INFO("Calling user start routine...");
     start(this);
+
+    frame_counter.previous_seconds = window->get_time();
+    fixed_update.previous_seconds = window->get_time();
 
     // model_render_system(registry);  // TODO replace with the other API
     // quad_render_system(registry);
@@ -92,6 +96,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 }
 
 Application::~Application() {
+    DEB_INFO("Calling user stop routine...");
     stop(this);
 
     if (builder.renderer_imgui) {
@@ -108,12 +113,10 @@ Application::~Application() {
 int Application::run() {
     ASSERT(current_scene != nullptr, "Starting scene not set");
 
-    DEB_INFO("Starting game...");
-
     prepare_scenes();
     on_start(current_scene);
 
-    DEB_INFO("Initialized game, entering main loop...");
+    DEB_INFO("Initialized application, entering main loop...");
 
     while (running) {
         delta = update_frame_counter();
@@ -138,7 +141,7 @@ int Application::run() {
         check_changed_scene();
     }
 
-    DEB_INFO("Closing game");
+    DEB_INFO("Closing application...");
 
     current_scene->on_stop();
 
@@ -192,24 +195,20 @@ void Application::purge_framebuffers() {
 float Application::update_frame_counter() {
     constexpr double MAX_DT = 1.0 / 20.0;
 
-    static double previous_seconds = window->get_time();  // FIXME static messes things up
-    static int frame_count = 0;
-    static double total_time = 0.0;
-
     frames++;
 
     const double current_seconds = window->get_time();
-    const double elapsed_seconds = current_seconds - previous_seconds;
-    previous_seconds = current_seconds;
+    const double elapsed_seconds = current_seconds - frame_counter.previous_seconds;
+    frame_counter.previous_seconds = current_seconds;
 
-    total_time += elapsed_seconds;
+    frame_counter.total_time += elapsed_seconds;
 
-    if (total_time > 0.25) {
-        fps = static_cast<double>(frame_count) / total_time;
-        frame_count = 0;
-        total_time = 0.0;
+    if (frame_counter.total_time > 0.25) {
+        fps = static_cast<double>(frame_counter.frame_count) / frame_counter.total_time;
+        frame_counter.frame_count = 0;
+        frame_counter.total_time = 0.0;
     }
-    frame_count++;
+    frame_counter.frame_count++;
 
     const double delta_time = std::min(elapsed_seconds, MAX_DT);
 
@@ -219,20 +218,17 @@ float Application::update_frame_counter() {
 unsigned int Application::calculate_fixed_update() {
     constexpr double FIXED_DT = 1.0 / 50.0;
 
-    static double previous_seconds = window->get_time();  // FIXME static messes things up
-    static double total_time = 0.0;
-
     const double current_seconds = window->get_time();
-    const double elapsed_seconds = current_seconds - previous_seconds;
-    previous_seconds = current_seconds;
+    const double elapsed_seconds = current_seconds - fixed_update.previous_seconds;
+    fixed_update.previous_seconds = current_seconds;
 
-    total_time += elapsed_seconds;
+    fixed_update.total_time += elapsed_seconds;
 
     unsigned int updates = 0;
 
     while (true) {
-        if (total_time > FIXED_DT) {
-            total_time -= FIXED_DT;
+        if (fixed_update.total_time > FIXED_DT) {
+            fixed_update.total_time -= FIXED_DT;
             updates++;
         } else {
             break;

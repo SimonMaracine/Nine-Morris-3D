@@ -30,6 +30,8 @@ static size_t map_resolution_to_index(const std::pair<int, int>& resolution) {
             return 5;
     }
 
+    REL_ERROR("Using default index for resolution");
+
     return DEFAULT;
 }
 
@@ -51,6 +53,8 @@ static std::pair<int, int> map_index_to_resolution(size_t index) {
             return {1792, 1008};
     }
 
+    REL_ERROR("Using default resolution for index");
+
     return DEFAULT;
 }
 
@@ -62,6 +66,8 @@ static size_t map_texture_quality_to_index(std::string_view texture_quality) {
     } else if (texture_quality == std::string(launcher_options::LOW)) {
         return 1;
     }
+
+    REL_ERROR("Using default index for texture_quality");
 
     return DEFAULT;
 }
@@ -76,6 +82,8 @@ static std::string map_index_to_texture_quality(size_t index) {
             return launcher_options::LOW;
     }
 
+    REL_ERROR("Using default texture_quality for index");
+
     return DEFAULT;
 }
 
@@ -83,7 +91,7 @@ static void help_marker(const char* text) {
     ImGui::TextDisabled("(?)");
 
     if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip(text);
+        ImGui::SetTooltip("%s", text);
     }
 }
 

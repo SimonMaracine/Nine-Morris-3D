@@ -10,8 +10,6 @@
 
 namespace game {
     void start(Application* app) {
-        DEB_INFO("User initializing game");
-
         srand(time(nullptr));
 
         auto& data = app->user_data<Data>();
@@ -201,6 +199,6 @@ namespace game {
     }
 
     void stop(Application*) {
-        DEB_INFO("User finalizing game");
+
     }
 }
