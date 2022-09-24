@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <cppblowfish.h>
+#include <cppblowfish/cppblowfish.h>
 
 #include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/encrypt.h"

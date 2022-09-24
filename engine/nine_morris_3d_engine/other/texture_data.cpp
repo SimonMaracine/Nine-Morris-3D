@@ -1,5 +1,5 @@
 #include <stb_image.h>
-#include <cppblowfish.h>
+#include <cppblowfish/cppblowfish.h>
 
 #include "nine_morris_3d_engine/other/texture_data.h"
 #include "nine_morris_3d_engine/other/logging.h"

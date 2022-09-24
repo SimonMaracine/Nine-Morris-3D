@@ -6,7 +6,7 @@
 #include <spdlog/version.h>
 #include <entt/entt.hpp>
 #include <cereal/version.hpp>
-#include <cppblowfish.h>
+#include <cppblowfish/cppblowfish.h>
 #include <resmanager/resmanager.h>
 
 #include "nine_morris_3d_engine/application/platform.h"

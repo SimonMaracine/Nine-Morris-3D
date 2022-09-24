@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <stb_image.h>
-#include <cppblowfish.h>
+#include <cppblowfish/cppblowfish.h>
 
 #include "nine_morris_3d_engine/application/extensions.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"

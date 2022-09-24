@@ -2,7 +2,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <glm/glm.hpp>
-#include <cppblowfish.h>
+#include <cppblowfish/cppblowfish.h>
 
 #include "nine_morris_3d_engine/other/mesh.h"
 #include "nine_morris_3d_engine/other/logging.h"

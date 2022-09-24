@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cppblowfish.h>
+#include <cppblowfish/cppblowfish.h>
 
 #include "nine_morris_3d_engine/application/platform.h"
 

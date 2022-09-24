@@ -3,7 +3,7 @@
 #include <fstream>
 #include <stdlib.h> 
 
-#include <cppblowfish.h>
+#include <cppblowfish/cppblowfish.h>
 
 static void open_file(const std::string& file_name, unsigned char** out, size_t* size) {
     std::ifstream file (file_name, std::ios::binary);
@@ -42,9 +42,9 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    std::string input_file = argv[1];
-    std::string output_file = argv[2];
-    std::string key = argv[3];
+    const std::string input_file = argv[1];
+    const std::string output_file = argv[2];
+    const std::string key = argv[3];
 
     cppblowfish::BlowfishContext blowfish (key);
 

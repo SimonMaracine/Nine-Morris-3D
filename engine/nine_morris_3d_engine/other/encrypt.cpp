@@ -1,4 +1,4 @@
-#include <cppblowfish.h>
+#include <cppblowfish/cppblowfish.h>
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/other/encrypt.h"

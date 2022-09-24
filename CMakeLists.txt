@@ -43,7 +43,7 @@ add_executable(${GAME} ${NO_CONSOLE}
     ${GAME_HEADERS}
 )
 
-# On Windows tell linker to use main instead of WinMain
+# On Windows tell linker to use main instead of WinMain  # TODO remove
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     target_link_options(${GAME} PRIVATE
         /entry:mainCRTStartup

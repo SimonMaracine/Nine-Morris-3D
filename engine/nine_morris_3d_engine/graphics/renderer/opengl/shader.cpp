@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <cppblowfish.h>
+#include <cppblowfish/cppblowfish.h>
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
