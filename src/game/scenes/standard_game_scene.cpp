@@ -3,6 +3,9 @@
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/imgui_layer.h"
 #include "game/assets.h"
+#include "game/constants.h"
+#include "game/piece.h"
+#include "game/node.h"
 #include "other/data.h"
 
 using namespace encrypt;
@@ -267,8 +270,6 @@ void StandardGameScene::initialize_rendering_board() {
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_index_buffer(indices);
 
-    VertexArray::unbind();
-
     TextureSpecification specification;
     specification.mag_filter = Filter::Linear;
     specification.mipmapping = true;
@@ -277,12 +278,14 @@ void StandardGameScene::initialize_rendering_board() {
 
     auto diffuse_texture = app->res.texture.load(
         "board_wood_diffuse_texture"_h,
-        app->res.texture_data["board_wood_diff_texture"_h], specification
+        app->res.texture_data["board_wood_diff_texture"_h],
+        specification
     );
 
     auto normal_texture = app->res.texture.load(
         "board_normal_texture"_h,
-        app->res.texture_data["board_norm_texture"_h], specification
+        app->res.texture_data["board_norm_texture"_h],
+        specification
     );
 
     auto material = app->res.material.load("wood_material"_h, shader);
@@ -344,8 +347,6 @@ void StandardGameScene::initialize_rendering_board_paint() {
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_index_buffer(indices);
 
-    VertexArray::unbind();
-
     TextureSpecification specification;
     specification.mag_filter = Filter::Linear;
     specification.mipmapping = true;
@@ -354,7 +355,8 @@ void StandardGameScene::initialize_rendering_board_paint() {
 
     auto diffuse_texture = app->res.texture.load(
         "board_paint_diffuse_texture"_h,
-        app->res.texture_data["board_paint_diff_texture"_h], specification
+        app->res.texture_data["board_paint_diff_texture"_h],
+        specification
     );
 
     auto material = app->res.material.load("board_paint_material"_h, shader);
@@ -456,6 +458,7 @@ void StandardGameScene::initialize_rendering_pieces() {
             white_piece_diffuse_texture, white_piece_vertices, white_piece_indices
         );
     }
+
     for (size_t i = 9; i < 18; i++) {
         initialize_rendering_piece(
             i, PieceType::Black, app->res.mesh_ptnt["black_piece_mesh"_h],
@@ -492,16 +495,145 @@ void StandardGameScene::initialize_rendering_piece(
     vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(indices);
 
-    VertexArray::unbind();
-
-    auto piece_material_instance = app->res.material_instance.load(
+    auto material_instance = app->res.material_instance.load(
         hs {"piece_material_instance" + std::to_string(index)},
         app->res.material["tinted_wood_material"_h]
     );
+    material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
+    material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
+    material_instance->set_float("u_material.shininess", 4.0f);
+    material_instance->set_texture("u_material.normal", app->res.texture["piece_normal_texture"_h], 1);
+    material_instance->set_vec3("u_material.tint", glm::vec3(1.0f));
+}
 
-    piece_material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
-    piece_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
-    piece_material_instance->set_float("u_material.shininess", 4.0f);
-    piece_material_instance->set_texture("u_material.normal", app->res.texture["piece_normal_texture"_h], 1);
-    piece_material_instance->set_vec3("u_material.tint", glm::vec3(1.0f));
+void StandardGameScene::initialize_rendering_nodes() {
+    auto shader = app->res.shader.load(
+        "node_shader"_h,
+        encr(paths::path_for_assets(assets::NODE_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
+        std::vector<std::string> { "u_model_matrix", "u_color" },
+        std::vector {
+            app->renderer->get_projection_view_uniform_block()
+        }
+    );
+    app->renderer->setup_shader(shader);
+
+    auto material = app->res.material.load("basic_material"_h, shader);
+    material->add_uniform(Material::Uniform::Vec4, "u_color");
+
+    auto vertices = app->res.buffer.load(
+        "node_mesh_vertices"_h,
+        app->res.mesh_p["node_mesh"_h]->vertices.data(),
+        app->res.mesh_p["node_mesh"_h]->vertices.size() * sizeof(P)
+    );
+
+    auto indices = app->res.index_buffer.load(
+        "node_mesh_indices"_h,
+        app->res.mesh_p["node_mesh"_h]->indices.data(),
+        app->res.mesh_p["node_mesh"_h]->indices.size() * sizeof(unsigned int)
+    );
+
+    for (size_t i = 0; i < 24; i++) {
+        initialize_rendering_node(i, vertices, indices);
+    }
+}
+
+void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<Buffer> vertices,
+        std::shared_ptr<IndexBuffer> indices) {
+    const hover::Id id = hover::generate_id();
+    // app->data.nodes_id[index] = id;
+
+    auto id_buffer = create_id_buffer(
+        app->res.mesh_p["node_mesh"_h]->vertices.size(), id,
+        hs {"node_id_buffer" + std::to_string(index)}
+    );
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Float, 3);
+
+    BufferLayout layout2;
+    layout2.add(1, BufferLayout::Int, 1);
+    
+    auto vertex_array = app->res.vertex_array.load("node_vertex_array"_h);
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(id_buffer, layout2);
+    vertex_array->add_index_buffer(indices);
+
+    auto material_instance = app->res.material_instance.load(
+        "node_material_instance"_h,
+        app->res.material["basic_material"_h]
+    );
+    material_instance->set_vec4("u_color", glm::vec4(0.0f));
+}
+
+void StandardGameScene::setup_and_add_model_board() {
+    board.get_model()->vertex_array = app->res.vertex_array["board_wood_vertex_array"_h];
+    board.get_model()->index_count = app->res.mesh_ptnt["board_wood_mesh"_h]->indices.size();
+    board.get_model()->scale = 20.0f;  // TODO move to constants
+    board.get_model()->material = app->res.material_instance["board_wood_material_instance"_h];
+    board.get_model()->cast_shadow = true;
+
+    app->renderer->add_model(board.get_model());
+
+    DEB_DEBUG("Setup model board");
+}
+
+void StandardGameScene::setup_and_add_model_board_paint() {
+    board.get_paint_model()->vertex_array = app->res.vertex_array["board_paint_vertex_array"_h];
+    board.get_paint_model()->index_count = app->res.mesh_ptnt["board_paint_mesh"_h]->indices.size();
+    board.get_paint_model()->position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
+    board.get_paint_model()->scale = 20.0f;
+    board.get_paint_model()->material = app->res.material_instance["board_paint_material_instance"_h];
+
+    app->renderer->add_model(board.get_paint_model());
+
+    DEB_DEBUG("Setup model board paint");
+}
+
+void StandardGameScene::setup_and_add_model_pieces() {
+    for (size_t i = 0; i < 9; i++) {
+        setup_and_add_model_piece(
+            i, app->res.mesh_ptnt["white_piece_mesh"_h]
+        );
+    }
+
+    for (size_t i = 9; i < 18; i++) {
+        setup_and_add_model_piece(
+            i, app->res.mesh_ptnt["black_piece_mesh"_h]
+        );
+    }
+}
+
+void StandardGameScene::setup_and_add_model_piece(size_t index, std::shared_ptr<Mesh<PTNT>> mesh) {
+    Piece& piece = board.get_pieces()[index].value();
+
+    piece.model->vertex_array = app->res.vertex_array["piece_vertex_array"_h];
+    piece.model->index_count = mesh->indices.size();
+    piece.model->scale = 20.0f;
+    piece.model->material = app->res.material_instance["piece_material_instance"_h];
+    piece.model->cast_shadow = true;
+
+    app->renderer->add_model(piece.model);
+
+    DEB_DEBUG("Setup model piece {}", index);
+}
+
+void StandardGameScene::setup_and_add_model_nodes() {
+    for (size_t i = 0; i < 24; i++) {
+        setup_and_add_model_node(i, NODE_POSITIONS[i]);
+    }
+}
+
+void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& position) {
+    Node& node = board.get_nodes()[index];
+
+    node.model->vertex_array = app->res.vertex_array["node_vertex_array"_h];
+    node.model->index_count = app->res.mesh_p["node_mesh"_h]->indices.size();
+    node.model->position = position;
+    node.model->scale = 20.0f;
+    node.model->material = app->res.material_instance["node_material_instance"_h];
+
+    app->renderer->add_model(node.model);
+
+    DEB_DEBUG("Setup model node {}", index);
 }

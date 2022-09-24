@@ -17,8 +17,4 @@ public:
     void add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer);
 private:
     GLuint array = 0;
-
-    // These are just to hold a strong reference to the buffers
-    // std::vector<std::shared_ptr<Buffer>> buffers;  // FIXME maybe not needed anymore
-    // std::shared_ptr<IndexBuffer> index_buffer;
 };

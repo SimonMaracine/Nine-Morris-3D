@@ -8,6 +8,7 @@
 #include "game/keyboard_controls.h"
 #include "game/game_context.h"
 #include "game/game_options.h"
+#include "game/constants.h"
 #include "game/timer.h"
 #include "game/minimax/minimax_thread.h"
 
@@ -38,6 +39,15 @@ struct StandardGameScene : public Scene {
         std::shared_ptr<Texture> diffuse_texture,
         std::shared_ptr<Buffer> vertices,
         std::shared_ptr<IndexBuffer> indices);
+    void initialize_rendering_nodes();
+    void initialize_rendering_node(size_t index, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices);
+
+    void setup_and_add_model_board();
+    void setup_and_add_model_board_paint();
+    void setup_and_add_model_pieces();
+    void setup_and_add_model_piece(size_t index, std::shared_ptr<Mesh<PTNT>> mesh);
+    void setup_and_add_model_nodes();
+    void setup_and_add_model_node(size_t index, const glm::vec3& position);
 
     // ImGui
     ImGuiLayer<StandardGameScene> imgui_layer;

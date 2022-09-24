@@ -22,6 +22,11 @@ public:
 
     GamePosition get_position();
 
+    std::shared_ptr<Renderer::Model>& get_model() { return model; }
+    std::shared_ptr<Renderer::Model>& get_paint_model() { return paint_model; }
+    std::vector<std::optional<Piece>>& get_pieces() { return pieces; }
+    std::array<Node, 24>& get_nodes() { return nodes; }
+
     BoardPhase get_phase() { return phase; }
     void set_phase(BoardPhase phase) { this->phase = phase; }
     const BoardEnding& get_ending() { return ending; }

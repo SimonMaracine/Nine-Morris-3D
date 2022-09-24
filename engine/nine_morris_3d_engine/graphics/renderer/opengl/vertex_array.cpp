@@ -58,11 +58,8 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout&
         glEnableVertexAttribArray(element.index);
         offset += element.size * VertexElement::get_size(element.type);
     }
-
-    // buffers.push_back(buffer);  // FIXME maybe not needed anymore
 }
 
 void VertexArray::add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer->buffer);
-    // this->index_buffer = index_buffer;
 }
