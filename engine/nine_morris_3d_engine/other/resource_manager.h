@@ -1,6 +1,6 @@
 #pragma once
 
-#include <entt/entt.hpp>
+#include <resmanager/resmanager.h>
 
 #include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/vertex_array.h"
@@ -17,20 +17,20 @@
 using namespace mesh;
 
 struct Resources {
-    entt::resource_cache<Texture> textures;
-    entt::resource_cache<Texture3D> textures_3d;
-    entt::resource_cache<VertexArray> vertex_arrays;
-    entt::resource_cache<Shader> shaders;
-    entt::resource_cache<Buffer> buffers;
-    entt::resource_cache<IndexBuffer> index_buffers;
-    entt::resource_cache<UniformBuffer> uniform_buffers;
-    entt::resource_cache<PixelBuffer> pixel_buffers;
-    entt::resource_cache<Framebuffer> framebuffers;
-    entt::resource_cache<Font> fonts;
-    entt::resource_cache<Material> materials;
-    entt::resource_cache<MaterialInstance> material_instances;
-    entt::resource_cache<TextureData> texture_data;
-    entt::resource_cache<Mesh<PTNT>> meshes_ptnt;
-    entt::resource_cache<Mesh<PTN>> meshes_ptn;
-    entt::resource_cache<Mesh<P>> meshes_p;
+    resmanager::Cache<Texture> texture;
+    resmanager::Cache<Texture3D> texture_3d;
+    resmanager::Cache<VertexArray> vertex_array;
+    resmanager::Cache<Shader> shader;
+    resmanager::Cache<Buffer> buffer;
+    resmanager::Cache<IndexBuffer> index_buffer;
+    resmanager::Cache<UniformBuffer> uniform_buffer;
+    resmanager::Cache<PixelBuffer> pixel_buffer;
+    resmanager::Cache<Framebuffer> framebuffer;
+    resmanager::Cache<Font> font;
+    resmanager::Cache<Material> material;
+    resmanager::Cache<MaterialInstance> material_instance;
+    resmanager::Cache<TextureData> texture_data;
+    resmanager::Cache<Mesh<PTNT>> mesh_ptnt;
+    resmanager::Cache<Mesh<PTN>> mesh_ptn;
+    resmanager::Cache<Mesh<P>> mesh_p;
 };

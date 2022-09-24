@@ -210,7 +210,7 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
     } 
 }
 
-std::shared_ptr<Buffer> StandardGameScene::create_ids_buffer(size_t vertices_size, hover::Id id) {
+std::shared_ptr<Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, hover::Id id, hs hash) {
     std::vector<int> array;
     array.resize(vertices_size);
 
@@ -218,13 +218,14 @@ std::shared_ptr<Buffer> StandardGameScene::create_ids_buffer(size_t vertices_siz
         array[i] = static_cast<int>(id);
     }
 
-    return std::make_shared<Buffer>(array.data(), array.size() * sizeof(int));
+    return app->res.buffer.load(hash, array.data(), array.size() * sizeof(int));
 }
 
 void StandardGameScene::initialize_rendering_board() {
     auto& data = app->user_data<Data>();
 
-    auto shader = app->res.shaders.load("board_wood_shader"_hs,
+    auto shader = app->res.shader.load(
+        "board_wood_shader"_h,
         encr(paths::path_for_assets(assets::BOARD_VERTEX_SHADER)),
         encr(paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
         std::vector<std::string> {
@@ -235,7 +236,7 @@ void StandardGameScene::initialize_rendering_board() {
             "u_material.shininess",
             "u_material.normal"
         },
-        std::vector<UniformBlockSpecification> {
+        std::vector {
             app->renderer->get_projection_view_uniform_block(),
             app->renderer->get_light_uniform_block(),
             app->renderer->get_light_view_position_uniform_block(),
@@ -244,14 +245,16 @@ void StandardGameScene::initialize_rendering_board() {
     );
     app->renderer->setup_shader(shader);
 
-    auto vertices = app->res.buffers.load("board_wood_mesh_vertices"_hs,
-        data.res_thread.meshes_ptnt["board_wood_mesh_vertices"_hs]->vertices.data(),
-        data.res_thread.meshes_ptnt["board_wood_mesh_vertices"_hs]->vertices.size() * sizeof(PTNT)
+    auto vertices = app->res.buffer.load(
+        "board_wood_mesh_vertices"_h,
+        app->res.mesh_ptnt["board_wood_mesh"_h]->vertices.data(),
+        app->res.mesh_ptnt["board_wood_mesh"_h]->vertices.size() * sizeof(PTNT)
     );
 
-    auto indices = app->res.index_buffers.load("board_wood_mesh_indices"_hs,
-        data.res_thread.meshes_ptnt["board_wood_mesh_vertices"_hs]->indices.data(),
-        data.res_thread.meshes_ptnt["board_wood_mesh_vertices"_hs]->indices.size() * sizeof(unsigned int)
+    auto indices = app->res.index_buffer.load(
+        "board_wood_mesh_indices"_h,
+        app->res.mesh_ptnt["board_wood_mesh"_h]->indices.data(),
+        app->res.mesh_ptnt["board_wood_mesh"_h]->indices.size() * sizeof(unsigned int)
     );
 
     BufferLayout layout;
@@ -260,7 +263,7 @@ void StandardGameScene::initialize_rendering_board() {
     layout.add(2, BufferLayout::Float, 3);
     layout.add(3, BufferLayout::Float, 3);
 
-    auto vertex_array = app->res.vertex_arrays.load("board_wood_vertex_array"_hs);
+    auto vertex_array = app->res.vertex_array.load("board_wood_vertex_array"_h);
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_index_buffer(indices);
 
@@ -272,21 +275,23 @@ void StandardGameScene::initialize_rendering_board() {
     specification.bias = -2.0f;
     specification.anisotropic_filtering = data.options.anisotropic_filtering;
 
-    auto diffuse_texture = app->res.textures.load("board_wood_diffuse_texture"_hs,
-        data.res_thread.texture_data["board_wood_diff_texture"_hs], specification
+    auto diffuse_texture = app->res.texture.load(
+        "board_wood_diffuse_texture"_h,
+        app->res.texture_data["board_wood_diff_texture"_h], specification
     );
 
-    auto normal_texture = app->res.textures.load("board_normal_texture"_hs,
-        data.res_thread.texture_data["board_norm_texture"_hs], specification
+    auto normal_texture = app->res.texture.load(
+        "board_normal_texture"_h,
+        app->res.texture_data["board_norm_texture"_h], specification
     );
 
-    auto material = app->res.materials.load("wood_material"_hs, shader);
+    auto material = app->res.material.load("wood_material"_h, shader);
     material->add_texture("u_material.diffuse");
     material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
     material->add_uniform(Material::Uniform::Float, "u_material.shininess");
     material->add_texture("u_material.normal");
 
-    auto material_instance = app->res.material_instances.load("board_wood_material_instance"_hs, material);
+    auto material_instance = app->res.material_instance.load("board_wood_material_instance"_h, material);
     material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
     material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess", 4.0f);
@@ -294,14 +299,209 @@ void StandardGameScene::initialize_rendering_board() {
 }
 
 void StandardGameScene::initialize_rendering_board_paint() {
+    auto& data = app->user_data<Data>();
 
+    auto shader = app->res.shader.load(
+        "board_paint_shader"_h,
+        encr(paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
+        std::vector<std::string> {
+            "u_model_matrix",
+            "u_shadow_map",
+            "u_material.diffuse",
+            "u_material.specular",
+            "u_material.shininess",
+            "u_material.normal"
+        },
+        std::vector {
+            app->renderer->get_projection_view_uniform_block(),
+            app->renderer->get_light_uniform_block(),
+            app->renderer->get_light_view_position_uniform_block(),
+            app->renderer->get_light_space_uniform_block()
+        }
+    );
+    app->renderer->setup_shader(shader);
+
+    auto vertices = app->res.buffer.load(
+        "board_paint_mesh_vertices"_h,
+        app->res.mesh_ptnt["board_paint_mesh"_h]->vertices.data(),
+        app->res.mesh_ptnt["board_paint_mesh"_h]->vertices.size() * sizeof(PTNT)
+    );
+
+    auto indices = app->res.index_buffer.load(
+        "board_paint_mesh_indices"_h,
+        app->res.mesh_ptnt["board_paint_mesh"_h]->indices.data(),
+        app->res.mesh_ptnt["board_paint_mesh"_h]->indices.size() * sizeof(unsigned int)
+    );
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Float, 3);
+    layout.add(1, BufferLayout::Float, 2);
+    layout.add(2, BufferLayout::Float, 3);
+    layout.add(3, BufferLayout::Float, 3);
+
+    auto vertex_array = app->res.vertex_array.load("board_paint_vertex_array"_h);
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_index_buffer(indices);
+
+    VertexArray::unbind();
+
+    TextureSpecification specification;
+    specification.mag_filter = Filter::Linear;
+    specification.mipmapping = true;
+    specification.bias = -1.0f;
+    specification.anisotropic_filtering = data.options.anisotropic_filtering;
+
+    auto diffuse_texture = app->res.texture.load(
+        "board_paint_diffuse_texture"_h,
+        app->res.texture_data["board_paint_diff_texture"_h], specification
+    );
+
+    auto material = app->res.material.load("board_paint_material"_h, shader);
+    material->add_texture("u_material.diffuse");
+    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
+    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
+    material->add_texture("u_material.normal");
+
+    auto material_instance = app->res.material_instance.load("board_paint_material_instance"_h, material);
+    material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
+    material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
+    material_instance->set_float("u_material.shininess", 4.0f);
+    material_instance->set_texture("u_material.normal", app->res.texture["board_normal_texture"_h], 1);
 }
 
 void StandardGameScene::initialize_rendering_pieces() {
+    auto& data = app->user_data<Data>();
 
+    auto shader = app->res.shader.load(
+        "piece_shader"_h,
+        encr(paths::path_for_assets(assets::PIECE_VERTEX_SHADER)),
+        encr(paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
+        std::vector<std::string> {
+            "u_model_matrix",
+            "u_shadow_map",
+            "u_material.diffuse",
+            "u_material.specular",
+            "u_material.shininess",
+            "u_material.normal",
+            "u_material.tint"
+        },
+        std::vector {
+            app->renderer->get_projection_view_uniform_block(),
+            app->renderer->get_light_uniform_block(),
+            app->renderer->get_light_view_position_uniform_block(),
+            app->renderer->get_light_space_uniform_block()
+        }
+    );
+    app->renderer->setup_shader(shader);
+
+    TextureSpecification specification;
+    specification.mag_filter = Filter::Linear;
+    specification.mipmapping = true;
+    specification.bias = -1.5f;
+    specification.anisotropic_filtering = data.options.anisotropic_filtering;
+
+    auto white_piece_diffuse_texture = app->res.texture.load(
+        "white_piece_diffuse_texture"_h,
+        app->res.texture_data["white_piece_diff_texture"_h],
+        specification
+    );
+
+    auto black_piece_diffuse_texture = app->res.texture.load(
+        "black_piece_diffuse_texture"_h,
+        app->res.texture_data["black_piece_diff_texture"_h],
+        specification
+    );
+
+    auto piece_normal_texture = app->res.texture.load(
+        "piece_normal_texture"_h,
+        app->res.texture_data["piece_norm_texture"_h],
+        specification
+    );
+
+    auto material = app->res.material.load("tinted_wood_material"_h, shader);
+    material->add_texture("u_material.diffuse");
+    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
+    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
+    material->add_texture("u_material.normal");
+    material->add_uniform(Material::Uniform::Vec3, "u_material.tint");
+
+    auto white_piece_vertices = app->res.buffer.load(
+        "white_piece_vertices"_h,
+        app->res.mesh_ptnt["white_piece_mesh"_h]->vertices.data(),
+        app->res.mesh_ptnt["white_piece_mesh"_h]->vertices.size() * sizeof(PTNT)
+    );
+
+    auto white_piece_indices = app->res.index_buffer.load(
+        "white_piece_indices"_h,
+        app->res.mesh_ptnt["white_piece_mesh"_h]->indices.data(),
+        app->res.mesh_ptnt["white_piece_mesh"_h]->indices.size() * sizeof(unsigned int)
+    );
+
+    auto black_piece_vertices = app->res.buffer.load(
+        "white_piece_vertices"_h,
+        app->res.mesh_ptnt["black_piece_mesh"_h]->vertices.data(),
+        app->res.mesh_ptnt["black_piece_mesh"_h]->vertices.size() * sizeof(PTNT)
+    );
+
+    auto black_piece_indices = app->res.index_buffer.load(
+        "black_piece_indices"_h,
+        app->res.mesh_ptnt["black_piece_mesh"_h]->indices.data(),
+        app->res.mesh_ptnt["black_piece_mesh"_h]->indices.size() * sizeof(unsigned int)
+    );
+
+    for (size_t i = 0; i < 9; i++) {
+        initialize_rendering_piece(
+            i, PieceType::White, app->res.mesh_ptnt["white_piece_mesh"_h],
+            white_piece_diffuse_texture, white_piece_vertices, white_piece_indices
+        );
+    }
+    for (size_t i = 9; i < 18; i++) {
+        initialize_rendering_piece(
+            i, PieceType::Black, app->res.mesh_ptnt["black_piece_mesh"_h],
+            black_piece_diffuse_texture, black_piece_vertices, black_piece_indices
+        );
+    }
 }
 
-void StandardGameScene::initialize_rendering_piece(size_t index, PieceType type, std::shared_ptr<Mesh<PTNT>> mesh,
-        std::shared_ptr<Texture> diffuse_texture, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices) {
+void StandardGameScene::initialize_rendering_piece(
+        size_t index, PieceType type,
+        std::shared_ptr<Mesh<PTNT>> mesh,
+        std::shared_ptr<Texture> diffuse_texture,
+        std::shared_ptr<Buffer> vertices,
+        std::shared_ptr<IndexBuffer> indices) {
+    const hover::Id id = hover::generate_id();
+    // app->data.pieces_id[index] = id;
 
+    auto id_buffer = create_id_buffer(
+        mesh->vertices.size(), id,
+        hs {"piece_id_buffer" + std::to_string(index)}
+    );
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Float, 3);
+    layout.add(1, BufferLayout::Float, 2);
+    layout.add(2, BufferLayout::Float, 3);
+    layout.add(3, BufferLayout::Float, 3);
+
+    BufferLayout layout2;
+    layout2.add(4, BufferLayout::Int, 1);
+
+    auto vertex_array = app->res.vertex_array.load(hs {"piece_vertex_array" + std::to_string(index)});
+    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(id_buffer, layout2);
+    vertex_array->add_index_buffer(indices);
+
+    VertexArray::unbind();
+
+    auto piece_material_instance = app->res.material_instance.load(
+        hs {"piece_material_instance" + std::to_string(index)},
+        app->res.material["tinted_wood_material"_h]
+    );
+
+    piece_material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
+    piece_material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
+    piece_material_instance->set_float("u_material.shininess", 4.0f);
+    piece_material_instance->set_texture("u_material.normal", app->res.texture["piece_normal_texture"_h], 1);
+    piece_material_instance->set_vec3("u_material.tint", glm::vec3(1.0f));
 }

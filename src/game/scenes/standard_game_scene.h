@@ -27,13 +27,17 @@ struct StandardGameScene : public Scene {
     void on_key_pressed(const KeyPressedEvent& event);
     void on_key_released(const KeyReleasedEvent& event);
 
-    std::shared_ptr<Buffer> create_ids_buffer(size_t vertices_size, hover::Id id);
+    std::shared_ptr<Buffer> create_id_buffer(size_t vertices_size, hover::Id id, hs hash);
 
     void initialize_rendering_board();
     void initialize_rendering_board_paint();
     void initialize_rendering_pieces();
-    void initialize_rendering_piece(size_t index, PieceType type, std::shared_ptr<Mesh<PTNT>> mesh,
-        std::shared_ptr<Texture> diffuse_texture, std::shared_ptr<Buffer> vertices, std::shared_ptr<IndexBuffer> indices);
+    void initialize_rendering_piece(
+        size_t index, PieceType type,
+        std::shared_ptr<Mesh<PTNT>> mesh,
+        std::shared_ptr<Texture> diffuse_texture,
+        std::shared_ptr<Buffer> vertices,
+        std::shared_ptr<IndexBuffer> indices);
 
     // ImGui
     ImGuiLayer<StandardGameScene> imgui_layer;

@@ -39,7 +39,10 @@
 #include <cereal/types/base_class.hpp>
 
 #include <entt/entt.hpp>
-using namespace entt::literals;
+
+#include <resmanager/resmanager.h>
+using namespace resmanager::literals;
+using hs = resmanager::hashed_str;
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

@@ -170,12 +170,9 @@ target_precompile_headers(${ENGINE} PRIVATE "engine/pch.h")
 target_precompile_headers(${GAME} PRIVATE "src/pch.h")
 
 add_subdirectory(extern/spdlog)
-add_subdirectory(extern/glm)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/assimp)
-add_subdirectory(extern/utfcpp)
 add_subdirectory(extern/cppblowfish)
-add_subdirectory(extern/entt)
 
 add_dependencies(${ENGINE} glfw)  # This is necessary for some reason
 
@@ -197,6 +194,7 @@ target_include_directories(${ENGINE} SYSTEM PRIVATE
     "${CMAKE_SOURCE_DIR}/extern/utfcpp/source"
     "${CMAKE_SOURCE_DIR}/extern/cppblowfish/include"
     "${CMAKE_SOURCE_DIR}/extern/entt/src"
+    "${CMAKE_SOURCE_DIR}/extern/resmanager/src"
 )
 
 target_include_directories(${GAME} PRIVATE
@@ -216,6 +214,7 @@ target_include_directories(${GAME} SYSTEM PRIVATE
     "${CMAKE_SOURCE_DIR}/extern/utfcpp/source"
     "${CMAKE_SOURCE_DIR}/extern/cppblowfish/include"
     "${CMAKE_SOURCE_DIR}/extern/entt/src"
+    "${CMAKE_SOURCE_DIR}/extern/resmanager/src"
 )
 
 target_include_directories(${GLAD_STB} SYSTEM PRIVATE

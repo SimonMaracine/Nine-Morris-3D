@@ -24,9 +24,9 @@ KeyboardControls::KeyboardControls(GenericBoard* board)
     quad->texture = (
         board->player_must_take_piece()
             ?
-            board->app->res.textures["keyboard_controls_cross_texture"_hs]
+            board->app->res.texture["keyboard_controls_cross_texture"_h]
             :
-            board->app->res.textures["keyboard_controls_texture"_hs]
+            board->app->res.texture["keyboard_controls_texture"_h]
     );
 }
 

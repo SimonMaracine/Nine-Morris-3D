@@ -29,3 +29,6 @@
 [submodule "extern/entt"]
 	path = extern/entt
 	url = https://github.com/SimonMaracine/entt.git
+[submodule "extern/resmanager"]
+	path = extern/resmanager
+	url = https://github.com/SimonMaracine/resource-manager.git

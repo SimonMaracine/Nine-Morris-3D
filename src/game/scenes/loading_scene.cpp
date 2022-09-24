@@ -9,11 +9,11 @@
 void LoadingScene::on_start() {
     auto& data = app->user_data<Data>();
 
-    loader = std::make_unique<ConcurrentLoader<game_options::GameOptions>>(data.res_thread, assets_load_functions::all_start);
+    loader = std::make_unique<ConcurrentLoader<game_options::GameOptions>>(assets_load_functions::all_start);
     loader->start_loading_thread(data.options);
 
     auto loading_text = std::make_shared<gui::Text>(
-        app->res.fonts["good_dog_plain_font"_hs], "Loading...", 1.2f, glm::vec3(0.81f)
+        app->res.font["good_dog_plain_font"_h], "Loading...", 1.2f, glm::vec3(0.81f)
     );
     loading_text->stick(gui::Sticky::SE);
     loading_text->offset(22, gui::Relative::Right)->offset(20, gui::Relative::Bottom);
@@ -29,14 +29,14 @@ void LoadingScene::on_start() {
     specification.min_filter = Filter::Linear;
     specification.mag_filter = Filter::Linear;
 
-    app->res.textures.load("splash_screen_texture"_hs, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+    app->res.texture.load("splash_screen_texture"_h, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
 }
 
 void LoadingScene::on_stop() {
     DEB_INFO("Done loading assets; initializing the rest of the game...");
 
-    loader->join();
-    loader = nullptr;
+    loader->join_and_merge(app->res);
+    loader.reset();
 
     app->gui_renderer->clear();
 }
@@ -46,7 +46,7 @@ void LoadingScene::on_update() {
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
     app->gui_renderer->im_draw_quad(
-        glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.textures["splash_screen_texture"_hs]
+        glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.texture["splash_screen_texture"_h]
     );
 
     if (loader->done_loading()) {

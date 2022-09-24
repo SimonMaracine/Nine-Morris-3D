@@ -153,7 +153,7 @@ void LauncherScene::on_start() {
     specification.min_filter = Filter::Linear;
     specification.mag_filter = Filter::Linear;
 
-    app->res.textures.load("splash_screen"_hs, encr(path_for_assets(SPLASH_SCREEN)), specification);
+    app->res.texture.load("splash_screen"_h, encr(path_for_assets(SPLASH_SCREEN)), specification);
 
     // Load options
     using namespace launcher_options;
@@ -221,7 +221,7 @@ void LauncherScene::on_imgui_update() {
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
     app->gui_renderer->im_draw_quad(
-        glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.textures["splash_screen"_hs]
+        glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.texture["splash_screen"_h]
     );
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();

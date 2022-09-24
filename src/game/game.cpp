@@ -80,7 +80,7 @@ namespace game {
                 AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
             );
 
-            auto framebuffer = app->res.framebuffers.load("scene_framebuffer"_hs, specification);
+            auto framebuffer = app->res.framebuffer.load("scene_framebuffer"_h, specification);
 
             app->renderer->set_scene_framebuffer(framebuffer);
         }
@@ -107,7 +107,7 @@ namespace game {
 
         // Load and create this font
         {
-            auto font = app->res.fonts.load("good_dog_plain_font"_hs, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
+            auto font = app->res.font.load("good_dog_plain_font"_h, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
 
             font->begin_baking();  // TODO maybe move part of texture baking to thread
             font->bake_characters(32, 127);

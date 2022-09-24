@@ -8,7 +8,6 @@
 struct Data {
     launcher_options::LauncherOptions launcher_options;
     game_options::GameOptions options;
-    Resources res_thread;
 
     unsigned int arrow_cursor = 0;
     unsigned int cross_cursor = 0;
