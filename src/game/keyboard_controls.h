@@ -17,7 +17,7 @@ public:
         Right = 3
     };
 
-    void initialize();
+    void initialize_refs();
     void move(Direction direction);
     bool press(bool& first_move);
 

@@ -8,10 +8,10 @@ struct Node;
 
 struct Piece {
     Piece() = default;
-    Piece(size_t index, PieceType type, hover::Id id)  // FIXME id?
+    Piece(size_t index, PieceType type, hover::Id id)  // FIXME id? store it in Renderer::Model?
         : index(index), type(type) {}
 
-    size_t index = INVALID_INDEX;  // From 0 through 17
+    size_t index = INVALID_INDEX;  // From 0 through 17 on standard game
 
     PieceType type = PieceType::None;
     bool in_use = false;  // true, if it is on the board
@@ -31,7 +31,7 @@ struct Piece {
         bool reached_target1 = false;
         bool moving = false;
     } movement;
-    
+
     bool show_outline = false;
     bool to_take = false;
     bool pending_remove = false;

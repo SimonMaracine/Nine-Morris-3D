@@ -30,7 +30,7 @@ KeyboardControls::KeyboardControls(GenericBoard* board)
     );
 }
 
-void KeyboardControls::initialize() {
+void KeyboardControls::initialize_refs() {
     board->keyboard = this;
 
     nodes[0].neighbors(nullptr, &nodes[9], nullptr, &nodes[1]);

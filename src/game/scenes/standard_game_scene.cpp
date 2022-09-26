@@ -11,9 +11,46 @@
 using namespace encrypt;
 
 void StandardGameScene::on_start() {
+    auto& data = app->user_data<Data>();
+
     imgui_layer.update();
 
-    DEB_INFO("Entered game scene");
+    undo_redo_state = UndoRedoState {};
+    board = StandardBoard {app};
+
+    setup_entities_board();
+
+    setup_and_add_model_board();
+    setup_and_add_model_board_paint();
+    setup_and_add_model_pieces();
+    setup_and_add_model_nodes();
+
+    setup_camera();
+
+    keyboard = KeyboardControls {&board};
+    keyboard.initialize_refs();
+
+    minimax_thread = MinimaxThread {&board};
+
+    game = GameContext {
+        static_cast<GamePlayer>(data.options.white_player),
+        static_cast<GamePlayer>(data.options.black_player),
+        &board,
+        &minimax_thread
+    };
+
+    board.undo_redo_state = &undo_redo_state;
+    board.keyboard = &keyboard;
+    board.game_context = &game;
+
+    app->window->set_cursor(data.options.custom_cursor ? data.arrow_cursor : 0);
+
+#ifdef PLATFORM_GAME_DEBUG
+    app->renderer->origin = true;
+    app->renderer->add_quad(light_bulb_quad);  // FIXME create light_bulb_quad
+#endif
+
+    camera.go_towards_position(default_camera_position);
 }
 
 void StandardGameScene::on_stop() {
@@ -48,7 +85,7 @@ void StandardGameScene::on_imgui_update() {
         imgui_layer.draw_could_not_load_game();
     } else if (imgui_layer.show_no_last_game) {
         imgui_layer.draw_no_last_game();
-    } else if (board.get_phase() == BoardPhase::GameOver) {
+    } else if (board.phase == BoardPhase::GameOver) {
         imgui_layer.draw_game_over();
     }
 
@@ -79,7 +116,7 @@ void StandardGameScene::on_imgui_update() {
 
 void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
     if (event.button == input::MouseButton::LEFT) {
-        if (board.get_next_move()) {
+        if (board.next_move) {
             // board.press(app->renderer->get_hovered_id());  // FIXME make these calls actually do the thing
         }
     }
@@ -87,16 +124,16 @@ void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& e
 
 void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
     if (event.button == input::MouseButton::LEFT) {
-        if (board.get_next_move() && board.get_is_players_turn()) {
+        if (board.next_move && board.is_players_turn) {
             bool did = false;
 
-            if (board.get_phase() == BoardPhase::PlacePieces) {
+            if (board.phase == BoardPhase::PlacePieces) {
                 if (board.player_must_take_piece()) {
                     // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
                 } else {
                     // did = board.place_piece(app->renderer->get_hovered_id());  // FIXME
                 }
-            } else if (board.get_phase() == BoardPhase::MovePieces) {
+            } else if (board.phase == BoardPhase::MovePieces) {
                 if (board.player_must_take_piece()) {
                     // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
                 } else {
@@ -114,7 +151,7 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
                 first_move = true;
             }
 
-            if (board.get_phase() == BoardPhase::GameOver) {
+            if (board.phase == BoardPhase::GameOver) {
                 timer.stop();
             }
 
@@ -180,7 +217,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
             );
             break;
         case input::Key::ENTER:
-            if (board.get_next_move() && board.get_is_players_turn()) {
+            if (board.next_move && board.is_players_turn) {
                 const bool did = keyboard.press(first_move);
 
                 if (did) {
@@ -192,7 +229,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
                     first_move = true;
                 }
 
-                if (board.get_phase() == BoardPhase::GameOver) {
+                if (board.phase == BoardPhase::GameOver) {
                     timer.stop();
                 }
 
@@ -553,7 +590,7 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
 
     BufferLayout layout2;
     layout2.add(1, BufferLayout::Int, 1);
-    
+
     auto vertex_array = app->res.vertex_array.load("node_vertex_array"_h);
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_buffer(id_buffer, layout2);
@@ -567,25 +604,25 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
 }
 
 void StandardGameScene::setup_and_add_model_board() {
-    board.get_model()->vertex_array = app->res.vertex_array["board_wood_vertex_array"_h];
-    board.get_model()->index_count = app->res.mesh_ptnt["board_wood_mesh"_h]->indices.size();
-    board.get_model()->scale = 20.0f;  // TODO move to constants
-    board.get_model()->material = app->res.material_instance["board_wood_material_instance"_h];
-    board.get_model()->cast_shadow = true;
+    board.model->vertex_array = app->res.vertex_array["board_wood_vertex_array"_h];
+    board.model->index_count = app->res.mesh_ptnt["board_wood_mesh"_h]->indices.size();
+    board.model->scale = WORLD_SCALE;
+    board.model->material = app->res.material_instance["board_wood_material_instance"_h];
+    board.model->cast_shadow = true;
 
-    app->renderer->add_model(board.get_model());
+    app->renderer->add_model(board.model);
 
     DEB_DEBUG("Setup model board");
 }
 
 void StandardGameScene::setup_and_add_model_board_paint() {
-    board.get_paint_model()->vertex_array = app->res.vertex_array["board_paint_vertex_array"_h];
-    board.get_paint_model()->index_count = app->res.mesh_ptnt["board_paint_mesh"_h]->indices.size();
-    board.get_paint_model()->position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
-    board.get_paint_model()->scale = 20.0f;
-    board.get_paint_model()->material = app->res.material_instance["board_paint_material_instance"_h];
+    board.paint_model->vertex_array = app->res.vertex_array["board_paint_vertex_array"_h];
+    board.paint_model->index_count = app->res.mesh_ptnt["board_paint_mesh"_h]->indices.size();
+    board.paint_model->position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
+    board.paint_model->scale = WORLD_SCALE;
+    board.paint_model->material = app->res.material_instance["board_paint_material_instance"_h];
 
-    app->renderer->add_model(board.get_paint_model());
+    app->renderer->add_model(board.paint_model);
 
     DEB_DEBUG("Setup model board paint");
 }
@@ -605,11 +642,11 @@ void StandardGameScene::setup_and_add_model_pieces() {
 }
 
 void StandardGameScene::setup_and_add_model_piece(size_t index, std::shared_ptr<Mesh<PTNT>> mesh) {
-    Piece& piece = board.get_pieces()[index].value();
+    Piece& piece = board.pieces[index].value();
 
     piece.model->vertex_array = app->res.vertex_array["piece_vertex_array"_h];
     piece.model->index_count = mesh->indices.size();
-    piece.model->scale = 20.0f;
+    piece.model->scale = WORLD_SCALE;
     piece.model->material = app->res.material_instance["piece_material_instance"_h];
     piece.model->cast_shadow = true;
 
@@ -625,15 +662,127 @@ void StandardGameScene::setup_and_add_model_nodes() {
 }
 
 void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& position) {
-    Node& node = board.get_nodes()[index];
+    Node& node = board.nodes[index];
 
     node.model->vertex_array = app->res.vertex_array["node_vertex_array"_h];
     node.model->index_count = app->res.mesh_p["node_mesh"_h]->indices.size();
     node.model->position = position;
-    node.model->scale = 20.0f;
+    node.model->scale = WORLD_SCALE;
     node.model->material = app->res.material_instance["node_material_instance"_h];
 
     app->renderer->add_model(node.model);
 
     DEB_DEBUG("Setup model node {}", index);
+}
+
+void StandardGameScene::setup_entities_board() {
+    auto& data = app->user_data<Data>();
+
+    for (size_t i = 0; i < 9; i++) {
+        Piece piece = Piece {i, PieceType::White, data.pieces_id[i]};
+        piece.model->position = WHITE_PIECE_POSITION(i);
+        piece.model->rotation = RANDOM_PIECE_ROTATION();
+
+        board.pieces.push_back(std::make_optional<Piece>(piece));  // FIXME think this through
+    }
+    for (size_t i = 9; i < 18; i++) {
+        Piece piece = Piece {i, PieceType::Black, data.pieces_id[i]};
+        piece.model->position = BLACK_PIECE_POSITION(i);
+        piece.model->rotation = RANDOM_PIECE_ROTATION();
+
+        board.pieces.push_back(std::make_optional<Piece>(piece));  // FIXME think this through
+    }
+    for (size_t i = 0; i < 24; i++) {
+        Node node = Node {i, data.nodes_id[i]};
+
+        board.nodes[i] = node;
+    }
+
+    DEB_DEBUG("Setup board's entities");
+}
+
+void StandardGameScene::setup_ids_board() {
+    auto& data = app->user_data<Data>();
+
+    for (size_t i = 0; i < 9; i++) {
+        // board.pieces[i].value().id = data.pieces_id[i];  // FIXME think this through
+    }
+    for (size_t i = 9; i < 18; i++) {
+        // board.pieces[i].value().id = data.pieces_id[i];  // FIXME this
+    }
+    for (size_t i = 0; i < 24; i++) {
+        // board.nodes[i].id = data.nodes_id[i];  // FIXME this
+    }
+
+    DEB_DEBUG("Setup board's entities' IDs");
+}
+
+void StandardGameScene::setup_skybox() {
+    std::array<std::shared_ptr<TextureData>, 6> data = {
+        app->res.texture_data["skybox_px_texture"_h],
+        app->res.texture_data["skybox_nx_texture"_h],
+        app->res.texture_data["skybox_py_texture"_h],
+        app->res.texture_data["skybox_ny_texture"_h],
+        app->res.texture_data["skybox_pz_texture"_h],
+        app->res.texture_data["skybox_nz_texture"_h]
+    };
+
+    auto texture = app->res.texture_3d.force_load("skybox_texture"_h, data);
+    app->renderer->set_skybox(texture);
+
+    DEB_DEBUG("Setup skybox");
+}
+
+void StandardGameScene::setup_light() {
+    auto& data = app->user_data<Data>();
+
+    if (data.options.skybox == game_options::FIELD) {
+        app->renderer->light = LIGHT_FIELD;
+        app->renderer->light_space = SHADOWS_FIELD;
+
+#ifdef PLATFORM_GAME_DEBUG
+        light_bulb_quad->position = LIGHT_FIELD.position;
+#endif
+    } else if (data.options.skybox == game_options::AUTUMN) {
+        app->renderer->light = LIGHT_AUTUMN;
+        app->renderer->light_space = SHADOWS_AUTUMN;
+
+#ifdef PLATFORM_GAME_DEBUG
+        light_bulb_quad->position = LIGHT_AUTUMN.position;
+#endif
+    } else {
+        ASSERT(false, "Invalid skybox");
+    }
+
+    DEB_DEBUG("Setup light");
+}
+
+void StandardGameScene::setup_camera() {
+    auto& data = app->user_data<Data>();
+
+    const glm::mat4 projection = glm::perspective(
+        glm::radians(FOV),
+        static_cast<float>(app->data().width) / app->data().height,
+        NEAR, FAR
+    );
+
+    camera = Camera {
+        data.options.sensitivity,
+        47.0f,
+        glm::vec3(0.0f),
+        8.0f,
+        projection
+    };
+
+    default_camera_position = camera.get_position();
+
+    camera = Camera {
+        data.options.sensitivity,
+        47.0f,
+        glm::vec3(0.0f),
+        8.7f,
+        projection
+    };
+
+    DEB_DEBUG("Setup camera");
 }

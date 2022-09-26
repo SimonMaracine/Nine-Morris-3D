@@ -49,6 +49,12 @@ struct StandardGameScene : public Scene {
     void setup_and_add_model_nodes();
     void setup_and_add_model_node(size_t index, const glm::vec3& position);
 
+    void setup_entities_board();
+    void setup_ids_board();
+    void setup_skybox();
+    void setup_light();
+    void setup_camera();
+
     // ImGui
     ImGuiLayer<StandardGameScene> imgui_layer;
 

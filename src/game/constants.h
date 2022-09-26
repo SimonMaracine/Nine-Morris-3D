@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+
 #define ACTIVE_PIECES(result) \
     std::vector<Piece*> result; \
     for (std::optional<Piece>& piece : pieces) { \
@@ -17,6 +19,11 @@
 #define WAIT_FOR_NEXT_MOVE() next_move = false
 #define CAN_MAKE_MOVE() next_move = true
 
+#define PIECE_Y_FLOATING_POSITION 0.3f
+#define WHITE_PIECE_POSITION(i) glm::vec3(-4.0f, PIECE_Y_FLOATING_POSITION, -2.0f + (i) * 0.49f)
+#define BLACK_PIECE_POSITION(i) glm::vec3(4.0f, PIECE_Y_FLOATING_POSITION, -2.0f + ((i) - 9) * 0.49f)
+#define RANDOM_PIECE_ROTATION() glm::vec3(0.0f, glm::radians(static_cast<float>(rand() % 360)), 0.0f)
+
 constexpr size_t NINE_MENS_MORRIS_MILLS = 16;
 constexpr size_t WINDMILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
@@ -32,6 +39,34 @@ constexpr size_t WINDMILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS][3] = {
     { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 },
     { 0, 3, 6 }, { 2, 5, 8 }, { 15, 18, 21 }, { 17, 20, 23 }
+};
+
+constexpr DirectionalLight LIGHT_FIELD = {
+    glm::vec3(5.7f, 8.4f, 12.4f),
+    glm::vec3(0.4f),
+    glm::vec3(0.88f),
+    glm::vec3(0.9f)
+};
+
+constexpr Renderer::LightSpace SHADOWS_FIELD = {
+    -4.7f, 4.7f,
+    -1.9f, 2.76f,
+    1.0f, 9.0f,
+    3.1f
+};
+
+constexpr DirectionalLight LIGHT_AUTUMN = {
+    glm::vec3(-4.4f, 11.0f, 6.4f),
+    glm::vec3(0.32f),
+    glm::vec3(0.82f),
+    glm::vec3(0.82f)
+};
+
+constexpr Renderer::LightSpace SHADOWS_AUTUMN = {
+    -4.66f, 4.66f,
+    -3.24f, 4.29f,
+    1.0f, 9.0f,
+    3.1f
 };
 
 enum class BoardPhase {
@@ -137,3 +172,5 @@ constexpr size_t INVALID_INDEX = UINT_MAX;
 constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
 
 using GamePosition = std::array<PieceType, 24>;
+
+constexpr float WORLD_SCALE = 20.0f;

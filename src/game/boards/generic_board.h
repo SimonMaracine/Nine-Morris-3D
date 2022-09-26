@@ -11,8 +11,7 @@ struct UndoRedoState;
 class KeyboardControls;
 class GameContext;
 
-class GenericBoard {
-public:
+struct GenericBoard {
     GenericBoard() = default;
     GenericBoard(Application* app)
         : app(app) {}
@@ -22,22 +21,6 @@ public:
 
     GamePosition get_position();
 
-    std::shared_ptr<Renderer::Model>& get_model() { return model; }
-    std::shared_ptr<Renderer::Model>& get_paint_model() { return paint_model; }
-    std::vector<std::optional<Piece>>& get_pieces() { return pieces; }
-    std::array<Node, 24>& get_nodes() { return nodes; }
-
-    BoardPhase get_phase() { return phase; }
-    void set_phase(BoardPhase phase) { this->phase = phase; }
-    const BoardEnding& get_ending() { return ending; }
-    std::array<bool, 2> get_can_jump() { return can_jump; }
-    BoardPlayer get_turn() { return turn; }
-    Node* get_hovered_node() { return hovered_node; }
-    Piece* get_hovered_piece() { return hovered_piece; }
-    Piece* get_selected_piece() { return selected_piece; }
-    bool get_next_move() { return next_move; }
-    bool get_is_players_turn() { return is_players_turn; }
-protected:
     Piece* new_piece_to_place(PieceType type, float x_pos, float z_pos, Node* node);
     void take_and_raise_piece(Piece* piece);
     void set_pieces_show_outline(PieceType type, bool show);
@@ -90,9 +73,9 @@ protected:
     bool is_players_turn = true;
     bool switched_turn = false;
 
-    friend class GameContext;
+    friend class GameContext;  // TODO see if needed
     friend class KeyboardControls;
-    
+
     template<typename Archive>
     friend void serialize(Archive& archive, GenericBoard& board);
 };

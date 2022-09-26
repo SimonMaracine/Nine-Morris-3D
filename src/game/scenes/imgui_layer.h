@@ -270,7 +270,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
 
                 if (redid_game_over) {
                     scene->timer.stop();
-                    scene->board.set_phase(BoardPhase::GameOver);
+                    scene->board.phase = BoardPhase::GameOver;
                 }
             }
             if (ImGui::MenuItem("Exit To Launcher", nullptr, false)) {
@@ -464,20 +464,20 @@ void ImGuiLayer<SceneType>::draw_game_over() {
     if (ImGui::BeginPopupModal("Game Over", nullptr, window_flags)) {
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        switch (scene->board.get_ending().type) {
+        switch (scene->board.ending.type) {
             case BoardEnding::WinnerWhite: {
                 const char* message1 = "White player wins!";
-                draw_game_over_message(message1, scene->board.get_ending().message);
+                draw_game_over_message(message1, scene->board.ending.message);
                 break;
             }
             case BoardEnding::WinnerBlack: {
                 const char* message1 = "Black player wins!";
-                draw_game_over_message(message1, scene->board.get_ending().message);
+                draw_game_over_message(message1, scene->board.ending.message);
                 break;
             }
             case BoardEnding::TieBetweenBothPlayers: {
                 const char* message1 = "Tie between both players!";
-                draw_game_over_message(message1, scene->board.get_ending().message);
+                draw_game_over_message(message1, scene->board.ending.message);
                 break;
             }
             case BoardEnding::None:
@@ -503,7 +503,7 @@ void ImGuiLayer<SceneType>::draw_game_over() {
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
-            scene->board.set_phase(BoardPhase::None);
+            scene->board.phase = BoardPhase::None;
         }
 
         ImGui::Dummy(ImVec2(0.0f, 2.0f));
@@ -677,22 +677,22 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %f", app->get_fps());
         ImGui::Text("Frame time (ms): %f", app->get_delta() * 1000.0f);
-        ImGui::Text("White pieces: %u", scene->board.get_white_pieces_count());
-        ImGui::Text("Black pieces: %u", scene->board.get_black_pieces_count());
-        ImGui::Text("Not placed white pieces: %u", scene->board.get_not_placed_pieces_count());
-        ImGui::Text("White can jump: %s", scene->board.get_can_jump()[0] ? "true" : "false");
-        ImGui::Text("Black can jump: %s", scene->board.get_can_jump()[1] ? "true" : "false");
-        ImGui::Text("Phase: %d", static_cast<int>(scene->board.get_phase()));
-        ImGui::Text("Turn: %s", scene->board.get_turn() == BoardPlayer::White ? "white" : "black");
+        ImGui::Text("White pieces: %u", scene->board.white_pieces_count);
+        ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
+        ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_pieces_count);
+        ImGui::Text("White can jump: %s", scene->board.can_jump[0] ? "true" : "false");
+        ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
+        ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
+        ImGui::Text("Turn: %s", scene->board.turn == BoardPlayer::White ? "white" : "black");
         ImGui::Text("Should take piece: %s", scene->board.player_must_take_piece() ? "true" : "false");
-        ImGui::Text("Turns without mills: %u", scene->board.get_turns_without_mills());
+        ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
         ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());
         ImGui::Text("Redo history size: %lu", scene->undo_redo_state.redo.size());
         ImGui::Text("Hovered ID: %d", app->renderer->get_hovered_id());
-        ImGui::Text("Hovered node: %p", scene->board.get_hovered_node());
-        ImGui::Text("Hovered piece: %p", scene->board.get_hovered_piece());
-        ImGui::Text("Selected piece: %p", scene->board.get_selected_piece());
-        ImGui::Text("Next move: %s", scene->board.get_next_move() ? "true" : "false");
+        ImGui::Text("Hovered node: %p", scene->board.hovered_node);
+        ImGui::Text("Hovered piece: %p", scene->board.hovered_piece);
+        ImGui::Text("Selected piece: %p", scene->board.selected_piece);
+        ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
         ImGui::Text("Game started: %s", scene->first_move ? "true" : "false");
         ImGui::End();
 

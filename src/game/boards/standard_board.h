@@ -7,8 +7,7 @@
 #include "game/node.h"
 #include "game/constants.h"
 
-class StandardBoard : public GenericBoard {
-public:
+struct StandardBoard : public GenericBoard {
     StandardBoard() = default;
     StandardBoard(Application* app)
         : GenericBoard(app) {}
@@ -16,11 +15,6 @@ public:
 
     virtual bool player_must_take_piece() override;
 
-    unsigned int get_white_pieces_count() { return white_pieces_count; }
-    unsigned int get_black_pieces_count() { return black_pieces_count; }
-    unsigned int get_not_placed_pieces_count() { return not_placed_pieces_count; }
-    unsigned int get_turns_without_mills() { return turns_without_mills; }
-private:
     void switch_turn_and_check_turns_without_mills();
     bool can_go(Node* source_node, Node* destination_node);
     void check_player_number_of_pieces(BoardPlayer player);
