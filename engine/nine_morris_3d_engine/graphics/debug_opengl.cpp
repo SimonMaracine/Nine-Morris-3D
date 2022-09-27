@@ -27,8 +27,10 @@ constexpr GLenum parameters[] = {
     GL_MAX_VERTEX_UNIFORM_COMPONENTS,
     GL_MAX_TEXTURE_LOD_BIAS,
     GL_MAX_UNIFORM_BUFFER_BINDINGS,
+    GL_MAX_DEPTH_TEXTURE_SAMPLES,
+    GL_MAX_COLOR_TEXTURE_SAMPLES,
+    GL_MAX_INTEGER_SAMPLES,
     GL_MAX_VIEWPORT_DIMS,
-    GL_STEREO
 };
 
 constexpr const char* names[] = {
@@ -43,8 +45,10 @@ constexpr const char* names[] = {
     "GL_MAX_VERTEX_UNIFORM_COMPONENTS",
     "GL_MAX_TEXTURE_LOD_BIAS",
     "GL_MAX_UNIFORM_BUFFER_BINDINGS",
+    "GL_MAX_DEPTH_TEXTURE_SAMPLES",
+    "GL_MAX_COLOR_TEXTURE_SAMPLES",
+    "GL_MAX_INTEGER_SAMPLES",
     "GL_MAX_VIEWPORT_DIMS",
-    "GL_STEREO"
 };
 
 #ifdef PLATFORM_GAME_DEBUG
@@ -158,7 +162,7 @@ namespace debug_opengl {
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** OpenGL Context Parameters ***\n");
 
-        size_t parameter_index = 10;
+        size_t parameter_index = 13;
 
         for (size_t i = 0; i <= parameter_index; i++) {
             GLint result;
@@ -174,14 +178,6 @@ namespace debug_opengl {
 
             char line[128];
             sprintf(line, "%s %i %i\n", names[parameter_index], result[0], result[1]);
-            output.append(line);
-        }
-        {
-            GLboolean result;
-            glGetBooleanv(parameters[++parameter_index], &result);
-
-            char line[128];
-            sprintf(line, "%s %u\n", names[parameter_index], static_cast<unsigned int>(result));
             output.append(line);
         }
 

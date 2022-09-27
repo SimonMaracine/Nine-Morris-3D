@@ -46,7 +46,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
         ImGui_ImplOpenGL3_Init("#version 430 core");
         ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
 
-        renderer_imgui = std::bind(&Application::renderer_imgui_functionality, this);        
+        renderer_imgui = std::bind(&Application::renderer_imgui_functionality, this);
 
         evt.sink<MouseScrolledEvent>().connect<&Application::on_imgui_mouse_scrolled>(*this);
         evt.sink<MouseMovedEvent>().connect<&Application::on_imgui_mouse_moved>(*this);
@@ -57,6 +57,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 #ifdef PLATFORM_GAME_DEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console, builder.info_file_name);
 #endif
+
     input::initialize(window->get_handle());
     debug_opengl::maybe_initialize_debugging();
     encrypt::initialize(builder.encrypt_key);
@@ -68,9 +69,9 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
         DEB_INFO("With renderer 3D");
 
         renderer = std::make_unique<Renderer>(this);
-        renderer_3d = std::bind(&Application::renderer_3d_functionality, this);        
+        renderer_3d = std::bind(&Application::renderer_3d_functionality, this);
     }
-    
+
     if (builder.renderer_2d) {
         DEB_INFO("With renderer 2D");
 
