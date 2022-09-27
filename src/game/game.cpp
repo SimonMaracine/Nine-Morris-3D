@@ -71,7 +71,7 @@ namespace game {
             FramebufferSpecification specification;
             specification.width = app->data().width;
             specification.height = app->data().height;
-            specification.samples = data.options.samples;
+            specification.samples = data.launcher_options.samples;
             specification.color_attachments = {
                 Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
                 Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)

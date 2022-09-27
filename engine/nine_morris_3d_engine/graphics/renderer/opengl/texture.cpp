@@ -36,8 +36,9 @@ static std::string get_name_texture3d(const char* file_path) {
 
 static void configure_mipmapping(const TextureSpecification& specification) {
     if (specification.mipmapping) {
-        const bool anisotropic_filtering_enabled = specification.anisotropic_filtering != 0
-                && extensions::extension_supported(extensions::AnisotropicFiltering);
+        const bool anisotropic_filtering_enabled = (
+            specification.anisotropic_filtering != 0 && extensions::extension_supported(extensions::AnisotropicFiltering)
+        );
 
         float bias = specification.bias;
 

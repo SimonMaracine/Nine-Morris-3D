@@ -13,8 +13,6 @@ namespace game_options {
 
     struct GameOptions {
         // These are default values
-        int samples = 2;
-        int anisotropic_filtering = 4;  // TODO maybe move this to launcher too
         bool vsync = true;
         bool save_on_exit = true;
         std::string skybox = FIELD;
@@ -28,8 +26,6 @@ namespace game_options {
         template<typename Archive>
         void serialize(Archive& archive) {
             archive(
-                samples,
-                anisotropic_filtering,
                 vsync,
                 save_on_exit,
                 skybox,

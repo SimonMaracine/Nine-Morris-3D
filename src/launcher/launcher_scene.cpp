@@ -23,7 +23,7 @@ static size_t map_resolution_to_index(const std::pair<int, int>& resolution) {
         case 1024:
             return 2;
         case 1280:
-            return 3;            
+            return 3;
         case 1536:
             return 4;
         case 1792:
@@ -83,6 +83,74 @@ static std::string map_index_to_texture_quality(size_t index) {
     }
 
     REL_ERROR("Using default texture_quality for index");
+
+    return DEFAULT;
+}
+
+static size_t map_samples_to_index(int samples) {
+    constexpr size_t DEFAULT = 1;
+
+    switch (samples) {
+        case 1:
+            return 0;
+        case 2:
+            return 1;
+        case 4:
+            return 2;
+    }
+
+    REL_ERROR("Using default index for samples");
+
+    return DEFAULT;
+}
+
+static int map_index_to_samples(size_t index) {
+    constexpr int DEFAULT = 2;
+
+    switch (index) {
+        case 0:
+            return 1;
+        case 1:
+            return 2;
+        case 2:
+            return 4;
+    }
+
+    REL_ERROR("Using default samples for index");
+
+    return DEFAULT;
+}
+
+static size_t map_anisotropic_filtering_to_index(int anisotropic_filtering) {
+    constexpr size_t DEFAULT = 1;
+
+    switch (anisotropic_filtering) {
+        case 0:
+            return 0;
+        case 4:
+            return 1;
+        case 8:
+            return 2;
+    }
+
+    REL_ERROR("Using default index for anisotropic_filtering");
+
+    return DEFAULT;
+}
+
+static int map_index_to_anisotropic_filtering(size_t index) {
+    constexpr int DEFAULT = 2;
+
+    switch (index) {
+        case 0:
+            return 0;
+        case 1:
+            return 4;
+        case 2:
+            return 8;
+    }
+
+    REL_ERROR("Using default anisotropic_filtering for index");
 
     return DEFAULT;
 }
@@ -316,12 +384,58 @@ void LauncherScene::graphics_page() {
     auto& data = app->user_data<Data>();
 
     if (ImGui::BeginTabItem("Graphics")) {
+        const char* combo_preview_value = nullptr;
+
         ImGui::PushItemWidth(170.0f);
+
+        ImGui::Text("Anti-Aliasing"); ImGui::SameLine();
+        static size_t samples_index = map_samples_to_index(data.launcher_options.samples);
+        const char* samples[] = { "Off", "2x", "4x" };
+        combo_preview_value = samples[samples_index];
+
+        if (ImGui::BeginCombo("##Anti-Aliasing", combo_preview_value)) {
+            for (size_t i = 0; i < 3; i++) {
+                const bool is_selected = samples_index == i;
+
+                if (ImGui::Selectable(samples[i], is_selected)) {
+                    samples_index = i;
+                    data.launcher_options.samples = map_index_to_samples(i);
+                }
+
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+
+            ImGui::EndCombo();
+        }
+
+        ImGui::Text("Anisotropic Filtering"); ImGui::SameLine();
+        static size_t anisotropic_fitering_index = map_anisotropic_filtering_to_index(data.launcher_options.anisotropic_filtering);
+        const char* anisotropic_fitering_options[] = { "Off", "4x", "8x" };
+        combo_preview_value = anisotropic_fitering_options[anisotropic_fitering_index];
+
+        if (ImGui::BeginCombo("##Anisotropic Filtering", combo_preview_value)) {
+            for (size_t i = 0; i < 3; i++) {
+                const bool is_selected = anisotropic_fitering_index == i;
+
+                if (ImGui::Selectable(anisotropic_fitering_options[i], is_selected)) {
+                    anisotropic_fitering_index = i;
+                    data.launcher_options.anisotropic_filtering = map_index_to_anisotropic_filtering(i);
+                }
+
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+
+            ImGui::EndCombo();
+        }
 
         ImGui::Text("Texture Quality"); ImGui::SameLine();
         static size_t texture_quality_index = map_texture_quality_to_index(data.launcher_options.texture_quality);
         const char* texture_qualities[] = { "Normal", "Low" };
-        const char* combo_preview_value = texture_qualities[texture_quality_index];
+        combo_preview_value = texture_qualities[texture_quality_index];
 
         if (ImGui::BeginCombo("##Texture Quality", combo_preview_value)) {
             for (size_t i = 0; i < 2; i++) {
@@ -348,7 +462,7 @@ void LauncherScene::graphics_page() {
 
         ImGui::Text("Bloom Strength"); ImGui::SameLine();
         ImGui::SliderFloat(
-            "##Bloom Strength", 
+            "##Bloom Strength",
             &data.launcher_options.bloom_strength,
             0.1f, 1.0f, "%.01f",
             ImGuiSliderFlags_Logarithmic

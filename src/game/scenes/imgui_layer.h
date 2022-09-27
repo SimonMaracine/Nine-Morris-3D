@@ -297,46 +297,6 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                         DEB_INFO("VSync disabled");
                     }
                 }
-                if (ImGui::BeginMenu("Anti-Aliasing")) {
-                    if (ImGui::RadioButton("Off", &data.options.samples, 1)) {
-                        // game_layer->set_scene_framebuffer(data.options.samples);  // FIXME
-
-                        DEB_INFO("Anti-aliasing disabled");
-                    }
-                    if (ImGui::RadioButton("2x", &data.options.samples, 2)) {
-                        // game_layer->set_scene_framebuffer(data.options.samples);  // FIXME
-
-                        DEB_INFO("2x anti-aliasing");
-                    }
-                    if (ImGui::RadioButton("4x", &data.options.samples, 4)) {
-                        // game_layer->set_scene_framebuffer(data.options.samples);  // FIXME
-
-                        DEB_INFO("4x anti-aliasing");
-                    }
-
-                    ImGui::EndMenu();
-                    HOVERING_GUI();
-                }
-                if (ImGui::BeginMenu("Anisotropic Filtering")) {
-                    if (ImGui::RadioButton("Off", &data.options.anisotropic_filtering, 0)) {
-                        // game_layer->resetup_textures();  // FIXME
-
-                        DEB_INFO("Anisotropic filtering disabled");
-                    }
-                    if (ImGui::RadioButton("4x", &data.options.anisotropic_filtering, 4)) {
-                        // game_layer->resetup_textures();  // FIXME
-
-                        DEB_INFO("4x Anisotropic filtering");
-                    }
-                    if (ImGui::RadioButton("8x", &data.options.anisotropic_filtering, 8)) {
-                        // game_layer->resetup_textures();  // FIXME
-
-                        DEB_INFO("8x Anisotropic filtering");
-                    }
-
-                    ImGui::EndMenu();
-                    HOVERING_GUI();
-                }
                 if (ImGui::MenuItem("Custom Cursor", nullptr, &data.options.custom_cursor)) {
                     if (data.options.custom_cursor) {
                         if (scene->board.player_must_take_piece()) {

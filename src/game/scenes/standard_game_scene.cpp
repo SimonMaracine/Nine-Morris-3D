@@ -311,7 +311,7 @@ void StandardGameScene::initialize_rendering_board() {
     specification.mag_filter = Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -2.0f;
-    specification.anisotropic_filtering = data.options.anisotropic_filtering;
+    specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
     auto diffuse_texture = app->res.texture.load(
         "board_wood_diffuse_texture"_h,
@@ -388,7 +388,7 @@ void StandardGameScene::initialize_rendering_board_paint() {
     specification.mag_filter = Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -1.0f;
-    specification.anisotropic_filtering = data.options.anisotropic_filtering;
+    specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
     auto diffuse_texture = app->res.texture.load(
         "board_paint_diffuse_texture"_h,
@@ -438,7 +438,7 @@ void StandardGameScene::initialize_rendering_pieces() {
     specification.mag_filter = Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -1.5f;
-    specification.anisotropic_filtering = data.options.anisotropic_filtering;
+    specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
     auto white_piece_diffuse_texture = app->res.texture.load(
         "white_piece_diffuse_texture"_h,

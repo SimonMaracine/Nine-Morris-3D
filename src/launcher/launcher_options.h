@@ -11,6 +11,8 @@ namespace launcher_options {
         bool fullscreen = false;
         bool native_resolution = true;
         std::pair<int, int> resolution = {1024, 576};
+        int samples = 2;
+        int anisotropic_filtering = 4;
         std::string texture_quality = NORMAL;
         bool normal_mapping = true;
         bool bloom = true;
@@ -22,6 +24,8 @@ namespace launcher_options {
                 fullscreen,
                 native_resolution,
                 resolution,
+                samples,
+                anisotropic_filtering,
                 texture_quality,
                 normal_mapping,
                 bloom,
