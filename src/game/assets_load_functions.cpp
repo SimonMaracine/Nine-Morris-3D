@@ -11,9 +11,7 @@ using namespace encrypt;
 
 namespace assets_load_functions {
     void all_start(ConcurrentLoader<game_options::GameOptions>& loader, const game_options::GameOptions& options) {
-        loader.set_done();
-
-        // loader->get()->node_mesh = load_model_VP(encr(path_for_assets(NODE_MESH)), true);
+        loader().mesh_p.load("node_mesh"_h, encr(path_for_assets(NODE_MESH)), true);
 
         // if (options.normal_mapping) {
         //     loader->get()->board_wood_mesh = load_model_VPTNT(encr(path_for_assets(BOARD_WOOD_MESH)));
@@ -27,11 +25,11 @@ namespace assets_load_functions {
         //     loader->get()->black_piece_no_normal_mesh = load_model_VPTN(encr(path_for_assets(BLACK_PIECE_MESH)));
         // }
 
-        // loader->get()->white_indicator_texture = std::make_shared<TextureData>(encr(path_for_assets(WHITE_INDICATOR_TEXTURE)), true);
-        // loader->get()->black_indicator_texture = std::make_shared<TextureData>(encr(path_for_assets(BLACK_INDICATOR_TEXTURE)), true);
-        // loader->get()->wait_indicator_texture = std::make_shared<TextureData>(encr(path_for_assets(WAIT_INDICATOR_TEXTURE)), true);
-        // loader->get()->keyboard_controls_texture = std::make_shared<TextureData>(encr(path_for_assets(KEYBOARD_CONTROLS_TEXTURE)), true);
-        // loader->get()->keyboard_controls_cross_texture = std::make_shared<TextureData>(encr(path_for_assets(KEYBOARD_CONTROLS_CROSS_TEXTURE)), true);
+        loader().texture_data.load("white_indicator_texture"_h, encr(path_for_assets(WHITE_INDICATOR_TEXTURE)), true);
+        loader().texture_data.load("black_indicator_texture"_h, encr(path_for_assets(BLACK_INDICATOR_TEXTURE)), true);
+        loader().texture_data.load("wait_indicator_texture"_h, encr(path_for_assets(WAIT_INDICATOR_TEXTURE)), true);
+        loader().texture_data.load("keyboard_controls_texture"_h, encr(path_for_assets(KEYBOARD_CONTROLS_TEXTURE)), true);
+        loader().texture_data.load("keyboard_controls_cross_texture"_h, encr(path_for_assets(KEYBOARD_CONTROLS_CROSS_TEXTURE)), true);
 
         // if (options.texture_quality == options::NORMAL) {
         //     loader->get()->board_wood_diff_texture = std::make_shared<TextureData>(encr(path_for_assets(BOARD_WOOD_DIFFUSE_TEXTURE)), true);
@@ -97,7 +95,7 @@ namespace assets_load_functions {
         //     }
         // }
 
-        // loader->set_done();
+        loader.set_done();
     }
 
     // void skybox(Loader<AssetsData, options::Options>* loader, const options::Options& options) {

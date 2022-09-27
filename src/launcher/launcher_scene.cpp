@@ -258,10 +258,10 @@ void LauncherScene::on_start() {
 }
 
 void LauncherScene::on_stop() {
+    auto& data = app->user_data<Data>();
+
     // Save options
     using namespace launcher_options;
-
-    auto& data = app->user_data<Data>();
 
     try {
         options::save_options_to_file<LauncherOptions>(data.launcher_options, LAUNCHER_OPTIONS_FILE);

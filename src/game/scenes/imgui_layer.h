@@ -653,7 +653,7 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::Text("Hovered piece: %p", scene->board.hovered_piece);
         ImGui::Text("Selected piece: %p", scene->board.selected_piece);
         ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
-        ImGui::Text("Game started: %s", scene->first_move ? "true" : "false");
+        ImGui::Text("Game started: %s", scene->made_first_move ? "true" : "false");
         ImGui::End();
 
         ImGui::Begin("Game");

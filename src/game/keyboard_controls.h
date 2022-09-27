@@ -19,7 +19,7 @@ public:
 
     void initialize_refs();
     void move(Direction direction);
-    bool press(bool& first_move);
+    bool press(bool& made_first_move);
 
     static Direction calculate(Direction original_direction, float camera_angle);
 

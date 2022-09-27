@@ -16,6 +16,10 @@ public:
         : load_function(load_function) {}
     ~ConcurrentLoader() = default;
 
+    Resources& operator()() {
+        return temp_res;
+    }
+
     bool done_loading() {
         return loaded.load();
     }
@@ -39,6 +43,10 @@ public:
         res.mesh_ptnt.merge(std::move(temp_res.mesh_ptnt));
         res.mesh_ptn.merge(std::move(temp_res.mesh_ptn));
         res.mesh_p.merge(std::move(temp_res.mesh_p));
+    }
+
+    void join() {
+        loading_thread.join();
     }
 
     bool joinable() {

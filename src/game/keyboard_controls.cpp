@@ -88,7 +88,7 @@ void KeyboardControls::move(Direction direction) {
     quad->position = POSITION(current_node->index);
 }
 
-bool KeyboardControls::press(bool& first_move) {
+bool KeyboardControls::press(bool& made_first_move) {
     // const Node& node = board->nodes[current_node->index];
     // const hoverable::Id hovered_id = node.piece == nullptr ? node.id : node.piece->id;
 

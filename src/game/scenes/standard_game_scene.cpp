@@ -2,11 +2,14 @@
 
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/imgui_layer.h"
+#include "game/game_options.h"
+#include "game/save_load.h"
 #include "game/assets.h"
 #include "game/constants.h"
 #include "game/piece.h"
 #include "game/node.h"
 #include "other/data.h"
+#include "options/options.h"
 
 using namespace encrypt;
 
@@ -50,15 +53,99 @@ void StandardGameScene::on_start() {
     app->renderer->add_quad(light_bulb_quad);  // FIXME create light_bulb_quad
 #endif
 
+    timer = Timer {};
+
     camera.go_towards_position(default_camera_position);
 }
 
 void StandardGameScene::on_stop() {
+    auto& data = app->user_data<Data>();
+
     imgui_layer.reset();
+
+    // Save game options
+    using namespace game_options;
+
+    try {
+        options::save_options_to_file<GameOptions>(data.options, GAME_OPTIONS_FILE);  // TODO put this into a function
+    } catch (const options::OptionsFileNotOpenError& e) {
+        REL_ERROR("{}", e.what());
+
+        options::handle_options_file_not_open_error<GameOptions>(
+            GAME_OPTIONS_FILE, app->data().application_name
+        );
+    } catch (const options::OptionsFileError& e) {
+        REL_ERROR("{}", e.what());
+
+        try {
+            options::create_options_file<GameOptions>(GAME_OPTIONS_FILE);
+        } catch (const options::OptionsFileNotOpenError& e) {
+            REL_ERROR("{}", e.what());
+        } catch (const options::OptionsFileError& e) {
+            REL_ERROR("{}", e.what());
+        }
+    }
+
+    // Save this game
+    if (data.options.save_on_exit && !app->running && made_first_move) {  // TODO maybe move this into a fuction
+        // board.finalize_pieces_state();  // FIXME this
+
+        save_load::SavedGame saved_game;
+        saved_game.board = board;
+        saved_game.camera = camera;
+        saved_game.time = timer.get_time_raw();
+
+        time_t current;
+        time(&current);
+        saved_game.date = ctime(&current);
+
+        saved_game.undo_redo_state = undo_redo_state;  // TODO think if it's alright
+        saved_game.white_player = game.white_player;
+        saved_game.black_player = game.black_player;
+
+        try {
+            save_load::save_game_to_file(saved_game);
+        } catch (const save_load::SaveFileNotOpenError& e) {
+            REL_ERROR("{}", e.what());
+
+            save_load::handle_save_file_not_open_error(app->data().application_name);
+
+            REL_ERROR("Could not save game");
+        } catch (const save_load::SaveFileError& e) {
+            REL_ERROR("{}", e.what());
+            REL_ERROR("Could not save game");
+        }
+    }
+
+#ifdef PLATFORM_GAME_DEBUG
+    app->renderer->origin = false;
+#endif
+
+    app->renderer->clear();
+
+    made_first_move = false;
+
+    // TODO stop timer here?
+
+    if (loader != nullptr) {
+        if (loader->joinable()) {
+            loader->join();
+        }
+    }
 }
 
 void StandardGameScene::on_awake() {
     imgui_layer = ImGuiLayer<StandardGameScene> {app, this};
+
+    initialize_rendering_board();
+    initialize_rendering_board_paint();
+    initialize_rendering_pieces();
+    initialize_rendering_nodes();
+
+    setup_skybox();
+    setup_light();
+
+    // FIXME initialize GUI textures here
 
     // It's ok to be called multiple times
     LOG_TOTAL_GPU_MEMORY_ALLOCATED();
@@ -146,9 +233,9 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
                 game.state = GameState::HumanDoingMove;
             }
 
-            if (did && !first_move && !timer.is_running()) {
+            if (did && !made_first_move && !timer.is_running()) {
                 timer.start(app->window->get_time());
-                first_move = true;
+                made_first_move = true;
             }
 
             if (board.phase == BoardPhase::GameOver) {
@@ -218,15 +305,15 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
             break;
         case input::Key::ENTER:
             if (board.next_move && board.is_players_turn) {
-                const bool did = keyboard.press(first_move);
+                const bool did = keyboard.press(made_first_move);
 
                 if (did) {
                     game.state = GameState::HumanDoingMove;
                 }
 
-                if (did && !first_move && !timer.is_running()) {
+                if (did && !made_first_move && !timer.is_running()) {
                     timer.start(app->window->get_time());
-                    first_move = true;
+                    made_first_move = true;
                 }
 
                 if (board.phase == BoardPhase::GameOver) {

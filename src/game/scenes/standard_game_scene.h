@@ -66,7 +66,7 @@ struct StandardGameScene : public Scene {
     GameContext game;
     MinimaxThread minimax_thread;
 
-    bool first_move = false;
+    bool made_first_move = false;
     bool show_keyboard_controls = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);

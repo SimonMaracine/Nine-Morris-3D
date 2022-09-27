@@ -12,6 +12,8 @@
 #include "nine_morris_3d_engine/other/texture_data.h"
 #include "nine_morris_3d_engine/other/mesh.h"
 
+// struct
+
 // TODO sound, music, sound data
 
 using namespace mesh;
