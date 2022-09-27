@@ -2,7 +2,7 @@
 #include <stb_image.h>
 #include <cppblowfish/cppblowfish.h>
 
-#include "nine_morris_3d_engine/application/extensions.h"
+#include "nine_morris_3d_engine/application/capabilities.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
 #include "nine_morris_3d_engine/other/logging.h"
@@ -37,7 +37,7 @@ static std::string get_name_texture3d(const char* file_path) {
 static void configure_mipmapping(const TextureSpecification& specification) {
     if (specification.mipmapping) {
         const bool anisotropic_filtering_enabled = (
-            specification.anisotropic_filtering != 0 && extensions::extension_supported(extensions::AnisotropicFiltering)
+            specification.anisotropic_filtering != 0 && capabilities::extension_supported(capabilities::AnisotropicFiltering)
         );
 
         float bias = specification.bias;

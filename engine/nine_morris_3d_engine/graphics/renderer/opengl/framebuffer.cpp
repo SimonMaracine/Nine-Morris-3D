@@ -61,8 +61,7 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
         LOG_ALLOCATION(width * height * 4)
     }
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, target(multisampled),
-            texture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, target(multisampled), texture, 0);
 }
 
 static void attach_color_renderbuffer(GLuint renderbuffer, int samples, GLenum internal_format,
@@ -207,7 +206,7 @@ void Framebuffer::resolve_framebuffer(GLuint draw_framebuffer, int width, int he
         glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
-}        
+}
 
 void Framebuffer::build() {
     // Delete old framebuffer first

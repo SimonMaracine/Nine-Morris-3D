@@ -55,7 +55,7 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/application/application_data.h"
     "engine/nine_morris_3d_engine/application/application.h"
     "engine/nine_morris_3d_engine/application/events.h"
-    "engine/nine_morris_3d_engine/application/extensions.h"
+    "engine/nine_morris_3d_engine/application/capabilities.h"
     "engine/nine_morris_3d_engine/application/input.h"
     "engine/nine_morris_3d_engine/application/platform.h"
     "engine/nine_morris_3d_engine/application/scene.h"
@@ -91,7 +91,7 @@ set(ENGINE_HEADERS
 add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/application/application_builder.cpp"
     "engine/nine_morris_3d_engine/application/application.cpp"
-    "engine/nine_morris_3d_engine/application/extensions.cpp"
+    "engine/nine_morris_3d_engine/application/capabilities.cpp"
     "engine/nine_morris_3d_engine/application/input.cpp"
     "engine/nine_morris_3d_engine/application/window.cpp"
     "engine/nine_morris_3d_engine/graphics/renderer/opengl/buffer.cpp"
