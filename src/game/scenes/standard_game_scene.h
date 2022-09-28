@@ -7,10 +7,10 @@
 #include "game/undo_redo_state.h"
 #include "game/keyboard_controls.h"
 #include "game/game_context.h"
-#include "game/game_options.h"
 #include "game/constants.h"
 #include "game/timer.h"
 #include "game/minimax/minimax_thread.h"
+#include "game/assets_load.h"
 
 struct StandardGameScene : public Scene {
     StandardGameScene()
@@ -71,7 +71,7 @@ struct StandardGameScene : public Scene {
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
 
-    std::unique_ptr<ConcurrentLoader<game_options::GameOptions>> loader;
+    std::unique_ptr<assets_load::CustomLoader> loader;
 
     // GUI-related
     Timer timer;

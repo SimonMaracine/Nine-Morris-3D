@@ -133,8 +133,8 @@ int Application::run() {
         render_helpers::clear(render_helpers::Color);
 
         renderer_3d();
-        renderer_2d();
         renderer_imgui();
+        renderer_2d();
 
         evt.update();
         window->update();
@@ -305,7 +305,7 @@ void Application::on_window_resized(const WindowResizedEvent& event) {
     // camera_projection_system(registry, event.width, event.height);  // TODO this should be user called
 
     if (builder.renderer_3d) {
-        renderer->on_window_resized(event);
+        renderer->on_window_resized(event);  // TODO don't call these directly
     }
 
     if (builder.renderer_2d) {

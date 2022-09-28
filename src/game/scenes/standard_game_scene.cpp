@@ -334,7 +334,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
 void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
     if (event.key == input::Key::SPACE) {
         camera.go_towards_position(default_camera_position);
-    } 
+    }
 }
 
 std::shared_ptr<Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, hover::Id id, hs hash) {

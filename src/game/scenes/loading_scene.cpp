@@ -1,16 +1,21 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "game/scenes/loading_scene.h"
-#include "game/game_options.h"
-#include "game/assets_load_functions.h"
+#include "game/assets_load.h"
 #include "game/assets.h"
+#include "launcher/launcher_options.h"
 #include "other/data.h"
 
 void LoadingScene::on_start() {
     auto& data = app->user_data<Data>();
 
-    loader = std::make_unique<ConcurrentLoader<game_options::GameOptions>>(assets_load_functions::all_start);
-    loader->start_loading_thread(data.options);
+    loader = std::make_unique<assets_load::CustomLoader>(assets_load::all_start);
+    loader->start_loading_thread(
+        data.launcher_options.normal_mapping,
+        data.launcher_options.texture_quality,
+        data.options.labeled_board,
+        data.options.skybox
+    );
 
     auto loading_text = std::make_shared<gui::Text>(
         app->res.font["good_dog_plain_font"_h], "Loading...", 1.2f, glm::vec3(0.81f)
@@ -42,14 +47,16 @@ void LoadingScene::on_stop() {
 }
 
 void LoadingScene::on_update() {
+    if (loader->done_loading()) {
+        app->change_scene("game");
+    }
+}
+
+void LoadingScene::on_imgui_update() {
     float width, height, x_pos, y_pos;
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
     app->gui_renderer->im_draw_quad(
         glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.texture["splash_screen_texture"_h]
     );
-
-    if (loader->done_loading()) {
-        app->change_scene("game");
-    }
 }

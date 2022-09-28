@@ -3,6 +3,7 @@
 #include "game/game.h"
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/loading_scene.h"
+#include "launcher/launcher.h"
 #include "launcher/launcher_scene.h"
 #include "other/data.h"
 
@@ -45,7 +46,7 @@ int main() {
 
         auto data = std::make_any<Data>();
 
-        auto launcher = std::make_unique<Application>(launcher_builder, data);
+        auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
         launcher->add_scene(new LauncherScene, true);
         exit_code = launcher->run();
         launcher.reset();

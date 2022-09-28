@@ -2,10 +2,6 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/game_options.h"
-
-using namespace mesh;
-
 // struct AssetsData {
     // std::shared_ptr<Mesh<P>> node_mesh;
     // std::shared_ptr<Mesh<PTNT>> board_wood_mesh;
@@ -39,8 +35,10 @@ using namespace mesh;
     // std::shared_ptr<TextureData> skybox_nz_texture;
 // };
 
-namespace assets_load_functions {
-    void all_start(ConcurrentLoader<game_options::GameOptions>& loader, const game_options::GameOptions& options);
+namespace assets_load {
+    using CustomLoader = ConcurrentLoader<bool, const std::string&, bool, const std::string&>;
+
+    void all_start(CustomLoader& loader, bool normal_mapping, const std::string& texture_quality, bool labeled_board, const std::string& skybox);
     // void skybox(Loader<AssetsData, options::Options>* loader, const options::Options& options);
     // void texture_quality(Loader<AssetsData, options::Options>* loader, const options::Options& options);
     // void board_paint_texture(Loader<AssetsData, options::Options>* loader, const options::Options& options);

@@ -1,6 +1,12 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 namespace assets {
+    const char* BOARD_WOOD_MESH = ENCR("data/models/board/board.obj");
+    const char* BOARD_PAINT_MESH = ENCR("data/models/board/board_paint.obj");
+    const char* NODE_MESH = ENCR("data/models/node/node.obj");
+    const char* WHITE_PIECE_MESH = ENCR("data/models/piece/white_piece.obj");
+    const char* BLACK_PIECE_MESH = ENCR("data/models/piece/black_piece.obj");
+
     const char* BOARD_WOOD_DIFFUSE_TEXTURE = ENCR("data/textures/board/wood/board_wood.png");
     const char* BOARD_PAINT_DIFFUSE_TEXTURE = ENCR("data/textures/board/paint/board_paint.png");
     const char* LABELED_BOARD_PAINT_DIFFUSE_TEXTURE = ENCR("data/textures/board/paint/board_paint_labeled.png");

@@ -11,17 +11,6 @@
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
 
-static int get_texture_quality_option(std::string_view option) {
-    // if (option == options::LOW) {
-    //     return 0;
-    // } else if (option == options::NORMAL) {
-    //     return 1;
-    // }
-
-    ASSERT(false, "Invalid option");
-    return -1;
-}
-
 static int get_skybox_option(std::string_view option) {
     if (option == game_options::FIELD) {
         return 0;

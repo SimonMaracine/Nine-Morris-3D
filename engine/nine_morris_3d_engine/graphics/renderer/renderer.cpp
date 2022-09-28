@@ -389,7 +389,7 @@ void Renderer::draw_screen_quad(GLuint texture) {
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
-    
+
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -603,7 +603,7 @@ void Renderer::draw_models_to_depth_buffer() {
             model->vertex_array->bind();
 
             glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
-        }      
+        }
     }
 }
 
