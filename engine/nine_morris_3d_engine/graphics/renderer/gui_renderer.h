@@ -81,6 +81,8 @@ namespace gui {
         virtual void render() override;
 
         void set_image(std::shared_ptr<Texture> texture);
+        void set_position(glm::vec2 position);
+        void set_size(glm::vec2 size);
     private:
         std::shared_ptr<Texture> texture;
     };
@@ -112,7 +114,6 @@ public:
     ~GuiRenderer();
 
     void render();
-    void im_draw_quad(glm::vec2 position, glm::vec2 scale, std::shared_ptr<Texture> texture);
 
     void add_widget(std::shared_ptr<gui::Widget> widget);
     void remove_widget(std::shared_ptr<gui::Widget> widget);

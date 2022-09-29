@@ -302,6 +302,9 @@ void LauncherScene::on_start() {
 
     app->res.texture.load("splash_screen"_h, encr(path_for_assets(SPLASH_SCREEN)), specification);
 
+    background = std::make_shared<gui::Image>(app->res.texture["splash_screen"_h]);
+    app->gui_renderer->add_widget(background);
+
     // Load options
     using namespace launcher_options;
 
@@ -363,14 +366,15 @@ void LauncherScene::on_stop() {
     }
 }
 
-void LauncherScene::on_imgui_update() {
+void LauncherScene::on_update() {
     float width, height, x_pos, y_pos;
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
-    app->gui_renderer->im_draw_quad(
-        glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.texture["splash_screen"_h]
-    );
+    background->set_position(glm::vec2(x_pos, y_pos));  // TODO it works, I have no idea why
+    background->set_size(glm::vec2(width, height));
+}
 
+void LauncherScene::on_imgui_update() {
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 

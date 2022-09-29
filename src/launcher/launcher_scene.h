@@ -12,6 +12,7 @@ struct LauncherScene : public Scene {
 
     virtual void on_start() override;
     virtual void on_stop() override;
+    virtual void on_update() override;
     virtual void on_imgui_update() override;
 
     void on_window_closed(const WindowClosedEvent& event);
@@ -21,6 +22,7 @@ struct LauncherScene : public Scene {
     void graphics_page();
 
     ImGuiWindowFlags window_flags = 0;
+    std::shared_ptr<gui::Image> background;
 
     DisplayManager display_manager;
 };

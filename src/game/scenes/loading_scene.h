@@ -12,7 +12,7 @@ struct LoadingScene : public Scene {
     virtual void on_start() override;
     virtual void on_stop() override;
     virtual void on_update() override;
-    virtual void on_imgui_update() override;
 
+    std::shared_ptr<gui::Image> background;
     std::unique_ptr<assets_load::CustomLoader> loader;
 };

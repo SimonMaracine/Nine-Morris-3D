@@ -35,6 +35,9 @@ void LoadingScene::on_start() {
     specification.mag_filter = Filter::Linear;
 
     app->res.texture.load("splash_screen_texture"_h, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+
+    background = std::make_shared<gui::Image>(app->res.texture["splash_screen_texture"_h]);
+    app->gui_renderer->add_widget(background);
 }
 
 void LoadingScene::on_stop() {
@@ -44,19 +47,17 @@ void LoadingScene::on_stop() {
     loader.reset();
 
     app->gui_renderer->clear();
+    background.reset();
 }
 
 void LoadingScene::on_update() {
-    if (loader->done_loading()) {
-        app->change_scene("game");
-    }
-}
-
-void LoadingScene::on_imgui_update() {
     float width, height, x_pos, y_pos;
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
-    app->gui_renderer->im_draw_quad(
-        glm::vec2(x_pos, y_pos), glm::vec2(width, height), app->res.texture["splash_screen_texture"_h]
-    );
+    background->set_position(glm::vec2(x_pos, y_pos));
+    background->set_size(glm::vec2(width, height));
+
+    if (loader->done_loading()) {
+        app->change_scene("game");
+    }
 }

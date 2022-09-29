@@ -133,8 +133,8 @@ int Application::run() {
         render_helpers::clear(render_helpers::Color);
 
         renderer_3d();
-        renderer_imgui();  // FIXME rework this, as it's not right
         renderer_2d();
+        renderer_imgui();
 
         evt.update();
         window->update();
