@@ -155,6 +155,85 @@ static int map_index_to_anisotropic_filtering(size_t index) {
     return DEFAULT;
 }
 
+static std::vector<const char*> options_sample() {
+    static const char* OPTIONS[] = {
+        "Off", "2x", "4x"
+    };
+
+    std::vector<const char*> options;
+
+    const int max = capabilities::max_samples_supported();
+
+    size_t options_supported = 0;
+
+    if (max < 2) {
+        options_supported = 1;
+    } else if (max < 4) {
+        options_supported = 2;
+    } else {
+        options_supported = 3;
+    }
+
+    for (size_t i = 0; i < options_supported; i++) {
+        options.push_back(OPTIONS[i]);
+    }
+
+    return options;
+}
+
+static std::vector<const char*> options_anisotropic_filtering() {
+    static const char* OPTIONS[] = {
+        "Off", "4x", "8x"
+    };
+
+    std::vector<const char*> options;
+
+    const int max = capabilities::max_anisotropic_filtering_supported();
+
+    size_t options_supported = 0;
+
+    if (max < 4) {
+        options_supported = 1;
+    } else if (max < 8) {
+        options_supported = 2;
+    } else {
+        options_supported = 3;
+    }
+
+    for (size_t i = 0; i < options_supported; i++) {
+        options.push_back(OPTIONS[i]);
+    }
+
+    return options;
+}
+
+static void combo(const char* title, const char* id, size_t& index, const std::vector<const char*>& options,
+        const std::function<void(size_t)>& action) {
+    ImGui::Text("%s", title); ImGui::SameLine();
+
+    index = std::min(index, options.size() - 1);
+    action(index);
+
+    const char* combo_preview_value = options[index];
+
+    if (ImGui::BeginCombo(id, combo_preview_value)) {
+        for (size_t i = 0; i < options.size(); i++) {
+            const bool is_selected = index == i;
+
+            if (ImGui::Selectable(options[i], is_selected)) {
+                index = i;
+                action(i);
+            }
+
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+
+        ImGui::EndCombo();
+    }
+}
+
 static void help_marker(const char* text) {
     ImGui::TextDisabled("(?)");
 
@@ -353,27 +432,10 @@ void LauncherScene::display_page() {
         ImGui::Checkbox("##Native Resolution", &data.launcher_options.native_resolution);
         ImGui::SameLine(); help_marker("Window will have the monitor's resolution, instead of the resolution below");
 
-        ImGui::Text("Resolution"); ImGui::SameLine();
         static size_t resolution_index = map_resolution_to_index(data.launcher_options.resolution);
-        const auto resolutions = display_manager.get_resolutions();
-        const char* combo_preview_value = resolutions[resolution_index];
-
-        if (ImGui::BeginCombo("##Resolution", combo_preview_value)) {
-            for (size_t i = 0; i < resolutions.size(); i++) {
-                const bool is_selected = resolution_index == i;
-
-                if (ImGui::Selectable(resolutions[i], is_selected)) {
-                    resolution_index = i;
-                    data.launcher_options.resolution = map_index_to_resolution(i);
-                }
-
-                if (is_selected) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-
-            ImGui::EndCombo();
-        }
+        combo("Resolution", "##Resolution", resolution_index, display_manager.get_resolutions(), [&data](size_t i) {
+            data.launcher_options.resolution = map_index_to_resolution(i);
+        });
 
         ImGui::PopItemWidth();
         ImGui::EndTabItem();
@@ -384,75 +446,22 @@ void LauncherScene::graphics_page() {
     auto& data = app->user_data<Data>();
 
     if (ImGui::BeginTabItem("Graphics")) {
-        const char* combo_preview_value = nullptr;
-
         ImGui::PushItemWidth(170.0f);
 
-        ImGui::Text("Anti-Aliasing"); ImGui::SameLine();
         static size_t samples_index = map_samples_to_index(data.launcher_options.samples);
-        const char* samples[] = { "Off", "2x", "4x" };
-        combo_preview_value = samples[samples_index];
+        combo("Anti-Aliasing", "##Anti-Aliasing", samples_index, options_sample(), [&data](size_t i) {
+            data.launcher_options.samples = map_index_to_samples(i);
+        });
 
-        if (ImGui::BeginCombo("##Anti-Aliasing", combo_preview_value)) {
-            for (size_t i = 0; i < 3; i++) {
-                const bool is_selected = samples_index == i;
-
-                if (ImGui::Selectable(samples[i], is_selected)) {
-                    samples_index = i;
-                    data.launcher_options.samples = map_index_to_samples(i);
-                }
-
-                if (is_selected) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-
-            ImGui::EndCombo();
-        }
-
-        ImGui::Text("Anisotropic Filtering"); ImGui::SameLine();
         static size_t anisotropic_fitering_index = map_anisotropic_filtering_to_index(data.launcher_options.anisotropic_filtering);
-        const char* anisotropic_fitering_options[] = { "Off", "4x", "8x" };
-        combo_preview_value = anisotropic_fitering_options[anisotropic_fitering_index];
+        combo("Anisotropic Filtering", "##Anisotropic Filtering", anisotropic_fitering_index, options_anisotropic_filtering(), [&data](size_t i) {
+            data.launcher_options.anisotropic_filtering = map_index_to_anisotropic_filtering(i);
+        });
 
-        if (ImGui::BeginCombo("##Anisotropic Filtering", combo_preview_value)) {
-            for (size_t i = 0; i < 3; i++) {
-                const bool is_selected = anisotropic_fitering_index == i;
-
-                if (ImGui::Selectable(anisotropic_fitering_options[i], is_selected)) {
-                    anisotropic_fitering_index = i;
-                    data.launcher_options.anisotropic_filtering = map_index_to_anisotropic_filtering(i);
-                }
-
-                if (is_selected) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-
-            ImGui::EndCombo();
-        }
-
-        ImGui::Text("Texture Quality"); ImGui::SameLine();
         static size_t texture_quality_index = map_texture_quality_to_index(data.launcher_options.texture_quality);
-        const char* texture_qualities[] = { "Normal", "Low" };
-        combo_preview_value = texture_qualities[texture_quality_index];
-
-        if (ImGui::BeginCombo("##Texture Quality", combo_preview_value)) {
-            for (size_t i = 0; i < 2; i++) {
-                const bool is_selected = texture_quality_index == i;
-
-                if (ImGui::Selectable(texture_qualities[i], is_selected)) {
-                    texture_quality_index = i;
-                    data.launcher_options.texture_quality = map_index_to_texture_quality(i);
-                }
-
-                if (is_selected) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-
-            ImGui::EndCombo();
-        }
+        combo("Texture Quality", "##Texture Quality", texture_quality_index, { "Normal", "Low" }, [&data](size_t i) {
+            data.launcher_options.texture_quality = map_index_to_texture_quality(i);
+        });
 
         ImGui::Text("Normal Mapping"); ImGui::SameLine();
         ImGui::Checkbox("##Normal Mapping", &data.launcher_options.normal_mapping);

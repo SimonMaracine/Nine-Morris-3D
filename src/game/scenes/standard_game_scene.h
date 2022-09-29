@@ -34,7 +34,7 @@ struct StandardGameScene : public Scene {
     void initialize_rendering_board_paint();
     void initialize_rendering_pieces();
     void initialize_rendering_piece(
-        size_t index, PieceType type,
+        size_t index,
         std::shared_ptr<Mesh<PTNT>> mesh,
         std::shared_ptr<Texture> diffuse_texture,
         std::shared_ptr<Buffer> vertices,

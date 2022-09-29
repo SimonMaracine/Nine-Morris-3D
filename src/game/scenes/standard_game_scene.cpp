@@ -578,21 +578,21 @@ void StandardGameScene::initialize_rendering_pieces() {
 
     for (size_t i = 0; i < 9; i++) {
         initialize_rendering_piece(
-            i, PieceType::White, app->res.mesh_ptnt["white_piece_mesh"_h],
+            i, app->res.mesh_ptnt["white_piece_mesh"_h],
             white_piece_diffuse_texture, white_piece_vertices, white_piece_indices
         );
     }
 
     for (size_t i = 9; i < 18; i++) {
         initialize_rendering_piece(
-            i, PieceType::Black, app->res.mesh_ptnt["black_piece_mesh"_h],
+            i, app->res.mesh_ptnt["black_piece_mesh"_h],
             black_piece_diffuse_texture, black_piece_vertices, black_piece_indices
         );
     }
 }
 
 void StandardGameScene::initialize_rendering_piece(
-        size_t index, PieceType type,
+        size_t index,
         std::shared_ptr<Mesh<PTNT>> mesh,
         std::shared_ptr<Texture> diffuse_texture,
         std::shared_ptr<Buffer> vertices,

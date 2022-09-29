@@ -4,13 +4,14 @@
 #include "nine_morris_3d_engine/other/logging.h"
 
 namespace capabilities {
-    bool extension_supported(Extension extension) {
-        switch (extension) {
-            case Extension::AnisotropicFiltering:
-                return GLAD_GL_EXT_texture_filter_anisotropic;
-            default:
-                DEB_CRITICAL("Unknown extension: {}, exiting...", static_cast<int>(extension));
-                exit(1);
+    int max_anisotropic_filtering_supported() {
+        if (GLAD_GL_EXT_texture_filter_anisotropic) {
+            float max_amount;
+            glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_amount);
+
+            return static_cast<int>(max_amount);
+        } else {
+            return 0;
         }
     }
 

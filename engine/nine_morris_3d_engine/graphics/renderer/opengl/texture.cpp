@@ -36,24 +36,20 @@ static std::string get_name_texture3d(const char* file_path) {
 
 static void configure_mipmapping(const TextureSpecification& specification) {
     if (specification.mipmapping) {
-        const bool anisotropic_filtering_enabled = (
-            specification.anisotropic_filtering != 0 && capabilities::extension_supported(capabilities::AnisotropicFiltering)
-        );
+        const bool anisotropic_filtering_enabled = specification.anisotropic_filtering > 0;
 
-        float bias = specification.bias;
-
-        if (anisotropic_filtering_enabled) {
-            bias = 0.0f;
-        }
+        const float bias = anisotropic_filtering_enabled ? 0.0f : specification.bias;
 
         glGenerateMipmap(GL_TEXTURE_2D);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
 
         if (anisotropic_filtering_enabled) {
-            float max_amount;
-            glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_amount);
+            ASSERT(
+                specification.anisotropic_filtering <= capabilities::max_anisotropic_filtering_supported(),
+                "Invalid anisotropic filtering value"
+            );
 
-            const float amount = std::min(static_cast<float>(specification.anisotropic_filtering), max_amount);
+            const float amount = static_cast<float>(specification.anisotropic_filtering);
 
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
         }

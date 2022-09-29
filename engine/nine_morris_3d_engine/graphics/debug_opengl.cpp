@@ -187,8 +187,8 @@ namespace debug_opengl {
         output.append("\n*** OpenGL Extensions ***\n");
 
         char line[128];
-        sprintf(line, "GL_EXT_texture_filter_anisotropic is supported: %s\n",
-                capabilities::extension_supported(capabilities::AnisotropicFiltering) ? "true" : "false");
+        sprintf(line, "GL_EXT_texture_filter_anisotropic max samples: %d\n",
+                capabilities::max_anisotropic_filtering_supported());
         output.append(line);
 
         //////////////////////////////////////////////////////////////////////////////////
