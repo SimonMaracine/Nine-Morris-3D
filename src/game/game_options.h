@@ -3,7 +3,7 @@
 #include "game/constants.h"
 
 namespace game_options {
-    static constexpr const char* GAME_OPTIONS_FILE = "options.json";
+    static constexpr const char* GAME_OPTIONS_FILE = "options.dat";
 
     static constexpr const char* FIELD = "field";
     static constexpr const char* AUTUMN = "autumn";

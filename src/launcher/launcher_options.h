@@ -1,7 +1,7 @@
 #pragma once
 
 namespace launcher_options {
-    static constexpr const char* LAUNCHER_OPTIONS_FILE = "launcher_options.json";
+    static constexpr const char* LAUNCHER_OPTIONS_FILE = "launcher_options.dat";
 
     static constexpr const char* NORMAL = "normal";
     static constexpr const char* LOW = "low";
