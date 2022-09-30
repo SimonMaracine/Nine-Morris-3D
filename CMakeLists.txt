@@ -113,6 +113,7 @@ add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/other/paths.cpp"
     "engine/nine_morris_3d_engine/other/texture_data.cpp"
     "engine/nine_morris_3d_engine/other/user_data.cpp"
+    "engine/nine_morris_3d_engine/other/resource_manager.cpp"
     ${ENGINE_HEADERS}
 )
 

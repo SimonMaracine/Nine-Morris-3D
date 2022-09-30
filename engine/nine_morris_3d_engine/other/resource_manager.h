@@ -38,6 +38,8 @@ struct _MeshPLoader : public resmanager::Loader<Mesh<P>> {
 };
 
 struct Resources {
+    void merge(Resources& other);
+
     resmanager::Cache<Texture> texture;
     resmanager::Cache<Texture3D> texture_3d;
     resmanager::Cache<VertexArray> vertex_array;

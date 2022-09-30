@@ -27,22 +27,7 @@ public:
     void join_and_merge(Resources& res) {
         loading_thread.join();
 
-        res.texture.merge(std::move(temp_res.texture));
-        res.texture_3d.merge(std::move(temp_res.texture_3d));
-        res.vertex_array.merge(std::move(temp_res.vertex_array));
-        res.shader.merge(std::move(temp_res.shader));
-        res.buffer.merge(std::move(temp_res.buffer));
-        res.index_buffer.merge(std::move(temp_res.index_buffer));
-        res.uniform_buffer.merge(std::move(temp_res.uniform_buffer));
-        res.pixel_buffer.merge(std::move(temp_res.pixel_buffer));
-        res.framebuffer.merge(std::move(temp_res.framebuffer));
-        res.font.merge(std::move(temp_res.font));
-        res.material.merge(std::move(temp_res.material));
-        res.material_instance.merge(std::move(temp_res.material_instance));
-        res.texture_data.merge(std::move(temp_res.texture_data));
-        res.mesh_ptnt.merge(std::move(temp_res.mesh_ptnt));
-        res.mesh_ptn.merge(std::move(temp_res.mesh_ptn));
-        res.mesh_p.merge(std::move(temp_res.mesh_p));
+        res.merge(temp_res);
     }
 
     void join() {
