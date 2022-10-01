@@ -21,20 +21,20 @@ struct GenericBoard {
 
     GamePosition get_position();
 
-    Piece* new_piece_to_place(PieceType type, float x_pos, float z_pos, Node* node);
-    void take_and_raise_piece(Piece* piece);
+    size_t new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index);
+    void take_and_raise_piece(size_t piece_index);
     void set_pieces_show_outline(PieceType type, bool show);
     void game_over(const BoardEnding& ending, PieceType type_to_hide);
-    bool is_windmill_made(Node* node, PieceType type, size_t** windmills, size_t mills_count);
+    bool is_windmill_made(size_t node_index, PieceType type, size_t** windmills, size_t mills_count);
     void set_pieces_to_take(PieceType type, bool take);
     size_t number_of_pieces_in_windmills(PieceType type, size_t** windmills, size_t mills_count);
-    void unselect_other_pieces(Piece* currently_selected_piece);
+    void unselect_other_pieces(size_t currently_selected_piece_index);
     void update_piece_outlines();
-    void remember_position_and_check_repetition(Piece* piece, Node* node);
+    void remember_position_and_check_repetition(size_t piece_index, Node* node);
     void remember_state(const Camera& camera);
-    void piece_arrive_at_node(Piece* piece);
-    void prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity);
-    void prepare_piece_for_three_step_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity,
+    void piece_arrive_at_node(size_t piece_index);
+    void prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity);
+    void prepare_piece_for_three_step_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity,
         const glm::vec3& target0, const glm::vec3& target1);
 
     Application* app = nullptr;
@@ -42,8 +42,8 @@ struct GenericBoard {
     std::shared_ptr<Renderer::Model> model;
     std::shared_ptr<Renderer::Model> paint_model;
 
-    std::array<Node, 24> nodes;
-    std::vector<std::optional<Piece>> pieces;
+    std::array<Node, 24> nodes;  // 24 ordered nodes
+    std::unordered_map<size_t, Piece> pieces;  // Any number of pieces
 
     BoardPhase phase = BoardPhase::PlacePieces;
     BoardPlayer turn = BoardPlayer::White;
@@ -55,9 +55,9 @@ struct GenericBoard {
 
     // bool player_must_take_piece() = false;
 
-    Node* hovered_node = nullptr;
-    Piece* hovered_piece = nullptr;
-    Piece* selected_piece = nullptr;
+    size_t hovered_node = NULL_INDEX;
+    size_t hovered_piece = NULL_INDEX;
+    size_t selected_piece = NULL_INDEX;
 
     std::array<bool, 2> can_jump = { false, false };  // White first and black second
 

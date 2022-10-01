@@ -8,8 +8,10 @@ GamePosition GenericBoard::get_position() {
     GamePosition position;
 
     for (const Node& node : nodes) {
-        if (node.piece != nullptr) {
-            position[node.index] = node.piece->type;
+        if (node.piece != NULL_INDEX) {
+            const Piece& piece = pieces[node.piece];
+
+            position[node.index] = piece.type;
         } else {
             position[node.index] = PieceType::None;
         }
@@ -18,48 +20,48 @@ GamePosition GenericBoard::get_position() {
     return position;
 }
 
-Piece* GenericBoard::new_piece_to_place(PieceType type, float x_pos, float z_pos, Node* node) {
-    ACTIVE_PIECES(active_pieces)
+size_t GenericBoard::new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index) {
+    for (auto& pair : pieces) {
+        Piece& piece = pair.second;
 
-    for (Piece* piece : active_pieces) {
-        if (!piece->in_use && piece->type == type) {
+        if (!piece.in_use && piece.type == type) {
             const glm::vec3 target = glm::vec3(x_pos, PIECE_Y_POSITION, z_pos);
-            const glm::vec3 target0 = piece->model->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+            const glm::vec3 target0 = piece.model->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
             const glm::vec3 target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
-            const glm::vec3 velocity = glm::normalize(target0 - piece->model->position) * PIECE_BASE_VELOCITY;
+            const glm::vec3 velocity = glm::normalize(target0 - piece.model->position) * PIECE_BASE_VELOCITY;
 
-            prepare_piece_for_three_step_move(piece, target, velocity, target0, target1);
+            prepare_piece_for_three_step_move(piece.index, target, velocity, target0, target1);
 
-            piece->in_use = true;
-            piece->node = node;
-            piece->node_index = node->index;
+            piece.in_use = true;
+            piece.node = node_index;
 
-            return piece;
+            return piece.index;
         }
     }
 
     ASSERT(false, "Couldn't find a piece");
-    return nullptr;
+    return NULL_INDEX;
 }
 
-void GenericBoard::take_and_raise_piece(Piece* piece) {
+void GenericBoard::take_and_raise_piece(size_t piece_index) {
+    Piece& piece = pieces[piece_index];
+
     prepare_piece_for_linear_move(
-        piece,
-        glm::vec3(piece->model->position.x, PIECE_Y_POSITION + PIECE_RAISE_HEIGHT, piece->model->position.z),
+        piece_index,
+        glm::vec3(piece.model->position.x, PIECE_Y_POSITION + PIECE_RAISE_HEIGHT, piece.model->position.z),
         glm::vec3(0.0f)
     );
 
-    piece->node = nullptr;
-    piece->node_index = INVALID_INDEX;
-    piece->pending_remove = true;
+    piece.node = NULL_INDEX;
+    piece.pending_remove = true;
 }
 
 void GenericBoard::set_pieces_show_outline(PieceType type, bool show) {
-    ACTIVE_PIECES(active_pieces)
+    for (auto& pair : pieces) {
+        Piece& piece = pair.second;
 
-    for (Piece* piece : active_pieces) {
-        if (piece->type == type) {
-            piece->show_outline = show;
+        if (piece.type == type) {
+            piece.show_outline = show;
         }
     }
 }
@@ -84,7 +86,7 @@ void GenericBoard::game_over(const BoardEnding& ending, PieceType type_to_hide) 
     }
 }
 
-bool GenericBoard::is_windmill_made(Node* node, PieceType type, size_t** windmills, size_t mills_count) {
+bool GenericBoard::is_windmill_made(size_t node_index, PieceType type, size_t** windmills, size_t mills_count) {
     for (size_t i = 0; i < mills_count; i++) {
         const size_t* mill = windmills[i];
 
@@ -92,13 +94,13 @@ bool GenericBoard::is_windmill_made(Node* node, PieceType type, size_t** windmil
         const Node& node2 = nodes[mill[1]];
         const Node& node3 = nodes[mill[2]];
 
-        if (node1.piece != nullptr && node2.piece != nullptr && node3.piece != nullptr) {
-            const Piece* piece1 = node1.piece;
-            const Piece* piece2 = node2.piece;
-            const Piece* piece3 = node3.piece;
+        if (node1.piece != NULL_INDEX && node2.piece != NULL_INDEX && node3.piece != NULL_INDEX) {
+            const Piece& piece1 = pieces[node1.piece];
+            const Piece& piece2 = pieces[node2.piece];
+            const Piece& piece3 = pieces[node3.piece];
 
-            if (piece1->type == type && piece2->type == type && piece3->type == type) {
-                if (piece1->node == node || piece2->node == node || piece3->node == node) {
+            if (piece1.type == type && piece2.type == type && piece3.type == type) {
+                if (piece1.node == node_index || piece2.node == node_index || piece3.node == node_index) {
                     return true;
                 }
             }
@@ -109,45 +111,41 @@ bool GenericBoard::is_windmill_made(Node* node, PieceType type, size_t** windmil
 }
 
 void GenericBoard::set_pieces_to_take(PieceType type, bool take) {
-    ACTIVE_PIECES(active_pieces)
+    for (auto& pair : pieces) {
+        Piece& piece = pair.second;
 
-    for (Piece* piece : active_pieces) {
-        if (piece->type == type) {
-            piece->to_take = take;
+        if (piece.type == type) {
+            piece.to_take = take;
         }
     }
 }
 
 size_t GenericBoard::number_of_pieces_in_windmills(PieceType type, size_t** windmills, size_t mills_count) {
-    std::vector<Piece*> pieces_inside_mills;
+    std::vector<size_t> pieces_inside_mills;
 
     for (size_t i = 0; i < mills_count; i++) {
         const size_t* mill = windmills[i];
 
-        const Node& node1 = nodes[mill[0]];
-        const Node& node2 = nodes[mill[1]];
-        const Node& node3 = nodes[mill[2]];
+        const Piece& piece1 = pieces[nodes[mill[0]].piece];
+        const Piece& piece2 = pieces[nodes[mill[1]].piece];
+        const Piece& piece3 = pieces[nodes[mill[2]].piece];
 
-        if (node1.piece != nullptr && node2.piece != nullptr && node3.piece != nullptr) {
-            const Piece* piece1 = node1.piece;
-            const Piece* piece2 = node2.piece;
-            const Piece* piece3 = node3.piece;
-
-            if (piece1->type == type && piece2->type == type && piece3->type == type) {
-                std::vector<Piece*>::iterator iter;
+        if (piece1.index != NULL_INDEX && piece2.index != NULL_INDEX && piece3.index != NULL_INDEX) {
+            if (piece1.type == type && piece2.type == type && piece3.type == type) {
+                std::vector<size_t>::iterator iter;
 
                 // TODO this seems wrong
-                iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), node1.piece);
+                iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), piece1.index);
                 if (iter == pieces_inside_mills.end()) {
-                    pieces_inside_mills.push_back(node1.piece);
+                    pieces_inside_mills.push_back(piece1.index);
                 }
-                iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), node2.piece);
+                iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), piece2.index);
                 if (iter == pieces_inside_mills.end()) {
-                    pieces_inside_mills.push_back(node2.piece);
+                    pieces_inside_mills.push_back(piece2.index);
                 }
-                iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), node3.piece);
+                iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), piece3.index);
                 if (iter == pieces_inside_mills.end()) {
-                    pieces_inside_mills.push_back(node3.piece);
+                    pieces_inside_mills.push_back(piece3.index);
                 }
             }
         }
@@ -162,12 +160,12 @@ size_t GenericBoard::number_of_pieces_in_windmills(PieceType type, size_t** wind
     return pieces_inside_mills.size();
 }
 
-void GenericBoard::unselect_other_pieces(Piece* currently_selected_piece) {
-    ACTIVE_PIECES(active_pieces)
+void GenericBoard::unselect_other_pieces(size_t currently_selected_piece_index) {
+    for (auto& pair : pieces) {
+        Piece& piece = pair.second;
 
-    for (Piece* piece : active_pieces) {
-        if (piece != currently_selected_piece) {
-            piece->selected = false;
+        if (piece.index != currently_selected_piece_index) {
+            piece.selected = false;
         }
     }
 }
@@ -184,13 +182,15 @@ void GenericBoard::update_piece_outlines() {
     }
 }
 
-void GenericBoard::remember_position_and_check_repetition(Piece* piece, Node* node) {
+void GenericBoard::remember_position_and_check_repetition(size_t piece_index, Node* node) {
     using Position = ThreefoldRepetitionHistory::PositionPlusInfo;
 
-    ASSERT(piece != nullptr, "Piece must not be null");
-    ASSERT(node != nullptr, "Node must not be null");
+    ASSERT(piece_index != NULL_INDEX, "Piece must not be null");
+    ASSERT(piece_index != NULL_INDEX, "Node must not be null");
 
-    const Position current_position = { get_position(), piece->index, node->index };
+    const Piece& piece = pieces[piece_index];
+
+    const Position current_position = { get_position(), piece.index, node->index };
 
     for (const Position& position : repetition_history.twos) {
         if (position == current_position) {
@@ -243,39 +243,44 @@ void GenericBoard::remember_state(const Camera& camera) {
     DEB_DEBUG("Pushed new state");
 }
 
-void GenericBoard::piece_arrive_at_node(Piece* piece) {
-    piece->model->position = piece->movement.target;
+void GenericBoard::piece_arrive_at_node(size_t piece_index) {
+    Piece& piece = pieces[piece_index];
+
+    piece.model->position = piece.movement.target;
 
     // Reset all these movement variables
-    piece->movement = Piece::Movement {};
+    piece.movement = Piece::Movement {};
 
-    // Remove piece if set to remove
-    if (piece->pending_remove) {
-        piece->pending_remove = false;
-        piece->active = false;
-        app->renderer->remove_model(piece->model);
+    // Remove piece, if set to remove
+    if (piece.pending_remove) {
+        app->renderer->remove_model(piece.model);
+        pieces.erase(piece.index);
     }
 
     CAN_MAKE_MOVE();
 }
 
-void GenericBoard::prepare_piece_for_linear_move(Piece* piece, const glm::vec3& target, const glm::vec3& velocity) {
-    piece->movement.target = target;
+void GenericBoard::prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity) {
+    Piece& piece = pieces[piece_index];
 
-    piece->movement.velocity = velocity;
+    piece.movement.target = target;
 
-    piece->movement.type = PieceMovementType::Linear;
-    piece->movement.moving = true;
+    piece.movement.velocity = velocity;
+
+    piece.movement.type = PieceMovementType::Linear;
+    piece.movement.moving = true;
 }
 
-void GenericBoard::prepare_piece_for_three_step_move(Piece* piece, const glm::vec3& target,
+void GenericBoard::prepare_piece_for_three_step_move(size_t piece_index, const glm::vec3& target,
         const glm::vec3& velocity, const glm::vec3& target0, const glm::vec3& target1) {
-    piece->movement.target = target;
+    Piece& piece = pieces[piece_index];
 
-    piece->movement.velocity = velocity;
-    piece->movement.target0 = target0;
-    piece->movement.target1 = target1;
+    piece.movement.target = target;
 
-    piece->movement.type = PieceMovementType::ThreeStep;
-    piece->movement.moving = true;
+    piece.movement.velocity = velocity;
+    piece.movement.target0 = target0;
+    piece.movement.target1 = target1;
+
+    piece.movement.type = PieceMovementType::ThreeStep;
+    piece.movement.moving = true;
 }

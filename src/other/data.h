@@ -15,7 +15,7 @@ struct Data {
     ImFont* imgui_info_font = nullptr;
     ImFont* imgui_windows_font = nullptr;
 
-    hover::Id pieces_id[18] = { hover::null };
-    hover::Id nodes_id[24] = { hover::null };
-    hover::Id board_paint_id = hover::null;
+    resmanager::Cache<Renderer::Model> model_cache;
+    std::unordered_map<size_t, hover::Id> node_ids;
+    std::unordered_map<size_t, hover::Id> piece_ids;
 };

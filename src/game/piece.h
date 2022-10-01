@@ -8,18 +8,17 @@ struct Node;
 
 struct Piece {
     Piece() = default;
-    Piece(size_t index, PieceType type, hover::Id id)  // FIXME id? store it in Renderer::Model?
-        : index(index), type(type) {}
+    Piece(size_t index, PieceType type, std::shared_ptr<Renderer::Model> model)  // FIXME id? store it in Renderer::Model?
+        : index(index), type(type), model(model) {}
 
-    size_t index = INVALID_INDEX;  // From 0 through 17 on standard game
+    size_t index = NULL_INDEX;  // From 0 through 17 on standard game
 
     PieceType type = PieceType::None;
     bool in_use = false;  // true, if it is on the board
 
     std::shared_ptr<Renderer::Model> model;
 
-    size_t node_index = INVALID_INDEX;
-    Node* node = nullptr;  // Reference to the node where it sits on
+    size_t node = NULL_INDEX;  // Reference to the node on top of which it sits on
 
     struct Movement {
         PieceMovementType type = PieceMovementType::None;
@@ -36,6 +35,4 @@ struct Piece {
     bool to_take = false;
     bool pending_remove = false;
     bool selected = false;
-
-    bool active = true;  // Not active pieces simply don't exist in the game, only in memory
 };

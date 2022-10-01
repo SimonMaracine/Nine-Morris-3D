@@ -19,9 +19,8 @@ void StandardGameScene::on_start() {
     imgui_layer.update();
 
     undo_redo_state = UndoRedoState {};
-    board = StandardBoard {app};
 
-    setup_entities_board();
+    setup_entities();
 
     setup_and_add_model_board();
     setup_and_add_model_board_paint();
@@ -87,34 +86,8 @@ void StandardGameScene::on_stop() {
     }
 
     // Save this game
-    if (data.options.save_on_exit && !app->running && made_first_move) {  // TODO maybe move this into a fuction
-        // board.finalize_pieces_state();  // FIXME this
-
-        save_load::SavedGame saved_game;
-        saved_game.board = board;
-        saved_game.camera = camera;
-        saved_game.time = timer.get_time_raw();
-
-        time_t current;
-        time(&current);
-        saved_game.date = ctime(&current);
-
-        saved_game.undo_redo_state = undo_redo_state;  // TODO think if it's alright
-        saved_game.white_player = game.white_player;
-        saved_game.black_player = game.black_player;
-
-        try {
-            save_load::save_game_to_file(saved_game);
-        } catch (const save_load::SaveFileNotOpenError& e) {
-            REL_ERROR("{}", e.what());
-
-            save_load::handle_save_file_not_open_error(app->data().application_name);
-
-            REL_ERROR("Could not save game");
-        } catch (const save_load::SaveFileError& e) {
-            REL_ERROR("{}", e.what());
-            REL_ERROR("Could not save game");
-        }
+    if (data.options.save_on_exit && !app->running && made_first_move) {
+        save_game();
     }
 
 #ifdef PLATFORM_GAME_DEBUG
@@ -597,8 +570,10 @@ void StandardGameScene::initialize_rendering_piece(
         std::shared_ptr<Texture> diffuse_texture,
         std::shared_ptr<Buffer> vertices,
         std::shared_ptr<IndexBuffer> indices) {
+    auto& data = app->user_data<Data>();
+
     const hover::Id id = hover::generate_id();
-    // app->data.pieces_id[index] = id;
+    data.piece_ids[index] = id;
 
     auto id_buffer = create_id_buffer(
         mesh->vertices.size(), id,
@@ -664,8 +639,10 @@ void StandardGameScene::initialize_rendering_nodes() {
 
 void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<Buffer> vertices,
         std::shared_ptr<IndexBuffer> indices) {
+    auto& data = app->user_data<Data>();
+
     const hover::Id id = hover::generate_id();
-    // app->data.nodes_id[index] = id;
+    data.node_ids[index] = id;
 
     auto id_buffer = create_id_buffer(
         app->res.mesh_p["node_mesh"_h]->vertices.size(), id,
@@ -678,7 +655,7 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
     BufferLayout layout2;
     layout2.add(1, BufferLayout::Int, 1);
 
-    auto vertex_array = app->res.vertex_array.load("node_vertex_array"_h);
+    auto vertex_array = app->res.vertex_array.load(hs {"node_vertex_array" + std::to_string(index)});
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(indices);
@@ -729,12 +706,18 @@ void StandardGameScene::setup_and_add_model_pieces() {
 }
 
 void StandardGameScene::setup_and_add_model_piece(size_t index, std::shared_ptr<Mesh<PTNT>> mesh) {
-    Piece& piece = board.pieces[index].value();
+    auto& data = app->user_data<Data>();
 
+    Piece& piece = board.pieces[index];
+
+    piece.model->position = WHITE_PIECE_POSITION(index);
+    piece.model->rotation = RANDOM_PIECE_ROTATION();
     piece.model->vertex_array = app->res.vertex_array["piece_vertex_array"_h];
     piece.model->index_count = mesh->indices.size();
     piece.model->scale = WORLD_SCALE;
     piece.model->material = app->res.material_instance["piece_material_instance"_h];
+    piece.model->outline_color = std::make_optional<glm::vec3>(glm::vec3(1.0f));
+    piece.model->id = std::make_optional<hover::Id>(data.piece_ids[index]);
     piece.model->cast_shadow = true;
 
     app->renderer->add_model(piece.model);
@@ -749,6 +732,8 @@ void StandardGameScene::setup_and_add_model_nodes() {
 }
 
 void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& position) {
+    auto& data = app->user_data<Data>();
+
     Node& node = board.nodes[index];
 
     node.model->vertex_array = app->res.vertex_array["node_vertex_array"_h];
@@ -756,49 +741,46 @@ void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& 
     node.model->position = position;
     node.model->scale = WORLD_SCALE;
     node.model->material = app->res.material_instance["node_material_instance"_h];
+    node.model->id = std::make_optional<hover::Id>(data.node_ids[index]);
 
     app->renderer->add_model(node.model);
 
     DEB_DEBUG("Setup model node {}", index);
 }
 
-void StandardGameScene::setup_entities_board() {
+void StandardGameScene::setup_entities() {
     auto& data = app->user_data<Data>();
 
+    board = StandardBoard {app};
+    board.model = data.model_cache.load("board"_h);
+    board.paint_model = data.model_cache.load("board_paint"_h);
+
     for (size_t i = 0; i < 9; i++) {
-        Piece piece = Piece {i, PieceType::White, data.pieces_id[i]};
-        piece.model->position = WHITE_PIECE_POSITION(i);
-        piece.model->rotation = RANDOM_PIECE_ROTATION();
-
-        board.pieces.push_back(std::make_optional<Piece>(piece));  // FIXME think this through
+        board.pieces[i] = Piece {i, PieceType::White, data.model_cache.load(hs {"piece" + std::to_string(i)})};
     }
+
     for (size_t i = 9; i < 18; i++) {
-        Piece piece = Piece {i, PieceType::Black, data.pieces_id[i]};
-        piece.model->position = BLACK_PIECE_POSITION(i);
-        piece.model->rotation = RANDOM_PIECE_ROTATION();
-
-        board.pieces.push_back(std::make_optional<Piece>(piece));  // FIXME think this through
+        board.pieces[i] = Piece {i, PieceType::Black, data.model_cache.load(hs {"piece" + std::to_string(i)})};
     }
+
     for (size_t i = 0; i < 24; i++) {
-        Node node = Node {i, data.nodes_id[i]};
-
-        board.nodes[i] = node;
+        board.nodes[i] = Node {i, data.model_cache.load(hs {"node" + std::to_string(i)})};
     }
 
-    DEB_DEBUG("Setup board's entities");
+    DEB_DEBUG("Setup entities");
 }
 
-void StandardGameScene::setup_ids_board() {
+void StandardGameScene::setup_entity_ids() {
     auto& data = app->user_data<Data>();
 
     for (size_t i = 0; i < 9; i++) {
-        // board.pieces[i].value().id = data.pieces_id[i];  // FIXME think this through
+        board.pieces[i].model->id = data.piece_ids[i];  // FIXME think this through
     }
     for (size_t i = 9; i < 18; i++) {
-        // board.pieces[i].value().id = data.pieces_id[i];  // FIXME this
+        board.pieces[i].model->id = data.piece_ids[i];  // FIXME this
     }
     for (size_t i = 0; i < 24; i++) {
-        // board.nodes[i].id = data.nodes_id[i];  // FIXME this
+        board.nodes[i].model->id = data.node_ids[i];  // FIXME this
     }
 
     DEB_DEBUG("Setup board's entities' IDs");
@@ -872,4 +854,34 @@ void StandardGameScene::setup_camera() {
     };
 
     DEB_DEBUG("Setup camera");
+}
+
+void StandardGameScene::save_game() {
+    // board.finalize_pieces_state();  // FIXME
+
+    save_load::SavedGame saved_game;
+    saved_game.board = board;
+    saved_game.camera = camera;
+    saved_game.time = timer.get_time_raw();
+
+    time_t current;
+    time(&current);
+    saved_game.date = ctime(&current);
+
+    saved_game.undo_redo_state = undo_redo_state;  // TODO think if it's alright
+    saved_game.white_player = game.white_player;
+    saved_game.black_player = game.black_player;
+
+    try {
+        save_load::save_game_to_file(saved_game);
+    } catch (const save_load::SaveFileNotOpenError& e) {
+        REL_ERROR("{}", e.what());
+
+        save_load::handle_save_file_not_open_error(app->data().application_name);
+
+        REL_ERROR("Could not save game");
+    } catch (const save_load::SaveFileError& e) {
+        REL_ERROR("{}", e.what());
+        REL_ERROR("Could not save game");
+    }
 }

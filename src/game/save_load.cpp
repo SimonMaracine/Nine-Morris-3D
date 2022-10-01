@@ -80,6 +80,9 @@ void serialize(Archive& archive, GenericBoard& board) {
         board.phase,
         board.turn,
         board.ending,
+        board.hovered_node,
+        board.hovered_piece,
+        board.selected_piece,
         // board.white_pieces_count,
         // board.black_pieces_count,
         // board.not_placed_pieces_count,
@@ -125,10 +128,6 @@ void serialize(Archive& archive, UndoRedoState::State& state) {
     archive(state.board, state.camera, state.game_state);
 }
 
-/*
-Unserialized fields:
-    node
-*/
 template<typename Archive>
 void serialize(Archive& archive, Piece& piece) {
     archive(
@@ -136,13 +135,12 @@ void serialize(Archive& archive, Piece& piece) {
         piece.type,
         piece.in_use,
         piece.model,
-        piece.node_index,
+        piece.node,
         piece.movement,
         piece.show_outline,
         piece.to_take,
         piece.pending_remove,
-        piece.selected,
-        piece.active  // TODO last one maybe is not needed
+        piece.selected
     );
 }
 
@@ -160,13 +158,9 @@ void serialize(Archive& archive, Piece::Movement& movement) {
     );
 }
 
-/*
-Unserialized fields:
-    piece
-*/
 template<typename Archive>
 void serialize(Archive& archive, Node& node) {
-    archive(node.index, node.model, node.piece_index);
+    archive(node.index, node.model, node.piece);
 }
 
 template<typename Archive>

@@ -638,9 +638,9 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());
         ImGui::Text("Redo history size: %lu", scene->undo_redo_state.redo.size());
         ImGui::Text("Hovered ID: %d", app->renderer->get_hovered_id());
-        ImGui::Text("Hovered node: %p", scene->board.hovered_node);
-        ImGui::Text("Hovered piece: %p", scene->board.hovered_piece);
-        ImGui::Text("Selected piece: %p", scene->board.selected_piece);
+        ImGui::Text("Hovered node: %zu", scene->board.hovered_node);
+        ImGui::Text("Hovered piece: %zu", scene->board.hovered_piece);
+        ImGui::Text("Selected piece: %zu", scene->board.selected_piece);
         ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
         ImGui::Text("Game started: %s", scene->made_first_move ? "true" : "false");
         ImGui::End();
@@ -682,16 +682,10 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::End();
 
         ImGui::Begin("Light Settings");
-        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position),
-                -30.0f, 30.0f)) {
-            // app->renderer->light = app->renderer->light;  // FIXME what?
-        }
-        ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color),
-                0.0f, 1.0f);
-        ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color),
-                0.0f, 1.0f);
-        ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color),
-                0.0f, 1.0f);
+        ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position), -30.0f, 30.0f);
+        ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color), 0.0f, 1.0f);
         ImGui::End();
 
         // If you recompile shaders, uniforms that are set only once need to be reuploaded

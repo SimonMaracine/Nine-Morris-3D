@@ -2,14 +2,6 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#define ACTIVE_PIECES(result) \
-    std::vector<Piece*> result; \
-    for (std::optional<Piece>& piece : pieces) { \
-        if (piece.has_value()) { \
-            result.push_back(&piece.value()); \
-        } \
-    }
-
 // format is the first argument to __VA_ARGS__
 #define FORMATTED_MESSAGE(result, size, ...) \
     char result[size]; \
@@ -167,7 +159,7 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
-constexpr size_t INVALID_INDEX = UINT_MAX;
+constexpr size_t NULL_INDEX = UINT_MAX;
 
 constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
 

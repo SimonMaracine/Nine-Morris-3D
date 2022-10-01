@@ -16,7 +16,7 @@ struct StandardBoard : public GenericBoard {
     virtual bool player_must_take_piece() override;
 
     void switch_turn_and_check_turns_without_mills();
-    bool can_go(Node* source_node, Node* destination_node);
+    bool can_go(size_t source_node_index, size_t destination_node_index);
     void check_player_number_of_pieces(BoardPlayer player);
     bool is_player_blocked(BoardPlayer player);
 
