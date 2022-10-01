@@ -7,7 +7,7 @@
 class KeyboardControls {
 public:
     KeyboardControls() = default;
-    KeyboardControls(GenericBoard* board);
+    KeyboardControls(GenericBoard* board, std::shared_ptr<Renderer::Quad> quad);
     ~KeyboardControls() = default;
 
     enum class Direction {
@@ -22,8 +22,6 @@ public:
     bool press(bool& made_first_move);
 
     static Direction calculate(Direction original_direction, float camera_angle);
-
-    std::shared_ptr<Renderer::Quad> quad;
 private:
     struct KNode {
         KNode() = default;
@@ -44,6 +42,7 @@ private:
         KNode* neighbor_right = nullptr;
     };
 
+    std::shared_ptr<Renderer::Quad> quad;
     KNode nodes[24];
     KNode* current_node = nullptr;
     GenericBoard* board = nullptr;

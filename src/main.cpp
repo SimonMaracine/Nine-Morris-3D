@@ -46,10 +46,10 @@ int main() {
 
         auto data = std::make_any<Data>();
 
-        auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
-        launcher->add_scene(new LauncherScene, true);
-        exit_code = launcher->run();
-        launcher.reset();
+        // auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
+        // launcher->add_scene(new LauncherScene, true);
+        // exit_code = launcher->run();
+        // launcher.reset();
 
         if (exit_code == 1) {
             return 0;

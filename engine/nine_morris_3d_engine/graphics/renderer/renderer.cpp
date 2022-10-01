@@ -248,8 +248,7 @@ void Renderer::render() {
     render_helpers::viewport(app->data().width, app->data().height);
 
     // Bind shadow map for use in shadow rendering
-    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
-    glBindTexture(GL_TEXTURE_2D, storage.depth_map_framebuffer->get_depth_attachment());
+    render_helpers::bind_texture_2d(storage.depth_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
 
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
@@ -337,7 +336,7 @@ void Renderer::clear() {
 }
 
 void Renderer::setup_shader(std::shared_ptr<Shader> shader) {
-    const std::vector<std::string>& uniforms = shader->get_uniforms();
+    const auto& uniforms = shader->get_uniforms();
 
     if (std::find(uniforms.begin(), uniforms.end(), "u_shadow_map") != uniforms.end()) {
         shader->bind();
@@ -395,7 +394,7 @@ void Renderer::draw_screen_quad(GLuint texture) {
 
 void Renderer::post_processing() {
     post_processing_context.original_texture = storage.intermediate_framebuffer->get_color_attachment(0);
-    post_processing_context.last_texture = storage.intermediate_framebuffer->get_color_attachment(0);
+    post_processing_context.last_texture = post_processing_context.original_texture;
     post_processing_context.textures.clear();
 
     for (size_t i = 0; i < post_processing_context.steps.size(); i++) {

@@ -1,3 +1,5 @@
+#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+
 #include "game/keyboard_controls.h"
 #include "game/boards/generic_board.h"
 #include "game/node.h"
@@ -12,8 +14,8 @@ constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Right, KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down }
 };
 
-KeyboardControls::KeyboardControls(GenericBoard* board)
-    : board(board) {
+KeyboardControls::KeyboardControls(GenericBoard* board, std::shared_ptr<Renderer::Quad> quad)
+    : board(board), quad(quad) {
 
     for (size_t i = 0; i < 24; i++) {
         nodes[i] = KNode(i);

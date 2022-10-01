@@ -16,6 +16,8 @@ struct Data {
     ImFont* imgui_windows_font = nullptr;
 
     resmanager::Cache<Renderer::Model> model_cache;
+    resmanager::Cache<Renderer::Quad> quad_cache;
+
     std::unordered_map<size_t, hover::Id> node_ids;
     std::unordered_map<size_t, hover::Id> piece_ids;
 };

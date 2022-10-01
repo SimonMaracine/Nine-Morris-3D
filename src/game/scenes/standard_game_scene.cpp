@@ -29,7 +29,7 @@ void StandardGameScene::on_start() {
 
     setup_camera();
 
-    keyboard = KeyboardControls {&board};
+    keyboard = KeyboardControls {&board, data.quad_cache["light_bulb"_h]};
     keyboard.initialize_refs();
 
     minimax_thread = MinimaxThread {&board};
@@ -49,7 +49,7 @@ void StandardGameScene::on_start() {
 
 #ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = true;
-    app->renderer->add_quad(light_bulb_quad);  // FIXME create light_bulb_quad
+    app->renderer->add_quad(data.quad_cache["light_bulb"_h]);
 #endif
 
     timer = Timer {};
@@ -108,7 +108,23 @@ void StandardGameScene::on_stop() {
 }
 
 void StandardGameScene::on_awake() {
+    auto& data = app->user_data<Data>();
+
     imgui_layer = ImGuiLayer<StandardGameScene> {app, this};
+
+#ifdef PLATFORM_GAME_DEBUG
+    data.quad_cache.load("light_bulb"_h);
+
+    TextureSpecification specification;
+    specification.min_filter = Filter::Linear;
+    specification.mag_filter = Filter::Linear;
+
+    app->res.texture.load(
+        "light_bulb_texture"_h,
+        "data/textures/internal/light_bulb/light_bulb.png",
+        specification
+    );
+#endif
 
     initialize_rendering_board();
     initialize_rendering_board_paint();
@@ -117,11 +133,10 @@ void StandardGameScene::on_awake() {
 
     setup_skybox();
     setup_light();
-
-    // FIXME initialize GUI textures here
+    setup_keyboard_controls();
 
     // It's ok to be called multiple times
-    LOG_TOTAL_GPU_MEMORY_ALLOCATED();
+    LOG_TOTAL_GPU_MEMORY_ALLOCATED()
 }
 
 void StandardGameScene::on_update() {
@@ -183,6 +198,8 @@ void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& e
 }
 
 void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
+    auto& data = app->user_data<Data>();
+
     if (event.button == input::MouseButton::LEFT) {
         if (board.next_move && board.is_players_turn) {
             bool did = false;
@@ -223,13 +240,15 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         // board.release();  // FIXME
 
         if (show_keyboard_controls) {
-            app->renderer->remove_quad(keyboard.quad);
+            app->renderer->remove_quad(data.quad_cache["light_bulb"_h]);
             show_keyboard_controls = false;
         }
     }
 }
 
 void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
+    auto& data = app->user_data<Data>();
+
     switch (event.key) {
         case input::Key::UP:
         case input::Key::DOWN:
@@ -237,7 +256,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::RIGHT:
         case input::Key::ENTER:
             if (!show_keyboard_controls) {
-                app->renderer->add_quad(keyboard.quad);
+                app->renderer->add_quad(data.quad_cache["light_bulb"_h]);
                 show_keyboard_controls = true;
                 return;
             }
@@ -366,6 +385,7 @@ void StandardGameScene::initialize_rendering_board() {
     auto vertex_array = app->res.vertex_array.load("board_wood_vertex_array"_h);
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_index_buffer(indices);
+    VertexArray::unbind();
 
     TextureSpecification specification;
     specification.mag_filter = Filter::Linear;
@@ -443,6 +463,7 @@ void StandardGameScene::initialize_rendering_board_paint() {
     auto vertex_array = app->res.vertex_array.load("board_paint_vertex_array"_h);
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_index_buffer(indices);
+    VertexArray::unbind();
 
     TextureSpecification specification;
     specification.mag_filter = Filter::Linear;
@@ -593,6 +614,7 @@ void StandardGameScene::initialize_rendering_piece(
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(indices);
+    VertexArray::unbind();
 
     auto material_instance = app->res.material_instance.load(
         hs {"piece_material_instance" + std::to_string(index)},
@@ -659,9 +681,10 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
     vertex_array->add_buffer(vertices, layout);
     vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(indices);
+    VertexArray::unbind();
 
     auto material_instance = app->res.material_instance.load(
-        "node_material_instance"_h,
+        hs {"node_material_instance" + std::to_string(index)},
         app->res.material["basic_material"_h]
     );
     material_instance->set_vec4("u_color", glm::vec4(0.0f));
@@ -712,11 +735,11 @@ void StandardGameScene::setup_and_add_model_piece(size_t index, std::shared_ptr<
 
     piece.model->position = WHITE_PIECE_POSITION(index);
     piece.model->rotation = RANDOM_PIECE_ROTATION();
-    piece.model->vertex_array = app->res.vertex_array["piece_vertex_array"_h];
+    piece.model->vertex_array = app->res.vertex_array[hs {"piece_vertex_array" + std::to_string(index)}];
     piece.model->index_count = mesh->indices.size();
     piece.model->scale = WORLD_SCALE;
-    piece.model->material = app->res.material_instance["piece_material_instance"_h];
-    piece.model->outline_color = std::make_optional<glm::vec3>(glm::vec3(1.0f));
+    piece.model->material = app->res.material_instance[hs {"piece_material_instance" + std::to_string(index)}];
+    piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
     piece.model->id = std::make_optional<hover::Id>(data.piece_ids[index]);
     piece.model->cast_shadow = true;
 
@@ -736,11 +759,11 @@ void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& 
 
     Node& node = board.nodes[index];
 
-    node.model->vertex_array = app->res.vertex_array["node_vertex_array"_h];
+    node.model->vertex_array = app->res.vertex_array[hs {"node_vertex_array" + std::to_string(index)}];
     node.model->index_count = app->res.mesh_p["node_mesh"_h]->indices.size();
     node.model->position = position;
     node.model->scale = WORLD_SCALE;
-    node.model->material = app->res.material_instance["node_material_instance"_h];
+    node.model->material = app->res.material_instance[hs {"node_material_instance" + std::to_string(index)}];
     node.model->id = std::make_optional<hover::Id>(data.node_ids[index]);
 
     app->renderer->add_model(node.model);
@@ -810,14 +833,14 @@ void StandardGameScene::setup_light() {
         app->renderer->light_space = SHADOWS_FIELD;
 
 #ifdef PLATFORM_GAME_DEBUG
-        light_bulb_quad->position = LIGHT_FIELD.position;
+        data.quad_cache["light_bulb"_h]->position = LIGHT_FIELD.position;
 #endif
     } else if (data.options.skybox == game_options::AUTUMN) {
         app->renderer->light = LIGHT_AUTUMN;
         app->renderer->light_space = SHADOWS_AUTUMN;
 
 #ifdef PLATFORM_GAME_DEBUG
-        light_bulb_quad->position = LIGHT_AUTUMN.position;
+        data.quad_cache["light_bulb"_h]->position = LIGHT_AUTUMN.position;
 #endif
     } else {
         ASSERT(false, "Invalid skybox");
@@ -853,7 +876,26 @@ void StandardGameScene::setup_camera() {
         projection
     };
 
+    app->renderer->set_camera(&camera);
+
     DEB_DEBUG("Setup camera");
+}
+
+void StandardGameScene::setup_keyboard_controls() {
+    TextureSpecification specification;
+    specification.min_filter = Filter::Linear;
+    specification.mag_filter = Filter::Linear;
+
+    app->res.texture.load(
+        "keyboard_controls_texture"_h,
+        app->res.texture_data["keyboard_controls_texture"_h],
+        specification
+    );
+    app->res.texture.load(
+        "keyboard_controls_cross_texture"_h,
+        app->res.texture_data["keyboard_controls_cross_texture"_h],
+        specification
+    );
 }
 
 void StandardGameScene::save_game() {

@@ -54,6 +54,7 @@ struct StandardGameScene : public Scene {
     void setup_skybox();
     void setup_light();
     void setup_camera();
+    void setup_keyboard_controls();
 
     void save_game();
 
@@ -89,9 +90,4 @@ struct StandardGameScene : public Scene {
     // bool changed_texture_quality = false;
     // bool changed_labeled_board_texture = false;
     // bool changed_normal_mapping = false;
-
-#ifdef PLATFORM_GAME_DEBUG
-    std::shared_ptr<Texture> light_bulb_texture;
-    std::shared_ptr<Renderer::Quad> light_bulb_quad;
-#endif
 };
