@@ -17,7 +17,7 @@ void GameContext::end_human_move() {
 void GameContext::begin_computer_move() {
     // TODO start the appropriate minimax algorithm in thread
 
-    if (board->player_must_take_piece()) {
+    if (board->must_take_piece) {
         return;  // Do nothing in this case
     }
 
@@ -26,13 +26,13 @@ void GameContext::begin_computer_move() {
 
 void GameContext::end_computer_move() {
     if (board->phase == BoardPhase::PlacePieces) {  // FIXME this
-        if (board->player_must_take_piece()) {
+        if (board->must_take_piece) {
             // board->computer_take_piece(minimax_thread->get_result().take_node_index);
         } else {
             // board->computer_place_piece(minimax_thread->get_result().place_node_index);
         }
     } else if (board->phase == BoardPhase::MovePieces) {
-        if (board->player_must_take_piece()) {
+        if (board->must_take_piece) {
             // board->computer_take_piece(minimax_thread->get_result().take_node_index);
         } else {
             const MinimaxThread::Result& result = minimax_thread->get_result();

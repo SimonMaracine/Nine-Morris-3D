@@ -13,8 +13,6 @@ struct StandardBoard : public GenericBoard {
         : GenericBoard(app) {}
     ~StandardBoard() = default;
 
-    virtual bool player_must_take_piece() override;
-
     void switch_turn_and_check_turns_without_mills();
     bool can_go(size_t source_node_index, size_t destination_node_index);
     void check_player_number_of_pieces(BoardPlayer player);
@@ -23,8 +21,6 @@ struct StandardBoard : public GenericBoard {
     unsigned int white_pieces_count = 0;  // Number of pieces on the board
     unsigned int black_pieces_count = 0;
     unsigned int not_placed_pieces_count = 18;  // Number of pieces floating
-
-    bool must_take_piece = false;
 
     unsigned int turns_without_mills = 0;
 };

@@ -14,7 +14,7 @@
 
 class Application final {
 public:
-    using UserFunc = std::function<void(Application* app)>;
+    using UserFunc = std::function<void(Application*)>;
 
     struct _DummyUserFunc {
         constexpr void operator()(Application*) {}  // Do nothing
@@ -49,7 +49,7 @@ public:
     float get_last_mouse_x() { return last_mouse_x; }
     float get_last_mouse_y() { return last_mouse_y; }
 
-    // Public variables accessible by all the code
+    // Public fields accessible by all the code
     bool running = true;
     int exit_code = 0;
     std::unique_ptr<Window> window;

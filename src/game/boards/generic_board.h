@@ -17,9 +17,9 @@ struct GenericBoard {
         : app(app) {}
     virtual ~GenericBoard() = default;
 
-    virtual bool player_must_take_piece() { return false; }
-
     GamePosition get_position();
+    void update_nodes(hover::Id hovered_id);
+    void update_pieces(hover::Id hovered_id);
 
     size_t new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index);
     void take_and_raise_piece(size_t piece_index);
@@ -53,7 +53,7 @@ struct GenericBoard {
     // unsigned int black_pieces_count = 0;
     // unsigned int not_placed_pieces_count = 18;  // Number of pieces floating
 
-    // bool player_must_take_piece() = false;
+    bool must_take_piece = false;
 
     size_t hovered_node = NULL_INDEX;
     size_t hovered_piece = NULL_INDEX;

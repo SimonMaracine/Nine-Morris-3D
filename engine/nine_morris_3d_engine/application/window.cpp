@@ -108,7 +108,7 @@ Window::Window(Application* app) {
                     static_cast<input::MouseButton>(button)
                 );
                 break;
-            }       
+            }
         }
     });
 

@@ -217,6 +217,8 @@ GuiRenderer::GuiRenderer(Application* app)
     // Set application pointer to widgets
     gui::Widget::app = app;
 
+    app->evt.sink<WindowResizedEvent>().connect<&GuiRenderer::on_window_resized>(*this);
+
     DEB_INFO("Initialized GUI renderer");
 }
 

@@ -3,10 +3,6 @@
 #include "game/boards/standard_board.h"
 #include "game/piece.h"
 
-bool StandardBoard::player_must_take_piece() {
-    return must_take_piece;
-}
-
 void StandardBoard::switch_turn_and_check_turns_without_mills() {
     if (phase == BoardPhase::MovePieces) {
         if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {

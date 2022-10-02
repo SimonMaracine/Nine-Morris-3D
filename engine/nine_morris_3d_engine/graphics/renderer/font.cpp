@@ -34,7 +34,6 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
 
     vertex_array = std::make_shared<VertexArray>();
     vertex_array->add_buffer(buffer, layout);
-
     VertexArray::unbind();
 
     name = get_name(file_path);

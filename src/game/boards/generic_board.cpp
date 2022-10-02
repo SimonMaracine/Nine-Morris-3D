@@ -20,6 +20,46 @@ GamePosition GenericBoard::get_position() {
     return position;
 }
 
+void GenericBoard::update_nodes(hover::Id hovered_id) {
+    for (Node& node : nodes) {
+        const bool hovered = node.model->id.value() == hovered_id;
+        const bool highlight = (
+            phase == BoardPhase::PlacePieces || phase == BoardPhase::MovePieces && selected_piece != NULL_INDEX
+        );
+        const bool permitted = !must_take_piece && is_players_turn;
+
+        if (hovered && highlight && permitted) {
+            node.model->material->set_vec4("u_color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+        } else {
+            node.model->material->set_vec4("u_color", glm::vec4(0.0f));
+        }
+    }
+}
+
+void GenericBoard::update_pieces(hover::Id hovered_id) {
+    for (auto& pair : pieces) {
+        Piece& piece = pair.second;
+
+        const hover::Id id = piece.model->id.value();
+
+        if (piece.selected) {
+            piece.model->outline_color = std::make_optional<glm::vec3>(1.0f, 0.0f, 0.0f);  // FIXME put these in constants
+        } else if (piece.show_outline && id == hovered_id && piece.in_use && !piece.pending_remove) {
+            piece.model->outline_color = std::make_optional<glm::vec3>(1.0f, 0.5f, 0.0f);
+        } else if (piece.to_take && id == hovered_id && piece.in_use) {
+            piece.model->material->set_vec3("u_material.tint", glm::vec3(1.0f, 0.2f, 0.2f));
+        } else {
+            piece.model->material->set_vec3("u_material.tint", glm::vec3(1.0f, 1.0f, 1.0f));
+        }
+
+        if (piece.selected || piece.show_outline && id == hovered_id && piece.in_use && !piece.pending_remove) {
+            // FIXME this
+        } else {
+            piece.model->outline_color = std::nullopt;
+        }
+    }
+}
+
 size_t GenericBoard::new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index) {
     for (auto& pair : pieces) {
         Piece& piece = pair.second;

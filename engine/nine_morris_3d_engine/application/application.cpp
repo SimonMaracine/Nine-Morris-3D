@@ -30,7 +30,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     _app_data.min_height = builder.min_height;
     _app_data.application_name = builder.application_name;
     _app_data.info_file_name = builder.info_file_name;
-    _app_data.authors = builder.authors;
+    _app_data.authors = builder.authors;  // TODO use this
     _app_data.version_major = builder.major;
     _app_data.version_minor = builder.minor;
     _app_data.version_patch = builder.patch;
@@ -89,11 +89,6 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 
     frame_counter.previous_seconds = window->get_time();
     fixed_update.previous_seconds = window->get_time();
-
-    // model_render_system(registry);  // TODO replace with the other API
-    // quad_render_system(registry);
-    // gui_image_system(registry);
-    // gui_text_system(registry);
 }
 
 Application::~Application() {
@@ -123,12 +118,14 @@ int Application::run() {
         delta = update_frame_counter();
         const unsigned int fixed_updates = calculate_fixed_update();
 
-        // camera_system(registry, mouse_wheel, dx, dy, dt);  // TODO this should be user called
-
         for (unsigned int i = 0; i < fixed_updates; i++) {
             current_scene->on_fixed_update();
         }
         current_scene->on_update();
+
+        mouse_wheel = 0.0f;  // TODO maybe find a better way using events directly
+        dx = 0.0f;
+        dy = 0.0f;
 
         render_helpers::clear(render_helpers::Color);
 
@@ -299,17 +296,6 @@ void Application::on_window_resized(const WindowResizedEvent& event) {
                 fb->resize(event.width, event.height);
             }
         }
-    }
-
-    // camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
-    // camera_projection_system(registry, event.width, event.height);  // TODO this should be user called
-
-    if (builder.renderer_3d) {
-        renderer->on_window_resized(event);  // TODO don't call these directly
-    }
-
-    if (builder.renderer_2d) {
-        gui_renderer->on_window_resized(event);
     }
 }
 

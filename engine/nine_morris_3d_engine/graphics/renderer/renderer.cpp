@@ -214,6 +214,8 @@ Renderer::Renderer(Application* app)
 
     Shader::unbind();
 
+    app->evt.sink<WindowResizedEvent>().connect<&Renderer::on_window_resized>(*this);
+
     DEB_INFO("Initialized renderer");
 }
 
@@ -230,14 +232,6 @@ void Renderer::render() {
 
     render_helpers::clear(render_helpers::Depth);
     render_helpers::viewport(shadow_map_size, shadow_map_size);
-
-    // Sort all models
-    std::sort(models.begin(), models.end(), [this](const std::shared_ptr<Model>& lhs, const std::shared_ptr<Model>& rhs) {
-        const float distance1 = glm::distance(lhs->position, camera_cache.position);
-        const float distance2 = glm::distance(rhs->position, camera_cache.position);
-
-        return distance1 < distance2;
-    });
 
     // Render objects with shadows to depth buffer
     draw_models_to_depth_buffer();
@@ -473,7 +467,7 @@ void Renderer::draw_model(const Model* model) {
 
     model->material->get_shader()->upload_uniform_mat4("u_model_matrix", matrix);
 
-    glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
 }
 
 void Renderer::draw_model_with_outline(const Model* model) {
@@ -501,7 +495,7 @@ void Renderer::draw_model_with_outline(const Model* model) {
 
         // Render without output to red
         glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-        glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
         glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 
@@ -546,21 +540,32 @@ void Renderer::draw_models() {
 }
 
 void Renderer::draw_models_with_outline() {
+    static std::vector<const Model*> outline_models;
     static std::vector<const Model*> non_hoverable_models;
     static std::vector<const Model*> hoverable_models;
 
+    outline_models.clear();
     non_hoverable_models.clear();
     hoverable_models.clear();
 
-    for (size_t i = 0; i < models.size(); i++) {
-        const Model* model = models[i].get();
-
+    std::for_each(models.begin(), models.end(), [](const std::shared_ptr<Model>& model) {
         if (model->outline_color.has_value()) {
-            if (model->id.has_value()) {
-                hoverable_models.push_back(model);
-            } else {
-                non_hoverable_models.push_back(model);
-            }
+            outline_models.push_back(model.get());
+        }
+    });
+
+    std::sort(outline_models.begin(), outline_models.end(), [this](const Model* lhs, const Model* rhs) {
+        const float distance1 = glm::distance(lhs->position, camera_cache.position);
+        const float distance2 = glm::distance(rhs->position, camera_cache.position);
+
+        return distance1 < distance2;
+    });
+
+    for (const Model* model : outline_models) {
+        if (model->id.has_value()) {
+            hoverable_models.push_back(model);
+        } else {
+            non_hoverable_models.push_back(model);
         }
     }
 
@@ -601,7 +606,7 @@ void Renderer::draw_models_to_depth_buffer() {
 
             model->vertex_array->bind();
 
-            glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, nullptr);
+            glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
         }
     }
 }

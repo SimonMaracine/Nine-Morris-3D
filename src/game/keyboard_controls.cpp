@@ -24,7 +24,7 @@ KeyboardControls::KeyboardControls(GenericBoard* board, std::shared_ptr<Renderer
     quad->position = POSITION(0);
     quad->scale = 0.14f;
     quad->texture = (
-        board->player_must_take_piece()
+        board->must_take_piece
             ?
             board->app->res.texture["keyboard_controls_cross_texture"_h]
             :

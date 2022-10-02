@@ -32,8 +32,11 @@ public:
 
     void bind();
     static void unbind();
+
+    int get_index_count() { return index_count; }
 private:
     GLuint buffer = 0;
+    int index_count = 0;
 
     friend class VertexArray;
 };

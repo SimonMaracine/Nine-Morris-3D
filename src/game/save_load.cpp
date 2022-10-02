@@ -9,7 +9,7 @@
 
 /*
 Unserialized fields:
-    vertex_array, material
+    vertex_array, index_buffer, material
 */
 template<typename Archive>
 void serialize(Archive& archive, Renderer::Model& model) {
@@ -17,7 +17,6 @@ void serialize(Archive& archive, Renderer::Model& model) {
         model.position,
         model.rotation,
         model.scale,
-        model.index_count,
         model.outline_color,
         model.id,
         model.cast_shadow
@@ -58,7 +57,7 @@ void serialize(Archive& archive, Camera& camera) {
         camera.auto_y_velocity,
         camera.virtual_pitch,
         camera.auto_move_zoom,
-        camera.target_distance_to_point, 
+        camera.target_distance_to_point,
         camera.auto_zoom_velocity,
         camera.virtual_distance_to_point,
         camera.cached_towards_position,
@@ -80,13 +79,13 @@ void serialize(Archive& archive, GenericBoard& board) {
         board.phase,
         board.turn,
         board.ending,
+        board.must_take_piece,
         board.hovered_node,
         board.hovered_piece,
         board.selected_piece,
         // board.white_pieces_count,
         // board.black_pieces_count,
         // board.not_placed_pieces_count,
-        // board.must_take_piece,
         board.can_jump,
         // board.turns_without_mills,
         board.repetition_history,
@@ -103,7 +102,6 @@ void serialize(Archive& archive, StandardBoard& board) {
         board.white_pieces_count,
         board.black_pieces_count,
         board.not_placed_pieces_count,
-        board.must_take_piece,
         board.turns_without_mills
     );
 }

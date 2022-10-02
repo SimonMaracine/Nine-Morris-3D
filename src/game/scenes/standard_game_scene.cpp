@@ -135,16 +135,29 @@ void StandardGameScene::on_awake() {
     setup_light();
     setup_keyboard_controls();
 
+    app->evt.sink<MouseButtonPressedEvent>().connect<&StandardGameScene::on_mouse_button_pressed>(*this);
+    app->evt.sink<MouseButtonReleasedEvent>().connect<&StandardGameScene::on_mouse_button_released>(*this);
+    app->evt.sink<KeyPressedEvent>().connect<&StandardGameScene::on_key_pressed>(*this);
+    app->evt.sink<KeyReleasedEvent>().connect<&StandardGameScene::on_key_released>(*this);
+    app->evt.sink<WindowResizedEvent>().connect<&StandardGameScene::on_window_resized>(*this);
+
     // It's ok to be called multiple times
     LOG_TOTAL_GPU_MEMORY_ALLOCATED()
 }
 
 void StandardGameScene::on_update() {
+    if (!imgui_layer.hovering_gui) {
+        camera.update(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
+    }
 
+    board.update_nodes(app->renderer->get_hovered_id());
+    board.update_pieces(app->renderer->get_hovered_id());
 }
 
 void StandardGameScene::on_fixed_update() {
-
+    if (!imgui_layer.hovering_gui) {
+        camera.update_friction();
+    }
 }
 
 void StandardGameScene::on_imgui_update() {
@@ -205,13 +218,13 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
             bool did = false;
 
             if (board.phase == BoardPhase::PlacePieces) {
-                if (board.player_must_take_piece()) {
+                if (board.must_take_piece) {
                     // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
                 } else {
                     // did = board.place_piece(app->renderer->get_hovered_id());  // FIXME
                 }
             } else if (board.phase == BoardPhase::MovePieces) {
-                if (board.player_must_take_piece()) {
+                if (board.must_take_piece) {
                     // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
                 } else {
                     // board.select_piece(app->renderer->get_hovered_id());  // FIXME
@@ -329,6 +342,10 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
     }
 }
 
+void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
+    camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
+}
+
 std::shared_ptr<Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, hover::Id id, hs hash) {
     std::vector<int> array;
     array.resize(vertices_size);
@@ -364,14 +381,14 @@ void StandardGameScene::initialize_rendering_board() {
     );
     app->renderer->setup_shader(shader);
 
-    auto vertices = app->res.buffer.load(
-        "board_wood_mesh_vertices"_h,
+    auto buffer = app->res.buffer.load(
+        "board_wood_buffer"_h,
         app->res.mesh_ptnt["board_wood_mesh"_h]->vertices.data(),
         app->res.mesh_ptnt["board_wood_mesh"_h]->vertices.size() * sizeof(PTNT)
     );
 
-    auto indices = app->res.index_buffer.load(
-        "board_wood_mesh_indices"_h,
+    auto index_buffer = app->res.index_buffer.load(
+        "board_wood_index_buffer"_h,
         app->res.mesh_ptnt["board_wood_mesh"_h]->indices.data(),
         app->res.mesh_ptnt["board_wood_mesh"_h]->indices.size() * sizeof(unsigned int)
     );
@@ -383,8 +400,8 @@ void StandardGameScene::initialize_rendering_board() {
     layout.add(3, BufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_wood_vertex_array"_h);
-    vertex_array->add_buffer(vertices, layout);
-    vertex_array->add_index_buffer(indices);
+    vertex_array->add_buffer(buffer, layout);
+    vertex_array->add_index_buffer(index_buffer);
     VertexArray::unbind();
 
     TextureSpecification specification;
@@ -442,14 +459,14 @@ void StandardGameScene::initialize_rendering_board_paint() {
     );
     app->renderer->setup_shader(shader);
 
-    auto vertices = app->res.buffer.load(
-        "board_paint_mesh_vertices"_h,
+    auto buffer = app->res.buffer.load(
+        "board_paint_buffer"_h,
         app->res.mesh_ptnt["board_paint_mesh"_h]->vertices.data(),
         app->res.mesh_ptnt["board_paint_mesh"_h]->vertices.size() * sizeof(PTNT)
     );
 
-    auto indices = app->res.index_buffer.load(
-        "board_paint_mesh_indices"_h,
+    auto index_buffer = app->res.index_buffer.load(
+        "board_paint_index_buffer"_h,
         app->res.mesh_ptnt["board_paint_mesh"_h]->indices.data(),
         app->res.mesh_ptnt["board_paint_mesh"_h]->indices.size() * sizeof(unsigned int)
     );
@@ -461,8 +478,8 @@ void StandardGameScene::initialize_rendering_board_paint() {
     layout.add(3, BufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_paint_vertex_array"_h);
-    vertex_array->add_buffer(vertices, layout);
-    vertex_array->add_index_buffer(indices);
+    vertex_array->add_buffer(buffer, layout);
+    vertex_array->add_index_buffer(index_buffer);
     VertexArray::unbind();
 
     TextureSpecification specification;
@@ -546,26 +563,26 @@ void StandardGameScene::initialize_rendering_pieces() {
     material->add_texture("u_material.normal");
     material->add_uniform(Material::Uniform::Vec3, "u_material.tint");
 
-    auto white_piece_vertices = app->res.buffer.load(
-        "white_piece_vertices"_h,
+    auto white_piece_buffer = app->res.buffer.load(
+        "white_piece_buffer"_h,
         app->res.mesh_ptnt["white_piece_mesh"_h]->vertices.data(),
         app->res.mesh_ptnt["white_piece_mesh"_h]->vertices.size() * sizeof(PTNT)
     );
 
-    auto white_piece_indices = app->res.index_buffer.load(
-        "white_piece_indices"_h,
+    auto white_piece_index_buffer = app->res.index_buffer.load(
+        "white_piece_index_buffer"_h,
         app->res.mesh_ptnt["white_piece_mesh"_h]->indices.data(),
         app->res.mesh_ptnt["white_piece_mesh"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    auto black_piece_vertices = app->res.buffer.load(
-        "white_piece_vertices"_h,
+    auto black_piece_buffer = app->res.buffer.load(
+        "black_piece_buffer"_h,
         app->res.mesh_ptnt["black_piece_mesh"_h]->vertices.data(),
         app->res.mesh_ptnt["black_piece_mesh"_h]->vertices.size() * sizeof(PTNT)
     );
 
-    auto black_piece_indices = app->res.index_buffer.load(
-        "black_piece_indices"_h,
+    auto black_piece_index_buffer = app->res.index_buffer.load(
+        "black_piece_index_buffer"_h,
         app->res.mesh_ptnt["black_piece_mesh"_h]->indices.data(),
         app->res.mesh_ptnt["black_piece_mesh"_h]->indices.size() * sizeof(unsigned int)
     );
@@ -573,14 +590,14 @@ void StandardGameScene::initialize_rendering_pieces() {
     for (size_t i = 0; i < 9; i++) {
         initialize_rendering_piece(
             i, app->res.mesh_ptnt["white_piece_mesh"_h],
-            white_piece_diffuse_texture, white_piece_vertices, white_piece_indices
+            white_piece_diffuse_texture, white_piece_buffer, white_piece_index_buffer
         );
     }
 
     for (size_t i = 9; i < 18; i++) {
         initialize_rendering_piece(
             i, app->res.mesh_ptnt["black_piece_mesh"_h],
-            black_piece_diffuse_texture, black_piece_vertices, black_piece_indices
+            black_piece_diffuse_texture, black_piece_buffer, black_piece_index_buffer
         );
     }
 }
@@ -589,8 +606,8 @@ void StandardGameScene::initialize_rendering_piece(
         size_t index,
         std::shared_ptr<Mesh<PTNT>> mesh,
         std::shared_ptr<Texture> diffuse_texture,
-        std::shared_ptr<Buffer> vertices,
-        std::shared_ptr<IndexBuffer> indices) {
+        std::shared_ptr<Buffer> buffer,
+        std::shared_ptr<IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
     const hover::Id id = hover::generate_id();
@@ -611,9 +628,9 @@ void StandardGameScene::initialize_rendering_piece(
     layout2.add(4, BufferLayout::Int, 1);
 
     auto vertex_array = app->res.vertex_array.load(hs {"piece_vertex_array" + std::to_string(index)});
-    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(buffer, layout);
     vertex_array->add_buffer(id_buffer, layout2);
-    vertex_array->add_index_buffer(indices);
+    vertex_array->add_index_buffer(index_buffer);
     VertexArray::unbind();
 
     auto material_instance = app->res.material_instance.load(
@@ -642,25 +659,25 @@ void StandardGameScene::initialize_rendering_nodes() {
     auto material = app->res.material.load("basic_material"_h, shader);
     material->add_uniform(Material::Uniform::Vec4, "u_color");
 
-    auto vertices = app->res.buffer.load(
-        "node_mesh_vertices"_h,
+    auto buffer = app->res.buffer.load(
+        "node_buffer"_h,
         app->res.mesh_p["node_mesh"_h]->vertices.data(),
         app->res.mesh_p["node_mesh"_h]->vertices.size() * sizeof(P)
     );
 
-    auto indices = app->res.index_buffer.load(
-        "node_mesh_indices"_h,
+    auto index_buffer = app->res.index_buffer.load(
+        "node_index_buffer"_h,
         app->res.mesh_p["node_mesh"_h]->indices.data(),
         app->res.mesh_p["node_mesh"_h]->indices.size() * sizeof(unsigned int)
     );
 
     for (size_t i = 0; i < 24; i++) {
-        initialize_rendering_node(i, vertices, indices);
+        initialize_rendering_node(i, buffer, index_buffer);
     }
 }
 
-void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<Buffer> vertices,
-        std::shared_ptr<IndexBuffer> indices) {
+void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<Buffer> buffer,
+        std::shared_ptr<IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
     const hover::Id id = hover::generate_id();
@@ -678,9 +695,9 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
     layout2.add(1, BufferLayout::Int, 1);
 
     auto vertex_array = app->res.vertex_array.load(hs {"node_vertex_array" + std::to_string(index)});
-    vertex_array->add_buffer(vertices, layout);
+    vertex_array->add_buffer(buffer, layout);
     vertex_array->add_buffer(id_buffer, layout2);
-    vertex_array->add_index_buffer(indices);
+    vertex_array->add_index_buffer(index_buffer);
     VertexArray::unbind();
 
     auto material_instance = app->res.material_instance.load(
@@ -692,7 +709,7 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
 
 void StandardGameScene::setup_and_add_model_board() {
     board.model->vertex_array = app->res.vertex_array["board_wood_vertex_array"_h];
-    board.model->index_count = app->res.mesh_ptnt["board_wood_mesh"_h]->indices.size();
+    board.model->index_buffer = app->res.index_buffer["board_wood_index_buffer"_h];
     board.model->scale = WORLD_SCALE;
     board.model->material = app->res.material_instance["board_wood_material_instance"_h];
     board.model->cast_shadow = true;
@@ -704,7 +721,7 @@ void StandardGameScene::setup_and_add_model_board() {
 
 void StandardGameScene::setup_and_add_model_board_paint() {
     board.paint_model->vertex_array = app->res.vertex_array["board_paint_vertex_array"_h];
-    board.paint_model->index_count = app->res.mesh_ptnt["board_paint_mesh"_h]->indices.size();
+    board.paint_model->index_buffer = app->res.index_buffer["board_paint_index_buffer"_h];
     board.paint_model->position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
     board.paint_model->scale = WORLD_SCALE;
     board.paint_model->material = app->res.material_instance["board_paint_material_instance"_h];
@@ -717,26 +734,28 @@ void StandardGameScene::setup_and_add_model_board_paint() {
 void StandardGameScene::setup_and_add_model_pieces() {
     for (size_t i = 0; i < 9; i++) {
         setup_and_add_model_piece(
-            i, app->res.mesh_ptnt["white_piece_mesh"_h]
+            i, WHITE_PIECE_POSITION(i),
+            app->res.index_buffer["white_piece_index_buffer"_h]
         );
     }
 
     for (size_t i = 9; i < 18; i++) {
         setup_and_add_model_piece(
-            i, app->res.mesh_ptnt["black_piece_mesh"_h]
+            i, BLACK_PIECE_POSITION(i),
+            app->res.index_buffer["black_piece_index_buffer"_h]
         );
     }
 }
 
-void StandardGameScene::setup_and_add_model_piece(size_t index, std::shared_ptr<Mesh<PTNT>> mesh) {
+void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3& position, std::shared_ptr<IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
     Piece& piece = board.pieces[index];
 
-    piece.model->position = WHITE_PIECE_POSITION(index);
+    piece.model->position = position;
     piece.model->rotation = RANDOM_PIECE_ROTATION();
     piece.model->vertex_array = app->res.vertex_array[hs {"piece_vertex_array" + std::to_string(index)}];
-    piece.model->index_count = mesh->indices.size();
+    piece.model->index_buffer = index_buffer;
     piece.model->scale = WORLD_SCALE;
     piece.model->material = app->res.material_instance[hs {"piece_material_instance" + std::to_string(index)}];
     piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
@@ -760,7 +779,7 @@ void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& 
     Node& node = board.nodes[index];
 
     node.model->vertex_array = app->res.vertex_array[hs {"node_vertex_array" + std::to_string(index)}];
-    node.model->index_count = app->res.mesh_p["node_mesh"_h]->indices.size();
+    node.model->index_buffer = app->res.index_buffer["node_index_buffer"_h];
     node.model->position = position;
     node.model->scale = WORLD_SCALE;
     node.model->material = app->res.material_instance[hs {"node_material_instance" + std::to_string(index)}];

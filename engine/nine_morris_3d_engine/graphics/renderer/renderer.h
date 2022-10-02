@@ -36,7 +36,7 @@ public:
         float scale = 1.0f;
 
         std::shared_ptr<VertexArray> vertex_array;
-        int index_count = 0;  // TODO maybe put this into IndexBuffer
+        std::shared_ptr<IndexBuffer> index_buffer;
         std::shared_ptr<MaterialInstance> material;
 
         std::optional<glm::vec3> outline_color;

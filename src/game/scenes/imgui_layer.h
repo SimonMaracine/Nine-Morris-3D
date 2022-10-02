@@ -288,7 +288,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                 }
                 if (ImGui::MenuItem("Custom Cursor", nullptr, &data.options.custom_cursor)) {
                     if (data.options.custom_cursor) {
-                        if (scene->board.player_must_take_piece()) {
+                        if (scene->board.must_take_piece) {
                             app->window->set_cursor(data.cross_cursor);
                         } else {
                             app->window->set_cursor(data.arrow_cursor);
@@ -633,7 +633,7 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
         ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
         ImGui::Text("Turn: %s", scene->board.turn == BoardPlayer::White ? "white" : "black");
-        ImGui::Text("Should take piece: %s", scene->board.player_must_take_piece() ? "true" : "false");
+        ImGui::Text("Should take piece: %s", scene->board.must_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
         ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());
         ImGui::Text("Redo history size: %lu", scene->undo_redo_state.redo.size());
