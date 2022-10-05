@@ -36,8 +36,6 @@ static size_t map_resolution_to_index(const std::pair<int, int>& resolution) {
 }
 
 static std::pair<int, int> map_index_to_resolution(size_t index) {
-    constexpr std::pair<int, int> DEFAULT = {1024, 576};
-
     switch (index) {
         case 0:
             return {512, 288};
@@ -55,7 +53,7 @@ static std::pair<int, int> map_index_to_resolution(size_t index) {
 
     REL_ERROR("Using default resolution for index");
 
-    return DEFAULT;
+    return launcher_options::DEFAULT_RESOLUTION;
 }
 
 static size_t map_texture_quality_to_index(std::string_view texture_quality) {
@@ -73,8 +71,6 @@ static size_t map_texture_quality_to_index(std::string_view texture_quality) {
 }
 
 static std::string map_index_to_texture_quality(size_t index) {
-    constexpr const char* DEFAULT = launcher_options::NORMAL;
-
     switch (index) {
         case 0:
             return launcher_options::NORMAL;
@@ -84,7 +80,7 @@ static std::string map_index_to_texture_quality(size_t index) {
 
     REL_ERROR("Using default texture_quality for index");
 
-    return DEFAULT;
+    return launcher_options::DEFAULT_TEXTURE_QUALITY;
 }
 
 static size_t map_samples_to_index(int samples) {
@@ -105,8 +101,6 @@ static size_t map_samples_to_index(int samples) {
 }
 
 static int map_index_to_samples(size_t index) {
-    constexpr int DEFAULT = 2;
-
     switch (index) {
         case 0:
             return 1;
@@ -118,7 +112,7 @@ static int map_index_to_samples(size_t index) {
 
     REL_ERROR("Using default samples for index");
 
-    return DEFAULT;
+    return launcher_options::DEFAULT_SAMPLES;
 }
 
 static size_t map_anisotropic_filtering_to_index(int anisotropic_filtering) {
@@ -139,8 +133,6 @@ static size_t map_anisotropic_filtering_to_index(int anisotropic_filtering) {
 }
 
 static int map_index_to_anisotropic_filtering(size_t index) {
-    constexpr int DEFAULT = 2;
-
     switch (index) {
         case 0:
             return 0;
@@ -152,7 +144,7 @@ static int map_index_to_anisotropic_filtering(size_t index) {
 
     REL_ERROR("Using default anisotropic_filtering for index");
 
-    return DEFAULT;
+    return launcher_options::DEFAULT_ANISOTROPIC_FILTERING;
 }
 
 static std::vector<const char*> options_sample() {

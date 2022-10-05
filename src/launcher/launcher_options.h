@@ -6,17 +6,26 @@ namespace launcher_options {
     static constexpr const char* NORMAL = "normal";
     static constexpr const char* LOW = "low";
 
+    static constexpr bool DEFAULT_FULLSCREEN = false;
+    static constexpr bool DEFAULT_NATIVE_RESOLUTION = true;
+    static constexpr std::pair<int, int> DEFAULT_RESOLUTION = {1024, 576};
+    static constexpr int DEFAULT_SAMPLES = 1;
+    static constexpr int DEFAULT_ANISOTROPIC_FILTERING = 4;
+    static constexpr const char* DEFAULT_TEXTURE_QUALITY = NORMAL;
+    static constexpr bool DEFAULT_NORMAL_MAPPING = true;
+    static constexpr bool DEFAULT_BLOOM = true;
+    static constexpr float DEFAULT_BLOOM_STRENGTH = 0.3f;
+
     struct LauncherOptions {
-        // These are default values
-        bool fullscreen = false;
-        bool native_resolution = true;
-        std::pair<int, int> resolution = {1024, 576};
-        int samples = 2;
-        int anisotropic_filtering = 4;
-        std::string texture_quality = NORMAL;
-        bool normal_mapping = true;
-        bool bloom = true;
-        float bloom_strength = 0.3f;
+        bool fullscreen = DEFAULT_FULLSCREEN;
+        bool native_resolution = DEFAULT_NATIVE_RESOLUTION;
+        std::pair<int, int> resolution = DEFAULT_RESOLUTION;
+        int samples = DEFAULT_SAMPLES;
+        int anisotropic_filtering = DEFAULT_ANISOTROPIC_FILTERING;
+        std::string texture_quality = DEFAULT_TEXTURE_QUALITY;
+        bool normal_mapping = DEFAULT_NORMAL_MAPPING;
+        bool bloom = DEFAULT_BLOOM;
+        float bloom_strength = DEFAULT_BLOOM_STRENGTH;
 
         template<typename Archive>
         void serialize(Archive& archive) {
