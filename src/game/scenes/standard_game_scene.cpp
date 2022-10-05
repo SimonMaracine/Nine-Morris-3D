@@ -152,6 +152,7 @@ void StandardGameScene::on_update() {
 
     board.update_nodes(app->renderer->get_hovered_id());
     board.update_pieces(app->renderer->get_hovered_id());
+    board.move_pieces();
 }
 
 void StandardGameScene::on_fixed_update() {

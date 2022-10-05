@@ -24,7 +24,7 @@ void GenericBoard::update_nodes(hover::Id hovered_id) {
     for (Node& node : nodes) {
         const bool hovered = node.model->id.value() == hovered_id;
         const bool highlight = (
-            phase == BoardPhase::PlacePieces || phase == BoardPhase::MovePieces && selected_piece != NULL_INDEX
+            phase == BoardPhase::PlacePieces || (phase == BoardPhase::MovePieces && selected_piece != NULL_INDEX)
         );
         const bool permitted = !must_take_piece && is_players_turn;
 
@@ -52,10 +52,88 @@ void GenericBoard::update_pieces(hover::Id hovered_id) {
             piece.model->material->set_vec3("u_material.tint", glm::vec3(1.0f, 1.0f, 1.0f));
         }
 
-        if (piece.selected || piece.show_outline && id == hovered_id && piece.in_use && !piece.pending_remove) {
+        if (piece.selected || (piece.show_outline && id == hovered_id && piece.in_use && !piece.pending_remove)) {
             // FIXME this
         } else {
             piece.model->outline_color = std::nullopt;
+        }
+    }
+}
+
+void GenericBoard::move_pieces() {
+    const float dt = app->get_delta();
+
+    for (auto& pair : pieces) {
+        Piece& piece = pair.second;
+
+        if (piece.movement.moving) {
+            switch (piece.movement.type) {
+                case PieceMovementType::None:
+                    ASSERT(false, "Movement type None is invalid");
+                    break;
+                case PieceMovementType::Linear: {
+                    piece.model->position += piece.movement.velocity * dt + (piece.movement.target - piece.model->position)
+                            * PIECE_VARIABLE_VELOCITY * dt;
+
+                    if (glm::length(piece.movement.target - piece.model->position) < 0.03f) {
+                        piece_arrive_at_node(piece.index);
+                    }
+
+                    break;
+                }
+                case PieceMovementType::ThreeStep: {
+                    if (!piece.movement.reached_target0) {
+                        piece.model->position += (
+                            piece.movement.velocity * dt + (piece.movement.target0 - piece.model->position)
+                                    * PIECE_VARIABLE_VELOCITY * dt
+                        );
+                    } else if (!piece.movement.reached_target1) {
+                        piece.model->position += (
+                            piece.movement.velocity * dt + (piece.movement.target1 - piece.model->position)
+                                    * PIECE_VARIABLE_VELOCITY * dt
+                        );
+                    } else {
+                        piece.model->position += (
+                            piece.movement.velocity * dt + (piece.movement.target - piece.model->position)
+                                    * PIECE_VARIABLE_VELOCITY * dt
+                        );
+                    }
+
+                    if (!piece.movement.reached_target0
+                            && glm::length(piece.movement.target0 - piece.model->position) < 0.03f) {
+                        piece.movement.reached_target0 = true;
+                        piece.model->position = piece.movement.target0;
+                        piece.movement.velocity = glm::normalize(piece.movement.target1 - piece.model->position)
+                                * PIECE_BASE_VELOCITY;
+                    } else if (!piece.movement.reached_target1
+                            && glm::length(piece.movement.target1 - piece.model->position) < 0.03f) {
+                        piece.movement.reached_target1 = true;
+                        piece.model->position = piece.movement.target1;
+                        piece.movement.velocity = glm::normalize(piece.movement.target - piece.model->position)
+                                * PIECE_BASE_VELOCITY;
+                    }
+
+                    if (glm::length(piece.movement.target - piece.model->position) < 0.03f) {
+                        piece_arrive_at_node(piece.index);
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void GenericBoard::select_piece(hover::Id hovered_id) {
+
+}
+
+void GenericBoard::finalize_pieces_state() {
+    for (const auto& pair : pieces) {
+        const Piece& piece = pair.second;
+
+        if (piece.movement.moving) {
+            piece_arrive_at_node(piece.index);
         }
     }
 }

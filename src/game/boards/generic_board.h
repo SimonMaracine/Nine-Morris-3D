@@ -20,6 +20,9 @@ struct GenericBoard {
     GamePosition get_position();
     void update_nodes(hover::Id hovered_id);
     void update_pieces(hover::Id hovered_id);
+    void move_pieces();
+    void select_piece(hover::Id hovered_id);  // FIXME
+    void finalize_pieces_state();
 
     size_t new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index);
     void take_and_raise_piece(size_t piece_index);

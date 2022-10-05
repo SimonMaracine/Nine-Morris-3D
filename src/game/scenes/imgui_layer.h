@@ -494,7 +494,7 @@ void ImGuiLayer<SceneType>::draw_about() {
     if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, window_flags)) {
         HOVERING_GUI();
 
-        // static bool deactivated = false;
+        // static bool deactivated = false;  // FIXME these
         // if (!deactivated) {
         //     game_layer->active = false;
         //     gui_layer->active = false;
@@ -689,9 +689,10 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::End();
 
         // If you recompile shaders, uniforms that are set only once need to be reuploaded
-        ImGui::Begin("Shaders");
+        /*
+        ImGui::Begin("Shaders");  // TODO see what to do with this
         if (ImGui::Button("board_paint")) {
-            // app->data.board_paint_shader->recompile();  // FIXME this
+            // app->data.board_paint_shader->recompile();
         }
         if (ImGui::Button("board")) {
             // app->data.board_wood_shader->recompile();
@@ -727,6 +728,7 @@ void ImGuiLayer<SceneType>::draw_debug() {
             // app->gui_renderer->get_text_shader()->recompile();
         }
         ImGui::End();
+        */
 
         const glm::vec3& position = scene->camera.get_position();
         ImGui::Begin("Camera Debug");
