@@ -159,7 +159,7 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
-constexpr size_t NULL_INDEX = UINT_MAX;
+constexpr size_t NULL_INDEX = 1000;
 
 constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
 

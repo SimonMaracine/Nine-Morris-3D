@@ -638,9 +638,9 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());
         ImGui::Text("Redo history size: %lu", scene->undo_redo_state.redo.size());
         ImGui::Text("Hovered ID: %d", app->renderer->get_hovered_id());
-        ImGui::Text("Hovered node: %zu", scene->board.hovered_node);
-        ImGui::Text("Hovered piece: %zu", scene->board.hovered_piece);
-        ImGui::Text("Selected piece: %zu", scene->board.selected_piece);
+        ImGui::Text("Hovered node: %zu", scene->board.clicked_node_index);
+        ImGui::Text("Hovered piece: %zu", scene->board.clicked_piece_index);
+        ImGui::Text("Selected piece: %zu", scene->board.selected_piece_index);
         ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
         ImGui::Text("Game started: %s", scene->made_first_move ? "true" : "false");
         ImGui::End();

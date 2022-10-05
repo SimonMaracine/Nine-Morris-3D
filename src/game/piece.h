@@ -18,7 +18,7 @@ struct Piece {
 
     std::shared_ptr<Renderer::Model> model;
 
-    size_t node = NULL_INDEX;  // Reference to the node on top of which it sits on
+    size_t node_index = NULL_INDEX;  // Reference to the node on top of which it sits on
 
     struct Movement {
         PieceMovementType type = PieceMovementType::None;

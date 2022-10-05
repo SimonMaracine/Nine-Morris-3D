@@ -3,6 +3,150 @@
 #include "game/boards/standard_board.h"
 #include "game/piece.h"
 
+void StandardBoard::click(hover::Id hovered_id) {
+    // Check for clicked nodes
+    for (const Node& node : nodes) {
+        if (node.model->id.value() == hovered_id) {
+            clicked_node_index = node.index;
+        }
+    }
+
+    // Check for clicked pieces
+    for (const auto& [_, piece] : pieces) {
+        if (piece.model->id.value() == hovered_id) {
+            clicked_piece_index = piece.index;
+        }
+    }
+}
+
+void StandardBoard::release() {
+    if (phase == BoardPhase::PlacePieces) {
+        if (must_take_piece) {
+            check_take_piece();
+        } else {
+
+        }
+    } else if (phase == BoardPhase::MovePieces) {
+        if (must_take_piece) {
+            check_take_piece();
+        } else {
+            check_select_piece();
+        }
+    }
+
+
+
+
+
+    clicked_node_index = NULL_INDEX;
+    clicked_piece_index = NULL_INDEX;
+}
+
+bool StandardBoard::place_piece(hover::Id hovered_id) {
+
+}
+
+bool StandardBoard::put_down_piece(hover::Id hovered_id) {
+
+}
+
+void StandardBoard::check_select_piece() {
+    for (const auto& [index, piece] : pieces) {
+        if (index == clicked_piece_index) {
+            if (turn == BoardPlayer::White && piece.type == PieceType::White
+                    || turn == BoardPlayer::Black && piece.type == PieceType::Black) {
+                select_piece(index);
+            }
+        }
+    }
+}
+
+bool StandardBoard::check_take_piece() {
+    if (clicked_piece_index == NULL_INDEX) {  // Do anything only if there is a hovered piece
+        return false;
+    }
+
+    constexpr auto windmills = WINDMILLS_NINE_MENS_MORRIS;
+    constexpr auto count = NINE_MENS_MORRIS_MILLS;
+
+    for (auto& [index, piece] : pieces) {
+        if (turn == BoardPlayer::White) {
+            if (index == clicked_piece_index && piece.type == PieceType::Black) {
+                if (!is_windmill_made(piece.node_index, PieceType::Black, windmills, count)
+                        || number_of_pieces_in_windmills(PieceType::Black, windmills, count) == black_pieces_count) {
+                    take_piece(index);
+                } else {
+                    DEB_DEBUG("Cannot take black piece from windmill");
+                }
+
+                break;
+            }
+        } else {
+            if (index == clicked_piece_index && piece.type == PieceType::White) {
+                if (!is_windmill_made(piece.node_index, PieceType::White, windmills, count)
+                        || number_of_pieces_in_windmills(PieceType::White, windmills, count) == white_pieces_count) {
+                    take_piece(index);
+                } else {
+                    DEB_DEBUG("Cannot take white piece from windmill");
+                }
+
+                break;
+            }
+        }
+    }
+
+    // Do this even if it may not be needed
+    if (not_placed_pieces_count == 0 && !must_take_piece && phase != BoardPhase::GameOver) {
+        phase = BoardPhase::MovePieces;
+        update_piece_outlines();
+
+        DEB_INFO("Phase 2");
+    }
+}
+
+void StandardBoard::take_piece(size_t piece_index) {
+    Piece& piece = pieces[piece_index];
+
+    ASSERT(piece.in_use, "Piece must be in use");
+
+    // remember_state();  // FIXME need reference to camera
+    WAIT_FOR_NEXT_MOVE();
+
+    nodes[piece.node_index].piece_index = NULL_INDEX;
+    take_and_raise_piece(piece_index);
+    must_take_piece = false;
+    set_pieces_to_take(piece.type, false);
+    // update_cursor();  // FIXME this
+
+    if (piece.type == PieceType::White) {
+        white_pieces_count--;
+    } else {
+        black_pieces_count--;
+    }
+
+    check_player_number_of_pieces(BoardPlayer::Black);
+    check_player_number_of_pieces(BoardPlayer::White);
+
+    switch_turn_and_check_turns_without_mills();
+    update_piece_outlines();
+
+    DEB_DEBUG("{} piece {} taken", piece.type == PieceType::White ? "White" : "Black", piece_index);
+
+    if (is_player_blocked(turn)) {
+        DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+
+        FORMATTED_MESSAGE(
+            message, 64, "%s player has blocked %s player.",
+            TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("White", "Black")
+        )
+
+        game_over(
+            BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message},
+            TURN_IS_WHITE_SO(PieceType::White, PieceType::Black)
+        );
+    }
+}
+
 void StandardBoard::switch_turn_and_check_turns_without_mills() {
     if (phase == BoardPhase::MovePieces) {
         if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
@@ -186,19 +330,17 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
         return false;
     }
 
-    for (auto& pair : pieces) {
-        Piece& piece = pair.second;
-
+    for (auto& [_, piece] : pieces) {
         if (piece.type == type && !piece.pending_remove && piece.in_use) {
             at_least_one_piece = true;
 
-            const Node& node = nodes[piece.node];
+            const Node& node = nodes[piece.node_index];
 
             switch (node.index) {
                 case 0: {
                     const Node& node1 = nodes[1];
                     const Node& node2 = nodes[9];
-                    if (node1.piece == NULL_INDEX|| node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX|| node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -206,22 +348,22 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node1 = nodes[0];
                     const Node& node2 = nodes[2];
                     const Node& node3 = nodes[4];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 2: {
                     const Node& node1 = nodes[1];
                     const Node& node2 = nodes[14];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 3: {
                     const Node& node1 = nodes[4];
                     const Node& node2 = nodes[10];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -230,22 +372,22 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node2 = nodes[3];
                     const Node& node3 = nodes[5];
                     const Node& node4 = nodes[7];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX || node4.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX || node4.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 5: {
                     const Node& node1 = nodes[4];
                     const Node& node2 = nodes[13];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 6: {
                     const Node& node1 = nodes[7];
                     const Node& node2 = nodes[11];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -253,15 +395,15 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node1 = nodes[4];
                     const Node& node2 = nodes[6];
                     const Node& node3 = nodes[8];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 8: {
                     const Node& node1 = nodes[7];
                     const Node& node2 = nodes[12];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -269,8 +411,8 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node1 = nodes[0];
                     const Node& node2 = nodes[10];
                     const Node& node3 = nodes[21];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -279,8 +421,8 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node2 = nodes[9];
                     const Node& node3 = nodes[11];
                     const Node& node4 = nodes[18];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX || node4.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX || node4.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -288,8 +430,8 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node1 = nodes[6];
                     const Node& node2 = nodes[10];
                     const Node& node3 = nodes[15];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -297,8 +439,8 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node1 = nodes[8];
                     const Node& node2 = nodes[13];
                     const Node& node3 = nodes[17];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -307,8 +449,8 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node2 = nodes[12];
                     const Node& node3 = nodes[14];
                     const Node& node4 = nodes[20];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX || node4.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX || node4.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -316,15 +458,15 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node1 = nodes[2];
                     const Node& node2 = nodes[13];
                     const Node& node3 = nodes[23];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 15: {
                     const Node& node1 = nodes[11];
                     const Node& node2 = nodes[16];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -332,22 +474,22 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node1 = nodes[15];
                     const Node& node2 = nodes[17];
                     const Node& node3 = nodes[19];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 17: {
                     const Node& node1 = nodes[12];
                     const Node& node2 = nodes[16];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 18: {
                     const Node& node1 = nodes[10];
                     const Node& node2 = nodes[19];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -356,22 +498,22 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node2 = nodes[18];
                     const Node& node3 = nodes[20];
                     const Node& node4 = nodes[22];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX || node4.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX || node4.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 20: {
                     const Node& node1 = nodes[13];
                     const Node& node2 = nodes[19];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 21: {
                     const Node& node1 = nodes[9];
                     const Node& node2 = nodes[22];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -379,15 +521,15 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
                     const Node& node1 = nodes[19];
                     const Node& node2 = nodes[21];
                     const Node& node3 = nodes[23];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX
-                            || node3.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
+                            || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 23: {
                     const Node& node1 = nodes[14];
                     const Node& node2 = nodes[22];
-                    if (node1.piece == NULL_INDEX || node2.piece == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }

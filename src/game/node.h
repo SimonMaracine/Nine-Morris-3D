@@ -15,5 +15,5 @@ struct Node {
 
     std::shared_ptr<Renderer::Model> model;
 
-    size_t piece = NULL_INDEX;  // Reference to the piece that sits on this node
+    size_t piece_index = NULL_INDEX;  // Reference to the piece that sits on this node
 };

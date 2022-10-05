@@ -21,17 +21,17 @@ struct GenericBoard {
     void update_nodes(hover::Id hovered_id);
     void update_pieces(hover::Id hovered_id);
     void move_pieces();
-    void select_piece(hover::Id hovered_id);  // FIXME
     void finalize_pieces_state();
 
     size_t new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index);
     void take_and_raise_piece(size_t piece_index);
+    void select_piece(size_t piece_index);
     void set_pieces_show_outline(PieceType type, bool show);
-    void game_over(const BoardEnding& ending, PieceType type_to_hide);
-    bool is_windmill_made(size_t node_index, PieceType type, size_t** windmills, size_t mills_count);
     void set_pieces_to_take(PieceType type, bool take);
-    size_t number_of_pieces_in_windmills(PieceType type, size_t** windmills, size_t mills_count);
-    void unselect_other_pieces(size_t currently_selected_piece_index);
+    void game_over(const BoardEnding& ending, PieceType type_to_hide);
+    bool is_windmill_made(size_t node_index, PieceType type, const size_t windmills[][3], size_t mills_count);
+    size_t number_of_pieces_in_windmills(PieceType type, const size_t windmills[][3], size_t mills_count);
+    void unselect_other_pieces(size_t currently_selected_piece_index_index);
     void update_piece_outlines();
     void remember_position_and_check_repetition(size_t piece_index, Node* node);
     void remember_state(const Camera& camera);
@@ -58,9 +58,9 @@ struct GenericBoard {
 
     bool must_take_piece = false;
 
-    size_t hovered_node = NULL_INDEX;
-    size_t hovered_piece = NULL_INDEX;
-    size_t selected_piece = NULL_INDEX;
+    size_t clicked_node_index = NULL_INDEX;
+    size_t clicked_piece_index = NULL_INDEX;
+    size_t selected_piece_index = NULL_INDEX;
 
     std::array<bool, 2> can_jump = { false, false };  // White first and black second
 

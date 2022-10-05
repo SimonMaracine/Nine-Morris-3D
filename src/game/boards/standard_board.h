@@ -13,12 +13,14 @@ struct StandardBoard : public GenericBoard {
         : GenericBoard(app) {}
     ~StandardBoard() = default;
 
-    void press(hover::Id hovered_id);
+    void click(hover::Id hovered_id);
     void release();
     bool place_piece(hover::Id hovered_id);
-    bool take_piece(hover::Id hovered_id);
     bool put_down_piece(hover::Id hovered_id);
 
+    void check_select_piece();
+    bool check_take_piece();
+    void take_piece(size_t piece_index);
     void switch_turn_and_check_turns_without_mills();
     bool can_go(size_t source_node_index, size_t destination_node_index);
     void check_player_number_of_pieces(BoardPlayer player);

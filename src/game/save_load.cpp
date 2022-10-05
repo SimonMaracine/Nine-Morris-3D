@@ -67,7 +67,7 @@ void serialize(Archive& archive, Camera& camera) {
 
 /*
 Unserialized fields:
-    hovered_node, hovered_piece, selected_piece, undo_redo_state, keyboard, game_context
+    undo_redo_state, keyboard, game_context
 */
 template<typename Archive>
 void serialize(Archive& archive, GenericBoard& board) {
@@ -80,9 +80,9 @@ void serialize(Archive& archive, GenericBoard& board) {
         board.turn,
         board.ending,
         board.must_take_piece,
-        board.hovered_node,
-        board.hovered_piece,
-        board.selected_piece,
+        board.clicked_node_index,
+        board.clicked_piece_index,
+        board.selected_piece_index,
         // board.white_pieces_count,
         // board.black_pieces_count,
         // board.not_placed_pieces_count,
@@ -133,7 +133,7 @@ void serialize(Archive& archive, Piece& piece) {
         piece.type,
         piece.in_use,
         piece.model,
-        piece.node,
+        piece.node_index,
         piece.movement,
         piece.show_outline,
         piece.to_take,
@@ -158,7 +158,7 @@ void serialize(Archive& archive, Piece::Movement& movement) {
 
 template<typename Archive>
 void serialize(Archive& archive, Node& node) {
-    archive(node.index, node.model, node.piece);
+    archive(node.index, node.model, node.piece_index);
 }
 
 template<typename Archive>
