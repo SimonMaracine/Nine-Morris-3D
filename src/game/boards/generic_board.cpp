@@ -37,6 +37,8 @@ void GenericBoard::update_nodes(hover::Id hovered_id) {
 }
 
 void GenericBoard::update_pieces(hover::Id hovered_id) {
+    const float dt = app->get_delta();
+
     for (auto& [_, piece] : pieces) {
         const bool hovered = piece.model->id.value() == hovered_id;
 
@@ -55,13 +57,7 @@ void GenericBoard::update_pieces(hover::Id hovered_id) {
         } else {
             piece.model->outline_color = std::nullopt;
         }
-    }
-}
 
-void GenericBoard::move_pieces() {
-    const float dt = app->get_delta();
-
-    for (auto& [_, piece] : pieces) {
         if (piece.movement.moving) {
             switch (piece.movement.type) {
                 case PieceMovementType::None:
@@ -131,10 +127,10 @@ void GenericBoard::finalize_pieces_state() {
 size_t GenericBoard::new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index) {
     for (auto& [_, piece] : pieces) {
         if (!piece.in_use && piece.type == type) {
-            const glm::vec3 target = glm::vec3(x_pos, PIECE_Y_POSITION, z_pos);
-            const glm::vec3 target0 = piece.model->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
-            const glm::vec3 target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
-            const glm::vec3 velocity = glm::normalize(target0 - piece.model->position) * PIECE_BASE_VELOCITY;
+            const auto target = glm::vec3(x_pos, PIECE_Y_POSITION, z_pos);
+            const auto target0 = piece.model->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+            const auto target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+            const auto velocity = glm::normalize(target0 - piece.model->position) * PIECE_BASE_VELOCITY;
 
             prepare_piece_for_three_step_move(piece.index, target, velocity, target0, target1);
 
@@ -295,15 +291,13 @@ void GenericBoard::update_piece_outlines() {
     }
 }
 
-void GenericBoard::remember_position_and_check_repetition(size_t piece_index, Node* node) {
+void GenericBoard::remember_position_and_check_repetition(size_t piece_index, size_t node_index) {
     using Position = ThreefoldRepetitionHistory::PositionPlusInfo;
 
     ASSERT(piece_index != NULL_INDEX, "Piece must not be null");
     ASSERT(piece_index != NULL_INDEX, "Node must not be null");
 
-    const Piece& piece = pieces[piece_index];
-
-    const Position current_position = { get_position(), piece.index, node->index };
+    const Position current_position = { get_position(), piece_index, node_index };
 
     for (const Position& position : repetition_history.twos) {
         if (position == current_position) {

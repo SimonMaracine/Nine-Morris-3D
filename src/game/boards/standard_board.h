@@ -15,14 +15,16 @@ struct StandardBoard : public GenericBoard {
 
     void click(hover::Id hovered_id);
     void release();
-    bool place_piece(hover::Id hovered_id);
-    bool put_down_piece(hover::Id hovered_id);
 
     void check_select_piece();
-    bool check_take_piece();
+    void check_place_piece();
+    void check_move_piece();
+    void check_take_piece();
+    void place_piece(size_t node_index);
+    void move_piece(size_t piece_index, size_t node_index);
     void take_piece(size_t piece_index);
     void switch_turn_and_check_turns_without_mills();
-    bool can_go(size_t source_node_index, size_t destination_node_index);
+    bool can_go(size_t piece_index, size_t destination_node_index);
     void check_player_number_of_pieces(BoardPlayer player);
     bool is_player_blocked(BoardPlayer player);
 

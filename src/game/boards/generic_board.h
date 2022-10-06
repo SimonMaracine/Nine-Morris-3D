@@ -33,7 +33,7 @@ struct GenericBoard {
     size_t number_of_pieces_in_windmills(PieceType type, const size_t windmills[][3], size_t mills_count);
     void unselect_other_pieces(size_t currently_selected_piece_index_index);
     void update_piece_outlines();
-    void remember_position_and_check_repetition(size_t piece_index, Node* node);
+    void remember_position_and_check_repetition(size_t piece_index, size_t node_index);
     void remember_state(const Camera& camera);
     void piece_arrive_at_node(size_t piece_index);
     void prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity);

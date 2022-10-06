@@ -24,13 +24,14 @@ void StandardBoard::release() {
         if (must_take_piece) {
             check_take_piece();
         } else {
-
+            check_place_piece();
         }
     } else if (phase == BoardPhase::MovePieces) {
         if (must_take_piece) {
             check_take_piece();
         } else {
             check_select_piece();
+            check_move_piece();
         }
     }
 
@@ -40,14 +41,6 @@ void StandardBoard::release() {
 
     clicked_node_index = NULL_INDEX;
     clicked_piece_index = NULL_INDEX;
-}
-
-bool StandardBoard::place_piece(hover::Id hovered_id) {
-
-}
-
-bool StandardBoard::put_down_piece(hover::Id hovered_id) {
-
 }
 
 void StandardBoard::check_select_piece() {
@@ -61,9 +54,30 @@ void StandardBoard::check_select_piece() {
     }
 }
 
-bool StandardBoard::check_take_piece() {
-    if (clicked_piece_index == NULL_INDEX) {  // Do anything only if there is a hovered piece
-        return false;
+void StandardBoard::check_place_piece() {
+    for (Node& node : nodes) {
+        if (node.index == clicked_node_index && node.piece_index == NULL_INDEX) {
+            place_piece(node.index);
+        }
+    }
+}
+
+void StandardBoard::check_move_piece() {
+    if (selected_piece_index == NULL_INDEX) {
+        return;
+    }
+
+    for (Node& node : nodes) {
+        if (node.index == clicked_node_index && can_go(selected_piece_index, node.index)) {
+            move_piece(selected_piece_index, node.index);
+            selected_piece_index = NULL_INDEX;
+        }
+    }
+}
+
+void StandardBoard::check_take_piece() {
+    if (clicked_piece_index == NULL_INDEX) {
+        return;
     }
 
     constexpr auto windmills = WINDMILLS_NINE_MENS_MORRIS;
@@ -101,6 +115,139 @@ bool StandardBoard::check_take_piece() {
         update_piece_outlines();
 
         DEB_INFO("Phase 2");
+    }
+}
+
+void StandardBoard::place_piece(size_t node_index) {
+    Node& node = nodes[node_index];
+
+    // remember_state();  FIXME need camera reference
+    WAIT_FOR_NEXT_MOVE();
+
+    const glm::vec3& position = node.model->position;
+
+    if (turn == BoardPlayer::White) {
+        node.piece_index = new_piece_to_place(PieceType::White, position.x, position.z, node_index);
+        white_pieces_count++;
+    } else {
+        node.piece_index = new_piece_to_place(PieceType::Black, position.x, position.z, node_index);
+        black_pieces_count++;
+    }
+
+    not_placed_pieces_count--;
+
+    constexpr auto windmills = WINDMILLS_NINE_MENS_MORRIS;
+    constexpr auto count = NINE_MENS_MORRIS_MILLS;
+
+    if (is_windmill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), windmills, count)) {
+        DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
+
+        must_take_piece = true;
+        // update_cursor();  // FIXME this
+
+        set_pieces_to_take(TURN_IS_WHITE_SO(PieceType::Black, PieceType::White), true);
+    } else {
+        check_player_number_of_pieces(turn);
+        switch_turn_and_check_turns_without_mills();
+
+        if (not_placed_pieces_count == 0) {
+            phase = BoardPhase::MovePieces;
+            update_piece_outlines();
+
+            DEB_INFO("Phase 2");
+
+            if (is_player_blocked(turn)) {
+                DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+
+                FORMATTED_MESSAGE(
+                    message, 64, "%s player has blocked %s player.",
+                    TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("White", "Black")
+                )
+
+                game_over(
+                    BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message},
+                    TURN_IS_WHITE_SO(PieceType::White, PieceType::Black)
+                );
+            }
+        }
+    }
+}
+
+void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
+    Piece& piece = pieces[piece_index];
+    Node& node = nodes[node_index];
+
+    ASSERT(node.piece_index == NULL_INDEX, "Piece must be null");
+
+    // remember_state();  FIXME need camera reference
+    WAIT_FOR_NEXT_MOVE();
+
+    if (piece.type == PieceType::White && can_jump[static_cast<int>(PieceType::White)]
+            || piece.type == PieceType::Black && can_jump[static_cast<int>(PieceType::Black)]) {
+        const auto target = glm::vec3(node.model->position.x, PIECE_Y_POSITION, node.model->position.z);
+        const auto target0 = piece.model->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+        const auto target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+        const auto velocity = glm::normalize(target0 - piece.model->position) * PIECE_BASE_VELOCITY;
+
+        prepare_piece_for_three_step_move(piece_index, target, velocity, target0, target1);
+    } else {
+        const auto target = glm::vec3(node.model->position.x, PIECE_Y_POSITION, node.model->position.z);
+
+        prepare_piece_for_linear_move(
+            piece_index,
+            target,
+            glm::normalize(target - piece.model->position) * PIECE_BASE_VELOCITY
+        );
+    }
+
+    // Reset all of these
+    Node& previous_node = nodes[piece.node_index];
+    previous_node.piece_index = NULL_INDEX;
+
+    piece.node_index = node_index;
+    piece.selected = false;
+    node.piece_index = piece_index;
+
+    constexpr auto windmills = WINDMILLS_NINE_MENS_MORRIS;
+    constexpr auto count = NINE_MENS_MORRIS_MILLS;
+
+    if (is_windmill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), windmills, count)) {
+        DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
+
+        must_take_piece = true;
+        // update_cursor();  // FIXME this
+
+        if (turn == BoardPlayer::White) {
+            set_pieces_to_take(PieceType::Black, true);
+            set_pieces_show_outline(PieceType::White, false);
+        } else {
+            set_pieces_to_take(PieceType::White, true);
+            set_pieces_show_outline(PieceType::Black, false);
+        }
+
+        turns_without_mills = 0;
+    } else {
+        check_player_number_of_pieces(BoardPlayer::White);
+        check_player_number_of_pieces(BoardPlayer::Black);
+        turns_without_mills++;
+        switch_turn_and_check_turns_without_mills();
+        update_piece_outlines();
+
+        if (is_player_blocked(turn)) {
+            DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+
+            FORMATTED_MESSAGE(
+                message, 64, "%s player has blocked %s player.",
+                TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("White", "Black")
+            )
+
+            game_over(
+                BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message},
+                TURN_IS_WHITE_SO(PieceType::White, PieceType::Black)
+            );
+        }
+
+        remember_position_and_check_repetition(piece_index, node_index);
     }
 }
 
@@ -168,7 +315,9 @@ void StandardBoard::switch_turn_and_check_turns_without_mills() {
     switched_turn = true;
 }
 
-bool StandardBoard::can_go(size_t source_node_index, size_t destination_node_index) {
+bool StandardBoard::can_go(size_t piece_index, size_t destination_node_index) {
+    const size_t source_node_index = pieces[piece_index].node_index;
+
     ASSERT(source_node_index != destination_node_index, "Source must be different than destination");
 
     if (can_jump[static_cast<int>(turn)]) {

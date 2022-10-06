@@ -633,14 +633,14 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
         ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
         ImGui::Text("Turn: %s", scene->board.turn == BoardPlayer::White ? "white" : "black");
-        ImGui::Text("Should take piece: %s", scene->board.must_take_piece ? "true" : "false");
+        ImGui::Text("Must take piece: %s", scene->board.must_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
         ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());
         ImGui::Text("Redo history size: %lu", scene->undo_redo_state.redo.size());
         ImGui::Text("Hovered ID: %d", app->renderer->get_hovered_id());
-        ImGui::Text("Hovered node: %zu", scene->board.clicked_node_index);
-        ImGui::Text("Hovered piece: %zu", scene->board.clicked_piece_index);
-        ImGui::Text("Selected piece: %zu", scene->board.selected_piece_index);
+        ImGui::Text("Clicked node: %lu", scene->board.clicked_node_index);
+        ImGui::Text("Clicked piece: %lu", scene->board.clicked_piece_index);
+        ImGui::Text("Selected piece: %lu", scene->board.selected_piece_index);
         ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
         ImGui::Text("Game started: %s", scene->made_first_move ? "true" : "false");
         ImGui::End();

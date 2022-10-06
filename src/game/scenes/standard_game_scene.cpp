@@ -152,7 +152,6 @@ void StandardGameScene::on_update() {
 
     board.update_nodes(app->renderer->get_hovered_id());
     board.update_pieces(app->renderer->get_hovered_id());
-    board.move_pieces();
 }
 
 void StandardGameScene::on_fixed_update() {
@@ -206,7 +205,7 @@ void StandardGameScene::on_imgui_update() {
 void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
     if (event.button == input::MouseButton::LEFT) {
         if (board.next_move) {
-            // board.press(app->renderer->get_hovered_id());  // FIXME make these calls actually do the thing
+            board.click(app->renderer->get_hovered_id());
         }
     }
 }
@@ -218,20 +217,22 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         if (board.next_move && board.is_players_turn) {
             bool did = false;
 
-            if (board.phase == BoardPhase::PlacePieces) {
-                if (board.must_take_piece) {
-                    // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
-                } else {
-                    // did = board.place_piece(app->renderer->get_hovered_id());  // FIXME
-                }
-            } else if (board.phase == BoardPhase::MovePieces) {
-                if (board.must_take_piece) {
-                    // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
-                } else {
-                    // board.select_piece(app->renderer->get_hovered_id());  // FIXME
-                    // did = board.put_down_piece(app->renderer->get_hovered_id());  // FIXME
-                }
-            }
+            board.release();
+
+            // if (board.phase == BoardPhase::PlacePieces) {
+            //     if (board.must_take_piece) {
+            //         // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
+            //     } else {
+            //         // did = board.place_piece(app->renderer->get_hovered_id());  // FIXME
+            //     }
+            // } else if (board.phase == BoardPhase::MovePieces) {
+            //     if (board.must_take_piece) {
+            //         // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
+            //     } else {
+            //         // board.select_piece(app->renderer->get_hovered_id());  // FIXME
+            //         // did = board.put_down_piece(app->renderer->get_hovered_id());  // FIXME
+            //     }
+            // }
 
             if (did) {
                 game.state = GameState::HumanDoingMove;
@@ -250,8 +251,6 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
                 imgui_layer.can_redo = false;
             }
         }
-
-        // board.release();  // FIXME
 
         if (show_keyboard_controls) {
             app->renderer->remove_quad(data.quad_cache["light_bulb"_h]);
