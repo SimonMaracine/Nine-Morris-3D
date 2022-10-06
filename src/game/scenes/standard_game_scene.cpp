@@ -28,6 +28,7 @@ void StandardGameScene::on_start() {
     setup_and_add_model_nodes();
 
     setup_camera();
+    setup_widgets();
 
     keyboard = KeyboardControls {&board, data.quad_cache["light_bulb"_h]};
     keyboard.initialize_refs();
@@ -95,6 +96,7 @@ void StandardGameScene::on_stop() {
 #endif
 
     app->renderer->clear();
+    app->gui_renderer->clear();
 
     made_first_move = false;
 
@@ -133,7 +135,8 @@ void StandardGameScene::on_awake() {
 
     setup_skybox();
     setup_light();
-    setup_keyboard_controls();
+    setup_keyboard_controls_textures();
+    setup_indicators_textures();
 
     app->evt.sink<MouseButtonPressedEvent>().connect<&StandardGameScene::on_mouse_button_pressed>(*this);
     app->evt.sink<MouseButtonReleasedEvent>().connect<&StandardGameScene::on_mouse_button_released>(*this);
@@ -152,6 +155,18 @@ void StandardGameScene::on_update() {
 
     board.update_nodes(app->renderer->get_hovered_id());
     board.update_pieces(app->renderer->get_hovered_id());
+
+    timer.update(app->window->get_time());
+
+    char time[32];
+    timer.get_time_formatted(time);
+    timer_text->set_text(time);
+
+    if (board.turn == BoardPlayer::White) {
+        turn_indicator->set_image(app->res.texture["white_indicator_texture"_h]);  // FIXME this is inefficient
+    } else {
+        turn_indicator->set_image(app->res.texture["black_indicator_texture"_h]);
+    }
 }
 
 void StandardGameScene::on_fixed_update() {
@@ -215,30 +230,13 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
 
     if (event.button == input::MouseButton::LEFT) {
         if (board.next_move && board.is_players_turn) {
-            bool did = false;
+            const bool did_action = board.release();
 
-            board.release();
-
-            // if (board.phase == BoardPhase::PlacePieces) {
-            //     if (board.must_take_piece) {
-            //         // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
-            //     } else {
-            //         // did = board.place_piece(app->renderer->get_hovered_id());  // FIXME
-            //     }
-            // } else if (board.phase == BoardPhase::MovePieces) {
-            //     if (board.must_take_piece) {
-            //         // did = board.take_piece(app->renderer->get_hovered_id());  // FIXME
-            //     } else {
-            //         // board.select_piece(app->renderer->get_hovered_id());  // FIXME
-            //         // did = board.put_down_piece(app->renderer->get_hovered_id());  // FIXME
-            //     }
-            // }
-
-            if (did) {
+            if (did_action) {
                 game.state = GameState::HumanDoingMove;
             }
 
-            if (did && !made_first_move && !timer.is_running()) {
+            if (did_action && !made_first_move && !timer.is_running()) {
                 timer.start(app->window->get_time());
                 made_first_move = true;
             }
@@ -310,13 +308,13 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
             break;
         case input::Key::ENTER:
             if (board.next_move && board.is_players_turn) {
-                const bool did = keyboard.press(made_first_move);
+                const bool did_action = keyboard.click_and_release();
 
-                if (did) {
+                if (did_action) {
                     game.state = GameState::HumanDoingMove;
                 }
 
-                if (did && !made_first_move && !timer.is_running()) {
+                if (did_action && !made_first_move && !timer.is_running()) {
                     timer.start(app->window->get_time());
                     made_first_move = true;
                 }
@@ -329,7 +327,6 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
                     imgui_layer.can_redo = false;
                 }
             }
-            // board.release();  // FIXME
             break;
         default:
             break;
@@ -412,13 +409,13 @@ void StandardGameScene::initialize_rendering_board() {
 
     auto diffuse_texture = app->res.texture.load(
         "board_wood_diffuse_texture"_h,
-        app->res.texture_data["board_wood_diff_texture"_h],
+        app->res.texture_data["board_wood_diffuse_texture"_h],
         specification
     );
 
     auto normal_texture = app->res.texture.load(
         "board_normal_texture"_h,
-        app->res.texture_data["board_norm_texture"_h],
+        app->res.texture_data["board_normal_texture"_h],
         specification
     );
 
@@ -490,7 +487,7 @@ void StandardGameScene::initialize_rendering_board_paint() {
 
     auto diffuse_texture = app->res.texture.load(
         "board_paint_diffuse_texture"_h,
-        app->res.texture_data["board_paint_diff_texture"_h],
+        app->res.texture_data["board_paint_diffuse_texture"_h],
         specification
     );
 
@@ -540,19 +537,19 @@ void StandardGameScene::initialize_rendering_pieces() {
 
     auto white_piece_diffuse_texture = app->res.texture.load(
         "white_piece_diffuse_texture"_h,
-        app->res.texture_data["white_piece_diff_texture"_h],
+        app->res.texture_data["white_piece_diffuse_texture"_h],
         specification
     );
 
     auto black_piece_diffuse_texture = app->res.texture.load(
         "black_piece_diffuse_texture"_h,
-        app->res.texture_data["black_piece_diff_texture"_h],
+        app->res.texture_data["black_piece_diffuse_texture"_h],
         specification
     );
 
     auto piece_normal_texture = app->res.texture.load(
         "piece_normal_texture"_h,
-        app->res.texture_data["piece_norm_texture"_h],
+        app->res.texture_data["piece_normal_texture"_h],
         specification
     );
 
@@ -900,7 +897,7 @@ void StandardGameScene::setup_camera() {
     DEB_DEBUG("Setup camera");
 }
 
-void StandardGameScene::setup_keyboard_controls() {
+void StandardGameScene::setup_keyboard_controls_textures() {
     TextureSpecification specification;
     specification.min_filter = Filter::Linear;
     specification.mag_filter = Filter::Linear;
@@ -917,8 +914,68 @@ void StandardGameScene::setup_keyboard_controls() {
     );
 }
 
+void StandardGameScene::setup_indicators_textures() {
+    TextureSpecification specification;
+    specification.min_filter = Filter::Linear;
+    specification.mag_filter = Filter::Linear;
+
+    app->res.texture.load(
+        "white_indicator_texture"_h,
+        app->res.texture_data["white_indicator_texture"_h],
+        specification
+    );
+    app->res.texture.load(
+        "black_indicator_texture"_h,
+        app->res.texture_data["black_indicator_texture"_h],
+        specification
+    );
+    app->res.texture.load(
+        "wait_indicator_texture"_h,
+        app->res.texture_data["wait_indicator_texture"_h],
+        specification
+    );
+    app->res.texture.load(
+        "computer_thinking_indicator_texture"_h,
+        app->res.texture_data["computer_thinking_indicator_texture"_h],
+        specification
+    );
+}
+
+void StandardGameScene::setup_widgets() {
+    auto& data = app->user_data<Data>();
+
+    constexpr int LOWEST_RESOLUTION = 288;
+    constexpr int HIGHEST_RESOLUTION = 1035;
+
+    turn_indicator = std::make_shared<gui::Image>(app->res.texture["white_indicator_texture"_h]);
+    turn_indicator->stick(gui::Sticky::SE);
+    turn_indicator->offset(30, gui::Relative::Right)->offset(30, gui::Relative::Bottom);
+    turn_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
+    app->gui_renderer->add_widget(turn_indicator);
+
+    timer_text = std::make_shared<gui::Text>(app->res.font["good_dog_plain_font"_h], "00:00", 1.5f, glm::vec3(0.9f));
+    timer_text->stick(gui::Sticky::N);
+    timer_text->offset(60, gui::Relative::Top);
+    timer_text->scale(0.6f, 1.4f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
+    timer_text->set_shadows(true);
+
+    if (!data.options.hide_timer) {
+        app->gui_renderer->add_widget(timer_text);
+    }
+
+    wait_indicator = std::make_shared<gui::Image>(app->res.texture["wait_indicator_texture"_h]);
+    wait_indicator->stick(gui::Sticky::NE);
+    wait_indicator->offset(25, gui::Relative::Right)->offset(55, gui::Relative::Top);
+    wait_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
+
+    computer_thinking_indicator = std::make_shared<gui::Image>(app->res.texture["computer_thinking_indicator_texture"_h]);
+    computer_thinking_indicator->stick(gui::Sticky::NE);
+    computer_thinking_indicator->offset(25, gui::Relative::Right)->offset(55, gui::Relative::Top);
+    computer_thinking_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
+}
+
 void StandardGameScene::save_game() {
-    // board.finalize_pieces_state();  // FIXME
+    board.finalize_pieces_state();
 
     save_load::SavedGame saved_game;
     saved_game.board = board;

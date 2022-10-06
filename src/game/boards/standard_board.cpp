@@ -19,28 +19,36 @@ void StandardBoard::click(hover::Id hovered_id) {
     }
 }
 
-void StandardBoard::release() {
-    if (phase == BoardPhase::PlacePieces) {
-        if (must_take_piece) {
-            check_take_piece();
-        } else {
-            check_place_piece();
-        }
-    } else if (phase == BoardPhase::MovePieces) {
-        if (must_take_piece) {
-            check_take_piece();
-        } else {
-            check_select_piece();
-            check_move_piece();
-        }
+bool StandardBoard::release() {
+    switch (phase) {
+        case BoardPhase::PlacePieces:
+            if (must_take_piece) {
+                check_take_piece();
+            } else {
+                check_place_piece();
+            }
+
+            break;
+        case BoardPhase::MovePieces:
+            if (must_take_piece) {
+                check_take_piece();
+            } else {
+                check_select_piece();
+                check_move_piece();
+            }
+
+            break;
+        default:
+            break;
     }
-
-
-
-
 
     clicked_node_index = NULL_INDEX;
     clicked_piece_index = NULL_INDEX;
+
+    const bool temp = did_action;
+    did_action = false;
+
+    return temp;
 }
 
 void StandardBoard::check_select_piece() {
@@ -58,6 +66,7 @@ void StandardBoard::check_place_piece() {
     for (Node& node : nodes) {
         if (node.index == clicked_node_index && node.piece_index == NULL_INDEX) {
             place_piece(node.index);
+            did_action = true;
         }
     }
 }
@@ -71,6 +80,7 @@ void StandardBoard::check_move_piece() {
         if (node.index == clicked_node_index && can_go(selected_piece_index, node.index)) {
             move_piece(selected_piece_index, node.index);
             selected_piece_index = NULL_INDEX;
+            did_action = true;
         }
     }
 }
@@ -89,6 +99,7 @@ void StandardBoard::check_take_piece() {
                 if (!is_windmill_made(piece.node_index, PieceType::Black, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::Black, windmills, count) == black_pieces_count) {
                     take_piece(index);
+                    did_action = true;
                 } else {
                     DEB_DEBUG("Cannot take black piece from windmill");
                 }
@@ -100,6 +111,7 @@ void StandardBoard::check_take_piece() {
                 if (!is_windmill_made(piece.node_index, PieceType::White, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::White, windmills, count) == white_pieces_count) {
                     take_piece(index);
+                    did_action = true;
                 } else {
                     DEB_DEBUG("Cannot take white piece from windmill");
                 }

@@ -90,32 +90,15 @@ void KeyboardControls::move(Direction direction) {
     quad->position = POSITION(current_node->index);
 }
 
-bool KeyboardControls::press(bool& made_first_move) {
-    // const Node& node = board->nodes[current_node->index];
-    // const hoverable::Id hovered_id = node.piece_index == nullptr ? node.id : node.piece->id;
+bool KeyboardControls::click_and_release() {
+    const Node& node = board->nodes[current_node->index];
+    const hover::Id hovered_id = (
+        node.piece_index == NULL_INDEX ? node.model->id.value() : board->pieces[node.piece_index].model->id.value()
+    );
 
-    // bool did = false;
+    board->click(hovered_id);
 
-    // board->press(hovered_id);
-
-    // if (board->phase == GenericBoard::Phase::PlacePieces) {
-    //     if (board->player_must_take_piece()) {
-    //         did = board->take_piece(hovered_id);
-    //     } else {
-    //         did = board->place_piece(hovered_id);
-    //     }
-    // } else if (board->phase == GenericBoard::Phase::MovePieces) {
-    //     if (board->player_must_take_piece()) {
-    //         did = board->take_piece(hovered_id);
-    //     } else {
-    //         board->select_piece(hovered_id);
-    //         did = board->put_down_piece(hovered_id);
-    //     }
-    // }
-
-    // return did;
-
-    // FIXME this
+    return board->release();
 }
 
 KeyboardControls::Direction KeyboardControls::calculate(Direction original_direction, float camera_angle) {

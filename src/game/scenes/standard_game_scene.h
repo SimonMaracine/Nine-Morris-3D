@@ -55,7 +55,9 @@ struct StandardGameScene : public Scene {
     void setup_skybox();
     void setup_light();
     void setup_camera();
-    void setup_keyboard_controls();
+    void setup_keyboard_controls_textures();
+    void setup_indicators_textures();
+    void setup_widgets();
 
     void save_game();
 

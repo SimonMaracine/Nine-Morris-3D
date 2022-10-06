@@ -13,8 +13,8 @@ struct StandardBoard : public GenericBoard {
         : GenericBoard(app) {}
     ~StandardBoard() = default;
 
-    void click(hover::Id hovered_id);
-    void release();
+    virtual void click(hover::Id hovered_id) override;
+    virtual bool release() override;
 
     void check_select_piece();
     void check_place_piece();

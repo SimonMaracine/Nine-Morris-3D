@@ -14,12 +14,12 @@
     // std::shared_ptr<Mesh<PTN>> white_piece_no_normal_mesh;
     // std::shared_ptr<Mesh<PTN>> black_piece_no_normal_mesh;
 
-    // std::shared_ptr<TextureData> board_wood_diff_texture;
-    // std::shared_ptr<TextureData> board_paint_diff_texture;
-    // std::shared_ptr<TextureData> black_piece_diff_texture;
-    // std::shared_ptr<TextureData> white_piece_diff_texture;
-    // std::shared_ptr<TextureData> board_norm_texture;
-    // std::shared_ptr<TextureData> piece_norm_texture;
+    // std::shared_ptr<TextureData> board_wood_diffuse_texture;
+    // std::shared_ptr<TextureData> board_paint_diffuse_texture;
+    // std::shared_ptr<TextureData> black_piece_diffuse_texture;
+    // std::shared_ptr<TextureData> white_piece_diffuse_texture;
+    // std::shared_ptr<TextureData> board_normal_texture;
+    // std::shared_ptr<TextureData> piece_normal_texture;
 
     // std::shared_ptr<TextureData> white_indicator_texture;
     // std::shared_ptr<TextureData> black_indicator_texture;

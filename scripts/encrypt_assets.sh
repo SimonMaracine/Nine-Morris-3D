@@ -65,6 +65,7 @@ encrypt textures/board/wood/board_wood-small.png
 encrypt textures/indicator/white_indicator.png
 encrypt textures/indicator/black_indicator.png
 encrypt textures/indicator/wait_indicator.png
+encrypt textures/indicator/computer_thinking_indicator.png
 encrypt textures/piece/piece_normal.png
 encrypt textures/piece/piece_normal-small.png
 encrypt textures/piece/white/white_piece.png
