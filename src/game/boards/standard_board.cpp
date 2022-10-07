@@ -19,7 +19,7 @@ void StandardBoard::click(hover::Id hovered_id) {
     }
 }
 
-bool StandardBoard::release() {
+std::tuple<bool, bool, bool> StandardBoard::release() {
     switch (phase) {
         case BoardPhase::PlacePieces:
             if (must_take_piece) {
@@ -45,10 +45,12 @@ bool StandardBoard::release() {
     clicked_node_index = NULL_INDEX;
     clicked_piece_index = NULL_INDEX;
 
-    const bool temp = did_action;
+    const auto result = std::make_tuple(did_action, switched_turn, must_take_piece_or_took_piece);
     did_action = false;
+    switched_turn = false;
+    must_take_piece_or_took_piece = false;
 
-    return temp;
+    return result;
 }
 
 void StandardBoard::check_select_piece() {
@@ -155,7 +157,7 @@ void StandardBoard::place_piece(size_t node_index) {
         DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
-        // update_cursor();  // FIXME this
+        must_take_piece_or_took_piece = true;
 
         set_pieces_to_take(TURN_IS_WHITE_SO(PieceType::Black, PieceType::White), true);
     } else {
@@ -227,7 +229,7 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
         DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
-        // update_cursor();  // FIXME this
+        must_take_piece_or_took_piece = true;
 
         if (turn == BoardPlayer::White) {
             set_pieces_to_take(PieceType::Black, true);
@@ -274,8 +276,8 @@ void StandardBoard::take_piece(size_t piece_index) {
     nodes[piece.node_index].piece_index = NULL_INDEX;
     take_and_raise_piece(piece_index);
     must_take_piece = false;
+    must_take_piece_or_took_piece = true;
     set_pieces_to_take(piece.type, false);
-    // update_cursor();  // FIXME this
 
     if (piece.type == PieceType::White) {
         white_pieces_count--;

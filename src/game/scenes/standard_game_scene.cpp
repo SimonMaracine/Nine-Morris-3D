@@ -30,7 +30,7 @@ void StandardGameScene::on_start() {
     setup_camera();
     setup_widgets();
 
-    keyboard = KeyboardControls {&board, data.quad_cache["light_bulb"_h]};
+    keyboard = KeyboardControls {&board, data.quad_cache["keyboard_controls"_h]};
     keyboard.initialize_refs();
 
     minimax_thread = MinimaxThread {&board};
@@ -110,32 +110,20 @@ void StandardGameScene::on_stop() {
 }
 
 void StandardGameScene::on_awake() {
-    auto& data = app->user_data<Data>();
-
     imgui_layer = ImGuiLayer<StandardGameScene> {app, this};
-
-#ifdef PLATFORM_GAME_DEBUG
-    data.quad_cache.load("light_bulb"_h);
-
-    TextureSpecification specification;
-    specification.min_filter = Filter::Linear;
-    specification.mag_filter = Filter::Linear;
-
-    app->res.texture.load(
-        "light_bulb_texture"_h,
-        "data/textures/internal/light_bulb/light_bulb.png",
-        specification
-    );
-#endif
 
     initialize_rendering_board();
     initialize_rendering_board_paint();
     initialize_rendering_pieces();
     initialize_rendering_nodes();
 
+    initialize_rendering_keyboard_controls();
+#ifdef PLATFORM_GAME_DEBUG
+    initialize_rendering_light_bulb();
+#endif
+
     setup_skybox();
     setup_light();
-    setup_keyboard_controls_textures();
     setup_indicators_textures();
 
     app->evt.sink<MouseButtonPressedEvent>().connect<&StandardGameScene::on_mouse_button_pressed>(*this);
@@ -161,12 +149,6 @@ void StandardGameScene::on_update() {
     char time[32];
     timer.get_time_formatted(time);
     timer_text->set_text(time);
-
-    if (board.turn == BoardPlayer::White) {
-        turn_indicator->set_image(app->res.texture["white_indicator_texture"_h]);  // FIXME this is inefficient
-    } else {
-        turn_indicator->set_image(app->res.texture["black_indicator_texture"_h]);
-    }
 }
 
 void StandardGameScene::on_fixed_update() {
@@ -230,9 +212,9 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
 
     if (event.button == input::MouseButton::LEFT) {
         if (board.next_move && board.is_players_turn) {
-            const bool did_action = board.release();
+            const auto [did_action, switched_turn, must_take_piece_or_took_piece] = board.release();
 
-            if (did_action) {
+            if (did_action) {  // FIXME here is some repetition
                 game.state = GameState::HumanDoingMove;
             }
 
@@ -245,13 +227,21 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
                 timer.stop();
             }
 
+            if (switched_turn) {
+                update_turn_indicator();
+            }
+
+            if (must_take_piece_or_took_piece) {
+                update_cursor();
+            }
+
             if (undo_redo_state.redo.empty()) {
                 imgui_layer.can_redo = false;
             }
         }
 
         if (show_keyboard_controls) {
-            app->renderer->remove_quad(data.quad_cache["light_bulb"_h]);
+            app->renderer->remove_quad(data.quad_cache["keyboard_controls"_h]);
             show_keyboard_controls = false;
         }
     }
@@ -267,7 +257,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::RIGHT:
         case input::Key::ENTER:
             if (!show_keyboard_controls) {
-                app->renderer->add_quad(data.quad_cache["light_bulb"_h]);
+                app->renderer->add_quad(data.quad_cache["keyboard_controls"_h]);
                 show_keyboard_controls = true;
                 return;
             }
@@ -308,7 +298,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
             break;
         case input::Key::ENTER:
             if (board.next_move && board.is_players_turn) {
-                const bool did_action = keyboard.click_and_release();
+                const auto [did_action, switched_turn, must_take_piece_or_took_piece] = keyboard.click_and_release();
 
                 if (did_action) {
                     game.state = GameState::HumanDoingMove;
@@ -321,6 +311,14 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
 
                 if (board.phase == BoardPhase::GameOver) {
                     timer.stop();
+                }
+
+                if (switched_turn) {
+                    update_turn_indicator();
+                }
+
+                if (must_take_piece_or_took_piece) {
+                    update_cursor();
                 }
 
                 if (undo_redo_state.redo.empty()) {
@@ -704,6 +702,47 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
     material_instance->set_vec4("u_color", glm::vec4(0.0f));
 }
 
+void StandardGameScene::initialize_rendering_keyboard_controls() {
+    auto& data = app->user_data<Data>();
+
+    auto keyboard_controls = data.quad_cache.load("keyboard_controls"_h);
+
+    TextureSpecification specification;
+    specification.min_filter = Filter::Linear;
+    specification.mag_filter = Filter::Linear;
+
+    auto texture = app->res.texture.load(
+        "keyboard_controls_texture"_h,
+        app->res.texture_data["keyboard_controls_texture"_h],
+        specification
+    );
+    app->res.texture.load(
+        "keyboard_controls_cross_texture"_h,
+        app->res.texture_data["keyboard_controls_cross_texture"_h],
+        specification
+    );
+
+    keyboard_controls->texture = texture;
+}
+
+void StandardGameScene::initialize_rendering_light_bulb() {
+    auto& data = app->user_data<Data>();
+
+    auto light_bulb = data.quad_cache.load("light_bulb"_h);
+
+    TextureSpecification specification;
+    specification.min_filter = Filter::Linear;
+    specification.mag_filter = Filter::Linear;
+
+    auto light_bulb_texture = app->res.texture.load(
+        "light_bulb_texture"_h,
+        "data/textures/internal/light_bulb/light_bulb.png",
+        specification
+    );
+
+    light_bulb->texture = light_bulb_texture;
+}
+
 void StandardGameScene::setup_and_add_model_board() {
     board.model->vertex_array = app->res.vertex_array["board_wood_vertex_array"_h];
     board.model->index_buffer = app->res.index_buffer["board_wood_index_buffer"_h];
@@ -847,20 +886,20 @@ void StandardGameScene::setup_light() {
     if (data.options.skybox == game_options::FIELD) {
         app->renderer->light = LIGHT_FIELD;
         app->renderer->light_space = SHADOWS_FIELD;
-
-#ifdef PLATFORM_GAME_DEBUG
-        data.quad_cache["light_bulb"_h]->position = LIGHT_FIELD.position;
-#endif
     } else if (data.options.skybox == game_options::AUTUMN) {
         app->renderer->light = LIGHT_AUTUMN;
         app->renderer->light_space = SHADOWS_AUTUMN;
-
-#ifdef PLATFORM_GAME_DEBUG
-        data.quad_cache["light_bulb"_h]->position = LIGHT_AUTUMN.position;
-#endif
     } else {
         ASSERT(false, "Invalid skybox");
     }
+
+#ifdef PLATFORM_GAME_DEBUG
+    if (data.options.skybox == game_options::FIELD) {
+        data.quad_cache["light_bulb"_h]->position = LIGHT_FIELD.position;
+    } else if (data.options.skybox == game_options::AUTUMN) {
+        data.quad_cache["light_bulb"_h]->position = LIGHT_AUTUMN.position;
+    }
+#endif
 
     DEB_DEBUG("Setup light");
 }
@@ -895,23 +934,6 @@ void StandardGameScene::setup_camera() {
     app->renderer->set_camera(&camera);
 
     DEB_DEBUG("Setup camera");
-}
-
-void StandardGameScene::setup_keyboard_controls_textures() {
-    TextureSpecification specification;
-    specification.min_filter = Filter::Linear;
-    specification.mag_filter = Filter::Linear;
-
-    app->res.texture.load(
-        "keyboard_controls_texture"_h,
-        app->res.texture_data["keyboard_controls_texture"_h],
-        specification
-    );
-    app->res.texture.load(
-        "keyboard_controls_cross_texture"_h,
-        app->res.texture_data["keyboard_controls_cross_texture"_h],
-        specification
-    );
 }
 
 void StandardGameScene::setup_indicators_textures() {
@@ -972,6 +994,30 @@ void StandardGameScene::setup_widgets() {
     computer_thinking_indicator->stick(gui::Sticky::NE);
     computer_thinking_indicator->offset(25, gui::Relative::Right)->offset(55, gui::Relative::Top);
     computer_thinking_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
+}
+
+void StandardGameScene::update_turn_indicator() {
+    if (board.turn == BoardPlayer::White) {
+        turn_indicator->set_image(app->res.texture["white_indicator_texture"_h]);
+    } else {
+        turn_indicator->set_image(app->res.texture["black_indicator_texture"_h]);
+    }
+}
+
+void StandardGameScene::update_cursor() {
+    auto& data = app->user_data<Data>();
+
+    if (data.options.custom_cursor) {
+        if (board.must_take_piece) {
+            app->window->set_cursor(data.cross_cursor);
+
+            data.quad_cache["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_cross_texture"_h];
+        } else {
+            app->window->set_cursor(data.arrow_cursor);
+
+            data.quad_cache["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_texture"_h];
+        }
+    }
 }
 
 void StandardGameScene::save_game() {

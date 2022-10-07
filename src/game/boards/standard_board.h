@@ -14,7 +14,7 @@ struct StandardBoard : public GenericBoard {
     ~StandardBoard() = default;
 
     virtual void click(hover::Id hovered_id) override;
-    virtual bool release() override;
+    virtual std::tuple<bool, bool, bool> release() override;
 
     void check_select_piece();
     void check_place_piece();

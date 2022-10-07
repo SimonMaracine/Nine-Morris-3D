@@ -18,7 +18,7 @@ struct GenericBoard {
     virtual ~GenericBoard() = default;
 
     virtual void click(hover::Id) {}
-    virtual bool release() { return false; }
+    virtual std::tuple<bool, bool, bool> release() { return {}; }
 
     GamePosition get_position();
     void update_nodes(hover::Id hovered_id);
@@ -77,8 +77,10 @@ struct GenericBoard {
 
     bool next_move = true;  // It is false when any piece is in the air, true otherwise
     bool is_players_turn = true;
-    bool switched_turn = false;
+
     bool did_action = false;
+    bool switched_turn = false;
+    bool must_take_piece_or_took_piece = false;
 
     friend class GameContext;  // TODO see if needed
     friend class KeyboardControls;

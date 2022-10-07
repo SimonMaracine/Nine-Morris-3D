@@ -19,7 +19,7 @@ public:
 
     void initialize_refs();
     void move(Direction direction);
-    bool click_and_release();
+    std::tuple<bool, bool, bool> click_and_release();
 
     static Direction calculate(Direction original_direction, float camera_angle);
 private:

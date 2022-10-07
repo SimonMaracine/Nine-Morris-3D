@@ -90,7 +90,7 @@ void KeyboardControls::move(Direction direction) {
     quad->position = POSITION(current_node->index);
 }
 
-bool KeyboardControls::click_and_release() {
+std::tuple<bool, bool, bool> KeyboardControls::click_and_release() {
     const Node& node = board->nodes[current_node->index];
     const hover::Id hovered_id = (
         node.piece_index == NULL_INDEX ? node.model->id.value() : board->pieces[node.piece_index].model->id.value()

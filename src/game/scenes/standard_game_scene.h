@@ -43,6 +43,9 @@ struct StandardGameScene : public Scene {
     void initialize_rendering_nodes();
     void initialize_rendering_node(size_t index, std::shared_ptr<Buffer> buffer, std::shared_ptr<IndexBuffer> index_buffer);
 
+    void initialize_rendering_keyboard_controls();
+    void initialize_rendering_light_bulb();
+
     void setup_and_add_model_board();
     void setup_and_add_model_board_paint();
     void setup_and_add_model_pieces();
@@ -55,9 +58,11 @@ struct StandardGameScene : public Scene {
     void setup_skybox();
     void setup_light();
     void setup_camera();
-    void setup_keyboard_controls_textures();
     void setup_indicators_textures();
     void setup_widgets();
+
+    void update_turn_indicator();
+    void update_cursor();
 
     void save_game();
 
