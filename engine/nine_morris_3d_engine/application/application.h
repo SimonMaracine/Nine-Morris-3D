@@ -109,7 +109,7 @@ private:
     std::vector<std::weak_ptr<Framebuffer>> framebuffers;
 
     // Input stuff
-    float mouse_wheel = 0.0f;
+    float mouse_wheel = 0.0f;  // TODO these shouldn't really be here
     float dx = 0.0f;
     float dy = 0.0f;
     float last_mouse_x = 0.0f;

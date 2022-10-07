@@ -269,12 +269,12 @@ namespace debug_opengl {
             sprintf(line, "stb_image\n");
             output.append(line);
         }
-        {   
+        {
             char line[128];
             sprintf(line, "stb_image_write\n");
             output.append(line);
         }
-        {   
+        {
             char line[128];
             sprintf(line, "stb_truetype\n");
             output.append(line);

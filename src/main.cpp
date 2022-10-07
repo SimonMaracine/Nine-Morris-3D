@@ -9,14 +9,10 @@
 
 #if defined(PLATFORM_GAME_LINUX)
     #define APP_NAME "ninemorris3d"
-#elif defined(PLATFORM_GAME_WINDOWS)
-    #define APP_NAME "NineMorris3D"
-#endif
-
-#if defined(PLATFORM_GAME_LINUX)
     #define LOG_FILE "log.txt"
     #define INFO_FILE "info.txt"
 #elif defined(PLATFORM_GAME_WINDOWS)
+    #define APP_NAME "NineMorris3D"
     #define LOG_FILE "ninemorris3d_log.txt"
     #define INFO_FILE "ninemorris3d_info.txt"
 #endif
@@ -36,7 +32,7 @@ int main() {
         int exit_code {};
 
         auto launcher_builder = ApplicationBuilder {}
-            .display_config(640, 480, "Nine Morris 3D Launcher", false, false, false)
+            .display_config(640, 480, "Nine Morris 3D Launcher", false, false, false)  // TODO  refactor a bit
             .file_names_config(APP_NAME, INFO_FILE)
             .version_config(MAJOR, MINOR, PATCH)
             .authors_config(authors)
