@@ -264,7 +264,7 @@ void Renderer::render() {
     glBindTexture(GL_TEXTURE_2D, storage.depth_map_framebuffer->get_depth_attachment());
 
     // Set to zero, because we are also rendering objects with outline later
-    glStencilMask(0x00);
+    glStencilMask(0x00);  // TODO maybe move this down a little to improve performance
 
     if (storage.skybox_texture != nullptr) {
         draw_skybox();
@@ -533,6 +533,10 @@ void Renderer::draw_models() {
 
     for (size_t i = 0; i < models.size(); i++) {
         const Model* model = models[i].get();
+
+        if (model->outline_color.has_value()) {
+            continue;
+        }
 
         if (model->id.has_value()) {
             hoverable_models.push_back(model);
