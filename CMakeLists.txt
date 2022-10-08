@@ -43,7 +43,7 @@ add_executable(${GAME} ${NO_CONSOLE}
     ${GAME_HEADERS}
 )
 
-# On Windows tell linker to use main instead of WinMain  # TODO remove
+# On Windows tell linker to use main instead of WinMain
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     target_link_options(${GAME} PRIVATE
         /entry:mainCRTStartup
@@ -232,25 +232,49 @@ target_include_directories(${MY_IMGUI} SYSTEM PRIVATE
 
 # Add all link directories
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-    target_link_directories(${ENGINE} PRIVATE
-        "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-        "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
-        "${CMAKE_SOURCE_DIR}/build/extern/glfw/src"
-    )
+    if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+        target_link_directories(${ENGINE} PRIVATE
+            "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
+            "${CMAKE_SOURCE_DIR}/build/extern/glfw/src"
+        )
 
-    target_link_directories(${GAME} PRIVATE
-        "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-    )
+        target_link_directories(${GAME} PRIVATE
+            "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
+        )
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+        target_link_directories(${ENGINE} PRIVATE
+            "${CMAKE_SOURCE_DIR}/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
+            "${CMAKE_SOURCE_DIR}/extern/glfw/src"
+        )
+
+        target_link_directories(${GAME} PRIVATE
+            "${CMAKE_SOURCE_DIR}/extern/spdlog"
+        )
+    endif()
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
-    target_link_directories(${ENGINE} PRIVATE
-        "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-        "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
-        "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src"
-    )
+    if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+        target_link_directories(${ENGINE} PRIVATE
+            "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
+            "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src"
+        )
 
-    target_link_directories(${GAME} PRIVATE
-        "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-    )
+        target_link_directories(${GAME} PRIVATE
+            "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
+        )
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+        target_link_directories(${ENGINE} PRIVATE
+            "${CMAKE_SOURCE_DIR}/extern/spdlog"
+            "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
+            "${CMAKE_SOURCE_DIR}/extern/glfw/src"
+        )
+
+        target_link_directories(${GAME} PRIVATE
+            "${CMAKE_SOURCE_DIR}/extern/spdlog"
+        )
+    endif()
 endif()
 
 # Change working directory for Windows

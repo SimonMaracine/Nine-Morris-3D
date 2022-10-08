@@ -25,14 +25,10 @@ CMakeCache.txt
 /CMakeFiles
 /Debug
 /Release
-*.vcxproj
-*.vcxproj.filters
-*.sln
-*.dir
+/x64
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
-*.vcxproj
-*.vcxproj.filters
+*.sln
+*.dir
 *.cmake
-/x64
