@@ -7,8 +7,8 @@ in vec4 v_fragment_position_light_space;
 in vec3 v_light_position_tangent;
 in vec3 v_view_position_tangent;
 
-layout (location = 0) out vec4 fragment_color;
-layout (location = 1) out int entity_id;
+layout(location = 0) out vec4 fragment_color;
+layout(location = 1) out int entity_id;
 
 uniform sampler2D u_shadow_map;
 
@@ -22,7 +22,7 @@ struct Material {
 
 uniform Material u_material;
 
-layout (binding = 1) uniform Light {
+layout(binding = 1) uniform Light {
     vec3 u_light_ambient;
     vec3 u_light_diffuse;
     vec3 u_light_specular;

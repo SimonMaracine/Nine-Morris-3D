@@ -1,10 +1,10 @@
 #version 430 core
 
-layout (location = 0) in vec3 a_position;
+layout(location = 0) in vec3 a_position;
 
 uniform mat4 u_model_matrix;
 
-layout (binding = 3) uniform LightSpace {
+layout(binding = 3) uniform LightSpace {
     mat4 u_light_space_matrix;
 };
 

@@ -1,11 +1,11 @@
 #version 430 core
 
-layout (location = 0) in vec3 a_position;
+layout(location = 0) in vec3 a_position;
 
 uniform mat4 u_model_matrix;
 
-layout (binding = 0) uniform ProjectionView {  // FIXME this whitespace
-   mat4 u_projection_view_matrix;
+layout(binding = 0) uniform ProjectionView {  // FIXME this whitespace
+    mat4 u_projection_view_matrix;
 };
 
 void main() {

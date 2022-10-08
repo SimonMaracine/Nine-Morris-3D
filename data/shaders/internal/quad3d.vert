@@ -1,7 +1,7 @@
 #version 430 core
 
-layout (location = 0) in vec2 a_position;
-layout (location = 1) in vec2 a_texture_coordinate;
+layout(location = 0) in vec2 a_position;
+layout(location = 1) in vec2 a_texture_coordinate;
 
 out vec2 v_texture_coordinate;
 

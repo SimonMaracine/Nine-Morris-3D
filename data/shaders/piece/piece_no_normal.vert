@@ -1,9 +1,9 @@
 #version 430 core
 
-layout (location = 0) in vec3 a_position;
-layout (location = 1) in vec2 a_texture_coordinate;
-layout (location = 2) in vec3 a_normal;
-layout (location = 3) in int a_entity_id;
+layout(location = 0) in vec3 a_position;
+layout(location = 1) in vec2 a_texture_coordinate;
+layout(location = 2) in vec3 a_normal;
+layout(location = 3) in int a_entity_id;
 
 out vec2 v_texture_coordinate;
 out vec3 v_normal;
@@ -15,16 +15,16 @@ out vec3 v_view_position;
 
 uniform mat4 u_model_matrix;
 
-layout (binding = 0) uniform ProjectionView {
+layout(binding = 0) uniform ProjectionView {
     mat4 u_projection_view_matrix;
 };
 
-layout (binding = 2) uniform LightViewPosition {
+layout(binding = 2) uniform LightViewPosition {
     vec3 u_light_position;
     vec3 u_view_position;
 };
 
-layout (binding = 3) uniform LightSpace {
+layout(binding = 3) uniform LightSpace {
     mat4 u_light_space_matrix;
 };
 
