@@ -68,8 +68,8 @@ public:
     void add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step);
 
     void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
+    void set_shadow_map_framebuffer(int size);
     void set_skybox(std::shared_ptr<Texture3D> texture);
-    void set_depth_map_framebuffer(int size);
     void set_camera(Camera* camera);
 
     hover::Id get_hovered_id() { return hovered_id; }
@@ -141,6 +141,8 @@ private:
 
         std::shared_ptr<VertexArray> skybox_vertex_array;
         std::shared_ptr<Buffer> skybox_buffer;
+        std::shared_ptr<VertexArray> screen_quad_vertex_array;
+        std::shared_ptr<Buffer> screen_quad_buffer;
         std::shared_ptr<VertexArray> quad_vertex_array;
         std::shared_ptr<Buffer> quad_buffer;
 #ifdef PLATFORM_GAME_DEBUG

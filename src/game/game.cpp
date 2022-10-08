@@ -86,7 +86,7 @@ namespace game {
         }
 
         // Setup depth map framebuffer
-        app->renderer->set_depth_map_framebuffer(data.launcher_options.texture_quality == launcher_options::NORMAL ? 4096 : 2048);
+        app->renderer->set_shadow_map_framebuffer(data.launcher_options.texture_quality == launcher_options::NORMAL ? 4096 : 2048);
 
         // Setup ImGui fonts
         {

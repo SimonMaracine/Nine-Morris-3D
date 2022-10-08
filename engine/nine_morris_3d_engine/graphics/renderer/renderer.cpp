@@ -31,7 +31,7 @@ Renderer::Renderer(Application* app)
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
     storage.projection_view_uniform_buffer = std::make_shared<UniformBuffer>();
     storage.light_uniform_buffer = std::make_shared<UniformBuffer>();
@@ -134,12 +134,11 @@ Renderer::Renderer(Application* app)
         layout.add(0, BufferLayout::Float, 3);
         storage.skybox_vertex_array = std::make_shared<VertexArray>();
         storage.skybox_vertex_array->add_buffer(storage.skybox_buffer, layout);
-
         VertexArray::unbind();
     }
 
     {
-        float screen_quad_vertices[] = {
+        constexpr float screen_quad_vertices[] = {
             -1.0f,  1.0f,
             -1.0f, -1.0f,
              1.0f,  1.0f,
@@ -148,18 +147,36 @@ Renderer::Renderer(Application* app)
              1.0f, -1.0f,
         };
 
-        storage.quad_buffer = std::make_shared<Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
+        storage.screen_quad_buffer = std::make_shared<Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Float, 2);
+        storage.screen_quad_vertex_array = std::make_shared<VertexArray>();
+        storage.screen_quad_vertex_array->add_buffer(storage.screen_quad_buffer, layout);
+        VertexArray::unbind();
+    }
+
+    {
+        constexpr float quad_vertices[] = {
+            -1.0f,  1.0f,    0.0f, 1.0f,
+            -1.0f, -1.0f,    0.0f, 0.0f,
+             1.0f,  1.0f,    1.0f, 1.0f,
+             1.0f,  1.0f,    1.0f, 1.0f,
+            -1.0f, -1.0f,    0.0f, 0.0f,
+             1.0f, -1.0f,    1.0f, 0.0f
+        };
+
+        storage.quad_buffer = std::make_shared<Buffer>(quad_vertices, sizeof(quad_vertices));
+        BufferLayout layout;
+        layout.add(0, BufferLayout::Float, 2);
+        layout.add(1, BufferLayout::Float, 2);
         storage.quad_vertex_array = std::make_shared<VertexArray>();
         storage.quad_vertex_array->add_buffer(storage.quad_buffer, layout);
-
         VertexArray::unbind();
     }
 
 #ifdef PLATFORM_GAME_DEBUG
     {
-        float origin_vertices[] = {
+        constexpr float origin_vertices[] = {
             -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
              20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
               0.0f, -20.0f,   0.0f,    0.0f, 1.0f, 0.0f,
@@ -167,13 +184,13 @@ Renderer::Renderer(Application* app)
               0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
               0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
         };
+
         storage.origin_buffer = std::make_shared<Buffer>(origin_vertices, sizeof(origin_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Float, 3);
         layout.add(1, BufferLayout::Float, 3);
         storage.origin_vertex_array = std::make_shared<VertexArray>();
         storage.origin_vertex_array->add_buffer(storage.origin_buffer, layout);
-
         VertexArray::unbind();
     }
 #endif
@@ -211,6 +228,7 @@ Renderer::Renderer(Application* app)
 
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_int("u_texture", 0);
+    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
 
     Shader::unbind();
 
@@ -351,11 +369,7 @@ void Renderer::set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
     app->add_framebuffer(storage.scene_framebuffer);
 }
 
-void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
-    storage.skybox_texture = texture;
-}
-
-void Renderer::set_depth_map_framebuffer(int size) {
+void Renderer::set_shadow_map_framebuffer(int size) {
     ASSERT(size > 0, "Shadow map size must be greater than 0");
 
     shadow_map_size = size;
@@ -373,8 +387,14 @@ void Renderer::set_depth_map_framebuffer(int size) {
     app->add_framebuffer(storage.depth_map_framebuffer);
 }
 
+void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
+    storage.skybox_texture = texture;
+}
+
 void Renderer::set_camera(Camera* camera) {
     this->camera = camera;
+    cache_camera();
+    on_window_resized(WindowResizedEvent {0, 0});  // Update projection
 }
 
 void Renderer::draw_screen_quad(GLuint texture) {
@@ -412,7 +432,7 @@ void Renderer::post_processing() {
 }
 
 void Renderer::end_rendering() {
-    storage.quad_vertex_array->bind();
+    storage.screen_quad_vertex_array->bind();
 
     glDisable(GL_DEPTH_TEST);
 
@@ -521,21 +541,17 @@ void Renderer::draw_models() {
     }
 
     // Draw non-hoverable models
-    {
-        glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        for (const Model* model : non_hoverable_models) {
-            draw_model(model);
-        }
+    for (const Model* model : non_hoverable_models) {
+        draw_model(model);
     }
 
     // Draw hoverable models
-    {
-        glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        for (const Model* model : hoverable_models) {
-            draw_model(model);
-        }
+    for (const Model* model : hoverable_models) {
+        draw_model(model);
     }
 }
 
@@ -570,21 +586,17 @@ void Renderer::draw_models_with_outline() {
     }
 
     // Draw non-hoverable models
-    {
-        glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        for (const Model* model : non_hoverable_models) {
-            draw_model_with_outline(model);
-        }
+    for (const Model* model : non_hoverable_models) {
+        draw_model_with_outline(model);
     }
 
     // Draw hoverable models
-    {
-        glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        for (const Model* model : hoverable_models) {
-            draw_model_with_outline(model);
-        }
+    for (const Model* model : hoverable_models) {
+        draw_model_with_outline(model);
     }
 }
 
@@ -614,7 +626,6 @@ void Renderer::draw_models_to_depth_buffer() {
 void Renderer::draw_quads() {
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_mat4("u_view_matrix", camera_cache.view_matrix);
-    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
 
     storage.quad_vertex_array->bind();
 
@@ -700,7 +711,7 @@ void Renderer::on_window_resized(const WindowResizedEvent&) {
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
 }
 
-namespace render_helpers {
+namespace render_helpers {  // TODO don't use these internally
     void clear(int buffers) {
         glClear(buffers);
     }
