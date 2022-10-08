@@ -248,19 +248,20 @@ void Renderer::render() {
     setup_shadows();
     storage.depth_map_framebuffer->bind();
 
-    render_helpers::clear(render_helpers::Depth);
-    render_helpers::viewport(shadow_map_size, shadow_map_size);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, shadow_map_size, shadow_map_size);
 
     // Render objects with shadows to depth buffer
     draw_models_to_depth_buffer();
 
     storage.scene_framebuffer->bind();
 
-    render_helpers::clear(render_helpers::Color | render_helpers::Depth | render_helpers::Stencil);
-    render_helpers::viewport(app->data().width, app->data().height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glViewport(0, 0, app->data().width, app->data().height);
 
     // Bind shadow map for use in shadow rendering
-    render_helpers::bind_texture_2d(storage.depth_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
+    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
+    glBindTexture(GL_TEXTURE_2D, storage.depth_map_framebuffer->get_depth_attachment());
 
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
@@ -421,10 +422,10 @@ void Renderer::post_processing() {
         const FramebufferSpecification& specification = step->framebuffer->get_specification();
 
         step->framebuffer->bind();
-        render_helpers::clear(render_helpers::Color);
-        render_helpers::viewport(specification.width, specification.height);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glViewport(0, 0, specification.width, specification.height);
         step->render(post_processing_context);
-        render_helpers::viewport(app->data().width, app->data().height);
+        glViewport(0, 0, app->data().width, app->data().height);
 
         post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
         post_processing_context.textures.push_back(step->framebuffer->get_color_attachment(0));
@@ -440,7 +441,7 @@ void Renderer::end_rendering() {
 
     // Draw the final result to the screen
     Framebuffer::bind_default();
-    render_helpers::clear(render_helpers::Color);
+    glClear(GL_COLOR_BUFFER_BIT);
     draw_screen_quad(post_processing_context.last_texture);
 
     glEnable(GL_DEPTH_TEST);
@@ -711,7 +712,7 @@ void Renderer::on_window_resized(const WindowResizedEvent&) {
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
 }
 
-namespace render_helpers {  // TODO don't use these internally
+namespace render_helpers {
     void clear(int buffers) {
         glClear(buffers);
     }
