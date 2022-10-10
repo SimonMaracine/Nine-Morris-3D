@@ -2,9 +2,9 @@
 
 #include "game/game_context.h"
 #include "game/boards/generic_board.h"
-#include "game/constants.h"
 #include "game/minimax/minimax_thread.h"
 #include "game/minimax/standard_game/minimax_standard_game.h"
+#include "other/constants.h"
 
 void GameContext::begin_human_move() {
     board->is_players_turn = true;

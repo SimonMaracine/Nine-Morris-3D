@@ -36,9 +36,9 @@
 // };
 
 namespace assets_load {
-    using CustomLoader = ConcurrentLoader<bool, const std::string&, bool, const std::string&>;
+    using CustomLoader = ConcurrentLoader<bool, int, bool, int>;
 
-    void all_start(CustomLoader& loader, bool normal_mapping, const std::string& texture_quality, bool labeled_board, const std::string& skybox);
+    void all_start(CustomLoader& loader, bool normal_mapping, int texture_quality, bool labeled_board, int skybox);
     // void skybox(Loader<AssetsData, options::Options>* loader, const options::Options& options);
     // void texture_quality(Loader<AssetsData, options::Options>* loader, const options::Options& options);
     // void board_paint_texture(Loader<AssetsData, options::Options>* loader, const options::Options& options);

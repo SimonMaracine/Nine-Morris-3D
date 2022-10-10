@@ -11,7 +11,7 @@ using namespace paths;
 using namespace encrypt;
 
 namespace assets_load {
-    void all_start(CustomLoader& loader, bool normal_mapping, const std::string& texture_quality, bool labeled_board, const std::string& skybox) {
+    void all_start(CustomLoader& loader, bool normal_mapping, int texture_quality, bool labeled_board, int skybox) {
         loader().mesh_p.load("node_mesh"_h, encr(path_for_assets(NODE_MESH)), true);
 
         if (normal_mapping) {

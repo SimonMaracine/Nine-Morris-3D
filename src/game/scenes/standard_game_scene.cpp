@@ -5,9 +5,9 @@
 #include "game/game_options.h"
 #include "game/save_load.h"
 #include "game/assets.h"
-#include "game/constants.h"
 #include "game/piece.h"
 #include "game/node.h"
+#include "other/constants.h"
 #include "other/data.h"
 #include "options/options.h"
 
@@ -183,14 +183,6 @@ void StandardGameScene::on_imgui_update() {
 #ifdef PLATFORM_GAME_DEBUG
     imgui_layer.draw_debug();
 #endif
-
-    if (undo_redo_state.undo.size() > 0) {  // TODO this can be better
-        imgui_layer.can_undo = true;
-    }
-
-    if (undo_redo_state.redo.size() > 0) {
-        imgui_layer.can_redo = true;
-    }
 }
 
 void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {

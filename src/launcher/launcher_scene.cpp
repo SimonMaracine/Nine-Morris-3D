@@ -56,12 +56,12 @@ static std::pair<int, int> map_index_to_resolution(size_t index) {
     return launcher_options::DEFAULT_RESOLUTION;
 }
 
-static size_t map_texture_quality_to_index(std::string_view texture_quality) {
+static size_t map_texture_quality_to_index(int texture_quality) {
     constexpr size_t DEFAULT = 0;
 
-    if (texture_quality == std::string(launcher_options::NORMAL)) {
+    if (texture_quality == launcher_options::NORMAL) {
         return 0;
-    } else if (texture_quality == std::string(launcher_options::LOW)) {
+    } else if (texture_quality == launcher_options::LOW) {
         return 1;
     }
 
@@ -70,7 +70,7 @@ static size_t map_texture_quality_to_index(std::string_view texture_quality) {
     return DEFAULT;
 }
 
-static std::string map_index_to_texture_quality(size_t index) {
+static int map_index_to_texture_quality(size_t index) {
     switch (index) {
         case 0:
             return launcher_options::NORMAL;

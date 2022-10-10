@@ -1,21 +1,22 @@
 #pragma once
 
-#include "game/constants.h"
+#include "other/constants.h"
 
 namespace game_options {
     static constexpr const char* GAME_OPTIONS_FILE = "options.dat";
 
-    static constexpr const char* FIELD = "field";
-    static constexpr const char* AUTUMN = "autumn";
+    static constexpr int NONE = static_cast<int>(Skybox::None);
+    static constexpr int FIELD = static_cast<int>(Skybox::Field);
+    static constexpr int AUTUMN = static_cast<int>(Skybox::Autumn);
 
-    constexpr int HUMAN = static_cast<int>(GamePlayer::Human);
-    constexpr int COMPUTER = static_cast<int>(GamePlayer::Computer);
+    static constexpr int HUMAN = static_cast<int>(GamePlayer::Human);
+    static constexpr int COMPUTER = static_cast<int>(GamePlayer::Computer);
 
     struct GameOptions {
         // These are default values
         bool vsync = true;
         bool save_on_exit = true;
-        std::string skybox = FIELD;
+        int skybox = FIELD;
         bool custom_cursor = true;
         float sensitivity = 1.0f;
         bool hide_timer = false;

@@ -7,10 +7,10 @@
 #include "game/undo_redo_state.h"
 #include "game/keyboard_controls.h"
 #include "game/game_context.h"
-#include "game/constants.h"
 #include "game/timer.h"
 #include "game/minimax/minimax_thread.h"
 #include "game/assets_load.h"
+#include "other/constants.h"
 
 struct StandardGameScene : public Scene {
     StandardGameScene()

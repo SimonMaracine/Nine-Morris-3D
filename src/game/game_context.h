@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/constants.h"
+#include "other/constants.h"
 
 class GenericBoard;
 class MinimaxThread;

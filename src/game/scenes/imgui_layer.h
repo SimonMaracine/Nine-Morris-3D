@@ -4,23 +4,12 @@
 
 #include "game/save_load.h"
 #include "game/game_options.h"
-#include "game/constants.h"
 #include "imgui_style/colors.h"
+#include "other/constants.h"
 #include "other/data.h"
 
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
-
-static int get_skybox_option(std::string_view option) {
-    if (option == game_options::FIELD) {
-        return 0;
-    } else if (option == game_options::AUTUMN) {
-        return 1;
-    }
-
-    ASSERT(false, "Invalid option");
-    return -1;
-}
 
 template<typename SceneType>
 struct ImGuiLayer {
@@ -162,7 +151,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                 DEB_INFO("Restarting game");
             }
             if (ImGui::MenuItem("Load Last Game", nullptr, false, can_change)) {
-                // scene->board.finalize_pieces_state();  // FIXME
+                scene->board.finalize_pieces_state();
 
                 // game_layer->load_game();  // FIXME
             }
@@ -170,7 +159,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                 ImGui::SetTooltip("%s", last_save_game_date.c_str());
             }
             if (ImGui::MenuItem("Save Game", nullptr, false)) {
-                // scene->board.finalize_pieces_state();  // FIXME
+                scene->board.finalize_pieces_state();
 
                 save_load::SavedGame saved_game;
                 saved_game.board = scene->board;
@@ -243,9 +232,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo && can_change)) {
                 const bool undid_game_over = false;  // FIXME game_layer->undo();
 
-                if (scene->undo_redo_state.undo.empty()) {
-                    can_undo = false;
-                }
+                can_undo = scene->undo_redo_state.undo.size() > 0;
 
                 if (undid_game_over) {
                     scene->timer.start(app->window->get_time());
@@ -254,9 +241,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
             if (ImGui::MenuItem("Redo", nullptr, false, can_redo && can_change)) {
                 const bool redid_game_over = false;  // FIXME game_layer->redo();
 
-                if (scene->undo_redo_state.redo.empty()) {
-                    can_redo = false;
-                }
+                can_redo = scene->undo_redo_state.redo.size() > 0;
 
                 if (redid_game_over) {
                     scene->timer.stop();
@@ -314,14 +299,17 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                 }
             }
             if (ImGui::BeginMenu("Skybox")) {
-                static int dummy = get_skybox_option(data.options.skybox);
+                if (ImGui::RadioButton("None", &data.options.skybox, 0)) {
+                    // game_layer->set_skybox(options::FIELD);  // FIXME
 
-                if (ImGui::RadioButton("Field", &dummy, 0)) {
+                    DEB_INFO("Skybox set to {}", game_options::NONE);
+                }
+                if (ImGui::RadioButton("Field", &data.options.skybox, 1)) {
                     // game_layer->set_skybox(options::FIELD);  // FIXME
 
                     DEB_INFO("Skybox set to {}", game_options::FIELD);
                 }
-                if (ImGui::RadioButton("Autumn", &dummy, 1)) {
+                if (ImGui::RadioButton("Autumn", &data.options.skybox, 2)) {
                     // game_layer->set_skybox(options::AUTUMN);  // FIXME
 
                     DEB_INFO("Skybox set to {}", game_options::AUTUMN);
