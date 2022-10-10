@@ -26,7 +26,7 @@ struct Attachment {
 
 struct FramebufferSpecification {
     // Must be specified
-    int width, height;
+    int width = 0, height = 0;
 
     // At least one of these two must be specified
     std::vector<Attachment> color_attachments;
@@ -36,6 +36,10 @@ struct FramebufferSpecification {
     bool resizable = true;
     unsigned int resize_divisor = 1;
     bool white_border_for_depth_texture = false;
+
+    // Integer color attachment clearing stuff
+    GLint clear_drawbuffer = 0;
+    const GLint* clear_value = nullptr;
 };
 
 class Framebuffer {
@@ -58,7 +62,8 @@ public:
     int read_pixel_red_integer(unsigned int attachment_index, int x, int y);
     void read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y);
 
-    void clear_red_integer_attachment(int index, int value);
+    // Clear buffer
+    void clear_integer_color_attachment();
 
     // Resolve this to draw_framebuffer
     void resolve_framebuffer(GLuint draw_framebuffer, int width, int height);

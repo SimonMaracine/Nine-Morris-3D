@@ -79,6 +79,9 @@ namespace game {
             specification.depth_attachment = Attachment(
                 AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
             );
+            constexpr int color[4] = { 0, 0, 0, 0 };
+            specification.clear_drawbuffer = 1;
+            specification.clear_value = color;
 
             auto framebuffer = app->res.framebuffer.load("scene_framebuffer"_h, specification);
 

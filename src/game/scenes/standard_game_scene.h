@@ -66,6 +66,8 @@ struct StandardGameScene : public Scene {
 
     void save_game();
 
+    std::unique_ptr<assets_load::CustomLoader> loader;
+
     // ImGui
     ImGuiLayer<StandardGameScene> imgui_layer;
 
@@ -81,8 +83,6 @@ struct StandardGameScene : public Scene {
     bool show_keyboard_controls = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
-
-    std::unique_ptr<assets_load::CustomLoader> loader;
 
     // GUI-related
     Timer timer;
