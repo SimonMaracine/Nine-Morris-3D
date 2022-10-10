@@ -33,6 +33,7 @@ struct ImGuiLayer {
     void initialize();
 
     void draw_menu_bar();
+    void draw_info();
     void draw_game_over();
     void draw_game_over_message(std::string_view message1, std::string_view message2);
     void draw_about();
@@ -403,6 +404,22 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
 }
 
 template<typename SceneType>
+void ImGuiLayer<SceneType>::draw_info() {
+    ImGui::PushFont(app->user_data<Data>().imgui_info_font);
+    ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+    ImGui::Text("FPS: %f", app->get_fps());
+    ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
+    ImGui::Text("GLSL: %s", debug_opengl::get_glsl_version());
+    ImGui::Text("Vendor: %s", debug_opengl::get_vendor());
+    ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
+    ImGui::End();
+    // if (ImGui::IsItemHovered()) {  // FIXME this
+    //     HOVERING_GUI();
+    // }
+    ImGui::PopFont();
+}
+
+template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_game_over() {
     ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("Game Over");
@@ -731,7 +748,7 @@ void ImGuiLayer<SceneType>::draw_debug() {
         */
 
         const glm::vec3& position = scene->camera.get_position();
-        ImGui::Begin("Camera Debug");
+        ImGui::Begin("Camera");
         ImGui::Text("Position: %f, %f, %f", position.x, position.y, position.z);
         ImGui::Text("Pitch: %f", scene->camera.get_pitch());
         ImGui::Text("Yaw: %f", scene->camera.get_yaw());

@@ -174,29 +174,21 @@ void StandardGameScene::on_imgui_update() {
         imgui_layer.draw_game_over();
     }
 
-    if (undo_redo_state.undo.size() > 0) {
+    if (imgui_layer.show_info && !imgui_layer.show_about) {
+        imgui_layer.draw_info();
+    }
+
+#ifdef PLATFORM_GAME_DEBUG
+    imgui_layer.draw_debug();
+#endif
+
+    if (undo_redo_state.undo.size() > 0) {  // TODO this can be better
         imgui_layer.can_undo = true;
     }
 
     if (undo_redo_state.redo.size() > 0) {
         imgui_layer.can_redo = true;
     }
-
-    if (imgui_layer.show_info && !imgui_layer.show_about) {
-        ImGui::PushFont(app->user_data<Data>().imgui_info_font);
-        ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoCollapse);
-        ImGui::Text("FPS: %f", app->get_fps());
-        ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
-        ImGui::Text("GLSL: %s", debug_opengl::get_glsl_version());
-        ImGui::Text("Vendor: %s", debug_opengl::get_vendor());
-        ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
-        ImGui::End();
-        ImGui::PopFont();
-    }
-
-#ifdef PLATFORM_GAME_DEBUG
-    imgui_layer.draw_debug();
-#endif
 }
 
 void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
