@@ -266,8 +266,9 @@ void Renderer::render() {
     glBindTexture(GL_TEXTURE_2D, storage.depth_map_framebuffer->get_depth_attachment());
 
     // Set to zero, because we are also rendering objects with outline later
-    glStencilMask(0x00);  // TODO maybe move this down a little to improve performance
+    glStencilMask(0x00);
 
+    // Render skybox
     if (storage.skybox_texture != nullptr) {
         draw_skybox();
     }
