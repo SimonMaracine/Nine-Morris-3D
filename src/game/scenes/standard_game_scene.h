@@ -89,11 +89,6 @@ struct StandardGameScene : public Scene {
     bool show_wait_indicator = false;
     bool show_computer_thinking_indicator = false;
 
-    std::shared_ptr<gui::Image> turn_indicator;
-    std::shared_ptr<gui::Text> timer_text;
-    std::shared_ptr<gui::Image> wait_indicator;
-    std::shared_ptr<gui::Image> computer_thinking_indicator;
-
     // bool changed_skybox = false;
     // bool changed_texture_quality = false;
     // bool changed_labeled_board_texture = false;

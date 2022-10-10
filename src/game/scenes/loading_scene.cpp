@@ -17,8 +17,10 @@ void LoadingScene::on_start() {
         data.options.skybox
     );
 
-    loading_text = std::make_shared<gui::Text>(
-        app->res.font["good_dog_plain_font"_h], "Loading", 1.2f, glm::vec3(0.81f)
+    auto loading_text = data.text_cache.load(
+        "loading_text"_h,
+        app->res.font["good_dog_plain_font"_h],
+        "Loading", 1.2f, glm::vec3(0.81f)
     );
     loading_text->stick(gui::Sticky::SW);
     loading_text->offset(app->data().width - 200, gui::Relative::Left)->offset(20, gui::Relative::Bottom);
@@ -27,27 +29,31 @@ void LoadingScene::on_start() {
 
     load_splash_screen_texture();
 
-    background = std::make_shared<gui::Image>(app->res.texture["splash_screen_texture"_h]);
+    auto background = data.image_cache.load("background"_h, app->res.texture["splash_screen_texture"_h]);
     app->gui_renderer->add_widget(background);
 }
 
 void LoadingScene::on_stop() {
+    auto& data = app->user_data<Data>();
+
     DEB_INFO("Done loading assets; initializing the rest of the game...");
 
     loader->join_and_merge(app->res);
     loader.reset();
 
     app->gui_renderer->clear();
-    background.reset();
-    loading_text.reset();
+    data.image_cache.clear();
+    data.text_cache.clear();
 }
 
 void LoadingScene::on_update() {
+    auto& data = app->user_data<Data>();
+
     float width, height, x_pos, y_pos;
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
-    background->set_position(glm::vec2(x_pos, y_pos));
-    background->set_size(glm::vec2(width, height));
+    data.image_cache["background"_h]->set_position(glm::vec2(x_pos, y_pos));
+    data.image_cache["background"_h]->set_size(glm::vec2(width, height));
 
     update_loading_animation();
 
@@ -69,13 +75,15 @@ void LoadingScene::load_splash_screen_texture() {
 }
 
 void LoadingScene::update_loading_animation() {
+    auto& data = app->user_data<Data>();
+
     if (app->get_frames() % 22 == 0) {
         static unsigned int dots = 0;
 
         std::string text = "Loading";
         text.append(dots, '.');
 
-        loading_text->set_text(text);
+        data.text_cache["loading_text"_h]->set_text(text);
 
         dots++;
         dots %= 4;

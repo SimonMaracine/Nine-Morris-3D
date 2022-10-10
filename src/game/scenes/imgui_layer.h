@@ -351,12 +351,14 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
             }
             if (ImGui::BeginMenu("User Interface")) {
                 if (ImGui::MenuItem("Hide Timer", nullptr, &data.options.hide_timer)) {
+                    auto& data = app->user_data<Data>();
+
                     if (data.options.hide_timer) {
-                        app->gui_renderer->remove_widget(scene->timer_text);
+                        app->gui_renderer->remove_widget(data.text_cache["timer_text"_h]);
 
                         DEB_INFO("Hide timer");
                     } else {
-                        app->gui_renderer->add_widget(scene->timer_text);
+                        app->gui_renderer->add_widget(data.text_cache["timer_text"_h]);
 
                         DEB_INFO("Show timer");
                     }

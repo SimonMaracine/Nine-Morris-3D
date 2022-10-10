@@ -17,7 +17,4 @@ struct LoadingScene : public Scene {
     void update_loading_animation();
 
     std::unique_ptr<assets_load::CustomLoader> loader;
-
-    std::shared_ptr<gui::Image> background;  // TODO maybe put them in a resource cache instead
-    std::shared_ptr<gui::Text> loading_text;
 };

@@ -137,6 +137,8 @@ void StandardGameScene::on_awake() {
 }
 
 void StandardGameScene::on_update() {
+    auto& data = app->user_data<Data>();
+
     if (!imgui_layer.hovering_gui) {
         camera.update(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
     }
@@ -148,7 +150,7 @@ void StandardGameScene::on_update() {
 
     char time[32];
     timer.get_time_formatted(time);
-    timer_text->set_text(time);
+    data.text_cache["timer_text"_h]->set_text(time);
 }
 
 void StandardGameScene::on_fixed_update() {
@@ -961,13 +963,19 @@ void StandardGameScene::setup_widgets() {
     constexpr int LOWEST_RESOLUTION = 288;
     constexpr int HIGHEST_RESOLUTION = 1035;
 
-    turn_indicator = std::make_shared<gui::Image>(app->res.texture["white_indicator_texture"_h]);
+    auto turn_indicator = data.image_cache.load(
+        "turn_indicator"_h, app->res.texture["white_indicator_texture"_h]
+    );
     turn_indicator->stick(gui::Sticky::SE);
     turn_indicator->offset(30, gui::Relative::Right)->offset(30, gui::Relative::Bottom);
     turn_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
     app->gui_renderer->add_widget(turn_indicator);
 
-    timer_text = std::make_shared<gui::Text>(app->res.font["good_dog_plain_font"_h], "00:00", 1.5f, glm::vec3(0.9f));
+    auto timer_text = data.text_cache.load(
+        "timer_text"_h,
+        app->res.font["good_dog_plain_font"_h],
+        "00:00", 1.5f, glm::vec3(0.9f)
+    );
     timer_text->stick(gui::Sticky::N);
     timer_text->offset(60, gui::Relative::Top);
     timer_text->scale(0.6f, 1.4f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
@@ -977,22 +985,28 @@ void StandardGameScene::setup_widgets() {
         app->gui_renderer->add_widget(timer_text);
     }
 
-    wait_indicator = std::make_shared<gui::Image>(app->res.texture["wait_indicator_texture"_h]);
+    auto wait_indicator = data.image_cache.load(
+        "wait_indicator"_h, app->res.texture["wait_indicator_texture"_h]
+    );
     wait_indicator->stick(gui::Sticky::NE);
     wait_indicator->offset(25, gui::Relative::Right)->offset(55, gui::Relative::Top);
     wait_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 
-    computer_thinking_indicator = std::make_shared<gui::Image>(app->res.texture["computer_thinking_indicator_texture"_h]);
+    auto computer_thinking_indicator = data.image_cache.load(
+        "computer_thinking_indicator"_h, app->res.texture["computer_thinking_indicator_texture"_h]
+    );
     computer_thinking_indicator->stick(gui::Sticky::NE);
     computer_thinking_indicator->offset(25, gui::Relative::Right)->offset(55, gui::Relative::Top);
     computer_thinking_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 }
 
 void StandardGameScene::update_turn_indicator() {
+    auto& data = app->user_data<Data>();
+
     if (board.turn == BoardPlayer::White) {
-        turn_indicator->set_image(app->res.texture["white_indicator_texture"_h]);
+        data.image_cache["turn_indicator"_h]->set_image(app->res.texture["white_indicator_texture"_h]);
     } else {
-        turn_indicator->set_image(app->res.texture["black_indicator_texture"_h]);
+        data.image_cache["turn_indicator"_h]->set_image(app->res.texture["black_indicator_texture"_h]);
     }
 }
 
