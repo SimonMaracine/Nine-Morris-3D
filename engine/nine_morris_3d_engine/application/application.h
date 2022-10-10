@@ -87,7 +87,7 @@ private:
 
     double fps = 0.0;
     float delta = 0.0f;
-    unsigned int frames = 0;  // TODO remove this, if not needed
+    unsigned int frames = 0;
 
     // Data for the scene system
     std::vector<Scene*> scenes;

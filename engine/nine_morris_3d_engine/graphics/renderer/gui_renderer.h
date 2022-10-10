@@ -138,15 +138,15 @@ private:
         std::shared_ptr<Shader> quad2d_shader;
         std::shared_ptr<Shader> text_shader;
 
-        std::shared_ptr<Buffer> quad2d_buffer;
         std::shared_ptr<VertexArray> quad2d_vertex_array;
+        std::shared_ptr<Buffer> quad2d_buffer;
 
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
     } storage;
 
     std::vector<std::shared_ptr<gui::Widget>> widgets;
 
-    const char* QUAD2D_VERTEX_SHADER = ENCR("data/shaders/internal/quad2d.vert");
+    const char* QUAD2D_VERTEX_SHADER = ENCR("data/shaders/internal/quad2d.vert");  // TODO maybe put internal assets in a different folder
     const char* QUAD2D_FRAGMENT_SHADER = ENCR("data/shaders/internal/quad2d.frag");
     const char* TEXT_VERTEX_SHADER = ENCR("data/shaders/internal/text.vert");
     const char* TEXT_FRAGMENT_SHADER = ENCR("data/shaders/internal/text.frag");
