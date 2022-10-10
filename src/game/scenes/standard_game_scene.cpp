@@ -722,7 +722,7 @@ void StandardGameScene::initialize_rendering_light_bulb() {
 
     auto light_bulb_texture = app->res.texture.load(
         "light_bulb_texture"_h,
-        "data/textures/internal/light_bulb/light_bulb.png",
+        "data/textures/light_bulb/light_bulb.png",
         specification
     );
 
