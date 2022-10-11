@@ -959,7 +959,8 @@ void StandardGameScene::setup_widgets() {
         "turn_indicator"_h, app->res.texture["white_indicator_texture"_h]
     );
     turn_indicator->stick(gui::Sticky::SE);
-    turn_indicator->offset(30, gui::Relative::Right)->offset(30, gui::Relative::Bottom);
+    turn_indicator->offset(30, gui::Relative::Right);
+    turn_indicator->offset(30, gui::Relative::Bottom);
     turn_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
     app->gui_renderer->add_widget(turn_indicator);
 
@@ -981,14 +982,16 @@ void StandardGameScene::setup_widgets() {
         "wait_indicator"_h, app->res.texture["wait_indicator_texture"_h]
     );
     wait_indicator->stick(gui::Sticky::NE);
-    wait_indicator->offset(25, gui::Relative::Right)->offset(55, gui::Relative::Top);
+    wait_indicator->offset(25, gui::Relative::Right);
+    wait_indicator->offset(55, gui::Relative::Top);
     wait_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 
     auto computer_thinking_indicator = data.image_cache.load(
         "computer_thinking_indicator"_h, app->res.texture["computer_thinking_indicator_texture"_h]
     );
     computer_thinking_indicator->stick(gui::Sticky::NE);
-    computer_thinking_indicator->offset(25, gui::Relative::Right)->offset(55, gui::Relative::Top);
+    computer_thinking_indicator->offset(25, gui::Relative::Right);
+    computer_thinking_indicator->offset(55, gui::Relative::Top);
     computer_thinking_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 }
 

@@ -232,6 +232,7 @@ Renderer::Renderer(Application* app)
 
     Shader::unbind();
 
+    // Setup events
     app->evt.sink<WindowResizedEvent>().connect<&Renderer::on_window_resized>(*this);
 
     DEB_INFO("Initialized renderer");

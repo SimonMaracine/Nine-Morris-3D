@@ -37,22 +37,25 @@ namespace gui {
 
         virtual void render() = 0;
 
-        Widget* offset(unsigned int offset, Relative relative);
+        Widget* offset(int offset, Relative relative);
         Widget* stick(Sticky sticky);
         Widget* scale(float min_scale, float max_scale, int min_bound, int max_bound);
+        Widget* fake_size(glm::vec2 fake_size);
 
-        glm::ivec2 get_position() { return position; }
-        glm::ivec2 get_size() { return size; }
+        glm::vec2 get_position() { return position; }
+        glm::vec2 get_size() { return size; }
         Sticky get_sticky() { return sticky; }
+        glm::vec2 get_actual_size() { return size * scale_parameters.current_scale; }
+        float get_current_scale() { return scale_parameters.current_scale; }
     protected:
-        glm::ivec2 position = glm::ivec2(0);  // Relative to bottom-left
-        glm::ivec2 size = glm::ivec2(0);  // Width-height
+        glm::vec2 position = glm::vec2(0.0f);  // Relative to bottom-left
+        glm::vec2 size = glm::vec2(0.0f);  // Width-height
 
         struct {
-            unsigned int left = 0;
-            unsigned int right = 0;
-            unsigned int top = 0;
-            unsigned int bottom = 0;
+            int left = 0;
+            int right = 0;
+            int top = 0;
+            int bottom = 0;
         } offset_parameters;
 
         struct {
@@ -62,6 +65,11 @@ namespace gui {
             int max_bound = 0;
             float current_scale = 1.0f;
         } scale_parameters;
+
+        struct {
+            glm::vec2 fake_size = glm::vec2(0.0f);
+            bool fake = false;
+        } fake;
 
         Sticky sticky = Sticky::Center;
 

@@ -13,6 +13,7 @@ struct LoadingScene : public Scene {
     virtual void on_stop() override;
     virtual void on_update() override;
 
+    void setup_widgets();
     void load_splash_screen_texture();
     void update_loading_animation();
 

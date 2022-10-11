@@ -17,16 +17,7 @@ void LoadingScene::on_start() {
         data.options.skybox
     );
 
-    auto loading_text = data.text_cache.load(
-        "loading_text"_h,
-        app->res.font["good_dog_plain_font"_h],
-        "Loading", 1.2f, glm::vec3(0.81f)
-    );
-    loading_text->stick(gui::Sticky::SW);
-    loading_text->offset(app->data().width - 250, gui::Relative::Left)->offset(20, gui::Relative::Bottom);
-    loading_text->set_shadows(true);
-    app->gui_renderer->add_widget(loading_text);
-
+    setup_widgets();
     load_splash_screen_texture();
 
     auto background = data.image_cache.load("background"_h, app->res.texture["splash_screen_texture"_h]);
@@ -62,6 +53,28 @@ void LoadingScene::on_update() {
     if (loader->done_loading()) {
         app->change_scene("game");
     }
+}
+
+void LoadingScene::setup_widgets() {
+    auto& data = app->user_data<Data>();
+
+    constexpr int LOWEST_RESOLUTION = 288;
+    constexpr int HIGHEST_RESOLUTION = 1035;
+
+    auto loading_text = data.text_cache.load(
+        "loading_text"_h,
+        app->res.font["good_dog_plain_font"_h],
+        "Loading", 1.5f, glm::vec3(0.81f)
+    );
+    loading_text->stick(gui::Sticky::SE);
+    loading_text->offset(20, gui::Relative::Right);
+    loading_text->offset(20, gui::Relative::Bottom);
+    loading_text->scale(0.4f, 1.4f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);  // TODO tweak parameters
+
+    const auto size = loading_text->get_actual_size();
+    loading_text->fake_size(glm::vec2(size.x + 80.0f, size.y));
+    loading_text->set_shadows(true);
+    app->gui_renderer->add_widget(loading_text);
 }
 
 void LoadingScene::load_splash_screen_texture() {

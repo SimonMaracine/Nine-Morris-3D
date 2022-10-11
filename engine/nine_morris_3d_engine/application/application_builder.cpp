@@ -1,20 +1,29 @@
 #include "nine_morris_3d_engine/application/application_builder.h"
 
-ApplicationBuilder& ApplicationBuilder::display_config(int width, int height, std::string_view title,
-        bool fullscreen, bool native_resolution, bool resizable, int min_width, int min_height) {
+ApplicationBuilder& ApplicationBuilder::display(int width, int height, std::string_view title) {
     this->width = width;
     this->height = height;
     this->title = title;
+
+    return *this;
+}
+
+ApplicationBuilder& ApplicationBuilder::display_flags(bool fullscreen, bool native_resolution, bool resizable) {
     this->fullscreen = fullscreen;
     this->native_resolution = native_resolution;
     this->resizable = resizable;
+
+    return *this;
+}
+
+ApplicationBuilder& ApplicationBuilder::display_min_resolution(int min_width, int min_height) {
     this->min_width = min_width;
     this->min_height = min_height;
 
     return *this;
 }
 
-ApplicationBuilder& ApplicationBuilder::file_names_config(std::string_view application_name,
+ApplicationBuilder& ApplicationBuilder::file_names(std::string_view application_name,
         std::string_view info_file_name) {
     this->application_name = application_name;
     this->info_file_name = info_file_name;
@@ -22,7 +31,7 @@ ApplicationBuilder& ApplicationBuilder::file_names_config(std::string_view appli
     return *this;
 }
 
-ApplicationBuilder& ApplicationBuilder::version_config(unsigned int major, unsigned int minor, unsigned int patch) {
+ApplicationBuilder& ApplicationBuilder::version(unsigned int major, unsigned int minor, unsigned int patch) {
     this->major = major;
     this->minor = minor;
     this->patch = patch;
@@ -30,19 +39,19 @@ ApplicationBuilder& ApplicationBuilder::version_config(unsigned int major, unsig
     return *this;
 }
 
-ApplicationBuilder& ApplicationBuilder::authors_config(const std::vector<std::string>& authors) {
-    this->authors = authors;
+ApplicationBuilder& ApplicationBuilder::authors(const std::vector<std::string>& author_list) {
+    this->author_list = author_list;
 
     return *this;
 }
 
-ApplicationBuilder& ApplicationBuilder::encrypt_key_config(std::string_view encrypt_key) {
-    this->encrypt_key = encrypt_key;
+ApplicationBuilder& ApplicationBuilder::encrypt_key(std::string_view encryption_key) {
+    this->encryption_key = encryption_key;
 
     return *this;
 }
 
-ApplicationBuilder& ApplicationBuilder::with(Renderer renderer) {
+ApplicationBuilder& ApplicationBuilder::with_renderer(Renderer renderer) {
     switch (renderer) {
         case Renderer::R3D:
             renderer_3d = true;
