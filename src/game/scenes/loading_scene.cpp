@@ -23,7 +23,7 @@ void LoadingScene::on_start() {
         "Loading", 1.2f, glm::vec3(0.81f)
     );
     loading_text->stick(gui::Sticky::SW);
-    loading_text->offset(app->data().width - 200, gui::Relative::Left)->offset(20, gui::Relative::Bottom);
+    loading_text->offset(app->data().width - 250, gui::Relative::Left)->offset(20, gui::Relative::Bottom);
     loading_text->set_shadows(true);
     app->gui_renderer->add_widget(loading_text);
 
@@ -31,6 +31,8 @@ void LoadingScene::on_start() {
 
     auto background = data.image_cache.load("background"_h, app->res.texture["splash_screen_texture"_h]);
     app->gui_renderer->add_widget(background);
+
+    loading_animation.previous_seconds = app->window->get_time();
 }
 
 void LoadingScene::on_stop() {
@@ -77,15 +79,21 @@ void LoadingScene::load_splash_screen_texture() {
 void LoadingScene::update_loading_animation() {
     auto& data = app->user_data<Data>();
 
-    if (app->get_frames() % 22 == 0) {
-        static unsigned int dots = 0;
+    const double current_seconds = app->window->get_time();
+    const double elapsed_seconds = current_seconds - loading_animation.previous_seconds;
+    loading_animation.previous_seconds = current_seconds;
+
+    loading_animation.total_time += elapsed_seconds;
+
+    if (loading_animation.total_time > 0.4) {
+        loading_animation.total_time = 0.0;
 
         std::string text = "Loading";
-        text.append(dots, '.');
+        text.append(loading_animation.dots, '.');
 
         data.text_cache["loading_text"_h]->set_text(text);
 
-        dots++;
-        dots %= 4;
+        loading_animation.dots++;
+        loading_animation.dots %= 6;
     }
 }

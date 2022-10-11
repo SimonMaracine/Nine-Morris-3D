@@ -42,7 +42,6 @@ public:
 
     double get_fps() { return fps; }
     float get_delta() { return delta; }
-    unsigned int get_frames() { return frames; }
     float get_mouse_wheel() { return mouse_wheel; }
     float get_dx() { return dx; }
     float get_dy() { return dy; }
@@ -87,7 +86,6 @@ private:
 
     double fps = 0.0;
     float delta = 0.0f;
-    unsigned int frames = 0;
 
     // Data for the scene system
     std::vector<Scene*> scenes;

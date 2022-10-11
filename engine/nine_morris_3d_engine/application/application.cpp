@@ -193,8 +193,6 @@ void Application::purge_framebuffers() {
 float Application::update_frame_counter() {
     constexpr double MAX_DT = 1.0 / 20.0;
 
-    frames++;
-
     const double current_seconds = window->get_time();
     const double elapsed_seconds = current_seconds - frame_counter.previous_seconds;
     frame_counter.previous_seconds = current_seconds;

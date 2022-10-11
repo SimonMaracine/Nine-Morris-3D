@@ -17,4 +17,10 @@ struct LoadingScene : public Scene {
     void update_loading_animation();
 
     std::unique_ptr<assets_load::CustomLoader> loader;
+
+    struct {
+        double previous_seconds = 0.0;
+        double total_time = 0.0;
+        unsigned int dots = 0;
+    } loading_animation;
 };
