@@ -69,10 +69,10 @@ void LoadingScene::setup_widgets() {
     loading_text->stick(gui::Sticky::SE);
     loading_text->offset(20, gui::Relative::Right);
     loading_text->offset(20, gui::Relative::Bottom);
-    loading_text->scale(0.4f, 1.4f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);  // TODO tweak parameters
+    loading_text->scale(0.4f, 1.3f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 
     const auto size = loading_text->get_actual_size();
-    loading_text->fake_size(glm::vec2(size.x + 80.0f, size.y));
+    loading_text->fake_size(glm::vec2(size.x + 70.0f, size.y));
     loading_text->set_shadows(true);
     app->gui_renderer->add_widget(loading_text);
 }
