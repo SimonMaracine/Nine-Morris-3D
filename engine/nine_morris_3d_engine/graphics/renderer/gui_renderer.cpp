@@ -20,7 +20,7 @@ static float map(float x, float in_min, float in_max, float out_min, float out_m
 }
 
 namespace gui {
-    Widget* Widget::offset(unsigned int offset, Relative relative) {
+    Widget* Widget::offset(int offset, Relative relative) {
         switch (relative) {
             case Relative::Left:
                 offset_parameters.left = offset;
@@ -54,6 +54,13 @@ namespace gui {
         return this;
     }
 
+    Widget* Widget::fake_size(glm::vec2 fake_size) {
+        fake.fake_size = fake_size;
+        fake.fake = true;
+
+        return this;
+    }
+
     Application* Widget::app = nullptr;
 
     Image::Image(std::shared_ptr<Texture> texture)
@@ -66,7 +73,7 @@ namespace gui {
     void Image::render() {
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
-        matrix = glm::scale(matrix, glm::vec3(static_cast<glm::vec2>(size) * scale_parameters.current_scale, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(size * scale_parameters.current_scale, 1.0f));
 
         app->gui_renderer->storage.quad2d_shader->upload_uniform_mat4("u_model_matrix", matrix);
 
@@ -82,17 +89,22 @@ namespace gui {
     }
 
     void Image::set_position(glm::vec2 position) {
-        this->position = static_cast<glm::ivec2>(position);
+        this->position = position;
     }
 
     void Image::set_size(glm::vec2 size) {
-        this->size = static_cast<glm::ivec2>(size);
+        this->size = size;
     }
 
     Text::Text(std::shared_ptr<Font> font, std::string_view text, float text_scale, const glm::vec3& color)
         : font(font), text(text), text_scale(text_scale), color(color) {
         type = WidgetType::Text;
-        font->get_string_size(text, text_scale, &size.x, &size.y);
+
+        int x, y;
+        font->get_string_size(text, text_scale, &x, &y);
+
+        size.x = static_cast<float>(x);
+        size.y = static_cast<float>(y);
     }
 
     void Text::render() {
@@ -110,6 +122,7 @@ namespace gui {
 
         app->gui_renderer->storage.text_shader->upload_uniform_mat4("u_model_matrix", matrix);
         app->gui_renderer->storage.text_shader->upload_uniform_vec3("u_color", color);
+
         if (!with_shadows) {
             app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width", 0.0f);
             app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset", glm::vec2(0.0f, 0.0f));
@@ -127,12 +140,22 @@ namespace gui {
 
     void Text::set_text(std::string_view text) {
         this->text = text;
-        font->get_string_size(text, text_scale, &size.x, &size.y);
+
+        int x, y;
+        font->get_string_size(text, text_scale, &x, &y);
+
+        size.x = static_cast<float>(x);
+        size.y = static_cast<float>(y);
     }
 
     void Text::set_scale(float text_scale) {
         this->text_scale = text_scale;
-        font->get_string_size(text, text_scale, &size.x, &size.y);
+
+        int x, y;
+        font->get_string_size(text, text_scale, &x, &y);
+
+        size.x = static_cast<float>(x);
+        size.y = static_cast<float>(y);
     }
 
     void Text::set_color(const glm::vec3& color) {
@@ -181,7 +204,7 @@ GuiRenderer::GuiRenderer(Application* app)
     }
 
     {
-        float quad2d_vertices[] = {
+        constexpr float quad2d_vertices[] = {
             0.0f, 1.0f,
             0.0f, 0.0f,
             1.0f, 1.0f,
@@ -214,10 +237,11 @@ GuiRenderer::GuiRenderer(Application* app)
 
     Shader::unbind();
 
+    // Setup events
+    app->evt.sink<WindowResizedEvent>().connect<&GuiRenderer::on_window_resized>(*this);
+
     // Set application pointer to widgets
     gui::Widget::app = app;
-
-    app->evt.sink<WindowResizedEvent>().connect<&GuiRenderer::on_window_resized>(*this);
 
     DEB_INFO("Initialized GUI renderer");
 }
@@ -323,57 +347,61 @@ void GuiRenderer::draw(std::vector<gui::Widget*>& subwidgets, const std::functio
 
         const float SCALE = widget->scale_parameters.current_scale;
 
+        if (widget->fake.fake) {
+            widget->size = widget->fake.fake_size;
+        }
+
         switch (widget->sticky) {
             case gui::Sticky::Center:
-                widget->position = glm::ivec2(
+                widget->position = glm::vec2(
                     WINDOW_WIDTH / 2 - widget->size.x * SCALE / 2,
                     WINDOW_HEIGHT / 2 - widget->size.y * SCALE / 2
                 );
                 break;
             case gui::Sticky::N:
-                widget->position = glm::ivec2(
+                widget->position = glm::vec2(
                     WINDOW_WIDTH / 2 - widget->size.x * SCALE / 2,
                     WINDOW_HEIGHT - widget->size.y * SCALE - widget->offset_parameters.top
                 );
                 break;
             case gui::Sticky::S:
-                widget->position = glm::ivec2(
+                widget->position = glm::vec2(
                     WINDOW_WIDTH / 2 - widget->size.x * SCALE / 2,
                     widget->offset_parameters.bottom
                 );
                 break;
             case gui::Sticky::E:
-                widget->position = glm::ivec2(
+                widget->position = glm::vec2(
                     WINDOW_WIDTH - widget->size.x * SCALE - widget->offset_parameters.right,
                     WINDOW_HEIGHT / 2 - widget->size.x * SCALE / 2
                 );
                 break;
             case gui::Sticky::W:
-                widget->position = glm::ivec2(
+                widget->position = glm::vec2(
                     widget->offset_parameters.left,
                     WINDOW_HEIGHT / 2 - widget->size.x * SCALE / 2
                 );
                 break;
             case gui::Sticky::NE:
-                widget->position = glm::ivec2(
+                widget->position = glm::vec2(
                     WINDOW_WIDTH - widget->size.x * SCALE - widget->offset_parameters.right,
                     WINDOW_HEIGHT - widget->size.y * SCALE - widget->offset_parameters.top
                 );
                 break;
             case gui::Sticky::NW:
-                widget->position = glm::ivec2(
+                widget->position = glm::vec2(
                     widget->offset_parameters.left,
                     WINDOW_HEIGHT - widget->size.y * SCALE - widget->offset_parameters.top
                 );
                 break;
             case gui::Sticky::SE:
-                widget->position = glm::ivec2(
+                widget->position = glm::vec2(
                     WINDOW_WIDTH - widget->size.x * SCALE - widget->offset_parameters.right,
                     widget->offset_parameters.bottom
                 );
                 break;
             case gui::Sticky::SW:
-                widget->position = glm::ivec2(
+                widget->position = glm::vec2(
                     widget->offset_parameters.left,
                     widget->offset_parameters.bottom
                 );

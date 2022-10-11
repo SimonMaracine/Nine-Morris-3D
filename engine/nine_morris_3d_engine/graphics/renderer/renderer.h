@@ -177,19 +177,19 @@ private:
 
     PostProcessingContext post_processing_context;
 
-    const char* SHADOW_VERTEX_SHADER = ENCR("data/shaders/internal/shadow.vert");
-    const char* SHADOW_FRAGMENT_SHADER = ENCR("data/shaders/internal/shadow.frag");
-    const char* SCREEN_QUAD_VERTEX_SHADER = ENCR("data/shaders/internal/screen_quad.vert");
-    const char* SCREEN_QUAD_FRAGMENT_SHADER = ENCR("data/shaders/internal/screen_quad.frag");
-    const char* OUTLINE_VERTEX_SHADER = ENCR("data/shaders/internal/outline.vert");
-    const char* OUTLINE_FRAGMENT_SHADER = ENCR("data/shaders/internal/outline.frag");
-    const char* SKYBOX_VERTEX_SHADER = ENCR("data/shaders/internal/skybox.vert");
-    const char* SKYBOX_FRAGMENT_SHADER = ENCR("data/shaders/internal/skybox.frag");
-    const char* QUAD3D_VERTEX_SHADER = ENCR("data/shaders/internal/quad3d.vert");
-    const char* QUAD3D_FRAGMENT_SHADER = ENCR("data/shaders/internal/quad3d.frag");
+    const char* SHADOW_VERTEX_SHADER = ENCR("engine_data/shaders/shadow.vert");
+    const char* SHADOW_FRAGMENT_SHADER = ENCR("engine_data/shaders/shadow.frag");
+    const char* SCREEN_QUAD_VERTEX_SHADER = ENCR("engine_data/shaders/screen_quad.vert");
+    const char* SCREEN_QUAD_FRAGMENT_SHADER = ENCR("engine_data/shaders/screen_quad.frag");
+    const char* OUTLINE_VERTEX_SHADER = ENCR("engine_data/shaders/outline.vert");
+    const char* OUTLINE_FRAGMENT_SHADER = ENCR("engine_data/shaders/outline.frag");
+    const char* SKYBOX_VERTEX_SHADER = ENCR("engine_data/shaders/skybox.vert");
+    const char* SKYBOX_FRAGMENT_SHADER = ENCR("engine_data/shaders/skybox.frag");
+    const char* QUAD3D_VERTEX_SHADER = ENCR("engine_data/shaders/quad3d.vert");
+    const char* QUAD3D_FRAGMENT_SHADER = ENCR("engine_data/shaders/quad3d.frag");
 #ifdef PLATFORM_GAME_DEBUG
-    const char* ORIGIN_VERTEX_SHADER = "data/shaders/internal/origin.vert";
-    const char* ORIGIN_FRAGMENT_SHADER = "data/shaders/internal/origin.frag";
+    const char* ORIGIN_VERTEX_SHADER = "engine_data/shaders/origin.vert";
+    const char* ORIGIN_FRAGMENT_SHADER = "engine_data/shaders/origin.frag";
 #endif
 
     Application* app = nullptr;

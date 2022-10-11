@@ -99,11 +99,22 @@ Framebuffer::Framebuffer(const FramebufferSpecification& specification)
         specification.samples == 1 || specification.samples == 2 || specification.samples == 4,
         "Invalid sample size"
     );
+
     if (specification.white_border_for_depth_texture) {
         ASSERT(specification.depth_attachment.format != AttachmentFormat::None, "Invalid configuration");
         ASSERT(specification.depth_attachment.type == AttachmentType::Texture, "Invalid configuration");
     }
+
     ASSERT(specification.width > 0 && specification.height > 0, "Invalid size");
+
+    ASSERT(specification.clear_drawbuffer >= 0, "Invalid drawbuffer to clear");
+
+    if (!specification.color_attachments.empty()) {
+        ASSERT(
+            static_cast<size_t>(specification.clear_drawbuffer) < specification.color_attachments.size(),
+            "Invalid drawbuffer to clear"
+        );
+    }
 
     build();
 
@@ -191,10 +202,8 @@ void Framebuffer::read_pixel_red_integer_pbo(unsigned int attachment_index, int 
     glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, nullptr);
 }
 
-void Framebuffer::clear_red_integer_attachment(int index, int value) {  // TODO is this even used?
-    ASSERT((size_t) index < color_attachments.size(), "Invalid color attachment");
-
-    glClearBufferiv(GL_COLOR, index, &value);
+void Framebuffer::clear_integer_color_attachment() {
+    glClearBufferiv(GL_COLOR, specification.clear_drawbuffer, specification.clear_value);
 }
 
 void Framebuffer::resolve_framebuffer(GLuint draw_framebuffer, int width, int height) {

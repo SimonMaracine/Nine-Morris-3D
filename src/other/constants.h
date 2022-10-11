@@ -122,6 +122,17 @@ enum class KeyboardControlsDirection {
     Right = 3
 };
 
+enum class Skybox {
+    None,
+    Field,
+    Autumn
+};
+
+enum class TextureQuality {
+    Normal,
+    Low
+};
+
 constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
 constexpr float PAINT_Y_POSITION = 0.062f;
 

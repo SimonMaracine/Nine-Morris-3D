@@ -2,10 +2,10 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/constants.h"
 #include "game/piece.h"
 #include "game/node.h"
 #include "game/threefold_repetition_history.h"
+#include "other/constants.h"
 
 struct UndoRedoState;
 class KeyboardControls;

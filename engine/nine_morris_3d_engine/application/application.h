@@ -38,11 +38,10 @@ public:
     template<typename Data>
     Data& user_data() { return std::any_cast<Data&>(_user_data); }
 
-    const ApplicationData& data() { return _app_data; }
+    const ApplicationData& data() { return app_data; }
 
     double get_fps() { return fps; }
     float get_delta() { return delta; }
-    unsigned int get_frames() { return frames; }
     float get_mouse_wheel() { return mouse_wheel; }
     float get_dx() { return dx; }
     float get_dy() { return dy; }
@@ -81,13 +80,12 @@ private:
 
     ApplicationBuilder builder;
     std::any& _user_data;
+    ApplicationData app_data;
     UserFunc start;
     UserFunc stop;
-    ApplicationData _app_data;
 
     double fps = 0.0;
     float delta = 0.0f;
-    unsigned int frames = 0;  // TODO remove this, if not needed
 
     // Data for the scene system
     std::vector<Scene*> scenes;

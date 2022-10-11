@@ -5,7 +5,7 @@
 #include "game/boards/generic_board.h"
 #include "game/piece.h"
 #include "game/node.h"
-#include "game/constants.h"
+#include "other/constants.h"
 
 struct StandardBoard : public GenericBoard {
     StandardBoard() = default;

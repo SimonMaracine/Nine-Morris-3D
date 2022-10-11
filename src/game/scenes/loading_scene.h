@@ -13,6 +13,15 @@ struct LoadingScene : public Scene {
     virtual void on_stop() override;
     virtual void on_update() override;
 
-    std::shared_ptr<gui::Image> background;
+    void setup_widgets();
+    void load_splash_screen_texture();
+    void update_loading_animation();
+
     std::unique_ptr<assets_load::CustomLoader> loader;
+
+    struct {
+        double previous_seconds = 0.0;
+        double total_time = 0.0;
+        unsigned int dots = 0;
+    } loading_animation;
 };

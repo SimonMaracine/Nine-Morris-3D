@@ -19,20 +19,17 @@ bitmap_*.png
 encrypter
 encrypter.exe
 /data-filtered
+/engine_data-filtered
 
 /.vs
 CMakeCache.txt
 /CMakeFiles
 /Debug
 /Release
-*.vcxproj
-*.vcxproj.filters
-*.sln
-*.dir
+/x64
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
-*.vcxproj
-*.vcxproj.filters
+*.sln
+*.dir
 *.cmake
-/x64

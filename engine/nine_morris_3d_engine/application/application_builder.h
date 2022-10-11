@@ -2,20 +2,21 @@
 
 class ApplicationBuilder {
 public:
-    enum class Renderer {
+    enum Renderer {
         R3D, R2D, RImGui
     };
 
     ApplicationBuilder() = default;
     ~ApplicationBuilder() = default;
 
-    ApplicationBuilder& display_config(int width, int height, std::string_view title = "Nine Morris 3D Engine",
-        bool fullscreen = false, bool native_resolution = true, bool resizable = true, int min_width = -1, int min_height = -1);
-    ApplicationBuilder& file_names_config(std::string_view application_name, std::string_view info_file_name);
-    ApplicationBuilder& version_config(unsigned int major, unsigned int minor, unsigned int patch);
-    ApplicationBuilder& authors_config(const std::vector<std::string>& authors);
-    ApplicationBuilder& encrypt_key_config(std::string_view encrypt_key);
-    ApplicationBuilder& with(Renderer renderer);
+    ApplicationBuilder& display(int width, int height, std::string_view title = "Nine Morris 3D Engine");
+    ApplicationBuilder& display_flags(bool fullscreen, bool native_resolution, bool resizable);
+    ApplicationBuilder& display_min_resolution(int min_width, int min_height);
+    ApplicationBuilder& file_names(std::string_view application_name, std::string_view info_file_name);
+    ApplicationBuilder& version(unsigned int major, unsigned int minor, unsigned int patch);
+    ApplicationBuilder& authors(const std::vector<std::string>& author_list);
+    ApplicationBuilder& encrypt_key(std::string_view encryption_key);
+    ApplicationBuilder& with_renderer(Renderer renderer);
 private:
     int width = 800;
     int height = 600;
@@ -30,8 +31,8 @@ private:
     unsigned int major = 0;
     unsigned int minor = 1;
     unsigned int patch = 0;
-    std::vector<std::string> authors;
-    std::string encrypt_key = "Nine Morris 3D Engine";
+    std::vector<std::string> author_list;
+    std::string encryption_key = "Nine Morris 3D Engine";
     bool renderer_3d = false;
     bool renderer_2d = false;
     bool renderer_imgui = false;

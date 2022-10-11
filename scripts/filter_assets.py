@@ -1,7 +1,9 @@
 import os
+import shutil
 from os import path
-from distutils import dir_util
 
+ENGINE_DATA = "engine_data"
+ENGINE_DATA_FILTERED = "engine_data-filtered"
 DATA = "data"
 DATA_FILTERED = "data-filtered"
 SUFFIX = ".dat"
@@ -13,6 +15,17 @@ FILES_TO_KEEP = (
     "OpenSans-Semibold.ttf",
     "ninemorris3d.png"
 )
+
+
+def copy_tree(source: str, destination: str):
+    for item in os.listdir(source):
+        src = path.join(source, item)
+        dest = path.join(destination, item)
+
+        if os.path.isdir(src):
+            shutil.copytree(src, dest, dirs_exist_ok=True)
+        else:
+            shutil.copy2(src, dest)
 
 
 def visit_directory(directory: str):
@@ -30,10 +43,14 @@ def visit_directory(directory: str):
         elif path.isdir(item_full_path):
             visit_directory(item_full_path)
 
+    os.chdir("..")
+
 
 if __name__ == "__main__":
     os.chdir("..")
     print("Copying...")
-    dir_util.copy_tree(DATA, DATA_FILTERED)
+    copy_tree(DATA, DATA_FILTERED)
+    copy_tree(ENGINE_DATA, ENGINE_DATA_FILTERED)
     visit_directory(DATA_FILTERED)
+    visit_directory(ENGINE_DATA_FILTERED)
     print("Done")

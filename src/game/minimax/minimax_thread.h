@@ -2,7 +2,7 @@
 
 class GenericBoard;
 
-#include "game/constants.h"
+#include "other/constants.h"
 
 class MinimaxThread {
 public:

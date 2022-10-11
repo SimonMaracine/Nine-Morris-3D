@@ -1,6 +1,6 @@
 echo off
 
 cls
-cd ..\build
-cmake --build .
-cd ..\scripts
+cd ..
+cmake --build . --config Debug
+cd scripts

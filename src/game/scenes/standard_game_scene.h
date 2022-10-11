@@ -7,10 +7,10 @@
 #include "game/undo_redo_state.h"
 #include "game/keyboard_controls.h"
 #include "game/game_context.h"
-#include "game/constants.h"
 #include "game/timer.h"
 #include "game/minimax/minimax_thread.h"
 #include "game/assets_load.h"
+#include "other/constants.h"
 
 struct StandardGameScene : public Scene {
     StandardGameScene()
@@ -66,6 +66,8 @@ struct StandardGameScene : public Scene {
 
     void save_game();
 
+    std::unique_ptr<assets_load::CustomLoader> loader;
+
     // ImGui
     ImGuiLayer<StandardGameScene> imgui_layer;
 
@@ -82,17 +84,10 @@ struct StandardGameScene : public Scene {
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
 
-    std::unique_ptr<assets_load::CustomLoader> loader;
-
     // GUI-related
     Timer timer;
     bool show_wait_indicator = false;
     bool show_computer_thinking_indicator = false;
-
-    std::shared_ptr<gui::Image> turn_indicator;
-    std::shared_ptr<gui::Text> timer_text;
-    std::shared_ptr<gui::Image> wait_indicator;
-    std::shared_ptr<gui::Image> computer_thinking_indicator;
 
     // bool changed_skybox = false;
     // bool changed_texture_quality = false;

@@ -32,20 +32,21 @@ int main() {
         int exit_code {};
 
         auto launcher_builder = ApplicationBuilder {}
-            .display_config(640, 480, "Nine Morris 3D Launcher", false, false, false)  // TODO  refactor a bit
-            .file_names_config(APP_NAME, INFO_FILE)
-            .version_config(MAJOR, MINOR, PATCH)
-            .authors_config(authors)
-            .encrypt_key_config(KEY)
-            .with(ApplicationBuilder::Renderer::RImGui)
-            .with(ApplicationBuilder::Renderer::R2D);
+            .display(640, 480, "Nine Morris 3D Launcher")
+            .display_flags(false, false, false)
+            .file_names(APP_NAME, INFO_FILE)
+            .version(MAJOR, MINOR, PATCH)
+            .authors(authors)
+            .encrypt_key(KEY)
+            .with_renderer(ApplicationBuilder::RImGui)
+            .with_renderer(ApplicationBuilder::R2D);
 
         auto data = std::make_any<Data>();
 
-        // auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
-        // launcher->add_scene(new LauncherScene, true);
-        // exit_code = launcher->run();
-        // launcher.reset();
+        auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
+        launcher->add_scene(new LauncherScene, true);
+        exit_code = launcher->run();
+        launcher.reset();
 
         if (exit_code == 1) {
             return 0;
@@ -54,17 +55,16 @@ int main() {
         const auto& options = std::any_cast<Data>(data).launcher_options;
 
         auto game_builder = ApplicationBuilder {}
-            .display_config(
-                options.resolution.first, options.resolution.second, "Nine Morris 3D",
-                options.fullscreen, options.native_resolution, true, 512, 288
-            )
-            .file_names_config(APP_NAME, INFO_FILE)
-            .version_config(MAJOR, MINOR, PATCH)
-            .authors_config(authors)
-            .encrypt_key_config(KEY)
-            .with(ApplicationBuilder::Renderer::R3D)
-            .with(ApplicationBuilder::Renderer::R2D)
-            .with(ApplicationBuilder::Renderer::RImGui);
+            .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
+            .display_flags(options.fullscreen, options.native_resolution, true)
+            .display_min_resolution(512, 288)
+            .file_names(APP_NAME, INFO_FILE)
+            .version(MAJOR, MINOR, PATCH)
+            .authors(authors)
+            .encrypt_key(KEY)
+            .with_renderer(ApplicationBuilder::R3D)
+            .with_renderer(ApplicationBuilder::R2D)
+            .with_renderer(ApplicationBuilder::RImGui);
 
         auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
         game->add_scene(new LoadingScene, true);

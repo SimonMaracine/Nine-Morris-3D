@@ -3,7 +3,9 @@
 ## A Nine Men's Morris implementation in 3D.
 
 ### Details:
-It is a free casual board game with hopefully beautiful 3D graphics. It has three game modes: standard, final and hunter, each with their AIs. Games can be saved and be continued later. AI and other settings are configurable. Works on Linux and Windows.
+It is a free casual board game with hopefully beautiful 3D graphics. It has five game modes:
+standard (nine men's morris), jump, jump+, twelve men's mmorris and hunt, each with their AIs.
+Games can be saved and be continued later. AI and other settings are configurable. Works on Linux and Windows.
 
 ### Tags:
 - Casual
@@ -16,8 +18,8 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has thre
 - Create a new folder called **_Nine-Morris-3D-vX.Y.Z-Linux_**
 - Copy the executable from build-release/
 - Make sure that all assets are encrypted
-- Use filter_assets.py to create the data folder filtered
-- Copy the newly created data directory and rename it from **_data-filtered_** to **_data_**
+- Use filter_assets.py to create the filtered data folders
+- Copy the two newly created data directories and rename them from ***_data-filtered_** to ***_data_**
 - Copy HELP_LINUX.txt
 - Copy README.txt
 - Copy install.sh and uninstall.sh from scripts/linux-install/
@@ -27,8 +29,8 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has thre
 - Create a new folder called whatever
 - Copy the executable from Release/
 - Make sure that all assets are encrypted
-- Use filter_assets.py to create the data folder filtered
-- Copy the newly created data directory and rename it from **_data-filtered_** to **_data_**
+- Use filter_assets.py to create the filtered data folders
+- Copy the two newly created data directories and rename them from ***_data-filtered_** to ***_data_**
 - Copy README.txt
 - Copy installer.nsi from scripts/windows-install/
 - Create the NSIS installer called **_Nine-Morris-3D-vX.Y.Z-Windows_** using the **_installer.nsi_** script

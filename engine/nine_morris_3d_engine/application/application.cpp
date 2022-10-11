@@ -20,21 +20,21 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     : builder(builder), _user_data(user_data), start(start), stop(stop) {
     DEB_INFO("Initializing application...");
 
-    _app_data.width = builder.width;
-    _app_data.height = builder.height;
-    _app_data.title = builder.title;
-    _app_data.fullscreen = builder.fullscreen;
-    _app_data.native_resolution = builder.native_resolution;
-    _app_data.resizable = builder.resizable;
-    _app_data.min_width = builder.min_width;
-    _app_data.min_height = builder.min_height;
-    _app_data.application_name = builder.application_name;
-    _app_data.info_file_name = builder.info_file_name;
-    _app_data.authors = builder.authors;  // TODO use this
-    _app_data.version_major = builder.major;
-    _app_data.version_minor = builder.minor;
-    _app_data.version_patch = builder.patch;
-    _app_data.app = this;
+    app_data.width = builder.width;
+    app_data.height = builder.height;
+    app_data.title = builder.title;
+    app_data.fullscreen = builder.fullscreen;
+    app_data.native_resolution = builder.native_resolution;
+    app_data.resizable = builder.resizable;
+    app_data.min_width = builder.min_width;
+    app_data.min_height = builder.min_height;
+    app_data.application_name = builder.application_name;
+    app_data.info_file_name = builder.info_file_name;
+    app_data.authors = builder.author_list;  // TODO use this
+    app_data.version_major = builder.major;
+    app_data.version_minor = builder.minor;
+    app_data.version_patch = builder.patch;
+    app_data.app = this;
 
     paths::initialize(builder.application_name);
     window = std::make_unique<Window>(this);
@@ -60,7 +60,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 
     input::initialize(window->get_handle());
     debug_opengl::maybe_initialize_debugging();
-    encrypt::initialize(builder.encrypt_key);
+    encrypt::initialize(builder.encryption_key);
 
     auto [version_major, version_minor] = debug_opengl::get_version_numbers();
     REL_INFO("Using OpenGL version {}.{}", version_major, version_minor);
@@ -192,8 +192,6 @@ void Application::purge_framebuffers() {
 
 float Application::update_frame_counter() {
     constexpr double MAX_DT = 1.0 / 20.0;
-
-    frames++;
 
     const double current_seconds = window->get_time();
     const double elapsed_seconds = current_seconds - frame_counter.previous_seconds;

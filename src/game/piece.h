@@ -2,7 +2,7 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/constants.h"
+#include "other/constants.h"
 
 struct Node;
 

@@ -224,6 +224,10 @@ GLFWwindow* Window::create_window(Application* app) {
             const GLFWvidmode* video_mode = glfwGetVideoMode(primary_monitor);
             width = video_mode->width;
             height = video_mode->height;
+
+            // Set the real resolution
+            app->app_data.width = video_mode->width;
+            app->app_data.height = video_mode->height;
         } else {
             width = app->data().width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
             height = app->data().height;

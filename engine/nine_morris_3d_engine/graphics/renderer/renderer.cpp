@@ -232,6 +232,7 @@ Renderer::Renderer(Application* app)
 
     Shader::unbind();
 
+    // Setup events
     app->evt.sink<WindowResizedEvent>().connect<&Renderer::on_window_resized>(*this);
 
     DEB_INFO("Initialized renderer");
@@ -259,13 +260,16 @@ void Renderer::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glViewport(0, 0, app->data().width, app->data().height);
 
+    storage.scene_framebuffer->clear_integer_color_attachment();
+
     // Bind shadow map for use in shadow rendering
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
     glBindTexture(GL_TEXTURE_2D, storage.depth_map_framebuffer->get_depth_attachment());
 
     // Set to zero, because we are also rendering objects with outline later
-    glStencilMask(0x00);  // TODO maybe move this down a little to improve performance
+    glStencilMask(0x00);
 
+    // Render skybox
     if (storage.skybox_texture != nullptr) {
         draw_skybox();
     }
@@ -364,6 +368,8 @@ void Renderer::add_post_processing(std::shared_ptr<PostProcessingStep> post_proc
 }
 
 void Renderer::set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
+    ASSERT(framebuffer->get_specification().clear_value != nullptr, "Scene framebuffer must define attachment clear");
+
     storage.scene_framebuffer = framebuffer;
 
     app->purge_framebuffers();
@@ -470,9 +476,13 @@ void Renderer::draw_skybox() {
     storage.skybox_vertex_array->bind();
     storage.skybox_texture->bind(0);
 
+    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_FALSE);
+
     glDrawArrays(GL_TRIANGLES, 0, 36);
+
     glDepthMask(GL_TRUE);
+    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 
 void Renderer::draw_model(const Model* model) {

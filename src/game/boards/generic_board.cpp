@@ -2,7 +2,7 @@
 
 #include "game/boards/generic_board.h"
 #include "game/undo_redo_state.h"
-#include "game/constants.h"
+#include "other/constants.h"
 
 GamePosition GenericBoard::get_position() {
     GamePosition position;
@@ -64,8 +64,8 @@ void GenericBoard::update_pieces(hover::Id hovered_id) {
                     ASSERT(false, "Movement type None is invalid");
                     break;
                 case PieceMovementType::Linear: {
-                    piece.model->position += piece.movement.velocity * dt + (piece.movement.target - piece.model->position)
-                            * PIECE_VARIABLE_VELOCITY * dt;
+                    piece.model->position += piece.movement.velocity * dt
+                            + (piece.movement.target - piece.model->position) * PIECE_VARIABLE_VELOCITY * dt;
 
                     if (glm::length(piece.movement.target - piece.model->position) < 0.03f) {
                         piece_arrive_at_node(piece.index);
@@ -95,14 +95,16 @@ void GenericBoard::update_pieces(hover::Id hovered_id) {
                             && glm::length(piece.movement.target0 - piece.model->position) < 0.03f) {
                         piece.movement.reached_target0 = true;
                         piece.model->position = piece.movement.target0;
-                        piece.movement.velocity = glm::normalize(piece.movement.target1 - piece.model->position)
-                                * PIECE_BASE_VELOCITY;
+                        piece.movement.velocity = (
+                            glm::normalize(piece.movement.target1 - piece.model->position)* PIECE_BASE_VELOCITY
+                        );
                     } else if (!piece.movement.reached_target1
                             && glm::length(piece.movement.target1 - piece.model->position) < 0.03f) {
                         piece.movement.reached_target1 = true;
                         piece.model->position = piece.movement.target1;
-                        piece.movement.velocity = glm::normalize(piece.movement.target - piece.model->position)
-                                * PIECE_BASE_VELOCITY;
+                        piece.movement.velocity = (
+                            glm::normalize(piece.movement.target - piece.model->position)* PIECE_BASE_VELOCITY
+                        );
                     }
 
                     if (glm::length(piece.movement.target - piece.model->position) < 0.03f) {
