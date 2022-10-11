@@ -55,7 +55,7 @@ std::tuple<bool, bool, bool> StandardBoard::release() {
 
 void StandardBoard::check_select_piece() {
     for (const auto& [index, piece] : pieces) {
-        if (index == clicked_piece_index) {
+        if (index == clicked_piece_index && piece.model->id.value() == app->renderer->get_hovered_id()) {
             if (turn == BoardPlayer::White && piece.type == PieceType::White
                     || turn == BoardPlayer::Black && piece.type == PieceType::Black) {
                 select_piece(index);
@@ -66,7 +66,8 @@ void StandardBoard::check_select_piece() {
 
 void StandardBoard::check_place_piece() {
     for (Node& node : nodes) {
-        if (node.index == clicked_node_index && node.piece_index == NULL_INDEX) {
+        if (node.index == clicked_node_index && node.model->id.value() == app->renderer->get_hovered_id()
+                && node.piece_index == NULL_INDEX) {
             place_piece(node.index);
             did_action = true;
         }
@@ -79,7 +80,8 @@ void StandardBoard::check_move_piece() {
     }
 
     for (Node& node : nodes) {
-        if (node.index == clicked_node_index && can_go(selected_piece_index, node.index)) {
+        if (node.index == clicked_node_index && node.model->id.value() == app->renderer->get_hovered_id()
+                && can_go(selected_piece_index, node.index)) {
             move_piece(selected_piece_index, node.index);
             selected_piece_index = NULL_INDEX;
             did_action = true;
@@ -97,7 +99,8 @@ void StandardBoard::check_take_piece() {
 
     for (auto& [index, piece] : pieces) {
         if (turn == BoardPlayer::White) {
-            if (index == clicked_piece_index && piece.type == PieceType::Black) {
+            if (index == clicked_piece_index && piece.model->id.value() == app->renderer->get_hovered_id()
+                    && piece.type == PieceType::Black) {
                 if (!is_windmill_made(piece.node_index, PieceType::Black, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::Black, windmills, count) == black_pieces_count) {
                     take_piece(index);
@@ -109,7 +112,8 @@ void StandardBoard::check_take_piece() {
                 break;
             }
         } else {
-            if (index == clicked_piece_index && piece.type == PieceType::White) {
+            if (index == clicked_piece_index && piece.model->id.value() == app->renderer->get_hovered_id()
+                    && piece.type == PieceType::White) {
                 if (!is_windmill_made(piece.node_index, PieceType::White, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::White, windmills, count) == white_pieces_count) {
                     take_piece(index);
