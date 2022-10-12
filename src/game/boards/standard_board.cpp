@@ -137,7 +137,9 @@ void StandardBoard::check_take_piece() {
 }
 
 void StandardBoard::place_piece(size_t node_index) {
-    Node& node = nodes[node_index];
+    ASSERT(node_index != NULL_INDEX, "Invalid index");
+
+    Node& node = nodes.at(node_index);
 
     // remember_state();  FIXME need camera reference
     WAIT_FOR_NEXT_MOVE();
@@ -192,8 +194,11 @@ void StandardBoard::place_piece(size_t node_index) {
 }
 
 void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
-    Piece& piece = pieces[piece_index];
-    Node& node = nodes[node_index];
+    ASSERT(piece_index != NULL_INDEX, "Invalid index");
+    ASSERT(node_index != NULL_INDEX, "Invalid index");
+
+    Piece& piece = pieces.at(piece_index);
+    Node& node = nodes.at(node_index);
 
     ASSERT(node.piece_index == NULL_INDEX, "Piece must be null");
 
@@ -219,7 +224,7 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
     }
 
     // Reset all of these
-    Node& previous_node = nodes[piece.node_index];
+    Node& previous_node = nodes.at(piece.node_index);
     previous_node.piece_index = NULL_INDEX;
 
     piece.node_index = node_index;
@@ -270,14 +275,16 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
 }
 
 void StandardBoard::take_piece(size_t piece_index) {
-    Piece& piece = pieces[piece_index];
+    ASSERT(piece_index != NULL_INDEX, "Invalid index");
+
+    Piece& piece = pieces.at(piece_index);
 
     ASSERT(piece.in_use, "Piece must be in use");
 
     // remember_state();  // FIXME need reference to camera
     WAIT_FOR_NEXT_MOVE();
 
-    nodes[piece.node_index].piece_index = NULL_INDEX;
+    nodes.at(piece.node_index).piece_index = NULL_INDEX;
     take_and_raise_piece(piece_index);
     must_take_piece = false;
     must_take_piece_or_took_piece = true;
@@ -334,16 +341,20 @@ void StandardBoard::switch_turn_and_check_turns_without_mills() {
 }
 
 bool StandardBoard::can_go(size_t piece_index, size_t destination_node_index) {
-    const size_t source_node_index = pieces[piece_index].node_index;
+    ASSERT(piece_index != NULL_INDEX, "Invalid index");
+    ASSERT(destination_node_index != NULL_INDEX, "Invalid index");
 
+    const size_t source_node_index = pieces.at(piece_index).node_index;
+
+    ASSERT(source_node_index != NULL_INDEX, "Source must not be null");
     ASSERT(source_node_index != destination_node_index, "Source must be different than destination");
 
     if (can_jump[static_cast<int>(turn)]) {
         return true;
     }
 
-    const Node& source_node = nodes[source_node_index];
-    const Node& destination_node = nodes[destination_node_index];
+    const Node& source_node = nodes.at(source_node_index);
+    const Node& destination_node = nodes.at(destination_node_index);
 
     switch (source_node.index) {
         case 0:
@@ -501,201 +512,201 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
         if (piece.type == type && !piece.pending_remove && piece.in_use) {
             at_least_one_piece = true;
 
-            const Node& node = nodes[piece.node_index];
+            const Node& node = nodes.at(piece.node_index);
 
             switch (node.index) {
                 case 0: {
-                    const Node& node1 = nodes[1];
-                    const Node& node2 = nodes[9];
+                    const Node& node1 = nodes.at(1);
+                    const Node& node2 = nodes.at(9);
                     if (node1.piece_index == NULL_INDEX|| node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 1: {
-                    const Node& node1 = nodes[0];
-                    const Node& node2 = nodes[2];
-                    const Node& node3 = nodes[4];
+                    const Node& node1 = nodes.at(0);
+                    const Node& node2 = nodes.at(2);
+                    const Node& node3 = nodes.at(4);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 2: {
-                    const Node& node1 = nodes[1];
-                    const Node& node2 = nodes[14];
+                    const Node& node1 = nodes.at(1);
+                    const Node& node2 = nodes.at(14);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 3: {
-                    const Node& node1 = nodes[4];
-                    const Node& node2 = nodes[10];
+                    const Node& node1 = nodes.at(4);
+                    const Node& node2 = nodes.at(10);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 4: {
-                    const Node& node1 = nodes[1];
-                    const Node& node2 = nodes[3];
-                    const Node& node3 = nodes[5];
-                    const Node& node4 = nodes[7];
+                    const Node& node1 = nodes.at(1);
+                    const Node& node2 = nodes.at(3);
+                    const Node& node3 = nodes.at(5);
+                    const Node& node4 = nodes.at(7);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX || node4.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 5: {
-                    const Node& node1 = nodes[4];
-                    const Node& node2 = nodes[13];
+                    const Node& node1 = nodes.at(4);
+                    const Node& node2 = nodes.at(13);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 6: {
-                    const Node& node1 = nodes[7];
-                    const Node& node2 = nodes[11];
+                    const Node& node1 = nodes.at(7);
+                    const Node& node2 = nodes.at(11);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 7: {
-                    const Node& node1 = nodes[4];
-                    const Node& node2 = nodes[6];
-                    const Node& node3 = nodes[8];
+                    const Node& node1 = nodes.at(4);
+                    const Node& node2 = nodes.at(6);
+                    const Node& node3 = nodes.at(8);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 8: {
-                    const Node& node1 = nodes[7];
-                    const Node& node2 = nodes[12];
+                    const Node& node1 = nodes.at(7);
+                    const Node& node2 = nodes.at(12);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 9: {
-                    const Node& node1 = nodes[0];
-                    const Node& node2 = nodes[10];
-                    const Node& node3 = nodes[21];
+                    const Node& node1 = nodes.at(0);
+                    const Node& node2 = nodes.at(10);
+                    const Node& node3 = nodes.at(21);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 10: {
-                    const Node& node1 = nodes[3];
-                    const Node& node2 = nodes[9];
-                    const Node& node3 = nodes[11];
-                    const Node& node4 = nodes[18];
+                    const Node& node1 = nodes.at(3);
+                    const Node& node2 = nodes.at(9);
+                    const Node& node3 = nodes.at(11);
+                    const Node& node4 = nodes.at(18);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX || node4.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 11: {
-                    const Node& node1 = nodes[6];
-                    const Node& node2 = nodes[10];
-                    const Node& node3 = nodes[15];
+                    const Node& node1 = nodes.at(6);
+                    const Node& node2 = nodes.at(10);
+                    const Node& node3 = nodes.at(15);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 12: {
-                    const Node& node1 = nodes[8];
-                    const Node& node2 = nodes[13];
-                    const Node& node3 = nodes[17];
+                    const Node& node1 = nodes.at(8);
+                    const Node& node2 = nodes.at(13);
+                    const Node& node3 = nodes.at(17);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 13: {
-                    const Node& node1 = nodes[5];
-                    const Node& node2 = nodes[12];
-                    const Node& node3 = nodes[14];
-                    const Node& node4 = nodes[20];
+                    const Node& node1 = nodes.at(5);
+                    const Node& node2 = nodes.at(12);
+                    const Node& node3 = nodes.at(14);
+                    const Node& node4 = nodes.at(20);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX || node4.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 14: {
-                    const Node& node1 = nodes[2];
-                    const Node& node2 = nodes[13];
-                    const Node& node3 = nodes[23];
+                    const Node& node1 = nodes.at(2);
+                    const Node& node2 = nodes.at(13);
+                    const Node& node3 = nodes.at(23);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 15: {
-                    const Node& node1 = nodes[11];
-                    const Node& node2 = nodes[16];
+                    const Node& node1 = nodes.at(11);
+                    const Node& node2 = nodes.at(16);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 16: {
-                    const Node& node1 = nodes[15];
-                    const Node& node2 = nodes[17];
-                    const Node& node3 = nodes[19];
+                    const Node& node1 = nodes.at(15);
+                    const Node& node2 = nodes.at(17);
+                    const Node& node3 = nodes.at(19);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 17: {
-                    const Node& node1 = nodes[12];
-                    const Node& node2 = nodes[16];
+                    const Node& node1 = nodes.at(12);
+                    const Node& node2 = nodes.at(16);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 18: {
-                    const Node& node1 = nodes[10];
-                    const Node& node2 = nodes[19];
+                    const Node& node1 = nodes.at(10);
+                    const Node& node2 = nodes.at(19);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 19: {
-                    const Node& node1 = nodes[16];
-                    const Node& node2 = nodes[18];
-                    const Node& node3 = nodes[20];
-                    const Node& node4 = nodes[22];
+                    const Node& node1 = nodes.at(16);
+                    const Node& node2 = nodes.at(18);
+                    const Node& node3 = nodes.at(20);
+                    const Node& node4 = nodes.at(22);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX || node4.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 20: {
-                    const Node& node1 = nodes[13];
-                    const Node& node2 = nodes[19];
+                    const Node& node1 = nodes.at(13);
+                    const Node& node2 = nodes.at(19);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 21: {
-                    const Node& node1 = nodes[9];
-                    const Node& node2 = nodes[22];
+                    const Node& node1 = nodes.at(9);
+                    const Node& node2 = nodes.at(22);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 22: {
-                    const Node& node1 = nodes[19];
-                    const Node& node2 = nodes[21];
-                    const Node& node3 = nodes[23];
+                    const Node& node1 = nodes.at(19);
+                    const Node& node2 = nodes.at(21);
+                    const Node& node3 = nodes.at(23);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX
                             || node3.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
                 case 23: {
-                    const Node& node1 = nodes[14];
-                    const Node& node2 = nodes[22];
+                    const Node& node1 = nodes.at(14);
+                    const Node& node2 = nodes.at(22);
                     if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;

@@ -772,7 +772,7 @@ void StandardGameScene::setup_and_add_model_pieces() {
 void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3& position, std::shared_ptr<IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
-    Piece& piece = board.pieces[index];
+    Piece& piece = board.pieces.at(index);
 
     piece.model->position = position;
     piece.model->rotation = RANDOM_PIECE_ROTATION();
@@ -798,7 +798,7 @@ void StandardGameScene::setup_and_add_model_nodes() {
 void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& position) {
     auto& data = app->user_data<Data>();
 
-    Node& node = board.nodes[index];
+    Node& node = board.nodes.at(index);
 
     node.model->vertex_array = app->res.vertex_array[hs {"node_vertex_array" + std::to_string(index)}];
     node.model->index_buffer = app->res.index_buffer["node_index_buffer"_h];
@@ -838,13 +838,13 @@ void StandardGameScene::setup_entity_ids() {
     auto& data = app->user_data<Data>();
 
     for (size_t i = 0; i < 9; i++) {
-        board.pieces[i].model->id = data.piece_ids[i];  // FIXME think this through
+        board.pieces.at(i).model->id = data.piece_ids[i];  // FIXME think this through
     }
     for (size_t i = 9; i < 18; i++) {
-        board.pieces[i].model->id = data.piece_ids[i];  // FIXME this
+        board.pieces.at(i).model->id = data.piece_ids[i];  // FIXME this
     }
     for (size_t i = 0; i < 24; i++) {
-        board.nodes[i].model->id = data.node_ids[i];  // FIXME this
+        board.nodes.at(i).model->id = data.node_ids[i];  // FIXME this
     }
 
     DEB_DEBUG("Setup board's entities' IDs");
