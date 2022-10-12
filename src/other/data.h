@@ -20,6 +20,6 @@ struct Data {
     resmanager::Cache<gui::Image> image_cache;
     resmanager::Cache<gui::Text> text_cache;
 
-    std::unordered_map<size_t, hover::Id> node_ids;
-    std::unordered_map<size_t, hover::Id> piece_ids;
+    std::unordered_map<size_t, identifier::Id> node_ids;
+    std::unordered_map<size_t, identifier::Id> piece_ids;
 };

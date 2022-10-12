@@ -13,7 +13,7 @@ struct StandardBoard : public GenericBoard {
         : GenericBoard(app) {}
     ~StandardBoard() = default;
 
-    virtual void click(hover::Id hovered_id) override;
+    virtual void click(identifier::Id hovered_id) override;
     virtual std::tuple<bool, bool, bool> release() override;
 
     void check_select_piece();

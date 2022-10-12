@@ -3,7 +3,7 @@
 #include "game/boards/standard_board.h"
 #include "game/piece.h"
 
-void StandardBoard::click(hover::Id hovered_id) {
+void StandardBoard::click(identifier::Id hovered_id) {
     // Check for clicked nodes
     for (const Node& node : nodes) {
         if (node.model->id.value() == hovered_id) {

@@ -29,7 +29,7 @@ struct StandardGameScene : public Scene {
     void on_key_released(const KeyReleasedEvent& event);
     void on_window_resized(const WindowResizedEvent& event);
 
-    std::shared_ptr<Buffer> create_id_buffer(size_t vertices_size, hover::Id id, hs hash);
+    std::shared_ptr<Buffer> create_id_buffer(size_t vertices_size, identifier::Id id, hs hash);
 
     void initialize_rendering_board();
     void initialize_rendering_board_paint();

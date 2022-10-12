@@ -98,7 +98,7 @@ void LoadingScene::update_loading_animation() {
 
     loading_animation.total_time += elapsed_seconds;
 
-    if (loading_animation.total_time > 0.4) {
+    if (loading_animation.total_time > 0.3) {
         loading_animation.total_time = 0.0;
 
         std::string text = "Loading";

@@ -10,7 +10,7 @@
 #include "nine_morris_3d_engine/graphics/renderer/camera.h"
 #include "nine_morris_3d_engine/graphics/renderer/material.h"
 #include "nine_morris_3d_engine/graphics/renderer/light.h"
-#include "nine_morris_3d_engine/graphics/renderer/hover.h"
+#include "nine_morris_3d_engine/graphics/renderer/identifier.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/vertex_array.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
 #include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
@@ -40,7 +40,7 @@ public:
         std::shared_ptr<MaterialInstance> material;
 
         std::optional<glm::vec3> outline_color;
-        std::optional<hover::Id> id;
+        std::optional<identifier::Id> id;
         bool cast_shadow = false;
     };
 
@@ -72,7 +72,7 @@ public:
     void set_skybox(std::shared_ptr<Texture3D> texture);
     void set_camera(Camera* camera);
 
-    hover::Id get_hovered_id() { return hovered_id; }
+    identifier::Id get_hovered_id() { return hovered_id; }
     PostProcessingContext& get_post_processing_context() { return post_processing_context; }
     UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
     UniformBlockSpecification& get_light_uniform_block() { return storage.light_uniform_block; }
@@ -169,7 +169,7 @@ private:
     std::vector<std::shared_ptr<Model>> models;
     std::vector<std::shared_ptr<Quad>> quads;
 
-    hover::Id hovered_id = hover::null;
+    identifier::Id hovered_id = identifier::null;
     FramebufferReader<4> reader;
     Camera* camera = nullptr;  // Don't use this directly
 

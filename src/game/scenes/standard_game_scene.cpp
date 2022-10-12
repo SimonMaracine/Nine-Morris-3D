@@ -328,7 +328,7 @@ void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
     camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
 }
 
-std::shared_ptr<Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, hover::Id id, hs hash) {
+std::shared_ptr<Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, identifier::Id id, hs hash) {
     std::vector<int> array;
     array.resize(vertices_size);
 
@@ -592,7 +592,7 @@ void StandardGameScene::initialize_rendering_piece(
         std::shared_ptr<IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
-    const hover::Id id = hover::generate_id();
+    const identifier::Id id = identifier::generate_id();
     data.piece_ids[index] = id;
 
     auto id_buffer = create_id_buffer(
@@ -662,7 +662,7 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
         std::shared_ptr<IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
-    const hover::Id id = hover::generate_id();
+    const identifier::Id id = identifier::generate_id();
     data.node_ids[index] = id;
 
     auto id_buffer = create_id_buffer(
@@ -783,7 +783,7 @@ void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3&
     piece.model->scale = WORLD_SCALE;
     piece.model->material = app->res.material_instance[hs {"piece_material_instance" + std::to_string(index)}];
     piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
-    piece.model->id = std::make_optional<hover::Id>(data.piece_ids[index]);
+    piece.model->id = std::make_optional<identifier::Id>(data.piece_ids[index]);
     piece.model->cast_shadow = true;
 
     app->renderer->add_model(piece.model);
@@ -807,7 +807,7 @@ void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& 
     node.model->position = position;
     node.model->scale = WORLD_SCALE;
     node.model->material = app->res.material_instance[hs {"node_material_instance" + std::to_string(index)}];
-    node.model->id = std::make_optional<hover::Id>(data.node_ids[index]);
+    node.model->id = std::make_optional<identifier::Id>(data.node_ids[index]);
 
     app->renderer->add_model(node.model);
 

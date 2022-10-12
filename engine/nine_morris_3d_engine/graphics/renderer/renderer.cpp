@@ -706,7 +706,7 @@ void Renderer::setup_uniform_buffers() {
 
 void Renderer::check_hovered_id(int x, int y) {
     if (x > app->data().width || x < 0 || y > app->data().height || y < 0) {
-        hovered_id = hover::null;
+        hovered_id = identifier::null;
     }
 }
 

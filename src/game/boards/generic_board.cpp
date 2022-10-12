@@ -20,7 +20,7 @@ GamePosition GenericBoard::get_position() {
     return position;
 }
 
-void GenericBoard::update_nodes(hover::Id hovered_id) {
+void GenericBoard::update_nodes(identifier::Id hovered_id) {
     for (Node& node : nodes) {
         const bool hovered = node.model->id.value() == hovered_id;
         const bool highlight = (
@@ -36,7 +36,7 @@ void GenericBoard::update_nodes(hover::Id hovered_id) {
     }
 }
 
-void GenericBoard::update_pieces(hover::Id hovered_id) {
+void GenericBoard::update_pieces(identifier::Id hovered_id) {
     const float dt = app->get_delta();
 
     for (auto& [_, piece] : pieces) {

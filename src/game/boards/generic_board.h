@@ -17,12 +17,12 @@ struct GenericBoard {
         : app(app) {}
     virtual ~GenericBoard() = default;
 
-    virtual void click(hover::Id) {}
+    virtual void click(identifier::Id) {}
     virtual std::tuple<bool, bool, bool> release() { return {}; }
 
     GamePosition get_position();
-    void update_nodes(hover::Id hovered_id);
-    void update_pieces(hover::Id hovered_id);
+    void update_nodes(identifier::Id hovered_id);
+    void update_pieces(identifier::Id hovered_id);
     void move_pieces();
     void finalize_pieces_state();
 
