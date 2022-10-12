@@ -163,7 +163,7 @@ void Framebuffer::bind_default() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-GLuint Framebuffer::get_color_attachment(unsigned int index) {
+GLuint Framebuffer::get_color_attachment(GLint index) {
     ASSERT(index < color_attachments.size(), "Invalid color attachment");
 
     return color_attachments[index];
@@ -185,7 +185,7 @@ void Framebuffer::resize(int width, int height) {
     build();
 }
 
-int Framebuffer::read_pixel_red_integer(unsigned int attachment_index, int x, int y) {
+int Framebuffer::read_pixel_red_integer(GLint attachment_index, int x, int y) {
     ASSERT(attachment_index < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -195,7 +195,7 @@ int Framebuffer::read_pixel_red_integer(unsigned int attachment_index, int x, in
     return pixel;
 }
 
-void Framebuffer::read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y) {
+void Framebuffer::read_pixel_red_integer_pbo(GLint attachment_index, int x, int y) {
     ASSERT(attachment_index < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -320,7 +320,7 @@ void Framebuffer::build() {
                 glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
                 break;
-            }   
+            }
         }
     }
 
@@ -386,7 +386,7 @@ void Framebuffer::build() {
                 glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
                 break;
-            }   
+            }
         }
     }
 
@@ -408,5 +408,5 @@ void Framebuffer::build() {
         exit(1);
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);   
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

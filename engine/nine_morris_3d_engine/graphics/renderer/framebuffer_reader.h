@@ -27,6 +27,7 @@ public:
     template<typename T>
     void get(T** data) {
         buffers[next_buffer_index]->bind();
+
         buffers[next_buffer_index]->map_data();
         buffers[next_buffer_index]->template get_data<T>(data);
         buffers[next_buffer_index]->unmap_data();

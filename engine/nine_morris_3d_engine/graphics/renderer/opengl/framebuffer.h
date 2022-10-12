@@ -50,7 +50,7 @@ public:
     void bind();
     static void bind_default();
 
-    GLuint get_color_attachment(unsigned int index);
+    GLuint get_color_attachment(GLint index);
     GLuint get_depth_attachment();
     GLuint get_id() { return framebuffer; }
     const FramebufferSpecification& get_specification() { return specification; }
@@ -59,8 +59,8 @@ public:
     void resize(int width, int height);
 
     // Read pixels
-    int read_pixel_red_integer(unsigned int attachment_index, int x, int y);
-    void read_pixel_red_integer_pbo(unsigned int attachment_index, int x, int y);
+    int read_pixel_red_integer(GLint attachment_index, int x, int y);
+    void read_pixel_red_integer_pbo(GLint attachment_index, int x, int y);
 
     // Clear buffer
     void clear_integer_color_attachment();
