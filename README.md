@@ -1,11 +1,11 @@
 # Nine Morris 3D
 
-## A Nine Men's Morris implementation in 3D.
+## A nine men's morris implementation in 3D.
 
 ### Details:
 It is a free casual board game with hopefully beautiful 3D graphics. It has five game modes:
-standard (nine men's morris), jump, jump+, twelve men's mmorris and hunt, each with their AIs.
-Games can be saved and be continued later. AI and other settings are configurable. Works on Linux and Windows.
+standard (nine men's morris), jump, jump+, twelve men's morris and hunt, each with their AIs.
+Games can be saved and continued later. AI and other settings are configurable. Works on Linux and Windows.
 
 ### Tags:
 - Casual
