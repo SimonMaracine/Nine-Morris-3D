@@ -45,6 +45,7 @@ void StandardGameScene::on_start() {
     board.undo_redo_state = &undo_redo_state;
     board.keyboard = &keyboard;
     board.game_context = &game;
+    board.camera = &camera;
 
     app->window->set_cursor(data.options.custom_cursor ? data.arrow_cursor : 0);
 
@@ -622,7 +623,7 @@ void StandardGameScene::initialize_rendering_piece(
     material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess", 4.0f);
     material_instance->set_texture("u_material.normal", app->res.texture["piece_normal_texture"_h], 1);
-    material_instance->set_vec3("u_material.tint", glm::vec3(1.0f));
+    material_instance->set_vec3("u_material.tint", DEFAULT_TINT);
 }
 
 void StandardGameScene::initialize_rendering_nodes() {
@@ -769,7 +770,8 @@ void StandardGameScene::setup_and_add_model_pieces() {
     }
 }
 
-void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3& position, std::shared_ptr<IndexBuffer> index_buffer) {
+void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3& position,
+        std::shared_ptr<IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
     Piece& piece = board.pieces.at(index);

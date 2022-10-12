@@ -68,7 +68,9 @@ void StandardBoard::check_place_piece() {
     for (Node& node : nodes) {
         if (node.index == clicked_node_index && node.model->id.value() == app->renderer->get_hovered_id()
                 && node.piece_index == NULL_INDEX) {
+            remember_state();  // FIXME need camera reference
             place_piece(node.index);
+
             did_action = true;
         }
     }
@@ -82,7 +84,9 @@ void StandardBoard::check_move_piece() {
     for (Node& node : nodes) {
         if (node.index == clicked_node_index && node.model->id.value() == app->renderer->get_hovered_id()
                 && can_go(selected_piece_index, node.index)) {
+            remember_state();  // FIXME need camera reference
             move_piece(selected_piece_index, node.index);
+
             selected_piece_index = NULL_INDEX;
             did_action = true;
         }
@@ -103,7 +107,9 @@ void StandardBoard::check_take_piece() {
                     && piece.type == PieceType::Black) {
                 if (!is_windmill_made(piece.node_index, PieceType::Black, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::Black, windmills, count) == black_pieces_count) {
+                    remember_state();  // FIXME need camera reference
                     take_piece(index);
+
                     did_action = true;
                 } else {
                     DEB_DEBUG("Cannot take black piece from windmill");
@@ -116,7 +122,9 @@ void StandardBoard::check_take_piece() {
                     && piece.type == PieceType::White) {
                 if (!is_windmill_made(piece.node_index, PieceType::White, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::White, windmills, count) == white_pieces_count) {
+                    remember_state();  // FIXME need camera reference
                     take_piece(index);
+
                     did_action = true;
                 } else {
                     DEB_DEBUG("Cannot take white piece from windmill");
@@ -141,7 +149,6 @@ void StandardBoard::place_piece(size_t node_index) {
 
     Node& node = nodes.at(node_index);
 
-    // remember_state();  FIXME need camera reference
     WAIT_FOR_NEXT_MOVE();
 
     const glm::vec3& position = node.model->position;
@@ -202,7 +209,6 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
 
     ASSERT(node.piece_index == NULL_INDEX, "Piece must be null");
 
-    // remember_state();  FIXME need camera reference
     WAIT_FOR_NEXT_MOVE();
 
     if (piece.type == PieceType::White && can_jump[static_cast<int>(PieceType::White)]
@@ -281,7 +287,6 @@ void StandardBoard::take_piece(size_t piece_index) {
 
     ASSERT(piece.in_use, "Piece must be in use");
 
-    // remember_state();  // FIXME need reference to camera
     WAIT_FOR_NEXT_MOVE();
 
     nodes.at(piece.node_index).piece_index = NULL_INDEX;

@@ -37,7 +37,7 @@ struct GenericBoard {
     void unselect_other_pieces(size_t currently_selected_piece_index_index);
     void update_piece_outlines();
     void remember_position_and_check_repetition(size_t piece_index, size_t node_index);
-    void remember_state(const Camera& camera);
+    void remember_state();
     void piece_arrive_at_node(size_t piece_index);
     void prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity);
     void prepare_piece_for_three_step_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity,
@@ -74,6 +74,7 @@ struct GenericBoard {
     UndoRedoState* undo_redo_state = nullptr;
     KeyboardControls* keyboard = nullptr;
     GameContext* game_context = nullptr;
+    Camera* camera = nullptr;
 
     bool next_move = true;  // It is false when any piece is in the air, true otherwise
     bool is_players_turn = true;

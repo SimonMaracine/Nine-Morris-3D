@@ -43,13 +43,13 @@ void GenericBoard::update_pieces(hover::Id hovered_id) {
         const bool hovered = piece.model->id.value() == hovered_id;
 
         if (piece.selected) {
-            piece.model->outline_color = std::make_optional<glm::vec3>(1.0f, 0.0f, 0.0f);  // FIXME put these in constants
+            piece.model->outline_color = std::make_optional<glm::vec3>(RED_OUTLINE);
         } else if (piece.show_outline && hovered && piece.in_use && !piece.pending_remove) {
-            piece.model->outline_color = std::make_optional<glm::vec3>(1.0f, 0.5f, 0.0f);
+            piece.model->outline_color = std::make_optional<glm::vec3>(ORANGE_OUTLINE);
         } else if (piece.to_take && hovered && piece.in_use) {
-            piece.model->material->set_vec3("u_material.tint", glm::vec3(1.0f, 0.2f, 0.2f));
+            piece.model->material->set_vec3("u_material.tint", RED_TINT);
         } else {
-            piece.model->material->set_vec3("u_material.tint", glm::vec3(1.0f, 1.0f, 1.0f));
+            piece.model->material->set_vec3("u_material.tint", DEFAULT_TINT);
         }
 
         if (piece.selected || (piece.show_outline && hovered && piece.in_use && !piece.pending_remove)) {
@@ -371,10 +371,10 @@ void GenericBoard::remember_position_and_check_repetition(size_t piece_index, si
     repetition_history.ones.push_back(current_position);
 }
 
-void GenericBoard::remember_state(const Camera& camera) {
+void GenericBoard::remember_state() {
     const UndoRedoState::State state = {
         *this,
-        camera,
+        *camera,
         game_context->state
     };
 

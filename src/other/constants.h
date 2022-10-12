@@ -177,3 +177,9 @@ constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
 using GamePosition = std::array<PieceType, 24>;
 
 constexpr float WORLD_SCALE = 20.0f;
+
+constexpr glm::vec3 RED_OUTLINE = { 1.0f, 0.0f, 0.0f };
+constexpr glm::vec3 ORANGE_OUTLINE = { 1.0f, 0.5f, 0.0f };
+
+constexpr glm::vec3 RED_TINT = { 1.0f, 0.2f, 0.2f };
+constexpr glm::vec3 DEFAULT_TINT = { 1.0f, 1.0f, 1.0f };
