@@ -201,7 +201,7 @@ Renderer::Renderer(Application* app)
         specification.height = app->data().height;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
-            Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
+            Attachment(AttachmentFormat::RED_I, AttachmentType::Renderbuffer)
         };
         specification.depth_attachment = Attachment(
             AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
@@ -243,11 +243,11 @@ Renderer::~Renderer() {
 }
 
 void Renderer::render() {
-    cache_camera();
+    cache_camera_data();
     setup_uniform_buffers();
 
     setup_shadows();
-    storage.depth_map_framebuffer->bind();
+    storage.shadow_map_framebuffer->bind();
 
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, shadow_map_size, shadow_map_size);
@@ -264,7 +264,7 @@ void Renderer::render() {
 
     // Bind shadow map for use in shadow rendering
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
-    glBindTexture(GL_TEXTURE_2D, storage.depth_map_framebuffer->get_depth_attachment());
+    glBindTexture(GL_TEXTURE_2D, storage.shadow_map_framebuffer->get_depth_attachment());
 
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
@@ -290,7 +290,7 @@ void Renderer::render() {
     draw_quads();
 
     // Blit the scene texture result to an intermediate texture resolving anti-aliasing
-    storage.scene_framebuffer->resolve_framebuffer(
+    storage.scene_framebuffer->blit(
         storage.intermediate_framebuffer->get_id(), app->data().width, app->data().height
     );
 
@@ -367,10 +367,23 @@ void Renderer::add_post_processing(std::shared_ptr<PostProcessingStep> post_proc
     post_processing_step->prepare(post_processing_context);
 }
 
-void Renderer::set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
-    ASSERT(framebuffer->get_specification().clear_value != nullptr, "Scene framebuffer must define attachment clear");
+void Renderer::set_scene_framebuffer(int samples) {
+    FramebufferSpecification specification;
+    specification.width = app->data().width;
+    specification.height = app->data().height;
+    specification.samples = samples;
+    specification.color_attachments = {
+        Attachment(AttachmentFormat::RGBA8, AttachmentType::Renderbuffer),
+        Attachment(AttachmentFormat::RED_I, AttachmentType::Renderbuffer)
+    };
+    specification.depth_attachment = Attachment(
+        AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
+    );
+    constexpr int color[4] = { 0, 0, 0, 0 };
+    specification.clear_drawbuffer = 1;
+    specification.clear_value = color;
 
-    storage.scene_framebuffer = framebuffer;
+    storage.scene_framebuffer = std::make_shared<Framebuffer>(specification);
 
     app->purge_framebuffers();
     app->add_framebuffer(storage.scene_framebuffer);
@@ -388,10 +401,10 @@ void Renderer::set_shadow_map_framebuffer(int size) {
     specification.white_border_for_depth_texture = true;
     specification.resizable = false;
 
-    storage.depth_map_framebuffer = std::make_shared<Framebuffer>(specification);
+    storage.shadow_map_framebuffer = std::make_shared<Framebuffer>(specification);
 
     app->purge_framebuffers();
-    app->add_framebuffer(storage.depth_map_framebuffer);
+    app->add_framebuffer(storage.shadow_map_framebuffer);
 }
 
 void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
@@ -400,7 +413,7 @@ void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
 
 void Renderer::set_camera(Camera* camera) {
     this->camera = camera;
-    cache_camera();
+    cache_camera_data();
     on_window_resized(WindowResizedEvent {0, 0});  // Update projection
 }
 
@@ -710,7 +723,7 @@ void Renderer::check_hovered_id(int x, int y) {
     }
 }
 
-void Renderer::cache_camera() {
+void Renderer::cache_camera_data() {
     if (camera != nullptr) {
         camera_cache.projection_matrix = camera->get_projection_matrix();
         camera_cache.view_matrix = camera->get_view_matrix();

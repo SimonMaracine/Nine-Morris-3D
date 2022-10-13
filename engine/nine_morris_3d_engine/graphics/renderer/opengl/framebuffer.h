@@ -50,7 +50,7 @@ public:
     void bind();
     static void bind_default();
 
-    GLuint get_color_attachment(GLint index);
+    GLuint get_color_attachment(GLint attachment_index);
     GLuint get_depth_attachment();
     GLuint get_id() { return framebuffer; }
     const FramebufferSpecification& get_specification() { return specification; }
@@ -66,7 +66,7 @@ public:
     void clear_integer_color_attachment();
 
     // Resolve this to draw_framebuffer
-    void resolve_framebuffer(GLuint draw_framebuffer, int width, int height);
+    void blit(GLuint draw_framebuffer, int width, int height);
 private:
     void build();
 

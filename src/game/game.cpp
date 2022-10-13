@@ -67,26 +67,7 @@ namespace game {
         );
 
         // Setup scene framebuffer
-        {
-            FramebufferSpecification specification;
-            specification.width = app->data().width;
-            specification.height = app->data().height;
-            specification.samples = data.launcher_options.samples;
-            specification.color_attachments = {
-                Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
-                Attachment(AttachmentFormat::RED_I, AttachmentType::Texture)
-            };
-            specification.depth_attachment = Attachment(
-                AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
-            );
-            constexpr int color[4] = { 0, 0, 0, 0 };
-            specification.clear_drawbuffer = 1;
-            specification.clear_value = color;
-
-            auto framebuffer = app->res.framebuffer.load("scene_framebuffer"_h, specification);
-
-            app->renderer->set_scene_framebuffer(framebuffer);
-        }
+        app->renderer->set_scene_framebuffer(data.launcher_options.samples);
 
         // Setup depth map framebuffer
         app->renderer->set_shadow_map_framebuffer(data.launcher_options.texture_quality == launcher_options::NORMAL ? 4096 : 2048);

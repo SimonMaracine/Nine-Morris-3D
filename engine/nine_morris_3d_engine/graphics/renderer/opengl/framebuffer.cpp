@@ -163,10 +163,10 @@ void Framebuffer::bind_default() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-GLuint Framebuffer::get_color_attachment(GLint index) {
-    ASSERT(index < color_attachments.size(), "Invalid color attachment");
+GLuint Framebuffer::get_color_attachment(GLint attachment_index) {
+    ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
-    return color_attachments[index];
+    return color_attachments[attachment_index];
 }
 
 GLuint Framebuffer::get_depth_attachment() {
@@ -175,7 +175,7 @@ GLuint Framebuffer::get_depth_attachment() {
 
 void Framebuffer::resize(int width, int height) {
     if (width < 1 || height < 1 || width > 8192 || height > 8192) {
-        DEB_ERROR("Attempted to resize framebuffer to [{}, {}]", width, height);
+        REL_ERROR("Attempted to resize framebuffer to [{}, {}]", width, height);
         return;
     }
 
@@ -186,7 +186,7 @@ void Framebuffer::resize(int width, int height) {
 }
 
 int Framebuffer::read_pixel_red_integer(GLint attachment_index, int x, int y) {
-    ASSERT(attachment_index < color_attachments.size(), "Invalid color attachment");
+    ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
     int pixel;
@@ -196,7 +196,7 @@ int Framebuffer::read_pixel_red_integer(GLint attachment_index, int x, int y) {
 }
 
 void Framebuffer::read_pixel_red_integer_pbo(GLint attachment_index, int x, int y) {
-    ASSERT(attachment_index < color_attachments.size(), "Invalid color attachment");
+    ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
     glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, nullptr);
@@ -206,7 +206,7 @@ void Framebuffer::clear_integer_color_attachment() {
     glClearBufferiv(GL_COLOR, specification.clear_drawbuffer, specification.clear_value);
 }
 
-void Framebuffer::resolve_framebuffer(GLuint draw_framebuffer, int width, int height) {
+void Framebuffer::blit(GLuint draw_framebuffer, int width, int height) {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
 

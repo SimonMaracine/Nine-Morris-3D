@@ -67,7 +67,7 @@ public:
     void setup_shader(std::shared_ptr<Shader> shader);
     void add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step);
 
-    void set_scene_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
+    void set_scene_framebuffer(int samples);
     void set_shadow_map_framebuffer(int size);
     void set_skybox(std::shared_ptr<Texture3D> texture);
     void set_camera(Camera* camera);
@@ -116,7 +116,7 @@ private:
     void setup_shadows();
     void setup_uniform_buffers();
     void check_hovered_id(int x, int y);
-    void cache_camera();
+    void cache_camera_data();
     void on_window_resized(const WindowResizedEvent& event);
 
     struct {
@@ -153,8 +153,8 @@ private:
         std::shared_ptr<Texture3D> skybox_texture;
 
         std::shared_ptr<Framebuffer> scene_framebuffer;
-        std::shared_ptr<Framebuffer> depth_map_framebuffer;
         std::shared_ptr<Framebuffer> intermediate_framebuffer;
+        std::shared_ptr<Framebuffer> shadow_map_framebuffer;
 
         std::array<std::shared_ptr<PixelBuffer>, 4> pixel_buffers;
     } storage;
