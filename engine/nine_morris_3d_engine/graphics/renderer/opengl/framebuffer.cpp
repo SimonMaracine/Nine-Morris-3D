@@ -95,6 +95,44 @@ static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum i
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderbuffer);
 }
 
+static const char* print_framebuffer_status_message(GLenum status) {
+    const char* message = nullptr;
+
+    switch (status) {
+        case GL_FRAMEBUFFER_UNDEFINED:
+            message = "GL_FRAMEBUFFER_UNDEFINED";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            message = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            message = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+            message = "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+            message = "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER";
+            break;
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            message = "GL_FRAMEBUFFER_UNSUPPORTED";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+            message = "GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE";
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+            message = "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS";
+            break;
+        case GL_FRAMEBUFFER_COMPLETE:
+            ASSERT(false, "Don't call this function, if the status is GL_FRAMEBUFFER_COMPLETE");
+            break;
+        default:
+            break;
+    }
+
+    return message;
+}
+
 Framebuffer::Framebuffer(const FramebufferSpecification& specification)
     : specification(specification) {
     ASSERT(
@@ -425,8 +463,11 @@ void Framebuffer::build() {
         glReadBuffer(GL_NONE);
     }
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
         REL_CRITICAL("Framebuffer {} is incomplete, exiting...", framebuffer);
+        REL_CRITICAL("Framebuffer status: {}", print_framebuffer_status_message(status));
         exit(1);
     }
 
