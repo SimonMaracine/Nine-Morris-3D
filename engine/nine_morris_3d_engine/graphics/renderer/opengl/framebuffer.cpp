@@ -17,34 +17,36 @@ static bool depth_attachment_present(const FramebufferSpecification& specificati
 }
 
 static void attach_color_texture(GLuint texture, int samples, GLenum internal_format,
-        GLenum format, int width, int height, unsigned int index) {
+        int width, int height, unsigned int index) {
     const bool multisampled = samples > 1;
 
     if (multisampled) {
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format,
-                width, height, GL_TRUE);
+        glTexImage2DMultisample(
+            GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_TRUE
+        );
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format,
-                GL_UNSIGNED_BYTE, nullptr);
+        glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
         LOG_ALLOCATION(width * height * 4)
     }
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
-            target(multisampled), texture, 0);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target(multisampled), texture, 0
+    );
 }
 
 static void attach_depth_texture(GLuint texture, int samples, GLenum internal_format,
-        GLenum format, GLenum attachment, int width, int height, bool white_border) {
+        GLenum attachment, int width, int height, bool white_border) {
     const bool multisampled = samples > 1;
 
     if (multisampled) {
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format,
-                width, height, GL_TRUE);
+        glTexImage2DMultisample(
+            GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_TRUE
+        );
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -52,12 +54,11 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         if (white_border) {
-            constexpr float border_color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            static constexpr float border_color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
         }
 
-        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format,
-                GL_UNSIGNED_BYTE, nullptr);
+        glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
         LOG_ALLOCATION(width * height * 4)
     }
 
@@ -75,8 +76,9 @@ static void attach_color_renderbuffer(GLuint renderbuffer, int samples, GLenum i
         LOG_ALLOCATION(width * height * 4)
     }
 
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER,
-            renderbuffer);
+    glFramebufferRenderbuffer(
+        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, renderbuffer
+    );
 }
 
 static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum internal_format,
@@ -207,7 +209,10 @@ void Framebuffer::clear_integer_color_attachment() {
 }
 
 void Framebuffer::blit(Framebuffer* draw_framebuffer, int width, int height) {
-    ASSERT(color_attachments.size() == draw_framebuffer->color_attachments.size(), "Framebuffers must have the same attachments");
+    ASSERT(
+        color_attachments.size() == draw_framebuffer->color_attachments.size(),
+        "Framebuffers must have the same attachments"
+    );
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer->framebuffer);
@@ -282,12 +287,16 @@ void Framebuffer::build() {
                         ASSERT(false, "Attachment format None is invalid");
                         break;
                     case AttachmentFormat::RGBA8:
-                        attach_color_texture(texture, specification.samples, GL_RGBA8, GL_BGRA,
-                                specification.width, specification.height, i);
+                        attach_color_texture(
+                            texture, specification.samples, GL_RGBA8,
+                            specification.width, specification.height, i
+                        );
                         break;
                     case AttachmentFormat::RED_I:
-                        attach_color_texture(texture, specification.samples, GL_R32I, GL_RED_INTEGER,
-                                specification.width, specification.height, i);
+                        attach_color_texture(
+                            texture, specification.samples, GL_R32I,
+                            specification.width, specification.height, i
+                        );
                         break;
                     default:
                         REL_CRITICAL("Wrong attachment format, exiting...");
@@ -309,12 +318,16 @@ void Framebuffer::build() {
                         ASSERT(false, "Attachment format None is invalid");
                         break;
                     case AttachmentFormat::RGBA8:
-                        attach_color_renderbuffer(renderbuffer, specification.samples, GL_RGBA8,
-                                specification.width, specification.height, i);
+                        attach_color_renderbuffer(
+                            renderbuffer, specification.samples, GL_RGBA8,
+                            specification.width, specification.height, i
+                        );
                         break;
                     case AttachmentFormat::RED_I:
-                        attach_color_renderbuffer(renderbuffer, specification.samples, GL_R32I,
-                                specification.width, specification.height, i);
+                        attach_color_renderbuffer(
+                            renderbuffer, specification.samples, GL_R32I,
+                            specification.width, specification.height, i
+                        );
                         break;
                     default:
                         REL_CRITICAL("Wrong attachment format, exiting...");
@@ -344,14 +357,18 @@ void Framebuffer::build() {
                         ASSERT(false, "Attachment format None is invalid");
                         break;
                     case AttachmentFormat::DEPTH24_STENCIL8:
-                        attach_depth_texture(texture, specification.samples, GL_DEPTH24_STENCIL8,
-                                GL_DEPTH_STENCIL, GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
-                                specification.height, specification.white_border_for_depth_texture);
+                        attach_depth_texture(
+                            texture, specification.samples, GL_DEPTH24_STENCIL8,
+                            GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
+                            specification.height, specification.white_border_for_depth_texture
+                        );
                         break;
                     case AttachmentFormat::DEPTH32:
-                        attach_depth_texture(texture, specification.samples, GL_DEPTH_COMPONENT32,
-                                GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT, specification.width,
-                                specification.height, specification.white_border_for_depth_texture);
+                        attach_depth_texture(
+                            texture, specification.samples, GL_DEPTH_COMPONENT32,
+                            GL_DEPTH_ATTACHMENT, specification.width,
+                            specification.height, specification.white_border_for_depth_texture
+                        );
                         break;
                     default:
                         REL_CRITICAL("Wrong attachment format, exiting...");
@@ -373,14 +390,18 @@ void Framebuffer::build() {
                         ASSERT(false, "Attachment format None is invalid");
                         break;
                     case AttachmentFormat::DEPTH24_STENCIL8:
-                        attach_depth_renderbuffer(renderbuffer, specification.samples,
-                                GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT,
-                                specification.width, specification.height);
+                        attach_depth_renderbuffer(
+                            renderbuffer, specification.samples,
+                            GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT,
+                            specification.width, specification.height
+                        );
                         break;
                     case AttachmentFormat::DEPTH32:
-                        attach_depth_renderbuffer(renderbuffer, specification.samples,
-                                GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT,
-                                specification.width, specification.height);
+                        attach_depth_renderbuffer(
+                            renderbuffer, specification.samples,
+                            GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT,
+                            specification.width, specification.height
+                        );
                         break;
                     default:
                         REL_CRITICAL("Wrong attachment format, exiting...");

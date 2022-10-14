@@ -192,25 +192,29 @@ Texture3D::Texture3D(const char** file_paths) {
     stbi_set_flip_vertically_on_load(0);
 
     int width, height, channels;
-    stbi_uc* data;
+    stbi_uc* data[6];
 
     for (size_t i = 0; i < 6; i++) {
         DEB_DEBUG("Loading texture '{}'...", file_paths[i]);
 
-        data = stbi_load(file_paths[i], &width, &height, &channels, 4);
+        data[i] = stbi_load(file_paths[i], &width, &height, &channels, 4);
 
         if (data == nullptr) {
             REL_CRITICAL("Could not load texture '{}', exiting...", file_paths[i]);
             exit(1);
         }
+    }
 
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8,
-            width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data
+    glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
+
+    for (size_t i = 0; i < 6; i++) {
+        glTexSubImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, GL_RGBA,
+            GL_UNSIGNED_BYTE, data[i]
         );
         LOG_ALLOCATION(width * height * 4)
 
-        stbi_image_free(data);
+        stbi_image_free(data[i]);
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
@@ -230,10 +234,12 @@ Texture3D::Texture3D(const std::array<std::shared_ptr<TextureData>, 6>& data) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+    glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, data[0]->width, data[0]->height);
+
     for (size_t i = 0; i < 6; i++) {
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, data[i]->width,
-            data[i]->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data
+        glTexSubImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, data[i]->width, data[i]->height,
+            GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data
         );
         LOG_ALLOCATION(data[i]->width * data[i]->height * 4)
     }
