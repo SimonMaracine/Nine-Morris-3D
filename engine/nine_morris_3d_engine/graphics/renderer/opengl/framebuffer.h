@@ -66,7 +66,7 @@ public:
     void clear_integer_color_attachment();
 
     // Resolve this to draw_framebuffer
-    void blit(GLuint draw_framebuffer, int width, int height);
+    void blit(Framebuffer* draw_framebuffer, int width, int height);
 private:
     void build();
 
@@ -77,4 +77,9 @@ private:
     // These can be texture or renderbuffer handles
     std::vector<GLuint> color_attachments;
     GLuint depth_attachment = 0;
+
+    static constexpr GLenum COLOR_ATTACHMENTS[4] = {
+        GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+        GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+    };
 };

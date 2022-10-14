@@ -138,7 +138,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        constexpr float screen_quad_vertices[] = {
+        static constexpr float screen_quad_vertices[] = {
             -1.0f,  1.0f,
             -1.0f, -1.0f,
              1.0f,  1.0f,
@@ -156,7 +156,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        constexpr float quad_vertices[] = {
+        static constexpr float quad_vertices[] = {
             -1.0f,  1.0f,    0.0f, 1.0f,
             -1.0f, -1.0f,    0.0f, 0.0f,
              1.0f,  1.0f,    1.0f, 1.0f,
@@ -176,7 +176,7 @@ Renderer::Renderer(Application* app)
 
 #ifdef PLATFORM_GAME_DEBUG
     {
-        constexpr float origin_vertices[] = {
+        static constexpr float origin_vertices[] = {
             -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
              20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
               0.0f, -20.0f,   0.0f,    0.0f, 1.0f, 0.0f,
@@ -203,9 +203,9 @@ Renderer::Renderer(Application* app)
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Renderbuffer)
         };
-        specification.depth_attachment = Attachment(
-            AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
-        );
+        // specification.depth_attachment = Attachment(  // FIXME needed?
+        //     AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
+        // );
 
         storage.intermediate_framebuffer = std::make_shared<Framebuffer>(specification);
 
@@ -291,7 +291,7 @@ void Renderer::render() {
 
     // Blit the scene texture result to an intermediate texture resolving anti-aliasing
     storage.scene_framebuffer->blit(
-        storage.intermediate_framebuffer->get_id(), app->data().width, app->data().height
+        storage.intermediate_framebuffer.get(), app->data().width, app->data().height
     );
 
     storage.intermediate_framebuffer->bind();
@@ -368,6 +368,8 @@ void Renderer::add_post_processing(std::shared_ptr<PostProcessingStep> post_proc
 }
 
 void Renderer::set_scene_framebuffer(int samples) {
+    ASSERT(samples > 0, "Samples must be greater than 0");
+
     FramebufferSpecification specification;
     specification.width = app->data().width;
     specification.height = app->data().height;
@@ -379,7 +381,7 @@ void Renderer::set_scene_framebuffer(int samples) {
     specification.depth_attachment = Attachment(
         AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
     );
-    constexpr int color[4] = { 0, 0, 0, 0 };
+    static constexpr int color[4] = { 0, 0, 0, 0 };
     specification.clear_drawbuffer = 1;
     specification.clear_value = color;
 
@@ -461,7 +463,7 @@ void Renderer::end_rendering() {
     // Draw the final result to the screen
     Framebuffer::bind_default();
     glClear(GL_COLOR_BUFFER_BIT);
-    draw_screen_quad(post_processing_context.last_texture);
+    draw_screen_quad(post_processing_context.last_texture);  // TODO maybe only blit
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -473,7 +475,7 @@ void Renderer::draw_origin() {
 
     storage.origin_vertex_array->bind();
 
-    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glDrawArrays(GL_LINES, 0, 6);
     glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
@@ -489,7 +491,7 @@ void Renderer::draw_skybox() {
     storage.skybox_vertex_array->bind();
     storage.skybox_texture->bind(0);
 
-    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glDepthMask(GL_FALSE);
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -538,7 +540,7 @@ void Renderer::draw_model_with_outline(const Model* model) {
         storage.outline_shader->upload_uniform_vec3("u_color", model->outline_color.value());  // Should never throw
 
         // Render without output to red
-        glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
         glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
         glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
@@ -569,7 +571,7 @@ void Renderer::draw_models() {
     }
 
     // Draw non-hoverable models
-    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
     for (const Model* model : non_hoverable_models) {
         draw_model(model);
@@ -614,7 +616,7 @@ void Renderer::draw_models_with_outline() {
     }
 
     // Draw non-hoverable models
-    glColorMaski(1, GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
     for (const Model* model : non_hoverable_models) {
         draw_model_with_outline(model);

@@ -204,7 +204,7 @@ GuiRenderer::GuiRenderer(Application* app)
     }
 
     {
-        constexpr float quad2d_vertices[] = {
+        static constexpr float quad2d_vertices[] = {
             0.0f, 1.0f,
             0.0f, 0.0f,
             1.0f, 1.0f,

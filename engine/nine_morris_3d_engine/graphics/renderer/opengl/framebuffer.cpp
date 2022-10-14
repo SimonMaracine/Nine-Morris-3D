@@ -52,7 +52,7 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         if (white_border) {
-            const float border_color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            constexpr float border_color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
         }
 
@@ -125,7 +125,7 @@ Framebuffer::~Framebuffer() {
     for (size_t i = 0; i < specification.color_attachments.size(); i++) {
         switch (specification.color_attachments[i].type) {
             case AttachmentType::None:
-                ASSERT(false, "Attachment type 'None' is invalid");
+                ASSERT(false, "Attachment type None is invalid");
                 break;
             case AttachmentType::Texture:
                 glDeleteTextures(1, &color_attachments[i]);
@@ -139,7 +139,7 @@ Framebuffer::~Framebuffer() {
     if (depth_attachment_present(specification)) {
         switch (specification.depth_attachment.type) {
             case AttachmentType::None:
-                ASSERT(false, "Attachment type 'None' is invalid");
+                ASSERT(false, "Attachment type None is invalid");
                 break;
             case AttachmentType::Texture:
                 glDeleteTextures(1, &depth_attachment);
@@ -206,15 +206,20 @@ void Framebuffer::clear_integer_color_attachment() {
     glClearBufferiv(GL_COLOR, specification.clear_drawbuffer, specification.clear_value);
 }
 
-void Framebuffer::blit(GLuint draw_framebuffer, int width, int height) {
+void Framebuffer::blit(Framebuffer* draw_framebuffer, int width, int height) {
+    ASSERT(color_attachments.size() == draw_framebuffer->color_attachments.size(), "Framebuffers must have the same attachments");
+
     glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer->framebuffer);
 
     for (size_t i = 0; i < color_attachments.size(); i++) {
         glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
         glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
+
+    // TODO don't know, if needed
+    glDrawBuffers(draw_framebuffer->color_attachments.size(), COLOR_ATTACHMENTS);
 }
 
 void Framebuffer::build() {
@@ -223,7 +228,7 @@ void Framebuffer::build() {
         for (size_t i = 0; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
-                    ASSERT(false, "Attachment type 'None' is invalid");
+                    ASSERT(false, "Attachment type None is invalid");
                     break;
                 case AttachmentType::Texture:
                     glDeleteTextures(1, &color_attachments[i]);
@@ -237,7 +242,7 @@ void Framebuffer::build() {
         if (depth_attachment_present(specification)) {
             switch (specification.depth_attachment.type) {
                 case AttachmentType::None:
-                    ASSERT(false, "Attachment type 'None' is invalid");
+                    ASSERT(false, "Attachment type None is invalid");
                     break;
                 case AttachmentType::Texture:
                     glDeleteTextures(1, &depth_attachment);
@@ -265,7 +270,7 @@ void Framebuffer::build() {
     for (size_t i = 0; i < specification.color_attachments.size(); i++) {
         switch (specification.color_attachments[i].type) {
             case AttachmentType::None:
-                ASSERT(false, "Attachment type 'None' is invalid");
+                ASSERT(false, "Attachment type None is invalid");
                 break;
             case AttachmentType::Texture: {
                 GLuint texture;
@@ -274,7 +279,7 @@ void Framebuffer::build() {
 
                 switch (specification.color_attachments[i].format) {
                     case AttachmentFormat::None:
-                        ASSERT(false, "Attachment format 'None' is invalid");
+                        ASSERT(false, "Attachment format None is invalid");
                         break;
                     case AttachmentFormat::RGBA8:
                         attach_color_texture(texture, specification.samples, GL_RGBA8, GL_BGRA,
@@ -301,7 +306,7 @@ void Framebuffer::build() {
 
                 switch (specification.color_attachments[i].format) {
                     case AttachmentFormat::None:
-                        ASSERT(false, "Attachment format 'None' is invalid");
+                        ASSERT(false, "Attachment format None is invalid");
                         break;
                     case AttachmentFormat::RGBA8:
                         attach_color_renderbuffer(renderbuffer, specification.samples, GL_RGBA8,
@@ -327,7 +332,7 @@ void Framebuffer::build() {
     if (depth_attachment_present(specification)) {
         switch (specification.depth_attachment.type) {
             case AttachmentType::None:
-                ASSERT(false, "Attachment type 'None' is invalid");
+                ASSERT(false, "Attachment type None is invalid");
                 break;
             case AttachmentType::Texture: {
                 GLuint texture;
@@ -336,7 +341,7 @@ void Framebuffer::build() {
 
                 switch (specification.depth_attachment.format) {
                     case AttachmentFormat::None:
-                        ASSERT(false, "Attachment format 'None' is invalid");
+                        ASSERT(false, "Attachment format None is invalid");
                         break;
                     case AttachmentFormat::DEPTH24_STENCIL8:
                         attach_depth_texture(texture, specification.samples, GL_DEPTH24_STENCIL8,
@@ -365,7 +370,7 @@ void Framebuffer::build() {
 
                 switch (specification.depth_attachment.format) {
                     case AttachmentFormat::None:
-                        ASSERT(false, "Attachment format 'None' is invalid");
+                        ASSERT(false, "Attachment format None is invalid");
                         break;
                     case AttachmentFormat::DEPTH24_STENCIL8:
                         attach_depth_renderbuffer(renderbuffer, specification.samples,
@@ -393,13 +398,9 @@ void Framebuffer::build() {
     if (color_attachments.size() > 1) {
         ASSERT(color_attachments.size() <= 4, "Currently there can be maximum 4 color attachments");
 
-        constexpr GLenum attachments[4] = {
-            GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-            GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
-        };
-        glDrawBuffers(color_attachments.size(), attachments);
+        glDrawBuffers(color_attachments.size(), COLOR_ATTACHMENTS);
     } else if (color_attachments.empty()) {
-        glDrawBuffer(GL_NONE);
+        glDrawBuffer(GL_NONE);  // TODO what is this?
         glReadBuffer(GL_NONE);
     }
 
