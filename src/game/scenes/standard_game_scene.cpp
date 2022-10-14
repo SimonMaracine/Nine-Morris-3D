@@ -202,7 +202,9 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
 
     if (event.button == input::MouseButton::LEFT) {
         if (board.next_move && board.is_players_turn) {
-            const auto [did_action, switched_turn, must_take_piece_or_took_piece] = board.release();
+            const auto [did_action, switched_turn, must_take_piece_or_took_piece] = (
+                board.release(app->renderer->get_hovered_id())
+            );
 
             if (did_action) {  // FIXME here is some repetition
                 game.state = GameState::HumanDoingMove;

@@ -8,6 +8,7 @@ void StandardBoard::click(identifier::Id hovered_id) {
     for (const Node& node : nodes) {
         if (node.model->id.value() == hovered_id) {
             clicked_node_index = node.index;
+            break;
         }
     }
 
@@ -15,26 +16,27 @@ void StandardBoard::click(identifier::Id hovered_id) {
     for (const auto& [_, piece] : pieces) {
         if (piece.model->id.value() == hovered_id) {
             clicked_piece_index = piece.index;
+            break;
         }
     }
 }
 
-std::tuple<bool, bool, bool> StandardBoard::release() {
+std::tuple<bool, bool, bool> StandardBoard::release(identifier::Id hovered_id) {
     switch (phase) {
         case BoardPhase::PlacePieces:
             if (must_take_piece) {
-                check_take_piece();
+                check_take_piece(hovered_id);
             } else {
-                check_place_piece();
+                check_place_piece(hovered_id);
             }
 
             break;
         case BoardPhase::MovePieces:
             if (must_take_piece) {
-                check_take_piece();
+                check_take_piece(hovered_id);
             } else {
-                check_select_piece();
-                check_move_piece();
+                check_select_piece(hovered_id);
+                check_move_piece(hovered_id);
             }
 
             break;
@@ -53,47 +55,50 @@ std::tuple<bool, bool, bool> StandardBoard::release() {
     return result;
 }
 
-void StandardBoard::check_select_piece() {
+void StandardBoard::check_select_piece(identifier::Id hovered_id) {
     for (const auto& [index, piece] : pieces) {
-        if (index == clicked_piece_index && piece.model->id.value() == app->renderer->get_hovered_id()) {
+        if (index == clicked_piece_index && piece.model->id.value() == hovered_id) {
             if (turn == BoardPlayer::White && piece.type == PieceType::White
                     || turn == BoardPlayer::Black && piece.type == PieceType::Black) {
                 select_piece(index);
+                break;
             }
         }
     }
 }
 
-void StandardBoard::check_place_piece() {
+void StandardBoard::check_place_piece(identifier::Id hovered_id) {
     for (Node& node : nodes) {
-        if (node.index == clicked_node_index && node.model->id.value() == app->renderer->get_hovered_id()
+        if (node.index == clicked_node_index && node.model->id.value() == hovered_id
                 && node.piece_index == NULL_INDEX) {
-            remember_state();  // FIXME need camera reference
+            remember_state();
             place_piece(node.index);
 
             did_action = true;
+            break;
         }
     }
 }
 
-void StandardBoard::check_move_piece() {
+void StandardBoard::check_move_piece(identifier::Id hovered_id) {
     if (selected_piece_index == NULL_INDEX) {
         return;
     }
 
     for (Node& node : nodes) {
-        if (node.index == clicked_node_index && node.model->id.value() == app->renderer->get_hovered_id()
+        if (node.index == clicked_node_index && node.model->id.value() == hovered_id
                 && can_go(selected_piece_index, node.index)) {
-            remember_state();  // FIXME need camera reference
+            remember_state();
             move_piece(selected_piece_index, node.index);
 
             selected_piece_index = NULL_INDEX;
             did_action = true;
+            break;
         }
     }
 }
 
-void StandardBoard::check_take_piece() {
+void StandardBoard::check_take_piece(identifier::Id hovered_id) {
     if (clicked_piece_index == NULL_INDEX) {
         return;
     }
@@ -103,11 +108,11 @@ void StandardBoard::check_take_piece() {
 
     for (auto& [index, piece] : pieces) {
         if (turn == BoardPlayer::White) {
-            if (index == clicked_piece_index && piece.model->id.value() == app->renderer->get_hovered_id()
+            if (index == clicked_piece_index && piece.model->id.value() == hovered_id
                     && piece.type == PieceType::Black) {
                 if (!is_windmill_made(piece.node_index, PieceType::Black, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::Black, windmills, count) == black_pieces_count) {
-                    remember_state();  // FIXME need camera reference
+                    remember_state();
                     take_piece(index);
 
                     did_action = true;
@@ -118,11 +123,11 @@ void StandardBoard::check_take_piece() {
                 break;
             }
         } else {
-            if (index == clicked_piece_index && piece.model->id.value() == app->renderer->get_hovered_id()
+            if (index == clicked_piece_index && piece.model->id.value() == hovered_id
                     && piece.type == PieceType::White) {
                 if (!is_windmill_made(piece.node_index, PieceType::White, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::White, windmills, count) == white_pieces_count) {
-                    remember_state();  // FIXME need camera reference
+                    remember_state();
                     take_piece(index);
 
                     did_action = true;

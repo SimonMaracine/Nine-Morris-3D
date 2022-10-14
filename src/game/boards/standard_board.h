@@ -14,12 +14,12 @@ struct StandardBoard : public GenericBoard {
     ~StandardBoard() = default;
 
     virtual void click(identifier::Id hovered_id) override;
-    virtual std::tuple<bool, bool, bool> release() override;
+    virtual std::tuple<bool, bool, bool> release(identifier::Id hovered_id) override;
 
-    void check_select_piece();
-    void check_place_piece();
-    void check_move_piece();
-    void check_take_piece();
+    void check_select_piece(identifier::Id hovered_id);
+    void check_place_piece(identifier::Id hovered_id);
+    void check_move_piece(identifier::Id hovered_id);
+    void check_take_piece(identifier::Id hovered_id);
     void place_piece(size_t node_index);
     void move_piece(size_t piece_index, size_t node_index);
     void take_piece(size_t piece_index);

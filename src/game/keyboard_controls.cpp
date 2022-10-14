@@ -98,7 +98,7 @@ std::tuple<bool, bool, bool> KeyboardControls::click_and_release() {
 
     board->click(hovered_id);
 
-    return board->release();
+    return board->release(hovered_id);
 }
 
 KeyboardControls::Direction KeyboardControls::calculate(Direction original_direction, float camera_angle) {
