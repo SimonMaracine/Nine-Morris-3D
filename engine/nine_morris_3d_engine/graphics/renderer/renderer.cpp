@@ -8,13 +8,13 @@
 #include "nine_morris_3d_engine/application/events.h"
 #include "nine_morris_3d_engine/application/input.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
-#include "nine_morris_3d_engine/graphics/renderer/framebuffer_reader.h"
-#include "nine_morris_3d_engine/graphics/renderer/post_processing_step.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/vertex_array.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
+#include "nine_morris_3d_engine/graphics/framebuffer_reader.h"
+#include "nine_morris_3d_engine/graphics/post_processing_step.h"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
+#include "nine_morris_3d_engine/graphics/opengl/buffer.h"
+#include "nine_morris_3d_engine/graphics/opengl/shader.h"
+#include "nine_morris_3d_engine/graphics/opengl/texture.h"
+#include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/other/paths.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
@@ -203,9 +203,6 @@ Renderer::Renderer(Application* app)
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
             Attachment(AttachmentFormat::RED_I, AttachmentType::Renderbuffer)
         };
-        // specification.depth_attachment = Attachment(  // FIXME needed?
-        //     AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
-        // );
 
         storage.intermediate_framebuffer = std::make_shared<Framebuffer>(specification);
 
@@ -463,7 +460,7 @@ void Renderer::end_rendering() {
     // Draw the final result to the screen
     Framebuffer::bind_default();
     glClear(GL_COLOR_BUFFER_BIT);
-    draw_screen_quad(post_processing_context.last_texture);  // TODO maybe only blit
+    draw_screen_quad(post_processing_context.last_texture);
 
     glEnable(GL_DEPTH_TEST);
 }

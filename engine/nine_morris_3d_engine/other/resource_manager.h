@@ -2,13 +2,13 @@
 
 #include <resmanager/resmanager.h>
 
-#include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/vertex_array.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
-#include "nine_morris_3d_engine/graphics/renderer/font.h"
-#include "nine_morris_3d_engine/graphics/renderer/material.h"
+#include "nine_morris_3d_engine/graphics/opengl/texture.h"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
+#include "nine_morris_3d_engine/graphics/opengl/shader.h"
+#include "nine_morris_3d_engine/graphics/opengl/buffer.h"
+#include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
+#include "nine_morris_3d_engine/graphics/font.h"
+#include "nine_morris_3d_engine/graphics/material.h"
 #include "nine_morris_3d_engine/other/texture_data.h"
 #include "nine_morris_3d_engine/other/mesh.h"
 

@@ -9,7 +9,7 @@
 #include "nine_morris_3d_engine/application/application_builder.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
+#include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/other/resource_manager.h"
 
 class Application final {

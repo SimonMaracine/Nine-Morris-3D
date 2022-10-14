@@ -4,7 +4,7 @@
 
 #include "nine_morris_3d_engine/application/capabilities.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
+#include "nine_morris_3d_engine/graphics/opengl/texture.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"

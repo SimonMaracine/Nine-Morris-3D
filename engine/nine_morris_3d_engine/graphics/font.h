@@ -3,7 +3,7 @@
 #include <stb_truetype.h>
 #include <glad/glad.h>
 
-#include "nine_morris_3d_engine/graphics/renderer/opengl/vertex_array.h"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
 
 class Font {
 public:

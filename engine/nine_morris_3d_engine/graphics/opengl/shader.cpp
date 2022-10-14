@@ -4,8 +4,8 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
+#include "nine_morris_3d_engine/graphics/opengl/shader.h"
+#include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"

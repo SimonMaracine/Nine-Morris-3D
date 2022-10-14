@@ -1,8 +1,8 @@
 #pragma once
 
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
+#include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
+#include "nine_morris_3d_engine/graphics/opengl/shader.h"
 
 class PostProcessingStep {
 public:

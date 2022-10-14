@@ -1,4 +1,4 @@
-#include "nine_morris_3d_engine/graphics/renderer/identifier.h"
+#include "nine_morris_3d_engine/graphics/identifier.h"
 
 namespace identifier {
     static Id id = 0;

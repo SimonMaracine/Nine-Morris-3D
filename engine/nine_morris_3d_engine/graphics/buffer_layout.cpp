@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 
-#include "nine_morris_3d_engine/graphics/renderer/buffer_layout.h"
+#include "nine_morris_3d_engine/graphics/buffer_layout.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
 size_t VertexElement::get_size(GLenum type) {

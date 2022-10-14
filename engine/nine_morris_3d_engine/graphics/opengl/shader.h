@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <cppblowfish/cppblowfish.h>
 
-#include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
+#include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 struct UniformBlockSpecification {

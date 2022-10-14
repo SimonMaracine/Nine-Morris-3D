@@ -1,7 +1,7 @@
 #include <glm/glm.hpp>
 
-#include "nine_morris_3d_engine/graphics/renderer/material.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
+#include "nine_morris_3d_engine/graphics/material.h"
+#include "nine_morris_3d_engine/graphics/opengl/shader.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 

@@ -2,7 +2,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "nine_morris_3d_engine/application/input.h"
-#include "nine_morris_3d_engine/graphics/renderer/camera.h"
+#include "nine_morris_3d_engine/graphics/camera.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
 constexpr float ZOOM_BASE_VELOCITY = 0.03f;

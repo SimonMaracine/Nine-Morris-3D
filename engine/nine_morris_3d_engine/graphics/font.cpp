@@ -6,9 +6,9 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
-#include "nine_morris_3d_engine/graphics/renderer/font.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/vertex_array.h"
+#include "nine_morris_3d_engine/graphics/font.h"
+#include "nine_morris_3d_engine/graphics/opengl/buffer.h"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 

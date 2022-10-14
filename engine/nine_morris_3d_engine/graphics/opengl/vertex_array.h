@@ -2,8 +2,8 @@
 
 #include <glad/glad.h>
 
-#include "nine_morris_3d_engine/graphics/renderer/buffer_layout.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
+#include "nine_morris_3d_engine/graphics/buffer_layout.h"
+#include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 
 class VertexArray {
 public:

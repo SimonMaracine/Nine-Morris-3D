@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
+#include "nine_morris_3d_engine/graphics/opengl/shader.h"
+#include "nine_morris_3d_engine/graphics/opengl/texture.h"
 
 class Material {
 public:

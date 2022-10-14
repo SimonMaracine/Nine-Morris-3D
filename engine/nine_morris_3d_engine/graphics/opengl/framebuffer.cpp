@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/framebuffer.h"
+#include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 

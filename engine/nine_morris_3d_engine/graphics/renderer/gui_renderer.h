@@ -3,11 +3,11 @@
 #include <glm/glm.hpp>
 
 #include "nine_morris_3d_engine/application/events.h"
-#include "nine_morris_3d_engine/graphics/renderer/font.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/shader.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/vertex_array.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/texture.h"
-#include "nine_morris_3d_engine/graphics/renderer/opengl/buffer.h"
+#include "nine_morris_3d_engine/graphics/font.h"
+#include "nine_morris_3d_engine/graphics/opengl/shader.h"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
+#include "nine_morris_3d_engine/graphics/opengl/texture.h"
+#include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 class Application;
