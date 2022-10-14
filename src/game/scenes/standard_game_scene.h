@@ -62,6 +62,8 @@ struct StandardGameScene : public Scene {
     void setup_widgets();
 
     void update_turn_indicator();
+    void update_wait_indicator();
+    void update_computer_thinking_indicator();
     void update_cursor();
 
     void save_game();

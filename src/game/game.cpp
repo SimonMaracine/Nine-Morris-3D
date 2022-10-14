@@ -10,9 +10,7 @@
 #include "other/data.h"
 
 namespace game {
-    void start(Application* app) {
-        srand(time(nullptr));
-
+    static void load_game_options(Application* app) {
         auto& data = app->user_data<Data>();
 
         try {
@@ -36,27 +34,30 @@ namespace game {
                 REL_ERROR("{}", e.what());
             }
         }
+    }
 
-        app->window->set_vsync(data.options.vsync);
-
+    static void setup_icons(Application* app) {
         using namespace assets;
-        using namespace encrypt;
         using namespace paths;
 
-        // Load and set icons
-        {
-            std::array<std::unique_ptr<TextureData>, 5> icons = {
-                std::make_unique<TextureData>(path_for_assets(ICON_512), false),
-                std::make_unique<TextureData>(path_for_assets(ICON_256), false),
-                std::make_unique<TextureData>(path_for_assets(ICON_128), false),
-                std::make_unique<TextureData>(path_for_assets(ICON_64), false),
-                std::make_unique<TextureData>(path_for_assets(ICON_32), false)
-            };
+        std::array<std::unique_ptr<TextureData>, 5> icons = {
+            std::make_unique<TextureData>(path_for_assets(ICON_512), false),
+            std::make_unique<TextureData>(path_for_assets(ICON_256), false),
+            std::make_unique<TextureData>(path_for_assets(ICON_128), false),
+            std::make_unique<TextureData>(path_for_assets(ICON_64), false),
+            std::make_unique<TextureData>(path_for_assets(ICON_32), false)
+        };
 
-            app->window->set_icons<5>(icons);
-        }
+        app->window->set_icons<5>(icons);
+    }
 
-        // Load and set cursors
+    static void setup_cursors(Application* app) {
+        auto& data = app->user_data<Data>();
+
+        using namespace assets;
+        using namespace paths;
+        using namespace encrypt;
+
         data.arrow_cursor = app->window->add_cursor(
             std::make_unique<TextureData>(encr(path_for_assets(ARROW_CURSOR)), false),
             4, 1
@@ -65,40 +66,49 @@ namespace game {
             std::make_unique<TextureData>(encr(path_for_assets(CROSS_CURSOR)), false),
             8, 8
         );
+    }
 
-        // Setup scene framebuffer
-        app->renderer->set_scene_framebuffer(data.launcher_options.samples);
+    static void setup_imgui_fonts(Application* app) {
+        auto& data = app->user_data<Data>();
 
-        // Setup depth map framebuffer
-        app->renderer->set_shadow_map_framebuffer(data.launcher_options.texture_quality == launcher_options::NORMAL ? 4096 : 2048);
+        using namespace assets;
+        using namespace paths;
 
-        // Setup ImGui fonts
-        {
-            ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO& io = ImGui::GetIO();
 
-            ImFontGlyphRangesBuilder builder;
-            builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-            builder.AddText(u8"ă");
-            ImVector<ImWchar> ranges;
-            builder.BuildRanges(&ranges);
+        ImFontGlyphRangesBuilder builder;
+        builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+        builder.AddText(u8"ă");
+        ImVector<ImWchar> ranges;
+        builder.BuildRanges(&ranges);
 
-            io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 21.0f);
-            data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
-            data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f,
-                    nullptr, ranges.Data);
-            io.Fonts->Build();
-        }
+        io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 21.0f);
+        data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
+        data.imgui_windows_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f,
+                nullptr, ranges.Data);
+        io.Fonts->Build();
+    }
 
-        // Load and create this font
-        {
-            auto font = app->res.font.load("good_dog_plain_font"_h, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512);
+    static void setup_game_font(Application* app) {
+        using namespace assets;
+        using namespace paths;
 
-            font->begin_baking();  // TODO maybe move part of texture baking to thread
-            font->bake_characters(32, 127);
-            font->end_baking();
-        }
+        auto font = app->res.font.load(
+            "good_dog_plain_font"_h, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512
+        );
 
-        // Setup post-processing  // FIXME this is optional
+        font->begin_baking();  // TODO maybe move part of texture baking to thread
+        font->bake_characters(32, 127);
+        font->end_baking();
+    }
+
+    static void setup_post_processing(Application* app) {
+        auto& data = app->user_data<Data>();
+
+        using namespace assets;
+        using namespace paths;
+        using namespace encrypt;
+
         {
             FramebufferSpecification specification;
             specification.width = app->data().width / 2;
@@ -121,11 +131,13 @@ namespace game {
 
             app->renderer->add_post_processing(std::make_shared<BrightFilter>("bright_filter", framebuffer, shader));
         }
+
         auto blur_shader = std::make_shared<Shader>(
             encr(path_for_assets(BLUR_VERTEX_SHADER)),
             encr(path_for_assets(BLUR_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_screen_texture" }
         );
+
         {
             FramebufferSpecification specification;
             specification.width = app->data().width / 4;
@@ -181,6 +193,27 @@ namespace game {
             combine->strength = data.launcher_options.bloom_strength;
             app->renderer->add_post_processing(combine);
         }
+    }
+
+    void start(Application* app) {
+        auto& data = app->user_data<Data>();
+
+        srand(time(nullptr));
+
+        load_game_options(app);
+        setup_icons(app);
+        setup_cursors(app);
+        setup_imgui_fonts(app);
+        setup_game_font(app);
+        setup_post_processing(app);  // FIXME this is optional
+
+        app->window->set_vsync(data.options.vsync);
+
+        // Setup scene framebuffer
+        app->renderer->set_scene_framebuffer(data.launcher_options.samples);
+
+        // Setup depth map framebuffer
+        app->renderer->set_shadow_map_framebuffer(data.launcher_options.texture_quality == launcher_options::NORMAL ? 4096 : 2048);
     }
 
     void stop(Application*) {

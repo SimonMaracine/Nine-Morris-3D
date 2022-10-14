@@ -152,6 +152,9 @@ void StandardGameScene::on_update() {
     char time[32];
     timer.get_time_formatted(time);
     data.text_cache["timer_text"_h]->set_text(time);
+
+    update_wait_indicator();
+    update_computer_thinking_indicator();
 }
 
 void StandardGameScene::on_fixed_update() {
@@ -1004,6 +1007,38 @@ void StandardGameScene::update_turn_indicator() {
         data.image_cache["turn_indicator"_h]->set_image(app->res.texture["white_indicator_texture"_h]);
     } else {
         data.image_cache["turn_indicator"_h]->set_image(app->res.texture["black_indicator_texture"_h]);
+    }
+}
+
+void StandardGameScene::update_wait_indicator() {
+    auto& data = app->user_data<Data>();
+
+    if (!board.next_move) {
+        if (!show_wait_indicator) {
+            app->gui_renderer->add_widget(data.image_cache["wait_indicator"_h]);
+            show_wait_indicator = true;
+        }
+    } else {
+        if (show_wait_indicator) {
+            app->gui_renderer->remove_widget(data.image_cache["wait_indicator"_h]);
+            show_wait_indicator = false;
+        }
+    }
+}
+
+void StandardGameScene::update_computer_thinking_indicator() {
+    auto& data = app->user_data<Data>();
+
+    if (game.state == GameState::ComputerThinkingMove) {
+        if (!show_computer_thinking_indicator) {
+            app->gui_renderer->add_widget(data.image_cache["computer_thinking_indicator"_h]);
+            show_computer_thinking_indicator = true;
+        }
+    } else {
+        if (show_computer_thinking_indicator) {
+            app->gui_renderer->remove_widget(data.image_cache["computer_thinking_indicator"_h]);
+            show_computer_thinking_indicator = false;
+        }
     }
 }
 
