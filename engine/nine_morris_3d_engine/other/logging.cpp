@@ -30,7 +30,7 @@ namespace logging {
         std::string file_path;
         try {
             file_path = paths::path_for_logs(log_file);
-        } catch (const user_data::UserNameError& e) {            
+        } catch (const user_data::UserNameError& e) {
             global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
             global_logger->set_pattern(LOG_PATTERN_RELEASE);
             global_logger->set_level(spdlog::level::trace);

@@ -12,30 +12,29 @@
 #include "nine_morris_3d_engine/other/user_data.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
-namespace user_data {
 #if defined(PLATFORM_GAME_LINUX)
     #define DIRECTORY_PATH(username, app_name) ("/home/" + (username) + "/." + (app_name) + "/")
 
-    std::string get_username() noexcept(false) {
+    static std::string get_username_impl() noexcept(false) {
         uid_t uid = geteuid();
         struct passwd* pw = getpwuid(uid);
 
         if (pw == nullptr) {
-            throw UserNameError("Could not get username");
+            throw user_data::UserNameError("Could not get username");
         }
 
         return std::string(pw->pw_name);
     }
 
-    std::string get_user_data_directory_path(std::string_view application_name) noexcept(false) {
-        const std::string username = get_username();
+    static std::string get_user_data_directory_path_impl(std::string_view application_name) noexcept(false) {
+        const std::string username = get_username_impl();
         const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         return path;
     }
 
-    bool user_data_directory_exists(std::string_view application_name) noexcept(false) {
-        const std::string username = get_username();
+    static bool user_data_directory_exists_impl(std::string_view application_name) noexcept(false) {
+        const std::string username = get_username_impl();
         const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         struct stat sb;
@@ -47,8 +46,8 @@ namespace user_data {
         }
     }
 
-    bool create_user_data_directory(std::string_view application_name) noexcept(false) {
-        const std::string username = get_username();
+    static bool create_user_data_directory_impl(std::string_view application_name) noexcept(false) {
+        const std::string username = get_username_impl();
         const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         if (mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < 0) {
@@ -60,7 +59,7 @@ namespace user_data {
 #elif defined(PLATFORM_GAME_WINDOWS)
     #define DIRECTORY_PATH(username, app_name) ("C:\\Users\\" + (username) + "\\AppData\\Roaming\\" + (app_name) + "\\")
 
-    std::string get_username() noexcept(false) {
+    static std::string get_username_impl() noexcept(false) {
         char username[UNLEN + 1];
         DWORD whatever = UNLEN + 1;
         const bool success = GetUserName(username, &whatever);
@@ -72,15 +71,15 @@ namespace user_data {
         return std::string(username);
     }
 
-    std::string get_user_data_directory_path(std::string_view application_name) noexcept(false) {
-        const std::string username = get_username();
+    static std::string get_user_data_directory_path_impl(std::string_view application_name) noexcept(false) {
+        const std::string username = get_username_impl();
         const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         return path;
     }
 
-    bool user_data_directory_exists(std::string_view application_name) noexcept(false) {
-        const std::string username = get_username();
+    static bool user_data_directory_exists_impl(std::string_view application_name) noexcept(false) {
+        const std::string username = get_username_impl();
         const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         WIN32_FIND_DATA find_data;
@@ -100,8 +99,8 @@ namespace user_data {
         }
     }
 
-    bool create_user_data_directory(std::string_view application_name) noexcept(false) {
-        const std::string username = get_username();
+    static bool create_user_data_directory_impl(std::string_view application_name) noexcept(false) {
+        const std::string username = get_username_impl();
         const std::string path = DIRECTORY_PATH(username, std::string(application_name));
 
         const bool success = CreateDirectory(path.c_str(), nullptr);
@@ -109,4 +108,21 @@ namespace user_data {
         return success;
     }
 #endif
+
+namespace user_data {
+    std::string get_username() noexcept(false) {
+        return get_username_impl();
+    }
+
+    std::string get_user_data_directory_path(std::string_view application_name) noexcept(false) {
+        return get_user_data_directory_path_impl(application_name);
+    }
+
+    bool user_data_directory_exists(std::string_view application_name) noexcept(false) {
+        return user_data_directory_exists_impl(application_name);
+    }
+
+    bool create_user_data_directory(std::string_view application_name) noexcept(false) {
+        return create_user_data_directory_impl(application_name);
+    }
 }
