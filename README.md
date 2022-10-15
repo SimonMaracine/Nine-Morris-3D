@@ -1,11 +1,11 @@
 # Nine Morris 3D
 
-## A nine men's morris implementation in 3D.
+## A nine men's morris implementation in 3D
 
 ### Details:
 It is a free casual board game with hopefully beautiful 3D graphics. It has five game modes:
 standard (nine men's morris), jump, jump+, twelve men's morris and hunt, each with their AIs.
-Games can be saved and continued later. AI and other settings are configurable. Works on Linux and Windows.
+Games can be saved and continued later. AI and other settings are configurable. It runs on Linux and Windows.
 
 ### Tags:
 - Casual
@@ -23,7 +23,8 @@ Games can be saved and continued later. AI and other settings are configurable. 
 - Copy HELP_LINUX.txt
 - Copy README.txt
 - Copy install.sh and uninstall.sh from scripts/linux-install/
-- Archive the **_Nine-Morris-3D-vX.Y.Z-Linux_** folder
+- Archive the **_Nine-Morris-3D-vX.Y.Z-Linux_** folder  
+  (`tar -c --file=Nine-Morris-3D-vX.Y.Z-Linux.tar.gz --gzip Nine-Morris-3D-vX.Y.Z-Linux`)
 
 ### Exporting on Windows:
 - Create a new folder called whatever
