@@ -10,7 +10,7 @@ namespace minimax_standard_game {
 
         for (size_t i = 0; i < position.size(); i++) {
             if (position[i] == PieceType::None) {
-                result.place_node_index = i; 
+                result.place_node_index = i;
             }
         }
 

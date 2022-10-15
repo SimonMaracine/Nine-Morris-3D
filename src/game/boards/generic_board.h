@@ -19,6 +19,9 @@ struct GenericBoard {
 
     virtual void click(identifier::Id) {}
     virtual std::tuple<bool, bool, bool> release(identifier::Id) { return {}; }
+    virtual void computer_place_piece(size_t) {}
+    virtual void computer_move_piece(size_t, size_t) {}
+    virtual void computer_take_piece(size_t) {}
 
     GamePosition get_position();
     void update_nodes(identifier::Id hovered_id);

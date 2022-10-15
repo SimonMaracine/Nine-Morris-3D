@@ -29,7 +29,6 @@ std::tuple<bool, bool, bool> StandardBoard::release(identifier::Id hovered_id) {
             } else {
                 check_place_piece(hovered_id);
             }
-
             break;
         case BoardPhase::MovePieces:
             if (must_take_piece) {
@@ -38,7 +37,6 @@ std::tuple<bool, bool, bool> StandardBoard::release(identifier::Id hovered_id) {
                 check_select_piece(hovered_id);
                 check_move_piece(hovered_id);
             }
-
             break;
         default:
             break;
@@ -53,6 +51,21 @@ std::tuple<bool, bool, bool> StandardBoard::release(identifier::Id hovered_id) {
     must_take_piece_or_took_piece = false;
 
     return result;
+}
+
+void StandardBoard::computer_place_piece(size_t node_index) {
+    remember_state();
+    place_piece(node_index);
+}
+
+void StandardBoard::computer_move_piece(size_t source_node_index, size_t destination_node_index) {
+    remember_state();
+    move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
+}
+
+void StandardBoard::computer_take_piece(size_t node_index) {
+    remember_state();
+    take_piece(nodes.at(node_index).piece_index);
 }
 
 void StandardBoard::check_select_piece(identifier::Id hovered_id) {

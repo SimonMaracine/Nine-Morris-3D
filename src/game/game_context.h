@@ -15,7 +15,7 @@ public:
     void begin_human_move();
     void end_human_move();
     void begin_computer_move();
-    void end_computer_move();
+    bool end_computer_move();
 
     void reset_player(GamePlayer player);
     bool both_players_human() { return white_player == GamePlayer::Human && black_player == GamePlayer::Human; }

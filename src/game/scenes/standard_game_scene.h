@@ -61,10 +61,15 @@ struct StandardGameScene : public Scene {
     void setup_indicators_textures();
     void setup_widgets();
 
+    void update_game_state();
+    void update_timer_text();
     void update_turn_indicator();
     void update_wait_indicator();
     void update_computer_thinking_indicator();
     void update_cursor();
+
+    void update_after_human_move(bool did_action, bool switched_turn, bool must_take_piece_or_took_piece);
+    void update_after_computer_move(bool switched_turn);
 
     void save_game();
 

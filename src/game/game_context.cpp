@@ -24,21 +24,38 @@ void GameContext::begin_computer_move() {
     minimax_thread->start(minimax_standard_game::minimax);
 }
 
-void GameContext::end_computer_move() {
-    if (board->phase == BoardPhase::PlacePieces) {  // FIXME this
-        if (board->must_take_piece) {
-            // board->computer_take_piece(minimax_thread->get_result().take_node_index);
-        } else {
-            // board->computer_place_piece(minimax_thread->get_result().place_node_index);
-        }
-    } else if (board->phase == BoardPhase::MovePieces) {
-        if (board->must_take_piece) {
-            // board->computer_take_piece(minimax_thread->get_result().take_node_index);
-        } else {
-            const MinimaxThread::Result& result = minimax_thread->get_result();
-            // board->computer_put_down_piece(result.put_down_source_node_index, result.put_down_destination_node_index);
-        }
+bool GameContext::end_computer_move() {
+    switch (board->phase) {
+        case BoardPhase::PlacePieces:
+            if (board->must_take_piece) {
+                const auto& result = minimax_thread->get_result();
+                board->computer_take_piece(result.take_node_index);
+            } else {
+                const auto& result = minimax_thread->get_result();
+                board->computer_place_piece(result.place_node_index);
+            }
+            break;
+        case BoardPhase::MovePieces:
+            if (board->must_take_piece) {
+                const auto& result = minimax_thread->get_result();
+                board->computer_take_piece(result.take_node_index);
+            } else {
+                const auto& result = minimax_thread->get_result();
+                board->computer_move_piece(
+                    result.put_down_source_node_index,
+                    result.put_down_destination_node_index
+                );
+            }
+            break;
+        default:
+            break;
     }
+
+    const bool result = board->switched_turn;
+    board->switched_turn = false;  // These need to be resetted
+    board->must_take_piece_or_took_piece = false;
+
+    return result;
 }
 
 void GameContext::reset_player(GamePlayer player) {

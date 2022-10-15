@@ -128,6 +128,7 @@ namespace debug_opengl {
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 ASSERT(false, "This should have been disabled");
+                break;
         }
     }
 #endif

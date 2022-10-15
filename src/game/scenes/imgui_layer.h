@@ -12,7 +12,8 @@
 #define HOVERING_GUI() hovering_gui = true
 
 template<typename SceneType>
-struct ImGuiLayer {
+class ImGuiLayer {
+public:
     ImGuiLayer() = default;
     ImGuiLayer(Application* app, SceneType* scene);
     ~ImGuiLayer() = default;
@@ -24,7 +25,6 @@ struct ImGuiLayer {
     void draw_menu_bar();
     void draw_info();
     void draw_game_over();
-    void draw_game_over_message(std::string_view message1, std::string_view message2);
     void draw_about();
     void draw_could_not_load_game();
     void draw_no_last_game();
@@ -32,9 +32,6 @@ struct ImGuiLayer {
 #ifdef PLATFORM_GAME_DEBUG
     void draw_debug();
 #endif
-
-    Application* app = nullptr;
-    SceneType* scene = nullptr;
 
     bool hovering_gui = false;
     bool can_undo = false;
@@ -44,6 +41,11 @@ struct ImGuiLayer {
     bool show_about = false;
     bool show_could_not_load_game = false;
     bool show_no_last_game = false;
+private:
+    void draw_game_over_message(std::string_view message1, std::string_view message2);
+
+    Application* app = nullptr;
+    SceneType* scene = nullptr;
 
     std::string last_save_game_date = save_load::NO_LAST_GAME;
 
@@ -151,9 +153,13 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                 DEB_INFO("Restarting game");
             }
             if (ImGui::MenuItem("Load Last Game", nullptr, false, can_change)) {
-                scene->board.finalize_pieces_state();
+                if (last_save_game_date == save_load::NO_LAST_GAME) {
+                    show_no_last_game = true;
+                } else {
+                    scene->board.finalize_pieces_state();
 
-                // game_layer->load_game();  // FIXME
+                    // game_layer->load_game();  // FIXME
+                }
             }
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", last_save_game_date.c_str());
@@ -191,13 +197,16 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
             if (ImGui::BeginMenu("Players", can_change)) {
                 if (ImGui::BeginMenu("White")) {
                     static int option = 0;
+
                     if (ImGui::RadioButton("Human", &option, 0)) {
+                        data.options.white_player = game_options::HUMAN;
                         scene->game.white_player = GamePlayer::Human;
                         scene->game.reset_player(GamePlayer::Human);
 
                         DEB_DEBUG("Set white player to human");
                     }
                     if (ImGui::RadioButton("Computer", &option, 1)) {
+                        data.options.white_player = game_options::COMPUTER;
                         scene->game.white_player = GamePlayer::Computer;
                         scene->game.reset_player(GamePlayer::Computer);
 
@@ -209,13 +218,16 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                 }
                 if (ImGui::BeginMenu("Black")) {
                     static int option = 1;
+
                     if (ImGui::RadioButton("Human", &option, 0)) {
+                        data.options.black_player = game_options::HUMAN;
                         scene->game.black_player = GamePlayer::Human;
                         scene->game.reset_player(GamePlayer::Human);
 
                         DEB_DEBUG("Set black player to human");
                     }
                     if (ImGui::RadioButton("Computer", &option, 1)) {
+                        data.options.black_player = game_options::COMPUTER;
                         scene->game.black_player = GamePlayer::Computer;
                         scene->game.reset_player(GamePlayer::Computer);
 
@@ -299,17 +311,20 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                 }
             }
             if (ImGui::BeginMenu("Skybox")) {
-                if (ImGui::RadioButton("None", &data.options.skybox, 0)) {
+                // Don't directly set options.skybox
+                static int skybox = data.options.skybox;
+
+                if (ImGui::RadioButton("None", &skybox, 0)) {
                     // game_layer->set_skybox(options::FIELD);  // FIXME
 
                     DEB_INFO("Skybox set to {}", game_options::NONE);
                 }
-                if (ImGui::RadioButton("Field", &data.options.skybox, 1)) {
+                if (ImGui::RadioButton("Field", &skybox, 1)) {
                     // game_layer->set_skybox(options::FIELD);  // FIXME
 
                     DEB_INFO("Skybox set to {}", game_options::FIELD);
                 }
-                if (ImGui::RadioButton("Autumn", &data.options.skybox, 2)) {
+                if (ImGui::RadioButton("Autumn", &skybox, 2)) {
                     // game_layer->set_skybox(options::AUTUMN);  // FIXME
 
                     DEB_INFO("Skybox set to {}", game_options::AUTUMN);
@@ -355,6 +370,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                 ImGui::EndMenu();
                 HOVERING_GUI();
             }
+            // Don't directly set options.labeled_board
             static bool labeled_board = data.options.labeled_board;
 
             if (ImGui::MenuItem("Labeled Board", nullptr, &labeled_board)) {
@@ -471,26 +487,6 @@ void ImGuiLayer<SceneType>::draw_game_over() {
 }
 
 template<typename SceneType>
-void ImGuiLayer<SceneType>::draw_game_over_message(std::string_view message1, std::string_view message2) {
-    ImGui::Dummy(ImVec2(20.0f, 0.0f)); ImGui::SameLine();
-
-    const float window_width = ImGui::GetWindowSize().x;
-    float text_width;
-
-    text_width = ImGui::CalcTextSize(message1.data()).x;
-    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-    ImGui::Text("%s", message1.data()); ImGui::SameLine();
-    ImGui::Dummy(ImVec2(20.0f, 0.0f));
-
-    text_width = ImGui::CalcTextSize(message2.data()).x;
-    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
-    ImGui::Text("%s", message2.data()); ImGui::SameLine();
-    ImGui::Dummy(ImVec2(20.0f, 0.0f));
-
-    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-}
-
-template<typename SceneType>
 void ImGuiLayer<SceneType>::draw_about() {
     ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("About Nine Morris 3D");
@@ -501,7 +497,7 @@ void ImGuiLayer<SceneType>::draw_about() {
     if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, window_flags)) {
         HOVERING_GUI();
 
-        // static bool deactivated = false;  // FIXME these
+        // static bool deactivated = false;  // FIXME these must be fixed somehow (hard)
         // if (!deactivated) {
         //     game_layer->active = false;
         //     gui_layer->active = false;
@@ -688,8 +684,12 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::Text("Black player: %s", scene->game.black_player == GamePlayer::Human ? "Human" : "Computer");
         ImGui::End();
 
+        auto& data = app->user_data<Data>();
+
         ImGui::Begin("Light Settings");
-        ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position), -30.0f, 30.0f);
+        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position), -30.0f, 30.0f)) {
+            data.quad_cache["light_bulb"_h]->position = app->renderer->light.position;
+        }
         ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color), 0.0f, 1.0f);
         ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color), 0.0f, 1.0f);
         ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color), 0.0f, 1.0f);
@@ -758,3 +758,23 @@ void ImGuiLayer<SceneType>::draw_debug() {
     }
 }
 #endif
+
+template<typename SceneType>
+void ImGuiLayer<SceneType>::draw_game_over_message(std::string_view message1, std::string_view message2) {
+    ImGui::Dummy(ImVec2(20.0f, 0.0f)); ImGui::SameLine();
+
+    const float window_width = ImGui::GetWindowSize().x;
+    float text_width;
+
+    text_width = ImGui::CalcTextSize(message1.data()).x;
+    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+    ImGui::Text("%s", message1.data()); ImGui::SameLine();
+    ImGui::Dummy(ImVec2(20.0f, 0.0f));
+
+    text_width = ImGui::CalcTextSize(message2.data()).x;
+    ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
+    ImGui::Text("%s", message2.data()); ImGui::SameLine();
+    ImGui::Dummy(ImVec2(20.0f, 0.0f));
+
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+}

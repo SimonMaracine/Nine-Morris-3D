@@ -138,8 +138,6 @@ void StandardGameScene::on_awake() {
 }
 
 void StandardGameScene::on_update() {
-    auto& data = app->user_data<Data>();
-
     if (!imgui_layer.hovering_gui) {
         camera.update(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
     }
@@ -147,12 +145,11 @@ void StandardGameScene::on_update() {
     board.update_nodes(app->renderer->get_hovered_id());
     board.update_pieces(app->renderer->get_hovered_id());
 
+    update_game_state();
+
     timer.update(app->window->get_time());
 
-    char time[32];
-    timer.get_time_formatted(time);
-    data.text_cache["timer_text"_h]->set_text(time);
-
+    update_timer_text();
     update_wait_indicator();
     update_computer_thinking_indicator();
 }
@@ -206,30 +203,7 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
                 board.release(app->renderer->get_hovered_id())
             );
 
-            if (did_action) {  // FIXME here is some repetition
-                game.state = GameState::HumanDoingMove;
-            }
-
-            if (did_action && !made_first_move && !timer.is_running()) {
-                timer.start(app->window->get_time());
-                made_first_move = true;
-            }
-
-            if (board.phase == BoardPhase::GameOver) {
-                timer.stop();
-            }
-
-            if (switched_turn) {
-                update_turn_indicator();
-            }
-
-            if (must_take_piece_or_took_piece) {
-                update_cursor();
-            }
-
-            if (undo_redo_state.redo.empty()) {
-                imgui_layer.can_redo = false;
-            }
+            update_after_human_move(did_action, switched_turn, must_take_piece_or_took_piece);
         }
 
         if (show_keyboard_controls) {
@@ -290,32 +264,11 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
             break;
         case input::Key::ENTER:
             if (board.next_move && board.is_players_turn) {
-                const auto [did_action, switched_turn, must_take_piece_or_took_piece] = keyboard.click_and_release();
+                const auto [did_action, switched_turn, must_take_piece_or_took_piece] = (
+                    keyboard.click_and_release()
+                );
 
-                if (did_action) {
-                    game.state = GameState::HumanDoingMove;
-                }
-
-                if (did_action && !made_first_move && !timer.is_running()) {
-                    timer.start(app->window->get_time());
-                    made_first_move = true;
-                }
-
-                if (board.phase == BoardPhase::GameOver) {
-                    timer.stop();
-                }
-
-                if (switched_turn) {
-                    update_turn_indicator();
-                }
-
-                if (must_take_piece_or_took_piece) {
-                    update_cursor();
-                }
-
-                if (undo_redo_state.redo.empty()) {
-                    imgui_layer.can_redo = false;
-                }
+                update_after_human_move(did_action, switched_turn, must_take_piece_or_took_piece);
             }
             break;
         default:
@@ -1002,6 +955,85 @@ void StandardGameScene::setup_widgets() {
     computer_thinking_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 }
 
+void StandardGameScene::update_game_state() {
+    switch (game.state) {
+        case GameState::MaybeNextPlayer:
+            switch (board.turn) {
+                case BoardPlayer::White:
+                    switch (game.white_player) {
+                        case GamePlayer::None:
+                            ASSERT(false, "Player must not be None");
+                            break;
+                        case GamePlayer::Human:
+                            game.state = GameState::HumanBeginMove;
+                            break;
+                        case GamePlayer::Computer:
+                            game.state = GameState::ComputerBeginMove;
+                            break;
+                    }
+                    break;
+                case BoardPlayer::Black:
+                    switch (game.black_player) {
+                        case GamePlayer::None:
+                            ASSERT(false, "Player must not be None");
+                            break;
+                        case GamePlayer::Human:
+                            game.state = GameState::HumanBeginMove;
+                            break;
+                        case GamePlayer::Computer:
+                            game.state = GameState::ComputerBeginMove;
+                            break;
+                    }
+                    break;
+            }
+            break;
+        case GameState::HumanBeginMove:
+            game.begin_human_move();
+            game.state = GameState::HumanThinkingMove;
+            break;
+        case GameState::HumanThinkingMove:
+            break;
+        case GameState::HumanDoingMove:
+            if (board.next_move) {
+                game.state = GameState::HumanEndMove;
+            }
+            break;
+        case GameState::HumanEndMove:
+            game.end_human_move();
+            game.state = GameState::MaybeNextPlayer;
+            break;
+        case GameState::ComputerBeginMove:
+            game.begin_computer_move();
+            game.state = GameState::ComputerThinkingMove;
+            break;
+        case GameState::ComputerThinkingMove:
+            if (!minimax_thread.is_running()) {
+                minimax_thread.join();
+
+                const bool switched_turn = game.end_computer_move();
+
+                update_after_computer_move(switched_turn);
+            }
+            break;
+        case GameState::ComputerDoingMove:
+            if (board.next_move) {
+                game.state = GameState::ComputerEndMove;
+            }
+            break;
+        case GameState::ComputerEndMove:
+            game.state = GameState::MaybeNextPlayer;
+            break;
+    }
+}
+
+void StandardGameScene::update_timer_text() {
+    auto& data = app->user_data<Data>();
+
+    char time[32];
+    timer.get_time_formatted(time);
+    data.text_cache["timer_text"_h]->set_text(time);
+}
+
 void StandardGameScene::update_turn_indicator() {
     auto& data = app->user_data<Data>();
 
@@ -1057,6 +1089,54 @@ void StandardGameScene::update_cursor() {
 
             data.quad_cache["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_texture"_h];
         }
+    }
+}
+
+void StandardGameScene::update_after_human_move(bool did_action, bool switched_turn, bool must_take_piece_or_took_piece) {
+    if (did_action) {
+        game.state = GameState::HumanDoingMove;
+    }
+
+    if (did_action && !made_first_move && !timer.is_running()) {
+        timer.start(app->window->get_time());
+        made_first_move = true;
+    }
+
+    if (board.phase == BoardPhase::GameOver) {
+        timer.stop();
+    }
+
+    if (switched_turn) {
+        update_turn_indicator();
+    }
+
+    if (must_take_piece_or_took_piece) {
+        update_cursor();
+    }
+
+    if (undo_redo_state.redo.empty()) {
+        imgui_layer.can_redo = false;
+    }
+}
+
+void StandardGameScene::update_after_computer_move(bool switched_turn) {
+    game.state = GameState::ComputerDoingMove;
+
+    if (!made_first_move && !timer.is_running()) {
+        timer.start(app->window->get_time());
+        made_first_move = true;
+    }
+
+    if (board.phase == BoardPhase::GameOver) {
+        timer.stop();
+    }
+
+    if (switched_turn) {
+        update_turn_indicator();
+    }
+
+    if (undo_redo_state.redo.empty()) {
+        imgui_layer.can_redo = false;
     }
 }
 
