@@ -7,9 +7,9 @@ DATA = "../data"
 SUFFIX = ".dat"
 
 if sys.platform.startswith("linux"):
-    ENCRYPTER = "../encrypter-helper/encrypter"
+    ENCRYPTER = "../encrypter_helper/encrypter"
 elif sys.platform.startswith("win32"):
-    ENCRYPTER = "../encrypter-helper/encrypter.exe"
+    ENCRYPTER = "../encrypter_helper/encrypter.exe"
 
 
 def encrypt(file: str):
