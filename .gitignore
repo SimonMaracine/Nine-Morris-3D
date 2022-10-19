@@ -17,6 +17,7 @@ encrypter
 encrypter.exe
 /data-filtered
 /engine_data-filtered
+/renderdoc_captures
 
 /.vs
 CMakeCache.txt

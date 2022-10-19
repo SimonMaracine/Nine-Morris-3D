@@ -53,6 +53,12 @@ private:
     std::string save_game_file_path;
 
     ImGuiWindowFlags window_flags = 0;
+
+#ifdef PLATFORM_GAME_DEBUG
+    static constexpr size_t FRAMES_SIZE = 100;
+    std::vector<float> frames = std::vector<float> {FRAMES_SIZE};
+    size_t index = 0;
+#endif
 };
 
 template<typename SceneType>
@@ -69,6 +75,7 @@ ImGuiLayer<SceneType>::ImGuiLayer(Application* app, SceneType* scene)
 #endif
     window_flags |= ImGuiWindowFlags_NoResize;
     window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
 
     ImVec4* colors = ImGui::GetStyle().Colors;
     colors[ImGuiCol_TitleBg] = DEFAULT_BROWN;
@@ -628,7 +635,6 @@ void ImGuiLayer<SceneType>::draw_debug() {
     if (!show_about) {
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %f", app->get_fps());
-        ImGui::Text("Frame time (ms): %f", app->get_delta() * 1000.0f);
         ImGui::Text("White pieces: %u", scene->board.white_pieces_count);
         ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
         ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_pieces_count);
@@ -647,6 +653,26 @@ void ImGuiLayer<SceneType>::draw_debug() {
         ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
         ImGui::Text("Game started: %s", scene->made_first_move ? "true" : "false");
         ImGui::End();
+
+        {
+            const float time = app->get_delta() * 1000.0f;
+            frames[index] = time;
+
+            if (index < FRAMES_SIZE) {
+                index++;
+                frames.push_back(time);
+            } else {
+                frames.push_back(time);
+                frames.erase(frames.begin());
+            }
+
+            char text[32];
+            sprintf(text, "%.3f", time);
+
+            ImGui::Begin("Frame Time");
+            ImGui::PlotLines("time (ms)", frames.data(), FRAMES_SIZE, 0, text, 0.0f, 50.0f, ImVec2(200, 60));
+            ImGui::End();
+        }
 
         ImGui::Begin("Game");
         std::string state;
