@@ -323,20 +323,26 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 
     target_compile_definitions(${ENGINE} PRIVATE
         SPDLOG_ACTIVE_LEVEL=0
+        GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES  # This is to easily enable or disable encrypted files
     )
 
     target_compile_definitions(${GAME} PRIVATE
         SPDLOG_ACTIVE_LEVEL=0
+        GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
     )
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message("Building in RELEASE mode")
 
     target_compile_definitions(${ENGINE} PRIVATE
-        SPDLOG_ACTIVE_LEVEL=0 NDEBUG ENTT_DISABLE_ASSERT
+        SPDLOG_ACTIVE_LEVEL=0
+        NDEBUG
+        ENTT_DISABLE_ASSERT
     )
 
     target_compile_definitions(${GAME} PRIVATE
-        SPDLOG_ACTIVE_LEVEL=0 NDEBUG ENTT_DISABLE_ASSERT
+        SPDLOG_ACTIVE_LEVEL=0
+        NDEBUG
+        ENTT_DISABLE_ASSERT
     )
 endif()
 

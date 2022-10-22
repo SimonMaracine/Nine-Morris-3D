@@ -197,8 +197,8 @@ GLint Shader::get_uniform_location(std::string_view name) {
     try {
         return cache.at(std::string(name));
     } catch (const std::out_of_range&) {
-        DEB_CRITICAL("Uniform variable `{}` unspecified for shader `{}`, exiting...", name.data(), this->name);
-        exit(1);
+        DEB_ERROR("Cannot get uniform variable `{}` for shader `{}`", name.data(), this->name);
+        return -1;
     }
 #endif
 }

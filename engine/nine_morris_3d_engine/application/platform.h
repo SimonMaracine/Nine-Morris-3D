@@ -7,13 +7,13 @@
     #if defined(__GNUG__)
         #define PLATFORM_GAME_LINUX
     #else
-        #error "GCC must be used (for now)"
+        #error "GCC must be used on Linux (for now)"
     #endif
 #elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     #if defined(_MSC_VER)
         #define PLATFORM_GAME_WINDOWS
     #else
-        #error "MSVC must be used (for now)"
+        #error "MSVC must be used on Windows (for now)"
     #endif
 #else
     #error "Unsupported platform"

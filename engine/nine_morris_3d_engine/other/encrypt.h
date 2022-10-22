@@ -4,7 +4,11 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 
-#define ENCR(file_string) (file_string ".dat")
+#ifdef GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
+    #define ENCR(file_string) (file_string)
+#else
+    #define ENCR(file_string) (file_string ".dat")
+#endif
 
 namespace encrypt {
     class EncryptedFile {
@@ -21,7 +25,13 @@ namespace encrypt {
     void initialize(std::string_view key);
     cppblowfish::Buffer load_file(EncryptedFile file_path);
 
+#ifdef GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
+    constexpr std::string_view encr(std::string_view file_path) {
+        return file_path;
+    }
+#else
     constexpr EncryptedFile encr(std::string_view file_path) {
         return EncryptedFile(file_path);
     }
+#endif
 }

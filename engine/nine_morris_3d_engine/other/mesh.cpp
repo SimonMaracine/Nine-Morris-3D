@@ -9,7 +9,7 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 namespace mesh {
-    std::shared_ptr<Mesh<PTN>> load_model_VPTN(std::string_view file_path, bool flip_winding) {
+    std::shared_ptr<Mesh<PTN>> load_model_PTN(std::string_view file_path, bool flip_winding) {
         DEB_DEBUG("Loading PTN model `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
