@@ -28,9 +28,9 @@ public:
 
     // Baking API
     void begin_baking();
+    void end_baking();
     void bake_characters(int begin_codepoint, int end_codepoint);
     void bake_character(int codepoint);
-    void end_baking();
 
     // Call render to get the buffer of data used in the end by OpenGL; pointer returned needs to be deleted
     void render(std::string_view string, size_t* out_size, float** out_buffer);
@@ -63,7 +63,7 @@ private:
 
     GLuint texture = 0;
 
-    // // Store references to vertex arrays and buffers 
+    // Store references to vertex array and buffer
     std::shared_ptr<VertexArray> vertex_array;
     std::shared_ptr<Buffer> buffer;
     unsigned int vertex_count = 0;

@@ -66,6 +66,33 @@ void Font::begin_baking() {
     memset(bake_context.bitmap, 0, SIZE);
 }
 
+void Font::end_baking() {
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, bitmap_size, bitmap_size);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bitmap_size, bitmap_size, GL_RED, GL_UNSIGNED_BYTE, bake_context.bitmap);
+    LOG_ALLOCATION(bitmap_size * bitmap_size * 4)
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+#ifdef PLATFORM_GAME_DEBUG
+    const std::string file_name = "bitmap_" + name + ".png";
+    if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
+        DEB_ERROR("Failed to create bitmap png file `{}`", file_name);
+    }
+#endif
+
+    delete[] bake_context.bitmap;
+
+    DEB_DEBUG("End baking font `{}`", name);
+}
+
 void Font::bake_characters(int begin_codepoint, int end_codepoint) {
     int descent;
     stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
@@ -78,8 +105,15 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
         int width = 0, height = 0;  // Assume 0, because glyph can be null
-        unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, on_edge_value,
-                static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr);
+        unsigned char* glyph = stbtt_GetCodepointSDF(
+            &info, sf, codepoint, padding, on_edge_value,
+            static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr
+        );
+
+        if (glyph == nullptr) {
+            DEB_ERROR("Couldn't bake character with codepoint: `{}`", codepoint);
+            continue;
+        }
 
         if (bake_context.x + width > bitmap_size) {
             bake_context.y += bake_context.max_row_height;
@@ -88,8 +122,10 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         }
 
         float s0, t0, s1, t1;
-        blit_glyph(bake_context.bitmap, bitmap_size, bitmap_size, glyph, width, height, bake_context.x,
-                bake_context.y, &s0, &t0, &s1, &t1);
+        blit_glyph(
+            bake_context.bitmap, bitmap_size, bitmap_size, glyph, width, height, bake_context.x,
+            bake_context.y, &s0, &t0, &s1, &t1
+        );
 
         stbtt_FreeSDF(glyph, nullptr);
 
@@ -124,8 +160,15 @@ void Font::bake_character(int codepoint) {
     stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
     int width = 0, height = 0;  // Assume 0, because glyph can be null
-    unsigned char* glyph = stbtt_GetCodepointSDF(&info, sf, codepoint, padding, on_edge_value,
-            static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr);
+    unsigned char* glyph = stbtt_GetCodepointSDF(
+        &info, sf, codepoint, padding, on_edge_value,
+        static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr
+    );
+
+    if (glyph == nullptr) {
+        DEB_ERROR("Couldn't bake character with codepoint: `{}`", codepoint);
+        return;
+    }
 
     if (bake_context.x + width > bitmap_size) {
         bake_context.y += bake_context.max_row_height;
@@ -134,8 +177,10 @@ void Font::bake_character(int codepoint) {
     }
 
     float s0, t0, s1, t1;
-    blit_glyph(bake_context.bitmap, bitmap_size, bitmap_size, glyph, width, height, bake_context.x,
-            bake_context.y, &s0, &t0, &s1, &t1);
+    blit_glyph(
+        bake_context.bitmap, bitmap_size, bitmap_size, glyph, width, height, bake_context.x,
+        bake_context.y, &s0, &t0, &s1, &t1
+    );
 
     stbtt_FreeSDF(glyph, nullptr);
 
@@ -156,34 +201,6 @@ void Font::bake_character(int codepoint) {
     ASSERT(glyphs.count(codepoint) == 0, "There should be only one of each glyph");
 
     glyphs[codepoint] = gl;
-}
-
-void Font::end_baking() {
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, bitmap_size, bitmap_size);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bitmap_size, bitmap_size, GL_RED, GL_UNSIGNED_BYTE, bake_context.bitmap);
-    LOG_ALLOCATION(bitmap_size * bitmap_size * 4)
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-#ifdef PLATFORM_GAME_DEBUG
-    const std::string file_name = "bitmap_" + name + ".png";
-    if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
-        DEB_CRITICAL("Failed to create png file `{}`, exiting...", file_name);
-        exit(1);
-    }
-#endif
-
-    delete[] bake_context.bitmap;
-
-    DEB_DEBUG("End baking font `{}`", name);
 }
 
 void Font::render(std::string_view string, size_t* out_size, float** out_buffer) {
@@ -290,12 +307,10 @@ const char* Font::get_file_data(std::string_view file_path) {
 
 void Font::blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsigned char* glyph,
         int width, int height, int dest_x, int dest_y, float* s0, float* t0, float* s1, float* t1) {
-    if (glyph != nullptr) {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                const size_t index = static_cast<size_t>((y + dest_y) * dest_width + (x + dest_x));
-                dest[index] = glyph[y * width + x];
-            }
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            const size_t index = static_cast<size_t>((y + dest_y) * dest_width + (x + dest_x));
+            dest[index] = glyph[y * width + x];
         }
     }
 

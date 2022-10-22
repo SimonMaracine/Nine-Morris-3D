@@ -92,6 +92,8 @@ void StandardGameScene::on_stop() {
         save_game();
     }
 
+    timer = Timer {};
+
 #ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = false;
 #endif
@@ -100,8 +102,6 @@ void StandardGameScene::on_stop() {
     app->gui_renderer->clear();
 
     made_first_move = false;
-
-    // TODO stop timer here?
 
     if (loader != nullptr) {
         if (loader->joinable()) {

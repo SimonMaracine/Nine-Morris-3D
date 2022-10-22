@@ -261,7 +261,6 @@ void Framebuffer::blit(Framebuffer* draw_framebuffer, int width, int height) {
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
-    // TODO don't know, if needed
     glDrawBuffers(draw_framebuffer->color_attachments.size(), COLOR_ATTACHMENTS);
 }
 
