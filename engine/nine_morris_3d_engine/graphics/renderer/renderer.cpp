@@ -266,11 +266,6 @@ void Renderer::render() {
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
 
-    // Render skybox
-    if (storage.skybox_texture != nullptr) {
-        draw_skybox();
-    }
-
     // Render all normal models
     draw_models();
 
@@ -283,7 +278,12 @@ void Renderer::render() {
     }
 #endif
 
-    // Render quads
+    // Render the skybox last (but before quads)
+    if (storage.skybox_texture != nullptr) {
+        draw_skybox();
+    }
+
+    // Render 3D quads
     draw_quads();
 
     // Blit the scene texture result to an intermediate texture resolving anti-aliasing
@@ -473,7 +473,9 @@ void Renderer::draw_origin() {
     storage.origin_vertex_array->bind();
 
     glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
     glDrawArrays(GL_LINES, 0, 6);
+
     glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 #endif
@@ -489,11 +491,9 @@ void Renderer::draw_skybox() {
     storage.skybox_texture->bind(0);
 
     glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    glDepthMask(GL_FALSE);
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    glDepthMask(GL_TRUE);
     glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 
@@ -538,7 +538,9 @@ void Renderer::draw_model_with_outline(const Model* model) {
 
         // Render without output to red
         glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
         glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
+
         glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 

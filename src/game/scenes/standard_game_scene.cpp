@@ -142,6 +142,9 @@ void StandardGameScene::on_update() {
         camera.update(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
     }
 
+    board.pieces.at(0).show_outline = true;
+    board.pieces.at(0).model->outline_color = glm::vec3(0.2f, 0.1f, 1.0f);
+
     board.update_nodes(app->renderer->get_hovered_id());
     board.update_pieces(app->renderer->get_hovered_id());
 

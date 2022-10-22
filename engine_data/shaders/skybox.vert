@@ -8,5 +8,7 @@ uniform mat4 u_projection_view_matrix;
 
 void main() {
     v_texture_coordinate = a_position;
-    gl_Position = u_projection_view_matrix * vec4(a_position, 1.0);
+    vec4 position = u_projection_view_matrix * vec4(a_position, 1.0);
+    position.z = position.w - 0.01;
+    gl_Position = position;
 }

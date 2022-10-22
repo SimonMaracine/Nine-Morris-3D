@@ -4,7 +4,7 @@
 
 constexpr float FOV = 45.0f;
 constexpr float NEAR = 0.1f;
-constexpr float FAR = 70.0f;
+constexpr float FAR = 90.0f;
 
 class Camera {  // TODO maybe refactor camera using quaternions
 public:
