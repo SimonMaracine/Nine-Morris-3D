@@ -2,6 +2,8 @@
 #include "nine_morris_3d_engine/other/paths.h"
 #include "nine_morris_3d_engine/other/user_data.h"
 
+static std::string app_name;
+
 #if defined(PLATFORM_GAME_DEBUG)
     // Use relative path for both operating systems
     static std::string path_for_logs_impl(std::string_view file) noexcept(false) {
@@ -44,8 +46,6 @@
 #endif
 
 namespace paths {
-    static std::string app_name;
-
     void initialize(std::string_view application_name) {
         app_name = application_name;
     }

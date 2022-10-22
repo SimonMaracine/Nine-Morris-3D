@@ -2,9 +2,9 @@
 
 ## Linux release
 
-    mkdir build-release  
-    cd build-release  
-    cmake .. -D CMAKE_BUILD_TYPE=Release  
+    mkdir build-release
+    cd build-release
+    cmake .. -D CMAKE_BUILD_TYPE=Release
     cmake --build .
 
 ## Windows release
@@ -19,17 +19,17 @@
 
 ## Linux debug
 
-    cd scripts  
-    setup.sh  
-    build.sh  
+    cd scripts
+    setup.sh
+    build.sh
     # test.sh
 
 ## Windows debug
 
 #### Visual Studio Code
-    cd scripts  
-    Setup.bat  
-    Build.bat  
+    cd scripts
+    Setup.bat
+    Build.bat
     :: Test.bat
 
 #### Visual Studio

@@ -4,18 +4,10 @@
 #include "nine_morris_3d_engine/other/logging.h"
 
 #if defined(PLATFORM_GAME_DEBUG)
-    #ifdef PRINT_GPU_RAM_ALLOCATED
-        #define LOG_ALLOCATION(bytes) \
-            if (!_gpu_mem_counter.stopped) { \
-                DEB_DEBUG("GPU: Allocated {} bytes ({} MiB)", (bytes), (bytes) / 1049000.0f); \
-                _gpu_mem_counter.bytes_allocated += (bytes); \
-            }
-    #else
-        #define LOG_ALLOCATION(bytes) \
-            if (!_gpu_mem_counter.stopped) { \
-                _gpu_mem_counter.bytes_allocated += (bytes); \
-            }
-    #endif
+    #define LOG_ALLOCATION(bytes) \
+        if (!_gpu_mem_counter.stopped) { \
+            _gpu_mem_counter.bytes_allocated += (bytes); \
+        }
 
     #define LOG_TOTAL_GPU_MEMORY_ALLOCATED() \
         if (!_gpu_mem_counter.stopped) { \
