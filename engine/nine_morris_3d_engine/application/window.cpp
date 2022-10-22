@@ -184,7 +184,7 @@ unsigned int Window::add_cursor(std::unique_ptr<TextureData> cursor, int x_hotsp
     );
 
     if (glfw_cursor == nullptr) {
-        REL_ERROR("Could not create custom cursor '{}'", cursor->get_file_path());
+        REL_ERROR("Could not create custom cursor `{}`", cursor->get_file_path());
     }
 
     static unsigned int id = 0;

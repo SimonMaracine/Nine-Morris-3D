@@ -216,7 +216,7 @@ namespace save_load {
 
         if (!file.is_open()) {
             throw SaveFileNotOpenError(
-                "Could not open last save game file '" + std::string(SAVE_GAME_FILE) + "' for writing"
+                "Could not open last save game file `" + std::string(SAVE_GAME_FILE) + "` for writing"
             );
         }
 
@@ -227,7 +227,7 @@ namespace save_load {
             throw SaveFileError(e.what());
         }
 
-        DEB_INFO("Saved game to file '{}'", SAVE_GAME_FILE);
+        DEB_INFO("Saved game to file `{}`", SAVE_GAME_FILE);
     }
 
     void load_game_from_file(SavedGame& saved_game) noexcept(false) {
@@ -237,7 +237,7 @@ namespace save_load {
 
         if (!file.is_open()) {
             throw SaveFileNotOpenError(
-                "Could not open last save game file '" + std::string(SAVE_GAME_FILE) + "'"
+                "Could not open last save game file `" + std::string(SAVE_GAME_FILE) + "`"
             );
         }
 
@@ -250,14 +250,14 @@ namespace save_load {
             throw SaveFileError(e.what());
         }
 
-        DEB_INFO("Loaded game from file '{}'", SAVE_GAME_FILE);
+        DEB_INFO("Loaded game from file `{}`", SAVE_GAME_FILE);
     }
 
     void delete_save_game_file(std::string_view file_path) {
         if (remove(file_path.data()) != 0) {
-            REL_INFO("Could not delete save game file '{}'", file_path);
+            REL_INFO("Could not delete save game file `{}`", file_path);
         } else {
-            REL_INFO("Deleted save game file '{}'", file_path);
+            REL_INFO("Deleted save game file `{}`", file_path);
         }
     }
 

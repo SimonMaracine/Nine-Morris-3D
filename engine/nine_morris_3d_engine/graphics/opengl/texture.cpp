@@ -72,7 +72,7 @@ static void configure_filter_and_wrap(const TextureSpecification& specification)
 }
 
 Texture::Texture(std::string_view file_path, const TextureSpecification& specification) {
-    DEB_DEBUG("Loading texture '{}'...", file_path);
+    DEB_DEBUG("Loading texture `{}`...", file_path);
 
     stbi_set_flip_vertically_on_load(1);
 
@@ -80,7 +80,7 @@ Texture::Texture(std::string_view file_path, const TextureSpecification& specifi
     stbi_uc* data = stbi_load(file_path.data(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture '{}', exiting...", file_path);
+        REL_CRITICAL("Could not load texture `{}`, exiting...", file_path);
         exit(1);
     }
 
@@ -105,7 +105,7 @@ Texture::Texture(std::string_view file_path, const TextureSpecification& specifi
 }
 
 Texture::Texture(encrypt::EncryptedFile file_path, const TextureSpecification& specification) {
-    DEB_DEBUG("Loading texture '{}'...", file_path);
+    DEB_DEBUG("Loading texture `{}`...", file_path);
 
     cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
@@ -115,7 +115,7 @@ Texture::Texture(encrypt::EncryptedFile file_path, const TextureSpecification& s
     stbi_uc* data = stbi_load_from_memory(buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture '{}', exiting...", file_path);
+        REL_CRITICAL("Could not load texture `{}`, exiting...", file_path);
         exit(1);
     }
 
@@ -195,12 +195,12 @@ Texture3D::Texture3D(const char** file_paths) {
     stbi_uc* data[6];
 
     for (size_t i = 0; i < 6; i++) {
-        DEB_DEBUG("Loading texture '{}'...", file_paths[i]);
+        DEB_DEBUG("Loading texture `{}`...", file_paths[i]);
 
         data[i] = stbi_load(file_paths[i], &width, &height, &channels, 4);
 
         if (data == nullptr) {
-            REL_CRITICAL("Could not load texture '{}', exiting...", file_paths[i]);
+            REL_CRITICAL("Could not load texture `{}`, exiting...", file_paths[i]);
             exit(1);
         }
     }

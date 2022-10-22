@@ -1,5 +1,5 @@
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "nine_morris_3d_engine/application/platform.h"
@@ -11,13 +11,34 @@
 #define LOG_PATTERN_DEBUG "%^[%l] [th %t] [%H:%M:%S]%$ %v"
 #define LOG_PATTERN_RELEASE "%^[%l] [th %t] [%!:%#] [%c]%$ %v"
 
-/* SPDLOG_TRACE, SPDLOG_DEBUG, SPDLOG_INFO,
-SPDLOG_WARN, SPDLOG_ERROR, SPDLOG_CRITICAL */
+#define FILE_SIZE 1048576 * 2  // 2 MiB
+#define ROTATING_FILES 2  // 3 total log files
+
+/*
+SPDLOG_TRACE,
+SPDLOG_DEBUG,
+SPDLOG_INFO,
+SPDLOG_WARN,
+SPDLOG_ERROR,
+SPDLOG_CRITICAL
+*/
+
+static std::shared_ptr<spdlog::logger> global_logger;
+
+#if defined(PLATFORM_GAME_RELEASE)
+static void set_fallback_logger(const char* message) {
+    global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
+    global_logger->set_pattern(LOG_PATTERN_RELEASE);
+    global_logger->set_level(spdlog::level::trace);
+
+    spdlog::set_default_logger(global_logger);
+
+    spdlog::error("Using fallback logger (console): {}", message);
+}
+#endif
 
 namespace logging {
-    static std::shared_ptr<spdlog::logger> global_logger;
-
-    void initialize(std::string_view log_file) {
+    void initialize_for_application(std::string_view log_file) {
 #if defined(PLATFORM_GAME_DEBUG)
         global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
         global_logger->set_pattern(LOG_PATTERN_DEBUG);
@@ -28,29 +49,18 @@ namespace logging {
         static_cast<void>(log_file);  // Trick the compiler that we do use log_file
 #elif defined(PLATFORM_GAME_RELEASE)
         std::string file_path;
+
         try {
             file_path = paths::path_for_logs(log_file);
         } catch (const user_data::UserNameError& e) {
-            global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
-            global_logger->set_pattern(LOG_PATTERN_RELEASE);
-            global_logger->set_level(spdlog::level::trace);
-
-            spdlog::error("Using fallback logger (console)");
-
-            spdlog::set_default_logger(global_logger);
+            set_fallback_logger(e.what());
             return;
         }
 
         try {
-            global_logger = spdlog::basic_logger_mt("Release Logger [File]", file_path, false);
+            global_logger = spdlog::rotating_logger_mt("Release Logger [File]", file_path, FILE_SIZE, ROTATING_FILES);
         } catch (const spdlog::spdlog_ex& e) {
-            global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
-            global_logger->set_pattern(LOG_PATTERN_RELEASE);
-            global_logger->set_level(spdlog::level::trace);
-
-            spdlog::error("Using fallback logger (console): {}", e.what());
-
-            spdlog::set_default_logger(global_logger);
+            set_fallback_logger(e.what());
             return;
         }
 
@@ -71,15 +81,14 @@ namespace logging {
                 try {
                     file_path = paths::path_for_logs(info_file);
                 } catch (const user_data::UserNameError& e) {
-                    REL_ERROR("{}", e.what());
-                    REL_ERROR("Could not create info file");
+                    REL_ERROR("Could not create info file: {}", e.what());
                     break;
                 }
 
                 std::ofstream file {file_path, std::ios::trunc};
 
                 if (!file.is_open()) {
-                    REL_ERROR("Could not open file '{}' for writing", file_path);
+                    REL_ERROR("Could not open file `{}` for writing", file_path);
                     break;
                 }
 

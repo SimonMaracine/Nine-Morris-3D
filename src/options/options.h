@@ -42,7 +42,7 @@ namespace options {
 
         if (!file.is_open()) {
             throw OptionsFileNotOpenError(
-                "Could not open options file '" + file_path + "' for writing"
+                "Could not open options file `" + file_path + "` for writing"
             );
         }
 
@@ -53,7 +53,7 @@ namespace options {
             throw OptionsFileError(e.what());
         }
 
-        DEB_INFO("Saved options to file '{}'", file_path);
+        DEB_INFO("Saved options to file `{}`", file_path);
     }
 
     template<typename OptionsType>
@@ -65,7 +65,7 @@ namespace options {
 
         if (!file.is_open()) {
             throw OptionsFileNotOpenError(
-                "Could not open options file '" + file_path + "'"
+                "Could not open options file `" + file_path + "`"
             );
         }
 
@@ -88,7 +88,7 @@ namespace options {
 
         options = temporary;
 
-        DEB_INFO("Loaded options from file '{}'", file_path);
+        DEB_INFO("Loaded options from file `{}`", file_path);
     }
 
     template<typename OptionsType>
@@ -99,7 +99,7 @@ namespace options {
 
         if (!file.is_open()) {
             throw OptionsFileNotOpenError(
-                "Could not open options file '" + file_path + "' for writing"
+                "Could not open options file `" + file_path + "` for writing"
             );
         }
 
@@ -112,7 +112,7 @@ namespace options {
             throw OptionsFileError(e.what());
         }
 
-        DEB_INFO("Created options file '{}'", file_path);
+        DEB_INFO("Created options file `{}`", file_path);
     }
 
     template<typename OptionsType>

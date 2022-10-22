@@ -15,7 +15,7 @@ namespace encrypt {
         std::ifstream file {std::string(file_path), std::ios::binary};
 
         if (!file.is_open()) {
-            REL_CRITICAL("Could not open encrypted file '{}', exiting...", file_path);
+            REL_CRITICAL("Could not open encrypted file `{}`, exiting...", file_path);
             exit(1);
         }
 

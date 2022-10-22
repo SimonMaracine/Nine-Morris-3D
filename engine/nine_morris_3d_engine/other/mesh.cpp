@@ -10,7 +10,7 @@
 
 namespace mesh {
     std::shared_ptr<Mesh<PTN>> load_model_VPTN(std::string_view file_path, bool flip_winding) {
-        DEB_DEBUG("Loading PTN model '{}'...", file_path);
+        DEB_DEBUG("Loading PTN model `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -21,7 +21,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
+            REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
@@ -68,7 +68,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh<PTN>> load_model_PTN(encrypt::EncryptedFile file_path, bool flip_winding) {
-        DEB_DEBUG("Loading PTN model '{}'...", file_path);
+        DEB_DEBUG("Loading PTN model `{}`...", file_path);
 
         const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
@@ -82,7 +82,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
+            REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
@@ -129,7 +129,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh<P>> load_model_P(std::string_view file_path, bool flip_winding) {
-        DEB_DEBUG("Loading P model '{}'...", file_path);
+        DEB_DEBUG("Loading P model `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -140,7 +140,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
+            REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
@@ -176,7 +176,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh<P>> load_model_P(encrypt::EncryptedFile file_path, bool flip_winding) {
-        DEB_DEBUG("Loading P model '{}'...", file_path);
+        DEB_DEBUG("Loading P model `{}`...", file_path);
 
         const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
@@ -190,7 +190,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
+            REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
@@ -226,7 +226,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh<PTNT>> load_model_PTNT(std::string_view file_path, bool flip_winding) {
-        DEB_DEBUG("Loading PTNT model '{}'...", file_path);
+        DEB_DEBUG("Loading PTNT model `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -237,7 +237,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
+            REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }
@@ -290,7 +290,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh<PTNT>> load_model_PTNT(encrypt::EncryptedFile file_path, bool flip_winding) {
-        DEB_DEBUG("Loading PTNT model '{}'...", file_path);
+        DEB_DEBUG("Loading PTNT model `{}`...", file_path);
 
         const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
@@ -304,7 +304,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model '{}', exiting...", file_path);
+            REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
             exit(1);
         }

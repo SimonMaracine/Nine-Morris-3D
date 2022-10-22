@@ -6,10 +6,10 @@
 #include <cppblowfish/cppblowfish.h>
 
 static void open_file(const std::string& file_name, unsigned char** out, size_t* size) {
-    std::ifstream file (file_name, std::ios::binary);
+    std::ifstream file {file_name, std::ios::binary};
 
     if (!file.is_open()) {
-        std::cout << "Could not open file '" << file_name << "'" << std::endl;
+        std::cout << "Could not open file `" << file_name << "`" << std::endl;
         exit(1);
     }
 
@@ -25,10 +25,10 @@ static void open_file(const std::string& file_name, unsigned char** out, size_t*
 }
 
 static void write_file(const std::string& file_name, const unsigned char* data, size_t size) {
-    std::ofstream file (file_name, std::ios::binary | std::ios::trunc);
+    std::ofstream file {file_name, std::ios::binary | std::ios::trunc};
 
     if (!file.is_open()) {
-        std::cout << "Could not open file '" << file_name << "' for writing" << std::endl;
+        std::cout << "Could not open file `" << file_name << "` for writing" << std::endl;
         exit(1);
     }
 
@@ -37,7 +37,7 @@ static void write_file(const std::string& file_name, const unsigned char* data, 
 
 int main(int argc, char** argv) {
     if (argc != 4) {
-        std::cout << "Invalid arguments" << std::endl;
+        std::cout << "Invalid arguments\n";
         std::cout << "Usage: encrypter-helper <input_file> <output_file> <key>" << std::endl;
         exit(1);
     }
@@ -46,15 +46,15 @@ int main(int argc, char** argv) {
     const std::string output_file = argv[2];
     const std::string key = argv[3];
 
-    cppblowfish::BlowfishContext blowfish (key);
+    cppblowfish::BlowfishContext blowfish {key};
 
     unsigned char* contents = nullptr;
     size_t contents_size = 0;
     open_file(input_file, &contents, &contents_size);
 
-    cppblowfish::Buffer input (contents, contents_size);
+    cppblowfish::Buffer input {contents, contents_size};
     delete[] contents;
-    
+
     cppblowfish::Buffer cipher;
     blowfish.encrypt(input, cipher);
 
@@ -63,5 +63,5 @@ int main(int argc, char** argv) {
     write_file(output_file, buffer, cipher.size() + cppblowfish::BUFFER_OFFSET);
     delete[] buffer;
 
-    std::cout << "Successfully written cipher to '" << output_file << "'" << std::endl;
+    std::cout << "Successfully written cipher to `" << output_file << "`" << std::endl;
 }

@@ -175,7 +175,7 @@ void Shader::recompile() {
     for (const std::string& uniform : uniforms) {
         const GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
-            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name);
+            DEB_ERROR("Uniform variable `{}` in shader `{}` not found", uniform.c_str(), name);
             continue;
         }
         cache[uniform] = location;
@@ -197,7 +197,7 @@ GLint Shader::get_uniform_location(std::string_view name) {
     try {
         return cache.at(std::string(name));
     } catch (const std::out_of_range&) {
-        DEB_CRITICAL("Uniform variable '{}' unspecified for shader '{}', exiting...", name.data(), this->name);
+        DEB_CRITICAL("Uniform variable `{}` unspecified for shader `{}`, exiting...", name.data(), this->name);
         exit(1);
     }
 #endif
@@ -207,7 +207,7 @@ void Shader::check_and_cache_uniforms(const std::vector<std::string>& uniforms) 
     for (const auto& uniform : uniforms) {
         const GLint location = glGetUniformLocation(program, uniform.c_str());
         if (location == -1) {
-            DEB_ERROR("Uniform variable '{}' in shader '{}' not found", uniform.c_str(), name);
+            DEB_ERROR("Uniform variable `{}` in shader `{}` not found", uniform.c_str(), name);
             continue;
         }
         cache[uniform] = location;
@@ -224,7 +224,7 @@ GLuint Shader::compile_shader(std::string_view source_path, GLenum type, std::st
             source.append(line).append("\n");
         }
     } else {
-        REL_CRITICAL("Could not open file '{}', exiting...", source_path);
+        REL_CRITICAL("Could not open file `{}`, exiting...", source_path);
         exit(1);
     }
     file.close();
@@ -271,12 +271,12 @@ bool Shader::check_compilation(GLuint shader, GLenum type, std::string_view name
         }
 
         if (log_length == 0) {
-            REL_CRITICAL("{} shader compilation error with no message in shader '{}'", t, name);
+            REL_CRITICAL("{} shader compilation error with no message in shader `{}`", t, name);
         } else {
             char* log_message = new char[log_length];
             glGetShaderInfoLog(shader, log_length, nullptr, log_message);
 
-            REL_CRITICAL("{} shader compilation error in shader '{}'\n{}", t, name, log_message);
+            REL_CRITICAL("{} shader compilation error in shader `{}`\n{}", t, name, log_message);
             delete[] log_message;
         }
 
@@ -295,12 +295,12 @@ bool Shader::check_linking(GLuint program, std::string_view name) {
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
         if (log_length == 0) {
-            REL_CRITICAL("Shader linking error with no message in shader '{}'", name);
+            REL_CRITICAL("Shader linking error with no message in shader `{}`", name);
         } else {
             char* log_message = new char[log_length];
             glGetProgramInfoLog(program, log_length, nullptr, log_message);
 
-            REL_CRITICAL("Shader linking error in shader '{}'\n{}", name, log_message);
+            REL_CRITICAL("Shader linking error in shader `{}`\n{}", name, log_message);
             delete[] log_message;
         }
 

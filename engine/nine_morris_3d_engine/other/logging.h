@@ -36,6 +36,6 @@ namespace logging {
         None, Console, File
     };
 
-    void initialize(std::string_view log_file);
+    void initialize_for_application(std::string_view log_file);
     void log_opengl_and_dependencies_info(LogTarget target, std::string_view info_file);
 }
