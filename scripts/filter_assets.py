@@ -46,11 +46,10 @@ def visit_directory(directory: str):
     os.chdir("..")
 
 
-if __name__ == "__main__":
-    os.chdir("..")
-    print("Copying...")
-    copy_tree(DATA, DATA_FILTERED)
-    copy_tree(ENGINE_DATA, ENGINE_DATA_FILTERED)
-    visit_directory(DATA_FILTERED)
-    visit_directory(ENGINE_DATA_FILTERED)
-    print("Done")
+os.chdir("..")
+print("Copying...")
+copy_tree(DATA, DATA_FILTERED)
+copy_tree(ENGINE_DATA, ENGINE_DATA_FILTERED)
+visit_directory(DATA_FILTERED)
+visit_directory(ENGINE_DATA_FILTERED)
+print("Done")
