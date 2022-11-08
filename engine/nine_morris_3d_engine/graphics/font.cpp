@@ -111,8 +111,7 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         );
 
         if (glyph == nullptr) {
-            DEB_ERROR("Couldn't bake character with codepoint: `{}`", codepoint);
-            continue;
+            DEB_WARN("Couldn't bake character with codepoint: `{}`; still adding to map...", codepoint);
         }
 
         if (bake_context.x + width > bitmap_size) {
@@ -166,8 +165,7 @@ void Font::bake_character(int codepoint) {
     );
 
     if (glyph == nullptr) {
-        DEB_ERROR("Couldn't bake character with codepoint: `{}`", codepoint);
-        return;
+        DEB_WARN("Couldn't bake character with codepoint: `{}`; still adding to map...", codepoint);
     }
 
     if (bake_context.x + width > bitmap_size) {
@@ -213,13 +211,13 @@ void Font::render(std::string_view string, size_t* out_size, float** out_buffer)
 
     int x = 0;
 
-    for (char16_t character : utf16_string) {
+    for (const char16_t character : utf16_string) {
         const Font::Glyph* glyph;
 
         try {
-            glyph = &get_glyphs().at(character);
+            glyph = &glyphs.at(character);
         } catch (const std::out_of_range&) {
-            glyph = &get_glyphs()[ERROR_CHARACTER];
+            glyph = &glyphs[ERROR_CHARACTER];
         }
 
         const float x0 = static_cast<float>(x + glyph->xoff);
@@ -270,13 +268,13 @@ void Font::get_string_size(std::string_view string, float scale, int* out_width,
     int x = 0;
     *out_height = 0;
 
-    for (char16_t character : utf16_string) {
+    for (const char16_t character : utf16_string) {
         const Font::Glyph* glyph;
 
         try {
-            glyph = &get_glyphs().at(character);
+            glyph = &glyphs.at(character);
         } catch (const std::out_of_range&) {
-            glyph = &get_glyphs()[ERROR_CHARACTER];
+            glyph = &glyphs[ERROR_CHARACTER];
         }
 
         x += glyph->xadvance;
