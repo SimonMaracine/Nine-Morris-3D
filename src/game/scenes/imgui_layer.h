@@ -203,16 +203,16 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
             }
             if (ImGui::BeginMenu("Players", can_change)) {
                 if (ImGui::BeginMenu("White")) {
-                    static int option = 0;
+                    static int option = data.options.white_player;
 
-                    if (ImGui::RadioButton("Human", &option, 0)) {
+                    if (ImGui::RadioButton("Human", &option, 1)) {
                         data.options.white_player = game_options::HUMAN;
                         scene->game.white_player = GamePlayer::Human;
                         scene->game.reset_player(GamePlayer::Human);
 
                         DEB_DEBUG("Set white player to human");
                     }
-                    if (ImGui::RadioButton("Computer", &option, 1)) {
+                    if (ImGui::RadioButton("Computer", &option, 2)) {
                         data.options.white_player = game_options::COMPUTER;
                         scene->game.white_player = GamePlayer::Computer;
                         scene->game.reset_player(GamePlayer::Computer);
@@ -224,16 +224,16 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                     HOVERING_GUI();
                 }
                 if (ImGui::BeginMenu("Black")) {
-                    static int option = 1;
+                    static int option = data.options.black_player;
 
-                    if (ImGui::RadioButton("Human", &option, 0)) {
+                    if (ImGui::RadioButton("Human", &option, 1)) {
                         data.options.black_player = game_options::HUMAN;
                         scene->game.black_player = GamePlayer::Human;
                         scene->game.reset_player(GamePlayer::Human);
 
                         DEB_DEBUG("Set black player to human");
                     }
-                    if (ImGui::RadioButton("Computer", &option, 1)) {
+                    if (ImGui::RadioButton("Computer", &option, 2)) {
                         data.options.black_player = game_options::COMPUTER;
                         scene->game.black_player = GamePlayer::Computer;
                         scene->game.reset_player(GamePlayer::Computer);
