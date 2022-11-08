@@ -18,7 +18,7 @@ void StandardGameScene::on_start() {
 
     imgui_layer.update();
 
-    undo_redo_state = UndoRedoState {};
+    undo_redo_state = UndoRedoState<StandardBoard> {};
 
     setup_entities();
 
@@ -42,7 +42,7 @@ void StandardGameScene::on_start() {
         &minimax_thread
     };
 
-    board.undo_redo_state = &undo_redo_state;
+    // board.undo_redo_state = &undo_redo_state;
     board.keyboard = &keyboard;
     board.game_context = &game;
     board.camera = &camera;
@@ -111,7 +111,7 @@ void StandardGameScene::on_stop() {
 }
 
 void StandardGameScene::on_awake() {
-    imgui_layer = ImGuiLayer<StandardGameScene> {app, this};
+    imgui_layer = ImGuiLayer<StandardGameScene, StandardBoard> {app, this};
 
     initialize_rendering_board();
     initialize_rendering_board_paint();
@@ -1143,7 +1143,7 @@ void StandardGameScene::update_after_computer_move(bool switched_turn) {
 void StandardGameScene::save_game() {
     board.finalize_pieces_state();
 
-    save_load::SavedGame saved_game;
+    save_load::SavedGame<StandardBoard> saved_game;
     saved_game.board = board;
     saved_game.camera = camera;
     saved_game.time = timer.get_time_raw();
@@ -1160,12 +1160,35 @@ void StandardGameScene::save_game() {
         save_load::save_game_to_file(saved_game);
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_ERROR("{}", e.what());
+        REL_ERROR("Could not save game");
 
         save_load::handle_save_file_not_open_error(app->data().application_name);
-
-        REL_ERROR("Could not save game");
     } catch (const save_load::SaveFileError& e) {
         REL_ERROR("{}", e.what());
         REL_ERROR("Could not save game");
     }
+}
+
+void StandardGameScene::load_game() {
+
+}
+
+void StandardGameScene::undo() {
+    ASSERT(!undo_redo_state.undo.empty(), "Undo history must not be empty");
+
+    if (!board.next_move) {
+        DEB_WARN("Cannot undo when pieces are in air");
+        return;
+    }
+
+    UndoRedoState<StandardBoard>::State current_state = { board, camera, game.state };
+    UndoRedoState<StandardBoard>::State& undo_state_top = undo_redo_state.undo.back();
+
+    board = undo_state_top.board;
+
+
+}
+
+void StandardGameScene::redo() {
+
 }

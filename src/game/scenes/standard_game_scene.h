@@ -72,16 +72,19 @@ struct StandardGameScene : public Scene {
     void update_after_computer_move(bool switched_turn);
 
     void save_game();
+    void load_game();
+    void undo();
+    void redo();
 
     std::unique_ptr<assets_load::CustomLoader> loader;
 
     // ImGui
-    ImGuiLayer<StandardGameScene> imgui_layer;
+    ImGuiLayer<StandardGameScene, StandardBoard> imgui_layer;
 
     // Game-related
     Camera camera;
     StandardBoard board;
-    UndoRedoState undo_redo_state;
+    UndoRedoState<StandardBoard> undo_redo_state;
     KeyboardControls keyboard;
     GameContext game;
     MinimaxThread minimax_thread;

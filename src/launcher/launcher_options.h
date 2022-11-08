@@ -3,7 +3,7 @@
 #include "other/constants.h"
 
 namespace launcher_options {
-    static constexpr const char* LAUNCHER_OPTIONS_FILE = "launcher_options.dat";
+    static const char* LAUNCHER_OPTIONS_FILE = "launcher_options.dat";
 
     static constexpr int NORMAL = static_cast<int>(TextureQuality::Normal);
     static constexpr int LOW = static_cast<int>(TextureQuality::Low);

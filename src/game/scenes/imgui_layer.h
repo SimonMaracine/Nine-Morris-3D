@@ -11,11 +11,11 @@
 #define RESET_HOVERING_GUI() hovering_gui = false
 #define HOVERING_GUI() hovering_gui = true
 
-template<typename SceneType>
+template<typename S, typename B>
 class ImGuiLayer {
 public:
     ImGuiLayer() = default;
-    ImGuiLayer(Application* app, SceneType* scene);
+    ImGuiLayer(Application* app, S* scene);
     ~ImGuiLayer() = default;
 
     void update();
@@ -45,7 +45,7 @@ private:
     void draw_game_over_message(std::string_view message1, std::string_view message2);
 
     Application* app = nullptr;
-    SceneType* scene = nullptr;
+    S* scene = nullptr;
 
     std::string last_save_game_date = save_load::NO_LAST_GAME;
 
@@ -61,8 +61,8 @@ private:
 #endif
 };
 
-template<typename SceneType>
-ImGuiLayer<SceneType>::ImGuiLayer(Application* app, SceneType* scene)
+template<typename S, typename B>
+ImGuiLayer<S, B>::ImGuiLayer(Application* app, S* scene)
     : app(app), scene(scene) {
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
@@ -105,15 +105,16 @@ ImGuiLayer<SceneType>::ImGuiLayer(Application* app, SceneType* scene)
     style.GrabRounding = 8;
 }
 
-template<typename SceneType>
-void ImGuiLayer<SceneType>::update() {
-    save_load::SavedGame saved_game;
+template<typename S, typename B>
+void ImGuiLayer<S, B>::update() {
+    save_load::SavedGame<B> saved_game;
     try {
         save_load::load_game_from_file(saved_game);
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_WARN("{}", e.what());
-        save_load::handle_save_file_not_open_error(app->data().application_name);
         REL_WARN("Could not load game");
+
+        save_load::handle_save_file_not_open_error(app->data().application_name);
     } catch (const save_load::SaveFileError& e) {
         REL_WARN("{}", e.what());  // TODO maybe delete file
         REL_WARN("Could not load game");
@@ -132,8 +133,8 @@ void ImGuiLayer<SceneType>::update() {
     }
 }
 
-template<typename SceneType>
-void ImGuiLayer<SceneType>::reset() {
+template<typename S, typename B>
+void ImGuiLayer<S, B>::reset() {
     hovering_gui = false;
     can_undo = false;
     can_redo = false;
@@ -144,8 +145,8 @@ void ImGuiLayer<SceneType>::reset() {
     show_no_last_game = false;
 }
 
-template<typename SceneType>
-void ImGuiLayer<SceneType>::draw_menu_bar() {
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_menu_bar() {
     auto& data = app->user_data<Data>();
 
     RESET_HOVERING_GUI();
@@ -174,7 +175,7 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
             if (ImGui::MenuItem("Save Game", nullptr, false)) {
                 scene->board.finalize_pieces_state();
 
-                save_load::SavedGame saved_game;
+                save_load::SavedGame<B> saved_game;
                 saved_game.board = scene->board;
                 saved_game.camera = scene->camera;
                 saved_game.time = scene->timer.get_time_raw();
@@ -192,8 +193,9 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
                     save_load::save_game_to_file(saved_game);
                 } catch (const save_load::SaveFileNotOpenError& e) {
                     REL_ERROR("{}", e.what());
-                    save_load::handle_save_file_not_open_error(app->data().application_name);
                     REL_ERROR("Could not save game");
+
+                    save_load::handle_save_file_not_open_error(app->data().application_name);
                 } catch (const save_load::SaveFileError& e) {
                     REL_ERROR("{}", e.what());
                     REL_ERROR("Could not save game");
@@ -416,8 +418,8 @@ void ImGuiLayer<SceneType>::draw_menu_bar() {
     }
 }
 
-template<typename SceneType>
-void ImGuiLayer<SceneType>::draw_info() {
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_info() {
     ImGui::PushFont(app->user_data<Data>().imgui_info_font);
     ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
     ImGui::Text("FPS: %f", app->get_fps());
@@ -432,8 +434,8 @@ void ImGuiLayer<SceneType>::draw_info() {
     ImGui::PopFont();
 }
 
-template<typename SceneType>
-void ImGuiLayer<SceneType>::draw_game_over() {
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_game_over() {
     ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("Game Over");
 
@@ -493,8 +495,8 @@ void ImGuiLayer<SceneType>::draw_game_over() {
     ImGui::PopFont();
 }
 
-template<typename SceneType>
-void ImGuiLayer<SceneType>::draw_about() {
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_about() {
     ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("About Nine Morris 3D");
 
@@ -540,8 +542,8 @@ void ImGuiLayer<SceneType>::draw_about() {
     ImGui::PopFont();
 }
 
-template<typename SceneType>
-void ImGuiLayer<SceneType>::draw_could_not_load_game() {
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_could_not_load_game() {
     ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("Error Loading Game");
 
@@ -586,8 +588,8 @@ void ImGuiLayer<SceneType>::draw_could_not_load_game() {
     ImGui::PopFont();
 }
 
-template<typename SceneType>
-void ImGuiLayer<SceneType>::draw_no_last_game() {
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_no_last_game() {
     ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup("No Last Game");
 
@@ -630,8 +632,8 @@ void ImGuiLayer<SceneType>::draw_no_last_game() {
 }
 
 #ifdef PLATFORM_GAME_DEBUG
-template<typename SceneType>
-void ImGuiLayer<SceneType>::draw_debug() {
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_debug() {
     if (!show_about) {
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %f", app->get_fps());
@@ -785,8 +787,8 @@ void ImGuiLayer<SceneType>::draw_debug() {
 }
 #endif
 
-template<typename SceneType>
-void ImGuiLayer<SceneType>::draw_game_over_message(std::string_view message1, std::string_view message2) {
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_game_over_message(std::string_view message1, std::string_view message2) {
     ImGui::Dummy(ImVec2(20.0f, 0.0f)); ImGui::SameLine();
 
     const float window_width = ImGui::GetWindowSize().x;

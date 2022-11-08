@@ -2,16 +2,26 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/boards/generic_board.h"
-#include "game/game_context.h"
+#include "other/constants.h"
 
+template<typename B>
 struct UndoRedoState {
     struct State {
-        GenericBoard board;
+        B board;
         Camera camera;
         GameState game_state;
+
+        template<typename Archive>
+        void serialize(Archive& archive) {
+            archive(board, camera, game_state);
+        }
     };
 
     std::vector<State> undo;
     std::vector<State> redo;
+
+    template<typename Archive>
+    void serialize(Archive& archive) {
+        archive(undo, redo);
+    }
 };

@@ -52,7 +52,7 @@ bool GameContext::end_computer_move() {
     }
 
     const bool result = board->switched_turn;
-    board->switched_turn = false;  // These need to be resetted
+    board->switched_turn = false;  // These need to be reset
     board->must_take_piece_or_took_piece = false;
 
     return result;

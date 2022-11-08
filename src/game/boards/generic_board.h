@@ -5,11 +5,10 @@
 #include "game/piece.h"
 #include "game/node.h"
 #include "game/threefold_repetition_history.h"
+#include "game/game_context.h"
 #include "other/constants.h"
 
-struct UndoRedoState;
 class KeyboardControls;
-class GameContext;
 
 struct GenericBoard {
     GenericBoard() = default;
@@ -17,7 +16,7 @@ struct GenericBoard {
         : app(app) {}
     virtual ~GenericBoard() = default;
 
-    virtual void click(identifier::Id) {}
+    virtual void click(identifier::Id) {}  // TODO maybe can be pure virtual
     virtual std::tuple<bool, bool, bool> release(identifier::Id) { return {}; }
     virtual void computer_place_piece(size_t) {}
     virtual void computer_move_piece(size_t, size_t) {}
@@ -40,7 +39,6 @@ struct GenericBoard {
     void unselect_other_pieces(size_t currently_selected_piece_index_index);
     void update_piece_outlines();
     void remember_position_and_check_repetition(size_t piece_index, size_t node_index);
-    void remember_state();
     void piece_arrive_at_node(size_t piece_index);
     void prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity);
     void prepare_piece_for_three_step_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity,
@@ -74,7 +72,6 @@ struct GenericBoard {
 
     ThreefoldRepetitionHistory repetition_history;
 
-    UndoRedoState* undo_redo_state = nullptr;
     KeyboardControls* keyboard = nullptr;
     GameContext* game_context = nullptr;
     Camera* camera = nullptr;
@@ -85,10 +82,4 @@ struct GenericBoard {
     bool did_action = false;
     bool switched_turn = false;
     bool must_take_piece_or_took_piece = false;
-
-    friend class GameContext;  // TODO see if needed
-    friend class KeyboardControls;
-
-    template<typename Archive>
-    friend void serialize(Archive& archive, GenericBoard& board);
 };

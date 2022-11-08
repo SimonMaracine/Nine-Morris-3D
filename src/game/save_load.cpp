@@ -67,7 +67,7 @@ void serialize(Archive& archive, Camera& camera) {
 
 /*
 Unserialized fields:
-    undo_redo_state, keyboard, game_context
+    keyboard, game_context, camera
 */
 template<typename Archive>
 void serialize(Archive& archive, GenericBoard& board) {
@@ -95,6 +95,10 @@ void serialize(Archive& archive, GenericBoard& board) {
     );
 }
 
+/*
+Unserialized fields:
+    undo_redo_state
+*/
 template<typename Archive>
 void serialize(Archive& archive, StandardBoard& board) {
     archive(
@@ -114,16 +118,6 @@ void serialize(Archive& archive, ThreefoldRepetitionHistory& repetition_history)
 template<typename Archive>
 void serialize(Archive& archive, ThreefoldRepetitionHistory::PositionPlusInfo& position_plus_info) {
     archive(position_plus_info.position, position_plus_info.piece_index, position_plus_info.node_index);
-}
-
-template<typename Archive>
-void serialize(Archive& archive, UndoRedoState& undo_redo_state) {
-    archive(undo_redo_state.undo, undo_redo_state.redo);
-}
-
-template<typename Archive>
-void serialize(Archive& archive, UndoRedoState::State& state) {
-    archive(state.board, state.camera, state.game_state);
 }
 
 template<typename Archive>
@@ -184,76 +178,7 @@ namespace glm {
 }
 
 namespace save_load {
-    template<typename Archive>
-    void serialize(Archive& archive, SavedGame& saved_game) {
-        archive(
-            saved_game.board,
-            saved_game.camera,
-            saved_game.time,
-            saved_game.date,
-            saved_game.undo_redo_state,
-            saved_game.white_player,
-            saved_game.black_player
-        );
-    }
-
-    static std::string get_file_path() noexcept(false) {
-        std::string file_path;
-
-        try {
-            file_path = paths::path_for_saved_data(SAVE_GAME_FILE);
-        } catch (const user_data::UserNameError& e) {
-            throw SaveFileError(e.what());
-        }
-
-        return file_path;
-    }
-
-    void save_game_to_file(const SavedGame& saved_game) noexcept(false) {
-        const std::string file_path = get_file_path();
-
-        std::ofstream file {file_path, std::ios::binary | std::ios::trunc};
-
-        if (!file.is_open()) {
-            throw SaveFileNotOpenError(
-                "Could not open last save game file `" + std::string(SAVE_GAME_FILE) + "` for writing"
-            );
-        }
-
-        try {
-            cereal::BinaryOutputArchive output {file};
-            output(saved_game);
-        } catch (const std::exception& e) {  // Just to be sure...
-            throw SaveFileError(e.what());
-        }
-
-        DEB_INFO("Saved game to file `{}`", SAVE_GAME_FILE);
-    }
-
-    void load_game_from_file(SavedGame& saved_game) noexcept(false) {
-        const std::string file_path = get_file_path();
-
-        std::ifstream file {file_path, std::ios::binary};
-
-        if (!file.is_open()) {
-            throw SaveFileNotOpenError(
-                "Could not open last save game file `" + std::string(SAVE_GAME_FILE) + "`"
-            );
-        }
-
-        try {
-            cereal::BinaryInputArchive input {file};
-            input(saved_game);
-        } catch (const cereal::Exception& e) {
-            throw SaveFileError(e.what());
-        } catch (const std::exception& e) {
-            throw SaveFileError(e.what());
-        }
-
-        DEB_INFO("Loaded game from file `{}`", SAVE_GAME_FILE);
-    }
-
-    void delete_save_game_file(std::string_view file_path) {
+    void delete_save_game_file(std::string_view file_path) {  // TODO use this, or delete it
         if (remove(file_path.data()) != 0) {
             REL_INFO("Could not delete save game file `{}`", file_path);
         } else {

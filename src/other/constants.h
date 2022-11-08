@@ -103,7 +103,7 @@ enum class GamePlayer {
     Computer
 };
 
-enum class GameState {
+enum class GameState {  // TODO this can be better
     MaybeNextPlayer,
     HumanBeginMove,
     HumanThinkingMove,

@@ -1,6 +1,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "game/boards/standard_board.h"
+#include "game/undo_redo_state.h"
 #include "game/piece.h"
 
 void StandardBoard::click(identifier::Id hovered_id) {
@@ -743,4 +744,17 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
     } else {
         return false;
     }
+}
+
+void StandardBoard::remember_state() {
+    const UndoRedoState<StandardBoard>::State state = {
+        *this,
+        *camera,
+        game_context->state
+    };
+
+    undo_redo_state->undo.push_back(state);
+    undo_redo_state->redo.clear();
+
+    DEB_DEBUG("Pushed new state");
 }

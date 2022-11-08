@@ -1,8 +1,8 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "game/boards/generic_board.h"
-#include "game/undo_redo_state.h"
 #include "other/constants.h"
+// TODO more
 
 GamePosition GenericBoard::get_position() {
     GamePosition position;
@@ -369,19 +369,6 @@ void GenericBoard::remember_position_and_check_repetition(size_t piece_index, si
     }
 
     repetition_history.ones.push_back(current_position);
-}
-
-void GenericBoard::remember_state() {
-    const UndoRedoState::State state = {
-        *this,
-        *camera,
-        game_context->state
-    };
-
-    undo_redo_state->undo.push_back(state);
-    undo_redo_state->redo.clear();
-
-    DEB_DEBUG("Pushed new state");
 }
 
 void GenericBoard::piece_arrive_at_node(size_t piece_index) {

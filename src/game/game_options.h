@@ -3,7 +3,7 @@
 #include "other/constants.h"
 
 namespace game_options {
-    static constexpr const char* GAME_OPTIONS_FILE = "options.dat";
+    static const char* GAME_OPTIONS_FILE = "options.dat";
 
     static constexpr int NONE = static_cast<int>(Skybox::None);
     static constexpr int FIELD = static_cast<int>(Skybox::Field);

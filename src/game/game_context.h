@@ -2,7 +2,7 @@
 
 #include "other/constants.h"
 
-class GenericBoard;
+struct GenericBoard;
 class MinimaxThread;
 
 class GameContext {

@@ -1,8 +1,8 @@
 #pragma once
 
-class GenericBoard;
-
 #include "other/constants.h"
+
+struct GenericBoard;
 
 class MinimaxThread {
 public:

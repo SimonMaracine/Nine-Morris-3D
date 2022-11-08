@@ -76,7 +76,7 @@ private:
 
     bool auto_move_zoom = false;
     float target_distance_to_point = 0.0f;
-    float auto_zoom_velocity = 0.0f;    
+    float auto_zoom_velocity = 0.0f;
     float virtual_distance_to_point = 0.0f;
 
     glm::vec3 cached_towards_position = glm::vec3(0.0f);
