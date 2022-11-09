@@ -31,11 +31,11 @@ namespace options {
         return file_path;
     }
 
-    template<typename OptionsType>
-    using _Validate = std::function<std::pair<bool, std::string>(const OptionsType&)>;
+    template<typename Opt>
+    using _Validate = std::function<std::pair<bool, std::string>(const Opt&)>;
 
-    template<typename OptionsType>
-    void save_options_to_file(const OptionsType& options, std::string_view options_file_name) noexcept(false) {
+    template<typename Opt>
+    void save_options_to_file(const Opt& options, std::string_view options_file_name) noexcept(false) {
         const std::string file_path = get_file_path(options_file_name);
 
         std::ofstream file {file_path, std::ios::binary | std::ios::trunc};
@@ -56,9 +56,9 @@ namespace options {
         DEB_INFO("Saved options to file `{}`", file_path);
     }
 
-    template<typename OptionsType>
-    void load_options_from_file(OptionsType& options, std::string_view options_file_name,
-            const _Validate<OptionsType>& validate) noexcept(false) {
+    template<typename Opt>
+    void load_options_from_file(Opt& options, std::string_view options_file_name,
+            const _Validate<Opt>& validate) noexcept(false) {
         const std::string file_path = get_file_path(options_file_name);
 
         std::ifstream file {file_path, std::ios::binary};
@@ -69,7 +69,7 @@ namespace options {
             );
         }
 
-        OptionsType temporary;
+        Opt temporary;
 
         try {
             cereal::BinaryInputArchive input {file};
@@ -91,7 +91,7 @@ namespace options {
         DEB_INFO("Loaded options from file `{}`", file_path);
     }
 
-    template<typename OptionsType>
+    template<typename Opt>
     void create_options_file(std::string_view options_file_name) noexcept(false) {
         const std::string file_path = get_file_path(options_file_name);
 
@@ -103,7 +103,7 @@ namespace options {
             );
         }
 
-        OptionsType options;
+        Opt options;
 
         try {
             cereal::BinaryOutputArchive output {file};
@@ -115,7 +115,7 @@ namespace options {
         DEB_INFO("Created options file `{}`", file_path);
     }
 
-    template<typename OptionsType>
+    template<typename Opt>
     void handle_options_file_not_open_error(std::string_view options_file_name, std::string_view app_name) {
         bool user_data_directory;
 
@@ -133,7 +133,7 @@ namespace options {
                 const bool success = user_data::create_user_data_directory(app_name);
                 if (success) {
                     try {
-                        create_options_file<OptionsType>(options_file_name);
+                        create_options_file<Opt>(options_file_name);
                     } catch (const OptionsFileNotOpenError& e) {
                         REL_ERROR("{}", e.what());
                         return;
@@ -151,7 +151,7 @@ namespace options {
             }
         } else {
             try {
-                create_options_file<OptionsType>(options_file_name);
+                create_options_file<Opt>(options_file_name);
             } catch (const OptionsFileNotOpenError& e) {
                 REL_ERROR("{}", e.what());
                 return;
