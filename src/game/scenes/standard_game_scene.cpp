@@ -9,7 +9,7 @@
 #include "game/node.h"
 #include "other/constants.h"
 #include "other/data.h"
-#include "options/options.h"
+#include "other/options.h"
 
 using namespace encrypt;
 

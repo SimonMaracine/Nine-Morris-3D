@@ -12,17 +12,26 @@ namespace game_options {
     static constexpr int HUMAN = static_cast<int>(GamePlayer::Human);
     static constexpr int COMPUTER = static_cast<int>(GamePlayer::Computer);
 
+    static constexpr bool DEFAULT_VSYNC = true;
+    static constexpr bool DEFAULT_SAVE_ON_EXIT = true;
+    static constexpr int DEFAULT_SKYBOX = FIELD;
+    static constexpr bool DEFAULT_CUSTOM_CURSOR = true;
+    static constexpr float DEFAULT_SENSITIVITY = 1.0f;
+    static constexpr bool DEFAULT_HIDE_TIMER = false;
+    static constexpr bool DEFAULT_LABELED_BOARD = true;
+    static constexpr int DEFAULT_WHITE_PLAYER = HUMAN;
+    static constexpr int DEFAULT_BLACK_PLAYER = COMPUTER;
+
     struct GameOptions {
-        // These are default values
-        bool vsync = true;
-        bool save_on_exit = true;
-        int skybox = FIELD;
-        bool custom_cursor = true;
-        float sensitivity = 1.0f;
-        bool hide_timer = false;
-        bool labeled_board = true;
-        int white_player = HUMAN;
-        int black_player = COMPUTER;
+        bool vsync = DEFAULT_VSYNC;
+        bool save_on_exit = DEFAULT_SAVE_ON_EXIT;
+        int skybox = DEFAULT_SKYBOX;
+        bool custom_cursor = DEFAULT_CUSTOM_CURSOR;
+        float sensitivity = DEFAULT_SENSITIVITY;
+        bool hide_timer = DEFAULT_HIDE_TIMER;
+        bool labeled_board = DEFAULT_LABELED_BOARD;
+        int white_player = DEFAULT_WHITE_PLAYER;
+        int black_player = DEFAULT_BLACK_PLAYER;
 
         template<typename Archive>
         void serialize(Archive& archive) {

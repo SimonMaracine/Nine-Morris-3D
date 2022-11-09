@@ -6,7 +6,7 @@
 #include "game/post_processing/blur.h"
 #include "game/post_processing/combine.h"
 #include "launcher/launcher_options.h"
-#include "options/options.h"
+#include "other/options.h"
 #include "other/data.h"
 
 namespace game {
