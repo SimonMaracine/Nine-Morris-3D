@@ -12,6 +12,7 @@
 #include "other/constants.h"
 #include "other/data.h"
 #include "other/options.h"
+#include "other/save_load_gracefully.h"
 
 using namespace encrypt;
 
@@ -66,28 +67,9 @@ void StandardGameScene::on_stop() {
 
     imgui_layer.reset();
 
-    // Save game options
-    using namespace game_options;
-
-    try {
-        options::save_options_to_file<GameOptions>(data.options, GAME_OPTIONS_FILE);  // TODO put this into a function
-    } catch (const options::OptionsFileNotOpenError& e) {
-        REL_ERROR("{}", e.what());
-
-        options::handle_options_file_not_open_error<GameOptions>(
-            GAME_OPTIONS_FILE, app->data().application_name
-        );
-    } catch (const options::OptionsFileError& e) {
-        REL_ERROR("{}", e.what());
-
-        try {
-            options::create_options_file<GameOptions>(GAME_OPTIONS_FILE);
-        } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("{}", e.what());
-        } catch (const options::OptionsFileError& e) {
-            REL_ERROR("{}", e.what());
-        }
-    }
+    save_load_gracefully::save_to_file<game_options::GameOptions>(
+        game_options::GAME_OPTIONS_FILE, data.options, app
+    );
 
     // Save this game
     if (data.options.save_on_exit && !app->running && made_first_move) {

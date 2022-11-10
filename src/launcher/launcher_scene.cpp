@@ -6,6 +6,7 @@
 #include "other/data.h"
 #include "other/display_manager.h"
 #include "other/constants.h"
+#include "other/save_load_gracefully.h"
 
 static const char* SPLASH_SCREEN = ENCR("data/textures/splash_screen/launcher/launcher_splash_screen.png");
 static const char* OPEN_SANS = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
@@ -235,6 +236,8 @@ static void help_marker(const char* text) {
 }
 
 void LauncherScene::on_start() {
+    auto& data = app->user_data<Data>();
+
     using namespace encrypt;
     using namespace paths;
 
@@ -297,32 +300,9 @@ void LauncherScene::on_start() {
     background = std::make_shared<gui::Image>(app->res.texture["splash_screen"_h]);
     app->gui_renderer->add_widget(background);
 
-    // Load options
-    using namespace launcher_options;
-
-    auto& data = app->user_data<Data>();
-
-    try {
-        options::load_options_from_file<LauncherOptions>(
-            data.launcher_options, LAUNCHER_OPTIONS_FILE, validate
-        );
-    } catch (const options::OptionsFileNotOpenError& e) {
-        REL_ERROR("{}", e.what());
-
-        options::handle_options_file_not_open_error<LauncherOptions>(
-            LAUNCHER_OPTIONS_FILE, app->data().application_name
-        );
-    } catch (const options::OptionsFileError& e) {
-        REL_ERROR("{}", e.what());
-
-        try {
-            options::create_options_file<LauncherOptions>(LAUNCHER_OPTIONS_FILE);
-        } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("{}", e.what());
-        } catch (const options::OptionsFileError& e) {
-            REL_ERROR("{}", e.what());
-        }
-    }
+    save_load_gracefully::load_from_file<launcher_options::LauncherOptions>(
+        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate, app
+    );
 
     // Set events
     app->evt.sink<WindowClosedEvent>().connect<&LauncherScene::on_window_closed>(*this);
@@ -334,28 +314,9 @@ void LauncherScene::on_start() {
 void LauncherScene::on_stop() {
     auto& data = app->user_data<Data>();
 
-    // Save options
-    using namespace launcher_options;
-
-    try {
-        options::save_options_to_file<LauncherOptions>(data.launcher_options, LAUNCHER_OPTIONS_FILE);
-    } catch (const options::OptionsFileNotOpenError& e) {
-        REL_ERROR("{}", e.what());
-
-        options::handle_options_file_not_open_error<LauncherOptions>(
-            LAUNCHER_OPTIONS_FILE, app->data().application_name
-        );
-    } catch (const options::OptionsFileError& e) {
-        REL_ERROR("{}", e.what());
-
-        try {
-            options::create_options_file<LauncherOptions>(LAUNCHER_OPTIONS_FILE);
-        } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("{}", e.what());
-        } catch (const options::OptionsFileError& e) {
-            REL_ERROR("{}", e.what());
-        }
-    }
+    save_load_gracefully::save_to_file<launcher_options::LauncherOptions>(
+        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, app
+    );
 }
 
 void LauncherScene::on_update() {

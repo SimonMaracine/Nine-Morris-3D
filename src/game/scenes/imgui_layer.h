@@ -643,7 +643,7 @@ void ImGuiLayer<S, B>::draw_debug() {
             }
 
             char text[32];
-            sprintf(text, "%.3f", time);
+            snprintf(text, 32, "%.3f", time);
 
             ImGui::Begin("Frame Time");
             ImGui::PlotLines("time (ms)", frames.data(), FRAMES_SIZE, 0, text, 0.0f, 50.0f, ImVec2(200, 60));

@@ -1,6 +1,6 @@
 #pragma once
 
-class Application;
+#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 class Timer {
 public:
