@@ -508,7 +508,7 @@ void ImGuiLayer<S, B>::draw_about() {
             // gui_layer->active = true;
             // app->update_active_layers();
 
-            scene->timer.reset_last_time(app->window->get_time());
+            scene->timer.reset_last_time();
         }
 
         ImGui::EndPopup();
@@ -554,7 +554,7 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
             // gui_layer->active = true;
             // app->update_active_layers();
 
-            scene->timer.reset_last_time(app->window->get_time());
+            scene->timer.reset_last_time();
         }
 
         ImGui::EndPopup();
@@ -597,7 +597,7 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
             // gui_layer->active = true;
             // app->update_active_layers();
 
-            scene->timer.reset_last_time(app->window->get_time());
+            scene->timer.reset_last_time();
         }
 
         ImGui::EndPopup();

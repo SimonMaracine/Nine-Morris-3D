@@ -2,19 +2,21 @@
 
 #include "game/timer.h"
 
-void Timer::update(double time) {  // TODO refactor a bit
+void Timer::update() {
     static double total_time = 0.0;
 
+    const double current_time = app->window->get_time();
+
     if (running) {
-        const double elapsed_time = time - last_time;
-        last_time = time;
+        const double elapsed_time = current_time - last_time;
+        last_time = current_time;
 
         total_time += elapsed_time;
 
         while (true) {
             if (total_time > 0.1) {
                 total_time -= 0.1;
-                this->time++;
+                time++;
             } else {
                 break;
             }
@@ -22,11 +24,13 @@ void Timer::update(double time) {  // TODO refactor a bit
     }
 }
 
-void Timer::start(double time) {
+void Timer::start() {
     ASSERT(!running, "Cannot start, if it is already running");
 
-    running = true;
-    last_time = time;
+    const double current_time = app->window->get_time();
+
+    running = current_time;
+    last_time = current_time;
 
     DEB_DEBUG("Started timer");
 }
@@ -37,29 +41,24 @@ void Timer::stop() {
     DEB_DEBUG("Stopped timer");
 }
 
-void Timer::reset_last_time(double time) {
-    last_time = time;
+void Timer::reset_last_time() {
+    const double current_time = app->window->get_time();
+
+    last_time = current_time;
 }
 
 bool Timer::is_running() {
     return running;
 }
 
-unsigned int Timer::get_time_seconds() {
-    return time / 10;
-}
-
-unsigned int Timer::get_time_raw() {
+unsigned int Timer::get_time() {
     return time;
 }
 
-void Timer::get_time_formatted(char* formatted_time) {
-    const unsigned int minutes = get_time_seconds() / 60;
-    const unsigned int seconds = get_time_seconds() % 60;
+void Timer::get_time_formatted(char* out_formatted_time) {
+    const unsigned int time_in_seconds = time / 10;
+    const unsigned int minutes = time_in_seconds / 60;
+    const unsigned int seconds = time_in_seconds % 60;
 
-    sprintf(formatted_time, "%.2u:%.2u", minutes, seconds);
-}
-
-void Timer::set_time(unsigned int time) {
-    this->time = time;
+    snprintf(out_formatted_time, 32, "%.2u:%.2u", minutes, seconds);
 }

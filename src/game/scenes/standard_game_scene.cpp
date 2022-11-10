@@ -44,6 +44,8 @@ void StandardGameScene::on_start() {
         &minimax_thread
     };
 
+    timer = Timer {app};
+
     board.app = app;
     board.keyboard = &keyboard;
     board.camera = &camera;
@@ -55,8 +57,6 @@ void StandardGameScene::on_start() {
     app->renderer->origin = true;
     app->renderer->add_quad(data.quad_cache["light_bulb"_h]);
 #endif
-
-    timer = Timer {};
 
     camera.go_towards_position(default_camera_position);
 }
@@ -149,7 +149,7 @@ void StandardGameScene::on_update() {
 
     update_game_state();
 
-    timer.update(app->window->get_time());
+    timer.update();
 
     update_timer_text();
     update_wait_indicator();
@@ -855,6 +855,9 @@ void StandardGameScene::setup_light() {
 void StandardGameScene::setup_camera() {
     auto& data = app->user_data<Data>();
 
+    constexpr float PITCH = 47.0f;
+    constexpr float DISTANCE_TO_POINT = 8.0f;
+
     const glm::mat4 projection = glm::perspective(
         glm::radians(FOV),
         static_cast<float>(app->data().width) / app->data().height,
@@ -863,9 +866,9 @@ void StandardGameScene::setup_camera() {
 
     camera = Camera {
         data.options.sensitivity,
-        47.0f,
+        PITCH,
         glm::vec3(0.0f),
-        8.0f,
+        DISTANCE_TO_POINT,
         projection
     };
 
@@ -873,9 +876,9 @@ void StandardGameScene::setup_camera() {
 
     camera = Camera {
         data.options.sensitivity,
-        47.0f,
+        PITCH,
         glm::vec3(0.0f),
-        8.7f,
+        DISTANCE_TO_POINT + 0.7f,
         projection
     };
 
@@ -1100,7 +1103,7 @@ void StandardGameScene::update_after_human_move(bool did_action, bool switched_t
     }
 
     if (did_action && !made_first_move && !timer.is_running()) {
-        timer.start(app->window->get_time());
+        timer.start();
         made_first_move = true;
     }
 
@@ -1124,7 +1127,7 @@ void StandardGameScene::update_after_computer_move(bool switched_turn) {
     game.state = GameState::ComputerDoingMove;
 
     if (!made_first_move && !timer.is_running()) {
-        timer.start(app->window->get_time());
+        timer.start();
         made_first_move = true;
     }
 
@@ -1149,7 +1152,7 @@ void StandardGameScene::save_game() {
     save_load::SavedGame<StandardBoardSerialized> saved_game;
     saved_game.board_serialized = serialized;
     saved_game.camera = camera;
-    saved_game.time = timer.get_time_raw();
+    saved_game.time = timer.get_time();
 
     time_t current;
     time(&current);
@@ -1204,7 +1207,7 @@ void StandardGameScene::undo() {
     made_first_move = board.not_placed_pieces_count != 18;
 
     if (undo_game_over) {
-        timer.start(app->window->get_time());
+        timer.start();
     }
 
     update_cursor();
