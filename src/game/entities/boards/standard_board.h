@@ -2,17 +2,21 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/boards/generic_board.h"
-#include "game/piece.h"
-#include "game/node.h"
+#include "game/entities/board.h"
+#include "game/entities/piece.h"
+#include "game/entities/node.h"
+#include "game/entities/serialization/standard_board_serialized.h"
 #include "game/undo_redo_state.h"
 #include "other/constants.h"
 
-struct StandardBoard : public GenericBoard {
+struct StandardBoard : public Board {
     StandardBoard() = default;
-    StandardBoard(Application* app)
-        : GenericBoard(app) {}
-    ~StandardBoard() = default;
+    virtual ~StandardBoard() = default;
+
+    StandardBoard(const StandardBoard&) = delete;
+    StandardBoard(StandardBoard&&) = default;
+    StandardBoard& operator=(const StandardBoard&) = delete;
+    StandardBoard& operator=(StandardBoard&&) = default;
 
     virtual void click(identifier::Id hovered_id) override;
     virtual std::tuple<bool, bool, bool> release(identifier::Id hovered_id) override;
@@ -32,6 +36,8 @@ struct StandardBoard : public GenericBoard {
     void check_player_number_of_pieces(BoardPlayer player);
     bool is_player_blocked(BoardPlayer player);
     void remember_state();
+    void to_serialized(StandardBoardSerialized& serialized);
+    void from_serialized(const StandardBoardSerialized& serialized);
 
     unsigned int white_pieces_count = 0;  // Number of pieces on the board
     unsigned int black_pieces_count = 0;
@@ -39,5 +45,5 @@ struct StandardBoard : public GenericBoard {
 
     unsigned int turns_without_mills = 0;
 
-    UndoRedoState<StandardBoard>* undo_redo_state = nullptr;
+    UndoRedoState<StandardBoardSerialized>* undo_redo_state = nullptr;
 };

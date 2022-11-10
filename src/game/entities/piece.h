@@ -2,14 +2,19 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
+#include "game/piece_movement.h"
 #include "other/constants.h"
-
-struct Node;
 
 struct Piece {
     Piece() = default;
-    Piece(size_t index, PieceType type, std::shared_ptr<Renderer::Model> model)  // FIXME id? store it in Renderer::Model?
+    Piece(size_t index, PieceType type, std::shared_ptr<Renderer::Model> model)
         : index(index), type(type), model(model) {}
+    ~Piece() = default;
+
+    Piece(const Piece&) = delete;
+    Piece(Piece&&) = default;
+    Piece& operator=(const Piece&) = default;
+    Piece& operator=(Piece&&) = default;
 
     size_t index = NULL_INDEX;  // From 0 through 17 on standard game
 
@@ -20,16 +25,7 @@ struct Piece {
 
     size_t node_index = NULL_INDEX;  // Reference to the node on top of which it sits on
 
-    struct Movement {
-        PieceMovementType type = PieceMovementType::None;
-        glm::vec3 velocity = glm::vec3(0.0f);
-        glm::vec3 target = glm::vec3(0.0f);
-        glm::vec3 target0 = glm::vec3(0.0f);
-        glm::vec3 target1 = glm::vec3(0.0f);
-        bool reached_target0 = false;
-        bool reached_target1 = false;
-        bool moving = false;
-    } movement;
+    PieceMovement movement;
 
     bool show_outline = false;
     bool to_take = false;

@@ -2,18 +2,15 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "other/constants.h"
-
 template<typename B>
 struct UndoRedoState {
     struct State {
-        B board;
+        B board_serialized;
         Camera camera;
-        GameState game_state;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(board, camera, game_state);
+            archive(board_serialized, camera);
         }
     };
 

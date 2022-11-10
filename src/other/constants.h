@@ -16,6 +16,13 @@
 #define BLACK_PIECE_POSITION(i) glm::vec3(4.0f, PIECE_Y_FLOATING_POSITION, -2.0f + ((i) - 9) * 0.49f)
 #define RANDOM_PIECE_ROTATION() glm::vec3(0.0f, glm::radians(static_cast<float>(rand() % 360)), 0.0f)
 
+#define DEFAULT_BROWN ImVec4(0.647f, 0.4f, 0.212f, 1.0f)
+#define DARK_BROWN ImVec4(0.4f, 0.25f, 0.1f, 1.0f)
+#define LIGHT_BROWN ImVec4(0.68f, 0.48f, 0.22f, 1.0f)
+#define BEIGE ImVec4(0.961f, 0.875f, 0.733f, 1.0f)
+#define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
+#define TRANSPARENT_BACKGROUND ImVec4(0.058f, 0.058f, 0.058f, 0.74f)
+
 constexpr size_t NINE_MENS_MORRIS_MILLS = 16;
 constexpr size_t WINDMILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
@@ -103,7 +110,7 @@ enum class GamePlayer {
     Computer
 };
 
-enum class GameState {  // TODO this can be better
+enum class GameState {  // TODO this can be better + more states needed for Computer
     MaybeNextPlayer,
     HumanBeginMove,
     HumanThinkingMove,

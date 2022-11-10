@@ -1,5 +1,5 @@
 #include "game/minimax/minimax_thread.h"
-#include "game/boards/generic_board.h"
+#include "game/entities/board.h"
 
 MinimaxThread::~MinimaxThread() {
     join_thread();

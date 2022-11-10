@@ -1,8 +1,11 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/boards/standard_board.h"
+#include "game/entities/boards/standard_board.h"
+#include "game/entities/serialization/standard_board_serialized.h"
 #include "game/undo_redo_state.h"
-#include "game/piece.h"
+#include "game/entities/piece.h"
+#include "other/constants.h"
+#include "other/data.h"
 
 void StandardBoard::click(identifier::Id hovered_id) {
     // Check for clicked nodes
@@ -747,14 +750,121 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
 }
 
 void StandardBoard::remember_state() {
-    const UndoRedoState<StandardBoard>::State state = {
-        *this,
-        *camera,
-        game_context->state
-    };
+    StandardBoardSerialized serialized;
+    to_serialized(serialized);
 
-    undo_redo_state->undo.push_back(state);
+    const UndoRedoState<StandardBoardSerialized>::State current_state = { serialized, *camera };
+
+    undo_redo_state->undo.push_back(current_state);
     undo_redo_state->redo.clear();
 
-    DEB_DEBUG("Pushed new state");
+    DEB_DEBUG("Pushed new state onto undo stack and cleared redo stack");
+}
+
+void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
+
+    for (size_t i = 0; i < 24; i++) {
+        serialized.nodes.at(i) = NodeSerialized {};
+        serialized.nodes.at(i).index = nodes.at(i).index;
+        serialized.nodes.at(i).piece_index = nodes.at(i).piece_index;
+    }
+
+    for (auto& [index, piece] : pieces) {
+        serialized.pieces[index] = PieceSerialized {};
+        serialized.pieces.at(index).index = piece.index;
+        serialized.pieces.at(index).type = piece.type;
+        serialized.pieces.at(index).in_use = piece.in_use;
+        serialized.pieces.at(index).position = piece.model->position;
+        serialized.pieces.at(index).rotation = piece.model->rotation;
+        serialized.pieces.at(index).node_index = piece.node_index;
+        serialized.pieces.at(index).movement = piece.movement;
+        serialized.pieces.at(index).show_outline = piece.show_outline;
+        serialized.pieces.at(index).to_take = piece.to_take;
+        serialized.pieces.at(index).pending_remove = piece.pending_remove;
+    }
+
+    serialized.phase = phase;
+    serialized.turn = turn;
+    serialized.ending = ending;
+    serialized.must_take_piece = must_take_piece;
+    serialized.can_jump = can_jump;
+    serialized.repetition_history = repetition_history;
+    serialized.is_players_turn = is_players_turn;
+    serialized.did_action = did_action;  // TODO think if these are needed
+    serialized.switched_turn = switched_turn;
+    serialized.must_take_piece_or_took_piece = must_take_piece_or_took_piece;
+    serialized.white_pieces_count = white_pieces_count;
+    serialized.black_pieces_count = black_pieces_count;
+    serialized.not_placed_pieces_count = not_placed_pieces_count;
+    serialized.turns_without_mills = turns_without_mills;
+}
+
+void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
+    auto& data = app->user_data<Data>();
+
+    for (size_t i = 0; i < 24; i++) {
+        nodes.at(i).index = serialized.nodes.at(i).index;
+        nodes.at(i).piece_index = serialized.nodes.at(i).piece_index;
+    }
+
+    for (auto& [ser_index, ser_piece] : serialized.pieces) {
+        if (pieces.find(ser_index) != pieces.end()) {
+            pieces.at(ser_index).type = ser_piece.type;
+            pieces.at(ser_index).in_use = ser_piece.in_use;
+            pieces.at(ser_index).model->position = ser_piece.position;
+            pieces.at(ser_index).model->rotation = ser_piece.rotation;
+            pieces.at(ser_index).node_index = ser_piece.node_index;
+            pieces.at(ser_index).movement = ser_piece.movement;
+            pieces.at(ser_index).show_outline = ser_piece.show_outline;
+            pieces.at(ser_index).to_take = ser_piece.to_take;
+            pieces.at(ser_index).pending_remove = ser_piece.pending_remove;
+        } else {
+            Piece piece = Piece {
+                ser_index,
+                ser_piece.type,
+                data.model_cache[hs {"piece" + std::to_string(ser_index)}]
+            };
+
+            piece.model->position = ser_piece.position;
+            piece.model->rotation = ser_piece.rotation;
+            piece.model->vertex_array = app->res.vertex_array[hs {"piece_vertex_array" + std::to_string(ser_index)}];
+            piece.model->index_buffer = (
+                ser_piece.type == PieceType::White
+                    ?
+                    app->res.index_buffer["white_piece_index_buffer"_h]
+                    :
+                    app->res.index_buffer["black_piece_index_buffer"_h]
+            );
+            piece.model->scale = WORLD_SCALE;
+            piece.model->material = app->res.material_instance[hs {"piece_material_instance" + std::to_string(ser_index)}];
+            piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
+            piece.model->id = std::make_optional<identifier::Id>(data.piece_ids[ser_index]);
+            piece.model->cast_shadow = true;
+
+            app->renderer->add_model(piece.model);
+            pieces[ser_index] = piece;
+        }
+    }
+
+    for (auto& [index, piece] : pieces) {
+        if (serialized.pieces.find(index) == serialized.pieces.end()) {
+            app->renderer->remove_model(piece.model);
+            pieces.erase(index);
+        }
+    }
+
+    phase = serialized.phase;
+    turn = serialized.turn;
+    ending = serialized.ending;
+    must_take_piece = serialized.must_take_piece;
+    can_jump = serialized.can_jump;
+    repetition_history = serialized.repetition_history;
+    is_players_turn = serialized.is_players_turn;
+    did_action = serialized.did_action;  // TODO think if these are needed
+    switched_turn = serialized.switched_turn;
+    must_take_piece_or_took_piece = serialized.must_take_piece_or_took_piece;
+    white_pieces_count = serialized.white_pieces_count;
+    black_pieces_count = serialized.black_pieces_count;
+    not_placed_pieces_count = serialized.not_placed_pieces_count;
+    turns_without_mills = serialized.turns_without_mills;
 }

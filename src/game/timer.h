@@ -1,6 +1,6 @@
 #pragma once
 
-class Timer {
+class Timer {  // TODO refactor a bit
 public:
     Timer() = default;
     ~Timer() = default;

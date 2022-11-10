@@ -5,7 +5,7 @@
 #include "other/options.h"
 #include "other/data.h"
 #include "other/display_manager.h"
-#include "imgui_style/colors.h"
+#include "other/constants.h"
 
 static const char* SPLASH_SCREEN = ENCR("data/textures/splash_screen/launcher/launcher_splash_screen.png");
 static const char* OPEN_SANS = "data/fonts/OpenSans/OpenSans-Semibold.ttf";

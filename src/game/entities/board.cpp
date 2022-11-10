@@ -1,10 +1,12 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/boards/generic_board.h"
+#include "game/entities/board.h"
+#include "game/entities/node.h"
+#include "game/entities/piece.h"
+#include "game/piece_movement.h"
 #include "other/constants.h"
-// TODO more
 
-GamePosition GenericBoard::get_position() {
+GamePosition Board::get_position() {
     GamePosition position;
 
     for (const Node& node : nodes) {
@@ -20,7 +22,7 @@ GamePosition GenericBoard::get_position() {
     return position;
 }
 
-void GenericBoard::update_nodes(identifier::Id hovered_id) {
+void Board::update_nodes(identifier::Id hovered_id) {
     for (Node& node : nodes) {
         const bool hovered = node.model->id.value() == hovered_id;
         const bool highlight = (
@@ -36,7 +38,7 @@ void GenericBoard::update_nodes(identifier::Id hovered_id) {
     }
 }
 
-void GenericBoard::update_pieces(identifier::Id hovered_id) {
+void Board::update_pieces(identifier::Id hovered_id) {
     const float dt = app->get_delta();
 
     for (auto& [_, piece] : pieces) {
@@ -131,7 +133,7 @@ void GenericBoard::update_pieces(identifier::Id hovered_id) {
     }
 }
 
-void GenericBoard::finalize_pieces_state() {
+void Board::finalize_pieces_state() {
     std::vector<size_t> to_erase;
 
     for (const auto& [index, piece] : pieces) {
@@ -145,7 +147,7 @@ void GenericBoard::finalize_pieces_state() {
     }
 }
 
-size_t GenericBoard::new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index) {
+size_t Board::new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index) {
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
     for (auto& [index, piece] : pieces) {
@@ -168,7 +170,7 @@ size_t GenericBoard::new_piece_to_place(PieceType type, float x_pos, float z_pos
     return NULL_INDEX;
 }
 
-void GenericBoard::take_and_raise_piece(size_t piece_index) {
+void Board::take_and_raise_piece(size_t piece_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
@@ -183,7 +185,7 @@ void GenericBoard::take_and_raise_piece(size_t piece_index) {
     piece.pending_remove = true;
 }
 
-void GenericBoard::select_piece(size_t piece_index) {
+void Board::select_piece(size_t piece_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
@@ -198,7 +200,7 @@ void GenericBoard::select_piece(size_t piece_index) {
     }
 }
 
-void GenericBoard::set_pieces_show_outline(PieceType type, bool show) {
+void Board::set_pieces_show_outline(PieceType type, bool show) {
     for (auto& [_, piece] : pieces) {
         if (piece.type == type) {
             piece.show_outline = show;
@@ -206,7 +208,7 @@ void GenericBoard::set_pieces_show_outline(PieceType type, bool show) {
     }
 }
 
-void GenericBoard::set_pieces_to_take(PieceType type, bool take) {
+void Board::set_pieces_to_take(PieceType type, bool take) {
     for (auto& [_, piece] : pieces) {
         if (piece.type == type) {
             piece.to_take = take;
@@ -214,7 +216,7 @@ void GenericBoard::set_pieces_to_take(PieceType type, bool take) {
     }
 }
 
-void GenericBoard::game_over(const BoardEnding& ending, PieceType type_to_hide) {
+void Board::game_over(const BoardEnding& ending, PieceType type_to_hide) {
     phase = BoardPhase::GameOver;
     this->ending = ending;
     set_pieces_show_outline(type_to_hide, false);
@@ -234,7 +236,7 @@ void GenericBoard::game_over(const BoardEnding& ending, PieceType type_to_hide) 
     }
 }
 
-bool GenericBoard::is_windmill_made(size_t node_index, PieceType type, const size_t windmills[][3], size_t mills_count) {
+bool Board::is_windmill_made(size_t node_index, PieceType type, const size_t windmills[][3], size_t mills_count) {
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
     for (size_t i = 0; i < mills_count; i++) {
@@ -260,7 +262,7 @@ bool GenericBoard::is_windmill_made(size_t node_index, PieceType type, const siz
     return false;
 }
 
-size_t GenericBoard::number_of_pieces_in_windmills(PieceType type, const size_t windmills[][3], size_t mills_count) {
+size_t Board::number_of_pieces_in_windmills(PieceType type, const size_t windmills[][3], size_t mills_count) {
     std::vector<size_t> pieces_inside_mills;
 
     for (size_t i = 0; i < mills_count; i++) {
@@ -304,7 +306,7 @@ size_t GenericBoard::number_of_pieces_in_windmills(PieceType type, const size_t 
     return pieces_inside_mills.size();
 }
 
-void GenericBoard::unselect_other_pieces(size_t currently_selected_piece_index) {
+void Board::unselect_other_pieces(size_t currently_selected_piece_index) {
     ASSERT(currently_selected_piece_index != NULL_INDEX, "Invalid index");
 
     for (auto& [_, piece] : pieces) {
@@ -314,7 +316,7 @@ void GenericBoard::unselect_other_pieces(size_t currently_selected_piece_index) 
     }
 }
 
-void GenericBoard::update_piece_outlines() {
+void Board::update_piece_outlines() {
     if (phase == BoardPhase::MovePieces) {
         if (turn == BoardPlayer::White) {
             set_pieces_show_outline(PieceType::White, true);
@@ -326,7 +328,7 @@ void GenericBoard::update_piece_outlines() {
     }
 }
 
-void GenericBoard::remember_position_and_check_repetition(size_t piece_index, size_t node_index) {
+void Board::remember_position_and_check_repetition(size_t piece_index, size_t node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
@@ -371,7 +373,7 @@ void GenericBoard::remember_position_and_check_repetition(size_t piece_index, si
     repetition_history.ones.push_back(current_position);
 }
 
-void GenericBoard::piece_arrive_at_node(size_t piece_index) {
+void Board::piece_arrive_at_node(size_t piece_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
@@ -379,9 +381,9 @@ void GenericBoard::piece_arrive_at_node(size_t piece_index) {
     piece.model->position = piece.movement.target;
 
     // Reset all these movement variables
-    piece.movement = Piece::Movement {};
+    piece.movement = PieceMovement {};
 
-    // Remove piece, if set to remove
+    // Remove piece forever, if set to remove
     if (piece.pending_remove) {
         app->renderer->remove_model(piece.model);
         pieces.erase(piece.index);
@@ -390,27 +392,25 @@ void GenericBoard::piece_arrive_at_node(size_t piece_index) {
     CAN_MAKE_MOVE();
 }
 
-void GenericBoard::prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity) {
+void Board::prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
 
     piece.movement.target = target;
-
     piece.movement.velocity = velocity;
 
     piece.movement.type = PieceMovementType::Linear;
     piece.movement.moving = true;
 }
 
-void GenericBoard::prepare_piece_for_three_step_move(size_t piece_index, const glm::vec3& target,
+void Board::prepare_piece_for_three_step_move(size_t piece_index, const glm::vec3& target,
         const glm::vec3& velocity, const glm::vec3& target0, const glm::vec3& target1) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
 
     piece.movement.target = target;
-
     piece.movement.velocity = velocity;
     piece.movement.target0 = target0;
     piece.movement.target1 = target1;

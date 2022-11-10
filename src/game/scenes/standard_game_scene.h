@@ -3,7 +3,8 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "game/scenes/imgui_layer.h"
-#include "game/boards/standard_board.h"
+#include "game/entities/boards/standard_board.h"
+#include "game/entities/serialization/standard_board_serialized.h"
 #include "game/undo_redo_state.h"
 #include "game/keyboard_controls.h"
 #include "game/game_context.h"
@@ -79,12 +80,12 @@ struct StandardGameScene : public Scene {
     std::unique_ptr<assets_load::CustomLoader> loader;
 
     // ImGui
-    ImGuiLayer<StandardGameScene, StandardBoard> imgui_layer;
+    ImGuiLayer<StandardGameScene, StandardBoardSerialized> imgui_layer;
 
     // Game-related
     Camera camera;
     StandardBoard board;
-    UndoRedoState<StandardBoard> undo_redo_state;
+    UndoRedoState<StandardBoardSerialized> undo_redo_state;
     KeyboardControls keyboard;
     GameContext game;
     MinimaxThread minimax_thread;

@@ -1,7 +1,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "game/game_context.h"
-#include "game/boards/generic_board.h"
+#include "game/entities/board.h"
 #include "game/minimax/minimax_thread.h"
 #include "game/minimax/standard_game/minimax_standard_game.h"
 #include "other/constants.h"

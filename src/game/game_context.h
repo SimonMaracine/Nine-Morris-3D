@@ -2,13 +2,13 @@
 
 #include "other/constants.h"
 
-struct GenericBoard;
+struct Board;
 class MinimaxThread;
 
 class GameContext {
 public:
     GameContext() = default;
-    GameContext(GamePlayer white_player, GamePlayer black_player, GenericBoard* board, MinimaxThread* minimax_thread)
+    GameContext(GamePlayer white_player, GamePlayer black_player, Board* board, MinimaxThread* minimax_thread)
         : white_player(white_player), black_player(black_player), board(board), minimax_thread(minimax_thread) {}
     ~GameContext() = default;
 
@@ -24,6 +24,6 @@ public:
     GamePlayer black_player = GamePlayer::None;
     GameState state = GameState::MaybeNextPlayer;
 private:
-    GenericBoard* board = nullptr;
+    Board* board = nullptr;
     MinimaxThread* minimax_thread = nullptr;
 };

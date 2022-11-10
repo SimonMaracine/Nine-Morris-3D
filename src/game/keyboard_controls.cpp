@@ -1,8 +1,8 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
 #include "game/keyboard_controls.h"
-#include "game/boards/generic_board.h"
-#include "game/node.h"
+#include "game/entities/board.h"
+#include "game/entities/node.h"
 
 #define Y_POSITION 0.47f
 #define POSITION(index) (glm::vec3(NODE_POSITIONS[index].x, Y_POSITION, NODE_POSITIONS[index].z))
@@ -14,7 +14,7 @@ constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Right, KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down }
 };
 
-KeyboardControls::KeyboardControls(GenericBoard* board, std::shared_ptr<Renderer::Quad> quad)
+KeyboardControls::KeyboardControls(Application* app, Board* board, std::shared_ptr<Renderer::Quad> quad)
     : quad(quad), board(board) {
 
     for (size_t i = 0; i < 24; i++) {
@@ -26,9 +26,9 @@ KeyboardControls::KeyboardControls(GenericBoard* board, std::shared_ptr<Renderer
     quad->texture = (
         board->must_take_piece
             ?
-            board->app->res.texture["keyboard_controls_cross_texture"_h]
+            app->res.texture["keyboard_controls_cross_texture"_h]
             :
-            board->app->res.texture["keyboard_controls_texture"_h]
+            app->res.texture["keyboard_controls_texture"_h]
     );
 }
 
@@ -93,7 +93,11 @@ void KeyboardControls::move(Direction direction) {
 std::tuple<bool, bool, bool> KeyboardControls::click_and_release() {
     const Node& node = board->nodes[current_node->index];
     const identifier::Id hovered_id = (
-        node.piece_index == NULL_INDEX ? node.model->id.value() : board->pieces.at(node.piece_index).model->id.value()
+        node.piece_index == NULL_INDEX
+            ?
+            node.model->id.value()
+            :
+            board->pieces.at(node.piece_index).model->id.value()
     );
 
     board->click(hovered_id);

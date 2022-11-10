@@ -5,8 +5,10 @@
 #include "game/game_options.h"
 #include "game/save_load.h"
 #include "game/assets.h"
-#include "game/piece.h"
-#include "game/node.h"
+#include "game/entities/boards/standard_board.h"
+#include "game/entities/serialization/standard_board_serialized.h"
+#include "game/entities/piece.h"
+#include "game/entities/node.h"
 #include "other/constants.h"
 #include "other/data.h"
 #include "other/options.h"
@@ -18,8 +20,6 @@ void StandardGameScene::on_start() {
 
     imgui_layer.update();
 
-    undo_redo_state = UndoRedoState<StandardBoard> {};
-
     setup_entities();
 
     setup_and_add_model_board();
@@ -30,8 +30,10 @@ void StandardGameScene::on_start() {
     setup_camera();
     setup_widgets();
 
-    keyboard = KeyboardControls {&board, data.quad_cache["keyboard_controls"_h]};
+    keyboard = KeyboardControls {app, &board, data.quad_cache["keyboard_controls"_h]};
     keyboard.initialize_refs();
+
+    undo_redo_state = UndoRedoState<StandardBoardSerialized> {};
 
     minimax_thread = MinimaxThread {&board};
 
@@ -42,10 +44,10 @@ void StandardGameScene::on_start() {
         &minimax_thread
     };
 
-    // board.undo_redo_state = &undo_redo_state;
+    board.app = app;
     board.keyboard = &keyboard;
-    board.game_context = &game;
     board.camera = &camera;
+    board.undo_redo_state = &undo_redo_state;
 
     app->window->set_cursor(data.options.custom_cursor ? data.arrow_cursor : 0);
 
@@ -111,7 +113,7 @@ void StandardGameScene::on_stop() {
 }
 
 void StandardGameScene::on_awake() {
-    imgui_layer = ImGuiLayer<StandardGameScene, StandardBoard> {app, this};
+    imgui_layer = ImGuiLayer<StandardGameScene, StandardBoardSerialized> {app, this};
 
     initialize_rendering_board();
     initialize_rendering_board_paint();
@@ -775,7 +777,7 @@ void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& 
 void StandardGameScene::setup_entities() {
     auto& data = app->user_data<Data>();
 
-    board = StandardBoard {app};
+    board = StandardBoard {};
     board.model = data.model_cache.load("board"_h);
     board.paint_model = data.model_cache.load("board_paint"_h);
 
@@ -1114,9 +1116,8 @@ void StandardGameScene::update_after_human_move(bool did_action, bool switched_t
         update_cursor();
     }
 
-    if (undo_redo_state.redo.empty()) {
-        imgui_layer.can_redo = false;
-    }
+    imgui_layer.can_undo = undo_redo_state.undo.size() > 0;
+    imgui_layer.can_redo = undo_redo_state.redo.size() > 0;
 }
 
 void StandardGameScene::update_after_computer_move(bool switched_turn) {
@@ -1135,16 +1136,18 @@ void StandardGameScene::update_after_computer_move(bool switched_turn) {
         update_turn_indicator();
     }
 
-    if (undo_redo_state.redo.empty()) {
-        imgui_layer.can_redo = false;
-    }
+    imgui_layer.can_undo = undo_redo_state.undo.size() > 0;
+    imgui_layer.can_redo = undo_redo_state.redo.size() > 0;
 }
 
 void StandardGameScene::save_game() {
     board.finalize_pieces_state();
 
-    save_load::SavedGame<StandardBoard> saved_game;
-    saved_game.board = board;
+    StandardBoardSerialized serialized;
+    board.to_serialized(serialized);
+
+    save_load::SavedGame<StandardBoardSerialized> saved_game;
+    saved_game.board_serialized = serialized;
     saved_game.camera = camera;
     saved_game.time = timer.get_time_raw();
 
@@ -1181,12 +1184,30 @@ void StandardGameScene::undo() {
         return;
     }
 
-    UndoRedoState<StandardBoard>::State current_state = { board, camera, game.state };
-    UndoRedoState<StandardBoard>::State& undo_state_top = undo_redo_state.undo.back();
+    const bool undo_game_over = board.phase == BoardPhase::None;
 
-    board = undo_state_top.board;
+    StandardBoardSerialized serialized;
+    board.to_serialized(serialized);
 
+    UndoRedoState<StandardBoardSerialized>::State current_state = { serialized, camera };
+    UndoRedoState<StandardBoardSerialized>::State& previous_state = undo_redo_state.undo.back();
 
+    board.from_serialized(previous_state.board_serialized);
+    camera = previous_state.camera;
+
+    undo_redo_state.undo.pop_back();
+    undo_redo_state.redo.push_back(current_state);
+
+    DEB_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
+
+    game.state = GameState::MaybeNextPlayer;
+    made_first_move = board.not_placed_pieces_count != 18;
+
+    if (undo_game_over) {
+        timer.start(app->window->get_time());
+    }
+
+    update_cursor();
 }
 
 void StandardGameScene::redo() {

@@ -2,12 +2,12 @@
 
 #include "other/constants.h"
 
-struct GenericBoard;
+struct Board;
 
 class MinimaxThread {
 public:
     MinimaxThread() = default;
-    MinimaxThread(GenericBoard* board)
+    MinimaxThread(Board* board)
         : board(board) {}
     ~MinimaxThread();
 
@@ -35,5 +35,5 @@ private:
     std::atomic<bool> running = false;
 
     Result result;
-    GenericBoard* board = nullptr;
+    Board* board = nullptr;
 };

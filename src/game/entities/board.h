@@ -2,25 +2,27 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/piece.h"
-#include "game/node.h"
+#include "game/entities/piece.h"
+#include "game/entities/node.h"
 #include "game/threefold_repetition_history.h"
-#include "game/game_context.h"
 #include "other/constants.h"
 
 class KeyboardControls;
 
-struct GenericBoard {
-    GenericBoard() = default;
-    GenericBoard(Application* app)
-        : app(app) {}
-    virtual ~GenericBoard() = default;
+struct Board {
+    Board() = default;
+    virtual ~Board() = default;
 
-    virtual void click(identifier::Id) {}  // TODO maybe can be pure virtual
-    virtual std::tuple<bool, bool, bool> release(identifier::Id) { return {}; }
-    virtual void computer_place_piece(size_t) {}
-    virtual void computer_move_piece(size_t, size_t) {}
-    virtual void computer_take_piece(size_t) {}
+    Board(const Board&) = delete;
+    Board(Board&&) = default;
+    Board& operator=(const Board&) = delete;
+    Board& operator=(Board&&) = default;
+
+    virtual void click(identifier::Id) = 0;
+    virtual std::tuple<bool, bool, bool> release(identifier::Id) = 0;
+    virtual void computer_place_piece(size_t) = 0;
+    virtual void computer_move_piece(size_t, size_t) = 0;
+    virtual void computer_take_piece(size_t) = 0;
 
     GamePosition get_position();
     void update_nodes(identifier::Id hovered_id);
@@ -44,8 +46,6 @@ struct GenericBoard {
     void prepare_piece_for_three_step_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity,
         const glm::vec3& target0, const glm::vec3& target1);
 
-    Application* app = nullptr;
-
     std::shared_ptr<Renderer::Model> model;
     std::shared_ptr<Renderer::Model> paint_model;
 
@@ -56,10 +56,6 @@ struct GenericBoard {
     BoardPlayer turn = BoardPlayer::White;
     BoardEnding ending;
 
-    // unsigned int white_pieces_count = 0;  // Number of pieces on the board
-    // unsigned int black_pieces_count = 0;
-    // unsigned int not_placed_pieces_count = 18;  // Number of pieces floating
-
     bool must_take_piece = false;
 
     size_t clicked_node_index = NULL_INDEX;
@@ -68,13 +64,7 @@ struct GenericBoard {
 
     std::array<bool, 2> can_jump = { false, false };  // White first and black second
 
-    // unsigned int turns_without_mills = 0;
-
     ThreefoldRepetitionHistory repetition_history;
-
-    KeyboardControls* keyboard = nullptr;
-    GameContext* game_context = nullptr;
-    Camera* camera = nullptr;
 
     bool next_move = true;  // It is false when any piece is in the air, true otherwise
     bool is_players_turn = true;
@@ -82,4 +72,8 @@ struct GenericBoard {
     bool did_action = false;
     bool switched_turn = false;
     bool must_take_piece_or_took_piece = false;
+
+    Application* app = nullptr;
+    KeyboardControls* keyboard = nullptr;
+    Camera* camera = nullptr;
 };

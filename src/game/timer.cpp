@@ -2,7 +2,7 @@
 
 #include "game/timer.h"
 
-void Timer::update(double time) {
+void Timer::update(double time) {  // TODO refactor a bit
     static double total_time = 0.0;
 
     if (running) {
@@ -55,7 +55,7 @@ unsigned int Timer::get_time_raw() {
 
 void Timer::get_time_formatted(char* formatted_time) {
     const unsigned int minutes = get_time_seconds() / 60;
-    const unsigned int seconds = get_time_seconds() % 60;    
+    const unsigned int seconds = get_time_seconds() % 60;
 
     sprintf(formatted_time, "%.2u:%.2u", minutes, seconds);
 }

@@ -4,7 +4,6 @@
 
 #include "game/save_load.h"
 #include "game/game_options.h"
-#include "imgui_style/colors.h"
 #include "other/constants.h"
 #include "other/data.h"
 
@@ -153,6 +152,10 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
 
     if (!show_about && ImGui::BeginMainMenuBar()) {
         const bool can_change = scene->game.state == GameState::HumanThinkingMove;
+        const bool can_undo_redo = (
+            scene->game.state == GameState::HumanThinkingMove
+            || scene->game.state == GameState::ComputerThinkingMove
+        );
 
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false, can_change)) {
@@ -173,35 +176,11 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 ImGui::SetTooltip("%s", last_save_game_date.c_str());
             }
             if (ImGui::MenuItem("Save Game", nullptr, false)) {
-                scene->board.finalize_pieces_state();
+                scene->save_game();
 
-                save_load::SavedGame<B> saved_game;
-                saved_game.board = scene->board;
-                saved_game.camera = scene->camera;
-                saved_game.time = scene->timer.get_time_raw();
-
-                time_t current;
+                time_t current;  // TODO this time might be quite later
                 time(&current);
-                saved_game.date = ctime(&current);
-
-                saved_game.undo_redo_state = scene->undo_redo_state;
-
-                saved_game.white_player = scene->game.white_player;
-                saved_game.black_player = scene->game.black_player;
-
-                try {
-                    save_load::save_game_to_file(saved_game);
-                } catch (const save_load::SaveFileNotOpenError& e) {
-                    REL_ERROR("{}", e.what());
-                    REL_ERROR("Could not save game");
-
-                    save_load::handle_save_file_not_open_error(app->data().application_name);
-                } catch (const save_load::SaveFileError& e) {
-                    REL_ERROR("{}", e.what());
-                    REL_ERROR("Could not save game");
-                }
-
-                last_save_game_date = std::move(saved_game.date);
+                last_save_game_date = ctime(&current);
             }
             if (ImGui::BeginMenu("Players", can_change)) {
                 if (ImGui::BeginMenu("White")) {
@@ -250,16 +229,11 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 ImGui::EndMenu();
                 HOVERING_GUI();
             }
-            if (ImGui::MenuItem("Undo", nullptr, false, can_undo && can_change)) {
-                const bool undid_game_over = false;  // FIXME game_layer->undo();
-
+            if (ImGui::MenuItem("Undo", nullptr, false, can_undo && can_undo_redo)) {
+                scene->undo();
                 can_undo = scene->undo_redo_state.undo.size() > 0;
-
-                if (undid_game_over) {
-                    scene->timer.start(app->window->get_time());
-                }
             }
-            if (ImGui::MenuItem("Redo", nullptr, false, can_redo && can_change)) {
+            if (ImGui::MenuItem("Redo", nullptr, false, can_redo && can_undo_redo)) {
                 const bool redid_game_over = false;  // FIXME game_layer->redo();
 
                 can_redo = scene->undo_redo_state.redo.size() > 0;

@@ -2,12 +2,13 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-struct GenericBoard;
+struct Board;
+class Application;
 
 class KeyboardControls {
 public:
     KeyboardControls() = default;
-    KeyboardControls(GenericBoard* board, std::shared_ptr<Renderer::Quad> quad);
+    KeyboardControls(Application* app, Board* board, std::shared_ptr<Renderer::Quad> quad);
     ~KeyboardControls() = default;
 
     enum class Direction {
@@ -42,8 +43,9 @@ private:
         KNode* neighbor_right = nullptr;
     };
 
+    Board* board = nullptr;
+
     std::shared_ptr<Renderer::Quad> quad;
     KNode nodes[24];
     KNode* current_node = nullptr;
-    GenericBoard* board = nullptr;
 };

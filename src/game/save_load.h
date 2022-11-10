@@ -2,11 +2,14 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "game/piece.h"
-#include "game/node.h"
-#include "game/boards/generic_board.h"
-#include "game/boards/standard_board.h"
+#include "game/entities/piece.h"
+#include "game/entities/node.h"
+#include "game/entities/board.h"
+#include "game/entities/serialization/standard_board_serialized.h"
+#include "game/entities/serialization/piece_serialized.h"
+#include "game/entities/serialization/node_serialized.h"
 #include "game/undo_redo_state.h"
+#include "game/piece_movement.h"
 #include "game/game_options.h"
 #include "launcher/launcher_options.h"
 #include "other/constants.h"
@@ -45,7 +48,7 @@ namespace save_load {
 
     template<typename B>
     struct SavedGame {
-        B board;
+        B board_serialized;
         Camera camera;
         unsigned int time = 0;  // In deciseconds
         std::string date = NO_LAST_GAME;
@@ -56,7 +59,7 @@ namespace save_load {
         template<typename Archive>
         void serialize(Archive& archive) {
             archive(
-                board,
+                board_serialized,
                 camera,
                 time,
                 date,
@@ -119,31 +122,6 @@ namespace save_load {
 
 // Mostly all serialization stuff
 
-/*
-Unserialized fields:
-    vertex_array, index_buffer, material
-*/
-template<typename Archive>
-void serialize(Archive& archive, Renderer::Model& model) {
-    archive(
-        model.position,
-        model.rotation,
-        model.scale,
-        model.outline_color,
-        model.id,
-        model.cast_shadow
-    );
-}
-
-/*
-Unserialized fields:
-    texture
-*/
-template<typename Archive>
-void serialize(Archive& archive, Renderer::Quad& quad) {
-    archive(quad.position, quad.scale);
-}
-
 template<typename Archive>
 void serialize(Archive& archive, Camera& camera) {
     archive(
@@ -177,44 +155,21 @@ void serialize(Archive& archive, Camera& camera) {
     );
 }
 
-/*
-Unserialized fields:
-    keyboard, game_context, camera
-*/
 template<typename Archive>
-void serialize(Archive& archive, GenericBoard& board) {
+void serialize(Archive& archive, StandardBoardSerialized& board) {
     archive(
-        board.model,
-        board.paint_model,
         board.nodes,
         board.pieces,
         board.phase,
         board.turn,
         board.ending,
         board.must_take_piece,
-        board.clicked_node_index,
-        board.clicked_piece_index,
-        board.selected_piece_index,
-        // board.white_pieces_count,
-        // board.black_pieces_count,
-        // board.not_placed_pieces_count,
         board.can_jump,
-        // board.turns_without_mills,
         board.repetition_history,
-        board.next_move,
         board.is_players_turn,
-        board.switched_turn
-    );
-}
-
-/*
-Unserialized fields:
-    undo_redo_state
-*/
-template<typename Archive>
-void serialize(Archive& archive, StandardBoard& board) {
-    archive(
-        cereal::virtual_base_class<GenericBoard>(&board),
+        board.did_action,
+        board.switched_turn,
+        board.must_take_piece_or_took_piece,
         board.white_pieces_count,
         board.black_pieces_count,
         board.not_placed_pieces_count,
@@ -233,12 +188,13 @@ void serialize(Archive& archive, ThreefoldRepetitionHistory::PositionPlusInfo& p
 }
 
 template<typename Archive>
-void serialize(Archive& archive, Piece& piece) {
+void serialize(Archive& archive, PieceSerialized& piece) {
     archive(
         piece.index,
         piece.type,
         piece.in_use,
-        piece.model,
+        piece.position,
+        piece.rotation,
         piece.node_index,
         piece.movement,
         piece.show_outline,
@@ -249,7 +205,12 @@ void serialize(Archive& archive, Piece& piece) {
 }
 
 template<typename Archive>
-void serialize(Archive& archive, Piece::Movement& movement) {
+void serialize(Archive& archive, NodeSerialized& node) {
+    archive(node.index, node.piece_index);
+}
+
+template<typename Archive>
+void serialize(Archive& archive, PieceMovement& movement) {
     archive(
         movement.type,
         movement.velocity,
@@ -260,11 +221,6 @@ void serialize(Archive& archive, Piece::Movement& movement) {
         movement.reached_target1,
         movement.moving
     );
-}
-
-template<typename Archive>
-void serialize(Archive& archive, Node& node) {
-    archive(node.index, node.model, node.piece_index);
 }
 
 template<typename Archive>
