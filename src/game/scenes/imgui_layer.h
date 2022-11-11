@@ -441,7 +441,7 @@ void ImGuiLayer<S, B>::draw_game_over() {
         char time[32];
         scene->timer.get_time_formatted(time);
         char time_label[64];
-        sprintf(time_label, "Time: %s", time);
+        snprintf(time_label, 64, "Time: %s", time);
 
         const float text_width = ImGui::CalcTextSize(time_label).x;
         ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
@@ -607,7 +607,8 @@ void ImGuiLayer<S, B>::draw_debug() {
         ImGui::Text("FPS: %f", app->get_fps());
         ImGui::Text("White pieces: %u", scene->board.white_pieces_count);
         ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
-        ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_pieces_count);
+        ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
+        ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
         ImGui::Text("White can jump: %s", scene->board.can_jump[0] ? "true" : "false");
         ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
         ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));

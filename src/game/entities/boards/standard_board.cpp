@@ -125,8 +125,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
 
     for (auto& [index, piece] : pieces) {
         if (turn == BoardPlayer::White) {
-            if (index == clicked_piece_index && piece.model->id.value() == hovered_id
-                    && piece.type == PieceType::Black) {
+            if (index == clicked_piece_index && piece.model->id.value() == hovered_id && piece.type == PieceType::Black) {
                 if (!is_windmill_made(piece.node_index, PieceType::Black, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::Black, windmills, count) == black_pieces_count) {
                     remember_state();
@@ -140,8 +139,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
                 break;
             }
         } else {
-            if (index == clicked_piece_index && piece.model->id.value() == hovered_id
-                    && piece.type == PieceType::White) {
+            if (index == clicked_piece_index && piece.model->id.value() == hovered_id && piece.type == PieceType::White) {
                 if (!is_windmill_made(piece.node_index, PieceType::White, windmills, count)
                         || number_of_pieces_in_windmills(PieceType::White, windmills, count) == white_pieces_count) {
                     remember_state();
@@ -158,11 +156,12 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
     }
 
     // Do this even if it may not be needed
-    if (not_placed_pieces_count == 0 && !must_take_piece && phase != BoardPhase::GameOver) {
+    if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0 && !must_take_piece
+            && phase != BoardPhase::GameOver) {
         phase = BoardPhase::MovePieces;
         update_piece_outlines();
 
-        DEB_INFO("Phase 2");
+        DEB_INFO("Started phase 2");
     }
 }
 
@@ -178,12 +177,12 @@ void StandardBoard::place_piece(size_t node_index) {
     if (turn == BoardPlayer::White) {
         node.piece_index = new_piece_to_place(PieceType::White, position.x, position.z, node_index);
         white_pieces_count++;
+        not_placed_white_pieces_count--;
     } else {
         node.piece_index = new_piece_to_place(PieceType::Black, position.x, position.z, node_index);
         black_pieces_count++;
+        not_placed_black_pieces_count--;
     }
-
-    not_placed_pieces_count--;
 
     constexpr auto windmills = WINDMILLS_NINE_MENS_MORRIS;
     constexpr auto count = NINE_MENS_MORRIS_MILLS;
@@ -199,11 +198,11 @@ void StandardBoard::place_piece(size_t node_index) {
         check_player_number_of_pieces(turn);
         switch_turn_and_check_turns_without_mills();
 
-        if (not_placed_pieces_count == 0) {
+        if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0) {
             phase = BoardPhase::MovePieces;
             update_piece_outlines();
 
-            DEB_INFO("Phase 2");
+            DEB_INFO("Started phase 2");
 
             if (is_player_blocked(turn)) {
                 DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
@@ -352,7 +351,7 @@ void StandardBoard::switch_turn_and_check_turns_without_mills() {
             DEB_INFO("The max amount of turns without mills has been hit");
 
             FORMATTED_MESSAGE(
-                message, 64, "%u turns have passed without a windmill made.",
+                message, 64, "%u turns have passed without a windmill.",
                 MAX_TURNS_WITHOUT_MILLS
             )
 
@@ -491,14 +490,14 @@ bool StandardBoard::can_go(size_t piece_index, size_t destination_node_index) {
 
 void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
     if (player == BoardPlayer::White) {
-        DEB_DEBUG("Checking white player number of pieces");
+        DEB_DEBUG("Checking white player number of pieces...");
 
-        if (white_pieces_count + not_placed_pieces_count == 3) {  // TODO really think this through
-            DEB_INFO("White player can jump");
+        if (white_pieces_count + not_placed_white_pieces_count == 3) {
+            DEB_INFO("White player can jump now");
 
             can_jump[static_cast<int>(player)] = true;
-        } else if (white_pieces_count + not_placed_pieces_count == 2) {
-            DEB_INFO("White player has only 2 pieces");
+        } else if (white_pieces_count + not_placed_white_pieces_count == 2) {
+            DEB_INFO("White player has only 2 pieces now");
 
             FORMATTED_MESSAGE(
                 message, 64, "White player cannot make any more windmills."
@@ -507,14 +506,14 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
             game_over(BoardEnding {BoardEnding::WinnerBlack, message}, PieceType::White);
         }
     } else {
-        DEB_DEBUG("Checking black player number of pieces");
+        DEB_DEBUG("Checking black player number of pieces...");
 
-        if (black_pieces_count + not_placed_pieces_count == 3) {
-            DEB_INFO("Black player can jump");
+        if (black_pieces_count + not_placed_black_pieces_count == 3) {
+            DEB_INFO("Black player can jump now");
 
             can_jump[static_cast<int>(player)] = true;
-        } else if (black_pieces_count + not_placed_pieces_count == 2) {
-            DEB_INFO("Black player has only 2 pieces");
+        } else if (black_pieces_count + not_placed_black_pieces_count == 2) {
+            DEB_INFO("Black player has only 2 pieces now");
 
             FORMATTED_MESSAGE(
                 message, 64, "Black player cannot make any more windmills."
@@ -526,7 +525,7 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
 }
 
 bool StandardBoard::is_player_blocked(BoardPlayer player) {
-    DEB_DEBUG("{} player is checked if it's blocked", player == BoardPlayer::White ? "White" : "Black");
+    DEB_DEBUG("Checking {} player if it's blocked...", player == BoardPlayer::White ? "white" : "black");
 
     const PieceType type = player == BoardPlayer::White ? PieceType::White : PieceType::Black;
     bool at_least_one_piece = false;
@@ -795,7 +794,8 @@ void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
     serialized.must_take_piece_or_took_piece = must_take_piece_or_took_piece;
     serialized.white_pieces_count = white_pieces_count;
     serialized.black_pieces_count = black_pieces_count;
-    serialized.not_placed_pieces_count = not_placed_pieces_count;
+    serialized.not_placed_white_pieces_count = not_placed_white_pieces_count;
+    serialized.not_placed_black_pieces_count = not_placed_black_pieces_count;
     serialized.turns_without_mills = turns_without_mills;
 }
 
@@ -871,6 +871,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
     must_take_piece_or_took_piece = serialized.must_take_piece_or_took_piece;
     white_pieces_count = serialized.white_pieces_count;
     black_pieces_count = serialized.black_pieces_count;
-    not_placed_pieces_count = serialized.not_placed_pieces_count;
+    not_placed_white_pieces_count = serialized.not_placed_white_pieces_count;
+    not_placed_black_pieces_count = serialized.not_placed_black_pieces_count;
     turns_without_mills = serialized.turns_without_mills;
 }

@@ -172,7 +172,8 @@ void serialize(Archive& archive, StandardBoardSerialized& board) {
         board.must_take_piece_or_took_piece,
         board.white_pieces_count,
         board.black_pieces_count,
-        board.not_placed_pieces_count,
+        board.not_placed_white_pieces_count,
+        board.not_placed_black_pieces_count,
         board.turns_without_mills
     );
 }

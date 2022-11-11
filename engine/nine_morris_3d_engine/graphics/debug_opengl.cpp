@@ -15,7 +15,7 @@
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 
-constexpr GLenum parameters[] = {
+static constexpr GLenum parameters[] = {
     GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
     GL_MAX_CUBE_MAP_TEXTURE_SIZE,
     GL_MAX_DRAW_BUFFERS,
@@ -31,10 +31,10 @@ constexpr GLenum parameters[] = {
     GL_MAX_DEPTH_TEXTURE_SAMPLES,
     GL_MAX_COLOR_TEXTURE_SAMPLES,
     GL_MAX_INTEGER_SAMPLES,
-    GL_MAX_VIEWPORT_DIMS,
+    GL_MAX_VIEWPORT_DIMS
 };
 
-constexpr const char* names[] = {
+static constexpr const char* names[] = {
     "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS",
     "GL_MAX_CUBE_MAP_TEXTURE_SIZE",
     "GL_MAX_DRAW_BUFFERS",
@@ -50,8 +50,10 @@ constexpr const char* names[] = {
     "GL_MAX_DEPTH_TEXTURE_SAMPLES",
     "GL_MAX_COLOR_TEXTURE_SAMPLES",
     "GL_MAX_INTEGER_SAMPLES",
-    "GL_MAX_VIEWPORT_DIMS",
+    "GL_MAX_VIEWPORT_DIMS"
 };
+
+static constexpr size_t BUFFER_LENGTH = 128;
 
 #ifdef PLATFORM_GAME_DEBUG
     GpuMemoryCounter _gpu_mem_counter;
@@ -151,14 +153,16 @@ namespace debug_opengl {
         output.append("\n*** OpenGL Version And Driver Information ***\n");
 
         {
-            char line[128];  // 128 should be enough
-            sprintf(line, "OpenGL version: %s\n", glGetString(GL_VERSION));
+            constexpr size_t LENGTH = 256;  // 256 should be enough
+
+            char line[LENGTH];
+            snprintf(line, LENGTH, "OpenGL version: %s\n", glGetString(GL_VERSION));
             output.append(line);
-            sprintf(line, "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+            snprintf(line, LENGTH, "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
             output.append(line);
-            sprintf(line, "Vendor: %s\n", glGetString(GL_VENDOR));
+            snprintf(line, LENGTH, "Vendor: %s\n", glGetString(GL_VENDOR));
             output.append(line);
-            sprintf(line, "Renderer: %s\n", glGetString(GL_RENDERER));
+            snprintf(line, LENGTH, "Renderer: %s\n", glGetString(GL_RENDERER));
             output.append(line);
         }
 
@@ -171,24 +175,24 @@ namespace debug_opengl {
             GLint result;
             glGetIntegerv(parameters[i], &result);
 
-            char line[128];
-            sprintf(line, "%s %i\n", names[i], result);
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "%s %i\n", names[i], result);
             output.append(line);
         }
         {
             GLint result[2];
             glGetIntegerv(parameters[++parameter_index], result);
 
-            char line[128];
-            sprintf(line, "%s %i %i\n", names[parameter_index], result[0], result[1]);
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "%s %i %i\n", names[parameter_index], result[0], result[1]);
             output.append(line);
         }
 
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** OpenGL Extensions ***\n");
 
-        char line[128];
-        sprintf(line, "GL_EXT_texture_filter_anisotropic max samples: %d\n",
+        char line[BUFFER_LENGTH];
+        snprintf(line, BUFFER_LENGTH, "GL_EXT_texture_filter_anisotropic max samples: %d\n",
                 capabilities::max_anisotropic_filtering_supported());
         output.append(line);
 
@@ -197,92 +201,92 @@ namespace debug_opengl {
 
 #if defined(PLATFORM_GAME_LINUX)
         {
-            char line[128];
-            sprintf(line, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
             output.append(line);
         }
 #elif defined(PLATFORM_GAME_WINDOWS)
         {
-            char line[128];
-            sprintf(line, "MSVC version: %d\n", _MSC_VER);
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "MSVC version: %d\n", _MSC_VER);
             output.append(line);
         }
 #endif
         {
-            char line[128];
-            sprintf(line, "GLFW version: %s\n", glfwGetVersionString());
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "GLFW version: %s\n", glfwGetVersionString());
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "Dear ImGui version: %s\n", ImGui::GetVersion());
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "Dear ImGui version: %s\n", ImGui::GetVersion());
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "EnTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR, ENTT_VERSION_MINOR,
-                    ENTT_VERSION_PATCH);
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "EnTT version: %d.%d.%d\n", ENTT_VERSION_MAJOR,
+                    ENTT_VERSION_MINOR, ENTT_VERSION_PATCH);
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "Assimp version: %d.%d.%d\n", aiGetVersionMajor(),
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "Assimp version: %d.%d.%d\n", aiGetVersionMajor(),
                     aiGetVersionMinor(), aiGetVersionPatch());
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "GLM version: %d.%d.%d\n", GLM_VERSION_MAJOR, GLM_VERSION_MINOR,
-                    GLM_VERSION_PATCH);
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "GLM version: %d.%d.%d\n", GLM_VERSION_MAJOR,
+                    GLM_VERSION_MINOR, GLM_VERSION_PATCH);
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "spdlog version: %d.%d.%d\n", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR,
-                    SPDLOG_VER_PATCH);
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "spdlog version: %d.%d.%d\n", SPDLOG_VER_MAJOR,
+                    SPDLOG_VER_MINOR, SPDLOG_VER_PATCH);
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "cereal version: %d.%d.%d\n", CEREAL_VERSION_MAJOR,
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "cereal version: %d.%d.%d\n", CEREAL_VERSION_MAJOR,
                     CEREAL_VERSION_MINOR, CEREAL_VERSION_PATCH);
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "cppblowfish version: %d.%d.%d\n", CPPBLOWFISH_VERSION_MAJOR,
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "cppblowfish version: %d.%d.%d\n", CPPBLOWFISH_VERSION_MAJOR,
                     CPPBLOWFISH_VERSION_MINOR, CPPBLOWFISH_VERSION_PATCH);
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "resmanager version: %d.%d.%d\n", RESMANAGER_VERSION_MAJOR,
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "resmanager version: %d.%d.%d\n", RESMANAGER_VERSION_MAJOR,
                     RESMANAGER_VERSION_MINOR, RESMANAGER_VERSION_PATCH);
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "glad\n");
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "glad\n");
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "stb_image\n");
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "stb_image\n");
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "stb_image_write\n");
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "stb_image_write\n");
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "stb_truetype\n");
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "stb_truetype\n");
             output.append(line);
         }
         {
-            char line[128];
-            sprintf(line, "utfcpp\n");
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "utfcpp\n");
             output.append(line);
         }
 

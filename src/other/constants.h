@@ -5,7 +5,7 @@
 // format is the first argument to __VA_ARGS__
 #define FORMATTED_MESSAGE(result, size, ...) \
     char result[size]; \
-    sprintf(result, __VA_ARGS__);
+    snprintf(result, size, __VA_ARGS__);
 
 #define TURN_IS_WHITE_SO(_true, _false) (turn == BoardPlayer::White ? (_true) : (_false))
 #define WAIT_FOR_NEXT_MOVE() next_move = false

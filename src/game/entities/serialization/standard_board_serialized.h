@@ -38,7 +38,8 @@ struct StandardBoardSerialized {
 
     unsigned int white_pieces_count = 0;
     unsigned int black_pieces_count = 0;
-    unsigned int not_placed_pieces_count = 18;
+    unsigned int not_placed_white_pieces_count = 9;
+    unsigned int not_placed_black_pieces_count = 9;
 
     unsigned int turns_without_mills = 0;
 };

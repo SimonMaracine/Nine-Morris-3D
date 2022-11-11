@@ -1189,7 +1189,7 @@ void StandardGameScene::undo() {
     DEB_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
 
     game.state = GameState::MaybeNextPlayer;
-    made_first_move = board.not_placed_pieces_count != 18;
+    made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;
 
     if (undo_game_over) {
         timer.start();
@@ -1223,7 +1223,7 @@ void StandardGameScene::redo() {
     DEB_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
 
     game.state = GameState::MaybeNextPlayer;
-    made_first_move = board.not_placed_pieces_count != 18;
+    made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;
 
     const bool redo_game_over = board.phase == BoardPhase::None;
 
