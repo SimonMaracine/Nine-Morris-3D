@@ -29,13 +29,15 @@ void Timer::start() {
 
     const double current_time = app->window->get_time();
 
-    running = current_time;
+    running = true;
     last_time = current_time;
 
     DEB_DEBUG("Started timer");
 }
 
 void Timer::stop() {
+    ASSERT(running, "Cannot stop, if it is already stopped");
+
     running = false;
 
     DEB_DEBUG("Stopped timer");

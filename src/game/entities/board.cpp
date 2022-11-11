@@ -108,14 +108,14 @@ void Board::update_pieces(identifier::Id hovered_id) {
                     piece.movement.reached_target0 = true;
                     piece.model->position = piece.movement.target0;
                     piece.movement.velocity = (
-                        glm::normalize(piece.movement.target1 - piece.model->position)* PIECE_BASE_VELOCITY
+                        glm::normalize(piece.movement.target1 - piece.model->position) * PIECE_BASE_VELOCITY
                     );
                 } else if (!piece.movement.reached_target1
                         && glm::length(piece.movement.target1 - piece.model->position) < 0.03f) {
                     piece.movement.reached_target1 = true;
                     piece.model->position = piece.movement.target1;
                     piece.movement.velocity = (
-                        glm::normalize(piece.movement.target - piece.model->position)* PIECE_BASE_VELOCITY
+                        glm::normalize(piece.movement.target - piece.model->position) * PIECE_BASE_VELOCITY
                     );
                 }
 

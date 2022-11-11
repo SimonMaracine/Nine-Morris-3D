@@ -71,7 +71,6 @@ void StandardGameScene::on_stop() {
         game_options::GAME_OPTIONS_FILE, data.options, app
     );
 
-    // Save this game
     if (data.options.save_on_exit && !app->running && made_first_move) {
         save_game();
     }
@@ -182,7 +181,8 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
     auto& data = app->user_data<Data>();
 
     if (event.button == input::MouseButton::LEFT) {
-        if (board.next_move && board.is_players_turn) {
+        if (board.next_move && board.is_players_turn
+                && (board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces)) {
             const auto [did_action, switched_turn, must_take_piece_or_took_piece] = (
                 board.release(app->renderer->get_hovered_id())
             );
@@ -247,7 +247,8 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
             );
             break;
         case input::Key::ENTER:
-            if (board.next_move && board.is_players_turn) {
+            if (board.next_move && board.is_players_turn
+                    && (board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces)) {
                 const auto [did_action, switched_turn, must_take_piece_or_took_piece] = (
                     keyboard.click_and_release()
                 );
@@ -1171,11 +1172,13 @@ void StandardGameScene::undo() {
 
     const bool undo_game_over = board.phase == BoardPhase::None;
 
+    using State = UndoRedoState<StandardBoardSerialized>::State;
+
     StandardBoardSerialized serialized;
     board.to_serialized(serialized);
 
-    UndoRedoState<StandardBoardSerialized>::State current_state = { serialized, camera };
-    UndoRedoState<StandardBoardSerialized>::State& previous_state = undo_redo_state.undo.back();
+    State current_state = { serialized, camera };
+    const State& previous_state = undo_redo_state.undo.back();
 
     board.from_serialized(previous_state.board_serialized);
     camera = previous_state.camera;
@@ -1196,5 +1199,38 @@ void StandardGameScene::undo() {
 }
 
 void StandardGameScene::redo() {
+    ASSERT(!undo_redo_state.redo.empty(), "Redo history must not be empty");
 
+    if (!board.next_move) {
+        DEB_WARN("Cannot redo when pieces are in air");
+        return;
+    }
+
+    using State = UndoRedoState<StandardBoardSerialized>::State;
+
+    StandardBoardSerialized serialized;
+    board.to_serialized(serialized);
+
+    State current_state = { serialized, camera };
+    const State& previous_state = undo_redo_state.redo.back();
+
+    board.from_serialized(previous_state.board_serialized);
+    camera = previous_state.camera;
+
+    undo_redo_state.redo.pop_back();
+    undo_redo_state.undo.push_back(current_state);
+
+    DEB_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
+
+    game.state = GameState::MaybeNextPlayer;
+    made_first_move = board.not_placed_pieces_count != 18;
+
+    const bool redo_game_over = board.phase == BoardPhase::None;
+
+    if (redo_game_over) {
+        timer.stop();
+        board.phase = BoardPhase::GameOver;  // Make the game over screen show up again
+    }
+
+    update_cursor();
 }

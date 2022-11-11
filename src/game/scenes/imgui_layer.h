@@ -234,14 +234,8 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 can_undo = scene->undo_redo_state.undo.size() > 0;
             }
             if (ImGui::MenuItem("Redo", nullptr, false, can_redo && can_undo_redo)) {
-                const bool redid_game_over = false;  // FIXME game_layer->redo();
-
+                scene->redo();
                 can_redo = scene->undo_redo_state.redo.size() > 0;
-
-                if (redid_game_over) {
-                    scene->timer.stop();
-                    scene->board.phase = BoardPhase::GameOver;
-                }
             }
             if (ImGui::MenuItem("Exit To Launcher", nullptr, false)) {
                 app->running = false;

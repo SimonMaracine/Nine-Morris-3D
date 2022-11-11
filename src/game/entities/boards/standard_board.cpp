@@ -323,13 +323,13 @@ void StandardBoard::take_piece(size_t piece_index) {
         black_pieces_count--;
     }
 
+    DEB_DEBUG("{} piece {} taken", piece.type == PieceType::White ? "White" : "Black", piece_index);
+
     check_player_number_of_pieces(BoardPlayer::Black);
     check_player_number_of_pieces(BoardPlayer::White);
 
     switch_turn_and_check_turns_without_mills();
     update_piece_outlines();
-
-    DEB_DEBUG("{} piece {} taken", piece.type == PieceType::White ? "White" : "Black", piece_index);
 
     if (is_player_blocked(turn)) {
         DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
@@ -846,11 +846,17 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
         }
     }
 
+    std::vector<size_t> to_remove;
+
     for (auto& [index, piece] : pieces) {
         if (serialized.pieces.find(index) == serialized.pieces.end()) {
             app->renderer->remove_model(piece.model);
-            pieces.erase(index);
+            to_remove.push_back(index);
         }
+    }
+
+    for (size_t index : to_remove) {
+        pieces.erase(index);
     }
 
     phase = serialized.phase;
