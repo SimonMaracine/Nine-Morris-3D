@@ -2,6 +2,7 @@
 
 #include "nine_morris_3d_engine/graphics/buffer_layout.h"
 #include "nine_morris_3d_engine/other/logging.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 size_t VertexElement::get_size(GLenum type) {
     switch (type) {
@@ -11,7 +12,8 @@ size_t VertexElement::get_size(GLenum type) {
             return sizeof(GLint);
         default:
             REL_CRITICAL("Type {} is not supported, exiting...", type);
-            exit(1);
+            game_exit::exit_critical();
+            return 0;
     }
 }
 
@@ -27,7 +29,7 @@ void BufferLayout::add(GLuint index, Type type, GLint size) {
             break;
         default:
             REL_CRITICAL("Unrecognized type, exiting...");
-            exit(1);
+            game_exit::exit_critical();
     }
 
     elements.push_back({ index, gl_type, size });

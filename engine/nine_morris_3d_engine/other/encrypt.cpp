@@ -3,6 +3,7 @@
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/logging.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 namespace encrypt {
     static cppblowfish::BlowfishContext blowfish;
@@ -16,7 +17,7 @@ namespace encrypt {
 
         if (!file.is_open()) {
             REL_CRITICAL("Could not open encrypted file `{}`, exiting...", file_path);
-            exit(1);
+            game_exit::exit_critical();
         }
 
         file.seekg(0, file.end);

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <stdlib.h> 
+#include <stdlib.h>
 
 #include <cppblowfish/cppblowfish.h>
 
@@ -38,7 +38,7 @@ static void write_file(const std::string& file_name, const unsigned char* data, 
 int main(int argc, char** argv) {
     if (argc != 4) {
         std::cout << "Invalid arguments\n";
-        std::cout << "Usage: encrypter-helper <input_file> <output_file> <key>" << std::endl;
+        std::cout << "Usage: encrypter <input_file> <output_file> <key>" << std::endl;
         exit(1);
     }
 

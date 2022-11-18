@@ -26,7 +26,7 @@ int main() {
     };
     constexpr const char* KEY = "data/models/board/board.obj";
 
-    logging::initialize_for_application(LOG_FILE);
+    logging::initialize_for_applications(LOG_FILE);
 
     while (true) {
         int exit_code {};

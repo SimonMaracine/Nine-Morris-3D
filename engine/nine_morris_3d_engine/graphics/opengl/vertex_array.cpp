@@ -5,6 +5,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 VertexArray::VertexArray() {
     glGenVertexArrays(1, &array);
@@ -52,7 +53,7 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout&
                 break;
             default:
                 REL_CRITICAL("Unknown element type, exiting...");
-                exit(1);
+                game_exit::exit_critical();
         }
 
         glEnableVertexAttribArray(element.index);

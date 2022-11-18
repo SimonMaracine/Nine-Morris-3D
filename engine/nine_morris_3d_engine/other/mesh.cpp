@@ -7,6 +7,7 @@
 #include "nine_morris_3d_engine/other/mesh.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 namespace mesh {
     std::shared_ptr<Mesh<PTN>> load_model_PTN(std::string_view file_path, bool flip_winding) {
@@ -23,7 +24,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            exit(1);
+            game_exit::exit_critical();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -84,7 +85,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            exit(1);
+            game_exit::exit_critical();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -142,7 +143,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            exit(1);
+            game_exit::exit_critical();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -192,7 +193,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            exit(1);
+            game_exit::exit_critical();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -239,7 +240,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            exit(1);
+            game_exit::exit_critical();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -306,7 +307,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            exit(1);
+            game_exit::exit_critical();
         }
 
         const aiNode* root_node = scene->mRootNode;

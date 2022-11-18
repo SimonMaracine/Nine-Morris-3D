@@ -14,6 +14,7 @@
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 static constexpr GLenum parameters[] = {
     GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
@@ -123,7 +124,8 @@ namespace debug_opengl {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
                 REL_CRITICAL("(ID: {}) {}", id, message);
-                exit(1);
+                game_exit::exit_critical();
+                break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:
                 REL_WARN("(ID: {}) {}", id, message);

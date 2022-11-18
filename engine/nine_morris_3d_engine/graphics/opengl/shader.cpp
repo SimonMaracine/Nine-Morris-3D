@@ -9,6 +9,7 @@
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 #define DELETE_SHADER(program, vertex_shader, fragment_shader) \
     glDetachShader(program, vertex_shader); \
@@ -27,7 +28,7 @@ static size_t type_size(GLenum type) {
         CASE(GL_FLOAT_MAT4, 16, GLfloat)
         default:
             REL_CRITICAL("Unknown type: {}, exiting...", type);
-            exit(1);
+            game_exit::exit_critical();
     }
 
     return size;
@@ -37,14 +38,14 @@ Shader::Shader(std::string_view vertex_source_path, std::string_view fragment_so
         const std::vector<std::string>& uniforms, const std::vector<UniformBlockSpecification>& uniform_blocks)
     : vertex_source_path(vertex_source_path), fragment_source_path(fragment_source_path),
       uniforms(uniforms) {
-    name = get_name(vertex_source_path, fragment_source_path);    
+    name = get_name(vertex_source_path, fragment_source_path);
 
     try {
         vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
         fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
     } catch (const std::runtime_error& e) {
         REL_CRITICAL("{}, exiting...", e.what());
-        exit(1);
+        game_exit::exit_critical();
     }
 
     program = glCreateProgram();
@@ -55,7 +56,7 @@ Shader::Shader(std::string_view vertex_source_path, std::string_view fragment_so
 
     if (!check_linking(program, name)) {
         REL_CRITICAL("Exiting...");
-        exit(1);
+        game_exit::exit_critical();
     }
 
     check_and_cache_uniforms(uniforms);
@@ -81,7 +82,7 @@ Shader::Shader(encrypt::EncryptedFile vertex_source_path, encrypt::EncryptedFile
         fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
     } catch (const std::runtime_error& e) {
         REL_CRITICAL("{}, exiting...", e.what());
-        exit(1);
+        game_exit::exit_critical();
     }
 
     program = glCreateProgram();
@@ -92,7 +93,7 @@ Shader::Shader(encrypt::EncryptedFile vertex_source_path, encrypt::EncryptedFile
 
     if (!check_linking(program, name)) {
         REL_CRITICAL("Exiting...");
-        exit(1);
+        game_exit::exit_critical();
     }
 
     check_and_cache_uniforms(uniforms);
@@ -225,7 +226,7 @@ GLuint Shader::compile_shader(std::string_view source_path, GLenum type, std::st
         }
     } else {
         REL_CRITICAL("Could not open file `{}`, exiting...", source_path);
-        exit(1);
+        game_exit::exit_critical();
     }
     file.close();
 
@@ -316,7 +317,7 @@ void Shader::configure_uniform_blocks(GLuint program, const std::vector<UniformB
 
         if (block_index == GL_INVALID_INDEX) {
             REL_CRITICAL("Invalid block index, exiting...");
-            exit(1);
+            game_exit::exit_critical();
         }
 
         if (!block.uniform_buffer->configured) {
@@ -355,7 +356,7 @@ void Shader::configure_uniform_blocks(GLuint program, const std::vector<UniformB
             for (unsigned int i = 0; i < block.field_count; i++) {
                 if (indices[i] == GL_INVALID_INDEX) {
                     REL_CRITICAL("Invalid field index, exiting...");
-                    exit(1);
+                    game_exit::exit_critical();
                 }
             }
 

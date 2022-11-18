@@ -4,6 +4,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 static GLenum target(bool multisampled) {
     return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
@@ -337,7 +338,7 @@ void Framebuffer::build() {
                         break;
                     default:
                         REL_CRITICAL("Wrong attachment format, exiting...");
-                        exit(1);
+                        game_exit::exit_critical();
                 }
 
                 color_attachments[i] = texture;
@@ -368,7 +369,7 @@ void Framebuffer::build() {
                         break;
                     default:
                         REL_CRITICAL("Wrong attachment format, exiting...");
-                        exit(1);
+                        game_exit::exit_critical();
                 }
 
                 color_attachments[i] = renderbuffer;
@@ -409,7 +410,7 @@ void Framebuffer::build() {
                         break;
                     default:
                         REL_CRITICAL("Wrong attachment format, exiting...");
-                        exit(1);
+                        game_exit::exit_critical();
                 }
 
                 depth_attachment = texture;
@@ -442,7 +443,7 @@ void Framebuffer::build() {
                         break;
                     default:
                         REL_CRITICAL("Wrong attachment format, exiting...");
-                        exit(1);
+                        game_exit::exit_critical();
                 }
 
                 depth_attachment = renderbuffer;
@@ -467,7 +468,7 @@ void Framebuffer::build() {
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         REL_CRITICAL("Framebuffer {} is incomplete, exiting...", framebuffer);
         REL_CRITICAL("Framebuffer status: {}", print_framebuffer_status_message(status));
-        exit(1);
+        game_exit::exit_critical();
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

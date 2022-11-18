@@ -5,6 +5,7 @@
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 TextureData::TextureData(std::string_view file_path, bool flip)
     : file_path(file_path) {
@@ -17,7 +18,7 @@ TextureData::TextureData(std::string_view file_path, bool flip)
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
-        exit(1);
+        game_exit::exit_critical();
     }
 }
 
@@ -34,7 +35,7 @@ TextureData::TextureData(encrypt::EncryptedFile file_path, bool flip)
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
-        exit(1);
+        game_exit::exit_critical();
     }
 }
 

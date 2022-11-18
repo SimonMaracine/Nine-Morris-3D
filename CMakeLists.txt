@@ -77,8 +77,9 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/graphics/post_processing_step.h"
     "engine/nine_morris_3d_engine/graphics/debug_opengl.h"
     "engine/nine_morris_3d_engine/other/assert.h"
-    "engine/nine_morris_3d_engine/other/encrypt.h"
     "engine/nine_morris_3d_engine/other/concurrent_loader.h"
+    "engine/nine_morris_3d_engine/other/encrypt.h"
+    "engine/nine_morris_3d_engine/other/exit.h"
     "engine/nine_morris_3d_engine/other/logging.h"
     "engine/nine_morris_3d_engine/other/mesh.h"
     "engine/nine_morris_3d_engine/other/paths.h"
@@ -108,6 +109,7 @@ add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/graphics/material.cpp"
     "engine/nine_morris_3d_engine/graphics/debug_opengl.cpp"
     "engine/nine_morris_3d_engine/other/encrypt.cpp"
+    "engine/nine_morris_3d_engine/other/exit.cpp"
     "engine/nine_morris_3d_engine/other/logging.cpp"
     "engine/nine_morris_3d_engine/other/mesh.cpp"
     "engine/nine_morris_3d_engine/other/paths.cpp"
@@ -300,7 +302,7 @@ endif()
 target_link_libraries(${GAME} PRIVATE
     ${ENGINE}
     ${MY_IMGUI}
-    spdlog
+    # spdlog  # TODO see if it works on Windows too
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)

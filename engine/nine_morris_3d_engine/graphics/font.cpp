@@ -11,6 +11,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 constexpr char ERROR_CHARACTER = 127;
 
@@ -22,7 +23,7 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
 
     if (!stbtt_InitFont(&info, (unsigned char*) font_file_buffer, 0)) {
         REL_CRITICAL("Could not load font `{}`, exiting...", file_path);
-        exit(1);
+        game_exit::exit_critical();
     }
     sf = stbtt_ScaleForPixelHeight(&info, size);
 
@@ -290,7 +291,7 @@ const char* Font::get_file_data(std::string_view file_path) {
 
     if (!file.is_open()) {
         REL_CRITICAL("Could not open file `{}` for reading, exiting...", file_path);
-        exit(1);
+        game_exit::exit_critical();
     }
 
     file.seekg(0, file.end);

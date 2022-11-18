@@ -15,36 +15,33 @@
 #define ROTATING_FILES 2  // 3 total log files
 
 /*
-SPDLOG_TRACE,
-SPDLOG_DEBUG,
-SPDLOG_INFO,
-SPDLOG_WARN,
-SPDLOG_ERROR,
-SPDLOG_CRITICAL
+    SPDLOG_TRACE,
+    SPDLOG_DEBUG,
+    SPDLOG_INFO,
+    SPDLOG_WARN,
+    SPDLOG_ERROR,
+    SPDLOG_CRITICAL
 */
 
-static std::shared_ptr<spdlog::logger> global_logger;
+// Should be cleaned up at exit()
+static std::shared_ptr<spdlog::logger> _global_logger;
 
 #if defined(PLATFORM_GAME_RELEASE)
-static void set_fallback_logger(const char* message) {
-    global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
-    global_logger->set_pattern(LOG_PATTERN_RELEASE);
-    global_logger->set_level(spdlog::level::trace);
+static void set_fallback_logger_release(const char* error_message) {
+    _global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
+    _global_logger->set_pattern(LOG_PATTERN_RELEASE);
+    _global_logger->set_level(spdlog::level::trace);
 
-    spdlog::set_default_logger(global_logger);
-
-    spdlog::error("Using fallback logger (console): {}", message);
+    _global_logger->error("Using Fallback Logger (Console): {}", error_message);
 }
 #endif
 
 namespace logging {
-    void initialize_for_application(std::string_view log_file) {
+    void initialize_for_applications(std::string_view log_file) {
 #if defined(PLATFORM_GAME_DEBUG)
-        global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
-        global_logger->set_pattern(LOG_PATTERN_DEBUG);
-        global_logger->set_level(spdlog::level::trace);
-
-        spdlog::set_default_logger(global_logger);
+        _global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
+        _global_logger->set_pattern(LOG_PATTERN_DEBUG);
+        _global_logger->set_level(spdlog::level::trace);
 
         static_cast<void>(log_file);  // Trick the compiler that we do use log_file
 #elif defined(PLATFORM_GAME_RELEASE)
@@ -53,22 +50,22 @@ namespace logging {
         try {
             file_path = paths::path_for_logs(log_file);
         } catch (const user_data::UserNameError& e) {
-            set_fallback_logger(e.what());
+            set_fallback_logger_release(e.what());
             return;
         }
 
         try {
-            global_logger = spdlog::rotating_logger_mt("Release Logger [File]", file_path, FILE_SIZE, ROTATING_FILES);
+            _global_logger = spdlog::rotating_logger_mt(
+                "Release Logger [File]", file_path, FILE_SIZE, ROTATING_FILES
+            );
         } catch (const spdlog::spdlog_ex& e) {
-            set_fallback_logger(e.what());
+            set_fallback_logger_release(e.what());
             return;
         }
 
-        global_logger->set_pattern(LOG_PATTERN_RELEASE);
-        global_logger->set_level(spdlog::level::trace);
-        global_logger->flush_on(spdlog::level::info);
-
-        spdlog::set_default_logger(global_logger);
+        _global_logger->set_pattern(LOG_PATTERN_RELEASE);
+        _global_logger->set_level(spdlog::level::trace);
+        _global_logger->flush_on(spdlog::level::info);
 #endif
     }
 
@@ -81,7 +78,7 @@ namespace logging {
                 try {
                     file_path = paths::path_for_logs(info_file);
                 } catch (const user_data::UserNameError& e) {
-                    REL_ERROR("Could not create info file: {}", e.what());
+                    REL_ERROR("Could not create info file `{}`: {}", info_file, e.what());
                     break;
                 }
 
@@ -102,5 +99,9 @@ namespace logging {
             case LogTarget::None:
                 break;  // Do nothing
         }
+    }
+
+    spdlog::logger* get_global_logger() {
+        return _global_logger.get();
     }
 }

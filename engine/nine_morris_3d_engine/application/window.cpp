@@ -9,11 +9,12 @@
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/application/input.h"
 #include "nine_morris_3d_engine/other/logging.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 Window::Window(Application* app) {
     if (!glfwInit()) {
         REL_CRITICAL("Could not initialize GLFW, exiting...");
-        exit(1);
+        game_exit::exit_critical();
     }
 
 #ifdef PLATFORM_GAME_DEBUG
@@ -40,7 +41,7 @@ Window::Window(Application* app) {
 
     if (window == nullptr) {
         REL_CRITICAL("Could not create window, exiting...");
-        exit(1);
+        game_exit::exit_critical();
     }
 
     DEB_INFO("Initialized GLFW and created window");
@@ -49,7 +50,7 @@ Window::Window(Application* app) {
 
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
         REL_CRITICAL("Could not initialize GLAD, exiting...");
-        exit(1);
+        game_exit::exit_critical();
     }
 
     glfwSwapInterval(1);
@@ -157,7 +158,7 @@ std::vector<Monitor> Window::get_monitors() {
 
     if (monitors == nullptr) {
         REL_CRITICAL("Could not retrieve monitors, exiting...");
-        exit(1);
+        game_exit::exit_critical();
     }
 
     std::vector<Monitor> result;
@@ -205,7 +206,7 @@ void Window::set_cursor(unsigned int handle) {
         cursor = cursors.at(handle);
     } catch (const std::out_of_range&) {
         DEB_CRITICAL("Invalid handle: {}, exiting...", handle);
-        exit(1);
+        game_exit::exit_critical();
     }
     glfwSetCursor(window, cursor);
 #elif defined(PLATFORM_GAME_RELEASE)

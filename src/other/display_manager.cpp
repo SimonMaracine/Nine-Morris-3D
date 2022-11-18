@@ -15,7 +15,7 @@ DisplayManager::DisplayManager(Application* app)
 
     if (width < 512) {
         REL_CRITICAL("Monitor has unsupported resolution, exiting...");
-        exit(1);
+        game_exit::exit_critical();
     } else if (width < 768) {
         resolutions_supported = 1;
     } else if (width < 1024) {

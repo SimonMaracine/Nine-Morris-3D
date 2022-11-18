@@ -15,7 +15,7 @@ constexpr KeyboardControls::Direction NEXT[4][4] = {
 };
 
 KeyboardControls::KeyboardControls(Application* app, Board* board, std::shared_ptr<Renderer::Quad> quad)
-    : quad(quad), board(board) {
+    : board(board), quad(quad) {
 
     for (size_t i = 0; i < 24; i++) {
         nodes[i] = KNode(i);

@@ -8,6 +8,7 @@
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
+#include "nine_morris_3d_engine/other/exit.h"
 
 static std::string get_name(std::string_view file_path) {
     size_t last_slash = file_path.find_last_of("/");
@@ -81,7 +82,7 @@ Texture::Texture(std::string_view file_path, const TextureSpecification& specifi
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load texture `{}`, exiting...", file_path);
-        exit(1);
+        game_exit::exit_critical();
     }
 
     glGenTextures(1, &texture);
@@ -116,7 +117,7 @@ Texture::Texture(encrypt::EncryptedFile file_path, const TextureSpecification& s
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load texture `{}`, exiting...", file_path);
-        exit(1);
+        game_exit::exit_critical();
     }
 
     glGenTextures(1, &texture);
@@ -201,7 +202,7 @@ Texture3D::Texture3D(const char** file_paths) {
 
         if (data == nullptr) {
             REL_CRITICAL("Could not load texture `{}`, exiting...", file_paths[i]);
-            exit(1);
+            game_exit::exit_critical();
         }
     }
 
