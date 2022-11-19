@@ -7,6 +7,8 @@ public:
     Timer() = default;
     Timer(Application* app)
         : app(app) {}
+    Timer(Application* app, unsigned int time)
+        : time(time), app(app) {}
     ~Timer() = default;
 
     Timer(const Timer&) = delete;

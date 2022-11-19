@@ -124,7 +124,7 @@ void ImGuiLayer<S, B>::update() {
     try {
         info_file_path = paths::path_for_logs(app->data().info_file_name);
         save_game_file_path = paths::path_for_saved_data(save_load::SAVE_GAME_FILE);
-    } catch (const user_data::UserNameError& e) {
+    } catch (const user_data::UserNameError& e) {  // TODO message can be better
         REL_ERROR("{}", e.what());
 
         info_file_path = app->data().info_file_name;
@@ -167,9 +167,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (last_save_game_date == save_load::NO_LAST_GAME) {
                     show_no_last_game = true;
                 } else {
-                    scene->board.finalize_pieces_state();
-
-                    // game_layer->load_game();  // FIXME
+                    scene->load_game();
                 }
             }
             if (ImGui::IsItemHovered()) {

@@ -12,8 +12,8 @@ public:
     std::vector<const char*> get_resolutions();
     std::vector<const char*> get_monitor_names();
 private:
-    Application* app = nullptr;
-
     std::vector<Monitor> monitors;
     size_t resolutions_supported = 0;
+
+    Application* app = nullptr;
 };

@@ -30,7 +30,7 @@ namespace save_load {
                     REL_ERROR("Could not create user data directory");
                     return;
                 }
-            } catch (const user_data::UserNameError& e) {
+            } catch (const user_data::UserNameError& e) {  // TODO message can be better
                 REL_ERROR("{}", e.what());
                 return;
             }

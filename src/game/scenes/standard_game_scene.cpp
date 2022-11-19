@@ -75,8 +75,6 @@ void StandardGameScene::on_stop() {
         save_game();
     }
 
-    timer = Timer {};
-
 #ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = false;
 #endif
@@ -1159,7 +1157,38 @@ void StandardGameScene::save_game() {
 }
 
 void StandardGameScene::load_game() {
+    board.finalize_pieces_state();
 
+    save_load::SavedGame<StandardBoardSerialized> saved_game;
+
+    try {
+        save_load::load_game_from_file(saved_game);
+    } catch (const save_load::SaveFileNotOpenError& e) {
+        REL_WARN("{}", e.what());
+        REL_WARN("Could not load game");
+
+        save_load::handle_save_file_not_open_error(app->data().application_name);
+
+        imgui_layer.show_could_not_load_game = true;
+        return;
+    } catch (const save_load::SaveFileError& e) {
+        REL_WARN("{}", e.what());  // TODO maybe delete file
+        REL_WARN("Could not load game");
+
+        imgui_layer.show_could_not_load_game = true;
+        return;
+    }
+
+    board.from_serialized(saved_game.board_serialized);
+    camera = saved_game.camera;
+    timer = Timer {app, saved_game.time};
+    undo_redo_state = std::move(saved_game.undo_redo_state);
+    game.white_player = saved_game.white_player;
+    game.black_player = saved_game.black_player;
+
+    made_first_move = false;
+
+    update_cursor();
 }
 
 void StandardGameScene::undo() {
