@@ -24,10 +24,10 @@ struct PieceSerialized {
 
     size_t node_index = NULL_INDEX;
 
-    PieceMovement movement;
+    PieceMovement movement;  // TODO maybe not needed
 
     bool show_outline = false;
     bool to_take = false;
     bool pending_remove = false;
-    bool selected = false;
+    bool selected = false;  // TODO maybe not needed
 };

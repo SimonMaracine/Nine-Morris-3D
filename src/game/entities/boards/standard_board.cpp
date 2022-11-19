@@ -209,7 +209,7 @@ void StandardBoard::place_piece(size_t node_index) {
 
                 FORMATTED_MESSAGE(
                     message, 64, "%s player has blocked %s player.",
-                    TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("White", "Black")
+                    TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
                 )
 
                 game_over(
@@ -288,7 +288,7 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
 
             FORMATTED_MESSAGE(
                 message, 64, "%s player has blocked %s player.",
-                TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("White", "Black")
+                TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
             )
 
             game_over(
@@ -335,7 +335,7 @@ void StandardBoard::take_piece(size_t piece_index) {
 
         FORMATTED_MESSAGE(
             message, 64, "%s player has blocked %s player.",
-            TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("White", "Black")
+            TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
         )
 
         game_over(
@@ -780,6 +780,7 @@ void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
         serialized.pieces.at(index).show_outline = piece.show_outline;
         serialized.pieces.at(index).to_take = piece.to_take;
         serialized.pieces.at(index).pending_remove = piece.pending_remove;
+        serialized.pieces.at(index).selected = piece.selected;
     }
 
     serialized.phase = phase;
@@ -818,6 +819,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             pieces.at(ser_index).show_outline = ser_piece.show_outline;
             pieces.at(ser_index).to_take = ser_piece.to_take;
             pieces.at(ser_index).pending_remove = ser_piece.pending_remove;
+            pieces.at(ser_index).selected = ser_piece.selected;
         } else {
             Piece piece = Piece {
                 ser_index,
@@ -840,6 +842,13 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
             piece.model->id = std::make_optional<identifier::Id>(data.piece_ids[ser_index]);
             piece.model->cast_shadow = true;
+
+            piece.in_use = ser_piece.in_use;
+            piece.node_index = ser_piece.node_index;
+            piece.show_outline = ser_piece.show_outline;
+            piece.to_take = ser_piece.to_take;
+            piece.pending_remove = ser_piece.pending_remove;
+            piece.selected = ser_piece.selected;
 
             app->renderer->add_model(piece.model);
             pieces[ser_index] = piece;
