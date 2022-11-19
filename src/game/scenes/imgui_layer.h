@@ -409,7 +409,9 @@ void ImGuiLayer<S, B>::draw_game_over() {
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("Game Over", nullptr, window_flags)) {
-        ImGui::Dummy(ImVec2(0.0f, 4.0f));
+        HOVERING_GUI();
+
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         switch (scene->board.ending.type) {
             case BoardEnding::WinnerWhite: {
@@ -445,7 +447,7 @@ void ImGuiLayer<S, B>::draw_game_over() {
         ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
         ImGui::Text("%s", time_label);
 
-        ImGui::Dummy(ImVec2(0.0f, 8.0f));
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
@@ -481,13 +483,15 @@ void ImGuiLayer<S, B>::draw_about() {
         //     deactivated = true;
         // }
 
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
         ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
         ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor, app->data().version_patch);
         ImGui::Separator();
         ImGui::Text("All programming by:");
         ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
 
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
         const float window_width = ImGui::GetWindowSize().x;
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
@@ -528,12 +532,14 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
         //     deactivated = true;
         // }
 
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
         ImGui::Text("Could not load last game.");
         ImGui::Text("The save game file is either missing or is corrupted.");
         ImGui::Separator();
         ImGui::Text("%s", save_game_file_path.c_str());
 
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
         const float window_width = ImGui::GetWindowSize().x;
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
@@ -574,9 +580,11 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
         //     deactivated = true;
         // }
 
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
         ImGui::Text("There is no last game saved.");
 
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
         const float window_width = ImGui::GetWindowSize().x;
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
