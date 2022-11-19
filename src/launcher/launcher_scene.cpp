@@ -342,7 +342,7 @@ void LauncherScene::on_imgui_update() {
         ImGui::EndTabBar();
     }
 
-    ImGui::Dummy(ImVec2(0.0f, 30.0f));
+    ImGui::Dummy(ImVec2(0.0f, 25.0f));
     ImGui::Dummy(ImVec2(90.0f, 0.0f));
     ImGui::SameLine();
 
@@ -367,6 +367,8 @@ void LauncherScene::on_window_closed(const WindowClosedEvent&) {
 
 void LauncherScene::welcome_page() {
     if (ImGui::BeginTabItem("Welcome")) {
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
         // FIXME add proper content
         ImGui::Text("Nine Morris 3D: a nice board game");
         ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor,
@@ -380,6 +382,8 @@ void LauncherScene::display_page() {
     auto& data = app->user_data<Data>();
 
     if (ImGui::BeginTabItem("Display")) {
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
         ImGui::PushItemWidth(170.0f);
 
         ImGui::Text("Fullscreen"); ImGui::SameLine();
@@ -404,6 +408,8 @@ void LauncherScene::graphics_page() {
     auto& data = app->user_data<Data>();
 
     if (ImGui::BeginTabItem("Graphics")) {
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
         ImGui::PushItemWidth(170.0f);
 
         static size_t samples_index = map_samples_to_index(data.launcher_options.samples);
