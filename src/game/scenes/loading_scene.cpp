@@ -9,7 +9,7 @@
 void LoadingScene::on_start() {
     auto& data = app->user_data<Data>();
 
-    loader = std::make_unique<assets_load::CustomLoader>(assets_load::all_start);
+    loader = std::make_unique<assets_load::AllStartLoader>(assets_load::all_start);
     loader->start_loading_thread(
         data.launcher_options.normal_mapping,
         data.launcher_options.texture_quality,

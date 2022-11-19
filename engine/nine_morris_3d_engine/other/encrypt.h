@@ -31,7 +31,7 @@ namespace encrypt {
     }
 #else
     constexpr EncryptedFile encr(std::string_view file_path) {
-        return EncryptedFile(file_path);
+        return EncryptedFile {file_path};
     }
 #endif
 }

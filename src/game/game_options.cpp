@@ -2,7 +2,7 @@
 
 namespace game_options {
     std::pair<bool, std::string> validate(const GameOptions& options) {
-        if (options.skybox != FIELD && options.skybox != AUTUMN) {
+        if (options.skybox != FIELD && options.skybox != AUTUMN && options.skybox != NONE) {
             return {false, "Options file is invalid: skybox"};
         }
 

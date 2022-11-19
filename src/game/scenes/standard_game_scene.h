@@ -72,12 +72,16 @@ struct StandardGameScene : public Scene {
     void update_after_human_move(bool did_action, bool switched_turn, bool must_take_piece_or_took_piece);
     void update_after_computer_move(bool switched_turn);
 
+    void set_skybox(Skybox skybox);  // TODO maybe move this out
+    void change_skybox();
+    void check_skybox_loader();
+
     void save_game();
     void load_game();
     void undo();
     void redo();
 
-    std::unique_ptr<assets_load::CustomLoader> loader;
+    std::unique_ptr<assets_load::SkyboxLoader> skybox_loader;
 
     // ImGui
     ImGuiLayer<StandardGameScene, StandardBoardSerialized> imgui_layer;

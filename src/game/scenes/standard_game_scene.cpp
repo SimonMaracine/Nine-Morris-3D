@@ -84,9 +84,9 @@ void StandardGameScene::on_stop() {
 
     made_first_move = false;
 
-    if (loader != nullptr) {
-        if (loader->joinable()) {
-            loader->join();
+    if (skybox_loader != nullptr) {
+        if (skybox_loader->joinable()) {
+            skybox_loader->join();
         }
     }
 }
@@ -133,6 +133,8 @@ void StandardGameScene::on_update() {
     update_timer_text();
     update_wait_indicator();
     update_computer_thinking_indicator();
+
+    check_skybox_loader();
 }
 
 void StandardGameScene::on_fixed_update() {
@@ -794,7 +796,12 @@ void StandardGameScene::setup_entity_ids() {
 }
 
 void StandardGameScene::setup_skybox() {
-    std::array<std::shared_ptr<TextureData>, 6> data = {
+    if (app->user_data<Data>().options.skybox == game_options::NONE) {
+        DEB_DEBUG("Setup skybox");
+        return;
+    }
+
+    const std::array<std::shared_ptr<TextureData>, 6> data = {
         app->res.texture_data["skybox_px_texture"_h],
         app->res.texture_data["skybox_nx_texture"_h],
         app->res.texture_data["skybox_py_texture"_h],
@@ -818,6 +825,9 @@ void StandardGameScene::setup_light() {
     } else if (data.options.skybox == game_options::AUTUMN) {
         app->renderer->light = LIGHT_AUTUMN;
         app->renderer->light_space = SHADOWS_AUTUMN;
+    } else if (data.options.skybox == game_options::NONE) {
+        app->renderer->light = LIGHT_NONE;
+        app->renderer->light_space = SHADOWS_NONE;
     } else {
         ASSERT(false, "Invalid skybox");
     }
@@ -827,6 +837,8 @@ void StandardGameScene::setup_light() {
         data.quad_cache["light_bulb"_h]->position = LIGHT_FIELD.position;
     } else if (data.options.skybox == game_options::AUTUMN) {
         data.quad_cache["light_bulb"_h]->position = LIGHT_AUTUMN.position;
+    } else if (data.options.skybox == game_options::NONE) {
+        data.quad_cache["light_bulb"_h]->position = LIGHT_NONE.position;
     }
 #endif
 
@@ -1122,6 +1134,48 @@ void StandardGameScene::update_after_computer_move(bool switched_turn) {
 
     imgui_layer.can_undo = undo_redo_state.undo.size() > 0;
     imgui_layer.can_redo = undo_redo_state.redo.size() > 0;
+}
+
+void StandardGameScene::set_skybox(Skybox skybox) {
+    if (skybox == Skybox::None) {
+        app->renderer->set_skybox(nullptr);
+        return;
+    }
+
+    if (skybox_loader != nullptr) {
+        DEB_WARN("Skybox already loading");
+        return;
+    }
+
+    auto& data = app->user_data<Data>();
+
+    skybox_loader = std::make_unique<assets_load::SkyboxLoader>(assets_load::skybox);
+    skybox_loader->start_loading_thread(data.launcher_options.texture_quality, data.options.skybox);
+}
+
+void StandardGameScene::change_skybox() {
+    const std::array<std::shared_ptr<TextureData>, 6> data = {
+        app->res.texture_data["skybox_px_texture"_h],
+        app->res.texture_data["skybox_nx_texture"_h],
+        app->res.texture_data["skybox_py_texture"_h],
+        app->res.texture_data["skybox_ny_texture"_h],
+        app->res.texture_data["skybox_pz_texture"_h],
+        app->res.texture_data["skybox_nz_texture"_h]
+    };
+
+    auto texture = app->res.texture_3d.force_load("skybox_texture"_h, data);
+    app->renderer->set_skybox(texture);
+
+    setup_light();
+}
+
+void StandardGameScene::check_skybox_loader() {
+    if (skybox_loader != nullptr && skybox_loader->done_loading()) {
+        skybox_loader->join_and_merge(app->res);
+        skybox_loader.reset();
+
+        change_skybox();
+    }
 }
 
 void StandardGameScene::save_game() {

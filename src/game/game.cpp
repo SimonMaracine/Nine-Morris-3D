@@ -8,32 +8,15 @@
 #include "launcher/launcher_options.h"
 #include "other/options.h"
 #include "other/data.h"
+#include "other/save_load_gracefully.h"
 
 namespace game {
     static void load_game_options(Application* app) {
         auto& data = app->user_data<Data>();
 
-        try {
-            options::load_options_from_file<game_options::GameOptions>(
-                data.options, game_options::GAME_OPTIONS_FILE, game_options::validate
-            );
-        } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("{}", e.what());
-
-            options::handle_options_file_not_open_error<game_options::GameOptions>(
-                game_options::GAME_OPTIONS_FILE, app->data().application_name
-            );
-        } catch (const options::OptionsFileError& e) {
-            REL_ERROR("{}", e.what());
-
-            try {
-                options::create_options_file<game_options::GameOptions>(game_options::GAME_OPTIONS_FILE);
-            } catch (const options::OptionsFileNotOpenError& e) {
-                REL_ERROR("{}", e.what());
-            } catch (const options::OptionsFileError& e) {
-                REL_ERROR("{}", e.what());
-            }
-        }
+        save_load_gracefully::load_from_file<game_options::GameOptions>(
+            game_options::GAME_OPTIONS_FILE, data.options, game_options::validate, app
+        );
     }
 
     static void setup_icons(Application* app) {
@@ -213,7 +196,9 @@ namespace game {
         app->renderer->set_scene_framebuffer(data.launcher_options.samples);
 
         // Setup depth map framebuffer
-        app->renderer->set_shadow_map_framebuffer(data.launcher_options.texture_quality == launcher_options::NORMAL ? 4096 : 2048);
+        app->renderer->set_shadow_map_framebuffer(
+            data.launcher_options.texture_quality == launcher_options::NORMAL ? 4096 : 2048
+        );
     }
 
     void stop(Application*) {

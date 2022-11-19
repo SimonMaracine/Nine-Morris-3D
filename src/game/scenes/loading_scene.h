@@ -17,7 +17,7 @@ struct LoadingScene : public Scene {
     void load_splash_screen_texture();
     void update_loading_animation();
 
-    std::unique_ptr<assets_load::CustomLoader> loader;
+    std::unique_ptr<assets_load::AllStartLoader> loader;
 
     struct {
         double previous_seconds = 0.0;

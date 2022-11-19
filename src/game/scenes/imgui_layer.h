@@ -290,19 +290,28 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 static int skybox = data.options.skybox;
 
                 if (ImGui::RadioButton("None", &skybox, 0)) {
-                    // game_layer->set_skybox(options::FIELD);  // FIXME
+                    if (skybox != data.options.skybox) {
+                        data.options.skybox = skybox;
+                        scene->set_skybox(Skybox::None);
 
-                    DEB_INFO("Skybox set to {}", game_options::NONE);
+                        DEB_INFO("Skybox set to none");
+                    }
                 }
                 if (ImGui::RadioButton("Field", &skybox, 1)) {
-                    // game_layer->set_skybox(options::FIELD);  // FIXME
+                    if (skybox != data.options.skybox) {
+                        data.options.skybox = skybox;
+                        scene->set_skybox(Skybox::Field);
 
-                    DEB_INFO("Skybox set to {}", game_options::FIELD);
+                        DEB_INFO("Skybox set to field");
+                    }
                 }
                 if (ImGui::RadioButton("Autumn", &skybox, 2)) {
-                    // game_layer->set_skybox(options::AUTUMN);  // FIXME
+                    if (skybox != data.options.skybox) {
+                        data.options.skybox = skybox;
+                        scene->set_skybox(Skybox::Autumn);
 
-                    DEB_INFO("Skybox set to {}", game_options::AUTUMN);
+                        DEB_INFO("Skybox set to autumn");
+                    }
                 }
 
                 ImGui::EndMenu();

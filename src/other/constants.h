@@ -68,6 +68,20 @@ constexpr Renderer::LightSpace SHADOWS_AUTUMN = {
     3.1f
 };
 
+constexpr DirectionalLight LIGHT_NONE = {  // TODO right now they are the same as field; change this
+    glm::vec3(5.7f, 8.4f, 12.4f),
+    glm::vec3(0.4f),
+    glm::vec3(0.88f),
+    glm::vec3(0.9f)
+};
+
+constexpr Renderer::LightSpace SHADOWS_NONE = {
+    -4.7f, 4.7f,
+    -1.9f, 2.76f,
+    1.0f, 9.0f,
+    3.1f
+};
+
 enum class BoardPhase {
     None,
     PlacePieces = 1,
