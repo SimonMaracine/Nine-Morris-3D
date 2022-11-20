@@ -76,12 +76,17 @@ struct StandardGameScene : public Scene {
     void change_skybox();
     void check_skybox_loader();
 
+    void set_board_paint_texture();  // TODO maybe move this out
+    void change_board_paint_texture();
+    void check_board_paint_texture_loader();
+
     void save_game();
     void load_game();
     void undo();
     void redo();
 
     std::unique_ptr<assets_load::SkyboxLoader> skybox_loader;
+    std::unique_ptr<assets_load::BoardPaintTextureLoader> board_paint_texture_loader;
 
     // ImGui
     ImGuiLayer<StandardGameScene, StandardBoardSerialized> imgui_layer;

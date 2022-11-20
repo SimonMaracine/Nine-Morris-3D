@@ -54,8 +54,8 @@ public:
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
-    entt::dispatcher evt;
-    Resources res;
+    entt::dispatcher evt;  // Event dispatcher
+    Resources res;  // Global cache of resources
 private:
     float update_frame_counter();
     unsigned int calculate_fixed_update();

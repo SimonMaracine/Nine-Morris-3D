@@ -135,6 +135,7 @@ void StandardGameScene::on_update() {
     update_computer_thinking_indicator();
 
     check_skybox_loader();
+    check_board_paint_texture_loader();
 }
 
 void StandardGameScene::on_fixed_update() {
@@ -1175,6 +1176,45 @@ void StandardGameScene::check_skybox_loader() {
         skybox_loader.reset();
 
         change_skybox();
+    }
+}
+
+void StandardGameScene::set_board_paint_texture() {
+    if (board_paint_texture_loader != nullptr) {
+        DEB_WARN("Board paint texture already loading");
+        return;
+    }
+
+    auto& data = app->user_data<Data>();
+
+    board_paint_texture_loader = std::make_unique<assets_load::BoardPaintTextureLoader>(assets_load::board_paint_texture);
+    board_paint_texture_loader->start_loading_thread(data.launcher_options.texture_quality, data.options.labeled_board);
+}
+
+void StandardGameScene::change_board_paint_texture() {
+    auto& data = app->user_data<Data>();
+
+    TextureSpecification specification;
+    specification.mag_filter = Filter::Linear;
+    specification.mipmapping = true;
+    specification.bias = -1.0f;
+    specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
+
+    auto diffuse_texture = app->res.texture.force_load(
+        "board_paint_diffuse_texture"_h,
+        app->res.texture_data["board_paint_diffuse_texture"_h],
+        specification
+    );
+
+    app->res.material_instance["board_paint_material_instance"_h]->set_texture("u_material.diffuse", diffuse_texture, 0);
+}
+
+void StandardGameScene::check_board_paint_texture_loader() {
+    if (board_paint_texture_loader != nullptr && board_paint_texture_loader->done_loading()) {
+        board_paint_texture_loader->join_and_merge(app->res);
+        board_paint_texture_loader.reset();
+
+        change_board_paint_texture();
     }
 }
 

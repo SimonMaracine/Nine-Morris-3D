@@ -358,14 +358,18 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             static bool labeled_board = data.options.labeled_board;
 
             if (ImGui::MenuItem("Labeled Board", nullptr, &labeled_board)) {
-                if (labeled_board) {
-                    // game_layer->set_labeled_board_texture(labeled_board);  // FIXME
+                if (labeled_board && labeled_board != data.options.labeled_board) {
+                    data.options.labeled_board = labeled_board;
+                    scene->set_board_paint_texture();
 
-                    DEB_INFO("Labeled board");
-                } else {
-                    // game_layer->set_labeled_board_texture(labeled_board);  // FIXME
+                    DEB_INFO("Board paint texture set to labeled");
+                }
 
-                    DEB_INFO("Non-labeled board");
+                if (!labeled_board && labeled_board != data.options.labeled_board) {
+                    data.options.labeled_board = labeled_board;
+                    scene->set_board_paint_texture();
+
+                    DEB_INFO("Board paint texture set to non-labeled");
                 }
             }
 

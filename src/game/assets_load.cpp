@@ -206,23 +206,23 @@ namespace assets_load {
     //     loader->set_done();
     // }
 
-    // void board_paint_texture(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
-    //     if (options.texture_quality == options::NORMAL) {
-    //         if (options.labeled_board) {
-    //             loader->get()->board_paint_diffuse_texture = std::make_shared<TextureData>(encr(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE)), true);
-    //         } else {
-    //             loader->get()->board_paint_diffuse_texture = std::make_shared<TextureData>(encr(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE)), true);
-    //         }
-    //     } else if (options.texture_quality == options::LOW) {
-    //         if (options.labeled_board) {
-    //             loader->get()->board_paint_diffuse_texture = std::make_shared<TextureData>(encr(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
-    //         } else {
-    //             loader->get()->board_paint_diffuse_texture = std::make_shared<TextureData>(encr(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
-    //         }
-    //     }
+    void board_paint_texture(BoardPaintTextureLoader& loader, int texture_quality, bool labeled_board) {
+        if (texture_quality == launcher_options::NORMAL) {
+            if (labeled_board) {
+                loader().texture_data.load("board_paint_diffuse_texture"_h, encr(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE)), true);
+            } else {
+                loader().texture_data.load("board_paint_diffuse_texture"_h, encr(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE)), true);
+            }
+        } else if (texture_quality == launcher_options::LOW) {
+            if (labeled_board) {
+                loader().texture_data.load("board_paint_diffuse_texture"_h, encr(path_for_assets(LABELED_BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
+            } else {
+                loader().texture_data.load("board_paint_diffuse_texture"_h, encr(path_for_assets(BOARD_PAINT_DIFFUSE_TEXTURE_SMALL)), true);
+            }
+        }
 
-    //     loader->set_done();
-    // }
+        loader.set_done();
+    }
 
     // void normal_mapping(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
     //     if (options.normal_mapping) {

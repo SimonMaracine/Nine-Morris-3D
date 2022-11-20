@@ -17,7 +17,7 @@ public:
     ~ConcurrentLoader() = default;
 
     Resources& operator()() {
-        return temp_res;
+        return local_res;
     }
 
     bool done_loading() {
@@ -27,7 +27,7 @@ public:
     void join_and_merge(Resources& res) {
         loading_thread.join();
 
-        res.merge(temp_res);
+        res.merge(local_res);
     }
 
     void join() {
@@ -48,7 +48,7 @@ public:
         loaded.store(true);
     }
 private:
-    Resources temp_res;
+    Resources local_res;
     Function load_function;
     std::thread loading_thread;
     std::atomic<bool> loaded = false;
