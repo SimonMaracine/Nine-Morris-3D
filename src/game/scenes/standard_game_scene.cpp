@@ -113,9 +113,6 @@ void StandardGameScene::on_awake() {
     app->evt.sink<KeyPressedEvent>().connect<&StandardGameScene::on_key_pressed>(*this);
     app->evt.sink<KeyReleasedEvent>().connect<&StandardGameScene::on_key_released>(*this);
     app->evt.sink<WindowResizedEvent>().connect<&StandardGameScene::on_window_resized>(*this);
-
-    // It's ok to be called multiple times
-    LOG_TOTAL_GPU_MEMORY_ALLOCATED()
 }
 
 void StandardGameScene::on_update() {
@@ -273,14 +270,16 @@ void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
 }
 
 std::shared_ptr<Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, identifier::Id id, hs hash) {
-    std::vector<int> array;
+    using IdType = float;
+
+    std::vector<IdType> array;
     array.resize(vertices_size);
 
     for (size_t i = 0; i < array.size(); i++) {
-        array[i] = static_cast<int>(id);
+        array[i] = id;
     }
 
-    return app->res.buffer.load(hash, array.data(), array.size() * sizeof(int));
+    return app->res.buffer.load(hash, array.data(), array.size() * sizeof(IdType));
 }
 
 void StandardGameScene::initialize_rendering_board() {
@@ -551,7 +550,7 @@ void StandardGameScene::initialize_rendering_piece(
     layout.add(3, BufferLayout::Float, 3);
 
     BufferLayout layout2;
-    layout2.add(4, BufferLayout::Int, 1);
+    layout2.add(4, BufferLayout::Float, 1);
 
     auto vertex_array = app->res.vertex_array.load(hs {"piece_vertex_array" + std::to_string(index)});
     vertex_array->add_buffer(buffer, layout);
@@ -618,7 +617,7 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
     layout.add(0, BufferLayout::Float, 3);
 
     BufferLayout layout2;
-    layout2.add(1, BufferLayout::Int, 1);
+    layout2.add(1, BufferLayout::Float, 1);
 
     auto vertex_array = app->res.vertex_array.load(hs {"node_vertex_array" + std::to_string(index)});
     vertex_array->add_buffer(buffer, layout);

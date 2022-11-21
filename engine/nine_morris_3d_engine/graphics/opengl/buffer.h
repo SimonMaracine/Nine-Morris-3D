@@ -86,6 +86,6 @@ public:
     void unmap_data();
 private:
     GLuint buffer = 0;
-    void* data = nullptr;
+    void* data = nullptr;  // FIXME clear value is float; should be generic
     char* dummy_data = nullptr;
 };

@@ -5,7 +5,8 @@
 enum class AttachmentFormat {
     None,
     RGBA8,
-    RED_I,
+    RED_INT,
+    RED_FLOAT,
     DEPTH24_STENCIL8,
     DEPTH32
 };
@@ -37,9 +38,9 @@ struct FramebufferSpecification {
     unsigned int resize_divisor = 1;
     bool white_border_for_depth_texture = false;
 
-    // Integer color attachment clearing stuff
+    // Color attachment clearing stuff
     GLint clear_drawbuffer = 0;
-    const GLint* clear_value = nullptr;
+    const GLfloat* clear_value = nullptr;
 };
 
 class Framebuffer {
@@ -59,11 +60,11 @@ public:
     void resize(int width, int height);
 
     // Read pixels
-    int read_pixel_red_integer(GLint attachment_index, int x, int y);
-    void read_pixel_red_integer_pbo(GLint attachment_index, int x, int y);
+    float read_pixel_red_value(GLint attachment_index, int x, int y);  // FIXME red value is float; should be generic
+    void read_pixel_red_value_pbo(GLint attachment_index, int x, int y);
 
     // Clear buffer
-    void clear_integer_color_attachment();
+    void clear_color_attachment_float();  // FIXME should be generic
 
     // Resolve this to draw_framebuffer
     void blit(Framebuffer* draw_framebuffer, int width, int height);
@@ -79,7 +80,9 @@ private:
     GLuint depth_attachment = 0;
 
     static constexpr GLenum COLOR_ATTACHMENTS[4] = {
-        GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-        GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+        GL_COLOR_ATTACHMENT0,
+        GL_COLOR_ATTACHMENT1,
+        GL_COLOR_ATTACHMENT2,
+        GL_COLOR_ATTACHMENT3
     };
 };

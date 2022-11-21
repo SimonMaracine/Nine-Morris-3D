@@ -201,7 +201,7 @@ Renderer::Renderer(Application* app)
         specification.height = app->data().height;
         specification.color_attachments = {
             Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
-            Attachment(AttachmentFormat::RED_I, AttachmentType::Renderbuffer)
+            Attachment(AttachmentFormat::RED_FLOAT, AttachmentType::Renderbuffer)
         };
 
         storage.intermediate_framebuffer = std::make_shared<Framebuffer>(specification);
@@ -211,10 +211,10 @@ Renderer::Renderer(Application* app)
     }
 
     storage.pixel_buffers = {
-        std::make_shared<PixelBuffer>(sizeof(int)),
-        std::make_shared<PixelBuffer>(sizeof(int)),
-        std::make_shared<PixelBuffer>(sizeof(int)),
-        std::make_shared<PixelBuffer>(sizeof(int))
+        std::make_shared<PixelBuffer>(sizeof(float)),
+        std::make_shared<PixelBuffer>(sizeof(float)),
+        std::make_shared<PixelBuffer>(sizeof(float)),
+        std::make_shared<PixelBuffer>(sizeof(float))
     };
 
     reader = FramebufferReader<4> {storage.pixel_buffers, storage.intermediate_framebuffer};
@@ -257,7 +257,7 @@ void Renderer::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glViewport(0, 0, app->data().width, app->data().height);
 
-    storage.scene_framebuffer->clear_integer_color_attachment();
+    storage.scene_framebuffer->clear_color_attachment_float();
 
     // Bind shadow map for use in shadow rendering
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
@@ -301,11 +301,15 @@ void Renderer::render() {
     // Do post processing and render the final image to the screen
     end_rendering();
 
-    int* data;
-    reader.get<int>(&data);
+    using IdType = float;
+
+    IdType* data;
+    reader.get<IdType>(&data);
     hovered_id = *data;
 
     check_hovered_id(x, y);
+
+    DEB_DEBUG("{}", hovered_id);
 }
 
 void Renderer::add_model(std::shared_ptr<Model> model) {
@@ -373,12 +377,12 @@ void Renderer::set_scene_framebuffer(int samples) {
     specification.samples = samples;
     specification.color_attachments = {
         Attachment(AttachmentFormat::RGBA8, AttachmentType::Renderbuffer),
-        Attachment(AttachmentFormat::RED_I, AttachmentType::Renderbuffer)
+        Attachment(AttachmentFormat::RED_FLOAT, AttachmentType::Renderbuffer)
     };
     specification.depth_attachment = Attachment(
         AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
     );
-    static constexpr int color[4] = { 0, 0, 0, 0 };
+    static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     specification.clear_drawbuffer = 1;
     specification.clear_value = color;
 

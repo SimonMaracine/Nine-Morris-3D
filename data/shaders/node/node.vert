@@ -1,9 +1,9 @@
 #version 430 core
 
 layout(location = 0) in vec3 a_position;
-layout(location = 1) in int a_entity_id;
+layout(location = 1) in float a_entity_id;
 
-out flat int v_entity_id;
+out flat float v_entity_id;
 
 uniform mat4 u_model_matrix;
 

@@ -3,7 +3,6 @@
 #include <cppblowfish/cppblowfish.h>
 
 #include "nine_morris_3d_engine/application/platform.h"
-#include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/graphics/opengl/shader.h"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
@@ -329,7 +328,6 @@ void Shader::configure_uniform_blocks(GLuint program, const std::vector<UniformB
 
             glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
             glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
-            LOG_ALLOCATION(block_size)
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
             ASSERT(block.field_count <= 16, "Maximum 16 fields for now");

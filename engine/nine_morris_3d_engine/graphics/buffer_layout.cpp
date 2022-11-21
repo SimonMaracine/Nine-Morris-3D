@@ -13,11 +13,12 @@ size_t VertexElement::get_size(GLenum type) {
         default:
             REL_CRITICAL("Type {} is not supported, exiting...", type);
             game_exit::exit_critical();
-            return 0;
     }
+
+    return 0;
 }
 
-void BufferLayout::add(GLuint index, Type type, GLint size) {
+void BufferLayout::add(GLuint index, Type type, GLint size) {  // TODO refactor
     GLenum gl_type = 0;
 
     switch (type) {
@@ -32,6 +33,6 @@ void BufferLayout::add(GLuint index, Type type, GLint size) {
             game_exit::exit_critical();
     }
 
-    elements.push_back({ index, gl_type, size });
+    elements.push_back(VertexElement {index, gl_type, size});
     stride += size * VertexElement::get_size(gl_type);
 }

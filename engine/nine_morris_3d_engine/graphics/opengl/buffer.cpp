@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 
-#include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
@@ -9,7 +8,6 @@ Buffer::Buffer(size_t size, DrawHint hint)
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, static_cast<int>(hint));
-    LOG_ALLOCATION(size)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -21,7 +19,6 @@ Buffer::Buffer(const void* data, size_t size, DrawHint hint)
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(hint));
-    LOG_ALLOCATION(size)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -52,7 +49,6 @@ IndexBuffer::IndexBuffer(const unsigned int* data, size_t size) {
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-    LOG_ALLOCATION(size)
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
@@ -115,9 +111,8 @@ PixelBuffer::PixelBuffer(size_t size) {
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
     glBufferData(GL_PIXEL_PACK_BUFFER, size, nullptr, GL_STREAM_READ);
-    const int value = 0;
-    glClearBufferData(GL_PIXEL_PACK_BUFFER, GL_R32I, GL_RED_INTEGER, GL_INT, &value);
-    LOG_ALLOCATION(size)
+    const float value = 0.0f;
+    glClearBufferData(GL_PIXEL_PACK_BUFFER, GL_R32F, GL_RED, GL_FLOAT, &value);
 
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
@@ -154,7 +149,7 @@ void PixelBuffer::map_data() {
 }
 
 void PixelBuffer::unmap_data() {
-    GLboolean success = glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+    const GLboolean success = glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 
     if (success == GL_FALSE) {
         DEB_ERROR("Memory mapped by buffer {} became corrupted while it was used", buffer);

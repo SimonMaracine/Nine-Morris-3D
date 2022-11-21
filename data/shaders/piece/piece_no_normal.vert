@@ -3,11 +3,11 @@
 layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec2 a_texture_coordinate;
 layout(location = 2) in vec3 a_normal;
-layout(location = 3) in int a_entity_id;
+layout(location = 3) in float a_entity_id;
 
 out vec2 v_texture_coordinate;
 out vec3 v_normal;
-out flat int v_entity_id;
+out flat float v_entity_id;
 out vec3 v_fragment_position;
 out vec4 v_fragment_position_light_space;
 out vec3 v_light_position;

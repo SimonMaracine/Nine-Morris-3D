@@ -636,7 +636,7 @@ void ImGuiLayer<S, B>::draw_debug() {
         ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
         ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());
         ImGui::Text("Redo history size: %lu", scene->undo_redo_state.redo.size());
-        ImGui::Text("Hovered ID: %d", app->renderer->get_hovered_id());
+        ImGui::Text("Hovered ID: %f", static_cast<float>(app->renderer->get_hovered_id()));
         ImGui::Text("Clicked node: %lu", scene->board.clicked_node_index);
         ImGui::Text("Clicked piece: %lu", scene->board.clicked_piece_index);
         ImGui::Text("Selected piece: %lu", scene->board.selected_piece_index);

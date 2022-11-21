@@ -3,7 +3,6 @@
 #include <cppblowfish/cppblowfish.h>
 
 #include "nine_morris_3d_engine/application/capabilities.h"
-#include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/graphics/opengl/texture.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
@@ -92,7 +91,6 @@ Texture::Texture(std::string_view file_path, const TextureSpecification& specifi
 
     glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    LOG_ALLOCATION(width * height * 4)
 
     configure_mipmapping(specification);
 
@@ -127,7 +125,6 @@ Texture::Texture(encrypt::EncryptedFile file_path, const TextureSpecification& s
 
     glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, width, height);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    LOG_ALLOCATION(width * height * 4)
 
     configure_mipmapping(specification);
 
@@ -150,7 +147,6 @@ Texture::Texture(std::shared_ptr<TextureData> data, const TextureSpecification& 
 
     glTexStorage2D(GL_TEXTURE_2D, 4, GL_RGBA8, data->width, data->height);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data->width, data->height, GL_RGBA, GL_UNSIGNED_BYTE, data->data);
-    LOG_ALLOCATION(data->width * data->height * 4)
 
     configure_mipmapping(specification);
 
@@ -213,7 +209,6 @@ Texture3D::Texture3D(const char** file_paths) {
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, GL_RGBA,
             GL_UNSIGNED_BYTE, data[i]
         );
-        LOG_ALLOCATION(width * height * 4)
 
         stbi_image_free(data[i]);
     }
@@ -242,7 +237,6 @@ Texture3D::Texture3D(const std::array<std::shared_ptr<TextureData>, 6>& data) {
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, data[i]->width, data[i]->height,
             GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data
         );
-        LOG_ALLOCATION(data[i]->width * data[i]->height * 4)
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);

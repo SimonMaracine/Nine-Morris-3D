@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 
-#include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
@@ -32,7 +31,6 @@ static void attach_color_texture(GLuint texture, int samples, GLenum internal_fo
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
-        LOG_ALLOCATION(width * height * 4)
     }
 
     glFramebufferTexture2D(
@@ -60,7 +58,6 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
         }
 
         glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
-        LOG_ALLOCATION(width * height * 4)
     }
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, target(multisampled), texture, 0);
@@ -73,8 +70,7 @@ static void attach_color_renderbuffer(GLuint renderbuffer, int samples, GLenum i
     if (multisampled) {
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
     } else {
-        glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
-        LOG_ALLOCATION(width * height * 4)
+        glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);  // TODO query GL_MAX_RENDERBUFFER_SIZE
     }
 
     glFramebufferRenderbuffer(
@@ -90,7 +86,6 @@ static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum i
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
     } else {
         glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
-        LOG_ALLOCATION(width * height * 4)
     }
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderbuffer);
@@ -226,25 +221,25 @@ void Framebuffer::resize(int width, int height) {
     build();
 }
 
-int Framebuffer::read_pixel_red_integer(GLint attachment_index, int x, int y) {
+float Framebuffer::read_pixel_red_value(GLint attachment_index, int x, int y) {
     ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
-    int pixel;
-    glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixel);
+    float pixel;
+    glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, &pixel);
 
     return pixel;
 }
 
-void Framebuffer::read_pixel_red_integer_pbo(GLint attachment_index, int x, int y) {
+void Framebuffer::read_pixel_red_value_pbo(GLint attachment_index, int x, int y) {
     ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
-    glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, nullptr);
+    glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
 }
 
-void Framebuffer::clear_integer_color_attachment() {
-    glClearBufferiv(GL_COLOR, specification.clear_drawbuffer, specification.clear_value);
+void Framebuffer::clear_color_attachment_float() {
+    glClearBufferfv(GL_COLOR, specification.clear_drawbuffer, specification.clear_value);
 }
 
 void Framebuffer::blit(Framebuffer* draw_framebuffer, int width, int height) {
@@ -330,9 +325,15 @@ void Framebuffer::build() {
                             specification.width, specification.height, i
                         );
                         break;
-                    case AttachmentFormat::RED_I:
+                    case AttachmentFormat::RED_INT:
                         attach_color_texture(
                             texture, specification.samples, GL_R32I,
+                            specification.width, specification.height, i
+                        );
+                        break;
+                    case AttachmentFormat::RED_FLOAT:
+                        attach_color_texture(
+                            texture, specification.samples, GL_R32F,
                             specification.width, specification.height, i
                         );
                         break;
@@ -361,9 +362,15 @@ void Framebuffer::build() {
                             specification.width, specification.height, i
                         );
                         break;
-                    case AttachmentFormat::RED_I:
+                    case AttachmentFormat::RED_INT:
                         attach_color_renderbuffer(
                             renderbuffer, specification.samples, GL_R32I,
+                            specification.width, specification.height, i
+                        );
+                        break;
+                    case AttachmentFormat::RED_FLOAT:
+                        attach_color_renderbuffer(
+                            renderbuffer, specification.samples, GL_R32F,
                             specification.width, specification.height, i
                         );
                         break;
@@ -396,15 +403,15 @@ void Framebuffer::build() {
                         break;
                     case AttachmentFormat::DEPTH24_STENCIL8:
                         attach_depth_texture(
-                            texture, specification.samples, GL_DEPTH24_STENCIL8,
-                            GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
+                            texture, specification.samples,
+                            GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
                             specification.height, specification.white_border_for_depth_texture
                         );
                         break;
                     case AttachmentFormat::DEPTH32:
                         attach_depth_texture(
-                            texture, specification.samples, GL_DEPTH_COMPONENT32,
-                            GL_DEPTH_ATTACHMENT, specification.width,
+                            texture, specification.samples,
+                            GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT, specification.width,
                             specification.height, specification.white_border_for_depth_texture
                         );
                         break;

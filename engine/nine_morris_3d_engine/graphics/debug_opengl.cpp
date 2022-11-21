@@ -56,10 +56,6 @@ static constexpr const char* names[] = {
 
 static constexpr size_t BUFFER_LENGTH = 128;
 
-#ifdef PLATFORM_GAME_DEBUG
-    GpuMemoryCounter _gpu_mem_counter;
-#endif
-
 namespace debug_opengl {
 #if 0
     static const std::string parse_version(int version) {
@@ -96,6 +92,7 @@ namespace debug_opengl {
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 ASSERT(false, "This should have been disabled");
+                break;
         }
 
         switch (source) {
@@ -142,8 +139,9 @@ namespace debug_opengl {
         glDebugMessageCallback(error_callback, nullptr);
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION,
-                0, nullptr, GL_FALSE);
+        glDebugMessageControl(
+            GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE
+        );
         DEB_INFO("OpenGL message callback is set");
 #endif
     }

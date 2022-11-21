@@ -5,7 +5,6 @@
 #include <utf8.h>
 
 #include "nine_morris_3d_engine/application/platform.h"
-#include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/graphics/font.h"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
@@ -78,7 +77,6 @@ void Font::end_baking() {
 
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, bitmap_size, bitmap_size);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bitmap_size, bitmap_size, GL_RED, GL_UNSIGNED_BYTE, bake_context.bitmap);
-    LOG_ALLOCATION(bitmap_size * bitmap_size * 4)
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -112,7 +110,7 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         );
 
         if (glyph == nullptr) {
-            DEB_WARN("Couldn't bake character with codepoint: `{}`; still adding to map...", codepoint);
+            DEB_WARN("Couldn't bake character with codepoint `{}`; still adding to map...", codepoint);
         }
 
         if (bake_context.x + width > bitmap_size) {
@@ -166,7 +164,7 @@ void Font::bake_character(int codepoint) {
     );
 
     if (glyph == nullptr) {
-        DEB_WARN("Couldn't bake character with codepoint: `{}`; still adding to map...", codepoint);
+        DEB_WARN("Couldn't bake character with codepoint `{}`; still adding to map...", codepoint);
     }
 
     if (bake_context.x + width > bitmap_size) {

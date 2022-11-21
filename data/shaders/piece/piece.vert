@@ -4,10 +4,10 @@ layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec2 a_texture_coordinate;
 layout(location = 2) in vec3 a_normal;
 layout(location = 3) in vec3 a_tangent;
-layout(location = 4) in int a_entity_id;
+layout(location = 4) in float a_entity_id;
 
 out vec2 v_texture_coordinate;
-out flat int v_entity_id;
+out flat float v_entity_id;
 out vec3 v_fragment_position_tangent;
 out vec4 v_fragment_position_light_space;
 out vec3 v_light_position_tangent;
