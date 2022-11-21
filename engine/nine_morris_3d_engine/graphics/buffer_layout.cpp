@@ -18,7 +18,7 @@ size_t VertexElement::get_size(GLenum type) {
 }
 
 void BufferLayout::add(GLuint index, Type type, GLint size) {
-    GLenum gl_type;
+    GLenum gl_type = 0;
 
     switch (type) {
         case Float:

@@ -21,7 +21,7 @@
 #define CASE(_enum, count, type) case _enum: size = (count) * sizeof(type); break;
 
 static size_t type_size(GLenum type) {
-    size_t size;
+    size_t size = 0;
 
     switch (type) {
         CASE(GL_FLOAT_VEC3, 3, GLfloat)
@@ -342,15 +342,16 @@ void Shader::configure_uniform_blocks(GLuint program, const std::vector<UniformB
             char* field_names[16];
             for (size_t i = 0; i < block.field_count; i++) {
                 const std::string& name = block.field_names[i];
+                const size_t size = name.size() + 1;
 
-                field_names[i] = static_cast<char*>(malloc(name.size() + 1));
-                strcpy(field_names[i], name.c_str());
+                field_names[i] = new char[size];
+                strncpy(field_names[i], name.c_str(), size);
             }
 
             glGetUniformIndices(program, block.field_count, const_cast<const char* const*>(field_names), indices);
 
             for (size_t i = 0; i < block.field_count; i++) {
-                free(field_names[i]);
+                delete[] field_names[i];
             }
 
             for (unsigned int i = 0; i < block.field_count; i++) {
