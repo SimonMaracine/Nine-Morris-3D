@@ -20,7 +20,8 @@
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
 
-constexpr int SHADOW_MAP_UNIT = 2;
+static constexpr int SHADOW_MAP_UNIT = 2;
+static constexpr glm::vec3 CLEAR_COLOR = { 0.7f, 0.1f, 0.1f };  // TODO undo
 
 Renderer::Renderer(Application* app)
     : app(app) {
@@ -31,7 +32,7 @@ Renderer::Renderer(Application* app)
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
 
     storage.projection_view_uniform_buffer = std::make_shared<UniformBuffer>();
     storage.light_uniform_buffer = std::make_shared<UniformBuffer>();
@@ -266,6 +267,9 @@ void Renderer::render() {
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
 
+    GLenum buffers[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };  // TODO undo
+    glDrawBuffers(2, buffers);
+
     // Render all normal models
     draw_models();
 
@@ -382,7 +386,7 @@ void Renderer::set_scene_framebuffer(int samples) {
     specification.depth_attachment = Attachment(
         AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
     );
-    static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    static constexpr float color[4] = { 0.15f, 0.0f, 0.0f, 0.0f };  // TODO undo
     specification.clear_drawbuffer = 1;
     specification.clear_value = color;
 
@@ -458,6 +462,7 @@ void Renderer::end_rendering() {
     storage.screen_quad_vertex_array->bind();
 
     glDisable(GL_DEPTH_TEST);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     post_processing();
 
@@ -466,6 +471,7 @@ void Renderer::end_rendering() {
     glClear(GL_COLOR_BUFFER_BIT);
     draw_screen_quad(post_processing_context.last_texture);
 
+    glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
     glEnable(GL_DEPTH_TEST);
 }
 
