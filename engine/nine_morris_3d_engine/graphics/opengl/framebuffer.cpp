@@ -25,7 +25,7 @@ static void attach_color_texture(GLuint texture, int samples, GLenum internal_fo
             GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_TRUE
         );
     } else {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  // TODO nearest?
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -47,7 +47,7 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
             GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_TRUE
         );
     } else {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  // TODO nearest?
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -309,6 +309,7 @@ void Framebuffer::build() {
         switch (specification.color_attachments[i].type) {
             case AttachmentType::None:
                 ASSERT(false, "Attachment type None is invalid");
+
                 break;
             case AttachmentType::Texture: {
                 GLuint texture;
@@ -391,6 +392,7 @@ void Framebuffer::build() {
         switch (specification.depth_attachment.type) {
             case AttachmentType::None:
                 ASSERT(false, "Attachment type None is invalid");
+
                 break;
             case AttachmentType::Texture: {
                 GLuint texture;

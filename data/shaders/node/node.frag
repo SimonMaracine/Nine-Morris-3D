@@ -9,5 +9,5 @@ uniform vec4 u_color;
 
 void main() {
     fragment_color = u_color;
-    entity_id = v_entity_id;
+    entity_id = 20.0;  // v_entity_id;
 }

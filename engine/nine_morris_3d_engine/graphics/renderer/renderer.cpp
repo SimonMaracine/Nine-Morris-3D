@@ -267,9 +267,6 @@ void Renderer::render() {
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
 
-    GLenum buffers[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };  // TODO undo
-    glDrawBuffers(2, buffers);
-
     // Render all normal models
     draw_models();
 
@@ -298,7 +295,7 @@ void Renderer::render() {
     storage.intermediate_framebuffer->bind();
 
     // Read the texture for mouse picking
-    const int x = static_cast<int>(input::get_mouse_x());
+    const int x = static_cast<int>(input::get_mouse_x());  // TODO one GLFW call
     const int y = app->data().height - static_cast<int>(input::get_mouse_y());
     reader.read(1, x, y);
 
@@ -450,7 +447,9 @@ void Renderer::post_processing() {
         step->framebuffer->bind();
         glClear(GL_COLOR_BUFFER_BIT);
         glViewport(0, 0, specification.width, specification.height);
+
         step->render(post_processing_context);
+
         glViewport(0, 0, app->data().width, app->data().height);
 
         post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
