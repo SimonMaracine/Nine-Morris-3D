@@ -21,7 +21,7 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 static constexpr int SHADOW_MAP_UNIT = 2;
-static constexpr glm::vec3 CLEAR_COLOR = { 0.7f, 0.1f, 0.1f };  // TODO undo
+static constexpr glm::vec3 CLEAR_COLOR = { 0.1f, 0.1f, 0.1f };
 
 Renderer::Renderer(Application* app)
     : app(app) {
@@ -267,11 +267,16 @@ void Renderer::render() {
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
 
+    // Disable blend to not mess up second, floating-point attachment
+    glDisablei(GL_BLEND, 1);  // TODO if post processing doesn't use two attachments, these calls are not needed in main loop
+
     // Render all normal models
     draw_models();
 
     // Render all models with outline
     draw_models_with_outline();
+
+    glEnablei(GL_BLEND, 1);
 
 #ifdef PLATFORM_GAME_DEBUG
     if (origin) {
@@ -309,8 +314,6 @@ void Renderer::render() {
     hovered_id = *data;
 
     check_hovered_id(x, y);
-
-    DEB_DEBUG("{}", hovered_id);
 }
 
 void Renderer::add_model(std::shared_ptr<Model> model) {
@@ -383,7 +386,7 @@ void Renderer::set_scene_framebuffer(int samples) {
     specification.depth_attachment = Attachment(
         AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
     );
-    static constexpr float color[4] = { 0.15f, 0.0f, 0.0f, 0.0f };  // TODO undo
+    static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     specification.clear_drawbuffer = 1;
     specification.clear_value = color;
 
