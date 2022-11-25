@@ -401,7 +401,7 @@ template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_info() {
     ImGui::PushFont(app->user_data<Data>().imgui_info_font);
     ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-    ImGui::Text("FPS: %f", app->get_fps());
+    ImGui::Text("FPS: %.3f", app->get_fps());
     ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
     ImGui::Text("GLSL: %s", debug_opengl::get_glsl_version());
     ImGui::Text("Vendor: %s", debug_opengl::get_vendor());
@@ -623,7 +623,7 @@ template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_debug() {
     if (!show_about) {
         ImGui::Begin("Debug");
-        ImGui::Text("FPS: %f", app->get_fps());
+        ImGui::Text("FPS: %.3f", app->get_fps());
         ImGui::Text("White pieces: %u", scene->board.white_pieces_count);
         ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
         ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
@@ -636,7 +636,7 @@ void ImGuiLayer<S, B>::draw_debug() {
         ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
         ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());
         ImGui::Text("Redo history size: %lu", scene->undo_redo_state.redo.size());
-        ImGui::Text("Hovered ID: %f", static_cast<float>(app->renderer->get_hovered_id()));
+        ImGui::Text("Hovered ID: %.3f", static_cast<float>(app->renderer->get_hovered_id()));
         ImGui::Text("Clicked node: %lu", scene->board.clicked_node_index);
         ImGui::Text("Clicked piece: %lu", scene->board.clicked_piece_index);
         ImGui::Text("Selected piece: %lu", scene->board.selected_piece_index);
@@ -755,11 +755,11 @@ void ImGuiLayer<S, B>::draw_debug() {
 
         const glm::vec3& position = scene->camera.get_position();
         ImGui::Begin("Camera");
-        ImGui::Text("Position: %f, %f, %f", position.x, position.y, position.z);
-        ImGui::Text("Pitch: %f", scene->camera.get_pitch());
-        ImGui::Text("Yaw: %f", scene->camera.get_yaw());
-        ImGui::Text("Angle around point: %f", scene->camera.get_angle_around_point());
-        ImGui::Text("Distance to point: %f", scene->camera.get_distance_to_point());
+        ImGui::Text("Position: %.3f, %.3f, %.3f", position.x, position.y, position.z);
+        ImGui::Text("Pitch: %.3f", scene->camera.get_pitch());
+        ImGui::Text("Yaw: %.3f", scene->camera.get_yaw());
+        ImGui::Text("Angle around point: %.3f", scene->camera.get_angle_around_point());
+        ImGui::Text("Distance to point: %.3f", scene->camera.get_distance_to_point());
         ImGui::End();
 
         ImGui::Begin("Light Space Matrix");
