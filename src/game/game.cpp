@@ -23,7 +23,7 @@ namespace game {
         using namespace assets;
         using namespace paths;
 
-        std::array<std::unique_ptr<TextureData>, 5> icons = {
+        const std::array<std::unique_ptr<TextureData>, 5> icons = {
             std::make_unique<TextureData>(path_for_assets(ICON_512), false),
             std::make_unique<TextureData>(path_for_assets(ICON_256), false),
             std::make_unique<TextureData>(path_for_assets(ICON_128), false),

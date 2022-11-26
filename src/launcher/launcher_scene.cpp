@@ -246,10 +246,10 @@ void LauncherScene::on_start() {
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
     io.IniFilename = nullptr;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
-    window_flags |= ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoResize;
     window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+    window_flags |= ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoDecoration;
 
     ImVec4* colors = ImGui::GetStyle().Colors;
@@ -274,11 +274,13 @@ void LauncherScene::on_start() {
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-    style.FrameRounding = 8;
-    style.WindowRounding = 8;
-    style.ChildRounding = 8;
-    style.PopupRounding = 8;
-    style.GrabRounding = 8;
+    style.FrameRounding = 4;
+    style.WindowRounding = 6;
+    style.ChildRounding = 6;
+    style.PopupRounding = 6;
+    style.GrabRounding = 6;
+    style.GrabMinSize = 12;
+    style.FramePadding = ImVec2(5.0f, 4.0f);
 
     // Setup ImGui fonts
     ImFontGlyphRangesBuilder builder;

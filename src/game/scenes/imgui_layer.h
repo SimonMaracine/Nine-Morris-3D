@@ -97,11 +97,13 @@ ImGuiLayer<S, B>::ImGuiLayer(Application* app, S* scene)
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
-    style.FrameRounding = 8;
-    style.WindowRounding = 8;
-    style.ChildRounding = 8;
-    style.PopupRounding = 8;
-    style.GrabRounding = 8;
+    style.FrameRounding = 4;
+    style.WindowRounding = 6;
+    style.ChildRounding = 6;
+    style.PopupRounding = 6;
+    style.GrabRounding = 6;
+    style.GrabMinSize = 12;
+    style.FramePadding = ImVec2(5.0f, 4.0f);
 }
 
 template<typename S, typename B>
@@ -498,7 +500,7 @@ void ImGuiLayer<S, B>::draw_about() {
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-        ImGui::Text("A 3D implementation of the board game Nine Men's Morris");
+        ImGui::Text("A 3D implementation of the board game nine men's morris");
         ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor, app->data().version_patch);
         ImGui::Separator();
         ImGui::Text("All programming by:");

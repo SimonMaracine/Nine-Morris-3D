@@ -63,7 +63,9 @@ static void configure_filter_and_wrap(const TextureSpecification& specification)
         ASSERT(specification.min_filter != Filter::None, "Filter must not be None");
     }
 
-    const GLint min_filter = specification.mipmapping ? GL_LINEAR_MIPMAP_LINEAR : static_cast<int>(specification.min_filter);
+    const GLint min_filter = (
+        specification.mipmapping ? GL_LINEAR_MIPMAP_LINEAR : static_cast<int>(specification.min_filter)
+    );
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<int>(specification.mag_filter));
@@ -95,7 +97,6 @@ Texture::Texture(std::string_view file_path, const TextureSpecification& specifi
     configure_mipmapping(specification);
 
     glBindTexture(GL_TEXTURE_2D, 0);
-
     stbi_image_free(data);
 
     name = get_name(file_path);
@@ -129,7 +130,6 @@ Texture::Texture(encrypt::EncryptedFile file_path, const TextureSpecification& s
     configure_mipmapping(specification);
 
     glBindTexture(GL_TEXTURE_2D, 0);
-
     stbi_image_free(data);
 
     name = get_name(file_path);
@@ -206,8 +206,8 @@ Texture3D::Texture3D(const char** file_paths) {
 
     for (size_t i = 0; i < 6; i++) {
         glTexSubImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, GL_RGBA,
-            GL_UNSIGNED_BYTE, data[i]
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height,
+            GL_RGBA, GL_UNSIGNED_BYTE, data[i]
         );
 
         stbi_image_free(data[i]);

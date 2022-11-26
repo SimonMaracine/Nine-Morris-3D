@@ -19,7 +19,7 @@ namespace encrypt {
 
         operator std::string_view() const { return file_path; }
     private:
-        std::string_view file_path;
+        const std::string_view file_path;
     };
 
     void initialize(std::string_view key);

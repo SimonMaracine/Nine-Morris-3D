@@ -61,7 +61,7 @@ Icon=$APP_NAME
 Type=Application
 Categories=Game;BoardGame;
 Name=Nine Morris 3D
-Comment=A Nine Men's Morris Implementation In 3D
+Comment=A nine men's morris implementation in 3D
 EOF
 check_failure
 echo "Created shortcut $SHORTCUT_FOLDER/$SHORTCUT"
