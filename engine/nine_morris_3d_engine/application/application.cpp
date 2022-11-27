@@ -16,6 +16,10 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/paths.h"
 
+std::any Application::dummy_user_data() {
+    return std::make_any<DummyUserData>();
+}
+
 Application::Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunc& start, const UserFunc& stop)
     : builder(builder), _user_data(user_data), start(start), stop(stop) {
     DEB_INFO("Initializing application...");
@@ -169,7 +173,7 @@ void Application::change_scene(std::string_view name) {
 }
 
 void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
-    framebuffers.push_back(static_cast<std::shared_ptr<Framebuffer>>(framebuffer));
+    framebuffers.push_back(framebuffer);
 }
 
 void Application::purge_framebuffers() {
@@ -309,7 +313,6 @@ void Application::on_mouse_moved(const MouseMovedEvent& event) {
     last_mouse_y = event.mouse_y;
 }
 
-
 void Application::on_imgui_mouse_scrolled(const MouseScrolledEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheel = event.scroll;
@@ -328,8 +331,4 @@ void Application::on_imgui_mouse_button_pressed(const MouseButtonPressedEvent& e
 void Application::on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[static_cast<int>(event.button)] = false;
-}
-
-std::any dummy_user_data() {
-    return std::make_any<_DummyUserData>();
 }

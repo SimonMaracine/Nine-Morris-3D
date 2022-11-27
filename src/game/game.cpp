@@ -201,7 +201,7 @@ namespace game {
         );
     }
 
-    void stop(Application*) {
-
+    void stop(Application* app) {
+        app->destroy_user_data();
     }
 }

@@ -20,7 +20,7 @@ public:
         return local_res;
     }
 
-    bool done_loading() {
+    bool done_loading() const {
         return loaded.load();
     }
 
@@ -34,7 +34,7 @@ public:
         loading_thread.join();
     }
 
-    bool joinable() {
+    bool joinable() const {
         return loading_thread.joinable();
     }
 

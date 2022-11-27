@@ -13,16 +13,19 @@
 #include "nine_morris_3d_engine/other/resource_manager.h"
 
 class Application final {
-public:
+private:
     using UserFunc = std::function<void(Application*)>;
-
-    struct _DummyUserFunc {
+public:
+    struct DummyUserFunc {
         constexpr void operator()(Application*) {}  // Do nothing
     };
 
+    struct DummyUserData {};
+    static std::any dummy_user_data();
+
     Application(const ApplicationBuilder& builder, std::any& user_data,
-        const UserFunc& start = _DummyUserFunc {}, const UserFunc& stop = _DummyUserFunc {});
-    virtual ~Application();
+        const UserFunc& start = DummyUserFunc {}, const UserFunc& stop = DummyUserFunc {});
+    ~Application();
 
     // Call this to run the application, after all scenes have been defined; it can return an exit code
     int run();
@@ -35,10 +38,12 @@ public:
     void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
     void purge_framebuffers();
 
+    // Data management
     template<typename Data>
     Data& user_data() { return std::any_cast<Data&>(_user_data); }
 
     const ApplicationData& data() { return app_data; }
+    void destroy_user_data() { _user_data.reset(); }
 
     double get_fps() { return fps; }
     float get_delta() { return delta; }
@@ -128,6 +133,3 @@ private:
     friend class Scene;
     friend class Window;
 };
-
-struct _DummyUserData {};
-std::any dummy_user_data();
