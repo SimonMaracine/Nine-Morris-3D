@@ -14,7 +14,7 @@ namespace identifier {
 
         operator float() const { return value; }
         Id& operator+=(const Id& other) { value += other.value; return *this; }
-        bool operator==(const Id& other) { return value == other.value; }
+        bool operator==(const Id& other) const { return value == other.value; }
     private:
         float value = 0.0f;
     };

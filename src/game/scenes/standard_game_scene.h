@@ -39,10 +39,20 @@ struct StandardGameScene : public Scene {
         size_t index,
         std::shared_ptr<Mesh<PTNT>> mesh,
         std::shared_ptr<Texture> diffuse_texture,
-        std::shared_ptr<Buffer> buffer,
+        std::shared_ptr<Buffer> vertex_buffer,
         std::shared_ptr<IndexBuffer> index_buffer);
     void initialize_rendering_nodes();
-    void initialize_rendering_node(size_t index, std::shared_ptr<Buffer> buffer, std::shared_ptr<IndexBuffer> index_buffer);
+    void initialize_rendering_node(size_t index, std::shared_ptr<Buffer> vertex_buffer, std::shared_ptr<IndexBuffer> index_buffer);
+
+    void initialize_rendering_board_no_normal();
+    void initialize_rendering_board_paint_no_normal();
+    void initialize_rendering_pieces_no_normal();
+    void initialize_rendering_piece_no_normal(
+        size_t index,
+        std::shared_ptr<Mesh<PTN>> mesh,
+        std::shared_ptr<Texture> diffuse_texture,
+        std::shared_ptr<Buffer> vertex_buffer,
+        std::shared_ptr<IndexBuffer> index_buffer);
 
     void initialize_rendering_keyboard_controls();
     void initialize_rendering_light_bulb();

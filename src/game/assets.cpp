@@ -67,12 +67,12 @@ namespace assets {
     const char* PIECE_FRAGMENT_SHADER = ENCR("data/shaders/piece/piece.frag");
     const char* NODE_VERTEX_SHADER = ENCR("data/shaders/node/node.vert");
     const char* NODE_FRAGMENT_SHADER = ENCR("data/shaders/node/node.frag");
-    const char* BOARD_NO_NORMAL_VERTEX_SHADER = ENCR("data/shaders/board/board_no_normal.vert");
-    const char* BOARD_NO_NORMAL_FRAGMENT_SHADER = ENCR("data/shaders/board/board_no_normal.frag");
-    const char* BOARD_PAINT_NO_NORMAL_VERTEX_SHADER = ENCR("data/shaders/board/board_paint_no_normal.vert");
-    const char* BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER = ENCR("data/shaders/board/board_paint_no_normal.frag");
-    const char* PIECE_NO_NORMAL_VERTEX_SHADER = ENCR("data/shaders/piece/piece_no_normal.vert");
-    const char* PIECE_NO_NORMAL_FRAGMENT_SHADER = ENCR("data/shaders/piece/piece_no_normal.frag");
+    const char* BOARD_VERTEX_SHADER_NO_NORMAL = ENCR("data/shaders/board/board_no_normal.vert");
+    const char* BOARD_FRAGMENT_SHADER_NO_NORMAL = ENCR("data/shaders/board/board_no_normal.frag");
+    const char* BOARD_PAINT_VERTEX_SHADER_NO_NORMAL = ENCR("data/shaders/board/board_paint_no_normal.vert");
+    const char* BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL = ENCR("data/shaders/board/board_paint_no_normal.frag");
+    const char* PIECE_VERTEX_SHADER_NO_NORMAL = ENCR("data/shaders/piece/piece_no_normal.vert");
+    const char* PIECE_FRAGMENT_SHADER_NO_NORMAL = ENCR("data/shaders/piece/piece_no_normal.frag");
 
     const char* BRIGHT_FILTER_VERTEX_SHADER = ENCR("data/shaders/post_processing/bright_filter.vert");
     const char* BRIGHT_FILTER_FRAGMENT_SHADER = ENCR("data/shaders/post_processing/bright_filter.frag");

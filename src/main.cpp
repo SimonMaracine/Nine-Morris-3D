@@ -4,7 +4,7 @@
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/loading_scene.h"
 #include "launcher/launcher.h"
-#include "launcher/launcher_scene.h"
+#include "launcher/scenes/launcher_scene.h"
 #include "other/data.h"
 
 #if defined(PLATFORM_GAME_LINUX)

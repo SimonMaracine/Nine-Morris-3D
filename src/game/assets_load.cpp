@@ -155,41 +155,4 @@ namespace assets_load {
 
         loader.set_done();
     }
-
-    // void normal_mapping(Loader<AssetsData, options::Options>* loader, const options::Options& options) {
-    //     if (options.normal_mapping) {
-    //         loader->get()->board_wood_mesh = load_model_VPTNT(encr(path_for_assets(BOARD_WOOD_MESH)));
-    //         loader->get()->board_paint_mesh = load_model_VPTNT(encr(path_for_assets(BOARD_PAINT_MESH)));
-    //         loader->get()->white_piece_mesh = load_model_VPTNT(encr(path_for_assets(WHITE_PIECE_MESH)));
-    //         loader->get()->black_piece_mesh = load_model_VPTNT(encr(path_for_assets(BLACK_PIECE_MESH)));
-
-    //         if (options.texture_quality == options::NORMAL) {
-    //             loader->get()->board_normal_texture = std::make_shared<TextureData>(encr(path_for_assets(BOARD_NORMAL_TEXTURE)), true);
-    //             loader->get()->piece_normal_texture = std::make_shared<TextureData>(encr(path_for_assets(PIECE_NORMAL_TEXTURE)), true);
-    //         } else if (options.texture_quality == options::LOW) {
-    //             loader->get()->board_normal_texture = std::make_shared<TextureData>(encr(path_for_assets(BOARD_NORMAL_TEXTURE_SMALL)), true);
-    //             loader->get()->piece_normal_texture = std::make_shared<TextureData>(encr(path_for_assets(PIECE_NORMAL_TEXTURE_SMALL)), true);
-    //         }
-
-    //         loader->get()->board_wood_no_normal_mesh = nullptr;
-    //         loader->get()->board_paint_no_normal_mesh = nullptr;
-    //         loader->get()->white_piece_no_normal_mesh = nullptr;
-    //         loader->get()->black_piece_no_normal_mesh = nullptr;
-    //     } else {
-    //         loader->get()->board_wood_no_normal_mesh = load_model_VPTN(encr(path_for_assets(BOARD_WOOD_MESH)));
-    //         loader->get()->board_paint_no_normal_mesh = load_model_VPTN(encr(path_for_assets(BOARD_PAINT_MESH)));
-    //         loader->get()->white_piece_no_normal_mesh = load_model_VPTN(encr(path_for_assets(WHITE_PIECE_MESH)));
-    //         loader->get()->black_piece_no_normal_mesh = load_model_VPTN(encr(path_for_assets(BLACK_PIECE_MESH)));
-
-    //         loader->get()->board_wood_mesh = nullptr;
-    //         loader->get()->board_paint_mesh = nullptr;
-    //         loader->get()->white_piece_mesh = nullptr;
-    //         loader->get()->black_piece_mesh = nullptr;
-
-    //         loader->get()->board_normal_texture = nullptr;
-    //         loader->get()->piece_normal_texture = nullptr;
-    //     }
-
-    //     loader->set_done();
-    // }
 }

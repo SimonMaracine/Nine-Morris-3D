@@ -16,26 +16,28 @@
 
 using namespace mesh;
 
-struct _MeshPTNTLoader : public resmanager::Loader<Mesh<PTNT>> {
-    template<typename... Args>
-    std::shared_ptr<Mesh<PTNT>> load(Args&&... args) const {
-        return load_model_PTNT(std::forward<Args>(args)...);
-    }
-};
+namespace _loaders {
+    struct MeshPTNTLoader : public resmanager::Loader<Mesh<PTNT>> {
+        template<typename... Args>
+        std::shared_ptr<Mesh<PTNT>> load(Args&&... args) const {
+            return load_model_PTNT(std::forward<Args>(args)...);
+        }
+    };
 
-struct _MeshPTNLoader : public resmanager::Loader<Mesh<PTN>> {
-    template<typename... Args>
-    std::shared_ptr<Mesh<PTN>> load(Args&&... args) const {
-        return load_model_PTN(std::forward<Args>(args)...);
-    }
-};
+    struct MeshPTNLoader : public resmanager::Loader<Mesh<PTN>> {
+        template<typename... Args>
+        std::shared_ptr<Mesh<PTN>> load(Args&&... args) const {
+            return load_model_PTN(std::forward<Args>(args)...);
+        }
+    };
 
-struct _MeshPLoader : public resmanager::Loader<Mesh<P>> {
-    template<typename... Args>
-    std::shared_ptr<Mesh<P>> load(Args&&... args) const {
-        return load_model_P(std::forward<Args>(args)...);
-    }
-};
+    struct MeshPLoader : public resmanager::Loader<Mesh<P>> {
+        template<typename... Args>
+        std::shared_ptr<Mesh<P>> load(Args&&... args) const {
+            return load_model_P(std::forward<Args>(args)...);
+        }
+    };
+}
 
 struct Resources {
     void merge(Resources& other);
@@ -53,7 +55,7 @@ struct Resources {
     resmanager::Cache<Material> material;
     resmanager::Cache<MaterialInstance> material_instance;
     resmanager::Cache<TextureData> texture_data;
-    resmanager::Cache<Mesh<PTNT>, _MeshPTNTLoader> mesh_ptnt;
-    resmanager::Cache<Mesh<PTN>, _MeshPTNLoader> mesh_ptn;
-    resmanager::Cache<Mesh<P>, _MeshPLoader> mesh_p;
+    resmanager::Cache<Mesh<PTNT>, _loaders::MeshPTNTLoader> mesh_ptnt;
+    resmanager::Cache<Mesh<PTN>, _loaders::MeshPTNLoader> mesh_ptn;
+    resmanager::Cache<Mesh<P>, _loaders::MeshPLoader> mesh_p;
 };

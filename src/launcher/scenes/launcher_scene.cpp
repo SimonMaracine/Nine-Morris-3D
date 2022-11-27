@@ -1,6 +1,6 @@
 #include <nine_morris_3d_engine/nine_morris_3d_engine.h>
 
-#include "launcher/launcher_scene.h"
+#include "launcher/scenes/launcher_scene.h"
 #include "launcher/launcher_options.h"
 #include "other/options.h"
 #include "other/data.h"

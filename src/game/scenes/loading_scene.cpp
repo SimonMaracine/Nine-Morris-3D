@@ -9,6 +9,8 @@
 void LoadingScene::on_start() {
     auto& data = app->user_data<Data>();
 
+    load_splash_screen_texture();
+
     loader = std::make_unique<assets_load::AllStartLoader>(assets_load::all_start);
     loader->start_loading_thread(
         data.launcher_options.normal_mapping,
@@ -18,7 +20,6 @@ void LoadingScene::on_start() {
     );
 
     setup_widgets();
-    load_splash_screen_texture();
 
     auto background = data.image_cache.load("background"_h, app->res.texture["splash_screen_texture"_h]);
     app->gui_renderer->add_widget(background);

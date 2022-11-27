@@ -67,12 +67,12 @@ namespace assets {
     extern const char* PIECE_FRAGMENT_SHADER;
     extern const char* NODE_VERTEX_SHADER;
     extern const char* NODE_FRAGMENT_SHADER;
-    extern const char* BOARD_NO_NORMAL_VERTEX_SHADER;
-    extern const char* BOARD_NO_NORMAL_FRAGMENT_SHADER;
-    extern const char* BOARD_PAINT_NO_NORMAL_VERTEX_SHADER;
-    extern const char* BOARD_PAINT_NO_NORMAL_FRAGMENT_SHADER;
-    extern const char* PIECE_NO_NORMAL_VERTEX_SHADER;
-    extern const char* PIECE_NO_NORMAL_FRAGMENT_SHADER;
+    extern const char* BOARD_VERTEX_SHADER_NO_NORMAL;
+    extern const char* BOARD_FRAGMENT_SHADER_NO_NORMAL;
+    extern const char* BOARD_PAINT_VERTEX_SHADER_NO_NORMAL;
+    extern const char* BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL;
+    extern const char* PIECE_VERTEX_SHADER_NO_NORMAL;
+    extern const char* PIECE_FRAGMENT_SHADER_NO_NORMAL;
 
     extern const char* BRIGHT_FILTER_VERTEX_SHADER;
     extern const char* BRIGHT_FILTER_FRAGMENT_SHADER;
