@@ -117,6 +117,7 @@ int Application::run() {
     prepare_scenes();
     on_start(current_scene);
 
+    window->show();
     DEB_INFO("Initialized application, entering main loop...");
 
     while (running) {

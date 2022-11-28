@@ -21,7 +21,8 @@ public:
     double get_time();
     std::vector<Monitor> get_monitors();
 
-    // VSync, cursor and icon API
+    // window, VSync, cursor and icon API
+    void show();
     void set_vsync(int interval);
     unsigned int add_cursor(std::unique_ptr<TextureData> cursor, int x_hotspot, int y_hotspot);
     void set_cursor(unsigned int handle);

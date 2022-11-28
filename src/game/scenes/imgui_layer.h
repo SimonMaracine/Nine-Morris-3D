@@ -630,8 +630,7 @@ void ImGuiLayer<S, B>::draw_debug() {
         ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
         ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
         ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
-        ImGui::Text("White can jump: %s", scene->board.can_jump[0] ? "true" : "false");
-        ImGui::Text("Black can jump: %s", scene->board.can_jump[1] ? "true" : "false");
+        ImGui::Text("Can jump: %s, %s", scene->board.can_jump[0] ? "true" : "false", scene->board.can_jump[1] ? "true" : "false");
         ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
         ImGui::Text("Turn: %s", scene->board.turn == BoardPlayer::White ? "white" : "black");
         ImGui::Text("Must take piece: %s", scene->board.must_take_piece ? "true" : "false");
@@ -642,6 +641,7 @@ void ImGuiLayer<S, B>::draw_debug() {
         ImGui::Text("Clicked node: %lu", scene->board.clicked_node_index);
         ImGui::Text("Clicked piece: %lu", scene->board.clicked_piece_index);
         ImGui::Text("Selected piece: %lu", scene->board.selected_piece_index);
+        ImGui::Text("Is player's turn: %s", scene->board.is_players_turn ? "true" : "false");
         ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
         ImGui::Text("Game started: %s", scene->made_first_move ? "true" : "false");
         ImGui::End();
