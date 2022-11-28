@@ -118,9 +118,4 @@ struct StandardGameScene : public Scene {
     Timer timer;
     bool show_wait_indicator = false;
     bool show_computer_thinking_indicator = false;
-
-    // bool changed_skybox = false;
-    // bool changed_texture_quality = false;
-    // bool changed_labeled_board_texture = false;
-    // bool changed_normal_mapping = false;
 };

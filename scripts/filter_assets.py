@@ -47,9 +47,13 @@ def visit_directory(directory: str):
 
 
 os.chdir("..")
+
 print("Copying...")
 copy_tree(DATA, DATA_FILTERED)
 copy_tree(ENGINE_DATA, ENGINE_DATA_FILTERED)
+
+print("Filtering...")
 visit_directory(DATA_FILTERED)
 visit_directory(ENGINE_DATA_FILTERED)
+
 print("Done")
