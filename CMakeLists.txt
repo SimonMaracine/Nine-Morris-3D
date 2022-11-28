@@ -234,7 +234,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
         glfw
         cppblowfish
         X11
-        # "${CMAKE_DL_LIBS}"  # TODO see if it works on Linux
         ${GLAD_STB}
         ${MY_IMGUI}
     )
@@ -244,7 +243,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
         assimp
         glfw
         cppblowfish
-        # "${CMAKE_DL_LIBS}"
         ${GLAD_STB}
         ${MY_IMGUI}
     )
