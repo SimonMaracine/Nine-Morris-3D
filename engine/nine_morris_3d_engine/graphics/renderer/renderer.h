@@ -90,8 +90,8 @@ public:
         float right = 0.0f;
         float bottom = 0.0f;
         float top = 0.0f;
-        float near = 1.0f;
-        float far = 1.0f;
+        float lens_near = 1.0f;
+        float lens_far = 1.0f;
         float light_divisor = 1.0f;
     } light_space;
 private:

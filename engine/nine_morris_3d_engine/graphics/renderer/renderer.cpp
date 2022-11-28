@@ -692,8 +692,8 @@ void Renderer::setup_shadows() {
         light_space.right,
         light_space.bottom,
         light_space.top,
-        light_space.near,
-        light_space.far
+        light_space.lens_near,
+        light_space.lens_far
     );
     const glm::mat4 view = glm::lookAt(
         light.position / light_space.light_divisor,

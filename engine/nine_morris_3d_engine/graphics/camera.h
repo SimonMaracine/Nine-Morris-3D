@@ -2,10 +2,6 @@
 
 #include <glm/glm.hpp>
 
-constexpr float FOV = 45.0f;
-constexpr float NEAR = 0.1f;
-constexpr float FAR = 90.0f;
-
 class Camera {  // TODO maybe refactor camera using quaternions
 public:
     Camera() = default;
@@ -38,6 +34,10 @@ public:
     const glm::mat4& get_projection_view_matrix() const { return projection_view_matrix; }
 
     float sensitivity = 1.0f;  // From 0.5 to 2.0
+
+    static constexpr float LENS_FOV = 45.0f;
+    static constexpr float LENS_NEAR = 0.1f;
+    static constexpr float LENS_FAR = 90.0f;
 private:
     void go_towards_position_x(const glm::vec3& direction);
     void go_towards_position_y(const glm::vec3& direction);

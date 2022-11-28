@@ -1,8 +1,7 @@
 /old
-/.vscode
-/build
+.vscode/
+build/
 /build-release
-/encrypter_helper/build
 log.txt
 info.txt
 ninemorris3d_log.txt
@@ -19,12 +18,12 @@ encrypter.exe
 /engine_data-filtered
 /renderdoc_captures
 
-/.vs
+.vs/
 CMakeCache.txt
-/CMakeFiles
-/Debug
-/Release
-/x64
+CMakeFiles/
+Debug/
+Release/
+x64/
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user

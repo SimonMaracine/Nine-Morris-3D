@@ -79,7 +79,7 @@ Window::Window(Application* app) {
         switch (action) {
             case GLFW_PRESS: {
                 data->app->evt.enqueue<KeyPressedEvent>(
-                    static_cast<input::Key>(key), false, mods & GLFW_MOD_CONTROL
+                    static_cast<input::Key>(key), false, static_cast<bool>(mods & GLFW_MOD_CONTROL)
                 );
                 break;
             }
@@ -89,7 +89,7 @@ Window::Window(Application* app) {
             }
             case GLFW_REPEAT: {
                 data->app->evt.enqueue<KeyPressedEvent>(
-                    static_cast<input::Key>(key), true, mods & GLFW_MOD_CONTROL
+                    static_cast<input::Key>(key), true, static_cast<bool>(mods & GLFW_MOD_CONTROL)
                 );
                 break;
             }

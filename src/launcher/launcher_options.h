@@ -11,7 +11,7 @@ namespace launcher_options {
     static constexpr bool DEFAULT_FULLSCREEN = false;
     static constexpr bool DEFAULT_NATIVE_RESOLUTION = true;
     static constexpr std::pair<int, int> DEFAULT_RESOLUTION = {1024, 576};
-    static constexpr int DEFAULT_SAMPLES = 1;
+    static constexpr int DEFAULT_SAMPLES = 2;
     static constexpr int DEFAULT_ANISOTROPIC_FILTERING = 4;
     static constexpr int DEFAULT_TEXTURE_QUALITY = NORMAL;
     static constexpr bool DEFAULT_NORMAL_MAPPING = true;

@@ -19,7 +19,6 @@ public:
 
     void update();
     void reset();
-    void initialize();
 
     void draw_menu_bar();
     void draw_info();
@@ -769,8 +768,8 @@ void ImGuiLayer<S, B>::draw_debug() {
         ImGui::SliderFloat("Right", &app->renderer->light_space.right, -10.0f, 10.0f);
         ImGui::SliderFloat("Bottom", &app->renderer->light_space.bottom, -10.0f, 10.0f);
         ImGui::SliderFloat("Top", &app->renderer->light_space.top, -10.0f, 10.0f);
-        ImGui::SliderFloat("Near", &app->renderer->light_space.near, 0.1f, 2.0f);
-        ImGui::SliderFloat("Far", &app->renderer->light_space.far, 2.0f, 50.0f);
+        ImGui::SliderFloat("Near", &app->renderer->light_space.lens_near, 0.1f, 2.0f);
+        ImGui::SliderFloat("Far", &app->renderer->light_space.lens_far, 2.0f, 50.0f);
         ImGui::SliderFloat("Light divisor", &app->renderer->light_space.light_divisor, 1.0f, 10.0f);
         ImGui::End();
     }

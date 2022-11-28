@@ -1122,9 +1122,9 @@ void StandardGameScene::setup_camera() {
     constexpr float DISTANCE_TO_POINT = 8.0f;
 
     const glm::mat4 projection = glm::perspective(
-        glm::radians(FOV),
+        glm::radians(Camera::LENS_FOV),
         static_cast<float>(app->data().width) / app->data().height,
-        NEAR, FAR
+        Camera::LENS_NEAR, Camera::LENS_FAR
     );
 
     camera = Camera {

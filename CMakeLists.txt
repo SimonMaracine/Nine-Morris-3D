@@ -143,10 +143,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_compile_options(${GAME} PRIVATE -Wall -Wextra)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     target_compile_options(${ENGINE} PRIVATE /w)  # FIXME
-    string(REGEX REPLACE "/W[1-3]" "/W0" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
     target_compile_options(${GAME} PRIVATE /w)  # FIXME
-    string(REGEX REPLACE "/W[1-3]" "/W0" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
@@ -228,53 +226,6 @@ target_include_directories(${MY_IMGUI} SYSTEM PRIVATE
     "${CMAKE_SOURCE_DIR}/extern/glfw/include"
 )
 
-# Add all link directories
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-        # target_link_directories(${ENGINE} PRIVATE  # TODO see if it works on Windows too
-        #     "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-        #     "${CMAKE_SOURCE_DIR}/build/extern/assimp/bin"
-        #     "${CMAKE_SOURCE_DIR}/build/extern/glfw/src"
-        # )
-
-        # target_link_directories(${GAME} PRIVATE
-        #     "${CMAKE_SOURCE_DIR}/build/extern/spdlog"
-        # )
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-        # target_link_directories(${ENGINE} PRIVATE
-        #     "${CMAKE_SOURCE_DIR}/extern/spdlog"
-        #     "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
-        #     "${CMAKE_SOURCE_DIR}/extern/glfw/src"
-        # )
-
-        # target_link_directories(${GAME} PRIVATE
-        #     "${CMAKE_SOURCE_DIR}/extern/spdlog"
-        # )
-    endif()
-elseif(CMAKE_BUILD_TYPE MATCHES Release)
-    if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-        # target_link_directories(${ENGINE} PRIVATE
-        #     "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-        #     "${CMAKE_SOURCE_DIR}/build-release/extern/assimp/bin"
-        #     "${CMAKE_SOURCE_DIR}/build-release/extern/glfw/src"
-        # )
-
-        # target_link_directories(${GAME} PRIVATE
-        #     "${CMAKE_SOURCE_DIR}/build-release/extern/spdlog"
-        # )
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-        # target_link_directories(${ENGINE} PRIVATE
-        #     "${CMAKE_SOURCE_DIR}/extern/spdlog"
-        #     "${CMAKE_SOURCE_DIR}/extern/assimp/bin"
-        #     "${CMAKE_SOURCE_DIR}/extern/glfw/src"
-        # )
-
-        # target_link_directories(${GAME} PRIVATE
-        #     "${CMAKE_SOURCE_DIR}/extern/spdlog"
-        # )
-    endif()
-endif()
-
 # Add all libraries
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_link_libraries(${ENGINE} PRIVATE
@@ -283,7 +234,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
         glfw
         cppblowfish
         X11
-        "${CMAKE_DL_LIBS}"
+        # "${CMAKE_DL_LIBS}"  # TODO see if it works on Linux
         ${GLAD_STB}
         ${MY_IMGUI}
     )
@@ -293,7 +244,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
         assimp
         glfw
         cppblowfish
-        "${CMAKE_DL_LIBS}"
+        # "${CMAKE_DL_LIBS}"
         ${GLAD_STB}
         ${MY_IMGUI}
     )
@@ -302,7 +253,7 @@ endif()
 target_link_libraries(${GAME} PRIVATE
     ${ENGINE}
     ${MY_IMGUI}
-    # spdlog  # TODO see if it works on Windows too
+    spdlog
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
@@ -325,7 +276,7 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 
     target_compile_definitions(${ENGINE} PRIVATE
         SPDLOG_ACTIVE_LEVEL=0
-        GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES  # This is to easily enable or disable encrypted files
+        GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES  # To easily enable or disable encrypted files
     )
 
     target_compile_definitions(${GAME} PRIVATE

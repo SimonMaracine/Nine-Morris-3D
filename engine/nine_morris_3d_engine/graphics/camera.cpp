@@ -123,7 +123,7 @@ void Camera::update_friction() {
 }
 
 void Camera::update_projection(float width, float height) {
-    projection_matrix = glm::perspective(glm::radians(FOV), width / height, NEAR, FAR);
+    projection_matrix = glm::perspective(glm::radians(LENS_FOV), width / height, LENS_NEAR, LENS_FAR);
     projection_view_matrix = projection_matrix * view_matrix;
 }
 

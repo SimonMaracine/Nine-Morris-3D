@@ -65,7 +65,7 @@
         const bool success = GetUserName(username, &whatever);
 
         if (!success) {
-            throw UserNameError("Could not get username");
+            throw user_data::UserNameError("Could not get username");
         }
 
         return std::string(username);
