@@ -36,28 +36,28 @@ void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout&
     size_t offset = 0;
 
     for (size_t i = 0; i < layout.elements.size(); i++) {
-        const VertexElement& element = layout.elements[i];
+        const BufferLayout::VertexElement& element = layout.elements[i];
 
         switch (element.type) {
-            case GL_FLOAT:
+            case BufferLayout::Float:
                 glVertexAttribPointer(
-                    element.index, element.size, element.type, GL_FALSE,
+                    element.index, element.size, GL_FLOAT, GL_FALSE,
                     layout.stride, reinterpret_cast<GLvoid*>(offset)
                 );
                 break;
-            case GL_INT:
+            case BufferLayout::Int:
                 glVertexAttribIPointer(
-                    element.index, element.size, element.type,
+                    element.index, element.size, GL_INT,
                     layout.stride, reinterpret_cast<GLvoid*>(offset)
                 );
                 break;
             default:
-                REL_CRITICAL("Unknown element type, exiting...");
+                REL_CRITICAL("Unknown element type `{}`, exiting...", element.type);
                 game_exit::exit_critical();
         }
 
         glEnableVertexAttribArray(element.index);
-        offset += element.size * VertexElement::get_size(element.type);
+        offset += element.size * BufferLayout::VertexElement::get_size(element.type);
     }
 }
 

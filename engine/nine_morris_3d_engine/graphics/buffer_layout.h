@@ -2,21 +2,21 @@
 
 #include <glad/glad.h>
 
-struct VertexElement {
-    GLuint index;
-    GLenum type;
-    GLint size;
-
-    static size_t get_size(GLenum type);
-};
-
 struct BufferLayout {
-    std::vector<VertexElement> elements;
-    GLsizei stride = 0;
-
     enum Type {
         Float, Int
     };
+
+    struct VertexElement {
+        GLuint index;
+        Type type;
+        GLint size;
+
+        static size_t get_size(Type type);
+    };
+
+    std::vector<VertexElement> elements;
+    GLsizei stride = 0;
 
     void add(GLuint index, Type type, GLint size);
 };

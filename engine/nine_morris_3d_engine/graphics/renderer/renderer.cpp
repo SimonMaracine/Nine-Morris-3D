@@ -300,9 +300,8 @@ void Renderer::render() {
     storage.intermediate_framebuffer->bind();
 
     // Read the texture for mouse picking
-    const int x = static_cast<int>(input::get_mouse_x());  // TODO one GLFW call
-    const int y = app->data().height - static_cast<int>(input::get_mouse_y());
-    reader.read(1, x, y);
+    const auto [x, y] = input::get_mouse();
+    reader.read(1, static_cast<int>(x), app->data().height - static_cast<int>(y));
 
     // Do post processing and render the final image to the screen
     end_rendering();

@@ -25,7 +25,7 @@ static void attach_color_texture(GLuint texture, int samples, GLenum internal_fo
             GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_TRUE
         );
     } else {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  // TODO nearest?
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  // These need to be linear
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -47,7 +47,7 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
             GL_TEXTURE_2D_MULTISAMPLE, samples, internal_format, width, height, GL_TRUE
         );
     } else {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  // TODO nearest?
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  // These need to be linear
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -70,7 +70,7 @@ static void attach_color_renderbuffer(GLuint renderbuffer, int samples, GLenum i
     if (multisampled) {
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
     } else {
-        glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);  // TODO query GL_MAX_RENDERBUFFER_SIZE
+        glRenderbufferStorage(GL_RENDERBUFFER, internal_format, width, height);
     }
 
     glFramebufferRenderbuffer(

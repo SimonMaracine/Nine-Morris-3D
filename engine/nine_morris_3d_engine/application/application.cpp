@@ -89,11 +89,11 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     evt.sink<MouseScrolledEvent>().connect<&Application::on_mouse_scrolled>(*this);
     evt.sink<MouseMovedEvent>().connect<&Application::on_mouse_moved>(*this);
 
-    DEB_INFO("Calling user start routine...");
-    start(this);
-
     frame_counter.previous_seconds = window->get_time();
     fixed_update.previous_seconds = window->get_time();
+
+    DEB_INFO("Calling user start routine...");
+    start(this);
 }
 
 Application::~Application() {

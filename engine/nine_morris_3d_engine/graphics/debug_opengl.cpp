@@ -23,6 +23,7 @@ static constexpr GLenum parameters[] = {
     GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
     GL_MAX_TEXTURE_IMAGE_UNITS,
     GL_MAX_TEXTURE_SIZE,
+    GL_MAX_RENDERBUFFER_SIZE,
     GL_MAX_VERTEX_ATTRIBS,
     GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
     GL_MAX_VERTEX_UNIFORM_COMPONENTS,
@@ -42,6 +43,7 @@ static constexpr const char* names[] = {
     "GL_MAX_FRAGMENT_UNIFORM_COMPONENTS",
     "GL_MAX_TEXTURE_IMAGE_UNITS",
     "GL_MAX_TEXTURE_SIZE",
+    "GL_MAX_RENDERBUFFER_SIZE",
     "GL_MAX_VERTEX_ATTRIBS",
     "GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS",
     "GL_MAX_VERTEX_UNIFORM_COMPONENTS",
@@ -169,7 +171,7 @@ namespace debug_opengl {
         //////////////////////////////////////////////////////////////////////////////////
         output.append("\n*** OpenGL Context Parameters ***\n");
 
-        size_t parameter_index = 14;
+        size_t parameter_index = 15;
 
         for (size_t i = 0; i <= parameter_index; i++) {
             GLint result;
