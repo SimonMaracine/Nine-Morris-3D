@@ -34,10 +34,10 @@ Camera::Camera(float sensitivity, float pitch, const glm::vec3& point, float dis
         const glm::mat4& projection_matrix)
     : sensitivity(sensitivity), pitch(pitch), point(point), distance_to_point(distance_to_point),
       projection_matrix(projection_matrix) {
-    update(0.0f, 0.0f, 0.0f, 0.0f);
+    update(0.0f);
 }
 
-void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
+void Camera::update_controls(float mouse_wheel, float dx, float dy, float dt) {
     constexpr float MOVE_SPEED = 3200.0f;
     constexpr float MOVE_SPEED_MOUSE = MOVE_SPEED * 0.0039f;
     constexpr float ZOOM_SPEED = 576.0f;
@@ -50,15 +50,6 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
     } else if (input::is_key_pressed(input::Key::F)) {
         zoom_velocity += ZOOM_SPEED * dt;
     }
-
-    distance_to_point += zoom_velocity * sensitivity * dt;
-
-    // Calculate automatic distance to point movement
-    calculate_auto_distance_to_point(dt);
-
-    // Limit distance_to_point
-    distance_to_point = std::max(distance_to_point, 5.0f);
-    distance_to_point = std::min(distance_to_point, 30.0f);
 
     if (input::is_mouse_button_pressed(input::MouseButton::RIGHT)) {
         y_velocity -= MOVE_SPEED_MOUSE * dy;
@@ -76,6 +67,17 @@ void Camera::update(float mouse_wheel, float dx, float dy, float dt) {
     } else if (input::is_key_pressed(input::Key::D)) {
         x_velocity += MOVE_SPEED * dt;
     }
+}
+
+void Camera::update(float dt) {
+    distance_to_point += zoom_velocity * sensitivity * dt;
+
+    // Calculate automatic distance to point movement
+    calculate_auto_distance_to_point(dt);
+
+    // Limit distance_to_point
+    distance_to_point = std::max(distance_to_point, 5.0f);
+    distance_to_point = std::min(distance_to_point, 30.0f);
 
     pitch += y_velocity * sensitivity * dt;
     angle_around_point += x_velocity * sensitivity * dt;

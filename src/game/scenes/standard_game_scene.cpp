@@ -125,8 +125,9 @@ void StandardGameScene::on_awake() {
 
 void StandardGameScene::on_update() {
     if (!imgui_layer.hovering_gui) {
-        camera.update(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
+        camera.update_controls(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
     }
+    camera.update(app->get_delta());
 
     board.update_nodes(app->renderer->get_hovered_id());
     board.update_pieces(app->renderer->get_hovered_id());
@@ -144,9 +145,7 @@ void StandardGameScene::on_update() {
 }
 
 void StandardGameScene::on_fixed_update() {
-    if (!imgui_layer.hovering_gui) {
-        camera.update_friction();
-    }
+    camera.update_friction();
 }
 
 void StandardGameScene::on_imgui_update() {
