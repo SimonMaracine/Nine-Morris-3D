@@ -81,7 +81,7 @@ void LoadingScene::setup_widgets() {
 void LoadingScene::load_splash_screen_texture() {
     using namespace assets;
     using namespace encrypt;
-    using namespace paths;
+    using namespace path;
 
     TextureSpecification specification;
     specification.min_filter = Filter::Linear;

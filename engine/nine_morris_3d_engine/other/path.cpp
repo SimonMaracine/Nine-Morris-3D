@@ -1,5 +1,5 @@
 #include "nine_morris_3d_engine/application/platform.h"
-#include "nine_morris_3d_engine/other/paths.h"
+#include "nine_morris_3d_engine/other/path.h"
 #include "nine_morris_3d_engine/other/user_data.h"
 
 static std::string app_name;
@@ -45,7 +45,7 @@ static std::string app_name;
     #endif
 #endif
 
-namespace paths {
+namespace path {
     void initialize(std::string_view application_name) {
         app_name = application_name;
     }

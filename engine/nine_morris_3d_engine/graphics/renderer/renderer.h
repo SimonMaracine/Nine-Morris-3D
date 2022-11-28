@@ -11,6 +11,7 @@
 #include "nine_morris_3d_engine/graphics/material.h"
 #include "nine_morris_3d_engine/graphics/light.h"
 #include "nine_morris_3d_engine/graphics/identifier.h"
+#include "nine_morris_3d_engine/graphics/post_processing.h"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/graphics/opengl/shader.h"
@@ -19,14 +20,6 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 class Application;
-class PostProcessingStep;
-
-struct PostProcessingContext {
-    std::vector<std::shared_ptr<PostProcessingStep>> steps;
-    GLuint last_texture = 0;  // Last texture at any moment in the processing pipeline
-    std::vector<GLuint> textures;  // All textures in order
-    GLuint original_texture = 0;
-};
 
 class Renderer {
 public:
@@ -65,7 +58,7 @@ public:
     void clear();
 
     void setup_shader(std::shared_ptr<Shader> shader);
-    void add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step);
+    void add_post_processing(std::unique_ptr<PostProcessingStep>&& post_processing_step);
 
     void set_scene_framebuffer(int samples);
     void set_shadow_map_framebuffer(int size);

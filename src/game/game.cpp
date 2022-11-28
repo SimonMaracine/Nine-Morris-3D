@@ -21,7 +21,7 @@ namespace game {
 
     static void setup_icons(Application* app) {
         using namespace assets;
-        using namespace paths;
+        using namespace path;
 
         const std::array<std::unique_ptr<TextureData>, 5> icons = {
             std::make_unique<TextureData>(path_for_assets(ICON_512), false),
@@ -38,7 +38,7 @@ namespace game {
         auto& data = app->user_data<Data>();
 
         using namespace assets;
-        using namespace paths;
+        using namespace path;
         using namespace encrypt;
 
         data.arrow_cursor = app->window->add_cursor(
@@ -55,7 +55,7 @@ namespace game {
         auto& data = app->user_data<Data>();
 
         using namespace assets;
-        using namespace paths;
+        using namespace path;
 
         ImGuiIO& io = ImGui::GetIO();
 
@@ -75,7 +75,7 @@ namespace game {
 
     static void setup_game_font(Application* app) {
         using namespace assets;
-        using namespace paths;
+        using namespace path;
 
         auto font = app->res.font.load(
             "good_dog_plain_font"_h, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512
@@ -89,8 +89,12 @@ namespace game {
     static void setup_post_processing(Application* app) {
         auto& data = app->user_data<Data>();
 
+        if (!data.launcher_options.bloom) {
+            return;  // Disable bloom
+        }
+
         using namespace assets;
-        using namespace paths;
+        using namespace path;
         using namespace encrypt;
 
         {
@@ -113,7 +117,7 @@ namespace game {
                 std::vector<std::string> { "u_screen_texture" }
             );
 
-            app->renderer->add_post_processing(std::make_shared<BrightFilter>("bright_filter", framebuffer, shader));
+            app->renderer->add_post_processing(std::make_unique<BrightFilter>("bright_filter", framebuffer, shader));
         }
 
         auto blur_shader = std::make_shared<Shader>(
@@ -136,7 +140,7 @@ namespace game {
             app->purge_framebuffers();
             app->add_framebuffer(framebuffer);
 
-            app->renderer->add_post_processing(std::make_shared<Blur>("blur1", framebuffer, blur_shader));
+            app->renderer->add_post_processing(std::make_unique<Blur>("blur1", framebuffer, blur_shader));
         }
         {
             FramebufferSpecification specification;
@@ -152,7 +156,7 @@ namespace game {
             app->purge_framebuffers();
             app->add_framebuffer(framebuffer);
 
-            app->renderer->add_post_processing(std::make_shared<Blur>("blur2", framebuffer, blur_shader));
+            app->renderer->add_post_processing(std::make_unique<Blur>("blur2", framebuffer, blur_shader));
         }
         {
             FramebufferSpecification specification;
@@ -173,9 +177,9 @@ namespace game {
             app->purge_framebuffers();
             app->add_framebuffer(framebuffer);
 
-            auto combine = std::make_shared<Combine>("combine", framebuffer, shader);
+            auto combine = std::make_unique<Combine>("combine", framebuffer, shader);
             combine->strength = data.launcher_options.bloom_strength;
-            app->renderer->add_post_processing(combine);
+            app->renderer->add_post_processing(std::move(combine));
         }
     }
 
@@ -189,7 +193,7 @@ namespace game {
         setup_cursors(app);
         setup_imgui_fonts(app);
         setup_game_font(app);
-        setup_post_processing(app);  // FIXME this is optional
+        setup_post_processing(app);
 
         app->window->set_vsync(data.options.vsync);
 

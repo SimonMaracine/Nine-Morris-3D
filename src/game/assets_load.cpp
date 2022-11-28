@@ -7,7 +7,7 @@
 
 using namespace mesh;
 using namespace assets;
-using namespace paths;
+using namespace path;
 using namespace encrypt;
 
 namespace assets_load {

@@ -10,7 +10,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/graphics/opengl/texture.h"
-#include "nine_morris_3d_engine/other/paths.h"
+#include "nine_morris_3d_engine/other/path.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
@@ -181,8 +181,8 @@ GuiRenderer::GuiRenderer(Application* app)
 
     {
         storage.quad2d_shader = std::make_shared<Shader>(
-            encr(paths::path_for_assets(QUAD2D_VERTEX_SHADER)),
-            encr(paths::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
+            encr(path::path_for_assets(QUAD2D_VERTEX_SHADER)),
+            encr(path::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix", "u_texture" },
             std::vector { storage.projection_uniform_block }
         );
@@ -190,8 +190,8 @@ GuiRenderer::GuiRenderer(Application* app)
 
     {
         storage.text_shader = std::make_shared<Shader>(
-            encr(paths::path_for_assets(TEXT_VERTEX_SHADER)),
-            encr(paths::path_for_assets(TEXT_FRAGMENT_SHADER)),
+            encr(path::path_for_assets(TEXT_VERTEX_SHADER)),
+            encr(path::path_for_assets(TEXT_FRAGMENT_SHADER)),
             std::vector<std::string> {
                 "u_model_matrix",
                 "u_bitmap",

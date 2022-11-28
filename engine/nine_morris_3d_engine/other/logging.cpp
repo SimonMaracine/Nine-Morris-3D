@@ -4,7 +4,7 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
-#include "nine_morris_3d_engine/other/paths.h"
+#include "nine_morris_3d_engine/other/path.h"
 #include "nine_morris_3d_engine/other/user_data.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
@@ -48,7 +48,7 @@ namespace logging {
         std::string file_path;
 
         try {
-            file_path = paths::path_for_logs(log_file);
+            file_path = path::path_for_logs(log_file);
         } catch (const user_data::UserNameError& e) {
             set_fallback_logger_release(e.what());
             return;
@@ -76,7 +76,7 @@ namespace logging {
             case LogTarget::File: {
                 std::string file_path;
                 try {
-                    file_path = paths::path_for_logs(info_file);
+                    file_path = path::path_for_logs(info_file);
                 } catch (const user_data::UserNameError& e) {
                     REL_ERROR("Could not create info file `{}`: {}", info_file, e.what());
                     break;

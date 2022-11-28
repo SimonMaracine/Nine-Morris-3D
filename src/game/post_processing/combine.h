@@ -4,8 +4,8 @@
 
 class Combine : public PostProcessingStep {
 public:
-    Combine(std::string_view id, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
-        : PostProcessingStep(id, framebuffer, shader) {}
+    Combine(std::string_view name, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
+        : PostProcessingStep(name, framebuffer, shader) {}
     virtual ~Combine() = default;
 
     virtual void render(const PostProcessingContext& context) const override;

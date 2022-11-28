@@ -239,7 +239,7 @@ void LauncherScene::on_start() {
     auto& data = app->user_data<Data>();
 
     using namespace encrypt;
-    using namespace paths;
+    using namespace path;
 
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;

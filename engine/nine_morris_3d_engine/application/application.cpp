@@ -14,7 +14,7 @@
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
-#include "nine_morris_3d_engine/other/paths.h"
+#include "nine_morris_3d_engine/other/path.h"
 
 std::any Application::dummy_user_data() {
     return std::make_any<DummyUserData>();
@@ -40,7 +40,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     app_data.version_patch = builder.patch;
     app_data.app = this;
 
-    paths::initialize(builder.application_name);
+    path::initialize(builder.application_name);
     window = std::make_unique<Window>(this);
 
     if (builder.renderer_imgui) {

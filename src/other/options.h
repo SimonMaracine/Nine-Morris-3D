@@ -23,7 +23,7 @@ namespace options {
         std::string file_path;
 
         try {
-            file_path = paths::path_for_saved_data(options_file_name);
+            file_path = path::path_for_saved_data(options_file_name);
         } catch (const user_data::UserNameError& e) {
             throw OptionsFileError(e.what());
         }

@@ -294,8 +294,8 @@ void StandardGameScene::initialize_rendering_board() {
 
     auto shader = app->res.shader.load(
         "board_wood_shader"_h,
-        encr(paths::path_for_assets(assets::BOARD_VERTEX_SHADER)),
-        encr(paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
+        encr(path::path_for_assets(assets::BOARD_VERTEX_SHADER)),
+        encr(path::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -372,8 +372,8 @@ void StandardGameScene::initialize_rendering_board_paint() {
 
     auto shader = app->res.shader.load(
         "board_paint_shader"_h,
-        encr(paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
-        encr(paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
+        encr(path::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
+        encr(path::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -444,8 +444,8 @@ void StandardGameScene::initialize_rendering_pieces() {
 
     auto shader = app->res.shader.load(
         "piece_shader"_h,
-        encr(paths::path_for_assets(assets::PIECE_VERTEX_SHADER)),
-        encr(paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
+        encr(path::path_for_assets(assets::PIECE_VERTEX_SHADER)),
+        encr(path::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -579,8 +579,8 @@ void StandardGameScene::initialize_rendering_piece(
 void StandardGameScene::initialize_rendering_nodes() {
     auto shader = app->res.shader.load(
         "node_shader"_h,
-        encr(paths::path_for_assets(assets::NODE_VERTEX_SHADER)),
-        encr(paths::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
+        encr(path::path_for_assets(assets::NODE_VERTEX_SHADER)),
+        encr(path::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_model_matrix", "u_color" },
         std::vector {
             app->renderer->get_projection_view_uniform_block()
@@ -644,8 +644,8 @@ void StandardGameScene::initialize_rendering_board_no_normal() {
 
     auto shader = app->res.shader.load(
         "board_wood_shader"_h,
-        encr(paths::path_for_assets(assets::BOARD_VERTEX_SHADER_NO_NORMAL)),
-        encr(paths::path_for_assets(assets::BOARD_FRAGMENT_SHADER_NO_NORMAL)),
+        encr(path::path_for_assets(assets::BOARD_VERTEX_SHADER_NO_NORMAL)),
+        encr(path::path_for_assets(assets::BOARD_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -712,8 +712,8 @@ void StandardGameScene::initialize_rendering_board_paint_no_normal() {
 
     auto shader = app->res.shader.load(
         "board_paint_shader"_h,
-        encr(paths::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER_NO_NORMAL)),
-        encr(paths::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL)),
+        encr(path::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER_NO_NORMAL)),
+        encr(path::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -780,8 +780,8 @@ void StandardGameScene::initialize_rendering_pieces_no_normal() {
 
     auto shader = app->res.shader.load(
         "piece_shader"_h,
-        encr(paths::path_for_assets(assets::PIECE_VERTEX_SHADER_NO_NORMAL)),
-        encr(paths::path_for_assets(assets::PIECE_FRAGMENT_SHADER_NO_NORMAL)),
+        encr(path::path_for_assets(assets::PIECE_VERTEX_SHADER_NO_NORMAL)),
+        encr(path::path_for_assets(assets::PIECE_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",

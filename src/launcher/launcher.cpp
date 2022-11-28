@@ -3,7 +3,7 @@
 #include "game/assets.h"
 #include "launcher/launcher.h"
 
-using namespace paths;
+using namespace path;
 using namespace assets;
 
 namespace launcher {

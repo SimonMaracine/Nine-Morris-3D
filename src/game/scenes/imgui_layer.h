@@ -124,8 +124,8 @@ void ImGuiLayer<S, B>::update() {
     DEB_INFO("Checked last saved game");
 
     try {
-        info_file_path = paths::path_for_logs(app->data().info_file_name);
-        save_game_file_path = paths::path_for_saved_data(save_load::SAVE_GAME_FILE);
+        info_file_path = path::path_for_logs(app->data().info_file_name);
+        save_game_file_path = path::path_for_saved_data(save_load::SAVE_GAME_FILE);
     } catch (const user_data::UserNameError& e) {  // TODO message can be better
         REL_ERROR("{}", e.what());
 

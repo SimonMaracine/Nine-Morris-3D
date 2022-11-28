@@ -38,7 +38,7 @@ namespace save_load {
         std::string file_path;
 
         try {
-            file_path = paths::path_for_saved_data(SAVE_GAME_FILE);
+            file_path = path::path_for_saved_data(SAVE_GAME_FILE);
         } catch (const user_data::UserNameError& e) {
             throw SaveFileError(e.what());
         }

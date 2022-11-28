@@ -1,8 +1,11 @@
 #pragma once
 
-#include "nine_morris_3d_engine/graphics/renderer/renderer.h"
+#include <glad/glad.h>
+
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/graphics/opengl/shader.h"
+
+struct PostProcessingContext;
 
 class PostProcessingStep {
 public:
@@ -14,8 +17,6 @@ public:
     virtual void prepare(const PostProcessingContext& context) const = 0;
 
     std::string_view get_name() const { return name; }
-
-    bool enabled = true;
 protected:
     std::string name;
 
@@ -24,4 +25,11 @@ protected:
     std::shared_ptr<Shader> shader;
 
     friend class Renderer;
+};
+
+struct PostProcessingContext {
+    std::vector<std::unique_ptr<PostProcessingStep>> steps;
+    GLuint last_texture = 0;  // Last texture at any moment in the processing pipeline
+    std::vector<GLuint> textures;  // All textures in order
+    GLuint original_texture = 0;
 };

@@ -9,13 +9,13 @@
 #include "nine_morris_3d_engine/application/input.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/framebuffer_reader.h"
-#include "nine_morris_3d_engine/graphics/post_processing_step.h"
+#include "nine_morris_3d_engine/graphics/post_processing.h"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/graphics/opengl/shader.h"
 #include "nine_morris_3d_engine/graphics/opengl/texture.h"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
-#include "nine_morris_3d_engine/other/paths.h"
+#include "nine_morris_3d_engine/other/path.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
@@ -74,24 +74,24 @@ Renderer::Renderer(Application* app)
 
     {
         storage.skybox_shader = std::make_shared<Shader>(
-            encr(paths::path_for_assets(SKYBOX_VERTEX_SHADER)),
-            encr(paths::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
+            encr(path::path_for_assets(SKYBOX_VERTEX_SHADER)),
+            encr(path::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_projection_view_matrix", "u_skybox" }
         );
     }
 
     {
         storage.screen_quad_shader = std::make_shared<Shader>(
-            encr(paths::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
-            encr(paths::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
+            encr(path::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
+            encr(path::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_screen_texture" }
         );
     }
 
     {
         storage.quad3d_shader = std::make_shared<Shader>(
-            encr(paths::path_for_assets(QUAD3D_VERTEX_SHADER)),
-            encr(paths::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
+            encr(path::path_for_assets(QUAD3D_VERTEX_SHADER)),
+            encr(path::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
             std::vector<std::string> {
                 "u_model_matrix",
                 "u_view_matrix",
@@ -103,8 +103,8 @@ Renderer::Renderer(Application* app)
 
     {
         storage.shadow_shader = std::make_shared<Shader>(
-            encr(paths::path_for_assets(SHADOW_VERTEX_SHADER)),
-            encr(paths::path_for_assets(SHADOW_FRAGMENT_SHADER)),
+            encr(path::path_for_assets(SHADOW_VERTEX_SHADER)),
+            encr(path::path_for_assets(SHADOW_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix" },
             std::vector { storage.light_space_uniform_block }
         );
@@ -112,8 +112,8 @@ Renderer::Renderer(Application* app)
 
     {
         storage.outline_shader = std::make_shared<Shader>(
-            encr(paths::path_for_assets(OUTLINE_VERTEX_SHADER)),
-            encr(paths::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
+            encr(path::path_for_assets(OUTLINE_VERTEX_SHADER)),
+            encr(path::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix", "u_color" },
             std::vector { storage.projection_view_uniform_block }
         );
@@ -122,8 +122,8 @@ Renderer::Renderer(Application* app)
 #ifdef PLATFORM_GAME_DEBUG
     {
         storage.origin_shader = std::make_shared<Shader>(
-            paths::path_for_assets(ORIGIN_VERTEX_SHADER),
-            paths::path_for_assets(ORIGIN_FRAGMENT_SHADER),
+            path::path_for_assets(ORIGIN_VERTEX_SHADER),
+            path::path_for_assets(ORIGIN_FRAGMENT_SHADER),
             std::vector<std::string> { "u_projection_view_matrix" }
         );
     }
@@ -366,9 +366,9 @@ void Renderer::setup_shader(std::shared_ptr<Shader> shader) {
     }
 }
 
-void Renderer::add_post_processing(std::shared_ptr<PostProcessingStep> post_processing_step) {
-    post_processing_context.steps.push_back(post_processing_step);
+void Renderer::add_post_processing(std::unique_ptr<PostProcessingStep>&& post_processing_step) {
     post_processing_step->prepare(post_processing_context);
+    post_processing_context.steps.push_back(std::move(post_processing_step));
 }
 
 void Renderer::set_scene_framebuffer(int samples) {
@@ -439,11 +439,6 @@ void Renderer::post_processing() {
 
     for (size_t i = 0; i < post_processing_context.steps.size(); i++) {
         const PostProcessingStep* step = post_processing_context.steps[i].get();
-
-        if (!step->enabled) {
-            continue;
-        }
-
         const FramebufferSpecification& specification = step->framebuffer->get_specification();
 
         step->framebuffer->bind();
