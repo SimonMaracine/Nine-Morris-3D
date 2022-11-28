@@ -11,10 +11,12 @@ void GameContext::begin_human_move() {
 }
 
 void GameContext::end_human_move() {
-    board->is_players_turn = false;
+    // Nothing needs to be done for now
 }
 
 void GameContext::begin_computer_move() {
+    board->is_players_turn = false;
+
     // TODO start the appropriate minimax algorithm in thread
 
     if (board->must_take_piece) {

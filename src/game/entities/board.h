@@ -67,7 +67,7 @@ struct Board {
     ThreefoldRepetitionHistory repetition_history;
 
     bool next_move = true;  // It is false when any piece is in the air, true otherwise
-    bool is_players_turn = true;
+    bool is_players_turn = false;
 
     bool did_action = false;
     bool switched_turn = false;

@@ -30,7 +30,7 @@ struct StandardBoardSerialized {
 
     ThreefoldRepetitionHistory repetition_history;
 
-    bool is_players_turn = true;
+    bool is_players_turn = false;
 
     bool did_action = false;
     bool switched_turn = false;
