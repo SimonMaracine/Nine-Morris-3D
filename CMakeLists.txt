@@ -12,13 +12,16 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
 endif()
 
 set(BUILD_SHARED_LIBS OFF)
-set(INJECT_DEBUG_POSTFIX OFF)  # This doesn't seem to work
-set(CMAKE_DEBUG_POSTFIX "")
+set(USE_STATIC_CRT ON)  # FIXME see if it works
+# set(INJECT_DEBUG_POSTFIX OFF)  # This doesn't seem to work
+# set(CMAKE_DEBUG_POSTFIX "")
 
 set(ASSIMP_BUILD_TESTS OFF)
-set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
-set(ASSIMP_INSTALL_PDB OFF)
+set(ASSIMP_INSTALL OFF)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF)
+# set(ASSIMP_INSTALL_PDB OFF)  # TODO clean up
 set(ASSIMP_NO_EXPORT ON)
+set(ASSIMP_BUILD_ASSIMP_VIEW OFF)
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 set(CPPBLOWFISH_BUILD_TESTS OFF)
@@ -177,7 +180,7 @@ add_dependencies(${ENGINE} glfw)  # This is necessary for some reason
 target_include_directories(${ENGINE} PRIVATE
     "${CMAKE_SOURCE_DIR}/engine"
 )
-target_include_directories(${ENGINE} SYSTEM PRIVATE
+target_include_directories(${ENGINE} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/glad/include"
     "${CMAKE_SOURCE_DIR}/dependencies/cereal/include"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
@@ -199,17 +202,9 @@ target_include_directories(${GAME} PRIVATE
 )
 target_include_directories(${GAME} SYSTEM PRIVATE
     "${CMAKE_SOURCE_DIR}/engine"
-    "${CMAKE_SOURCE_DIR}/dependencies/glad/include"
     "${CMAKE_SOURCE_DIR}/dependencies/cereal/include"
-    "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
-    "${CMAKE_SOURCE_DIR}/dependencies/stb_truetype"
-    "${CMAKE_SOURCE_DIR}/dependencies/stb_image_write"
-    "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/glm"
-    "${CMAKE_SOURCE_DIR}/extern/glfw/include"
     "${CMAKE_SOURCE_DIR}/extern/imgui"
-    "${CMAKE_SOURCE_DIR}/extern/utfcpp/source"
-    "${CMAKE_SOURCE_DIR}/extern/cppblowfish/include"
     "${CMAKE_SOURCE_DIR}/extern/entt/src"
     "${CMAKE_SOURCE_DIR}/extern/resmanager/src"
 )
@@ -251,7 +246,7 @@ endif()
 target_link_libraries(${GAME} PRIVATE
     ${ENGINE}
     ${MY_IMGUI}
-    spdlog
+    spdlog  # TODO clean up
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)

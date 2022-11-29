@@ -5,14 +5,14 @@
     mkdir build-release
     cd build-release
     cmake .. -D CMAKE_BUILD_TYPE=Release
-    cmake --build .
+    cmake --build . -j4
 
 ## Windows release
 
 #### Visual Studio Code
 
     cmake . -D CMAKE_BUILD_TYPE=Release -A x64
-    cmake --build . --config Release
+    cmake --build . --config Release -j4
 
 #### Visual Studio
 

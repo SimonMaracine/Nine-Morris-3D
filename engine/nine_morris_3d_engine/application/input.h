@@ -1,7 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>  // Include glad just to make everything compile
-#include <GLFW/glfw3.h>
+struct GLFWwindow;
 
 namespace input {
     enum class Key;
