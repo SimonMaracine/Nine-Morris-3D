@@ -11,17 +11,16 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
+# Use static linking everywhere
 set(BUILD_SHARED_LIBS OFF)
-set(USE_STATIC_CRT ON)  # FIXME see if it works
-# set(INJECT_DEBUG_POSTFIX OFF)  # This doesn't seem to work
-# set(CMAKE_DEBUG_POSTFIX "")
 
+set(USE_STATIC_CRT ON)  # Windows stuff
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_INSTALL OFF)
-set(ASSIMP_WARNINGS_AS_ERRORS OFF)
-# set(ASSIMP_INSTALL_PDB OFF)  # TODO clean up
-set(ASSIMP_NO_EXPORT ON)
 set(ASSIMP_BUILD_ASSIMP_VIEW OFF)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF)
+set(ASSIMP_NO_EXPORT ON)
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 set(CPPBLOWFISH_BUILD_TESTS OFF)
@@ -246,7 +245,7 @@ endif()
 target_link_libraries(${GAME} PRIVATE
     ${ENGINE}
     ${MY_IMGUI}
-    spdlog  # TODO clean up
+    spdlog  # This avoids having to link engine libraries publicly
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
