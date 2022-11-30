@@ -4,9 +4,10 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
+#include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/path.h"
 #include "nine_morris_3d_engine/other/user_data.h"
-#include "nine_morris_3d_engine/other/logging.h"
+#include "nine_morris_3d_engine/other/dependencies.h"
 
 #define LOG_PATTERN_DEBUG "%^[%l] [th %t] [%H:%M:%S]%$ %v"
 #define LOG_PATTERN_RELEASE "%^[%l] [th %t] [%!:%#] [%c]%$ %v"
@@ -70,7 +71,8 @@ namespace logging {
     }
 
     void log_opengl_and_dependencies_info(LogTarget target, std::string_view info_file) {
-        const std::string contents = debug_opengl::get_info();
+        std::string contents = debug_opengl::get_info();
+        contents += dependencies::get_info();
 
         switch (target) {
             case LogTarget::File: {

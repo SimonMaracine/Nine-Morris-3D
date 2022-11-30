@@ -67,7 +67,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     encrypt::initialize(builder.encryption_key);
     identifier::initialize();
 
-    auto [version_major, version_minor] = debug_opengl::get_version_numbers();
+    auto [version_major, version_minor] = debug_opengl::get_version_number();
     REL_INFO("Using OpenGL version {}.{}", version_major, version_minor);
 
     if (builder.renderer_3d) {

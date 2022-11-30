@@ -6,10 +6,10 @@
 namespace debug_opengl {
     void maybe_initialize_debugging();
 
-    // Get information about OpenGL and dependencies
+    // Get various information about OpenGL
     std::string get_info();
 
-    std::pair<int, int> get_version_numbers();
+    std::pair<int, int> get_version_number();
     const unsigned char* get_opengl_version();
     const unsigned char* get_glsl_version();
     const unsigned char* get_vendor();
