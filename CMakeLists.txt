@@ -25,7 +25,7 @@ set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 set(CPPBLOWFISH_BUILD_TESTS OFF)
 
-project("Nine Morris 3D"
+project("Nine-Morris-3D"
     VERSION 0.2.0
     LANGUAGES C CXX
 )
@@ -145,9 +145,9 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
 
     target_compile_options(${GAME} PRIVATE -Wall -Wextra)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_compile_options(${ENGINE} PRIVATE /w)  # FIXME
+    target_compile_options(${ENGINE} PRIVATE /W3)  # FIXME
 
-    target_compile_options(${GAME} PRIVATE /w)  # FIXME
+    target_compile_options(${GAME} PRIVATE /W3)  # FIXME
 else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
