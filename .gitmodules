@@ -9,6 +9,7 @@
 [submodule "extern/assimp"]
 	path = extern/assimp
 	url = https://github.com/SimonMaracine/assimp.git
+	branch = master
 	ignore = dirty
 [submodule "extern/glm"]
 	path = extern/glm
