@@ -59,7 +59,7 @@ void StandardGameScene::on_start() {
     app->renderer->add_quad(data.quad_cache["light_bulb"_h]);
 #endif
 
-    camera.go_towards_position(default_camera_position);
+    camera_controller.go_towards_position(default_camera_position);
 }
 
 void StandardGameScene::on_stop() {
@@ -124,10 +124,10 @@ void StandardGameScene::on_awake() {
 }
 
 void StandardGameScene::on_update() {
-    if (!imgui_layer.hovering_gui) {
-        camera.update_controls(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
-    }
-    camera.update(app->get_delta());
+    // if (!imgui_layer.hovering_gui) {  // FIXME solve this
+    //     camera.update_controls(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
+    // }
+    camera_controller.update(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
 
     board.update_nodes(app->renderer->get_hovered_id());
     board.update_pieces(app->renderer->get_hovered_id());
@@ -145,7 +145,7 @@ void StandardGameScene::on_update() {
 }
 
 void StandardGameScene::on_fixed_update() {
-    camera.update_friction();
+    camera_controller.update_friction();
 }
 
 void StandardGameScene::on_imgui_update() {
@@ -186,8 +186,11 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
     auto& data = app->user_data<Data>();
 
     if (event.button == input::MouseButton::LEFT) {
-        if (board.next_move && board.is_players_turn
-                && (board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces)) {
+        const bool valid_phases = (
+            board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
+        );
+
+        if (board.next_move && board.is_players_turn && valid_phases) {
             const auto [did_action, switched_turn, must_take_piece_or_took_piece] = (
                 board.release(app->renderer->get_hovered_id())
             );
@@ -226,34 +229,37 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::UP:
             keyboard.move(
                 KB::calculate(
-                    KB::Direction::Up, camera.get_angle_around_point()
+                    KB::Direction::Up, camera_controller.get_angle_around_point()
                 )
             );
             break;
         case input::Key::DOWN:
             keyboard.move(
                 KB::calculate(
-                    KB::Direction::Down, camera.get_angle_around_point()
+                    KB::Direction::Down, camera_controller.get_angle_around_point()
                 )
             );
             break;
         case input::Key::LEFT:
             keyboard.move(
                 KB::calculate(
-                    KB::Direction::Left, camera.get_angle_around_point()
+                    KB::Direction::Left, camera_controller.get_angle_around_point()
                 )
             );
             break;
         case input::Key::RIGHT:
             keyboard.move(
                 KB::calculate(
-                    KB::Direction::Right, camera.get_angle_around_point()
+                    KB::Direction::Right, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case input::Key::ENTER:
-            if (board.next_move && board.is_players_turn
-                    && (board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces)) {
+        case input::Key::ENTER: {
+            const bool valid_phases = (
+                board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
+            );
+
+            if (board.next_move && board.is_players_turn && valid_phases) {
                 const auto [did_action, switched_turn, must_take_piece_or_took_piece] = (
                     keyboard.click_and_release()
                 );
@@ -261,6 +267,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
                 update_after_human_move(did_action, switched_turn, must_take_piece_or_took_piece);
             }
             break;
+        }
         default:
             break;
     }
@@ -268,12 +275,12 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
 
 void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
     if (event.key == input::Key::SPACE) {
-        camera.go_towards_position(default_camera_position);
+        camera_controller.go_towards_position(default_camera_position);
     }
 }
 
 void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
-    camera.update_projection(static_cast<float>(event.width), static_cast<float>(event.height));
+    camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
 }
 
 std::shared_ptr<Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, identifier::Id id, hs hash) {
@@ -1121,29 +1128,62 @@ void StandardGameScene::setup_camera() {
     constexpr float PITCH = 47.0f;
     constexpr float DISTANCE_TO_POINT = 8.0f;
 
-    const glm::mat4 projection = glm::perspective(
-        glm::radians(Camera::LENS_FOV),
-        static_cast<float>(app->data().width) / app->data().height,
-        Camera::LENS_NEAR, Camera::LENS_FAR
-    );
+    // const glm::mat4 projection = glm::perspective(
+    //     glm::radians(Camera::LENS_FOV),
+    //     static_cast<float>(app->data().width) / app->data().height,
+    //     Camera::LENS_NEAR, Camera::LENS_FAR
+    // );
 
-    camera = Camera {
-        data.options.sensitivity,
-        PITCH,
+
+
+    camera = Camera {};
+
+    camera_controller = CameraController {
+        &camera,
+        app->data().width,
+        app->data().height,
+        LENS_FOV,
+        LENS_NEAR,
+        LENS_FAR,
         glm::vec3(0.0f),
         DISTANCE_TO_POINT,
-        projection
+        PITCH,
+        data.options.sensitivity
     };
 
     default_camera_position = camera.get_position();
 
-    camera = Camera {
-        data.options.sensitivity,
-        PITCH,
+    camera_controller = CameraController {
+        &camera,
+        app->data().width,
+        app->data().height,
+        LENS_FOV,
+        LENS_NEAR,
+        LENS_FAR,
         glm::vec3(0.0f),
         DISTANCE_TO_POINT + 0.7f,
-        projection
+        PITCH,
+        data.options.sensitivity
     };
+
+
+    // camera = Camera {
+    //     data.options.sensitivity,
+    //     PITCH,
+    //     glm::vec3(0.0f),
+    //     DISTANCE_TO_POINT,
+    //     projection
+    // };
+
+    // default_camera_position = camera.get_position();
+
+    // camera = Camera {
+    //     data.options.sensitivity,
+    //     PITCH,
+    //     glm::vec3(0.0f),
+    //     DISTANCE_TO_POINT + 0.7f,
+    //     projection
+    // };
 
     app->renderer->set_camera(&camera);
 

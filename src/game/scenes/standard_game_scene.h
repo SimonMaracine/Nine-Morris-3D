@@ -104,6 +104,7 @@ struct StandardGameScene : public Scene {
 
     // Game-related
     Camera camera;
+    CameraController camera_controller {&camera};
     StandardBoard board;
     UndoRedoState<StandardBoardSerialized> undo_redo_state;
     KeyboardControls keyboard;

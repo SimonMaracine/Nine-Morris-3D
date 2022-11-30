@@ -1,6 +1,7 @@
 #pragma once
 
 #include "nine_morris_3d_engine/other/assert.h"
+#include "nine_morris_3d_engine/other/camera_controller.h"
 #include "nine_morris_3d_engine/other/dependencies.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/exit.h"

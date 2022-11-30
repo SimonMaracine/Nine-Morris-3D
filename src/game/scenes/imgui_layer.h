@@ -328,9 +328,9 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             if (ImGui::BeginMenu("Camera Sensitivity")) {
                 ImGui::PushItemWidth(100.0f);
                 if (ImGui::SliderFloat("##", &data.options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
-                    scene->camera.sensitivity = data.options.sensitivity;
+                    scene->camera_controller.sensitivity = data.options.sensitivity;
 
-                    DEB_INFO("Changed camera sensitivity to {}", scene->camera.sensitivity);
+                    DEB_INFO("Changed camera sensitivity to {}", scene->camera_controller.sensitivity);
                 }
                 ImGui::PopItemWidth();
 
@@ -757,10 +757,10 @@ void ImGuiLayer<S, B>::draw_debug() {
         const glm::vec3& position = scene->camera.get_position();
         ImGui::Begin("Camera");
         ImGui::Text("Position: %.3f, %.3f, %.3f", position.x, position.y, position.z);
-        ImGui::Text("Pitch: %.3f", scene->camera.get_pitch());
-        ImGui::Text("Yaw: %.3f", scene->camera.get_yaw());
-        ImGui::Text("Angle around point: %.3f", scene->camera.get_angle_around_point());
-        ImGui::Text("Distance to point: %.3f", scene->camera.get_distance_to_point());
+        ImGui::Text("Pitch: %.3f", scene->camera_controller.get_pitch());
+        ImGui::Text("Yaw: %.3f", scene->camera_controller.get_yaw());
+        ImGui::Text("Angle around point: %.3f", scene->camera_controller.get_angle_around_point());
+        ImGui::Text("Distance to point: %.3f", scene->camera_controller.get_distance_to_point());
         ImGui::End();
 
         ImGui::Begin("Light Space Matrix");
