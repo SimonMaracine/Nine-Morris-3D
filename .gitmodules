@@ -1,32 +1,25 @@
 [submodule "extern/glfw"]
 	path = extern/glfw
 	url = https://github.com/SimonMaracine/glfw.git
-	ignore = dirty
 [submodule "extern/imgui"]
 	path = extern/imgui
 	url = https://github.com/SimonMaracine/imgui.git
-	ignore = all
 [submodule "extern/assimp"]
 	path = extern/assimp
 	url = https://github.com/SimonMaracine/assimp.git
 	branch = master
-	ignore = dirty
 [submodule "extern/glm"]
 	path = extern/glm
 	url = https://github.com/SimonMaracine/glm.git
-	ignore = dirty
 [submodule "extern/spdlog"]
 	path = extern/spdlog
 	url = https://github.com/SimonMaracine/spdlog.git
-	ignore = dirty
 [submodule "extern/utfcpp"]
 	path = extern/utfcpp
 	url = https://github.com/SimonMaracine/utfcpp.git
-	ignore = dirty
 [submodule "extern/cppblowfish"]
 	path = extern/cppblowfish
 	url = https://github.com/SimonMaracine/cppblowfish.git
-	ignore = dirty
 [submodule "extern/entt"]
 	path = extern/entt
 	url = https://github.com/SimonMaracine/entt.git
