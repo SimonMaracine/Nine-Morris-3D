@@ -142,12 +142,10 @@ add_library(${MY_IMGUI} STATIC
 # Enable warnings
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_compile_options(${ENGINE} PRIVATE -Wall -Wextra)
-
     target_compile_options(${GAME} PRIVATE -Wall -Wextra)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_compile_options(${ENGINE} PRIVATE /W3)  # FIXME
-
-    target_compile_options(${GAME} PRIVATE /W3)  # FIXME
+    target_compile_options(${ENGINE} PRIVATE /W2)
+    target_compile_options(${GAME} PRIVATE /W2)
 else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
@@ -293,11 +291,13 @@ elseif(CMAKE_BUILD_TYPE MATCHES Release)
 endif()
 
 target_compile_definitions(${ENGINE} PRIVATE
+    _CRT_SECURE_NO_WARNINGS
     IMGUI_IMPL_OPENGL_LOADER_GLAD
     ENTT_NO_ETO
     UTF_CPP_CPLUSPLUS=201703
 )
 
 target_compile_definitions(${GAME} PRIVATE
+    _CRT_SECURE_NO_WARNINGS
     ENTT_NO_ETO
 )

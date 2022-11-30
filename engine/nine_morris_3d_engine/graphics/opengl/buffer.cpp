@@ -52,7 +52,7 @@ IndexBuffer::IndexBuffer(const unsigned int* data, size_t size) {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    index_count = size / sizeof(unsigned int);
+    index_count = static_cast<int>(size / sizeof(unsigned int));
 
     DEB_DEBUG("Created index buffer {}", buffer);
 }
