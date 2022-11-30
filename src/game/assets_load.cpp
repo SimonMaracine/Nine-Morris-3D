@@ -1,4 +1,4 @@
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+#include <nine_morris_3d_engine/engine_other.h>
 
 #include "game/assets_load.h"
 #include "game/assets.h"

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
-
 #include "game/entities/serialization/node_serialized.h"
 #include "game/entities/serialization/piece_serialized.h"
 #include "game/entities/node.h"

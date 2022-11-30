@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+#include <nine_morris_3d_engine/engine_application.h>
 
 #include "game/assets_load.h"
 #include "launcher/launcher_options.h"

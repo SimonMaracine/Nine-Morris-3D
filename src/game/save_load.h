@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+#include <nine_morris_3d_engine/engine_other.h>
 
 #include "game/entities/piece.h"
 #include "game/entities/node.h"

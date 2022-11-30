@@ -1,4 +1,5 @@
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+#include <nine_morris_3d_engine/engine_graphics.h>
+#include <nine_morris_3d_engine/engine_other.h>
 
 #include "game/entities/board.h"
 #include "game/entities/node.h"

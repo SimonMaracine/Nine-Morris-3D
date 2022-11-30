@@ -1,4 +1,5 @@
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+#include <nine_morris_3d_engine/engine_application.h>
+#include <nine_morris_3d_engine/engine_other.h>
 
 #include "other/display_manager.h"
 

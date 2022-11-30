@@ -1,7 +1,5 @@
 #pragma once
 
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
-
 template<typename B>
 struct UndoRedoState {
     struct State {

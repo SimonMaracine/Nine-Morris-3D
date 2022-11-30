@@ -1,4 +1,4 @@
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+#include <nine_morris_3d_engine/engine_other.h>
 
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/imgui_layer.h"

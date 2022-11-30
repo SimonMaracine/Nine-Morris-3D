@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-set(ENGINE NineMorris3D-Engine)
+set(ENGINE nine-morris-3d-engine)
 set(GAME Nine-Morris-3D)
 set(GLAD_STB glad-stb)
 set(MY_IMGUI my-imgui)

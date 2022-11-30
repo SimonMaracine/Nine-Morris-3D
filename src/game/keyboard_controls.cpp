@@ -1,4 +1,4 @@
-#include <nine_morris_3d_engine/nine_morris_3d_engine.h>
+#include <nine_morris_3d_engine/engine_other.h>
 
 #include "game/keyboard_controls.h"
 #include "game/entities/board.h"
@@ -121,6 +121,6 @@ KeyboardControls::Direction KeyboardControls::calculate(Direction original_direc
         return NEXT[static_cast<int>(original_direction)][3];
     }
 
-    ASSERT(false, "This shouldn't be reached");
+    ASSERT(false, "This line shouldn't be reached");
     return {};
 }

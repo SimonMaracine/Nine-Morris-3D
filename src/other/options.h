@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nine_morris_3d_engine/nine_morris_3d_engine.h"
+#include <nine_morris_3d_engine/engine_other.h>
 
 namespace options {
     class OptionsFileError : public std::runtime_error {
