@@ -88,7 +88,6 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/other/texture_data.h"
     "engine/nine_morris_3d_engine/other/user_data.h"
     "engine/nine_morris_3d_engine/other/resource_manager.h"
-    "engine/nine_morris_3d_engine/nine_morris_3d_engine.h"
 )
 
 add_library(${ENGINE} STATIC
