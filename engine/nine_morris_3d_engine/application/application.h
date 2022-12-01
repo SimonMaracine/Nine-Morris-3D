@@ -51,7 +51,7 @@ public:
     // Public fields accessible by all the code
     bool running = true;
     int exit_code = 0;
-    std::unique_ptr<Window> window;
+    std::unique_ptr<Window> window;  // The last* object destroyed in an application instance
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
     entt::dispatcher evt;  // Event dispatcher

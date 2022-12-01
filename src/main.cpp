@@ -50,7 +50,7 @@ int main() {
         launcher.reset();
 
         if (exit_code == 1) {
-            return 0;
+            break;
         }
 
         const auto& options = std::any_cast<Data>(data).launcher_options;
@@ -73,7 +73,9 @@ int main() {
         exit_code = game->run();
 
         if (exit_code == 0) {
-            return 0;
+            break;
         }
     }
+
+    REL_INFO("Terminated game successfully");
 }

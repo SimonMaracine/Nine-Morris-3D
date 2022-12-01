@@ -26,7 +26,7 @@ static size_t type_size(GLenum type) {
         CASE(GL_FLOAT_VEC3, 3, GLfloat)
         CASE(GL_FLOAT_MAT4, 16, GLfloat)
         default:
-            REL_CRITICAL("Unknown type: {}, exiting...", type);
+            REL_CRITICAL("Unknown type `{}`, exiting...", type);
             game_exit::exit_critical();
     }
 

@@ -211,7 +211,7 @@ void Window::set_cursor(unsigned int handle) {
     try {
         cursor = cursors.at(handle);
     } catch (const std::out_of_range&) {
-        DEB_CRITICAL("Invalid handle: {}, exiting...", handle);
+        DEB_CRITICAL("Invalid handle `{}`, exiting...", handle);
         game_exit::exit_critical();
     }
     glfwSetCursor(window, cursor);
