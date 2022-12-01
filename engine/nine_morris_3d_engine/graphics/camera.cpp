@@ -10,42 +10,21 @@ void Camera::set_projection(int width, int height, float fov, float near, float 
     projection_view_matrix = projection_matrix * view_matrix;
 }
 
-void Camera::set_view(const glm::vec3& position, const glm::vec3& look, const glm::vec3& up, const glm::vec3& rotation) {
-    this->position = position;
-    this->rotation = rotation;
-
+void Camera::set_view(const glm::vec3& position, const glm::vec3& look, const glm::vec3& up) {
     view_matrix = glm::lookAt(position, look, up);
     projection_view_matrix = projection_matrix * view_matrix;
 }
 
-void Camera::set_view(const glm::mat4& view_matrix, const glm::vec3& position, const glm::vec3& rotation) {
-    this->position = position;
-    this->rotation = rotation;
-
+void Camera::set_view(const glm::mat4& view_matrix) {
     this->view_matrix = view_matrix;
     projection_view_matrix = projection_matrix * view_matrix;
 }
 
-void Camera::set_position(const glm::vec3& position) {
-    this->position = position;
-
-    recalculate_view();
-}
-
-void Camera::set_rotation(const glm::vec3& rotation) {
-    this->rotation = rotation;
-
-    recalculate_view();
-}
-
 void Camera::set_position_rotation(const glm::vec3& position, const glm::vec3& rotation) {
-    this->position = position;
-    this->rotation = rotation;
-
-    recalculate_view();
+    recalculate_view(position, rotation);
 }
 
-void Camera::recalculate_view() {
+void Camera::recalculate_view(const glm::vec3& position, const glm::vec3& rotation) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, position);
     matrix = glm::rotate(matrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));

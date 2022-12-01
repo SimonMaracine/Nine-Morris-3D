@@ -86,8 +86,6 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 
     evt.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(*this);
     evt.sink<WindowResizedEvent>().connect<&Application::on_window_resized>(*this);
-    evt.sink<MouseScrolledEvent>().connect<&Application::on_mouse_scrolled>(*this);
-    evt.sink<MouseMovedEvent>().connect<&Application::on_mouse_moved>(*this);
 
     frame_counter.previous_seconds = window->get_time();
     fixed_update.previous_seconds = window->get_time();
@@ -128,10 +126,6 @@ int Application::run() {
             current_scene->on_fixed_update();
         }
         current_scene->on_update();
-
-        mouse_wheel = 0.0f;  // TODO maybe find a better way using events directly
-        dx = 0.0f;
-        dy = 0.0f;
 
         render_helpers::clear(render_helpers::Color);
 
@@ -301,17 +295,6 @@ void Application::on_window_resized(const WindowResizedEvent& event) {
             }
         }
     }
-}
-
-void Application::on_mouse_scrolled(const MouseScrolledEvent& event) {
-    mouse_wheel = event.scroll;
-}
-
-void Application::on_mouse_moved(const MouseMovedEvent& event) {
-    dx = last_mouse_x - event.mouse_x;
-    dy = last_mouse_y - event.mouse_y;
-    last_mouse_x = event.mouse_x;
-    last_mouse_y = event.mouse_y;
 }
 
 void Application::on_imgui_mouse_scrolled(const MouseScrolledEvent& event) {

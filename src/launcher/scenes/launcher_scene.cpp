@@ -308,9 +308,6 @@ void LauncherScene::on_start() {
         launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate, app
     );
 
-    // Set events
-    app->evt.sink<WindowClosedEvent>().connect<&LauncherScene::on_window_closed>(*this);
-
     // Initialize display manager
     display_manager = DisplayManager {app};
 }
@@ -321,6 +318,10 @@ void LauncherScene::on_stop() {
     save_load_gracefully::save_to_file<launcher_options::LauncherOptions>(
         launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, app
     );
+}
+
+void LauncherScene::on_awake() {
+    app->evt.sink<WindowClosedEvent>().connect<&LauncherScene::on_window_closed>(this);
 }
 
 void LauncherScene::on_update() {

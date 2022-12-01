@@ -19,6 +19,7 @@
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
+#include "nine_morris_3d_engine/other/camera_controller.h"
 
 static constexpr int SHADOW_MAP_UNIT = 2;
 static constexpr glm::vec3 CLEAR_COLOR = { 0.1f, 0.1f, 0.1f };
@@ -231,7 +232,7 @@ Renderer::Renderer(Application* app)
     Shader::unbind();
 
     // Setup events
-    app->evt.sink<WindowResizedEvent>().connect<&Renderer::on_window_resized>(*this);
+    app->evt.sink<WindowResizedEvent>().connect<&Renderer::on_window_resized>(this);
 
     DEB_INFO("Initialized renderer");
 }
@@ -417,10 +418,17 @@ void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
     storage.skybox_texture = texture;
 }
 
-void Renderer::set_camera(Camera* camera) {
-    this->camera = camera;
-    cache_camera_data();
-    on_window_resized(WindowResizedEvent {0, 0});  // Update projection
+void Renderer::set_camera_controller(CameraController* camera_controller) {
+    this->camera_controller = camera_controller;
+
+    if (camera_controller != nullptr) {
+        cache_camera_data();
+    } else {
+        camera_cache = CameraCache {};
+    }
+
+    // Update the projection
+    on_window_resized(WindowResizedEvent {0, 0});
 }
 
 void Renderer::draw_screen_quad(GLuint texture) {
@@ -731,13 +739,11 @@ void Renderer::check_hovered_id(int x, int y) {
 }
 
 void Renderer::cache_camera_data() {
-    if (camera != nullptr) {
-        camera_cache.projection_matrix = camera->get_projection_matrix();
-        camera_cache.view_matrix = camera->get_view_matrix();
-        camera_cache.projection_view_matrix = camera->get_projection_view_matrix();
-        camera_cache.position = camera->get_position();
-    } else {
-        camera_cache = CameraCache {};
+    if (camera_controller != nullptr) {
+        camera_cache.projection_matrix = camera_controller->get_camera().get_projection_matrix();
+        camera_cache.view_matrix = camera_controller->get_camera().get_view_matrix();
+        camera_cache.projection_view_matrix = camera_controller->get_camera().get_projection_view_matrix();
+        camera_cache.position = camera_controller->get_position();
     }
 }
 

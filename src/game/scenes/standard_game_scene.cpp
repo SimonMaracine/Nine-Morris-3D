@@ -5,6 +5,7 @@
 #include "game/game_options.h"
 #include "game/save_load.h"
 #include "game/assets.h"
+#include "game/point_camera_controller.h"
 #include "game/entities/boards/standard_board.h"
 #include "game/entities/serialization/standard_board_serialized.h"
 #include "game/entities/piece.h"
@@ -18,8 +19,6 @@ using namespace encrypt;
 
 void StandardGameScene::on_start() {
     auto& data = app->user_data<Data>();
-
-    imgui_layer.update();
 
     setup_entities();
 
@@ -49,7 +48,7 @@ void StandardGameScene::on_start() {
 
     board.app = app;
     board.keyboard = &keyboard;
-    board.camera = &camera;
+    board.camera_controller = &camera_controller;
     board.undo_redo_state = &undo_redo_state;
 
     app->window->set_cursor(data.options.custom_cursor ? data.arrow_cursor : 0);
@@ -59,13 +58,14 @@ void StandardGameScene::on_start() {
     app->renderer->add_quad(data.quad_cache["light_bulb"_h]);
 #endif
 
+    imgui_layer.update();
+
     camera_controller.go_towards_position(default_camera_position);
+    camera_controller.setup_events(app);
 }
 
 void StandardGameScene::on_stop() {
     auto& data = app->user_data<Data>();
-
-    imgui_layer.reset();
 
     save_load_gracefully::save_to_file<game_options::GameOptions>(
         game_options::GAME_OPTIONS_FILE, data.options, app
@@ -79,6 +79,8 @@ void StandardGameScene::on_stop() {
     app->renderer->origin = false;
 #endif
 
+    imgui_layer.reset();
+    camera_controller.remove_events(app);
     app->renderer->clear();
     app->gui_renderer->clear();
 
@@ -116,25 +118,23 @@ void StandardGameScene::on_awake() {
     setup_light();
     setup_indicators_textures();
 
-    app->evt.sink<MouseButtonPressedEvent>().connect<&StandardGameScene::on_mouse_button_pressed>(*this);
-    app->evt.sink<MouseButtonReleasedEvent>().connect<&StandardGameScene::on_mouse_button_released>(*this);
-    app->evt.sink<KeyPressedEvent>().connect<&StandardGameScene::on_key_pressed>(*this);
-    app->evt.sink<KeyReleasedEvent>().connect<&StandardGameScene::on_key_released>(*this);
-    app->evt.sink<WindowResizedEvent>().connect<&StandardGameScene::on_window_resized>(*this);
+    app->evt.sink<MouseButtonPressedEvent>().connect<&StandardGameScene::on_mouse_button_pressed>(this);
+    app->evt.sink<MouseButtonReleasedEvent>().connect<&StandardGameScene::on_mouse_button_released>(this);
+    app->evt.sink<KeyPressedEvent>().connect<&StandardGameScene::on_key_pressed>(this);
+    app->evt.sink<KeyReleasedEvent>().connect<&StandardGameScene::on_key_released>(this);
+    app->evt.sink<WindowResizedEvent>().connect<&StandardGameScene::on_window_resized>(this);
 }
 
 void StandardGameScene::on_update() {
-    // if (!imgui_layer.hovering_gui) {  // FIXME solve this
-    //     camera.update_controls(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
-    // }
-    camera_controller.update(app->get_mouse_wheel(), app->get_dx(), app->get_dy(), app->get_delta());
+    if (!imgui_layer.hovering_gui) {
+        camera_controller.update(app->get_delta());
 
-    board.update_nodes(app->renderer->get_hovered_id());
-    board.update_pieces(app->renderer->get_hovered_id());
+        board.update_nodes(app->renderer->get_hovered_id());
+        board.update_pieces(app->renderer->get_hovered_id());
+        timer.update();  // TODO maybe should have been after update_game_state()
+    }
 
     update_game_state();
-
-    timer.update();
 
     update_timer_text();
     update_wait_indicator();
@@ -175,6 +175,10 @@ void StandardGameScene::on_imgui_update() {
 }
 
 void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
+    if (imgui_layer.hovering_gui) {
+        return;
+    }
+
     if (event.button == input::MouseButton::LEFT) {
         if (board.next_move) {
             board.click(app->renderer->get_hovered_id());
@@ -183,6 +187,10 @@ void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& e
 }
 
 void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
+    if (imgui_layer.hovering_gui) {
+        return;
+    }
+
     auto& data = app->user_data<Data>();
 
     if (event.button == input::MouseButton::LEFT) {
@@ -206,6 +214,10 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
 }
 
 void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
+    if (imgui_layer.hovering_gui) {
+        return;
+    }
+
     auto& data = app->user_data<Data>();
 
     switch (event.key) {
@@ -274,6 +286,10 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
 }
 
 void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
+    if (imgui_layer.hovering_gui) {
+        return;
+    }
+
     if (event.key == input::Key::SPACE) {
         camera_controller.go_towards_position(default_camera_position);
     }
@@ -1128,17 +1144,9 @@ void StandardGameScene::setup_camera() {
     constexpr float PITCH = 47.0f;
     constexpr float DISTANCE_TO_POINT = 8.0f;
 
-    // const glm::mat4 projection = glm::perspective(
-    //     glm::radians(Camera::LENS_FOV),
-    //     static_cast<float>(app->data().width) / app->data().height,
-    //     Camera::LENS_NEAR, Camera::LENS_FAR
-    // );
-
-
-
     camera = Camera {};
 
-    camera_controller = CameraController {
+    camera_controller = PointCameraController {
         &camera,
         app->data().width,
         app->data().height,
@@ -1151,9 +1159,9 @@ void StandardGameScene::setup_camera() {
         data.options.sensitivity
     };
 
-    default_camera_position = camera.get_position();
+    default_camera_position = camera_controller.get_position();
 
-    camera_controller = CameraController {
+    camera_controller = PointCameraController {
         &camera,
         app->data().width,
         app->data().height,
@@ -1166,26 +1174,7 @@ void StandardGameScene::setup_camera() {
         data.options.sensitivity
     };
 
-
-    // camera = Camera {
-    //     data.options.sensitivity,
-    //     PITCH,
-    //     glm::vec3(0.0f),
-    //     DISTANCE_TO_POINT,
-    //     projection
-    // };
-
-    // default_camera_position = camera.get_position();
-
-    // camera = Camera {
-    //     data.options.sensitivity,
-    //     PITCH,
-    //     glm::vec3(0.0f),
-    //     DISTANCE_TO_POINT + 0.7f,
-    //     projection
-    // };
-
-    app->renderer->set_camera(&camera);
+    app->renderer->set_camera_controller(&camera_controller);
 
     DEB_DEBUG("Setup camera");
 }
@@ -1535,7 +1524,7 @@ void StandardGameScene::save_game() {
 
     save_load::SavedGame<StandardBoardSerialized> saved_game;
     saved_game.board_serialized = serialized;
-    saved_game.camera = camera;
+    saved_game.camera_controller = camera_controller;
     saved_game.time = timer.get_time();
 
     time_t current;
@@ -1583,16 +1572,20 @@ void StandardGameScene::load_game() {
     }
 
     board.from_serialized(saved_game.board_serialized);
-    camera = saved_game.camera;
+    camera_controller = saved_game.camera_controller;
     timer = Timer {app, saved_game.time};
     undo_redo_state = std::move(saved_game.undo_redo_state);
     game.white_player = saved_game.white_player;
     game.black_player = saved_game.black_player;
 
+    // Set camera pointer lost in serialization
+    camera_controller.set_camera(&camera);
+
     made_first_move = false;
 
     update_cursor();
 }
+
 
 void StandardGameScene::undo() {
     ASSERT(!undo_redo_state.undo.empty(), "Undo history must not be empty");
@@ -1609,11 +1602,11 @@ void StandardGameScene::undo() {
     StandardBoardSerialized serialized;
     board.to_serialized(serialized);
 
-    State current_state = { serialized, camera };
+    State current_state = { serialized, camera_controller };
     const State& previous_state = undo_redo_state.undo.back();
 
     board.from_serialized(previous_state.board_serialized);
-    camera = previous_state.camera;
+    camera_controller = previous_state.camera_controller;
 
     undo_redo_state.undo.pop_back();
     undo_redo_state.redo.push_back(current_state);
@@ -1643,11 +1636,11 @@ void StandardGameScene::redo() {
     StandardBoardSerialized serialized;
     board.to_serialized(serialized);
 
-    State current_state = { serialized, camera };
+    State current_state = { serialized, camera_controller };
     const State& previous_state = undo_redo_state.redo.back();
 
     board.from_serialized(previous_state.board_serialized);
-    camera = previous_state.camera;
+    camera_controller = previous_state.camera_controller;
 
     undo_redo_state.redo.pop_back();
     undo_redo_state.undo.push_back(current_state);

@@ -753,7 +753,7 @@ void StandardBoard::remember_state() {
     StandardBoardSerialized serialized;
     to_serialized(serialized);
 
-    const UndoRedoState<StandardBoardSerialized>::State current_state = { serialized, *camera };
+    const UndoRedoState<StandardBoardSerialized>::State current_state = { serialized, *camera_controller };
 
     undo_redo_state->undo.push_back(current_state);
     undo_redo_state->redo.clear();

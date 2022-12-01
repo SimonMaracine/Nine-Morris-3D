@@ -17,6 +17,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/shader.h"
 #include "nine_morris_3d_engine/graphics/opengl/texture.h"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
+#include "nine_morris_3d_engine/other/camera_controller.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 class Application;
@@ -63,7 +64,7 @@ public:
     void set_scene_framebuffer(int samples);
     void set_shadow_map_framebuffer(int size);
     void set_skybox(std::shared_ptr<Texture3D> texture);
-    void set_camera(Camera* camera);
+    void set_camera_controller(CameraController* camera_controller);
 
     identifier::Id get_hovered_id() { return hovered_id; }
     PostProcessingContext& get_post_processing_context() { return post_processing_context; }
@@ -164,7 +165,7 @@ private:
 
     identifier::Id hovered_id = identifier::null;
     FramebufferReader<4> reader;
-    Camera* camera = nullptr;  // Don't use this directly
+    CameraController* camera_controller = nullptr;  // Don't use this directly
 
     int shadow_map_size = 4096;
 

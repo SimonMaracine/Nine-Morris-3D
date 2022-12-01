@@ -12,6 +12,7 @@
 #include "game/timer.h"
 #include "game/minimax/minimax_thread.h"
 #include "game/assets_load.h"
+#include "game/point_camera_controller.h"
 #include "other/constants.h"
 
 struct StandardGameScene : public Scene {
@@ -104,7 +105,7 @@ struct StandardGameScene : public Scene {
 
     // Game-related
     Camera camera;
-    CameraController camera_controller {&camera};
+    PointCameraController camera_controller {&camera};
     StandardBoard board;
     UndoRedoState<StandardBoardSerialized> undo_redo_state;
     KeyboardControls keyboard;

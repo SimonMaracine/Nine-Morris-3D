@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nine_morris_3d_engine/engine_graphics.h>
 #include <nine_morris_3d_engine/engine_other.h>
 
 #include "game/entities/piece.h"
@@ -11,6 +10,7 @@
 #include "game/entities/serialization/node_serialized.h"
 #include "game/undo_redo_state.h"
 #include "game/piece_movement.h"
+#include "game/point_camera_controller.h"
 #include "game/game_options.h"
 #include "launcher/launcher_options.h"
 #include "other/constants.h"
@@ -50,7 +50,7 @@ namespace save_load {
     template<typename B>
     struct SavedGame {
         B board_serialized;
-        Camera camera;
+        PointCameraController camera_controller;
         unsigned int time = 0;  // In deciseconds
         std::string date = NO_LAST_GAME;
         UndoRedoState<B> undo_redo_state;
@@ -61,7 +61,7 @@ namespace save_load {
         void serialize(Archive& archive) {
             archive(
                 board_serialized,
-                camera,
+                camera_controller,
                 time,
                 date,
                 undo_redo_state,
@@ -124,13 +124,15 @@ namespace save_load {
 // Mostly all serialization stuff
 
 template<typename Archive>
-void serialize(Archive& archive, Camera& camera) {
+void serialize(Archive& archive, PointCameraController& camera_controller) {
     archive(
-        camera.position,
-        camera.rotation,
-        camera.view_matrix,
-        camera.projection_matrix,
-        camera.projection_view_matrix
+        camera_controller.sensitivity,
+        camera_controller.position,
+        camera_controller.pitch,
+        camera_controller.yaw,
+        camera_controller.point,
+        camera_controller.distance_to_point,
+        camera_controller.angle_around_point
     );
 }
 

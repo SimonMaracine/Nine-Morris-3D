@@ -13,6 +13,7 @@ struct LauncherScene : public Scene {
 
     virtual void on_start() override;
     virtual void on_stop() override;
+    virtual void on_awake() override;
     virtual void on_update() override;
     virtual void on_imgui_update() override;
 

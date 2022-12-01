@@ -7,8 +7,8 @@
 #include "other/constants.h"
 #include "other/data.h"
 
-#define RESET_HOVERING_GUI() hovering_gui = false
-#define HOVERING_GUI() hovering_gui = true
+#define RESET_HOVERING_GUI() hovering_gui = false;
+#define HOVERING_GUI() hovering_gui = true;
 
 template<typename S, typename B>
 class ImGuiLayer {
@@ -201,7 +201,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     }
 
                     ImGui::EndMenu();
-                    HOVERING_GUI();
+                    HOVERING_GUI()
                 }
                 if (ImGui::BeginMenu("Black")) {
                     static int option = data.options.black_player;
@@ -222,11 +222,11 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     }
 
                     ImGui::EndMenu();
-                    HOVERING_GUI();
+                    HOVERING_GUI()
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI();
+                HOVERING_GUI()
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo && can_undo_redo)) {
                 scene->undo();
@@ -245,7 +245,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             }
 
             ImGui::EndMenu();
-            HOVERING_GUI();
+            HOVERING_GUI()
         }
         if (ImGui::BeginMenu("Options")) {
             if (ImGui::BeginMenu("Graphics")) {
@@ -277,7 +277,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI();
+                HOVERING_GUI()
             }
             if (ImGui::MenuItem("Save On Exit", nullptr, &data.options.save_on_exit)) {
                 if (data.options.save_on_exit) {
@@ -316,7 +316,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI();
+                HOVERING_GUI()
             }
             if (ImGui::MenuItem("Show Info", nullptr, &show_info)) {
                 if (show_info) {
@@ -335,7 +335,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 ImGui::PopItemWidth();
 
                 ImGui::EndMenu();
-                HOVERING_GUI();
+                HOVERING_GUI()
             }
             if (ImGui::BeginMenu("User Interface")) {
                 if (ImGui::MenuItem("Hide Timer", nullptr, &data.options.hide_timer)) {
@@ -353,7 +353,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI();
+                HOVERING_GUI()
             }
             // Don't directly set options.labeled_board
             static bool labeled_board = data.options.labeled_board;
@@ -375,7 +375,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             }
 
             ImGui::EndMenu();
-            HOVERING_GUI();
+            HOVERING_GUI()
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About", nullptr, false)) {
@@ -391,7 +391,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             }
 
             ImGui::EndMenu();
-            HOVERING_GUI();
+            HOVERING_GUI()
         }
 
         ImGui::EndMainMenuBar();
@@ -409,7 +409,7 @@ void ImGuiLayer<S, B>::draw_info() {
     ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
     ImGui::End();
     // if (ImGui::IsItemHovered()) {  // FIXME this
-    //     HOVERING_GUI();
+    //     HOVERING_GUI()
     // }
     ImGui::PopFont();
 }
@@ -423,7 +423,7 @@ void ImGuiLayer<S, B>::draw_game_over() {
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("Game Over", nullptr, window_flags)) {
-        HOVERING_GUI();
+        HOVERING_GUI()
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
@@ -472,7 +472,7 @@ void ImGuiLayer<S, B>::draw_game_over() {
         ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         ImGui::EndPopup();
-        HOVERING_GUI();
+        HOVERING_GUI()
     }
     ImGui::PopFont();
 }
@@ -486,16 +486,7 @@ void ImGuiLayer<S, B>::draw_about() {
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, window_flags)) {
-        HOVERING_GUI();
-
-        // static bool deactivated = false;  // FIXME these must be fixed somehow (hard)
-        // if (!deactivated) {
-        //     game_layer->active = false;
-        //     gui_layer->active = false;
-        //     app->update_active_layers();
-
-        //     deactivated = true;
-        // }
+        HOVERING_GUI()
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
@@ -512,11 +503,6 @@ void ImGuiLayer<S, B>::draw_about() {
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
             show_about = false;
-            // deactivated = false;
-
-            // game_layer->active = true;
-            // gui_layer->active = true;
-            // app->update_active_layers();
 
             scene->timer.reset_last_time();
         }
@@ -535,16 +521,7 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("Error Loading Game", nullptr, window_flags)) {
-        HOVERING_GUI();
-
-        // static bool deactivated = false;
-        // if (!deactivated) {
-        //     game_layer->active = false;
-        //     gui_layer->active = false;
-        //     app->update_active_layers();
-
-        //     deactivated = true;
-        // }
+        HOVERING_GUI()
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
@@ -560,11 +537,6 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
             show_could_not_load_game = false;
-            // deactivated = false;
-
-            // game_layer->active = true;
-            // gui_layer->active = true;
-            // app->update_active_layers();
 
             scene->timer.reset_last_time();
         }
@@ -583,16 +555,7 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("No Last Game", nullptr, window_flags)) {
-        HOVERING_GUI();
-
-        // static bool deactivated = false;
-        // if (!deactivated) {
-        //     game_layer->active = false;
-        //     gui_layer->active = false;
-        //     app->update_active_layers();
-
-        //     deactivated = true;
-        // }
+        HOVERING_GUI()
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
@@ -605,11 +568,6 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
             show_no_last_game = false;
-            // deactivated = false;
-
-            // game_layer->active = true;
-            // gui_layer->active = true;
-            // app->update_active_layers();
 
             scene->timer.reset_last_time();
         }
@@ -754,11 +712,13 @@ void ImGuiLayer<S, B>::draw_debug() {
         ImGui::End();
         */
 
-        const glm::vec3& position = scene->camera.get_position();
+        const glm::vec3& position = scene->camera_controller.get_position();
+        const glm::vec3& rotation = scene->camera_controller.get_rotation();
+
         ImGui::Begin("Camera");
         ImGui::Text("Position: %.3f, %.3f, %.3f", position.x, position.y, position.z);
-        ImGui::Text("Pitch: %.3f", scene->camera_controller.get_pitch());
-        ImGui::Text("Yaw: %.3f", scene->camera_controller.get_yaw());
+        ImGui::Text("Pitch: %.3f", rotation.x);
+        ImGui::Text("Yaw: %.3f", rotation.y);
         ImGui::Text("Angle around point: %.3f", scene->camera_controller.get_angle_around_point());
         ImGui::Text("Distance to point: %.3f", scene->camera_controller.get_distance_to_point());
         ImGui::End();

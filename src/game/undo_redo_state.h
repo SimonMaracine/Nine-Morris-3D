@@ -1,14 +1,16 @@
 #pragma once
 
+#include "game/point_camera_controller.h"
+
 template<typename B>
 struct UndoRedoState {
     struct State {
         B board_serialized;
-        Camera camera;
+        PointCameraController camera_controller;
 
         template<typename Archive>
         void serialize(Archive& archive) {
-            archive(board_serialized, camera);
+            archive(board_serialized, camera_controller);
         }
     };
 

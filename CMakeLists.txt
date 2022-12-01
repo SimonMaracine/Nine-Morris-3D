@@ -117,7 +117,6 @@ add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/graphics/identifier.cpp"
     "engine/nine_morris_3d_engine/graphics/material.cpp"
     "engine/nine_morris_3d_engine/graphics/debug_opengl.cpp"
-    "engine/nine_morris_3d_engine/other/camera_controller.cpp"
     "engine/nine_morris_3d_engine/other/dependencies.cpp"
     "engine/nine_morris_3d_engine/other/encrypt.cpp"
     "engine/nine_morris_3d_engine/other/exit.cpp"

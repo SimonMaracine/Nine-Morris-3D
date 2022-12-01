@@ -47,11 +47,6 @@ public:
 
     double get_fps() { return fps; }
     float get_delta() { return delta; }
-    float get_mouse_wheel() { return mouse_wheel; }
-    float get_dx() { return dx; }
-    float get_dy() { return dy; }
-    float get_last_mouse_x() { return last_mouse_x; }
-    float get_last_mouse_y() { return last_mouse_y; }
 
     // Public fields accessible by all the code
     bool running = true;
@@ -75,8 +70,6 @@ private:
 
     void on_window_closed(const WindowClosedEvent& event);
     void on_window_resized(const WindowResizedEvent& event);
-    void on_mouse_scrolled(const MouseScrolledEvent& event);
-    void on_mouse_moved(const MouseMovedEvent& event);
 
     void on_imgui_mouse_scrolled(const MouseScrolledEvent& event);
     void on_imgui_mouse_moved(const MouseMovedEvent& event);
@@ -110,13 +103,6 @@ private:
 
     // Keep track of all framebuffers to resize them, if needed
     std::vector<std::weak_ptr<Framebuffer>> framebuffers;
-
-    // Input stuff
-    float mouse_wheel = 0.0f;  // TODO these shouldn't really be here
-    float dx = 0.0f;
-    float dy = 0.0f;
-    float last_mouse_x = 0.0f;
-    float last_mouse_y = 0.0f;
 
     // Clock variables
     struct {

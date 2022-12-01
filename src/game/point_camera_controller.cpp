@@ -1,9 +1,7 @@
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <nine_morris_3d_engine/engine_application.h>
+#include <nine_morris_3d_engine/engine_other.h>
 
-#include "nine_morris_3d_engine/application/input.h"
-#include "nine_morris_3d_engine/graphics/camera.h"
-#include "nine_morris_3d_engine/other/camera_controller.h"
+#include "game/point_camera_controller.h"
 
 static constexpr float ZOOM_BASE_VELOCITY = 0.03f;
 static constexpr float ZOOM_VARIABLE_VELOCITY = 5.0f;
@@ -30,25 +28,38 @@ static float calculate_angle_velocity(float target_angle, float angle) {
     return result;
 }
 
-CameraController::CameraController(Camera* camera)
-    : camera(camera) {
-    update(0.0f, 0.0f, 0.0f, 1.0f);
+PointCameraController::PointCameraController(Camera* camera)
+    : CameraController(camera) {
+    update(1.0f);
 }
 
-CameraController::CameraController(Camera* camera, int width, int height, float fov, float near, float far,
-        const glm::vec3& point, float distance_to_point, float pitch, float sensitivity)
-    : sensitivity(sensitivity), camera(camera), pitch(pitch), point(point), distance_to_point(distance_to_point) {
+PointCameraController::PointCameraController(Camera* camera, int width, int height, float fov, float near,
+        float far, const glm::vec3& point, float distance_to_point, float pitch, float sensitivity)
+    : CameraController(camera), sensitivity(sensitivity), pitch(pitch), point(point),
+      distance_to_point(distance_to_point) {
     camera->set_projection(width, height, fov, near, far);
-    update(0.0f, 0.0f, 0.0f, 1.0f);
+    update(1.0f);
 }
 
-void CameraController::update(float mouse_wheel, float dx, float dy, float dt) {
+const glm::vec3& PointCameraController::get_position() const {
+    return position;
+}
+
+const glm::vec3& PointCameraController::get_rotation() const {
+    static glm::vec3 rotation = glm::vec3(0.0f);
+    rotation.x = pitch;
+    rotation.y = yaw;
+
+    return rotation;
+}
+
+void PointCameraController::update(float dt) {
     constexpr float MOVE_SPEED = 3200.0f;
     constexpr float MOVE_SPEED_MOUSE = MOVE_SPEED * 0.0039f;
     constexpr float ZOOM_SPEED = 576.0f;
     constexpr float ZOOM_SPEED_WHEEL = ZOOM_SPEED * 0.01953f;
 
-    zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_wheel;
+    zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_input.mouse_wheel;
 
     if (input::is_key_pressed(input::Key::R)) {
         zoom_velocity -= ZOOM_SPEED * dt;
@@ -57,8 +68,8 @@ void CameraController::update(float mouse_wheel, float dx, float dy, float dt) {
     }
 
     if (input::is_mouse_button_pressed(input::MouseButton::RIGHT)) {
-        y_velocity -= MOVE_SPEED_MOUSE * dy;
-        x_velocity += MOVE_SPEED_MOUSE * dx;
+        y_velocity -= MOVE_SPEED_MOUSE * mouse_input.dy;
+        x_velocity += MOVE_SPEED_MOUSE * mouse_input.dx;
     }
 
     if (input::is_key_pressed(input::Key::W)) {
@@ -114,24 +125,28 @@ void CameraController::update(float mouse_wheel, float dx, float dy, float dt) {
     matrix = glm::rotate(matrix, glm::radians(yaw), glm::vec3(0.0f, 1.0f, 0.0f));
     matrix = glm::translate(matrix, -position);
 
-    camera->set_view(matrix, position, glm::vec3(pitch, yaw, 0.0f));
+    camera->set_view(matrix);
+
+    mouse_input.mouse_wheel = 0.0f;
+    mouse_input.dx = 0.0f;
+    mouse_input.dy = 0.0f;
 }
 
-void CameraController::update_friction() {
+void PointCameraController::update_friction() {
     // Slow down velocity
-    x_velocity *= 0.8f;
-    y_velocity *= 0.8f;
-    zoom_velocity *= 0.8f;
+    x_velocity *= 0.81f;
+    y_velocity *= 0.81f;
+    zoom_velocity *= 0.81f;
 }
 
-void CameraController::set_position(const glm::vec3& position) {
+void PointCameraController::set_position(const glm::vec3& position) {
     this->position = position;
 
     // Calculate distance to point
     distance_to_point = glm::length(position - point);
 
     // Update camera data
-    camera->set_view(position, point - position, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(pitch, yaw, 0.0f));
+    camera->set_view(position, point - position, glm::vec3(0.0f, 1.0f, 0.0f));
 
     // Calculate yaw, pitch and angle_around_point
     const glm::vec3 direction = glm::vec3(glm::transpose(camera->get_view_matrix())[2]);
@@ -139,15 +154,13 @@ void CameraController::set_position(const glm::vec3& position) {
     pitch = glm::degrees(glm::asin(direction.y));
     angle_around_point = 180.0f - yaw;
 
-    camera->set_rotation(glm::vec3(pitch, yaw, 0.0f));  // FIXME redundant calculations
-
     // Stop go_towards_position
     movement.auto_move_x = false;
     movement.auto_move_y = false;
     movement.auto_move_zoom = false;
 }
 
-void CameraController::go_towards_position(const glm::vec3& position) {
+void PointCameraController::go_towards_position(const glm::vec3& position) {
     movement.cached_towards_position = position;
     movement.dont_auto_call_go_towards_position = false;
 
@@ -164,7 +177,27 @@ void CameraController::go_towards_position(const glm::vec3& position) {
     go_towards_position_x(direction);
 }
 
-void CameraController::go_towards_position_x(const glm::vec3& direction) {
+void PointCameraController::setup_events(Application* app) {
+    app->evt.sink<MouseScrolledEvent>().connect<&PointCameraController::on_mouse_scrolled>(this);
+    app->evt.sink<MouseMovedEvent>().connect<&PointCameraController::on_mouse_moved>(this);
+}
+
+void PointCameraController::remove_events(Application* app) {
+    app->evt.disconnect(this);
+}
+
+void PointCameraController::on_mouse_scrolled(const MouseScrolledEvent& event) {
+    mouse_input.mouse_wheel = event.scroll;
+}
+
+void PointCameraController::on_mouse_moved(const MouseMovedEvent& event) {
+    mouse_input.dx = mouse_input.last_mouse_x - event.mouse_x;
+    mouse_input.dy = mouse_input.last_mouse_y - event.mouse_y;
+    mouse_input.last_mouse_x = event.mouse_x;
+    mouse_input.last_mouse_y = event.mouse_y;
+}
+
+void PointCameraController::go_towards_position_x(const glm::vec3& direction) {
     float integer_angle;
     const float fract = glm::modf(180.0f - glm::degrees(glm::atan(-direction.x, direction.z)), integer_angle);
 
@@ -182,7 +215,7 @@ void CameraController::go_towards_position_x(const glm::vec3& direction) {
     x_velocity = 0.0f;
 }
 
-void CameraController::go_towards_position_y(const glm::vec3& direction) {
+void PointCameraController::go_towards_position_y(const glm::vec3& direction) {
     movement.target_pitch = glm::degrees(glm::asin(direction.y));
 
     movement.auto_y_velocity = (movement.target_pitch - pitch) * Y_BASE_VELOCITY;
@@ -191,7 +224,7 @@ void CameraController::go_towards_position_y(const glm::vec3& direction) {
     y_velocity = 0.0f;
 }
 
-void CameraController::go_towards_position_zoom(const glm::vec3& position) {
+void PointCameraController::go_towards_position_zoom(const glm::vec3& position) {
     movement.target_distance_to_point = glm::length(position - point);
 
     movement.auto_zoom_velocity = (movement.target_distance_to_point - distance_to_point) * ZOOM_BASE_VELOCITY;
@@ -200,7 +233,7 @@ void CameraController::go_towards_position_zoom(const glm::vec3& position) {
     zoom_velocity = 0.0f;
 }
 
-void CameraController::calculate_auto_angle_around_point(float dt) {
+void PointCameraController::calculate_auto_angle_around_point(float dt) {
     if (x_velocity < -0.1f || x_velocity > 0.1f) {
         movement.auto_move_x = false;
         movement.dont_auto_call_go_towards_position = true;
@@ -229,7 +262,7 @@ void CameraController::calculate_auto_angle_around_point(float dt) {
     }
 }
 
-void CameraController::calculate_auto_pitch(float dt) {
+void PointCameraController::calculate_auto_pitch(float dt) {
     if (y_velocity < -0.1f || y_velocity > 0.1f) {
         movement.auto_move_y = false;
         movement.dont_auto_call_go_towards_position = true;
@@ -253,7 +286,7 @@ void CameraController::calculate_auto_pitch(float dt) {
     }
 }
 
-void CameraController::calculate_auto_distance_to_point(float dt) {
+void PointCameraController::calculate_auto_distance_to_point(float dt) {
     if (zoom_velocity < -0.1f || zoom_velocity > 0.1f) {
         movement.auto_move_zoom = false;
         movement.dont_auto_call_go_towards_position = true;

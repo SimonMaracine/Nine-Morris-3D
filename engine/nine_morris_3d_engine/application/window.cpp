@@ -131,10 +131,11 @@ Window::Window(Application* app) {
 }
 
 Window::~Window() {
-    glfwDestroyWindow(window);
     for (const auto& cursor : cursors) {
         glfwDestroyCursor(cursor.second);
     }
+
+    glfwDestroyWindow(window);
     glfwTerminate();
 
     DEB_INFO("Terminated GLFW and destroyed window");

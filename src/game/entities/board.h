@@ -6,6 +6,7 @@
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
 #include "game/threefold_repetition_history.h"
+#include "game/point_camera_controller.h"
 #include "other/constants.h"
 
 class KeyboardControls;
@@ -75,5 +76,5 @@ struct Board {
 
     Application* app = nullptr;
     KeyboardControls* keyboard = nullptr;
-    Camera* camera = nullptr;
+    PointCameraController* camera_controller = nullptr;
 };
