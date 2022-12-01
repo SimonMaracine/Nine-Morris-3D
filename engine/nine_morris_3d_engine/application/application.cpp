@@ -103,10 +103,6 @@ Application::~Application() {
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
-
-    for (Scene* scene : scenes) {  // TODO maybe use unique_ptr instead
-        delete scene;
-    }
 }
 
 int Application::run() {
@@ -146,19 +142,19 @@ int Application::run() {
     return exit_code;
 }
 
-void Application::add_scene(Scene* scene, bool start) {
-    scenes.push_back(scene);
-
+void Application::add_scene(std::unique_ptr<Scene>&& scene, bool start) {
     if (start) {
         ASSERT(current_scene == nullptr, "Cannot set two starting scenes");
-        current_scene = scene;
+        current_scene = scene.get();
     }
+
+    scenes.push_back(std::move(scene));
 }
 
 void Application::change_scene(std::string_view name) {
-    for (Scene* scene : scenes) {
+    for (std::unique_ptr<Scene>& scene : scenes) {
         if (scene->name == name) {
-            to_scene = scene;
+            to_scene = scene.get();
             changed_scene = true;
             return;
         }
@@ -237,9 +233,7 @@ unsigned int Application::calculate_fixed_update() {
 void Application::check_changed_scene() {
     if (changed_scene) {
         current_scene->on_stop();
-
         current_scene = to_scene;
-
         on_start(current_scene);
 
         changed_scene = false;
@@ -267,7 +261,7 @@ void Application::renderer_imgui_functionality() {
 }
 
 void Application::prepare_scenes() {
-    for (Scene* scene : scenes) {
+    for (std::unique_ptr<Scene>& scene : scenes) {
         scene->app = this;
     }
 }

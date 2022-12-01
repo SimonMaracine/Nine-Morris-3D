@@ -45,7 +45,7 @@ int main() {
         auto data = std::make_any<Data>();
 
         auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
-        launcher->add_scene(new LauncherScene, true);
+        launcher->add_scene(std::make_unique<LauncherScene>(), true);
         exit_code = launcher->run();
         launcher.reset();
 
@@ -68,8 +68,8 @@ int main() {
             .with_renderer(ApplicationBuilder::RImGui);
 
         auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
-        game->add_scene(new LoadingScene, true);
-        game->add_scene(new StandardGameScene, false);
+        game->add_scene(std::make_unique<LoadingScene>(), true);
+        game->add_scene(std::make_unique<StandardGameScene>(), false);
         exit_code = game->run();
 
         if (exit_code == 0) {

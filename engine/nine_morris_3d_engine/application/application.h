@@ -31,7 +31,7 @@ public:
     int run();
 
     // Scene management functions
-    void add_scene(Scene* scene, bool start = false);
+    void add_scene(std::unique_ptr<Scene>&& scene, bool start = false);
     void change_scene(std::string_view name);
 
     // Framebuffer management functions
@@ -86,7 +86,7 @@ private:
     float delta = 0.0f;
 
     // Data for the scene system
-    std::vector<Scene*> scenes;
+    std::vector<std::unique_ptr<Scene>> scenes;
     Scene* current_scene = nullptr;
 
     bool changed_scene = false;
