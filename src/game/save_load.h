@@ -148,9 +148,6 @@ void serialize(Archive& archive, StandardBoardSerialized& board) {
         board.can_jump,
         board.repetition_history,
         board.is_players_turn,
-        board.did_action,
-        board.switched_turn,
-        board.must_take_piece_or_took_piece,
         board.white_pieces_count,
         board.black_pieces_count,
         board.not_placed_white_pieces_count,
@@ -178,11 +175,9 @@ void serialize(Archive& archive, PieceSerialized& piece) {
         piece.position,
         piece.rotation,
         piece.node_index,
-        piece.movement,
         piece.show_outline,
         piece.to_take,
-        piece.pending_remove,
-        piece.selected
+        piece.pending_remove
     );
 }
 

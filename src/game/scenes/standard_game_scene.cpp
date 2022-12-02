@@ -1621,6 +1621,7 @@ void StandardGameScene::undo() {
     }
 
     update_cursor();
+    update_turn_indicator();
 }
 
 void StandardGameScene::redo() {
@@ -1658,4 +1659,5 @@ void StandardGameScene::redo() {
     }
 
     update_cursor();
+    update_turn_indicator();
 }

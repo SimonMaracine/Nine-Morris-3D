@@ -777,11 +777,9 @@ void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
         serialized.pieces.at(index).position = piece.model->position;
         serialized.pieces.at(index).rotation = piece.model->rotation;
         serialized.pieces.at(index).node_index = piece.node_index;
-        serialized.pieces.at(index).movement = piece.movement;
         serialized.pieces.at(index).show_outline = piece.show_outline;
         serialized.pieces.at(index).to_take = piece.to_take;
         serialized.pieces.at(index).pending_remove = piece.pending_remove;
-        serialized.pieces.at(index).selected = piece.selected;
     }
 
     serialized.phase = phase;
@@ -791,9 +789,6 @@ void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
     serialized.can_jump = can_jump;
     serialized.repetition_history = repetition_history;
     serialized.is_players_turn = is_players_turn;
-    serialized.did_action = did_action;  // TODO think if these are needed
-    serialized.switched_turn = switched_turn;
-    serialized.must_take_piece_or_took_piece = must_take_piece_or_took_piece;
     serialized.white_pieces_count = white_pieces_count;
     serialized.black_pieces_count = black_pieces_count;
     serialized.not_placed_white_pieces_count = not_placed_white_pieces_count;
@@ -816,11 +811,13 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             pieces.at(ser_index).model->position = ser_piece.position;
             pieces.at(ser_index).model->rotation = ser_piece.rotation;
             pieces.at(ser_index).node_index = ser_piece.node_index;
-            pieces.at(ser_index).movement = ser_piece.movement;
             pieces.at(ser_index).show_outline = ser_piece.show_outline;
             pieces.at(ser_index).to_take = ser_piece.to_take;
             pieces.at(ser_index).pending_remove = ser_piece.pending_remove;
-            pieces.at(ser_index).selected = ser_piece.selected;
+
+            // Reset these values
+            pieces.at(ser_index).selected = false;
+            pieces.at(ser_index).movement = PieceMovement {};
         } else {
             Piece piece = Piece {
                 ser_index,
@@ -849,7 +846,6 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             piece.show_outline = ser_piece.show_outline;
             piece.to_take = ser_piece.to_take;
             piece.pending_remove = ser_piece.pending_remove;
-            piece.selected = ser_piece.selected;
 
             app->renderer->add_model(piece.model);
             pieces[ser_index] = piece;
@@ -876,12 +872,14 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
     can_jump = serialized.can_jump;
     repetition_history = serialized.repetition_history;
     is_players_turn = serialized.is_players_turn;
-    did_action = serialized.did_action;  // TODO think if these are needed
-    switched_turn = serialized.switched_turn;
-    must_take_piece_or_took_piece = serialized.must_take_piece_or_took_piece;
     white_pieces_count = serialized.white_pieces_count;
     black_pieces_count = serialized.black_pieces_count;
     not_placed_white_pieces_count = serialized.not_placed_white_pieces_count;
     not_placed_black_pieces_count = serialized.not_placed_black_pieces_count;
     turns_without_mills = serialized.turns_without_mills;
+
+    // Reset these values
+    clicked_node_index = NULL_INDEX;
+    clicked_piece_index = NULL_INDEX;
+    selected_piece_index = NULL_INDEX;
 }

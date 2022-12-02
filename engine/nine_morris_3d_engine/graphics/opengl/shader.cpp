@@ -319,7 +319,7 @@ void Shader::configure_uniform_blocks(GLuint program, const std::vector<UniformB
             game_exit::exit_critical();
         }
 
-        if (!block.uniform_buffer->configured) {
+        if (!block.uniform_buffer->configured) {  // TODO improve
             GLint block_size;
             glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
 
@@ -352,7 +352,7 @@ void Shader::configure_uniform_blocks(GLuint program, const std::vector<UniformB
                 delete[] field_names[i];
             }
 
-            for (unsigned int i = 0; i < block.field_count; i++) {
+            for (size_t i = 0; i < block.field_count; i++) {
                 if (indices[i] == GL_INVALID_INDEX) {
                     REL_CRITICAL("Invalid field index, exiting...");
                     game_exit::exit_critical();
@@ -363,7 +363,7 @@ void Shader::configure_uniform_blocks(GLuint program, const std::vector<UniformB
             glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
             glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
 
-            for (unsigned int i = 0; i < block.field_count; i++) {
+            for (size_t i = 0; i < block.field_count; i++) {
                 block.uniform_buffer->fields[i] = {
                     static_cast<size_t>(offsets[i]),
                     static_cast<size_t>(sizes[i]) * type_size(types[i])

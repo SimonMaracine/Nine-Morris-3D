@@ -59,12 +59,12 @@ public:
     // Usually called by application
     void resize(int width, int height);
 
-    // Read pixels
-    float read_pixel_red_value(GLint attachment_index, int x, int y);  // FIXME red value is float; should be generic
-    void read_pixel_red_value_pbo(GLint attachment_index, int x, int y);
+    // Read pixels from some buffer
+    float read_pixel_float(GLint attachment_index, int x, int y);  // TODO red value is float; should be generic
+    void read_pixel_float_pbo(GLint attachment_index, int x, int y);
 
-    // Clear buffer
-    void clear_color_attachment_float();  // FIXME should be generic
+    // Clear some buffer
+    void clear_color_attachment_float();  // TODO should be generic
 
     // Resolve this to draw_framebuffer
     void blit(Framebuffer* draw_framebuffer, int width, int height);

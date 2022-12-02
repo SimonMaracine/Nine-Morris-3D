@@ -30,10 +30,6 @@ struct StandardBoardSerialized {
 
     bool is_players_turn = false;
 
-    bool did_action = false;
-    bool switched_turn = false;
-    bool must_take_piece_or_took_piece = false;
-
     unsigned int white_pieces_count = 0;
     unsigned int black_pieces_count = 0;
     unsigned int not_placed_white_pieces_count = 9;

@@ -221,7 +221,7 @@ void Framebuffer::resize(int width, int height) {
     build();
 }
 
-float Framebuffer::read_pixel_red_value(GLint attachment_index, int x, int y) {
+float Framebuffer::read_pixel_float(GLint attachment_index, int x, int y) {
     ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -231,7 +231,7 @@ float Framebuffer::read_pixel_red_value(GLint attachment_index, int x, int y) {
     return pixel;
 }
 
-void Framebuffer::read_pixel_red_value_pbo(GLint attachment_index, int x, int y) {
+void Framebuffer::read_pixel_float_pbo(GLint attachment_index, int x, int y) {
     ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);

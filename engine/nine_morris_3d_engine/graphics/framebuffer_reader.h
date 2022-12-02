@@ -20,7 +20,7 @@ public:
         next_buffer_index = (buffer_index + 1) % BufferCount;
 
         buffers[buffer_index]->bind();
-        framebuffer->read_pixel_red_value_pbo(attachment_index, x, y);
+        framebuffer->read_pixel_float_pbo(attachment_index, x, y);
     }
 
     // Call this as far as possible from read() to actually get the data

@@ -49,7 +49,7 @@ public:
     void bind();
     static void unbind();
 
-    void set(const void* data, unsigned int field_index);
+    void set(const void* data, size_t field_index);
     void upload_data();
 private:
     struct UniformBlockField {
@@ -61,7 +61,7 @@ private:
     char* data = nullptr;  // Allocated externally, deallocated internally!
     size_t size = 0;
 
-    std::unordered_map<unsigned int, UniformBlockField> fields;
+    std::unordered_map<size_t, UniformBlockField> fields;
 
     bool configured = false;  // Used externally by shader!
 
@@ -86,6 +86,6 @@ public:
     void unmap_data();
 private:
     GLuint buffer = 0;
-    void* data = nullptr;  // FIXME clear value is float; should be generic
+    void* data = nullptr;  // TODO clear value is float; should be generic
     char* dummy_data = nullptr;
 };
