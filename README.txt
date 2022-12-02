@@ -8,7 +8,7 @@
  VERSION 0.2.0
 
  Thank you for downloading Nine Morris 3D! A lot of effort was put in the making of this game. I hope
- that you like it. :)
+ that you find it useful and enjoyable. :)
  If you find any bugs or have any suggestion, please contact me at simonmara.dev@gmail.com.
 
 ----------------------------------------------------------------------------------------------------

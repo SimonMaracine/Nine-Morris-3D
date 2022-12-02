@@ -11,6 +11,7 @@
 
 ### On Linux
 
+- GCC (version >= 11)
 - libxrandr
 - libxinerama
 - libxcursor
