@@ -14,6 +14,7 @@ endif()
 # Use static linking everywhere
 set(BUILD_SHARED_LIBS OFF)
 
+# Assimp
 set(USE_STATIC_CRT ON)  # Windows stuff
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_INSTALL OFF)
@@ -23,13 +24,27 @@ set(ASSIMP_WARNINGS_AS_ERRORS OFF)
 set(ASSIMP_NO_EXPORT ON)
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
+
+# GLFW
 set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)  # Windows stuff
 set(GLFW_INSTALL OFF)
 set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_TESTS OFF)
 set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_DOCS OFF)
+
+# cppblowfish
 set(CPPBLOWFISH_BUILD_TESTS OFF)
+
+# OpenAL Soft
+set(ALSOFT_UTILS OFF)
+set(ALSOFT_EXAMPLES OFF)
+set(ALSOFT_INSTALL OFF)
+set(ALSOFT_INSTALL_CONFIG OFF)
+set(ALSOFT_INSTALL_HRTF_DATA OFF)
+set(ALSOFT_INSTALL_AMBDEC_PRESETS OFF)
+set(ALSOFT_INSTALL_EXAMPLES OFF)
+set(ALSOFT_INSTALL_UTILS OFF)
 
 project("Nine-Morris-3D"
     VERSION 0.2.0
@@ -68,6 +83,10 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/application/platform.h"
     "engine/nine_morris_3d_engine/application/scene.h"
     "engine/nine_morris_3d_engine/application/window.h"
+    "engine/nine_morris_3d_engine/audio/openal/buffer.h"
+    "engine/nine_morris_3d_engine/audio/openal/source.h"
+    "engine/nine_morris_3d_engine/audio/device.h"
+    "engine/nine_morris_3d_engine/audio/debug_openal.h"
     "engine/nine_morris_3d_engine/graphics/opengl/buffer.h"
     "engine/nine_morris_3d_engine/graphics/opengl/framebuffer.h"
     "engine/nine_morris_3d_engine/graphics/opengl/shader.h"
@@ -104,6 +123,9 @@ add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/application/capabilities.cpp"
     "engine/nine_morris_3d_engine/application/input.cpp"
     "engine/nine_morris_3d_engine/application/window.cpp"
+    "engine/nine_morris_3d_engine/audio/openal/buffer.cpp"
+    "engine/nine_morris_3d_engine/audio/openal/source.cpp"
+    "engine/nine_morris_3d_engine/audio/debug_openal.cpp"
     "engine/nine_morris_3d_engine/graphics/opengl/buffer.cpp"
     "engine/nine_morris_3d_engine/graphics/opengl/framebuffer.cpp"
     "engine/nine_morris_3d_engine/graphics/opengl/shader.cpp"
@@ -134,6 +156,7 @@ add_library(${GLAD_STB} STATIC
     "dependencies/stb_image/stb_image.c"
     "dependencies/stb_truetype/stb_truetype.c"
     "dependencies/stb_image_write/stb_image_write.c"
+    "dependencies/stb_vorbis/stb_vorbis.c"
 )
 
 add_library(${MY_IMGUI} STATIC
@@ -178,6 +201,7 @@ add_subdirectory(extern/spdlog)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/assimp)
 add_subdirectory(extern/cppblowfish)
+add_subdirectory(extern/openal-soft)
 
 add_dependencies(${ENGINE} glfw)  # This is necessary for some reason
 
@@ -191,6 +215,7 @@ target_include_directories(${ENGINE} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_truetype"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image_write"
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_vorbis"
     "${CMAKE_SOURCE_DIR}/extern/spdlog/include"
     "${CMAKE_SOURCE_DIR}/extern/assimp/include"
     "${CMAKE_SOURCE_DIR}/extern/glm"
@@ -200,6 +225,7 @@ target_include_directories(${ENGINE} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/cppblowfish/include"
     "${CMAKE_SOURCE_DIR}/extern/entt/src"
     "${CMAKE_SOURCE_DIR}/extern/resmanager/src"
+    "${CMAKE_SOURCE_DIR}/extern/openal-soft/include"
 )
 
 target_include_directories(${GAME} PRIVATE
@@ -219,6 +245,7 @@ target_include_directories(${GLAD_STB} SYSTEM PRIVATE
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_truetype"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image_write"
+    "${CMAKE_SOURCE_DIR}/dependencies/stb_vorbis"
 )
 
 target_include_directories(${MY_IMGUI} SYSTEM PRIVATE
@@ -227,24 +254,19 @@ target_include_directories(${MY_IMGUI} SYSTEM PRIVATE
 )
 
 # Add all libraries
+target_link_libraries(${ENGINE} PRIVATE
+    spdlog
+    assimp
+    glfw
+    cppblowfish
+    OpenAL
+    ${GLAD_STB}
+    ${MY_IMGUI}
+)
+
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     target_link_libraries(${ENGINE} PRIVATE
-        spdlog
-        assimp
-        glfw
-        cppblowfish
         X11
-        ${GLAD_STB}
-        ${MY_IMGUI}
-    )
-elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_link_libraries(${ENGINE} PRIVATE
-        spdlog
-        assimp
-        glfw
-        cppblowfish
-        ${GLAD_STB}
-        ${MY_IMGUI}
     )
 endif()
 
@@ -257,12 +279,12 @@ target_link_libraries(${GAME} PRIVATE
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         set_property(TARGET
-            ${ENGINE} ${GAME} ${GLAD_STB} ${MY_IMGUI} spdlog assimp glfw cppblowfish
+            ${ENGINE} ${GAME} ${GLAD_STB} ${MY_IMGUI} spdlog assimp glfw cppblowfish OpenAL
             PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug
         )
     elseif(CMAKE_BUILD_TYPE MATCHES Release)
         set_property(TARGET
-            ${ENGINE} ${GAME} ${GLAD_STB} ${MY_IMGUI} spdlog assimp glfw cppblowfish
+            ${ENGINE} ${GAME} ${GLAD_STB} ${MY_IMGUI} spdlog assimp glfw cppblowfish OpenAL
             PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded
         )
     endif()

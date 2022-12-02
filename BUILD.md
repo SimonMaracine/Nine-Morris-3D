@@ -17,6 +17,8 @@
 - libxcursor
 - libxi
 - libopengl-dev | libegl1-mesa-dev | mesa-common-dev (one of these)
+- libasound2-dev
+- libpulse-dev
 
 ## Linux release
 

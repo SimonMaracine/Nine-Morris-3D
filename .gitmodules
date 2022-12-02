@@ -25,3 +25,6 @@
 [submodule "extern/resmanager"]
 	path = extern/resmanager
 	url = https://github.com/SimonMaracine/resource-manager.git
+[submodule "extern/openal-soft"]
+	path = extern/openal-soft
+	url = https://github.com/SimonMaracine/openal-soft.git

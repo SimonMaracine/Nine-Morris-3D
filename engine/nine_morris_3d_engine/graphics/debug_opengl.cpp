@@ -113,12 +113,12 @@ namespace debug_opengl {
 
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                REL_CRITICAL("(ID: {}) {}", id, message);
+                REL_CRITICAL("({}) {}", id, message);
                 game_exit::exit_critical();
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:
-                REL_WARN("(ID: {}) {}", id, message);
+                REL_WARN("({}) {}", id, message);
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 ASSERT(false, "This should have been disabled");
