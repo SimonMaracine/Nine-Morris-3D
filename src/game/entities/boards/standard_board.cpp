@@ -76,8 +76,12 @@ void StandardBoard::computer_take_piece(size_t node_index) {
 void StandardBoard::check_select_piece(identifier::Id hovered_id) {
     for (const auto& [index, piece] : pieces) {
         if (index == clicked_piece_index && piece.model->id.value() == hovered_id) {
-            if (turn == BoardPlayer::White && piece.type == PieceType::White
-                    || turn == BoardPlayer::Black && piece.type == PieceType::Black) {
+            const bool can_select = (
+                turn == BoardPlayer::White && piece.type == PieceType::White
+                || turn == BoardPlayer::Black && piece.type == PieceType::Black
+            );
+
+            if (can_select) {
                 select_piece(index);
                 break;
             }
@@ -87,8 +91,12 @@ void StandardBoard::check_select_piece(identifier::Id hovered_id) {
 
 void StandardBoard::check_place_piece(identifier::Id hovered_id) {
     for (Node& node : nodes) {
-        if (node.index == clicked_node_index && node.model->id.value() == hovered_id
-                && node.piece_index == NULL_INDEX) {
+        const bool can_place = (
+            node.index == clicked_node_index && node.model->id.value() == hovered_id
+            && node.piece_index == NULL_INDEX
+        );
+
+        if (can_place) {
             remember_state();
             place_piece(node.index);
 
@@ -104,8 +112,12 @@ void StandardBoard::check_move_piece(identifier::Id hovered_id) {
     }
 
     for (Node& node : nodes) {
-        if (node.index == clicked_node_index && node.model->id.value() == hovered_id
-                && can_go(selected_piece_index, node.index)) {
+        const bool can_move = (
+            node.index == clicked_node_index && node.model->id.value() == hovered_id
+            && can_go(selected_piece_index, node.index)
+        );
+
+        if (can_move) {
             remember_state();
             move_piece(selected_piece_index, node.index);
 
@@ -126,9 +138,18 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
 
     for (auto& [index, piece] : pieces) {
         if (turn == BoardPlayer::White) {
-            if (index == clicked_piece_index && piece.model->id.value() == hovered_id && piece.type == PieceType::Black) {
-                if (!is_windmill_made(piece.node_index, PieceType::Black, windmills, count)
-                        || number_of_pieces_in_windmills(PieceType::Black, windmills, count) == black_pieces_count) {
+            const bool valid_piece = (
+                index == clicked_piece_index && piece.model->id.value() == hovered_id
+                && piece.type == PieceType::Black && piece.in_use
+            );
+
+            if (valid_piece) {
+                const bool can_take = (
+                    !is_windmill_made(piece.node_index, PieceType::Black, windmills, count)
+                    || number_of_pieces_in_windmills(PieceType::Black, windmills, count) == black_pieces_count
+                );
+
+                if (can_take) {
                     remember_state();
                     take_piece(index);
 
@@ -140,9 +161,18 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
                 break;
             }
         } else {
-            if (index == clicked_piece_index && piece.model->id.value() == hovered_id && piece.type == PieceType::White) {
-                if (!is_windmill_made(piece.node_index, PieceType::White, windmills, count)
-                        || number_of_pieces_in_windmills(PieceType::White, windmills, count) == white_pieces_count) {
+            const bool valid_piece = (
+                index == clicked_piece_index && piece.model->id.value() == hovered_id
+                && piece.type == PieceType::White && piece.in_use
+            );
+
+            if (valid_piece) {
+                const bool can_take = (
+                    !is_windmill_made(piece.node_index, PieceType::White, windmills, count)
+                    || number_of_pieces_in_windmills(PieceType::White, windmills, count) == white_pieces_count
+                );
+
+                if (can_take) {
                     remember_state();
                     take_piece(index);
 

@@ -49,16 +49,14 @@ void Board::update_pieces(identifier::Id hovered_id) {
             piece.model->outline_color = std::make_optional<glm::vec3>(RED_OUTLINE);
         } else if (piece.show_outline && hovered && piece.in_use && !piece.pending_remove) {
             piece.model->outline_color = std::make_optional<glm::vec3>(ORANGE_OUTLINE);
-        } else if (piece.to_take && hovered && piece.in_use) {
+        } else {
+            piece.model->outline_color = std::nullopt;
+        }
+
+        if (piece.to_take && hovered && piece.in_use) {
             piece.model->material->set_vec3("u_material.tint", RED_TINT);
         } else {
             piece.model->material->set_vec3("u_material.tint", DEFAULT_TINT);
-        }
-
-        if (piece.selected || (piece.show_outline && hovered && piece.in_use && !piece.pending_remove)) {
-            // FIXME this
-        } else {
-            piece.model->outline_color = std::nullopt;
         }
     }
 
