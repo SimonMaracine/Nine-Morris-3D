@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <stb_truetype.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "nine_morris_3d_engine/application/application.h"
 #include "nine_morris_3d_engine/application/platform.h"
@@ -219,7 +218,7 @@ Renderer::Renderer(Application* app)
         std::make_shared<PixelBuffer>(sizeof(float))
     };
 
-    reader = FramebufferReader<4> {storage.pixel_buffers, storage.intermediate_framebuffer};
+    framebuffer_reader = FramebufferReader<4> {storage.pixel_buffers, storage.intermediate_framebuffer};
 
     // Setup uniform variables
     storage.screen_quad_shader->bind();
@@ -302,15 +301,13 @@ void Renderer::render() {
 
     // Read the texture for mouse picking
     const auto [x, y] = input::get_mouse();
-    reader.read(1, static_cast<int>(x), app->data().height - static_cast<int>(y));
+    framebuffer_reader.read(1, static_cast<int>(x), app->data().height - static_cast<int>(y));
 
     // Do post processing and render the final image to the screen
     end_rendering();
 
-    using IdType = float;
-
-    IdType* data;
-    reader.get<IdType>(&data);
+    float* data;
+    framebuffer_reader.get<float>(&data);
     hovered_id = *data;
 
     check_hovered_id(x, y);
@@ -322,7 +319,7 @@ void Renderer::add_model(std::shared_ptr<Model> model) {
     if (iter == models.end()) {
         models.push_back(model);
     } else {
-        DEB_WARN("Model already present");
+        DEB_WARN("Model already present in list");
     }
 }
 
@@ -340,7 +337,7 @@ void Renderer::add_quad(std::shared_ptr<Quad> quad) {
     if (iter == quads.end()) {
         quads.push_back(quad);
     } else {
-        DEB_WARN("Quad already present");
+        DEB_WARN("Quad already present in list");
     }
 }
 
@@ -573,7 +570,7 @@ void Renderer::draw_models() {
         const Model* model = models[i].get();
 
         if (model->outline_color.has_value()) {
-            continue;
+            continue;  // This model is rendered differently
         }
 
         if (model->id.has_value()) {

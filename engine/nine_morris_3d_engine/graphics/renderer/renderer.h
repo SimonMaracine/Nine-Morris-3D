@@ -164,7 +164,7 @@ private:
     std::vector<std::shared_ptr<Quad>> quads;
 
     identifier::Id hovered_id = identifier::null;
-    FramebufferReader<4> reader;
+    FramebufferReader<4> framebuffer_reader;
     CameraController* camera_controller = nullptr;  // Don't use this directly
 
     int shadow_map_size = 4096;

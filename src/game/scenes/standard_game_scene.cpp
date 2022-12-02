@@ -300,16 +300,14 @@ void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
 }
 
 std::shared_ptr<Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, identifier::Id id, hs hash) {
-    using IdType = float;
-
-    std::vector<IdType> array;
+    std::vector<float> array;
     array.resize(vertices_size);
 
     for (size_t i = 0; i < array.size(); i++) {
         array[i] = id;
     }
 
-    return app->res.buffer.load(hash, array.data(), array.size() * sizeof(IdType));
+    return app->res.buffer.load(hash, array.data(), array.size() * sizeof(float));
 }
 
 void StandardGameScene::initialize_rendering_board() {
