@@ -67,7 +67,7 @@ static void setup_imgui_fonts(Application* app) {
     builder.BuildRanges(&ranges);
 
     io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 21.0f);
-    data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 16.0f);
+    data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 15.0f);
     data.imgui_windows_font = (
         io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f, nullptr, ranges.Data)
         );

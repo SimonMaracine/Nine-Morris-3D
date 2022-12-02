@@ -316,11 +316,11 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 ImGui::EndMenu();
                 HOVERING_GUI()
             }
-            if (ImGui::MenuItem("Show Info", nullptr, &show_info)) {
+            if (ImGui::MenuItem("Show Information", nullptr, &show_info)) {
                 if (show_info) {
-                    DEB_INFO("Show info");
+                    DEB_INFO("Show information");
                 } else {
-                    DEB_INFO("Hide info");
+                    DEB_INFO("Hide information");
                 }
             }
             if (ImGui::BeginMenu("Camera Sensitivity")) {
@@ -379,10 +379,10 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             if (ImGui::MenuItem("About", nullptr, false)) {
                 show_about = true;
             }
-            if (ImGui::MenuItem("Log Info", nullptr, false)) {
+            if (ImGui::MenuItem("Log Information", nullptr, false)) {
                 logging::log_opengl_and_dependencies_info(logging::LogTarget::File, app->data().info_file_name);
 
-                DEB_INFO("Logged OpenGL and dependencies info");
+                DEB_INFO("Logged OpenGL and dependencies information");
             }
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", info_file_path.c_str());
@@ -399,16 +399,18 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_info() {
     ImGui::PushFont(app->user_data<Data>().imgui_info_font);
-    ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+
+    const int flags = (
+        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground
+        | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove
+    );
+
+    ImGui::Begin("Information", nullptr, flags);
     ImGui::Text("FPS: %.3f", app->get_fps());
     ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
-    ImGui::Text("GLSL: %s", debug_opengl::get_glsl_version());
-    ImGui::Text("Vendor: %s", debug_opengl::get_vendor());
     ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
     ImGui::End();
-    // if (ImGui::IsItemHovered()) {  // FIXME this
-    //     HOVERING_GUI()
-    // }
+
     ImGui::PopFont();
 }
 
@@ -492,7 +494,7 @@ void ImGuiLayer<S, B>::draw_about() {
         ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor, app->data().version_patch);
         ImGui::Separator();
         ImGui::Text("All programming by:");
-        ImGui::Text(u8"Simon Teodor Mărăcine - simonmara.dev@gmail.com");
+        ImGui::Text(u8"Simon-Teodor Mărăcine - simonmara.dev@gmail.com");
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
