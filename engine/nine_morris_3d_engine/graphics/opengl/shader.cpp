@@ -43,7 +43,7 @@ Shader::Shader(std::string_view vertex_source_path, std::string_view fragment_so
         vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
         fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
     } catch (const std::runtime_error& e) {
-        REL_CRITICAL("{}, exiting...", e.what());
+        REL_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
         game_exit::exit_critical();
     }
 
@@ -80,7 +80,7 @@ Shader::Shader(encrypt::EncryptedFile vertex_source_path, encrypt::EncryptedFile
         vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);
         fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
     } catch (const std::runtime_error& e) {
-        REL_CRITICAL("{}, exiting...", e.what());
+        REL_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
         game_exit::exit_critical();
     }
 

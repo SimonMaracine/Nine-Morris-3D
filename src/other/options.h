@@ -122,7 +122,7 @@ namespace options {
         try {
             user_data_directory = user_data::user_data_directory_exists(app_name);
         } catch (const user_data::UserNameError& e) {
-            REL_ERROR("{}", e.what());
+            REL_ERROR("Could not determine if user data directory exists: {}", e.what());
             return;
         }
 
@@ -135,10 +135,10 @@ namespace options {
                     try {
                         create_options_file<Opt>(options_file_name);
                     } catch (const OptionsFileNotOpenError& e) {
-                        REL_ERROR("{}", e.what());
+                        REL_ERROR("Could not create options file: {}", e.what());
                         return;
                     } catch (const OptionsFileError& e) {
-                        REL_ERROR("{}", e.what());
+                        REL_ERROR("Could not create options file: {}", e.what());
                         return;
                     }
                 } else {
@@ -146,17 +146,17 @@ namespace options {
                     return;
                 }
             } catch (const user_data::UserNameError& e) {
-                REL_ERROR("{}", e.what());
+                REL_ERROR("Could not Could not create user data directory: {}", e.what());
                 return;
             }
         } else {
             try {
                 create_options_file<Opt>(options_file_name);
             } catch (const OptionsFileNotOpenError& e) {
-                REL_ERROR("{}", e.what());
+                REL_ERROR("Could not create options file: {}", e.what());
                 return;
             } catch (const OptionsFileError& e) {
-                REL_ERROR("{}", e.what());
+                REL_ERROR("Could not create options file: {}", e.what());
                 return;
             }
         }

@@ -11,20 +11,20 @@ namespace save_load_gracefully {
         try {
             options::save_options_to_file<Opt>(options, options_file);
         } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("{}", e.what());
+            REL_ERROR("Could not save options to file: {}", e.what());
 
             options::handle_options_file_not_open_error<Opt>(
                 options_file, app->data().application_name
             );
         } catch (const options::OptionsFileError& e) {
-            REL_ERROR("{}", e.what());
+            REL_ERROR("Could not save options to file: {}", e.what());
 
             try {
                 options::create_options_file<Opt>(options_file);
             } catch (const options::OptionsFileNotOpenError& e) {
-                REL_ERROR("{}", e.what());
+                REL_ERROR("Could not create options file: {}", e.what());
             } catch (const options::OptionsFileError& e) {
-                REL_ERROR("{}", e.what());
+                REL_ERROR("Could not create options file: {}", e.what());
             }
         }
     }
@@ -34,20 +34,20 @@ namespace save_load_gracefully {
         try {
             options::load_options_from_file<Opt>(options, options_file, validate);
         } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("{}", e.what());
+            REL_ERROR("Could not load options to file: {}", e.what());
 
             options::handle_options_file_not_open_error<Opt>(
                 options_file, app->data().application_name
             );
         } catch (const options::OptionsFileError& e) {
-            REL_ERROR("{}", e.what());
+            REL_ERROR("Could not load options to file: {}", e.what());
 
             try {
                 options::create_options_file<Opt>(options_file);
             } catch (const options::OptionsFileNotOpenError& e) {
-                REL_ERROR("{}", e.what());
+                REL_ERROR("Could not create options file: {}", e.what());
             } catch (const options::OptionsFileError& e) {
-                REL_ERROR("{}", e.what());
+                REL_ERROR("Could not create options file: {}", e.what());
             }
         }
     }

@@ -17,7 +17,7 @@ namespace save_load {
         try {
             user_data_directory = user_data::user_data_directory_exists(app_name);
         } catch (const user_data::UserNameError& e) {
-            REL_ERROR("{}", e.what());
+            REL_ERROR("Could not determine if user data directory exists: {}", e.what());
             return;
         }
 
@@ -30,8 +30,8 @@ namespace save_load {
                     REL_ERROR("Could not create user data directory");
                     return;
                 }
-            } catch (const user_data::UserNameError& e) {  // TODO message can be better
-                REL_ERROR("{}", e.what());
+            } catch (const user_data::UserNameError& e) {
+                REL_ERROR("Could not create user data directory: {}", e.what());
                 return;
             }
         }

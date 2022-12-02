@@ -67,7 +67,6 @@ struct StandardGameScene : public Scene {
     void setup_and_add_model_node(size_t index, const glm::vec3& position);
 
     void setup_entities();
-    void setup_entity_ids();
     void setup_skybox();
     void setup_light();
     void setup_camera();

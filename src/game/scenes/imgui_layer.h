@@ -111,13 +111,11 @@ void ImGuiLayer<S, B>::update() {
     try {
         save_load::load_game_from_file(saved_game);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_WARN("{}", e.what());
-        REL_WARN("Could not load game");
+        REL_WARN("Could not load game: {}", e.what());
 
         save_load::handle_save_file_not_open_error(app->data().application_name);
     } catch (const save_load::SaveFileError& e) {
-        REL_WARN("{}", e.what());  // TODO maybe delete file
-        REL_WARN("Could not load game");
+        REL_WARN("Could not load game: {}", e.what());  // TODO maybe delete file
     }
     last_save_game_date = std::move(saved_game.date);
     DEB_INFO("Checked last saved game");
@@ -125,8 +123,8 @@ void ImGuiLayer<S, B>::update() {
     try {
         info_file_path = path::path_for_logs(app->data().info_file_name);
         save_game_file_path = path::path_for_saved_data(save_load::SAVE_GAME_FILE);
-    } catch (const user_data::UserNameError& e) {  // TODO message can be better
-        REL_ERROR("{}", e.what());
+    } catch (const user_data::UserNameError& e) {
+        REL_ERROR("Could not get info file and save game file paths: {}", e.what());
 
         info_file_path = app->data().info_file_name;
         save_game_file_path = save_load::SAVE_GAME_FILE;

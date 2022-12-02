@@ -279,15 +279,16 @@ size_t Board::number_of_pieces_in_windmills(PieceType type, const size_t windmil
             if (piece1.type == type && piece2.type == type && piece3.type == type) {
                 std::vector<size_t>::iterator iter;
 
-                // TODO this seems wrong
                 iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), piece1.index);
                 if (iter == pieces_inside_mills.end()) {
                     pieces_inside_mills.push_back(piece1.index);
                 }
+
                 iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), piece2.index);
                 if (iter == pieces_inside_mills.end()) {
                     pieces_inside_mills.push_back(piece2.index);
                 }
+
                 iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), piece3.index);
                 if (iter == pieces_inside_mills.end()) {
                     pieces_inside_mills.push_back(piece3.index);

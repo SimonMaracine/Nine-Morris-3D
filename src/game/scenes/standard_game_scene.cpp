@@ -1072,22 +1072,6 @@ void StandardGameScene::setup_entities() {
     DEB_DEBUG("Setup entities");
 }
 
-void StandardGameScene::setup_entity_ids() {
-    auto& data = app->user_data<Data>();
-
-    for (size_t i = 0; i < 9; i++) {
-        board.pieces.at(i).model->id = data.piece_ids[i];  // FIXME think this through
-    }
-    for (size_t i = 9; i < 18; i++) {
-        board.pieces.at(i).model->id = data.piece_ids[i];  // FIXME this
-    }
-    for (size_t i = 0; i < 24; i++) {
-        board.nodes.at(i).model->id = data.node_ids[i];  // FIXME this
-    }
-
-    DEB_DEBUG("Setup board's entities' IDs");
-}
-
 void StandardGameScene::setup_skybox() {
     if (app->user_data<Data>().options.skybox == game_options::NONE) {
         DEB_DEBUG("Setup skybox");
@@ -1531,20 +1515,18 @@ void StandardGameScene::save_game() {
     time(&current);
     saved_game.date = ctime(&current);
 
-    saved_game.undo_redo_state = undo_redo_state;  // TODO think if it's alright
+    saved_game.undo_redo_state = undo_redo_state;
     saved_game.white_player = game.white_player;
     saved_game.black_player = game.black_player;
 
     try {
         save_load::save_game_to_file(saved_game);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_ERROR("{}", e.what());
-        REL_ERROR("Could not save game");
+        REL_ERROR("Could not save game: {}", e.what());
 
         save_load::handle_save_file_not_open_error(app->data().application_name);
     } catch (const save_load::SaveFileError& e) {
-        REL_ERROR("{}", e.what());
-        REL_ERROR("Could not save game");
+        REL_ERROR("Could not save game: {}", e.what());
     }
 }
 
@@ -1556,16 +1538,14 @@ void StandardGameScene::load_game() {
     try {
         save_load::load_game_from_file(saved_game);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_WARN("{}", e.what());
-        REL_WARN("Could not load game");
+        REL_WARN("Could not load game: {}", e.what());
 
         save_load::handle_save_file_not_open_error(app->data().application_name);
 
         imgui_layer.show_could_not_load_game = true;
         return;
     } catch (const save_load::SaveFileError& e) {
-        REL_WARN("{}", e.what());  // TODO maybe delete file
-        REL_WARN("Could not load game");
+        REL_WARN("Could not load game: {}", e.what());  // TODO maybe delete file
 
         imgui_layer.show_could_not_load_game = true;
         return;
