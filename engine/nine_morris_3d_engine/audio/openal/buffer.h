@@ -5,7 +5,7 @@
 namespace al {
     class Buffer {
     public:
-        Buffer(size_t size, const void* data, int frequency);
+        Buffer(const void* data, size_t size, int frequency);
         ~Buffer();
     private:
         ALuint buffer = 0;

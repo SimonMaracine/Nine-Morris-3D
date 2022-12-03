@@ -17,6 +17,7 @@ public:
     ApplicationBuilder& authors(const std::vector<std::string>& author_list);
     ApplicationBuilder& encrypt_key(std::string_view encryption_key);
     ApplicationBuilder& with_renderer(Renderer renderer);
+    ApplicationBuilder& with_audio();
 private:
     int width = 800;
     int height = 600;
@@ -36,6 +37,7 @@ private:
     bool renderer_3d = false;
     bool renderer_2d = false;
     bool renderer_imgui = false;
+    bool audio = false;
 
     friend class Application;
 };

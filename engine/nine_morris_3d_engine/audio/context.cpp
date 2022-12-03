@@ -1,4 +1,3 @@
-// #include <AL/al.h>
 #include <AL/alc.h>
 
 #include "nine_morris_3d_engine/audio/context.h"

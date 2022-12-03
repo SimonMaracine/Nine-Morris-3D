@@ -8,6 +8,7 @@
 #include "nine_morris_3d_engine/application/scene.h"
 #include "nine_morris_3d_engine/application/input.h"
 #include "nine_morris_3d_engine/application/application_builder.h"
+#include "nine_morris_3d_engine/audio/context.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
@@ -52,10 +53,10 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 
         renderer_imgui = std::bind(&Application::renderer_imgui_functionality, this);
 
-        evt.sink<MouseScrolledEvent>().connect<&Application::on_imgui_mouse_scrolled>(*this);
-        evt.sink<MouseMovedEvent>().connect<&Application::on_imgui_mouse_moved>(*this);
-        evt.sink<MouseButtonPressedEvent>().connect<&Application::on_imgui_mouse_button_pressed>(*this);
-        evt.sink<MouseButtonReleasedEvent>().connect<&Application::on_imgui_mouse_button_released>(*this);
+        evt.sink<MouseScrolledEvent>().connect<&Application::on_imgui_mouse_scrolled>(this);
+        evt.sink<MouseMovedEvent>().connect<&Application::on_imgui_mouse_moved>(this);
+        evt.sink<MouseButtonPressedEvent>().connect<&Application::on_imgui_mouse_button_pressed>(this);
+        evt.sink<MouseButtonReleasedEvent>().connect<&Application::on_imgui_mouse_button_released>(this);
     }
 
 #ifdef PLATFORM_GAME_DEBUG
@@ -84,8 +85,14 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
         renderer_2d = std::bind(&Application::renderer_2d_functionality, this);
     }
 
-    evt.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(*this);
-    evt.sink<WindowResizedEvent>().connect<&Application::on_window_resized>(*this);
+    if (builder.audio) {
+        DEB_INFO("With audio");
+
+        openal_context = std::make_unique<OpenALContext>();
+    }
+
+    evt.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(this);
+    evt.sink<WindowResizedEvent>().connect<&Application::on_window_resized>(this);
 
     frame_counter.previous_seconds = window->get_time();
     fixed_update.previous_seconds = window->get_time();

@@ -62,6 +62,15 @@ void StandardGameScene::on_start() {
 
     camera_controller.go_towards_position(default_camera_position);
     camera_controller.setup_events(app);
+
+    // TODO delete later
+    auto sound_data = app->res.sound_data.load("test_sound"_h, "data/sounds/test.ogg");
+    app->res.al_buffer.load("test_sound"_h, sound_data->get_data(), sound_data->get_size(), sound_data->get_sample_rate());
+    app->res.al_source.load("test_sound"_h);
+
+    auto sound_data2 = app->res.sound_data.load("test_sound2"_h, "data/sounds/test2.ogg");
+    app->res.al_buffer.load("test_sound2"_h, sound_data2->get_data(), sound_data2->get_size(), sound_data2->get_sample_rate());
+    app->res.al_source.load("test_sound2"_h);
 }
 
 void StandardGameScene::on_stop() {
@@ -292,6 +301,14 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
 
     if (event.key == input::Key::SPACE) {
         camera_controller.go_towards_position(default_camera_position);
+    } else if (event.key == input::Key::K) {  // TODO delete later
+        app->res.al_source["test_sound"_h]->play(
+            app->res.al_buffer["test_sound"_h].get()
+        );
+    } else if (event.key == input::Key::L) {
+        app->res.al_source["test_sound2"_h]->play(
+            app->res.al_buffer["test_sound2"_h].get()
+        );
     }
 }
 

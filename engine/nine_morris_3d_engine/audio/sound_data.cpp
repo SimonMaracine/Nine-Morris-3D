@@ -17,6 +17,9 @@ SoundData::SoundData(std::string_view file_path)
         REL_CRITICAL("Could not load sound data `{}`, exiting...", file_path);
         game_exit::exit_critical();
     }
+
+    size = compute_size();
+    bits_per_sample = compute_bits_per_sample();
 }
 
 SoundData::SoundData(encrypt::EncryptedFile file_path)
@@ -31,12 +34,23 @@ SoundData::SoundData(encrypt::EncryptedFile file_path)
         REL_CRITICAL("Could not load sound data `{}`, exiting...", file_path);
         game_exit::exit_critical();
     }
+
+    size = compute_size();
+    bits_per_sample = compute_bits_per_sample();
 }
 
 SoundData::~SoundData() {
     ASSERT(data != nullptr, "No data");
 
-    free(data);  // TODO see if this is right
+    free(data);
 
     DEB_DEBUG("Freed sound data `{}`", file_path);
+}
+
+size_t SoundData::compute_size() {
+    return samples * channels * sizeof(short);
+}
+
+size_t SoundData::compute_bits_per_sample() {
+    return (8 * size) / (samples * channels);
 }

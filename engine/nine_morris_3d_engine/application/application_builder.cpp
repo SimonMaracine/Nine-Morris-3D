@@ -66,3 +66,9 @@ ApplicationBuilder& ApplicationBuilder::with_renderer(Renderer renderer) {
 
     return *this;
 }
+
+ApplicationBuilder& ApplicationBuilder::with_audio() {
+    audio = true;
+
+    return *this;
+}

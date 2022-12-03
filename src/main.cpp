@@ -65,7 +65,8 @@ int main() {
             .encrypt_key(KEY)
             .with_renderer(ApplicationBuilder::R3D)
             .with_renderer(ApplicationBuilder::R2D)
-            .with_renderer(ApplicationBuilder::RImGui);
+            .with_renderer(ApplicationBuilder::RImGui)
+            .with_audio();
 
         auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
         game->add_scene(std::make_unique<LoadingScene>(), true);

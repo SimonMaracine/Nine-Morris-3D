@@ -2,6 +2,9 @@
 
 #include <resmanager/resmanager.h>
 
+#include "nine_morris_3d_engine/audio/openal/source.h"
+#include "nine_morris_3d_engine/audio/openal/buffer.h"
+#include "nine_morris_3d_engine/audio/sound_data.h"
 #include "nine_morris_3d_engine/graphics/opengl/texture.h"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
 #include "nine_morris_3d_engine/graphics/opengl/shader.h"
@@ -58,4 +61,7 @@ struct Resources {
     resmanager::Cache<Mesh<PTNT>, _loaders::MeshPTNTLoader> mesh_ptnt;
     resmanager::Cache<Mesh<PTN>, _loaders::MeshPTNLoader> mesh_ptn;
     resmanager::Cache<Mesh<P>, _loaders::MeshPLoader> mesh_p;
+    resmanager::Cache<al::Source> al_source;
+    resmanager::Cache<al::Buffer> al_buffer;
+    resmanager::Cache<SoundData> sound_data;
 };
