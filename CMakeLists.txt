@@ -103,6 +103,7 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/graphics/light.h"
     "engine/nine_morris_3d_engine/graphics/material.h"
     "engine/nine_morris_3d_engine/graphics/post_processing.h"
+    "engine/nine_morris_3d_engine/graphics/texture_data.h"
     "engine/nine_morris_3d_engine/graphics/debug_opengl.h"
     "engine/nine_morris_3d_engine/other/assert.h"
     "engine/nine_morris_3d_engine/other/camera_controller.h"
@@ -113,7 +114,6 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/other/logging.h"
     "engine/nine_morris_3d_engine/other/mesh.h"
     "engine/nine_morris_3d_engine/other/path.h"
-    "engine/nine_morris_3d_engine/other/texture_data.h"
     "engine/nine_morris_3d_engine/other/user_data.h"
     "engine/nine_morris_3d_engine/other/resource_manager.h"
 )
@@ -141,6 +141,7 @@ add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/graphics/font.cpp"
     "engine/nine_morris_3d_engine/graphics/identifier.cpp"
     "engine/nine_morris_3d_engine/graphics/material.cpp"
+    "engine/nine_morris_3d_engine/graphics/texture_data.cpp"
     "engine/nine_morris_3d_engine/graphics/debug_opengl.cpp"
     "engine/nine_morris_3d_engine/other/dependencies.cpp"
     "engine/nine_morris_3d_engine/other/encrypt.cpp"
@@ -148,7 +149,6 @@ add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/other/logging.cpp"
     "engine/nine_morris_3d_engine/other/mesh.cpp"
     "engine/nine_morris_3d_engine/other/path.cpp"
-    "engine/nine_morris_3d_engine/other/texture_data.cpp"
     "engine/nine_morris_3d_engine/other/user_data.cpp"
     "engine/nine_morris_3d_engine/other/resource_manager.cpp"
     ${ENGINE_HEADERS}

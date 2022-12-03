@@ -19,7 +19,7 @@ Window::Window(Application* app) {
 
 #ifdef PLATFORM_GAME_DEBUG
     glfwSetErrorCallback([](int error, const char* description) {
-        DEB_CRITICAL("[GLFW Error Callback: {}] {}", error, description);
+        DEB_CRITICAL("({}) GLFW Error Callback: {}", error, description);
     });
 #endif
 
@@ -45,7 +45,7 @@ Window::Window(Application* app) {
         game_exit::exit_critical();
     }
 
-    DEB_INFO("Initialized GLFW and created window");
+    DEB_INFO("Initialized GLFW and created window and OpenGL context");
 
     glfwMakeContextCurrent(window);
 
@@ -138,7 +138,7 @@ Window::~Window() {
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    DEB_INFO("Terminated GLFW and destroyed window");
+    DEB_INFO("Destroyed window and OpenGL context and terminated GLFW");
 }
 
 void Window::update() {

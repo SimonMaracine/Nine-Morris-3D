@@ -110,7 +110,17 @@ namespace dependencies {
         }
         {
             char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "stb_vorbis\n");
+            output.append(line);
+        }
+        {
+            char line[BUFFER_LENGTH];
             snprintf(line, BUFFER_LENGTH, "utfcpp\n");
+            output.append(line);
+        }
+        {
+            char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "OpenAL Soft\n");
             output.append(line);
         }
 

@@ -31,10 +31,14 @@ OpenALContext::OpenALContext() {
         REL_CRITICAL("Could not make AL context current, exiting...");
         game_exit::exit_critical();
     }
+
+    DEB_INFO("Created OpenAL device and context");
 }
 
 OpenALContext::~OpenALContext() {
     alcMakeContextCurrent(nullptr);
     alcDestroyContext(context);
     alcCloseDevice(device);
+
+    DEB_INFO("Destroyed OpenAL context and device");
 }

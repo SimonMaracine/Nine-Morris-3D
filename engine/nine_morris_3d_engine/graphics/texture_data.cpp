@@ -1,7 +1,7 @@
 #include <stb_image.h>
 #include <cppblowfish/cppblowfish.h>
 
-#include "nine_morris_3d_engine/other/texture_data.h"
+#include "nine_morris_3d_engine/graphics/texture_data.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"

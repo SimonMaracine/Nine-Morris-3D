@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "nine_morris_3d_engine/application/platform.h"
-#include "nine_morris_3d_engine/other/texture_data.h"
+#include "nine_morris_3d_engine/graphics/texture_data.h"
 
 class Application;
 class Monitor;

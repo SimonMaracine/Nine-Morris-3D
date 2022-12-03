@@ -14,5 +14,6 @@
 #include "nine_morris_3d_engine/graphics/light.h"
 #include "nine_morris_3d_engine/graphics/material.h"
 #include "nine_morris_3d_engine/graphics/post_processing.h"
+#include "nine_morris_3d_engine/graphics/texture_data.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"

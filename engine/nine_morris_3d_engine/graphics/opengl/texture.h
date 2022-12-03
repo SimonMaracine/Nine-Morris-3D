@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include "nine_morris_3d_engine/other/texture_data.h"
+#include "nine_morris_3d_engine/graphics/texture_data.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 enum class Filter {

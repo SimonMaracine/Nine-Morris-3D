@@ -121,6 +121,11 @@ public:
     GuiRenderer(Application* app);
     ~GuiRenderer();
 
+    GuiRenderer(const GuiRenderer&) = delete;
+    GuiRenderer& operator=(const GuiRenderer&) = delete;
+    GuiRenderer(GuiRenderer&&) = delete;
+    GuiRenderer& operator=(GuiRenderer&&) = delete;
+
     void render();
 
     void add_widget(std::shared_ptr<gui::Widget> widget);

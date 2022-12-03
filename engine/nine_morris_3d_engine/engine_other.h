@@ -9,6 +9,5 @@
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/mesh.h"
 #include "nine_morris_3d_engine/other/path.h"
-#include "nine_morris_3d_engine/other/texture_data.h"
 #include "nine_morris_3d_engine/other/user_data.h"
 #include "nine_morris_3d_engine/other/resource_manager.h"

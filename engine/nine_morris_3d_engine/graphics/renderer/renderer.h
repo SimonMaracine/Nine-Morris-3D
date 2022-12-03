@@ -48,6 +48,11 @@ public:
     Renderer(Application* app);
     ~Renderer();
 
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
+    Renderer(Renderer&&) = delete;
+    Renderer& operator=(Renderer&&) = delete;
+
     void render();
 
     void add_model(std::shared_ptr<Model> model);
@@ -64,7 +69,7 @@ public:
     void set_scene_framebuffer(int samples);
     void set_shadow_map_framebuffer(int size);
     void set_skybox(std::shared_ptr<Texture3D> texture);
-    void set_camera_controller(CameraController* camera_controller);
+    void set_camera_controller(const CameraController* camera_controller);
 
     identifier::Id get_hovered_id() { return hovered_id; }
     PostProcessingContext& get_post_processing_context() { return post_processing_context; }
@@ -165,7 +170,7 @@ private:
 
     identifier::Id hovered_id = identifier::null;
     FramebufferReader<4> framebuffer_reader;
-    CameraController* camera_controller = nullptr;  // Don't use this directly
+    const CameraController* camera_controller = nullptr;  // Don't use this directly
 
     int shadow_map_size = 4096;
 

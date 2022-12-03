@@ -3,6 +3,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "nine_morris_3d_engine/application/platform.h"
+#include "nine_morris_3d_engine/audio/debug_openal.h"
 #include "nine_morris_3d_engine/graphics/debug_opengl.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/path.h"
@@ -72,6 +73,7 @@ namespace logging {
 
     void log_opengl_and_dependencies_info(LogTarget target, std::string_view info_file) {
         std::string contents = debug_opengl::get_info();
+        contents += debug_openal::get_info();
         contents += dependencies::get_info();
 
         switch (target) {

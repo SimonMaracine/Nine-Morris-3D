@@ -5,6 +5,20 @@
 #include "nine_morris_3d_engine/other/exit.h"
 
 namespace debug_openal {
+    std::string get_info() {
+        std::string output;
+
+        output.append("\n*** OpenAL Version ***\n");
+
+        constexpr size_t LENGTH = 256;  // 256 should be enough
+
+        char line[LENGTH];
+        snprintf(line, LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));
+        output.append(line);
+
+        return output;
+    }
+
     void check_errors() {
         const ALenum error = alGetError();
 
@@ -33,5 +47,9 @@ namespace debug_openal {
 
             game_exit::exit_critical();
         }
+    }
+
+    const char* get_version() {
+        return alGetString(AL_VERSION);
     }
 }

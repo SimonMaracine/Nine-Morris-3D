@@ -2,11 +2,31 @@
 
 #include "nine_morris_3d_engine/audio/openal/buffer.h"
 #include "nine_morris_3d_engine/other/logging.h"
+#include "nine_morris_3d_engine/other/exit.h"
+
+static ALenum get_format(int channels, size_t bps) {
+    ALenum format = 0;
+
+    if (channels == 1 && bps == 8) {
+        format = AL_FORMAT_MONO8;
+    } else if (channels == 1 && bps == 16) {
+        format = AL_FORMAT_MONO16;
+    } else if (channels == 2 && bps == 8) {
+        format = AL_FORMAT_STEREO8;
+    } else if (channels == 2 && bps == 16) {
+        format = AL_FORMAT_STEREO16;
+    } else {
+        REL_CRITICAL("Unknown format: channels = `{}`, bps = `{}`, exiting...", channels, bps);
+        game_exit::exit_critical();
+    }
+
+    return format;
+}
 
 namespace al {
-    Buffer::Buffer(const void* data, size_t size, int frequency) {
+    Buffer::Buffer(const void* data, size_t size, int channels, size_t bps, int frequency) {
         alGenBuffers(1, &buffer);
-        alBufferData(buffer, AL_FORMAT_MONO16, data, size, frequency);
+        alBufferData(buffer, get_format(channels, bps), data, size, frequency);
 
         DEB_DEBUG("Created AL buffer {}", buffer);
     }

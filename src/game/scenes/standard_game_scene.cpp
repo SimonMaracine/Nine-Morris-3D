@@ -1,4 +1,5 @@
 #include <nine_morris_3d_engine/engine_other.h>
+#include <nine_morris_3d_engine/engine_graphics.h>
 
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/imgui_layer.h"
@@ -65,11 +66,25 @@ void StandardGameScene::on_start() {
 
     // TODO delete later
     auto sound_data = app->res.sound_data.load("test_sound"_h, "data/sounds/test.ogg");
-    app->res.al_buffer.load("test_sound"_h, sound_data->get_data(), sound_data->get_size(), sound_data->get_sample_rate());
+    app->res.al_buffer.load(
+        "test_sound"_h,
+        sound_data->get_data(),
+        sound_data->get_size(),
+        sound_data->get_channels(),
+        sound_data->get_bits_per_sample(),
+        sound_data->get_sample_rate()
+    );
     app->res.al_source.load("test_sound"_h);
 
     auto sound_data2 = app->res.sound_data.load("test_sound2"_h, "data/sounds/test2.ogg");
-    app->res.al_buffer.load("test_sound2"_h, sound_data2->get_data(), sound_data2->get_size(), sound_data2->get_sample_rate());
+    app->res.al_buffer.load(
+        "test_sound2"_h,
+        sound_data2->get_data(),
+        sound_data2->get_size(),
+        sound_data2->get_channels(),
+        sound_data2->get_bits_per_sample(),
+        sound_data2->get_sample_rate()
+    );
     app->res.al_source.load("test_sound2"_h);
 }
 

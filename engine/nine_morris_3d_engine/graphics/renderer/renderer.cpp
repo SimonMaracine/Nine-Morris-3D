@@ -415,7 +415,7 @@ void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
     storage.skybox_texture = texture;
 }
 
-void Renderer::set_camera_controller(CameraController* camera_controller) {
+void Renderer::set_camera_controller(const CameraController* camera_controller) {
     this->camera_controller = camera_controller;
 
     if (camera_controller != nullptr) {
