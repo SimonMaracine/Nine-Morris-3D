@@ -247,7 +247,7 @@ GuiRenderer::GuiRenderer(Application* app)
 }
 
 GuiRenderer::~GuiRenderer() {
-    DEB_INFO("Destroyed GUI renderer");
+    DEB_INFO("Uninitialized GUI renderer");
 }
 
 void GuiRenderer::render() {

@@ -21,11 +21,12 @@ namespace al {
         DEB_DEBUG("Deleted AL source {}", source);
     }
 
-    void Source::bind() {
-
+    void Source::play(Buffer* buffer) {
+        alSourcei(source, AL_BUFFER, buffer->buffer);
+        alSourcePlay(source);
     }
 
-    void Source::unbind() {
-
+    void Source::stop() {
+        alSourceStop(source);
     }
 }

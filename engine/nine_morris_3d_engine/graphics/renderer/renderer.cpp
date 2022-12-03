@@ -237,7 +237,7 @@ Renderer::Renderer(Application* app)
 }
 
 Renderer::~Renderer() {
-    DEB_INFO("Destroyed renderer");
+    DEB_INFO("Uninitialized renderer");
 }
 
 void Renderer::render() {

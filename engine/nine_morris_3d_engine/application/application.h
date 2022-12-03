@@ -7,9 +7,10 @@
 #include "nine_morris_3d_engine/application/window.h"
 #include "nine_morris_3d_engine/application/scene.h"
 #include "nine_morris_3d_engine/application/application_builder.h"
+#include "nine_morris_3d_engine/audio/context.h"
+#include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
-#include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
 #include "nine_morris_3d_engine/other/resource_manager.h"
 
 class Application final {
@@ -26,6 +27,11 @@ public:
     Application(const ApplicationBuilder& builder, std::any& user_data,
         const UserFunc& start = DummyUserFunc {}, const UserFunc& stop = DummyUserFunc {});
     ~Application();
+
+    Application(const Application&) = delete;
+    Application& operator=(const Application&) = delete;
+    Application(Application&&) = delete;
+    Application& operator=(Application&&) = delete;
 
     // Call this to run the application, after all scenes have been defined; it can return an exit code
     int run();
@@ -52,6 +58,7 @@ public:
     bool running = true;
     int exit_code = 0;
     std::unique_ptr<Window> window;  // The last* object destroyed in an application instance
+    std::unique_ptr<OpenALContext> openal_context;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
     entt::dispatcher evt;  // Event dispatcher

@@ -1,3 +1,5 @@
 #pragma once
 
-void check_errors();
+namespace debug_openal {
+    void check_errors();
+}

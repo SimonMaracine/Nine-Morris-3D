@@ -34,8 +34,6 @@ public:
 
     void bind(GLenum slot);
     static void unbind();
-
-	GLuint get_id() { return texture; }
 private:
     GLuint texture = 0;
 	int width = 0, height = 0;

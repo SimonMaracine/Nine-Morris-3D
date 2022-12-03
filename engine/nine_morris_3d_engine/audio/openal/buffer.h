@@ -9,5 +9,7 @@ namespace al {
         ~Buffer();
     private:
         ALuint buffer = 0;
+
+        friend class Source;
     };
 }

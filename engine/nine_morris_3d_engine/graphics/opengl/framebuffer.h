@@ -53,7 +53,6 @@ public:
 
     GLuint get_color_attachment(GLint attachment_index);
     GLuint get_depth_attachment();
-    GLuint get_id() { return framebuffer; }
     const FramebufferSpecification& get_specification() { return specification; }
 
     // Usually called by application

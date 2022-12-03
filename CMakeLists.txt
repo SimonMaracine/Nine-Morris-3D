@@ -85,8 +85,9 @@ set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/application/window.h"
     "engine/nine_morris_3d_engine/audio/openal/buffer.h"
     "engine/nine_morris_3d_engine/audio/openal/source.h"
-    "engine/nine_morris_3d_engine/audio/device.h"
+    "engine/nine_morris_3d_engine/audio/context.h"
     "engine/nine_morris_3d_engine/audio/debug_openal.h"
+    "engine/nine_morris_3d_engine/audio/sound_data.h"
     "engine/nine_morris_3d_engine/graphics/opengl/buffer.h"
     "engine/nine_morris_3d_engine/graphics/opengl/framebuffer.h"
     "engine/nine_morris_3d_engine/graphics/opengl/shader.h"
@@ -125,7 +126,9 @@ add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/application/window.cpp"
     "engine/nine_morris_3d_engine/audio/openal/buffer.cpp"
     "engine/nine_morris_3d_engine/audio/openal/source.cpp"
+    "engine/nine_morris_3d_engine/audio/context.cpp"
     "engine/nine_morris_3d_engine/audio/debug_openal.cpp"
+    "engine/nine_morris_3d_engine/audio/sound_data.cpp"
     "engine/nine_morris_3d_engine/graphics/opengl/buffer.cpp"
     "engine/nine_morris_3d_engine/graphics/opengl/framebuffer.cpp"
     "engine/nine_morris_3d_engine/graphics/opengl/shader.cpp"
@@ -245,7 +248,6 @@ target_include_directories(${GLAD_STB} SYSTEM PRIVATE
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_truetype"
     "${CMAKE_SOURCE_DIR}/dependencies/stb_image_write"
-    "${CMAKE_SOURCE_DIR}/dependencies/stb_vorbis"
 )
 
 target_include_directories(${MY_IMGUI} SYSTEM PRIVATE
