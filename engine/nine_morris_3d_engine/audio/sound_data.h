@@ -17,8 +17,8 @@ public:
     size_t get_size() { return size; }
     int get_samples() { return samples; }
     int get_channels() { return channels; }
-    int get_sample_rate() { return sample_rate; }
-    size_t get_bits_per_sample() { return bits_per_sample; }
+    int get_frequency() { return sample_rate; }
+    size_t get_bps() { return bits_per_sample; }
     std::string_view get_file_path() { return file_path; }
 private:
     size_t compute_size();

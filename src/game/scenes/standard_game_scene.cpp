@@ -72,10 +72,11 @@ void StandardGameScene::on_start() {
         sound_data->get_data(),
         sound_data->get_size(),
         sound_data->get_channels(),
-        sound_data->get_bits_per_sample(),
-        sound_data->get_sample_rate()
+        sound_data->get_bps(),
+        sound_data->get_frequency()
     );
-    app->res.al_source.load("test_sound"_h);
+    auto source = app->res.al_source.load("test_sound"_h);
+    source->set_pitch(3.0f);
 
     auto sound_data2 = app->res.sound_data.load("test_sound2"_h, "data/sounds/test2.ogg");
     app->res.al_buffer.load(
@@ -83,10 +84,13 @@ void StandardGameScene::on_start() {
         sound_data2->get_data(),
         sound_data2->get_size(),
         sound_data2->get_channels(),
-        sound_data2->get_bits_per_sample(),
-        sound_data2->get_sample_rate()
+        sound_data2->get_bps(),
+        sound_data2->get_frequency()
     );
-    app->res.al_source.load("test_sound2"_h);
+    auto source2 = app->res.al_source.load("test_sound2"_h);
+    source2->set_looping(true);
+
+    app->openal->get_listener().set_position(glm::vec3(1.0f));
 }
 
 void StandardGameScene::on_stop() {

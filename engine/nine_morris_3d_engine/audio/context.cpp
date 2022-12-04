@@ -1,12 +1,25 @@
 #include <AL/alc.h>
 
-#include "nine_morris_3d_engine/audio/openal/info_and_debug.h"
+#include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/audio/context.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/exit.h"
 
 static ALCdevice* _global_device = nullptr;
 static ALCcontext* _global_context = nullptr;
+
+#if 0
+static void maybe_check_errors(ALCdevice* device) {
+#ifdef PLATFORM_GAME_DEBUG
+    const ALCenum error = alcGetError(device);
+
+    if (error != ALC_NO_ERROR) {
+        REL_CRITICAL("OpenAL Context Debug Error: {}", error);
+        game_exit::exit_critical();
+    }
+#endif
+}
+#endif
 
 OpenALContext::OpenALContext() {
     // Choose the default device
@@ -17,7 +30,7 @@ OpenALContext::OpenALContext() {
         game_exit::exit_critical();
     }
 
-    context = alcCreateContext(device, nullptr);  // TODO context attributes
+    context = alcCreateContext(device, nullptr);  // TODO maybe pass some context attributes
 
     if (context == nullptr) {
         REL_CRITICAL("Could not create an AL context, exiting...");
@@ -32,8 +45,6 @@ OpenALContext::OpenALContext() {
         game_exit::exit_critical();
     }
 
-    al::maybe_check_errors();
-
     _global_device = device;
     _global_context = context;
 
@@ -44,8 +55,6 @@ OpenALContext::~OpenALContext() {
     alcMakeContextCurrent(nullptr);
     alcDestroyContext(context);
     alcCloseDevice(device);
-
-    al::maybe_check_errors();
 
     _global_device = nullptr;
     _global_context = nullptr;

@@ -7,11 +7,6 @@
 namespace al {
     Source::Source() {
         alGenSources(1, &source);
-        alSourcef(source, AL_GAIN, 1.0f);
-        alSourcef(source, AL_PITCH, 1.0f);
-        alSource3f(source, AL_POSITION, 0.0f, 0.0f, 0.0f);
-        alSource3f(source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-        alSourcei(source, AL_LOOPING, AL_FALSE);
 
         maybe_check_errors();
 
@@ -19,21 +14,102 @@ namespace al {
     }
 
     Source::~Source() {
+        stop();
+
         alDeleteSources(1, &source);
+
+        maybe_check_errors();
 
         DEB_DEBUG("Deleted AL source {}", source);
     }
 
     void Source::play(Buffer* buffer) {
+        stop();
+
         alSourcei(source, AL_BUFFER, buffer->buffer);
         alSourcePlay(source);
 
         maybe_check_errors();
+
+        buffer->source_attached = source;
     }
 
     void Source::stop() {
         alSourceStop(source);
 
         maybe_check_errors();
+    }
+
+    void Source::pause_playing() {
+        alSourcePause(source);
+    }
+
+    void Source::continue_playing() {
+        alSourcePlay(source);
+    }
+
+    bool Source::is_playing() {
+        int state = 0;
+        alGetSourcei(source, AL_SOURCE_STATE, &state);
+
+        maybe_check_errors();
+
+        return state == AL_PLAYING;
+    }
+
+    void Source::set_gain(float gain) {
+        alSourcef(source, AL_GAIN, gain);
+
+        maybe_check_errors();
+
+        this->gain = gain;
+    }
+
+    void Source::set_pitch(float pitch) {
+        alSourcef(source, AL_PITCH, pitch);
+
+        maybe_check_errors();
+
+        this->pitch = pitch;
+    }
+
+    void Source::set_rolloff_factor(float rolloff_factor) {
+        alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
+
+        maybe_check_errors();
+
+        this->rolloff_factor = rolloff_factor;
+    }
+
+    void Source::set_position(const glm::vec3& position) {
+        alSource3f(source, AL_POSITION, position.x, position.y, position.z);
+
+        maybe_check_errors();
+
+        this->position = position;
+    }
+
+    void Source::set_velocity(const glm::vec3& velocity) {
+        alSource3f(source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+
+        maybe_check_errors();
+
+        this->velocity = velocity;
+    }
+
+    void Source::set_direction(const glm::vec3& direction) {
+        alSource3f(source, AL_DIRECTION, direction.x, direction.y, direction.z);
+
+        maybe_check_errors();
+
+        this->direction = direction;
+    }
+
+    void Source::set_looping(bool looping) {
+        alSourcei(source, AL_LOOPING, static_cast<int>(looping));
+
+        maybe_check_errors();
+
+        this->looping = looping;
     }
 }

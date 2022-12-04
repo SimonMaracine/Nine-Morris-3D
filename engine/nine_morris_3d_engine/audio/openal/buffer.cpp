@@ -34,7 +34,29 @@ namespace al {
         DEB_DEBUG("Created AL buffer {}", buffer);
     }
 
+    Buffer::Buffer(std::shared_ptr<SoundData> data) {
+        alGenBuffers(1, &buffer);
+        alBufferData(
+            buffer,
+            get_format(data->get_channels(), data->get_bps()),
+            data->get_data(),
+            data->get_size(),
+            data->get_frequency()
+        );
+
+        maybe_check_errors();
+
+        DEB_DEBUG("Created AL buffer {}", buffer);
+    }
+
     Buffer::~Buffer() {
+        if (source_attached != 0) {
+            alSourceStop(source_attached);
+            alSourcei(source_attached, AL_BUFFER, 0);
+        }
+
+        maybe_check_errors();
+
         alDeleteBuffers(1, &buffer);
 
         maybe_check_errors();

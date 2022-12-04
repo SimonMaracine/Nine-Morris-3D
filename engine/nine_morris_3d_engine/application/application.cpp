@@ -85,7 +85,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     if (builder.audio) {
         DEB_INFO("With audio");
 
-        openal_context = std::make_unique<OpenALContext>();
+        openal = std::make_unique<OpenALContext>();
     }
 
     evt.sink<WindowClosedEvent>().connect<&Application::on_window_closed>(this);
