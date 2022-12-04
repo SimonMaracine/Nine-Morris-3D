@@ -3,6 +3,7 @@
 #include "nine_morris_3d_engine/audio/openal/source.h"
 #include "nine_morris_3d_engine/audio/openal/info_and_debug.h"
 #include "nine_morris_3d_engine/other/logging.h"
+#include "nine_morris_3d_engine/other/assert.h"
 
 namespace al {
     Source::Source() {
@@ -26,7 +27,11 @@ namespace al {
     void Source::play(Buffer* buffer) {
         stop();
 
-        alSourcei(source, AL_BUFFER, buffer->buffer);
+        if (buffer->buffer != attached_buffer) {
+            attached_buffer = buffer->buffer;
+            alSourcei(source, AL_BUFFER, attached_buffer);
+        }
+
         alSourcePlay(source);
 
         maybe_check_errors();
@@ -58,6 +63,8 @@ namespace al {
     }
 
     void Source::set_gain(float gain) {
+        ASSERT(gain >= 0.0f, "Must be positive");
+
         alSourcef(source, AL_GAIN, gain);
 
         maybe_check_errors();
@@ -66,6 +73,8 @@ namespace al {
     }
 
     void Source::set_pitch(float pitch) {
+        ASSERT(pitch >= 0.0f, "Must be positive");
+
         alSourcef(source, AL_PITCH, pitch);
 
         maybe_check_errors();

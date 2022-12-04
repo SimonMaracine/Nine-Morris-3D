@@ -3,9 +3,12 @@
 
 #include "nine_morris_3d_engine/audio/openal/listener.h"
 #include "nine_morris_3d_engine/audio/openal/info_and_debug.h"
+#include "nine_morris_3d_engine/other/assert.h"
 
 namespace al {
     void Listener::set_gain(float gain) {
+        ASSERT(gain >= 0.0f, "Must be positive");
+
         alListenerf(AL_GAIN, gain);
 
         maybe_check_errors();

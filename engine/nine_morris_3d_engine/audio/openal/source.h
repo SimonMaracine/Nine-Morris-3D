@@ -35,6 +35,7 @@ namespace al {
         void set_looping(bool looping);
     private:
         ALuint source = 0;
+        ALuint attached_buffer = 0;
 
         float gain = 1.0f;
         float pitch = 1.0f;

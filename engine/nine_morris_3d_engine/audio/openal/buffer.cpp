@@ -53,9 +53,9 @@ namespace al {
         if (source_attached != 0) {
             alSourceStop(source_attached);
             alSourcei(source_attached, AL_BUFFER, 0);
-        }
 
-        maybe_check_errors();
+            maybe_check_errors();
+        }
 
         alDeleteBuffers(1, &buffer);
 
