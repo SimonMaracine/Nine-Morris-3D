@@ -13,6 +13,11 @@ public:
         : name(name), framebuffer(framebuffer), shader(shader) {}
     virtual ~PostProcessingStep() = default;
 
+    PostProcessingStep(const PostProcessingStep&) = delete;
+    PostProcessingStep& operator=(const PostProcessingStep&) = delete;
+    PostProcessingStep(PostProcessingStep&&) = delete;
+    PostProcessingStep& operator=(PostProcessingStep&&) = delete;
+
     virtual void render(const PostProcessingContext& context) const = 0;
     virtual void prepare(const PostProcessingContext& context) const = 0;
 

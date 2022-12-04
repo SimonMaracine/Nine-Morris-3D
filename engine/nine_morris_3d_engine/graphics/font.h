@@ -17,6 +17,11 @@ public:
         int pixel_dist_scale, int bitmap_size);
     ~Font();
 
+    Font(const Font&) = delete;
+    Font& operator=(const Font&) = delete;
+    Font(Font&&) = delete;
+    Font& operator=(Font&&) = delete;
+
     void update_data(const float* data, size_t size);
 
     std::unordered_map<int, Glyph>& get_glyphs() { return glyphs; }

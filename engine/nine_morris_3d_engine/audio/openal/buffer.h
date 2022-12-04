@@ -10,6 +10,11 @@ namespace al {
         Buffer(const void* data, size_t size, int channels, size_t bps, int frequency);
         Buffer(std::shared_ptr<SoundData> data);
         ~Buffer();
+
+        Buffer(const Buffer&) = delete;
+        Buffer& operator=(const Buffer&) = delete;
+        Buffer(Buffer&&) = delete;
+        Buffer& operator=(Buffer&&) = delete;
     private:
         ALuint buffer = 0;
         ALuint source_attached = 0;

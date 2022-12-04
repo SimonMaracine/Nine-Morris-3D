@@ -49,6 +49,11 @@ namespace gl {
         Framebuffer(const FramebufferSpecification& specification);
         ~Framebuffer();
 
+        Framebuffer(const Framebuffer&) = delete;
+        Framebuffer& operator=(const Framebuffer&) = delete;
+        Framebuffer(Framebuffer&&) = delete;
+        Framebuffer& operator=(Framebuffer&&) = delete;
+
         void bind();
         static void bind_default();
 

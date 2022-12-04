@@ -18,6 +18,11 @@ public:
     Material(std::shared_ptr<gl::Shader> shader, int flags = 0);
     ~Material();
 
+    Material(const Material&) = delete;
+    Material& operator=(const Material&) = delete;
+    Material(Material&&) = delete;
+    Material& operator=(Material&&) = delete;
+
     void add_uniform(Uniform type, std::string_view name);
     void add_texture(std::string_view name);
 private:
@@ -41,6 +46,11 @@ class MaterialInstance {
 public:
     MaterialInstance(std::shared_ptr<Material> material);
     ~MaterialInstance();
+
+    MaterialInstance(const MaterialInstance&) = delete;
+    MaterialInstance& operator=(const MaterialInstance&) = delete;
+    MaterialInstance(MaterialInstance&&) = delete;
+    MaterialInstance& operator=(MaterialInstance&&) = delete;
 
     void bind();
 

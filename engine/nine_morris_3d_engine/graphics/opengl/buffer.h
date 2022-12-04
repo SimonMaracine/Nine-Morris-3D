@@ -15,6 +15,11 @@ namespace gl {
         Buffer(const void* data, size_t size, DrawHint hint = DrawHint::Static);
         ~Buffer();
 
+        Buffer(const Buffer&) = delete;
+        Buffer& operator=(const Buffer&) = delete;
+        Buffer(Buffer&&) = delete;
+        Buffer& operator=(Buffer&&) = delete;
+
         void bind();
         static void unbind();
 
@@ -31,6 +36,11 @@ namespace gl {
         IndexBuffer(const unsigned int* data, size_t size);
         ~IndexBuffer();
 
+        IndexBuffer(const IndexBuffer&) = delete;
+        IndexBuffer& operator=(const IndexBuffer&) = delete;
+        IndexBuffer(IndexBuffer&&) = delete;
+        IndexBuffer& operator=(IndexBuffer&&) = delete;
+
         void bind();
         static void unbind();
 
@@ -46,6 +56,11 @@ namespace gl {
     public:
         UniformBuffer();
         ~UniformBuffer();
+
+        UniformBuffer(const UniformBuffer&) = delete;
+        UniformBuffer& operator=(const UniformBuffer&) = delete;
+        UniformBuffer(UniformBuffer&&) = delete;
+        UniformBuffer& operator=(UniformBuffer&&) = delete;
 
         void bind();
         static void unbind();
@@ -73,6 +88,11 @@ namespace gl {
     public:
         PixelBuffer(size_t size);
         ~PixelBuffer();
+
+        PixelBuffer(const PixelBuffer&) = delete;
+        PixelBuffer& operator=(const PixelBuffer&) = delete;
+        PixelBuffer(PixelBuffer&&) = delete;
+        PixelBuffer& operator=(PixelBuffer&&) = delete;
 
         void bind();
         static void unbind();

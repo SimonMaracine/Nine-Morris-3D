@@ -11,6 +11,11 @@ namespace al {
         Source();
         ~Source();
 
+        Source(const Source&) = delete;
+        Source& operator=(const Source&) = delete;
+        Source(Source&&) = delete;
+        Source& operator=(Source&&) = delete;
+
         void play(Buffer* buffer);
         void stop();
         void pause_playing();

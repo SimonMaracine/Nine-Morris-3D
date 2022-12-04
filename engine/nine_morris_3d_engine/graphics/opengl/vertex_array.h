@@ -11,6 +11,11 @@ namespace gl {
         VertexArray();
         ~VertexArray();
 
+        VertexArray(const VertexArray&) = delete;
+        VertexArray& operator=(const VertexArray&) = delete;
+        VertexArray(VertexArray&&) = delete;
+        VertexArray& operator=(VertexArray&&) = delete;
+
         void bind();
         static void unbind();
 

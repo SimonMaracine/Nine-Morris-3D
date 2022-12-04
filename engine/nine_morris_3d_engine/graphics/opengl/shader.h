@@ -24,6 +24,11 @@ namespace gl {
             const std::vector<std::string>& uniforms, const std::vector<UniformBlockSpecification>& uniform_blocks = {});
         ~Shader();
 
+        Shader(const Shader&) = delete;
+        Shader& operator=(const Shader&) = delete;
+        Shader(Shader&&) = delete;
+        Shader& operator=(Shader&&) = delete;
+
         void bind();
         static void unbind();
 

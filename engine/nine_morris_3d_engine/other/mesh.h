@@ -26,6 +26,12 @@ namespace mesh {
     struct Mesh {
         Mesh(const std::vector<V>& vertices, const std::vector<unsigned int>& indices)
             : vertices(vertices), indices(indices) {}
+        ~Mesh() = default;
+
+        Mesh(const Mesh&) = delete;
+        Mesh& operator=(const Mesh&) = delete;
+        Mesh(Mesh&&) = delete;
+        Mesh& operator=(Mesh&&) = delete;
 
         std::vector<V> vertices;
         std::vector<unsigned int> indices;
