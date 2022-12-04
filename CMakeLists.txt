@@ -208,7 +208,7 @@ add_subdirectory(extern/spdlog)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/assimp)
 add_subdirectory(extern/cppblowfish)
-add_subdirectory(extern/openal-soft)
+add_subdirectory(extern/openal_soft)
 
 add_dependencies(${ENGINE} glfw)  # This is necessary for some reason
 
@@ -232,7 +232,7 @@ target_include_directories(${ENGINE} SYSTEM PUBLIC
     "${CMAKE_SOURCE_DIR}/extern/cppblowfish/include"
     "${CMAKE_SOURCE_DIR}/extern/entt/src"
     "${CMAKE_SOURCE_DIR}/extern/resmanager/src"
-    "${CMAKE_SOURCE_DIR}/extern/openal-soft/include"
+    "${CMAKE_SOURCE_DIR}/extern/openal_soft/include"
 )
 
 target_include_directories(${GAME} PRIVATE
