@@ -1,15 +1,12 @@
 #include <AL/alc.h>
 
+#include "nine_morris_3d_engine/audio/openal/info_and_debug.h"
 #include "nine_morris_3d_engine/audio/context.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/exit.h"
 
-static void get_available_devices() {
-    ALCdevice* device;
-    const ALCchar* devices = alcGetString(device, ALC_DEVICE_SPECIFIER);
-
-    // TODO implement
-}
+static ALCdevice* _global_device = nullptr;
+static ALCcontext* _global_context = nullptr;
 
 OpenALContext::OpenALContext() {
     // Choose the default device
@@ -27,10 +24,18 @@ OpenALContext::OpenALContext() {
         game_exit::exit_critical();
     }
 
-    if (alcMakeContextCurrent(context) == ALC_FALSE) {  // FIXME clean up gracefully
+    if (alcMakeContextCurrent(context) == ALC_FALSE) {
+        alcDestroyContext(context);
+        alcCloseDevice(device);
+
         REL_CRITICAL("Could not make AL context current, exiting...");
         game_exit::exit_critical();
     }
+
+    al::maybe_check_errors();
+
+    _global_device = device;
+    _global_context = context;
 
     DEB_INFO("Created OpenAL device and context");
 }
@@ -40,5 +45,22 @@ OpenALContext::~OpenALContext() {
     alcDestroyContext(context);
     alcCloseDevice(device);
 
+    al::maybe_check_errors();
+
+    _global_device = nullptr;
+    _global_context = nullptr;
+
     DEB_INFO("Destroyed OpenAL context and device");
+}
+
+void destroy_openal_context() {
+    alcMakeContextCurrent(nullptr);
+
+    if (_global_context != nullptr) {
+        alcDestroyContext(_global_context);
+
+        if (_global_device != nullptr) {
+            alcCloseDevice(_global_device);
+        }
+    }
 }

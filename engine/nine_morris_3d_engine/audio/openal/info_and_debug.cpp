@@ -1,25 +1,13 @@
 #include <AL/al.h>
 
-#include "nine_morris_3d_engine/audio/debug_openal.h"
+#include "nine_morris_3d_engine/application/platform.h"
+#include "nine_morris_3d_engine/audio/openal/info_and_debug.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/exit.h"
 
-namespace debug_openal {
-    std::string get_info() {
-        std::string output;
-
-        output.append("\n*** OpenAL Version ***\n");
-
-        constexpr size_t LENGTH = 256;  // 256 should be enough
-
-        char line[LENGTH];
-        snprintf(line, LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));
-        output.append(line);
-
-        return output;
-    }
-
-    void check_errors() {
+namespace al {
+    void maybe_check_errors() {
+#ifdef PLATFORM_GAME_DEBUG
         const ALenum error = alGetError();
 
         if (error != AL_NO_ERROR) {
@@ -47,6 +35,21 @@ namespace debug_openal {
 
             game_exit::exit_critical();
         }
+#endif
+    }
+
+    std::string get_info() {
+        std::string output;
+
+        output.append("\n*** OpenAL Version ***\n");
+
+        constexpr size_t LENGTH = 256;  // 256 should be enough
+
+        char line[LENGTH];
+        snprintf(line, LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));
+        output.append(line);
+
+        return output;
     }
 
     const char* get_version() {

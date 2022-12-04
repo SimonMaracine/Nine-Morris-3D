@@ -83,16 +83,16 @@ namespace gui {
 
     class Image : public Widget {
     public:
-        Image(std::shared_ptr<Texture> texture);
+        Image(std::shared_ptr<gl::Texture> texture);
         virtual ~Image() = default;
 
         virtual void render() override;
 
-        void set_image(std::shared_ptr<Texture> texture);
+        void set_image(std::shared_ptr<gl::Texture> texture);
         void set_position(glm::vec2 position);
         void set_size(glm::vec2 size);
     private:
-        std::shared_ptr<Texture> texture;
+        std::shared_ptr<gl::Texture> texture;
     };
 
     class Text : public Widget {
@@ -135,8 +135,8 @@ public:
 
     void quad_center(float& width, float& height, float& x_pos, float& y_pos);
 
-    std::shared_ptr<Shader> get_quad2d_shader() { return storage.quad2d_shader; }
-    std::shared_ptr<Shader> get_text_shader() { return storage.text_shader; }
+    std::shared_ptr<gl::Shader> get_quad2d_shader() { return storage.quad2d_shader; }
+    std::shared_ptr<gl::Shader> get_text_shader() { return storage.text_shader; }
 private:
     void prepare_draw_image();
     void prepare_draw_text();
@@ -144,15 +144,15 @@ private:
     void on_window_resized(const WindowResizedEvent& event);
 
     struct Storage {
-        std::shared_ptr<UniformBuffer> projection_uniform_buffer;
+        std::shared_ptr<gl::UniformBuffer> projection_uniform_buffer;
 
-        UniformBlockSpecification projection_uniform_block;
+        gl::UniformBlockSpecification projection_uniform_block;
 
-        std::shared_ptr<Shader> quad2d_shader;
-        std::shared_ptr<Shader> text_shader;
+        std::shared_ptr<gl::Shader> quad2d_shader;
+        std::shared_ptr<gl::Shader> text_shader;
 
-        std::shared_ptr<VertexArray> quad2d_vertex_array;
-        std::shared_ptr<Buffer> quad2d_buffer;
+        std::shared_ptr<gl::VertexArray> quad2d_vertex_array;
+        std::shared_ptr<gl::Buffer> quad2d_buffer;
 
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
     } storage;

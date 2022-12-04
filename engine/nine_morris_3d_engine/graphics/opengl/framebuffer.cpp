@@ -9,10 +9,10 @@ static GLenum target(bool multisampled) {
     return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 }
 
-static bool depth_attachment_present(const FramebufferSpecification& specification) {
+static bool depth_attachment_present(const gl::FramebufferSpecification& specification) {
     return (
-        specification.depth_attachment.format != AttachmentFormat::None
-        && specification.depth_attachment.type != AttachmentType::None
+        specification.depth_attachment.format != gl::AttachmentFormat::None
+        && specification.depth_attachment.type != gl::AttachmentType::None
     );
 }
 
@@ -129,140 +129,36 @@ static const char* print_framebuffer_status_message(GLenum status) {
     return message;
 }
 
-Framebuffer::Framebuffer(const FramebufferSpecification& specification)
-    : specification(specification) {
-    ASSERT(
-        specification.samples == 1 || specification.samples == 2 || specification.samples == 4,
-        "Invalid sample size"
-    );
-
-    if (specification.white_border_for_depth_texture) {
-        ASSERT(specification.depth_attachment.format != AttachmentFormat::None, "Invalid configuration");
-        ASSERT(specification.depth_attachment.type == AttachmentType::Texture, "Invalid configuration");
-    }
-
-    ASSERT(specification.width > 0 && specification.height > 0, "Invalid size");
-
-    ASSERT(specification.clear_drawbuffer >= 0, "Invalid drawbuffer to clear");
-
-    if (!specification.color_attachments.empty()) {
+namespace gl {
+    Framebuffer::Framebuffer(const FramebufferSpecification& specification)
+        : specification(specification) {
         ASSERT(
-            static_cast<size_t>(specification.clear_drawbuffer) < specification.color_attachments.size(),
-            "Invalid drawbuffer to clear"
+            specification.samples == 1 || specification.samples == 2 || specification.samples == 4,
+            "Invalid sample size"
         );
-    }
 
-    build();
-
-    DEB_DEBUG("Created framebuffer {}", framebuffer);
-}
-
-Framebuffer::~Framebuffer() {
-    for (size_t i = 0; i < specification.color_attachments.size(); i++) {
-        switch (specification.color_attachments[i].type) {
-            case AttachmentType::None:
-                ASSERT(false, "Attachment type None is invalid");
-                break;
-            case AttachmentType::Texture:
-                glDeleteTextures(1, &color_attachments[i]);
-                break;
-            case AttachmentType::Renderbuffer:
-                glDeleteRenderbuffers(1, &color_attachments[i]);
-                break;
+        if (specification.white_border_for_depth_texture) {
+            ASSERT(specification.depth_attachment.format != AttachmentFormat::None, "Invalid configuration");
+            ASSERT(specification.depth_attachment.type == AttachmentType::Texture, "Invalid configuration");
         }
-    }
 
-    if (depth_attachment_present(specification)) {
-        switch (specification.depth_attachment.type) {
-            case AttachmentType::None:
-                ASSERT(false, "Attachment type None is invalid");
-                break;
-            case AttachmentType::Texture:
-                glDeleteTextures(1, &depth_attachment);
-                break;
-            case AttachmentType::Renderbuffer:
-                glDeleteRenderbuffers(1, &depth_attachment);
-                break;
+        ASSERT(specification.width > 0 && specification.height > 0, "Invalid size");
+
+        ASSERT(specification.clear_drawbuffer >= 0, "Invalid drawbuffer to clear");
+
+        if (!specification.color_attachments.empty()) {
+            ASSERT(
+                static_cast<size_t>(specification.clear_drawbuffer) < specification.color_attachments.size(),
+                "Invalid drawbuffer to clear"
+            );
         }
+
+        build();
+
+        DEB_DEBUG("Created framebuffer {}", framebuffer);
     }
 
-    glDeleteFramebuffers(1, &framebuffer);
-
-    DEB_DEBUG("Deleted framebuffer {}", framebuffer);
-}
-
-void Framebuffer::bind() {
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-}
-
-void Framebuffer::bind_default() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-GLuint Framebuffer::get_color_attachment(GLint attachment_index) {
-    ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
-
-    return color_attachments[attachment_index];
-}
-
-GLuint Framebuffer::get_depth_attachment() {
-    return depth_attachment;
-}
-
-void Framebuffer::resize(int width, int height) {
-    if (width < 1 || height < 1 || width > 8192 || height > 8192) {
-        REL_ERROR("Attempted to resize framebuffer to [{}, {}]", width, height);
-        return;
-    }
-
-    specification.width = width / specification.resize_divisor;
-    specification.height = height / specification.resize_divisor;
-
-    build();
-}
-
-float Framebuffer::read_pixel_float(GLint attachment_index, int x, int y) {
-    ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
-
-    glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
-    float pixel;
-    glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, &pixel);
-
-    return pixel;
-}
-
-void Framebuffer::read_pixel_float_pbo(GLint attachment_index, int x, int y) {
-    ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
-
-    glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
-    glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
-}
-
-void Framebuffer::clear_color_attachment_float() {
-    glClearBufferfv(GL_COLOR, specification.clear_drawbuffer, specification.clear_value);
-}
-
-void Framebuffer::blit(Framebuffer* draw_framebuffer, int width, int height) {
-    ASSERT(
-        color_attachments.size() == draw_framebuffer->color_attachments.size(),
-        "Framebuffers must have the same attachments"
-    );
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer->framebuffer);
-
-    for (size_t i = 0; i < color_attachments.size(); i++) {
-        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    }
-
-    glDrawBuffers(draw_framebuffer->color_attachments.size(), COLOR_ATTACHMENTS);
-}
-
-void Framebuffer::build() {
-    // Delete old framebuffer first
-    if (framebuffer != 0) {
+    Framebuffer::~Framebuffer() {
         for (size_t i = 0; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
@@ -293,192 +189,298 @@ void Framebuffer::build() {
 
         glDeleteFramebuffers(1, &framebuffer);
 
-        color_attachments.clear();
-        depth_attachment = 0;
+        DEB_DEBUG("Deleted framebuffer {}", framebuffer);
     }
 
-    // Then create a new framebuffer
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    void Framebuffer::bind() {
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    }
 
-    const bool multisampled = specification.samples > 1;
+    void Framebuffer::bind_default() {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 
-    color_attachments.resize(specification.color_attachments.size());
+    GLuint Framebuffer::get_color_attachment(GLint attachment_index) {
+        ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
-    for (size_t i = 0; i < specification.color_attachments.size(); i++) {
-        switch (specification.color_attachments[i].type) {
-            case AttachmentType::None:
-                ASSERT(false, "Attachment type None is invalid");
+        return color_attachments[attachment_index];
+    }
 
-                break;
-            case AttachmentType::Texture: {
-                GLuint texture;
-                glGenTextures(1, &texture);
-                glBindTexture(target(multisampled), texture);
+    GLuint Framebuffer::get_depth_attachment() {
+        return depth_attachment;
+    }
 
-                switch (specification.color_attachments[i].format) {
-                    case AttachmentFormat::None:
-                        ASSERT(false, "Attachment format None is invalid");
+    void Framebuffer::resize(int width, int height) {
+        if (width < 1 || height < 1 || width > 8192 || height > 8192) {
+            REL_ERROR("Attempted to resize framebuffer to [{}, {}]", width, height);
+            return;
+        }
+
+        specification.width = width / specification.resize_divisor;
+        specification.height = height / specification.resize_divisor;
+
+        build();
+    }
+
+    float Framebuffer::read_pixel_float(GLint attachment_index, int x, int y) {
+        ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
+
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
+        float pixel;
+        glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, &pixel);
+
+        return pixel;
+    }
+
+    void Framebuffer::read_pixel_float_pbo(GLint attachment_index, int x, int y) {
+        ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
+
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
+        glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
+    }
+
+    void Framebuffer::clear_color_attachment_float() {
+        glClearBufferfv(GL_COLOR, specification.clear_drawbuffer, specification.clear_value);
+    }
+
+    void Framebuffer::blit(Framebuffer* draw_framebuffer, int width, int height) {
+        ASSERT(
+            color_attachments.size() == draw_framebuffer->color_attachments.size(),
+            "Framebuffers must have the same attachments"
+        );
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer->framebuffer);
+
+        for (size_t i = 0; i < color_attachments.size(); i++) {
+            glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+
+        glDrawBuffers(draw_framebuffer->color_attachments.size(), COLOR_ATTACHMENTS);
+    }
+
+    void Framebuffer::build() {
+        // Delete old framebuffer first
+        if (framebuffer != 0) {
+            for (size_t i = 0; i < specification.color_attachments.size(); i++) {
+                switch (specification.color_attachments[i].type) {
+                    case AttachmentType::None:
+                        ASSERT(false, "Attachment type None is invalid");
                         break;
-                    case AttachmentFormat::RGBA8:
-                        attach_color_texture(
-                            texture, specification.samples, GL_RGBA8,
-                            specification.width, specification.height, i
-                        );
+                    case AttachmentType::Texture:
+                        glDeleteTextures(1, &color_attachments[i]);
                         break;
-                    case AttachmentFormat::RED_INT:
-                        attach_color_texture(
-                            texture, specification.samples, GL_R32I,
-                            specification.width, specification.height, i
-                        );
+                    case AttachmentType::Renderbuffer:
+                        glDeleteRenderbuffers(1, &color_attachments[i]);
                         break;
-                    case AttachmentFormat::RED_FLOAT:
-                        attach_color_texture(
-                            texture, specification.samples, GL_R32F,
-                            specification.width, specification.height, i
-                        );
-                        break;
-                    default:
-                        REL_CRITICAL("Wrong attachment format, exiting...");
-                        game_exit::exit_critical();
                 }
-
-                color_attachments[i] = texture;
-                glBindTexture(target(multisampled), 0);
-
-                break;
             }
-            case AttachmentType::Renderbuffer: {
-                GLuint renderbuffer;
-                glGenRenderbuffers(1, &renderbuffer);
-                glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
-                switch (specification.color_attachments[i].format) {
-                    case AttachmentFormat::None:
-                        ASSERT(false, "Attachment format None is invalid");
+            if (depth_attachment_present(specification)) {
+                switch (specification.depth_attachment.type) {
+                    case AttachmentType::None:
+                        ASSERT(false, "Attachment type None is invalid");
                         break;
-                    case AttachmentFormat::RGBA8:
-                        attach_color_renderbuffer(
-                            renderbuffer, specification.samples, GL_RGBA8,
-                            specification.width, specification.height, i
-                        );
+                    case AttachmentType::Texture:
+                        glDeleteTextures(1, &depth_attachment);
                         break;
-                    case AttachmentFormat::RED_INT:
-                        attach_color_renderbuffer(
-                            renderbuffer, specification.samples, GL_R32I,
-                            specification.width, specification.height, i
-                        );
+                    case AttachmentType::Renderbuffer:
+                        glDeleteRenderbuffers(1, &depth_attachment);
                         break;
-                    case AttachmentFormat::RED_FLOAT:
-                        attach_color_renderbuffer(
-                            renderbuffer, specification.samples, GL_R32F,
-                            specification.width, specification.height, i
-                        );
-                        break;
-                    default:
-                        REL_CRITICAL("Wrong attachment format, exiting...");
-                        game_exit::exit_critical();
                 }
+            }
 
-                color_attachments[i] = renderbuffer;
-                glBindRenderbuffer(GL_RENDERBUFFER, 0);
+            glDeleteFramebuffers(1, &framebuffer);
 
-                break;
+            color_attachments.clear();
+            depth_attachment = 0;
+        }
+
+        // Then create a new framebuffer
+        glGenFramebuffers(1, &framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+        const bool multisampled = specification.samples > 1;
+
+        color_attachments.resize(specification.color_attachments.size());
+
+        for (size_t i = 0; i < specification.color_attachments.size(); i++) {
+            switch (specification.color_attachments[i].type) {
+                case AttachmentType::None:
+                    ASSERT(false, "Attachment type None is invalid");
+
+                    break;
+                case AttachmentType::Texture: {
+                    GLuint texture;
+                    glGenTextures(1, &texture);
+                    glBindTexture(target(multisampled), texture);
+
+                    switch (specification.color_attachments[i].format) {
+                        case AttachmentFormat::None:
+                            ASSERT(false, "Attachment format None is invalid");
+                            break;
+                        case AttachmentFormat::RGBA8:
+                            attach_color_texture(
+                                texture, specification.samples, GL_RGBA8,
+                                specification.width, specification.height, i
+                            );
+                            break;
+                        case AttachmentFormat::RED_INT:
+                            attach_color_texture(
+                                texture, specification.samples, GL_R32I,
+                                specification.width, specification.height, i
+                            );
+                            break;
+                        case AttachmentFormat::RED_FLOAT:
+                            attach_color_texture(
+                                texture, specification.samples, GL_R32F,
+                                specification.width, specification.height, i
+                            );
+                            break;
+                        default:
+                            REL_CRITICAL("Wrong attachment format, exiting...");
+                            game_exit::exit_critical();
+                    }
+
+                    color_attachments[i] = texture;
+                    glBindTexture(target(multisampled), 0);
+
+                    break;
+                }
+                case AttachmentType::Renderbuffer: {
+                    GLuint renderbuffer;
+                    glGenRenderbuffers(1, &renderbuffer);
+                    glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
+
+                    switch (specification.color_attachments[i].format) {
+                        case AttachmentFormat::None:
+                            ASSERT(false, "Attachment format None is invalid");
+                            break;
+                        case AttachmentFormat::RGBA8:
+                            attach_color_renderbuffer(
+                                renderbuffer, specification.samples, GL_RGBA8,
+                                specification.width, specification.height, i
+                            );
+                            break;
+                        case AttachmentFormat::RED_INT:
+                            attach_color_renderbuffer(
+                                renderbuffer, specification.samples, GL_R32I,
+                                specification.width, specification.height, i
+                            );
+                            break;
+                        case AttachmentFormat::RED_FLOAT:
+                            attach_color_renderbuffer(
+                                renderbuffer, specification.samples, GL_R32F,
+                                specification.width, specification.height, i
+                            );
+                            break;
+                        default:
+                            REL_CRITICAL("Wrong attachment format, exiting...");
+                            game_exit::exit_critical();
+                    }
+
+                    color_attachments[i] = renderbuffer;
+                    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+                    break;
+                }
             }
         }
-    }
 
-    if (depth_attachment_present(specification)) {
-        switch (specification.depth_attachment.type) {
-            case AttachmentType::None:
-                ASSERT(false, "Attachment type None is invalid");
+        if (depth_attachment_present(specification)) {
+            switch (specification.depth_attachment.type) {
+                case AttachmentType::None:
+                    ASSERT(false, "Attachment type None is invalid");
 
-                break;
-            case AttachmentType::Texture: {
-                GLuint texture;
-                glGenTextures(1, &texture);
-                glBindTexture(target(multisampled), texture);
+                    break;
+                case AttachmentType::Texture: {
+                    GLuint texture;
+                    glGenTextures(1, &texture);
+                    glBindTexture(target(multisampled), texture);
 
-                switch (specification.depth_attachment.format) {
-                    case AttachmentFormat::None:
-                        ASSERT(false, "Attachment format None is invalid");
-                        break;
-                    case AttachmentFormat::DEPTH24_STENCIL8:
-                        attach_depth_texture(
-                            texture, specification.samples,
-                            GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
-                            specification.height, specification.white_border_for_depth_texture
-                        );
-                        break;
-                    case AttachmentFormat::DEPTH32:
-                        attach_depth_texture(
-                            texture, specification.samples,
-                            GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT, specification.width,
-                            specification.height, specification.white_border_for_depth_texture
-                        );
-                        break;
-                    default:
-                        REL_CRITICAL("Wrong attachment format, exiting...");
-                        game_exit::exit_critical();
+                    switch (specification.depth_attachment.format) {
+                        case AttachmentFormat::None:
+                            ASSERT(false, "Attachment format None is invalid");
+                            break;
+                        case AttachmentFormat::DEPTH24_STENCIL8:
+                            attach_depth_texture(
+                                texture, specification.samples,
+                                GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
+                                specification.height, specification.white_border_for_depth_texture
+                            );
+                            break;
+                        case AttachmentFormat::DEPTH32:
+                            attach_depth_texture(
+                                texture, specification.samples,
+                                GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT, specification.width,
+                                specification.height, specification.white_border_for_depth_texture
+                            );
+                            break;
+                        default:
+                            REL_CRITICAL("Wrong attachment format, exiting...");
+                            game_exit::exit_critical();
+                    }
+
+                    depth_attachment = texture;
+                    glBindTexture(target(multisampled), 0);
+
+                    break;
                 }
+                case AttachmentType::Renderbuffer: {
+                    GLuint renderbuffer;
+                    glGenRenderbuffers(1, &renderbuffer);
+                    glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
-                depth_attachment = texture;
-                glBindTexture(target(multisampled), 0);
+                    switch (specification.depth_attachment.format) {
+                        case AttachmentFormat::None:
+                            ASSERT(false, "Attachment format None is invalid");
+                            break;
+                        case AttachmentFormat::DEPTH24_STENCIL8:
+                            attach_depth_renderbuffer(
+                                renderbuffer, specification.samples,
+                                GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT,
+                                specification.width, specification.height
+                            );
+                            break;
+                        case AttachmentFormat::DEPTH32:
+                            attach_depth_renderbuffer(
+                                renderbuffer, specification.samples,
+                                GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT,
+                                specification.width, specification.height
+                            );
+                            break;
+                        default:
+                            REL_CRITICAL("Wrong attachment format, exiting...");
+                            game_exit::exit_critical();
+                    }
 
-                break;
-            }
-            case AttachmentType::Renderbuffer: {
-                GLuint renderbuffer;
-                glGenRenderbuffers(1, &renderbuffer);
-                glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
+                    depth_attachment = renderbuffer;
+                    glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-                switch (specification.depth_attachment.format) {
-                    case AttachmentFormat::None:
-                        ASSERT(false, "Attachment format None is invalid");
-                        break;
-                    case AttachmentFormat::DEPTH24_STENCIL8:
-                        attach_depth_renderbuffer(
-                            renderbuffer, specification.samples,
-                            GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT,
-                            specification.width, specification.height
-                        );
-                        break;
-                    case AttachmentFormat::DEPTH32:
-                        attach_depth_renderbuffer(
-                            renderbuffer, specification.samples,
-                            GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT,
-                            specification.width, specification.height
-                        );
-                        break;
-                    default:
-                        REL_CRITICAL("Wrong attachment format, exiting...");
-                        game_exit::exit_critical();
+                    break;
                 }
-
-                depth_attachment = renderbuffer;
-                glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-                break;
             }
         }
+
+        if (color_attachments.size() > 1) {
+            ASSERT(color_attachments.size() <= 4, "Currently there can be maximum 4 color attachments");
+
+            glDrawBuffers(color_attachments.size(), COLOR_ATTACHMENTS);
+        } else if (color_attachments.empty()) {
+            glDrawBuffer(GL_NONE);  // TODO what is this?
+            glReadBuffer(GL_NONE);
+        }
+
+        const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+        if (status != GL_FRAMEBUFFER_COMPLETE) {
+            REL_CRITICAL("Framebuffer {} is incomplete, exiting...", framebuffer);
+            REL_CRITICAL("Framebuffer status: {}", print_framebuffer_status_message(status));
+            game_exit::exit_critical();
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
-
-    if (color_attachments.size() > 1) {
-        ASSERT(color_attachments.size() <= 4, "Currently there can be maximum 4 color attachments");
-
-        glDrawBuffers(color_attachments.size(), COLOR_ATTACHMENTS);
-    } else if (color_attachments.empty()) {
-        glDrawBuffer(GL_NONE);  // TODO what is this?
-        glReadBuffer(GL_NONE);
-    }
-
-    const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-        REL_CRITICAL("Framebuffer {} is incomplete, exiting...", framebuffer);
-        REL_CRITICAL("Framebuffer status: {}", print_framebuffer_status_message(status));
-        game_exit::exit_critical();
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

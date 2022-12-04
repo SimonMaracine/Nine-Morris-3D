@@ -26,15 +26,15 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
     }
     sf = stbtt_ScaleForPixelHeight(&info, size);
 
-    buffer = std::make_shared<Buffer>(1, DrawHint::Stream);
+    buffer = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Float, 2);
     layout.add(1, BufferLayout::Float, 2);
 
-    vertex_array = std::make_shared<VertexArray>();
+    vertex_array = std::make_shared<gl::VertexArray>();
     vertex_array->add_buffer(buffer, layout);
-    VertexArray::unbind();
+    gl::VertexArray::unbind();
 
     name = get_name(file_path);
 

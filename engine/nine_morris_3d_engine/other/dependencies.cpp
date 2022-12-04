@@ -15,7 +15,7 @@
 static constexpr size_t BUFFER_LENGTH = 128;
 
 namespace dependencies {
-	std::string get_info() {
+    std::string get_info() {
         std::string output;
 
         output.append("\n*** Compiler ***\n");
@@ -90,6 +90,11 @@ namespace dependencies {
         }
         {
             char line[BUFFER_LENGTH];
+            snprintf(line, BUFFER_LENGTH, "OpenAL Soft\n");
+            output.append(line);
+        }
+        {
+            char line[BUFFER_LENGTH];
             snprintf(line, BUFFER_LENGTH, "glad\n");
             output.append(line);
         }
@@ -118,12 +123,7 @@ namespace dependencies {
             snprintf(line, BUFFER_LENGTH, "utfcpp\n");
             output.append(line);
         }
-        {
-            char line[BUFFER_LENGTH];
-            snprintf(line, BUFFER_LENGTH, "OpenAL Soft\n");
-            output.append(line);
-        }
 
         return output;
-	}
+    }
 }

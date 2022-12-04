@@ -63,7 +63,7 @@ namespace gui {
 
     Application* Widget::app = nullptr;
 
-    Image::Image(std::shared_ptr<Texture> texture)
+    Image::Image(std::shared_ptr<gl::Texture> texture)
         : texture(texture) {
         type = WidgetType::Image;
         size.x = texture->get_width();
@@ -82,7 +82,7 @@ namespace gui {
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
-    void Image::set_image(std::shared_ptr<Texture> texture) {
+    void Image::set_image(std::shared_ptr<gl::Texture> texture) {
         this->texture = texture;
         size.x = texture->get_width();
         size.y = texture->get_height();
@@ -169,7 +169,7 @@ namespace gui {
 
 GuiRenderer::GuiRenderer(Application* app)
     : app(app) {
-    storage.projection_uniform_buffer = std::make_shared<UniformBuffer>();
+    storage.projection_uniform_buffer = std::make_shared<gl::UniformBuffer>();
 
     storage.projection_uniform_block.block_name = "Projection";
     storage.projection_uniform_block.field_count = 1;
@@ -180,7 +180,7 @@ GuiRenderer::GuiRenderer(Application* app)
     using namespace encrypt;
 
     {
-        storage.quad2d_shader = std::make_shared<Shader>(
+        storage.quad2d_shader = std::make_shared<gl::Shader>(
             encr(path::path_for_assets(QUAD2D_VERTEX_SHADER)),
             encr(path::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix", "u_texture" },
@@ -189,7 +189,7 @@ GuiRenderer::GuiRenderer(Application* app)
     }
 
     {
-        storage.text_shader = std::make_shared<Shader>(
+        storage.text_shader = std::make_shared<gl::Shader>(
             encr(path::path_for_assets(TEXT_VERTEX_SHADER)),
             encr(path::path_for_assets(TEXT_FRAGMENT_SHADER)),
             std::vector<std::string> {
@@ -213,13 +213,12 @@ GuiRenderer::GuiRenderer(Application* app)
             1.0f, 0.0f
         };
 
-        storage.quad2d_buffer = std::make_shared<Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
+        storage.quad2d_buffer = std::make_shared<gl::Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Float, 2);
-        storage.quad2d_vertex_array = std::make_shared<VertexArray>();
+        storage.quad2d_vertex_array = std::make_shared<gl::VertexArray>();
         storage.quad2d_vertex_array->add_buffer(storage.quad2d_buffer, layout);
-
-        VertexArray::unbind();
+        gl::VertexArray::unbind();
     }
 
     storage.orthographic_projection_matrix = glm::ortho(
@@ -234,8 +233,7 @@ GuiRenderer::GuiRenderer(Application* app)
 
     storage.quad2d_shader->bind();
     storage.quad2d_shader->upload_uniform_int("u_texture", 0);
-
-    Shader::unbind();
+    gl::Shader::unbind();
 
     // Setup events
     app->evt.sink<WindowResizedEvent>().connect<&GuiRenderer::on_window_resized>(this);

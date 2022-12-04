@@ -99,20 +99,20 @@ static void setup_post_processing(Application* app) {
     using namespace encrypt;
 
     {
-        FramebufferSpecification specification;
+        gl::FramebufferSpecification specification;
         specification.width = app->data().width / 2;
         specification.height = app->data().height / 2;
         specification.resize_divisor = 2;
         specification.color_attachments = {
-            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
+            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
         };
 
-        auto framebuffer = std::make_shared<Framebuffer>(specification);
+        auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
         app->purge_framebuffers();
         app->add_framebuffer(framebuffer);
 
-        auto shader = std::make_shared<Shader>(
+        auto shader = std::make_shared<gl::Shader>(
             encr(path_for_assets(BRIGHT_FILTER_VERTEX_SHADER)),
             encr(path_for_assets(BRIGHT_FILTER_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_screen_texture" }
@@ -121,22 +121,22 @@ static void setup_post_processing(Application* app) {
         app->renderer->add_post_processing(std::make_unique<BrightFilter>("bright_filter", framebuffer, shader));
     }
 
-    auto blur_shader = std::make_shared<Shader>(
+    auto blur_shader = std::make_shared<gl::Shader>(
         encr(path_for_assets(BLUR_VERTEX_SHADER)),
         encr(path_for_assets(BLUR_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_screen_texture" }
     );
 
     {
-        FramebufferSpecification specification;
+        gl::FramebufferSpecification specification;
         specification.width = app->data().width / 4;
         specification.height = app->data().height / 4;
         specification.resize_divisor = 4;
         specification.color_attachments = {
-            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
+            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
         };
 
-        auto framebuffer = std::make_shared<Framebuffer>(specification);
+        auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
         app->purge_framebuffers();
         app->add_framebuffer(framebuffer);
@@ -144,15 +144,15 @@ static void setup_post_processing(Application* app) {
         app->renderer->add_post_processing(std::make_unique<Blur>("blur1", framebuffer, blur_shader));
     }
     {
-        FramebufferSpecification specification;
+        gl::FramebufferSpecification specification;
         specification.width = app->data().width / 8;
         specification.height = app->data().height / 8;
         specification.resize_divisor = 8;
         specification.color_attachments = {
-            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
+            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
         };
 
-        auto framebuffer = std::make_shared<Framebuffer>(specification);
+        auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
         app->purge_framebuffers();
         app->add_framebuffer(framebuffer);
@@ -160,16 +160,16 @@ static void setup_post_processing(Application* app) {
         app->renderer->add_post_processing(std::make_unique<Blur>("blur2", framebuffer, blur_shader));
     }
     {
-        FramebufferSpecification specification;
+        gl::FramebufferSpecification specification;
         specification.width = app->data().width;
         specification.height = app->data().height;
         specification.color_attachments = {
-            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture)
+            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
         };
 
-        auto framebuffer = std::make_shared<Framebuffer>(specification);
+        auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
-        auto shader = std::make_shared<Shader>(
+        auto shader = std::make_shared<gl::Shader>(
             encr(path_for_assets(COMBINE_VERTEX_SHADER)),
             encr(path_for_assets(COMBINE_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_screen_texture", "u_bright_texture", "u_strength" }

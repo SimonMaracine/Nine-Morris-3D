@@ -1,6 +1,7 @@
 #include <AL/al.h>
 
 #include "nine_morris_3d_engine/audio/openal/buffer.h"
+#include "nine_morris_3d_engine/audio/openal/info_and_debug.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/exit.h"
 
@@ -28,11 +29,15 @@ namespace al {
         alGenBuffers(1, &buffer);
         alBufferData(buffer, get_format(channels, bps), data, size, frequency);
 
+        maybe_check_errors();
+
         DEB_DEBUG("Created AL buffer {}", buffer);
     }
 
     Buffer::~Buffer() {
         alDeleteBuffers(1, &buffer);
+
+        maybe_check_errors();
 
         DEB_DEBUG("Deleted AL buffer {}", buffer);
     }

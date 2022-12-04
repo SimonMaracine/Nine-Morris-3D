@@ -1,6 +1,7 @@
 #include <AL/al.h>
 
 #include "nine_morris_3d_engine/audio/openal/source.h"
+#include "nine_morris_3d_engine/audio/openal/info_and_debug.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
 namespace al {
@@ -11,6 +12,8 @@ namespace al {
         alSource3f(source, AL_POSITION, 0.0f, 0.0f, 0.0f);
         alSource3f(source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
         alSourcei(source, AL_LOOPING, AL_FALSE);
+
+        maybe_check_errors();
 
         DEB_DEBUG("Created AL source {}", source);
     }
@@ -24,9 +27,13 @@ namespace al {
     void Source::play(Buffer* buffer) {
         alSourcei(source, AL_BUFFER, buffer->buffer);
         alSourcePlay(source);
+
+        maybe_check_errors();
     }
 
     void Source::stop() {
         alSourceStop(source);
+
+        maybe_check_errors();
     }
 }

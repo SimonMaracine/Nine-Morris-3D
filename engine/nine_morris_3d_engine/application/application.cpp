@@ -1,6 +1,4 @@
 #include <imgui.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <backends/imgui_impl_glfw.h>
 
 #include "nine_morris_3d_engine/application/application.h"
 #include "nine_morris_3d_engine/application/window.h"
@@ -11,7 +9,8 @@
 #include "nine_morris_3d_engine/audio/context.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
-#include "nine_morris_3d_engine/graphics/debug_opengl.h"
+#include "nine_morris_3d_engine/graphics/opengl/info_and_debug.h"
+#include "nine_morris_3d_engine/graphics/imgui_context.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
@@ -47,9 +46,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     if (builder.renderer_imgui) {
         DEB_INFO("With renderer ImGui");
 
-        ImGui::CreateContext();
-        ImGui_ImplOpenGL3_Init("#version 430 core");
-        ImGui_ImplGlfw_InitForOpenGL(window->get_handle(), false);
+        imgui_context::initialize(window);
 
         renderer_imgui = std::bind(&Application::renderer_imgui_functionality, this);
 
@@ -64,11 +61,11 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 #endif
 
     input::initialize(window->get_handle());
-    debug_opengl::maybe_initialize_debugging();
+    gl::maybe_initialize_debugging();
     encrypt::initialize(builder.encryption_key);
     identifier::initialize();
 
-    const auto [version_major, version_minor] = debug_opengl::get_version_number();
+    const auto [version_major, version_minor] = gl::get_version_number();
     REL_INFO("Using OpenGL version {}.{}", version_major, version_minor);
 
     if (builder.renderer_3d) {
@@ -106,9 +103,7 @@ Application::~Application() {
     stop(this);
 
     if (builder.renderer_imgui) {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
+        imgui_context::uninitialize();
     }
 }
 
@@ -170,7 +165,7 @@ void Application::change_scene(std::string_view name) {
     ASSERT(false, "Scene not found");
 }
 
-void Application::add_framebuffer(std::shared_ptr<Framebuffer> framebuffer) {
+void Application::add_framebuffer(std::shared_ptr<gl::Framebuffer> framebuffer) {
     framebuffers.push_back(framebuffer);
 }
 
@@ -256,15 +251,11 @@ void Application::renderer_2d_functionality() {
 }
 
 void Application::renderer_imgui_functionality() {
-    ImGui_ImplGlfw_NewFrame();
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui::NewFrame();
+    imgui_context::begin_frame();
 
     current_scene->on_imgui_update();
 
-    ImGui::EndFrame();
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    imgui_context::end_frame();
 }
 
 void Application::prepare_scenes() {
@@ -288,8 +279,8 @@ void Application::on_window_closed(const WindowClosedEvent&) {
 void Application::on_window_resized(const WindowResizedEvent& event) {
     render_helpers::viewport(event.width, event.height);
 
-    for (std::weak_ptr<Framebuffer> framebuffer : framebuffers) {
-        std::shared_ptr<Framebuffer> fb = framebuffer.lock();
+    for (std::weak_ptr<gl::Framebuffer> framebuffer : framebuffers) {
+        std::shared_ptr<gl::Framebuffer> fb = framebuffer.lock();
         if (fb != nullptr) {
             if (fb->get_specification().resizable) {
                 fb->resize(event.width, event.height);

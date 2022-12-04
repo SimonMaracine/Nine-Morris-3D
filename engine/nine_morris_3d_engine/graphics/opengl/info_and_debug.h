@@ -3,7 +3,7 @@
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
-namespace debug_opengl {
+namespace gl {
     void maybe_initialize_debugging();
 
     // Get various information about OpenGL

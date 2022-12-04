@@ -47,7 +47,7 @@ TextureData::~TextureData() {
     DEB_DEBUG("Freed texture data `{}`", file_path);
 }
 
-Image TextureData::get_data() {
+TextureData::Image TextureData::get_data() {
     Image image;
     image.width = width;
     image.height = height;

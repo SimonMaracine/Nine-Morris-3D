@@ -2,7 +2,7 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/application/capabilities.h"
-#include "nine_morris_3d_engine/graphics/debug_opengl.h"
+#include "nine_morris_3d_engine/graphics/opengl/info_and_debug.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/assert.h"
 #include "nine_morris_3d_engine/other/exit.h"
@@ -49,7 +49,6 @@ static constexpr const char* names[] = {
 
 static constexpr size_t BUFFER_LENGTH = 128;
 
-namespace debug_opengl {
 #if 0
     static const std::string parse_version(int version) {
         int major, minor, patch;
@@ -127,6 +126,7 @@ namespace debug_opengl {
     }
 #endif
 
+namespace gl {
     void maybe_initialize_debugging() {
 #ifdef PLATFORM_GAME_DEBUG
         glDebugMessageCallback(error_callback, nullptr);

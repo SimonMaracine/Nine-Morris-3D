@@ -32,7 +32,7 @@ struct StandardGameScene : public Scene {
     void on_key_released(const KeyReleasedEvent& event);
     void on_window_resized(const WindowResizedEvent& event);
 
-    std::shared_ptr<Buffer> create_id_buffer(size_t vertices_size, identifier::Id id, hs hash);
+    std::shared_ptr<gl::Buffer> create_id_buffer(size_t vertices_size, identifier::Id id, hs hash);
 
     void initialize_rendering_board();
     void initialize_rendering_board_paint();
@@ -40,11 +40,11 @@ struct StandardGameScene : public Scene {
     void initialize_rendering_piece(
         size_t index,
         std::shared_ptr<Mesh<PTNT>> mesh,
-        std::shared_ptr<Texture> diffuse_texture,
-        std::shared_ptr<Buffer> vertex_buffer,
-        std::shared_ptr<IndexBuffer> index_buffer);
+        std::shared_ptr<gl::Texture> diffuse_texture,
+        std::shared_ptr<gl::Buffer> vertex_buffer,
+        std::shared_ptr<gl::IndexBuffer> index_buffer);
     void initialize_rendering_nodes();
-    void initialize_rendering_node(size_t index, std::shared_ptr<Buffer> vertex_buffer, std::shared_ptr<IndexBuffer> index_buffer);
+    void initialize_rendering_node(size_t index, std::shared_ptr<gl::Buffer> vertex_buffer, std::shared_ptr<gl::IndexBuffer> index_buffer);
 
     void initialize_rendering_board_no_normal();
     void initialize_rendering_board_paint_no_normal();
@@ -52,9 +52,9 @@ struct StandardGameScene : public Scene {
     void initialize_rendering_piece_no_normal(
         size_t index,
         std::shared_ptr<Mesh<PTN>> mesh,
-        std::shared_ptr<Texture> diffuse_texture,
-        std::shared_ptr<Buffer> vertex_buffer,
-        std::shared_ptr<IndexBuffer> index_buffer);
+        std::shared_ptr<gl::Texture> diffuse_texture,
+        std::shared_ptr<gl::Buffer> vertex_buffer,
+        std::shared_ptr<gl::IndexBuffer> index_buffer);
 
     void initialize_rendering_keyboard_controls();
     void initialize_rendering_light_bulb();
@@ -62,7 +62,7 @@ struct StandardGameScene : public Scene {
     void setup_and_add_model_board();
     void setup_and_add_model_board_paint();
     void setup_and_add_model_pieces();
-    void setup_and_add_model_piece(size_t index, const glm::vec3& position, std::shared_ptr<IndexBuffer> index_buffer);
+    void setup_and_add_model_piece(size_t index, const glm::vec3& position, std::shared_ptr<gl::IndexBuffer> index_buffer);
     void setup_and_add_model_nodes();
     void setup_and_add_model_node(size_t index, const glm::vec3& position);
 

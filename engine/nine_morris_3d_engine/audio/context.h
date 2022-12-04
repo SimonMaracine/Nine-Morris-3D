@@ -16,3 +16,5 @@ private:
     ALCdevice* device = nullptr;
     ALCcontext* context = nullptr;
 };
+
+void destroy_openal_context();

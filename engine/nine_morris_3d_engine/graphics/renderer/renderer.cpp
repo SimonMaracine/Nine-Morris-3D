@@ -34,10 +34,10 @@ Renderer::Renderer(Application* app)
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
 
-    storage.projection_view_uniform_buffer = std::make_shared<UniformBuffer>();
-    storage.light_uniform_buffer = std::make_shared<UniformBuffer>();
-    storage.light_view_position_uniform_buffer = std::make_shared<UniformBuffer>();
-    storage.light_space_uniform_buffer = std::make_shared<UniformBuffer>();
+    storage.projection_view_uniform_buffer = std::make_shared<gl::UniformBuffer>();
+    storage.light_uniform_buffer = std::make_shared<gl::UniformBuffer>();
+    storage.light_view_position_uniform_buffer = std::make_shared<gl::UniformBuffer>();
+    storage.light_space_uniform_buffer = std::make_shared<gl::UniformBuffer>();
 
     storage.projection_view_uniform_block.block_name = "ProjectionView";
     storage.projection_view_uniform_block.field_count = 1;
@@ -73,7 +73,7 @@ Renderer::Renderer(Application* app)
     using namespace encrypt;
 
     {
-        storage.skybox_shader = std::make_shared<Shader>(
+        storage.skybox_shader = std::make_shared<gl::Shader>(
             encr(path::path_for_assets(SKYBOX_VERTEX_SHADER)),
             encr(path::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_projection_view_matrix", "u_skybox" }
@@ -81,7 +81,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        storage.screen_quad_shader = std::make_shared<Shader>(
+        storage.screen_quad_shader = std::make_shared<gl::Shader>(
             encr(path::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
             encr(path::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_screen_texture" }
@@ -89,7 +89,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        storage.quad3d_shader = std::make_shared<Shader>(
+        storage.quad3d_shader = std::make_shared<gl::Shader>(
             encr(path::path_for_assets(QUAD3D_VERTEX_SHADER)),
             encr(path::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
             std::vector<std::string> {
@@ -102,7 +102,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        storage.shadow_shader = std::make_shared<Shader>(
+        storage.shadow_shader = std::make_shared<gl::Shader>(
             encr(path::path_for_assets(SHADOW_VERTEX_SHADER)),
             encr(path::path_for_assets(SHADOW_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix" },
@@ -111,7 +111,7 @@ Renderer::Renderer(Application* app)
     }
 
     {
-        storage.outline_shader = std::make_shared<Shader>(
+        storage.outline_shader = std::make_shared<gl::Shader>(
             encr(path::path_for_assets(OUTLINE_VERTEX_SHADER)),
             encr(path::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix", "u_color" },
@@ -121,7 +121,7 @@ Renderer::Renderer(Application* app)
 
 #ifdef PLATFORM_GAME_DEBUG
     {
-        storage.origin_shader = std::make_shared<Shader>(
+        storage.origin_shader = std::make_shared<gl::Shader>(
             path::path_for_assets(ORIGIN_VERTEX_SHADER),
             path::path_for_assets(ORIGIN_FRAGMENT_SHADER),
             std::vector<std::string> { "u_projection_view_matrix" }
@@ -130,12 +130,12 @@ Renderer::Renderer(Application* app)
 #endif
 
     {
-        storage.skybox_buffer = std::make_shared<Buffer>(SKYBOX_VERTICES, sizeof(SKYBOX_VERTICES));
+        storage.skybox_buffer = std::make_shared<gl::Buffer>(gl::CUBEMAP_VERTICES, sizeof(gl::CUBEMAP_VERTICES));
         BufferLayout layout;
         layout.add(0, BufferLayout::Float, 3);
-        storage.skybox_vertex_array = std::make_shared<VertexArray>();
+        storage.skybox_vertex_array = std::make_shared<gl::VertexArray>();
         storage.skybox_vertex_array->add_buffer(storage.skybox_buffer, layout);
-        VertexArray::unbind();
+        gl::VertexArray::unbind();
     }
 
     {
@@ -148,12 +148,12 @@ Renderer::Renderer(Application* app)
              1.0f, -1.0f,
         };
 
-        storage.screen_quad_buffer = std::make_shared<Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
+        storage.screen_quad_buffer = std::make_shared<gl::Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Float, 2);
-        storage.screen_quad_vertex_array = std::make_shared<VertexArray>();
+        storage.screen_quad_vertex_array = std::make_shared<gl::VertexArray>();
         storage.screen_quad_vertex_array->add_buffer(storage.screen_quad_buffer, layout);
-        VertexArray::unbind();
+        gl::VertexArray::unbind();
     }
 
     {
@@ -166,13 +166,13 @@ Renderer::Renderer(Application* app)
              1.0f, -1.0f,    1.0f, 0.0f
         };
 
-        storage.quad_buffer = std::make_shared<Buffer>(quad_vertices, sizeof(quad_vertices));
+        storage.quad_buffer = std::make_shared<gl::Buffer>(quad_vertices, sizeof(quad_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Float, 2);
         layout.add(1, BufferLayout::Float, 2);
-        storage.quad_vertex_array = std::make_shared<VertexArray>();
+        storage.quad_vertex_array = std::make_shared<gl::VertexArray>();
         storage.quad_vertex_array->add_buffer(storage.quad_buffer, layout);
-        VertexArray::unbind();
+        gl::VertexArray::unbind();
     }
 
 #ifdef PLATFORM_GAME_DEBUG
@@ -186,36 +186,36 @@ Renderer::Renderer(Application* app)
               0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
         };
 
-        storage.origin_buffer = std::make_shared<Buffer>(origin_vertices, sizeof(origin_vertices));
+        storage.origin_buffer = std::make_shared<gl::Buffer>(origin_vertices, sizeof(origin_vertices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Float, 3);
         layout.add(1, BufferLayout::Float, 3);
-        storage.origin_vertex_array = std::make_shared<VertexArray>();
+        storage.origin_vertex_array = std::make_shared<gl::VertexArray>();
         storage.origin_vertex_array->add_buffer(storage.origin_buffer, layout);
-        VertexArray::unbind();
+        gl::VertexArray::unbind();
     }
 #endif
 
     {
-        FramebufferSpecification specification;
+        gl::FramebufferSpecification specification;
         specification.width = app->data().width;
         specification.height = app->data().height;
         specification.color_attachments = {
-            Attachment(AttachmentFormat::RGBA8, AttachmentType::Texture),
-            Attachment(AttachmentFormat::RED_FLOAT, AttachmentType::Renderbuffer)
+            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture},
+            gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Renderbuffer}
         };
 
-        storage.intermediate_framebuffer = std::make_shared<Framebuffer>(specification);
+        storage.intermediate_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
         app->purge_framebuffers();
         app->add_framebuffer(storage.intermediate_framebuffer);
     }
 
     storage.pixel_buffers = {
-        std::make_shared<PixelBuffer>(sizeof(float)),
-        std::make_shared<PixelBuffer>(sizeof(float)),
-        std::make_shared<PixelBuffer>(sizeof(float)),
-        std::make_shared<PixelBuffer>(sizeof(float))
+        std::make_shared<gl::PixelBuffer>(sizeof(float)),
+        std::make_shared<gl::PixelBuffer>(sizeof(float)),
+        std::make_shared<gl::PixelBuffer>(sizeof(float)),
+        std::make_shared<gl::PixelBuffer>(sizeof(float))
     };
 
     framebuffer_reader = FramebufferReader<4> {storage.pixel_buffers, storage.intermediate_framebuffer};
@@ -228,7 +228,7 @@ Renderer::Renderer(Application* app)
     storage.quad3d_shader->upload_uniform_int("u_texture", 0);
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
 
-    Shader::unbind();
+    gl::Shader::unbind();
 
     // Setup events
     app->evt.sink<WindowResizedEvent>().connect<&Renderer::on_window_resized>(this);
@@ -354,13 +354,13 @@ void Renderer::clear() {
     quads.clear();
 }
 
-void Renderer::setup_shader(std::shared_ptr<Shader> shader) {
+void Renderer::setup_shader(std::shared_ptr<gl::Shader> shader) {
     const auto& uniforms = shader->get_uniforms();
 
     if (std::find(uniforms.begin(), uniforms.end(), "u_shadow_map") != uniforms.end()) {
         shader->bind();
         shader->upload_uniform_int("u_shadow_map", SHADOW_MAP_UNIT);
-        Shader::unbind();
+        gl::Shader::unbind();
     }
 }
 
@@ -372,22 +372,22 @@ void Renderer::add_post_processing(std::unique_ptr<PostProcessingStep>&& post_pr
 void Renderer::set_scene_framebuffer(int samples) {
     ASSERT(samples > 0, "Samples must be greater than 0");
 
-    FramebufferSpecification specification;
+    gl::FramebufferSpecification specification;
     specification.width = app->data().width;
     specification.height = app->data().height;
     specification.samples = samples;
     specification.color_attachments = {
-        Attachment(AttachmentFormat::RGBA8, AttachmentType::Renderbuffer),
-        Attachment(AttachmentFormat::RED_FLOAT, AttachmentType::Renderbuffer)
+        gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Renderbuffer},
+        gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Renderbuffer}
     };
-    specification.depth_attachment = Attachment(
-        AttachmentFormat::DEPTH24_STENCIL8, AttachmentType::Renderbuffer
-    );
+    specification.depth_attachment = gl::Attachment {
+        gl::AttachmentFormat::DEPTH24_STENCIL8, gl::AttachmentType::Renderbuffer
+    };
     static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     specification.clear_drawbuffer = 1;
     specification.clear_value = color;
 
-    storage.scene_framebuffer = std::make_shared<Framebuffer>(specification);
+    storage.scene_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
     app->purge_framebuffers();
     app->add_framebuffer(storage.scene_framebuffer);
@@ -398,20 +398,20 @@ void Renderer::set_shadow_map_framebuffer(int size) {
 
     shadow_map_size = size;
 
-    FramebufferSpecification specification;
+    gl::FramebufferSpecification specification;
     specification.width = shadow_map_size;
     specification.height = shadow_map_size;
-    specification.depth_attachment = Attachment(AttachmentFormat::DEPTH32, AttachmentType::Texture);
+    specification.depth_attachment = gl::Attachment {gl::AttachmentFormat::DEPTH32, gl::AttachmentType::Texture};
     specification.white_border_for_depth_texture = true;
     specification.resizable = false;
 
-    storage.shadow_map_framebuffer = std::make_shared<Framebuffer>(specification);
+    storage.shadow_map_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
     app->purge_framebuffers();
     app->add_framebuffer(storage.shadow_map_framebuffer);
 }
 
-void Renderer::set_skybox(std::shared_ptr<Texture3D> texture) {
+void Renderer::set_skybox(std::shared_ptr<gl::Texture3D> texture) {
     storage.skybox_texture = texture;
 }
 
@@ -444,7 +444,7 @@ void Renderer::post_processing() {
 
     for (size_t i = 0; i < post_processing_context.steps.size(); i++) {
         const PostProcessingStep* step = post_processing_context.steps[i].get();
-        const FramebufferSpecification& specification = step->framebuffer->get_specification();
+        const gl::FramebufferSpecification& specification = step->framebuffer->get_specification();
 
         step->framebuffer->bind();
         glClear(GL_COLOR_BUFFER_BIT);
@@ -468,7 +468,7 @@ void Renderer::end_rendering() {
     post_processing();
 
     // Draw the final result to the screen
-    Framebuffer::bind_default();
+    gl::Framebuffer::bind_default();
     glClear(GL_COLOR_BUFFER_BIT);
     draw_screen_quad(post_processing_context.last_texture);
 

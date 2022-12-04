@@ -41,7 +41,7 @@ public:
     void change_scene(std::string_view name);
 
     // Framebuffer management functions
-    void add_framebuffer(std::shared_ptr<Framebuffer> framebuffer);
+    void add_framebuffer(std::shared_ptr<gl::Framebuffer> framebuffer);
     void purge_framebuffers();
 
     // Data management
@@ -109,7 +109,7 @@ private:
     std::function<void()> renderer_imgui = DummyFunction {};
 
     // Keep track of all framebuffers to resize them, if needed
-    std::vector<std::weak_ptr<Framebuffer>> framebuffers;
+    std::vector<std::weak_ptr<gl::Framebuffer>> framebuffers;
 
     // Clock variables
     struct {

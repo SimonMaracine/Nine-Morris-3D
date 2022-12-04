@@ -407,8 +407,8 @@ void ImGuiLayer<S, B>::draw_info() {
 
     ImGui::Begin("Information", nullptr, flags);
     ImGui::Text("FPS: %.3f", app->get_fps());
-    ImGui::Text("OpenGL: %s", debug_opengl::get_opengl_version());
-    ImGui::Text("Renderer: %s", debug_opengl::get_renderer());
+    ImGui::Text("OpenGL: %s", gl::get_opengl_version());
+    ImGui::Text("Renderer: %s", gl::get_renderer());
     ImGui::End();
 
     ImGui::PopFont();

@@ -2,90 +2,92 @@
 
 #include <glad/glad.h>
 
-enum class DrawHint {
-    Static = GL_STATIC_DRAW,
-    Dynamic = GL_DYNAMIC_DRAW,
-    Stream = GL_STREAM_DRAW
-};
-
-class Buffer {
-public:
-    Buffer(size_t size, DrawHint hint = DrawHint::Static);
-    Buffer(const void* data, size_t size, DrawHint hint = DrawHint::Static);
-    ~Buffer();
-
-    void bind();
-    static void unbind();
-
-    void update_data(const void* data, size_t size);
-private:
-    GLuint buffer = 0;
-    DrawHint hint = DrawHint::Static;
-
-    friend class VertexArray;
-};
-
-class IndexBuffer {
-public:
-    IndexBuffer(const unsigned int* data, size_t size);
-    ~IndexBuffer();
-
-    void bind();
-    static void unbind();
-
-    int get_index_count() { return index_count; }
-private:
-    GLuint buffer = 0;
-    int index_count = 0;
-
-    friend class VertexArray;
-};
-
-class UniformBuffer {
-public:
-    UniformBuffer();
-    ~UniformBuffer();
-
-    void bind();
-    static void unbind();
-
-    void set(const void* data, size_t field_index);
-    void upload_data();
-private:
-    struct UniformBlockField {
-        size_t offset, size;
+namespace gl {
+    enum class DrawHint {
+        Static = GL_STATIC_DRAW,
+        Dynamic = GL_DYNAMIC_DRAW,
+        Stream = GL_STREAM_DRAW
     };
 
-    GLuint buffer = 0;
+    class Buffer {
+    public:
+        Buffer(size_t size, DrawHint hint = DrawHint::Static);
+        Buffer(const void* data, size_t size, DrawHint hint = DrawHint::Static);
+        ~Buffer();
 
-    char* data = nullptr;  // Allocated externally, deallocated internally!
-    size_t size = 0;
+        void bind();
+        static void unbind();
 
-    std::unordered_map<size_t, UniformBlockField> fields;
+        void update_data(const void* data, size_t size);
+    private:
+        GLuint buffer = 0;
+        DrawHint hint = DrawHint::Static;
 
-    bool configured = false;  // Used externally by shader!
+        friend class VertexArray;
+    };
 
-    friend class Shader;
-};
+    class IndexBuffer {
+    public:
+        IndexBuffer(const unsigned int* data, size_t size);
+        ~IndexBuffer();
 
-class PixelBuffer {
-public:
-    PixelBuffer(size_t size);
-    ~PixelBuffer();
+        void bind();
+        static void unbind();
 
-    void bind();
-    static void unbind();
+        int get_index_count() { return index_count; }
+    private:
+        GLuint buffer = 0;
+        int index_count = 0;
 
-    void map_data();
+        friend class VertexArray;
+    };
 
-    template<typename T>
-    void get_data(T** data_out) {
-        *data_out = static_cast<T*>(data);
-    }
+    class UniformBuffer {
+    public:
+        UniformBuffer();
+        ~UniformBuffer();
 
-    void unmap_data();
-private:
-    GLuint buffer = 0;
-    void* data = nullptr;  // TODO clear value is float; should be generic
-    char* dummy_data = nullptr;
-};
+        void bind();
+        static void unbind();
+
+        void set(const void* data, size_t field_index);
+        void upload_data();
+    private:
+        struct UniformBlockField {
+            size_t offset, size;
+        };
+
+        GLuint buffer = 0;
+
+        char* data = nullptr;  // Allocated externally, deallocated internally!
+        size_t size = 0;
+
+        std::unordered_map<size_t, UniformBlockField> fields;
+
+        bool configured = false;  // Used externally by shader!
+
+        friend class Shader;
+    };
+
+    class PixelBuffer {
+    public:
+        PixelBuffer(size_t size);
+        ~PixelBuffer();
+
+        void bind();
+        static void unbind();
+
+        void map_data();
+
+        template<typename T>
+        void get_data(T** data_out) {
+            *data_out = static_cast<T*>(data);
+        }
+
+        void unmap_data();
+    private:
+        GLuint buffer = 0;
+        void* data = nullptr;  // TODO clear value is float; should be generic
+        char* dummy_data = nullptr;
+    };
+}

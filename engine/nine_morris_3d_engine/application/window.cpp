@@ -8,6 +8,7 @@
 #include "nine_morris_3d_engine/application/events.h"
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/application/input.h"
+#include "nine_morris_3d_engine/graphics/texture_data.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/exit.h"
 
@@ -184,11 +185,15 @@ void Window::set_vsync(int interval) {
 }
 
 unsigned int Window::add_cursor(std::unique_ptr<TextureData> cursor, int x_hotspot, int y_hotspot) {
-    const Image data = cursor->get_data();
+    const TextureData::Image data = cursor->get_data();
 
-    GLFWcursor* glfw_cursor = glfwCreateCursor(
-        reinterpret_cast<const GLFWimage*>(&data), x_hotspot, y_hotspot
-    );
+    GLFWimage image = {
+        data.width,
+        data.height,
+        data.pixels
+    };
+
+    GLFWcursor* glfw_cursor = glfwCreateCursor(&image, x_hotspot, y_hotspot);
 
     if (glfw_cursor == nullptr) {
         REL_ERROR("Could not create custom cursor `{}`", cursor->get_file_path());
@@ -256,4 +261,8 @@ std::pair<int, int> Monitor::get_resolution() {
 
 const char* Monitor::get_name() {
     return glfwGetMonitorName(monitor);
+}
+
+void destroy_glfw_context() {
+    glfwTerminate();
 }

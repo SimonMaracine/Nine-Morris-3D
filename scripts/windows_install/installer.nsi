@@ -61,7 +61,7 @@ Section "Nine Morris 3D (required)" section_game
 
     CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
     CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-	  CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Nine-Morris-3D.lnk" "$INSTDIR\Nine-Morris-3D.exe"
+      CreateShortcut "$SMPROGRAMS\$StartMenuFolder\Nine-Morris-3D.lnk" "$INSTDIR\Nine-Morris-3D.exe"
 
   !insertmacro MUI_STARTMENU_WRITE_END
 

@@ -1,5 +1,6 @@
-#include <nine_morris_3d_engine/engine_other.h>
+#include <nine_morris_3d_engine/engine_audio.h>
 #include <nine_morris_3d_engine/engine_graphics.h>
+#include <nine_morris_3d_engine/engine_other.h>
 
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/imgui_layer.h"
@@ -331,7 +332,7 @@ void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
     camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
 }
 
-std::shared_ptr<Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, identifier::Id id, hs hash) {
+std::shared_ptr<gl::Buffer> StandardGameScene::create_id_buffer(size_t vertices_size, identifier::Id id, hs hash) {
     std::vector<float> array;
     array.resize(vertices_size);
 
@@ -387,10 +388,10 @@ void StandardGameScene::initialize_rendering_board() {
     auto vertex_array = app->res.vertex_array.load("board_wood_vertex_array"_h);
     vertex_array->add_buffer(vertex_buffer, layout);
     vertex_array->add_index_buffer(index_buffer);
-    VertexArray::unbind();
+    gl::VertexArray::unbind();
 
-    TextureSpecification specification;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.mag_filter = gl::Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -2.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -465,10 +466,10 @@ void StandardGameScene::initialize_rendering_board_paint() {
     auto vertex_array = app->res.vertex_array.load("board_paint_vertex_array"_h);
     vertex_array->add_buffer(vertex_buffer, layout);
     vertex_array->add_index_buffer(index_buffer);
-    VertexArray::unbind();
+    gl::VertexArray::unbind();
 
-    TextureSpecification specification;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.mag_filter = gl::Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -517,8 +518,8 @@ void StandardGameScene::initialize_rendering_pieces() {
     );
     app->renderer->setup_shader(shader);
 
-    TextureSpecification specification;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.mag_filter = gl::Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -1.5f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -590,9 +591,9 @@ void StandardGameScene::initialize_rendering_pieces() {
 void StandardGameScene::initialize_rendering_piece(
         size_t index,
         std::shared_ptr<Mesh<PTNT>> mesh,
-        std::shared_ptr<Texture> diffuse_texture,
-        std::shared_ptr<Buffer> vertex_buffer,
-        std::shared_ptr<IndexBuffer> index_buffer) {
+        std::shared_ptr<gl::Texture> diffuse_texture,
+        std::shared_ptr<gl::Buffer> vertex_buffer,
+        std::shared_ptr<gl::IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
     const identifier::Id id = identifier::generate_id();
@@ -616,7 +617,7 @@ void StandardGameScene::initialize_rendering_piece(
     vertex_array->add_buffer(vertex_buffer, layout);
     vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(index_buffer);
-    VertexArray::unbind();
+    gl::VertexArray::unbind();
 
     auto material_instance = app->res.material_instance.load(
         hs {"piece_material_instance" + std::to_string(index)},
@@ -661,8 +662,8 @@ void StandardGameScene::initialize_rendering_nodes() {
     }
 }
 
-void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<Buffer> vertex_buffer,
-        std::shared_ptr<IndexBuffer> index_buffer) {
+void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<gl::Buffer> vertex_buffer,
+        std::shared_ptr<gl::IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
     const identifier::Id id = identifier::generate_id();
@@ -683,7 +684,7 @@ void StandardGameScene::initialize_rendering_node(size_t index, std::shared_ptr<
     vertex_array->add_buffer(vertex_buffer, layout);
     vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(index_buffer);
-    VertexArray::unbind();
+    gl::VertexArray::unbind();
 
     auto material_instance = app->res.material_instance.load(
         hs {"node_material_instance" + std::to_string(index)},
@@ -735,10 +736,10 @@ void StandardGameScene::initialize_rendering_board_no_normal() {
     auto vertex_array = app->res.vertex_array.load("board_wood_vertex_array"_h);
     vertex_array->add_buffer(vertex_buffer, layout);
     vertex_array->add_index_buffer(index_buffer);
-    VertexArray::unbind();
+    gl::VertexArray::unbind();
 
-    TextureSpecification specification;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.mag_filter = gl::Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -2.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -803,10 +804,10 @@ void StandardGameScene::initialize_rendering_board_paint_no_normal() {
     auto vertex_array = app->res.vertex_array.load("board_paint_vertex_array"_h);
     vertex_array->add_buffer(vertex_buffer, layout);
     vertex_array->add_index_buffer(index_buffer);
-    VertexArray::unbind();
+    gl::VertexArray::unbind();
 
-    TextureSpecification specification;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.mag_filter = gl::Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -829,7 +830,7 @@ void StandardGameScene::initialize_rendering_board_paint_no_normal() {
 }
 
 void StandardGameScene::initialize_rendering_pieces_no_normal() {
-        auto& data = app->user_data<Data>();
+    auto& data = app->user_data<Data>();
 
     auto shader = app->res.shader.load(
         "piece_shader"_h,
@@ -852,8 +853,8 @@ void StandardGameScene::initialize_rendering_pieces_no_normal() {
     );
     app->renderer->setup_shader(shader);
 
-    TextureSpecification specification;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.mag_filter = gl::Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -1.5f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -918,9 +919,9 @@ void StandardGameScene::initialize_rendering_pieces_no_normal() {
 void StandardGameScene::initialize_rendering_piece_no_normal(
         size_t index,
         std::shared_ptr<Mesh<PTN>> mesh,
-        std::shared_ptr<Texture> diffuse_texture,
-        std::shared_ptr<Buffer> vertex_buffer,
-        std::shared_ptr<IndexBuffer> index_buffer) {
+        std::shared_ptr<gl::Texture> diffuse_texture,
+        std::shared_ptr<gl::Buffer> vertex_buffer,
+        std::shared_ptr<gl::IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
     const identifier::Id id = identifier::generate_id();
@@ -943,7 +944,7 @@ void StandardGameScene::initialize_rendering_piece_no_normal(
     vertex_array->add_buffer(vertex_buffer, layout);
     vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(index_buffer);
-    VertexArray::unbind();
+    gl::VertexArray::unbind();
 
     auto material_instance = app->res.material_instance.load(
         hs {"piece_material_instance" + std::to_string(index)},
@@ -960,9 +961,9 @@ void StandardGameScene::initialize_rendering_keyboard_controls() {
 
     auto keyboard_controls = data.quad_cache.load("keyboard_controls"_h);
 
-    TextureSpecification specification;
-    specification.min_filter = Filter::Linear;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.min_filter = gl::Filter::Linear;
+    specification.mag_filter = gl::Filter::Linear;
 
     auto texture = app->res.texture.load(
         "keyboard_controls_texture"_h,
@@ -983,9 +984,9 @@ void StandardGameScene::initialize_rendering_light_bulb() {
 
     auto light_bulb = data.quad_cache.load("light_bulb"_h);
 
-    TextureSpecification specification;
-    specification.min_filter = Filter::Linear;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.min_filter = gl::Filter::Linear;
+    specification.mag_filter = gl::Filter::Linear;
 
     auto light_bulb_texture = app->res.texture.load(
         "light_bulb_texture"_h,
@@ -1037,7 +1038,7 @@ void StandardGameScene::setup_and_add_model_pieces() {
 }
 
 void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3& position,
-        std::shared_ptr<IndexBuffer> index_buffer) {
+        std::shared_ptr<gl::IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
     Piece& piece = board.pieces.at(index);
@@ -1194,9 +1195,9 @@ void StandardGameScene::setup_camera() {
 }
 
 void StandardGameScene::setup_indicators_textures() {
-    TextureSpecification specification;
-    specification.min_filter = Filter::Linear;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.min_filter = gl::Filter::Linear;
+    specification.mag_filter = gl::Filter::Linear;
 
     app->res.texture.load(
         "white_indicator_texture"_h,
@@ -1506,8 +1507,8 @@ void StandardGameScene::set_board_paint_texture() {
 void StandardGameScene::change_board_paint_texture() {
     auto& data = app->user_data<Data>();
 
-    TextureSpecification specification;
-    specification.mag_filter = Filter::Linear;
+    gl::TextureSpecification specification;
+    specification.mag_filter = gl::Filter::Linear;
     specification.mipmapping = true;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;

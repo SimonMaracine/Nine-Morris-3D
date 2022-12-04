@@ -32,8 +32,15 @@ public:
         std::array<GLFWimage, Count> glfw_icons;
 
         for (size_t i = 0; i < icons.size(); i++) {
-            Image data = icons[i]->get_data();
-            glfw_icons[i] = *reinterpret_cast<GLFWimage*>(&data);
+            const TextureData::Image data = icons[i]->get_data();
+
+            GLFWimage image = {
+                data.width,
+                data.height,
+                data.pixels
+            };
+
+            glfw_icons[i] = image;
         }
 
         glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
@@ -58,3 +65,5 @@ private:
 
     friend class Window;
 };
+
+void destroy_glfw_context();

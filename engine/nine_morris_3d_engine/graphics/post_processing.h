@@ -9,7 +9,7 @@ struct PostProcessingContext;
 
 class PostProcessingStep {
 public:
-    PostProcessingStep(std::string_view name, std::shared_ptr<Framebuffer> framebuffer, std::shared_ptr<Shader> shader)
+    PostProcessingStep(std::string_view name, std::shared_ptr<gl::Framebuffer> framebuffer, std::shared_ptr<gl::Shader> shader)
         : name(name), framebuffer(framebuffer), shader(shader) {}
     virtual ~PostProcessingStep() = default;
 
@@ -21,8 +21,8 @@ protected:
     std::string name;
 
     // Store references to shaders and framebuffers
-    std::shared_ptr<Framebuffer> framebuffer;
-    std::shared_ptr<Shader> shader;
+    std::shared_ptr<gl::Framebuffer> framebuffer;
+    std::shared_ptr<gl::Shader> shader;
 
     friend class Renderer;
 };

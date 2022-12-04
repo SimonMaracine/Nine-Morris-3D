@@ -45,15 +45,15 @@ namespace _loaders {
 struct Resources {
     void merge(Resources& other);
 
-    resmanager::Cache<Texture> texture;
-    resmanager::Cache<Texture3D> texture_3d;
-    resmanager::Cache<VertexArray> vertex_array;
-    resmanager::Cache<Shader> shader;
-    resmanager::Cache<Buffer> buffer;
-    resmanager::Cache<IndexBuffer> index_buffer;
-    resmanager::Cache<UniformBuffer> uniform_buffer;
-    resmanager::Cache<PixelBuffer> pixel_buffer;
-    resmanager::Cache<Framebuffer> framebuffer;
+    resmanager::Cache<gl::Texture> texture;
+    resmanager::Cache<gl::Texture3D> texture_3d;
+    resmanager::Cache<gl::VertexArray> vertex_array;
+    resmanager::Cache<gl::Shader> shader;
+    resmanager::Cache<gl::Buffer> buffer;
+    resmanager::Cache<gl::IndexBuffer> index_buffer;
+    resmanager::Cache<gl::UniformBuffer> uniform_buffer;
+    resmanager::Cache<gl::PixelBuffer> pixel_buffer;
+    resmanager::Cache<gl::Framebuffer> framebuffer;
     resmanager::Cache<Font> font;
     resmanager::Cache<Material> material;
     resmanager::Cache<MaterialInstance> material_instance;
