@@ -10,6 +10,7 @@
 #include <utility>
 #include <fstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
 #include <cstddef>
 #include <functional>

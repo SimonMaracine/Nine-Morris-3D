@@ -18,8 +18,8 @@ namespace al {
 
         void play(Buffer* buffer);
         void stop();
-        void pause_playing();
-        void continue_playing();
+        void pause();
+        void continue_();
 
         float get_gain() { return gain; }
         float get_pitch() { return pitch; }
@@ -54,7 +54,7 @@ namespace al {
         bool looping = false;
 
         float rolloff_factor = 1.0f;  // How fast the gain loses energy with distance
-        float reference_distance = 0.0f;  // The distance at which gain is 1.0 // FIXME defaults?
+        float reference_distance = 0.0f;  // The distance at which gain is 1.0  // FIXME defaults?
         float max_distance = 0.0f;  // The distance at which the gain is 0.0
     };
 }

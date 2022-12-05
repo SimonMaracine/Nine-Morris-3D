@@ -17,7 +17,6 @@ namespace al {
     Source::~Source() {
         stop();
 
-        alSourcei(source, AL_BUFFER, 0);  // TODO not needed
         alDeleteSources(1, &source);
 
         maybe_check_errors();
@@ -29,10 +28,12 @@ namespace al {
         stop();
 
         if (buffer->buffer != attached_buffer) {
+            ALuint previous_attached_buffer = attached_buffer;
             attached_buffer = buffer->buffer;
-            alSourcei(source, AL_BUFFER, attached_buffer);  // FIXME bug
+            alSourcei(source, AL_BUFFER, attached_buffer);
 
-            buffer->sources_attached.push_back(source);
+            buffer->sources_attached.insert(source);
+            buffer->sources_attached.erase(previous_attached_buffer);
 
             maybe_check_errors();
         }
@@ -48,13 +49,13 @@ namespace al {
         maybe_check_errors();
     }
 
-    void Source::pause_playing() {
+    void Source::pause() {
         alSourcePause(source);
 
         maybe_check_errors();
     }
 
-    void Source::continue_playing() {
+    void Source::continue_() {
         alSourcePlay(source);
 
         maybe_check_errors();
