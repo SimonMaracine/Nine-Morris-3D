@@ -44,7 +44,7 @@ namespace al {
         void set_max_distance(float max_distance);
     private:
         ALuint source = 0;
-        ALuint attached_buffer = 0;
+        ALuint attached_buffer = 0;  // The buffer that is currently attached to this source
 
         float gain = 1.0f;
         float pitch = 1.0f;

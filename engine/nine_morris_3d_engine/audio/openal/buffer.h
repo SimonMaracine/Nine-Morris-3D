@@ -17,7 +17,7 @@ namespace al {
         Buffer& operator=(Buffer&&) = delete;
     private:
         ALuint buffer = 0;
-        ALuint source_attached = 0;
+        std::vector<ALuint> sources_attached;  // The sources that this buffer is attached to
 
         friend class Source;
     };

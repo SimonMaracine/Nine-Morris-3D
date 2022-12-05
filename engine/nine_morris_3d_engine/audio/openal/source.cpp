@@ -17,6 +17,7 @@ namespace al {
     Source::~Source() {
         stop();
 
+        alSourcei(source, AL_BUFFER, 0);  // TODO not needed
         alDeleteSources(1, &source);
 
         maybe_check_errors();
@@ -30,13 +31,15 @@ namespace al {
         if (buffer->buffer != attached_buffer) {
             attached_buffer = buffer->buffer;
             alSourcei(source, AL_BUFFER, attached_buffer);  // FIXME bug
+
+            buffer->sources_attached.push_back(source);
+
+            maybe_check_errors();
         }
 
         alSourcePlay(source);
 
         maybe_check_errors();
-
-        buffer->source_attached = source;
     }
 
     void Source::stop() {
@@ -47,10 +50,14 @@ namespace al {
 
     void Source::pause_playing() {
         alSourcePause(source);
+
+        maybe_check_errors();
     }
 
     void Source::continue_playing() {
         alSourcePlay(source);
+
+        maybe_check_errors();
     }
 
     bool Source::is_playing() {

@@ -50,9 +50,9 @@ namespace al {
     }
 
     Buffer::~Buffer() {
-        if (source_attached != 0) {
-            alSourceStop(source_attached);
-            alSourcei(source_attached, AL_BUFFER, 0);
+        for (ALuint source : sources_attached) {
+            alSourceStop(source);
+            alSourcei(source, AL_BUFFER, 0);
 
             maybe_check_errors();
         }
