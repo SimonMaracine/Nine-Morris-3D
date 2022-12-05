@@ -57,4 +57,12 @@ namespace al {
 
         this->up = up;
     }
+
+    void Listener::set_distance_model(DistanceModel distance_model) {
+        alDistanceModel(static_cast<ALenum>(distance_model));
+
+        maybe_check_errors();
+
+        this->distance_model = distance_model;
+    }
 }

@@ -81,6 +81,9 @@ namespace assets {
     const char* COMBINE_VERTEX_SHADER = ENCR("data/shaders/post_processing/combine.vert");
     const char* COMBINE_FRAGMENT_SHADER = ENCR("data/shaders/post_processing/combine.frag");
 
+    const char* PIECE_PLACE_SOUND = ENCR("data/sounds/piece_place_sound.ogg");  // FIXME declare these in encrypter too
+    const char* PIECE_MOVE_SOUND = ENCR("data/sounds/piece_move_sound.ogg");
+
     const char* ICON_512 = "data/icons/512x512/ninemorris3d.png";
     const char* ICON_256 = "data/icons/256x256/ninemorris3d.png";
     const char* ICON_128 = "data/icons/128x128/ninemorris3d.png";

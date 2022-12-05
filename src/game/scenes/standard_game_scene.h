@@ -34,30 +34,30 @@ struct StandardGameScene : public Scene {
 
     std::shared_ptr<gl::Buffer> create_id_buffer(size_t vertices_size, identifier::Id id, hs hash);
 
-    void initialize_rendering_board();
-    void initialize_rendering_board_paint();
-    void initialize_rendering_pieces();
-    void initialize_rendering_piece(
+    void initialize_board();
+    void initialize_board_paint();
+    void initialize_pieces();
+    void initialize_piece(
         size_t index,
         std::shared_ptr<Mesh<PTNT>> mesh,
         std::shared_ptr<gl::Texture> diffuse_texture,
         std::shared_ptr<gl::Buffer> vertex_buffer,
         std::shared_ptr<gl::IndexBuffer> index_buffer);
-    void initialize_rendering_nodes();
-    void initialize_rendering_node(size_t index, std::shared_ptr<gl::Buffer> vertex_buffer, std::shared_ptr<gl::IndexBuffer> index_buffer);
+    void initialize_nodes();
+    void initialize_node(size_t index, std::shared_ptr<gl::Buffer> vertex_buffer, std::shared_ptr<gl::IndexBuffer> index_buffer);
 
-    void initialize_rendering_board_no_normal();
-    void initialize_rendering_board_paint_no_normal();
-    void initialize_rendering_pieces_no_normal();
-    void initialize_rendering_piece_no_normal(
+    void initialize_board_no_normal();
+    void initialize_board_paint_no_normal();
+    void initialize_pieces_no_normal();
+    void initialize_piece_no_normal(
         size_t index,
         std::shared_ptr<Mesh<PTN>> mesh,
         std::shared_ptr<gl::Texture> diffuse_texture,
         std::shared_ptr<gl::Buffer> vertex_buffer,
         std::shared_ptr<gl::IndexBuffer> index_buffer);
 
-    void initialize_rendering_keyboard_controls();
-    void initialize_rendering_light_bulb();
+    void initialize_keyboard_controls();
+    void initialize_light_bulb();
 
     void setup_and_add_model_board();
     void setup_and_add_model_board_paint();

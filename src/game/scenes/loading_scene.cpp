@@ -22,7 +22,7 @@ void LoadingScene::on_start() {
 
     setup_widgets();
 
-    auto background = data.image_cache.load("background"_h, app->res.texture["splash_screen_texture"_h]);
+    auto background = data.image_cache.load("background"_h, app->res.texture["splash_screen"_h]);
     app->gui_renderer->add_widget(background);
 
     loading_animation.previous_seconds = app->window->get_time();
@@ -65,7 +65,7 @@ void LoadingScene::setup_widgets() {
 
     auto loading_text = data.text_cache.load(
         "loading_text"_h,
-        app->res.font["good_dog_plain_font"_h],
+        app->res.font["good_dog_plain"_h],
         "Loading", 1.5f, glm::vec3(0.81f)
     );
     loading_text->stick(gui::Sticky::SE);
@@ -88,7 +88,7 @@ void LoadingScene::load_splash_screen_texture() {
     specification.min_filter = gl::Filter::Linear;
     specification.mag_filter = gl::Filter::Linear;
 
-    app->res.texture.load("splash_screen_texture"_h, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+    app->res.texture.load("splash_screen"_h, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
 }
 
 void LoadingScene::update_loading_animation() {

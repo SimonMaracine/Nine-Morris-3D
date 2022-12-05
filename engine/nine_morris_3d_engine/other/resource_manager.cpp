@@ -17,4 +17,7 @@ void Resources::merge(Resources& other) {
     mesh_ptnt.merge_replace(std::move(other.mesh_ptnt));
     mesh_ptn.merge_replace(std::move(other.mesh_ptn));
     mesh_p.merge_replace(std::move(other.mesh_p));
+    al_source.merge_replace(std::move(other.al_source));
+    al_buffer.merge_replace(std::move(other.al_buffer));
+    sound_data.merge_replace(std::move(other.sound_data));
 }

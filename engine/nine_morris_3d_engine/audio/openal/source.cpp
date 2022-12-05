@@ -29,7 +29,7 @@ namespace al {
 
         if (buffer->buffer != attached_buffer) {
             attached_buffer = buffer->buffer;
-            alSourcei(source, AL_BUFFER, attached_buffer);
+            alSourcei(source, AL_BUFFER, attached_buffer);  // FIXME bug
         }
 
         alSourcePlay(source);
@@ -82,14 +82,6 @@ namespace al {
         this->pitch = pitch;
     }
 
-    void Source::set_rolloff_factor(float rolloff_factor) {
-        alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
-
-        maybe_check_errors();
-
-        this->rolloff_factor = rolloff_factor;
-    }
-
     void Source::set_position(const glm::vec3& position) {
         alSource3f(source, AL_POSITION, position.x, position.y, position.z);
 
@@ -115,10 +107,34 @@ namespace al {
     }
 
     void Source::set_looping(bool looping) {
-        alSourcei(source, AL_LOOPING, static_cast<int>(looping));
+        alSourcei(source, AL_LOOPING, static_cast<ALint>(looping));
 
         maybe_check_errors();
 
         this->looping = looping;
+    }
+
+    void Source::set_rolloff_factor(float rolloff_factor) {
+        alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
+
+        maybe_check_errors();
+
+        this->rolloff_factor = rolloff_factor;
+    }
+
+    void Source::set_reference_distance(float reference_distance) {
+        alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
+
+        maybe_check_errors();
+
+        this->reference_distance = reference_distance;
+    }
+
+    void Source::set_max_distance(float max_distance) {
+        alSourcef(source, AL_MAX_DISTANCE, max_distance);
+
+        maybe_check_errors();
+
+        this->max_distance = max_distance;
     }
 }

@@ -81,6 +81,9 @@ namespace assets {
     extern const char* COMBINE_VERTEX_SHADER;
     extern const char* COMBINE_FRAGMENT_SHADER;
 
+    extern const char* PIECE_PLACE_SOUND;
+    extern const char* PIECE_MOVE_SOUND;
+
     extern const char* ICON_512;
     extern const char* ICON_256;
     extern const char* ICON_128;

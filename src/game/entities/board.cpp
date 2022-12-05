@@ -378,6 +378,11 @@ void Board::piece_arrive_at_node(size_t piece_index) {
 
     Piece& piece = pieces.at(piece_index);
 
+    // TODO play a sound
+    piece.source->play(
+        app->res.al_buffer["piece_place"_h].get()
+    );
+
     piece.model->position = piece.movement.target;
 
     // Reset all these movement variables

@@ -17,7 +17,7 @@ static void load_game_options(Application* app) {
 
     save_load_gracefully::load_from_file<game_options::GameOptions>(
         game_options::GAME_OPTIONS_FILE, data.options, game_options::validate, app
-        );
+    );
 }
 
 static void setup_icons(Application* app) {
@@ -79,7 +79,7 @@ static void setup_game_font(Application* app) {
     using namespace path;
 
     auto font = app->res.font.load(
-        "good_dog_plain_font"_h, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512
+        "good_dog_plain"_h, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512
     );
 
     font->begin_baking();  // TODO maybe move part of texture baking to thread

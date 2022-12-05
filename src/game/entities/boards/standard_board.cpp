@@ -783,7 +783,9 @@ void StandardBoard::remember_state() {
     StandardBoardSerialized serialized;
     to_serialized(serialized);
 
-    const UndoRedoState<StandardBoardSerialized>::State current_state = { serialized, *camera_controller };
+    const UndoRedoState<StandardBoardSerialized>::State current_state = {
+        serialized, *camera_controller
+    };
 
     undo_redo_state->undo.push_back(current_state);
     undo_redo_state->redo.clear();
@@ -852,21 +854,22 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             Piece piece = Piece {
                 ser_index,
                 ser_piece.type,
-                data.model_cache[hs {"piece" + std::to_string(ser_index)}]
+                data.model_cache[hs {"piece" + std::to_string(ser_index)}],
+                app->res.al_source[hs {"piece" + std::to_string(ser_index)}]
             };
 
             piece.model->position = ser_piece.position;
             piece.model->rotation = ser_piece.rotation;
-            piece.model->vertex_array = app->res.vertex_array[hs {"piece_vertex_array" + std::to_string(ser_index)}];
+            piece.model->vertex_array = app->res.vertex_array[hs {"piece" + std::to_string(ser_index)}];
             piece.model->index_buffer = (
                 ser_piece.type == PieceType::White
                     ?
-                    app->res.index_buffer["white_piece_index_buffer"_h]
+                    app->res.index_buffer["white_piece"_h]
                     :
-                    app->res.index_buffer["black_piece_index_buffer"_h]
+                    app->res.index_buffer["black_piece"_h]
             );
             piece.model->scale = WORLD_SCALE;
-            piece.model->material = app->res.material_instance[hs {"piece_material_instance" + std::to_string(ser_index)}];
+            piece.model->material = app->res.material_instance[hs {"piece" + std::to_string(ser_index)}];
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
             piece.model->id = std::make_optional<identifier::Id>(data.piece_ids[ser_index]);
             piece.model->cast_shadow = true;
