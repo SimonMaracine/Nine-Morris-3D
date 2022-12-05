@@ -6,6 +6,12 @@
 #include "nine_morris_3d_engine/other/assert.h"
 
 namespace al {
+    Listener::Listener() {
+        alDistanceModel(static_cast<ALenum>(distance_model));
+
+        maybe_check_errors();
+    }
+
     void Listener::set_gain(float gain) {
         ASSERT(gain >= 0.0f, "Must be positive");
 

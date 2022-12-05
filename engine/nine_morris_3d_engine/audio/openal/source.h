@@ -54,7 +54,7 @@ namespace al {
         bool looping = false;
 
         float rolloff_factor = 1.0f;  // How fast the gain loses energy with distance
-        float reference_distance = 0.0f;  // The distance at which gain is 1.0  // FIXME defaults?
-        float max_distance = 0.0f;  // The distance at which the gain is 0.0
+        float reference_distance = 8.0f;  // The distance at which gain is 1.0
+        float max_distance = 22.0f;  // The distance at which the gain is 0.0 (linear) or at which the gain doesn't decrease (clamped)
     };
 }

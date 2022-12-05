@@ -8,6 +8,9 @@
 namespace al {
     Source::Source() {
         alGenSources(1, &source);
+        alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
+        alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
+        alSourcef(source, AL_MAX_DISTANCE, max_distance);
 
         maybe_check_errors();
 

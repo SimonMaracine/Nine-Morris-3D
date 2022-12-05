@@ -16,7 +16,7 @@ namespace al {
 
     class Listener {
     public:
-        Listener() = default;  // TODO must set defaults?
+        Listener();
         ~Listener() = default;
 
         Listener(const Listener&) = delete;
