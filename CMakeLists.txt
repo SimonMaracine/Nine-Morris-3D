@@ -11,13 +11,14 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-# Use static linking everywhere
+# Use static linking everywhere possible
 set(BUILD_SHARED_LIBS OFF)
 
 # Assimp
 set(USE_STATIC_CRT ON)  # Windows stuff
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_INSTALL OFF)
+set(ASSIMP_INSTALL_PDB OFF)
 set(ASSIMP_BUILD_ASSIMP_VIEW OFF)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
 set(ASSIMP_WARNINGS_AS_ERRORS OFF)
@@ -45,6 +46,7 @@ set(ALSOFT_INSTALL_HRTF_DATA OFF)
 set(ALSOFT_INSTALL_AMBDEC_PRESETS OFF)
 set(ALSOFT_INSTALL_EXAMPLES OFF)
 set(ALSOFT_INSTALL_UTILS OFF)
+set(LIBTYPE STATIC)  # To make static library
 
 project("Nine-Morris-3D"
     VERSION 0.2.0
@@ -298,41 +300,40 @@ endif()
 
 # Add some defines
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-    message("Building in DEBUG mode")
+    message("Building Nine Morris 3D in DEBUG mode")
 
     target_compile_definitions(${ENGINE} PRIVATE
-        SPDLOG_ACTIVE_LEVEL=0
         GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES  # To easily enable or disable encrypted files
     )
 
     target_compile_definitions(${GAME} PRIVATE
-        SPDLOG_ACTIVE_LEVEL=0
         GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
     )
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
-    message("Building in RELEASE mode")
+    message("Building Nine Morris 3D in RELEASE mode")
 
     target_compile_definitions(${ENGINE} PRIVATE
-        SPDLOG_ACTIVE_LEVEL=0
         NDEBUG
         ENTT_DISABLE_ASSERT
     )
 
     target_compile_definitions(${GAME} PRIVATE
-        SPDLOG_ACTIVE_LEVEL=0
         NDEBUG
         ENTT_DISABLE_ASSERT
     )
 endif()
 
 target_compile_definitions(${ENGINE} PRIVATE
+    SPDLOG_ACTIVE_LEVEL=0
     _CRT_SECURE_NO_WARNINGS
     IMGUI_IMPL_OPENGL_LOADER_GLAD
     ENTT_NO_ETO
     UTF_CPP_CPLUSPLUS=201703
+    AL_LIBTYPE_STATIC
 )
 
 target_compile_definitions(${GAME} PRIVATE
+    SPDLOG_ACTIVE_LEVEL=0
     _CRT_SECURE_NO_WARNINGS
     ENTT_NO_ETO
 )
