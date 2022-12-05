@@ -33,12 +33,13 @@ namespace al {
         if (buffer->buffer != attached_buffer) {
             ALuint previous_attached_buffer = attached_buffer;
             attached_buffer = buffer->buffer;
+
             alSourcei(source, AL_BUFFER, attached_buffer);
+
+            maybe_check_errors();
 
             buffer->sources_attached.insert(source);
             buffer->sources_attached.erase(previous_attached_buffer);
-
-            maybe_check_errors();
         }
 
         alSourcePlay(source);

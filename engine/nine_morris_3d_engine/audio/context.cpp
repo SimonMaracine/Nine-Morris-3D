@@ -2,6 +2,7 @@
 
 #include "nine_morris_3d_engine/application/platform.h"
 #include "nine_morris_3d_engine/audio/context.h"
+#include "nine_morris_3d_engine/audio/openal/listener.h"
 #include "nine_morris_3d_engine/other/logging.h"
 #include "nine_morris_3d_engine/other/exit.h"
 
@@ -47,6 +48,8 @@ OpenALContext::OpenALContext() {
 
     _global_device = device;
     _global_context = context;
+
+    listener.set_distance_model(al::DistanceModel::InverseClamped);
 
     DEB_INFO("Created OpenAL device and context");
 }

@@ -11,8 +11,8 @@ struct Node {
     ~Node() = default;
 
     Node(const Node&) = delete;
-    Node(Node&&) = default;
     Node& operator=(const Node&) = delete;
+    Node(Node&&) = default;
     Node& operator=(Node&&) = default;
 
     size_t index = NULL_INDEX;  // From 0 through 23

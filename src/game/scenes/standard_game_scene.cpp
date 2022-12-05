@@ -161,6 +161,9 @@ void StandardGameScene::on_update() {
         board.update_nodes(app->renderer->get_hovered_id());
         board.update_pieces(app->renderer->get_hovered_id());
         timer.update();  // TODO maybe should have been after update_game_state()
+
+        // Update listener position every frame
+        app->openal->get_listener().set_position(camera_controller.get_position());
     }
 
     update_game_state();
@@ -1228,6 +1231,7 @@ void StandardGameScene::setup_camera() {
     };
 
     app->renderer->set_camera_controller(&camera_controller);
+    app->openal->get_listener().set_position(camera_controller.get_position());
 
     DEB_DEBUG("Setup camera");
 }

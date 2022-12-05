@@ -13,8 +13,8 @@ struct Piece {
     ~Piece() = default;
 
     Piece(const Piece&) = delete;
-    Piece(Piece&&) = default;
     Piece& operator=(const Piece&) = default;
+    Piece(Piece&&) = default;
     Piece& operator=(Piece&&) = default;
 
     size_t index = NULL_INDEX;  // From 0 through 17 on standard game

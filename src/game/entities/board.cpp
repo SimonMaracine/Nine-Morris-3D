@@ -77,6 +77,7 @@ void Board::update_pieces(identifier::Id hovered_id) {
                     piece.movement.velocity * dt + (piece.movement.target - piece.model->position)
                             * PIECE_VARIABLE_VELOCITY * dt
                 );
+                piece.source->set_position(piece.model->position);
 
                 if (glm::length(piece.movement.target - piece.model->position) < 0.03f) {
                     to_erase.push_back(index);
@@ -102,15 +103,15 @@ void Board::update_pieces(identifier::Id hovered_id) {
                     );
                 }
 
-                if (!piece.movement.reached_target0
-                        && glm::length(piece.movement.target0 - piece.model->position) < 0.03f) {
+                piece.source->set_position(piece.model->position);
+
+                if (!piece.movement.reached_target0 && glm::length(piece.movement.target0 - piece.model->position) < 0.03f) {
                     piece.movement.reached_target0 = true;
                     piece.model->position = piece.movement.target0;
                     piece.movement.velocity = (
                         glm::normalize(piece.movement.target1 - piece.model->position) * PIECE_BASE_VELOCITY
                     );
-                } else if (!piece.movement.reached_target1
-                        && glm::length(piece.movement.target1 - piece.model->position) < 0.03f) {
+                } else if (!piece.movement.reached_target1 && glm::length(piece.movement.target1 - piece.model->position) < 0.03f) {
                     piece.movement.reached_target1 = true;
                     piece.model->position = piece.movement.target1;
                     piece.movement.velocity = (
@@ -119,7 +120,7 @@ void Board::update_pieces(identifier::Id hovered_id) {
                 }
 
                 if (glm::length(piece.movement.target - piece.model->position) < 0.03f) {
-                    to_erase.push_back(index);
+                    to_erase.push_back(index);  // Reached target
                 }
 
                 break;
@@ -379,9 +380,7 @@ void Board::piece_arrive_at_node(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
     // TODO play a sound
-    piece.source->play(
-        app->res.al_buffer["piece_place"_h].get()
-    );
+    piece.source->play(app->res.al_buffer["piece_place"_h].get());
 
     piece.model->position = piece.movement.target;
 

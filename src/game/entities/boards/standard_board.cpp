@@ -226,7 +226,7 @@ void StandardBoard::place_piece(size_t node_index) {
 
         set_pieces_to_take(TURN_IS_WHITE_SO(PieceType::Black, PieceType::White), true);
     } else {
-        check_player_number_of_pieces(turn);
+        check_player_number_of_pieces(turn);  // TODO maybe check both?
         switch_turn_and_check_turns_without_mills();
 
         if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0) {
@@ -310,6 +310,7 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
     } else {
         check_player_number_of_pieces(BoardPlayer::White);
         check_player_number_of_pieces(BoardPlayer::Black);
+
         turns_without_mills++;
         switch_turn_and_check_turns_without_mills();
         update_piece_outlines();

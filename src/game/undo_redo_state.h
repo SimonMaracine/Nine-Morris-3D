@@ -17,8 +17,8 @@ struct UndoRedoState {
     UndoRedoState() = default;
     ~UndoRedoState() = default;
     UndoRedoState(const UndoRedoState&) = delete;
-    UndoRedoState(UndoRedoState&&) = delete;
     UndoRedoState& operator=(const UndoRedoState&) = default;
+    UndoRedoState(UndoRedoState&&) = delete;
     UndoRedoState& operator=(UndoRedoState&& other);
 
     std::vector<State> undo;

@@ -16,8 +16,8 @@ struct Board {
     virtual ~Board() = default;
 
     Board(const Board&) = delete;
-    Board(Board&&) = default;
     Board& operator=(const Board&) = delete;
+    Board(Board&&) = default;
     Board& operator=(Board&&) = default;
 
     virtual void click(identifier::Id) = 0;

@@ -16,7 +16,7 @@ namespace al {
 
     class Listener {
     public:
-        Listener();
+        Listener() = default;
         ~Listener() = default;
 
         Listener(const Listener&) = delete;
