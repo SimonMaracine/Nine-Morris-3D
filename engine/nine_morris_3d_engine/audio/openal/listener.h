@@ -34,8 +34,7 @@ namespace al {
         void set_gain(float gain);
         void set_position(const glm::vec3& position);
         void set_velocity(const glm::vec3& velocity);
-        void set_look_at(const glm::vec3& look_at);
-        void set_up(const glm::vec3& up);
+        void set_look_at_and_up(const glm::vec3& look_at, const glm::vec3& up);
         void set_distance_model(DistanceModel distance_model);
     private:
         float gain = 1.0f;

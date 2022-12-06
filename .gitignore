@@ -17,6 +17,7 @@ encrypter.exe
 /data-filtered
 /engine_data-filtered
 /renderdoc_captures
+*.aup3-wal
 
 .vs/
 CMakeCache.txt

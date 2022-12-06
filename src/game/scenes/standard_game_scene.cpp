@@ -64,33 +64,6 @@ void StandardGameScene::on_start() {
 
     camera_controller.go_towards_position(default_camera_position);
     camera_controller.setup_events(app);
-
-    // TODO delete later
-    auto sound_data = app->res.sound_data.load("test_sound"_h, "data/sounds/test.ogg");
-    app->res.al_buffer.load(
-        "test_sound"_h,
-        sound_data->get_data(),
-        sound_data->get_size(),
-        sound_data->get_channels(),
-        sound_data->get_bps(),
-        sound_data->get_frequency()
-    );
-    auto source = app->res.al_source.load("test_sound"_h);
-    source->set_pitch(3.0f);
-
-    auto sound_data2 = app->res.sound_data.load("test_sound2"_h, "data/sounds/test2.ogg");
-    app->res.al_buffer.load(
-        "test_sound2"_h,
-        sound_data2->get_data(),
-        sound_data2->get_size(),
-        sound_data2->get_channels(),
-        sound_data2->get_bps(),
-        sound_data2->get_frequency()
-    );
-    auto source2 = app->res.al_source.load("test_sound2"_h);
-    source2->set_looping(true);
-
-    app->openal->get_listener().set_position(glm::vec3(1.0f));
 }
 
 void StandardGameScene::on_stop() {
@@ -162,8 +135,12 @@ void StandardGameScene::on_update() {
         board.update_pieces(app->renderer->get_hovered_id());
         timer.update();  // TODO maybe should have been after update_game_state()
 
-        // Update listener position every frame
+        // Update listener position, look at and up vectors every frame
         app->openal->get_listener().set_position(camera_controller.get_position());
+        app->openal->get_listener().set_look_at_and_up(
+            camera_controller.get_point() - camera_controller.get_position(),
+            glm::rotate(glm::vec3(0.0f, 1.0f, 0.0f), camera_controller.get_rotation().y, glm::vec3(0.0f, 1.0f, 0.0f))
+        );
     }
 
     update_game_state();
@@ -324,14 +301,6 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
 
     if (event.key == input::Key::SPACE) {
         camera_controller.go_towards_position(default_camera_position);
-    } else if (event.key == input::Key::K) {  // TODO delete later
-        app->res.al_source["test_sound"_h]->play(
-            app->res.al_buffer["test_sound"_h].get()
-        );
-    } else if (event.key == input::Key::L) {
-        app->res.al_source["test_sound2"_h]->play(
-            app->res.al_buffer["test_sound2"_h].get()
-        );
     }
 }
 
@@ -1073,7 +1042,7 @@ void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3&
 
     piece.model->position = position;
     piece.model->rotation = RANDOM_PIECE_ROTATION();
-    piece.model->vertex_array = app->res.vertex_array[hs {"piece" + std::to_string(index)}];  // TODO change names
+    piece.model->vertex_array = app->res.vertex_array[hs {"piece" + std::to_string(index)}];
     piece.model->index_buffer = index_buffer;
     piece.model->scale = WORLD_SCALE;
     piece.model->material = app->res.material_instance[hs {"piece" + std::to_string(index)}];
@@ -1232,6 +1201,11 @@ void StandardGameScene::setup_camera() {
 
     app->renderer->set_camera_controller(&camera_controller);
     app->openal->get_listener().set_position(camera_controller.get_position());
+    app->openal->get_listener().set_look_at_and_up(
+        camera_controller.get_point() - camera_controller.get_position(),
+        glm::rotate(glm::vec3(0.0f, 1.0f, 0.0f), camera_controller.get_rotation().y, glm::vec3(0.0f, 1.0f, 0.0f))
+    );
+
 
     DEB_DEBUG("Setup camera");
 }

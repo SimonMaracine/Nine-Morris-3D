@@ -10,8 +10,8 @@ void Camera::set_projection(int width, int height, float fov, float near, float 
     projection_view_matrix = projection_matrix * view_matrix;
 }
 
-void Camera::set_view(const glm::vec3& position, const glm::vec3& look, const glm::vec3& up) {
-    view_matrix = glm::lookAt(position, look, up);
+void Camera::set_view(const glm::vec3& position, const glm::vec3& at, const glm::vec3& up) {
+    view_matrix = glm::lookAt(position, at, up);
     projection_view_matrix = projection_matrix * view_matrix;
 }
 

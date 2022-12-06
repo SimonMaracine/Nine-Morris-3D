@@ -32,7 +32,7 @@ namespace al {
         this->velocity = velocity;
     }
 
-    void Listener::set_look_at(const glm::vec3& look_at) {
+    void Listener::set_look_at_and_up(const glm::vec3& look_at, const glm::vec3& up) {
         const float orientation[6] = {
             look_at.x, look_at.y, look_at.z,
             up.x, up.y, up.z
@@ -43,18 +43,6 @@ namespace al {
         maybe_check_errors();
 
         this->look_at = look_at;
-    }
-
-    void Listener::set_up(const glm::vec3& up) {
-        const float orientation[6] = {
-            look_at.x, look_at.y, look_at.z,
-            up.x, up.y, up.z
-        };
-
-        alListenerfv(AL_ORIENTATION, orientation);
-
-        maybe_check_errors();
-
         this->up = up;
     }
 

@@ -46,5 +46,6 @@ using hs = resmanager::hashed_str;
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include <imgui.h>
