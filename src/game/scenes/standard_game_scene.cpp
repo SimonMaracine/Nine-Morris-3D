@@ -33,7 +33,7 @@ void StandardGameScene::on_start() {
     setup_widgets();
 
     keyboard = KeyboardControls {app, &board, data.quad_cache["keyboard_controls"_h]};
-    keyboard.initialize_refs();
+    keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<StandardBoardSerialized> {};
 
@@ -139,7 +139,7 @@ void StandardGameScene::on_update() {
         app->openal->get_listener().set_position(camera_controller.get_position());
         app->openal->get_listener().set_look_at_and_up(
             camera_controller.get_point() - camera_controller.get_position(),
-            glm::rotate(glm::vec3(0.0f, 1.0f, 0.0f), camera_controller.get_rotation().y, glm::vec3(0.0f, 1.0f, 0.0f))
+            glm::rotate(UP_VECTOR, camera_controller.get_rotation().y, UP_VECTOR)
         );
     }
 
@@ -963,8 +963,8 @@ void StandardGameScene::initialize_keyboard_controls() {
     specification.mag_filter = gl::Filter::Linear;
 
     auto texture = app->res.texture.load(
-        "keyboard_controls"_h,
-        app->res.texture_data["keyboard_controls"_h],
+        "keyboard_controls_default"_h,
+        app->res.texture_data["keyboard_controls_default"_h],
         specification
     );
     app->res.texture.load(
@@ -1203,9 +1203,8 @@ void StandardGameScene::setup_camera() {
     app->openal->get_listener().set_position(camera_controller.get_position());
     app->openal->get_listener().set_look_at_and_up(
         camera_controller.get_point() - camera_controller.get_position(),
-        glm::rotate(glm::vec3(0.0f, 1.0f, 0.0f), camera_controller.get_rotation().y, glm::vec3(0.0f, 1.0f, 0.0f))
+        glm::rotate(UP_VECTOR, camera_controller.get_rotation().y, UP_VECTOR)
     );
-
 
     DEB_DEBUG("Setup camera");
 }
@@ -1415,7 +1414,7 @@ void StandardGameScene::update_cursor() {
         } else {
             app->window->set_cursor(data.arrow_cursor);
 
-            data.quad_cache["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls"_h];  // TODO rename this
+            data.quad_cache["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_default"_h];
         }
     }
 }

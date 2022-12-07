@@ -2,6 +2,7 @@
 #include <nine_morris_3d_engine/engine_other.h>
 
 #include "game/point_camera_controller.h"
+#include "other/constants.h"
 
 static constexpr float ZOOM_BASE_VELOCITY = 0.03f;
 static constexpr float ZOOM_VARIABLE_VELOCITY = 5.0f;
@@ -146,7 +147,7 @@ void PointCameraController::set_position(const glm::vec3& position) {
     distance_to_point = glm::length(position - point);
 
     // Update camera data
-    camera->set_view(position, point - position, glm::vec3(0.0f, 1.0f, 0.0f));
+    camera->set_view(position, point - position, UP_VECTOR);
 
     // Calculate yaw, pitch and angle_around_point
     const glm::vec3 direction = glm::vec3(glm::transpose(camera->get_view_matrix())[2]);
@@ -167,7 +168,7 @@ void PointCameraController::go_towards_position(const glm::vec3& position) {
     // Calculate distance to point velocity
     go_towards_position_zoom(position);
 
-    const glm::mat4 view = glm::lookAt(position, point - position, glm::vec3(0.0f, 1.0f, 0.0f));
+    const glm::mat4 view = glm::lookAt(position, point - position, UP_VECTOR);
     const glm::vec3 direction = glm::vec3(glm::transpose(view)[2]);
 
     // Calculate pitch velocity

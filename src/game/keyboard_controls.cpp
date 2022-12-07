@@ -28,11 +28,11 @@ KeyboardControls::KeyboardControls(Application* app, Board* board, std::shared_p
             ?
             app->res.texture["keyboard_controls_cross"_h]
             :
-            app->res.texture["keyboard_controls"_h]
+            app->res.texture["keyboard_controls_default"_h]
     );
 }
 
-void KeyboardControls::initialize_refs() {
+void KeyboardControls::post_initialize() {
     board->keyboard = this;
 
     nodes[0].neighbors(nullptr, &nodes[9], nullptr, &nodes[1]);

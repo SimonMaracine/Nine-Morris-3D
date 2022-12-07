@@ -204,3 +204,5 @@ constexpr glm::vec3 ORANGE_OUTLINE = { 1.0f, 0.5f, 0.0f };
 
 constexpr glm::vec3 RED_TINT = { 1.0f, 0.2f, 0.2f };
 constexpr glm::vec3 DEFAULT_TINT = { 1.0f, 1.0f, 1.0f };
+
+constexpr glm::vec3 UP_VECTOR = { 0.0f, 1.0f, 0.0f };

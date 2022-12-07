@@ -12,6 +12,11 @@ public:
     KeyboardControls(Application* app, Board* board, std::shared_ptr<Renderer::Quad> quad);
     ~KeyboardControls() = default;
 
+    KeyboardControls(const KeyboardControls&) = delete;
+    KeyboardControls& operator=(const KeyboardControls&) = delete;
+    KeyboardControls(KeyboardControls&&) = default;
+    KeyboardControls& operator=(KeyboardControls&&) = default;
+
     enum class Direction {
         Up = 0,
         Left = 1,
@@ -19,7 +24,7 @@ public:
         Right = 3
     };
 
-    void initialize_refs();
+    void post_initialize();
     void move(Direction direction);
     std::tuple<bool, bool, bool> click_and_release();
 

@@ -329,6 +329,13 @@ void Board::update_piece_outlines() {
     }
 }
 
+void Board::play_piece_place_sound(size_t piece_index) {
+    Piece& piece = pieces.at(piece_index);
+
+    // TODO choose one sound from multiple sounds
+    piece.source->play(app->res.al_buffer["piece_place"_h].get());
+}
+
 void Board::remember_position_and_check_repetition(size_t piece_index, size_t node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
@@ -379,12 +386,14 @@ void Board::piece_arrive_at_node(size_t piece_index) {
 
     Piece& piece = pieces.at(piece_index);
 
-    // TODO play a sound
-    piece.source->play(app->res.al_buffer["piece_place"_h].get());
+    if (piece.movement.type == PieceMovementType::ThreeStep) {
+        // Play sound even if piece is forced to finalize its state
+        play_piece_place_sound(piece_index);
+    }
 
     piece.model->position = piece.movement.target;
 
-    // Reset all these movement variables
+    // Reset all these movement data
     piece.movement = PieceMovement {};
 
     // Remove piece forever, if set to remove

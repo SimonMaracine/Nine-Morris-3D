@@ -27,7 +27,7 @@ namespace assets {
     const char* BLACK_INDICATOR_TEXTURE = ENCR("data/textures/indicator/black_indicator.png");
     const char* WAIT_INDICATOR_TEXTURE = ENCR("data/textures/indicator/wait_indicator.png");
     const char* COMPUTER_THINKING_INDICATOR_TEXTURE = ENCR("data/textures/indicator/computer_thinking_indicator.png");
-    const char* KEYBOARD_CONTROLS_TEXTURE = ENCR("data/textures/keyboard_controls/keyboard_controls.png");
+    const char* KEYBOARD_CONTROLS_DEFAULT_TEXTURE = ENCR("data/textures/keyboard_controls/keyboard_controls_default.png");
     const char* KEYBOARD_CONTROLS_CROSS_TEXTURE = ENCR("data/textures/keyboard_controls/keyboard_controls_cross.png");
     const char* SPLASH_SCREEN_TEXTURE = ENCR("data/textures/splash_screen/splash_screen.png");
 

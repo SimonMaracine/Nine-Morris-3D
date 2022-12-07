@@ -30,7 +30,7 @@ namespace assets_load {
         loader().texture_data.load("black_indicator"_h, encr(path_for_assets(BLACK_INDICATOR_TEXTURE)), true);
         loader().texture_data.load("wait_indicator"_h, encr(path_for_assets(WAIT_INDICATOR_TEXTURE)), true);
         loader().texture_data.load("computer_thinking_indicator"_h, encr(path_for_assets(COMPUTER_THINKING_INDICATOR_TEXTURE)), true);
-        loader().texture_data.load("keyboard_controls"_h, encr(path_for_assets(KEYBOARD_CONTROLS_TEXTURE)), true);
+        loader().texture_data.load("keyboard_controls_default"_h, encr(path_for_assets(KEYBOARD_CONTROLS_DEFAULT_TEXTURE)), true);
         loader().texture_data.load("keyboard_controls_cross"_h, encr(path_for_assets(KEYBOARD_CONTROLS_CROSS_TEXTURE)), true);
 
         if (texture_quality == launcher_options::NORMAL) {

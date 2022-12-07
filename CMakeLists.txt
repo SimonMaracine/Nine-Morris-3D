@@ -46,6 +46,7 @@ set(ALSOFT_INSTALL_HRTF_DATA OFF)
 set(ALSOFT_INSTALL_AMBDEC_PRESETS OFF)
 set(ALSOFT_INSTALL_EXAMPLES OFF)
 set(ALSOFT_INSTALL_UTILS OFF)
+set(ALSOFT_UPDATE_BUILD_VERSION OFF)
 set(LIBTYPE STATIC)  # To make static library
 
 project("Nine-Morris-3D"
@@ -267,7 +268,7 @@ target_link_libraries(${ENGINE} PRIVATE
     assimp
     glfw
     cppblowfish
-    OpenAL
+    OpenAL::OpenAL
     ${GLAD_STB}
     ${MY_IMGUI}
 )
@@ -287,12 +288,12 @@ target_link_libraries(${GAME} PRIVATE
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         set_property(TARGET
-            ${ENGINE} ${GAME} ${GLAD_STB} ${MY_IMGUI} spdlog assimp glfw cppblowfish OpenAL
+            ${ENGINE} ${GAME} ${GLAD_STB} ${MY_IMGUI} spdlog assimp glfw cppblowfish OpenAL::OpenAL
             PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug
         )
     elseif(CMAKE_BUILD_TYPE MATCHES Release)
         set_property(TARGET
-            ${ENGINE} ${GAME} ${GLAD_STB} ${MY_IMGUI} spdlog assimp glfw cppblowfish OpenAL
+            ${ENGINE} ${GAME} ${GLAD_STB} ${MY_IMGUI} spdlog assimp glfw cppblowfish OpenAL::OpenAL
             PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded
         )
     endif()

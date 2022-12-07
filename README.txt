@@ -36,6 +36,6 @@ TOOLS I USED:
 
 Code editing: Visual Studio Code, Visual Studio
 Graphics: GIMP, Blender, https://matheowis.github.io/HDRI-to-CubeMap/
-Audio:
+Audio: Audacity
 Workflow: Git, CMake
 Other: NSIS, Trello, RenderDoc

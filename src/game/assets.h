@@ -27,7 +27,7 @@ namespace assets {
     extern const char* BLACK_INDICATOR_TEXTURE;
     extern const char* WAIT_INDICATOR_TEXTURE;
     extern const char* COMPUTER_THINKING_INDICATOR_TEXTURE;
-    extern const char* KEYBOARD_CONTROLS_TEXTURE;
+    extern const char* KEYBOARD_CONTROLS_DEFAULT_TEXTURE;
     extern const char* KEYBOARD_CONTROLS_CROSS_TEXTURE;
     extern const char* SPLASH_SCREEN_TEXTURE;
 
