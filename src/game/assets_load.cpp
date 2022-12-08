@@ -97,7 +97,8 @@ namespace assets_load {
             }
         }
 
-        loader().sound_data.load("piece_place"_h, encr(path_for_assets(PIECE_PLACE_SOUND)));
+        loader().sound_data.load("piece_place1"_h, encr(path_for_assets(PIECE_PLACE_SOUND1)));
+        loader().sound_data.load("piece_place2"_h, encr(path_for_assets(PIECE_PLACE_SOUND2)));
         loader().sound_data.load("piece_move"_h, encr(path_for_assets(PIECE_MOVE_SOUND)));
 
         loader.set_done();

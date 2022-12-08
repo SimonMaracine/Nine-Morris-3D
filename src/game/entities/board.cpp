@@ -332,8 +332,18 @@ void Board::update_piece_outlines() {
 void Board::play_piece_place_sound(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
-    // TODO choose one sound from multiple sounds
-    piece.source->play(app->res.al_buffer["piece_place"_h].get());
+    const int random = rand() % 2;  // TODO maybe use a better RNG
+
+    switch (random) {
+        case 0:
+            piece.source->play(app->res.al_buffer["piece_place1"_h].get());
+            break;
+        case 1:
+            piece.source->play(app->res.al_buffer["piece_place2"_h].get());
+            break;
+        default:
+            ASSERT(false, "Invalid option");
+    }
 }
 
 void Board::remember_position_and_check_repetition(size_t piece_index, size_t node_index) {
