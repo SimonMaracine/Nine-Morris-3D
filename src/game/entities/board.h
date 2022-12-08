@@ -42,6 +42,7 @@ struct Board {
     void unselect_other_pieces(size_t currently_selected_piece_index_index);
     void update_piece_outlines();
     void play_piece_place_sound(size_t piece_index);
+    void play_piece_move_sound(size_t piece_index);
     void remember_position_and_check_repetition(size_t piece_index, size_t node_index);
     void piece_arrive_at_node(size_t piece_index);
     void prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity);

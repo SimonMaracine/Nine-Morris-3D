@@ -83,7 +83,8 @@ namespace assets {
 
     extern const char* PIECE_PLACE_SOUND1;
     extern const char* PIECE_PLACE_SOUND2;
-    extern const char* PIECE_MOVE_SOUND;
+    extern const char* PIECE_MOVE_SOUND1;
+    extern const char* PIECE_MOVE_SOUND2;
 
     extern const char* ICON_512;
     extern const char* ICON_256;

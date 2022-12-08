@@ -60,7 +60,7 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
       pixel_dist_scale(pixel_dist_scale) {
     font_file_buffer = get_file_data(file_path);
 
-    if (!stbtt_InitFont(&info, (unsigned char*) font_file_buffer, 0)) {
+    if (!stbtt_InitFont(&info, reinterpret_cast<const unsigned char*>(font_file_buffer), 0)) {
         REL_CRITICAL("Could not load font `{}`, exiting...", file_path);
         game_exit::exit_critical();
     }

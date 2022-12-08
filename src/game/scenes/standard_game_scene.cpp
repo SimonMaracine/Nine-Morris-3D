@@ -560,8 +560,13 @@ void StandardGameScene::initialize_pieces() {
     );
 
     app->res.al_buffer.load(
-        "piece_move"_h,
-        app->res.sound_data["piece_move"_h]
+        "piece_move1"_h,
+        app->res.sound_data["piece_move1"_h]
+    );
+
+    app->res.al_buffer.load(
+        "piece_move2"_h,
+        app->res.sound_data["piece_move2"_h]
     );
 
     for (size_t i = 0; i < 9; i++) {
@@ -898,9 +903,19 @@ void StandardGameScene::initialize_pieces_no_normal() {
         app->res.sound_data["piece_place1"_h]
     );
 
-    app->res.al_buffer.load(  // FIXME that bug again at deinitialization
+    app->res.al_buffer.load(
         "piece_place2"_h,
         app->res.sound_data["piece_place2"_h]
+    );
+
+    app->res.al_buffer.load(
+        "piece_move1"_h,
+        app->res.sound_data["piece_move1"_h]
+    );
+
+    app->res.al_buffer.load(
+        "piece_move2"_h,
+        app->res.sound_data["piece_move2"_h]
     );
 
     for (size_t i = 0; i < 9; i++) {

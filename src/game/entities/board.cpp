@@ -175,14 +175,14 @@ void Board::take_and_raise_piece(size_t piece_index) {
 
     Piece& piece = pieces.at(piece_index);
 
+    piece.node_index = NULL_INDEX;
+    piece.pending_remove = true;
+
     prepare_piece_for_linear_move(
         piece_index,
         glm::vec3(piece.model->position.x, PIECE_Y_POSITION + PIECE_RAISE_HEIGHT, piece.model->position.z),
         glm::vec3(0.0f)
     );
-
-    piece.node_index = NULL_INDEX;
-    piece.pending_remove = true;
 }
 
 void Board::select_piece(size_t piece_index) {
@@ -346,6 +346,23 @@ void Board::play_piece_place_sound(size_t piece_index) {
     }
 }
 
+void Board::play_piece_move_sound(size_t piece_index) {
+    Piece& piece = pieces.at(piece_index);
+
+    const int random = rand() % 2;  // TODO maybe use a better RNG
+
+    switch (random) {
+        case 0:
+            piece.source->play(app->res.al_buffer["piece_move1"_h].get());
+            break;
+        case 1:
+            piece.source->play(app->res.al_buffer["piece_move2"_h].get());
+            break;
+        default:
+            ASSERT(false, "Invalid option");
+    }
+}
+
 void Board::remember_position_and_check_repetition(size_t piece_index, size_t node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
@@ -419,6 +436,10 @@ void Board::prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& t
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
+
+    if (!piece.pending_remove) {
+        play_piece_move_sound(piece_index);
+    }
 
     piece.movement.target = target;
     piece.movement.velocity = velocity;
