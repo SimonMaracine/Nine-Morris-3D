@@ -102,7 +102,7 @@ namespace gl {
 
         name = get_name(file_path);
 
-        DEB_DEBUG("Created texture {} ({})", texture, name);
+        DEB_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
     Texture::Texture(encrypt::EncryptedFile file_path, const gl::TextureSpecification& specification) {
@@ -135,7 +135,7 @@ namespace gl {
 
         name = get_name(file_path);
 
-        DEB_DEBUG("Created texture {} ({})", texture, name);
+        DEB_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
     Texture::Texture(std::shared_ptr<TextureData> data, const gl::TextureSpecification& specification) {
@@ -157,13 +157,13 @@ namespace gl {
         height = data->height;
         name = get_name(data->file_path);
 
-        DEB_DEBUG("Created texture {} ({})", texture, name);
+        DEB_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
     Texture::~Texture() {
         glDeleteTextures(1, &texture);
 
-        DEB_DEBUG("Deleted texture {} ({})", texture, name);
+        DEB_DEBUG("Deleted GL texture {} ({})", texture, name);
     }
 
     void Texture::bind(GLenum slot) {
@@ -218,7 +218,7 @@ namespace gl {
 
         name = get_name_texture3d(file_paths[0]);
 
-        DEB_DEBUG("Created 3D texture {} ({})", texture, name);
+        DEB_DEBUG("Created GL 3D texture {} ({})", texture, name);
     }
 
     Texture3D::Texture3D(const std::array<std::shared_ptr<TextureData>, 6>& data) {
@@ -244,13 +244,13 @@ namespace gl {
 
         name = get_name_texture3d(data[0]->file_path.c_str());
 
-        DEB_DEBUG("Created 3D texture {} ({})", texture, name);
+        DEB_DEBUG("Created GL 3D texture {} ({})", texture, name);
     }
 
     Texture3D::~Texture3D() {
         glDeleteTextures(1, &texture);
 
-        DEB_DEBUG("Deleted 3D texture {} ({})", texture, name);
+        DEB_DEBUG("Deleted GL 3D texture {} ({})", texture, name);
     }
 
     void Texture3D::bind(GLenum slot) {

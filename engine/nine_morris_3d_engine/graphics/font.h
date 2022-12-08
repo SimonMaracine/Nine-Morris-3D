@@ -43,11 +43,6 @@ public:
     // Get width and height of a line of text
     void get_string_size(std::string_view string, float scale, int* out_width, int* out_height);
 private:
-    static const char* get_file_data(std::string_view file_path);
-    static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsigned char* glyph,
-        int width, int height, int dest_x, int dest_y, float* s0, float* t0, float* s1, float* t1);
-    static std::string get_name(std::string_view file_path);
-
     struct BakeContext {
         int x = 0, y = 0;
         int max_row_height = 0;

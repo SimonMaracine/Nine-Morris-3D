@@ -14,6 +14,46 @@
 
 constexpr char ERROR_CHARACTER = 127;
 
+static std::string get_name(std::string_view file_path) {
+    size_t last_slash = file_path.find_last_of("/");
+    ASSERT(last_slash != std::string::npos, "Could not find slash");
+
+    return std::string(file_path.substr(last_slash + 1));
+}
+
+static const char* get_file_data(std::string_view file_path) {
+    std::ifstream file {std::string(file_path), std::ios::binary};
+
+    if (!file.is_open()) {
+        REL_CRITICAL("Could not open file `{}` for reading, exiting...", file_path);
+        game_exit::exit_critical();
+    }
+
+    file.seekg(0, file.end);
+    const size_t length = file.tellg();
+    file.seekg(0, file.beg);
+
+    char* buffer = new char[length];
+    file.read(buffer, length);
+
+    return buffer;
+}
+
+static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsigned char* glyph,
+        int width, int height, int dest_x, int dest_y, float* s0, float* t0, float* s1, float* t1) {
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            const size_t index = static_cast<size_t>((y + dest_y) * dest_width + (x + dest_x));
+            dest[index] = glyph[y * width + x];
+        }
+    }
+
+    *s0 = static_cast<float>(dest_x) / static_cast<float>(dest_width);
+    *t0 = static_cast<float>(dest_y) / static_cast<float>(dest_height);
+    *s1 = static_cast<float>(dest_x + width) / static_cast<float>(dest_width);
+    *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
+}
+
 Font::Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
         int pixel_dist_scale, int bitmap_size)
     : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value),
@@ -282,55 +322,4 @@ void Font::get_string_size(std::string_view string, float scale, int* out_width,
     }
 
     *out_width = static_cast<int>(roundf((x + 2) * scale));
-}
-
-const char* Font::get_file_data(std::string_view file_path) {
-    std::ifstream file {std::string(file_path), std::ios::binary};
-
-    if (!file.is_open()) {
-        REL_CRITICAL("Could not open file `{}` for reading, exiting...", file_path);
-        game_exit::exit_critical();
-    }
-
-    file.seekg(0, file.end);
-    const size_t length = file.tellg();
-    file.seekg(0, file.beg);
-
-    char* buffer = new char[length];
-    file.read(buffer, length);
-
-    return buffer;
-}
-
-void Font::blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsigned char* glyph,
-        int width, int height, int dest_x, int dest_y, float* s0, float* t0, float* s1, float* t1) {
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            const size_t index = static_cast<size_t>((y + dest_y) * dest_width + (x + dest_x));
-            dest[index] = glyph[y * width + x];
-        }
-    }
-
-    *s0 = static_cast<float>(dest_x) / static_cast<float>(dest_width);
-    *t0 = static_cast<float>(dest_y) / static_cast<float>(dest_height);
-    *s1 = static_cast<float>(dest_x + width) / static_cast<float>(dest_width);
-    *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
-}
-
-std::string Font::get_name(std::string_view file_path) {
-    std::vector<std::string> tokens;
-
-    char copy[512];
-    strncpy(copy, file_path.data(), 512 - 1);
-
-    char* token = strtok(copy, "/.");
-
-    while (token != nullptr) {
-        tokens.push_back(token);
-        token = strtok(nullptr, "/.");
-    }
-
-    ASSERT(tokens.size() >= 2, "Invalid file name");
-
-    return tokens[tokens.size() - 2];  // It's ok
 }

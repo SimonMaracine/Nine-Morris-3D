@@ -12,13 +12,13 @@ namespace gl {
         glGenVertexArrays(1, &array);
         glBindVertexArray(array);
 
-        DEB_DEBUG("Created vertex array {}", array);
+        DEB_DEBUG("Created GL vertex array {}", array);
     }
 
     VertexArray::~VertexArray() {
         glDeleteVertexArrays(1, &array);
 
-        DEB_DEBUG("Deleted vertex array {}", array);
+        DEB_DEBUG("Deleted GL vertex array {}", array);
     }
 
     void VertexArray::bind() {

@@ -65,7 +65,7 @@ namespace gl {
             configure_uniform_blocks(program, uniform_blocks);
         }
 
-        DEB_DEBUG("Created shader {} ({})", program, name);
+        DEB_DEBUG("Created GL shader {} ({})", program, name);
     }
 
     Shader::Shader(encrypt::EncryptedFile vertex_source_path, encrypt::EncryptedFile fragment_source_path,
@@ -102,13 +102,13 @@ namespace gl {
             configure_uniform_blocks(program, uniform_blocks);
         }
 
-        DEB_DEBUG("Created shader {} ({})", program, name);
+        DEB_DEBUG("Created GL shader {} ({})", program, name);
     }
 
     Shader::~Shader() {
         DELETE_SHADER(program, vertex_shader, fragment_shader);
 
-        DEB_DEBUG("Deleted shader {} ({})", program, name);
+        DEB_DEBUG("Deleted GL shader {} ({})", program, name);
     }
 
     void Shader::bind() {

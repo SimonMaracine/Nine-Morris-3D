@@ -155,7 +155,7 @@ namespace gl {
 
         build();
 
-        DEB_DEBUG("Created framebuffer {}", framebuffer);
+        DEB_DEBUG("Created GL framebuffer {}", framebuffer);
     }
 
     Framebuffer::~Framebuffer() {
@@ -189,7 +189,7 @@ namespace gl {
 
         glDeleteFramebuffers(1, &framebuffer);
 
-        DEB_DEBUG("Deleted framebuffer {}", framebuffer);
+        DEB_DEBUG("Deleted GL framebuffer {}", framebuffer);
     }
 
     void Framebuffer::bind() {
@@ -476,8 +476,8 @@ namespace gl {
         const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
         if (status != GL_FRAMEBUFFER_COMPLETE) {
-            REL_CRITICAL("Framebuffer {} is incomplete, exiting...", framebuffer);
-            REL_CRITICAL("Framebuffer status: {}", print_framebuffer_status_message(status));
+            REL_CRITICAL("GL framebuffer {} is incomplete, exiting...", framebuffer);
+            REL_CRITICAL("GL framebuffer status: {}", print_framebuffer_status_message(status));
             game_exit::exit_critical();
         }
 
