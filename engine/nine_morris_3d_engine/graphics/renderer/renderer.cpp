@@ -267,7 +267,7 @@ void Renderer::render() {
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
 
-    // Disable blend to not mess up second, floating-point attachment
+    // Disable blending to not mess up the second, floating-point attachment
     glDisablei(GL_BLEND, 1);  // TODO if post processing doesn't use two attachments, these calls are not needed in main loop
 
     // Render all normal models
@@ -275,8 +275,6 @@ void Renderer::render() {
 
     // Render all models with outline
     draw_models_with_outline();
-
-    glEnablei(GL_BLEND, 1);
 
 #ifdef PLATFORM_GAME_DEBUG
     if (origin) {
@@ -292,7 +290,10 @@ void Renderer::render() {
     // Render 3D quads
     draw_quads();
 
-    // Blit the scene texture result to an intermediate texture resolving anti-aliasing
+    // Re-enable blending
+    glEnablei(GL_BLEND, 1);
+
+    // Blit the resulted scene texture to an intermediate texture, resolving anti-aliasing
     storage.scene_framebuffer->blit(
         storage.intermediate_framebuffer.get(), app->data().width, app->data().height
     );

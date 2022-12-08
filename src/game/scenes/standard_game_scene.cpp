@@ -955,7 +955,7 @@ void StandardGameScene::initialize_piece_no_normal(
     layout.add(2, BufferLayout::Float, 3);
 
     BufferLayout layout2;
-    layout2.add(4, BufferLayout::Float, 1);
+    layout2.add(3, BufferLayout::Float, 1);
 
     auto vertex_array = app->res.vertex_array.load(hs {"piece" + std::to_string(index)});
     vertex_array->add_buffer(vertex_buffer, layout);
