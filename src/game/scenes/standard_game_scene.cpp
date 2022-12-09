@@ -569,6 +569,11 @@ void StandardGameScene::initialize_pieces() {
         app->res.sound_data["piece_move2"_h]
     );
 
+    app->res.al_buffer.load(
+        "piece_take"_h,
+        app->res.sound_data["piece_take"_h]
+    );
+
     for (size_t i = 0; i < 9; i++) {
         initialize_piece(
             i, app->res.mesh_ptnt["white_piece"_h],
@@ -916,6 +921,11 @@ void StandardGameScene::initialize_pieces_no_normal() {
     app->res.al_buffer.load(
         "piece_move2"_h,
         app->res.sound_data["piece_move2"_h]
+    );
+
+    app->res.al_buffer.load(
+        "piece_take"_h,
+        app->res.sound_data["piece_take"_h]
     );
 
     for (size_t i = 0; i < 9; i++) {

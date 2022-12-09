@@ -175,6 +175,8 @@ void Board::take_and_raise_piece(size_t piece_index) {
 
     Piece& piece = pieces.at(piece_index);
 
+    play_piece_take_sound(piece_index);
+
     piece.node_index = NULL_INDEX;
     piece.pending_remove = true;
 
@@ -361,6 +363,12 @@ void Board::play_piece_move_sound(size_t piece_index) {
         default:
             ASSERT(false, "Invalid option");
     }
+}
+
+void Board::play_piece_take_sound(size_t piece_index) {
+    Piece& piece = pieces.at(piece_index);
+
+    piece.source->play(app->res.al_buffer["piece_take"_h].get());
 }
 
 void Board::remember_position_and_check_repetition(size_t piece_index, size_t node_index) {

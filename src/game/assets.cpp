@@ -85,6 +85,7 @@ namespace assets {
     const char* PIECE_PLACE_SOUND2 = ENCR("data/sounds/piece_place-02.ogg");
     const char* PIECE_MOVE_SOUND1 = ENCR("data/sounds/piece_move-01.ogg");
     const char* PIECE_MOVE_SOUND2 = ENCR("data/sounds/piece_move-02.ogg");
+    const char* PIECE_TAKE_SOUND = ENCR("data/sounds/piece_take.ogg");
 
     const char* ICON_512 = "data/icons/512x512/ninemorris3d.png";
     const char* ICON_256 = "data/icons/256x256/ninemorris3d.png";

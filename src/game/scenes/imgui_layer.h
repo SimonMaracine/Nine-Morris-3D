@@ -229,9 +229,11 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo && can_undo_redo)) {
                 scene->undo();
                 can_undo = scene->undo_redo_state.undo.size() > 0;
+                can_redo = scene->undo_redo_state.redo.size() > 0;
             }
             if (ImGui::MenuItem("Redo", nullptr, false, can_redo && can_undo_redo)) {
                 scene->redo();
+                can_undo = scene->undo_redo_state.undo.size() > 0;
                 can_redo = scene->undo_redo_state.redo.size() > 0;
             }
             if (ImGui::MenuItem("Exit To Launcher", nullptr, false)) {
