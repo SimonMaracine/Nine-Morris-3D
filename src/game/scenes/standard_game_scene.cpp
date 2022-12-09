@@ -125,6 +125,13 @@ void StandardGameScene::on_awake() {
     app->evt.sink<KeyPressedEvent>().connect<&StandardGameScene::on_key_pressed>(this);
     app->evt.sink<KeyReleasedEvent>().connect<&StandardGameScene::on_key_released>(this);
     app->evt.sink<WindowResizedEvent>().connect<&StandardGameScene::on_window_resized>(this);
+
+    auto music_buffer = app->res.al_buffer.load(
+        "music"_h,
+        app->res.sound_data["music"_h]
+    );
+    auto music = app->res.al_source.load("music"_h);
+    music->play(music_buffer.get());
 }
 
 void StandardGameScene::on_update() {
