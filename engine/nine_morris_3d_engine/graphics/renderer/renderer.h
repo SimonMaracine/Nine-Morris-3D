@@ -45,6 +45,8 @@ public:
         std::shared_ptr<gl::Texture> texture;
     };
 
+    struct Storage;
+
     Renderer(Application* app);
     ~Renderer();
 
@@ -73,20 +75,7 @@ public:
 
     identifier::Id get_hovered_id() { return hovered_id; }
     PostProcessingContext& get_post_processing_context() { return post_processing_context; }
-    gl::UniformBlockSpecification& get_projection_view_uniform_block() { return storage.projection_view_uniform_block; }
-    gl::UniformBlockSpecification& get_light_uniform_block() { return storage.light_uniform_block; }
-    gl::UniformBlockSpecification& get_light_view_position_uniform_block() { return storage.light_view_position_uniform_block; }
-    gl::UniformBlockSpecification& get_light_space_uniform_block() { return storage.light_space_uniform_block; }
-    std::shared_ptr<gl::Framebuffer> get_scene_framebuffer() { return storage.scene_framebuffer; }
-
-#ifdef PLATFORM_GAME_DEBUG
-    std::shared_ptr<gl::Shader> get_origin_shader() { return storage.origin_shader; }
-#endif
-    std::shared_ptr<gl::Shader> get_outline_shader() { return storage.outline_shader; }
-    std::shared_ptr<gl::Shader> get_quad3d_shader() { return storage.quad3d_shader; }
-    std::shared_ptr<gl::Shader> get_screen_quad_shader() { return storage.screen_quad_shader; }
-    std::shared_ptr<gl::Shader> get_shadow_shader() { return storage.shadow_shader; }
-    std::shared_ptr<gl::Shader> get_skybox_shader() { return storage.skybox_shader; }
+    const Storage& get_storage() { return storage; }
 
     bool origin = false;  // This does nothing in release mode
     DirectionalLight light;
@@ -118,7 +107,7 @@ private:
     void cache_camera_data();
     void on_window_resized(const WindowResizedEvent& event);
 
-    struct {
+    struct Storage {
         std::shared_ptr<gl::UniformBuffer> projection_view_uniform_buffer;
         std::shared_ptr<gl::UniformBuffer> light_uniform_buffer;
         std::shared_ptr<gl::UniformBuffer> light_view_position_uniform_buffer;

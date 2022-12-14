@@ -346,10 +346,10 @@ void StandardGameScene::initialize_board() {
             "u_material.normal"
         },
         std::vector {
-            app->renderer->get_projection_view_uniform_block(),
-            app->renderer->get_light_uniform_block(),
-            app->renderer->get_light_view_position_uniform_block(),
-            app->renderer->get_light_space_uniform_block()
+            app->renderer->get_storage().projection_view_uniform_block,
+            app->renderer->get_storage().light_uniform_block,
+            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_space_uniform_block
         }
     );
     app->renderer->setup_shader(shader);
@@ -424,10 +424,10 @@ void StandardGameScene::initialize_board_paint() {
             "u_material.normal"
         },
         std::vector {
-            app->renderer->get_projection_view_uniform_block(),
-            app->renderer->get_light_uniform_block(),
-            app->renderer->get_light_view_position_uniform_block(),
-            app->renderer->get_light_space_uniform_block()
+            app->renderer->get_storage().projection_view_uniform_block,
+            app->renderer->get_storage().light_uniform_block,
+            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_space_uniform_block
         }
     );
     app->renderer->setup_shader(shader);
@@ -497,10 +497,10 @@ void StandardGameScene::initialize_pieces() {
             "u_material.tint"
         },
         std::vector {
-            app->renderer->get_projection_view_uniform_block(),
-            app->renderer->get_light_uniform_block(),
-            app->renderer->get_light_view_position_uniform_block(),
-            app->renderer->get_light_space_uniform_block()
+            app->renderer->get_storage().projection_view_uniform_block,
+            app->renderer->get_storage().light_uniform_block,
+            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_space_uniform_block
         }
     );
     app->renderer->setup_shader(shader);
@@ -649,7 +649,7 @@ void StandardGameScene::initialize_nodes() {
         encr(path::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_model_matrix", "u_color" },
         std::vector {
-            app->renderer->get_projection_view_uniform_block()
+            app->renderer->get_storage().projection_view_uniform_block
         }
     );
     app->renderer->setup_shader(shader);
@@ -720,10 +720,10 @@ void StandardGameScene::initialize_board_no_normal() {
             "u_material.shininess"
         },
         std::vector {
-            app->renderer->get_projection_view_uniform_block(),
-            app->renderer->get_light_uniform_block(),
-            app->renderer->get_light_view_position_uniform_block(),
-            app->renderer->get_light_space_uniform_block()
+            app->renderer->get_storage().projection_view_uniform_block,
+            app->renderer->get_storage().light_uniform_block,
+            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_space_uniform_block
         }
     );
     app->renderer->setup_shader(shader);
@@ -788,10 +788,10 @@ void StandardGameScene::initialize_board_paint_no_normal() {
             "u_material.shininess",
         },
         std::vector {
-            app->renderer->get_projection_view_uniform_block(),
-            app->renderer->get_light_uniform_block(),
-            app->renderer->get_light_view_position_uniform_block(),
-            app->renderer->get_light_space_uniform_block()
+            app->renderer->get_storage().projection_view_uniform_block,
+            app->renderer->get_storage().light_uniform_block,
+            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_space_uniform_block
         }
     );
     app->renderer->setup_shader(shader);
@@ -858,10 +858,10 @@ void StandardGameScene::initialize_pieces_no_normal() {
             "u_material.tint"
         },
         std::vector {
-            app->renderer->get_projection_view_uniform_block(),
-            app->renderer->get_light_uniform_block(),
-            app->renderer->get_light_view_position_uniform_block(),
-            app->renderer->get_light_space_uniform_block()
+            app->renderer->get_storage().projection_view_uniform_block,
+            app->renderer->get_storage().light_uniform_block,
+            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_space_uniform_block
         }
     );
     app->renderer->setup_shader(shader);

@@ -118,6 +118,8 @@ namespace gui {
 
 class GuiRenderer {
 public:
+    struct Storage;
+
     GuiRenderer(Application* app);
     ~GuiRenderer();
 
@@ -135,8 +137,7 @@ public:
 
     void quad_center(float& width, float& height, float& x_pos, float& y_pos);
 
-    std::shared_ptr<gl::Shader> get_quad2d_shader() { return storage.quad2d_shader; }  // TODO this
-    std::shared_ptr<gl::Shader> get_text_shader() { return storage.text_shader; }
+    const Storage& get_storage() { return storage; }
 private:
     void prepare_draw_image();
     void prepare_draw_text();
