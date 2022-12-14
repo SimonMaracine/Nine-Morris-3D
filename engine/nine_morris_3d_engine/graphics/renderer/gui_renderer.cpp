@@ -320,7 +320,7 @@ void GuiRenderer::prepare_draw_text() {
     storage.text_shader->bind();
 }
 
-void GuiRenderer::draw(std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw) {
+void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw) {
     prepare_draw();
 
     for (gui::Widget* widget : subwidgets) {

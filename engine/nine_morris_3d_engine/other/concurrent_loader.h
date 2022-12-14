@@ -16,7 +16,12 @@ public:
         : load_function(load_function) {}
     ~ConcurrentLoader() = default;
 
-    Resources& operator()() {
+    ConcurrentLoader(const ConcurrentLoader&) = delete;
+    ConcurrentLoader& operator=(const ConcurrentLoader&) = delete;
+    ConcurrentLoader(ConcurrentLoader&&) = delete;
+    ConcurrentLoader& operator=(ConcurrentLoader&&) = delete;
+
+    ResourcesCache& operator()() {
         return local_res;
     }
 
@@ -24,10 +29,12 @@ public:
         return loaded.load();
     }
 
-    void join_and_merge(Resources& res) {
+    void join_and_merge(ResourcesCache& res) {
         loading_thread.join();
 
         res.merge(local_res);
+
+        DEB_INFO("Merged local resources into global resources");
     }
 
     void join() {
@@ -48,7 +55,7 @@ public:
         loaded.store(true);
     }
 private:
-    Resources local_res;
+    ResourcesCache local_res;
     Function load_function;
     std::thread loading_thread;
     std::atomic<bool> loaded = false;

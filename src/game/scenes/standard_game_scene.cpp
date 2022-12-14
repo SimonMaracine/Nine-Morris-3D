@@ -32,7 +32,7 @@ void StandardGameScene::on_start() {
     setup_camera();
     setup_widgets();
 
-    keyboard = KeyboardControls {app, &board, data.quad_cache["keyboard_controls"_h]};
+    keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_h]};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<StandardBoardSerialized> {};
@@ -57,13 +57,17 @@ void StandardGameScene::on_start() {
 
 #ifdef PLATFORM_GAME_DEBUG
     app->renderer->origin = true;
-    app->renderer->add_quad(data.quad_cache["light_bulb"_h]);
+    app->renderer->add_quad(app->res.quad["light_bulb"_h]);
 #endif
 
     imgui_layer.update();
 
     camera_controller.go_towards_position(default_camera_position);
     camera_controller.setup_events(app);
+
+    // Can dispose of these
+    app->res.texture_data.clear();
+    app->res.sound_data.clear();
 }
 
 void StandardGameScene::on_stop() {
@@ -116,9 +120,9 @@ void StandardGameScene::on_awake() {
     initialize_light_bulb();
 #endif
 
-    setup_skybox();
-    setup_light();
-    setup_indicators_textures();
+    initialize_skybox();
+    initialize_light();
+    initialize_indicators_textures();
 
     app->evt.sink<MouseButtonPressedEvent>().connect<&StandardGameScene::on_mouse_button_pressed>(this);
     app->evt.sink<MouseButtonReleasedEvent>().connect<&StandardGameScene::on_mouse_button_released>(this);
@@ -203,8 +207,6 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         return;
     }
 
-    auto& data = app->user_data<Data>();
-
     if (event.button == input::MouseButton::LEFT) {
         const bool valid_phases = (
             board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
@@ -219,7 +221,7 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         }
 
         if (show_keyboard_controls) {
-            app->renderer->remove_quad(data.quad_cache["keyboard_controls"_h]);
+            app->renderer->remove_quad(app->res.quad["keyboard_controls"_h]);
             show_keyboard_controls = false;
         }
     }
@@ -230,8 +232,6 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
         return;
     }
 
-    auto& data = app->user_data<Data>();
-
     switch (event.key) {
         case input::Key::UP:
         case input::Key::DOWN:
@@ -239,7 +239,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::RIGHT:
         case input::Key::ENTER:
             if (!show_keyboard_controls) {
-                app->renderer->add_quad(data.quad_cache["keyboard_controls"_h]);
+                app->renderer->add_quad(app->res.quad["keyboard_controls"_h]);
                 show_keyboard_controls = true;
                 return;
             }
@@ -995,9 +995,7 @@ void StandardGameScene::initialize_piece_no_normal(
 }
 
 void StandardGameScene::initialize_keyboard_controls() {
-    auto& data = app->user_data<Data>();
-
-    auto keyboard_controls = data.quad_cache.load("keyboard_controls"_h);
+    auto keyboard_controls = app->res.quad.load("keyboard_controls"_h);
 
     gl::TextureSpecification specification;
     specification.min_filter = gl::Filter::Linear;
@@ -1018,9 +1016,7 @@ void StandardGameScene::initialize_keyboard_controls() {
 }
 
 void StandardGameScene::initialize_light_bulb() {
-    auto& data = app->user_data<Data>();
-
-    auto light_bulb = data.quad_cache.load("light_bulb"_h);
+    auto light_bulb = app->res.quad.load("light_bulb"_h);
 
     gl::TextureSpecification specification;
     specification.min_filter = gl::Filter::Linear;
@@ -1123,16 +1119,14 @@ void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& 
 }
 
 void StandardGameScene::setup_entities() {
-    auto& data = app->user_data<Data>();
-
     board = StandardBoard {};
-    board.model = data.model_cache.load("board"_h);
-    board.paint_model = data.model_cache.load("board_paint"_h);
+    board.model = app->res.model.load("board"_h);
+    board.paint_model = app->res.model.load("board_paint"_h);
 
     for (size_t i = 0; i < 9; i++) {
         board.pieces[i] = Piece {
             i, PieceType::White,
-            data.model_cache.load(hs {"piece" + std::to_string(i)}),  // FIXME is model ever deleted from cache?
+            app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
     }
@@ -1140,21 +1134,21 @@ void StandardGameScene::setup_entities() {
     for (size_t i = 9; i < 18; i++) {
         board.pieces[i] = Piece {
             i, PieceType::Black,
-            data.model_cache.load(hs {"piece" + std::to_string(i)}),
+            app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
     }
 
     for (size_t i = 0; i < 24; i++) {
         board.nodes[i] = Node {
-            i, data.model_cache.load(hs {"node" + std::to_string(i)})
+            i, app->res.model.load(hs {"node" + std::to_string(i)})
         };
     }
 
     DEB_DEBUG("Setup entities");
 }
 
-void StandardGameScene::setup_skybox() {
+void StandardGameScene::initialize_skybox() {
     if (app->user_data<Data>().options.skybox == game_options::NONE) {
         DEB_DEBUG("Setup skybox");
         return;
@@ -1175,7 +1169,7 @@ void StandardGameScene::setup_skybox() {
     DEB_DEBUG("Setup skybox");
 }
 
-void StandardGameScene::setup_light() {
+void StandardGameScene::initialize_light() {
     auto& data = app->user_data<Data>();
 
     if (data.options.skybox == game_options::FIELD) {
@@ -1193,11 +1187,11 @@ void StandardGameScene::setup_light() {
 
 #ifdef PLATFORM_GAME_DEBUG
     if (data.options.skybox == game_options::FIELD) {
-        data.quad_cache["light_bulb"_h]->position = LIGHT_FIELD.position;
+        app->res.quad["light_bulb"_h]->position = LIGHT_FIELD.position;
     } else if (data.options.skybox == game_options::AUTUMN) {
-        data.quad_cache["light_bulb"_h]->position = LIGHT_AUTUMN.position;
+        app->res.quad["light_bulb"_h]->position = LIGHT_AUTUMN.position;
     } else if (data.options.skybox == game_options::NONE) {
-        data.quad_cache["light_bulb"_h]->position = LIGHT_NONE.position;
+        app->res.quad["light_bulb"_h]->position = LIGHT_NONE.position;
     }
 #endif
 
@@ -1250,7 +1244,7 @@ void StandardGameScene::setup_camera() {
     DEB_DEBUG("Setup camera");
 }
 
-void StandardGameScene::setup_indicators_textures() {
+void StandardGameScene::initialize_indicators_textures() {
     gl::TextureSpecification specification;
     specification.min_filter = gl::Filter::Linear;
     specification.mag_filter = gl::Filter::Linear;
@@ -1283,7 +1277,7 @@ void StandardGameScene::setup_widgets() {
     constexpr int LOWEST_RESOLUTION = 288;
     constexpr int HIGHEST_RESOLUTION = 1035;
 
-    auto turn_indicator = data.image_cache.load(
+    auto turn_indicator = app->res.image.load(
         "turn_indicator"_h, app->res.texture["white_indicator"_h]
     );
     turn_indicator->stick(gui::Sticky::SE);
@@ -1292,7 +1286,7 @@ void StandardGameScene::setup_widgets() {
     turn_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
     app->gui_renderer->add_widget(turn_indicator);
 
-    auto timer_text = data.text_cache.load(
+    auto timer_text = app->res.text.load(
         "timer_text"_h,
         app->res.font["good_dog_plain"_h],
         "00:00", 1.5f, glm::vec3(0.9f)
@@ -1306,7 +1300,7 @@ void StandardGameScene::setup_widgets() {
         app->gui_renderer->add_widget(timer_text);
     }
 
-    auto wait_indicator = data.image_cache.load(
+    auto wait_indicator = app->res.image.load(
         "wait_indicator"_h, app->res.texture["wait_indicator"_h]
     );
     wait_indicator->stick(gui::Sticky::NE);
@@ -1314,7 +1308,7 @@ void StandardGameScene::setup_widgets() {
     wait_indicator->offset(55, gui::Relative::Top);
     wait_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 
-    auto computer_thinking_indicator = data.image_cache.load(
+    auto computer_thinking_indicator = app->res.image.load(
         "computer_thinking_indicator"_h, app->res.texture["computer_thinking_indicator"_h]
     );
     computer_thinking_indicator->stick(gui::Sticky::NE);
@@ -1395,50 +1389,42 @@ void StandardGameScene::update_game_state() {
 }
 
 void StandardGameScene::update_timer_text() {
-    auto& data = app->user_data<Data>();
-
     char time[32];
     timer.get_time_formatted(time);
-    data.text_cache["timer_text"_h]->set_text(time);
+    app->res.text["timer_text"_h]->set_text(time);
 }
 
 void StandardGameScene::update_turn_indicator() {
-    auto& data = app->user_data<Data>();
-
     if (board.turn == BoardPlayer::White) {
-        data.image_cache["turn_indicator"_h]->set_image(app->res.texture["white_indicator"_h]);
+        app->res.image["turn_indicator"_h]->set_image(app->res.texture["white_indicator"_h]);
     } else {
-        data.image_cache["turn_indicator"_h]->set_image(app->res.texture["black_indicator"_h]);
+        app->res.image["turn_indicator"_h]->set_image(app->res.texture["black_indicator"_h]);
     }
 }
 
 void StandardGameScene::update_wait_indicator() {
-    auto& data = app->user_data<Data>();
-
     if (!board.next_move) {
         if (!show_wait_indicator) {
-            app->gui_renderer->add_widget(data.image_cache["wait_indicator"_h]);
+            app->gui_renderer->add_widget(app->res.image["wait_indicator"_h]);
             show_wait_indicator = true;
         }
     } else {
         if (show_wait_indicator) {
-            app->gui_renderer->remove_widget(data.image_cache["wait_indicator"_h]);
+            app->gui_renderer->remove_widget(app->res.image["wait_indicator"_h]);
             show_wait_indicator = false;
         }
     }
 }
 
 void StandardGameScene::update_computer_thinking_indicator() {
-    auto& data = app->user_data<Data>();
-
     if (game.state == GameState::ComputerThinkingMove) {
         if (!show_computer_thinking_indicator) {
-            app->gui_renderer->add_widget(data.image_cache["computer_thinking_indicator"_h]);
+            app->gui_renderer->add_widget(app->res.image["computer_thinking_indicator"_h]);
             show_computer_thinking_indicator = true;
         }
     } else {
         if (show_computer_thinking_indicator) {
-            app->gui_renderer->remove_widget(data.image_cache["computer_thinking_indicator"_h]);
+            app->gui_renderer->remove_widget(app->res.image["computer_thinking_indicator"_h]);
             show_computer_thinking_indicator = false;
         }
     }
@@ -1451,11 +1437,11 @@ void StandardGameScene::update_cursor() {
         if (board.must_take_piece) {
             app->window->set_cursor(data.cross_cursor);
 
-            data.quad_cache["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_cross"_h];
+            app->res.quad["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_cross"_h];
         } else {
             app->window->set_cursor(data.arrow_cursor);
 
-            data.quad_cache["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_default"_h];
+            app->res.quad["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_default"_h];
         }
     }
 }
@@ -1536,7 +1522,9 @@ void StandardGameScene::change_skybox() {
     auto texture = app->res.texture_3d.force_load("skybox"_h, data);
     app->renderer->set_skybox(texture);
 
-    setup_light();
+    initialize_light();
+
+    app->res.texture_data.release("skybox"_h);
 }
 
 void StandardGameScene::check_skybox_loader() {
@@ -1576,6 +1564,8 @@ void StandardGameScene::change_board_paint_texture() {
     );
 
     app->res.material_instance["board_paint"_h]->set_texture("u_material.diffuse", diffuse_texture, 0);
+
+    app->res.texture_data.release("board_paint_diffuse"_h);
 }
 
 void StandardGameScene::check_board_paint_texture_loader() {

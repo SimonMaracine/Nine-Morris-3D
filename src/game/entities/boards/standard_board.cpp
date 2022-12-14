@@ -855,7 +855,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             Piece piece = Piece {
                 ser_index,
                 ser_piece.type,
-                data.model_cache[hs {"piece" + std::to_string(ser_index)}],
+                app->res.model[hs {"piece" + std::to_string(ser_index)}],
                 app->res.al_source[hs {"piece" + std::to_string(ser_index)}]
             };
 

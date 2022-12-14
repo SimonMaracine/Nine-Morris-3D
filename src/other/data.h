@@ -15,11 +15,6 @@ struct Data {
     ImFont* imgui_info_font = nullptr;
     ImFont* imgui_windows_font = nullptr;
 
-    resmanager::Cache<Renderer::Model> model_cache;  // TODO maybe put these in global cache
-    resmanager::Cache<Renderer::Quad> quad_cache;
-    resmanager::Cache<gui::Image> image_cache;
-    resmanager::Cache<gui::Text> text_cache;
-
     std::unordered_map<size_t, identifier::Id> node_ids;
     std::unordered_map<size_t, identifier::Id> piece_ids;
 };

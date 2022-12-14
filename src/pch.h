@@ -38,8 +38,6 @@
 #include <cereal/types/utility.hpp>
 #include <cereal/types/optional.hpp>
 
-#include <entt/entt.hpp>
-
 #include <resmanager/resmanager.h>
 using namespace resmanager::literals;
 using hs = resmanager::hashed_str;

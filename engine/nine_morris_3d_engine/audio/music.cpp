@@ -14,6 +14,7 @@ namespace music {
         source = std::make_shared<al::Source>();
         buffer = std::make_shared<al::Buffer>(data);
 
+        source->set_rolloff_factor(0.0f);  // TODO see if this is right
         name = file_path;
 
         DEB_DEBUG("Loaded music track `{}`", name);
@@ -25,6 +26,7 @@ namespace music {
         source = std::make_shared<al::Source>();
         buffer = std::make_shared<al::Buffer>(data);
 
+        source->set_rolloff_factor(0.0f);
         name = file_path;
 
         DEB_DEBUG("Loaded music track `{}`", name);
@@ -34,6 +36,7 @@ namespace music {
         source = std::make_shared<al::Source>();
         buffer = std::make_shared<al::Buffer>(data);
 
+        source->set_rolloff_factor(0.0f);
         name = data->get_file_path();
 
         DEB_DEBUG("Loaded music track `{}`", name);

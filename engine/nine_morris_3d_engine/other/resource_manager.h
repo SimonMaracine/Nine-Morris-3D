@@ -11,6 +11,8 @@
 #include "nine_morris_3d_engine/graphics/opengl/shader.h"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.h"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.h"
+#include "nine_morris_3d_engine/graphics/renderer/renderer.h"
+#include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
 #include "nine_morris_3d_engine/graphics/font.h"
 #include "nine_morris_3d_engine/graphics/material.h"
 #include "nine_morris_3d_engine/graphics/texture_data.h"
@@ -41,8 +43,8 @@ namespace _loaders {
     };
 }
 
-struct Resources {
-    void merge(Resources& other);
+struct ResourcesCache {
+    void merge(ResourcesCache& other);
 
     resmanager::Cache<gl::Texture> texture;
     resmanager::Cache<gl::Texture3D> texture_3d;
@@ -64,4 +66,8 @@ struct Resources {
     resmanager::Cache<al::Buffer> al_buffer;
     resmanager::Cache<SoundData> sound_data;
     resmanager::Cache<music::MusicTrack> music_track;
+    resmanager::Cache<Renderer::Model> model;
+    resmanager::Cache<Renderer::Quad> quad;
+    resmanager::Cache<gui::Image> image;
+    resmanager::Cache<gui::Text> text;
 };

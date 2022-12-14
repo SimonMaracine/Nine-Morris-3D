@@ -135,12 +135,12 @@ public:
 
     void quad_center(float& width, float& height, float& x_pos, float& y_pos);
 
-    std::shared_ptr<gl::Shader> get_quad2d_shader() { return storage.quad2d_shader; }
+    std::shared_ptr<gl::Shader> get_quad2d_shader() { return storage.quad2d_shader; }  // TODO this
     std::shared_ptr<gl::Shader> get_text_shader() { return storage.text_shader; }
 private:
     void prepare_draw_image();
     void prepare_draw_text();
-    void draw(std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw);
+    void draw(const std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw);
     void on_window_resized(const WindowResizedEvent& event);
 
     struct Storage {

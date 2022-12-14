@@ -342,11 +342,11 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     auto& data = app->user_data<Data>();
 
                     if (data.options.hide_timer) {
-                        app->gui_renderer->remove_widget(data.text_cache["timer_text"_h]);
+                        app->gui_renderer->remove_widget(app->res.text["timer_text"_h]);
 
                         DEB_INFO("Hide timer");
                     } else {
-                        app->gui_renderer->add_widget(data.text_cache["timer_text"_h]);
+                        app->gui_renderer->add_widget(app->res.text["timer_text"_h]);
 
                         DEB_INFO("Show timer");
                     }
@@ -661,11 +661,9 @@ void ImGuiLayer<S, B>::draw_debug() {
         ImGui::Text("Black player: %s", scene->game.black_player == GamePlayer::Human ? "Human" : "Computer");
         ImGui::End();
 
-        auto& data = app->user_data<Data>();
-
         ImGui::Begin("Light Settings");
         if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position), -30.0f, 30.0f)) {
-            data.quad_cache["light_bulb"_h]->position = app->renderer->light.position;
+            app->res.quad["light_bulb"_h]->position = app->renderer->light.position;
         }
         ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color), 0.0f, 1.0f);
         ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color), 0.0f, 1.0f);

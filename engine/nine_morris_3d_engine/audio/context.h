@@ -5,15 +5,15 @@
 struct ALCdevice;
 struct ALCcontext;
 
-class OpenALContext {
+class OpenAlContext {
 public:
-    OpenALContext();
-    ~OpenALContext();
+    OpenAlContext();
+    ~OpenAlContext();
 
-    OpenALContext(const OpenALContext&) = delete;
-    OpenALContext& operator=(const OpenALContext&) = delete;
-    OpenALContext(OpenALContext&&) = delete;
-    OpenALContext& operator=(OpenALContext&&) = delete;
+    OpenAlContext(const OpenAlContext&) = delete;
+    OpenAlContext& operator=(const OpenAlContext&) = delete;
+    OpenAlContext(OpenAlContext&&) = delete;
+    OpenAlContext& operator=(OpenAlContext&&) = delete;
 
     al::Listener& get_listener() { return listener; }
 private:

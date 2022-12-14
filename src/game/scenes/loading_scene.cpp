@@ -22,33 +22,29 @@ void LoadingScene::on_start() {
 
     setup_widgets();
 
-    auto background = data.image_cache.load("background"_h, app->res.texture["splash_screen"_h]);
+    auto background = app->res.image.load("background"_h, app->res.texture["splash_screen"_h]);
     app->gui_renderer->add_widget(background);
 
     loading_animation.previous_seconds = app->window->get_time();
 }
 
 void LoadingScene::on_stop() {
-    auto& data = app->user_data<Data>();
-
     DEB_INFO("Done loading assets; initializing the rest of the game...");
 
     loader->join_and_merge(app->res);
     loader.reset();
 
     app->gui_renderer->clear();
-    data.image_cache.clear();
-    data.text_cache.clear();
+    app->res.image.clear();
+    app->res.text.clear();
 }
 
 void LoadingScene::on_update() {
-    auto& data = app->user_data<Data>();
-
     float width, height, x_pos, y_pos;
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
-    data.image_cache["background"_h]->set_position(glm::vec2(x_pos, y_pos));
-    data.image_cache["background"_h]->set_size(glm::vec2(width, height));
+    app->res.image["background"_h]->set_position(glm::vec2(x_pos, y_pos));
+    app->res.image["background"_h]->set_size(glm::vec2(width, height));
 
     update_loading_animation();
 
@@ -58,12 +54,10 @@ void LoadingScene::on_update() {
 }
 
 void LoadingScene::setup_widgets() {
-    auto& data = app->user_data<Data>();
-
     constexpr int LOWEST_RESOLUTION = 288;
     constexpr int HIGHEST_RESOLUTION = 1035;
 
-    auto loading_text = data.text_cache.load(
+    auto loading_text = app->res.text.load(
         "loading_text"_h,
         app->res.font["good_dog_plain"_h],
         "Loading", 1.5f, glm::vec3(0.81f)
@@ -92,8 +86,6 @@ void LoadingScene::load_splash_screen_texture() {
 }
 
 void LoadingScene::update_loading_animation() {
-    auto& data = app->user_data<Data>();
-
     const double current_seconds = app->window->get_time();
     const double elapsed_seconds = current_seconds - loading_animation.previous_seconds;
     loading_animation.previous_seconds = current_seconds;
@@ -106,7 +98,7 @@ void LoadingScene::update_loading_animation() {
         std::string text = "Loading";
         text.append(loading_animation.dots, '.');
 
-        data.text_cache["loading_text"_h]->set_text(text);
+        app->res.text["loading_text"_h]->set_text(text);
 
         loading_animation.dots++;
         loading_animation.dots %= 6;

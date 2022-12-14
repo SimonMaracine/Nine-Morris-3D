@@ -22,7 +22,7 @@ static void maybe_check_errors(ALCdevice* device) {
 }
 #endif
 
-OpenALContext::OpenALContext() {
+OpenAlContext::OpenAlContext() {
     // Choose the default device
     device = alcOpenDevice(nullptr);
 
@@ -54,7 +54,7 @@ OpenALContext::OpenALContext() {
     DEB_INFO("Created OpenAL device and context");
 }
 
-OpenALContext::~OpenALContext() {
+OpenAlContext::~OpenAlContext() {
     alcMakeContextCurrent(nullptr);
     alcDestroyContext(context);
     alcCloseDevice(device);

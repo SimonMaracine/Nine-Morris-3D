@@ -58,11 +58,11 @@ public:
     bool running = true;
     int exit_code = 0;
     std::unique_ptr<Window> window;  // The last* object destroyed in an application instance
-    std::unique_ptr<OpenALContext> openal;
+    std::unique_ptr<OpenAlContext> openal;
     std::unique_ptr<Renderer> renderer;
-    std::unique_ptr<GuiRenderer> gui_renderer;  // TODO maybe change name
+    std::unique_ptr<GuiRenderer> gui_renderer;
     entt::dispatcher evt;  // Event dispatcher
-    Resources res;  // Global cache of resources
+    ResourcesCache res;  // Global cache of resources
 private:
     float update_frame_counter();
     unsigned int calculate_fixed_update();
