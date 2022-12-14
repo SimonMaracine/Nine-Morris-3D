@@ -11,10 +11,8 @@ namespace music {
     MusicTrack::MusicTrack(std::string_view file_path) {
         auto data = std::make_shared<SoundData>(file_path);
 
-        source = std::make_shared<al::Source>();
-        buffer = std::make_shared<al::Buffer>(data);
+        setup(data);
 
-        source->set_rolloff_factor(0.0f);  // TODO see if this is right
         name = file_path;
 
         DEB_DEBUG("Loaded music track `{}`", name);
@@ -23,20 +21,16 @@ namespace music {
     MusicTrack::MusicTrack(encrypt::EncryptedFile file_path) {
         auto data = std::make_shared<SoundData>(file_path);
 
-        source = std::make_shared<al::Source>();
-        buffer = std::make_shared<al::Buffer>(data);
+        setup(data);
 
-        source->set_rolloff_factor(0.0f);
         name = file_path;
 
         DEB_DEBUG("Loaded music track `{}`", name);
     }
 
     MusicTrack::MusicTrack(std::shared_ptr<SoundData> data) {
-        source = std::make_shared<al::Source>();
-        buffer = std::make_shared<al::Buffer>(data);
+        setup(data);
 
-        source->set_rolloff_factor(0.0f);
         name = data->get_file_path();
 
         DEB_DEBUG("Loaded music track `{}`", name);
@@ -46,12 +40,21 @@ namespace music {
         DEB_DEBUG("Unloaded music track `{}`", name);
     }
 
+    void MusicTrack::setup(std::shared_ptr<SoundData> data) {
+        source = std::make_shared<al::Source>();
+        buffer = std::make_shared<al::Buffer>(data);
+
+        source->set_rolloff_factor(0.0f);
+
+        if (data->get_channels() != 2) {
+            DEB_WARN("Music track is not stereo");
+        }
+    }
+
     void play_music_track(std::shared_ptr<MusicTrack> music_track) {
         _current_music_track = music_track;
 
-        _current_music_track->source->play(
-            _current_music_track->buffer.get()
-        );
+        _current_music_track->source->play(_current_music_track->buffer.get());
 
         DEB_DEBUG("Started playing music track `{}`", _current_music_track->name);
     }

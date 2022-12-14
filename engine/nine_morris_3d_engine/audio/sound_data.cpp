@@ -7,6 +7,12 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 #include "nine_morris_3d_engine/other/exit.h"
 
+static void check_bits_per_sample(size_t bits_per_sample, std::string_view file_path) {
+    if (bits_per_sample == 8) {
+        DEB_WARN("bits_per_sample = 8 for sound file `{}`", file_path);
+    }
+}
+
 SoundData::SoundData(std::string_view file_path)
     : file_path(file_path) {
     DEB_DEBUG("Loading sound data `{}`...", file_path);
@@ -20,6 +26,8 @@ SoundData::SoundData(std::string_view file_path)
 
     size = compute_size();
     bits_per_sample = compute_bits_per_sample();
+
+    check_bits_per_sample(bits_per_sample, file_path);
 }
 
 SoundData::SoundData(encrypt::EncryptedFile file_path)
@@ -37,6 +45,8 @@ SoundData::SoundData(encrypt::EncryptedFile file_path)
 
     size = compute_size();
     bits_per_sample = compute_bits_per_sample();
+
+    check_bits_per_sample(bits_per_sample, file_path);
 }
 
 SoundData::~SoundData() {

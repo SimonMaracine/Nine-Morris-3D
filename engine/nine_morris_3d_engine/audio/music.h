@@ -5,6 +5,10 @@
 #include "nine_morris_3d_engine/audio/sound_data.h"
 #include "nine_morris_3d_engine/other/encrypt.h"
 
+/**
+ * All music tracks are streamed, so they should be considered sound files longer than 1 minute
+ * Sound effects should be sound files shorter than 45-50 seconds
+ */
 namespace music {
     class MusicTrack {
     public:
@@ -18,6 +22,8 @@ namespace music {
         MusicTrack(MusicTrack&&) = delete;
         MusicTrack& operator=(MusicTrack&&) = delete;
     private:
+        void setup(std::shared_ptr<SoundData> data);
+
         std::shared_ptr<al::Source> source;
         std::shared_ptr<al::Buffer> buffer;
 
