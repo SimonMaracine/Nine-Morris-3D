@@ -1,31 +1,90 @@
+#include "nine_morris_3d_engine/audio/openal/source.h"
+#include "nine_morris_3d_engine/audio/openal/buffer.h"
 #include "nine_morris_3d_engine/audio/music.h"
+#include "nine_morris_3d_engine/audio/sound_data.h"
+#include "nine_morris_3d_engine/other/encrypt.h"
+#include "nine_morris_3d_engine/other/logging.h"
 
 namespace music {
     static std::shared_ptr<MusicTrack> _current_music_track = nullptr;
 
     MusicTrack::MusicTrack(std::string_view file_path) {
+        auto data = std::make_shared<SoundData>(file_path);
 
+        source = std::make_shared<al::Source>();
+        buffer = std::make_shared<al::Buffer>(data);
+
+        name = file_path;
+
+        DEB_DEBUG("Loaded music track `{}`", name);
+    }
+
+    MusicTrack::MusicTrack(encrypt::EncryptedFile file_path) {
+        auto data = std::make_shared<SoundData>(file_path);
+
+        source = std::make_shared<al::Source>();
+        buffer = std::make_shared<al::Buffer>(data);
+
+        name = file_path;
+
+        DEB_DEBUG("Loaded music track `{}`", name);
+    }
+
+    MusicTrack::MusicTrack(std::shared_ptr<SoundData> data) {
+        source = std::make_shared<al::Source>();
+        buffer = std::make_shared<al::Buffer>(data);
+
+        name = data->get_file_path();
+
+        DEB_DEBUG("Loaded music track `{}`", name);
     }
 
     MusicTrack::~MusicTrack() {
-
+        DEB_DEBUG("Unloaded music track `{}`", name);
     }
 
     void play_music_track(std::shared_ptr<MusicTrack> music_track) {
         _current_music_track = music_track;
-        // TODO this
+
+        _current_music_track->source->play(
+            _current_music_track->buffer.get()
+        );
+
+        DEB_DEBUG("Started playing music track `{}`", _current_music_track->name);
     }
 
     void stop_music_track() {
-        // TODO this
+        if (_current_music_track == nullptr) {
+            DEB_WARN("No music track pointer");
+            return;
+        }
+
+        _current_music_track->source->stop();
+
+        DEB_DEBUG("Stopped playing music track `{}`", _current_music_track->name);
+
         _current_music_track = nullptr;
     }
 
     void pause_music_track() {
+        if (_current_music_track == nullptr) {
+            DEB_WARN("No music track pointer");
+            return;
+        }
 
+        _current_music_track->source->pause();
+
+        DEB_DEBUG("Paused playing music track `{}`", _current_music_track->name);
     }
 
     void continue_music_track() {
+        if (_current_music_track == nullptr) {
+            DEB_WARN("No music track pointer");
+            return;
+        }
 
+        _current_music_track->source->continue_();
+
+        DEB_DEBUG("Continued playing music track `{}`", _current_music_track->name);
     }
 }

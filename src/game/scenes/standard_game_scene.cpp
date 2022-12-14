@@ -126,12 +126,8 @@ void StandardGameScene::on_awake() {
     app->evt.sink<KeyReleasedEvent>().connect<&StandardGameScene::on_key_released>(this);
     app->evt.sink<WindowResizedEvent>().connect<&StandardGameScene::on_window_resized>(this);
 
-    auto music_buffer = app->res.al_buffer.load(
-        "music"_h,
-        app->res.sound_data["music"_h]
-    );
-    auto music = app->res.al_source.load("music"_h);
-    music->play(music_buffer.get());
+    auto track = app->res.music_track.load("music"_h, app->res.sound_data["music"_h]);
+    music::play_music_track(track);
 }
 
 void StandardGameScene::on_update() {
@@ -308,6 +304,14 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
 
     if (event.key == input::Key::SPACE) {
         camera_controller.go_towards_position(default_camera_position);
+    } else if (event.key == input::Key::P) {  // TODO temporary
+        music::play_music_track(app->res.music_track["music"_h]);
+    } else if (event.key == input::Key::O) {
+        music::stop_music_track();
+    } else if (event.key == input::Key::K) {
+        music::pause_music_track();
+    } else if (event.key == input::Key::L) {
+        music::continue_music_track();
     }
 }
 

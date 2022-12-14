@@ -5,6 +5,7 @@
 #include "nine_morris_3d_engine/audio/openal/source.h"
 #include "nine_morris_3d_engine/audio/openal/buffer.h"
 #include "nine_morris_3d_engine/audio/sound_data.h"
+#include "nine_morris_3d_engine/audio/music.h"
 #include "nine_morris_3d_engine/graphics/opengl/texture.h"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.h"
 #include "nine_morris_3d_engine/graphics/opengl/shader.h"
@@ -14,8 +15,6 @@
 #include "nine_morris_3d_engine/graphics/material.h"
 #include "nine_morris_3d_engine/graphics/texture_data.h"
 #include "nine_morris_3d_engine/other/mesh.h"
-
-// TODO maybe music
 
 using namespace mesh;
 
@@ -64,4 +63,5 @@ struct Resources {
     resmanager::Cache<al::Source> al_source;
     resmanager::Cache<al::Buffer> al_buffer;
     resmanager::Cache<SoundData> sound_data;
+    resmanager::Cache<music::MusicTrack> music_track;
 };

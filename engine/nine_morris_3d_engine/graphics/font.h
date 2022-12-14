@@ -43,6 +43,8 @@ public:
     // Get width and height of a line of text
     void get_string_size(std::string_view string, float scale, int* out_width, int* out_height);
 private:
+    void write_bitmap_to_file();
+
     struct BakeContext {
         int x = 0, y = 0;
         int max_row_height = 0;

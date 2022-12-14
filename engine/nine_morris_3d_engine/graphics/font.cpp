@@ -121,10 +121,7 @@ void Font::end_baking() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
 #ifdef PLATFORM_GAME_DEBUG
-    const std::string file_name = "bitmap_" + name + ".png";
-    if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
-        DEB_ERROR("Failed to create bitmap png file `{}`", file_name);
-    }
+    write_bitmap_to_file();
 #endif
 
     delete[] bake_context.bitmap;
@@ -322,4 +319,12 @@ void Font::get_string_size(std::string_view string, float scale, int* out_width,
     }
 
     *out_width = static_cast<int>(roundf((x + 2) * scale));
+}
+
+void Font::write_bitmap_to_file() {
+    const std::string file_name = "bitmap_" + name + ".png";
+
+    if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
+        DEB_ERROR("Failed to create bitmap png file `{}`", file_name);
+    }
 }

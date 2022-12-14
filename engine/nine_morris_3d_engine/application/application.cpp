@@ -7,6 +7,7 @@
 #include "nine_morris_3d_engine/application/input.h"
 #include "nine_morris_3d_engine/application/application_builder.h"
 #include "nine_morris_3d_engine/audio/context.h"
+#include "nine_morris_3d_engine/audio/music.h"
 #include "nine_morris_3d_engine/graphics/renderer/renderer.h"
 #include "nine_morris_3d_engine/graphics/renderer/gui_renderer.h"
 #include "nine_morris_3d_engine/graphics/opengl/info_and_debug.h"
@@ -98,13 +99,15 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     start(this);
 }
 
-Application::~Application() {
+Application::~Application() {  // Destructor is called before all member variables
     DEB_INFO("Calling user stop routine...");
     stop(this);
 
     if (builder.renderer_imgui) {
         imgui_context::uninitialize();
     }
+
+    music::stop_music_track();
 }
 
 int Application::run() {
