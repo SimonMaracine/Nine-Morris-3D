@@ -6,8 +6,10 @@
 
 It is a free casual board game with hopefully beautiful 3D graphics. It has five game modes:
 _standard (nine men's morris)_, _jump_, _jump+_, _twelve men's morris_ and _hunt_, each with their AIs.
-Games can be saved and be continued later. AI and other settings are configurable. The background
-can be changed as you wish. The game runs on Linux and Windows.
+Games can be saved and be continued later. AI and other settings are configurable.
+The background can be changed as you wish. It supports 3D sounds and has some beautiful music.
+
+The game runs on Linux and Windows.
 
 Hopefully an Android version will be made.
 
