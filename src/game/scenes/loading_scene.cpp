@@ -12,7 +12,10 @@ void LoadingScene::on_start() {
 
     load_splash_screen_texture();
 
-    loader = std::make_unique<assets_load::AllStartLoader>(assets_load::all_start);
+    loader = std::make_unique<assets_load::AllStartLoader>(
+        assets_load::all_start, std::bind(&Application::change_scene, app, "game")
+    );
+
     loader->start_loading_thread(
         data.launcher_options.normal_mapping,
         data.launcher_options.texture_quality,
@@ -31,7 +34,6 @@ void LoadingScene::on_start() {
 void LoadingScene::on_stop() {
     DEB_INFO("Done loading assets; initializing the rest of the game...");
 
-    loader->join_and_merge(app->res);
     loader.reset();
 
     app->gui_renderer->clear();
@@ -48,9 +50,7 @@ void LoadingScene::on_update() {
 
     update_loading_animation();
 
-    if (loader->done_loading()) {
-        app->change_scene("game");
-    }
+    loader->update(app);
 }
 
 void LoadingScene::setup_widgets() {

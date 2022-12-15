@@ -2,16 +2,17 @@
 #include <nine_morris_3d_engine/engine_graphics.h>
 #include <nine_morris_3d_engine/engine_other.h>
 
+#include "game/entities/boards/standard_board.h"
+#include "game/entities/serialization/standard_board_serialized.h"
+#include "game/entities/piece.h"
+#include "game/entities/node.h"
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/imgui_layer.h"
 #include "game/game_options.h"
 #include "game/save_load.h"
 #include "game/assets.h"
+#include "game/assets_load.h"
 #include "game/point_camera_controller.h"
-#include "game/entities/boards/standard_board.h"
-#include "game/entities/serialization/standard_board_serialized.h"
-#include "game/entities/piece.h"
-#include "game/entities/node.h"
 #include "other/constants.h"
 #include "other/data.h"
 #include "other/options.h"
@@ -132,6 +133,15 @@ void StandardGameScene::on_awake() {
 
     auto track = app->res.music_track.load("music"_h, app->res.sound_data["music"_h]);
     music::play_music_track(track);
+
+    using namespace assets_load;
+
+    skybox_loader = std::make_unique<SkyboxLoader>(
+        skybox, std::bind(&StandardGameScene::change_skybox, this)
+    );
+    board_paint_texture_loader = std::make_unique<BoardPaintTextureLoader>(
+        board_paint_texture, std::bind(&StandardGameScene::change_board_paint_texture, this)
+    );
 }
 
 void StandardGameScene::on_update() {
@@ -156,8 +166,8 @@ void StandardGameScene::on_update() {
     update_wait_indicator();
     update_computer_thinking_indicator();
 
-    check_skybox_loader();
-    check_board_paint_texture_loader();
+    skybox_loader->update(app);
+    board_paint_texture_loader->update(app);
 }
 
 void StandardGameScene::on_fixed_update() {
@@ -1150,7 +1160,7 @@ void StandardGameScene::setup_entities() {
 
 void StandardGameScene::initialize_skybox() {
     if (app->user_data<Data>().options.skybox == game_options::NONE) {
-        DEB_DEBUG("Setup skybox");
+        DEB_DEBUG("Initialized skybox");
         return;
     }
 
@@ -1166,7 +1176,7 @@ void StandardGameScene::initialize_skybox() {
     auto texture = app->res.texture_3d.force_load("skybox"_h, data);
     app->renderer->set_skybox(texture);
 
-    DEB_DEBUG("Setup skybox");
+    DEB_DEBUG("Initialized skybox");
 }
 
 void StandardGameScene::initialize_light() {
@@ -1195,7 +1205,7 @@ void StandardGameScene::initialize_light() {
     }
 #endif
 
-    DEB_DEBUG("Setup light");
+    DEB_DEBUG("Initialized light");
 }
 
 void StandardGameScene::setup_camera() {
@@ -1498,14 +1508,8 @@ void StandardGameScene::set_skybox(Skybox skybox) {
         return;
     }
 
-    if (skybox_loader != nullptr) {
-        DEB_WARN("Skybox already loading");
-        return;
-    }
-
     auto& data = app->user_data<Data>();
 
-    skybox_loader = std::make_unique<assets_load::SkyboxLoader>(assets_load::skybox);
     skybox_loader->start_loading_thread(data.launcher_options.texture_quality, data.options.skybox);
 }
 
@@ -1527,25 +1531,13 @@ void StandardGameScene::change_skybox() {
     app->res.texture_data.release("skybox"_h);
 }
 
-void StandardGameScene::check_skybox_loader() {
-    if (skybox_loader != nullptr && skybox_loader->done_loading()) {
-        skybox_loader->join_and_merge(app->res);
-        skybox_loader.reset();
-
-        change_skybox();
-    }
-}
-
 void StandardGameScene::set_board_paint_texture() {
-    if (board_paint_texture_loader != nullptr) {
-        DEB_WARN("Board paint texture already loading");
-        return;
-    }
-
     auto& data = app->user_data<Data>();
 
-    board_paint_texture_loader = std::make_unique<assets_load::BoardPaintTextureLoader>(assets_load::board_paint_texture);
-    board_paint_texture_loader->start_loading_thread(data.launcher_options.texture_quality, data.options.labeled_board);
+    board_paint_texture_loader->start_loading_thread(
+        data.launcher_options.texture_quality,
+        data.options.labeled_board
+    );
 }
 
 void StandardGameScene::change_board_paint_texture() {
@@ -1566,15 +1558,6 @@ void StandardGameScene::change_board_paint_texture() {
     app->res.material_instance["board_paint"_h]->set_texture("u_material.diffuse", diffuse_texture, 0);
 
     app->res.texture_data.release("board_paint_diffuse"_h);
-}
-
-void StandardGameScene::check_board_paint_texture_loader() {
-    if (board_paint_texture_loader != nullptr && board_paint_texture_loader->done_loading()) {
-        board_paint_texture_loader->join_and_merge(app->res);
-        board_paint_texture_loader.reset();
-
-        change_board_paint_texture();
-    }
 }
 
 void StandardGameScene::save_game() {

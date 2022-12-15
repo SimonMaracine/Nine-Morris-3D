@@ -10,16 +10,26 @@
 template<typename... Args>
 class ConcurrentLoader {
 public:
-    using Function = std::function<void(ConcurrentLoader<Args...>&, const Args&...)>;
+    using LoadFunction = std::function<void(ConcurrentLoader<Args...>&, const Args&...)>;
+    using CallbackFunction = std::function<void()>;
 
-    ConcurrentLoader(const Function& load_function)
-        : load_function(load_function) {}
+    ConcurrentLoader(const LoadFunction& load_function, const CallbackFunction& callback_function)
+        : load_function(load_function), callback_function(callback_function) {}
     ~ConcurrentLoader() = default;
 
     ConcurrentLoader(const ConcurrentLoader&) = delete;
     ConcurrentLoader& operator=(const ConcurrentLoader&) = delete;
     ConcurrentLoader(ConcurrentLoader&&) = delete;
     ConcurrentLoader& operator=(ConcurrentLoader&&) = delete;
+
+    void update(Application* app) {
+        if (in_use && done_loading()) {
+            join_and_merge(app->res);
+            reset();
+
+            callback_function();
+        }
+    }
 
     ResourcesCache& operator()() {
         return local_res;
@@ -48,6 +58,7 @@ public:
     void start_loading_thread(const Args&... args) {
         DEB_INFO("Loading some assets from separate thread...");
 
+        in_use = true;
         loading_thread = std::thread(load_function, std::ref(*this), args...);
     }
 
@@ -55,8 +66,17 @@ public:
         loaded.store(true);
     }
 private:
+    void reset() {
+        local_res = ResourcesCache {};
+        loading_thread = std::thread {};
+        loaded.store(false);
+        in_use = false;
+    }
+
     ResourcesCache local_res;
-    Function load_function;
+    LoadFunction load_function;
+    CallbackFunction callback_function;
     std::thread loading_thread;
     std::atomic<bool> loaded = false;
+    bool in_use = false;
 };

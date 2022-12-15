@@ -3,14 +3,14 @@
 #include <nine_morris_3d_engine/engine_application.h>
 #include <nine_morris_3d_engine/engine_graphics.h>
 
-#include "game/scenes/imgui_layer.h"
 #include "game/entities/boards/standard_board.h"
 #include "game/entities/serialization/standard_board_serialized.h"
+#include "game/minimax/minimax_thread.h"
+#include "game/scenes/imgui_layer.h"
 #include "game/undo_redo_state.h"
 #include "game/keyboard_controls.h"
 #include "game/game_context.h"
 #include "game/timer.h"
-#include "game/minimax/minimax_thread.h"
 #include "game/assets_load.h"
 #include "game/point_camera_controller.h"
 #include "other/constants.h"
@@ -85,11 +85,9 @@ struct StandardGameScene : public Scene {
 
     void set_skybox(Skybox skybox);  // TODO maybe move this out
     void change_skybox();
-    void check_skybox_loader();
 
     void set_board_paint_texture();  // TODO maybe move this out
     void change_board_paint_texture();
-    void check_board_paint_texture_loader();
 
     void save_game();
     void load_game();
