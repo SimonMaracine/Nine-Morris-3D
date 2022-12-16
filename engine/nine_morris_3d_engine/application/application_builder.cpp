@@ -53,13 +53,13 @@ ApplicationBuilder& ApplicationBuilder::encrypt_key(std::string_view encryption_
 
 ApplicationBuilder& ApplicationBuilder::with_renderer(Renderer renderer) {
     switch (renderer) {
-        case Renderer::R3D:
+        case Renderer::Renderer3D:
             renderer_3d = true;
             break;
-        case Renderer::R2D:
+        case Renderer::Renderer2D:
             renderer_2d = true;
             break;
-        case Renderer::RImGui:
+        case Renderer::RendererImGui:
             renderer_imgui = true;
             break;
     }

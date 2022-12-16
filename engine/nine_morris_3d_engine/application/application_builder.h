@@ -3,7 +3,7 @@
 class ApplicationBuilder {
 public:
     enum Renderer {
-        R3D, R2D, RImGui
+        Renderer3D, Renderer2D, RendererImGui
     };
 
     ApplicationBuilder() = default;

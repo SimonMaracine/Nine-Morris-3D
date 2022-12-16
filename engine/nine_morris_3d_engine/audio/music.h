@@ -6,8 +6,8 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 /**
- * All music tracks are streamed, so they should be considered sound files longer than 1 minute
- * Sound effects should be sound files shorter than 45-50 seconds
+ * All music tracks are streamed, so they should be considered sound files longer than 1 minute.
+ * Sound effects should be sound files shorter than 45-50 seconds.
  */
 namespace music {
     class MusicTrack {

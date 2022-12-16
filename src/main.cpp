@@ -10,11 +10,11 @@
 
 #if defined(PLATFORM_GAME_LINUX)
     #define APP_NAME "ninemorris3d"
-    #define LOG_FILE "log.txt"
+    #define LOG_FILE "ninemorris3d.log"
     #define INFO_FILE "info.txt"
 #elif defined(PLATFORM_GAME_WINDOWS)
     #define APP_NAME "NineMorris3D"
-    #define LOG_FILE "ninemorris3d_log.txt"
+    #define LOG_FILE "ninemorris3d.log"
     #define INFO_FILE "ninemorris3d_info.txt"
 #endif
 
@@ -39,8 +39,8 @@ int main() {
             .version(MAJOR, MINOR, PATCH)
             .authors(authors)
             .encrypt_key(KEY)
-            .with_renderer(ApplicationBuilder::RImGui)
-            .with_renderer(ApplicationBuilder::R2D);
+            .with_renderer(ApplicationBuilder::RendererImGui)
+            .with_renderer(ApplicationBuilder::Renderer2D);
 
         auto data = std::make_any<Data>();
 
@@ -63,9 +63,9 @@ int main() {
             .version(MAJOR, MINOR, PATCH)
             .authors(authors)
             .encrypt_key(KEY)
-            .with_renderer(ApplicationBuilder::R3D)
-            .with_renderer(ApplicationBuilder::R2D)
-            .with_renderer(ApplicationBuilder::RImGui)
+            .with_renderer(ApplicationBuilder::Renderer3D)
+            .with_renderer(ApplicationBuilder::Renderer2D)
+            .with_renderer(ApplicationBuilder::RendererImGui)
             .with_audio();
 
         auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);

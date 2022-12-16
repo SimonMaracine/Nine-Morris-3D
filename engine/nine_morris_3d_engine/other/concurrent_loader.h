@@ -22,56 +22,16 @@ public:
     ConcurrentLoader(ConcurrentLoader&&) = delete;
     ConcurrentLoader& operator=(ConcurrentLoader&&) = delete;
 
-    void update(Application* app) {
-        if (in_use && done_loading()) {
-            join_and_merge(app->res);
-            reset();
-
-            callback_function();
-        }
-    }
-
-    ResourcesCache& operator()() {
-        return local_res;
-    }
-
-    bool done_loading() const {
-        return loaded.load();
-    }
-
-    void join_and_merge(ResourcesCache& res) {
-        loading_thread.join();
-
-        res.merge(local_res);
-
-        DEB_INFO("Merged local resources into global resources");
-    }
-
-    void join() {
-        loading_thread.join();
-    }
-
-    bool joinable() const {
-        return loading_thread.joinable();
-    }
-
-    void start_loading_thread(const Args&... args) {
-        DEB_INFO("Loading some assets from separate thread...");
-
-        in_use = true;
-        loading_thread = std::thread(load_function, std::ref(*this), args...);
-    }
-
-    void set_done() {
-        loaded.store(true);
-    }
+    void start_loading_thread(const Args&... args);
+    void update(Application* app);
+    bool is_done() const;
+    void join_and_merge(ResourcesCache& res);
+    void join();
+    bool joinable() const;
+    void set_done();
+    ResourcesCache& operator()();
 private:
-    void reset() {
-        local_res = ResourcesCache {};
-        loading_thread = std::thread {};
-        loaded.store(false);
-        in_use = false;
-    }
+    void reset();
 
     ResourcesCache local_res;
     LoadFunction load_function;
@@ -80,3 +40,63 @@ private:
     std::atomic<bool> loaded = false;
     bool in_use = false;
 };
+
+template<typename... Args>
+void ConcurrentLoader<Args...>::start_loading_thread(const Args&... args) {
+    DEB_INFO("Loading some assets from separate thread...");
+
+    in_use = true;
+    loading_thread = std::thread(load_function, std::ref(*this), args...);
+}
+
+template<typename... Args>
+void ConcurrentLoader<Args...>::update(Application* app) {
+    if (in_use && is_done()) {
+        join_and_merge(app->res);
+        reset();
+
+        callback_function();
+    }
+}
+
+template<typename... Args>
+bool ConcurrentLoader<Args...>::is_done() const {
+    return loaded.load();
+}
+
+template<typename... Args>
+void ConcurrentLoader<Args...>::join_and_merge(ResourcesCache& res) {
+    loading_thread.join();
+
+    res.merge(local_res);
+
+    DEB_INFO("Merged local resources into global ones");
+}
+
+template<typename... Args>
+void ConcurrentLoader<Args...>::join() {
+    loading_thread.join();
+}
+
+template<typename... Args>
+bool ConcurrentLoader<Args...>::joinable() const {
+    return loading_thread.joinable();
+}
+
+template<typename... Args>
+void ConcurrentLoader<Args...>::set_done() {
+    loaded.store(true);
+}
+
+template<typename... Args>
+ResourcesCache& ConcurrentLoader<Args...>::operator()() {
+    return local_res;
+}
+
+template<typename... Args>
+void ConcurrentLoader<Args...>::reset() {
+    local_res = ResourcesCache {};
+    loading_thread = std::thread {};
+    loaded.store(false);
+    in_use = false;
+}

@@ -1,8 +1,8 @@
 #pragma once
 
 /**
- * Identifier is okay to be float, since numbers are integers (0.0, 1.0, 2.0 etc.) and the floating-point
- * standard used should be IEEE-754.
+ * Identifier is okay to be float, since numbers are integers (0.0, 1.0, 2.0 etc.) and the
+ * floating-point standard used should be IEEE-754.
  */
 namespace identifier {
     class Id {
