@@ -132,7 +132,11 @@ void StandardGameScene::on_awake() {
     app->evt.sink<WindowResizedEvent>().connect<&StandardGameScene::on_window_resized>(this);
 
     auto track = app->res.music_track.load("music"_h, app->res.sound_data["music"_h]);
-    music::play_music_track(track);
+    current_music_track = track;
+
+    if (data.options.enable_music) {
+        music::play_music_track(track);
+    }
 
     using namespace assets_load;
 
@@ -314,14 +318,6 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
 
     if (event.key == input::Key::SPACE) {
         camera_controller.go_towards_position(default_camera_position);
-    } else if (event.key == input::Key::P) {  // TODO temporary
-        music::play_music_track(app->res.music_track["music"_h]);
-    } else if (event.key == input::Key::O) {
-        music::stop_music_track();
-    } else if (event.key == input::Key::K) {
-        music::pause_music_track();
-    } else if (event.key == input::Key::L) {
-        music::continue_music_track();
     }
 }
 

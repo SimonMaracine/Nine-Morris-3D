@@ -2,6 +2,7 @@
 
 #include <nine_morris_3d_engine/engine_application.h>
 #include <nine_morris_3d_engine/engine_graphics.h>
+#include <nine_morris_3d_engine/engine_audio.h>
 
 #include "game/entities/boards/standard_board.h"
 #include "game/entities/serialization/standard_board_serialized.h"
@@ -113,6 +114,7 @@ struct StandardGameScene : public Scene {
     bool show_keyboard_controls = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
+    std::shared_ptr<music::MusicTrack> current_music_track;
 
     // GUI-related
     Timer timer;

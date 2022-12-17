@@ -1,5 +1,6 @@
 #include <nine_morris_3d_engine/engine_application.h>
 #include <nine_morris_3d_engine/engine_graphics.h>
+#include <nine_morris_3d_engine/engine_audio.h>
 #include <nine_morris_3d_engine/engine_other.h>
 
 #include "game/assets.h"
@@ -197,7 +198,10 @@ namespace game {
         setup_game_font(app);
         setup_post_processing(app);
 
+        // Set some parameters
         app->window->set_vsync(data.options.vsync);
+        app->openal->get_listener().set_gain(data.options.master_volume);
+        music::set_music_gain(data.options.music_volume);
 
         // Setup scene framebuffer
         app->renderer->set_scene_framebuffer(data.launcher_options.samples);

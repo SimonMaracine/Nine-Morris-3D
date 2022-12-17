@@ -18,6 +18,14 @@ namespace game_options {
             return {false, "Options file is invalid: black_player"};
         }
 
+        if (options.master_volume < 0.0f || options.master_volume > 1.0f) {
+            return {false, "Options file is invalid: master_volume"};
+        }
+
+        if (options.music_volume < 0.0f || options.music_volume > 1.0f) {
+            return {false, "Options file is invalid: music_volume"};
+        }
+
         return {true, ""};
     }
 }

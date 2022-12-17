@@ -6,7 +6,7 @@
 #include "nine_morris_3d_engine/other/encrypt.h"
 
 /**
- * All music tracks are streamed, so they should be considered sound files longer than 1 minute.
+ * All music tracks are streamed, so they should be considered sound files longer than 1 minute.  // TODO do this!
  * Sound effects should be sound files shorter than 45-50 seconds.
  */
 namespace music {
@@ -33,10 +33,12 @@ namespace music {
         friend void stop_music_track();
         friend void pause_music_track();
         friend void continue_music_track();
+        friend void set_music_gain(float gain);
     };
 
     void play_music_track(std::shared_ptr<MusicTrack> music_track);
     void stop_music_track();  // Must be called before the OpenAL context is destroyed
     void pause_music_track();
     void continue_music_track();  // TODO add more music API functions
+    void set_music_gain(float gain);
 }

@@ -21,6 +21,9 @@ namespace game_options {
     static constexpr bool DEFAULT_LABELED_BOARD = true;
     static constexpr int DEFAULT_WHITE_PLAYER = HUMAN;
     static constexpr int DEFAULT_BLACK_PLAYER = COMPUTER;
+    static constexpr float DEFAULT_MASTER_VOLUME = 1.0f;
+    static constexpr float DEFAULT_MUSIC_VOLUME = 0.7f;
+    static constexpr bool DEFAULT_ENABLE_MUSIC = true;
 
     struct GameOptions {
         bool vsync = DEFAULT_VSYNC;
@@ -32,6 +35,9 @@ namespace game_options {
         bool labeled_board = DEFAULT_LABELED_BOARD;
         int white_player = DEFAULT_WHITE_PLAYER;
         int black_player = DEFAULT_BLACK_PLAYER;
+        float master_volume = DEFAULT_MASTER_VOLUME;
+        float music_volume = DEFAULT_MUSIC_VOLUME;
+        bool enable_music = DEFAULT_ENABLE_MUSIC;
 
         template<typename Archive>
         void serialize(Archive& archive) {
@@ -44,7 +50,10 @@ namespace game_options {
                 hide_timer,
                 labeled_board,
                 white_player,
-                black_player
+                black_player,
+                master_volume,
+                music_volume,
+                enable_music
             );
         }
     };

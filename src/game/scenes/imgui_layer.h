@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nine_morris_3d_engine/engine_application.h>
+#include <nine_morris_3d_engine/engine_audio.h>
 
 #include "game/save_load.h"
 #include "game/game_options.h"
@@ -273,6 +274,46 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                         app->window->set_cursor(0);
 
                         DEB_INFO("Set default cursor");
+                    }
+                }
+
+                ImGui::EndMenu();
+                HOVERING_GUI()
+            }
+            if (ImGui::BeginMenu("Audio")) {
+                if (ImGui::BeginMenu("Master Volume")) {
+                    ImGui::PushItemWidth(100.0f);
+                    if (ImGui::SliderFloat("##", &data.options.master_volume, 0.0f, 1.0f, "%.01f")) {
+                        app->openal->get_listener().set_gain(data.options.master_volume);
+
+                        DEB_INFO("Changed master volume to {}", data.options.master_volume);
+                    }
+                    ImGui::PopItemWidth();
+
+                    ImGui::EndMenu();
+                    HOVERING_GUI()
+                }
+                if (ImGui::BeginMenu("Music Volume")) {
+                    ImGui::PushItemWidth(100.0f);
+                    if (ImGui::SliderFloat("##", &data.options.music_volume, 0.0f, 1.0f, "%.01f")) {
+                        music::set_music_gain(data.options.music_volume);
+
+                        DEB_INFO("Changed music volume to {}", data.options.music_volume);
+                    }
+                    ImGui::PopItemWidth();
+
+                    ImGui::EndMenu();
+                    HOVERING_GUI()
+                }
+                if (ImGui::MenuItem("Enable Music", nullptr, &data.options.enable_music)) {
+                    if (data.options.enable_music) {
+                        music::play_music_track(scene->current_music_track);
+
+                        DEB_INFO("Enabled music");
+                    } else {
+                        music::stop_music_track();
+
+                        DEB_INFO("Disabled music");
                     }
                 }
 
