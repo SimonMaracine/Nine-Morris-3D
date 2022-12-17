@@ -2,9 +2,8 @@
 .vscode/
 build/
 /build-release
-log.txt
+*.log
 info.txt
-ninemorris3d_log.txt
 ninemorris3d_info.txt
 imgui.ini
 *.blend1
