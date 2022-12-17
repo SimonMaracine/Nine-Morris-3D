@@ -68,7 +68,7 @@ void LoadingScene::setup_widgets() {
     loading_text->scale(0.4f, 1.3f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 
     const auto size = loading_text->get_actual_size();
-    loading_text->fake_size(glm::vec2(size.x + 70.0f, size.y));
+    loading_text->fake_size(glm::vec2(size.x + 40.0f, size.y));
     loading_text->set_shadows(true);
     app->gui_renderer->add_widget(loading_text);
 }
@@ -92,7 +92,7 @@ void LoadingScene::update_loading_animation() {
 
     loading_animation.total_time += elapsed_seconds;
 
-    if (loading_animation.total_time > 0.3) {
+    if (loading_animation.total_time > 0.4) {
         loading_animation.total_time = 0.0;
 
         std::string text = "Loading";
@@ -101,6 +101,6 @@ void LoadingScene::update_loading_animation() {
         app->res.text["loading_text"_h]->set_text(text);
 
         loading_animation.dots++;
-        loading_animation.dots %= 6;
+        loading_animation.dots %= 4;
     }
 }
