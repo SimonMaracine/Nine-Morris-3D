@@ -32,6 +32,7 @@ void StandardGameScene::on_start() {
 
     setup_camera();
     setup_widgets();
+    update_turn_indicator();
 
     keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_h]};
     keyboard.post_initialize();
@@ -1620,6 +1621,7 @@ void StandardGameScene::load_game() {
     made_first_move = false;
 
     update_cursor();
+    update_turn_indicator();
 }
 
 

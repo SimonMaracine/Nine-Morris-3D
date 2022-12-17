@@ -15,7 +15,7 @@ public:
 
     ConcurrentLoader(const LoadFunction& load_function, const CallbackFunction& callback_function)
         : load_function(load_function), callback_function(callback_function) {}
-    ~ConcurrentLoader() = default;
+    ~ConcurrentLoader();
 
     ConcurrentLoader(const ConcurrentLoader&) = delete;
     ConcurrentLoader& operator=(const ConcurrentLoader&) = delete;
@@ -40,6 +40,13 @@ private:
     std::atomic<bool> loaded = false;
     bool in_use = false;
 };
+
+template<typename... Args>
+ConcurrentLoader<Args...>::~ConcurrentLoader() {
+    if (loading_thread.joinable()) {
+        loading_thread.join();
+    }
+}
 
 template<typename... Args>
 void ConcurrentLoader<Args...>::start_loading_thread(const Args&... args) {
