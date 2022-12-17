@@ -31,7 +31,7 @@ namespace assets {
     extern const char* KEYBOARD_CONTROLS_CROSS_TEXTURE;
     extern const char* SPLASH_SCREEN_TEXTURE;
 
-    extern const char* OPEN_SANS_FONT;
+    extern const char* OPEN_SANS_SEMIBOLD_FONT;
     extern const char* GOOD_DOG_PLAIN_FONT;
 
     extern const char* FIELD_PX_TEXTURE;

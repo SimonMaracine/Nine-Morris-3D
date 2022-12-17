@@ -31,7 +31,7 @@ namespace assets {
     const char* KEYBOARD_CONTROLS_CROSS_TEXTURE = ENCR("data/textures/keyboard_controls/keyboard_controls_cross.png");
     const char* SPLASH_SCREEN_TEXTURE = ENCR("data/textures/splash_screen/splash_screen.png");
 
-    const char* OPEN_SANS_FONT = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
+    const char* OPEN_SANS_SEMIBOLD_FONT = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
     const char* GOOD_DOG_PLAIN_FONT = "data/fonts/FH-GoodDogPlain-WTT/GOODDP__.TTF";
 
     const char* FIELD_PX_TEXTURE = ENCR("data/textures/skybox/field/px.png");

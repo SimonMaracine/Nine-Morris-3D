@@ -1295,7 +1295,7 @@ void StandardGameScene::setup_widgets() {
 
     auto timer_text = app->res.text.load(
         "timer_text"_h,
-        app->res.font["good_dog_plain"_h],
+        app->res.font["open_sans"_h],  // TODO think about which one is better
         "00:00", 1.5f, glm::vec3(0.9f)
     );
     timer_text->stick(gui::Sticky::N);

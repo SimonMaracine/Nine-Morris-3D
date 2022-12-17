@@ -67,25 +67,37 @@ static void setup_imgui_fonts(Application* app) {
     ImVector<ImWchar> ranges;
     builder.BuildRanges(&ranges);
 
-    io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 21.0f);
-    data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 15.0f);
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_SEMIBOLD_FONT).c_str(), 21.0f);
+    data.imgui_info_font = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_SEMIBOLD_FONT).c_str(), 15.0f);
     data.imgui_windows_font = (
-        io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_FONT).c_str(), 24.0f, nullptr, ranges.Data)
-        );
+        io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS_SEMIBOLD_FONT).c_str(), 24.0f, nullptr, ranges.Data)
+    );
     io.Fonts->Build();
 }
 
-static void setup_game_font(Application* app) {
+static void setup_game_fonts(Application* app) {
     using namespace assets;
     using namespace path;
 
-    auto font = app->res.font.load(
-        "good_dog_plain"_h, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512
-    );
+    {
+        auto font = app->res.font.load(
+            "good_dog_plain"_h, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 5, 180, 40, 512
+        );
 
-    font->begin_baking();  // TODO maybe move part of texture baking to thread
-    font->bake_characters(32, 127);
-    font->end_baking();
+        font->begin_baking();
+        font->bake_characters(32, 127);
+        font->end_baking();
+    }
+
+    {
+        auto font = app->res.font.load(
+            "open_sans"_h, path_for_assets(OPEN_SANS_SEMIBOLD_FONT), 50.0f, 5, 180, 40, 512
+        );
+
+        font->begin_baking();
+        font->bake_characters(32, 127);
+        font->end_baking();
+    }
 }
 
 static void setup_post_processing(Application* app) {
@@ -195,7 +207,7 @@ namespace game {
         setup_icons(app);
         setup_cursors(app);
         setup_imgui_fonts(app);
-        setup_game_font(app);
+        setup_game_fonts(app);
         setup_post_processing(app);
 
         // Set some parameters
