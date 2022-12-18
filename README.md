@@ -30,7 +30,7 @@ Hopefully an Android version will be made.
 - Copy the two newly created data directories and rename them from ***data-filtered** to ***data**
 - Copy **HELP_LINUX.txt**
 - Copy **README.txt**
-- Copy **install.sh** and **uninstall.sh** from **scripts/linux-install/**
+- Copy **install.sh** and **uninstall.sh** and **user_data_remove.sh** from **scripts/linux-install/**
 - Archive the **_Nine-Morris-3D-vX.Y.Z-Linux_** folder  
   (`tar -c --file=Nine-Morris-3D-vX.Y.Z-Linux.tar.gz --gzip Nine-Morris-3D-vX.Y.Z-Linux`)
 

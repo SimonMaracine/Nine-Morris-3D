@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Notice! To be executed from the root directory of the game and with sudo.
+# Notice! Execute this from the root directory of the game and with sudo.
 # Currently working only on Ubuntu version >= 20.04.
 
 APP_NAME="ninemorris3d"
@@ -71,6 +71,10 @@ echo "Created desktop file $DESKTOP_FOLDER/$DESKTOP"
 
 # Uninstall script
 cp -v "$current_dir/uninstall.sh" "$DATA_DESTINATION_FOLDER/uninstall.sh"
+check_failure
+
+# User data removal script
+cp -v "$current_dir/user_data_remove.sh" "$DATA_DESTINATION_FOLDER/user_data_remove.sh"
 check_failure
 
 # Help file

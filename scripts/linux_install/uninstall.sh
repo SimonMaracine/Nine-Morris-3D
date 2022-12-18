@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# Execute this with sudo from anywhere.
 # Currently working only on Ubuntu >= 20.04.
 
 APP_NAME="ninemorris3d"
@@ -40,9 +41,6 @@ remove_icon 64x64
 remove_icon 32x32
 
 rm -v -f "$DESKTOP_FOLDER/$DESKTOP"
-check_failure
-
-rm -v -rf "$HOME/.$APP_NAME"
 check_failure
 
 if [[ "$error" = true ]]; then
