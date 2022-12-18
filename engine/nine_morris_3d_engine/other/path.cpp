@@ -28,7 +28,7 @@ static std::string app_name;
         }
 
         static std::string path_for_assets_impl(std::string_view file_path) {
-            return std::string("/usr/share/") + app_name + "/" + std::string(file_path);
+            return std::string("/usr/local/share/") + app_name + "/" + std::string(file_path);
         }
     #elif defined(PLATFORM_GAME_WINDOWS)
         static std::string path_for_logs_impl(std::string_view file) noexcept(false) {
