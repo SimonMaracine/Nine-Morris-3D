@@ -13,7 +13,7 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has five
 
 And each game mode has its own AI. Games can be saved and be continued later. AI and other
 settings are configurable. The background can be changed as you wish. It supports 3D sounds and
-has some beautiful music.
+it has some beautiful music.
 
 The game runs on Linux and Windows.
 
