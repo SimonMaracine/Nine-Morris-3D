@@ -106,7 +106,7 @@ Renderer::Renderer(Application* app)
             encr(path::path_for_assets(SHADOW_VERTEX_SHADER)),
             encr(path::path_for_assets(SHADOW_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix" },
-            std::vector { storage.light_space_uniform_block }
+            std::initializer_list { storage.light_space_uniform_block }
         );
     }
 
@@ -115,7 +115,7 @@ Renderer::Renderer(Application* app)
             encr(path::path_for_assets(OUTLINE_VERTEX_SHADER)),
             encr(path::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix", "u_color" },
-            std::vector { storage.projection_view_uniform_block }
+            std::initializer_list { storage.projection_view_uniform_block }
         );
     }
 

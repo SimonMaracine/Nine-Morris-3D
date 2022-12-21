@@ -184,7 +184,7 @@ GuiRenderer::GuiRenderer(Application* app)
             encr(path::path_for_assets(QUAD2D_VERTEX_SHADER)),
             encr(path::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix", "u_texture" },
-            std::vector { storage.projection_uniform_block }
+            std::initializer_list { storage.projection_uniform_block }
         );
     }
 
@@ -199,7 +199,7 @@ GuiRenderer::GuiRenderer(Application* app)
                 "u_border_width",
                 "u_offset"
             },
-            std::vector { storage.projection_uniform_block }
+            std::initializer_list { storage.projection_uniform_block }
         );
     }
 

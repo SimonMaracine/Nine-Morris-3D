@@ -23,6 +23,7 @@
 #include <cassert>
 #include <optional>
 #include <any>
+#include <initializer_list>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>

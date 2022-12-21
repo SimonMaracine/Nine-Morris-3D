@@ -24,13 +24,13 @@ namespace encrypt {
         const size_t length = file.tellg();
         file.seekg(0, file.beg);
 
-        char* buff = new char[length];
-        file.read(buff, length);
+        char* raw_buffer = new char[length];
+        file.read(raw_buffer, length);
 
         cppblowfish::Buffer buffer;
-        cppblowfish::Buffer cipher = cppblowfish::Buffer::from_whole_data(buff, length);
+        cppblowfish::Buffer cipher = cppblowfish::Buffer::from_whole_data(raw_buffer, length);
 
-        delete[] buff;
+        delete[] raw_buffer;
 
         blowfish.decrypt(cipher, buffer);
 

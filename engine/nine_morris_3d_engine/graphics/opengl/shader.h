@@ -16,12 +16,14 @@ namespace gl {
         GLuint binding_index;
     };
 
+    using UniformBlocks = std::initializer_list<UniformBlockSpecification>;
+
     class Shader {
     public:
         Shader(std::string_view vertex_source_path, std::string_view fragment_source_path,
-            const std::vector<std::string>& uniforms, const std::vector<UniformBlockSpecification>& uniform_blocks = {});
+            const std::vector<std::string>& uniforms, const UniformBlocks& uniform_blocks = {});
         Shader(encrypt::EncryptedFile vertex_source_path, encrypt::EncryptedFile fragment_source_path,
-            const std::vector<std::string>& uniforms, const std::vector<UniformBlockSpecification>& uniform_blocks = {});
+            const std::vector<std::string>& uniforms, const UniformBlocks& uniform_blocks = {});
         ~Shader();
 
         Shader(const Shader&) = delete;
@@ -48,12 +50,7 @@ namespace gl {
         GLint get_uniform_location(std::string_view name);
         void check_and_cache_uniforms(const std::vector<std::string>& uniforms);
 
-        static GLuint compile_shader(std::string_view source_path, GLenum type, std::string_view name) noexcept(false);
-        static GLuint compile_shader(const cppblowfish::Buffer& source_buffer, GLenum type, std::string_view name) noexcept(false);
-        static bool check_compilation(GLuint shader, GLenum type, std::string_view name) noexcept(false);
-        static bool check_linking(GLuint program, std::string_view name);
-        static void configure_uniform_blocks(GLuint program, const std::vector<UniformBlockSpecification>& uniform_blocks);
-        static std::string get_name(std::string_view vertex_source, std::string_view fragment_source);
+        static void configure_uniform_blocks(GLuint program, const UniformBlocks& uniform_blocks);
 
         GLuint program = 0;
         GLuint vertex_shader = 0;

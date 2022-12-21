@@ -6,6 +6,14 @@
 
 class EventDispatcher {  // TODO this probably needs to be extended in the future
 public:
+    EventDispatcher() = default;
+    ~EventDispatcher() = default;
+
+    EventDispatcher(const EventDispatcher&) = delete;
+    EventDispatcher& operator=(const EventDispatcher&) = delete;
+    EventDispatcher(EventDispatcher&&) = delete;
+    EventDispatcher& operator=(EventDispatcher&&) = delete;
+
     template<typename E, auto F, typename T>
     void add_event(T&& instance);
 

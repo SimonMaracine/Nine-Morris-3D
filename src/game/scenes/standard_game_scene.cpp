@@ -352,7 +352,7 @@ void StandardGameScene::initialize_board() {
             "u_material.shininess",
             "u_material.normal"
         },
-        std::vector {
+        std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
             app->renderer->get_storage().light_uniform_block,
             app->renderer->get_storage().light_view_position_uniform_block,
@@ -430,7 +430,7 @@ void StandardGameScene::initialize_board_paint() {
             "u_material.shininess",
             "u_material.normal"
         },
-        std::vector {
+        std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
             app->renderer->get_storage().light_uniform_block,
             app->renderer->get_storage().light_view_position_uniform_block,
@@ -503,7 +503,7 @@ void StandardGameScene::initialize_pieces() {
             "u_material.normal",
             "u_material.tint"
         },
-        std::vector {
+        std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
             app->renderer->get_storage().light_uniform_block,
             app->renderer->get_storage().light_view_position_uniform_block,
@@ -655,7 +655,7 @@ void StandardGameScene::initialize_nodes() {
         encr(path::path_for_assets(assets::NODE_VERTEX_SHADER)),
         encr(path::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_model_matrix", "u_color" },
-        std::vector {
+        std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block
         }
     );
@@ -726,7 +726,7 @@ void StandardGameScene::initialize_board_no_normal() {
             "u_material.specular",
             "u_material.shininess"
         },
-        std::vector {
+        std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
             app->renderer->get_storage().light_uniform_block,
             app->renderer->get_storage().light_view_position_uniform_block,
@@ -794,7 +794,7 @@ void StandardGameScene::initialize_board_paint_no_normal() {
             "u_material.specular",
             "u_material.shininess",
         },
-        std::vector {
+        std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
             app->renderer->get_storage().light_uniform_block,
             app->renderer->get_storage().light_view_position_uniform_block,
@@ -864,7 +864,7 @@ void StandardGameScene::initialize_pieces_no_normal() {
             "u_material.shininess",
             "u_material.tint"
         },
-        std::vector {
+        std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
             app->renderer->get_storage().light_uniform_block,
             app->renderer->get_storage().light_view_position_uniform_block,
