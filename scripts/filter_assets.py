@@ -38,8 +38,8 @@ def visit_directory(directory: str):
 
         if path.isfile(item_full_path):
             if item not in FILES_TO_KEEP and path.splitext(item)[1] != SUFFIX:
-                print(f"Removing {item_full_path}")
                 os.remove(item_full_path)
+                print(f"Removed {item_full_path}")
         elif path.isdir(item_full_path):
             visit_directory(item_full_path)
 
