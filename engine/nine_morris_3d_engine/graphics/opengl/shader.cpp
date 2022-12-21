@@ -368,7 +368,9 @@ namespace gl {
                 strncpy(field_names[i], name.c_str(), size);
             }
 
-            glGetUniformIndices(program, block.field_count, const_cast<const char* const*>(field_names), indices);
+            glGetUniformIndices(
+                program, block.field_count, const_cast<const char* const*>(field_names), indices
+            );
 
             for (size_t i = 0; i < block.field_count; i++) {
                 delete[] field_names[i];

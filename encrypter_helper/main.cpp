@@ -58,9 +58,10 @@ int main(int argc, char** argv) {
     cppblowfish::Buffer cipher;
     blowfish.encrypt(input, cipher);
 
-    unsigned char* buffer = new unsigned char[cipher.size() + cppblowfish::BUFFER_OFFSET];
+    const size_t size = cipher.size() + cppblowfish::BUFFER_OFFSET;
+    unsigned char* buffer = new unsigned char[size];
     cipher.write_whole_data(buffer);
-    write_file(output_file, buffer, cipher.size() + cppblowfish::BUFFER_OFFSET);
+    write_file(output_file, buffer, size);
     delete[] buffer;
 
     std::cout << "Successfully written cipher to `" << output_file << "`" << std::endl;
