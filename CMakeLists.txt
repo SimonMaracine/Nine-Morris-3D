@@ -128,6 +128,7 @@ add_library(${ENGINE} STATIC
     "engine/nine_morris_3d_engine/application/application_builder.cpp"
     "engine/nine_morris_3d_engine/application/application.cpp"
     "engine/nine_morris_3d_engine/application/capabilities.cpp"
+    "engine/nine_morris_3d_engine/application/events.cpp"
     "engine/nine_morris_3d_engine/application/input.cpp"
     "engine/nine_morris_3d_engine/application/window.cpp"
     "engine/nine_morris_3d_engine/audio/openal/buffer.cpp"

@@ -321,7 +321,7 @@ void LauncherScene::on_stop() {
 }
 
 void LauncherScene::on_awake() {
-    app->evt.sink<WindowClosedEvent>().connect<&LauncherScene::on_window_closed>(this);
+    app->evt.add_event<WindowClosedEvent, &LauncherScene::on_window_closed>(this);
 }
 
 void LauncherScene::on_update() {
