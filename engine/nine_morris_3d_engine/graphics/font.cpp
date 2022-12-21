@@ -147,7 +147,7 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         );
 
         if (glyph == nullptr) {
-            DEB_WARN("Couldn't bake character with codepoint `{}`; still adding to map...", codepoint);
+            DEB_WARNING("Couldn't bake character with codepoint `{}`; still adding to map...", codepoint);
         }
 
         if (bake_context.x + width > bitmap_size) {
@@ -201,7 +201,7 @@ void Font::bake_character(int codepoint) {
     );
 
     if (glyph == nullptr) {
-        DEB_WARN("Couldn't bake character with codepoint `{}`; still adding to map...", codepoint);
+        DEB_WARNING("Couldn't bake character with codepoint `{}`; still adding to map...", codepoint);
     }
 
     if (bake_context.x + width > bitmap_size) {

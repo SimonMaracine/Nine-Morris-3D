@@ -326,7 +326,7 @@ namespace gl {
 
     void Shader::configure_uniform_blocks(GLuint program, const UniformBlocks& uniform_blocks) {
         if (uniform_blocks.size() == 0) {
-            DEB_WARN("Uniform blocks structure is empty; this function does nothing");
+            DEB_WARNING("Uniform blocks structure is empty; this function does nothing");
         }
 
         for (const gl::UniformBlockSpecification& block : uniform_blocks) {

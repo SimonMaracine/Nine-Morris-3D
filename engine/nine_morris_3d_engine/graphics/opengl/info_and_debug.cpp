@@ -117,7 +117,7 @@ static constexpr size_t BUFFER_LENGTH = 128;
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:
-                REL_WARN("({}) {}", id, message);
+                REL_WARNING("({}) {}", id, message);
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 ASSERT(false, "This should have been disabled");

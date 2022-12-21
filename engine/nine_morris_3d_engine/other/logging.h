@@ -16,20 +16,20 @@
 #if defined(PLATFORM_GAME_RELEASE)
     #define DEB_DEBUG(...) ((void) 0)
     #define DEB_INFO(...) ((void) 0)
-    #define DEB_WARN(...) ((void) 0)
+    #define DEB_WARNING(...) ((void) 0)
     #define DEB_ERROR(...) ((void) 0)
     #define DEB_CRITICAL(...) ((void) 0)
 #elif defined(PLATFORM_GAME_DEBUG)
     #define DEB_DEBUG(...) SPDLOG_LOGGER_DEBUG(logging::get_global_logger(), __VA_ARGS__)
     #define DEB_INFO(...) SPDLOG_LOGGER_INFO(logging::get_global_logger(), __VA_ARGS__)
-    #define DEB_WARN(...) SPDLOG_LOGGER_WARN(logging::get_global_logger(), __VA_ARGS__)
+    #define DEB_WARNING(...) SPDLOG_LOGGER_WARN(logging::get_global_logger(), __VA_ARGS__)
     #define DEB_ERROR(...) SPDLOG_LOGGER_ERROR(logging::get_global_logger(), __VA_ARGS__)
     #define DEB_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(logging::get_global_logger(), __VA_ARGS__)
 #endif
 
 #define REL_DEBUG(...) SPDLOG_LOGGER_DEBUG(logging::get_global_logger(), __VA_ARGS__)
 #define REL_INFO(...) SPDLOG_LOGGER_INFO(logging::get_global_logger(), __VA_ARGS__)
-#define REL_WARN(...) SPDLOG_LOGGER_WARN(logging::get_global_logger(), __VA_ARGS__)
+#define REL_WARNING(...) SPDLOG_LOGGER_WARN(logging::get_global_logger(), __VA_ARGS__)
 #define REL_ERROR(...) SPDLOG_LOGGER_ERROR(logging::get_global_logger(), __VA_ARGS__)
 #define REL_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(logging::get_global_logger(), __VA_ARGS__)
 

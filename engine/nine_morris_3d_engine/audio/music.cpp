@@ -49,7 +49,7 @@ namespace music {
         source->set_rolloff_factor(0.0f);
 
         if (data->get_channels() != 2) {
-            DEB_WARN("Music track is not stereo");
+            DEB_WARNING("Music track is not stereo");
         }
     }
 
@@ -64,7 +64,7 @@ namespace music {
 
     void stop_music_track() {
         if (_current_music_track == nullptr) {
-            DEB_WARN("No music track pointer");
+            DEB_WARNING("No music track pointer");
             return;
         }
 
@@ -77,7 +77,7 @@ namespace music {
 
     void pause_music_track() {
         if (_current_music_track == nullptr) {
-            DEB_WARN("No music track pointer");
+            DEB_WARNING("No music track pointer");
             return;
         }
 
@@ -88,7 +88,7 @@ namespace music {
 
     void continue_music_track() {
         if (_current_music_track == nullptr) {
-            DEB_WARN("No music track pointer");
+            DEB_WARNING("No music track pointer");
             return;
         }
 
@@ -101,7 +101,7 @@ namespace music {
         ASSERT(gain >= 0.0f, "Gain must be positive");
 
         if (gain > 1.0f) {
-            DEB_WARN("Gain is larger than 1.0");
+            DEB_WARNING("Gain is larger than 1.0");
         }
 
         _gain = gain;

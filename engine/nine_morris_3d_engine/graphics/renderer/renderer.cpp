@@ -320,7 +320,7 @@ void Renderer::add_model(std::shared_ptr<Model> model) {
     if (iter == models.end()) {
         models.push_back(model);
     } else {
-        DEB_WARN("Model already present in list");
+        DEB_WARNING("Model already present in list");
     }
 }
 
@@ -338,7 +338,7 @@ void Renderer::add_quad(std::shared_ptr<Quad> quad) {
     if (iter == quads.end()) {
         quads.push_back(quad);
     } else {
-        DEB_WARN("Quad already present in list");
+        DEB_WARNING("Quad already present in list");
     }
 }
 

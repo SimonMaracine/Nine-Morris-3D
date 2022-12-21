@@ -112,11 +112,11 @@ void ImGuiLayer<S, B>::update() {
     try {
         save_load::load_game_from_file(saved_game);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_WARN("Could not load game: {}", e.what());
+        REL_WARNING("Could not load game: {}", e.what());
 
         save_load::handle_save_file_not_open_error(app->data().application_name);
     } catch (const save_load::SaveFileError& e) {
-        REL_WARN("Could not load game: {}", e.what());  // TODO maybe delete file
+        REL_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
     }
     last_save_game_date = std::move(saved_game.date);
     DEB_INFO("Checked last saved game");

@@ -281,7 +281,7 @@ void GuiRenderer::add_widget(std::shared_ptr<gui::Widget> widget) {
     if (iter == widgets.end()) {
         widgets.push_back(widget);
     } else {
-        DEB_WARN("Widget already present");
+        DEB_WARNING("Widget already present");
     }
 }
 

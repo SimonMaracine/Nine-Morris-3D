@@ -1595,14 +1595,14 @@ void StandardGameScene::load_game() {
     try {
         save_load::load_game_from_file(saved_game);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_WARN("Could not load game: {}", e.what());
+        REL_WARNING("Could not load game: {}", e.what());
 
         save_load::handle_save_file_not_open_error(app->data().application_name);
 
         imgui_layer.show_could_not_load_game = true;
         return;
     } catch (const save_load::SaveFileError& e) {
-        REL_WARN("Could not load game: {}", e.what());  // TODO maybe delete file
+        REL_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
 
         imgui_layer.show_could_not_load_game = true;
         return;
@@ -1629,7 +1629,7 @@ void StandardGameScene::undo() {
     ASSERT(!undo_redo_state.undo.empty(), "Undo history must not be empty");
 
     if (!board.next_move) {
-        DEB_WARN("Cannot undo when pieces are in air");
+        DEB_WARNING("Cannot undo when pieces are in air");
         return;
     }
 
@@ -1666,7 +1666,7 @@ void StandardGameScene::redo() {
     ASSERT(!undo_redo_state.redo.empty(), "Redo history must not be empty");
 
     if (!board.next_move) {
-        DEB_WARN("Cannot redo when pieces are in air");
+        DEB_WARNING("Cannot redo when pieces are in air");
         return;
     }
 

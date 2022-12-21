@@ -9,7 +9,7 @@
 
 static void check_bits_per_sample(size_t bits_per_sample, std::string_view file_path) {
     if (bits_per_sample == 8) {
-        DEB_WARN("bits_per_sample = 8 for sound file `{}`", file_path);
+        DEB_WARNING("bits_per_sample = 8 for sound file `{}`", file_path);
     }
 }
 
