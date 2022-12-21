@@ -236,7 +236,7 @@ GuiRenderer::GuiRenderer(Application* app)
     gl::Shader::unbind();
 
     // Setup events
-    app->evt.sink<WindowResizedEvent>().connect<&GuiRenderer::on_window_resized>(this);
+    app->evt.add_event<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);
 
     // Set application pointer to widgets
     gui::Widget::app = app;

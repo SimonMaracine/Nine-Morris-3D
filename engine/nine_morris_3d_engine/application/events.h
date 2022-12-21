@@ -1,6 +1,39 @@
 #pragma once
 
+#include <entt/signal/dispatcher.hpp>
+
 #include "nine_morris_3d_engine/application/input.h"
+
+class EventDispatcher {  // TODO this probably needs to be extended in the future
+public:
+    template<typename E, auto F, typename T>
+    void add_event(T&& instance);
+
+    template<typename T>
+    void remove_events(T&& instance);
+
+    template<typename E, typename... Args>
+    void enqueue(Args&&...);
+
+    void update();
+private:
+    entt::dispatcher dispatcher;
+};
+
+template<typename E, auto F, typename T>
+void EventDispatcher::add_event(T&& instance) {
+    dispatcher.template sink<E>().template connect<F, T>(std::forward<T>(instance));
+}
+
+template<typename T>
+void EventDispatcher::remove_events(T&& instance) {
+    dispatcher.disconnect(std::forward<T>(instance));
+}
+
+template<typename E, typename... Args>
+void EventDispatcher::enqueue(Args&&... args) {
+    dispatcher.template enqueue<E>(std::forward<Args>(args)...);
+}
 
 struct WindowClosedEvent {};
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <entt/entt.hpp>
-
 #include "nine_morris_3d_engine/application/application_data.h"
 #include "nine_morris_3d_engine/application/events.h"
 #include "nine_morris_3d_engine/application/window.h"
@@ -61,7 +59,7 @@ public:
     std::unique_ptr<OpenAlContext> openal;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
-    entt::dispatcher evt;  // Event dispatcher
+    EventDispatcher evt;  // Event dispatcher
     ResourcesCache res;  // Global cache of resources
 private:
     float update_frame_counter();

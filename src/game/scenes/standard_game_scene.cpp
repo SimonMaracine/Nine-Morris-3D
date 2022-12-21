@@ -126,11 +126,11 @@ void StandardGameScene::on_awake() {
     initialize_light();
     initialize_indicators_textures();
 
-    app->evt.sink<MouseButtonPressedEvent>().connect<&StandardGameScene::on_mouse_button_pressed>(this);
-    app->evt.sink<MouseButtonReleasedEvent>().connect<&StandardGameScene::on_mouse_button_released>(this);
-    app->evt.sink<KeyPressedEvent>().connect<&StandardGameScene::on_key_pressed>(this);
-    app->evt.sink<KeyReleasedEvent>().connect<&StandardGameScene::on_key_released>(this);
-    app->evt.sink<WindowResizedEvent>().connect<&StandardGameScene::on_window_resized>(this);
+    app->evt.add_event<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
+    app->evt.add_event<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
+    app->evt.add_event<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
+    app->evt.add_event<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
+    app->evt.add_event<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
 
     auto track = app->res.music_track.load("music"_h, app->res.sound_data["music"_h]);
     current_music_track = track;
