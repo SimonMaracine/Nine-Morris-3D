@@ -25,9 +25,9 @@ Normal texture:
     https://www.goodtextures.com/image/19816/wood-plain-04-normal
 
 Fonts:
-    See "data/fonts/" directory.
+    See the data/fonts/ directory.
 
-Skyboxes:
+Cube maps:
     https://polyhaven.com/hdris
 
 ----------------------------------------------------------------------------------------------------

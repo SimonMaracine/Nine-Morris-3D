@@ -215,6 +215,9 @@ add_subdirectory(extern/assimp)
 add_subdirectory(extern/cppblowfish)
 add_subdirectory(extern/openal_soft)
 
+# Also build the encrypter
+add_subdirectory(encrypter_helper)
+
 add_dependencies(${ENGINE} glfw)  # This is necessary for some reason
 
 # Add all include directories
