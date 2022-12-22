@@ -65,7 +65,7 @@ namespace options {
 
         if (!file.is_open()) {
             throw OptionsFileNotOpenError(
-                "Could not open options file `" + file_path + "`"
+                "Could not open options file `" + file_path + "` for reading"
             );
         }
 

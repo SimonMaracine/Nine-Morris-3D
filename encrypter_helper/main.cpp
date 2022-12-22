@@ -9,7 +9,7 @@ static void open_file(const std::string& file_name, unsigned char** out, size_t*
     std::ifstream file {file_name, std::ios::binary};
 
     if (!file.is_open()) {
-        std::cout << "Could not open file `" << file_name << "`" << std::endl;
+        std::cout << "Could not open file `" << file_name << "` for reading" << std::endl;
         exit(1);
     }
 

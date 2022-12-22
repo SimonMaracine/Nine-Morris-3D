@@ -101,7 +101,7 @@ namespace save_load {
 
         if (!file.is_open()) {
             throw SaveFileNotOpenError(
-                "Could not open last save game file `" + std::string(SAVE_GAME_FILE) + "`"
+                "Could not open last save game file `" + std::string(SAVE_GAME_FILE) + "` for reading"
             );
         }
 

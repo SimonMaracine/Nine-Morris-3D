@@ -68,7 +68,7 @@ static GLuint compile_shader(std::string_view source_path, GLenum type, std::str
     std::ifstream file {std::string(source_path), std::ios::binary};
 
     if (!file.is_open()) {
-        REL_CRITICAL("Could not open file `{}`, exiting...", source_path);
+        REL_CRITICAL("Could not open file `{}` for reading, exiting...", source_path);
         game_exit::exit_critical();
     }
 
