@@ -28,7 +28,7 @@ public:
     void draw_could_not_load_game();
     void draw_no_last_game();
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     void draw_debug();
 #endif
 
@@ -53,7 +53,7 @@ private:
 
     ImGuiWindowFlags window_flags = 0;
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     static constexpr size_t FRAMES_SIZE = 100;
     std::vector<float> frames = std::vector<float> {FRAMES_SIZE};
     size_t index = 0;
@@ -69,7 +69,7 @@ ImGuiLayer<S, B>::ImGuiLayer(Application* app, S* scene)
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigWindowsResizeFromEdges = false;
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-#ifdef PLATFORM_GAME_RELEASE
+#ifdef NM3D_PLATFORM_RELEASE
     io.IniFilename = nullptr;
 #endif
     window_flags |= ImGuiWindowFlags_NoResize;
@@ -620,7 +620,7 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
     ImGui::PopFont();
 }
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_debug() {
     if (!show_about) {

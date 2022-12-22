@@ -11,7 +11,7 @@ static ALCcontext* _global_context = nullptr;
 
 #if 0
 static void maybe_check_errors(ALCdevice* device) {
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     const ALCenum error = alcGetError(device);
 
     if (error != ALC_NO_ERROR) {

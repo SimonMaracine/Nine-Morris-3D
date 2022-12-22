@@ -13,13 +13,13 @@
  * spdlog is used directly only in the engine, which means it should work fine.
  */
 
-#if defined(PLATFORM_GAME_RELEASE)
+#if defined(NM3D_PLATFORM_RELEASE)
     #define DEB_DEBUG(...) ((void) 0)
     #define DEB_INFO(...) ((void) 0)
     #define DEB_WARNING(...) ((void) 0)
     #define DEB_ERROR(...) ((void) 0)
     #define DEB_CRITICAL(...) ((void) 0)
-#elif defined(PLATFORM_GAME_DEBUG)
+#elif defined(NM3D_PLATFORM_DEBUG)
     #define DEB_DEBUG(...) SPDLOG_LOGGER_DEBUG(logging::get_global_logger(), __VA_ARGS__)
     #define DEB_INFO(...) SPDLOG_LOGGER_INFO(logging::get_global_logger(), __VA_ARGS__)
     #define DEB_WARNING(...) SPDLOG_LOGGER_WARN(logging::get_global_logger(), __VA_ARGS__)

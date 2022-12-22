@@ -20,13 +20,13 @@ namespace dependencies {
 
         output.append("\n*** Compiler ***\n");
 
-#if defined(PLATFORM_GAME_LINUX)
+#if defined(NM3D_PLATFORM_LINUX)
         {
             char line[BUFFER_LENGTH];
             snprintf(line, BUFFER_LENGTH, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
             output.append(line);
         }
-#elif defined(PLATFORM_GAME_WINDOWS)
+#elif defined(NM3D_PLATFORM_WINDOWS)
         {
             char line[BUFFER_LENGTH];
             snprintf(line, BUFFER_LENGTH, "MSVC version: %d\n", _MSC_VER);

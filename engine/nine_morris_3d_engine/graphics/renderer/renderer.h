@@ -123,7 +123,7 @@ private:
         std::shared_ptr<gl::Shader> quad3d_shader;
         std::shared_ptr<gl::Shader> shadow_shader;
         std::shared_ptr<gl::Shader> outline_shader;
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
         std::shared_ptr<gl::Shader> origin_shader;
 #endif
 
@@ -133,7 +133,7 @@ private:
         std::shared_ptr<gl::Buffer> screen_quad_buffer;
         std::shared_ptr<gl::VertexArray> quad_vertex_array;
         std::shared_ptr<gl::Buffer> quad_buffer;
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
         std::shared_ptr<gl::VertexArray> origin_vertex_array;
         std::shared_ptr<gl::Buffer> origin_buffer;
 #endif
@@ -175,7 +175,7 @@ private:
     const char* SKYBOX_FRAGMENT_SHADER = ENCR("engine_data/shaders/skybox.frag");
     const char* QUAD3D_VERTEX_SHADER = ENCR("engine_data/shaders/quad3d.vert");
     const char* QUAD3D_FRAGMENT_SHADER = ENCR("engine_data/shaders/quad3d.frag");
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     const char* ORIGIN_VERTEX_SHADER = "engine_data/shaders/origin.vert";
     const char* ORIGIN_FRAGMENT_SHADER = "engine_data/shaders/origin.frag";
 #endif

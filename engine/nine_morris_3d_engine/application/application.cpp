@@ -57,7 +57,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
         evt.add_event<MouseButtonReleasedEvent, &Application::on_imgui_mouse_button_released>(this);
     }
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     logging::log_opengl_and_dependencies_info(logging::LogTarget::Console, builder.info_file_name);
 #endif
 

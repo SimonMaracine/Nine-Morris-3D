@@ -57,8 +57,8 @@ project("Nine-Morris-3D"
 file(GLOB_RECURSE GAME_HEADERS "src/*.h")
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 
-# Add WIN32 option for Windows
-if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+# Add WIN32 option for Windows in release mode
+if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)  // TODO this
     if(CMAKE_BUILD_TYPE MATCHES Release)
         set(NO_CONSOLE WIN32)
     endif()
@@ -69,18 +69,12 @@ add_executable(${GAME} ${NO_CONSOLE}
     ${GAME_HEADERS}
 )
 
-# On Windows tell linker to use main instead of WinMain
-if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    target_link_options(${GAME} PRIVATE
-        /entry:mainCRTStartup
-    )
-endif()
-
 set(ENGINE_HEADERS
     "engine/nine_morris_3d_engine/application/application_builder.h"
     "engine/nine_morris_3d_engine/application/application_data.h"
     "engine/nine_morris_3d_engine/application/application.h"
     "engine/nine_morris_3d_engine/application/capabilities.h"
+    "engine/nine_morris_3d_engine/application/entry_point.h"
     "engine/nine_morris_3d_engine/application/events.h"
     "engine/nine_morris_3d_engine/application/input.h"
     "engine/nine_morris_3d_engine/application/platform.h"
@@ -305,16 +299,16 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     endif()
 endif()
 
-# Add some defines
+# Add definitions
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     message("Building Nine Morris 3D in DEBUG mode")
 
     target_compile_definitions(${ENGINE} PRIVATE
-        GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES  # To easily enable or disable encrypted files
+        NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES  # To easily enable or disable encrypted files
     )
 
     target_compile_definitions(${GAME} PRIVATE
-        GAME_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
+        NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
     )
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message("Building Nine Morris 3D in RELEASE mode")
@@ -333,8 +327,8 @@ endif()
 target_compile_definitions(${ENGINE} PRIVATE
     SPDLOG_ACTIVE_LEVEL=0
     _CRT_SECURE_NO_WARNINGS
-    IMGUI_IMPL_OPENGL_LOADER_GLAD
     ENTT_NO_ETO
+    IMGUI_IMPL_OPENGL_LOADER_GLAD
     UTF_CPP_CPLUSPLUS=201703
     AL_LIBTYPE_STATIC
 )

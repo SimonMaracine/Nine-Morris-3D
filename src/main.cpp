@@ -8,17 +8,17 @@
 #include "launcher/scenes/launcher_scene.h"
 #include "other/data.h"
 
-#if defined(PLATFORM_GAME_LINUX)
+#if defined(NM3D_PLATFORM_LINUX)
     #define APP_NAME "ninemorris3d"
     #define LOG_FILE "ninemorris3d.log"
     #define INFO_FILE "info.txt"
-#elif defined(PLATFORM_GAME_WINDOWS)
+#elif defined(NM3D_PLATFORM_WINDOWS)
     #define APP_NAME "NineMorris3D"
     #define LOG_FILE "ninemorris3d.log"
     #define INFO_FILE "ninemorris3d_info.txt"
 #endif
 
-int main() {
+void application_main() {
     constexpr unsigned int MAJOR = 0;
     constexpr unsigned int MINOR = 2;
     constexpr unsigned int PATCH = 0;
@@ -80,3 +80,5 @@ int main() {
 
     REL_INFO("Terminated game successfully");
 }
+
+DEFINE_MAIN_FUNCTION()

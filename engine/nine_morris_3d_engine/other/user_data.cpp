@@ -1,10 +1,10 @@
 #include "nine_morris_3d_engine/application/platform.h"
 
-#if defined(PLATFORM_GAME_LINUX)
+#if defined(NM3D_PLATFORM_LINUX)
     #include <pwd.h>
     #include <unistd.h>
     #include <sys/stat.h>
-#elif defined(PLATFORM_GAME_WINDOWS)
+#elif defined(NM3D_PLATFORM_WINDOWS)
     #include <Windows.h>
     #include <Lmcons.h>
 #endif
@@ -12,7 +12,7 @@
 #include "nine_morris_3d_engine/other/user_data.h"
 #include "nine_morris_3d_engine/other/logging.h"
 
-#if defined(PLATFORM_GAME_LINUX)
+#if defined(NM3D_PLATFORM_LINUX)
     #define DIRECTORY_PATH(username, app_name) ("/home/" + (username) + "/." + (app_name) + "/")
 
     static std::string get_username_impl() noexcept(false) {
@@ -56,7 +56,7 @@
             return true;
         }
     }
-#elif defined(PLATFORM_GAME_WINDOWS)
+#elif defined(NM3D_PLATFORM_WINDOWS)
     #define DIRECTORY_PATH(username, app_name) ("C:\\Users\\" + (username) + "\\AppData\\Roaming\\" + (app_name) + "\\")
 
     static std::string get_username_impl() noexcept(false) {

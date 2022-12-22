@@ -18,7 +18,7 @@ Window::Window(Application* app) {
         game_exit::exit_critical();
     }
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     glfwSetErrorCallback([](int error, const char* description) {
         DEB_CRITICAL("({}) GLFW Error Callback: {}", error, description);
     });
@@ -32,7 +32,7 @@ Window::Window(Application* app) {
     glfwWindowHint(GLFW_RESIZABLE, app->data().resizable ? GLFW_TRUE : GLFW_FALSE);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
     DEB_INFO("Using OpenGL debug context");
 #else
@@ -211,7 +211,7 @@ void Window::set_cursor(unsigned int handle) {
         return;
     }
 
-#if defined(PLATFORM_GAME_DEBUG)
+#if defined(NM3D_PLATFORM_DEBUG)
     GLFWcursor* cursor;
     try {
         cursor = cursors.at(handle);
@@ -220,7 +220,7 @@ void Window::set_cursor(unsigned int handle) {
         game_exit::exit_critical();
     }
     glfwSetCursor(window, cursor);
-#elif defined(PLATFORM_GAME_RELEASE)
+#elif defined(NM3D_PLATFORM_RELEASE)
     GLFWcursor* cursor = cursors[handle];
     glfwSetCursor(window, cursor);
 #endif

@@ -71,7 +71,7 @@ static constexpr size_t BUFFER_LENGTH = 128;
     }
 #endif
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     static void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
             GLsizei, const GLchar* message, const void*) {
         switch (severity) {
@@ -128,7 +128,7 @@ static constexpr size_t BUFFER_LENGTH = 128;
 
 namespace gl {
     void maybe_initialize_debugging() {
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
         glDebugMessageCallback(error_callback, nullptr);
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);

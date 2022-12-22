@@ -28,7 +28,7 @@
 // Should be cleaned up at exit()
 static std::shared_ptr<spdlog::logger> _global_logger;
 
-#if defined(PLATFORM_GAME_RELEASE)
+#if defined(NM3D_PLATFORM_RELEASE)
 static void set_fallback_logger_release(const char* error_message) {
     _global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
     _global_logger->set_pattern(LOG_PATTERN_RELEASE);
@@ -40,13 +40,13 @@ static void set_fallback_logger_release(const char* error_message) {
 
 namespace logging {
     void initialize_for_applications(std::string_view log_file) {
-#if defined(PLATFORM_GAME_DEBUG)
+#if defined(NM3D_PLATFORM_DEBUG)
         _global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
         _global_logger->set_pattern(LOG_PATTERN_DEBUG);
         _global_logger->set_level(spdlog::level::trace);
 
         static_cast<void>(log_file);  // Trick the compiler that we do use log_file
-#elif defined(PLATFORM_GAME_RELEASE)
+#elif defined(NM3D_PLATFORM_RELEASE)
         std::string file_path;
 
         try {

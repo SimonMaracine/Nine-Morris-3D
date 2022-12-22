@@ -7,7 +7,7 @@
 
 namespace al {
     void maybe_check_errors() {
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
         const ALenum error = alGetError();
 
         if (error != AL_NO_ERROR) {

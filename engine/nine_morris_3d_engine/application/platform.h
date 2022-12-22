@@ -5,13 +5,13 @@
  */
 #if defined(__linux__)
     #if defined(__GNUG__)
-        #define PLATFORM_GAME_LINUX
+        #define NM3D_PLATFORM_LINUX
     #else
         #error "GCC must be used on Linux (for now)"
     #endif
 #elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     #if defined(_MSC_VER)
-        #define PLATFORM_GAME_WINDOWS
+        #define NM3D_PLATFORM_WINDOWS
     #else
         #error "MSVC must be used on Windows (for now)"
     #endif
@@ -20,7 +20,7 @@
 #endif
 
 #ifdef NDEBUG
-    #define PLATFORM_GAME_RELEASE
+    #define NM3D_PLATFORM_RELEASE
 #else
-    #define PLATFORM_GAME_DEBUG
+    #define NM3D_PLATFORM_DEBUG
 #endif

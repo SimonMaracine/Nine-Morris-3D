@@ -119,7 +119,7 @@ Renderer::Renderer(Application* app)
         );
     }
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     {
         storage.origin_shader = std::make_shared<gl::Shader>(
             path::path_for_assets(ORIGIN_VERTEX_SHADER),
@@ -175,7 +175,7 @@ Renderer::Renderer(Application* app)
         gl::VertexArray::unbind();
     }
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     {
         static constexpr float origin_vertices[] = {
             -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
@@ -276,7 +276,7 @@ void Renderer::render() {
     // Render all models with outline
     draw_models_with_outline();
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     if (origin) {
         draw_origin();
     }
@@ -477,7 +477,7 @@ void Renderer::end_rendering() {
     glEnable(GL_DEPTH_TEST);
 }
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
 void Renderer::draw_origin() {
     storage.origin_shader->bind();
     storage.origin_shader->upload_uniform_mat4("u_projection_view_matrix", camera_cache.projection_view_matrix);

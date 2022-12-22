@@ -57,7 +57,7 @@ void StandardGameScene::on_start() {
 
     app->window->set_cursor(data.options.custom_cursor ? data.arrow_cursor : 0);
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     app->renderer->origin = true;
     app->renderer->add_quad(app->res.quad["light_bulb"_h]);
 #endif
@@ -83,7 +83,7 @@ void StandardGameScene::on_stop() {
         save_game();
     }
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     app->renderer->origin = false;
 #endif
 
@@ -118,7 +118,7 @@ void StandardGameScene::on_awake() {
     initialize_nodes();
 
     initialize_keyboard_controls();
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     initialize_light_bulb();
 #endif
 
@@ -200,7 +200,7 @@ void StandardGameScene::on_imgui_update() {
         imgui_layer.draw_info();
     }
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     imgui_layer.draw_debug();
 #endif
 }
@@ -1192,7 +1192,7 @@ void StandardGameScene::initialize_light() {
         ASSERT(false, "Invalid skybox");
     }
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     if (data.options.skybox == game_options::FIELD) {
         app->res.quad["light_bulb"_h]->position = LIGHT_FIELD.position;
     } else if (data.options.skybox == game_options::AUTUMN) {

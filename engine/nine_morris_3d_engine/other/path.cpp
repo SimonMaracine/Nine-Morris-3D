@@ -4,7 +4,7 @@
 
 static std::string app_name;
 
-#if defined(PLATFORM_GAME_DEBUG)
+#if defined(NM3D_PLATFORM_DEBUG)
     // Use relative path for both operating systems
     static std::string path_for_logs_impl(std::string_view file) noexcept(false) {
         return std::string(file);
@@ -17,8 +17,8 @@ static std::string app_name;
     static std::string path_for_assets_impl(std::string_view file_path) {
         return std::string(file_path);
     }
-#elif defined(PLATFORM_GAME_RELEASE)
-    #if defined(PLATFORM_GAME_LINUX)
+#elif defined(NM3D_PLATFORM_RELEASE)
+    #if defined(NM3D_PLATFORM_LINUX)
         static std::string path_for_logs_impl(std::string_view file) noexcept(false) {
             return user_data::get_user_data_directory_path(app_name) + std::string(file);
         }
@@ -30,7 +30,7 @@ static std::string app_name;
         static std::string path_for_assets_impl(std::string_view file_path) {
             return std::string("/usr/local/share/") + app_name + "/" + std::string(file_path);
         }
-    #elif defined(PLATFORM_GAME_WINDOWS)
+    #elif defined(NM3D_PLATFORM_WINDOWS)
         static std::string path_for_logs_impl(std::string_view file) noexcept(false) {
             return "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + app_name + "\\" + std::string(file);
         }

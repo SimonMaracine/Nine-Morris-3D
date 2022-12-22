@@ -120,7 +120,7 @@ void Font::end_baking() {
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-#ifdef PLATFORM_GAME_DEBUG
+#ifdef NM3D_PLATFORM_DEBUG
     write_bitmap_to_file();
 #endif
 

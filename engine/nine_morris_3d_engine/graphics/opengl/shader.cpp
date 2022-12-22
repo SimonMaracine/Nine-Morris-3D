@@ -299,9 +299,9 @@ namespace gl {
     }
 
     GLint Shader::get_uniform_location(std::string_view name) {
-#if defined(PLATFORM_GAME_RELEASE)
+#if defined(NM3D_PLATFORM_RELEASE)
         return cache[std::string(name)];
-#elif defined(PLATFORM_GAME_DEBUG)
+#elif defined(NM3D_PLATFORM_DEBUG)
         try {
             return cache.at(std::string(name));
         } catch (const std::out_of_range&) {
