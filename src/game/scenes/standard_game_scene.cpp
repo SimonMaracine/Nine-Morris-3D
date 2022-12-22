@@ -155,7 +155,7 @@ void StandardGameScene::on_update() {
 
         board.update_nodes(app->renderer->get_hovered_id());
         board.update_pieces(app->renderer->get_hovered_id());
-        timer.update();  // TODO maybe should have been after update_game_state()
+        timer.update();
 
         // Update listener position, look at and up vectors every frame
         app->openal->get_listener().set_position(camera_controller.get_position());

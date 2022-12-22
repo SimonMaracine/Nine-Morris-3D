@@ -547,7 +547,7 @@ void ImGuiLayer<S, B>::draw_about() {
             ImGui::CloseCurrentPopup();
             show_about = false;
 
-            scene->timer.reset_last_time();
+            scene->timer.update();
         }
 
         ImGui::EndPopup();
@@ -581,7 +581,7 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
             ImGui::CloseCurrentPopup();
             show_could_not_load_game = false;
 
-            scene->timer.reset_last_time();
+            scene->timer.update();
         }
 
         ImGui::EndPopup();
@@ -612,7 +612,7 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
             ImGui::CloseCurrentPopup();
             show_no_last_game = false;
 
-            scene->timer.reset_last_time();
+            scene->timer.update();
         }
 
         ImGui::EndPopup();
