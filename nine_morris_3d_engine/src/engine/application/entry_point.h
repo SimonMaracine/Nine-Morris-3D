@@ -1,0 +1,31 @@
+#pragma once
+
+#include "engine/application/platform.h"
+
+/**
+ * Define a pseudo main function with this declaration:
+ *
+ * void application_main();
+ *
+ * And include this engine_entry_point.h header file once into your main compilation unit.
+ */
+
+void application_main();
+
+#if defined(NM3D_PLATFORM_LINUX)
+    int main(int argc, char** argv) {
+        application_main();
+    }
+#elif defined(NM3D_PLATFORM_WINDOWS)
+    #include <Windows.h>
+
+    #if defined(NM3D_PLATFORM_RELEASE)
+        INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) {
+            application_main();
+        }
+    #elif defined(NM3D_PLATFORM_DEBUG)
+        int main(int argc, char** argv) {
+            application_main();
+        }
+    #endif
+#endif

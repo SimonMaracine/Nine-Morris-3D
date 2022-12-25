@@ -1,30 +1,30 @@
-[submodule "extern/glfw"]
-    path = extern/glfw
-    url = https://github.com/SimonMaracine/glfw.git
-[submodule "extern/imgui"]
-    path = extern/imgui
-    url = https://github.com/SimonMaracine/imgui.git
-[submodule "extern/assimp"]
-    path = extern/assimp
-    url = https://github.com/SimonMaracine/assimp.git
-[submodule "extern/glm"]
-    path = extern/glm
-    url = https://github.com/SimonMaracine/glm.git
-[submodule "extern/spdlog"]
-    path = extern/spdlog
-    url = https://github.com/SimonMaracine/spdlog.git
-[submodule "extern/utfcpp"]
-    path = extern/utfcpp
-    url = https://github.com/SimonMaracine/utfcpp.git
-[submodule "extern/cppblowfish"]
-    path = extern/cppblowfish
-    url = https://github.com/SimonMaracine/cppblowfish.git
-[submodule "extern/entt"]
-    path = extern/entt
-    url = https://github.com/SimonMaracine/entt.git
-[submodule "extern/resmanager"]
-    path = extern/resmanager
-    url = https://github.com/SimonMaracine/resource-manager.git
-[submodule "extern/openal_soft"]
-	path = extern/openal_soft
-    url = https://github.com/SimonMaracine/openal-soft.git
+[submodule "nine_morris_3d_engine/extern/assimp"]
+	path = nine_morris_3d_engine/extern/assimp
+	url = https://github.com/SimonMaracine/assimp.git
+[submodule "nine_morris_3d_engine/extern/glfw"]
+	path = nine_morris_3d_engine/extern/glfw
+	url = https://github.com/SimonMaracine/glfw.git
+[submodule "nine_morris_3d_engine/extern/imgui"]
+	path = nine_morris_3d_engine/extern/imgui
+	url = https://github.com/SimonMaracine/imgui.git
+[submodule "nine_morris_3d_engine/extern/glm"]
+	path = nine_morris_3d_engine/extern/glm
+	url = https://github.com/SimonMaracine/glm.git
+[submodule "nine_morris_3d_engine/extern/spdlog"]
+	path = nine_morris_3d_engine/extern/spdlog
+	url = https://github.com/SimonMaracine/spdlog.git
+[submodule "nine_morris_3d_engine/extern/utfcpp"]
+	path = nine_morris_3d_engine/extern/utfcpp
+	url = https://github.com/SimonMaracine/utfcpp.git
+[submodule "nine_morris_3d_engine/extern/cppblowfish"]
+	path = nine_morris_3d_engine/extern/cppblowfish
+	url = https://github.com/SimonMaracine/cppblowfish.git
+[submodule "nine_morris_3d_engine/extern/entt"]
+	path = nine_morris_3d_engine/extern/entt
+	url = https://github.com/SimonMaracine/entt.git
+[submodule "nine_morris_3d_engine/extern/openal_soft"]
+	path = nine_morris_3d_engine/extern/openal_soft
+	url = https://github.com/SimonMaracine/openal-soft.git
+[submodule "nine_morris_3d_engine/extern/resmanager"]
+	path = nine_morris_3d_engine/extern/resmanager
+	url = https://github.com/SimonMaracine/resource-manager.git

@@ -1,50 +1,44 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(EXECUTABLE_NAME "encrypter")
-set(CPPBLOWFISH_BUILD_TESTS OFF)
+set(EXECUTABLE "encrypter")
+set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Variable used to control the build type")
 
-if(NOT DEFINED CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
-endif()
+add_executable(${EXECUTABLE} "main.cpp")
 
-project("encrypter_helper" LANGUAGES CXX)
+target_link_libraries(${EXECUTABLE} PRIVATE cppblowfish)
 
-add_executable(${EXECUTABLE_NAME} "main.cpp")
-
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE cppblowfish)
-
-if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set_property(TARGET
-            ${EXECUTABLE_NAME}
+            ${EXECUTABLE}
             PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug
         )
-    elseif(CMAKE_BUILD_TYPE MATCHES Release)
+    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
         set_property(TARGET
-            ${EXECUTABLE_NAME}
+            ${EXECUTABLE}
             PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded
         )
     endif()
 endif()
 
-if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-    add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-        "${PROJECT_BINARY_DIR}/${EXECUTABLE_NAME}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/${EXECUTABLE_NAME}"
+        "${PROJECT_BINARY_DIR}/${EXECUTABLE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/${EXECUTABLE}"
     )
-elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
-        add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-            "${PROJECT_BINARY_DIR}/Debug/${EXECUTABLE_NAME}.exe"
-            "${CMAKE_CURRENT_SOURCE_DIR}/${EXECUTABLE_NAME}.exe"
+            "${CMAKE_CURRENT_BINARY_DIR}/Debug/${EXECUTABLE}.exe"
+            "${CMAKE_CURRENT_SOURCE_DIR}/${EXECUTABLE}.exe"
         )
-    elseif(CMAKE_BUILD_TYPE MATCHES Release)
-        add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-            "${PROJECT_BINARY_DIR}/Release/${EXECUTABLE_NAME}.exe"
-            "${CMAKE_CURRENT_SOURCE_DIR}/${EXECUTABLE_NAME}.exe"
+            "${CMAKE_CURRENT_BINARY_DIR}/Release/${EXECUTABLE}.exe"
+            "${CMAKE_CURRENT_SOURCE_DIR}/${EXECUTABLE}.exe"
         )
     endif()
 else()

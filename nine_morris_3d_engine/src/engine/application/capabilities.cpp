@@ -1,0 +1,38 @@
+#include <glad/glad.h>
+
+#include "engine/application/capabilities.h"
+#include "engine/other/logging.h"
+
+namespace capabilities {
+    int max_anisotropic_filtering_supported() {
+        if (GLAD_GL_EXT_texture_filter_anisotropic) {
+            float max_amount;
+            glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_amount);
+
+            return static_cast<int>(max_amount);
+        } else {
+            return 0;
+        }
+    }
+
+    int max_samples_supported() {
+        GLint max_samples;
+        glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+
+        GLint max_depth_texture_samples;
+        glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &max_depth_texture_samples);
+
+        GLint max_color_texture_samples;
+        glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &max_color_texture_samples);
+
+        if (max_depth_texture_samples < max_samples) {
+            REL_ERROR("GL_MAX_DEPTH_TEXTURE_SAMPLES < GL_MAX_SAMPLES");
+        }
+
+        if (max_color_texture_samples < max_samples) {
+            REL_ERROR("GL_MAX_COLOR_TEXTURE_SAMPLES < GL_MAX_SAMPLES");
+        }
+
+        return max_samples;
+    }
+}
