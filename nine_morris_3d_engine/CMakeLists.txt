@@ -5,7 +5,7 @@ set(GLAD_STB glad-stb)
 set(IMGUI imgui)
 
 # Use static linking everywhere possible
-set(BUILD_SHARED_LIBS OFF)  # TODO more options need to be set
+set(BUILD_SHARED_LIBS OFF)
 
 # Assimp
 set(USE_STATIC_CRT ON)  # Windows stuff
@@ -183,7 +183,7 @@ add_subdirectory(extern/glfw)
 add_subdirectory(extern/openal_soft)
 add_subdirectory(extern/spdlog)
 
-add_dependencies(${ENGINE} glfw)  # TODO this is necessary for some reason
+add_dependencies(${ENGINE} glfw)  # TODO this was necessary for some reason
 
 # Add all include directories
 target_include_directories(${ENGINE} PUBLIC "src")
@@ -233,22 +233,6 @@ target_link_libraries(${ENGINE} PUBLIC
     ${IMGUI}
 )
 
-# On Windows set runtime library
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set_property(TARGET
-            ${ENGINE} ${GLAD_STB} ${IMGUI} spdlog assimp glfw cppblowfish OpenAL
-            PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug
-        )
-    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set_property(TARGET
-            ${ENGINE} ${GLAD_STB} ${IMGUI} spdlog assimp glfw cppblowfish OpenAL
-            PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded
-        )
-    endif()
-endif()
-
-
 # Add compile definitions
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Project building Nine Morris 3D engine in DEBUG mode")
@@ -282,3 +266,16 @@ target_compile_definitions(${ENGINE} PUBLIC
     _CRT_SECURE_NO_WARNINGS
     ENTT_NO_ETO
 )
+
+# On Windows set runtime library
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set_property(TARGET
+        ${ENGINE} ${GLAD_STB} ${IMGUI} spdlog assimp glfw cppblowfish OpenAL
+        PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug
+    )
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set_property(TARGET
+        ${ENGINE} ${GLAD_STB} ${IMGUI} spdlog assimp glfw cppblowfish OpenAL
+        PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded
+    )
+endif()

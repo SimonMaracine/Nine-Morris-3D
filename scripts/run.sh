@@ -10,5 +10,5 @@ cmake --build . -j $threads
 if [ $? -eq 0 ]; then
     cd ..
     clear
-    build/Nine-Morris-3D
+    build/Nine-Morris-3D/Nine-Morris-3D
 fi

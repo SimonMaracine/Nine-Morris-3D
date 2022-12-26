@@ -13,7 +13,7 @@
 void application_main();
 
 #if defined(NM3D_PLATFORM_LINUX)
-    int main(int argc, char** argv) {
+    int main(int, char**) {
         application_main();
     }
 #elif defined(NM3D_PLATFORM_WINDOWS)

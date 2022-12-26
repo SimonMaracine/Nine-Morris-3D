@@ -36,23 +36,7 @@ target_include_directories(${GAME} PRIVATE "src")
 # Add all libraries
 target_link_libraries(${GAME} PRIVATE
     ${ENGINE}
-    # spdlog  # TODO this avoids having to link engine libraries publicly
 )
-
-# On Windows set runtime library
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set_property(TARGET
-            ${GAME}
-            PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug
-        )
-    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set_property(TARGET
-            ${GAME}
-            PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded
-        )
-    endif()
-endif()
 
 # Add compile definitions
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -66,4 +50,18 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     )
 endif()
 
+# On Windows set runtime library
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set_property(TARGET
+        ${GAME}
+        PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug
+    )
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set_property(TARGET
+        ${GAME}
+        PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded
+    )
+endif()
+
+# On Windows set Visual Studio working directory
 set_property(TARGET ${GAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")

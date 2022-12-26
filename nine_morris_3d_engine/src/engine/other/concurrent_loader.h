@@ -1,5 +1,6 @@
 #pragma once
 
+#include "engine/application/application.h"
 #include "engine/other/logging.h"
 #include "engine/other/resource_manager.h"
 

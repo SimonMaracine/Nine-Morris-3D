@@ -1,7 +1,4 @@
 #! /bin/bash
 
-cd ../encrypter_helper
-mkdir -p build
-cd build
-cmake .. -D CMAKE_BUILD_TYPE=Release
-cmake --build .
+cd ../build
+cmake --build . --target encrypter_helper
