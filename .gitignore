@@ -10,6 +10,7 @@ imgui.ini
 bitmap_*.png
 *.dat
 encrypter_helper/encrypter_helper
+encrypter_helper/encrypter_helper.exe
 /data-filtered
 /engine_data-filtered
 /renderdoc_captures

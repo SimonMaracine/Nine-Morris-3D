@@ -21,10 +21,4 @@ add_subdirectory(nine_morris_3d_engine)
 add_subdirectory(Nine-Morris-3D)
 
 # Also build the encrypter
-add_subdirectory(encrypter_helper EXCLUDE_FROM_ALL)
-
-# if(CMAKE_CXX_COMPILER_ID STREQUAL GNU)  # TODO needed?
-#     target_link_libraries(${ENGINE} PRIVATE
-#         X11
-#     )
-# endif()
+add_subdirectory(encrypter_helper)
