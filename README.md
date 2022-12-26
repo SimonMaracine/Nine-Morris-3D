@@ -5,6 +5,7 @@
 ### Description
 
 It is a free casual board game with hopefully beautiful 3D graphics. It has five game modes:
+
 - _standard (nine men's morris)_
 - _jump_
 - _jump+_
@@ -30,7 +31,7 @@ Hopefully an Android version will be made.
 ### Exporting on Linux
 
 - Create a new folder called **_Nine-Morris-3D-vX.Y.Z-Linux_**
-- Copy the executable from **build-release/**
+- Copy the executable from **build-release/Nine-Morris-3D/**
 - Make sure that all assets are encrypted
 - Use **filter_assets.py** to create the filtered data folders
 - Copy the two newly created data directories and rename them from ***data-filtered** to ***data**
@@ -43,12 +44,12 @@ Hopefully an Android version will be made.
 ### Exporting on Windows
 
 - Create a new folder called whatever
-- Copy the executable from **Release/**
+- Copy the executable from **build\Nine-Morris-3D\Release\\**
 - Make sure that all assets are encrypted
 - Use **filter_assets.py** to create the filtered data folders
 - Copy the two newly created data directories and rename them from ***data-filtered** to ***data**
 - Copy **README.txt**
-- Copy **installer.nsi** from **scripts/windows_install/**
+- Copy **installer.nsi** from **scripts\windows_install\\**
 - Create an NSIS installer called **_Nine-Morris-3D-vX.Y.Z-Windows_** using the **installer.nsi** script
 
 ### Where to update the version

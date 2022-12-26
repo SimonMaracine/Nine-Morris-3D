@@ -7,7 +7,7 @@
 
 ### On Windows
 
-- Visual Studio (version >= 2019)
+- Visual Studio (version >= 2022)
 
 ### On Linux
 
@@ -31,13 +31,17 @@
 
 ### Visual Studio Code
 
-    cmake . -D CMAKE_BUILD_TYPE=Release -A x64
+    mkdir build
+    cd build
+    cmake .. -D CMAKE_BUILD_TYPE=Release -A x64
     cmake --build . --config Release -j4
 
 ### Visual Studio
 
-    cmake . -D CMAKE_BUILD_TYPE=Release -A x64
-    :: Open in Visual Studio and build from there
+    mkdir build
+    cd build
+    cmake .. -D CMAKE_BUILD_TYPE=Release -A x64
+    :: Open in Visual Studio, change to Release mode and build from there
 
 ## Linux debug
 
@@ -57,5 +61,7 @@
 
 ### Visual Studio
 
-    cmake . -D CMAKE_BUILD_TYPE=Debug -A x64
+    mkdir build
+    cd build
+    cmake .. -D CMAKE_BUILD_TYPE=Debug -A x64
     :: Open in Visual Studio and build from there
