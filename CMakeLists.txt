@@ -54,12 +54,6 @@ project("Nine-Morris-3D"
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-message("Binary dir: ${CMAKE_BINARY_DIR}")
-message("Current binary dir: ${CMAKE_CURRENT_BINARY_DIR}")
-message("Source dir: ${CMAKE_SOURCE_DIR}")
-message("Project binary dir: ${PROJECT_BINARY_DIR}")
-message("Project source dir: ${PROJECT_SOURCE_DIR}")
-
 message(STATUS "Project compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "Project build type: ${CMAKE_BUILD_TYPE}")
 

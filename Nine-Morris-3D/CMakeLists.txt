@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-message("Binary dir: ${CMAKE_BINARY_DIR}")
-message("Current binary dir: ${CMAKE_CURRENT_BINARY_DIR}")
-message("Source dir: ${CMAKE_SOURCE_DIR}")
-message("Project binary dir: ${PROJECT_BINARY_DIR}")
-message("Project source dir: ${PROJECT_SOURCE_DIR}")
-
 set(GAME Nine-Morris-3D)
 set(ENGINE nine-morris-3d-engine)
 
