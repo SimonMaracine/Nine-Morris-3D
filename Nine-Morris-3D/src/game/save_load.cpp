@@ -22,7 +22,7 @@ namespace save_load {
         }
 
         if (!user_data_directory) {
-            REL_INFO("User data folder missing; creating one...");
+            REL_INFO("User data directory missing; creating one...");
 
             try {
                 const bool success = user_data::create_user_data_directory(app_name);

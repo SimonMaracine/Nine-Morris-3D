@@ -66,9 +66,9 @@ private:
     unsigned int calculate_fixed_update();
     void check_changed_scene();
 
-    void renderer_3d_functionality();
-    void renderer_2d_functionality();
-    void renderer_imgui_functionality();
+    void renderer_3d_func();
+    void renderer_2d_func();
+    void renderer_imgui_func();
 
     void prepare_scenes();
     void on_start(Scene* scene);
@@ -102,9 +102,9 @@ private:
         constexpr void operator()() {}  // Do nothing
     };
 
-    std::function<void()> renderer_3d = DummyFunction {};
-    std::function<void()> renderer_2d = DummyFunction {};
-    std::function<void()> renderer_imgui = DummyFunction {};
+    std::function<void()> renderer_3d_update = DummyFunction {};
+    std::function<void()> renderer_2d_update = DummyFunction {};
+    std::function<void()> renderer_imgui_update = DummyFunction {};
 
     // Keep track of all framebuffers to resize them, if needed
     std::vector<std::weak_ptr<gl::Framebuffer>> framebuffers;

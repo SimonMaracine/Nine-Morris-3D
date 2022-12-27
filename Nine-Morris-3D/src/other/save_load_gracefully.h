@@ -14,7 +14,7 @@ namespace save_load_gracefully {
             REL_ERROR("Could not save options to file: {}", e.what());
 
             options::handle_options_file_not_open_error<Opt>(
-                options_file, app->data().application_name
+                options_file, app->data().app_name
             );
         } catch (const options::OptionsFileError& e) {
             REL_ERROR("Could not save options to file: {}", e.what());
@@ -34,13 +34,13 @@ namespace save_load_gracefully {
         try {
             options::load_options_from_file<Opt>(options, options_file, validate);
         } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("Could not load options to file: {}", e.what());
+            REL_ERROR("Could not load options from file: {}", e.what());
 
             options::handle_options_file_not_open_error<Opt>(
-                options_file, app->data().application_name
+                options_file, app->data().app_name
             );
         } catch (const options::OptionsFileError& e) {
-            REL_ERROR("Could not load options to file: {}", e.what());
+            REL_ERROR("Could not load options from file: {}", e.what());
 
             try {
                 options::create_options_file<Opt>(options_file);

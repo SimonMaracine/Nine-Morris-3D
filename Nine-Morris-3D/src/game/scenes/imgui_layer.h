@@ -114,7 +114,7 @@ void ImGuiLayer<S, B>::update() {
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_WARNING("Could not load game: {}", e.what());
 
-        save_load::handle_save_file_not_open_error(app->data().application_name);
+        save_load::handle_save_file_not_open_error(app->data().app_name);
     } catch (const save_load::SaveFileError& e) {
         REL_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
     }
@@ -423,7 +423,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 show_about = true;
             }
             if (ImGui::MenuItem("Log Information", nullptr, false)) {
-                logging::log_opengl_and_dependencies_info(logging::LogTarget::File, app->data().info_file_name);
+                logging::log_general_information(logging::LogTarget::File, app->data().info_file_name);
 
                 DEB_INFO("Logged OpenGL and dependencies information");
             }

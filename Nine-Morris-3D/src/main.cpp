@@ -11,13 +11,12 @@
 
 #if defined(NM3D_PLATFORM_LINUX)
     #define APP_NAME "ninemorris3d"
-    #define LOG_FILE "ninemorris3d.log"
-    #define INFO_FILE "info.txt"
 #elif defined(NM3D_PLATFORM_WINDOWS)
     #define APP_NAME "NineMorris3D"
-    #define LOG_FILE "ninemorris3d.log"
-    #define INFO_FILE "ninemorris3d_info.txt"
 #endif
+
+#define LOG_FILE "debug.log"
+#define INFO_FILE "info.txt"
 
 void application_main() {
     constexpr unsigned int MAJOR = 0;
@@ -28,6 +27,7 @@ void application_main() {
     };
     constexpr const char* KEY = "data/models/board/board.obj";
 
+    path::initialize_for_applications(APP_NAME);
     logging::initialize_for_applications(LOG_FILE);
 
     while (true) {

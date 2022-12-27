@@ -33,7 +33,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     app_data.resizable = builder.resizable;
     app_data.min_width = builder.min_width;
     app_data.min_height = builder.min_height;
-    app_data.application_name = builder.application_name;
+    app_data.app_name = builder.application_name;
     app_data.info_file_name = builder.info_file_name;
     app_data.authors = builder.author_list;  // TODO use this
     app_data.version_major = builder.major;
@@ -41,7 +41,6 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     app_data.version_patch = builder.patch;
     app_data.app = this;
 
-    path::initialize(builder.application_name);
     window = std::make_unique<Window>(this);
 
     if (builder.renderer_imgui) {
@@ -49,7 +48,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 
         imgui_context::initialize(window);
 
-        renderer_imgui = std::bind(&Application::renderer_imgui_functionality, this);
+        renderer_imgui_update = std::bind(&Application::renderer_imgui_func, this);
 
         evt.add_event<MouseScrolledEvent, &Application::on_imgui_mouse_scrolled>(this);
         evt.add_event<MouseMovedEvent, &Application::on_imgui_mouse_moved>(this);
@@ -58,7 +57,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
-    logging::log_opengl_and_dependencies_info(logging::LogTarget::Console, builder.info_file_name);
+    logging::log_general_information(logging::LogTarget::Console, builder.info_file_name);
 #endif
 
     input::initialize(window->get_handle());
@@ -73,14 +72,14 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
         DEB_INFO("With renderer 3D");
 
         renderer = std::make_unique<Renderer>(this);
-        renderer_3d = std::bind(&Application::renderer_3d_functionality, this);
+        renderer_3d_update = std::bind(&Application::renderer_3d_func, this);
     }
 
     if (builder.renderer_2d) {
         DEB_INFO("With renderer 2D");
 
         gui_renderer = std::make_unique<GuiRenderer>(this);
-        renderer_2d = std::bind(&Application::renderer_2d_functionality, this);
+        renderer_2d_update = std::bind(&Application::renderer_2d_func, this);
     }
 
     if (builder.audio) {
@@ -130,9 +129,9 @@ int Application::run() {
 
         render_helpers::clear(render_helpers::Color);
 
-        renderer_3d();
-        renderer_2d();
-        renderer_imgui();
+        renderer_3d_update();
+        renderer_2d_update();
+        renderer_imgui_update();
 
         evt.update();
         window->update();
@@ -245,15 +244,15 @@ void Application::check_changed_scene() {
     }
 }
 
-void Application::renderer_3d_functionality() {
+void Application::renderer_3d_func() {
     renderer->render();
 }
 
-void Application::renderer_2d_functionality() {
+void Application::renderer_2d_func() {
     gui_renderer->render();
 }
 
-void Application::renderer_imgui_functionality() {
+void Application::renderer_imgui_func() {
     imgui_context::begin_frame();
 
     current_scene->on_imgui_update();

@@ -13,6 +13,55 @@
 #include "other/data.h"
 #include "other/save_load_gracefully.h"
 
+static void check_user_data_directory(Application* app) {
+    bool user_data_directory;
+
+    try {
+        user_data_directory = user_data::user_data_directory_exists(app->data().app_name);
+    } catch (const user_data::UserNameError& e) {
+        REL_ERROR("Could not determine if user data directory exists: {}", e.what());
+        return;
+    }
+
+    if (!user_data_directory) {
+        REL_INFO("User data directory missing; creating one...");
+
+        try {
+            const bool success = user_data::create_user_data_directory(app->data().app_name);
+            if (!success) {
+                REL_ERROR("Could not create user data directory");
+            }
+        } catch (const user_data::UserNameError& e) {
+            REL_ERROR("Could not create user data directory: {}", e.what());
+        }
+    }
+}
+
+static void check_documents_directory(Application* app) {
+#if defined(NM3D_PLATFORM_WINDOWS) && defined(NM3D_PLATFORM_RELEASE)
+    std::string path;
+    try {
+        path = "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + app->data().app_name;
+    } catch (const user_data::UserNameError& e) {
+        REL_ERROR("Could not determine if Documents directory exists: {}", e.what());
+        return;
+    }
+
+    if (!user_data::directory_exists(path)) {
+        REL_INFO("Documents directory missing; creating one...");
+
+        try {
+            const bool success = user_data::create_directory(path);
+            if (!success) {
+                REL_ERROR("Could not create Documents directory");
+            }
+        } catch (const user_data::UserNameError& e) {
+            REL_ERROR("Could not create Documents directory: {}", e.what());
+        }
+    }
+#endif
+}
+
 static void load_game_options(Application* app) {
     auto& data = app->user_data<Data>();
 
@@ -203,6 +252,8 @@ namespace game {
 
         srand(time(nullptr));
 
+        check_user_data_directory(app);
+        check_documents_directory(app);
         load_game_options(app);
         setup_icons(app);
         setup_cursors(app);

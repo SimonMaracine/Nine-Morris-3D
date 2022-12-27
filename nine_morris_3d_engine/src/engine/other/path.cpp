@@ -46,7 +46,7 @@ static std::string app_name;
 #endif
 
 namespace path {
-    void initialize(std::string_view application_name) {
+    void initialize_for_applications(std::string_view application_name) {
         app_name = application_name;
     }
 

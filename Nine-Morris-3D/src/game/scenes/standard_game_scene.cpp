@@ -1581,7 +1581,7 @@ void StandardGameScene::save_game() {
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_ERROR("Could not save game: {}", e.what());
 
-        save_load::handle_save_file_not_open_error(app->data().application_name);
+        save_load::handle_save_file_not_open_error(app->data().app_name);
     } catch (const save_load::SaveFileError& e) {
         REL_ERROR("Could not save game: {}", e.what());
     }
@@ -1597,7 +1597,7 @@ void StandardGameScene::load_game() {
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_WARNING("Could not load game: {}", e.what());
 
-        save_load::handle_save_file_not_open_error(app->data().application_name);
+        save_load::handle_save_file_not_open_error(app->data().app_name);
 
         imgui_layer.show_could_not_load_game = true;
         return;

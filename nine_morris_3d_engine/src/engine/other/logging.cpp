@@ -45,10 +45,9 @@ namespace logging {
         _global_logger->set_pattern(LOG_PATTERN_DEBUG);
         _global_logger->set_level(spdlog::level::trace);
 
-        static_cast<void>(log_file);  // Trick the compiler that we do use log_file
+        static_cast<void>(log_file);
 #elif defined(NM3D_PLATFORM_RELEASE)
         std::string file_path;
-
         try {
             file_path = path::path_for_logs(log_file);
         } catch (const user_data::UserNameError& e) {
@@ -71,7 +70,7 @@ namespace logging {
 #endif
     }
 
-    void log_opengl_and_dependencies_info(LogTarget target, std::string_view info_file) {
+    void log_general_information(LogTarget target, std::string_view info_file) {
         std::string contents = gl::get_info();
         contents += al::get_info();
         contents += dependencies::get_info();

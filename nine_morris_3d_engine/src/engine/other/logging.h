@@ -39,6 +39,6 @@ namespace logging {
     };
 
     void initialize_for_applications(std::string_view log_file);
-    void log_opengl_and_dependencies_info(LogTarget target, std::string_view info_file);
+    void log_general_information(LogTarget target, std::string_view info_file);
     spdlog::logger* get_global_logger();
 }

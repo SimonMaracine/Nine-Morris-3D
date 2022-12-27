@@ -20,11 +20,11 @@ void application_main();
     #include <Windows.h>
 
     #if defined(NM3D_PLATFORM_RELEASE)
-        INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) {
+        INT WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, INT) {
             application_main();
         }
     #elif defined(NM3D_PLATFORM_DEBUG)
-        int main(int argc, char** argv) {
+        int main(int, char**) {
             application_main();
         }
     #endif
