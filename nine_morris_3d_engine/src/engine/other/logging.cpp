@@ -27,6 +27,7 @@
 
 // Should be cleaned up at exit()
 static std::shared_ptr<spdlog::logger> _global_logger;
+static std::string _info_file;
 
 #if defined(NM3D_PLATFORM_RELEASE)
 static void set_fallback_logger_release(const char* error_message) {
@@ -39,7 +40,9 @@ static void set_fallback_logger_release(const char* error_message) {
 #endif
 
 namespace logging {
-    void initialize_for_applications(std::string_view log_file) {
+    void initialize_for_applications(std::string_view log_file, std::string_view info_file) {
+        _info_file = info_file;
+
 #if defined(NM3D_PLATFORM_DEBUG)
         _global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
         _global_logger->set_pattern(LOG_PATTERN_DEBUG);
@@ -70,7 +73,7 @@ namespace logging {
 #endif
     }
 
-    void log_general_information(LogTarget target, std::string_view info_file) {
+    void log_general_information(LogTarget target) {
         std::string contents = gl::get_info();
         contents += al::get_info();
         contents += dependencies::get_info();
@@ -79,9 +82,9 @@ namespace logging {
             case LogTarget::File: {
                 std::string file_path;
                 try {
-                    file_path = path::path_for_logs(info_file);
+                    file_path = path::path_for_logs(_info_file);
                 } catch (const user_data::UserNameError& e) {
-                    REL_ERROR("Could not create info file `{}`: {}", info_file, e.what());
+                    REL_ERROR("Could not create info file `{}`: {}", _info_file, e.what());
                     break;
                 }
 
@@ -106,5 +109,9 @@ namespace logging {
 
     spdlog::logger* get_global_logger() {
         return _global_logger.get();
+    }
+
+    std::string_view get_info_file() {
+        return _info_file;
     }
 }

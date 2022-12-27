@@ -21,6 +21,11 @@ std::any Application::dummy_user_data() {
     return std::make_any<DummyUserData>();
 }
 
+void Application::preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file) {
+    path::initialize_for_applications(app_name);
+    logging::initialize_for_applications(log_file, info_file);
+}
+
 Application::Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunc& start, const UserFunc& stop)
     : builder(builder), _user_data(user_data), start(start), stop(stop) {
     DEB_INFO("Initializing application...");
@@ -33,8 +38,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     app_data.resizable = builder.resizable;
     app_data.min_width = builder.min_width;
     app_data.min_height = builder.min_height;
-    app_data.app_name = builder.application_name;
-    app_data.info_file_name = builder.info_file_name;
+    app_data.app_name = builder.app_name;
     app_data.authors = builder.author_list;  // TODO use this
     app_data.version_major = builder.major;
     app_data.version_minor = builder.minor;
@@ -57,7 +61,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
-    logging::log_general_information(logging::LogTarget::Console, builder.info_file_name);
+    logging::log_general_information(logging::LogTarget::Console);
 #endif
 
     input::initialize(window->get_handle());
@@ -66,7 +70,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     identifier::initialize();
 
     const auto [version_major, version_minor] = gl::get_version_number();
-    REL_INFO("Using OpenGL version {}.{}", version_major, version_minor);
+    REL_INFO("OpenGL version {}.{}", version_major, version_minor);
 
     if (builder.renderer_3d) {
         DEB_INFO("With renderer 3D");

@@ -38,7 +38,8 @@ namespace logging {
         None, Console, File
     };
 
-    void initialize_for_applications(std::string_view log_file);
-    void log_general_information(LogTarget target, std::string_view info_file);
+    void initialize_for_applications(std::string_view log_file, std::string_view info_file);
+    void log_general_information(LogTarget target);
     spdlog::logger* get_global_logger();
+    std::string_view get_info_file();
 }

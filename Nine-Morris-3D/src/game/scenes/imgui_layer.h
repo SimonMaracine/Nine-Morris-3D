@@ -2,6 +2,7 @@
 
 #include <engine/engine_application.h>
 #include <engine/engine_audio.h>
+#include <engine/engine_other.h>
 
 #include "game/save_load.h"
 #include "game/game_options.h"
@@ -122,12 +123,12 @@ void ImGuiLayer<S, B>::update() {
     DEB_INFO("Checked last saved game");
 
     try {
-        info_file_path = path::path_for_logs(app->data().info_file_name);
+        info_file_path = path::path_for_logs(logging::get_info_file());
         save_game_file_path = path::path_for_saved_data(save_load::SAVE_GAME_FILE);
     } catch (const user_data::UserNameError& e) {
         REL_ERROR("Could not get info file and save game file paths: {}", e.what());
 
-        info_file_path = app->data().info_file_name;
+        info_file_path = logging::get_info_file();
         save_game_file_path = save_load::SAVE_GAME_FILE;
     }
 }
@@ -423,7 +424,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 show_about = true;
             }
             if (ImGui::MenuItem("Log Information", nullptr, false)) {
-                logging::log_general_information(logging::LogTarget::File, app->data().info_file_name);
+                logging::log_general_information(logging::LogTarget::File);
 
                 DEB_INFO("Logged OpenGL and dependencies information");
             }

@@ -19,8 +19,11 @@ public:
         constexpr void operator()(Application*) {}  // Do nothing
     };
 
+    // User data stuff
     struct DummyUserData {};
     static std::any dummy_user_data();
+
+    static void preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file);
 
     Application(const ApplicationBuilder& builder, std::any& user_data,
         const UserFunc& start = DummyUserFunc {}, const UserFunc& stop = DummyUserFunc {});
@@ -30,6 +33,9 @@ public:
     Application& operator=(const Application&) = delete;
     Application(Application&&) = delete;
     Application& operator=(Application&&) = delete;
+
+    double get_fps() { return fps; }
+    float get_delta() { return delta; }
 
     // Call this to run the application, after all scenes have been defined; it can return an exit code
     int run();
@@ -48,9 +54,6 @@ public:
 
     const ApplicationData& data() { return app_data; }
     void destroy_user_data() { _user_data.reset(); }
-
-    double get_fps() { return fps; }
-    float get_delta() { return delta; }
 
     // Public fields accessible by all the code
     bool running = true;

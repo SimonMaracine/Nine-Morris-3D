@@ -23,10 +23,8 @@ ApplicationBuilder& ApplicationBuilder::display_min_resolution(int min_width, in
     return *this;
 }
 
-ApplicationBuilder& ApplicationBuilder::file_names(std::string_view application_name,
-        std::string_view info_file_name) {
-    this->application_name = application_name;
-    this->info_file_name = info_file_name;
+ApplicationBuilder& ApplicationBuilder::application_name(std::string_view app_name) {
+    this->app_name = app_name;
 
     return *this;
 }

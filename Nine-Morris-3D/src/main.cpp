@@ -18,17 +18,18 @@
 #define LOG_FILE "debug.log"
 #define INFO_FILE "info.txt"
 
-void application_main() {
-    constexpr unsigned int MAJOR = 0;
-    constexpr unsigned int MINOR = 2;
-    constexpr unsigned int PATCH = 0;
-    const std::vector<std::string> authors = {
-        u8"Simon Mărăcine"
-    };
-    constexpr const char* KEY = "data/models/board/board.obj";
+constexpr unsigned int MAJOR = 0;
+constexpr unsigned int MINOR = 2;
+constexpr unsigned int PATCH = 0;
 
-    path::initialize_for_applications(APP_NAME);
-    logging::initialize_for_applications(LOG_FILE);
+constexpr const char* KEY = "data/models/board/board.obj";
+
+const std::vector<std::string> authors = {
+    u8"Simon Mărăcine"
+};
+
+void application_main() {
+    Application::preinitialize(APP_NAME, LOG_FILE, INFO_FILE);
 
     while (true) {
         int exit_code {};
@@ -36,7 +37,7 @@ void application_main() {
         auto launcher_builder = ApplicationBuilder {}
             .display(640, 480, "Nine Morris 3D Launcher")
             .display_flags(false, false, false)
-            .file_names(APP_NAME, INFO_FILE)
+            .application_name(APP_NAME)
             .version(MAJOR, MINOR, PATCH)
             .authors(authors)
             .encrypt_key(KEY)
@@ -60,7 +61,7 @@ void application_main() {
             .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
             .display_flags(options.fullscreen, options.native_resolution, true)
             .display_min_resolution(512, 288)
-            .file_names(APP_NAME, INFO_FILE)
+            .application_name(APP_NAME)
             .version(MAJOR, MINOR, PATCH)
             .authors(authors)
             .encrypt_key(KEY)

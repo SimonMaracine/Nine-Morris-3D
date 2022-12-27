@@ -14,7 +14,6 @@ struct ApplicationData {
     int min_width;
     int min_height;
     std::string app_name;
-    std::string info_file_name;
     unsigned int version_major;
     unsigned int version_minor;
     unsigned int version_patch;

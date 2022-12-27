@@ -5,11 +5,11 @@
 #include "engine/other/logging.h"
 #include "engine/other/exit.h"
 
-namespace encrypt {
-    static cppblowfish::BlowfishContext blowfish;
+static cppblowfish::BlowfishContext _blowfish;
 
+namespace encrypt {
     void initialize(std::string_view key) {
-        blowfish = cppblowfish::BlowfishContext {std::string(key) + 'S'};
+        _blowfish = cppblowfish::BlowfishContext {std::string(key) + 'S'};
     }
 
     cppblowfish::Buffer load_file(EncryptedFile file_path) {
@@ -32,7 +32,7 @@ namespace encrypt {
 
         delete[] raw_buffer;
 
-        blowfish.decrypt(cipher, buffer);
+        _blowfish.decrypt(cipher, buffer);
 
         return buffer;
     }
