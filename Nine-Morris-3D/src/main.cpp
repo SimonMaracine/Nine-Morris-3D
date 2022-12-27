@@ -10,13 +10,13 @@
 #include "other/data.h"
 
 #if defined(NM3D_PLATFORM_LINUX)
-    #define APP_NAME "ninemorris3d"
+    constexpr const char* APP_NAME = "ninemorris3d";
 #elif defined(NM3D_PLATFORM_WINDOWS)
-    #define APP_NAME "NineMorris3D"
+    constexpr const char* APP_NAME = "NineMorris3D";
 #endif
 
-#define LOG_FILE "debug.log"
-#define INFO_FILE "info.txt"
+constexpr const char* LOG_FILE = "debug.log";
+constexpr const char* INFO_FILE = "info.txt";
 
 constexpr unsigned int MAJOR = 0;
 constexpr unsigned int MINOR = 2;

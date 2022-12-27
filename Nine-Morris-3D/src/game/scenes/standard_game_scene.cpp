@@ -192,7 +192,7 @@ void StandardGameScene::on_imgui_update() {
         imgui_layer.draw_could_not_load_game();
     } else if (imgui_layer.show_no_last_game) {
         imgui_layer.draw_no_last_game();
-    } else if (board.phase == BoardPhase::GameOver) {
+    } else if (board.phase == BoardPhase::GameOver && board.next_move) {
         imgui_layer.draw_game_over();
     }
 
