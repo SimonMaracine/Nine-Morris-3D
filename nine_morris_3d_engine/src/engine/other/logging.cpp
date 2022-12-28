@@ -6,8 +6,7 @@
 #include "engine/audio/openal/info_and_debug.h"
 #include "engine/graphics/opengl/info_and_debug.h"
 #include "engine/other/logging.h"
-#include "engine/other/path.h"
-#include "engine/other/user_data.h"
+#include "engine/other/file_system.h"
 #include "engine/other/dependencies.h"
 
 #define LOG_PATTERN_DEBUG "%^[%l] [th %t] [%H:%M:%S]%$ %v"
@@ -50,13 +49,7 @@ namespace logging {
 
         static_cast<void>(log_file);
 #elif defined(NM3D_PLATFORM_RELEASE)
-        std::string file_path;
-        try {
-            file_path = path::path_for_logs(log_file);
-        } catch (const user_data::UserNameError& e) {
-            set_fallback_logger_release(e.what());
-            return;
-        }
+        const std::string file_path = file_system::path_for_logs(log_file);
 
         try {
             _global_logger = spdlog::rotating_logger_mt(
@@ -80,13 +73,7 @@ namespace logging {
 
         switch (target) {
             case LogTarget::File: {
-                std::string file_path;
-                try {
-                    file_path = path::path_for_logs(_info_file);
-                } catch (const user_data::UserNameError& e) {
-                    REL_ERROR("Could not create info file `{}`: {}", _info_file, e.what());
-                    break;
-                }
+                const std::string file_path = file_system::path_for_logs(_info_file);
 
                 std::ofstream file {file_path, std::ios::trunc};
 

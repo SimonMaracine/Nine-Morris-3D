@@ -5,9 +5,9 @@
 namespace options {
     class OptionsFileError : public std::runtime_error {
     public:
-        OptionsFileError(const std::string& message)
+        explicit OptionsFileError(const std::string& message)
             : std::runtime_error(message) {}
-        OptionsFileError(const char* message)
+        explicit OptionsFileError(const char* message)
             : std::runtime_error(message) {}
     };
 
@@ -19,24 +19,12 @@ namespace options {
             : OptionsFileError(message) {}
     };
 
-    static std::string get_file_path(std::string_view options_file_name) noexcept(false) {
-        std::string file_path;
-
-        try {
-            file_path = path::path_for_saved_data(options_file_name);
-        } catch (const user_data::UserNameError& e) {
-            throw OptionsFileError(e.what());
-        }
-
-        return file_path;
-    }
-
     template<typename Opt>
     using _Validate = std::function<std::pair<bool, std::string>(const Opt&)>;
 
     template<typename Opt>
     void save_options_to_file(const Opt& options, std::string_view options_file_name) noexcept(false) {
-        const std::string file_path = get_file_path(options_file_name);
+        const std::string file_path = file_system::path_for_saved_data(options_file_name);
 
         std::ofstream file {file_path, std::ios::binary | std::ios::trunc};
 
@@ -59,7 +47,7 @@ namespace options {
     template<typename Opt>
     void load_options_from_file(Opt& options, std::string_view options_file_name,
             const _Validate<Opt>& validate) noexcept(false) {
-        const std::string file_path = get_file_path(options_file_name);
+        const std::string file_path = file_system::path_for_saved_data(options_file_name);
 
         std::ifstream file {file_path, std::ios::binary};
 
@@ -93,7 +81,7 @@ namespace options {
 
     template<typename Opt>
     void create_options_file(std::string_view options_file_name) noexcept(false) {
-        const std::string file_path = get_file_path(options_file_name);
+        const std::string file_path = file_system::path_for_saved_data(options_file_name);
 
         std::ofstream file {file_path, std::ios::binary | std::ios::trunc};
 
@@ -116,40 +104,19 @@ namespace options {
     }
 
     template<typename Opt>
-    void handle_options_file_not_open_error(std::string_view options_file_name, std::string_view app_name) {
-        bool user_data_directory;
+    void handle_options_file_not_open_error(std::string_view options_file_name) {
+        const bool exists = file_system::directory_exists(file_system::path_for_saved_data());
 
-        try {
-            user_data_directory = user_data::user_data_directory_exists(app_name);
-        } catch (const user_data::UserNameError& e) {
-            REL_ERROR("Could not determine if user data directory exists: {}", e.what());
-            return;
-        }
+        if (!exists) {
+            REL_WARNING("User data directory missing; creating it...");
 
-        if (!user_data_directory) {
-            REL_INFO("User data directory missing; creating one...");
+            const bool success = file_system::create_directory(file_system::path_for_saved_data());
 
-            try {
-                const bool success = user_data::create_user_data_directory(app_name);
-                if (success) {
-                    try {
-                        create_options_file<Opt>(options_file_name);
-                    } catch (const OptionsFileNotOpenError& e) {
-                        REL_ERROR("Could not create options file: {}", e.what());
-                        return;
-                    } catch (const OptionsFileError& e) {
-                        REL_ERROR("Could not create options file: {}", e.what());
-                        return;
-                    }
-                } else {
-                    REL_ERROR("Could not create user data directory");
-                    return;
-                }
-            } catch (const user_data::UserNameError& e) {
-                REL_ERROR("Could not create user data directory: {}", e.what());
+            if (!success) {
+                REL_ERROR("Could not create user data directory");
                 return;
             }
-        } else {
+
             try {
                 create_options_file<Opt>(options_file_name);
             } catch (const OptionsFileNotOpenError& e) {
@@ -159,6 +126,14 @@ namespace options {
                 REL_ERROR("Could not create options file: {}", e.what());
                 return;
             }
+        }
+
+        try {
+            create_options_file<Opt>(options_file_name);
+        } catch (const OptionsFileNotOpenError& e) {
+            REL_ERROR("Could not create options file: {}", e.what());
+        } catch (const OptionsFileError& e) {
+            REL_ERROR("Could not create options file: {}", e.what());
         }
     }
 }

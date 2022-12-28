@@ -21,9 +21,9 @@ namespace save_load {
 
     class SaveFileError : public std::runtime_error {
     public:
-        SaveFileError(const std::string& message)
+        explicit SaveFileError(const std::string& message)
             : std::runtime_error(message) {}
-        SaveFileError(const char* message)
+        explicit SaveFileError(const char* message)
             : std::runtime_error(message) {}
     };
 
@@ -34,18 +34,6 @@ namespace save_load {
         SaveFileNotOpenError(const char* message)
             : SaveFileError(message) {}
     };
-
-    static std::string get_file_path() noexcept(false) {
-        std::string file_path;
-
-        try {
-            file_path = path::path_for_saved_data(SAVE_GAME_FILE);
-        } catch (const user_data::UserNameError& e) {
-            throw SaveFileError(e.what());
-        }
-
-        return file_path;
-    }
 
     template<typename B>
     struct SavedGame {
@@ -73,7 +61,7 @@ namespace save_load {
 
     template<typename B>
     void save_game_to_file(const SavedGame<B>& saved_game) noexcept(false) {
-        const std::string file_path = get_file_path();
+        const std::string file_path = file_system::path_for_saved_data(SAVE_GAME_FILE);
 
         std::ofstream file {file_path, std::ios::binary | std::ios::trunc};
 
@@ -95,7 +83,7 @@ namespace save_load {
 
     template<typename B>
     void load_game_from_file(SavedGame<B>& saved_game) noexcept(false) {
-        const std::string file_path = get_file_path();
+        const std::string file_path = file_system::path_for_saved_data(SAVE_GAME_FILE);
 
         std::ifstream file {file_path, std::ios::binary};
 
@@ -117,8 +105,7 @@ namespace save_load {
         DEB_INFO("Loaded game from file `{}`", SAVE_GAME_FILE);
     }
 
-    void delete_save_game_file(std::string_view file_path);  // TODO use this, or delete it
-    void handle_save_file_not_open_error(std::string_view app_name);
+    void handle_save_file_not_open_error();
 }
 
 // Mostly all serialization stuff

@@ -7,7 +7,7 @@
 #include "other/data.h"
 #include "other/display_manager.h"
 #include "other/constants.h"
-#include "other/save_load_gracefully.h"
+#include "other/options_gracefully.h"
 
 static const char* SPLASH_SCREEN = ENCR("data/textures/splash_screen/launcher/launcher_splash_screen.png");
 static const char* OPEN_SANS = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
@@ -240,7 +240,7 @@ void LauncherScene::on_start() {
     auto& data = app->user_data<Data>();
 
     using namespace encrypt;
-    using namespace path;
+    using namespace file_system;
 
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
@@ -304,8 +304,8 @@ void LauncherScene::on_start() {
     app->gui_renderer->add_widget(background);
 
     // Load launcher options from file
-    save_load_gracefully::load_from_file<launcher_options::LauncherOptions>(
-        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate, app
+    options_gracefully::load_from_file<launcher_options::LauncherOptions>(
+        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate
     );
 
     // Initialize display manager
@@ -315,8 +315,8 @@ void LauncherScene::on_start() {
 void LauncherScene::on_stop() {
     auto& data = app->user_data<Data>();
 
-    save_load_gracefully::save_to_file<launcher_options::LauncherOptions>(
-        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, app
+    options_gracefully::save_to_file<launcher_options::LauncherOptions>(
+        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options
     );
 }
 

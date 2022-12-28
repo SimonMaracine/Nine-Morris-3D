@@ -84,11 +84,10 @@ set(ENGINE_HEADERS
     "src/engine/other/dependencies.h"
     "src/engine/other/encrypt.h"
     "src/engine/other/exit.h"
+    "src/engine/other/file_system.h"
     "src/engine/other/logging.h"
     "src/engine/other/mesh.h"
-    "src/engine/other/path.h"
     "src/engine/other/resource_manager.h"
-    "src/engine/other/user_data.h"
     "src/engine/engine_application.h"
     "src/engine/engine_audio.h"
     "src/engine/engine_entry_point.h"
@@ -128,11 +127,10 @@ add_library(${ENGINE} STATIC
     "src/engine/other/dependencies.cpp"
     "src/engine/other/encrypt.cpp"
     "src/engine/other/exit.cpp"
+    "src/engine/other/file_system.cpp"
     "src/engine/other/logging.cpp"
     "src/engine/other/mesh.cpp"
-    "src/engine/other/path.cpp"
     "src/engine/other/resource_manager.cpp"
-    "src/engine/other/user_data.cpp"
     ${ENGINE_HEADERS}
 )
 

@@ -1,0 +1,249 @@
+#include "engine/application/platform.h"
+
+#if defined(NM3D_PLATFORM_LINUX)
+    #include <pwd.h>
+    #include <unistd.h>
+    #include <sys/stat.h>
+#elif defined(NM3D_PLATFORM_WINDOWS)
+    #include <Windows.h>
+    #include <Lmcons.h>
+#endif
+
+#include "engine/other/file_system.h"
+#include "engine/other/logging.h"
+#include "engine/other/assert.h"
+
+static std::string _user_name;
+static std::string _app_name;
+
+#if defined(NM3D_PLATFORM_LINUX)
+    #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
+        ("/home/" + (user_name) + "/." + (application_name) + "/")
+    #define ASSETS_DIRECTORY_PATH(user_name, application_name) \
+        ("/usr/local/share/" + (application_name) + "/")
+
+    static bool directory_exists_impl(std::string_view path) {
+        struct stat sb;
+
+        if (stat(path.data(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static bool create_directory_impl(std::string_view path) {
+        if (mkdir(path.data(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    static std::string get_user_name_impl() noexcept(false) {
+        uid_t uid = geteuid();
+        struct passwd* pw = getpwuid(uid);
+
+        if (pw == nullptr) {
+            throw file_system::UserNameError("Could not get user name");
+        }
+
+        return std::string(pw->pw_name);
+    }
+
+    static void check_and_fix_directories_impl() {
+        ASSERT(!_user_name.empty(), "User name must be set");
+        ASSERT(!_app_name.empty(), "Application name must be set");
+
+        const std::string path = USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+
+        if (!directory_exists_impl(path)) {
+            REL_WARNING("Directory `{}` doesn't exist, creating it...", path);
+
+            if (create_directory_impl(path)) {
+                REL_INFO("Created directory `{}`", path);
+            } else {
+                REL_ERROR("Couldn't create directory `{}`", path);
+            }
+        }
+    }
+#elif defined(NM3D_PLATFORM_WINDOWS)
+    #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
+        ("C:\\Users\\" + (user_name) + "\\AppData\\Roaming\\" + (application_name) + "\\")
+    #define DOCUMENTS_DIRECTORY_PATH(user_name, application_name) \
+        ("C:\\Users\\" + (user_name) + "\\Documents\\" + (application_name) + "\\")
+
+    static bool directory_exists_impl(std::string_view path) {
+        WIN32_FIND_DATA find_data;
+        HANDLE find_handle = FindFirstFile(path.data(), &find_data);
+
+        if (find_handle == INVALID_HANDLE_VALUE) {
+            FindClose(find_handle);
+            return false;
+        } else {
+            if (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                FindClose(find_handle);
+                return true;
+            } else {
+                FindClose(find_handle);
+                return false;
+            }
+        }
+    }
+
+    static bool create_directory_impl(std::string_view path) {
+        const bool success = CreateDirectory(path.data(), nullptr);
+        return success;
+    }
+
+    static std::string get_user_name_impl() noexcept(false) {
+        char user_name[UNLEN + 1];
+        DWORD _ = UNLEN + 1;
+        const bool success = GetUserName(user_name, &_);
+
+        if (!success) {
+            throw file_system::UserNameError("Could not get user name");
+        }
+
+        return std::string(user_name);
+    }
+
+    static void check_and_fix_directories_impl() {
+        ASSERT(!_user_name.empty(), "User name must be set");
+        ASSERT(!_app_name.empty(), "Application name must be set");
+
+        {
+            const std::string path = USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+
+            if (!directory_exists_impl(path)) {
+                REL_WARNING("Directory `{}` doesn't exist, creating it...", path);
+
+                if (create_directory_impl(path)) {
+                    REL_INFO("Created directory `{}`", path);
+                } else {
+                    REL_ERROR("Couldn't create directory `{}`", path);
+                }
+            }
+        }
+
+        {
+            const std::string path = DOCUMENTS_DIRECTORY_PATH(_user_name, _app_name);
+
+            if (!directory_exists_impl(path)) {
+                REL_WARNING("Directory `{}` doesn't exist, creating it...", path);
+
+                if (create_directory_impl(path)) {
+                    REL_INFO("Created directory `{}`", path);
+                } else {
+                    REL_ERROR("Couldn't create directory `{}`", path);
+                }
+            }
+        }
+    }
+#endif
+
+#if defined(NM3D_PLATFORM_DEBUG)
+    // Use relative path for both operating systems
+    static std::string path_for_logs_impl() {
+        return {};
+    }
+
+    static std::string path_for_saved_data_impl() {
+        return {};
+    }
+
+    static std::string path_for_assets_impl() {
+        return {};
+    }
+#elif defined(NM3D_PLATFORM_RELEASE)
+    #if defined(NM3D_PLATFORM_LINUX)
+        static std::string path_for_logs_impl() {
+            ASSERT(!_user_name.empty(), "User name must be set");
+            ASSERT(!_app_name.empty(), "Application name must be set");
+
+            return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+        }
+
+        static std::string path_for_saved_data_impl() {
+            ASSERT(!_user_name.empty(), "User name must be set");
+            ASSERT(!_app_name.empty(), "Application name must be set");
+
+            return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+        }
+
+        static std::string path_for_assets_impl() {
+            ASSERT(!_app_name.empty(), "Application name must be set");
+
+            return ASSETS_DIRECTORY_PATH(_app_name);
+        }
+    #elif defined(NM3D_PLATFORM_WINDOWS)
+        static std::string path_for_logs_impl() {
+            ASSERT(!_user_name.empty(), "User name must be set");
+            ASSERT(!_app_name.empty(), "Application name must be set");
+
+            return DOCUMENTS_DIRECTORY_PATH(_user_name, _app_name);
+        }
+
+        static std::string path_for_saved_data_impl() {
+            ASSERT(!_user_name.empty(), "User name must be set");
+            ASSERT(!_app_name.empty(), "Application name must be set");
+
+            return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+        }
+
+        static std::string path_for_assets_impl() {
+            return {};
+        }
+    #endif
+#endif
+
+namespace file_system {
+    void initialize_for_applications(std::string_view application_name) noexcept(false) {
+        _user_name = get_user_name();
+        _app_name = application_name;
+    }
+
+    bool directory_exists(std::string_view path) {
+        return directory_exists_impl(path);
+    }
+
+    bool create_directory(std::string_view path) {
+        return create_directory_impl(path);
+    }
+
+    bool delete_file(std::string_view path) {
+        return remove(path.data()) != 0;
+    }
+
+    std::string get_user_name() noexcept(false) {
+        return get_user_name_impl();
+    }
+
+    void check_and_fix_directories() {
+        check_and_fix_directories_impl();
+    }
+
+    std::string path_for_logs() {
+        return path_for_logs_impl();
+    }
+
+    std::string path_for_saved_data() {
+        return path_for_saved_data_impl();
+    }
+
+    std::string path_for_assets() {
+        return path_for_assets_impl();
+    }
+
+    std::string path_for_logs(std::string_view file) {
+        return path_for_logs_impl() + std::string(file);
+    }
+
+    std::string path_for_saved_data(std::string_view file) {
+        return path_for_saved_data_impl() + std::string(file);
+    }
+
+    std::string path_for_assets(std::string_view file) {
+        return path_for_assets_impl() + std::string(file);
+    }
+}

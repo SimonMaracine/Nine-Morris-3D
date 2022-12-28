@@ -76,7 +76,7 @@ void LoadingScene::setup_widgets() {
 void LoadingScene::load_splash_screen_texture() {
     using namespace assets;
     using namespace encrypt;
-    using namespace path;
+    using namespace file_system;
 
     gl::TextureSpecification specification;
     specification.min_filter = gl::Filter::Linear;

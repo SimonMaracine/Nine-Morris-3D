@@ -3,35 +3,16 @@
 #include "game/save_load.h"
 
 namespace save_load {
-    void delete_save_game_file(std::string_view file_path) {  // TODO use this, or delete it
-        if (remove(file_path.data()) != 0) {
-            REL_INFO("Could not delete save game file `{}`", file_path);
-        } else {
-            REL_INFO("Deleted save game file `{}`", file_path);
-        }
-    }
+    void handle_save_file_not_open_error() {
+        const bool exists = file_system::directory_exists(file_system::path_for_saved_data());
 
-    void handle_save_file_not_open_error(std::string_view app_name) {
-        bool user_data_directory;
+        if (!exists) {
+            REL_INFO("User data directory missing; creating it...");
 
-        try {
-            user_data_directory = user_data::user_data_directory_exists(app_name);
-        } catch (const user_data::UserNameError& e) {
-            REL_ERROR("Could not determine if user data directory exists: {}", e.what());
-            return;
-        }
+            const bool success = file_system::create_directory(file_system::path_for_saved_data());
 
-        if (!user_data_directory) {
-            REL_INFO("User data directory missing; creating one...");
-
-            try {
-                const bool success = user_data::create_user_data_directory(app_name);
-                if (!success) {
-                    REL_ERROR("Could not create user data directory");
-                    return;
-                }
-            } catch (const user_data::UserNameError& e) {
-                REL_ERROR("Could not create user data directory: {}", e.what());
+            if (!success) {
+                REL_ERROR("Could not create user data directory");
                 return;
             }
         }

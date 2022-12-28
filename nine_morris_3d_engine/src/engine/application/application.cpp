@@ -15,14 +15,21 @@
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
-#include "engine/other/path.h"
+#include "engine/other/file_system.h"
+#include "engine/other/exit.h"
 
 std::any Application::dummy_user_data() {
     return std::make_any<DummyUserData>();
 }
 
 void Application::preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file) {
-    path::initialize_for_applications(app_name);
+    try {
+        file_system::initialize_for_applications(app_name);
+    } catch (const file_system::UserNameError& e) {
+        REL_CRITICAL("Could not initialize file_system, exiting...");
+        game_exit::exit_critical();
+    }
+
     logging::initialize_for_applications(log_file, info_file);
 }
 

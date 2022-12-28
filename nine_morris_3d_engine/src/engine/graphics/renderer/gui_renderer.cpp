@@ -10,7 +10,7 @@
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/texture.h"
-#include "engine/other/path.h"
+#include "engine/other/file_system.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
@@ -181,8 +181,8 @@ GuiRenderer::GuiRenderer(Application* app)
 
     {
         storage.quad2d_shader = std::make_shared<gl::Shader>(
-            encr(path::path_for_assets(QUAD2D_VERTEX_SHADER)),
-            encr(path::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
+            encr(file_system::path_for_assets(QUAD2D_VERTEX_SHADER)),
+            encr(file_system::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix", "u_texture" },
             std::initializer_list { storage.projection_uniform_block }
         );
@@ -190,8 +190,8 @@ GuiRenderer::GuiRenderer(Application* app)
 
     {
         storage.text_shader = std::make_shared<gl::Shader>(
-            encr(path::path_for_assets(TEXT_VERTEX_SHADER)),
-            encr(path::path_for_assets(TEXT_FRAGMENT_SHADER)),
+            encr(file_system::path_for_assets(TEXT_VERTEX_SHADER)),
+            encr(file_system::path_for_assets(TEXT_FRAGMENT_SHADER)),
             std::vector<std::string> {
                 "u_model_matrix",
                 "u_bitmap",

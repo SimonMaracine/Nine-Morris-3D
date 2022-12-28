@@ -16,7 +16,7 @@
 #include "other/constants.h"
 #include "other/data.h"
 #include "other/options.h"
-#include "other/save_load_gracefully.h"
+#include "other/options_gracefully.h"
 
 using namespace encrypt;
 
@@ -75,8 +75,8 @@ void StandardGameScene::on_start() {
 void StandardGameScene::on_stop() {
     auto& data = app->user_data<Data>();
 
-    save_load_gracefully::save_to_file<game_options::GameOptions>(
-        game_options::GAME_OPTIONS_FILE, data.options, app
+    options_gracefully::save_to_file<game_options::GameOptions>(
+        game_options::GAME_OPTIONS_FILE, data.options
     );
 
     if (data.options.save_on_exit && !app->running && made_first_move) {
@@ -343,8 +343,8 @@ void StandardGameScene::initialize_board() {
 
     auto shader = app->res.shader.load(
         "board_wood"_h,
-        encr(path::path_for_assets(assets::BOARD_VERTEX_SHADER)),
-        encr(path::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
+        encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -421,8 +421,8 @@ void StandardGameScene::initialize_board_paint() {
 
     auto shader = app->res.shader.load(
         "board_paint"_h,
-        encr(path::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
-        encr(path::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
+        encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -493,8 +493,8 @@ void StandardGameScene::initialize_pieces() {
 
     auto shader = app->res.shader.load(
         "piece"_h,
-        encr(path::path_for_assets(assets::PIECE_VERTEX_SHADER)),
-        encr(path::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
+        encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -653,8 +653,8 @@ void StandardGameScene::initialize_piece(
 void StandardGameScene::initialize_nodes() {
     auto shader = app->res.shader.load(
         "node"_h,
-        encr(path::path_for_assets(assets::NODE_VERTEX_SHADER)),
-        encr(path::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
+        encr(file_system::path_for_assets(assets::NODE_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_model_matrix", "u_color" },
         std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block
@@ -718,8 +718,8 @@ void StandardGameScene::initialize_board_no_normal() {
 
     auto shader = app->res.shader.load(
         "board_wood"_h,
-        encr(path::path_for_assets(assets::BOARD_VERTEX_SHADER_NO_NORMAL)),
-        encr(path::path_for_assets(assets::BOARD_FRAGMENT_SHADER_NO_NORMAL)),
+        encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER_NO_NORMAL)),
+        encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -786,8 +786,8 @@ void StandardGameScene::initialize_board_paint_no_normal() {
 
     auto shader = app->res.shader.load(
         "board_paint"_h,
-        encr(path::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER_NO_NORMAL)),
-        encr(path::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL)),
+        encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER_NO_NORMAL)),
+        encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -855,8 +855,8 @@ void StandardGameScene::initialize_pieces_no_normal() {
     // FIXME maybe should give another name
     auto shader = app->res.shader.load(
         "piece"_h,
-        encr(path::path_for_assets(assets::PIECE_VERTEX_SHADER_NO_NORMAL)),
-        encr(path::path_for_assets(assets::PIECE_FRAGMENT_SHADER_NO_NORMAL)),
+        encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER_NO_NORMAL)),
+        encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -1580,11 +1580,11 @@ void StandardGameScene::save_game() {
     try {
         save_load::save_game_to_file(saved_game);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_ERROR("Could not save game: {}", e.what());
+        REL_WARNING("Could not save game: {}", e.what());
 
-        save_load::handle_save_file_not_open_error(app->data().app_name);
+        save_load::handle_save_file_not_open_error();
     } catch (const save_load::SaveFileError& e) {
-        REL_ERROR("Could not save game: {}", e.what());
+        REL_WARNING("Could not save game: {}", e.what());
     }
 }
 
@@ -1598,7 +1598,7 @@ void StandardGameScene::load_game() {
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_WARNING("Could not load game: {}", e.what());
 
-        save_load::handle_save_file_not_open_error(app->data().app_name);
+        save_load::handle_save_file_not_open_error();
 
         imgui_layer.show_could_not_load_game = true;
         return;

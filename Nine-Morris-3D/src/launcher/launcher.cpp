@@ -5,7 +5,7 @@
 #include "game/assets.h"
 #include "launcher/launcher.h"
 
-using namespace path;
+using namespace file_system;
 using namespace assets;
 
 namespace launcher {

@@ -114,23 +114,14 @@ void ImGuiLayer<S, B>::update() {
         save_load::load_game_from_file(saved_game);
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_WARNING("Could not load game: {}", e.what());
-
-        save_load::handle_save_file_not_open_error(app->data().app_name);
     } catch (const save_load::SaveFileError& e) {
         REL_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
     }
     last_save_game_date = std::move(saved_game.date);
     DEB_INFO("Checked last saved game");
 
-    try {
-        info_file_path = path::path_for_logs(logging::get_info_file());
-        save_game_file_path = path::path_for_saved_data(save_load::SAVE_GAME_FILE);
-    } catch (const user_data::UserNameError& e) {
-        REL_ERROR("Could not get info file and save game file paths: {}", e.what());
-
-        info_file_path = logging::get_info_file();
-        save_game_file_path = save_load::SAVE_GAME_FILE;
-    }
+    info_file_path = file_system::path_for_logs(logging::get_info_file());
+    save_game_file_path = file_system::path_for_saved_data(save_load::SAVE_GAME_FILE);
 }
 
 template<typename S, typename B>

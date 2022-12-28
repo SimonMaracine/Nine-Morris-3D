@@ -11,68 +11,19 @@
 #include "launcher/launcher_options.h"
 #include "other/options.h"
 #include "other/data.h"
-#include "other/save_load_gracefully.h"
-
-static void check_user_data_directory(Application* app) {
-    bool user_data_directory;
-
-    try {
-        user_data_directory = user_data::user_data_directory_exists(app->data().app_name);
-    } catch (const user_data::UserNameError& e) {
-        REL_ERROR("Could not determine if user data directory exists: {}", e.what());
-        return;
-    }
-
-    if (!user_data_directory) {
-        REL_INFO("User data directory missing; creating one...");
-
-        try {
-            const bool success = user_data::create_user_data_directory(app->data().app_name);
-            if (!success) {
-                REL_ERROR("Could not create user data directory");
-            }
-        } catch (const user_data::UserNameError& e) {
-            REL_ERROR("Could not create user data directory: {}", e.what());
-        }
-    }
-}
-
-static void check_documents_directory(Application* app) {
-#if defined(NM3D_PLATFORM_WINDOWS) && defined(NM3D_PLATFORM_RELEASE)
-    std::string path;
-    try {
-        path = "C:\\Users\\" + user_data::get_username() + "\\Documents\\" + app->data().app_name;
-    } catch (const user_data::UserNameError& e) {
-        REL_ERROR("Could not determine if Documents directory exists: {}", e.what());
-        return;
-    }
-
-    if (!user_data::directory_exists(path)) {
-        REL_INFO("Documents directory missing; creating one...");
-
-        try {
-            const bool success = user_data::create_directory(path);
-            if (!success) {
-                REL_ERROR("Could not create Documents directory");
-            }
-        } catch (const user_data::UserNameError& e) {
-            REL_ERROR("Could not create Documents directory: {}", e.what());
-        }
-    }
-#endif
-}
+#include "other/options_gracefully.h"
 
 static void load_game_options(Application* app) {
     auto& data = app->user_data<Data>();
 
-    save_load_gracefully::load_from_file<game_options::GameOptions>(
-        game_options::GAME_OPTIONS_FILE, data.options, game_options::validate, app
+    options_gracefully::load_from_file<game_options::GameOptions>(
+        game_options::GAME_OPTIONS_FILE, data.options, game_options::validate
     );
 }
 
 static void setup_icons(Application* app) {
     using namespace assets;
-    using namespace path;
+    using namespace file_system;
 
     const std::array<std::unique_ptr<TextureData>, 5> icons = {
         std::make_unique<TextureData>(path_for_assets(ICON_512), false),
@@ -89,7 +40,7 @@ static void setup_cursors(Application* app) {
     auto& data = app->user_data<Data>();
 
     using namespace assets;
-    using namespace path;
+    using namespace file_system;
     using namespace encrypt;
 
     data.arrow_cursor = app->window->add_cursor(
@@ -106,7 +57,7 @@ static void setup_imgui_fonts(Application* app) {
     auto& data = app->user_data<Data>();
 
     using namespace assets;
-    using namespace path;
+    using namespace file_system;
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -126,7 +77,7 @@ static void setup_imgui_fonts(Application* app) {
 
 static void setup_game_fonts(Application* app) {
     using namespace assets;
-    using namespace path;
+    using namespace file_system;
 
     {
         auto font = app->res.font.load(
@@ -157,7 +108,7 @@ static void setup_post_processing(Application* app) {
     }
 
     using namespace assets;
-    using namespace path;
+    using namespace file_system;
     using namespace encrypt;
 
     {
@@ -251,9 +202,7 @@ namespace game {
         auto& data = app->user_data<Data>();
 
         srand(time(nullptr));
-
-        check_user_data_directory(app);
-        check_documents_directory(app);
+        file_system::check_and_fix_directories();
         load_game_options(app);
         setup_icons(app);
         setup_cursors(app);

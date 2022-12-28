@@ -14,7 +14,7 @@
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/texture.h"
 #include "engine/graphics/opengl/framebuffer.h"
-#include "engine/other/path.h"
+#include "engine/other/file_system.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
@@ -74,24 +74,24 @@ Renderer::Renderer(Application* app)
 
     {
         storage.skybox_shader = std::make_shared<gl::Shader>(
-            encr(path::path_for_assets(SKYBOX_VERTEX_SHADER)),
-            encr(path::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
+            encr(file_system::path_for_assets(SKYBOX_VERTEX_SHADER)),
+            encr(file_system::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_projection_view_matrix", "u_skybox" }
         );
     }
 
     {
         storage.screen_quad_shader = std::make_shared<gl::Shader>(
-            encr(path::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
-            encr(path::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
+            encr(file_system::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
+            encr(file_system::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_screen_texture" }
         );
     }
 
     {
         storage.quad3d_shader = std::make_shared<gl::Shader>(
-            encr(path::path_for_assets(QUAD3D_VERTEX_SHADER)),
-            encr(path::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
+            encr(file_system::path_for_assets(QUAD3D_VERTEX_SHADER)),
+            encr(file_system::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
             std::vector<std::string> {
                 "u_model_matrix",
                 "u_view_matrix",
@@ -103,8 +103,8 @@ Renderer::Renderer(Application* app)
 
     {
         storage.shadow_shader = std::make_shared<gl::Shader>(
-            encr(path::path_for_assets(SHADOW_VERTEX_SHADER)),
-            encr(path::path_for_assets(SHADOW_FRAGMENT_SHADER)),
+            encr(file_system::path_for_assets(SHADOW_VERTEX_SHADER)),
+            encr(file_system::path_for_assets(SHADOW_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix" },
             std::initializer_list { storage.light_space_uniform_block }
         );
@@ -112,8 +112,8 @@ Renderer::Renderer(Application* app)
 
     {
         storage.outline_shader = std::make_shared<gl::Shader>(
-            encr(path::path_for_assets(OUTLINE_VERTEX_SHADER)),
-            encr(path::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
+            encr(file_system::path_for_assets(OUTLINE_VERTEX_SHADER)),
+            encr(file_system::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_model_matrix", "u_color" },
             std::initializer_list { storage.projection_view_uniform_block }
         );
@@ -122,8 +122,8 @@ Renderer::Renderer(Application* app)
 #ifdef NM3D_PLATFORM_DEBUG
     {
         storage.origin_shader = std::make_shared<gl::Shader>(
-            path::path_for_assets(ORIGIN_VERTEX_SHADER),
-            path::path_for_assets(ORIGIN_FRAGMENT_SHADER),
+            file_system::path_for_assets(ORIGIN_VERTEX_SHADER),
+            file_system::path_for_assets(ORIGIN_FRAGMENT_SHADER),
             std::vector<std::string> { "u_projection_view_matrix" }
         );
     }
