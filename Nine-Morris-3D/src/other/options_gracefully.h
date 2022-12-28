@@ -11,11 +11,11 @@ namespace options_gracefully {
         try {
             options::save_options_to_file<Opt>(options, options_file);
         } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("Could not save options to file: {}", e.what());
+            REL_WARNING("Could not save options to file: {}", e.what());
 
             options::handle_options_file_not_open_error<Opt>(options_file);
         } catch (const options::OptionsFileError& e) {
-            REL_ERROR("Could not save options to file: {}", e.what());
+            REL_WARNING("Could not save options to file: {}", e.what());
         }
     }
 
@@ -24,11 +24,11 @@ namespace options_gracefully {
         try {
             options::load_options_from_file<Opt>(options, options_file, validate);
         } catch (const options::OptionsFileNotOpenError& e) {
-            REL_ERROR("Could not load options from file: {}", e.what());
+            REL_WARNING("Could not load options from file: {}", e.what());
 
             options::handle_options_file_not_open_error<Opt>(options_file);
         } catch (const options::OptionsFileError& e) {
-            REL_ERROR("Could not load options from file: {}", e.what());
+            REL_WARNING("Could not load options from file: {}", e.what());
 
             if (file_system::delete_file(options_file)) {
                 REL_INFO("Deleted options file `{}`", options_file);

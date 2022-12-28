@@ -19,7 +19,7 @@ static std::string _app_name;
 #if defined(NM3D_PLATFORM_LINUX)
     #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
         ("/home/" + (user_name) + "/." + (application_name) + "/")
-    #define ASSETS_DIRECTORY_PATH(user_name, application_name) \
+    #define ASSETS_DIRECTORY_PATH(application_name) \
         ("/usr/local/share/" + (application_name) + "/")
 
     static bool directory_exists_impl(std::string_view path) {

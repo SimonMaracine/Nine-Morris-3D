@@ -23,6 +23,8 @@ std::any Application::dummy_user_data() {
 }
 
 void Application::preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file) {
+    logging::initialize_for_applications(log_file, info_file);
+
     try {
         file_system::initialize_for_applications(app_name);
     } catch (const file_system::UserNameError& e) {
@@ -30,7 +32,9 @@ void Application::preinitialize(std::string_view app_name, std::string_view log_
         game_exit::exit_critical();
     }
 
-    logging::initialize_for_applications(log_file, info_file);
+#ifdef NM3D_PLATFORM_RELEASE
+    file_system::check_and_fix_directories();
+#endif
 }
 
 Application::Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunc& start, const UserFunc& stop)

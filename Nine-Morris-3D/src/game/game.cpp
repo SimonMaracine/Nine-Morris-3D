@@ -202,7 +202,7 @@ namespace game {
         auto& data = app->user_data<Data>();
 
         srand(time(nullptr));
-        file_system::check_and_fix_directories();
+
         load_game_options(app);
         setup_icons(app);
         setup_cursors(app);
