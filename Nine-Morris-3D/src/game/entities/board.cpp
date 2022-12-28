@@ -40,8 +40,6 @@ void Board::update_nodes(identifier::Id hovered_id) {
 }
 
 void Board::update_pieces(identifier::Id hovered_id) {
-    const float dt = app->get_delta();
-
     for (auto& [_, piece] : pieces) {
         const bool hovered = piece.model->id.value() == hovered_id;
 
@@ -59,8 +57,11 @@ void Board::update_pieces(identifier::Id hovered_id) {
             piece.model->material->set_vec3("u_material.tint", DEFAULT_TINT);
         }
     }
+}
 
-    // Iterate for the second time for updating movement and potentially erasing elements
+void Board::move_pieces() {
+    const float dt = app->get_delta();
+
     std::vector<size_t> to_erase;
 
     for (auto& [index, piece] : pieces) {

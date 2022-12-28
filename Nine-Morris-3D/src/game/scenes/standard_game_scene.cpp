@@ -152,10 +152,8 @@ void StandardGameScene::on_awake() {
 void StandardGameScene::on_update() {
     if (!imgui_layer.hovering_gui) {
         camera_controller.update(app->get_delta());
-
         board.update_nodes(app->renderer->get_hovered_id());
         board.update_pieces(app->renderer->get_hovered_id());
-        timer.update();
 
         // Update listener position, look at and up vectors every frame
         app->openal->get_listener().set_position(camera_controller.get_position());
@@ -164,6 +162,9 @@ void StandardGameScene::on_update() {
             glm::rotate(UP_VECTOR, camera_controller.get_rotation().y, UP_VECTOR)
         );
     }
+
+    board.move_pieces();
+    timer.update();
 
     update_game_state();
 

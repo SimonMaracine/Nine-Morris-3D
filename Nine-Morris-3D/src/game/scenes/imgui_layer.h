@@ -547,8 +547,6 @@ void ImGuiLayer<S, B>::draw_about() {
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
             show_about = false;
-
-            scene->timer.update();
         }
 
         ImGui::EndPopup();
@@ -581,8 +579,6 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
             show_could_not_load_game = false;
-
-            scene->timer.update();
         }
 
         ImGui::EndPopup();
@@ -612,8 +608,6 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
             show_no_last_game = false;
-
-            scene->timer.update();
         }
 
         ImGui::EndPopup();

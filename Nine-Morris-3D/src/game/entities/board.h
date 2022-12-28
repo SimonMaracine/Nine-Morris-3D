@@ -29,6 +29,7 @@ struct Board {
     GamePosition get_position();
     void update_nodes(identifier::Id hovered_id);
     void update_pieces(identifier::Id hovered_id);
+    void move_pieces();
     void finalize_pieces_state();
 
     size_t new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index);
