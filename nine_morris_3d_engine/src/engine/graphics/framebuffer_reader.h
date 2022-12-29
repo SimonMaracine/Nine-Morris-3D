@@ -2,6 +2,7 @@
 
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/framebuffer.h"
+#include "engine/other/assert.h"
 
 template<size_t BufferCount>
 class FramebufferReader {
@@ -20,7 +21,9 @@ public:
     FramebufferReader& operator=(FramebufferReader&&) = default;
 
     // Call this after the framebuffer is bound to begin reading the framebuffer
-    void read(unsigned int attachment_index, int x, int y) {
+    void read(int attachment_index, int x, int y) {
+        ASSERT(attachment_index >= 0, "Attachment index must be positive");
+
         buffer_index = (buffer_index + 1) % BufferCount;
         next_buffer_index = (buffer_index + 1) % BufferCount;
 

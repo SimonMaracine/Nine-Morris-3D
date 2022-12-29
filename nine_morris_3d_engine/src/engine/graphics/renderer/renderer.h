@@ -24,6 +24,11 @@ class Application;
 
 class Renderer {
 public:
+    struct BoundingBox {
+        identifier::Id id;
+        glm::vec3 size = glm::vec3(0.0f);
+    };
+
     struct Model {
         glm::vec3 position = glm::vec3(0.0f);
         glm::vec3 rotation = glm::vec3(0.0f);
@@ -34,7 +39,7 @@ public:
         std::shared_ptr<MaterialInstance> material;
 
         std::optional<glm::vec3> outline_color;
-        std::optional<identifier::Id> id;
+        std::optional<BoundingBox> bounding_box;
         bool cast_shadow = false;
     };
 
@@ -100,7 +105,10 @@ private:
     void draw_models();
     void draw_models_with_outline();
     void draw_models_to_depth_buffer();
+    void draw_quad(const Quad* quad);
     void draw_quads();
+    void draw_bounding_box(const Model* model);
+    void draw_bounding_boxes();
     void setup_shadows();
     void setup_uniform_buffers();
     void check_hovered_id(int x, int y);
@@ -123,6 +131,7 @@ private:
         std::shared_ptr<gl::Shader> quad3d_shader;
         std::shared_ptr<gl::Shader> shadow_shader;
         std::shared_ptr<gl::Shader> outline_shader;
+        std::shared_ptr<gl::Shader> box_shader;
 #ifdef NM3D_PLATFORM_DEBUG
         std::shared_ptr<gl::Shader> origin_shader;
 #endif
@@ -133,6 +142,9 @@ private:
         std::shared_ptr<gl::Buffer> screen_quad_buffer;
         std::shared_ptr<gl::VertexArray> quad_vertex_array;
         std::shared_ptr<gl::Buffer> quad_buffer;
+        std::shared_ptr<gl::VertexArray> box_vertex_array;
+        std::shared_ptr<gl::Buffer> box_buffer;
+        std::shared_ptr<gl::IndexBuffer> box_index_buffer;
 #ifdef NM3D_PLATFORM_DEBUG
         std::shared_ptr<gl::VertexArray> origin_vertex_array;
         std::shared_ptr<gl::Buffer> origin_buffer;
@@ -143,6 +155,7 @@ private:
         std::shared_ptr<gl::Framebuffer> scene_framebuffer;
         std::shared_ptr<gl::Framebuffer> intermediate_framebuffer;
         std::shared_ptr<gl::Framebuffer> shadow_map_framebuffer;
+        std::shared_ptr<gl::Framebuffer> bounding_box_framebuffer;
 
         std::array<std::shared_ptr<gl::PixelBuffer>, 4> pixel_buffers;
     } storage;
@@ -175,6 +188,8 @@ private:
     const char* SKYBOX_FRAGMENT_SHADER = ENCR("engine_data/shaders/skybox.frag");
     const char* QUAD3D_VERTEX_SHADER = ENCR("engine_data/shaders/quad3d.vert");
     const char* QUAD3D_FRAGMENT_SHADER = ENCR("engine_data/shaders/quad3d.frag");
+    const char* BOUNDING_BOX_VERTEX_SHADER = ENCR("engine_data/shaders/bounding_box.vert");
+    const char* BOUNDING_BOX_FRAGMENT_SHADER = ENCR("engine_data/shaders/bounding_box.frag");
 #ifdef NM3D_PLATFORM_DEBUG
     const char* ORIGIN_VERTEX_SHADER = "engine_data/shaders/origin.vert";
     const char* ORIGIN_FRAGMENT_SHADER = "engine_data/shaders/origin.frag";

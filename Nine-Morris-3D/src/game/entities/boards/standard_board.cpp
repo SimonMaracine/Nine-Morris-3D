@@ -11,7 +11,7 @@
 void StandardBoard::click(identifier::Id hovered_id) {
     // Check for clicked nodes
     for (const Node& node : nodes) {
-        if (node.model->id.value() == hovered_id) {
+        if (node.model->bounding_box->id == hovered_id) {
             clicked_node_index = node.index;
             break;
         }
@@ -19,7 +19,7 @@ void StandardBoard::click(identifier::Id hovered_id) {
 
     // Check for clicked pieces
     for (const auto& [_, piece] : pieces) {
-        if (piece.model->id.value() == hovered_id) {
+        if (piece.model->bounding_box->id == hovered_id) {
             clicked_piece_index = piece.index;
             break;
         }
@@ -75,7 +75,7 @@ void StandardBoard::computer_take_piece(size_t node_index) {
 
 void StandardBoard::check_select_piece(identifier::Id hovered_id) {
     for (const auto& [index, piece] : pieces) {
-        if (index == clicked_piece_index && piece.model->id.value() == hovered_id) {
+        if (index == clicked_piece_index && piece.model->bounding_box->id == hovered_id) {
             const bool can_select = (
                 turn == BoardPlayer::White && piece.type == PieceType::White
                 || turn == BoardPlayer::Black && piece.type == PieceType::Black
@@ -92,7 +92,7 @@ void StandardBoard::check_select_piece(identifier::Id hovered_id) {
 void StandardBoard::check_place_piece(identifier::Id hovered_id) {
     for (Node& node : nodes) {
         const bool can_place = (
-            node.index == clicked_node_index && node.model->id.value() == hovered_id
+            node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
             && node.piece_index == NULL_INDEX
         );
 
@@ -113,7 +113,7 @@ void StandardBoard::check_move_piece(identifier::Id hovered_id) {
 
     for (Node& node : nodes) {
         const bool can_move = (
-            node.index == clicked_node_index && node.model->id.value() == hovered_id
+            node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
             && can_go(selected_piece_index, node.index)
         );
 
@@ -139,7 +139,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
     for (auto& [index, piece] : pieces) {
         if (turn == BoardPlayer::White) {
             const bool valid_piece = (
-                index == clicked_piece_index && piece.model->id.value() == hovered_id
+                index == clicked_piece_index && piece.model->bounding_box->id == hovered_id
                 && piece.type == PieceType::Black && piece.in_use
             );
 
@@ -162,7 +162,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
             }
         } else {
             const bool valid_piece = (
-                index == clicked_piece_index && piece.model->id.value() == hovered_id
+                index == clicked_piece_index && piece.model->bounding_box->id == hovered_id
                 && piece.type == PieceType::White && piece.in_use
             );
 
@@ -872,7 +872,9 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             piece.model->scale = WORLD_SCALE;
             piece.model->material = app->res.material_instance[hs {"piece" + std::to_string(ser_index)}];
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
-            piece.model->id = std::make_optional<identifier::Id>(data.piece_ids[ser_index]);
+            piece.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
+            piece.model->bounding_box->id = data.piece_ids[ser_index];
+            piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
             piece.model->cast_shadow = true;
 
             piece.in_use = ser_piece.in_use;

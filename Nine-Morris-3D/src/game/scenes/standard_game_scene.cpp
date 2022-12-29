@@ -27,8 +27,8 @@ void StandardGameScene::on_start() {
 
     setup_and_add_model_board();
     setup_and_add_model_board_paint();
+    setup_and_add_model_nodes();  // Nodes first
     setup_and_add_model_pieces();
-    setup_and_add_model_nodes();
 
     setup_camera();
     setup_widgets();
@@ -619,10 +619,10 @@ void StandardGameScene::initialize_piece(
     const identifier::Id id = identifier::generate_id();
     data.piece_ids[index] = id;
 
-    auto id_buffer = create_id_buffer(
-        mesh->vertices.size(), id,
-        hs {"piece_id" + std::to_string(index)}
-    );
+    // auto id_buffer = create_id_buffer(  // TODO clean up
+    //     mesh->vertices.size(), id,
+    //     hs {"piece_id" + std::to_string(index)}
+    // );
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Float, 3);
@@ -630,12 +630,12 @@ void StandardGameScene::initialize_piece(
     layout.add(2, BufferLayout::Float, 3);
     layout.add(3, BufferLayout::Float, 3);
 
-    BufferLayout layout2;
-    layout2.add(4, BufferLayout::Float, 1);
+    // BufferLayout layout2;
+    // layout2.add(4, BufferLayout::Float, 1);
 
     auto vertex_array = app->res.vertex_array.load(hs {"piece" + std::to_string(index)});
     vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_buffer(id_buffer, layout2);
+    // vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(index_buffer);
     gl::VertexArray::unbind();
 
@@ -689,20 +689,20 @@ void StandardGameScene::initialize_node(size_t index, std::shared_ptr<gl::Buffer
     const identifier::Id id = identifier::generate_id();
     data.node_ids[index] = id;
 
-    auto id_buffer = create_id_buffer(
-        app->res.mesh_p["node"_h]->vertices.size(), id,
-        hs {"node_id" + std::to_string(index)}
-    );
+    // auto id_buffer = create_id_buffer(  // TODO clean up
+    //     app->res.mesh_p["node"_h]->vertices.size(), id,
+    //     hs {"node_id" + std::to_string(index)}
+    // );
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Float, 3);
 
-    BufferLayout layout2;
-    layout2.add(1, BufferLayout::Float, 1);
+    // BufferLayout layout2;
+    // layout2.add(1, BufferLayout::Float, 1);
 
     auto vertex_array = app->res.vertex_array.load(hs {"node" + std::to_string(index)});
     vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_buffer(id_buffer, layout2);
+    // vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(index_buffer);
     gl::VertexArray::unbind();
 
@@ -793,7 +793,7 @@ void StandardGameScene::initialize_board_paint_no_normal() {
             "u_shadow_map",
             "u_material.diffuse",
             "u_material.specular",
-            "u_material.shininess",
+            "u_material.shininess"
         },
         std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
@@ -973,22 +973,22 @@ void StandardGameScene::initialize_piece_no_normal(
     const identifier::Id id = identifier::generate_id();
     data.piece_ids[index] = id;
 
-    auto id_buffer = create_id_buffer(
-        mesh->vertices.size(), id,
-        hs {"piece_id" + std::to_string(index)}
-    );
+    // auto id_buffer = create_id_buffer(  // TODO clean up
+    //     mesh->vertices.size(), id,
+    //     hs {"piece_id" + std::to_string(index)}
+    // );
 
     BufferLayout layout;
     layout.add(0, BufferLayout::Float, 3);
     layout.add(1, BufferLayout::Float, 2);
     layout.add(2, BufferLayout::Float, 3);
 
-    BufferLayout layout2;
-    layout2.add(3, BufferLayout::Float, 1);
+    // BufferLayout layout2;
+    // layout2.add(3, BufferLayout::Float, 1);
 
     auto vertex_array = app->res.vertex_array.load(hs {"piece" + std::to_string(index)});
     vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_buffer(id_buffer, layout2);
+    // vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(index_buffer);
     gl::VertexArray::unbind();
 
@@ -1092,7 +1092,9 @@ void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3&
     piece.model->scale = WORLD_SCALE;
     piece.model->material = app->res.material_instance[hs {"piece" + std::to_string(index)}];
     piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
-    piece.model->id = std::make_optional<identifier::Id>(data.piece_ids[index]);
+    piece.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
+    piece.model->bounding_box->id = data.piece_ids[index];
+    piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
     piece.model->cast_shadow = true;
 
     app->renderer->add_model(piece.model);
@@ -1119,7 +1121,9 @@ void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& 
     node.model->position = position;
     node.model->scale = WORLD_SCALE;
     node.model->material = app->res.material_instance[hs {"node" + std::to_string(index)}];
-    node.model->id = std::make_optional<identifier::Id>(data.node_ids[index]);
+    node.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
+    node.model->bounding_box->id = data.node_ids[index];
+    node.model->bounding_box->size = NODE_BOUNDING_BOX;
 
     app->renderer->add_model(node.model);
 
@@ -1296,8 +1300,10 @@ void StandardGameScene::setup_widgets() {
 
     auto timer_text = app->res.text.load(
         "timer_text"_h,
-        app->res.font["open_sans"_h],  // TODO think about which one is better
-        "00:00", 1.5f, glm::vec3(0.9f)
+        app->res.font["open_sans"_h],
+        "00:00",
+        1.5f,
+        glm::vec3(0.9f)
     );
     timer_text->stick(gui::Sticky::N);
     timer_text->offset(60, gui::Relative::Top);

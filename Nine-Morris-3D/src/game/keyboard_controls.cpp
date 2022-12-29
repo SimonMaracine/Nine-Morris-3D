@@ -95,9 +95,9 @@ std::tuple<bool, bool, bool> KeyboardControls::click_and_release() {
     const identifier::Id hovered_id = (
         node.piece_index == NULL_INDEX
             ?
-            node.model->id.value()
+            node.model->bounding_box->id
             :
-            board->pieces.at(node.piece_index).model->id.value()
+            board->pieces.at(node.piece_index).model->bounding_box->id
     );
 
     board->click(hovered_id);

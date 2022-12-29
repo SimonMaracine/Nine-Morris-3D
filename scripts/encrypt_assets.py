@@ -34,6 +34,8 @@ encrypt_engine("shaders/skybox.vert")
 encrypt_engine("shaders/skybox.frag")
 encrypt_engine("shaders/text.vert")
 encrypt_engine("shaders/text.frag")
+encrypt_engine("shaders/bounding_box.vert")
+encrypt_engine("shaders/bounding_box.frag")
 
 encrypt("sounds/piece_place-01.ogg")
 encrypt("sounds/piece_place-02.ogg")

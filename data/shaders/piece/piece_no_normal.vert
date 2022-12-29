@@ -3,11 +3,9 @@
 layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec2 a_texture_coordinate;
 layout(location = 2) in vec3 a_normal;
-layout(location = 3) in float a_entity_id;
 
 out vec2 v_texture_coordinate;
 out vec3 v_normal;
-out flat float v_entity_id;
 out vec3 v_fragment_position;
 out vec4 v_fragment_position_light_space;
 out vec3 v_light_position;
@@ -31,7 +29,6 @@ layout(binding = 3) uniform LightSpace {
 void main() {
     v_texture_coordinate = a_texture_coordinate;
     v_normal = mat3(u_model_matrix) * a_normal;
-    v_entity_id = a_entity_id;
 
     v_fragment_position = vec3(u_model_matrix * vec4(a_position, 1.0));
     v_fragment_position_light_space = u_light_space_matrix * vec4(v_fragment_position, 1.0);

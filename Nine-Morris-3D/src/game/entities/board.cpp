@@ -25,7 +25,7 @@ GamePosition Board::get_position() {
 
 void Board::update_nodes(identifier::Id hovered_id) {
     for (Node& node : nodes) {
-        const bool hovered = node.model->id.value() == hovered_id;
+        const bool hovered = node.model->bounding_box->id == hovered_id;
         const bool highlight = (
             phase == BoardPhase::PlacePieces || (phase == BoardPhase::MovePieces && selected_piece_index != NULL_INDEX)
         );
@@ -41,7 +41,7 @@ void Board::update_nodes(identifier::Id hovered_id) {
 
 void Board::update_pieces(identifier::Id hovered_id) {
     for (auto& [_, piece] : pieces) {
-        const bool hovered = piece.model->id.value() == hovered_id;
+        const bool hovered = piece.model->bounding_box->id == hovered_id;
 
         if (piece.selected) {
             piece.model->outline_color = std::make_optional<glm::vec3>(RED_OUTLINE);

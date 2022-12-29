@@ -119,6 +119,15 @@ Renderer::Renderer(Application* app)
         );
     }
 
+    {
+        storage.box_shader = std::make_shared<gl::Shader>(
+            encr(file_system::path_for_assets(BOUNDING_BOX_VERTEX_SHADER)),
+            encr(file_system::path_for_assets(BOUNDING_BOX_FRAGMENT_SHADER)),
+            std::vector<std::string> { "u_model_matrix", "u_entity_id" },
+            std::initializer_list { storage.projection_view_uniform_block }
+        );
+    }
+
 #ifdef NM3D_PLATFORM_DEBUG
     {
         storage.origin_shader = std::make_shared<gl::Shader>(
@@ -175,6 +184,37 @@ Renderer::Renderer(Application* app)
         gl::VertexArray::unbind();
     }
 
+    {
+        static constexpr float box_vertices[] = {
+            -0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f
+        };
+
+        static constexpr unsigned int box_indices[] = {
+            0, 1, 2, 0, 2, 3,
+            1, 5, 6, 1, 6, 2,
+            5, 4, 6, 4, 7, 6,
+            4, 0, 7, 0, 3, 7,
+            3, 2, 6, 3, 6, 7,
+            4, 5, 1, 4, 1, 0
+        };
+
+        storage.box_buffer = std::make_shared<gl::Buffer>(box_vertices, sizeof(box_vertices));
+        BufferLayout layout;
+        layout.add(0, BufferLayout::Float, 3);
+        storage.box_index_buffer = std::make_shared<gl::IndexBuffer>(box_indices, sizeof(box_indices));
+        storage.box_vertex_array = std::make_shared<gl::VertexArray>();
+        storage.box_vertex_array->add_buffer(storage.box_buffer, layout);
+        storage.box_vertex_array->add_index_buffer(storage.box_index_buffer);
+        gl::VertexArray::unbind();
+    }
+
 #ifdef NM3D_PLATFORM_DEBUG
     {
         static constexpr float origin_vertices[] = {
@@ -201,14 +241,30 @@ Renderer::Renderer(Application* app)
         specification.width = app->data().width;
         specification.height = app->data().height;
         specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture},
-            gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Renderbuffer}
+            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
         };
 
         storage.intermediate_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
         app->purge_framebuffers();
         app->add_framebuffer(storage.intermediate_framebuffer);
+    }
+
+    {
+        gl::FramebufferSpecification specification;
+        specification.width = app->data().width;
+        specification.height = app->data().height;
+        specification.color_attachments = {
+            gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Texture}  // TODO later needs to be renderbuffer
+        };
+        static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        specification.clear_drawbuffer = 0;
+        specification.clear_value = color;
+
+        storage.bounding_box_framebuffer = std::make_shared<gl::Framebuffer>(specification);
+
+        app->purge_framebuffers();
+        app->add_framebuffer(storage.bounding_box_framebuffer);
     }
 
     storage.pixel_buffers = {
@@ -218,7 +274,7 @@ Renderer::Renderer(Application* app)
         std::make_shared<gl::PixelBuffer>(sizeof(float))
     };
 
-    framebuffer_reader = FramebufferReader<4> {storage.pixel_buffers, storage.intermediate_framebuffer};
+    framebuffer_reader = FramebufferReader<4> {storage.pixel_buffers, storage.bounding_box_framebuffer};
 
     // Setup uniform variables
     storage.screen_quad_shader->bind();
@@ -258,17 +314,12 @@ void Renderer::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glViewport(0, 0, app->data().width, app->data().height);
 
-    storage.scene_framebuffer->clear_color_attachment_float();
-
     // Bind shadow map for use in shadow rendering
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
     glBindTexture(GL_TEXTURE_2D, storage.shadow_map_framebuffer->get_depth_attachment());
 
     // Set to zero, because we are also rendering objects with outline later
     glStencilMask(0x00);
-
-    // Disable blending to not mess up the second, floating-point attachment
-    glDisablei(GL_BLEND, 1);  // TODO if post processing doesn't use two attachments, these calls are not needed in main loop
 
     // Render all normal models
     draw_models();
@@ -290,25 +341,28 @@ void Renderer::render() {
     // Render 3D quads
     draw_quads();
 
-    // Re-enable blending
-    glEnablei(GL_BLEND, 1);
-
     // Blit the resulted scene texture to an intermediate texture, resolving anti-aliasing
     storage.scene_framebuffer->blit(
         storage.intermediate_framebuffer.get(), app->data().width, app->data().height
     );
 
-    storage.intermediate_framebuffer->bind();
+    storage.bounding_box_framebuffer->bind();
+    storage.bounding_box_framebuffer->clear_color_attachment_float();
+
+    // Render bounding boxes for models that can pe picked
+    draw_bounding_boxes();
 
     // Read the texture for mouse picking
     const auto [x, y] = input::get_mouse();
-    framebuffer_reader.read(1, static_cast<int>(x), app->data().height - static_cast<int>(y));
+    framebuffer_reader.read(0, static_cast<int>(x), app->data().height - static_cast<int>(y));
+
+    storage.intermediate_framebuffer->bind();
 
     // Do post processing and render the final image to the screen
     end_rendering();
 
     float* data;
-    framebuffer_reader.get<float>(&data);
+    framebuffer_reader.get<float>(&data);  // TODO is it right?
     hovered_id = *data;
 
     check_hovered_id(x, y);
@@ -378,15 +432,11 @@ void Renderer::set_scene_framebuffer(int samples) {
     specification.height = app->data().height;
     specification.samples = samples;
     specification.color_attachments = {
-        gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Renderbuffer},
-        gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Renderbuffer}
+        gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Renderbuffer}
     };
     specification.depth_attachment = gl::Attachment {
         gl::AttachmentFormat::DEPTH24_STENCIL8, gl::AttachmentType::Renderbuffer
     };
-    static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    specification.clear_drawbuffer = 1;
-    specification.clear_value = color;
 
     storage.scene_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
@@ -456,7 +506,7 @@ void Renderer::post_processing() {
         glViewport(0, 0, app->data().width, app->data().height);
 
         post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
-        post_processing_context.textures.push_back(step->framebuffer->get_color_attachment(0));
+        post_processing_context.textures.push_back(post_processing_context.last_texture);
     }
 }
 
@@ -471,7 +521,13 @@ void Renderer::end_rendering() {
     // Draw the final result to the screen
     gl::Framebuffer::bind_default();
     glClear(GL_COLOR_BUFFER_BIT);
-    draw_screen_quad(post_processing_context.last_texture);
+    static bool res = true;  // TODO clean up
+    if (res) {
+        draw_screen_quad(post_processing_context.last_texture);
+    } else {
+        draw_screen_quad(storage.bounding_box_framebuffer->get_color_attachment(0));
+    }
+    if (input::is_key_pressed(input::Key::EQUAL)) res = !res;
 
     glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
     glEnable(GL_DEPTH_TEST);
@@ -484,11 +540,7 @@ void Renderer::draw_origin() {
 
     storage.origin_vertex_array->bind();
 
-    glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
     glDrawArrays(GL_LINES, 0, 6);
-
-    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 #endif
 
@@ -502,11 +554,7 @@ void Renderer::draw_skybox() {
     storage.skybox_vertex_array->bind();
     storage.skybox_texture->bind(0);
 
-    glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
     glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 }
 
 void Renderer::draw_model(const Model* model) {
@@ -561,12 +609,6 @@ void Renderer::draw_model_with_outline(const Model* model) {
 }
 
 void Renderer::draw_models() {
-    static std::vector<const Model*> non_hoverable_models;
-    static std::vector<const Model*> hoverable_models;
-
-    non_hoverable_models.clear();
-    hoverable_models.clear();
-
     for (size_t i = 0; i < models.size(); i++) {
         const Model* model = models[i].get();
 
@@ -574,36 +616,14 @@ void Renderer::draw_models() {
             continue;  // This model is rendered differently
         }
 
-        if (model->id.has_value()) {
-            hoverable_models.push_back(model);
-        } else {
-            non_hoverable_models.push_back(model);
-        }
-    }
-
-    // Draw non-hoverable models
-    glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-    for (const Model* model : non_hoverable_models) {
-        draw_model(model);
-    }
-
-    // Draw hoverable models
-    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-    for (const Model* model : hoverable_models) {
         draw_model(model);
     }
 }
 
 void Renderer::draw_models_with_outline() {
     static std::vector<const Model*> outline_models;
-    static std::vector<const Model*> non_hoverable_models;
-    static std::vector<const Model*> hoverable_models;
 
     outline_models.clear();
-    non_hoverable_models.clear();
-    hoverable_models.clear();
 
     std::for_each(models.begin(), models.end(), [](const std::shared_ptr<Model>& model) {
         if (model->outline_color.has_value()) {
@@ -619,24 +639,6 @@ void Renderer::draw_models_with_outline() {
     });
 
     for (const Model* model : outline_models) {
-        if (model->id.has_value()) {
-            hoverable_models.push_back(model);
-        } else {
-            non_hoverable_models.push_back(model);
-        }
-    }
-
-    // Draw non-hoverable models
-    glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-    for (const Model* model : non_hoverable_models) {
-        draw_model_with_outline(model);
-    }
-
-    // Draw hoverable models
-    glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-    for (const Model* model : hoverable_models) {
         draw_model_with_outline(model);
     }
 }
@@ -664,6 +666,18 @@ void Renderer::draw_models_to_depth_buffer() {
     }
 }
 
+void Renderer::draw_quad(const Quad* quad) {
+    glm::mat4 matrix = glm::mat4(1.0f);
+    matrix = glm::translate(matrix, quad->position);
+    matrix = glm::scale(matrix, glm::vec3(quad->scale));
+
+    storage.quad3d_shader->upload_uniform_mat4("u_model_matrix", matrix);
+
+    quad->texture->bind(0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
 void Renderer::draw_quads() {
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_mat4("u_view_matrix", camera_cache.view_matrix);
@@ -680,16 +694,42 @@ void Renderer::draw_quads() {
     for (size_t i = 0; i < quads.size(); i++) {
         const Quad* quad = quads[i].get();
 
-        glm::mat4 matrix = glm::mat4(1.0f);
-        matrix = glm::translate(matrix, quad->position);
-        matrix = glm::scale(matrix, glm::vec3(quad->scale));
-
-        storage.quad3d_shader->upload_uniform_mat4("u_model_matrix", matrix);
-
-        quad->texture->bind(0);
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        draw_quad(quad);
     }
+}
+
+void Renderer::draw_bounding_box(const Model* model) {
+    glm::mat4 matrix = glm::mat4(1.0f);
+    matrix = glm::translate(matrix, model->position);
+    matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    matrix = glm::rotate(matrix, model->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    matrix = glm::scale(matrix, model->bounding_box->size);
+
+    storage.box_shader->upload_uniform_mat4("u_model_matrix", matrix);
+    storage.box_shader->upload_uniform_float("u_entity_id", model->bounding_box->id);
+
+    glDrawElements(GL_TRIANGLES, storage.box_index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
+}
+
+void Renderer::draw_bounding_boxes() {
+    // Disable blending, because this is a floating-point framebuffer
+    glDisable(GL_BLEND);
+
+    storage.box_shader->bind();
+    storage.box_vertex_array->bind();
+
+    for (size_t i = 0; i < models.size(); i++) {
+        const Model* model = models[i].get();
+
+        if (!model->bounding_box.has_value()) {
+            continue;
+        }
+
+        draw_bounding_box(model);
+    }
+
+    glEnable(GL_BLEND);
 }
 
 void Renderer::setup_shadows() {

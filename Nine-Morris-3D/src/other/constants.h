@@ -191,6 +191,9 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
+constexpr glm::vec3 PIECE_BOUNDING_BOX = glm::vec3(0.35f, 0.19f, 0.35f);
+constexpr glm::vec3 NODE_BOUNDING_BOX = glm::vec3(0.31f, 0.01f, 0.31f);
+
 constexpr size_t NULL_INDEX = 1000;
 
 constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;

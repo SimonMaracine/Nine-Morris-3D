@@ -4,10 +4,8 @@ layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec2 a_texture_coordinate;
 layout(location = 2) in vec3 a_normal;
 layout(location = 3) in vec3 a_tangent;
-layout(location = 4) in float a_entity_id;
 
 out vec2 v_texture_coordinate;
-out flat float v_entity_id;
 out vec3 v_fragment_position_tangent;
 out vec4 v_fragment_position_light_space;
 out vec3 v_light_position_tangent;
@@ -40,7 +38,6 @@ mat3 compute_TBN(mat4 model_matrix, vec3 normal, vec3 tangent) {
 
 void main() {
     v_texture_coordinate = a_texture_coordinate;
-    v_entity_id = a_entity_id;
 
     mat3 TBN = compute_TBN(u_model_matrix, a_normal, a_tangent);
     TBN = transpose(TBN);

@@ -2,14 +2,12 @@
 
 in vec2 v_texture_coordinate;
 in vec3 v_normal;
-in flat float v_entity_id;
 in vec3 v_fragment_position;
 in vec4 v_fragment_position_light_space;
 in vec3 v_light_position;
 in vec3 v_view_position;
 
 layout(location = 0) out vec4 fragment_color;
-layout(location = 1) out float entity_id;
 
 uniform sampler2D u_shadow_map;
 
@@ -106,5 +104,4 @@ void main() {
     );
 
     fragment_color = vec4(total_light * u_material.tint, 1.0);;
-    entity_id = v_entity_id;
 }
