@@ -18,7 +18,7 @@ size_t BufferLayout::VertexElement::get_size(Type type) {
     return 0;
 }
 
-void BufferLayout::add(GLuint index, Type type, GLint size) {
-    elements.push_back(VertexElement {index, type, size});
+void BufferLayout::add(GLuint index, Type type, GLint size, bool per_instance) {
+    elements.push_back(VertexElement {index, type, size, per_instance});
     stride += size * VertexElement::get_size(type);
 }

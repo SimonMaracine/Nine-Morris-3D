@@ -123,7 +123,7 @@ Renderer::Renderer(Application* app)
         storage.box_shader = std::make_shared<gl::Shader>(
             encr(file_system::path_for_assets(BOUNDING_BOX_VERTEX_SHADER)),
             encr(file_system::path_for_assets(BOUNDING_BOX_FRAGMENT_SHADER)),
-            std::vector<std::string> { "u_model_matrix", "u_entity_id" },
+            std::vector<std::string> {},
             std::initializer_list { storage.projection_view_uniform_block }
         );
     }
@@ -206,11 +206,22 @@ Renderer::Renderer(Application* app)
         };
 
         storage.box_buffer = std::make_shared<gl::Buffer>(box_vertices, sizeof(box_vertices));
+        storage.box_ids = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
+        storage.box_transforms = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
+        storage.box_index_buffer = std::make_shared<gl::IndexBuffer>(box_indices, sizeof(box_indices));
         BufferLayout layout;
         layout.add(0, BufferLayout::Float, 3);
-        storage.box_index_buffer = std::make_shared<gl::IndexBuffer>(box_indices, sizeof(box_indices));
+        BufferLayout layout_ids;
+        layout_ids.add(1, BufferLayout::Float, 1, true);
+        BufferLayout layout_transforms;
+        layout_transforms.add(2, BufferLayout::Float, 4, true);
+        layout_transforms.add(3, BufferLayout::Float, 4, true);
+        layout_transforms.add(4, BufferLayout::Float, 4, true);
+        layout_transforms.add(5, BufferLayout::Float, 4, true);
         storage.box_vertex_array = std::make_shared<gl::VertexArray>();
         storage.box_vertex_array->add_buffer(storage.box_buffer, layout);
+        storage.box_vertex_array->add_buffer(storage.box_ids, layout_ids);
+        storage.box_vertex_array->add_buffer(storage.box_transforms, layout_transforms);
         storage.box_vertex_array->add_index_buffer(storage.box_index_buffer);
         gl::VertexArray::unbind();
     }
@@ -698,7 +709,7 @@ void Renderer::draw_quads() {
     }
 }
 
-void Renderer::draw_bounding_box(const Model* model) {
+void Renderer::prepare_bounding_box(const Model* model, std::vector<float>& buffer_ids, std::vector<glm::mat4>& buffer_transforms) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, model->position);
     matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -706,18 +717,20 @@ void Renderer::draw_bounding_box(const Model* model) {
     matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
     matrix = glm::scale(matrix, model->bounding_box->size);
 
-    storage.box_shader->upload_uniform_mat4("u_model_matrix", matrix);
-    storage.box_shader->upload_uniform_float("u_entity_id", model->bounding_box->id);
-
-    glDrawElements(GL_TRIANGLES, storage.box_index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
+    buffer_ids.push_back(model->bounding_box->id);
+    buffer_transforms.push_back(matrix);
 }
 
 void Renderer::draw_bounding_boxes() {
-    // Disable blending, because this is a floating-point framebuffer
-    glDisable(GL_BLEND);
-
     storage.box_shader->bind();
     storage.box_vertex_array->bind();
+
+    size_t instances = 0;
+    static std::vector<float> buffer_ids;
+    static std::vector<glm::mat4> buffer_transforms;
+
+    buffer_ids.clear();
+    buffer_transforms.clear();
 
     for (size_t i = 0; i < models.size(); i++) {
         const Model* model = models[i].get();
@@ -726,8 +739,21 @@ void Renderer::draw_bounding_boxes() {
             continue;
         }
 
-        draw_bounding_box(model);
+        instances++;
+        prepare_bounding_box(model, buffer_ids, buffer_transforms);
     }
+
+    storage.box_ids->bind();
+    storage.box_ids->update_data(buffer_ids.data(), sizeof(float) * buffer_ids.size());
+    storage.box_transforms->bind();
+    storage.box_transforms->update_data(buffer_transforms.data(), sizeof(glm::mat4) * buffer_transforms.size());
+
+    // Disable blending, because this is a floating-point framebuffer
+    glDisable(GL_BLEND);
+
+    glDrawElementsInstanced(
+        GL_TRIANGLES, storage.box_index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr, instances
+    );
 
     glEnable(GL_BLEND);
 }

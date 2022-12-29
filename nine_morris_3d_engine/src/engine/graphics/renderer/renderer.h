@@ -107,7 +107,7 @@ private:
     void draw_models_to_depth_buffer();
     void draw_quad(const Quad* quad);
     void draw_quads();
-    void draw_bounding_box(const Model* model);
+    void prepare_bounding_box(const Model* model, std::vector<float>& buffer_ids, std::vector<glm::mat4>& buffer_transforms);
     void draw_bounding_boxes();
     void setup_shadows();
     void setup_uniform_buffers();
@@ -144,6 +144,8 @@ private:
         std::shared_ptr<gl::Buffer> quad_buffer;
         std::shared_ptr<gl::VertexArray> box_vertex_array;
         std::shared_ptr<gl::Buffer> box_buffer;
+        std::shared_ptr<gl::Buffer> box_ids;
+        std::shared_ptr<gl::Buffer> box_transforms;
         std::shared_ptr<gl::IndexBuffer> box_index_buffer;
 #ifdef NM3D_PLATFORM_DEBUG
         std::shared_ptr<gl::VertexArray> origin_vertex_array;

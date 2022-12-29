@@ -59,6 +59,10 @@ namespace gl {
 
             glEnableVertexAttribArray(element.index);
             offset += element.size * BufferLayout::VertexElement::get_size(element.type);
+
+            if (element.per_instance) {
+                glVertexAttribDivisor(element.index, 1);
+            }
         }
     }
 

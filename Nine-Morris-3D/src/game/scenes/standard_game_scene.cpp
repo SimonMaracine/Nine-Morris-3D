@@ -619,23 +619,14 @@ void StandardGameScene::initialize_piece(
     const identifier::Id id = identifier::generate_id();
     data.piece_ids[index] = id;
 
-    // auto id_buffer = create_id_buffer(  // TODO clean up
-    //     mesh->vertices.size(), id,
-    //     hs {"piece_id" + std::to_string(index)}
-    // );
-
     BufferLayout layout;
     layout.add(0, BufferLayout::Float, 3);
     layout.add(1, BufferLayout::Float, 2);
     layout.add(2, BufferLayout::Float, 3);
     layout.add(3, BufferLayout::Float, 3);
 
-    // BufferLayout layout2;
-    // layout2.add(4, BufferLayout::Float, 1);
-
     auto vertex_array = app->res.vertex_array.load(hs {"piece" + std::to_string(index)});
     vertex_array->add_buffer(vertex_buffer, layout);
-    // vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(index_buffer);
     gl::VertexArray::unbind();
 
@@ -689,20 +680,11 @@ void StandardGameScene::initialize_node(size_t index, std::shared_ptr<gl::Buffer
     const identifier::Id id = identifier::generate_id();
     data.node_ids[index] = id;
 
-    // auto id_buffer = create_id_buffer(  // TODO clean up
-    //     app->res.mesh_p["node"_h]->vertices.size(), id,
-    //     hs {"node_id" + std::to_string(index)}
-    // );
-
     BufferLayout layout;
     layout.add(0, BufferLayout::Float, 3);
 
-    // BufferLayout layout2;
-    // layout2.add(1, BufferLayout::Float, 1);
-
     auto vertex_array = app->res.vertex_array.load(hs {"node" + std::to_string(index)});
     vertex_array->add_buffer(vertex_buffer, layout);
-    // vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(index_buffer);
     gl::VertexArray::unbind();
 
@@ -973,22 +955,13 @@ void StandardGameScene::initialize_piece_no_normal(
     const identifier::Id id = identifier::generate_id();
     data.piece_ids[index] = id;
 
-    // auto id_buffer = create_id_buffer(  // TODO clean up
-    //     mesh->vertices.size(), id,
-    //     hs {"piece_id" + std::to_string(index)}
-    // );
-
     BufferLayout layout;
     layout.add(0, BufferLayout::Float, 3);
     layout.add(1, BufferLayout::Float, 2);
     layout.add(2, BufferLayout::Float, 3);
 
-    // BufferLayout layout2;
-    // layout2.add(3, BufferLayout::Float, 1);
-
     auto vertex_array = app->res.vertex_array.load(hs {"piece" + std::to_string(index)});
     vertex_array->add_buffer(vertex_buffer, layout);
-    // vertex_array->add_buffer(id_buffer, layout2);
     vertex_array->add_index_buffer(index_buffer);
     gl::VertexArray::unbind();
 
