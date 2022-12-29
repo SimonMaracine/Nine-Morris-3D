@@ -22,6 +22,7 @@
 
 static constexpr int SHADOW_MAP_UNIT = 2;
 static constexpr glm::vec3 CLEAR_COLOR = { 0.1f, 0.1f, 0.1f };
+static constexpr int BOUNDING_BOX_DIVISOR = 4;
 
 Renderer::Renderer(Application* app)
     : app(app) {
@@ -263,8 +264,9 @@ Renderer::Renderer(Application* app)
 
     {
         gl::FramebufferSpecification specification;
-        specification.width = app->data().width;
-        specification.height = app->data().height;
+        specification.width = app->data().width / BOUNDING_BOX_DIVISOR;
+        specification.height = app->data().height / BOUNDING_BOX_DIVISOR;
+        specification.resize_divisor = BOUNDING_BOX_DIVISOR;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Texture}  // TODO later needs to be renderbuffer
         };
@@ -315,7 +317,8 @@ void Renderer::render() {
     storage.shadow_map_framebuffer->bind();
 
     glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, shadow_map_size, shadow_map_size);
+    const auto& shadow_map_specification = storage.shadow_map_framebuffer->get_specification();
+    glViewport(0, 0, shadow_map_specification.width, shadow_map_specification.height);
 
     // Render objects with shadows to depth buffer
     draw_models_to_depth_buffer();
@@ -323,7 +326,8 @@ void Renderer::render() {
     storage.scene_framebuffer->bind();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glViewport(0, 0, app->data().width, app->data().height);
+    const auto& scene_specification = storage.scene_framebuffer->get_specification();
+    glViewport(0, 0, scene_specification.width, scene_specification.height);
 
     // Bind shadow map for use in shadow rendering
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
@@ -360,14 +364,22 @@ void Renderer::render() {
     storage.bounding_box_framebuffer->bind();
     storage.bounding_box_framebuffer->clear_color_attachment_float();
 
+    const auto& bounding_box_specification = storage.bounding_box_framebuffer->get_specification();
+    glViewport(0, 0, bounding_box_specification.width, bounding_box_specification.height);
+
     // Render bounding boxes for models that can pe picked
     draw_bounding_boxes();
 
     // Read the texture for mouse picking
-    const auto [x, y] = input::get_mouse();
-    framebuffer_reader.read(0, static_cast<int>(x), app->data().height - static_cast<int>(y));
+    const auto [mouse_x, mouse_y] = input::get_mouse();
+    const int x = static_cast<int>(mouse_x) / BOUNDING_BOX_DIVISOR;
+    const int y = (app->data().height - static_cast<int>(mouse_y)) / BOUNDING_BOX_DIVISOR;
+    framebuffer_reader.read(0, x, y);
 
     storage.intermediate_framebuffer->bind();
+
+    const auto& intermediate_specification = storage.intermediate_framebuffer->get_specification();
+    glViewport(0, 0, intermediate_specification.width, intermediate_specification.height);
 
     // Do post processing and render the final image to the screen
     end_rendering();
@@ -607,12 +619,7 @@ void Renderer::draw_model_with_outline(const Model* model) {
         storage.outline_shader->upload_uniform_mat4("u_model_matrix", matrix);
         storage.outline_shader->upload_uniform_vec3("u_color", model->outline_color.value());  // Should never throw
 
-        // Render without output to red
-        glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
         glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
-
-        glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -725,21 +732,28 @@ void Renderer::draw_bounding_boxes() {
     storage.box_shader->bind();
     storage.box_vertex_array->bind();
 
-    size_t instances = 0;
+    static std::vector<const Model*> bounding_box_models;
     static std::vector<float> buffer_ids;
     static std::vector<glm::mat4> buffer_transforms;
 
+    bounding_box_models.clear();
     buffer_ids.clear();
     buffer_transforms.clear();
 
-    for (size_t i = 0; i < models.size(); i++) {
-        const Model* model = models[i].get();
-
-        if (!model->bounding_box.has_value()) {
-            continue;
+    std::for_each(models.begin(), models.end(), [](const std::shared_ptr<Model>& model) {
+        if (model->bounding_box.has_value()) {
+            bounding_box_models.push_back(model.get());
         }
+    });
 
-        instances++;
+    std::sort(bounding_box_models.begin(), bounding_box_models.end(), [this](const Model* lhs, const Model* rhs) {
+        const float distance1 = glm::distance(lhs->position, camera_cache.position);
+        const float distance2 = glm::distance(rhs->position, camera_cache.position);
+
+        return distance1 > distance2;
+    });
+
+    for (const Model* model : bounding_box_models) {
         prepare_bounding_box(model, buffer_ids, buffer_transforms);
     }
 
@@ -752,7 +766,11 @@ void Renderer::draw_bounding_boxes() {
     glDisable(GL_BLEND);
 
     glDrawElementsInstanced(
-        GL_TRIANGLES, storage.box_index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr, instances
+        GL_TRIANGLES,
+        storage.box_index_buffer->get_index_count(),
+        GL_UNSIGNED_INT,
+        nullptr,
+        bounding_box_models.size()
     );
 
     glEnable(GL_BLEND);
