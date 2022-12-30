@@ -4,6 +4,7 @@
 
 #include "game/game.h"
 #include "game/scenes/standard_game_scene.h"
+#include "game/scenes/jump_variant_scene.h"
 #include "game/scenes/loading_scene.h"
 #include "launcher/launcher.h"
 #include "launcher/scenes/launcher_scene.h"
@@ -73,6 +74,7 @@ void application_main() {
         auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
         game->add_scene(std::make_unique<LoadingScene>(), true);
         game->add_scene(std::make_unique<StandardGameScene>(), false);
+        game->add_scene(std::make_unique<JumpVariantScene>(), false);
         exit_code = game->run();
 
         if (exit_code == 0) {

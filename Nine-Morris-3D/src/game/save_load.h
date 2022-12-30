@@ -6,6 +6,7 @@
 #include "game/entities/node.h"
 #include "game/entities/board.h"
 #include "game/entities/serialization/standard_board_serialized.h"
+#include "game/entities/serialization/jump_board_serialized.h"
 #include "game/entities/serialization/piece_serialized.h"
 #include "game/entities/serialization/node_serialized.h"
 #include "game/undo_redo_state.h"
@@ -125,6 +126,26 @@ void serialize(Archive& archive, PointCameraController& camera_controller) {
 
 template<typename Archive>
 void serialize(Archive& archive, StandardBoardSerialized& board) {
+    archive(
+        board.nodes,
+        board.pieces,
+        board.phase,
+        board.turn,
+        board.ending,
+        board.must_take_piece,
+        board.can_jump,
+        board.repetition_history,
+        board.is_players_turn,
+        board.white_pieces_count,
+        board.black_pieces_count,
+        board.not_placed_white_pieces_count,
+        board.not_placed_black_pieces_count,
+        board.turns_without_mills
+    );
+}
+
+template<typename Archive>
+void serialize(Archive& archive, JumpBoardSerialized& board) {
     archive(
         board.nodes,
         board.pieces,

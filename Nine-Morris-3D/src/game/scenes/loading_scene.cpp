@@ -13,7 +13,7 @@ void LoadingScene::on_start() {
     load_splash_screen_texture();
 
     loader = std::make_unique<assets_load::AllStartLoader>(
-        assets_load::all_start, std::bind(&Application::change_scene, app, "game")
+        assets_load::all_start, std::bind(&Application::change_scene, app, "standard_game")
     );
 
     loader->start_loading_thread(

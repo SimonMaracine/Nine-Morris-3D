@@ -1,13 +1,12 @@
-#include <engine/engine_application.h>
 #include <engine/engine_audio.h>
 #include <engine/engine_graphics.h>
 #include <engine/engine_other.h>
 
-#include "game/entities/boards/standard_board.h"
-#include "game/entities/serialization/standard_board_serialized.h"
+#include "game/entities/boards/jump_board.h"
+#include "game/entities/serialization/jump_board_serialized.h"
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
-#include "game/scenes/standard_game_scene.h"
+#include "game/scenes/jump_variant_scene.h"
 #include "game/scenes/imgui_layer.h"
 #include "game/scenes/common.h"
 #include "game/game_options.h"
@@ -22,7 +21,7 @@
 
 using namespace encrypt;
 
-void StandardGameScene::on_start() {
+void JumpVariantScene::on_start() {
     auto& data = app->user_data<Data>();
 
     setup_entities();
@@ -39,7 +38,7 @@ void StandardGameScene::on_start() {
     keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_h]};
     keyboard.post_initialize();
 
-    undo_redo_state = UndoRedoState<StandardBoardSerialized> {};
+    undo_redo_state = UndoRedoState<JumpBoardSerialized> {};
 
     minimax_thread = MinimaxThread {&board};
 
@@ -74,7 +73,7 @@ void StandardGameScene::on_start() {
     app->res.sound_data.clear();
 }
 
-void StandardGameScene::on_stop() {
+void JumpVariantScene::on_stop() {
     auto& data = app->user_data<Data>();
 
     options_gracefully::save_to_file<game_options::GameOptions>(
@@ -103,10 +102,10 @@ void StandardGameScene::on_stop() {
     }
 }
 
-void StandardGameScene::on_awake() {
+void JumpVariantScene::on_awake() {
     auto& data = app->user_data<Data>();
 
-    imgui_layer = ImGuiLayer<StandardGameScene, StandardBoardSerialized> {app, this};
+    imgui_layer = ImGuiLayer<JumpVariantScene, JumpBoardSerialized> {app, this};
 
     if (data.launcher_options.normal_mapping) {
         initialize_board(app);
@@ -128,11 +127,11 @@ void StandardGameScene::on_awake() {
     initialize_light(app);
     initialize_indicators_textures(app);
 
-    app->evt.add_event<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
-    app->evt.add_event<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
-    app->evt.add_event<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
-    app->evt.add_event<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
-    app->evt.add_event<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
+    app->evt.add_event<MouseButtonPressedEvent, &JumpVariantScene::on_mouse_button_pressed>(this);
+    app->evt.add_event<MouseButtonReleasedEvent, &JumpVariantScene::on_mouse_button_released>(this);
+    app->evt.add_event<KeyPressedEvent, &JumpVariantScene::on_key_pressed>(this);
+    app->evt.add_event<KeyReleasedEvent, &JumpVariantScene::on_key_released>(this);
+    app->evt.add_event<WindowResizedEvent, &JumpVariantScene::on_window_resized>(this);
 
     auto track = app->res.music_track.load("music"_h, app->res.sound_data["music"_h]);
     current_music_track = track;
@@ -151,7 +150,7 @@ void StandardGameScene::on_awake() {
     );
 }
 
-void StandardGameScene::on_update() {
+void JumpVariantScene::on_update() {
     if (!imgui_layer.hovering_gui) {
         camera_controller.update(app->get_delta());
         board.update_nodes(app->renderer->get_hovered_id());
@@ -170,7 +169,7 @@ void StandardGameScene::on_update() {
 
     update_game_state();
 
-    update_timer_text();
+    // update_timer_text();
     update_wait_indicator();
     update_computer_thinking_indicator();
 
@@ -178,11 +177,11 @@ void StandardGameScene::on_update() {
     board_paint_texture_loader->update(app);
 }
 
-void StandardGameScene::on_fixed_update() {
+void JumpVariantScene::on_fixed_update() {
     camera_controller.update_friction();
 }
 
-void StandardGameScene::on_imgui_update() {
+void JumpVariantScene::on_imgui_update() {
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2(app->data().width, app->data().height);
     io.DeltaTime = app->get_delta();
@@ -208,7 +207,7 @@ void StandardGameScene::on_imgui_update() {
 #endif
 }
 
-void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
+void JumpVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
     if (imgui_layer.hovering_gui) {
         return;
     }
@@ -220,7 +219,7 @@ void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& e
     }
 }
 
-void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
+void JumpVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
     if (imgui_layer.hovering_gui) {
         return;
     }
@@ -245,7 +244,7 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
     }
 }
 
-void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
+void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
     if (imgui_layer.hovering_gui) {
         return;
     }
@@ -315,7 +314,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
     }
 }
 
-void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
+void JumpVariantScene::on_key_released(const KeyReleasedEvent& event) {
     if (imgui_layer.hovering_gui) {
         return;
     }
@@ -325,11 +324,11 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
     }
 }
 
-void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
+void JumpVariantScene::on_window_resized(const WindowResizedEvent& event) {
     camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
 }
 
-void StandardGameScene::setup_and_add_model_board() {
+void JumpVariantScene::setup_and_add_model_board() {
     board.model->vertex_array = app->res.vertex_array["board_wood"_h];
     board.model->index_buffer = app->res.index_buffer["board_wood"_h];
     board.model->scale = WORLD_SCALE;
@@ -345,7 +344,7 @@ void StandardGameScene::setup_and_add_model_board() {
     DEB_DEBUG("Setup model board");
 }
 
-void StandardGameScene::setup_and_add_model_board_paint() {
+void JumpVariantScene::setup_and_add_model_board_paint() {
     board.paint_model->vertex_array = app->res.vertex_array["board_paint"_h];
     board.paint_model->index_buffer = app->res.index_buffer["board_paint"_h];
     board.paint_model->position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
@@ -357,7 +356,7 @@ void StandardGameScene::setup_and_add_model_board_paint() {
     DEB_DEBUG("Setup model board paint");
 }
 
-void StandardGameScene::setup_and_add_model_pieces() {
+void JumpVariantScene::setup_and_add_model_pieces() {
     for (size_t i = 0; i < 9; i++) {
         setup_and_add_model_piece(
             i, WHITE_PIECE_POSITION(i),
@@ -373,7 +372,7 @@ void StandardGameScene::setup_and_add_model_pieces() {
     }
 }
 
-void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3& position,
+void JumpVariantScene::setup_and_add_model_piece(size_t index, const glm::vec3& position,
         std::shared_ptr<gl::IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
@@ -399,13 +398,13 @@ void StandardGameScene::setup_and_add_model_piece(size_t index, const glm::vec3&
     DEB_DEBUG("Setup model piece {}", index);
 }
 
-void StandardGameScene::setup_and_add_model_nodes() {
+void JumpVariantScene::setup_and_add_model_nodes() {
     for (size_t i = 0; i < 24; i++) {
         setup_and_add_model_node(i, NODE_POSITIONS[i]);
     }
 }
 
-void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& position) {
+void JumpVariantScene::setup_and_add_model_node(size_t index, const glm::vec3& position) {
     auto& data = app->user_data<Data>();
 
     Node& node = board.nodes.at(index);
@@ -424,8 +423,8 @@ void StandardGameScene::setup_and_add_model_node(size_t index, const glm::vec3& 
     DEB_DEBUG("Setup model node {}", index);
 }
 
-void StandardGameScene::setup_entities() {
-    board = StandardBoard {};
+void JumpVariantScene::setup_entities() {
+    board = JumpBoard {};
     board.model = app->res.model.load("board"_h);
     board.paint_model = app->res.model.load("board_paint"_h);
 
@@ -454,7 +453,7 @@ void StandardGameScene::setup_entities() {
     DEB_DEBUG("Setup entities");
 }
 
-void StandardGameScene::setup_widgets() {
+void JumpVariantScene::setup_widgets() {
     auto& data = app->user_data<Data>();
 
     constexpr int LOWEST_RESOLUTION = 288;
@@ -502,7 +501,7 @@ void StandardGameScene::setup_widgets() {
     computer_thinking_indicator->scale(0.4f, 1.0f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 }
 
-void StandardGameScene::update_game_state() {
+void JumpVariantScene::update_game_state() {
     switch (game.state) {
         case GameState::MaybeNextPlayer:
             switch (board.turn) {
@@ -573,13 +572,13 @@ void StandardGameScene::update_game_state() {
     }
 }
 
-void StandardGameScene::update_timer_text() {
+void JumpVariantScene::update_timer_text() {
     char time[32];
     timer.get_time_formatted(time);
     app->res.text["timer_text"_h]->set_text(time);
 }
 
-void StandardGameScene::update_turn_indicator() {
+void JumpVariantScene::update_turn_indicator() {
     if (board.turn == BoardPlayer::White) {
         app->res.image["turn_indicator"_h]->set_image(app->res.texture["white_indicator"_h]);
     } else {
@@ -587,7 +586,7 @@ void StandardGameScene::update_turn_indicator() {
     }
 }
 
-void StandardGameScene::update_wait_indicator() {
+void JumpVariantScene::update_wait_indicator() {
     if (!board.next_move) {
         if (!show_wait_indicator) {
             app->gui_renderer->add_widget(app->res.image["wait_indicator"_h]);
@@ -601,7 +600,7 @@ void StandardGameScene::update_wait_indicator() {
     }
 }
 
-void StandardGameScene::update_computer_thinking_indicator() {
+void JumpVariantScene::update_computer_thinking_indicator() {
     if (game.state == GameState::ComputerThinkingMove) {
         if (!show_computer_thinking_indicator) {
             app->gui_renderer->add_widget(app->res.image["computer_thinking_indicator"_h]);
@@ -615,7 +614,7 @@ void StandardGameScene::update_computer_thinking_indicator() {
     }
 }
 
-void StandardGameScene::update_after_human_move(bool did_action, bool switched_turn, bool must_take_piece_or_took_piece) {
+void JumpVariantScene::update_after_human_move(bool did_action, bool switched_turn, bool must_take_piece_or_took_piece) {
     if (did_action) {
         game.state = GameState::HumanDoingMove;
     }
@@ -641,7 +640,7 @@ void StandardGameScene::update_after_human_move(bool did_action, bool switched_t
     imgui_layer.can_redo = undo_redo_state.redo.size() > 0;
 }
 
-void StandardGameScene::update_after_computer_move(bool switched_turn) {
+void JumpVariantScene::update_after_computer_move(bool switched_turn) {
     game.state = GameState::ComputerDoingMove;
 
     if (!made_first_move && !timer.is_running()) {
@@ -661,13 +660,13 @@ void StandardGameScene::update_after_computer_move(bool switched_turn) {
     imgui_layer.can_redo = undo_redo_state.redo.size() > 0;
 }
 
-void StandardGameScene::save_game() {
+void JumpVariantScene::save_game() {
     board.finalize_pieces_state();
 
-    StandardBoardSerialized serialized;
+    JumpBoardSerialized serialized;
     board.to_serialized(serialized);
 
-    save_load::SavedGame<StandardBoardSerialized> saved_game;
+    save_load::SavedGame<JumpBoardSerialized> saved_game;
     saved_game.board_serialized = serialized;
     saved_game.camera_controller = camera_controller;
     saved_game.time = timer.get_time();
@@ -691,10 +690,10 @@ void StandardGameScene::save_game() {
     }
 }
 
-void StandardGameScene::load_game() {
+void JumpVariantScene::load_game() {
     board.finalize_pieces_state();
 
-    save_load::SavedGame<StandardBoardSerialized> saved_game;
+    save_load::SavedGame<JumpBoardSerialized> saved_game;
 
     try {
         save_load::load_game_from_file(saved_game);
@@ -729,7 +728,7 @@ void StandardGameScene::load_game() {
 }
 
 
-void StandardGameScene::undo() {
+void JumpVariantScene::undo() {
     ASSERT(!undo_redo_state.undo.empty(), "Undo history must not be empty");
 
     if (!board.next_move) {
@@ -739,9 +738,9 @@ void StandardGameScene::undo() {
 
     const bool undo_game_over = board.phase == BoardPhase::None;
 
-    using State = UndoRedoState<StandardBoardSerialized>::State;
+    using State = UndoRedoState<JumpBoardSerialized>::State;
 
-    StandardBoardSerialized serialized;
+    JumpBoardSerialized serialized;
     board.to_serialized(serialized);
 
     State current_state = { serialized, camera_controller };
@@ -766,7 +765,7 @@ void StandardGameScene::undo() {
     update_turn_indicator();
 }
 
-void StandardGameScene::redo() {
+void JumpVariantScene::redo() {
     ASSERT(!undo_redo_state.redo.empty(), "Redo history must not be empty");
 
     if (!board.next_move) {
@@ -774,9 +773,9 @@ void StandardGameScene::redo() {
         return;
     }
 
-    using State = UndoRedoState<StandardBoardSerialized>::State;
+    using State = UndoRedoState<JumpBoardSerialized>::State;
 
-    StandardBoardSerialized serialized;
+    JumpBoardSerialized serialized;
     board.to_serialized(serialized);
 
     State current_state = { serialized, camera_controller };

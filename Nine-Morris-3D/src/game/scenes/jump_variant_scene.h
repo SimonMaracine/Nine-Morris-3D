@@ -4,8 +4,8 @@
 #include <engine/engine_graphics.h>
 #include <engine/engine_audio.h>
 
-#include "game/entities/boards/standard_board.h"
-#include "game/entities/serialization/standard_board_serialized.h"
+#include "game/entities/boards/jump_board.h"
+#include "game/entities/serialization/jump_board_serialized.h"
 #include "game/minimax/minimax_thread.h"
 #include "game/scenes/imgui_layer.h"
 #include "game/undo_redo_state.h"
@@ -16,9 +16,9 @@
 #include "game/point_camera_controller.h"
 #include "other/constants.h"
 
-struct StandardGameScene : public Scene {
-    StandardGameScene()
-        : Scene("standard_game") {}
+struct JumpVariantScene : public Scene {
+    JumpVariantScene()
+        : Scene("jump_variant") {}
 
     virtual void on_start() override;
     virtual void on_stop() override;
@@ -95,13 +95,13 @@ struct StandardGameScene : public Scene {
     std::unique_ptr<assets_load::BoardPaintTextureLoader> board_paint_texture_loader;
 
     // ImGui
-    ImGuiLayer<StandardGameScene, StandardBoardSerialized> imgui_layer;
+    ImGuiLayer<JumpVariantScene, JumpBoardSerialized> imgui_layer;
 
     // Game-related
     Camera camera;
     PointCameraController camera_controller {&camera};
-    StandardBoard board;
-    UndoRedoState<StandardBoardSerialized> undo_redo_state;
+    JumpBoard board;
+    UndoRedoState<JumpBoardSerialized> undo_redo_state;
     KeyboardControls keyboard;
     GameContext game;
     MinimaxThread minimax_thread;

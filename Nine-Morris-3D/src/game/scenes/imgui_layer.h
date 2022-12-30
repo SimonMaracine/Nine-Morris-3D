@@ -4,6 +4,7 @@
 #include <engine/engine_audio.h>
 #include <engine/engine_other.h>
 
+#include "game/scenes/common.h"
 #include "game/save_load.h"
 #include "game/game_options.h"
 #include "other/constants.h"
@@ -151,7 +152,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
 
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false, can_change)) {
-                app->change_scene("game");
+                app->change_scene("standard_game");  // FIXME this
 
                 DEB_INFO("Restarting game");
             }
@@ -171,6 +172,19 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 time_t current;  // TODO this time might be quite later
                 time(&current);
                 last_save_game_date = ctime(&current);
+            }
+            if (ImGui::BeginMenu("Game", can_change)) {
+                static int option = 0;
+
+                if (ImGui::RadioButton("Standard Game", &option, 0)) {
+                    app->change_scene("standard_game");
+                }
+                if (ImGui::RadioButton("Jump Variant", &option, 1)) {
+                    app->change_scene("jump_variant");
+                }
+
+                ImGui::EndMenu();
+                HOVERING_GUI()
             }
             if (ImGui::BeginMenu("Players", can_change)) {
                 if (ImGui::BeginMenu("White")) {
@@ -326,7 +340,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("None", &skybox, 0)) {
                     if (skybox != data.options.skybox) {
                         data.options.skybox = skybox;
-                        scene->set_skybox(Skybox::None);
+                        set_skybox(app, *scene, Skybox::None);
 
                         DEB_INFO("Skybox set to none");
                     }
@@ -334,7 +348,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Field", &skybox, 1)) {
                     if (skybox != data.options.skybox) {
                         data.options.skybox = skybox;
-                        scene->set_skybox(Skybox::Field);
+                        set_skybox(app, *scene, Skybox::Field);
 
                         DEB_INFO("Skybox set to field");
                     }
@@ -342,7 +356,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Autumn", &skybox, 2)) {
                     if (skybox != data.options.skybox) {
                         data.options.skybox = skybox;
-                        scene->set_skybox(Skybox::Autumn);
+                        set_skybox(app, *scene, Skybox::Autumn);
 
                         DEB_INFO("Skybox set to autumn");
                     }
@@ -394,14 +408,14 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             if (ImGui::MenuItem("Labeled Board", nullptr, &labeled_board)) {
                 if (labeled_board && labeled_board != data.options.labeled_board) {
                     data.options.labeled_board = labeled_board;
-                    scene->set_board_paint_texture();
+                    set_board_paint_texture(app, *scene);
 
                     DEB_INFO("Board paint texture set to labeled");
                 }
 
                 if (!labeled_board && labeled_board != data.options.labeled_board) {
                     data.options.labeled_board = labeled_board;
-                    scene->set_board_paint_texture();
+                    set_board_paint_texture(app, *scene);
 
                     DEB_INFO("Board paint texture set to non-labeled");
                 }

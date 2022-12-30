@@ -11,6 +11,11 @@ public:
         : name(name) {}
     virtual ~Scene() = default;
 
+    Scene(const Scene&) = delete;
+    Scene& operator=(const Scene&) = delete;
+    Scene(Scene&&) = delete;
+    Scene& operator=(Scene&&) = delete;
+
     virtual void on_start() {}  // Called when the scene is started
     virtual void on_stop() {}  // Called when the scene is stopped
     virtual void on_awake() {}  // Called once before on_start is called for the first time
