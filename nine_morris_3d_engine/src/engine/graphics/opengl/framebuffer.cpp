@@ -239,7 +239,7 @@ namespace gl {
         glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
     }
 
-    void Framebuffer::clear_color_attachment_float() {
+    void Framebuffer::clear_color_attachment_float() {  // TODO right now not used
         glClearBufferfv(GL_COLOR, specification.clear_drawbuffer, specification.clear_value);
     }
 

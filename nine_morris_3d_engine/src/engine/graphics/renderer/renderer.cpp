@@ -270,7 +270,10 @@ Renderer::Renderer(Application* app)
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Texture}  // TODO later needs to be renderbuffer
         };
-        static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        specification.depth_attachment = gl::Attachment {
+            gl::AttachmentFormat::DEPTH32, gl::AttachmentType::Renderbuffer
+        };
+        static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };  // TODO right now not used
         specification.clear_drawbuffer = 0;
         specification.clear_value = color;
 
@@ -362,8 +365,8 @@ void Renderer::render() {
     );
 
     storage.bounding_box_framebuffer->bind();
-    storage.bounding_box_framebuffer->clear_color_attachment_float();
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     const auto& bounding_box_specification = storage.bounding_box_framebuffer->get_specification();
     glViewport(0, 0, bounding_box_specification.width, bounding_box_specification.height);
 
@@ -385,7 +388,7 @@ void Renderer::render() {
     end_rendering();
 
     float* data;
-    framebuffer_reader.get<float>(&data);  // TODO is it right?
+    framebuffer_reader.get<float>(&data);
     hovered_id = *data;
 
     check_hovered_id(x, y);
@@ -733,16 +736,22 @@ void Renderer::draw_bounding_boxes() {
     storage.box_vertex_array->bind();
 
     static std::vector<const Model*> bounding_box_models;
+    static std::vector<const Model*> bounding_box_models_unsorted;
     static std::vector<float> buffer_ids;
     static std::vector<glm::mat4> buffer_transforms;
 
     bounding_box_models.clear();
+    bounding_box_models_unsorted.clear();
     buffer_ids.clear();
     buffer_transforms.clear();
 
     std::for_each(models.begin(), models.end(), [](const std::shared_ptr<Model>& model) {
         if (model->bounding_box.has_value()) {
-            bounding_box_models.push_back(model.get());
+            if (model->bounding_box->sort) {
+                bounding_box_models.push_back(model.get());
+            } else {
+                bounding_box_models_unsorted.push_back(model.get());
+            }
         }
     });
 
@@ -752,6 +761,10 @@ void Renderer::draw_bounding_boxes() {
 
         return distance1 > distance2;
     });
+
+    for (const Model* model : bounding_box_models_unsorted) {
+        prepare_bounding_box(model, buffer_ids, buffer_transforms);
+    }
 
     for (const Model* model : bounding_box_models) {
         prepare_bounding_box(model, buffer_ids, buffer_transforms);
@@ -770,7 +783,7 @@ void Renderer::draw_bounding_boxes() {
         storage.box_index_buffer->get_index_count(),
         GL_UNSIGNED_INT,
         nullptr,
-        bounding_box_models.size()
+        bounding_box_models.size() + bounding_box_models_unsorted.size()
     );
 
     glEnable(GL_BLEND);

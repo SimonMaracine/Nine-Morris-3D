@@ -193,6 +193,7 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
 
 constexpr glm::vec3 PIECE_BOUNDING_BOX = glm::vec3(0.35f, 0.19f, 0.35f);
 constexpr glm::vec3 NODE_BOUNDING_BOX = glm::vec3(0.31f, 0.01f, 0.31f);
+constexpr glm::vec3 BOARD_BOUNDING_BOX = glm::vec3(5.5f, 0.01f, 5.5f);
 
 constexpr size_t NULL_INDEX = 1000;
 

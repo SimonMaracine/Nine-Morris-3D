@@ -1011,6 +1011,10 @@ void StandardGameScene::setup_and_add_model_board() {
     board.model->index_buffer = app->res.index_buffer["board_wood"_h];
     board.model->scale = WORLD_SCALE;
     board.model->material = app->res.material_instance["board_wood"_h];
+    board.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
+    board.model->bounding_box->id = identifier::null;
+    board.model->bounding_box->size = BOARD_BOUNDING_BOX;
+    board.model->bounding_box->sort = false;
     board.model->cast_shadow = true;
 
     app->renderer->add_model(board.model);
