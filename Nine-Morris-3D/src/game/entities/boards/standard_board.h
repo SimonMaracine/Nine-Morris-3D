@@ -19,12 +19,12 @@ struct StandardBoard : public Board {
     StandardBoard& operator=(StandardBoard&&) = default;
 
     virtual void click(identifier::Id hovered_id) override;
-    virtual std::tuple<bool, bool, bool> release(identifier::Id hovered_id) override;
+    virtual Board::Flags release(identifier::Id hovered_id) override;
     virtual void computer_place_piece(size_t node_index) override;
     virtual void computer_move_piece(size_t source_node_index, size_t destination_node_index) override;
     virtual void computer_take_piece(size_t node_index) override;
 
-    void check_select_piece(identifier::Id hovered_id);  // FIXME handle node and piece hovered correctly, as nodes can be clicked behind pieces
+    void check_select_piece(identifier::Id hovered_id);
     void check_place_piece(identifier::Id hovered_id);
     void check_move_piece(identifier::Id hovered_id);
     void check_take_piece(identifier::Id hovered_id);

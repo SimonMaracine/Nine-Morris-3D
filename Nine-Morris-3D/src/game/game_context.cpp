@@ -53,9 +53,9 @@ bool GameContext::end_computer_move() {
             break;
     }
 
-    const bool result = board->switched_turn;
-    board->switched_turn = false;  // These need to be reset
-    board->must_take_piece_or_took_piece = false;
+    const bool result = board->flags.switched_turn;
+    board->flags.switched_turn = false;  // These need to be reset
+    board->flags.must_take_piece_or_took_piece = false;
 
     return result;
 }

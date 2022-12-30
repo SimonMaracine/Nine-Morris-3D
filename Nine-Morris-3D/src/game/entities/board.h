@@ -20,8 +20,10 @@ struct Board {
     Board(Board&&) = default;
     Board& operator=(Board&&) = default;
 
+    struct Flags;
+
     virtual void click(identifier::Id) = 0;
-    virtual std::tuple<bool, bool, bool> release(identifier::Id) = 0;
+    virtual Flags release(identifier::Id) = 0;
     virtual void computer_place_piece(size_t) = 0;
     virtual void computer_move_piece(size_t, size_t) = 0;
     virtual void computer_take_piece(size_t) = 0;
@@ -74,9 +76,11 @@ struct Board {
     bool next_move = true;  // It is false when any piece is in the air, true otherwise
     bool is_players_turn = false;
 
-    bool did_action = false;
-    bool switched_turn = false;
-    bool must_take_piece_or_took_piece = false;
+    struct Flags {
+        bool did_action = false;
+        bool switched_turn = false;
+        bool must_take_piece_or_took_piece = false;
+    } flags;
 
     Application* app = nullptr;
     KeyboardControls* keyboard = nullptr;

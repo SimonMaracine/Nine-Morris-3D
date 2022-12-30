@@ -40,7 +40,6 @@ struct StandardGameScene : public Scene {
     void initialize_pieces();
     void initialize_piece(
         size_t index,
-        std::shared_ptr<Mesh<PTNT>> mesh,
         std::shared_ptr<gl::Texture> diffuse_texture,
         std::shared_ptr<gl::Buffer> vertex_buffer,
         std::shared_ptr<gl::IndexBuffer> index_buffer);
@@ -52,7 +51,6 @@ struct StandardGameScene : public Scene {
     void initialize_pieces_no_normal();
     void initialize_piece_no_normal(
         size_t index,
-        std::shared_ptr<Mesh<PTN>> mesh,
         std::shared_ptr<gl::Texture> diffuse_texture,
         std::shared_ptr<gl::Buffer> vertex_buffer,
         std::shared_ptr<gl::IndexBuffer> index_buffer);

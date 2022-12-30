@@ -367,7 +367,7 @@ void Renderer::render() {
     const auto& bounding_box_specification = storage.bounding_box_framebuffer->get_specification();
     glViewport(0, 0, bounding_box_specification.width, bounding_box_specification.height);
 
-    // Render bounding boxes for models that can pe picked
+    // Render bounding boxes for models that are pickable
     draw_bounding_boxes();
 
     // Read the texture for mouse picking
@@ -758,7 +758,7 @@ void Renderer::draw_bounding_boxes() {
     }
 
     storage.box_ids->bind();
-    storage.box_ids->update_data(buffer_ids.data(), sizeof(float) * buffer_ids.size());
+    storage.box_ids->update_data(buffer_ids.data(), sizeof(float) * buffer_ids.size());  // TODO optimize this
     storage.box_transforms->bind();
     storage.box_transforms->update_data(buffer_transforms.data(), sizeof(glm::mat4) * buffer_transforms.size());
 

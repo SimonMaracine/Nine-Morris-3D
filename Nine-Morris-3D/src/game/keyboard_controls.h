@@ -3,7 +3,8 @@
 #include <engine/engine_application.h>
 #include <engine/engine_graphics.h>
 
-struct Board;
+#include "game/entities/board.h"
+
 class Application;
 
 class KeyboardControls {
@@ -26,7 +27,7 @@ public:
 
     void post_initialize();
     void move(Direction direction);
-    std::tuple<bool, bool, bool> click_and_release();
+    Board::Flags click_and_release();
 
     static Direction calculate(Direction original_direction, float camera_angle);
 private:

@@ -229,11 +229,11 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         );
 
         if (board.next_move && board.is_players_turn && valid_phases) {
-            const auto [did_action, switched_turn, must_take_piece_or_took_piece] = (
-                board.release(app->renderer->get_hovered_id())
-            );
+            const auto flags = board.release(app->renderer->get_hovered_id());
 
-            update_after_human_move(did_action, switched_turn, must_take_piece_or_took_piece);
+            update_after_human_move(
+                flags.did_action, flags.switched_turn, flags.must_take_piece_or_took_piece
+            );
         }
 
         if (show_keyboard_controls) {
@@ -300,11 +300,11 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
             );
 
             if (board.next_move && board.is_players_turn && valid_phases) {
-                const auto [did_action, switched_turn, must_take_piece_or_took_piece] = (
-                    keyboard.click_and_release()
-                );
+                const auto flags = keyboard.click_and_release();
 
-                update_after_human_move(did_action, switched_turn, must_take_piece_or_took_piece);
+                update_after_human_move(
+                    flags.did_action, flags.switched_turn, flags.must_take_piece_or_took_piece
+                );
             }
             break;
         }
@@ -595,22 +595,19 @@ void StandardGameScene::initialize_pieces() {
 
     for (size_t i = 0; i < 9; i++) {
         initialize_piece(
-            i, app->res.mesh_ptnt["white_piece"_h],
-            white_piece_diffuse_texture, white_piece_vertex_buffer, white_piece_index_buffer
+            i, white_piece_diffuse_texture, white_piece_vertex_buffer, white_piece_index_buffer
         );
     }
 
     for (size_t i = 9; i < 18; i++) {
         initialize_piece(
-            i, app->res.mesh_ptnt["black_piece"_h],
-            black_piece_diffuse_texture, black_piece_vertex_buffer, black_piece_index_buffer
+            i, black_piece_diffuse_texture, black_piece_vertex_buffer, black_piece_index_buffer
         );
     }
 }
 
 void StandardGameScene::initialize_piece(
         size_t index,
-        std::shared_ptr<Mesh<PTNT>> mesh,
         std::shared_ptr<gl::Texture> diffuse_texture,
         std::shared_ptr<gl::Buffer> vertex_buffer,
         std::shared_ptr<gl::IndexBuffer> index_buffer) {
@@ -931,22 +928,19 @@ void StandardGameScene::initialize_pieces_no_normal() {
 
     for (size_t i = 0; i < 9; i++) {
         initialize_piece_no_normal(
-            i, app->res.mesh_ptn["white_piece"_h],
-            white_piece_diffuse_texture, white_piece_vertex_buffer, white_piece_index_buffer
+            i, white_piece_diffuse_texture, white_piece_vertex_buffer, white_piece_index_buffer
         );
     }
 
     for (size_t i = 9; i < 18; i++) {
         initialize_piece_no_normal(
-            i, app->res.mesh_ptn["black_piece"_h],
-            black_piece_diffuse_texture, black_piece_vertex_buffer, black_piece_index_buffer
+            i, black_piece_diffuse_texture, black_piece_vertex_buffer, black_piece_index_buffer
         );
     }
 }
 
 void StandardGameScene::initialize_piece_no_normal(
         size_t index,
-        std::shared_ptr<Mesh<PTN>> mesh,
         std::shared_ptr<gl::Texture> diffuse_texture,
         std::shared_ptr<gl::Buffer> vertex_buffer,
         std::shared_ptr<gl::IndexBuffer> index_buffer) {

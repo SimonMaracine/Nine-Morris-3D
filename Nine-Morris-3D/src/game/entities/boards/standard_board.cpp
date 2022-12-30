@@ -26,7 +26,7 @@ void StandardBoard::click(identifier::Id hovered_id) {
     }
 }
 
-std::tuple<bool, bool, bool> StandardBoard::release(identifier::Id hovered_id) {
+Board::Flags StandardBoard::release(identifier::Id hovered_id) {
     switch (phase) {
         case BoardPhase::PlacePieces:
             if (must_take_piece) {
@@ -50,10 +50,13 @@ std::tuple<bool, bool, bool> StandardBoard::release(identifier::Id hovered_id) {
     clicked_node_index = NULL_INDEX;
     clicked_piece_index = NULL_INDEX;
 
-    const auto result = std::make_tuple(did_action, switched_turn, must_take_piece_or_took_piece);
-    did_action = false;
-    switched_turn = false;
-    must_take_piece_or_took_piece = false;
+    const auto result = Flags {
+        flags.did_action,
+        flags.switched_turn,
+        flags.must_take_piece_or_took_piece
+    };
+
+    flags = Flags {};
 
     return result;
 }
@@ -90,7 +93,7 @@ void StandardBoard::check_select_piece(identifier::Id hovered_id) {
 }
 
 void StandardBoard::check_place_piece(identifier::Id hovered_id) {
-    for (Node& node : nodes) {
+    for (const Node& node : nodes) {
         const bool can_place = (
             node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
             && node.piece_index == NULL_INDEX
@@ -100,7 +103,7 @@ void StandardBoard::check_place_piece(identifier::Id hovered_id) {
             remember_state();
             place_piece(node.index);
 
-            did_action = true;
+            flags.did_action = true;
             break;
         }
     }
@@ -111,10 +114,10 @@ void StandardBoard::check_move_piece(identifier::Id hovered_id) {
         return;
     }
 
-    for (Node& node : nodes) {
+    for (const Node& node : nodes) {
         const bool can_move = (
             node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
-            && can_go(selected_piece_index, node.index)
+            && node.piece_index == NULL_INDEX && can_go(selected_piece_index, node.index)
         );
 
         if (can_move) {
@@ -122,7 +125,7 @@ void StandardBoard::check_move_piece(identifier::Id hovered_id) {
             move_piece(selected_piece_index, node.index);
 
             selected_piece_index = NULL_INDEX;
-            did_action = true;
+            flags.did_action = true;
             break;
         }
     }
@@ -153,7 +156,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
                     remember_state();
                     take_piece(index);
 
-                    did_action = true;
+                    flags.did_action = true;
                 } else {
                     DEB_DEBUG("Cannot take black piece from windmill");
                 }
@@ -176,7 +179,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
                     remember_state();
                     take_piece(index);
 
-                    did_action = true;
+                    flags.did_action = true;
                 } else {
                     DEB_DEBUG("Cannot take white piece from windmill");
                 }
@@ -222,7 +225,7 @@ void StandardBoard::place_piece(size_t node_index) {
         DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
-        must_take_piece_or_took_piece = true;
+        flags.must_take_piece_or_took_piece = true;
 
         set_pieces_to_take(TURN_IS_WHITE_SO(PieceType::Black, PieceType::White), true);
     } else {
@@ -296,7 +299,7 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
         DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
-        must_take_piece_or_took_piece = true;
+        flags.must_take_piece_or_took_piece = true;
 
         if (turn == BoardPlayer::White) {
             set_pieces_to_take(PieceType::Black, true);
@@ -345,7 +348,7 @@ void StandardBoard::take_piece(size_t piece_index) {
     nodes.at(piece.node_index).piece_index = NULL_INDEX;
     take_and_raise_piece(piece_index);
     must_take_piece = false;
-    must_take_piece_or_took_piece = true;
+    flags.must_take_piece_or_took_piece = true;
     set_pieces_to_take(piece.type, false);
 
     if (piece.type == PieceType::White) {
@@ -395,7 +398,7 @@ void StandardBoard::switch_turn_and_check_turns_without_mills() {
     }
 
     turn = TURN_IS_WHITE_SO(BoardPlayer::Black, BoardPlayer::White);
-    switched_turn = true;
+    flags.switched_turn = true;
 }
 
 bool StandardBoard::can_go(size_t piece_index, size_t destination_node_index) {
