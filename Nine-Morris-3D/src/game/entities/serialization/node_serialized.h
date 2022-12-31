@@ -7,8 +7,8 @@ struct NodeSerialized {
     ~NodeSerialized() = default;
 
     NodeSerialized(const NodeSerialized&) = default;
-    NodeSerialized(NodeSerialized&&) = delete;
     NodeSerialized& operator=(const NodeSerialized&) = default;
+    NodeSerialized(NodeSerialized&&) = delete;
     NodeSerialized& operator=(NodeSerialized&&) = default;
 
     size_t index = NULL_INDEX;

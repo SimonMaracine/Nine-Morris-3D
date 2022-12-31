@@ -8,8 +8,8 @@ struct PieceSerialized {
     ~PieceSerialized() = default;
 
     PieceSerialized(const PieceSerialized&) = default;
-    PieceSerialized(PieceSerialized&&) = delete;
     PieceSerialized& operator=(const PieceSerialized&) = default;
+    PieceSerialized(PieceSerialized&&) = delete;
     PieceSerialized& operator=(PieceSerialized&&) = default;
 
     size_t index = NULL_INDEX;

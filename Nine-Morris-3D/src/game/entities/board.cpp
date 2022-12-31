@@ -32,7 +32,7 @@ void Board::update_nodes(identifier::Id hovered_id) {
         const bool permitted = !must_take_piece && is_players_turn;
 
         if (hovered && highlight && permitted) {
-            node.model->material->set_vec4("u_color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+            node.model->material->set_vec4("u_color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));  // TODO move to constant
         } else {
             node.model->material->set_vec4("u_color", glm::vec4(0.0f));
         }

@@ -121,4 +121,6 @@ const char* LoadingScene::scene_int_to_string(int scene) {  // FIXME find a bett
             REL_CRITICAL("Invalid scene number, exiting...");
             game_exit::exit_critical();
     }
+
+    return nullptr;
 }

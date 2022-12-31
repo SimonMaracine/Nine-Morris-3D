@@ -622,10 +622,10 @@ void ImGuiLayer<S, B>::draw_debug() {
     if (!show_about) {
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %.3f", app->get_fps());
-        ImGui::Text("White pieces: %u", scene->board.white_pieces_count);
-        ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
-        ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
-        ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
+        // ImGui::Text("White pieces: %u", scene->board.white_pieces_count);  // FIXME this
+        // ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
+        // ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
+        // ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
         ImGui::Text("Can jump: %s, %s", scene->board.can_jump[0] ? "true" : "false", scene->board.can_jump[1] ? "true" : "false");
         ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
         ImGui::Text("Turn: %s", scene->board.turn == BoardPlayer::White ? "white" : "black");

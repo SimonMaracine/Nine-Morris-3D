@@ -156,10 +156,6 @@ void serialize(Archive& archive, JumpBoardSerialized& board) {
         board.can_jump,
         board.repetition_history,
         board.is_players_turn,
-        board.white_pieces_count,
-        board.black_pieces_count,
-        board.not_placed_white_pieces_count,
-        board.not_placed_black_pieces_count,
         board.turns_without_mills
     );
 }

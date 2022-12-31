@@ -47,7 +47,7 @@ struct JumpVariantScene : public Scene {
     std::unique_ptr<assets_load::BoardPaintTextureLoader> board_paint_texture_loader;
 
     // ImGui
-    ImGuiLayer<JumpVariantScene, JumpBoardSerialized> imgui_layer;  // TODO maybe should be just one instance
+    ImGuiLayer<JumpVariantScene, JumpBoardSerialized> imgui_layer;
 
     // Game-related
     Camera camera;

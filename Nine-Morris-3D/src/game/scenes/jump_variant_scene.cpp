@@ -141,7 +141,7 @@ void JumpVariantScene::on_update() {
 
     update_game_state(app, this);
 
-    // update_timer_text(app, this);  // TODO temporary
+    update_timer_text(app, this);
     update_wait_indicator(app, this);
     update_computer_thinking_indicator(app, this);
 
@@ -197,9 +197,7 @@ void JumpVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& 
     }
 
     if (event.button == input::MouseButton::LEFT) {
-        const bool valid_phases = (
-            board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
-        );
+        const bool valid_phases = board.phase == BoardPhase::MovePieces;
 
         if (board.next_move && board.is_players_turn && valid_phases) {
             const auto flags = board.release(app->renderer->get_hovered_id());
@@ -268,9 +266,7 @@ void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
             );
             break;
         case input::Key::ENTER: {
-            const bool valid_phases = (
-                board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
-            );
+            const bool valid_phases = board.phase == BoardPhase::MovePieces;
 
             if (board.next_move && board.is_players_turn && valid_phases) {
                 const auto flags = keyboard.click_and_release();
@@ -307,25 +303,83 @@ void JumpVariantScene::setup_and_add_model_nodes() {
 }
 
 void JumpVariantScene::setup_and_add_model_pieces() {
-    for (size_t i = 0; i < 9; i++) {
-        setup_and_add_model_piece(
-            app,
-            this,
-            i,
-            WHITE_PIECE_POSITION(i),
-            app->res.index_buffer["white_piece"_h]
-        );
-    }
+    // for (size_t i = 0; i < 9; i++) {
+    //     setup_and_add_model_piece(
+    //         app,
+    //         this,
+    //         i,
+    //         WHITE_PIECE_POSITION(i),
+    //         app->res.index_buffer["white_piece"_h]
+    //     );
+    // }
 
-    for (size_t i = 9; i < 18; i++) {
-        setup_and_add_model_piece(
-            app,
-            this,
-            i,
-            BLACK_PIECE_POSITION(i),
-            app->res.index_buffer["black_piece"_h]
-        );
-    }
+    // for (size_t i = 9; i < 18; i++) {
+    //     setup_and_add_model_piece(
+    //         app,
+    //         this,
+    //         i,
+    //         BLACK_PIECE_POSITION(i),
+    //         app->res.index_buffer["black_piece"_h]
+    //     );
+    // }
+
+    // White pieces
+    setup_and_add_model_piece(
+        app,
+        this,
+        0,
+        PIECE_INDEX_POSITION(15),
+        app->res.index_buffer["white_piece"_h]
+    );
+
+    setup_and_add_model_piece(
+        app,
+        this,
+        1,
+        PIECE_INDEX_POSITION(4),
+        app->res.index_buffer["white_piece"_h]
+    );
+
+    setup_and_add_model_piece(
+        app,
+        this,
+        2,
+        PIECE_INDEX_POSITION(13),
+        app->res.index_buffer["white_piece"_h]
+    );
+
+    board.pieces.at(0).node_index = 15;
+    board.pieces.at(1).node_index = 4;
+    board.pieces.at(2).node_index = 13;
+
+    // Black pieces
+    setup_and_add_model_piece(
+        app,
+        this,
+        3,
+        PIECE_INDEX_POSITION(5),
+        app->res.index_buffer["black_piece"_h]
+    );
+
+    setup_and_add_model_piece(
+        app,
+        this,
+        4,
+        PIECE_INDEX_POSITION(11),
+        app->res.index_buffer["black_piece"_h]
+    );
+
+    setup_and_add_model_piece(
+        app,
+        this,
+        5,
+        PIECE_INDEX_POSITION(16),
+        app->res.index_buffer["black_piece"_h]
+    );
+
+    board.pieces.at(3).node_index = 5;
+    board.pieces.at(4).node_index = 11;
+    board.pieces.at(5).node_index = 16;
 }
 
 void JumpVariantScene::setup_entities() {
@@ -333,20 +387,31 @@ void JumpVariantScene::setup_entities() {
     board.model = app->res.model.load("board"_h);
     board.paint_model = app->res.model.load("board_paint"_h);
 
-    for (size_t i = 0; i < 9; i++) {
-        board.pieces[i] = Piece {
-            i, PieceType::White,
-            app->res.model.load(hs {"piece" + std::to_string(i)}),
+    board.phase = BoardPhase::MovePieces;
+    board.can_jump = { true, true };  // Doesn't really matter
+
+    for (size_t i = 0; i < 3; i++) {
+        Piece piece = Piece {
+            i,
+            PieceType::White,
+            app->res.model.load(hs {"piece" + std::to_string(i)}),  // FIXME delete models and sources after scene
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
+        piece.in_use = true;
+
+        board.pieces[i] = piece;
     }
 
-    for (size_t i = 9; i < 18; i++) {
-        board.pieces[i] = Piece {
-            i, PieceType::Black,
+    for (size_t i = 3; i < 6; i++) {
+        Piece piece = Piece {
+            i,
+            PieceType::Black,
             app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
+        piece.in_use = true;
+
+        board.pieces[i] = piece;
     }
 
     for (size_t i = 0; i < 24; i++) {
@@ -354,6 +419,9 @@ void JumpVariantScene::setup_entities() {
             i, app->res.model.load(hs {"node" + std::to_string(i)})
         };
     }
+
+    // Set white pieces to show outline
+    board.update_piece_outlines();
 
     DEB_DEBUG("Setup entities");
 }
@@ -453,7 +521,7 @@ void JumpVariantScene::undo() {
     DEB_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
 
     game.state = GameState::MaybeNextPlayer;
-    made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;
+    // made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;  // FIXME this
 
     if (undo_game_over) {
         timer.start();
@@ -488,7 +556,7 @@ void JumpVariantScene::redo() {
     DEB_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
 
     game.state = GameState::MaybeNextPlayer;
-    made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;
+    // made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;  // FIXME this
 
     const bool redo_game_over = board.phase == BoardPhase::None;
 

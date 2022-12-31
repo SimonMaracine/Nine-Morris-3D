@@ -265,7 +265,7 @@ void initialize_pieces(Application* app) {
         app->res.sound_data["piece_take"_h]
     );
 
-    for (size_t i = 0; i < 9; i++) {
+    for (size_t i = 0; i < 9; i++) {  // FIXME need to rewrite this to accommodate different number of pieces
         initialize_piece(
             app, i, white_piece_diffuse_texture, white_piece_vertex_buffer, white_piece_index_buffer
         );

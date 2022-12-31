@@ -336,15 +336,17 @@ void StandardGameScene::setup_entities() {
 
     for (size_t i = 0; i < 9; i++) {
         board.pieces[i] = Piece {
-            i, PieceType::White,
-            app->res.model.load(hs {"piece" + std::to_string(i)}),
+            i,
+            PieceType::White,
+            app->res.model.load(hs {"piece" + std::to_string(i)}),  // FIXME delete models and sources after scene
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
     }
 
     for (size_t i = 9; i < 18; i++) {
         board.pieces[i] = Piece {
-            i, PieceType::Black,
+            i,
+            PieceType::Black,
             app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
