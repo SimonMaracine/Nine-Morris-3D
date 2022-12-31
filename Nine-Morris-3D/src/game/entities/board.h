@@ -79,7 +79,7 @@ struct Board {
     struct Flags {
         bool did_action = false;
         bool switched_turn = false;
-        bool must_take_piece_or_took_piece = false;
+        bool must_take_or_took_piece = false;
     } flags;
 
     Application* app = nullptr;

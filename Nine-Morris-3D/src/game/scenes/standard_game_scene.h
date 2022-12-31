@@ -33,58 +33,10 @@ struct StandardGameScene : public Scene {
     void on_key_released(const KeyReleasedEvent& event);
     void on_window_resized(const WindowResizedEvent& event);
 
-    // void initialize_board();
-    // void initialize_board_paint();
-    // void initialize_pieces();
-    // void initialize_piece(
-    //     size_t index,
-    //     std::shared_ptr<gl::Texture> diffuse_texture,
-    //     std::shared_ptr<gl::Buffer> vertex_buffer,
-    //     std::shared_ptr<gl::IndexBuffer> index_buffer);
-    // void initialize_nodes();
-    // void initialize_node(size_t index, std::shared_ptr<gl::Buffer> vertex_buffer, std::shared_ptr<gl::IndexBuffer> index_buffer);
-
-    // void initialize_board_no_normal();
-    // void initialize_board_paint_no_normal();
-    // void initialize_pieces_no_normal();
-    // void initialize_piece_no_normal(
-    //     size_t index,
-    //     std::shared_ptr<gl::Texture> diffuse_texture,
-    //     std::shared_ptr<gl::Buffer> vertex_buffer,
-    //     std::shared_ptr<gl::IndexBuffer> index_buffer);
-
-    // void initialize_keyboard_controls();
-    // void initialize_light_bulb();
-
-    void setup_and_add_model_board();
-    void setup_and_add_model_board_paint();
-    void setup_and_add_model_pieces();
-    void setup_and_add_model_piece(size_t index, const glm::vec3& position, std::shared_ptr<gl::IndexBuffer> index_buffer);
     void setup_and_add_model_nodes();
-    void setup_and_add_model_node(size_t index, const glm::vec3& position);
+    void setup_and_add_model_pieces();
 
     void setup_entities();
-    // void initialize_skybox();
-    // void initialize_light();
-    // void setup_camera();
-    // void initialize_indicators_textures();
-    void setup_widgets();
-
-    void update_game_state();
-    void update_timer_text();
-    void update_turn_indicator();
-    void update_wait_indicator();
-    void update_computer_thinking_indicator();
-    // void update_cursor();
-
-    void update_after_human_move(bool did_action, bool switched_turn, bool must_take_piece_or_took_piece);
-    void update_after_computer_move(bool switched_turn);
-
-    // void set_skybox(Skybox skybox);  // TODO maybe move this out
-    // void change_skybox();
-
-    // void set_board_paint_texture();  // TODO maybe move this out
-    // void change_board_paint_texture();
 
     void save_game();
     void load_game();
@@ -105,6 +57,7 @@ struct StandardGameScene : public Scene {
     KeyboardControls keyboard;
     GameContext game;
     MinimaxThread minimax_thread;
+    Timer timer;
 
     bool made_first_move = false;
     bool show_keyboard_controls = false;
@@ -113,7 +66,6 @@ struct StandardGameScene : public Scene {
     std::shared_ptr<music::MusicTrack> current_music_track;
 
     // GUI-related
-    Timer timer;
     bool show_wait_indicator = false;
     bool show_computer_thinking_indicator = false;
 };

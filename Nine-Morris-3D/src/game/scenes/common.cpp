@@ -6,6 +6,7 @@
 #include "game/scenes/common.h"
 #include "game/assets.h"
 #include "other/data.h"
+#include "other/constants.h"
 
 using namespace encrypt;
 
@@ -792,4 +793,60 @@ void change_board_paint_texture(Application* app) {
     app->res.material_instance["board_paint"_h]->set_texture("u_material.diffuse", diffuse_texture, 0);
 
     app->res.texture_data.release("board_paint_diffuse"_h);
+}
+
+void setup_and_add_turn_indicator(Application* app) {
+    auto turn_indicator = app->res.image.load(
+        "turn_indicator"_h, app->res.texture["white_indicator"_h]
+    );
+
+    turn_indicator->stick(gui::Sticky::SE);
+    turn_indicator->offset(30, gui::Relative::Right);
+    turn_indicator->offset(30, gui::Relative::Bottom);
+    turn_indicator->scale(0.4f, 1.0f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
+
+    app->gui_renderer->add_widget(turn_indicator);
+}
+
+void setup_and_add_timer_text(Application* app) {
+    auto& data = app->user_data<Data>();
+
+    auto timer_text = app->res.text.load(
+        "timer_text"_h,
+        app->res.font["open_sans"_h],
+        "00:00",
+        1.5f,
+        glm::vec3(0.9f)
+    );
+
+    timer_text->stick(gui::Sticky::N);
+    timer_text->offset(60, gui::Relative::Top);
+    timer_text->scale(0.6f, 1.4f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
+    timer_text->set_shadows(true);
+
+    if (!data.options.hide_timer) {
+        app->gui_renderer->add_widget(timer_text);
+    }
+}
+
+void setup_wait_indicator(Application* app) {
+    auto wait_indicator = app->res.image.load(
+        "wait_indicator"_h, app->res.texture["wait_indicator"_h]
+    );
+
+    wait_indicator->stick(gui::Sticky::NE);
+    wait_indicator->offset(25, gui::Relative::Right);
+    wait_indicator->offset(55, gui::Relative::Top);
+    wait_indicator->scale(0.4f, 1.0f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
+}
+
+void setup_computer_thinking_indicator(Application* app) {
+    auto computer_thinking_indicator = app->res.image.load(
+        "computer_thinking_indicator"_h, app->res.texture["computer_thinking_indicator"_h]
+    );
+
+    computer_thinking_indicator->stick(gui::Sticky::NE);
+    computer_thinking_indicator->offset(25, gui::Relative::Right);
+    computer_thinking_indicator->offset(55, gui::Relative::Top);
+    computer_thinking_indicator->scale(0.4f, 1.0f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
 }

@@ -340,7 +340,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("None", &skybox, 0)) {
                     if (skybox != data.options.skybox) {
                         data.options.skybox = skybox;
-                        set_skybox(app, *scene, Skybox::None);
+                        set_skybox(app, scene, Skybox::None);
 
                         DEB_INFO("Skybox set to none");
                     }
@@ -348,7 +348,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Field", &skybox, 1)) {
                     if (skybox != data.options.skybox) {
                         data.options.skybox = skybox;
-                        set_skybox(app, *scene, Skybox::Field);
+                        set_skybox(app, scene, Skybox::Field);
 
                         DEB_INFO("Skybox set to field");
                     }
@@ -356,7 +356,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Autumn", &skybox, 2)) {
                     if (skybox != data.options.skybox) {
                         data.options.skybox = skybox;
-                        set_skybox(app, *scene, Skybox::Autumn);
+                        set_skybox(app, scene, Skybox::Autumn);
 
                         DEB_INFO("Skybox set to autumn");
                     }
@@ -408,14 +408,14 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             if (ImGui::MenuItem("Labeled Board", nullptr, &labeled_board)) {
                 if (labeled_board && labeled_board != data.options.labeled_board) {
                     data.options.labeled_board = labeled_board;
-                    set_board_paint_texture(app, *scene);
+                    set_board_paint_texture(app, scene);
 
                     DEB_INFO("Board paint texture set to labeled");
                 }
 
                 if (!labeled_board && labeled_board != data.options.labeled_board) {
                     data.options.labeled_board = labeled_board;
-                    set_board_paint_texture(app, *scene);
+                    set_board_paint_texture(app, scene);
 
                     DEB_INFO("Board paint texture set to non-labeled");
                 }

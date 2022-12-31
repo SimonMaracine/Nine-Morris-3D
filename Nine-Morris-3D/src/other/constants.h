@@ -210,3 +210,6 @@ constexpr glm::vec3 RED_TINT = { 1.0f, 0.2f, 0.2f };
 constexpr glm::vec3 DEFAULT_TINT = { 1.0f, 1.0f, 1.0f };
 
 constexpr glm::vec3 UP_VECTOR = { 0.0f, 1.0f, 0.0f };
+
+constexpr int WIDGET_LOWEST_RESOLUTION = 288;
+constexpr int WIDGET_HIGHEST_RESOLUTION = 1035;

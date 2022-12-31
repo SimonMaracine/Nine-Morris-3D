@@ -53,7 +53,7 @@ Board::Flags StandardBoard::release(identifier::Id hovered_id) {
     const auto result = Flags {
         flags.did_action,
         flags.switched_turn,
-        flags.must_take_piece_or_took_piece
+        flags.must_take_or_took_piece
     };
 
     flags = Flags {};
@@ -225,7 +225,7 @@ void StandardBoard::place_piece(size_t node_index) {
         DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
-        flags.must_take_piece_or_took_piece = true;
+        flags.must_take_or_took_piece = true;
 
         set_pieces_to_take(TURN_IS_WHITE_SO(PieceType::Black, PieceType::White), true);
     } else {
@@ -299,7 +299,7 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
         DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
-        flags.must_take_piece_or_took_piece = true;
+        flags.must_take_or_took_piece = true;
 
         if (turn == BoardPlayer::White) {
             set_pieces_to_take(PieceType::Black, true);
@@ -348,7 +348,7 @@ void StandardBoard::take_piece(size_t piece_index) {
     nodes.at(piece.node_index).piece_index = NULL_INDEX;
     take_and_raise_piece(piece_index);
     must_take_piece = false;
-    flags.must_take_piece_or_took_piece = true;
+    flags.must_take_or_took_piece = true;
     set_pieces_to_take(piece.type, false);
 
     if (piece.type == PieceType::White) {
