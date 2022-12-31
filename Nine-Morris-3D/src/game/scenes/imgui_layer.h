@@ -20,6 +20,11 @@ public:
     ImGuiLayer(Application* app, S* scene);
     ~ImGuiLayer() = default;
 
+    ImGuiLayer(const ImGuiLayer&) = delete;
+    ImGuiLayer& operator=(const ImGuiLayer&) = delete;
+    ImGuiLayer(ImGuiLayer&&) = delete;
+    ImGuiLayer& operator=(ImGuiLayer&&) = default;
+
     void update();
     void reset();
 
@@ -44,6 +49,7 @@ public:
     bool show_no_last_game = false;
 private:
     void draw_game_over_message(std::string_view message1, std::string_view message2);
+    void initialize_options();
 
     Application* app = nullptr;
     S* scene = nullptr;
@@ -106,6 +112,8 @@ ImGuiLayer<S, B>::ImGuiLayer(Application* app, S* scene)
     style.GrabRounding = 6;
     style.GrabMinSize = 12;
     style.FramePadding = ImVec2(5.0f, 4.0f);
+
+    initialize_options();
 }
 
 template<typename S, typename B>
@@ -152,9 +160,9 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
 
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false, can_change)) {
-                app->change_scene("standard_game");  // FIXME this
+                app->change_scene(app->get_current_scene()->get_name());
 
-                DEB_INFO("Restarting game");
+                DEB_INFO("Restarting current game");
             }
             if (ImGui::MenuItem("Load Last Game", nullptr, false, can_change)) {
                 if (last_save_game_date == save_load::NO_LAST_GAME) {
@@ -166,7 +174,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", last_save_game_date.c_str());
             }
-            if (ImGui::MenuItem("Save Game", nullptr, false)) {
+            if (ImGui::MenuItem("Save Game", nullptr, false, can_change)) {
                 scene->save_game();
 
                 time_t current;  // TODO this time might be quite later
@@ -174,12 +182,10 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 last_save_game_date = ctime(&current);
             }
             if (ImGui::BeginMenu("Game", can_change)) {
-                static int option = 0;
-
-                if (ImGui::RadioButton("Standard Game", &option, 0)) {
+                if (ImGui::RadioButton("Standard Game", &data.options.scene, 0)) {
                     app->change_scene("standard_game");
                 }
-                if (ImGui::RadioButton("Jump Variant", &option, 1)) {
+                if (ImGui::RadioButton("Jump Variant", &data.options.scene, 1)) {
                     app->change_scene("jump_variant");
                 }
 
@@ -188,17 +194,13 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             }
             if (ImGui::BeginMenu("Players", can_change)) {
                 if (ImGui::BeginMenu("White")) {
-                    static int option = data.options.white_player;
-
-                    if (ImGui::RadioButton("Human", &option, 1)) {
-                        data.options.white_player = game_options::HUMAN;
+                    if (ImGui::RadioButton("Human", &data.options.white_player, game_options::HUMAN)) {
                         scene->game.white_player = GamePlayer::Human;
                         scene->game.reset_player(GamePlayer::Human);
 
                         DEB_DEBUG("Set white player to human");
                     }
-                    if (ImGui::RadioButton("Computer", &option, 2)) {
-                        data.options.white_player = game_options::COMPUTER;
+                    if (ImGui::RadioButton("Computer", &data.options.white_player, game_options::COMPUTER)) {
                         scene->game.white_player = GamePlayer::Computer;
                         scene->game.reset_player(GamePlayer::Computer);
 
@@ -209,17 +211,13 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     HOVERING_GUI()
                 }
                 if (ImGui::BeginMenu("Black")) {
-                    static int option = data.options.black_player;
-
-                    if (ImGui::RadioButton("Human", &option, 1)) {
-                        data.options.black_player = game_options::HUMAN;
+                    if (ImGui::RadioButton("Human", &data.options.black_player, game_options::HUMAN)) {
                         scene->game.black_player = GamePlayer::Human;
                         scene->game.reset_player(GamePlayer::Human);
 
                         DEB_DEBUG("Set black player to human");
                     }
-                    if (ImGui::RadioButton("Computer", &option, 2)) {
-                        data.options.black_player = game_options::COMPUTER;
+                    if (ImGui::RadioButton("Computer", &data.options.black_player, game_options::COMPUTER)) {
                         scene->game.black_player = GamePlayer::Computer;
                         scene->game.reset_player(GamePlayer::Computer);
 
@@ -235,11 +233,13 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo && can_undo_redo)) {
                 scene->undo();
+
                 can_undo = scene->undo_redo_state.undo.size() > 0;
                 can_redo = scene->undo_redo_state.redo.size() > 0;
             }
             if (ImGui::MenuItem("Redo", nullptr, false, can_redo && can_undo_redo)) {
                 scene->redo();
+
                 can_undo = scene->undo_redo_state.undo.size() > 0;
                 can_redo = scene->undo_redo_state.redo.size() > 0;
             }
@@ -313,7 +313,9 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 }
                 if (ImGui::MenuItem("Enable Music", nullptr, &data.options.enable_music)) {
                     if (data.options.enable_music) {
-                        music::play_music_track(scene->current_music_track);
+                        auto& data = app->user_data<Data>();
+
+                        music::play_music_track(data.current_music_track);
 
                         DEB_INFO("Enabled music");
                     } else {
@@ -334,28 +336,25 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 }
             }
             if (ImGui::BeginMenu("Skybox")) {
-                // Don't directly set options.skybox
-                static int skybox = data.options.skybox;
-
-                if (ImGui::RadioButton("None", &skybox, 0)) {
-                    if (skybox != data.options.skybox) {
-                        data.options.skybox = skybox;
+                if (ImGui::RadioButton("None", &data.imgui_option.skybox, 0)) {
+                    if (data.imgui_option.skybox != data.options.skybox) {
+                        data.options.skybox = data.imgui_option.skybox;
                         set_skybox(app, scene, Skybox::None);
 
                         DEB_INFO("Skybox set to none");
                     }
                 }
-                if (ImGui::RadioButton("Field", &skybox, 1)) {
-                    if (skybox != data.options.skybox) {
-                        data.options.skybox = skybox;
+                if (ImGui::RadioButton("Field", &data.imgui_option.skybox, 1)) {
+                    if (data.imgui_option.skybox != data.options.skybox) {
+                        data.options.skybox = data.imgui_option.skybox;
                         set_skybox(app, scene, Skybox::Field);
 
                         DEB_INFO("Skybox set to field");
                     }
                 }
-                if (ImGui::RadioButton("Autumn", &skybox, 2)) {
-                    if (skybox != data.options.skybox) {
-                        data.options.skybox = skybox;
+                if (ImGui::RadioButton("Autumn", &data.imgui_option.skybox, 2)) {
+                    if (data.imgui_option.skybox != data.options.skybox) {
+                        data.options.skybox = data.imgui_option.skybox;
                         set_skybox(app, scene, Skybox::Autumn);
 
                         DEB_INFO("Skybox set to autumn");
@@ -402,19 +401,16 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 ImGui::EndMenu();
                 HOVERING_GUI()
             }
-            // Don't directly set options.labeled_board
-            static bool labeled_board = data.options.labeled_board;
-
-            if (ImGui::MenuItem("Labeled Board", nullptr, &labeled_board)) {
-                if (labeled_board && labeled_board != data.options.labeled_board) {
-                    data.options.labeled_board = labeled_board;
+            if (ImGui::MenuItem("Labeled Board", nullptr, &data.imgui_option.labeled_board)) {
+                if (data.imgui_option.labeled_board && data.imgui_option.labeled_board != data.options.labeled_board) {
+                    data.options.labeled_board = data.imgui_option.labeled_board;
                     set_board_paint_texture(app, scene);
 
                     DEB_INFO("Board paint texture set to labeled");
                 }
 
-                if (!labeled_board && labeled_board != data.options.labeled_board) {
-                    data.options.labeled_board = labeled_board;
+                if (!data.imgui_option.labeled_board && data.imgui_option.labeled_board != data.options.labeled_board) {
+                    data.options.labeled_board = data.imgui_option.labeled_board;
                     set_board_paint_texture(app, scene);
 
                     DEB_INFO("Board paint texture set to non-labeled");
@@ -795,4 +791,12 @@ void ImGuiLayer<S, B>::draw_game_over_message(std::string_view message1, std::st
     ImGui::Dummy(ImVec2(20.0f, 0.0f));
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
+}
+
+template<typename S, typename B>
+void ImGuiLayer<S, B>::initialize_options() {
+    auto& data = app->user_data<Data>();
+
+    data.imgui_option.skybox = data.options.skybox;
+    data.imgui_option.labeled_board = data.options.labeled_board;
 }

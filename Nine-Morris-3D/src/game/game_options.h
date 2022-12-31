@@ -24,6 +24,7 @@ namespace game_options {
     static constexpr float DEFAULT_MASTER_VOLUME = 1.0f;
     static constexpr float DEFAULT_MUSIC_VOLUME = 0.7f;
     static constexpr bool DEFAULT_ENABLE_MUSIC = true;
+    static constexpr int DEFAULT_SCENE = 0;
 
     struct GameOptions {
         bool vsync = DEFAULT_VSYNC;
@@ -38,6 +39,7 @@ namespace game_options {
         float master_volume = DEFAULT_MASTER_VOLUME;
         float music_volume = DEFAULT_MUSIC_VOLUME;
         bool enable_music = DEFAULT_ENABLE_MUSIC;
+        int scene = DEFAULT_SCENE;
 
         template<typename Archive>
         void serialize(Archive& archive) {
@@ -53,7 +55,8 @@ namespace game_options {
                 black_player,
                 master_volume,
                 music_volume,
-                enable_music
+                enable_music,
+                scene
             );
         }
     };

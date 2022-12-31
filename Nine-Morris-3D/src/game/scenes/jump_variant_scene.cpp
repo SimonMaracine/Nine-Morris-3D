@@ -97,50 +97,23 @@ void JumpVariantScene::on_stop() {
 
     made_first_move = false;
 
-    if (skybox_loader != nullptr) {
-        if (skybox_loader->joinable()) {
-            skybox_loader->join();
-        }
+    if (skybox_loader->joinable()) {
+        skybox_loader->join();
+    }
+
+    if (board_paint_texture_loader->joinable()) {
+        board_paint_texture_loader->join();
     }
 }
 
 void JumpVariantScene::on_awake() {
-    auto& data = app->user_data<Data>();
-
     imgui_layer = ImGuiLayer<JumpVariantScene, JumpBoardSerialized> {app, this};
-
-    if (data.launcher_options.normal_mapping) {
-        initialize_board(app);
-        initialize_board_paint(app);
-        initialize_pieces(app);
-    } else {
-        initialize_board_no_normal(app);
-        initialize_board_paint_no_normal(app);
-        initialize_pieces_no_normal(app);
-    }
-    initialize_nodes(app);
-
-    initialize_keyboard_controls(app);
-#ifdef NM3D_PLATFORM_DEBUG
-    initialize_light_bulb(app);
-#endif
-
-    initialize_skybox(app);
-    initialize_light(app);
-    initialize_indicators_textures(app);
 
     app->evt.add_event<MouseButtonPressedEvent, &JumpVariantScene::on_mouse_button_pressed>(this);
     app->evt.add_event<MouseButtonReleasedEvent, &JumpVariantScene::on_mouse_button_released>(this);
     app->evt.add_event<KeyPressedEvent, &JumpVariantScene::on_key_pressed>(this);
     app->evt.add_event<KeyReleasedEvent, &JumpVariantScene::on_key_released>(this);
     app->evt.add_event<WindowResizedEvent, &JumpVariantScene::on_window_resized>(this);
-
-    auto track = app->res.music_track.load("music"_h, app->res.sound_data["music"_h]);
-    current_music_track = track;
-
-    if (data.options.enable_music) {
-        music::play_music_track(track);
-    }
 
     using namespace assets_load;
 
@@ -154,16 +127,17 @@ void JumpVariantScene::on_awake() {
 
 void JumpVariantScene::on_update() {
     if (!imgui_layer.hovering_gui) {
-        camera_controller.update(app->get_delta());
+        camera_controller.update_controls(app->get_delta());
         board.update_nodes(app->renderer->get_hovered_id());
         board.update_pieces(app->renderer->get_hovered_id());
-
-        // Update listener position, look at and up vectors every frame
-        update_listener(app, this);
     }
 
+    camera_controller.update_camera(app->get_delta());
     board.move_pieces();
     timer.update();
+
+    // Update listener position, look at and up vectors every frame
+    update_listener(app, this);
 
     update_game_state(app, this);
 

@@ -11,7 +11,8 @@ public:
         : camera(camera) {}
     virtual ~CameraController() = default;
 
-    virtual void update(float dt) = 0;
+    virtual void update_controls(float dt) = 0;
+    virtual void update_camera(float dt) = 0;
     virtual const glm::vec3& get_position() const = 0;
     virtual const glm::vec3& get_rotation() const = 0;
 

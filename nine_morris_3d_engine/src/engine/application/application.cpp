@@ -171,7 +171,7 @@ void Application::add_scene(std::unique_ptr<Scene>&& scene, bool start) {
 }
 
 void Application::change_scene(std::string_view name) {
-    for (std::unique_ptr<Scene>& scene : scenes) {
+    for (const std::unique_ptr<Scene>& scene : scenes) {
         if (scene->name == name) {
             to_scene = scene.get();
             changed_scene = true;

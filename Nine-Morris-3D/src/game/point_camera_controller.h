@@ -23,8 +23,9 @@ public:
     float get_distance_to_point() const { return distance_to_point; }
     float get_angle_around_point() const { return angle_around_point; }
 
-    // Call this every frame
-    virtual void update(float dt) override;
+    // Call these every frame
+    virtual void update_controls(float dt) override;
+    virtual void update_camera(float dt) override;
 
     // Call this regularly
     void update_friction();

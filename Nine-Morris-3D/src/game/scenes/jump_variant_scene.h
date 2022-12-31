@@ -47,7 +47,7 @@ struct JumpVariantScene : public Scene {
     std::unique_ptr<assets_load::BoardPaintTextureLoader> board_paint_texture_loader;
 
     // ImGui
-    ImGuiLayer<JumpVariantScene, JumpBoardSerialized> imgui_layer;
+    ImGuiLayer<JumpVariantScene, JumpBoardSerialized> imgui_layer;  // TODO maybe should be just one instance
 
     // Game-related
     Camera camera;
@@ -63,7 +63,6 @@ struct JumpVariantScene : public Scene {
     bool show_keyboard_controls = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
-    std::shared_ptr<music::MusicTrack> current_music_track;
 
     // GUI-related
     bool show_wait_indicator = false;

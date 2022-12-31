@@ -54,6 +54,9 @@ void setup_and_add_timer_text(Application* app);
 void setup_wait_indicator(Application* app);
 void setup_computer_thinking_indicator(Application* app);
 
+// Must be called only once
+void initialize_game(Application* app);
+
 template<typename S>
 void setup_and_add_model_board(Application* app, S* scene) {
     auto& board = scene->board;

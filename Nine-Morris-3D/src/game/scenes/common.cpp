@@ -343,7 +343,10 @@ void initialize_nodes(Application* app) {
     }
 }
 
-void initialize_node(Application* app, size_t index, std::shared_ptr<gl::Buffer> vertex_buffer,
+void initialize_node(
+        Application* app,
+        size_t index,
+        std::shared_ptr<gl::Buffer> vertex_buffer,
         std::shared_ptr<gl::IndexBuffer> index_buffer) {
     auto& data = app->user_data<Data>();
 
@@ -849,4 +852,35 @@ void setup_computer_thinking_indicator(Application* app) {
     computer_thinking_indicator->offset(25, gui::Relative::Right);
     computer_thinking_indicator->offset(55, gui::Relative::Top);
     computer_thinking_indicator->scale(0.4f, 1.0f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
+}
+
+void initialize_game(Application* app) {
+    auto& data = app->user_data<Data>();
+
+    if (data.launcher_options.normal_mapping) {
+        initialize_board(app);
+        initialize_board_paint(app);
+        initialize_pieces(app);
+    } else {
+        initialize_board_no_normal(app);
+        initialize_board_paint_no_normal(app);
+        initialize_pieces_no_normal(app);
+    }
+    initialize_nodes(app);
+
+    initialize_keyboard_controls(app);
+#ifdef NM3D_PLATFORM_DEBUG
+    initialize_light_bulb(app);
+#endif
+
+    initialize_skybox(app);
+    initialize_light(app);
+    initialize_indicators_textures(app);
+
+    auto track = app->res.music_track.load("music"_h, app->res.sound_data["music"_h]);
+    data.current_music_track = track;
+
+    if (data.options.enable_music) {
+        music::play_music_track(track);
+    }
 }

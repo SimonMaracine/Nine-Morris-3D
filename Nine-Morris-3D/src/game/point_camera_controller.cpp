@@ -31,7 +31,7 @@ static float calculate_angle_velocity(float target_angle, float angle) {
 
 PointCameraController::PointCameraController(Camera* camera)
     : CameraController(camera) {
-    update(1.0f);
+    update_camera(1.0f);
 }
 
 PointCameraController::PointCameraController(Camera* camera, int width, int height, float fov, float near,
@@ -39,7 +39,7 @@ PointCameraController::PointCameraController(Camera* camera, int width, int heig
     : CameraController(camera), sensitivity(sensitivity), pitch(pitch), point(point),
       distance_to_point(distance_to_point) {
     camera->set_projection(width, height, fov, near, far);
-    update(1.0f);
+    update_camera(1.0f);
 }
 
 const glm::vec3& PointCameraController::get_position() const {
@@ -54,7 +54,7 @@ const glm::vec3& PointCameraController::get_rotation() const {
     return rotation;
 }
 
-void PointCameraController::update(float dt) {
+void PointCameraController::update_controls(float dt) {
     constexpr float MOVE_SPEED = 3200.0f;
     constexpr float MOVE_SPEED_MOUSE = MOVE_SPEED * 0.0039f;
     constexpr float ZOOM_SPEED = 576.0f;
@@ -85,6 +85,12 @@ void PointCameraController::update(float dt) {
         x_velocity += MOVE_SPEED * dt;
     }
 
+    mouse_input.mouse_wheel = 0.0f;
+    mouse_input.dx = 0.0f;
+    mouse_input.dy = 0.0f;
+}
+
+void PointCameraController::update_camera(float dt) {
     distance_to_point += zoom_velocity * sensitivity * dt;
 
     // Calculate automatic distance to point movement
@@ -127,10 +133,6 @@ void PointCameraController::update(float dt) {
     matrix = glm::translate(matrix, -position);
 
     camera->set_view(matrix);
-
-    mouse_input.mouse_wheel = 0.0f;
-    mouse_input.dx = 0.0f;
-    mouse_input.dy = 0.0f;
 }
 
 void PointCameraController::update_friction() {

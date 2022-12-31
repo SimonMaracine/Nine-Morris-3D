@@ -1,5 +1,6 @@
 #pragma once
 
+#include <engine/engine_audio.h>
 #include <engine/engine_graphics.h>
 
 #include "game/game_options.h"
@@ -17,4 +18,12 @@ struct Data {
 
     std::unordered_map<size_t, identifier::Id> node_ids;
     std::unordered_map<size_t, identifier::Id> piece_ids;
+
+    std::shared_ptr<music::MusicTrack> current_music_track;
+
+    // Some ImGui widget options for radio buttons
+    struct {
+        int skybox = 0;
+        int labeled_board = 0;
+    } imgui_option;
 };

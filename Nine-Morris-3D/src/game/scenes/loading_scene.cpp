@@ -2,6 +2,7 @@
 #include <engine/engine_other.h>
 
 #include "game/scenes/loading_scene.h"
+#include "game/scenes/common.h"
 #include "game/assets_load.h"
 #include "game/assets.h"
 #include "launcher/launcher_options.h"
@@ -13,7 +14,8 @@ void LoadingScene::on_start() {
     load_splash_screen_texture();
 
     loader = std::make_unique<assets_load::AllStartLoader>(
-        assets_load::all_start, std::bind(&Application::change_scene, app, "standard_game")
+        assets_load::all_start,
+        std::bind(&Application::change_scene, app, scene_int_to_string(data.options.scene))
     );
 
     loader->start_loading_thread(
@@ -33,6 +35,8 @@ void LoadingScene::on_start() {
 
 void LoadingScene::on_stop() {
     DEB_INFO("Done loading assets; initializing the rest of the game...");
+
+    initialize_game(app);
 
     loader.reset();
 
@@ -60,7 +64,9 @@ void LoadingScene::setup_widgets() {
     auto loading_text = app->res.text.load(
         "loading_text"_h,
         app->res.font["good_dog_plain"_h],
-        "Loading", 1.5f, glm::vec3(0.81f)
+        "Loading",
+        1.5f,
+        glm::vec3(0.81f)
     );
     loading_text->stick(gui::Sticky::SE);
     loading_text->offset(20, gui::Relative::Right);
@@ -102,5 +108,17 @@ void LoadingScene::update_loading_animation() {
 
         loading_animation.dots++;
         loading_animation.dots %= 4;
+    }
+}
+
+const char* LoadingScene::scene_int_to_string(int scene) {  // FIXME find a better way
+    switch (scene) {
+        case 0:
+            return "standard_game";
+        case 1:
+            return "jump_variant";
+        default:
+            REL_CRITICAL("Invalid scene number, exiting...");
+            game_exit::exit_critical();
     }
 }

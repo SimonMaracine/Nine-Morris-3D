@@ -22,6 +22,8 @@ public:
     virtual void on_update() {}  // Called every frame
     virtual void on_fixed_update() {}  // Called once every 50 milliseconds
     virtual void on_imgui_update() {}  // Called every frame for ImGui only
+
+    std::string_view get_name() const { return name; }
 protected:
     Application* app = nullptr;
 private:

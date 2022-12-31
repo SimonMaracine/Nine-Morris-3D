@@ -43,6 +43,7 @@ public:
     // Scene management functions
     void add_scene(std::unique_ptr<Scene>&& scene, bool start = false);
     void change_scene(std::string_view name);
+    const Scene* get_current_scene() { return current_scene; }
 
     // Framebuffer management functions
     void add_framebuffer(std::shared_ptr<gl::Framebuffer> framebuffer);
