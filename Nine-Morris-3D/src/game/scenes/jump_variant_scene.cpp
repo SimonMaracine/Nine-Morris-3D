@@ -22,18 +22,19 @@ using namespace encrypt;
 void JumpVariantScene::on_start() {
     auto& data = app->user_data<Data>();
 
+    initialize_pieces();
     setup_entities();
-    setup_camera(app, this);
 
     setup_and_add_model_board(app, this);
     setup_and_add_model_board_paint(app, this);
-    setup_and_add_model_nodes();
+    setup_and_add_model_nodes(app, this);
     setup_and_add_model_pieces();
 
     setup_and_add_turn_indicator(app);
     setup_and_add_timer_text(app);
     setup_wait_indicator(app);
     setup_computer_thinking_indicator(app);
+    setup_camera(app, this);
 
     update_turn_indicator(app, this);
 
@@ -94,6 +95,11 @@ void JumpVariantScene::on_stop() {
     camera_controller.remove_events(app);
     app->renderer->clear();
     app->gui_renderer->clear();
+
+    // Delete all piece material instances
+    for (size_t i = 0; i < MAX_PIECES; i++) {
+        app->res.material_instance.release(hs {"piece" + std::to_string(i)});
+    }
 
     made_first_move = false;
 
@@ -296,90 +302,38 @@ void JumpVariantScene::on_window_resized(const WindowResizedEvent& event) {
     camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
 }
 
-void JumpVariantScene::setup_and_add_model_nodes() {
-    for (size_t i = 0; i < 24; i++) {
-        setup_and_add_model_node(app, this, i, NODE_POSITIONS[i]);
-    }
-}
-
 void JumpVariantScene::setup_and_add_model_pieces() {
-    // for (size_t i = 0; i < 9; i++) {
-    //     setup_and_add_model_piece(
-    //         app,
-    //         this,
-    //         i,
-    //         WHITE_PIECE_POSITION(i),
-    //         app->res.index_buffer["white_piece"_h]
-    //     );
-    // }
-
-    // for (size_t i = 9; i < 18; i++) {
-    //     setup_and_add_model_piece(
-    //         app,
-    //         this,
-    //         i,
-    //         BLACK_PIECE_POSITION(i),
-    //         app->res.index_buffer["black_piece"_h]
-    //     );
-    // }
-
     // White pieces
-    setup_and_add_model_piece(
-        app,
-        this,
-        0,
-        PIECE_INDEX_POSITION(15),
-        app->res.index_buffer["white_piece"_h]
-    );
-
-    setup_and_add_model_piece(
-        app,
-        this,
-        1,
-        PIECE_INDEX_POSITION(4),
-        app->res.index_buffer["white_piece"_h]
-    );
-
-    setup_and_add_model_piece(
-        app,
-        this,
-        2,
-        PIECE_INDEX_POSITION(13),
-        app->res.index_buffer["white_piece"_h]
-    );
-
-    board.pieces.at(0).node_index = 15;
-    board.pieces.at(1).node_index = 4;
-    board.pieces.at(2).node_index = 13;
+    setup_piece_on_node(app, this, 0, 15);
+    setup_piece_on_node(app, this, 1, 4);
+    setup_piece_on_node(app, this, 2, 13);
 
     // Black pieces
-    setup_and_add_model_piece(
-        app,
-        this,
-        3,
-        PIECE_INDEX_POSITION(5),
-        app->res.index_buffer["black_piece"_h]
-    );
+    setup_piece_on_node(app, this, 3, 5);
+    setup_piece_on_node(app, this, 4, 11);
+    setup_piece_on_node(app, this, 5, 16);
+}
 
-    setup_and_add_model_piece(
-        app,
-        this,
-        4,
-        PIECE_INDEX_POSITION(11),
-        app->res.index_buffer["black_piece"_h]
-    );
+void JumpVariantScene::initialize_pieces() {
+    auto& data = app->user_data<Data>();
 
-    setup_and_add_model_piece(
-        app,
-        this,
-        5,
-        PIECE_INDEX_POSITION(16),
-        app->res.index_buffer["black_piece"_h]
-    );
+    if (data.launcher_options.normal_mapping) {
+        for (size_t i = 0; i < 3; i++) {
+            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_h]);
+        }
 
-    board.pieces.at(3).node_index = 5;
-    board.pieces.at(4).node_index = 11;
-    board.pieces.at(5).node_index = 16;
+        for (size_t i = 3; i < 6; i++) {
+            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_h]);
+        }
+    } else {
+        for (size_t i = 0; i < 3; i++) {
+            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_h]);
+        }
+
+        for (size_t i = 3; i < 6; i++) {
+            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_h]);
+        }
+    }
 }
 
 void JumpVariantScene::setup_entities() {
@@ -388,13 +342,12 @@ void JumpVariantScene::setup_entities() {
     board.paint_model = app->res.model.load("board_paint"_h);
 
     board.phase = BoardPhase::MovePieces;
-    board.can_jump = { true, true };  // Doesn't really matter
 
     for (size_t i = 0; i < 3; i++) {
         Piece piece = Piece {
             i,
             PieceType::White,
-            app->res.model.load(hs {"piece" + std::to_string(i)}),  // FIXME delete models and sources after scene
+            app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
         piece.in_use = true;
@@ -521,7 +474,7 @@ void JumpVariantScene::undo() {
     DEB_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
 
     game.state = GameState::MaybeNextPlayer;
-    // made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;  // FIXME this
+    made_first_move = board.turn_count != 0;
 
     if (undo_game_over) {
         timer.start();
@@ -556,7 +509,7 @@ void JumpVariantScene::redo() {
     DEB_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
 
     game.state = GameState::MaybeNextPlayer;
-    // made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;  // FIXME this
+    made_first_move = board.turn_count != 0;
 
     const bool redo_game_over = board.phase == BoardPhase::None;
 

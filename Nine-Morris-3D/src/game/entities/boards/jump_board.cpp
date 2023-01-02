@@ -271,23 +271,12 @@ void JumpBoard::move_piece(size_t piece_index, size_t node_index) {
 
     WAIT_FOR_NEXT_MOVE();
 
-    if (piece.type == PieceType::White && can_jump[static_cast<int>(PieceType::White)]
-            || piece.type == PieceType::Black && can_jump[static_cast<int>(PieceType::Black)]) {
-        const auto target = glm::vec3(node.model->position.x, PIECE_Y_POSITION, node.model->position.z);
-        const auto target0 = piece.model->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
-        const auto target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
-        const auto velocity = glm::normalize(target0 - piece.model->position) * PIECE_BASE_VELOCITY;
+    const auto target = glm::vec3(node.model->position.x, PIECE_Y_POSITION, node.model->position.z);
+    const auto target0 = piece.model->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+    const auto target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
+    const auto velocity = glm::normalize(target0 - piece.model->position) * PIECE_BASE_VELOCITY;
 
-        prepare_piece_for_three_step_move(piece_index, target, velocity, target0, target1);
-    } else {
-        const auto target = glm::vec3(node.model->position.x, PIECE_Y_POSITION, node.model->position.z);
-
-        prepare_piece_for_linear_move(
-            piece_index,
-            target,
-            glm::normalize(target - piece.model->position) * PIECE_BASE_VELOCITY
-        );
-    }
+    prepare_piece_for_three_step_move(piece_index, target, velocity, target0, target1);
 
     // Reset all of these
     Node& previous_node = nodes.at(piece.node_index);
@@ -316,13 +305,13 @@ void JumpBoard::move_piece(size_t piece_index, size_t node_index) {
         // must_take_piece = true;
         // flags.must_take_or_took_piece = true;
 
-        // if (turn == BoardPlayer::White) {
-        //     set_pieces_to_take(PieceType::Black, true);
-        //     set_pieces_show_outline(PieceType::White, false);
-        // } else {
-        //     set_pieces_to_take(PieceType::White, true);
-        //     set_pieces_show_outline(PieceType::Black, false);
-        // }
+        if (turn == BoardPlayer::White) {
+            // set_pieces_to_take(PieceType::Black, true);
+            set_pieces_show_outline(PieceType::White, false);
+        } else {
+            // set_pieces_to_take(PieceType::White, true);
+            set_pieces_show_outline(PieceType::Black, false);
+        }
 
         turns_without_mills = 0;
     } else {
@@ -414,6 +403,7 @@ void JumpBoard::switch_turn_and_check_turns_without_mills() {
 
     turn = TURN_IS_WHITE_SO(BoardPlayer::Black, BoardPlayer::White);
     flags.switched_turn = true;
+    turn_count++;
 }
 
 // bool JumpBoard::can_go(size_t piece_index, size_t destination_node_index) {
@@ -837,7 +827,7 @@ void JumpBoard::to_serialized(JumpBoardSerialized& serialized) {
     serialized.turn = turn;
     serialized.ending = ending;
     serialized.must_take_piece = must_take_piece;
-    serialized.can_jump = can_jump;
+    serialized.turn_count = turn_count;
     serialized.repetition_history = repetition_history;
     serialized.is_players_turn = is_players_turn;
     serialized.turns_without_mills = turns_without_mills;
@@ -918,10 +908,10 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
     phase = serialized.phase;
     turn = serialized.turn;
     ending = serialized.ending;
-    must_take_piece = serialized.must_take_piece;
-    can_jump = serialized.can_jump;
     repetition_history = serialized.repetition_history;
+    must_take_piece = serialized.must_take_piece;
     is_players_turn = serialized.is_players_turn;
+    turn_count = serialized.turn_count;
     turns_without_mills = serialized.turns_without_mills;
 
     // Reset these values

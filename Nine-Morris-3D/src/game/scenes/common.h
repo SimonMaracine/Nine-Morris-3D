@@ -10,41 +10,8 @@
 #include "other/data.h"
 #include "other/constants.h"
 
-void initialize_board(Application* app);
-void initialize_board_paint(Application* app);
-void initialize_pieces(Application* app);
-void initialize_piece(
-    Application* app,
-    size_t index,
-    std::shared_ptr<gl::Texture> diffuse_texture,
-    std::shared_ptr<gl::Buffer> vertex_buffer,
-    std::shared_ptr<gl::IndexBuffer> index_buffer
-);
-void initialize_nodes(Application* app);
-void initialize_node(
-    Application* app,
-    size_t index,
-    std::shared_ptr<gl::Buffer> vertex_buffer,
-    std::shared_ptr<gl::IndexBuffer> index_buffer
-);
-
-void initialize_board_no_normal(Application* app);
-void initialize_board_paint_no_normal(Application* app);
-void initialize_pieces_no_normal(Application* app);
-void initialize_piece_no_normal(
-    Application* app,
-    size_t index,
-    std::shared_ptr<gl::Texture> diffuse_texture,
-    std::shared_ptr<gl::Buffer> vertex_buffer,
-    std::shared_ptr<gl::IndexBuffer> index_buffer
-);
-
-void initialize_keyboard_controls(Application* app);
-void initialize_light_bulb(Application* app);
-
-void initialize_skybox(Application* app);
-void initialize_light(Application* app);
-void initialize_indicators_textures(Application* app);
+void initialize_piece(Application* app, size_t index, std::shared_ptr<gl::Texture> diffuse_texture);
+void initialize_piece_no_normal(Application* app, size_t index, std::shared_ptr<gl::Texture> diffuse_texture);
 
 void change_skybox(Application* app);
 void change_board_paint_texture(Application* app);
@@ -61,15 +28,15 @@ template<typename S>
 void setup_and_add_model_board(Application* app, S* scene) {
     auto& board = scene->board;
 
+    board.model->scale = WORLD_SCALE;
     board.model->vertex_array = app->res.vertex_array["board_wood"_h];
     board.model->index_buffer = app->res.index_buffer["board_wood"_h];
-    board.model->scale = WORLD_SCALE;
     board.model->material = app->res.material_instance["board_wood"_h];
+    board.model->cast_shadow = true;
     board.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
     board.model->bounding_box->id = identifier::null;
     board.model->bounding_box->size = BOARD_BOUNDING_BOX;
     board.model->bounding_box->sort = false;
-    board.model->cast_shadow = true;
 
     app->renderer->add_model(board.model);
 
@@ -78,12 +45,12 @@ void setup_and_add_model_board(Application* app, S* scene) {
 
 template<typename S>
 void setup_and_add_model_board_paint(Application* app, S* scene) {
-    auto& board = scene->board;
+    const auto& board = scene->board;
 
-    board.paint_model->vertex_array = app->res.vertex_array["board_paint"_h];
-    board.paint_model->index_buffer = app->res.index_buffer["board_paint"_h];
     board.paint_model->position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
     board.paint_model->scale = WORLD_SCALE;
+    board.paint_model->vertex_array = app->res.vertex_array["board_paint"_h];
+    board.paint_model->index_buffer = app->res.index_buffer["board_paint"_h];
     board.paint_model->material = app->res.material_instance["board_paint"_h];
 
     app->renderer->add_model(board.paint_model);
@@ -92,23 +59,24 @@ void setup_and_add_model_board_paint(Application* app, S* scene) {
 }
 
 template<typename S>
-void setup_and_add_model_piece(Application* app, S* scene, size_t index, const glm::vec3& position,
-        std::shared_ptr<gl::IndexBuffer> index_buffer) {
+void setup_and_add_model_piece(Application* app, S* scene, size_t index, const glm::vec3& position) {
     auto& data = app->user_data<Data>();
 
-    Piece& piece = scene->board.pieces.at(index);
+    const Piece& piece = scene->board.pieces.at(index);
+
+    const auto id = piece.type == PieceType::White ? "white_piece"_h : "black_piece"_h;
 
     piece.model->position = position;
     piece.model->rotation = RANDOM_PIECE_ROTATION();
-    piece.model->vertex_array = app->res.vertex_array[hs {"piece" + std::to_string(index)}];
-    piece.model->index_buffer = index_buffer;
     piece.model->scale = WORLD_SCALE;
+    piece.model->vertex_array = app->res.vertex_array[id];
+    piece.model->index_buffer = app->res.index_buffer[id];
     piece.model->material = app->res.material_instance[hs {"piece" + std::to_string(index)}];
     piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
+    piece.model->cast_shadow = true;
     piece.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
     piece.model->bounding_box->id = data.piece_ids[index];
     piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
-    piece.model->cast_shadow = true;
 
     app->renderer->add_model(piece.model);
 
@@ -119,15 +87,22 @@ void setup_and_add_model_piece(Application* app, S* scene, size_t index, const g
 }
 
 template<typename S>
+void setup_and_add_model_nodes(Application* app, S* scene) {
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        setup_and_add_model_node(app, scene, i, NODE_POSITIONS[i]);
+    }
+}
+
+template<typename S>
 void setup_and_add_model_node(Application* app, S* scene, size_t index, const glm::vec3& position) {
     auto& data = app->user_data<Data>();
 
-    Node& node = scene->board.nodes.at(index);
+    const Node& node = scene->board.nodes.at(index);
 
-    node.model->vertex_array = app->res.vertex_array[hs {"node" + std::to_string(index)}];
-    node.model->index_buffer = app->res.index_buffer["node"_h];
     node.model->position = position;
     node.model->scale = WORLD_SCALE;
+    node.model->vertex_array = app->res.vertex_array["node"_h];
+    node.model->index_buffer = app->res.index_buffer["node"_h];
     node.model->material = app->res.material_instance[hs {"node" + std::to_string(index)}];
     node.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
     node.model->bounding_box->id = data.node_ids[index];
@@ -393,4 +368,17 @@ void update_game_state(Application* app, S* scene) {
             scene->game.state = GameState::MaybeNextPlayer;
             break;
     }
+}
+
+template<typename S>
+void setup_piece_on_node(Application* app, S* scene, size_t index, size_t node_index) {
+    setup_and_add_model_piece(
+        app,
+        scene,
+        index,
+        PIECE_INDEX_POSITION(node_index)
+    );
+
+    scene->board.pieces.at(index).node_index = node_index;
+    scene->board.nodes.at(node_index).piece_index = index;
 }

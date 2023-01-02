@@ -22,13 +22,14 @@ struct StandardBoardSerialized {
     BoardPlayer turn = BoardPlayer::White;
     BoardEnding ending;
 
-    bool must_take_piece = false;
-
     std::array<bool, 2> can_jump = { false, false };
 
     ThreefoldRepetitionHistory repetition_history;
 
+    bool must_take_piece = false;
     bool is_players_turn = false;
+
+    size_t turn_count = 0;
 
     unsigned int white_pieces_count = 0;
     unsigned int black_pieces_count = 0;

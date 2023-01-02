@@ -155,6 +155,9 @@ enum class TextureQuality {
     Low
 };
 
+constexpr size_t MAX_NODES = 24;
+constexpr size_t MAX_PIECES = 18;  // TODO will change
+
 constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
 constexpr float PAINT_Y_POSITION = 0.062f;
 
@@ -165,7 +168,7 @@ constexpr float PIECE_THREESTEP_HEIGHT = 0.4f;
 constexpr float PIECE_RAISE_HEIGHT = 1.3f;
 
 constexpr float NODE_Y_POSITION = 0.063f;
-constexpr glm::vec3 NODE_POSITIONS[24] = {
+constexpr glm::vec3 NODE_POSITIONS[MAX_NODES] = {
     glm::vec3(2.046f, NODE_Y_POSITION, 2.062f),    // 0
     glm::vec3(-0.008f, NODE_Y_POSITION, 2.089f),   // 1
     glm::vec3(-2.101f, NODE_Y_POSITION, 2.076f),   // 2
@@ -192,23 +195,23 @@ constexpr glm::vec3 NODE_POSITIONS[24] = {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
-constexpr glm::vec3 PIECE_BOUNDING_BOX = glm::vec3(0.35f, 0.19f, 0.35f);
-constexpr glm::vec3 NODE_BOUNDING_BOX = glm::vec3(0.31f, 0.01f, 0.31f);
+constexpr glm::vec3 PIECE_BOUNDING_BOX = glm::vec3(0.36f, 0.19f, 0.36f);
+constexpr glm::vec3 NODE_BOUNDING_BOX = glm::vec3(0.32f, 0.01f, 0.32f);
 constexpr glm::vec3 BOARD_BOUNDING_BOX = glm::vec3(5.5f, 0.01f, 5.5f);
 
 constexpr size_t NULL_INDEX = 1000;
 
 constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
 
-using GamePosition = std::array<PieceType, 24>;
+using GamePosition = std::array<PieceType, MAX_NODES>;
 
 constexpr float WORLD_SCALE = 20.0f;
 
 constexpr glm::vec3 RED_OUTLINE = { 1.0f, 0.0f, 0.0f };
 constexpr glm::vec3 ORANGE_OUTLINE = { 1.0f, 0.5f, 0.0f };
-
 constexpr glm::vec3 RED_TINT = { 1.0f, 0.2f, 0.2f };
 constexpr glm::vec3 DEFAULT_TINT = { 1.0f, 1.0f, 1.0f };
+constexpr glm::vec4 GRAY = { 0.7f, 0.7f, 0.7f, 1.0f };
 
 constexpr glm::vec3 UP_VECTOR = { 0.0f, 1.0f, 0.0f };
 

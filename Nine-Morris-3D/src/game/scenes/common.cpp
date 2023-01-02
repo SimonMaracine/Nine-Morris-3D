@@ -10,7 +10,7 @@
 
 using namespace encrypt;
 
-void initialize_board(Application* app) {
+static void initialize_board(Application* app) {
     auto& data = app->user_data<Data>();
 
     auto shader = app->res.shader.load(
@@ -88,7 +88,7 @@ void initialize_board(Application* app) {
     material_instance->set_texture("u_material.normal", normal_texture, 1);
 }
 
-void initialize_board_paint(Application* app) {
+static void initialize_board_paint(Application* app) {
     auto& data = app->user_data<Data>();
 
     auto shader = app->res.shader.load(
@@ -160,7 +160,7 @@ void initialize_board_paint(Application* app) {
     material_instance->set_texture("u_material.normal", app->res.texture["board_normal"_h], 1);
 }
 
-void initialize_pieces(Application* app) {
+static void initialize_pieces(Application* app) {
     auto& data = app->user_data<Data>();
 
     auto shader = app->res.shader.load(
@@ -184,6 +184,46 @@ void initialize_pieces(Application* app) {
         }
     );
     app->renderer->setup_shader(shader);
+
+    auto white_piece_vertex_buffer = app->res.buffer.load(
+        "white_piece"_h,
+        app->res.mesh_ptnt["white_piece"_h]->vertices.data(),
+        app->res.mesh_ptnt["white_piece"_h]->vertices.size() * sizeof(PTNT)
+    );
+
+    auto white_piece_index_buffer = app->res.index_buffer.load(
+        "white_piece"_h,
+        app->res.mesh_ptnt["white_piece"_h]->indices.data(),
+        app->res.mesh_ptnt["white_piece"_h]->indices.size() * sizeof(unsigned int)
+    );
+
+    auto black_piece_vertex_buffer = app->res.buffer.load(
+        "black_piece"_h,
+        app->res.mesh_ptnt["black_piece"_h]->vertices.data(),
+        app->res.mesh_ptnt["black_piece"_h]->vertices.size() * sizeof(PTNT)
+    );
+
+    auto black_piece_index_buffer = app->res.index_buffer.load(
+        "black_piece"_h,
+        app->res.mesh_ptnt["black_piece"_h]->indices.data(),
+        app->res.mesh_ptnt["black_piece"_h]->indices.size() * sizeof(unsigned int)
+    );
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Float, 3);
+    layout.add(1, BufferLayout::Float, 2);
+    layout.add(2, BufferLayout::Float, 3);
+    layout.add(3, BufferLayout::Float, 3);
+
+    auto white_piece_vertex_array = app->res.vertex_array.load("white_piece"_h);
+    white_piece_vertex_array->add_buffer(white_piece_vertex_buffer, layout);
+    white_piece_vertex_array->add_index_buffer(white_piece_index_buffer);
+    gl::VertexArray::unbind();
+
+    auto black_piece_vertex_array = app->res.vertex_array.load("black_piece"_h);
+    black_piece_vertex_array->add_buffer(black_piece_vertex_buffer, layout);
+    black_piece_vertex_array->add_index_buffer(black_piece_index_buffer);
+    gl::VertexArray::unbind();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -216,30 +256,6 @@ void initialize_pieces(Application* app) {
     material->add_texture("u_material.normal");
     material->add_uniform(Material::Uniform::Vec3, "u_material.tint");
 
-    auto white_piece_vertex_buffer = app->res.buffer.load(
-        "white_piece"_h,
-        app->res.mesh_ptnt["white_piece"_h]->vertices.data(),
-        app->res.mesh_ptnt["white_piece"_h]->vertices.size() * sizeof(PTNT)
-    );
-
-    auto white_piece_index_buffer = app->res.index_buffer.load(
-        "white_piece"_h,
-        app->res.mesh_ptnt["white_piece"_h]->indices.data(),
-        app->res.mesh_ptnt["white_piece"_h]->indices.size() * sizeof(unsigned int)
-    );
-
-    auto black_piece_vertex_buffer = app->res.buffer.load(
-        "black_piece"_h,
-        app->res.mesh_ptnt["black_piece"_h]->vertices.data(),
-        app->res.mesh_ptnt["black_piece"_h]->vertices.size() * sizeof(PTNT)
-    );
-
-    auto black_piece_index_buffer = app->res.index_buffer.load(
-        "black_piece"_h,
-        app->res.mesh_ptnt["black_piece"_h]->indices.data(),
-        app->res.mesh_ptnt["black_piece"_h]->indices.size() * sizeof(unsigned int)
-    );
-
     app->res.al_buffer.load(
         "piece_place1"_h,
         app->res.sound_data["piece_place1"_h]
@@ -264,42 +280,9 @@ void initialize_pieces(Application* app) {
         "piece_take"_h,
         app->res.sound_data["piece_take"_h]
     );
-
-    for (size_t i = 0; i < 9; i++) {  // FIXME need to rewrite this to accommodate different number of pieces
-        initialize_piece(
-            app, i, white_piece_diffuse_texture, white_piece_vertex_buffer, white_piece_index_buffer
-        );
-    }
-
-    for (size_t i = 9; i < 18; i++) {
-        initialize_piece(
-            app, i, black_piece_diffuse_texture, black_piece_vertex_buffer, black_piece_index_buffer
-        );
-    }
 }
 
-void initialize_piece(
-        Application* app,
-        size_t index,
-        std::shared_ptr<gl::Texture> diffuse_texture,
-        std::shared_ptr<gl::Buffer> vertex_buffer,
-        std::shared_ptr<gl::IndexBuffer> index_buffer) {
-    auto& data = app->user_data<Data>();
-
-    const identifier::Id id = identifier::generate_id();
-    data.piece_ids[index] = id;
-
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 3);
-    layout.add(1, BufferLayout::Float, 2);
-    layout.add(2, BufferLayout::Float, 3);
-    layout.add(3, BufferLayout::Float, 3);
-
-    auto vertex_array = app->res.vertex_array.load(hs {"piece" + std::to_string(index)});
-    vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_index_buffer(index_buffer);
-    gl::VertexArray::unbind();
-
+void initialize_piece(Application* app, size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
     auto material_instance = app->res.material_instance.load(
         hs {"piece" + std::to_string(index)},
         app->res.material["tinted_wood"_h]
@@ -311,7 +294,15 @@ void initialize_piece(
     material_instance->set_vec3("u_material.tint", DEFAULT_TINT);
 }
 
-void initialize_nodes(Application* app) {
+static void initialize_node(Application* app, size_t index) {
+    auto material_instance = app->res.material_instance.load(
+        hs {"node" + std::to_string(index)},
+        app->res.material["basic"_h]
+    );
+    material_instance->set_vec4("u_color", glm::vec4(0.0f));
+}
+
+static void initialize_nodes(Application* app) {
     auto shader = app->res.shader.load(
         "node"_h,
         encr(file_system::path_for_assets(assets::NODE_VERTEX_SHADER)),
@@ -322,9 +313,6 @@ void initialize_nodes(Application* app) {
         }
     );
     app->renderer->setup_shader(shader);
-
-    auto material = app->res.material.load("basic"_h, shader);
-    material->add_uniform(Material::Uniform::Vec4, "u_color");
 
     auto vertex_buffer = app->res.buffer.load(
         "node"_h,
@@ -338,37 +326,23 @@ void initialize_nodes(Application* app) {
         app->res.mesh_p["node"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    for (size_t i = 0; i < 24; i++) {
-        initialize_node(app, i, vertex_buffer, index_buffer);
-    }
-}
-
-void initialize_node(
-        Application* app,
-        size_t index,
-        std::shared_ptr<gl::Buffer> vertex_buffer,
-        std::shared_ptr<gl::IndexBuffer> index_buffer) {
-    auto& data = app->user_data<Data>();
-
-    const identifier::Id id = identifier::generate_id();
-    data.node_ids[index] = id;
-
     BufferLayout layout;
     layout.add(0, BufferLayout::Float, 3);
 
-    auto vertex_array = app->res.vertex_array.load(hs {"node" + std::to_string(index)});
+    auto vertex_array = app->res.vertex_array.load("node"_h);
     vertex_array->add_buffer(vertex_buffer, layout);
     vertex_array->add_index_buffer(index_buffer);
     gl::VertexArray::unbind();
 
-    auto material_instance = app->res.material_instance.load(
-        hs {"node" + std::to_string(index)},
-        app->res.material["basic"_h]
-    );
-    material_instance->set_vec4("u_color", glm::vec4(0.0f));
+    auto material = app->res.material.load("basic"_h, shader);
+    material->add_uniform(Material::Uniform::Vec4, "u_color");
+
+    for (size_t i = 0; i < 24; i++) {
+        initialize_node(app, i);
+    }
 }
 
-void initialize_board_no_normal(Application* app) {
+static void initialize_board_no_normal(Application* app) {
     auto& data = app->user_data<Data>();
 
     auto shader = app->res.shader.load(
@@ -436,7 +410,7 @@ void initialize_board_no_normal(Application* app) {
     material_instance->set_float("u_material.shininess", 4.0f);
 }
 
-void initialize_board_paint_no_normal(Application* app) {
+static void initialize_board_paint_no_normal(Application* app) {
     auto& data = app->user_data<Data>();
 
     auto shader = app->res.shader.load(
@@ -504,7 +478,7 @@ void initialize_board_paint_no_normal(Application* app) {
     material_instance->set_float("u_material.shininess", 4.0f);
 }
 
-void initialize_pieces_no_normal(Application* app) {
+static void initialize_pieces_no_normal(Application* app) {
     auto& data = app->user_data<Data>();
 
     // FIXME maybe should give another name
@@ -528,30 +502,6 @@ void initialize_pieces_no_normal(Application* app) {
         }
     );
     app->renderer->setup_shader(shader);
-
-    gl::TextureSpecification specification;
-    specification.mag_filter = gl::Filter::Linear;
-    specification.mipmapping = true;
-    specification.bias = -1.5f;
-    specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
-
-    auto white_piece_diffuse_texture = app->res.texture.load(
-        "white_piece_diffuse"_h,
-        app->res.texture_data["white_piece_diffuse"_h],
-        specification
-    );
-
-    auto black_piece_diffuse_texture = app->res.texture.load(
-        "black_piece_diffuse"_h,
-        app->res.texture_data["black_piece_diffuse"_h],
-        specification
-    );
-
-    auto material = app->res.material.load("tinted_wood"_h, shader);
-    material->add_texture("u_material.diffuse");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.tint");
 
     auto white_piece_vertex_buffer = app->res.buffer.load(
         "white_piece"_h,
@@ -577,6 +527,45 @@ void initialize_pieces_no_normal(Application* app) {
         app->res.mesh_ptn["black_piece"_h]->indices.size() * sizeof(unsigned int)
     );
 
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Float, 3);
+    layout.add(1, BufferLayout::Float, 2);
+    layout.add(2, BufferLayout::Float, 3);
+
+    auto white_piece_vertex_array = app->res.vertex_array.load("white_piece"_h);
+    white_piece_vertex_array->add_buffer(white_piece_vertex_buffer, layout);
+    white_piece_vertex_array->add_index_buffer(white_piece_index_buffer);
+    gl::VertexArray::unbind();
+
+    auto black_piece_vertex_array = app->res.vertex_array.load("black_piece"_h);
+    black_piece_vertex_array->add_buffer(black_piece_vertex_buffer, layout);
+    black_piece_vertex_array->add_index_buffer(black_piece_index_buffer);
+    gl::VertexArray::unbind();
+
+    gl::TextureSpecification specification;
+    specification.mag_filter = gl::Filter::Linear;
+    specification.mipmapping = true;
+    specification.bias = -1.5f;
+    specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
+
+    auto white_piece_diffuse_texture = app->res.texture.load(
+        "white_piece_diffuse"_h,
+        app->res.texture_data["white_piece_diffuse"_h],
+        specification
+    );
+
+    auto black_piece_diffuse_texture = app->res.texture.load(
+        "black_piece_diffuse"_h,
+        app->res.texture_data["black_piece_diffuse"_h],
+        specification
+    );
+
+    auto material = app->res.material.load("tinted_wood"_h, shader);
+    material->add_texture("u_material.diffuse");
+    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
+    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
+    material->add_uniform(Material::Uniform::Vec3, "u_material.tint");
+
     app->res.al_buffer.load(
         "piece_place1"_h,
         app->res.sound_data["piece_place1"_h]
@@ -601,41 +590,9 @@ void initialize_pieces_no_normal(Application* app) {
         "piece_take"_h,
         app->res.sound_data["piece_take"_h]
     );
-
-    for (size_t i = 0; i < 9; i++) {
-        initialize_piece_no_normal(
-            app, i, white_piece_diffuse_texture, white_piece_vertex_buffer, white_piece_index_buffer
-        );
-    }
-
-    for (size_t i = 9; i < 18; i++) {
-        initialize_piece_no_normal(
-            app, i, black_piece_diffuse_texture, black_piece_vertex_buffer, black_piece_index_buffer
-        );
-    }
 }
 
-void initialize_piece_no_normal(
-        Application* app,
-        size_t index,
-        std::shared_ptr<gl::Texture> diffuse_texture,
-        std::shared_ptr<gl::Buffer> vertex_buffer,
-        std::shared_ptr<gl::IndexBuffer> index_buffer) {
-    auto& data = app->user_data<Data>();
-
-    const identifier::Id id = identifier::generate_id();
-    data.piece_ids[index] = id;
-
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 3);
-    layout.add(1, BufferLayout::Float, 2);
-    layout.add(2, BufferLayout::Float, 3);
-
-    auto vertex_array = app->res.vertex_array.load(hs {"piece" + std::to_string(index)});
-    vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_index_buffer(index_buffer);
-    gl::VertexArray::unbind();
-
+void initialize_piece_no_normal(Application* app, size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
     auto material_instance = app->res.material_instance.load(
         hs {"piece" + std::to_string(index)},
         app->res.material["tinted_wood"_h]
@@ -646,7 +603,7 @@ void initialize_piece_no_normal(
     material_instance->set_vec3("u_material.tint", DEFAULT_TINT);
 }
 
-void initialize_keyboard_controls(Application* app) {
+static void initialize_keyboard_controls(Application* app) {
     auto keyboard_controls = app->res.quad.load("keyboard_controls"_h);
 
     gl::TextureSpecification specification;
@@ -667,7 +624,7 @@ void initialize_keyboard_controls(Application* app) {
     keyboard_controls->texture = texture;
 }
 
-void initialize_light_bulb(Application* app) {
+static void initialize_light_bulb(Application* app) {
     auto light_bulb = app->res.quad.load("light_bulb"_h);
 
     gl::TextureSpecification specification;
@@ -683,7 +640,7 @@ void initialize_light_bulb(Application* app) {
     light_bulb->texture = light_bulb_texture;
 }
 
-void initialize_skybox(Application* app) {
+static void initialize_skybox(Application* app) {
     if (app->user_data<Data>().options.skybox == game_options::NONE) {
         DEB_DEBUG("Initialized skybox");
         return;
@@ -704,7 +661,7 @@ void initialize_skybox(Application* app) {
     DEB_DEBUG("Initialized skybox");
 }
 
-void initialize_light(Application* app) {
+static void initialize_light(Application* app) {
     auto& data = app->user_data<Data>();
 
     if (data.options.skybox == game_options::FIELD) {
@@ -733,7 +690,7 @@ void initialize_light(Application* app) {
     DEB_DEBUG("Initialized light");
 }
 
-void initialize_indicators_textures(Application* app) {
+static void initialize_indicators_textures(Application* app) {
     gl::TextureSpecification specification;
     specification.min_filter = gl::Filter::Linear;
     specification.mag_filter = gl::Filter::Linear;
@@ -854,8 +811,22 @@ void setup_computer_thinking_indicator(Application* app) {
     computer_thinking_indicator->scale(0.4f, 1.0f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
 }
 
+static void initialize_ids(Application* app) {
+    auto& data = app->user_data<Data>();
+
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        data.node_ids[i] = identifier::generate_id();
+    }
+
+    for (size_t i = 0; i < MAX_PIECES; i++) {
+        data.piece_ids[i] = identifier::generate_id();
+    }
+}
+
 void initialize_game(Application* app) {
     auto& data = app->user_data<Data>();
+
+    initialize_ids(app);
 
     if (data.launcher_options.normal_mapping) {
         initialize_board(app);

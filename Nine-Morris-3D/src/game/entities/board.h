@@ -56,25 +56,24 @@ struct Board {
     std::shared_ptr<Renderer::Model> model;
     std::shared_ptr<Renderer::Model> paint_model;
 
-    std::array<Node, 24> nodes;  // 24 ordered nodes
+    std::array<Node, MAX_NODES> nodes;  // 24 ordered nodes
     std::unordered_map<size_t, Piece> pieces;  // Any number of pieces
 
     BoardPhase phase = BoardPhase::PlacePieces;
     BoardPlayer turn = BoardPlayer::White;
     BoardEnding ending;
 
-    bool must_take_piece = false;
-
     size_t clicked_node_index = NULL_INDEX;
     size_t clicked_piece_index = NULL_INDEX;
     size_t selected_piece_index = NULL_INDEX;
 
-    std::array<bool, 2> can_jump = { false, false };  // White first and black second
-
     ThreefoldRepetitionHistory repetition_history;
 
+    bool must_take_piece = false;
     bool next_move = true;  // It is false when any piece is in the air, true otherwise
     bool is_players_turn = false;
+
+    size_t turn_count = 0;
 
     struct Flags {
         bool did_action = false;

@@ -626,9 +626,10 @@ void ImGuiLayer<S, B>::draw_debug() {
         // ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
         // ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
         // ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
-        ImGui::Text("Can jump: %s, %s", scene->board.can_jump[0] ? "true" : "false", scene->board.can_jump[1] ? "true" : "false");
+        // ImGui::Text("Can jump: %s, %s", scene->board.can_jump[0] ? "true" : "false", scene->board.can_jump[1] ? "true" : "false");
         ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
         ImGui::Text("Turn: %s", scene->board.turn == BoardPlayer::White ? "white" : "black");
+        ImGui::Text("Turn count: %lu", scene->board.turn_count);
         ImGui::Text("Must take piece: %s", scene->board.must_take_piece ? "true" : "false");
         ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
         ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());

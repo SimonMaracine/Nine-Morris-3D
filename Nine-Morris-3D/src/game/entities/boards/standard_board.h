@@ -39,6 +39,8 @@ struct StandardBoard : public Board {
     void to_serialized(StandardBoardSerialized& serialized);
     void from_serialized(const StandardBoardSerialized& serialized);
 
+    std::array<bool, 2> can_jump = { false, false };  // White first and black second
+
     unsigned int white_pieces_count = 0;  // Number of pieces on the board
     unsigned int black_pieces_count = 0;
     unsigned int not_placed_white_pieces_count = 9;  // Number of pieces floating

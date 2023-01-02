@@ -33,9 +33,9 @@ struct StandardGameScene : public Scene {
     void on_key_released(const KeyReleasedEvent& event);
     void on_window_resized(const WindowResizedEvent& event);
 
-    void setup_and_add_model_nodes();
     void setup_and_add_model_pieces();
 
+    void initialize_pieces();
     void setup_entities();
 
     void save_game();

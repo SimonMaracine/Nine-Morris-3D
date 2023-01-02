@@ -399,6 +399,7 @@ void StandardBoard::switch_turn_and_check_turns_without_mills() {
 
     turn = TURN_IS_WHITE_SO(BoardPlayer::Black, BoardPlayer::White);
     flags.switched_turn = true;
+    turn_count++;
 }
 
 bool StandardBoard::can_go(size_t piece_index, size_t destination_node_index) {
@@ -821,10 +822,11 @@ void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
     serialized.phase = phase;
     serialized.turn = turn;
     serialized.ending = ending;
-    serialized.must_take_piece = must_take_piece;
     serialized.can_jump = can_jump;
     serialized.repetition_history = repetition_history;
     serialized.is_players_turn = is_players_turn;
+    serialized.must_take_piece = must_take_piece;
+    serialized.turn_count = turn_count;
     serialized.white_pieces_count = white_pieces_count;
     serialized.black_pieces_count = black_pieces_count;
     serialized.not_placed_white_pieces_count = not_placed_white_pieces_count;
@@ -907,10 +909,11 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
     phase = serialized.phase;
     turn = serialized.turn;
     ending = serialized.ending;
-    must_take_piece = serialized.must_take_piece;
     can_jump = serialized.can_jump;
     repetition_history = serialized.repetition_history;
+    must_take_piece = serialized.must_take_piece;
     is_players_turn = serialized.is_players_turn;
+    turn_count = serialized.turn_count;
     white_pieces_count = serialized.white_pieces_count;
     black_pieces_count = serialized.black_pieces_count;
     not_placed_white_pieces_count = serialized.not_placed_white_pieces_count;

@@ -23,18 +23,19 @@ using namespace encrypt;
 void StandardGameScene::on_start() {
     auto& data = app->user_data<Data>();
 
+    initialize_pieces();
     setup_entities();
-    setup_camera(app, this);
 
     setup_and_add_model_board(app, this);
     setup_and_add_model_board_paint(app, this);
-    setup_and_add_model_nodes();
+    setup_and_add_model_nodes(app, this);
     setup_and_add_model_pieces();
 
     setup_and_add_turn_indicator(app);
     setup_and_add_timer_text(app);
     setup_wait_indicator(app);
     setup_computer_thinking_indicator(app);
+    setup_camera(app, this);
 
     update_turn_indicator(app, this);
 
@@ -95,6 +96,11 @@ void StandardGameScene::on_stop() {
     camera_controller.remove_events(app);
     app->renderer->clear();
     app->gui_renderer->clear();
+
+    // Delete all piece material instances
+    for (size_t i = 0; i < MAX_PIECES; i++) {
+        app->res.material_instance.release(hs {"piece" + std::to_string(i)});
+    }
 
     made_first_move = false;
 
@@ -301,20 +307,13 @@ void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
     camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
 }
 
-void StandardGameScene::setup_and_add_model_nodes() {
-    for (size_t i = 0; i < 24; i++) {
-        setup_and_add_model_node(app, this, i, NODE_POSITIONS[i]);
-    }
-}
-
 void StandardGameScene::setup_and_add_model_pieces() {
     for (size_t i = 0; i < 9; i++) {
         setup_and_add_model_piece(
             app,
             this,
             i,
-            WHITE_PIECE_POSITION(i),
-            app->res.index_buffer["white_piece"_h]
+            WHITE_PIECE_POSITION(i)
         );
     }
 
@@ -323,8 +322,7 @@ void StandardGameScene::setup_and_add_model_pieces() {
             app,
             this,
             i,
-            BLACK_PIECE_POSITION(i),
-            app->res.index_buffer["black_piece"_h]
+            BLACK_PIECE_POSITION(i)
         );
     }
 }
@@ -338,7 +336,7 @@ void StandardGameScene::setup_entities() {
         board.pieces[i] = Piece {
             i,
             PieceType::White,
-            app->res.model.load(hs {"piece" + std::to_string(i)}),  // FIXME delete models and sources after scene
+            app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
     }
@@ -359,6 +357,28 @@ void StandardGameScene::setup_entities() {
     }
 
     DEB_DEBUG("Setup entities");
+}
+
+void StandardGameScene::initialize_pieces() {
+    auto& data = app->user_data<Data>();
+
+    if (data.launcher_options.normal_mapping) {
+        for (size_t i = 0; i < 9; i++) {
+            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_h]);
+        }
+
+        for (size_t i = 9; i < 18; i++) {
+            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_h]);
+        }
+    } else {
+        for (size_t i = 0; i < 9; i++) {
+            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_h]);
+        }
+
+        for (size_t i = 9; i < 18; i++) {
+            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_h]);
+        }
+    }
 }
 
 void StandardGameScene::save_game() {
@@ -455,7 +475,7 @@ void StandardGameScene::undo() {
     DEB_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
 
     game.state = GameState::MaybeNextPlayer;
-    made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;
+    made_first_move = board.turn_count != 0;
 
     if (undo_game_over) {
         timer.start();
@@ -490,7 +510,7 @@ void StandardGameScene::redo() {
     DEB_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
 
     game.state = GameState::MaybeNextPlayer;
-    made_first_move = board.not_placed_white_pieces_count + board.not_placed_black_pieces_count != 18;
+    made_first_move = board.turn_count != 0;
 
     const bool redo_game_over = board.phase == BoardPhase::None;
 
