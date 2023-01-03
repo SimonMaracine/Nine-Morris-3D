@@ -73,7 +73,7 @@ struct Board {
     bool next_move = true;  // It is false when any piece is in the air, true otherwise
     bool is_players_turn = false;
 
-    size_t turn_count = 0;
+    size_t turn_count = 0;  // TODO doesn't need to be size_t
 
     struct Flags {
         bool did_action = false;

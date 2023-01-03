@@ -122,6 +122,7 @@ void JumpVariantScene::on_stop() {
 
 void JumpVariantScene::on_awake() {
     imgui_layer = ImGuiLayer<JumpVariantScene, JumpBoardSerialized> {app, this};
+    save_game_file_name = save_load::save_game_file_name(get_name());
 
     using namespace assets_load;
 
@@ -522,4 +523,8 @@ void JumpVariantScene::redo() {
 
     update_cursor(app, this);
     update_turn_indicator(app, this);
+}
+
+void JumpVariantScene::imgui_draw_debug() {
+    ImGui::Text("Turns without mills: %u", board.turns_without_mills);
 }

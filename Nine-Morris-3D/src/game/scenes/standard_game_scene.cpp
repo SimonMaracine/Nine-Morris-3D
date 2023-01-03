@@ -123,6 +123,7 @@ void StandardGameScene::on_stop() {
 
 void StandardGameScene::on_awake() {
     imgui_layer = ImGuiLayer<StandardGameScene, StandardBoardSerialized> {app, this};
+    save_game_file_name = save_load::save_game_file_name(get_name());
 
     using namespace assets_load;
 
@@ -523,4 +524,11 @@ void StandardGameScene::redo() {
 
     update_cursor(app, this);
     update_turn_indicator(app, this);
+}
+
+void StandardGameScene::imgui_draw_debug() {
+    ImGui::Text("White and black pieces: %u, %u", board.white_pieces_count, board.black_pieces_count);
+    ImGui::Text("Not placed pieces: %u, %u", board.not_placed_white_pieces_count, board.not_placed_black_pieces_count);
+    ImGui::Text("Can jump: %s, %s", board.can_jump[0] ? "true" : "false", board.can_jump[1] ? "true" : "false");
+    ImGui::Text("Turns without mills: %u", board.turns_without_mills);
 }

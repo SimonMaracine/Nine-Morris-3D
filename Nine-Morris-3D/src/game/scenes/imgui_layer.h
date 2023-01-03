@@ -4,6 +4,8 @@
 #include <engine/engine_audio.h>
 #include <engine/engine_other.h>
 
+#include "game/entities/boards/standard_board.h"
+#include "game/entities/boards/jump_board.h"
 #include "game/scenes/common.h"
 #include "game/save_load.h"
 #include "game/game_options.h"
@@ -635,158 +637,155 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
 #ifdef NM3D_PLATFORM_DEBUG
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_debug() {
-    if (!show_about) {
-        ImGui::Begin("Debug");
-        ImGui::Text("FPS: %.3f", app->get_fps());
-        // ImGui::Text("White pieces: %u", scene->board.white_pieces_count);  // FIXME this
-        // ImGui::Text("Black pieces: %u", scene->board.black_pieces_count);
-        // ImGui::Text("Not placed white pieces: %u", scene->board.not_placed_white_pieces_count);
-        // ImGui::Text("Not placed black pieces: %u", scene->board.not_placed_black_pieces_count);
-        // ImGui::Text("Can jump: %s, %s", scene->board.can_jump[0] ? "true" : "false", scene->board.can_jump[1] ? "true" : "false");
-        ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
-        ImGui::Text("Turn: %s", scene->board.turn == BoardPlayer::White ? "white" : "black");
-        ImGui::Text("Turn count: %lu", scene->board.turn_count);
-        ImGui::Text("Must take piece: %s", scene->board.must_take_piece ? "true" : "false");
-        ImGui::Text("Turns without mills: %u", scene->board.turns_without_mills);
-        ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());
-        ImGui::Text("Redo history size: %lu", scene->undo_redo_state.redo.size());
-        ImGui::Text("Hovered ID: %.3f", static_cast<float>(app->renderer->get_hovered_id()));
-        ImGui::Text("Clicked node: %lu", scene->board.clicked_node_index);
-        ImGui::Text("Clicked piece: %lu", scene->board.clicked_piece_index);
-        ImGui::Text("Selected piece: %lu", scene->board.selected_piece_index);
-        ImGui::Text("Is player's turn: %s", scene->board.is_players_turn ? "true" : "false");
-        ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
-        ImGui::Text("Game started: %s", scene->made_first_move ? "true" : "false");
-        ImGui::End();
+    if (show_about) {
+        return;
+    }
 
-        {
-            const float time = app->get_delta() * 1000.0f;
-            frames[index] = time;
+    ImGui::Begin("Debug");
+    ImGui::Text("FPS: %.3f", app->get_fps());
+    scene->imgui_draw_debug();
+    ImGui::Text("Phase: %d", static_cast<int>(scene->board.phase));
+    ImGui::Text("Turn: %s", scene->board.turn == BoardPlayer::White ? "white" : "black");
+    ImGui::Text("Turn count: %lu", scene->board.turn_count);
+    ImGui::Text("Must take piece: %s", scene->board.must_take_piece ? "true" : "false");
+    ImGui::Text("Undo history size: %lu", scene->undo_redo_state.undo.size());
+    ImGui::Text("Redo history size: %lu", scene->undo_redo_state.redo.size());
+    ImGui::Text("Hovered ID: %.3f", static_cast<float>(app->renderer->get_hovered_id()));
+    ImGui::Text("Clicked node: %lu", scene->board.clicked_node_index);
+    ImGui::Text("Clicked piece: %lu", scene->board.clicked_piece_index);
+    ImGui::Text("Selected piece: %lu", scene->board.selected_piece_index);
+    ImGui::Text("Is player's turn: %s", scene->board.is_players_turn ? "true" : "false");
+    ImGui::Text("Next move: %s", scene->board.next_move ? "true" : "false");
+    ImGui::Text("Game started: %s", scene->made_first_move ? "true" : "false");
+    ImGui::End();
 
-            if (index < FRAMES_SIZE) {
-                index++;
-                frames.push_back(time);
-            } else {
-                frames.push_back(time);
-                frames.erase(frames.begin());
-            }
+    {
+        const float time = app->get_delta() * 1000.0f;
+        frames[index] = time;
 
-            char text[32];
-            snprintf(text, 32, "%.3f", time);
-
-            ImGui::Begin("Frame Time");
-            ImGui::PlotLines("time (ms)", frames.data(), FRAMES_SIZE, 0, text, 0.0f, 50.0f, ImVec2(200, 60));
-            ImGui::End();
+        if (index < FRAMES_SIZE) {
+            index++;
+            frames.push_back(time);
+        } else {
+            frames.push_back(time);
+            frames.erase(frames.begin());
         }
 
-        ImGui::Begin("Game");
-        std::string state;
-        switch (scene->game.state) {
-            case GameState::MaybeNextPlayer:
-                state = "MaybeNextPlayer";
-                break;
-            case GameState::HumanBeginMove:
-                state = "HumanBeginMove";
-                break;
-            case GameState::HumanThinkingMove:
-                state = "HumanThinkingMove";
-                break;
-            case GameState::HumanDoingMove:
-                state = "HumanDoingMove";
-                break;
-            case GameState::HumanEndMove:
-                state = "HumanEndMove";
-                break;
-            case GameState::ComputerBeginMove:
-                state = "ComputerBeginMove";
-                break;
-            case GameState::ComputerThinkingMove:
-                state = "ComputerThinkingMove";
-                break;
-            case GameState::ComputerDoingMove:
-                state = "ComputerDoingMove";
-                break;
-            case GameState::ComputerEndMove:
-                state = "ComputerEndMove";
-                break;
-        }
-        ImGui::Text("State: %s", state.c_str());
-        ImGui::Text("White player: %s", scene->game.white_player == GamePlayer::Human ? "Human" : "Computer");
-        ImGui::Text("Black player: %s", scene->game.black_player == GamePlayer::Human ? "Human" : "Computer");
-        ImGui::End();
+        char text[32];
+        snprintf(text, 32, "%.3f", time);
 
-        ImGui::Begin("Light Settings");
-        if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position), -30.0f, 30.0f)) {
-            app->res.quad["light_bulb"_h]->position = app->renderer->light.position;
-        }
-        ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color), 0.0f, 1.0f);
-        ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color), 0.0f, 1.0f);
-        ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color), 0.0f, 1.0f);
-        ImGui::End();
-
-        // If you recompile shaders, uniforms that are set only once need to be reuploaded
-        /*
-        ImGui::Begin("Shaders");  // TODO see what to do with this
-        if (ImGui::Button("board_paint")) {
-            // app->data.board_paint_shader->recompile();
-        }
-        if (ImGui::Button("board")) {
-            // app->data.board_wood_shader->recompile();
-        }
-        if (ImGui::Button("node")) {
-            // app->data.node_shader->recompile();
-        }
-        if (ImGui::Button("origin")) {
-            // app->renderer->get_origin_shader()->recompile();
-        }
-        if (ImGui::Button("outline")) {
-            // app->renderer->get_outline_shader()->recompile();
-        }
-        if (ImGui::Button("piece")) {
-            // app->data.piece_shader->recompile();
-        }
-        if (ImGui::Button("quad2d")) {
-            // app->gui_renderer->get_quad2d_shader()->recompile();
-        }
-        if (ImGui::Button("quad3d")) {
-            // app->renderer->get_quad3d_shader()->recompile();
-        }
-        if (ImGui::Button("screen_quad")) {
-            // app->renderer->get_screen_quad_shader()->recompile();
-        }
-        if (ImGui::Button("shadow")) {
-            // app->renderer->get_shadow_shader()->recompile();
-        }
-        if (ImGui::Button("skybox")) {
-            // app->renderer->get_skybox_shader()->recompile();
-        }
-        if (ImGui::Button("text")) {
-            // app->gui_renderer->get_text_shader()->recompile();
-        }
-        ImGui::End();
-        */
-
-        const glm::vec3& position = scene->camera_controller.get_position();
-        const glm::vec3& rotation = scene->camera_controller.get_rotation();
-
-        ImGui::Begin("Camera");
-        ImGui::Text("Position: %.3f, %.3f, %.3f", position.x, position.y, position.z);
-        ImGui::Text("Pitch: %.3f", rotation.x);
-        ImGui::Text("Yaw: %.3f", rotation.y);
-        ImGui::Text("Angle around point: %.3f", scene->camera_controller.get_angle_around_point());
-        ImGui::Text("Distance to point: %.3f", scene->camera_controller.get_distance_to_point());
-        ImGui::End();
-
-        ImGui::Begin("Light Space Matrix");
-        ImGui::SliderFloat("Left", &app->renderer->light_space.left, -10.0f, 10.0f);
-        ImGui::SliderFloat("Right", &app->renderer->light_space.right, -10.0f, 10.0f);
-        ImGui::SliderFloat("Bottom", &app->renderer->light_space.bottom, -10.0f, 10.0f);
-        ImGui::SliderFloat("Top", &app->renderer->light_space.top, -10.0f, 10.0f);
-        ImGui::SliderFloat("Near", &app->renderer->light_space.lens_near, 0.1f, 2.0f);
-        ImGui::SliderFloat("Far", &app->renderer->light_space.lens_far, 2.0f, 50.0f);
-        ImGui::SliderFloat("Light divisor", &app->renderer->light_space.light_divisor, 1.0f, 10.0f);
+        ImGui::Begin("Frame Time");
+        ImGui::PlotLines("time (ms)", frames.data(), FRAMES_SIZE, 0, text, 0.0f, 50.0f, ImVec2(200, 60));
         ImGui::End();
     }
+
+    ImGui::Begin("Game");
+    std::string state;
+    switch (scene->game.state) {
+        case GameState::MaybeNextPlayer:
+            state = "MaybeNextPlayer";
+            break;
+        case GameState::HumanBeginMove:
+            state = "HumanBeginMove";
+            break;
+        case GameState::HumanThinkingMove:
+            state = "HumanThinkingMove";
+            break;
+        case GameState::HumanDoingMove:
+            state = "HumanDoingMove";
+            break;
+        case GameState::HumanEndMove:
+            state = "HumanEndMove";
+            break;
+        case GameState::ComputerBeginMove:
+            state = "ComputerBeginMove";
+            break;
+        case GameState::ComputerThinkingMove:
+            state = "ComputerThinkingMove";
+            break;
+        case GameState::ComputerDoingMove:
+            state = "ComputerDoingMove";
+            break;
+        case GameState::ComputerEndMove:
+            state = "ComputerEndMove";
+            break;
+    }
+    ImGui::Text("State: %s", state.c_str());
+    ImGui::Text("White player: %s", scene->game.white_player == GamePlayer::Human ? "Human" : "Computer");
+    ImGui::Text("Black player: %s", scene->game.black_player == GamePlayer::Human ? "Human" : "Computer");
+    ImGui::End();
+
+    ImGui::Begin("Light Settings");
+    if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position), -30.0f, 30.0f)) {
+        app->res.quad["light_bulb"_h]->position = app->renderer->light.position;
+    }
+    ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color), 0.0f, 1.0f);
+    ImGui::End();
+
+    // If you recompile shaders, uniforms that are set only once need to be reuploaded
+    /*
+    ImGui::Begin("Shaders");  // TODO see what to do with this
+    if (ImGui::Button("board_paint")) {
+        // app->data.board_paint_shader->recompile();
+    }
+    if (ImGui::Button("board")) {
+        // app->data.board_wood_shader->recompile();
+    }
+    if (ImGui::Button("node")) {
+        // app->data.node_shader->recompile();
+    }
+    if (ImGui::Button("origin")) {
+        // app->renderer->get_origin_shader()->recompile();
+    }
+    if (ImGui::Button("outline")) {
+        // app->renderer->get_outline_shader()->recompile();
+    }
+    if (ImGui::Button("piece")) {
+        // app->data.piece_shader->recompile();
+    }
+    if (ImGui::Button("quad2d")) {
+        // app->gui_renderer->get_quad2d_shader()->recompile();
+    }
+    if (ImGui::Button("quad3d")) {
+        // app->renderer->get_quad3d_shader()->recompile();
+    }
+    if (ImGui::Button("screen_quad")) {
+        // app->renderer->get_screen_quad_shader()->recompile();
+    }
+    if (ImGui::Button("shadow")) {
+        // app->renderer->get_shadow_shader()->recompile();
+    }
+    if (ImGui::Button("skybox")) {
+        // app->renderer->get_skybox_shader()->recompile();
+    }
+    if (ImGui::Button("text")) {
+        // app->gui_renderer->get_text_shader()->recompile();
+    }
+    ImGui::End();
+    */
+
+    const glm::vec3& position = scene->camera_controller.get_position();
+    const glm::vec3& rotation = scene->camera_controller.get_rotation();
+
+    ImGui::Begin("Camera");
+    ImGui::Text("Position: %.3f, %.3f, %.3f", position.x, position.y, position.z);
+    ImGui::Text("Pitch: %.3f", rotation.x);
+    ImGui::Text("Yaw: %.3f", rotation.y);
+    ImGui::Text("Angle around point: %.3f", scene->camera_controller.get_angle_around_point());
+    ImGui::Text("Distance to point: %.3f", scene->camera_controller.get_distance_to_point());
+    ImGui::End();
+
+    ImGui::Begin("Light Space Matrix");
+    ImGui::SliderFloat("Left", &app->renderer->light_space.left, -10.0f, 10.0f);
+    ImGui::SliderFloat("Right", &app->renderer->light_space.right, -10.0f, 10.0f);
+    ImGui::SliderFloat("Bottom", &app->renderer->light_space.bottom, -10.0f, 10.0f);
+    ImGui::SliderFloat("Top", &app->renderer->light_space.top, -10.0f, 10.0f);
+    ImGui::SliderFloat("Near", &app->renderer->light_space.lens_near, 0.1f, 2.0f);
+    ImGui::SliderFloat("Far", &app->renderer->light_space.lens_far, 2.0f, 50.0f);
+    ImGui::SliderFloat("Light divisor", &app->renderer->light_space.light_divisor, 1.0f, 10.0f);
+    ImGui::End();
 }
 #endif
 
