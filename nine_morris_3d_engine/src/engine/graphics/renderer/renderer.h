@@ -112,7 +112,7 @@ private:
     void draw_bounding_boxes();
     void setup_shadows();
     void setup_uniform_buffers();
-    void check_hovered_id(int x, int y);
+    void validate_hovered_id(int x, int y);
     void cache_camera_data();
     void on_window_resized(const WindowResizedEvent& event);
 

@@ -391,7 +391,7 @@ void Renderer::render() {
     framebuffer_reader.get<float>(&data);
     hovered_id = *data;
 
-    check_hovered_id(x, y);
+    validate_hovered_id(mouse_x, mouse_y);
 }
 
 void Renderer::add_model(std::shared_ptr<Model> model) {
@@ -827,7 +827,7 @@ void Renderer::setup_uniform_buffers() {
     storage.light_view_position_uniform_buffer->upload_data();
 }
 
-void Renderer::check_hovered_id(int x, int y) {
+void Renderer::validate_hovered_id(int x, int y) {
     if (x > app->data().width || x < 0 || y > app->data().height || y < 0) {
         hovered_id = identifier::null;
     }
