@@ -560,6 +560,8 @@ void ImGuiLayer<S, B>::draw_about() {
             show_about = false;
         }
 
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
         ImGui::EndPopup();
     }
     ImGui::PopFont();
@@ -592,6 +594,8 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
             show_could_not_load_game = false;
         }
 
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
         ImGui::EndPopup();
     }
     ImGui::PopFont();
@@ -610,7 +614,7 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
-        ImGui::Text("There is no last game saved.");
+        ImGui::Text("There is no last saved game.");
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
@@ -620,6 +624,8 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
             ImGui::CloseCurrentPopup();
             show_no_last_game = false;
         }
+
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         ImGui::EndPopup();
     }
