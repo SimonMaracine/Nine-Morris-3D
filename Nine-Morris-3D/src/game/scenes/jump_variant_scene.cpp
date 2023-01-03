@@ -124,13 +124,11 @@ void JumpVariantScene::on_awake() {
     imgui_layer = ImGuiLayer<JumpVariantScene, JumpBoardSerialized> {app, this};
     save_game_file_name = save_load::save_game_file_name(get_name());
 
-    using namespace assets_load;
-
-    skybox_loader = std::make_unique<SkyboxLoader>(
-        skybox, std::bind(change_skybox, app)
+    skybox_loader = std::make_unique<assets_load::SkyboxLoader>(
+        assets_load::skybox, std::bind(change_skybox, app)
     );
-    board_paint_texture_loader = std::make_unique<BoardPaintTextureLoader>(
-        board_paint_texture, std::bind(change_board_paint_texture, app)
+    board_paint_texture_loader = std::make_unique<assets_load::BoardPaintTextureLoader>(
+        assets_load::board_paint_texture, std::bind(change_board_paint_texture, app)
     );
 }
 
@@ -149,7 +147,6 @@ void JumpVariantScene::on_update() {
     update_listener(app, this);
 
     update_game_state(app, this);
-
     update_timer_text(app, this);
     update_wait_indicator(app, this);
     update_computer_thinking_indicator(app, this);
@@ -163,29 +160,7 @@ void JumpVariantScene::on_fixed_update() {
 }
 
 void JumpVariantScene::on_imgui_update() {
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(app->data().width, app->data().height);
-    io.DeltaTime = app->get_delta();
-
-    imgui_layer.draw_menu_bar();
-
-    if (imgui_layer.show_about) {
-        imgui_layer.draw_about();
-    } else if (imgui_layer.show_could_not_load_game) {
-        imgui_layer.draw_could_not_load_game();
-    } else if (imgui_layer.show_no_last_game) {
-        imgui_layer.draw_no_last_game();
-    } else if (board.phase == BoardPhase::GameOver && board.next_move) {
-        imgui_layer.draw_game_over();
-    }
-
-    if (imgui_layer.show_info && !imgui_layer.show_about) {
-        imgui_layer.draw_info();
-    }
-
-#ifdef NM3D_PLATFORM_DEBUG
-    imgui_layer.draw_debug();
-#endif
+    update_all_imgui(app, this);
 }
 
 void JumpVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
@@ -306,15 +281,17 @@ void JumpVariantScene::on_window_resized(const WindowResizedEvent& event) {
 }
 
 void JumpVariantScene::setup_and_add_model_pieces() {
+    size_t index = 0;
+
     // White pieces
-    setup_piece_on_node(app, this, 0, 15);
-    setup_piece_on_node(app, this, 1, 4);
-    setup_piece_on_node(app, this, 2, 13);
+    setup_piece_on_node(app, this, index++, 15);
+    setup_piece_on_node(app, this, index++, 4);
+    setup_piece_on_node(app, this, index++, 13);
 
     // Black pieces
-    setup_piece_on_node(app, this, 3, 5);
-    setup_piece_on_node(app, this, 4, 11);
-    setup_piece_on_node(app, this, 5, 16);
+    setup_piece_on_node(app, this, index++, 5);
+    setup_piece_on_node(app, this, index++, 11);
+    setup_piece_on_node(app, this, index++, 16);
 }
 
 void JumpVariantScene::initialize_pieces() {
@@ -370,7 +347,7 @@ void JumpVariantScene::setup_entities() {
         board.pieces[i] = piece;
     }
 
-    for (size_t i = 0; i < 24; i++) {
+    for (size_t i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
             i, app->res.model.load(hs {"node" + std::to_string(i)})
         };

@@ -200,6 +200,14 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                         DEB_INFO("Changed scene to jump variant");
                     }
                 }
+                if (ImGui::RadioButton("Jump Plus Variant", &data.imgui_option.scene, game_options::JUMP_PLUS)) {
+                    if (data.imgui_option.scene != data.options.scene) {
+                        data.options.scene = data.imgui_option.scene;
+                        app->change_scene("jump_plus_variant");
+
+                        DEB_INFO("Changed scene to jump plus variant");
+                    }
+                }
 
                 ImGui::EndMenu();
                 HOVERING_GUI()

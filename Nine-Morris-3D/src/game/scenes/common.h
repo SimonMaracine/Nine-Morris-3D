@@ -382,3 +382,32 @@ void setup_piece_on_node(Application* app, S* scene, size_t index, size_t node_i
     scene->board.pieces.at(index).node_index = node_index;
     scene->board.nodes.at(node_index).piece_index = index;
 }
+
+template<typename S>
+void update_all_imgui(Application* app, S* scene) {
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2(app->data().width, app->data().height);
+    io.DeltaTime = app->get_delta();
+
+    auto& imgui_layer = scene->imgui_layer;
+
+    imgui_layer.draw_menu_bar();
+
+    if (imgui_layer.show_about) {
+        imgui_layer.draw_about();
+    } else if (imgui_layer.show_could_not_load_game) {
+        imgui_layer.draw_could_not_load_game();
+    } else if (imgui_layer.show_no_last_game) {
+        imgui_layer.draw_no_last_game();
+    } else if (scene->board.phase == BoardPhase::GameOver && scene->board.next_move) {
+        imgui_layer.draw_game_over();
+    }
+
+    if (imgui_layer.show_info && !imgui_layer.show_about) {
+        imgui_layer.draw_info();
+    }
+
+#ifdef NM3D_PLATFORM_DEBUG
+    imgui_layer.draw_debug();
+#endif
+}

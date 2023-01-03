@@ -9,7 +9,7 @@
 #include "game/undo_redo_state.h"
 #include "other/constants.h"
 
-struct JumpBoard : public Board {
+struct JumpBoard : public Board {  // Also good for jump plus variant
     JumpBoard() = default;
     virtual ~JumpBoard() = default;
 

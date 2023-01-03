@@ -1,13 +1,12 @@
-#include <engine/engine_application.h>
 #include <engine/engine_audio.h>
 #include <engine/engine_graphics.h>
 #include <engine/engine_other.h>
 
-#include "game/entities/boards/standard_board.h"
-#include "game/entities/serialization/standard_board_serialized.h"
+#include "game/entities/boards/jump_board.h"
+#include "game/entities/serialization/jump_board_serialized.h"
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
-#include "game/scenes/standard_game_scene.h"
+#include "game/scenes/jump_plus_variant_scene.h"
 #include "game/scenes/imgui_layer.h"
 #include "game/scenes/common.h"
 #include "game/game_options.h"
@@ -20,7 +19,7 @@
 
 using namespace encrypt;
 
-void StandardGameScene::on_start() {
+void JumpPlusVariantScene::on_start() {
     auto& data = app->user_data<Data>();
 
     initialize_pieces();
@@ -42,7 +41,7 @@ void StandardGameScene::on_start() {
     keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_h]};
     keyboard.post_initialize();
 
-    undo_redo_state = UndoRedoState<StandardBoardSerialized> {};
+    undo_redo_state = UndoRedoState<JumpBoardSerialized> {};
 
     minimax_thread = MinimaxThread {&board};
 
@@ -76,14 +75,14 @@ void StandardGameScene::on_start() {
     app->res.texture_data.clear();
     app->res.sound_data.clear();
 
-    app->evt.add_event<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
-    app->evt.add_event<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
-    app->evt.add_event<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
-    app->evt.add_event<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
-    app->evt.add_event<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
+    app->evt.add_event<MouseButtonPressedEvent, &JumpPlusVariantScene::on_mouse_button_pressed>(this);
+    app->evt.add_event<MouseButtonReleasedEvent, &JumpPlusVariantScene::on_mouse_button_released>(this);
+    app->evt.add_event<KeyPressedEvent, &JumpPlusVariantScene::on_key_pressed>(this);
+    app->evt.add_event<KeyReleasedEvent, &JumpPlusVariantScene::on_key_released>(this);
+    app->evt.add_event<WindowResizedEvent, &JumpPlusVariantScene::on_window_resized>(this);
 }
 
-void StandardGameScene::on_stop() {
+void JumpPlusVariantScene::on_stop() {
     auto& data = app->user_data<Data>();
 
     options_gracefully::save_to_file<game_options::GameOptions>(
@@ -121,8 +120,8 @@ void StandardGameScene::on_stop() {
     app->evt.remove_events(this);
 }
 
-void StandardGameScene::on_awake() {
-    imgui_layer = ImGuiLayer<StandardGameScene, StandardBoardSerialized> {app, this};
+void JumpPlusVariantScene::on_awake() {
+    imgui_layer = ImGuiLayer<JumpPlusVariantScene, JumpBoardSerialized> {app, this};
     save_game_file_name = save_load::save_game_file_name(get_name());
 
     skybox_loader = std::make_unique<assets_load::SkyboxLoader>(
@@ -133,7 +132,7 @@ void StandardGameScene::on_awake() {
     );
 }
 
-void StandardGameScene::on_update() {
+void JumpPlusVariantScene::on_update() {
     if (!imgui_layer.hovering_gui) {
         camera_controller.update_controls(app->get_delta());
         board.update_nodes(app->renderer->get_hovered_id());
@@ -156,15 +155,15 @@ void StandardGameScene::on_update() {
     board_paint_texture_loader->update(app);
 }
 
-void StandardGameScene::on_fixed_update() {
+void JumpPlusVariantScene::on_fixed_update() {
     camera_controller.update_friction();
 }
 
-void StandardGameScene::on_imgui_update() {
+void JumpPlusVariantScene::on_imgui_update() {
     update_all_imgui(app, this);
 }
 
-void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
+void JumpPlusVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
     if (imgui_layer.hovering_gui) {
         return;
     }
@@ -176,15 +175,13 @@ void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& e
     }
 }
 
-void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
+void JumpPlusVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
     if (imgui_layer.hovering_gui) {
         return;
     }
 
     if (event.button == input::MouseButton::LEFT) {
-        const bool valid_phases = (
-            board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
-        );
+        const bool valid_phases = board.phase == BoardPhase::MovePieces;
 
         if (board.next_move && board.is_players_turn && valid_phases) {
             const auto flags = board.release(app->renderer->get_hovered_id());
@@ -201,7 +198,7 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
     }
 }
 
-void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
+void JumpPlusVariantScene::on_key_pressed(const KeyPressedEvent& event) {
     if (imgui_layer.hovering_gui) {
         return;
     }
@@ -253,9 +250,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
             );
             break;
         case input::Key::ENTER: {
-            const bool valid_phases = (
-                board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
-            );
+            const bool valid_phases = board.phase == BoardPhase::MovePieces;
 
             if (board.next_move && board.is_players_turn && valid_phases) {
                 const auto flags = keyboard.click_and_release();
@@ -271,7 +266,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
     }
 }
 
-void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
+void JumpPlusVariantScene::on_key_released(const KeyReleasedEvent& event) {
     if (imgui_layer.hovering_gui) {
         return;
     }
@@ -281,51 +276,81 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
     }
 }
 
-void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
+void JumpPlusVariantScene::on_window_resized(const WindowResizedEvent& event) {
     camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
 }
 
-void StandardGameScene::setup_and_add_model_pieces() {
-    for (size_t i = 0; i < 9; i++) {
-        setup_and_add_model_piece(
-            app,
-            this,
-            i,
-            WHITE_PIECE_POSITION(i)
-        );
-    }
+void JumpPlusVariantScene::setup_and_add_model_pieces() {
+    size_t index = 0;
 
-    for (size_t i = 9; i < 18; i++) {
-        setup_and_add_model_piece(
-            app,
-            this,
-            i,
-            BLACK_PIECE_POSITION(i)
-        );
+    // White pieces
+    setup_piece_on_node(app, this, index++, 0);
+    setup_piece_on_node(app, this, index++, 3);
+    setup_piece_on_node(app, this, index++, 6);
+    setup_piece_on_node(app, this, index++, 17);
+    setup_piece_on_node(app, this, index++, 20);
+    setup_piece_on_node(app, this, index++, 23);
+
+    // Black pieces
+    setup_piece_on_node(app, this, index++, 2);
+    setup_piece_on_node(app, this, index++, 5);
+    setup_piece_on_node(app, this, index++, 8);
+    setup_piece_on_node(app, this, index++, 15);
+    setup_piece_on_node(app, this, index++, 18);
+    setup_piece_on_node(app, this, index++, 21);
+}
+
+void JumpPlusVariantScene::initialize_pieces() {
+    auto& data = app->user_data<Data>();
+
+    if (data.launcher_options.normal_mapping) {
+        for (size_t i = 0; i < 6; i++) {
+            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_h]);
+        }
+
+        for (size_t i = 6; i < 12; i++) {
+            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_h]);
+        }
+    } else {
+        for (size_t i = 0; i < 6; i++) {
+            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_h]);
+        }
+
+        for (size_t i = 6; i < 12; i++) {
+            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_h]);
+        }
     }
 }
 
-void StandardGameScene::setup_entities() {
-    board = StandardBoard {};
+void JumpPlusVariantScene::setup_entities() {
+    board = JumpBoard {};
     board.model = app->res.model.load("board"_h);
     board.paint_model = app->res.model.load("board_paint"_h);
 
-    for (size_t i = 0; i < 9; i++) {
-        board.pieces[i] = Piece {
+    board.phase = BoardPhase::MovePieces;
+
+    for (size_t i = 0; i < 6; i++) {
+        Piece piece = Piece {
             i,
             PieceType::White,
             app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
+        piece.in_use = true;
+
+        board.pieces[i] = piece;
     }
 
-    for (size_t i = 9; i < 18; i++) {
-        board.pieces[i] = Piece {
+    for (size_t i = 6; i < 12; i++) {
+        Piece piece = Piece {
             i,
             PieceType::Black,
             app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
         };
+        piece.in_use = true;
+
+        board.pieces[i] = piece;
     }
 
     for (size_t i = 0; i < MAX_NODES; i++) {
@@ -334,38 +359,19 @@ void StandardGameScene::setup_entities() {
         };
     }
 
+    // Set white pieces to show outline
+    board.update_piece_outlines();
+
     DEB_DEBUG("Setup entities");
 }
 
-void StandardGameScene::initialize_pieces() {
-    auto& data = app->user_data<Data>();
-
-    if (data.launcher_options.normal_mapping) {
-        for (size_t i = 0; i < 9; i++) {
-            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_h]);
-        }
-
-        for (size_t i = 9; i < 18; i++) {
-            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_h]);
-        }
-    } else {
-        for (size_t i = 0; i < 9; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_h]);
-        }
-
-        for (size_t i = 9; i < 18; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_h]);
-        }
-    }
-}
-
-void StandardGameScene::save_game() {
+void JumpPlusVariantScene::save_game() {
     board.finalize_pieces_state();
 
-    StandardBoardSerialized serialized;
+    JumpBoardSerialized serialized;
     board.to_serialized(serialized);
 
-    save_load::SavedGame<StandardBoardSerialized> saved_game;
+    save_load::SavedGame<JumpBoardSerialized> saved_game;
     saved_game.board_serialized = serialized;
     saved_game.camera_controller = camera_controller;
     saved_game.time = timer.get_time();
@@ -389,10 +395,10 @@ void StandardGameScene::save_game() {
     }
 }
 
-void StandardGameScene::load_game() {
+void JumpPlusVariantScene::load_game() {
     board.finalize_pieces_state();
 
-    save_load::SavedGame<StandardBoardSerialized> saved_game;
+    save_load::SavedGame<JumpBoardSerialized> saved_game;
 
     try {
         save_load::load_game_from_file(saved_game, save_game_file_name);
@@ -426,7 +432,8 @@ void StandardGameScene::load_game() {
     update_turn_indicator(app, this);
 }
 
-void StandardGameScene::undo() {
+
+void JumpPlusVariantScene::undo() {
     ASSERT(!undo_redo_state.undo.empty(), "Undo history must not be empty");
 
     if (!board.next_move) {
@@ -436,9 +443,9 @@ void StandardGameScene::undo() {
 
     const bool undo_game_over = board.phase == BoardPhase::None;
 
-    using State = UndoRedoState<StandardBoardSerialized>::State;
+    using State = UndoRedoState<JumpBoardSerialized>::State;
 
-    StandardBoardSerialized serialized;
+    JumpBoardSerialized serialized;
     board.to_serialized(serialized);
 
     State current_state = { serialized, camera_controller };
@@ -463,7 +470,7 @@ void StandardGameScene::undo() {
     update_turn_indicator(app, this);
 }
 
-void StandardGameScene::redo() {
+void JumpPlusVariantScene::redo() {
     ASSERT(!undo_redo_state.redo.empty(), "Redo history must not be empty");
 
     if (!board.next_move) {
@@ -471,9 +478,9 @@ void StandardGameScene::redo() {
         return;
     }
 
-    using State = UndoRedoState<StandardBoardSerialized>::State;
+    using State = UndoRedoState<JumpBoardSerialized>::State;
 
-    StandardBoardSerialized serialized;
+    JumpBoardSerialized serialized;
     board.to_serialized(serialized);
 
     State current_state = { serialized, camera_controller };
@@ -501,9 +508,6 @@ void StandardGameScene::redo() {
     update_turn_indicator(app, this);
 }
 
-void StandardGameScene::imgui_draw_debug() {
-    ImGui::Text("White and black pieces: %u, %u", board.white_pieces_count, board.black_pieces_count);
-    ImGui::Text("Not placed pieces: %u, %u", board.not_placed_white_pieces_count, board.not_placed_black_pieces_count);
-    ImGui::Text("Can jump: %s, %s", board.can_jump[0] ? "true" : "false", board.can_jump[1] ? "true" : "false");
+void JumpPlusVariantScene::imgui_draw_debug() {
     ImGui::Text("Turns without mills: %u", board.turns_without_mills);
 }

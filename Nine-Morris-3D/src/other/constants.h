@@ -157,7 +157,8 @@ enum class TextureQuality {
 
 enum class GameMode {
     Standard,
-    Jump
+    Jump,
+    JumpPlus
 };
 
 constexpr size_t MAX_NODES = 24;

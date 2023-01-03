@@ -26,7 +26,7 @@ namespace game_options {
             return {false, "Options file is invalid: music_volume"};
         }
 
-        if (options.scene < 0 || options.scene > 1) {
+        if (options.scene != STANDARD && options.scene != JUMP && options.scene != JUMP_PLUS) {
             return {false, "Options file is invalid: scene"};
         }
 

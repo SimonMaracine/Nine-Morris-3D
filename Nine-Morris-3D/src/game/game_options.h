@@ -14,6 +14,7 @@ namespace game_options {
 
     static constexpr int STANDARD = static_cast<int>(GameMode::Standard);
     static constexpr int JUMP = static_cast<int>(GameMode::Jump);
+    static constexpr int JUMP_PLUS = static_cast<int>(GameMode::JumpPlus);
 
     static constexpr bool DEFAULT_VSYNC = true;
     static constexpr bool DEFAULT_SAVE_ON_EXIT = true;
