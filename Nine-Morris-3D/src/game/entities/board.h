@@ -39,7 +39,7 @@ struct Board {
     void select_piece(size_t piece_index);
     void set_pieces_show_outline(PieceType type, bool show);
     void set_pieces_to_take(PieceType type, bool take);
-    void game_over(const BoardEnding& ending, PieceType type_to_hide);
+    void game_over(const BoardEnding& ending);
     bool is_windmill_made(size_t node_index, PieceType type, const size_t windmills[][3], size_t mills_count);
     size_t number_of_pieces_in_windmills(PieceType type, const size_t windmills[][3], size_t mills_count);
     void unselect_other_pieces(size_t currently_selected_piece_index_index);

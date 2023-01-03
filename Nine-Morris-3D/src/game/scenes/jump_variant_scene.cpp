@@ -74,6 +74,12 @@ void JumpVariantScene::on_start() {
     // Can dispose of these
     app->res.texture_data.clear();
     app->res.sound_data.clear();
+
+    app->evt.add_event<MouseButtonPressedEvent, &JumpVariantScene::on_mouse_button_pressed>(this);
+    app->evt.add_event<MouseButtonReleasedEvent, &JumpVariantScene::on_mouse_button_released>(this);
+    app->evt.add_event<KeyPressedEvent, &JumpVariantScene::on_key_pressed>(this);
+    app->evt.add_event<KeyReleasedEvent, &JumpVariantScene::on_key_released>(this);
+    app->evt.add_event<WindowResizedEvent, &JumpVariantScene::on_window_resized>(this);
 }
 
 void JumpVariantScene::on_stop() {
@@ -110,16 +116,12 @@ void JumpVariantScene::on_stop() {
     if (board_paint_texture_loader->joinable()) {
         board_paint_texture_loader->join();
     }
+
+    app->evt.remove_events(this);
 }
 
 void JumpVariantScene::on_awake() {
     imgui_layer = ImGuiLayer<JumpVariantScene, JumpBoardSerialized> {app, this};
-
-    app->evt.add_event<MouseButtonPressedEvent, &JumpVariantScene::on_mouse_button_pressed>(this);
-    app->evt.add_event<MouseButtonReleasedEvent, &JumpVariantScene::on_mouse_button_released>(this);
-    app->evt.add_event<KeyPressedEvent, &JumpVariantScene::on_key_pressed>(this);
-    app->evt.add_event<KeyReleasedEvent, &JumpVariantScene::on_key_released>(this);
-    app->evt.add_event<WindowResizedEvent, &JumpVariantScene::on_window_resized>(this);
 
     using namespace assets_load;
 
@@ -191,7 +193,7 @@ void JumpVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& ev
     }
 
     if (event.button == input::MouseButton::LEFT) {
-        if (board.next_move) {
+        if (board.next_move && board.phase != BoardPhase::None) {
             board.click(app->renderer->get_hovered_id());
         }
     }

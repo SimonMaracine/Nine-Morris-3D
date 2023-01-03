@@ -155,6 +155,11 @@ enum class TextureQuality {
     Low
 };
 
+enum class GameMode {
+    Standard,
+    Jump
+};
+
 constexpr size_t MAX_NODES = 24;
 constexpr size_t MAX_PIECES = 18;  // TODO will change
 

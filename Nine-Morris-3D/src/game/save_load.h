@@ -5,6 +5,7 @@
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
 #include "game/entities/board.h"
+#include "game/entities/serialization/board_serialized.h"
 #include "game/entities/serialization/standard_board_serialized.h"
 #include "game/entities/serialization/jump_board_serialized.h"
 #include "game/entities/serialization/piece_serialized.h"
@@ -125,7 +126,7 @@ void serialize(Archive& archive, PointCameraController& camera_controller) {
 }
 
 template<typename Archive>
-void serialize(Archive& archive, StandardBoardSerialized& board) {
+void serialize(Archive& archive, BoardSerialized& board) {
     archive(
         board.nodes,
         board.pieces,
@@ -133,9 +134,17 @@ void serialize(Archive& archive, StandardBoardSerialized& board) {
         board.turn,
         board.ending,
         board.must_take_piece,
-        board.can_jump,
         board.repetition_history,
         board.is_players_turn,
+        board.turn_count
+    );
+}
+
+template<typename Archive>
+void serialize(Archive& archive, StandardBoardSerialized& board) {
+    archive(
+        cereal::base_class<BoardSerialized>(&board),
+        board.can_jump,
         board.white_pieces_count,
         board.black_pieces_count,
         board.not_placed_white_pieces_count,
@@ -147,15 +156,7 @@ void serialize(Archive& archive, StandardBoardSerialized& board) {
 template<typename Archive>
 void serialize(Archive& archive, JumpBoardSerialized& board) {
     archive(
-        board.nodes,
-        board.pieces,
-        board.phase,
-        board.turn,
-        board.ending,
-        board.must_take_piece,
-        board.can_jump,
-        board.repetition_history,
-        board.is_players_turn,
+        cereal::base_class<BoardSerialized>(&board),
         board.turns_without_mills
     );
 }

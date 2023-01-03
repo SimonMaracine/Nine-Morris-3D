@@ -4,14 +4,6 @@
 #include "other/constants.h"
 
 struct PieceSerialized {
-    PieceSerialized() = default;
-    ~PieceSerialized() = default;
-
-    PieceSerialized(const PieceSerialized&) = default;
-    PieceSerialized& operator=(const PieceSerialized&) = default;
-    PieceSerialized(PieceSerialized&&) = delete;
-    PieceSerialized& operator=(PieceSerialized&&) = default;
-
     size_t index = NULL_INDEX;
 
     PieceType type = PieceType::None;

@@ -247,8 +247,7 @@ void StandardBoard::place_piece(size_t node_index) {
                 )
 
                 game_over(
-                    BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message},
-                    TURN_IS_WHITE_SO(PieceType::White, PieceType::Black)
+                    BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
                 );
             }
         }
@@ -327,8 +326,7 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
             )
 
             game_over(
-                BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message},
-                TURN_IS_WHITE_SO(PieceType::White, PieceType::Black)
+                BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
             );
         }
 
@@ -374,8 +372,7 @@ void StandardBoard::take_piece(size_t piece_index) {
         )
 
         game_over(
-            BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message},
-            TURN_IS_WHITE_SO(PieceType::White, PieceType::Black)
+            BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
         );
     }
 }
@@ -390,10 +387,7 @@ void StandardBoard::switch_turn_and_check_turns_without_mills() {
                 MAX_TURNS_WITHOUT_MILLS
             )
 
-            game_over(
-                BoardEnding {BoardEnding::TieBetweenBothPlayers, message},
-                TURN_IS_WHITE_SO(PieceType::White, PieceType::Black)
-            );
+            game_over(BoardEnding {BoardEnding::TieBetweenBothPlayers, message});
         }
     }
 
@@ -539,7 +533,7 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
                 message, 64, "White player cannot make any more windmills."
             )
 
-            game_over(BoardEnding {BoardEnding::WinnerBlack, message}, PieceType::White);
+            game_over(BoardEnding {BoardEnding::WinnerBlack, message});
         }
     } else {
         DEB_DEBUG("Checking black player number of pieces...");
@@ -555,7 +549,7 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
                 message, 64, "Black player cannot make any more windmills."
             )
 
-            game_over(BoardEnding {BoardEnding::WinnerWhite, message}, PieceType::Black);
+            game_over(BoardEnding {BoardEnding::WinnerWhite, message});
         }
     }
 }
@@ -822,11 +816,11 @@ void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
     serialized.phase = phase;
     serialized.turn = turn;
     serialized.ending = ending;
-    serialized.can_jump = can_jump;
     serialized.repetition_history = repetition_history;
     serialized.is_players_turn = is_players_turn;
     serialized.must_take_piece = must_take_piece;
     serialized.turn_count = turn_count;
+    serialized.can_jump = can_jump;
     serialized.white_pieces_count = white_pieces_count;
     serialized.black_pieces_count = black_pieces_count;
     serialized.not_placed_white_pieces_count = not_placed_white_pieces_count;
@@ -909,11 +903,11 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
     phase = serialized.phase;
     turn = serialized.turn;
     ending = serialized.ending;
-    can_jump = serialized.can_jump;
     repetition_history = serialized.repetition_history;
     must_take_piece = serialized.must_take_piece;
     is_players_turn = serialized.is_players_turn;
     turn_count = serialized.turn_count;
+    can_jump = serialized.can_jump;
     white_pieces_count = serialized.white_pieces_count;
     black_pieces_count = serialized.black_pieces_count;
     not_placed_white_pieces_count = serialized.not_placed_white_pieces_count;

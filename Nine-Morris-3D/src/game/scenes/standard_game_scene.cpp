@@ -75,6 +75,12 @@ void StandardGameScene::on_start() {
     // Can dispose of these
     app->res.texture_data.clear();
     app->res.sound_data.clear();
+
+    app->evt.add_event<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
+    app->evt.add_event<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
+    app->evt.add_event<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
+    app->evt.add_event<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
+    app->evt.add_event<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
 }
 
 void StandardGameScene::on_stop() {
@@ -111,16 +117,12 @@ void StandardGameScene::on_stop() {
     if (board_paint_texture_loader->joinable()) {
         board_paint_texture_loader->join();
     }
+
+    app->evt.remove_events(this);
 }
 
 void StandardGameScene::on_awake() {
     imgui_layer = ImGuiLayer<StandardGameScene, StandardBoardSerialized> {app, this};
-
-    app->evt.add_event<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
-    app->evt.add_event<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
-    app->evt.add_event<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
-    app->evt.add_event<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
-    app->evt.add_event<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
 
     using namespace assets_load;
 
@@ -192,7 +194,7 @@ void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& e
     }
 
     if (event.button == input::MouseButton::LEFT) {
-        if (board.next_move) {
+        if (board.next_move && board.phase != BoardPhase::None) {
             board.click(app->renderer->get_hovered_id());
         }
     }

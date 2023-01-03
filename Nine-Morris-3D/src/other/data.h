@@ -25,5 +25,6 @@ struct Data {
     struct {
         int skybox = 0;
         int labeled_board = 0;
+        int scene = 0;
     } imgui_option;
 };

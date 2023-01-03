@@ -219,10 +219,12 @@ void Board::set_pieces_to_take(PieceType type, bool take) {
     }
 }
 
-void Board::game_over(const BoardEnding& ending, PieceType type_to_hide) {
+void Board::game_over(const BoardEnding& ending) {
     phase = BoardPhase::GameOver;
     this->ending = ending;
-    set_pieces_show_outline(type_to_hide, false);
+
+    set_pieces_show_outline(PieceType::White, false);  // Just hide both
+    set_pieces_show_outline(PieceType::Black, false);
 
     switch (ending.type) {
         case BoardEnding::WinnerWhite:
@@ -388,10 +390,7 @@ void Board::remember_position_and_check_repetition(size_t piece_index, size_t no
                 TURN_IS_WHITE_SO("Black", "White")
             )
 
-            game_over(
-                BoardEnding {BoardEnding::TieBetweenBothPlayers, message},
-                TURN_IS_WHITE_SO(PieceType::White, PieceType::Black)
-            );
+            game_over(BoardEnding {BoardEnding::TieBetweenBothPlayers, message});
 
             return;
         }

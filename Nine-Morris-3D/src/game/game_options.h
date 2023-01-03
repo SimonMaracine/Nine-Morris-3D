@@ -12,6 +12,9 @@ namespace game_options {
     static constexpr int HUMAN = static_cast<int>(GamePlayer::Human);
     static constexpr int COMPUTER = static_cast<int>(GamePlayer::Computer);
 
+    static constexpr int STANDARD = static_cast<int>(GameMode::Standard);
+    static constexpr int JUMP = static_cast<int>(GameMode::Jump);
+
     static constexpr bool DEFAULT_VSYNC = true;
     static constexpr bool DEFAULT_SAVE_ON_EXIT = true;
     static constexpr int DEFAULT_SKYBOX = FIELD;
@@ -24,7 +27,7 @@ namespace game_options {
     static constexpr float DEFAULT_MASTER_VOLUME = 1.0f;
     static constexpr float DEFAULT_MUSIC_VOLUME = 0.7f;
     static constexpr bool DEFAULT_ENABLE_MUSIC = true;
-    static constexpr int DEFAULT_SCENE = 0;
+    static constexpr int DEFAULT_SCENE = STANDARD;
 
     struct GameOptions {
         bool vsync = DEFAULT_VSYNC;
