@@ -403,7 +403,7 @@ void StandardGameScene::save_game() {
     saved_game.black_player = game.black_player;
 
     try {
-        save_load::save_game_to_file(saved_game);
+        save_load::save_game_to_file(saved_game, save_game_file_name);
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_WARNING("Could not save game: {}", e.what());
 
@@ -419,7 +419,7 @@ void StandardGameScene::load_game() {
     save_load::SavedGame<StandardBoardSerialized> saved_game;
 
     try {
-        save_load::load_game_from_file(saved_game);
+        save_load::load_game_from_file(saved_game, save_game_file_name);
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_WARNING("Could not load game: {}", e.what());
 

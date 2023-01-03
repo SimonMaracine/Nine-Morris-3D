@@ -63,6 +63,7 @@ struct StandardGameScene : public Scene {
     bool show_keyboard_controls = false;
 
     glm::vec3 default_camera_position = glm::vec3(0.0f);
+    std::string save_game_file_name = save_load::save_game_file_name("standard_game");
 
     // GUI-related
     bool show_wait_indicator = false;

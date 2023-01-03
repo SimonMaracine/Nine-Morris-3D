@@ -120,7 +120,7 @@ template<typename S, typename B>
 void ImGuiLayer<S, B>::update() {
     save_load::SavedGame<B> saved_game;
     try {
-        save_load::load_game_from_file(saved_game);
+        save_load::load_game_from_file(saved_game, scene->save_game_file_name);
     } catch (const save_load::SaveFileNotOpenError& e) {
         REL_WARNING("Could not load game: {}", e.what());
     } catch (const save_load::SaveFileError& e) {
@@ -130,7 +130,7 @@ void ImGuiLayer<S, B>::update() {
     DEB_INFO("Checked last saved game");
 
     info_file_path = file_system::path_for_logs(logging::get_info_file());
-    save_game_file_path = file_system::path_for_saved_data(save_load::SAVE_GAME_FILE);
+    save_game_file_path = file_system::path_for_saved_data(scene->save_game_file_name);
 }
 
 template<typename S, typename B>
@@ -581,7 +581,7 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
         ImGui::Text("Could not load last game.");
         ImGui::Text("The save game file is either missing or is corrupted.");
         ImGui::Separator();
-        ImGui::Text("%s", save_game_file_path.c_str());
+        ImGui::Text("%s", save_game_file_path.c_str());  // FIXME probably text is too large
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 

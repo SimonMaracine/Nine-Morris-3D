@@ -18,8 +18,7 @@
 #include "other/constants.h"
 
 namespace save_load {
-    static const char* SAVE_GAME_FILE = "last_game.dat";
-    static const char* NO_LAST_GAME = "No Last Game";
+    static constexpr const char* NO_LAST_GAME = "No Last Game";
 
     class SaveFileError : public std::runtime_error {
     public:
@@ -36,6 +35,9 @@ namespace save_load {
         SaveFileNotOpenError(const char* message)
             : SaveFileError(message) {}
     };
+
+    void handle_save_file_not_open_error();
+    std::string save_game_file_name(std::string_view name);
 
     template<typename B>
     struct SavedGame {
@@ -62,14 +64,14 @@ namespace save_load {
     };
 
     template<typename B>
-    void save_game_to_file(const SavedGame<B>& saved_game) noexcept(false) {
-        const std::string file_path = file_system::path_for_saved_data(SAVE_GAME_FILE);
+    void save_game_to_file(const SavedGame<B>& saved_game, std::string_view file_name) noexcept(false) {
+        const std::string file_path = file_system::path_for_saved_data(file_name);
 
         std::ofstream file {file_path, std::ios::binary | std::ios::trunc};
 
         if (!file.is_open()) {
             throw SaveFileNotOpenError(
-                "Could not open last save game file `" + std::string(SAVE_GAME_FILE) + "` for writing"
+                "Could not open last save game file `" + std::string(file_name) + "` for writing"
             );
         }
 
@@ -80,18 +82,18 @@ namespace save_load {
             throw SaveFileError(e.what());
         }
 
-        DEB_INFO("Saved game to file `{}`", SAVE_GAME_FILE);
+        DEB_INFO("Saved game to file `{}`", file_name);
     }
 
     template<typename B>
-    void load_game_from_file(SavedGame<B>& saved_game) noexcept(false) {
-        const std::string file_path = file_system::path_for_saved_data(SAVE_GAME_FILE);
+    void load_game_from_file(SavedGame<B>& saved_game, std::string_view file_name) noexcept(false) {
+        const std::string file_path = file_system::path_for_saved_data(file_name);
 
         std::ifstream file {file_path, std::ios::binary};
 
         if (!file.is_open()) {
             throw SaveFileNotOpenError(
-                "Could not open last save game file `" + std::string(SAVE_GAME_FILE) + "` for reading"
+                "Could not open last save game file `" + std::string(file_name) + "` for reading"
             );
         }
 
@@ -104,10 +106,8 @@ namespace save_load {
             throw SaveFileError(e.what());
         }
 
-        DEB_INFO("Loaded game from file `{}`", SAVE_GAME_FILE);
+        DEB_INFO("Loaded game from file `{}`", file_name);
     }
-
-    void handle_save_file_not_open_error();
 }
 
 // Mostly all serialization stuff
