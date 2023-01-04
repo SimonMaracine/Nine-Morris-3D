@@ -396,19 +396,39 @@ void update_all_imgui(Application* app, S* scene) {
 
     auto& imgui_layer = scene->imgui_layer;
 
-    imgui_layer.draw_menu_bar();
-
-    if (imgui_layer.show_about) {
-        imgui_layer.draw_about();
-    } else if (imgui_layer.show_could_not_load_game) {
-        imgui_layer.draw_could_not_load_game();
-    } else if (imgui_layer.show_no_last_game) {
-        imgui_layer.draw_no_last_game();
-    } else if (scene->board.phase == BoardPhase::GameOver && scene->board.next_move) {
-        imgui_layer.draw_game_over();
+    if (scene->board.phase == BoardPhase::GameOver && scene->board.next_move) {
+        imgui_layer.window = WindowImGui::ShowGameOver;
     }
 
-    if (imgui_layer.show_info && !imgui_layer.show_about) {
+    imgui_layer.draw_menu_bar();
+
+    switch (imgui_layer.window) {
+        case WindowImGui::None:
+            break;
+        case WindowImGui::ShowAbout:
+            imgui_layer.draw_about();
+            break;
+        case WindowImGui::ShowCouldNotLoadGame:
+            imgui_layer.draw_could_not_load_game();
+            break;
+        case WindowImGui::ShowNoLastGame:
+            imgui_layer.draw_no_last_game();
+            break;
+        case WindowImGui::ShowGameOver:
+            imgui_layer.draw_game_over();
+            break;
+        case WindowImGui::ShowRulesStandardGame:
+            imgui_layer.draw_rules_standard_game();
+            break;
+        case WindowImGui::ShowRulesJumpVariant:
+            imgui_layer.draw_rules_jump_variant();
+            break;
+        case WindowImGui::ShowRulesJumpPlusVariant:
+            imgui_layer.draw_rules_jump_plus_variant();
+            break;
+    }
+
+    if (imgui_layer.show_info && imgui_layer.window != WindowImGui::ShowAbout) {
         imgui_layer.draw_info();
     }
 
@@ -461,12 +481,12 @@ void load_game_generic(Application* app, S* scene) {
 
         save_load::handle_save_file_not_open_error();
 
-        scene->imgui_layer.show_could_not_load_game = true;
+        scene->imgui_layer.window = WindowImGui::ShowCouldNotLoadGame;
         return;
     } catch (const save_load::SaveFileError& e) {
         REL_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
 
-        scene->imgui_layer.show_could_not_load_game = true;
+        scene->imgui_layer.window = WindowImGui::ShowCouldNotLoadGame;
         return;
     }
 

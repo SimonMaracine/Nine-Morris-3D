@@ -36,6 +36,9 @@ public:
     void draw_about();
     void draw_could_not_load_game();
     void draw_no_last_game();
+    void draw_rules_standard_game();
+    void draw_rules_jump_variant();
+    void draw_rules_jump_plus_variant();
 
 #ifdef NM3D_PLATFORM_DEBUG
     void draw_debug();
@@ -44,11 +47,9 @@ public:
     bool hovering_gui = false;
     bool can_undo = false;
     bool can_redo = false;
-
     bool show_info = false;
-    bool show_about = false;
-    bool show_could_not_load_game = false;
-    bool show_no_last_game = false;
+
+    WindowImGui window = WindowImGui::None;
 private:
     void draw_game_over_message(std::string_view message1, std::string_view message2);
     void initialize_options();
@@ -140,20 +141,20 @@ void ImGuiLayer<S, B>::reset() {
     hovering_gui = false;
     can_undo = false;
     can_redo = false;
-
     show_info = false;
-    show_about = false;
-    show_could_not_load_game = false;
-    show_no_last_game = false;
 }
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_menu_bar() {
-    auto& data = app->user_data<Data>();
-
     RESET_HOVERING_GUI();
 
-    if (!show_about && ImGui::BeginMainMenuBar()) {
+    if (window == WindowImGui::ShowAbout) {  // TODO don't need to hide this
+        return;
+    }
+
+    auto& data = app->user_data<Data>();
+
+    if (ImGui::BeginMainMenuBar()) {
         const bool can_change = scene->game.state == GameState::HumanThinkingMove;
         const bool can_undo_redo = (
             scene->game.state == GameState::HumanThinkingMove
@@ -168,7 +169,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             }
             if (ImGui::MenuItem("Load Last Game", nullptr, false, can_change)) {
                 if (last_save_game_date == save_load::NO_LAST_GAME) {
-                    show_no_last_game = true;
+                    window = WindowImGui::ShowNoLastGame;
                 } else {
                     scene->load_game();
                 }
@@ -183,7 +184,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 time(&current);
                 last_save_game_date = ctime(&current);
             }
-            if (ImGui::BeginMenu("Game", can_change)) {
+            if (ImGui::BeginMenu("Game Mode", can_change)) {
                 if (ImGui::RadioButton("Standard Game", &data.imgui_option.scene, game_options::STANDARD)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
@@ -442,7 +443,21 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About", nullptr, false)) {
-                show_about = true;
+                window = WindowImGui::ShowAbout;
+            }
+            if (ImGui::BeginMenu("Game Rules")) {
+                if (ImGui::MenuItem("Standard Game", nullptr, false)) {
+                    window = WindowImGui::ShowRulesStandardGame;
+                }
+                if (ImGui::MenuItem("Jump Variant", nullptr, false)) {
+                    window = WindowImGui::ShowRulesJumpVariant;
+                }
+                if (ImGui::MenuItem("Jump Plus Variant", nullptr, false)) {
+                    window = WindowImGui::ShowRulesJumpPlusVariant;
+                }
+
+                ImGui::EndMenu();
+                HOVERING_GUI()
             }
             if (ImGui::MenuItem("Log Information", nullptr, false)) {
                 logging::log_general_information(logging::LogTarget::File);
@@ -488,8 +503,6 @@ void ImGuiLayer<S, B>::draw_game_over() {
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("Game Over", nullptr, window_flags)) {
-        HOVERING_GUI()
-
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         switch (scene->board.ending.type) {
@@ -551,8 +564,6 @@ void ImGuiLayer<S, B>::draw_about() {
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, window_flags)) {
-        HOVERING_GUI()
-
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         ImGui::Text("A 3D implementation of the board game nine men's morris");
@@ -567,12 +578,13 @@ void ImGuiLayer<S, B>::draw_about() {
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
-            show_about = false;
+            window = WindowImGui::None;
         }
 
         ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         ImGui::EndPopup();
+        HOVERING_GUI()
     }
     ImGui::PopFont();
 }
@@ -586,8 +598,6 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("Error Loading Game", nullptr, window_flags)) {
-        HOVERING_GUI()
-
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         ImGui::Text("Could not load last game.");
@@ -601,12 +611,13 @@ void ImGuiLayer<S, B>::draw_could_not_load_game() {
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
-            show_could_not_load_game = false;
+            window = WindowImGui::None;
         }
 
         ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         ImGui::EndPopup();
+        HOVERING_GUI()
     }
     ImGui::PopFont();
 }
@@ -620,8 +631,6 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
     ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("No Last Game", nullptr, window_flags)) {
-        HOVERING_GUI()
-
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
         ImGui::Text("There is no last saved game.");
@@ -632,12 +641,115 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
         ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
-            show_no_last_game = false;
+            window = WindowImGui::None;
         }
 
         ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         ImGui::EndPopup();
+        HOVERING_GUI()
+    }
+    ImGui::PopFont();
+}
+
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_rules_standard_game() {
+    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
+    ImGui::OpenPopup("Standard Game Rules");
+
+    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Standard Game Rules", nullptr, window_flags)) {  // TODO make this window generic
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        const char* rules = R"(The board consists of a grid with twenty-four nodes.
+Each player has nine pieces, either black or white.
+A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.
+When a player remains with three pieces they can jump on the board.
+A player may take a piece from a mill only if there are no other pieces available.
+The game ends with a tie when forty turns take place without any mill.
+The game ends with a tie also when the exact same move happens a third time.)";
+        ImGui::Text("%s", rules);
+
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        const float window_width = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
+        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
+            ImGui::CloseCurrentPopup();
+            window = WindowImGui::None;
+        }
+
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+        ImGui::EndPopup();
+        HOVERING_GUI()
+    }
+    ImGui::PopFont();
+}
+
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_rules_jump_variant() {
+    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
+    ImGui::OpenPopup("Jump Variant Rules");
+
+    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Jump Variant Rules", nullptr, window_flags)) {
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        const char* rules = R"(Each player has only three pieces and can jump anywhere on the board.
+The first player to form a mill wins.
+The game ends with a tie when forty turns take place without any mill.
+The game ends with a tie also when the exact same move happens a third time.)";
+        ImGui::Text("%s", rules);
+
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        const float window_width = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
+        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
+            ImGui::CloseCurrentPopup();
+            window = WindowImGui::None;
+        }
+
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+        ImGui::EndPopup();
+        HOVERING_GUI()
+    }
+    ImGui::PopFont();
+}
+
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_rules_jump_plus_variant() {
+    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
+    ImGui::OpenPopup("Jump Plus Variant Rules");
+
+    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Jump Plus Variant Rules", nullptr, window_flags)) {
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        const char* rules = R"(Same rules as the jump variant, but each player has six pieces instead of three.)";
+        ImGui::Text("%s", rules);
+
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        const float window_width = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
+        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
+            ImGui::CloseCurrentPopup();
+            window = WindowImGui::None;
+        }
+
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+        ImGui::EndPopup();
+        HOVERING_GUI()
     }
     ImGui::PopFont();
 }
@@ -645,7 +757,7 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
 #ifdef NM3D_PLATFORM_DEBUG
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_debug() {
-    if (show_about) {
+    if (window == WindowImGui::ShowAbout) {
         return;
     }
 

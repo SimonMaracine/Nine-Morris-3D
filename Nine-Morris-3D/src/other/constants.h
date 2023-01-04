@@ -161,6 +161,17 @@ enum class GameMode {
     JumpPlus
 };
 
+enum class WindowImGui {
+    None,
+    ShowAbout,
+    ShowCouldNotLoadGame,
+    ShowNoLastGame,
+    ShowGameOver,
+    ShowRulesStandardGame,
+    ShowRulesJumpVariant,
+    ShowRulesJumpPlusVariant
+};
+
 using Index = int;
 constexpr Index NULL_INDEX = -1;
 
