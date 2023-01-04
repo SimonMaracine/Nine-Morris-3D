@@ -20,7 +20,7 @@ add_executable(${GAME} ${GUI_EXECUTABLE_WINDOWS}
 
 # Enable warnings
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(${GAME} PRIVATE -Wall -Wextra)
+    target_compile_options(${GAME} PRIVATE -Wall -Wextra -Wno-parentheses)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(${GAME} PRIVATE /W2)
 else()

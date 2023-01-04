@@ -39,6 +39,6 @@ namespace music {
     void play_music_track(std::shared_ptr<MusicTrack> music_track);
     void stop_music_track();  // Must be called before the OpenAL context is destroyed
     void pause_music_track();
-    void continue_music_track();  // TODO add more music API functions
+    void continue_music_track();
     void set_music_gain(float gain);
 }
