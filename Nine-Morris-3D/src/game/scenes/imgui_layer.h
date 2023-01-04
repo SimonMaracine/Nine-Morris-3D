@@ -51,7 +51,13 @@ public:
 
     WindowImGui window = WindowImGui::None;
 private:
+    struct DummyFunc {
+        constexpr void operator()() {}
+    };
+
     void draw_game_over_message(std::string_view message1, std::string_view message2);
+    void draw_window(const char* title, const std::function<void()>& contents,
+            const std::function<void()>& ok_callback = DummyFunc {});
     void initialize_options();
 
     Application* app = nullptr;
@@ -142,15 +148,12 @@ void ImGuiLayer<S, B>::reset() {
     can_undo = false;
     can_redo = false;
     show_info = false;
+    window = WindowImGui::None;
 }
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_menu_bar() {
     RESET_HOVERING_GUI();
-
-    if (window == WindowImGui::ShowAbout) {  // TODO don't need to hide this
-        return;
-    }
 
     auto& data = app->user_data<Data>();
 
@@ -496,15 +499,7 @@ void ImGuiLayer<S, B>::draw_info() {
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_game_over() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
-    ImGui::OpenPopup("Game Over");
-
-    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
-
-    if (ImGui::BeginPopupModal("Game Over", nullptr, window_flags)) {
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
+    draw_window("Game Over", [this]() {
         switch (scene->board.ending.type) {
             case BoardEnding::WinnerWhite: {
                 const char* message1 = "White player wins!";
@@ -528,239 +523,85 @@ void ImGuiLayer<S, B>::draw_game_over() {
         ImGui::Separator();
         ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-        const float window_width = ImGui::GetWindowSize().x;
-
         char time[32];
         scene->timer.get_time_formatted(time);
         char time_label[64];
         snprintf(time_label, 64, "Time: %s", time);
 
+        const float window_width = ImGui::GetWindowSize().x;
         const float text_width = ImGui::CalcTextSize(time_label).x;
         ImGui::SetCursorPosX((window_width - text_width) * 0.5f);
         ImGui::Text("%s", time_label);
-
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
-        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
-            ImGui::CloseCurrentPopup();
-            scene->board.phase = BoardPhase::None;
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-        ImGui::EndPopup();
-        HOVERING_GUI()
-    }
-    ImGui::PopFont();
+    },
+    [this]() {
+        scene->board.phase = BoardPhase::None;
+    });
 }
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_about() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
-    ImGui::OpenPopup("About Nine Morris 3D");
-
-    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
-
-    if (ImGui::BeginPopupModal("About Nine Morris 3D", nullptr, window_flags)) {
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
+    draw_window("Error Loading Game", [this]() {
         ImGui::Text("A 3D implementation of the board game nine men's morris");
         ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor, app->data().version_patch);
         ImGui::Separator();
         ImGui::Text("All programming by:");
         ImGui::Text(u8"Simon-Teodor Mărăcine - simonmara.dev@gmail.com");
-
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-        const float window_width = ImGui::GetWindowSize().x;
-        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
-        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
-            ImGui::CloseCurrentPopup();
-            window = WindowImGui::None;
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-        ImGui::EndPopup();
-        HOVERING_GUI()
-    }
-    ImGui::PopFont();
+    });
 }
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_could_not_load_game() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
-    ImGui::OpenPopup("Error Loading Game");
-
-    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
-
-    if (ImGui::BeginPopupModal("Error Loading Game", nullptr, window_flags)) {
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
+    draw_window("Error Loading Game", [this]() {
         ImGui::Text("Could not load last game.");
         ImGui::Text("The save game file is either missing or is corrupted.");
         ImGui::Separator();
         ImGui::Text("%s", save_game_file_path.c_str());  // FIXME probably text is too large
-
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-        const float window_width = ImGui::GetWindowSize().x;
-        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
-        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
-            ImGui::CloseCurrentPopup();
-            window = WindowImGui::None;
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-        ImGui::EndPopup();
-        HOVERING_GUI()
-    }
-    ImGui::PopFont();
+    });
 }
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_no_last_game() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
-    ImGui::OpenPopup("No Last Game");
-
-    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
-
-    if (ImGui::BeginPopupModal("No Last Game", nullptr, window_flags)) {
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
+    draw_window("No Last Game", []() {
         ImGui::Text("There is no last saved game.");
-
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-        const float window_width = ImGui::GetWindowSize().x;
-        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
-        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
-            ImGui::CloseCurrentPopup();
-            window = WindowImGui::None;
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-        ImGui::EndPopup();
-        HOVERING_GUI()
-    }
-    ImGui::PopFont();
+    });
 }
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_rules_standard_game() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
-    ImGui::OpenPopup("Standard Game Rules");
-
-    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
-
-    if (ImGui::BeginPopupModal("Standard Game Rules", nullptr, window_flags)) {  // TODO make this window generic
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
+    draw_window("Standard Game Rules", []() {
         const char* rules = R"(The board consists of a grid with twenty-four nodes.
 Each player has nine pieces, either black or white.
 A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.
-When a player remains with three pieces they can jump on the board.
+When a player remains with three pieces, they can jump on the board.
 A player may take a piece from a mill only if there are no other pieces available.
 The game ends with a tie when forty turns take place without any mill.
-The game ends with a tie also when the exact same move happens a third time.)";
+The game ends with a tie when the exact same move happens for the third time.)";
         ImGui::Text("%s", rules);
-
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-        const float window_width = ImGui::GetWindowSize().x;
-        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
-        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
-            ImGui::CloseCurrentPopup();
-            window = WindowImGui::None;
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-        ImGui::EndPopup();
-        HOVERING_GUI()
-    }
-    ImGui::PopFont();
+    });
 }
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_rules_jump_variant() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
-    ImGui::OpenPopup("Jump Variant Rules");
-
-    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
-
-    if (ImGui::BeginPopupModal("Jump Variant Rules", nullptr, window_flags)) {
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
+    draw_window("Jump Variant Rules", []() {
         const char* rules = R"(Each player has only three pieces and can jump anywhere on the board.
 The first player to form a mill wins.
 The game ends with a tie when forty turns take place without any mill.
-The game ends with a tie also when the exact same move happens a third time.)";
+The game ends with a tie when the exact same move happens for the third time.)";
         ImGui::Text("%s", rules);
-
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-        const float window_width = ImGui::GetWindowSize().x;
-        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
-        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
-            ImGui::CloseCurrentPopup();
-            window = WindowImGui::None;
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-        ImGui::EndPopup();
-        HOVERING_GUI()
-    }
-    ImGui::PopFont();
+    });
 }
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_rules_jump_plus_variant() {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
-    ImGui::OpenPopup("Jump Plus Variant Rules");
-
-    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
-
-    if (ImGui::BeginPopupModal("Jump Plus Variant Rules", nullptr, window_flags)) {
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
+    draw_window("Jump Plus Variant Rules", []() {
         const char* rules = R"(Same rules as the jump variant, but each player has six pieces instead of three.)";
         ImGui::Text("%s", rules);
-
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-        const float window_width = ImGui::GetWindowSize().x;
-        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
-        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
-            ImGui::CloseCurrentPopup();
-            window = WindowImGui::None;
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-        ImGui::EndPopup();
-        HOVERING_GUI()
-    }
-    ImGui::PopFont();
+    });
 }
 
 #ifdef NM3D_PLATFORM_DEBUG
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_debug() {
-    if (window == WindowImGui::ShowAbout) {
-        return;
-    }
-
     ImGui::Begin("Debug");
     ImGui::Text("FPS: %.3f", app->get_fps());
     scene->imgui_draw_debug();
@@ -927,6 +768,38 @@ void ImGuiLayer<S, B>::draw_game_over_message(std::string_view message1, std::st
     ImGui::Dummy(ImVec2(20.0f, 0.0f));
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
+}
+
+template<typename S, typename B>
+void ImGuiLayer<S, B>::draw_window(const char* title, const std::function<void()>& contents,
+        const std::function<void()>& ok_callback) {
+    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
+    ImGui::OpenPopup(title);
+
+    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal(title, nullptr, window_flags)) {
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        contents();
+
+        ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+        const float window_width = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((window_width - 150.0f) * 0.5f);
+        if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
+            ImGui::CloseCurrentPopup();
+            window = WindowImGui::None;
+            ok_callback();
+        }
+
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+        ImGui::EndPopup();
+        HOVERING_GUI()
+    }
+    ImGui::PopFont();
 }
 
 template<typename S, typename B>

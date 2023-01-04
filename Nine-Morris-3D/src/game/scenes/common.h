@@ -404,6 +404,7 @@ void update_all_imgui(Application* app, S* scene) {
 
     switch (imgui_layer.window) {
         case WindowImGui::None:
+            // Do nothing
             break;
         case WindowImGui::ShowAbout:
             imgui_layer.draw_about();
@@ -428,7 +429,7 @@ void update_all_imgui(Application* app, S* scene) {
             break;
     }
 
-    if (imgui_layer.show_info && imgui_layer.window != WindowImGui::ShowAbout) {
+    if (imgui_layer.show_info) {
         imgui_layer.draw_info();
     }
 
