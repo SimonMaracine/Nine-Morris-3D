@@ -7,6 +7,9 @@
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
 #include "game/point_camera_controller.h"
+#include "game/undo_redo_state.h"
+#include "game/save_load.h"
+#include "game/timer.h"
 #include "other/data.h"
 #include "other/constants.h"
 
@@ -20,6 +23,8 @@ void setup_and_add_turn_indicator(Application* app);
 void setup_and_add_timer_text(Application* app);
 void setup_wait_indicator(Application* app);
 void setup_computer_thinking_indicator(Application* app);
+
+void release_piece_material_instances(Application* app);
 
 // Must be called only once
 void initialize_game(Application* app);
@@ -410,4 +415,150 @@ void update_all_imgui(Application* app, S* scene) {
 #ifdef NM3D_PLATFORM_DEBUG
     imgui_layer.draw_debug();
 #endif
+}
+
+template<typename S, typename B>
+void save_game_generic(S* scene) {
+    scene->board.finalize_pieces_state();
+
+    B board_serialized;
+    scene->board.to_serialized(board_serialized);
+
+    save_load::SavedGame<B> saved_game;
+    saved_game.board_serialized = board_serialized;
+    saved_game.camera_controller = scene->camera_controller;
+    saved_game.time = scene->timer.get_time();
+
+    time_t current;
+    time(&current);
+    saved_game.date = ctime(&current);
+
+    saved_game.undo_redo_state = scene->undo_redo_state;
+    saved_game.white_player = scene->game.white_player;
+    saved_game.black_player = scene->game.black_player;
+
+    try {
+        save_load::save_game_to_file(saved_game, scene->save_game_file_name);
+    } catch (const save_load::SaveFileNotOpenError& e) {
+        REL_WARNING("Could not save game: {}", e.what());
+
+        save_load::handle_save_file_not_open_error();
+    } catch (const save_load::SaveFileError& e) {
+        REL_WARNING("Could not save game: {}", e.what());
+    }
+}
+
+template<typename S, typename B>
+void load_game_generic(Application* app, S* scene) {
+    scene->board.finalize_pieces_state();
+
+    save_load::SavedGame<B> saved_game;
+
+    try {
+        save_load::load_game_from_file(saved_game, scene->save_game_file_name);
+    } catch (const save_load::SaveFileNotOpenError& e) {
+        REL_WARNING("Could not load game: {}", e.what());
+
+        save_load::handle_save_file_not_open_error();
+
+        scene->imgui_layer.show_could_not_load_game = true;
+        return;
+    } catch (const save_load::SaveFileError& e) {
+        REL_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
+
+        scene->imgui_layer.show_could_not_load_game = true;
+        return;
+    }
+
+    scene->board.from_serialized(saved_game.board_serialized);
+    scene->camera_controller = saved_game.camera_controller;
+    scene->timer = Timer {app, saved_game.time};
+    scene->undo_redo_state = std::move(saved_game.undo_redo_state);
+    scene->game.white_player = saved_game.white_player;
+    scene->game.black_player = saved_game.black_player;
+
+    // Set camera pointer lost in serialization
+    scene->camera_controller.set_camera(&scene->camera);
+
+    scene->made_first_move = false;
+
+    update_cursor(app, scene);
+    update_turn_indicator(app, scene);
+}
+
+template<typename S, typename B>
+void undo_generic(Application* app, S* scene) {
+    ASSERT(!scene->undo_redo_state.undo.empty(), "Undo history must not be empty");
+
+    if (!scene->board.next_move) {
+        DEB_WARNING("Cannot undo when pieces are in air");
+        return;
+    }
+
+    const bool undo_game_over = scene->board.phase == BoardPhase::None;
+
+    using State = typename UndoRedoState<B>::State;
+
+    B board_serialized;
+    scene->board.to_serialized(board_serialized);
+
+    State current_state = { board_serialized, scene->camera_controller };
+    const State& previous_state = scene->undo_redo_state.undo.back();
+
+    scene->board.from_serialized(previous_state.board_serialized);
+    scene->camera_controller = previous_state.camera_controller;
+
+    scene->undo_redo_state.undo.pop_back();
+    scene->undo_redo_state.redo.push_back(current_state);
+
+    DEB_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
+
+    scene->game.state = GameState::MaybeNextPlayer;
+    scene->made_first_move = scene->board.turn_count != 0;
+
+    if (undo_game_over) {
+        scene->timer.start();
+    }
+
+    update_cursor(app, scene);
+    update_turn_indicator(app, scene);
+}
+
+template<typename S, typename B>
+void redo_generic(Application* app, S* scene) {
+    ASSERT(!scene->undo_redo_state.redo.empty(), "Redo history must not be empty");
+
+    if (!scene->board.next_move) {
+        DEB_WARNING("Cannot redo when pieces are in air");
+        return;
+    }
+
+    using State = typename UndoRedoState<B>::State;
+
+    B board_serialized;
+    scene->board.to_serialized(board_serialized);
+
+    State current_state = { board_serialized, scene->camera_controller };
+    const State& previous_state = scene->undo_redo_state.redo.back();
+
+    scene->board.from_serialized(previous_state.board_serialized);
+    scene->camera_controller = previous_state.camera_controller;
+
+    scene->undo_redo_state.redo.pop_back();
+    scene->undo_redo_state.undo.push_back(current_state);
+
+    DEB_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
+
+    scene->game.state = GameState::MaybeNextPlayer;
+    scene->made_first_move = scene->board.turn_count != 0;
+
+    const bool redo_game_over = scene->board.phase == BoardPhase::None;
+
+    if (redo_game_over) {
+        scene->timer.stop();
+        scene->board.phase = BoardPhase::GameOver;  // Make the game over screen show up again
+    }
+
+    update_cursor(app, scene);
+    update_turn_indicator(app, scene);
 }

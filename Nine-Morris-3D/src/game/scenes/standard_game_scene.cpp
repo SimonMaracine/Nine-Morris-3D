@@ -103,10 +103,8 @@ void StandardGameScene::on_stop() {
     app->renderer->clear();
     app->gui_renderer->clear();
 
-    // Delete all piece material instances
-    for (size_t i = 0; i < MAX_PIECES; i++) {
-        app->res.material_instance.release(hs {"piece" + std::to_string(i)});
-    }
+    // Should dispose of these
+    release_piece_material_instances(app);
 
     made_first_move = false;
 
@@ -361,145 +359,19 @@ void StandardGameScene::initialize_pieces() {
 }
 
 void StandardGameScene::save_game() {
-    board.finalize_pieces_state();
-
-    StandardBoardSerialized serialized;
-    board.to_serialized(serialized);
-
-    save_load::SavedGame<StandardBoardSerialized> saved_game;
-    saved_game.board_serialized = serialized;
-    saved_game.camera_controller = camera_controller;
-    saved_game.time = timer.get_time();
-
-    time_t current;
-    time(&current);
-    saved_game.date = ctime(&current);
-
-    saved_game.undo_redo_state = undo_redo_state;
-    saved_game.white_player = game.white_player;
-    saved_game.black_player = game.black_player;
-
-    try {
-        save_load::save_game_to_file(saved_game, save_game_file_name);
-    } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_WARNING("Could not save game: {}", e.what());
-
-        save_load::handle_save_file_not_open_error();
-    } catch (const save_load::SaveFileError& e) {
-        REL_WARNING("Could not save game: {}", e.what());
-    }
+    save_game_generic<StandardGameScene, StandardBoardSerialized>(this);
 }
 
 void StandardGameScene::load_game() {
-    board.finalize_pieces_state();
-
-    save_load::SavedGame<StandardBoardSerialized> saved_game;
-
-    try {
-        save_load::load_game_from_file(saved_game, save_game_file_name);
-    } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_WARNING("Could not load game: {}", e.what());
-
-        save_load::handle_save_file_not_open_error();
-
-        imgui_layer.show_could_not_load_game = true;
-        return;
-    } catch (const save_load::SaveFileError& e) {
-        REL_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
-
-        imgui_layer.show_could_not_load_game = true;
-        return;
-    }
-
-    board.from_serialized(saved_game.board_serialized);
-    camera_controller = saved_game.camera_controller;
-    timer = Timer {app, saved_game.time};
-    undo_redo_state = std::move(saved_game.undo_redo_state);
-    game.white_player = saved_game.white_player;
-    game.black_player = saved_game.black_player;
-
-    // Set camera pointer lost in serialization
-    camera_controller.set_camera(&camera);
-
-    made_first_move = false;
-
-    update_cursor(app, this);
-    update_turn_indicator(app, this);
+    load_game_generic<StandardGameScene, StandardBoardSerialized>(app, this);
 }
 
 void StandardGameScene::undo() {
-    ASSERT(!undo_redo_state.undo.empty(), "Undo history must not be empty");
-
-    if (!board.next_move) {
-        DEB_WARNING("Cannot undo when pieces are in air");
-        return;
-    }
-
-    const bool undo_game_over = board.phase == BoardPhase::None;
-
-    using State = UndoRedoState<StandardBoardSerialized>::State;
-
-    StandardBoardSerialized serialized;
-    board.to_serialized(serialized);
-
-    State current_state = { serialized, camera_controller };
-    const State& previous_state = undo_redo_state.undo.back();
-
-    board.from_serialized(previous_state.board_serialized);
-    camera_controller = previous_state.camera_controller;
-
-    undo_redo_state.undo.pop_back();
-    undo_redo_state.redo.push_back(current_state);
-
-    DEB_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
-
-    game.state = GameState::MaybeNextPlayer;
-    made_first_move = board.turn_count != 0;
-
-    if (undo_game_over) {
-        timer.start();
-    }
-
-    update_cursor(app, this);
-    update_turn_indicator(app, this);
+    undo_generic<StandardGameScene, StandardBoardSerialized>(app, this);
 }
 
 void StandardGameScene::redo() {
-    ASSERT(!undo_redo_state.redo.empty(), "Redo history must not be empty");
-
-    if (!board.next_move) {
-        DEB_WARNING("Cannot redo when pieces are in air");
-        return;
-    }
-
-    using State = UndoRedoState<StandardBoardSerialized>::State;
-
-    StandardBoardSerialized serialized;
-    board.to_serialized(serialized);
-
-    State current_state = { serialized, camera_controller };
-    const State& previous_state = undo_redo_state.redo.back();
-
-    board.from_serialized(previous_state.board_serialized);
-    camera_controller = previous_state.camera_controller;
-
-    undo_redo_state.redo.pop_back();
-    undo_redo_state.undo.push_back(current_state);
-
-    DEB_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
-
-    game.state = GameState::MaybeNextPlayer;
-    made_first_move = board.turn_count != 0;
-
-    const bool redo_game_over = board.phase == BoardPhase::None;
-
-    if (redo_game_over) {
-        timer.stop();
-        board.phase = BoardPhase::GameOver;  // Make the game over screen show up again
-    }
-
-    update_cursor(app, this);
-    update_turn_indicator(app, this);
+    redo_generic<StandardGameScene, StandardBoardSerialized>(app, this);
 }
 
 void StandardGameScene::imgui_draw_debug() {

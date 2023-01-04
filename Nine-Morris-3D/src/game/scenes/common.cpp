@@ -823,6 +823,12 @@ static void initialize_ids(Application* app) {
     }
 }
 
+void release_piece_material_instances(Application* app) {
+    for (size_t i = 0; i < MAX_PIECES; i++) {
+        app->res.material_instance.release(hs {"piece" + std::to_string(i)});
+    }
+}
+
 void initialize_game(Application* app) {
     auto& data = app->user_data<Data>();
 
