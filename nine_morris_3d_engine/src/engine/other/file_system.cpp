@@ -52,12 +52,9 @@ static std::string _app_name;
     }
 
     static void check_and_fix_directories_impl() {
-        ASSERT(!_user_name.empty(), "User name must be set");
-        ASSERT(!_app_name.empty(), "Application name must be set");
-
         const std::string path = USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
 
-        if (!directory_exists_impl(path)) {
+        if (!directory_exists_impl(file_system::cut_slash(path))) {
             REL_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
             if (create_directory_impl(path)) {
@@ -75,17 +72,17 @@ static std::string _app_name;
 
     static bool directory_exists_impl(std::string_view path) {
         WIN32_FIND_DATA find_data;
-        HANDLE find_handle = FindFirstFile(path.data(), &find_data);
+        HANDLE handle = FindFirstFile(path.data(), &find_data);
 
-        if (find_handle == INVALID_HANDLE_VALUE) {
-            FindClose(find_handle);
+        if (handle == INVALID_HANDLE_VALUE) {
+            FindClose(handle);
             return false;
         } else {
             if (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                FindClose(find_handle);
+                FindClose(handle);
                 return true;
             } else {
-                FindClose(find_handle);
+                FindClose(handle);
                 return false;
             }
         }
@@ -109,13 +106,10 @@ static std::string _app_name;
     }
 
     static void check_and_fix_directories_impl() {
-        ASSERT(!_user_name.empty(), "User name must be set");
-        ASSERT(!_app_name.empty(), "Application name must be set");
-
         {
             const std::string path = USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
 
-            if (!directory_exists_impl(path)) {
+            if (!directory_exists_impl(file_system::cut_slash(path))) {
                 REL_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
                 if (create_directory_impl(path)) {
@@ -129,7 +123,7 @@ static std::string _app_name;
         {
             const std::string path = DOCUMENTS_DIRECTORY_PATH(_user_name, _app_name);
 
-            if (!directory_exists_impl(path)) {
+            if (!directory_exists_impl(file_system::cut_slash(path))) {
                 REL_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
                 if (create_directory_impl(path)) {
@@ -158,36 +152,22 @@ static std::string _app_name;
 #elif defined(NM3D_PLATFORM_RELEASE)
     #if defined(NM3D_PLATFORM_LINUX)
         static std::string path_for_logs_impl() {
-            ASSERT(!_user_name.empty(), "User name must be set");
-            ASSERT(!_app_name.empty(), "Application name must be set");
-
             return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
         }
 
         static std::string path_for_saved_data_impl() {
-            ASSERT(!_user_name.empty(), "User name must be set");
-            ASSERT(!_app_name.empty(), "Application name must be set");
-
             return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
         }
 
         static std::string path_for_assets_impl() {
-            ASSERT(!_app_name.empty(), "Application name must be set");
-
             return ASSETS_DIRECTORY_PATH(_app_name);
         }
     #elif defined(NM3D_PLATFORM_WINDOWS)
         static std::string path_for_logs_impl() {
-            ASSERT(!_user_name.empty(), "User name must be set");
-            ASSERT(!_app_name.empty(), "Application name must be set");
-
             return DOCUMENTS_DIRECTORY_PATH(_user_name, _app_name);
         }
 
         static std::string path_for_saved_data_impl() {
-            ASSERT(!_user_name.empty(), "User name must be set");
-            ASSERT(!_app_name.empty(), "Application name must be set");
-
             return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
         }
 
@@ -213,6 +193,10 @@ namespace file_system {
 
     bool delete_file(std::string_view path) {
         return remove(path.data()) != 0;
+    }
+
+    std::string cut_slash(std::string_view path) {
+        return std::string(path.substr(0, path.length() - 1));
     }
 
     std::string get_user_name() noexcept(false) {

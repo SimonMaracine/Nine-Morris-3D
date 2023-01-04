@@ -425,7 +425,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 ImGui::EndMenu();
                 HOVERING_GUI()
             }
-            if (ImGui::MenuItem("Labeled Board", nullptr, &data.imgui_option.labeled_board)) {
+            if (ImGui::MenuItem("Labeled Board", nullptr, &data.imgui_option.labeled_board)) {  // TODO why int?
                 if (data.imgui_option.labeled_board && data.imgui_option.labeled_board != data.options.labeled_board) {
                     data.options.labeled_board = data.imgui_option.labeled_board;
                     set_board_paint_texture(app, scene);

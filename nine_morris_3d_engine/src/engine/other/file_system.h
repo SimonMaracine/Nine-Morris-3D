@@ -11,9 +11,11 @@ namespace file_system {
 
     void initialize_for_applications(std::string_view application_name) noexcept(false);
 
-    bool directory_exists(std::string_view path);
+    bool directory_exists(std::string_view path);  // Path must not end with trailing backslash
     bool create_directory(std::string_view path);
     bool delete_file(std::string_view path);
+
+    std::string cut_slash(std::string_view path);
 
     std::string get_user_name() noexcept(false);
     void check_and_fix_directories();

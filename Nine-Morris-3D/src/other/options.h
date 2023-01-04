@@ -105,7 +105,9 @@ namespace options {
 
     template<typename Opt>
     void handle_options_file_not_open_error(std::string_view options_file_name) {
-        const bool exists = file_system::directory_exists(file_system::path_for_saved_data());
+        const bool exists = file_system::directory_exists(
+            file_system::cut_slash(file_system::path_for_saved_data())
+        );
 
         if (!exists) {
             REL_WARNING("User data directory missing; creating it...");
