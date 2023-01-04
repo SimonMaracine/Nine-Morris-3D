@@ -10,8 +10,8 @@
 #include "other/data.h"
 #include "other/constants.h"
 
-void initialize_piece(Application* app, size_t index, std::shared_ptr<gl::Texture> diffuse_texture);
-void initialize_piece_no_normal(Application* app, size_t index, std::shared_ptr<gl::Texture> diffuse_texture);
+void initialize_piece(Application* app, Index index, std::shared_ptr<gl::Texture> diffuse_texture);
+void initialize_piece_no_normal(Application* app, Index index, std::shared_ptr<gl::Texture> diffuse_texture);
 
 void change_skybox(Application* app);
 void change_board_paint_texture(Application* app);
@@ -59,7 +59,7 @@ void setup_and_add_model_board_paint(Application* app, S* scene) {
 }
 
 template<typename S>
-void setup_and_add_model_piece(Application* app, S* scene, size_t index, const glm::vec3& position) {
+void setup_and_add_model_piece(Application* app, S* scene, Index index, const glm::vec3& position) {
     auto& data = app->user_data<Data>();
 
     const Piece& piece = scene->board.pieces.at(index);
@@ -371,7 +371,7 @@ void update_game_state(Application* app, S* scene) {
 }
 
 template<typename S>
-void setup_piece_on_node(Application* app, S* scene, size_t index, size_t node_index) {
+void setup_piece_on_node(Application* app, S* scene, Index index, Index node_index) {
     setup_and_add_model_piece(
         app,
         scene,

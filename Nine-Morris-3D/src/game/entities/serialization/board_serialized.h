@@ -9,7 +9,7 @@
 
 struct BoardSerialized {
     std::array<NodeSerialized, MAX_NODES> nodes;
-    std::unordered_map<size_t, PieceSerialized> pieces;
+    std::unordered_map<Index, PieceSerialized> pieces;
 
     BoardPhase phase = BoardPhase::PlacePieces;
     BoardPlayer turn = BoardPlayer::White;
@@ -20,5 +20,5 @@ struct BoardSerialized {
     bool must_take_piece = false;
     bool is_players_turn = false;
 
-    size_t turn_count = 0;
+    unsigned int turn_count = 0;
 };

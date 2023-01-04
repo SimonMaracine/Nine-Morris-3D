@@ -12,9 +12,9 @@ struct ThreefoldRepetitionHistory {
             );
         }
 
-        std::array<PieceType, 24> position;
-        size_t piece_index;
-        size_t node_index;
+        std::array<PieceType, MAX_NODES> position;
+        Index piece_index;
+        Index node_index;
     };
 
     std::vector<PositionPlusInfo> ones;

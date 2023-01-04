@@ -281,7 +281,7 @@ void JumpVariantScene::on_window_resized(const WindowResizedEvent& event) {
 }
 
 void JumpVariantScene::setup_and_add_model_pieces() {
-    size_t index = 0;
+    Index index = 0;
 
     // White pieces
     setup_piece_on_node(app, this, index++, 15);
@@ -325,7 +325,7 @@ void JumpVariantScene::setup_entities() {
 
     for (size_t i = 0; i < 3; i++) {
         Piece piece = Piece {
-            i,
+            static_cast<Index>(i),
             PieceType::White,
             app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
@@ -335,9 +335,9 @@ void JumpVariantScene::setup_entities() {
         board.pieces[i] = piece;
     }
 
-    for (size_t i = 3; i < 6; i++) {
+    for (Index i = 3; i < 6; i++) {
         Piece piece = Piece {
-            i,
+            static_cast<Index>(i),
             PieceType::Black,
             app->res.model.load(hs {"piece" + std::to_string(i)}),
             app->res.al_source.load(hs {"piece" + std::to_string(i)})
@@ -347,9 +347,10 @@ void JumpVariantScene::setup_entities() {
         board.pieces[i] = piece;
     }
 
-    for (size_t i = 0; i < MAX_NODES; i++) {
+    for (Index i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
-            i, app->res.model.load(hs {"node" + std::to_string(i)})
+            static_cast<Index>(i),
+            app->res.model.load(hs {"node" + std::to_string(i)})
         };
     }
 

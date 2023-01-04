@@ -44,16 +44,16 @@ Board::Flags JumpBoard::release(identifier::Id hovered_id) {
     return result;
 }
 
-void JumpBoard::computer_place_piece(size_t) {
+void JumpBoard::computer_place_piece(Index) {
     ASSERT(false, "Unimplemented");
 }
 
-void JumpBoard::computer_move_piece(size_t source_node_index, size_t destination_node_index) {
+void JumpBoard::computer_move_piece(Index source_node_index, Index destination_node_index) {
     remember_state();
     move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
 }
 
-void JumpBoard::computer_take_piece(size_t) {
+void JumpBoard::computer_take_piece(Index) {
     ASSERT(false, "Unimplemented");
 }
 
@@ -95,7 +95,7 @@ void JumpBoard::check_move_piece(identifier::Id hovered_id) {
     }
 }
 
-void JumpBoard::move_piece(size_t piece_index, size_t node_index) {
+void JumpBoard::move_piece(Index piece_index, Index node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
@@ -186,8 +186,7 @@ void JumpBoard::remember_state() {
 }
 
 void JumpBoard::to_serialized(JumpBoardSerialized& serialized) {
-
-    for (size_t i = 0; i < 24; i++) {
+    for (size_t i = 0; i < MAX_NODES; i++) {
         serialized.nodes.at(i) = NodeSerialized {};
         serialized.nodes.at(i).index = nodes.at(i).index;
         serialized.nodes.at(i).piece_index = nodes.at(i).piece_index;
@@ -219,7 +218,7 @@ void JumpBoard::to_serialized(JumpBoardSerialized& serialized) {
 void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
     auto& data = app->user_data<Data>();
 
-    for (size_t i = 0; i < 24; i++) {
+    for (size_t i = 0; i < MAX_NODES; i++) {
         nodes.at(i).index = serialized.nodes.at(i).index;
         nodes.at(i).piece_index = serialized.nodes.at(i).piece_index;
     }
@@ -275,7 +274,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
         }
     }
 
-    std::vector<size_t> to_remove;
+    std::vector<Index> to_remove;
 
     for (auto& [index, piece] : pieces) {
         if (serialized.pieces.find(index) == serialized.pieces.end()) {
@@ -284,7 +283,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
         }
     }
 
-    for (size_t index : to_remove) {
+    for (Index index : to_remove) {
         pieces.erase(index);
     }
 

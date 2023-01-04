@@ -61,17 +61,17 @@ Board::Flags StandardBoard::release(identifier::Id hovered_id) {
     return result;
 }
 
-void StandardBoard::computer_place_piece(size_t node_index) {
+void StandardBoard::computer_place_piece(Index node_index) {
     remember_state();
     place_piece(node_index);
 }
 
-void StandardBoard::computer_move_piece(size_t source_node_index, size_t destination_node_index) {
+void StandardBoard::computer_move_piece(Index source_node_index, Index destination_node_index) {
     remember_state();
     move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
 }
 
-void StandardBoard::computer_take_piece(size_t node_index) {
+void StandardBoard::computer_take_piece(Index node_index) {
     remember_state();
     take_piece(nodes.at(node_index).piece_index);
 }
@@ -199,7 +199,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
     }
 }
 
-void StandardBoard::place_piece(size_t node_index) {
+void StandardBoard::place_piece(Index node_index) {
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
     Node& node = nodes.at(node_index);
@@ -254,7 +254,7 @@ void StandardBoard::place_piece(size_t node_index) {
     }
 }
 
-void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
+void StandardBoard::move_piece(Index piece_index, Index node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
@@ -334,7 +334,7 @@ void StandardBoard::move_piece(size_t piece_index, size_t node_index) {
     }
 }
 
-void StandardBoard::take_piece(size_t piece_index) {
+void StandardBoard::take_piece(Index piece_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
@@ -396,11 +396,11 @@ void StandardBoard::switch_turn_and_check_turns_without_mills() {
     turn_count++;
 }
 
-bool StandardBoard::can_go(size_t piece_index, size_t destination_node_index) {
+bool StandardBoard::can_go(Index piece_index, Index destination_node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(destination_node_index != NULL_INDEX, "Invalid index");
 
-    const size_t source_node_index = pieces.at(piece_index).node_index;
+    const Index source_node_index = pieces.at(piece_index).node_index;
 
     ASSERT(source_node_index != NULL_INDEX, "Source must not be null");
     ASSERT(source_node_index != destination_node_index, "Source must be different than destination");
@@ -793,8 +793,7 @@ void StandardBoard::remember_state() {
 }
 
 void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
-
-    for (size_t i = 0; i < 24; i++) {
+    for (size_t i = 0; i < MAX_NODES; i++) {
         serialized.nodes.at(i) = NodeSerialized {};
         serialized.nodes.at(i).index = nodes.at(i).index;
         serialized.nodes.at(i).piece_index = nodes.at(i).piece_index;
@@ -831,7 +830,7 @@ void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
 void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
     auto& data = app->user_data<Data>();
 
-    for (size_t i = 0; i < 24; i++) {
+    for (size_t i = 0; i < MAX_NODES; i++) {
         nodes.at(i).index = serialized.nodes.at(i).index;
         nodes.at(i).piece_index = serialized.nodes.at(i).piece_index;
     }
@@ -887,7 +886,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
         }
     }
 
-    std::vector<size_t> to_remove;
+    std::vector<Index> to_remove;
 
     for (auto& [index, piece] : pieces) {
         if (serialized.pieces.find(index) == serialized.pieces.end()) {
@@ -896,7 +895,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
         }
     }
 
-    for (size_t index : to_remove) {
+    for (Index index : to_remove) {
         pieces.erase(index);
     }
 

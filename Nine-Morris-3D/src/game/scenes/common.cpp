@@ -282,7 +282,7 @@ static void initialize_pieces(Application* app) {
     );
 }
 
-void initialize_piece(Application* app, size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
+void initialize_piece(Application* app, Index index, std::shared_ptr<gl::Texture> diffuse_texture) {
     auto material_instance = app->res.material_instance.load(
         hs {"piece" + std::to_string(index)},
         app->res.material["tinted_wood"_h]
@@ -294,7 +294,7 @@ void initialize_piece(Application* app, size_t index, std::shared_ptr<gl::Textur
     material_instance->set_vec3("u_material.tint", DEFAULT_TINT);
 }
 
-static void initialize_node(Application* app, size_t index) {
+static void initialize_node(Application* app, Index index) {
     auto material_instance = app->res.material_instance.load(
         hs {"node" + std::to_string(index)},
         app->res.material["basic"_h]
@@ -592,7 +592,7 @@ static void initialize_pieces_no_normal(Application* app) {
     );
 }
 
-void initialize_piece_no_normal(Application* app, size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
+void initialize_piece_no_normal(Application* app, Index index, std::shared_ptr<gl::Texture> diffuse_texture) {
     auto material_instance = app->res.material_instance.load(
         hs {"piece" + std::to_string(index)},
         app->res.material["tinted_wood"_h]

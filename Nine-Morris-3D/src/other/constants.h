@@ -161,6 +161,9 @@ enum class GameMode {
     JumpPlus
 };
 
+using Index = int;
+constexpr Index NULL_INDEX = -1;
+
 constexpr size_t MAX_NODES = 24;
 constexpr size_t MAX_PIECES = 18;  // TODO will change
 
@@ -204,8 +207,6 @@ constexpr glm::vec3 NODE_POSITIONS[MAX_NODES] = {
 constexpr glm::vec3 PIECE_BOUNDING_BOX = glm::vec3(0.36f, 0.19f, 0.36f);
 constexpr glm::vec3 NODE_BOUNDING_BOX = glm::vec3(0.32f, 0.01f, 0.32f);
 constexpr glm::vec3 BOARD_BOUNDING_BOX = glm::vec3(5.5f, 0.01f, 5.5f);
-
-constexpr size_t NULL_INDEX = 1000;
 
 constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
 

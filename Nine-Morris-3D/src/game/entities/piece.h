@@ -8,7 +8,7 @@
 
 struct Piece {
     Piece() = default;
-    Piece(size_t index, PieceType type, std::shared_ptr<Renderer::Model> model, std::shared_ptr<al::Source> source)
+    Piece(Index index, PieceType type, std::shared_ptr<Renderer::Model> model, std::shared_ptr<al::Source> source)
         : index(index), type(type), model(model), source(source) {}
     ~Piece() = default;
 
@@ -17,7 +17,7 @@ struct Piece {
     Piece(Piece&&) = default;
     Piece& operator=(Piece&&) = default;
 
-    size_t index = NULL_INDEX;  // From 0 through 17 on standard game
+    Index index = NULL_INDEX;  // From 0 through 17 on standard game
 
     PieceType type = PieceType::None;
     bool in_use = false;  // true, if it is on the board
@@ -25,7 +25,7 @@ struct Piece {
     std::shared_ptr<Renderer::Model> model;
     std::shared_ptr<al::Source> source;
 
-    size_t node_index = NULL_INDEX;  // Reference to the node on top of which it sits on
+    Index node_index = NULL_INDEX;  // Reference to the node on top of which it sits on
 
     PieceMovement movement;
 
