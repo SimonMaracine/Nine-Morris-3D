@@ -189,6 +189,11 @@ void PointCameraController::remove_events(Application* app) {
     app->evt.remove_events(this);
 }
 
+void PointCameraController::discard_events(Application* app) {
+    app->evt.discard_events<MouseScrolledEvent>();  // TODO dirty solution
+    app->evt.discard_events<MouseMovedEvent>();
+}
+
 void PointCameraController::on_mouse_scrolled(const MouseScrolledEvent& event) {
     mouse_input.mouse_wheel = event.scroll;
 }

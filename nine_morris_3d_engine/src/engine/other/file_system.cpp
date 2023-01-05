@@ -60,7 +60,7 @@ static std::string _app_name;
             if (create_directory_impl(path)) {
                 REL_INFO("Created directory `{}`", path);
             } else {
-                REL_ERROR("Couldn't create directory `{}`", path);
+                REL_ERROR("Could not create directory `{}`", path);
             }
         }
     }
@@ -115,7 +115,7 @@ static std::string _app_name;
                 if (create_directory_impl(path)) {
                     REL_INFO("Created directory `{}`", path);
                 } else {
-                    REL_ERROR("Couldn't create directory `{}`", path);
+                    REL_ERROR("Could not create directory `{}`", path);
                 }
             }
         }
@@ -129,7 +129,7 @@ static std::string _app_name;
                 if (create_directory_impl(path)) {
                     REL_INFO("Created directory `{}`", path);
                 } else {
-                    REL_ERROR("Couldn't create directory `{}`", path);
+                    REL_ERROR("Could not create directory `{}`", path);
                 }
             }
         }
@@ -195,8 +195,8 @@ namespace file_system {
         return remove(path.data()) != 0;
     }
 
-    std::string cut_slash(std::string_view path) {
-        return std::string(path.substr(0, path.length() - 1));
+    std::string_view cut_slash(std::string_view path) {
+        return path.substr(0, path.length() - 1);
     }
 
     std::string get_user_name() noexcept(false) {

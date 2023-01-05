@@ -15,7 +15,7 @@ namespace file_system {
     bool create_directory(std::string_view path);
     bool delete_file(std::string_view path);
 
-    std::string cut_slash(std::string_view path);
+    std::string_view cut_slash(std::string_view path);
 
     std::string get_user_name() noexcept(false);
     void check_and_fix_directories();

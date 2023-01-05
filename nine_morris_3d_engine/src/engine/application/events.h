@@ -20,6 +20,9 @@ public:
     template<typename T>
     void remove_events(T&& instance);
 
+    template<typename E>
+    void discard_events();
+
     template<typename E, typename... Args>
     void enqueue(Args&&...);
 
@@ -36,6 +39,11 @@ void EventDispatcher::add_event(T&& instance) {
 template<typename T>
 void EventDispatcher::remove_events(T&& instance) {
     dispatcher.disconnect(std::forward<T>(instance));
+}
+
+template<typename E>
+void EventDispatcher::discard_events() {
+    dispatcher.clear<E>();
 }
 
 template<typename E, typename... Args>

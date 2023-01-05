@@ -167,7 +167,7 @@ Index Board::new_piece_to_place(PieceType type, float x_pos, float z_pos, Index 
         }
     }
 
-    ASSERT(false, "Couldn't find a piece");
+    ASSERT(false, "Could not find a piece");
     return NULL_INDEX;
 }
 

@@ -36,6 +36,7 @@ public:
 
     void setup_events(Application* app);
     void remove_events(Application* app);
+    void discard_events(Application* app);
 
     float sensitivity = 1.0f;  // Best from 0.5 to 2.0
 private:

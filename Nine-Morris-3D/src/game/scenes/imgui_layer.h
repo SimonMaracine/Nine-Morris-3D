@@ -569,8 +569,7 @@ void ImGuiLayer<S, B>::draw_no_last_game() {
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_rules_standard_game() {
     draw_window("Standard Game Rules", []() {
-        const char* rules = R"(The board consists of a grid with twenty-four nodes.
-Each player has nine pieces, either black or white.
+        const char* rules = R"(Each player has nine pieces, either black or white.
 A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.
 When a player remains with three pieces, they can jump on the board.
 A player may take a piece from a mill only if there are no other pieces available.
