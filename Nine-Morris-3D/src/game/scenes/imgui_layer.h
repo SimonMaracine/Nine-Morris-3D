@@ -503,17 +503,17 @@ void ImGuiLayer<S, B>::draw_game_over() {
         switch (scene->board.ending.type) {
             case BoardEnding::WinnerWhite: {
                 const char* message1 = "White player wins!";
-                draw_game_over_message(message1, scene->board.ending.message);
+                draw_game_over_message(message1, scene->board.ending.reason);
                 break;
             }
             case BoardEnding::WinnerBlack: {
                 const char* message1 = "Black player wins!";
-                draw_game_over_message(message1, scene->board.ending.message);
+                draw_game_over_message(message1, scene->board.ending.reason);
                 break;
             }
             case BoardEnding::TieBetweenBothPlayers: {
                 const char* message1 = "Tie between both players!";
-                draw_game_over_message(message1, scene->board.ending.message);
+                draw_game_over_message(message1, scene->board.ending.reason);
                 break;
             }
             case BoardEnding::None:

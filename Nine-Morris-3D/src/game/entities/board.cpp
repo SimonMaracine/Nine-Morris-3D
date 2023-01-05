@@ -241,11 +241,11 @@ void Board::game_over(const BoardEnding& ending) {
     }
 }
 
-bool Board::is_windmill_made(Index node_index, PieceType type, const size_t windmills[][3], size_t mills_count) {
+bool Board::is_mill_made(Index node_index, PieceType type, const size_t mills[][3], size_t mills_count) {
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
     for (size_t i = 0; i < mills_count; i++) {
-        const size_t* mill = windmills[i];
+        const size_t* mill = mills[i];
 
         const Node& node1 = nodes.at(mill[0]);
         const Node& node2 = nodes.at(mill[1]);
@@ -267,11 +267,11 @@ bool Board::is_windmill_made(Index node_index, PieceType type, const size_t wind
     return false;
 }
 
-size_t Board::number_of_pieces_in_windmills(PieceType type, const size_t windmills[][3], size_t mills_count) {
+size_t Board::number_of_pieces_in_mills(PieceType type, const size_t mills[][3], size_t mills_count) {
     std::vector<Index> pieces_inside_mills;
 
     for (size_t i = 0; i < mills_count; i++) {
-        const size_t* mill = windmills[i];
+        const size_t* mill = mills[i];
 
         const Node& node1 = nodes.at(mill[0]);
         const Node& node2 = nodes.at(mill[1]);

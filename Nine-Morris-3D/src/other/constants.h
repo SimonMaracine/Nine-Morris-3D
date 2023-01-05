@@ -25,7 +25,7 @@
 #define TRANSPARENT_BACKGROUND ImVec4(0.058f, 0.058f, 0.058f, 0.74f)
 
 constexpr size_t NINE_MENS_MORRIS_MILLS = 16;
-constexpr size_t WINDMILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
+constexpr size_t MILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
     { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
     { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
@@ -33,7 +33,7 @@ constexpr size_t WINDMILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
 };
 
 constexpr size_t TWELVE_MENS_MORRIS_MILLS = 20;
-constexpr size_t WINDMILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS][3] = {
+constexpr size_t MILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
     { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
     { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
@@ -104,7 +104,7 @@ struct BoardEnding {
     };
 
     Type type = None;
-    std::string message;
+    std::string reason;
 };
 
 enum class PieceType {

@@ -121,14 +121,14 @@ void JumpBoard::move_piece(Index piece_index, Index node_index) {
     piece.selected = false;
     node.piece_index = piece_index;
 
-    constexpr auto windmills = WINDMILLS_NINE_MENS_MORRIS;
+    constexpr auto mills = MILLS_NINE_MENS_MORRIS;
     constexpr auto count = NINE_MENS_MORRIS_MILLS;
 
-    if (is_windmill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), windmills, count)) {
-        DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
+    if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
+        DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         FORMATTED_MESSAGE(
-            message, 64, "%s player has made a windmill.",
+            message, 64, "%s player has made a mill.",
             TURN_IS_WHITE_SO("White", "Black")
         )
 
@@ -158,7 +158,7 @@ void JumpBoard::switch_turn_and_check_turns_without_mills() {
             DEB_INFO("The max amount of turns without mills has been hit");
 
             FORMATTED_MESSAGE(
-                message, 64, "%u turns have passed without a windmill.",
+                message, 64, "%u turns have passed without a mill.",
                 MAX_TURNS_WITHOUT_MILLS
             )
 

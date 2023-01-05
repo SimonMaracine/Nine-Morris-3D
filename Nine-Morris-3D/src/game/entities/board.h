@@ -40,8 +40,8 @@ struct Board {
     void set_pieces_show_outline(PieceType type, bool show);
     void set_pieces_to_take(PieceType type, bool take);
     void game_over(const BoardEnding& ending);
-    bool is_windmill_made(Index node_index, PieceType type, const size_t windmills[][3], size_t mills_count);
-    size_t number_of_pieces_in_windmills(PieceType type, const size_t windmills[][3], size_t mills_count);
+    bool is_mill_made(Index node_index, PieceType type, const size_t mills[][3], size_t mills_count);
+    size_t number_of_pieces_in_mills(PieceType type, const size_t mills[][3], size_t mills_count);
     void unselect_other_pieces(Index currently_selected_piece_index_index);
     void update_piece_outlines();
     void play_piece_place_sound(Index piece_index);

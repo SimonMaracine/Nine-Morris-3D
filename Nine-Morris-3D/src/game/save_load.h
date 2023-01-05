@@ -207,7 +207,7 @@ void serialize(Archive& archive, PieceMovement& movement) {
 
 template<typename Archive>
 void serialize(Archive& archive, BoardEnding& board_ending) {
-    archive(board_ending.type, board_ending.message);
+    archive(board_ending.type, board_ending.reason);
 }
 
 namespace glm {

@@ -136,7 +136,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
         return;
     }
 
-    constexpr auto windmills = WINDMILLS_NINE_MENS_MORRIS;
+    constexpr auto mills = MILLS_NINE_MENS_MORRIS;
     constexpr auto count = NINE_MENS_MORRIS_MILLS;
 
     for (auto& [index, piece] : pieces) {
@@ -148,8 +148,8 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
 
             if (valid_piece) {
                 const bool can_take = (
-                    !is_windmill_made(piece.node_index, PieceType::Black, windmills, count)
-                    || number_of_pieces_in_windmills(PieceType::Black, windmills, count) == black_pieces_count
+                    !is_mill_made(piece.node_index, PieceType::Black, mills, count)
+                    || number_of_pieces_in_mills(PieceType::Black, mills, count) == black_pieces_count
                 );
 
                 if (can_take) {
@@ -158,7 +158,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
 
                     flags.did_action = true;
                 } else {
-                    DEB_DEBUG("Cannot take black piece from windmill");
+                    DEB_DEBUG("Cannot take black piece from mill");
                 }
 
                 break;
@@ -171,8 +171,8 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
 
             if (valid_piece) {
                 const bool can_take = (
-                    !is_windmill_made(piece.node_index, PieceType::White, windmills, count)
-                    || number_of_pieces_in_windmills(PieceType::White, windmills, count) == white_pieces_count
+                    !is_mill_made(piece.node_index, PieceType::White, mills, count)
+                    || number_of_pieces_in_mills(PieceType::White, mills, count) == white_pieces_count
                 );
 
                 if (can_take) {
@@ -181,7 +181,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
 
                     flags.did_action = true;
                 } else {
-                    DEB_DEBUG("Cannot take white piece from windmill");
+                    DEB_DEBUG("Cannot take white piece from mill");
                 }
 
                 break;
@@ -218,11 +218,11 @@ void StandardBoard::place_piece(Index node_index) {
         not_placed_black_pieces_count--;
     }
 
-    constexpr auto windmills = WINDMILLS_NINE_MENS_MORRIS;
+    constexpr auto mills = MILLS_NINE_MENS_MORRIS;
     constexpr auto count = NINE_MENS_MORRIS_MILLS;
 
-    if (is_windmill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), windmills, count)) {
-        DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
+    if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
+        DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
         flags.must_take_or_took_piece = true;
@@ -242,8 +242,8 @@ void StandardBoard::place_piece(Index node_index) {
                 DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
                 FORMATTED_MESSAGE(
-                    message, 64, "%s player has blocked %s player.",
-                    TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
+                    message, 64, "%s player has no more legal moves to make.",
+                    TURN_IS_WHITE_SO("White", "Black")
                 )
 
                 game_over(
@@ -291,11 +291,11 @@ void StandardBoard::move_piece(Index piece_index, Index node_index) {
     piece.selected = false;
     node.piece_index = piece_index;
 
-    constexpr auto windmills = WINDMILLS_NINE_MENS_MORRIS;
+    constexpr auto mills = MILLS_NINE_MENS_MORRIS;
     constexpr auto count = NINE_MENS_MORRIS_MILLS;
 
-    if (is_windmill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), windmills, count)) {
-        DEB_DEBUG("{} windmill is made", TURN_IS_WHITE_SO("White", "Black"));
+    if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
+        DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
         flags.must_take_or_took_piece = true;
@@ -321,8 +321,8 @@ void StandardBoard::move_piece(Index piece_index, Index node_index) {
             DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
             FORMATTED_MESSAGE(
-                message, 64, "%s player has blocked %s player.",
-                TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
+                message, 64, "%s player has no more legal moves to make.",
+                TURN_IS_WHITE_SO("White", "Black")
             )
 
             game_over(
@@ -367,8 +367,8 @@ void StandardBoard::take_piece(Index piece_index) {
         DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
         FORMATTED_MESSAGE(
-            message, 64, "%s player has blocked %s player.",
-            TURN_IS_WHITE_SO("Black", "White"), TURN_IS_WHITE_SO("white", "black")
+            message, 64, "%s player has no more legal moves to make.",
+            TURN_IS_WHITE_SO("White", "Black")
         )
 
         game_over(
@@ -383,7 +383,7 @@ void StandardBoard::switch_turn_and_check_turns_without_mills() {
             DEB_INFO("The max amount of turns without mills has been hit");
 
             FORMATTED_MESSAGE(
-                message, 64, "%u turns have passed without a windmill.",
+                message, 64, "%u turns have passed without a mill.",
                 MAX_TURNS_WITHOUT_MILLS
             )
 
@@ -530,7 +530,7 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
             DEB_INFO("White player has only 2 pieces now");
 
             FORMATTED_MESSAGE(
-                message, 64, "White player cannot make any more windmills."
+                message, 64, "White player cannot make any more mills."
             )
 
             game_over(BoardEnding {BoardEnding::WinnerBlack, message});
@@ -546,7 +546,7 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
             DEB_INFO("Black player has only 2 pieces now");
 
             FORMATTED_MESSAGE(
-                message, 64, "Black player cannot make any more windmills."
+                message, 64, "Black player cannot make any more mills."
             )
 
             game_over(BoardEnding {BoardEnding::WinnerWhite, message});
