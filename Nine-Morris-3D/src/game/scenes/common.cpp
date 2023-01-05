@@ -624,6 +624,7 @@ static void initialize_keyboard_controls(Application* app) {
     keyboard_controls->texture = texture;
 }
 
+#ifdef NM3D_PLATFORM_DEBUG
 static void initialize_light_bulb(Application* app) {
     auto light_bulb = app->res.quad.load("light_bulb"_h);
 
@@ -639,6 +640,7 @@ static void initialize_light_bulb(Application* app) {
 
     light_bulb->texture = light_bulb_texture;
 }
+#endif
 
 static void initialize_skybox(Application* app) {
     if (app->user_data<Data>().options.skybox == game_options::NONE) {
