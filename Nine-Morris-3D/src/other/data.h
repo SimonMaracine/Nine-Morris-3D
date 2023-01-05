@@ -25,7 +25,7 @@ struct Data {
     // Some ImGui widget options for radio buttons
     struct {
         int skybox = 0;
-        int labeled_board = 0;
+        bool labeled_board = false;
         int scene = 0;
     } imgui_option;
 };

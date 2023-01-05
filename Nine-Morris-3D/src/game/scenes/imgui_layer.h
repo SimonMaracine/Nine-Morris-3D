@@ -360,28 +360,34 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 }
             }
             if (ImGui::BeginMenu("Skybox")) {
-                if (ImGui::RadioButton("None", &data.imgui_option.skybox, game_options::NONE)) {
-                    if (data.imgui_option.skybox != data.options.skybox) {
-                        data.options.skybox = data.imgui_option.skybox;
-                        set_skybox(app, scene, Skybox::None);
+                if (scene->skybox_loader->is_in_use()) {
+                    ImGui::RadioButton("None", false);
+                    ImGui::RadioButton("Field", false);
+                    ImGui::RadioButton("Autumn", false);
+                } else {
+                    if (ImGui::RadioButton("None", &data.imgui_option.skybox, game_options::NONE)) {
+                        if (data.imgui_option.skybox != data.options.skybox) {
+                            data.options.skybox = data.imgui_option.skybox;
+                            set_skybox(app, scene, Skybox::None);
 
-                        DEB_INFO("Skybox set to none");
+                            DEB_INFO("Skybox set to none");
+                        }
                     }
-                }
-                if (ImGui::RadioButton("Field", &data.imgui_option.skybox, game_options::FIELD)) {
-                    if (data.imgui_option.skybox != data.options.skybox) {
-                        data.options.skybox = data.imgui_option.skybox;
-                        set_skybox(app, scene, Skybox::Field);
+                    if (ImGui::RadioButton("Field", &data.imgui_option.skybox, game_options::FIELD)) {
+                        if (data.imgui_option.skybox != data.options.skybox) {
+                            data.options.skybox = data.imgui_option.skybox;
+                            set_skybox(app, scene, Skybox::Field);
 
-                        DEB_INFO("Skybox set to field");
+                            DEB_INFO("Skybox set to field");
+                        }
                     }
-                }
-                if (ImGui::RadioButton("Autumn", &data.imgui_option.skybox, game_options::AUTUMN)) {
-                    if (data.imgui_option.skybox != data.options.skybox) {
-                        data.options.skybox = data.imgui_option.skybox;
-                        set_skybox(app, scene, Skybox::Autumn);
+                    if (ImGui::RadioButton("Autumn", &data.imgui_option.skybox, game_options::AUTUMN)) {
+                        if (data.imgui_option.skybox != data.options.skybox) {
+                            data.options.skybox = data.imgui_option.skybox;
+                            set_skybox(app, scene, Skybox::Autumn);
 
-                        DEB_INFO("Skybox set to autumn");
+                            DEB_INFO("Skybox set to autumn");
+                        }
                     }
                 }
 
@@ -425,19 +431,16 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 ImGui::EndMenu();
                 HOVERING_GUI()
             }
-            if (ImGui::MenuItem("Labeled Board", nullptr, &data.imgui_option.labeled_board)) {  // TODO why int?
-                if (data.imgui_option.labeled_board && data.imgui_option.labeled_board != data.options.labeled_board) {
+            if (ImGui::MenuItem("Labeled Board", nullptr, &data.imgui_option.labeled_board)) {
+                if (data.imgui_option.labeled_board != data.options.labeled_board) {
                     data.options.labeled_board = data.imgui_option.labeled_board;
                     set_board_paint_texture(app, scene);
 
-                    DEB_INFO("Board paint texture set to labeled");
-                }
-
-                if (!data.imgui_option.labeled_board && data.imgui_option.labeled_board != data.options.labeled_board) {
-                    data.options.labeled_board = data.imgui_option.labeled_board;
-                    set_board_paint_texture(app, scene);
-
-                    DEB_INFO("Board paint texture set to non-labeled");
+                    if (data.imgui_option.labeled_board) {
+                        DEB_INFO("Board paint texture set to labeled");
+                    } else {
+                        DEB_INFO("Board paint texture set to non-labeled");
+                    }
                 }
             }
 

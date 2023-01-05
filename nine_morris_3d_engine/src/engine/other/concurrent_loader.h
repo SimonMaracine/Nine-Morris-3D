@@ -26,6 +26,7 @@ public:
     void start_loading_thread(const Args&... args);
     void update(Application* app);
     bool is_done() const;
+    bool is_in_use() const;
     void join_and_merge(ResourcesCache& res);
     void join();
     bool joinable() const;
@@ -70,6 +71,11 @@ void ConcurrentLoader<Args...>::update(Application* app) {
 template<typename... Args>
 bool ConcurrentLoader<Args...>::is_done() const {
     return loaded.load();
+}
+
+template<typename... Args>
+bool ConcurrentLoader<Args...>::is_in_use() const {
+    return in_use;
 }
 
 template<typename... Args>
