@@ -217,6 +217,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
                 show_keyboard_controls = true;
                 return;
             }
+            break;
         default:
             break;
     }

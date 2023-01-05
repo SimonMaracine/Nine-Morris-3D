@@ -135,6 +135,8 @@ void JumpVariantScene::on_update() {
         camera_controller.update_controls(app->get_delta());
         board.update_nodes(app->renderer->get_hovered_id());
         board.update_pieces(app->renderer->get_hovered_id());
+    } else {
+        camera_controller.discard_events(app);
     }
 
     camera_controller.update_camera(app->get_delta());
@@ -212,6 +214,7 @@ void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
                 show_keyboard_controls = true;
                 return;
             }
+            break;
         default:
             break;
     }
