@@ -22,7 +22,7 @@ add_executable(${GAME} ${GUI_EXECUTABLE_WINDOWS}
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(${GAME} PRIVATE -Wall -Wextra -Wno-parentheses)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(${GAME} PRIVATE /W2)
+    target_compile_options(${GAME} PRIVATE /W2 /wd4244)
 else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()

@@ -51,7 +51,7 @@ public:
         std::shared_ptr<gl::Texture> texture;
     };
 
-    struct Storage;  // TODO warning on Windows
+    struct Storage;
 
     Renderer(Application* app);
     ~Renderer();

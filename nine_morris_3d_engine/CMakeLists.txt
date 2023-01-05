@@ -138,7 +138,7 @@ add_library(${ENGINE} STATIC
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(${ENGINE} PRIVATE -Wall -Wextra)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(${ENGINE} PRIVATE /W2)
+    target_compile_options(${ENGINE} PRIVATE /W2 /wd4244)
 else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
