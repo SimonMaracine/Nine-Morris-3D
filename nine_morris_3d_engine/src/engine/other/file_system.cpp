@@ -195,8 +195,9 @@ namespace file_system {
         return remove(path.data()) != 0;
     }
 
-    std::string_view cut_slash(std::string_view path) {
-        return path.substr(0, path.length() - 1);
+    std::string cut_slash(std::string_view path) {
+        // Needs to return a new string
+        return std::string(path.substr(0, path.length() - 1));
     }
 
     std::string get_user_name() noexcept(false) {
