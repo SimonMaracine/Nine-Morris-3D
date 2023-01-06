@@ -5,7 +5,7 @@
  | |\  | | | | |  __/ | |  | | (_) | |  | |  | \__ \  ___) | |__| |
  |_| \_|_|_| |_|\___| |_|  |_|\___/|_|  |_|  |_|___/ |____/|_____/ 
 
- VERSION 0.2.0
+ VERSION 0.3.0
 
  Thank you for downloading Nine Morris 3D! A lot of effort was put in the making of this game. I hope
  that you find it useful and enjoyable. :)

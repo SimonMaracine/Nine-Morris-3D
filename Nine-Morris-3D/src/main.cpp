@@ -21,7 +21,7 @@ constexpr const char* LOG_FILE = "debug.log";
 constexpr const char* INFO_FILE = "info.txt";
 
 constexpr unsigned int MAJOR = 0;
-constexpr unsigned int MINOR = 2;
+constexpr unsigned int MINOR = 3;
 constexpr unsigned int PATCH = 0;
 
 constexpr const char* KEY = "data/models/board/board.obj";

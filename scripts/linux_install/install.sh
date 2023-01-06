@@ -8,6 +8,7 @@ EXECUTABLE="Nine-Morris-3D"
 HELP="HELP_LINUX.txt"
 DESKTOP="ninemorris3d.desktop"
 ICON="ninemorris3d.png"
+VERSION="0.3.0"
 
 EXECUTABLE_DESTINATION_FOLDER="/usr/local/games"
 DATA_DESTINATION_FOLDER="/usr/local/share/$APP_NAME"
@@ -57,7 +58,7 @@ touch "$DESKTOP_FOLDER/$DESKTOP"
 check_failure
 cat << EOF > "$DESKTOP_FOLDER/$DESKTOP"
 [Desktop Entry]
-Version=0.2.0
+Version=$VERSION
 Terminal=false
 Exec=$EXECUTABLE
 Icon=$APP_NAME
