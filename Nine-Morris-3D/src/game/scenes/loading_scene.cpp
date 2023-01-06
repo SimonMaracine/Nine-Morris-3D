@@ -36,7 +36,10 @@ void LoadingScene::on_start() {
 void LoadingScene::on_stop() {
     DEB_INFO("Done loading assets; initializing the rest of the game...");
 
-    initialize_game(app);
+    if (app->running) {
+        // Initialize only if game is not closing
+        initialize_game(app);
+    }
 
     loader.reset();
 

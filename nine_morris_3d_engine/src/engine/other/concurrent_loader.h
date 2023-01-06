@@ -29,11 +29,11 @@ public:
     bool is_in_use() const;
     void join_and_merge(ResourcesCache& res);
     void join();
-    bool joinable() const;
     void set_done();
     ResourcesCache& operator()();
 private:
     void reset();
+    void join_thread();
 
     ResourcesCache local_res;
     LoadFunction load_function;
@@ -45,9 +45,7 @@ private:
 
 template<typename... Args>
 ConcurrentLoader<Args...>::~ConcurrentLoader() {
-    if (loading_thread.joinable()) {
-        loading_thread.join();
-    }
+    join_thread();
 }
 
 template<typename... Args>
@@ -89,12 +87,7 @@ void ConcurrentLoader<Args...>::join_and_merge(ResourcesCache& res) {
 
 template<typename... Args>
 void ConcurrentLoader<Args...>::join() {
-    loading_thread.join();
-}
-
-template<typename... Args>
-bool ConcurrentLoader<Args...>::joinable() const {
-    return loading_thread.joinable();
+    join_thread();
 }
 
 template<typename... Args>
@@ -113,4 +106,11 @@ void ConcurrentLoader<Args...>::reset() {
     loading_thread = std::thread {};
     loaded.store(false);
     in_use = false;
+}
+
+template<typename... Args>
+void ConcurrentLoader<Args...>::join_thread() {
+    if (loading_thread.joinable()) {
+        loading_thread.join();
+    }
 }

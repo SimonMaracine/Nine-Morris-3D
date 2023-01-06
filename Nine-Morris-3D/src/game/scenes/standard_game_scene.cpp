@@ -108,13 +108,8 @@ void StandardGameScene::on_stop() {
 
     made_first_move = false;
 
-    if (skybox_loader->joinable()) {
-        skybox_loader->join();
-    }
-
-    if (board_paint_texture_loader->joinable()) {
-        board_paint_texture_loader->join();
-    }
+    skybox_loader->join();
+    board_paint_texture_loader->join();
 
     app->evt.remove_events(this);
 }
