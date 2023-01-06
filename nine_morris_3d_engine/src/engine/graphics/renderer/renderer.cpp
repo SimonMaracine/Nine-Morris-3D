@@ -268,7 +268,7 @@ Renderer::Renderer(Application* app)
         specification.height = app->data().height / BOUNDING_BOX_DIVISOR;
         specification.resize_divisor = BOUNDING_BOX_DIVISOR;
         specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Texture}  // TODO later needs to be renderbuffer
+            gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Renderbuffer}
         };
         specification.depth_attachment = gl::Attachment {
             gl::AttachmentFormat::DEPTH32, gl::AttachmentType::Renderbuffer
@@ -547,14 +547,7 @@ void Renderer::end_rendering() {
     // Draw the final result to the screen
     gl::Framebuffer::bind_default();
     glClear(GL_COLOR_BUFFER_BIT);
-    static bool res = true;  // TODO clean up
-    if (res) {
-        draw_screen_quad(post_processing_context.last_texture);
-    } else {
-        draw_screen_quad(storage.bounding_box_framebuffer->get_color_attachment(0));
-    }
-    if (input::is_key_pressed(input::Key::EQUAL)) res = !res;
-
+    draw_screen_quad(post_processing_context.last_texture);
     glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
     glEnable(GL_DEPTH_TEST);
 }
