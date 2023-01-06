@@ -184,7 +184,7 @@ void Window::set_vsync(int interval) {
     glfwSwapInterval(interval);
 }
 
-unsigned int Window::add_cursor(std::unique_ptr<TextureData> cursor, int x_hotspot, int y_hotspot) {
+unsigned int Window::add_cursor(std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
     const TextureData::Image data = cursor->get_data();
 
     GLFWimage image = {
@@ -224,6 +224,25 @@ void Window::set_cursor(unsigned int handle) {
     GLFWcursor* cursor = cursors[handle];
     glfwSetCursor(window, cursor);
 #endif
+}
+
+void Window::set_icons(const std::initializer_list<std::unique_ptr<TextureData>>& icons) {
+    std::vector<GLFWimage> glfw_icons;
+    glfw_icons.reserve(icons.size());
+
+    for (const std::unique_ptr<TextureData>& icon : icons) {
+        const TextureData::Image data = icon->get_data();
+
+        GLFWimage image = {
+            data.width,
+            data.height,
+            data.pixels
+        };
+
+        glfw_icons.push_back(image);
+    }
+
+    glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
 }
 
 GLFWwindow* Window::create_window(Application* app) {

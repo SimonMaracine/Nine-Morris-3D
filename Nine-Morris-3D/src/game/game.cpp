@@ -25,7 +25,7 @@ static void setup_icons(Application* app) {
     using namespace assets;
     using namespace file_system;
 
-    const std::array<std::unique_ptr<TextureData>, 5> icons = {
+    const auto icons = {
         std::make_unique<TextureData>(path_for_assets(ICON_512), false),
         std::make_unique<TextureData>(path_for_assets(ICON_256), false),
         std::make_unique<TextureData>(path_for_assets(ICON_128), false),
@@ -33,7 +33,7 @@ static void setup_icons(Application* app) {
         std::make_unique<TextureData>(path_for_assets(ICON_32), false)
     };
 
-    app->window->set_icons<5>(icons);
+    app->window->set_icons(icons);
 }
 
 static void setup_cursors(Application* app) {
