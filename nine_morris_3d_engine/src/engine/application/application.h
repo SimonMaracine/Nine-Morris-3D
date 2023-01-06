@@ -38,10 +38,10 @@ public:
     float get_delta() { return delta; }
 
     // Call this to run the application, after all scenes have been defined; it can return an exit code
-    int run();
+    int run(std::string_view start_scene_name);
 
     // Scene management functions
-    void add_scene(std::unique_ptr<Scene>&& scene, bool start = false);
+    void add_scene(std::unique_ptr<Scene>&& scene);
     void change_scene(std::string_view name);
     const Scene* get_current_scene() { return current_scene; }
 
@@ -74,7 +74,7 @@ private:
     void renderer_2d_func();
     void renderer_imgui_func();
 
-    void prepare_scenes();
+    void prepare_scenes(std::string_view start_scene_name);
     void on_start(Scene* scene);
 
     void on_window_closed(const WindowClosedEvent& event);

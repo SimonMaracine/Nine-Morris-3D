@@ -123,10 +123,9 @@ Application::~Application() {  // Destructor is called before all member variabl
     music::stop_music_track();
 }
 
-int Application::run() {
-    ASSERT(current_scene != nullptr, "Starting scene not set");
+int Application::run(std::string_view start_scene_name) {
+    prepare_scenes(start_scene_name);
 
-    prepare_scenes();
     on_start(current_scene);
 
     window->show();
@@ -160,12 +159,7 @@ int Application::run() {
     return exit_code;
 }
 
-void Application::add_scene(std::unique_ptr<Scene>&& scene, bool start) {
-    if (start) {
-        ASSERT(current_scene == nullptr, "Cannot set two starting scenes");
-        current_scene = scene.get();
-    }
-
+void Application::add_scene(std::unique_ptr<Scene>&& scene) {
     scenes.push_back(std::move(scene));
 }
 
@@ -274,9 +268,13 @@ void Application::renderer_imgui_func() {
     imgui_context::end_frame();
 }
 
-void Application::prepare_scenes() {
+void Application::prepare_scenes(std::string_view start_scene_name) {
     for (std::unique_ptr<Scene>& scene : scenes) {
         scene->app = this;
+
+        if (scene->name == start_scene_name) {
+            current_scene = scene.get();
+        }
     }
 }
 

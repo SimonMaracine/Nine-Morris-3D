@@ -339,7 +339,6 @@ void LauncherScene::on_imgui_update() {
     ImGui::Begin("Launcher", nullptr, window_flags);
 
     if (ImGui::BeginTabBar("tabs")) {
-        welcome_page();
         display_page();
         graphics_page();
 
@@ -369,19 +368,6 @@ void LauncherScene::on_window_closed(const WindowClosedEvent&) {
     app->exit_code = 1;
 }
 
-void LauncherScene::welcome_page() {
-    if (ImGui::BeginTabItem("Welcome")) {
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-        // FIXME add proper content
-        ImGui::Text("Nine Morris 3D: a nice board game");
-        ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor,
-                app->data().version_patch);
-
-        ImGui::EndTabItem();
-    }
-}
-
 void LauncherScene::display_page() {
     auto& data = app->user_data<Data>();
 
@@ -396,12 +382,14 @@ void LauncherScene::display_page() {
 
         ImGui::Text("Native Resolution"); ImGui::SameLine();
         ImGui::Checkbox("##Native Resolution", &data.launcher_options.native_resolution);
-        ImGui::SameLine(); help_marker("Window will have the monitor's resolution, instead of the resolution below");
+        ImGui::SameLine(); help_marker("Window will have the monitor's resolution instead of the resolution below");
 
         static size_t resolution_index = map_resolution_to_index(data.launcher_options.resolution);
         combo("Resolution", "##Resolution", resolution_index, display_manager.get_resolutions(), [&data](size_t i) {
             data.launcher_options.resolution = map_index_to_resolution(i);
         });
+
+        ImGui::Dummy(ImVec2(0.0f, 95.0f));
 
         ImGui::PopItemWidth();
         ImGui::EndTabItem();

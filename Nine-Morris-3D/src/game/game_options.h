@@ -27,7 +27,7 @@ namespace game_options {
     static constexpr int DEFAULT_BLACK_PLAYER = COMPUTER;
     static constexpr float DEFAULT_MASTER_VOLUME = 1.0f;
     static constexpr float DEFAULT_MUSIC_VOLUME = 0.7f;
-    static constexpr bool DEFAULT_ENABLE_MUSIC = true;
+    static constexpr bool DEFAULT_ENABLE_MUSIC = false;  // TODO temporary to false!
     static constexpr int DEFAULT_SCENE = STANDARD;
 
     struct GameOptions {

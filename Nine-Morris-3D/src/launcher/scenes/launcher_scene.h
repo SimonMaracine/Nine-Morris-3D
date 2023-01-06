@@ -8,7 +8,7 @@
 
 struct LauncherScene : public Scene {
     LauncherScene()
-        : Scene("launcher_scene") {}
+        : Scene("launcher") {}
     virtual ~LauncherScene() = default;
 
     virtual void on_start() override;
@@ -19,7 +19,6 @@ struct LauncherScene : public Scene {
 
     void on_window_closed(const WindowClosedEvent& event);
 
-    void welcome_page();
     void display_page();
     void graphics_page();
 

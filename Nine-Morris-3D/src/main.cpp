@@ -49,8 +49,8 @@ void application_main() {
         auto data = std::make_any<Data>();
 
         auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
-        launcher->add_scene(std::make_unique<LauncherScene>(), true);
-        exit_code = launcher->run();
+        launcher->add_scene(std::make_unique<LauncherScene>());
+        exit_code = launcher->run("launcher");
         launcher.reset();
 
         if (exit_code == 1) {
@@ -73,11 +73,11 @@ void application_main() {
             .with_audio();
 
         auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
-        game->add_scene(std::make_unique<LoadingScene>(), true);
-        game->add_scene(std::make_unique<StandardGameScene>(), false);
-        game->add_scene(std::make_unique<JumpVariantScene>(), false);
-        game->add_scene(std::make_unique<JumpPlusVariantScene>(), false);
-        exit_code = game->run();
+        game->add_scene(std::make_unique<LoadingScene>());
+        game->add_scene(std::make_unique<StandardGameScene>());
+        game->add_scene(std::make_unique<JumpVariantScene>());
+        game->add_scene(std::make_unique<JumpPlusVariantScene>());
+        exit_code = game->run("loading");
 
         if (exit_code == 0) {
             break;
