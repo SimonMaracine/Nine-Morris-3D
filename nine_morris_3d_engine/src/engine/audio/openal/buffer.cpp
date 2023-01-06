@@ -18,7 +18,7 @@ static ALenum get_format(int channels, size_t bps) {
         format = AL_FORMAT_STEREO16;
     } else {
         REL_CRITICAL("Unknown format: channels = `{}`, bps = `{}`, exiting...", channels, bps);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     return format;

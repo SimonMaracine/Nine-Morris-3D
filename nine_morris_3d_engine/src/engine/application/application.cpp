@@ -26,7 +26,7 @@ void Application::preinitialize(std::string_view app_name, std::string_view log_
     try {
         file_system::initialize_for_applications(app_name);
     } catch (const file_system::UserNameError& e) {
-        game_exit::exit_critical();  // Really bad that there is no feedback
+        application_exit::panic();  // Really bad that there is no feedback
     }
 
     logging::initialize_for_applications(log_file, info_file);

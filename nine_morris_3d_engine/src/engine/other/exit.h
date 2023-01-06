@@ -1,5 +1,5 @@
 #pragma once
 
-namespace game_exit {
-    void exit_critical();
+namespace application_exit {
+    void panic();
 }

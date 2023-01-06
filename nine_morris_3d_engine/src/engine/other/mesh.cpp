@@ -24,7 +24,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -85,7 +85,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -143,7 +143,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -193,7 +193,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -240,7 +240,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -307,7 +307,7 @@ namespace mesh {
         if (!scene) {
             REL_CRITICAL("Could not load model `{}`, exiting...", file_path);
             REL_CRITICAL(importer.GetErrorString());
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;

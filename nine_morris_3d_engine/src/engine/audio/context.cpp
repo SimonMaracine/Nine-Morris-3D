@@ -16,7 +16,7 @@ static void maybe_check_errors(ALCdevice* device) {
 
     if (error != ALC_NO_ERROR) {
         REL_CRITICAL("OpenAL Context Debug Error: {}", error);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 #endif
 }
@@ -28,14 +28,14 @@ OpenAlContext::OpenAlContext() {
 
     if (device == nullptr) {
         REL_CRITICAL("Could not open an AL device, exiting...");
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     context = alcCreateContext(device, nullptr);  // TODO maybe pass some context attributes
 
     if (context == nullptr) {
         REL_CRITICAL("Could not create an AL context, exiting...");
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     if (alcMakeContextCurrent(context) == ALC_FALSE) {
@@ -43,7 +43,7 @@ OpenAlContext::OpenAlContext() {
         alcCloseDevice(device);
 
         REL_CRITICAL("Could not make AL context current, exiting...");
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     _global_device = device;

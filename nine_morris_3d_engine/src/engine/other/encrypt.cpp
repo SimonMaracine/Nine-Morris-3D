@@ -17,7 +17,7 @@ namespace encrypt {
 
         if (!file.is_open()) {
             REL_CRITICAL("Could not open encrypted file `{}` for reading, exiting...", file_path);
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         file.seekg(0, file.end);

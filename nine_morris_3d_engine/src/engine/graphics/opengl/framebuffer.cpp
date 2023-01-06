@@ -341,7 +341,7 @@ namespace gl {
                             break;
                         default:
                             REL_CRITICAL("Wrong attachment format, exiting...");
-                            game_exit::exit_critical();
+                            application_exit::panic();
                     }
 
                     color_attachments[i] = texture;
@@ -378,7 +378,7 @@ namespace gl {
                             break;
                         default:
                             REL_CRITICAL("Wrong attachment format, exiting...");
-                            game_exit::exit_critical();
+                            application_exit::panic();
                     }
 
                     color_attachments[i] = renderbuffer;
@@ -420,7 +420,7 @@ namespace gl {
                             break;
                         default:
                             REL_CRITICAL("Wrong attachment format, exiting...");
-                            game_exit::exit_critical();
+                            application_exit::panic();
                     }
 
                     depth_attachment = texture;
@@ -453,7 +453,7 @@ namespace gl {
                             break;
                         default:
                             REL_CRITICAL("Wrong attachment format, exiting...");
-                            game_exit::exit_critical();
+                            application_exit::panic();
                     }
 
                     depth_attachment = renderbuffer;
@@ -478,7 +478,7 @@ namespace gl {
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             REL_CRITICAL("GL framebuffer {} is incomplete, exiting...", framebuffer);
             REL_CRITICAL("GL framebuffer status: {}", print_framebuffer_status_message(status));
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -54,7 +54,7 @@ namespace gl {
                     break;
                 default:
                     REL_CRITICAL("Unknown element type `{}`, exiting...", element.type);
-                    game_exit::exit_critical();
+                    application_exit::panic();
             }
 
             glEnableVertexAttribArray(element.index);

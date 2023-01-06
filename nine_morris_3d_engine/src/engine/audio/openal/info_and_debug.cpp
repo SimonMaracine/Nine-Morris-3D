@@ -33,7 +33,7 @@ namespace al {
                     REL_CRITICAL("({}) Unknown AL error", error);
             }
 
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 #endif
     }

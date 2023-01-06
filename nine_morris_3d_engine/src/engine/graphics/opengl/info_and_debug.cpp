@@ -113,7 +113,7 @@ static constexpr size_t BUFFER_LENGTH = 128;
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
                 REL_CRITICAL("({}) {}", id, message);
-                game_exit::exit_critical();
+                application_exit::panic();
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:

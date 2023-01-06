@@ -18,7 +18,7 @@ TextureData::TextureData(std::string_view file_path, bool flip)
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 }
 
@@ -35,7 +35,7 @@ TextureData::TextureData(encrypt::EncryptedFile file_path, bool flip)
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 }
 

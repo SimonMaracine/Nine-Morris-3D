@@ -20,7 +20,7 @@ static size_t type_size(GLenum type) {
         CASE(GL_FLOAT_MAT4, 16, GLfloat)
         default:
             REL_CRITICAL("Unknown type `{}`, exiting...", type);
-            game_exit::exit_critical();
+            application_exit::panic();
     }
 
     return size;
@@ -69,7 +69,7 @@ static GLuint compile_shader(std::string_view source_path, GLenum type, std::str
 
     if (!file.is_open()) {
         REL_CRITICAL("Could not open file `{}` for reading, exiting...", source_path);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     file.seekg(0, file.end);
@@ -160,7 +160,7 @@ namespace gl {
             fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
         } catch (const std::runtime_error& e) {
             REL_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         program = glCreateProgram();
@@ -171,7 +171,7 @@ namespace gl {
 
         if (!check_linking(program, name)) {
             REL_CRITICAL("Exiting...");
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         check_and_cache_uniforms(uniforms);
@@ -196,7 +196,7 @@ namespace gl {
             fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
         } catch (const std::runtime_error& e) {
             REL_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         program = glCreateProgram();
@@ -207,7 +207,7 @@ namespace gl {
 
         if (!check_linking(program, name)) {
             REL_CRITICAL("Exiting...");
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         check_and_cache_uniforms(uniforms);
@@ -334,7 +334,7 @@ namespace gl {
 
             if (block_index == GL_INVALID_INDEX) {
                 REL_CRITICAL("Invalid block index, exiting...");
-                game_exit::exit_critical();
+                application_exit::panic();
             }
 
             // If it's already configured, skip to the binding call
@@ -379,7 +379,7 @@ namespace gl {
             for (size_t i = 0; i < block.field_count; i++) {
                 if (indices[i] == GL_INVALID_INDEX) {
                     REL_CRITICAL("Invalid field index, exiting...");
-                    game_exit::exit_critical();
+                    application_exit::panic();
                 }
             }
 

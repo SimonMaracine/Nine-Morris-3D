@@ -23,7 +23,7 @@ SoundData::SoundData(std::string_view file_path)
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load sound data `{}`, exiting...", file_path);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     size = compute_size();
@@ -42,7 +42,7 @@ SoundData::SoundData(encrypt::EncryptedFile file_path)
 
     if (data == nullptr) {
         REL_CRITICAL("Could not load sound data `{}`, exiting...", file_path);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     size = compute_size();

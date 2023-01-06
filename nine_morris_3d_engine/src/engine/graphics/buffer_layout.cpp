@@ -12,7 +12,7 @@ size_t BufferLayout::VertexElement::get_size(Type type) {
             return sizeof(GLint);
         default:
             REL_CRITICAL("Type `{}` is not supported, exiting...", type);
-            game_exit::exit_critical();
+            application_exit::panic();
     }
 
     return 0;

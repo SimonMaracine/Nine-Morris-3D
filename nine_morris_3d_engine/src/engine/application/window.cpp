@@ -15,7 +15,7 @@
 Window::Window(Application* app) {
     if (!glfwInit()) {
         REL_CRITICAL("Could not initialize GLFW, exiting...");
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
@@ -43,7 +43,7 @@ Window::Window(Application* app) {
 
     if (window == nullptr) {
         REL_CRITICAL("Could not create window, exiting...");
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     DEB_INFO("Initialized GLFW and created window and OpenGL context");
@@ -52,7 +52,7 @@ Window::Window(Application* app) {
 
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
         REL_CRITICAL("Could not initialize GLAD, exiting...");
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     glfwSwapInterval(1);
@@ -161,7 +161,7 @@ std::vector<Monitor> Window::get_monitors() {
 
     if (monitors == nullptr) {
         REL_CRITICAL("Could not retrieve monitors, exiting...");
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     std::vector<Monitor> result;
@@ -217,7 +217,7 @@ void Window::set_cursor(unsigned int handle) {
         cursor = cursors.at(handle);
     } catch (const std::out_of_range&) {
         DEB_CRITICAL("Invalid handle `{}`, exiting...", handle);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
     glfwSetCursor(window, cursor);
 #elif defined(NM3D_PLATFORM_RELEASE)

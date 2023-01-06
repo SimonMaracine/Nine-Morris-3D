@@ -26,7 +26,7 @@ static const char* get_file_data(std::string_view file_path) {
 
     if (!file.is_open()) {
         REL_CRITICAL("Could not open file `{}` for reading, exiting...", file_path);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
 
     file.seekg(0, file.end);
@@ -62,7 +62,7 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
 
     if (!stbtt_InitFont(&info, reinterpret_cast<const unsigned char*>(font_file_buffer), 0)) {
         REL_CRITICAL("Could not load font `{}`, exiting...", file_path);
-        game_exit::exit_critical();
+        application_exit::panic();
     }
     sf = stbtt_ScaleForPixelHeight(&info, size);
 

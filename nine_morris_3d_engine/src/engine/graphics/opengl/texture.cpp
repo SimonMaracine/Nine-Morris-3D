@@ -84,7 +84,7 @@ namespace gl {
 
         if (data == nullptr) {
             REL_CRITICAL("Could not load texture `{}`, exiting...", file_path);
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         glGenTextures(1, &texture);
@@ -117,7 +117,7 @@ namespace gl {
 
         if (data == nullptr) {
             REL_CRITICAL("Could not load texture `{}`, exiting...", file_path);
-            game_exit::exit_critical();
+            application_exit::panic();
         }
 
         glGenTextures(1, &texture);
@@ -199,7 +199,7 @@ namespace gl {
 
             if (data == nullptr) {
                 REL_CRITICAL("Could not load texture `{}`, exiting...", file_paths[i]);
-                game_exit::exit_critical();
+                application_exit::panic();
             }
         }
 
