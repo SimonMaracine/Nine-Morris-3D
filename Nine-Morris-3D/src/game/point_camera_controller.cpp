@@ -11,6 +11,9 @@ static constexpr float Y_VARIABLE_VELOCITY = 5.0f;
 static constexpr float X_BASE_VELOCITY = 0.03f;
 static constexpr float X_VARIABLE_VELOCITY = 5.0f;
 
+static constexpr float MIN_DISTANCE_TO_POINT = 5.0f;
+static constexpr float MAX_DISTANCE_TO_POINT = 25.0f;
+
 static float calculate_angle_velocity(float target_angle, float angle) {
     float integer_angle;
     const float fract = glm::modf(angle, integer_angle);
@@ -55,10 +58,10 @@ const glm::vec3& PointCameraController::get_rotation() const {
 }
 
 void PointCameraController::update_controls(float dt) {
-    constexpr float MOVE_SPEED = 3200.0f;
-    constexpr float MOVE_SPEED_MOUSE = MOVE_SPEED * 0.0039f;
-    constexpr float ZOOM_SPEED = 576.0f;
-    constexpr float ZOOM_SPEED_WHEEL = ZOOM_SPEED * 0.01953f;
+    constexpr float MOVE_SPEED = 2700.0f;
+    constexpr float MOVE_SPEED_MOUSE = MOVE_SPEED * 0.004f;
+    constexpr float ZOOM_SPEED = 370.0f;
+    constexpr float ZOOM_SPEED_WHEEL = ZOOM_SPEED * 0.02f;
 
     zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_input.mouse_wheel;
 
@@ -97,8 +100,8 @@ void PointCameraController::update_camera(float dt) {
     calculate_auto_distance_to_point(dt);
 
     // Limit distance_to_point
-    distance_to_point = std::max(distance_to_point, 5.0f);
-    distance_to_point = std::min(distance_to_point, 30.0f);
+    distance_to_point = std::max(distance_to_point, MIN_DISTANCE_TO_POINT);
+    distance_to_point = std::min(distance_to_point, MAX_DISTANCE_TO_POINT);
 
     pitch += y_velocity * sensitivity * dt;
 
