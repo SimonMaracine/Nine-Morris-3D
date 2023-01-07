@@ -27,6 +27,14 @@ else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
 
+# Enable sanitizing in debug mode
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${GAME} PRIVATE -fsanitize=undefined -g)
+        target_link_options(${GAME} PRIVATE -static-libasan -fsanitize=undefined)
+    endif()
+endif()
+
 # Use PCH
 target_precompile_headers(${GAME} PRIVATE "src/pch.hpp")
 

@@ -2,6 +2,7 @@
 
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/other/logging.h"
+#include "engine/other/assert.h"
 
 namespace gl {
     Buffer::Buffer(size_t size, DrawHint hint)
@@ -99,6 +100,9 @@ namespace gl {
     }
 
     void UniformBuffer::set(const void* field_data, size_t field_index) {
+        ASSERT(configured, "Uniform buffer must be configured");
+        ASSERT(data != nullptr, "Data must be allocated");
+
         memcpy(data + fields[field_index].offset, field_data, fields[field_index].size);
     }
 

@@ -65,6 +65,8 @@ namespace gl {
         void bind();
         static void unbind();
 
+        bool is_configured() { return configured; }
+
         void set(const void* data, size_t field_index);
         void upload_data();
     private:

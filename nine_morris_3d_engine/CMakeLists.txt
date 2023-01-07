@@ -143,6 +143,14 @@ else()
     message(FATAL_ERROR "Compiler is not GCC or MSVC")
 endif()
 
+# Enable sanitizing in debug mode
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${ENGINE} PRIVATE -fsanitize=undefined -g)
+        target_link_options(${ENGINE} PRIVATE -static-libasan -fsanitize=undefined)
+    endif()
+endif()
+
 # Use UTF-8 encoding on Windows for both engine and client
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(${ENGINE} PUBLIC /utf-8)

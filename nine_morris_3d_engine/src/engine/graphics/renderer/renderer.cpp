@@ -798,26 +798,32 @@ void Renderer::setup_shadows() {
     );
     const glm::mat4 light_space_matrix = projection * view;
 
+    // Should be already configured
     storage.light_space_uniform_buffer->set(&light_space_matrix, 0);
     storage.light_space_uniform_buffer->bind();
     storage.light_space_uniform_buffer->upload_data();
 }
 
 void Renderer::setup_uniform_buffers() {
+    // Should be already configured
     storage.projection_view_uniform_buffer->set(&camera_cache.projection_view_matrix, 0);
     storage.projection_view_uniform_buffer->bind();
     storage.projection_view_uniform_buffer->upload_data();
 
-    storage.light_uniform_buffer->set(&light.ambient_color, 0);
-    storage.light_uniform_buffer->set(&light.diffuse_color, 1);
-    storage.light_uniform_buffer->set(&light.specular_color, 2);
-    storage.light_uniform_buffer->bind();
-    storage.light_uniform_buffer->upload_data();
+    if (storage.light_uniform_buffer->is_configured()) {
+        storage.light_uniform_buffer->set(&light.ambient_color, 0);
+        storage.light_uniform_buffer->set(&light.diffuse_color, 1);
+        storage.light_uniform_buffer->set(&light.specular_color, 2);
+        storage.light_uniform_buffer->bind();
+        storage.light_uniform_buffer->upload_data();
+    }
 
-    storage.light_view_position_uniform_buffer->set(&light.position, 0);
-    storage.light_view_position_uniform_buffer->set(&camera_cache.position, 1);
-    storage.light_view_position_uniform_buffer->bind();
-    storage.light_view_position_uniform_buffer->upload_data();
+    if (storage.light_view_position_uniform_buffer->is_configured()) {
+        storage.light_view_position_uniform_buffer->set(&light.position, 0);
+        storage.light_view_position_uniform_buffer->set(&camera_cache.position, 1);
+        storage.light_view_position_uniform_buffer->bind();
+        storage.light_view_position_uniform_buffer->upload_data();
+    }
 }
 
 void Renderer::validate_hovered_id(int x, int y) {

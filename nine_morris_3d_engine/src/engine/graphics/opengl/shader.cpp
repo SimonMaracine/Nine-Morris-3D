@@ -342,12 +342,15 @@ namespace gl {
                 goto just_bind;
             }
 
+            // Get data block size
             GLint block_size;
             glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
 
+            // Allocate that amount on the CPU side
             block.uniform_buffer->data = new char[block_size];
             block.uniform_buffer->size = block_size;
 
+            // Allocate that amount on the GPU side
             glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
             glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -360,6 +363,7 @@ namespace gl {
             GLint types[16];
 
             char* field_names[16];
+
             for (size_t i = 0; i < block.field_count; i++) {
                 const std::string& name = block.field_names[i];
                 const size_t size = name.size() + 1;
@@ -368,6 +372,7 @@ namespace gl {
                 strncpy(field_names[i], name.c_str(), size);
             }
 
+            // Get uniform indices just to later get offsets, sizes and types
             glGetUniformIndices(
                 program, block.field_count, const_cast<const char* const*>(field_names), indices
             );
@@ -387,6 +392,7 @@ namespace gl {
             glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
             glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
 
+            // Finally setup the uniform block fields
             for (size_t i = 0; i < block.field_count; i++) {
                 block.uniform_buffer->fields[i] = {
                     static_cast<size_t>(offsets[i]),
