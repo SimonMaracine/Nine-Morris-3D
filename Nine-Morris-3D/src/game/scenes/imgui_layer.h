@@ -543,7 +543,7 @@ void ImGuiLayer<S, B>::draw_game_over() {
 
 template<typename S, typename B>
 void ImGuiLayer<S, B>::draw_about() {
-    draw_window("Error Loading Game", [this]() {
+    draw_window("About Nine Morris 3D", [this]() {
         ImGui::Text("A 3D implementation of the board game nine men's morris");
         ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor, app->data().version_patch);
         ImGui::Separator();
