@@ -226,14 +226,7 @@ GuiRenderer::GuiRenderer(Application* app)
         0.0f, static_cast<float>(app->data().height)
     );
 
-    // Setup uniform variables
-    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
-    storage.projection_uniform_buffer->bind();
-    storage.projection_uniform_buffer->upload_data();
-
-    storage.quad2d_shader->bind();
-    storage.quad2d_shader->upload_uniform_int("u_texture", 0);
-    gl::Shader::unbind();
+    initialize_uniform_variables();
 
     // Setup events
     app->evt.add_event<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);
@@ -410,12 +403,25 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const std::f
     }
 }
 
+void GuiRenderer::initialize_uniform_variables() {
+    // Should be already configured
+    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
+    storage.projection_uniform_buffer->bind();
+    storage.projection_uniform_buffer->upload_data();
+
+    storage.quad2d_shader->bind();
+    storage.quad2d_shader->upload_uniform_int("u_texture", 0);
+
+    gl::Shader::unbind();
+}
+
 void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
     storage.orthographic_projection_matrix = glm::ortho(
         0.0f, static_cast<float>(event.width),
         0.0f, static_cast<float>(event.height)
     );
 
+    // Should be already configured
     storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
     storage.projection_uniform_buffer->bind();
     storage.projection_uniform_buffer->upload_data();

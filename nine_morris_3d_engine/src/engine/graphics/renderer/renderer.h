@@ -114,6 +114,7 @@ private:
     void setup_uniform_buffers();
     void validate_hovered_id(int x, int y);
     void cache_camera_data();
+    void initialize_uniform_variables();
     void on_window_resized(const WindowResizedEvent& event);
 
     struct Storage {

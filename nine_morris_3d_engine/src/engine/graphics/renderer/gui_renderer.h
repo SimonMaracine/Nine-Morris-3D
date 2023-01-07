@@ -142,6 +142,7 @@ private:
     void prepare_draw_image();
     void prepare_draw_text();
     void draw(const std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw);
+    void initialize_uniform_variables();
     void on_window_resized(const WindowResizedEvent& event);
 
     struct Storage {

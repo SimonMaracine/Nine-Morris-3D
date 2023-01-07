@@ -292,15 +292,7 @@ Renderer::Renderer(Application* app)
 
     framebuffer_reader = FramebufferReader<4> {storage.pixel_buffers, storage.bounding_box_framebuffer};
 
-    // Setup uniform variables
-    storage.screen_quad_shader->bind();
-    storage.screen_quad_shader->upload_uniform_int("u_screen_texture", 0);
-
-    storage.quad3d_shader->bind();
-    storage.quad3d_shader->upload_uniform_int("u_texture", 0);
-    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
-
-    gl::Shader::unbind();
+    initialize_uniform_variables();
 
     // Setup events
     app->evt.add_event<WindowResizedEvent, &Renderer::on_window_resized>(this);
@@ -839,6 +831,17 @@ void Renderer::cache_camera_data() {
         camera_cache.projection_view_matrix = camera_controller->get_camera().get_projection_view_matrix();
         camera_cache.position = camera_controller->get_position();
     }
+}
+
+void Renderer::initialize_uniform_variables() {
+    storage.screen_quad_shader->bind();
+    storage.screen_quad_shader->upload_uniform_int("u_screen_texture", 0);
+
+    storage.quad3d_shader->bind();
+    storage.quad3d_shader->upload_uniform_int("u_texture", 0);
+    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
+
+    gl::Shader::unbind();
 }
 
 void Renderer::on_window_resized(const WindowResizedEvent&) {
