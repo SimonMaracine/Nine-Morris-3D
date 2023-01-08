@@ -12,5 +12,6 @@ layout(binding = 0) uniform ProjectionView {
 
 void main() {
     v_entity_id = a_entity_id;
+
     gl_Position = u_projection_view_matrix * a_model_matrix * vec4(a_position, 1.0);
 }

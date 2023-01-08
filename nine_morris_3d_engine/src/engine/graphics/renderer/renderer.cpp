@@ -756,9 +756,9 @@ void Renderer::draw_bounding_boxes() {
     }
 
     storage.box_ids->bind();
-    storage.box_ids->update_data(buffer_ids.data(), sizeof(float) * buffer_ids.size());  // TODO optimize this
+    storage.box_ids->upload_data(buffer_ids.data(), sizeof(float) * buffer_ids.size());  // TODO optimize this
     storage.box_transforms->bind();
-    storage.box_transforms->update_data(buffer_transforms.data(), sizeof(glm::mat4) * buffer_transforms.size());
+    storage.box_transforms->upload_data(buffer_transforms.data(), sizeof(glm::mat4) * buffer_transforms.size());
 
     // Disable blending, because this is a floating-point framebuffer
     glDisable(GL_BLEND);
@@ -790,14 +790,14 @@ void Renderer::setup_shadows() {
     );
     const glm::mat4 light_space_matrix = projection * view;
 
-    // Should be already configured
+    // Should already be configured
     storage.light_space_uniform_buffer->set(&light_space_matrix, 0);
     storage.light_space_uniform_buffer->bind();
     storage.light_space_uniform_buffer->upload_data();
 }
 
 void Renderer::setup_uniform_buffers() {
-    // Should be already configured
+    // Should already be configured
     storage.projection_view_uniform_buffer->set(&camera_cache.projection_view_matrix, 0);
     storage.projection_view_uniform_buffer->bind();
     storage.projection_view_uniform_buffer->upload_data();

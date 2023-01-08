@@ -404,7 +404,7 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const std::f
 }
 
 void GuiRenderer::initialize_uniform_variables() {
-    // Should be already configured
+    // Should already be configured
     storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
     storage.projection_uniform_buffer->bind();
     storage.projection_uniform_buffer->upload_data();
@@ -421,7 +421,7 @@ void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
         0.0f, static_cast<float>(event.height)
     );
 
-    // Should be already configured
+    // Should already be configured
     storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
     storage.projection_uniform_buffer->bind();
     storage.projection_uniform_buffer->upload_data();

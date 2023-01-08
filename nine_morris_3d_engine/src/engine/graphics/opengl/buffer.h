@@ -23,7 +23,7 @@ namespace gl {
         void bind();
         static void unbind();
 
-        void update_data(const void* data, size_t size);
+        void upload_data(const void* data, size_t size);
     private:
         GLuint buffer = 0;
         DrawHint hint = DrawHint::Static;

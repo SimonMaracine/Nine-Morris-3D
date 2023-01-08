@@ -12,7 +12,7 @@
 #include "engine/other/assert.h"
 #include "engine/other/exit.h"
 
-constexpr char ERROR_CHARACTER = 127;
+static constexpr char ERROR_CHARACTER = 127;
 
 static std::string get_name(std::string_view file_path) {
     size_t last_slash = file_path.find_last_of("/");
@@ -90,7 +90,7 @@ Font::~Font() {
 
 void Font::update_data(const float* data, size_t size) {
     buffer->bind();
-    buffer->update_data(data, size);
+    buffer->upload_data(data, size);
     vertex_count = size / sizeof(float);
 }
 
@@ -158,8 +158,12 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
 
         float s0, t0, s1, t1;
         blit_glyph(
-            bake_context.bitmap, bitmap_size, bitmap_size, glyph, width, height, bake_context.x,
-            bake_context.y, &s0, &t0, &s1, &t1
+            bake_context.bitmap,
+            bitmap_size, bitmap_size,
+            glyph,
+            width, height,
+            bake_context.x, bake_context.y,
+            &s0, &t0, &s1, &t1
         );
 
         stbtt_FreeSDF(glyph, nullptr);
@@ -212,8 +216,12 @@ void Font::bake_character(int codepoint) {
 
     float s0, t0, s1, t1;
     blit_glyph(
-        bake_context.bitmap, bitmap_size, bitmap_size, glyph, width, height, bake_context.x,
-        bake_context.y, &s0, &t0, &s1, &t1
+        bake_context.bitmap,
+        bitmap_size, bitmap_size,
+        glyph,
+        width, height,
+        bake_context.x, bake_context.y,
+        &s0, &t0, &s1, &t1
     );
 
     stbtt_FreeSDF(glyph, nullptr);

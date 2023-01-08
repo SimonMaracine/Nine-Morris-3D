@@ -13,7 +13,6 @@ const float WIDTH = 0.3;
 const float EDGE = 0.2;
 
 const float BORDER_EDGE = 0.4;
-
 const vec3 OUTLINE_COLOR = vec3(0.1, 0.1, 0.1);
 
 void main() {

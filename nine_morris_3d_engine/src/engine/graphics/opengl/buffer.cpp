@@ -41,7 +41,7 @@ namespace gl {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void Buffer::update_data(const void* data, size_t size) {
+    void Buffer::upload_data(const void* data, size_t size) {
         glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(hint));
     }
 
@@ -107,6 +107,8 @@ namespace gl {
     }
 
     void UniformBuffer::upload_data() {
+        ASSERT(data != nullptr && size > 0, "Data must be allocated");
+
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
     }
 
