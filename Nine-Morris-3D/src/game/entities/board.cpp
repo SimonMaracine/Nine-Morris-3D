@@ -337,35 +337,15 @@ void Board::update_piece_outlines() {
 void Board::play_piece_place_sound(Index piece_index) {
     Piece& piece = pieces.at(piece_index);
 
-    const int random = rand() % 2;  // TODO maybe use a better RNG
-
-    switch (random) {
-        case 0:
-            piece.source->play(app->res.al_buffer["piece_place1"_h].get());
-            break;
-        case 1:
-            piece.source->play(app->res.al_buffer["piece_place2"_h].get());
-            break;
-        default:
-            ASSERT(false, "Invalid option");
-    }
+    const auto choice = random_gen::choice({ "piece_place1"_h, "piece_place2"_h });
+    piece.source->play(app->res.al_buffer[choice].get());
 }
 
 void Board::play_piece_move_sound(Index piece_index) {
     Piece& piece = pieces.at(piece_index);
 
-    const int random = rand() % 2;  // TODO maybe use a better RNG
-
-    switch (random) {
-        case 0:
-            piece.source->play(app->res.al_buffer["piece_move1"_h].get());
-            break;
-        case 1:
-            piece.source->play(app->res.al_buffer["piece_move2"_h].get());
-            break;
-        default:
-            ASSERT(false, "Invalid option");
-    }
+    const auto choice = random_gen::choice({ "piece_move1"_h, "piece_move2"_h });
+    piece.source->play(app->res.al_buffer[choice].get());
 }
 
 void Board::play_piece_take_sound(Index piece_index) {

@@ -9,4 +9,5 @@
 #include "engine/other/concurrent_loader.h"
 #include "engine/other/logging.h"
 #include "engine/other/mesh.h"
+#include "engine/other/random_gen.h"
 #include "engine/other/resource_manager.h"

@@ -87,6 +87,7 @@ set(ENGINE_HEADERS
     "src/engine/other/file_system.h"
     "src/engine/other/logging.h"
     "src/engine/other/mesh.h"
+    "src/engine/other/random_gen.h"
     "src/engine/other/resource_manager.h"
     "src/engine/engine_application.h"
     "src/engine/engine_audio.h"
@@ -130,6 +131,7 @@ add_library(${ENGINE} STATIC
     "src/engine/other/file_system.cpp"
     "src/engine/other/logging.cpp"
     "src/engine/other/mesh.cpp"
+    "src/engine/other/random_gen.cpp"
     "src/engine/other/resource_manager.cpp"
     ${ENGINE_HEADERS}
 )

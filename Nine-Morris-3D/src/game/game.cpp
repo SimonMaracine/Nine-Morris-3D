@@ -201,8 +201,6 @@ namespace game {
     void start(Application* app) {
         auto& data = app->user_data<Data>();
 
-        srand(time(nullptr));
-
         load_game_options(app);
         setup_icons(app);
         setup_cursors(app);

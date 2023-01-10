@@ -16,6 +16,7 @@
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
 #include "engine/other/file_system.h"
+#include "engine/other/random_gen.h"
 #include "engine/other/exit.h"
 
 std::any Application::dummy_user_data() {
@@ -78,6 +79,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     gl::maybe_initialize_debugging();
     encrypt::initialize(builder.encryption_key);
     identifier::initialize();
+    random_gen::initialize();
 
     const auto [version_major, version_minor] = gl::get_version_number();
     REL_INFO("OpenGL version {}.{}", version_major, version_minor);
