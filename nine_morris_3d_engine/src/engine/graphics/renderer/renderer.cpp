@@ -40,7 +40,7 @@ Renderer::Renderer(Application* app)
     storage.light_view_position_uniform_buffer = std::make_shared<gl::UniformBuffer>();
     storage.light_space_uniform_buffer = std::make_shared<gl::UniformBuffer>();
 
-    storage.projection_view_uniform_block.block_name = "ProjectionView";
+    storage.projection_view_uniform_block.block_name = "ProjectionView";  // TODO improve this
     storage.projection_view_uniform_block.field_count = 1;
     storage.projection_view_uniform_block.field_names = { "u_projection_view_matrix" };
     storage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;

@@ -374,7 +374,10 @@ namespace gl {
 
             // Get uniform indices just to later get offsets, sizes and types
             glGetUniformIndices(
-                program, block.field_count, const_cast<const char* const*>(field_names), indices
+                program,
+                block.field_count,
+                const_cast<const char* const*>(field_names),
+                indices
             );
 
             for (size_t i = 0; i < block.field_count; i++) {
