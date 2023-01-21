@@ -27,13 +27,21 @@ namespace gui {
     };
 
     enum class Relative {
-        Left, Right, Top, Bottom
+        Left,
+        Right,
+        Top,
+        Bottom
     };
 
     class Widget {
     public:
         Widget() = default;
         virtual ~Widget() = default;
+
+        Widget(const Widget&) = delete;
+        Widget& operator=(const Widget&) = delete;
+        Widget(Widget&&) = delete;
+        Widget& operator=(Widget&&) = delete;
 
         virtual void render() = 0;
 

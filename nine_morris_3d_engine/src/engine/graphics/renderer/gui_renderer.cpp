@@ -132,6 +132,7 @@ namespace gui {
         }
 
         font->get_vertex_array().bind();
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, font->get_texture());
 
@@ -263,8 +264,10 @@ void GuiRenderer::render() {
     });
 
     glDisable(GL_DEPTH_TEST);
+
     draw(images, std::bind(&GuiRenderer::prepare_draw_image, this));
     draw(texts, std::bind(&GuiRenderer::prepare_draw_text, this));
+
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -305,8 +308,8 @@ void GuiRenderer::quad_center(float& width, float& height, float& x_pos, float& 
 }
 
 void GuiRenderer::prepare_draw_image() {
-    storage.quad2d_shader->bind();
     storage.quad2d_vertex_array->bind();
+    storage.quad2d_shader->bind();
 }
 
 void GuiRenderer::prepare_draw_text() {
@@ -411,6 +414,8 @@ void GuiRenderer::initialize_uniform_variables() {
 
     storage.quad2d_shader->bind();
     storage.quad2d_shader->upload_uniform_int("u_texture", 0);
+    storage.text_shader->bind();
+    storage.text_shader->upload_uniform_int("u_bitmap", 0);
 
     gl::Shader::unbind();
 }

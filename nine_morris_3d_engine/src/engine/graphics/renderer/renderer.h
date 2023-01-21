@@ -120,12 +120,12 @@ private:
     struct Storage {
         std::shared_ptr<gl::UniformBuffer> projection_view_uniform_buffer;
         std::shared_ptr<gl::UniformBuffer> light_uniform_buffer;
-        std::shared_ptr<gl::UniformBuffer> light_view_position_uniform_buffer;
+        std::shared_ptr<gl::UniformBuffer> light_view_uniform_buffer;
         std::shared_ptr<gl::UniformBuffer> light_space_uniform_buffer;
 
         gl::UniformBlockSpecification projection_view_uniform_block;
         gl::UniformBlockSpecification light_uniform_block;
-        gl::UniformBlockSpecification light_view_position_uniform_block;
+        gl::UniformBlockSpecification light_view_uniform_block;
         gl::UniformBlockSpecification light_space_uniform_block;
 
         std::shared_ptr<gl::Shader> skybox_shader;

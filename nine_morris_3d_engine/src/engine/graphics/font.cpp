@@ -64,14 +64,13 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
         REL_CRITICAL("Could not load font `{}`, exiting...", file_path);
         application_exit::panic();
     }
+
     sf = stbtt_ScaleForPixelHeight(&info, size);
 
     buffer = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
-
     BufferLayout layout;
     layout.add(0, BufferLayout::Float, 2);
     layout.add(1, BufferLayout::Float, 2);
-
     vertex_array = std::make_shared<gl::VertexArray>();
     vertex_array->add_buffer(buffer, layout);
     gl::VertexArray::unbind();

@@ -37,7 +37,7 @@ Renderer::Renderer(Application* app)
 
     storage.projection_view_uniform_buffer = std::make_shared<gl::UniformBuffer>();
     storage.light_uniform_buffer = std::make_shared<gl::UniformBuffer>();
-    storage.light_view_position_uniform_buffer = std::make_shared<gl::UniformBuffer>();
+    storage.light_view_uniform_buffer = std::make_shared<gl::UniformBuffer>();
     storage.light_space_uniform_buffer = std::make_shared<gl::UniformBuffer>();
 
     storage.projection_view_uniform_block.block_name = "ProjectionView";  // TODO improve this
@@ -56,14 +56,14 @@ Renderer::Renderer(Application* app)
     storage.light_uniform_block.uniform_buffer = storage.light_uniform_buffer;
     storage.light_uniform_block.binding_index = 1;
 
-    storage.light_view_position_uniform_block.block_name = "LightViewPosition";
-    storage.light_view_position_uniform_block.field_count = 2;
-    storage.light_view_position_uniform_block.field_names = {
+    storage.light_view_uniform_block.block_name = "LightView";
+    storage.light_view_uniform_block.field_count = 2;
+    storage.light_view_uniform_block.field_names = {
         "u_light_position",
         "u_view_position"
     };
-    storage.light_view_position_uniform_block.uniform_buffer = storage.light_view_position_uniform_buffer;
-    storage.light_view_position_uniform_block.binding_index = 2;
+    storage.light_view_uniform_block.uniform_buffer = storage.light_view_uniform_buffer;
+    storage.light_view_uniform_block.binding_index = 2;
 
     storage.light_space_uniform_block.block_name = "LightSpace";
     storage.light_space_uniform_block.field_count = 1;
@@ -810,11 +810,11 @@ void Renderer::setup_uniform_buffers() {
         storage.light_uniform_buffer->upload_data();
     }
 
-    if (storage.light_view_position_uniform_buffer->is_configured()) {
-        storage.light_view_position_uniform_buffer->set(&light.position, 0);
-        storage.light_view_position_uniform_buffer->set(&camera_cache.position, 1);
-        storage.light_view_position_uniform_buffer->bind();
-        storage.light_view_position_uniform_buffer->upload_data();
+    if (storage.light_view_uniform_buffer->is_configured()) {
+        storage.light_view_uniform_buffer->set(&light.position, 0);
+        storage.light_view_uniform_buffer->set(&camera_cache.position, 1);
+        storage.light_view_uniform_buffer->bind();
+        storage.light_view_uniform_buffer->upload_data();
     }
 }
 

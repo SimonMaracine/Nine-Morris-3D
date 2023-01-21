@@ -370,6 +370,7 @@ namespace gl {
 
                 field_names[i] = new char[size];
                 strncpy(field_names[i], name.c_str(), size);
+                field_names[i][size - 1] = '\0';  // Not really needed
             }
 
             // Get uniform indices just to later get offsets, sizes and types

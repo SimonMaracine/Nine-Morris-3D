@@ -98,30 +98,30 @@ void MaterialInstance::bind() {
     }
 }
 
-void MaterialInstance::set_mat4(std::string_view name, const glm::mat4& matrix) {
-    uniforms_mat4[std::string(name)] = matrix;
+void MaterialInstance::set_mat4(std::string_view name, const glm::mat4& matrix) {  // TODO optimize these in release mode
+    uniforms_mat4.at(std::string(name)) = matrix;
 }
 
 void MaterialInstance::set_int(std::string_view name, int value) {
-    uniforms_int[std::string(name)] = value;
+    uniforms_int.at(std::string(name)) = value;
 }
 
 void MaterialInstance::set_float(std::string_view name, float value) {
-    uniforms_float[std::string(name)] = value;
+    uniforms_float.at(std::string(name)) = value;
 }
 
 void MaterialInstance::set_vec2(std::string_view name, glm::vec2 vector) {
-    uniforms_vec2[std::string(name)] = vector;
+    uniforms_vec2.at(std::string(name)) = vector;
 }
 
 void MaterialInstance::set_vec3(std::string_view name, const glm::vec3& vector) {
-    uniforms_vec3[std::string(name)] = vector;
+    uniforms_vec3.at(std::string(name)) = vector;
 }
 
 void MaterialInstance::set_vec4(std::string_view name, const glm::vec4& vector) {
-    uniforms_vec4[std::string(name)] = vector;
+    uniforms_vec4.at(std::string(name)) = vector;
 }
 
 void MaterialInstance::set_texture(std::string_view name, std::shared_ptr<gl::Texture> texture, int unit) {
-    textures[std::string(name)] = std::make_pair(unit, texture);
+    textures.at(std::string(name)) = std::make_pair(unit, texture);
 }

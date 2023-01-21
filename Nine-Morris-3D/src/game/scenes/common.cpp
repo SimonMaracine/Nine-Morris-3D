@@ -27,7 +27,7 @@ static void initialize_board(Application* app) {
         },
         std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_view_uniform_block,
             app->renderer->get_storage().light_space_uniform_block,
             app->renderer->get_storage().light_uniform_block
         }
@@ -105,7 +105,7 @@ static void initialize_board_paint(Application* app) {
         },
         std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_view_uniform_block,
             app->renderer->get_storage().light_space_uniform_block,
             app->renderer->get_storage().light_uniform_block
         }
@@ -178,7 +178,7 @@ static void initialize_pieces(Application* app) {
         },
         std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_view_uniform_block,
             app->renderer->get_storage().light_space_uniform_block,
             app->renderer->get_storage().light_uniform_block,
         }
@@ -358,7 +358,7 @@ static void initialize_board_no_normal(Application* app) {
         },
         std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_view_uniform_block,
             app->renderer->get_storage().light_space_uniform_block,
             app->renderer->get_storage().light_uniform_block,
         }
@@ -426,7 +426,7 @@ static void initialize_board_paint_no_normal(Application* app) {
         },
         std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_view_uniform_block,
             app->renderer->get_storage().light_space_uniform_block,
             app->renderer->get_storage().light_uniform_block
         }
@@ -496,7 +496,7 @@ static void initialize_pieces_no_normal(Application* app) {
         },
         std::initializer_list {
             app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_position_uniform_block,
+            app->renderer->get_storage().light_view_uniform_block,
             app->renderer->get_storage().light_space_uniform_block,
             app->renderer->get_storage().light_uniform_block
         }

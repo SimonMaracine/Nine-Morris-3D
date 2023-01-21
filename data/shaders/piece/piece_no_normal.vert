@@ -17,7 +17,7 @@ layout(binding = 0) uniform ProjectionView {
     mat4 u_projection_view_matrix;
 };
 
-layout(binding = 2) uniform LightViewPosition {
+layout(binding = 2) uniform LightView {
     vec3 u_light_position;
     vec3 u_view_position;
 };
