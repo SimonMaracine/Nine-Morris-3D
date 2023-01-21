@@ -93,7 +93,7 @@ public:
         float top = 0.0f;
         float lens_near = 1.0f;
         float lens_far = 1.0f;
-        float light_divisor = 1.0f;
+        float position_divisor = 1.0f;
     } light_space;
 private:
     void draw_screen_quad(GLuint texture);

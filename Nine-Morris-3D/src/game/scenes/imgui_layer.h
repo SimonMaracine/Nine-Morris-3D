@@ -747,7 +747,7 @@ void ImGuiLayer<S, B>::draw_debug() {
     ImGui::SliderFloat("Top", &app->renderer->light_space.top, -10.0f, 10.0f);
     ImGui::SliderFloat("Near", &app->renderer->light_space.lens_near, 0.1f, 2.0f);
     ImGui::SliderFloat("Far", &app->renderer->light_space.lens_far, 2.0f, 50.0f);
-    ImGui::SliderFloat("Light divisor", &app->renderer->light_space.light_divisor, 1.0f, 10.0f);
+    ImGui::SliderFloat("Position divisor", &app->renderer->light_space.position_divisor, 1.0f, 10.0f);
     ImGui::End();
 }
 #endif

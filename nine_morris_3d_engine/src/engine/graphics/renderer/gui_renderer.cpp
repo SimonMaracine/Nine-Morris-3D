@@ -412,6 +412,8 @@ void GuiRenderer::initialize_uniform_variables() {
     storage.projection_uniform_buffer->bind();
     storage.projection_uniform_buffer->upload_data();
 
+    gl::UniformBuffer::unbind();
+
     storage.quad2d_shader->bind();
     storage.quad2d_shader->upload_uniform_int("u_texture", 0);
     storage.text_shader->bind();
@@ -430,4 +432,6 @@ void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
     storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
     storage.projection_uniform_buffer->bind();
     storage.projection_uniform_buffer->upload_data();
+
+    gl::UniformBuffer::unbind();
 }

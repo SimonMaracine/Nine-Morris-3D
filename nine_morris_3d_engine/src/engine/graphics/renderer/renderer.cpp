@@ -540,6 +540,7 @@ void Renderer::end_rendering() {
     gl::Framebuffer::bind_default();
     glClear(GL_COLOR_BUFFER_BIT);
     draw_screen_quad(post_processing_context.last_texture);
+
     glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
     glEnable(GL_DEPTH_TEST);
 }
@@ -685,10 +686,10 @@ void Renderer::draw_quad(const Quad* quad) {
 }
 
 void Renderer::draw_quads() {
+    storage.quad_vertex_array->bind();
+
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_mat4("u_view_matrix", camera_cache.view_matrix);
-
-    storage.quad_vertex_array->bind();
 
     std::sort(quads.begin(), quads.end(), [this](const std::shared_ptr<Quad>& lhs, const std::shared_ptr<Quad>& rhs) {
         const float distance1 = glm::distance(lhs->position, camera_cache.position);
@@ -717,8 +718,8 @@ void Renderer::prepare_bounding_box(const Model* model, std::vector<float>& buff
 }
 
 void Renderer::draw_bounding_boxes() {
-    storage.box_shader->bind();
     storage.box_vertex_array->bind();
+    storage.box_shader->bind();
 
     static std::vector<const Model*> bounding_box_models;
     static std::vector<const Model*> bounding_box_models_unsorted;
@@ -784,7 +785,7 @@ void Renderer::setup_shadows() {
         light_space.lens_far
     );
     const glm::mat4 view = glm::lookAt(
-        light.position / light_space.light_divisor,
+        light.position / light_space.position_divisor,
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)
     );
@@ -794,6 +795,8 @@ void Renderer::setup_shadows() {
     storage.light_space_uniform_buffer->set(&light_space_matrix, 0);
     storage.light_space_uniform_buffer->bind();
     storage.light_space_uniform_buffer->upload_data();
+
+    gl::UniformBuffer::unbind();
 }
 
 void Renderer::setup_uniform_buffers() {
@@ -816,6 +819,8 @@ void Renderer::setup_uniform_buffers() {
         storage.light_view_uniform_buffer->bind();
         storage.light_view_uniform_buffer->upload_data();
     }
+
+    gl::UniformBuffer::unbind();
 }
 
 void Renderer::validate_hovered_id(int x, int y) {
@@ -847,6 +852,8 @@ void Renderer::initialize_uniform_variables() {
 void Renderer::on_window_resized(const WindowResizedEvent&) {
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
+
+    gl::Shader::unbind();
 }
 
 namespace render_helpers {

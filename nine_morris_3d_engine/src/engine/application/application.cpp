@@ -297,6 +297,7 @@ void Application::on_window_resized(const WindowResizedEvent& event) {
 
     for (std::weak_ptr<gl::Framebuffer> framebuffer : framebuffers) {
         std::shared_ptr<gl::Framebuffer> fb = framebuffer.lock();
+
         if (fb != nullptr) {
             if (fb->get_specification().resizable) {
                 fb->resize(event.width, event.height);

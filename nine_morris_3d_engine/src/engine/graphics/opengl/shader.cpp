@@ -337,9 +337,9 @@ namespace gl {
                 application_exit::panic();
             }
 
-            // If it's already configured, skip to the binding call
+            // If it's already configured, skip everything else
             if (block.uniform_buffer->configured) {
-                goto just_bind;
+                continue;
             }
 
             // Get data block size
@@ -354,6 +354,9 @@ namespace gl {
             glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
             glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+            // Link uniform buffer to binding index
+            glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
 
             ASSERT(block.field_count <= 16, "Maximum 16 fields for now");
 
@@ -405,9 +408,6 @@ namespace gl {
             }
 
             block.uniform_buffer->configured = true;
-
-            just_bind:
-            glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
         }
     }
 }
