@@ -103,7 +103,7 @@ namespace gl {
         ASSERT(configured, "Uniform buffer must be configured");
         ASSERT(data != nullptr, "Data must be allocated");
 
-        memcpy(data + fields[field_index].offset, field_data, fields[field_index].size);
+        memcpy(data + fields.at(field_index).offset, field_data, fields.at(field_index).size);  // TODO optimize in release
     }
 
     void UniformBuffer::upload_data() {

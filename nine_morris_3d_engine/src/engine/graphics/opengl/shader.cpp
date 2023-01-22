@@ -358,16 +358,20 @@ namespace gl {
             // Link uniform buffer to binding index
             glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
 
-            ASSERT(block.field_count <= 16, "Maximum 16 fields for now");
+            const size_t field_count = block.field_names.size();
+            constexpr size_t MAX_FIELD_COUNT = 8;
 
-            GLuint indices[16];
-            GLint offsets[16];
-            GLint sizes[16];
-            GLint types[16];
+            ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 8 fields for now");
 
-            char* field_names[16];
+            GLuint indices[MAX_FIELD_COUNT];
+            GLint offsets[MAX_FIELD_COUNT];
+            GLint sizes[MAX_FIELD_COUNT];
+            GLint types[MAX_FIELD_COUNT];
 
-            for (size_t i = 0; i < block.field_count; i++) {
+            // Create the uniforms names list, the order of these names matters
+            char* field_names[MAX_FIELD_COUNT];
+
+            for (size_t i = 0; i < field_count; i++) {
                 const std::string& name = block.field_names[i];
                 const size_t size = name.size() + 1;
 
@@ -379,28 +383,28 @@ namespace gl {
             // Get uniform indices just to later get offsets, sizes and types
             glGetUniformIndices(
                 program,
-                block.field_count,
+                field_count,
                 const_cast<const char* const*>(field_names),
                 indices
             );
 
-            for (size_t i = 0; i < block.field_count; i++) {
+            for (size_t i = 0; i < field_count; i++) {
                 delete[] field_names[i];
             }
 
-            for (size_t i = 0; i < block.field_count; i++) {
+            for (size_t i = 0; i < field_count; i++) {
                 if (indices[i] == GL_INVALID_INDEX) {
                     REL_CRITICAL("Invalid field index, exiting...");
                     application_exit::panic();
                 }
             }
 
-            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_OFFSET, offsets);
-            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_SIZE, sizes);
-            glGetActiveUniformsiv(program, block.field_count, indices, GL_UNIFORM_TYPE, types);
+            glGetActiveUniformsiv(program, field_count, indices, GL_UNIFORM_OFFSET, offsets);
+            glGetActiveUniformsiv(program, field_count, indices, GL_UNIFORM_SIZE, sizes);  // For arrays
+            glGetActiveUniformsiv(program, field_count, indices, GL_UNIFORM_TYPE, types);
 
             // Finally setup the uniform block fields
-            for (size_t i = 0; i < block.field_count; i++) {
+            for (size_t i = 0; i < field_count; i++) {
                 block.uniform_buffer->fields[i] = {
                     static_cast<size_t>(offsets[i]),
                     static_cast<size_t>(sizes[i]) * type_size(types[i])

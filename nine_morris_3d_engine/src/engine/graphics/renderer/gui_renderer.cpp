@@ -173,7 +173,6 @@ GuiRenderer::GuiRenderer(Application* app)
     storage.projection_uniform_buffer = std::make_shared<gl::UniformBuffer>();
 
     storage.projection_uniform_block.block_name = "Projection";
-    storage.projection_uniform_block.field_count = 1;
     storage.projection_uniform_block.field_names = { "u_projection_matrix" };
     storage.projection_uniform_block.uniform_buffer = storage.projection_uniform_buffer;
     storage.projection_uniform_block.binding_index = 4;

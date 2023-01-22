@@ -10,8 +10,7 @@
 namespace gl {
     struct UniformBlockSpecification {
         std::string block_name;
-        size_t field_count;
-        std::vector<std::string> field_names;
+        std::vector<std::string> field_names;  // Must be defined in the order that they appear in shader
         std::shared_ptr<UniformBuffer> uniform_buffer;
         GLuint binding_index;
     };

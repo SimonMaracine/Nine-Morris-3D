@@ -79,7 +79,7 @@ namespace gl {
         char* data = nullptr;  // Allocated externally, deallocated internally!
         size_t size = 0;
 
-        std::unordered_map<size_t, UniformBlockField> fields;
+        std::unordered_map<size_t, UniformBlockField> fields;  // Initialized externally by shader!
 
         bool configured = false;  // Used externally by shader!
 
