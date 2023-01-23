@@ -170,62 +170,14 @@ namespace gui {
 
 GuiRenderer::GuiRenderer(Application* app)
     : app(app) {
-    storage.projection_uniform_buffer = std::make_shared<gl::UniformBuffer>();
-
-    storage.projection_uniform_block.block_name = "Projection";
-    storage.projection_uniform_block.field_names = { "u_projection_matrix" };
-    storage.projection_uniform_block.uniform_buffer = storage.projection_uniform_buffer;
-    storage.projection_uniform_block.binding_index = 4;
-
-    using namespace encrypt;
-
-    {
-        storage.quad2d_shader = std::make_shared<gl::Shader>(
-            encr(file_system::path_for_assets(QUAD2D_VERTEX_SHADER)),
-            encr(file_system::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
-            std::vector<std::string> { "u_model_matrix", "u_texture" },
-            std::initializer_list { storage.projection_uniform_block }
-        );
-    }
-
-    {
-        storage.text_shader = std::make_shared<gl::Shader>(
-            encr(file_system::path_for_assets(TEXT_VERTEX_SHADER)),
-            encr(file_system::path_for_assets(TEXT_FRAGMENT_SHADER)),
-            std::vector<std::string> {
-                "u_model_matrix",
-                "u_bitmap",
-                "u_color",
-                "u_border_width",
-                "u_offset"
-            },
-            std::initializer_list { storage.projection_uniform_block }
-        );
-    }
-
-    {
-        static constexpr float quad2d_vertices[] = {
-            0.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 1.0f,
-            1.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 0.0f
-        };
-
-        storage.quad2d_buffer = std::make_shared<gl::Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Float, 2);
-        storage.quad2d_vertex_array = std::make_shared<gl::VertexArray>();
-        storage.quad2d_vertex_array->add_buffer(storage.quad2d_buffer, layout);
-        gl::VertexArray::unbind();
-    }
-
     storage.orthographic_projection_matrix = glm::ortho(
         0.0f, static_cast<float>(app->data().width),
         0.0f, static_cast<float>(app->data().height)
     );
 
+    initialize_uniform_buffers();
+    initialize_shaders();
+    initialize_vertex_arrays();
     initialize_uniform_variables();
 
     // Setup events
@@ -405,6 +357,77 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const std::f
     }
 }
 
+void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
+    storage.orthographic_projection_matrix = glm::ortho(
+        0.0f, static_cast<float>(event.width),
+        0.0f, static_cast<float>(event.height)
+    );
+
+    // Should already be configured
+    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
+    storage.projection_uniform_buffer->bind();
+    storage.projection_uniform_buffer->upload_data();
+
+    gl::UniformBuffer::unbind();
+}
+
+void GuiRenderer::initialize_uniform_buffers() {
+    storage.projection_uniform_buffer = std::make_shared<gl::UniformBuffer>();
+
+    storage.projection_uniform_block.block_name = "Projection";
+    storage.projection_uniform_block.field_names = { "u_projection_matrix" };
+    storage.projection_uniform_block.uniform_buffer = storage.projection_uniform_buffer;
+    storage.projection_uniform_block.binding_index = 4;
+}
+
+void GuiRenderer::initialize_shaders() {
+    using namespace encrypt;
+
+    storage.quad2d_shader = std::make_shared<gl::Shader>(
+        encr(file_system::path_for_assets(QUAD2D_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
+        std::vector<std::string> {
+            "u_model_matrix",
+            "u_texture"
+        },
+        std::initializer_list { storage.projection_uniform_block }
+    );
+
+    storage.text_shader = std::make_shared<gl::Shader>(
+        encr(file_system::path_for_assets(TEXT_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(TEXT_FRAGMENT_SHADER)),
+        std::vector<std::string> {
+            "u_model_matrix",
+            "u_bitmap",
+            "u_color",
+            "u_border_width",
+            "u_offset"
+        },
+        std::initializer_list { storage.projection_uniform_block }
+    );
+}
+
+void GuiRenderer::initialize_vertex_arrays() {
+    static constexpr float quad2d_vertices[] = {
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f
+    };
+
+    storage.quad2d_buffer = std::make_shared<gl::Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
+
+    BufferLayout layout = BufferLayout {}
+        .add(0, BufferLayout::Float, 2);
+
+    storage.quad2d_vertex_array = std::make_shared<gl::VertexArray>();
+    storage.quad2d_vertex_array->begin_definition()
+        .add_buffer(storage.quad2d_buffer, layout)
+        .end_definition();
+}
+
 void GuiRenderer::initialize_uniform_variables() {
     // Should already be configured
     storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
@@ -419,18 +442,4 @@ void GuiRenderer::initialize_uniform_variables() {
     storage.text_shader->upload_uniform_int("u_bitmap", 0);
 
     gl::Shader::unbind();
-}
-
-void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
-    storage.orthographic_projection_matrix = glm::ortho(
-        0.0f, static_cast<float>(event.width),
-        0.0f, static_cast<float>(event.height)
-    );
-
-    // Should already be configured
-    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
-    storage.projection_uniform_buffer->bind();
-    storage.projection_uniform_buffer->upload_data();
-
-    gl::UniformBuffer::unbind();
 }

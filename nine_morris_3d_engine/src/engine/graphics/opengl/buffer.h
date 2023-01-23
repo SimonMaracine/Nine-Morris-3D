@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include "engine/graphics/opengl/vertex_array.h"
+
 namespace gl {
     enum class DrawHint {
         Static = GL_STATIC_DRAW,
@@ -28,7 +30,7 @@ namespace gl {
         GLuint buffer = 0;
         DrawHint hint = DrawHint::Static;
 
-        friend class VertexArray;
+        friend class VertexArray::Def;
     };
 
     class IndexBuffer {

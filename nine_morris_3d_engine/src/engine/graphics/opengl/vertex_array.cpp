@@ -29,7 +29,11 @@ namespace gl {
         glBindVertexArray(0);
     }
 
-    void VertexArray::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout) {
+    VertexArray::Def VertexArray::begin_definition() {
+        return Def {};
+    }
+
+    VertexArray::Def& VertexArray::Def::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout) {
         ASSERT(layout.elements.size() > 0, "Invalid layout");
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
@@ -64,9 +68,17 @@ namespace gl {
                 glVertexAttribDivisor(element.index, 1);
             }
         }
+
+        return *this;
     }
 
-    void VertexArray::add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer) {
+    VertexArray::Def& VertexArray::Def::add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer->buffer);
+
+        return *this;
+    }
+
+    void VertexArray::Def::end_definition() {
+        unbind();
     }
 }

@@ -78,6 +78,7 @@ namespace gl {
     UniformBuffer::UniformBuffer() {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
         DEB_DEBUG("Created GL uniform buffer {}", buffer);

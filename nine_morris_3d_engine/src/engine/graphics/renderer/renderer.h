@@ -114,8 +114,12 @@ private:
     void setup_uniform_buffers();
     void validate_hovered_id(int x, int y);
     void cache_camera_data();
-    void initialize_uniform_variables();
     void on_window_resized(const WindowResizedEvent& event);
+    void initialize_uniform_buffers();
+    void initialize_shaders();
+    void initialize_vertex_arrays();
+    void initialize_framebuffers();
+    void initialize_uniform_variables();
 
     struct Storage {
         std::shared_ptr<gl::UniformBuffer> projection_view_uniform_buffer;

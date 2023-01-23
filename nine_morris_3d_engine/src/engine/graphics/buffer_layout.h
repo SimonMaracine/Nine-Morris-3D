@@ -4,7 +4,9 @@
 
 struct BufferLayout {
     enum Type {
-        Invalid, Float, Int
+        Invalid,
+        Float,
+        Int
     };
 
     struct VertexElement {
@@ -19,5 +21,5 @@ struct BufferLayout {
     std::vector<VertexElement> elements;
     GLsizei stride = 0;
 
-    void add(GLuint index, Type type, GLint size, bool per_instance = false);
+    BufferLayout& add(GLuint index, Type type, GLint size, bool per_instance = false);
 };

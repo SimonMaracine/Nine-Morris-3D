@@ -3,10 +3,25 @@
 #include <glad/glad.h>
 
 #include "engine/graphics/buffer_layout.h"
-#include "engine/graphics/opengl/buffer.h"
+
+namespace gl {
+    class Buffer;
+    class IndexBuffer;
+}
 
 namespace gl {
     class VertexArray {
+    public:
+        class Def {
+        public:
+            Def& add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout);
+            Def& add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer);
+            void end_definition();
+        private:
+            Def() = default;
+
+            friend class VertexArray;
+        };
     public:
         VertexArray();
         ~VertexArray();
@@ -19,8 +34,7 @@ namespace gl {
         void bind();
         static void unbind();
 
-        void add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout);
-        void add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer);
+        Def begin_definition();
     private:
         GLuint array = 0;
     };

@@ -46,16 +46,17 @@ static void initialize_board(Application* app) {
         app->res.mesh_ptnt["board_wood"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 3);
-    layout.add(1, BufferLayout::Float, 2);
-    layout.add(2, BufferLayout::Float, 3);
-    layout.add(3, BufferLayout::Float, 3);
+    BufferLayout layout = BufferLayout {}
+        .add(0, BufferLayout::Float, 3)
+        .add(1, BufferLayout::Float, 2)
+        .add(2, BufferLayout::Float, 3)
+        .add(3, BufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_wood"_h);
-    vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_index_buffer(index_buffer);
-    gl::VertexArray::unbind();
+    vertex_array->begin_definition()
+        .add_buffer(vertex_buffer, layout)
+        .add_index_buffer(index_buffer)
+        .end_definition();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -124,16 +125,17 @@ static void initialize_board_paint(Application* app) {
         app->res.mesh_ptnt["board_paint"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 3);
-    layout.add(1, BufferLayout::Float, 2);
-    layout.add(2, BufferLayout::Float, 3);
-    layout.add(3, BufferLayout::Float, 3);
+    BufferLayout layout = BufferLayout {}
+        .add(0, BufferLayout::Float, 3)
+        .add(1, BufferLayout::Float, 2)
+        .add(2, BufferLayout::Float, 3)
+        .add(3, BufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_paint"_h);
-    vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_index_buffer(index_buffer);
-    gl::VertexArray::unbind();
+    vertex_array->begin_definition()
+        .add_buffer(vertex_buffer, layout)
+        .add_index_buffer(index_buffer)
+        .end_definition();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -209,21 +211,23 @@ static void initialize_pieces(Application* app) {
         app->res.mesh_ptnt["black_piece"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 3);
-    layout.add(1, BufferLayout::Float, 2);
-    layout.add(2, BufferLayout::Float, 3);
-    layout.add(3, BufferLayout::Float, 3);
+    BufferLayout layout = BufferLayout {}
+        .add(0, BufferLayout::Float, 3)
+        .add(1, BufferLayout::Float, 2)
+        .add(2, BufferLayout::Float, 3)
+        .add(3, BufferLayout::Float, 3);
 
     auto white_piece_vertex_array = app->res.vertex_array.load("white_piece"_h);
-    white_piece_vertex_array->add_buffer(white_piece_vertex_buffer, layout);
-    white_piece_vertex_array->add_index_buffer(white_piece_index_buffer);
-    gl::VertexArray::unbind();
+    white_piece_vertex_array->begin_definition()
+        .add_buffer(white_piece_vertex_buffer, layout)
+        .add_index_buffer(white_piece_index_buffer)
+        .end_definition();
 
     auto black_piece_vertex_array = app->res.vertex_array.load("black_piece"_h);
-    black_piece_vertex_array->add_buffer(black_piece_vertex_buffer, layout);
-    black_piece_vertex_array->add_index_buffer(black_piece_index_buffer);
-    gl::VertexArray::unbind();
+    black_piece_vertex_array->begin_definition()
+        .add_buffer(black_piece_vertex_buffer, layout)
+        .add_index_buffer(black_piece_index_buffer)
+        .end_definition();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -326,13 +330,14 @@ static void initialize_nodes(Application* app) {
         app->res.mesh_p["node"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 3);
+    BufferLayout layout = BufferLayout {}
+        .add(0, BufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("node"_h);
-    vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_index_buffer(index_buffer);
-    gl::VertexArray::unbind();
+    vertex_array->begin_definition()
+        .add_buffer(vertex_buffer, layout)
+        .add_index_buffer(index_buffer)
+        .end_definition();
 
     auto material = app->res.material.load("basic"_h, shader);
     material->add_uniform(Material::Uniform::Vec4, "u_color");
@@ -377,15 +382,16 @@ static void initialize_board_no_normal(Application* app) {
         app->res.mesh_ptn["board_wood"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 3);
-    layout.add(1, BufferLayout::Float, 2);
-    layout.add(2, BufferLayout::Float, 3);
+    BufferLayout layout = BufferLayout {}
+        .add(0, BufferLayout::Float, 3)
+        .add(1, BufferLayout::Float, 2)
+        .add(2, BufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_wood"_h);
-    vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_index_buffer(index_buffer);
-    gl::VertexArray::unbind();
+    vertex_array->begin_definition()
+        .add_buffer(vertex_buffer, layout)
+        .add_index_buffer(index_buffer)
+        .end_definition();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -445,15 +451,16 @@ static void initialize_board_paint_no_normal(Application* app) {
         app->res.mesh_ptn["board_paint"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 3);
-    layout.add(1, BufferLayout::Float, 2);
-    layout.add(2, BufferLayout::Float, 3);
+    BufferLayout layout = BufferLayout {}
+        .add(0, BufferLayout::Float, 3)
+        .add(1, BufferLayout::Float, 2)
+        .add(2, BufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_paint"_h);
-    vertex_array->add_buffer(vertex_buffer, layout);
-    vertex_array->add_index_buffer(index_buffer);
-    gl::VertexArray::unbind();
+    vertex_array->begin_definition()
+        .add_buffer(vertex_buffer, layout)
+        .add_index_buffer(index_buffer)
+        .end_definition();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -527,20 +534,22 @@ static void initialize_pieces_no_normal(Application* app) {
         app->res.mesh_ptn["black_piece"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 3);
-    layout.add(1, BufferLayout::Float, 2);
-    layout.add(2, BufferLayout::Float, 3);
+    BufferLayout layout = BufferLayout {}
+        .add(0, BufferLayout::Float, 3)
+        .add(1, BufferLayout::Float, 2)
+        .add(2, BufferLayout::Float, 3);
 
     auto white_piece_vertex_array = app->res.vertex_array.load("white_piece"_h);
-    white_piece_vertex_array->add_buffer(white_piece_vertex_buffer, layout);
-    white_piece_vertex_array->add_index_buffer(white_piece_index_buffer);
-    gl::VertexArray::unbind();
+    white_piece_vertex_array->begin_definition()
+        .add_buffer(white_piece_vertex_buffer, layout)
+        .add_index_buffer(white_piece_index_buffer)
+        .end_definition();
 
     auto black_piece_vertex_array = app->res.vertex_array.load("black_piece"_h);
-    black_piece_vertex_array->add_buffer(black_piece_vertex_buffer, layout);
-    black_piece_vertex_array->add_index_buffer(black_piece_index_buffer);
-    gl::VertexArray::unbind();
+    black_piece_vertex_array->begin_definition()
+        .add_buffer(black_piece_vertex_buffer, layout)
+        .add_index_buffer(black_piece_index_buffer)
+        .end_definition();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;

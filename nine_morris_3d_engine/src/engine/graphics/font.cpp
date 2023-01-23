@@ -67,13 +67,7 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
 
     sf = stbtt_ScaleForPixelHeight(&info, size);
 
-    buffer = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 2);
-    layout.add(1, BufferLayout::Float, 2);
-    vertex_array = std::make_shared<gl::VertexArray>();
-    vertex_array->add_buffer(buffer, layout);
-    gl::VertexArray::unbind();
+    initialize();
 
     name = get_name(file_path);
 
@@ -326,6 +320,19 @@ void Font::get_string_size(std::string_view string, float scale, int* out_width,
     }
 
     *out_width = static_cast<int>(roundf((x + 2) * scale));
+}
+
+void Font::initialize() {
+    buffer = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
+
+    BufferLayout layout;
+    layout.add(0, BufferLayout::Float, 2);
+    layout.add(1, BufferLayout::Float, 2);
+
+    vertex_array = std::make_shared<gl::VertexArray>();
+    vertex_array->begin_definition()
+        .add_buffer(buffer, layout)
+        .end_definition();
 }
 
 void Font::write_bitmap_to_file() {

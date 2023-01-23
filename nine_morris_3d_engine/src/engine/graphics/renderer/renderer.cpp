@@ -35,249 +35,11 @@ Renderer::Renderer(Application* app)
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
 
-    storage.projection_view_uniform_buffer = std::make_shared<gl::UniformBuffer>();
-    storage.light_uniform_buffer = std::make_shared<gl::UniformBuffer>();
-    storage.light_view_uniform_buffer = std::make_shared<gl::UniformBuffer>();
-    storage.light_space_uniform_buffer = std::make_shared<gl::UniformBuffer>();
-
-    storage.projection_view_uniform_block.block_name = "ProjectionView";
-    storage.projection_view_uniform_block.field_names = { "u_projection_view_matrix" };
-    storage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;
-    storage.projection_view_uniform_block.binding_index = 0;
-
-    storage.light_uniform_block.block_name = "Light";
-    storage.light_uniform_block.field_names = {
-        "u_light_ambient",
-        "u_light_diffuse",
-        "u_light_specular"
-    };
-    storage.light_uniform_block.uniform_buffer = storage.light_uniform_buffer;
-    storage.light_uniform_block.binding_index = 1;
-
-    storage.light_view_uniform_block.block_name = "LightView";
-    storage.light_view_uniform_block.field_names = {
-        "u_light_position",
-        "u_view_position"
-    };
-    storage.light_view_uniform_block.uniform_buffer = storage.light_view_uniform_buffer;
-    storage.light_view_uniform_block.binding_index = 2;
-
-    storage.light_space_uniform_block.block_name = "LightSpace";
-    storage.light_space_uniform_block.field_names = { "u_light_space_matrix" };
-    storage.light_space_uniform_block.uniform_buffer = storage.light_space_uniform_buffer;
-    storage.light_space_uniform_block.binding_index = 3;
-
-    using namespace encrypt;
-
-    {
-        storage.skybox_shader = std::make_shared<gl::Shader>(
-            encr(file_system::path_for_assets(SKYBOX_VERTEX_SHADER)),
-            encr(file_system::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
-            std::vector<std::string> { "u_projection_view_matrix", "u_skybox" }
-        );
-    }
-
-    {
-        storage.screen_quad_shader = std::make_shared<gl::Shader>(
-            encr(file_system::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
-            encr(file_system::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
-            std::vector<std::string> { "u_screen_texture" }
-        );
-    }
-
-    {
-        storage.quad3d_shader = std::make_shared<gl::Shader>(
-            encr(file_system::path_for_assets(QUAD3D_VERTEX_SHADER)),
-            encr(file_system::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
-            std::vector<std::string> {
-                "u_model_matrix",
-                "u_view_matrix",
-                "u_projection_matrix",
-                "u_texture"
-            }
-        );
-    }
-
-    {
-        storage.shadow_shader = std::make_shared<gl::Shader>(
-            encr(file_system::path_for_assets(SHADOW_VERTEX_SHADER)),
-            encr(file_system::path_for_assets(SHADOW_FRAGMENT_SHADER)),
-            std::vector<std::string> { "u_model_matrix" },
-            std::initializer_list { storage.light_space_uniform_block }
-        );
-    }
-
-    {
-        storage.outline_shader = std::make_shared<gl::Shader>(
-            encr(file_system::path_for_assets(OUTLINE_VERTEX_SHADER)),
-            encr(file_system::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
-            std::vector<std::string> { "u_model_matrix", "u_color" },
-            std::initializer_list { storage.projection_view_uniform_block }
-        );
-    }
-
-    {
-        storage.box_shader = std::make_shared<gl::Shader>(
-            encr(file_system::path_for_assets(BOUNDING_BOX_VERTEX_SHADER)),
-            encr(file_system::path_for_assets(BOUNDING_BOX_FRAGMENT_SHADER)),
-            std::vector<std::string> {},
-            std::initializer_list { storage.projection_view_uniform_block }
-        );
-    }
-
-#ifdef NM3D_PLATFORM_DEBUG
-    {
-        storage.origin_shader = std::make_shared<gl::Shader>(
-            file_system::path_for_assets(ORIGIN_VERTEX_SHADER),
-            file_system::path_for_assets(ORIGIN_FRAGMENT_SHADER),
-            std::vector<std::string> { "u_projection_view_matrix" }
-        );
-    }
-#endif
-
-    {
-        storage.skybox_buffer = std::make_shared<gl::Buffer>(gl::CUBEMAP_VERTICES, sizeof(gl::CUBEMAP_VERTICES));
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Float, 3);
-        storage.skybox_vertex_array = std::make_shared<gl::VertexArray>();
-        storage.skybox_vertex_array->add_buffer(storage.skybox_buffer, layout);
-        gl::VertexArray::unbind();
-    }
-
-    {
-        static constexpr float screen_quad_vertices[] = {
-            -1.0f,  1.0f,
-            -1.0f, -1.0f,
-             1.0f,  1.0f,
-             1.0f,  1.0f,
-            -1.0f, -1.0f,
-             1.0f, -1.0f,
-        };
-
-        storage.screen_quad_buffer = std::make_shared<gl::Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Float, 2);
-        storage.screen_quad_vertex_array = std::make_shared<gl::VertexArray>();
-        storage.screen_quad_vertex_array->add_buffer(storage.screen_quad_buffer, layout);
-        gl::VertexArray::unbind();
-    }
-
-    {
-        static constexpr float quad_vertices[] = {
-            -1.0f,  1.0f,    0.0f, 1.0f,
-            -1.0f, -1.0f,    0.0f, 0.0f,
-             1.0f,  1.0f,    1.0f, 1.0f,
-             1.0f,  1.0f,    1.0f, 1.0f,
-            -1.0f, -1.0f,    0.0f, 0.0f,
-             1.0f, -1.0f,    1.0f, 0.0f
-        };
-
-        storage.quad_buffer = std::make_shared<gl::Buffer>(quad_vertices, sizeof(quad_vertices));
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Float, 2);
-        layout.add(1, BufferLayout::Float, 2);
-        storage.quad_vertex_array = std::make_shared<gl::VertexArray>();
-        storage.quad_vertex_array->add_buffer(storage.quad_buffer, layout);
-        gl::VertexArray::unbind();
-    }
-
-    {
-        static constexpr float box_vertices[] = {
-            -0.5f, -0.5f,  0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f
-        };
-
-        static constexpr unsigned int box_indices[] = {
-            0, 1, 2, 0, 2, 3,
-            1, 5, 6, 1, 6, 2,
-            5, 4, 6, 4, 7, 6,
-            4, 0, 7, 0, 3, 7,
-            3, 2, 6, 3, 6, 7,
-            4, 5, 1, 4, 1, 0
-        };
-
-        storage.box_buffer = std::make_shared<gl::Buffer>(box_vertices, sizeof(box_vertices));
-        storage.box_ids = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
-        storage.box_transforms = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
-        storage.box_index_buffer = std::make_shared<gl::IndexBuffer>(box_indices, sizeof(box_indices));
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Float, 3);
-        BufferLayout layout_ids;
-        layout_ids.add(1, BufferLayout::Float, 1, true);
-        BufferLayout layout_transforms;
-        layout_transforms.add(2, BufferLayout::Float, 4, true);
-        layout_transforms.add(3, BufferLayout::Float, 4, true);
-        layout_transforms.add(4, BufferLayout::Float, 4, true);
-        layout_transforms.add(5, BufferLayout::Float, 4, true);
-        storage.box_vertex_array = std::make_shared<gl::VertexArray>();
-        storage.box_vertex_array->add_buffer(storage.box_buffer, layout);
-        storage.box_vertex_array->add_buffer(storage.box_ids, layout_ids);
-        storage.box_vertex_array->add_buffer(storage.box_transforms, layout_transforms);
-        storage.box_vertex_array->add_index_buffer(storage.box_index_buffer);
-        gl::VertexArray::unbind();
-    }
-
-#ifdef NM3D_PLATFORM_DEBUG
-    {
-        static constexpr float origin_vertices[] = {
-            -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
-             20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
-              0.0f, -20.0f,   0.0f,    0.0f, 1.0f, 0.0f,
-              0.0f,  20.0f,   0.0f,    0.0f, 1.0f, 0.0f,
-              0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
-              0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
-        };
-
-        storage.origin_buffer = std::make_shared<gl::Buffer>(origin_vertices, sizeof(origin_vertices));
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Float, 3);
-        layout.add(1, BufferLayout::Float, 3);
-        storage.origin_vertex_array = std::make_shared<gl::VertexArray>();
-        storage.origin_vertex_array->add_buffer(storage.origin_buffer, layout);
-        gl::VertexArray::unbind();
-    }
-#endif
-
-    {
-        gl::FramebufferSpecification specification;
-        specification.width = app->data().width;
-        specification.height = app->data().height;
-        specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
-        };
-
-        storage.intermediate_framebuffer = std::make_shared<gl::Framebuffer>(specification);
-
-        app->purge_framebuffers();
-        app->add_framebuffer(storage.intermediate_framebuffer);
-    }
-
-    {
-        gl::FramebufferSpecification specification;
-        specification.width = app->data().width / BOUNDING_BOX_DIVISOR;
-        specification.height = app->data().height / BOUNDING_BOX_DIVISOR;
-        specification.resize_divisor = BOUNDING_BOX_DIVISOR;
-        specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Renderbuffer}
-        };
-        specification.depth_attachment = gl::Attachment {
-            gl::AttachmentFormat::DEPTH32, gl::AttachmentType::Renderbuffer
-        };
-        static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };  // TODO right now not used
-        specification.clear_drawbuffer = 0;
-        specification.clear_value = color;
-
-        storage.bounding_box_framebuffer = std::make_shared<gl::Framebuffer>(specification);
-
-        app->purge_framebuffers();
-        app->add_framebuffer(storage.bounding_box_framebuffer);
-    }
+    initialize_uniform_buffers();
+    initialize_shaders();
+    initialize_vertex_arrays();
+    initialize_framebuffers();
+    initialize_uniform_variables();
 
     storage.pixel_buffers = {
         std::make_shared<gl::PixelBuffer>(sizeof(float)),
@@ -287,8 +49,6 @@ Renderer::Renderer(Application* app)
     };
 
     framebuffer_reader = FramebufferReader<4> {storage.pixel_buffers, storage.bounding_box_framebuffer};
-
-    initialize_uniform_variables();
 
     // Setup events
     app->evt.add_event<WindowResizedEvent, &Renderer::on_window_resized>(this);
@@ -834,19 +594,280 @@ void Renderer::cache_camera_data() {
     }
 }
 
+void Renderer::on_window_resized(const WindowResizedEvent&) {
+    storage.quad3d_shader->bind();
+    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
+
+    gl::Shader::unbind();
+}
+
+void Renderer::initialize_uniform_buffers() {
+    storage.projection_view_uniform_buffer = std::make_shared<gl::UniformBuffer>();
+    storage.light_uniform_buffer = std::make_shared<gl::UniformBuffer>();
+    storage.light_view_uniform_buffer = std::make_shared<gl::UniformBuffer>();
+    storage.light_space_uniform_buffer = std::make_shared<gl::UniformBuffer>();
+
+    storage.projection_view_uniform_block.block_name = "ProjectionView";
+    storage.projection_view_uniform_block.field_names = { "u_projection_view_matrix" };
+    storage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;
+    storage.projection_view_uniform_block.binding_index = 0;
+
+    storage.light_uniform_block.block_name = "Light";
+    storage.light_uniform_block.field_names = {
+        "u_light_ambient",
+        "u_light_diffuse",
+        "u_light_specular"
+    };
+    storage.light_uniform_block.uniform_buffer = storage.light_uniform_buffer;
+    storage.light_uniform_block.binding_index = 1;
+
+    storage.light_view_uniform_block.block_name = "LightView";
+    storage.light_view_uniform_block.field_names = {
+        "u_light_position",
+        "u_view_position"
+    };
+    storage.light_view_uniform_block.uniform_buffer = storage.light_view_uniform_buffer;
+    storage.light_view_uniform_block.binding_index = 2;
+
+    storage.light_space_uniform_block.block_name = "LightSpace";
+    storage.light_space_uniform_block.field_names = { "u_light_space_matrix" };
+    storage.light_space_uniform_block.uniform_buffer = storage.light_space_uniform_buffer;
+    storage.light_space_uniform_block.binding_index = 3;
+}
+
+void Renderer::initialize_shaders() {
+    using namespace encrypt;
+
+    storage.skybox_shader = std::make_shared<gl::Shader>(
+        encr(file_system::path_for_assets(SKYBOX_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
+        std::vector<std::string> {
+            "u_projection_view_matrix",
+            "u_skybox"
+        }
+    );
+
+    storage.screen_quad_shader = std::make_shared<gl::Shader>(
+        encr(file_system::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
+        std::vector<std::string> { "u_screen_texture" }
+    );
+
+    storage.quad3d_shader = std::make_shared<gl::Shader>(
+        encr(file_system::path_for_assets(QUAD3D_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
+        std::vector<std::string> {
+            "u_model_matrix",
+            "u_view_matrix",
+            "u_projection_matrix",
+            "u_texture"
+        }
+    );
+
+    storage.shadow_shader = std::make_shared<gl::Shader>(
+        encr(file_system::path_for_assets(SHADOW_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(SHADOW_FRAGMENT_SHADER)),
+        std::vector<std::string> { "u_model_matrix" },
+        std::initializer_list { storage.light_space_uniform_block }
+    );
+
+    storage.outline_shader = std::make_shared<gl::Shader>(
+        encr(file_system::path_for_assets(OUTLINE_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
+        std::vector<std::string> {
+            "u_model_matrix",
+            "u_color"
+        },
+        std::initializer_list { storage.projection_view_uniform_block }
+    );
+
+    storage.box_shader = std::make_shared<gl::Shader>(
+        encr(file_system::path_for_assets(BOUNDING_BOX_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(BOUNDING_BOX_FRAGMENT_SHADER)),
+        std::vector<std::string> {},
+        std::initializer_list { storage.projection_view_uniform_block }
+    );
+
+#ifdef NM3D_PLATFORM_DEBUG
+    storage.origin_shader = std::make_shared<gl::Shader>(
+        file_system::path_for_assets(ORIGIN_VERTEX_SHADER),
+        file_system::path_for_assets(ORIGIN_FRAGMENT_SHADER),
+        std::vector<std::string> { "u_projection_view_matrix" }
+    );
+#endif
+}
+
+void Renderer::initialize_vertex_arrays() {
+    {
+        storage.skybox_buffer = std::make_shared<gl::Buffer>(gl::CUBEMAP_VERTICES, sizeof(gl::CUBEMAP_VERTICES));
+
+        BufferLayout layout = BufferLayout {}
+            .add(0, BufferLayout::Float, 3);
+
+        storage.skybox_vertex_array = std::make_shared<gl::VertexArray>();
+        storage.skybox_vertex_array->begin_definition()
+            .add_buffer(storage.skybox_buffer, layout)
+            .end_definition();
+    }
+
+    {
+        static constexpr float screen_quad_vertices[] = {
+            -1.0f,  1.0f,
+            -1.0f, -1.0f,
+             1.0f,  1.0f,
+             1.0f,  1.0f,
+            -1.0f, -1.0f,
+             1.0f, -1.0f,
+        };
+
+        storage.screen_quad_buffer = std::make_shared<gl::Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
+
+        BufferLayout layout = BufferLayout {}
+            .add(0, BufferLayout::Float, 2);
+
+        storage.screen_quad_vertex_array = std::make_shared<gl::VertexArray>();
+        storage.screen_quad_vertex_array->begin_definition()
+            .add_buffer(storage.screen_quad_buffer, layout)
+            .end_definition();
+    }
+
+    {
+        static constexpr float quad_vertices[] = {
+            -1.0f,  1.0f,    0.0f, 1.0f,
+            -1.0f, -1.0f,    0.0f, 0.0f,
+             1.0f,  1.0f,    1.0f, 1.0f,
+             1.0f,  1.0f,    1.0f, 1.0f,
+            -1.0f, -1.0f,    0.0f, 0.0f,
+             1.0f, -1.0f,    1.0f, 0.0f
+        };
+
+        storage.quad_buffer = std::make_shared<gl::Buffer>(quad_vertices, sizeof(quad_vertices));
+
+        BufferLayout layout = BufferLayout {}
+            .add(0, BufferLayout::Float, 2)
+            .add(1, BufferLayout::Float, 2);
+
+        storage.quad_vertex_array = std::make_shared<gl::VertexArray>();
+        storage.quad_vertex_array->begin_definition()
+            .add_buffer(storage.quad_buffer, layout)
+            .end_definition();
+    }
+
+    {
+        static constexpr float box_vertices[] = {
+            -0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f
+        };
+
+        static constexpr unsigned int box_indices[] = {
+            0, 1, 2, 0, 2, 3,
+            1, 5, 6, 1, 6, 2,
+            5, 4, 6, 4, 7, 6,
+            4, 0, 7, 0, 3, 7,
+            3, 2, 6, 3, 6, 7,
+            4, 5, 1, 4, 1, 0
+        };
+
+        storage.box_buffer = std::make_shared<gl::Buffer>(box_vertices, sizeof(box_vertices));
+        storage.box_ids = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
+        storage.box_transforms = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
+        storage.box_index_buffer = std::make_shared<gl::IndexBuffer>(box_indices, sizeof(box_indices));
+
+        BufferLayout layout = BufferLayout {}
+            .add(0, BufferLayout::Float, 3);
+
+        BufferLayout layout_ids = BufferLayout {}
+            .add(1, BufferLayout::Float, 1, true);
+
+        BufferLayout layout_transforms = BufferLayout {}
+            .add(2, BufferLayout::Float, 4, true)
+            .add(3, BufferLayout::Float, 4, true)
+            .add(4, BufferLayout::Float, 4, true)
+            .add(5, BufferLayout::Float, 4, true);
+
+        storage.box_vertex_array = std::make_shared<gl::VertexArray>();
+        storage.box_vertex_array->begin_definition()
+            .add_buffer(storage.box_buffer, layout)
+            .add_buffer(storage.box_ids, layout_ids)
+            .add_buffer(storage.box_transforms, layout_transforms)
+            .add_index_buffer(storage.box_index_buffer)
+            .end_definition();
+    }
+
+#ifdef NM3D_PLATFORM_DEBUG
+    {
+        static constexpr float origin_vertices[] = {
+            -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
+             20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
+              0.0f, -20.0f,   0.0f,    0.0f, 1.0f, 0.0f,
+              0.0f,  20.0f,   0.0f,    0.0f, 1.0f, 0.0f,
+              0.0f,   0.0f, -20.0f,    0.0f, 0.0f, 1.0f,
+              0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
+        };
+
+        storage.origin_buffer = std::make_shared<gl::Buffer>(origin_vertices, sizeof(origin_vertices));
+
+        BufferLayout layout;
+        layout.add(0, BufferLayout::Float, 3);
+        layout.add(1, BufferLayout::Float, 3);
+
+        storage.origin_vertex_array = std::make_shared<gl::VertexArray>();
+        storage.origin_vertex_array->begin_definition()
+            .add_buffer(storage.origin_buffer, layout)
+            .end_definition();
+    }
+#endif
+}
+
+void Renderer::initialize_framebuffers() {
+    {
+        gl::FramebufferSpecification specification;
+        specification.width = app->data().width;
+        specification.height = app->data().height;
+        specification.color_attachments = {
+            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
+        };
+
+        storage.intermediate_framebuffer = std::make_shared<gl::Framebuffer>(specification);
+
+        app->purge_framebuffers();
+        app->add_framebuffer(storage.intermediate_framebuffer);
+    }
+
+    {
+        gl::FramebufferSpecification specification;
+        specification.width = app->data().width / BOUNDING_BOX_DIVISOR;
+        specification.height = app->data().height / BOUNDING_BOX_DIVISOR;
+        specification.resize_divisor = BOUNDING_BOX_DIVISOR;
+        specification.color_attachments = {
+            gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Renderbuffer}
+        };
+        specification.depth_attachment = gl::Attachment {
+            gl::AttachmentFormat::DEPTH32, gl::AttachmentType::Renderbuffer
+        };
+        static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };  // TODO right now not used
+        specification.clear_drawbuffer = 0;
+        specification.clear_value = color;
+
+        storage.bounding_box_framebuffer = std::make_shared<gl::Framebuffer>(specification);
+
+        app->purge_framebuffers();
+        app->add_framebuffer(storage.bounding_box_framebuffer);
+    }
+}
+
 void Renderer::initialize_uniform_variables() {
     storage.screen_quad_shader->bind();
     storage.screen_quad_shader->upload_uniform_int("u_screen_texture", 0);
 
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_int("u_texture", 0);
-    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
-
-    gl::Shader::unbind();
-}
-
-void Renderer::on_window_resized(const WindowResizedEvent&) {
-    storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
 
     gl::Shader::unbind();
