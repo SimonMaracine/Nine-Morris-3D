@@ -38,11 +38,11 @@ public:
     void bake_characters(int begin_codepoint, int end_codepoint);
     void bake_character(int codepoint);
 
-    // Call render to get the buffer of data used in the end by OpenGL; pointer returned needs to be deleted
-    void render(std::string_view string, size_t* out_size, float** out_buffer);
+    // Call render to get the buffer of data used in the end by OpenGL
+    void render(std::string_view string, std::vector<float>& buffer);
 
     // Get width and height of a line of text
-    void get_string_size(std::string_view string, float scale, int* out_width, int* out_height);
+    std::pair<int, int> get_string_size(std::string_view string, float scale);
 private:
     void initialize();
     void write_bitmap_to_file();

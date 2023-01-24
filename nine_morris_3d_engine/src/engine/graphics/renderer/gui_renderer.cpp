@@ -100,20 +100,18 @@ namespace gui {
         : font(font), text(text), text_scale(text_scale), color(color) {
         type = WidgetType::Text;
 
-        int x, y;
-        font->get_string_size(text, text_scale, &x, &y);
+        const auto [x, y] = font->get_string_size(text, text_scale);
 
         size.x = static_cast<float>(x);
         size.y = static_cast<float>(y);
     }
 
     void Text::render() {
-        size_t size;
-        float* buffer;
-        font->render(text, &size, &buffer);
+        static std::vector<float> buffer;
+        buffer.clear();
 
-        font->update_data(buffer, size);
-        delete[] buffer;
+        font->render(text, buffer);
+        font->update_data(buffer.data(), sizeof(float) * buffer.size());
 
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
@@ -123,13 +121,11 @@ namespace gui {
         app->gui_renderer->storage.text_shader->upload_uniform_mat4("u_model_matrix", matrix);
         app->gui_renderer->storage.text_shader->upload_uniform_vec3("u_color", color);
 
-        if (!with_shadows) {
-            app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width", 0.0f);
-            app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset", glm::vec2(0.0f, 0.0f));
-        } else {
-            app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width", 0.3f);
-            app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset", glm::vec2(-0.003f, -0.003f));
-        }
+        const float border_width = with_shadows ? 0.3f : 0.0f;
+        const float offset = with_shadows ? -0.003f : 0.0f;
+
+        app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width", border_width);
+        app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset", glm::vec2(offset, offset));
 
         font->get_vertex_array().bind();
 
@@ -142,8 +138,7 @@ namespace gui {
     void Text::set_text(std::string_view text) {
         this->text = text;
 
-        int x, y;
-        font->get_string_size(text, text_scale, &x, &y);
+        const auto [x, y] = font->get_string_size(text, text_scale);
 
         size.x = static_cast<float>(x);
         size.y = static_cast<float>(y);
@@ -152,8 +147,7 @@ namespace gui {
     void Text::set_scale(float text_scale) {
         this->text_scale = text_scale;
 
-        int x, y;
-        font->get_string_size(text, text_scale, &x, &y);
+        const auto [x, y] = font->get_string_size(text, text_scale);
 
         size.x = static_cast<float>(x);
         size.y = static_cast<float>(y);

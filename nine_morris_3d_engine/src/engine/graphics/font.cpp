@@ -136,7 +136,8 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         int width = 0, height = 0;  // Assume 0, because glyph can be null
         unsigned char* glyph = stbtt_GetCodepointSDF(
             &info, sf, codepoint, padding, on_edge_value,
-            static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr
+            static_cast<float>(pixel_dist_scale), &width, &height,
+            nullptr, nullptr
         );
 
         if (glyph == nullptr) {
@@ -194,7 +195,8 @@ void Font::bake_character(int codepoint) {
     int width = 0, height = 0;  // Assume 0, because glyph can be null
     unsigned char* glyph = stbtt_GetCodepointSDF(
         &info, sf, codepoint, padding, on_edge_value,
-        static_cast<float>(pixel_dist_scale), &width, &height, nullptr, nullptr
+        static_cast<float>(pixel_dist_scale), &width, &height,
+        nullptr, nullptr
     );
 
     if (glyph == nullptr) {
@@ -238,13 +240,8 @@ void Font::bake_character(int codepoint) {
     glyphs[codepoint] = gl;
 }
 
-void Font::render(std::string_view string, size_t* out_size, float** out_buffer) {
+void Font::render(std::string_view string, std::vector<float>& buffer) {
     const std::u16string utf16_string = utf8::utf8to16(string);
-
-    const size_t SIZE = sizeof(float) * utf16_string.length() * 24;
-
-    float* buffer = new float[SIZE];
-    unsigned int buffer_index = 0;
 
     int x = 0;
 
@@ -262,48 +259,45 @@ void Font::render(std::string_view string, size_t* out_size, float** out_buffer)
         const float x1 = static_cast<float>(x + glyph->xoff + glyph->width);
         const float y1 = static_cast<float>(glyph->yoff);
 
-        buffer[buffer_index++] = x0;
-        buffer[buffer_index++] = y1;
-        buffer[buffer_index++] = glyph->s0;
-        buffer[buffer_index++] = glyph->t0;
+        buffer.push_back(x0);
+        buffer.push_back(y1);
+        buffer.push_back(glyph->s0);
+        buffer.push_back(glyph->t0);
 
-        buffer[buffer_index++] = x0;
-        buffer[buffer_index++] = y0;
-        buffer[buffer_index++] = glyph->s0;
-        buffer[buffer_index++] = glyph->t1;
+        buffer.push_back(x0);
+        buffer.push_back(y0);
+        buffer.push_back(glyph->s0);
+        buffer.push_back(glyph->t1);
 
-        buffer[buffer_index++] = x1;
-        buffer[buffer_index++] = y1;
-        buffer[buffer_index++] = glyph->s1;
-        buffer[buffer_index++] = glyph->t0;
+        buffer.push_back(x1);
+        buffer.push_back(y1);
+        buffer.push_back(glyph->s1);
+        buffer.push_back(glyph->t0);
 
-        buffer[buffer_index++] = x1;
-        buffer[buffer_index++] = y1;
-        buffer[buffer_index++] = glyph->s1;
-        buffer[buffer_index++] = glyph->t0;
+        buffer.push_back(x1);
+        buffer.push_back(y1);
+        buffer.push_back(glyph->s1);
+        buffer.push_back(glyph->t0);
 
-        buffer[buffer_index++] = x0;
-        buffer[buffer_index++] = y0;
-        buffer[buffer_index++] = glyph->s0;
-        buffer[buffer_index++] = glyph->t1;
+        buffer.push_back(x0);
+        buffer.push_back(y0);
+        buffer.push_back(glyph->s0);
+        buffer.push_back(glyph->t1);
 
-        buffer[buffer_index++] = x1;
-        buffer[buffer_index++] = y0;
-        buffer[buffer_index++] = glyph->s1;
-        buffer[buffer_index++] = glyph->t1;
+        buffer.push_back(x1);
+        buffer.push_back(y0);
+        buffer.push_back(glyph->s1);
+        buffer.push_back(glyph->t1);
 
         x += glyph->xadvance;
     }
-
-    *out_size = SIZE;
-    *out_buffer = buffer;
 }
 
-void Font::get_string_size(std::string_view string, float scale, int* out_width, int* out_height) {
+std::pair<int, int> Font::get_string_size(std::string_view string, float scale) {
     const std::u16string utf16_string = utf8::utf8to16(string);
 
     int x = 0;
-    *out_height = 0;
+    int height = 0;
 
     for (const char16_t character : utf16_string) {
         const Font::Glyph* glyph;
@@ -316,18 +310,20 @@ void Font::get_string_size(std::string_view string, float scale, int* out_width,
 
         x += glyph->xadvance;
 
-        *out_height = std::max(*out_height, static_cast<int>(roundf(glyph->yoff * scale)));
+        height = std::max(height, static_cast<int>(roundf(glyph->yoff * scale)));
     }
 
-    *out_width = static_cast<int>(roundf((x + 2) * scale));
+    const int width = static_cast<int>(roundf((x + 2) * scale));
+
+    return std::make_pair(width, height);
 }
 
 void Font::initialize() {
     buffer = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
 
-    BufferLayout layout;
-    layout.add(0, BufferLayout::Float, 2);
-    layout.add(1, BufferLayout::Float, 2);
+    BufferLayout layout = BufferLayout {}
+        .add(0, BufferLayout::Float, 2)
+        .add(1, BufferLayout::Float, 2);
 
     vertex_array = std::make_shared<gl::VertexArray>();
     vertex_array->begin_definition()
