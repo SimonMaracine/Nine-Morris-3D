@@ -293,32 +293,32 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const Prepar
         switch (widget->sticky) {
             case gui::Sticky::Center:
                 widget->position = glm::vec2(
-                    WINDOW_WIDTH / 2 - widget->size.x * SCALE / 2,
-                    WINDOW_HEIGHT / 2 - widget->size.y * SCALE / 2
+                    WINDOW_WIDTH / 2.0f - widget->size.x * SCALE / 2.0f,
+                    WINDOW_HEIGHT / 2.0f - widget->size.y * SCALE / 2.0f
                 );
                 break;
             case gui::Sticky::N:
                 widget->position = glm::vec2(
-                    WINDOW_WIDTH / 2 - widget->size.x * SCALE / 2,
+                    WINDOW_WIDTH / 2.0f - widget->size.x * SCALE / 2.0f,
                     WINDOW_HEIGHT - widget->size.y * SCALE - widget->offset_parameters.top
                 );
                 break;
             case gui::Sticky::S:
                 widget->position = glm::vec2(
-                    WINDOW_WIDTH / 2 - widget->size.x * SCALE / 2,
+                    WINDOW_WIDTH / 2.0f - widget->size.x * SCALE / 2.0f,
                     widget->offset_parameters.bottom
                 );
                 break;
             case gui::Sticky::E:
                 widget->position = glm::vec2(
                     WINDOW_WIDTH - widget->size.x * SCALE - widget->offset_parameters.right,
-                    WINDOW_HEIGHT / 2 - widget->size.x * SCALE / 2
+                    WINDOW_HEIGHT / 2.0f - widget->size.x * SCALE / 2.0f
                 );
                 break;
             case gui::Sticky::W:
                 widget->position = glm::vec2(
                     widget->offset_parameters.left,
-                    WINDOW_HEIGHT / 2 - widget->size.x * SCALE / 2
+                    WINDOW_HEIGHT / 2.0f - widget->size.x * SCALE / 2.0f
                 );
                 break;
             case gui::Sticky::NE:

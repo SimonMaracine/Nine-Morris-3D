@@ -21,7 +21,7 @@ static std::string get_name(std::string_view file_path) {
     return std::string(file_path.substr(last_slash + 1));
 }
 
-static const char* get_file_data(std::string_view file_path) {
+static const char* get_font_file_data(std::string_view file_path) {
     std::ifstream file {std::string(file_path), std::ios::binary};
 
     if (!file.is_open()) {
@@ -44,6 +44,9 @@ static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, uns
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
             const size_t index = static_cast<size_t>((y + dest_y) * dest_width + (x + dest_x));
+
+            ASSERT(index < dest_width * dest_height, "Write out of bounds");
+
             dest[index] = glyph[y * width + x];
         }
     }
@@ -58,9 +61,9 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
         int pixel_dist_scale, int bitmap_size)
     : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value),
       pixel_dist_scale(pixel_dist_scale) {
-    font_file_buffer = get_file_data(file_path);
+    font_info_buffer = get_font_file_data(file_path);
 
-    if (!stbtt_InitFont(&info, reinterpret_cast<const unsigned char*>(font_file_buffer), 0)) {
+    if (!stbtt_InitFont(&info, reinterpret_cast<const unsigned char*>(font_info_buffer), 0)) {
         REL_CRITICAL("Could not load font `{}`, exiting...", file_path);
         application_exit::panic();
     }
@@ -76,7 +79,7 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
 
 Font::~Font() {
     glDeleteTextures(1, &texture);
-    delete[] font_file_buffer;
+    delete[] font_info_buffer;
 
     DEB_DEBUG("Unloaded font `{}`", name);
 }
@@ -110,8 +113,11 @@ void Font::end_baking() {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    float border_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
 
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, bitmap_size, bitmap_size);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bitmap_size, bitmap_size, GL_RED, GL_UNSIGNED_BYTE, bake_context.bitmap);

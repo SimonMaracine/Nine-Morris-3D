@@ -56,7 +56,7 @@ private:
     std::unordered_map<int, Glyph> glyphs;
 
     stbtt_fontinfo info;
-    const char* font_file_buffer = nullptr;
+    const char* font_info_buffer = nullptr;
     int bitmap_size = 0;
     int padding = 0;
     unsigned char on_edge_value = 0;

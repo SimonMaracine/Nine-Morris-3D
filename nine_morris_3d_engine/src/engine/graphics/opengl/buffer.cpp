@@ -54,6 +54,8 @@ namespace gl {
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+        ASSERT(size % sizeof(unsigned int) == 0, "Data may be corrupted");
+
         index_count = static_cast<int>(size / sizeof(unsigned int));
 
         DEB_DEBUG("Created GL index buffer {}", buffer);

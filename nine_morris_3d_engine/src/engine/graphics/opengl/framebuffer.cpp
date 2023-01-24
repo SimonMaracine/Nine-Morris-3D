@@ -30,6 +30,9 @@ static void attach_color_texture(GLuint texture, int samples, GLenum internal_fo
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
+        float border_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
+
         glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
     }
 
@@ -53,7 +56,7 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         if (white_border) {
-            static constexpr float border_color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            float border_color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
         }
 

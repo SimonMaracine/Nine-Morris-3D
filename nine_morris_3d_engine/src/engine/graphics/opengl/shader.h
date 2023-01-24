@@ -12,7 +12,7 @@ namespace gl {
         std::string block_name;
         std::vector<std::string> field_names;  // Must be defined in the order that they appear in shader
         std::shared_ptr<UniformBuffer> uniform_buffer;
-        GLuint binding_index;
+        GLuint binding_index = 0;
     };
 
     using UniformBlocks = std::initializer_list<UniformBlockSpecification>;

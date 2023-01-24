@@ -99,11 +99,11 @@ static GLuint compile_shader(std::string_view source_path, GLenum type, std::str
 static GLuint compile_shader(const cppblowfish::Buffer& source_buffer, GLenum type, std::string_view name) noexcept(false) {
     GLuint shader = glCreateShader(type);
 
-    const int length = source_buffer.size() - source_buffer.padding();
-    char* source = reinterpret_cast<char*>(source_buffer.get());
-    const char* const s = source;
+    char* buffer = reinterpret_cast<char*>(source_buffer.get());
+    const char* const source = buffer;
+    const int source_length = source_buffer.size() - source_buffer.padding();
 
-    glShaderSource(shader, 1, &s, &length);
+    glShaderSource(shader, 1, &source, &source_length);
     glCompileShader(shader);
 
     if (!check_compilation(shader, type, name)) {
