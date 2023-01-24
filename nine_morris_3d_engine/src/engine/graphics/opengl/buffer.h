@@ -13,6 +13,7 @@ namespace gl {
 
     class Buffer {
     public:
+        Buffer(DrawHint hint = DrawHint::Static);
         Buffer(size_t size, DrawHint hint = DrawHint::Static);
         Buffer(const void* data, size_t size, DrawHint hint = DrawHint::Static);
         ~Buffer();
@@ -102,13 +103,12 @@ namespace gl {
         static void unbind();
 
         void map_data();
+        void unmap_data();
 
         template<typename T>
         void get_data(T** data_out) {
             *data_out = static_cast<T*>(data);
         }
-
-        void unmap_data();
     private:
         GLuint buffer = 0;
         void* data = nullptr;  // TODO clear value is float; should be generic

@@ -12,6 +12,8 @@ namespace gl {
         glGenVertexArrays(1, &array);
         glBindVertexArray(array);
 
+        glBindVertexArray(0);
+
         DEB_DEBUG("Created GL vertex array {}", array);
     }
 
@@ -30,6 +32,8 @@ namespace gl {
     }
 
     VertexArray::Def VertexArray::begin_definition() {
+        glBindVertexArray(array);
+
         return Def {};
     }
 
@@ -79,6 +83,6 @@ namespace gl {
     }
 
     void VertexArray::Def::end_definition() {
-        unbind();
+        glBindVertexArray(0);
     }
 }

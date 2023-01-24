@@ -5,6 +5,16 @@
 #include "engine/other/assert.h"
 
 namespace gl {
+    Buffer::Buffer(DrawHint hint)
+        : hint(hint) {
+        glGenBuffers(1, &buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        DEB_DEBUG("Created GL buffer {}", buffer);
+    }
+
     Buffer::Buffer(size_t size, DrawHint hint)
         : hint(hint) {
         glGenBuffers(1, &buffer);
@@ -104,7 +114,7 @@ namespace gl {
 
     void UniformBuffer::set(const void* field_data, size_t field_index) {
         ASSERT(configured, "Uniform buffer must be configured");
-        ASSERT(data != nullptr, "Data must be allocated");
+        ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
         memcpy(data + fields.at(field_index).offset, field_data, fields.at(field_index).size);  // TODO optimize in release
     }

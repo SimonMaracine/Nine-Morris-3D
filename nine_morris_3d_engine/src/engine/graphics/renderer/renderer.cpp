@@ -794,8 +794,8 @@ void Renderer::initialize_vertex_arrays() {
         };
 
         storage.box_buffer = std::make_shared<gl::Buffer>(box_vertices, sizeof(box_vertices));
-        storage.box_ids = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
-        storage.box_transforms = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
+        storage.box_ids = std::make_shared<gl::Buffer>(gl::DrawHint::Stream);
+        storage.box_transforms = std::make_shared<gl::Buffer>(gl::DrawHint::Stream);
         storage.box_index_buffer = std::make_shared<gl::IndexBuffer>(box_indices, sizeof(box_indices));
 
         BufferLayout layout = BufferLayout {}

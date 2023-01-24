@@ -330,7 +330,7 @@ std::pair<int, int> Font::get_string_size(std::string_view string, float scale) 
 }
 
 void Font::initialize() {
-    buffer = std::make_shared<gl::Buffer>(1, gl::DrawHint::Stream);
+    buffer = std::make_shared<gl::Buffer>(gl::DrawHint::Stream);
 
     BufferLayout layout = BufferLayout {}
         .add(0, BufferLayout::Float, 2)
