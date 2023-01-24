@@ -261,8 +261,8 @@ void GuiRenderer::prepare_draw_text() {
     storage.text_shader->bind();
 }
 
-void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw) {
-    prepare_draw();
+void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const Prepare& prepare) {
+    prepare();
 
     for (gui::Widget* widget : subwidgets) {
         const int WINDOW_WIDTH = app->data().width;
@@ -349,6 +349,9 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const std::f
 
         widget->render();
     }
+
+    // Vertex arrays were bound in widget->render()
+    gl::VertexArray::unbind();
 }
 
 void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {

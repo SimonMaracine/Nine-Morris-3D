@@ -147,9 +147,11 @@ public:
 
     const Storage& get_storage() { return storage; }
 private:
+    using Prepare = std::function<void()>;
+
     void prepare_draw_image();
     void prepare_draw_text();
-    void draw(const std::vector<gui::Widget*>& subwidgets, const std::function<void()>& prepare_draw);
+    void draw(const std::vector<gui::Widget*>& subwidgets, const Prepare& prepare);
     void on_window_resized(const WindowResizedEvent& event);
     void initialize_uniform_buffers();
     void initialize_shaders();

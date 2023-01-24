@@ -299,6 +299,8 @@ void Renderer::end_rendering() {
 
     glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
     glEnable(GL_DEPTH_TEST);
+
+    gl::VertexArray::unbind();
 }
 
 #ifdef NM3D_PLATFORM_DEBUG
@@ -309,6 +311,8 @@ void Renderer::draw_origin() {
     storage.origin_vertex_array->bind();
 
     glDrawArrays(GL_LINES, 0, 6);
+
+    gl::VertexArray::unbind();
 }
 #endif
 
@@ -323,6 +327,8 @@ void Renderer::draw_skybox() {
     storage.skybox_texture->bind(0);
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    gl::VertexArray::unbind();
 }
 
 void Renderer::draw_model(const Model* model) {
@@ -365,6 +371,9 @@ void Renderer::draw_model_with_outline(const Model* model) {
         storage.outline_shader->upload_uniform_vec3("u_color", model->outline_color.value());  // Should never throw
 
         glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
+
+        // Vertex array was bound in draw_model()
+        gl::VertexArray::unbind();
     }
 
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -381,6 +390,9 @@ void Renderer::draw_models() {
 
         draw_model(model);
     }
+
+    // Don't unbind for every model
+    gl::VertexArray::unbind();
 }
 
 void Renderer::draw_models_with_outline() {
@@ -427,6 +439,9 @@ void Renderer::draw_models_to_depth_buffer() {
             glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
         }
     }
+
+    // Don't unbind for every model
+    gl::VertexArray::unbind();
 }
 
 void Renderer::draw_quad(const Quad* quad) {
@@ -459,6 +474,8 @@ void Renderer::draw_quads() {
 
         draw_quad(quad);
     }
+
+    gl::VertexArray::unbind();
 }
 
 void Renderer::prepare_bounding_box(const Model* model, std::vector<float>& buffer_ids, std::vector<glm::mat4>& buffer_transforms) {
@@ -529,6 +546,8 @@ void Renderer::draw_bounding_boxes() {
     );
 
     glEnable(GL_BLEND);
+
+    gl::VertexArray::unbind();
 }
 
 void Renderer::setup_shadows() {

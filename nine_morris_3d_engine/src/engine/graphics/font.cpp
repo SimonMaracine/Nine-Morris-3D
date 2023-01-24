@@ -84,6 +84,11 @@ Font::~Font() {
 void Font::update_data(const float* data, size_t size) {
     buffer->bind();
     buffer->upload_data(data, size);
+
+    gl::Buffer::unbind();
+
+    ASSERT(size % sizeof(float) == 0, "Data may be corrupted");
+
     vertex_count = size / sizeof(float);
 }
 
