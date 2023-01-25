@@ -7,6 +7,7 @@
 #include "engine/application/events.h"
 #include "engine/application/input.h"
 #include "engine/graphics/renderer/renderer.h"
+#include "engine/graphics/renderer/render_helpers.h"
 #include "engine/graphics/framebuffer_reader.h"
 #include "engine/graphics/post_processing.h"
 #include "engine/graphics/opengl/vertex_array.h"
@@ -890,27 +891,4 @@ void Renderer::initialize_uniform_variables() {
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix", camera_cache.projection_matrix);
 
     gl::Shader::unbind();
-}
-
-namespace render_helpers {
-    void clear(int buffers) {
-        glClear(buffers);
-    }
-
-    void viewport(int width, int height) {
-        glViewport(0, 0, width, height);
-    }
-
-    void clear_color(float red, float green, float blue) {
-        glClearColor(red, green, blue, 1.0f);
-    }
-
-    void bind_texture_2d(GLuint texture, int unit) {
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_2D, texture);
-    }
-
-    void draw_arrays(int count) {
-        glDrawArrays(GL_TRIANGLES, 0, count);
-    }
 }

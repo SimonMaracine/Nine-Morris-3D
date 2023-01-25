@@ -45,7 +45,7 @@ static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, uns
         for (int y = 0; y < height; y++) {
             const size_t index = static_cast<size_t>((y + dest_y) * dest_width + (x + dest_x));
 
-            ASSERT(index < dest_width * dest_height, "Write out of bounds");
+            ASSERT(index < static_cast<size_t>(dest_width * dest_height), "Write out of bounds");
 
             dest[index] = glyph[y * width + x];
         }

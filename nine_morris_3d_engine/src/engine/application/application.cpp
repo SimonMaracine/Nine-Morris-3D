@@ -9,6 +9,7 @@
 #include "engine/audio/context.h"
 #include "engine/audio/music.h"
 #include "engine/graphics/renderer/renderer.h"
+#include "engine/graphics/renderer/render_helpers.h"
 #include "engine/graphics/renderer/gui_renderer.h"
 #include "engine/graphics/opengl/info_and_debug.h"
 #include "engine/graphics/imgui_context.h"

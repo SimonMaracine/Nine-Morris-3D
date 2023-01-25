@@ -7,6 +7,7 @@
 #include "engine/graphics/opengl/texture.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/renderer/gui_renderer.h"
+#include "engine/graphics/renderer/render_helpers.h"
 #include "engine/graphics/renderer/renderer.h"
 #include "engine/graphics/buffer_layout.h"
 #include "engine/graphics/camera.h"
