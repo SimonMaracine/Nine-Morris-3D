@@ -64,13 +64,12 @@ Renderer::~Renderer() {
 void Renderer::render() {
     cache_camera_data();
     setup_uniform_buffers();
-
     setup_shadows();
+
     storage.shadow_map_framebuffer->bind();
 
     glClear(GL_DEPTH_BUFFER_BIT);
-    const auto& shadow_map_specification = storage.shadow_map_framebuffer->get_specification();
-    glViewport(0, 0, shadow_map_specification.width, shadow_map_specification.height);
+    render_helpers::viewport(storage.shadow_map_framebuffer->get_specification());
 
     // Render objects with shadows to depth buffer
     draw_models_to_depth_buffer();
@@ -78,8 +77,7 @@ void Renderer::render() {
     storage.scene_framebuffer->bind();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    const auto& scene_specification = storage.scene_framebuffer->get_specification();
-    glViewport(0, 0, scene_specification.width, scene_specification.height);
+    render_helpers::viewport(storage.scene_framebuffer->get_specification());
 
     // Bind shadow map for use in shadow rendering
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
@@ -116,8 +114,7 @@ void Renderer::render() {
     storage.bounding_box_framebuffer->bind();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    const auto& bounding_box_specification = storage.bounding_box_framebuffer->get_specification();
-    glViewport(0, 0, bounding_box_specification.width, bounding_box_specification.height);
+    render_helpers::viewport(storage.bounding_box_framebuffer->get_specification());
 
     // Render bounding boxes for models that are pickable
     draw_bounding_boxes();
@@ -130,8 +127,7 @@ void Renderer::render() {
 
     storage.intermediate_framebuffer->bind();
 
-    const auto& intermediate_specification = storage.intermediate_framebuffer->get_specification();
-    glViewport(0, 0, intermediate_specification.width, intermediate_specification.height);
+    render_helpers::viewport(storage.intermediate_framebuffer->get_specification());
 
     // Do post processing and render the final image to the screen
     end_rendering();
@@ -270,11 +266,11 @@ void Renderer::post_processing() {
 
     for (size_t i = 0; i < post_processing_context.steps.size(); i++) {
         const PostProcessingStep* step = post_processing_context.steps[i].get();
-        const gl::FramebufferSpecification& specification = step->framebuffer->get_specification();
 
         step->framebuffer->bind();
+
         glClear(GL_COLOR_BUFFER_BIT);
-        glViewport(0, 0, specification.width, specification.height);
+        render_helpers::viewport(step->framebuffer->get_specification());
 
         step->render(post_processing_context);
 
