@@ -167,7 +167,7 @@ private:
         std::shared_ptr<gl::Shader> text_shader;
 
         std::shared_ptr<gl::VertexArray> quad2d_vertex_array;
-        std::shared_ptr<gl::Buffer> quad2d_buffer;
+        std::shared_ptr<gl::VertexBuffer> quad2d_buffer;
 
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
     } storage;

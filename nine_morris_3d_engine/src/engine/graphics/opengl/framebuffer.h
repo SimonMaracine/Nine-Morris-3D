@@ -22,13 +22,15 @@ namespace gl {
         Attachment() = default;
         Attachment(AttachmentFormat format, AttachmentType type)
             : format(format), type(type) {}
+
         AttachmentFormat format = AttachmentFormat::None;
         AttachmentType type = AttachmentType::None;
     };
 
     struct FramebufferSpecification {
         // Must be specified
-        int width = 0, height = 0;
+        int width = 0;
+        int height = 0;
 
         // At least one of these two must be specified
         std::vector<Attachment> color_attachments;
@@ -41,7 +43,7 @@ namespace gl {
 
         // Color attachment clearing stuff
         GLint clear_drawbuffer = 0;
-        const GLfloat* clear_value = nullptr;
+        GLfloat color_clear_value[4];
     };
 
     class Framebuffer {
@@ -83,12 +85,5 @@ namespace gl {
         // These can be texture or renderbuffer handles
         std::vector<GLuint> color_attachments;
         GLuint depth_attachment = 0;
-
-        static constexpr GLenum COLOR_ATTACHMENTS[4] = {
-            GL_COLOR_ATTACHMENT0,
-            GL_COLOR_ATTACHMENT1,
-            GL_COLOR_ATTACHMENT2,
-            GL_COLOR_ATTACHMENT3
-        };
     };
 }

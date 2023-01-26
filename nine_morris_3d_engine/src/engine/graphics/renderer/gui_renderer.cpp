@@ -363,7 +363,7 @@ void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
     // Should already be configured
     storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
     storage.projection_uniform_buffer->bind();
-    storage.projection_uniform_buffer->upload_data();
+    storage.projection_uniform_buffer->upload_sub_data();
 
     gl::UniformBuffer::unbind();
 }
@@ -405,7 +405,7 @@ void GuiRenderer::initialize_shaders() {
 }
 
 void GuiRenderer::initialize_vertex_arrays() {
-    static constexpr float quad2d_vertices[] = {
+    float quad2d_vertices[] = {
         0.0f, 1.0f,
         0.0f, 0.0f,
         1.0f, 1.0f,
@@ -414,7 +414,7 @@ void GuiRenderer::initialize_vertex_arrays() {
         1.0f, 0.0f
     };
 
-    storage.quad2d_buffer = std::make_shared<gl::Buffer>(quad2d_vertices, sizeof(quad2d_vertices));
+    storage.quad2d_buffer = std::make_shared<gl::VertexBuffer>(quad2d_vertices, sizeof(quad2d_vertices));
 
     BufferLayout layout = BufferLayout {}
         .add(0, BufferLayout::Float, 2);
@@ -429,7 +429,7 @@ void GuiRenderer::initialize_uniform_variables() {
     // Should already be configured
     storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
     storage.projection_uniform_buffer->bind();
-    storage.projection_uniform_buffer->upload_data();
+    storage.projection_uniform_buffer->upload_sub_data();
 
     gl::UniformBuffer::unbind();
 

@@ -34,7 +34,7 @@ static void initialize_board(Application* app) {
     );
     app->renderer->setup_shader(shader);
 
-    auto vertex_buffer = app->res.buffer.load(
+    auto vertex_buffer = app->res.vertex_buffer.load(
         "board_wood"_h,
         app->res.mesh_ptnt["board_wood"_h]->vertices.data(),
         app->res.mesh_ptnt["board_wood"_h]->vertices.size() * sizeof(PTNT)
@@ -113,7 +113,7 @@ static void initialize_board_paint(Application* app) {
     );
     app->renderer->setup_shader(shader);
 
-    auto vertex_buffer = app->res.buffer.load(
+    auto vertex_buffer = app->res.vertex_buffer.load(
         "board_paint"_h,
         app->res.mesh_ptnt["board_paint"_h]->vertices.data(),
         app->res.mesh_ptnt["board_paint"_h]->vertices.size() * sizeof(PTNT)
@@ -187,7 +187,7 @@ static void initialize_pieces(Application* app) {
     );
     app->renderer->setup_shader(shader);
 
-    auto white_piece_vertex_buffer = app->res.buffer.load(
+    auto white_piece_vertex_buffer = app->res.vertex_buffer.load(
         "white_piece"_h,
         app->res.mesh_ptnt["white_piece"_h]->vertices.data(),
         app->res.mesh_ptnt["white_piece"_h]->vertices.size() * sizeof(PTNT)
@@ -199,7 +199,7 @@ static void initialize_pieces(Application* app) {
         app->res.mesh_ptnt["white_piece"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    auto black_piece_vertex_buffer = app->res.buffer.load(
+    auto black_piece_vertex_buffer = app->res.vertex_buffer.load(
         "black_piece"_h,
         app->res.mesh_ptnt["black_piece"_h]->vertices.data(),
         app->res.mesh_ptnt["black_piece"_h]->vertices.size() * sizeof(PTNT)
@@ -318,7 +318,7 @@ static void initialize_nodes(Application* app) {
     );
     app->renderer->setup_shader(shader);
 
-    auto vertex_buffer = app->res.buffer.load(
+    auto vertex_buffer = app->res.vertex_buffer.load(
         "node"_h,
         app->res.mesh_p["node"_h]->vertices.data(),
         app->res.mesh_p["node"_h]->vertices.size() * sizeof(P)
@@ -370,7 +370,7 @@ static void initialize_board_no_normal(Application* app) {
     );
     app->renderer->setup_shader(shader);
 
-    auto vertex_buffer = app->res.buffer.load(
+    auto vertex_buffer = app->res.vertex_buffer.load(
         "board_wood"_h,
         app->res.mesh_ptn["board_wood"_h]->vertices.data(),
         app->res.mesh_ptn["board_wood"_h]->vertices.size() * sizeof(PTN)
@@ -439,7 +439,7 @@ static void initialize_board_paint_no_normal(Application* app) {
     );
     app->renderer->setup_shader(shader);
 
-    auto vertex_buffer = app->res.buffer.load(
+    auto vertex_buffer = app->res.vertex_buffer.load(
         "board_paint"_h,
         app->res.mesh_ptn["board_paint"_h]->vertices.data(),
         app->res.mesh_ptn["board_paint"_h]->vertices.size() * sizeof(PTN)
@@ -510,7 +510,7 @@ static void initialize_pieces_no_normal(Application* app) {
     );
     app->renderer->setup_shader(shader);
 
-    auto white_piece_vertex_buffer = app->res.buffer.load(
+    auto white_piece_vertex_buffer = app->res.vertex_buffer.load(
         "white_piece"_h,
         app->res.mesh_ptn["white_piece"_h]->vertices.data(),
         app->res.mesh_ptn["white_piece"_h]->vertices.size() * sizeof(PTN)
@@ -522,7 +522,7 @@ static void initialize_pieces_no_normal(Application* app) {
         app->res.mesh_ptn["white_piece"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    auto black_piece_vertex_buffer = app->res.buffer.load(
+    auto black_piece_vertex_buffer = app->res.vertex_buffer.load(
         "black_piece"_h,
         app->res.mesh_ptn["black_piece"_h]->vertices.data(),
         app->res.mesh_ptn["black_piece"_h]->vertices.size() * sizeof(PTN)

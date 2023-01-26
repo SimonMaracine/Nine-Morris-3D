@@ -50,7 +50,7 @@ struct ResourcesCache {
     resmanager::Cache<gl::Texture3D> texture_3d;
     resmanager::Cache<gl::VertexArray> vertex_array;
     resmanager::Cache<gl::Shader> shader;
-    resmanager::Cache<gl::Buffer> buffer;
+    resmanager::Cache<gl::VertexBuffer> vertex_buffer;
     resmanager::Cache<gl::IndexBuffer> index_buffer;
     resmanager::Cache<gl::UniformBuffer> uniform_buffer;
     resmanager::Cache<gl::PixelBuffer> pixel_buffer;

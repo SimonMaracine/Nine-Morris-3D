@@ -1,21 +1,22 @@
 #include <glad/glad.h>
 
+#include "engine/application/platform.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 
 namespace gl {
-    Buffer::Buffer(DrawHint hint)
+    VertexBuffer::VertexBuffer(DrawHint hint)
         : hint(hint) {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        DEB_DEBUG("Created GL buffer {}", buffer);
+        DEB_DEBUG("Created GL vertex buffer {}", buffer);
     }
 
-    Buffer::Buffer(size_t size, DrawHint hint)
+    VertexBuffer::VertexBuffer(size_t size, DrawHint hint)
         : hint(hint) {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -23,10 +24,10 @@ namespace gl {
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        DEB_DEBUG("Created GL buffer {}", buffer);
+        DEB_DEBUG("Created GL vertex buffer {}", buffer);
     }
 
-    Buffer::Buffer(const void* data, size_t size, DrawHint hint)
+    VertexBuffer::VertexBuffer(const void* data, size_t size, DrawHint hint)
         : hint(hint) {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -34,25 +35,29 @@ namespace gl {
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        DEB_DEBUG("Created GL buffer {}", buffer);
+        DEB_DEBUG("Created GL vertex buffer {}", buffer);
     }
 
-    Buffer::~Buffer() {
+    VertexBuffer::~VertexBuffer() {
         glDeleteBuffers(1, &buffer);
 
-        DEB_DEBUG("Deleted GL buffer {}", buffer);
+        DEB_DEBUG("Deleted GL vertex buffer {}", buffer);
     }
 
-    void Buffer::bind() {
+    void VertexBuffer::bind() {
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
     }
 
-    void Buffer::unbind() {
+    void VertexBuffer::unbind() {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void Buffer::upload_data(const void* data, size_t size) {
+    void VertexBuffer::upload_data(const void* data, size_t size) {
         glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(hint));
+    }
+
+    void VertexBuffer::upload_sub_data(const void* data, size_t offset, size_t size) {
+        glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
     }
 
     // --- Index buffer
@@ -116,13 +121,32 @@ namespace gl {
         ASSERT(configured, "Uniform buffer must be configured");
         ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
-        memcpy(data + fields.at(field_index).offset, field_data, fields.at(field_index).size);  // TODO optimize in release
+#if defined(NM3D_PLATFORM_DEBUG)
+        memcpy(data + fields.at(field_index).offset, field_data, fields.at(field_index).size);
+#elif defined(NM3D_PLATFORM_RELEASE)
+        memcpy(data + fields[field_index].offset, field_data, fields[field_index].size);
+#endif
     }
 
-    void UniformBuffer::upload_data() {
+    void UniformBuffer::upload_sub_data() {
         ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
+    }
+
+    void UniformBuffer::allocate_memory(size_t size) {
+        data = new char[size];
+        this->size = size;
+
+        glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STREAM_DRAW);
+    }
+
+    void UniformBuffer::add_field(size_t index, const UniformBlockField& field) {
+        fields[index] = field;
+    }
+
+    void UniformBuffer::configure() {
+        configured = true;
     }
 
     // --- Pixel buffer

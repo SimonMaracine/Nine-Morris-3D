@@ -2,7 +2,7 @@
 
 #include "game/save_load.h"
 
-static constexpr const char* PARTIAL_SAVE_GAME_FILE = "_last_game.dat";
+static const char* PARTIAL_SAVE_GAME_FILE = "_last_game.dat";
 
 namespace save_load {
     void handle_save_file_not_open_error() {

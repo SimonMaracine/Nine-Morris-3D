@@ -96,6 +96,11 @@ public:
         float position_divisor = 1.0f;
     } light_space;
 private:
+    struct IdMatrix {
+        float id;
+        glm::mat4 model_matrix;
+    };
+
     void draw_screen_quad(GLuint texture);
     void post_processing();
     void end_rendering();
@@ -108,7 +113,7 @@ private:
     void draw_models_to_depth_buffer();
     void draw_quad(const Quad* quad);
     void draw_quads();
-    void prepare_bounding_box(const Model* model, std::vector<float>& buffer_ids, std::vector<glm::mat4>& buffer_transforms);
+    void prepare_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids);
     void draw_bounding_boxes();
     void setup_shadows();
     void setup_uniform_buffers();
@@ -141,18 +146,17 @@ private:
         std::shared_ptr<gl::Shader> origin_shader;
 
         std::shared_ptr<gl::VertexArray> skybox_vertex_array;
-        std::shared_ptr<gl::Buffer> skybox_buffer;
+        std::shared_ptr<gl::VertexBuffer> skybox_buffer;
         std::shared_ptr<gl::VertexArray> screen_quad_vertex_array;
-        std::shared_ptr<gl::Buffer> screen_quad_buffer;
+        std::shared_ptr<gl::VertexBuffer> screen_quad_buffer;
         std::shared_ptr<gl::VertexArray> quad_vertex_array;
-        std::shared_ptr<gl::Buffer> quad_buffer;
+        std::shared_ptr<gl::VertexBuffer> quad_buffer;
         std::shared_ptr<gl::VertexArray> box_vertex_array;
-        std::shared_ptr<gl::Buffer> box_buffer;
-        std::shared_ptr<gl::Buffer> box_ids;
-        std::shared_ptr<gl::Buffer> box_transforms;
+        std::shared_ptr<gl::VertexBuffer> box_buffer;
+        std::shared_ptr<gl::VertexBuffer> box_ids_transforms_buffer;
         std::shared_ptr<gl::IndexBuffer> box_index_buffer;
         std::shared_ptr<gl::VertexArray> origin_vertex_array;
-        std::shared_ptr<gl::Buffer> origin_buffer;
+        std::shared_ptr<gl::VertexBuffer> origin_buffer;
 
         std::shared_ptr<gl::Texture3D> skybox_texture;
 

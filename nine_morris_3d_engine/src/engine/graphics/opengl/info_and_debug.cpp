@@ -7,7 +7,7 @@
 #include "engine/other/assert.h"
 #include "engine/other/exit.h"
 
-static constexpr GLenum parameters[] = {
+static const GLenum parameters[] = {
     GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
     GL_MAX_CUBE_MAP_TEXTURE_SIZE,
     GL_MAX_DRAW_BUFFERS,
@@ -27,7 +27,7 @@ static constexpr GLenum parameters[] = {
     GL_MAX_VIEWPORT_DIMS
 };
 
-static constexpr const char* names[] = {
+static const char* names[] = {
     "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS",
     "GL_MAX_CUBE_MAP_TEXTURE_SIZE",
     "GL_MAX_DRAW_BUFFERS",

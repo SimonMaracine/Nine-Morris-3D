@@ -70,6 +70,6 @@ private:
 
     // Store references to vertex array and buffer
     std::shared_ptr<gl::VertexArray> vertex_array;
-    std::shared_ptr<gl::Buffer> buffer;
+    std::shared_ptr<gl::VertexBuffer> buffer;
     int vertex_count = 0;
 };

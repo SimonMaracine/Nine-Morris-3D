@@ -5,6 +5,13 @@
 #include "engine/other/assert.h"
 #include "engine/other/exit.h"
 
+static const GLenum COLOR_ATTACHMENTS[4] = {
+    GL_COLOR_ATTACHMENT0,
+    GL_COLOR_ATTACHMENT1,
+    GL_COLOR_ATTACHMENT2,
+    GL_COLOR_ATTACHMENT3
+};
+
 static GLenum target(bool multisampled) {
     return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 }
@@ -243,7 +250,7 @@ namespace gl {
     }
 
     void Framebuffer::clear_color_attachment_float() {  // TODO right now not used
-        glClearBufferfv(GL_COLOR, specification.clear_drawbuffer, specification.clear_value);
+        glClearBufferfv(GL_COLOR, specification.clear_drawbuffer, specification.color_clear_value);
     }
 
     void Framebuffer::blit(Framebuffer* draw_framebuffer, int width, int height) {

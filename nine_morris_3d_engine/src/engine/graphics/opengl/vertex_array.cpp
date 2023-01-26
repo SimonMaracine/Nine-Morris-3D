@@ -37,7 +37,7 @@ namespace gl {
         return Def {};
     }
 
-    VertexArray::Def& VertexArray::Def::add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout) {
+    VertexArray::Def& VertexArray::Def::add_buffer(std::shared_ptr<VertexBuffer> buffer, const BufferLayout& layout) {
         ASSERT(layout.elements.size() > 0, "Invalid layout");
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);

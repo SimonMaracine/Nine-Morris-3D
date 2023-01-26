@@ -5,7 +5,7 @@
 #include "engine/graphics/buffer_layout.h"
 
 namespace gl {
-    class Buffer;
+    class VertexBuffer;
     class IndexBuffer;
 }
 
@@ -14,7 +14,7 @@ namespace gl {
     public:
         class Def {
         public:
-            Def& add_buffer(std::shared_ptr<Buffer> buffer, const BufferLayout& layout);
+            Def& add_buffer(std::shared_ptr<VertexBuffer> buffer, const BufferLayout& layout);
             Def& add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer);
             void end_definition();
         private:

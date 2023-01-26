@@ -11,22 +11,23 @@ namespace gl {
         Stream = GL_STREAM_DRAW
     };
 
-    class Buffer {
+    class VertexBuffer {
     public:
-        Buffer(DrawHint hint = DrawHint::Static);
-        Buffer(size_t size, DrawHint hint = DrawHint::Static);
-        Buffer(const void* data, size_t size, DrawHint hint = DrawHint::Static);
-        ~Buffer();
+        VertexBuffer(DrawHint hint = DrawHint::Static);
+        VertexBuffer(size_t size, DrawHint hint = DrawHint::Static);
+        VertexBuffer(const void* data, size_t size, DrawHint hint = DrawHint::Static);
+        ~VertexBuffer();
 
-        Buffer(const Buffer&) = delete;
-        Buffer& operator=(const Buffer&) = delete;
-        Buffer(Buffer&&) = delete;
-        Buffer& operator=(Buffer&&) = delete;
+        VertexBuffer(const VertexBuffer&) = delete;
+        VertexBuffer& operator=(const VertexBuffer&) = delete;
+        VertexBuffer(VertexBuffer&&) = delete;
+        VertexBuffer& operator=(VertexBuffer&&) = delete;
 
         void bind();
         static void unbind();
 
         void upload_data(const void* data, size_t size);
+        void upload_sub_data(const void* data, size_t offset, size_t size);
     private:
         GLuint buffer = 0;
         DrawHint hint = DrawHint::Static;
@@ -55,6 +56,11 @@ namespace gl {
         friend class VertexArray;
     };
 
+    struct UniformBlockField {
+        size_t offset = 0;
+        size_t size = 0;
+    };
+
     class UniformBuffer {
     public:
         UniformBuffer();
@@ -71,20 +77,20 @@ namespace gl {
         bool is_configured() { return configured; }
 
         void set(const void* data, size_t field_index);
-        void upload_data();
+        void upload_sub_data();
     private:
-        struct UniformBlockField {
-            size_t offset, size;
-        };
+        void allocate_memory(size_t size);
+        void add_field(size_t index, const UniformBlockField& field);
+        void configure();
 
         GLuint buffer = 0;
 
-        char* data = nullptr;  // Allocated externally, deallocated internally!
+        char* data = nullptr;
         size_t size = 0;
 
-        std::unordered_map<size_t, UniformBlockField> fields;  // Initialized externally by shader!
+        std::unordered_map<size_t, UniformBlockField> fields;
 
-        bool configured = false;  // Used externally by shader!
+        bool configured = false;
 
         friend class Shader;
     };

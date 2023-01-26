@@ -5,7 +5,7 @@ void ResourcesCache::merge(ResourcesCache& other) {
     texture_3d.merge_replace(std::move(other.texture_3d));
     vertex_array.merge_replace(std::move(other.vertex_array));
     shader.merge_replace(std::move(other.shader));
-    buffer.merge_replace(std::move(other.buffer));
+    vertex_buffer.merge_replace(std::move(other.vertex_buffer));
     index_buffer.merge_replace(std::move(other.index_buffer));
     uniform_buffer.merge_replace(std::move(other.uniform_buffer));
     pixel_buffer.merge_replace(std::move(other.pixel_buffer));

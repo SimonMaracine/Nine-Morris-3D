@@ -338,7 +338,7 @@ namespace gl {
             }
 
             // If it's already configured, skip everything else
-            if (block.uniform_buffer->configured) {
+            if (block.uniform_buffer->is_configured()) {
                 continue;
             }
 
@@ -346,14 +346,11 @@ namespace gl {
             GLint block_size;
             glGetActiveUniformBlockiv(program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
 
-            // Allocate that amount on the CPU side
-            block.uniform_buffer->data = new char[block_size];
-            block.uniform_buffer->size = block_size;
+            // Allocate memory on both CPU and GPU side
+            block.uniform_buffer->bind();
+            block.uniform_buffer->allocate_memory(block_size);
 
-            // Allocate that amount on the GPU side
-            glBindBuffer(GL_UNIFORM_BUFFER, block.uniform_buffer->buffer);
-            glBufferData(GL_UNIFORM_BUFFER, block_size, nullptr, GL_STREAM_DRAW);
-            glBindBuffer(GL_UNIFORM_BUFFER, 0);
+            gl::UniformBuffer::unbind();
 
             // Link uniform buffer to binding index
             glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
@@ -368,7 +365,7 @@ namespace gl {
             GLint sizes[MAX_FIELD_COUNT];
             GLint types[MAX_FIELD_COUNT];
 
-            // Create the uniforms names list, the order of these names matters
+            // Create the uniforms names list; the order of these names matters
             char* field_names[MAX_FIELD_COUNT];
 
             for (size_t i = 0; i < field_count; i++) {
@@ -405,13 +402,15 @@ namespace gl {
 
             // Finally setup the uniform block fields
             for (size_t i = 0; i < field_count; i++) {
-                block.uniform_buffer->fields[i] = {
+                const gl::UniformBlockField field = {
                     static_cast<size_t>(offsets[i]),
                     static_cast<size_t>(sizes[i]) * type_size(types[i])
                 };
+
+                block.uniform_buffer->add_field(i, field);
             }
 
-            block.uniform_buffer->configured = true;
+            block.uniform_buffer->configure();
         }
     }
 }

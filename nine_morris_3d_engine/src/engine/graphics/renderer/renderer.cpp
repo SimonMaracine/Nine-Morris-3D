@@ -477,7 +477,7 @@ void Renderer::draw_quads() {
     gl::VertexArray::unbind();
 }
 
-void Renderer::prepare_bounding_box(const Model* model, std::vector<float>& buffer_ids, std::vector<glm::mat4>& buffer_transforms) {
+void Renderer::prepare_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids_transforms) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, model->position);
     matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -485,8 +485,8 @@ void Renderer::prepare_bounding_box(const Model* model, std::vector<float>& buff
     matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
     matrix = glm::scale(matrix, model->bounding_box->size);
 
-    buffer_ids.push_back(model->bounding_box->id);
-    buffer_transforms.push_back(matrix);
+    const IdMatrix element = { model->bounding_box->id, matrix };
+    buffer_ids_transforms.push_back(element);
 }
 
 void Renderer::draw_bounding_boxes() {
@@ -495,13 +495,11 @@ void Renderer::draw_bounding_boxes() {
 
     static std::vector<const Model*> bounding_box_models;
     static std::vector<const Model*> bounding_box_models_unsorted;
-    static std::vector<float> buffer_ids;
-    static std::vector<glm::mat4> buffer_transforms;
+    static std::vector<IdMatrix> buffer_ids_transforms;
 
     bounding_box_models.clear();
     bounding_box_models_unsorted.clear();
-    buffer_ids.clear();
-    buffer_transforms.clear();
+    buffer_ids_transforms.clear();
 
     std::for_each(models.begin(), models.end(), [](const std::shared_ptr<Model>& model) {
         if (model->bounding_box.has_value()) {
@@ -521,17 +519,20 @@ void Renderer::draw_bounding_boxes() {
     });
 
     for (const Model* model : bounding_box_models_unsorted) {
-        prepare_bounding_box(model, buffer_ids, buffer_transforms);
+        prepare_bounding_box(model, buffer_ids_transforms);
     }
 
     for (const Model* model : bounding_box_models) {
-        prepare_bounding_box(model, buffer_ids, buffer_transforms);
+        prepare_bounding_box(model, buffer_ids_transforms);
     }
 
-    storage.box_ids->bind();
-    storage.box_ids->upload_data(buffer_ids.data(), sizeof(float) * buffer_ids.size());  // TODO optimize this
-    storage.box_transforms->bind();
-    storage.box_transforms->upload_data(buffer_transforms.data(), sizeof(glm::mat4) * buffer_transforms.size());
+    storage.box_ids_transforms_buffer->bind();
+    storage.box_ids_transforms_buffer->upload_data(
+        buffer_ids_transforms.data(),
+        sizeof(IdMatrix) * buffer_ids_transforms.size()
+    );
+
+    gl::VertexBuffer::unbind();
 
     // Disable blending, because this is a floating-point framebuffer
     glDisable(GL_BLEND);
@@ -568,7 +569,7 @@ void Renderer::setup_shadows() {
     // Should already be configured
     storage.light_space_uniform_buffer->set(&light_space_matrix, 0);
     storage.light_space_uniform_buffer->bind();
-    storage.light_space_uniform_buffer->upload_data();
+    storage.light_space_uniform_buffer->upload_sub_data();
 
     gl::UniformBuffer::unbind();
 }
@@ -577,21 +578,21 @@ void Renderer::setup_uniform_buffers() {
     // Should already be configured
     storage.projection_view_uniform_buffer->set(&camera_cache.projection_view_matrix, 0);
     storage.projection_view_uniform_buffer->bind();
-    storage.projection_view_uniform_buffer->upload_data();
+    storage.projection_view_uniform_buffer->upload_sub_data();
 
     if (storage.light_uniform_buffer->is_configured()) {
         storage.light_uniform_buffer->set(&light.ambient_color, 0);
         storage.light_uniform_buffer->set(&light.diffuse_color, 1);
         storage.light_uniform_buffer->set(&light.specular_color, 2);
         storage.light_uniform_buffer->bind();
-        storage.light_uniform_buffer->upload_data();
+        storage.light_uniform_buffer->upload_sub_data();
     }
 
     if (storage.light_view_uniform_buffer->is_configured()) {
         storage.light_view_uniform_buffer->set(&light.position, 0);
         storage.light_view_uniform_buffer->set(&camera_cache.position, 1);
         storage.light_view_uniform_buffer->bind();
-        storage.light_view_uniform_buffer->upload_data();
+        storage.light_view_uniform_buffer->upload_sub_data();
     }
 
     gl::UniformBuffer::unbind();
@@ -717,7 +718,7 @@ void Renderer::initialize_shaders() {
 
 void Renderer::initialize_vertex_arrays() {
     {
-        storage.skybox_buffer = std::make_shared<gl::Buffer>(gl::CUBEMAP_VERTICES, sizeof(gl::CUBEMAP_VERTICES));
+        storage.skybox_buffer = std::make_shared<gl::VertexBuffer>(gl::CUBEMAP_VERTICES, sizeof(gl::CUBEMAP_VERTICES));
 
         BufferLayout layout = BufferLayout {}
             .add(0, BufferLayout::Float, 3);
@@ -729,7 +730,7 @@ void Renderer::initialize_vertex_arrays() {
     }
 
     {
-        static constexpr float screen_quad_vertices[] = {
+        const float screen_quad_vertices[] = {
             -1.0f,  1.0f,
             -1.0f, -1.0f,
              1.0f,  1.0f,
@@ -738,7 +739,7 @@ void Renderer::initialize_vertex_arrays() {
              1.0f, -1.0f,
         };
 
-        storage.screen_quad_buffer = std::make_shared<gl::Buffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
+        storage.screen_quad_buffer = std::make_shared<gl::VertexBuffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
 
         BufferLayout layout = BufferLayout {}
             .add(0, BufferLayout::Float, 2);
@@ -750,7 +751,7 @@ void Renderer::initialize_vertex_arrays() {
     }
 
     {
-        static constexpr float quad_vertices[] = {
+        const float quad_vertices[] = {
             -1.0f,  1.0f,    0.0f, 1.0f,
             -1.0f, -1.0f,    0.0f, 0.0f,
              1.0f,  1.0f,    1.0f, 1.0f,
@@ -759,7 +760,7 @@ void Renderer::initialize_vertex_arrays() {
              1.0f, -1.0f,    1.0f, 0.0f
         };
 
-        storage.quad_buffer = std::make_shared<gl::Buffer>(quad_vertices, sizeof(quad_vertices));
+        storage.quad_buffer = std::make_shared<gl::VertexBuffer>(quad_vertices, sizeof(quad_vertices));
 
         BufferLayout layout = BufferLayout {}
             .add(0, BufferLayout::Float, 2)
@@ -772,7 +773,7 @@ void Renderer::initialize_vertex_arrays() {
     }
 
     {
-        static constexpr float box_vertices[] = {
+        const float box_vertices[] = {
             -0.5f, -0.5f,  0.5f,
              0.5f, -0.5f,  0.5f,
              0.5f,  0.5f,  0.5f,
@@ -783,7 +784,7 @@ void Renderer::initialize_vertex_arrays() {
             -0.5f,  0.5f, -0.5f
         };
 
-        static constexpr unsigned int box_indices[] = {
+        const unsigned int box_indices[] = {
             0, 1, 2, 0, 2, 3,
             1, 5, 6, 1, 6, 2,
             5, 4, 6, 4, 7, 6,
@@ -792,18 +793,15 @@ void Renderer::initialize_vertex_arrays() {
             4, 5, 1, 4, 1, 0
         };
 
-        storage.box_buffer = std::make_shared<gl::Buffer>(box_vertices, sizeof(box_vertices));
-        storage.box_ids = std::make_shared<gl::Buffer>(gl::DrawHint::Stream);
-        storage.box_transforms = std::make_shared<gl::Buffer>(gl::DrawHint::Stream);
+        storage.box_buffer = std::make_shared<gl::VertexBuffer>(box_vertices, sizeof(box_vertices));
+        storage.box_ids_transforms_buffer = std::make_shared<gl::VertexBuffer>(gl::DrawHint::Stream);
         storage.box_index_buffer = std::make_shared<gl::IndexBuffer>(box_indices, sizeof(box_indices));
 
         BufferLayout layout = BufferLayout {}
             .add(0, BufferLayout::Float, 3);
 
-        BufferLayout layout_ids = BufferLayout {}
-            .add(1, BufferLayout::Float, 1, true);
-
-        BufferLayout layout_transforms = BufferLayout {}
+        BufferLayout layout_ids_transforms = BufferLayout {}
+            .add(1, BufferLayout::Float, 1, true)
             .add(2, BufferLayout::Float, 4, true)
             .add(3, BufferLayout::Float, 4, true)
             .add(4, BufferLayout::Float, 4, true)
@@ -812,15 +810,14 @@ void Renderer::initialize_vertex_arrays() {
         storage.box_vertex_array = std::make_shared<gl::VertexArray>();
         storage.box_vertex_array->begin_definition()
             .add_buffer(storage.box_buffer, layout)
-            .add_buffer(storage.box_ids, layout_ids)
-            .add_buffer(storage.box_transforms, layout_transforms)
+            .add_buffer(storage.box_ids_transforms_buffer, layout_ids_transforms)
             .add_index_buffer(storage.box_index_buffer)
             .end_definition();
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
     {
-        static constexpr float origin_vertices[] = {
+        const float origin_vertices[] = {
             -20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
              20.0f,   0.0f,   0.0f,    1.0f, 0.0f, 0.0f,
               0.0f, -20.0f,   0.0f,    0.0f, 1.0f, 0.0f,
@@ -829,11 +826,11 @@ void Renderer::initialize_vertex_arrays() {
               0.0f,   0.0f,  20.0f,    0.0f, 0.0f, 1.0f
         };
 
-        storage.origin_buffer = std::make_shared<gl::Buffer>(origin_vertices, sizeof(origin_vertices));
+        storage.origin_buffer = std::make_shared<gl::VertexBuffer>(origin_vertices, sizeof(origin_vertices));
 
-        BufferLayout layout;
-        layout.add(0, BufferLayout::Float, 3);
-        layout.add(1, BufferLayout::Float, 3);
+        BufferLayout layout = BufferLayout {}
+            .add(0, BufferLayout::Float, 3)
+            .add(1, BufferLayout::Float, 3);
 
         storage.origin_vertex_array = std::make_shared<gl::VertexArray>();
         storage.origin_vertex_array->begin_definition()
@@ -869,9 +866,9 @@ void Renderer::initialize_framebuffers() {
         specification.depth_attachment = gl::Attachment {
             gl::AttachmentFormat::DEPTH32, gl::AttachmentType::Renderbuffer
         };
-        static constexpr float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };  // TODO right now not used
+        float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };  // TODO right now not used
         specification.clear_drawbuffer = 0;
-        specification.clear_value = color;
+        memcpy(specification.color_clear_value, color, sizeof(float) * 4);
 
         storage.bounding_box_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 

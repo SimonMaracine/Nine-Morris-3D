@@ -88,7 +88,7 @@ void Font::update_data(const float* data, size_t size) {
     buffer->bind();
     buffer->upload_data(data, size);
 
-    gl::Buffer::unbind();
+    gl::VertexBuffer::unbind();
 
     constexpr size_t FLOATS_PER_VERTEX = 4;
 
@@ -334,7 +334,7 @@ std::pair<int, int> Font::get_string_size(std::string_view string, float scale) 
 }
 
 void Font::initialize() {
-    buffer = std::make_shared<gl::Buffer>(gl::DrawHint::Stream);
+    buffer = std::make_shared<gl::VertexBuffer>(gl::DrawHint::Stream);
 
     BufferLayout layout = BufferLayout {}
         .add(0, BufferLayout::Float, 2)
