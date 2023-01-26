@@ -138,9 +138,7 @@ private:
         std::shared_ptr<gl::Shader> shadow_shader;
         std::shared_ptr<gl::Shader> outline_shader;
         std::shared_ptr<gl::Shader> box_shader;
-#ifdef NM3D_PLATFORM_DEBUG
         std::shared_ptr<gl::Shader> origin_shader;
-#endif
 
         std::shared_ptr<gl::VertexArray> skybox_vertex_array;
         std::shared_ptr<gl::Buffer> skybox_buffer;
@@ -153,10 +151,8 @@ private:
         std::shared_ptr<gl::Buffer> box_ids;
         std::shared_ptr<gl::Buffer> box_transforms;
         std::shared_ptr<gl::IndexBuffer> box_index_buffer;
-#ifdef NM3D_PLATFORM_DEBUG
         std::shared_ptr<gl::VertexArray> origin_vertex_array;
         std::shared_ptr<gl::Buffer> origin_buffer;
-#endif
 
         std::shared_ptr<gl::Texture3D> skybox_texture;
 

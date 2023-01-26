@@ -29,6 +29,8 @@ public:
 
         buffers[buffer_index]->bind();
         framebuffer->read_pixel_float_pbo(attachment_index, x, y);
+
+        gl::PixelBuffer::unbind();
     }
 
     // Call this as far as possible from read() to actually get the data

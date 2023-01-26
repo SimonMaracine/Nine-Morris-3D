@@ -12,7 +12,7 @@
 #include "engine/other/assert.h"
 #include "engine/other/exit.h"
 
-static constexpr char ERROR_CHARACTER = 127;
+static constexpr char16_t ERROR_CHARACTER = 127;
 
 static std::string get_name(std::string_view file_path) {
     size_t last_slash = file_path.find_last_of("/");
@@ -90,9 +90,11 @@ void Font::update_data(const float* data, size_t size) {
 
     gl::Buffer::unbind();
 
-    ASSERT(size % sizeof(float) == 0, "Data may be corrupted");
+    constexpr size_t FLOATS_PER_VERTEX = 4;
 
-    vertex_count = size / sizeof(float);
+    ASSERT(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0, "Data may be corrupted");
+
+    vertex_count = static_cast<int>(size / (sizeof(float) * FLOATS_PER_VERTEX));
 }
 
 void Font::begin_baking() {
@@ -105,6 +107,8 @@ void Font::begin_baking() {
     bake_context = BakeContext {};
     bake_context.bitmap = new unsigned char[SIZE];
     memset(bake_context.bitmap, 0, SIZE);
+
+    glyphs.clear();
 }
 
 void Font::end_baking() {
@@ -183,13 +187,13 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         gl.t1 = t1;
         gl.width = width;
         gl.height = height;
-        gl.xoff = static_cast<int>(std::roundf(left_side_bearing * sf));
-        gl.yoff = static_cast<int>(std::roundf(-descent * sf - y0));
-        gl.xadvance = static_cast<int>(std::roundf(advance_width * sf));
+        gl.xoff = static_cast<int>(std::roundf(static_cast<float>(left_side_bearing) * sf));
+        gl.yoff = static_cast<int>(std::roundf(static_cast<float>(-descent) * sf - static_cast<float>(y0)));
+        gl.xadvance = static_cast<int>(std::roundf(static_cast<float>(advance_width) * sf));
 
         ASSERT(glyphs.count(codepoint) == 0, "There should be only one of each glyph");
 
-        glyphs[codepoint] = gl;
+        glyphs[static_cast<char16_t>(codepoint)] = gl;
     }
 }
 
@@ -242,13 +246,13 @@ void Font::bake_character(int codepoint) {
     gl.t1 = t1;
     gl.width = width;
     gl.height = height;
-    gl.xoff = static_cast<int>(std::roundf(left_side_bearing * sf));
-    gl.yoff = static_cast<int>(std::roundf(-descent * sf - y0));
-    gl.xadvance = static_cast<int>(std::roundf(advance_width * sf));
+    gl.xoff = static_cast<int>(std::roundf(static_cast<float>(left_side_bearing) * sf));
+    gl.yoff = static_cast<int>(std::roundf(static_cast<float>(-descent) * sf - static_cast<float>(y0)));
+    gl.xadvance = static_cast<int>(std::roundf(static_cast<float>(advance_width) * sf));
 
     ASSERT(glyphs.count(codepoint) == 0, "There should be only one of each glyph");
 
-    glyphs[codepoint] = gl;
+    glyphs[static_cast<char16_t>(codepoint)] = gl;
 }
 
 void Font::render(std::string_view string, std::vector<float>& buffer) {
@@ -257,10 +261,10 @@ void Font::render(std::string_view string, std::vector<float>& buffer) {
     int x = 0;
 
     for (const char16_t character : utf16_string) {
-        const Font::Glyph* glyph;
+        const Glyph* glyph;
 
         try {
-            glyph = &glyphs.at(character);
+            glyph = &glyphs.at(static_cast<char16_t>(character));
         } catch (const std::out_of_range&) {
             glyph = &glyphs[ERROR_CHARACTER];
         }
@@ -311,7 +315,7 @@ std::pair<int, int> Font::get_string_size(std::string_view string, float scale) 
     int height = 0;
 
     for (const char16_t character : utf16_string) {
-        const Font::Glyph* glyph;
+        const Glyph* glyph;
 
         try {
             glyph = &glyphs.at(character);
@@ -321,10 +325,10 @@ std::pair<int, int> Font::get_string_size(std::string_view string, float scale) 
 
         x += glyph->xadvance;
 
-        height = std::max(height, static_cast<int>(roundf(glyph->yoff * scale)));
+        height = std::max(height, static_cast<int>(std::roundf(static_cast<float>(glyph->yoff) * scale)));
     }
 
-    const int width = static_cast<int>(roundf((x + 2) * scale));
+    const int width = static_cast<int>(std::roundf((x + 2) * scale));
 
     return std::make_pair(width, height);
 }

@@ -304,7 +304,6 @@ void Renderer::end_rendering() {
     gl::VertexArray::unbind();
 }
 
-#ifdef NM3D_PLATFORM_DEBUG
 void Renderer::draw_origin() {
     storage.origin_shader->bind();
     storage.origin_shader->upload_uniform_mat4("u_projection_view_matrix", camera_cache.projection_view_matrix);
@@ -315,7 +314,6 @@ void Renderer::draw_origin() {
 
     gl::VertexArray::unbind();
 }
-#endif
 
 void Renderer::draw_skybox() {
     const glm::mat4& projection = camera_cache.projection_matrix;

@@ -25,12 +25,12 @@ public:
 
     void update_data(const float* data, size_t size);
 
-    std::unordered_map<int, Glyph>& get_glyphs() { return glyphs; }
+    const std::unordered_map<char16_t, Glyph>& get_glyphs() { return glyphs; }
     unsigned int get_bitmap_size() { return static_cast<unsigned int>(bitmap_size); }
 
     gl::VertexArray& get_vertex_array() { return *vertex_array; }
     GLuint get_texture() { return texture; }
-    unsigned int get_vertex_count() { return vertex_count; }
+    int get_vertex_count() { return vertex_count; }
 
     // Baking API
     void begin_baking();
@@ -53,22 +53,23 @@ private:
         unsigned char* bitmap = nullptr;
     } bake_context;
 
-    std::unordered_map<int, Glyph> glyphs;
+    std::unordered_map<char16_t, Glyph> glyphs;
 
     stbtt_fontinfo info;
     const char* font_info_buffer = nullptr;
     int bitmap_size = 0;
-    int padding = 0;
+    int padding = 0;  // Between glyphs
     unsigned char on_edge_value = 0;
     int pixel_dist_scale = 0;
-    float sf = 0.0f;
+    float sf = 0.0f;  // Scale factor
 
     std::string name;
 
+    // Bitmap
     GLuint texture = 0;
 
     // Store references to vertex array and buffer
     std::shared_ptr<gl::VertexArray> vertex_array;
     std::shared_ptr<gl::Buffer> buffer;
-    unsigned int vertex_count = 0;
+    int vertex_count = 0;
 };
