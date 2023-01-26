@@ -5,7 +5,7 @@
 #include "engine/application/events.h"
 #include "engine/graphics/renderer/gui_renderer.h"
 #include "engine/graphics/font.h"
-#include "engine/graphics/buffer_layout.h"
+#include "engine/graphics/vertex_buffer_layout.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
@@ -405,7 +405,7 @@ void GuiRenderer::initialize_shaders() {
 }
 
 void GuiRenderer::initialize_vertex_arrays() {
-    float quad2d_vertices[] = {
+    const float quad2d_vertices[] = {
         0.0f, 1.0f,
         0.0f, 0.0f,
         1.0f, 1.0f,
@@ -416,8 +416,8 @@ void GuiRenderer::initialize_vertex_arrays() {
 
     storage.quad2d_buffer = std::make_shared<gl::VertexBuffer>(quad2d_vertices, sizeof(quad2d_vertices));
 
-    BufferLayout layout = BufferLayout {}
-        .add(0, BufferLayout::Float, 2);
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 2);
 
     storage.quad2d_vertex_array = std::make_shared<gl::VertexArray>();
     storage.quad2d_vertex_array->begin_definition()

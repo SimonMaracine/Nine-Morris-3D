@@ -143,6 +143,7 @@ int Application::run(std::string_view start_scene_name) {
         }
         current_scene->on_update();
 
+        // Clear the default framebuffer, as nobody does that for us
         render_helpers::clear(render_helpers::Color);
 
         renderer_3d_update();

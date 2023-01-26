@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-struct BufferLayout {
+struct VertexBufferLayout {
     enum Type {
         Invalid,
         Float,
@@ -21,5 +21,5 @@ struct BufferLayout {
     std::vector<VertexElement> elements;
     GLsizei stride = 0;
 
-    BufferLayout& add(GLuint index, Type type, GLint size, bool per_instance = false);
+    VertexBufferLayout& add(GLuint index, Type type, GLint size, bool per_instance = false);
 };

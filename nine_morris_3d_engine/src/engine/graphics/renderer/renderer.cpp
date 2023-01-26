@@ -292,6 +292,7 @@ void Renderer::end_rendering() {
     // Draw the final result to the screen
     gl::Framebuffer::bind_default();
     glClear(GL_COLOR_BUFFER_BIT);
+
     draw_screen_quad(post_processing_context.last_texture);
 
     glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
@@ -716,8 +717,8 @@ void Renderer::initialize_vertex_arrays() {
     {
         storage.skybox_buffer = std::make_shared<gl::VertexBuffer>(gl::CUBEMAP_VERTICES, sizeof(gl::CUBEMAP_VERTICES));
 
-        BufferLayout layout = BufferLayout {}
-            .add(0, BufferLayout::Float, 3);
+        VertexBufferLayout layout = VertexBufferLayout {}
+            .add(0, VertexBufferLayout::Float, 3);
 
         storage.skybox_vertex_array = std::make_shared<gl::VertexArray>();
         storage.skybox_vertex_array->begin_definition()
@@ -737,8 +738,8 @@ void Renderer::initialize_vertex_arrays() {
 
         storage.screen_quad_buffer = std::make_shared<gl::VertexBuffer>(screen_quad_vertices, sizeof(screen_quad_vertices));
 
-        BufferLayout layout = BufferLayout {}
-            .add(0, BufferLayout::Float, 2);
+        VertexBufferLayout layout = VertexBufferLayout {}
+            .add(0, VertexBufferLayout::Float, 2);
 
         storage.screen_quad_vertex_array = std::make_shared<gl::VertexArray>();
         storage.screen_quad_vertex_array->begin_definition()
@@ -758,9 +759,9 @@ void Renderer::initialize_vertex_arrays() {
 
         storage.quad_buffer = std::make_shared<gl::VertexBuffer>(quad_vertices, sizeof(quad_vertices));
 
-        BufferLayout layout = BufferLayout {}
-            .add(0, BufferLayout::Float, 2)
-            .add(1, BufferLayout::Float, 2);
+        VertexBufferLayout layout = VertexBufferLayout {}
+            .add(0, VertexBufferLayout::Float, 2)
+            .add(1, VertexBufferLayout::Float, 2);
 
         storage.quad_vertex_array = std::make_shared<gl::VertexArray>();
         storage.quad_vertex_array->begin_definition()
@@ -793,15 +794,15 @@ void Renderer::initialize_vertex_arrays() {
         storage.box_ids_transforms_buffer = std::make_shared<gl::VertexBuffer>(gl::DrawHint::Stream);
         storage.box_index_buffer = std::make_shared<gl::IndexBuffer>(box_indices, sizeof(box_indices));
 
-        BufferLayout layout = BufferLayout {}
-            .add(0, BufferLayout::Float, 3);
+        VertexBufferLayout layout = VertexBufferLayout {}
+            .add(0, VertexBufferLayout::Float, 3);
 
-        BufferLayout layout_ids_transforms = BufferLayout {}
-            .add(1, BufferLayout::Float, 1, true)
-            .add(2, BufferLayout::Float, 4, true)
-            .add(3, BufferLayout::Float, 4, true)
-            .add(4, BufferLayout::Float, 4, true)
-            .add(5, BufferLayout::Float, 4, true);
+        VertexBufferLayout layout_ids_transforms = VertexBufferLayout {}
+            .add(1, VertexBufferLayout::Float, 1, true)
+            .add(2, VertexBufferLayout::Float, 4, true)
+            .add(3, VertexBufferLayout::Float, 4, true)
+            .add(4, VertexBufferLayout::Float, 4, true)
+            .add(5, VertexBufferLayout::Float, 4, true);
 
         storage.box_vertex_array = std::make_shared<gl::VertexArray>();
         storage.box_vertex_array->begin_definition()
@@ -824,9 +825,9 @@ void Renderer::initialize_vertex_arrays() {
 
         storage.origin_buffer = std::make_shared<gl::VertexBuffer>(origin_vertices, sizeof(origin_vertices));
 
-        BufferLayout layout = BufferLayout {}
-            .add(0, BufferLayout::Float, 3)
-            .add(1, BufferLayout::Float, 3);
+        VertexBufferLayout layout = VertexBufferLayout {}
+            .add(0, VertexBufferLayout::Float, 3)
+            .add(1, VertexBufferLayout::Float, 3);
 
         storage.origin_vertex_array = std::make_shared<gl::VertexArray>();
         storage.origin_vertex_array->begin_definition()

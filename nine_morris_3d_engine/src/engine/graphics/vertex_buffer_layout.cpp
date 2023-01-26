@@ -1,10 +1,10 @@
 #include <glad/glad.h>
 
-#include "engine/graphics/buffer_layout.h"
+#include "engine/graphics/vertex_buffer_layout.h"
 #include "engine/other/logging.h"
 #include "engine/other/exit.h"
 
-size_t BufferLayout::VertexElement::get_size(Type type) {
+size_t VertexBufferLayout::VertexElement::get_size(Type type) {
     switch (type) {
         case Float:
             return sizeof(GLfloat);
@@ -18,7 +18,7 @@ size_t BufferLayout::VertexElement::get_size(Type type) {
     return 0;
 }
 
-BufferLayout& BufferLayout::add(GLuint index, Type type, GLint size, bool per_instance) {
+VertexBufferLayout& VertexBufferLayout::add(GLuint index, Type type, GLint size, bool per_instance) {
     elements.push_back(VertexElement {index, type, size, per_instance});
     stride += size * VertexElement::get_size(type);
 

@@ -9,7 +9,6 @@
 #include "engine/graphics/renderer/gui_renderer.h"
 #include "engine/graphics/renderer/render_helpers.h"
 #include "engine/graphics/renderer/renderer.h"
-#include "engine/graphics/buffer_layout.h"
 #include "engine/graphics/camera.h"
 #include "engine/graphics/font.h"
 #include "engine/graphics/framebuffer_reader.h"
@@ -18,3 +17,4 @@
 #include "engine/graphics/material.h"
 #include "engine/graphics/post_processing.h"
 #include "engine/graphics/texture_data.h"
+#include "engine/graphics/vertex_buffer_layout.h"

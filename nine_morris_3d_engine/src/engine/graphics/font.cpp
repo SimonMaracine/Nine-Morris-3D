@@ -336,9 +336,9 @@ std::pair<int, int> Font::get_string_size(std::string_view string, float scale) 
 void Font::initialize() {
     buffer = std::make_shared<gl::VertexBuffer>(gl::DrawHint::Stream);
 
-    BufferLayout layout = BufferLayout {}
-        .add(0, BufferLayout::Float, 2)
-        .add(1, BufferLayout::Float, 2);
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 2)
+        .add(1, VertexBufferLayout::Float, 2);
 
     vertex_array = std::make_shared<gl::VertexArray>();
     vertex_array->begin_definition()

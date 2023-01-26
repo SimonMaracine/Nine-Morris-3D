@@ -46,11 +46,11 @@ static void initialize_board(Application* app) {
         app->res.mesh_ptnt["board_wood"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout = BufferLayout {}
-        .add(0, BufferLayout::Float, 3)
-        .add(1, BufferLayout::Float, 2)
-        .add(2, BufferLayout::Float, 3)
-        .add(3, BufferLayout::Float, 3);
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 3)
+        .add(1, VertexBufferLayout::Float, 2)
+        .add(2, VertexBufferLayout::Float, 3)
+        .add(3, VertexBufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_wood"_h);
     vertex_array->begin_definition()
@@ -125,11 +125,11 @@ static void initialize_board_paint(Application* app) {
         app->res.mesh_ptnt["board_paint"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout = BufferLayout {}
-        .add(0, BufferLayout::Float, 3)
-        .add(1, BufferLayout::Float, 2)
-        .add(2, BufferLayout::Float, 3)
-        .add(3, BufferLayout::Float, 3);
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 3)
+        .add(1, VertexBufferLayout::Float, 2)
+        .add(2, VertexBufferLayout::Float, 3)
+        .add(3, VertexBufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_paint"_h);
     vertex_array->begin_definition()
@@ -211,11 +211,11 @@ static void initialize_pieces(Application* app) {
         app->res.mesh_ptnt["black_piece"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout = BufferLayout {}
-        .add(0, BufferLayout::Float, 3)
-        .add(1, BufferLayout::Float, 2)
-        .add(2, BufferLayout::Float, 3)
-        .add(3, BufferLayout::Float, 3);
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 3)
+        .add(1, VertexBufferLayout::Float, 2)
+        .add(2, VertexBufferLayout::Float, 3)
+        .add(3, VertexBufferLayout::Float, 3);
 
     auto white_piece_vertex_array = app->res.vertex_array.load("white_piece"_h);
     white_piece_vertex_array->begin_definition()
@@ -330,8 +330,8 @@ static void initialize_nodes(Application* app) {
         app->res.mesh_p["node"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout = BufferLayout {}
-        .add(0, BufferLayout::Float, 3);
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("node"_h);
     vertex_array->begin_definition()
@@ -382,10 +382,10 @@ static void initialize_board_no_normal(Application* app) {
         app->res.mesh_ptn["board_wood"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout = BufferLayout {}
-        .add(0, BufferLayout::Float, 3)
-        .add(1, BufferLayout::Float, 2)
-        .add(2, BufferLayout::Float, 3);
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 3)
+        .add(1, VertexBufferLayout::Float, 2)
+        .add(2, VertexBufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_wood"_h);
     vertex_array->begin_definition()
@@ -451,10 +451,10 @@ static void initialize_board_paint_no_normal(Application* app) {
         app->res.mesh_ptn["board_paint"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout = BufferLayout {}
-        .add(0, BufferLayout::Float, 3)
-        .add(1, BufferLayout::Float, 2)
-        .add(2, BufferLayout::Float, 3);
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 3)
+        .add(1, VertexBufferLayout::Float, 2)
+        .add(2, VertexBufferLayout::Float, 3);
 
     auto vertex_array = app->res.vertex_array.load("board_paint"_h);
     vertex_array->begin_definition()
@@ -534,10 +534,10 @@ static void initialize_pieces_no_normal(Application* app) {
         app->res.mesh_ptn["black_piece"_h]->indices.size() * sizeof(unsigned int)
     );
 
-    BufferLayout layout = BufferLayout {}
-        .add(0, BufferLayout::Float, 3)
-        .add(1, BufferLayout::Float, 2)
-        .add(2, BufferLayout::Float, 3);
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 3)
+        .add(1, VertexBufferLayout::Float, 2)
+        .add(2, VertexBufferLayout::Float, 3);
 
     auto white_piece_vertex_array = app->res.vertex_array.load("white_piece"_h);
     white_piece_vertex_array->begin_definition()

@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 
-#include "engine/graphics/buffer_layout.h"
+#include "engine/graphics/vertex_buffer_layout.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/other/logging.h"
@@ -37,7 +37,7 @@ namespace gl {
         return Def {};
     }
 
-    VertexArray::Def& VertexArray::Def::add_buffer(std::shared_ptr<VertexBuffer> buffer, const BufferLayout& layout) {
+    VertexArray::Def& VertexArray::Def::add_buffer(std::shared_ptr<VertexBuffer> buffer, const VertexBufferLayout& layout) {
         ASSERT(layout.elements.size() > 0, "Invalid layout");
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
@@ -45,16 +45,16 @@ namespace gl {
         size_t offset = 0;
 
         for (size_t i = 0; i < layout.elements.size(); i++) {
-            const BufferLayout::VertexElement& element = layout.elements[i];
+            const VertexBufferLayout::VertexElement& element = layout.elements[i];
 
             switch (element.type) {
-                case BufferLayout::Float:
+                case VertexBufferLayout::Float:
                     glVertexAttribPointer(
                         element.index, element.size, GL_FLOAT, GL_FALSE,
                         layout.stride, reinterpret_cast<GLvoid*>(offset)
                     );
                     break;
-                case BufferLayout::Int:
+                case VertexBufferLayout::Int:
                     glVertexAttribIPointer(
                         element.index, element.size, GL_INT,
                         layout.stride, reinterpret_cast<GLvoid*>(offset)
@@ -66,7 +66,7 @@ namespace gl {
             }
 
             glEnableVertexAttribArray(element.index);
-            offset += element.size * BufferLayout::VertexElement::get_size(element.type);
+            offset += element.size * VertexBufferLayout::VertexElement::get_size(element.type);
 
             if (element.per_instance) {
                 glVertexAttribDivisor(element.index, 1);

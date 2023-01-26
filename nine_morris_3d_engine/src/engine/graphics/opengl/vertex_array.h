@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "engine/graphics/buffer_layout.h"
+#include "engine/graphics/vertex_buffer_layout.h"
 
 namespace gl {
     class VertexBuffer;
@@ -14,7 +14,7 @@ namespace gl {
     public:
         class Def {
         public:
-            Def& add_buffer(std::shared_ptr<VertexBuffer> buffer, const BufferLayout& layout);
+            Def& add_buffer(std::shared_ptr<VertexBuffer> buffer, const VertexBufferLayout& layout);
             Def& add_index_buffer(std::shared_ptr<IndexBuffer> index_buffer);
             void end_definition();
         private:
