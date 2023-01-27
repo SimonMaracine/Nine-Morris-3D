@@ -241,13 +241,13 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
             Piece piece = Piece {
                 ser_index,
                 ser_piece.type,
-                app->res.model[hs {"piece" + std::to_string(ser_index)}],
-                app->res.al_source[hs {"piece" + std::to_string(ser_index)}]
+                app->res.model[hs("piece" + std::to_string(ser_index))],
+                app->res.al_source[hs("piece" + std::to_string(ser_index))]
             };
 
             piece.model->position = ser_piece.position;
             piece.model->rotation = ser_piece.rotation;
-            piece.model->vertex_array = app->res.vertex_array[hs {"piece" + std::to_string(ser_index)}];
+            piece.model->vertex_array = app->res.vertex_array[hs("piece" + std::to_string(ser_index))];
             piece.model->index_buffer = (
                 ser_piece.type == PieceType::White
                     ?
@@ -256,7 +256,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
                     app->res.index_buffer["black_piece"_h]
             );
             piece.model->scale = WORLD_SCALE;
-            piece.model->material = app->res.material_instance[hs {"piece" + std::to_string(ser_index)}];
+            piece.model->material = app->res.material_instance[hs("piece" + std::to_string(ser_index))];
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
             piece.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
             piece.model->bounding_box->id = data.piece_ids[ser_index];

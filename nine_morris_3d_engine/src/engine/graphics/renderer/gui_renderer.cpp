@@ -1,5 +1,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <resmanager/resmanager.h>
 
 #include "engine/application/application.h"
 #include "engine/application/events.h"
@@ -14,6 +15,8 @@
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
+
+using namespace resmanager::literals;
 
 static float map(float x, float in_min, float in_max, float out_min, float out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -75,7 +78,7 @@ namespace gui {
         matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
         matrix = glm::scale(matrix, glm::vec3(size * scale_parameters.current_scale, 1.0f));
 
-        app->gui_renderer->storage.quad2d_shader->upload_uniform_mat4("u_model_matrix", matrix);
+        app->gui_renderer->storage.quad2d_shader->upload_uniform_mat4("u_model_matrix"_h, matrix);
 
         texture->bind(0);
 
@@ -118,14 +121,14 @@ namespace gui {
         matrix = glm::scale(matrix, glm::vec3(text_scale, text_scale, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(scale_parameters.current_scale, scale_parameters.current_scale, 1.0f));
 
-        app->gui_renderer->storage.text_shader->upload_uniform_mat4("u_model_matrix", matrix);
-        app->gui_renderer->storage.text_shader->upload_uniform_vec3("u_color", color);
+        app->gui_renderer->storage.text_shader->upload_uniform_mat4("u_model_matrix"_h, matrix);
+        app->gui_renderer->storage.text_shader->upload_uniform_vec3("u_color"_h, color);
 
         const float border_width = with_shadows ? 0.3f : 0.0f;
         const float offset = with_shadows ? -0.003f : 0.0f;
 
-        app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width", border_width);
-        app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset", glm::vec2(offset, offset));
+        app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width"_h, border_width);
+        app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset"_h, glm::vec2(offset, offset));
 
         font->get_vertex_array().bind();
 
@@ -434,9 +437,9 @@ void GuiRenderer::initialize_uniform_variables() {
     gl::UniformBuffer::unbind();
 
     storage.quad2d_shader->bind();
-    storage.quad2d_shader->upload_uniform_int("u_texture", 0);
+    storage.quad2d_shader->upload_uniform_int("u_texture"_h, 0);
     storage.text_shader->bind();
-    storage.text_shader->upload_uniform_int("u_bitmap", 0);
+    storage.text_shader->upload_uniform_int("u_bitmap"_h, 0);
 
     gl::Shader::unbind();
 }

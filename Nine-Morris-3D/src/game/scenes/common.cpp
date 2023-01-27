@@ -77,16 +77,16 @@ static void initialize_board(Application* app) {
     );
 
     auto material = app->res.material.load("wood"_h, shader);
-    material->add_texture("u_material.diffuse");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
-    material->add_texture("u_material.normal");
+    material->add_texture("u_material.diffuse"_h);
+    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_h);
+    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_h);
+    material->add_texture("u_material.normal"_h);
 
     auto material_instance = app->res.material_instance.load("board_wood"_h, material);
-    material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
-    material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
-    material_instance->set_float("u_material.shininess", 4.0f);
-    material_instance->set_texture("u_material.normal", normal_texture, 1);
+    material_instance->set_texture("u_material.diffuse"_h, diffuse_texture, 0);
+    material_instance->set_vec3("u_material.specular"_h, glm::vec3(0.2f));
+    material_instance->set_float("u_material.shininess"_h, 4.0f);
+    material_instance->set_texture("u_material.normal"_h, normal_texture, 1);
 }
 
 static void initialize_board_paint(Application* app) {
@@ -150,16 +150,16 @@ static void initialize_board_paint(Application* app) {
     );
 
     auto material = app->res.material.load("board_paint"_h, shader);
-    material->add_texture("u_material.diffuse");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
-    material->add_texture("u_material.normal");
+    material->add_texture("u_material.diffuse"_h);
+    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_h);
+    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_h);
+    material->add_texture("u_material.normal"_h);
 
     auto material_instance = app->res.material_instance.load("board_paint"_h, material);
-    material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
-    material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
-    material_instance->set_float("u_material.shininess", 4.0f);
-    material_instance->set_texture("u_material.normal", app->res.texture["board_normal"_h], 1);
+    material_instance->set_texture("u_material.diffuse"_h, diffuse_texture, 0);
+    material_instance->set_vec3("u_material.specular"_h, glm::vec3(0.2f));
+    material_instance->set_float("u_material.shininess"_h, 4.0f);
+    material_instance->set_texture("u_material.normal"_h, app->res.texture["board_normal"_h], 1);
 }
 
 static void initialize_pieces(Application* app) {
@@ -254,11 +254,11 @@ static void initialize_pieces(Application* app) {
     );
 
     auto material = app->res.material.load("tinted_wood"_h, shader);
-    material->add_texture("u_material.diffuse");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
-    material->add_texture("u_material.normal");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.tint");
+    material->add_texture("u_material.diffuse"_h);
+    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_h);
+    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_h);
+    material->add_texture("u_material.normal"_h);
+    material->add_uniform(Material::Uniform::Vec3, "u_material.tint"_h);
 
     app->res.al_buffer.load(
         "piece_place1"_h,
@@ -288,22 +288,22 @@ static void initialize_pieces(Application* app) {
 
 void initialize_piece(Application* app, Index index, std::shared_ptr<gl::Texture> diffuse_texture) {
     auto material_instance = app->res.material_instance.load(
-        hs {"piece" + std::to_string(index)},
+        hs("piece" + std::to_string(index)),
         app->res.material["tinted_wood"_h]
     );
-    material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
-    material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
-    material_instance->set_float("u_material.shininess", 4.0f);
-    material_instance->set_texture("u_material.normal", app->res.texture["piece_normal"_h], 1);
-    material_instance->set_vec3("u_material.tint", DEFAULT_TINT);
+    material_instance->set_texture("u_material.diffuse"_h, diffuse_texture, 0);
+    material_instance->set_vec3("u_material.specular"_h, glm::vec3(0.2f));
+    material_instance->set_float("u_material.shininess"_h, 4.0f);
+    material_instance->set_texture("u_material.normal"_h, app->res.texture["piece_normal"_h], 1);
+    material_instance->set_vec3("u_material.tint"_h, DEFAULT_TINT);
 }
 
 static void initialize_node(Application* app, Index index) {
     auto material_instance = app->res.material_instance.load(
-        hs {"node" + std::to_string(index)},
+        hs("node" + std::to_string(index)),
         app->res.material["basic"_h]
     );
-    material_instance->set_vec4("u_color", glm::vec4(0.0f));
+    material_instance->set_vec4("u_color"_h, glm::vec4(0.0f));
 }
 
 static void initialize_nodes(Application* app) {
@@ -340,7 +340,7 @@ static void initialize_nodes(Application* app) {
         .end_definition();
 
     auto material = app->res.material.load("basic"_h, shader);
-    material->add_uniform(Material::Uniform::Vec4, "u_color");
+    material->add_uniform(Material::Uniform::Vec4, "u_color"_h);
 
     for (size_t i = 0; i < 24; i++) {
         initialize_node(app, i);
@@ -406,14 +406,14 @@ static void initialize_board_no_normal(Application* app) {
     );
 
     auto material = app->res.material.load("wood"_h, shader);
-    material->add_texture("u_material.diffuse");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
+    material->add_texture("u_material.diffuse"_h);
+    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_h);
+    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_h);
 
     auto material_instance = app->res.material_instance.load("board_wood"_h, material);
-    material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
-    material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
-    material_instance->set_float("u_material.shininess", 4.0f);
+    material_instance->set_texture("u_material.diffuse"_h, diffuse_texture, 0);
+    material_instance->set_vec3("u_material.specular"_h, glm::vec3(0.2f));
+    material_instance->set_float("u_material.shininess"_h, 4.0f);
 }
 
 static void initialize_board_paint_no_normal(Application* app) {
@@ -475,14 +475,14 @@ static void initialize_board_paint_no_normal(Application* app) {
     );
 
     auto material = app->res.material.load("board_paint"_h, shader);
-    material->add_texture("u_material.diffuse");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
+    material->add_texture("u_material.diffuse"_h);
+    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_h);
+    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_h);
 
     auto material_instance = app->res.material_instance.load("board_paint"_h, material);
-    material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
-    material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
-    material_instance->set_float("u_material.shininess", 4.0f);
+    material_instance->set_texture("u_material.diffuse"_h, diffuse_texture, 0);
+    material_instance->set_vec3("u_material.specular"_h, glm::vec3(0.2f));
+    material_instance->set_float("u_material.shininess"_h, 4.0f);
 }
 
 static void initialize_pieces_no_normal(Application* app) {
@@ -570,10 +570,10 @@ static void initialize_pieces_no_normal(Application* app) {
     );
 
     auto material = app->res.material.load("tinted_wood"_h, shader);
-    material->add_texture("u_material.diffuse");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular");
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess");
-    material->add_uniform(Material::Uniform::Vec3, "u_material.tint");
+    material->add_texture("u_material.diffuse"_h);
+    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_h);
+    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_h);
+    material->add_uniform(Material::Uniform::Vec3, "u_material.tint"_h);
 
     app->res.al_buffer.load(
         "piece_place1"_h,
@@ -603,13 +603,13 @@ static void initialize_pieces_no_normal(Application* app) {
 
 void initialize_piece_no_normal(Application* app, Index index, std::shared_ptr<gl::Texture> diffuse_texture) {
     auto material_instance = app->res.material_instance.load(
-        hs {"piece" + std::to_string(index)},
+        hs("piece" + std::to_string(index)),
         app->res.material["tinted_wood"_h]
     );
-    material_instance->set_texture("u_material.diffuse", diffuse_texture, 0);
-    material_instance->set_vec3("u_material.specular", glm::vec3(0.2f));
-    material_instance->set_float("u_material.shininess", 4.0f);
-    material_instance->set_vec3("u_material.tint", DEFAULT_TINT);
+    material_instance->set_texture("u_material.diffuse"_h, diffuse_texture, 0);
+    material_instance->set_vec3("u_material.specular"_h, glm::vec3(0.2f));
+    material_instance->set_float("u_material.shininess"_h, 4.0f);
+    material_instance->set_vec3("u_material.tint"_h, DEFAULT_TINT);
 }
 
 static void initialize_keyboard_controls(Application* app) {
@@ -761,7 +761,7 @@ void change_board_paint_texture(Application* app) {
         specification
     );
 
-    app->res.material_instance["board_paint"_h]->set_texture("u_material.diffuse", diffuse_texture, 0);
+    app->res.material_instance["board_paint"_h]->set_texture("u_material.diffuse"_h, diffuse_texture, 0);
 
     app->res.texture_data.release("board_paint_diffuse"_h);
 }
@@ -836,7 +836,7 @@ static void initialize_ids(Application* app) {
 
 void release_piece_material_instances(Application* app) {
     for (size_t i = 0; i < MAX_PIECES; i++) {
-        app->res.material_instance.release(hs {"piece" + std::to_string(i)});
+        app->res.material_instance.release(hs("piece" + std::to_string(i)));
     }
 }
 

@@ -76,7 +76,7 @@ void setup_and_add_model_piece(Application* app, S* scene, Index index, const gl
     piece.model->scale = WORLD_SCALE;
     piece.model->vertex_array = app->res.vertex_array[id];
     piece.model->index_buffer = app->res.index_buffer[id];
-    piece.model->material = app->res.material_instance[hs {"piece" + std::to_string(index)}];
+    piece.model->material = app->res.material_instance[hs("piece" + std::to_string(index))];
     piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
     piece.model->cast_shadow = true;
     piece.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
@@ -108,7 +108,7 @@ void setup_and_add_model_node(Application* app, S* scene, size_t index, const gl
     node.model->scale = WORLD_SCALE;
     node.model->vertex_array = app->res.vertex_array["node"_h];
     node.model->index_buffer = app->res.index_buffer["node"_h];
-    node.model->material = app->res.material_instance[hs {"node" + std::to_string(index)}];
+    node.model->material = app->res.material_instance[hs("node" + std::to_string(index))];
     node.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
     node.model->bounding_box->id = data.node_ids[index];
     node.model->bounding_box->size = NODE_BOUNDING_BOX;

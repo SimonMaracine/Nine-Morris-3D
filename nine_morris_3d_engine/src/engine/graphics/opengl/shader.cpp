@@ -233,32 +233,32 @@ namespace gl {
         glUseProgram(0);
     }
 
-    void Shader::upload_uniform_mat4(std::string_view name, const glm::mat4& matrix) {
+    void Shader::upload_uniform_mat4(resmanager::HashedStr32 name, const glm::mat4& matrix) {
         const GLint location = get_uniform_location(name);
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
-    void Shader::upload_uniform_int(std::string_view name, int value) {
+    void Shader::upload_uniform_int(resmanager::HashedStr32 name, int value) {
         const GLint location = get_uniform_location(name);
         glUniform1i(location, value);
     }
 
-    void Shader::upload_uniform_float(std::string_view name, float value) {
+    void Shader::upload_uniform_float(resmanager::HashedStr32 name, float value) {
         const GLint location = get_uniform_location(name);
         glUniform1f(location, value);
     }
 
-    void Shader::upload_uniform_vec2(std::string_view name, glm::vec2 vector) {
+    void Shader::upload_uniform_vec2(resmanager::HashedStr32 name, glm::vec2 vector) {
         const GLint location = get_uniform_location(name);
         glUniform2f(location, vector.x, vector.y);
     }
 
-    void Shader::upload_uniform_vec3(std::string_view name, const glm::vec3& vector) {
+    void Shader::upload_uniform_vec3(resmanager::HashedStr32 name, const glm::vec3& vector) {
         const GLint location = get_uniform_location(name);
         glUniform3f(location, vector.x, vector.y, vector.z);
     }
 
-    void Shader::upload_uniform_vec4(std::string_view name, const glm::vec4& vector) {
+    void Shader::upload_uniform_vec4(resmanager::HashedStr32 name, const glm::vec4& vector) {
         const GLint location = get_uniform_location(name);
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
     }
@@ -298,14 +298,14 @@ namespace gl {
         fragment_shader = new_fragment_shader;
     }
 
-    GLint Shader::get_uniform_location(std::string_view name) {
+    GLint Shader::get_uniform_location(resmanager::HashedStr32 name) {
 #if defined(NM3D_PLATFORM_RELEASE)
-        return cache[std::string(name)];
+        return cache[name];
 #elif defined(NM3D_PLATFORM_DEBUG)
         try {
-            return cache.at(std::string(name));
+            return cache.at(name);
         } catch (const std::out_of_range&) {
-            DEB_ERROR("Cannot get uniform variable `{}` from shader `{}`", name.data(), this->name);
+            DEB_ERROR("Cannot get hashed uniform variable `{}` from shader `{}`", name, this->name);
             return -1;
         }
 #endif
@@ -320,7 +320,7 @@ namespace gl {
                 continue;
             }
 
-            cache[uniform] = location;
+            cache[resmanager::HashedStr32(uniform)] = location;
         }
     }
 

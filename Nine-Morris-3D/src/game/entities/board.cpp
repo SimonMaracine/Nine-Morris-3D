@@ -32,9 +32,9 @@ void Board::update_nodes(identifier::Id hovered_id) {
         const bool permitted = !must_take_piece && is_players_turn;
 
         if (hovered && highlight && permitted) {
-            node.model->material->set_vec4("u_color", GRAY);
+            node.model->material->set_vec4("u_color"_h, GRAY);
         } else {
-            node.model->material->set_vec4("u_color", glm::vec4(0.0f));
+            node.model->material->set_vec4("u_color"_h, glm::vec4(0.0f));
         }
     }
 }
@@ -52,9 +52,9 @@ void Board::update_pieces(identifier::Id hovered_id) {
         }
 
         if (piece.to_take && hovered && piece.in_use) {
-            piece.model->material->set_vec3("u_material.tint", RED_TINT);
+            piece.model->material->set_vec3("u_material.tint"_h, RED_TINT);
         } else {
-            piece.model->material->set_vec3("u_material.tint", DEFAULT_TINT);
+            piece.model->material->set_vec3("u_material.tint"_h, DEFAULT_TINT);
         }
     }
 }

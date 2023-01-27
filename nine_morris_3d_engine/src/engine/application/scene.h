@@ -10,7 +10,7 @@ class Application;
 class Scene {
 public:
     Scene(const std::string& name)
-        : name(name), id(resmanager::hashed_str(name)) {}
+        : name(name), id(resmanager::HashedStr32(name)) {}
     virtual ~Scene() = default;
 
     Scene(const Scene&) = delete;
@@ -26,12 +26,12 @@ public:
     virtual void on_imgui_update() {}  // Called every frame for ImGui only
 
     std::string_view get_name() const { return name; }
-    resmanager::hashed_str get_id() const { return id; }
+    resmanager::HashedStr32 get_id() const { return id; }
 protected:
     Application* app = nullptr;
 private:
     const std::string name;
-    const resmanager::hashed_str id;
+    const resmanager::HashedStr32 id;
     bool on_awake_called = false;
 
     friend class Application;

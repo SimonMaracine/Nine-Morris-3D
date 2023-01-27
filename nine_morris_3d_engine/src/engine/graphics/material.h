@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <resmanager/resmanager.h>
 
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/texture.h"
@@ -15,6 +16,9 @@ public:
         // FIXME flags here; anything needed?
     };
 
+    using Key = resmanager::HashedStr32;
+    using HashFunction = resmanager::Hash<resmanager::HashedStr32>;
+
     Material(std::shared_ptr<gl::Shader> shader, int flags = 0);
     ~Material();
 
@@ -23,19 +27,19 @@ public:
     Material(Material&&) = delete;
     Material& operator=(Material&&) = delete;
 
-    void add_uniform(Uniform type, std::string_view name);
-    void add_texture(std::string_view name);
+    void add_uniform(Uniform type, Key name);
+    void add_texture(Key name);
 private:
     std::shared_ptr<gl::Shader> shader;
 
-    std::unordered_map<std::string, glm::mat4> uniforms_mat4;
-    std::unordered_map<std::string, int> uniforms_int;
-    std::unordered_map<std::string, float> uniforms_float;
-    std::unordered_map<std::string, glm::vec2> uniforms_vec2;
-    std::unordered_map<std::string, glm::vec3> uniforms_vec3;
-    std::unordered_map<std::string, glm::vec4> uniforms_vec4;
+    std::unordered_map<Key, glm::mat4, HashFunction> uniforms_mat4;
+    std::unordered_map<Key, int, HashFunction> uniforms_int;
+    std::unordered_map<Key, float, HashFunction> uniforms_float;
+    std::unordered_map<Key, glm::vec2, HashFunction> uniforms_vec2;
+    std::unordered_map<Key, glm::vec3, HashFunction> uniforms_vec3;
+    std::unordered_map<Key, glm::vec4, HashFunction> uniforms_vec4;
 
-    std::unordered_map<std::string, std::pair<int, std::shared_ptr<gl::Texture>>> textures;
+    std::unordered_map<Key, std::pair<int, std::shared_ptr<gl::Texture>>, HashFunction> textures;
 
     int flags = 0;  // FIXME is needed?
 
@@ -44,6 +48,9 @@ private:
 
 class MaterialInstance {
 public:
+    using Key = Material::Key;
+    using HashFunction = Material::HashFunction;
+
     MaterialInstance(std::shared_ptr<Material> material);
     ~MaterialInstance();
 
@@ -54,26 +61,26 @@ public:
 
     void bind();
 
-    void set_mat4(std::string_view name, const glm::mat4& matrix);
-    void set_int(std::string_view name, int value);
-    void set_float(std::string_view name, float value);
-    void set_vec2(std::string_view name, glm::vec2 vector);
-    void set_vec3(std::string_view name, const glm::vec3& vector);
-    void set_vec4(std::string_view name, const glm::vec4& vector);
-    void set_texture(std::string_view name, std::shared_ptr<gl::Texture> texture, int unit);
+    void set_mat4(Key name, const glm::mat4& matrix);
+    void set_int(Key name, int value);
+    void set_float(Key name, float value);
+    void set_vec2(Key name, glm::vec2 vector);
+    void set_vec3(Key name, const glm::vec3& vector);
+    void set_vec4(Key name, const glm::vec4& vector);
+    void set_texture(Key name, std::shared_ptr<gl::Texture> texture, int unit);
 
     std::shared_ptr<gl::Shader> get_shader() { return shader; }
 private:
     std::shared_ptr<gl::Shader> shader;
 
-    std::unordered_map<std::string, glm::mat4> uniforms_mat4;
-    std::unordered_map<std::string, int> uniforms_int;
-    std::unordered_map<std::string, float> uniforms_float;
-    std::unordered_map<std::string, glm::vec2> uniforms_vec2;
-    std::unordered_map<std::string, glm::vec3> uniforms_vec3;
-    std::unordered_map<std::string, glm::vec4> uniforms_vec4;
+    std::unordered_map<Key, glm::mat4, HashFunction> uniforms_mat4;
+    std::unordered_map<Key, int, HashFunction> uniforms_int;
+    std::unordered_map<Key, float, HashFunction> uniforms_float;
+    std::unordered_map<Key, glm::vec2, HashFunction> uniforms_vec2;
+    std::unordered_map<Key, glm::vec3, HashFunction> uniforms_vec3;
+    std::unordered_map<Key, glm::vec4, HashFunction> uniforms_vec4;
 
-    std::unordered_map<std::string, std::pair<int, std::shared_ptr<gl::Texture>>> textures;
+    std::unordered_map<Key, std::pair<int, std::shared_ptr<gl::Texture>>, HashFunction> textures;
 
     int flags = 0;  // FIXME is needed?
 };

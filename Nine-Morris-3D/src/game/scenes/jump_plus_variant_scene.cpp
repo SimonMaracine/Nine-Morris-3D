@@ -329,8 +329,8 @@ void JumpPlusVariantScene::setup_entities() {
         Piece piece = Piece {
             static_cast<Index>(i),
             PieceType::White,
-            app->res.model.load(hs {"piece" + std::to_string(i)}),
-            app->res.al_source.load(hs {"piece" + std::to_string(i)})
+            app->res.model.load(hs("piece" + std::to_string(i))),
+            app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
         piece.in_use = true;
 
@@ -341,8 +341,8 @@ void JumpPlusVariantScene::setup_entities() {
         Piece piece = Piece {
             static_cast<Index>(i),
             PieceType::Black,
-            app->res.model.load(hs {"piece" + std::to_string(i)}),
-            app->res.al_source.load(hs {"piece" + std::to_string(i)})
+            app->res.model.load(hs("piece" + std::to_string(i))),
+            app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
         piece.in_use = true;
 
@@ -352,7 +352,7 @@ void JumpPlusVariantScene::setup_entities() {
     for (size_t i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
             static_cast<Index>(i),
-            app->res.model.load(hs {"node" + std::to_string(i)})
+            app->res.model.load(hs("node" + std::to_string(i)))
         };
     }
 
