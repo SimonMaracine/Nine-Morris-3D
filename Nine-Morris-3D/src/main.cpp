@@ -12,21 +12,21 @@
 #include "other/data.h"
 
 #if defined(NM3D_PLATFORM_LINUX)
-    constexpr const char* APP_NAME = "ninemorris3d";
+    static const char* APP_NAME = "ninemorris3d";
 #elif defined(NM3D_PLATFORM_WINDOWS)
-    constexpr const char* APP_NAME = "NineMorris3D";
+    static const char* APP_NAME = "NineMorris3D";
 #endif
 
-constexpr const char* LOG_FILE = "debug.log";
-constexpr const char* INFO_FILE = "info.txt";
+static const char* LOG_FILE = "debug.log";
+static const char* INFO_FILE = "info.txt";
 
-constexpr unsigned int MAJOR = 0;
-constexpr unsigned int MINOR = 3;
-constexpr unsigned int PATCH = 0;
+static constexpr unsigned int MAJOR = 0;
+static constexpr unsigned int MINOR = 3;
+static constexpr unsigned int PATCH = 0;
 
-constexpr const char* KEY = "data/models/board/board.obj";
+static const char* KEY = "data/models/board/board.obj";
 
-const std::vector<std::string> authors = {
+static const std::vector<std::string> authors = {
     u8"Simon Mărăcine"
 };
 
@@ -50,7 +50,7 @@ void application_main() {
 
         auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
         launcher->add_scene(std::make_unique<LauncherScene>());
-        exit_code = launcher->run("launcher");
+        exit_code = launcher->run("launcher"_h);
         launcher.reset();
 
         if (exit_code == 1) {
@@ -77,7 +77,7 @@ void application_main() {
         game->add_scene(std::make_unique<StandardGameScene>());
         game->add_scene(std::make_unique<JumpVariantScene>());
         game->add_scene(std::make_unique<JumpPlusVariantScene>());
-        exit_code = game->run("loading");
+        exit_code = game->run("loading"_h);
 
         if (exit_code == 0) {
             break;

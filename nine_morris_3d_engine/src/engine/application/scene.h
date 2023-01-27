@@ -1,5 +1,7 @@
 #pragma once
 
+#include <resmanager/resmanager.h>
+
 class Application;
 
 /**
@@ -7,8 +9,8 @@ class Application;
  */
 class Scene {
 public:
-    Scene(std::string_view name)
-        : name(name) {}
+    Scene(const std::string& name)
+        : name(name), id(resmanager::hashed_str(name)) {}
     virtual ~Scene() = default;
 
     Scene(const Scene&) = delete;
@@ -24,10 +26,12 @@ public:
     virtual void on_imgui_update() {}  // Called every frame for ImGui only
 
     std::string_view get_name() const { return name; }
+    resmanager::hashed_str get_id() const { return id; }
 protected:
     Application* app = nullptr;
 private:
-    std::string name;
+    const std::string name;
+    const resmanager::hashed_str id;
     bool on_awake_called = false;
 
     friend class Application;

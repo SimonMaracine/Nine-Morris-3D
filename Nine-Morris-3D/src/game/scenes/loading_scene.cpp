@@ -15,7 +15,7 @@ void LoadingScene::on_start() {
 
     loader = std::make_unique<assets_load::AllStartLoader>(
         assets_load::all_start,
-        std::bind(&Application::change_scene, app, scene_int_to_string(data.options.scene))
+        std::bind(&Application::change_scene, app, scene_int_to_id(data.options.scene))
     );
 
     loader->start_loading_thread(
@@ -114,18 +114,18 @@ void LoadingScene::update_loading_animation() {
     }
 }
 
-const char* LoadingScene::scene_int_to_string(int scene) {  // FIXME find a better way
+hs LoadingScene::scene_int_to_id(int scene) {  // FIXME find a better way
     switch (scene) {
         case 0:
-            return "standard_game";
+            return "standard_game"_h;
         case 1:
-            return "jump_variant";
+            return "jump_variant"_h;
         case 2:
-            return "jump_plus_variant";
+            return "jump_plus_variant"_h;
         default:
             REL_CRITICAL("Invalid scene number, exiting...");
             application_exit::panic();
     }
 
-    return nullptr;
+    return ""_h;
 }

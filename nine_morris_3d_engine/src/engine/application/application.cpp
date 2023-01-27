@@ -1,4 +1,5 @@
 #include <imgui.h>
+#include <resmanager/resmanager.h>
 
 #include "engine/application/application.h"
 #include "engine/application/window.h"
@@ -126,8 +127,8 @@ Application::~Application() {  // Destructor is called before all member variabl
     music::stop_music_track();
 }
 
-int Application::run(std::string_view start_scene_name) {
-    prepare_scenes(start_scene_name);
+int Application::run(resmanager::hashed_str start_scene_id) {
+    prepare_scenes(start_scene_id);
 
     on_start(current_scene);
 
@@ -167,9 +168,9 @@ void Application::add_scene(std::unique_ptr<Scene>&& scene) {
     scenes.push_back(std::move(scene));
 }
 
-void Application::change_scene(std::string_view name) {
+void Application::change_scene(resmanager::hashed_str id) {
     for (const std::unique_ptr<Scene>& scene : scenes) {
-        if (scene->name == name) {
+        if (scene->id == id) {
             to_scene = scene.get();
             changed_scene = true;
             return;
@@ -272,11 +273,11 @@ void Application::renderer_imgui_func() {
     imgui_context::end_frame();
 }
 
-void Application::prepare_scenes(std::string_view start_scene_name) {
+void Application::prepare_scenes(resmanager::hashed_str start_scene_id) {
     for (std::unique_ptr<Scene>& scene : scenes) {
         scene->app = this;
 
-        if (scene->name == start_scene_name) {
+        if (scene->id == start_scene_id) {
             current_scene = scene.get();
         }
     }

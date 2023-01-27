@@ -166,7 +166,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
 
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false, can_change)) {
-                app->change_scene(app->get_current_scene()->get_name());
+                app->change_scene(app->get_current_scene()->get_id());
 
                 DEB_INFO("Restarted current game");
             }
@@ -191,7 +191,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Standard Game", &data.imgui_option.scene, game_options::STANDARD)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
-                        app->change_scene("standard_game");
+                        app->change_scene("standard_game"_h);
 
                         DEB_INFO("Changed scene to standard game");
                     }
@@ -199,7 +199,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Jump Variant", &data.imgui_option.scene, game_options::JUMP)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
-                        app->change_scene("jump_variant");
+                        app->change_scene("jump_variant"_h);
 
                         DEB_INFO("Changed scene to jump variant");
                     }
@@ -207,7 +207,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Jump Plus Variant", &data.imgui_option.scene, game_options::JUMP_PLUS)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
-                        app->change_scene("jump_plus_variant");
+                        app->change_scene("jump_plus_variant"_h);
 
                         DEB_INFO("Changed scene to jump plus variant");
                     }

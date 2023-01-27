@@ -43,7 +43,7 @@ namespace game_options {
         float master_volume = DEFAULT_MASTER_VOLUME;
         float music_volume = DEFAULT_MUSIC_VOLUME;
         bool enable_music = DEFAULT_ENABLE_MUSIC;
-        int scene = DEFAULT_SCENE;
+        int scene = DEFAULT_SCENE;  // TODO maybe store these as hashes
 
         template<typename Archive>
         void serialize(Archive& archive) {

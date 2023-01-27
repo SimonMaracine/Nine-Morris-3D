@@ -16,7 +16,7 @@ struct LoadingScene : public Scene {
     void setup_widgets();
     void load_splash_screen_texture();
     void update_loading_animation();
-    const char* scene_int_to_string(int scene);
+    hs scene_int_to_id(int scene);
 
     std::unique_ptr<assets_load::AllStartLoader> loader;
 
