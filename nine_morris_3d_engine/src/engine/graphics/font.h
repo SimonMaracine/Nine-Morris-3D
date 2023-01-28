@@ -7,13 +7,13 @@
 #include "engine/graphics/opengl/buffer.h"
 
 class Font {
-public:
+private:
     struct Glyph {
         float s0, t0, s1, t1;
         int width, height;
         int xoff, yoff, xadvance;
     };
-
+public:
     Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
         int pixel_dist_scale, int bitmap_size);
     ~Font();
@@ -25,7 +25,6 @@ public:
 
     void update_data(const float* data, size_t size);
 
-    const std::unordered_map<char16_t, Glyph>& get_glyphs() { return glyphs; }
     unsigned int get_bitmap_size() { return static_cast<unsigned int>(bitmap_size); }
 
     gl::VertexArray& get_vertex_array() { return *vertex_array; }

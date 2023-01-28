@@ -315,13 +315,13 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const Prepar
             case gui::Sticky::E:
                 widget->position = glm::vec2(
                     WINDOW_WIDTH - widget->size.x * SCALE - widget->offset_parameters.right,
-                    WINDOW_HEIGHT / 2.0f - widget->size.x * SCALE / 2.0f
+                    WINDOW_HEIGHT / 2.0f - widget->size.y * SCALE / 2.0f
                 );
                 break;
             case gui::Sticky::W:
                 widget->position = glm::vec2(
                     widget->offset_parameters.left,
-                    WINDOW_HEIGHT / 2.0f - widget->size.x * SCALE / 2.0f
+                    WINDOW_HEIGHT / 2.0f - widget->size.y * SCALE / 2.0f
                 );
                 break;
             case gui::Sticky::NE:

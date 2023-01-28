@@ -328,7 +328,7 @@ std::pair<int, int> Font::get_string_size(std::string_view string, float scale) 
         height = std::max(height, static_cast<int>(std::roundf(static_cast<float>(glyph->yoff) * scale)));
     }
 
-    const int width = static_cast<int>(std::roundf((x + 2) * scale));
+    const int width = static_cast<int>(std::roundf((x + padding * 2) * scale));  // Take padding into consideration
 
     return std::make_pair(width, height);
 }
