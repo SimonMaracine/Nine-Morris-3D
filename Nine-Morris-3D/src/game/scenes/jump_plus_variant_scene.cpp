@@ -38,7 +38,7 @@ void JumpPlusVariantScene::on_start() {
 
     update_turn_indicator(app, this);
 
-    keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_h]};
+    keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_H]};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<JumpBoardSerialized> {};
@@ -63,7 +63,7 @@ void JumpPlusVariantScene::on_start() {
 
 #ifdef NM3D_PLATFORM_DEBUG
     app->renderer->origin = true;
-    app->renderer->add_quad(app->res.quad["light_bulb"_h]);
+    app->renderer->add_quad(app->res.quad["light_bulb"_H]);
 #endif
 
     imgui_layer.update();
@@ -187,7 +187,7 @@ void JumpPlusVariantScene::on_mouse_button_released(const MouseButtonReleasedEve
         }
 
         if (show_keyboard_controls) {
-            app->renderer->remove_quad(app->res.quad["keyboard_controls"_h]);
+            app->renderer->remove_quad(app->res.quad["keyboard_controls"_H]);
             show_keyboard_controls = false;
         }
     }
@@ -205,7 +205,7 @@ void JumpPlusVariantScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::RIGHT:
         case input::Key::ENTER:
             if (!show_keyboard_controls) {
-                app->renderer->add_quad(app->res.quad["keyboard_controls"_h]);
+                app->renderer->add_quad(app->res.quad["keyboard_controls"_H]);
                 show_keyboard_controls = true;
                 return;
             }
@@ -301,27 +301,27 @@ void JumpPlusVariantScene::initialize_pieces() {
 
     if (data.launcher_options.normal_mapping) {
         for (size_t i = 0; i < 6; i++) {
-            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_h]);
+            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 6; i < 12; i++) {
-            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_h]);
+            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_H]);
         }
     } else {
         for (size_t i = 0; i < 6; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_h]);
+            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 6; i < 12; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_h]);
+            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_H]);
         }
     }
 }
 
 void JumpPlusVariantScene::setup_entities() {
     board = JumpBoard {};
-    board.model = app->res.model.load("board"_h);
-    board.paint_model = app->res.model.load("board_paint"_h);
+    board.model = app->res.model.load("board"_H);
+    board.paint_model = app->res.model.load("board_paint"_H);
 
     board.phase = BoardPhase::MovePieces;
 

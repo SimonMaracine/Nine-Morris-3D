@@ -81,7 +81,7 @@ static void setup_game_fonts(Application* app) {
 
     {
         auto font = app->res.font.load(
-            "good_dog_plain"_h, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 6, 180, 40, 512
+            "good_dog_plain"_H, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 6, 180, 40, 512
         );
 
         font->begin_baking();
@@ -91,7 +91,7 @@ static void setup_game_fonts(Application* app) {
 
     {
         auto font = app->res.font.load(
-            "open_sans"_h, path_for_assets(OPEN_SANS_SEMIBOLD_FONT), 50.0f, 6, 180, 40, 512
+            "open_sans"_H, path_for_assets(OPEN_SANS_SEMIBOLD_FONT), 50.0f, 6, 180, 40, 512
         );
 
         font->begin_baking();

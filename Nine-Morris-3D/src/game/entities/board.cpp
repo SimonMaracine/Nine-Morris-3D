@@ -32,9 +32,9 @@ void Board::update_nodes(identifier::Id hovered_id) {
         const bool permitted = !must_take_piece && is_players_turn;
 
         if (hovered && highlight && permitted) {
-            node.model->material->set_vec4("u_color"_h, GRAY);
+            node.model->material->set_vec4("u_color"_H, GRAY);
         } else {
-            node.model->material->set_vec4("u_color"_h, glm::vec4(0.0f));
+            node.model->material->set_vec4("u_color"_H, glm::vec4(0.0f));
         }
     }
 }
@@ -52,9 +52,9 @@ void Board::update_pieces(identifier::Id hovered_id) {
         }
 
         if (piece.to_take && hovered && piece.in_use) {
-            piece.model->material->set_vec3("u_material.tint"_h, RED_TINT);
+            piece.model->material->set_vec3("u_material.tint"_H, RED_TINT);
         } else {
-            piece.model->material->set_vec3("u_material.tint"_h, DEFAULT_TINT);
+            piece.model->material->set_vec3("u_material.tint"_H, DEFAULT_TINT);
         }
     }
 }
@@ -337,21 +337,21 @@ void Board::update_piece_outlines() {
 void Board::play_piece_place_sound(Index piece_index) {
     Piece& piece = pieces.at(piece_index);
 
-    const auto choice = random_gen::choice({ "piece_place1"_h, "piece_place2"_h });
+    const auto choice = random_gen::choice({ "piece_place1"_H, "piece_place2"_H });
     piece.source->play(app->res.al_buffer[choice].get());
 }
 
 void Board::play_piece_move_sound(Index piece_index) {
     Piece& piece = pieces.at(piece_index);
 
-    const auto choice = random_gen::choice({ "piece_move1"_h, "piece_move2"_h });
+    const auto choice = random_gen::choice({ "piece_move1"_H, "piece_move2"_H });
     piece.source->play(app->res.al_buffer[choice].get());
 }
 
 void Board::play_piece_take_sound(Index piece_index) {
     Piece& piece = pieces.at(piece_index);
 
-    piece.source->play(app->res.al_buffer["piece_take"_h].get());
+    piece.source->play(app->res.al_buffer["piece_take"_H].get());
 }
 
 void Board::remember_position_and_check_repetition(Index piece_index, Index node_index) {

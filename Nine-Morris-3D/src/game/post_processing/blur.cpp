@@ -11,5 +11,5 @@ void Blur::render(const PostProcessingContext& context) const {
 
 void Blur::prepare(const PostProcessingContext&) const {
     shader->bind();
-    shader->upload_uniform_int("u_screen_texture"_h, 0);
+    shader->upload_uniform_int("u_screen_texture"_H, 0);
 }

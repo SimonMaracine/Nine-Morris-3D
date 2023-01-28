@@ -7,6 +7,9 @@
 #include "engine/graphics/opengl/texture.h"
 
 class Material {
+private:
+    using Key = resmanager::HashedStr64;
+    using HashFunction = resmanager::Hash<Key>;
 public:
     enum class Uniform {
         Mat4, Int, Float, Vec2, Vec3, Vec4
@@ -15,9 +18,6 @@ public:
     enum {
         // FIXME flags here; anything needed?
     };
-
-    using Key = resmanager::HashedStr32;
-    using HashFunction = resmanager::Hash<resmanager::HashedStr32>;
 
     Material(std::shared_ptr<gl::Shader> shader, int flags = 0);
     ~Material();
@@ -47,10 +47,10 @@ private:
 };
 
 class MaterialInstance {
-public:
+private:
     using Key = Material::Key;
     using HashFunction = Material::HashFunction;
-
+public:
     MaterialInstance(std::shared_ptr<Material> material);
     ~MaterialInstance();
 

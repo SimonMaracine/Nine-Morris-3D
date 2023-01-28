@@ -16,6 +16,8 @@
 class Application final {
 private:
     using UserFunc = std::function<void(Application*)>;
+    using SceneId = resmanager::HashedStr64;
+
 public:
     struct DummyUserFunc {
         constexpr void operator()(Application*) {}  // Do nothing
@@ -40,11 +42,11 @@ public:
     float get_delta() { return delta; }
 
     // Call this to run the application, after all scenes have been defined; it can return an exit code
-    int run(resmanager::HashedStr32 start_scene_id);
+    int run(SceneId start_scene_id);
 
     // Scene management functions
     void add_scene(std::unique_ptr<Scene>&& scene);
-    void change_scene(resmanager::HashedStr32 id);
+    void change_scene(SceneId id);
     const Scene* get_current_scene() { return current_scene; }
 
     // Framebuffer management functions
@@ -76,7 +78,7 @@ private:
     void renderer_2d_func();
     void renderer_imgui_func();
 
-    void prepare_scenes(resmanager::HashedStr32 start_scene_id);
+    void prepare_scenes(SceneId start_scene_id);
     void on_start(Scene* scene);
 
     void on_window_closed(const WindowClosedEvent& event);

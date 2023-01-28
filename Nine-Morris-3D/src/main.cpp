@@ -50,7 +50,7 @@ void application_main() {
 
         auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
         launcher->add_scene(std::make_unique<LauncherScene>());
-        exit_code = launcher->run("launcher"_h);
+        exit_code = launcher->run("launcher"_H);
         launcher.reset();
 
         if (exit_code == 1) {
@@ -77,7 +77,7 @@ void application_main() {
         game->add_scene(std::make_unique<StandardGameScene>());
         game->add_scene(std::make_unique<JumpVariantScene>());
         game->add_scene(std::make_unique<JumpPlusVariantScene>());
-        exit_code = game->run("loading"_h);
+        exit_code = game->run("loading"_H);
 
         if (exit_code == 0) {
             break;

@@ -251,9 +251,9 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
             piece.model->index_buffer = (
                 ser_piece.type == PieceType::White
                     ?
-                    app->res.index_buffer["white_piece"_h]
+                    app->res.index_buffer["white_piece"_H]
                     :
-                    app->res.index_buffer["black_piece"_h]
+                    app->res.index_buffer["black_piece"_H]
             );
             piece.model->scale = WORLD_SCALE;
             piece.model->material = app->res.material_instance[hs("piece" + std::to_string(ser_index))];

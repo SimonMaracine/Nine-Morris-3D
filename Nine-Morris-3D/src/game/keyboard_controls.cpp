@@ -26,9 +26,9 @@ KeyboardControls::KeyboardControls(Application* app, Board* board, std::shared_p
     quad->texture = (
         board->must_take_piece
             ?
-            app->res.texture["keyboard_controls_cross"_h]
+            app->res.texture["keyboard_controls_cross"_H]
             :
-            app->res.texture["keyboard_controls_default"_h]
+            app->res.texture["keyboard_controls_default"_H]
     );
 }
 

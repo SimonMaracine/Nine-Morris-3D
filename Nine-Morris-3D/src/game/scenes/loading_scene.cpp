@@ -27,7 +27,7 @@ void LoadingScene::on_start() {
 
     setup_widgets();
 
-    auto background = app->res.image.load("background"_h, app->res.texture["splash_screen"_h]);
+    auto background = app->res.image.load("background"_H, app->res.texture["splash_screen"_H]);
     app->gui_renderer->add_widget(background);
 
     loading_animation.previous_seconds = app->window->get_time();
@@ -52,8 +52,8 @@ void LoadingScene::on_update() {
     float width, height, x_pos, y_pos;
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
-    app->res.image["background"_h]->set_position(glm::vec2(x_pos, y_pos));
-    app->res.image["background"_h]->set_size(glm::vec2(width, height));
+    app->res.image["background"_H]->set_position(glm::vec2(x_pos, y_pos));
+    app->res.image["background"_H]->set_size(glm::vec2(width, height));
 
     update_loading_animation();
 
@@ -65,8 +65,8 @@ void LoadingScene::setup_widgets() {
     constexpr int HIGHEST_RESOLUTION = 1035;
 
     auto loading_text = app->res.text.load(
-        "loading_text"_h,
-        app->res.font["good_dog_plain"_h],
+        "loading_text"_H,
+        app->res.font["good_dog_plain"_H],
         "Loading",
         1.5f,
         glm::vec3(0.81f)
@@ -91,7 +91,7 @@ void LoadingScene::load_splash_screen_texture() {
     specification.min_filter = gl::Filter::Linear;
     specification.mag_filter = gl::Filter::Linear;
 
-    app->res.texture.load("splash_screen"_h, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+    app->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
 }
 
 void LoadingScene::update_loading_animation() {
@@ -107,7 +107,7 @@ void LoadingScene::update_loading_animation() {
         std::string text = "Loading";
         text.append(loading_animation.dots, '.');
 
-        app->res.text["loading_text"_h]->set_text(text);
+        app->res.text["loading_text"_H]->set_text(text);
 
         loading_animation.dots++;
         loading_animation.dots %= 4;
@@ -117,15 +117,15 @@ void LoadingScene::update_loading_animation() {
 hs LoadingScene::scene_int_to_id(int scene) {  // FIXME find a better way
     switch (scene) {
         case 0:
-            return "standard_game"_h;
+            return "standard_game"_H;
         case 1:
-            return "jump_variant"_h;
+            return "jump_variant"_H;
         case 2:
-            return "jump_plus_variant"_h;
+            return "jump_plus_variant"_H;
         default:
             REL_CRITICAL("Invalid scene number, exiting...");
             application_exit::panic();
     }
 
-    return ""_h;
+    return ""_H;
 }

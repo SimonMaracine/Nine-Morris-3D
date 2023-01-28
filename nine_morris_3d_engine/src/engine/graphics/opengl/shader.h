@@ -19,6 +19,9 @@ namespace gl {
     using UniformBlocks = std::initializer_list<UniformBlockSpecification>;
 
     class Shader {
+    private:
+        using Key = resmanager::HashedStr64;
+        using HashFunction = resmanager::Hash<Key>;
     public:
         Shader(std::string_view vertex_source_path, std::string_view fragment_source_path,
             const std::vector<std::string>& uniforms, const UniformBlocks& uniform_blocks = {});
@@ -34,12 +37,12 @@ namespace gl {
         void bind();
         static void unbind();
 
-        void upload_uniform_mat4(resmanager::HashedStr32 name, const glm::mat4& matrix);
-        void upload_uniform_int(resmanager::HashedStr32 name, int value);
-        void upload_uniform_float(resmanager::HashedStr32 name, float value);
-        void upload_uniform_vec2(resmanager::HashedStr32 name, glm::vec2 vector);
-        void upload_uniform_vec3(resmanager::HashedStr32 name, const glm::vec3& vector);
-        void upload_uniform_vec4(resmanager::HashedStr32 name, const glm::vec4& vector);
+        void upload_uniform_mat4(Key name, const glm::mat4& matrix);
+        void upload_uniform_int(Key name, int value);
+        void upload_uniform_float(Key name, float value);
+        void upload_uniform_vec2(Key name, glm::vec2 vector);
+        void upload_uniform_vec3(Key name, const glm::vec3& vector);
+        void upload_uniform_vec4(Key name, const glm::vec4& vector);
 
         // Make sure to reupload any uniforms that need to after calling this function
         void recompile();
@@ -47,7 +50,7 @@ namespace gl {
         std::string_view get_name() { return name; }
         const std::vector<std::string>& get_uniforms() { return uniforms; }
     private:
-        GLint get_uniform_location(resmanager::HashedStr32 name);
+        GLint get_uniform_location(Key name);
         void check_and_cache_uniforms(const std::vector<std::string>& uniforms);
 
         static void configure_uniform_blocks(GLuint program, const UniformBlocks& uniform_blocks);
@@ -59,7 +62,7 @@ namespace gl {
         std::string name;
 
         // Uniforms cache
-        std::unordered_map<resmanager::HashedStr32, GLint, resmanager::Hash<resmanager::HashedStr32>> cache;
+        std::unordered_map<Key, GLint, HashFunction> cache;
 
         // Keep these for hot-reloading functionality
         std::string vertex_source_path;

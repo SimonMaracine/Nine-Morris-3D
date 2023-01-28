@@ -188,7 +188,7 @@ void Renderer::setup_shader(std::shared_ptr<gl::Shader> shader) {
 
     if (std::find(uniforms.begin(), uniforms.end(), "u_shadow_map") != uniforms.end()) {
         shader->bind();
-        shader->upload_uniform_int("u_shadow_map"_h, SHADOW_MAP_UNIT);
+        shader->upload_uniform_int("u_shadow_map"_H, SHADOW_MAP_UNIT);
         gl::Shader::unbind();
     }
 }
@@ -306,7 +306,7 @@ void Renderer::end_rendering() {
 
 void Renderer::draw_origin() {
     storage.origin_shader->bind();
-    storage.origin_shader->upload_uniform_mat4("u_projection_view_matrix"_h, camera_cache.projection_view_matrix);
+    storage.origin_shader->upload_uniform_mat4("u_projection_view_matrix"_H, camera_cache.projection_view_matrix);
 
     storage.origin_vertex_array->bind();
 
@@ -320,7 +320,7 @@ void Renderer::draw_skybox() {
     const glm::mat4 view = glm::mat4(glm::mat3(camera_cache.view_matrix));
 
     storage.skybox_shader->bind();
-    storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_h, projection * view);
+    storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
 
     storage.skybox_vertex_array->bind();
     storage.skybox_texture->bind(0);
@@ -341,7 +341,7 @@ void Renderer::draw_model(const Model* model) {
     model->vertex_array->bind();
     model->material->bind();
 
-    model->material->get_shader()->upload_uniform_mat4("u_model_matrix"_h, matrix);
+    model->material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
     glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
 }
@@ -366,8 +366,8 @@ void Renderer::draw_model_with_outline(const Model* model) {
         matrix = glm::scale(matrix, glm::vec3(model->scale + SIZE));
 
         storage.outline_shader->bind();
-        storage.outline_shader->upload_uniform_mat4("u_model_matrix"_h, matrix);
-        storage.outline_shader->upload_uniform_vec3("u_color"_h, model->outline_color.value());  // Should never throw
+        storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
+        storage.outline_shader->upload_uniform_vec3("u_color"_H, model->outline_color.value());  // Should never throw
 
         glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
 
@@ -431,7 +431,7 @@ void Renderer::draw_models_to_depth_buffer() {
             matrix = glm::rotate(matrix, model->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
             matrix = glm::scale(matrix, glm::vec3(model->scale));
 
-            storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_h, matrix);
+            storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
             model->vertex_array->bind();
 
@@ -448,7 +448,7 @@ void Renderer::draw_quad(const Quad* quad) {
     matrix = glm::translate(matrix, quad->position);
     matrix = glm::scale(matrix, glm::vec3(quad->scale));
 
-    storage.quad3d_shader->upload_uniform_mat4("u_model_matrix"_h, matrix);
+    storage.quad3d_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
     quad->texture->bind(0);
 
@@ -459,7 +459,7 @@ void Renderer::draw_quads() {
     storage.quad_vertex_array->bind();
 
     storage.quad3d_shader->bind();
-    storage.quad3d_shader->upload_uniform_mat4("u_view_matrix"_h, camera_cache.view_matrix);
+    storage.quad3d_shader->upload_uniform_mat4("u_view_matrix"_H, camera_cache.view_matrix);
 
     std::sort(quads.begin(), quads.end(), [this](const std::shared_ptr<Quad>& lhs, const std::shared_ptr<Quad>& rhs) {
         const float distance1 = glm::distance(lhs->position, camera_cache.position);
@@ -615,7 +615,7 @@ void Renderer::cache_camera_data() {
 
 void Renderer::on_window_resized(const WindowResizedEvent&) {
     storage.quad3d_shader->bind();
-    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix"_h, camera_cache.projection_matrix);
+    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix"_H, camera_cache.projection_matrix);
 
     gl::Shader::unbind();
 }
@@ -879,11 +879,11 @@ void Renderer::initialize_framebuffers() {
 
 void Renderer::initialize_uniform_variables() {
     storage.screen_quad_shader->bind();
-    storage.screen_quad_shader->upload_uniform_int("u_screen_texture"_h, 0);
+    storage.screen_quad_shader->upload_uniform_int("u_screen_texture"_H, 0);
 
     storage.quad3d_shader->bind();
-    storage.quad3d_shader->upload_uniform_int("u_texture"_h, 0);
-    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix"_h, camera_cache.projection_matrix);
+    storage.quad3d_shader->upload_uniform_int("u_texture"_H, 0);
+    storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix"_H, camera_cache.projection_matrix);
 
     gl::Shader::unbind();
 }

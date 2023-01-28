@@ -298,9 +298,9 @@ void LauncherScene::on_start() {
     specification.min_filter = gl::Filter::Linear;
     specification.mag_filter = gl::Filter::Linear;
 
-    app->res.texture.load("splash_screen"_h, encr(path_for_assets(SPLASH_SCREEN)), specification);
+    app->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN)), specification);
 
-    background = std::make_shared<gui::Image>(app->res.texture["splash_screen"_h]);
+    background = std::make_shared<gui::Image>(app->res.texture["splash_screen"_H]);
     app->gui_renderer->add_widget(background);
 
     // Load launcher options from file

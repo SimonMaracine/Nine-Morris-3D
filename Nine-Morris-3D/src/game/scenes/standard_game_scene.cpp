@@ -39,7 +39,7 @@ void StandardGameScene::on_start() {
 
     update_turn_indicator(app, this);
 
-    keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_h]};
+    keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_H]};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<StandardBoardSerialized> {};
@@ -64,7 +64,7 @@ void StandardGameScene::on_start() {
 
 #ifdef NM3D_PLATFORM_DEBUG
     app->renderer->origin = true;
-    app->renderer->add_quad(app->res.quad["light_bulb"_h]);
+    app->renderer->add_quad(app->res.quad["light_bulb"_H]);
 #endif
 
     imgui_layer.update();
@@ -190,7 +190,7 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         }
 
         if (show_keyboard_controls) {
-            app->renderer->remove_quad(app->res.quad["keyboard_controls"_h]);
+            app->renderer->remove_quad(app->res.quad["keyboard_controls"_H]);
             show_keyboard_controls = false;
         }
     }
@@ -208,7 +208,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::RIGHT:
         case input::Key::ENTER:
             if (!show_keyboard_controls) {
-                app->renderer->add_quad(app->res.quad["keyboard_controls"_h]);
+                app->renderer->add_quad(app->res.quad["keyboard_controls"_H]);
                 show_keyboard_controls = true;
                 return;
             }
@@ -303,8 +303,8 @@ void StandardGameScene::setup_and_add_model_pieces() {
 
 void StandardGameScene::setup_entities() {
     board = StandardBoard {};
-    board.model = app->res.model.load("board"_h);
-    board.paint_model = app->res.model.load("board_paint"_h);
+    board.model = app->res.model.load("board"_H);
+    board.paint_model = app->res.model.load("board_paint"_H);
 
     for (size_t i = 0; i < 9; i++) {
         board.pieces[i] = Piece {
@@ -339,19 +339,19 @@ void StandardGameScene::initialize_pieces() {
 
     if (data.launcher_options.normal_mapping) {
         for (size_t i = 0; i < 9; i++) {
-            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_h]);
+            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 9; i < 18; i++) {
-            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_h]);
+            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_H]);
         }
     } else {
         for (size_t i = 0; i < 9; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_h]);
+            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 9; i < 18; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_h]);
+            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_H]);
         }
     }
 }

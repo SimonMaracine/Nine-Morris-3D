@@ -34,9 +34,9 @@ void setup_and_add_model_board(Application* app, S* scene) {
     auto& board = scene->board;
 
     board.model->scale = WORLD_SCALE;
-    board.model->vertex_array = app->res.vertex_array["board_wood"_h];
-    board.model->index_buffer = app->res.index_buffer["board_wood"_h];
-    board.model->material = app->res.material_instance["board_wood"_h];
+    board.model->vertex_array = app->res.vertex_array["board_wood"_H];
+    board.model->index_buffer = app->res.index_buffer["board_wood"_H];
+    board.model->material = app->res.material_instance["board_wood"_H];
     board.model->cast_shadow = true;
     board.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
     board.model->bounding_box->id = identifier::null;
@@ -54,9 +54,9 @@ void setup_and_add_model_board_paint(Application* app, S* scene) {
 
     board.paint_model->position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
     board.paint_model->scale = WORLD_SCALE;
-    board.paint_model->vertex_array = app->res.vertex_array["board_paint"_h];
-    board.paint_model->index_buffer = app->res.index_buffer["board_paint"_h];
-    board.paint_model->material = app->res.material_instance["board_paint"_h];
+    board.paint_model->vertex_array = app->res.vertex_array["board_paint"_H];
+    board.paint_model->index_buffer = app->res.index_buffer["board_paint"_H];
+    board.paint_model->material = app->res.material_instance["board_paint"_H];
 
     app->renderer->add_model(board.paint_model);
 
@@ -69,7 +69,7 @@ void setup_and_add_model_piece(Application* app, S* scene, Index index, const gl
 
     const Piece& piece = scene->board.pieces.at(index);
 
-    const auto id = piece.type == PieceType::White ? "white_piece"_h : "black_piece"_h;
+    const auto id = piece.type == PieceType::White ? "white_piece"_H : "black_piece"_H;
 
     piece.model->position = position;
     piece.model->rotation = RANDOM_PIECE_ROTATION();
@@ -106,8 +106,8 @@ void setup_and_add_model_node(Application* app, S* scene, size_t index, const gl
 
     node.model->position = position;
     node.model->scale = WORLD_SCALE;
-    node.model->vertex_array = app->res.vertex_array["node"_h];
-    node.model->index_buffer = app->res.index_buffer["node"_h];
+    node.model->vertex_array = app->res.vertex_array["node"_H];
+    node.model->index_buffer = app->res.index_buffer["node"_H];
     node.model->material = app->res.material_instance[hs("node" + std::to_string(index))];
     node.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
     node.model->bounding_box->id = data.node_ids[index];
@@ -178,11 +178,11 @@ void update_cursor(Application* app, const S* scene) {
         if (scene->board.must_take_piece) {
             app->window->set_cursor(data.cross_cursor);
 
-            app->res.quad["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_cross"_h];
+            app->res.quad["keyboard_controls"_H]->texture = app->res.texture["keyboard_controls_cross"_H];
         } else {
             app->window->set_cursor(data.arrow_cursor);
 
-            app->res.quad["keyboard_controls"_h]->texture = app->res.texture["keyboard_controls_default"_h];
+            app->res.quad["keyboard_controls"_H]->texture = app->res.texture["keyboard_controls_default"_H];
         }
     }
 }
@@ -212,9 +212,9 @@ void set_board_paint_texture(Application* app, const S* scene) {
 template<typename S>
 void update_turn_indicator(Application* app, const S* scene) {
     if (scene->board.turn == BoardPlayer::White) {
-        app->res.image["turn_indicator"_h]->set_image(app->res.texture["white_indicator"_h]);
+        app->res.image["turn_indicator"_H]->set_image(app->res.texture["white_indicator"_H]);
     } else {
-        app->res.image["turn_indicator"_h]->set_image(app->res.texture["black_indicator"_h]);
+        app->res.image["turn_indicator"_H]->set_image(app->res.texture["black_indicator"_H]);
     }
 }
 
@@ -222,12 +222,12 @@ template<typename S>
 void update_wait_indicator(Application* app, S* scene) {
     if (!scene->board.next_move) {
         if (!scene->show_wait_indicator) {
-            app->gui_renderer->add_widget(app->res.image["wait_indicator"_h]);
+            app->gui_renderer->add_widget(app->res.image["wait_indicator"_H]);
             scene->show_wait_indicator = true;
         }
     } else {
         if (scene->show_wait_indicator) {
-            app->gui_renderer->remove_widget(app->res.image["wait_indicator"_h]);
+            app->gui_renderer->remove_widget(app->res.image["wait_indicator"_H]);
             scene->show_wait_indicator = false;
         }
     }
@@ -237,12 +237,12 @@ template<typename S>
 void update_computer_thinking_indicator(Application* app, S* scene) {
     if (scene->game.state == GameState::ComputerThinkingMove) {
         if (!scene->show_computer_thinking_indicator) {
-            app->gui_renderer->add_widget(app->res.image["computer_thinking_indicator"_h]);
+            app->gui_renderer->add_widget(app->res.image["computer_thinking_indicator"_H]);
             scene->show_computer_thinking_indicator = true;
         }
     } else {
         if (scene->show_computer_thinking_indicator) {
-            app->gui_renderer->remove_widget(app->res.image["computer_thinking_indicator"_h]);
+            app->gui_renderer->remove_widget(app->res.image["computer_thinking_indicator"_H]);
             scene->show_computer_thinking_indicator = false;
         }
     }
@@ -252,7 +252,7 @@ template<typename S>
 void update_timer_text(Application* app, const S* scene) {
     char time[32];
     scene->timer.get_time_formatted(time);
-    app->res.text["timer_text"_h]->set_text(time);
+    app->res.text["timer_text"_H]->set_text(time);
 }
 
 template<typename S>

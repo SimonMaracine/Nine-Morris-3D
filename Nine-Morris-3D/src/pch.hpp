@@ -40,7 +40,7 @@
 
 #include <resmanager/resmanager.h>
 using namespace resmanager::literals;
-using hs = resmanager::HashedStr32;
+using hs = resmanager::HashedStr64;
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

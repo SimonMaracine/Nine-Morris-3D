@@ -233,32 +233,32 @@ namespace gl {
         glUseProgram(0);
     }
 
-    void Shader::upload_uniform_mat4(resmanager::HashedStr32 name, const glm::mat4& matrix) {
+    void Shader::upload_uniform_mat4(Key name, const glm::mat4& matrix) {
         const GLint location = get_uniform_location(name);
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
-    void Shader::upload_uniform_int(resmanager::HashedStr32 name, int value) {
+    void Shader::upload_uniform_int(Key name, int value) {
         const GLint location = get_uniform_location(name);
         glUniform1i(location, value);
     }
 
-    void Shader::upload_uniform_float(resmanager::HashedStr32 name, float value) {
+    void Shader::upload_uniform_float(Key name, float value) {
         const GLint location = get_uniform_location(name);
         glUniform1f(location, value);
     }
 
-    void Shader::upload_uniform_vec2(resmanager::HashedStr32 name, glm::vec2 vector) {
+    void Shader::upload_uniform_vec2(Key name, glm::vec2 vector) {
         const GLint location = get_uniform_location(name);
         glUniform2f(location, vector.x, vector.y);
     }
 
-    void Shader::upload_uniform_vec3(resmanager::HashedStr32 name, const glm::vec3& vector) {
+    void Shader::upload_uniform_vec3(Key name, const glm::vec3& vector) {
         const GLint location = get_uniform_location(name);
         glUniform3f(location, vector.x, vector.y, vector.z);
     }
 
-    void Shader::upload_uniform_vec4(resmanager::HashedStr32 name, const glm::vec4& vector) {
+    void Shader::upload_uniform_vec4(Key name, const glm::vec4& vector) {
         const GLint location = get_uniform_location(name);
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
     }
@@ -298,7 +298,7 @@ namespace gl {
         fragment_shader = new_fragment_shader;
     }
 
-    GLint Shader::get_uniform_location(resmanager::HashedStr32 name) {
+    GLint Shader::get_uniform_location(Key name) {
 #if defined(NM3D_PLATFORM_RELEASE)
         return cache[name];
 #elif defined(NM3D_PLATFORM_DEBUG)
@@ -320,7 +320,7 @@ namespace gl {
                 continue;
             }
 
-            cache[resmanager::HashedStr32(uniform)] = location;
+            cache[Key(uniform)] = location;
         }
     }
 

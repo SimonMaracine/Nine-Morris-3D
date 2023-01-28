@@ -191,7 +191,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Standard Game", &data.imgui_option.scene, game_options::STANDARD)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
-                        app->change_scene("standard_game"_h);
+                        app->change_scene("standard_game"_H);
 
                         DEB_INFO("Changed scene to standard game");
                     }
@@ -199,7 +199,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Jump Variant", &data.imgui_option.scene, game_options::JUMP)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
-                        app->change_scene("jump_variant"_h);
+                        app->change_scene("jump_variant"_H);
 
                         DEB_INFO("Changed scene to jump variant");
                     }
@@ -207,7 +207,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                 if (ImGui::RadioButton("Jump Plus Variant", &data.imgui_option.scene, game_options::JUMP_PLUS)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
-                        app->change_scene("jump_plus_variant"_h);
+                        app->change_scene("jump_plus_variant"_H);
 
                         DEB_INFO("Changed scene to jump plus variant");
                     }
@@ -418,11 +418,11 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     auto& data = app->user_data<Data>();
 
                     if (data.options.hide_timer) {
-                        app->gui_renderer->remove_widget(app->res.text["timer_text"_h]);
+                        app->gui_renderer->remove_widget(app->res.text["timer_text"_H]);
 
                         DEB_INFO("Hide timer");
                     } else {
-                        app->gui_renderer->add_widget(app->res.text["timer_text"_h]);
+                        app->gui_renderer->add_widget(app->res.text["timer_text"_H]);
 
                         DEB_INFO("Show timer");
                     }
@@ -680,7 +680,7 @@ void ImGuiLayer<S, B>::draw_debug() {
 
     ImGui::Begin("Light Settings");
     if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position), -30.0f, 30.0f)) {
-        app->res.quad["light_bulb"_h]->position = app->renderer->light.position;
+        app->res.quad["light_bulb"_H]->position = app->renderer->light.position;
     }
     ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color), 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color), 0.0f, 1.0f);
