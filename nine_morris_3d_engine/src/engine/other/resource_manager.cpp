@@ -14,9 +14,7 @@ void ResourcesCache::merge(ResourcesCache& other) {
     material.merge_replace(std::move(other.material));
     material_instance.merge_replace(std::move(other.material_instance));
     texture_data.merge_replace(std::move(other.texture_data));
-    mesh_ptnt.merge_replace(std::move(other.mesh_ptnt));
-    mesh_ptn.merge_replace(std::move(other.mesh_ptn));
-    mesh_p.merge_replace(std::move(other.mesh_p));
+    mesh.merge_replace(std::move(other.mesh));
     al_source.merge_replace(std::move(other.al_source));
     al_buffer.merge_replace(std::move(other.al_buffer));
     sound_data.merge_replace(std::move(other.sound_data));

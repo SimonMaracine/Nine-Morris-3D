@@ -17,7 +17,6 @@ class Application final {
 private:
     using UserFunc = std::function<void(Application*)>;
     using SceneId = resmanager::HashedStr64;
-
 public:
     struct DummyUserFunc {
         constexpr void operator()(Application*) {}  // Do nothing

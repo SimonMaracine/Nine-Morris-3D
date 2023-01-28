@@ -36,14 +36,14 @@ static void initialize_board(Application* app) {
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "board_wood"_H,
-        app->res.mesh_ptnt["board_wood"_H]->vertices.data(),
-        app->res.mesh_ptnt["board_wood"_H]->vertices.size() * sizeof(PTNT)
+        app->res.mesh["board_wood"_H]->get_vertices(),
+        app->res.mesh["board_wood"_H]->get_vertices_size()
     );
 
     auto index_buffer = app->res.index_buffer.load(
         "board_wood"_H,
-        app->res.mesh_ptnt["board_wood"_H]->indices.data(),
-        app->res.mesh_ptnt["board_wood"_H]->indices.size() * sizeof(unsigned int)
+        app->res.mesh["board_wood"_H]->get_indices(),
+        app->res.mesh["board_wood"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -115,14 +115,14 @@ static void initialize_board_paint(Application* app) {
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "board_paint"_H,
-        app->res.mesh_ptnt["board_paint"_H]->vertices.data(),
-        app->res.mesh_ptnt["board_paint"_H]->vertices.size() * sizeof(PTNT)
+        app->res.mesh["board_paint"_H]->get_vertices(),
+        app->res.mesh["board_paint"_H]->get_vertices_size()
     );
 
     auto index_buffer = app->res.index_buffer.load(
         "board_paint"_H,
-        app->res.mesh_ptnt["board_paint"_H]->indices.data(),
-        app->res.mesh_ptnt["board_paint"_H]->indices.size() * sizeof(unsigned int)
+        app->res.mesh["board_paint"_H]->get_indices(),
+        app->res.mesh["board_paint"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -189,26 +189,26 @@ static void initialize_pieces(Application* app) {
 
     auto white_piece_vertex_buffer = app->res.vertex_buffer.load(
         "white_piece"_H,
-        app->res.mesh_ptnt["white_piece"_H]->vertices.data(),
-        app->res.mesh_ptnt["white_piece"_H]->vertices.size() * sizeof(PTNT)
+        app->res.mesh["white_piece"_H]->get_vertices(),
+        app->res.mesh["white_piece"_H]->get_vertices_size()
     );
 
     auto white_piece_index_buffer = app->res.index_buffer.load(
         "white_piece"_H,
-        app->res.mesh_ptnt["white_piece"_H]->indices.data(),
-        app->res.mesh_ptnt["white_piece"_H]->indices.size() * sizeof(unsigned int)
+        app->res.mesh["white_piece"_H]->get_indices(),
+        app->res.mesh["white_piece"_H]->get_indices_size()
     );
 
     auto black_piece_vertex_buffer = app->res.vertex_buffer.load(
         "black_piece"_H,
-        app->res.mesh_ptnt["black_piece"_H]->vertices.data(),
-        app->res.mesh_ptnt["black_piece"_H]->vertices.size() * sizeof(PTNT)
+        app->res.mesh["black_piece"_H]->get_vertices(),
+        app->res.mesh["black_piece"_H]->get_vertices_size()
     );
 
     auto black_piece_index_buffer = app->res.index_buffer.load(
         "black_piece"_H,
-        app->res.mesh_ptnt["black_piece"_H]->indices.data(),
-        app->res.mesh_ptnt["black_piece"_H]->indices.size() * sizeof(unsigned int)
+        app->res.mesh["black_piece"_H]->get_indices(),
+        app->res.mesh["black_piece"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -320,14 +320,14 @@ static void initialize_nodes(Application* app) {
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "node"_H,
-        app->res.mesh_p["node"_H]->vertices.data(),
-        app->res.mesh_p["node"_H]->vertices.size() * sizeof(P)
+        app->res.mesh["node"_H]->get_vertices(),
+        app->res.mesh["node"_H]->get_vertices_size()
     );
 
     auto index_buffer = app->res.index_buffer.load(
         "node"_H,
-        app->res.mesh_p["node"_H]->indices.data(),
-        app->res.mesh_p["node"_H]->indices.size() * sizeof(unsigned int)
+        app->res.mesh["node"_H]->get_indices(),
+        app->res.mesh["node"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -372,14 +372,14 @@ static void initialize_board_no_normal(Application* app) {
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "board_wood"_H,
-        app->res.mesh_ptn["board_wood"_H]->vertices.data(),
-        app->res.mesh_ptn["board_wood"_H]->vertices.size() * sizeof(PTN)
+        app->res.mesh["board_wood"_H]->get_vertices(),
+        app->res.mesh["board_wood"_H]->get_vertices_size()
     );
 
     auto index_buffer = app->res.index_buffer.load(
         "board_wood"_H,
-        app->res.mesh_ptn["board_wood"_H]->indices.data(),
-        app->res.mesh_ptn["board_wood"_H]->indices.size() * sizeof(unsigned int)
+        app->res.mesh["board_wood"_H]->get_indices(),
+        app->res.mesh["board_wood"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -441,14 +441,14 @@ static void initialize_board_paint_no_normal(Application* app) {
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "board_paint"_H,
-        app->res.mesh_ptn["board_paint"_H]->vertices.data(),
-        app->res.mesh_ptn["board_paint"_H]->vertices.size() * sizeof(PTN)
+        app->res.mesh["board_paint"_H]->get_vertices(),
+        app->res.mesh["board_paint"_H]->get_vertices_size()
     );
 
     auto index_buffer = app->res.index_buffer.load(
         "board_paint"_H,
-        app->res.mesh_ptn["board_paint"_H]->indices.data(),
-        app->res.mesh_ptn["board_paint"_H]->indices.size() * sizeof(unsigned int)
+        app->res.mesh["board_paint"_H]->get_indices(),
+        app->res.mesh["board_paint"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -512,26 +512,26 @@ static void initialize_pieces_no_normal(Application* app) {
 
     auto white_piece_vertex_buffer = app->res.vertex_buffer.load(
         "white_piece"_H,
-        app->res.mesh_ptn["white_piece"_H]->vertices.data(),
-        app->res.mesh_ptn["white_piece"_H]->vertices.size() * sizeof(PTN)
+        app->res.mesh["white_piece"_H]->get_vertices(),
+        app->res.mesh["white_piece"_H]->get_vertices_size()
     );
 
     auto white_piece_index_buffer = app->res.index_buffer.load(
         "white_piece"_H,
-        app->res.mesh_ptn["white_piece"_H]->indices.data(),
-        app->res.mesh_ptn["white_piece"_H]->indices.size() * sizeof(unsigned int)
+        app->res.mesh["white_piece"_H]->get_indices(),
+        app->res.mesh["white_piece"_H]->get_indices_size()
     );
 
     auto black_piece_vertex_buffer = app->res.vertex_buffer.load(
         "black_piece"_H,
-        app->res.mesh_ptn["black_piece"_H]->vertices.data(),
-        app->res.mesh_ptn["black_piece"_H]->vertices.size() * sizeof(PTN)
+        app->res.mesh["black_piece"_H]->get_vertices(),
+        app->res.mesh["black_piece"_H]->get_vertices_size()
     );
 
     auto black_piece_index_buffer = app->res.index_buffer.load(
         "black_piece"_H,
-        app->res.mesh_ptn["black_piece"_H]->indices.data(),
-        app->res.mesh_ptn["black_piece"_H]->indices.size() * sizeof(unsigned int)
+        app->res.mesh["black_piece"_H]->get_indices(),
+        app->res.mesh["black_piece"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}

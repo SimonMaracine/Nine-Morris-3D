@@ -12,18 +12,18 @@ using namespace encrypt;
 
 namespace assets_load {
     void all_start(AllStartLoader& loader, bool normal_mapping, int texture_quality, bool labeled_board, int skybox) {
-        loader().mesh_p.load("node"_H, encr(path_for_assets(NODE_MESH)), true);
+        loader().mesh.load("node"_H, MeshLoader::P {}, encr(path_for_assets(NODE_MESH)), true);
 
         if (normal_mapping) {
-            loader().mesh_ptnt.load("board_wood"_H, encr(path_for_assets(BOARD_WOOD_MESH)));
-            loader().mesh_ptnt.load("board_paint"_H, encr(path_for_assets(BOARD_PAINT_MESH)));
-            loader().mesh_ptnt.load("white_piece"_H, encr(path_for_assets(WHITE_PIECE_MESH)));
-            loader().mesh_ptnt.load("black_piece"_H, encr(path_for_assets(BLACK_PIECE_MESH)));
+            loader().mesh.load("board_wood"_H, MeshLoader::PTNT {}, encr(path_for_assets(BOARD_WOOD_MESH)));
+            loader().mesh.load("board_paint"_H, MeshLoader::PTNT {}, encr(path_for_assets(BOARD_PAINT_MESH)));
+            loader().mesh.load("white_piece"_H, MeshLoader::PTNT {}, encr(path_for_assets(WHITE_PIECE_MESH)));
+            loader().mesh.load("black_piece"_H, MeshLoader::PTNT {}, encr(path_for_assets(BLACK_PIECE_MESH)));
         } else {
-            loader().mesh_ptn.load("board_wood"_H, encr(path_for_assets(BOARD_WOOD_MESH)));
-            loader().mesh_ptn.load("board_paint"_H, encr(path_for_assets(BOARD_PAINT_MESH)));
-            loader().mesh_ptn.load("white_piece"_H, encr(path_for_assets(WHITE_PIECE_MESH)));
-            loader().mesh_ptn.load("black_piece"_H, encr(path_for_assets(BLACK_PIECE_MESH)));
+            loader().mesh.load("board_wood"_H, MeshLoader::PTN {}, encr(path_for_assets(BOARD_WOOD_MESH)));
+            loader().mesh.load("board_paint"_H, MeshLoader::PTN {}, encr(path_for_assets(BOARD_PAINT_MESH)));
+            loader().mesh.load("white_piece"_H, MeshLoader::PTN {}, encr(path_for_assets(WHITE_PIECE_MESH)));
+            loader().mesh.load("black_piece"_H, MeshLoader::PTN {}, encr(path_for_assets(BLACK_PIECE_MESH)));
         }
 
         loader().texture_data.load("white_indicator"_H, encr(path_for_assets(WHITE_INDICATOR_TEXTURE)), true);

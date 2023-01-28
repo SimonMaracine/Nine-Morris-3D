@@ -26,9 +26,9 @@ TextureData::TextureData(encrypt::EncryptedFile file_path, bool flip)
     : file_path(file_path) {
     DEB_DEBUG("Loading texture data `{}`...", file_path);
 
-    const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
-
     stbi_set_flip_vertically_on_load(static_cast<int>(flip));
+
+    const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
     int channels;
     data = stbi_load_from_memory(buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, 4);
