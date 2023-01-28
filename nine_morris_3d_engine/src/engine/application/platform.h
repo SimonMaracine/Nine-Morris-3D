@@ -19,7 +19,7 @@
     #error "Unsupported platform"
 #endif
 
-#ifdef NDEBUG
+#ifdef NM3D_RELEASE
     #define NM3D_PLATFORM_RELEASE
 #else
     #define NM3D_PLATFORM_DEBUG

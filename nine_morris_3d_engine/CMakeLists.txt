@@ -258,9 +258,10 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
         ENTT_DISABLE_ASSERT
     )
 
-    # Both engine and client
+    # Optimization on in both engine and client
     target_compile_definitions(${ENGINE} PUBLIC
         NDEBUG
+        NM3D_RELEASE
     )
 endif()
 
