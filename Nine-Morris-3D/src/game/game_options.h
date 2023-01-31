@@ -3,32 +3,32 @@
 #include "other/constants.h"
 
 namespace game_options {
-    static constexpr const char* GAME_OPTIONS_FILE = "options.dat";
+    inline constexpr const char* GAME_OPTIONS_FILE = "options.dat";
 
-    static constexpr int NONE = static_cast<int>(Skybox::None);
-    static constexpr int FIELD = static_cast<int>(Skybox::Field);
-    static constexpr int AUTUMN = static_cast<int>(Skybox::Autumn);
+    inline constexpr int NONE = static_cast<int>(Skybox::None);
+    inline constexpr int FIELD = static_cast<int>(Skybox::Field);
+    inline constexpr int AUTUMN = static_cast<int>(Skybox::Autumn);
 
-    static constexpr int HUMAN = static_cast<int>(GamePlayer::Human);
-    static constexpr int COMPUTER = static_cast<int>(GamePlayer::Computer);
+    inline constexpr int HUMAN = static_cast<int>(GamePlayer::Human);
+    inline constexpr int COMPUTER = static_cast<int>(GamePlayer::Computer);
 
-    static constexpr int STANDARD = static_cast<int>(GameMode::Standard);
-    static constexpr int JUMP = static_cast<int>(GameMode::Jump);
-    static constexpr int JUMP_PLUS = static_cast<int>(GameMode::JumpPlus);
+    inline constexpr int STANDARD = static_cast<int>(GameMode::Standard);
+    inline constexpr int JUMP = static_cast<int>(GameMode::Jump);
+    inline constexpr int JUMP_PLUS = static_cast<int>(GameMode::JumpPlus);
 
-    static constexpr bool DEFAULT_VSYNC = true;
-    static constexpr bool DEFAULT_SAVE_ON_EXIT = true;
-    static constexpr int DEFAULT_SKYBOX = FIELD;
-    static constexpr bool DEFAULT_CUSTOM_CURSOR = true;
-    static constexpr float DEFAULT_SENSITIVITY = 1.0f;
-    static constexpr bool DEFAULT_HIDE_TIMER = false;
-    static constexpr bool DEFAULT_LABELED_BOARD = true;
-    static constexpr int DEFAULT_WHITE_PLAYER = HUMAN;
-    static constexpr int DEFAULT_BLACK_PLAYER = COMPUTER;
-    static constexpr float DEFAULT_MASTER_VOLUME = 1.0f;
-    static constexpr float DEFAULT_MUSIC_VOLUME = 0.7f;
-    static constexpr bool DEFAULT_ENABLE_MUSIC = false;  // TODO temporary to false!
-    static constexpr int DEFAULT_SCENE = STANDARD;
+    inline constexpr bool DEFAULT_VSYNC = true;
+    inline constexpr bool DEFAULT_SAVE_ON_EXIT = true;
+    inline constexpr int DEFAULT_SKYBOX = FIELD;
+    inline constexpr bool DEFAULT_CUSTOM_CURSOR = true;
+    inline constexpr float DEFAULT_SENSITIVITY = 1.0f;
+    inline constexpr bool DEFAULT_HIDE_TIMER = false;
+    inline constexpr bool DEFAULT_LABELED_BOARD = true;
+    inline constexpr int DEFAULT_WHITE_PLAYER = HUMAN;
+    inline constexpr int DEFAULT_BLACK_PLAYER = COMPUTER;
+    inline constexpr float DEFAULT_MASTER_VOLUME = 1.0f;
+    inline constexpr float DEFAULT_MUSIC_VOLUME = 0.7f;
+    inline constexpr bool DEFAULT_ENABLE_MUSIC = false;  // TODO temporary to false!
+    inline constexpr int DEFAULT_SCENE = STANDARD;
 
     struct GameOptions {
         bool vsync = DEFAULT_VSYNC;

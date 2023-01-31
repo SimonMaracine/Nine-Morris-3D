@@ -356,7 +356,7 @@ namespace gl {
             glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
 
             const size_t field_count = block.field_names.size();
-            constexpr size_t MAX_FIELD_COUNT = 8;
+            static constexpr size_t MAX_FIELD_COUNT = 8;
 
             ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 8 fields for now");
 

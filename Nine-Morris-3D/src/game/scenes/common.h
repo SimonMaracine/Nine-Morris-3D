@@ -122,8 +122,8 @@ template<typename S>
 void setup_camera(Application* app, S* scene) {
     auto& data = app->user_data<Data>();
 
-    constexpr float PITCH = 47.0f;
-    constexpr float DISTANCE_TO_POINT = 8.0f;
+    static constexpr float PITCH = 47.0f;
+    static constexpr float DISTANCE_TO_POINT = 8.0f;
 
     scene->camera = Camera {};
 

@@ -4,10 +4,9 @@
 #include "game/entities/board.h"
 #include "game/entities/node.h"
 
-#define Y_POSITION 0.47f
-#define POSITION(index) (glm::vec3(NODE_POSITIONS[index].x, Y_POSITION, NODE_POSITIONS[index].z))
+#define POSITION(index) (glm::vec3(NODE_POSITIONS[index].x, 0.47f, NODE_POSITIONS[index].z))
 
-constexpr KeyboardControls::Direction NEXT[4][4] = {
+static constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down, KeyboardControls::Direction::Right },
     { KeyboardControls::Direction::Left, KeyboardControls::Direction::Down, KeyboardControls::Direction::Right, KeyboardControls::Direction::Up },
     { KeyboardControls::Direction::Down, KeyboardControls::Direction::Right, KeyboardControls::Direction::Up, KeyboardControls::Direction::Left },

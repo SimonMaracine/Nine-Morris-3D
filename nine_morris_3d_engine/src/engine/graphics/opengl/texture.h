@@ -67,7 +67,7 @@ namespace gl {
         std::string name;
     };
 
-    static constexpr float CUBEMAP_VERTICES[] = {
+    inline constexpr float CUBEMAP_VERTICES[] = {
         -5.0f,  5.0f, -5.0f,
         -5.0f, -5.0f, -5.0f,
          5.0f, -5.0f, -5.0f,

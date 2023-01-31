@@ -61,8 +61,8 @@ void LoadingScene::on_update() {
 }
 
 void LoadingScene::setup_widgets() {
-    constexpr int LOWEST_RESOLUTION = 288;
-    constexpr int HIGHEST_RESOLUTION = 1035;
+    static constexpr int LOWEST_RESOLUTION = 288;
+    static constexpr int HIGHEST_RESOLUTION = 1035;
 
     auto loading_text = app->res.text.load(
         "loading_text"_H,

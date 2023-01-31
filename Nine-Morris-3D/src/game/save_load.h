@@ -18,7 +18,7 @@
 #include "other/constants.h"
 
 namespace save_load {
-    static constexpr const char* NO_LAST_GAME = "No Last Game";
+    inline constexpr const char* NO_LAST_GAME = "No Last Game";
 
     class SaveFileError : public std::runtime_error {
     public:

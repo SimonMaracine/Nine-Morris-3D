@@ -356,7 +356,7 @@ void Renderer::draw_model_with_outline(const Model* model) {
     glStencilMask(0x00);
 
     {
-        constexpr float SIZE = 3.6f;
+        static constexpr float SIZE = 3.6f;
 
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, model->position);

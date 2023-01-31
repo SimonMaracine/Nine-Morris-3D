@@ -10,19 +10,19 @@ namespace identifier {
         constexpr Id() = default;
         constexpr Id(const float value)
             : value(value) {}
-        ~Id() = default;
 
-        operator float() const { return value; }
+        constexpr operator float() const { return value; }
         Id& operator+=(const Id& other) { value += other.value; return *this; }
-        bool operator==(const Id& other) const { return value == other.value; }
+        constexpr bool operator==(const Id& other) const { return value == other.value; }
     private:
         float value = 0.0f;
     };
 
-    constexpr Id null = 0.0f;
+    inline constexpr Id null = 0.0f;
 
     void initialize();
     Id generate_id();
+
 #if 0
     bool check(Id identifier_generated, Id identifier_unreliable);
 #endif

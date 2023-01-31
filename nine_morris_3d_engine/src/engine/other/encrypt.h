@@ -15,16 +15,15 @@ namespace encrypt {
     public:
         explicit constexpr EncryptedFile(std::string_view file_path)
             : file_path(file_path) {}
-        ~EncryptedFile() = default;
 
         EncryptedFile(const EncryptedFile&) = default;
         EncryptedFile& operator=(const EncryptedFile&) = default;
         EncryptedFile(EncryptedFile&&) = default;
         EncryptedFile& operator=(EncryptedFile&&) = default;
 
-        operator std::string_view() const { return file_path; }
+        constexpr operator std::string_view() const { return file_path; }
     private:
-        const std::string_view file_path;
+        std::string_view file_path;
     };
 
     void initialize(std::string_view key);

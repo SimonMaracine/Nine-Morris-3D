@@ -58,10 +58,10 @@ const glm::vec3& PointCameraController::get_rotation() const {
 }
 
 void PointCameraController::update_controls(float dt) {
-    constexpr float MOVE_SPEED = 2700.0f;
-    constexpr float MOVE_SPEED_MOUSE = MOVE_SPEED * 0.004f;
-    constexpr float ZOOM_SPEED = 370.0f;
-    constexpr float ZOOM_SPEED_WHEEL = ZOOM_SPEED * 0.02f;
+    static constexpr float MOVE_SPEED = 2700.0f;
+    static constexpr float MOVE_SPEED_MOUSE = MOVE_SPEED * 0.004f;
+    static constexpr float ZOOM_SPEED = 370.0f;
+    static constexpr float ZOOM_SPEED_WHEEL = ZOOM_SPEED * 0.02f;
 
     zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_input.mouse_wheel;
 

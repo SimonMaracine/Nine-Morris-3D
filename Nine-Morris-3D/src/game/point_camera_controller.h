@@ -4,9 +4,9 @@
 #include <engine/engine_graphics.h>
 #include <engine/engine_other.h>
 
-constexpr float LENS_FOV = 45.0f;
-constexpr float LENS_NEAR = 0.1f;
-constexpr float LENS_FAR = 90.0f;
+inline constexpr float LENS_FOV = 45.0f;
+inline constexpr float LENS_NEAR = 0.1f;
+inline constexpr float LENS_FAR = 90.0f;
 
 class PointCameraController : public CameraController {
 public:

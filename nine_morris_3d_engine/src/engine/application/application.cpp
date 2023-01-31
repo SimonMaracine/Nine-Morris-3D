@@ -203,7 +203,7 @@ void Application::purge_framebuffers() {
 }
 
 float Application::update_frame_counter() {
-    constexpr double MAX_DT = 1.0 / 20.0;
+    static constexpr double MAX_DT = 1.0 / 20.0;
 
     const double current_seconds = window->get_time();
     const double elapsed_seconds = current_seconds - frame_counter.previous_seconds;
@@ -224,7 +224,7 @@ float Application::update_frame_counter() {
 }
 
 unsigned int Application::calculate_fixed_update() {
-    constexpr double FIXED_DT = 1.0 / 50.0;
+    static constexpr double FIXED_DT = 1.0 / 50.0;
 
     const double current_seconds = window->get_time();
     const double elapsed_seconds = current_seconds - fixed_update.previous_seconds;

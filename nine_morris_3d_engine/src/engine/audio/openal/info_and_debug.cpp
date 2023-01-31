@@ -43,7 +43,7 @@ namespace al {
 
         output.append("\n*** OpenAL Version ***\n");
 
-        constexpr size_t LENGTH = 256;  // 256 should be enough
+        static constexpr size_t LENGTH = 256;  // 256 should be enough
 
         char line[LENGTH];
         snprintf(line, LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));

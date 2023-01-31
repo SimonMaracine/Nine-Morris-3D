@@ -14,7 +14,7 @@ namespace identifier {
 
 #if 0
     bool check(Id identifier_generated, Id identifier_unreliable) {
-        constexpr float OFFSET = 0.1f;
+        static constexpr float OFFSET = 0.1f;
 
         return (
             identifier_generated < identifier_unreliable + OFFSET

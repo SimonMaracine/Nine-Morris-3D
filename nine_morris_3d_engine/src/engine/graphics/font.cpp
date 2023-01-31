@@ -90,7 +90,7 @@ void Font::update_data(const float* data, size_t size) {
 
     gl::VertexBuffer::unbind();
 
-    constexpr size_t FLOATS_PER_VERTEX = 4;
+    static constexpr size_t FLOATS_PER_VERTEX = 4;
 
     ASSERT(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0, "Data may be corrupted");
 

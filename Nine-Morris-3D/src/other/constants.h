@@ -24,16 +24,16 @@
 #define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
 #define TRANSPARENT_BACKGROUND ImVec4(0.058f, 0.058f, 0.058f, 0.74f)
 
-constexpr size_t NINE_MENS_MORRIS_MILLS = 16;
-constexpr size_t MILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
+inline constexpr size_t NINE_MENS_MORRIS_MILLS = 16;
+inline constexpr size_t MILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
     { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
     { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-constexpr size_t TWELVE_MENS_MORRIS_MILLS = 20;
-constexpr size_t MILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS][3] = {
+inline constexpr size_t TWELVE_MENS_MORRIS_MILLS = 20;
+inline constexpr size_t MILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
     { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
     { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
@@ -41,42 +41,42 @@ constexpr size_t MILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS][3] = {
     { 0, 3, 6 }, { 2, 5, 8 }, { 15, 18, 21 }, { 17, 20, 23 }
 };
 
-constexpr DirectionalLight LIGHT_FIELD = {
+inline constexpr DirectionalLight LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
     glm::vec3(0.4f),
     glm::vec3(0.88f),
     glm::vec3(0.9f)
 };
 
-constexpr Renderer::LightSpace SHADOWS_FIELD = {
+inline constexpr Renderer::LightSpace SHADOWS_FIELD = {
     -4.7f, 4.7f,
     -1.9f, 2.76f,
     1.0f, 9.0f,
     3.1f
 };
 
-constexpr DirectionalLight LIGHT_AUTUMN = {
+inline constexpr DirectionalLight LIGHT_AUTUMN = {
     glm::vec3(-4.4f, 11.0f, 6.4f),
     glm::vec3(0.32f),
     glm::vec3(0.82f),
     glm::vec3(0.82f)
 };
 
-constexpr Renderer::LightSpace SHADOWS_AUTUMN = {
+inline constexpr Renderer::LightSpace SHADOWS_AUTUMN = {
     -4.66f, 4.66f,
     -3.24f, 4.29f,
     1.0f, 9.0f,
     3.1f
 };
 
-constexpr DirectionalLight LIGHT_NONE = {  // TODO right now they are the same as field; change this
+inline constexpr DirectionalLight LIGHT_NONE = {  // TODO right now they are the same as field; change this
     glm::vec3(5.7f, 8.4f, 12.4f),
     glm::vec3(0.4f),
     glm::vec3(0.88f),
     glm::vec3(0.9f)
 };
 
-constexpr Renderer::LightSpace SHADOWS_NONE = {
+inline constexpr Renderer::LightSpace SHADOWS_NONE = {
     -4.7f, 4.7f,
     -1.9f, 2.76f,
     1.0f, 9.0f,
@@ -173,22 +173,22 @@ enum class WindowImGui {
 };
 
 using Index = int;
-constexpr Index NULL_INDEX = -1;
+inline constexpr Index NULL_INDEX = -1;
 
-constexpr size_t MAX_NODES = 24;
-constexpr size_t MAX_PIECES = 18;  // TODO will change
+inline constexpr size_t MAX_NODES = 24;
+inline constexpr size_t MAX_PIECES = 18;  // TODO will change
 
-constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
-constexpr float PAINT_Y_POSITION = 0.062f;
+inline constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
+inline constexpr float PAINT_Y_POSITION = 0.062f;
 
-constexpr float PIECE_Y_POSITION = 0.135f;
-constexpr float PIECE_BASE_VELOCITY = 0.3f;
-constexpr float PIECE_VARIABLE_VELOCITY = 10.0f;
-constexpr float PIECE_THREESTEP_HEIGHT = 0.4f;
-constexpr float PIECE_RAISE_HEIGHT = 1.3f;
+inline constexpr float PIECE_Y_POSITION = 0.135f;
+inline constexpr float PIECE_BASE_VELOCITY = 0.3f;
+inline constexpr float PIECE_VARIABLE_VELOCITY = 10.0f;
+inline constexpr float PIECE_THREESTEP_HEIGHT = 0.4f;
+inline constexpr float PIECE_RAISE_HEIGHT = 1.3f;
 
-constexpr float NODE_Y_POSITION = 0.063f;
-constexpr glm::vec3 NODE_POSITIONS[MAX_NODES] = {
+inline constexpr float NODE_Y_POSITION = 0.063f;
+inline constexpr glm::vec3 NODE_POSITIONS[MAX_NODES] = {
     glm::vec3(2.046f, NODE_Y_POSITION, 2.062f),    // 0
     glm::vec3(-0.008f, NODE_Y_POSITION, 2.089f),   // 1
     glm::vec3(-2.101f, NODE_Y_POSITION, 2.076f),   // 2
@@ -215,23 +215,23 @@ constexpr glm::vec3 NODE_POSITIONS[MAX_NODES] = {
     glm::vec3(-2.081f, NODE_Y_POSITION, -2.045f)   // 23
 };
 
-constexpr glm::vec3 PIECE_BOUNDING_BOX = glm::vec3(0.36f, 0.19f, 0.36f);
-constexpr glm::vec3 NODE_BOUNDING_BOX = glm::vec3(0.32f, 0.01f, 0.32f);
-constexpr glm::vec3 BOARD_BOUNDING_BOX = glm::vec3(5.5f, 0.01f, 5.5f);
+inline constexpr glm::vec3 PIECE_BOUNDING_BOX = glm::vec3(0.36f, 0.19f, 0.36f);
+inline constexpr glm::vec3 NODE_BOUNDING_BOX = glm::vec3(0.32f, 0.01f, 0.32f);
+inline constexpr glm::vec3 BOARD_BOUNDING_BOX = glm::vec3(5.5f, 0.01f, 5.5f);
 
-constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
+inline constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
 
 using GamePosition = std::array<PieceType, MAX_NODES>;
 
-constexpr float WORLD_SCALE = 20.0f;
+inline constexpr float WORLD_SCALE = 20.0f;
 
-constexpr glm::vec3 RED_OUTLINE = { 1.0f, 0.0f, 0.0f };
-constexpr glm::vec3 ORANGE_OUTLINE = { 1.0f, 0.5f, 0.0f };
-constexpr glm::vec3 RED_TINT = { 1.0f, 0.2f, 0.2f };
-constexpr glm::vec3 DEFAULT_TINT = { 1.0f, 1.0f, 1.0f };
-constexpr glm::vec4 GRAY = { 0.7f, 0.7f, 0.7f, 1.0f };
+inline constexpr glm::vec3 RED_OUTLINE = { 1.0f, 0.0f, 0.0f };
+inline constexpr glm::vec3 ORANGE_OUTLINE = { 1.0f, 0.5f, 0.0f };
+inline constexpr glm::vec3 RED_TINT = { 1.0f, 0.2f, 0.2f };
+inline constexpr glm::vec3 DEFAULT_TINT = { 1.0f, 1.0f, 1.0f };
+inline constexpr glm::vec4 GRAY = { 0.7f, 0.7f, 0.7f, 1.0f };
 
-constexpr glm::vec3 UP_VECTOR = { 0.0f, 1.0f, 0.0f };
+inline constexpr glm::vec3 UP_VECTOR = { 0.0f, 1.0f, 0.0f };
 
-constexpr int WIDGET_LOWEST_RESOLUTION = 288;
-constexpr int WIDGET_HIGHEST_RESOLUTION = 1035;
+inline constexpr int WIDGET_LOWEST_RESOLUTION = 288;
+inline constexpr int WIDGET_HIGHEST_RESOLUTION = 1035;

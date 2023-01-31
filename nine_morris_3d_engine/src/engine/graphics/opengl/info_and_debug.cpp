@@ -146,7 +146,7 @@ namespace gl {
         output.append("\n*** OpenGL Version And Driver ***\n");
 
         {
-            constexpr size_t LENGTH = 256;  // 256 should be enough
+            static constexpr size_t LENGTH = 256;  // 256 should be enough
 
             char line[LENGTH];
             snprintf(line, LENGTH, "OpenGL version: %s\n", glGetString(GL_VERSION));

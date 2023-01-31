@@ -15,7 +15,7 @@ static const char* OPEN_SANS = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
 // There seems to be no better way
 
 static size_t map_resolution_to_index(const std::pair<int, int>& resolution) {
-    constexpr size_t DEFAULT = 2;
+    static constexpr size_t DEFAULT = 2;
 
     switch (resolution.first) {
         case 512:
@@ -59,7 +59,7 @@ static std::pair<int, int> map_index_to_resolution(size_t index) {
 }
 
 static size_t map_texture_quality_to_index(int texture_quality) {
-    constexpr size_t DEFAULT = 0;
+    static constexpr size_t DEFAULT = 0;
 
     if (texture_quality == launcher_options::NORMAL) {
         return 0;
@@ -86,7 +86,7 @@ static int map_index_to_texture_quality(size_t index) {
 }
 
 static size_t map_samples_to_index(int samples) {
-    constexpr size_t DEFAULT = 1;
+    static constexpr size_t DEFAULT = 1;
 
     switch (samples) {
         case 1:
@@ -118,7 +118,7 @@ static int map_index_to_samples(size_t index) {
 }
 
 static size_t map_anisotropic_filtering_to_index(int anisotropic_filtering) {
-    constexpr size_t DEFAULT = 1;
+    static constexpr size_t DEFAULT = 1;
 
     switch (anisotropic_filtering) {
         case 0:

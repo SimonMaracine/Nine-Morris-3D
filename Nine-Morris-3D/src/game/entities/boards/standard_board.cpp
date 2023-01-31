@@ -136,8 +136,8 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
         return;
     }
 
-    constexpr auto mills = MILLS_NINE_MENS_MORRIS;
-    constexpr auto count = NINE_MENS_MORRIS_MILLS;
+    static constexpr auto mills = MILLS_NINE_MENS_MORRIS;
+    static constexpr auto count = NINE_MENS_MORRIS_MILLS;
 
     for (auto& [index, piece] : pieces) {
         if (turn == BoardPlayer::White) {
@@ -218,8 +218,8 @@ void StandardBoard::place_piece(Index node_index) {
         not_placed_black_pieces_count--;
     }
 
-    constexpr auto mills = MILLS_NINE_MENS_MORRIS;
-    constexpr auto count = NINE_MENS_MORRIS_MILLS;
+    static constexpr auto mills = MILLS_NINE_MENS_MORRIS;
+    static constexpr auto count = NINE_MENS_MORRIS_MILLS;
 
     if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
         DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
@@ -291,8 +291,8 @@ void StandardBoard::move_piece(Index piece_index, Index node_index) {
     piece.selected = false;
     node.piece_index = piece_index;
 
-    constexpr auto mills = MILLS_NINE_MENS_MORRIS;
-    constexpr auto count = NINE_MENS_MORRIS_MILLS;
+    static constexpr auto mills = MILLS_NINE_MENS_MORRIS;
+    static constexpr auto count = NINE_MENS_MORRIS_MILLS;
 
     if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
         DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
