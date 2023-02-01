@@ -57,7 +57,6 @@ float calculate_shadow(
 }
 
 vec3 calculate_light(
-        Material material,
         vec3 light_position,
         vec3 light_ambient,
         vec3 light_diffuse,
@@ -82,8 +81,8 @@ vec3 calculate_light(
     const vec3 view_direction = normalize(view_position - fragment_position);
     const vec3 reflect_direction = reflect(-light_direction, normalized_normal);
 
-    const float specular_strength = pow(max(dot(view_direction, reflect_direction), 0.0), material.shininess);
-    const vec3 specular_light = material.specular * specular_strength * light_specular;
+    const float specular_strength = pow(max(dot(view_direction, reflect_direction), 0.0), u_material.shininess);
+    const vec3 specular_light = u_material.specular * specular_strength * light_specular;
 
     // Calculate shadow and final result
     const float shadow = calculate_shadow(fragment_position_light_space, normalized_normal, light_direction, shadow_map);
@@ -96,7 +95,7 @@ void main() {
     const vec3 texture_colors = vec3(texture(u_material.diffuse, v_texture_coordinate));
 
     const vec3 total_light = calculate_light(
-        u_material, v_light_position, u_light_ambient,
+        v_light_position, u_light_ambient,
         u_light_diffuse, u_light_specular, v_view_position,
         texture_colors, v_fragment_position, v_fragment_position_light_space,
         u_shadow_map, v_normal

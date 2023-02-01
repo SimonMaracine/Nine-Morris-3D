@@ -17,7 +17,7 @@ const vec2 offsets[9] = vec2[](
     vec2(offset, 0.0f),  // center-right
     vec2(-offset, -offset),  // bottom-left
     vec2(0.0, -offset),  // bottom-center
-    vec2(offset, -offset)  // bottom-right    
+    vec2(offset, -offset)  // bottom-right
 );
 
 const float kernel[9] = float[](
