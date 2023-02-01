@@ -294,7 +294,7 @@ void Renderer::end_rendering() {
 
     // Draw the final result to the screen
     gl::Framebuffer::bind_default();
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);  // TODO maybe don't need clearing
 
     draw_screen_quad(post_processing_context.last_texture);
 
