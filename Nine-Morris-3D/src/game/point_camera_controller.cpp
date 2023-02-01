@@ -12,7 +12,7 @@ static constexpr float X_BASE_VELOCITY = 0.03f;
 static constexpr float X_VARIABLE_VELOCITY = 5.0f;
 
 static constexpr float MIN_DISTANCE_TO_POINT = 5.0f;
-static constexpr float MAX_DISTANCE_TO_POINT = 25.0f;
+static constexpr float MAX_DISTANCE_TO_POINT = 24.0f;
 
 static float calculate_angle_velocity(float target_angle, float angle) {
     float integer_angle;
