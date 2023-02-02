@@ -63,7 +63,7 @@ static void attach_depth_texture(GLuint texture, int samples, GLenum internal_fo
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         if (white_border) {
-            float border_color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            const float border_color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
         }
 

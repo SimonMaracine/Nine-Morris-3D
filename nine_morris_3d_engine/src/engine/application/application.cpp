@@ -295,6 +295,10 @@ void Application::on_window_closed(const WindowClosedEvent&) {
 }
 
 void Application::on_window_resized(const WindowResizedEvent& event) {
+    if (event.width == 0 || event.height == 0) {  // TODO maybe rework event system
+        return;
+    }
+
     render_helpers::viewport(event.width, event.height);
 
     for (std::weak_ptr<gl::Framebuffer> framebuffer : framebuffers) {

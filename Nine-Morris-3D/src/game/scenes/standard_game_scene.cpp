@@ -278,6 +278,10 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
 }
 
 void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
+    if (event.width == 0 || event.height == 0) {
+        return;
+    }
+
     camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
 }
 
