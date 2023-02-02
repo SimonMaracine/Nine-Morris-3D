@@ -147,16 +147,26 @@ public:
 
     const Storage& get_storage() { return storage; }
 private:
-    using Prepare = std::function<void()>;
+    using BeginEnd = std::function<void()>;
 
-    void prepare_draw_image();
-    void prepare_draw_text();
-    void draw(const std::vector<gui::Widget*>& subwidgets, const Prepare& prepare);
+    void begin_quads_batch();
+    void end_quads_batch();
+    void flush_quads();
+    void draw_quad(glm::vec2 position, glm::vec2 size, std::shared_ptr<gl::Texture> texture);
+
+    void begin_draw_image();
+    void begin_draw_text();
+    void end_draw_image();
+    void end_draw_text();
+
+    void draw(const std::vector<gui::Widget*>& subwidgets, const BeginEnd& begin, const BeginEnd& end);
     void on_window_resized(const WindowResizedEvent& event);
+
     void initialize_uniform_buffers();
     void initialize_shaders();
     void initialize_vertex_arrays();
     void initialize_uniform_variables();
+    std::shared_ptr<gl::IndexBuffer> initialize_quads_index_buffer();
 
     struct Storage {
         std::shared_ptr<gl::UniformBuffer> projection_uniform_buffer;
@@ -168,8 +178,19 @@ private:
 
         std::shared_ptr<gl::VertexArray> quad2d_vertex_array;
         std::shared_ptr<gl::VertexBuffer> quad2d_buffer;
+        std::shared_ptr<gl::IndexBuffer> quad2d_index_buffer;
 
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
+
+        struct {
+            unsigned char* buffer = nullptr;
+            unsigned char* buffer_pointer = nullptr;
+
+            std::array<GLuint, 8> texture_slots;
+            size_t texture_slot_index = 0;
+
+            size_t quad_count = 0;
+        } quads;
     } storage;
 
     std::vector<std::shared_ptr<gui::Widget>> widgets;

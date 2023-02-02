@@ -38,6 +38,8 @@ namespace gl {
         int get_width() { return width; }
         int get_height() { return height; }
 
+        GLuint get_id() { return texture; }
+
         void bind(GLenum slot);
         static void unbind();
     private:
