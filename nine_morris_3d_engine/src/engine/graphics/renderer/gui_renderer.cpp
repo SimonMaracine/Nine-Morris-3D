@@ -19,14 +19,8 @@
 
 using namespace resmanager::literals;
 
-struct QuadVertex {
-    glm::vec2 position;
-    // glm::vec2 texture_coordinate;
-    float texture_index;
-};
-
 static constexpr size_t MAX_QUAD_COUNT = 1000;
-static constexpr size_t MAX_VERTEX_BUFFER_SIZE = sizeof(QuadVertex) * 4 * MAX_QUAD_COUNT;
+static constexpr size_t MAX_VERTEX_BUFFER_SIZE = sizeof(GuiRenderer::QuadVertex) * 4 * MAX_QUAD_COUNT;
 static constexpr size_t MAX_INDICES = 6 * MAX_QUAD_COUNT;
 
 static float map(float x, float in_min, float in_max, float out_min, float out_max) {
@@ -85,17 +79,7 @@ namespace gui {
     }
 
     void Image::render() {
-        // glm::mat4 matrix = glm::mat4(1.0f);
-        // matrix = glm::translate(matrix, glm::vec3(position, 0.0f));
-        // matrix = glm::scale(matrix, glm::vec3(size * scale_parameters.current_scale, 1.0f));
-
-        // app->gui_renderer->storage.quad2d_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
-
-        // texture->bind(0);
-
-        // glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        app->gui_renderer->draw_quad(position, size, texture);
+        app->gui_renderer->draw_quad(position, size * scale_parameters.current_scale, texture);
     }
 
     void Image::set_image(std::shared_ptr<gl::Texture> texture) {
@@ -276,10 +260,11 @@ void GuiRenderer::quad_center(float& width, float& height, float& x_pos, float& 
 void GuiRenderer::begin_quads_batch() {
     storage.quads.quad_count = 0;
     storage.quads.buffer_pointer = storage.quads.buffer;
+    storage.quads.texture_slot_index = 0;
 }
 
 void GuiRenderer::end_quads_batch() {
-    const size_t size = storage.quads.buffer_pointer - storage.quads.buffer;
+    const size_t size = sizeof(QuadVertex) * (storage.quads.buffer_pointer - storage.quads.buffer);
 
     storage.quad2d_buffer->bind();
     storage.quad2d_buffer->upload_sub_data(storage.quads.buffer, 0, size);
@@ -321,25 +306,25 @@ void GuiRenderer::draw_quad(glm::vec2 position, glm::vec2 size, std::shared_ptr<
         storage.quads.texture_slot_index++;
     }
 
-    glm::vec2 vertex_position = glm::vec2(position.x + size.x, position.y + size.y);
-    memcpy(storage.quads.buffer_pointer + 0, &vertex_position, sizeof(vertex_position));
-    memcpy(storage.quads.buffer_pointer + sizeof(vertex_position), &texture_index, sizeof(texture_index));
-    storage.quads.buffer_pointer += sizeof(QuadVertex);
+    storage.quads.buffer_pointer->position = glm::vec2(position.x + size.x, position.y + size.y);
+    storage.quads.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 1.0f);
+    storage.quads.buffer_pointer->texture_index = texture_index;
+    storage.quads.buffer_pointer++;
 
-    vertex_position = glm::vec2(position.x, position.y + size.y);
-    memcpy(storage.quads.buffer_pointer + 0, &vertex_position, sizeof(vertex_position));
-    memcpy(storage.quads.buffer_pointer + sizeof(vertex_position), &texture_index, sizeof(texture_index));
-    storage.quads.buffer_pointer += sizeof(QuadVertex);
+    storage.quads.buffer_pointer->position = glm::vec2(position.x, position.y + size.y);
+    storage.quads.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 1.0f);
+    storage.quads.buffer_pointer->texture_index = texture_index;
+    storage.quads.buffer_pointer++;
 
-    vertex_position = glm::vec2(position.x, position.y);
-    memcpy(storage.quads.buffer_pointer + 0, &vertex_position, sizeof(vertex_position));
-    memcpy(storage.quads.buffer_pointer + sizeof(vertex_position), &texture_index, sizeof(texture_index));
-    storage.quads.buffer_pointer += sizeof(QuadVertex);
+    storage.quads.buffer_pointer->position = glm::vec2(position.x, position.y);
+    storage.quads.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 0.0f);
+    storage.quads.buffer_pointer->texture_index = texture_index;
+    storage.quads.buffer_pointer++;
 
-    vertex_position = glm::vec2(position.x + size.x, position.y);
-    memcpy(storage.quads.buffer_pointer + 0, &vertex_position, sizeof(vertex_position));
-    memcpy(storage.quads.buffer_pointer + sizeof(vertex_position), &texture_index, sizeof(texture_index));
-    storage.quads.buffer_pointer += sizeof(QuadVertex);
+    storage.quads.buffer_pointer->position = glm::vec2(position.x + size.x, position.y);
+    storage.quads.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 0.0f);
+    storage.quads.buffer_pointer->texture_index = texture_index;
+    storage.quads.buffer_pointer++;
 
     storage.quads.quad_count++;
 }
@@ -484,11 +469,26 @@ void GuiRenderer::initialize_shaders() {
         encr(file_system::path_for_assets(QUAD2D_VERTEX_SHADER)),
         encr(file_system::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
         std::vector<std::string> {
-            "u_model_matrix",
-            "u_texture"
+            "u_texture[0]",
+            "u_texture[1]",
+            "u_texture[2]",
+            "u_texture[3]",
+            "u_texture[4]",
+            "u_texture[5]",
+            "u_texture[6]",
+            "u_texture[7]"
         },
         std::initializer_list { storage.projection_uniform_block }
     );
+
+    storage.quad2d_shader->bind();
+
+    for (size_t i = 0; i < 8; i++) {
+        storage.quad2d_shader->upload_uniform_int(
+            resmanager::HashedStr64("u_texture[" + std::to_string(i) + "]"),
+            i
+        );
+    }
 
     storage.text_shader = std::make_shared<gl::Shader>(
         encr(file_system::path_for_assets(TEXT_VERTEX_SHADER)),
@@ -505,21 +505,13 @@ void GuiRenderer::initialize_shaders() {
 }
 
 void GuiRenderer::initialize_vertex_arrays() {
-    // const float quad2d_vertices[] = {
-    //     0.0f, 1.0f,
-    //     0.0f, 0.0f,
-    //     1.0f, 1.0f,
-    //     1.0f, 1.0f,
-    //     0.0f, 0.0f,
-    //     1.0f, 0.0f
-    // };
-
     storage.quad2d_buffer = std::make_shared<gl::VertexBuffer>(MAX_VERTEX_BUFFER_SIZE, gl::DrawHint::Stream);
     storage.quad2d_index_buffer = initialize_quads_index_buffer();
 
     VertexBufferLayout layout = VertexBufferLayout {}
         .add(0, VertexBufferLayout::Float, 2)
-        .add(1, VertexBufferLayout::Float, 1);
+        .add(1, VertexBufferLayout::Float, 2)
+        .add(2, VertexBufferLayout::Float, 1);
 
     storage.quad2d_vertex_array = std::make_shared<gl::VertexArray>();
     storage.quad2d_vertex_array->begin_definition()
@@ -527,7 +519,7 @@ void GuiRenderer::initialize_vertex_arrays() {
         .add_index_buffer(storage.quad2d_index_buffer)
         .end_definition();
 
-    storage.quads.buffer = new unsigned char[MAX_VERTEX_BUFFER_SIZE];
+    storage.quads.buffer = new QuadVertex[MAX_QUAD_COUNT];
     storage.quads.texture_slots.fill(0);
 }
 
@@ -539,10 +531,8 @@ void GuiRenderer::initialize_uniform_variables() {
 
     gl::UniformBuffer::unbind();
 
-    storage.quad2d_shader->bind();
-    storage.quad2d_shader->upload_uniform_int("u_texture"_H, 0);
     storage.text_shader->bind();
-    storage.text_shader->upload_uniform_int("u_bitmap"_H, 0);  // TODO make these constant in shader
+    storage.text_shader->upload_uniform_int("u_bitmap"_H, 0);  // TODO make this constant in shader
 
     gl::Shader::unbind();
 }

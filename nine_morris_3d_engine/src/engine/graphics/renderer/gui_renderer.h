@@ -146,6 +146,12 @@ public:
     void quad_center(float& width, float& height, float& x_pos, float& y_pos);
 
     const Storage& get_storage() { return storage; }
+
+    struct QuadVertex {
+        glm::vec2 position;
+        glm::vec2 texture_coordinate;
+        float texture_index;
+    };
 private:
     using BeginEnd = std::function<void()>;
 
@@ -183,8 +189,8 @@ private:
         glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
 
         struct {
-            unsigned char* buffer = nullptr;
-            unsigned char* buffer_pointer = nullptr;
+            QuadVertex* buffer = nullptr;
+            QuadVertex* buffer_pointer = nullptr;
 
             std::array<GLuint, 8> texture_slots;
             size_t texture_slot_index = 0;
