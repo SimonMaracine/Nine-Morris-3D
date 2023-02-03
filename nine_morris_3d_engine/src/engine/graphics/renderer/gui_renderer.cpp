@@ -1,4 +1,3 @@
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.h>
@@ -6,6 +5,7 @@
 #include "engine/application/application.h"
 #include "engine/application/events.h"
 #include "engine/graphics/renderer/gui_renderer.h"
+#include "engine/graphics/renderer/render_helpers.h"
 #include "engine/graphics/font.h"
 #include "engine/graphics/vertex_buffer_layout.h"
 #include "engine/graphics/opengl/shader.h"
@@ -129,10 +129,9 @@ namespace gui {
 
         font->get_vertex_array().bind();
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, font->get_texture());
+        render_helpers::bind_texture_2d(font->get_texture(), 0);
 
-        glDrawArrays(GL_TRIANGLES, 0, font->get_vertex_count());
+        render_helpers::draw_arrays(font->get_vertex_count());
     }
 
     void Text::set_text(std::string_view text) {
@@ -210,12 +209,12 @@ void GuiRenderer::render() {
         }
     });
 
-    glDisable(GL_DEPTH_TEST);
+    render_helpers::disable_depth_test();
 
     draw(images, std::bind(&GuiRenderer::begin_draw_image, this), std::bind(&GuiRenderer::end_draw_image, this));
     draw(texts, std::bind(&GuiRenderer::begin_draw_text, this), std::bind(&GuiRenderer::end_draw_text, this));
 
-    glEnable(GL_DEPTH_TEST);
+    render_helpers::enable_depth_test();
 }
 
 void GuiRenderer::add_widget(std::shared_ptr<gui::Widget> widget) {
@@ -275,11 +274,10 @@ void GuiRenderer::flush_quads() {
     storage.quad2d_shader->bind();
 
     for (size_t i = 0; i < storage.quads.texture_slot_index; i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, storage.quads.texture_slots[i]);
+        render_helpers::bind_texture_2d(storage.quads.texture_slots[i], i);
     }
 
-    glDrawElements(GL_TRIANGLES, storage.quads.quad_count * 6, GL_UNSIGNED_INT, nullptr);
+    render_helpers::draw_elements(storage.quads.quad_count * 6);
 }
 
 void GuiRenderer::draw_quad(glm::vec2 position, glm::vec2 size, std::shared_ptr<gl::Texture> texture) {
@@ -433,10 +431,10 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const BeginE
         widget->render();
     }
 
-    // Vertex arrays were bound in widget->render()
-    gl::VertexArray::unbind();
-
     end();
+
+    // Vertex arrays that were bound in widget->render()
+    gl::VertexArray::unbind();
 }
 
 void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include "engine/application/platform.h"
@@ -71,7 +70,6 @@ public:
 
     void clear();
 
-    void setup_shader(std::shared_ptr<gl::Shader> shader);
     void add_post_processing(std::unique_ptr<PostProcessingStep>&& post_processing_step);
 
     void set_scene_framebuffer(int samples);

@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+#include <glad/glad.h>  // TODO this
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.h>
@@ -30,7 +30,7 @@ static constexpr int BOUNDING_BOX_DIVISOR = 4;
 
 Renderer::Renderer(Application* app)
     : app(app) {
-    glEnable(GL_BLEND);
+    glEnable(GL_BLEND);  // TODO this
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -69,7 +69,7 @@ void Renderer::render() {
 
     storage.shadow_map_framebuffer->bind();
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    render_helpers::clear(render_helpers::Depth);
     render_helpers::viewport(storage.shadow_map_framebuffer->get_specification());
 
     // Render objects with shadows to depth buffer
@@ -77,15 +77,14 @@ void Renderer::render() {
 
     storage.scene_framebuffer->bind();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    render_helpers::clear(render_helpers::Color | render_helpers::Depth | render_helpers::Stencil);
     render_helpers::viewport(storage.scene_framebuffer->get_specification());
 
     // Bind shadow map for use in shadow rendering
-    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_UNIT);
-    glBindTexture(GL_TEXTURE_2D, storage.shadow_map_framebuffer->get_depth_attachment());
+    render_helpers::bind_texture_2d(storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
 
     // Set to zero, because we are also rendering objects with outline later
-    glStencilMask(0x00);
+    glStencilMask(0x00);  // TODO this
 
     // Render all normal models
     draw_models();
@@ -114,7 +113,7 @@ void Renderer::render() {
 
     storage.bounding_box_framebuffer->bind();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    render_helpers::clear(render_helpers::Color | render_helpers::Depth);
     render_helpers::viewport(storage.bounding_box_framebuffer->get_specification());
 
     // Render bounding boxes for models that are pickable
@@ -250,10 +249,9 @@ void Renderer::set_camera_controller(const CameraController* camera_controller) 
 void Renderer::draw_screen_quad(GLuint texture) {
     storage.screen_quad_shader->bind();
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    render_helpers::bind_texture_2d(texture, 0);
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    render_helpers::draw_arrays(6);
 }
 
 void Renderer::post_processing() {
@@ -266,12 +264,12 @@ void Renderer::post_processing() {
 
         step->framebuffer->bind();
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        render_helpers::clear(render_helpers::Color);
         render_helpers::viewport(step->framebuffer->get_specification());
 
         step->render(post_processing_context);
 
-        glViewport(0, 0, app->data().width, app->data().height);
+        render_helpers::viewport(app->data().width, app->data().height);
 
         post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
         post_processing_context.textures.push_back(post_processing_context.last_texture);
@@ -281,19 +279,19 @@ void Renderer::post_processing() {
 void Renderer::end_rendering() {
     storage.screen_quad_vertex_array->bind();
 
-    glDisable(GL_DEPTH_TEST);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    render_helpers::disable_depth_test();
+    render_helpers::clear_color(0.0f, 0.0f, 0.0f);
 
     post_processing();
 
     // Draw the final result to the screen
     gl::Framebuffer::bind_default();
-    glClear(GL_COLOR_BUFFER_BIT);  // TODO maybe don't need clearing
+    render_helpers::clear(render_helpers::Color);  // TODO maybe don't need clearing
 
     draw_screen_quad(post_processing_context.last_texture);
 
-    glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
-    glEnable(GL_DEPTH_TEST);
+    render_helpers::clear_color(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b);
+    render_helpers::enable_depth_test();
 
     gl::VertexArray::unbind();
 }
@@ -304,7 +302,7 @@ void Renderer::draw_origin() {
 
     storage.origin_vertex_array->bind();
 
-    glDrawArrays(GL_LINES, 0, 6);
+    render_helpers::draw_arrays_lines(6);
 
     gl::VertexArray::unbind();
 }
@@ -319,7 +317,7 @@ void Renderer::draw_skybox() {
     storage.skybox_vertex_array->bind();
     storage.skybox_texture->bind(0);
 
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    render_helpers::draw_arrays(36);
 
     gl::VertexArray::unbind();
 }
@@ -337,16 +335,16 @@ void Renderer::draw_model(const Model* model) {
 
     model->material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
-    glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
+    render_helpers::draw_elements(model->index_buffer->get_index_count());
 }
 
 void Renderer::draw_model_with_outline(const Model* model) {
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);  // TODO this
     glStencilMask(0xFF);
 
     draw_model(model);
 
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // TODO this
     glStencilMask(0x00);
 
     {
@@ -363,13 +361,13 @@ void Renderer::draw_model_with_outline(const Model* model) {
         storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
         storage.outline_shader->upload_uniform_vec3("u_color"_H, model->outline_color.value());  // Should never throw
 
-        glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
+        render_helpers::draw_elements(model->index_buffer->get_index_count());
 
         // Vertex array was bound in draw_model()
         gl::VertexArray::unbind();
     }
 
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);  // TODO this
     glStencilMask(0xFF);
 }
 
@@ -429,7 +427,7 @@ void Renderer::draw_models_to_depth_buffer() {
 
             model->vertex_array->bind();
 
-            glDrawElements(GL_TRIANGLES, model->index_buffer->get_index_count(), GL_UNSIGNED_INT, nullptr);
+            render_helpers::draw_elements(model->index_buffer->get_index_count());
         }
     }
 
@@ -446,7 +444,7 @@ void Renderer::draw_quad(const Quad* quad) {
 
     quad->texture->bind(0);
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    render_helpers::draw_arrays(6);
 }
 
 void Renderer::draw_quads() {
@@ -529,17 +527,14 @@ void Renderer::draw_bounding_boxes() {
     gl::VertexBuffer::unbind();
 
     // Disable blending, because this is a floating-point framebuffer
-    glDisable(GL_BLEND);
+    render_helpers::disable_blending();
 
-    glDrawElementsInstanced(
-        GL_TRIANGLES,
+    render_helpers::draw_elements_instanced(
         storage.box_index_buffer->get_index_count(),
-        GL_UNSIGNED_INT,
-        nullptr,
         bounding_box_models.size() + bounding_box_models_unsorted.size()
     );
 
-    glEnable(GL_BLEND);
+    render_helpers::enable_blending();
 
     gl::VertexArray::unbind();
 }
