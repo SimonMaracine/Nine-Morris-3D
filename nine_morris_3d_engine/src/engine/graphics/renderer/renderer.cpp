@@ -143,39 +143,45 @@ void Renderer::render() {
 }
 
 void Renderer::add_model(std::shared_ptr<Model> model) {
-    auto iter = std::find(models.begin(), models.end(), model);
+    const auto iter = std::find(models.cbegin(), models.cend(), model);
 
-    if (iter == models.end()) {
-        models.push_back(model);
-    } else {
+    if (iter != models.cend()) {
         DEB_WARNING("Model already present in list");
+        return;
     }
+
+    models.push_back(model);
 }
 
 void Renderer::remove_model(std::shared_ptr<Model> model) {
-    auto iter = std::find(models.begin(), models.end(), model);
+    const auto iter = std::find(models.cbegin(), models.cend(), model);
 
-    if (iter != models.end()) {
-        models.erase(iter);
+    if (iter == models.cend()) {
+        return;
     }
+
+    models.erase(iter);
 }
 
 void Renderer::add_quad(std::shared_ptr<Quad> quad) {
-    auto iter = std::find(quads.begin(), quads.end(), quad);
+    const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
 
-    if (iter == quads.end()) {
-        quads.push_back(quad);
-    } else {
+    if (iter != quads.cend()) {
         DEB_WARNING("Quad already present in list");
+        return;
     }
+
+    quads.push_back(quad);
 }
 
 void Renderer::remove_quad(std::shared_ptr<Quad> quad) {
-    auto iter = std::find(quads.begin(), quads.end(), quad);
+    const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
 
-    if (iter != quads.end()) {
-        quads.erase(iter);
+    if (iter == quads.cend()) {
+        return;
     }
+
+    quads.erase(iter);
 }
 
 void Renderer::clear() {
@@ -186,7 +192,7 @@ void Renderer::clear() {
 void Renderer::setup_shader(std::shared_ptr<gl::Shader> shader) {
     const auto& uniforms = shader->get_uniforms();
 
-    if (std::find(uniforms.begin(), uniforms.end(), "u_shadow_map") != uniforms.end()) {
+    if (std::find(uniforms.cbegin(), uniforms.cend(), "u_shadow_map") != uniforms.cend()) {
         shader->bind();
         shader->upload_uniform_int("u_shadow_map"_H, SHADOW_MAP_UNIT);
         gl::Shader::unbind();
@@ -477,7 +483,7 @@ void Renderer::draw_quads() {
     gl::VertexArray::unbind();
 }
 
-void Renderer::prepare_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids_transforms) {
+void Renderer::add_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids_transforms) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, model->position);
     matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -519,11 +525,11 @@ void Renderer::draw_bounding_boxes() {
     });
 
     for (const Model* model : bounding_box_models_unsorted) {
-        prepare_bounding_box(model, buffer_ids_transforms);
+        add_bounding_box(model, buffer_ids_transforms);
     }
 
     for (const Model* model : bounding_box_models) {
-        prepare_bounding_box(model, buffer_ids_transforms);
+        add_bounding_box(model, buffer_ids_transforms);
     }
 
     storage.box_ids_transforms_buffer->bind();

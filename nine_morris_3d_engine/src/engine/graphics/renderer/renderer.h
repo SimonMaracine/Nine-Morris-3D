@@ -104,6 +104,7 @@ private:
     void draw_screen_quad(GLuint texture);
     void post_processing();
     void end_rendering();
+
     void draw_origin();
     void draw_skybox();
     void draw_model(const Model* model);
@@ -113,13 +114,15 @@ private:
     void draw_models_to_depth_buffer();
     void draw_quad(const Quad* quad);
     void draw_quads();
-    void prepare_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids);
+
+    void add_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids);
     void draw_bounding_boxes();
     void setup_shadows();
     void setup_uniform_buffers();
     void validate_hovered_id(int x, int y);
     void cache_camera_data();
     void on_window_resized(const WindowResizedEvent& event);
+
     void initialize_uniform_buffers();
     void initialize_shaders();
     void initialize_vertex_arrays();
