@@ -170,9 +170,9 @@ GuiRenderer::GuiRenderer(Application* app)
     );
 
     initialize_uniform_buffers();
-    initialize_shaders();
-    initialize_vertex_arrays();
-    initialize_uniform_variables();
+    initialize_quad_renderer();
+    initialize_text_renderer();
+    initialize_projection_uniform_buffer();
 
     // Setup events
     app->evt.add_event<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);
@@ -462,7 +462,7 @@ void GuiRenderer::initialize_uniform_buffers() {
     storage.projection_uniform_block.binding_index = 4;
 }
 
-void GuiRenderer::initialize_shaders() {
+void GuiRenderer::initialize_quad_renderer() {
     using namespace encrypt;
 
     storage.quad2d_shader = std::make_shared<gl::Shader>(
@@ -490,21 +490,8 @@ void GuiRenderer::initialize_shaders() {
         );
     }
 
-    storage.text_shader = std::make_shared<gl::Shader>(
-        encr(file_system::path_for_assets(TEXT_VERTEX_SHADER)),
-        encr(file_system::path_for_assets(TEXT_FRAGMENT_SHADER)),
-        std::vector<std::string> {
-            "u_model_matrix",
-            "u_bitmap",
-            "u_color",
-            "u_border_width",
-            "u_offset"
-        },
-        std::initializer_list { storage.projection_uniform_block }
-    );
-}
+    gl::Shader::unbind();
 
-void GuiRenderer::initialize_vertex_arrays() {
     storage.quad2d_buffer = std::make_shared<gl::VertexBuffer>(MAX_VERTEX_BUFFER_SIZE, gl::DrawHint::Stream);
     storage.quad2d_index_buffer = initialize_quads_index_buffer();
 
@@ -521,20 +508,6 @@ void GuiRenderer::initialize_vertex_arrays() {
 
     storage.quads.buffer = new QuadVertex[MAX_QUAD_COUNT];
     storage.quads.texture_slots.fill(0);
-}
-
-void GuiRenderer::initialize_uniform_variables() {
-    // Should already be configured
-    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
-    storage.projection_uniform_buffer->bind();
-    storage.projection_uniform_buffer->upload_sub_data();
-
-    gl::UniformBuffer::unbind();
-
-    storage.text_shader->bind();
-    storage.text_shader->upload_uniform_int("u_bitmap"_H, 0);  // TODO make this constant in shader
-
-    gl::Shader::unbind();
 }
 
 std::shared_ptr<gl::IndexBuffer> GuiRenderer::initialize_quads_index_buffer() {
@@ -557,4 +530,30 @@ std::shared_ptr<gl::IndexBuffer> GuiRenderer::initialize_quads_index_buffer() {
     delete[] buffer;
 
     return index_buffer;
+}
+
+void GuiRenderer::initialize_text_renderer() {
+    using namespace encrypt;
+
+    storage.text_shader = std::make_shared<gl::Shader>(
+        encr(file_system::path_for_assets(TEXT_VERTEX_SHADER)),
+        encr(file_system::path_for_assets(TEXT_FRAGMENT_SHADER)),
+        std::vector<std::string> {
+            "u_model_matrix",
+            "u_bitmap",
+            "u_color",
+            "u_border_width",
+            "u_offset"
+        },
+        std::initializer_list { storage.projection_uniform_block }
+    );
+}
+
+void GuiRenderer::initialize_projection_uniform_buffer() {
+    // Should already be configured
+    storage.projection_uniform_buffer->set(&storage.orthographic_projection_matrix, 0);
+    storage.projection_uniform_buffer->bind();
+    storage.projection_uniform_buffer->upload_sub_data();
+
+    gl::UniformBuffer::unbind();
 }

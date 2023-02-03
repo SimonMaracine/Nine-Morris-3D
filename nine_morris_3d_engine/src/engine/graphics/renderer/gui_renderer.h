@@ -169,10 +169,10 @@ private:
     void on_window_resized(const WindowResizedEvent& event);
 
     void initialize_uniform_buffers();
-    void initialize_shaders();
-    void initialize_vertex_arrays();
-    void initialize_uniform_variables();
+    void initialize_quad_renderer();
     std::shared_ptr<gl::IndexBuffer> initialize_quads_index_buffer();
+    void initialize_text_renderer();
+    void initialize_projection_uniform_buffer();
 
     struct Storage {
         std::shared_ptr<gl::UniformBuffer> projection_uniform_buffer;

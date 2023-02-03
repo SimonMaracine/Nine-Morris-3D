@@ -32,7 +32,6 @@ static void initialize_board(Application* app) {
             app->renderer->get_storage().light_uniform_block
         }
     );
-    app->renderer->setup_shader(shader);
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "board_wood"_H,
@@ -111,7 +110,6 @@ static void initialize_board_paint(Application* app) {
             app->renderer->get_storage().light_uniform_block
         }
     );
-    app->renderer->setup_shader(shader);
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "board_paint"_H,
@@ -185,7 +183,6 @@ static void initialize_pieces(Application* app) {
             app->renderer->get_storage().light_uniform_block,
         }
     );
-    app->renderer->setup_shader(shader);
 
     auto white_piece_vertex_buffer = app->res.vertex_buffer.load(
         "white_piece"_H,
@@ -316,7 +313,6 @@ static void initialize_nodes(Application* app) {
             app->renderer->get_storage().projection_view_uniform_block
         }
     );
-    app->renderer->setup_shader(shader);
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "node"_H,
@@ -368,7 +364,6 @@ static void initialize_board_no_normal(Application* app) {
             app->renderer->get_storage().light_uniform_block,
         }
     );
-    app->renderer->setup_shader(shader);
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "board_wood"_H,
@@ -437,7 +432,6 @@ static void initialize_board_paint_no_normal(Application* app) {
             app->renderer->get_storage().light_uniform_block
         }
     );
-    app->renderer->setup_shader(shader);
 
     auto vertex_buffer = app->res.vertex_buffer.load(
         "board_paint"_H,
@@ -508,7 +502,6 @@ static void initialize_pieces_no_normal(Application* app) {
             app->renderer->get_storage().light_uniform_block
         }
     );
-    app->renderer->setup_shader(shader);
 
     auto white_piece_vertex_buffer = app->res.vertex_buffer.load(
         "white_piece"_H,

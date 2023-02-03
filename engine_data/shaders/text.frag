@@ -4,7 +4,7 @@ in vec2 v_texture_coordinate;
 
 layout(location = 0) out vec4 fragment_color;
 
-uniform sampler2D u_bitmap;
+layout(binding = 0) uniform sampler2D u_bitmap;
 uniform vec3 u_color;
 uniform float u_border_width;  // 0.5
 uniform vec2 u_offset;  // vec2(-0.003, -0.003)

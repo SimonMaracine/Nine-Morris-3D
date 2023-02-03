@@ -124,10 +124,15 @@ private:
     void on_window_resized(const WindowResizedEvent& event);
 
     void initialize_uniform_buffers();
-    void initialize_shaders();
-    void initialize_vertex_arrays();
+    void initialize_skybox_renderer();
+    void initialize_screen_quad_renderer();
+    void initialize_quad3d_renderer();
+    void initialize_shadow_renderer();
+    void initialize_outline_renderer();
+    void initialize_bounding_box_renderer();
+    void initialize_origin_renderer();
     void initialize_framebuffers();
-    void initialize_uniform_variables();
+    void initialize_pixel_buffers();
 
     struct Storage {
         std::shared_ptr<gl::UniformBuffer> projection_view_uniform_buffer;
@@ -152,8 +157,8 @@ private:
         std::shared_ptr<gl::VertexBuffer> skybox_buffer;
         std::shared_ptr<gl::VertexArray> screen_quad_vertex_array;
         std::shared_ptr<gl::VertexBuffer> screen_quad_buffer;
-        std::shared_ptr<gl::VertexArray> quad_vertex_array;
-        std::shared_ptr<gl::VertexBuffer> quad_buffer;
+        std::shared_ptr<gl::VertexArray> quad3d_vertex_array;
+        std::shared_ptr<gl::VertexBuffer> quad3d_buffer;
         std::shared_ptr<gl::VertexArray> box_vertex_array;
         std::shared_ptr<gl::VertexBuffer> box_buffer;
         std::shared_ptr<gl::VertexBuffer> box_ids_transforms_buffer;
@@ -201,10 +206,8 @@ private:
     const char* QUAD3D_FRAGMENT_SHADER = ENCR("engine_data/shaders/quad3d.frag");
     const char* BOUNDING_BOX_VERTEX_SHADER = ENCR("engine_data/shaders/bounding_box.vert");
     const char* BOUNDING_BOX_FRAGMENT_SHADER = ENCR("engine_data/shaders/bounding_box.frag");
-#ifdef NM3D_PLATFORM_DEBUG
     const char* ORIGIN_VERTEX_SHADER = "engine_data/shaders/origin.vert";
     const char* ORIGIN_FRAGMENT_SHADER = "engine_data/shaders/origin.frag";
-#endif
 
     Application* app = nullptr;
 
