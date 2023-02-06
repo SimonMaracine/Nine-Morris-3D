@@ -46,7 +46,7 @@ public:
     std::pair<int, int> get_string_size(std::string_view string, float scale);
 private:
     void initialize();
-    void bake_character_and_add_to_map(int codepoint, int descent);
+    void try_bake_character(int codepoint, int descent);
     const Glyph& get_character_glyph(char32_t character);
     void write_bitmap_to_file();
 

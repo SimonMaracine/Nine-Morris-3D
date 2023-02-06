@@ -96,7 +96,6 @@ static void setup_game_fonts(Application* app) {
 
         font->begin_baking();
         font->bake_ascii();
-        font->bake_characters(u8"Șșș! Fă liniște! Țapul doarme de când ai plecat în Spania.");
         font->end_baking();
     }
 }

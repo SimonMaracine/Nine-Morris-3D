@@ -81,16 +81,6 @@ void StandardGameScene::on_start() {
     app->evt.add_event<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
     app->evt.add_event<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
     app->evt.add_event<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
-
-    auto text = app->res.text.load(
-        "test"_H,
-        app->res.font["open_sans"_H],
-        u8"Șarpele s-a băgat în bocanc.",
-        1.0f,
-        glm::vec3(1.0f)
-    );
-
-    app->gui_renderer->add_widget(text);
 }
 
 void StandardGameScene::on_stop() {

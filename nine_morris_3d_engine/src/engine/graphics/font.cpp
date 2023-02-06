@@ -12,6 +12,8 @@
 #include "engine/other/assert.h"
 #include "engine/other/exit.h"
 
+static constexpr char32_t ERROR_CHARACTER = 127;
+
 static std::string get_name(std::string_view file_path) {
     size_t last_slash = file_path.find_last_of("/");
     ASSERT(last_slash != std::string::npos, "Could not find slash");
@@ -53,35 +55,6 @@ static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, uns
     *t0 = static_cast<float>(dest_y) / static_cast<float>(dest_height);
     *s1 = static_cast<float>(dest_x + width) / static_cast<float>(dest_width);
     *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
-}
-
-static int character_to_codepoint(char32_t character) {
-    const uint8_t byte1 = static_cast<int>(character) & (1 << 3);
-    const uint8_t byte2 = static_cast<int>(character) & (1 << 2);
-    const uint8_t byte3 = static_cast<int>(character) & (1 << 1);
-    const uint8_t byte4 = static_cast<int>(character) & (1 << 0);
-
-    if (byte1 <= 127) {
-        return byte1;
-    }
-
-    if (byte1 >= 192 && byte1 <= 223) {
-        return (byte1 - 192) * 64 + (byte2 - 128);
-    }
-
-    if (byte1 == 0xED && (byte2 & 0xA0) == 0xA0) {
-        return -1;
-    }
-
-    if (byte1 >= 224 && byte1 <= 239) {
-        return (byte1 - 224) * 4096 + (byte2 - 128) * 64 + (byte3 - 128);
-    }
-
-    if (byte1 >= 240 && byte1 <= 247) {
-        return (byte1 - 240) * 262144 + (byte2 - 128) * 4096 + (byte3 - 128) * 64 + (byte4 - 128);
-    }
-
-    return -1;
 }
 
 Font::Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
@@ -136,10 +109,13 @@ void Font::begin_baking() {
     memset(bake_context.bitmap, 0, SIZE);
 
     glyphs.clear();
+
+    // This character should always be present
+    bake_character(ERROR_CHARACTER);
 }
 
 void Font::end_baking() {
-    glGenTextures(1, &texture);
+    glGenTextures(1, &texture);  // TODO maybe move this to Texture class
     glBindTexture(GL_TEXTURE_2D, texture);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -169,7 +145,7 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
     stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
     for (int codepoint = begin_codepoint; codepoint <= end_codepoint; codepoint++) {
-        bake_character_and_add_to_map(codepoint, descent);
+        try_bake_character(codepoint, descent);
     }
 }
 
@@ -180,8 +156,7 @@ void Font::bake_characters(const char* string) {
     const std::u32string utf32_string = utf8::utf8to32(string);
 
     for (const char32_t character : utf32_string) {
-        const int codepoint = character_to_codepoint(character);
-        bake_character_and_add_to_map(codepoint, descent);
+        try_bake_character(character, descent);
     }
 }
 
@@ -189,11 +164,11 @@ void Font::bake_character(int codepoint) {
     int descent;
     stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
-    bake_character_and_add_to_map(codepoint, descent);
+    try_bake_character(codepoint, descent);
 }
 
 void Font::bake_ascii() {
-    bake_characters(32, 127);
+    bake_characters(32, 126);
 }
 
 void Font::render(std::string_view string, std::vector<float>& buffer) {
@@ -275,9 +250,9 @@ void Font::initialize() {
         .end_definition();
 }
 
-void Font::bake_character_and_add_to_map(int codepoint, int descent) {
+void Font::try_bake_character(int codepoint, int descent) {
     if (glyphs.count(codepoint) > 0) {
-        DEB_WARNING("There should be only one glyph for each character");
+        DEB_WARNING("Character with codepoint `{}` is already baked");
         return;
     }
 
@@ -289,9 +264,16 @@ void Font::bake_character_and_add_to_map(int codepoint, int descent) {
 
     int width = 0, height = 0;  // Assume 0, because glyph can be null
     unsigned char* glyph = stbtt_GetCodepointSDF(
-        &info, sf, codepoint, padding, on_edge_value,
-        static_cast<float>(pixel_dist_scale), &width, &height,
-        nullptr, nullptr
+        &info,
+        sf,
+        codepoint,
+        padding,
+        on_edge_value,
+        static_cast<float>(pixel_dist_scale),
+        &width,
+        &height,
+        nullptr,
+        nullptr
     );
 
     if (glyph == nullptr) {
@@ -334,8 +316,6 @@ void Font::bake_character_and_add_to_map(int codepoint, int descent) {
 }
 
 const Font::Glyph& Font::get_character_glyph(char32_t character) {
-    static constexpr char32_t ERROR_CHARACTER = 127;
-
     try {
         return glyphs.at(character);
     } catch (const std::out_of_range&) {
