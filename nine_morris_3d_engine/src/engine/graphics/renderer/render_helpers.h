@@ -13,6 +13,13 @@ namespace render_helpers {
         Stencil = GL_STENCIL_BUFFER_BIT
     };
 
+    enum {
+        Always = GL_ALWAYS,
+        NotEqual = GL_NOTEQUAL
+    };
+
+    void initialize_default();
+
     void clear(int buffers);
     void clear_color(float red, float green, float blue);
 
@@ -31,4 +38,8 @@ namespace render_helpers {
 
     void disable_blending();
     void enable_blending();
+
+    void initialize_stencil();
+    void stencil_function(int function, int ref, unsigned int mask);
+    void stencil_mask(unsigned int mask);
 }

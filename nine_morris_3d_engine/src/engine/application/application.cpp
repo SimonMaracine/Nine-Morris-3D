@@ -78,6 +78,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 
     input::initialize(window->get_handle());
     gl::maybe_initialize_debugging();
+    render_helpers::initialize_default();
     encrypt::initialize(builder.encryption_key);
     identifier::initialize();
     random_gen::initialize();

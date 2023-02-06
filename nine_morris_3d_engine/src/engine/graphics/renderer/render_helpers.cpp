@@ -3,6 +3,12 @@
 #include "engine/graphics/opengl/framebuffer.h"
 
 namespace render_helpers {
+    void initialize_default() {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_CULL_FACE);
+    }
+
     void clear(int buffers) {
         glClear(buffers);
     }
@@ -54,5 +60,19 @@ namespace render_helpers {
 
     void enable_blending() {
         glEnable(GL_BLEND);
+    }
+
+    void initialize_stencil() {
+        glEnable(GL_STENCIL_TEST);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    }
+
+    void stencil_function(int function, int ref, unsigned int mask) {
+        glStencilFunc(function, ref, mask);
+    }
+
+    void stencil_mask(unsigned int mask) {
+        glStencilMask(mask);
     }
 }

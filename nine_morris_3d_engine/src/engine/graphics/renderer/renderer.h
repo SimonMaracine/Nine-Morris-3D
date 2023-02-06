@@ -113,7 +113,7 @@ private:
     void draw_quad(const Quad* quad);
     void draw_quads();
 
-    void add_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids);
+    void add_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids_transforms);
     void draw_bounding_boxes();
     void setup_shadows();
     void setup_uniform_buffers();

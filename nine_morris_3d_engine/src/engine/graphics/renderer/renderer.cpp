@@ -1,4 +1,3 @@
-#include <glad/glad.h>  // TODO this
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.h>
@@ -30,14 +29,9 @@ static constexpr int BOUNDING_BOX_DIVISOR = 4;
 
 Renderer::Renderer(Application* app)
     : app(app) {
-    glEnable(GL_BLEND);  // TODO this
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
+    render_helpers::clear_color(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b);
+    render_helpers::enable_depth_test();
+    render_helpers::initialize_stencil();
 
     initialize_uniform_buffers();
     initialize_skybox_renderer();
@@ -84,7 +78,7 @@ void Renderer::render() {
     render_helpers::bind_texture_2d(storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
 
     // Set to zero, because we are also rendering objects with outline later
-    glStencilMask(0x00);  // TODO this
+    render_helpers::stencil_mask(0x00);
 
     // Render all normal models
     draw_models();
@@ -284,9 +278,8 @@ void Renderer::end_rendering() {
 
     post_processing();
 
-    // Draw the final result to the screen
+    // Draw the final result to the screen; don't need clearing
     gl::Framebuffer::bind_default();
-    render_helpers::clear(render_helpers::Color);  // TODO maybe don't need clearing
 
     draw_screen_quad(post_processing_context.last_texture);
 
@@ -339,13 +332,12 @@ void Renderer::draw_model(const Model* model) {
 }
 
 void Renderer::draw_model_with_outline(const Model* model) {
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);  // TODO this
-    glStencilMask(0xFF);
+    render_helpers::stencil_mask(0xFF);
 
     draw_model(model);
 
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // TODO this
-    glStencilMask(0x00);
+    render_helpers::stencil_function(render_helpers::NotEqual, 1, 0xFF);
+    render_helpers::stencil_mask(0x00);
 
     {
         static constexpr float SIZE = 3.6f;
@@ -367,8 +359,8 @@ void Renderer::draw_model_with_outline(const Model* model) {
         gl::VertexArray::unbind();
     }
 
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);  // TODO this
-    glStencilMask(0xFF);
+    render_helpers::stencil_function(render_helpers::Always, 1, 0xFF);
+    render_helpers::stencil_mask(0xFF);
 }
 
 void Renderer::draw_models() {
