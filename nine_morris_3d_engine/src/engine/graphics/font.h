@@ -35,7 +35,9 @@ public:
     void begin_baking();
     void end_baking();
     void bake_characters(int begin_codepoint, int end_codepoint);
+    void bake_characters(const char* string);
     void bake_character(int codepoint);
+    void bake_ascii();
 
     // Call render to get the buffer of data used in the end by OpenGL
     void render(std::string_view string, std::vector<float>& buffer);
@@ -44,6 +46,8 @@ public:
     std::pair<int, int> get_string_size(std::string_view string, float scale);
 private:
     void initialize();
+    void bake_character_and_add_to_map(int codepoint, int descent);
+    const Glyph& get_character_glyph(char32_t character);
     void write_bitmap_to_file();
 
     struct BakeContext {
@@ -52,7 +56,7 @@ private:
         unsigned char* bitmap = nullptr;
     } bake_context;
 
-    std::unordered_map<char16_t, Glyph> glyphs;
+    std::unordered_map<char32_t, Glyph> glyphs;
 
     stbtt_fontinfo info;
     const char* font_info_buffer = nullptr;

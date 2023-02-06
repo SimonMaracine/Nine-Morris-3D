@@ -12,8 +12,6 @@
 #include "engine/other/assert.h"
 #include "engine/other/exit.h"
 
-static constexpr char16_t ERROR_CHARACTER = 127;
-
 static std::string get_name(std::string_view file_path) {
     size_t last_slash = file_path.find_last_of("/");
     ASSERT(last_slash != std::string::npos, "Could not find slash");
@@ -55,6 +53,35 @@ static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, uns
     *t0 = static_cast<float>(dest_y) / static_cast<float>(dest_height);
     *s1 = static_cast<float>(dest_x + width) / static_cast<float>(dest_width);
     *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
+}
+
+static int character_to_codepoint(char32_t character) {
+    const uint8_t byte1 = static_cast<int>(character) & (1 << 3);
+    const uint8_t byte2 = static_cast<int>(character) & (1 << 2);
+    const uint8_t byte3 = static_cast<int>(character) & (1 << 1);
+    const uint8_t byte4 = static_cast<int>(character) & (1 << 0);
+
+    if (byte1 <= 127) {
+        return byte1;
+    }
+
+    if (byte1 >= 192 && byte1 <= 223) {
+        return (byte1 - 192) * 64 + (byte2 - 128);
+    }
+
+    if (byte1 == 0xED && (byte2 & 0xA0) == 0xA0) {
+        return -1;
+    }
+
+    if (byte1 >= 224 && byte1 <= 239) {
+        return (byte1 - 224) * 4096 + (byte2 - 128) * 64 + (byte3 - 128);
+    }
+
+    if (byte1 >= 240 && byte1 <= 247) {
+        return (byte1 - 240) * 262144 + (byte2 - 128) * 4096 + (byte3 - 128) * 64 + (byte4 - 128);
+    }
+
+    return -1;
 }
 
 Font::Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
@@ -142,64 +169,117 @@ void Font::bake_characters(int begin_codepoint, int end_codepoint) {
     stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
     for (int codepoint = begin_codepoint; codepoint <= end_codepoint; codepoint++) {
-        int advance_width, left_side_bearing;
-        stbtt_GetCodepointHMetrics(&info, codepoint, &advance_width, &left_side_bearing);
+        bake_character_and_add_to_map(codepoint, descent);
+    }
+}
 
-        int y0;
-        stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
+void Font::bake_characters(const char* string) {
+    int descent;
+    stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
-        int width = 0, height = 0;  // Assume 0, because glyph can be null
-        unsigned char* glyph = stbtt_GetCodepointSDF(
-            &info, sf, codepoint, padding, on_edge_value,
-            static_cast<float>(pixel_dist_scale), &width, &height,
-            nullptr, nullptr
-        );
+    const std::u32string utf32_string = utf8::utf8to32(string);
 
-        if (glyph == nullptr) {
-            DEB_WARNING("Could not bake character with codepoint `{}`; still adding to map...", codepoint);
-        }
-
-        if (bake_context.x + width > bitmap_size) {
-            bake_context.y += bake_context.max_row_height;
-            bake_context.x = 0;
-            bake_context.max_row_height = 0;
-        }
-
-        float s0, t0, s1, t1;
-        blit_glyph(
-            bake_context.bitmap,
-            bitmap_size, bitmap_size,
-            glyph,
-            width, height,
-            bake_context.x, bake_context.y,
-            &s0, &t0, &s1, &t1
-        );
-
-        stbtt_FreeSDF(glyph, nullptr);
-
-        bake_context.x += width;
-        bake_context.max_row_height = std::max(bake_context.max_row_height, height);
-
-        Glyph gl;
-        gl.s0 = s0;
-        gl.t0 = t0;
-        gl.s1 = s1;
-        gl.t1 = t1;
-        gl.width = width;
-        gl.height = height;
-        gl.xoff = static_cast<int>(std::roundf(static_cast<float>(left_side_bearing) * sf));
-        gl.yoff = static_cast<int>(std::roundf(static_cast<float>(-descent) * sf - static_cast<float>(y0)));
-        gl.xadvance = static_cast<int>(std::roundf(static_cast<float>(advance_width) * sf));
-
-        ASSERT(glyphs.count(codepoint) == 0, "There should be only one of each glyph");
-
-        glyphs[static_cast<char16_t>(codepoint)] = gl;
+    for (const char32_t character : utf32_string) {
+        const int codepoint = character_to_codepoint(character);
+        bake_character_and_add_to_map(codepoint, descent);
     }
 }
 
 void Font::bake_character(int codepoint) {
     int descent;
     stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
+
+    bake_character_and_add_to_map(codepoint, descent);
+}
+
+void Font::bake_ascii() {
+    bake_characters(32, 127);
+}
+
+void Font::render(std::string_view string, std::vector<float>& buffer) {
+    const std::u32string utf32_string = utf8::utf8to32(string);
+
+    int x = 0;
+
+    for (const char32_t character : utf32_string) {
+        const Glyph& glyph = get_character_glyph(character);
+
+        const float x0 = static_cast<float>(x + glyph.xoff);
+        const float y0 = -static_cast<float>(glyph.height - glyph.yoff);
+        const float x1 = static_cast<float>(x + glyph.xoff + glyph.width);
+        const float y1 = static_cast<float>(glyph.yoff);
+
+        buffer.push_back(x0);
+        buffer.push_back(y1);
+        buffer.push_back(glyph.s0);
+        buffer.push_back(glyph.t0);
+
+        buffer.push_back(x0);
+        buffer.push_back(y0);
+        buffer.push_back(glyph.s0);
+        buffer.push_back(glyph.t1);
+
+        buffer.push_back(x1);
+        buffer.push_back(y1);
+        buffer.push_back(glyph.s1);
+        buffer.push_back(glyph.t0);
+
+        buffer.push_back(x1);
+        buffer.push_back(y1);
+        buffer.push_back(glyph.s1);
+        buffer.push_back(glyph.t0);
+
+        buffer.push_back(x0);
+        buffer.push_back(y0);
+        buffer.push_back(glyph.s0);
+        buffer.push_back(glyph.t1);
+
+        buffer.push_back(x1);
+        buffer.push_back(y0);
+        buffer.push_back(glyph.s1);
+        buffer.push_back(glyph.t1);
+
+        x += glyph.xadvance;
+    }
+}
+
+std::pair<int, int> Font::get_string_size(std::string_view string, float scale) {
+    const std::u32string utf32_string = utf8::utf8to32(string);
+
+    int x = 0;
+    int height = 0;
+
+    for (const char32_t character : utf32_string) {
+        const Glyph& glyph = get_character_glyph(character);
+
+        x += glyph.xadvance;
+
+        height = std::max(height, static_cast<int>(std::roundf(static_cast<float>(glyph.yoff) * scale)));
+    }
+
+    const int width = static_cast<int>(std::roundf((x + padding * 2) * scale));  // Take padding into consideration
+
+    return std::make_pair(width, height);
+}
+
+void Font::initialize() {
+    buffer = std::make_shared<gl::VertexBuffer>(gl::DrawHint::Stream);
+
+    VertexBufferLayout layout = VertexBufferLayout {}
+        .add(0, VertexBufferLayout::Float, 2)
+        .add(1, VertexBufferLayout::Float, 2);
+
+    vertex_array = std::make_shared<gl::VertexArray>();
+    vertex_array->begin_definition()
+        .add_buffer(buffer, layout)
+        .end_definition();
+}
+
+void Font::bake_character_and_add_to_map(int codepoint, int descent) {
+    if (glyphs.count(codepoint) > 0) {
+        DEB_WARNING("There should be only one glyph for each character");
+        return;
+    }
 
     int advance_width, left_side_bearing;
     stbtt_GetCodepointHMetrics(&info, codepoint, &advance_width, &left_side_bearing);
@@ -250,100 +330,17 @@ void Font::bake_character(int codepoint) {
     gl.yoff = static_cast<int>(std::roundf(static_cast<float>(-descent) * sf - static_cast<float>(y0)));
     gl.xadvance = static_cast<int>(std::roundf(static_cast<float>(advance_width) * sf));
 
-    ASSERT(glyphs.count(codepoint) == 0, "There should be only one of each glyph");
-
-    glyphs[static_cast<char16_t>(codepoint)] = gl;
+    glyphs[static_cast<char32_t>(codepoint)] = gl;
 }
 
-void Font::render(std::string_view string, std::vector<float>& buffer) {
-    const std::u16string utf16_string = utf8::utf8to16(string);
+const Font::Glyph& Font::get_character_glyph(char32_t character) {
+    static constexpr char32_t ERROR_CHARACTER = 127;
 
-    int x = 0;
-
-    for (const char16_t character : utf16_string) {
-        const Glyph* glyph;
-
-        try {
-            glyph = &glyphs.at(static_cast<char16_t>(character));
-        } catch (const std::out_of_range&) {
-            glyph = &glyphs[ERROR_CHARACTER];
-        }
-
-        const float x0 = static_cast<float>(x + glyph->xoff);
-        const float y0 = -static_cast<float>(glyph->height - glyph->yoff);
-        const float x1 = static_cast<float>(x + glyph->xoff + glyph->width);
-        const float y1 = static_cast<float>(glyph->yoff);
-
-        buffer.push_back(x0);
-        buffer.push_back(y1);
-        buffer.push_back(glyph->s0);
-        buffer.push_back(glyph->t0);
-
-        buffer.push_back(x0);
-        buffer.push_back(y0);
-        buffer.push_back(glyph->s0);
-        buffer.push_back(glyph->t1);
-
-        buffer.push_back(x1);
-        buffer.push_back(y1);
-        buffer.push_back(glyph->s1);
-        buffer.push_back(glyph->t0);
-
-        buffer.push_back(x1);
-        buffer.push_back(y1);
-        buffer.push_back(glyph->s1);
-        buffer.push_back(glyph->t0);
-
-        buffer.push_back(x0);
-        buffer.push_back(y0);
-        buffer.push_back(glyph->s0);
-        buffer.push_back(glyph->t1);
-
-        buffer.push_back(x1);
-        buffer.push_back(y0);
-        buffer.push_back(glyph->s1);
-        buffer.push_back(glyph->t1);
-
-        x += glyph->xadvance;
+    try {
+        return glyphs.at(character);
+    } catch (const std::out_of_range&) {
+        return glyphs[ERROR_CHARACTER];
     }
-}
-
-std::pair<int, int> Font::get_string_size(std::string_view string, float scale) {
-    const std::u16string utf16_string = utf8::utf8to16(string);
-
-    int x = 0;
-    int height = 0;
-
-    for (const char16_t character : utf16_string) {
-        const Glyph* glyph;
-
-        try {
-            glyph = &glyphs.at(character);
-        } catch (const std::out_of_range&) {
-            glyph = &glyphs[ERROR_CHARACTER];
-        }
-
-        x += glyph->xadvance;
-
-        height = std::max(height, static_cast<int>(std::roundf(static_cast<float>(glyph->yoff) * scale)));
-    }
-
-    const int width = static_cast<int>(std::roundf((x + padding * 2) * scale));  // Take padding into consideration
-
-    return std::make_pair(width, height);
-}
-
-void Font::initialize() {
-    buffer = std::make_shared<gl::VertexBuffer>(gl::DrawHint::Stream);
-
-    VertexBufferLayout layout = VertexBufferLayout {}
-        .add(0, VertexBufferLayout::Float, 2)
-        .add(1, VertexBufferLayout::Float, 2);
-
-    vertex_array = std::make_shared<gl::VertexArray>();
-    vertex_array->begin_definition()
-        .add_buffer(buffer, layout)
-        .end_definition();
 }
 
 void Font::write_bitmap_to_file() {
