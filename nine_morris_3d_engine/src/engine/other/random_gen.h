@@ -9,7 +9,7 @@ namespace random_gen {
     int next(int begin, int end);
 
     template<typename T>
-    T choice(const std::initializer_list<T>& list) {
+    T choice(std::initializer_list<T> list) {
         ASSERT(list.size() > 0, "List must not be empty");
 
         const int index = next(list.size());

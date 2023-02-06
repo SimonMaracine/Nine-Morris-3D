@@ -23,10 +23,10 @@ namespace gl {
         using Key = resmanager::HashedStr64;
         using HashFunction = resmanager::Hash<Key>;
     public:
-        Shader(std::string_view vertex_source_path, std::string_view fragment_source_path,
-            const std::vector<std::string>& uniforms, const UniformBlocks& uniform_blocks = {});
-        Shader(encrypt::EncryptedFile vertex_source_path, encrypt::EncryptedFile fragment_source_path,
-            const std::vector<std::string>& uniforms, const UniformBlocks& uniform_blocks = {});
+        Shader(std::string_view vertex_source, std::string_view fragment_source,
+            const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks = {});
+        Shader(encrypt::EncryptedFile vertex_source, encrypt::EncryptedFile fragment_source,
+            const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks = {});
         ~Shader();
 
         Shader(const Shader&) = delete;

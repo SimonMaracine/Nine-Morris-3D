@@ -31,7 +31,7 @@ public:
     void set_vsync(int interval);
     unsigned int add_cursor(std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
     void set_cursor(unsigned int handle);
-    void set_icons(const std::initializer_list<std::unique_ptr<TextureData>>& icons);
+    void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons);
 private:
     GLFWwindow* create_window(Application* app);
 

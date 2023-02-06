@@ -226,7 +226,7 @@ void Window::set_cursor(unsigned int handle) {
 #endif
 }
 
-void Window::set_icons(const std::initializer_list<std::unique_ptr<TextureData>>& icons) {
+void Window::set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) {
     std::vector<GLFWimage> glfw_icons;
     glfw_icons.reserve(icons.size());
 
