@@ -2,20 +2,35 @@
 
 #include <glad/glad.h>
 #include <stb_image.h>
+#include <glm/glm.hpp>
 
 #include "engine/graphics/texture_data.h"
 #include "engine/other/encrypt.h"
 
 namespace gl {
     enum class Filter {
-        None = 0,
         Linear = GL_LINEAR,
         Nearest = GL_NEAREST
     };
 
+    enum class Wrap {
+        Repeat = GL_REPEAT,
+        ClampEdge = GL_CLAMP_TO_EDGE,
+        ClampBorder = GL_CLAMP_TO_BORDER
+    };
+
+    enum class Format {
+
+    };
+
     struct TextureSpecification {
-        Filter min_filter = Filter::None;
-        Filter mag_filter = Filter::None;
+        Filter min_filter = Filter::Linear;
+        Filter mag_filter = Filter::Linear;
+
+        Wrap wrap_s = Wrap::ClampBorder;
+        Wrap wrap_t = Wrap::ClampBorder;
+
+        std::optional<glm::vec3> border_color = std::nullopt;
 
         // Mipmapping is off by default
         bool mipmapping = false;
