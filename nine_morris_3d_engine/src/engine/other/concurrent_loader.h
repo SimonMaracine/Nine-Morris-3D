@@ -8,15 +8,14 @@
  * Objects of this class load assets in a separate thread.
  * Pass a loading function to load the assets.
  */
-template<typename... Args>
+template<typename D, typename... Args>
 class ConcurrentLoader {
 public:
-    using LoadFunction = std::function<void(ConcurrentLoader<Args...>&, const Args&...)>;
-    using CallbackFunction = std::function<void()>;
+    using Callback = std::function<void()>;
 
-    ConcurrentLoader(const LoadFunction& load_function, const CallbackFunction& callback_function)
-        : load_function(load_function), callback_function(callback_function) {}
-    ~ConcurrentLoader();
+    ConcurrentLoader(const Callback& callback_function)
+        : callback_function(callback_function) {}
+    virtual ~ConcurrentLoader();
 
     ConcurrentLoader(const ConcurrentLoader&) = delete;
     ConcurrentLoader& operator=(const ConcurrentLoader&) = delete;
@@ -29,35 +28,39 @@ public:
     bool is_in_use() const;
     void join_and_merge(ResourcesCache& res);
     void join();
+protected:
     void set_done();
-    ResourcesCache& operator()();
+
+    ResourcesCache res;
 private:
     void reset();
     void join_thread();
 
-    ResourcesCache local_res;
-    LoadFunction load_function;
-    CallbackFunction callback_function;
+    Callback callback_function;
     std::thread loading_thread;
     std::atomic<bool> loaded = false;
     bool in_use = false;
 };
 
-template<typename... Args>
-ConcurrentLoader<Args...>::~ConcurrentLoader() {
+template<typename D, typename... Args>
+ConcurrentLoader<D, Args...>::~ConcurrentLoader() {
     join_thread();
 }
 
-template<typename... Args>
-void ConcurrentLoader<Args...>::start_loading_thread(const Args&... args) {
+template<typename D, typename... Args>
+void ConcurrentLoader<D, Args...>::start_loading_thread(const Args&... args) {
     DEB_INFO("Loading some assets from separate thread...");
 
+    const auto load_function = [&]() {
+        static_cast<D*>(this)->load(args...);
+    };
+
     in_use = true;
-    loading_thread = std::thread(load_function, std::ref(*this), args...);
+    loading_thread = std::thread(load_function);
 }
 
-template<typename... Args>
-void ConcurrentLoader<Args...>::update(Application* app) {
+template<typename D, typename... Args>
+void ConcurrentLoader<D, Args...>::update(Application* app) {
     if (in_use && is_done()) {
         join_and_merge(app->res);
         reset();
@@ -66,50 +69,45 @@ void ConcurrentLoader<Args...>::update(Application* app) {
     }
 }
 
-template<typename... Args>
-bool ConcurrentLoader<Args...>::is_done() const {
+template<typename D, typename... Args>
+bool ConcurrentLoader<D, Args...>::is_done() const {
     return loaded.load();
 }
 
-template<typename... Args>
-bool ConcurrentLoader<Args...>::is_in_use() const {
+template<typename D, typename... Args>
+bool ConcurrentLoader<D, Args...>::is_in_use() const {
     return in_use;
 }
 
-template<typename... Args>
-void ConcurrentLoader<Args...>::join_and_merge(ResourcesCache& res) {
+template<typename D, typename... Args>
+void ConcurrentLoader<D, Args...>::join_and_merge(ResourcesCache& res) {
     loading_thread.join();
 
-    res.merge(local_res);
+    res.merge(this->res);
 
     DEB_INFO("Merged local resources into global ones");
 }
 
-template<typename... Args>
-void ConcurrentLoader<Args...>::join() {
+template<typename D, typename... Args>
+void ConcurrentLoader<D, Args...>::join() {
     join_thread();
 }
 
-template<typename... Args>
-void ConcurrentLoader<Args...>::set_done() {
+template<typename D, typename... Args>
+void ConcurrentLoader<D, Args...>::set_done() {
     loaded.store(true);
 }
 
-template<typename... Args>
-ResourcesCache& ConcurrentLoader<Args...>::operator()() {
-    return local_res;
-}
-
-template<typename... Args>
-void ConcurrentLoader<Args...>::reset() {
-    local_res = ResourcesCache {};
+template<typename D, typename... Args>
+void ConcurrentLoader<D, Args...>::reset() {
+    res = ResourcesCache {};
     loading_thread = std::thread {};
     loaded.store(false);
     in_use = false;
 }
 
-template<typename... Args>
-void ConcurrentLoader<Args...>::join_thread() {
+template<typename D, typename... Args>
+void ConcurrentLoader<D, Args...>::join_thread() {
     if (loading_thread.joinable()) {
         loading_thread.join();
     }

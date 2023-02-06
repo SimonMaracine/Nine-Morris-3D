@@ -14,8 +14,9 @@ void LoadingScene::on_start() {
     load_splash_screen_texture();
 
     loader = std::make_unique<assets_load::AllStartLoader>(
-        assets_load::all_start,
-        std::bind(&Application::change_scene, app, scene_int_to_id(data.options.scene))
+        [this, &data]() {
+            app->change_scene(scene_int_to_id(data.options.scene));
+        }
     );
 
     loader->start_loading_thread(
@@ -127,5 +128,5 @@ hs LoadingScene::scene_int_to_id(int scene) {  // FIXME find a better way
             application_exit::panic();
     }
 
-    return ""_H;
+    return {};
 }

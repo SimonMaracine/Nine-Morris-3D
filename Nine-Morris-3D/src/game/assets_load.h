@@ -3,11 +3,24 @@
 #include <engine/engine_other.h>
 
 namespace assets_load {
-    using AllStartLoader = ConcurrentLoader<bool, int, bool, int>;
-    using SkyboxLoader = ConcurrentLoader<int, int>;
-    using BoardPaintTextureLoader = ConcurrentLoader<int, bool>;
+    struct AllStartLoader : ConcurrentLoader<AllStartLoader, bool, int, bool, int> {
+        AllStartLoader(const ConcurrentLoader::Callback& callback_function)
+            : ConcurrentLoader(callback_function) {}
 
-    void all_start(AllStartLoader& loader, bool normal_mapping, int texture_quality, bool labeled_board, int skybox);
-    void skybox(SkyboxLoader& loader, int texture_quality, int skybox);
-    void board_paint_texture(BoardPaintTextureLoader& loader, int texture_quality, bool labeled_board);
+        void load(bool normal_mapping, int texture_quality, bool labeled_board, int skybox);
+    };
+
+    struct SkyboxLoader : ConcurrentLoader<SkyboxLoader, int, int> {
+        SkyboxLoader(const ConcurrentLoader::Callback& callback_function)
+            : ConcurrentLoader(callback_function) {}
+
+        void load(int texture_quality, int skybox);
+    };
+
+    struct BoardPaintTextureLoader : ConcurrentLoader<BoardPaintTextureLoader, int, bool> {
+        BoardPaintTextureLoader(const ConcurrentLoader::Callback& callback_function)
+            : ConcurrentLoader(callback_function) {}
+
+        void load(int texture_quality, bool labeled_board);
+    };
 }

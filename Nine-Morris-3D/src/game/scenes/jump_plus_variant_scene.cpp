@@ -118,10 +118,14 @@ void JumpPlusVariantScene::on_awake() {
     save_game_file_name = save_load::save_game_file_name(get_name());
 
     skybox_loader = std::make_unique<assets_load::SkyboxLoader>(
-        assets_load::skybox, std::bind(change_skybox, app)
+        [this]() {
+            change_skybox(app);
+        }
     );
     board_paint_texture_loader = std::make_unique<assets_load::BoardPaintTextureLoader>(
-        assets_load::board_paint_texture, std::bind(change_board_paint_texture, app)
+        [this]() {
+            change_board_paint_texture(app);
+        }
     );
 }
 
