@@ -6,15 +6,16 @@
 #include "engine/application/platform.h"
 #include "engine/application/events.h"
 #include "engine/application/input.h"
-#include "engine/graphics/renderer/renderer.h"
-#include "engine/graphics/renderer/render_helpers.h"
-#include "engine/graphics/framebuffer_reader.h"
-#include "engine/graphics/post_processing.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/texture.h"
 #include "engine/graphics/opengl/framebuffer.h"
+#include "engine/graphics/renderer/renderer.h"
+#include "engine/graphics/renderer/render_helpers.h"
+#include "engine/graphics/actors.h"
+#include "engine/graphics/framebuffer_reader.h"
+#include "engine/graphics/post_processing.h"
 #include "engine/other/file_system.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
@@ -133,7 +134,7 @@ void Renderer::render() {
     validate_hovered_id(mouse_x, mouse_y);
 }
 
-void Renderer::add_model(std::shared_ptr<Model> model) {
+void Renderer::add_model(Model* model) {
     const auto iter = std::find(models.cbegin(), models.cend(), model);
 
     if (iter != models.cend()) {
@@ -144,7 +145,7 @@ void Renderer::add_model(std::shared_ptr<Model> model) {
     models.push_back(model);
 }
 
-void Renderer::remove_model(std::shared_ptr<Model> model) {
+void Renderer::remove_model(Model* model) {
     const auto iter = std::find(models.cbegin(), models.cend(), model);
 
     if (iter == models.cend()) {
@@ -154,7 +155,7 @@ void Renderer::remove_model(std::shared_ptr<Model> model) {
     models.erase(iter);
 }
 
-void Renderer::add_quad(std::shared_ptr<Quad> quad) {
+void Renderer::add_quad(Quad* quad) {
     const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
 
     if (iter != quads.cend()) {
@@ -165,7 +166,7 @@ void Renderer::add_quad(std::shared_ptr<Quad> quad) {
     quads.push_back(quad);
 }
 
-void Renderer::remove_quad(std::shared_ptr<Quad> quad) {
+void Renderer::remove_quad(Quad* quad) {
     const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
 
     if (iter == quads.cend()) {
@@ -365,7 +366,7 @@ void Renderer::draw_model_with_outline(const Model* model) {
 
 void Renderer::draw_models() {
     for (size_t i = 0; i < models.size(); i++) {
-        const Model* model = models[i].get();
+        const Model* model = models[i];
 
         if (model->outline_color.has_value()) {
             continue;  // This model is rendered differently
@@ -383,9 +384,9 @@ void Renderer::draw_models_with_outline() {
 
     outline_models.clear();
 
-    std::for_each(models.begin(), models.end(), [](const std::shared_ptr<Model>& model) {
+    std::for_each(models.begin(), models.end(), [](const Model* model) {
         if (model->outline_color.has_value()) {
-            outline_models.push_back(model.get());
+            outline_models.push_back(model);
         }
     });
 
@@ -405,7 +406,7 @@ void Renderer::draw_models_to_depth_buffer() {
     storage.shadow_shader->bind();
 
     for (size_t i = 0; i < models.size(); i++) {
-        const Model* model = models[i].get();
+        const Model* model = models[i];
 
         if (model->cast_shadow) {
             glm::mat4 matrix = glm::mat4(1.0f);
@@ -445,7 +446,7 @@ void Renderer::draw_quads() {
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_mat4("u_view_matrix"_H, camera_cache.view_matrix);
 
-    std::sort(quads.begin(), quads.end(), [this](const std::shared_ptr<Quad>& lhs, const std::shared_ptr<Quad>& rhs) {
+    std::sort(quads.begin(), quads.end(), [this](const Quad* lhs, const Quad* rhs) {
         const float distance1 = glm::distance(lhs->position, camera_cache.position);
         const float distance2 = glm::distance(rhs->position, camera_cache.position);
 
@@ -453,7 +454,7 @@ void Renderer::draw_quads() {
     });
 
     for (size_t i = 0; i < quads.size(); i++) {
-        const Quad* quad = quads[i].get();
+        const Quad* quad = quads[i];
 
         draw_quad(quad);
     }
@@ -485,12 +486,12 @@ void Renderer::draw_bounding_boxes() {
     bounding_box_models_unsorted.clear();
     buffer_ids_transforms.clear();
 
-    std::for_each(models.begin(), models.end(), [](const std::shared_ptr<Model>& model) {
+    std::for_each(models.begin(), models.end(), [](const Model* model) {
         if (model->bounding_box.has_value()) {
             if (model->bounding_box->sort) {
-                bounding_box_models.push_back(model.get());
+                bounding_box_models.push_back(model);
             } else {
-                bounding_box_models_unsorted.push_back(model.get());
+                bounding_box_models_unsorted.push_back(model);
             }
         }
     });

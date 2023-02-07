@@ -6,7 +6,7 @@
 
 struct Node {
     Node() = default;
-    Node(Index index, std::shared_ptr<Renderer::Model> model)
+    Node(Index index, Model* model)
         : index(index), model(model) {}
     ~Node() = default;
 
@@ -17,7 +17,7 @@ struct Node {
 
     Index index = NULL_INDEX;  // From 0 through 23
 
-    std::shared_ptr<Renderer::Model> model;
+    Model* model = nullptr;
 
     Index piece_index = NULL_INDEX;  // Reference to the piece that sits on this node
 };

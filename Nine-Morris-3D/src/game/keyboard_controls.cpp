@@ -13,7 +13,7 @@ static constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Right, KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down }
 };
 
-KeyboardControls::KeyboardControls(Application* app, Board* board, std::shared_ptr<Renderer::Quad> quad)
+KeyboardControls::KeyboardControls(Application* app, Board* board, Quad* quad)
     : board(board), quad(quad) {
 
     for (size_t i = 0; i < 24; i++) {

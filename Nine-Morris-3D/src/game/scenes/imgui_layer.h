@@ -418,11 +418,11 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     auto& data = app->user_data<Data>();
 
                     if (data.options.hide_timer) {
-                        app->gui_renderer->remove_widget(app->res.text["timer_text"_H]);
+                        app->gui_renderer->remove_widget(scene->scene.text["timer_text"_H].get());
 
                         DEB_INFO("Hide timer");
                     } else {
-                        app->gui_renderer->add_widget(app->res.text["timer_text"_H]);
+                        app->gui_renderer->add_widget(scene->scene.text["timer_text"_H].get());
 
                         DEB_INFO("Show timer");
                     }
@@ -679,12 +679,12 @@ void ImGuiLayer<S, B>::draw_debug() {
     ImGui::End();
 
     ImGui::Begin("Light Settings");
-    if (ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&app->renderer->light.position), -30.0f, 30.0f)) {
-        app->res.quad["light_bulb"_H]->position = app->renderer->light.position;
+    if (ImGui::SliderFloat3("Position", glm::value_ptr(app->renderer->light.position), -30.0f, 30.0f)) {
+        scene->scene.quad["light_bulb"_H]->position = app->renderer->light.position;
     }
-    ImGui::SliderFloat3("Ambient color", reinterpret_cast<float*>(&app->renderer->light.ambient_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse color", reinterpret_cast<float*>(&app->renderer->light.diffuse_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Specular color", reinterpret_cast<float*>(&app->renderer->light.specular_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Ambient color", glm::value_ptr(app->renderer->light.ambient_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse color", glm::value_ptr(app->renderer->light.diffuse_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Specular color", glm::value_ptr(app->renderer->light.specular_color), 0.0f, 1.0f);
     ImGui::End();
 
     // If you recompile shaders, uniforms that are set only once need to be reuploaded

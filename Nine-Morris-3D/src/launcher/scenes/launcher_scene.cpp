@@ -299,7 +299,7 @@ void LauncherScene::on_start() {
     app->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN)), specification);
 
     background = std::make_shared<gui::Image>(app->res.texture["splash_screen"_H]);
-    app->gui_renderer->add_widget(background);
+    app->gui_renderer->add_widget(background.get());
 
     // Load launcher options from file
     options_gracefully::load_from_file<launcher_options::LauncherOptions>(

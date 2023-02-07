@@ -241,7 +241,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
             Piece piece = Piece {
                 ser_index,
                 ser_piece.type,
-                app->res.model[hs("piece" + std::to_string(ser_index))],
+                scene->scene.model[hs("piece" + std::to_string(ser_index))].get(),
                 app->res.al_source[hs("piece" + std::to_string(ser_index))]
             };
 
@@ -258,7 +258,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
             piece.model->scale = WORLD_SCALE;
             piece.model->material = app->res.material_instance[hs("piece" + std::to_string(ser_index))];
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
-            piece.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
+            piece.model->bounding_box = std::make_optional<BoundingBox>();
             piece.model->bounding_box->id = data.piece_ids[ser_index];
             piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
             piece.model->cast_shadow = true;

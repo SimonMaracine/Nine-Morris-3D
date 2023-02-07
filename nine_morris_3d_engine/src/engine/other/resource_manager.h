@@ -60,8 +60,4 @@ struct ResourcesCache {
     resmanager::Cache<al::Buffer> al_buffer;
     resmanager::Cache<SoundData> sound_data;
     resmanager::Cache<music::MusicTrack> music_track;
-    resmanager::Cache<Renderer::Model> model;
-    resmanager::Cache<Renderer::Quad> quad;
-    resmanager::Cache<gui::Image> image;
-    resmanager::Cache<gui::Text> text;
 };

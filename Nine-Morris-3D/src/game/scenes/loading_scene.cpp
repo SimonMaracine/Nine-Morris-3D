@@ -28,8 +28,8 @@ void LoadingScene::on_start() {
 
     setup_widgets();
 
-    auto background = app->res.image.load("background"_H, app->res.texture["splash_screen"_H]);
-    app->gui_renderer->add_widget(background);
+    auto background = scene.image.load("background"_H, app->res.texture["splash_screen"_H]);
+    app->gui_renderer->add_widget(background.get());
 
     loading_animation.previous_seconds = app->window->get_time();
 }
@@ -39,22 +39,22 @@ void LoadingScene::on_stop() {
 
     if (app->running) {
         // Initialize only if game is not closing
-        initialize_game(app);
+        initialize_game(app, this);
     }
 
     loader.reset();
 
     app->gui_renderer->clear();
-    app->res.image.clear();
-    app->res.text.clear();
+    scene.image.clear();  // FIXME should be automatic management
+    scene.text.clear();
 }
 
 void LoadingScene::on_update() {
     float width, height, x_pos, y_pos;
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
-    app->res.image["background"_H]->set_position(glm::vec2(x_pos, y_pos));
-    app->res.image["background"_H]->set_size(glm::vec2(width, height));
+    scene.image["background"_H]->set_position(glm::vec2(x_pos, y_pos));
+    scene.image["background"_H]->set_size(glm::vec2(width, height));
 
     update_loading_animation();
 
@@ -65,7 +65,7 @@ void LoadingScene::setup_widgets() {
     static constexpr int LOWEST_RESOLUTION = 288;
     static constexpr int HIGHEST_RESOLUTION = 1035;
 
-    auto loading_text = app->res.text.load(
+    auto loading_text = scene.text.load(
         "loading_text"_H,
         app->res.font["good_dog_plain"_H],
         "Loading",
@@ -80,7 +80,7 @@ void LoadingScene::setup_widgets() {
     const auto size = loading_text->get_actual_size();
     loading_text->fake_size(glm::vec2(size.x + 40.0f, size.y));
     loading_text->set_shadows(true);
-    app->gui_renderer->add_widget(loading_text);
+    app->gui_renderer->add_widget(loading_text.get());
 }
 
 void LoadingScene::load_splash_screen_texture() {
@@ -106,7 +106,7 @@ void LoadingScene::update_loading_animation() {
         std::string text = "Loading";
         text.append(loading_animation.dots, '.');
 
-        app->res.text["loading_text"_H]->set_text(text);
+        scene.text["loading_text"_H]->set_text(text);
 
         loading_animation.dots++;
         loading_animation.dots %= 4;

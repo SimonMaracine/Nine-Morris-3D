@@ -31,15 +31,15 @@ void StandardGameScene::on_start() {
     setup_and_add_model_nodes(app, this);
     setup_and_add_model_pieces();
 
-    setup_and_add_turn_indicator(app);
-    setup_and_add_timer_text(app);
-    setup_wait_indicator(app);
-    setup_computer_thinking_indicator(app);
+    setup_and_add_turn_indicator(app, this);
+    setup_and_add_timer_text(app, this);
+    setup_wait_indicator(app, this);
+    setup_computer_thinking_indicator(app, this);
     setup_camera(app, this);
 
     update_turn_indicator(app, this);
 
-    keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_H]};
+    keyboard = KeyboardControls {app, &board, scene.quad["keyboard_controls"_H].get()};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<StandardBoardSerialized> {};
@@ -64,7 +64,7 @@ void StandardGameScene::on_start() {
 
 #ifdef NM3D_PLATFORM_DEBUG
     app->renderer->origin = true;
-    app->renderer->add_quad(app->res.quad["light_bulb"_H]);
+    app->renderer->add_quad(scene.quad["light_bulb"_H].get());
 #endif
 
     imgui_layer.update();
@@ -120,7 +120,7 @@ void StandardGameScene::on_awake() {
 
     skybox_loader = std::make_unique<assets_load::SkyboxLoader>(
         [this]() {
-            change_skybox(app);
+            change_skybox(app, this);
         }
     );
     board_paint_texture_loader = std::make_unique<assets_load::BoardPaintTextureLoader>(
@@ -147,7 +147,7 @@ void StandardGameScene::on_update() {
     update_listener(app, this);
 
     update_game_state(app, this);
-    update_timer_text(app, this);
+    update_timer_text(this);
     update_wait_indicator(app, this);
     update_computer_thinking_indicator(app, this);
 
@@ -194,7 +194,7 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         }
 
         if (show_keyboard_controls) {
-            app->renderer->remove_quad(app->res.quad["keyboard_controls"_H]);
+            app->renderer->remove_quad(scene.quad["keyboard_controls"_H].get());
             show_keyboard_controls = false;
         }
     }
@@ -212,7 +212,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::Right:
         case input::Key::Enter:
             if (!show_keyboard_controls) {
-                app->renderer->add_quad(app->res.quad["keyboard_controls"_H]);
+                app->renderer->add_quad(scene.quad["keyboard_controls"_H].get());
                 show_keyboard_controls = true;
                 return;
             }
@@ -311,14 +311,14 @@ void StandardGameScene::setup_and_add_model_pieces() {
 
 void StandardGameScene::setup_entities() {
     board = StandardBoard {};
-    board.model = app->res.model.load("board"_H);
-    board.paint_model = app->res.model.load("board_paint"_H);
+    board.model = scene.model.load("board"_H).get();
+    board.paint_model = scene.model.load("board_paint"_H).get();
 
     for (size_t i = 0; i < 9; i++) {
         board.pieces[i] = Piece {
             static_cast<Index>(i),
             PieceType::White,
-            app->res.model.load(hs("piece" + std::to_string(i))),
+            scene.model.load(hs("piece" + std::to_string(i))).get(),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
     }
@@ -327,7 +327,7 @@ void StandardGameScene::setup_entities() {
         board.pieces[i] = Piece {
             static_cast<Index>(i),
             PieceType::Black,
-            app->res.model.load(hs("piece" + std::to_string(i))),
+            scene.model.load(hs("piece" + std::to_string(i))).get(),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
     }
@@ -335,7 +335,7 @@ void StandardGameScene::setup_entities() {
     for (size_t i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
             static_cast<Index>(i),
-            app->res.model.load(hs("node" + std::to_string(i)))
+            scene.model.load(hs("node" + std::to_string(i))).get()
         };
     }
 

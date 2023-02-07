@@ -19,8 +19,4 @@ void ResourcesCache::merge(ResourcesCache& other) {
     al_buffer.merge_replace(std::move(other.al_buffer));
     sound_data.merge_replace(std::move(other.sound_data));
     music_track.merge_replace(std::move(other.music_track));
-    model.merge_replace(std::move(other.model));
-    quad.merge_replace(std::move(other.quad));
-    image.merge_replace(std::move(other.image));
-    text.merge_replace(std::move(other.text));
 }

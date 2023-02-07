@@ -4,18 +4,19 @@
 
 #include "engine/application/platform.h"
 #include "engine/application/events.h"
+#include "engine/graphics/opengl/vertex_array.h"
+#include "engine/graphics/opengl/buffer.h"
+#include "engine/graphics/opengl/shader.h"
+#include "engine/graphics/opengl/texture.h"
+#include "engine/graphics/opengl/framebuffer.h"
 #include "engine/graphics/framebuffer_reader.h"
+#include "engine/graphics/actors.h"
 #include "engine/graphics/font.h"
 #include "engine/graphics/camera.h"
 #include "engine/graphics/material.h"
 #include "engine/graphics/light.h"
 #include "engine/graphics/identifier.h"
 #include "engine/graphics/post_processing.h"
-#include "engine/graphics/opengl/vertex_array.h"
-#include "engine/graphics/opengl/buffer.h"
-#include "engine/graphics/opengl/shader.h"
-#include "engine/graphics/opengl/texture.h"
-#include "engine/graphics/opengl/framebuffer.h"
 #include "engine/other/camera_controller.h"
 #include "engine/other/encrypt.h"
 
@@ -23,33 +24,6 @@ class Application;
 
 class Renderer {
 public:
-    struct BoundingBox {
-        identifier::Id id;
-        glm::vec3 size = glm::vec3(0.0f);
-        bool sort = true;
-    };
-
-    struct Model {
-        glm::vec3 position = glm::vec3(0.0f);
-        glm::vec3 rotation = glm::vec3(0.0f);
-        float scale = 1.0f;
-
-        std::shared_ptr<gl::VertexArray> vertex_array;
-        std::shared_ptr<gl::IndexBuffer> index_buffer;
-        std::shared_ptr<MaterialInstance> material;
-
-        std::optional<glm::vec3> outline_color;
-        std::optional<BoundingBox> bounding_box;
-        bool cast_shadow = false;
-    };
-
-    struct Quad {
-        glm::vec3 position = glm::vec3(0.0f);
-        float scale = 1.0f;
-
-        std::shared_ptr<gl::Texture> texture;
-    };
-
     struct Storage;
 
     Renderer(Application* app);
@@ -62,11 +36,11 @@ public:
 
     void render();
 
-    void add_model(std::shared_ptr<Model> model);
-    void remove_model(std::shared_ptr<Model> model);
+    void add_model(Model* model);
+    void remove_model(Model* model);
 
-    void add_quad(std::shared_ptr<Quad> quad);
-    void remove_quad(std::shared_ptr<Quad> quad);
+    void add_quad(Quad* quad);
+    void remove_quad(Quad* quad);
 
     void clear();
 
@@ -181,8 +155,8 @@ private:
         glm::vec3 position = glm::vec3(0.0f);
     } camera_cache;
 
-    std::vector<std::shared_ptr<Model>> models;
-    std::vector<std::shared_ptr<Quad>> quads;
+    std::vector<Model*> models;
+    std::vector<Quad*> quads;
 
     identifier::Id hovered_id = identifier::null;
     FramebufferReader<4> framebuffer_reader;

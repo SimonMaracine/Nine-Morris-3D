@@ -2,6 +2,8 @@
 
 #include <resmanager/resmanager.h>
 
+#include "engine/graphics/scene_list.h"
+
 class Application;
 
 /**
@@ -29,11 +31,13 @@ public:
 
     std::string_view get_name() const { return name; }
     SceneId get_id() const { return id; }
+
+    SceneList scene;
 protected:
     Application* app = nullptr;
 private:
-    const std::string name;
-    const SceneId id;
+    std::string name;
+    SceneId id;
     bool on_awake_called = false;
 
     friend class Application;
