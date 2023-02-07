@@ -1,5 +1,7 @@
-#include <engine/engine_application.h>
+// Include entry point first as it includes Windows.h
 #include <engine/engine_entry_point.h>
+
+#include <engine/engine_application.h>
 #include <engine/engine_other.h>
 
 #include "game/game.h"
@@ -20,9 +22,9 @@
 static const char* LOG_FILE = "debug.log";
 static const char* INFO_FILE = "info.txt";
 
-inline constexpr unsigned int MAJOR = 0;
-inline constexpr unsigned int MINOR = 3;
-inline constexpr unsigned int PATCH = 0;
+static constexpr unsigned int MAJOR = 0;
+static constexpr unsigned int MINOR = 3;
+static constexpr unsigned int PATCH = 0;
 
 static const char* KEY = "data/models/board/board.obj";
 

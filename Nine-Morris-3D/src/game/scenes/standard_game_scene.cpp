@@ -168,7 +168,7 @@ void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& e
         return;
     }
 
-    if (event.button == input::MouseButton::LEFT) {
+    if (event.button == input::MouseButton::Left) {
         if (board.next_move && board.phase != BoardPhase::None) {
             board.click(app->renderer->get_hovered_id());
         }
@@ -180,7 +180,7 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         return;
     }
 
-    if (event.button == input::MouseButton::LEFT) {
+    if (event.button == input::MouseButton::Left) {
         const bool valid_phases = (
             board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
         );
@@ -206,11 +206,11 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
     }
 
     switch (event.key) {
-        case input::Key::UP:
-        case input::Key::DOWN:
-        case input::Key::LEFT:
-        case input::Key::RIGHT:
-        case input::Key::ENTER:
+        case input::Key::Up:
+        case input::Key::Down:
+        case input::Key::Left:
+        case input::Key::Right:
+        case input::Key::Enter:
             if (!show_keyboard_controls) {
                 app->renderer->add_quad(app->res.quad["keyboard_controls"_H]);
                 show_keyboard_controls = true;
@@ -224,35 +224,35 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
     using KB = KeyboardControls;
 
     switch (event.key) {
-        case input::Key::UP:
+        case input::Key::Up:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Up, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case input::Key::DOWN:
+        case input::Key::Down:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Down, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case input::Key::LEFT:
+        case input::Key::Left:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Left, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case input::Key::RIGHT:
+        case input::Key::Right:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Right, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case input::Key::ENTER: {
+        case input::Key::Enter: {
             const bool valid_phases = (
                 board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
             );
@@ -276,7 +276,7 @@ void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
         return;
     }
 
-    if (event.key == input::Key::SPACE) {
+    if (event.key == input::Key::Space) {
         camera_controller.go_towards_position(default_camera_position);
     }
 }

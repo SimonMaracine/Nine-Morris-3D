@@ -71,7 +71,7 @@ void PointCameraController::update_controls(float dt) {
         zoom_velocity += ZOOM_SPEED * dt;
     }
 
-    if (input::is_mouse_button_pressed(input::MouseButton::RIGHT)) {
+    if (input::is_mouse_button_pressed(input::MouseButton::Right)) {
         y_velocity -= MOVE_SPEED_MOUSE * mouse_input.dy;
         x_velocity += MOVE_SPEED_MOUSE * mouse_input.dx;
     }

@@ -17,6 +17,8 @@ void application_main();
         application_main();
     }
 #elif defined(NM3D_PLATFORM_WINDOWS)
+    #define WIN32_LEAN_AND_MEAN
+    #define NOMINMAX
     #include <Windows.h>
 
     #if defined(NM3D_PLATFORM_RELEASE)

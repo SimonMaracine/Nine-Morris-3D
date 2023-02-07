@@ -3,7 +3,9 @@
 class ApplicationBuilder {
 public:
     enum Renderer {
-        Renderer3D, Renderer2D, RendererImGui
+        Renderer3D,
+        Renderer2D,
+        RendererImGui
     };
 
     ApplicationBuilder& display(int width, int height, std::string_view title = "Nine Morris 3D Engine");
