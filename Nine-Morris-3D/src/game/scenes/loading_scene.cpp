@@ -70,7 +70,7 @@ void LoadingScene::setup_widgets() {
         app->res.font["good_dog_plain"_H],
         "Loading",
         1.5f,
-        glm::vec3(0.81f)
+        glm::vec3(0.75f)
     );
     loading_text->stick(gui::Sticky::SE);
     loading_text->offset(20, gui::Relative::Right);

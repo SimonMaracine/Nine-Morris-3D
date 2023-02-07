@@ -23,6 +23,8 @@
 #define BEIGE ImVec4(0.961f, 0.875f, 0.733f, 1.0f)
 #define LIGHT_GRAY_BLUE ImVec4(0.357f, 0.408f, 0.525f, 1.0f)
 #define TRANSPARENT_BACKGROUND ImVec4(0.058f, 0.058f, 0.058f, 0.74f)
+#define GRAYISH_TEXT ImVec4(0.89f, 0.87f, 0.81f, 1.0f)
+#define BLACK_BACKGROUND ImVec4(0.138f, 0.138f, 0.138f, 1.0f)
 
 inline constexpr size_t NINE_MENS_MORRIS_MILLS = 16;
 inline constexpr size_t MILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
@@ -216,7 +218,7 @@ inline constexpr glm::vec3 NODE_POSITIONS[MAX_NODES] = {
 };
 
 inline constexpr glm::vec3 PIECE_BOUNDING_BOX = glm::vec3(0.36f, 0.19f, 0.36f);
-inline constexpr glm::vec3 NODE_BOUNDING_BOX = glm::vec3(0.32f, 0.01f, 0.32f);
+inline constexpr glm::vec3 NODE_BOUNDING_BOX = glm::vec3(0.333f, 0.01f, 0.333f);
 inline constexpr glm::vec3 BOARD_BOUNDING_BOX = glm::vec3(5.5f, 0.01f, 5.5f);
 
 inline constexpr float KEYBOARD_CONTROLS_Y_POSITION = 0.47f;
@@ -225,11 +227,11 @@ using GamePosition = std::array<PieceType, MAX_NODES>;
 
 inline constexpr float WORLD_SCALE = 20.0f;
 
-inline constexpr glm::vec3 RED_OUTLINE = { 1.0f, 0.0f, 0.0f };
-inline constexpr glm::vec3 ORANGE_OUTLINE = { 1.0f, 0.5f, 0.0f };
+inline constexpr glm::vec3 RED_OUTLINE = { 0.8f, 0.16f, 0.3f };
+inline constexpr glm::vec3 ORANGE_OUTLINE = { 0.96f, 0.58f, 0.15f };
 inline constexpr glm::vec3 RED_TINT = { 1.0f, 0.2f, 0.2f };
 inline constexpr glm::vec3 DEFAULT_TINT = { 1.0f, 1.0f, 1.0f };
-inline constexpr glm::vec4 GRAY = { 0.7f, 0.7f, 0.7f, 1.0f };
+inline constexpr glm::vec4 NODE_COLOR = { 0.1f, 0.1f, 0.1f, 1.0f };
 
 inline constexpr glm::vec3 UP_VECTOR = { 0.0f, 1.0f, 0.0f };
 

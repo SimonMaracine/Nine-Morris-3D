@@ -774,7 +774,7 @@ void setup_and_add_timer_text(Application* app) {
         app->res.font["open_sans"_H],
         "00:00",
         1.5f,
-        glm::vec3(0.9f)
+        glm::vec3(0.8f)
     );
 
     timer_text->stick(gui::Sticky::N);

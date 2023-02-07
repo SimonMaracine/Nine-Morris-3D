@@ -271,7 +271,10 @@ void LauncherScene::on_start() {
     colors[ImGuiCol_Tab] = DARK_BROWN;
     colors[ImGuiCol_TabHovered] = LIGHT_BROWN;
     colors[ImGuiCol_TabActive] = DEFAULT_BROWN;
+    colors[ImGuiCol_Text] = GRAYISH_TEXT;
     colors[ImGuiCol_WindowBg] = TRANSPARENT_BACKGROUND;
+    colors[ImGuiCol_ChildBg] = BLACK_BACKGROUND;
+    colors[ImGuiCol_PopupBg] = BLACK_BACKGROUND;
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
