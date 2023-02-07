@@ -193,10 +193,10 @@ void Renderer::set_scene_framebuffer(int samples) {
     specification.height = app->data().height;
     specification.samples = samples;
     specification.color_attachments = {
-        gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Renderbuffer}
+        gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Renderbuffer}
     };
     specification.depth_attachment = gl::Attachment {
-        gl::AttachmentFormat::DEPTH24_STENCIL8, gl::AttachmentType::Renderbuffer
+        gl::AttachmentFormat::Depth24Stencil8, gl::AttachmentType::Renderbuffer
     };
 
     storage.scene_framebuffer = std::make_shared<gl::Framebuffer>(specification);
@@ -213,7 +213,7 @@ void Renderer::set_shadow_map_framebuffer(int size) {
     gl::FramebufferSpecification specification;
     specification.width = shadow_map_size;
     specification.height = shadow_map_size;
-    specification.depth_attachment = gl::Attachment {gl::AttachmentFormat::DEPTH32, gl::AttachmentType::Texture};
+    specification.depth_attachment = gl::Attachment {gl::AttachmentFormat::Depth32, gl::AttachmentType::Texture};
     specification.white_border_for_depth_texture = true;
     specification.resizable = false;
 
@@ -842,7 +842,7 @@ void Renderer::initialize_framebuffers() {
         specification.width = app->data().width;
         specification.height = app->data().height;
         specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
+            gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
         };
 
         storage.intermediate_framebuffer = std::make_shared<gl::Framebuffer>(specification);
@@ -857,10 +857,10 @@ void Renderer::initialize_framebuffers() {
         specification.height = app->data().height / BOUNDING_BOX_DIVISOR;
         specification.resize_divisor = BOUNDING_BOX_DIVISOR;
         specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RED_FLOAT, gl::AttachmentType::Renderbuffer}
+            gl::Attachment {gl::AttachmentFormat::RedFloat, gl::AttachmentType::Renderbuffer}
         };
         specification.depth_attachment = gl::Attachment {
-            gl::AttachmentFormat::DEPTH32, gl::AttachmentType::Renderbuffer
+            gl::AttachmentFormat::Depth32, gl::AttachmentType::Renderbuffer
         };
         float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };  // TODO right now not used
         specification.clear_drawbuffer = 0;

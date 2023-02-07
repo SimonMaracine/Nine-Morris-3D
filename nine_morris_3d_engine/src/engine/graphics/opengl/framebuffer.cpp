@@ -331,19 +331,19 @@ namespace gl {
                         case AttachmentFormat::None:
                             ASSERT(false, "Attachment format None is invalid");
                             break;
-                        case AttachmentFormat::RGBA8:
+                        case AttachmentFormat::Rgba8:
                             attach_color_texture(
                                 texture, specification.samples, GL_RGBA8,
                                 specification.width, specification.height, i
                             );
                             break;
-                        case AttachmentFormat::RED_INT:
+                        case AttachmentFormat::RedInt:
                             attach_color_texture(
                                 texture, specification.samples, GL_R32I,
                                 specification.width, specification.height, i
                             );
                             break;
-                        case AttachmentFormat::RED_FLOAT:
+                        case AttachmentFormat::RedFloat:
                             attach_color_texture(
                                 texture, specification.samples, GL_R32F,
                                 specification.width, specification.height, i
@@ -368,19 +368,19 @@ namespace gl {
                         case AttachmentFormat::None:
                             ASSERT(false, "Attachment format None is invalid");
                             break;
-                        case AttachmentFormat::RGBA8:
+                        case AttachmentFormat::Rgba8:
                             attach_color_renderbuffer(
                                 renderbuffer, specification.samples, GL_RGBA8,
                                 specification.width, specification.height, i
                             );
                             break;
-                        case AttachmentFormat::RED_INT:
+                        case AttachmentFormat::RedInt:
                             attach_color_renderbuffer(
                                 renderbuffer, specification.samples, GL_R32I,
                                 specification.width, specification.height, i
                             );
                             break;
-                        case AttachmentFormat::RED_FLOAT:
+                        case AttachmentFormat::RedFloat:
                             attach_color_renderbuffer(
                                 renderbuffer, specification.samples, GL_R32F,
                                 specification.width, specification.height, i
@@ -414,14 +414,14 @@ namespace gl {
                         case AttachmentFormat::None:
                             ASSERT(false, "Attachment format None is invalid");
                             break;
-                        case AttachmentFormat::DEPTH24_STENCIL8:
+                        case AttachmentFormat::Depth24Stencil8:
                             attach_depth_texture(
                                 texture, specification.samples,
                                 GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
                                 specification.height, specification.white_border_for_depth_texture
                             );
                             break;
-                        case AttachmentFormat::DEPTH32:
+                        case AttachmentFormat::Depth32:
                             attach_depth_texture(
                                 texture, specification.samples,
                                 GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT, specification.width,
@@ -447,14 +447,14 @@ namespace gl {
                         case AttachmentFormat::None:
                             ASSERT(false, "Attachment format None is invalid");
                             break;
-                        case AttachmentFormat::DEPTH24_STENCIL8:
+                        case AttachmentFormat::Depth24Stencil8:
                             attach_depth_renderbuffer(
                                 renderbuffer, specification.samples,
                                 GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT,
                                 specification.width, specification.height
                             );
                             break;
-                        case AttachmentFormat::DEPTH32:
+                        case AttachmentFormat::Depth32:
                             attach_depth_renderbuffer(
                                 renderbuffer, specification.samples,
                                 GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT,

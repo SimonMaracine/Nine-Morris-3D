@@ -295,8 +295,6 @@ void LauncherScene::on_start() {
 
     // Load splash screen
     gl::TextureSpecification specification;
-    specification.min_filter = gl::Filter::Linear;
-    specification.mag_filter = gl::Filter::Linear;
 
     app->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN)), specification);
 

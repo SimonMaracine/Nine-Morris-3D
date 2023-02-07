@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <stb_image.h>
 #include <glm/glm.hpp>
 
 #include "engine/graphics/texture_data.h"
@@ -20,20 +19,23 @@ namespace gl {
     };
 
     enum class Format {
-
+        Rgba8,
+        R8
     };
 
     struct TextureSpecification {
+        Format format = Format::Rgba8;
+
         Filter min_filter = Filter::Linear;
         Filter mag_filter = Filter::Linear;
 
         Wrap wrap_s = Wrap::ClampBorder;
         Wrap wrap_t = Wrap::ClampBorder;
 
-        std::optional<glm::vec3> border_color = std::nullopt;
+        std::optional<glm::vec4> border_color = std::nullopt;
 
         // Mipmapping is off by default
-        bool mipmapping = false;
+        int mipmap_levels = 1;
         float bias = 0.0f;
         int anisotropic_filtering = 0;
     };
@@ -43,6 +45,7 @@ namespace gl {
         Texture(std::string_view file_path, const TextureSpecification& specification);
         Texture(encrypt::EncryptedFile file_path, const TextureSpecification& specification);
         Texture(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
+        Texture(int width, int height, unsigned char* data, const TextureSpecification& specification);
         ~Texture();
 
         Texture(const Texture&) = delete;
@@ -52,12 +55,15 @@ namespace gl {
 
         int get_width() { return width; }
         int get_height() { return height; }
-
         GLuint get_id() { return texture; }
 
-        void bind(GLenum slot);
+        void bind(GLenum unit);
         static void unbind();
     private:
+        void allocate_texture(int width, int height, unsigned char* data);
+
+        TextureSpecification specification;
+
         GLuint texture = 0;
         int width = 0;
         int height = 0;
@@ -76,7 +82,7 @@ namespace gl {
         Texture3D(Texture3D&&) = delete;
         Texture3D& operator=(Texture3D&&) = delete;
 
-        void bind(GLenum slot);
+        void bind(GLenum unit);
         static void unbind();
     private:
         GLuint texture = 0;

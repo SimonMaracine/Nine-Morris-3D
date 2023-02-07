@@ -59,7 +59,7 @@ static void initialize_board(Application* app) {
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
-    specification.mipmapping = true;
+    specification.mipmap_levels = 4;
     specification.bias = -2.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
@@ -137,7 +137,7 @@ static void initialize_board_paint(Application* app) {
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
-    specification.mipmapping = true;
+    specification.mipmap_levels = 4;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
@@ -228,7 +228,7 @@ static void initialize_pieces(Application* app) {
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
-    specification.mipmapping = true;
+    specification.mipmap_levels = 4;
     specification.bias = -1.5f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
@@ -390,7 +390,7 @@ static void initialize_board_no_normal(Application* app) {
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
-    specification.mipmapping = true;
+    specification.mipmap_levels = 4;
     specification.bias = -2.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
@@ -458,7 +458,7 @@ static void initialize_board_paint_no_normal(Application* app) {
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
-    specification.mipmapping = true;
+    specification.mipmap_levels = 4;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
@@ -546,7 +546,7 @@ static void initialize_pieces_no_normal(Application* app) {
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
-    specification.mipmapping = true;
+    specification.mipmap_levels = 4;
     specification.bias = -1.5f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
@@ -609,8 +609,6 @@ static void initialize_keyboard_controls(Application* app) {
     auto keyboard_controls = app->res.quad.load("keyboard_controls"_H);
 
     gl::TextureSpecification specification;
-    specification.min_filter = gl::Filter::Linear;
-    specification.mag_filter = gl::Filter::Linear;
 
     auto texture = app->res.texture.load(
         "keyboard_controls_default"_H,
@@ -631,8 +629,6 @@ static void initialize_light_bulb(Application* app) {
     auto light_bulb = app->res.quad.load("light_bulb"_H);
 
     gl::TextureSpecification specification;
-    specification.min_filter = gl::Filter::Linear;
-    specification.mag_filter = gl::Filter::Linear;
 
     auto light_bulb_texture = app->res.texture.load(
         "light_bulb"_H,
@@ -696,8 +692,6 @@ static void initialize_light(Application* app) {
 
 static void initialize_indicators_textures(Application* app) {
     gl::TextureSpecification specification;
-    specification.min_filter = gl::Filter::Linear;
-    specification.mag_filter = gl::Filter::Linear;
 
     app->res.texture.load(
         "white_indicator"_H,
@@ -744,7 +738,7 @@ void change_board_paint_texture(Application* app) {
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
-    specification.mipmapping = true;
+    specification.mipmap_levels = 4;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 

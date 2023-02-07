@@ -1,6 +1,6 @@
 #include <stb_truetype.h>
 #include <stb_image_write.h>
-#include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #include <utf8.h>
 
@@ -8,6 +8,7 @@
 #include "engine/graphics/font.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/vertex_array.h"
+#include "engine/graphics/opengl/texture.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/exit.h"
@@ -78,7 +79,6 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
 }
 
 Font::~Font() {
-    glDeleteTextures(1, &texture);
     delete[] font_info_buffer;
 
     DEB_DEBUG("Unloaded font `{}`", name);
@@ -100,7 +100,8 @@ void Font::update_data(const float* data, size_t size) {
 void Font::begin_baking() {
     DEB_DEBUG("Begin baking font `{}`", name);
 
-    glDeleteTextures(1, &texture);
+    // Delete the previous bitmap before creating another one
+    bitmap_image.reset();
 
     const size_t SIZE = sizeof(unsigned char) * bitmap_size * bitmap_size;
 
@@ -115,21 +116,11 @@ void Font::begin_baking() {
 }
 
 void Font::end_baking() {
-    glGenTextures(1, &texture);  // TODO maybe move this to Texture class
-    glBindTexture(GL_TEXTURE_2D, texture);
+    gl::TextureSpecification specification;
+    specification.format = gl::Format::R8;
+    specification.border_color = std::make_optional<glm::vec4>(0.0f, 0.0f, 0.0f, 1.0f);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-    float border_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
-
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, bitmap_size, bitmap_size);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bitmap_size, bitmap_size, GL_RED, GL_UNSIGNED_BYTE, bake_context.bitmap);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
+    bitmap_image = std::make_shared<gl::Texture>(bitmap_size, bitmap_size, bake_context.bitmap, specification);
 
 #ifdef NM3D_PLATFORM_DEBUG
     write_bitmap_to_file();

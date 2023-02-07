@@ -117,7 +117,7 @@ static void setup_post_processing(Application* app) {
         specification.height = app->data().height / 2;
         specification.resize_divisor = 2;
         specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
+            gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
         };
 
         auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
@@ -146,7 +146,7 @@ static void setup_post_processing(Application* app) {
         specification.height = app->data().height / 4;
         specification.resize_divisor = 4;
         specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
+            gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
         };
 
         auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
@@ -162,7 +162,7 @@ static void setup_post_processing(Application* app) {
         specification.height = app->data().height / 8;
         specification.resize_divisor = 8;
         specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
+            gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
         };
 
         auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
@@ -177,7 +177,7 @@ static void setup_post_processing(Application* app) {
         specification.width = app->data().width;
         specification.height = app->data().height;
         specification.color_attachments = {
-            gl::Attachment {gl::AttachmentFormat::RGBA8, gl::AttachmentType::Texture}
+            gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
         };
 
         auto framebuffer = std::make_shared<gl::Framebuffer>(specification);

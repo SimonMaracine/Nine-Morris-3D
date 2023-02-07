@@ -1,10 +1,10 @@
 #pragma once
 
 #include <stb_truetype.h>
-#include <glad/glad.h>
 
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
+#include "engine/graphics/opengl/texture.h"
 
 class Font {
 private:
@@ -28,7 +28,7 @@ public:
     unsigned int get_bitmap_size() { return static_cast<unsigned int>(bitmap_size); }
 
     gl::VertexArray& get_vertex_array() { return *vertex_array; }
-    GLuint get_texture() { return texture; }
+    gl::Texture& get_bitmap() { return *bitmap_image; }
     int get_vertex_count() { return vertex_count; }
 
     // Baking API
@@ -68,8 +68,7 @@ private:
 
     std::string name;
 
-    // Bitmap
-    GLuint texture = 0;
+    std::shared_ptr<gl::Texture> bitmap_image;
 
     // Store references to vertex array and buffer
     std::shared_ptr<gl::VertexArray> vertex_array;

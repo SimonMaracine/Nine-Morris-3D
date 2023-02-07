@@ -89,8 +89,6 @@ void LoadingScene::load_splash_screen_texture() {
     using namespace file_system;
 
     gl::TextureSpecification specification;
-    specification.min_filter = gl::Filter::Linear;
-    specification.mag_filter = gl::Filter::Linear;
 
     app->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
 }

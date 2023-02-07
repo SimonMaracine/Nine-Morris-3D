@@ -5,11 +5,11 @@
 namespace gl {
     enum class AttachmentFormat {
         None,
-        RGBA8,
-        RED_INT,
-        RED_FLOAT,
-        DEPTH24_STENCIL8,
-        DEPTH32
+        Rgba8,
+        RedInt,
+        RedFloat,
+        Depth24Stencil8,
+        Depth32
     };
 
     enum class AttachmentType {
