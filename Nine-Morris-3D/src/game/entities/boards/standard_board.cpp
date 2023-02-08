@@ -859,7 +859,8 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
 
             piece.model->position = ser_piece.position;
             piece.model->rotation = ser_piece.rotation;
-            piece.model->vertex_array = app->res.vertex_array[hs("piece" + std::to_string(ser_index))];
+            const char* piece_tag = piece.type == PieceType::White ? "white_piece" : "black_piece";
+            piece.model->vertex_array = app->res.vertex_array[hs(piece_tag + std::to_string(ser_index))];
             piece.model->index_buffer = (
                 ser_piece.type == PieceType::White
                     ?

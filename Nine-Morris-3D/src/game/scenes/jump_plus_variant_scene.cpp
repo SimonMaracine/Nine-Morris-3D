@@ -22,6 +22,13 @@ using namespace encrypt;
 void JumpPlusVariantScene::on_start() {
     auto& data = app->user_data<Data>();
 
+    auto keyboard_controls = scene.quad.load("keyboard_controls"_H);  // TODO clean up
+
+#ifdef NM3D_PLATFORM_DEBUG
+    initialize_light_bulb(app, this);
+#endif
+    initialize_light(app, this);
+
     initialize_pieces();
     setup_entities();
 
@@ -55,6 +62,7 @@ void JumpPlusVariantScene::on_start() {
     timer = Timer {app};
 
     board.app = app;
+    board.scene = this;
     board.keyboard = &keyboard;
     board.camera_controller = &camera_controller;
     board.undo_redo_state = &undo_redo_state;

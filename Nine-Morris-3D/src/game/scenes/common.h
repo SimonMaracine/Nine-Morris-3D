@@ -1249,13 +1249,10 @@ void redo_generic(Application* app, S* scene) {
     update_turn_indicator(app, scene);
 }
 
-template<typename S>
-void initialize_keyboard_controls(Application* app, S* scene) {
-    auto keyboard_controls = scene->scene.quad.load("keyboard_controls"_H);
-
+inline void initialize_keyboard_controls(Application* app) {
     gl::TextureSpecification specification;
 
-    auto texture = app->res.texture.load(
+    app->res.texture.load(
         "keyboard_controls_default"_H,
         app->res.texture_data["keyboard_controls_default"_H],
         specification
@@ -1265,8 +1262,6 @@ void initialize_keyboard_controls(Application* app, S* scene) {
         app->res.texture_data["keyboard_controls_cross"_H],
         specification
     );
-
-    keyboard_controls->texture = texture;
 }
 
 #ifdef NM3D_PLATFORM_DEBUG
@@ -1396,8 +1391,7 @@ void change_skybox(Application* app, S* scene) {
 }
 
 // Must be called only once
-template<typename S>
-void initialize_game(Application* app, S* scene) {
+inline void initialize_game(Application* app) {
     auto& data = app->user_data<Data>();
 
     initialize_ids(app);
@@ -1413,13 +1407,8 @@ void initialize_game(Application* app, S* scene) {
     }
     initialize_nodes(app);
 
-    initialize_keyboard_controls(app, scene);
-#ifdef NM3D_PLATFORM_DEBUG
-    initialize_light_bulb(app, scene);
-#endif
-
+    initialize_keyboard_controls(app);
     initialize_skybox(app);
-    initialize_light(app, scene);
     initialize_indicators_textures(app);
 
     auto track = app->res.music_track.load("music"_H, app->res.sound_data["music"_H]);

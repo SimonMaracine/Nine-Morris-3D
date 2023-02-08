@@ -39,7 +39,7 @@ void LoadingScene::on_stop() {
 
     if (app->running) {
         // Initialize only if game is not closing
-        initialize_game(app, this);
+        initialize_game(app);
     }
 
     loader.reset();
