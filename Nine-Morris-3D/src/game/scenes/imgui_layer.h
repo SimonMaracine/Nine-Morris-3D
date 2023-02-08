@@ -6,7 +6,6 @@
 
 #include "game/entities/boards/standard_board.h"
 #include "game/entities/boards/jump_board.h"
-#include "game/scenes/common.h"
 #include "game/save_load.h"
 #include "game/game_options.h"
 #include "other/constants.h"

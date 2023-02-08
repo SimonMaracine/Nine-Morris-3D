@@ -7,7 +7,7 @@
 #include "game/scenes/imgui_layer.h"
 #include "game/scenes/scene_game.h"
 
-struct StandardGameScene : public Scene, public SceneGame {
+struct StandardGameScene : public Scene, public SceneGame<StandardGameScene, StandardBoardSerialized> {
     StandardGameScene()
         : Scene("standard_game") {}
 
@@ -25,12 +25,8 @@ struct StandardGameScene : public Scene, public SceneGame {
     void on_window_resized(const WindowResizedEvent& event);
 
     virtual void setup_and_add_model_pieces() override;
-    virtual void initialize_pieces() override;
     virtual void setup_entities() override;
-    virtual void save_game() override;
-    virtual void load_game() override;
-    virtual void undo() override;
-    virtual void redo() override;
+    virtual void initialize_pieces() override;
     virtual void imgui_draw_debug() override;
 
     ImGuiLayer<StandardGameScene, StandardBoardSerialized> imgui_layer;

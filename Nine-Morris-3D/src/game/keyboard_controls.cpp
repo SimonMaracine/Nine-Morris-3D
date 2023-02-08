@@ -1,4 +1,5 @@
 #include <engine/engine_other.h>
+#include <engine/engine_scene.h>
 
 #include "game/keyboard_controls.h"
 #include "game/entities/board.h"
@@ -13,7 +14,7 @@ static constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Right, KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down }
 };
 
-KeyboardControls::KeyboardControls(Application* app, Board* board, Quad* quad)
+KeyboardControls::KeyboardControls(Application* app, Board* board, object::Quad* quad)
     : board(board), quad(quad) {
 
     for (size_t i = 0; i < 24; i++) {

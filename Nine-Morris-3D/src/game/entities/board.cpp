@@ -413,7 +413,8 @@ void Board::piece_arrive_at_node(Index piece_index) {
 
     // Remove piece forever, if set to remove
     if (piece.pending_remove) {
-        app->renderer->remove_model(piece.model);
+        scene->scene_list.remove(piece.model);
+        // app->renderer->remove_model(piece.model);
         pieces.erase(piece.index);
     }
 

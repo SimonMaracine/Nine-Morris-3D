@@ -5,13 +5,13 @@
 #include "engine/application/application_data.h"
 #include "engine/application/events.h"
 #include "engine/application/window.h"
-#include "engine/application/scene.h"
 #include "engine/application/application_builder.h"
 #include "engine/audio/context.h"
 #include "engine/graphics/opengl/framebuffer.h"
 #include "engine/graphics/renderer/renderer.h"
 #include "engine/graphics/renderer/gui_renderer.h"
 #include "engine/other/resource_manager.h"
+#include "engine/scene/scene.h"
 
 class Application final {
 private:

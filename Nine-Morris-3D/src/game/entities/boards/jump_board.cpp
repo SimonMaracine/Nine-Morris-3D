@@ -259,7 +259,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
             piece.model->scale = WORLD_SCALE;
             piece.model->material = app->res.material_instance[hs("piece" + std::to_string(ser_index))];
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
-            piece.model->bounding_box = std::make_optional<BoundingBox>();
+            piece.model->bounding_box = std::make_optional<object::Model::BoundingBox>();
             piece.model->bounding_box->id = data.piece_ids[ser_index];
             piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
             piece.model->cast_shadow = true;

@@ -10,7 +10,6 @@
 #include "engine/graphics/opengl/texture.h"
 #include "engine/graphics/opengl/framebuffer.h"
 #include "engine/graphics/framebuffer_reader.h"
-#include "engine/graphics/actors.h"
 #include "engine/graphics/font.h"
 #include "engine/graphics/camera.h"
 #include "engine/graphics/material.h"
@@ -19,6 +18,8 @@
 #include "engine/graphics/post_processing.h"
 #include "engine/other/camera_controller.h"
 #include "engine/other/encrypt.h"
+#include "engine/scene/objects.h"
+#include "engine/scene/scene_list.h"
 
 class Application;
 
@@ -34,15 +35,15 @@ public:
     Renderer(Renderer&&) = delete;
     Renderer& operator=(Renderer&&) = delete;
 
-    void render();
+    void render(const SceneList& scene);
 
-    void add_model(Model* model);
-    void remove_model(Model* model);
+    // void add_model(Model* model);
+    // void remove_model(Model* model);
 
-    void add_quad(Quad* quad);
-    void remove_quad(Quad* quad);
+    // void add_quad(Quad* quad);
+    // void remove_quad(Quad* quad);
 
-    void clear();
+    // void clear();
 
     void add_post_processing(std::unique_ptr<PostProcessingStep>&& post_processing_step);
 
@@ -79,16 +80,16 @@ private:
 
     void draw_origin();
     void draw_skybox();
-    void draw_model(const Model* model);
-    void draw_model_with_outline(const Model* model);
-    void draw_models();
-    void draw_models_with_outline();
-    void draw_models_to_depth_buffer();
-    void draw_quad(const Quad* quad);
-    void draw_quads();
+    void draw_model(const object::Model* model);
+    void draw_model_with_outline(const object::Model* model);
+    void draw_models(const SceneList& scene);
+    void draw_models_with_outline(const SceneList& scene);
+    void draw_models_to_depth_buffer(const SceneList& scene);
+    void draw_quad(const object::Quad* quad);
+    void draw_quads(const SceneList& scene);
 
-    void add_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids_transforms);
-    void draw_bounding_boxes();
+    void add_bounding_box(const object::Model* model, std::vector<IdMatrix>& buffer_ids_transforms);
+    void draw_bounding_boxes(const SceneList& scene);
     void setup_shadows();
     void setup_uniform_buffers();
     void validate_hovered_id(int x, int y);
@@ -155,8 +156,8 @@ private:
         glm::vec3 position = glm::vec3(0.0f);
     } camera_cache;
 
-    std::vector<Model*> models;
-    std::vector<Quad*> quads;
+    // std::vector<Model*> models;
+    // std::vector<Quad*> quads;
 
     identifier::Id hovered_id = identifier::null;
     FramebufferReader<4> framebuffer_reader;

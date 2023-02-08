@@ -1,12 +1,12 @@
 #pragma once
 
-#include <engine/engine_graphics.h>
+#include <engine/engine_scene.h>
 
 #include "other/constants.h"
 
 struct Node {
     Node() = default;
-    Node(Index index, Model* model)
+    Node(Index index, object::Model* model)
         : index(index), model(model) {}
     ~Node() = default;
 
@@ -17,7 +17,7 @@ struct Node {
 
     Index index = NULL_INDEX;  // From 0 through 23
 
-    Model* model = nullptr;
+    object::Model* model = nullptr;
 
     Index piece_index = NULL_INDEX;  // Reference to the piece that sits on this node
 };

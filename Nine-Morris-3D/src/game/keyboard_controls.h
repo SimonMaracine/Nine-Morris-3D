@@ -1,7 +1,7 @@
 #pragma once
 
 #include <engine/engine_application.h>
-#include <engine/engine_graphics.h>
+#include <engine/engine_scene.h>
 
 #include "game/entities/board.h"
 
@@ -10,7 +10,7 @@ class Application;
 class KeyboardControls {
 public:
     KeyboardControls() = default;
-    KeyboardControls(Application* app, Board* board, Quad* quad);
+    KeyboardControls(Application* app, Board* board, object::Quad* quad);
     ~KeyboardControls() = default;
 
     KeyboardControls(const KeyboardControls&) = delete;
@@ -52,7 +52,7 @@ private:
 
     Board* board = nullptr;
 
-    Quad* quad = nullptr;
+    object::Quad* quad = nullptr;
     KNode nodes[24];
     KNode* current_node = nullptr;
 };

@@ -7,7 +7,7 @@
 #include "game/scenes/imgui_layer.h"
 #include "game/scenes/scene_game.h"
 
-struct JumpPlusVariantScene : public Scene, public SceneGame {
+struct JumpPlusVariantScene : public Scene, public SceneGame<JumpPlusVariantScene, JumpBoardSerialized> {
     JumpPlusVariantScene()
         : Scene("jump_plus_variant") {}
 
@@ -27,10 +27,6 @@ struct JumpPlusVariantScene : public Scene, public SceneGame {
     virtual void setup_and_add_model_pieces() override;
     virtual void initialize_pieces() override;
     virtual void setup_entities() override;
-    virtual void save_game() override;
-    virtual void load_game() override;
-    virtual void undo() override;
-    virtual void redo() override;
     virtual void imgui_draw_debug() override;
 
     ImGuiLayer<JumpPlusVariantScene, JumpBoardSerialized> imgui_layer;
