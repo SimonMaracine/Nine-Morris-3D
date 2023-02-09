@@ -11,7 +11,10 @@ public:
         : board(board) {}
     ~MinimaxThread();
 
-    MinimaxThread& operator=(MinimaxThread&& other);
+    MinimaxThread(const MinimaxThread& other) = delete;
+    MinimaxThread& operator=(const MinimaxThread& other) = delete;
+    MinimaxThread(MinimaxThread&& other) = delete;
+    MinimaxThread& operator=(MinimaxThread&& other) noexcept;
 
     struct Result {
         size_t place_node_index = 0;

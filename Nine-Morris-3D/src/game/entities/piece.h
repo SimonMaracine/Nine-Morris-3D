@@ -14,8 +14,8 @@ struct Piece {
 
     Piece(const Piece&) = delete;
     Piece& operator=(const Piece&) = default;
-    Piece(Piece&&) = default;
-    Piece& operator=(Piece&&) = default;
+    Piece(Piece&&) noexcept = default;
+    Piece& operator=(Piece&&) noexcept = default;
 
     Index index = NULL_INDEX;  // From 0 through 17 on standard game
 

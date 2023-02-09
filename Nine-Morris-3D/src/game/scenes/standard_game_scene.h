@@ -38,8 +38,6 @@ struct StandardGameScene : public SceneGame {
     virtual size_t get_undo_size() override;
     virtual size_t get_redo_size() override;
 
-    // ImGuiLayer<StandardGameScene, StandardBoardSerialized> imgui_layer;
-
     StandardBoard board;
     UndoRedoState<StandardBoardSerialized> undo_redo_state;
 };

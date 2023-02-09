@@ -25,11 +25,11 @@ public:
 
     void update_data(const float* data, size_t size);
 
-    unsigned int get_bitmap_size() { return static_cast<unsigned int>(bitmap_size); }
+    unsigned int get_bitmap_size() const { return static_cast<unsigned int>(bitmap_size); }
 
-    gl::VertexArray* get_vertex_array() { return vertex_array.get(); }
-    gl::Texture* get_bitmap() { return bitmap_image.get(); }
-    int get_vertex_count() { return vertex_count; }
+    gl::VertexArray* get_vertex_array() const { return vertex_array.get(); }
+    gl::Texture* get_bitmap() const { return bitmap_image.get(); }
+    int get_vertex_count() const { return vertex_count; }
 
     // Baking API
     void begin_baking();
@@ -40,14 +40,14 @@ public:
     void bake_ascii();
 
     // Call render to get the buffer of data used in the end by OpenGL
-    void render(std::string_view string, std::vector<float>& buffer);
+    void render(std::string_view string, std::vector<float>& buffer) const;
 
     // Get width and height of a line of text
-    std::pair<int, int> get_string_size(std::string_view string, float scale);
+    std::pair<int, int> get_string_size(std::string_view string, float scale) const;
 private:
     void initialize();
     void try_bake_character(int codepoint, int descent);
-    const Glyph& get_character_glyph(char32_t character);
+    const Glyph& get_character_glyph(char32_t character) const;
     void write_bitmap_to_file();
 
     struct BakeContext {
@@ -56,12 +56,12 @@ private:
         unsigned char* bitmap = nullptr;
     } bake_context;
 
-    std::unordered_map<char32_t, Glyph> glyphs;
+    mutable std::unordered_map<char32_t, Glyph> glyphs;
 
     stbtt_fontinfo info;
     const char* font_info_buffer = nullptr;
     int bitmap_size = 0;
-    int padding = 0;  // Between glyphs
+    int padding = 0;  // Between glyphs 
     unsigned char on_edge_value = 0;
     int pixel_dist_scale = 0;
     float sf = 0.0f;  // Scale factor

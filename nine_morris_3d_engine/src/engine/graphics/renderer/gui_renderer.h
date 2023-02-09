@@ -28,11 +28,6 @@ public:
 
     void render(const SceneList& scene);
 
-    // void add_widget(gui::Widget* widget);
-    // void remove_widget(gui::Widget* widget);
-
-    // void clear();
-
     void quad_center(float& width, float& height, float& x_pos, float& y_pos);
 
     const Storage& get_storage() { return storage; }
@@ -88,8 +83,6 @@ private:
             size_t quad_count = 0;
         } quads;
     } storage;
-
-    // std::vector<gui::Widget*> widgets;
 
     const char* QUAD2D_VERTEX_SHADER = ENCR("engine_data/shaders/quad2d.vert");
     const char* QUAD2D_FRAGMENT_SHADER = ENCR("engine_data/shaders/quad2d.frag");

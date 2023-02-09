@@ -37,14 +37,6 @@ public:
 
     void render(const SceneList& scene);
 
-    // void add_model(Model* model);
-    // void remove_model(Model* model);
-
-    // void add_quad(Quad* quad);
-    // void remove_quad(Quad* quad);
-
-    // void clear();
-
     void add_post_processing(std::unique_ptr<PostProcessingStep>&& post_processing_step);
 
     void set_scene_framebuffer(int samples);
@@ -57,7 +49,7 @@ public:
     const Storage& get_storage() { return storage; }
 
     bool origin = false;  // This does nothing in release mode
-    DirectionalLight light;
+    DirectionalLight directional_light;
 
     struct LightSpace {
         float left = 0.0f;
@@ -155,9 +147,6 @@ private:
         glm::mat4 projection_view_matrix = glm::mat4(1.0f);
         glm::vec3 position = glm::vec3(0.0f);
     } camera_cache;
-
-    // std::vector<Model*> models;
-    // std::vector<Quad*> quads;
 
     identifier::Id hovered_id = identifier::null;
     FramebufferReader<4> framebuffer_reader;

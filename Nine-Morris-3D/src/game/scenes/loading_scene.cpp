@@ -38,8 +38,6 @@ void LoadingScene::on_start() {
 
     auto background = objects.add<gui::Image>("background"_H, app->res.texture["splash_screen"_H]);
     scene_list.add(background);
-    // auto background = scene.image.load("background"_H, app->res.texture["splash_screen"_H]);
-    // app->gui_renderer->add_widget(background.get());
 
     loading_animation.previous_seconds = app->window->get_time();
 }
@@ -53,10 +51,6 @@ void LoadingScene::on_stop() {
     }
 
     loader.reset();
-
-    // app->gui_renderer->clear();  // FIXME this is replaced
-    // scene.images.clear();  // FIXME (fixed) should be automatic management
-    // scene.texts.clear();
 }
 
 void LoadingScene::on_update() {
@@ -66,8 +60,6 @@ void LoadingScene::on_update() {
     auto background = objects.get<gui::Image>("background"_H);
     background->set_position(glm::vec2(x_pos, y_pos));
     background->set_size(glm::vec2(width, height));
-    // scene.images["background"_H]->set_position(glm::vec2(x_pos, y_pos));
-    // scene.images["background"_H]->set_size(glm::vec2(width, height));
 
     update_loading_animation();
 
@@ -85,13 +77,6 @@ void LoadingScene::setup_widgets() {
         1.5f,
         glm::vec3(0.81f)
     );
-    // auto loading_text = scene.texts.load(
-    //     "loading_text"_H,
-    //     app->res.font["good_dog_plain"_H],
-    //     "Loading",
-    //     1.5f,
-    //     glm::vec3(0.81f)
-    // );
     loading_text->stick(gui::Sticky::SE);
     loading_text->offset(20, gui::Relative::Right);
     loading_text->offset(20, gui::Relative::Bottom);
@@ -102,7 +87,6 @@ void LoadingScene::setup_widgets() {
     loading_text->set_shadows(true);
 
     scene_list.add(loading_text);
-    // app->gui_renderer->add_widget(loading_text.get());
 }
 
 void LoadingScene::load_splash_screen_texture() {
@@ -129,7 +113,6 @@ void LoadingScene::update_loading_animation() {
         text.append(loading_animation.dots, '.');
 
         objects.get<gui::Text>("loading_text"_H)->set_text(text);
-        // scene.text["loading_text"_H]->set_text(text);
 
         loading_animation.dots++;
         loading_animation.dots %= 4;
@@ -818,8 +801,6 @@ void LoadingScene::initialize_keyboard_controls() {
 }
 
 void LoadingScene::initialize_light_bulb() {
-    // auto light_bulb = scene->scene.quad.load("light_bulb"_H);  // FIXME (solved) this
-
     gl::TextureSpecification specification;
 
     app->res.texture.load(
@@ -827,27 +808,25 @@ void LoadingScene::initialize_light_bulb() {
         "data/textures/light_bulb/light_bulb.png",
         specification
     );
-
-    // light_bulb->texture = light_bulb_texture;
 }
 
 void LoadingScene::initialize_light() {
     auto& data = app->user_data<Data>();
 
     if (data.options.skybox == game_options::FIELD) {
-        app->renderer->light = LIGHT_FIELD;
+        app->renderer->directional_light = LIGHT_FIELD;
         app->renderer->light_space = SHADOWS_FIELD;
     } else if (data.options.skybox == game_options::AUTUMN) {
-        app->renderer->light = LIGHT_AUTUMN;
+        app->renderer->directional_light = LIGHT_AUTUMN;
         app->renderer->light_space = SHADOWS_AUTUMN;
     } else if (data.options.skybox == game_options::NONE) {
-        app->renderer->light = LIGHT_NONE;
+        app->renderer->directional_light = LIGHT_NONE;
         app->renderer->light_space = SHADOWS_NONE;
     } else {
         ASSERT(false, "Invalid skybox");
     }
 
-    DEB_DEBUG("Initialized light");
+    DEB_DEBUG("Initialized directional_light");
 }
 
 void LoadingScene::initialize_game() {

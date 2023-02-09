@@ -69,7 +69,6 @@ void JumpPlusVariantScene::on_start() {
 #ifdef NM3D_PLATFORM_DEBUG
     app->renderer->origin = true;
     scene_list.add(objects.get<renderables::Quad>("light_bulb"_H));
-    // app->renderer->add_quad(scene.quad["light_bulb"_H].get());
 #endif
 
     update_menubar();
@@ -105,8 +104,6 @@ void JumpPlusVariantScene::on_stop() {
 
     imgui_reset();
     camera_controller.remove_events(app);
-    // app->renderer->clear();  // FIXME this is replaced
-    // app->gui_renderer->clear();
 
     // Should dispose of these
     release_piece_material_instances();
@@ -121,7 +118,6 @@ void JumpPlusVariantScene::on_stop() {
 
 void JumpPlusVariantScene::on_awake() {
     imgui_initialize();
-    // imgui_layer = ImGuiLayer<JumpPlusVariantScene, JumpBoardSerialized> {app, this};
     save_game_file_name = save_load::save_game_file_name(get_name());
 
     skybox_loader = std::make_unique<assets_load::SkyboxLoader>(
@@ -199,7 +195,6 @@ void JumpPlusVariantScene::on_mouse_button_released(const MouseButtonReleasedEve
 
         if (show_keyboard_controls) {
             scene_list.remove(objects.get<renderables::Quad>("keyboard_controls"_H));
-            // app->renderer->remove_quad(scene.quad["keyboard_controls"_H].get());
             show_keyboard_controls = false;
         }
     }
@@ -218,7 +213,6 @@ void JumpPlusVariantScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::Enter:
             if (!show_keyboard_controls) {
                 scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
-                // app->renderer->add_quad(scene.quad["keyboard_controls"_H].get());
                 show_keyboard_controls = true;
                 return;
             }
@@ -339,8 +333,6 @@ void JumpPlusVariantScene::setup_entities() {
     board = JumpBoard {};
     board.model = objects.add<renderables::Model>("board"_H);
     board.paint_model = objects.add<renderables::Model>("board_paint"_H);
-    // board.model = scene.model.load("board"_H).get();
-    // board.paint_model = scene.model.load("board_paint"_H).get();
 
     board.phase = BoardPhase::MovePieces;
 
@@ -349,7 +341,6 @@ void JumpPlusVariantScene::setup_entities() {
             static_cast<Index>(i),
             PieceType::White,
             objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
-            // scene.model.load(hs("piece" + std::to_string(i))).get(),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
         piece.in_use = true;
@@ -362,7 +353,6 @@ void JumpPlusVariantScene::setup_entities() {
             static_cast<Index>(i),
             PieceType::Black,
             objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
-            // scene.model.load(hs("piece" + std::to_string(i))).get(),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
         piece.in_use = true;
@@ -374,7 +364,6 @@ void JumpPlusVariantScene::setup_entities() {
         board.nodes[i] = Node {
             static_cast<Index>(i),
             objects.get<renderables::Model>(hs("node" + std::to_string(i)))
-            // scene.model.load(hs("node" + std::to_string(i))).get()
         };
     }
 

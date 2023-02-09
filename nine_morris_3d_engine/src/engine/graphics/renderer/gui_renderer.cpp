@@ -55,26 +55,6 @@ GuiRenderer::~GuiRenderer() {
 }
 
 void GuiRenderer::render(const SceneList& scene) {
-    // static std::vector<gui::Widget*> images;
-    // static std::vector<gui::Widget*> texts;
-
-    // images.clear();
-    // texts.clear();
-
-    // std::for_each(widgets.begin(), widgets.end(), [&](gui::Widget* widget) {
-    //     switch (widget->type) {
-    //         case gui::WidgetType::Image:
-    //             images.push_back(widget);
-    //             break;
-    //         case gui::WidgetType::Text:
-    //             texts.push_back(widget);
-    //             break;
-    //         case gui::WidgetType::None:
-    //             ASSERT(false, "Widget type must not be None");
-    //             break;
-    //     }
-    // });
-
     static std::vector<gui::Widget*> images;
     static std::vector<gui::Widget*> texts;
 
@@ -96,31 +76,6 @@ void GuiRenderer::render(const SceneList& scene) {
 
     render_helpers::enable_depth_test();
 }
-
-// void GuiRenderer::add_widget(gui::Widget* widget) {
-//     const auto iter = std::find(widgets.cbegin(), widgets.cend(), widget);
-
-//     if (iter != widgets.cend()) {
-//         DEB_WARNING("Widget already present");
-//         return;
-//     }
-
-//     widgets.push_back(widget);
-// }
-
-// void GuiRenderer::remove_widget(gui::Widget* widget) {
-//     const auto iter = std::find(widgets.cbegin(), widgets.cend(), widget);
-
-//     if (iter == widgets.cend()) {
-//         return;
-//     }
-
-//     widgets.erase(iter);
-// }
-
-// void GuiRenderer::clear() {
-//     widgets.clear();
-// }
 
 void GuiRenderer::quad_center(float& width, float& height, float& x_pos, float& y_pos) {
     if (static_cast<float>(app->data().width) / app->data().height > 16.0f / 9.0f) {

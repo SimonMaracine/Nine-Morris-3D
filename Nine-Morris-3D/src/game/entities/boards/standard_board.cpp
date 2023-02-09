@@ -854,7 +854,6 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
                 ser_index,
                 ser_piece.type,
                 scene->objects.get<renderables::Model>(hs("piece" + std::to_string(ser_index))),
-                // scene->scene.model[hs("piece" + std::to_string(ser_index))].get(),
                 app->res.al_source[hs("piece" + std::to_string(ser_index))]
             };
 
@@ -884,7 +883,6 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             piece.pending_remove = ser_piece.pending_remove;
 
             scene->scene_list.add(piece.model);
-            // app->renderer->add_model(piece.model);
             pieces[ser_index] = piece;
         }
     }
@@ -894,7 +892,6 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
     for (auto& [index, piece] : pieces) {
         if (serialized.pieces.find(index) == serialized.pieces.end()) {
             scene->scene_list.remove(piece.model);
-            // app->renderer->remove_model(piece.model);
             to_remove.push_back(index);
         }
     }

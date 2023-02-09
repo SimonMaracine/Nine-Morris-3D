@@ -135,53 +135,6 @@ void Renderer::render(const SceneList& scene) {
     validate_hovered_id(mouse_x, mouse_y);
 }
 
-// void Renderer::add_model(Model* model) {
-//     const auto iter = std::find(models.cbegin(), models.cend(), model);
-
-//     if (iter != models.cend()) {
-//         DEB_WARNING("Model already present in list");
-//         return;
-//     }
-
-//     models.push_back(model);
-// }
-
-// void Renderer::remove_model(Model* model) {
-//     const auto iter = std::find(models.cbegin(), models.cend(), model);
-
-//     if (iter == models.cend()) {
-//         return;
-//     }
-
-//     models.erase(iter);
-// }
-
-// void Renderer::add_quad(Quad* quad) {
-//     const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
-
-//     if (iter != quads.cend()) {
-//         DEB_WARNING("Quad already present in list");
-//         return;
-//     }
-
-//     quads.push_back(quad);
-// }
-
-// void Renderer::remove_quad(Quad* quad) {
-//     const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
-
-//     if (iter == quads.cend()) {
-//         return;
-//     }
-
-//     quads.erase(iter);
-// }
-
-// void Renderer::clear() {
-//     models.clear();
-//     quads.clear();
-// }
-
 void Renderer::add_post_processing(std::unique_ptr<PostProcessingStep>&& post_processing_step) {
     post_processing_step->prepare(post_processing_context);
     post_processing_context.steps.push_back(std::move(post_processing_step));
@@ -551,7 +504,7 @@ void Renderer::setup_shadows() {
         light_space.lens_far
     );
     const glm::mat4 view = glm::lookAt(
-        light.position / light_space.position_divisor,
+        directional_light.position / light_space.position_divisor,
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)
     );
@@ -572,15 +525,15 @@ void Renderer::setup_uniform_buffers() {
     storage.projection_view_uniform_buffer->upload_sub_data();
 
     if (storage.light_uniform_buffer->is_configured()) {
-        storage.light_uniform_buffer->set(&light.ambient_color, 0);
-        storage.light_uniform_buffer->set(&light.diffuse_color, 1);
-        storage.light_uniform_buffer->set(&light.specular_color, 2);
+        storage.light_uniform_buffer->set(&directional_light.ambient_color, 0);
+        storage.light_uniform_buffer->set(&directional_light.diffuse_color, 1);
+        storage.light_uniform_buffer->set(&directional_light.specular_color, 2);
         storage.light_uniform_buffer->bind();
         storage.light_uniform_buffer->upload_sub_data();
     }
 
     if (storage.light_view_uniform_buffer->is_configured()) {
-        storage.light_view_uniform_buffer->set(&light.position, 0);
+        storage.light_view_uniform_buffer->set(&directional_light.position, 0);
         storage.light_view_uniform_buffer->set(&camera_cache.position, 1);
         storage.light_view_uniform_buffer->bind();
         storage.light_view_uniform_buffer->upload_sub_data();

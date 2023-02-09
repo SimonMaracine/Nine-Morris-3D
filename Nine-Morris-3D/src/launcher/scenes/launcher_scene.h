@@ -23,7 +23,6 @@ struct LauncherScene : public Scene {
     void graphics_page();
 
     ImGuiWindowFlags window_flags = 0;
-    // std::shared_ptr<gui::Image> background;
 
     DisplayManager display_manager;
 };

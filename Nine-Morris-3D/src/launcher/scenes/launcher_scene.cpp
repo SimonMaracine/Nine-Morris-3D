@@ -300,8 +300,6 @@ void LauncherScene::on_start() {
 
     auto background = objects.add<gui::Image>("background"_H, app->res.texture["splash_screen"_H]);
     scene_list.add(background);
-    // background = std::make_shared<gui::Image>(app->res.texture["splash_screen"_H]);
-    // app->gui_renderer->add_widget(background.get());
 
     // Load launcher options from file
     options_gracefully::load_from_file<launcher_options::LauncherOptions>(

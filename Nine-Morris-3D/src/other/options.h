@@ -13,9 +13,9 @@ namespace options {
 
     class OptionsFileNotOpenError : public OptionsFileError {
     public:
-        OptionsFileNotOpenError(const std::string& message)
+        explicit OptionsFileNotOpenError(const std::string& message)
             : OptionsFileError(message) {}
-        OptionsFileNotOpenError(const char* message)
+        explicit OptionsFileNotOpenError(const char* message)
             : OptionsFileError(message) {}
     };
 

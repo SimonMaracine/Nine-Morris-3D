@@ -18,8 +18,8 @@ struct Board {
 
     Board(const Board&) = delete;
     Board& operator=(const Board&) = delete;
-    Board(Board&&) = default;
-    Board& operator=(Board&&) = default;
+    Board(Board&&) noexcept = default;
+    Board& operator=(Board&&) noexcept = default;
 
     struct Flags;
 

@@ -38,8 +38,6 @@ struct JumpVariantScene : public SceneGame {
     virtual size_t get_undo_size() override;
     virtual size_t get_redo_size() override;
 
-    // ImGuiLayer<JumpVariantScene, JumpBoardSerialized> imgui_layer;
-
     JumpBoard board;
     UndoRedoState<JumpBoardSerialized> undo_redo_state;
 };

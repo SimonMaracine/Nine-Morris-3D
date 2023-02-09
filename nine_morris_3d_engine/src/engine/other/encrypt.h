@@ -18,8 +18,8 @@ namespace encrypt {
 
         EncryptedFile(const EncryptedFile&) = default;
         EncryptedFile& operator=(const EncryptedFile&) = default;
-        EncryptedFile(EncryptedFile&&) = default;
-        EncryptedFile& operator=(EncryptedFile&&) = default;
+        EncryptedFile(EncryptedFile&&) noexcept = default;
+        EncryptedFile& operator=(EncryptedFile&&) noexcept = default;
 
         constexpr operator std::string_view() const { return file_path; }
     private:

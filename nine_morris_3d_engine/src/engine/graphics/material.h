@@ -12,7 +12,12 @@ private:
     using HashFunction = resmanager::Hash<Key>;
 public:
     enum class Uniform {
-        Mat4, Int, Float, Vec2, Vec3, Vec4
+        Mat4,
+        Int,
+        Float,
+        Vec2,
+        Vec3,
+        Vec4
     };
 
     enum {

@@ -15,8 +15,8 @@ struct StandardBoard : public Board {
 
     StandardBoard(const StandardBoard&) = delete;
     StandardBoard& operator=(const StandardBoard&) = delete;
-    StandardBoard(StandardBoard&&) = default;
-    StandardBoard& operator=(StandardBoard&&) = default;
+    StandardBoard(StandardBoard&&) noexcept = default;
+    StandardBoard& operator=(StandardBoard&&) noexcept = default;
 
     virtual void click(identifier::Id hovered_id) override;
     virtual Board::Flags release(identifier::Id hovered_id) override;

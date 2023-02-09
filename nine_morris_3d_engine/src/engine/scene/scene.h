@@ -8,7 +8,7 @@
 class Application;
 
 /**
- * Class representing an entire scene in the game.
+ * Class representing an entire scene of a game.
  */
 class Scene {
 private:

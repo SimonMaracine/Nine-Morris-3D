@@ -29,7 +29,6 @@ void SceneGame::setup_and_add_model_board() {
     board.model->bounding_box->sort = false;
 
     scene_list.add(get_board().model);
-    // app->renderer->add_model(get_board().model);
 
     DEB_DEBUG("Setup model board");
 }
@@ -44,7 +43,6 @@ void SceneGame::setup_and_add_model_board_paint() {
     board.paint_model->material = app->res.material_instance["board_paint"_H];
 
     scene_list.add(get_board().paint_model);
-    // app->renderer->add_model(get_board().paint_model);
 
     DEB_DEBUG("Setup model board paint");
 }
@@ -69,7 +67,6 @@ void SceneGame::setup_and_add_model_piece(Index index, const glm::vec3& position
     piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
 
     scene_list.add(piece.model);
-    // app->renderer->add_model(piece.model);
 
     piece.source->set_position(position);
     piece.source->set_reference_distance(6.0f);
@@ -98,7 +95,6 @@ void SceneGame::setup_and_add_model_node(Index index, const glm::vec3& position)
     node.model->bounding_box->size = NODE_BOUNDING_BOX;
 
     scene_list.add(node.model);
-    // app->renderer->add_model(node.model);
 
     DEB_DEBUG("Setup model node {}", index);
 }
@@ -157,9 +153,6 @@ void SceneGame::setup_and_add_turn_indicator() {
     auto turn_indicator = objects.add<gui::Image>(
         "turn_indicator"_H, app->res.texture["white_indicator"_H]
     );
-    // auto turn_indicator = scene.image.load(
-    //     "turn_indicator"_H, app->res.texture["white_indicator"_H]
-    // );
 
     turn_indicator->stick(gui::Sticky::SE);
     turn_indicator->offset(30, gui::Relative::Right);
@@ -167,7 +160,6 @@ void SceneGame::setup_and_add_turn_indicator() {
     turn_indicator->scale(0.4f, 1.0f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
 
     scene_list.add(turn_indicator);
-    // app->gui_renderer->add_widget(turn_indicator.get());
 }
 
 void SceneGame::setup_and_add_timer_text() {
@@ -180,13 +172,6 @@ void SceneGame::setup_and_add_timer_text() {
         1.5f,
         glm::vec3(0.9f)
     );
-    // auto timer_text = scene.text.load(
-    //     "timer_text"_H,
-    //     app->res.font["open_sans"_H],
-    //     "00:00",
-    //     1.5f,
-    //     glm::vec3(0.9f)
-    // );
 
     timer_text->stick(gui::Sticky::N);
     timer_text->offset(60, gui::Relative::Top);
@@ -195,7 +180,6 @@ void SceneGame::setup_and_add_timer_text() {
 
     if (!data.options.hide_timer) {
         scene_list.add(timer_text);
-        // app->gui_renderer->add_widget(timer_text.get());
     }
 }
 
@@ -203,9 +187,6 @@ void SceneGame::setup_wait_indicator() {
     auto wait_indicator = objects.add<gui::Image>(
         "wait_indicator"_H, app->res.texture["wait_indicator"_H]
     );
-    // auto wait_indicator = scene.image.load(
-    //     "wait_indicator"_H, app->res.texture["wait_indicator"_H]
-    // );
 
     wait_indicator->stick(gui::Sticky::NE);
     wait_indicator->offset(25, gui::Relative::Right);
@@ -217,9 +198,6 @@ void SceneGame::setup_computer_thinking_indicator() {
     auto computer_thinking_indicator = objects.add<gui::Image>(
         "computer_thinking_indicator"_H, app->res.texture["computer_thinking_indicator"_H]
     );
-    // auto computer_thinking_indicator = scene.image.load(
-    //     "computer_thinking_indicator"_H, app->res.texture["computer_thinking_indicator"_H]
-    // );
 
     computer_thinking_indicator->stick(gui::Sticky::NE);
     computer_thinking_indicator->offset(25, gui::Relative::Right);
@@ -229,7 +207,6 @@ void SceneGame::setup_computer_thinking_indicator() {
 
 void SceneGame::setup_light_bulb() {
     auto light_bulb = objects.add<renderables::Quad>("light_bulb"_H);
-    // auto light_bulb = scene.quad.load("light_bulb"_H);
 
     light_bulb->texture = app->res.texture["light_bulb"_H];
 
@@ -293,13 +270,13 @@ void SceneGame::change_skybox() {
     app->renderer->set_skybox(texture);
 
     if (data.options.skybox == game_options::FIELD) {  // FIXME this is not dry
-        app->renderer->light = LIGHT_FIELD;
+        app->renderer->directional_light = LIGHT_FIELD;
         app->renderer->light_space = SHADOWS_FIELD;
     } else if (data.options.skybox == game_options::AUTUMN) {
-        app->renderer->light = LIGHT_AUTUMN;
+        app->renderer->directional_light = LIGHT_AUTUMN;
         app->renderer->light_space = SHADOWS_AUTUMN;
     } else if (data.options.skybox == game_options::NONE) {
-        app->renderer->light = LIGHT_NONE;
+        app->renderer->directional_light = LIGHT_NONE;
         app->renderer->light_space = SHADOWS_NONE;
     } else {
         ASSERT(false, "Invalid skybox");
@@ -347,12 +324,10 @@ void SceneGame::update_cursor() {
             app->window->set_cursor(data.cross_cursor);
 
             objects.get<renderables::Quad>("keyboard_controls"_H)->texture = app->res.texture["keyboard_controls_cross"_H];
-            // scene.quad["keyboard_controls"_H]->texture = app->res.texture["keyboard_controls_cross"_H];
         } else {
             app->window->set_cursor(data.arrow_cursor);
 
             objects.get<renderables::Quad>("keyboard_controls"_H)->texture = app->res.texture["keyboard_controls_default"_H];
-            // scene.quad["keyboard_controls"_H]->texture = app->res.texture["keyboard_controls_default"_H];
         }
     }
 }
@@ -360,10 +335,8 @@ void SceneGame::update_cursor() {
 void SceneGame::update_turn_indicator() {
     if (get_board().turn == BoardPlayer::White) {
         objects.get<gui::Image>("turn_indicator"_H)->set_image(app->res.texture["white_indicator"_H]);
-        // scene.image["turn_indicator"_H]->set_image(app->res.texture["white_indicator"_H]);
     } else {
         objects.get<gui::Image>("turn_indicator"_H)->set_image(app->res.texture["black_indicator"_H]);
-        // scene.image["turn_indicator"_H]->set_image(app->res.texture["black_indicator"_H]);
     }
 }
 
@@ -371,13 +344,11 @@ void SceneGame::update_wait_indicator() {
     if (!get_board().next_move) {
         if (!show_wait_indicator) {
             scene_list.add(objects.get<gui::Image>("wait_indicator"_H));
-            // app->gui_renderer->add_widget(scene.image["wait_indicator"_H].get());
             show_wait_indicator = true;
         }
     } else {
         if (show_wait_indicator) {
             scene_list.remove(objects.get<gui::Image>("wait_indicator"_H));
-            // app->gui_renderer->remove_widget(scene.image["wait_indicator"_H].get());
             show_wait_indicator = false;
         }
     }
@@ -387,13 +358,11 @@ void SceneGame::update_computer_thinking_indicator() {
     if (game.state == GameState::ComputerThinkingMove) {
         if (!show_computer_thinking_indicator) {
             scene_list.add(objects.get<gui::Image>("computer_thinking_indicator"_H));
-            // app->gui_renderer->add_widget(scene.image["computer_thinking_indicator"_H].get());
             show_computer_thinking_indicator = true;
         }
     } else {
         if (show_computer_thinking_indicator) {
             scene_list.remove(objects.get<gui::Image>("computer_thinking_indicator"_H));
-            // app->gui_renderer->remove_widget(scene.image["computer_thinking_indicator"_H].get());
             show_computer_thinking_indicator = false;
         }
     }
@@ -403,7 +372,6 @@ void SceneGame::update_timer_text() {
     char time[32];
     timer.get_time_formatted(time);
     objects.get<gui::Text>("timer_text"_H)->set_text(time);
-    // scene.text["timer_text"_H]->set_text(time);
 }
 
 void SceneGame::update_after_human_move(bool did_action, bool switched_turn, bool must_take_or_took_piece) {
@@ -911,12 +879,10 @@ void SceneGame::imgui_draw_menu_bar() {
 
                     if (data.options.hide_timer) {
                         scene_list.remove(objects.get<gui::Text>("timer_text"_H));
-                        // app->gui_renderer->remove_widget(scene.text["timer_text"_H].get());
 
                         DEB_INFO("Hide timer");
                     } else {
                         scene_list.add(objects.get<gui::Text>("timer_text"_H));
-                        // app->gui_renderer->add_widget(scene.text["timer_text"_H].get());
 
                         DEB_INFO("Show timer");
                     }
@@ -1163,13 +1129,12 @@ void SceneGame::imgui_draw_debug() {
     ImGui::End();
 
     ImGui::Begin("Light Settings");
-    if (ImGui::SliderFloat3("Position", glm::value_ptr(app->renderer->light.position), -30.0f, 30.0f)) {
-        objects.get<renderables::Quad>("light_bulb"_H)->position = app->renderer->light.position;
-        // scene.quad["light_bulb"_H]->position = app->renderer->light.position;
+    if (ImGui::SliderFloat3("Position", glm::value_ptr(app->renderer->directional_light.position), -30.0f, 30.0f)) {
+        objects.get<renderables::Quad>("light_bulb"_H)->position = app->renderer->directional_light.position;
     }
-    ImGui::SliderFloat3("Ambient color", glm::value_ptr(app->renderer->light.ambient_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse color", glm::value_ptr(app->renderer->light.diffuse_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Specular color", glm::value_ptr(app->renderer->light.specular_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Ambient color", glm::value_ptr(app->renderer->directional_light.ambient_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse color", glm::value_ptr(app->renderer->directional_light.diffuse_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Specular color", glm::value_ptr(app->renderer->directional_light.specular_color), 0.0f, 1.0f);
     ImGui::End();
 
     // If you recompile shaders, uniforms that are set only once need to be reuploaded

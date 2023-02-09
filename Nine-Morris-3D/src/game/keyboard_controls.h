@@ -16,7 +16,7 @@ public:
     KeyboardControls(const KeyboardControls&) = delete;
     KeyboardControls& operator=(const KeyboardControls&) = delete;
     KeyboardControls(KeyboardControls&&) = default;
-    KeyboardControls& operator=(KeyboardControls&&) = default;
+    KeyboardControls& operator=(KeyboardControls&&) noexcept = default;
 
     enum class Direction {
         Up = 0,
