@@ -7,9 +7,10 @@
 #include "engine/graphics/opengl/texture.h"
 #include "engine/graphics/material.h"
 #include "engine/graphics/identifier.h"
+#include "engine/scene/object.h"  // TODO not great
 
-namespace object {
-    struct Model {
+namespace renderables {
+    struct Model : public Object {
         struct BoundingBox {
             identifier::Id id;
             glm::vec3 size = glm::vec3(0.0f);
@@ -29,7 +30,7 @@ namespace object {
         bool cast_shadow = false;
     };
 
-    struct Quad {
+    struct Quad : public Object {
         glm::vec3 position = glm::vec3(0.0f);
         float scale = 1.0f;
 

@@ -54,8 +54,8 @@ struct Board {
     void prepare_piece_for_three_step_move(Index piece_index, const glm::vec3& target, const glm::vec3& velocity,
         const glm::vec3& target0, const glm::vec3& target1);
 
-    object::Model* model = nullptr;
-    object::Model* paint_model = nullptr;
+    renderables::Model* model = nullptr;
+    renderables::Model* paint_model = nullptr;
 
     std::array<Node, MAX_NODES> nodes;  // 24 ordered nodes
     std::unordered_map<Index, Piece> pieces;  // Any number of pieces

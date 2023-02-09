@@ -1,9 +1,9 @@
 #include "engine/graphics/gui.h"
 #include "engine/other/logging.h"
 #include "engine/scene/scene_list.h"
-#include "engine/scene/objects.h"
+#include "engine/scene/renderables.h"
 
-void SceneList::add(object::Model* model) {
+void SceneList::add(renderables::Model* model) {
     const auto iter = std::find(models.cbegin(), models.cend(), model);
 
     if (iter != models.cend()) {
@@ -14,7 +14,7 @@ void SceneList::add(object::Model* model) {
     models.push_back(model);
 }
 
-void SceneList::remove(object::Model* model) {
+void SceneList::remove(renderables::Model* model) {
     const auto iter = std::find(models.cbegin(), models.cend(), model);
 
     if (iter == models.cend()) {
@@ -24,7 +24,7 @@ void SceneList::remove(object::Model* model) {
     models.erase(iter);
 }
 
-void SceneList::add(object::Quad* quad) {
+void SceneList::add(renderables::Quad* quad) {
     const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
 
     if (iter != quads.cend()) {
@@ -35,7 +35,7 @@ void SceneList::add(object::Quad* quad) {
     quads.push_back(quad);
 }
 
-void SceneList::remove(object::Quad* quad) {
+void SceneList::remove(renderables::Quad* quad) {
     const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
 
     if (iter == quads.cend()) {

@@ -4,10 +4,11 @@
 
 #include "game/entities/boards/jump_board.h"
 #include "game/entities/serialization/jump_board_serialized.h"
+#include "game/entities/board.h"
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
 #include "game/scenes/jump_variant_scene.h"
-#include "game/scenes/imgui_layer.h"
+#include "game/scenes/common.h"
 #include "game/game_options.h"
 #include "game/save_load.h"
 #include "game/assets.h"
@@ -21,9 +22,7 @@ using namespace encrypt;
 void JumpVariantScene::on_start() {
     auto& data = app->user_data<Data>();
 
-    objects.add<object::Quad>("keyboard_controls"_H);  // TODO clean up
-    // auto keyboard_controls = scene.quad.load("keyboard_controls"_H);
-
+    initialize_renderables();
     initialize_pieces();
     setup_entities();
 
@@ -43,7 +42,7 @@ void JumpVariantScene::on_start() {
 
     update_turn_indicator();
 
-    keyboard = KeyboardControls {app, &board, objects.get<object::Quad>("keyboard_controls"_H)};
+    keyboard = KeyboardControls {app, &board, objects.get<renderables::Quad>("keyboard_controls"_H)};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<JumpBoardSerialized> {};
@@ -69,11 +68,11 @@ void JumpVariantScene::on_start() {
 
 #ifdef NM3D_PLATFORM_DEBUG
     app->renderer->origin = true;
-    scene_list.add(objects.get<object::Quad>("light_bulb"_H));
+    scene_list.add(objects.get<renderables::Quad>("light_bulb"_H));
     // app->renderer->add_quad(scene.quad["light_bulb"_H].get());
 #endif
 
-    imgui_layer.update();
+    update_menubar();
 
     camera_controller.go_towards_position(default_camera_position);
     camera_controller.setup_events(app);
@@ -104,7 +103,7 @@ void JumpVariantScene::on_stop() {
     app->renderer->origin = false;
 #endif
 
-    imgui_layer.reset();
+    imgui_reset();
     camera_controller.remove_events(app);
     // app->renderer->clear();  // FIXME this is replaced
     // app->gui_renderer->clear();
@@ -121,7 +120,8 @@ void JumpVariantScene::on_stop() {
 }
 
 void JumpVariantScene::on_awake() {
-    imgui_layer = ImGuiLayer<JumpVariantScene, JumpBoardSerialized> {};
+    imgui_initialize();
+    // imgui_layer = ImGuiLayer<JumpVariantScene, JumpBoardSerialized> {};
     save_game_file_name = save_load::save_game_file_name(get_name());
 
     skybox_loader = std::make_unique<assets_load::SkyboxLoader>(
@@ -137,7 +137,7 @@ void JumpVariantScene::on_awake() {
 }
 
 void JumpVariantScene::on_update() {
-    if (!imgui_layer.hovering_gui) {
+    if (!hovering_gui) {
         camera_controller.update_controls(app->get_delta());
         board.update_nodes(app->renderer->get_hovered_id());
         board.update_pieces(app->renderer->get_hovered_id());
@@ -170,7 +170,7 @@ void JumpVariantScene::on_imgui_update() {
 }
 
 void JumpVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -182,7 +182,7 @@ void JumpVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& ev
 }
 
 void JumpVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -198,7 +198,7 @@ void JumpVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& 
         }
 
         if (show_keyboard_controls) {
-            scene_list.remove(objects.get<object::Quad>("keyboard_controls"_H));
+            scene_list.remove(objects.get<renderables::Quad>("keyboard_controls"_H));
             // app->renderer->remove_quad(scene.quad["keyboard_controls"_H].get());
             show_keyboard_controls = false;
         }
@@ -206,7 +206,7 @@ void JumpVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& 
 }
 
 void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -217,7 +217,7 @@ void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::Right:
         case input::Key::Enter:
             if (!show_keyboard_controls) {
-                scene_list.add(objects.get<object::Quad>("keyboard_controls"_H));
+                scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
                 // app->renderer->add_quad(scene.quad["keyboard_controls"_H].get());
                 show_keyboard_controls = true;
                 return;
@@ -276,7 +276,7 @@ void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
 }
 
 void JumpVariantScene::on_key_released(const KeyReleasedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -331,8 +331,8 @@ void JumpVariantScene::initialize_pieces() {
 
 void JumpVariantScene::setup_entities() {
     board = JumpBoard {};
-    board.model = objects.add<object::Model>("board"_H);
-    board.paint_model = objects.add<object::Model>("board_paint"_H);
+    board.model = objects.add<renderables::Model>("board"_H);
+    board.paint_model = objects.add<renderables::Model>("board_paint"_H);
     // board.model = scene.model.load("board"_H).get();
     // board.paint_model = scene.model.load("board_paint"_H).get();
 
@@ -342,7 +342,7 @@ void JumpVariantScene::setup_entities() {
         Piece piece = Piece {
             static_cast<Index>(i),
             PieceType::White,
-            objects.get<object::Model>(hs("piece" + std::to_string(i))),
+            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
             // scene.model.load(hs("piece" + std::to_string(i))).get(),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
@@ -355,7 +355,7 @@ void JumpVariantScene::setup_entities() {
         Piece piece = Piece {
             static_cast<Index>(i),
             PieceType::Black,
-            objects.get<object::Model>(hs("piece" + std::to_string(i))),
+            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
             // scene.model.load(hs("piece" + std::to_string(i))).get(),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
@@ -367,7 +367,7 @@ void JumpVariantScene::setup_entities() {
     for (size_t i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
             static_cast<Index>(i),
-            objects.get<object::Model>(hs("node" + std::to_string(i)))
+            objects.get<renderables::Model>(hs("node" + std::to_string(i)))
             // scene.model.load(hs("node" + std::to_string(i))).get()
         };
     }
@@ -378,6 +378,57 @@ void JumpVariantScene::setup_entities() {
     DEB_DEBUG("Setup entities");
 }
 
-void JumpVariantScene::imgui_draw_debug() {
+void JumpVariantScene::initialize_renderables() {
+    objects.add<renderables::Model>("board"_H);
+    objects.add<renderables::Model>("board_paint"_H);
+
+    for (size_t i = 0; i < 3; i++) {
+        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+    }
+
+    for (size_t i = 3; i < 6; i++) {
+        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+    }
+
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        objects.add<renderables::Model>(hs("node" + std::to_string(i)));
+    }
+
+    objects.add<renderables::Quad>("keyboard_controls"_H);
+}
+
+void JumpVariantScene::draw_debug_imgui() {
     ImGui::Text("Turns without mills: %u", board.turns_without_mills);
+}
+
+void JumpVariantScene::update_menubar() {
+    generic_update_menubar<JumpVariantScene, JumpBoardSerialized>(this);
+}
+
+void JumpVariantScene::save_game() {
+    generic_save_game<JumpVariantScene, JumpBoardSerialized>(this);
+}
+
+void JumpVariantScene::load_game() {
+    generic_load_game<JumpVariantScene, JumpBoardSerialized>(this);
+}
+
+void JumpVariantScene::undo() {
+    generic_undo<JumpVariantScene, JumpBoardSerialized>(this);
+}
+
+void JumpVariantScene::redo() {
+    generic_redo<JumpVariantScene, JumpBoardSerialized>(this);
+}
+
+Board& JumpVariantScene::get_board() {
+    return board;
+}
+
+size_t JumpVariantScene::get_undo_size() {
+    return undo_redo_state.undo.size();
+}
+
+size_t JumpVariantScene::get_redo_size() {
+    return undo_redo_state.redo.size();
 }

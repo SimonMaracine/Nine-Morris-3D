@@ -16,10 +16,11 @@ struct UndoRedoState {
 
     UndoRedoState() = default;
     ~UndoRedoState() = default;
+
     UndoRedoState(const UndoRedoState&) = delete;
     UndoRedoState& operator=(const UndoRedoState&) = default;
     UndoRedoState(UndoRedoState&&) = delete;
-    UndoRedoState& operator=(UndoRedoState&& other);
+    UndoRedoState& operator=(UndoRedoState&& other) noexcept;
 
     std::vector<State> undo;
     std::vector<State> redo;
@@ -31,7 +32,7 @@ struct UndoRedoState {
 };
 
 template<typename B>
-UndoRedoState<B>& UndoRedoState<B>::operator=(UndoRedoState<B>&& other) {
+UndoRedoState<B>& UndoRedoState<B>::operator=(UndoRedoState<B>&& other) noexcept {
     undo = std::move(other.undo);
     redo = std::move(other.redo);
 

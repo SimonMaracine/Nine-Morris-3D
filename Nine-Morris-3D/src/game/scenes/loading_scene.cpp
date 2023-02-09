@@ -847,16 +847,6 @@ void LoadingScene::initialize_light() {
         ASSERT(false, "Invalid skybox");
     }
 
-// #ifdef NM3D_PLATFORM_DEBUG  // FIXME this should be updated
-//     if (data.options.skybox == game_options::FIELD) {
-//         scene->scene.quad["light_bulb"_H]->position = LIGHT_FIELD.position;
-//     } else if (data.options.skybox == game_options::AUTUMN) {
-//         scene->scene.quad["light_bulb"_H]->position = LIGHT_AUTUMN.position;
-//     } else if (data.options.skybox == game_options::NONE) {
-//         scene->scene.quad["light_bulb"_H]->position = LIGHT_NONE.position;
-//     }
-// #endif
-
     DEB_DEBUG("Initialized light");
 }
 

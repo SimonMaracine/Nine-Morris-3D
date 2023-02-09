@@ -10,7 +10,7 @@ class Application;
 class KeyboardControls {
 public:
     KeyboardControls() = default;
-    KeyboardControls(Application* app, Board* board, object::Quad* quad);
+    KeyboardControls(Application* app, Board* board, renderables::Quad* quad);
     ~KeyboardControls() = default;
 
     KeyboardControls(const KeyboardControls&) = delete;
@@ -52,7 +52,7 @@ private:
 
     Board* board = nullptr;
 
-    object::Quad* quad = nullptr;
+    renderables::Quad* quad = nullptr;
     KNode nodes[24];
     KNode* current_node = nullptr;
 };

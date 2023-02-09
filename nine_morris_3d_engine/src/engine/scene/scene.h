@@ -35,7 +35,7 @@ public:
 
     SceneList scene_list;  // List of all objects to be rendered
     ObjectManager objects;  // Storage for all the renderable objects
-protected:
+
     Application* app = nullptr;
 private:
     inline void _on_stop() {  // Used to clean up objects

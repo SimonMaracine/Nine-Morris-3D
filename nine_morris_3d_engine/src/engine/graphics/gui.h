@@ -4,6 +4,7 @@
 
 #include "engine/graphics/opengl/texture.h"
 #include "engine/graphics/font.h"
+#include "engine/scene/object.h"  // TODO not great
 
 class Application;
 class GuiRenderer;
@@ -28,7 +29,7 @@ namespace gui {
         Bottom
     };
 
-    class Widget {
+    class Widget : public Object {
     public:
         Widget() = default;
         virtual ~Widget() = default;

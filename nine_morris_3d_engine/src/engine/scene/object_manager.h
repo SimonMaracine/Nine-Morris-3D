@@ -2,6 +2,8 @@
 
 #include <resmanager/resmanager.h>
 
+#include "engine/scene/object.h"
+
 class ObjectManager {
 private:
     using Id = resmanager::HashedStr64;
@@ -26,7 +28,7 @@ public:
 private:
     void destroy();
 
-    std::unordered_map<Id, void*, resmanager::Hash<Id>> objects;
+    std::unordered_map<Id, Object*, resmanager::Hash<Id>> objects;
 };
 
 template<typename T, typename... Args>

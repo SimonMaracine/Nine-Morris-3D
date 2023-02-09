@@ -18,7 +18,7 @@
 #include "engine/graphics/post_processing.h"
 #include "engine/other/camera_controller.h"
 #include "engine/other/encrypt.h"
-#include "engine/scene/objects.h"
+#include "engine/scene/renderables.h"
 #include "engine/scene/scene_list.h"
 
 class Application;
@@ -80,15 +80,15 @@ private:
 
     void draw_origin();
     void draw_skybox();
-    void draw_model(const object::Model* model);
-    void draw_model_with_outline(const object::Model* model);
+    void draw_model(const renderables::Model* model);
+    void draw_model_with_outline(const renderables::Model* model);
     void draw_models(const SceneList& scene);
     void draw_models_with_outline(const SceneList& scene);
     void draw_models_to_depth_buffer(const SceneList& scene);
-    void draw_quad(const object::Quad* quad);
+    void draw_quad(const renderables::Quad* quad);
     void draw_quads(const SceneList& scene);
 
-    void add_bounding_box(const object::Model* model, std::vector<IdMatrix>& buffer_ids_transforms);
+    void add_bounding_box(const renderables::Model* model, std::vector<IdMatrix>& buffer_ids_transforms);
     void draw_bounding_boxes(const SceneList& scene);
     void setup_shadows();
     void setup_uniform_buffers();

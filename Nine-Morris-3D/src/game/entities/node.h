@@ -6,7 +6,7 @@
 
 struct Node {
     Node() = default;
-    Node(Index index, object::Model* model)
+    Node(Index index, renderables::Model* model)
         : index(index), model(model) {}
     ~Node() = default;
 
@@ -17,7 +17,7 @@ struct Node {
 
     Index index = NULL_INDEX;  // From 0 through 23
 
-    object::Model* model = nullptr;
+    renderables::Model* model = nullptr;
 
     Index piece_index = NULL_INDEX;  // Reference to the piece that sits on this node
 };

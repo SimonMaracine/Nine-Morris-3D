@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/scene/objects.h"
+#include "engine/scene/renderables.h"
 #include "engine/graphics/gui.h"
 
 class SceneList {
@@ -13,11 +13,11 @@ public:
     SceneList(SceneList&&) = delete;
     SceneList& operator=(SceneList&&) = delete;
 
-    void add(object::Model* model);
-    void remove(object::Model* model);
+    void add(renderables::Model* model);
+    void remove(renderables::Model* model);
 
-    void add(object::Quad* quad);
-    void remove(object::Quad* quad);
+    void add(renderables::Quad* quad);
+    void remove(renderables::Quad* quad);
 
     void add(gui::Image* image);
     void remove(gui::Image* image);
@@ -27,8 +27,8 @@ public:
 
     void clear();
 private:
-    std::vector<object::Model*> models;
-    std::vector<object::Quad*> quads;
+    std::vector<renderables::Model*> models;
+    std::vector<renderables::Quad*> quads;
     std::vector<gui::Image*> images;
     std::vector<gui::Text*> texts;
 
