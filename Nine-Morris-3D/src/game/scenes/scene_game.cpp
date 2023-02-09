@@ -1033,7 +1033,7 @@ void SceneGame::imgui_draw_rules_standard_game() {
     imgui_draw_window("Standard Game Rules", []() {
         const char* rules = R"(Each player has nine pieces, either black or white.
 A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.
-When a player remains with three pieces, they can jump on the get_board().
+When a player remains with three pieces, they can jump on the board.
 A player may take a piece from a mill only if there are no other pieces available.
 The game ends with a tie when forty turns take place without any mill.
 The game ends with a tie when the exact same move happens for the third time.)";
@@ -1043,7 +1043,7 @@ The game ends with a tie when the exact same move happens for the third time.)";
 
 void SceneGame::imgui_draw_rules_jump_variant() {
     imgui_draw_window("Jump Variant Rules", []() {
-        const char* rules = R"(Each player has only three pieces and can jump anywhere on the get_board().
+        const char* rules = R"(Each player has only three pieces and can jump anywhere on the board.
 The first player to form a mill wins.
 The game ends with a tie when forty turns take place without any mill.
 The game ends with a tie when the exact same move happens for the third time.)";
