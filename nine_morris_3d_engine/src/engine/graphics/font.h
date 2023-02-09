@@ -27,8 +27,8 @@ public:
 
     unsigned int get_bitmap_size() { return static_cast<unsigned int>(bitmap_size); }
 
-    gl::VertexArray& get_vertex_array() { return *vertex_array; }
-    gl::Texture& get_bitmap() { return *bitmap_image; }
+    gl::VertexArray* get_vertex_array() { return vertex_array.get(); }
+    gl::Texture* get_bitmap() { return bitmap_image.get(); }
     int get_vertex_count() { return vertex_count; }
 
     // Baking API

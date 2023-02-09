@@ -14,7 +14,7 @@
 
 template<typename S, typename B>
 class SceneGame {
-protected:
+public:
     SceneGame() {
         App = static_cast<S*>(this)->App;
         scene = static_cast<S*>(this);
@@ -43,6 +43,7 @@ protected:
     void setup_and_add_timer_text();
     void setup_wait_indicator();
     void setup_computer_thinking_indicator();
+    void setup_light_bulb();
 
     void initialize_piece(Index index, std::shared_ptr<gl::Texture> diffuse_texture);
     void initialize_piece_no_normal(Index index, std::shared_ptr<gl::Texture> diffuse_texture);
@@ -104,7 +105,7 @@ void SceneGame<S, B>::setup_and_add_model_board() {
     board.model->index_buffer = App->res.index_buffer["board_wood"_H];
     board.model->material = App->res.material_instance["board_wood"_H];
     board.model->cast_shadow = true;
-    board.model->bounding_box = std::make_optional<BoundingBox>();
+    board.model->bounding_box = std::make_optional<object::Model::BoundingBox>();
     board.model->bounding_box->id = identifier::null;
     board.model->bounding_box->size = BOARD_BOUNDING_BOX;
     board.model->bounding_box->sort = false;
@@ -125,7 +126,7 @@ void SceneGame<S, B>::setup_and_add_model_board_paint() {
     board.paint_model->index_buffer = App->res.index_buffer["board_paint"_H];
     board.paint_model->material = App->res.material_instance["board_paint"_H];
 
-    scene->scene_list.add(board.paint_model)
+    scene->scene_list.add(board.paint_model);
     // App->renderer->add_model(board.paint_model);
 
     DEB_DEBUG("Setup model board paint");
@@ -147,7 +148,7 @@ void SceneGame<S, B>::setup_and_add_model_piece(Index index, const glm::vec3& po
     piece.model->material = App->res.material_instance[hs("piece" + std::to_string(index))];
     piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
     piece.model->cast_shadow = true;
-    piece.model->bounding_box = std::make_optional<BoundingBox>();
+    piece.model->bounding_box = std::make_optional<object::Model::BoundingBox>();
     piece.model->bounding_box->id = data.piece_ids[index];
     piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
 
@@ -178,7 +179,7 @@ void SceneGame<S, B>::setup_and_add_model_node(Index index, const glm::vec3& pos
     node.model->vertex_array = App->res.vertex_array["node"_H];
     node.model->index_buffer = App->res.index_buffer["node"_H];
     node.model->material = App->res.material_instance[hs("node" + std::to_string(index))];
-    node.model->bounding_box = std::make_optional<BoundingBox>();
+    node.model->bounding_box = std::make_optional<object::Model::BoundingBox>();
     node.model->bounding_box->id = data.node_ids[index];
     node.model->bounding_box->size = NODE_BOUNDING_BOX;
 
@@ -241,9 +242,12 @@ void SceneGame<S, B>::setup_camera() {
 
 template<typename S, typename B>
 void SceneGame<S, B>::setup_and_add_turn_indicator() {
-    auto turn_indicator = scene->scene.image.load(
+    auto turn_indicator = scene->objects.template add<gui::Image>(
         "turn_indicator"_H, App->res.texture["white_indicator"_H]
     );
+    // auto turn_indicator = scene->scene.image.load(
+    //     "turn_indicator"_H, App->res.texture["white_indicator"_H]
+    // );
 
     turn_indicator->stick(gui::Sticky::SE);
     turn_indicator->offset(30, gui::Relative::Right);
@@ -258,13 +262,20 @@ template<typename S, typename B>
 void SceneGame<S, B>::setup_and_add_timer_text() {
     auto& data = App->user_data<Data>();
 
-    auto timer_text = scene->scene.text.load(
+    auto timer_text = scene->objects.template add<gui::Text>(
         "timer_text"_H,
         App->res.font["open_sans"_H],
         "00:00",
         1.5f,
         glm::vec3(0.9f)
     );
+    // auto timer_text = scene->scene.text.load(
+    //     "timer_text"_H,
+    //     App->res.font["open_sans"_H],
+    //     "00:00",
+    //     1.5f,
+    //     glm::vec3(0.9f)
+    // );
 
     timer_text->stick(gui::Sticky::N);
     timer_text->offset(60, gui::Relative::Top);
@@ -279,9 +290,12 @@ void SceneGame<S, B>::setup_and_add_timer_text() {
 
 template<typename S, typename B>
 void SceneGame<S, B>::setup_wait_indicator() {
-    auto wait_indicator = scene->scene.image.load(
+    auto wait_indicator = scene->objects.template add<gui::Image>(
         "wait_indicator"_H, App->res.texture["wait_indicator"_H]
     );
+    // auto wait_indicator = scene->scene.image.load(
+    //     "wait_indicator"_H, App->res.texture["wait_indicator"_H]
+    // );
 
     wait_indicator->stick(gui::Sticky::NE);
     wait_indicator->offset(25, gui::Relative::Right);
@@ -291,9 +305,12 @@ void SceneGame<S, B>::setup_wait_indicator() {
 
 template<typename S, typename B>
 void SceneGame<S, B>::setup_computer_thinking_indicator() {
-    auto computer_thinking_indicator = scene->scene.image.load(
+    auto computer_thinking_indicator = scene->objects.template add<gui::Image>(
         "computer_thinking_indicator"_H, App->res.texture["computer_thinking_indicator"_H]
     );
+    // auto computer_thinking_indicator = scene->scene.image.load(
+    //     "computer_thinking_indicator"_H, App->res.texture["computer_thinking_indicator"_H]
+    // );
 
     computer_thinking_indicator->stick(gui::Sticky::NE);
     computer_thinking_indicator->offset(25, gui::Relative::Right);
@@ -302,24 +319,32 @@ void SceneGame<S, B>::setup_computer_thinking_indicator() {
 }
 
 template<typename S, typename B>
+void SceneGame<S, B>::setup_light_bulb() {
+    auto light_bulb = scene->objects.template add<object::Quad>("light_bulb"_H);
+    // auto light_bulb = scene->scene.quad.load("light_bulb"_H);
+
+    light_bulb->texture = App->res.texture["light_bulb"_H];
+}
+
+template<typename S, typename B>
 void SceneGame<S, B>::initialize_piece(Index index, std::shared_ptr<gl::Texture> diffuse_texture) {
-    auto material_instance = app->res.material_instance.load(
+    auto material_instance = App->res.material_instance.load(
         hs("piece" + std::to_string(index)),
-        app->res.material["tinted_wood"_H]
+        App->res.material["tinted_wood"_H]
     );
 
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess"_H, 4.0f);
-    material_instance->set_texture("u_material.normal"_H, app->res.texture["piece_normal"_H], 1);
+    material_instance->set_texture("u_material.normal"_H, App->res.texture["piece_normal"_H], 1);
     material_instance->set_vec3("u_material.tint"_H, DEFAULT_TINT);
 }
 
 template<typename S, typename B>
 void SceneGame<S, B>::initialize_piece_no_normal(Index index, std::shared_ptr<gl::Texture> diffuse_texture) {
-    auto material_instance = app->res.material_instance.load(
+    auto material_instance = App->res.material_instance.load(
         hs("piece" + std::to_string(index)),
-        app->res.material["tinted_wood"_H]
+        App->res.material["tinted_wood"_H]
     );
 
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
@@ -337,7 +362,9 @@ void SceneGame<S, B>::release_piece_material_instances() {
 
 template<typename S, typename B>
 void SceneGame<S, B>::change_skybox() {
-    const std::array<std::shared_ptr<TextureData>, 6> data = {
+    auto& data = App->user_data<Data>();
+
+    const std::array<std::shared_ptr<TextureData>, 6> texture_data = {
         App->res.texture_data["skybox_px"_H],
         App->res.texture_data["skybox_nx"_H],
         App->res.texture_data["skybox_py"_H],
@@ -346,10 +373,21 @@ void SceneGame<S, B>::change_skybox() {
         App->res.texture_data["skybox_nz"_H]
     };
 
-    auto texture = App->res.texture_3d.force_load("skybox"_H, data);
+    auto texture = App->res.texture_3d.force_load("skybox"_H, texture_data);
     App->renderer->set_skybox(texture);
 
-    initialize_light();
+    if (data.options.skybox == game_options::FIELD) {  // FIXME this is not dry
+        App->renderer->light = LIGHT_FIELD;
+        App->renderer->light_space = SHADOWS_FIELD;
+    } else if (data.options.skybox == game_options::AUTUMN) {
+        App->renderer->light = LIGHT_AUTUMN;
+        App->renderer->light_space = SHADOWS_AUTUMN;
+    } else if (data.options.skybox == game_options::NONE) {
+        App->renderer->light = LIGHT_NONE;
+        App->renderer->light_space = SHADOWS_NONE;
+    } else {
+        ASSERT(false, "Invalid skybox");
+    }
 
     App->res.texture_data.release("skybox"_H);
 }
@@ -395,12 +433,12 @@ void SceneGame<S, B>::update_cursor() {
         if (scene->board.must_take_piece) {
             App->window->set_cursor(data.cross_cursor);
 
-            scene->objects.get<object::Quad>("keyboard_controls"_H)->texture = App->res.texture["keyboard_controls_cross"_H];
+            scene->objects.template get<object::Quad>("keyboard_controls"_H)->texture = App->res.texture["keyboard_controls_cross"_H];
             // scene->scene.quad["keyboard_controls"_H]->texture = App->res.texture["keyboard_controls_cross"_H];
         } else {
             App->window->set_cursor(data.arrow_cursor);
 
-            scene->objects.get<object::Quad>("keyboard_controls"_H)->texture = App->res.texture["keyboard_controls_default"_H];
+            scene->objects.template get<object::Quad>("keyboard_controls"_H)->texture = App->res.texture["keyboard_controls_default"_H];
             // scene->scene.quad["keyboard_controls"_H]->texture = App->res.texture["keyboard_controls_default"_H];
         }
     }
@@ -409,10 +447,10 @@ void SceneGame<S, B>::update_cursor() {
 template<typename S, typename B>
 void SceneGame<S, B>::update_turn_indicator() {
     if (scene->board.turn == BoardPlayer::White) {
-        scene->objects.get<gui::Image>("turn_indicator"_H)->set_image(App->res.texture["white_indicator"_H]);
+        scene->objects.template get<gui::Image>("turn_indicator"_H)->set_image(App->res.texture["white_indicator"_H]);
         // scene->scene.image["turn_indicator"_H]->set_image(App->res.texture["white_indicator"_H]);
     } else {
-        scene->objects.get<gui::Image>("turn_indicator"_H)->set_image(App->res.texture["black_indicator"_H]);
+        scene->objects.template get<gui::Image>("turn_indicator"_H)->set_image(App->res.texture["black_indicator"_H]);
         // scene->scene.image["turn_indicator"_H]->set_image(App->res.texture["black_indicator"_H]);
     }
 }
@@ -421,14 +459,13 @@ template<typename S, typename B>
 void SceneGame<S, B>::update_wait_indicator() {
     if (!scene->board.next_move) {
         if (!scene->show_wait_indicator) {
-            scene->scene_list.add(scene->objects.get<gui::Image>("wait_indicator"_H));
-            App->gui_renderer->add_widget(scene->scene.image["wait_indicator"_H].get());
+            scene->scene_list.add(scene->objects.template get<gui::Image>("wait_indicator"_H));
             // App->gui_renderer->add_widget(scene->scene.image["wait_indicator"_H].get());
             scene->show_wait_indicator = true;
         }
     } else {
         if (scene->show_wait_indicator) {
-            scene->scene_list.remove(scene->objects.get<gui::Image>("wait_indicator"_H));
+            scene->scene_list.remove(scene->objects.template get<gui::Image>("wait_indicator"_H));
             // App->gui_renderer->remove_widget(scene->scene.image["wait_indicator"_H].get());
             scene->show_wait_indicator = false;
         }
@@ -439,13 +476,13 @@ template<typename S, typename B>
 void SceneGame<S, B>::update_computer_thinking_indicator() {
     if (scene->game.state == GameState::ComputerThinkingMove) {
         if (!scene->show_computer_thinking_indicator) {
-            scene->scene_list.add(scene->objects.get<gui::Image>("computer_thinking_indicator"_H));
+            scene->scene_list.add(scene->objects.template get<gui::Image>("computer_thinking_indicator"_H));
             // App->gui_renderer->add_widget(scene->scene.image["computer_thinking_indicator"_H].get());
             scene->show_computer_thinking_indicator = true;
         }
     } else {
         if (scene->show_computer_thinking_indicator) {
-            scene->scene_list.remove(scene->objects.get<gui::Image>("computer_thinking_indicator"_H));
+            scene->scene_list.remove(scene->objects.template get<gui::Image>("computer_thinking_indicator"_H));
             // App->gui_renderer->remove_widget(scene->scene.image["computer_thinking_indicator"_H].get());
             scene->show_computer_thinking_indicator = false;
         }
@@ -456,7 +493,8 @@ template<typename S, typename B>
 void SceneGame<S, B>::update_timer_text() {
     char time[32];
     scene->timer.get_time_formatted(time);
-    scene->scene.text["timer_text"_H]->set_text(time);
+    scene->objects.template get<gui::Text>("timer_text"_H)->set_text(time);
+    // scene->scene.text["timer_text"_H]->set_text(time);
 }
 
 template<typename S, typename B>

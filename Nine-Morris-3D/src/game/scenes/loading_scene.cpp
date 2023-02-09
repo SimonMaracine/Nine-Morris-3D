@@ -818,11 +818,11 @@ void LoadingScene::initialize_keyboard_controls() {
 }
 
 void LoadingScene::initialize_light_bulb() {
-    // auto light_bulb = scene->scene.quad.load("light_bulb"_H);  // FIXME this
+    // auto light_bulb = scene->scene.quad.load("light_bulb"_H);  // FIXME (solved) this
 
     gl::TextureSpecification specification;
 
-    auto light_bulb_texture = app->res.texture.load(
+    app->res.texture.load(
         "light_bulb"_H,
         "data/textures/light_bulb/light_bulb.png",
         specification
@@ -847,7 +847,7 @@ void LoadingScene::initialize_light() {
         ASSERT(false, "Invalid skybox");
     }
 
-// #ifdef NM3D_PLATFORM_DEBUG  // FIXME this
+// #ifdef NM3D_PLATFORM_DEBUG  // FIXME this should be updated
 //     if (data.options.skybox == game_options::FIELD) {
 //         scene->scene.quad["light_bulb"_H]->position = LIGHT_FIELD.position;
 //     } else if (data.options.skybox == game_options::AUTUMN) {

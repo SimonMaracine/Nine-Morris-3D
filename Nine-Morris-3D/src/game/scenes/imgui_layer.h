@@ -2,7 +2,9 @@
 
 #include <engine/engine_application.h>
 #include <engine/engine_audio.h>
+#include <engine/engine_graphics.h>
 #include <engine/engine_other.h>
+#include <engine/engine_scene.h>
 
 #include "game/entities/boards/standard_board.h"
 #include "game/entities/boards/jump_board.h"
@@ -367,7 +369,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     if (ImGui::RadioButton("None", &data.imgui_option.skybox, game_options::NONE)) {
                         if (data.imgui_option.skybox != data.options.skybox) {
                             data.options.skybox = data.imgui_option.skybox;
-                            set_skybox(app, scene, Skybox::None);
+                            scene->set_skybox(Skybox::None);
 
                             DEB_INFO("Skybox set to none");
                         }
@@ -375,7 +377,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     if (ImGui::RadioButton("Field", &data.imgui_option.skybox, game_options::FIELD)) {
                         if (data.imgui_option.skybox != data.options.skybox) {
                             data.options.skybox = data.imgui_option.skybox;
-                            set_skybox(app, scene, Skybox::Field);
+                            scene->set_skybox(Skybox::Field);
 
                             DEB_INFO("Skybox set to field");
                         }
@@ -383,7 +385,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     if (ImGui::RadioButton("Autumn", &data.imgui_option.skybox, game_options::AUTUMN)) {
                         if (data.imgui_option.skybox != data.options.skybox) {
                             data.options.skybox = data.imgui_option.skybox;
-                            set_skybox(app, scene, Skybox::Autumn);
+                            scene->set_skybox(Skybox::Autumn);
 
                             DEB_INFO("Skybox set to autumn");
                         }
@@ -417,11 +419,13 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
                     auto& data = app->user_data<Data>();
 
                     if (data.options.hide_timer) {
-                        app->gui_renderer->remove_widget(scene->scene.text["timer_text"_H].get());
+                        scene->scene_list.remove(scene->objects.template get<gui::Text>("timer_text"_H));
+                        // app->gui_renderer->remove_widget(scene->scene.text["timer_text"_H].get());
 
                         DEB_INFO("Hide timer");
                     } else {
-                        app->gui_renderer->add_widget(scene->scene.text["timer_text"_H].get());
+                        scene->scene_list.add(scene->objects.template get<gui::Text>("timer_text"_H));
+                        // app->gui_renderer->add_widget(scene->scene.text["timer_text"_H].get());
 
                         DEB_INFO("Show timer");
                     }
@@ -433,7 +437,7 @@ void ImGuiLayer<S, B>::draw_menu_bar() {
             if (ImGui::MenuItem("Labeled Board", nullptr, &data.imgui_option.labeled_board)) {
                 if (data.imgui_option.labeled_board != data.options.labeled_board) {
                     data.options.labeled_board = data.imgui_option.labeled_board;
-                    set_board_paint_texture(app, scene);
+                    scene->set_board_paint_texture();
 
                     if (data.imgui_option.labeled_board) {
                         DEB_INFO("Board paint texture set to labeled");
@@ -679,7 +683,8 @@ void ImGuiLayer<S, B>::draw_debug() {
 
     ImGui::Begin("Light Settings");
     if (ImGui::SliderFloat3("Position", glm::value_ptr(app->renderer->light.position), -30.0f, 30.0f)) {
-        scene->scene.quad["light_bulb"_H]->position = app->renderer->light.position;
+        scene->objects.template get<object::Quad>("light_bulb"_H)->position = app->renderer->light.position;
+        // scene->scene.quad["light_bulb"_H]->position = app->renderer->light.position;
     }
     ImGui::SliderFloat3("Ambient color", glm::value_ptr(app->renderer->light.ambient_color), 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse color", glm::value_ptr(app->renderer->light.diffuse_color), 0.0f, 1.0f);

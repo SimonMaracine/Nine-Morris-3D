@@ -298,8 +298,10 @@ void LauncherScene::on_start() {
 
     app->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN)), specification);
 
-    background = std::make_shared<gui::Image>(app->res.texture["splash_screen"_H]);
-    app->gui_renderer->add_widget(background.get());
+    auto background = objects.add<gui::Image>("background"_H, app->res.texture["splash_screen"_H]);
+    scene_list.add(background);
+    // background = std::make_shared<gui::Image>(app->res.texture["splash_screen"_H]);
+    // app->gui_renderer->add_widget(background.get());
 
     // Load launcher options from file
     options_gracefully::load_from_file<launcher_options::LauncherOptions>(
@@ -326,6 +328,7 @@ void LauncherScene::on_update() {
     float width, height, x_pos, y_pos;
     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
 
+    auto background = objects.get<gui::Image>("background"_H);
     background->set_position(glm::vec2(x_pos, y_pos));  // TODO it works, I have no idea why
     background->set_size(glm::vec2(width, height));
 }

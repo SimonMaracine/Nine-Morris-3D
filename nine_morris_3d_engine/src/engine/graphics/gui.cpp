@@ -108,9 +108,9 @@ namespace gui {
         app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width"_H, border_width);
         app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset"_H, glm::vec2(offset, offset));
 
-        font->get_vertex_array().bind();
+        font->get_vertex_array()->bind();
 
-        render_helpers::bind_texture_2d(font->get_bitmap().get_id(), 0);
+        render_helpers::bind_texture_2d(font->get_bitmap()->get_id(), 0);
 
         render_helpers::draw_arrays(font->get_vertex_count());
     }

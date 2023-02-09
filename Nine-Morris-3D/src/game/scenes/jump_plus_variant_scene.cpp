@@ -32,6 +32,9 @@ void JumpPlusVariantScene::on_start() {
     setup_and_add_model_nodes();
     setup_and_add_model_pieces();
 
+#ifdef NM3D_PLATFORM_DEBUG
+    setup_light_bulb();
+#endif
     setup_and_add_turn_indicator();
     setup_and_add_timer_text();
     setup_wait_indicator();

@@ -241,7 +241,8 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
             Piece piece = Piece {
                 ser_index,
                 ser_piece.type,
-                scene->scene.model[hs("piece" + std::to_string(ser_index))].get(),
+                scene->objects.get<object::Model>(hs("piece" + std::to_string(ser_index))),
+                // scene->scene.model[hs("piece" + std::to_string(ser_index))].get(),
                 app->res.al_source[hs("piece" + std::to_string(ser_index))]
             };
 
@@ -270,7 +271,8 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
             piece.to_take = ser_piece.to_take;
             piece.pending_remove = ser_piece.pending_remove;
 
-            app->renderer->add_model(piece.model);
+            scene->scene_list.add(piece.model);
+            // app->renderer->add_model(piece.model);
             pieces[ser_index] = piece;
         }
     }
@@ -279,7 +281,8 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
 
     for (auto& [index, piece] : pieces) {
         if (serialized.pieces.find(index) == serialized.pieces.end()) {
-            app->renderer->remove_model(piece.model);
+            scene->scene_list.remove(piece.model);
+            // app->renderer->remove_model(piece.model);
             to_remove.push_back(index);
         }
     }
