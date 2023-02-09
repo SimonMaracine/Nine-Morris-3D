@@ -5,10 +5,10 @@
 
 #include "game/entities/boards/standard_board.h"
 #include "game/entities/serialization/standard_board_serialized.h"
+#include "game/entities/board.h"
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
 #include "game/scenes/standard_game_scene.h"
-#include "game/scenes/imgui_layer.h"
 #include "game/scenes/common.h"
 #include "game/game_options.h"
 #include "game/save_load.h"
@@ -23,23 +23,27 @@ using namespace encrypt;
 void StandardGameScene::on_start() {
     auto& data = app->user_data<Data>();
 
+    initialize_renderables();
     initialize_pieces();
     setup_entities();
 
-    setup_and_add_model_board(app, this);
-    setup_and_add_model_board_paint(app, this);
-    setup_and_add_model_nodes(app, this);
+    setup_and_add_model_board();
+    setup_and_add_model_board_paint();
+    setup_and_add_model_nodes();
     setup_and_add_model_pieces();
 
-    setup_and_add_turn_indicator(app);
-    setup_and_add_timer_text(app);
-    setup_wait_indicator(app);
-    setup_computer_thinking_indicator(app);
-    setup_camera(app, this);
+#ifdef NM3D_PLATFORM_DEBUG
+    setup_light_bulb();
+#endif
+    setup_and_add_turn_indicator();
+    setup_and_add_timer_text();
+    setup_wait_indicator();
+    setup_computer_thinking_indicator();
+    setup_camera();
 
-    update_turn_indicator(app, this);
+    update_turn_indicator();
 
-    keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_H]};
+    keyboard = KeyboardControls {app, &board, objects.get<renderables::Quad>("keyboard_controls"_H)};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<StandardBoardSerialized> {};
@@ -56,6 +60,7 @@ void StandardGameScene::on_start() {
     timer = Timer {app};
 
     board.app = app;
+    board.scene = this;
     board.keyboard = &keyboard;
     board.camera_controller = &camera_controller;
     board.undo_redo_state = &undo_redo_state;
@@ -64,10 +69,10 @@ void StandardGameScene::on_start() {
 
 #ifdef NM3D_PLATFORM_DEBUG
     app->renderer->origin = true;
-    app->renderer->add_quad(app->res.quad["light_bulb"_H]);
+    scene_list.add(objects.get<renderables::Quad>("light_bulb"_H));
 #endif
 
-    imgui_layer.update();
+    update_menubar();
 
     camera_controller.go_towards_position(default_camera_position);
     camera_controller.setup_events(app);
@@ -98,13 +103,11 @@ void StandardGameScene::on_stop() {
     app->renderer->origin = false;
 #endif
 
-    imgui_layer.reset();
+    imgui_reset();
     camera_controller.remove_events(app);
-    app->renderer->clear();
-    app->gui_renderer->clear();
 
     // Should dispose of these
-    release_piece_material_instances(app);
+    release_piece_material_instances();
 
     made_first_move = false;
 
@@ -115,23 +118,23 @@ void StandardGameScene::on_stop() {
 }
 
 void StandardGameScene::on_awake() {
-    imgui_layer = ImGuiLayer<StandardGameScene, StandardBoardSerialized> {app, this};
+    imgui_initialize();
     save_game_file_name = save_load::save_game_file_name(get_name());
 
     skybox_loader = std::make_unique<assets_load::SkyboxLoader>(
         [this]() {
-            change_skybox(app);
+            change_skybox();
         }
     );
     board_paint_texture_loader = std::make_unique<assets_load::BoardPaintTextureLoader>(
         [this]() {
-            change_board_paint_texture(app);
+            change_board_paint_texture();
         }
     );
 }
 
 void StandardGameScene::on_update() {
-    if (!imgui_layer.hovering_gui) {
+    if (!hovering_gui) {
         camera_controller.update_controls(app->get_delta());
         board.update_nodes(app->renderer->get_hovered_id());
         board.update_pieces(app->renderer->get_hovered_id());
@@ -144,12 +147,12 @@ void StandardGameScene::on_update() {
     timer.update();
 
     // Update listener position, look at and up vectors every frame
-    update_listener(app, this);
+    update_listener();
 
-    update_game_state(app, this);
-    update_timer_text(app, this);
-    update_wait_indicator(app, this);
-    update_computer_thinking_indicator(app, this);
+    update_game_state();
+    update_timer_text();
+    update_wait_indicator();
+    update_computer_thinking_indicator();
 
     skybox_loader->update(app);
     board_paint_texture_loader->update(app);
@@ -160,11 +163,11 @@ void StandardGameScene::on_fixed_update() {
 }
 
 void StandardGameScene::on_imgui_update() {
-    update_all_imgui(app, this);
+    update_all_imgui();
 }
 
 void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -176,7 +179,7 @@ void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& e
 }
 
 void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -189,19 +192,19 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
             const auto flags = board.release(app->renderer->get_hovered_id());
 
             update_after_human_move(
-                app, this, flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
+                flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
             );
         }
 
         if (show_keyboard_controls) {
-            app->renderer->remove_quad(app->res.quad["keyboard_controls"_H]);
+            scene_list.remove(objects.get<renderables::Quad>("keyboard_controls"_H));
             show_keyboard_controls = false;
         }
     }
 }
 
 void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -212,7 +215,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::Right:
         case input::Key::Enter:
             if (!show_keyboard_controls) {
-                app->renderer->add_quad(app->res.quad["keyboard_controls"_H]);
+                scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
                 show_keyboard_controls = true;
                 return;
             }
@@ -261,7 +264,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
                 const auto flags = keyboard.click_and_release();
 
                 update_after_human_move(
-                    app, this, flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
+                    flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
                 );
             }
             break;
@@ -272,7 +275,7 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
 }
 
 void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -292,33 +295,27 @@ void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
 void StandardGameScene::setup_and_add_model_pieces() {
     for (size_t i = 0; i < 9; i++) {
         setup_and_add_model_piece(
-            app,
-            this,
-            i,
-            WHITE_PIECE_POSITION(i)
+            i, WHITE_PIECE_POSITION(i)
         );
     }
 
     for (size_t i = 9; i < 18; i++) {
         setup_and_add_model_piece(
-            app,
-            this,
-            i,
-            BLACK_PIECE_POSITION(i)
+            i, BLACK_PIECE_POSITION(i)
         );
     }
 }
 
 void StandardGameScene::setup_entities() {
     board = StandardBoard {};
-    board.model = app->res.model.load("board"_H);
-    board.paint_model = app->res.model.load("board_paint"_H);
+    board.model = objects.get<renderables::Model>("board"_H);
+    board.paint_model = objects.get<renderables::Model>("board_paint"_H);
 
     for (size_t i = 0; i < 9; i++) {
         board.pieces[i] = Piece {
             static_cast<Index>(i),
             PieceType::White,
-            app->res.model.load(hs("piece" + std::to_string(i))),
+            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
     }
@@ -327,7 +324,7 @@ void StandardGameScene::setup_entities() {
         board.pieces[i] = Piece {
             static_cast<Index>(i),
             PieceType::Black,
-            app->res.model.load(hs("piece" + std::to_string(i))),
+            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
     }
@@ -335,11 +332,30 @@ void StandardGameScene::setup_entities() {
     for (size_t i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
             static_cast<Index>(i),
-            app->res.model.load(hs("node" + std::to_string(i)))
+            objects.get<renderables::Model>(hs("node" + std::to_string(i)))
         };
     }
 
     DEB_DEBUG("Setup entities");
+}
+
+void StandardGameScene::initialize_renderables() {
+    board.model = objects.add<renderables::Model>("board"_H);
+    board.paint_model = objects.add<renderables::Model>("board_paint"_H);
+
+    for (size_t i = 0; i < 9; i++) {
+        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+    }
+
+    for (size_t i = 9; i < 18; i++) {
+        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+    }
+
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        objects.add<renderables::Model>(hs("node" + std::to_string(i)));
+    }
+
+    objects.add<renderables::Quad>("keyboard_controls"_H);
 }
 
 void StandardGameScene::initialize_pieces() {
@@ -347,42 +363,58 @@ void StandardGameScene::initialize_pieces() {
 
     if (data.launcher_options.normal_mapping) {
         for (size_t i = 0; i < 9; i++) {
-            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_H]);
+            initialize_piece(i, app->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 9; i < 18; i++) {
-            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_H]);
+            initialize_piece(i, app->res.texture["black_piece_diffuse"_H]);
         }
     } else {
         for (size_t i = 0; i < 9; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_H]);
+            initialize_piece_no_normal(i, app->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 9; i < 18; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_H]);
+            initialize_piece_no_normal(i, app->res.texture["black_piece_diffuse"_H]);
         }
     }
 }
 
-void StandardGameScene::save_game() {
-    save_game_generic<StandardGameScene, StandardBoardSerialized>(this);
-}
-
-void StandardGameScene::load_game() {
-    load_game_generic<StandardGameScene, StandardBoardSerialized>(app, this);
-}
-
-void StandardGameScene::undo() {
-    undo_generic<StandardGameScene, StandardBoardSerialized>(app, this);
-}
-
-void StandardGameScene::redo() {
-    redo_generic<StandardGameScene, StandardBoardSerialized>(app, this);
-}
-
-void StandardGameScene::imgui_draw_debug() {
+void StandardGameScene::draw_debug_imgui() {
     ImGui::Text("White and black pieces: %u, %u", board.white_pieces_count, board.black_pieces_count);
     ImGui::Text("Not placed pieces: %u, %u", board.not_placed_white_pieces_count, board.not_placed_black_pieces_count);
     ImGui::Text("Can jump: %s, %s", board.can_jump[0] ? "true" : "false", board.can_jump[1] ? "true" : "false");
     ImGui::Text("Turns without mills: %u", board.turns_without_mills);
+}
+
+void StandardGameScene::update_menubar() {
+    generic_update_menubar<StandardGameScene, StandardBoardSerialized>(this);
+}
+
+void StandardGameScene::save_game() {
+    generic_save_game<StandardGameScene, StandardBoardSerialized>(this);
+}
+
+void StandardGameScene::load_game() {
+    generic_load_game<StandardGameScene, StandardBoardSerialized>(this);
+}
+
+void StandardGameScene::undo() {
+    generic_undo<StandardGameScene, StandardBoardSerialized>(this);
+}
+
+void StandardGameScene::redo() {
+    generic_redo<StandardGameScene, StandardBoardSerialized>(this);
+}
+
+Board& StandardGameScene::get_board() {
+    return board;
+}
+
+size_t StandardGameScene::get_undo_size() {
+    return undo_redo_state.undo.size();
+}
+
+size_t StandardGameScene::get_redo_size() {
+    return undo_redo_state.redo.size();
 }

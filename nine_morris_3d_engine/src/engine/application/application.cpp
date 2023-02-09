@@ -3,7 +3,6 @@
 #include "engine/application/application.h"
 #include "engine/application/window.h"
 #include "engine/application/events.h"
-#include "engine/application/scene.h"
 #include "engine/application/input.h"
 #include "engine/application/application_builder.h"
 #include "engine/audio/context.h"
@@ -19,6 +18,7 @@
 #include "engine/other/file_system.h"
 #include "engine/other/random_gen.h"
 #include "engine/other/exit.h"
+#include "engine/scene/scene.h"
 
 std::any Application::dummy_user_data() {
     return std::make_any<DummyUserData>();
@@ -160,6 +160,7 @@ int Application::run(SceneId start_scene_id) {
     DEB_INFO("Closing application...");
 
     current_scene->on_stop();
+    current_scene->_on_stop();
 
     return exit_code;
 }
@@ -250,6 +251,7 @@ unsigned int Application::calculate_fixed_update() {
 void Application::check_changed_scene() {
     if (changed_scene) {
         current_scene->on_stop();
+        current_scene->_on_stop();
         current_scene = to_scene;
         on_start(current_scene);
 
@@ -258,11 +260,11 @@ void Application::check_changed_scene() {
 }
 
 void Application::renderer_3d_func() {
-    renderer->render();
+    renderer->render(current_scene->scene_list);
 }
 
 void Application::renderer_2d_func() {
-    gui_renderer->render();
+    gui_renderer->render(current_scene->scene_list);
 }
 
 void Application::renderer_imgui_func() {
@@ -305,11 +307,15 @@ void Application::on_window_resized(const WindowResizedEvent& event) {
     for (std::weak_ptr<gl::Framebuffer> framebuffer : framebuffers) {
         std::shared_ptr<gl::Framebuffer> fb = framebuffer.lock();
 
-        if (fb != nullptr) {
-            if (fb->get_specification().resizable) {
-                fb->resize(event.width, event.height);
-            }
+        if (fb == nullptr) {
+            return;
         }
+
+        if (!fb->get_specification().resizable) {
+            return;
+        }
+
+        fb->resize(event.width, event.height);
     }
 }
 

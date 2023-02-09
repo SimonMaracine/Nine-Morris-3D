@@ -6,20 +6,22 @@
 #include "engine/application/platform.h"
 #include "engine/application/events.h"
 #include "engine/application/input.h"
-#include "engine/graphics/renderer/renderer.h"
-#include "engine/graphics/renderer/render_helpers.h"
-#include "engine/graphics/framebuffer_reader.h"
-#include "engine/graphics/post_processing.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/texture.h"
 #include "engine/graphics/opengl/framebuffer.h"
+#include "engine/graphics/renderer/renderer.h"
+#include "engine/graphics/renderer/render_helpers.h"
+#include "engine/graphics/framebuffer_reader.h"
+#include "engine/graphics/post_processing.h"
 #include "engine/other/file_system.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
 #include "engine/other/camera_controller.h"
+#include "engine/scene/renderables.h"
+#include "engine/scene/scene_list.h"
 
 using namespace resmanager::literals;
 
@@ -56,7 +58,7 @@ Renderer::~Renderer() {
     DEB_INFO("Uninitialized renderer");
 }
 
-void Renderer::render() {
+void Renderer::render(const SceneList& scene) {
     cache_camera_data();
     setup_uniform_buffers();
     setup_shadows();
@@ -67,7 +69,7 @@ void Renderer::render() {
     render_helpers::viewport(storage.shadow_map_framebuffer->get_specification());
 
     // Render objects with shadows to depth buffer
-    draw_models_to_depth_buffer();
+    draw_models_to_depth_buffer(scene);
 
     storage.scene_framebuffer->bind();
 
@@ -81,10 +83,10 @@ void Renderer::render() {
     render_helpers::stencil_mask(0x00);
 
     // Render all normal models
-    draw_models();
+    draw_models(scene);
 
     // Render all models with outline
-    draw_models_with_outline();
+    draw_models_with_outline(scene);
 
 #ifdef NM3D_PLATFORM_DEBUG
     if (origin) {
@@ -98,7 +100,7 @@ void Renderer::render() {
     }
 
     // Render 3D quads
-    draw_quads();
+    draw_quads(scene);
 
     // Blit the resulted scene texture to an intermediate texture, resolving anti-aliasing
     storage.scene_framebuffer->blit(
@@ -111,7 +113,7 @@ void Renderer::render() {
     render_helpers::viewport(storage.bounding_box_framebuffer->get_specification());
 
     // Render bounding boxes for models that are pickable
-    draw_bounding_boxes();
+    draw_bounding_boxes(scene);
 
     // Read the texture for mouse picking
     const auto [mouse_x, mouse_y] = input::get_mouse();
@@ -131,53 +133,6 @@ void Renderer::render() {
     hovered_id = *data;
 
     validate_hovered_id(mouse_x, mouse_y);
-}
-
-void Renderer::add_model(std::shared_ptr<Model> model) {
-    const auto iter = std::find(models.cbegin(), models.cend(), model);
-
-    if (iter != models.cend()) {
-        DEB_WARNING("Model already present in list");
-        return;
-    }
-
-    models.push_back(model);
-}
-
-void Renderer::remove_model(std::shared_ptr<Model> model) {
-    const auto iter = std::find(models.cbegin(), models.cend(), model);
-
-    if (iter == models.cend()) {
-        return;
-    }
-
-    models.erase(iter);
-}
-
-void Renderer::add_quad(std::shared_ptr<Quad> quad) {
-    const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
-
-    if (iter != quads.cend()) {
-        DEB_WARNING("Quad already present in list");
-        return;
-    }
-
-    quads.push_back(quad);
-}
-
-void Renderer::remove_quad(std::shared_ptr<Quad> quad) {
-    const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
-
-    if (iter == quads.cend()) {
-        return;
-    }
-
-    quads.erase(iter);
-}
-
-void Renderer::clear() {
-    models.clear();
-    quads.clear();
 }
 
 void Renderer::add_post_processing(std::unique_ptr<PostProcessingStep>&& post_processing_step) {
@@ -315,7 +270,7 @@ void Renderer::draw_skybox() {
     gl::VertexArray::unbind();
 }
 
-void Renderer::draw_model(const Model* model) {
+void Renderer::draw_model(const renderables::Model* model) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, model->position);
     matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -331,7 +286,7 @@ void Renderer::draw_model(const Model* model) {
     render_helpers::draw_elements(model->index_buffer->get_index_count());
 }
 
-void Renderer::draw_model_with_outline(const Model* model) {
+void Renderer::draw_model_with_outline(const renderables::Model* model) {
     render_helpers::stencil_mask(0xFF);
 
     draw_model(model);
@@ -363,9 +318,9 @@ void Renderer::draw_model_with_outline(const Model* model) {
     render_helpers::stencil_mask(0xFF);
 }
 
-void Renderer::draw_models() {
-    for (size_t i = 0; i < models.size(); i++) {
-        const Model* model = models[i].get();
+void Renderer::draw_models(const SceneList& scene) {
+    for (size_t i = 0; i < scene.models.size(); i++) {
+        const renderables::Model* model = scene.models[i];
 
         if (model->outline_color.has_value()) {
             continue;  // This model is rendered differently
@@ -378,34 +333,34 @@ void Renderer::draw_models() {
     gl::VertexArray::unbind();
 }
 
-void Renderer::draw_models_with_outline() {
-    static std::vector<const Model*> outline_models;
+void Renderer::draw_models_with_outline(const SceneList& scene) {
+    static std::vector<const renderables::Model*> outline_models;
 
     outline_models.clear();
 
-    std::for_each(models.begin(), models.end(), [](const std::shared_ptr<Model>& model) {
+    std::for_each(scene.models.cbegin(), scene.models.cend(), [](const renderables::Model* model) {
         if (model->outline_color.has_value()) {
-            outline_models.push_back(model.get());
+            outline_models.push_back(model);
         }
     });
 
-    std::sort(outline_models.begin(), outline_models.end(), [this](const Model* lhs, const Model* rhs) {
+    std::sort(outline_models.begin(), outline_models.end(), [this](const renderables::Model* lhs, const renderables::Model* rhs) {
         const float distance1 = glm::distance(lhs->position, camera_cache.position);
         const float distance2 = glm::distance(rhs->position, camera_cache.position);
 
         return distance1 < distance2;
     });
 
-    for (const Model* model : outline_models) {
+    for (const renderables::Model* model : outline_models) {
         draw_model_with_outline(model);
     }
 }
 
-void Renderer::draw_models_to_depth_buffer() {
+void Renderer::draw_models_to_depth_buffer(const SceneList& scene) {
     storage.shadow_shader->bind();
 
-    for (size_t i = 0; i < models.size(); i++) {
-        const Model* model = models[i].get();
+    for (size_t i = 0; i < scene.models.size(); i++) {
+        const renderables::Model* model = scene.models[i];
 
         if (model->cast_shadow) {
             glm::mat4 matrix = glm::mat4(1.0f);
@@ -427,7 +382,7 @@ void Renderer::draw_models_to_depth_buffer() {
     gl::VertexArray::unbind();
 }
 
-void Renderer::draw_quad(const Quad* quad) {
+void Renderer::draw_quad(const renderables::Quad* quad) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, quad->position);
     matrix = glm::scale(matrix, glm::vec3(quad->scale));
@@ -439,21 +394,29 @@ void Renderer::draw_quad(const Quad* quad) {
     render_helpers::draw_arrays(6);
 }
 
-void Renderer::draw_quads() {
+void Renderer::draw_quads(const SceneList& scene) {
     storage.quad3d_vertex_array->bind();
 
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_mat4("u_view_matrix"_H, camera_cache.view_matrix);
 
-    std::sort(quads.begin(), quads.end(), [this](const std::shared_ptr<Quad>& lhs, const std::shared_ptr<Quad>& rhs) {
+    static std::vector<const renderables::Quad*> quads;
+
+    quads.clear();
+
+    std::for_each(scene.quads.cbegin(), scene.quads.cend(), [&](const renderables::Quad* quad) {
+        quads.push_back(quad);
+    });
+
+    std::sort(quads.begin(), quads.end(), [this](const renderables::Quad* lhs, const renderables::Quad* rhs) {
         const float distance1 = glm::distance(lhs->position, camera_cache.position);
         const float distance2 = glm::distance(rhs->position, camera_cache.position);
 
         return distance1 > distance2;
     });
 
-    for (size_t i = 0; i < quads.size(); i++) {
-        const Quad* quad = quads[i].get();
+    for (size_t i = 0; i < scene.quads.size(); i++) {
+        const renderables::Quad* quad = scene.quads[i];
 
         draw_quad(quad);
     }
@@ -461,7 +424,7 @@ void Renderer::draw_quads() {
     gl::VertexArray::unbind();
 }
 
-void Renderer::add_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids_transforms) {
+void Renderer::add_bounding_box(const renderables::Model* model, std::vector<IdMatrix>& buffer_ids_transforms) {
     glm::mat4 matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, model->position);
     matrix = glm::rotate(matrix, model->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -473,40 +436,40 @@ void Renderer::add_bounding_box(const Model* model, std::vector<IdMatrix>& buffe
     buffer_ids_transforms.push_back(element);
 }
 
-void Renderer::draw_bounding_boxes() {
+void Renderer::draw_bounding_boxes(const SceneList& scene) {
     storage.box_vertex_array->bind();
     storage.box_shader->bind();
 
-    static std::vector<const Model*> bounding_box_models;
-    static std::vector<const Model*> bounding_box_models_unsorted;
+    static std::vector<const renderables::Model*> bounding_box_models;
+    static std::vector<const renderables::Model*> bounding_box_models_unsorted;
     static std::vector<IdMatrix> buffer_ids_transforms;
 
     bounding_box_models.clear();
     bounding_box_models_unsorted.clear();
     buffer_ids_transforms.clear();
 
-    std::for_each(models.begin(), models.end(), [](const std::shared_ptr<Model>& model) {
+    std::for_each(scene.models.cbegin(), scene.models.cend(), [](const renderables::Model* model) {
         if (model->bounding_box.has_value()) {
             if (model->bounding_box->sort) {
-                bounding_box_models.push_back(model.get());
+                bounding_box_models.push_back(model);
             } else {
-                bounding_box_models_unsorted.push_back(model.get());
+                bounding_box_models_unsorted.push_back(model);
             }
         }
     });
 
-    std::sort(bounding_box_models.begin(), bounding_box_models.end(), [this](const Model* lhs, const Model* rhs) {
+    std::sort(bounding_box_models.begin(), bounding_box_models.end(), [this](const renderables::Model* lhs, const renderables::Model* rhs) {
         const float distance1 = glm::distance(lhs->position, camera_cache.position);
         const float distance2 = glm::distance(rhs->position, camera_cache.position);
 
         return distance1 > distance2;
     });
 
-    for (const Model* model : bounding_box_models_unsorted) {
+    for (const renderables::Model* model : bounding_box_models_unsorted) {
         add_bounding_box(model, buffer_ids_transforms);
     }
 
-    for (const Model* model : bounding_box_models) {
+    for (const renderables::Model* model : bounding_box_models) {
         add_bounding_box(model, buffer_ids_transforms);
     }
 
@@ -541,7 +504,7 @@ void Renderer::setup_shadows() {
         light_space.lens_far
     );
     const glm::mat4 view = glm::lookAt(
-        light.position / light_space.position_divisor,
+        directional_light.position / light_space.position_divisor,
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)
     );
@@ -562,15 +525,15 @@ void Renderer::setup_uniform_buffers() {
     storage.projection_view_uniform_buffer->upload_sub_data();
 
     if (storage.light_uniform_buffer->is_configured()) {
-        storage.light_uniform_buffer->set(&light.ambient_color, 0);
-        storage.light_uniform_buffer->set(&light.diffuse_color, 1);
-        storage.light_uniform_buffer->set(&light.specular_color, 2);
+        storage.light_uniform_buffer->set(&directional_light.ambient_color, 0);
+        storage.light_uniform_buffer->set(&directional_light.diffuse_color, 1);
+        storage.light_uniform_buffer->set(&directional_light.specular_color, 2);
         storage.light_uniform_buffer->bind();
         storage.light_uniform_buffer->upload_sub_data();
     }
 
     if (storage.light_view_uniform_buffer->is_configured()) {
-        storage.light_view_uniform_buffer->set(&light.position, 0);
+        storage.light_view_uniform_buffer->set(&directional_light.position, 0);
         storage.light_view_uniform_buffer->set(&camera_cache.position, 1);
         storage.light_view_uniform_buffer->bind();
         storage.light_view_uniform_buffer->upload_sub_data();

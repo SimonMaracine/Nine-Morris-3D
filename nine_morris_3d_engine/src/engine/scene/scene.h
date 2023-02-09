@@ -2,10 +2,13 @@
 
 #include <resmanager/resmanager.h>
 
+#include "engine/scene/scene_list.h"
+#include "engine/scene/object_manager.h"
+
 class Application;
 
 /**
- * Class representing an entire scene in the game.
+ * Class representing an entire scene of a game.
  */
 class Scene {
 private:
@@ -29,11 +32,19 @@ public:
 
     std::string_view get_name() const { return name; }
     SceneId get_id() const { return id; }
-protected:
+
+    SceneList scene_list;  // List of all objects to be rendered
+    ObjectManager objects;  // Storage for all the renderable objects
+
     Application* app = nullptr;
 private:
-    const std::string name;
-    const SceneId id;
+    inline void _on_stop() {  // Used to clean up objects
+        scene_list.clear();
+        objects.clear();
+    }
+
+    std::string name;
+    SceneId id;
     bool on_awake_called = false;
 
     friend class Application;

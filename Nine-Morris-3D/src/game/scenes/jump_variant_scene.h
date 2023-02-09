@@ -4,12 +4,12 @@
 
 #include "game/entities/boards/jump_board.h"
 #include "game/entities/serialization/jump_board_serialized.h"
-#include "game/scenes/imgui_layer.h"
+#include "game/entities/board.h"
 #include "game/scenes/scene_game.h"
 
-struct JumpVariantScene : public Scene, public SceneGame {
+struct JumpVariantScene : public SceneGame {
     JumpVariantScene()
-        : Scene("jump_variant") {}
+        : SceneGame("jump_variant") {}
 
     virtual void on_start() override;
     virtual void on_stop() override;
@@ -25,15 +25,18 @@ struct JumpVariantScene : public Scene, public SceneGame {
     void on_window_resized(const WindowResizedEvent& event);
 
     virtual void setup_and_add_model_pieces() override;
-    virtual void initialize_pieces() override;
     virtual void setup_entities() override;
+    virtual void initialize_renderables() override;
+    virtual void initialize_pieces() override;
+    virtual void draw_debug_imgui() override;
+    virtual void update_menubar() override;
     virtual void save_game() override;
     virtual void load_game() override;
     virtual void undo() override;
     virtual void redo() override;
-    virtual void imgui_draw_debug() override;
-
-    ImGuiLayer<JumpVariantScene, JumpBoardSerialized> imgui_layer;
+    virtual Board& get_board() override;
+    virtual size_t get_undo_size() override;
+    virtual size_t get_redo_size() override;
 
     JumpBoard board;
     UndoRedoState<JumpBoardSerialized> undo_redo_state;

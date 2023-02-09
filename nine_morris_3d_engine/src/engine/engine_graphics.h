@@ -12,6 +12,7 @@
 #include "engine/graphics/camera.h"
 #include "engine/graphics/font.h"
 #include "engine/graphics/framebuffer_reader.h"
+#include "engine/graphics/gui.h"
 #include "engine/graphics/identifier.h"
 #include "engine/graphics/light.h"
 #include "engine/graphics/material.h"

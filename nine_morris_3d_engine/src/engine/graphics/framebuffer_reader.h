@@ -17,8 +17,8 @@ public:
 
     FramebufferReader(const FramebufferReader&) = delete;
     FramebufferReader& operator=(const FramebufferReader&) = delete;
-    FramebufferReader(FramebufferReader&&) = default;
-    FramebufferReader& operator=(FramebufferReader&&) = default;
+    FramebufferReader(FramebufferReader&&) noexcept = default;
+    FramebufferReader& operator=(FramebufferReader&&) noexcept = default;
 
     // Call this after the framebuffer is bound to begin reading the framebuffer
     void read(int attachment_index, int x, int y) {

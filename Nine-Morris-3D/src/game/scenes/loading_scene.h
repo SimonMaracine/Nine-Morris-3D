@@ -18,6 +18,24 @@ struct LoadingScene : public Scene {
     void update_loading_animation();
     hs scene_int_to_id(int scene);
 
+    void initialize_board();
+    void initialize_board_paint();
+    void initialize_pieces();
+    void initialize_node(Index index);
+    void initialize_nodes();
+    void initialize_board_no_normal();
+    void initialize_board_paint_no_normal();
+    void initialize_pieces_no_normal();
+    void initialize_skybox();
+    void initialize_indicators();
+    void change_board_paint_texture();
+    void initialize_ids();
+
+    void initialize_keyboard_controls();
+    void initialize_light_bulb();
+    void initialize_light();
+    void initialize_game();  // Must be called only once
+
     std::unique_ptr<assets_load::AllStartLoader> loader;
 
     struct {

@@ -162,7 +162,7 @@ void Font::bake_ascii() {
     bake_characters(32, 126);
 }
 
-void Font::render(std::string_view string, std::vector<float>& buffer) {
+void Font::render(std::string_view string, std::vector<float>& buffer) const {
     const std::u32string utf32_string = utf8::utf8to32(string);
 
     int x = 0;
@@ -209,7 +209,7 @@ void Font::render(std::string_view string, std::vector<float>& buffer) {
     }
 }
 
-std::pair<int, int> Font::get_string_size(std::string_view string, float scale) {
+std::pair<int, int> Font::get_string_size(std::string_view string, float scale) const {
     const std::u32string utf32_string = utf8::utf8to32(string);
 
     int x = 0;
@@ -306,7 +306,7 @@ void Font::try_bake_character(int codepoint, int descent) {
     glyphs[static_cast<char32_t>(codepoint)] = gl;
 }
 
-const Font::Glyph& Font::get_character_glyph(char32_t character) {
+const Font::Glyph& Font::get_character_glyph(char32_t character) const {
     try {
         return glyphs.at(character);
     } catch (const std::out_of_range&) {

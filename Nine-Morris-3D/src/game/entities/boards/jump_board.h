@@ -15,8 +15,8 @@ struct JumpBoard : public Board {  // Also good for jump plus variant
 
     JumpBoard(const JumpBoard&) = delete;
     JumpBoard& operator=(const JumpBoard&) = delete;
-    JumpBoard(JumpBoard&&) = default;
-    JumpBoard& operator=(JumpBoard&&) = default;
+    JumpBoard(JumpBoard&&) noexcept = default;
+    JumpBoard& operator=(JumpBoard&&) noexcept = default;
 
     virtual void click(identifier::Id hovered_id) override;
     virtual Board::Flags release(identifier::Id hovered_id) override;

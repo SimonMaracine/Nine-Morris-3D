@@ -1,7 +1,7 @@
 #pragma once
 
 #include <engine/engine_application.h>
-#include <engine/engine_graphics.h>
+#include <engine/engine_scene.h>
 
 #include "game/entities/board.h"
 
@@ -10,13 +10,13 @@ class Application;
 class KeyboardControls {
 public:
     KeyboardControls() = default;
-    KeyboardControls(Application* app, Board* board, std::shared_ptr<Renderer::Quad> quad);
+    KeyboardControls(Application* app, Board* board, renderables::Quad* quad);
     ~KeyboardControls() = default;
 
     KeyboardControls(const KeyboardControls&) = delete;
     KeyboardControls& operator=(const KeyboardControls&) = delete;
     KeyboardControls(KeyboardControls&&) = default;
-    KeyboardControls& operator=(KeyboardControls&&) = default;
+    KeyboardControls& operator=(KeyboardControls&&) noexcept = default;
 
     enum class Direction {
         Up = 0,
@@ -52,7 +52,7 @@ private:
 
     Board* board = nullptr;
 
-    std::shared_ptr<Renderer::Quad> quad;
+    renderables::Quad* quad = nullptr;
     KNode nodes[24];
     KNode* current_node = nullptr;
 };

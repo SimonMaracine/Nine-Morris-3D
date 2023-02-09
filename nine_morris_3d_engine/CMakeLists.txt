@@ -51,7 +51,6 @@ set(ENGINE_HEADERS
     "src/engine/application/events.h"
     "src/engine/application/input.h"
     "src/engine/application/platform.h"
-    "src/engine/application/scene.h"
     "src/engine/application/window.h"
     "src/engine/audio/openal/buffer.h"
     "src/engine/audio/openal/info_and_debug.h"
@@ -72,6 +71,7 @@ set(ENGINE_HEADERS
     "src/engine/graphics/camera.h"
     "src/engine/graphics/font.h"
     "src/engine/graphics/framebuffer_reader.h"
+    "src/engine/graphics/gui.h"
     "src/engine/graphics/identifier.h"
     "src/engine/graphics/imgui_context.h"
     "src/engine/graphics/light.h"
@@ -90,11 +90,17 @@ set(ENGINE_HEADERS
     "src/engine/other/mesh.h"
     "src/engine/other/random_gen.h"
     "src/engine/other/resource_manager.h"
+    "src/engine/scene/object_manager.h"
+    "src/engine/scene/object.h"
+    "src/engine/scene/renderables.h"
+    "src/engine/scene/scene_list.h"
+    "src/engine/scene/scene.h"
     "src/engine/engine_application.h"
     "src/engine/engine_audio.h"
     "src/engine/engine_entry_point.h"
     "src/engine/engine_graphics.h"
     "src/engine/engine_other.h"
+    "src/engine/engine_scene.h"
 )
 
 add_library(${ENGINE} STATIC
@@ -122,6 +128,7 @@ add_library(${ENGINE} STATIC
     "src/engine/graphics/renderer/renderer.cpp"
     "src/engine/graphics/camera.cpp"
     "src/engine/graphics/font.cpp"
+    "src/engine/graphics/gui.cpp"
     "src/engine/graphics/identifier.cpp"
     "src/engine/graphics/imgui_context.cpp"
     "src/engine/graphics/material.cpp"
@@ -135,6 +142,8 @@ add_library(${ENGINE} STATIC
     "src/engine/other/mesh.cpp"
     "src/engine/other/random_gen.cpp"
     "src/engine/other/resource_manager.cpp"
+    "src/engine/scene/object_manager.cpp"
+    "src/engine/scene/scene_list.cpp"
     ${ENGINE_HEADERS}
 )
 

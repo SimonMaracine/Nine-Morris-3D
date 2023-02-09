@@ -30,9 +30,9 @@ namespace save_load {
 
     class SaveFileNotOpenError : public SaveFileError {
     public:
-        SaveFileNotOpenError(const std::string& message)
+        explicit SaveFileNotOpenError(const std::string& message)
             : SaveFileError(message) {}
-        SaveFileNotOpenError(const char* message)
+        explicit SaveFileNotOpenError(const char* message)
             : SaveFileError(message) {}
     };
 

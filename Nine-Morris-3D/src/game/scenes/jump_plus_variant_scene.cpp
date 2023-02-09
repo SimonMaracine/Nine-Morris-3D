@@ -4,10 +4,10 @@
 
 #include "game/entities/boards/jump_board.h"
 #include "game/entities/serialization/jump_board_serialized.h"
+#include "game/entities/board.h"
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
 #include "game/scenes/jump_plus_variant_scene.h"
-#include "game/scenes/imgui_layer.h"
 #include "game/scenes/common.h"
 #include "game/game_options.h"
 #include "game/save_load.h"
@@ -22,23 +22,27 @@ using namespace encrypt;
 void JumpPlusVariantScene::on_start() {
     auto& data = app->user_data<Data>();
 
+    initialize_renderables();
     initialize_pieces();
     setup_entities();
 
-    setup_and_add_model_board(app, this);
-    setup_and_add_model_board_paint(app, this);
-    setup_and_add_model_nodes(app, this);
+    setup_and_add_model_board();
+    setup_and_add_model_board_paint();
+    setup_and_add_model_nodes();
     setup_and_add_model_pieces();
 
-    setup_and_add_turn_indicator(app);
-    setup_and_add_timer_text(app);
-    setup_wait_indicator(app);
-    setup_computer_thinking_indicator(app);
-    setup_camera(app, this);
+#ifdef NM3D_PLATFORM_DEBUG
+    setup_light_bulb();
+#endif
+    setup_and_add_turn_indicator();
+    setup_and_add_timer_text();
+    setup_wait_indicator();
+    setup_computer_thinking_indicator();
+    setup_camera();
 
-    update_turn_indicator(app, this);
+    update_turn_indicator();
 
-    keyboard = KeyboardControls {app, &board, app->res.quad["keyboard_controls"_H]};
+    keyboard = KeyboardControls {app, &board, objects.get<renderables::Quad>("keyboard_controls"_H)};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<JumpBoardSerialized> {};
@@ -55,6 +59,7 @@ void JumpPlusVariantScene::on_start() {
     timer = Timer {app};
 
     board.app = app;
+    board.scene = this;
     board.keyboard = &keyboard;
     board.camera_controller = &camera_controller;
     board.undo_redo_state = &undo_redo_state;
@@ -63,10 +68,10 @@ void JumpPlusVariantScene::on_start() {
 
 #ifdef NM3D_PLATFORM_DEBUG
     app->renderer->origin = true;
-    app->renderer->add_quad(app->res.quad["light_bulb"_H]);
+    scene_list.add(objects.get<renderables::Quad>("light_bulb"_H));
 #endif
 
-    imgui_layer.update();
+    update_menubar();
 
     camera_controller.go_towards_position(default_camera_position);
     camera_controller.setup_events(app);
@@ -97,13 +102,11 @@ void JumpPlusVariantScene::on_stop() {
     app->renderer->origin = false;
 #endif
 
-    imgui_layer.reset();
+    imgui_reset();
     camera_controller.remove_events(app);
-    app->renderer->clear();
-    app->gui_renderer->clear();
 
     // Should dispose of these
-    release_piece_material_instances(app);
+    release_piece_material_instances();
 
     made_first_move = false;
 
@@ -114,23 +117,23 @@ void JumpPlusVariantScene::on_stop() {
 }
 
 void JumpPlusVariantScene::on_awake() {
-    imgui_layer = ImGuiLayer<JumpPlusVariantScene, JumpBoardSerialized> {app, this};
+    imgui_initialize();
     save_game_file_name = save_load::save_game_file_name(get_name());
 
     skybox_loader = std::make_unique<assets_load::SkyboxLoader>(
         [this]() {
-            change_skybox(app);
+            change_skybox();
         }
     );
     board_paint_texture_loader = std::make_unique<assets_load::BoardPaintTextureLoader>(
         [this]() {
-            change_board_paint_texture(app);
+            change_board_paint_texture();
         }
     );
 }
 
 void JumpPlusVariantScene::on_update() {
-    if (!imgui_layer.hovering_gui) {
+    if (!hovering_gui) {
         camera_controller.update_controls(app->get_delta());
         board.update_nodes(app->renderer->get_hovered_id());
         board.update_pieces(app->renderer->get_hovered_id());
@@ -143,12 +146,12 @@ void JumpPlusVariantScene::on_update() {
     timer.update();
 
     // Update listener position, look at and up vectors every frame
-    update_listener(app, this);
+    update_listener();
 
-    update_game_state(app, this);
-    update_timer_text(app, this);
-    update_wait_indicator(app, this);
-    update_computer_thinking_indicator(app, this);
+    update_game_state();
+    update_timer_text();
+    update_wait_indicator();
+    update_computer_thinking_indicator();
 
     skybox_loader->update(app);
     board_paint_texture_loader->update(app);
@@ -159,11 +162,11 @@ void JumpPlusVariantScene::on_fixed_update() {
 }
 
 void JumpPlusVariantScene::on_imgui_update() {
-    update_all_imgui(app, this);
+    update_all_imgui();
 }
 
 void JumpPlusVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -175,7 +178,7 @@ void JumpPlusVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent
 }
 
 void JumpPlusVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -186,19 +189,19 @@ void JumpPlusVariantScene::on_mouse_button_released(const MouseButtonReleasedEve
             const auto flags = board.release(app->renderer->get_hovered_id());
 
             update_after_human_move(
-                app, this, flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
+                flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
             );
         }
 
         if (show_keyboard_controls) {
-            app->renderer->remove_quad(app->res.quad["keyboard_controls"_H]);
+            scene_list.remove(objects.get<renderables::Quad>("keyboard_controls"_H));
             show_keyboard_controls = false;
         }
     }
 }
 
 void JumpPlusVariantScene::on_key_pressed(const KeyPressedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -209,7 +212,7 @@ void JumpPlusVariantScene::on_key_pressed(const KeyPressedEvent& event) {
         case input::Key::Right:
         case input::Key::Enter:
             if (!show_keyboard_controls) {
-                app->renderer->add_quad(app->res.quad["keyboard_controls"_H]);
+                scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
                 show_keyboard_controls = true;
                 return;
             }
@@ -256,7 +259,7 @@ void JumpPlusVariantScene::on_key_pressed(const KeyPressedEvent& event) {
                 const auto flags = keyboard.click_and_release();
 
                 update_after_human_move(
-                    app, this, flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
+                    flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
                 );
             }
             break;
@@ -267,7 +270,7 @@ void JumpPlusVariantScene::on_key_pressed(const KeyPressedEvent& event) {
 }
 
 void JumpPlusVariantScene::on_key_released(const KeyReleasedEvent& event) {
-    if (imgui_layer.hovering_gui) {
+    if (hovering_gui) {
         return;
     }
 
@@ -288,20 +291,20 @@ void JumpPlusVariantScene::setup_and_add_model_pieces() {
     Index index = 0;
 
     // White pieces
-    setup_piece_on_node(app, this, index++, 0);
-    setup_piece_on_node(app, this, index++, 3);
-    setup_piece_on_node(app, this, index++, 6);
-    setup_piece_on_node(app, this, index++, 17);
-    setup_piece_on_node(app, this, index++, 20);
-    setup_piece_on_node(app, this, index++, 23);
+    setup_piece_on_node(index++, 0);
+    setup_piece_on_node(index++, 3);
+    setup_piece_on_node(index++, 6);
+    setup_piece_on_node(index++, 17);
+    setup_piece_on_node(index++, 20);
+    setup_piece_on_node(index++, 23);
 
     // Black pieces
-    setup_piece_on_node(app, this, index++, 2);
-    setup_piece_on_node(app, this, index++, 5);
-    setup_piece_on_node(app, this, index++, 8);
-    setup_piece_on_node(app, this, index++, 15);
-    setup_piece_on_node(app, this, index++, 18);
-    setup_piece_on_node(app, this, index++, 21);
+    setup_piece_on_node(index++, 2);
+    setup_piece_on_node(index++, 5);
+    setup_piece_on_node(index++, 8);
+    setup_piece_on_node(index++, 15);
+    setup_piece_on_node(index++, 18);
+    setup_piece_on_node(index++, 21);
 }
 
 void JumpPlusVariantScene::initialize_pieces() {
@@ -309,27 +312,27 @@ void JumpPlusVariantScene::initialize_pieces() {
 
     if (data.launcher_options.normal_mapping) {
         for (size_t i = 0; i < 6; i++) {
-            initialize_piece(app, i, app->res.texture["white_piece_diffuse"_H]);
+            initialize_piece(i, app->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 6; i < 12; i++) {
-            initialize_piece(app, i, app->res.texture["black_piece_diffuse"_H]);
+            initialize_piece(i, app->res.texture["black_piece_diffuse"_H]);
         }
     } else {
         for (size_t i = 0; i < 6; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["white_piece_diffuse"_H]);
+            initialize_piece_no_normal(i, app->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 6; i < 12; i++) {
-            initialize_piece_no_normal(app, i, app->res.texture["black_piece_diffuse"_H]);
+            initialize_piece_no_normal(i, app->res.texture["black_piece_diffuse"_H]);
         }
     }
 }
 
 void JumpPlusVariantScene::setup_entities() {
     board = JumpBoard {};
-    board.model = app->res.model.load("board"_H);
-    board.paint_model = app->res.model.load("board_paint"_H);
+    board.model = objects.add<renderables::Model>("board"_H);
+    board.paint_model = objects.add<renderables::Model>("board_paint"_H);
 
     board.phase = BoardPhase::MovePieces;
 
@@ -337,7 +340,7 @@ void JumpPlusVariantScene::setup_entities() {
         Piece piece = Piece {
             static_cast<Index>(i),
             PieceType::White,
-            app->res.model.load(hs("piece" + std::to_string(i))),
+            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
         piece.in_use = true;
@@ -349,7 +352,7 @@ void JumpPlusVariantScene::setup_entities() {
         Piece piece = Piece {
             static_cast<Index>(i),
             PieceType::Black,
-            app->res.model.load(hs("piece" + std::to_string(i))),
+            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
         };
         piece.in_use = true;
@@ -360,7 +363,7 @@ void JumpPlusVariantScene::setup_entities() {
     for (size_t i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
             static_cast<Index>(i),
-            app->res.model.load(hs("node" + std::to_string(i)))
+            objects.get<renderables::Model>(hs("node" + std::to_string(i)))
         };
     }
 
@@ -370,22 +373,57 @@ void JumpPlusVariantScene::setup_entities() {
     DEB_DEBUG("Setup entities");
 }
 
+void JumpPlusVariantScene::initialize_renderables() {
+    objects.add<renderables::Model>("board"_H);
+    objects.add<renderables::Model>("board_paint"_H);
+
+    for (size_t i = 0; i < 6; i++) {
+        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+    }
+
+    for (size_t i = 6; i < 12; i++) {
+        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+    }
+
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        objects.add<renderables::Model>(hs("node" + std::to_string(i)));
+    }
+
+    objects.add<renderables::Quad>("keyboard_controls"_H);
+}
+
+void JumpPlusVariantScene::draw_debug_imgui() {
+    ImGui::Text("Turns without mills: %u", board.turns_without_mills);
+}
+
+void JumpPlusVariantScene::update_menubar() {
+    generic_update_menubar<JumpPlusVariantScene, JumpBoardSerialized>(this);
+}
+
 void JumpPlusVariantScene::save_game() {
-    save_game_generic<JumpPlusVariantScene, JumpBoardSerialized>(this);
+    generic_save_game<JumpPlusVariantScene, JumpBoardSerialized>(this);
 }
 
 void JumpPlusVariantScene::load_game() {
-    load_game_generic<JumpPlusVariantScene, JumpBoardSerialized>(app, this);
+    generic_load_game<JumpPlusVariantScene, JumpBoardSerialized>(this);
 }
 
 void JumpPlusVariantScene::undo() {
-    undo_generic<JumpPlusVariantScene, JumpBoardSerialized>(app, this);
+    generic_undo<JumpPlusVariantScene, JumpBoardSerialized>(this);
 }
 
 void JumpPlusVariantScene::redo() {
-    redo_generic<JumpPlusVariantScene, JumpBoardSerialized>(app, this);
+    generic_redo<JumpPlusVariantScene, JumpBoardSerialized>(this);
 }
 
-void JumpPlusVariantScene::imgui_draw_debug() {
-    ImGui::Text("Turns without mills: %u", board.turns_without_mills);
+Board& JumpPlusVariantScene::get_board() {
+    return board;
+}
+
+size_t JumpPlusVariantScene::get_undo_size() {
+    return undo_redo_state.undo.size();
+}
+
+size_t JumpPlusVariantScene::get_redo_size() {
+    return undo_redo_state.redo.size();
 }

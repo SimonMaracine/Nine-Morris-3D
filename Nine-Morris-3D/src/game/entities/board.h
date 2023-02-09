@@ -1,7 +1,7 @@
 #pragma once
 
 #include <engine/engine_application.h>
-#include <engine/engine_graphics.h>
+#include <engine/engine_scene.h>
 
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
@@ -10,6 +10,7 @@
 #include "other/constants.h"
 
 class KeyboardControls;
+class Scene;
 
 struct Board {
     Board() = default;
@@ -17,8 +18,8 @@ struct Board {
 
     Board(const Board&) = delete;
     Board& operator=(const Board&) = delete;
-    Board(Board&&) = default;
-    Board& operator=(Board&&) = default;
+    Board(Board&&) noexcept = default;
+    Board& operator=(Board&&) noexcept = default;
 
     struct Flags;
 
@@ -53,8 +54,8 @@ struct Board {
     void prepare_piece_for_three_step_move(Index piece_index, const glm::vec3& target, const glm::vec3& velocity,
         const glm::vec3& target0, const glm::vec3& target1);
 
-    std::shared_ptr<Renderer::Model> model;
-    std::shared_ptr<Renderer::Model> paint_model;
+    renderables::Model* model = nullptr;
+    renderables::Model* paint_model = nullptr;
 
     std::array<Node, MAX_NODES> nodes;  // 24 ordered nodes
     std::unordered_map<Index, Piece> pieces;  // Any number of pieces
@@ -82,6 +83,7 @@ struct Board {
     } flags;
 
     Application* app = nullptr;
+    Scene* scene = nullptr;
     KeyboardControls* keyboard = nullptr;
     PointCameraController* camera_controller = nullptr;
 };

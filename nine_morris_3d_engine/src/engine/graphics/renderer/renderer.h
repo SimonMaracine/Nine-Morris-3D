@@ -4,6 +4,11 @@
 
 #include "engine/application/platform.h"
 #include "engine/application/events.h"
+#include "engine/graphics/opengl/vertex_array.h"
+#include "engine/graphics/opengl/buffer.h"
+#include "engine/graphics/opengl/shader.h"
+#include "engine/graphics/opengl/texture.h"
+#include "engine/graphics/opengl/framebuffer.h"
 #include "engine/graphics/framebuffer_reader.h"
 #include "engine/graphics/font.h"
 #include "engine/graphics/camera.h"
@@ -11,45 +16,15 @@
 #include "engine/graphics/light.h"
 #include "engine/graphics/identifier.h"
 #include "engine/graphics/post_processing.h"
-#include "engine/graphics/opengl/vertex_array.h"
-#include "engine/graphics/opengl/buffer.h"
-#include "engine/graphics/opengl/shader.h"
-#include "engine/graphics/opengl/texture.h"
-#include "engine/graphics/opengl/framebuffer.h"
 #include "engine/other/camera_controller.h"
 #include "engine/other/encrypt.h"
+#include "engine/scene/renderables.h"
+#include "engine/scene/scene_list.h"
 
 class Application;
 
 class Renderer {
 public:
-    struct BoundingBox {
-        identifier::Id id;
-        glm::vec3 size = glm::vec3(0.0f);
-        bool sort = true;
-    };
-
-    struct Model {
-        glm::vec3 position = glm::vec3(0.0f);
-        glm::vec3 rotation = glm::vec3(0.0f);
-        float scale = 1.0f;
-
-        std::shared_ptr<gl::VertexArray> vertex_array;
-        std::shared_ptr<gl::IndexBuffer> index_buffer;
-        std::shared_ptr<MaterialInstance> material;
-
-        std::optional<glm::vec3> outline_color;
-        std::optional<BoundingBox> bounding_box;
-        bool cast_shadow = false;
-    };
-
-    struct Quad {
-        glm::vec3 position = glm::vec3(0.0f);
-        float scale = 1.0f;
-
-        std::shared_ptr<gl::Texture> texture;
-    };
-
     struct Storage;
 
     Renderer(Application* app);
@@ -60,15 +35,7 @@ public:
     Renderer(Renderer&&) = delete;
     Renderer& operator=(Renderer&&) = delete;
 
-    void render();
-
-    void add_model(std::shared_ptr<Model> model);
-    void remove_model(std::shared_ptr<Model> model);
-
-    void add_quad(std::shared_ptr<Quad> quad);
-    void remove_quad(std::shared_ptr<Quad> quad);
-
-    void clear();
+    void render(const SceneList& scene);
 
     void add_post_processing(std::unique_ptr<PostProcessingStep>&& post_processing_step);
 
@@ -82,7 +49,7 @@ public:
     const Storage& get_storage() { return storage; }
 
     bool origin = false;  // This does nothing in release mode
-    DirectionalLight light;
+    DirectionalLight directional_light;
 
     struct LightSpace {
         float left = 0.0f;
@@ -105,16 +72,16 @@ private:
 
     void draw_origin();
     void draw_skybox();
-    void draw_model(const Model* model);
-    void draw_model_with_outline(const Model* model);
-    void draw_models();
-    void draw_models_with_outline();
-    void draw_models_to_depth_buffer();
-    void draw_quad(const Quad* quad);
-    void draw_quads();
+    void draw_model(const renderables::Model* model);
+    void draw_model_with_outline(const renderables::Model* model);
+    void draw_models(const SceneList& scene);
+    void draw_models_with_outline(const SceneList& scene);
+    void draw_models_to_depth_buffer(const SceneList& scene);
+    void draw_quad(const renderables::Quad* quad);
+    void draw_quads(const SceneList& scene);
 
-    void add_bounding_box(const Model* model, std::vector<IdMatrix>& buffer_ids_transforms);
-    void draw_bounding_boxes();
+    void add_bounding_box(const renderables::Model* model, std::vector<IdMatrix>& buffer_ids_transforms);
+    void draw_bounding_boxes(const SceneList& scene);
     void setup_shadows();
     void setup_uniform_buffers();
     void validate_hovered_id(int x, int y);
@@ -180,9 +147,6 @@ private:
         glm::mat4 projection_view_matrix = glm::mat4(1.0f);
         glm::vec3 position = glm::vec3(0.0f);
     } camera_cache;
-
-    std::vector<std::shared_ptr<Model>> models;
-    std::vector<std::shared_ptr<Quad>> quads;
 
     identifier::Id hovered_id = identifier::null;
     FramebufferReader<4> framebuffer_reader;

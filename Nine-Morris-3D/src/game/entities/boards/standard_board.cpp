@@ -853,13 +853,14 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             Piece piece = Piece {
                 ser_index,
                 ser_piece.type,
-                app->res.model[hs("piece" + std::to_string(ser_index))],
+                scene->objects.get<renderables::Model>(hs("piece" + std::to_string(ser_index))),
                 app->res.al_source[hs("piece" + std::to_string(ser_index))]
             };
 
             piece.model->position = ser_piece.position;
             piece.model->rotation = ser_piece.rotation;
-            piece.model->vertex_array = app->res.vertex_array[hs("piece" + std::to_string(ser_index))];
+            const char* piece_tag = piece.type == PieceType::White ? "white_piece" : "black_piece";
+            piece.model->vertex_array = app->res.vertex_array[hs(piece_tag + std::to_string(ser_index))];
             piece.model->index_buffer = (
                 ser_piece.type == PieceType::White
                     ?
@@ -870,7 +871,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             piece.model->scale = WORLD_SCALE;
             piece.model->material = app->res.material_instance[hs("piece" + std::to_string(ser_index))];
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
-            piece.model->bounding_box = std::make_optional<Renderer::BoundingBox>();
+            piece.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
             piece.model->bounding_box->id = data.piece_ids[ser_index];
             piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
             piece.model->cast_shadow = true;
@@ -881,7 +882,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             piece.to_take = ser_piece.to_take;
             piece.pending_remove = ser_piece.pending_remove;
 
-            app->renderer->add_model(piece.model);
+            scene->scene_list.add(piece.model);
             pieces[ser_index] = piece;
         }
     }
@@ -890,7 +891,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
 
     for (auto& [index, piece] : pieces) {
         if (serialized.pieces.find(index) == serialized.pieces.end()) {
-            app->renderer->remove_model(piece.model);
+            scene->scene_list.remove(piece.model);
             to_remove.push_back(index);
         }
     }

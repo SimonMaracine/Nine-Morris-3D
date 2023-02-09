@@ -5,7 +5,7 @@ MinimaxThread::~MinimaxThread() {
     join_thread();
 }
 
-MinimaxThread& MinimaxThread::operator=(MinimaxThread&& other) {
+MinimaxThread& MinimaxThread::operator=(MinimaxThread&& other) noexcept {
     join_thread();
 
     thread = std::move(other.thread);
