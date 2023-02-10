@@ -8,7 +8,7 @@
 class Application;
 
 /**
- * Class representing an entire scene of a game.
+ * Class representing an entire scene of a game. Doesn't need to be heap-allocated.
  */
 class Scene {
 private:

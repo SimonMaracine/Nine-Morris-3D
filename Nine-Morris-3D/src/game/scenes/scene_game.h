@@ -116,13 +116,9 @@ public:
 
     WindowImGui window = WindowImGui::None;
 
-    struct DummyFunc {
-        constexpr void operator()() {}
-    };
-
     void imgui_draw_game_over_message(std::string_view message1, std::string_view message2);
     void imgui_draw_window(const char* title, const std::function<void()>& contents,
-            const std::function<void()>& ok_callback = DummyFunc {});
+        const std::function<void()>& ok_callback = dummy::ProcFunc {});
     void imgui_initialize_options();
 
     std::string last_save_game_date = save_load::NO_LAST_GAME;

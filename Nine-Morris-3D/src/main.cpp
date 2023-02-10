@@ -28,7 +28,7 @@ static constexpr unsigned int PATCH = 0;
 
 static const char* KEY = "data/models/board/board.obj";
 
-static const std::vector<std::string> authors = {
+static const std::vector<std::string> AUTHORS = {
     u8"Simon Mărăcine"
 };
 
@@ -43,23 +43,24 @@ void application_main() {
             .display_flags(false, false, false)
             .application_name(APP_NAME)
             .version(MAJOR, MINOR, PATCH)
-            .authors(authors)
+            .authors(AUTHORS)
             .encrypt_key(KEY)
             .with_renderer(ApplicationBuilder::RendererImGui)
             .with_renderer(ApplicationBuilder::Renderer2D);
 
-        auto data = std::make_any<Data>();
+        auto global_data = std::make_any<Data>();
 
-        auto launcher = std::make_unique<Application>(launcher_builder, data, launcher::start);
-        launcher->add_scene(std::make_unique<LauncherScene>());
-        exit_code = launcher->run("launcher"_H);
-        launcher.reset();
+        {
+            auto launcher = Application {launcher_builder, global_data, launcher::start};
+            launcher.add_scene<LauncherScene>();
+            exit_code = launcher.run("launcher"_H);
 
-        if (exit_code == 1) {
-            break;
+            if (exit_code == 1) {
+                break;
+            }
         }
 
-        const auto& options = std::any_cast<Data>(data).launcher_options;
+        const auto& options = std::any_cast<Data>(global_data).launcher_options;
 
         auto game_builder = ApplicationBuilder {}
             .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
@@ -67,19 +68,19 @@ void application_main() {
             .display_min_resolution(512, 288)
             .application_name(APP_NAME)
             .version(MAJOR, MINOR, PATCH)
-            .authors(authors)
+            .authors(AUTHORS)
             .encrypt_key(KEY)
             .with_renderer(ApplicationBuilder::Renderer3D)
             .with_renderer(ApplicationBuilder::Renderer2D)
             .with_renderer(ApplicationBuilder::RendererImGui)
             .with_audio();
 
-        auto game = std::make_unique<Application>(game_builder, data, game::start, game::stop);
-        game->add_scene(std::make_unique<LoadingScene>());
-        game->add_scene(std::make_unique<StandardGameScene>());
-        game->add_scene(std::make_unique<JumpVariantScene>());
-        game->add_scene(std::make_unique<JumpPlusVariantScene>());
-        exit_code = game->run("loading"_H);
+        auto game = Application {game_builder, global_data, game::start, game::stop};
+        game.add_scene<LoadingScene>();
+        game.add_scene<StandardGameScene>();
+        game.add_scene<JumpVariantScene>();
+        game.add_scene<JumpPlusVariantScene>();
+        exit_code = game.run("loading"_H);
 
         if (exit_code == 0) {
             break;

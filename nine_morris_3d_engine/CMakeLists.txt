@@ -83,6 +83,7 @@ set(ENGINE_HEADERS
     "src/engine/other/camera_controller.h"
     "src/engine/other/concurrent_loader.h"
     "src/engine/other/dependencies.h"
+    "src/engine/other/dummy.h"
     "src/engine/other/encrypt.h"
     "src/engine/other/exit.h"
     "src/engine/other/file_system.h"

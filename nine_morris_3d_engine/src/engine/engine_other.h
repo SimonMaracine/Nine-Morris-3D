@@ -3,6 +3,7 @@
 #include "engine/other/assert.h"
 #include "engine/other/camera_controller.h"
 #include "engine/other/dependencies.h"
+#include "engine/other/dummy.h"
 #include "engine/other/encrypt.h"
 #include "engine/other/exit.h"
 #include "engine/other/file_system.h"

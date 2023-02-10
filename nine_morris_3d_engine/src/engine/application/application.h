@@ -11,25 +11,19 @@
 #include "engine/graphics/renderer/renderer.h"
 #include "engine/graphics/renderer/gui_renderer.h"
 #include "engine/other/resource_manager.h"
+#include "engine/other/dummy.h"
 #include "engine/scene/scene.h"
 
 class Application final {
 private:
     using UserFunc = std::function<void(Application*)>;
     using SceneId = resmanager::HashedStr64;
+    using RendererFunc = std::function<void()>;
 public:
-    struct DummyUserFunc {
-        constexpr void operator()(Application*) {}  // Do nothing
-    };
-
-    // User data stuff
-    struct DummyUserData {};
-    static std::any dummy_user_data();
-
     static void preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file);
 
     Application(const ApplicationBuilder& builder, std::any& user_data,
-        const UserFunc& start = DummyUserFunc {}, const UserFunc& stop = DummyUserFunc {});
+        const UserFunc& start = dummy::UserFunc {}, const UserFunc& stop = dummy::UserFunc {});
     ~Application();
 
     Application(const Application&) = delete;
@@ -44,7 +38,9 @@ public:
     int run(SceneId start_scene_id);
 
     // Scene management functions
-    void add_scene(std::unique_ptr<Scene>&& scene);
+    template<typename S>
+    void add_scene() { scenes.push_back(std::make_unique<S>()); }
+
     void change_scene(SceneId id);
     const Scene* get_current_scene() { return current_scene; }
 
@@ -54,10 +50,10 @@ public:
 
     // Data management
     template<typename Data>
-    Data& user_data() { return std::any_cast<Data&>(_user_data); }
+    Data& user_data() { return std::any_cast<Data&>(*_user_data); }
 
     const ApplicationData& data() { return app_data; }
-    void destroy_user_data() { _user_data.reset(); }
+    void destroy_user_data() { _user_data->reset(); }
 
     // Public fields accessible by all the code
     bool running = true;
@@ -79,6 +75,12 @@ private:
 
     void prepare_scenes(SceneId start_scene_id);
     void on_start(Scene* scene);
+    void user_start();
+    void user_stop();
+    void initialize_renderer_3d();
+    void initialize_renderer_2d();
+    void initialize_renderer_imgui();
+    void initialize_audio();
 
     void on_window_closed(const WindowClosedEvent& event);
     void on_window_resized(const WindowResizedEvent& event);
@@ -89,7 +91,7 @@ private:
     void on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event);
 
     ApplicationBuilder builder;
-    std::any& _user_data;
+    std::any* _user_data = nullptr;
     ApplicationData app_data;
     UserFunc start;
     UserFunc stop;
@@ -105,13 +107,9 @@ private:
     Scene* to_scene = nullptr;
 
     // Data for modular rendering
-    struct DummyFunction {
-        constexpr void operator()() {}  // Do nothing
-    };
-
-    std::function<void()> renderer_3d_update = DummyFunction {};
-    std::function<void()> renderer_2d_update = DummyFunction {};
-    std::function<void()> renderer_imgui_update = DummyFunction {};
+    RendererFunc renderer_3d_update = dummy::ProcFunc {};
+    RendererFunc renderer_2d_update = dummy::ProcFunc {};
+    RendererFunc renderer_imgui_update = dummy::ProcFunc {};
 
     // Keep track of all framebuffers to resize them, if needed
     std::vector<std::weak_ptr<gl::Framebuffer>> framebuffers;

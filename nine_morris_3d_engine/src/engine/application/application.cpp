@@ -20,10 +20,6 @@
 #include "engine/other/exit.h"
 #include "engine/scene/scene.h"
 
-std::any Application::dummy_user_data() {
-    return std::make_any<DummyUserData>();
-}
-
 void Application::preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file) {
     try {
         file_system::initialize_for_applications(app_name);
@@ -39,7 +35,7 @@ void Application::preinitialize(std::string_view app_name, std::string_view log_
 }
 
 Application::Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunc& start, const UserFunc& stop)
-    : builder(builder), _user_data(user_data), start(start), stop(stop) {
+    : builder(builder), _user_data(&user_data), start(start), stop(stop) {
     DEB_INFO("Initializing application...");
 
     app_data.width = builder.width;
@@ -60,16 +56,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     window = std::make_unique<Window>(this);
 
     if (builder.renderer_imgui) {
-        DEB_INFO("With renderer ImGui");
-
-        imgui_context::initialize(window);
-
-        renderer_imgui_update = std::bind(&Application::renderer_imgui_func, this);
-
-        evt.add_event<MouseScrolledEvent, &Application::on_imgui_mouse_scrolled>(this);
-        evt.add_event<MouseMovedEvent, &Application::on_imgui_mouse_moved>(this);
-        evt.add_event<MouseButtonPressedEvent, &Application::on_imgui_mouse_button_pressed>(this);
-        evt.add_event<MouseButtonReleasedEvent, &Application::on_imgui_mouse_button_released>(this);
+        initialize_renderer_imgui();
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
@@ -87,23 +74,15 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     REL_INFO("OpenGL version {}.{}", version_major, version_minor);
 
     if (builder.renderer_3d) {
-        DEB_INFO("With renderer 3D");
-
-        renderer = std::make_unique<Renderer>(this);
-        renderer_3d_update = std::bind(&Application::renderer_3d_func, this);
+        initialize_renderer_3d();
     }
 
     if (builder.renderer_2d) {
-        DEB_INFO("With renderer 2D");
-
-        gui_renderer = std::make_unique<GuiRenderer>(this);
-        renderer_2d_update = std::bind(&Application::renderer_2d_func, this);
+        initialize_renderer_2d();
     }
 
     if (builder.audio) {
-        DEB_INFO("With audio");
-
-        openal = std::make_unique<OpenAlContext>();
+        initialize_audio();
     }
 
     evt.add_event<WindowClosedEvent, &Application::on_window_closed>(this);
@@ -112,13 +91,11 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     frame_counter.previous_seconds = window->get_time();
     fixed_update.previous_seconds = window->get_time();
 
-    DEB_INFO("Calling user start routine...");
-    start(this);
+    user_start();
 }
 
 Application::~Application() {  // Destructor is called before all member variables
-    DEB_INFO("Calling user stop routine...");
-    stop(this);
+    user_stop();
 
     if (builder.renderer_imgui) {
         imgui_context::uninitialize();
@@ -142,6 +119,7 @@ int Application::run(SceneId start_scene_id) {
         for (unsigned int i = 0; i < fixed_updates; i++) {
             current_scene->on_fixed_update();
         }
+
         current_scene->on_update();
 
         // Clear the default framebuffer, as nobody does that for us
@@ -165,12 +143,8 @@ int Application::run(SceneId start_scene_id) {
     return exit_code;
 }
 
-void Application::add_scene(std::unique_ptr<Scene>&& scene) {
-    scenes.push_back(std::move(scene));
-}
-
 void Application::change_scene(SceneId id) {
-    for (const std::unique_ptr<Scene>& scene : scenes) {
+    for (std::unique_ptr<Scene>& scene : scenes) {
         if (scene->id == id) {
             to_scene = scene.get();
             changed_scene = true;
@@ -291,6 +265,51 @@ void Application::on_start(Scene* scene) {
         scene->on_awake_called = true;
     }
     scene->on_start();
+}
+
+void Application::user_start() {
+    DEB_INFO("Calling user start routine...");
+
+    start(this);
+}
+
+void Application::user_stop() {
+    DEB_INFO("Calling user stop routine...");
+
+    stop(this);
+}
+
+void Application::initialize_renderer_3d() {
+    DEB_INFO("With renderer 3D");
+
+    renderer = std::make_unique<Renderer>(this);
+    renderer_3d_update = std::bind(&Application::renderer_3d_func, this);
+}
+
+void Application::initialize_renderer_2d() {
+    DEB_INFO("With renderer 2D");
+
+    gui_renderer = std::make_unique<GuiRenderer>(this);
+    renderer_2d_update = std::bind(&Application::renderer_2d_func, this);
+}
+
+void Application::initialize_renderer_imgui() {
+    DEB_INFO("With renderer ImGui");
+
+    imgui_context::initialize(window);
+
+    renderer_imgui_update = std::bind(&Application::renderer_imgui_func, this);
+
+    evt.add_event<MouseScrolledEvent, &Application::on_imgui_mouse_scrolled>(this);
+    evt.add_event<MouseMovedEvent, &Application::on_imgui_mouse_moved>(this);
+    evt.add_event<MouseButtonPressedEvent, &Application::on_imgui_mouse_button_pressed>(this);
+    evt.add_event<MouseButtonReleasedEvent, &Application::on_imgui_mouse_button_released>(this);
+}
+
+void Application::initialize_audio() {
+    DEB_INFO("With audio");
+
+    openal = std::make_unique<OpenAlContext>();
 }
 
 void Application::on_window_closed(const WindowClosedEvent&) {
