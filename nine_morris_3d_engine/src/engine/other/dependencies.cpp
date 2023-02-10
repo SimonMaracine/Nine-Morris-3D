@@ -78,14 +78,14 @@ namespace dependencies {
         }
         {
             char line[BUFFER_LENGTH];
-            snprintf(line, BUFFER_LENGTH, "cppblowfish version: %d.%d.%d\n", CPPBLOWFISH_VERSION_MAJOR,
-                CPPBLOWFISH_VERSION_MINOR, CPPBLOWFISH_VERSION_PATCH);
+            snprintf(line, BUFFER_LENGTH, "cppblowfish version: %d.%d.%d\n", cppblowfish::VERSION_MAJOR,
+                cppblowfish::VERSION_MINOR, cppblowfish::VERSION_PATCH);
             output.append(line);
         }
         {
             char line[BUFFER_LENGTH];
-            snprintf(line, BUFFER_LENGTH, "resmanager version: %d.%d.%d\n", RESMANAGER_VERSION_MAJOR,
-                RESMANAGER_VERSION_MINOR, RESMANAGER_VERSION_PATCH);
+            snprintf(line, BUFFER_LENGTH, "resmanager version: %d.%d.%d\n", resmanager::VERSION_MAJOR,
+                resmanager::VERSION_MINOR, resmanager::VERSION_PATCH);
             output.append(line);
         }
         {

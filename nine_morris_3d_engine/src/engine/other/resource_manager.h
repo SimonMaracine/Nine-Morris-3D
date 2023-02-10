@@ -18,7 +18,7 @@
 #include "engine/graphics/texture_data.h"
 #include "engine/other/mesh.h"
 
-struct MeshLoader : public resmanager::Loader<mesh::Mesh> {
+struct MeshLoader : public resmanager::DefaultLoader<mesh::Mesh> {
     struct PTN {};
     struct P {};
     struct PTNT {};
