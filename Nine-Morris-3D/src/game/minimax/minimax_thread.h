@@ -23,14 +23,14 @@ public:
         size_t put_down_destination_node_index = 0;
     };
 
-    using Function = std::function<void(GamePosition, Result&, std::atomic<bool>&)>;
+    using Algorithm = std::function<void(GamePosition, Result&, std::atomic<bool>&)>;
 
-    void start(const Function& function);
+    void start(const Algorithm& algorithm);
 
-    bool is_running();
+    bool is_running() const;
     void join();
 
-    const Result& get_result() { return result; }
+    const Result& get_result() const { return result; }
 private:
     void join_thread();
 

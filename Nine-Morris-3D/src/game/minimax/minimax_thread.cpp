@@ -17,14 +17,14 @@ MinimaxThread& MinimaxThread::operator=(MinimaxThread&& other) noexcept {
     return *this;
 }
 
-void MinimaxThread::start(const Function& function) {
+void MinimaxThread::start(const Algorithm& algorithm) {
     running.store(true);
     result = Result {};
 
-    thread = std::thread(function, board->get_position(), std::ref(result), std::ref(running));
+    thread = std::thread(algorithm, board->get_position(), std::ref(result), std::ref(running));
 }
 
-bool MinimaxThread::is_running() {
+bool MinimaxThread::is_running() const {
     return running.load();
 }
 

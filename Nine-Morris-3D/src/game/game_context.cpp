@@ -6,6 +6,8 @@
 #include "game/minimax/standard_game/minimax_standard_game.h"
 #include "other/constants.h"
 
+// FIXME these methods don't make much sense
+
 void GameContext::begin_human_move() {
     board->is_players_turn = true;
 }

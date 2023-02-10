@@ -423,33 +423,30 @@ void SceneGame::update_after_computer_move(bool switched_turn) {
 void SceneGame::update_game_state() {
     switch (game.state) {
         case GameState::MaybeNextPlayer:
-            switch (get_board().turn) {
-                case BoardPlayer::White:
-                    switch (game.white_player) {
-                        case GamePlayer::None:
-                            ASSERT(false, "Player must not be None");
-                            break;
-                        case GamePlayer::Human:
-                            game.state = GameState::HumanBeginMove;
-                            break;
-                        case GamePlayer::Computer:
-                            game.state = GameState::ComputerBeginMove;
-                            break;
-                    }
-                    break;
-                case BoardPlayer::Black:
-                    switch (game.black_player) {
-                        case GamePlayer::None:
-                            ASSERT(false, "Player must not be None");
-                            break;
-                        case GamePlayer::Human:
-                            game.state = GameState::HumanBeginMove;
-                            break;
-                        case GamePlayer::Computer:
-                            game.state = GameState::ComputerBeginMove;
-                            break;
-                    }
-                    break;
+            if (get_board().turn == BoardPlayer::White) {
+                switch (game.white_player) {
+                    case GamePlayer::None:
+                        ASSERT(false, "Player must not be None");
+                        break;
+                    case GamePlayer::Human:
+                        game.state = GameState::HumanBeginMove;
+                        break;
+                    case GamePlayer::Computer:
+                        game.state = GameState::ComputerBeginMove;
+                        break;
+                }
+            } else {
+                switch (game.black_player) {
+                    case GamePlayer::None:
+                        ASSERT(false, "Player must not be None");
+                        break;
+                    case GamePlayer::Human:
+                        game.state = GameState::HumanBeginMove;
+                        break;
+                    case GamePlayer::Computer:
+                        game.state = GameState::ComputerBeginMove;
+                        break;
+                }
             }
             break;
         case GameState::HumanBeginMove:
@@ -458,7 +455,7 @@ void SceneGame::update_game_state() {
             break;
         case GameState::HumanThinkingMove:
             break;
-        case GameState::HumanDoingMove:
+        case GameState::HumanDoingMove:  // TODO these two DoingMove can be merged
             if (get_board().next_move) {
                 game.state = GameState::HumanEndMove;
             }

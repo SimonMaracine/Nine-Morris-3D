@@ -12,13 +12,18 @@ public:
         : white_player(white_player), black_player(black_player), board(board), minimax_thread(minimax_thread) {}
     ~GameContext() = default;
 
+    GameContext(const GameContext&) = default;
+    GameContext& operator=(const GameContext&) = default;
+    GameContext(GameContext&&) noexcept = default;
+    GameContext& operator=(GameContext&&) noexcept = default;
+
     void begin_human_move();
     void end_human_move();
     void begin_computer_move();
     bool end_computer_move();
 
     void reset_player(GamePlayer player);
-    bool both_players_human() { return white_player == GamePlayer::Human && black_player == GamePlayer::Human; }
+    bool both_players_human() const { return white_player == GamePlayer::Human && black_player == GamePlayer::Human; }
 
     GamePlayer white_player = GamePlayer::None;
     GamePlayer black_player = GamePlayer::None;

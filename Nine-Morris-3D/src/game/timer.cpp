@@ -57,7 +57,7 @@ unsigned int Timer::get_time() const {
     return time;
 }
 
-void Timer::get_time_formatted(char* out_formatted_time) const {
+void Timer::get_time_formatted(char* out_formatted_time) const {  // return std::string
     const unsigned int time_in_seconds = time / 10;
     const unsigned int minutes = time_in_seconds / 60;
     const unsigned int seconds = time_in_seconds % 60;
