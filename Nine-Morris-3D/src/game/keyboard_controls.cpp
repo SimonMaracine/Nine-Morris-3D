@@ -33,8 +33,6 @@ KeyboardControls::KeyboardControls(Application* app, Board* board, renderables::
 }
 
 void KeyboardControls::post_initialize() {
-    board->keyboard = this;
-
     nodes[0].neighbors(nullptr, &nodes[9], nullptr, &nodes[1]);
     nodes[1].neighbors(nullptr, &nodes[4], &nodes[0], &nodes[2]);
     nodes[2].neighbors(nullptr, &nodes[14], &nodes[1], nullptr);

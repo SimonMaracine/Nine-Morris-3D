@@ -20,17 +20,19 @@ struct StandardBoard : public Board {
 
     virtual void click(identifier::Id hovered_id) override;
     virtual Board::Flags release(identifier::Id hovered_id) override;
-    virtual void computer_place_piece(Index node_index) override;
-    virtual void computer_move_piece(Index source_node_index, Index destination_node_index) override;
-    virtual void computer_take_piece(Index node_index) override;
+    virtual void place_piece(Index node_index) override;
+    virtual void move_piece(Index source_node_index, Index destination_node_index) override;
+    virtual void take_piece(Index node_index) override;
+
+    void _place_piece(Index node_index);
+    void _move_piece(Index piece_index, Index node_index);
+    void _take_piece(Index piece_index);
 
     void check_select_piece(identifier::Id hovered_id);
     void check_place_piece(identifier::Id hovered_id);
     void check_move_piece(identifier::Id hovered_id);
     void check_take_piece(identifier::Id hovered_id);
-    void place_piece(Index node_index);
-    void move_piece(Index piece_index, Index node_index);
-    void take_piece(Index piece_index);
+
     void switch_turn_and_check_turns_without_mills();
     bool can_go(Index piece_index, Index destination_node_index);
     void check_player_number_of_pieces(BoardPlayer player);

@@ -44,58 +44,21 @@ Board::Flags JumpBoard::release(identifier::Id hovered_id) {
     return result;
 }
 
-void JumpBoard::computer_place_piece(Index) {
+void JumpBoard::place_piece(Index) {
     ASSERT(false, "Unimplemented");
 }
 
-void JumpBoard::computer_move_piece(Index source_node_index, Index destination_node_index) {
+void JumpBoard::move_piece(Index source_node_index, Index destination_node_index) {
     remember_state();
-    move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
+
+    _move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
 }
 
-void JumpBoard::computer_take_piece(Index) {
+void JumpBoard::take_piece(Index) {
     ASSERT(false, "Unimplemented");
 }
 
-void JumpBoard::check_select_piece(identifier::Id hovered_id) {
-    for (const auto& [index, piece] : pieces) {
-        if (index == clicked_piece_index && piece.model->bounding_box->id == hovered_id) {
-            const bool can_select = (
-                turn == BoardPlayer::White && piece.type == PieceType::White
-                || turn == BoardPlayer::Black && piece.type == PieceType::Black
-            );
-
-            if (can_select) {
-                select_piece(index);
-                break;
-            }
-        }
-    }
-}
-
-void JumpBoard::check_move_piece(identifier::Id hovered_id) {
-    if (selected_piece_index == NULL_INDEX) {
-        return;
-    }
-
-    for (const Node& node : nodes) {
-        const bool can_move = (
-            node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
-            && node.piece_index == NULL_INDEX
-        );
-
-        if (can_move) {
-            remember_state();
-            move_piece(selected_piece_index, node.index);
-
-            selected_piece_index = NULL_INDEX;
-            flags.did_action = true;
-            break;
-        }
-    }
-}
-
-void JumpBoard::move_piece(Index piece_index, Index node_index) {
+void JumpBoard::_move_piece(Index piece_index, Index node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
@@ -149,6 +112,44 @@ void JumpBoard::move_piece(Index piece_index, Index node_index) {
         update_piece_outlines();
 
         remember_position_and_check_repetition(piece_index, node_index);
+    }
+}
+
+void JumpBoard::check_select_piece(identifier::Id hovered_id) {
+    for (const auto& [index, piece] : pieces) {
+        if (index == clicked_piece_index && piece.model->bounding_box->id == hovered_id) {
+            const bool can_select = (
+                turn == BoardPlayer::White && piece.type == PieceType::White
+                || turn == BoardPlayer::Black && piece.type == PieceType::Black
+            );
+
+            if (can_select) {
+                select_piece(index);
+                break;
+            }
+        }
+    }
+}
+
+void JumpBoard::check_move_piece(identifier::Id hovered_id) {
+    if (selected_piece_index == NULL_INDEX) {
+        return;
+    }
+
+    for (const Node& node : nodes) {
+        const bool can_move = (
+            node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
+            && node.piece_index == NULL_INDEX
+        );
+
+        if (can_move) {
+            remember_state();
+            move_piece(pieces.at(selected_piece_index).node_index, node.index);
+
+            selected_piece_index = NULL_INDEX;
+            flags.did_action = true;
+            break;
+        }
     }
 }
 

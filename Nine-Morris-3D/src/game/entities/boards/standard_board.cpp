@@ -61,145 +61,25 @@ Board::Flags StandardBoard::release(identifier::Id hovered_id) {
     return result;
 }
 
-void StandardBoard::computer_place_piece(Index node_index) {
-    remember_state();
-    place_piece(node_index);
-}
-
-void StandardBoard::computer_move_piece(Index source_node_index, Index destination_node_index) {
-    remember_state();
-    move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
-}
-
-void StandardBoard::computer_take_piece(Index node_index) {
-    remember_state();
-    take_piece(nodes.at(node_index).piece_index);
-}
-
-void StandardBoard::check_select_piece(identifier::Id hovered_id) {
-    for (const auto& [index, piece] : pieces) {
-        if (index == clicked_piece_index && piece.model->bounding_box->id == hovered_id) {
-            const bool can_select = (
-                turn == BoardPlayer::White && piece.type == PieceType::White
-                || turn == BoardPlayer::Black && piece.type == PieceType::Black
-            );
-
-            if (can_select) {
-                select_piece(index);
-                break;
-            }
-        }
-    }
-}
-
-void StandardBoard::check_place_piece(identifier::Id hovered_id) {
-    for (const Node& node : nodes) {
-        const bool can_place = (
-            node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
-            && node.piece_index == NULL_INDEX
-        );
-
-        if (can_place) {
-            remember_state();
-            place_piece(node.index);
-
-            flags.did_action = true;
-            break;
-        }
-    }
-}
-
-void StandardBoard::check_move_piece(identifier::Id hovered_id) {
-    if (selected_piece_index == NULL_INDEX) {
-        return;
-    }
-
-    for (const Node& node : nodes) {
-        const bool can_move = (
-            node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
-            && node.piece_index == NULL_INDEX && can_go(selected_piece_index, node.index)
-        );
-
-        if (can_move) {
-            remember_state();
-            move_piece(selected_piece_index, node.index);
-
-            selected_piece_index = NULL_INDEX;
-            flags.did_action = true;
-            break;
-        }
-    }
-}
-
-void StandardBoard::check_take_piece(identifier::Id hovered_id) {
-    if (clicked_piece_index == NULL_INDEX) {
-        return;
-    }
-
-    static constexpr auto mills = MILLS_NINE_MENS_MORRIS;
-    static constexpr auto count = NINE_MENS_MORRIS_MILLS;
-
-    for (auto& [index, piece] : pieces) {
-        if (turn == BoardPlayer::White) {
-            const bool valid_piece = (
-                index == clicked_piece_index && piece.model->bounding_box->id == hovered_id
-                && piece.type == PieceType::Black && piece.in_use
-            );
-
-            if (valid_piece) {
-                const bool can_take = (
-                    !is_mill_made(piece.node_index, PieceType::Black, mills, count)
-                    || number_of_pieces_in_mills(PieceType::Black, mills, count) == black_pieces_count
-                );
-
-                if (can_take) {
-                    remember_state();
-                    take_piece(index);
-
-                    flags.did_action = true;
-                } else {
-                    DEB_DEBUG("Cannot take black piece from mill");
-                }
-
-                break;
-            }
-        } else {
-            const bool valid_piece = (
-                index == clicked_piece_index && piece.model->bounding_box->id == hovered_id
-                && piece.type == PieceType::White && piece.in_use
-            );
-
-            if (valid_piece) {
-                const bool can_take = (
-                    !is_mill_made(piece.node_index, PieceType::White, mills, count)
-                    || number_of_pieces_in_mills(PieceType::White, mills, count) == white_pieces_count
-                );
-
-                if (can_take) {
-                    remember_state();
-                    take_piece(index);
-
-                    flags.did_action = true;
-                } else {
-                    DEB_DEBUG("Cannot take white piece from mill");
-                }
-
-                break;
-            }
-        }
-    }
-
-    // Do this even if it may not be needed
-    if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0 && !must_take_piece
-            && phase != BoardPhase::GameOver) {
-        phase = BoardPhase::MovePieces;
-        update_piece_outlines();
-
-        DEB_INFO("Started phase 2");
-    }
-}
-
 void StandardBoard::place_piece(Index node_index) {
+    remember_state();
+
+    _place_piece(node_index);
+}
+
+void StandardBoard::move_piece(Index source_node_index, Index destination_node_index) {
+    remember_state();
+
+    _move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
+}
+
+void StandardBoard::take_piece(Index node_index) {
+    remember_state();
+
+    _take_piece(nodes.at(node_index).piece_index);
+}
+
+void StandardBoard::_place_piece(Index node_index) {
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
     Node& node = nodes.at(node_index);
@@ -254,7 +134,7 @@ void StandardBoard::place_piece(Index node_index) {
     }
 }
 
-void StandardBoard::move_piece(Index piece_index, Index node_index) {
+void StandardBoard::_move_piece(Index piece_index, Index node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
@@ -334,7 +214,7 @@ void StandardBoard::move_piece(Index piece_index, Index node_index) {
     }
 }
 
-void StandardBoard::take_piece(Index piece_index) {
+void StandardBoard::_take_piece(Index piece_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
@@ -374,6 +254,125 @@ void StandardBoard::take_piece(Index piece_index) {
         game_over(
             BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
         );
+    }
+}
+
+void StandardBoard::check_select_piece(identifier::Id hovered_id) {
+    for (const auto& [index, piece] : pieces) {
+        if (index == clicked_piece_index && piece.model->bounding_box->id == hovered_id) {
+            const bool can_select = (
+                turn == BoardPlayer::White && piece.type == PieceType::White
+                || turn == BoardPlayer::Black && piece.type == PieceType::Black
+            );
+
+            if (can_select) {
+                select_piece(index);
+                break;
+            }
+        }
+    }
+}
+
+void StandardBoard::check_place_piece(identifier::Id hovered_id) {
+    for (const Node& node : nodes) {
+        const bool can_place = (
+            node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
+            && node.piece_index == NULL_INDEX
+        );
+
+        if (can_place) {
+            place_piece(node.index);
+
+            flags.did_action = true;
+            break;
+        }
+    }
+}
+
+void StandardBoard::check_move_piece(identifier::Id hovered_id) {
+    if (selected_piece_index == NULL_INDEX) {
+        return;
+    }
+
+    for (const Node& node : nodes) {
+        const bool can_move = (
+            node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
+            && node.piece_index == NULL_INDEX && can_go(selected_piece_index, node.index)
+        );
+
+        if (can_move) {
+            move_piece(pieces.at(selected_piece_index).node_index, node.index);
+
+            selected_piece_index = NULL_INDEX;
+            flags.did_action = true;
+            break;
+        }
+    }
+}
+
+void StandardBoard::check_take_piece(identifier::Id hovered_id) {
+    if (clicked_piece_index == NULL_INDEX) {
+        return;
+    }
+
+    static constexpr auto mills = MILLS_NINE_MENS_MORRIS;
+    static constexpr auto count = NINE_MENS_MORRIS_MILLS;
+
+    for (auto& [index, piece] : pieces) {
+        if (turn == BoardPlayer::White) {
+            const bool valid_piece = (
+                index == clicked_piece_index && piece.model->bounding_box->id == hovered_id
+                && piece.type == PieceType::Black && piece.in_use
+            );
+
+            if (valid_piece) {
+                const bool can_take = (
+                    !is_mill_made(piece.node_index, PieceType::Black, mills, count)
+                    || number_of_pieces_in_mills(PieceType::Black, mills, count) == black_pieces_count
+                );
+
+                if (can_take) {
+                    take_piece(piece.node_index);
+
+                    flags.did_action = true;
+                } else {
+                    DEB_DEBUG("Cannot take black piece from mill");
+                }
+
+                break;
+            }
+        } else {
+            const bool valid_piece = (
+                index == clicked_piece_index && piece.model->bounding_box->id == hovered_id
+                && piece.type == PieceType::White && piece.in_use
+            );
+
+            if (valid_piece) {
+                const bool can_take = (
+                    !is_mill_made(piece.node_index, PieceType::White, mills, count)
+                    || number_of_pieces_in_mills(PieceType::White, mills, count) == white_pieces_count
+                );
+
+                if (can_take) {
+                    take_piece(piece.node_index);
+
+                    flags.did_action = true;
+                } else {
+                    DEB_DEBUG("Cannot take white piece from mill");
+                }
+
+                break;
+            }
+        }
+    }
+
+    // Do this even if it may not be needed
+    if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0 && !must_take_piece
+            && phase != BoardPhase::GameOver) {
+        phase = BoardPhase::MovePieces;
+        update_piece_outlines();
+
+        DEB_INFO("Started phase 2");
     }
 }
 

@@ -369,8 +369,7 @@ void SceneGame::update_computer_thinking_indicator() {
 }
 
 void SceneGame::update_timer_text() {
-    char time[32];
-    timer.get_time_formatted(time);
+    const auto time = timer.get_time_formatted();
     objects.get<gui::Text>("timer_text"_H)->set_text(time);
 }
 
@@ -986,10 +985,9 @@ void SceneGame::imgui_draw_game_over() {
         ImGui::Separator();
         ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-        char time[32];
-        timer.get_time_formatted(time);
+        const auto time = timer.get_time_formatted();
         char time_label[64];
-        snprintf(time_label, 64, "Time: %s", time);
+        snprintf(time_label, 64, "Time: %s", time.c_str());
 
         const float window_width = ImGui::GetWindowSize().x;
         const float text_width = ImGui::CalcTextSize(time_label).x;

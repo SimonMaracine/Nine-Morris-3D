@@ -11,16 +11,16 @@ public:
         : board(board) {}
     ~MinimaxThread();
 
-    MinimaxThread(const MinimaxThread& other) = delete;
-    MinimaxThread& operator=(const MinimaxThread& other) = delete;
-    MinimaxThread(MinimaxThread&& other) = delete;
+    MinimaxThread(const MinimaxThread&) = delete;
+    MinimaxThread& operator=(const MinimaxThread&) = delete;
+    MinimaxThread(MinimaxThread&&) = delete;
     MinimaxThread& operator=(MinimaxThread&& other) noexcept;
 
     struct Result {
-        size_t place_node_index = 0;
-        size_t take_node_index = 0;
-        size_t put_down_source_node_index = 0;
-        size_t put_down_destination_node_index = 0;
+        Index place_node_index = NULL_INDEX;
+        Index take_node_index = NULL_INDEX;
+        Index put_down_source_node_index = NULL_INDEX;
+        Index put_down_destination_node_index = NULL_INDEX;
     };
 
     using Algorithm = std::function<void(GamePosition, Result&, std::atomic<bool>&)>;

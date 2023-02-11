@@ -12,7 +12,8 @@
 class KeyboardControls;
 class Scene;
 
-struct Board {
+class Board {
+public:
     Board() = default;
     virtual ~Board() = default;
 
@@ -25,16 +26,17 @@ struct Board {
 
     virtual void click(identifier::Id) = 0;
     virtual Flags release(identifier::Id) = 0;
-    virtual void computer_place_piece(Index) = 0;
-    virtual void computer_move_piece(Index, Index) = 0;
-    virtual void computer_take_piece(Index) = 0;
+    virtual void place_piece(Index) = 0;
+    virtual void move_piece(Index, Index) = 0;
+    virtual void take_piece(Index) = 0;
 
     GamePosition get_position();
     void update_nodes(identifier::Id hovered_id);
     void update_pieces(identifier::Id hovered_id);
     void move_pieces();
     void finalize_pieces_state();
-
+    void update_piece_outlines();
+protected:
     Index new_piece_to_place(PieceType type, float x_pos, float z_pos, Index node_index);
     void take_and_raise_piece(Index piece_index);
     void select_piece(Index piece_index);
@@ -44,7 +46,6 @@ struct Board {
     bool is_mill_made(Index node_index, PieceType type, const size_t mills[][3], size_t mills_count);
     size_t number_of_pieces_in_mills(PieceType type, const size_t mills[][3], size_t mills_count);
     void unselect_other_pieces(Index currently_selected_piece_index_index);
-    void update_piece_outlines();
     void play_piece_place_sound(Index piece_index);
     void play_piece_move_sound(Index piece_index);
     void play_piece_take_sound(Index piece_index);
@@ -53,7 +54,7 @@ struct Board {
     void prepare_piece_for_linear_move(Index piece_index, const glm::vec3& target, const glm::vec3& velocity);
     void prepare_piece_for_three_step_move(Index piece_index, const glm::vec3& target, const glm::vec3& velocity,
         const glm::vec3& target0, const glm::vec3& target1);
-
+public:
     renderables::Model* model = nullptr;
     renderables::Model* paint_model = nullptr;
 

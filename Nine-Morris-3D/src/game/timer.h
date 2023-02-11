@@ -22,7 +22,7 @@ public:
     void reset_last_time();
     bool is_running() const;
     unsigned int get_time() const;
-    void get_time_formatted(char* out_formatted_time) const;  // Maximum 32 bytes
+    std::string get_time_formatted() const;
 private:
     unsigned int time = 0;  // In deciseconds
     double last_time = 0.0;  // Last GLFW time (in seconds)

@@ -29,30 +29,29 @@ void GameContext::begin_computer_move() {
 }
 
 bool GameContext::end_computer_move() {
-    switch (board->phase) {
-        case BoardPhase::PlacePieces:
-            if (board->must_take_piece) {
+    if (board->must_take_piece) {
+        const auto& result = minimax_thread->get_result();
+        board->take_piece(result.take_node_index);
+    } else {
+        switch (board->phase) {
+            case BoardPhase::PlacePieces: {
                 const auto& result = minimax_thread->get_result();
-                board->computer_take_piece(result.take_node_index);
-            } else {
-                const auto& result = minimax_thread->get_result();
-                board->computer_place_piece(result.place_node_index);
+                board->place_piece(result.place_node_index);
+
+                break;
             }
-            break;
-        case BoardPhase::MovePieces:
-            if (board->must_take_piece) {
+            case BoardPhase::MovePieces: {
                 const auto& result = minimax_thread->get_result();
-                board->computer_take_piece(result.take_node_index);
-            } else {
-                const auto& result = minimax_thread->get_result();
-                board->computer_move_piece(
+                board->move_piece(
                     result.put_down_source_node_index,
                     result.put_down_destination_node_index
                 );
+
+                break;
             }
-            break;
-        default:
-            break;
+            default:
+                break;
+        }
     }
 
     const bool result = board->flags.switched_turn;

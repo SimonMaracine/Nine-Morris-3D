@@ -12,9 +12,7 @@ GamePosition Board::get_position() {
 
     for (const Node& node : nodes) {
         if (node.piece_index != NULL_INDEX) {
-            const Piece& piece = pieces.at(node.piece_index);
-
-            position[node.index] = piece.type;
+            position[node.index] = pieces.at(node.piece_index).type;
         } else {
             position[node.index] = PieceType::None;
         }
@@ -145,6 +143,18 @@ void Board::finalize_pieces_state() {
 
     for (size_t index : to_erase) {
         piece_arrive_at_node(index);
+    }
+}
+
+void Board::update_piece_outlines() {
+    if (phase == BoardPhase::MovePieces) {
+        if (turn == BoardPlayer::White) {
+            set_pieces_show_outline(PieceType::White, true);
+            set_pieces_show_outline(PieceType::Black, false);
+        } else {
+            set_pieces_show_outline(PieceType::Black, true);
+            set_pieces_show_outline(PieceType::White, false);
+        }
     }
 }
 
@@ -318,18 +328,6 @@ void Board::unselect_other_pieces(Index currently_selected_piece_index) {
     for (auto& [_, piece] : pieces) {
         if (piece.index != currently_selected_piece_index) {
             piece.selected = false;
-        }
-    }
-}
-
-void Board::update_piece_outlines() {
-    if (phase == BoardPhase::MovePieces) {
-        if (turn == BoardPlayer::White) {
-            set_pieces_show_outline(PieceType::White, true);
-            set_pieces_show_outline(PieceType::Black, false);
-        } else {
-            set_pieces_show_outline(PieceType::Black, true);
-            set_pieces_show_outline(PieceType::White, false);
         }
     }
 }
