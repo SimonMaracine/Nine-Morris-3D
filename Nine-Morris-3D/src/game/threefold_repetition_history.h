@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/game_position.h"
 #include "other/constants.h"
 
 struct ThreefoldRepetitionHistory {
@@ -12,9 +13,9 @@ struct ThreefoldRepetitionHistory {
             );
         }
 
-        std::array<PieceType, MAX_NODES> position;
-        Index piece_index;
-        Index node_index;
+        GamePosition position;
+        size_t piece_index;
+        size_t node_index;
     };
 
     std::vector<PositionPlusInfo> ones;

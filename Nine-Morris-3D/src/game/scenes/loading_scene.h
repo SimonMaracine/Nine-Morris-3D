@@ -21,7 +21,7 @@ struct LoadingScene : public Scene {
     void initialize_board();
     void initialize_board_paint();
     void initialize_pieces();
-    void initialize_node(Index index);
+    void initialize_node(size_t index);
     void initialize_nodes();
     void initialize_board_no_normal();
     void initialize_board_paint_no_normal();

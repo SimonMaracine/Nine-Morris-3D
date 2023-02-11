@@ -3,6 +3,6 @@
 #include "other/constants.h"
 
 struct NodeSerialized {
-    Index index = NULL_INDEX;
-    Index piece_index = NULL_INDEX;
+    size_t index = NULL_INDEX;
+    size_t piece_index = NULL_INDEX;
 };

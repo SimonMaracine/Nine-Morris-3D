@@ -408,7 +408,7 @@ void LoadingScene::initialize_pieces() {
     );
 }
 
-void LoadingScene::initialize_node(Index index) {
+void LoadingScene::initialize_node(size_t index) {
     auto material_instance = app->res.material_instance.load(
         hs("node" + std::to_string(index)),
         app->res.material["basic"_H]

@@ -44,21 +44,21 @@ Board::Flags JumpBoard::release(identifier::Id hovered_id) {
     return result;
 }
 
-void JumpBoard::place_piece(Index) {
+void JumpBoard::place_piece(size_t) {
     ASSERT(false, "Unimplemented");
 }
 
-void JumpBoard::move_piece(Index source_node_index, Index destination_node_index) {
+void JumpBoard::move_piece(size_t source_node_index, size_t destination_node_index) {
     remember_state();
 
     _move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
 }
 
-void JumpBoard::take_piece(Index) {
+void JumpBoard::take_piece(size_t) {
     ASSERT(false, "Unimplemented");
 }
 
-void JumpBoard::_move_piece(Index piece_index, Index node_index) {
+void JumpBoard::_move_piece(size_t piece_index, size_t node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
@@ -276,7 +276,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
         }
     }
 
-    std::vector<Index> to_remove;
+    std::vector<size_t> to_remove;
 
     for (auto& [index, piece] : pieces) {
         if (serialized.pieces.find(index) == serialized.pieces.end()) {
@@ -285,7 +285,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
         }
     }
 
-    for (Index index : to_remove) {
+    for (size_t index : to_remove) {
         pieces.erase(index);
     }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/game_position.h"
 #include "other/constants.h"
 
 struct Board;
@@ -17,10 +18,10 @@ public:
     MinimaxThread& operator=(MinimaxThread&& other) noexcept;
 
     struct Result {
-        Index place_node_index = NULL_INDEX;
-        Index take_node_index = NULL_INDEX;
-        Index put_down_source_node_index = NULL_INDEX;
-        Index put_down_destination_node_index = NULL_INDEX;
+        size_t place_node_index = NULL_INDEX;
+        size_t take_node_index = NULL_INDEX;
+        size_t put_down_source_node_index = NULL_INDEX;
+        size_t put_down_destination_node_index = NULL_INDEX;
     };
 
     using Algorithm = std::function<void(GamePosition, Result&, std::atomic<bool>&)>;

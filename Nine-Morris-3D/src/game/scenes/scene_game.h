@@ -41,10 +41,10 @@ public:
 
     void setup_and_add_model_board();
     void setup_and_add_model_board_paint();
-    void setup_and_add_model_piece(Index index, const glm::vec3& position);
+    void setup_and_add_model_piece(size_t index, const glm::vec3& position);
     void setup_and_add_model_nodes();
-    void setup_and_add_model_node(Index index, const glm::vec3& position);
-    void setup_piece_on_node(Index index, Index node_index);
+    void setup_and_add_model_node(size_t index, const glm::vec3& position);
+    void setup_piece_on_node(size_t index, size_t node_index);
     void setup_camera();
     void setup_and_add_turn_indicator();
     void setup_and_add_timer_text();
@@ -52,8 +52,8 @@ public:
     void setup_computer_thinking_indicator();
     void setup_light_bulb();
 
-    void initialize_piece(Index index, std::shared_ptr<gl::Texture> diffuse_texture);
-    void initialize_piece_no_normal(Index index, std::shared_ptr<gl::Texture> diffuse_texture);
+    void initialize_piece(size_t index, std::shared_ptr<gl::Texture> diffuse_texture);
+    void initialize_piece_no_normal(size_t index, std::shared_ptr<gl::Texture> diffuse_texture);
 
     void release_piece_material_instances();
     void change_skybox();

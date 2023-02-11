@@ -20,11 +20,11 @@ struct JumpBoard : public Board {  // Also good for jump plus variant
 
     virtual void click(identifier::Id hovered_id) override;
     virtual Board::Flags release(identifier::Id hovered_id) override;
-    virtual void place_piece(Index node_index) override;
-    virtual void move_piece(Index source_node_index, Index destination_node_index) override;
-    virtual void take_piece(Index node_index) override;
+    virtual void place_piece(size_t node_index) override;
+    virtual void move_piece(size_t source_node_index, size_t destination_node_index) override;
+    virtual void take_piece(size_t node_index) override;
 
-    void _move_piece(Index piece_index, Index node_index);
+    void _move_piece(size_t piece_index, size_t node_index);
 
     void check_select_piece(identifier::Id hovered_id);
     void check_move_piece(identifier::Id hovered_id);

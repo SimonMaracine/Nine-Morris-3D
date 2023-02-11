@@ -172,6 +172,11 @@ void serialize(Archive& archive, ThreefoldRepetitionHistory::PositionPlusInfo& p
 }
 
 template<typename Archive>
+void serialize(Archive& archive, GamePosition& game_position) {
+    archive(game_position.data, game_position.turns);
+}
+
+template<typename Archive>
 void serialize(Archive& archive, PieceSerialized& piece) {
     archive(
         piece.index,

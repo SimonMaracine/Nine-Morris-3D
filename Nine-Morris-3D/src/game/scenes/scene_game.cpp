@@ -47,7 +47,7 @@ void SceneGame::setup_and_add_model_board_paint() {
     DEB_DEBUG("Setup model board paint");
 }
 
-void SceneGame::setup_and_add_model_piece(Index index, const glm::vec3& position) {
+void SceneGame::setup_and_add_model_piece(size_t index, const glm::vec3& position) {
     auto& data = app->user_data<Data>();
 
     const Piece& piece = get_board().pieces.at(index);
@@ -80,7 +80,7 @@ void SceneGame::setup_and_add_model_nodes() {
     }
 }
 
-void SceneGame::setup_and_add_model_node(Index index, const glm::vec3& position) {
+void SceneGame::setup_and_add_model_node(size_t index, const glm::vec3& position) {
     auto& data = app->user_data<Data>();
 
     const Node& node = get_board().nodes.at(index);
@@ -100,7 +100,7 @@ void SceneGame::setup_and_add_model_node(Index index, const glm::vec3& position)
 }
 
 
-void SceneGame::setup_piece_on_node(Index index, Index node_index) {
+void SceneGame::setup_piece_on_node(size_t index, size_t node_index) {
     setup_and_add_model_piece(index, PIECE_INDEX_POSITION(node_index));
 
     get_board().pieces.at(index).node_index = node_index;
@@ -223,7 +223,7 @@ void SceneGame::setup_light_bulb() {
 #endif
 }
 
-void SceneGame::initialize_piece(Index index, std::shared_ptr<gl::Texture> diffuse_texture) {
+void SceneGame::initialize_piece(size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
     auto material_instance = app->res.material_instance.load(
         hs("piece" + std::to_string(index)),
         app->res.material["tinted_wood"_H]
@@ -236,7 +236,7 @@ void SceneGame::initialize_piece(Index index, std::shared_ptr<gl::Texture> diffu
     material_instance->set_vec3("u_material.tint"_H, DEFAULT_TINT);
 }
 
-void SceneGame::initialize_piece_no_normal(Index index, std::shared_ptr<gl::Texture> diffuse_texture) {
+void SceneGame::initialize_piece_no_normal(size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
     auto material_instance = app->res.material_instance.load(
         hs("piece" + std::to_string(index)),
         app->res.material["tinted_wood"_H]
@@ -1082,9 +1082,9 @@ void SceneGame::imgui_draw_debug() {
     ImGui::Text("Undo history size: %lu", get_undo_size());
     ImGui::Text("Redo history size: %lu", get_redo_size());
     ImGui::Text("Hovered ID: %.3f", static_cast<float>(app->renderer->get_hovered_id()));
-    ImGui::Text("Clicked node: %d", get_board().clicked_node_index);
-    ImGui::Text("Clicked piece: %d", get_board().clicked_piece_index);
-    ImGui::Text("Selected piece: %d", get_board().selected_piece_index);
+    ImGui::Text("Clicked node: %lu", get_board().clicked_node_index);
+    ImGui::Text("Clicked piece: %lu", get_board().clicked_piece_index);
+    ImGui::Text("Selected piece: %lu", get_board().selected_piece_index);
     ImGui::Text("Is player's turn: %s", get_board().is_players_turn ? "true" : "false");
     ImGui::Text("Next move: %s", get_board().next_move ? "true" : "false");
     ImGui::Text("Game started: %s", made_first_move ? "true" : "false");

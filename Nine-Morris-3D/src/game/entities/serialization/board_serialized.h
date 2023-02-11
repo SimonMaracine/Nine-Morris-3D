@@ -9,7 +9,7 @@
 
 struct BoardSerialized {
     std::array<NodeSerialized, MAX_NODES> nodes;
-    std::unordered_map<Index, PieceSerialized> pieces;
+    std::unordered_map<size_t, PieceSerialized> pieces;
 
     BoardPhase phase = BoardPhase::PlacePieces;
     BoardPlayer turn = BoardPlayer::White;

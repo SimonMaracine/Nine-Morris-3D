@@ -313,7 +313,7 @@ void StandardGameScene::setup_entities() {
 
     for (size_t i = 0; i < 9; i++) {
         board.pieces[i] = Piece {
-            static_cast<Index>(i),
+            i,
             PieceType::White,
             objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
@@ -322,7 +322,7 @@ void StandardGameScene::setup_entities() {
 
     for (size_t i = 9; i < 18; i++) {
         board.pieces[i] = Piece {
-            static_cast<Index>(i),
+            i,
             PieceType::Black,
             objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
             app->res.al_source.load(hs("piece" + std::to_string(i)))
@@ -331,7 +331,7 @@ void StandardGameScene::setup_entities() {
 
     for (size_t i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
-            static_cast<Index>(i),
+            i,
             objects.get<renderables::Model>(hs("node" + std::to_string(i)))
         };
     }

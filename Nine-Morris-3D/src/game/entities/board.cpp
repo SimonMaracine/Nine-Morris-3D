@@ -5,6 +5,7 @@
 #include "game/entities/node.h"
 #include "game/entities/piece.h"
 #include "game/piece_movement.h"
+#include "game/game_position.h"
 #include "other/constants.h"
 
 GamePosition Board::get_position() {
@@ -12,11 +13,13 @@ GamePosition Board::get_position() {
 
     for (const Node& node : nodes) {
         if (node.piece_index != NULL_INDEX) {
-            position[node.index] = pieces.at(node.piece_index).type;
+            position.at(node.index) = pieces.at(node.piece_index).type;
         } else {
-            position[node.index] = PieceType::None;
+            position.at(node.index) = PieceType::None;
         }
     }
+
+    position.turns = turn_count;
 
     return position;
 }
@@ -158,7 +161,7 @@ void Board::update_piece_outlines() {
     }
 }
 
-Index Board::new_piece_to_place(PieceType type, float x_pos, float z_pos, Index node_index) {
+size_t Board::new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index) {
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
     for (auto& [index, piece] : pieces) {
@@ -181,7 +184,7 @@ Index Board::new_piece_to_place(PieceType type, float x_pos, float z_pos, Index 
     return NULL_INDEX;
 }
 
-void Board::take_and_raise_piece(Index piece_index) {
+void Board::take_and_raise_piece(size_t piece_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
@@ -198,7 +201,7 @@ void Board::take_and_raise_piece(Index piece_index) {
     );
 }
 
-void Board::select_piece(Index piece_index) {
+void Board::select_piece(size_t piece_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
@@ -251,7 +254,7 @@ void Board::game_over(const BoardEnding& ending) {
     }
 }
 
-bool Board::is_mill_made(Index node_index, PieceType type, const size_t mills[][3], size_t mills_count) {
+bool Board::is_mill_made(size_t node_index, PieceType type, const size_t mills[][3], size_t mills_count) {
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
     for (size_t i = 0; i < mills_count; i++) {
@@ -278,7 +281,7 @@ bool Board::is_mill_made(Index node_index, PieceType type, const size_t mills[][
 }
 
 size_t Board::number_of_pieces_in_mills(PieceType type, const size_t mills[][3], size_t mills_count) {
-    std::vector<Index> pieces_inside_mills;
+    std::vector<size_t> pieces_inside_mills;
 
     for (size_t i = 0; i < mills_count; i++) {
         const size_t* mill = mills[i];
@@ -293,7 +296,7 @@ size_t Board::number_of_pieces_in_mills(PieceType type, const size_t mills[][3],
             const Piece& piece3 = pieces.at(node3.piece_index);
 
             if (piece1.type == type && piece2.type == type && piece3.type == type) {
-                std::vector<Index>::iterator iter;
+                std::vector<size_t>::iterator iter;
 
                 iter = std::find(pieces_inside_mills.begin(), pieces_inside_mills.end(), piece1.index);
                 if (iter == pieces_inside_mills.end()) {
@@ -322,7 +325,7 @@ size_t Board::number_of_pieces_in_mills(PieceType type, const size_t mills[][3],
     return pieces_inside_mills.size();
 }
 
-void Board::unselect_other_pieces(Index currently_selected_piece_index) {
+void Board::unselect_other_pieces(size_t currently_selected_piece_index) {
     ASSERT(currently_selected_piece_index != NULL_INDEX, "Invalid index");
 
     for (auto& [_, piece] : pieces) {
@@ -332,27 +335,27 @@ void Board::unselect_other_pieces(Index currently_selected_piece_index) {
     }
 }
 
-void Board::play_piece_place_sound(Index piece_index) {
+void Board::play_piece_place_sound(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
     const auto choice = random_gen::choice({ "piece_place1"_H, "piece_place2"_H });
     piece.source->play(app->res.al_buffer[choice].get());
 }
 
-void Board::play_piece_move_sound(Index piece_index) {
+void Board::play_piece_move_sound(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
     const auto choice = random_gen::choice({ "piece_move1"_H, "piece_move2"_H });
     piece.source->play(app->res.al_buffer[choice].get());
 }
 
-void Board::play_piece_take_sound(Index piece_index) {
+void Board::play_piece_take_sound(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
     piece.source->play(app->res.al_buffer["piece_take"_H].get());
 }
 
-void Board::remember_position_and_check_repetition(Index piece_index, Index node_index) {
+void Board::remember_position_and_check_repetition(size_t piece_index, size_t node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
@@ -394,7 +397,7 @@ void Board::remember_position_and_check_repetition(Index piece_index, Index node
     repetition_history.ones.push_back(current_position);
 }
 
-void Board::piece_arrive_at_node(Index piece_index) {
+void Board::piece_arrive_at_node(size_t piece_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
@@ -419,7 +422,7 @@ void Board::piece_arrive_at_node(Index piece_index) {
     CAN_MAKE_MOVE();
 }
 
-void Board::prepare_piece_for_linear_move(Index piece_index, const glm::vec3& target, const glm::vec3& velocity) {
+void Board::prepare_piece_for_linear_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);
@@ -435,7 +438,7 @@ void Board::prepare_piece_for_linear_move(Index piece_index, const glm::vec3& ta
     piece.movement.moving = true;
 }
 
-void Board::prepare_piece_for_three_step_move(Index piece_index, const glm::vec3& target,
+void Board::prepare_piece_for_three_step_move(size_t piece_index, const glm::vec3& target,
         const glm::vec3& velocity, const glm::vec3& target0, const glm::vec3& target1) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
