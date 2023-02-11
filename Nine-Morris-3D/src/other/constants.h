@@ -127,15 +127,18 @@ enum class GamePlayer {
     Computer
 };
 
-enum class GameState {  // TODO this can be better + more states needed for Computer
-    MaybeNextPlayer,
+enum class GameState {
+    NextPlayer,
     HumanBeginMove,
     HumanThinkingMove,
-    HumanDoingMove,
+    HumanDoingMove,  // TODO HumanDoingMove and ComputerDoingMove could be merged
+    HumanDoingMoveAndTake,
     HumanEndMove,
+
     ComputerBeginMove,
     ComputerThinkingMove,
     ComputerDoingMove,
+    ComputerDoingMoveAndTake,
     ComputerEndMove
 };
 

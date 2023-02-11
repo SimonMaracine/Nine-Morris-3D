@@ -120,7 +120,7 @@ void generic_undo(S* scene) {
 
     DEB_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
 
-    scene->game.state = GameState::MaybeNextPlayer;
+    scene->game.state = GameState::NextPlayer;
     scene->made_first_move = scene->board.turn_count != 0;
 
     if (undo_game_over) {
@@ -159,7 +159,7 @@ void generic_redo(S* scene) {
 
     DEB_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
 
-    scene->game.state = GameState::MaybeNextPlayer;
+    scene->game.state = GameState::NextPlayer;
     scene->made_first_move = scene->board.turn_count != 0;
 
     const bool redo_game_over = scene->board.phase == BoardPhase::None;

@@ -375,7 +375,11 @@ void SceneGame::update_timer_text() {
 
 void SceneGame::update_after_human_move(bool did_action, bool switched_turn, bool must_take_or_took_piece) {
     if (did_action) {
-        game.state = GameState::HumanDoingMove;
+        if (switched_turn) {
+            game.state = GameState::HumanDoingMove;
+        } else {
+            game.state = GameState::HumanDoingMoveAndTake;
+        }
     }
 
     if (did_action && !made_first_move && !timer.is_running()) {
@@ -400,8 +404,6 @@ void SceneGame::update_after_human_move(bool did_action, bool switched_turn, boo
 }
 
 void SceneGame::update_after_computer_move(bool switched_turn) {
-    game.state = GameState::ComputerDoingMove;
-
     if (!made_first_move && !timer.is_running()) {
         timer.start();
         made_first_move = true;
@@ -421,7 +423,7 @@ void SceneGame::update_after_computer_move(bool switched_turn) {
 
 void SceneGame::update_game_state() {
     switch (game.state) {
-        case GameState::MaybeNextPlayer:
+        case GameState::NextPlayer:
             if (get_board().turn == BoardPlayer::White) {
                 switch (game.white_player) {
                     case GamePlayer::None:
@@ -449,31 +451,41 @@ void SceneGame::update_game_state() {
             }
             break;
         case GameState::HumanBeginMove:
-            game.begin_human_move();
+            game.human_begin_move();
             game.state = GameState::HumanThinkingMove;
             break;
         case GameState::HumanThinkingMove:
             break;
-        case GameState::HumanDoingMove:  // TODO these two DoingMove can be merged
+        case GameState::HumanDoingMove:
             if (get_board().next_move) {
                 game.state = GameState::HumanEndMove;
             }
             break;
+        case GameState::HumanDoingMoveAndTake:
+            if (get_board().next_move) {
+                game.state = GameState::HumanThinkingMove;
+            }
+            break;
         case GameState::HumanEndMove:
-            game.end_human_move();
-            game.state = GameState::MaybeNextPlayer;
+            game.state = GameState::NextPlayer;
             break;
         case GameState::ComputerBeginMove:
-            game.begin_computer_move();
+            game.computer_think_move();
             game.state = GameState::ComputerThinkingMove;
             break;
         case GameState::ComputerThinkingMove:
             if (!minimax_thread.is_running()) {
                 minimax_thread.join();
 
-                const bool switched_turn = game.end_computer_move();
+                const bool switched_turn = game.computer_execute_move();
 
                 update_after_computer_move(switched_turn);
+
+                if (switched_turn) {
+                    game.state = GameState::ComputerDoingMove;
+                } else {
+                    game.state = GameState::ComputerDoingMoveAndTake;
+                }
             }
             break;
         case GameState::ComputerDoingMove:
@@ -481,8 +493,14 @@ void SceneGame::update_game_state() {
                 game.state = GameState::ComputerEndMove;
             }
             break;
+        case GameState::ComputerDoingMoveAndTake:
+            if (get_board().next_move) {
+                game.computer_execute_take_move();
+                game.state = GameState::ComputerDoingMove;
+            }
+            break;
         case GameState::ComputerEndMove:
-            game.state = GameState::MaybeNextPlayer;
+            game.state = GameState::NextPlayer;
             break;
     }
 }
@@ -681,13 +699,13 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::BeginMenu("White")) {
                     if (ImGui::RadioButton("Human", &data.options.white_player, game_options::HUMAN)) {
                         game.white_player = GamePlayer::Human;
-                        game.reset_player(GamePlayer::Human);
+                        game.reset_players();
 
                         DEB_INFO("Set white player to human");
                     }
                     if (ImGui::RadioButton("Computer", &data.options.white_player, game_options::COMPUTER)) {
                         game.white_player = GamePlayer::Computer;
-                        game.reset_player(GamePlayer::Computer);
+                        game.reset_players();
 
                         DEB_INFO("Set white player to computer");
                     }
@@ -698,13 +716,13 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::BeginMenu("Black")) {
                     if (ImGui::RadioButton("Human", &data.options.black_player, game_options::HUMAN)) {
                         game.black_player = GamePlayer::Human;
-                        game.reset_player(GamePlayer::Human);
+                        game.reset_players();
 
                         DEB_INFO("Set black player to human");
                     }
                     if (ImGui::RadioButton("Computer", &data.options.black_player, game_options::COMPUTER)) {
                         game.black_player = GamePlayer::Computer;
-                        game.reset_player(GamePlayer::Computer);
+                        game.reset_players();
 
                         DEB_INFO("Set black player to computer");
                     }
@@ -1093,10 +1111,10 @@ void SceneGame::imgui_draw_debug() {
     }
 
     ImGui::Begin("Game");
-    std::string state;
+    const char* state = nullptr;
     switch (game.state) {
-        case GameState::MaybeNextPlayer:
-            state = "MaybeNextPlayer";
+        case GameState::NextPlayer:
+            state = "NextPlayer";
             break;
         case GameState::HumanBeginMove:
             state = "HumanBeginMove";
@@ -1106,6 +1124,9 @@ void SceneGame::imgui_draw_debug() {
             break;
         case GameState::HumanDoingMove:
             state = "HumanDoingMove";
+            break;
+        case GameState::HumanDoingMoveAndTake:
+            state = "HumanDoingMoveAndTake";
             break;
         case GameState::HumanEndMove:
             state = "HumanEndMove";
@@ -1119,11 +1140,14 @@ void SceneGame::imgui_draw_debug() {
         case GameState::ComputerDoingMove:
             state = "ComputerDoingMove";
             break;
+        case GameState::ComputerDoingMoveAndTake:
+            state = "ComputerDoingMoveAndTake";
+            break;
         case GameState::ComputerEndMove:
             state = "ComputerEndMove";
             break;
     }
-    ImGui::Text("State: %s", state.c_str());
+    ImGui::Text("State: %s", state);
     ImGui::Text("White player: %s", game.white_player == GamePlayer::Human ? "Human" : "Computer");
     ImGui::Text("Black player: %s", game.black_player == GamePlayer::Human ? "Human" : "Computer");
     ImGui::End();

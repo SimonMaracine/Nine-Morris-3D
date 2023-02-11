@@ -17,17 +17,18 @@ public:
     GameContext(GameContext&&) noexcept = default;
     GameContext& operator=(GameContext&&) noexcept = default;
 
-    void begin_human_move();
-    void end_human_move();
-    void begin_computer_move();
-    bool end_computer_move();
+    void human_begin_move();
 
-    void reset_player(GamePlayer player);
+    void computer_think_move();
+    bool computer_execute_move();
+    void computer_execute_take_move();
+
+    void reset_players();
     bool both_players_human() const { return white_player == GamePlayer::Human && black_player == GamePlayer::Human; }
 
     GamePlayer white_player = GamePlayer::None;
     GamePlayer black_player = GamePlayer::None;
-    GameState state = GameState::MaybeNextPlayer;
+    GameState state = GameState::NextPlayer;
 private:
     Board* board = nullptr;
     MinimaxThread* minimax_thread = nullptr;
