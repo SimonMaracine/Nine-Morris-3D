@@ -186,8 +186,27 @@ static int evaluate_position(GamePosition position) {  // TODO also evaluate pos
     return evaluation;
 }
 
-static std::vector<GamePosition> get_all_valid_moves(GamePosition position, PieceType type) {
-    std::vector<GamePosition> moves;
+enum class MoveType {
+    None,
+    Place,
+    Move,
+    PlaceTake,
+    MoveTake
+};
+
+struct Move {
+    size_t place_node_index = NULL_INDEX;
+    size_t take_node_index = NULL_INDEX;
+    size_t put_down_source_node_index = NULL_INDEX;
+    size_t put_down_destination_node_index = NULL_INDEX;
+
+    MoveType type = MoveType::None;
+};
+
+static Move best_move;
+
+static std::vector<Move> get_all_moves(GamePosition position, PieceType type) {
+    std::vector<Move> moves;
 
     if (calculate_material(position, type) == 3) {  // Phase 3
 
@@ -202,25 +221,47 @@ static std::vector<GamePosition> get_all_valid_moves(GamePosition position, Piec
     }
 }
 
-static int _minimax(GamePosition position, size_t depth, bool maximizing_player) {
+static void make_move(GamePosition position, const Move& move) {
+
+}
+
+static void unmake_move(GamePosition position, const Move& move) {
+
+}
+
+static int _minimax(GamePosition position, size_t depth, size_t turns_from_root, PieceType type) {
     if (depth == 0 || is_game_over(position)) {
         return evaluate_position(position);
     }
 
-    if (maximizing_player) {
+    if (type == PieceType::White) {
         int max_evaluation = MINIMUM_EVALUATION_VALUE;
 
-        for (const GamePosition& new_position : get_all_valid_moves(position, PieceType::White)) {
-            const int evaluation = _minimax(new_position, depth - 1, false);
+        const auto moves = get_all_moves(position, PieceType::White);
+
+        for (const Move& move : moves) {
+            make_move(position, move);
+            const int evaluation = _minimax(position, depth - 1, turns_from_root + 1, PieceType::Black);
+            unmake_move(position, move);
+
             max_evaluation = std::max(max_evaluation, evaluation);
         }
+
+        // if (turns_from_root == 0) {
+        //     best_move = move;
+        // }
 
         return max_evaluation;
     } else {
         int min_evaluation = MAXIMUM_EVALUATION_VALUE;
 
-        for (const GamePosition& new_position : get_all_valid_moves(position, PieceType::Black)) {
-            const int evaluation = _minimax(new_position, depth - 1, true);
+        const auto moves = get_all_moves(position, PieceType::Black);
+
+        for (const Move& move : moves) {
+            make_move(position, move);
+            const int evaluation = _minimax(position, depth - 1, turns_from_root + 1, PieceType::White);
+            unmake_move(position, move);
+
             min_evaluation = std::min(min_evaluation, evaluation);
         }
 
@@ -230,7 +271,7 @@ static int _minimax(GamePosition position, size_t depth, bool maximizing_player)
 
 namespace minimax_standard_game {
     void minimax(GamePosition position, MinimaxThread::Result& result, std::atomic<bool>& running) {
-        const auto what = _minimax(position, 4, true);
+        const auto what = _minimax(position, 4, 0, PieceType::White);
 
         result.place_node_index = 917437;
 
