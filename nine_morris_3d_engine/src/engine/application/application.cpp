@@ -51,6 +51,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     app_data.version_major = builder.major;
     app_data.version_minor = builder.minor;
     app_data.version_patch = builder.patch;
+    app_data.on_event = std::bind(&Application::on_event, this, std::placeholders::_1);
     app_data.app = this;
 
     window = std::make_unique<Window>(this);
@@ -117,10 +118,20 @@ int Application::run(SceneId start_scene_id) {
         const unsigned int fixed_updates = calculate_fixed_update();
 
         for (unsigned int i = 0; i < fixed_updates; i++) {
-            current_scene->on_fixed_update();
+            // current_scene->on_fixed_update();
+            for (size_t i = 0; i < 4; i++) {
+                current_scene->layer_stack[i].on_fixed_update();
+            }
         }
 
-        current_scene->on_update();
+        // current_scene->on_update();
+        for (size_t i = 0; i < 4; i++) {
+            current_scene->layer_stack[i].on_update();
+        }
+
+        for (size_t i = 0; i < 4; i++) {
+            current_scene->layer_stack[i].on_update();
+        }
 
         // Clear the default framebuffer, as nobody does that for us
         render_helpers::clear(render_helpers::Color);
@@ -129,7 +140,7 @@ int Application::run(SceneId start_scene_id) {
         renderer_2d_update();
         renderer_imgui_update();
 
-        evt.update();
+        // evt.update();
         window->update();
 
         check_changed_scene();
@@ -244,7 +255,10 @@ void Application::renderer_2d_func() {
 void Application::renderer_imgui_func() {
     imgui_context::begin_frame();
 
-    current_scene->on_imgui_update();
+    // current_scene->on_imgui_update();
+    for (size_t i = 0; i < 4; i++) {
+        current_scene->layer_stack[i].on_imgui_update();
+    }
 
     imgui_context::end_frame();
 }
@@ -310,6 +324,14 @@ void Application::initialize_audio() {
     DEB_INFO("With audio");
 
     openal = std::make_unique<OpenAlContext>();
+}
+
+void Application::on_event(const events::Event& event) {
+    
+
+    for (size_t i = 0; i < 4; i++) {
+        current_scene->layer_stack[i].on_event(event);
+    }
 }
 
 void Application::on_window_closed(const WindowClosedEvent&) {

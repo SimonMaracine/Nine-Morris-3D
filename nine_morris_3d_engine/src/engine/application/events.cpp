@@ -1,5 +1,5 @@
 #include "engine/application/events.h"
 
-void EventDispatcher::update() {
-    dispatcher.update();
-}
+// void EventDispatcher::update() {
+//     dispatcher.update();
+// }

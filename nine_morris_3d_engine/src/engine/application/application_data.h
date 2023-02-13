@@ -19,5 +19,6 @@ struct ApplicationData {
     unsigned int version_patch;
     std::vector<std::string> authors;
 
+    std::function<void(const events::Event&)> on_event;
     Application* app = nullptr;
 };

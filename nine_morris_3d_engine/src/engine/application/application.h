@@ -62,7 +62,7 @@ public:
     std::unique_ptr<OpenAlContext> openal;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
-    EventDispatcher evt;  // Event dispatcher
+    // EventDispatcher evt;  // Event dispatcher
     ResourcesCache res;  // Global cache of resources
 private:
     float update_frame_counter();
@@ -82,13 +82,15 @@ private:
     void initialize_renderer_imgui();
     void initialize_audio();
 
-    void on_window_closed(const WindowClosedEvent& event);
-    void on_window_resized(const WindowResizedEvent& event);
+    void on_event(const events::Event& event);
 
-    void on_imgui_mouse_scrolled(const MouseScrolledEvent& event);
-    void on_imgui_mouse_moved(const MouseMovedEvent& event);
-    void on_imgui_mouse_button_pressed(const MouseButtonPressedEvent& event);
-    void on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event);
+    void on_window_closed(const events::WindowClosedEvent& event);
+    void on_window_resized(const events::WindowResizedEvent& event);
+
+    void on_imgui_mouse_scrolled(const events::MouseScrolledEvent& event);
+    void on_imgui_mouse_moved(const events::MouseMovedEvent& event);
+    void on_imgui_mouse_button_pressed(const events::MouseButtonPressedEvent& event);
+    void on_imgui_mouse_button_released(const events::MouseButtonReleasedEvent& event);
 
     ApplicationBuilder builder;
     std::any* _user_data = nullptr;
