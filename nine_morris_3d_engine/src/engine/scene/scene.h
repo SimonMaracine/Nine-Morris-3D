@@ -2,7 +2,7 @@
 
 #include <resmanager/resmanager.h>
 
-#include "engine/application/events.h"
+#include "engine/application/event.h"
 #include "engine/scene/scene_list.h"
 #include "engine/scene/object_manager.h"
 
@@ -10,7 +10,7 @@ class Application;
 
 class Layer {
 private:
-    using OnEvent = std::function<bool(const events::Event&)>;
+    using OnEvent = std::function<bool(event::Event&)>;
     using OnUpdate = std::function<void()>;
 public:
     OnEvent on_event;  // Called for every event
@@ -37,10 +37,10 @@ public:
 
     Layer& layer(size_t index) { return layer_stack.at(index); }
 
+    virtual void on_bind() {}  // Called at initialization for defining layer updates
     virtual void on_start() {}  // Called when the scene is entered
     virtual void on_stop() {}  // Called when the scene is exited
     virtual void on_awake() {}  // Called once before on_start is called for the first time
-    virtual void on_bind() {}  // Called at initialization for defining layer updates
     // virtual void on_update() {}  // Called every frame
     // virtual void on_fixed_update() {}  // Called once every 50 milliseconds
     // virtual void on_imgui_update() {}  // Called every frame for ImGui only

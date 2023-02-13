@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "engine/application/events.h"
+#include "engine/application/event.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/texture.h"
@@ -51,7 +51,7 @@ private:
     void end_draw_text();
 
     void draw(const std::vector<gui::Widget*>& subwidgets, const BeginEnd& begin, const BeginEnd& end);
-    void on_window_resized(const WindowResizedEvent& event);
+    bool on_window_resized(event::WindowResizedEvent& event);
 
     void initialize_uniform_buffers();
     void initialize_quad_renderer();

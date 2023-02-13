@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "engine/application/platform.h"
-#include "engine/application/events.h"
+#include "engine/application/event.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/shader.h"
@@ -86,7 +86,7 @@ private:
     void setup_uniform_buffers();
     void validate_hovered_id(int x, int y);
     void cache_camera_data();
-    void on_window_resized(const WindowResizedEvent& event);
+    bool on_window_resized(event::WindowResizedEvent&);
 
     void initialize_uniform_buffers();
     void initialize_skybox_renderer();

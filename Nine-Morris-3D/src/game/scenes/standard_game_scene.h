@@ -14,9 +14,9 @@ struct StandardGameScene : public SceneGame {
     virtual void on_start() override;
     virtual void on_stop() override;
     virtual void on_awake() override;
-    virtual void on_update() override;
-    virtual void on_fixed_update() override;
-    virtual void on_imgui_update() override;
+    // virtual void on_update() override;
+    // virtual void on_fixed_update() override;
+    // virtual void on_imgui_update() override;
 
     void on_mouse_button_pressed(const MouseButtonPressedEvent& event);
     void on_mouse_button_released(const MouseButtonReleasedEvent& event);

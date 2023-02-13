@@ -3,7 +3,7 @@
 #include <resmanager/resmanager.h>
 
 #include "engine/application/application.h"
-#include "engine/application/events.h"
+#include "engine/application/event.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
@@ -40,7 +40,7 @@ GuiRenderer::GuiRenderer(Application* app)
     initialize_projection_uniform_buffer();
 
     // Setup events
-    app->evt.add_event<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);
+    // app->evt.add_event<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);  // TODO remove
 
     // Set application pointer to widgets
     gui::Widget::app = app;
@@ -272,7 +272,7 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const BeginE
     gl::VertexArray::unbind();
 }
 
-void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
+bool GuiRenderer::on_window_resized(event::WindowResizedEvent& event) {
     storage.orthographic_projection_matrix = glm::ortho(
         0.0f, static_cast<float>(event.width),
         0.0f, static_cast<float>(event.height)
@@ -284,6 +284,8 @@ void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
     storage.projection_uniform_buffer->upload_sub_data();
 
     gl::UniformBuffer::unbind();
+
+    return false;
 }
 
 void GuiRenderer::initialize_uniform_buffers() {

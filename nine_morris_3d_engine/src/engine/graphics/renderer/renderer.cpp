@@ -4,7 +4,7 @@
 
 #include "engine/application/application.h"
 #include "engine/application/platform.h"
-#include "engine/application/events.h"
+#include "engine/application/event.h"
 #include "engine/application/input.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
@@ -49,7 +49,7 @@ Renderer::Renderer(Application* app)
     framebuffer_reader = FramebufferReader<4> {storage.pixel_buffers, storage.bounding_box_framebuffer};
 
     // Setup events
-    app->evt.add_event<WindowResizedEvent, &Renderer::on_window_resized>(this);
+    // app->evt.add_event<WindowResizedEvent, &Renderer::on_window_resized>(this);  // TODO remove
 
     DEB_INFO("Initialized renderer");
 }
@@ -192,7 +192,10 @@ void Renderer::set_camera_controller(const CameraController* camera_controller) 
     }
 
     // Update the projection
-    on_window_resized(WindowResizedEvent {0, 0});
+    event::WindowResizedEvent event;  // TODO quite a hack
+    event.width = 0;
+    event.height = 0;
+    on_window_resized(event);
 }
 
 void Renderer::draw_screen_quad(GLuint texture) {
@@ -557,11 +560,13 @@ void Renderer::cache_camera_data() {
     }
 }
 
-void Renderer::on_window_resized(const WindowResizedEvent&) {
+bool Renderer::on_window_resized(event::WindowResizedEvent&) {
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix"_H, camera_cache.projection_matrix);
 
     gl::Shader::unbind();
+
+    return false;
 }
 
 void Renderer::initialize_uniform_buffers() {

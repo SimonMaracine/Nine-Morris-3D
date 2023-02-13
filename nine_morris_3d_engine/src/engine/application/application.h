@@ -3,7 +3,7 @@
 #include <resmanager/resmanager.h>
 
 #include "engine/application/application_data.h"
-#include "engine/application/events.h"
+#include "engine/application/event.h"
 #include "engine/application/window.h"
 #include "engine/application/application_builder.h"
 #include "engine/audio/context.h"
@@ -82,15 +82,15 @@ private:
     void initialize_renderer_imgui();
     void initialize_audio();
 
-    void on_event(const events::Event& event);
+    void on_event(event::Event& event);
 
-    void on_window_closed(const events::WindowClosedEvent& event);
-    void on_window_resized(const events::WindowResizedEvent& event);
+    bool on_window_closed(event::WindowClosedEvent&);
+    bool on_window_resized(event::WindowResizedEvent& event);
 
-    void on_imgui_mouse_scrolled(const events::MouseScrolledEvent& event);
-    void on_imgui_mouse_moved(const events::MouseMovedEvent& event);
-    void on_imgui_mouse_button_pressed(const events::MouseButtonPressedEvent& event);
-    void on_imgui_mouse_button_released(const events::MouseButtonReleasedEvent& event);
+    bool on_imgui_mouse_scrolled(event::MouseScrolledEvent& event);
+    bool on_imgui_mouse_moved(event::MouseMovedEvent& event);
+    bool on_imgui_mouse_button_pressed(event::MouseButtonPressedEvent& event);
+    bool on_imgui_mouse_button_released(event::MouseButtonReleasedEvent& event);
 
     ApplicationBuilder builder;
     std::any* _user_data = nullptr;

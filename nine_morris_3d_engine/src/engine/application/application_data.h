@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/application/events.h"
+#include "engine/application/event.h"
 
 class Application;
 
@@ -19,6 +19,6 @@ struct ApplicationData {
     unsigned int version_patch;
     std::vector<std::string> authors;
 
-    std::function<void(const events::Event&)> on_event;
+    std::function<void(event::Event&)> on_event;
     Application* app = nullptr;
 };

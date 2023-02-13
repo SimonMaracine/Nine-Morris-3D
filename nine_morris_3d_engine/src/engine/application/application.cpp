@@ -2,7 +2,7 @@
 
 #include "engine/application/application.h"
 #include "engine/application/window.h"
-#include "engine/application/events.h"
+#include "engine/application/event.h"
 #include "engine/application/input.h"
 #include "engine/application/application_builder.h"
 #include "engine/audio/context.h"
@@ -86,8 +86,8 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
         initialize_audio();
     }
 
-    evt.add_event<WindowClosedEvent, &Application::on_window_closed>(this);
-    evt.add_event<WindowResizedEvent, &Application::on_window_resized>(this);
+    // evt.add_event<WindowClosedEvent, &Application::on_window_closed>(this);
+    // evt.add_event<WindowResizedEvent, &Application::on_window_resized>(this);
 
     frame_counter.previous_seconds = window->get_time();
     fixed_update.previous_seconds = window->get_time();
@@ -179,9 +179,11 @@ void Application::purge_framebuffers() {
         }
     }
 
-    for (int64_t i = framebuffers.size() - 1; i >= 0; i--) {
+    for (size_t i = framebuffers.size(); i > 0; i--) {
+        const size_t I = i - 1;
+
         for (size_t index : indices) {
-            if (static_cast<int64_t>(index) == i) {
+            if (index == I) {
                 framebuffers.erase(std::next(framebuffers.begin(), index));
                 break;
             }
@@ -314,10 +316,10 @@ void Application::initialize_renderer_imgui() {
 
     renderer_imgui_update = std::bind(&Application::renderer_imgui_func, this);
 
-    evt.add_event<MouseScrolledEvent, &Application::on_imgui_mouse_scrolled>(this);
-    evt.add_event<MouseMovedEvent, &Application::on_imgui_mouse_moved>(this);
-    evt.add_event<MouseButtonPressedEvent, &Application::on_imgui_mouse_button_pressed>(this);
-    evt.add_event<MouseButtonReleasedEvent, &Application::on_imgui_mouse_button_released>(this);
+    // evt.add_event<MouseScrolledEvent, &Application::on_imgui_mouse_scrolled>(this);  // TODO fix this
+    // evt.add_event<MouseMovedEvent, &Application::on_imgui_mouse_moved>(this);
+    // evt.add_event<MouseButtonPressedEvent, &Application::on_imgui_mouse_button_pressed>(this);
+    // evt.add_event<MouseButtonReleasedEvent, &Application::on_imgui_mouse_button_released>(this);
 }
 
 void Application::initialize_audio() {
@@ -326,21 +328,30 @@ void Application::initialize_audio() {
     openal = std::make_unique<OpenAlContext>();
 }
 
-void Application::on_event(const events::Event& event) {
-    
+void Application::on_event(event::Event& event) {
+    event::Dispatcher dispatcher {event};
+    dispatcher.dispatch<event::WindowClosedEvent>(std::bind(&Application::on_window_closed, this, std::placeholders::_1));
+    dispatcher.dispatch<event::WindowResizedEvent>(std::bind(&Application::on_window_resized, this, std::placeholders::_1));
 
-    for (size_t i = 0; i < 4; i++) {
-        current_scene->layer_stack[i].on_event(event);
+    for (size_t i = 4; i > 0; i--) {
+        if (event.skip) {
+            break;
+        }
+
+        const size_t I = i - 1;
+        current_scene->layer_stack[I].on_event(event);
     }
 }
 
-void Application::on_window_closed(const WindowClosedEvent&) {
+bool Application::on_window_closed(event::WindowClosedEvent&) {
     running = false;
+
+    return false;
 }
 
-void Application::on_window_resized(const WindowResizedEvent& event) {
-    if (event.width == 0 || event.height == 0) {  // TODO maybe rework event system
-        return;
+bool Application::on_window_resized(event::WindowResizedEvent& event) {
+    if (event.width == 0 || event.height == 0) {
+        return true;
     }
 
     render_helpers::viewport(event.width, event.height);
@@ -349,33 +360,43 @@ void Application::on_window_resized(const WindowResizedEvent& event) {
         std::shared_ptr<gl::Framebuffer> fb = framebuffer.lock();
 
         if (fb == nullptr) {
-            return;
+            return false;
         }
 
         if (!fb->get_specification().resizable) {
-            return;
+            return false;
         }
 
         fb->resize(event.width, event.height);
     }
+
+    return false;
 }
 
-void Application::on_imgui_mouse_scrolled(const MouseScrolledEvent& event) {
+bool Application::on_imgui_mouse_scrolled(event::MouseScrolledEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheel = event.scroll;
+
+    return false;
 }
 
-void Application::on_imgui_mouse_moved(const MouseMovedEvent& event) {
+bool Application::on_imgui_mouse_moved(event::MouseMovedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
+
+    return false;
 }
 
-void Application::on_imgui_mouse_button_pressed(const MouseButtonPressedEvent& event) {
+bool Application::on_imgui_mouse_button_pressed(event::MouseButtonPressedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[static_cast<int>(event.button)] = true;
+
+    return false;
 }
 
-void Application::on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event) {
+bool Application::on_imgui_mouse_button_released(event::MouseButtonReleasedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[static_cast<int>(event.button)] = false;
+
+    return false;
 }

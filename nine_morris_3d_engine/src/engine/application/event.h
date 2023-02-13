@@ -51,7 +51,7 @@
 //     dispatcher.template enqueue<E>(std::forward<Args>(args)...);
 // }
 
-namespace events {
+namespace event {
     enum class EventType {
         None,
         WindowClosed,
@@ -65,50 +65,83 @@ namespace events {
         Custom
     };
 
-    template<typename E>
-    class Dispatcher {
-    public:
-        Dispatcher(E& event)
-            : event(event) {}
-    private:
-        E& event;
-    };
-
     struct Event {
         EventType type = EventType::None;
-        bool skipped = false;
+        bool skip = false;
     };
 
-    struct WindowClosedEvent : Event {};
+    class Dispatcher {
+    public:
+        Dispatcher(Event& event)
+            : event(event) {}
+        ~Dispatcher() = default;
+
+        Dispatcher(const Dispatcher&) = delete;
+        Dispatcher& operator=(const Dispatcher&) = delete;
+        Dispatcher(Dispatcher&&) = delete;
+        Dispatcher& operator=(Dispatcher&&) = delete;
+
+        template<typename E, typename F>
+        void dispatch(const F& handler) {
+            if (event.type == E::static_type()) {
+                event.skip = handler(static_cast<E&>(event));
+            }
+        }
+    private:
+        Event& event;
+    };
+
+    #define EVENT_IMPLEMENT(EventName, Type) \
+        inline EventName() { type = EventType::Type; } \
+        static EventType static_type() { return EventType::Type; } \
+        static const char* static_name() { return #Type; }
+
+    struct WindowClosedEvent : Event {
+        EVENT_IMPLEMENT(WindowClosedEvent, WindowClosed)
+    };
 
     struct WindowResizedEvent : Event {
+        EVENT_IMPLEMENT(WindowResizedEvent, WindowResized)
+
         int width;
         int height;
     };
 
     struct KeyPressedEvent : Event {
+        EVENT_IMPLEMENT(KeyPressedEvent, KeyPressed)
+
         input::Key key;
         bool repeat;
         bool control;
     };
 
     struct KeyReleasedEvent : Event {
+        EVENT_IMPLEMENT(KeyReleasedEvent, KeyReleased)
+
         input::Key key;
     };
 
     struct MouseButtonPressedEvent : Event {
+        EVENT_IMPLEMENT(MouseButtonPressedEvent, MouseButtonPressed)
+
         input::MouseButton button;
     };
 
     struct MouseButtonReleasedEvent : Event {
+        EVENT_IMPLEMENT(MouseButtonReleasedEvent, MouseButtonReleased)
+
         input::MouseButton button;
     };
 
     struct MouseScrolledEvent : Event {
+        EVENT_IMPLEMENT(MouseScrolledEvent, MouseScrolled)
+
         float scroll;
     };
 
     struct MouseMovedEvent : Event {
+        EVENT_IMPLEMENT(MouseMovedEvent, MouseMoved)
+
         float mouse_x;
         float mouse_y;
     };
