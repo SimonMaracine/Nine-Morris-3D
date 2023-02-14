@@ -19,6 +19,10 @@
 
 using namespace encrypt;
 
+void JumpPlusVariantScene::on_bind() {
+
+}
+
 void JumpPlusVariantScene::on_start() {
     auto& data = app->user_data<Data>();
 
@@ -74,17 +78,17 @@ void JumpPlusVariantScene::on_start() {
     update_menubar();
 
     camera_controller.go_towards_position(default_camera_position);
-    camera_controller.setup_events(app);
+    // camera_controller.setup_events(app);
 
     // Can dispose of these
     app->res.texture_data.clear();
     app->res.sound_data.clear();
 
-    app->evt.add_event<MouseButtonPressedEvent, &JumpPlusVariantScene::on_mouse_button_pressed>(this);
-    app->evt.add_event<MouseButtonReleasedEvent, &JumpPlusVariantScene::on_mouse_button_released>(this);
-    app->evt.add_event<KeyPressedEvent, &JumpPlusVariantScene::on_key_pressed>(this);
-    app->evt.add_event<KeyReleasedEvent, &JumpPlusVariantScene::on_key_released>(this);
-    app->evt.add_event<WindowResizedEvent, &JumpPlusVariantScene::on_window_resized>(this);
+    // app->evt.add_event<MouseButtonPressedEvent, &JumpPlusVariantScene::on_mouse_button_pressed>(this);
+    // app->evt.add_event<MouseButtonReleasedEvent, &JumpPlusVariantScene::on_mouse_button_released>(this);
+    // app->evt.add_event<KeyPressedEvent, &JumpPlusVariantScene::on_key_pressed>(this);
+    // app->evt.add_event<KeyReleasedEvent, &JumpPlusVariantScene::on_key_released>(this);
+    // app->evt.add_event<WindowResizedEvent, &JumpPlusVariantScene::on_window_resized>(this);
 }
 
 void JumpPlusVariantScene::on_stop() {
@@ -103,7 +107,7 @@ void JumpPlusVariantScene::on_stop() {
 #endif
 
     imgui_reset();
-    camera_controller.remove_events(app);
+    // camera_controller.remove_events(app);
 
     // Should dispose of these
     release_piece_material_instances();
@@ -113,7 +117,7 @@ void JumpPlusVariantScene::on_stop() {
     skybox_loader->join();
     board_paint_texture_loader->join();
 
-    app->evt.remove_events(this);
+    // app->evt.remove_events(this);
 }
 
 void JumpPlusVariantScene::on_awake() {
@@ -132,160 +136,160 @@ void JumpPlusVariantScene::on_awake() {
     );
 }
 
-void JumpPlusVariantScene::on_update() {
-    if (!hovering_gui) {
-        camera_controller.update_controls(app->get_delta());
-        board.update_nodes(app->renderer->get_hovered_id());
-        board.update_pieces(app->renderer->get_hovered_id());
-    } else {
-        camera_controller.discard_events(app);
-    }
+// void JumpPlusVariantScene::on_update() {
+//     if (!hovering_gui) {
+//         camera_controller.update_controls(app->get_delta());
+//         board.update_nodes(app->renderer->get_hovered_id());
+//         board.update_pieces(app->renderer->get_hovered_id());
+//     } else {
+//         camera_controller.discard_events(app);
+//     }
 
-    camera_controller.update_camera(app->get_delta());
-    board.move_pieces();
-    timer.update();
+//     camera_controller.update_camera(app->get_delta());
+//     board.move_pieces();
+//     timer.update();
 
-    // Update listener position, look at and up vectors every frame
-    update_listener();
+//     // Update listener position, look at and up vectors every frame
+//     update_listener();
 
-    update_game_state();
-    update_timer_text();
-    update_wait_indicator();
-    update_computer_thinking_indicator();
+//     update_game_state();
+//     update_timer_text();
+//     update_wait_indicator();
+//     update_computer_thinking_indicator();
 
-    skybox_loader->update(app);
-    board_paint_texture_loader->update(app);
-}
+//     skybox_loader->update(app);
+//     board_paint_texture_loader->update(app);
+// }
 
-void JumpPlusVariantScene::on_fixed_update() {
-    camera_controller.update_friction();
-}
+// void JumpPlusVariantScene::on_fixed_update() {
+//     camera_controller.update_friction();
+// }
 
-void JumpPlusVariantScene::on_imgui_update() {
-    update_all_imgui();
-}
+// void JumpPlusVariantScene::on_imgui_update() {
+//     update_all_imgui();
+// }
 
-void JumpPlusVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
+// void JumpPlusVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
+//     if (hovering_gui) {
+//         return;
+//     }
 
-    if (event.button == input::MouseButton::Left) {
-        if (board.next_move && board.phase != BoardPhase::None) {
-            board.click(app->renderer->get_hovered_id());
-        }
-    }
-}
+//     if (event.button == input::MouseButton::Left) {
+//         if (board.next_move && board.phase != BoardPhase::None) {
+//             board.click(app->renderer->get_hovered_id());
+//         }
+//     }
+// }
 
-void JumpPlusVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
+// void JumpPlusVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
+//     if (hovering_gui) {
+//         return;
+//     }
 
-    if (event.button == input::MouseButton::Left) {
-        const bool valid_phases = board.phase == BoardPhase::MovePieces;
+//     if (event.button == input::MouseButton::Left) {
+//         const bool valid_phases = board.phase == BoardPhase::MovePieces;
 
-        if (board.next_move && board.is_players_turn && valid_phases) {
-            const auto flags = board.release(app->renderer->get_hovered_id());
+//         if (board.next_move && board.is_players_turn && valid_phases) {
+//             const auto flags = board.release(app->renderer->get_hovered_id());
 
-            update_after_human_move(
-                flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
-            );
-        }
+//             update_after_human_move(
+//                 flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
+//             );
+//         }
 
-        if (show_keyboard_controls) {
-            scene_list.remove(objects.get<renderables::Quad>("keyboard_controls"_H));
-            show_keyboard_controls = false;
-        }
-    }
-}
+//         if (show_keyboard_controls) {
+//             scene_list.remove(objects.get<renderables::Quad>("keyboard_controls"_H));
+//             show_keyboard_controls = false;
+//         }
+//     }
+// }
 
-void JumpPlusVariantScene::on_key_pressed(const KeyPressedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
+// void JumpPlusVariantScene::on_key_pressed(const KeyPressedEvent& event) {
+//     if (hovering_gui) {
+//         return;
+//     }
 
-    switch (event.key) {
-        case input::Key::Up:
-        case input::Key::Down:
-        case input::Key::Left:
-        case input::Key::Right:
-        case input::Key::Enter:
-            if (!show_keyboard_controls) {
-                scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
-                show_keyboard_controls = true;
-                return;
-            }
-            break;
-        default:
-            break;
-    }
+//     switch (event.key) {
+//         case input::Key::Up:
+//         case input::Key::Down:
+//         case input::Key::Left:
+//         case input::Key::Right:
+//         case input::Key::Enter:
+//             if (!show_keyboard_controls) {
+//                 scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
+//                 show_keyboard_controls = true;
+//                 return;
+//             }
+//             break;
+//         default:
+//             break;
+//     }
 
-    using KB = KeyboardControls;
+//     using KB = KeyboardControls;
 
-    switch (event.key) {
-        case input::Key::Up:
-            keyboard.move(
-                KB::calculate(
-                    KB::Direction::Up, camera_controller.get_angle_around_point()
-                )
-            );
-            break;
-        case input::Key::Down:
-            keyboard.move(
-                KB::calculate(
-                    KB::Direction::Down, camera_controller.get_angle_around_point()
-                )
-            );
-            break;
-        case input::Key::Left:
-            keyboard.move(
-                KB::calculate(
-                    KB::Direction::Left, camera_controller.get_angle_around_point()
-                )
-            );
-            break;
-        case input::Key::Right:
-            keyboard.move(
-                KB::calculate(
-                    KB::Direction::Right, camera_controller.get_angle_around_point()
-                )
-            );
-            break;
-        case input::Key::Enter: {
-            const bool valid_phases = board.phase == BoardPhase::MovePieces;
+//     switch (event.key) {
+//         case input::Key::Up:
+//             keyboard.move(
+//                 KB::calculate(
+//                     KB::Direction::Up, camera_controller.get_angle_around_point()
+//                 )
+//             );
+//             break;
+//         case input::Key::Down:
+//             keyboard.move(
+//                 KB::calculate(
+//                     KB::Direction::Down, camera_controller.get_angle_around_point()
+//                 )
+//             );
+//             break;
+//         case input::Key::Left:
+//             keyboard.move(
+//                 KB::calculate(
+//                     KB::Direction::Left, camera_controller.get_angle_around_point()
+//                 )
+//             );
+//             break;
+//         case input::Key::Right:
+//             keyboard.move(
+//                 KB::calculate(
+//                     KB::Direction::Right, camera_controller.get_angle_around_point()
+//                 )
+//             );
+//             break;
+//         case input::Key::Enter: {
+//             const bool valid_phases = board.phase == BoardPhase::MovePieces;
 
-            if (board.next_move && board.is_players_turn && valid_phases) {
-                const auto flags = keyboard.click_and_release();
+//             if (board.next_move && board.is_players_turn && valid_phases) {
+//                 const auto flags = keyboard.click_and_release();
 
-                update_after_human_move(
-                    flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
-                );
-            }
-            break;
-        }
-        default:
-            break;
-    }
-}
+//                 update_after_human_move(
+//                     flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
+//                 );
+//             }
+//             break;
+//         }
+//         default:
+//             break;
+//     }
+// }
 
-void JumpPlusVariantScene::on_key_released(const KeyReleasedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
+// void JumpPlusVariantScene::on_key_released(const KeyReleasedEvent& event) {
+//     if (hovering_gui) {
+//         return;
+//     }
 
-    if (event.key == input::Key::Space) {
-        camera_controller.go_towards_position(default_camera_position);
-    }
-}
+//     if (event.key == input::Key::Space) {
+//         camera_controller.go_towards_position(default_camera_position);
+//     }
+// }
 
-void JumpPlusVariantScene::on_window_resized(const WindowResizedEvent& event) {
-    if (event.width == 0 || event.height == 0) {
-        return;
-    }
+// void JumpPlusVariantScene::on_window_resized(const WindowResizedEvent& event) {
+//     if (event.width == 0 || event.height == 0) {
+//         return;
+//     }
 
-    camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
-}
+//     camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
+// }
 
 void JumpPlusVariantScene::setup_and_add_model_pieces() {
     size_t index = 0;

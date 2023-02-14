@@ -11,6 +11,7 @@ struct StandardGameScene : public SceneGame {
     StandardGameScene()
         : SceneGame("standard_game") {}
 
+    virtual void on_bind() override;
     virtual void on_start() override;
     virtual void on_stop() override;
     virtual void on_awake() override;
@@ -18,11 +19,16 @@ struct StandardGameScene : public SceneGame {
     // virtual void on_fixed_update() override;
     // virtual void on_imgui_update() override;
 
-    void on_mouse_button_pressed(const MouseButtonPressedEvent& event);
-    void on_mouse_button_released(const MouseButtonReleasedEvent& event);
-    void on_key_pressed(const KeyPressedEvent& event);
-    void on_key_released(const KeyReleasedEvent& event);
-    void on_window_resized(const WindowResizedEvent& event);
+    void on_update();
+    void on_fixed_update();
+    void on_update_imgui();
+    bool on_event(event::Event& event);
+
+    bool on_mouse_button_pressed(event::MouseButtonPressedEvent& event);
+    bool on_mouse_button_released(event::MouseButtonReleasedEvent& event);
+    bool on_key_pressed(event::KeyPressedEvent& event);
+    bool on_key_released(event::KeyReleasedEvent& event);
+    bool on_window_resized(event::WindowResizedEvent& event);
 
     virtual void setup_and_add_model_pieces() override;
     virtual void setup_entities() override;

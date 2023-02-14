@@ -37,7 +37,7 @@ public:
 
     Layer& layer(size_t index) { return layer_stack.at(index); }
 
-    virtual void on_bind() {}  // Called at initialization for defining layer updates
+    virtual void on_bind() = 0;  // Called at initialization for defining layer updates
     virtual void on_start() {}  // Called when the scene is entered
     virtual void on_stop() {}  // Called when the scene is exited
     virtual void on_awake() {}  // Called once before on_start is called for the first time

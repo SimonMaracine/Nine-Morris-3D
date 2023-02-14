@@ -9,9 +9,12 @@ struct LoadingScene : public Scene {
     LoadingScene()
         : Scene("loading") {}
 
+    virtual void on_bind() override;
     virtual void on_start() override;
     virtual void on_stop() override;
-    virtual void on_update() override;
+    // virtual void on_update() override;
+
+    void on_update();
 
     void setup_widgets();
     void load_splash_screen_texture();
