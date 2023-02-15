@@ -29,6 +29,7 @@ public:
     void render(const SceneList& scene);
 
     void quad_center(float& width, float& height, float& x_pos, float& y_pos);
+    void on_event(event::Event& event);
 
     const Storage& get_storage() { return storage; }
 

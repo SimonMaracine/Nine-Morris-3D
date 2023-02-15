@@ -9,7 +9,6 @@
 struct LauncherScene : public Scene {
     LauncherScene()
         : Scene("launcher") {}
-    virtual ~LauncherScene() = default;
 
     virtual void on_bind() override;
     virtual void on_start() override;
@@ -20,7 +19,7 @@ struct LauncherScene : public Scene {
 
     void on_update();
     void on_imgui_update();
-    bool on_event(event::Event& event);
+    void on_event(event::Event& event);
 
     bool on_window_closed(event::WindowClosedEvent&);
 

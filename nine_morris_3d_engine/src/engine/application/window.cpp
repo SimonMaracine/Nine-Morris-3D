@@ -56,7 +56,7 @@ Window::Window(Application* app) {
     }
 
     glfwSwapInterval(1);
-    glfwSetWindowUserPointer(window, &const_cast<ApplicationData&>(app->data()));
+    glfwSetWindowUserPointer(window, &app->app_data);
     glfwSetWindowSizeLimits(window, app->data().min_width, app->data().min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {

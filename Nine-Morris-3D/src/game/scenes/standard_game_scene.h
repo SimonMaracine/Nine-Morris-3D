@@ -21,8 +21,8 @@ struct StandardGameScene : public SceneGame {
 
     void on_update();
     void on_fixed_update();
-    void on_update_imgui();
-    bool on_event(event::Event& event);
+    void on_event(event::Event& event);
+    void imgui_on_update();
 
     bool on_mouse_button_pressed(event::MouseButtonPressedEvent& event);
     bool on_mouse_button_released(event::MouseButtonReleasedEvent& event);

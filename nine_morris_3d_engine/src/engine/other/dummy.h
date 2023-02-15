@@ -2,6 +2,10 @@
 
 class Application;
 
+namespace event {
+    struct Event;
+}
+
 namespace dummy {
     struct UserFunc {
         void operator()(Application*) {}
@@ -9,6 +13,10 @@ namespace dummy {
 
     struct ProcFunc {
         void operator()() {}
+    };
+
+    struct OnEventFunc {
+        void operator()(event::Event&) {}
     };
 
     struct UserData {};

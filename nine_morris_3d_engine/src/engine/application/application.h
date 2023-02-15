@@ -87,7 +87,7 @@ private:
     bool on_window_closed(event::WindowClosedEvent&);
     bool on_window_resized(event::WindowResizedEvent& event);
 
-    bool on_imgui_mouse_scrolled(event::MouseScrolledEvent& event);
+    bool on_imgui_mouse_scrolled(event::MouseScrolledEvent& event);  // FIXME these can't block layers
     bool on_imgui_mouse_moved(event::MouseMovedEvent& event);
     bool on_imgui_mouse_button_pressed(event::MouseButtonPressedEvent& event);
     bool on_imgui_mouse_button_released(event::MouseButtonReleasedEvent& event);

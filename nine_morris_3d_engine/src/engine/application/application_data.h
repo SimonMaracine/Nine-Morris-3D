@@ -1,10 +1,13 @@
 #pragma once
 
-#include "engine/application/event.h"
-
 class Application;
 
-struct ApplicationData {
+namespace event {
+    struct Event;
+}
+
+class ApplicationData {
+public:
     int width;
     int height;
     std::string title;
@@ -18,7 +21,10 @@ struct ApplicationData {
     unsigned int version_minor;
     unsigned int version_patch;
     std::vector<std::string> authors;
-
+private:
     std::function<void(event::Event&)> on_event;
     Application* app = nullptr;
+
+    friend class Application;
+    friend class Window;
 };

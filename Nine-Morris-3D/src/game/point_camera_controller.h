@@ -1,7 +1,6 @@
 #pragma once
 
 #include <engine/engine_application.h>
-#include <engine/engine_graphics.h>
 #include <engine/engine_other.h>
 
 inline constexpr float LENS_FOV = 45.0f;
@@ -14,7 +13,6 @@ public:
     PointCameraController(Camera* camera);
     PointCameraController(Camera* camera, int width, int height, float fov, float near, float far,
         const glm::vec3& point, float distance_to_point, float pitch, float sensitivity);
-    virtual ~PointCameraController() = default;
 
     virtual const glm::vec3& get_position() const override;
     virtual const glm::vec3& get_rotation() const override;
@@ -33,6 +31,8 @@ public:
     // Directly set this position and linearly interpolate to this position respectively
     void set_position(const glm::vec3& position);
     void go_towards_position(const glm::vec3& position);
+
+    void on_event(event::Event& event);
 
     // void setup_events(Application* app);
     // void remove_events(Application* app);

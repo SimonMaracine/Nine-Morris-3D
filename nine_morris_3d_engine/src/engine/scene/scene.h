@@ -3,6 +3,7 @@
 #include <resmanager/resmanager.h>
 
 #include "engine/application/event.h"
+#include "engine/other/dummy.h"
 #include "engine/scene/scene_list.h"
 #include "engine/scene/object_manager.h"
 
@@ -10,17 +11,17 @@ class Application;
 
 class Layer {
 private:
-    using OnEvent = std::function<bool(event::Event&)>;
+    using OnEvent = std::function<void(event::Event&)>;
     using OnUpdate = std::function<void()>;
 public:
-    OnEvent on_event;  // Called for every event
-    OnUpdate on_update;  // Called every frame
-    OnUpdate on_fixed_update;  // Called once every 50 milliseconds
-    OnUpdate on_imgui_update;  // Called every frame for ImGui only
+    OnEvent on_event = dummy::OnEventFunc {};  // Called for every event
+    OnUpdate on_update = dummy::ProcFunc {};  // Called every frame
+    OnUpdate on_fixed_update = dummy::ProcFunc {};  // Called once every 50 milliseconds
+    OnUpdate on_imgui_update = dummy::ProcFunc {};  // Called every frame for ImGui only
 };
 
 /**
- * Class representing an entire scene of a game. Doesn't need to be heap-allocated.
+ * Class representing an entire scene of a game. Needs to be heap-allocated.
  */
 class Scene {
 private:

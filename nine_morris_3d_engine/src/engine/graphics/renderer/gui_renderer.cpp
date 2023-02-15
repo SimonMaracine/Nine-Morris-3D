@@ -91,6 +91,12 @@ void GuiRenderer::quad_center(float& width, float& height, float& x_pos, float& 
     }
 }
 
+void GuiRenderer::on_event(event::Event& event) {
+    event::Dispatcher dispatcher {event};
+
+    dispatcher.dispatch<event::WindowResizedEvent>(std::bind(&GuiRenderer::on_window_resized, this, std::placeholders::_1));
+}
+
 void GuiRenderer::begin_quads_batch() {
     storage.quads.quad_count = 0;
     storage.quads.buffer_pointer = storage.quads.buffer;

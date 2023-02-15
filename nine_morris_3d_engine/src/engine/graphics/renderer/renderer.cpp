@@ -198,6 +198,12 @@ void Renderer::set_camera_controller(const CameraController* camera_controller) 
     on_window_resized(event);
 }
 
+void Renderer::on_event(event::Event& event) {
+    event::Dispatcher dispatcher {event};
+
+    dispatcher.dispatch<event::WindowResizedEvent>(std::bind(&Renderer::on_window_resized, this, std::placeholders::_1));
+}
+
 void Renderer::draw_screen_quad(GLuint texture) {
     storage.screen_quad_shader->bind();
 

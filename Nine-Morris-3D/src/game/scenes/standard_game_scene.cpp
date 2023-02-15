@@ -24,7 +24,7 @@ void StandardGameScene::on_bind() {
     layer(0).on_update = std::bind(&StandardGameScene::on_update, this);
     layer(0).on_fixed_update = std::bind(&StandardGameScene::on_fixed_update, this);
     layer(0).on_event = std::bind(&StandardGameScene::on_event, this, std::placeholders::_1);
-    layer(1).on_imgui_update = std::bind(&StandardGameScene::on_update_imgui, this);
+    layer(1).on_imgui_update = std::bind(&StandardGameScene::imgui_on_update, this);
 }
 
 void StandardGameScene::on_start() {
@@ -169,14 +169,20 @@ void StandardGameScene::on_fixed_update() {
     camera_controller.update_friction();
 }
 
-void StandardGameScene::on_update_imgui() {
-    update_all_imgui();
-}
+void StandardGameScene::on_event(event::Event& event) {
+    camera_controller.on_event(event);
 
-bool StandardGameScene::on_event(event::Event& event) {
     event::Dispatcher dispatcher {event};
 
-    // dispatcher.dispatch()  // TODO this
+    dispatcher.dispatch<event::MouseButtonPressedEvent>(std::bind(&StandardGameScene::on_mouse_button_pressed, this, std::placeholders::_1));
+    dispatcher.dispatch<event::MouseButtonReleasedEvent>(std::bind(&StandardGameScene::on_mouse_button_released, this, std::placeholders::_1));
+    dispatcher.dispatch<event::KeyPressedEvent>(std::bind(&StandardGameScene::on_key_pressed, this, std::placeholders::_1));
+    dispatcher.dispatch<event::KeyReleasedEvent>(std::bind(&StandardGameScene::on_key_released, this, std::placeholders::_1));
+    dispatcher.dispatch<event::WindowResizedEvent>(std::bind(&StandardGameScene::on_window_resized, this, std::placeholders::_1));
+}
+
+void StandardGameScene::imgui_on_update() {
+    update_all_imgui();
 }
 
 // void StandardGameScene::on_update() {
@@ -213,21 +219,23 @@ bool StandardGameScene::on_event(event::Event& event) {
 // }
 
 bool StandardGameScene::on_mouse_button_pressed(event::MouseButtonPressedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
+    // if (hovering_gui) {
+    //     return;
+    // }
 
     if (event.button == input::MouseButton::Left) {
         if (board.next_move && board.phase != BoardPhase::None) {
             board.click(app->renderer->get_hovered_id());
         }
     }
+
+    return false;
 }
 
 bool StandardGameScene::on_mouse_button_released(event::MouseButtonReleasedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
+    // if (hovering_gui) {
+    //     return;
+    // }
 
     if (event.button == input::MouseButton::Left) {
         const bool valid_phases = (
@@ -247,12 +255,14 @@ bool StandardGameScene::on_mouse_button_released(event::MouseButtonReleasedEvent
             show_keyboard_controls = false;
         }
     }
+
+    return false;
 }
 
 bool StandardGameScene::on_key_pressed(event::KeyPressedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
+    // if (hovering_gui) {
+    //     return;
+    // }
 
     switch (event.key) {
         case input::Key::Up:
@@ -263,7 +273,7 @@ bool StandardGameScene::on_key_pressed(event::KeyPressedEvent& event) {
             if (!show_keyboard_controls) {
                 scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
                 show_keyboard_controls = true;
-                return;
+                return false;
             }
             break;
         default:
@@ -318,24 +328,30 @@ bool StandardGameScene::on_key_pressed(event::KeyPressedEvent& event) {
         default:
             break;
     }
+
+    return false;
 }
 
 bool StandardGameScene::on_key_released(event::KeyReleasedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
+    // if (hovering_gui) {
+    //     return;
+    // }
 
     if (event.key == input::Key::Space) {
         camera_controller.go_towards_position(default_camera_position);
     }
+
+    return false;
 }
 
 bool StandardGameScene::on_window_resized(event::WindowResizedEvent& event) {
-    if (event.width == 0 || event.height == 0) {
-        return;
-    }
+    // if (event.width == 0 || event.height == 0) {
+    //     return;
+    // }
 
     camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
+
+    return false;
 }
 
 void StandardGameScene::setup_and_add_model_pieces() {

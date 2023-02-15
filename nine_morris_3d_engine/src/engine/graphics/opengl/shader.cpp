@@ -381,7 +381,7 @@ namespace gl {
             glGetUniformIndices(
                 program,
                 field_count,
-                const_cast<const char* const*>(field_names),
+                static_cast<const char* const*>(field_names),
                 indices
             );
 

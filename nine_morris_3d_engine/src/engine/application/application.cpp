@@ -129,10 +129,6 @@ int Application::run(SceneId start_scene_id) {
             current_scene->layer_stack[i].on_update();
         }
 
-        for (size_t i = 0; i < 4; i++) {
-            current_scene->layer_stack[i].on_update();
-        }
-
         // Clear the default framebuffer, as nobody does that for us
         render_helpers::clear(render_helpers::Color);
 
@@ -267,6 +263,7 @@ void Application::renderer_imgui_func() {
 
 void Application::prepare_scenes(SceneId start_scene_id) {
     for (std::unique_ptr<Scene>& scene : scenes) {
+        scene->on_bind();
         scene->app = this;
 
         if (scene->id == start_scene_id) {
@@ -330,8 +327,24 @@ void Application::initialize_audio() {
 
 void Application::on_event(event::Event& event) {
     event::Dispatcher dispatcher {event};
+
     dispatcher.dispatch<event::WindowClosedEvent>(std::bind(&Application::on_window_closed, this, std::placeholders::_1));
     dispatcher.dispatch<event::WindowResizedEvent>(std::bind(&Application::on_window_resized, this, std::placeholders::_1));
+
+    if (builder.renderer_3d) {
+        renderer->on_event(event);
+    }
+
+    if (builder.renderer_2d) {
+        gui_renderer->on_event(event);
+    }
+
+    if (builder.renderer_imgui) {
+        dispatcher.dispatch<event::MouseScrolledEvent>(std::bind(&Application::on_imgui_mouse_scrolled, this, std::placeholders::_1));
+        dispatcher.dispatch<event::MouseMovedEvent>(std::bind(&Application::on_imgui_mouse_moved, this, std::placeholders::_1));
+        dispatcher.dispatch<event::MouseButtonPressedEvent>(std::bind(&Application::on_imgui_mouse_button_pressed, this, std::placeholders::_1));
+        dispatcher.dispatch<event::MouseButtonReleasedEvent>(std::bind(&Application::on_imgui_mouse_button_released, this, std::placeholders::_1));
+    }
 
     for (size_t i = 4; i > 0; i--) {
         if (event.skip) {

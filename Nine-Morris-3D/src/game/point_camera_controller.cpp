@@ -197,6 +197,13 @@ void PointCameraController::go_towards_position(const glm::vec3& position) {
 //     app->evt.discard_events<MouseMovedEvent>();
 // }
 
+void PointCameraController::on_event(event::Event& event) {
+    event::Dispatcher dispatcher {event};
+
+    dispatcher.dispatch<event::MouseScrolledEvent>(std::bind(&PointCameraController::on_mouse_scrolled, this, std::placeholders::_1));
+    dispatcher.dispatch<event::MouseMovedEvent>(std::bind(&PointCameraController::on_mouse_moved, this, std::placeholders::_1));
+}
+
 bool PointCameraController::on_mouse_scrolled(event::MouseScrolledEvent& event) {
     mouse_input.mouse_wheel = event.scroll;
 
