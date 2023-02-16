@@ -4,6 +4,9 @@
 
 #include "engine/application/input.h"
 
+/**
+ * Main class for managing application-level events.
+ */
 class EventDispatcher {
 public:
     EventDispatcher() = default;

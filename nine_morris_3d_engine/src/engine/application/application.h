@@ -62,7 +62,7 @@ public:
     std::unique_ptr<OpenAlContext> openal;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
-    EventDispatcher evt;  // Event dispatcher
+    EventDispatcher evt;  // Application manager of events
     ResourcesCache res;  // Global cache of resources
 private:
     float update_frame_counter();
@@ -104,7 +104,7 @@ private:
     Scene* current_scene = nullptr;
 
     bool changed_scene = false;
-    Scene* to_scene = nullptr;
+    Scene* to_scene = nullptr;  // Next scene to enter
 
     // Data for modular rendering
     RendererFunc renderer_3d_update = dummy::ProcFunc {};

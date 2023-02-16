@@ -1,5 +1,8 @@
 #pragma once
 
+/**
+ * Parameters for an instance of an application or a game.
+ */
 class ApplicationBuilder {
 public:
     enum Renderer {

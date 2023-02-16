@@ -75,7 +75,7 @@ void StandardGameScene::on_start() {
     update_menubar();
 
     camera_controller.go_towards_position(default_camera_position);
-    camera_controller.connect_events(app);  // TODO this
+    camera_controller.connect_events(app);
 
     // Can dispose of these
     app->res.texture_data.clear();
@@ -104,7 +104,7 @@ void StandardGameScene::on_stop() {
 #endif
 
     imgui_reset();
-    camera_controller.disconnect_events(app);  // TODO this
+    camera_controller.disconnect_events(app);
 
     // Should dispose of these
     release_piece_material_instances();
@@ -114,7 +114,7 @@ void StandardGameScene::on_stop() {
     skybox_loader->join();
     board_paint_texture_loader->join();
 
-    app->evt.disconnect(this);  // TODO this
+    app->evt.disconnect(this);
 }
 
 void StandardGameScene::on_awake() {

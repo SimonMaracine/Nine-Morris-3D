@@ -228,7 +228,9 @@ void Application::check_changed_scene() {
     if (changed_scene) {
         current_scene->on_stop();
         current_scene->_on_stop();
+
         current_scene = to_scene;
+
         on_start(current_scene);
 
         changed_scene = false;

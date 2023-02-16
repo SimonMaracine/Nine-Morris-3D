@@ -5,21 +5,23 @@
 void Timer::update() {
     static double total_time = 0.0;
 
+    if (!running) {
+        return;
+    }
+
     const double current_time = app->window->get_time();
 
-    if (running) {
-        const double elapsed_time = current_time - last_time;
-        last_time = current_time;
+    const double elapsed_time = current_time - last_time;
+    last_time = current_time;
 
-        total_time += elapsed_time;
+    total_time += elapsed_time;
 
-        while (true) {
-            if (total_time > 0.1) {
-                total_time -= 0.1;
-                time++;
-            } else {
-                break;
-            }
+    while (true) {
+        if (total_time > 0.1) {
+            total_time -= 0.1;
+            time++;
+        } else {
+            break;
         }
     }
 }
