@@ -62,7 +62,7 @@ public:
     std::unique_ptr<OpenAlContext> openal;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<GuiRenderer> gui_renderer;
-    // EventDispatcher evt;  // Event dispatcher
+    EventDispatcher evt;  // Event dispatcher
     ResourcesCache res;  // Global cache of resources
 private:
     float update_frame_counter();
@@ -82,15 +82,13 @@ private:
     void initialize_renderer_imgui();
     void initialize_audio();
 
-    void on_event(event::Event& event);
+    void on_window_closed(const WindowClosedEvent&);
+    void on_window_resized(const WindowResizedEvent& event);
 
-    bool on_window_closed(event::WindowClosedEvent&);
-    bool on_window_resized(event::WindowResizedEvent& event);
-
-    bool on_imgui_mouse_scrolled(event::MouseScrolledEvent& event);  // FIXME these can't block layers
-    bool on_imgui_mouse_moved(event::MouseMovedEvent& event);
-    bool on_imgui_mouse_button_pressed(event::MouseButtonPressedEvent& event);
-    bool on_imgui_mouse_button_released(event::MouseButtonReleasedEvent& event);
+    void on_imgui_mouse_scrolled(const MouseScrolledEvent& event);
+    void on_imgui_mouse_moved(const MouseMovedEvent& event);
+    void on_imgui_mouse_button_pressed(const MouseButtonPressedEvent& event);
+    void on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event);
 
     ApplicationBuilder builder;
     std::any* _user_data = nullptr;

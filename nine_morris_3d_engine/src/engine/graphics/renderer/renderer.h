@@ -44,8 +44,6 @@ public:
     void set_skybox(std::shared_ptr<gl::Texture3D> texture);
     void set_camera_controller(const CameraController* camera_controller);
 
-    void on_event(event::Event& event);
-
     identifier::Id get_hovered_id() { return hovered_id; }
     PostProcessingContext& get_post_processing_context() { return post_processing_context; }
     const Storage& get_storage() { return storage; }
@@ -88,7 +86,7 @@ private:
     void setup_uniform_buffers();
     void validate_hovered_id(int x, int y);
     void cache_camera_data();
-    bool on_window_resized(event::WindowResizedEvent&);
+    void on_window_resized(const WindowResizedEvent&);
 
     void initialize_uniform_buffers();
     void initialize_skybox_renderer();

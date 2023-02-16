@@ -2,9 +2,9 @@
 
 class Application;
 
-namespace event {
-    struct Event;
-}
+// namespace event {
+//     struct Event;
+// }
 
 class ApplicationData {
 public:
@@ -22,7 +22,7 @@ public:
     unsigned int version_patch;
     std::vector<std::string> authors;
 private:
-    std::function<void(event::Event&)> on_event;
+    // std::function<void(event::Event&)> on_event;
     Application* app = nullptr;
 
     friend class Application;

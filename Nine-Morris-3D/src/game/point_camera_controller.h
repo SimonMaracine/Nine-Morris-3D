@@ -32,16 +32,14 @@ public:
     void set_position(const glm::vec3& position);
     void go_towards_position(const glm::vec3& position);
 
-    void on_event(event::Event& event);
-
-    // void setup_events(Application* app);
-    // void remove_events(Application* app);
-    // void discard_events(Application* app);
+    void connect_events(Application* app);
+    void disconnect_events(Application* app);
+    void discard_events(Application* app);
 
     float sensitivity = 1.0f;  // Best from 0.5 to 2.0
 private:
-    bool on_mouse_scrolled(event::MouseScrolledEvent& event);
-    bool on_mouse_moved(event::MouseMovedEvent& event);
+    void on_mouse_scrolled(const MouseScrolledEvent& event);
+    void on_mouse_moved(const MouseMovedEvent& event);
 
     void go_towards_position_x(const glm::vec3& direction);
     void go_towards_position_y(const glm::vec3& direction);

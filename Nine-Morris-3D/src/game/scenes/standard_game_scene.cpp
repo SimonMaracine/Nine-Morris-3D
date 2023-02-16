@@ -20,13 +20,6 @@
 
 using namespace encrypt;
 
-void StandardGameScene::on_bind() {
-    layer(0).on_update = std::bind(&StandardGameScene::on_update, this);
-    layer(0).on_fixed_update = std::bind(&StandardGameScene::on_fixed_update, this);
-    layer(0).on_event = std::bind(&StandardGameScene::on_event, this, std::placeholders::_1);
-    layer(1).on_imgui_update = std::bind(&StandardGameScene::imgui_on_update, this);
-}
-
 void StandardGameScene::on_start() {
     auto& data = app->user_data<Data>();
 
@@ -82,17 +75,17 @@ void StandardGameScene::on_start() {
     update_menubar();
 
     camera_controller.go_towards_position(default_camera_position);
-    // camera_controller.setup_events(app);  // FIXME this
+    camera_controller.connect_events(app);  // TODO this
 
     // Can dispose of these
     app->res.texture_data.clear();
     app->res.sound_data.clear();
 
-    // app->evt.add_event<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);  // FIXME this
-    // app->evt.add_event<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
-    // app->evt.add_event<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
-    // app->evt.add_event<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
-    // app->evt.add_event<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
+    app->evt.connect<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
+    app->evt.connect<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
+    app->evt.connect<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
+    app->evt.connect<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
+    app->evt.connect<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
 }
 
 void StandardGameScene::on_stop() {
@@ -111,7 +104,7 @@ void StandardGameScene::on_stop() {
 #endif
 
     imgui_reset();
-    // camera_controller.remove_events(app);  // FIXME this
+    camera_controller.disconnect_events(app);  // TODO this
 
     // Should dispose of these
     release_piece_material_instances();
@@ -121,7 +114,7 @@ void StandardGameScene::on_stop() {
     skybox_loader->join();
     board_paint_texture_loader->join();
 
-    // app->evt.remove_events(this);  // FIXME this
+    app->evt.disconnect(this);  // TODO this
 }
 
 void StandardGameScene::on_awake() {
@@ -146,7 +139,7 @@ void StandardGameScene::on_update() {
         board.update_nodes(app->renderer->get_hovered_id());
         board.update_pieces(app->renderer->get_hovered_id());
     } else {
-        // camera_controller.discard_events(app);  // FIXME this
+        camera_controller.discard_events(app);
     }
 
     camera_controller.update_camera(app->get_delta());
@@ -169,73 +162,26 @@ void StandardGameScene::on_fixed_update() {
     camera_controller.update_friction();
 }
 
-void StandardGameScene::on_event(event::Event& event) {
-    camera_controller.on_event(event);
-
-    event::Dispatcher dispatcher {event};
-
-    dispatcher.dispatch<event::MouseButtonPressedEvent>(std::bind(&StandardGameScene::on_mouse_button_pressed, this, std::placeholders::_1));
-    dispatcher.dispatch<event::MouseButtonReleasedEvent>(std::bind(&StandardGameScene::on_mouse_button_released, this, std::placeholders::_1));
-    dispatcher.dispatch<event::KeyPressedEvent>(std::bind(&StandardGameScene::on_key_pressed, this, std::placeholders::_1));
-    dispatcher.dispatch<event::KeyReleasedEvent>(std::bind(&StandardGameScene::on_key_released, this, std::placeholders::_1));
-    dispatcher.dispatch<event::WindowResizedEvent>(std::bind(&StandardGameScene::on_window_resized, this, std::placeholders::_1));
-}
-
-void StandardGameScene::imgui_on_update() {
+void StandardGameScene::on_imgui_update() {
     update_all_imgui();
 }
 
-// void StandardGameScene::on_update() {
-    // if (!hovering_gui) {
-    //     camera_controller.update_controls(app->get_delta());
-    //     board.update_nodes(app->renderer->get_hovered_id());
-    //     board.update_pieces(app->renderer->get_hovered_id());
-    // } else {
-    //     camera_controller.discard_events(app);
-    // }
-
-    // camera_controller.update_camera(app->get_delta());
-    // board.move_pieces();
-    // timer.update();
-
-    // // Update listener position, look at and up vectors every frame
-    // update_listener();
-
-    // update_game_state();
-    // update_timer_text();
-    // update_wait_indicator();
-    // update_computer_thinking_indicator();
-
-    // skybox_loader->update(app);
-    // board_paint_texture_loader->update(app);
-// }
-
-// void StandardGameScene::on_fixed_update() {
-    // camera_controller.update_friction();
-// }
-
-// void StandardGameScene::on_imgui_update() {
-//     update_all_imgui();
-// }
-
-bool StandardGameScene::on_mouse_button_pressed(event::MouseButtonPressedEvent& event) {
-    // if (hovering_gui) {
-    //     return;
-    // }
+void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
+    if (hovering_gui) {
+        return;
+    }
 
     if (event.button == input::MouseButton::Left) {
         if (board.next_move && board.phase != BoardPhase::None) {
             board.click(app->renderer->get_hovered_id());
         }
     }
-
-    return false;
 }
 
-bool StandardGameScene::on_mouse_button_released(event::MouseButtonReleasedEvent& event) {
-    // if (hovering_gui) {
-    //     return;
-    // }
+void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
+    if (hovering_gui) {
+        return;
+    }
 
     if (event.button == input::MouseButton::Left) {
         const bool valid_phases = (
@@ -255,14 +201,12 @@ bool StandardGameScene::on_mouse_button_released(event::MouseButtonReleasedEvent
             show_keyboard_controls = false;
         }
     }
-
-    return false;
 }
 
-bool StandardGameScene::on_key_pressed(event::KeyPressedEvent& event) {
-    // if (hovering_gui) {
-    //     return;
-    // }
+void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
+    if (hovering_gui) {
+        return;
+    }
 
     switch (event.key) {
         case input::Key::Up:
@@ -273,7 +217,7 @@ bool StandardGameScene::on_key_pressed(event::KeyPressedEvent& event) {
             if (!show_keyboard_controls) {
                 scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
                 show_keyboard_controls = true;
-                return false;
+                return;
             }
             break;
         default:
@@ -328,30 +272,24 @@ bool StandardGameScene::on_key_pressed(event::KeyPressedEvent& event) {
         default:
             break;
     }
-
-    return false;
 }
 
-bool StandardGameScene::on_key_released(event::KeyReleasedEvent& event) {
-    // if (hovering_gui) {
-    //     return;
-    // }
+void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
+    if (hovering_gui) {
+        return;
+    }
 
     if (event.key == input::Key::Space) {
         camera_controller.go_towards_position(default_camera_position);
     }
-
-    return false;
 }
 
-bool StandardGameScene::on_window_resized(event::WindowResizedEvent& event) {
-    // if (event.width == 0 || event.height == 0) {
-    //     return;
-    // }
+void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
+    if (event.width == 0 || event.height == 0) {
+        return;
+    }
 
     camera.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
-
-    return false;
 }
 
 void StandardGameScene::setup_and_add_model_pieces() {

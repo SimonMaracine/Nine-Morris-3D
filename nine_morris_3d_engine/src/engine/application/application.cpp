@@ -51,7 +51,6 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     app_data.version_major = builder.major;
     app_data.version_minor = builder.minor;
     app_data.version_patch = builder.patch;
-    app_data.on_event = std::bind(&Application::on_event, this, std::placeholders::_1);
     app_data.app = this;
 
     window = std::make_unique<Window>(this);
@@ -86,8 +85,8 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
         initialize_audio();
     }
 
-    // evt.add_event<WindowClosedEvent, &Application::on_window_closed>(this);
-    // evt.add_event<WindowResizedEvent, &Application::on_window_resized>(this);
+    evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
+    evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);
 
     frame_counter.previous_seconds = window->get_time();
     fixed_update.previous_seconds = window->get_time();
@@ -118,16 +117,10 @@ int Application::run(SceneId start_scene_id) {
         const unsigned int fixed_updates = calculate_fixed_update();
 
         for (unsigned int i = 0; i < fixed_updates; i++) {
-            // current_scene->on_fixed_update();
-            for (size_t i = 0; i < 4; i++) {
-                current_scene->layer_stack[i].on_fixed_update();
-            }
+            current_scene->on_fixed_update();
         }
 
-        // current_scene->on_update();
-        for (size_t i = 0; i < 4; i++) {
-            current_scene->layer_stack[i].on_update();
-        }
+        current_scene->on_update();
 
         // Clear the default framebuffer, as nobody does that for us
         render_helpers::clear(render_helpers::Color);
@@ -136,8 +129,8 @@ int Application::run(SceneId start_scene_id) {
         renderer_2d_update();
         renderer_imgui_update();
 
-        // evt.update();
         window->update();
+        evt.update();
 
         check_changed_scene();
     }
@@ -253,17 +246,13 @@ void Application::renderer_2d_func() {
 void Application::renderer_imgui_func() {
     imgui_context::begin_frame();
 
-    // current_scene->on_imgui_update();
-    for (size_t i = 0; i < 4; i++) {
-        current_scene->layer_stack[i].on_imgui_update();
-    }
+    current_scene->on_imgui_update();
 
     imgui_context::end_frame();
 }
 
 void Application::prepare_scenes(SceneId start_scene_id) {
     for (std::unique_ptr<Scene>& scene : scenes) {
-        scene->on_bind();
         scene->app = this;
 
         if (scene->id == start_scene_id) {
@@ -313,10 +302,10 @@ void Application::initialize_renderer_imgui() {
 
     renderer_imgui_update = std::bind(&Application::renderer_imgui_func, this);
 
-    // evt.add_event<MouseScrolledEvent, &Application::on_imgui_mouse_scrolled>(this);  // TODO fix this
-    // evt.add_event<MouseMovedEvent, &Application::on_imgui_mouse_moved>(this);
-    // evt.add_event<MouseButtonPressedEvent, &Application::on_imgui_mouse_button_pressed>(this);
-    // evt.add_event<MouseButtonReleasedEvent, &Application::on_imgui_mouse_button_released>(this);
+    evt.connect<MouseScrolledEvent, &Application::on_imgui_mouse_scrolled>(this);
+    evt.connect<MouseMovedEvent, &Application::on_imgui_mouse_moved>(this);
+    evt.connect<MouseButtonPressedEvent, &Application::on_imgui_mouse_button_pressed>(this);
+    evt.connect<MouseButtonReleasedEvent, &Application::on_imgui_mouse_button_released>(this);
 }
 
 void Application::initialize_audio() {
@@ -325,46 +314,13 @@ void Application::initialize_audio() {
     openal = std::make_unique<OpenAlContext>();
 }
 
-void Application::on_event(event::Event& event) {
-    event::Dispatcher dispatcher {event};
-
-    dispatcher.dispatch<event::WindowClosedEvent>(std::bind(&Application::on_window_closed, this, std::placeholders::_1));
-    dispatcher.dispatch<event::WindowResizedEvent>(std::bind(&Application::on_window_resized, this, std::placeholders::_1));
-
-    if (builder.renderer_3d) {
-        renderer->on_event(event);
-    }
-
-    if (builder.renderer_2d) {
-        gui_renderer->on_event(event);
-    }
-
-    if (builder.renderer_imgui) {
-        dispatcher.dispatch<event::MouseScrolledEvent>(std::bind(&Application::on_imgui_mouse_scrolled, this, std::placeholders::_1));
-        dispatcher.dispatch<event::MouseMovedEvent>(std::bind(&Application::on_imgui_mouse_moved, this, std::placeholders::_1));
-        dispatcher.dispatch<event::MouseButtonPressedEvent>(std::bind(&Application::on_imgui_mouse_button_pressed, this, std::placeholders::_1));
-        dispatcher.dispatch<event::MouseButtonReleasedEvent>(std::bind(&Application::on_imgui_mouse_button_released, this, std::placeholders::_1));
-    }
-
-    for (size_t i = 4; i > 0; i--) {
-        if (event.skip) {
-            break;
-        }
-
-        const size_t I = i - 1;
-        current_scene->layer_stack[I].on_event(event);
-    }
-}
-
-bool Application::on_window_closed(event::WindowClosedEvent&) {
+void Application::on_window_closed(const WindowClosedEvent&) {
     running = false;
-
-    return false;
 }
 
-bool Application::on_window_resized(event::WindowResizedEvent& event) {
+void Application::on_window_resized(const WindowResizedEvent& event) {
     if (event.width == 0 || event.height == 0) {
-        return true;
+        return;
     }
 
     render_helpers::viewport(event.width, event.height);
@@ -373,43 +329,33 @@ bool Application::on_window_resized(event::WindowResizedEvent& event) {
         std::shared_ptr<gl::Framebuffer> fb = framebuffer.lock();
 
         if (fb == nullptr) {
-            return false;
+            return;
         }
 
         if (!fb->get_specification().resizable) {
-            return false;
+            return;
         }
 
         fb->resize(event.width, event.height);
     }
-
-    return false;
 }
 
-bool Application::on_imgui_mouse_scrolled(event::MouseScrolledEvent& event) {
+void Application::on_imgui_mouse_scrolled(const MouseScrolledEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheel = event.scroll;
-
-    return false;
 }
 
-bool Application::on_imgui_mouse_moved(event::MouseMovedEvent& event) {
+void Application::on_imgui_mouse_moved(const MouseMovedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
-
-    return false;
 }
 
-bool Application::on_imgui_mouse_button_pressed(event::MouseButtonPressedEvent& event) {
+void Application::on_imgui_mouse_button_pressed(const MouseButtonPressedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[static_cast<int>(event.button)] = true;
-
-    return false;
 }
 
-bool Application::on_imgui_mouse_button_released(event::MouseButtonReleasedEvent& event) {
+void Application::on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event) {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDown[static_cast<int>(event.button)] = false;
-
-    return false;
 }

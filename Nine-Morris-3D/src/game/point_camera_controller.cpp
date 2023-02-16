@@ -183,40 +183,29 @@ void PointCameraController::go_towards_position(const glm::vec3& position) {
     go_towards_position_x(direction);
 }
 
-// void PointCameraController::setup_events(Application* app) {
-//     app->evt.add_event<MouseScrolledEvent, &PointCameraController::on_mouse_scrolled>(this);
-//     app->evt.add_event<MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
-// }
-
-// void PointCameraController::remove_events(Application* app) {
-//     app->evt.remove_events(this);
-// }
-
-// void PointCameraController::discard_events(Application* app) {
-//     app->evt.discard_events<MouseScrolledEvent>();  // TODO dirty solution
-//     app->evt.discard_events<MouseMovedEvent>();
-// }
-
-void PointCameraController::on_event(event::Event& event) {
-    event::Dispatcher dispatcher {event};
-
-    dispatcher.dispatch<event::MouseScrolledEvent>(std::bind(&PointCameraController::on_mouse_scrolled, this, std::placeholders::_1));
-    dispatcher.dispatch<event::MouseMovedEvent>(std::bind(&PointCameraController::on_mouse_moved, this, std::placeholders::_1));
+void PointCameraController::connect_events(Application* app) {
+    app->evt.connect<MouseScrolledEvent, &PointCameraController::on_mouse_scrolled>(this);
+    app->evt.connect<MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
 }
 
-bool PointCameraController::on_mouse_scrolled(event::MouseScrolledEvent& event) {
+void PointCameraController::disconnect_events(Application* app) {
+    app->evt.disconnect(this);
+}
+
+void PointCameraController::discard_events(Application* app) {
+    app->evt.discard<MouseScrolledEvent>();  // TODO dirty solution
+    app->evt.discard<MouseMovedEvent>();
+}
+
+void PointCameraController::on_mouse_scrolled(const MouseScrolledEvent& event) {
     mouse_input.mouse_wheel = event.scroll;
-
-    return false;
 }
 
-bool PointCameraController::on_mouse_moved(event::MouseMovedEvent& event) {
+void PointCameraController::on_mouse_moved(const MouseMovedEvent& event) {
     mouse_input.dx = mouse_input.last_mouse_x - event.mouse_x;
     mouse_input.dy = mouse_input.last_mouse_y - event.mouse_y;
     mouse_input.last_mouse_x = event.mouse_x;
     mouse_input.last_mouse_y = event.mouse_y;
-
-    return false;
 }
 
 void PointCameraController::go_towards_position_x(const glm::vec3& direction) {

@@ -29,7 +29,6 @@ public:
     void render(const SceneList& scene);
 
     void quad_center(float& width, float& height, float& x_pos, float& y_pos);
-    void on_event(event::Event& event);
 
     const Storage& get_storage() { return storage; }
 
@@ -52,7 +51,7 @@ private:
     void end_draw_text();
 
     void draw(const std::vector<gui::Widget*>& subwidgets, const BeginEnd& begin, const BeginEnd& end);
-    bool on_window_resized(event::WindowResizedEvent& event);
+    void on_window_resized(const WindowResizedEvent& event);
 
     void initialize_uniform_buffers();
     void initialize_quad_renderer();

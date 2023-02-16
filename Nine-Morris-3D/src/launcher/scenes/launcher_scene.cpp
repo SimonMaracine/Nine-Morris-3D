@@ -236,12 +236,6 @@ static void help_marker(const char* text) {
     }
 }
 
-void LauncherScene::on_bind() {
-    layer(0).on_update = std::bind(&LauncherScene::on_update, this);
-    layer(0).on_imgui_update = std::bind(&LauncherScene::on_imgui_update, this);
-    layer(0).on_event = std::bind(&LauncherScene::on_event, this, std::placeholders::_1);
-}
-
 void LauncherScene::on_start() {
     auto& data = app->user_data<Data>();
 
@@ -328,7 +322,7 @@ void LauncherScene::on_stop() {
 }
 
 void LauncherScene::on_awake() {
-    // app->evt.add_event<WindowClosedEvent, &LauncherScene::on_window_closed>(this);  // FIXME this
+    app->evt.connect<WindowClosedEvent, &LauncherScene::on_window_closed>(this);
 }
 
 void LauncherScene::on_update() {
@@ -372,16 +366,8 @@ void LauncherScene::on_imgui_update() {
     ImGui::End();
 }
 
-void LauncherScene::on_event(event::Event& event) {
-    event::Dispatcher dispatcher {event};
-
-    dispatcher.dispatch<event::WindowClosedEvent>(std::bind(&LauncherScene::on_window_closed, this, std::placeholders::_1));
-}
-
-bool LauncherScene::on_window_closed(event::WindowClosedEvent&) {
+void LauncherScene::on_window_closed(const WindowClosedEvent&) {
     app->exit_code = 1;
-
-    return false;
 }
 
 void LauncherScene::display_page() {

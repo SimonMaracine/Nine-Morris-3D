@@ -48,8 +48,7 @@ Renderer::Renderer(Application* app)
 
     framebuffer_reader = FramebufferReader<4> {storage.pixel_buffers, storage.bounding_box_framebuffer};
 
-    // Setup events
-    // app->evt.add_event<WindowResizedEvent, &Renderer::on_window_resized>(this);  // TODO remove
+    app->evt.connect<WindowResizedEvent, &Renderer::on_window_resized>(this);
 
     DEB_INFO("Initialized renderer");
 }
@@ -192,16 +191,7 @@ void Renderer::set_camera_controller(const CameraController* camera_controller) 
     }
 
     // Update the projection
-    event::WindowResizedEvent event;  // TODO quite a hack
-    event.width = 0;
-    event.height = 0;
-    on_window_resized(event);
-}
-
-void Renderer::on_event(event::Event& event) {
-    event::Dispatcher dispatcher {event};
-
-    dispatcher.dispatch<event::WindowResizedEvent>(std::bind(&Renderer::on_window_resized, this, std::placeholders::_1));
+    on_window_resized(WindowResizedEvent {0, 0});
 }
 
 void Renderer::draw_screen_quad(GLuint texture) {
@@ -566,13 +556,11 @@ void Renderer::cache_camera_data() {
     }
 }
 
-bool Renderer::on_window_resized(event::WindowResizedEvent&) {
+void Renderer::on_window_resized(const WindowResizedEvent&) {
     storage.quad3d_shader->bind();
     storage.quad3d_shader->upload_uniform_mat4("u_projection_matrix"_H, camera_cache.projection_matrix);
 
     gl::Shader::unbind();
-
-    return false;
 }
 
 void Renderer::initialize_uniform_buffers() {

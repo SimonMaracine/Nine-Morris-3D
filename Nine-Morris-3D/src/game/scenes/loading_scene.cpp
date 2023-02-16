@@ -16,10 +16,6 @@
 #include "other/data.h"
 #include "other/constants.h"
 
-void LoadingScene::on_bind() {
-    layer(0).on_update = std::bind(&LoadingScene::on_update, this);
-}
-
 void LoadingScene::on_start() {
     auto& data = app->user_data<Data>();
 
@@ -69,19 +65,6 @@ void LoadingScene::on_update() {
 
     loader->update(app);
 }
-
-// void LoadingScene::on_update() {
-//     float width, height, x_pos, y_pos;
-//     app->gui_renderer->quad_center(width, height, x_pos, y_pos);
-
-//     auto background = objects.get<gui::Image>("background"_H);
-//     background->set_position(glm::vec2(x_pos, y_pos));
-//     background->set_size(glm::vec2(width, height));
-
-//     update_loading_animation();
-
-//     loader->update(app);
-// }
 
 void LoadingScene::setup_widgets() {
     static constexpr int LOWEST_RESOLUTION = 288;

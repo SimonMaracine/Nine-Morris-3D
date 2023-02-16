@@ -39,8 +39,7 @@ GuiRenderer::GuiRenderer(Application* app)
     initialize_text_renderer();
     initialize_projection_uniform_buffer();
 
-    // Setup events
-    // app->evt.add_event<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);  // TODO remove
+    app->evt.connect<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);
 
     // Set application pointer to widgets
     gui::Widget::app = app;
@@ -89,12 +88,6 @@ void GuiRenderer::quad_center(float& width, float& height, float& x_pos, float& 
         x_pos = (width - app->data().width) / -2.0f;
         y_pos = 0.0f;
     }
-}
-
-void GuiRenderer::on_event(event::Event& event) {
-    event::Dispatcher dispatcher {event};
-
-    dispatcher.dispatch<event::WindowResizedEvent>(std::bind(&GuiRenderer::on_window_resized, this, std::placeholders::_1));
 }
 
 void GuiRenderer::begin_quads_batch() {
@@ -278,7 +271,7 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const BeginE
     gl::VertexArray::unbind();
 }
 
-bool GuiRenderer::on_window_resized(event::WindowResizedEvent& event) {
+void GuiRenderer::on_window_resized(const WindowResizedEvent& event) {
     storage.orthographic_projection_matrix = glm::ortho(
         0.0f, static_cast<float>(event.width),
         0.0f, static_cast<float>(event.height)
@@ -290,8 +283,6 @@ bool GuiRenderer::on_window_resized(event::WindowResizedEvent& event) {
     storage.projection_uniform_buffer->upload_sub_data();
 
     gl::UniformBuffer::unbind();
-
-    return false;
 }
 
 void GuiRenderer::initialize_uniform_buffers() {
