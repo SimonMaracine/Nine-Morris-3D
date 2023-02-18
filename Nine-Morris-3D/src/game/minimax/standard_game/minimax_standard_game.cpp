@@ -1,6 +1,7 @@
-#include <engine/other/assert.h>
+#include <engine/engine_other.h>
 
 #include "game/minimax/standard_game/minimax_standard_game.h"
+#include "game/minimax/common.h"
 #include "game/game_position.h"
 #include "other/constants.h"
 
@@ -18,12 +19,12 @@ static constexpr int MINIMUM_EVALUATION_VALUE = INT_MIN;
 static constexpr int MAXIMUM_EVALUATION_VALUE = INT_MAX;
 
 namespace values {
-    static constexpr int PIECE = 10;
+    static constexpr int PIECE = 7;
     static constexpr int FREEDOM = 1;
     // static constexpr int  = 10;
 }
 
-static unsigned int calculate_material(GamePosition position, PieceType piece) {
+static unsigned int calculate_material(GamePosition& position, PieceType piece) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
     unsigned int piece_count = 0;
@@ -35,7 +36,7 @@ static unsigned int calculate_material(GamePosition position, PieceType piece) {
     return piece_count;
 }
 
-static unsigned int calculate_piece_freedom(GamePosition position, size_t index) {
+static unsigned int calculate_piece_freedom(GamePosition& position, size_t index) {
     int freedom = 0;
 
     switch (index) {
@@ -156,7 +157,7 @@ static unsigned int calculate_piece_freedom(GamePosition position, size_t index)
     return freedom;
 }
 
-static unsigned int calculate_freedom(GamePosition position, PieceType piece) {
+static unsigned int calculate_freedom(GamePosition& position, PieceType piece) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
     unsigned int total_free_positions = 0;
@@ -170,11 +171,56 @@ static unsigned int calculate_freedom(GamePosition position, PieceType piece) {
     return total_free_positions;
 }
 
-static bool is_game_over(GamePosition position) {
-    return {};
+static unsigned int total_number_of_pieces(GamePosition& position, PieceType type) {
+    switch (type) {
+        case PieceType::White:
+            return position.white_pieces_on_board + position.white_pieces_outside;
+        case PieceType::Black:
+            return position.black_pieces_on_board + position.black_pieces_outside;
+        case PieceType::None:
+            ASSERT(false, "Invalid enum");
+    }
+
+    return 0;
 }
 
-static int evaluate_position(GamePosition position) {  // TODO also evaluate positions
+static unsigned int number_of_pieces_outside(GamePosition& position, PieceType type) {
+    switch (type) {
+        case PieceType::White:
+            return position.white_pieces_outside;
+        case PieceType::Black:
+            return position.black_pieces_outside;
+        case PieceType::None:
+            ASSERT(false, "Invalid enum");
+    }
+
+    return 0;
+}
+
+static bool is_game_over(GamePosition& position) {
+    const unsigned int total_white_pieces = total_number_of_pieces(position, PieceType::White);
+    const unsigned int total_black_pieces = total_number_of_pieces(position, PieceType::Black);
+
+    if (total_white_pieces < 3) {
+        return true;
+    }
+
+    if (total_black_pieces < 3) {
+        return true;
+    }
+
+    if (calculate_freedom(position, PieceType::White) == 0 && number_of_pieces_outside(position, PieceType::White) == 0) {
+        return true;
+    }
+
+    if (calculate_freedom(position, PieceType::Black) == 0 && number_of_pieces_outside(position, PieceType::Black) == 0) {
+        return true;
+    }
+
+    return false;
+}
+
+static int evaluate_position(GamePosition& position) {  // TODO also evaluate positions
     int evaluation = 0;
 
     const unsigned int white_material = calculate_material(position, PieceType::White);
@@ -194,7 +240,7 @@ static int evaluate_position(GamePosition position) {  // TODO also evaluate pos
 
 #define IS_PC(const_index) (position.at(const_index) == piece)
 
-static bool is_mill_made(GamePosition position, PieceType piece, size_t index) {
+static bool is_mill_made(GamePosition& position, PieceType piece, size_t index) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
     switch (index) {
@@ -314,7 +360,7 @@ static constexpr PieceType opponent_piece(PieceType type) {
         result[pos++] = (const_index); \
     }
 
-std::array<size_t, 4> neighbor_free_positions(GamePosition position, PieceType piece, size_t index) {
+std::array<size_t, 4> neighbor_free_positions(GamePosition& position, PieceType piece, size_t index) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
     std::array<size_t, 4> result = { NULL_INDEX, NULL_INDEX, NULL_INDEX, NULL_INDEX };
@@ -439,56 +485,7 @@ std::array<size_t, 4> neighbor_free_positions(GamePosition position, PieceType p
     return result;
 }
 
-enum class MoveType {
-    None,
-    Place,
-    Move,
-    PlaceTake,
-    MoveTake
-};
-
-struct Move {  // TODO can use union
-    size_t place_node_index = NULL_INDEX;
-    size_t take_node_index = NULL_INDEX;
-    size_t put_down_source_node_index = NULL_INDEX;
-    size_t put_down_destination_node_index = NULL_INDEX;
-
-    MoveType type = MoveType::None;
-
-    static Move createPlace(size_t place_node_index) {
-        Move move;
-        move.type = MoveType::Place;
-        move.place_node_index = place_node_index;
-        return move;
-    }
-
-    static Move createMove(size_t put_down_source_node_index, size_t put_down_destination_node_index) {
-        Move move;
-        move.type = MoveType::Move;
-        move.put_down_source_node_index = put_down_source_node_index;
-        move.put_down_destination_node_index = put_down_destination_node_index;
-        return move;
-    }
-
-    static Move createPlaceTake(size_t place_node_index, size_t take_node_index) {
-        Move move;
-        move.type = MoveType::PlaceTake;
-        move.place_node_index = place_node_index;
-        move.take_node_index = take_node_index;
-        return move;
-    }
-
-    static Move createMoveTake(size_t put_down_source_node_index, size_t put_down_destination_node_index, size_t take_node_index) {
-        Move move;
-        move.type = MoveType::MoveTake;
-        move.put_down_source_node_index = put_down_source_node_index;
-        move.put_down_destination_node_index = put_down_destination_node_index;
-        move.take_node_index = take_node_index;
-        return move;
-    }
-};
-
-static void get_moves_phase1(GamePosition position, PieceType piece, std::vector<Move>& moves) {
+static void get_moves_phase1(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
     for (size_t i = 0; i < MAX_NODES; i++) {
@@ -496,17 +493,17 @@ static void get_moves_phase1(GamePosition position, PieceType piece, std::vector
             if (is_mill_made(position, piece, i)) {
                 for (size_t j = 0; j < MAX_NODES; j++) {
                     if (position.at(j) == opponent_piece(piece)) {
-                        moves.push_back(Move::createPlaceTake(i, j));
+                        moves.push_back(Move::create_place_take(piece, i, j));
                     }
                 }
             } else {
-                moves.push_back(Move::createPlace(i));
+                moves.push_back(Move::create_place(piece, i));
             }
         }
     }
 }
 
-static void get_moves_phase2(GamePosition position, PieceType piece, std::vector<Move>& moves) {
+static void get_moves_phase2(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
     for (size_t i = 0; i < MAX_NODES; i++) {
@@ -517,29 +514,45 @@ static void get_moves_phase2(GamePosition position, PieceType piece, std::vector
                 if (is_mill_made(position, piece, i)) {
                     for (size_t k = 0; k < MAX_NODES; k++) {
                         if (position.at(k) == opponent_piece(piece)) {
-                            moves.push_back(Move::createMoveTake(i, j, k));
+                            moves.push_back(Move::create_move_take(piece, i, j, k));
                         }
                     }
                 } else {
-                    moves.push_back(Move::createMove(i, j));
+                    moves.push_back(Move::create_move(piece, i, j));
                 }
             }
         }
     }
 }
 
-static void get_moves_phase3(GamePosition position, PieceType piece, std::vector<Move>& moves) {
+static void get_moves_phase3(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
     ASSERT(piece != PieceType::None, "Invalid enum");
+
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        if (position.at(i) == piece) {
+            for (size_t j = 0; j < MAX_NODES; j++) {
+                if (position.at(j) == PieceType::None) {
+                    if (is_mill_made(position, piece, i)) {
+                        for (size_t k = 0; k < MAX_NODES; k++) {
+                            if (position.at(k) == opponent_piece(piece)) {
+                                moves.push_back(Move::create_move_take(piece, i, j, k));
+                            }
+                        }
+                    } else {
+                        moves.push_back(Move::create_move(piece, i, j));
+                    }
+                }
+            }
+        }
+    }
 }
 
-static Move best_move;  // TODO refactor into a class
-
-static std::vector<Move> get_all_moves(GamePosition position, PieceType piece) {
+static std::vector<Move> get_all_moves(GamePosition& position, PieceType piece) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
     std::vector<Move> moves;
 
-    if (calculate_material(position, piece) == 3) {  // Phase 3
+    if (total_number_of_pieces(position, piece) == 3) {  // Phase 3
         get_moves_phase3(position, piece, moves);
         return moves;
     }
@@ -553,15 +566,57 @@ static std::vector<Move> get_all_moves(GamePosition position, PieceType piece) {
     return moves;
 }
 
-static void make_move(GamePosition position, const Move& move) {
-
+static void make_move(GamePosition& position, const Move& move) {
+    switch (move.type) {
+        case MoveType::Place:
+            position.at(move.place_node_index) = move.piece;
+            break;
+        case MoveType::Move:
+            position.at(move.move_destination_node_index) = move.piece;
+            position.at(move.move_source_node_index) = PieceType::None;
+            break;
+        case MoveType::PlaceTake:
+            position.at(move.place_node_index) = move.piece;
+            position.at(move.take_node_index) = PieceType::None;
+            break;
+        case MoveType::MoveTake:
+            position.at(move.move_destination_node_index) = move.piece;
+            position.at(move.move_source_node_index) = PieceType::None;
+            position.at(move.take_node_index) = PieceType::None;
+            break;
+        case MoveType::None:
+            ASSERT(false, "Invalid move type");
+            break;
+    }
 }
 
-static void unmake_move(GamePosition position, const Move& move) {
-
+static void unmake_move(GamePosition& position, const Move& move) {
+    switch (move.type) {
+        case MoveType::Place:
+            position.at(move.place_node_index) = PieceType::None;
+            break;
+        case MoveType::Move:
+            position.at(move.move_destination_node_index) = PieceType::None;
+            position.at(move.move_source_node_index) = move.piece;
+            break;
+        case MoveType::PlaceTake:
+            position.at(move.place_node_index) = PieceType::None;
+            position.at(move.take_node_index) = opponent_piece(move.piece);
+            break;
+        case MoveType::MoveTake:
+            position.at(move.move_destination_node_index) = PieceType::None;
+            position.at(move.move_source_node_index) = move.piece;
+            position.at(move.take_node_index) = opponent_piece(move.piece);
+            break;
+        case MoveType::None:
+            ASSERT(false, "Invalid move type");
+            break;
+    }
 }
 
-static int _minimax(GamePosition position, size_t depth, size_t turns_from_root, PieceType type) {  // TODO merge those two parts
+static Move best_move;  // TODO refactor into a class
+
+static int _minimax(GamePosition& position, size_t depth, size_t turns_from_root, PieceType type) {  // TODO merge these two parts
     ASSERT(type != PieceType::None, "Invalid enum");
 
     if (depth == 0 || is_game_over(position)) {
@@ -611,14 +666,20 @@ static int _minimax(GamePosition position, size_t depth, size_t turns_from_root,
     }
 }
 
+static void random_move(GamePosition& position, PieceType piece) {
+    const auto moves = get_all_moves(position, piece);
+    best_move = random_gen::choice<Move>(moves.begin(), moves.end());
+}
+
 namespace minimax_standard_game {
-    void minimax(GamePosition position, MinimaxThread::Result& result, std::atomic<bool>& running) {
+    void minimax(GamePosition position, PieceType piece, Move& result, std::atomic<bool>& running) {
         // Initialize variables
         best_move = Move {};
 
-        const auto what = _minimax(position, 4, 0, PieceType::White);
+        // _minimax(position, 4, 0, piece);
+        random_move(position, piece);
 
-        result.place_node_index = 917437;
+        result = best_move;
 
         running.store(false);
     }

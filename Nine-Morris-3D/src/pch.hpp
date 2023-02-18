@@ -22,11 +22,11 @@
 #include <cassert>
 #include <optional>
 #include <any>
+#include <climits>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
-#include <limits.h>
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>

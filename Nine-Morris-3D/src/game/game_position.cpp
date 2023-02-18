@@ -14,5 +14,5 @@ PieceType& GamePosition::at(size_t index) {
 }
 
 bool GamePosition::operator==(const GamePosition& other) const {
-    return data == other.data;  // Don't take into account turns
+    return data == other.data;  // Don't take into account turns and pieces
 }

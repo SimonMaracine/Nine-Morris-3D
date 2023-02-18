@@ -20,6 +20,10 @@ GamePosition Board::get_position() {
     }
 
     position.turns = turn_count;
+    position.white_pieces_on_board = white_pieces_count;
+    position.black_pieces_on_board = black_pieces_count;
+    position.white_pieces_outside = not_placed_white_pieces_count;
+    position.black_pieces_outside = not_placed_black_pieces_count;
 
     return position;
 }

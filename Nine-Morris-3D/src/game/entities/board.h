@@ -76,6 +76,11 @@ public:
     bool next_move = true;  // It is false when any piece is in the air, true otherwise
     bool is_players_turn = false;
 
+    unsigned int white_pieces_count = 0;  // Number of pieces on the board
+    unsigned int black_pieces_count = 0;
+    unsigned int not_placed_white_pieces_count = 9;  // Number of pieces floating
+    unsigned int not_placed_black_pieces_count = 9;
+
     unsigned int turn_count = 0;
 
     struct Flags {
