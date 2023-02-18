@@ -112,24 +112,24 @@ void StandardBoard::_place_piece(size_t node_index) {
         check_player_number_of_pieces(turn);  // TODO maybe check both?
         switch_turn_and_check_turns_without_mills();
 
+        if (is_player_blocked(turn)) {
+            DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+
+            FORMATTED_MESSAGE(
+                message, 64, "%s player has no more legal moves to make.",
+                TURN_IS_WHITE_SO("White", "Black")
+            )
+
+            game_over(
+                BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
+            );
+        }
+
         if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0) {
             phase = BoardPhase::MovePieces;
             update_piece_outlines();
 
             DEB_INFO("Started phase 2");
-
-            if (is_player_blocked(turn)) {
-                DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
-
-                FORMATTED_MESSAGE(
-                    message, 64, "%s player has no more legal moves to make.",
-                    TURN_IS_WHITE_SO("White", "Black")
-                )
-
-                game_over(
-                    BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
-                );
-            }
         }
     }
 }
@@ -255,6 +255,8 @@ void StandardBoard::_take_piece(size_t piece_index) {
             BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
         );
     }
+
+    // TODO note that it's not needed to check for phase two here
 }
 
 void StandardBoard::check_select_piece(identifier::Id hovered_id) {
@@ -367,7 +369,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
     }
 
     // Do this even if it may not be needed
-    if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0 && !must_take_piece
+    if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0 && !must_take_piece  // FIXME this code is not executed when computer makes a move
             && phase != BoardPhase::GameOver) {
         phase = BoardPhase::MovePieces;
         update_piece_outlines();

@@ -240,7 +240,7 @@ static int evaluate_position(GamePosition& position) {  // TODO also evaluate po
 
 #define IS_PC(const_index) (position.at(const_index) == piece)
 
-static bool is_mill_made(GamePosition& position, PieceType piece, size_t index) {
+static bool is_mill(GamePosition& position, PieceType piece, size_t index) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
     switch (index) {
@@ -485,14 +485,30 @@ std::array<size_t, 4> neighbor_free_positions(GamePosition& position, PieceType 
     return result;
 }
 
+static bool all_pieces_in_mills(GamePosition& position, PieceType piece) {
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        if (position.at(i) == piece) {
+            if (!is_mill(position, piece, i)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 static void get_moves_phase1(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
     for (size_t i = 0; i < MAX_NODES; i++) {
         if (position.at(i) == PieceType::None) {
-            if (is_mill_made(position, piece, i)) {
+            if (is_mill(position, piece, i)) {
                 for (size_t j = 0; j < MAX_NODES; j++) {
                     if (position.at(j) == opponent_piece(piece)) {
+                        if (is_mill(position, opponent_piece(piece), j) && !all_pieces_in_mills(position, piece)) {
+                            return;
+                        }
+
                         moves.push_back(Move::create_place_take(piece, i, j));
                     }
                 }
@@ -511,14 +527,18 @@ static void get_moves_phase2(GamePosition& position, PieceType piece, std::vecto
             const auto free_positions = neighbor_free_positions(position, piece, i);
 
             for (size_t j = 0; free_positions[j] != NULL_INDEX; j++) {
-                if (is_mill_made(position, piece, i)) {
+                if (is_mill(position, piece, i)) {
                     for (size_t k = 0; k < MAX_NODES; k++) {
                         if (position.at(k) == opponent_piece(piece)) {
-                            moves.push_back(Move::create_move_take(piece, i, j, k));
+                            if (is_mill(position, opponent_piece(piece), k) && !all_pieces_in_mills(position, piece)) {
+                                return;
+                            }
+
+                            moves.push_back(Move::create_move_take(piece, i, free_positions[j], k));
                         }
                     }
                 } else {
-                    moves.push_back(Move::create_move(piece, i, j));
+                    moves.push_back(Move::create_move(piece, i, free_positions[j]));
                 }
             }
         }
@@ -532,9 +552,13 @@ static void get_moves_phase3(GamePosition& position, PieceType piece, std::vecto
         if (position.at(i) == piece) {
             for (size_t j = 0; j < MAX_NODES; j++) {
                 if (position.at(j) == PieceType::None) {
-                    if (is_mill_made(position, piece, i)) {
+                    if (is_mill(position, piece, i)) {
                         for (size_t k = 0; k < MAX_NODES; k++) {
                             if (position.at(k) == opponent_piece(piece)) {
+                                if (is_mill(position, opponent_piece(piece), k) && !all_pieces_in_mills(position, piece)) {
+                                    return;
+                                }
+
                                 moves.push_back(Move::create_move_take(piece, i, j, k));
                             }
                         }
