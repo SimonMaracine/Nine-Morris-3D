@@ -2,8 +2,9 @@
 
 #include "game/game_context.h"
 #include "game/entities/board.h"
-#include "game/minimax/minimax_thread.h"
 #include "game/minimax/standard_game/minimax_standard_game.h"
+#include "game/minimax/minimax_thread.h"
+#include "game/minimax/common.h"
 #include "other/constants.h"
 
 void GameContext::human_begin_move() {
@@ -19,29 +20,32 @@ void GameContext::computer_think_move() {
 }
 
 bool GameContext::computer_execute_move() {
-    switch (board->phase) {
-        case BoardPhase::PlacePieces: {
-            const auto& result = minimax_thread->get_result();
+    const auto& result = minimax_thread->get_result();
+
+    switch (result.type) {
+        case MoveType::Place:
+        case MoveType::PlaceTake:
             board->place_piece(result.place_node_index);
-
             break;
-        }
-        case BoardPhase::MovePieces: {
-            const auto& result = minimax_thread->get_result();
+        case MoveType::Move:
+        case MoveType::MoveTake:
             board->move_piece(
-                result.put_down_source_node_index,
-                result.put_down_destination_node_index
+                result.move_source_node_index,
+                result.move_destination_node_index
             );
-
             break;
-        }
-        default:
+        case MoveType::None:
+            ASSERT(false, "Invalid move type");
             break;
     }
 
+    const bool take = result.type == MoveType::PlaceTake || result.type == MoveType::MoveTake;
+
     const bool result_switched = board->flags.switched_turn;
-    board->flags.switched_turn = false;  // These need to be reset
+    board->flags.switched_turn = false;  // These need to be reset  // FIXME bad design
     board->flags.must_take_or_took_piece = false;
+
+    ASSERT(take != result_switched, "Everything is wrong");
 
     return result_switched;
 }

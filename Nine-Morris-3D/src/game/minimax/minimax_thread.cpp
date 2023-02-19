@@ -1,5 +1,7 @@
 #include "game/minimax/minimax_thread.h"
+#include "game/minimax/common.h"
 #include "game/entities/board.h"
+#include "other/constants.h"
 
 MinimaxThread::~MinimaxThread() {
     join_thread();
@@ -19,9 +21,11 @@ MinimaxThread& MinimaxThread::operator=(MinimaxThread&& other) noexcept {
 
 void MinimaxThread::start(const Algorithm& algorithm) {
     running.store(true);
-    result = Result {};
+    result = Move {};
 
-    thread = std::thread(algorithm, board->get_position(), std::ref(result), std::ref(running));
+    auto position = board->get_position();
+    const auto player = board->turn;
+    thread = std::thread(algorithm, position, static_cast<PieceType>(player), std::ref(result), std::ref(running));
 }
 
 bool MinimaxThread::is_running() const {

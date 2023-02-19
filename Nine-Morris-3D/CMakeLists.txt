@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(GAME Nine-Morris-3D)
-set(ENGINE nine-morris-3d-engine)
+set(GAME "Nine-Morris-3D")
+set(ENGINE "nine-morris-3d-engine")
 
 file(GLOB_RECURSE GAME_HEADERS "src/*.h")
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS "src/*.cpp")

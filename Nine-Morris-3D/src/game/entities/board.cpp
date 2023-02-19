@@ -20,6 +20,10 @@ GamePosition Board::get_position() {
     }
 
     position.turns = turn_count;
+    position.white_pieces_on_board = white_pieces_on_board_count;
+    position.black_pieces_on_board = black_pieces_on_board_count;
+    position.white_pieces_outside = white_pieces_outside_count;
+    position.black_pieces_outside = black_pieces_outside_count;
 
     return position;
 }
@@ -149,20 +153,21 @@ void Board::finalize_pieces_state() {
     }
 }
 
-void Board::update_piece_outlines() {
-    if (phase == BoardPhase::MovePieces) {
-        if (turn == BoardPlayer::White) {
-            set_pieces_show_outline(PieceType::White, true);
-            set_pieces_show_outline(PieceType::Black, false);
-        } else {
-            set_pieces_show_outline(PieceType::Black, true);
-            set_pieces_show_outline(PieceType::White, false);
-        }
+void Board::switch_piece_outlines() {
+    ASSERT(phase == BoardPhase::MovePieces, "Invalid state");
+
+    if (turn == BoardPlayer::White) {
+        set_pieces_show_outline(PieceType::White, true);
+        set_pieces_show_outline(PieceType::Black, false);
+    } else {
+        set_pieces_show_outline(PieceType::Black, true);
+        set_pieces_show_outline(PieceType::White, false);
     }
 }
 
 size_t Board::new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index) {
     ASSERT(node_index != NULL_INDEX, "Invalid index");
+    ASSERT(white_pieces_outside_count > 0 || black_pieces_outside_count > 0, "Invalid state");
 
     for (auto& [index, piece] : pieces) {
         if (!piece.in_use && piece.type == type) {
@@ -233,6 +238,11 @@ void Board::set_pieces_to_take(PieceType type, bool take) {
 }
 
 void Board::game_over(const BoardEnding& ending) {
+    // If game is already over, don't override
+    if (phase == BoardPhase::GameOver) {
+        return;
+    }
+
     phase = BoardPhase::GameOver;
     this->ending = ending;
 
@@ -384,10 +394,10 @@ void Board::remember_position_and_check_repetition(size_t piece_index, size_t no
             auto iter = std::find(ones.begin(), ones.end(), position);
             ASSERT(iter != ones.end(), "That should be impossible");
 
-            // This invalidates repetition_history.ones, but it's okay, because we return
+            // This invalidates the iterator, but it's okay, because we return
             ones.erase(iter);
 
-            // Insert current_position, because position is invalidated
+            // Insert `current_position`, because `position` is invalidated
             repetition_history.twos.push_back(current_position);
 
             return;

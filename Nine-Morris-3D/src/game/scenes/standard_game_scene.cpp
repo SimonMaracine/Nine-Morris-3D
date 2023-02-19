@@ -381,8 +381,8 @@ void StandardGameScene::initialize_pieces() {
 }
 
 void StandardGameScene::draw_debug_imgui() {
-    ImGui::Text("White and black pieces: %u, %u", board.white_pieces_count, board.black_pieces_count);
-    ImGui::Text("Not placed pieces: %u, %u", board.not_placed_white_pieces_count, board.not_placed_black_pieces_count);
+    ImGui::Text("White and black pieces: %u, %u", board.white_pieces_on_board_count, board.black_pieces_on_board_count);
+    ImGui::Text("Not placed pieces: %u, %u", board.white_pieces_outside_count, board.black_pieces_outside_count);
     ImGui::Text("Can jump: %s, %s", board.can_jump[0] ? "true" : "false", board.can_jump[1] ? "true" : "false");
     ImGui::Text("Turns without mills: %u", board.turns_without_mills);
 }

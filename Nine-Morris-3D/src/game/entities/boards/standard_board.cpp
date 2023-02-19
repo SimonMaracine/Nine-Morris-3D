@@ -86,20 +86,21 @@ void StandardBoard::_place_piece(size_t node_index) {
 
     WAIT_FOR_NEXT_MOVE();
 
+    // Set state accordingly
     const glm::vec3& position = node.model->position;
 
     if (turn == BoardPlayer::White) {
         node.piece_index = new_piece_to_place(PieceType::White, position.x, position.z, node_index);
-        white_pieces_count++;
-        not_placed_white_pieces_count--;
+        white_pieces_on_board_count++;
+        white_pieces_outside_count--;
     } else {
         node.piece_index = new_piece_to_place(PieceType::Black, position.x, position.z, node_index);
-        black_pieces_count++;
-        not_placed_black_pieces_count--;
+        black_pieces_on_board_count++;
+        black_pieces_outside_count--;
     }
 
     static constexpr auto mills = MILLS_NINE_MENS_MORRIS;
-    static constexpr auto count = NINE_MENS_MORRIS_MILLS;
+    static constexpr auto count = NINE_MENS_MORRIS_MILLS_COUNT;
 
     if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
         DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
@@ -109,28 +110,14 @@ void StandardBoard::_place_piece(size_t node_index) {
 
         set_pieces_to_take(TURN_IS_WHITE_SO(PieceType::Black, PieceType::White), true);
     } else {
-        check_player_number_of_pieces(turn);  // TODO maybe check both?
         switch_turn_and_check_turns_without_mills();
 
-        if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0) {
-            phase = BoardPhase::MovePieces;
-            update_piece_outlines();
-
-            DEB_INFO("Started phase 2");
-
-            if (is_player_blocked(turn)) {
-                DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
-
-                FORMATTED_MESSAGE(
-                    message, 64, "%s player has no more legal moves to make.",
-                    TURN_IS_WHITE_SO("White", "Black")
-                )
-
-                game_over(
-                    BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
-                );
-            }
+        // Check ONLY the opponent
+        if (is_player_blocked(turn)) {
+            set_game_over_player_blocked();
         }
+
+        check_phase_two();
     }
 }
 
@@ -145,8 +132,8 @@ void StandardBoard::_move_piece(size_t piece_index, size_t node_index) {
 
     WAIT_FOR_NEXT_MOVE();
 
-    if (piece.type == PieceType::White && can_jump[static_cast<int>(PieceType::White)]
-            || piece.type == PieceType::Black && can_jump[static_cast<int>(PieceType::Black)]) {
+    if (piece.type == PieceType::White && can_player_jump(PieceType::White)
+            || piece.type == PieceType::Black && can_player_jump(PieceType::Black)) {
         const auto target = glm::vec3(node.model->position.x, PIECE_Y_POSITION, node.model->position.z);
         const auto target0 = piece.model->position + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
         const auto target1 = target + glm::vec3(0.0f, PIECE_THREESTEP_HEIGHT, 0.0f);
@@ -163,16 +150,14 @@ void StandardBoard::_move_piece(size_t piece_index, size_t node_index) {
         );
     }
 
-    // Reset all of these
-    Node& previous_node = nodes.at(piece.node_index);
-    previous_node.piece_index = NULL_INDEX;
-
+    // Set state accordingly
+    nodes.at(piece.node_index).piece_index = NULL_INDEX;
     piece.node_index = node_index;
-    piece.selected = false;
     node.piece_index = piece_index;
+    piece.selected = false;
 
     static constexpr auto mills = MILLS_NINE_MENS_MORRIS;
-    static constexpr auto count = NINE_MENS_MORRIS_MILLS;
+    static constexpr auto count = NINE_MENS_MORRIS_MILLS_COUNT;
 
     if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
         DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
@@ -190,24 +175,14 @@ void StandardBoard::_move_piece(size_t piece_index, size_t node_index) {
 
         turns_without_mills = 0;
     } else {
-        check_player_number_of_pieces(BoardPlayer::White);
-        check_player_number_of_pieces(BoardPlayer::Black);
-
         turns_without_mills++;
+
         switch_turn_and_check_turns_without_mills();
-        update_piece_outlines();
+        switch_piece_outlines();
 
+        // Check ONLY the opponent
         if (is_player_blocked(turn)) {
-            DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
-
-            FORMATTED_MESSAGE(
-                message, 64, "%s player has no more legal moves to make.",
-                TURN_IS_WHITE_SO("White", "Black")
-            )
-
-            game_over(
-                BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
-            );
+            set_game_over_player_blocked();
         }
 
         remember_position_and_check_repetition(piece_index, node_index);
@@ -223,38 +198,36 @@ void StandardBoard::_take_piece(size_t piece_index) {
 
     WAIT_FOR_NEXT_MOVE();
 
+    // Set state accordingly
     nodes.at(piece.node_index).piece_index = NULL_INDEX;
-    take_and_raise_piece(piece_index);
     must_take_piece = false;
     flags.must_take_or_took_piece = true;
+    take_and_raise_piece(piece_index);
     set_pieces_to_take(piece.type, false);
 
     if (piece.type == PieceType::White) {
-        white_pieces_count--;
+        white_pieces_on_board_count--;
     } else {
-        black_pieces_count--;
+        black_pieces_on_board_count--;
     }
 
     DEB_DEBUG("{} piece {} taken", piece.type == PieceType::White ? "White" : "Black", piece_index);
 
-    check_player_number_of_pieces(BoardPlayer::Black);
-    check_player_number_of_pieces(BoardPlayer::White);
-
     switch_turn_and_check_turns_without_mills();
-    update_piece_outlines();
 
-    if (is_player_blocked(turn)) {
-        DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+    check_player_number_of_pieces(BoardPlayer::White);
+    check_player_number_of_pieces(BoardPlayer::Black);
 
-        FORMATTED_MESSAGE(
-            message, 64, "%s player has no more legal moves to make.",
-            TURN_IS_WHITE_SO("White", "Black")
-        )
-
-        game_over(
-            BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
-        );
+    if (phase == BoardPhase::MovePieces) {
+        switch_piece_outlines();
     }
+
+    // Check ONLY the opponent
+    if (is_player_blocked(turn)) {
+        set_game_over_player_blocked();
+    }
+
+    check_phase_two();
 }
 
 void StandardBoard::check_select_piece(identifier::Id hovered_id) {
@@ -316,7 +289,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
     }
 
     static constexpr auto mills = MILLS_NINE_MENS_MORRIS;
-    static constexpr auto count = NINE_MENS_MORRIS_MILLS;
+    static constexpr auto count = NINE_MENS_MORRIS_MILLS_COUNT;
 
     for (auto& [index, piece] : pieces) {
         if (turn == BoardPlayer::White) {
@@ -328,7 +301,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
             if (valid_piece) {
                 const bool can_take = (
                     !is_mill_made(piece.node_index, PieceType::Black, mills, count)
-                    || number_of_pieces_in_mills(PieceType::Black, mills, count) == black_pieces_count
+                    || number_of_pieces_in_mills(PieceType::Black, mills, count) == black_pieces_on_board_count
                 );
 
                 if (can_take) {
@@ -350,7 +323,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
             if (valid_piece) {
                 const bool can_take = (
                     !is_mill_made(piece.node_index, PieceType::White, mills, count)
-                    || number_of_pieces_in_mills(PieceType::White, mills, count) == white_pieces_count
+                    || number_of_pieces_in_mills(PieceType::White, mills, count) == white_pieces_on_board_count
                 );
 
                 if (can_take) {
@@ -365,34 +338,40 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
             }
         }
     }
+}
 
-    // Do this even if it may not be needed
-    if (not_placed_white_pieces_count + not_placed_black_pieces_count == 0 && !must_take_piece
-            && phase != BoardPhase::GameOver) {
+void StandardBoard::check_phase_two() {
+    if (phase != BoardPhase::PlacePieces) {
+        return;
+    }
+
+    if (white_pieces_outside_count + black_pieces_outside_count == 0 ) {
         phase = BoardPhase::MovePieces;
-        update_piece_outlines();
+        switch_piece_outlines();
 
-        DEB_INFO("Started phase 2");
+        DEB_INFO("Started phase two");
     }
 }
 
 void StandardBoard::switch_turn_and_check_turns_without_mills() {
-    if (phase == BoardPhase::MovePieces) {
-        if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
-            DEB_INFO("The max amount of turns without mills has been hit");
-
-            FORMATTED_MESSAGE(
-                message, 64, "%u turns have passed without a mill.",
-                MAX_TURNS_WITHOUT_MILLS
-            )
-
-            game_over(BoardEnding {BoardEnding::TieBetweenBothPlayers, message});
-        }
-    }
-
     turn = TURN_IS_WHITE_SO(BoardPlayer::Black, BoardPlayer::White);
     flags.switched_turn = true;
     turn_count++;
+
+    if (phase != BoardPhase::MovePieces) {
+        return;
+    }
+
+    if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
+        DEB_INFO("The max amount of turns without mills has been hit");
+
+        FORMATTED_MESSAGE(
+            message, 64, "%s turns have passed without a mill.",
+            MAX_TURNS_WITHOUT_MILLS_TEXT
+        )
+
+        game_over(BoardEnding {BoardEnding::TieBetweenBothPlayers, message});
+    }
 }
 
 bool StandardBoard::can_go(size_t piece_index, size_t destination_node_index) {
@@ -404,7 +383,7 @@ bool StandardBoard::can_go(size_t piece_index, size_t destination_node_index) {
     ASSERT(source_node_index != NULL_INDEX, "Source must not be null");
     ASSERT(source_node_index != destination_node_index, "Source must be different than destination");
 
-    if (can_jump[static_cast<int>(turn)]) {
+    if (can_player_jump(turn)) {
         return true;
     }
 
@@ -521,11 +500,11 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
     if (player == BoardPlayer::White) {
         DEB_DEBUG("Checking white player number of pieces...");
 
-        if (white_pieces_count + not_placed_white_pieces_count == 3) {
+        if (white_pieces_on_board_count + white_pieces_outside_count == 3) {
             DEB_INFO("White player can jump now");
 
-            can_jump[static_cast<int>(player)] = true;
-        } else if (white_pieces_count + not_placed_white_pieces_count == 2) {
+            can_jump[0] = true;
+        } else if (white_pieces_on_board_count + white_pieces_outside_count == 2) {
             DEB_INFO("White player has only 2 pieces now");
 
             FORMATTED_MESSAGE(
@@ -537,11 +516,11 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
     } else {
         DEB_DEBUG("Checking black player number of pieces...");
 
-        if (black_pieces_count + not_placed_black_pieces_count == 3) {
+        if (black_pieces_on_board_count + black_pieces_outside_count == 3) {
             DEB_INFO("Black player can jump now");
 
-            can_jump[static_cast<int>(player)] = true;
-        } else if (black_pieces_count + not_placed_black_pieces_count == 2) {
+            can_jump[1] = true;
+        } else if (black_pieces_on_board_count + black_pieces_outside_count == 2) {
             DEB_INFO("Black player has only 2 pieces now");
 
             FORMATTED_MESSAGE(
@@ -553,27 +532,36 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
     }
 }
 
+bool StandardBoard::can_player_jump(BoardPlayer player) {
+    return can_jump[static_cast<size_t>(player)];
+}
+
+bool StandardBoard::can_player_jump(PieceType piece) {
+    return can_jump[static_cast<size_t>(piece)];
+}
+
 bool StandardBoard::is_player_blocked(BoardPlayer player) {
     DEB_DEBUG("Checking {} player if it's blocked...", player == BoardPlayer::White ? "white" : "black");
 
     const PieceType type = player == BoardPlayer::White ? PieceType::White : PieceType::Black;
-    bool at_least_one_piece = false;
 
-    if (can_jump[static_cast<int>(player)]) {
+    if (can_player_jump(player)) {
+        return false;
+    }
+
+    if (white_pieces_outside_count > 0 || black_pieces_outside_count > 0) {
         return false;
     }
 
     for (auto& [_, piece] : pieces) {
-        if (piece.type == type && !piece.pending_remove && piece.in_use) {
-            at_least_one_piece = true;
-
+        if (piece.type == type && piece.in_use && !piece.pending_remove) {
             const Node& node = nodes.at(piece.node_index);
 
             switch (node.index) {
                 case 0: {
                     const Node& node1 = nodes.at(1);
                     const Node& node2 = nodes.at(9);
-                    if (node1.piece_index == NULL_INDEX|| node2.piece_index == NULL_INDEX)
+                    if (node1.piece_index == NULL_INDEX || node2.piece_index == NULL_INDEX)
                         return false;
                     break;
                 }
@@ -770,11 +758,20 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
         }
     }
 
-    if (at_least_one_piece) {
-        return true;
-    } else {
-        return false;
-    }
+    return true;
+}
+
+void StandardBoard::set_game_over_player_blocked() {
+    DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+
+    FORMATTED_MESSAGE(
+        message, 64, "%s player has no more legal moves to make.",
+        TURN_IS_WHITE_SO("White", "Black")
+    )
+
+    game_over(
+        BoardEnding {TURN_IS_WHITE_SO(BoardEnding::WinnerBlack, BoardEnding::WinnerWhite), message}
+    );
 }
 
 void StandardBoard::remember_state() {
@@ -819,10 +816,10 @@ void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
     serialized.must_take_piece = must_take_piece;
     serialized.turn_count = turn_count;
     serialized.can_jump = can_jump;
-    serialized.white_pieces_count = white_pieces_count;
-    serialized.black_pieces_count = black_pieces_count;
-    serialized.not_placed_white_pieces_count = not_placed_white_pieces_count;
-    serialized.not_placed_black_pieces_count = not_placed_black_pieces_count;
+    serialized.white_pieces_on_board_count = white_pieces_on_board_count;
+    serialized.black_pieces_on_board_count = black_pieces_on_board_count;
+    serialized.white_pieces_outside_count = white_pieces_outside_count;
+    serialized.black_pieces_outside_count = black_pieces_outside_count;
     serialized.turns_without_mills = turns_without_mills;
 }
 
@@ -859,7 +856,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             piece.model->position = ser_piece.position;
             piece.model->rotation = ser_piece.rotation;
             const char* piece_tag = piece.type == PieceType::White ? "white_piece" : "black_piece";
-            piece.model->vertex_array = app->res.vertex_array[hs(piece_tag + std::to_string(ser_index))];
+            piece.model->vertex_array = app->res.vertex_array[hs(piece_tag + std::to_string(ser_index))];  // FIXME crash here (no saving/loading into play)
             piece.model->index_buffer = (
                 ser_piece.type == PieceType::White
                     ?
@@ -907,10 +904,10 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
     is_players_turn = serialized.is_players_turn;
     turn_count = serialized.turn_count;
     can_jump = serialized.can_jump;
-    white_pieces_count = serialized.white_pieces_count;
-    black_pieces_count = serialized.black_pieces_count;
-    not_placed_white_pieces_count = serialized.not_placed_white_pieces_count;
-    not_placed_black_pieces_count = serialized.not_placed_black_pieces_count;
+    white_pieces_on_board_count = serialized.white_pieces_on_board_count;
+    black_pieces_on_board_count = serialized.black_pieces_on_board_count;
+    white_pieces_outside_count = serialized.white_pieces_outside_count;
+    black_pieces_outside_count = serialized.black_pieces_outside_count;
     turns_without_mills = serialized.turns_without_mills;
 
     // Reset these values

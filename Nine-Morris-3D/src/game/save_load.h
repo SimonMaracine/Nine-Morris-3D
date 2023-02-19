@@ -136,6 +136,10 @@ void serialize(Archive& archive, BoardSerialized& board) {
         board.must_take_piece,
         board.repetition_history,
         board.is_players_turn,
+        board.white_pieces_on_board_count,
+        board.black_pieces_on_board_count,
+        board.white_pieces_outside_count,
+        board.black_pieces_outside_count,
         board.turn_count
     );
 }
@@ -145,10 +149,6 @@ void serialize(Archive& archive, StandardBoardSerialized& board) {
     archive(
         cereal::base_class<BoardSerialized>(&board),
         board.can_jump,
-        board.white_pieces_count,
-        board.black_pieces_count,
-        board.not_placed_white_pieces_count,
-        board.not_placed_black_pieces_count,
         board.turns_without_mills
     );
 }

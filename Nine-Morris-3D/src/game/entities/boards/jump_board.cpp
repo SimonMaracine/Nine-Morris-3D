@@ -76,16 +76,14 @@ void JumpBoard::_move_piece(size_t piece_index, size_t node_index) {
 
     prepare_piece_for_three_step_move(piece_index, target, velocity, target0, target1);
 
-    // Reset all of these
-    Node& previous_node = nodes.at(piece.node_index);
-    previous_node.piece_index = NULL_INDEX;
-
+    // Set state accordingly
+    nodes.at(piece.node_index).piece_index = NULL_INDEX;
     piece.node_index = node_index;
-    piece.selected = false;
     node.piece_index = piece_index;
+    piece.selected = false;
 
     static constexpr auto mills = MILLS_NINE_MENS_MORRIS;
-    static constexpr auto count = NINE_MENS_MORRIS_MILLS;
+    static constexpr auto count = NINE_MENS_MORRIS_MILLS_COUNT;
 
     if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
         DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
@@ -108,8 +106,9 @@ void JumpBoard::_move_piece(size_t piece_index, size_t node_index) {
         turns_without_mills = 0;
     } else {
         turns_without_mills++;
+
         switch_turn_and_check_turns_without_mills();
-        update_piece_outlines();
+        switch_piece_outlines();
 
         remember_position_and_check_repetition(piece_index, node_index);
     }
@@ -143,7 +142,6 @@ void JumpBoard::check_move_piece(identifier::Id hovered_id) {
         );
 
         if (can_move) {
-            remember_state();
             move_piece(pieces.at(selected_piece_index).node_index, node.index);
 
             selected_piece_index = NULL_INDEX;
@@ -154,22 +152,24 @@ void JumpBoard::check_move_piece(identifier::Id hovered_id) {
 }
 
 void JumpBoard::switch_turn_and_check_turns_without_mills() {
-    if (phase == BoardPhase::MovePieces) {
-        if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
-            DEB_INFO("The max amount of turns without mills has been hit");
-
-            FORMATTED_MESSAGE(
-                message, 64, "%u turns have passed without a mill.",
-                MAX_TURNS_WITHOUT_MILLS
-            )
-
-            game_over(BoardEnding {BoardEnding::TieBetweenBothPlayers, message});
-        }
-    }
-
     turn = TURN_IS_WHITE_SO(BoardPlayer::Black, BoardPlayer::White);
     flags.switched_turn = true;
     turn_count++;
+
+    if (phase != BoardPhase::MovePieces) {
+        return;
+    }
+
+    if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
+        DEB_INFO("The max amount of turns without mills has been hit");
+
+        FORMATTED_MESSAGE(
+            message, 64, "%s turns have passed without a mill.",
+            MAX_TURNS_WITHOUT_MILLS_TEXT
+        )
+
+        game_over(BoardEnding {BoardEnding::TieBetweenBothPlayers, message});
+    }
 }
 
 void JumpBoard::remember_state() {

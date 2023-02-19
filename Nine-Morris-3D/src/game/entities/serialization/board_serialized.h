@@ -20,5 +20,10 @@ struct BoardSerialized {
     bool must_take_piece = false;
     bool is_players_turn = false;
 
+    unsigned int white_pieces_on_board_count = 0;
+    unsigned int black_pieces_on_board_count = 0;
+    unsigned int white_pieces_outside_count = 9;
+    unsigned int black_pieces_outside_count = 9;
+
     unsigned int turn_count = 0;
 };

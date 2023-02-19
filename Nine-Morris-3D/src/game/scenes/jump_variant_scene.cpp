@@ -362,7 +362,7 @@ void JumpVariantScene::setup_entities() {
     }
 
     // Set white pieces to show outline
-    board.update_piece_outlines();
+    board.switch_piece_outlines();
 
     DEB_DEBUG("Setup entities");
 }
