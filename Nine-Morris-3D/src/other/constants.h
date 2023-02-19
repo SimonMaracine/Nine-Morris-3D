@@ -26,16 +26,16 @@
 #define GRAYISH_TEXT ImVec4(0.89f, 0.87f, 0.81f, 1.0f)
 #define BLACK_BACKGROUND ImVec4(0.138f, 0.138f, 0.138f, 1.0f)
 
-inline constexpr size_t NINE_MENS_MORRIS_MILLS = 16;
-inline constexpr size_t MILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS][3] = {
+inline constexpr size_t NINE_MENS_MORRIS_MILLS_COUNT = 16;
+inline constexpr size_t MILLS_NINE_MENS_MORRIS[NINE_MENS_MORRIS_MILLS_COUNT][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
     { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
     { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
     { 1, 4, 7 }, { 12, 13, 14 }, { 16, 19, 22 }, { 9, 10, 11 }
 };
 
-inline constexpr size_t TWELVE_MENS_MORRIS_MILLS = 20;
-inline constexpr size_t MILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS][3] = {
+inline constexpr size_t TWELVE_MENS_MORRIS_MILLS_COUNT = 20;
+inline constexpr size_t MILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS_COUNT][3] = {
     { 0, 1, 2 }, { 2, 14, 23 }, { 21, 22, 23 }, { 0, 9, 21 },
     { 3, 4, 5 }, { 5, 13, 20 }, { 18, 19, 20 }, { 3, 10, 18 },
     { 6, 7, 8 }, { 8, 12, 17 }, { 15, 16, 17 }, { 6, 11, 15 },
@@ -183,6 +183,7 @@ inline constexpr size_t MAX_NODES = 24;
 inline constexpr size_t MAX_PIECES = 18;  // TODO will change
 
 inline constexpr unsigned int MAX_TURNS_WITHOUT_MILLS = 40;
+inline const char* MAX_TURNS_WITHOUT_MILLS_TEXT = "Forty";
 inline constexpr float PAINT_Y_POSITION = 0.062f;
 
 inline constexpr float PIECE_Y_POSITION = 0.135f;

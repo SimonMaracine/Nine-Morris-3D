@@ -36,7 +36,7 @@ public:
     void update_pieces(identifier::Id hovered_id);
     void move_pieces();
     void finalize_pieces_state();
-    void update_piece_outlines();
+    void switch_piece_outlines();
 protected:
     size_t new_piece_to_place(PieceType type, float x_pos, float z_pos, size_t node_index);
     void take_and_raise_piece(size_t piece_index);
@@ -76,10 +76,10 @@ public:
     bool next_move = true;  // It is false when any piece is in the air, true otherwise
     bool is_players_turn = false;
 
-    unsigned int white_pieces_count = 0;  // Number of pieces on the board
-    unsigned int black_pieces_count = 0;
-    unsigned int not_placed_white_pieces_count = 9;  // Number of pieces floating
-    unsigned int not_placed_black_pieces_count = 9;
+    unsigned int white_pieces_on_board_count = 0;
+    unsigned int black_pieces_on_board_count = 0;
+    unsigned int white_pieces_outside_count = 9;  // FIXME won't work with other variants
+    unsigned int black_pieces_outside_count = 9;
 
     unsigned int turn_count = 0;
 
