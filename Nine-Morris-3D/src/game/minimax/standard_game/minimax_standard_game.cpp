@@ -209,11 +209,13 @@ static bool is_game_over(GamePosition& position) {
         return true;
     }
 
-    if (calculate_freedom(position, PieceType::White) == 0 && number_of_pieces_outside(position, PieceType::White) == 0) {
+    if (calculate_freedom(position, PieceType::White) == 0
+            && position.white_pieces_outside == 0 && position.black_pieces_outside == 0) {
         return true;
     }
 
-    if (calculate_freedom(position, PieceType::Black) == 0 && number_of_pieces_outside(position, PieceType::Black) == 0) {
+    if (calculate_freedom(position, PieceType::Black) == 0
+            && position.white_pieces_outside == 0 && position.black_pieces_outside == 0) {
         return true;
     }
 
@@ -360,10 +362,10 @@ static constexpr PieceType opponent_piece(PieceType type) {
         result[pos++] = (const_index); \
     }
 
-std::array<size_t, 4> neighbor_free_positions(GamePosition& position, PieceType piece, size_t index) {
+std::array<size_t, 5> neighbor_free_positions(GamePosition& position, PieceType piece, size_t index) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
-    std::array<size_t, 4> result = { NULL_INDEX, NULL_INDEX, NULL_INDEX, NULL_INDEX };
+    std::array<size_t, 5> result = { NULL_INDEX, NULL_INDEX, NULL_INDEX, NULL_INDEX, NULL_INDEX };
     size_t pos = 0;
 
     switch (index) {
@@ -497,99 +499,6 @@ static bool all_pieces_in_mills(GamePosition& position, PieceType piece) {
     return true;
 }
 
-static void get_moves_phase1(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
-    ASSERT(piece != PieceType::None, "Invalid enum");
-
-    for (size_t i = 0; i < MAX_NODES; i++) {
-        if (position.at(i) == PieceType::None) {
-            if (is_mill(position, piece, i)) {
-                for (size_t j = 0; j < MAX_NODES; j++) {
-                    if (position.at(j) == opponent_piece(piece)) {
-                        if (is_mill(position, opponent_piece(piece), j) && !all_pieces_in_mills(position, piece)) {
-                            return;
-                        }
-
-                        moves.push_back(Move::create_place_take(piece, i, j));
-                    }
-                }
-            } else {
-                moves.push_back(Move::create_place(piece, i));
-            }
-        }
-    }
-}
-
-static void get_moves_phase2(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
-    ASSERT(piece != PieceType::None, "Invalid enum");
-
-    for (size_t i = 0; i < MAX_NODES; i++) {
-        if (position.at(i) == piece) {
-            const auto free_positions = neighbor_free_positions(position, piece, i);
-
-            for (size_t j = 0; free_positions[j] != NULL_INDEX; j++) {
-                if (is_mill(position, piece, i)) {
-                    for (size_t k = 0; k < MAX_NODES; k++) {
-                        if (position.at(k) == opponent_piece(piece)) {
-                            if (is_mill(position, opponent_piece(piece), k) && !all_pieces_in_mills(position, piece)) {
-                                return;
-                            }
-
-                            moves.push_back(Move::create_move_take(piece, i, free_positions[j], k));
-                        }
-                    }
-                } else {
-                    moves.push_back(Move::create_move(piece, i, free_positions[j]));
-                }
-            }
-        }
-    }
-}
-
-static void get_moves_phase3(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
-    ASSERT(piece != PieceType::None, "Invalid enum");
-
-    for (size_t i = 0; i < MAX_NODES; i++) {
-        if (position.at(i) == piece) {
-            for (size_t j = 0; j < MAX_NODES; j++) {
-                if (position.at(j) == PieceType::None) {
-                    if (is_mill(position, piece, i)) {
-                        for (size_t k = 0; k < MAX_NODES; k++) {
-                            if (position.at(k) == opponent_piece(piece)) {
-                                if (is_mill(position, opponent_piece(piece), k) && !all_pieces_in_mills(position, piece)) {
-                                    return;
-                                }
-
-                                moves.push_back(Move::create_move_take(piece, i, j, k));
-                            }
-                        }
-                    } else {
-                        moves.push_back(Move::create_move(piece, i, j));
-                    }
-                }
-            }
-        }
-    }
-}
-
-static std::vector<Move> get_all_moves(GamePosition& position, PieceType piece) {
-    ASSERT(piece != PieceType::None, "Invalid enum");
-
-    std::vector<Move> moves;
-
-    if (total_number_of_pieces(position, piece) == 3) {  // Phase 3
-        get_moves_phase3(position, piece, moves);
-        return moves;
-    }
-
-    if (position.turns < 18) {  // Phase 1
-        get_moves_phase1(position, piece, moves);
-    } else {  // Phase 2
-        get_moves_phase2(position, piece, moves);
-    }
-
-    return moves;
-}
-
 static void make_move(GamePosition& position, const Move& move) {
     switch (move.type) {
         case MoveType::Place:
@@ -636,6 +545,129 @@ static void unmake_move(GamePosition& position, const Move& move) {
             ASSERT(false, "Invalid move type");
             break;
     }
+}
+
+static void get_moves_phase1(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
+    ASSERT(piece != PieceType::None, "Invalid enum");
+
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        if (position.at(i) == PieceType::None) {
+            make_move(position, Move::create_place(piece, i));  // TODO optimize
+
+            if (is_mill(position, piece, i)) {
+                const auto opponent = opponent_piece(piece);
+
+                for (size_t j = 0; j < MAX_NODES; j++) {
+                    if (position.at(j) == opponent) {
+                        if (is_mill(position, opponent, j) && !all_pieces_in_mills(position, opponent)) {
+                            continue;
+                        }
+
+                        // TODO should make move
+
+                        moves.push_back(Move::create_place_take(piece, i, j));
+
+                        // TODO should unmake move, but it doesn't change anything
+                    }
+                }
+            } else {
+                moves.push_back(Move::create_place(piece, i));
+            }
+
+            unmake_move(position, Move::create_place(piece, i));
+        }
+    }
+}
+
+static void get_moves_phase2(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
+    ASSERT(piece != PieceType::None, "Invalid enum");
+
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        if (position.at(i) == piece) {
+            const auto free_positions = neighbor_free_positions(position, piece, i);
+
+            for (size_t j = 0; free_positions[j] != NULL_INDEX; j++) {
+                make_move(position, Move::create_move(piece, i, free_positions[j]));  // TODO optimize
+
+                if (is_mill(position, piece, free_positions[j])) {
+                    const auto opponent = opponent_piece(piece);
+
+                    for (size_t k = 0; k < MAX_NODES; k++) {
+                        if (position.at(k) == opponent) {
+                            if (is_mill(position, opponent, k) && !all_pieces_in_mills(position, opponent)) {
+                                continue;
+                            }
+
+                            // TODO should make move
+
+                            moves.push_back(Move::create_move_take(piece, i, free_positions[j], k));
+
+                            // TODO should unmake move, but it doesn't change anything
+                        }
+                    }
+                } else {
+                    moves.push_back(Move::create_move(piece, i, free_positions[j]));
+                }
+
+                unmake_move(position, Move::create_move(piece, i, free_positions[j]));
+            }
+        }
+    }
+}
+
+static void get_moves_phase3(GamePosition& position, PieceType piece, std::vector<Move>& moves) {
+    ASSERT(piece != PieceType::None, "Invalid enum");
+
+    for (size_t i = 0; i < MAX_NODES; i++) {
+        if (position.at(i) == piece) {
+            for (size_t j = 0; j < MAX_NODES; j++) {
+                if (position.at(j) == PieceType::None) {
+                    make_move(position, Move::create_move(piece, i, j));  // TODO optimize
+
+                    if (is_mill(position, piece, j)) {
+                        const auto opponent = opponent_piece(piece);
+
+                        for (size_t k = 0; k < MAX_NODES; k++) {
+                            if (position.at(k) == opponent) {
+                                if (is_mill(position, opponent, k) && !all_pieces_in_mills(position, opponent)) {
+                                    continue;
+                                }
+
+                                // TODO should make move
+
+                                moves.push_back(Move::create_move_take(piece, i, j, k));
+
+                                // TODO should unmake move, but it doesn't change anything
+                            }
+                        }
+                    } else {
+                        moves.push_back(Move::create_move(piece, i, j));
+                    }
+
+                    unmake_move(position, Move::create_move(piece, i, j));
+                }
+            }
+        }
+    }
+}
+
+static std::vector<Move> get_all_moves(GamePosition& position, PieceType piece) {
+    ASSERT(piece != PieceType::None, "Invalid enum");
+
+    std::vector<Move> moves;
+
+    if (total_number_of_pieces(position, piece) == 3) {  // Phase 3
+        get_moves_phase3(position, piece, moves);
+        return moves;
+    }
+
+    if (position.turns < 18) {  // Phase 1
+        get_moves_phase1(position, piece, moves);
+    } else {  // Phase 2
+        get_moves_phase2(position, piece, moves);
+    }
+
+    return moves;
 }
 
 static Move best_move;  // TODO refactor into a class
@@ -692,6 +724,12 @@ static int _minimax(GamePosition& position, size_t depth, size_t turns_from_root
 
 static void random_move(GamePosition& position, PieceType piece) {
     const auto moves = get_all_moves(position, piece);
+
+    if (moves.empty()) {
+        DEB_INFO("Game Over");
+        return;
+    }
+
     best_move = random_gen::choice<Move>(moves.begin(), moves.end());
 }
 
