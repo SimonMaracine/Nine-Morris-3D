@@ -470,6 +470,11 @@ void SceneGame::update_game_state() {
             game.state = GameState::NextPlayer;
             break;
         case GameState::ComputerBeginMove:
+            if (get_board().phase == BoardPhase::GameOver) {
+                game.state = GameState::ComputerStop;
+                break;
+            }
+
             game.computer_think_move();
             game.state = GameState::ComputerThinkingMove;
             break;
@@ -496,11 +501,17 @@ void SceneGame::update_game_state() {
         case GameState::ComputerDoingMoveAndTake:
             if (get_board().next_move) {
                 game.computer_execute_take_move();
+
+                update_after_computer_move(true);
+
                 game.state = GameState::ComputerDoingMove;
             }
             break;
         case GameState::ComputerEndMove:
             game.state = GameState::NextPlayer;
+            break;
+        case GameState::ComputerStop:
+            // Do nothig
             break;
     }
 }
@@ -637,10 +648,12 @@ void SceneGame::imgui_draw_menu_bar() {
     auto& data = app->user_data<Data>();
 
     if (ImGui::BeginMainMenuBar()) {
-        const bool can_change = game.state == GameState::HumanThinkingMove;
+        // TODO what to do when computer is in charge?
+        const bool can_change = (
+            game.state == GameState::HumanThinkingMove || game.state == GameState::ComputerStop
+        );
         const bool can_undo_redo = (
-            game.state == GameState::HumanThinkingMove
-            || game.state == GameState::ComputerThinkingMove
+            game.state == GameState::HumanThinkingMove || game.state == GameState::ComputerStop
         );
 
         if (ImGui::BeginMenu("Game")) {
@@ -1145,6 +1158,9 @@ void SceneGame::imgui_draw_debug() {
             break;
         case GameState::ComputerEndMove:
             state = "ComputerEndMove";
+            break;
+        case GameState::ComputerStop:
+            state = "ComputerStop";
             break;
     }
     ImGui::Text("State: %s", state);

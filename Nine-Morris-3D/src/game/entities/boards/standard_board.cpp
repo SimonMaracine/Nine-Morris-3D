@@ -218,9 +218,7 @@ void StandardBoard::_take_piece(size_t piece_index) {
     check_player_number_of_pieces(BoardPlayer::White);
     check_player_number_of_pieces(BoardPlayer::Black);
 
-    if (phase == BoardPhase::MovePieces) {
-        switch_piece_outlines();
-    }
+    switch_piece_outlines();
 
     // Check ONLY the opponent
     if (is_player_blocked(turn)) {

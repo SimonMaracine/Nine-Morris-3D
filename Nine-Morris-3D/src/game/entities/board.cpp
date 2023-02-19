@@ -154,7 +154,9 @@ void Board::finalize_pieces_state() {
 }
 
 void Board::switch_piece_outlines() {
-    ASSERT(phase == BoardPhase::MovePieces, "Invalid state");
+    if (phase != BoardPhase::MovePieces) {
+        return;
+    }
 
     if (turn == BoardPlayer::White) {
         set_pieces_show_outline(PieceType::White, true);

@@ -139,7 +139,8 @@ enum class GameState {
     ComputerThinkingMove,
     ComputerDoingMove,
     ComputerDoingMoveAndTake,
-    ComputerEndMove
+    ComputerEndMove,
+    ComputerStop
 };
 
 enum class KeyboardControlsDirection {
