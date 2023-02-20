@@ -4,7 +4,8 @@
 
 ### Description
 
-It is a free casual board game with hopefully beautiful 3D graphics. It has five game modes:
+It is a free casual board game with hopefully beautiful 3D graphics. You can play against the computer
+or another person. It has five game modes:
 
 - _standard (nine men's morris)_
 - _jump_
@@ -14,7 +15,7 @@ It is a free casual board game with hopefully beautiful 3D graphics. It has five
 
 And each game mode has its own AI. Games can be saved and be continued later. AI and other
 settings are configurable. The background can be changed as you wish. It supports 3D sounds and
-it has some beautiful music.
+it has beautiful music. 
 
 The game runs on Linux and Windows.
 
