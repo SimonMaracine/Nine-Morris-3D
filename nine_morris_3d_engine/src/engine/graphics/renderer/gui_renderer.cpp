@@ -4,6 +4,7 @@
 
 #include "engine/application/application.h"
 #include "engine/application/event.h"
+#include "engine/application/capabilities.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
@@ -115,7 +116,7 @@ void GuiRenderer::flush_quads() {
 }
 
 void GuiRenderer::draw_quad(glm::vec2 position, glm::vec2 size, std::shared_ptr<gl::Texture> texture) {
-    if (storage.quads.quad_count == MAX_QUAD_COUNT || storage.quads.texture_slot_index == 8) {
+    if (storage.quads.quad_count == MAX_QUAD_COUNT || storage.quads.texture_slot_index == storage.quads.MAX_TEXTURE_UNITS) {
         end_quads_batch();
         flush_quads();
         begin_quads_batch();
@@ -301,7 +302,7 @@ void GuiRenderer::initialize_quad_renderer() {
         encr(file_system::path_for_assets(QUAD2D_VERTEX_SHADER)),
         encr(file_system::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
         std::vector<std::string> {
-            "u_texture[0]",
+            "u_texture[0]",  // FIXME this
             "u_texture[1]",
             "u_texture[2]",
             "u_texture[3]",
@@ -339,7 +340,8 @@ void GuiRenderer::initialize_quad_renderer() {
         .end_definition();
 
     storage.quads.buffer = new QuadVertex[MAX_QUAD_COUNT];
-    storage.quads.texture_slots.fill(0);
+    storage.quads.MAX_TEXTURE_UNITS = capabilities::max_texture_units_supported();
+    storage.quads.texture_slots.resize(storage.quads.MAX_TEXTURE_UNITS);
 }
 
 std::shared_ptr<gl::IndexBuffer> GuiRenderer::initialize_quads_index_buffer() {

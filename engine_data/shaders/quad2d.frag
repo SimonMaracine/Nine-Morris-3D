@@ -8,6 +8,6 @@ layout(location = 0) out vec4 fragment_color;
 uniform sampler2D u_texture[8];
 
 void main() {
-    const int index = int(v_texture_index);
+    const int index = int(v_texture_index);  // FIXME this
     fragment_color = texture(u_texture[index], v_texture_coordinate);
 }

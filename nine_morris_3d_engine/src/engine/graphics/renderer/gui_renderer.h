@@ -77,7 +77,8 @@ private:
             QuadVertex* buffer = nullptr;
             QuadVertex* buffer_pointer = nullptr;
 
-            std::array<GLuint, 8> texture_slots;
+            size_t MAX_TEXTURE_UNITS;
+            std::vector<GLuint> texture_slots;
             size_t texture_slot_index = 0;
 
             size_t quad_count = 0;

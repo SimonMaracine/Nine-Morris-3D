@@ -35,4 +35,11 @@ namespace capabilities {
 
         return max_samples;
     }
+
+    int max_texture_units_supported() {
+        GLint max_units;
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_units);
+
+        return max_units;
+    }
 }
