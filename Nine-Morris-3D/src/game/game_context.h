@@ -4,12 +4,15 @@
 
 struct Board;
 class MinimaxThread;
+struct MinimaxAlgorithm;
 
 class GameContext {
 public:
     GameContext() = default;
-    GameContext(GamePlayer white_player, GamePlayer black_player, Board* board, MinimaxThread* minimax_thread)
-        : white_player(white_player), black_player(black_player), board(board), minimax_thread(minimax_thread) {}
+    GameContext(GamePlayer white_player, GamePlayer black_player, Board* board,
+            MinimaxThread* minimax_thread, MinimaxAlgorithm* minimax_algorithm)
+        : white_player(white_player), black_player(black_player), board(board),
+          minimax_thread(minimax_thread), minimax_algorithm(minimax_algorithm) {}
     ~GameContext() = default;
 
     GameContext(const GameContext&) = default;
@@ -32,4 +35,5 @@ public:
 private:
     Board* board = nullptr;
     MinimaxThread* minimax_thread = nullptr;
+    MinimaxAlgorithm* minimax_algorithm = nullptr;
 };

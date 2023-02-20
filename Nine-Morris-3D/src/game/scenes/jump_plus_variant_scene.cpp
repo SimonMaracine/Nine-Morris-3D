@@ -49,11 +49,14 @@ void JumpPlusVariantScene::on_start() {
 
     minimax_thread = MinimaxThread {&board};
 
+    // FIXME minimax_algorithm
+
     game = GameContext {
         static_cast<GamePlayer>(data.options.white_player),
         static_cast<GamePlayer>(data.options.black_player),
         &board,
-        &minimax_thread
+        &minimax_thread,
+        nullptr
     };
 
     timer = Timer {app};

@@ -129,6 +129,8 @@ enum class GamePlayer {
 
 enum class GameState {
     NextPlayer,
+    Stop,
+
     HumanBeginMove,
     HumanThinkingMove,
     HumanDoingMove,  // TODO HumanDoingMove and ComputerDoingMove could be merged
@@ -139,8 +141,7 @@ enum class GameState {
     ComputerThinkingMove,
     ComputerDoingMove,
     ComputerDoingMoveAndTake,
-    ComputerEndMove,
-    ComputerStop
+    ComputerEndMove
 };
 
 enum class KeyboardControlsDirection {

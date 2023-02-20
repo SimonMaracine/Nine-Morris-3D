@@ -19,13 +19,21 @@ MinimaxThread& MinimaxThread::operator=(MinimaxThread&& other) noexcept {
     return *this;
 }
 
-void MinimaxThread::start(const Algorithm& algorithm) {
+void MinimaxThread::start(MinimaxAlgorithm* minimax) {
     running.store(true);
     result = Move {};
 
     auto position = board->get_position();
     const auto player = board->turn;
-    thread = std::thread(algorithm, position, static_cast<PieceType>(player), std::ref(result), std::ref(running));
+
+    thread = std::thread(  // TODO spawn only one thread and reuse it
+        &MinimaxAlgorithm::start,
+        minimax,
+        position,
+        static_cast<PieceType>(player),
+        std::ref(result),
+        std::ref(running)
+    );
 }
 
 bool MinimaxThread::is_running() const {

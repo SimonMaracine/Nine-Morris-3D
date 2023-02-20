@@ -8,6 +8,7 @@
 #include "game/entities/board.h"
 #include "game/entities/piece.h"
 #include "game/entities/node.h"
+#include "game/minimax/standard_game/minimax_standard_game.h"
 #include "game/scenes/standard_game_scene.h"
 #include "game/scenes/common.h"
 #include "game/game_options.h"
@@ -50,11 +51,14 @@ void StandardGameScene::on_start() {
 
     minimax_thread = MinimaxThread {&board};
 
+    minimax_algorithm = std::make_unique<MinimaxStandardGame>();
+
     game = GameContext {
         static_cast<GamePlayer>(data.options.white_player),
         static_cast<GamePlayer>(data.options.black_player),
         &board,
-        &minimax_thread
+        &minimax_thread,
+        minimax_algorithm.get()
     };
 
     timer = Timer {app};
