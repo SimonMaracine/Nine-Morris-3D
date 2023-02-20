@@ -18,9 +18,7 @@ public:
     MinimaxThread(MinimaxThread&&) = delete;
     MinimaxThread& operator=(MinimaxThread&& other) noexcept;
 
-    using Algorithm = std::function<void(GamePosition, PieceType, Move&, std::atomic<bool>&)>;
-
-    void start(const Algorithm& algorithm);
+    void start(MinimaxAlgorithm* minimax);
 
     bool is_running() const;
     void join();

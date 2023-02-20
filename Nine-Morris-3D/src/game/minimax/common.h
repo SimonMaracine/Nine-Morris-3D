@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/game_position.h"
 #include "other/constants.h"
 
 enum class MoveType {
@@ -23,4 +24,10 @@ struct Move {  // TODO can use union
     static Move create_move(PieceType piece, size_t move_source_node_index, size_t move_destination_node_index);
     static Move create_place_take(PieceType piece, size_t place_node_index, size_t take_node_index);
     static Move create_move_take(PieceType piece, size_t move_source_node_index, size_t move_destination_node_index, size_t take_node_index);
+};
+
+struct MinimaxAlgorithm {
+    using Algorithm = std::function<void(GamePosition, PieceType, Move&, std::atomic<bool>&)>;
+
+    virtual void start(GamePosition position, PieceType piece, Move& result, std::atomic<bool>& running) = 0;
 };

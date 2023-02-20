@@ -16,7 +16,7 @@ void GameContext::computer_think_move() {
 
     // TODO start the appropriate minimax algorithm in thread
 
-    minimax_thread->start(minimax_standard_game::minimax);
+    minimax_thread->start(minimax_algorithm);
 }
 
 bool GameContext::computer_execute_move() {
