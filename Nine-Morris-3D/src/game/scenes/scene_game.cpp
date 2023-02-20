@@ -450,7 +450,15 @@ void SceneGame::update_game_state() {
                 }
             }
             break;
+        case GameState::Stop:
+            // Do nothig
+            break;
         case GameState::HumanBeginMove:
+            if (get_board().phase == BoardPhase::GameOver) {
+                game.state = GameState::Stop;
+                break;
+            }
+
             game.human_begin_move();
             game.state = GameState::HumanThinkingMove;
             break;
@@ -471,7 +479,7 @@ void SceneGame::update_game_state() {
             break;
         case GameState::ComputerBeginMove:
             if (get_board().phase == BoardPhase::GameOver) {
-                game.state = GameState::ComputerStop;
+                game.state = GameState::Stop;
                 break;
             }
 
@@ -509,9 +517,6 @@ void SceneGame::update_game_state() {
             break;
         case GameState::ComputerEndMove:
             game.state = GameState::NextPlayer;
-            break;
-        case GameState::ComputerStop:
-            // Do nothig
             break;
     }
 }
@@ -650,10 +655,10 @@ void SceneGame::imgui_draw_menu_bar() {
     if (ImGui::BeginMainMenuBar()) {
         // TODO what to do when computer is in charge?
         const bool can_change = (
-            game.state == GameState::HumanThinkingMove || game.state == GameState::ComputerStop
+            game.state == GameState::HumanThinkingMove || game.state == GameState::Stop
         );
         const bool can_undo_redo = (
-            game.state == GameState::HumanThinkingMove || game.state == GameState::ComputerStop
+            game.state == GameState::HumanThinkingMove || game.state == GameState::Stop
         );
 
         if (ImGui::BeginMenu("Game")) {
@@ -675,7 +680,7 @@ void SceneGame::imgui_draw_menu_bar() {
             if (ImGui::MenuItem("Save Game", nullptr, false, can_change)) {
                 save_game();
 
-                time_t current;  // TODO this time might be quite later
+                time_t current;  // FIXME this time might be quite later
                 time(&current);
                 last_save_game_date = ctime(&current);
             }
@@ -712,13 +717,19 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::BeginMenu("White")) {
                     if (ImGui::RadioButton("Human", &data.options.white_player, game_options::HUMAN)) {
                         game.white_player = GamePlayer::Human;
-                        game.reset_players();
+
+                        if (game.state != GameState::Stop) {
+                            game.reset_players();
+                        }
 
                         DEB_INFO("Set white player to human");
                     }
                     if (ImGui::RadioButton("Computer", &data.options.white_player, game_options::COMPUTER)) {
                         game.white_player = GamePlayer::Computer;
-                        game.reset_players();
+
+                        if (game.state != GameState::Stop) {
+                            game.reset_players();
+                        }
 
                         DEB_INFO("Set white player to computer");
                     }
@@ -729,13 +740,19 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::BeginMenu("Black")) {
                     if (ImGui::RadioButton("Human", &data.options.black_player, game_options::HUMAN)) {
                         game.black_player = GamePlayer::Human;
-                        game.reset_players();
+
+                        if (game.state != GameState::Stop) {
+                            game.reset_players();
+                        }
 
                         DEB_INFO("Set black player to human");
                     }
                     if (ImGui::RadioButton("Computer", &data.options.black_player, game_options::COMPUTER)) {
                         game.black_player = GamePlayer::Computer;
-                        game.reset_players();
+
+                        if (game.state != GameState::Stop) {
+                            game.reset_players();
+                        }
 
                         DEB_INFO("Set black player to computer");
                     }
@@ -862,7 +879,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             data.options.skybox = data.imgui_option.skybox;
                             set_skybox(Skybox::None);
 
-                            DEB_INFO("Skybox set to none");
+                            DEB_INFO("Skybox set to None");
                         }
                     }
                     if (ImGui::RadioButton("Field", &data.imgui_option.skybox, game_options::FIELD)) {
@@ -870,7 +887,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             data.options.skybox = data.imgui_option.skybox;
                             set_skybox(Skybox::Field);
 
-                            DEB_INFO("Skybox set to field");
+                            DEB_INFO("Skybox set to Field");
                         }
                     }
                     if (ImGui::RadioButton("Autumn", &data.imgui_option.skybox, game_options::AUTUMN)) {
@@ -878,7 +895,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             data.options.skybox = data.imgui_option.skybox;
                             set_skybox(Skybox::Autumn);
 
-                            DEB_INFO("Skybox set to autumn");
+                            DEB_INFO("Skybox set to Autumn");
                         }
                     }
                 }
@@ -1129,6 +1146,9 @@ void SceneGame::imgui_draw_debug() {
         case GameState::NextPlayer:
             state = "NextPlayer";
             break;
+        case GameState::Stop:
+            state = "Stop";
+            break;
         case GameState::HumanBeginMove:
             state = "HumanBeginMove";
             break;
@@ -1158,9 +1178,6 @@ void SceneGame::imgui_draw_debug() {
             break;
         case GameState::ComputerEndMove:
             state = "ComputerEndMove";
-            break;
-        case GameState::ComputerStop:
-            state = "ComputerStop";
             break;
     }
     ImGui::Text("State: %s", state);
