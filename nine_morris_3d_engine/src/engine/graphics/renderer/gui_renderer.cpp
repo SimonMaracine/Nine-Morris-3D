@@ -302,7 +302,7 @@ void GuiRenderer::initialize_quad_renderer() {
         encr(file_system::path_for_assets(QUAD2D_VERTEX_SHADER)),
         encr(file_system::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
         std::vector<std::string> {
-            "u_texture[0]",  // FIXME this
+            "u_texture[0]",  // FIXME this should be max
             "u_texture[1]",
             "u_texture[2]",
             "u_texture[3]",
