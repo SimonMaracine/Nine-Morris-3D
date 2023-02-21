@@ -16,7 +16,7 @@ public:
 
     virtual void start(GamePosition position, PieceType piece, Move& result, std::atomic<bool>& running) override;
 private:
-    int minimax(GamePosition& position, size_t depth, size_t turns_from_root, PieceType type);
+    int minimax(GamePosition& position, size_t depth, size_t turns_from_root, int alpha, int beta, PieceType type);
     void random_move(GamePosition& position, PieceType piece);  // TODO temporary
 
     std::vector<Move> get_all_moves(GamePosition& position, PieceType piece);

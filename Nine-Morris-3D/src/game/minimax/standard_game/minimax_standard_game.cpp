@@ -15,8 +15,8 @@
     Value of 0 means equal position, positive means white is better, negative means black is better.
 */
 
-static constexpr int MINIMUM_EVALUATION_VALUE = INT_MIN;
-static constexpr int MAXIMUM_EVALUATION_VALUE = INT_MAX;
+static constexpr int MIN_EVALUATION_VALUE = INT_MIN;
+static constexpr int MAX_EVALUATION_VALUE = INT_MAX;
 
 namespace values {
     static constexpr int PIECE = 7;
@@ -31,7 +31,7 @@ void MinimaxStandardGame::start(GamePosition position, PieceType piece, Move& re
     positions_calculated = 0;
 
     auto start = std::chrono::high_resolution_clock::now();
-    evaluation = minimax(position, depth, 0, piece);
+    evaluation = minimax(position, depth, 0, MIN_EVALUATION_VALUE, MAX_EVALUATION_VALUE, piece);
     auto end = std::chrono::high_resolution_clock::now();
 
     REL_INFO("Time: {}", std::chrono::duration<double>(end - start).count());
@@ -44,7 +44,7 @@ void MinimaxStandardGame::start(GamePosition position, PieceType piece, Move& re
     running.store(false);
 }
 
-int MinimaxStandardGame::minimax(GamePosition& position, size_t depth, size_t turns_from_root, PieceType type) {  // TODO merge these two parts
+int MinimaxStandardGame::minimax(GamePosition& position, size_t depth, size_t turns_from_root, int alpha, int beta, PieceType type) {
     ASSERT(type != PieceType::None, "Invalid enum");
 
     if (depth == 0 || is_game_over(position)) {
@@ -52,13 +52,13 @@ int MinimaxStandardGame::minimax(GamePosition& position, size_t depth, size_t tu
     }
 
     if (type == PieceType::White) {
-        int max_evaluation = MINIMUM_EVALUATION_VALUE;
+        int max_evaluation = MIN_EVALUATION_VALUE;
 
         const auto moves = get_all_moves(position, PieceType::White);
 
         for (const Move& move : moves) {
             make_move(position, move);
-            const int evaluation = minimax(position, depth - 1, turns_from_root + 1, PieceType::Black);
+            const int evaluation = minimax(position, depth - 1, turns_from_root + 1, alpha, beta, PieceType::Black);
             unmake_move(position, move);
 
             if (evaluation > max_evaluation) {
@@ -68,17 +68,25 @@ int MinimaxStandardGame::minimax(GamePosition& position, size_t depth, size_t tu
                     best_move = move;
                 }
             }
+
+            // if (evaluation > alpha) {
+            //     alpha = evaluation;  // FIXME
+            // }
+
+            // if (beta <= alpha) {
+            //     break;
+            // }
         }
 
         return max_evaluation;
     } else {
-        int min_evaluation = MAXIMUM_EVALUATION_VALUE;
+        int min_evaluation = MAX_EVALUATION_VALUE;
 
         const auto moves = get_all_moves(position, PieceType::Black);
 
         for (const Move& move : moves) {
             make_move(position, move);
-            const int evaluation = minimax(position, depth - 1, turns_from_root + 1, PieceType::White);
+            const int evaluation = minimax(position, depth - 1, turns_from_root + 1, alpha, beta, PieceType::White);
             unmake_move(position, move);
 
             if (evaluation < min_evaluation) {
@@ -88,6 +96,14 @@ int MinimaxStandardGame::minimax(GamePosition& position, size_t depth, size_t tu
                     best_move = move;
                 }
             }
+
+            // if (evaluation < beta) {
+            //     alpha = evaluation;  // FIXME
+            // }
+
+            // if (beta <= alpha) {
+            //     break;
+            // }
         }
 
         return min_evaluation;
@@ -591,13 +607,16 @@ std::array<size_t, 5> MinimaxStandardGame::neighbor_free_positions(GamePosition&
 }
 
 PieceType MinimaxStandardGame::opponent_piece(PieceType type) {
-    ASSERT(type != PieceType::None, "Invalid enum");
-
-    if (type == PieceType::White) {
-        return PieceType::Black;
-    } else {
-        return PieceType::White;
+    switch (type) {
+        case PieceType::White:
+            return PieceType::Black;
+        case PieceType::Black:
+            return PieceType::White;
+        case PieceType::None:
+            ASSERT(false, "Invalid enum");
     }
+
+    return {};
 }
 
 #define IS_PC(const_index) (position.at(const_index) == piece)
