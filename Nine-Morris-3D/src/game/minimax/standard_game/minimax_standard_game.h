@@ -16,7 +16,7 @@ public:
 
     virtual void start(GamePosition position, PieceType piece, Move& result, std::atomic<bool>& running) override;
 private:
-    int minimax(GamePosition& position, size_t depth, size_t turns_from_root, PieceType type);
+    int minimax(GamePosition& position, size_t depth, size_t turns_from_root, int alpha, int beta, PieceType type);
     void random_move(GamePosition& position, PieceType piece);  // TODO temporary
 
     std::vector<Move> get_all_moves(GamePosition& position, PieceType piece);
@@ -40,5 +40,9 @@ private:
     unsigned int number_of_pieces_outside(GamePosition& position, PieceType type);
     unsigned int total_number_of_pieces(GamePosition& position, PieceType type);
 
+    // Data for a full minimax search
     Move best_move;
+    int evaluation = 0;
+    unsigned int positions_calculated = 0;
+    unsigned int depth = 5;
 };

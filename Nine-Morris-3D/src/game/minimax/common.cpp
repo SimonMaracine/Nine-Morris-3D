@@ -35,3 +35,25 @@ Move Move::create_move_take(PieceType piece, size_t move_source_node_index, size
     move.take_node_index = take_node_index;
     return move;
 }
+
+std::ostream& operator<<(std::ostream& stream, const Move& move) {
+    switch (move.type) {
+        case MoveType::None:
+            stream << "[None]";
+            break;
+        case MoveType::Place:
+            stream << "[Place: " << move.place_node_index << ']';
+            break;
+        case MoveType::Move:
+            stream << "[Move: " << move.move_source_node_index << "->" << move.move_destination_node_index << ']';
+            break;
+        case MoveType::PlaceTake:
+            stream << "[PlaceTake: " << move.place_node_index << "; " << move.take_node_index << ']';
+            break;
+        case MoveType::MoveTake:
+            stream << "[MoveTake: " << move.move_source_node_index << "->" << move.move_destination_node_index << "; " << move.take_node_index << ']';
+            break;
+    }
+
+    return stream;
+}

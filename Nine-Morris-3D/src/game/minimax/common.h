@@ -26,6 +26,8 @@ struct Move {  // TODO can use union
     static Move create_move_take(PieceType piece, size_t move_source_node_index, size_t move_destination_node_index, size_t take_node_index);
 };
 
+std::ostream& operator<<(std::ostream& stream, const Move& move);
+
 struct MinimaxAlgorithm {
     using Algorithm = std::function<void(GamePosition, PieceType, Move&, std::atomic<bool>&)>;
 
