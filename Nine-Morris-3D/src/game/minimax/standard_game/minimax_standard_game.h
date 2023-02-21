@@ -40,5 +40,9 @@ private:
     unsigned int number_of_pieces_outside(GamePosition& position, PieceType type);
     unsigned int total_number_of_pieces(GamePosition& position, PieceType type);
 
+    // Data for a full minimax search
     Move best_move;
+    int evaluation = 0;
+    unsigned int positions_calculated = 0;
+    unsigned int depth = 5;
 };

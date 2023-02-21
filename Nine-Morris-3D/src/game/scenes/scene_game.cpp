@@ -1102,6 +1102,7 @@ void SceneGame::imgui_draw_rules_jump_plus_variant() {
 }
 
 void SceneGame::imgui_draw_debug() {
+#ifdef NM3D_PLATFORM_DEBUG
     ImGui::Begin("Debug");
     ImGui::Text("FPS: %.3f", app->get_fps());
     draw_debug_imgui();
@@ -1256,6 +1257,7 @@ void SceneGame::imgui_draw_debug() {
     ImGui::SliderFloat("Far", &app->renderer->light_space.lens_far, 2.0f, 50.0f);
     ImGui::SliderFloat("Position divisor", &app->renderer->light_space.position_divisor, 1.0f, 10.0f);
     ImGui::End();
+#endif
 }
 
 void SceneGame::imgui_draw_game_over_message(std::string_view message1, std::string_view message2) {

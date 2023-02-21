@@ -27,9 +27,17 @@ namespace values {
 void MinimaxStandardGame::start(GamePosition position, PieceType piece, Move& result, std::atomic<bool>& running) {
     // Initialize variables
     best_move = Move {};
+    evaluation = 0;
+    positions_calculated = 0;
 
-    // _minimax(position, 4, 0, piece);
-    random_move(position, piece);
+    auto start = std::chrono::high_resolution_clock::now();
+    evaluation = minimax(position, depth, 0, piece);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    REL_INFO("Time: {}", std::chrono::duration<double>(end - start).count());
+    REL_INFO("Evaluation: {}", evaluation);
+    REL_INFO("Positions evaluated: {}", positions_calculated);
+    REL_INFO("Depth: {}", depth);
 
     result = best_move;
 
@@ -88,6 +96,11 @@ int MinimaxStandardGame::minimax(GamePosition& position, size_t depth, size_t tu
 
 void MinimaxStandardGame::random_move(GamePosition& position, PieceType piece) {
     const auto moves = get_all_moves(position, piece);
+
+    for (const auto& move : moves) {
+        std::cout << move << '\n';
+    }
+    std::cout << std::endl;
 
     if (moves.empty()) {
         DEB_INFO("Game Over");
@@ -269,6 +282,8 @@ void MinimaxStandardGame::unmake_move(GamePosition& position, const Move& move) 
 }
 
 int MinimaxStandardGame::evaluate_position(GamePosition& position) {  // TODO also evaluate positions
+    positions_calculated++;
+
     int evaluation = 0;
 
     const unsigned int white_material = calculate_material(position, PieceType::White);
