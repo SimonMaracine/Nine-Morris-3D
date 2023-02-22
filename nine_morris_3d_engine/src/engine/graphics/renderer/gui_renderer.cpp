@@ -316,7 +316,7 @@ void GuiRenderer::initialize_quad_renderer() {
 
     storage.quad2d_shader->bind();
 
-    for (size_t i = 0; i < storage.quads.MAX_TEXTURE_UNITS; i++) {
+    for (size_t i = 0; i < 8; i++) {  // FIXME storage.quads.MAX_TEXTURE_UNITS
         storage.quad2d_shader->upload_uniform_int(
             resmanager::HashedStr64("u_texture[" + std::to_string(i) + "]"),
             i
