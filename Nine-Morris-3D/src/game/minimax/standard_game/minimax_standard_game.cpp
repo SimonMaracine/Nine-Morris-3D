@@ -34,9 +34,9 @@ void MinimaxStandardGame::start(GamePosition position, PieceType piece, Move& re
     evaluation = minimax(position, depth, 0, MIN_EVALUATION_VALUE, MAX_EVALUATION_VALUE, piece);
     auto end = std::chrono::high_resolution_clock::now();
 
-    REL_INFO("Time: {}", std::chrono::duration<double>(end - start).count());
+    REL_INFO("Time: {:.3f}", std::chrono::duration<double>(end - start).count());
     REL_INFO("Evaluation: {}", evaluation);
-    REL_INFO("Positions evaluated: {}", positions_calculated);
+    REL_INFO("Positions evaluated: {:L}", positions_calculated);
     REL_INFO("Depth: {}", depth);
 
     result = best_move;
