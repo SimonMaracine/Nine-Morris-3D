@@ -26,11 +26,11 @@ namespace capabilities {
         glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &max_color_texture_samples);
 
         if (max_depth_texture_samples < max_samples) {
-            REL_ERROR("GL_MAX_DEPTH_TEXTURE_SAMPLES < GL_MAX_SAMPLES");
+            LOG_DIST_ERROR("GL_MAX_DEPTH_TEXTURE_SAMPLES < GL_MAX_SAMPLES");
         }
 
         if (max_color_texture_samples < max_samples) {
-            REL_ERROR("GL_MAX_COLOR_TEXTURE_SAMPLES < GL_MAX_SAMPLES");
+            LOG_DIST_ERROR("GL_MAX_COLOR_TEXTURE_SAMPLES < GL_MAX_SAMPLES");
         }
 
         return max_samples;

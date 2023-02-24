@@ -19,8 +19,19 @@
     #error "Unsupported platform"
 #endif
 
-#ifdef NM3D_RELEASE
-    #define NM3D_PLATFORM_RELEASE
+/**
+ * There are three build modes:
+ *
+ * NM3D_PLATFORM_DEBUG
+ * NM3D_PLATFORM_RELEASE
+ * NM3D_PLATFORM_RELEASE_DISTRIBUTION
+ */
+#ifdef NM3D_OPTIMIZED  // Defined in CMake
+    #ifdef NM3D_DISTRIBUTION  // Defined in CMake
+        #define NM3D_PLATFORM_RELEASE_DISTRIBUTION  // Flag for building for distribution
+    #else
+        #define NM3D_PLATFORM_RELEASE  // Compiled with optimization, but with debug code
+    #endif
 #else
-    #define NM3D_PLATFORM_DEBUG
+    #define NM3D_PLATFORM_DEBUG  // Compiled without optimization + additional debug code
 #endif

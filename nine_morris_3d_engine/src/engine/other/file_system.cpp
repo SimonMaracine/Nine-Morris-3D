@@ -55,12 +55,12 @@ static std::string _app_name;
         const std::string path = USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
 
         if (!directory_exists_impl(file_system::cut_slash(path))) {
-            REL_WARNING("Directory `{}` doesn't exist, creating it...", path);
+            LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
             if (create_directory_impl(path)) {
-                REL_INFO("Created directory `{}`", path);
+                LOG_DIST_INFO("Created directory `{}`", path);
             } else {
-                REL_ERROR("Could not create directory `{}`", path);
+                LOG_DIST_ERROR("Could not create directory `{}`", path);
             }
         }
     }
@@ -110,12 +110,12 @@ static std::string _app_name;
             const std::string path = USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
 
             if (!directory_exists_impl(file_system::cut_slash(path))) {
-                REL_WARNING("Directory `{}` doesn't exist, creating it...", path);
+                LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
                 if (create_directory_impl(path)) {
-                    REL_INFO("Created directory `{}`", path);
+                    LOG_DIST_INFO("Created directory `{}`", path);
                 } else {
-                    REL_ERROR("Could not create directory `{}`", path);
+                    LOG_DIST_ERROR("Could not create directory `{}`", path);
                 }
             }
         }
@@ -124,32 +124,19 @@ static std::string _app_name;
             const std::string path = DOCUMENTS_DIRECTORY_PATH(_user_name, _app_name);
 
             if (!directory_exists_impl(file_system::cut_slash(path))) {
-                REL_WARNING("Directory `{}` doesn't exist, creating it...", path);
+                LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
                 if (create_directory_impl(path)) {
-                    REL_INFO("Created directory `{}`", path);
+                    LOG_DIST_INFO("Created directory `{}`", path);
                 } else {
-                    REL_ERROR("Could not create directory `{}`", path);
+                    LOG_DIST_ERROR("Could not create directory `{}`", path);
                 }
             }
         }
     }
 #endif
 
-#if defined(NM3D_PLATFORM_DEBUG)
-    // Use relative path for both operating systems
-    static std::string path_for_logs_impl() {
-        return {};
-    }
-
-    static std::string path_for_saved_data_impl() {
-        return {};
-    }
-
-    static std::string path_for_assets_impl() {
-        return {};
-    }
-#elif defined(NM3D_PLATFORM_RELEASE)
+#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
     #if defined(NM3D_PLATFORM_LINUX)
         static std::string path_for_logs_impl() {
             return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
@@ -175,6 +162,19 @@ static std::string _app_name;
             return {};
         }
     #endif
+#else
+    // Use relative path for both operating systems
+    static std::string path_for_logs_impl() {
+        return {};
+    }
+
+    static std::string path_for_saved_data_impl() {
+        return {};
+    }
+
+    static std::string path_for_assets_impl() {
+        return {};
+    }
 #endif
 
 namespace file_system {

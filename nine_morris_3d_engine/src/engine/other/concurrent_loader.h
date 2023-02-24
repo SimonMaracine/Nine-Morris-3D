@@ -49,7 +49,7 @@ ConcurrentLoader<D, Args...>::~ConcurrentLoader() {
 
 template<typename D, typename... Args>
 void ConcurrentLoader<D, Args...>::start_loading_thread(const Args&... args) {
-    DEB_INFO("Loading some assets from separate thread...");
+    LOG_INFO("Loading some assets from separate thread...");
 
     const auto load_function = [&]() {
         static_cast<D*>(this)->load(args...);
@@ -85,7 +85,7 @@ void ConcurrentLoader<D, Args...>::join_and_merge(ResourcesCache& res) {
 
     res.merge(this->res);
 
-    DEB_INFO("Merged local resources into global ones");
+    LOG_INFO("Merged local resources into global ones");
 }
 
 template<typename D, typename... Args>

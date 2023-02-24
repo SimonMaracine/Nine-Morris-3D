@@ -10,12 +10,12 @@ void generic_update_menubar(S* scene) {
     try {
         save_load::load_game_from_file(saved_game, scene->save_game_file_name);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_WARNING("Could not load game: {}", e.what());
+        LOG_DIST_WARNING("Could not load game: {}", e.what());
     } catch (const save_load::SaveFileError& e) {
-        REL_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
+        LOG_DIST_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
     }
     scene->last_save_game_date = std::move(saved_game.date);
-    DEB_INFO("Checked last saved game");
+    LOG_INFO("Checked last saved game");
 
     scene->info_file_path = file_system::path_for_logs(logging::get_info_file());
     scene->save_game_file_path = file_system::path_for_saved_data(scene->save_game_file_name);
@@ -44,11 +44,11 @@ void generic_save_game(S* scene) {
     try {
         save_load::save_game_to_file(saved_game, scene->save_game_file_name);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_WARNING("Could not save game: {}", e.what());
+        LOG_DIST_WARNING("Could not save game: {}", e.what());
 
         save_load::handle_save_file_not_open_error();
     } catch (const save_load::SaveFileError& e) {
-        REL_WARNING("Could not save game: {}", e.what());
+        LOG_DIST_WARNING("Could not save game: {}", e.what());
     }
 }
 
@@ -61,14 +61,14 @@ void generic_load_game(S* scene) {
     try {
         save_load::load_game_from_file(saved_game, scene->save_game_file_name);
     } catch (const save_load::SaveFileNotOpenError& e) {
-        REL_WARNING("Could not load game: {}", e.what());
+        LOG_DIST_WARNING("Could not load game: {}", e.what());
 
         save_load::handle_save_file_not_open_error();
 
         scene->window = WindowImGui::ShowCouldNotLoadGame;
         return;
     } catch (const save_load::SaveFileError& e) {
-        REL_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
+        LOG_DIST_WARNING("Could not load game: {}", e.what());  // TODO maybe delete file
 
         scene->window = WindowImGui::ShowCouldNotLoadGame;
         return;
@@ -95,7 +95,7 @@ void generic_undo(S* scene) {
     ASSERT(!scene->undo_redo_state.undo.empty(), "Undo history must not be empty");
 
     if (!scene->board.next_move) {
-        DEB_WARNING("Cannot undo when pieces are in air");
+        LOG_WARNING("Cannot undo when pieces are in air");
         return;
     }
 
@@ -118,7 +118,7 @@ void generic_undo(S* scene) {
     scene->undo_redo_state.undo.pop_back();
     scene->undo_redo_state.redo.push_back(current_state);
 
-    DEB_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
+    LOG_DEBUG("Undid move; popped from undo stack and pushed onto redo stack");
 
     scene->game.state = GameState::NextPlayer;
     scene->made_first_move = scene->board.turn_count != 0;
@@ -136,7 +136,7 @@ void generic_redo(S* scene) {
     ASSERT(!scene->undo_redo_state.redo.empty(), "Redo history must not be empty");
 
     if (!scene->board.next_move) {
-        DEB_WARNING("Cannot redo when pieces are in air");
+        LOG_WARNING("Cannot redo when pieces are in air");
         return;
     }
 
@@ -157,7 +157,7 @@ void generic_redo(S* scene) {
     scene->undo_redo_state.redo.pop_back();
     scene->undo_redo_state.undo.push_back(current_state);
 
-    DEB_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
+    LOG_DEBUG("Redid move; popped from redo stack and pushed onto undo stack");
 
     scene->game.state = GameState::NextPlayer;
     scene->made_first_move = scene->board.turn_count != 0;

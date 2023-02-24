@@ -50,11 +50,11 @@ Renderer::Renderer(Application* app)
 
     app->evt.connect<WindowResizedEvent, &Renderer::on_window_resized>(this);
 
-    DEB_INFO("Initialized renderer");
+    LOG_INFO("Initialized renderer");
 }
 
 Renderer::~Renderer() {
-    DEB_INFO("Uninitialized renderer");
+    LOG_INFO("Uninitialized renderer");
 }
 
 void Renderer::render(const SceneList& scene) {

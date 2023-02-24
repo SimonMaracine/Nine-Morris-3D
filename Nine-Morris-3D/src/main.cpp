@@ -87,5 +87,5 @@ void application_main() {
         }
     }
 
-    REL_INFO("Terminated game successfully");
+    LOG_DIST_INFO("Terminated game successfully");
 }

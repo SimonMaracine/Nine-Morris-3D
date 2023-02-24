@@ -103,7 +103,7 @@ void StandardBoard::_place_piece(size_t node_index) {
     static constexpr auto count = NINE_MENS_MORRIS_MILLS_COUNT;
 
     if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
-        DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
+        LOG_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
         flags.must_take_or_took_piece = true;
@@ -160,7 +160,7 @@ void StandardBoard::_move_piece(size_t piece_index, size_t node_index) {
     static constexpr auto count = NINE_MENS_MORRIS_MILLS_COUNT;
 
     if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
-        DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
+        LOG_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         must_take_piece = true;
         flags.must_take_or_took_piece = true;
@@ -211,7 +211,7 @@ void StandardBoard::_take_piece(size_t piece_index) {
         black_pieces_on_board_count--;
     }
 
-    DEB_DEBUG("{} piece {} taken", piece.type == PieceType::White ? "White" : "Black", piece_index);
+    LOG_DEBUG("{} piece {} taken", piece.type == PieceType::White ? "White" : "Black", piece_index);
 
     switch_turn_and_check_turns_without_mills();
 
@@ -307,7 +307,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
 
                     flags.did_action = true;
                 } else {
-                    DEB_DEBUG("Cannot take black piece from mill");
+                    LOG_DEBUG("Cannot take black piece from mill");
                 }
 
                 break;
@@ -329,7 +329,7 @@ void StandardBoard::check_take_piece(identifier::Id hovered_id) {
 
                     flags.did_action = true;
                 } else {
-                    DEB_DEBUG("Cannot take white piece from mill");
+                    LOG_DEBUG("Cannot take white piece from mill");
                 }
 
                 break;
@@ -347,7 +347,7 @@ void StandardBoard::check_phase_two() {
         phase = BoardPhase::MovePieces;
         switch_piece_outlines();
 
-        DEB_INFO("Started phase two");
+        LOG_INFO("Started phase two");
     }
 }
 
@@ -361,7 +361,7 @@ void StandardBoard::switch_turn_and_check_turns_without_mills() {
     }
 
     if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
-        DEB_INFO("The max amount of turns without mills has been hit");
+        LOG_INFO("The max amount of turns without mills has been hit");
 
         FORMATTED_MESSAGE(
             message, 64, "%s turns have passed without a mill.",
@@ -496,14 +496,14 @@ bool StandardBoard::can_go(size_t piece_index, size_t destination_node_index) {
 
 void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
     if (player == BoardPlayer::White) {
-        DEB_DEBUG("Checking white player number of pieces...");
+        LOG_DEBUG("Checking white player number of pieces...");
 
         if (white_pieces_on_board_count + white_pieces_outside_count == 3) {
-            DEB_INFO("White player can jump now");
+            LOG_INFO("White player can jump now");
 
             can_jump[0] = true;
         } else if (white_pieces_on_board_count + white_pieces_outside_count == 2) {
-            DEB_INFO("White player has only 2 pieces now");
+            LOG_INFO("White player has only 2 pieces now");
 
             FORMATTED_MESSAGE(
                 message, 64, "White player cannot make any more mills."
@@ -512,14 +512,14 @@ void StandardBoard::check_player_number_of_pieces(BoardPlayer player) {
             game_over(BoardEnding {BoardEnding::WinnerBlack, message});
         }
     } else {
-        DEB_DEBUG("Checking black player number of pieces...");
+        LOG_DEBUG("Checking black player number of pieces...");
 
         if (black_pieces_on_board_count + black_pieces_outside_count == 3) {
-            DEB_INFO("Black player can jump now");
+            LOG_INFO("Black player can jump now");
 
             can_jump[1] = true;
         } else if (black_pieces_on_board_count + black_pieces_outside_count == 2) {
-            DEB_INFO("Black player has only 2 pieces now");
+            LOG_INFO("Black player has only 2 pieces now");
 
             FORMATTED_MESSAGE(
                 message, 64, "Black player cannot make any more mills."
@@ -539,7 +539,7 @@ bool StandardBoard::can_player_jump(PieceType piece) {
 }
 
 bool StandardBoard::is_player_blocked(BoardPlayer player) {
-    DEB_DEBUG("Checking {} player if it's blocked...", player == BoardPlayer::White ? "white" : "black");
+    LOG_DEBUG("Checking {} player if it's blocked...", player == BoardPlayer::White ? "white" : "black");
 
     const PieceType type = player == BoardPlayer::White ? PieceType::White : PieceType::Black;
 
@@ -760,7 +760,7 @@ bool StandardBoard::is_player_blocked(BoardPlayer player) {
 }
 
 void StandardBoard::set_game_over_player_blocked() {
-    DEB_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
+    LOG_INFO("{} player is blocked", TURN_IS_WHITE_SO("White", "Black"));
 
     FORMATTED_MESSAGE(
         message, 64, "%s player has no more legal moves to make.",
@@ -783,7 +783,7 @@ void StandardBoard::remember_state() {
     undo_redo_state->undo.push_back(current_state);
     undo_redo_state->redo.clear();
 
-    DEB_DEBUG("Pushed new state onto undo stack and cleared redo stack");
+    LOG_DEBUG("Pushed new state onto undo stack and cleared redo stack");
 }
 
 void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {

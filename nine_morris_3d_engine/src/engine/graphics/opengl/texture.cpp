@@ -93,7 +93,7 @@ static void configure_filter_and_wrap_3d() {
 namespace gl {
     Texture::Texture(std::string_view file_path, const gl::TextureSpecification& specification)
         : specification(specification) {
-        DEB_DEBUG("Loading texture `{}`...", file_path);
+        LOG_DEBUG("Loading texture `{}`...", file_path);
 
         stbi_set_flip_vertically_on_load(1);
 
@@ -101,7 +101,7 @@ namespace gl {
         unsigned char* data = stbi_load(file_path.data(), &width, &height, &channels, CHANNELS);
 
         if (data == nullptr) {
-            REL_CRITICAL("Could not load texture `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load texture `{}`, exiting...", file_path);
             application_exit::panic();
         }
 
@@ -119,12 +119,12 @@ namespace gl {
         this->height = height;
         name = get_name(file_path);
 
-        DEB_DEBUG("Created GL texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
     Texture::Texture(encrypt::EncryptedFile file_path, const gl::TextureSpecification& specification)
         : specification(specification) {
-        DEB_DEBUG("Loading texture `{}`...", file_path);
+        LOG_DEBUG("Loading texture `{}`...", file_path);
 
         cppblowfish::Buffer buffer = encrypt::load_file(file_path);
 
@@ -136,7 +136,7 @@ namespace gl {
         );
 
         if (data == nullptr) {
-            REL_CRITICAL("Could not load texture `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load texture `{}`, exiting...", file_path);
             application_exit::panic();
         }
 
@@ -154,7 +154,7 @@ namespace gl {
         this->height = height;
         name = get_name(file_path);
 
-        DEB_DEBUG("Created GL texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
     Texture::Texture(std::shared_ptr<TextureData> data, const gl::TextureSpecification& specification)
@@ -174,7 +174,7 @@ namespace gl {
         height = data->height;
         name = get_name(data->file_path);
 
-        DEB_DEBUG("Created GL texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
     Texture::Texture(int width, int height, unsigned char* data, const TextureSpecification& specification)
@@ -194,13 +194,13 @@ namespace gl {
         this->height = height;
         name = "Unnamed";
 
-        DEB_DEBUG("Created GL texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
     Texture::~Texture() {
         glDeleteTextures(1, &texture);
 
-        DEB_DEBUG("Deleted GL texture {} ({})", texture, name);
+        LOG_DEBUG("Deleted GL texture {} ({})", texture, name);
     }
 
     void Texture::bind(GLenum unit) {
@@ -225,7 +225,7 @@ namespace gl {
 
                 break;
             default:
-                REL_CRITICAL("Invalid texture format `{}`, exiting...", static_cast<int>(specification.format));
+                LOG_DIST_CRITICAL("Invalid texture format `{}`, exiting...", static_cast<int>(specification.format));
                 application_exit::panic();
         }
     }
@@ -244,12 +244,12 @@ namespace gl {
         unsigned char* data[6];
 
         for (size_t i = 0; i < 6; i++) {
-            DEB_DEBUG("Loading texture `{}`...", file_paths[i]);
+            LOG_DEBUG("Loading texture `{}`...", file_paths[i]);
 
             data[i] = stbi_load(file_paths[i], &width, &height, &channels, CHANNELS);
 
             if (data == nullptr) {
-                REL_CRITICAL("Could not load texture `{}`, exiting...", file_paths[i]);
+                LOG_DIST_CRITICAL("Could not load texture `{}`, exiting...", file_paths[i]);
                 application_exit::panic();
             }
         }
@@ -269,7 +269,7 @@ namespace gl {
 
         name = get_name_texture3d(file_paths[0]);
 
-        DEB_DEBUG("Created GL 3D texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL 3D texture {} ({})", texture, name);
     }
 
     Texture3D::Texture3D(const std::array<std::shared_ptr<TextureData>, 6>& data) {
@@ -291,13 +291,13 @@ namespace gl {
 
         name = get_name_texture3d(data[0]->file_path.c_str());
 
-        DEB_DEBUG("Created GL 3D texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL 3D texture {} ({})", texture, name);
     }
 
     Texture3D::~Texture3D() {
         glDeleteTextures(1, &texture);
 
-        DEB_DEBUG("Deleted GL 3D texture {} ({})", texture, name);
+        LOG_DEBUG("Deleted GL 3D texture {} ({})", texture, name);
     }
 
     void Texture3D::bind(GLenum unit) {

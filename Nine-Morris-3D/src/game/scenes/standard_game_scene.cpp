@@ -340,7 +340,7 @@ void StandardGameScene::setup_entities() {
         };
     }
 
-    DEB_DEBUG("Setup entities");
+    LOG_DEBUG("Setup entities");
 }
 
 void StandardGameScene::initialize_renderables() {

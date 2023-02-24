@@ -7,7 +7,7 @@ void SceneList::add(renderables::Model* model) {
     const auto iter = std::find(models.cbegin(), models.cend(), model);
 
     if (iter != models.cend()) {
-        DEB_WARNING("Model already present in list");
+        LOG_WARNING("Model already present in list");
         return;
     }
 
@@ -28,7 +28,7 @@ void SceneList::add(renderables::Quad* quad) {
     const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
 
     if (iter != quads.cend()) {
-        DEB_WARNING("Quad already present in list");
+        LOG_WARNING("Quad already present in list");
         return;
     }
 
@@ -49,7 +49,7 @@ void SceneList::add(gui::Image* image) {
     const auto iter = std::find(images.cbegin(), images.cend(), image);
 
     if (iter != images.cend()) {
-        DEB_WARNING("Widget already present");
+        LOG_WARNING("Widget already present");
         return;
     }
 
@@ -70,7 +70,7 @@ void SceneList::add(gui::Text* text) {
     const auto iter = std::find(texts.cbegin(), texts.cend(), text);
 
     if (iter != texts.cend()) {
-        DEB_WARNING("Widget already present");
+        LOG_WARNING("Widget already present");
         return;
     }
 

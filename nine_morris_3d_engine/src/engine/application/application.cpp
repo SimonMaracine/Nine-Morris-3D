@@ -32,14 +32,14 @@ void Application::preinitialize(std::string_view app_name, std::string_view log_
 
     logging::initialize_for_applications(log_file, info_file);
 
-#ifdef NM3D_PLATFORM_RELEASE
+#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
     file_system::check_and_fix_directories();
 #endif
 }
 
 Application::Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunc& start, const UserFunc& stop)
     : builder(builder), _user_data(&user_data), start(start), stop(stop) {
-    DEB_INFO("Initializing application...");
+    LOG_INFO("Initializing application...");
 
     app_data.width = builder.width;
     app_data.height = builder.height;
@@ -74,7 +74,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     random_gen::initialize();
 
     const auto [version_major, version_minor] = gl::get_version_number();
-    REL_INFO("OpenGL version {}.{}", version_major, version_minor);
+    LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
     if (builder.renderer_3d) {
         initialize_renderer_3d();
@@ -113,7 +113,7 @@ int Application::run(SceneId start_scene_id) {
     on_start(current_scene);
 
     window->show();
-    DEB_INFO("Initialized application, entering main loop...");
+    LOG_INFO("Initialized application, entering main loop...");
 
     while (running) {
         delta = update_frame_counter();
@@ -138,7 +138,7 @@ int Application::run(SceneId start_scene_id) {
         check_changed_scene();
     }
 
-    DEB_INFO("Closing application...");
+    LOG_INFO("Closing application...");
 
     current_scene->on_stop();
     current_scene->_on_stop();
@@ -275,33 +275,33 @@ void Application::on_start(Scene* scene) {
 }
 
 void Application::user_start() {
-    DEB_INFO("Calling user start routine...");
+    LOG_INFO("Calling user start routine...");
 
     start(this);
 }
 
 void Application::user_stop() {
-    DEB_INFO("Calling user stop routine...");
+    LOG_INFO("Calling user stop routine...");
 
     stop(this);
 }
 
 void Application::initialize_renderer_3d() {
-    DEB_INFO("With renderer 3D");
+    LOG_INFO("With renderer 3D");
 
     renderer = std::make_unique<Renderer>(this);
     renderer_3d_update = std::bind(&Application::renderer_3d_func, this);
 }
 
 void Application::initialize_renderer_2d() {
-    DEB_INFO("With renderer 2D");
+    LOG_INFO("With renderer 2D");
 
     gui_renderer = std::make_unique<GuiRenderer>(this);
     renderer_2d_update = std::bind(&Application::renderer_2d_func, this);
 }
 
 void Application::initialize_renderer_imgui() {
-    DEB_INFO("With renderer ImGui");
+    LOG_INFO("With renderer ImGui");
 
     imgui_context::initialize(window);
 
@@ -314,7 +314,7 @@ void Application::initialize_renderer_imgui() {
 }
 
 void Application::initialize_audio() {
-    DEB_INFO("With audio");
+    LOG_INFO("With audio");
 
     openal = std::make_unique<OpenAlContext>();
 }

@@ -135,11 +135,11 @@ namespace mesh {
         delete[] vertices;
         delete[] indices;
 
-        DEB_DEBUG("Freed model data");
+        LOG_DEBUG("Freed model data");
     }
 
     std::shared_ptr<Mesh> load_model_PTN(std::string_view file_path, bool flip_winding) {
-        DEB_DEBUG("Loading PTN model data `{}`...", file_path);
+        LOG_DEBUG("Loading PTN model data `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -150,8 +150,8 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model data `{}`, exiting...", file_path);
-            REL_CRITICAL(importer.GetErrorString());
+            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
             application_exit::panic();
         }
 
@@ -174,7 +174,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh> load_model_PTN(encrypt::EncryptedFile file_path, bool flip_winding) {
-        DEB_DEBUG("Loading PTN model data `{}`...", file_path);
+        LOG_DEBUG("Loading PTN model data `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -188,8 +188,8 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model data `{}`, exiting...", file_path);
-            REL_CRITICAL(importer.GetErrorString());
+            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
             application_exit::panic();
         }
 
@@ -212,7 +212,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh> load_model_P(std::string_view file_path, bool flip_winding) {
-        DEB_DEBUG("Loading P model data `{}`...", file_path);
+        LOG_DEBUG("Loading P model data `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -223,8 +223,8 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model data `{}`, exiting...", file_path);
-            REL_CRITICAL(importer.GetErrorString());
+            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
             application_exit::panic();
         }
 
@@ -247,7 +247,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh> load_model_P(encrypt::EncryptedFile file_path, bool flip_winding) {
-        DEB_DEBUG("Loading P model data `{}`...", file_path);
+        LOG_DEBUG("Loading P model data `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -261,8 +261,8 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model data `{}`, exiting...", file_path);
-            REL_CRITICAL(importer.GetErrorString());
+            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
             application_exit::panic();
         }
 
@@ -285,7 +285,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh> load_model_PTNT(std::string_view file_path, bool flip_winding) {
-        DEB_DEBUG("Loading PTNT model data `{}`...", file_path);
+        LOG_DEBUG("Loading PTNT model data `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -296,8 +296,8 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model data `{}`, exiting...", file_path);
-            REL_CRITICAL(importer.GetErrorString());
+            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
             application_exit::panic();
         }
 
@@ -320,7 +320,7 @@ namespace mesh {
     }
 
     std::shared_ptr<Mesh> load_model_PTNT(encrypt::EncryptedFile file_path, bool flip_winding) {
-        DEB_DEBUG("Loading PTNT model data `{}`...", file_path);
+        LOG_DEBUG("Loading PTNT model data `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
@@ -334,8 +334,8 @@ namespace mesh {
         );
 
         if (!scene) {
-            REL_CRITICAL("Could not load model data `{}`, exiting...", file_path);
-            REL_CRITICAL(importer.GetErrorString());
+            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
             application_exit::panic();
         }
 

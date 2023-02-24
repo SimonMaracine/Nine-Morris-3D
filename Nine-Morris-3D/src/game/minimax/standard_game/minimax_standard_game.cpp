@@ -34,10 +34,10 @@ void MinimaxStandardGame::start(GamePosition position, PieceType piece, Move& re
     evaluation = minimax(position, depth, 0, MIN_EVALUATION_VALUE, MAX_EVALUATION_VALUE, piece);
     auto end = std::chrono::high_resolution_clock::now();
 
-    REL_INFO("Time: {:.3f}", std::chrono::duration<double>(end - start).count());
-    REL_INFO("Evaluation: {}", evaluation);
-    REL_INFO("Positions evaluated: {:L}", positions_calculated);
-    REL_INFO("Depth: {}", depth);
+    LOG_DIST_INFO("Time: {:.3f}", std::chrono::duration<double>(end - start).count());
+    LOG_DIST_INFO("Evaluation: {}", evaluation);
+    LOG_DIST_INFO("Positions evaluated: {:L}", positions_calculated);
+    LOG_DIST_INFO("Depth: {}", depth);
 
     result = best_move;
 
@@ -119,7 +119,7 @@ void MinimaxStandardGame::random_move(GamePosition& position, PieceType piece) {
     std::cout << std::endl;
 
     if (moves.empty()) {
-        DEB_INFO("Game Over");
+        LOG_INFO("Game Over");
         return;
     }
 

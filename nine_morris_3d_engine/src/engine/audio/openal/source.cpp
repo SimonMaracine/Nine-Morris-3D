@@ -14,7 +14,7 @@ namespace al {
 
         maybe_check_errors();
 
-        DEB_DEBUG("Created AL source {}", source);
+        LOG_DEBUG("Created AL source {}", source);
     }
 
     Source::~Source() {
@@ -24,7 +24,7 @@ namespace al {
 
         maybe_check_errors();
 
-        DEB_DEBUG("Deleted AL source {}", source);
+        LOG_DEBUG("Deleted AL source {}", source);
     }
 
     void Source::play(Buffer* buffer) {

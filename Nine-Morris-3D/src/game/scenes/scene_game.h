@@ -131,7 +131,7 @@ public:
 
     ImGuiWindowFlags window_flags = 0;
 
-#ifdef NM3D_PLATFORM_DEBUG
+#ifndef NM3D_PLATFORM_RELEASE_DITRIBUTION
     static constexpr size_t FRAMES_SIZE = 100;
     std::vector<float> frames = std::vector<float>{FRAMES_SIZE};
     size_t index = 0;

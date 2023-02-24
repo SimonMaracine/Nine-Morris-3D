@@ -14,13 +14,13 @@ namespace gl {
 
         glBindVertexArray(0);
 
-        DEB_DEBUG("Created GL vertex array {}", array);
+        LOG_DEBUG("Created GL vertex array {}", array);
     }
 
     VertexArray::~VertexArray() {
         glDeleteVertexArrays(1, &array);
 
-        DEB_DEBUG("Deleted GL vertex array {}", array);
+        LOG_DEBUG("Deleted GL vertex array {}", array);
     }
 
     void VertexArray::bind() {
@@ -61,7 +61,7 @@ namespace gl {
                     );
                     break;
                 default:
-                    REL_CRITICAL("Unknown element type `{}`, exiting...", element.type);
+                    LOG_DIST_CRITICAL("Unknown element type `{}`, exiting...", element.type);
                     application_exit::panic();
             }
 

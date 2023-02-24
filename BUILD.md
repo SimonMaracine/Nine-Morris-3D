@@ -20,27 +20,27 @@
 - libasound2-dev
 - libpulse-dev
 
-## Linux release
+## Linux release distribution
 
     mkdir build-release
     cd build-release
-    cmake .. -D CMAKE_BUILD_TYPE=Release
+    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_DISTRIBUTION=ON
     cmake --build . -j4
 
-## Windows release
+## Windows release distribution
 
 ### Visual Studio Code
 
     mkdir build
     cd build
-    cmake .. -D CMAKE_BUILD_TYPE=Release -A x64
+    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_DISTRIBUTION=ON -A x64
     cmake --build . --config Release -j4
 
 ### Visual Studio
 
     mkdir build
     cd build
-    cmake .. -D CMAKE_BUILD_TYPE=Release -A x64
+    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_DISTRIBUTION=ON -A x64
     :: Open in Visual Studio, change to Release mode and build from there
 
 ## Linux debug

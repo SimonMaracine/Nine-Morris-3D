@@ -19,7 +19,7 @@ static size_t type_size(GLenum type) {
         CASE(GL_FLOAT_VEC3, 3, GLfloat)
         CASE(GL_FLOAT_MAT4, 16, GLfloat)
         default:
-            REL_CRITICAL("Unknown type `{}`, exiting...", type);
+            LOG_DIST_CRITICAL("Unknown type `{}`, exiting...", type);
             application_exit::panic();
     }
 
@@ -49,12 +49,12 @@ static bool check_compilation(GLuint shader, GLenum type, std::string_view name)
         }
 
         if (log_length == 0) {
-            REL_CRITICAL("{} shader compilation error with no message in shader `{}`", t, name);
+            LOG_DIST_CRITICAL("{} shader compilation error with no message in shader `{}`", t, name);
         } else {
             char* log_message = new char[log_length];
             glGetShaderInfoLog(shader, log_length, nullptr, log_message);
 
-            REL_CRITICAL("{} shader compilation error in shader `{}`\n{}", t, name, log_message);
+            LOG_DIST_CRITICAL("{} shader compilation error in shader `{}`\n{}", t, name, log_message);
             delete[] log_message;
         }
 
@@ -68,7 +68,7 @@ static GLuint compile_shader(std::string_view source_path, GLenum type, std::str
     std::ifstream file {std::string(source_path), std::ios::binary};
 
     if (!file.is_open()) {
-        REL_CRITICAL("Could not open file `{}` for reading, exiting...", source_path);
+        LOG_DIST_CRITICAL("Could not open file `{}` for reading, exiting...", source_path);
         application_exit::panic();
     }
 
@@ -122,12 +122,12 @@ static bool check_linking(GLuint program, std::string_view name) {
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
         if (log_length == 0) {
-            REL_CRITICAL("Shader linking error with no message in shader `{}`", name);
+            LOG_DIST_CRITICAL("Shader linking error with no message in shader `{}`", name);
         } else {
             char* log_message = new char[log_length];
             glGetProgramInfoLog(program, log_length, nullptr, log_message);
 
-            REL_CRITICAL("Shader linking error in shader `{}`\n{}", name, log_message);
+            LOG_DIST_CRITICAL("Shader linking error in shader `{}`\n{}", name, log_message);
             delete[] log_message;
         }
 
@@ -159,7 +159,7 @@ namespace gl {
             vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
             fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
         } catch (const std::runtime_error& e) {
-            REL_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
+            LOG_DIST_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
             application_exit::panic();
         }
 
@@ -170,7 +170,7 @@ namespace gl {
         glValidateProgram(program);
 
         if (!check_linking(program, name)) {
-            REL_CRITICAL("Exiting...");
+            LOG_DIST_CRITICAL("Exiting...");
             application_exit::panic();
         }
 
@@ -180,7 +180,7 @@ namespace gl {
             configure_uniform_blocks(program, uniform_blocks);
         }
 
-        DEB_DEBUG("Created GL shader {} ({})", program, name);
+        LOG_DEBUG("Created GL shader {} ({})", program, name);
     }
 
     Shader::Shader(encrypt::EncryptedFile vertex_source, encrypt::EncryptedFile fragment_source,
@@ -195,7 +195,7 @@ namespace gl {
             vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);
             fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
         } catch (const std::runtime_error& e) {
-            REL_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
+            LOG_DIST_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
             application_exit::panic();
         }
 
@@ -206,7 +206,7 @@ namespace gl {
         glValidateProgram(program);
 
         if (!check_linking(program, name)) {
-            REL_CRITICAL("Exiting...");
+            LOG_DIST_CRITICAL("Exiting...");
             application_exit::panic();
         }
 
@@ -216,13 +216,13 @@ namespace gl {
             configure_uniform_blocks(program, uniform_blocks);
         }
 
-        DEB_DEBUG("Created GL shader {} ({})", program, name);
+        LOG_DEBUG("Created GL shader {} ({})", program, name);
     }
 
     Shader::~Shader() {
         delete_shader(program, vertex_shader, fragment_shader);
 
-        DEB_DEBUG("Deleted GL shader {} ({})", program, name);
+        LOG_DEBUG("Deleted GL shader {} ({})", program, name);
     }
 
     void Shader::bind() {
@@ -270,7 +270,7 @@ namespace gl {
             new_vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
             new_fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
         } catch (const std::runtime_error&) {
-            DEB_ERROR("Abort recompiling");
+            LOG_ERROR("Abort recompiling");
             return;
         }
 
@@ -281,7 +281,7 @@ namespace gl {
         glValidateProgram(new_program);
 
         if (!check_linking(new_program, name)) {
-            DEB_ERROR("Abort recompiling");
+            LOG_ERROR("Abort recompiling");
             delete_shader(new_program, new_vertex_shader, new_fragment_shader);
             return;
         }
@@ -291,7 +291,7 @@ namespace gl {
 
         delete_shader(program, vertex_shader, fragment_shader);
 
-        DEB_DEBUG("Recompiled old shader {} to new shader {} ({})", program, new_program, name);
+        LOG_DEBUG("Recompiled old shader {} to new shader {} ({})", program, new_program, name);
 
         program = new_program;
         vertex_shader = new_vertex_shader;
@@ -299,15 +299,15 @@ namespace gl {
     }
 
     GLint Shader::get_uniform_location(Key name) {
-#if defined(NM3D_PLATFORM_RELEASE)
-        return cache[name];
-#elif defined(NM3D_PLATFORM_DEBUG)
+#ifdef NM3D_PLATFORM_DEBUG
         try {
             return cache.at(name);
         } catch (const std::out_of_range&) {
-            DEB_ERROR("Cannot get hashed uniform variable `{}` from shader `{}`", name, this->name);
+            LOG_ERROR("Cannot get hashed uniform variable `{}` from shader `{}`", name, this->name);
             return -1;
         }
+#else
+        return cache[name];
 #endif
     }
 
@@ -316,7 +316,7 @@ namespace gl {
             const GLint location = glGetUniformLocation(program, uniform.c_str());
 
             if (location == -1) {
-                DEB_ERROR("Uniform variable `{}` in shader `{}` not found", uniform.c_str(), name);
+                LOG_ERROR("Uniform variable `{}` in shader `{}` not found", uniform.c_str(), name);
                 continue;
             }
 
@@ -326,14 +326,14 @@ namespace gl {
 
     void Shader::configure_uniform_blocks(GLuint program, const UniformBlocks& uniform_blocks) {
         if (uniform_blocks.size() == 0) {
-            DEB_WARNING("Uniform blocks structure is empty; this function does nothing");
+            LOG_WARNING("Uniform blocks structure is empty; this function does nothing");
         }
 
         for (const gl::UniformBlockSpecification& block : uniform_blocks) {
             const GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
 
             if (block_index == GL_INVALID_INDEX) {
-                REL_CRITICAL("Invalid block index, exiting...");
+                LOG_DIST_CRITICAL("Invalid block index, exiting...");
                 application_exit::panic();
             }
 
@@ -391,7 +391,7 @@ namespace gl {
 
             for (size_t i = 0; i < field_count; i++) {
                 if (indices[i] == GL_INVALID_INDEX) {
-                    REL_CRITICAL("Invalid field index, exiting...");
+                    LOG_DIST_CRITICAL("Invalid field index, exiting...");
                     application_exit::panic();
                 }
             }

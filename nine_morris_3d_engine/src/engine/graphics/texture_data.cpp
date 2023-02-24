@@ -9,7 +9,7 @@
 
 TextureData::TextureData(std::string_view file_path, bool flip)
     : file_path(file_path) {
-    DEB_DEBUG("Loading texture data `{}`...", file_path);
+    LOG_DEBUG("Loading texture data `{}`...", file_path);
 
     stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
@@ -17,14 +17,14 @@ TextureData::TextureData(std::string_view file_path, bool flip)
     data = stbi_load(file_path.data(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
         application_exit::panic();
     }
 }
 
 TextureData::TextureData(encrypt::EncryptedFile file_path, bool flip)
     : file_path(file_path) {
-    DEB_DEBUG("Loading texture data `{}`...", file_path);
+    LOG_DEBUG("Loading texture data `{}`...", file_path);
 
     stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
@@ -34,7 +34,7 @@ TextureData::TextureData(encrypt::EncryptedFile file_path, bool flip)
     data = stbi_load_from_memory(buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        REL_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
         application_exit::panic();
     }
 }
@@ -44,7 +44,7 @@ TextureData::~TextureData() {
 
     stbi_image_free(data);
 
-    DEB_DEBUG("Freed texture data `{}`", file_path);
+    LOG_DEBUG("Freed texture data `{}`", file_path);
 }
 
 TextureData::Image TextureData::get_data() {

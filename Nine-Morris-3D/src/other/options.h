@@ -41,7 +41,7 @@ namespace options {
             throw OptionsFileError(e.what());
         }
 
-        DEB_INFO("Saved options to file `{}`", file_path);
+        LOG_INFO("Saved options to file `{}`", file_path);
     }
 
     template<typename Opt>
@@ -76,7 +76,7 @@ namespace options {
 
         options = temporary;
 
-        DEB_INFO("Loaded options from file `{}`", file_path);
+        LOG_INFO("Loaded options from file `{}`", file_path);
     }
 
     template<typename Opt>
@@ -100,23 +100,23 @@ namespace options {
             throw OptionsFileError(e.what());
         }
 
-        DEB_INFO("Created options file `{}`", file_path);
+        LOG_INFO("Created options file `{}`", file_path);
     }
 
     template<typename Opt>
     void handle_options_file_not_open_error(std::string_view options_file_name) {
-#ifdef NM3D_PLATFORM_RELEASE
+#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
         const bool exists = file_system::directory_exists(
             file_system::cut_slash(file_system::path_for_saved_data())
         );
 
         if (!exists) {
-            REL_WARNING("User data directory missing; creating it...");
+            LOG_DIST_WARNING("User data directory missing; creating it...");
 
             const bool success = file_system::create_directory(file_system::path_for_saved_data());
 
             if (!success) {
-                REL_ERROR("Could not create user data directory");
+                LOG_DIST_ERROR("Could not create user data directory");
                 return;
             }
         }
@@ -125,9 +125,9 @@ namespace options {
         try {
             create_options_file<Opt>(options_file_name);
         } catch (const OptionsFileNotOpenError& e) {
-            REL_ERROR("Could not create options file: {}", e.what());
+            LOG_DIST_ERROR("Could not create options file: {}", e.what());
         } catch (const OptionsFileError& e) {
-            REL_ERROR("Could not create options file: {}", e.what());
+            LOG_DIST_ERROR("Could not create options file: {}", e.what());
         }
     }
 }

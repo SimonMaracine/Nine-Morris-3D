@@ -165,7 +165,7 @@ namespace gl {
 
         build();
 
-        DEB_DEBUG("Created GL framebuffer {}", framebuffer);
+        LOG_DEBUG("Created GL framebuffer {}", framebuffer);
     }
 
     Framebuffer::~Framebuffer() {
@@ -199,7 +199,7 @@ namespace gl {
 
         glDeleteFramebuffers(1, &framebuffer);
 
-        DEB_DEBUG("Deleted GL framebuffer {}", framebuffer);
+        LOG_DEBUG("Deleted GL framebuffer {}", framebuffer);
     }
 
     void Framebuffer::bind() {
@@ -222,7 +222,7 @@ namespace gl {
 
     void Framebuffer::resize(int width, int height) {
         if (width < 1 || height < 1 || width > 8192 || height > 8192) {
-            REL_ERROR("Attempted to resize framebuffer to [{}, {}]", width, height);
+            LOG_DIST_ERROR("Attempted to resize framebuffer to [{}, {}]", width, height);
             return;
         }
 
@@ -350,7 +350,7 @@ namespace gl {
                             );
                             break;
                         default:
-                            REL_CRITICAL("Wrong attachment format, exiting...");
+                            LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
                             application_exit::panic();
                     }
 
@@ -387,7 +387,7 @@ namespace gl {
                             );
                             break;
                         default:
-                            REL_CRITICAL("Wrong attachment format, exiting...");
+                            LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
                             application_exit::panic();
                     }
 
@@ -429,7 +429,7 @@ namespace gl {
                             );
                             break;
                         default:
-                            REL_CRITICAL("Wrong attachment format, exiting...");
+                            LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
                             application_exit::panic();
                     }
 
@@ -462,7 +462,7 @@ namespace gl {
                             );
                             break;
                         default:
-                            REL_CRITICAL("Wrong attachment format, exiting...");
+                            LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
                             application_exit::panic();
                     }
 
@@ -486,8 +486,8 @@ namespace gl {
         const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
         if (status != GL_FRAMEBUFFER_COMPLETE) {
-            REL_CRITICAL("GL framebuffer {} is incomplete, exiting...", framebuffer);
-            REL_CRITICAL("GL framebuffer status: {}", print_framebuffer_status_message(status));
+            LOG_DIST_CRITICAL("GL framebuffer {} is incomplete, exiting...", framebuffer);
+            LOG_DIST_CRITICAL("GL framebuffer status: {}", print_framebuffer_status_message(status));
             application_exit::panic();
         }
 

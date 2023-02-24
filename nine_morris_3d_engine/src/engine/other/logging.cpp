@@ -28,7 +28,7 @@
 static std::shared_ptr<spdlog::logger> _global_logger;
 static std::string _info_file;
 
-#if defined(NM3D_PLATFORM_RELEASE)
+#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
 static void set_fallback_logger_release(const char* error_message) {
     _global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
     _global_logger->set_pattern(LOG_PATTERN_RELEASE);
@@ -42,13 +42,7 @@ namespace logging {
     void initialize_for_applications(std::string_view log_file, std::string_view info_file) {
         _info_file = info_file;
 
-#if defined(NM3D_PLATFORM_DEBUG)
-        _global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
-        _global_logger->set_pattern(LOG_PATTERN_DEBUG);
-        _global_logger->set_level(spdlog::level::trace);
-
-        static_cast<void>(log_file);
-#elif defined(NM3D_PLATFORM_RELEASE)
+#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
         const std::string file_path = file_system::path_for_logs(log_file);
 
         try {
@@ -63,6 +57,12 @@ namespace logging {
         _global_logger->set_pattern(LOG_PATTERN_RELEASE);
         _global_logger->set_level(spdlog::level::trace);
         _global_logger->flush_on(spdlog::level::info);
+#else
+        _global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
+        _global_logger->set_pattern(LOG_PATTERN_DEBUG);
+        _global_logger->set_level(spdlog::level::trace);
+
+        static_cast<void>(log_file);
 #endif
     }
 
@@ -78,7 +78,7 @@ namespace logging {
                 std::ofstream file {file_path, std::ios::trunc};
 
                 if (!file.is_open()) {
-                    REL_ERROR("Could not open file `{}` for writing", file_path);
+                    LOG_DIST_ERROR("Could not open file `{}` for writing", file_path);
                     break;
                 }
 
@@ -87,7 +87,7 @@ namespace logging {
                 break;
             }
             case LogTarget::Console:
-                REL_INFO("{}", contents);
+                LOG_DIST_INFO("{}", contents);
                 break;
             case LogTarget::None:
                 break;  // Do nothing

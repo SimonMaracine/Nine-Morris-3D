@@ -45,13 +45,13 @@ GuiRenderer::GuiRenderer(Application* app)
     // Set application pointer to widgets
     gui::Widget::app = app;
 
-    DEB_INFO("Initialized GUI renderer");
+    LOG_INFO("Initialized GUI renderer");
 }
 
 GuiRenderer::~GuiRenderer() {
     delete[] storage.quads.buffer;
 
-    DEB_INFO("Uninitialized GUI renderer");
+    LOG_INFO("Uninitialized GUI renderer");
 }
 
 void GuiRenderer::render(const SceneList& scene) {

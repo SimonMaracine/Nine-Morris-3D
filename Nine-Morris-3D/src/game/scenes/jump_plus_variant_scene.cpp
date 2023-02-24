@@ -373,7 +373,7 @@ void JumpPlusVariantScene::setup_entities() {
     // Set white pieces to show outline
     board.switch_piece_outlines();
 
-    DEB_DEBUG("Setup entities");
+    LOG_DEBUG("Setup entities");
 }
 
 void JumpPlusVariantScene::initialize_renderables() {

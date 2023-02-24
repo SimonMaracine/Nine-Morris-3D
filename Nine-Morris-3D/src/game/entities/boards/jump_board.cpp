@@ -86,7 +86,7 @@ void JumpBoard::_move_piece(size_t piece_index, size_t node_index) {
     static constexpr auto count = NINE_MENS_MORRIS_MILLS_COUNT;
 
     if (is_mill_made(node_index, TURN_IS_WHITE_SO(PieceType::White, PieceType::Black), mills, count)) {
-        DEB_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
+        LOG_DEBUG("{} mill is made", TURN_IS_WHITE_SO("White", "Black"));
 
         FORMATTED_MESSAGE(
             message, 64, "%s player has made a mill.",
@@ -161,7 +161,7 @@ void JumpBoard::switch_turn_and_check_turns_without_mills() {
     }
 
     if (turns_without_mills == MAX_TURNS_WITHOUT_MILLS) {
-        DEB_INFO("The max amount of turns without mills has been hit");
+        LOG_INFO("The max amount of turns without mills has been hit");
 
         FORMATTED_MESSAGE(
             message, 64, "%s turns have passed without a mill.",
@@ -183,7 +183,7 @@ void JumpBoard::remember_state() {
     undo_redo_state->undo.push_back(current_state);
     undo_redo_state->redo.clear();
 
-    DEB_DEBUG("Pushed new state onto undo stack and cleared redo stack");
+    LOG_DEBUG("Pushed new state onto undo stack and cleared redo stack");
 }
 
 void JumpBoard::to_serialized(JumpBoardSerialized& serialized) {

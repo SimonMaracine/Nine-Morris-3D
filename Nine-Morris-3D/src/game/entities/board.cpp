@@ -253,13 +253,13 @@ void Board::game_over(const BoardEnding& ending) {
 
     switch (ending.type) {
         case BoardEnding::WinnerWhite:
-            DEB_INFO("Game over, white wins");
+            LOG_INFO("Game over, white wins");
             break;
         case BoardEnding::WinnerBlack:
-            DEB_INFO("Game over, black wins");
+            LOG_INFO("Game over, black wins");
             break;
         case BoardEnding::TieBetweenBothPlayers:
-            DEB_INFO("Game over, tie between both players");
+            LOG_INFO("Game over, tie between both players");
             break;
         default:
             ASSERT(false, "Invalid ending");
@@ -328,7 +328,7 @@ size_t Board::number_of_pieces_in_mills(PieceType type, const size_t mills[][3],
         }
     }
 
-    DEB_DEBUG(
+    LOG_DEBUG(
         "Number of {} pieces in mills: {}",
         type == PieceType::White ? "white" : "black",
         pieces_inside_mills.size()
@@ -376,7 +376,7 @@ void Board::remember_position_and_check_repetition(size_t piece_index, size_t no
 
     for (const Position& position : repetition_history.twos) {
         if (position == current_position) {
-            DEB_INFO("Threefold repetition");
+            LOG_INFO("Threefold repetition");
 
             FORMATTED_MESSAGE(
                 message, 64, "%s player has made threefold repetition.",

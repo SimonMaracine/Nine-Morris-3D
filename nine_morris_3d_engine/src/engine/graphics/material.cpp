@@ -8,11 +8,11 @@
 
 Material::Material(std::shared_ptr<gl::Shader> shader, int flags)
     : shader(shader), flags(flags) {
-    DEB_DEBUG("Created material from shader `{}` with flags `{}`", shader->get_name(), flags);
+    LOG_DEBUG("Created material from shader `{}` with flags `{}`", shader->get_name(), flags);
 }
 
 Material::~Material() {
-    DEB_DEBUG("Deleted material from shader `{}` with flags `{}`", shader->get_name(), flags);
+    LOG_DEBUG("Deleted material from shader `{}` with flags `{}`", shader->get_name(), flags);
 }
 
 void Material::add_uniform(Uniform type, Key name) {
@@ -57,11 +57,11 @@ MaterialInstance::MaterialInstance(std::shared_ptr<Material> material) {
     textures = material->textures;
     flags = material->flags;
 
-    DEB_DEBUG("Created material instance");
+    LOG_DEBUG("Created material instance");
 }
 
 MaterialInstance::~MaterialInstance() {
-    DEB_DEBUG("Deleted material instance");
+    LOG_DEBUG("Deleted material instance");
 }
 
 void MaterialInstance::bind() {

@@ -43,7 +43,7 @@ void LoadingScene::on_start() {
 }
 
 void LoadingScene::on_stop() {
-    DEB_INFO("Done loading assets; initializing the rest of the game...");
+    LOG_INFO("Done loading assets; initializing the rest of the game...");
 
     if (app->running) {
         // Stop initializing, if the user closed the window
@@ -128,7 +128,7 @@ hs LoadingScene::scene_int_to_id(int scene) {  // FIXME find a better way
         case 2:
             return "jump_plus_variant"_H;
         default:
-            REL_CRITICAL("Invalid scene number, exiting...");
+            LOG_DIST_CRITICAL("Invalid scene number, exiting...");
             application_exit::panic();
     }
 
@@ -709,7 +709,7 @@ void LoadingScene::initialize_pieces_no_normal() {
 
 void LoadingScene::initialize_skybox() {
     if (app->user_data<Data>().options.skybox == game_options::NONE) {
-        DEB_DEBUG("Initialized skybox");
+        LOG_DEBUG("Initialized skybox");
         return;
     }
 
@@ -725,7 +725,7 @@ void LoadingScene::initialize_skybox() {
     auto texture = app->res.texture_3d.force_load("skybox"_H, data);
     app->renderer->set_skybox(texture);
 
-    DEB_DEBUG("Initialized skybox");
+    LOG_DEBUG("Initialized skybox");
 }
 
 void LoadingScene::initialize_indicators() {
@@ -826,7 +826,7 @@ void LoadingScene::initialize_light() {
         ASSERT(false, "Invalid skybox");
     }
 
-    DEB_DEBUG("Initialized directional_light");
+    LOG_DEBUG("Initialized directional_light");
 }
 
 void LoadingScene::initialize_game() {

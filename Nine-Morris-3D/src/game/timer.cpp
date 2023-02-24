@@ -34,7 +34,7 @@ void Timer::start() {
     running = true;
     last_time = current_time;
 
-    DEB_DEBUG("Started timer");
+    LOG_DEBUG("Started timer");
 }
 
 void Timer::stop() {
@@ -42,7 +42,7 @@ void Timer::stop() {
 
     running = false;
 
-    DEB_DEBUG("Stopped timer");
+    LOG_DEBUG("Stopped timer");
 }
 
 void Timer::reset_last_time() {

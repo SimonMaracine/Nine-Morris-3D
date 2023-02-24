@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
+option(NM3D_DISTRIBUTION "Build for distribution" OFF)
+
 set(ENGINE "nine-morris-3d-engine")
 set(GLAD_STB "glad-stb")
 set(IMGUI "imgui")
@@ -258,44 +260,53 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
     # Both engine and client
     target_compile_definitions(${ENGINE} PUBLIC
-        NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES  # To easily enable or disable encrypted files
+        "NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES"  # To easily enable or disable encrypted files
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     message(STATUS "Project building Nine Morris 3D engine in RELEASE mode")
 
     target_compile_definitions(${ENGINE} PRIVATE
-        ENTT_DISABLE_ASSERT
+        "ENTT_DISABLE_ASSERT"
     )
 
     # Optimization on in both engine and client
     target_compile_definitions(${ENGINE} PUBLIC
-        NDEBUG
-        NM3D_RELEASE
+        "NDEBUG"
+        "NM3D_OPTIMIZED"
     )
+
+    if (${NM3D_DISTRIBUTION})
+        # Distribution flag on in both engine and client
+        target_compile_definitions(${ENGINE} PUBLIC
+            "NM3D_DISTRIBUTION"
+        )
+
+        message(STATUS "Project building Nine Morris 3D engine in RELEASE + DISTRIBUTION mode")
+    endif()
 endif()
 
 target_compile_definitions(${ENGINE} PRIVATE
-    IMGUI_IMPL_OPENGL_LOADER_GLAD
-    UTF_CPP_CPLUSPLUS=201703
-    AL_LIBTYPE_STATIC
+    "IMGUI_IMPL_OPENGL_LOADER_GLAD"
+    "UTF_CPP_CPLUSPLUS=201703"
+    "AL_LIBTYPE_STATIC"
 )
 
 # Both engine and client
 target_compile_definitions(${ENGINE} PUBLIC
-    SPDLOG_ACTIVE_LEVEL=0
-    _CRT_SECURE_NO_WARNINGS
-    ENTT_NO_ETO
+    "SPDLOG_ACTIVE_LEVEL=0"
+    "_CRT_SECURE_NO_WARNINGS"
+    "ENTT_NO_ETO"
 )
 
 # On Windows set runtime library
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET
         ${ENGINE} ${GLAD_STB} ${IMGUI} spdlog assimp glfw cppblowfish OpenAL
-        PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug
+        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug"
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     set_property(TARGET
         ${ENGINE} ${GLAD_STB} ${IMGUI} spdlog assimp glfw cppblowfish OpenAL
-        PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded
+        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded"
     )
 endif()

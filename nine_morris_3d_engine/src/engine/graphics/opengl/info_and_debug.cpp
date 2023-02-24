@@ -112,12 +112,12 @@ static constexpr size_t BUFFER_LENGTH = 128;
 
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                REL_CRITICAL("({}) {}", id, message);
+                LOG_DIST_CRITICAL("({}) {}", id, message);
                 application_exit::panic();
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:
-                REL_WARNING("({}) {}", id, message);
+                LOG_DIST_WARNING("({}) {}", id, message);
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 ASSERT(false, "This should have been disabled");
@@ -136,7 +136,7 @@ namespace gl {
             GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE
         );
 
-        DEB_INFO("OpenGL message callback is set");
+        LOG_INFO("OpenGL message callback is set");
 #endif
     }
 

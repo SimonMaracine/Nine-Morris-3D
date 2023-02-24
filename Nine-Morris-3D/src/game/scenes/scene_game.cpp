@@ -30,7 +30,7 @@ void SceneGame::setup_and_add_model_board() {
 
     scene_list.add(get_board().model);
 
-    DEB_DEBUG("Setup model board");
+    LOG_DEBUG("Setup model board");
 }
 
 void SceneGame::setup_and_add_model_board_paint() {
@@ -44,7 +44,7 @@ void SceneGame::setup_and_add_model_board_paint() {
 
     scene_list.add(get_board().paint_model);
 
-    DEB_DEBUG("Setup model board paint");
+    LOG_DEBUG("Setup model board paint");
 }
 
 void SceneGame::setup_and_add_model_piece(size_t index, const glm::vec3& position) {
@@ -71,7 +71,7 @@ void SceneGame::setup_and_add_model_piece(size_t index, const glm::vec3& positio
     piece.source->set_position(position);
     piece.source->set_reference_distance(6.0f);
 
-    DEB_DEBUG("Setup model piece {}", index);
+    LOG_DEBUG("Setup model piece {}", index);
 }
 
 void SceneGame::setup_and_add_model_nodes() {
@@ -96,7 +96,7 @@ void SceneGame::setup_and_add_model_node(size_t index, const glm::vec3& position
 
     scene_list.add(node.model);
 
-    DEB_DEBUG("Setup model node {}", index);
+    LOG_DEBUG("Setup model node {}", index);
 }
 
 
@@ -146,7 +146,7 @@ void SceneGame::setup_camera() {
     app->renderer->set_camera_controller(&camera_controller);
     update_listener();
 
-    DEB_DEBUG("Setup camera");
+    LOG_DEBUG("Setup camera");
 }
 
 void SceneGame::setup_and_add_turn_indicator() {
@@ -595,7 +595,7 @@ void SceneGame::imgui_initialize() {
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigWindowsResizeFromEdges = false;
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-#ifdef NM3D_PLATFORM_RELEASE
+#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
     io.IniFilename = nullptr;
 #endif
     window_flags |= ImGuiWindowFlags_NoResize;
@@ -665,7 +665,7 @@ void SceneGame::imgui_draw_menu_bar() {
             if (ImGui::MenuItem("New Game", nullptr, false, can_change)) {
                 app->change_scene(app->get_current_scene()->get_id());
 
-                DEB_INFO("Restarted current game");
+                LOG_INFO("Restarted current game");
             }
             if (ImGui::MenuItem("Load Last Game", nullptr, false, can_change)) {
                 if (last_save_game_date == save_load::NO_LAST_GAME) {
@@ -690,7 +690,7 @@ void SceneGame::imgui_draw_menu_bar() {
                         data.options.scene = data.imgui_option.scene;
                         app->change_scene("standard_game"_H);
 
-                        DEB_INFO("Changed scene to standard game");
+                        LOG_INFO("Changed scene to standard game");
                     }
                 }
                 if (ImGui::RadioButton("Jump Variant", &data.imgui_option.scene, game_options::JUMP)) {
@@ -698,7 +698,7 @@ void SceneGame::imgui_draw_menu_bar() {
                         data.options.scene = data.imgui_option.scene;
                         app->change_scene("jump_variant"_H);
 
-                        DEB_INFO("Changed scene to jump variant");
+                        LOG_INFO("Changed scene to jump variant");
                     }
                 }
                 if (ImGui::RadioButton("Jump Plus Variant", &data.imgui_option.scene, game_options::JUMP_PLUS)) {
@@ -706,7 +706,7 @@ void SceneGame::imgui_draw_menu_bar() {
                         data.options.scene = data.imgui_option.scene;
                         app->change_scene("jump_plus_variant"_H);
 
-                        DEB_INFO("Changed scene to jump plus variant");
+                        LOG_INFO("Changed scene to jump plus variant");
                     }
                 }
 
@@ -722,7 +722,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             game.reset_players();
                         }
 
-                        DEB_INFO("Set white player to human");
+                        LOG_INFO("Set white player to human");
                     }
                     if (ImGui::RadioButton("Computer", &data.options.white_player, game_options::COMPUTER)) {
                         game.white_player = GamePlayer::Computer;
@@ -731,7 +731,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             game.reset_players();
                         }
 
-                        DEB_INFO("Set white player to computer");
+                        LOG_INFO("Set white player to computer");
                     }
 
                     ImGui::EndMenu();
@@ -745,7 +745,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             game.reset_players();
                         }
 
-                        DEB_INFO("Set black player to human");
+                        LOG_INFO("Set black player to human");
                     }
                     if (ImGui::RadioButton("Computer", &data.options.black_player, game_options::COMPUTER)) {
                         game.black_player = GamePlayer::Computer;
@@ -754,7 +754,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             game.reset_players();
                         }
 
-                        DEB_INFO("Set black player to computer");
+                        LOG_INFO("Set black player to computer");
                     }
 
                     ImGui::EndMenu();
@@ -793,11 +793,11 @@ void SceneGame::imgui_draw_menu_bar() {
                     if (data.options.vsync) {
                         app->window->set_vsync(data.options.vsync);
 
-                        DEB_INFO("VSync enabled");
+                        LOG_INFO("VSync enabled");
                     } else {
                         app->window->set_vsync(data.options.vsync);
 
-                        DEB_INFO("VSync disabled");
+                        LOG_INFO("VSync disabled");
                     }
                 }
                 if (ImGui::MenuItem("Custom Cursor", nullptr, &data.options.custom_cursor)) {
@@ -808,11 +808,11 @@ void SceneGame::imgui_draw_menu_bar() {
                             app->window->set_cursor(data.arrow_cursor);
                         }
 
-                        DEB_INFO("Set custom cursor");
+                        LOG_INFO("Set custom cursor");
                     } else {
                         app->window->set_cursor(0);
 
-                        DEB_INFO("Set default cursor");
+                        LOG_INFO("Set default cursor");
                     }
                 }
 
@@ -825,7 +825,7 @@ void SceneGame::imgui_draw_menu_bar() {
                     if (ImGui::SliderFloat("##", &data.options.master_volume, 0.0f, 1.0f, "%.01f")) {
                         app->openal->get_listener().set_gain(data.options.master_volume);
 
-                        DEB_INFO("Changed master volume to {}", data.options.master_volume);
+                        LOG_INFO("Changed master volume to {}", data.options.master_volume);
                     }
                     ImGui::PopItemWidth();
 
@@ -837,7 +837,7 @@ void SceneGame::imgui_draw_menu_bar() {
                     if (ImGui::SliderFloat("##", &data.options.music_volume, 0.0f, 1.0f, "%.01f")) {
                         music::set_music_gain(data.options.music_volume);
 
-                        DEB_INFO("Changed music volume to {}", data.options.music_volume);
+                        LOG_INFO("Changed music volume to {}", data.options.music_volume);
                     }
                     ImGui::PopItemWidth();
 
@@ -850,11 +850,11 @@ void SceneGame::imgui_draw_menu_bar() {
 
                         music::play_music_track(data.current_music_track);
 
-                        DEB_INFO("Enabled music");
+                        LOG_INFO("Enabled music");
                     } else {
                         music::stop_music_track();
 
-                        DEB_INFO("Disabled music");
+                        LOG_INFO("Disabled music");
                     }
                 }
 
@@ -863,9 +863,9 @@ void SceneGame::imgui_draw_menu_bar() {
             }
             if (ImGui::MenuItem("Save On Exit", nullptr, &data.options.save_on_exit)) {
                 if (data.options.save_on_exit) {
-                    DEB_INFO("The game will be saved on exit");
+                    LOG_INFO("The game will be saved on exit");
                 } else {
-                    DEB_INFO("The game will not be saved on exit");
+                    LOG_INFO("The game will not be saved on exit");
                 }
             }
             if (ImGui::BeginMenu("Skybox")) {
@@ -879,7 +879,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             data.options.skybox = data.imgui_option.skybox;
                             set_skybox(Skybox::None);
 
-                            DEB_INFO("Skybox set to None");
+                            LOG_INFO("Skybox set to None");
                         }
                     }
                     if (ImGui::RadioButton("Field", &data.imgui_option.skybox, game_options::FIELD)) {
@@ -887,7 +887,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             data.options.skybox = data.imgui_option.skybox;
                             set_skybox(Skybox::Field);
 
-                            DEB_INFO("Skybox set to Field");
+                            LOG_INFO("Skybox set to Field");
                         }
                     }
                     if (ImGui::RadioButton("Autumn", &data.imgui_option.skybox, game_options::AUTUMN)) {
@@ -895,7 +895,7 @@ void SceneGame::imgui_draw_menu_bar() {
                             data.options.skybox = data.imgui_option.skybox;
                             set_skybox(Skybox::Autumn);
 
-                            DEB_INFO("Skybox set to Autumn");
+                            LOG_INFO("Skybox set to Autumn");
                         }
                     }
                 }
@@ -905,9 +905,9 @@ void SceneGame::imgui_draw_menu_bar() {
             }
             if (ImGui::MenuItem("Show Information", nullptr, &show_info)) {
                 if (show_info) {
-                    DEB_INFO("Show information");
+                    LOG_INFO("Show information");
                 } else {
-                    DEB_INFO("Hide information");
+                    LOG_INFO("Hide information");
                 }
             }
             if (ImGui::BeginMenu("Camera Sensitivity")) {
@@ -915,7 +915,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::SliderFloat("##", &data.options.sensitivity, 0.5f, 2.0f, "%.01f", ImGuiSliderFlags_Logarithmic)) {
                     camera_controller.sensitivity = data.options.sensitivity;
 
-                    DEB_INFO("Changed camera sensitivity to {}", camera_controller.sensitivity);
+                    LOG_INFO("Changed camera sensitivity to {}", camera_controller.sensitivity);
                 }
                 ImGui::PopItemWidth();
 
@@ -929,11 +929,11 @@ void SceneGame::imgui_draw_menu_bar() {
                     if (data.options.hide_timer) {
                         scene_list.remove(objects.get<gui::Text>("timer_text"_H));
 
-                        DEB_INFO("Hide timer");
+                        LOG_INFO("Hide timer");
                     } else {
                         scene_list.add(objects.get<gui::Text>("timer_text"_H));
 
-                        DEB_INFO("Show timer");
+                        LOG_INFO("Show timer");
                     }
                 }
 
@@ -946,9 +946,9 @@ void SceneGame::imgui_draw_menu_bar() {
                     set_board_paint_texture();
 
                     if (data.imgui_option.labeled_board) {
-                        DEB_INFO("Board paint texture set to labeled");
+                        LOG_INFO("Board paint texture set to labeled");
                     } else {
-                        DEB_INFO("Board paint texture set to non-labeled");
+                        LOG_INFO("Board paint texture set to non-labeled");
                     }
                 }
             }
@@ -977,7 +977,7 @@ void SceneGame::imgui_draw_menu_bar() {
             if (ImGui::MenuItem("Log Information", nullptr, false)) {
                 logging::log_general_information(logging::LogTarget::File);
 
-                DEB_INFO("Logged OpenGL and dependencies information");
+                LOG_INFO("Logged OpenGL and dependencies information");
             }
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", info_file_path.c_str());
@@ -995,14 +995,20 @@ void SceneGame::imgui_draw_info() {
     ImGui::PushFont(app->user_data<Data>().imgui_info_font);
 
     const int flags = (
-        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground
-        | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove
+        ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove
     );
+
+#if defined(NM3D_PLATFORM_DEBUG)
+    const char* build_mode = "debug";
+#elif defined(NM3D_PLATFORM_RELEASE)
+    const char* build_mode = "release";
+#elif defined(NM3D_PLATFORM_RELEASE_DISTRIBUTION)
+    const char* build_mode = "release_distribution";
+#endif
 
     ImGui::Begin("Information", nullptr, flags);
     ImGui::Text("FPS: %.3f", app->get_fps());
-    ImGui::Text("OpenGL: %s", gl::get_opengl_version());
-    ImGui::Text("Renderer: %s", gl::get_renderer());
+    ImGui::Text("Build: %s", build_mode);
     ImGui::End();
 
     ImGui::PopFont();
@@ -1102,7 +1108,7 @@ void SceneGame::imgui_draw_rules_jump_plus_variant() {
 }
 
 void SceneGame::imgui_draw_debug() {
-#ifdef NM3D_PLATFORM_DEBUG
+#ifndef NM3D_PLATFORM_RELEASE_DITRIBUTION
     ImGui::Begin("Debug");
     ImGui::Text("FPS: %.3f", app->get_fps());
     draw_debug_imgui();

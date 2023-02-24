@@ -82,7 +82,7 @@ namespace save_load {
             throw SaveFileError(e.what());
         }
 
-        DEB_INFO("Saved game to file `{}`", file_name);
+        LOG_INFO("Saved game to file `{}`", file_name);
     }
 
     template<typename B>
@@ -106,7 +106,7 @@ namespace save_load {
             throw SaveFileError(e.what());
         }
 
-        DEB_INFO("Loaded game from file `{}`", file_name);
+        LOG_INFO("Loaded game from file `{}`", file_name);
     }
 }
 

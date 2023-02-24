@@ -32,7 +32,7 @@ static size_t map_resolution_to_index(const std::pair<int, int>& resolution) {
             return 5;
     }
 
-    REL_ERROR("Using default index for resolution");
+    LOG_DIST_ERROR("Using default index for resolution");
 
     return DEFAULT;
 }
@@ -53,7 +53,7 @@ static std::pair<int, int> map_index_to_resolution(size_t index) {
             return {1792, 1008};
     }
 
-    REL_ERROR("Using default resolution for index");
+    LOG_DIST_ERROR("Using default resolution for index");
 
     return launcher_options::DEFAULT_RESOLUTION;
 }
@@ -67,7 +67,7 @@ static size_t map_texture_quality_to_index(int texture_quality) {
         return 1;
     }
 
-    REL_ERROR("Using default index for texture_quality");
+    LOG_DIST_ERROR("Using default index for texture_quality");
 
     return DEFAULT;
 }
@@ -80,7 +80,7 @@ static int map_index_to_texture_quality(size_t index) {
             return launcher_options::LOW;
     }
 
-    REL_ERROR("Using default texture_quality for index");
+    LOG_DIST_ERROR("Using default texture_quality for index");
 
     return launcher_options::DEFAULT_TEXTURE_QUALITY;
 }
@@ -97,7 +97,7 @@ static size_t map_samples_to_index(int samples) {
             return 2;
     }
 
-    REL_ERROR("Using default index for samples");
+    LOG_DIST_ERROR("Using default index for samples");
 
     return DEFAULT;
 }
@@ -112,7 +112,7 @@ static int map_index_to_samples(size_t index) {
             return 4;
     }
 
-    REL_ERROR("Using default samples for index");
+    LOG_DIST_ERROR("Using default samples for index");
 
     return launcher_options::DEFAULT_SAMPLES;
 }
@@ -129,7 +129,7 @@ static size_t map_anisotropic_filtering_to_index(int anisotropic_filtering) {
             return 2;
     }
 
-    REL_ERROR("Using default index for anisotropic_filtering");
+    LOG_DIST_ERROR("Using default index for anisotropic_filtering");
 
     return DEFAULT;
 }
@@ -144,7 +144,7 @@ static int map_index_to_anisotropic_filtering(size_t index) {
             return 8;
     }
 
-    REL_ERROR("Using default anisotropic_filtering for index");
+    LOG_DIST_ERROR("Using default anisotropic_filtering for index");
 
     return launcher_options::DEFAULT_ANISOTROPIC_FILTERING;
 }

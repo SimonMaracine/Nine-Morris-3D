@@ -14,13 +14,13 @@
 
 Window::Window(Application* app) {
     if (!glfwInit()) {
-        REL_CRITICAL("Could not initialize GLFW, exiting...");
+        LOG_DIST_CRITICAL("Could not initialize GLFW, exiting...");
         application_exit::panic();
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
     glfwSetErrorCallback([](int error, const char* description) {
-        DEB_CRITICAL("({}) GLFW Error Callback: {}", error, description);
+        LOG_CRITICAL("({}) GLFW Error Callback: {}", error, description);
     });
 #endif
 
@@ -34,7 +34,7 @@ Window::Window(Application* app) {
 
 #ifdef NM3D_PLATFORM_DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-    DEB_INFO("Using OpenGL debug context");
+    LOG_INFO("Using OpenGL debug context");
 #else
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif
@@ -42,16 +42,16 @@ Window::Window(Application* app) {
     window = create_window(app);
 
     if (window == nullptr) {
-        REL_CRITICAL("Could not create window, exiting...");
+        LOG_DIST_CRITICAL("Could not create window, exiting...");
         application_exit::panic();
     }
 
-    DEB_INFO("Initialized GLFW and created window and OpenGL context");
+    LOG_INFO("Initialized GLFW and created window and OpenGL context");
 
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
-        REL_CRITICAL("Could not initialize GLAD, exiting...");
+        LOG_DIST_CRITICAL("Could not initialize GLAD, exiting...");
         application_exit::panic();
     }
 
@@ -176,7 +176,7 @@ Window::~Window() {
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    DEB_INFO("Destroyed window and OpenGL context and terminated GLFW");
+    LOG_INFO("Destroyed window and OpenGL context and terminated GLFW");
 }
 
 void Window::update() {
@@ -197,7 +197,7 @@ std::vector<Monitor> Window::get_monitors() {
     GLFWmonitor** monitors = glfwGetMonitors(&count);
 
     if (monitors == nullptr) {
-        REL_CRITICAL("Could not retrieve monitors, exiting...");
+        LOG_DIST_CRITICAL("Could not retrieve monitors, exiting...");
         application_exit::panic();
     }
 
@@ -233,7 +233,7 @@ unsigned int Window::add_cursor(std::unique_ptr<TextureData>&& cursor, int x_hot
     GLFWcursor* glfw_cursor = glfwCreateCursor(&image, x_hotspot, y_hotspot);
 
     if (glfw_cursor == nullptr) {
-        REL_ERROR("Could not create custom cursor `{}`", cursor->get_file_path());
+        LOG_DIST_ERROR("Could not create custom cursor `{}`", cursor->get_file_path());
     }
 
     static unsigned int id = 0;
@@ -249,15 +249,15 @@ void Window::set_cursor(unsigned int handle) {
     }
 
 #if defined(NM3D_PLATFORM_DEBUG)
-    GLFWcursor* cursor;
+    GLFWcursor* cursor = nullptr;
     try {
         cursor = cursors.at(handle);
     } catch (const std::out_of_range&) {
-        DEB_CRITICAL("Invalid handle `{}`, exiting...", handle);
+        LOG_CRITICAL("Invalid handle `{}`, exiting...", handle);
         application_exit::panic();
     }
     glfwSetCursor(window, cursor);
-#elif defined(NM3D_PLATFORM_RELEASE)
+#elif defined(NM3D_PLATFORM_RELEASE_DISTRIBUTION)
     GLFWcursor* cursor = cursors[handle];
     glfwSetCursor(window, cursor);
 #endif

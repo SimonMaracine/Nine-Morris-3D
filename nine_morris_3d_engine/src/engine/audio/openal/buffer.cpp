@@ -17,7 +17,7 @@ static ALenum get_format(int channels, size_t bps) {
     } else if (channels == 2 && bps == 16) {
         format = AL_FORMAT_STEREO16;
     } else {
-        REL_CRITICAL("Unknown format: channels = `{}`, bps = `{}`, exiting...", channels, bps);
+        LOG_DIST_CRITICAL("Unknown format: channels = `{}`, bps = `{}`, exiting...", channels, bps);
         application_exit::panic();
     }
 
@@ -31,7 +31,7 @@ namespace al {
 
         maybe_check_errors();
 
-        DEB_DEBUG("Created AL buffer {}", buffer);
+        LOG_DEBUG("Created AL buffer {}", buffer);
     }
 
     Buffer::Buffer(std::shared_ptr<SoundData> data) {
@@ -46,7 +46,7 @@ namespace al {
 
         maybe_check_errors();
 
-        DEB_DEBUG("Created AL buffer {}", buffer);
+        LOG_DEBUG("Created AL buffer {}", buffer);
     }
 
     Buffer::~Buffer() {
@@ -61,6 +61,6 @@ namespace al {
 
         maybe_check_errors();
 
-        DEB_DEBUG("Deleted AL buffer {}", buffer);
+        LOG_DEBUG("Deleted AL buffer {}", buffer);
     }
 }

@@ -26,7 +26,7 @@ static const char* get_font_file_data(std::string_view file_path) {
     std::ifstream file {std::string(file_path), std::ios::binary};
 
     if (!file.is_open()) {
-        REL_CRITICAL("Could not open file `{}` for reading, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not open file `{}` for reading, exiting...", file_path);
         application_exit::panic();
     }
 
@@ -65,7 +65,7 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
     font_info_buffer = get_font_file_data(file_path);
 
     if (!stbtt_InitFont(&info, reinterpret_cast<const unsigned char*>(font_info_buffer), 0)) {
-        REL_CRITICAL("Could not load font `{}`, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not load font `{}`, exiting...", file_path);
         application_exit::panic();
     }
 
@@ -75,13 +75,13 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
 
     name = get_name(file_path);
 
-    DEB_DEBUG("Loaded font `{}`", file_path);
+    LOG_DEBUG("Loaded font `{}`", file_path);
 }
 
 Font::~Font() {
     delete[] font_info_buffer;
 
-    DEB_DEBUG("Unloaded font `{}`", name);
+    LOG_DEBUG("Unloaded font `{}`", name);
 }
 
 void Font::update_data(const float* data, size_t size) {
@@ -98,7 +98,7 @@ void Font::update_data(const float* data, size_t size) {
 }
 
 void Font::begin_baking() {
-    DEB_DEBUG("Begin baking font `{}`", name);
+    LOG_DEBUG("Begin baking font `{}`", name);
 
     // Delete the previous bitmap before creating another one
     bitmap_image.reset();
@@ -128,7 +128,7 @@ void Font::end_baking() {
 
     delete[] bake_context.bitmap;
 
-    DEB_DEBUG("End baking font `{}`", name);
+    LOG_DEBUG("End baking font `{}`", name);
 }
 
 void Font::bake_characters(int begin_codepoint, int end_codepoint) {
@@ -243,7 +243,7 @@ void Font::initialize() {
 
 void Font::try_bake_character(int codepoint, int descent) {
     if (glyphs.count(codepoint) > 0) {
-        DEB_WARNING("Character with codepoint `{}` is already baked");
+        LOG_WARNING("Character with codepoint `{}` is already baked");
         return;
     }
 
@@ -268,7 +268,7 @@ void Font::try_bake_character(int codepoint, int descent) {
     );
 
     if (glyph == nullptr) {
-        DEB_WARNING("Could not bake character with codepoint `{}`; still adding to map...", codepoint);
+        LOG_WARNING("Could not bake character with codepoint `{}`; still adding to map...", codepoint);
     }
 
     if (bake_context.x + width > bitmap_size) {
@@ -318,6 +318,6 @@ void Font::write_bitmap_to_file() {
     const std::string file_name = "bitmap_" + name + ".png";
 
     if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
-        DEB_ERROR("Failed to create bitmap png file `{}`", file_name);
+        LOG_ERROR("Failed to create bitmap png file `{}`", file_name);
     }
 }

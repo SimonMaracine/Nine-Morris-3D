@@ -13,7 +13,7 @@ namespace gl {
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        DEB_DEBUG("Created GL vertex buffer {}", buffer);
+        LOG_DEBUG("Created GL vertex buffer {}", buffer);
     }
 
     VertexBuffer::VertexBuffer(size_t size, DrawHint hint)
@@ -24,7 +24,7 @@ namespace gl {
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        DEB_DEBUG("Created GL vertex buffer {}", buffer);
+        LOG_DEBUG("Created GL vertex buffer {}", buffer);
     }
 
     VertexBuffer::VertexBuffer(const void* data, size_t size, DrawHint hint)
@@ -35,13 +35,13 @@ namespace gl {
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        DEB_DEBUG("Created GL vertex buffer {}", buffer);
+        LOG_DEBUG("Created GL vertex buffer {}", buffer);
     }
 
     VertexBuffer::~VertexBuffer() {
         glDeleteBuffers(1, &buffer);
 
-        DEB_DEBUG("Deleted GL vertex buffer {}", buffer);
+        LOG_DEBUG("Deleted GL vertex buffer {}", buffer);
     }
 
     void VertexBuffer::bind() {
@@ -73,13 +73,13 @@ namespace gl {
 
         index_count = static_cast<int>(size / sizeof(unsigned int));
 
-        DEB_DEBUG("Created GL index buffer {}", buffer);
+        LOG_DEBUG("Created GL index buffer {}", buffer);
     }
 
     IndexBuffer::~IndexBuffer() {
         glDeleteBuffers(1, &buffer);
 
-        DEB_DEBUG("Deleted GL index buffer {}", buffer);
+        LOG_DEBUG("Deleted GL index buffer {}", buffer);
     }
 
     void IndexBuffer::bind() {
@@ -98,7 +98,7 @@ namespace gl {
 
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-        DEB_DEBUG("Created GL uniform buffer {}", buffer);
+        LOG_DEBUG("Created GL uniform buffer {}", buffer);
     }
 
     UniformBuffer::~UniformBuffer() {
@@ -106,7 +106,7 @@ namespace gl {
 
         delete[] data;
 
-        DEB_DEBUG("Deleted GL uniform buffer {}", buffer);
+        LOG_DEBUG("Deleted GL uniform buffer {}", buffer);
     }
 
     void UniformBuffer::bind() {
@@ -121,9 +121,9 @@ namespace gl {
         ASSERT(configured, "Uniform buffer must be configured");
         ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
-#if defined(NM3D_PLATFORM_DEBUG)
+#ifdef NM3D_PLATFORM_DEBUG
         memcpy(data + fields.at(field_index).offset, field_data, fields.at(field_index).size);
-#elif defined(NM3D_PLATFORM_RELEASE)
+#else
         memcpy(data + fields[field_index].offset, field_data, fields[field_index].size);
 #endif
     }
@@ -163,7 +163,7 @@ namespace gl {
         dummy_data = new char[size];
         memset(dummy_data, 0, size);
 
-        DEB_DEBUG("Created GL pixel buffer {}", buffer);
+        LOG_DEBUG("Created GL pixel buffer {}", buffer);
     }
 
     PixelBuffer::~PixelBuffer() {
@@ -171,7 +171,7 @@ namespace gl {
 
         delete[] dummy_data;
 
-        DEB_DEBUG("Deleted GL pixel buffer {}", buffer);
+        LOG_DEBUG("Deleted GL pixel buffer {}", buffer);
     }
 
     void PixelBuffer::bind() {
@@ -186,7 +186,7 @@ namespace gl {
         data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 
         if (data == nullptr) {
-            DEB_ERROR("Could not map GL buffer {}", buffer);
+            LOG_ERROR("Could not map GL buffer {}", buffer);
 
             data = dummy_data;
         }
@@ -196,7 +196,7 @@ namespace gl {
         const GLboolean success = glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 
         if (success == GL_FALSE) {
-            DEB_ERROR("Memory mapped by GL buffer {} became corrupted while it was used", buffer);
+            LOG_ERROR("Memory mapped by GL buffer {} became corrupted while it was used", buffer);
         }
     }
 }

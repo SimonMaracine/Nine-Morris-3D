@@ -15,7 +15,7 @@ static void maybe_check_errors(ALCdevice* device) {
     const ALCenum error = alcGetError(device);
 
     if (error != ALC_NO_ERROR) {
-        REL_CRITICAL("OpenAL Context Debug Error: {}", error);
+        LOG_DIST_CRITICAL("OpenAL Context Debug Error: {}", error);
         application_exit::panic();
     }
 #endif
@@ -27,14 +27,14 @@ OpenAlContext::OpenAlContext() {
     device = alcOpenDevice(nullptr);
 
     if (device == nullptr) {
-        REL_CRITICAL("Could not open an AL device, exiting...");
+        LOG_DIST_CRITICAL("Could not open an AL device, exiting...");
         application_exit::panic();
     }
 
     context = alcCreateContext(device, nullptr);  // TODO maybe pass some context attributes
 
     if (context == nullptr) {
-        REL_CRITICAL("Could not create an AL context, exiting...");
+        LOG_DIST_CRITICAL("Could not create an AL context, exiting...");
         application_exit::panic();
     }
 
@@ -42,7 +42,7 @@ OpenAlContext::OpenAlContext() {
         alcDestroyContext(context);
         alcCloseDevice(device);
 
-        REL_CRITICAL("Could not make AL context current, exiting...");
+        LOG_DIST_CRITICAL("Could not make AL context current, exiting...");
         application_exit::panic();
     }
 
@@ -51,7 +51,7 @@ OpenAlContext::OpenAlContext() {
 
     listener.set_distance_model(al::DistanceModel::InverseClamped);
 
-    DEB_INFO("Created OpenAL device and context");
+    LOG_INFO("Created OpenAL device and context");
 }
 
 OpenAlContext::~OpenAlContext() {
@@ -62,7 +62,7 @@ OpenAlContext::~OpenAlContext() {
     _global_device = nullptr;
     _global_context = nullptr;
 
-    DEB_INFO("Destroyed OpenAL context and device");
+    LOG_INFO("Destroyed OpenAL context and device");
 }
 
 void destroy_openal_context() {

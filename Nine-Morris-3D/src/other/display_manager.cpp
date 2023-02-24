@@ -15,7 +15,7 @@ DisplayManager::DisplayManager(Application* app)
     const int width = resolution.first;
 
     if (width < 512) {
-        REL_CRITICAL("Monitor has unsupported resolution, exiting...");
+        LOG_DIST_CRITICAL("Monitor has unsupported resolution, exiting...");
         application_exit::panic();
     } else if (width < 768) {
         resolutions_supported = 1;

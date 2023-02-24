@@ -11,7 +11,7 @@ size_t VertexBufferLayout::VertexElement::get_size(Type type) {
         case Int:
             return sizeof(GLint);
         default:
-            REL_CRITICAL("Type `{}` is not supported, exiting...", type);
+            LOG_DIST_CRITICAL("Type `{}` is not supported, exiting...", type);
             application_exit::panic();
     }
 

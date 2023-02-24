@@ -11,12 +11,12 @@ namespace save_load {
         );
 
         if (!exists) {
-            REL_INFO("User data directory missing; creating it...");
+            LOG_DIST_INFO("User data directory missing; creating it...");
 
             const bool success = file_system::create_directory(file_system::path_for_saved_data());
 
             if (!success) {
-                REL_ERROR("Could not create user data directory");
+                LOG_DIST_ERROR("Could not create user data directory");
                 return;
             }
         }
