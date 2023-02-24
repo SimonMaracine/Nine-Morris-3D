@@ -27,6 +27,9 @@ void Application::preinitialize(std::string_view app_name, std::string_view log_
         application_exit::panic();  // Really bad that there is no feedback
     }
 
+    // Set locale for the applications; used mostly by spdlog
+    std::locale::global(std::locale("en_US.UTF-8"));
+
     logging::initialize_for_applications(log_file, info_file);
 
 #ifdef NM3D_PLATFORM_RELEASE

@@ -25,6 +25,7 @@
 #include <any>
 #include <initializer_list>
 #include <climits>
+#include <locale>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
