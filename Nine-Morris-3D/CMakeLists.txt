@@ -49,12 +49,12 @@ target_link_libraries(${GAME} PRIVATE
 # Add compile definitions
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(${GAME} PRIVATE
-        NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
+        "NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES"
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_definitions(${GAME} PRIVATE
-        NDEBUG
-        ENTT_DISABLE_ASSERT
+        "NDEBUG"
+        "ENTT_DISABLE_ASSERT"
     )
 endif()
 
@@ -62,12 +62,12 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET
         ${GAME}
-        PROPERTY MSVC_RUNTIME_LIBRARY MultiThreadedDebug
+        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug"
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     set_property(TARGET
         ${GAME}
-        PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded
+        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded"
     )
 endif()
 

@@ -563,7 +563,7 @@ void SceneGame::update_all_imgui() {
         imgui_draw_info();
     }
 
-#ifdef NM3D_PLATFORM_DEBUG
+#ifndef NM3D_PLATFORM_RELEASE_DISTRIBUTION
     imgui_draw_debug();
 #endif
 }
@@ -1108,7 +1108,7 @@ void SceneGame::imgui_draw_rules_jump_plus_variant() {
 }
 
 void SceneGame::imgui_draw_debug() {
-#ifndef NM3D_PLATFORM_RELEASE_DITRIBUTION
+#ifndef NM3D_PLATFORM_RELEASE_DISTRIBUTION
     ImGui::Begin("Debug");
     ImGui::Text("FPS: %.3f", app->get_fps());
     draw_debug_imgui();

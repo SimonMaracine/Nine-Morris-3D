@@ -275,7 +275,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
         "NM3D_OPTIMIZED"
     )
 
-    if (${NM3D_DISTRIBUTION})
+    if(${NM3D_DISTRIBUTION})
         # Distribution flag on in both engine and client
         target_compile_definitions(${ENGINE} PUBLIC
             "NM3D_DISTRIBUTION"
