@@ -130,8 +130,8 @@ void MinimaxStandardGame::random_move(PieceType piece) {
 std::vector<Move> MinimaxStandardGame::get_all_moves(PieceType piece) {
     ASSERT(piece != PieceType::None, "Invalid enum");
 
-    std::vector<Move> moves;
-    moves.reserve(55);  // This is the estimated maximum amount of moves possible
+    std::vector<Move> moves;  // TODO optimize allocation
+    moves.reserve(54);  // This is the maximum amount of moves possible
 
     if (total_number_of_pieces(piece) == 3) {  // Phase 3
         get_moves_phase3(piece, moves);
@@ -144,6 +144,8 @@ std::vector<Move> MinimaxStandardGame::get_all_moves(PieceType piece) {
         get_moves_phase2(piece, moves);
     }
 
+    ASSERT(moves.size() <= 54, "Invalid moves");
+
     return moves;
 }
 
@@ -152,7 +154,7 @@ void MinimaxStandardGame::get_moves_phase1(PieceType piece, std::vector<Move>& m
 
     for (size_t i = 0; i < MAX_NODES; i++) {
         if (position.at(i) == PieceType::None) {
-            make_move(Move::create_place(piece, i));  // TODO optimize
+            make_place_move(piece, i);
 
             if (is_mill(piece, i)) {
                 const auto opponent = opponent_piece(piece);
@@ -163,18 +165,14 @@ void MinimaxStandardGame::get_moves_phase1(PieceType piece, std::vector<Move>& m
                             continue;
                         }
 
-                        // TODO should make move
-
                         moves.push_back(Move::create_place_take(piece, i, j));
-
-                        // TODO should unmake move, but it doesn't change anything
                     }
                 }
             } else {
                 moves.push_back(Move::create_place(piece, i));
             }
 
-            unmake_move(Move::create_place(piece, i));
+            unmake_place_move(i);
         }
     }
 }
@@ -184,10 +182,10 @@ void MinimaxStandardGame::get_moves_phase2(PieceType piece, std::vector<Move>& m
 
     for (size_t i = 0; i < MAX_NODES; i++) {
         if (position.at(i) == piece) {
-            const auto free_positions = neighbor_free_positions(piece, i);
+            const auto free_positions = neighbor_free_positions(i);
 
             for (size_t j = 0; free_positions[j] != NULL_INDEX; j++) {
-                make_move(Move::create_move(piece, i, free_positions[j]));  // TODO optimize
+                make_move_move(piece, i, free_positions[j]);
 
                 if (is_mill(piece, free_positions[j])) {
                     const auto opponent = opponent_piece(piece);
@@ -198,18 +196,14 @@ void MinimaxStandardGame::get_moves_phase2(PieceType piece, std::vector<Move>& m
                                 continue;
                             }
 
-                            // TODO should make move
-
                             moves.push_back(Move::create_move_take(piece, i, free_positions[j], k));
-
-                            // TODO should unmake move, but it doesn't change anything
                         }
                     }
                 } else {
                     moves.push_back(Move::create_move(piece, i, free_positions[j]));
                 }
 
-                unmake_move(Move::create_move(piece, i, free_positions[j]));
+                unmake_move_move(piece, i, free_positions[j]);
             }
         }
     }
@@ -222,7 +216,7 @@ void MinimaxStandardGame::get_moves_phase3(PieceType piece, std::vector<Move>& m
         if (position.at(i) == piece) {
             for (size_t j = 0; j < MAX_NODES; j++) {
                 if (position.at(j) == PieceType::None) {
-                    make_move(Move::create_move(piece, i, j));  // TODO optimize
+                    make_move_move(piece, i, j);
 
                     if (is_mill(piece, j)) {
                         const auto opponent = opponent_piece(piece);
@@ -233,18 +227,14 @@ void MinimaxStandardGame::get_moves_phase3(PieceType piece, std::vector<Move>& m
                                     continue;
                                 }
 
-                                // TODO should make move
-
                                 moves.push_back(Move::create_move_take(piece, i, j, k));
-
-                                // TODO should unmake move, but it doesn't change anything
                             }
                         }
                     } else {
                         moves.push_back(Move::create_move(piece, i, j));
                     }
 
-                    unmake_move(Move::create_move(piece, i, j));
+                    unmake_move_move(piece, i, j);
                 }
             }
         }
@@ -299,6 +289,24 @@ void MinimaxStandardGame::unmake_move(const Move& move) {
     }
 }
 
+void MinimaxStandardGame::make_place_move(PieceType piece, size_t place_node_index) {
+    position.at(place_node_index) = piece;
+}
+
+void MinimaxStandardGame::unmake_place_move(size_t place_node_index) {
+    position.at(place_node_index) = PieceType::None;
+}
+
+void MinimaxStandardGame::make_move_move(PieceType piece, size_t move_source_node_index, size_t move_destination_node_index) {
+    position.at(move_destination_node_index) = piece;
+    position.at(move_source_node_index) = PieceType::None;
+}
+
+void MinimaxStandardGame::unmake_move_move(PieceType piece, size_t move_source_node_index, size_t move_destination_node_index) {
+    position.at(move_destination_node_index) = PieceType::None;
+    position.at(move_source_node_index) = piece;
+}
+
 int MinimaxStandardGame::evaluate_position() {  // TODO also evaluate positions
     positions_calculated++;
 
@@ -346,7 +354,7 @@ unsigned int MinimaxStandardGame::calculate_freedom(PieceType piece) {
 }
 
 unsigned int MinimaxStandardGame::calculate_piece_freedom(size_t index) {
-    int freedom = 0;
+    unsigned int freedom = 0;
 
     switch (index) {
         case 0:
@@ -483,9 +491,7 @@ bool MinimaxStandardGame::all_pieces_in_mills(PieceType piece) {
         result[pos++] = (const_index); \
     }
 
-std::array<size_t, 5> MinimaxStandardGame::neighbor_free_positions(PieceType piece, size_t index) {
-    ASSERT(piece != PieceType::None, "Invalid enum");
-
+std::array<size_t, 5> MinimaxStandardGame::neighbor_free_positions(size_t index) {
     std::array<size_t, 5> result = { NULL_INDEX, NULL_INDEX, NULL_INDEX, NULL_INDEX, NULL_INDEX };
     size_t pos = 0;
 

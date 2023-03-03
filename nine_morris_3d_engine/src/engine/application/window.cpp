@@ -257,7 +257,7 @@ void Window::set_cursor(unsigned int handle) {
         application_exit::panic();
     }
     glfwSetCursor(window, cursor);
-#elif defined(NM3D_PLATFORM_RELEASE_DISTRIBUTION)
+#else
     GLFWcursor* cursor = cursors[handle];
     glfwSetCursor(window, cursor);
 #endif

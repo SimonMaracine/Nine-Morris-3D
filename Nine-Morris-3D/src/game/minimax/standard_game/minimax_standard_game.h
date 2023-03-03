@@ -27,13 +27,18 @@ private:
     void make_move(const Move& move);
     void unmake_move(const Move& move);
 
+    void make_place_move(PieceType piece, size_t place_node_index);
+    void unmake_place_move(size_t place_node_index);
+    void make_move_move(PieceType piece, size_t move_source_node_index, size_t move_destination_node_index);
+    void unmake_move_move(PieceType piece, size_t move_source_node_index, size_t move_destination_node_index);
+
     int evaluate_position();
     unsigned int calculate_material(PieceType piece);
     unsigned int calculate_freedom(PieceType piece);
     unsigned int calculate_piece_freedom(size_t index);
 
     bool all_pieces_in_mills(PieceType piece);
-    std::array<size_t, 5> neighbor_free_positions(PieceType piece, size_t index);
+    std::array<size_t, 5> neighbor_free_positions(size_t index);
     PieceType opponent_piece(PieceType type);
     bool is_mill(PieceType piece, size_t index);
     bool is_game_over();
@@ -41,7 +46,6 @@ private:
     unsigned int total_number_of_pieces(PieceType type);
 
     GamePosition position;
-    // std::vector<Move> moves;
     Move best_move;
     int evaluation = 0;
     unsigned int positions_calculated = 0;
