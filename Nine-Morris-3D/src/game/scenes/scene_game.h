@@ -15,17 +15,16 @@
 #include "game/game_context.h"
 #include "game/timer.h"
 
-class SceneGame : public Scene
-{
+class SceneGame : public Scene {
 public:
-    SceneGame(const std::string &name)
+    SceneGame(const std::string& name)
         : Scene(name) {}
     virtual ~SceneGame() = default;
 
-    SceneGame(const SceneGame &) = delete;
-    SceneGame &operator=(const SceneGame &) = delete;
-    SceneGame(SceneGame &&) = delete;
-    SceneGame &operator=(SceneGame &&) = delete;
+    SceneGame(const SceneGame&) = delete;
+    SceneGame& operator=(const SceneGame&) = delete;
+    SceneGame(SceneGame&&) = delete;
+    SceneGame& operator=(SceneGame&&) = delete;
 
     virtual void setup_and_add_model_pieces() = 0;
     virtual void setup_entities() = 0;
@@ -37,15 +36,15 @@ public:
     virtual void load_game() = 0;
     virtual void undo() = 0;
     virtual void redo() = 0;
-    virtual Board &get_board() = 0;
+    virtual Board& get_board() = 0;
     virtual size_t get_undo_size() = 0;
     virtual size_t get_redo_size() = 0;
 
     void setup_and_add_model_board();
     void setup_and_add_model_board_paint();
-    void setup_and_add_model_piece(size_t index, const glm::vec3 &position);
+    void setup_and_add_model_piece(size_t index, const glm::vec3& position);
     void setup_and_add_model_nodes();
-    void setup_and_add_model_node(size_t index, const glm::vec3 &position);
+    void setup_and_add_model_node(size_t index, const glm::vec3& position);
     void setup_piece_on_node(size_t index, size_t node_index);
     void setup_camera();
     void setup_and_add_turn_indicator();
@@ -80,7 +79,7 @@ public:
 
     // Game-related
     Camera camera;
-    PointCameraController camera_controller{&camera};
+    PointCameraController camera_controller {&camera};
     KeyboardControls keyboard;
     GameContext game;
     MinimaxThread minimax_thread;
@@ -110,6 +109,7 @@ public:
     void imgui_draw_rules_standard_game();
     void imgui_draw_rules_jump_variant();
     void imgui_draw_rules_jump_plus_variant();
+    void imgui_draw_ai_settings();
     void imgui_draw_debug();
 
     bool hovering_gui = false;
@@ -120,8 +120,8 @@ public:
     WindowImGui window = WindowImGui::None;
 
     void imgui_draw_game_over_message(std::string_view message1, std::string_view message2);
-    void imgui_draw_window(const char *title, const std::function<void()> &contents,
-                           const std::function<void()> &ok_callback = dummy::ProcFunc{});
+    void imgui_draw_window(const char* title, const std::function<void()>& contents,
+        const std::function<void()>& ok_callback = dummy::ProcFunc {});
     void imgui_initialize_options();
 
     std::string last_save_game_date = save_load::NO_LAST_GAME;
@@ -133,7 +133,7 @@ public:
 
 #ifndef NM3D_PLATFORM_RELEASE_DITRIBUTION
     static constexpr size_t FRAMES_SIZE = 100;
-    std::vector<float> frames = std::vector<float>{FRAMES_SIZE};
+    std::vector<float> frames = std::vector<float> {FRAMES_SIZE};
     size_t index = 0;
 #endif
 };

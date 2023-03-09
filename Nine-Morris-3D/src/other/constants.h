@@ -176,7 +176,8 @@ enum class WindowImGui {
     ShowGameOver,
     ShowRulesStandardGame,
     ShowRulesJumpVariant,
-    ShowRulesJumpPlusVariant
+    ShowRulesJumpPlusVariant,
+    ShowAiSettings
 };
 
 inline constexpr size_t NULL_INDEX = 100;

@@ -557,6 +557,9 @@ void SceneGame::update_all_imgui() {
         case WindowImGui::ShowRulesJumpPlusVariant:
             imgui_draw_rules_jump_plus_variant();
             break;
+        case WindowImGui::ShowAiSettings:
+            imgui_draw_ai_settings();
+            break;
     }
 
     if (show_info) {
@@ -776,11 +779,11 @@ void SceneGame::imgui_draw_menu_bar() {
                 can_undo = get_undo_size() > 0;
                 can_redo = get_redo_size() > 0;
             }
-            if (ImGui::MenuItem("Exit To Launcher", nullptr, false)) {
+            if (ImGui::MenuItem("Exit To Launcher")) {
                 app->running = false;
                 app->exit_code = 1;
             }
-            if (ImGui::MenuItem("Exit", nullptr, false)) {
+            if (ImGui::MenuItem("Exit")) {
                 app->running = false;
             }
 
@@ -860,6 +863,9 @@ void SceneGame::imgui_draw_menu_bar() {
 
                 ImGui::EndMenu();
                 HOVERING_GUI()
+            }
+            if (ImGui::MenuItem("A.I.")) {
+                window = WindowImGui::ShowAiSettings;
             }
             if (ImGui::MenuItem("Save On Exit", nullptr, &data.options.save_on_exit)) {
                 if (data.options.save_on_exit) {
@@ -957,24 +963,24 @@ void SceneGame::imgui_draw_menu_bar() {
             HOVERING_GUI()
         }
         if (ImGui::BeginMenu("Help")) {
-            if (ImGui::MenuItem("About", nullptr, false)) {
+            if (ImGui::MenuItem("About")) {
                 window = WindowImGui::ShowAbout;
             }
             if (ImGui::BeginMenu("Game Rules")) {
-                if (ImGui::MenuItem("Standard Game", nullptr, false)) {
+                if (ImGui::MenuItem("Standard Game")) {
                     window = WindowImGui::ShowRulesStandardGame;
                 }
-                if (ImGui::MenuItem("Jump Variant", nullptr, false)) {
+                if (ImGui::MenuItem("Jump Variant")) {
                     window = WindowImGui::ShowRulesJumpVariant;
                 }
-                if (ImGui::MenuItem("Jump Plus Variant", nullptr, false)) {
+                if (ImGui::MenuItem("Jump Plus Variant")) {
                     window = WindowImGui::ShowRulesJumpPlusVariant;
                 }
 
                 ImGui::EndMenu();
                 HOVERING_GUI()
             }
-            if (ImGui::MenuItem("Log Information", nullptr, false)) {
+            if (ImGui::MenuItem("Log Information")) {
                 logging::log_general_information(logging::LogTarget::File);
 
                 LOG_INFO("Logged OpenGL and dependencies information");
@@ -1080,30 +1086,42 @@ void SceneGame::imgui_draw_no_last_game() {
 
 void SceneGame::imgui_draw_rules_standard_game() {
     imgui_draw_window("Standard Game Rules", []() {
-        const char* rules = R"(Each player has nine pieces, either black or white.
+        const char* rules = (
+R"(Each player has nine pieces, either black or white.
 A player wins by reducing the opponent to two pieces, or by leaving them without a legal move.
 When a player remains with three pieces, they can jump on the board.
 A player may take a piece from a mill only if there are no other pieces available.
 The game ends with a tie when forty turns take place without any mill.
-The game ends with a tie when the exact same move happens for the third time.)";
+The game ends with a tie when the exact same move happens for the third time.)"
+        );
         ImGui::Text("%s", rules);
     });
 }
 
 void SceneGame::imgui_draw_rules_jump_variant() {
     imgui_draw_window("Jump Variant Rules", []() {
-        const char* rules = R"(Each player has only three pieces and can jump anywhere on the board.
+        const char* rules = (
+R"(Each player has only three pieces and can jump anywhere on the board.
 The first player to form a mill wins.
 The game ends with a tie when forty turns take place without any mill.
-The game ends with a tie when the exact same move happens for the third time.)";
+The game ends with a tie when the exact same move happens for the third time.)"
+        );
         ImGui::Text("%s", rules);
     });
 }
 
 void SceneGame::imgui_draw_rules_jump_plus_variant() {
     imgui_draw_window("Jump Plus Variant Rules", []() {
-        const char* rules = R"(Same rules as the jump variant, but each player has six pieces instead of three.)";
+        const char* rules = (
+            R"(Same rules as the jump variant, but each player has six pieces instead of three.)"
+        );
         ImGui::Text("%s", rules);
+    });
+}
+
+void SceneGame::imgui_draw_ai_settings() {
+    imgui_draw_window("A.I. Configuration", []() {
+        ImGui::Text("TODO this");
     });
 }
 
