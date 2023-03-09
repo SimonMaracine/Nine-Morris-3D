@@ -11,10 +11,15 @@ public:
 
     MinimaxStandardGame(const MinimaxStandardGame&) = default;
     MinimaxStandardGame& operator=(const MinimaxStandardGame&) = default;
-    MinimaxStandardGame(MinimaxStandardGame&&) = default;
-    MinimaxStandardGame& operator=(MinimaxStandardGame&&) = default;
+    MinimaxStandardGame(MinimaxStandardGame&&) noexcept = default;
+    MinimaxStandardGame& operator=(MinimaxStandardGame&&) noexcept = default;
 
     virtual void start(GamePosition position, PieceType piece, Move& result, std::atomic<bool>& running) override;
+
+    struct {
+        int PIECE = 7;
+        int FREEDOM = 1;
+    } parameters;
 private:
     int minimax(size_t depth, size_t turns_from_root, int alpha, int beta, PieceType type);
     void random_move(PieceType piece);  // TODO temporary

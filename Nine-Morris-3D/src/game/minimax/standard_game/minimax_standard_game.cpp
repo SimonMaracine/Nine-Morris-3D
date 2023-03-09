@@ -18,11 +18,11 @@
 static constexpr int MIN_EVALUATION_VALUE = INT_MIN;
 static constexpr int MAX_EVALUATION_VALUE = INT_MAX;
 
-namespace values {
-    static constexpr int PIECE = 7;
-    static constexpr int FREEDOM = 1;
-    // static constexpr int  = 10;
-}
+// namespace values {
+//     static constexpr int PIECE = 7;
+//     static constexpr int FREEDOM = 1;
+//     // static constexpr int  = 10;
+// }
 
 void MinimaxStandardGame::start(GamePosition position, PieceType piece, Move& result, std::atomic<bool>& running) {
     // Initialize variables
@@ -315,14 +315,14 @@ int MinimaxStandardGame::evaluate_position() {  // TODO also evaluate positions
     const unsigned int white_material = calculate_material(PieceType::White);
     const unsigned int black_material = calculate_material(PieceType::Black);
 
-    evaluation += white_material * values::PIECE;
-    evaluation -= black_material * values::PIECE;
+    evaluation += white_material * parameters.PIECE;
+    evaluation -= black_material * parameters.PIECE;
 
     const unsigned int white_freedom = calculate_freedom(PieceType::White);
     const unsigned int black_freedom = calculate_freedom(PieceType::Black);
 
-    evaluation += white_freedom * values::FREEDOM;
-    evaluation -= black_freedom * values::FREEDOM;
+    evaluation += white_freedom * parameters.FREEDOM;
+    evaluation -= black_freedom * parameters.FREEDOM;
 
     return evaluation;
 }

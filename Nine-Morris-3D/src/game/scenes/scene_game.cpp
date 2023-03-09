@@ -1120,9 +1120,7 @@ void SceneGame::imgui_draw_rules_jump_plus_variant() {
 }
 
 void SceneGame::imgui_draw_ai_settings() {
-    imgui_draw_window("A.I. Configuration", []() {
-        ImGui::Text("TODO this");
-    });
+    draw_ai_configuration_imgui();
 }
 
 void SceneGame::imgui_draw_debug() {

@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 
 option(NM3D_DISTRIBUTION "Build for distribution" OFF)
 
-set(ENGINE "nine-morris-3d-engine")
-set(GLAD_STB "glad-stb")
+set(ENGINE "nine_morris_3d_engine")
+set(GLAD_STB "glad_stb")
 set(IMGUI "imgui")
 
 # Use static linking everywhere possible

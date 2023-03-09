@@ -51,14 +51,12 @@ void StandardGameScene::on_start() {
 
     minimax_thread = MinimaxThread {&board};
 
-    minimax_algorithm = std::make_unique<MinimaxStandardGame>();
-
     game = GameContext {
         static_cast<GamePlayer>(data.options.white_player),
         static_cast<GamePlayer>(data.options.black_player),
         &board,
         &minimax_thread,
-        minimax_algorithm.get()
+        &minimax_algorithm
     };
 
     timer = Timer {app};
@@ -389,6 +387,13 @@ void StandardGameScene::draw_debug_imgui() {
     ImGui::Text("Not placed pieces: %u, %u", board.white_pieces_outside_count, board.black_pieces_outside_count);
     ImGui::Text("Can jump: %s, %s", board.can_jump[0] ? "true" : "false", board.can_jump[1] ? "true" : "false");
     ImGui::Text("Turns without mills: %u", board.turns_without_mills);
+}
+
+void StandardGameScene::draw_ai_configuration_imgui() {
+    imgui_draw_window("A.I. Configuration", [this]() {
+        ImGui::InputInt("Piece", &minimax_algorithm.parameters.PIECE);
+        ImGui::InputInt("Freedom", &minimax_algorithm.parameters.FREEDOM);
+    });
 }
 
 void StandardGameScene::update_menubar() {

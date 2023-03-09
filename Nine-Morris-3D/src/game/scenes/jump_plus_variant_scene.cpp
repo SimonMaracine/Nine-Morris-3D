@@ -49,8 +49,6 @@ void JumpPlusVariantScene::on_start() {
 
     minimax_thread = MinimaxThread {&board};
 
-    // FIXME minimax_algorithm
-
     game = GameContext {
         static_cast<GamePlayer>(data.options.white_player),
         static_cast<GamePlayer>(data.options.black_player),
@@ -397,6 +395,10 @@ void JumpPlusVariantScene::initialize_renderables() {
 
 void JumpPlusVariantScene::draw_debug_imgui() {
     ImGui::Text("Turns without mills: %u", board.turns_without_mills);
+}
+
+void JumpPlusVariantScene::draw_ai_configuration_imgui() {
+
 }
 
 void JumpPlusVariantScene::update_menubar() {

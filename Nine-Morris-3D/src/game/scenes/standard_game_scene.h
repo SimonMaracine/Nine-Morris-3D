@@ -5,6 +5,7 @@
 #include "game/entities/boards/standard_board.h"
 #include "game/entities/serialization/standard_board_serialized.h"
 #include "game/entities/board.h"
+#include "game/minimax/standard_game/minimax_standard_game.h"
 #include "game/scenes/scene_game.h"
 
 struct StandardGameScene : public SceneGame {
@@ -29,6 +30,7 @@ struct StandardGameScene : public SceneGame {
     virtual void initialize_renderables() override;
     virtual void initialize_pieces() override;
     virtual void draw_debug_imgui() override;
+    virtual void draw_ai_configuration_imgui() override;
     virtual void update_menubar() override;
     virtual void save_game() override;
     virtual void load_game() override;
@@ -40,4 +42,5 @@ struct StandardGameScene : public SceneGame {
 
     StandardBoard board;
     UndoRedoState<StandardBoardSerialized> undo_redo_state;
+    MinimaxStandardGame minimax_algorithm;
 };

@@ -31,6 +31,7 @@ public:
     virtual void initialize_renderables() = 0;
     virtual void initialize_pieces() = 0;
     virtual void draw_debug_imgui() = 0;
+    virtual void draw_ai_configuration_imgui() = 0;
     virtual void update_menubar() = 0;
     virtual void save_game() = 0;
     virtual void load_game() = 0;
@@ -84,7 +85,6 @@ public:
     GameContext game;
     MinimaxThread minimax_thread;
     Timer timer;
-    std::unique_ptr<MinimaxAlgorithm> minimax_algorithm;
 
     bool made_first_move = false;
     bool show_keyboard_controls = false;

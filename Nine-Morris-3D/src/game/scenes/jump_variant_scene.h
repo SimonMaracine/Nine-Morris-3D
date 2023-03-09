@@ -29,6 +29,7 @@ struct JumpVariantScene : public SceneGame {
     virtual void initialize_renderables() override;
     virtual void initialize_pieces() override;
     virtual void draw_debug_imgui() override;
+    virtual void draw_ai_configuration_imgui() override;
     virtual void update_menubar() override;
     virtual void save_game() override;
     virtual void load_game() override;
