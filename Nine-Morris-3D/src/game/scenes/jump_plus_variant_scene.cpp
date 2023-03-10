@@ -398,7 +398,7 @@ void JumpPlusVariantScene::draw_debug_imgui() {
 }
 
 void JumpPlusVariantScene::draw_ai_configuration_imgui() {
-
+    // TODO implement
 }
 
 void JumpPlusVariantScene::update_menubar() {

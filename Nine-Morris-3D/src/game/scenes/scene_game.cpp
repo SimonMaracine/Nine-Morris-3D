@@ -864,7 +864,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 ImGui::EndMenu();
                 HOVERING_GUI()
             }
-            if (ImGui::MenuItem("A.I.")) {
+            if (ImGui::MenuItem("Artificial Intelligence")) {
                 window = WindowImGui::ShowAiSettings;
             }
             if (ImGui::MenuItem("Save On Exit", nullptr, &data.options.save_on_exit)) {

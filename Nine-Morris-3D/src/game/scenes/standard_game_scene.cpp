@@ -390,9 +390,28 @@ void StandardGameScene::draw_debug_imgui() {
 }
 
 void StandardGameScene::draw_ai_configuration_imgui() {
-    imgui_draw_window("A.I. Configuration", [this]() {
-        ImGui::InputInt("Piece", &minimax_algorithm.parameters.PIECE);
-        ImGui::InputInt("Freedom", &minimax_algorithm.parameters.FREEDOM);
+    imgui_draw_window("Artificial Intelligence Configuration", [this]() {
+        int piece = minimax_algorithm.parameters.PIECE;
+        int freedom = minimax_algorithm.parameters.FREEDOM;
+        int depth = static_cast<int>(minimax_algorithm.parameters.DEPTH);
+
+        if (ImGui::InputInt("Piece", &piece)) {
+            if (piece >= 0 && piece <= 10) {
+                minimax_algorithm.parameters.PIECE = piece;
+            }
+        }
+
+        if (ImGui::InputInt("Freedom", &freedom)) {
+            if (freedom >= 0 && freedom <= 10) {
+                minimax_algorithm.parameters.FREEDOM = freedom;
+            }
+        }
+
+        if (ImGui::InputInt("Depth", &depth)) {
+            if (depth > 0 && depth <= 10) {
+                minimax_algorithm.parameters.DEPTH = static_cast<unsigned int>(depth);
+            }
+        }
     });
 }
 

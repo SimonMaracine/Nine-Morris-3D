@@ -18,12 +18,6 @@
 static constexpr int MIN_EVALUATION_VALUE = INT_MIN;
 static constexpr int MAX_EVALUATION_VALUE = INT_MAX;
 
-// namespace values {
-//     static constexpr int PIECE = 7;
-//     static constexpr int FREEDOM = 1;
-//     // static constexpr int  = 10;
-// }
-
 void MinimaxStandardGame::start(GamePosition position, PieceType piece, Move& result, std::atomic<bool>& running) {
     // Initialize variables
     this->position = position;
@@ -32,13 +26,13 @@ void MinimaxStandardGame::start(GamePosition position, PieceType piece, Move& re
     positions_calculated = 0;
 
     auto start = std::chrono::high_resolution_clock::now();
-    evaluation = minimax(depth, 0, MIN_EVALUATION_VALUE, MAX_EVALUATION_VALUE, piece);
+    evaluation = minimax(parameters.DEPTH, 0, MIN_EVALUATION_VALUE, MAX_EVALUATION_VALUE, piece);
     auto end = std::chrono::high_resolution_clock::now();
 
     LOG_DIST_INFO("Time: {:.3f}", std::chrono::duration<double>(end - start).count());
     LOG_DIST_INFO("Evaluation: {}", evaluation);
     LOG_DIST_INFO("Positions evaluated: {:L}", positions_calculated);
-    LOG_DIST_INFO("Depth: {}", depth);
+    LOG_DIST_INFO("Depth: {}", parameters.DEPTH);
 
     result = best_move;
 

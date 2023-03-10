@@ -19,6 +19,7 @@ public:
     struct {
         int PIECE = 7;
         int FREEDOM = 1;
+        unsigned int DEPTH = 5;
     } parameters;
 private:
     int minimax(size_t depth, size_t turns_from_root, int alpha, int beta, PieceType type);
@@ -54,5 +55,4 @@ private:
     Move best_move;
     int evaluation = 0;
     unsigned int positions_calculated = 0;
-    unsigned int depth = 5;
 };
