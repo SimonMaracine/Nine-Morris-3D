@@ -6,12 +6,15 @@ namespace input {
     enum class Key;
     enum class MouseButton;
 
-    void initialize(GLFWwindow* window);
+    void initialize(GLFWwindow* window_handle);
     bool is_key_pressed(Key key);
     bool is_mouse_button_pressed(MouseButton button);
     float get_mouse_x();
     float get_mouse_y();
     std::pair<float, float> get_mouse();
+
+    Key key_from_code(int code);
+    MouseButton mouse_button_from_code(int code);
 
     enum class Key {
         Unknown =             -1,

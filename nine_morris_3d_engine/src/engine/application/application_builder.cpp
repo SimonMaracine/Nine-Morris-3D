@@ -57,8 +57,8 @@ ApplicationBuilder& ApplicationBuilder::with_renderer(Renderer renderer) {
         case Renderer::Renderer2D:
             renderer_2d = true;
             break;
-        case Renderer::RendererImGui:
-            renderer_imgui = true;
+        case Renderer::RendererDearImGui:
+            renderer_dear_imgui = true;
             break;
     }
 

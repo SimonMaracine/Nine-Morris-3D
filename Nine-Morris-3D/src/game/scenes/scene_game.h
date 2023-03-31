@@ -96,7 +96,7 @@ public:
     bool show_wait_indicator = false;
     bool show_computer_thinking_indicator = false;
 
-    // ImGui-related
+    // Dear ImGui-related
     void imgui_initialize();
     void imgui_reset();
 
@@ -112,7 +112,6 @@ public:
     void imgui_draw_ai_settings();
     void imgui_draw_debug();
 
-    bool hovering_gui = false;
     bool can_undo = false;
     bool can_redo = false;
     bool show_info = false;

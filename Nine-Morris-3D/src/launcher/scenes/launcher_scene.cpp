@@ -286,7 +286,7 @@ void LauncherScene::on_start() {
     style.GrabMinSize = 12;
     style.FramePadding = ImVec2(5.0f, 4.0f);
 
-    // Setup ImGui fonts
+    // Setup Dear ImGui fonts
     ImFontGlyphRangesBuilder builder;
     builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
     builder.AddText(u8"ă");

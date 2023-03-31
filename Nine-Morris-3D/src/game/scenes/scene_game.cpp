@@ -12,9 +12,6 @@
 #include "other/constants.h"
 #include "other/data.h"
 
-#define RESET_HOVERING_GUI() hovering_gui = false;
-#define HOVERING_GUI() hovering_gui = true;
-
 void SceneGame::setup_and_add_model_board() {
     auto& board = get_board();
 
@@ -593,14 +590,9 @@ void SceneGame::set_board_paint_texture() {
 
 void SceneGame::imgui_initialize() {
     ImGuiIO& io = ImGui::GetIO();
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigWindowsResizeFromEdges = false;
-    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
-    io.IniFilename = nullptr;
-#endif
+
     window_flags |= ImGuiWindowFlags_NoResize;
     window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
     window_flags |= ImGuiWindowFlags_NoCollapse;
@@ -643,7 +635,6 @@ void SceneGame::imgui_initialize() {
 }
 
 void SceneGame::imgui_reset() {
-    hovering_gui = false;
     can_undo = false;
     can_redo = false;
     show_info = false;
@@ -651,8 +642,6 @@ void SceneGame::imgui_reset() {
 }
 
 void SceneGame::imgui_draw_menu_bar() {
-    RESET_HOVERING_GUI();
-
     auto& data = app->user_data<Data>();
 
     if (ImGui::BeginMainMenuBar()) {
@@ -714,7 +703,6 @@ void SceneGame::imgui_draw_menu_bar() {
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI()
             }
             if (ImGui::BeginMenu("Players", can_change)) {
                 if (ImGui::BeginMenu("White")) {
@@ -738,7 +726,6 @@ void SceneGame::imgui_draw_menu_bar() {
                     }
 
                     ImGui::EndMenu();
-                    HOVERING_GUI()
                 }
                 if (ImGui::BeginMenu("Black")) {
                     if (ImGui::RadioButton("Human", &data.options.black_player, game_options::HUMAN)) {
@@ -761,11 +748,9 @@ void SceneGame::imgui_draw_menu_bar() {
                     }
 
                     ImGui::EndMenu();
-                    HOVERING_GUI()
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI()
             }
             if (ImGui::MenuItem("Undo", nullptr, false, can_undo && can_undo_redo)) {
                 undo();
@@ -788,7 +773,6 @@ void SceneGame::imgui_draw_menu_bar() {
             }
 
             ImGui::EndMenu();
-            HOVERING_GUI()
         }
         if (ImGui::BeginMenu("Options")) {
             if (ImGui::BeginMenu("Graphics")) {
@@ -820,7 +804,6 @@ void SceneGame::imgui_draw_menu_bar() {
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI()
             }
             if (ImGui::BeginMenu("Audio")) {
                 if (ImGui::BeginMenu("Master Volume")) {
@@ -833,7 +816,6 @@ void SceneGame::imgui_draw_menu_bar() {
                     ImGui::PopItemWidth();
 
                     ImGui::EndMenu();
-                    HOVERING_GUI()
                 }
                 if (ImGui::BeginMenu("Music Volume")) {
                     ImGui::PushItemWidth(100.0f);
@@ -845,7 +827,6 @@ void SceneGame::imgui_draw_menu_bar() {
                     ImGui::PopItemWidth();
 
                     ImGui::EndMenu();
-                    HOVERING_GUI()
                 }
                 if (ImGui::MenuItem("Enable Music", nullptr, &data.options.enable_music)) {
                     if (data.options.enable_music) {
@@ -862,7 +843,6 @@ void SceneGame::imgui_draw_menu_bar() {
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI()
             }
             if (ImGui::MenuItem("Artificial Intelligence")) {
                 window = WindowImGui::ShowAiSettings;
@@ -907,7 +887,6 @@ void SceneGame::imgui_draw_menu_bar() {
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI()
             }
             if (ImGui::MenuItem("Show Information", nullptr, &show_info)) {
                 if (show_info) {
@@ -926,7 +905,6 @@ void SceneGame::imgui_draw_menu_bar() {
                 ImGui::PopItemWidth();
 
                 ImGui::EndMenu();
-                HOVERING_GUI()
             }
             if (ImGui::BeginMenu("User Interface")) {
                 if (ImGui::MenuItem("Hide Timer", nullptr, &data.options.hide_timer)) {
@@ -944,7 +922,6 @@ void SceneGame::imgui_draw_menu_bar() {
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI()
             }
             if (ImGui::MenuItem("Labeled Board", nullptr, &data.imgui_option.labeled_board)) {
                 if (data.imgui_option.labeled_board != data.options.labeled_board) {
@@ -960,7 +937,6 @@ void SceneGame::imgui_draw_menu_bar() {
             }
 
             ImGui::EndMenu();
-            HOVERING_GUI()
         }
         if (ImGui::BeginMenu("Help")) {
             if (ImGui::MenuItem("About")) {
@@ -978,7 +954,6 @@ void SceneGame::imgui_draw_menu_bar() {
                 }
 
                 ImGui::EndMenu();
-                HOVERING_GUI()
             }
             if (ImGui::MenuItem("Log Information")) {
                 logging::log_general_information(logging::LogTarget::File);
@@ -990,7 +965,6 @@ void SceneGame::imgui_draw_menu_bar() {
             }
 
             ImGui::EndMenu();
-            HOVERING_GUI()
         }
 
         ImGui::EndMainMenuBar();
@@ -1327,7 +1301,6 @@ void SceneGame::imgui_draw_window(const char* title, const std::function<void()>
         ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         ImGui::EndPopup();
-        HOVERING_GUI()
     }
     ImGui::PopFont();
 }

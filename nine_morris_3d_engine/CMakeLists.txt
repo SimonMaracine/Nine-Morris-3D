@@ -4,7 +4,7 @@ option(NM3D_DISTRIBUTION "Build for distribution" OFF)
 
 set(ENGINE "nine_morris_3d_engine")
 set(GLAD_STB "glad_stb")
-set(IMGUI "imgui")
+set(DEAR_IMGUI "dear_imgui")
 
 # Use static linking everywhere possible
 set(BUILD_SHARED_LIBS OFF)
@@ -61,6 +61,7 @@ set(ENGINE_HEADERS
     "src/engine/audio/context.h"
     "src/engine/audio/music.h"
     "src/engine/audio/sound_data.h"
+    "src/engine/dear_imgui/imgui_context.h"
     "src/engine/graphics/opengl/buffer.h"
     "src/engine/graphics/opengl/framebuffer.h"
     "src/engine/graphics/opengl/info_and_debug.h"
@@ -75,7 +76,6 @@ set(ENGINE_HEADERS
     "src/engine/graphics/framebuffer_reader.h"
     "src/engine/graphics/gui.h"
     "src/engine/graphics/identifier.h"
-    "src/engine/graphics/imgui_context.h"
     "src/engine/graphics/light.h"
     "src/engine/graphics/material.h"
     "src/engine/graphics/post_processing.h"
@@ -119,6 +119,7 @@ add_library(${ENGINE} STATIC
     "src/engine/audio/context.cpp"
     "src/engine/audio/music.cpp"
     "src/engine/audio/sound_data.cpp"
+    "src/engine/dear_imgui/imgui_context.cpp"
     "src/engine/graphics/opengl/buffer.cpp"
     "src/engine/graphics/opengl/framebuffer.cpp"
     "src/engine/graphics/opengl/info_and_debug.cpp"
@@ -132,7 +133,6 @@ add_library(${ENGINE} STATIC
     "src/engine/graphics/font.cpp"
     "src/engine/graphics/gui.cpp"
     "src/engine/graphics/identifier.cpp"
-    "src/engine/graphics/imgui_context.cpp"
     "src/engine/graphics/material.cpp"
     "src/engine/graphics/texture_data.cpp"
     "src/engine/graphics/vertex_buffer_layout.cpp"
@@ -187,8 +187,8 @@ add_library(${GLAD_STB} STATIC
     "dependencies/stb_vorbis/stb_vorbis.c"
 )
 
-# Make dependency target ImGui
-add_library(${IMGUI} STATIC
+# Make dependency target Dear ImGui
+add_library(${DEAR_IMGUI} STATIC
     "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_demo.cpp"
     "extern/imgui/imgui_tables.cpp"
@@ -235,7 +235,7 @@ target_include_directories(${GLAD_STB} SYSTEM PUBLIC
     "dependencies/stb_image_write"
 )
 
-target_include_directories(${IMGUI} SYSTEM PUBLIC
+target_include_directories(${DEAR_IMGUI} SYSTEM PUBLIC
     "extern/imgui"
     "extern/glfw/include"
 )
@@ -251,7 +251,7 @@ target_link_libraries(${ENGINE} PRIVATE
 
 target_link_libraries(${ENGINE} PUBLIC
     spdlog
-    ${IMGUI}
+    ${DEAR_IMGUI}
 )
 
 # Add compile definitions
@@ -301,12 +301,12 @@ target_compile_definitions(${ENGINE} PUBLIC
 # On Windows set runtime library
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET
-        ${ENGINE} ${GLAD_STB} ${IMGUI} spdlog assimp glfw cppblowfish OpenAL
+        ${ENGINE} ${GLAD_STB} ${DEAR_IMGUI} spdlog assimp glfw cppblowfish OpenAL
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug"
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     set_property(TARGET
-        ${ENGINE} ${GLAD_STB} ${IMGUI} spdlog assimp glfw cppblowfish OpenAL
+        ${ENGINE} ${GLAD_STB} ${DEAR_IMGUI} spdlog assimp glfw cppblowfish OpenAL
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded"
     )
 endif()

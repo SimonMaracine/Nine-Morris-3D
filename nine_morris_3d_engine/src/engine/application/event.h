@@ -56,6 +56,8 @@ void EventDispatcher::enqueue(Args&&... args) {
     dispatcher.template enqueue<E>(std::forward<Args>(args)...);
 }
 
+// TODO print events
+
 struct WindowClosedEvent {};
 
 struct WindowResizedEvent {

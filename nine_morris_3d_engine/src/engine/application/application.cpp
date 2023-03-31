@@ -11,7 +11,7 @@
 #include "engine/graphics/renderer/render_helpers.h"
 #include "engine/graphics/renderer/gui_renderer.h"
 #include "engine/graphics/opengl/info_and_debug.h"
-#include "engine/graphics/imgui_context.h"
+#include "engine/dear_imgui/imgui_context.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
@@ -58,8 +58,8 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 
     window = std::make_unique<Window>(this);
 
-    if (builder.renderer_imgui) {
-        initialize_renderer_imgui();
+    if (builder.renderer_dear_imgui) {
+        initialize_renderer_dear_imgui();
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
@@ -100,7 +100,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 Application::~Application() {  // Destructor is called before all member variables
     user_stop();
 
-    if (builder.renderer_imgui) {
+    if (builder.renderer_dear_imgui) {
         imgui_context::uninitialize();
     }
 
@@ -130,7 +130,7 @@ int Application::run(SceneId start_scene_id) {
 
         renderer_3d_update();
         renderer_2d_update();
-        renderer_imgui_update();
+        renderer_dear_imgui_update();
 
         window->update();
         evt.update();
@@ -300,17 +300,12 @@ void Application::initialize_renderer_2d() {
     renderer_2d_update = std::bind(&Application::renderer_2d_func, this);
 }
 
-void Application::initialize_renderer_imgui() {
-    LOG_INFO("With renderer ImGui");
+void Application::initialize_renderer_dear_imgui() {
+    LOG_INFO("With renderer Dear ImGui");
 
-    imgui_context::initialize(window);
+    imgui_context::initialize(window->get_handle());
 
-    renderer_imgui_update = std::bind(&Application::renderer_imgui_func, this);
-
-    evt.connect<MouseScrolledEvent, &Application::on_imgui_mouse_scrolled>(this);
-    evt.connect<MouseMovedEvent, &Application::on_imgui_mouse_moved>(this);
-    evt.connect<MouseButtonPressedEvent, &Application::on_imgui_mouse_button_pressed>(this);
-    evt.connect<MouseButtonReleasedEvent, &Application::on_imgui_mouse_button_released>(this);
+    renderer_dear_imgui_update = std::bind(&Application::renderer_imgui_func, this);
 }
 
 void Application::initialize_audio() {
@@ -343,24 +338,4 @@ void Application::on_window_resized(const WindowResizedEvent& event) {
 
         fb->resize(event.width, event.height);
     }
-}
-
-void Application::on_imgui_mouse_scrolled(const MouseScrolledEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseWheel = event.scroll;
-}
-
-void Application::on_imgui_mouse_moved(const MouseMovedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MousePos = ImVec2(event.mouse_x, event.mouse_y);
-}
-
-void Application::on_imgui_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[static_cast<int>(event.button)] = true;
-}
-
-void Application::on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[static_cast<int>(event.button)] = false;
 }

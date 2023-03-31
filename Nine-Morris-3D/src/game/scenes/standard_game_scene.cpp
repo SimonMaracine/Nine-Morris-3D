@@ -136,16 +136,13 @@ void StandardGameScene::on_awake() {
 }
 
 void StandardGameScene::on_update() {
-    if (!hovering_gui) {
-        camera_controller.update_controls(app->get_delta());
-        board.update_nodes(app->renderer->get_hovered_id());
-        board.update_pieces(app->renderer->get_hovered_id());
-    } else {
-        camera_controller.discard_events(app);
-    }
-
+    camera_controller.update_controls(app->get_delta());
     camera_controller.update_camera(app->get_delta());
+
+    board.update_nodes(app->renderer->get_hovered_id());
+    board.update_pieces(app->renderer->get_hovered_id());
     board.move_pieces();
+
     timer.update();
 
     // Update listener position, look at and up vectors every frame
@@ -169,10 +166,6 @@ void StandardGameScene::on_imgui_update() {
 }
 
 void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
-
     if (event.button == input::MouseButton::Left) {
         if (board.next_move && board.phase != BoardPhase::None) {
             board.click(app->renderer->get_hovered_id());
@@ -181,10 +174,6 @@ void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& e
 }
 
 void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
-
     if (event.button == input::MouseButton::Left) {
         const bool valid_phases = (
             board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
@@ -206,10 +195,6 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
 }
 
 void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
-
     switch (event.key) {
         case input::Key::Up:
         case input::Key::Down:
@@ -277,10 +262,6 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
 }
 
 void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
-
     if (event.key == input::Key::Space) {
         camera_controller.go_towards_position(default_camera_position);
     }
@@ -390,7 +371,7 @@ void StandardGameScene::draw_debug_imgui() {
 }
 
 void StandardGameScene::draw_ai_configuration_imgui() {
-    imgui_draw_window("Artificial Intelligence Configuration", [this]() {
+    imgui_draw_window("Artificial Intelligence Configuration", [this]() {  // TODO rename
         int piece = minimax_algorithm.parameters.PIECE;
         int freedom = minimax_algorithm.parameters.FREEDOM;
         int depth = static_cast<int>(minimax_algorithm.parameters.DEPTH);

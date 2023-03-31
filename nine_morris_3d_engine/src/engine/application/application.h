@@ -79,16 +79,11 @@ private:
     void user_stop();
     void initialize_renderer_3d();
     void initialize_renderer_2d();
-    void initialize_renderer_imgui();
+    void initialize_renderer_dear_imgui();
     void initialize_audio();
 
     void on_window_closed(const WindowClosedEvent&);
     void on_window_resized(const WindowResizedEvent& event);
-
-    void on_imgui_mouse_scrolled(const MouseScrolledEvent& event);
-    void on_imgui_mouse_moved(const MouseMovedEvent& event);
-    void on_imgui_mouse_button_pressed(const MouseButtonPressedEvent& event);
-    void on_imgui_mouse_button_released(const MouseButtonReleasedEvent& event);
 
     ApplicationBuilder builder;
     std::any* _user_data = nullptr;
@@ -109,7 +104,7 @@ private:
     // Data for modular rendering
     RendererFunc renderer_3d_update = dummy::ProcFunc {};
     RendererFunc renderer_2d_update = dummy::ProcFunc {};
-    RendererFunc renderer_imgui_update = dummy::ProcFunc {};
+    RendererFunc renderer_dear_imgui_update = dummy::ProcFunc {};
 
     // Keep track of all framebuffers to resize them, if needed
     std::vector<std::weak_ptr<gl::Framebuffer>> framebuffers;

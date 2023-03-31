@@ -24,7 +24,7 @@
  *
  * NM3D_PLATFORM_DEBUG
  * NM3D_PLATFORM_RELEASE
- * NM3D_PLATFORM_RELEASE_DISTRIBUTION
+ * NM3D_PLATFORM_RELEASE_DISTRIBUTION  // TODO rename/refactor
  */
 #ifdef NM3D_OPTIMIZED  // Defined in CMake
     #ifdef NM3D_DISTRIBUTION  // Defined in CMake
@@ -33,5 +33,5 @@
         #define NM3D_PLATFORM_RELEASE  // Compiled with optimization, but with debug code
     #endif
 #else
-    #define NM3D_PLATFORM_DEBUG  // Compiled without optimization + additional debug code
+    #define NM3D_PLATFORM_DEBUG  // Compiled without optimization and additional debug code
 #endif

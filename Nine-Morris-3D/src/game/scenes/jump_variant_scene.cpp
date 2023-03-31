@@ -134,16 +134,13 @@ void JumpVariantScene::on_awake() {
 }
 
 void JumpVariantScene::on_update() {
-    if (!hovering_gui) {
-        camera_controller.update_controls(app->get_delta());
-        board.update_nodes(app->renderer->get_hovered_id());
-        board.update_pieces(app->renderer->get_hovered_id());
-    } else {
-        camera_controller.discard_events(app);
-    }
-
+    camera_controller.update_controls(app->get_delta());
     camera_controller.update_camera(app->get_delta());
+
+    board.update_nodes(app->renderer->get_hovered_id());
+    board.update_pieces(app->renderer->get_hovered_id());
     board.move_pieces();
+
     timer.update();
 
     // Update listener position, look at and up vectors every frame
@@ -167,10 +164,6 @@ void JumpVariantScene::on_imgui_update() {
 }
 
 void JumpVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
-
     if (event.button == input::MouseButton::Left) {
         if (board.next_move && board.phase != BoardPhase::None) {
             board.click(app->renderer->get_hovered_id());
@@ -179,10 +172,6 @@ void JumpVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& ev
 }
 
 void JumpVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
-
     if (event.button == input::MouseButton::Left) {
         const bool valid_phases = board.phase == BoardPhase::MovePieces;
 
@@ -202,10 +191,6 @@ void JumpVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& 
 }
 
 void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
-
     switch (event.key) {
         case input::Key::Up:
         case input::Key::Down:
@@ -271,10 +256,6 @@ void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
 }
 
 void JumpVariantScene::on_key_released(const KeyReleasedEvent& event) {
-    if (hovering_gui) {
-        return;
-    }
-
     if (event.key == input::Key::Space) {
         camera_controller.go_towards_position(default_camera_position);
     }

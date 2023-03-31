@@ -45,7 +45,7 @@ void application_main() {
             .version(MAJOR, MINOR, PATCH)
             .authors(AUTHORS)
             .encrypt_key(KEY)
-            .with_renderer(ApplicationBuilder::RendererImGui)
+            .with_renderer(ApplicationBuilder::RendererDearImGui)
             .with_renderer(ApplicationBuilder::Renderer2D);
 
         auto global_data = std::make_any<Data>();
@@ -72,7 +72,7 @@ void application_main() {
             .encrypt_key(KEY)
             .with_renderer(ApplicationBuilder::Renderer3D)
             .with_renderer(ApplicationBuilder::Renderer2D)
-            .with_renderer(ApplicationBuilder::RendererImGui)
+            .with_renderer(ApplicationBuilder::RendererDearImGui)
             .with_audio();
 
         auto game = Application {game_builder, global_data, game::start, game::stop};

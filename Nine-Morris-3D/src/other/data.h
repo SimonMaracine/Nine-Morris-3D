@@ -22,7 +22,7 @@ struct Data {
 
     std::shared_ptr<music::MusicTrack> current_music_track;
 
-    // Some ImGui widget options for radio buttons
+    // Some Dear ImGui widget options for radio buttons
     struct {
         int skybox = 0;
         bool labeled_board = false;

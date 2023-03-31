@@ -8,7 +8,7 @@ public:
     enum Renderer {
         Renderer3D,
         Renderer2D,
-        RendererImGui
+        RendererDearImGui
     };
 
     ApplicationBuilder& display(int width, int height, std::string_view title = "Nine Morris 3D Engine");
@@ -29,7 +29,7 @@ private:
     bool resizable = true;
     int min_width = -1;
     int min_height = -1;
-    std::string app_name = "NineMorris3DEngineExampleApp";
+    std::string app_name = "NineMorris3DEngineExample";
     unsigned int major = 0;
     unsigned int minor = 1;
     unsigned int patch = 0;
@@ -37,8 +37,9 @@ private:
     std::string encryption_key = "Nine Morris 3D Engine";
     bool renderer_3d = false;
     bool renderer_2d = false;
-    bool renderer_imgui = false;
+    bool renderer_dear_imgui = false;
     bool audio = false;
 
     friend class Application;
+    friend class Window;
 };
