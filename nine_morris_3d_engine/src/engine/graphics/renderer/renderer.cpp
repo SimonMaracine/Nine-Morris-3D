@@ -4,7 +4,7 @@
 
 #include "engine/application/application.h"
 #include "engine/application/platform.h"
-#include "engine/application/event.h"
+#include "engine/application/events.h"
 #include "engine/application/input.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
@@ -29,7 +29,7 @@ static constexpr int SHADOW_MAP_UNIT = 2;
 static constexpr glm::vec3 CLEAR_COLOR = { 0.1f, 0.1f, 0.1f };
 static constexpr int BOUNDING_BOX_DIVISOR = 4;
 
-Renderer::Renderer(Application* app)
+Renderer::Renderer(Ctx* ctx)
     : app(app) {
     render_helpers::clear_color(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b);
     render_helpers::enable_depth_test();
@@ -48,7 +48,7 @@ Renderer::Renderer(Application* app)
 
     framebuffer_reader = FramebufferReader<4> {storage.pixel_buffers, storage.bounding_box_framebuffer};
 
-    app->evt.connect<WindowResizedEvent, &Renderer::on_window_resized>(this);
+    ctx->evt.connect<WindowResizedEvent, &Renderer::on_window_resized>(this);
 
     LOG_INFO("Initialized renderer");
 }
@@ -103,7 +103,7 @@ void Renderer::render(const SceneList& scene) {
 
     // Blit the resulted scene texture to an intermediate texture, resolving anti-aliasing
     storage.scene_framebuffer->blit(
-        storage.intermediate_framebuffer.get(), app->data().width, app->data().height
+        storage.intermediate_framebuffer.get(), ctx->data().width, ctx->data().height
     );
 
     storage.bounding_box_framebuffer->bind();
@@ -117,7 +117,7 @@ void Renderer::render(const SceneList& scene) {
     // Read the texture for mouse picking
     const auto [mouse_x, mouse_y] = input::get_mouse();
     const int x = static_cast<int>(mouse_x) / BOUNDING_BOX_DIVISOR;
-    const int y = (app->data().height - static_cast<int>(mouse_y)) / BOUNDING_BOX_DIVISOR;
+    const int y = (ctx->data().height - static_cast<int>(mouse_y)) / BOUNDING_BOX_DIVISOR;
     framebuffer_reader.read(0, x, y);
 
     storage.intermediate_framebuffer->bind();
@@ -143,8 +143,8 @@ void Renderer::set_scene_framebuffer(int samples) {
     ASSERT(samples > 0, "Samples must be greater than 0");
 
     gl::FramebufferSpecification specification;
-    specification.width = app->data().width;
-    specification.height = app->data().height;
+    specification.width = ctx->data().width;
+    specification.height = ctx->data().height;
     specification.samples = samples;
     specification.color_attachments = {
         gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Renderbuffer}
@@ -155,8 +155,8 @@ void Renderer::set_scene_framebuffer(int samples) {
 
     storage.scene_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
-    app->purge_framebuffers();
-    app->add_framebuffer(storage.scene_framebuffer);
+    ctx->purge_framebuffers();
+    ctx->add_framebuffer(storage.scene_framebuffer);
 }
 
 void Renderer::set_shadow_map_framebuffer(int size) {
@@ -173,8 +173,8 @@ void Renderer::set_shadow_map_framebuffer(int size) {
 
     storage.shadow_map_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
-    app->purge_framebuffers();
-    app->add_framebuffer(storage.shadow_map_framebuffer);
+    ctx->purge_framebuffers();
+    ctx->add_framebuffer(storage.shadow_map_framebuffer);
 }
 
 void Renderer::set_skybox(std::shared_ptr<gl::Texture3D> texture) {
@@ -217,7 +217,7 @@ void Renderer::post_processing() {
 
         step->render(post_processing_context);
 
-        render_helpers::viewport(app->data().width, app->data().height);
+        render_helpers::viewport(ctx->data().width, ctx->data().height);
 
         post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
         post_processing_context.textures.push_back(post_processing_context.last_texture);
@@ -542,7 +542,7 @@ void Renderer::setup_uniform_buffers() {
 }
 
 void Renderer::validate_hovered_id(int x, int y) {
-    if (x > app->data().width || x < 0 || y > app->data().height || y < 0) {
+    if (x > ctx->data().width || x < 0 || y > ctx->data().height || y < 0) {
         hovered_id = identifier::null;
     }
 }
@@ -801,22 +801,22 @@ void Renderer::initialize_origin_renderer() {
 void Renderer::initialize_framebuffers() {
     {
         gl::FramebufferSpecification specification;
-        specification.width = app->data().width;
-        specification.height = app->data().height;
+        specification.width = ctx->data().width;
+        specification.height = ctx->data().height;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
         };
 
         storage.intermediate_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
-        app->purge_framebuffers();
-        app->add_framebuffer(storage.intermediate_framebuffer);
+        ctx->purge_framebuffers();
+        ctx->add_framebuffer(storage.intermediate_framebuffer);
     }
 
     {
         gl::FramebufferSpecification specification;
-        specification.width = app->data().width / BOUNDING_BOX_DIVISOR;
-        specification.height = app->data().height / BOUNDING_BOX_DIVISOR;
+        specification.width = ctx->data().width / BOUNDING_BOX_DIVISOR;
+        specification.height = ctx->data().height / BOUNDING_BOX_DIVISOR;
         specification.resize_divisor = BOUNDING_BOX_DIVISOR;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::RedFloat, gl::AttachmentType::Renderbuffer}
@@ -830,8 +830,8 @@ void Renderer::initialize_framebuffers() {
 
         storage.bounding_box_framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
-        app->purge_framebuffers();
-        app->add_framebuffer(storage.bounding_box_framebuffer);
+        ctx->purge_framebuffers();
+        ctx->add_framebuffer(storage.bounding_box_framebuffer);
     }
 }
 

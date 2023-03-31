@@ -217,7 +217,7 @@ void JumpBoard::to_serialized(JumpBoardSerialized& serialized) {
 }
 
 void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     for (size_t i = 0; i < MAX_NODES; i++) {
         nodes.at(i).index = serialized.nodes.at(i).index;
@@ -243,22 +243,22 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
                 ser_index,
                 ser_piece.type,
                 scene->objects.get<renderables::Model>(hs("piece" + std::to_string(ser_index))),
-                app->res.al_source[hs("piece" + std::to_string(ser_index))]
+                ctx->res.al_source[hs("piece" + std::to_string(ser_index))]
             };
 
             piece.model->position = ser_piece.position;
             piece.model->rotation = ser_piece.rotation;
             const char* piece_tag = piece.type == PieceType::White ? "white_piece" : "black_piece";
-            piece.model->vertex_array = app->res.vertex_array[hs(piece_tag + std::to_string(ser_index))];
+            piece.model->vertex_array = ctx->res.vertex_array[hs(piece_tag + std::to_string(ser_index))];
             piece.model->index_buffer = (
                 ser_piece.type == PieceType::White
                     ?
-                    app->res.index_buffer["white_piece"_H]
+                    ctx->res.index_buffer["white_piece"_H]
                     :
-                    app->res.index_buffer["black_piece"_H]
+                    ctx->res.index_buffer["black_piece"_H]
             );
             piece.model->scale = WORLD_SCALE;
-            piece.model->material = app->res.material_instance[hs("piece" + std::to_string(ser_index))];
+            piece.model->material = ctx->res.material_instance[hs("piece" + std::to_string(ser_index))];
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
             piece.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
             piece.model->bounding_box->id = data.piece_ids[ser_index];

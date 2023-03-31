@@ -14,7 +14,7 @@ static constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Right, KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down }
 };
 
-KeyboardControls::KeyboardControls(Application* app, Board* board, renderables::Quad* quad)
+KeyboardControls::KeyboardControls(Ctx* ctx, Board* board, renderables::Quad* quad)
     : board(board), quad(quad) {
 
     for (size_t i = 0; i < 24; i++) {
@@ -26,9 +26,9 @@ KeyboardControls::KeyboardControls(Application* app, Board* board, renderables::
     quad->texture = (
         board->must_take_piece
             ?
-            app->res.texture["keyboard_controls_cross"_H]
+            ctx->res.texture["keyboard_controls_cross"_H]
             :
-            app->res.texture["keyboard_controls_default"_H]
+            ctx->res.texture["keyboard_controls_default"_H]
     );
 }
 

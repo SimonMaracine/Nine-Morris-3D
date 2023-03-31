@@ -3,7 +3,7 @@
 #include <resmanager/resmanager.h>
 
 #include "engine/application/application.h"
-#include "engine/application/event.h"
+#include "engine/application/events.h"
 #include "engine/application/capabilities.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/vertex_array.h"
@@ -28,11 +28,11 @@ static float map(float x, float in_min, float in_max, float out_min, float out_m
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-GuiRenderer::GuiRenderer(Application* app)
+GuiRenderer::GuiRenderer(Ctx* ctx)
     : app(app) {
     storage.orthographic_projection_matrix = glm::ortho(
-        0.0f, static_cast<float>(app->data().width),
-        0.0f, static_cast<float>(app->data().height)
+        0.0f, static_cast<float>(ctx->data().width),
+        0.0f, static_cast<float>(ctx->data().height)
     );
 
     initialize_uniform_buffers();
@@ -40,7 +40,7 @@ GuiRenderer::GuiRenderer(Application* app)
     initialize_text_renderer();
     initialize_projection_uniform_buffer();
 
-    app->evt.connect<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);
+    ctx->evt.connect<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);
 
     // Set application pointer to widgets
     gui::Widget::app = app;
@@ -78,15 +78,15 @@ void GuiRenderer::render(const SceneList& scene) {
 }
 
 void GuiRenderer::quad_center(float& width, float& height, float& x_pos, float& y_pos) {
-    if (static_cast<float>(app->data().width) / app->data().height > 16.0f / 9.0f) {
-        width = app->data().width;
-        height = app->data().width * (9.0f / 16.0f);
+    if (static_cast<float>(ctx->data().width) / ctx->data().height > 16.0f / 9.0f) {
+        width = ctx->data().width;
+        height = ctx->data().width * (9.0f / 16.0f);
         x_pos = 0.0f;
-        y_pos = (height - app->data().height) / -2.0f;
+        y_pos = (height - ctx->data().height) / -2.0f;
     } else {
-        height = app->data().height;
-        width = app->data().height * (16.0f / 9.0f);
-        x_pos = (width - app->data().width) / -2.0f;
+        height = ctx->data().height;
+        width = ctx->data().height * (16.0f / 9.0f);
+        x_pos = (width - ctx->data().width) / -2.0f;
         y_pos = 0.0f;
     }
 }
@@ -181,8 +181,8 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const BeginE
     begin();
 
     for (gui::Widget* widget : subwidgets) {
-        const int WINDOW_WIDTH = app->data().width;
-        const int WINDOW_HEIGHT = app->data().height;
+        const int WINDOW_WIDTH = ctx->data().width;
+        const int WINDOW_HEIGHT = ctx->data().height;
 
         if (widget->scale_parameters.min_bound != 0 && widget->scale_parameters.max_bound != 0) {
             if (WINDOW_HEIGHT <= widget->scale_parameters.min_bound) {
@@ -316,7 +316,7 @@ void GuiRenderer::initialize_quad_renderer() {
 
     storage.quad2d_shader->bind();
 
-    for (size_t i = 0; i < 8; i++) {  // FIXME storage.quads.MAX_TEXTURE_UNITS
+    for (size_t i = 0; i < 8; i++) {  // FIXME should be storage.quads.MAX_TEXTURE_UNITS
         storage.quad2d_shader->upload_uniform_int(
             resmanager::HashedStr64("u_texture[" + std::to_string(i) + "]"),
             i

@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "engine/application/platform.h"
-#include "engine/application/event.h"
+#include "engine/application/events.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/shader.h"
@@ -27,7 +27,7 @@ class Renderer {
 public:
     struct Storage;
 
-    Renderer(Application* app);
+    Renderer(Ctx* ctx);
     ~Renderer();
 
     Renderer(const Renderer&) = delete;
@@ -171,7 +171,7 @@ private:
     const char* ORIGIN_VERTEX_SHADER = "engine_data/shaders/origin.vert";
     const char* ORIGIN_FRAGMENT_SHADER = "engine_data/shaders/origin.frag";
 
-    Application* app = nullptr;
+    Ctx* ctx = nullptr;
 
     friend class Application;
 };

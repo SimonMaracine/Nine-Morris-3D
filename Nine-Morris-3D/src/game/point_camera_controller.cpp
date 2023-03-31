@@ -183,18 +183,18 @@ void PointCameraController::go_towards_position(const glm::vec3& position) {
     go_towards_position_x(direction);
 }
 
-void PointCameraController::connect_events(Application* app) {
-    app->evt.connect<MouseScrolledEvent, &PointCameraController::on_mouse_scrolled>(this);
-    app->evt.connect<MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
+void PointCameraController::connect_events(Ctx* ctx) {
+    ctx->evt.connect<MouseScrolledEvent, &PointCameraController::on_mouse_scrolled>(this);
+    ctx->evt.connect<MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
 }
 
-void PointCameraController::disconnect_events(Application* app) {
-    app->evt.disconnect(this);
+void PointCameraController::disconnect_events(Ctx* ctx) {
+    ctx->evt.disconnect(this);
 }
 
-void PointCameraController::discard_events(Application* app) {
-    app->evt.discard<MouseScrolledEvent>();  // TODO dirty solution
-    app->evt.discard<MouseMovedEvent>();
+void PointCameraController::discard_events(Ctx* ctx) {
+    ctx->evt.discard<MouseScrolledEvent>();  // TODO dirty solution
+    ctx->evt.discard<MouseMovedEvent>();
 }
 
 void PointCameraController::on_mouse_scrolled(const MouseScrolledEvent& event) {

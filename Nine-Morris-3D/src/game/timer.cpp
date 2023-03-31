@@ -9,7 +9,7 @@ void Timer::update() {
         return;
     }
 
-    const double current_time = app->window->get_time();
+    const double current_time = ctx->window->get_time();
 
     const double elapsed_time = current_time - last_time;
     last_time = current_time;
@@ -29,7 +29,7 @@ void Timer::update() {
 void Timer::start() {
     ASSERT(!running, "Cannot start, if it is already running");
 
-    const double current_time = app->window->get_time();
+    const double current_time = ctx->window->get_time();
 
     running = true;
     last_time = current_time;
@@ -46,7 +46,7 @@ void Timer::stop() {
 }
 
 void Timer::reset_last_time() {
-    const double current_time = app->window->get_time();
+    const double current_time = ctx->window->get_time();
 
     last_time = current_time;
 }

@@ -17,13 +17,13 @@
 #include "other/constants.h"
 
 void LoadingScene::on_start() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     load_splash_screen_texture();
 
     loader = std::make_unique<assets_load::AllStartLoader>(
         [this, &data]() {
-            app->change_scene(scene_int_to_id(data.options.scene));
+            ctx->change_scene(scene_int_to_id(data.options.scene));
         }
     );
 
@@ -36,16 +36,16 @@ void LoadingScene::on_start() {
 
     setup_widgets();
 
-    auto background = objects.add<gui::Image>("background"_H, app->res.texture["splash_screen"_H]);
+    auto background = objects.add<gui::Image>("background"_H, ctx->res.texture["splash_screen"_H]);
     scene_list.add(background);
 
-    loading_animation.previous_seconds = app->window->get_time();
+    loading_animation.previous_seconds = ctx->window->get_time();
 }
 
 void LoadingScene::on_stop() {
     LOG_INFO("Done loading assets; initializing the rest of the game...");
 
-    if (app->running) {
+    if (ctx->running) {
         // Stop initializing, if the user closed the window
         initialize_game();
     }
@@ -55,7 +55,7 @@ void LoadingScene::on_stop() {
 
 void LoadingScene::on_update() {
     float width, height, x_pos, y_pos;
-    app->gui_renderer->quad_center(width, height, x_pos, y_pos);
+    ctx->r2d->quad_center(width, height, x_pos, y_pos);
 
     auto background = objects.get<gui::Image>("background"_H);
     background->set_position(glm::vec2(x_pos, y_pos));
@@ -72,7 +72,7 @@ void LoadingScene::setup_widgets() {
 
     auto loading_text = objects.add<gui::Text>(
         "loading_text"_H,
-        app->res.font["good_dog_plain"_H],
+        ctx->res.font["good_dog_plain"_H],
         "Loading",
         1.5f,
         glm::vec3(0.75f)
@@ -96,11 +96,11 @@ void LoadingScene::load_splash_screen_texture() {
 
     gl::TextureSpecification specification;
 
-    app->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+    ctx->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
 }
 
 void LoadingScene::update_loading_animation() {
-    const double current_seconds = app->window->get_time();
+    const double current_seconds = ctx->window->get_time();
     const double elapsed_seconds = current_seconds - loading_animation.previous_seconds;
     loading_animation.previous_seconds = current_seconds;
 
@@ -136,9 +136,9 @@ hs LoadingScene::scene_int_to_id(int scene) {  // FIXME find a better way
 }
 
 void LoadingScene::initialize_board() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
-    auto shader = app->res.shader.load(
+    auto shader = ctx->res.shader.load(
         "board_wood"_H,
         encrypt::encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER)),
         encrypt::encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
@@ -151,23 +151,23 @@ void LoadingScene::initialize_board() {
             "u_material.normal"
         },
         std::initializer_list {
-            app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_uniform_block,
-            app->renderer->get_storage().light_space_uniform_block,
-            app->renderer->get_storage().light_uniform_block
+            ctx->r3d->get_storage().projection_view_uniform_block,
+            ctx->r3d->get_storage().light_view_uniform_block,
+            ctx->r3d->get_storage().light_space_uniform_block,
+            ctx->r3d->get_storage().light_uniform_block
         }
     );
 
-    auto vertex_buffer = app->res.vertex_buffer.load(
+    auto vertex_buffer = ctx->res.vertex_buffer.load(
         "board_wood"_H,
-        app->res.mesh["board_wood"_H]->get_vertices(),
-        app->res.mesh["board_wood"_H]->get_vertices_size()
+        ctx->res.mesh["board_wood"_H]->get_vertices(),
+        ctx->res.mesh["board_wood"_H]->get_vertices_size()
     );
 
-    auto index_buffer = app->res.index_buffer.load(
+    auto index_buffer = ctx->res.index_buffer.load(
         "board_wood"_H,
-        app->res.mesh["board_wood"_H]->get_indices(),
-        app->res.mesh["board_wood"_H]->get_indices_size()
+        ctx->res.mesh["board_wood"_H]->get_indices(),
+        ctx->res.mesh["board_wood"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -176,7 +176,7 @@ void LoadingScene::initialize_board() {
         .add(2, VertexBufferLayout::Float, 3)
         .add(3, VertexBufferLayout::Float, 3);
 
-    auto vertex_array = app->res.vertex_array.load("board_wood"_H);
+    auto vertex_array = ctx->res.vertex_array.load("board_wood"_H);
     vertex_array->begin_definition()
         .add_buffer(vertex_buffer, layout)
         .add_index_buffer(index_buffer)
@@ -188,25 +188,25 @@ void LoadingScene::initialize_board() {
     specification.bias = -2.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
-    auto diffuse_texture = app->res.texture.load(
+    auto diffuse_texture = ctx->res.texture.load(
         "board_wood_diffuse"_H,
-        app->res.texture_data["board_wood_diffuse"_H],
+        ctx->res.texture_data["board_wood_diffuse"_H],
         specification
     );
 
-    auto normal_texture = app->res.texture.load(
+    auto normal_texture = ctx->res.texture.load(
         "board_normal"_H,
-        app->res.texture_data["board_normal"_H],
+        ctx->res.texture_data["board_normal"_H],
         specification
     );
 
-    auto material = app->res.material.load("wood"_H, shader);
+    auto material = ctx->res.material.load("wood"_H, shader);
     material->add_texture("u_material.diffuse"_H);
     material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
     material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
     material->add_texture("u_material.normal"_H);
 
-    auto material_instance = app->res.material_instance.load("board_wood"_H, material);
+    auto material_instance = ctx->res.material_instance.load("board_wood"_H, material);
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess"_H, 4.0f);
@@ -214,9 +214,9 @@ void LoadingScene::initialize_board() {
 }
 
 void LoadingScene::initialize_board_paint() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
-    auto shader = app->res.shader.load(
+    auto shader = ctx->res.shader.load(
         "board_paint"_H,
         encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
         encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
@@ -229,23 +229,23 @@ void LoadingScene::initialize_board_paint() {
             "u_material.normal"
         },
         std::initializer_list {
-            app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_uniform_block,
-            app->renderer->get_storage().light_space_uniform_block,
-            app->renderer->get_storage().light_uniform_block
+            ctx->r3d->get_storage().projection_view_uniform_block,
+            ctx->r3d->get_storage().light_view_uniform_block,
+            ctx->r3d->get_storage().light_space_uniform_block,
+            ctx->r3d->get_storage().light_uniform_block
         }
     );
 
-    auto vertex_buffer = app->res.vertex_buffer.load(
+    auto vertex_buffer = ctx->res.vertex_buffer.load(
         "board_paint"_H,
-        app->res.mesh["board_paint"_H]->get_vertices(),
-        app->res.mesh["board_paint"_H]->get_vertices_size()
+        ctx->res.mesh["board_paint"_H]->get_vertices(),
+        ctx->res.mesh["board_paint"_H]->get_vertices_size()
     );
 
-    auto index_buffer = app->res.index_buffer.load(
+    auto index_buffer = ctx->res.index_buffer.load(
         "board_paint"_H,
-        app->res.mesh["board_paint"_H]->get_indices(),
-        app->res.mesh["board_paint"_H]->get_indices_size()
+        ctx->res.mesh["board_paint"_H]->get_indices(),
+        ctx->res.mesh["board_paint"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -254,7 +254,7 @@ void LoadingScene::initialize_board_paint() {
         .add(2, VertexBufferLayout::Float, 3)
         .add(3, VertexBufferLayout::Float, 3);
 
-    auto vertex_array = app->res.vertex_array.load("board_paint"_H);
+    auto vertex_array = ctx->res.vertex_array.load("board_paint"_H);
     vertex_array->begin_definition()
         .add_buffer(vertex_buffer, layout)
         .add_index_buffer(index_buffer)
@@ -266,29 +266,29 @@ void LoadingScene::initialize_board_paint() {
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
-    auto diffuse_texture = app->res.texture.load(
+    auto diffuse_texture = ctx->res.texture.load(
         "board_paint_diffuse"_H,
-        app->res.texture_data["board_paint_diffuse"_H],
+        ctx->res.texture_data["board_paint_diffuse"_H],
         specification
     );
 
-    auto material = app->res.material.load("board_paint"_H, shader);
+    auto material = ctx->res.material.load("board_paint"_H, shader);
     material->add_texture("u_material.diffuse"_H);
     material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
     material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
     material->add_texture("u_material.normal"_H);
 
-    auto material_instance = app->res.material_instance.load("board_paint"_H, material);
+    auto material_instance = ctx->res.material_instance.load("board_paint"_H, material);
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess"_H, 4.0f);
-    material_instance->set_texture("u_material.normal"_H, app->res.texture["board_normal"_H], 1);
+    material_instance->set_texture("u_material.normal"_H, ctx->res.texture["board_normal"_H], 1);
 }
 
 void LoadingScene::initialize_pieces() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
-    auto shader = app->res.shader.load(
+    auto shader = ctx->res.shader.load(
         "piece"_H,
         encrypt::encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER)),
         encrypt::encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
@@ -302,35 +302,35 @@ void LoadingScene::initialize_pieces() {
             "u_material.tint"
         },
         std::initializer_list {
-            app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_uniform_block,
-            app->renderer->get_storage().light_space_uniform_block,
-            app->renderer->get_storage().light_uniform_block,
+            ctx->r3d->get_storage().projection_view_uniform_block,
+            ctx->r3d->get_storage().light_view_uniform_block,
+            ctx->r3d->get_storage().light_space_uniform_block,
+            ctx->r3d->get_storage().light_uniform_block,
         }
     );
 
-    auto white_piece_vertex_buffer = app->res.vertex_buffer.load(
+    auto white_piece_vertex_buffer = ctx->res.vertex_buffer.load(
         "white_piece"_H,
-        app->res.mesh["white_piece"_H]->get_vertices(),
-        app->res.mesh["white_piece"_H]->get_vertices_size()
+        ctx->res.mesh["white_piece"_H]->get_vertices(),
+        ctx->res.mesh["white_piece"_H]->get_vertices_size()
     );
 
-    auto white_piece_index_buffer = app->res.index_buffer.load(
+    auto white_piece_index_buffer = ctx->res.index_buffer.load(
         "white_piece"_H,
-        app->res.mesh["white_piece"_H]->get_indices(),
-        app->res.mesh["white_piece"_H]->get_indices_size()
+        ctx->res.mesh["white_piece"_H]->get_indices(),
+        ctx->res.mesh["white_piece"_H]->get_indices_size()
     );
 
-    auto black_piece_vertex_buffer = app->res.vertex_buffer.load(
+    auto black_piece_vertex_buffer = ctx->res.vertex_buffer.load(
         "black_piece"_H,
-        app->res.mesh["black_piece"_H]->get_vertices(),
-        app->res.mesh["black_piece"_H]->get_vertices_size()
+        ctx->res.mesh["black_piece"_H]->get_vertices(),
+        ctx->res.mesh["black_piece"_H]->get_vertices_size()
     );
 
-    auto black_piece_index_buffer = app->res.index_buffer.load(
+    auto black_piece_index_buffer = ctx->res.index_buffer.load(
         "black_piece"_H,
-        app->res.mesh["black_piece"_H]->get_indices(),
-        app->res.mesh["black_piece"_H]->get_indices_size()
+        ctx->res.mesh["black_piece"_H]->get_indices(),
+        ctx->res.mesh["black_piece"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -339,13 +339,13 @@ void LoadingScene::initialize_pieces() {
         .add(2, VertexBufferLayout::Float, 3)
         .add(3, VertexBufferLayout::Float, 3);
 
-    auto white_piece_vertex_array = app->res.vertex_array.load("white_piece"_H);
+    auto white_piece_vertex_array = ctx->res.vertex_array.load("white_piece"_H);
     white_piece_vertex_array->begin_definition()
         .add_buffer(white_piece_vertex_buffer, layout)
         .add_index_buffer(white_piece_index_buffer)
         .end_definition();
 
-    auto black_piece_vertex_array = app->res.vertex_array.load("black_piece"_H);
+    auto black_piece_vertex_array = ctx->res.vertex_array.load("black_piece"_H);
     black_piece_vertex_array->begin_definition()
         .add_buffer(black_piece_vertex_buffer, layout)
         .add_index_buffer(black_piece_index_buffer)
@@ -357,98 +357,98 @@ void LoadingScene::initialize_pieces() {
     specification.bias = -1.5f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
-    auto white_piece_diffuse_texture = app->res.texture.load(
+    auto white_piece_diffuse_texture = ctx->res.texture.load(
         "white_piece_diffuse"_H,
-        app->res.texture_data["white_piece_diffuse"_H],
+        ctx->res.texture_data["white_piece_diffuse"_H],
         specification
     );
 
-    auto black_piece_diffuse_texture = app->res.texture.load(
+    auto black_piece_diffuse_texture = ctx->res.texture.load(
         "black_piece_diffuse"_H,
-        app->res.texture_data["black_piece_diffuse"_H],
+        ctx->res.texture_data["black_piece_diffuse"_H],
         specification
     );
 
-    auto piece_normal_texture = app->res.texture.load(
+    auto piece_normal_texture = ctx->res.texture.load(
         "piece_normal"_H,
-        app->res.texture_data["piece_normal"_H],
+        ctx->res.texture_data["piece_normal"_H],
         specification
     );
 
-    auto material = app->res.material.load("tinted_wood"_H, shader);
+    auto material = ctx->res.material.load("tinted_wood"_H, shader);
     material->add_texture("u_material.diffuse"_H);
     material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
     material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
     material->add_texture("u_material.normal"_H);
     material->add_uniform(Material::Uniform::Vec3, "u_material.tint"_H);
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_place1"_H,
-        app->res.sound_data["piece_place1"_H]
+        ctx->res.sound_data["piece_place1"_H]
     );
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_place2"_H,
-        app->res.sound_data["piece_place2"_H]
+        ctx->res.sound_data["piece_place2"_H]
     );
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_move1"_H,
-        app->res.sound_data["piece_move1"_H]
+        ctx->res.sound_data["piece_move1"_H]
     );
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_move2"_H,
-        app->res.sound_data["piece_move2"_H]
+        ctx->res.sound_data["piece_move2"_H]
     );
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_take"_H,
-        app->res.sound_data["piece_take"_H]
+        ctx->res.sound_data["piece_take"_H]
     );
 }
 
 void LoadingScene::initialize_node(size_t index) {
-    auto material_instance = app->res.material_instance.load(
+    auto material_instance = ctx->res.material_instance.load(
         hs("node" + std::to_string(index)),
-        app->res.material["basic"_H]
+        ctx->res.material["basic"_H]
     );
     material_instance->set_vec4("u_color"_H, glm::vec4(0.0f));
 }
 
 void LoadingScene::initialize_nodes() {
-    auto shader = app->res.shader.load(
+    auto shader = ctx->res.shader.load(
         "node"_H,
         encrypt::encr(file_system::path_for_assets(assets::NODE_VERTEX_SHADER)),
         encrypt::encr(file_system::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_model_matrix", "u_color" },
         std::initializer_list {
-            app->renderer->get_storage().projection_view_uniform_block
+            ctx->r3d->get_storage().projection_view_uniform_block
         }
     );
 
-    auto vertex_buffer = app->res.vertex_buffer.load(
+    auto vertex_buffer = ctx->res.vertex_buffer.load(
         "node"_H,
-        app->res.mesh["node"_H]->get_vertices(),
-        app->res.mesh["node"_H]->get_vertices_size()
+        ctx->res.mesh["node"_H]->get_vertices(),
+        ctx->res.mesh["node"_H]->get_vertices_size()
     );
 
-    auto index_buffer = app->res.index_buffer.load(
+    auto index_buffer = ctx->res.index_buffer.load(
         "node"_H,
-        app->res.mesh["node"_H]->get_indices(),
-        app->res.mesh["node"_H]->get_indices_size()
+        ctx->res.mesh["node"_H]->get_indices(),
+        ctx->res.mesh["node"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
         .add(0, VertexBufferLayout::Float, 3);
 
-    auto vertex_array = app->res.vertex_array.load("node"_H);
+    auto vertex_array = ctx->res.vertex_array.load("node"_H);
     vertex_array->begin_definition()
         .add_buffer(vertex_buffer, layout)
         .add_index_buffer(index_buffer)
         .end_definition();
 
-    auto material = app->res.material.load("basic"_H, shader);
+    auto material = ctx->res.material.load("basic"_H, shader);
     material->add_uniform(Material::Uniform::Vec4, "u_color"_H);
 
     for (size_t i = 0; i < 24; i++) {
@@ -457,9 +457,9 @@ void LoadingScene::initialize_nodes() {
 }
 
 void LoadingScene::initialize_board_no_normal() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
-    auto shader = app->res.shader.load(
+    auto shader = ctx->res.shader.load(
         "board_wood"_H,
         encrypt::encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER_NO_NORMAL)),
         encrypt::encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER_NO_NORMAL)),
@@ -471,23 +471,23 @@ void LoadingScene::initialize_board_no_normal() {
             "u_material.shininess"
         },
         std::initializer_list {
-            app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_uniform_block,
-            app->renderer->get_storage().light_space_uniform_block,
-            app->renderer->get_storage().light_uniform_block,
+            ctx->r3d->get_storage().projection_view_uniform_block,
+            ctx->r3d->get_storage().light_view_uniform_block,
+            ctx->r3d->get_storage().light_space_uniform_block,
+            ctx->r3d->get_storage().light_uniform_block,
         }
     );
 
-    auto vertex_buffer = app->res.vertex_buffer.load(
+    auto vertex_buffer = ctx->res.vertex_buffer.load(
         "board_wood"_H,
-        app->res.mesh["board_wood"_H]->get_vertices(),
-        app->res.mesh["board_wood"_H]->get_vertices_size()
+        ctx->res.mesh["board_wood"_H]->get_vertices(),
+        ctx->res.mesh["board_wood"_H]->get_vertices_size()
     );
 
-    auto index_buffer = app->res.index_buffer.load(
+    auto index_buffer = ctx->res.index_buffer.load(
         "board_wood"_H,
-        app->res.mesh["board_wood"_H]->get_indices(),
-        app->res.mesh["board_wood"_H]->get_indices_size()
+        ctx->res.mesh["board_wood"_H]->get_indices(),
+        ctx->res.mesh["board_wood"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -495,7 +495,7 @@ void LoadingScene::initialize_board_no_normal() {
         .add(1, VertexBufferLayout::Float, 2)
         .add(2, VertexBufferLayout::Float, 3);
 
-    auto vertex_array = app->res.vertex_array.load("board_wood"_H);
+    auto vertex_array = ctx->res.vertex_array.load("board_wood"_H);
     vertex_array->begin_definition()
         .add_buffer(vertex_buffer, layout)
         .add_index_buffer(index_buffer)
@@ -507,27 +507,27 @@ void LoadingScene::initialize_board_no_normal() {
     specification.bias = -2.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
-    auto diffuse_texture = app->res.texture.load(
+    auto diffuse_texture = ctx->res.texture.load(
         "board_wood_diffuse"_H,
-        app->res.texture_data["board_wood_diffuse"_H],
+        ctx->res.texture_data["board_wood_diffuse"_H],
         specification
     );
 
-    auto material = app->res.material.load("wood"_H, shader);
+    auto material = ctx->res.material.load("wood"_H, shader);
     material->add_texture("u_material.diffuse"_H);
     material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
     material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
 
-    auto material_instance = app->res.material_instance.load("board_wood"_H, material);
+    auto material_instance = ctx->res.material_instance.load("board_wood"_H, material);
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess"_H, 4.0f);
 }
 
 void LoadingScene::initialize_board_paint_no_normal() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
-    auto shader = app->res.shader.load(
+    auto shader = ctx->res.shader.load(
         "board_paint"_H,
         encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER_NO_NORMAL)),
         encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL)),
@@ -539,23 +539,23 @@ void LoadingScene::initialize_board_paint_no_normal() {
             "u_material.shininess"
         },
         std::initializer_list {
-            app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_uniform_block,
-            app->renderer->get_storage().light_space_uniform_block,
-            app->renderer->get_storage().light_uniform_block
+            ctx->r3d->get_storage().projection_view_uniform_block,
+            ctx->r3d->get_storage().light_view_uniform_block,
+            ctx->r3d->get_storage().light_space_uniform_block,
+            ctx->r3d->get_storage().light_uniform_block
         }
     );
 
-    auto vertex_buffer = app->res.vertex_buffer.load(
+    auto vertex_buffer = ctx->res.vertex_buffer.load(
         "board_paint"_H,
-        app->res.mesh["board_paint"_H]->get_vertices(),
-        app->res.mesh["board_paint"_H]->get_vertices_size()
+        ctx->res.mesh["board_paint"_H]->get_vertices(),
+        ctx->res.mesh["board_paint"_H]->get_vertices_size()
     );
 
-    auto index_buffer = app->res.index_buffer.load(
+    auto index_buffer = ctx->res.index_buffer.load(
         "board_paint"_H,
-        app->res.mesh["board_paint"_H]->get_indices(),
-        app->res.mesh["board_paint"_H]->get_indices_size()
+        ctx->res.mesh["board_paint"_H]->get_indices(),
+        ctx->res.mesh["board_paint"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -563,7 +563,7 @@ void LoadingScene::initialize_board_paint_no_normal() {
         .add(1, VertexBufferLayout::Float, 2)
         .add(2, VertexBufferLayout::Float, 3);
 
-    auto vertex_array = app->res.vertex_array.load("board_paint"_H);
+    auto vertex_array = ctx->res.vertex_array.load("board_paint"_H);
     vertex_array->begin_definition()
         .add_buffer(vertex_buffer, layout)
         .add_index_buffer(index_buffer)
@@ -575,28 +575,28 @@ void LoadingScene::initialize_board_paint_no_normal() {
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
-    auto diffuse_texture = app->res.texture.load(
+    auto diffuse_texture = ctx->res.texture.load(
         "board_paint_diffuse"_H,
-        app->res.texture_data["board_paint_diffuse"_H],
+        ctx->res.texture_data["board_paint_diffuse"_H],
         specification
     );
 
-    auto material = app->res.material.load("board_paint"_H, shader);
+    auto material = ctx->res.material.load("board_paint"_H, shader);
     material->add_texture("u_material.diffuse"_H);
     material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
     material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
 
-    auto material_instance = app->res.material_instance.load("board_paint"_H, material);
+    auto material_instance = ctx->res.material_instance.load("board_paint"_H, material);
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess"_H, 4.0f);
 }
 
 void LoadingScene::initialize_pieces_no_normal() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     // FIXME maybe should give another name
-    auto shader = app->res.shader.load(
+    auto shader = ctx->res.shader.load(
         "piece"_H,
         encrypt::encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER_NO_NORMAL)),
         encrypt::encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER_NO_NORMAL)),
@@ -609,35 +609,35 @@ void LoadingScene::initialize_pieces_no_normal() {
             "u_material.tint"
         },
         std::initializer_list {
-            app->renderer->get_storage().projection_view_uniform_block,
-            app->renderer->get_storage().light_view_uniform_block,
-            app->renderer->get_storage().light_space_uniform_block,
-            app->renderer->get_storage().light_uniform_block
+            ctx->r3d->get_storage().projection_view_uniform_block,
+            ctx->r3d->get_storage().light_view_uniform_block,
+            ctx->r3d->get_storage().light_space_uniform_block,
+            ctx->r3d->get_storage().light_uniform_block
         }
     );
 
-    auto white_piece_vertex_buffer = app->res.vertex_buffer.load(
+    auto white_piece_vertex_buffer = ctx->res.vertex_buffer.load(
         "white_piece"_H,
-        app->res.mesh["white_piece"_H]->get_vertices(),
-        app->res.mesh["white_piece"_H]->get_vertices_size()
+        ctx->res.mesh["white_piece"_H]->get_vertices(),
+        ctx->res.mesh["white_piece"_H]->get_vertices_size()
     );
 
-    auto white_piece_index_buffer = app->res.index_buffer.load(
+    auto white_piece_index_buffer = ctx->res.index_buffer.load(
         "white_piece"_H,
-        app->res.mesh["white_piece"_H]->get_indices(),
-        app->res.mesh["white_piece"_H]->get_indices_size()
+        ctx->res.mesh["white_piece"_H]->get_indices(),
+        ctx->res.mesh["white_piece"_H]->get_indices_size()
     );
 
-    auto black_piece_vertex_buffer = app->res.vertex_buffer.load(
+    auto black_piece_vertex_buffer = ctx->res.vertex_buffer.load(
         "black_piece"_H,
-        app->res.mesh["black_piece"_H]->get_vertices(),
-        app->res.mesh["black_piece"_H]->get_vertices_size()
+        ctx->res.mesh["black_piece"_H]->get_vertices(),
+        ctx->res.mesh["black_piece"_H]->get_vertices_size()
     );
 
-    auto black_piece_index_buffer = app->res.index_buffer.load(
+    auto black_piece_index_buffer = ctx->res.index_buffer.load(
         "black_piece"_H,
-        app->res.mesh["black_piece"_H]->get_indices(),
-        app->res.mesh["black_piece"_H]->get_indices_size()
+        ctx->res.mesh["black_piece"_H]->get_indices(),
+        ctx->res.mesh["black_piece"_H]->get_indices_size()
     );
 
     VertexBufferLayout layout = VertexBufferLayout {}
@@ -645,13 +645,13 @@ void LoadingScene::initialize_pieces_no_normal() {
         .add(1, VertexBufferLayout::Float, 2)
         .add(2, VertexBufferLayout::Float, 3);
 
-    auto white_piece_vertex_array = app->res.vertex_array.load("white_piece"_H);
+    auto white_piece_vertex_array = ctx->res.vertex_array.load("white_piece"_H);
     white_piece_vertex_array->begin_definition()
         .add_buffer(white_piece_vertex_buffer, layout)
         .add_index_buffer(white_piece_index_buffer)
         .end_definition();
 
-    auto black_piece_vertex_array = app->res.vertex_array.load("black_piece"_H);
+    auto black_piece_vertex_array = ctx->res.vertex_array.load("black_piece"_H);
     black_piece_vertex_array->begin_definition()
         .add_buffer(black_piece_vertex_buffer, layout)
         .add_index_buffer(black_piece_index_buffer)
@@ -663,67 +663,67 @@ void LoadingScene::initialize_pieces_no_normal() {
     specification.bias = -1.5f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
-    auto white_piece_diffuse_texture = app->res.texture.load(
+    auto white_piece_diffuse_texture = ctx->res.texture.load(
         "white_piece_diffuse"_H,
-        app->res.texture_data["white_piece_diffuse"_H],
+        ctx->res.texture_data["white_piece_diffuse"_H],
         specification
     );
 
-    auto black_piece_diffuse_texture = app->res.texture.load(
+    auto black_piece_diffuse_texture = ctx->res.texture.load(
         "black_piece_diffuse"_H,
-        app->res.texture_data["black_piece_diffuse"_H],
+        ctx->res.texture_data["black_piece_diffuse"_H],
         specification
     );
 
-    auto material = app->res.material.load("tinted_wood"_H, shader);
+    auto material = ctx->res.material.load("tinted_wood"_H, shader);
     material->add_texture("u_material.diffuse"_H);
     material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
     material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
     material->add_uniform(Material::Uniform::Vec3, "u_material.tint"_H);
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_place1"_H,
-        app->res.sound_data["piece_place1"_H]
+        ctx->res.sound_data["piece_place1"_H]
     );
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_place2"_H,
-        app->res.sound_data["piece_place2"_H]
+        ctx->res.sound_data["piece_place2"_H]
     );
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_move1"_H,
-        app->res.sound_data["piece_move1"_H]
+        ctx->res.sound_data["piece_move1"_H]
     );
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_move2"_H,
-        app->res.sound_data["piece_move2"_H]
+        ctx->res.sound_data["piece_move2"_H]
     );
 
-    app->res.al_buffer.load(
+    ctx->res.al_buffer.load(
         "piece_take"_H,
-        app->res.sound_data["piece_take"_H]
+        ctx->res.sound_data["piece_take"_H]
     );
 }
 
 void LoadingScene::initialize_skybox() {
-    if (app->user_data<Data>().options.skybox == game_options::NONE) {
+    if (ctx->user_data<Data>().options.skybox == game_options::NONE) {
         LOG_DEBUG("Initialized skybox");
         return;
     }
 
     const std::array<std::shared_ptr<TextureData>, 6> data = {
-        app->res.texture_data["skybox_px"_H],
-        app->res.texture_data["skybox_nx"_H],
-        app->res.texture_data["skybox_py"_H],
-        app->res.texture_data["skybox_ny"_H],
-        app->res.texture_data["skybox_pz"_H],
-        app->res.texture_data["skybox_nz"_H]
+        ctx->res.texture_data["skybox_px"_H],
+        ctx->res.texture_data["skybox_nx"_H],
+        ctx->res.texture_data["skybox_py"_H],
+        ctx->res.texture_data["skybox_ny"_H],
+        ctx->res.texture_data["skybox_pz"_H],
+        ctx->res.texture_data["skybox_nz"_H]
     };
 
-    auto texture = app->res.texture_3d.force_load("skybox"_H, data);
-    app->renderer->set_skybox(texture);
+    auto texture = ctx->res.texture_3d.force_load("skybox"_H, data);
+    ctx->r3d->set_skybox(texture);
 
     LOG_DEBUG("Initialized skybox");
 }
@@ -731,30 +731,30 @@ void LoadingScene::initialize_skybox() {
 void LoadingScene::initialize_indicators() {
     gl::TextureSpecification specification;
 
-    app->res.texture.load(
+    ctx->res.texture.load(
         "white_indicator"_H,
-        app->res.texture_data["white_indicator"_H],
+        ctx->res.texture_data["white_indicator"_H],
         specification
     );
-    app->res.texture.load(
+    ctx->res.texture.load(
         "black_indicator"_H,
-        app->res.texture_data["black_indicator"_H],
+        ctx->res.texture_data["black_indicator"_H],
         specification
     );
-    app->res.texture.load(
+    ctx->res.texture.load(
         "wait_indicator"_H,
-        app->res.texture_data["wait_indicator"_H],
+        ctx->res.texture_data["wait_indicator"_H],
         specification
     );
-    app->res.texture.load(
+    ctx->res.texture.load(
         "computer_thinking_indicator"_H,
-        app->res.texture_data["computer_thinking_indicator"_H],
+        ctx->res.texture_data["computer_thinking_indicator"_H],
         specification
     );
 }
 
 void LoadingScene::change_board_paint_texture() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -762,19 +762,19 @@ void LoadingScene::change_board_paint_texture() {
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
-    auto diffuse_texture = app->res.texture.force_load(
+    auto diffuse_texture = ctx->res.texture.force_load(
         "board_paint_diffuse"_H,
-        app->res.texture_data["board_paint_diffuse"_H],
+        ctx->res.texture_data["board_paint_diffuse"_H],
         specification
     );
 
-    app->res.material_instance["board_paint"_H]->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
+    ctx->res.material_instance["board_paint"_H]->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
 
-    app->res.texture_data.release("board_paint_diffuse"_H);
+    ctx->res.texture_data.release("board_paint_diffuse"_H);
 }
 
 void LoadingScene::initialize_ids() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     for (size_t i = 0; i < MAX_NODES; i++) {
         data.node_ids[i] = identifier::generate_id();
@@ -788,14 +788,14 @@ void LoadingScene::initialize_ids() {
 void LoadingScene::initialize_keyboard_controls() {
     gl::TextureSpecification specification;
 
-    app->res.texture.load(
+    ctx->res.texture.load(
         "keyboard_controls_default"_H,
-        app->res.texture_data["keyboard_controls_default"_H],
+        ctx->res.texture_data["keyboard_controls_default"_H],
         specification
     );
-    app->res.texture.load(
+    ctx->res.texture.load(
         "keyboard_controls_cross"_H,
-        app->res.texture_data["keyboard_controls_cross"_H],
+        ctx->res.texture_data["keyboard_controls_cross"_H],
         specification
     );
 }
@@ -803,7 +803,7 @@ void LoadingScene::initialize_keyboard_controls() {
 void LoadingScene::initialize_light_bulb() {
     gl::TextureSpecification specification;
 
-    app->res.texture.load(
+    ctx->res.texture.load(
         "light_bulb"_H,
         "data/textures/light_bulb/light_bulb.png",
         specification
@@ -811,17 +811,17 @@ void LoadingScene::initialize_light_bulb() {
 }
 
 void LoadingScene::initialize_light() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     if (data.options.skybox == game_options::FIELD) {
-        app->renderer->directional_light = LIGHT_FIELD;
-        app->renderer->light_space = SHADOWS_FIELD;
+        ctx->r3d->directional_light = LIGHT_FIELD;
+        ctx->r3d->light_space = SHADOWS_FIELD;
     } else if (data.options.skybox == game_options::AUTUMN) {
-        app->renderer->directional_light = LIGHT_AUTUMN;
-        app->renderer->light_space = SHADOWS_AUTUMN;
+        ctx->r3d->directional_light = LIGHT_AUTUMN;
+        ctx->r3d->light_space = SHADOWS_AUTUMN;
     } else if (data.options.skybox == game_options::NONE) {
-        app->renderer->directional_light = LIGHT_NONE;
-        app->renderer->light_space = SHADOWS_NONE;
+        ctx->r3d->directional_light = LIGHT_NONE;
+        ctx->r3d->light_space = SHADOWS_NONE;
     } else {
         ASSERT(false, "Invalid skybox");
     }
@@ -830,7 +830,7 @@ void LoadingScene::initialize_light() {
 }
 
 void LoadingScene::initialize_game() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     initialize_ids();
 
@@ -853,7 +853,7 @@ void LoadingScene::initialize_game() {
     initialize_keyboard_controls();
     initialize_indicators();
 
-    auto track = app->res.music_track.load("music"_H, app->res.sound_data["music"_H]);
+    auto track = ctx->res.music_track.load("music"_H, ctx->res.sound_data["music"_H]);
     data.current_music_track = track;
 
     if (data.options.enable_music) {

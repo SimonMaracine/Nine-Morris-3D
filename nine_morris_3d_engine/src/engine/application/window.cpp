@@ -5,7 +5,7 @@
 #include "engine/application/window.h"
 #include "engine/application/application.h"
 #include "engine/application/application_data.h"
-#include "engine/application/event.h"
+#include "engine/application/events.h"
 #include "engine/application/platform.h"
 #include "engine/application/input.h"
 #include "engine/dear_imgui/imgui_context.h"
@@ -13,8 +13,8 @@
 #include "engine/other/logging.h"
 #include "engine/other/exit.h"
 
-#define APPLICATION_DATA(variable) const ApplicationData* variable = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
-#define WITH_DEAR_IMGUI() (data->app->builder.renderer_dear_imgui)
+#define APPLICATION_DATA(VARIABLE) const ApplicationData* VARIABLE = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
+#define WITH_DEAR_IMGUI() (data->app->builder.dear_imgui)
 
 Window::Window(Application* app) {
     if (!glfwInit()) {
@@ -33,7 +33,7 @@ Window::Window(Application* app) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, app->data().resizable ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, app->app_data.resizable ? GLFW_TRUE : GLFW_FALSE);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 #ifdef NM3D_PLATFORM_DEBUG
@@ -54,114 +54,18 @@ Window::Window(Application* app) {
 
     glfwMakeContextCurrent(window);
 
-    // FIXME use gladLoadGL() instead
-    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+    if (!gladLoadGL()) {
         LOG_DIST_CRITICAL("Could not initialize GLAD, exiting...");
         application_exit::panic();
     }
 
     glfwSwapInterval(1);
     glfwSetWindowUserPointer(window, &app->app_data);
-    glfwSetWindowSizeLimits(window, app->data().min_width, app->data().min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    glfwSetWindowSizeLimits(window, app->app_data.min_width, app->app_data.min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
-    // TODO add callbacks for other events
+    install_callbacks();
 
-    glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
-        APPLICATION_DATA(data)
-
-        data->app->evt.enqueue<WindowClosedEvent>();
-    });
-
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
-
-        data->width = width;
-        data->height = height;
-
-        data->app->evt.enqueue<WindowResizedEvent>(width, height);
-    });
-
-    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        APPLICATION_DATA(data)
-
-        switch (action) {
-            case GLFW_PRESS: {
-                if (WITH_DEAR_IMGUI() && imgui_context::on_key_pressed(key, scancode)) {
-                    return;
-                }
-
-                data->app->evt.enqueue<KeyPressedEvent>(
-                    input::key_from_code(key),
-                    false,
-                    static_cast<bool>(mods & GLFW_MOD_CONTROL)
-                );
-                break;
-            }
-            case GLFW_RELEASE: {
-                if (WITH_DEAR_IMGUI() && imgui_context::on_key_released(key, scancode)) {
-                    return;
-                }
-
-                data->app->evt.enqueue<KeyReleasedEvent>(input::key_from_code(key));
-                break;
-            }
-            case GLFW_REPEAT: {
-                if (WITH_DEAR_IMGUI() && imgui_context::on_key_pressed(key, scancode)) {
-                    return;
-                }
-
-                data->app->evt.enqueue<KeyPressedEvent>(
-                    input::key_from_code(key),
-                    true,
-                    static_cast<bool>(mods & GLFW_MOD_CONTROL)
-                );
-                break;
-            }
-        }
-    });
-
-    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
-        APPLICATION_DATA(data)
-
-        switch (action) {
-            case GLFW_PRESS: {
-                if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_button_pressed(button)) {
-                    return;
-                }
-
-                data->app->evt.enqueue<MouseButtonPressedEvent>(input::mouse_button_from_code(button));
-                break;
-            }
-            case GLFW_RELEASE: {
-                if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_button_released(button)) {
-                    return;
-                }
-
-                data->app->evt.enqueue<MouseButtonReleasedEvent>(input::mouse_button_from_code(button));
-                break;
-            }
-        }
-    });
-
-    glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
-        APPLICATION_DATA(data)
-
-        if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_scrolled(static_cast<float>(yoffset))) {
-            return;
-        }
-
-        data->app->evt.enqueue<MouseScrolledEvent>(static_cast<float>(yoffset));
-    });
-
-    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-        APPLICATION_DATA(data)
-
-        if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
-            return;
-        }
-
-        data->app->evt.enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
-    });
+    LOG_INFO("Installed window and input callbacks");
 }
 
 Window::~Window() {
@@ -282,10 +186,10 @@ GLFWwindow* Window::create_window(Application* app) {
     GLFWmonitor* primary_monitor = nullptr;
     int width = 0, height = 0;
 
-    if (app->data().fullscreen) {
+    if (app->app_data.fullscreen) {
         primary_monitor = glfwGetPrimaryMonitor();
 
-        if (app->data().native_resolution) {
+        if (app->app_data.native_resolution) {
             const GLFWvidmode* video_mode = glfwGetVideoMode(primary_monitor);
             width = video_mode->width;
             height = video_mode->height;
@@ -294,15 +198,120 @@ GLFWwindow* Window::create_window(Application* app) {
             app->app_data.width = video_mode->width;
             app->app_data.height = video_mode->height;
         } else {
-            width = app->data().width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
-            height = app->data().height;
+            width = app->app_data.width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
+            height = app->app_data.height;
         }
     } else {
-        width = app->data().width;
-        height = app->data().height;
+        width = app->app_data.width;
+        height = app->app_data.height;
     }
 
-    return glfwCreateWindow(width, height, app->data().title.c_str(), primary_monitor, nullptr);
+    return glfwCreateWindow(width, height, app->app_data.title.c_str(), primary_monitor, nullptr);
+}
+
+void Window::install_callbacks() {
+    glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
+        APPLICATION_DATA(data)
+
+        data->app->evt.enqueue<WindowClosedEvent>();
+    });
+
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
+
+        data->width = width;
+        data->height = height;
+
+        data->app->evt.enqueue<WindowResizedEvent>(width, height);
+    });
+
+    glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {
+        APPLICATION_DATA(data)
+
+        data->app->evt.enqueue<WindowFocusedEvent>(focused);
+    });
+
+    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        APPLICATION_DATA(data)
+
+        switch (action) {
+            case GLFW_PRESS: {
+                if (WITH_DEAR_IMGUI() && imgui_context::on_key_pressed(key, scancode)) {
+                    return;
+                }
+
+                data->app->evt.enqueue<KeyPressedEvent>(
+                    input::key_from_code(key),
+                    false,
+                    static_cast<bool>(mods & GLFW_MOD_CONTROL)
+                );
+                break;
+            }
+            case GLFW_RELEASE: {
+                if (WITH_DEAR_IMGUI() && imgui_context::on_key_released(key, scancode)) {
+                    return;
+                }
+
+                data->app->evt.enqueue<KeyReleasedEvent>(input::key_from_code(key));
+                break;
+            }
+            case GLFW_REPEAT: {
+                if (WITH_DEAR_IMGUI() && imgui_context::on_key_pressed(key, scancode)) {
+                    return;
+                }
+
+                data->app->evt.enqueue<KeyPressedEvent>(
+                    input::key_from_code(key),
+                    true,
+                    static_cast<bool>(mods & GLFW_MOD_CONTROL)
+                );
+                break;
+            }
+        }
+    });
+
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
+        APPLICATION_DATA(data)
+
+        switch (action) {
+            case GLFW_PRESS: {
+                if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_button_pressed(button)) {
+                    return;
+                }
+
+                data->app->evt.enqueue<MouseButtonPressedEvent>(input::mouse_button_from_code(button));
+                break;
+            }
+            case GLFW_RELEASE: {
+                if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_button_released(button)) {
+                    return;
+                }
+
+                data->app->evt.enqueue<MouseButtonReleasedEvent>(input::mouse_button_from_code(button));
+                break;
+            }
+        }
+    });
+
+    glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
+        APPLICATION_DATA(data)
+
+        if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_scrolled(static_cast<float>(yoffset))) {
+            return;
+        }
+
+        data->app->evt.enqueue<MouseScrolledEvent>(static_cast<float>(yoffset));
+    });
+
+    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+        APPLICATION_DATA(data)
+
+        if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
+            return;
+        }
+
+        data->app->evt.enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
+    });
 }
 
 std::pair<int, int> Monitor::get_resolution() {

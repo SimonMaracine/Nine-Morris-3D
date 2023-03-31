@@ -99,7 +99,7 @@ void MaterialInstance::bind() {
     }
 }
 
-void MaterialInstance::set_mat4(Key name, const glm::mat4& matrix) {  // TODO optimize these in release mode
+void MaterialInstance::set_mat4(Key name, const glm::mat4& matrix) {
     uniforms_mat4.at(name) = matrix;
 }
 

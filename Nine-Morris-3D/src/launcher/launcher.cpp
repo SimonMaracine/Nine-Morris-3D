@@ -5,7 +5,7 @@
 #include "launcher/launcher.h"
 
 namespace launcher {
-    void start(Application* app) {
+    void start(Ctx* ctx) {
         using namespace file_system;
         using namespace assets;
 
@@ -17,6 +17,6 @@ namespace launcher {
             std::make_unique<TextureData>(path_for_assets(ICON_32), false)
         };
 
-        app->window->set_icons(icons);
+        ctx->window->set_icons(icons);
     }
 }

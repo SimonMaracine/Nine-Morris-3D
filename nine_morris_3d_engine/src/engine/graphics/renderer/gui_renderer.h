@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "engine/application/event.h"
+#include "engine/application/events.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/texture.h"
@@ -18,7 +18,7 @@ class GuiRenderer {
 public:
     struct Storage;
 
-    GuiRenderer(Application* app);
+    GuiRenderer(Ctx* ctx);
     ~GuiRenderer();
 
     GuiRenderer(const GuiRenderer&) = delete;
@@ -90,7 +90,7 @@ private:
     const char* TEXT_VERTEX_SHADER = ENCR("engine_data/shaders/text.vert");
     const char* TEXT_FRAGMENT_SHADER = ENCR("engine_data/shaders/text.frag");
 
-    Application* app = nullptr;
+    Ctx* ctx = nullptr;
 
     friend class Application;
     friend class gui::Widget;

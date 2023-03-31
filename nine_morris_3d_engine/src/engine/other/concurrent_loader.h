@@ -23,7 +23,7 @@ public:
     ConcurrentLoader& operator=(ConcurrentLoader&&) = delete;
 
     void start_loading_thread(const Args&... args);
-    void update(Application* app);
+    void update(Ctx* ctx);
     bool is_done() const;
     bool is_in_use() const;
     void join_and_merge(ResourcesCache& res);
@@ -60,9 +60,9 @@ void ConcurrentLoader<D, Args...>::start_loading_thread(const Args&... args) {
 }
 
 template<typename D, typename... Args>
-void ConcurrentLoader<D, Args...>::update(Application* app) {
+void ConcurrentLoader<D, Args...>::update(Ctx* ctx) {
     if (in_use && is_done()) {
-        join_and_merge(app->res);
+        join_and_merge(ctx->res);
         reset();
 
         callback_function();

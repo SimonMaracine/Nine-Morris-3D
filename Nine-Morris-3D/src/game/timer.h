@@ -5,9 +5,9 @@
 class Timer {
 public:
     Timer() = default;
-    Timer(Application* app)
+    Timer(Ctx* ctx)
         : app(app) {}
-    Timer(Application* app, unsigned int time)
+    Timer(Ctx* ctx, unsigned int time)
         : time(time), app(app) {}
     ~Timer() = default;
 
@@ -28,5 +28,5 @@ private:
     double last_time = 0.0;  // Last GLFW time (in seconds)
     bool running = false;
 
-    Application* app = nullptr;
+    Ctx* ctx = nullptr;
 };

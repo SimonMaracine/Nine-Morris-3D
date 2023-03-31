@@ -22,7 +22,7 @@
 using namespace encrypt;
 
 void StandardGameScene::on_start() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     initialize_renderables();
     initialize_pieces();
@@ -67,10 +67,10 @@ void StandardGameScene::on_start() {
     board.camera_controller = &camera_controller;
     board.undo_redo_state = &undo_redo_state;
 
-    app->window->set_cursor(data.options.custom_cursor ? data.arrow_cursor : 0);
+    ctx->window->set_cursor(data.options.custom_cursor ? data.arrow_cursor : 0);
 
 #ifdef NM3D_PLATFORM_DEBUG
-    app->renderer->origin = true;
+    ctx->r3d->origin = true;
     scene_list.add(objects.get<renderables::Quad>("light_bulb"_H));
 #endif
 
@@ -80,29 +80,29 @@ void StandardGameScene::on_start() {
     camera_controller.connect_events(app);
 
     // Can dispose of these
-    app->res.texture_data.clear();
-    app->res.sound_data.clear();
+    ctx->res.texture_data.clear();
+    ctx->res.sound_data.clear();
 
-    app->evt.connect<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
-    app->evt.connect<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
-    app->evt.connect<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
-    app->evt.connect<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
-    app->evt.connect<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
+    ctx->evt.connect<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
+    ctx->evt.connect<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
+    ctx->evt.connect<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
+    ctx->evt.connect<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
+    ctx->evt.connect<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
 }
 
 void StandardGameScene::on_stop() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     options_gracefully::save_to_file<game_options::GameOptions>(
         game_options::GAME_OPTIONS_FILE, data.options
     );
 
-    if (data.options.save_on_exit && !app->running && made_first_move) {
+    if (data.options.save_on_exit && !ctx->running && made_first_move) {
         save_game();
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
-    app->renderer->origin = false;
+    ctx->r3d->origin = false;
 #endif
 
     imgui_reset();
@@ -116,7 +116,7 @@ void StandardGameScene::on_stop() {
     skybox_loader->join();
     board_paint_texture_loader->join();
 
-    app->evt.disconnect(this);
+    ctx->evt.disconnect(this);
 }
 
 void StandardGameScene::on_awake() {
@@ -136,11 +136,11 @@ void StandardGameScene::on_awake() {
 }
 
 void StandardGameScene::on_update() {
-    camera_controller.update_controls(app->get_delta());
-    camera_controller.update_camera(app->get_delta());
+    camera_controller.update_controls(ctx->get_delta());
+    camera_controller.update_camera(ctx->get_delta());
 
-    board.update_nodes(app->renderer->get_hovered_id());
-    board.update_pieces(app->renderer->get_hovered_id());
+    board.update_nodes(ctx->r3d->get_hovered_id());
+    board.update_pieces(ctx->r3d->get_hovered_id());
     board.move_pieces();
 
     timer.update();
@@ -168,7 +168,7 @@ void StandardGameScene::on_imgui_update() {
 void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
     if (event.button == input::MouseButton::Left) {
         if (board.next_move && board.phase != BoardPhase::None) {
-            board.click(app->renderer->get_hovered_id());
+            board.click(ctx->r3d->get_hovered_id());
         }
     }
 }
@@ -180,7 +180,7 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         );
 
         if (board.next_move && board.is_players_turn && valid_phases) {
-            const auto flags = board.release(app->renderer->get_hovered_id());
+            const auto flags = board.release(ctx->r3d->get_hovered_id());
 
             update_after_human_move(
                 flags.did_action, flags.switched_turn, flags.must_take_or_took_piece
@@ -299,7 +299,7 @@ void StandardGameScene::setup_entities() {
             i,
             PieceType::White,
             objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
-            app->res.al_source.load(hs("piece" + std::to_string(i)))
+            ctx->res.al_source.load(hs("piece" + std::to_string(i)))
         };
     }
 
@@ -308,7 +308,7 @@ void StandardGameScene::setup_entities() {
             i,
             PieceType::Black,
             objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
-            app->res.al_source.load(hs("piece" + std::to_string(i)))
+            ctx->res.al_source.load(hs("piece" + std::to_string(i)))
         };
     }
 
@@ -342,23 +342,23 @@ void StandardGameScene::initialize_renderables() {
 }
 
 void StandardGameScene::initialize_pieces() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     if (data.launcher_options.normal_mapping) {
         for (size_t i = 0; i < 9; i++) {
-            initialize_piece(i, app->res.texture["white_piece_diffuse"_H]);
+            initialize_piece(i, ctx->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 9; i < 18; i++) {
-            initialize_piece(i, app->res.texture["black_piece_diffuse"_H]);
+            initialize_piece(i, ctx->res.texture["black_piece_diffuse"_H]);
         }
     } else {
         for (size_t i = 0; i < 9; i++) {
-            initialize_piece_no_normal(i, app->res.texture["white_piece_diffuse"_H]);
+            initialize_piece_no_normal(i, ctx->res.texture["white_piece_diffuse"_H]);
         }
 
         for (size_t i = 9; i < 18; i++) {
-            initialize_piece_no_normal(i, app->res.texture["black_piece_diffuse"_H]);
+            initialize_piece_no_normal(i, ctx->res.texture["black_piece_diffuse"_H]);
         }
     }
 }

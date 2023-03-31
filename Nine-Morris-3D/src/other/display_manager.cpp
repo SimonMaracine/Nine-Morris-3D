@@ -7,9 +7,9 @@ static const char* RESOLUTIONS[] = {
     "512x288", "768x432", "1024x576", "1280x720", "1536x864", "1792x1008"
 };
 
-DisplayManager::DisplayManager(Application* app)
+DisplayManager::DisplayManager(Ctx* ctx)
     : app(app) {
-    monitors = app->window->get_monitors();
+    monitors = ctx->window->get_monitors();
 
     const auto resolution = monitors[0].get_resolution();
     const int width = resolution.first;

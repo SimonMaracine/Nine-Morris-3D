@@ -79,7 +79,7 @@ namespace gui {
 
         WidgetType type = WidgetType::None;
 
-        static Application* app;
+        static Ctx* ctx;
 
         friend class ::Application;
         friend class ::GuiRenderer;

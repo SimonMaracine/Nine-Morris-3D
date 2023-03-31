@@ -65,7 +65,7 @@ void Board::update_pieces(identifier::Id hovered_id) {
 }
 
 void Board::move_pieces() {
-    const float dt = app->get_delta();
+    const float dt = ctx->delta;
 
     std::vector<size_t> to_erase;
 
@@ -351,20 +351,20 @@ void Board::play_piece_place_sound(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
     const auto choice = random_gen::choice({ "piece_place1"_H, "piece_place2"_H });
-    piece.source->play(app->res.al_buffer[choice].get());
+    piece.source->play(ctx->res.al_buffer[choice].get());
 }
 
 void Board::play_piece_move_sound(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
     const auto choice = random_gen::choice({ "piece_move1"_H, "piece_move2"_H });
-    piece.source->play(app->res.al_buffer[choice].get());
+    piece.source->play(ctx->res.al_buffer[choice].get());
 }
 
 void Board::play_piece_take_sound(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
-    piece.source->play(app->res.al_buffer["piece_take"_H].get());
+    piece.source->play(ctx->res.al_buffer["piece_take"_H].get());
 }
 
 void Board::remember_position_and_check_repetition(size_t piece_index, size_t node_index) {
@@ -427,7 +427,7 @@ void Board::piece_arrive_at_node(size_t piece_index) {
     // Remove piece forever, if set to remove
     if (piece.pending_remove) {
         scene->scene_list.remove(piece.model);
-        // app->renderer->remove_model(piece.model);
+        // ctx->r3d->remove_model(piece.model);
         pieces.erase(piece.index);
     }
 

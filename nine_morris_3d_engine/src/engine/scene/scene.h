@@ -2,12 +2,12 @@
 
 #include <resmanager/resmanager.h>
 
-#include "engine/application/event.h"
+#include "engine/application/events.h"
 #include "engine/other/dummy.h"
 #include "engine/scene/scene_list.h"
 #include "engine/scene/object_manager.h"
 
-class Application;
+class Ctx;
 
 /**
  * Class representing an entire scene of a game. Needs to be heap-allocated.
@@ -38,7 +38,7 @@ public:
     SceneList scene_list;  // List of all objects to be rendered
     ObjectManager objects;  // Storage for all the renderable objects
 
-    Application* app = nullptr;
+    Ctx* ctx = nullptr;
 private:
     inline void _on_stop() {  // Used to clean up objects
         scene_list.clear();
@@ -49,5 +49,6 @@ private:
     SceneId id;
     bool on_awake_called = false;
 
+    friend class Ctx;
     friend class Application;
 };

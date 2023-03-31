@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/signal/dispatcher.hpp>
+#include <spdlog/fmt/fmt.h>
 
 #include "engine/application/input.h"
 
@@ -56,8 +57,6 @@ void EventDispatcher::enqueue(Args&&... args) {
     dispatcher.template enqueue<E>(std::forward<Args>(args)...);
 }
 
-// TODO print events
-
 struct WindowClosedEvent {};
 
 struct WindowResizedEvent {
@@ -65,10 +64,14 @@ struct WindowResizedEvent {
     int height;
 };
 
+struct WindowFocusedEvent {
+    bool focused;
+};
+
 struct KeyPressedEvent {
     input::Key key;
     bool repeat;
-    bool control;
+    bool ctrl;
 };
 
 struct KeyReleasedEvent {
@@ -91,3 +94,30 @@ struct MouseMovedEvent {
     float mouse_x;
     float mouse_y;
 };
+
+#define EVENT_FORMATTER(EVENT, ...) \
+    template<> \
+    struct fmt::formatter<EVENT> { \
+        constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) { \
+            if (ctx.begin() != ctx.end()) { \
+                throw format_error("invalid format"); \
+            } \
+        \
+            return ctx.begin(); \
+        } \
+        \
+        template <typename FormatContext> \
+        auto format(const EVENT& event, FormatContext& ctx) const -> decltype(ctx.out()) { \
+            return fmt::format_to(ctx.out(), __VA_ARGS__); \
+        } \
+    };
+
+EVENT_FORMATTER(WindowClosedEvent, "WindowClosedEvent()")
+EVENT_FORMATTER(WindowResizedEvent, "WindowResizedEvent({}, {})", event.width, event.height)
+EVENT_FORMATTER(WindowFocusedEvent, "WindowFocusedEvent({})", event.focused)
+EVENT_FORMATTER(KeyPressedEvent, "KeyPressedEvent({}, {})", static_cast<int>(event.key), event.repeat)
+EVENT_FORMATTER(KeyReleasedEvent, "KeyReleasedEvent({})", static_cast<int>(event.key))
+EVENT_FORMATTER(MouseButtonPressedEvent, "MouseButtonPressedEvent({})", static_cast<int>(event.button))
+EVENT_FORMATTER(MouseButtonReleasedEvent, "MouseButtonReleasedEvent({})", static_cast<int>(event.button))
+EVENT_FORMATTER(MouseScrolledEvent, "MouseScrolledEvent({})", event.scroll)
+EVENT_FORMATTER(MouseMovedEvent, "MouseMovedEvent({}, {})", event.mouse_x, event.mouse_y)

@@ -3,6 +3,6 @@
 #include <engine/engine_application.h>
 
 namespace game {
-    void start(Application* app);
-    void stop(Application* app);
+    void start(Ctx* ctx);
+    void stop(Ctx* ctx);
 }

@@ -16,9 +16,9 @@ void SceneGame::setup_and_add_model_board() {
     auto& board = get_board();
 
     board.model->scale = WORLD_SCALE;
-    board.model->vertex_array = app->res.vertex_array["board_wood"_H];
-    board.model->index_buffer = app->res.index_buffer["board_wood"_H];
-    board.model->material = app->res.material_instance["board_wood"_H];
+    board.model->vertex_array = ctx->res.vertex_array["board_wood"_H];
+    board.model->index_buffer = ctx->res.index_buffer["board_wood"_H];
+    board.model->material = ctx->res.material_instance["board_wood"_H];
     board.model->cast_shadow = true;
     board.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
     board.model->bounding_box->id = identifier::null;
@@ -35,9 +35,9 @@ void SceneGame::setup_and_add_model_board_paint() {
 
     board.paint_model->position = glm::vec3(0.0f, PAINT_Y_POSITION, 0.0f);
     board.paint_model->scale = WORLD_SCALE;
-    board.paint_model->vertex_array = app->res.vertex_array["board_paint"_H];
-    board.paint_model->index_buffer = app->res.index_buffer["board_paint"_H];
-    board.paint_model->material = app->res.material_instance["board_paint"_H];
+    board.paint_model->vertex_array = ctx->res.vertex_array["board_paint"_H];
+    board.paint_model->index_buffer = ctx->res.index_buffer["board_paint"_H];
+    board.paint_model->material = ctx->res.material_instance["board_paint"_H];
 
     scene_list.add(get_board().paint_model);
 
@@ -45,7 +45,7 @@ void SceneGame::setup_and_add_model_board_paint() {
 }
 
 void SceneGame::setup_and_add_model_piece(size_t index, const glm::vec3& position) {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     const Piece& piece = get_board().pieces.at(index);
 
@@ -54,9 +54,9 @@ void SceneGame::setup_and_add_model_piece(size_t index, const glm::vec3& positio
     piece.model->position = position;
     piece.model->rotation = RANDOM_PIECE_ROTATION();
     piece.model->scale = WORLD_SCALE;
-    piece.model->vertex_array = app->res.vertex_array[id];
-    piece.model->index_buffer = app->res.index_buffer[id];
-    piece.model->material = app->res.material_instance[hs("piece" + std::to_string(index))];
+    piece.model->vertex_array = ctx->res.vertex_array[id];
+    piece.model->index_buffer = ctx->res.index_buffer[id];
+    piece.model->material = ctx->res.material_instance[hs("piece" + std::to_string(index))];
     piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
     piece.model->cast_shadow = true;
     piece.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
@@ -78,15 +78,15 @@ void SceneGame::setup_and_add_model_nodes() {
 }
 
 void SceneGame::setup_and_add_model_node(size_t index, const glm::vec3& position) {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     const Node& node = get_board().nodes.at(index);
 
     node.model->position = position;
     node.model->scale = WORLD_SCALE;
-    node.model->vertex_array = app->res.vertex_array["node"_H];
-    node.model->index_buffer = app->res.index_buffer["node"_H];
-    node.model->material = app->res.material_instance[hs("node" + std::to_string(index))];
+    node.model->vertex_array = ctx->res.vertex_array["node"_H];
+    node.model->index_buffer = ctx->res.index_buffer["node"_H];
+    node.model->material = ctx->res.material_instance[hs("node" + std::to_string(index))];
     node.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
     node.model->bounding_box->id = data.node_ids[index];
     node.model->bounding_box->size = NODE_BOUNDING_BOX;
@@ -105,7 +105,7 @@ void SceneGame::setup_piece_on_node(size_t index, size_t node_index) {
 }
 
 void SceneGame::setup_camera() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     static constexpr float PITCH = 47.0f;
     static constexpr float DISTANCE_TO_POINT = 8.0f;
@@ -114,8 +114,8 @@ void SceneGame::setup_camera() {
 
     camera_controller = PointCameraController {
         &camera,
-        app->data().width,
-        app->data().height,
+        ctx->data().width,
+        ctx->data().height,
         LENS_FOV,
         LENS_NEAR,
         LENS_FAR,
@@ -129,8 +129,8 @@ void SceneGame::setup_camera() {
 
     camera_controller = PointCameraController {
         &camera,
-        app->data().width,
-        app->data().height,
+        ctx->data().width,
+        ctx->data().height,
         LENS_FOV,
         LENS_NEAR,
         LENS_FAR,
@@ -140,7 +140,7 @@ void SceneGame::setup_camera() {
         data.options.sensitivity
     };
 
-    app->renderer->set_camera_controller(&camera_controller);
+    ctx->r3d->set_camera_controller(&camera_controller);
     update_listener();
 
     LOG_DEBUG("Setup camera");
@@ -148,7 +148,7 @@ void SceneGame::setup_camera() {
 
 void SceneGame::setup_and_add_turn_indicator() {
     auto turn_indicator = objects.add<gui::Image>(
-        "turn_indicator"_H, app->res.texture["white_indicator"_H]
+        "turn_indicator"_H, ctx->res.texture["white_indicator"_H]
     );
 
     turn_indicator->stick(gui::Sticky::SE);
@@ -160,11 +160,11 @@ void SceneGame::setup_and_add_turn_indicator() {
 }
 
 void SceneGame::setup_and_add_timer_text() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     auto timer_text = objects.add<gui::Text>(
         "timer_text"_H,
-        app->res.font["open_sans"_H],
+        ctx->res.font["open_sans"_H],
         "00:00",
         1.5f,
         TIMER_TEXT_COLOR
@@ -182,7 +182,7 @@ void SceneGame::setup_and_add_timer_text() {
 
 void SceneGame::setup_wait_indicator() {
     auto wait_indicator = objects.add<gui::Image>(
-        "wait_indicator"_H, app->res.texture["wait_indicator"_H]
+        "wait_indicator"_H, ctx->res.texture["wait_indicator"_H]
     );
 
     wait_indicator->stick(gui::Sticky::NE);
@@ -193,7 +193,7 @@ void SceneGame::setup_wait_indicator() {
 
 void SceneGame::setup_computer_thinking_indicator() {
     auto computer_thinking_indicator = objects.add<gui::Image>(
-        "computer_thinking_indicator"_H, app->res.texture["computer_thinking_indicator"_H]
+        "computer_thinking_indicator"_H, ctx->res.texture["computer_thinking_indicator"_H]
     );
 
     computer_thinking_indicator->stick(gui::Sticky::NE);
@@ -205,10 +205,10 @@ void SceneGame::setup_computer_thinking_indicator() {
 void SceneGame::setup_light_bulb() {
     auto light_bulb = objects.add<renderables::Quad>("light_bulb"_H);
 
-    light_bulb->texture = app->res.texture["light_bulb"_H];
+    light_bulb->texture = ctx->res.texture["light_bulb"_H];
 
 #ifdef NM3D_PLATFORM_DEBUG
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     if (data.options.skybox == game_options::FIELD) {
         light_bulb->position = LIGHT_FIELD.position;
@@ -221,22 +221,22 @@ void SceneGame::setup_light_bulb() {
 }
 
 void SceneGame::initialize_piece(size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
-    auto material_instance = app->res.material_instance.load(
+    auto material_instance = ctx->res.material_instance.load(
         hs("piece" + std::to_string(index)),
-        app->res.material["tinted_wood"_H]
+        ctx->res.material["tinted_wood"_H]
     );
 
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.2f));
     material_instance->set_float("u_material.shininess"_H, 4.0f);
-    material_instance->set_texture("u_material.normal"_H, app->res.texture["piece_normal"_H], 1);
+    material_instance->set_texture("u_material.normal"_H, ctx->res.texture["piece_normal"_H], 1);
     material_instance->set_vec3("u_material.tint"_H, DEFAULT_TINT);
 }
 
 void SceneGame::initialize_piece_no_normal(size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
-    auto material_instance = app->res.material_instance.load(
+    auto material_instance = ctx->res.material_instance.load(
         hs("piece" + std::to_string(index)),
-        app->res.material["tinted_wood"_H]
+        ctx->res.material["tinted_wood"_H]
     );
 
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
@@ -247,43 +247,43 @@ void SceneGame::initialize_piece_no_normal(size_t index, std::shared_ptr<gl::Tex
 
 void SceneGame::release_piece_material_instances() {
     for (size_t i = 0; i < MAX_PIECES; i++) {
-        app->res.material_instance.release(hs("piece" + std::to_string(i)));
+        ctx->res.material_instance.release(hs("piece" + std::to_string(i)));
     }
 }
 
 void SceneGame::change_skybox() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     const std::array<std::shared_ptr<TextureData>, 6> texture_data = {
-        app->res.texture_data["skybox_px"_H],
-        app->res.texture_data["skybox_nx"_H],
-        app->res.texture_data["skybox_py"_H],
-        app->res.texture_data["skybox_ny"_H],
-        app->res.texture_data["skybox_pz"_H],
-        app->res.texture_data["skybox_nz"_H]
+        ctx->res.texture_data["skybox_px"_H],
+        ctx->res.texture_data["skybox_nx"_H],
+        ctx->res.texture_data["skybox_py"_H],
+        ctx->res.texture_data["skybox_ny"_H],
+        ctx->res.texture_data["skybox_pz"_H],
+        ctx->res.texture_data["skybox_nz"_H]
     };
 
-    auto texture = app->res.texture_3d.force_load("skybox"_H, texture_data);
-    app->renderer->set_skybox(texture);
+    auto texture = ctx->res.texture_3d.force_load("skybox"_H, texture_data);
+    ctx->r3d->set_skybox(texture);
 
     if (data.options.skybox == game_options::FIELD) {  // FIXME this is not dry
-        app->renderer->directional_light = LIGHT_FIELD;
-        app->renderer->light_space = SHADOWS_FIELD;
+        ctx->r3d->directional_light = LIGHT_FIELD;
+        ctx->r3d->light_space = SHADOWS_FIELD;
     } else if (data.options.skybox == game_options::AUTUMN) {
-        app->renderer->directional_light = LIGHT_AUTUMN;
-        app->renderer->light_space = SHADOWS_AUTUMN;
+        ctx->r3d->directional_light = LIGHT_AUTUMN;
+        ctx->r3d->light_space = SHADOWS_AUTUMN;
     } else if (data.options.skybox == game_options::NONE) {
-        app->renderer->directional_light = LIGHT_NONE;
-        app->renderer->light_space = SHADOWS_NONE;
+        ctx->r3d->directional_light = LIGHT_NONE;
+        ctx->r3d->light_space = SHADOWS_NONE;
     } else {
         ASSERT(false, "Invalid skybox");
     }
 
-    app->res.texture_data.release("skybox"_H);
+    ctx->res.texture_data.release("skybox"_H);
 }
 
 void SceneGame::change_board_paint_texture() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -291,19 +291,19 @@ void SceneGame::change_board_paint_texture() {
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
 
-    auto diffuse_texture = app->res.texture.force_load(
+    auto diffuse_texture = ctx->res.texture.force_load(
         "board_paint_diffuse"_H,
-        app->res.texture_data["board_paint_diffuse"_H],
+        ctx->res.texture_data["board_paint_diffuse"_H],
         specification
     );
 
-    app->res.material_instance["board_paint"_H]->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
+    ctx->res.material_instance["board_paint"_H]->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
 
-    app->res.texture_data.release("board_paint_diffuse"_H);
+    ctx->res.texture_data.release("board_paint_diffuse"_H);
 }
 
 void SceneGame::update_listener() {
-    auto& listener = app->openal->get_listener();
+    auto& listener = ctx->snd->get_listener();
 
     listener.set_position(camera_controller.get_position());
 
@@ -314,26 +314,26 @@ void SceneGame::update_listener() {
 }
 
 void SceneGame::update_cursor() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     if (data.options.custom_cursor) {
         if (get_board().must_take_piece) {
-            app->window->set_cursor(data.cross_cursor);
+            ctx->window->set_cursor(data.cross_cursor);
 
-            objects.get<renderables::Quad>("keyboard_controls"_H)->texture = app->res.texture["keyboard_controls_cross"_H];
+            objects.get<renderables::Quad>("keyboard_controls"_H)->texture = ctx->res.texture["keyboard_controls_cross"_H];
         } else {
-            app->window->set_cursor(data.arrow_cursor);
+            ctx->window->set_cursor(data.arrow_cursor);
 
-            objects.get<renderables::Quad>("keyboard_controls"_H)->texture = app->res.texture["keyboard_controls_default"_H];
+            objects.get<renderables::Quad>("keyboard_controls"_H)->texture = ctx->res.texture["keyboard_controls_default"_H];
         }
     }
 }
 
 void SceneGame::update_turn_indicator() {
     if (get_board().turn == BoardPlayer::White) {
-        objects.get<gui::Image>("turn_indicator"_H)->set_image(app->res.texture["white_indicator"_H]);
+        objects.get<gui::Image>("turn_indicator"_H)->set_image(ctx->res.texture["white_indicator"_H]);
     } else {
-        objects.get<gui::Image>("turn_indicator"_H)->set_image(app->res.texture["black_indicator"_H]);
+        objects.get<gui::Image>("turn_indicator"_H)->set_image(ctx->res.texture["black_indicator"_H]);
     }
 }
 
@@ -520,8 +520,8 @@ void SceneGame::update_game_state() {
 
 void SceneGame::update_all_imgui() {
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(app->data().width, app->data().height);
-    io.DeltaTime = app->get_delta();
+    io.DisplaySize = ImVec2(ctx->data().width, ctx->data().height);
+    io.DeltaTime = ctx->get_delta();
 
     if (get_board().phase == BoardPhase::GameOver && get_board().next_move) {
         window = WindowImGui::ShowGameOver;
@@ -570,17 +570,17 @@ void SceneGame::update_all_imgui() {
 
 void SceneGame::set_skybox(Skybox skybox) {
     if (skybox == Skybox::None) {
-        app->renderer->set_skybox(nullptr);
+        ctx->r3d->set_skybox(nullptr);
         return;
     }
 
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     skybox_loader->start_loading_thread(data.launcher_options.texture_quality, data.options.skybox);
 }
 
 void SceneGame::set_board_paint_texture() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     board_paint_texture_loader->start_loading_thread(
         data.launcher_options.texture_quality,
@@ -642,7 +642,7 @@ void SceneGame::imgui_reset() {
 }
 
 void SceneGame::imgui_draw_menu_bar() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     if (ImGui::BeginMainMenuBar()) {
         // TODO what to do when computer is in charge?
@@ -655,7 +655,7 @@ void SceneGame::imgui_draw_menu_bar() {
 
         if (ImGui::BeginMenu("Game")) {
             if (ImGui::MenuItem("New Game", nullptr, false, can_change)) {
-                app->change_scene(app->get_current_scene()->get_id());
+                ctx->change_scene(ctx->get_current_scene()->get_id());
 
                 LOG_INFO("Restarted current game");
             }
@@ -680,7 +680,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::RadioButton("Standard Game", &data.imgui_option.scene, game_options::STANDARD)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
-                        app->change_scene("standard_game"_H);
+                        ctx->change_scene("standard_game"_H);
 
                         LOG_INFO("Changed scene to standard game");
                     }
@@ -688,7 +688,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::RadioButton("Jump Variant", &data.imgui_option.scene, game_options::JUMP)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
-                        app->change_scene("jump_variant"_H);
+                        ctx->change_scene("jump_variant"_H);
 
                         LOG_INFO("Changed scene to jump variant");
                     }
@@ -696,7 +696,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::RadioButton("Jump Plus Variant", &data.imgui_option.scene, game_options::JUMP_PLUS)) {
                     if (data.imgui_option.scene != data.options.scene) {
                         data.options.scene = data.imgui_option.scene;
-                        app->change_scene("jump_plus_variant"_H);
+                        ctx->change_scene("jump_plus_variant"_H);
 
                         LOG_INFO("Changed scene to jump plus variant");
                     }
@@ -765,11 +765,11 @@ void SceneGame::imgui_draw_menu_bar() {
                 can_redo = get_redo_size() > 0;
             }
             if (ImGui::MenuItem("Exit To Launcher")) {
-                app->running = false;
-                app->exit_code = 1;
+                ctx->running = false;
+                ctx->exit_code = 1;
             }
             if (ImGui::MenuItem("Exit")) {
-                app->running = false;
+                ctx->running = false;
             }
 
             ImGui::EndMenu();
@@ -778,11 +778,11 @@ void SceneGame::imgui_draw_menu_bar() {
             if (ImGui::BeginMenu("Graphics")) {
                 if (ImGui::MenuItem("VSync", nullptr, &data.options.vsync)) {
                     if (data.options.vsync) {
-                        app->window->set_vsync(data.options.vsync);
+                        ctx->window->set_vsync(data.options.vsync);
 
                         LOG_INFO("VSync enabled");
                     } else {
-                        app->window->set_vsync(data.options.vsync);
+                        ctx->window->set_vsync(data.options.vsync);
 
                         LOG_INFO("VSync disabled");
                     }
@@ -790,14 +790,14 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::MenuItem("Custom Cursor", nullptr, &data.options.custom_cursor)) {
                     if (data.options.custom_cursor) {
                         if (get_board().must_take_piece) {
-                            app->window->set_cursor(data.cross_cursor);
+                            ctx->window->set_cursor(data.cross_cursor);
                         } else {
-                            app->window->set_cursor(data.arrow_cursor);
+                            ctx->window->set_cursor(data.arrow_cursor);
                         }
 
                         LOG_INFO("Set custom cursor");
                     } else {
-                        app->window->set_cursor(0);
+                        ctx->window->set_cursor(0);
 
                         LOG_INFO("Set default cursor");
                     }
@@ -809,7 +809,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::BeginMenu("Master Volume")) {
                     ImGui::PushItemWidth(100.0f);
                     if (ImGui::SliderFloat("##", &data.options.master_volume, 0.0f, 1.0f, "%.01f")) {
-                        app->openal->get_listener().set_gain(data.options.master_volume);
+                        ctx->snd->get_listener().set_gain(data.options.master_volume);
 
                         LOG_INFO("Changed master volume to {}", data.options.master_volume);
                     }
@@ -830,7 +830,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 }
                 if (ImGui::MenuItem("Enable Music", nullptr, &data.options.enable_music)) {
                     if (data.options.enable_music) {
-                        auto& data = app->user_data<Data>();
+                        auto& data = ctx->user_data<Data>();
 
                         music::play_music_track(data.current_music_track);
 
@@ -908,7 +908,7 @@ void SceneGame::imgui_draw_menu_bar() {
             }
             if (ImGui::BeginMenu("User Interface")) {
                 if (ImGui::MenuItem("Hide Timer", nullptr, &data.options.hide_timer)) {
-                    auto& data = app->user_data<Data>();
+                    auto& data = ctx->user_data<Data>();
 
                     if (data.options.hide_timer) {
                         scene_list.remove(objects.get<gui::Text>("timer_text"_H));
@@ -972,7 +972,7 @@ void SceneGame::imgui_draw_menu_bar() {
 }
 
 void SceneGame::imgui_draw_info() {
-    ImGui::PushFont(app->user_data<Data>().imgui_info_font);
+    ImGui::PushFont(ctx->user_data<Data>().imgui_info_font);
 
     const int flags = (
         ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove
@@ -987,7 +987,7 @@ void SceneGame::imgui_draw_info() {
 #endif
 
     ImGui::Begin("Information", nullptr, flags);
-    ImGui::Text("FPS: %.3f", app->get_fps());
+    ImGui::Text("FPS: %.3f", ctx->get_fps());
     ImGui::Text("Build: %s", build_mode);
     ImGui::End();
 
@@ -1036,7 +1036,7 @@ void SceneGame::imgui_draw_game_over() {
 void SceneGame::imgui_draw_about() {
     imgui_draw_window("About Nine Morris 3D", [this]() {
         ImGui::Text("A 3D implementation of the board game nine men's morris");
-        ImGui::Text("Version %u.%u.%u", app->data().version_major, app->data().version_minor, app->data().version_patch);
+        ImGui::Text("Version %u.%u.%u", ctx->data().version_major, ctx->data().version_minor, ctx->data().version_patch);
         ImGui::Separator();
         ImGui::Text("All programming by:");
         ImGui::Text(u8"Simon-Teodor Mărăcine - simonmara.dev@gmail.com");
@@ -1100,7 +1100,7 @@ void SceneGame::imgui_draw_ai_settings() {
 void SceneGame::imgui_draw_debug() {
 #ifndef NM3D_PLATFORM_RELEASE_DISTRIBUTION
     ImGui::Begin("Debug");
-    ImGui::Text("FPS: %.3f", app->get_fps());
+    ImGui::Text("FPS: %.3f", ctx->get_fps());
     draw_debug_imgui();
     ImGui::Text("Phase: %d", static_cast<int>(get_board().phase));
     ImGui::Text("Turn: %s", get_board().turn == BoardPlayer::White ? "white" : "black");
@@ -1108,7 +1108,7 @@ void SceneGame::imgui_draw_debug() {
     ImGui::Text("Must take piece: %s", get_board().must_take_piece ? "true" : "false");
     ImGui::Text("Undo history size: %lu", get_undo_size());
     ImGui::Text("Redo history size: %lu", get_redo_size());
-    ImGui::Text("Hovered ID: %.3f", static_cast<float>(app->renderer->get_hovered_id()));
+    ImGui::Text("Hovered ID: %.3f", static_cast<float>(ctx->r3d->get_hovered_id()));
     ImGui::Text("Clicked node: %lu", get_board().clicked_node_index);
     ImGui::Text("Clicked piece: %lu", get_board().clicked_piece_index);
     ImGui::Text("Selected piece: %lu", get_board().selected_piece_index);
@@ -1118,7 +1118,7 @@ void SceneGame::imgui_draw_debug() {
     ImGui::End();
 
     {
-        const float time = app->get_delta() * 1000.0f;
+        const float time = ctx->get_delta() * 1000.0f;
         frames[index] = time;
 
         if (index < FRAMES_SIZE) {
@@ -1183,52 +1183,52 @@ void SceneGame::imgui_draw_debug() {
     ImGui::End();
 
     ImGui::Begin("Light Settings");
-    if (ImGui::SliderFloat3("Position", glm::value_ptr(app->renderer->directional_light.position), -30.0f, 30.0f)) {
-        objects.get<renderables::Quad>("light_bulb"_H)->position = app->renderer->directional_light.position;
+    if (ImGui::SliderFloat3("Position", glm::value_ptr(ctx->r3d->directional_light.position), -30.0f, 30.0f)) {
+        objects.get<renderables::Quad>("light_bulb"_H)->position = ctx->r3d->directional_light.position;
     }
-    ImGui::SliderFloat3("Ambient color", glm::value_ptr(app->renderer->directional_light.ambient_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse color", glm::value_ptr(app->renderer->directional_light.diffuse_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Specular color", glm::value_ptr(app->renderer->directional_light.specular_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Ambient color", glm::value_ptr(ctx->r3d->directional_light.ambient_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse color", glm::value_ptr(ctx->r3d->directional_light.diffuse_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Specular color", glm::value_ptr(ctx->r3d->directional_light.specular_color), 0.0f, 1.0f);
     ImGui::End();
 
     // If you recompile shaders, uniforms that are set only once need to be reuploaded
     /*
     ImGui::Begin("Shaders");  // TODO see what to do with this
     if (ImGui::Button("board_paint")) {
-        // app->data.board_paint_shader->recompile();
+        // ctx->data.board_paint_shader->recompile();
     }
     if (ImGui::Button("board")) {
-        // app->data.board_wood_shader->recompile();
+        // ctx->data.board_wood_shader->recompile();
     }
     if (ImGui::Button("node")) {
-        // app->data.node_shader->recompile();
+        // ctx->data.node_shader->recompile();
     }
     if (ImGui::Button("origin")) {
-        // app->renderer->get_origin_shader()->recompile();
+        // ctx->r3d->get_origin_shader()->recompile();
     }
     if (ImGui::Button("outline")) {
-        // app->renderer->get_outline_shader()->recompile();
+        // ctx->r3d->get_outline_shader()->recompile();
     }
     if (ImGui::Button("piece")) {
-        // app->data.piece_shader->recompile();
+        // ctx->data.piece_shader->recompile();
     }
     if (ImGui::Button("quad2d")) {
-        // app->gui_renderer->get_quad2d_shader()->recompile();
+        // ctx->r2d->get_quad2d_shader()->recompile();
     }
     if (ImGui::Button("quad3d")) {
-        // app->renderer->get_quad3d_shader()->recompile();
+        // ctx->r3d->get_quad3d_shader()->recompile();
     }
     if (ImGui::Button("screen_quad")) {
-        // app->renderer->get_screen_quad_shader()->recompile();
+        // ctx->r3d->get_screen_quad_shader()->recompile();
     }
     if (ImGui::Button("shadow")) {
-        // app->renderer->get_shadow_shader()->recompile();
+        // ctx->r3d->get_shadow_shader()->recompile();
     }
     if (ImGui::Button("skybox")) {
-        // app->renderer->get_skybox_shader()->recompile();
+        // ctx->r3d->get_skybox_shader()->recompile();
     }
     if (ImGui::Button("text")) {
-        // app->gui_renderer->get_text_shader()->recompile();
+        // ctx->r2d->get_text_shader()->recompile();
     }
     ImGui::End();
     */
@@ -1245,13 +1245,13 @@ void SceneGame::imgui_draw_debug() {
     ImGui::End();
 
     ImGui::Begin("Light Space Matrix");
-    ImGui::SliderFloat("Left", &app->renderer->light_space.left, -10.0f, 10.0f);
-    ImGui::SliderFloat("Right", &app->renderer->light_space.right, -10.0f, 10.0f);
-    ImGui::SliderFloat("Bottom", &app->renderer->light_space.bottom, -10.0f, 10.0f);
-    ImGui::SliderFloat("Top", &app->renderer->light_space.top, -10.0f, 10.0f);
-    ImGui::SliderFloat("Near", &app->renderer->light_space.lens_near, 0.1f, 2.0f);
-    ImGui::SliderFloat("Far", &app->renderer->light_space.lens_far, 2.0f, 50.0f);
-    ImGui::SliderFloat("Position divisor", &app->renderer->light_space.position_divisor, 1.0f, 10.0f);
+    ImGui::SliderFloat("Left", &ctx->r3d->light_space.left, -10.0f, 10.0f);
+    ImGui::SliderFloat("Right", &ctx->r3d->light_space.right, -10.0f, 10.0f);
+    ImGui::SliderFloat("Bottom", &ctx->r3d->light_space.bottom, -10.0f, 10.0f);
+    ImGui::SliderFloat("Top", &ctx->r3d->light_space.top, -10.0f, 10.0f);
+    ImGui::SliderFloat("Near", &ctx->r3d->light_space.lens_near, 0.1f, 2.0f);
+    ImGui::SliderFloat("Far", &ctx->r3d->light_space.lens_far, 2.0f, 50.0f);
+    ImGui::SliderFloat("Position divisor", &ctx->r3d->light_space.position_divisor, 1.0f, 10.0f);
     ImGui::End();
 #endif
 }
@@ -1277,7 +1277,7 @@ void SceneGame::imgui_draw_game_over_message(std::string_view message1, std::str
 
 void SceneGame::imgui_draw_window(const char* title, const std::function<void()>& contents,
         const std::function<void()>& ok_callback) {
-    ImGui::PushFont(app->user_data<Data>().imgui_windows_font);
+    ImGui::PushFont(ctx->user_data<Data>().imgui_windows_font);
     ImGui::OpenPopup(title);
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -1306,7 +1306,7 @@ void SceneGame::imgui_draw_window(const char* title, const std::function<void()>
 }
 
 void SceneGame::imgui_initialize_options() {  // FIXME this is no longer needed
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     data.imgui_option.skybox = data.options.skybox;
     data.imgui_option.labeled_board = data.options.labeled_board;

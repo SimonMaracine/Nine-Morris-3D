@@ -89,7 +89,7 @@ public:
         bool must_take_or_took_piece = false;
     } flags;
 
-    Application* app = nullptr;
+    Ctx* ctx = nullptr;
     Scene* scene = nullptr;
     KeyboardControls* keyboard = nullptr;
     PointCameraController* camera_controller = nullptr;

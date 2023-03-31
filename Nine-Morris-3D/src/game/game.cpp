@@ -13,15 +13,15 @@
 #include "other/data.h"
 #include "other/options_gracefully.h"
 
-static void load_game_options(Application* app) {
-    auto& data = app->user_data<Data>();
+static void load_game_options(Ctx* ctx) {
+    auto& data = ctx->user_data<Data>();
 
     options_gracefully::load_from_file<game_options::GameOptions>(
         game_options::GAME_OPTIONS_FILE, data.options, game_options::validate
     );
 }
 
-static void setup_icons(Application* app) {
+static void setup_icons(Ctx* ctx) {
     using namespace assets;
     using namespace file_system;
 
@@ -33,28 +33,28 @@ static void setup_icons(Application* app) {
         std::make_unique<TextureData>(path_for_assets(ICON_32), false)
     };
 
-    app->window->set_icons(icons);
+    ctx->window->set_icons(icons);
 }
 
-static void setup_cursors(Application* app) {
-    auto& data = app->user_data<Data>();
+static void setup_cursors(Ctx* ctx) {
+    auto& data = ctx->user_data<Data>();
 
     using namespace assets;
     using namespace file_system;
     using namespace encrypt;
 
-    data.arrow_cursor = app->window->add_cursor(
+    data.arrow_cursor = ctx->window->add_cursor(
         std::make_unique<TextureData>(encr(path_for_assets(ARROW_CURSOR)), false),
         4, 1
     );
-    data.cross_cursor = app->window->add_cursor(
+    data.cross_cursor = ctx->window->add_cursor(
         std::make_unique<TextureData>(encr(path_for_assets(CROSS_CURSOR)), false),
         8, 8
     );
 }
 
-static void setup_imgui_fonts(Application* app) {
-    auto& data = app->user_data<Data>();
+static void setup_imgui_fonts(Ctx* ctx) {
+    auto& data = ctx->user_data<Data>();
 
     using namespace assets;
     using namespace file_system;
@@ -75,12 +75,12 @@ static void setup_imgui_fonts(Application* app) {
     io.Fonts->Build();
 }
 
-static void setup_game_fonts(Application* app) {
+static void setup_game_fonts(Ctx* ctx) {
     using namespace assets;
     using namespace file_system;
 
     {
-        auto font = app->res.font.load(
+        auto font = ctx->res.font.load(
             "good_dog_plain"_H, path_for_assets(GOOD_DOG_PLAIN_FONT), 50.0f, 6, 180, 40, 512
         );
 
@@ -90,7 +90,7 @@ static void setup_game_fonts(Application* app) {
     }
 
     {
-        auto font = app->res.font.load(
+        auto font = ctx->res.font.load(
             "open_sans"_H, path_for_assets(OPEN_SANS_SEMIBOLD_FONT), 50.0f, 6, 180, 40, 512
         );
 
@@ -100,8 +100,8 @@ static void setup_game_fonts(Application* app) {
     }
 }
 
-static void setup_post_processing(Application* app) {
-    auto& data = app->user_data<Data>();
+static void setup_post_processing(Ctx* ctx) {
+    auto& data = ctx->user_data<Data>();
 
     if (!data.launcher_options.bloom) {
         return;  // Disable bloom
@@ -113,8 +113,8 @@ static void setup_post_processing(Application* app) {
 
     {
         gl::FramebufferSpecification specification;
-        specification.width = app->data().width / 2;
-        specification.height = app->data().height / 2;
+        specification.width = ctx->data().width / 2;
+        specification.height = ctx->data().height / 2;
         specification.resize_divisor = 2;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
@@ -122,8 +122,8 @@ static void setup_post_processing(Application* app) {
 
         auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
-        app->purge_framebuffers();
-        app->add_framebuffer(framebuffer);
+        ctx->purge_framebuffers();
+        ctx->add_framebuffer(framebuffer);
 
         auto shader = std::make_shared<gl::Shader>(
             encr(path_for_assets(BRIGHT_FILTER_VERTEX_SHADER)),
@@ -131,7 +131,7 @@ static void setup_post_processing(Application* app) {
             std::vector<std::string> { "u_screen_texture" }
         );
 
-        app->renderer->add_post_processing(std::make_unique<BrightFilter>("bright_filter", framebuffer, shader));
+        ctx->r3d->add_post_processing(std::make_unique<BrightFilter>("bright_filter", framebuffer, shader));
     }
 
     auto blur_shader = std::make_shared<gl::Shader>(
@@ -142,8 +142,8 @@ static void setup_post_processing(Application* app) {
 
     {
         gl::FramebufferSpecification specification;
-        specification.width = app->data().width / 4;
-        specification.height = app->data().height / 4;
+        specification.width = ctx->data().width / 4;
+        specification.height = ctx->data().height / 4;
         specification.resize_divisor = 4;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
@@ -151,15 +151,15 @@ static void setup_post_processing(Application* app) {
 
         auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
-        app->purge_framebuffers();
-        app->add_framebuffer(framebuffer);
+        ctx->purge_framebuffers();
+        ctx->add_framebuffer(framebuffer);
 
-        app->renderer->add_post_processing(std::make_unique<Blur>("blur1", framebuffer, blur_shader));
+        ctx->r3d->add_post_processing(std::make_unique<Blur>("blur1", framebuffer, blur_shader));
     }
     {
         gl::FramebufferSpecification specification;
-        specification.width = app->data().width / 8;
-        specification.height = app->data().height / 8;
+        specification.width = ctx->data().width / 8;
+        specification.height = ctx->data().height / 8;
         specification.resize_divisor = 8;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
@@ -167,15 +167,15 @@ static void setup_post_processing(Application* app) {
 
         auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
-        app->purge_framebuffers();
-        app->add_framebuffer(framebuffer);
+        ctx->purge_framebuffers();
+        ctx->add_framebuffer(framebuffer);
 
-        app->renderer->add_post_processing(std::make_unique<Blur>("blur2", framebuffer, blur_shader));
+        ctx->r3d->add_post_processing(std::make_unique<Blur>("blur2", framebuffer, blur_shader));
     }
     {
         gl::FramebufferSpecification specification;
-        specification.width = app->data().width;
-        specification.height = app->data().height;
+        specification.width = ctx->data().width;
+        specification.height = ctx->data().height;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
         };
@@ -188,20 +188,20 @@ static void setup_post_processing(Application* app) {
             std::vector<std::string> { "u_screen_texture", "u_bright_texture", "u_strength" }
         );
 
-        app->purge_framebuffers();
-        app->add_framebuffer(framebuffer);
+        ctx->purge_framebuffers();
+        ctx->add_framebuffer(framebuffer);
 
         auto combine = std::make_unique<Combine>("combine", framebuffer, shader);
         combine->strength = data.launcher_options.bloom_strength;
-        app->renderer->add_post_processing(std::move(combine));
+        ctx->r3d->add_post_processing(std::move(combine));
     }
 }
 
 namespace game {
-    void start(Application* app) {
-        auto& data = app->user_data<Data>();
+    void start(Ctx* ctx) {
+        auto& data = ctx->user_data<Data>();
 
-        load_game_options(app);
+        load_game_options(ctx);
         setup_icons(app);
         setup_cursors(app);
         setup_imgui_fonts(app);
@@ -209,20 +209,20 @@ namespace game {
         setup_post_processing(app);
 
         // Set some parameters
-        app->window->set_vsync(data.options.vsync);
-        app->openal->get_listener().set_gain(data.options.master_volume);
+        ctx->window->set_vsync(data.options.vsync);
+        ctx->snd->get_listener().set_gain(data.options.master_volume);
         music::set_music_gain(data.options.music_volume);
 
         // Setup scene framebuffer
-        app->renderer->set_scene_framebuffer(data.launcher_options.samples);
+        ctx->r3d->set_scene_framebuffer(data.launcher_options.samples);
 
         // Setup depth map framebuffer
-        app->renderer->set_shadow_map_framebuffer(
+        ctx->r3d->set_shadow_map_framebuffer(
             data.launcher_options.texture_quality == launcher_options::NORMAL ? 4096 : 2048
         );
     }
 
-    void stop(Application* app) {
-        app->destroy_user_data();
+    void stop(Ctx* ctx) {
+        ctx->destroy_user_data();
     }
 }

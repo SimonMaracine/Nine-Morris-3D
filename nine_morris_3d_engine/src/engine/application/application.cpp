@@ -2,7 +2,7 @@
 
 #include "engine/application/application.h"
 #include "engine/application/window.h"
-#include "engine/application/event.h"
+#include "engine/application/events.h"
 #include "engine/application/input.h"
 #include "engine/application/application_builder.h"
 #include "engine/audio/context.h"
@@ -41,6 +41,8 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     : builder(builder), _user_data(&user_data), start(start), stop(stop) {
     LOG_INFO("Initializing application...");
 
+    ctx._application = this;
+
     app_data.width = builder.width;
     app_data.height = builder.height;
     app_data.title = builder.title;
@@ -56,17 +58,17 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     app_data.version_patch = builder.patch;
     app_data.app = this;
 
-    window = std::make_unique<Window>(this);
+    ctx.window = std::make_unique<Window>(this);
 
-    if (builder.renderer_dear_imgui) {
-        initialize_renderer_dear_imgui();
+    if (builder.dear_imgui) {
+        initialize_dear_imgui();
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
     logging::log_general_information(logging::LogTarget::Console);
 #endif
 
-    input::initialize(window->get_handle());
+    input::initialize(ctx.window->get_handle());
     gl::maybe_initialize_debugging();
     render_helpers::initialize_default();
     encrypt::initialize(builder.encryption_key);
@@ -77,22 +79,22 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
     LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
     if (builder.renderer_3d) {
-        initialize_renderer_3d();
+        initialize_r3d();
     }
 
     if (builder.renderer_2d) {
-        initialize_renderer_2d();
+        initialize_r2d();
     }
 
     if (builder.audio) {
         initialize_audio();
     }
 
-    evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
-    evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);
+    ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
+    ctx.evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);
 
-    frame_counter.previous_seconds = window->get_time();
-    fixed_update.previous_seconds = window->get_time();
+    frame_counter.previous_seconds = ctx.window->get_time();
+    fixed_update.previous_seconds = ctx.window->get_time();
 
     user_start();
 }
@@ -100,7 +102,7 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 Application::~Application() {  // Destructor is called before all member variables
     user_stop();
 
-    if (builder.renderer_dear_imgui) {
+    if (builder.dear_imgui) {
         imgui_context::uninitialize();
     }
 
@@ -112,11 +114,11 @@ int Application::run(SceneId start_scene_id) {
 
     on_start(current_scene);
 
-    window->show();
+    ctx.window->show();
     LOG_INFO("Initialized application, entering main loop...");
 
-    while (running) {
-        delta = update_frame_counter();
+    while (ctx.running) {
+        ctx.delta = update_frame_counter();
         const unsigned int fixed_updates = calculate_fixed_update();
 
         for (unsigned int i = 0; i < fixed_updates; i++) {
@@ -128,12 +130,12 @@ int Application::run(SceneId start_scene_id) {
         // Clear the default framebuffer, as nobody does that for us
         render_helpers::clear(render_helpers::Color);
 
-        renderer_3d_update();
-        renderer_2d_update();
-        renderer_dear_imgui_update();
+        r3d_update();
+        r2d_update();
+        dear_imgui_update();
 
-        window->update();
-        evt.update();
+        ctx.window->update();
+        ctx.evt.update();
 
         check_changed_scene();
     }
@@ -143,57 +145,20 @@ int Application::run(SceneId start_scene_id) {
     current_scene->on_stop();
     current_scene->_on_stop();
 
-    return exit_code;
-}
-
-void Application::change_scene(SceneId id) {
-    for (std::unique_ptr<Scene>& scene : scenes) {
-        if (scene->id == id) {
-            to_scene = scene.get();
-            changed_scene = true;
-            return;
-        }
-    }
-
-    ASSERT(false, "Scene not found");
-}
-
-void Application::add_framebuffer(std::shared_ptr<gl::Framebuffer> framebuffer) {
-    framebuffers.push_back(framebuffer);
-}
-
-void Application::purge_framebuffers() {
-    std::vector<size_t> indices;
-
-    for (size_t i = 0; i < framebuffers.size(); i++) {
-        if (framebuffers[i].expired()) {
-            indices.push_back(i);
-        }
-    }
-
-    for (size_t i = framebuffers.size(); i > 0; i--) {
-        const size_t I = i - 1;
-
-        for (size_t index : indices) {
-            if (index == I) {
-                framebuffers.erase(std::next(framebuffers.begin(), index));
-                break;
-            }
-        }
-    }
+    return ctx.exit_code;
 }
 
 float Application::update_frame_counter() {
     static constexpr double MAX_DT = 1.0 / 20.0;
 
-    const double current_seconds = window->get_time();
+    const double current_seconds = ctx.window->get_time();
     const double elapsed_seconds = current_seconds - frame_counter.previous_seconds;
     frame_counter.previous_seconds = current_seconds;
 
     frame_counter.total_time += elapsed_seconds;
 
     if (frame_counter.total_time > 0.25) {
-        fps = static_cast<double>(frame_counter.frame_count) / frame_counter.total_time;
+        ctx.fps = static_cast<double>(frame_counter.frame_count) / frame_counter.total_time;
         frame_counter.frame_count = 0;
         frame_counter.total_time = 0.0;
     }
@@ -207,7 +172,7 @@ float Application::update_frame_counter() {
 unsigned int Application::calculate_fixed_update() {
     static constexpr double FIXED_DT = 1.0 / 50.0;
 
-    const double current_seconds = window->get_time();
+    const double current_seconds = ctx.window->get_time();
     const double elapsed_seconds = current_seconds - fixed_update.previous_seconds;
     fixed_update.previous_seconds = current_seconds;
 
@@ -240,15 +205,15 @@ void Application::check_changed_scene() {
     }
 }
 
-void Application::renderer_3d_func() {
-    renderer->render(current_scene->scene_list);
+void Application::r3d_function() {
+    ctx.r3d->render(current_scene->scene_list);
 }
 
-void Application::renderer_2d_func() {
-    gui_renderer->render(current_scene->scene_list);
+void Application::r2d_function() {
+    ctx.r2d->render(current_scene->scene_list);
 }
 
-void Application::renderer_imgui_func() {
+void Application::dear_imgui_function() {
     imgui_context::begin_frame();
 
     current_scene->on_imgui_update();
@@ -258,7 +223,7 @@ void Application::renderer_imgui_func() {
 
 void Application::prepare_scenes(SceneId start_scene_id) {
     for (std::unique_ptr<Scene>& scene : scenes) {
-        scene->app = this;
+        scene->ctx = &ctx;
 
         if (scene->id == start_scene_id) {
             current_scene = scene.get();
@@ -286,36 +251,36 @@ void Application::user_stop() {
     stop(this);
 }
 
-void Application::initialize_renderer_3d() {
+void Application::initialize_r3d() {
     LOG_INFO("With renderer 3D");
 
-    renderer = std::make_unique<Renderer>(this);
-    renderer_3d_update = std::bind(&Application::renderer_3d_func, this);
+    ctx.r3d = std::make_unique<Renderer>(this);
+    r3d_update = std::bind(&Application::r3d_function, this);
 }
 
-void Application::initialize_renderer_2d() {
+void Application::initialize_r2d() {
     LOG_INFO("With renderer 2D");
 
-    gui_renderer = std::make_unique<GuiRenderer>(this);
-    renderer_2d_update = std::bind(&Application::renderer_2d_func, this);
+    ctx.r2d = std::make_unique<GuiRenderer>(this);
+    r2d_update = std::bind(&Application::r2d_function, this);
 }
 
-void Application::initialize_renderer_dear_imgui() {
+void Application::initialize_dear_imgui() {
     LOG_INFO("With renderer Dear ImGui");
 
-    imgui_context::initialize(window->get_handle());
+    imgui_context::initialize(ctx.window->get_handle());
 
-    renderer_dear_imgui_update = std::bind(&Application::renderer_imgui_func, this);
+    dear_imgui_update = std::bind(&Application::dear_imgui_function, this);
 }
 
 void Application::initialize_audio() {
     LOG_INFO("With audio");
 
-    openal = std::make_unique<OpenAlContext>();
+    ctx.snd = std::make_unique<OpenAlContext>();
 }
 
 void Application::on_window_closed(const WindowClosedEvent&) {
-    running = false;
+    ctx.running = false;
 }
 
 void Application::on_window_resized(const WindowResizedEvent& event) {

@@ -237,7 +237,7 @@ static void help_marker(const char* text) {
 }
 
 void LauncherScene::on_start() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     using namespace encrypt;
     using namespace file_system;
@@ -299,9 +299,9 @@ void LauncherScene::on_start() {
     // Load splash screen
     gl::TextureSpecification specification;
 
-    app->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN)), specification);
+    ctx->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN)), specification);
 
-    auto background = objects.add<gui::Image>("background"_H, app->res.texture["splash_screen"_H]);
+    auto background = objects.add<gui::Image>("background"_H, ctx->res.texture["splash_screen"_H]);
     scene_list.add(background);
 
     // Load launcher options from file
@@ -314,7 +314,7 @@ void LauncherScene::on_start() {
 }
 
 void LauncherScene::on_stop() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     options_gracefully::save_to_file<launcher_options::LauncherOptions>(
         launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options
@@ -322,12 +322,12 @@ void LauncherScene::on_stop() {
 }
 
 void LauncherScene::on_awake() {
-    app->evt.connect<WindowClosedEvent, &LauncherScene::on_window_closed>(this);
+    ctx->evt.connect<WindowClosedEvent, &LauncherScene::on_window_closed>(this);
 }
 
 void LauncherScene::on_update() {
     float width, height, x_pos, y_pos;
-    app->gui_renderer->quad_center(width, height, x_pos, y_pos);
+    ctx->r2d->quad_center(width, height, x_pos, y_pos);
 
     auto background = objects.get<gui::Image>("background"_H);
     background->set_position(glm::vec2(x_pos, y_pos));  // TODO it works, I have no idea why
@@ -352,26 +352,26 @@ void LauncherScene::on_imgui_update() {
     ImGui::SameLine();
 
     if (ImGui::Button("Play", ImVec2(120.0f, 32.0f))) {
-        app->exit_code = 0;
-        app->running = false;
+        ctx->exit_code = 0;
+        ctx->running = false;
     }
 
     ImGui::SameLine();
 
     if (ImGui::Button("Quit", ImVec2(120.0f, 32.0f))) {
-        app->exit_code = 1;
-        app->running = false;
+        ctx->exit_code = 1;
+        ctx->running = false;
     }
 
     ImGui::End();
 }
 
 void LauncherScene::on_window_closed(const WindowClosedEvent&) {
-    app->exit_code = 1;
+    ctx->exit_code = 1;
 }
 
 void LauncherScene::display_page() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     if (ImGui::BeginTabItem("Display")) {
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
@@ -399,7 +399,7 @@ void LauncherScene::display_page() {
 }
 
 void LauncherScene::graphics_page() {
-    auto& data = app->user_data<Data>();
+    auto& data = ctx->user_data<Data>();
 
     if (ImGui::BeginTabItem("Graphics")) {
         ImGui::Dummy(ImVec2(0.0f, 10.0f));

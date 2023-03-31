@@ -7,8 +7,7 @@ class ApplicationBuilder {
 public:
     enum Renderer {
         Renderer3D,
-        Renderer2D,
-        RendererDearImGui
+        Renderer2D
     };
 
     ApplicationBuilder& display(int width, int height, std::string_view title = "Nine Morris 3D Engine");
@@ -19,6 +18,7 @@ public:
     ApplicationBuilder& authors(const std::vector<std::string>& author_list);
     ApplicationBuilder& encrypt_key(std::string_view encryption_key);
     ApplicationBuilder& with_renderer(Renderer renderer);
+    ApplicationBuilder& with_dear_imgui();
     ApplicationBuilder& with_audio();
 private:
     int width = 800;
@@ -37,7 +37,7 @@ private:
     std::string encryption_key = "Nine Morris 3D Engine";
     bool renderer_3d = false;
     bool renderer_2d = false;
-    bool renderer_dear_imgui = false;
+    bool dear_imgui = false;
     bool audio = false;
 
     friend class Application;

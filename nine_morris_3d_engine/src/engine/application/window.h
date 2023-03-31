@@ -34,6 +34,7 @@ public:
     void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons);
 private:
     GLFWwindow* create_window(Application* app);
+    void install_callbacks();
 
     GLFWwindow* window = nullptr;
     std::unordered_map<unsigned int, GLFWcursor*> cursors;

@@ -57,10 +57,13 @@ ApplicationBuilder& ApplicationBuilder::with_renderer(Renderer renderer) {
         case Renderer::Renderer2D:
             renderer_2d = true;
             break;
-        case Renderer::RendererDearImGui:
-            renderer_dear_imgui = true;
-            break;
     }
+
+    return *this;
+}
+
+ApplicationBuilder& ApplicationBuilder::with_dear_imgui() {
+    dear_imgui = true;
 
     return *this;
 }

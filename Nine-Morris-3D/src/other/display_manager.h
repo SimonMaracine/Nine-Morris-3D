@@ -5,7 +5,7 @@
 class DisplayManager {
 public:
     DisplayManager() = default;
-    DisplayManager(Application* app);
+    DisplayManager(Ctx* ctx);
     ~DisplayManager() = default;
 
     const std::vector<Monitor>& get_monitors() { return monitors; }
@@ -15,5 +15,5 @@ private:
     std::vector<Monitor> monitors;
     size_t resolutions_supported = 0;
 
-    Application* app = nullptr;
+    Ctx* ctx = nullptr;
 };

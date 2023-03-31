@@ -60,7 +60,7 @@ namespace gui {
     }
 
     void Image::render() {
-        app->gui_renderer->draw_quad(position, size * scale_parameters.current_scale, texture);
+        ctx->r2d->draw_quad(position, size * scale_parameters.current_scale, texture);
     }
 
     void Image::set_image(std::shared_ptr<gl::Texture> texture) {
@@ -99,14 +99,14 @@ namespace gui {
         matrix = glm::scale(matrix, glm::vec3(text_scale, text_scale, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(scale_parameters.current_scale, scale_parameters.current_scale, 1.0f));
 
-        app->gui_renderer->storage.text_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
-        app->gui_renderer->storage.text_shader->upload_uniform_vec3("u_color"_H, color);
+        ctx->r2d->storage.text_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
+        ctx->r2d->storage.text_shader->upload_uniform_vec3("u_color"_H, color);
 
         const float border_width = with_shadows ? 0.3f : 0.0f;
         const float offset = with_shadows ? -0.003f : 0.0f;
 
-        app->gui_renderer->storage.text_shader->upload_uniform_float("u_border_width"_H, border_width);
-        app->gui_renderer->storage.text_shader->upload_uniform_vec2("u_offset"_H, glm::vec2(offset, offset));
+        ctx->r2d->storage.text_shader->upload_uniform_float("u_border_width"_H, border_width);
+        ctx->r2d->storage.text_shader->upload_uniform_vec2("u_offset"_H, glm::vec2(offset, offset));
 
         font->get_vertex_array()->bind();
 

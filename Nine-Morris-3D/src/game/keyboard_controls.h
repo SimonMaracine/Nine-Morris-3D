@@ -10,7 +10,7 @@ class Application;
 class KeyboardControls {
 public:
     KeyboardControls() = default;
-    KeyboardControls(Application* app, Board* board, renderables::Quad* quad);
+    KeyboardControls(Ctx* ctx, Board* board, renderables::Quad* quad);
     ~KeyboardControls() = default;
 
     KeyboardControls(const KeyboardControls&) = delete;
