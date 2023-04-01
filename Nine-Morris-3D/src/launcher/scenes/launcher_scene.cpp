@@ -237,7 +237,7 @@ static void help_marker(const char* text) {
 }
 
 void LauncherScene::on_start() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     using namespace encrypt;
     using namespace file_system;
@@ -309,12 +309,12 @@ void LauncherScene::on_start() {
         launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate
     );
 
-    // Initialize display manager
-    display_manager = DisplayManager {app};
+    // Initialize display manager for getting screen resolutions
+    display_manager = DisplayManager {ctx};
 }
 
 void LauncherScene::on_stop() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     options_gracefully::save_to_file<launcher_options::LauncherOptions>(
         launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options
@@ -371,7 +371,7 @@ void LauncherScene::on_window_closed(const WindowClosedEvent&) {
 }
 
 void LauncherScene::display_page() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     if (ImGui::BeginTabItem("Display")) {
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
@@ -399,7 +399,7 @@ void LauncherScene::display_page() {
 }
 
 void LauncherScene::graphics_page() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     if (ImGui::BeginTabItem("Graphics")) {
         ImGui::Dummy(ImVec2(0.0f, 10.0f));

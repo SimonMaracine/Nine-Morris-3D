@@ -37,26 +37,29 @@ void Application::preinitialize(std::string_view app_name, std::string_view log_
 #endif
 }
 
-Application::Application(const ApplicationBuilder& builder, std::any& user_data, const UserFunc& start, const UserFunc& stop)
-    : builder(builder), _user_data(&user_data), start(start), stop(stop) {
+Application::Application(const ApplicationBuilder& builder, void* user_data)
+    : builder(builder) {
     LOG_INFO("Initializing application...");
 
-    ctx._application = this;
+    ctx.application = this;
+    ctx.user_data = user_data;
+    ctx.properties = &properties;
 
-    app_data.width = builder.width;
-    app_data.height = builder.height;
-    app_data.title = builder.title;
-    app_data.fullscreen = builder.fullscreen;
-    app_data.native_resolution = builder.native_resolution;
-    app_data.resizable = builder.resizable;
-    app_data.min_width = builder.min_width;
-    app_data.min_height = builder.min_height;
-    app_data.app_name = builder.app_name;
-    app_data.authors = builder.author_list;  // TODO use this
-    app_data.version_major = builder.major;
-    app_data.version_minor = builder.minor;
-    app_data.version_patch = builder.patch;
-    app_data.app = this;
+    properties.width = builder.width;
+    properties.height = builder.height;
+    properties.title = builder.title;
+    properties.fullscreen = builder.fullscreen;
+    properties.native_resolution = builder.native_resolution;
+    properties.resizable = builder.resizable;
+    properties.min_width = builder.min_width;
+    properties.min_height = builder.min_height;
+    properties.app_name = builder.app_name;
+    properties.authors = builder.author_list;  // TODO use this
+    properties.version_major = builder.major;
+    properties.version_minor = builder.minor;
+    properties.version_patch = builder.patch;
+    properties.application = this;
+    properties.ctx = &ctx;
 
     ctx.window = std::make_unique<Window>(this);
 
@@ -95,13 +98,9 @@ Application::Application(const ApplicationBuilder& builder, std::any& user_data,
 
     frame_counter.previous_seconds = ctx.window->get_time();
     fixed_update.previous_seconds = ctx.window->get_time();
-
-    user_start();
 }
 
 Application::~Application() {  // Destructor is called before all member variables
-    user_stop();
-
     if (builder.dear_imgui) {
         imgui_context::uninitialize();
     }
@@ -110,6 +109,8 @@ Application::~Application() {  // Destructor is called before all member variabl
 }
 
 int Application::run(SceneId start_scene_id) {
+    user_start_function();
+
     prepare_scenes(start_scene_id);
 
     on_start(current_scene);
@@ -145,7 +146,17 @@ int Application::run(SceneId start_scene_id) {
     current_scene->on_stop();
     current_scene->_on_stop();
 
+    user_stop_function();
+
     return ctx.exit_code;
+}
+
+void Application::set_start_function(const UserFunc& start) {
+    this->start = start;
+}
+
+void Application::set_stop_function(const UserFunc& stop) {
+    this->stop = stop;
 }
 
 float Application::update_frame_counter() {
@@ -239,29 +250,29 @@ void Application::on_start(Scene* scene) {
     scene->on_start();
 }
 
-void Application::user_start() {
+void Application::user_start_function() {
     LOG_INFO("Calling user start routine...");
 
-    start(this);
+    start(&ctx);
 }
 
-void Application::user_stop() {
+void Application::user_stop_function() {
     LOG_INFO("Calling user stop routine...");
 
-    stop(this);
+    stop(&ctx);
 }
 
 void Application::initialize_r3d() {
     LOG_INFO("With renderer 3D");
 
-    ctx.r3d = std::make_unique<Renderer>(this);
+    ctx.r3d = std::make_unique<Renderer>(&ctx);
     r3d_update = std::bind(&Application::r3d_function, this);
 }
 
 void Application::initialize_r2d() {
     LOG_INFO("With renderer 2D");
 
-    ctx.r2d = std::make_unique<GuiRenderer>(this);
+    ctx.r2d = std::make_unique<GuiRenderer>(&ctx);
     r2d_update = std::bind(&Application::r2d_function, this);
 }
 

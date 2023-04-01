@@ -76,7 +76,7 @@ void generic_load_game(S* scene) {
 
     scene->board.from_serialized(saved_game.board_serialized);
     scene->camera_controller = saved_game.camera_controller;
-    scene->timer = Timer {scene->app, saved_game.time};
+    scene->timer = Timer {scene->ctx, saved_game.time};
     scene->undo_redo_state = std::move(saved_game.undo_redo_state);
     scene->game.white_player = saved_game.white_player;
     scene->game.black_player = saved_game.black_player;

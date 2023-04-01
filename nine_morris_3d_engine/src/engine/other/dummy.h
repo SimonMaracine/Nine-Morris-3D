@@ -1,6 +1,6 @@
 #pragma once
 
-class Application;
+class Ctx;
 
 namespace event {
     struct Event;
@@ -8,7 +8,7 @@ namespace event {
 
 namespace dummy {
     struct UserFunc {
-        void operator()(Application*) {}
+        void operator()(Ctx*) {}
     };
 
     struct ProcFunc {
@@ -21,7 +21,7 @@ namespace dummy {
 
     struct UserData {};
 
-    inline std::any empty_user_data() {
-        return std::make_any<UserData>();
-    }
+    // inline std::any empty_user_data() {  // TODO remove
+    //     return std::make_any<UserData>();
+    // }
 }

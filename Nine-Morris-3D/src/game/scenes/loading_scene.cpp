@@ -17,7 +17,7 @@
 #include "other/constants.h"
 
 void LoadingScene::on_start() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     load_splash_screen_texture();
 
@@ -63,7 +63,7 @@ void LoadingScene::on_update() {
 
     update_loading_animation();
 
-    loader->update(app);
+    loader->update(ctx);
 }
 
 void LoadingScene::setup_widgets() {
@@ -136,7 +136,7 @@ hs LoadingScene::scene_int_to_id(int scene) {  // FIXME find a better way
 }
 
 void LoadingScene::initialize_board() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     auto shader = ctx->res.shader.load(
         "board_wood"_H,
@@ -214,7 +214,7 @@ void LoadingScene::initialize_board() {
 }
 
 void LoadingScene::initialize_board_paint() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     auto shader = ctx->res.shader.load(
         "board_paint"_H,
@@ -286,7 +286,7 @@ void LoadingScene::initialize_board_paint() {
 }
 
 void LoadingScene::initialize_pieces() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     auto shader = ctx->res.shader.load(
         "piece"_H,
@@ -457,7 +457,7 @@ void LoadingScene::initialize_nodes() {
 }
 
 void LoadingScene::initialize_board_no_normal() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     auto shader = ctx->res.shader.load(
         "board_wood"_H,
@@ -525,7 +525,7 @@ void LoadingScene::initialize_board_no_normal() {
 }
 
 void LoadingScene::initialize_board_paint_no_normal() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     auto shader = ctx->res.shader.load(
         "board_paint"_H,
@@ -593,7 +593,7 @@ void LoadingScene::initialize_board_paint_no_normal() {
 }
 
 void LoadingScene::initialize_pieces_no_normal() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     // FIXME maybe should give another name
     auto shader = ctx->res.shader.load(
@@ -708,7 +708,7 @@ void LoadingScene::initialize_pieces_no_normal() {
 }
 
 void LoadingScene::initialize_skybox() {
-    if (ctx->user_data<Data>().options.skybox == game_options::NONE) {
+    if (ctx->data<Data>().options.skybox == game_options::NONE) {
         LOG_DEBUG("Initialized skybox");
         return;
     }
@@ -754,7 +754,7 @@ void LoadingScene::initialize_indicators() {
 }
 
 void LoadingScene::change_board_paint_texture() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -774,7 +774,7 @@ void LoadingScene::change_board_paint_texture() {
 }
 
 void LoadingScene::initialize_ids() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     for (size_t i = 0; i < MAX_NODES; i++) {
         data.node_ids[i] = identifier::generate_id();
@@ -811,7 +811,7 @@ void LoadingScene::initialize_light_bulb() {
 }
 
 void LoadingScene::initialize_light() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     if (data.options.skybox == game_options::FIELD) {
         ctx->r3d->directional_light = LIGHT_FIELD;
@@ -830,7 +830,7 @@ void LoadingScene::initialize_light() {
 }
 
 void LoadingScene::initialize_game() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     initialize_ids();
 

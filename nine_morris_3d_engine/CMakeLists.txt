@@ -46,7 +46,7 @@ set(LIBTYPE STATIC)  # To make static library
 
 set(ENGINE_HEADERS
     "src/engine/application/application_builder.h"
-    "src/engine/application/application_data.h"
+    "src/engine/application/application_properties.h"
     "src/engine/application/application.h"
     "src/engine/application/capabilities.h"
     "src/engine/application/context.h"

@@ -13,13 +13,16 @@
 
 class Application;
 class Scene;
-struct ApplicationData;
+struct ApplicationProperties;
 
-// Wrapper struct around public functionality exposed to user
-struct Ctx {
+/**
+ * Wrapper struct around public functionality exposed to user.
+ */
+class Ctx {
+private:
     using SceneId = resmanager::HashedStr64;
-    Application* _application = nullptr;
-
+    Application* application = nullptr;
+public:
     void change_scene(SceneId id);
     const Scene* get_current_scene();
 
@@ -27,20 +30,19 @@ struct Ctx {
     void add_framebuffer(std::shared_ptr<gl::Framebuffer> framebuffer);
     void purge_framebuffers();
 
-    // Data management
-    template<typename Data>
-    Data& user_data() {
-        return std::any_cast<Data&>(*_application->_user_data);
+    // Helper function
+    template<typename T>
+    T& data() {
+        return *static_cast<T*>(user_data);
     }
 
-    const ApplicationData& data();
-    void destroy_user_data();
-
-    // Public fields accessible by all the code
     bool running = true;
     int exit_code = 0;
     double fps = 0.0;
     float delta = 0.0f;
+
+    void* user_data = nullptr;  // Arbitrary data defined by the user
+    ApplicationProperties* properties = nullptr;  // Application data like window width and height
 
     std::unique_ptr<Window> window;  // The last* object destroyed in an application instance
     std::unique_ptr<OpenAlContext> snd;  // Sound context
@@ -48,4 +50,6 @@ struct Ctx {
     std::unique_ptr<GuiRenderer> r2d;  // 2D renderer
     EventDispatcher evt;  // Manager of application events
     ResourcesCache res;  // Global cache of resources
+
+    friend class Application;
 };

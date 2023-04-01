@@ -14,7 +14,7 @@
 #include "other/options_gracefully.h"
 
 static void load_game_options(Ctx* ctx) {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     options_gracefully::load_from_file<game_options::GameOptions>(
         game_options::GAME_OPTIONS_FILE, data.options, game_options::validate
@@ -37,7 +37,7 @@ static void setup_icons(Ctx* ctx) {
 }
 
 static void setup_cursors(Ctx* ctx) {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     using namespace assets;
     using namespace file_system;
@@ -54,7 +54,7 @@ static void setup_cursors(Ctx* ctx) {
 }
 
 static void setup_imgui_fonts(Ctx* ctx) {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     using namespace assets;
     using namespace file_system;
@@ -101,7 +101,7 @@ static void setup_game_fonts(Ctx* ctx) {
 }
 
 static void setup_post_processing(Ctx* ctx) {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     if (!data.launcher_options.bloom) {
         return;  // Disable bloom
@@ -113,8 +113,8 @@ static void setup_post_processing(Ctx* ctx) {
 
     {
         gl::FramebufferSpecification specification;
-        specification.width = ctx->data().width / 2;
-        specification.height = ctx->data().height / 2;
+        specification.width = ctx->properties->width / 2;
+        specification.height = ctx->properties->height / 2;
         specification.resize_divisor = 2;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
@@ -142,8 +142,8 @@ static void setup_post_processing(Ctx* ctx) {
 
     {
         gl::FramebufferSpecification specification;
-        specification.width = ctx->data().width / 4;
-        specification.height = ctx->data().height / 4;
+        specification.width = ctx->properties->width / 4;
+        specification.height = ctx->properties->height / 4;
         specification.resize_divisor = 4;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
@@ -158,8 +158,8 @@ static void setup_post_processing(Ctx* ctx) {
     }
     {
         gl::FramebufferSpecification specification;
-        specification.width = ctx->data().width / 8;
-        specification.height = ctx->data().height / 8;
+        specification.width = ctx->properties->width / 8;
+        specification.height = ctx->properties->height / 8;
         specification.resize_divisor = 8;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
@@ -174,8 +174,8 @@ static void setup_post_processing(Ctx* ctx) {
     }
     {
         gl::FramebufferSpecification specification;
-        specification.width = ctx->data().width;
-        specification.height = ctx->data().height;
+        specification.width = ctx->properties->width;
+        specification.height = ctx->properties->height;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
         };
@@ -199,14 +199,14 @@ static void setup_post_processing(Ctx* ctx) {
 
 namespace game {
     void start(Ctx* ctx) {
-        auto& data = ctx->user_data<Data>();
+        auto& data = ctx->data<Data>();
 
         load_game_options(ctx);
-        setup_icons(app);
-        setup_cursors(app);
-        setup_imgui_fonts(app);
-        setup_game_fonts(app);
-        setup_post_processing(app);
+        setup_icons(ctx);
+        setup_cursors(ctx);
+        setup_imgui_fonts(ctx);
+        setup_game_fonts(ctx);
+        setup_post_processing(ctx);
 
         // Set some parameters
         ctx->window->set_vsync(data.options.vsync);
@@ -223,6 +223,7 @@ namespace game {
     }
 
     void stop(Ctx* ctx) {
-        ctx->destroy_user_data();
+        // ctx->destroy_user_data();  // TODO
+        delete static_cast<Data*>(ctx->user_data);
     }
 }

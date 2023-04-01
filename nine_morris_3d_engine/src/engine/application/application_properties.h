@@ -1,11 +1,17 @@
 #pragma once
 
+class Ctx;
 class Application;
 
-class ApplicationData {
+/**
+ * Struct for mostly constant application properties.
+ */
+class ApplicationProperties {
 public:
+    // These two change when the window resizes
     int width;
     int height;
+
     std::string title;
     bool fullscreen;
     bool native_resolution;
@@ -18,7 +24,8 @@ public:
     unsigned int version_patch;
     std::vector<std::string> authors;
 private:
-    Application* app = nullptr;
+    Application* application = nullptr;
+    Ctx* ctx = nullptr;
 
     friend class Application;
     friend class Window;

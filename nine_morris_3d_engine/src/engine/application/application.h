@@ -2,7 +2,7 @@
 
 #include <resmanager/resmanager.h>
 
-#include "engine/application/application_data.h"
+#include "engine/application/application_properties.h"
 #include "engine/application/events.h"
 #include "engine/application/window.h"
 #include "engine/application/application_builder.h"
@@ -17,14 +17,13 @@
 
 class Application final {
 private:
-    using UserFunc = std::function<void(Application*)>;
+    using UserFunc = std::function<void(Ctx*)>;
     using SceneId = resmanager::HashedStr64;
     using RendererFunc = std::function<void()>;
 public:
     static void preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file);
 
-    Application(const ApplicationBuilder& builder, std::any& user_data,
-        const UserFunc& start = dummy::UserFunc {}, const UserFunc& stop = dummy::UserFunc {});
+    Application(const ApplicationBuilder& builder, void* user_data = nullptr);
     ~Application();
 
     Application(const Application&) = delete;
@@ -32,14 +31,19 @@ public:
     Application(Application&&) = delete;
     Application& operator=(Application&&) = delete;
 
-    // Call this to launch the application after all scenes have been defined; it can return an exit code
+    // Call this to launch the application; it can return an exit code
     int run(SceneId start_scene_id);
 
-    // Scene management functions
+    // Add scenes to the application before calling run()
     template<typename S>
-    void add_scene() { scenes.push_back(std::make_unique<S>()); }
+    void add_scene() {
+        scenes.push_back(std::make_unique<S>());
+    }
 
-    // API accessible to user
+    void set_start_function(const UserFunc& start);
+    void set_stop_function(const UserFunc& stop);
+
+    // API accessible to the user
     Ctx ctx;
 protected:
     float update_frame_counter();
@@ -52,8 +56,8 @@ protected:
 
     void prepare_scenes(SceneId start_scene_id);
     void on_start(Scene* scene);
-    void user_start();
-    void user_stop();
+    void user_start_function();
+    void user_stop_function();
     void initialize_r3d();
     void initialize_r2d();
     void initialize_dear_imgui();
@@ -63,16 +67,15 @@ protected:
     void on_window_resized(const WindowResizedEvent& event);
 
     ApplicationBuilder builder;
-    std::any* _user_data = nullptr;
-    ApplicationData app_data;
-    UserFunc start;
-    UserFunc stop;
+    ApplicationProperties properties;
+    UserFunc start = dummy::UserFunc {};
+    UserFunc stop = dummy::UserFunc {};
 
     // Data for the scene system
     std::vector<std::unique_ptr<Scene>> scenes;
     Scene* current_scene = nullptr;
 
-    bool changed_scene = false;
+    bool changed_scene = false;  // Flag set when the user requested a scene change
     Scene* to_scene = nullptr;  // Next scene to enter
 
     // Data for modular rendering
@@ -97,5 +100,5 @@ protected:
 
     friend class Scene;
     friend class Window;
-    friend struct Ctx;
+    friend class Ctx;
 };

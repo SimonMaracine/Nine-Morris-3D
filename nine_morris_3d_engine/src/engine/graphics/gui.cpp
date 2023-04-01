@@ -50,7 +50,7 @@ namespace gui {
         return this;
     }
 
-    Application* Widget::app = nullptr;
+    Ctx* Widget::ctx = nullptr;
 
     Image::Image(std::shared_ptr<gl::Texture> texture)
         : texture(texture) {

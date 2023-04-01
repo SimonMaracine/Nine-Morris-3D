@@ -11,7 +11,7 @@ class Monitor;
 
 class Window {
 public:
-    Window(Application* app);
+    Window(Application* application);
     ~Window();
 
     Window(const Window&) = delete;
@@ -33,7 +33,7 @@ public:
     void set_cursor(unsigned int handle);
     void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons);
 private:
-    GLFWwindow* create_window(Application* app);
+    GLFWwindow* create_window(Application* application);
     void install_callbacks();
 
     GLFWwindow* window = nullptr;

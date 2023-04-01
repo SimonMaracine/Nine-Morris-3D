@@ -45,7 +45,7 @@ void SceneGame::setup_and_add_model_board_paint() {
 }
 
 void SceneGame::setup_and_add_model_piece(size_t index, const glm::vec3& position) {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     const Piece& piece = get_board().pieces.at(index);
 
@@ -78,7 +78,7 @@ void SceneGame::setup_and_add_model_nodes() {
 }
 
 void SceneGame::setup_and_add_model_node(size_t index, const glm::vec3& position) {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     const Node& node = get_board().nodes.at(index);
 
@@ -105,7 +105,7 @@ void SceneGame::setup_piece_on_node(size_t index, size_t node_index) {
 }
 
 void SceneGame::setup_camera() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     static constexpr float PITCH = 47.0f;
     static constexpr float DISTANCE_TO_POINT = 8.0f;
@@ -114,8 +114,8 @@ void SceneGame::setup_camera() {
 
     camera_controller = PointCameraController {
         &camera,
-        ctx->data().width,
-        ctx->data().height,
+        ctx->properties->width,
+        ctx->properties->height,
         LENS_FOV,
         LENS_NEAR,
         LENS_FAR,
@@ -129,8 +129,8 @@ void SceneGame::setup_camera() {
 
     camera_controller = PointCameraController {
         &camera,
-        ctx->data().width,
-        ctx->data().height,
+        ctx->properties->width,
+        ctx->properties->height,
         LENS_FOV,
         LENS_NEAR,
         LENS_FAR,
@@ -160,7 +160,7 @@ void SceneGame::setup_and_add_turn_indicator() {
 }
 
 void SceneGame::setup_and_add_timer_text() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     auto timer_text = objects.add<gui::Text>(
         "timer_text"_H,
@@ -208,7 +208,7 @@ void SceneGame::setup_light_bulb() {
     light_bulb->texture = ctx->res.texture["light_bulb"_H];
 
 #ifdef NM3D_PLATFORM_DEBUG
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     if (data.options.skybox == game_options::FIELD) {
         light_bulb->position = LIGHT_FIELD.position;
@@ -252,7 +252,7 @@ void SceneGame::release_piece_material_instances() {
 }
 
 void SceneGame::change_skybox() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     const std::array<std::shared_ptr<TextureData>, 6> texture_data = {
         ctx->res.texture_data["skybox_px"_H],
@@ -283,7 +283,7 @@ void SceneGame::change_skybox() {
 }
 
 void SceneGame::change_board_paint_texture() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     gl::TextureSpecification specification;
     specification.mag_filter = gl::Filter::Linear;
@@ -314,7 +314,7 @@ void SceneGame::update_listener() {
 }
 
 void SceneGame::update_cursor() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     if (data.options.custom_cursor) {
         if (get_board().must_take_piece) {
@@ -520,8 +520,8 @@ void SceneGame::update_game_state() {
 
 void SceneGame::update_all_imgui() {
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(ctx->data().width, ctx->data().height);
-    io.DeltaTime = ctx->get_delta();
+    io.DisplaySize = ImVec2(ctx->properties->width, ctx->properties->height);
+    io.DeltaTime = ctx->delta;
 
     if (get_board().phase == BoardPhase::GameOver && get_board().next_move) {
         window = WindowImGui::ShowGameOver;
@@ -574,13 +574,13 @@ void SceneGame::set_skybox(Skybox skybox) {
         return;
     }
 
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     skybox_loader->start_loading_thread(data.launcher_options.texture_quality, data.options.skybox);
 }
 
 void SceneGame::set_board_paint_texture() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     board_paint_texture_loader->start_loading_thread(
         data.launcher_options.texture_quality,
@@ -642,7 +642,7 @@ void SceneGame::imgui_reset() {
 }
 
 void SceneGame::imgui_draw_menu_bar() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     if (ImGui::BeginMainMenuBar()) {
         // TODO what to do when computer is in charge?
@@ -830,7 +830,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 }
                 if (ImGui::MenuItem("Enable Music", nullptr, &data.options.enable_music)) {
                     if (data.options.enable_music) {
-                        auto& data = ctx->user_data<Data>();
+                        auto& data = ctx->data<Data>();
 
                         music::play_music_track(data.current_music_track);
 
@@ -908,7 +908,7 @@ void SceneGame::imgui_draw_menu_bar() {
             }
             if (ImGui::BeginMenu("User Interface")) {
                 if (ImGui::MenuItem("Hide Timer", nullptr, &data.options.hide_timer)) {
-                    auto& data = ctx->user_data<Data>();
+                    auto& data = ctx->data<Data>();
 
                     if (data.options.hide_timer) {
                         scene_list.remove(objects.get<gui::Text>("timer_text"_H));
@@ -972,7 +972,7 @@ void SceneGame::imgui_draw_menu_bar() {
 }
 
 void SceneGame::imgui_draw_info() {
-    ImGui::PushFont(ctx->user_data<Data>().imgui_info_font);
+    ImGui::PushFont(ctx->data<Data>().imgui_info_font);
 
     const int flags = (
         ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove
@@ -987,7 +987,7 @@ void SceneGame::imgui_draw_info() {
 #endif
 
     ImGui::Begin("Information", nullptr, flags);
-    ImGui::Text("FPS: %.3f", ctx->get_fps());
+    ImGui::Text("FPS: %.3f", ctx->fps);
     ImGui::Text("Build: %s", build_mode);
     ImGui::End();
 
@@ -1036,7 +1036,7 @@ void SceneGame::imgui_draw_game_over() {
 void SceneGame::imgui_draw_about() {
     imgui_draw_window("About Nine Morris 3D", [this]() {
         ImGui::Text("A 3D implementation of the board game nine men's morris");
-        ImGui::Text("Version %u.%u.%u", ctx->data().version_major, ctx->data().version_minor, ctx->data().version_patch);
+        ImGui::Text("Version %u.%u.%u", ctx->properties->version_major, ctx->properties->version_minor, ctx->properties->version_patch);
         ImGui::Separator();
         ImGui::Text("All programming by:");
         ImGui::Text(u8"Simon-Teodor Mărăcine - simonmara.dev@gmail.com");
@@ -1100,7 +1100,7 @@ void SceneGame::imgui_draw_ai_settings() {
 void SceneGame::imgui_draw_debug() {
 #ifndef NM3D_PLATFORM_RELEASE_DISTRIBUTION
     ImGui::Begin("Debug");
-    ImGui::Text("FPS: %.3f", ctx->get_fps());
+    ImGui::Text("FPS: %.3f", ctx->fps);
     draw_debug_imgui();
     ImGui::Text("Phase: %d", static_cast<int>(get_board().phase));
     ImGui::Text("Turn: %s", get_board().turn == BoardPlayer::White ? "white" : "black");
@@ -1118,7 +1118,7 @@ void SceneGame::imgui_draw_debug() {
     ImGui::End();
 
     {
-        const float time = ctx->get_delta() * 1000.0f;
+        const float time = ctx->delta * 1000.0f;
         frames[index] = time;
 
         if (index < FRAMES_SIZE) {
@@ -1277,7 +1277,7 @@ void SceneGame::imgui_draw_game_over_message(std::string_view message1, std::str
 
 void SceneGame::imgui_draw_window(const char* title, const std::function<void()>& contents,
         const std::function<void()>& ok_callback) {
-    ImGui::PushFont(ctx->user_data<Data>().imgui_windows_font);
+    ImGui::PushFont(ctx->data<Data>().imgui_windows_font);
     ImGui::OpenPopup(title);
 
     const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -1306,7 +1306,7 @@ void SceneGame::imgui_draw_window(const char* title, const std::function<void()>
 }
 
 void SceneGame::imgui_initialize_options() {  // FIXME this is no longer needed
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     data.imgui_option.skybox = data.options.skybox;
     data.imgui_option.labeled_board = data.options.labeled_board;

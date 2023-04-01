@@ -30,7 +30,7 @@ static constexpr glm::vec3 CLEAR_COLOR = { 0.1f, 0.1f, 0.1f };
 static constexpr int BOUNDING_BOX_DIVISOR = 4;
 
 Renderer::Renderer(Ctx* ctx)
-    : app(app) {
+    : ctx(ctx) {
     render_helpers::clear_color(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b);
     render_helpers::enable_depth_test();
     render_helpers::initialize_stencil();
@@ -103,7 +103,7 @@ void Renderer::render(const SceneList& scene) {
 
     // Blit the resulted scene texture to an intermediate texture, resolving anti-aliasing
     storage.scene_framebuffer->blit(
-        storage.intermediate_framebuffer.get(), ctx->data().width, ctx->data().height
+        storage.intermediate_framebuffer.get(), ctx->properties->width, ctx->properties->height
     );
 
     storage.bounding_box_framebuffer->bind();
@@ -117,7 +117,7 @@ void Renderer::render(const SceneList& scene) {
     // Read the texture for mouse picking
     const auto [mouse_x, mouse_y] = input::get_mouse();
     const int x = static_cast<int>(mouse_x) / BOUNDING_BOX_DIVISOR;
-    const int y = (ctx->data().height - static_cast<int>(mouse_y)) / BOUNDING_BOX_DIVISOR;
+    const int y = (ctx->properties->height - static_cast<int>(mouse_y)) / BOUNDING_BOX_DIVISOR;
     framebuffer_reader.read(0, x, y);
 
     storage.intermediate_framebuffer->bind();
@@ -143,8 +143,8 @@ void Renderer::set_scene_framebuffer(int samples) {
     ASSERT(samples > 0, "Samples must be greater than 0");
 
     gl::FramebufferSpecification specification;
-    specification.width = ctx->data().width;
-    specification.height = ctx->data().height;
+    specification.width = ctx->properties->width;
+    specification.height = ctx->properties->height;
     specification.samples = samples;
     specification.color_attachments = {
         gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Renderbuffer}
@@ -217,7 +217,7 @@ void Renderer::post_processing() {
 
         step->render(post_processing_context);
 
-        render_helpers::viewport(ctx->data().width, ctx->data().height);
+        render_helpers::viewport(ctx->properties->width, ctx->properties->height);
 
         post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
         post_processing_context.textures.push_back(post_processing_context.last_texture);
@@ -542,7 +542,7 @@ void Renderer::setup_uniform_buffers() {
 }
 
 void Renderer::validate_hovered_id(int x, int y) {
-    if (x > ctx->data().width || x < 0 || y > ctx->data().height || y < 0) {
+    if (x > ctx->properties->width || x < 0 || y > ctx->properties->height || y < 0) {
         hovered_id = identifier::null;
     }
 }
@@ -801,8 +801,8 @@ void Renderer::initialize_origin_renderer() {
 void Renderer::initialize_framebuffers() {
     {
         gl::FramebufferSpecification specification;
-        specification.width = ctx->data().width;
-        specification.height = ctx->data().height;
+        specification.width = ctx->properties->width;
+        specification.height = ctx->properties->height;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::Rgba8, gl::AttachmentType::Texture}
         };
@@ -815,8 +815,8 @@ void Renderer::initialize_framebuffers() {
 
     {
         gl::FramebufferSpecification specification;
-        specification.width = ctx->data().width / BOUNDING_BOX_DIVISOR;
-        specification.height = ctx->data().height / BOUNDING_BOX_DIVISOR;
+        specification.width = ctx->properties->width / BOUNDING_BOX_DIVISOR;
+        specification.height = ctx->properties->height / BOUNDING_BOX_DIVISOR;
         specification.resize_divisor = BOUNDING_BOX_DIVISOR;
         specification.color_attachments = {
             gl::Attachment {gl::AttachmentFormat::RedFloat, gl::AttachmentType::Renderbuffer}

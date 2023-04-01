@@ -8,7 +8,7 @@ static const char* RESOLUTIONS[] = {
 };
 
 DisplayManager::DisplayManager(Ctx* ctx)
-    : app(app) {
+    : ctx(ctx) {
     monitors = ctx->window->get_monitors();
 
     const auto resolution = monitors[0].get_resolution();

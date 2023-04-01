@@ -20,7 +20,7 @@
 using namespace encrypt;
 
 void JumpPlusVariantScene::on_start() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     initialize_renderables();
     initialize_pieces();
@@ -42,7 +42,7 @@ void JumpPlusVariantScene::on_start() {
 
     update_turn_indicator();
 
-    keyboard = KeyboardControls {app, &board, objects.get<renderables::Quad>("keyboard_controls"_H)};
+    keyboard = KeyboardControls {ctx, &board, objects.get<renderables::Quad>("keyboard_controls"_H)};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<JumpBoardSerialized> {};
@@ -57,9 +57,9 @@ void JumpPlusVariantScene::on_start() {
         nullptr
     };
 
-    timer = Timer {app};
+    timer = Timer {ctx};
 
-    board.app = app;
+    board.ctx = ctx;
     board.scene = this;
     board.keyboard = &keyboard;
     board.camera_controller = &camera_controller;
@@ -75,7 +75,7 @@ void JumpPlusVariantScene::on_start() {
     update_menubar();
 
     camera_controller.go_towards_position(default_camera_position);
-    camera_controller.connect_events(app);
+    camera_controller.connect_events(ctx);
 
     // Can dispose of these
     ctx->res.texture_data.clear();
@@ -89,7 +89,7 @@ void JumpPlusVariantScene::on_start() {
 }
 
 void JumpPlusVariantScene::on_stop() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     options_gracefully::save_to_file<game_options::GameOptions>(
         game_options::GAME_OPTIONS_FILE, data.options
@@ -104,7 +104,7 @@ void JumpPlusVariantScene::on_stop() {
 #endif
 
     imgui_reset();
-    camera_controller.disconnect_events(app);
+    camera_controller.disconnect_events(ctx);
 
     // Should dispose of these
     release_piece_material_instances();
@@ -134,8 +134,8 @@ void JumpPlusVariantScene::on_awake() {
 }
 
 void JumpPlusVariantScene::on_update() {
-    camera_controller.update_controls(ctx->get_delta());
-    camera_controller.update_camera(ctx->get_delta());
+    camera_controller.update_controls(ctx->delta);
+    camera_controller.update_camera(ctx->delta);
 
     board.update_nodes(ctx->r3d->get_hovered_id());
     board.update_pieces(ctx->r3d->get_hovered_id());
@@ -151,8 +151,8 @@ void JumpPlusVariantScene::on_update() {
     update_wait_indicator();
     update_computer_thinking_indicator();
 
-    skybox_loader->update(app);
-    board_paint_texture_loader->update(app);
+    skybox_loader->update(ctx);
+    board_paint_texture_loader->update(ctx);
 }
 
 void JumpPlusVariantScene::on_fixed_update() {
@@ -290,7 +290,7 @@ void JumpPlusVariantScene::setup_and_add_model_pieces() {
 }
 
 void JumpPlusVariantScene::initialize_pieces() {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     if (data.launcher_options.normal_mapping) {
         for (size_t i = 0; i < 6; i++) {

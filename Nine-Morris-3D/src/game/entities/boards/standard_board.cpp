@@ -822,7 +822,7 @@ void StandardBoard::to_serialized(StandardBoardSerialized& serialized) {
 }
 
 void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     for (size_t i = 0; i < MAX_NODES; i++) {
         nodes.at(i).index = serialized.nodes.at(i).index;

@@ -38,49 +38,54 @@ void application_main() {
     while (true) {
         int exit_code {};
 
-        auto launcher_builder = ApplicationBuilder {}
-            .display(640, 480, "Nine Morris 3D Launcher")
-            .display_flags(false, false, false)
-            .application_name(APP_NAME)
-            .version(MAJOR, MINOR, PATCH)
-            .authors(AUTHORS)
-            .encrypt_key(KEY)
-            .with_dear_imgui()
-            .with_renderer(ApplicationBuilder::Renderer2D);
-
-        auto global_data = std::make_any<Data>();
+        Data* global_data = new Data;
 
         {
-            auto launcher = Application {launcher_builder, global_data, launcher::start};
+            auto launcher_builder = ApplicationBuilder {}
+                .display(640, 480, "Nine Morris 3D Launcher")
+                .display_flags(false, false, false)
+                .application_name(APP_NAME)
+                .version(MAJOR, MINOR, PATCH)
+                .authors(AUTHORS)
+                .encrypt_key(KEY)
+                .with_dear_imgui()
+                .with_renderer(ApplicationBuilder::Renderer2D);
+
+            auto launcher = Application {launcher_builder, global_data};
+            launcher.set_start_function(launcher::start);
             launcher.add_scene<LauncherScene>();
             exit_code = launcher.run("launcher"_H);
-
-            if (exit_code == 1) {
-                break;
-            }
         }
 
-        const auto& options = std::any_cast<Data>(global_data).launcher_options;
+        if (exit_code == 1) {
+            break;
+        }
 
-        auto game_builder = ApplicationBuilder {}
-            .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
-            .display_flags(options.fullscreen, options.native_resolution, true)
-            .display_min_resolution(512, 288)
-            .application_name(APP_NAME)
-            .version(MAJOR, MINOR, PATCH)
-            .authors(AUTHORS)
-            .encrypt_key(KEY)
-            .with_renderer(ApplicationBuilder::Renderer3D)
-            .with_renderer(ApplicationBuilder::Renderer2D)
-            .with_dear_imgui()
-            .with_audio();
+        {
+            const auto& options = global_data->launcher_options;
 
-        auto game = Application {game_builder, global_data, game::start, game::stop};
-        game.add_scene<LoadingScene>();
-        game.add_scene<StandardGameScene>();
-        game.add_scene<JumpVariantScene>();
-        game.add_scene<JumpPlusVariantScene>();
-        exit_code = game.run("loading"_H);
+            auto game_builder = ApplicationBuilder {}
+                .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
+                .display_flags(options.fullscreen, options.native_resolution, true)
+                .display_min_resolution(512, 288)
+                .application_name(APP_NAME)
+                .version(MAJOR, MINOR, PATCH)
+                .authors(AUTHORS)
+                .encrypt_key(KEY)
+                .with_renderer(ApplicationBuilder::Renderer3D)
+                .with_renderer(ApplicationBuilder::Renderer2D)
+                .with_dear_imgui()
+                .with_audio();
+
+            auto game = Application {game_builder, global_data};
+            game.set_start_function(game::start);
+            game.set_stop_function(game::stop);
+            game.add_scene<LoadingScene>();
+            game.add_scene<StandardGameScene>();
+            game.add_scene<JumpVariantScene>();
+            game.add_scene<JumpPlusVariantScene>();
+            exit_code = game.run("loading"_H);
+        }
 
         if (exit_code == 0) {
             break;

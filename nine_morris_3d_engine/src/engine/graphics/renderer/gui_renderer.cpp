@@ -29,10 +29,10 @@ static float map(float x, float in_min, float in_max, float out_min, float out_m
 }
 
 GuiRenderer::GuiRenderer(Ctx* ctx)
-    : app(app) {
+    : ctx(ctx) {
     storage.orthographic_projection_matrix = glm::ortho(
-        0.0f, static_cast<float>(ctx->data().width),
-        0.0f, static_cast<float>(ctx->data().height)
+        0.0f, static_cast<float>(ctx->properties->width),
+        0.0f, static_cast<float>(ctx->properties->height)
     );
 
     initialize_uniform_buffers();
@@ -43,7 +43,7 @@ GuiRenderer::GuiRenderer(Ctx* ctx)
     ctx->evt.connect<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);
 
     // Set application pointer to widgets
-    gui::Widget::app = app;
+    gui::Widget::ctx = ctx;
 
     LOG_INFO("Initialized GUI renderer");
 }
@@ -78,15 +78,15 @@ void GuiRenderer::render(const SceneList& scene) {
 }
 
 void GuiRenderer::quad_center(float& width, float& height, float& x_pos, float& y_pos) {
-    if (static_cast<float>(ctx->data().width) / ctx->data().height > 16.0f / 9.0f) {
-        width = ctx->data().width;
-        height = ctx->data().width * (9.0f / 16.0f);
+    if (static_cast<float>(ctx->properties->width) / ctx->properties->height > 16.0f / 9.0f) {
+        width = ctx->properties->width;
+        height = ctx->properties->width * (9.0f / 16.0f);
         x_pos = 0.0f;
-        y_pos = (height - ctx->data().height) / -2.0f;
+        y_pos = (height - ctx->properties->height) / -2.0f;
     } else {
-        height = ctx->data().height;
-        width = ctx->data().height * (16.0f / 9.0f);
-        x_pos = (width - ctx->data().width) / -2.0f;
+        height = ctx->properties->height;
+        width = ctx->properties->height * (16.0f / 9.0f);
+        x_pos = (width - ctx->properties->width) / -2.0f;
         y_pos = 0.0f;
     }
 }
@@ -181,8 +181,8 @@ void GuiRenderer::draw(const std::vector<gui::Widget*>& subwidgets, const BeginE
     begin();
 
     for (gui::Widget* widget : subwidgets) {
-        const int WINDOW_WIDTH = ctx->data().width;
-        const int WINDOW_HEIGHT = ctx->data().height;
+        const int WINDOW_WIDTH = ctx->properties->width;
+        const int WINDOW_HEIGHT = ctx->properties->height;
 
         if (widget->scale_parameters.min_bound != 0 && widget->scale_parameters.max_bound != 0) {
             if (WINDOW_HEIGHT <= widget->scale_parameters.min_bound) {

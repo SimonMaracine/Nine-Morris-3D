@@ -4,7 +4,7 @@
 
 #include "engine/application/window.h"
 #include "engine/application/application.h"
-#include "engine/application/application_data.h"
+#include "engine/application/application_properties.h"
 #include "engine/application/events.h"
 #include "engine/application/platform.h"
 #include "engine/application/input.h"
@@ -13,10 +13,13 @@
 #include "engine/other/logging.h"
 #include "engine/other/exit.h"
 
-#define APPLICATION_DATA(VARIABLE) const ApplicationData* VARIABLE = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
-#define WITH_DEAR_IMGUI() (data->app->builder.dear_imgui)
+#define APPLICATION_DATA(VARIABLE) \
+    const ApplicationProperties* VARIABLE = ( \
+        static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window)) \
+    );
+#define WITH_DEAR_IMGUI() (data->application->builder.dear_imgui)
 
-Window::Window(Application* app) {
+Window::Window(Application* application) {
     if (!glfwInit()) {
         LOG_DIST_CRITICAL("Could not initialize GLFW, exiting...");
         application_exit::panic();
@@ -33,7 +36,7 @@ Window::Window(Application* app) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, app->app_data.resizable ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, application->properties.resizable ? GLFW_TRUE : GLFW_FALSE);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 #ifdef NM3D_PLATFORM_DEBUG
@@ -43,7 +46,7 @@ Window::Window(Application* app) {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif
 
-    window = create_window(app);
+    window = create_window(application);
 
     if (window == nullptr) {
         LOG_DIST_CRITICAL("Could not create window, exiting...");
@@ -60,8 +63,14 @@ Window::Window(Application* app) {
     }
 
     glfwSwapInterval(1);
-    glfwSetWindowUserPointer(window, &app->app_data);
-    glfwSetWindowSizeLimits(window, app->app_data.min_width, app->app_data.min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    glfwSetWindowUserPointer(window, &application->properties);
+    glfwSetWindowSizeLimits(
+        window,
+        application->properties.min_width,
+        application->properties.min_height,
+        GLFW_DONT_CARE,
+        GLFW_DONT_CARE
+    );
 
     install_callbacks();
 
@@ -182,53 +191,54 @@ void Window::set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons
     glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
 }
 
-GLFWwindow* Window::create_window(Application* app) {
+GLFWwindow* Window::create_window(Application* application) {
     GLFWmonitor* primary_monitor = nullptr;
     int width = 0, height = 0;
 
-    if (app->app_data.fullscreen) {
+    if (application->properties.fullscreen) {
         primary_monitor = glfwGetPrimaryMonitor();
 
-        if (app->app_data.native_resolution) {
+        if (application->properties.native_resolution) {
             const GLFWvidmode* video_mode = glfwGetVideoMode(primary_monitor);
+
             width = video_mode->width;
             height = video_mode->height;
 
             // Set the real resolution
-            app->app_data.width = video_mode->width;
-            app->app_data.height = video_mode->height;
+            application->properties.width = video_mode->width;
+            application->properties.height = video_mode->height;
         } else {
-            width = app->app_data.width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
-            height = app->app_data.height;
+            width = application->properties.width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
+            height = application->properties.height;
         }
     } else {
-        width = app->app_data.width;
-        height = app->app_data.height;
+        width = application->properties.width;
+        height = application->properties.height;
     }
 
-    return glfwCreateWindow(width, height, app->app_data.title.c_str(), primary_monitor, nullptr);
+    return glfwCreateWindow(width, height, application->properties.title.c_str(), primary_monitor, nullptr);
 }
 
 void Window::install_callbacks() {
     glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
         APPLICATION_DATA(data)
 
-        data->app->evt.enqueue<WindowClosedEvent>();
+        data->ctx->evt.enqueue<WindowClosedEvent>();
     });
 
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-        ApplicationData* data = static_cast<ApplicationData*>(glfwGetWindowUserPointer(window));
+        ApplicationProperties* data = static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window));
 
         data->width = width;
         data->height = height;
 
-        data->app->evt.enqueue<WindowResizedEvent>(width, height);
+        data->ctx->evt.enqueue<WindowResizedEvent>(width, height);
     });
 
     glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {
         APPLICATION_DATA(data)
 
-        data->app->evt.enqueue<WindowFocusedEvent>(focused);
+        data->ctx->evt.enqueue<WindowFocusedEvent>(focused);
     });
 
     glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -240,7 +250,7 @@ void Window::install_callbacks() {
                     return;
                 }
 
-                data->app->evt.enqueue<KeyPressedEvent>(
+                data->ctx->evt.enqueue<KeyPressedEvent>(
                     input::key_from_code(key),
                     false,
                     static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -252,7 +262,7 @@ void Window::install_callbacks() {
                     return;
                 }
 
-                data->app->evt.enqueue<KeyReleasedEvent>(input::key_from_code(key));
+                data->ctx->evt.enqueue<KeyReleasedEvent>(input::key_from_code(key));
                 break;
             }
             case GLFW_REPEAT: {
@@ -260,7 +270,7 @@ void Window::install_callbacks() {
                     return;
                 }
 
-                data->app->evt.enqueue<KeyPressedEvent>(
+                data->ctx->evt.enqueue<KeyPressedEvent>(
                     input::key_from_code(key),
                     true,
                     static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -279,7 +289,7 @@ void Window::install_callbacks() {
                     return;
                 }
 
-                data->app->evt.enqueue<MouseButtonPressedEvent>(input::mouse_button_from_code(button));
+                data->ctx->evt.enqueue<MouseButtonPressedEvent>(input::mouse_button_from_code(button));
                 break;
             }
             case GLFW_RELEASE: {
@@ -287,7 +297,7 @@ void Window::install_callbacks() {
                     return;
                 }
 
-                data->app->evt.enqueue<MouseButtonReleasedEvent>(input::mouse_button_from_code(button));
+                data->ctx->evt.enqueue<MouseButtonReleasedEvent>(input::mouse_button_from_code(button));
                 break;
             }
         }
@@ -300,7 +310,7 @@ void Window::install_callbacks() {
             return;
         }
 
-        data->app->evt.enqueue<MouseScrolledEvent>(static_cast<float>(yoffset));
+        data->ctx->evt.enqueue<MouseScrolledEvent>(static_cast<float>(yoffset));
     });
 
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
@@ -310,7 +320,7 @@ void Window::install_callbacks() {
             return;
         }
 
-        data->app->evt.enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
+        data->ctx->evt.enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
     });
 }
 

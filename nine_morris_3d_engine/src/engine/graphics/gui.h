@@ -6,7 +6,7 @@
 #include "engine/graphics/font.h"
 #include "engine/scene/object.h"  // TODO not great
 
-class Application;
+class Ctx;
 class GuiRenderer;
 
 namespace gui {
@@ -81,7 +81,7 @@ namespace gui {
 
         static Ctx* ctx;
 
-        friend class ::Application;
+        friend class ::Ctx;
         friend class ::GuiRenderer;
     };
 

@@ -217,7 +217,7 @@ void JumpBoard::to_serialized(JumpBoardSerialized& serialized) {
 }
 
 void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
-    auto& data = ctx->user_data<Data>();
+    auto& data = ctx->data<Data>();
 
     for (size_t i = 0; i < MAX_NODES; i++) {
         nodes.at(i).index = serialized.nodes.at(i).index;

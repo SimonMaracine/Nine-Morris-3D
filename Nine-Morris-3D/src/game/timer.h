@@ -6,9 +6,9 @@ class Timer {
 public:
     Timer() = default;
     Timer(Ctx* ctx)
-        : app(app) {}
+        : ctx(ctx) {}
     Timer(Ctx* ctx, unsigned int time)
-        : time(time), app(app) {}
+        : time(time), ctx(ctx) {}
     ~Timer() = default;
 
     Timer(const Timer&) = delete;
