@@ -11,7 +11,7 @@
 #include "engine/graphics/opengl/texture.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 static constexpr char32_t ERROR_CHARACTER = 127;
 
@@ -27,7 +27,7 @@ static const char* get_font_file_data(std::string_view file_path) {
 
     if (!file.is_open()) {
         LOG_DIST_CRITICAL("Could not open file `{}` for reading, exiting...", file_path);
-        application_exit::panic();
+        panic::panic();
     }
 
     file.seekg(0, file.end);
@@ -66,7 +66,7 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
 
     if (!stbtt_InitFont(&info, reinterpret_cast<const unsigned char*>(font_info_buffer), 0)) {
         LOG_DIST_CRITICAL("Could not load font `{}`, exiting...", file_path);
-        application_exit::panic();
+        panic::panic();
     }
 
     sf = stbtt_ScaleForPixelHeight(&info, size);

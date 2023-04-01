@@ -4,7 +4,7 @@
 #include "engine/audio/context.h"
 #include "engine/audio/openal/listener.h"
 #include "engine/other/logging.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 static ALCdevice* _global_device = nullptr;
 static ALCcontext* _global_context = nullptr;
@@ -16,7 +16,7 @@ static void maybe_check_errors(ALCdevice* device) {
 
     if (error != ALC_NO_ERROR) {
         LOG_DIST_CRITICAL("OpenAL Context Debug Error: {}", error);
-        application_exit::panic();
+        panic::panic();
     }
 #endif
 }
@@ -28,14 +28,14 @@ OpenAlContext::OpenAlContext() {
 
     if (device == nullptr) {
         LOG_DIST_CRITICAL("Could not open an AL device, exiting...");
-        application_exit::panic();
+        panic::panic();
     }
 
     context = alcCreateContext(device, nullptr);  // TODO maybe pass some context attributes
 
     if (context == nullptr) {
         LOG_DIST_CRITICAL("Could not create an AL context, exiting...");
-        application_exit::panic();
+        panic::panic();
     }
 
     if (alcMakeContextCurrent(context) == ALC_FALSE) {
@@ -43,7 +43,7 @@ OpenAlContext::OpenAlContext() {
         alcCloseDevice(device);
 
         LOG_DIST_CRITICAL("Could not make AL context current, exiting...");
-        application_exit::panic();
+        panic::panic();
     }
 
     _global_device = device;

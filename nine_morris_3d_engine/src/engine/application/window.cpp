@@ -11,7 +11,7 @@
 #include "engine/dear_imgui/imgui_context.h"
 #include "engine/graphics/texture_data.h"
 #include "engine/other/logging.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 #define APPLICATION_DATA(VARIABLE) \
     const ApplicationProperties* VARIABLE = ( \
@@ -22,7 +22,7 @@
 Window::Window(Application* application) {
     if (!glfwInit()) {
         LOG_DIST_CRITICAL("Could not initialize GLFW, exiting...");
-        application_exit::panic();
+        panic::panic();
     }
 
 #ifdef NM3D_PLATFORM_DEBUG
@@ -50,7 +50,7 @@ Window::Window(Application* application) {
 
     if (window == nullptr) {
         LOG_DIST_CRITICAL("Could not create window, exiting...");
-        application_exit::panic();
+        panic::panic();
     }
 
     LOG_INFO("Initialized GLFW and created window and OpenGL context");
@@ -59,7 +59,7 @@ Window::Window(Application* application) {
 
     if (!gladLoadGL()) {
         LOG_DIST_CRITICAL("Could not initialize GLAD, exiting...");
-        application_exit::panic();
+        panic::panic();
     }
 
     glfwSwapInterval(1);
@@ -107,7 +107,7 @@ std::vector<Monitor> Window::get_monitors() {
 
     if (monitors == nullptr) {
         LOG_DIST_CRITICAL("Could not retrieve monitors, exiting...");
-        application_exit::panic();
+        panic::panic();
     }
 
     std::vector<Monitor> result;
@@ -163,7 +163,7 @@ void Window::set_cursor(unsigned int handle) {
         cursor = cursors.at(handle);
     } catch (const std::out_of_range&) {
         LOG_CRITICAL("Invalid handle `{}`, exiting...", handle);
-        application_exit::panic();
+        panic::panic();
     }
     glfwSetCursor(window, cursor);
 #else

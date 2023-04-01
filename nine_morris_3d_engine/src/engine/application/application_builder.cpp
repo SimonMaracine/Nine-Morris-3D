@@ -73,3 +73,9 @@ ApplicationBuilder& ApplicationBuilder::with_audio() {
 
     return *this;
 }
+
+ApplicationBuilder& ApplicationBuilder::with_random_generator() {
+    random_generator = true;
+
+    return *this;
+}

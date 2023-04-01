@@ -1,26 +1,25 @@
 #include "engine/other/random_gen.h"
 #include "engine/other/assert.h"
 
-namespace random_gen {
-    void initialize() {
-        srand(time(nullptr));
-    }
+RandomGenerator::RandomGenerator() {
+    std::random_device dev;
+    random = std::mt19937(dev());
+}
 
-    int next() {
-        return rand();
-    }
+uint32_t RandomGenerator::next() {
+    return default_distribution(random);
+}
 
-    int next(int end) {
-        ASSERT(end >= 0 && end <= RAND_MAX, "Invalid end value");
+uint32_t RandomGenerator::next(uint32_t end) {
+    std::uniform_int_distribution<std::mt19937::result_type> distribution {0, end};
 
-        return rand() % end;
-    }
+    return distribution(random);
+}
 
-    int next(int begin, int end) {
-        ASSERT(begin >= 0, "Invalid begin value");
-        ASSERT(end >= 0 && end <= RAND_MAX, "Invalid end value");
-        ASSERT(end > begin, "Invalid range");
+uint32_t RandomGenerator::next(uint32_t begin, uint32_t end) {
+    ASSERT(end > begin, "Invalid range");
 
-        return rand() % (end - begin) + begin;
-    }
+    std::uniform_int_distribution<std::mt19937::result_type> distribution {begin, end};
+
+    return distribution(random);
 }

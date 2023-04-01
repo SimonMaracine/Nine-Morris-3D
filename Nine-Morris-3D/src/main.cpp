@@ -75,7 +75,8 @@ void application_main() {
                 .with_renderer(ApplicationBuilder::Renderer3D)
                 .with_renderer(ApplicationBuilder::Renderer2D)
                 .with_dear_imgui()
-                .with_audio();
+                .with_audio()
+                .with_random_generator();
 
             auto game = Application {game_builder, global_data};
             game.set_start_function(game::start);

@@ -5,7 +5,7 @@
 #include "engine/graphics/opengl/info_and_debug.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 static const GLenum parameters[] = {
     GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
@@ -113,7 +113,7 @@ static constexpr size_t BUFFER_LENGTH = 128;
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
                 LOG_DIST_CRITICAL("({}) {}", id, message);
-                application_exit::panic();
+                panic::panic();
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:

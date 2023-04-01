@@ -5,7 +5,7 @@
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 namespace gl {
     VertexArray::VertexArray() {
@@ -62,7 +62,7 @@ namespace gl {
                     break;
                 default:
                     LOG_DIST_CRITICAL("Unknown element type `{}`, exiting...", element.type);
-                    application_exit::panic();
+                    panic::panic();
             }
 
             glEnableVertexAttribArray(element.index);

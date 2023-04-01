@@ -5,7 +5,7 @@
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 TextureData::TextureData(std::string_view file_path, bool flip)
     : file_path(file_path) {
@@ -18,7 +18,7 @@ TextureData::TextureData(std::string_view file_path, bool flip)
 
     if (data == nullptr) {
         LOG_DIST_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
-        application_exit::panic();
+        panic::panic();
     }
 }
 
@@ -35,7 +35,7 @@ TextureData::TextureData(encrypt::EncryptedFile file_path, bool flip)
 
     if (data == nullptr) {
         LOG_DIST_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
-        application_exit::panic();
+        panic::panic();
     }
 }
 

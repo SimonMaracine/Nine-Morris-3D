@@ -17,14 +17,14 @@
 #include "engine/other/encrypt.h"
 #include "engine/other/file_system.h"
 #include "engine/other/random_gen.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 #include "engine/scene/scene.h"
 
 void Application::preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file) {
     try {
         file_system::initialize_for_applications(app_name);
     } catch (const file_system::UserNameError& e) {
-        application_exit::panic();  // Really bad that there is no feedback
+        panic::panic();  // Really bad that there is no feedback
     }
 
     // Set locale for the applications; used mostly by spdlog
@@ -71,12 +71,11 @@ Application::Application(const ApplicationBuilder& builder, void* user_data)
     logging::log_general_information(logging::LogTarget::Console);
 #endif
 
-    input::initialize(ctx.window->get_handle());
+    input::initialize(ctx.window->get_handle());  // TODO get rid of static data
     gl::maybe_initialize_debugging();
     render_helpers::initialize_default();
     encrypt::initialize(builder.encryption_key);
     identifier::initialize();
-    random_gen::initialize();
 
     const auto [version_major, version_minor] = gl::get_version_number();
     LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
@@ -91,6 +90,10 @@ Application::Application(const ApplicationBuilder& builder, void* user_data)
 
     if (builder.audio) {
         initialize_audio();
+    }
+
+    if (builder.random_generator) {
+        initialize_random_generator();
     }
 
     ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
@@ -288,6 +291,12 @@ void Application::initialize_audio() {
     LOG_INFO("With audio");
 
     ctx.snd = std::make_unique<OpenAlContext>();
+}
+
+void Application::initialize_random_generator() {
+    LOG_INFO("With random number generator");
+
+    ctx.rng = std::make_unique<RandomGenerator>();
 }
 
 void Application::on_window_closed(const WindowClosedEvent&) {

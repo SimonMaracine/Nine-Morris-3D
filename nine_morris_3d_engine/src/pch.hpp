@@ -26,6 +26,7 @@
 #include <initializer_list>
 #include <climits>
 #include <locale>
+#include <random>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>

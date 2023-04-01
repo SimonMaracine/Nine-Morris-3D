@@ -42,5 +42,5 @@ struct StandardGameScene : public SceneGame {
 
     StandardBoard board;
     UndoRedoState<StandardBoardSerialized> undo_redo_state;
-    MinimaxStandardGame minimax_algorithm;
+    MinimaxStandardGame minimax_algorithm {ctx};
 };

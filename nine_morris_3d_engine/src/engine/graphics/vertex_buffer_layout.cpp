@@ -2,7 +2,7 @@
 
 #include "engine/graphics/vertex_buffer_layout.h"
 #include "engine/other/logging.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 size_t VertexBufferLayout::VertexElement::get_size(Type type) {
     switch (type) {
@@ -12,7 +12,7 @@ size_t VertexBufferLayout::VertexElement::get_size(Type type) {
             return sizeof(GLint);
         default:
             LOG_DIST_CRITICAL("Type `{}` is not supported, exiting...", type);
-            application_exit::panic();
+            panic::panic();
     }
 
     return 0;

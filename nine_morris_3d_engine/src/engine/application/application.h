@@ -62,6 +62,7 @@ protected:
     void initialize_r2d();
     void initialize_dear_imgui();
     void initialize_audio();
+    void initialize_random_generator();
 
     void on_window_closed(const WindowClosedEvent&);
     void on_window_resized(const WindowResizedEvent& event);

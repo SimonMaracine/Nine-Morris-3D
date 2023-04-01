@@ -3,7 +3,7 @@
 #include "engine/application/platform.h"
 #include "engine/audio/openal/info_and_debug.h"
 #include "engine/other/logging.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 namespace al {
     void maybe_check_errors() {
@@ -33,7 +33,7 @@ namespace al {
                     LOG_DIST_CRITICAL("({}) Unknown AL error", error);
             }
 
-            application_exit::panic();
+            panic::panic();
         }
 #endif
     }

@@ -14,7 +14,7 @@
 #define PIECE_Y_FLOATING_POSITION 0.3f
 #define WHITE_PIECE_POSITION(i) glm::vec3(-4.0f, PIECE_Y_FLOATING_POSITION, -2.0f + (i) * 0.49f)
 #define BLACK_PIECE_POSITION(i) glm::vec3(4.0f, PIECE_Y_FLOATING_POSITION, -2.0f + ((i) - 9) * 0.49f)
-#define RANDOM_PIECE_ROTATION() glm::vec3(0.0f, glm::radians(static_cast<float>(random_gen::next(360))), 0.0f)
+#define RANDOM_PIECE_ROTATION() glm::vec3(0.0f, glm::radians(static_cast<float>(ctx->rng->next(360))), 0.0f)
 #define PIECE_INDEX_POSITION(i) glm::vec3(NODE_POSITIONS[i].x, PIECE_Y_POSITION, NODE_POSITIONS[i].z)
 
 inline constexpr ImVec4 DEFAULT_BROWN = ImVec4(0.647f, 0.4f, 0.212f, 1.0f);

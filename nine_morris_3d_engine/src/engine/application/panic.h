@@ -1,5 +1,5 @@
 #pragma once
 
-namespace application_exit {
+namespace panic {
     void panic();
 }

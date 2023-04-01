@@ -20,6 +20,7 @@ public:
     ApplicationBuilder& with_renderer(Renderer renderer);
     ApplicationBuilder& with_dear_imgui();
     ApplicationBuilder& with_audio();
+    ApplicationBuilder& with_random_generator();
 private:
     int width = 800;
     int height = 600;
@@ -39,6 +40,7 @@ private:
     bool renderer_2d = false;
     bool dear_imgui = false;
     bool audio = false;
+    bool random_generator = false;
 
     friend class Application;
     friend class Window;

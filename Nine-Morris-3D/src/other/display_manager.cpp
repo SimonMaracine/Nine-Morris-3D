@@ -16,7 +16,7 @@ DisplayManager::DisplayManager(Ctx* ctx)
 
     if (width < 512) {
         LOG_DIST_CRITICAL("Monitor has unsupported resolution, exiting...");
-        application_exit::panic();
+        panic::panic();
     } else if (width < 768) {
         resolutions_supported = 1;
     } else if (width < 1024) {

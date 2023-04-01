@@ -5,7 +5,6 @@
 #include "engine/other/dependencies.h"
 #include "engine/other/dummy.h"
 #include "engine/other/encrypt.h"
-#include "engine/other/exit.h"
 #include "engine/other/file_system.h"
 #include "engine/other/concurrent_loader.h"
 #include "engine/other/logging.h"

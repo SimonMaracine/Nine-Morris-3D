@@ -1,12 +1,15 @@
 #pragma once
 
+#include <engine/engine_application.h>
+
 #include "game/minimax/common.h"
 #include "game/game_position.h"
 #include "other/constants.h"
 
 class MinimaxStandardGame : public MinimaxAlgorithm {
 public:
-    MinimaxStandardGame() = default;
+    MinimaxStandardGame(Ctx* ctx)
+        : MinimaxAlgorithm(ctx) {}
     ~MinimaxStandardGame() = default;
 
     MinimaxStandardGame(const MinimaxStandardGame&) = default;

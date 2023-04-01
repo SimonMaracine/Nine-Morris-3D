@@ -350,14 +350,14 @@ void Board::unselect_other_pieces(size_t currently_selected_piece_index) {
 void Board::play_piece_place_sound(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
-    const auto choice = random_gen::choice({ "piece_place1"_H, "piece_place2"_H });
+    const auto choice = ctx->rng->choice({ "piece_place1"_H, "piece_place2"_H });
     piece.source->play(ctx->res.al_buffer[choice].get());
 }
 
 void Board::play_piece_move_sound(size_t piece_index) {
     Piece& piece = pieces.at(piece_index);
 
-    const auto choice = random_gen::choice({ "piece_move1"_H, "piece_move2"_H });
+    const auto choice = ctx->rng->choice({ "piece_move1"_H, "piece_move2"_H });
     piece.source->play(ctx->res.al_buffer[choice].get());
 }
 

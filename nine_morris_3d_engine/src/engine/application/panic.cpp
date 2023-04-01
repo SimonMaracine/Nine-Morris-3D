@@ -1,8 +1,8 @@
 #include "engine/application/window.h"
 #include "engine/audio/context.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
-namespace application_exit {
+namespace panic {
     void panic() {
         // Gracefully clean up at least some resources
         destroy_openal_context();

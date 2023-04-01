@@ -7,7 +7,7 @@
 #include "engine/other/mesh.h"
 #include "engine/other/logging.h"
 #include "engine/other/encrypt.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 struct PTN {
     glm::vec3 position = glm::vec3(0.0f);
@@ -152,7 +152,7 @@ namespace mesh {
         if (!scene) {
             LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
-            application_exit::panic();
+            panic::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -190,7 +190,7 @@ namespace mesh {
         if (!scene) {
             LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
-            application_exit::panic();
+            panic::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -225,7 +225,7 @@ namespace mesh {
         if (!scene) {
             LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
-            application_exit::panic();
+            panic::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -263,7 +263,7 @@ namespace mesh {
         if (!scene) {
             LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
-            application_exit::panic();
+            panic::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -298,7 +298,7 @@ namespace mesh {
         if (!scene) {
             LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
-            application_exit::panic();
+            panic::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;
@@ -336,7 +336,7 @@ namespace mesh {
         if (!scene) {
             LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
-            application_exit::panic();
+            panic::panic();
         }
 
         const aiNode* root_node = scene->mRootNode;

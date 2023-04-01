@@ -118,7 +118,7 @@ void MinimaxStandardGame::random_move(PieceType piece) {
         return;
     }
 
-    best_move = random_gen::choice<Move>(moves.begin(), moves.end());
+    best_move = ctx->rng->choice<Move>(moves.begin(), moves.end());
 }
 
 std::vector<Move> MinimaxStandardGame::get_all_moves(PieceType piece) {

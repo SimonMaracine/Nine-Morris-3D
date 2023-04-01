@@ -3,7 +3,7 @@
 #include "engine/graphics/opengl/framebuffer.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 static const GLenum COLOR_ATTACHMENTS[4] = {
     GL_COLOR_ATTACHMENT0,
@@ -351,7 +351,7 @@ namespace gl {
                             break;
                         default:
                             LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
-                            application_exit::panic();
+                            panic::panic();
                     }
 
                     color_attachments[i] = texture;
@@ -388,7 +388,7 @@ namespace gl {
                             break;
                         default:
                             LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
-                            application_exit::panic();
+                            panic::panic();
                     }
 
                     color_attachments[i] = renderbuffer;
@@ -430,7 +430,7 @@ namespace gl {
                             break;
                         default:
                             LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
-                            application_exit::panic();
+                            panic::panic();
                     }
 
                     depth_attachment = texture;
@@ -463,7 +463,7 @@ namespace gl {
                             break;
                         default:
                             LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
-                            application_exit::panic();
+                            panic::panic();
                     }
 
                     depth_attachment = renderbuffer;
@@ -488,7 +488,7 @@ namespace gl {
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             LOG_DIST_CRITICAL("GL framebuffer {} is incomplete, exiting...", framebuffer);
             LOG_DIST_CRITICAL("GL framebuffer status: {}", print_framebuffer_status_message(status));
-            application_exit::panic();
+            panic::panic();
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

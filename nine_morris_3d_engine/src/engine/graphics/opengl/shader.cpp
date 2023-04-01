@@ -8,7 +8,7 @@
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 #define CASE(_enum, count, type) case _enum: size = (count) * sizeof(type); break;
 
@@ -20,7 +20,7 @@ static size_t type_size(GLenum type) {
         CASE(GL_FLOAT_MAT4, 16, GLfloat)
         default:
             LOG_DIST_CRITICAL("Unknown type `{}`, exiting...", type);
-            application_exit::panic();
+            panic::panic();
     }
 
     return size;
@@ -69,7 +69,7 @@ static GLuint compile_shader(std::string_view source_path, GLenum type, std::str
 
     if (!file.is_open()) {
         LOG_DIST_CRITICAL("Could not open file `{}` for reading, exiting...", source_path);
-        application_exit::panic();
+        panic::panic();
     }
 
     file.seekg(0, file.end);
@@ -160,7 +160,7 @@ namespace gl {
             fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
         } catch (const std::runtime_error& e) {
             LOG_DIST_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
-            application_exit::panic();
+            panic::panic();
         }
 
         program = glCreateProgram();
@@ -171,7 +171,7 @@ namespace gl {
 
         if (!check_linking(program, name)) {
             LOG_DIST_CRITICAL("Exiting...");
-            application_exit::panic();
+            panic::panic();
         }
 
         check_and_cache_uniforms(uniforms);
@@ -196,7 +196,7 @@ namespace gl {
             fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
         } catch (const std::runtime_error& e) {
             LOG_DIST_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
-            application_exit::panic();
+            panic::panic();
         }
 
         program = glCreateProgram();
@@ -207,7 +207,7 @@ namespace gl {
 
         if (!check_linking(program, name)) {
             LOG_DIST_CRITICAL("Exiting...");
-            application_exit::panic();
+            panic::panic();
         }
 
         check_and_cache_uniforms(uniforms);
@@ -334,7 +334,7 @@ namespace gl {
 
             if (block_index == GL_INVALID_INDEX) {
                 LOG_DIST_CRITICAL("Invalid block index, exiting...");
-                application_exit::panic();
+                panic::panic();
             }
 
             // If it's already configured, skip everything else
@@ -392,7 +392,7 @@ namespace gl {
             for (size_t i = 0; i < field_count; i++) {
                 if (indices[i] == GL_INVALID_INDEX) {
                     LOG_DIST_CRITICAL("Invalid field index, exiting...");
-                    application_exit::panic();
+                    panic::panic();
                 }
             }
 

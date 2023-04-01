@@ -129,7 +129,7 @@ hs LoadingScene::scene_int_to_id(int scene) {  // FIXME find a better way
             return "jump_plus_variant"_H;
         default:
             LOG_DIST_CRITICAL("Invalid scene number, exiting...");
-            application_exit::panic();
+            panic::panic();
     }
 
     return {};

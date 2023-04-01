@@ -6,6 +6,7 @@
 #include "engine/application/capabilities.h"
 #include "engine/application/context.h"
 #include "engine/application/events.h"
+#include "engine/application/panic.h"
 #include "engine/application/input.h"
 #include "engine/application/platform.h"
 #include "engine/application/window.h"

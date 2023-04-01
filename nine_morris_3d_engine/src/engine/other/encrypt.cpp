@@ -3,9 +3,11 @@
 #include "engine/application/platform.h"
 #include "engine/other/encrypt.h"
 #include "engine/other/logging.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 static cppblowfish::BlowfishContext _blowfish;
+
+constexpr size_t foo = sizeof(_blowfish);
 
 namespace encrypt {
     void initialize(std::string_view key) {
@@ -17,7 +19,7 @@ namespace encrypt {
 
         if (!file.is_open()) {
             LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading, exiting...", file_path);
-            application_exit::panic();
+            panic::panic();
         }
 
         file.seekg(0, file.end);

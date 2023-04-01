@@ -3,7 +3,7 @@
 #include "engine/audio/openal/buffer.h"
 #include "engine/audio/openal/info_and_debug.h"
 #include "engine/other/logging.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 static ALenum get_format(int channels, size_t bps) {
     ALenum format = 0;
@@ -18,7 +18,7 @@ static ALenum get_format(int channels, size_t bps) {
         format = AL_FORMAT_STEREO16;
     } else {
         LOG_DIST_CRITICAL("Unknown format: channels = `{}`, bps = `{}`, exiting...", channels, bps);
-        application_exit::panic();
+        panic::panic();
     }
 
     return format;

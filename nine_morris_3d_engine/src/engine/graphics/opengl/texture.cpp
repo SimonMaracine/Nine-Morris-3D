@@ -9,7 +9,7 @@
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
-#include "engine/other/exit.h"
+#include "engine/application/panic.h"
 
 static constexpr int CHANNELS = 4;
 
@@ -102,7 +102,7 @@ namespace gl {
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture `{}`, exiting...", file_path);
-            application_exit::panic();
+            panic::panic();
         }
 
         glGenTextures(1, &texture);
@@ -137,7 +137,7 @@ namespace gl {
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture `{}`, exiting...", file_path);
-            application_exit::panic();
+            panic::panic();
         }
 
         glGenTextures(1, &texture);
@@ -226,7 +226,7 @@ namespace gl {
                 break;
             default:
                 LOG_DIST_CRITICAL("Invalid texture format `{}`, exiting...", static_cast<int>(specification.format));
-                application_exit::panic();
+                panic::panic();
         }
     }
 
@@ -250,7 +250,7 @@ namespace gl {
 
             if (data == nullptr) {
                 LOG_DIST_CRITICAL("Could not load texture `{}`, exiting...", file_paths[i]);
-                application_exit::panic();
+                panic::panic();
             }
         }
 
