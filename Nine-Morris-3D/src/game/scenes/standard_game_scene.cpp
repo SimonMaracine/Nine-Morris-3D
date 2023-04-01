@@ -371,7 +371,7 @@ void StandardGameScene::draw_debug_imgui() {
 }
 
 void StandardGameScene::draw_ai_configuration_imgui() {
-    imgui_draw_window("Artificial Intelligence Configuration", [this]() {  // TODO rename
+    imgui_draw_window("Computer AI Configuration", [this]() {  // TODO rename
         int piece = minimax_algorithm.parameters.PIECE;
         int freedom = minimax_algorithm.parameters.FREEDOM;
         int depth = static_cast<int>(minimax_algorithm.parameters.DEPTH);

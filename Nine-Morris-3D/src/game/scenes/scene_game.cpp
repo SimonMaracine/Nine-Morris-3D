@@ -844,7 +844,7 @@ void SceneGame::imgui_draw_menu_bar() {
 
                 ImGui::EndMenu();
             }
-            if (ImGui::MenuItem("Artificial Intelligence")) {
+            if (ImGui::MenuItem("Computer AI")) {
                 window = WindowImGui::ShowAiSettings;
             }
             if (ImGui::MenuItem("Save On Exit", nullptr, &data.options.save_on_exit)) {
@@ -1295,6 +1295,7 @@ void SceneGame::imgui_draw_window(const char* title, const std::function<void()>
         if (ImGui::Button("Ok", ImVec2(150.0f, 0.0f))) {
             ImGui::CloseCurrentPopup();
             window = WindowImGui::None;
+
             ok_callback();
         }
 

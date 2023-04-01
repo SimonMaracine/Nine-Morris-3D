@@ -93,6 +93,13 @@ namespace imgui_context {
         return io.WantCaptureKeyboard;
     }
 
+    bool on_char_typed(unsigned int codepoint) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddInputCharacter(codepoint);
+
+        return io.WantCaptureKeyboard;
+    }
+
     // Taken from Dear ImGui; it's not rock-solid, as it's just a workaround
     static int translate_untranslated_key(int key, int scancode) {
         if (key >= GLFW_KEY_KP_0 && key <= GLFW_KEY_KP_EQUAL) {

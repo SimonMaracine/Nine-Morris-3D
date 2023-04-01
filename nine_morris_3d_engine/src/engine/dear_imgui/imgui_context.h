@@ -13,4 +13,5 @@ namespace imgui_context {
     bool on_mouse_button_released(int button);
     bool on_key_pressed(int key, int scancode);
     bool on_key_released(int key, int scancode);
+    bool on_char_typed(unsigned int codepoint);
 }

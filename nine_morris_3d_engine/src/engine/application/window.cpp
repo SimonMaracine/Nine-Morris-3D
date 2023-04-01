@@ -280,6 +280,16 @@ void Window::install_callbacks() {
         }
     });
 
+    glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int codepoint) {
+        APPLICATION_DATA(data)
+
+        if (WITH_DEAR_IMGUI() && imgui_context::on_char_typed(codepoint)) {
+            return;
+        }
+
+        // A char typed event is not defined
+    });
+
     glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
         APPLICATION_DATA(data)
 
