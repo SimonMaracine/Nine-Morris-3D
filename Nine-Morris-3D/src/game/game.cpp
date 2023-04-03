@@ -39,17 +39,16 @@ static void setup_icons(Ctx* ctx) {
 static void setup_cursors(Ctx* ctx) {
     using namespace assets;
     using namespace file_system;
-    using namespace encrypt;
 
     ctx->window->add_cursor(
         "arrow"_H,
-        std::make_unique<TextureData>(encr(path_for_assets(ARROW_CURSOR)), false),
+        std::make_unique<TextureData>(Encrypt::encr(path_for_assets(ARROW_CURSOR)), false),
         4, 1
     );
 
     ctx->window->add_cursor(
         "cross"_H,
-        std::make_unique<TextureData>(encr(path_for_assets(CROSS_CURSOR)), false),
+        std::make_unique<TextureData>(Encrypt::encr(path_for_assets(CROSS_CURSOR)), false),
         8, 8
     );
 }
@@ -110,7 +109,6 @@ static void setup_post_processing(Ctx* ctx) {
 
     using namespace assets;
     using namespace file_system;
-    using namespace encrypt;
 
     {
         gl::FramebufferSpecification specification;
@@ -127,8 +125,8 @@ static void setup_post_processing(Ctx* ctx) {
         ctx->add_framebuffer(framebuffer);
 
         auto shader = std::make_shared<gl::Shader>(
-            encr(path_for_assets(BRIGHT_FILTER_VERTEX_SHADER)),
-            encr(path_for_assets(BRIGHT_FILTER_FRAGMENT_SHADER)),
+            Encrypt::encr(path_for_assets(BRIGHT_FILTER_VERTEX_SHADER)),
+            Encrypt::encr(path_for_assets(BRIGHT_FILTER_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_screen_texture" }
         );
 
@@ -136,8 +134,8 @@ static void setup_post_processing(Ctx* ctx) {
     }
 
     auto blur_shader = std::make_shared<gl::Shader>(
-        encr(path_for_assets(BLUR_VERTEX_SHADER)),
-        encr(path_for_assets(BLUR_FRAGMENT_SHADER)),
+        Encrypt::encr(path_for_assets(BLUR_VERTEX_SHADER)),
+        Encrypt::encr(path_for_assets(BLUR_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_screen_texture" }
     );
 
@@ -184,8 +182,8 @@ static void setup_post_processing(Ctx* ctx) {
         auto framebuffer = std::make_shared<gl::Framebuffer>(specification);
 
         auto shader = std::make_shared<gl::Shader>(
-            encr(path_for_assets(COMBINE_VERTEX_SHADER)),
-            encr(path_for_assets(COMBINE_FRAGMENT_SHADER)),
+            Encrypt::encr(path_for_assets(COMBINE_VERTEX_SHADER)),
+            Encrypt::encr(path_for_assets(COMBINE_FRAGMENT_SHADER)),
             std::vector<std::string> { "u_screen_texture", "u_bright_texture", "u_strength" }
         );
 

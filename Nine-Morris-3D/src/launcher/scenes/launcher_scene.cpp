@@ -239,7 +239,6 @@ static void help_marker(const char* text) {
 void LauncherScene::on_start() {
     auto& data = ctx->data<Data>();
 
-    using namespace encrypt;
     using namespace file_system;
 
     ImGuiIO& io = ImGui::GetIO();
@@ -299,7 +298,7 @@ void LauncherScene::on_start() {
     // Load splash screen
     gl::TextureSpecification specification;
 
-    ctx->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN)), specification);
+    ctx->res.texture.load("splash_screen"_H, Encrypt::encr(path_for_assets(SPLASH_SCREEN)), specification);
 
     auto background = objects.add<gui::Image>("background"_H, ctx->res.texture["splash_screen"_H]);
     scene_list.add(background);

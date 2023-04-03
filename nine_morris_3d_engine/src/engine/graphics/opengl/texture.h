@@ -43,7 +43,7 @@ namespace gl {
     class Texture {
     public:
         Texture(std::string_view file_path, const TextureSpecification& specification);
-        Texture(encrypt::EncryptedFile file_path, const TextureSpecification& specification);
+        Texture(Encrypt::EncryptedFile file_path, const TextureSpecification& specification);
         Texture(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
         Texture(int width, int height, unsigned char* data, const TextureSpecification& specification);
         ~Texture();

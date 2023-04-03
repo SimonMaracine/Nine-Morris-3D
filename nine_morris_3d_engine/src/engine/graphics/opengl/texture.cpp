@@ -122,11 +122,11 @@ namespace gl {
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
-    Texture::Texture(encrypt::EncryptedFile file_path, const gl::TextureSpecification& specification)
+    Texture::Texture(Encrypt::EncryptedFile file_path, const gl::TextureSpecification& specification)
         : specification(specification) {
         LOG_DEBUG("Loading texture `{}`...", file_path);
 
-        cppblowfish::Buffer buffer = encrypt::load_file(file_path);
+        const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
 
         stbi_set_flip_vertically_on_load(1);
 

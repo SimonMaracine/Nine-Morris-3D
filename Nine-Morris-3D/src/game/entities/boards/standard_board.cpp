@@ -8,7 +8,7 @@
 #include "other/constants.h"
 #include "other/data.h"
 
-void StandardBoard::click(identifier::Id hovered_id) {
+void StandardBoard::click(Identifier::Id hovered_id) {
     // Check for clicked nodes
     for (const Node& node : nodes) {
         if (node.model->bounding_box->id == hovered_id) {
@@ -26,7 +26,7 @@ void StandardBoard::click(identifier::Id hovered_id) {
     }
 }
 
-Board::Flags StandardBoard::release(identifier::Id hovered_id) {
+Board::Flags StandardBoard::release(Identifier::Id hovered_id) {
     switch (phase) {
         case BoardPhase::PlacePieces:
             if (must_take_piece) {
@@ -228,7 +228,7 @@ void StandardBoard::_take_piece(size_t piece_index) {
     check_phase_two();
 }
 
-void StandardBoard::check_select_piece(identifier::Id hovered_id) {
+void StandardBoard::check_select_piece(Identifier::Id hovered_id) {
     for (const auto& [index, piece] : pieces) {
         if (index == clicked_piece_index && piece.model->bounding_box->id == hovered_id) {
             const bool can_select = (
@@ -244,7 +244,7 @@ void StandardBoard::check_select_piece(identifier::Id hovered_id) {
     }
 }
 
-void StandardBoard::check_place_piece(identifier::Id hovered_id) {
+void StandardBoard::check_place_piece(Identifier::Id hovered_id) {
     for (const Node& node : nodes) {
         const bool can_place = (
             node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
@@ -260,7 +260,7 @@ void StandardBoard::check_place_piece(identifier::Id hovered_id) {
     }
 }
 
-void StandardBoard::check_move_piece(identifier::Id hovered_id) {
+void StandardBoard::check_move_piece(Identifier::Id hovered_id) {
     if (selected_piece_index == NULL_INDEX) {
         return;
     }
@@ -281,7 +281,7 @@ void StandardBoard::check_move_piece(identifier::Id hovered_id) {
     }
 }
 
-void StandardBoard::check_take_piece(identifier::Id hovered_id) {
+void StandardBoard::check_take_piece(Identifier::Id hovered_id) {
     if (clicked_piece_index == NULL_INDEX) {
         return;
     }

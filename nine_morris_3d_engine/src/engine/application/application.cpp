@@ -62,6 +62,7 @@ Application::Application(const ApplicationBuilder& builder, void* user_data)
     properties.ctx = &ctx;
 
     ctx.window = std::make_unique<Window>(this);
+    ctx.input.window_handle = ctx.window->get_handle();
 
     if (builder.dear_imgui) {
         initialize_dear_imgui();
@@ -71,11 +72,9 @@ Application::Application(const ApplicationBuilder& builder, void* user_data)
     logging::log_general_information(logging::LogTarget::Console);
 #endif
 
-    input::initialize(ctx.window->get_handle());  // TODO get rid of static data
     gl::maybe_initialize_debugging();
     render_helpers::initialize_default();
-    encrypt::initialize(builder.encryption_key);
-    identifier::initialize();
+    Encrypt::initialize(builder.encryption_key);
 
     const auto [version_major, version_minor] = gl::get_version_number();
     LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);

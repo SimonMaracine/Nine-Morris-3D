@@ -5,7 +5,7 @@
 class SoundData {
 public:
     SoundData(std::string_view file_path);
-    SoundData(encrypt::EncryptedFile file_path);
+    SoundData(Encrypt::EncryptedFile file_path);
     ~SoundData();
 
     SoundData(const SoundData&) = delete;

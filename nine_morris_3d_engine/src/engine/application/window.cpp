@@ -128,6 +128,8 @@ void Window::show() {
 }
 
 void Window::set_vsync(int interval) {
+    ASSERT(interval >= 0, "Invalid interval");
+
     glfwSwapInterval(interval);
 }
 
@@ -252,7 +254,7 @@ void Window::install_callbacks() {
                 }
 
                 data->ctx->evt.enqueue<KeyPressedEvent>(
-                    input::key_from_code(key),
+                    Input::key_from_code(key),
                     false,
                     static_cast<bool>(mods & GLFW_MOD_CONTROL)
                 );
@@ -263,7 +265,7 @@ void Window::install_callbacks() {
                     return;
                 }
 
-                data->ctx->evt.enqueue<KeyReleasedEvent>(input::key_from_code(key));
+                data->ctx->evt.enqueue<KeyReleasedEvent>(Input::key_from_code(key));
                 break;
             }
             case GLFW_REPEAT: {
@@ -272,7 +274,7 @@ void Window::install_callbacks() {
                 }
 
                 data->ctx->evt.enqueue<KeyPressedEvent>(
-                    input::key_from_code(key),
+                    Input::key_from_code(key),
                     true,
                     static_cast<bool>(mods & GLFW_MOD_CONTROL)
                 );
@@ -300,7 +302,7 @@ void Window::install_callbacks() {
                     return;
                 }
 
-                data->ctx->evt.enqueue<MouseButtonPressedEvent>(input::mouse_button_from_code(button));
+                data->ctx->evt.enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
                 break;
             }
             case GLFW_RELEASE: {
@@ -308,7 +310,7 @@ void Window::install_callbacks() {
                     return;
                 }
 
-                data->ctx->evt.enqueue<MouseButtonReleasedEvent>(input::mouse_button_from_code(button));
+                data->ctx->evt.enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
                 break;
             }
         }

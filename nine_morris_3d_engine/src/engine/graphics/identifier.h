@@ -1,10 +1,21 @@
 #pragma once
 
 /**
- * Identifier is okay to be float, since numbers are integers (0.0, 1.0, 2.0 etc.) and the
+ * Generator of unique IDs.
+ *
+ * Id is okay to be float, since numbers are integers (0.0, 1.0, 2.0 etc.) and the
  * floating-point standard used should be IEEE-754.
  */
-namespace identifier {
+class Identifier {
+public:
+    Identifier() = default;
+    ~Identifier() = default;
+
+    Identifier(const Identifier&) = delete;
+    Identifier& operator=(const Identifier&) = delete;
+    Identifier(Identifier&&) = delete;
+    Identifier& operator=(Identifier&&) = delete;
+
     class Id {
     public:
         constexpr Id() = default;
@@ -18,12 +29,13 @@ namespace identifier {
         float value = 0.0f;
     };
 
-    inline constexpr Id null = 0.0f;
-
-    void initialize();
-    Id generate_id();
+    Id generate();
 
 #if 0
-    bool check(Id identifier_generated, Id identifier_unreliable);
+    static bool check(Id identifier_generated, Id identifier_unreliable);
 #endif
-}
+
+    static Id null;  // Should have been static constexpr, but compiler is too dumb
+private:
+    Id id = 0.0f;
+};

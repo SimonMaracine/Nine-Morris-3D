@@ -69,21 +69,21 @@ struct WindowFocusedEvent {
 };
 
 struct KeyPressedEvent {
-    input::Key key;
+    Input::Key key;
     bool repeat;
     bool ctrl;
 };
 
 struct KeyReleasedEvent {
-    input::Key key;
+    Input::Key key;
 };
 
 struct MouseButtonPressedEvent {
-    input::MouseButton button;
+    Input::MouseButton button;
 };
 
 struct MouseButtonReleasedEvent {
-    input::MouseButton button;
+    Input::MouseButton button;
 };
 
 struct MouseScrolledEvent {

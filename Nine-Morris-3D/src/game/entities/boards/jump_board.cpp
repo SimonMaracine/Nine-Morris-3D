@@ -8,7 +8,7 @@
 #include "other/constants.h"
 #include "other/data.h"
 
-void JumpBoard::click(identifier::Id hovered_id) {
+void JumpBoard::click(Identifier::Id hovered_id) {
     // Check for clicked nodes
     for (const Node& node : nodes) {
         if (node.model->bounding_box->id == hovered_id) {
@@ -26,7 +26,7 @@ void JumpBoard::click(identifier::Id hovered_id) {
     }
 }
 
-Board::Flags JumpBoard::release(identifier::Id hovered_id) {
+Board::Flags JumpBoard::release(Identifier::Id hovered_id) {
     check_select_piece(hovered_id);
     check_move_piece(hovered_id);
 
@@ -114,7 +114,7 @@ void JumpBoard::_move_piece(size_t piece_index, size_t node_index) {
     }
 }
 
-void JumpBoard::check_select_piece(identifier::Id hovered_id) {
+void JumpBoard::check_select_piece(Identifier::Id hovered_id) {
     for (const auto& [index, piece] : pieces) {
         if (index == clicked_piece_index && piece.model->bounding_box->id == hovered_id) {
             const bool can_select = (
@@ -130,7 +130,7 @@ void JumpBoard::check_select_piece(identifier::Id hovered_id) {
     }
 }
 
-void JumpBoard::check_move_piece(identifier::Id hovered_id) {
+void JumpBoard::check_move_piece(Identifier::Id hovered_id) {
     if (selected_piece_index == NULL_INDEX) {
         return;
     }

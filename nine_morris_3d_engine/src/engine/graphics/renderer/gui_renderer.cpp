@@ -296,11 +296,9 @@ void GuiRenderer::initialize_uniform_buffers() {
 }
 
 void GuiRenderer::initialize_quad_renderer() {
-    using namespace encrypt;
-
     storage.quad2d_shader = std::make_shared<gl::Shader>(
-        encr(file_system::path_for_assets(QUAD2D_VERTEX_SHADER)),
-        encr(file_system::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(QUAD2D_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_texture[0]",  // FIXME this should be max
             "u_texture[1]",
@@ -367,11 +365,9 @@ std::shared_ptr<gl::IndexBuffer> GuiRenderer::initialize_quads_index_buffer() {
 }
 
 void GuiRenderer::initialize_text_renderer() {
-    using namespace encrypt;
-
     storage.text_shader = std::make_shared<gl::Shader>(
-        encr(file_system::path_for_assets(TEXT_VERTEX_SHADER)),
-        encr(file_system::path_for_assets(TEXT_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(TEXT_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(TEXT_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_bitmap",

@@ -173,12 +173,12 @@ namespace mesh {
         );
     }
 
-    std::shared_ptr<Mesh> load_model_PTN(encrypt::EncryptedFile file_path, bool flip_winding) {
+    std::shared_ptr<Mesh> load_model_PTN(Encrypt::EncryptedFile file_path, bool flip_winding) {
         LOG_DEBUG("Loading PTN model data `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-        const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
+        const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFileFromMemory(
@@ -246,12 +246,12 @@ namespace mesh {
         );
     }
 
-    std::shared_ptr<Mesh> load_model_P(encrypt::EncryptedFile file_path, bool flip_winding) {
+    std::shared_ptr<Mesh> load_model_P(Encrypt::EncryptedFile file_path, bool flip_winding) {
         LOG_DEBUG("Loading P model data `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-        const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
+        const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFileFromMemory(
@@ -319,12 +319,12 @@ namespace mesh {
         );
     }
 
-    std::shared_ptr<Mesh> load_model_PTNT(encrypt::EncryptedFile file_path, bool flip_winding) {
+    std::shared_ptr<Mesh> load_model_PTNT(Encrypt::EncryptedFile file_path, bool flip_winding) {
         LOG_DEBUG("Loading PTNT model data `{}`...", file_path);
 
         const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-        const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
+        const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFileFromMemory(

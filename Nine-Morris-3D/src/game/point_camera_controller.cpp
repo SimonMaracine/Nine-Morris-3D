@@ -32,14 +32,14 @@ static float calculate_angle_velocity(float target_angle, float angle) {
     return result;
 }
 
-PointCameraController::PointCameraController(Camera* camera)
-    : CameraController(camera) {
+PointCameraController::PointCameraController(Camera* camera, Ctx* ctx)
+    : CameraController(camera, ctx) {  // TODO maybe put ctx in base class
     update_camera(1.0f);
 }
 
-PointCameraController::PointCameraController(Camera* camera, int width, int height, float fov, float near,
-        float far, const glm::vec3& point, float distance_to_point, float pitch, float sensitivity)
-    : CameraController(camera), sensitivity(sensitivity), pitch(pitch), point(point),
+PointCameraController::PointCameraController(Camera* camera, Ctx* ctx, int width, int height, float fov,
+        float near, float far, const glm::vec3& point, float distance_to_point, float pitch, float sensitivity)
+    : CameraController(camera, ctx), sensitivity(sensitivity), pitch(pitch), point(point),
       distance_to_point(distance_to_point) {
     camera->set_projection(width, height, fov, near, far);
     update_camera(1.0f);
@@ -65,26 +65,26 @@ void PointCameraController::update_controls(float dt) {
 
     zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_input.mouse_wheel;
 
-    if (input::is_key_pressed(input::Key::R)) {
+    if (ctx->input.is_key_pressed(Input::Key::R)) {
         zoom_velocity -= ZOOM_SPEED * dt;
-    } else if (input::is_key_pressed(input::Key::F)) {
+    } else if (ctx->input.is_key_pressed(Input::Key::F)) {
         zoom_velocity += ZOOM_SPEED * dt;
     }
 
-    if (input::is_mouse_button_pressed(input::MouseButton::Right)) {
+    if (ctx->input.is_mouse_button_pressed(Input::MouseButton::Right)) {
         y_velocity -= MOVE_SPEED_MOUSE * mouse_input.dy;
         x_velocity += MOVE_SPEED_MOUSE * mouse_input.dx;
     }
 
-    if (input::is_key_pressed(input::Key::W)) {
+    if (ctx->input.is_key_pressed(Input::Key::W)) {
         y_velocity += MOVE_SPEED * dt;
-    } else if (input::is_key_pressed(input::Key::S)) {
+    } else if (ctx->input.is_key_pressed(Input::Key::S)) {
         y_velocity -= MOVE_SPEED * dt;
     }
 
-    if (input::is_key_pressed(input::Key::A)) {
+    if (ctx->input.is_key_pressed(Input::Key::A)) {
         x_velocity -= MOVE_SPEED * dt;
-    } else if (input::is_key_pressed(input::Key::D)) {
+    } else if (ctx->input.is_key_pressed(Input::Key::D)) {
         x_velocity += MOVE_SPEED * dt;
     }
 

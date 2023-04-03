@@ -16,7 +16,7 @@ public:
     };
 
     TextureData(std::string_view file_path, bool flip = false);
-    TextureData(encrypt::EncryptedFile file_path, bool flip = false);
+    TextureData(Encrypt::EncryptedFile file_path, bool flip = false);
     ~TextureData();
 
     TextureData(const TextureData&) = delete;

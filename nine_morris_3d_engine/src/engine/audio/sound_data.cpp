@@ -32,11 +32,11 @@ SoundData::SoundData(std::string_view file_path)
     check_bits_per_sample(bits_per_sample, file_path);
 }
 
-SoundData::SoundData(encrypt::EncryptedFile file_path)
+SoundData::SoundData(Encrypt::EncryptedFile file_path)
     : file_path(file_path) {
     LOG_DEBUG("Loading sound data `{}`...", file_path);
 
-    const cppblowfish::Buffer buffer = encrypt::load_file(file_path);
+    const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
 
     samples = stb_vorbis_decode_memory(buffer.get(), buffer.size() - buffer.padding(), &channels, &sample_rate, &data);
 

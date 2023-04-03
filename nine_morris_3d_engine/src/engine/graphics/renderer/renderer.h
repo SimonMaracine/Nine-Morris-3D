@@ -44,7 +44,7 @@ public:
     void set_skybox(std::shared_ptr<gl::Texture3D> texture);
     void set_camera_controller(const CameraController* camera_controller);
 
-    identifier::Id get_hovered_id() { return hovered_id; }
+    Identifier::Id get_hovered_id() { return hovered_id; }
     PostProcessingContext& get_post_processing_context() { return post_processing_context; }
     const Storage& get_storage() { return storage; }
 
@@ -148,7 +148,7 @@ private:
         glm::vec3 position = glm::vec3(0.0f);
     } camera_cache;
 
-    identifier::Id hovered_id = identifier::null;
+    Identifier::Id hovered_id = Identifier::null;
     FramebufferReader<4> framebuffer_reader;
     const CameraController* camera_controller = nullptr;  // Don't use this directly
 

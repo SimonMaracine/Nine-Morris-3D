@@ -10,8 +10,8 @@ inline constexpr float LENS_FAR = 90.0f;
 class PointCameraController : public CameraController {
 public:
     PointCameraController() = default;
-    PointCameraController(Camera* camera);
-    PointCameraController(Camera* camera, int width, int height, float fov, float near, float far,
+    PointCameraController(Camera* camera, Ctx* ctx);
+    PointCameraController(Camera* camera, Ctx* ctx, int width, int height, float fov, float near, float far,
         const glm::vec3& point, float distance_to_point, float pitch, float sensitivity);
 
     virtual const glm::vec3& get_position() const override;

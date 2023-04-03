@@ -183,13 +183,13 @@ namespace gl {
         LOG_DEBUG("Created GL shader {} ({})", program, name);
     }
 
-    Shader::Shader(encrypt::EncryptedFile vertex_source, encrypt::EncryptedFile fragment_source,
+    Shader::Shader(Encrypt::EncryptedFile vertex_source, Encrypt::EncryptedFile fragment_source,
             const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks)
         : vertex_source_path(vertex_source), fragment_source_path(fragment_source), uniforms(uniforms) {
         name = get_name_sources(vertex_source_path, fragment_source_path);
 
-        const cppblowfish::Buffer buffer_vertex = encrypt::load_file(vertex_source);
-        const cppblowfish::Buffer buffer_fragment = encrypt::load_file(fragment_source);
+        const cppblowfish::Buffer buffer_vertex = Encrypt::load_file(vertex_source);
+        const cppblowfish::Buffer buffer_fragment = Encrypt::load_file(fragment_source);
 
         try {
             vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);

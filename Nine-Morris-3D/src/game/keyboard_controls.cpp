@@ -90,7 +90,7 @@ void KeyboardControls::move(Direction direction) {
 
 Board::Flags KeyboardControls::click_and_release() {
     const Node& node = board->nodes[current_node->index];
-    const identifier::Id hovered_id = (
+    const Identifier::Id hovered_id = (
         node.piece_index == NULL_INDEX
             ?
             node.model->bounding_box->id

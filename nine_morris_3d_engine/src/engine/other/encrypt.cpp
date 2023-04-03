@@ -1,41 +1,36 @@
 #include <cppblowfish/cppblowfish.h>
 
-#include "engine/application/platform.h"
+#include "engine/application/panic.h"
 #include "engine/other/encrypt.h"
 #include "engine/other/logging.h"
-#include "engine/application/panic.h"
 
-static cppblowfish::BlowfishContext _blowfish;
+cppblowfish::Buffer Encrypt::load_file(EncryptedFile file_path) {
+    std::ifstream file {std::string(file_path), std::ios::binary};
 
-constexpr size_t foo = sizeof(_blowfish);
-
-namespace encrypt {
-    void initialize(std::string_view key) {
-        _blowfish = cppblowfish::BlowfishContext {std::string(key) + 'S'};
+    if (!file.is_open()) {
+        LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading, exiting...", file_path);
+        panic::panic();
     }
 
-    cppblowfish::Buffer load_file(EncryptedFile file_path) {
-        std::ifstream file {std::string(file_path), std::ios::binary};
+    file.seekg(0, file.end);
+    const size_t length = file.tellg();
+    file.seekg(0, file.beg);
 
-        if (!file.is_open()) {
-            LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading, exiting...", file_path);
-            panic::panic();
-        }
+    char* raw_buffer = new char[length];
+    file.read(raw_buffer, length);
 
-        file.seekg(0, file.end);
-        const size_t length = file.tellg();
-        file.seekg(0, file.beg);
+    cppblowfish::Buffer buffer;
+    cppblowfish::Buffer cipher = cppblowfish::Buffer::from_whole_data(raw_buffer, length);
 
-        char* raw_buffer = new char[length];
-        file.read(raw_buffer, length);
+    delete[] raw_buffer;
 
-        cppblowfish::Buffer buffer;
-        cppblowfish::Buffer cipher = cppblowfish::Buffer::from_whole_data(raw_buffer, length);
+    context.decrypt(cipher, buffer);
 
-        delete[] raw_buffer;
-
-        _blowfish.decrypt(cipher, buffer);
-
-        return buffer;
-    }
+    return buffer;
 }
+
+void Encrypt::initialize(std::string_view key) {
+    context = cppblowfish::BlowfishContext {std::string(key) + 'S'};
+}
+
+cppblowfish::BlowfishContext Encrypt::context {};

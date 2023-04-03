@@ -2,14 +2,16 @@
 
 #include <glm/glm.hpp>
 
-#include "engine/graphics/camera.h"
 #include "engine/other/assert.h"
+
+class Camera;
+class Ctx;
 
 class CameraController {
 public:
     CameraController() = default;
-    CameraController(Camera* camera)
-        : camera(camera) {}
+    CameraController(Camera* camera, Ctx* ctx)
+        : camera(camera), ctx(ctx) {}
     virtual ~CameraController() = default;
 
     CameraController(const CameraController&) = default;
@@ -30,4 +32,5 @@ public:
     }
 protected:
     Camera* camera = nullptr;
+    Ctx* ctx = nullptr;
 };

@@ -10,7 +10,16 @@
     #define ENCR(file_string) (file_string ".dat")
 #endif
 
-namespace encrypt {
+class Encrypt {
+public:
+    Encrypt() = default;
+    ~Encrypt() = default;
+
+    Encrypt(const Encrypt&) = delete;
+    Encrypt& operator=(const Encrypt&) = delete;
+    Encrypt(Encrypt&&) = delete;
+    Encrypt& operator=(Encrypt&&) = delete;
+
     class EncryptedFile {
     public:
         explicit constexpr EncryptedFile(std::string_view file_path)
@@ -26,16 +35,21 @@ namespace encrypt {
         std::string_view file_path;
     };
 
-    void initialize(std::string_view key);
-    cppblowfish::Buffer load_file(EncryptedFile file_path);
+    static cppblowfish::Buffer load_file(EncryptedFile file_path);
 
 #ifdef NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
-    constexpr std::string_view encr(std::string_view file_path) {
+    static constexpr std::string_view encr(std::string_view file_path) {
         return file_path;
     }
 #else
-    constexpr EncryptedFile encr(std::string_view file_path) {
+    static constexpr EncryptedFile encr(std::string_view file_path) {
         return EncryptedFile {file_path};
     }
 #endif
-}
+private:
+    static void initialize(std::string_view key);
+
+    static cppblowfish::BlowfishContext context;
+
+    friend class Application;
+};

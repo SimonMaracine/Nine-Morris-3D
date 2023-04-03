@@ -12,7 +12,7 @@
 namespace renderables {
     struct Model : public Object {
         struct BoundingBox {
-            identifier::Id id;
+            Identifier::Id id;
             glm::vec3 size = glm::vec3(0.0f);
             bool sort = true;
         };

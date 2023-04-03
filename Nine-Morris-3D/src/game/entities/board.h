@@ -25,15 +25,15 @@ public:
 
     struct Flags;
 
-    virtual void click(identifier::Id) = 0;
-    virtual Flags release(identifier::Id) = 0;
+    virtual void click(Identifier::Id) = 0;
+    virtual Flags release(Identifier::Id) = 0;
     virtual void place_piece(size_t) = 0;
     virtual void move_piece(size_t, size_t) = 0;
     virtual void take_piece(size_t) = 0;
 
     GamePosition get_position();
-    void update_nodes(identifier::Id hovered_id);
-    void update_pieces(identifier::Id hovered_id);
+    void update_nodes(Identifier::Id hovered_id);
+    void update_pieces(Identifier::Id hovered_id);
     void move_pieces();
     void finalize_pieces_state();
     void switch_piece_outlines();

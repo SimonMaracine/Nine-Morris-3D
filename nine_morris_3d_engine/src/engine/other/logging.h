@@ -15,11 +15,11 @@
  */
 
 #if defined(NM3D_PLATFORM_RELEASE_DISTRIBUTION)
-    #define LOG_DEBUG(...) ((void) 0)
-    #define LOG_INFO(...) ((void) 0)
-    #define LOG_WARNING(...) ((void) 0)
-    #define LOG_ERROR(...) ((void) 0)
-    #define LOG_CRITICAL(...) ((void) 0)
+    #define LOG_DEBUG(...) static_cast<void>(0)
+    #define LOG_INFO(...) static_cast<void>(0)
+    #define LOG_WARNING(...) static_cast<void>(0)
+    #define LOG_ERROR(...) static_cast<void>(0)
+    #define LOG_CRITICAL(...) static_cast<void>(0)
 #else
     #define LOG_DEBUG(...) SPDLOG_LOGGER_DEBUG(logging::get_global_logger(), __VA_ARGS__)
     #define LOG_INFO(...) SPDLOG_LOGGER_INFO(logging::get_global_logger(), __VA_ARGS__)
@@ -36,7 +36,9 @@
 
 namespace logging {
     enum class LogTarget {
-        None, Console, File
+        None,
+        Console,
+        File
     };
 
     void initialize_for_applications(std::string_view log_file, std::string_view info_file);

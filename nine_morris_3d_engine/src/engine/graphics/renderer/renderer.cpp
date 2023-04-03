@@ -115,7 +115,7 @@ void Renderer::render(const SceneList& scene) {
     draw_bounding_boxes(scene);
 
     // Read the texture for mouse picking
-    const auto [mouse_x, mouse_y] = input::get_mouse();
+    const auto [mouse_x, mouse_y] = ctx->input.get_mouse();
     const int x = static_cast<int>(mouse_x) / BOUNDING_BOX_DIVISOR;
     const int y = (ctx->properties->height - static_cast<int>(mouse_y)) / BOUNDING_BOX_DIVISOR;
     framebuffer_reader.read(0, x, y);
@@ -543,7 +543,7 @@ void Renderer::setup_uniform_buffers() {
 
 void Renderer::validate_hovered_id(int x, int y) {
     if (x > ctx->properties->width || x < 0 || y > ctx->properties->height || y < 0) {
-        hovered_id = identifier::null;
+        hovered_id = Identifier::null;
     }
 }
 
@@ -598,11 +598,9 @@ void Renderer::initialize_uniform_buffers() {
 }
 
 void Renderer::initialize_skybox_renderer() {
-    using namespace encrypt;
-
     storage.skybox_shader = std::make_shared<gl::Shader>(
-        encr(file_system::path_for_assets(SKYBOX_VERTEX_SHADER)),
-        encr(file_system::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(SKYBOX_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(SKYBOX_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_projection_view_matrix",
             "u_skybox"
@@ -621,11 +619,9 @@ void Renderer::initialize_skybox_renderer() {
 }
 
 void Renderer::initialize_screen_quad_renderer() {
-    using namespace encrypt;
-
     storage.screen_quad_shader = std::make_shared<gl::Shader>(
-        encr(file_system::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
-        encr(file_system::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(SCREEN_QUAD_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(SCREEN_QUAD_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_screen_texture" }
     );
 
@@ -650,11 +646,9 @@ void Renderer::initialize_screen_quad_renderer() {
 }
 
 void Renderer::initialize_quad3d_renderer() {
-    using namespace encrypt;
-
     storage.quad3d_shader = std::make_shared<gl::Shader>(
-        encr(file_system::path_for_assets(QUAD3D_VERTEX_SHADER)),
-        encr(file_system::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(QUAD3D_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(QUAD3D_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_view_matrix",
@@ -690,22 +684,18 @@ void Renderer::initialize_quad3d_renderer() {
 }
 
 void Renderer::initialize_shadow_renderer() {
-    using namespace encrypt;
-
     storage.shadow_shader = std::make_shared<gl::Shader>(
-        encr(file_system::path_for_assets(SHADOW_VERTEX_SHADER)),
-        encr(file_system::path_for_assets(SHADOW_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(SHADOW_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(SHADOW_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_model_matrix" },
         std::initializer_list { storage.light_space_uniform_block }
     );
 }
 
 void Renderer::initialize_outline_renderer() {
-    using namespace encrypt;
-
     storage.outline_shader = std::make_shared<gl::Shader>(
-        encr(file_system::path_for_assets(OUTLINE_VERTEX_SHADER)),
-        encr(file_system::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(OUTLINE_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(OUTLINE_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_color"
@@ -715,11 +705,9 @@ void Renderer::initialize_outline_renderer() {
 }
 
 void Renderer::initialize_bounding_box_renderer() {
-    using namespace encrypt;
-
     storage.box_shader = std::make_shared<gl::Shader>(
-        encr(file_system::path_for_assets(BOUNDING_BOX_VERTEX_SHADER)),
-        encr(file_system::path_for_assets(BOUNDING_BOX_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(BOUNDING_BOX_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(BOUNDING_BOX_FRAGMENT_SHADER)),
         std::vector<std::string> {},
         std::initializer_list { storage.projection_view_uniform_block }
     );
@@ -767,8 +755,6 @@ void Renderer::initialize_bounding_box_renderer() {
 }
 
 void Renderer::initialize_origin_renderer() {
-    using namespace encrypt;
-
 #ifdef NM3D_PLATFORM_DEBUG
         storage.origin_shader = std::make_shared<gl::Shader>(
             file_system::path_for_assets(ORIGIN_VERTEX_SHADER),

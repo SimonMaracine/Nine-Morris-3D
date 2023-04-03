@@ -80,7 +80,7 @@ public:
 
     // Game-related
     Camera camera;
-    PointCameraController camera_controller {&camera};
+    PointCameraController camera_controller {&camera, ctx};
     KeyboardControls keyboard;
     GameContext game;
     MinimaxThread minimax_thread;

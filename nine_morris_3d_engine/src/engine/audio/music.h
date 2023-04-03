@@ -13,7 +13,7 @@ namespace music {
     class MusicTrack {
     public:
         MusicTrack(std::string_view file_path);
-        MusicTrack(encrypt::EncryptedFile file_path);
+        MusicTrack(Encrypt::EncryptedFile file_path);
         MusicTrack(std::shared_ptr<SoundData> data);
         ~MusicTrack();
 

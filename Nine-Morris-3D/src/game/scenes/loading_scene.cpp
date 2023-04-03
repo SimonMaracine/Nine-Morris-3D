@@ -91,12 +91,11 @@ void LoadingScene::setup_widgets() {
 
 void LoadingScene::load_splash_screen_texture() {
     using namespace assets;
-    using namespace encrypt;
     using namespace file_system;
 
     gl::TextureSpecification specification;
 
-    ctx->res.texture.load("splash_screen"_H, encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+    ctx->res.texture.load("splash_screen"_H, Encrypt::encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
 }
 
 void LoadingScene::update_loading_animation() {
@@ -140,8 +139,8 @@ void LoadingScene::initialize_board() {
 
     auto shader = ctx->res.shader.load(
         "board_wood"_H,
-        encrypt::encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER)),
-        encrypt::encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -218,8 +217,8 @@ void LoadingScene::initialize_board_paint() {
 
     auto shader = ctx->res.shader.load(
         "board_paint"_H,
-        encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
-        encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -290,8 +289,8 @@ void LoadingScene::initialize_pieces() {
 
     auto shader = ctx->res.shader.load(
         "piece"_H,
-        encrypt::encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER)),
-        encrypt::encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -419,8 +418,8 @@ void LoadingScene::initialize_node(size_t index) {
 void LoadingScene::initialize_nodes() {
     auto shader = ctx->res.shader.load(
         "node"_H,
-        encrypt::encr(file_system::path_for_assets(assets::NODE_VERTEX_SHADER)),
-        encrypt::encr(file_system::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(assets::NODE_VERTEX_SHADER)),
+        Encrypt::encr(file_system::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_model_matrix", "u_color" },
         std::initializer_list {
             ctx->r3d->get_storage().projection_view_uniform_block
@@ -461,8 +460,8 @@ void LoadingScene::initialize_board_no_normal() {
 
     auto shader = ctx->res.shader.load(
         "board_wood"_H,
-        encrypt::encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER_NO_NORMAL)),
-        encrypt::encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER_NO_NORMAL)),
+        Encrypt::encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER_NO_NORMAL)),
+        Encrypt::encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -529,8 +528,8 @@ void LoadingScene::initialize_board_paint_no_normal() {
 
     auto shader = ctx->res.shader.load(
         "board_paint"_H,
-        encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER_NO_NORMAL)),
-        encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL)),
+        Encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER_NO_NORMAL)),
+        Encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -598,8 +597,8 @@ void LoadingScene::initialize_pieces_no_normal() {
     // FIXME maybe should give another name
     auto shader = ctx->res.shader.load(
         "piece"_H,
-        encrypt::encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER_NO_NORMAL)),
-        encrypt::encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER_NO_NORMAL)),
+        Encrypt::encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER_NO_NORMAL)),
+        Encrypt::encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -777,11 +776,11 @@ void LoadingScene::initialize_ids() {
     auto& data = ctx->data<Data>();
 
     for (size_t i = 0; i < MAX_NODES; i++) {
-        data.node_ids[i] = identifier::generate_id();
+        data.node_ids[i] = ctx->idt.generate();
     }
 
     for (size_t i = 0; i < MAX_PIECES; i++) {
-        data.piece_ids[i] = identifier::generate_id();
+        data.piece_ids[i] = ctx->idt.generate();
     }
 }
 

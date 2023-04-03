@@ -20,7 +20,7 @@ namespace music {
         LOG_DEBUG("Loaded music track `{}`", name);
     }
 
-    MusicTrack::MusicTrack(encrypt::EncryptedFile file_path) {
+    MusicTrack::MusicTrack(Encrypt::EncryptedFile file_path) {
         auto data = std::make_shared<SoundData>(file_path);
 
         setup(data);

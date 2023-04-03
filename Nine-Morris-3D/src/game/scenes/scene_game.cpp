@@ -21,7 +21,7 @@ void SceneGame::setup_and_add_model_board() {
     board.model->material = ctx->res.material_instance["board_wood"_H];
     board.model->cast_shadow = true;
     board.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
-    board.model->bounding_box->id = identifier::null;
+    board.model->bounding_box->id = Identifier::null;
     board.model->bounding_box->size = BOARD_BOUNDING_BOX;
     board.model->bounding_box->sort = false;
 
@@ -114,6 +114,7 @@ void SceneGame::setup_camera() {
 
     camera_controller = PointCameraController {
         &camera,
+        ctx,
         ctx->properties->width,
         ctx->properties->height,
         LENS_FOV,
@@ -129,6 +130,7 @@ void SceneGame::setup_camera() {
 
     camera_controller = PointCameraController {
         &camera,
+        ctx,
         ctx->properties->width,
         ctx->properties->height,
         LENS_FOV,
