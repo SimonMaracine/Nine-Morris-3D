@@ -41,6 +41,7 @@ namespace logging {
         File
     };
 
+    // There is no uninitialization
     void initialize_for_applications(std::string_view log_file, std::string_view info_file);
     void log_general_information(LogTarget target);
     spdlog::logger* get_global_logger();

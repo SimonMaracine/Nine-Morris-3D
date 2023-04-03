@@ -12,7 +12,7 @@
 #define LOG_PATTERN_DEBUG "%^[%l] [th %t] [%H:%M:%S]%$ %v"
 #define LOG_PATTERN_RELEASE "%^[%l] [th %t] [%!:%#] [%c]%$ %v"
 
-#define FILE_SIZE 1048576 * 2  // 2 MiB
+#define FILE_SIZE (1048576 * 2)  // 2 MiB
 #define ROTATING_FILES 2  // 3 total log files
 
 /*
@@ -67,7 +67,7 @@ namespace logging {
     }
 
     void log_general_information(LogTarget target) {
-        std::string contents = gl::get_info();
+        std::string contents = gl::get_info();  // TODO improve
         contents += al::get_info();
         contents += dependencies::get_info();
 
@@ -88,9 +88,12 @@ namespace logging {
             }
             case LogTarget::Console:
                 LOG_DIST_INFO("{}", contents);
+
                 break;
             case LogTarget::None:
-                break;  // Do nothing
+                // Do nothing
+
+                break;
         }
     }
 
