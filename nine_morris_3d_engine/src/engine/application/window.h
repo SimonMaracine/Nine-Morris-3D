@@ -1,5 +1,7 @@
 #pragma once
 
+#include <resmanager/resmanager.h>
+
 #include "engine/application/platform.h"
 #include "engine/graphics/texture_data.h"
 
@@ -10,6 +12,9 @@ class Application;
 class Monitor;
 
 class Window {
+private:
+    using CursorId = resmanager::HashedStr64;
+    using CursorHashFunction = resmanager::Hash<CursorId>;
 public:
     Window(Application* application);
     ~Window();
@@ -26,18 +31,18 @@ public:
     double get_time();
     std::vector<Monitor> get_monitors();
 
-    // Vsync, cursor and icon API
+    // VSync, cursor and icon API
     void show();
     void set_vsync(int interval);
-    unsigned int add_cursor(std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
-    void set_cursor(unsigned int handle);
+    void add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
+    void set_cursor(CursorId id);
     void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons);
 private:
     GLFWwindow* create_window(Application* application);
     void install_callbacks();
 
     GLFWwindow* window = nullptr;
-    std::unordered_map<unsigned int, GLFWcursor*> cursors;
+    std::unordered_map<CursorId, GLFWcursor*, CursorHashFunction> cursors;
 };
 
 class Monitor {

@@ -39,5 +39,5 @@ public:
     }
 private:
     std::mt19937 random;
-    std::uniform_int_distribution<std::mt19937::result_type> default_distribution;  // TODO test it!!!
+    std::uniform_int_distribution<std::mt19937::result_type> default_distribution;
 };

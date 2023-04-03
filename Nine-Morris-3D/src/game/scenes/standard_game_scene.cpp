@@ -67,7 +67,7 @@ void StandardGameScene::on_start() {
     board.camera_controller = &camera_controller;
     board.undo_redo_state = &undo_redo_state;
 
-    ctx->window->set_cursor(data.options.custom_cursor ? data.arrow_cursor : 0);
+    ctx->window->set_cursor(data.options.custom_cursor ? "arrow"_H : "null"_H);
 
 #ifdef NM3D_PLATFORM_DEBUG
     ctx->r3d->origin = true;

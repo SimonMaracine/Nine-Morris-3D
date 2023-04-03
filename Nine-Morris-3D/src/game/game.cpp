@@ -37,17 +37,18 @@ static void setup_icons(Ctx* ctx) {
 }
 
 static void setup_cursors(Ctx* ctx) {
-    auto& data = ctx->data<Data>();
-
     using namespace assets;
     using namespace file_system;
     using namespace encrypt;
 
-    data.arrow_cursor = ctx->window->add_cursor(
+    ctx->window->add_cursor(
+        "arrow"_H,
         std::make_unique<TextureData>(encr(path_for_assets(ARROW_CURSOR)), false),
         4, 1
     );
-    data.cross_cursor = ctx->window->add_cursor(
+
+    ctx->window->add_cursor(
+        "cross"_H,
         std::make_unique<TextureData>(encr(path_for_assets(CROSS_CURSOR)), false),
         8, 8
     );

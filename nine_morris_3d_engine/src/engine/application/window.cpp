@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
+#include <resmanager/resmanager.h>
 
 #include "engine/application/window.h"
 #include "engine/application/application.h"
@@ -130,7 +131,7 @@ void Window::set_vsync(int interval) {
     glfwSwapInterval(interval);
 }
 
-unsigned int Window::add_cursor(std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
+void Window::add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
     const TextureData::Image data = cursor->get_data();
 
     GLFWimage image = {
@@ -145,14 +146,13 @@ unsigned int Window::add_cursor(std::unique_ptr<TextureData>&& cursor, int x_hot
         LOG_DIST_ERROR("Could not create custom cursor `{}`", cursor->get_file_path());
     }
 
-    static unsigned int id = 0;
-
-    cursors[++id] = glfw_cursor;
-    return id;
+    cursors[id] = glfw_cursor;
 }
 
-void Window::set_cursor(unsigned int handle) {
-    if (handle == 0) {
+void Window::set_cursor(CursorId id) {
+    static constexpr auto null = resmanager::HashedStr64("null");
+
+    if (id == null) {
         glfwSetCursor(window, nullptr);
         return;
     }
@@ -160,14 +160,15 @@ void Window::set_cursor(unsigned int handle) {
 #if defined(NM3D_PLATFORM_DEBUG)
     GLFWcursor* cursor = nullptr;
     try {
-        cursor = cursors.at(handle);
+        cursor = cursors.at(id);
     } catch (const std::out_of_range&) {
-        LOG_CRITICAL("Invalid handle `{}`, exiting...", handle);
+        LOG_CRITICAL("Invalid handle `{}`, exiting...", id);
         panic::panic();
     }
+
     glfwSetCursor(window, cursor);
 #else
-    GLFWcursor* cursor = cursors[handle];
+    GLFWcursor* cursor = cursors[id];
     glfwSetCursor(window, cursor);
 #endif
 }

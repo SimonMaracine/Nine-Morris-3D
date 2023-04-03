@@ -318,11 +318,11 @@ void SceneGame::update_cursor() {
 
     if (data.options.custom_cursor) {
         if (get_board().must_take_piece) {
-            ctx->window->set_cursor(data.cross_cursor);
+            ctx->window->set_cursor("cross"_H);
 
             objects.get<renderables::Quad>("keyboard_controls"_H)->texture = ctx->res.texture["keyboard_controls_cross"_H];
         } else {
-            ctx->window->set_cursor(data.arrow_cursor);
+            ctx->window->set_cursor("arrow"_H);
 
             objects.get<renderables::Quad>("keyboard_controls"_H)->texture = ctx->res.texture["keyboard_controls_default"_H];
         }
@@ -790,14 +790,14 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::MenuItem("Custom Cursor", nullptr, &data.options.custom_cursor)) {
                     if (data.options.custom_cursor) {
                         if (get_board().must_take_piece) {
-                            ctx->window->set_cursor(data.cross_cursor);
+                            ctx->window->set_cursor("cross"_H);
                         } else {
-                            ctx->window->set_cursor(data.arrow_cursor);
+                            ctx->window->set_cursor("arrow"_H);
                         }
 
                         LOG_INFO("Set custom cursor");
                     } else {
-                        ctx->window->set_cursor(0);
+                        ctx->window->set_cursor("null"_H);
 
                         LOG_INFO("Set default cursor");
                     }

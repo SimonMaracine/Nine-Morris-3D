@@ -31,10 +31,10 @@ OpenAlContext::OpenAlContext() {
         panic::panic();
     }
 
-    context = alcCreateContext(device, nullptr);  // TODO maybe pass some context attributes
+    context = alcCreateContext(device, nullptr);
 
     if (context == nullptr) {
-        LOG_DIST_CRITICAL("Could not create an AL context, exiting...");
+        LOG_DIST_CRITICAL("Could not create AL context, exiting...");
         panic::panic();
     }
 

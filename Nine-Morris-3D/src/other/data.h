@@ -11,9 +11,6 @@ struct Data {
     launcher_options::LauncherOptions launcher_options;
     game_options::GameOptions options;
 
-    unsigned int arrow_cursor = 0;
-    unsigned int cross_cursor = 0;
-
     ImFont* imgui_info_font = nullptr;
     ImFont* imgui_windows_font = nullptr;
 
