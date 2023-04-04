@@ -209,7 +209,6 @@ void SceneGame::setup_light_bulb() {
 
     light_bulb->texture = ctx->res.texture["light_bulb"_H];
 
-#ifdef NM3D_PLATFORM_DEBUG
     auto& data = ctx->data<Data>();
 
     if (data.options.skybox == game_options::FIELD) {
@@ -219,7 +218,6 @@ void SceneGame::setup_light_bulb() {
     } else if (data.options.skybox == game_options::NONE) {
         light_bulb->position = LIGHT_NONE.position;
     }
-#endif
 }
 
 void SceneGame::initialize_piece(size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {

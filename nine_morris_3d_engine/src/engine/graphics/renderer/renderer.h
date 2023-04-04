@@ -48,7 +48,10 @@ public:
     PostProcessingContext& get_post_processing_context() { return post_processing_context; }
     const Storage& get_storage() { return storage; }
 
-    bool origin = false;  // This does nothing in release mode
+#ifndef NM3D_PLATFORM_DISTRIBUTION
+    bool origin = false;
+#endif
+
     DirectionalLight directional_light;
 
     struct LightSpace {

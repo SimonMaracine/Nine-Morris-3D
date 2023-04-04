@@ -29,7 +29,7 @@ void JumpPlusVariantScene::on_start() {
     setup_and_add_model_nodes();
     setup_and_add_model_pieces();
 
-#ifdef NM3D_PLATFORM_DEBUG
+#ifndef NM3D_PLATFORM_DISTRIBUTION
     setup_light_bulb();
 #endif
     setup_and_add_turn_indicator();
@@ -65,7 +65,7 @@ void JumpPlusVariantScene::on_start() {
 
     ctx->window->set_cursor(data.options.custom_cursor ? "arrow"_H : "null"_H);
 
-#ifdef NM3D_PLATFORM_DEBUG
+#ifndef NM3D_PLATFORM_DISTRIBUTION
     ctx->r3d->origin = true;
     scene_list.add(objects.get<renderables::Quad>("light_bulb"_H));
 #endif
@@ -97,7 +97,7 @@ void JumpPlusVariantScene::on_stop() {
         save_game();
     }
 
-#ifdef NM3D_PLATFORM_DEBUG
+#ifndef NM3D_PLATFORM_DISTRIBUTION
     ctx->r3d->origin = false;
 #endif
 

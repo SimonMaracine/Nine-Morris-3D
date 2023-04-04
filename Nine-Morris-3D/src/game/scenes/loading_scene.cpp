@@ -844,7 +844,7 @@ void LoadingScene::initialize_game() {
     }
     initialize_nodes();
 
-#ifdef NM3D_PLATFORM_DEBUG
+#ifndef NM3D_PLATFORM_DISTRIBUTION
     initialize_light_bulb();
 #endif
     initialize_light();
