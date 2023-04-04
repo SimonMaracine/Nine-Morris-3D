@@ -13,6 +13,7 @@
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 
+// These don't need to be reset explicitly
 static std::string _user_name;
 static std::string _app_name;
 

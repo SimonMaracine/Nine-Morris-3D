@@ -20,7 +20,7 @@ namespace options {
     };
 
     template<typename Opt>
-    using _Validate = std::function<std::pair<bool, std::string>(const Opt&)>;
+    using _Validate = std::function<std::pair<bool, std::string>(const Opt&)>;  // TODO use std::optional instead
 
     template<typename Opt>
     void save_options_to_file(const Opt& options, std::string_view options_file_name) noexcept(false) {
@@ -68,7 +68,7 @@ namespace options {
             throw OptionsFileError(e.what());
         }
 
-        auto [result, message] = validate(temporary);
+        const auto [result, message] = validate(temporary);
 
         if (!result) {
             throw OptionsFileError(message);

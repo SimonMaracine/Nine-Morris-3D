@@ -24,6 +24,7 @@
     SPDLOG_CRITICAL
 */
 
+// These don't need to be reset explicitly
 // Should be cleaned up at exit()
 static std::shared_ptr<spdlog::logger> _global_logger;
 static std::string _info_file;
