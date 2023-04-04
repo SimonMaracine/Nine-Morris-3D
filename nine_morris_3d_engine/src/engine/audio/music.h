@@ -36,6 +36,7 @@ namespace music {
         friend void set_music_gain(float gain);
     };
 
+    void uninitialize();
     void play_music_track(std::shared_ptr<MusicTrack> music_track);
     void stop_music_track();  // Must be called before the OpenAL context is destroyed
     void pause_music_track();

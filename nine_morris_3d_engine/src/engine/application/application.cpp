@@ -107,7 +107,7 @@ Application::~Application() {  // Destructor is called before all member variabl
         imgui_context::uninitialize();
     }
 
-    music::stop_music_track();
+    music::uninitialize();
 }
 
 int Application::run(SceneId start_scene_id) {

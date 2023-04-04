@@ -1,6 +1,5 @@
 #include <AL/alc.h>
 
-#include "engine/application/platform.h"
 #include "engine/audio/context.h"
 #include "engine/audio/openal/listener.h"
 #include "engine/other/logging.h"
@@ -75,4 +74,6 @@ void destroy_openal_context() {
             alcCloseDevice(_global_device);
         }
     }
+
+    // Global device and context pointers don't need to be reset
 }

@@ -6,12 +6,14 @@
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 
+// Pointer is reset when music is stopped
+// Both are reset at the coresponding function call
 static std::shared_ptr<music::MusicTrack> _current_music_track = nullptr;
-static float _gain = 1.0f;
+static float _current_gain = 1.0f;
 
 namespace music {
     MusicTrack::MusicTrack(std::string_view file_path) {
-        auto data = std::make_shared<SoundData>(file_path);
+        const auto data = std::make_shared<SoundData>(file_path);
 
         setup(data);
 
@@ -21,7 +23,7 @@ namespace music {
     }
 
     MusicTrack::MusicTrack(Encrypt::EncryptedFile file_path) {
-        auto data = std::make_shared<SoundData>(file_path);
+        const auto data = std::make_shared<SoundData>(file_path);
 
         setup(data);
 
@@ -47,16 +49,24 @@ namespace music {
         buffer = std::make_shared<al::Buffer>(data);
 
         source->set_rolloff_factor(0.0f);
+        source->set_looping(true);
 
         if (data->get_channels() != 2) {
             LOG_WARNING("Music track is not stereo");
         }
     }
 
+    void uninitialize() {
+        stop_music_track();
+        _current_gain = 1.0f;
+
+        LOG_INFO("Uninitialized music");
+    }
+
     void play_music_track(std::shared_ptr<MusicTrack> music_track) {
         _current_music_track = music_track;
 
-        _current_music_track->source->set_gain(_gain);  // Set the gain for this potentially new music track
+        _current_music_track->source->set_gain(_current_gain);  // Set the gain for this potentially new music track
         _current_music_track->source->play(_current_music_track->buffer.get());
 
         LOG_DEBUG("Started playing music track `{}`", _current_music_track->name);
@@ -104,7 +114,7 @@ namespace music {
             LOG_WARNING("Gain is larger than 1.0");
         }
 
-        _gain = gain;
+        _current_gain = gain;
 
         if (_current_music_track != nullptr) {
             _current_music_track->source->set_gain(gain);

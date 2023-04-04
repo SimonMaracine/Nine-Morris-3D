@@ -43,6 +43,7 @@ encrypt("sounds/piece_move-01.ogg")
 encrypt("sounds/piece_move-02.ogg")
 encrypt("sounds/piece_take.ogg")
 encrypt("sounds/music/Kalimba.ogg")
+encrypt("sounds/music/relaxing.ogg")
 
 encrypt("cursors/arrow/arrow.png")
 encrypt("cursors/cross/cross.png")
