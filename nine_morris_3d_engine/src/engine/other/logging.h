@@ -14,7 +14,7 @@
  * spdlog is used directly only in the engine, which means it should work fine.
  */
 
-#if defined(NM3D_PLATFORM_RELEASE_DISTRIBUTION)
+#if defined(NM3D_PLATFORM_DISTRIBUTION)
     #define LOG_DEBUG(...) static_cast<void>(0)
     #define LOG_INFO(...) static_cast<void>(0)
     #define LOG_WARNING(...) static_cast<void>(0)

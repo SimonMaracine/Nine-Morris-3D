@@ -24,7 +24,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(${GAME} PRIVATE /W2 /wd4244)
 else()
-    message(FATAL_ERROR "Compiler is not GCC or MSVC")
+    message(FATAL_ERROR "NM3D: Compiler is not GCC or MSVC")
 endif()
 
 # Enable sanitizing in debug mode
@@ -32,6 +32,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(${GAME} PRIVATE -fsanitize=undefined -g)
         target_link_options(${GAME} PRIVATE -static-libasan -fsanitize=undefined)
+
+        message(STATUS "NM3D: Building with sanitizers")
     endif()
 endif()
 
@@ -45,18 +47,6 @@ target_include_directories(${GAME} PRIVATE "src")
 target_link_libraries(${GAME} PRIVATE
     ${ENGINE}
 )
-
-# Add compile definitions
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(${GAME} PRIVATE
-        "NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES"
-    )
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_definitions(${GAME} PRIVATE
-        "NDEBUG"
-        "ENTT_DISABLE_ASSERT"
-    )
-endif()
 
 # On Windows set runtime library
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

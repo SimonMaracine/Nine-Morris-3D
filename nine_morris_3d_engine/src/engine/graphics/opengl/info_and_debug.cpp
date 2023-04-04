@@ -142,6 +142,7 @@ namespace gl {
 
     std::string get_info() {
         std::string output;
+        output.reserve(1024);
 
         output.append("\n*** OpenGL Version And Driver ***\n");
 

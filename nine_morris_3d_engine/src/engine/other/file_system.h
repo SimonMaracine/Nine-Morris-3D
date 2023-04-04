@@ -9,6 +9,7 @@ namespace file_system {
             : std::runtime_error(message) {}
     };
 
+    // There is no uninitialization
     void initialize_for_applications(std::string_view application_name) noexcept(false);
 
     bool directory_exists(std::string_view path);  // Path must not end with trailing backslash

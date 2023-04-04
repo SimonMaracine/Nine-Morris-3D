@@ -24,14 +24,14 @@
  *
  * NM3D_PLATFORM_DEBUG
  * NM3D_PLATFORM_RELEASE
- * NM3D_PLATFORM_RELEASE_DISTRIBUTION  // TODO rename/refactor
+ * NM3D_PLATFORM_DISTRIBUTION
  */
-#ifdef NM3D_OPTIMIZED  // Defined in CMake
-    #ifdef NM3D_DISTRIBUTION  // Defined in CMake
-        #define NM3D_PLATFORM_RELEASE_DISTRIBUTION  // Flag for building for distribution
+#ifdef NM3D_RELEASE_BUILD_MODE  // Defined in CMake
+    #ifdef NM3D_FOR_DISTRIBUTION  // Defined in CMake
+        #define NM3D_PLATFORM_DISTRIBUTION  // Flag for building for distribution
     #else
-        #define NM3D_PLATFORM_RELEASE  // Compiled with optimization, but with debug code
+        #define NM3D_PLATFORM_RELEASE  // Compiled with optimization, but with additional debug code
     #endif
 #else
-    #define NM3D_PLATFORM_DEBUG  // Compiled without optimization and additional debug code
+    #define NM3D_PLATFORM_DEBUG  // Compiled without optimization and with additional debug code
 #endif

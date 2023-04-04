@@ -136,7 +136,7 @@ static std::string _app_name;
     }
 #endif
 
-#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
+#ifdef NM3D_PLATFORM_DISTRIBUTION
     #if defined(NM3D_PLATFORM_LINUX)
         static std::string path_for_logs_impl() {
             return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);

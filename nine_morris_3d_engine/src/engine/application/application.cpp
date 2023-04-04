@@ -32,7 +32,7 @@ void Application::preinitialize(std::string_view app_name, std::string_view log_
 
     logging::initialize_for_applications(log_file, info_file);
 
-#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
+#ifdef NM3D_PLATFORM_DISTRIBUTION
     file_system::check_and_fix_directories();
 #endif
 }

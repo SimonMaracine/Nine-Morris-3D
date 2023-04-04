@@ -21,7 +21,7 @@ void application_main();
     #define NOMINMAX
     #include <Windows.h>
 
-    #if defined(NM3D_PLATFORM_RELEASE_DISTRIBUTION)
+    #if defined(NM3D_PLATFORM_DISTRIBUTION)
         INT WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, INT) {
             application_main();
         }

@@ -40,6 +40,7 @@ namespace al {
 
     std::string get_info() {
         std::string output;
+        output.reserve(64);
 
         output.append("\n*** OpenAL Version ***\n");
 

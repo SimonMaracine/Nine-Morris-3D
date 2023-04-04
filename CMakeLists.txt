@@ -11,8 +11,8 @@ project("Nine-Morris-3D"
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-message(STATUS "Project compiler ID: ${CMAKE_CXX_COMPILER_ID}")
-message(STATUS "Project build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "NM3D: Project compiler ID: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "NM3D: Project build type: ${CMAKE_BUILD_TYPE}")
 
 # Build the engine
 add_subdirectory(nine_morris_3d_engine)

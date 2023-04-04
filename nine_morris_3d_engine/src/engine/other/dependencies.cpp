@@ -17,6 +17,7 @@ static constexpr size_t BUFFER_LENGTH = 128;
 namespace dependencies {
     std::string get_info() {
         std::string output;
+        output.reserve(512);
 
         output.append("\n*** Compiler ***\n");
 

@@ -105,7 +105,7 @@ namespace options {
 
     template<typename Opt>
     void handle_options_file_not_open_error(std::string_view options_file_name) {
-#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
+#ifdef NM3D_PLATFORM_DISTRIBUTION
         const bool exists = file_system::directory_exists(
             file_system::cut_slash(file_system::path_for_saved_data())
         );

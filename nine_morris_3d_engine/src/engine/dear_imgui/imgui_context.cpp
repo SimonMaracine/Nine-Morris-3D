@@ -21,7 +21,7 @@ namespace imgui_context {
         io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // TODO maybe not needed
         io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;  // TODO needed?
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // TODO needed?
-#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
+#ifdef NM3D_PLATFORM_DISTRIBUTION
         io.IniFilename = nullptr;
 #endif
     }

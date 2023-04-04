@@ -565,7 +565,7 @@ void SceneGame::update_all_imgui() {
         imgui_draw_info();
     }
 
-#ifndef NM3D_PLATFORM_RELEASE_DISTRIBUTION
+#ifndef NM3D_PLATFORM_DISTRIBUTION
     imgui_draw_debug();
 #endif
 }
@@ -984,8 +984,8 @@ void SceneGame::imgui_draw_info() {
     const char* build_mode = "debug";
 #elif defined(NM3D_PLATFORM_RELEASE)
     const char* build_mode = "release";
-#elif defined(NM3D_PLATFORM_RELEASE_DISTRIBUTION)
-    const char* build_mode = "release_distribution";
+#elif defined(NM3D_PLATFORM_DISTRIBUTION)
+    const char* build_mode = "distribution";
 #endif
 
     ImGui::Begin("Information", nullptr, flags);
@@ -1100,7 +1100,7 @@ void SceneGame::imgui_draw_ai_settings() {
 }
 
 void SceneGame::imgui_draw_debug() {
-#ifndef NM3D_PLATFORM_RELEASE_DISTRIBUTION
+#ifndef NM3D_PLATFORM_DISTRIBUTION
     ImGui::Begin("Debug");
     ImGui::Text("FPS: %.3f", ctx->fps);
     draw_debug_imgui();

@@ -28,7 +28,7 @@
 static std::shared_ptr<spdlog::logger> _global_logger;
 static std::string _info_file;
 
-#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
+#ifdef NM3D_PLATFORM_DISTRIBUTION
 static void set_fallback_logger_release(const char* error_message) {
     _global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
     _global_logger->set_pattern(LOG_PATTERN_RELEASE);
@@ -42,7 +42,7 @@ namespace logging {
     void initialize_for_applications(std::string_view log_file, std::string_view info_file) {
         _info_file = info_file;
 
-#ifdef NM3D_PLATFORM_RELEASE_DISTRIBUTION
+#ifdef NM3D_PLATFORM_DISTRIBUTION
         const std::string file_path = file_system::path_for_logs(log_file);
 
         try {
@@ -67,7 +67,10 @@ namespace logging {
     }
 
     void log_general_information(LogTarget target) {
-        std::string contents = gl::get_info();  // TODO improve
+        std::string contents;
+        contents.reserve(1024 + 64 + 512);
+
+        contents += gl::get_info();
         contents += al::get_info();
         contents += dependencies::get_info();
 

@@ -24,7 +24,7 @@
 
     mkdir build-release
     cd build-release
-    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_DISTRIBUTION=ON
+    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_FOR_DISTRIBUTION=ON
     cmake --build . -j4
 
 ## Windows release distribution
@@ -33,14 +33,14 @@
 
     mkdir build
     cd build
-    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_DISTRIBUTION=ON -A x64
+    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_FOR_DISTRIBUTION=ON -A x64
     cmake --build . --config Release -j4
 
 ### Visual Studio
 
     mkdir build
     cd build
-    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_DISTRIBUTION=ON -A x64
+    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_FOR_DISTRIBUTION=ON -A x64
     :: Open in Visual Studio, change to Release mode and build from there
 
 ## Linux debug

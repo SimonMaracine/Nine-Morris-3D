@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-option(NM3D_DISTRIBUTION "Build for distribution" OFF)
+option(NM3D_FOR_DISTRIBUTION "Build for distribution" OFF)
 
 set(ENGINE "nine_morris_3d_engine")
 set(GLAD_STB "glad_stb")
@@ -157,14 +157,16 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(${ENGINE} PRIVATE /W2 /wd4244)
 else()
-    message(FATAL_ERROR "Compiler is not GCC or MSVC")
+    message(FATAL_ERROR "NM3D: Compiler is not GCC or MSVC")
 endif()
 
-# Enable sanitizing in debug mode
+# Enable sanitizing in debug mode for GCC
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(${ENGINE} PRIVATE -fsanitize=undefined -g)
         target_link_options(${ENGINE} PRIVATE -static-libasan -fsanitize=undefined)
+
+        message(STATUS "NM3D: Building engine with sanitizers")
     endif()
 endif()
 
@@ -251,40 +253,40 @@ target_link_libraries(${ENGINE} PRIVATE
     ${GLAD_STB}
 )
 
+# But link these ones publicly
 target_link_libraries(${ENGINE} PUBLIC
     spdlog
     ${DEAR_IMGUI}
 )
 
-# Add compile definitions
+# Add compile definitions for engine and client
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(STATUS "Project building Nine Morris 3D engine in DEBUG mode")
+    message(STATUS "NM3D: Building Nine Morris 3D engine in DEBUG mode")
 
     # Both engine and client
     target_compile_definitions(${ENGINE} PUBLIC
         "NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES"  # To easily enable or disable encrypted files
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    message(STATUS "Project building Nine Morris 3D engine in RELEASE mode")
-
-    target_compile_definitions(${ENGINE} PRIVATE
-        "ENTT_DISABLE_ASSERT"
-    )
+    message(STATUS "NM3D: Building Nine Morris 3D engine in RELEASE mode")
 
     # Optimization on in both engine and client
     target_compile_definitions(${ENGINE} PUBLIC
-        "NDEBUG"
-        "NM3D_OPTIMIZED"
+        "NDEBUG"  # Disable asserts globally
+        "NM3D_RELEASE_BUILD_MODE"  # Just a flag used by platform.h
+        "ENTT_DISABLE_ASSERT"
     )
 
-    if(${NM3D_DISTRIBUTION})
+    if(${NM3D_FOR_DISTRIBUTION})
         # Distribution flag on in both engine and client
         target_compile_definitions(${ENGINE} PUBLIC
-            "NM3D_DISTRIBUTION"
+            "NM3D_FOR_DISTRIBUTION"
         )
 
-        message(STATUS "Project building Nine Morris 3D engine in RELEASE + DISTRIBUTION mode")
+        message(STATUS "NM3D: Building Nine Morris 3D engine for DISTRIBUTION")
     endif()
+else()
+    message(FATAL_ERROR "NM3D: Unknown build type")
 endif()
 
 target_compile_definitions(${ENGINE} PRIVATE
