@@ -68,7 +68,7 @@ Application::Application(const ApplicationBuilder& builder, void* user_data)
         initialize_dear_imgui();
     }
 
-#ifdef NM3D_PLATFORM_DEBUG
+#ifndef NM3D_PLATFORM_DISTRIBUTION
     logging::log_general_information(logging::LogTarget::Console);
 #endif
 

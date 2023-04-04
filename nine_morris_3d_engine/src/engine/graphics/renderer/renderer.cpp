@@ -87,7 +87,7 @@ void Renderer::render(const SceneList& scene) {
     // Render all models with outline
     draw_models_with_outline(scene);
 
-#ifdef NM3D_PLATFORM_DEBUG
+#ifndef NM3D_PLATFORM_DISTRIBUTION
     if (origin) {
         draw_origin();
     }
@@ -414,8 +414,8 @@ void Renderer::draw_quads(const SceneList& scene) {
         return distance1 > distance2;
     });
 
-    for (size_t i = 0; i < scene.quads.size(); i++) {
-        const renderables::Quad* quad = scene.quads[i];
+    for (size_t i = 0; i < quads.size(); i++) {
+        const renderables::Quad* quad = quads[i];
 
         draw_quad(quad);
     }
