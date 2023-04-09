@@ -305,7 +305,7 @@ void LauncherScene::on_start() {
 
     // Load launcher options from file
     options_gracefully::load_from_file<launcher_options::LauncherOptions>(
-        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate
+        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate_load
     );
 
     // Initialize display manager for getting screen resolutions

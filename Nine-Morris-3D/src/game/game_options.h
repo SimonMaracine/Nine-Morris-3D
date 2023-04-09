@@ -65,5 +65,5 @@ namespace game_options {
         }
     };
 
-    std::pair<bool, std::string> validate(const GameOptions& options);
+    std::optional<std::string> validate_load(const GameOptions& options);
 }

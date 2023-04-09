@@ -45,5 +45,5 @@ namespace launcher_options {
         }
     };
 
-    std::pair<bool, std::string> validate(const LauncherOptions& options);
+    std::optional<std::string> validate_load(const LauncherOptions& options);
 }

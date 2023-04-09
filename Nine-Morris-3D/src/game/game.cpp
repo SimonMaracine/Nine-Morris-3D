@@ -17,7 +17,7 @@ static void load_game_options(Ctx* ctx) {
     auto& data = ctx->data<Data>();
 
     options_gracefully::load_from_file<game_options::GameOptions>(
-        game_options::GAME_OPTIONS_FILE, data.options, game_options::validate
+        game_options::GAME_OPTIONS_FILE, data.options, game_options::validate_load
     );
 }
 
