@@ -17,7 +17,7 @@ static ALenum get_format(int channels, size_t bps) {
     } else if (channels == 2 && bps == 16) {
         format = AL_FORMAT_STEREO16;
     } else {
-        LOG_DIST_CRITICAL("Unknown format: channels = `{}`, bps = `{}`, exiting...", channels, bps);
+        LOG_DIST_CRITICAL("Unknown format: channels = `{}`, bps = `{}`", channels, bps);
         panic::panic();
     }
 

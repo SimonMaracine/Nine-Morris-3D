@@ -8,8 +8,10 @@
  * Use LOG_ macros for messages to be printed only in debug mode.
  * Use LOG_DIST_ macros for messages to be printed both in debug and release mode.
  *
- * Messages in debug mode are logged in the console. Messages in release mode are logged
+ * Messages in debug mode are printed in the console. Messages in release mode are printed
  * in a log file (with console as fallback).
+ *
+ * Use LOG_CRITICAL only right before panicking.
  *
  * spdlog is used directly only in the engine, which means it should work fine.
  */

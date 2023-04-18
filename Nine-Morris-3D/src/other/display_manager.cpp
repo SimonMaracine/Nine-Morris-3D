@@ -11,11 +11,11 @@ DisplayManager::DisplayManager(Ctx* ctx)
     : ctx(ctx) {
     monitors = ctx->window->get_monitors();
 
-    const auto resolution = monitors[0].get_resolution();
+    const auto resolution = monitors[0].get_resolution();  // Primary monitor's resolution
     const int width = resolution.first;
 
     if (width < 512) {
-        LOG_DIST_CRITICAL("Monitor has unsupported resolution, exiting...");
+        LOG_DIST_CRITICAL("Monitor has unsupported resolution");
         panic::panic();
     } else if (width < 768) {
         resolutions_supported = 1;

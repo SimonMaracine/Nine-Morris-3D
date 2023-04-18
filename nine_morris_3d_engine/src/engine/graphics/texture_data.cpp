@@ -17,7 +17,7 @@ TextureData::TextureData(std::string_view file_path, bool flip)
     data = stbi_load(file_path.data(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        LOG_DIST_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not load texture data `{}`", file_path);
         panic::panic();
     }
 }
@@ -34,7 +34,7 @@ TextureData::TextureData(Encrypt::EncryptedFile file_path, bool flip)
     data = stbi_load_from_memory(buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, 4);
 
     if (data == nullptr) {
-        LOG_DIST_CRITICAL("Could not load texture data `{}`, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not load texture data `{}`", file_path);
         panic::panic();
     }
 }

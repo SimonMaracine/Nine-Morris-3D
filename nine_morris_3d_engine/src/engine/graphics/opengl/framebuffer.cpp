@@ -350,7 +350,7 @@ namespace gl {
                             );
                             break;
                         default:
-                            LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
+                            LOG_DIST_CRITICAL("Wrong attachment format");
                             panic::panic();
                     }
 
@@ -387,7 +387,7 @@ namespace gl {
                             );
                             break;
                         default:
-                            LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
+                            LOG_DIST_CRITICAL("Wrong attachment format");
                             panic::panic();
                     }
 
@@ -429,7 +429,7 @@ namespace gl {
                             );
                             break;
                         default:
-                            LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
+                            LOG_DIST_CRITICAL("Wrong attachment format");
                             panic::panic();
                     }
 
@@ -462,7 +462,7 @@ namespace gl {
                             );
                             break;
                         default:
-                            LOG_DIST_CRITICAL("Wrong attachment format, exiting...");
+                            LOG_DIST_CRITICAL("Wrong attachment format");
                             panic::panic();
                     }
 
@@ -486,7 +486,7 @@ namespace gl {
         const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
         if (status != GL_FRAMEBUFFER_COMPLETE) {
-            LOG_DIST_CRITICAL("GL framebuffer {} is incomplete, exiting...", framebuffer);
+            LOG_DIST_CRITICAL("GL framebuffer {} is incomplete", framebuffer);
             LOG_DIST_CRITICAL("GL framebuffer status: {}", print_framebuffer_status_message(status));
             panic::panic();
         }

@@ -8,7 +8,7 @@ cppblowfish::Buffer Encrypt::load_file(EncryptedFile file_path) {
     std::ifstream file {std::string(file_path), std::ios::binary};
 
     if (!file.is_open()) {
-        LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading", file_path);
         panic::panic();
     }
 

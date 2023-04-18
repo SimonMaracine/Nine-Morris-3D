@@ -26,7 +26,7 @@ static const char* get_font_file_data(std::string_view file_path) {
     std::ifstream file {std::string(file_path), std::ios::binary};
 
     if (!file.is_open()) {
-        LOG_DIST_CRITICAL("Could not open file `{}` for reading, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not open file `{}` for reading", file_path);
         panic::panic();
     }
 
@@ -65,7 +65,7 @@ Font::Font(std::string_view file_path, float size, int padding, unsigned char on
     font_info_buffer = get_font_file_data(file_path);
 
     if (!stbtt_InitFont(&info, reinterpret_cast<const unsigned char*>(font_info_buffer), 0)) {
-        LOG_DIST_CRITICAL("Could not load font `{}`, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not load font `{}`", file_path);
         panic::panic();
     }
 

@@ -150,7 +150,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
             panic::panic();
         }
@@ -188,7 +188,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
             panic::panic();
         }
@@ -223,7 +223,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
             panic::panic();
         }
@@ -261,7 +261,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
             panic::panic();
         }
@@ -296,7 +296,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
             panic::panic();
         }
@@ -334,7 +334,7 @@ namespace mesh {
         );
 
         if (!scene) {
-            LOG_DIST_CRITICAL("Could not load model data `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
             panic::panic();
         }

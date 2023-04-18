@@ -19,7 +19,7 @@ static size_t type_size(GLenum type) {
         CASE(GL_FLOAT_VEC3, 3, GLfloat)
         CASE(GL_FLOAT_MAT4, 16, GLfloat)
         default:
-            LOG_DIST_CRITICAL("Unknown type `{}`, exiting...", type);
+            LOG_DIST_CRITICAL("Unknown type `{}`", type);
             panic::panic();
     }
 
@@ -68,7 +68,7 @@ static GLuint compile_shader(std::string_view source_path, GLenum type, std::str
     std::ifstream file {std::string(source_path), std::ios::binary};
 
     if (!file.is_open()) {
-        LOG_DIST_CRITICAL("Could not open file `{}` for reading, exiting...", source_path);
+        LOG_DIST_CRITICAL("Could not open file `{}` for reading", source_path);
         panic::panic();
     }
 
@@ -159,7 +159,7 @@ namespace gl {
             vertex_shader = compile_shader(vertex_source_path, GL_VERTEX_SHADER, name);
             fragment_shader = compile_shader(fragment_source_path, GL_FRAGMENT_SHADER, name);
         } catch (const std::runtime_error& e) {
-            LOG_DIST_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
+            LOG_DIST_CRITICAL("Could not compile shaders: {}", e.what());
             panic::panic();
         }
 
@@ -195,7 +195,7 @@ namespace gl {
             vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);
             fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER, name);
         } catch (const std::runtime_error& e) {
-            LOG_DIST_CRITICAL("Could not compile shaders: {}, exiting...", e.what());
+            LOG_DIST_CRITICAL("Could not compile shaders: {}", e.what());
             panic::panic();
         }
 
@@ -333,7 +333,7 @@ namespace gl {
             const GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
 
             if (block_index == GL_INVALID_INDEX) {
-                LOG_DIST_CRITICAL("Invalid block index, exiting...");
+                LOG_DIST_CRITICAL("Invalid block index");
                 panic::panic();
             }
 
@@ -391,7 +391,7 @@ namespace gl {
 
             for (size_t i = 0; i < field_count; i++) {
                 if (indices[i] == GL_INVALID_INDEX) {
-                    LOG_DIST_CRITICAL("Invalid field index, exiting...");
+                    LOG_DIST_CRITICAL("Invalid field index");
                     panic::panic();
                 }
             }

@@ -37,6 +37,8 @@ public:
     void add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
     void set_cursor(CursorId id);
     void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons);
+
+    static void destroy_glfw_context();
 private:
     GLFWwindow* create_window(Application* application);
     void install_callbacks();
@@ -50,12 +52,16 @@ public:
     Monitor() = default;
     ~Monitor() = default;
 
+    Monitor(const Monitor&) = default;
+    Monitor& operator=(const Monitor&) = default;
+    Monitor(Monitor&&) noexcept = default;
+    Monitor& operator=(Monitor&&) noexcept = default;
+
     std::pair<int, int> get_resolution();
+    std::pair<float, float> get_content_scale();
     const char* get_name();
 private:
     GLFWmonitor* monitor = nullptr;
 
     friend class Window;
 };
-
-void destroy_glfw_context();

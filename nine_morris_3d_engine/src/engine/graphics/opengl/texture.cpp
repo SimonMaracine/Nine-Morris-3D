@@ -101,7 +101,7 @@ namespace gl {
         unsigned char* data = stbi_load(file_path.data(), &width, &height, &channels, CHANNELS);
 
         if (data == nullptr) {
-            LOG_DIST_CRITICAL("Could not load texture `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
             panic::panic();
         }
 
@@ -136,7 +136,7 @@ namespace gl {
         );
 
         if (data == nullptr) {
-            LOG_DIST_CRITICAL("Could not load texture `{}`, exiting...", file_path);
+            LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
             panic::panic();
         }
 
@@ -225,7 +225,7 @@ namespace gl {
 
                 break;
             default:
-                LOG_DIST_CRITICAL("Invalid texture format `{}`, exiting...", static_cast<int>(specification.format));
+                LOG_DIST_CRITICAL("Invalid texture format `{}`", static_cast<int>(specification.format));
                 panic::panic();
         }
     }
@@ -249,7 +249,7 @@ namespace gl {
             data[i] = stbi_load(file_paths[i], &width, &height, &channels, CHANNELS);
 
             if (data == nullptr) {
-                LOG_DIST_CRITICAL("Could not load texture `{}`, exiting...", file_paths[i]);
+                LOG_DIST_CRITICAL("Could not load texture `{}`", file_paths[i]);
                 panic::panic();
             }
         }

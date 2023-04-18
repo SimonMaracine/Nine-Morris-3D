@@ -241,11 +241,30 @@ void LauncherScene::on_start() {
 
     using namespace file_system;
 
-    ImGuiIO& io = ImGui::GetIO();
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-    io.IniFilename = nullptr;
+    // Load splash screen
+    ctx->res.texture.load("splash_screen"_H, Encrypt::encr(path_for_assets(SPLASH_SCREEN)), gl::TextureSpecification {});
+
+    auto background = objects.add<gui::Image>("background"_H, ctx->res.texture["splash_screen"_H]);
+    scene_list.add(background);
+
+    // Load launcher options from file
+    options_gracefully::load_from_file<launcher_options::LauncherOptions>(
+        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate_load
+    );
+
+    // Initialize display manager for getting screen resolutions
+    display_manager = DisplayManager {ctx};
+}
+
+void LauncherScene::on_stop() {
+    auto& data = ctx->data<Data>();
+
+    options_gracefully::save_to_file<launcher_options::LauncherOptions>(
+        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options
+    );
+}
+
+void LauncherScene::on_awake() {
     window_flags |= ImGuiWindowFlags_NoResize;
     window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
     window_flags |= ImGuiWindowFlags_NoCollapse;
@@ -285,6 +304,8 @@ void LauncherScene::on_start() {
     style.GrabMinSize = 12;
     style.FramePadding = ImVec2(5.0f, 4.0f);
 
+    ImGuiIO& io = ImGui::GetIO();
+
     // Setup Dear ImGui fonts
     ImFontGlyphRangesBuilder builder;
     builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
@@ -292,35 +313,11 @@ void LauncherScene::on_start() {
     ImVector<ImWchar> ranges;
     builder.BuildRanges(&ranges);
 
+    using namespace file_system;
+
     io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS).c_str(), 21.0f, nullptr, ranges.Data);
     io.Fonts->Build();
 
-    // Load splash screen
-    gl::TextureSpecification specification;
-
-    ctx->res.texture.load("splash_screen"_H, Encrypt::encr(path_for_assets(SPLASH_SCREEN)), specification);
-
-    auto background = objects.add<gui::Image>("background"_H, ctx->res.texture["splash_screen"_H]);
-    scene_list.add(background);
-
-    // Load launcher options from file
-    options_gracefully::load_from_file<launcher_options::LauncherOptions>(
-        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate_load
-    );
-
-    // Initialize display manager for getting screen resolutions
-    display_manager = DisplayManager {ctx};
-}
-
-void LauncherScene::on_stop() {
-    auto& data = ctx->data<Data>();
-
-    options_gracefully::save_to_file<launcher_options::LauncherOptions>(
-        launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options
-    );
-}
-
-void LauncherScene::on_awake() {
     ctx->evt.connect<WindowClosedEvent, &LauncherScene::on_window_closed>(this);
 }
 
@@ -340,8 +337,8 @@ void LauncherScene::on_imgui_update() {
     ImGui::Begin("Launcher", nullptr, window_flags);
 
     if (ImGui::BeginTabBar("tabs")) {
-        display_page();
-        graphics_page();
+        page_display();
+        page_graphics();
 
         ImGui::EndTabBar();
     }
@@ -369,7 +366,7 @@ void LauncherScene::on_window_closed(const WindowClosedEvent&) {
     ctx->exit_code = 1;
 }
 
-void LauncherScene::display_page() {
+void LauncherScene::page_display() {
     auto& data = ctx->data<Data>();
 
     if (ImGui::BeginTabItem("Display")) {
@@ -397,7 +394,7 @@ void LauncherScene::display_page() {
     }
 }
 
-void LauncherScene::graphics_page() {
+void LauncherScene::page_graphics() {
     auto& data = ctx->data<Data>();
 
     if (ImGui::BeginTabItem("Graphics")) {

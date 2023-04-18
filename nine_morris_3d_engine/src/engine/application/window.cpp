@@ -22,7 +22,7 @@
 
 Window::Window(Application* application) {
     if (!glfwInit()) {
-        LOG_DIST_CRITICAL("Could not initialize GLFW, exiting...");
+        LOG_DIST_CRITICAL("Could not initialize GLFW");
         panic::panic();
     }
 
@@ -50,7 +50,7 @@ Window::Window(Application* application) {
     window = create_window(application);
 
     if (window == nullptr) {
-        LOG_DIST_CRITICAL("Could not create window, exiting...");
+        LOG_DIST_CRITICAL("Could not create window");
         panic::panic();
     }
 
@@ -59,7 +59,7 @@ Window::Window(Application* application) {
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGL()) {
-        LOG_DIST_CRITICAL("Could not initialize GLAD, exiting...");
+        LOG_DIST_CRITICAL("Could not initialize GLAD");
         panic::panic();
     }
 
@@ -107,7 +107,7 @@ std::vector<Monitor> Window::get_monitors() {
     GLFWmonitor** monitors = glfwGetMonitors(&count);
 
     if (monitors == nullptr) {
-        LOG_DIST_CRITICAL("Could not retrieve monitors, exiting...");
+        LOG_DIST_CRITICAL("Could not retrieve monitors");
         panic::panic();
     }
 
@@ -164,7 +164,7 @@ void Window::set_cursor(CursorId id) {
     try {
         cursor = cursors.at(id);
     } catch (const std::out_of_range&) {
-        LOG_CRITICAL("Invalid handle `{}`, exiting...", id);
+        LOG_CRITICAL("Invalid handle `{}`", id);
         panic::panic();
     }
 
@@ -192,6 +192,10 @@ void Window::set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons
     }
 
     glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
+}
+
+void Window::destroy_glfw_context() {
+    glfwTerminate();
 }
 
 GLFWwindow* Window::create_window(Application* application) {
@@ -343,10 +347,20 @@ std::pair<int, int> Monitor::get_resolution() {
     return std::make_pair(video_mode->width, video_mode->height);
 }
 
-const char* Monitor::get_name() {
-    return glfwGetMonitorName(monitor);
+std::pair<float, float> Monitor::get_content_scale() {
+    float xscale, yscale;
+    glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+
+    return std::make_pair(xscale, yscale);
 }
 
-void destroy_glfw_context() {
-    glfwTerminate();
+const char* Monitor::get_name() {
+    const char* name = glfwGetMonitorName(monitor);
+
+    if (name == nullptr) {
+        LOG_DIST_CRITICAL("Could not retrieve monitor name");
+        panic::panic();
+    }
+
+    return name;
 }

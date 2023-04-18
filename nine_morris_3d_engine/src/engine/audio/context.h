@@ -16,11 +16,11 @@ public:
     OpenAlContext& operator=(OpenAlContext&&) = delete;
 
     al::Listener& get_listener() { return listener; }
+
+    static void destroy_openal_context();
 private:
     ALCdevice* device = nullptr;
     ALCcontext* context = nullptr;
 
     al::Listener listener;
 };
-
-void destroy_openal_context();

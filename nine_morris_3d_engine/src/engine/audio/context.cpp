@@ -26,14 +26,14 @@ OpenAlContext::OpenAlContext() {
     device = alcOpenDevice(nullptr);
 
     if (device == nullptr) {
-        LOG_DIST_CRITICAL("Could not open an AL device, exiting...");
+        LOG_DIST_CRITICAL("Could not open an AL device");
         panic::panic();
     }
 
     context = alcCreateContext(device, nullptr);
 
     if (context == nullptr) {
-        LOG_DIST_CRITICAL("Could not create AL context, exiting...");
+        LOG_DIST_CRITICAL("Could not create AL context");
         panic::panic();
     }
 
@@ -41,7 +41,7 @@ OpenAlContext::OpenAlContext() {
         alcDestroyContext(context);
         alcCloseDevice(device);
 
-        LOG_DIST_CRITICAL("Could not make AL context current, exiting...");
+        LOG_DIST_CRITICAL("Could not make AL context current");
         panic::panic();
     }
 
@@ -64,7 +64,7 @@ OpenAlContext::~OpenAlContext() {
     LOG_INFO("Destroyed OpenAL context and device");
 }
 
-void destroy_openal_context() {
+void OpenAlContext::destroy_openal_context() {
     alcMakeContextCurrent(nullptr);
 
     if (_global_context != nullptr) {

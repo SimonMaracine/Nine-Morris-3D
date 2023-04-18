@@ -22,7 +22,7 @@ SoundData::SoundData(std::string_view file_path)
     samples = stb_vorbis_decode_filename(file_path.data(), &channels, &sample_rate, &data);
 
     if (data == nullptr) {
-        LOG_DIST_CRITICAL("Could not load sound data `{}`, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not load sound data `{}`", file_path);
         panic::panic();
     }
 
@@ -41,7 +41,7 @@ SoundData::SoundData(Encrypt::EncryptedFile file_path)
     samples = stb_vorbis_decode_memory(buffer.get(), buffer.size() - buffer.padding(), &channels, &sample_rate, &data);
 
     if (data == nullptr) {
-        LOG_DIST_CRITICAL("Could not load sound data `{}`, exiting...", file_path);
+        LOG_DIST_CRITICAL("Could not load sound data `{}`", file_path);
         panic::panic();
     }
 

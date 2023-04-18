@@ -61,7 +61,7 @@ namespace gl {
                     );
                     break;
                 default:
-                    LOG_DIST_CRITICAL("Unknown element type `{}`, exiting...", element.type);
+                    LOG_DIST_CRITICAL("Unknown element type `{}`", element.type);
                     panic::panic();
             }
 
