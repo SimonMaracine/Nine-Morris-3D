@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/engine_other.h>
+#include <engine/public/other.h>
 
 #include "other/constants.h"
 

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <engine/engine_audio.h>
-#include <engine/engine_graphics.h>
+#include <engine/public/audio.h>
+#include <engine/public/graphics.h>
+#include <engine/public/external/imgui.h>
 
 #include "game/game_options.h"
 #include "launcher/launcher_options.h"

@@ -15,7 +15,7 @@ or another person. It has five game modes:
 
 And each game mode has its own AI. Games can be saved and be continued later. AI and other
 settings are configurable. The background can be changed as you wish. It supports 3D sounds and
-it has beautiful music. 
+it has beautiful music.
 
 The game runs on Linux and Windows.
 

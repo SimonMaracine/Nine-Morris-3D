@@ -3,7 +3,7 @@
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/fmt/fmt.h>
 
-#include "engine/application/input.h"
+#include "engine/application_base/input.h"
 
 /**
  * Main class for managing application-level events.

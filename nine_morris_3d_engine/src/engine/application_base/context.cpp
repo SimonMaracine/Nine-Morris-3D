@@ -1,9 +1,9 @@
 #include <resmanager/resmanager.h>
 
-#include "engine/application/context.h"
-#include "engine/application/application.h"
-#include "engine/application/events.h"
-#include "engine/application/window.h"
+#include "engine/application_base/context.h"
+#include "engine/application_base/application.h"
+#include "engine/application_base/events.h"
+#include "engine/application_base/window.h"
 #include "engine/audio/context.h"
 #include "engine/graphics/opengl/framebuffer.h"
 #include "engine/graphics/renderer/renderer.h"

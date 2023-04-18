@@ -1,5 +1,6 @@
-#include <engine/engine_other.h>
-#include <engine/engine_scene.h>
+#include <engine/public/other.h>
+#include <engine/public/scene.h>
+#include <engine/public/external/resmanager.h>
 
 #include "game/keyboard_controls.h"
 #include "game/entities/board.h"

@@ -1,8 +1,9 @@
 // Include entry point first as it includes Windows.h
-#include <engine/engine_entry_point.h>
+#include <engine/public/entry_point.h>
 
-#include <engine/engine_application.h>
-#include <engine/engine_other.h>
+#include <engine/public/application_base.h>
+#include <engine/public/other.h>
+#include <engine/public/external/resmanager.h>
 
 #include "game/game.h"
 #include "game/scenes/standard_game_scene.h"

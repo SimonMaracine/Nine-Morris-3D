@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/engine_application.h>
+#include <engine/public/application_base.h>
 
 #include "game/minimax/common.h"
 #include "game/game_position.h"

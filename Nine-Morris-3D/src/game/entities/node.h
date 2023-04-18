@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/engine_scene.h>
+#include <engine/public/scene.h>
 
 #include "other/constants.h"
 

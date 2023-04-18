@@ -1,7 +1,7 @@
 #pragma once
 
-#include <engine/engine_application.h>
-#include <engine/engine_other.h>
+#include <engine/public/application_base.h>
+#include <engine/public/other.h>
 
 inline constexpr float LENS_FOV = 45.0f;
 inline constexpr float LENS_NEAR = 0.1f;

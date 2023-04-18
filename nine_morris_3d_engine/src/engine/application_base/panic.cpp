@@ -1,5 +1,5 @@
-#include "engine/application/panic.h"
-#include "engine/application/window.h"
+#include "engine/application_base/panic.h"
+#include "engine/application_base/window.h"
 #include "engine/audio/context.h"
 
 namespace panic {

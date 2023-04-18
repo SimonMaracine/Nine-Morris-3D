@@ -45,17 +45,17 @@ set(ALSOFT_UPDATE_BUILD_VERSION OFF)
 set(LIBTYPE STATIC)  # To make static library
 
 set(ENGINE_HEADERS
-    "src/engine/application/application_builder.h"
-    "src/engine/application/application_properties.h"
-    "src/engine/application/application.h"
-    "src/engine/application/capabilities.h"
-    "src/engine/application/context.h"
-    "src/engine/application/entry_point.h"
-    "src/engine/application/events.h"
-    "src/engine/application/input.h"
-    "src/engine/application/panic.h"
-    "src/engine/application/platform.h"
-    "src/engine/application/window.h"
+    "src/engine/application_base/application_builder.h"
+    "src/engine/application_base/application_properties.h"
+    "src/engine/application_base/application.h"
+    "src/engine/application_base/capabilities.h"
+    "src/engine/application_base/context.h"
+    "src/engine/application_base/entry_point.h"
+    "src/engine/application_base/events.h"
+    "src/engine/application_base/input.h"
+    "src/engine/application_base/panic.h"
+    "src/engine/application_base/platform.h"
+    "src/engine/application_base/window.h"
     "src/engine/audio/openal/buffer.h"
     "src/engine/audio/openal/info_and_debug.h"
     "src/engine/audio/openal/listener.h"
@@ -99,22 +99,30 @@ set(ENGINE_HEADERS
     "src/engine/scene/renderables.h"
     "src/engine/scene/scene_list.h"
     "src/engine/scene/scene.h"
-    "src/engine/engine_application.h"
-    "src/engine/engine_audio.h"
-    "src/engine/engine_entry_point.h"
-    "src/engine/engine_graphics.h"
-    "src/engine/engine_other.h"
-    "src/engine/engine_scene.h"
+
+    # For client
+    "src/engine/public/external/cereal.h"
+    "src/engine/public/external/entt.h"
+    "src/engine/public/external/glm.h"
+    "src/engine/public/external/imgui.h"
+    "src/engine/public/external/resmanager.h"
+    "src/engine/public/application_base.h"
+    "src/engine/public/audio.h"
+    "src/engine/public/entry_point.h"
+    "src/engine/public/graphics.h"
+    "src/engine/public/other.h"
+    "src/engine/public/prelude.h"  # Very common functionality # FIXME use this
+    "src/engine/public/scene.h"
 )
 
 add_library(${ENGINE} STATIC
-    "src/engine/application/application_builder.cpp"
-    "src/engine/application/application.cpp"
-    "src/engine/application/capabilities.cpp"
-    "src/engine/application/context.cpp"
-    "src/engine/application/input.cpp"
-    "src/engine/application/panic.cpp"
-    "src/engine/application/window.cpp"
+    "src/engine/application_base/application_builder.cpp"
+    "src/engine/application_base/application.cpp"
+    "src/engine/application_base/capabilities.cpp"
+    "src/engine/application_base/context.cpp"
+    "src/engine/application_base/input.cpp"
+    "src/engine/application_base/panic.cpp"
+    "src/engine/application_base/window.cpp"
     "src/engine/audio/openal/buffer.cpp"
     "src/engine/audio/openal/info_and_debug.cpp"
     "src/engine/audio/openal/listener.cpp"
@@ -213,6 +221,7 @@ add_dependencies(${ENGINE} glfw)  # TODO this was necessary for some reason
 # Add all include directories
 target_include_directories(${ENGINE} PUBLIC "src")
 
+# These have to be public in client
 target_include_directories(${ENGINE} SYSTEM PUBLIC
     "dependencies/cereal/include"
     "dependencies/glad/include"
@@ -223,8 +232,8 @@ target_include_directories(${ENGINE} SYSTEM PUBLIC
     "extern/spdlog/include"
     "extern/assimp/include"
     "extern/glm"
-    "extern/glfw/include"
     "extern/imgui"
+    "extern/glfw/include"
     "extern/utfcpp/source"
     "extern/cppblowfish/include"
     "extern/entt/src"
@@ -232,14 +241,14 @@ target_include_directories(${ENGINE} SYSTEM PUBLIC
     "extern/openal_soft/include"
 )
 
-target_include_directories(${GLAD_STB} SYSTEM PUBLIC
+target_include_directories(${GLAD_STB} SYSTEM PRIVATE
     "dependencies/glad/include"
     "dependencies/stb_image"
     "dependencies/stb_truetype"
     "dependencies/stb_image_write"
 )
 
-target_include_directories(${DEAR_IMGUI} SYSTEM PUBLIC
+target_include_directories(${DEAR_IMGUI} SYSTEM PRIVATE
     "extern/imgui"
     "extern/glfw/include"
 )

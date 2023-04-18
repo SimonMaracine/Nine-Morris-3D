@@ -1,4 +1,4 @@
-#include <engine/engine_other.h>
+#include <engine/public/other.h>
 
 #include "game/minimax/standard_game/minimax_standard_game.h"
 #include "game/minimax/common.h"

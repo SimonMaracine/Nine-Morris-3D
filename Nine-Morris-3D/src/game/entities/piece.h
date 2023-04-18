@@ -1,7 +1,7 @@
 #pragma once
 
-#include <engine/engine_audio.h>
-#include <engine/engine_scene.h>
+#include <engine/public/audio.h>
+#include <engine/public/scene.h>
 
 #include "game/piece_movement.h"
 #include "other/constants.h"

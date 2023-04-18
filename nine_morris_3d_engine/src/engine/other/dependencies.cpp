@@ -9,7 +9,7 @@
 #include <cppblowfish/cppblowfish.h>
 #include <resmanager/resmanager.h>
 
-#include "engine/application/platform.h"
+#include "engine/application_base/platform.h"
 #include "engine/other/dependencies.h"
 
 static constexpr size_t BUFFER_LENGTH = 128;

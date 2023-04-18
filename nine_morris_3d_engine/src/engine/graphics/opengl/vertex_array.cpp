@@ -5,7 +5,7 @@
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
-#include "engine/application/panic.h"
+#include "engine/application_base/panic.h"
 
 namespace gl {
     VertexArray::VertexArray() {

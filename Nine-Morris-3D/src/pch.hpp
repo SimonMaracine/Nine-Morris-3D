@@ -10,6 +10,7 @@
 #include <utility>
 #include <fstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
 #include <cstddef>
 #include <functional>
@@ -28,24 +29,3 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
-
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/unordered_map.hpp>
-#include <cereal/types/array.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/utility.hpp>
-#include <cereal/types/optional.hpp>
-
-#include <resmanager/resmanager.h>
-using namespace resmanager::literals;
-using hs = resmanager::HashedStr64;
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-
-#include <imgui.h>

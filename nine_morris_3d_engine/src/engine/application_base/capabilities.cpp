@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 
-#include "engine/application/capabilities.h"
+#include "engine/application_base/capabilities.h"
 #include "engine/other/logging.h"
 
 namespace capabilities {

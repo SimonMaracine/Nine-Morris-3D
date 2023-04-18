@@ -4,14 +4,14 @@
 
 #include <utf8.h>
 
-#include "engine/application/platform.h"
+#include "engine/application_base/platform.h"
 #include "engine/graphics/font.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/texture.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
-#include "engine/application/panic.h"
+#include "engine/application_base/panic.h"
 
 static constexpr char32_t ERROR_CHARACTER = 127;
 

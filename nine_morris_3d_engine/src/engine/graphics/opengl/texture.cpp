@@ -4,12 +4,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "engine/application/capabilities.h"
+#include "engine/application_base/capabilities.h"
 #include "engine/graphics/opengl/texture.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
-#include "engine/application/panic.h"
+#include "engine/application_base/panic.h"
 
 static constexpr int CHANNELS = 4;
 

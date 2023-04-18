@@ -1,4 +1,4 @@
-#include <engine/engine_other.h>
+#include <engine/public/other.h>
 
 namespace assets {
     const char* BOARD_WOOD_MESH = ENCR("data/models/board/board.obj");

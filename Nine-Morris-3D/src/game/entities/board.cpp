@@ -1,5 +1,6 @@
-#include <engine/engine_graphics.h>
-#include <engine/engine_other.h>
+#include <engine/public/graphics.h>
+#include <engine/public/other.h>
+#include <engine/public/external/resmanager.h>
 
 #include "game/entities/board.h"
 #include "game/entities/node.h"
