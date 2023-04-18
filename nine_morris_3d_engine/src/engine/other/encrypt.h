@@ -2,7 +2,7 @@
 
 #include <cppblowfish/cppblowfish.h>
 
-#include "engine/application/platform.h"
+#include "engine/application_base/platform.h"
 
 #ifdef NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
     #define ENCR(file_string) (file_string)

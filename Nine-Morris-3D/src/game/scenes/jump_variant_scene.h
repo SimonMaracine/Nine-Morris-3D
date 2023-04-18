@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/engine_application.h>
+#include <engine/public/application_base.h>
 
 #include "game/entities/boards/jump_board.h"
 #include "game/entities/serialization/jump_board_serialized.h"

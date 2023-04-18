@@ -1,4 +1,5 @@
-#include <engine/engine_other.h>
+#include <engine/public/other.h>
+#include <engine/public/external/resmanager.h>
 
 #include "game/assets_load.h"
 #include "game/assets.h"

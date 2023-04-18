@@ -1,7 +1,7 @@
 #pragma once
 
-#include <engine/engine_application.h>
-#include <engine/engine_other.h>
+#include <engine/public/application_base.h>
+#include <engine/public/other.h>
 
 #include "other/options.h"
 

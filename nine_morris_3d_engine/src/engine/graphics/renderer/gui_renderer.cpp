@@ -2,9 +2,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.h>
 
-#include "engine/application/application.h"
-#include "engine/application/events.h"
-#include "engine/application/capabilities.h"
+#include "engine/application_base/application.h"
+#include "engine/application_base/events.h"
+#include "engine/application_base/capabilities.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"

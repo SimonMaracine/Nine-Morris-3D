@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/engine_application.h>  // TODO replace with ligther header
+#include <engine/public/application_base.h>  // TODO replace with lighter header
 
 #include "game/game_position.h"
 #include "other/constants.h"

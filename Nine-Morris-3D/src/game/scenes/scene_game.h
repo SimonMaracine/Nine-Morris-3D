@@ -1,9 +1,9 @@
 #pragma once
 
-#include <engine/engine_application.h>
-#include <engine/engine_graphics.h>
-#include <engine/engine_other.h>
-#include <engine/engine_scene.h>
+#include <engine/public/application_base.h>
+#include <engine/public/graphics.h>
+#include <engine/public/other.h>
+#include <engine/public/scene.h>
 
 #include "game/minimax/minimax_thread.h"
 #include "game/minimax/common.h"

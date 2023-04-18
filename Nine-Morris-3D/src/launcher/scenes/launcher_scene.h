@@ -1,7 +1,7 @@
 #pragma once
 
-#include <engine/engine_application.h>
-#include <engine/engine_graphics.h>
+#include <engine/public/application_base.h>
+#include <engine/public/graphics.h>
 
 #include "other/display_manager.h"
 #include "other/data.h"

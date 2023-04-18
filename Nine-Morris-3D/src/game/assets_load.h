@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/engine_other.h>
+#include <engine/public/other.h>
 
 namespace assets_load {
     struct AllStartLoader : ConcurrentLoader<AllStartLoader, bool, int, bool, int> {

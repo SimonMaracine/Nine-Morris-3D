@@ -1,7 +1,7 @@
 #include <glad/glad.h>  // Include glad just to make everything compile
 #include <GLFW/glfw3.h>
 
-#include "engine/application/input.h"
+#include "engine/application_base/input.h"
 
 struct GLFWwindow;
 

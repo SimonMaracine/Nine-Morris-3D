@@ -1,4 +1,5 @@
-#include <engine/engine_graphics.h>
+#include <engine/public/graphics.h>
+#include <engine/public/external/resmanager.h>
 
 #include "game/post_processing/combine.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/engine_graphics.h>
+#include <engine/public/graphics.h>
 
 class Combine : public PostProcessingStep {
 public:

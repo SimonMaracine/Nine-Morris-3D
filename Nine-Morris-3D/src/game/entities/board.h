@@ -1,7 +1,7 @@
 #pragma once
 
-#include <engine/engine_application.h>
-#include <engine/engine_scene.h>
+#include <engine/public/application_base.h>
+#include <engine/public/scene.h>
 
 #include "game/entities/piece.h"
 #include "game/entities/node.h"

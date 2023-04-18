@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/application/platform.h"
+#include "engine/application_base/platform.h"
 
 /**
  * Define a pseudo main function with this declaration:

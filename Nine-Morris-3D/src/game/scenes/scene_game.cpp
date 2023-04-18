@@ -1,8 +1,10 @@
-#include <engine/engine_application.h>
-#include <engine/engine_audio.h>
-#include <engine/engine_graphics.h>
-#include <engine/engine_other.h>
-#include <engine/engine_scene.h>
+#include <engine/public/application_base.h>
+#include <engine/public/audio.h>
+#include <engine/public/graphics.h>
+#include <engine/public/other.h>
+#include <engine/public/scene.h>
+#include <engine/public/external/resmanager.h>
+#include <engine/public/external/imgui.h>
 
 #include "game/entities/boards/standard_board.h"
 #include "game/entities/boards/jump_board.h"

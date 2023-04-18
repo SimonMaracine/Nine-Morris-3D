@@ -1,6 +1,6 @@
 #include <cppblowfish/cppblowfish.h>
 
-#include "engine/application/panic.h"
+#include "engine/application_base/panic.h"
 #include "engine/other/encrypt.h"
 #include "engine/other/logging.h"
 

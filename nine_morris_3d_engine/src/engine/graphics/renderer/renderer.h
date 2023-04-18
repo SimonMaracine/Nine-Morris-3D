@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "engine/application/platform.h"
-#include "engine/application/events.h"
+#include "engine/application_base/platform.h"
+#include "engine/application_base/events.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/shader.h"

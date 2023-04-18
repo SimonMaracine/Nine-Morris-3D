@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "engine/application/platform.h"
+#include "engine/application_base/platform.h"
 
 /**
  * Use LOG_ macros for messages to be printed only in debug mode.

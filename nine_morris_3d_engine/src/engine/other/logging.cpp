@@ -2,7 +2,7 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "engine/application/platform.h"
+#include "engine/application_base/platform.h"
 #include "engine/audio/openal/info_and_debug.h"
 #include "engine/graphics/opengl/info_and_debug.h"
 #include "engine/other/logging.h"

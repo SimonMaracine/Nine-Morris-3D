@@ -3,16 +3,16 @@
 #include <stb_image.h>
 #include <resmanager/resmanager.h>
 
-#include "engine/application/window.h"
-#include "engine/application/application.h"
-#include "engine/application/application_properties.h"
-#include "engine/application/events.h"
-#include "engine/application/platform.h"
-#include "engine/application/input.h"
+#include "engine/application_base/window.h"
+#include "engine/application_base/application.h"
+#include "engine/application_base/application_properties.h"
+#include "engine/application_base/events.h"
+#include "engine/application_base/platform.h"
+#include "engine/application_base/input.h"
 #include "engine/dear_imgui/imgui_context.h"
 #include "engine/graphics/texture_data.h"
 #include "engine/other/logging.h"
-#include "engine/application/panic.h"
+#include "engine/application_base/panic.h"
 
 #define APPLICATION_DATA(VARIABLE) \
     const ApplicationProperties* VARIABLE = ( \

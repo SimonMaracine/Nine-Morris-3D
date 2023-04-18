@@ -3,7 +3,7 @@
 #include "engine/audio/openal/buffer.h"
 #include "engine/audio/openal/info_and_debug.h"
 #include "engine/other/logging.h"
-#include "engine/application/panic.h"
+#include "engine/application_base/panic.h"
 
 static ALenum get_format(int channels, size_t bps) {
     ALenum format = 0;

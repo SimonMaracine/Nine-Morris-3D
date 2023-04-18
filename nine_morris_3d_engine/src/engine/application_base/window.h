@@ -2,7 +2,7 @@
 
 #include <resmanager/resmanager.h>
 
-#include "engine/application/platform.h"
+#include "engine/application_base/platform.h"
 #include "engine/graphics/texture_data.h"
 
 struct GLFWwindow;

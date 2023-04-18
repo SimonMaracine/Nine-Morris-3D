@@ -1,4 +1,4 @@
-#include <engine/engine_other.h>
+#include <engine/public/other.h>
 
 #include "game/timer.h"
 
