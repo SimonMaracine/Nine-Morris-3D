@@ -57,9 +57,9 @@ public:
     Monitor(Monitor&&) noexcept = default;
     Monitor& operator=(Monitor&&) noexcept = default;
 
-    std::pair<int, int> get_resolution();
-    std::pair<float, float> get_content_scale();
-    const char* get_name();
+    std::pair<int, int> get_resolution() const;
+    std::pair<float, float> get_content_scale() const;
+    const char* get_name() const;
 private:
     GLFWmonitor* monitor = nullptr;
 

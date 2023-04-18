@@ -3,12 +3,12 @@
 #include <cppblowfish/cppblowfish.h>
 
 #include "engine/application_base/platform.h"
+#include "engine/application_base/panic.h"
 #include "engine/graphics/opengl/shader.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
-#include "engine/application_base/panic.h"
 
 #define CASE(_enum, count, type) case _enum: size = (count) * sizeof(type); break;
 

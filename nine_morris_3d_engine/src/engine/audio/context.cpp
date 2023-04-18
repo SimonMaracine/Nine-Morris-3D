@@ -1,9 +1,9 @@
 #include <AL/alc.h>
 
+#include "engine/application_base/panic.h"
 #include "engine/audio/context.h"
 #include "engine/audio/openal/listener.h"
 #include "engine/other/logging.h"
-#include "engine/application_base/panic.h"
 
 static ALCdevice* _global_device = nullptr;
 static ALCcontext* _global_context = nullptr;

@@ -2,10 +2,10 @@
 
 #include "engine/application_base/platform.h"
 #include "engine/application_base/capabilities.h"
+#include "engine/application_base/panic.h"
 #include "engine/graphics/opengl/info_and_debug.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
-#include "engine/application_base/panic.h"
 
 static const GLenum parameters[] = {
     GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,

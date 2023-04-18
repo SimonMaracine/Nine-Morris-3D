@@ -3,7 +3,6 @@
 #include <engine/public/application_base.h>
 #include <engine/public/graphics.h>
 
-#include "other/display_manager.h"
 #include "other/data.h"
 
 struct LauncherScene : public Scene {
@@ -21,7 +20,10 @@ struct LauncherScene : public Scene {
     void page_display();
     void page_graphics();
 
+    void initialize_resolutions();
+    std::vector<const char*> get_available_resolutions();
+
     ImGuiWindowFlags window_flags = 0;
 
-    DisplayManager display_manager;
+    size_t resolutions_supported = 0;
 };

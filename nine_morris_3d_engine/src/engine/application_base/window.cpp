@@ -9,10 +9,10 @@
 #include "engine/application_base/events.h"
 #include "engine/application_base/platform.h"
 #include "engine/application_base/input.h"
+#include "engine/application_base/panic.h"
 #include "engine/dear_imgui/imgui_context.h"
 #include "engine/graphics/texture_data.h"
 #include "engine/other/logging.h"
-#include "engine/application_base/panic.h"
 
 #define APPLICATION_DATA(VARIABLE) \
     const ApplicationProperties* VARIABLE = ( \
@@ -341,20 +341,20 @@ void Window::install_callbacks() {
     });
 }
 
-std::pair<int, int> Monitor::get_resolution() {
+std::pair<int, int> Monitor::get_resolution() const {
     const GLFWvidmode* video_mode = glfwGetVideoMode(monitor);
 
     return std::make_pair(video_mode->width, video_mode->height);
 }
 
-std::pair<float, float> Monitor::get_content_scale() {
+std::pair<float, float> Monitor::get_content_scale() const {
     float xscale, yscale;
     glfwGetMonitorContentScale(monitor, &xscale, &yscale);
 
     return std::make_pair(xscale, yscale);
 }
 
-const char* Monitor::get_name() {
+const char* Monitor::get_name() const {
     const char* name = glfwGetMonitorName(monitor);
 
     if (name == nullptr) {

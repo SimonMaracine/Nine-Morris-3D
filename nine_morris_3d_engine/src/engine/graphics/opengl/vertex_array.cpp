@@ -1,11 +1,11 @@
 #include <glad/glad.h>
 
+#include "engine/application_base/panic.h"
 #include "engine/graphics/vertex_buffer_layout.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
-#include "engine/application_base/panic.h"
 
 namespace gl {
     VertexArray::VertexArray() {

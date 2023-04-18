@@ -4,10 +4,10 @@
 #include <glm/glm.hpp>
 #include <cppblowfish/cppblowfish.h>
 
+#include "engine/application_base/panic.h"
 #include "engine/other/mesh.h"
 #include "engine/other/logging.h"
 #include "engine/other/encrypt.h"
-#include "engine/application_base/panic.h"
 
 struct PTN {
     glm::vec3 position = glm::vec3(0.0f);

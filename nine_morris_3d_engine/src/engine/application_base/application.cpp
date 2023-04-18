@@ -5,6 +5,7 @@
 #include "engine/application_base/events.h"
 #include "engine/application_base/input.h"
 #include "engine/application_base/application_builder.h"
+#include "engine/application_base/panic.h"
 #include "engine/audio/context.h"
 #include "engine/audio/music.h"
 #include "engine/graphics/renderer/renderer.h"
@@ -17,7 +18,6 @@
 #include "engine/other/encrypt.h"
 #include "engine/other/file_system.h"
 #include "engine/other/random_gen.h"
-#include "engine/application_base/panic.h"
 #include "engine/scene/scene.h"
 
 void Application::preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file) {

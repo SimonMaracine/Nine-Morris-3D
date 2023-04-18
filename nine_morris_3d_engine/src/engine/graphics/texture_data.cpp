@@ -1,11 +1,11 @@
 #include <stb_image.h>
 #include <cppblowfish/cppblowfish.h>
 
+#include "engine/application_base/panic.h"
 #include "engine/graphics/texture_data.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
-#include "engine/application_base/panic.h"
 
 TextureData::TextureData(std::string_view file_path, bool flip)
     : file_path(file_path) {

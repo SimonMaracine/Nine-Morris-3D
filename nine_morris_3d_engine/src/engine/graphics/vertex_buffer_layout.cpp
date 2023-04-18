@@ -1,8 +1,8 @@
 #include <glad/glad.h>
 
+#include "engine/application_base/panic.h"
 #include "engine/graphics/vertex_buffer_layout.h"
 #include "engine/other/logging.h"
-#include "engine/application_base/panic.h"
 
 size_t VertexBufferLayout::VertexElement::get_size(Type type) {
     switch (type) {

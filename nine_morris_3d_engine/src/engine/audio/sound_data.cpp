@@ -1,11 +1,11 @@
 #include <stb_vorbis.h>
 #include <cppblowfish/cppblowfish.h>
 
+#include "engine/application_base/panic.h"
 #include "engine/audio/sound_data.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 #include "engine/other/encrypt.h"
-#include "engine/application_base/panic.h"
 
 static void check_bits_per_sample(size_t bits_per_sample, std::string_view file_path) {
     if (bits_per_sample == 8) {

@@ -6,12 +6,15 @@
 #include "launcher/launcher_options.h"
 #include "other/options.h"
 #include "other/data.h"
-#include "other/display_manager.h"
 #include "other/constants.h"
 #include "other/options_gracefully.h"
 
 static const char* SPLASH_SCREEN = ENCR("data/textures/splash_screen/launcher/launcher_splash_screen.png");
 static const char* OPEN_SANS = "data/fonts/OpenSans/OpenSans-Semibold.ttf";
+
+static const char* RESOLUTIONS[] = {
+    "512x288", "768x432", "1024x576", "1280x720", "1536x864", "1792x1008"  // TODO this is a mess
+};
 
 // There seems to be no better way
 
@@ -253,8 +256,8 @@ void LauncherScene::on_start() {
         launcher_options::LAUNCHER_OPTIONS_FILE, data.launcher_options, launcher_options::validate_load
     );
 
-    // Initialize display manager for getting screen resolutions
-    display_manager = DisplayManager {ctx};
+    // Calculate available screen resolutions
+    initialize_resolutions();
 }
 
 void LauncherScene::on_stop() {
@@ -384,7 +387,7 @@ void LauncherScene::page_display() {
         ImGui::SameLine(); help_marker("Window will have the monitor's resolution instead of the resolution below");
 
         static size_t resolution_index = map_resolution_to_index(data.launcher_options.resolution);
-        combo("Resolution", "##Resolution", resolution_index, display_manager.get_resolutions(), [&data](size_t i) {
+        combo("Resolution", "##Resolution", resolution_index, get_available_resolutions(), [&data](size_t i) {
             data.launcher_options.resolution = map_index_to_resolution(i);
         });
 
@@ -435,4 +438,38 @@ void LauncherScene::page_graphics() {
         ImGui::PopItemWidth();
         ImGui::EndTabItem();
     }
+}
+
+void LauncherScene::initialize_resolutions() {
+    const auto monitors = ctx->window->get_monitors();
+
+    const auto resolution = monitors[0].get_resolution();  // Primary monitor's resolution
+    const int width = resolution.first;
+
+    if (width < 512) {
+        LOG_DIST_CRITICAL("Monitor has unsupported resolution");
+        panic::panic();
+    } else if (width < 768) {
+        resolutions_supported = 1;
+    } else if (width < 1024) {
+        resolutions_supported = 2;
+    } else if (width < 1280) {
+        resolutions_supported = 3;
+    } else if (width < 1536) {
+        resolutions_supported = 4;
+    } else if (width < 1792) {
+        resolutions_supported = 5;
+    } else {
+        resolutions_supported = 6;
+    }
+}
+
+std::vector<const char*> LauncherScene::get_available_resolutions() {
+    std::vector<const char*> resolutions;
+
+    for (size_t i = 0; i < resolutions_supported; i++) {
+        resolutions.push_back(RESOLUTIONS[i]);
+    }
+
+    return resolutions;
 }

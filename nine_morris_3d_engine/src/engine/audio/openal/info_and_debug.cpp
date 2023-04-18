@@ -1,9 +1,9 @@
 #include <AL/al.h>
 
 #include "engine/application_base/platform.h"
+#include "engine/application_base/panic.h"
 #include "engine/audio/openal/info_and_debug.h"
 #include "engine/other/logging.h"
-#include "engine/application_base/panic.h"
 
 namespace al {
     void maybe_check_errors() {

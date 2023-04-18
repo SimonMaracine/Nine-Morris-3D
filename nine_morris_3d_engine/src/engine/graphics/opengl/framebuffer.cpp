@@ -1,9 +1,9 @@
 #include <glad/glad.h>
 
+#include "engine/application_base/panic.h"
 #include "engine/graphics/opengl/framebuffer.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
-#include "engine/application_base/panic.h"
 
 static const GLenum COLOR_ATTACHMENTS[4] = {
     GL_COLOR_ATTACHMENT0,
