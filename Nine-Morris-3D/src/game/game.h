@@ -3,6 +3,6 @@
 #include <engine/public/application_base.h>
 
 namespace game {
-    void start(Ctx* ctx);
-    void stop(Ctx* ctx);
+    void start(sm::Ctx* ctx);
+    void stop(sm::Ctx* ctx);
 }

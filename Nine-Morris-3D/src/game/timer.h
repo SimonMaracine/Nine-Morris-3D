@@ -1,13 +1,13 @@
 #pragma once
 
-#include <engine/public/application_base.h>
+#include <engine/public/application_base.h>  // TODO light header
 
 class Timer {
 public:
     Timer() = default;
-    Timer(Ctx* ctx)
+    Timer(sm::Ctx* ctx)
         : ctx(ctx) {}
-    Timer(Ctx* ctx, unsigned int time)
+    Timer(sm::Ctx* ctx, unsigned int time)
         : time(time), ctx(ctx) {}
     ~Timer() = default;
 
@@ -28,5 +28,5 @@ private:
     double last_time = 0.0;  // Last GLFW time (in seconds)
     bool running = false;
 
-    Ctx* ctx = nullptr;
+    sm::Ctx* ctx = nullptr;
 };

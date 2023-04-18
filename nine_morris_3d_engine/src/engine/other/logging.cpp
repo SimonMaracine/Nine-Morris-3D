@@ -24,88 +24,90 @@
     SPDLOG_CRITICAL
 */
 
-// These don't need to be reset explicitly
-// Should be cleaned up at exit()
-static std::shared_ptr<spdlog::logger> _global_logger;
-static std::string _info_file;
+namespace sm {
+    // These don't need to be reset explicitly
+    // Should be cleaned up at exit()
+    static std::shared_ptr<spdlog::logger> _global_logger;
+    static std::string _info_file;
 
 #ifdef NM3D_PLATFORM_DISTRIBUTION
-static void set_fallback_logger_release(const char* error_message) {
-    _global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
-    _global_logger->set_pattern(LOG_PATTERN_RELEASE);
-    _global_logger->set_level(spdlog::level::trace);
-
-    _global_logger->error("Using Fallback Logger (Console): {}", error_message);
-}
-#endif
-
-namespace logging {
-    void initialize_for_applications(std::string_view log_file, std::string_view info_file) {
-        _info_file = info_file;
-
-#ifdef NM3D_PLATFORM_DISTRIBUTION
-        const std::string file_path = file_system::path_for_logs(log_file);
-
-        try {
-            _global_logger = spdlog::rotating_logger_mt(
-                "Release Logger [File]", file_path, FILE_SIZE, ROTATING_FILES
-            );
-        } catch (const spdlog::spdlog_ex& e) {
-            set_fallback_logger_release(e.what());
-            return;
-        }
-
+    static void set_fallback_logger_release(const char* error_message) {
+        _global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
         _global_logger->set_pattern(LOG_PATTERN_RELEASE);
         _global_logger->set_level(spdlog::level::trace);
-        _global_logger->flush_on(spdlog::level::info);
-#else
-        _global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
-        _global_logger->set_pattern(LOG_PATTERN_DEBUG);
-        _global_logger->set_level(spdlog::level::trace);
 
-        static_cast<void>(log_file);
-#endif
+        _global_logger->error("Using Fallback Logger (Console): {}", error_message);
     }
+#endif
 
-    void log_general_information(LogTarget target) {
-        std::string contents;
-        contents.reserve(1024 + 64 + 512);
+    namespace logging {
+        void initialize_for_applications(std::string_view log_file, std::string_view info_file) {
+            _info_file = info_file;
 
-        contents += gl::get_info();
-        contents += al::get_info();
-        contents += dependencies::get_info();
+#ifdef NM3D_PLATFORM_DISTRIBUTION
+            const std::string file_path = file_system::path_for_logs(log_file);
 
-        switch (target) {
-            case LogTarget::File: {
-                const std::string file_path = file_system::path_for_logs(_info_file);
+            try {
+                _global_logger = spdlog::rotating_logger_mt(
+                    "Release Logger [File]", file_path, FILE_SIZE, ROTATING_FILES
+                );
+            } catch (const spdlog::spdlog_ex& e) {
+                set_fallback_logger_release(e.what());
+                return;
+            }
 
-                std::ofstream file {file_path, std::ios::trunc};
+            _global_logger->set_pattern(LOG_PATTERN_RELEASE);
+            _global_logger->set_level(spdlog::level::trace);
+            _global_logger->flush_on(spdlog::level::info);
+#else
+            _global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
+            _global_logger->set_pattern(LOG_PATTERN_DEBUG);
+            _global_logger->set_level(spdlog::level::trace);
 
-                if (!file.is_open()) {
-                    LOG_DIST_ERROR("Could not open file `{}` for writing", file_path);
+            static_cast<void>(log_file);
+#endif
+        }
+
+        void log_general_information(LogTarget target) {
+            std::string contents;
+            contents.reserve(1024 + 64 + 512);
+
+            contents += gl::get_info();
+            contents += al::get_info();
+            contents += dependencies::get_info();
+
+            switch (target) {
+                case LogTarget::File: {
+                    const std::string file_path = file_system::path_for_logs(_info_file);
+
+                    std::ofstream file {file_path, std::ios::trunc};
+
+                    if (!file.is_open()) {
+                        LOG_DIST_ERROR("Could not open file `{}` for writing", file_path);
+                        break;
+                    }
+
+                    file << contents;
+
                     break;
                 }
+                case LogTarget::Console:
+                    LOG_DIST_INFO("{}", contents);
 
-                file << contents;
+                    break;
+                case LogTarget::None:
+                    // Do nothing
 
-                break;
+                    break;
             }
-            case LogTarget::Console:
-                LOG_DIST_INFO("{}", contents);
-
-                break;
-            case LogTarget::None:
-                // Do nothing
-
-                break;
         }
-    }
 
-    spdlog::logger* get_global_logger() {
-        return _global_logger.get();
-    }
+        spdlog::logger* get_global_logger() {
+            return _global_logger.get();
+        }
 
-    std::string_view get_info_file() {
-        return _info_file;
+        std::string_view get_info_file() {
+            return _info_file;
+        }
     }
 }

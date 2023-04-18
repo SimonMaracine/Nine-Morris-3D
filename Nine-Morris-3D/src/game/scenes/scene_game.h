@@ -15,7 +15,7 @@
 #include "game/game_context.h"
 #include "game/timer.h"
 
-class SceneGame : public Scene {
+class SceneGame : public sm::Scene {
 public:
     SceneGame(const std::string& name)
         : Scene(name) {}
@@ -54,8 +54,8 @@ public:
     void setup_computer_thinking_indicator();
     void setup_light_bulb();
 
-    void initialize_piece(size_t index, std::shared_ptr<gl::Texture> diffuse_texture);
-    void initialize_piece_no_normal(size_t index, std::shared_ptr<gl::Texture> diffuse_texture);
+    void initialize_piece(size_t index, std::shared_ptr<sm::gl::Texture> diffuse_texture);
+    void initialize_piece_no_normal(size_t index, std::shared_ptr<sm::gl::Texture> diffuse_texture);
 
     void release_piece_material_instances();
     void change_skybox();
@@ -79,7 +79,7 @@ public:
     std::unique_ptr<assets_load::BoardPaintTextureLoader> board_paint_texture_loader;
 
     // Game-related
-    Camera camera;
+    sm::Camera camera;
     PointCameraController camera_controller {&camera, ctx};
     KeyboardControls keyboard;
     GameContext game;
@@ -120,7 +120,7 @@ public:
 
     void imgui_draw_game_over_message(std::string_view message1, std::string_view message2);
     void imgui_draw_window(const char* title, const std::function<void()>& contents,
-        const std::function<void()>& ok_callback = dummy::ProcFunc {});
+        const std::function<void()>& ok_callback = sm::dummy::ProcFunc {});
     void imgui_initialize_options();
 
     std::string last_save_game_date = save_load::NO_LAST_GAME;

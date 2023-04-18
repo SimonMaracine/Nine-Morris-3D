@@ -3,93 +3,95 @@
 #include "engine/scene/scene_list.h"
 #include "engine/scene/renderables.h"
 
-void SceneList::add(renderables::Model* model) {
-    const auto iter = std::find(models.cbegin(), models.cend(), model);
+namespace sm {
+    void SceneList::add(renderables::Model* model) {
+        const auto iter = std::find(models.cbegin(), models.cend(), model);
 
-    if (iter != models.cend()) {
-        LOG_WARNING("Model already present in list");
-        return;
+        if (iter != models.cend()) {
+            LOG_WARNING("Model already present in list");
+            return;
+        }
+
+        models.push_back(model);
     }
 
-    models.push_back(model);
-}
+    void SceneList::remove(renderables::Model* model) {
+        const auto iter = std::find(models.cbegin(), models.cend(), model);
 
-void SceneList::remove(renderables::Model* model) {
-    const auto iter = std::find(models.cbegin(), models.cend(), model);
+        if (iter == models.cend()) {
+            return;
+        }
 
-    if (iter == models.cend()) {
-        return;
+        models.erase(iter);
     }
 
-    models.erase(iter);
-}
+    void SceneList::add(renderables::Quad* quad) {
+        const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
 
-void SceneList::add(renderables::Quad* quad) {
-    const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
+        if (iter != quads.cend()) {
+            LOG_WARNING("Quad already present in list");
+            return;
+        }
 
-    if (iter != quads.cend()) {
-        LOG_WARNING("Quad already present in list");
-        return;
+        quads.push_back(quad);
     }
 
-    quads.push_back(quad);
-}
+    void SceneList::remove(renderables::Quad* quad) {
+        const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
 
-void SceneList::remove(renderables::Quad* quad) {
-    const auto iter = std::find(quads.cbegin(), quads.cend(), quad);
+        if (iter == quads.cend()) {
+            return;
+        }
 
-    if (iter == quads.cend()) {
-        return;
+        quads.erase(iter);
     }
 
-    quads.erase(iter);
-}
+    void SceneList::add(gui::Image* image) {
+        const auto iter = std::find(images.cbegin(), images.cend(), image);
 
-void SceneList::add(gui::Image* image) {
-    const auto iter = std::find(images.cbegin(), images.cend(), image);
+        if (iter != images.cend()) {
+            LOG_WARNING("Widget already present");
+            return;
+        }
 
-    if (iter != images.cend()) {
-        LOG_WARNING("Widget already present");
-        return;
+        images.push_back(image);
     }
 
-    images.push_back(image);
-}
+    void SceneList::remove(gui::Image* image) {
+        const auto iter = std::find(images.cbegin(), images.cend(), image);
 
-void SceneList::remove(gui::Image* image) {
-    const auto iter = std::find(images.cbegin(), images.cend(), image);
+        if (iter == images.cend()) {
+            return;
+        }
 
-    if (iter == images.cend()) {
-        return;
+        images.erase(iter);
     }
 
-    images.erase(iter);
-}
+    void SceneList::add(gui::Text* text) {
+        const auto iter = std::find(texts.cbegin(), texts.cend(), text);
 
-void SceneList::add(gui::Text* text) {
-    const auto iter = std::find(texts.cbegin(), texts.cend(), text);
+        if (iter != texts.cend()) {
+            LOG_WARNING("Widget already present");
+            return;
+        }
 
-    if (iter != texts.cend()) {
-        LOG_WARNING("Widget already present");
-        return;
+        texts.push_back(text);
     }
 
-    texts.push_back(text);
-}
+    void SceneList::remove(gui::Text* text) {
+        const auto iter = std::find(texts.cbegin(), texts.cend(), text);
 
-void SceneList::remove(gui::Text* text) {
-    const auto iter = std::find(texts.cbegin(), texts.cend(), text);
+        if (iter == texts.cend()) {
+            return;
+        }
 
-    if (iter == texts.cend()) {
-        return;
+        texts.erase(iter);
     }
 
-    texts.erase(iter);
-}
-
-void SceneList::clear() {
-    models.clear();
-    quads.clear();
-    images.clear();
-    texts.clear();
+    void SceneList::clear() {
+        models.clear();
+        quads.clear();
+        images.clear();
+        texts.clear();
+    }
 }

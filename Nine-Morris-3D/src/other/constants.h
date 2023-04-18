@@ -45,42 +45,42 @@ inline constexpr size_t MILLS_TWELVE_MENS_MORRIS[TWELVE_MENS_MORRIS_MILLS_COUNT]
     { 0, 3, 6 }, { 2, 5, 8 }, { 15, 18, 21 }, { 17, 20, 23 }
 };
 
-inline constexpr DirectionalLight LIGHT_FIELD = {
+inline constexpr sm::DirectionalLight LIGHT_FIELD = {
     glm::vec3(5.7f, 8.4f, 12.4f),
     glm::vec3(0.4f),
     glm::vec3(0.88f),
     glm::vec3(0.9f)
 };
 
-inline constexpr Renderer::LightSpace SHADOWS_FIELD = {
+inline constexpr sm::Renderer::LightSpace SHADOWS_FIELD = {
     -4.7f, 4.7f,
     -1.9f, 2.76f,
     1.0f, 9.0f,
     3.1f
 };
 
-inline constexpr DirectionalLight LIGHT_AUTUMN = {
+inline constexpr sm::DirectionalLight LIGHT_AUTUMN = {
     glm::vec3(-4.4f, 11.0f, 6.4f),
     glm::vec3(0.32f),
     glm::vec3(0.82f),
     glm::vec3(0.82f)
 };
 
-inline constexpr Renderer::LightSpace SHADOWS_AUTUMN = {
+inline constexpr sm::Renderer::LightSpace SHADOWS_AUTUMN = {
     -4.66f, 4.66f,
     -3.24f, 4.29f,
     1.0f, 9.0f,
     3.1f
 };
 
-inline constexpr DirectionalLight LIGHT_NONE = {  // TODO right now they are the same as field; change this
+inline constexpr sm::DirectionalLight LIGHT_NONE = {  // TODO right now they are the same as field; change this
     glm::vec3(5.7f, 8.4f, 12.4f),
     glm::vec3(0.4f),
     glm::vec3(0.88f),
     glm::vec3(0.9f)
 };
 
-inline constexpr Renderer::LightSpace SHADOWS_NONE = {
+inline constexpr sm::Renderer::LightSpace SHADOWS_NONE = {
     -4.7f, 4.7f,
     -1.9f, 2.76f,
     1.0f, 9.0f,

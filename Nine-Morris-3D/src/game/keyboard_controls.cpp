@@ -15,7 +15,7 @@ static constexpr KeyboardControls::Direction NEXT[4][4] = {
     { KeyboardControls::Direction::Right, KeyboardControls::Direction::Up, KeyboardControls::Direction::Left, KeyboardControls::Direction::Down }
 };
 
-KeyboardControls::KeyboardControls(Ctx* ctx, Board* board, renderables::Quad* quad)
+KeyboardControls::KeyboardControls(sm::Ctx* ctx, Board* board, sm::renderables::Quad* quad)
     : board(board), quad(quad) {
 
     for (size_t i = 0; i < 24; i++) {
@@ -91,7 +91,7 @@ void KeyboardControls::move(Direction direction) {
 
 Board::Flags KeyboardControls::click_and_release() {
     const Node& node = board->nodes[current_node->index];
-    const Identifier::Id hovered_id = (
+    const sm::Identifier::Id hovered_id = (
         node.piece_index == NULL_INDEX
             ?
             node.model->bounding_box->id

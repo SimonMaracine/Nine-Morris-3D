@@ -34,7 +34,7 @@ static const std::vector<std::string> AUTHORS = {
 };
 
 void application_main() {
-    Application::preinitialize(APP_NAME, LOG_FILE, INFO_FILE);
+    sm::Application::preinitialize(APP_NAME, LOG_FILE, INFO_FILE);
 
     while (true) {
         int exit_code {};
@@ -42,7 +42,7 @@ void application_main() {
         Data* global_data = new Data;
 
         {
-            auto launcher_builder = ApplicationBuilder {}
+            auto launcher_builder = sm::ApplicationBuilder {}
                 .display(640, 480, "Nine Morris 3D Launcher")
                 .display_flags(false, false, false)
                 .application_name(APP_NAME)
@@ -50,9 +50,9 @@ void application_main() {
                 .authors(AUTHORS)
                 .encrypt_key(KEY)
                 .with_dear_imgui()
-                .with_renderer(ApplicationBuilder::Renderer2D);
+                .with_renderer(sm::ApplicationBuilder::Renderer2D);
 
-            auto launcher = Application {launcher_builder, global_data};
+            auto launcher = sm::Application {launcher_builder, global_data};
             launcher.set_start_function(launcher::start);
             launcher.add_scene<LauncherScene>();
             exit_code = launcher.run("launcher"_H);
@@ -65,7 +65,7 @@ void application_main() {
         {
             const auto& options = global_data->launcher_options;
 
-            auto game_builder = ApplicationBuilder {}
+            auto game_builder = sm::ApplicationBuilder {}
                 .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
                 .display_flags(options.fullscreen, options.native_resolution, true)
                 .display_min_resolution(512, 288)
@@ -73,13 +73,13 @@ void application_main() {
                 .version(MAJOR, MINOR, PATCH)
                 .authors(AUTHORS)
                 .encrypt_key(KEY)
-                .with_renderer(ApplicationBuilder::Renderer3D)
-                .with_renderer(ApplicationBuilder::Renderer2D)
+                .with_renderer(sm::ApplicationBuilder::Renderer3D)
+                .with_renderer(sm::ApplicationBuilder::Renderer2D)
                 .with_dear_imgui()
                 .with_audio()
                 .with_random_generator();
 
-            auto game = Application {game_builder, global_data};
+            auto game = sm::Application {game_builder, global_data};
             game.set_start_function(game::start);
             game.set_stop_function(game::stop);
             game.add_scene<LoadingScene>();

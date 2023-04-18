@@ -29,7 +29,7 @@ GamePosition Board::get_position() {
     return position;
 }
 
-void Board::update_nodes(Identifier::Id hovered_id) {
+void Board::update_nodes(sm::Identifier::Id hovered_id) {
     for (Node& node : nodes) {
         const bool hovered = node.model->bounding_box->id == hovered_id;
         const bool highlight = (
@@ -45,7 +45,7 @@ void Board::update_nodes(Identifier::Id hovered_id) {
     }
 }
 
-void Board::update_pieces(Identifier::Id hovered_id) {
+void Board::update_pieces(sm::Identifier::Id hovered_id) {
     for (auto& [_, piece] : pieces) {
         const bool hovered = piece.model->bounding_box->id == hovered_id;
 

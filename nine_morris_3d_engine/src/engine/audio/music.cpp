@@ -6,118 +6,120 @@
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 
-// Pointer is reset when music is stopped
-// Both are reset at the coresponding function call
-static std::shared_ptr<music::MusicTrack> _current_music_track = nullptr;
-static float _current_gain = 1.0f;
+namespace sm {
+    // Pointer is reset when music is stopped
+    // Both are reset at the coresponding function call
+    static std::shared_ptr<music::MusicTrack> _current_music_track = nullptr;
+    static float _current_gain = 1.0f;
 
-namespace music {
-    MusicTrack::MusicTrack(std::string_view file_path) {
-        const auto data = std::make_shared<SoundData>(file_path);
+    namespace music {
+        MusicTrack::MusicTrack(std::string_view file_path) {
+            const auto data = std::make_shared<SoundData>(file_path);
 
-        setup(data);
+            setup(data);
 
-        name = file_path;
+            name = file_path;
 
-        LOG_DEBUG("Loaded music track `{}`", name);
-    }
-
-    MusicTrack::MusicTrack(Encrypt::EncryptedFile file_path) {
-        const auto data = std::make_shared<SoundData>(file_path);
-
-        setup(data);
-
-        name = file_path;
-
-        LOG_DEBUG("Loaded music track `{}`", name);
-    }
-
-    MusicTrack::MusicTrack(std::shared_ptr<SoundData> data) {
-        setup(data);
-
-        name = data->get_file_path();
-
-        LOG_DEBUG("Loaded music track `{}`", name);
-    }
-
-    MusicTrack::~MusicTrack() {
-        LOG_DEBUG("Unloaded music track `{}`", name);
-    }
-
-    void MusicTrack::setup(std::shared_ptr<SoundData> data) {
-        source = std::make_shared<al::Source>();
-        buffer = std::make_shared<al::Buffer>(data);
-
-        source->set_rolloff_factor(0.0f);
-        source->set_looping(true);
-
-        if (data->get_channels() != 2) {
-            LOG_WARNING("Music track is not stereo");
-        }
-    }
-
-    void uninitialize() {
-        stop_music_track();
-        _current_gain = 1.0f;
-
-        LOG_INFO("Uninitialized music");
-    }
-
-    void play_music_track(std::shared_ptr<MusicTrack> music_track) {
-        _current_music_track = music_track;
-
-        _current_music_track->source->set_gain(_current_gain);  // Set the gain for this potentially new music track
-        _current_music_track->source->play(_current_music_track->buffer.get());
-
-        LOG_DEBUG("Started playing music track `{}`", _current_music_track->name);
-    }
-
-    void stop_music_track() {
-        if (_current_music_track == nullptr) {
-            LOG_WARNING("No music track pointer");
-            return;
+            LOG_DEBUG("Loaded music track `{}`", name);
         }
 
-        _current_music_track->source->stop();
+        MusicTrack::MusicTrack(Encrypt::EncryptedFile file_path) {
+            const auto data = std::make_shared<SoundData>(file_path);
 
-        LOG_DEBUG("Stopped playing music track `{}`", _current_music_track->name);
+            setup(data);
 
-        _current_music_track = nullptr;
-    }
+            name = file_path;
 
-    void pause_music_track() {
-        if (_current_music_track == nullptr) {
-            LOG_WARNING("No music track pointer");
-            return;
+            LOG_DEBUG("Loaded music track `{}`", name);
         }
 
-        _current_music_track->source->pause();
+        MusicTrack::MusicTrack(std::shared_ptr<SoundData> data) {
+            setup(data);
 
-        LOG_DEBUG("Paused playing music track `{}`", _current_music_track->name);
-    }
+            name = data->get_file_path();
 
-    void continue_music_track() {
-        if (_current_music_track == nullptr) {
-            LOG_WARNING("No music track pointer");
-            return;
+            LOG_DEBUG("Loaded music track `{}`", name);
         }
 
-        _current_music_track->source->continue_();
-
-        LOG_DEBUG("Continued playing music track `{}`", _current_music_track->name);
-    }
-
-    void set_music_gain(float gain) {
-        ASSERT(gain >= 0.0f, "Gain must be positive");
-
-        if (gain > 1.0f) {
-            LOG_WARNING("Gain is larger than 1.0");
+        MusicTrack::~MusicTrack() {
+            LOG_DEBUG("Unloaded music track `{}`", name);
         }
 
-        _current_gain = gain;
+        void MusicTrack::setup(std::shared_ptr<SoundData> data) {
+            source = std::make_shared<al::Source>();
+            buffer = std::make_shared<al::Buffer>(data);
 
-        if (_current_music_track != nullptr) {
-            _current_music_track->source->set_gain(gain);
+            source->set_rolloff_factor(0.0f);
+            source->set_looping(true);
+
+            if (data->get_channels() != 2) {
+                LOG_WARNING("Music track is not stereo");
+            }
+        }
+
+        void uninitialize() {
+            stop_music_track();
+            _current_gain = 1.0f;
+
+            LOG_INFO("Uninitialized music");
+        }
+
+        void play_music_track(std::shared_ptr<MusicTrack> music_track) {
+            _current_music_track = music_track;
+
+            _current_music_track->source->set_gain(_current_gain);  // Set the gain for this potentially new music track
+            _current_music_track->source->play(_current_music_track->buffer.get());
+
+            LOG_DEBUG("Started playing music track `{}`", _current_music_track->name);
+        }
+
+        void stop_music_track() {
+            if (_current_music_track == nullptr) {
+                LOG_WARNING("No music track pointer");
+                return;
+            }
+
+            _current_music_track->source->stop();
+
+            LOG_DEBUG("Stopped playing music track `{}`", _current_music_track->name);
+
+            _current_music_track = nullptr;
+        }
+
+        void pause_music_track() {
+            if (_current_music_track == nullptr) {
+                LOG_WARNING("No music track pointer");
+                return;
+            }
+
+            _current_music_track->source->pause();
+
+            LOG_DEBUG("Paused playing music track `{}`", _current_music_track->name);
+        }
+
+        void continue_music_track() {
+            if (_current_music_track == nullptr) {
+                LOG_WARNING("No music track pointer");
+                return;
+            }
+
+            _current_music_track->source->continue_();
+
+            LOG_DEBUG("Continued playing music track `{}`", _current_music_track->name);
+        }
+
+        void set_music_gain(float gain) {
+            ASSERT(gain >= 0.0f, "Gain must be positive");
+
+            if (gain > 1.0f) {
+                LOG_WARNING("Gain is larger than 1.0");
+            }
+
+            _current_gain = gain;
+
+            if (_current_music_track != nullptr) {
+                _current_music_track->source->set_gain(gain);
+            }
         }
     }
 }

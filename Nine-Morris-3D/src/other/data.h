@@ -15,10 +15,10 @@ struct Data {
     ImFont* imgui_info_font = nullptr;
     ImFont* imgui_windows_font = nullptr;
 
-    std::unordered_map<size_t, Identifier::Id> node_ids;
-    std::unordered_map<size_t, Identifier::Id> piece_ids;
+    std::unordered_map<size_t, sm::Identifier::Id> node_ids;
+    std::unordered_map<size_t, sm::Identifier::Id> piece_ids;
 
-    std::shared_ptr<music::MusicTrack> current_music_track;
+    std::shared_ptr<sm::music::MusicTrack> current_music_track;
 
     // Some Dear ImGui widget options for radio buttons
     struct {

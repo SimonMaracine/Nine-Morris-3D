@@ -7,11 +7,11 @@ inline constexpr float LENS_FOV = 45.0f;
 inline constexpr float LENS_NEAR = 0.1f;
 inline constexpr float LENS_FAR = 90.0f;
 
-class PointCameraController : public CameraController {
+class PointCameraController : public sm::CameraController {
 public:
     PointCameraController() = default;
-    PointCameraController(Camera* camera, Ctx* ctx);
-    PointCameraController(Camera* camera, Ctx* ctx, int width, int height, float fov, float near, float far,
+    PointCameraController(sm::Camera* camera, sm::Ctx* ctx);
+    PointCameraController(sm::Camera* camera, sm::Ctx* ctx, int width, int height, float fov, float near, float far,
         const glm::vec3& point, float distance_to_point, float pitch, float sensitivity);
 
     virtual const glm::vec3& get_position() const override;
@@ -32,14 +32,14 @@ public:
     void set_position(const glm::vec3& position);
     void go_towards_position(const glm::vec3& position);
 
-    void connect_events(Ctx* ctx);
-    void disconnect_events(Ctx* ctx);
-    void discard_events(Ctx* ctx);
+    void connect_events(sm::Ctx* ctx);
+    void disconnect_events(sm::Ctx* ctx);
+    void discard_events(sm::Ctx* ctx);
 
     float sensitivity = 1.0f;  // Best from 0.5 to 2.0
 private:
-    void on_mouse_scrolled(const MouseScrolledEvent& event);
-    void on_mouse_moved(const MouseMovedEvent& event);
+    void on_mouse_scrolled(const sm::MouseScrolledEvent& event);
+    void on_mouse_moved(const sm::MouseMovedEvent& event);
 
     void go_towards_position_x(const glm::vec3& direction);
     void go_towards_position_y(const glm::vec3& direction);

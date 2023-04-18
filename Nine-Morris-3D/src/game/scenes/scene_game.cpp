@@ -22,8 +22,8 @@ void SceneGame::setup_and_add_model_board() {
     board.model->index_buffer = ctx->res.index_buffer["board_wood"_H];
     board.model->material = ctx->res.material_instance["board_wood"_H];
     board.model->cast_shadow = true;
-    board.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
-    board.model->bounding_box->id = Identifier::null;
+    board.model->bounding_box = std::make_optional<sm::renderables::Model::BoundingBox>();
+    board.model->bounding_box->id = sm::Identifier::null;
     board.model->bounding_box->size = BOARD_BOUNDING_BOX;
     board.model->bounding_box->sort = false;
 
@@ -61,7 +61,7 @@ void SceneGame::setup_and_add_model_piece(size_t index, const glm::vec3& positio
     piece.model->material = ctx->res.material_instance[hs("piece" + std::to_string(index))];
     piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
     piece.model->cast_shadow = true;
-    piece.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
+    piece.model->bounding_box = std::make_optional<sm::renderables::Model::BoundingBox>();
     piece.model->bounding_box->id = data.piece_ids[index];
     piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
 
@@ -89,7 +89,7 @@ void SceneGame::setup_and_add_model_node(size_t index, const glm::vec3& position
     node.model->vertex_array = ctx->res.vertex_array["node"_H];
     node.model->index_buffer = ctx->res.index_buffer["node"_H];
     node.model->material = ctx->res.material_instance[hs("node" + std::to_string(index))];
-    node.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
+    node.model->bounding_box = std::make_optional<sm::renderables::Model::BoundingBox>();
     node.model->bounding_box->id = data.node_ids[index];
     node.model->bounding_box->size = NODE_BOUNDING_BOX;
 
@@ -112,7 +112,7 @@ void SceneGame::setup_camera() {
     static constexpr float PITCH = 47.0f;
     static constexpr float DISTANCE_TO_POINT = 8.0f;
 
-    camera = Camera {};
+    camera = sm::Camera {};
 
     camera_controller = PointCameraController {
         &camera,
@@ -151,13 +151,13 @@ void SceneGame::setup_camera() {
 }
 
 void SceneGame::setup_and_add_turn_indicator() {
-    auto turn_indicator = objects.add<gui::Image>(
+    auto turn_indicator = objects.add<sm::gui::Image>(
         "turn_indicator"_H, ctx->res.texture["white_indicator"_H]
     );
 
-    turn_indicator->stick(gui::Sticky::SE);
-    turn_indicator->offset(30, gui::Relative::Right);
-    turn_indicator->offset(30, gui::Relative::Bottom);
+    turn_indicator->stick(sm::gui::Sticky::SE);
+    turn_indicator->offset(30, sm::gui::Relative::Right);
+    turn_indicator->offset(30, sm::gui::Relative::Bottom);
     turn_indicator->scale(0.4f, 1.0f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
 
     scene_list.add(turn_indicator);
@@ -166,7 +166,7 @@ void SceneGame::setup_and_add_turn_indicator() {
 void SceneGame::setup_and_add_timer_text() {
     auto& data = ctx->data<Data>();
 
-    auto timer_text = objects.add<gui::Text>(
+    auto timer_text = objects.add<sm::gui::Text>(
         "timer_text"_H,
         ctx->res.font["open_sans"_H],
         "00:00",
@@ -174,8 +174,8 @@ void SceneGame::setup_and_add_timer_text() {
         TIMER_TEXT_COLOR
     );
 
-    timer_text->stick(gui::Sticky::N);
-    timer_text->offset(60, gui::Relative::Top);
+    timer_text->stick(sm::gui::Sticky::N);
+    timer_text->offset(60, sm::gui::Relative::Top);
     timer_text->scale(0.6f, 1.4f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
     timer_text->set_shadows(true);
 
@@ -185,29 +185,29 @@ void SceneGame::setup_and_add_timer_text() {
 }
 
 void SceneGame::setup_wait_indicator() {
-    auto wait_indicator = objects.add<gui::Image>(
+    auto wait_indicator = objects.add<sm::gui::Image>(
         "wait_indicator"_H, ctx->res.texture["wait_indicator"_H]
     );
 
-    wait_indicator->stick(gui::Sticky::NE);
-    wait_indicator->offset(25, gui::Relative::Right);
-    wait_indicator->offset(55, gui::Relative::Top);
+    wait_indicator->stick(sm::gui::Sticky::NE);
+    wait_indicator->offset(25, sm::gui::Relative::Right);
+    wait_indicator->offset(55, sm::gui::Relative::Top);
     wait_indicator->scale(0.4f, 1.0f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
 }
 
 void SceneGame::setup_computer_thinking_indicator() {
-    auto computer_thinking_indicator = objects.add<gui::Image>(
+    auto computer_thinking_indicator = objects.add<sm::gui::Image>(
         "computer_thinking_indicator"_H, ctx->res.texture["computer_thinking_indicator"_H]
     );
 
-    computer_thinking_indicator->stick(gui::Sticky::NE);
-    computer_thinking_indicator->offset(25, gui::Relative::Right);
-    computer_thinking_indicator->offset(55, gui::Relative::Top);
+    computer_thinking_indicator->stick(sm::gui::Sticky::NE);
+    computer_thinking_indicator->offset(25, sm::gui::Relative::Right);
+    computer_thinking_indicator->offset(55, sm::gui::Relative::Top);
     computer_thinking_indicator->scale(0.4f, 1.0f, WIDGET_LOWEST_RESOLUTION, WIDGET_HIGHEST_RESOLUTION);
 }
 
 void SceneGame::setup_light_bulb() {
-    auto light_bulb = objects.add<renderables::Quad>("light_bulb"_H);
+    auto light_bulb = objects.add<sm::renderables::Quad>("light_bulb"_H);
 
     light_bulb->texture = ctx->res.texture["light_bulb"_H];
 
@@ -222,7 +222,7 @@ void SceneGame::setup_light_bulb() {
     }
 }
 
-void SceneGame::initialize_piece(size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
+void SceneGame::initialize_piece(size_t index, std::shared_ptr<sm::gl::Texture> diffuse_texture) {
     auto material_instance = ctx->res.material_instance.load(
         hs("piece" + std::to_string(index)),
         ctx->res.material["tinted_wood"_H]
@@ -235,7 +235,7 @@ void SceneGame::initialize_piece(size_t index, std::shared_ptr<gl::Texture> diff
     material_instance->set_vec3("u_material.tint"_H, DEFAULT_TINT);
 }
 
-void SceneGame::initialize_piece_no_normal(size_t index, std::shared_ptr<gl::Texture> diffuse_texture) {
+void SceneGame::initialize_piece_no_normal(size_t index, std::shared_ptr<sm::gl::Texture> diffuse_texture) {
     auto material_instance = ctx->res.material_instance.load(
         hs("piece" + std::to_string(index)),
         ctx->res.material["tinted_wood"_H]
@@ -256,7 +256,7 @@ void SceneGame::release_piece_material_instances() {
 void SceneGame::change_skybox() {
     auto& data = ctx->data<Data>();
 
-    const std::array<std::shared_ptr<TextureData>, 6> texture_data = {
+    const std::array<std::shared_ptr<sm::TextureData>, 6> texture_data = {
         ctx->res.texture_data["skybox_px"_H],
         ctx->res.texture_data["skybox_nx"_H],
         ctx->res.texture_data["skybox_py"_H],
@@ -287,8 +287,8 @@ void SceneGame::change_skybox() {
 void SceneGame::change_board_paint_texture() {
     auto& data = ctx->data<Data>();
 
-    gl::TextureSpecification specification;
-    specification.mag_filter = gl::Filter::Linear;
+    sm::gl::TextureSpecification specification;
+    specification.mag_filter = sm::gl::Filter::Linear;
     specification.mipmap_levels = 4;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -322,32 +322,32 @@ void SceneGame::update_cursor() {
         if (get_board().must_take_piece) {
             ctx->window->set_cursor("cross"_H);
 
-            objects.get<renderables::Quad>("keyboard_controls"_H)->texture = ctx->res.texture["keyboard_controls_cross"_H];
+            objects.get<sm::renderables::Quad>("keyboard_controls"_H)->texture = ctx->res.texture["keyboard_controls_cross"_H];
         } else {
             ctx->window->set_cursor("arrow"_H);
 
-            objects.get<renderables::Quad>("keyboard_controls"_H)->texture = ctx->res.texture["keyboard_controls_default"_H];
+            objects.get<sm::renderables::Quad>("keyboard_controls"_H)->texture = ctx->res.texture["keyboard_controls_default"_H];
         }
     }
 }
 
 void SceneGame::update_turn_indicator() {
     if (get_board().turn == BoardPlayer::White) {
-        objects.get<gui::Image>("turn_indicator"_H)->set_image(ctx->res.texture["white_indicator"_H]);
+        objects.get<sm::gui::Image>("turn_indicator"_H)->set_image(ctx->res.texture["white_indicator"_H]);
     } else {
-        objects.get<gui::Image>("turn_indicator"_H)->set_image(ctx->res.texture["black_indicator"_H]);
+        objects.get<sm::gui::Image>("turn_indicator"_H)->set_image(ctx->res.texture["black_indicator"_H]);
     }
 }
 
 void SceneGame::update_wait_indicator() {
     if (!get_board().next_move) {
         if (!show_wait_indicator) {
-            scene_list.add(objects.get<gui::Image>("wait_indicator"_H));
+            scene_list.add(objects.get<sm::gui::Image>("wait_indicator"_H));
             show_wait_indicator = true;
         }
     } else {
         if (show_wait_indicator) {
-            scene_list.remove(objects.get<gui::Image>("wait_indicator"_H));
+            scene_list.remove(objects.get<sm::gui::Image>("wait_indicator"_H));
             show_wait_indicator = false;
         }
     }
@@ -356,12 +356,12 @@ void SceneGame::update_wait_indicator() {
 void SceneGame::update_computer_thinking_indicator() {
     if (game.state == GameState::ComputerThinkingMove) {
         if (!show_computer_thinking_indicator) {
-            scene_list.add(objects.get<gui::Image>("computer_thinking_indicator"_H));
+            scene_list.add(objects.get<sm::gui::Image>("computer_thinking_indicator"_H));
             show_computer_thinking_indicator = true;
         }
     } else {
         if (show_computer_thinking_indicator) {
-            scene_list.remove(objects.get<gui::Image>("computer_thinking_indicator"_H));
+            scene_list.remove(objects.get<sm::gui::Image>("computer_thinking_indicator"_H));
             show_computer_thinking_indicator = false;
         }
     }
@@ -369,7 +369,7 @@ void SceneGame::update_computer_thinking_indicator() {
 
 void SceneGame::update_timer_text() {
     const auto time = timer.get_time_formatted();
-    objects.get<gui::Text>("timer_text"_H)->set_text(time);
+    objects.get<sm::gui::Text>("timer_text"_H)->set_text(time);
 }
 
 void SceneGame::update_after_human_move(bool did_action, bool switched_turn, bool must_take_or_took_piece) {
@@ -822,7 +822,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 if (ImGui::BeginMenu("Music Volume")) {
                     ImGui::PushItemWidth(100.0f);
                     if (ImGui::SliderFloat("##", &data.options.music_volume, 0.0f, 1.0f, "%.01f")) {
-                        music::set_music_gain(data.options.music_volume);
+                        sm::music::set_music_gain(data.options.music_volume);
 
                         LOG_INFO("Changed music volume to {}", data.options.music_volume);
                     }
@@ -834,11 +834,11 @@ void SceneGame::imgui_draw_menu_bar() {
                     if (data.options.enable_music) {
                         auto& data = ctx->data<Data>();
 
-                        music::play_music_track(data.current_music_track);
+                        sm::music::play_music_track(data.current_music_track);
 
                         LOG_INFO("Enabled music");
                     } else {
-                        music::stop_music_track();
+                        sm::music::stop_music_track();
 
                         LOG_INFO("Disabled music");
                     }
@@ -913,11 +913,11 @@ void SceneGame::imgui_draw_menu_bar() {
                     auto& data = ctx->data<Data>();
 
                     if (data.options.hide_timer) {
-                        scene_list.remove(objects.get<gui::Text>("timer_text"_H));
+                        scene_list.remove(objects.get<sm::gui::Text>("timer_text"_H));
 
                         LOG_INFO("Hide timer");
                     } else {
-                        scene_list.add(objects.get<gui::Text>("timer_text"_H));
+                        scene_list.add(objects.get<sm::gui::Text>("timer_text"_H));
 
                         LOG_INFO("Show timer");
                     }
@@ -958,7 +958,7 @@ void SceneGame::imgui_draw_menu_bar() {
                 ImGui::EndMenu();
             }
             if (ImGui::MenuItem("Log Information")) {
-                logging::log_general_information(logging::LogTarget::File);
+                sm::logging::log_general_information(sm::logging::LogTarget::File);
 
                 LOG_INFO("Logged OpenGL and dependencies information");
             }
@@ -1186,7 +1186,7 @@ void SceneGame::imgui_draw_debug() {
 
     ImGui::Begin("Light Settings");
     if (ImGui::SliderFloat3("Position", glm::value_ptr(ctx->r3d->directional_light.position), -30.0f, 30.0f)) {
-        objects.get<renderables::Quad>("light_bulb"_H)->position = ctx->r3d->directional_light.position;
+        objects.get<sm::renderables::Quad>("light_bulb"_H)->position = ctx->r3d->directional_light.position;
     }
     ImGui::SliderFloat3("Ambient color", glm::value_ptr(ctx->r3d->directional_light.ambient_color), 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse color", glm::value_ptr(ctx->r3d->directional_light.diffuse_color), 0.0f, 1.0f);

@@ -18,8 +18,8 @@ struct StandardBoard : public Board {
     StandardBoard(StandardBoard&&) noexcept = default;
     StandardBoard& operator=(StandardBoard&&) noexcept = default;
 
-    virtual void click(Identifier::Id hovered_id) override;
-    virtual Board::Flags release(Identifier::Id hovered_id) override;
+    virtual void click(sm::Identifier::Id hovered_id) override;
+    virtual Board::Flags release(sm::Identifier::Id hovered_id) override;
     virtual void place_piece(size_t node_index) override;
     virtual void move_piece(size_t source_node_index, size_t destination_node_index) override;
     virtual void take_piece(size_t node_index) override;
@@ -28,10 +28,10 @@ struct StandardBoard : public Board {
     void _move_piece(size_t piece_index, size_t node_index);
     void _take_piece(size_t piece_index);
 
-    void check_select_piece(Identifier::Id hovered_id);
-    void check_place_piece(Identifier::Id hovered_id);
-    void check_move_piece(Identifier::Id hovered_id);
-    void check_take_piece(Identifier::Id hovered_id);
+    void check_select_piece(sm::Identifier::Id hovered_id);
+    void check_place_piece(sm::Identifier::Id hovered_id);
+    void check_move_piece(sm::Identifier::Id hovered_id);
+    void check_take_piece(sm::Identifier::Id hovered_id);
 
     void check_phase_two();
     void switch_turn_and_check_turns_without_mills();

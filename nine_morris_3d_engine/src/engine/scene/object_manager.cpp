@@ -2,22 +2,24 @@
 
 #include "engine/scene/object_manager.h"
 
-ObjectManager::~ObjectManager() {
-    destroy();
-}
+namespace sm {
+    ObjectManager::~ObjectManager() {
+        destroy();
+    }
 
-void ObjectManager::remove(Id id) {
-    delete objects.at(id);
-    objects.erase(id);
-}
+    void ObjectManager::remove(Id id) {
+        delete objects.at(id);
+        objects.erase(id);
+    }
 
-void ObjectManager::clear() {
-    destroy();
-    objects.clear();
-}
+    void ObjectManager::clear() {
+        destroy();
+        objects.clear();
+    }
 
-void ObjectManager::destroy() {
-    for (const auto& [_, object] : objects) {
-        delete object;
+    void ObjectManager::destroy() {
+        for (const auto& [_, object] : objects) {
+            delete object;
+        }
     }
 }

@@ -9,7 +9,7 @@
 #include "other/constants.h"
 #include "other/data.h"
 
-void StandardBoard::click(Identifier::Id hovered_id) {
+void StandardBoard::click(sm::Identifier::Id hovered_id) {
     // Check for clicked nodes
     for (const Node& node : nodes) {
         if (node.model->bounding_box->id == hovered_id) {
@@ -27,7 +27,7 @@ void StandardBoard::click(Identifier::Id hovered_id) {
     }
 }
 
-Board::Flags StandardBoard::release(Identifier::Id hovered_id) {
+Board::Flags StandardBoard::release(sm::Identifier::Id hovered_id) {
     switch (phase) {
         case BoardPhase::PlacePieces:
             if (must_take_piece) {
@@ -229,7 +229,7 @@ void StandardBoard::_take_piece(size_t piece_index) {
     check_phase_two();
 }
 
-void StandardBoard::check_select_piece(Identifier::Id hovered_id) {
+void StandardBoard::check_select_piece(sm::Identifier::Id hovered_id) {
     for (const auto& [index, piece] : pieces) {
         if (index == clicked_piece_index && piece.model->bounding_box->id == hovered_id) {
             const bool can_select = (
@@ -245,7 +245,7 @@ void StandardBoard::check_select_piece(Identifier::Id hovered_id) {
     }
 }
 
-void StandardBoard::check_place_piece(Identifier::Id hovered_id) {
+void StandardBoard::check_place_piece(sm::Identifier::Id hovered_id) {
     for (const Node& node : nodes) {
         const bool can_place = (
             node.index == clicked_node_index && node.model->bounding_box->id == hovered_id
@@ -261,7 +261,7 @@ void StandardBoard::check_place_piece(Identifier::Id hovered_id) {
     }
 }
 
-void StandardBoard::check_move_piece(Identifier::Id hovered_id) {
+void StandardBoard::check_move_piece(sm::Identifier::Id hovered_id) {
     if (selected_piece_index == NULL_INDEX) {
         return;
     }
@@ -282,7 +282,7 @@ void StandardBoard::check_move_piece(Identifier::Id hovered_id) {
     }
 }
 
-void StandardBoard::check_take_piece(Identifier::Id hovered_id) {
+void StandardBoard::check_take_piece(sm::Identifier::Id hovered_id) {
     if (clicked_piece_index == NULL_INDEX) {
         return;
     }
@@ -848,7 +848,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             Piece piece = Piece {
                 ser_index,
                 ser_piece.type,
-                scene->objects.get<renderables::Model>(hs("piece" + std::to_string(ser_index))),
+                scene->objects.get<sm::renderables::Model>(hs("piece" + std::to_string(ser_index))),
                 ctx->res.al_source[hs("piece" + std::to_string(ser_index))]
             };
 
@@ -866,7 +866,7 @@ void StandardBoard::from_serialized(const StandardBoardSerialized& serialized) {
             piece.model->scale = WORLD_SCALE;
             piece.model->material = ctx->res.material_instance[hs("piece" + std::to_string(ser_index))];
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
-            piece.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
+            piece.model->bounding_box = std::make_optional<sm::renderables::Model::BoundingBox>();
             piece.model->bounding_box->id = data.piece_ids[ser_index];
             piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
             piece.model->cast_shadow = true;

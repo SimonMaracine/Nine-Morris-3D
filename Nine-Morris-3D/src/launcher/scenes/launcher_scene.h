@@ -5,7 +5,7 @@
 
 #include "other/data.h"
 
-struct LauncherScene : public Scene {
+struct LauncherScene : public sm::Scene {
     LauncherScene()
         : Scene("launcher") {}
 
@@ -15,7 +15,7 @@ struct LauncherScene : public Scene {
     virtual void on_update() override;
     virtual void on_imgui_update() override;
 
-    void on_window_closed(const WindowClosedEvent&);
+    void on_window_closed(const sm::WindowClosedEvent&);
 
     void page_display();
     void page_graphics();

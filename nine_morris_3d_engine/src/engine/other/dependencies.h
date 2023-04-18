@@ -1,6 +1,8 @@
 #pragma once
 
-namespace dependencies {
-    // Get information about dependencies
-    std::string get_info();
+namespace sm {
+    namespace dependencies {
+        // Get information about dependencies
+        std::string get_info();
+    }
 }

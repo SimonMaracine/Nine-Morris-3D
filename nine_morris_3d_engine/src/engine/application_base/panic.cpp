@@ -2,7 +2,7 @@
 #include "engine/application_base/window.h"
 #include "engine/audio/context.h"
 
-namespace panic {
+namespace sm {
     void panic() {
         // Gracefully clean up at least some resources
         OpenAlContext::destroy_openal_context();

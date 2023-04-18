@@ -5,7 +5,7 @@
 #include "game/assets_load.h"
 #include "launcher/launcher_options.h"
 
-struct LoadingScene : public Scene {
+struct LoadingScene : public sm::Scene {
     LoadingScene()
         : Scene("loading") {}
 

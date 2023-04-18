@@ -66,7 +66,7 @@ namespace save_load {
 
     template<typename B>
     void save_game_to_file(const SavedGame<B>& saved_game, std::string_view file_name) noexcept(false) {
-        const std::string file_path = file_system::path_for_saved_data(file_name);
+        const std::string file_path = sm::file_system::path_for_saved_data(file_name);
 
         std::ofstream file {file_path, std::ios::binary | std::ios::trunc};
 
@@ -88,7 +88,7 @@ namespace save_load {
 
     template<typename B>
     void load_game_from_file(SavedGame<B>& saved_game, std::string_view file_name) noexcept(false) {
-        const std::string file_path = file_system::path_for_saved_data(file_name);
+        const std::string file_path = sm::file_system::path_for_saved_data(file_name);
 
         std::ifstream file {file_path, std::ios::binary};
 

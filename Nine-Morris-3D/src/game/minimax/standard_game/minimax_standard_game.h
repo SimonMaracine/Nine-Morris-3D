@@ -8,7 +8,7 @@
 
 class MinimaxStandardGame : public MinimaxAlgorithm {
 public:
-    MinimaxStandardGame(Ctx* ctx)
+    MinimaxStandardGame(sm::Ctx* ctx)
         : MinimaxAlgorithm(ctx) {}
     ~MinimaxStandardGame() = default;
 

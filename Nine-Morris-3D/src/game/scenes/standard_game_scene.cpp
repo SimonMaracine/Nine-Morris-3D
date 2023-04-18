@@ -43,7 +43,7 @@ void StandardGameScene::on_start() {
 
     update_turn_indicator();
 
-    keyboard = KeyboardControls {ctx, &board, objects.get<renderables::Quad>("keyboard_controls"_H)};
+    keyboard = KeyboardControls {ctx, &board, objects.get<sm::renderables::Quad>("keyboard_controls"_H)};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<StandardBoardSerialized> {};
@@ -70,7 +70,7 @@ void StandardGameScene::on_start() {
 
 #ifndef NM3D_PLATFORM_DISTRIBUTION
     ctx->r3d->origin = true;
-    scene_list.add(objects.get<renderables::Quad>("light_bulb"_H));
+    scene_list.add(objects.get<sm::renderables::Quad>("light_bulb"_H));
 #endif
 
     update_menubar();
@@ -82,11 +82,11 @@ void StandardGameScene::on_start() {
     ctx->res.texture_data.clear();
     ctx->res.sound_data.clear();
 
-    ctx->evt.connect<MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
-    ctx->evt.connect<MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
-    ctx->evt.connect<KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
-    ctx->evt.connect<KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
-    ctx->evt.connect<WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
+    ctx->evt.connect<sm::MouseButtonPressedEvent, &StandardGameScene::on_mouse_button_pressed>(this);
+    ctx->evt.connect<sm::MouseButtonReleasedEvent, &StandardGameScene::on_mouse_button_released>(this);
+    ctx->evt.connect<sm::KeyPressedEvent, &StandardGameScene::on_key_pressed>(this);
+    ctx->evt.connect<sm::KeyReleasedEvent, &StandardGameScene::on_key_released>(this);
+    ctx->evt.connect<sm::WindowResizedEvent, &StandardGameScene::on_window_resized>(this);
 }
 
 void StandardGameScene::on_stop() {
@@ -164,16 +164,16 @@ void StandardGameScene::on_imgui_update() {
     update_all_imgui();
 }
 
-void StandardGameScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    if (event.button == Input::MouseButton::Left) {
+void StandardGameScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event) {
+    if (event.button == sm::MouseButton::Left) {
         if (board.next_move && board.phase != BoardPhase::None) {
             board.click(ctx->r3d->get_hovered_id());
         }
     }
 }
 
-void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    if (event.button == Input::MouseButton::Left) {
+void StandardGameScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
+    if (event.button == sm::MouseButton::Left) {
         const bool valid_phases = (
             board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
         );
@@ -187,21 +187,21 @@ void StandardGameScene::on_mouse_button_released(const MouseButtonReleasedEvent&
         }
 
         if (show_keyboard_controls) {
-            scene_list.remove(objects.get<renderables::Quad>("keyboard_controls"_H));
+            scene_list.remove(objects.get<sm::renderables::Quad>("keyboard_controls"_H));
             show_keyboard_controls = false;
         }
     }
 }
 
-void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
+void StandardGameScene::on_key_pressed(const sm::KeyPressedEvent& event) {
     switch (event.key) {
-        case Input::Key::Up:
-        case Input::Key::Down:
-        case Input::Key::Left:
-        case Input::Key::Right:
-        case Input::Key::Enter:
+        case sm::Key::Up:
+        case sm::Key::Down:
+        case sm::Key::Left:
+        case sm::Key::Right:
+        case sm::Key::Enter:
             if (!show_keyboard_controls) {
-                scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
+                scene_list.add(objects.get<sm::renderables::Quad>("keyboard_controls"_H));
                 show_keyboard_controls = true;
                 return;
             }
@@ -213,35 +213,35 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
     using KB = KeyboardControls;
 
     switch (event.key) {
-        case Input::Key::Up:
+        case sm::Key::Up:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Up, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case Input::Key::Down:
+        case sm::Key::Down:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Down, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case Input::Key::Left:
+        case sm::Key::Left:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Left, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case Input::Key::Right:
+        case sm::Key::Right:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Right, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case Input::Key::Enter: {
+        case sm::Key::Enter: {
             const bool valid_phases = (
                 board.phase == BoardPhase::PlacePieces || board.phase == BoardPhase::MovePieces
             );
@@ -260,13 +260,13 @@ void StandardGameScene::on_key_pressed(const KeyPressedEvent& event) {
     }
 }
 
-void StandardGameScene::on_key_released(const KeyReleasedEvent& event) {
-    if (event.key == Input::Key::Space) {
+void StandardGameScene::on_key_released(const sm::KeyReleasedEvent& event) {
+    if (event.key == sm::Key::Space) {
         camera_controller.go_towards_position(default_camera_position);
     }
 }
 
-void StandardGameScene::on_window_resized(const WindowResizedEvent& event) {
+void StandardGameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     if (event.width == 0 || event.height == 0) {
         return;
     }
@@ -290,14 +290,14 @@ void StandardGameScene::setup_and_add_model_pieces() {
 
 void StandardGameScene::setup_entities() {
     board = StandardBoard {};
-    board.model = objects.get<renderables::Model>("board"_H);
-    board.paint_model = objects.get<renderables::Model>("board_paint"_H);
+    board.model = objects.get<sm::renderables::Model>("board"_H);
+    board.paint_model = objects.get<sm::renderables::Model>("board_paint"_H);
 
     for (size_t i = 0; i < 9; i++) {
         board.pieces[i] = Piece {
             i,
             PieceType::White,
-            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
+            objects.get<sm::renderables::Model>(hs("piece" + std::to_string(i))),
             ctx->res.al_source.load(hs("piece" + std::to_string(i)))
         };
     }
@@ -306,7 +306,7 @@ void StandardGameScene::setup_entities() {
         board.pieces[i] = Piece {
             i,
             PieceType::Black,
-            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
+            objects.get<sm::renderables::Model>(hs("piece" + std::to_string(i))),
             ctx->res.al_source.load(hs("piece" + std::to_string(i)))
         };
     }
@@ -314,7 +314,7 @@ void StandardGameScene::setup_entities() {
     for (size_t i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
             i,
-            objects.get<renderables::Model>(hs("node" + std::to_string(i)))
+            objects.get<sm::renderables::Model>(hs("node" + std::to_string(i)))
         };
     }
 
@@ -322,22 +322,22 @@ void StandardGameScene::setup_entities() {
 }
 
 void StandardGameScene::initialize_renderables() {
-    board.model = objects.add<renderables::Model>("board"_H);
-    board.paint_model = objects.add<renderables::Model>("board_paint"_H);
+    board.model = objects.add<sm::renderables::Model>("board"_H);
+    board.paint_model = objects.add<sm::renderables::Model>("board_paint"_H);
 
     for (size_t i = 0; i < 9; i++) {
-        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+        objects.add<sm::renderables::Model>(hs("piece" + std::to_string(i)));
     }
 
     for (size_t i = 9; i < 18; i++) {
-        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+        objects.add<sm::renderables::Model>(hs("piece" + std::to_string(i)));
     }
 
     for (size_t i = 0; i < MAX_NODES; i++) {
-        objects.add<renderables::Model>(hs("node" + std::to_string(i)));
+        objects.add<sm::renderables::Model>(hs("node" + std::to_string(i)));
     }
 
-    objects.add<renderables::Quad>("keyboard_controls"_H);
+    objects.add<sm::renderables::Quad>("keyboard_controls"_H);
 }
 
 void StandardGameScene::initialize_pieces() {

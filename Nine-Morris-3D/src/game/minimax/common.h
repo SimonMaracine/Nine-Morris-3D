@@ -31,12 +31,12 @@ struct Move {  // TODO can use union
 std::ostream& operator<<(std::ostream& stream, const Move& move);
 
 struct MinimaxAlgorithm {
-    MinimaxAlgorithm(Ctx* ctx)
+    MinimaxAlgorithm(sm::Ctx* ctx)
         : ctx(ctx) {}
 
     using Algorithm = std::function<void(GamePosition, PieceType, Move&, std::atomic<bool>&)>;
 
     virtual void start(GamePosition position, PieceType piece, Move& result, std::atomic<bool>& running) = 0;
 
-    Ctx* ctx = nullptr;
+    sm::Ctx* ctx = nullptr;
 };

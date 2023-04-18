@@ -3,14 +3,14 @@
 
 #include "game/post_processing/bright_filter.h"
 
-void BrightFilter::render(const PostProcessingContext& context) const {
+void BrightFilter::render(const sm::PostProcessingContext& context) const {
     shader->bind();
 
-    render_helpers::bind_texture_2d(context.last_texture, 0);
-    render_helpers::draw_arrays(6);
+    sm::render_helpers::bind_texture_2d(context.last_texture, 0);
+    sm::render_helpers::draw_arrays(6);
 }
 
-void BrightFilter::prepare(const PostProcessingContext&) const {
+void BrightFilter::prepare(const sm::PostProcessingContext&) const {
     shader->bind();
     shader->upload_uniform_int("u_screen_texture"_H, 0);
 }

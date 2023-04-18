@@ -32,12 +32,12 @@ static float calculate_angle_velocity(float target_angle, float angle) {
     return result;
 }
 
-PointCameraController::PointCameraController(Camera* camera, Ctx* ctx)
+PointCameraController::PointCameraController(sm::Camera* camera, sm::Ctx* ctx)
     : CameraController(camera, ctx) {  // TODO maybe put ctx in base class
     update_camera(1.0f);
 }
 
-PointCameraController::PointCameraController(Camera* camera, Ctx* ctx, int width, int height, float fov,
+PointCameraController::PointCameraController(sm::Camera* camera, sm::Ctx* ctx, int width, int height, float fov,
         float near, float far, const glm::vec3& point, float distance_to_point, float pitch, float sensitivity)
     : CameraController(camera, ctx), sensitivity(sensitivity), pitch(pitch), point(point),
       distance_to_point(distance_to_point) {
@@ -65,26 +65,26 @@ void PointCameraController::update_controls(float dt) {
 
     zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_input.mouse_wheel;
 
-    if (ctx->input.is_key_pressed(Input::Key::R)) {
+    if (ctx->input.is_key_pressed(sm::Key::R)) {
         zoom_velocity -= ZOOM_SPEED * dt;
-    } else if (ctx->input.is_key_pressed(Input::Key::F)) {
+    } else if (ctx->input.is_key_pressed(sm::Key::F)) {
         zoom_velocity += ZOOM_SPEED * dt;
     }
 
-    if (ctx->input.is_mouse_button_pressed(Input::MouseButton::Right)) {
+    if (ctx->input.is_mouse_button_pressed(sm::MouseButton::Right)) {
         y_velocity -= MOVE_SPEED_MOUSE * mouse_input.dy;
         x_velocity += MOVE_SPEED_MOUSE * mouse_input.dx;
     }
 
-    if (ctx->input.is_key_pressed(Input::Key::W)) {
+    if (ctx->input.is_key_pressed(sm::Key::W)) {
         y_velocity += MOVE_SPEED * dt;
-    } else if (ctx->input.is_key_pressed(Input::Key::S)) {
+    } else if (ctx->input.is_key_pressed(sm::Key::S)) {
         y_velocity -= MOVE_SPEED * dt;
     }
 
-    if (ctx->input.is_key_pressed(Input::Key::A)) {
+    if (ctx->input.is_key_pressed(sm::Key::A)) {
         x_velocity -= MOVE_SPEED * dt;
-    } else if (ctx->input.is_key_pressed(Input::Key::D)) {
+    } else if (ctx->input.is_key_pressed(sm::Key::D)) {
         x_velocity += MOVE_SPEED * dt;
     }
 
@@ -183,25 +183,25 @@ void PointCameraController::go_towards_position(const glm::vec3& position) {
     go_towards_position_x(direction);
 }
 
-void PointCameraController::connect_events(Ctx* ctx) {
-    ctx->evt.connect<MouseScrolledEvent, &PointCameraController::on_mouse_scrolled>(this);
-    ctx->evt.connect<MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
+void PointCameraController::connect_events(sm::Ctx* ctx) {
+    ctx->evt.connect<sm::MouseScrolledEvent, &PointCameraController::on_mouse_scrolled>(this);
+    ctx->evt.connect<sm::MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
 }
 
-void PointCameraController::disconnect_events(Ctx* ctx) {
+void PointCameraController::disconnect_events(sm::Ctx* ctx) {
     ctx->evt.disconnect(this);
 }
 
-void PointCameraController::discard_events(Ctx* ctx) {
-    ctx->evt.discard<MouseScrolledEvent>();  // TODO dirty solution
-    ctx->evt.discard<MouseMovedEvent>();
+void PointCameraController::discard_events(sm::Ctx* ctx) {
+    ctx->evt.discard<sm::MouseScrolledEvent>();  // TODO dirty solution
+    ctx->evt.discard<sm::MouseMovedEvent>();
 }
 
-void PointCameraController::on_mouse_scrolled(const MouseScrolledEvent& event) {
+void PointCameraController::on_mouse_scrolled(const sm::MouseScrolledEvent& event) {
     mouse_input.mouse_wheel = event.scroll;
 }
 
-void PointCameraController::on_mouse_moved(const MouseMovedEvent& event) {
+void PointCameraController::on_mouse_moved(const sm::MouseMovedEvent& event) {
     mouse_input.dx = mouse_input.last_mouse_x - event.mouse_x;
     mouse_input.dy = mouse_input.last_mouse_y - event.mouse_y;
     mouse_input.last_mouse_x = event.mouse_x;

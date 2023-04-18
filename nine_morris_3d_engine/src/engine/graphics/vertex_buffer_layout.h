@@ -2,24 +2,26 @@
 
 #include <glad/glad.h>
 
-struct VertexBufferLayout {
-    enum Type {
-        Invalid,
-        Float,
-        Int
+namespace sm {
+    struct VertexBufferLayout final {
+        enum Type {
+            Invalid,
+            Float,
+            Int
+        };
+
+        struct VertexElement {
+            GLuint index = 0;
+            Type type = Invalid;
+            GLint size = 0;
+            bool per_instance = false;
+
+            static size_t get_size(Type type);
+        };
+
+        std::vector<VertexElement> elements;
+        GLsizei stride = 0;
+
+        VertexBufferLayout& add(GLuint index, Type type, GLint size, bool per_instance = false);
     };
-
-    struct VertexElement {
-        GLuint index = 0;
-        Type type = Invalid;
-        GLint size = 0;
-        bool per_instance = false;
-
-        static size_t get_size(Type type);
-    };
-
-    std::vector<VertexElement> elements;
-    GLsizei stride = 0;
-
-    VertexBufferLayout& add(GLuint index, Type type, GLint size, bool per_instance = false);
-};
+}

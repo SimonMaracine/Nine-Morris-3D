@@ -6,7 +6,7 @@
 
 struct Node {
     Node() = default;
-    Node(size_t index, renderables::Model* model)
+    Node(size_t index, sm::renderables::Model* model)
         : index(index), model(model) {}
     ~Node() = default;
 
@@ -17,7 +17,7 @@ struct Node {
 
     size_t index = NULL_INDEX;  // From 0 through 23
 
-    renderables::Model* model = nullptr;
+    sm::renderables::Model* model = nullptr;
 
     size_t piece_index = NULL_INDEX;  // Reference to the piece that sits on this node
 };

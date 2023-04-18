@@ -3,7 +3,7 @@
 #include "engine/application_base/capabilities.h"
 #include "engine/other/logging.h"
 
-namespace capabilities {
+namespace sm {
     int max_anisotropic_filtering_supported() {
         if (GLAD_GL_EXT_texture_filter_anisotropic) {
             float max_amount;

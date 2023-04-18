@@ -2,36 +2,38 @@
 
 #include "engine/other/encrypt.h"
 
-namespace gl {
-    class Texture;
-    class Texture3D;
-}
+namespace sm {
+    namespace gl {
+        class Texture;
+        class Texture3D;
+    }
 
-class TextureData {
-public:
-    struct Image {
-        int width;
-        int height;
-        unsigned char* pixels;
+    class TextureData final {
+    public:
+        struct Image {
+            int width;
+            int height;
+            unsigned char* pixels;
+        };
+
+        TextureData(std::string_view file_path, bool flip = false);
+        TextureData(Encrypt::EncryptedFile file_path, bool flip = false);
+        ~TextureData();
+
+        TextureData(const TextureData&) = delete;
+        TextureData& operator=(const TextureData&) = delete;
+        TextureData(TextureData&&) = delete;
+        TextureData& operator=(TextureData&&) = delete;
+
+        Image get_data();
+        std::string_view get_file_path() { return file_path; }
+    private:
+        unsigned char* data = nullptr;
+        int width = 0;
+        int height = 0;
+        std::string file_path;
+
+        friend class gl::Texture;
+        friend class gl::Texture3D;
     };
-
-    TextureData(std::string_view file_path, bool flip = false);
-    TextureData(Encrypt::EncryptedFile file_path, bool flip = false);
-    ~TextureData();
-
-    TextureData(const TextureData&) = delete;
-    TextureData& operator=(const TextureData&) = delete;
-    TextureData(TextureData&&) = delete;
-    TextureData& operator=(TextureData&&) = delete;
-
-    Image get_data();
-    std::string_view get_file_path() { return file_path; }
-private:
-    unsigned char* data = nullptr;
-    int width = 0;
-    int height = 0;
-    std::string file_path;
-
-    friend class gl::Texture;
-    friend class gl::Texture3D;
-};
+}

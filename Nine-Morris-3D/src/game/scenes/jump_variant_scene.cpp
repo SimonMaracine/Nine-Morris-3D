@@ -41,7 +41,7 @@ void JumpVariantScene::on_start() {
 
     update_turn_indicator();
 
-    keyboard = KeyboardControls {ctx, &board, objects.get<renderables::Quad>("keyboard_controls"_H)};
+    keyboard = KeyboardControls {ctx, &board, objects.get<sm::renderables::Quad>("keyboard_controls"_H)};
     keyboard.post_initialize();
 
     undo_redo_state = UndoRedoState<JumpBoardSerialized> {};
@@ -68,7 +68,7 @@ void JumpVariantScene::on_start() {
 
 #ifndef NM3D_PLATFORM_DISTRIBUTION
     ctx->r3d->origin = true;
-    scene_list.add(objects.get<renderables::Quad>("light_bulb"_H));
+    scene_list.add(objects.get<sm::renderables::Quad>("light_bulb"_H));
 #endif
 
     update_menubar();
@@ -80,11 +80,11 @@ void JumpVariantScene::on_start() {
     ctx->res.texture_data.clear();
     ctx->res.sound_data.clear();
 
-    ctx->evt.connect<MouseButtonPressedEvent, &JumpVariantScene::on_mouse_button_pressed>(this);
-    ctx->evt.connect<MouseButtonReleasedEvent, &JumpVariantScene::on_mouse_button_released>(this);
-    ctx->evt.connect<KeyPressedEvent, &JumpVariantScene::on_key_pressed>(this);
-    ctx->evt.connect<KeyReleasedEvent, &JumpVariantScene::on_key_released>(this);
-    ctx->evt.connect<WindowResizedEvent, &JumpVariantScene::on_window_resized>(this);
+    ctx->evt.connect<sm::MouseButtonPressedEvent, &JumpVariantScene::on_mouse_button_pressed>(this);
+    ctx->evt.connect<sm::MouseButtonReleasedEvent, &JumpVariantScene::on_mouse_button_released>(this);
+    ctx->evt.connect<sm::KeyPressedEvent, &JumpVariantScene::on_key_pressed>(this);
+    ctx->evt.connect<sm::KeyReleasedEvent, &JumpVariantScene::on_key_released>(this);
+    ctx->evt.connect<sm::WindowResizedEvent, &JumpVariantScene::on_window_resized>(this);
 }
 
 void JumpVariantScene::on_stop() {
@@ -162,16 +162,16 @@ void JumpVariantScene::on_imgui_update() {
     update_all_imgui();
 }
 
-void JumpVariantScene::on_mouse_button_pressed(const MouseButtonPressedEvent& event) {
-    if (event.button == Input::MouseButton::Left) {
+void JumpVariantScene::on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event) {
+    if (event.button == sm::MouseButton::Left) {
         if (board.next_move && board.phase != BoardPhase::None) {
             board.click(ctx->r3d->get_hovered_id());
         }
     }
 }
 
-void JumpVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& event) {
-    if (event.button == Input::MouseButton::Left) {
+void JumpVariantScene::on_mouse_button_released(const sm::MouseButtonReleasedEvent& event) {
+    if (event.button == sm::MouseButton::Left) {
         const bool valid_phases = board.phase == BoardPhase::MovePieces;
 
         if (board.next_move && board.is_players_turn && valid_phases) {
@@ -183,21 +183,21 @@ void JumpVariantScene::on_mouse_button_released(const MouseButtonReleasedEvent& 
         }
 
         if (show_keyboard_controls) {
-            scene_list.remove(objects.get<renderables::Quad>("keyboard_controls"_H));
+            scene_list.remove(objects.get<sm::renderables::Quad>("keyboard_controls"_H));
             show_keyboard_controls = false;
         }
     }
 }
 
-void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
+void JumpVariantScene::on_key_pressed(const sm::KeyPressedEvent& event) {
     switch (event.key) {
-        case Input::Key::Up:
-        case Input::Key::Down:
-        case Input::Key::Left:
-        case Input::Key::Right:
-        case Input::Key::Enter:
+        case sm::Key::Up:
+        case sm::Key::Down:
+        case sm::Key::Left:
+        case sm::Key::Right:
+        case sm::Key::Enter:
             if (!show_keyboard_controls) {
-                scene_list.add(objects.get<renderables::Quad>("keyboard_controls"_H));
+                scene_list.add(objects.get<sm::renderables::Quad>("keyboard_controls"_H));
                 show_keyboard_controls = true;
                 return;
             }
@@ -209,35 +209,35 @@ void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
     using KB = KeyboardControls;
 
     switch (event.key) {
-        case Input::Key::Up:
+        case sm::Key::Up:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Up, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case Input::Key::Down:
+        case sm::Key::Down:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Down, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case Input::Key::Left:
+        case sm::Key::Left:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Left, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case Input::Key::Right:
+        case sm::Key::Right:
             keyboard.move(
                 KB::calculate(
                     KB::Direction::Right, camera_controller.get_angle_around_point()
                 )
             );
             break;
-        case Input::Key::Enter: {
+        case sm::Key::Enter: {
             const bool valid_phases = board.phase == BoardPhase::MovePieces;
 
             if (board.next_move && board.is_players_turn && valid_phases) {
@@ -254,13 +254,13 @@ void JumpVariantScene::on_key_pressed(const KeyPressedEvent& event) {
     }
 }
 
-void JumpVariantScene::on_key_released(const KeyReleasedEvent& event) {
-    if (event.key == Input::Key::Space) {
+void JumpVariantScene::on_key_released(const sm::KeyReleasedEvent& event) {
+    if (event.key == sm::Key::Space) {
         camera_controller.go_towards_position(default_camera_position);
     }
 }
 
-void JumpVariantScene::on_window_resized(const WindowResizedEvent& event) {
+void JumpVariantScene::on_window_resized(const sm::WindowResizedEvent& event) {
     if (event.width == 0 || event.height == 0) {
         return;
     }
@@ -306,8 +306,8 @@ void JumpVariantScene::initialize_pieces() {
 
 void JumpVariantScene::setup_entities() {
     board = JumpBoard {};
-    board.model = objects.add<renderables::Model>("board"_H);
-    board.paint_model = objects.add<renderables::Model>("board_paint"_H);
+    board.model = objects.add<sm::renderables::Model>("board"_H);
+    board.paint_model = objects.add<sm::renderables::Model>("board_paint"_H);
 
     board.phase = BoardPhase::MovePieces;
 
@@ -315,7 +315,7 @@ void JumpVariantScene::setup_entities() {
         Piece piece = Piece {
             i,
             PieceType::White,
-            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
+            objects.get<sm::renderables::Model>(hs("piece" + std::to_string(i))),
             ctx->res.al_source.load(hs("piece" + std::to_string(i)))
         };
         piece.in_use = true;
@@ -327,7 +327,7 @@ void JumpVariantScene::setup_entities() {
         Piece piece = Piece {
             i,
             PieceType::Black,
-            objects.get<renderables::Model>(hs("piece" + std::to_string(i))),
+            objects.get<sm::renderables::Model>(hs("piece" + std::to_string(i))),
             ctx->res.al_source.load(hs("piece" + std::to_string(i)))
         };
         piece.in_use = true;
@@ -338,7 +338,7 @@ void JumpVariantScene::setup_entities() {
     for (size_t i = 0; i < MAX_NODES; i++) {
         board.nodes[i] = Node {
             i,
-            objects.get<renderables::Model>(hs("node" + std::to_string(i)))
+            objects.get<sm::renderables::Model>(hs("node" + std::to_string(i)))
         };
     }
 
@@ -349,22 +349,22 @@ void JumpVariantScene::setup_entities() {
 }
 
 void JumpVariantScene::initialize_renderables() {
-    objects.add<renderables::Model>("board"_H);
-    objects.add<renderables::Model>("board_paint"_H);
+    objects.add<sm::renderables::Model>("board"_H);
+    objects.add<sm::renderables::Model>("board_paint"_H);
 
     for (size_t i = 0; i < 3; i++) {
-        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+        objects.add<sm::renderables::Model>(hs("piece" + std::to_string(i)));
     }
 
     for (size_t i = 3; i < 6; i++) {
-        objects.add<renderables::Model>(hs("piece" + std::to_string(i)));
+        objects.add<sm::renderables::Model>(hs("piece" + std::to_string(i)));
     }
 
     for (size_t i = 0; i < MAX_NODES; i++) {
-        objects.add<renderables::Model>(hs("node" + std::to_string(i)));
+        objects.add<sm::renderables::Model>(hs("node" + std::to_string(i)));
     }
 
-    objects.add<renderables::Quad>("keyboard_controls"_H);
+    objects.add<sm::renderables::Quad>("keyboard_controls"_H);
 }
 
 void JumpVariantScene::draw_debug_imgui() {

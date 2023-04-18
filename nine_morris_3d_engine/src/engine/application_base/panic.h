@@ -1,5 +1,5 @@
 #pragma once
 
-namespace panic {
+namespace sm {
     void panic();
 }

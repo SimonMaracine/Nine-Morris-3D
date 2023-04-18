@@ -23,29 +23,31 @@
     #define LOG_ERROR(...) static_cast<void>(0)
     #define LOG_CRITICAL(...) static_cast<void>(0)
 #else
-    #define LOG_DEBUG(...) SPDLOG_LOGGER_DEBUG(logging::get_global_logger(), __VA_ARGS__)
-    #define LOG_INFO(...) SPDLOG_LOGGER_INFO(logging::get_global_logger(), __VA_ARGS__)
-    #define LOG_WARNING(...) SPDLOG_LOGGER_WARN(logging::get_global_logger(), __VA_ARGS__)
-    #define LOG_ERROR(...) SPDLOG_LOGGER_ERROR(logging::get_global_logger(), __VA_ARGS__)
-    #define LOG_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(logging::get_global_logger(), __VA_ARGS__)
+    #define LOG_DEBUG(...) SPDLOG_LOGGER_DEBUG(sm::logging::get_global_logger(), __VA_ARGS__)
+    #define LOG_INFO(...) SPDLOG_LOGGER_INFO(sm::logging::get_global_logger(), __VA_ARGS__)
+    #define LOG_WARNING(...) SPDLOG_LOGGER_WARN(sm::logging::get_global_logger(), __VA_ARGS__)
+    #define LOG_ERROR(...) SPDLOG_LOGGER_ERROR(sm::logging::get_global_logger(), __VA_ARGS__)
+    #define LOG_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(sm::logging::get_global_logger(), __VA_ARGS__)
 #endif
 
-#define LOG_DIST_DEBUG(...) SPDLOG_LOGGER_DEBUG(logging::get_global_logger(), __VA_ARGS__)
-#define LOG_DIST_INFO(...) SPDLOG_LOGGER_INFO(logging::get_global_logger(), __VA_ARGS__)
-#define LOG_DIST_WARNING(...) SPDLOG_LOGGER_WARN(logging::get_global_logger(), __VA_ARGS__)
-#define LOG_DIST_ERROR(...) SPDLOG_LOGGER_ERROR(logging::get_global_logger(), __VA_ARGS__)
-#define LOG_DIST_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(logging::get_global_logger(), __VA_ARGS__)
+#define LOG_DIST_DEBUG(...) SPDLOG_LOGGER_DEBUG(sm::logging::get_global_logger(), __VA_ARGS__)
+#define LOG_DIST_INFO(...) SPDLOG_LOGGER_INFO(sm::logging::get_global_logger(), __VA_ARGS__)
+#define LOG_DIST_WARNING(...) SPDLOG_LOGGER_WARN(sm::logging::get_global_logger(), __VA_ARGS__)
+#define LOG_DIST_ERROR(...) SPDLOG_LOGGER_ERROR(sm::logging::get_global_logger(), __VA_ARGS__)
+#define LOG_DIST_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(sm::logging::get_global_logger(), __VA_ARGS__)
 
-namespace logging {
-    enum class LogTarget {
-        None,
-        Console,
-        File
-    };
+namespace sm {
+    namespace logging {
+        enum class LogTarget {
+            None,
+            Console,
+            File
+        };
 
-    // There is no uninitialization
-    void initialize_for_applications(std::string_view log_file, std::string_view info_file);
-    void log_general_information(LogTarget target);
-    spdlog::logger* get_global_logger();
-    std::string_view get_info_file();
+        // There is no uninitialization
+        void initialize_for_applications(std::string_view log_file, std::string_view info_file);
+        void log_general_information(LogTarget target);
+        spdlog::logger* get_global_logger();
+        std::string_view get_info_file();
+    }
 }

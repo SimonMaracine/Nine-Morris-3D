@@ -5,22 +5,24 @@
 struct ALCdevice;
 struct ALCcontext;
 
-class OpenAlContext {
-public:
-    OpenAlContext();
-    ~OpenAlContext();
+namespace sm {
+    class OpenAlContext final {
+    public:
+        OpenAlContext();
+        ~OpenAlContext();
 
-    OpenAlContext(const OpenAlContext&) = delete;
-    OpenAlContext& operator=(const OpenAlContext&) = delete;
-    OpenAlContext(OpenAlContext&&) = delete;
-    OpenAlContext& operator=(OpenAlContext&&) = delete;
+        OpenAlContext(const OpenAlContext&) = delete;
+        OpenAlContext& operator=(const OpenAlContext&) = delete;
+        OpenAlContext(OpenAlContext&&) = delete;
+        OpenAlContext& operator=(OpenAlContext&&) = delete;
 
-    al::Listener& get_listener() { return listener; }
+        al::Listener& get_listener() { return listener; }
 
-    static void destroy_openal_context();
-private:
-    ALCdevice* device = nullptr;
-    ALCcontext* context = nullptr;
+        static void destroy_openal_context();
+    private:
+        ALCdevice* device = nullptr;
+        ALCcontext* context = nullptr;
 
-    al::Listener listener;
-};
+        al::Listener listener;
+    };
+}

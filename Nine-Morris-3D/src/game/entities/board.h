@@ -11,7 +11,10 @@
 #include "other/constants.h"
 
 class KeyboardControls;
-class Scene;
+
+namespace sm {
+    class Scene;
+}
 
 class Board {
 public:
@@ -25,15 +28,15 @@ public:
 
     struct Flags;
 
-    virtual void click(Identifier::Id) = 0;
-    virtual Flags release(Identifier::Id) = 0;
+    virtual void click(sm::Identifier::Id) = 0;
+    virtual Flags release(sm::Identifier::Id) = 0;
     virtual void place_piece(size_t) = 0;
     virtual void move_piece(size_t, size_t) = 0;
     virtual void take_piece(size_t) = 0;
 
     GamePosition get_position();
-    void update_nodes(Identifier::Id hovered_id);
-    void update_pieces(Identifier::Id hovered_id);
+    void update_nodes(sm::Identifier::Id hovered_id);
+    void update_pieces(sm::Identifier::Id hovered_id);
     void move_pieces();
     void finalize_pieces_state();
     void switch_piece_outlines();
@@ -56,8 +59,8 @@ protected:
     void prepare_piece_for_three_step_move(size_t piece_index, const glm::vec3& target, const glm::vec3& velocity,
         const glm::vec3& target0, const glm::vec3& target1);
 public:
-    renderables::Model* model = nullptr;
-    renderables::Model* paint_model = nullptr;
+    sm::renderables::Model* model = nullptr;
+    sm::renderables::Model* paint_model = nullptr;
 
     std::array<Node, MAX_NODES> nodes;  // 24 ordered nodes
     std::unordered_map<size_t, Piece> pieces;  // Any number of pieces
@@ -89,8 +92,8 @@ public:
         bool must_take_or_took_piece = false;
     } flags;
 
-    Ctx* ctx = nullptr;
-    Scene* scene = nullptr;
+    sm::Ctx* ctx = nullptr;
+    sm::Scene* scene = nullptr;
     KeyboardControls* keyboard = nullptr;
     PointCameraController* camera_controller = nullptr;
 };

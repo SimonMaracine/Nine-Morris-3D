@@ -8,7 +8,7 @@
 
 struct Piece {
     Piece() = default;
-    Piece(size_t index, PieceType type, renderables::Model* model, std::shared_ptr<al::Source> source)
+    Piece(size_t index, PieceType type, sm::renderables::Model* model, std::shared_ptr<sm::al::Source> source)
         : index(index), type(type), model(model), source(source) {}
     ~Piece() = default;
 
@@ -22,8 +22,8 @@ struct Piece {
     PieceType type = PieceType::None;
     bool in_use = false;  // true, if it is on the board
 
-    renderables::Model* model = nullptr;
-    std::shared_ptr<al::Source> source;
+    sm::renderables::Model* model = nullptr;
+    std::shared_ptr<sm::al::Source> source;
 
     size_t node_index = NULL_INDEX;  // Reference to the node on top of which it sits on
 

@@ -30,7 +30,7 @@ namespace options_gracefully {
         } catch (const options::OptionsFileError& e) {
             LOG_DIST_WARNING("Could not load options from file: {}", e.what());
 
-            if (file_system::delete_file(options_file)) {
+            if (sm::file_system::delete_file(options_file)) {
                 LOG_DIST_INFO("Deleted options file `{}`", options_file);
             } else {
                 LOG_DIST_ERROR("Could not delete options file `{}`", options_file);

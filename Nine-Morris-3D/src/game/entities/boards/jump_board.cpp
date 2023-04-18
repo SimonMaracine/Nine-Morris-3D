@@ -9,7 +9,7 @@
 #include "other/constants.h"
 #include "other/data.h"
 
-void JumpBoard::click(Identifier::Id hovered_id) {
+void JumpBoard::click(sm::Identifier::Id hovered_id) {
     // Check for clicked nodes
     for (const Node& node : nodes) {
         if (node.model->bounding_box->id == hovered_id) {
@@ -27,7 +27,7 @@ void JumpBoard::click(Identifier::Id hovered_id) {
     }
 }
 
-Board::Flags JumpBoard::release(Identifier::Id hovered_id) {
+Board::Flags JumpBoard::release(sm::Identifier::Id hovered_id) {
     check_select_piece(hovered_id);
     check_move_piece(hovered_id);
 
@@ -115,7 +115,7 @@ void JumpBoard::_move_piece(size_t piece_index, size_t node_index) {
     }
 }
 
-void JumpBoard::check_select_piece(Identifier::Id hovered_id) {
+void JumpBoard::check_select_piece(sm::Identifier::Id hovered_id) {
     for (const auto& [index, piece] : pieces) {
         if (index == clicked_piece_index && piece.model->bounding_box->id == hovered_id) {
             const bool can_select = (
@@ -131,7 +131,7 @@ void JumpBoard::check_select_piece(Identifier::Id hovered_id) {
     }
 }
 
-void JumpBoard::check_move_piece(Identifier::Id hovered_id) {
+void JumpBoard::check_move_piece(sm::Identifier::Id hovered_id) {
     if (selected_piece_index == NULL_INDEX) {
         return;
     }
@@ -243,7 +243,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
             Piece piece = Piece {
                 ser_index,
                 ser_piece.type,
-                scene->objects.get<renderables::Model>(hs("piece" + std::to_string(ser_index))),
+                scene->objects.get<sm::renderables::Model>(hs("piece" + std::to_string(ser_index))),
                 ctx->res.al_source[hs("piece" + std::to_string(ser_index))]
             };
 
@@ -261,7 +261,7 @@ void JumpBoard::from_serialized(const JumpBoardSerialized& serialized) {
             piece.model->scale = WORLD_SCALE;
             piece.model->material = ctx->res.material_instance[hs("piece" + std::to_string(ser_index))];
             piece.model->outline_color = std::make_optional<glm::vec3>(1.0f);
-            piece.model->bounding_box = std::make_optional<renderables::Model::BoundingBox>();
+            piece.model->bounding_box = std::make_optional<sm::renderables::Model::BoundingBox>();
             piece.model->bounding_box->id = data.piece_ids[ser_index];
             piece.model->bounding_box->size = PIECE_BOUNDING_BOX;
             piece.model->cast_shadow = true;

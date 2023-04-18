@@ -6,14 +6,14 @@ static const char* PARTIAL_SAVE_GAME_FILE = "_last_game.dat";
 
 namespace save_load {
     void handle_save_file_not_open_error() {
-        const bool exists = file_system::directory_exists(
-            file_system::cut_slash(file_system::path_for_saved_data())
+        const bool exists = sm::file_system::directory_exists(
+            sm::file_system::cut_slash(sm::file_system::path_for_saved_data())
         );
 
         if (!exists) {
             LOG_DIST_INFO("User data directory missing; creating it...");
 
-            const bool success = file_system::create_directory(file_system::path_for_saved_data());
+            const bool success = sm::file_system::create_directory(sm::file_system::path_for_saved_data());
 
             if (!success) {
                 LOG_DIST_ERROR("Could not create user data directory");

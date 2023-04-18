@@ -37,7 +37,7 @@ void LoadingScene::on_start() {
 
     setup_widgets();
 
-    auto background = objects.add<gui::Image>("background"_H, ctx->res.texture["splash_screen"_H]);
+    auto background = objects.add<sm::gui::Image>("background"_H, ctx->res.texture["splash_screen"_H]);
     scene_list.add(background);
 
     loading_animation.previous_seconds = ctx->window->get_time();
@@ -58,7 +58,7 @@ void LoadingScene::on_update() {
     float width, height, x_pos, y_pos;
     ctx->r2d->quad_center(width, height, x_pos, y_pos);
 
-    auto background = objects.get<gui::Image>("background"_H);
+    auto background = objects.get<sm::gui::Image>("background"_H);
     background->set_position(glm::vec2(x_pos, y_pos));
     background->set_size(glm::vec2(width, height));
 
@@ -71,16 +71,16 @@ void LoadingScene::setup_widgets() {
     static constexpr int LOWEST_RESOLUTION = 288;
     static constexpr int HIGHEST_RESOLUTION = 1035;
 
-    auto loading_text = objects.add<gui::Text>(
+    auto loading_text = objects.add<sm::gui::Text>(
         "loading_text"_H,
         ctx->res.font["good_dog_plain"_H],
         "Loading",
         1.5f,
         glm::vec3(0.75f)
     );
-    loading_text->stick(gui::Sticky::SE);
-    loading_text->offset(20, gui::Relative::Right);
-    loading_text->offset(20, gui::Relative::Bottom);
+    loading_text->stick(sm::gui::Sticky::SE);
+    loading_text->offset(20, sm::gui::Relative::Right);
+    loading_text->offset(20, sm::gui::Relative::Bottom);
     loading_text->scale(0.4f, 1.3f, LOWEST_RESOLUTION, HIGHEST_RESOLUTION);
 
     const auto size = loading_text->get_actual_size();
@@ -91,12 +91,11 @@ void LoadingScene::setup_widgets() {
 }
 
 void LoadingScene::load_splash_screen_texture() {
+    using namespace sm::file_system;
     using namespace assets;
-    using namespace file_system;
 
-    gl::TextureSpecification specification;
-
-    ctx->res.texture.load("splash_screen"_H, Encrypt::encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
+    sm::gl::TextureSpecification specification;
+    ctx->res.texture.load("splash_screen"_H, sm::Encrypt::encr(path_for_assets(SPLASH_SCREEN_TEXTURE)), specification);
 }
 
 void LoadingScene::update_loading_animation() {
@@ -112,7 +111,7 @@ void LoadingScene::update_loading_animation() {
         std::string text = "Loading";
         text.append(loading_animation.dots, '.');
 
-        objects.get<gui::Text>("loading_text"_H)->set_text(text);
+        objects.get<sm::gui::Text>("loading_text"_H)->set_text(text);
 
         loading_animation.dots++;
         loading_animation.dots %= 4;
@@ -129,7 +128,7 @@ hs LoadingScene::scene_int_to_id(int scene) {  // FIXME find a better way
             return "jump_plus_variant"_H;
         default:
             LOG_DIST_CRITICAL("Invalid scene number");
-            panic::panic();
+            sm::panic();
     }
 
     return {};
@@ -140,8 +139,8 @@ void LoadingScene::initialize_board() {
 
     auto shader = ctx->res.shader.load(
         "board_wood"_H,
-        Encrypt::encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER)),
-        Encrypt::encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::BOARD_VERTEX_SHADER)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -170,11 +169,11 @@ void LoadingScene::initialize_board() {
         ctx->res.mesh["board_wood"_H]->get_indices_size()
     );
 
-    VertexBufferLayout layout = VertexBufferLayout {}
-        .add(0, VertexBufferLayout::Float, 3)
-        .add(1, VertexBufferLayout::Float, 2)
-        .add(2, VertexBufferLayout::Float, 3)
-        .add(3, VertexBufferLayout::Float, 3);
+    sm::VertexBufferLayout layout = sm::VertexBufferLayout {}
+        .add(0, sm::VertexBufferLayout::Float, 3)
+        .add(1, sm::VertexBufferLayout::Float, 2)
+        .add(2, sm::VertexBufferLayout::Float, 3)
+        .add(3, sm::VertexBufferLayout::Float, 3);
 
     auto vertex_array = ctx->res.vertex_array.load("board_wood"_H);
     vertex_array->begin_definition()
@@ -182,8 +181,8 @@ void LoadingScene::initialize_board() {
         .add_index_buffer(index_buffer)
         .end_definition();
 
-    gl::TextureSpecification specification;
-    specification.mag_filter = gl::Filter::Linear;
+    sm::gl::TextureSpecification specification;
+    specification.mag_filter = sm::gl::Filter::Linear;
     specification.mipmap_levels = 4;
     specification.bias = -2.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -202,8 +201,8 @@ void LoadingScene::initialize_board() {
 
     auto material = ctx->res.material.load("wood"_H, shader);
     material->add_texture("u_material.diffuse"_H);
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
+    material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
     material->add_texture("u_material.normal"_H);
 
     auto material_instance = ctx->res.material_instance.load("board_wood"_H, material);
@@ -218,8 +217,8 @@ void LoadingScene::initialize_board_paint() {
 
     auto shader = ctx->res.shader.load(
         "board_paint"_H,
-        Encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
-        Encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -248,11 +247,11 @@ void LoadingScene::initialize_board_paint() {
         ctx->res.mesh["board_paint"_H]->get_indices_size()
     );
 
-    VertexBufferLayout layout = VertexBufferLayout {}
-        .add(0, VertexBufferLayout::Float, 3)
-        .add(1, VertexBufferLayout::Float, 2)
-        .add(2, VertexBufferLayout::Float, 3)
-        .add(3, VertexBufferLayout::Float, 3);
+    sm::VertexBufferLayout layout = sm::VertexBufferLayout {}
+        .add(0, sm::VertexBufferLayout::Float, 3)
+        .add(1, sm::VertexBufferLayout::Float, 2)
+        .add(2, sm::VertexBufferLayout::Float, 3)
+        .add(3, sm::VertexBufferLayout::Float, 3);
 
     auto vertex_array = ctx->res.vertex_array.load("board_paint"_H);
     vertex_array->begin_definition()
@@ -260,8 +259,8 @@ void LoadingScene::initialize_board_paint() {
         .add_index_buffer(index_buffer)
         .end_definition();
 
-    gl::TextureSpecification specification;
-    specification.mag_filter = gl::Filter::Linear;
+    sm::gl::TextureSpecification specification;
+    specification.mag_filter = sm::gl::Filter::Linear;
     specification.mipmap_levels = 4;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -274,8 +273,8 @@ void LoadingScene::initialize_board_paint() {
 
     auto material = ctx->res.material.load("board_paint"_H, shader);
     material->add_texture("u_material.diffuse"_H);
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
+    material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
     material->add_texture("u_material.normal"_H);
 
     auto material_instance = ctx->res.material_instance.load("board_paint"_H, material);
@@ -290,8 +289,8 @@ void LoadingScene::initialize_pieces() {
 
     auto shader = ctx->res.shader.load(
         "piece"_H,
-        Encrypt::encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER)),
-        Encrypt::encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::PIECE_VERTEX_SHADER)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -333,11 +332,11 @@ void LoadingScene::initialize_pieces() {
         ctx->res.mesh["black_piece"_H]->get_indices_size()
     );
 
-    VertexBufferLayout layout = VertexBufferLayout {}
-        .add(0, VertexBufferLayout::Float, 3)
-        .add(1, VertexBufferLayout::Float, 2)
-        .add(2, VertexBufferLayout::Float, 3)
-        .add(3, VertexBufferLayout::Float, 3);
+    sm::VertexBufferLayout layout = sm::VertexBufferLayout {}
+        .add(0, sm::VertexBufferLayout::Float, 3)
+        .add(1, sm::VertexBufferLayout::Float, 2)
+        .add(2, sm::VertexBufferLayout::Float, 3)
+        .add(3, sm::VertexBufferLayout::Float, 3);
 
     auto white_piece_vertex_array = ctx->res.vertex_array.load("white_piece"_H);
     white_piece_vertex_array->begin_definition()
@@ -351,8 +350,8 @@ void LoadingScene::initialize_pieces() {
         .add_index_buffer(black_piece_index_buffer)
         .end_definition();
 
-    gl::TextureSpecification specification;
-    specification.mag_filter = gl::Filter::Linear;
+    sm::gl::TextureSpecification specification;
+    specification.mag_filter = sm::gl::Filter::Linear;
     specification.mipmap_levels = 4;
     specification.bias = -1.5f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -377,10 +376,10 @@ void LoadingScene::initialize_pieces() {
 
     auto material = ctx->res.material.load("tinted_wood"_H, shader);
     material->add_texture("u_material.diffuse"_H);
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
+    material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
     material->add_texture("u_material.normal"_H);
-    material->add_uniform(Material::Uniform::Vec3, "u_material.tint"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.tint"_H);
 
     ctx->res.al_buffer.load(
         "piece_place1"_H,
@@ -419,8 +418,8 @@ void LoadingScene::initialize_node(size_t index) {
 void LoadingScene::initialize_nodes() {
     auto shader = ctx->res.shader.load(
         "node"_H,
-        Encrypt::encr(file_system::path_for_assets(assets::NODE_VERTEX_SHADER)),
-        Encrypt::encr(file_system::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::NODE_VERTEX_SHADER)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::NODE_FRAGMENT_SHADER)),
         std::vector<std::string> { "u_model_matrix", "u_color" },
         std::initializer_list {
             ctx->r3d->get_storage().projection_view_uniform_block
@@ -439,8 +438,8 @@ void LoadingScene::initialize_nodes() {
         ctx->res.mesh["node"_H]->get_indices_size()
     );
 
-    VertexBufferLayout layout = VertexBufferLayout {}
-        .add(0, VertexBufferLayout::Float, 3);
+    sm::VertexBufferLayout layout = sm::VertexBufferLayout {}
+        .add(0, sm::VertexBufferLayout::Float, 3);
 
     auto vertex_array = ctx->res.vertex_array.load("node"_H);
     vertex_array->begin_definition()
@@ -449,7 +448,7 @@ void LoadingScene::initialize_nodes() {
         .end_definition();
 
     auto material = ctx->res.material.load("basic"_H, shader);
-    material->add_uniform(Material::Uniform::Vec4, "u_color"_H);
+    material->add_uniform(sm::Material::Uniform::Vec4, "u_color"_H);
 
     for (size_t i = 0; i < 24; i++) {
         initialize_node(i);
@@ -461,8 +460,8 @@ void LoadingScene::initialize_board_no_normal() {
 
     auto shader = ctx->res.shader.load(
         "board_wood"_H,
-        Encrypt::encr(file_system::path_for_assets(assets::BOARD_VERTEX_SHADER_NO_NORMAL)),
-        Encrypt::encr(file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER_NO_NORMAL)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::BOARD_VERTEX_SHADER_NO_NORMAL)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::BOARD_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -490,10 +489,10 @@ void LoadingScene::initialize_board_no_normal() {
         ctx->res.mesh["board_wood"_H]->get_indices_size()
     );
 
-    VertexBufferLayout layout = VertexBufferLayout {}
-        .add(0, VertexBufferLayout::Float, 3)
-        .add(1, VertexBufferLayout::Float, 2)
-        .add(2, VertexBufferLayout::Float, 3);
+    sm::VertexBufferLayout layout = sm::VertexBufferLayout {}
+        .add(0, sm::VertexBufferLayout::Float, 3)
+        .add(1, sm::VertexBufferLayout::Float, 2)
+        .add(2, sm::VertexBufferLayout::Float, 3);
 
     auto vertex_array = ctx->res.vertex_array.load("board_wood"_H);
     vertex_array->begin_definition()
@@ -501,8 +500,8 @@ void LoadingScene::initialize_board_no_normal() {
         .add_index_buffer(index_buffer)
         .end_definition();
 
-    gl::TextureSpecification specification;
-    specification.mag_filter = gl::Filter::Linear;
+    sm::gl::TextureSpecification specification;
+    specification.mag_filter = sm::gl::Filter::Linear;
     specification.mipmap_levels = 4;
     specification.bias = -2.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -515,8 +514,8 @@ void LoadingScene::initialize_board_no_normal() {
 
     auto material = ctx->res.material.load("wood"_H, shader);
     material->add_texture("u_material.diffuse"_H);
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
+    material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
 
     auto material_instance = ctx->res.material_instance.load("board_wood"_H, material);
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
@@ -529,8 +528,8 @@ void LoadingScene::initialize_board_paint_no_normal() {
 
     auto shader = ctx->res.shader.load(
         "board_paint"_H,
-        Encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER_NO_NORMAL)),
-        Encrypt::encr(file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::BOARD_PAINT_VERTEX_SHADER_NO_NORMAL)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::BOARD_PAINT_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -558,10 +557,10 @@ void LoadingScene::initialize_board_paint_no_normal() {
         ctx->res.mesh["board_paint"_H]->get_indices_size()
     );
 
-    VertexBufferLayout layout = VertexBufferLayout {}
-        .add(0, VertexBufferLayout::Float, 3)
-        .add(1, VertexBufferLayout::Float, 2)
-        .add(2, VertexBufferLayout::Float, 3);
+    sm::VertexBufferLayout layout = sm::VertexBufferLayout {}
+        .add(0, sm::VertexBufferLayout::Float, 3)
+        .add(1, sm::VertexBufferLayout::Float, 2)
+        .add(2, sm::VertexBufferLayout::Float, 3);
 
     auto vertex_array = ctx->res.vertex_array.load("board_paint"_H);
     vertex_array->begin_definition()
@@ -569,8 +568,8 @@ void LoadingScene::initialize_board_paint_no_normal() {
         .add_index_buffer(index_buffer)
         .end_definition();
 
-    gl::TextureSpecification specification;
-    specification.mag_filter = gl::Filter::Linear;
+    sm::gl::TextureSpecification specification;
+    specification.mag_filter = sm::gl::Filter::Linear;
     specification.mipmap_levels = 4;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -583,8 +582,8 @@ void LoadingScene::initialize_board_paint_no_normal() {
 
     auto material = ctx->res.material.load("board_paint"_H, shader);
     material->add_texture("u_material.diffuse"_H);
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
+    material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
 
     auto material_instance = ctx->res.material_instance.load("board_paint"_H, material);
     material_instance->set_texture("u_material.diffuse"_H, diffuse_texture, 0);
@@ -598,8 +597,8 @@ void LoadingScene::initialize_pieces_no_normal() {
     // FIXME maybe should give another name
     auto shader = ctx->res.shader.load(
         "piece"_H,
-        Encrypt::encr(file_system::path_for_assets(assets::PIECE_VERTEX_SHADER_NO_NORMAL)),
-        Encrypt::encr(file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER_NO_NORMAL)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::PIECE_VERTEX_SHADER_NO_NORMAL)),
+        sm::Encrypt::encr(sm::file_system::path_for_assets(assets::PIECE_FRAGMENT_SHADER_NO_NORMAL)),
         std::vector<std::string> {
             "u_model_matrix",
             "u_shadow_map",
@@ -640,10 +639,10 @@ void LoadingScene::initialize_pieces_no_normal() {
         ctx->res.mesh["black_piece"_H]->get_indices_size()
     );
 
-    VertexBufferLayout layout = VertexBufferLayout {}
-        .add(0, VertexBufferLayout::Float, 3)
-        .add(1, VertexBufferLayout::Float, 2)
-        .add(2, VertexBufferLayout::Float, 3);
+    sm::VertexBufferLayout layout = sm::VertexBufferLayout {}
+        .add(0, sm::VertexBufferLayout::Float, 3)
+        .add(1, sm::VertexBufferLayout::Float, 2)
+        .add(2, sm::VertexBufferLayout::Float, 3);
 
     auto white_piece_vertex_array = ctx->res.vertex_array.load("white_piece"_H);
     white_piece_vertex_array->begin_definition()
@@ -657,8 +656,8 @@ void LoadingScene::initialize_pieces_no_normal() {
         .add_index_buffer(black_piece_index_buffer)
         .end_definition();
 
-    gl::TextureSpecification specification;
-    specification.mag_filter = gl::Filter::Linear;
+    sm::gl::TextureSpecification specification;
+    specification.mag_filter = sm::gl::Filter::Linear;
     specification.mipmap_levels = 4;
     specification.bias = -1.5f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -677,9 +676,9 @@ void LoadingScene::initialize_pieces_no_normal() {
 
     auto material = ctx->res.material.load("tinted_wood"_H, shader);
     material->add_texture("u_material.diffuse"_H);
-    material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
-    material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
-    material->add_uniform(Material::Uniform::Vec3, "u_material.tint"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
+    material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.tint"_H);
 
     ctx->res.al_buffer.load(
         "piece_place1"_H,
@@ -713,7 +712,7 @@ void LoadingScene::initialize_skybox() {
         return;
     }
 
-    const std::array<std::shared_ptr<TextureData>, 6> data = {
+    const std::array<std::shared_ptr<sm::TextureData>, 6> data = {
         ctx->res.texture_data["skybox_px"_H],
         ctx->res.texture_data["skybox_nx"_H],
         ctx->res.texture_data["skybox_py"_H],
@@ -729,7 +728,7 @@ void LoadingScene::initialize_skybox() {
 }
 
 void LoadingScene::initialize_indicators() {
-    gl::TextureSpecification specification;
+    sm::gl::TextureSpecification specification;
 
     ctx->res.texture.load(
         "white_indicator"_H,
@@ -756,8 +755,8 @@ void LoadingScene::initialize_indicators() {
 void LoadingScene::change_board_paint_texture() {
     auto& data = ctx->data<Data>();
 
-    gl::TextureSpecification specification;
-    specification.mag_filter = gl::Filter::Linear;
+    sm::gl::TextureSpecification specification;
+    specification.mag_filter = sm::gl::Filter::Linear;
     specification.mipmap_levels = 4;
     specification.bias = -1.0f;
     specification.anisotropic_filtering = data.launcher_options.anisotropic_filtering;
@@ -786,7 +785,7 @@ void LoadingScene::initialize_ids() {
 }
 
 void LoadingScene::initialize_keyboard_controls() {
-    gl::TextureSpecification specification;
+    sm::gl::TextureSpecification specification;
 
     ctx->res.texture.load(
         "keyboard_controls_default"_H,
@@ -801,7 +800,7 @@ void LoadingScene::initialize_keyboard_controls() {
 }
 
 void LoadingScene::initialize_light_bulb() {
-    gl::TextureSpecification specification;
+    sm::gl::TextureSpecification specification;
 
     ctx->res.texture.load(
         "light_bulb"_H,
@@ -857,6 +856,6 @@ void LoadingScene::initialize_game() {
     data.current_music_track = track;
 
     if (data.options.enable_music) {
-        music::play_music_track(track);
+        sm::music::play_music_track(track);
     }
 }

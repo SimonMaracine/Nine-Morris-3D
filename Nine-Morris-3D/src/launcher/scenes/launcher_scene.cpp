@@ -160,7 +160,7 @@ static std::vector<const char*> options_sample() {
 
     std::vector<const char*> options;
 
-    const int max = capabilities::max_samples_supported();
+    const int max = sm::max_samples_supported();
 
     size_t options_supported = 0;
 
@@ -186,7 +186,7 @@ static std::vector<const char*> options_anisotropic_filtering() {
 
     std::vector<const char*> options;
 
-    const int max = capabilities::max_anisotropic_filtering_supported();
+    const int max = sm::max_anisotropic_filtering_supported();
 
     size_t options_supported = 0;
 
@@ -243,12 +243,12 @@ static void help_marker(const char* text) {
 void LauncherScene::on_start() {
     auto& data = ctx->data<Data>();
 
-    using namespace file_system;
+    using namespace sm::file_system;
 
     // Load splash screen
-    ctx->res.texture.load("splash_screen"_H, Encrypt::encr(path_for_assets(SPLASH_SCREEN)), gl::TextureSpecification {});
+    ctx->res.texture.load("splash_screen"_H, sm::Encrypt::encr(path_for_assets(SPLASH_SCREEN)), sm::gl::TextureSpecification {});
 
-    auto background = objects.add<gui::Image>("background"_H, ctx->res.texture["splash_screen"_H]);
+    auto background = objects.add<sm::gui::Image>("background"_H, ctx->res.texture["splash_screen"_H]);
     scene_list.add(background);
 
     // Load launcher options from file
@@ -317,19 +317,19 @@ void LauncherScene::on_awake() {
     ImVector<ImWchar> ranges;
     builder.BuildRanges(&ranges);
 
-    using namespace file_system;
+    using namespace sm::file_system;
 
     io.FontDefault = io.Fonts->AddFontFromFileTTF(path_for_assets(OPEN_SANS).c_str(), 21.0f, nullptr, ranges.Data);
     io.Fonts->Build();
 
-    ctx->evt.connect<WindowClosedEvent, &LauncherScene::on_window_closed>(this);
+    ctx->evt.connect<sm::WindowClosedEvent, &LauncherScene::on_window_closed>(this);
 }
 
 void LauncherScene::on_update() {
     float width, height, x_pos, y_pos;
     ctx->r2d->quad_center(width, height, x_pos, y_pos);
 
-    auto background = objects.get<gui::Image>("background"_H);
+    auto background = objects.get<sm::gui::Image>("background"_H);
     background->set_position(glm::vec2(x_pos, y_pos));  // TODO it works, I have no idea why
     background->set_size(glm::vec2(width, height));
 }
@@ -366,7 +366,7 @@ void LauncherScene::on_imgui_update() {
     ImGui::End();
 }
 
-void LauncherScene::on_window_closed(const WindowClosedEvent&) {
+void LauncherScene::on_window_closed(const sm::WindowClosedEvent&) {
     ctx->exit_code = 1;
 }
 
@@ -448,7 +448,7 @@ void LauncherScene::initialize_resolutions() {
 
     if (width < 512) {
         LOG_DIST_CRITICAL("Monitor has unsupported resolution");
-        panic::panic();
+        sm::panic();
     } else if (width < 768) {
         resolutions_supported = 1;
     } else if (width < 1024) {

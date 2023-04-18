@@ -17,8 +17,8 @@ void generic_update_menubar(S* scene) {
     scene->last_save_game_date = std::move(saved_game.date);
     LOG_INFO("Checked last saved game");
 
-    scene->info_file_path = file_system::path_for_logs(logging::get_info_file());
-    scene->save_game_file_path = file_system::path_for_saved_data(scene->save_game_file_name);
+    scene->info_file_path = sm::file_system::path_for_logs(sm::logging::get_info_file());
+    scene->save_game_file_path = sm::file_system::path_for_saved_data(scene->save_game_file_name);
 }
 
 template<typename S, typename B>

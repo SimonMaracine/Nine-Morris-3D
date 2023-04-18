@@ -4,33 +4,35 @@
 #include "engine/other/encrypt.h"
 #include "engine/other/logging.h"
 
-cppblowfish::Buffer Encrypt::load_file(EncryptedFile file_path) {
-    std::ifstream file {std::string(file_path), std::ios::binary};
+namespace sm {
+    cppblowfish::Buffer Encrypt::load_file(EncryptedFile file_path) {
+        std::ifstream file {std::string(file_path), std::ios::binary};
 
-    if (!file.is_open()) {
-        LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading", file_path);
-        panic::panic();
+        if (!file.is_open()) {
+            LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading", file_path);
+            panic();
+        }
+
+        file.seekg(0, file.end);
+        const size_t length = file.tellg();
+        file.seekg(0, file.beg);
+
+        char* raw_buffer = new char[length];
+        file.read(raw_buffer, length);
+
+        cppblowfish::Buffer buffer;
+        cppblowfish::Buffer cipher = cppblowfish::Buffer::from_whole_data(raw_buffer, length);
+
+        delete[] raw_buffer;
+
+        context.decrypt(cipher, buffer);
+
+        return buffer;
     }
 
-    file.seekg(0, file.end);
-    const size_t length = file.tellg();
-    file.seekg(0, file.beg);
+    void Encrypt::initialize(std::string_view key) {
+        context = cppblowfish::BlowfishContext {std::string(key) + 'S'};
+    }
 
-    char* raw_buffer = new char[length];
-    file.read(raw_buffer, length);
-
-    cppblowfish::Buffer buffer;
-    cppblowfish::Buffer cipher = cppblowfish::Buffer::from_whole_data(raw_buffer, length);
-
-    delete[] raw_buffer;
-
-    context.decrypt(cipher, buffer);
-
-    return buffer;
+    cppblowfish::BlowfishContext Encrypt::context {};
 }
-
-void Encrypt::initialize(std::string_view key) {
-    context = cppblowfish::BlowfishContext {std::string(key) + 'S'};
-}
-
-cppblowfish::BlowfishContext Encrypt::context {};
