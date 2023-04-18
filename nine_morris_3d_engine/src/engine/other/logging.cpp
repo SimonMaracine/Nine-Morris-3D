@@ -9,8 +9,8 @@
 #include "engine/other/file_system.h"
 #include "engine/other/dependencies.h"
 
-#define LOG_PATTERN_DEBUG "%^[%l] [th %t] [%H:%M:%S]%$ %v"
-#define LOG_PATTERN_RELEASE "%^[%l] [th %t] [%!:%#] [%c]%$ %v"
+#define LOG_PATTERN_DEBUG "%^[%l] [t %t] [%H:%M:%S]%$ %v"
+#define LOG_PATTERN_RELEASE "%^[%l] [t %t] [%!:%#] [%c]%$ %v"
 
 #define FILE_SIZE (1048576 * 2)  // 2 MiB
 #define ROTATING_FILES 2  // 3 total log files
