@@ -1,11 +1,9 @@
 #pragma once
 
-#include <engine/public/application_base.h>
+#include "engine/public/prelude.h"
 #include <engine/public/scene.h>
 
 #include "game/entities/board.h"
-
-class Application;
 
 class KeyboardControls {
 public:

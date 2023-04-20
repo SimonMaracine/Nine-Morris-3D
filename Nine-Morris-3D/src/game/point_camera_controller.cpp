@@ -1,5 +1,6 @@
-#include <engine/public/application_base.h>
+#include "engine/public/prelude.h"
 #include <engine/public/other.h>
+#include <engine/public/external/glm.h>
 
 #include "game/point_camera_controller.h"
 #include "other/constants.h"

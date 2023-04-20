@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/public/application_base.h>  // TODO light header
+#include "engine/public/prelude.h"
 
 class Timer {
 public:

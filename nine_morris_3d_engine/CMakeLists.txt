@@ -110,7 +110,7 @@ set(ENGINE_HEADERS
     "src/engine/public/entry_point.h"
     "src/engine/public/graphics.h"
     "src/engine/public/other.h"
-    "src/engine/public/prelude.h"  # Very common functionality # FIXME use this
+    "src/engine/public/prelude.h"  # Very common functionality
     "src/engine/public/scene.h"
 )
 

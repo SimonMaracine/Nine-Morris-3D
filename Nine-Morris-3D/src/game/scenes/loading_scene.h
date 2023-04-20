@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/public/application_base.h>
+#include <engine/public/prelude.h>
 
 #include "game/assets_load.h"
 #include "launcher/launcher_options.h"

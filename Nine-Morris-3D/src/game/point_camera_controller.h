@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/public/application_base.h>
+#include "engine/public/prelude.h"
 #include <engine/public/other.h>
 
 inline constexpr float LENS_FOV = 45.0f;

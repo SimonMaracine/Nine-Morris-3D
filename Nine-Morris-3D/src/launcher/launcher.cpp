@@ -1,4 +1,4 @@
-#include <engine/public/application_base.h>
+#include <engine/public/prelude.h>
 #include <engine/public/other.h>
 
 #include "game/assets.h"

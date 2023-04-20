@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/public/application_base.h>
+#include "engine/public/prelude.h"
 
 namespace game {
     void start(sm::Ctx* ctx);
