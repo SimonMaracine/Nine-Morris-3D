@@ -249,7 +249,7 @@ namespace sm {
 
                 data[i] = stbi_load(file_paths[i], &width, &height, &channels, CHANNELS);
 
-                if (data == nullptr) {
+                if (data[i] == nullptr) {
                     LOG_DIST_CRITICAL("Could not load texture `{}`", file_paths[i]);
                     panic();
                 }

@@ -9,16 +9,22 @@
 
 - Visual Studio (version >= 2022)
 
-### On Linux
+### On Linux, Fedora
 
 - GCC (version >= 11)
-- libxrandr
-- libxinerama
-- libxcursor
-- libxi
+- X11: libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel
+- Wayland: wayland-devel libxkbcommon-devel wayland-protocols-devel extra-cmake-modules
+- PipeWire: pipewire-devel.x86_64
+- mesa-libGL-devel.x86_64
+- libasan libubsan
+
+### On Linux, Debian
+
+- GCC (version >= 11)
+- X11: xorg-dev
+- Wayland: libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules
+- PulseAudio: libasound2-dev libpulse-dev
 - libopengl-dev | libegl1-mesa-dev | mesa-common-dev (one of these)
-- libasound2-dev
-- libpulse-dev
 
 ## Linux release distribution
 
