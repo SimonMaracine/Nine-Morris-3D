@@ -5,20 +5,22 @@
 - Git
 - CMake (version >= 3.20)
 
+**On Linux, prefer building on Wayland instead of X11.**
+
 ### On Windows
 
 - Visual Studio (version >= 2022)
 
-### On Linux, Fedora
+### On Linux - Fedora
 
-- GCC (version >= 11)
+- GCC (version >= 13)
 - X11: libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel
 - Wayland: wayland-devel libxkbcommon-devel wayland-protocols-devel extra-cmake-modules
 - PipeWire: pipewire-devel.x86_64
 - mesa-libGL-devel.x86_64
 - libasan libubsan
 
-### On Linux, Debian
+### On Linux - Ubuntu
 
 - GCC (version >= 11)
 - X11: xorg-dev
@@ -30,7 +32,7 @@
 
     mkdir build-release
     cd build-release
-    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_FOR_DISTRIBUTION=ON
+    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_FOR_DISTRIBUTION=ON -D GLFW_USE_WAYLAND=OFF
     cmake --build . -j4
 
 ## Windows release distribution
