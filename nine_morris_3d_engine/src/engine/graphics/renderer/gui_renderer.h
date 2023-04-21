@@ -27,7 +27,7 @@ namespace sm {
         GuiRenderer(GuiRenderer&&) = delete;
         GuiRenderer& operator=(GuiRenderer&&) = delete;
 
-        void render(const SceneList& scene);
+        void render(const SceneList& scene, bool debug_text);
 
         void quad_center(float& width, float& height, float& x_pos, float& y_pos);
 
@@ -47,18 +47,21 @@ namespace sm {
         void draw_quad(glm::vec2 position, glm::vec2 size, std::shared_ptr<gl::Texture> texture);
 
         void begin_draw_image();
-        void begin_draw_text();
         void end_draw_image();
+        void begin_draw_text();
         void end_draw_text();
 
         void draw(const std::vector<gui::Widget*>& subwidgets, const BeginEnd& begin, const BeginEnd& end);
         void on_window_resized(const WindowResizedEvent& event);
+
+        void render_debug_text();
 
         void initialize_uniform_buffers();
         void initialize_quad_renderer();
         std::shared_ptr<gl::IndexBuffer> initialize_quads_index_buffer();
         void initialize_text_renderer();
         void initialize_projection_uniform_buffer();
+        void initialize_debug_text();
 
         struct Storage {
             std::shared_ptr<gl::UniformBuffer> projection_uniform_buffer;
@@ -73,6 +76,8 @@ namespace sm {
             std::shared_ptr<gl::IndexBuffer> quad2d_index_buffer;
 
             glm::mat4 orthographic_projection_matrix = glm::mat4(1.0f);
+
+            std::shared_ptr<Font> debug_font;
 
             struct {
                 QuadVertex* buffer = nullptr;
@@ -90,6 +95,7 @@ namespace sm {
         const char* QUAD2D_FRAGMENT_SHADER = ENCR("engine_data/shaders/quad2d.frag");
         const char* TEXT_VERTEX_SHADER = ENCR("engine_data/shaders/text.vert");
         const char* TEXT_FRAGMENT_SHADER = ENCR("engine_data/shaders/text.frag");
+        const char* DEBUG_TEXT_FONT = ENCR("engine_data/fonts/CodeNewRoman/code-new-roman.regular.ttf");
 
         Ctx* ctx = nullptr;
 

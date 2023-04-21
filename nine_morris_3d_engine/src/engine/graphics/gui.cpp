@@ -113,7 +113,7 @@ namespace sm {
 
             render_helpers::bind_texture_2d(font->get_bitmap()->get_id(), 0);
 
-            render_helpers::draw_arrays(font->get_vertex_count());
+            render_helpers::draw_arrays(font->get_vertex_count());  // TODO render text in batches
         }
 
         void Text::set_text(std::string_view text) {

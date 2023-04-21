@@ -40,6 +40,7 @@ namespace sm {
         initialize_quad_renderer();
         initialize_text_renderer();
         initialize_projection_uniform_buffer();
+        initialize_debug_text();
 
         ctx->evt.connect<WindowResizedEvent, &GuiRenderer::on_window_resized>(this);
 
@@ -55,7 +56,7 @@ namespace sm {
         LOG_INFO("Uninitialized GUI renderer");
     }
 
-    void GuiRenderer::render(const SceneList& scene) {
+    void GuiRenderer::render(const SceneList& scene, bool debug_text) {
         static std::vector<gui::Widget*> images;
         static std::vector<gui::Widget*> texts;
 
@@ -72,8 +73,12 @@ namespace sm {
 
         render_helpers::disable_depth_test();
 
-        draw(images, std::bind(&GuiRenderer::begin_draw_image, this), std::bind(&GuiRenderer::end_draw_image, this));
+        draw(images, std::bind(&GuiRenderer::begin_draw_image, this), std::bind(&GuiRenderer::end_draw_image, this));  // TODO use something else than std::bind
         draw(texts, std::bind(&GuiRenderer::begin_draw_text, this), std::bind(&GuiRenderer::end_draw_text, this));
+
+        if (debug_text) {
+            render_debug_text();  // FIXME implement this
+        }
 
         render_helpers::enable_depth_test();
     }
@@ -167,13 +172,13 @@ namespace sm {
         begin_quads_batch();
     }
 
-    void GuiRenderer::begin_draw_text() {
-        storage.text_shader->bind();
-    }
-
     void GuiRenderer::end_draw_image() {
         end_quads_batch();
         flush_quads();
+    }
+
+    void GuiRenderer::begin_draw_text() {
+        storage.text_shader->bind();
     }
 
     void GuiRenderer::end_draw_text() {}
@@ -287,6 +292,10 @@ namespace sm {
         gl::UniformBuffer::unbind();
     }
 
+    void GuiRenderer::render_debug_text() {
+        // FIXME implement this
+    }
+
     void GuiRenderer::initialize_uniform_buffers() {
         storage.projection_uniform_buffer = std::make_shared<gl::UniformBuffer>();
 
@@ -387,5 +396,11 @@ namespace sm {
         storage.projection_uniform_buffer->upload_sub_data();
 
         gl::UniformBuffer::unbind();
+    }
+
+    void GuiRenderer::initialize_debug_text() {
+        storage.debug_font = std::make_shared<Font>(DEBUG_TEXT_FONT, 14.0f, 6, 180, 40, 512);
+
+        // FIXME implement this
     }
 }

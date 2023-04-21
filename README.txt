@@ -25,6 +25,7 @@ Normal texture:
     https://www.goodtextures.com/image/19816/wood-plain-04-normal
 
 Fonts:
+    https://www.1001fonts.com/code-new-roman-font.html
     See the data/fonts/ directory.
 
 Cube maps:

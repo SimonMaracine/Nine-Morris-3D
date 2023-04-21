@@ -224,7 +224,7 @@ namespace sm {
     }
 
     void Application::r2d_function() {
-        ctx.r2d->render(current_scene->scene_list);
+        ctx.r2d->render(current_scene->scene_list, true);
     }
 
     void Application::dear_imgui_function() {
