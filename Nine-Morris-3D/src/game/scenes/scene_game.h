@@ -4,6 +4,7 @@
 #include <engine/public/graphics.h>
 #include <engine/public/other.h>
 #include <engine/public/scene.h>
+#include <engine/public/external/imgui.h++>
 
 #include "game/minimax/minimax_thread.h"
 #include "game/minimax/common.h"

@@ -100,11 +100,11 @@ set(ENGINE_HEADERS
     "src/engine/scene/scene.h"
 
     # For client
-    "src/engine/public/external/cereal.h"
-    "src/engine/public/external/entt.h"
-    "src/engine/public/external/glm.h"
-    "src/engine/public/external/imgui.h"
-    "src/engine/public/external/resmanager.h"
+    "src/engine/public/external/cereal.h++"
+    "src/engine/public/external/entt.h++"
+    "src/engine/public/external/glm.h++"
+    "src/engine/public/external/imgui.h++"
+    "src/engine/public/external/resmanager.h++"
     "src/engine/public/application_base.h"
     "src/engine/public/audio.h"
     "src/engine/public/entry_point.h"

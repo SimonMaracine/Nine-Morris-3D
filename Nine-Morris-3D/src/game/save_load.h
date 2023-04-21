@@ -1,7 +1,7 @@
 #pragma once
 
 #include <engine/public/other.h>
-#include <engine/public/external/cereal.h>
+#include <engine/public/external/cereal.h++>
 
 #include "game/entities/piece.h"
 #include "game/entities/node.h"

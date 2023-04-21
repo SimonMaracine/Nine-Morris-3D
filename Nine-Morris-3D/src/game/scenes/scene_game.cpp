@@ -3,8 +3,8 @@
 #include <engine/public/graphics.h>
 #include <engine/public/other.h>
 #include <engine/public/scene.h>
-#include <engine/public/external/resmanager.h>
-#include <engine/public/external/imgui.h>
+#include <engine/public/external/resmanager.h++>
+#include <engine/public/external/imgui.h++>
 
 #include "game/entities/boards/standard_board.h"
 #include "game/entities/boards/jump_board.h"

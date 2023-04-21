@@ -2,7 +2,7 @@
 
 #include <engine/public/application_base.h>
 #include <engine/public/scene.h>
-#include <engine/public/external/imgui.h>
+#include <engine/public/external/imgui.h++>
 
 #include "other/data.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <engine/public/other.h>
-#include <engine/public/external/cereal.h>
+#include <engine/public/external/cereal.h++>
 
 namespace options {
     class OptionsFileError : public std::runtime_error {

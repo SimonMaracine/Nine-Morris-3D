@@ -1,6 +1,6 @@
 #include <engine/public/other.h>
-#include <engine/public/external/imgui.h>
-#include <engine/public/external/resmanager.h>
+#include <engine/public/external/imgui.h++>
+#include <engine/public/external/resmanager.h++>
 
 #include "launcher/scenes/launcher_scene.h"
 #include "launcher/launcher_options.h"

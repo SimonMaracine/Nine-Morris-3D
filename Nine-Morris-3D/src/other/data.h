@@ -2,7 +2,7 @@
 
 #include <engine/public/audio.h>
 #include <engine/public/graphics.h>
-#include <engine/public/external/imgui.h>
+#include <engine/public/external/imgui.h++>
 
 #include "game/game_options.h"
 #include "launcher/launcher_options.h"

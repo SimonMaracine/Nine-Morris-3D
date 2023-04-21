@@ -2,8 +2,8 @@
 #include <engine/public/audio.h>
 #include <engine/public/graphics.h>
 #include <engine/public/other.h>
-#include <engine/public/external/resmanager.h>
-#include <engine/public/external/glm.h>
+#include <engine/public/external/resmanager.h++>
+#include <engine/public/external/glm.h++>
 
 #include "game/entities/piece.h"
 #include "game/entities/node.h"

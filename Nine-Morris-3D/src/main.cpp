@@ -3,7 +3,7 @@
 
 #include <engine/public/application_base.h>
 #include <engine/public/other.h>
-#include <engine/public/external/resmanager.h>
+#include <engine/public/external/resmanager.h++>
 
 #include "game/game.h"
 #include "game/scenes/standard_game_scene.h"

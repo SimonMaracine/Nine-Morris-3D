@@ -1,6 +1,6 @@
 #include <engine/public/graphics.h>
 #include <engine/public/other.h>
-#include <engine/public/external/resmanager.h>
+#include <engine/public/external/resmanager.h++>
 
 #include "game/entities/boards/jump_board.h"
 #include "game/entities/serialization/jump_board_serialized.h"

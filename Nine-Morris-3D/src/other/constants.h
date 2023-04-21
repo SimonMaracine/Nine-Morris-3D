@@ -1,8 +1,8 @@
 #pragma once
 
 #include <engine/public/graphics.h>
-#include <engine/public/external/glm.h>
-#include <engine/public/external/imgui.h>
+#include <engine/public/external/glm.h++>
+#include <engine/public/external/imgui.h++>
 
 // format is the first argument to __VA_ARGS__
 #define FORMATTED_MESSAGE(result, size, ...) \
