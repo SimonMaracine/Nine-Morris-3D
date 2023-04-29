@@ -19,6 +19,11 @@
     #error "Unsupported platform"
 #endif
 
+// Check for 64-bit architecture
+#if SIZE_MAX != 0xFFFFFFFFFFFFFFFF
+    #error "Unsupported platform"
+#endif
+
 /**
  * There are three build modes:
  *
