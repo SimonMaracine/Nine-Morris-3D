@@ -36,7 +36,7 @@ namespace sm {
             std::string_view file_path;
         };
 
-        static cppblowfish::Buffer load_file(EncryptedFile file_path);
+        static std::pair<unsigned char*, size_t> load_file(EncryptedFile file_path);
 
 #ifdef NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
         static constexpr std::string_view encr(std::string_view file_path) {

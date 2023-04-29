@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 #include <stb_image.h>
-#include <cppblowfish/cppblowfish.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -127,13 +126,13 @@ namespace sm {
             : specification(specification) {
             LOG_DEBUG("Loading texture `{}`...", file_path);
 
-            const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
+            const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
             stbi_set_flip_vertically_on_load(1);
 
             int width, height, channels;
             unsigned char* data = stbi_load_from_memory(
-                buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, CHANNELS
+                buffer, buffer_size, &width, &height, &channels, CHANNELS
             );
 
             if (data == nullptr) {

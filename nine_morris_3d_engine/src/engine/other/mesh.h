@@ -8,7 +8,7 @@ namespace sm {
     namespace mesh {
         struct Mesh final {
         public:
-            Mesh(const char* vertices, size_t vertices_size, const unsigned int* indices, size_t indices_size);
+            Mesh(const void* vertices, size_t vertices_size, const void* indices, size_t indices_size);
             ~Mesh();
 
             Mesh(const Mesh&) = delete;
@@ -16,14 +16,14 @@ namespace sm {
             Mesh(Mesh&&) = delete;
             Mesh& operator=(Mesh&&) = delete;
 
-            const char* get_vertices() { return vertices; }
-            size_t get_vertices_size() { return vertices_size; }
-            const unsigned int* get_indices() { return indices; }
-            size_t get_indices_size() { return indices_size; }
+            const char* get_vertices() const { return vertices; }
+            const unsigned int* get_indices() const { return indices; }
+            size_t get_vertices_size() const { return vertices_size; }
+            size_t get_indices_size() const { return indices_size; }
         private:
             char* vertices = nullptr;
-            size_t vertices_size = 0;
             unsigned int* indices = nullptr;
+            size_t vertices_size = 0;
             size_t indices_size = 0;
         };
 

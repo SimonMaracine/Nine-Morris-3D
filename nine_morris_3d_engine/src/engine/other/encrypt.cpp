@@ -5,7 +5,7 @@
 #include "engine/other/logging.h"
 
 namespace sm {
-    cppblowfish::Buffer Encrypt::load_file(EncryptedFile file_path) {
+    std::pair<unsigned char*, size_t> Encrypt::load_file(EncryptedFile file_path) {
         std::ifstream file {std::string(file_path), std::ios::binary};
 
         if (!file.is_open()) {
@@ -27,7 +27,10 @@ namespace sm {
 
         context.decrypt(cipher, buffer);
 
-        return buffer;
+        unsigned char* pointer = buffer.steal();
+        const size_t size = buffer.size();
+
+        return std::make_pair(pointer, size);
     }
 
     void Encrypt::initialize(std::string_view key) {

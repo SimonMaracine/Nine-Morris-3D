@@ -2,7 +2,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <glm/glm.hpp>
-#include <cppblowfish/cppblowfish.h>
 
 #include "engine/application_base/panic.h"
 #include "engine/other/mesh.h"
@@ -122,7 +121,7 @@ namespace sm {
     }
 
     namespace mesh {
-        Mesh::Mesh(const char* vertices, size_t vertices_size, const unsigned int* indices, size_t indices_size) {
+        Mesh::Mesh(const void* vertices, size_t vertices_size, const void* indices, size_t indices_size) {
             this->vertices = new char[vertices_size];
             memcpy(this->vertices, vertices, vertices_size);
             this->vertices_size = vertices_size;
@@ -167,7 +166,7 @@ namespace sm {
             load_PTN(mesh, vertices, indices);
 
             return std::make_shared<Mesh>(
-                reinterpret_cast<const char*>(vertices.data()),
+                vertices.data(),
                 vertices.size() * sizeof(PTN),
                 indices.data(),
                 indices.size() * sizeof(unsigned int)
@@ -179,12 +178,12 @@ namespace sm {
 
             const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-            const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
+            const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
             Assimp::Importer importer;
             const aiScene* scene = importer.ReadFileFromMemory(
-                buffer.get(),
-                buffer.size() - buffer.padding(),
+                buffer,
+                buffer_size,
                 aiProcess_ValidateDataStructure | flip
             );
 
@@ -205,7 +204,7 @@ namespace sm {
             load_PTN(mesh, vertices, indices);
 
             return std::make_shared<Mesh>(
-                reinterpret_cast<const char*>(vertices.data()),
+                vertices.data(),
                 vertices.size() * sizeof(PTN),
                 indices.data(),
                 indices.size() * sizeof(unsigned int)
@@ -240,7 +239,7 @@ namespace sm {
             load_P(mesh, vertices, indices);
 
             return std::make_shared<Mesh>(
-                reinterpret_cast<const char*>(vertices.data()),
+                vertices.data(),
                 vertices.size() * sizeof(P),
                 indices.data(),
                 indices.size() * sizeof(unsigned int)
@@ -252,12 +251,12 @@ namespace sm {
 
             const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-            const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
+            const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
             Assimp::Importer importer;
             const aiScene* scene = importer.ReadFileFromMemory(
-                buffer.get(),
-                buffer.size() - buffer.padding(),
+                buffer,
+                buffer_size,
                 aiProcess_ValidateDataStructure | flip
             );
 
@@ -278,7 +277,7 @@ namespace sm {
             load_P(mesh, vertices, indices);
 
             return std::make_shared<Mesh>(
-                reinterpret_cast<const char*>(vertices.data()),
+                vertices.data(),
                 vertices.size() * sizeof(P),
                 indices.data(),
                 indices.size() * sizeof(unsigned int)
@@ -313,7 +312,7 @@ namespace sm {
             load_PTNT(mesh, vertices, indices);
 
             return std::make_shared<Mesh>(
-                reinterpret_cast<const char*>(vertices.data()),
+                vertices.data(),
                 vertices.size() * sizeof(PTNT),
                 indices.data(),
                 indices.size() * sizeof(unsigned int)
@@ -325,12 +324,12 @@ namespace sm {
 
             const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-            const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
+            const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
             Assimp::Importer importer;
             const aiScene* scene = importer.ReadFileFromMemory(
-                buffer.get(),
-                buffer.size() - buffer.padding(),
+                buffer,
+                buffer_size,
                 aiProcess_ValidateDataStructure | flip | aiProcess_CalcTangentSpace
             );
 
@@ -351,7 +350,7 @@ namespace sm {
             load_PTNT(mesh, vertices, indices);
 
             return std::make_shared<Mesh>(
-                reinterpret_cast<const char*>(vertices.data()),
+                vertices.data(),
                 vertices.size() * sizeof(PTNT),
                 indices.data(),
                 indices.size() * sizeof(unsigned int)

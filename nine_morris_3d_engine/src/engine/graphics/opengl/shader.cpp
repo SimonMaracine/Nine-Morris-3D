@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <cppblowfish/cppblowfish.h>
 
 #include "engine/application_base/platform.h"
 #include "engine/application_base/panic.h"
@@ -97,12 +96,12 @@ namespace sm {
         return shader;
     }
 
-    static GLuint compile_shader(const cppblowfish::Buffer& source_buffer, GLenum type, std::string_view name) noexcept(false) {
+    static GLuint compile_shader(const std::pair<unsigned char*, size_t>& source_buffer, GLenum type, std::string_view name) noexcept(false) {
         GLuint shader = glCreateShader(type);
 
-        const char* buffer = reinterpret_cast<const char*>(source_buffer.get());
+        const char* buffer = reinterpret_cast<const char*>(source_buffer.first);
         const char* const source = buffer;
-        const int source_length = source_buffer.size() - source_buffer.padding();
+        const int source_length = source_buffer.second;
 
         glShaderSource(shader, 1, &source, &source_length);
         glCompileShader(shader);
@@ -189,8 +188,8 @@ namespace sm {
             : vertex_source_path(vertex_source), fragment_source_path(fragment_source), uniforms(uniforms) {
             name = get_name_sources(vertex_source_path, fragment_source_path);
 
-            const cppblowfish::Buffer buffer_vertex = Encrypt::load_file(vertex_source);
-            const cppblowfish::Buffer buffer_fragment = Encrypt::load_file(fragment_source);
+            const auto buffer_vertex = Encrypt::load_file(vertex_source);
+            const auto buffer_fragment = Encrypt::load_file(fragment_source);
 
             try {
                 vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER, name);

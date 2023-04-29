@@ -1,5 +1,4 @@
 #include <stb_image.h>
-#include <cppblowfish/cppblowfish.h>
 
 #include "engine/application_base/panic.h"
 #include "engine/graphics/texture_data.h"
@@ -29,10 +28,10 @@ namespace sm {
 
         stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
-        const cppblowfish::Buffer buffer = Encrypt::load_file(file_path);
+        const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
         int channels;
-        data = stbi_load_from_memory(buffer.get(), buffer.size() - buffer.padding(), &width, &height, &channels, 4);
+        data = stbi_load_from_memory(buffer, buffer_size, &width, &height, &channels, 4);
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture data `{}`", file_path);
