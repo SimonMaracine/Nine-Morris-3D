@@ -20,7 +20,7 @@ static void open_file(const std::string& file_name, unsigned char** out, size_t*
     char* buffer = new char[length];
     file.read(buffer, length);
 
-    *out = reinterpret_cast<unsigned char*>(buffer);
+    *out = reinterpret_cast<unsigned char*>(buffer);  // It is safe
     *size = length;
 }
 
@@ -32,7 +32,7 @@ static void write_file(const std::string& file_name, const unsigned char* data, 
         exit(1);
     }
 
-    file.write(reinterpret_cast<const char*>(data), size);
+    file.write(reinterpret_cast<const char*>(data), size);  // It is safe
 }
 
 int main(int argc, char** argv) {

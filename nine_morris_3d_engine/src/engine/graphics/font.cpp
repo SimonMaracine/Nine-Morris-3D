@@ -1,15 +1,14 @@
 #include <stb_truetype.h>
 #include <stb_image_write.h>
 #include <glm/glm.hpp>
-
 #include <utf8.h>
 
 #include "engine/application_base/platform.h"
 #include "engine/application_base/panic.h"
-#include "engine/graphics/font.h"
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/graphics/opengl/vertex_array.h"
 #include "engine/graphics/opengl/texture.h"
+#include "engine/graphics/font.h"
 #include "engine/other/logging.h"
 #include "engine/other/assert.h"
 
@@ -62,9 +61,10 @@ namespace sm {
     Font::Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
             int pixel_dist_scale, int bitmap_size)
         : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value),
-        pixel_dist_scale(pixel_dist_scale) {
+          pixel_dist_scale(pixel_dist_scale) {
         font_info_buffer = get_font_file_data(file_path);
 
+        // Cast is safe
         if (!stbtt_InitFont(&info, reinterpret_cast<const unsigned char*>(font_info_buffer), 0)) {
             LOG_DIST_CRITICAL("Could not load font `{}`", file_path);
             panic();

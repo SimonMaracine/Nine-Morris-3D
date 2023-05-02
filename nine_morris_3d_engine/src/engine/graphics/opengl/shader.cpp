@@ -99,7 +99,7 @@ namespace sm {
     static GLuint compile_shader(const std::pair<unsigned char*, size_t>& source_buffer, GLenum type, std::string_view name) noexcept(false) {
         GLuint shader = glCreateShader(type);
 
-        const char* buffer = reinterpret_cast<const char*>(source_buffer.first);
+        const char* buffer = reinterpret_cast<const char*>(source_buffer.first);  // It is safe
         const char* const source = buffer;
         const int source_length = source_buffer.second;
 
