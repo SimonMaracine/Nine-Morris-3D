@@ -21,7 +21,7 @@ namespace options {
     };
 
     template<typename Opt>
-    using _ValidateLoad = std::function<std::optional<std::string>(const Opt&)>;
+    using ValidateLoad = std::function<std::optional<std::string>(const Opt&)>;
 
     template<typename Opt>
     void save_options_to_file(const Opt& options, std::string_view options_file_name) noexcept(false) {
@@ -47,7 +47,7 @@ namespace options {
 
     template<typename Opt>
     void load_options_from_file(Opt& options, std::string_view options_file_name,
-            const _ValidateLoad<Opt>& validate_load) noexcept(false) {
+            const ValidateLoad<Opt>& validate_load) noexcept(false) {
         const std::string file_path = sm::file_system::path_for_saved_data(options_file_name);
 
         std::ifstream file {file_path, std::ios::binary};

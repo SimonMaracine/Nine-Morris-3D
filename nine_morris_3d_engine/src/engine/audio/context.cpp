@@ -6,8 +6,8 @@
 #include "engine/other/logging.h"
 
 namespace sm {
-    static ALCdevice* _global_device = nullptr;
-    static ALCcontext* _global_context = nullptr;
+    static ALCdevice* global_device = nullptr;
+    static ALCcontext* global_context = nullptr;
 
 #if 0
     static void maybe_check_errors(ALCdevice* device) {
@@ -46,8 +46,8 @@ namespace sm {
             panic();
         }
 
-        _global_device = device;
-        _global_context = context;
+        global_device = device;
+        global_context = context;
 
         listener.set_distance_model(al::DistanceModel::InverseClamped);
 
@@ -59,8 +59,8 @@ namespace sm {
         alcDestroyContext(context);
         alcCloseDevice(device);
 
-        _global_device = nullptr;
-        _global_context = nullptr;
+        global_device = nullptr;
+        global_context = nullptr;
 
         LOG_INFO("Destroyed OpenAL context and device");
     }
@@ -68,11 +68,11 @@ namespace sm {
     void OpenAlContext::destroy_openal_context() {
         alcMakeContextCurrent(nullptr);
 
-        if (_global_context != nullptr) {
-            alcDestroyContext(_global_context);
+        if (global_context != nullptr) {
+            alcDestroyContext(global_context);
 
-            if (_global_device != nullptr) {
-                alcCloseDevice(_global_device);
+            if (global_device != nullptr) {
+                alcCloseDevice(global_device);
             }
         }
 

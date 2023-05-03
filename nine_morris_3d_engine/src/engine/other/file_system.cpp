@@ -15,8 +15,8 @@
 
 namespace sm {
     // These don't need to be reset explicitly
-    static std::string _user_name;
-    static std::string _app_name;
+    static std::string g_user_name;
+    static std::string g_app_name;
 
 #if defined(NM3D_PLATFORM_LINUX)
         #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
@@ -54,7 +54,7 @@ namespace sm {
         }
 
         static void check_and_fix_directories_impl() {
-            const std::string path = USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+            const std::string path = USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
 
             if (!directory_exists_impl(file_system::cut_slash(path))) {
                 LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
@@ -109,7 +109,7 @@ namespace sm {
 
         static void check_and_fix_directories_impl() {
             {
-                const std::string path = USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+                const std::string path = USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
 
                 if (!directory_exists_impl(file_system::cut_slash(path))) {
                     LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
@@ -123,7 +123,7 @@ namespace sm {
             }
 
             {
-                const std::string path = DOCUMENTS_DIRECTORY_PATH(_user_name, _app_name);
+                const std::string path = DOCUMENTS_DIRECTORY_PATH(g_user_name, g_app_name);
 
                 if (!directory_exists_impl(file_system::cut_slash(path))) {
                     LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
@@ -141,23 +141,23 @@ namespace sm {
 #ifdef NM3D_PLATFORM_DISTRIBUTION
     #if defined(NM3D_PLATFORM_LINUX)
             static std::string path_for_logs_impl() {
-                return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+                return USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
             }
 
             static std::string path_for_saved_data_impl() {
-                return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+                return USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
             }
 
             static std::string path_for_assets_impl() {
-                return ASSETS_DIRECTORY_PATH(_app_name);
+                return ASSETS_DIRECTORY_PATH(g_app_name);
             }
     #elif defined(NM3D_PLATFORM_WINDOWS)
             static std::string path_for_logs_impl() {
-                return DOCUMENTS_DIRECTORY_PATH(_user_name, _app_name);
+                return DOCUMENTS_DIRECTORY_PATH(g_user_name, g_app_name);
             }
 
             static std::string path_for_saved_data_impl() {
-                return USER_DATA_DIRECTORY_PATH(_user_name, _app_name);
+                return USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
             }
 
             static std::string path_for_assets_impl() {
@@ -181,8 +181,8 @@ namespace sm {
 
     namespace file_system {
         void initialize_for_applications(std::string_view application_name) noexcept(false) {
-            _user_name = get_user_name();
-            _app_name = application_name;
+            g_user_name = get_user_name();
+            g_app_name = application_name;
         }
 
         bool directory_exists(std::string_view path) {

@@ -41,7 +41,7 @@ namespace sm {
 
         Ctx* ctx = nullptr;
     private:
-        inline void _on_stop() {  // Used to clean up objects
+        inline void objects_on_stop() {  // Used to clean up objects
             scene_list.clear();
             objects.clear();
         }

@@ -65,22 +65,22 @@ Board::Flags StandardBoard::release(sm::Identifier::Id hovered_id) {
 void StandardBoard::place_piece(size_t node_index) {
     remember_state();
 
-    _place_piece(node_index);
+    place_piece_manually(node_index);
 }
 
 void StandardBoard::move_piece(size_t source_node_index, size_t destination_node_index) {
     remember_state();
 
-    _move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
+    move_piece_manually(nodes.at(source_node_index).piece_index, destination_node_index);
 }
 
 void StandardBoard::take_piece(size_t node_index) {
     remember_state();
 
-    _take_piece(nodes.at(node_index).piece_index);
+    take_piece_manually(nodes.at(node_index).piece_index);
 }
 
-void StandardBoard::_place_piece(size_t node_index) {
+void StandardBoard::place_piece_manually(size_t node_index) {
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
     Node& node = nodes.at(node_index);
@@ -122,7 +122,7 @@ void StandardBoard::_place_piece(size_t node_index) {
     }
 }
 
-void StandardBoard::_move_piece(size_t piece_index, size_t node_index) {
+void StandardBoard::move_piece_manually(size_t piece_index, size_t node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 
@@ -190,7 +190,7 @@ void StandardBoard::_move_piece(size_t piece_index, size_t node_index) {
     }
 }
 
-void StandardBoard::_take_piece(size_t piece_index) {
+void StandardBoard::take_piece_manually(size_t piece_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
 
     Piece& piece = pieces.at(piece_index);

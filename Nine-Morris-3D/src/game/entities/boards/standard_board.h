@@ -24,9 +24,9 @@ struct StandardBoard : public Board {
     virtual void move_piece(size_t source_node_index, size_t destination_node_index) override;
     virtual void take_piece(size_t node_index) override;
 
-    void _place_piece(size_t node_index);
-    void _move_piece(size_t piece_index, size_t node_index);
-    void _take_piece(size_t piece_index);
+    void place_piece_manually(size_t node_index);
+    void move_piece_manually(size_t piece_index, size_t node_index);
+    void take_piece_manually(size_t piece_index);
 
     void check_select_piece(sm::Identifier::Id hovered_id);
     void check_place_piece(sm::Identifier::Id hovered_id);

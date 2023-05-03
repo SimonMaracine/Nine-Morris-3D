@@ -147,7 +147,7 @@ namespace sm {
         LOG_INFO("Closing application...");
 
         current_scene->on_stop();
-        current_scene->_on_stop();
+        current_scene->objects_on_stop();
 
         user_stop_function();
 
@@ -209,7 +209,7 @@ namespace sm {
     void Application::check_changed_scene() {
         if (changed_scene) {
             current_scene->on_stop();
-            current_scene->_on_stop();
+            current_scene->objects_on_stop();
 
             current_scene = to_scene;
 

@@ -52,14 +52,14 @@ void JumpBoard::place_piece(size_t) {
 void JumpBoard::move_piece(size_t source_node_index, size_t destination_node_index) {
     remember_state();
 
-    _move_piece(nodes.at(source_node_index).piece_index, destination_node_index);
+    move_piece_manually(nodes.at(source_node_index).piece_index, destination_node_index);
 }
 
 void JumpBoard::take_piece(size_t) {
     ASSERT(false, "Unimplemented");
 }
 
-void JumpBoard::_move_piece(size_t piece_index, size_t node_index) {
+void JumpBoard::move_piece_manually(size_t piece_index, size_t node_index) {
     ASSERT(piece_index != NULL_INDEX, "Invalid index");
     ASSERT(node_index != NULL_INDEX, "Invalid index");
 

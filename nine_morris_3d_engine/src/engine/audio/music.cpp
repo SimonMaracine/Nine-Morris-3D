@@ -9,8 +9,8 @@
 namespace sm {
     // Pointer is reset when music is stopped
     // Both are reset at the coresponding function call
-    static std::shared_ptr<music::MusicTrack> _current_music_track = nullptr;
-    static float _current_gain = 1.0f;
+    static std::shared_ptr<music::MusicTrack> g_current_music_track = nullptr;
+    static float g_current_gain = 1.0f;
 
     namespace music {
         MusicTrack::MusicTrack(std::string_view file_path) {
@@ -59,53 +59,53 @@ namespace sm {
 
         void uninitialize() {
             stop_music_track();
-            _current_gain = 1.0f;
+            g_current_gain = 1.0f;
 
             LOG_INFO("Uninitialized music");
         }
 
         void play_music_track(std::shared_ptr<MusicTrack> music_track) {
-            _current_music_track = music_track;
+            g_current_music_track = music_track;
 
-            _current_music_track->source->set_gain(_current_gain);  // Set the gain for this potentially new music track
-            _current_music_track->source->play(_current_music_track->buffer.get());
+            g_current_music_track->source->set_gain(g_current_gain);  // Set the gain for this potentially new music track
+            g_current_music_track->source->play(g_current_music_track->buffer.get());
 
-            LOG_DEBUG("Started playing music track `{}`", _current_music_track->name);
+            LOG_DEBUG("Started playing music track `{}`", g_current_music_track->name);
         }
 
         void stop_music_track() {
-            if (_current_music_track == nullptr) {
+            if (g_current_music_track == nullptr) {
                 LOG_WARNING("No music track pointer");
                 return;
             }
 
-            _current_music_track->source->stop();
+            g_current_music_track->source->stop();
 
-            LOG_DEBUG("Stopped playing music track `{}`", _current_music_track->name);
+            LOG_DEBUG("Stopped playing music track `{}`", g_current_music_track->name);
 
-            _current_music_track = nullptr;
+            g_current_music_track = nullptr;
         }
 
         void pause_music_track() {
-            if (_current_music_track == nullptr) {
+            if (g_current_music_track == nullptr) {
                 LOG_WARNING("No music track pointer");
                 return;
             }
 
-            _current_music_track->source->pause();
+            g_current_music_track->source->pause();
 
-            LOG_DEBUG("Paused playing music track `{}`", _current_music_track->name);
+            LOG_DEBUG("Paused playing music track `{}`", g_current_music_track->name);
         }
 
         void continue_music_track() {
-            if (_current_music_track == nullptr) {
+            if (g_current_music_track == nullptr) {
                 LOG_WARNING("No music track pointer");
                 return;
             }
 
-            _current_music_track->source->continue_();
+            g_current_music_track->source->continue_();
 
-            LOG_DEBUG("Continued playing music track `{}`", _current_music_track->name);
+            LOG_DEBUG("Continued playing music track `{}`", g_current_music_track->name);
         }
 
         void set_music_gain(float gain) {
@@ -115,10 +115,10 @@ namespace sm {
                 LOG_WARNING("Gain is larger than 1.0");
             }
 
-            _current_gain = gain;
+            g_current_gain = gain;
 
-            if (_current_music_track != nullptr) {
-                _current_music_track->source->set_gain(gain);
+            if (g_current_music_track != nullptr) {
+                g_current_music_track->source->set_gain(gain);
             }
         }
     }

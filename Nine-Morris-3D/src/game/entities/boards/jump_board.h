@@ -24,7 +24,7 @@ struct JumpBoard : public Board {  // Also good for jump plus variant
     virtual void move_piece(size_t source_node_index, size_t destination_node_index) override;
     virtual void take_piece(size_t node_index) override;
 
-    void _move_piece(size_t piece_index, size_t node_index);
+    void move_piece_manually(size_t piece_index, size_t node_index);
 
     void check_select_piece(sm::Identifier::Id hovered_id);
     void check_move_piece(sm::Identifier::Id hovered_id);

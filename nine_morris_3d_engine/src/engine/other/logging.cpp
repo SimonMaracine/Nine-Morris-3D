@@ -27,28 +27,28 @@
 namespace sm {
     // These don't need to be reset explicitly
     // Should be cleaned up at exit()
-    static std::shared_ptr<spdlog::logger> _global_logger;
-    static std::string _info_file;
+    static std::shared_ptr<spdlog::logger> global_logger;
+    static std::string g_info_file;
 
 #ifdef NM3D_PLATFORM_DISTRIBUTION
     static void set_fallback_logger_release(const char* error_message) {
-        _global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
-        _global_logger->set_pattern(LOG_PATTERN_RELEASE);
-        _global_logger->set_level(spdlog::level::trace);
+        global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
+        global_logger->set_pattern(LOG_PATTERN_RELEASE);
+        global_logger->set_level(spdlog::level::trace);
 
-        _global_logger->error("Using Fallback Logger (Console): {}", error_message);
+        global_logger->error("Using Fallback Logger (Console): {}", error_message);
     }
 #endif
 
     namespace logging {
         void initialize_for_applications(std::string_view log_file, std::string_view info_file) {
-            _info_file = info_file;
+            g_info_file = info_file;
 
 #ifdef NM3D_PLATFORM_DISTRIBUTION
             const std::string file_path = file_system::path_for_logs(log_file);
 
             try {
-                _global_logger = spdlog::rotating_logger_mt(
+                global_logger = spdlog::rotating_logger_mt(
                     "Release Logger [File]", file_path, FILE_SIZE, ROTATING_FILES
                 );
             } catch (const spdlog::spdlog_ex& e) {
@@ -56,13 +56,13 @@ namespace sm {
                 return;
             }
 
-            _global_logger->set_pattern(LOG_PATTERN_RELEASE);
-            _global_logger->set_level(spdlog::level::trace);
-            _global_logger->flush_on(spdlog::level::info);
+            global_logger->set_pattern(LOG_PATTERN_RELEASE);
+            global_logger->set_level(spdlog::level::trace);
+            global_logger->flush_on(spdlog::level::info);
 #else
-            _global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
-            _global_logger->set_pattern(LOG_PATTERN_DEBUG);
-            _global_logger->set_level(spdlog::level::trace);
+            global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
+            global_logger->set_pattern(LOG_PATTERN_DEBUG);
+            global_logger->set_level(spdlog::level::trace);
 
             static_cast<void>(log_file);
 #endif
@@ -78,7 +78,7 @@ namespace sm {
 
             switch (target) {
                 case LogTarget::File: {
-                    const std::string file_path = file_system::path_for_logs(_info_file);
+                    const std::string file_path = file_system::path_for_logs(g_info_file);
 
                     std::ofstream file {file_path, std::ios::trunc};
 
@@ -103,11 +103,11 @@ namespace sm {
         }
 
         spdlog::logger* get_global_logger() {
-            return _global_logger.get();
+            return global_logger.get();
         }
 
         std::string_view get_info_file() {
-            return _info_file;
+            return g_info_file;
         }
     }
 }
