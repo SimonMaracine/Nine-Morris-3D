@@ -41,7 +41,7 @@ namespace sm {
 #endif
 
     namespace logging {
-        void initialize_for_applications(std::string_view log_file, std::string_view info_file) {
+        void initialize_for_applications([[maybe_unused]] std::string_view log_file, std::string_view info_file) {
             g_info_file = info_file;
 
 #ifdef NM3D_PLATFORM_DISTRIBUTION
@@ -63,8 +63,6 @@ namespace sm {
             global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
             global_logger->set_pattern(LOG_PATTERN_DEBUG);
             global_logger->set_level(spdlog::level::trace);
-
-            static_cast<void>(log_file);
 #endif
         }
 

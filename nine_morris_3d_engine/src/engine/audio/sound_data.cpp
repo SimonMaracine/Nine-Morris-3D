@@ -7,12 +7,10 @@
 #include "engine/other/encrypt.h"
 
 namespace sm {
-    static void check_bits_per_sample(size_t bits_per_sample, std::string_view file_path) {
+    static void check_bits_per_sample(size_t bits_per_sample, [[maybe_unused]] std::string_view file_path) {
         if (bits_per_sample == 8) {
             LOG_WARNING("bits_per_sample = 8 for sound file `{}`", file_path);
         }
-
-        static_cast<void>(file_path);
     }
 
     SoundData::SoundData(std::string_view file_path)
