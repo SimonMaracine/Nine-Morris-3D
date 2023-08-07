@@ -5,7 +5,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Variable used to control the build type")
 
 project("Nine-Morris-3D"
-    VERSION 0.3.0
+    VERSION 0.4.0
     LANGUAGES C CXX
 )
 
