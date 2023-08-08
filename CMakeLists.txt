@@ -4,7 +4,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Variable used to control the build type")
 
-option(NM3D_FOR_DISTRIBUTION "Build for distribution" OFF)
+option(NM3D_DISTRIBUTION_MODE "Build for distribution" OFF)
 
 project("Nine-Morris-3D" LANGUAGES C CXX)
 
@@ -30,4 +30,4 @@ add_subdirectory(Nine-Morris-3D)
 # Also build the encrypter
 add_subdirectory(encrypter_helper)
 
-message(STATUS "Nine-Morris-3D: Building for distribution: ${NM3D_FOR_DISTRIBUTION}")
+message(STATUS "Nine-Morris-3D: Building for distribution: ${NM3D_DISTRIBUTION_MODE}")
