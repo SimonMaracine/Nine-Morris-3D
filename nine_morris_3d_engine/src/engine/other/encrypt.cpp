@@ -1,4 +1,4 @@
-#include <cppblowfish/cppblowfish.h>
+#include <cppblowfish/cppblowfish.hpp>
 
 #include "engine/application_base/panic.h"
 #include "engine/other/encrypt.h"

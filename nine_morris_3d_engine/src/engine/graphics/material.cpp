@@ -1,5 +1,5 @@
 #include <glm/glm.hpp>
-#include <resmanager/resmanager.h>
+#include <resmanager/resmanager.hpp>
 
 #include "engine/graphics/material.h"
 #include "engine/graphics/opengl/shader.h"

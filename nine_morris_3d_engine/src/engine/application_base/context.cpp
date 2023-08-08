@@ -1,4 +1,4 @@
-#include <resmanager/resmanager.h>
+#include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/context.h"
 #include "engine/application_base/application.h"

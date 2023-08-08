@@ -55,7 +55,6 @@ Hopefully an Android version will be made.
 
 ### Where to update the version
 
-- CMakeLists.txt
 - main.cpp
 - install.sh
 - installer.nsi

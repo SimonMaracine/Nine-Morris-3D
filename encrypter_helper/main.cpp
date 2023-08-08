@@ -3,7 +3,7 @@
 #include <fstream>
 #include <stdlib.h>
 
-#include <cppblowfish/cppblowfish.h>
+#include <cppblowfish/cppblowfish.hpp>
 
 static void open_file(const std::string& file_name, unsigned char** out, size_t* size) {
     std::ifstream file {file_name, std::ios::binary};

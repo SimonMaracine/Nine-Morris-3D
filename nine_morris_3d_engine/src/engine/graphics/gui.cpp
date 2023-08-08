@@ -1,6 +1,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <resmanager/resmanager.h>
+#include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/application.h"
 #include "engine/graphics/renderer/render_helpers.h"

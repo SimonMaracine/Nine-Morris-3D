@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
-#include <resmanager/resmanager.h>
+#include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/window.h"
 #include "engine/application_base/application.h"

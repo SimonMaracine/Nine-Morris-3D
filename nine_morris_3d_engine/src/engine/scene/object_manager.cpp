@@ -1,4 +1,4 @@
-#include <resmanager/resmanager.h>
+#include <resmanager/resmanager.hpp>
 
 #include "engine/scene/object_manager.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <resmanager/resmanager.h>
+#include <resmanager/resmanager.hpp>
 
 #include "engine/audio/openal/source.h"
 #include "engine/audio/openal/buffer.h"

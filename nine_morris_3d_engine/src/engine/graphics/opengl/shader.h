@@ -2,8 +2,8 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <cppblowfish/cppblowfish.h>
-#include <resmanager/resmanager.h>
+#include <cppblowfish/cppblowfish.hpp>
+#include <resmanager/resmanager.hpp>
 
 #include "engine/graphics/opengl/buffer.h"
 #include "engine/other/encrypt.h"

@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-option(NM3D_FOR_DISTRIBUTION "Build for distribution" OFF)
-
-set(ENGINE "nine_morris_3d_engine")
-set(GLAD_STB "glad_stb")
-set(DEAR_IMGUI "dear_imgui")
-
 # Use static linking everywhere possible
 set(BUILD_SHARED_LIBS OFF)
 
@@ -28,8 +22,6 @@ set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_TESTS OFF)
 set(GLFW_BUILD_DOCS OFF)
 
-# cppblowfish
-set(CPPBLOWFISH_BUILD_TESTS OFF)
 
 # OpenAL Soft
 set(ALSOFT_UTILS OFF)
@@ -41,7 +33,61 @@ set(ALSOFT_INSTALL_AMBDEC_PRESETS OFF)
 set(ALSOFT_INSTALL_EXAMPLES OFF)
 set(ALSOFT_INSTALL_UTILS OFF)
 set(ALSOFT_UPDATE_BUILD_VERSION OFF)
-set(LIBTYPE STATIC)  # To make static library
+set(LIBTYPE "STATIC")  # To make static library
+
+# Make glad
+add_library(glad STATIC "dependencies/glad/src/glad.c")
+
+target_include_directories(glad PUBLIC "dependencies/glad/include")
+
+# Make stb
+add_library(stb STATIC
+    "dependencies/stb_image/stb_image.c"
+    "dependencies/stb_truetype/stb_truetype.c"
+    "dependencies/stb_image_write/stb_image_write.c"
+    "dependencies/stb_vorbis/stb_vorbis.c"
+)
+
+target_include_directories(stb PUBLIC
+    "dependencies/stb_image"
+    "dependencies/stb_truetype"
+    "dependencies/stb_image_write"
+    "dependencies/stb_vorbis"
+)
+
+# Make Dear ImGui
+add_library(dear_imgui STATIC
+    "extern/imgui/imgui_draw.cpp"
+    "extern/imgui/imgui_demo.cpp"
+    "extern/imgui/imgui_tables.cpp"
+    "extern/imgui/imgui_widgets.cpp"
+    "extern/imgui/imgui.cpp"
+    "extern/imgui/imgui.h"
+    "extern/imgui/imgui_internal.h"
+
+    "extern/imgui/backends/imgui_impl_glfw.cpp"
+    "extern/imgui/backends/imgui_impl_opengl3.cpp"
+    "extern/imgui/backends/imgui_impl_glfw.h"
+    "extern/imgui/backends/imgui_impl_opengl3.h"
+)
+
+target_include_directories(dear_imgui PUBLIC "extern/imgui")
+target_include_directories(dear_imgui PRIVATE "extern/glfw/include")
+
+# Make cereal
+add_library(cereal INTERFACE)  # FIXME use submodule
+
+target_include_directories(cereal INTERFACE "dependencies/cereal/include")
+
+add_subdirectory(extern/assimp)
+add_subdirectory(extern/cppblowfish)
+add_subdirectory(extern/entt)
+add_subdirectory(extern/glfw)
+add_subdirectory(extern/glm)
+add_subdirectory(extern/openal_soft)
+add_subdirectory(extern/resmanager)
+add_subdirectory(extern/spdlog)
+add_subdirectory(extern/utfcpp)
 
 set(ENGINE_HEADERS
     "src/engine/application_base/application_builder.h"
@@ -114,7 +160,7 @@ set(ENGINE_HEADERS
     "src/engine/public/scene.h"
 )
 
-add_library(${ENGINE} STATIC
+add_library(nine_morris_3d_engine STATIC
     "src/engine/application_base/application_builder.cpp"
     "src/engine/application_base/application.cpp"
     "src/engine/application_base/capabilities.cpp"
@@ -158,153 +204,138 @@ add_library(${ENGINE} STATIC
     ${ENGINE_HEADERS}
 )
 
+target_link_libraries(nine_morris_3d_engine PRIVATE
+    glad
+    stb
+    cereal
+    assimp
+    cppblowfish
+    EnTT::EnTT
+    glfw
+    glm
+    OpenAL::OpenAL
+    resmanager
+    utf8cpp
+)
+
+target_link_libraries(nine_morris_3d_engine PUBLIC
+    dear_imgui
+    spdlog
+)
+
+target_include_directories(nine_morris_3d_engine PUBLIC "src")
+
 # Enable warnings only for engine
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(${ENGINE} PRIVATE -Wall -Wextra)
+    target_compile_options(nine_morris_3d_engine PRIVATE "-Wall" "-Wextra" "-Wpedantic")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(${ENGINE} PRIVATE /W2 /wd4244)
-else()
-    message(FATAL_ERROR "NM3D: Compiler is not GCC or MSVC")
+    target_compile_options(nine_morris_3d_engine PRIVATE "/W3")
 endif()
 
 # Enable sanitizing in debug mode for GCC
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(${ENGINE} PRIVATE -fsanitize=undefined -g)
-        target_link_options(${ENGINE} PRIVATE -static-libasan -fsanitize=undefined)
+        target_compile_options(nine_morris_3d_engine PRIVATE "-fsanitize=undefined" "-g")
+        target_link_options(nine_morris_3d_engine PRIVATE "-static-libasan" "-fsanitize=undefined")
 
-        message(STATUS "NM3D: Building engine with sanitizers")
+        message(STATUS "Nine-Morris-3D: Building engine with sanitizers")
     endif()
 endif()
 
 # Use UTF-8 encoding on Windows for both engine and client
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(${ENGINE} PUBLIC /utf-8)
+    target_compile_options(nine_morris_3d_engine PUBLIC "/utf-8")
 endif()
 
-# Use C++17 for both engine and client
-target_compile_features(${ENGINE} PUBLIC cxx_std_17)
-set_target_properties(${ENGINE} PROPERTIES CXX_EXTENSIONS OFF)
+# Use C++ 17 for both engine and client
+target_compile_features(nine_morris_3d_engine PUBLIC cxx_std_17)
+set_target_properties(nine_morris_3d_engine PROPERTIES CXX_EXTENSIONS OFF)
 
 # Use PCH
-target_precompile_headers(${ENGINE} PRIVATE "src/pch.hpp")
+target_precompile_headers(nine_morris_3d_engine PRIVATE "src/pch.hpp")
 
-# Make dependency target glad and stb
-add_library(${GLAD_STB} STATIC
-    "dependencies/glad/src/glad.c"
-    "dependencies/stb_image/stb_image.c"
-    "dependencies/stb_truetype/stb_truetype.c"
-    "dependencies/stb_image_write/stb_image_write.c"
-    "dependencies/stb_vorbis/stb_vorbis.c"
-)
 
-# Make dependency target Dear ImGui
-add_library(${DEAR_IMGUI} STATIC
-    "extern/imgui/imgui_draw.cpp"
-    "extern/imgui/imgui_demo.cpp"
-    "extern/imgui/imgui_tables.cpp"
-    "extern/imgui/imgui_widgets.cpp"
-    "extern/imgui/imgui.cpp"
-    "extern/imgui/backends/imgui_impl_opengl3.cpp"
-    "extern/imgui/backends/imgui_impl_glfw.cpp"
-)
 
-add_subdirectory(extern/assimp)
-add_subdirectory(extern/cppblowfish)
-add_subdirectory(extern/glfw)
-add_subdirectory(extern/openal_soft)
-add_subdirectory(extern/spdlog)
 
-add_dependencies(${ENGINE} glfw)  # TODO this was necessary for some reason
 
 # Add all include directories
-target_include_directories(${ENGINE} PUBLIC "src")
+
 
 # These have to be public in client
-target_include_directories(${ENGINE} SYSTEM PUBLIC
-    "dependencies/cereal/include"
-    "dependencies/glad/include"
-    "dependencies/stb_image"
-    "dependencies/stb_truetype"
-    "dependencies/stb_image_write"
-    "dependencies/stb_vorbis"
-    "extern/spdlog/include"
-    "extern/assimp/include"
-    "extern/glm"
-    "extern/imgui"
-    "extern/glfw/include"
-    "extern/utfcpp/source"
-    "extern/cppblowfish/include"
-    "extern/entt/src"
-    "extern/resmanager/src"
-    "extern/openal_soft/include"
-)
+# target_include_directories(nine_morris_3d_engine SYSTEM PUBLIC
+#     "dependencies/cereal/include"
+#     "dependencies/glad/include"
+#     "dependencies/stb_image"
+#     "dependencies/stb_truetype"
+#     "dependencies/stb_image_write"
+#     "dependencies/stb_vorbis"
+#     "extern/spdlog/include"
+#     "extern/assimp/include"
+#     "extern/glm"
+#     "extern/imgui"
+#     "extern/glfw/include"
+#     "extern/utfcpp/source"
+#     "extern/cppblowfish/include"
+#     "extern/entt/src"
+#     "extern/resmanager/src"
+#     "extern/openal_soft/include"
+# )
 
-target_include_directories(${GLAD_STB} SYSTEM PRIVATE
-    "dependencies/glad/include"
-    "dependencies/stb_image"
-    "dependencies/stb_truetype"
-    "dependencies/stb_image_write"
-)
 
-target_include_directories(${DEAR_IMGUI} SYSTEM PRIVATE
-    "extern/imgui"
-    "extern/glfw/include"
-)
+
+
+
+
 
 # Add all libraries
-target_link_libraries(${ENGINE} PRIVATE
-    assimp
-    cppblowfish
-    glfw
-    OpenAL::OpenAL
-    ${GLAD_STB}
-)
+# target_link_libraries(nine_morris_3d_engine PRIVATE
+#     assimp
+#     cppblowfish
+#     glfw
+#     OpenAL::OpenAL
+#     glad_stb
+# )
 
 # But link these ones publicly
-target_link_libraries(${ENGINE} PUBLIC
-    spdlog
-    ${DEAR_IMGUI}
-)
+# target_link_libraries(nine_morris_3d_engine PUBLIC
+#     spdlog
+#     dear_imgui
+# )
 
 # Add compile definitions for engine and client
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(STATUS "NM3D: Building Nine Morris 3D engine in DEBUG mode")
-
     # Both engine and client
-    target_compile_definitions(${ENGINE} PUBLIC
-        "NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES"  # To easily enable or disable encrypted files
-    )
+    # target_compile_definitions(nine_morris_3d_engine PUBLIC
+    #     "NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES"  # To easily enable or disable encrypted files # FIXME remove this
+    # )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    message(STATUS "NM3D: Building Nine Morris 3D engine in RELEASE mode")
+    # message(STATUS "NM3D: Building Nine Morris 3D engine in RELEASE mode")
 
     # Optimization on in both engine and client
-    target_compile_definitions(${ENGINE} PUBLIC
+    target_compile_definitions(nine_morris_3d_engine PUBLIC
         "NDEBUG"  # Disable asserts globally
         "NM3D_RELEASE_BUILD_MODE"  # Just a flag used by platform.h
         "ENTT_DISABLE_ASSERT"
     )
 
-    if(${NM3D_FOR_DISTRIBUTION})
+    if(NM3D_FOR_DISTRIBUTION)
         # Distribution flag on in both engine and client
-        target_compile_definitions(${ENGINE} PUBLIC
+        target_compile_definitions(nine_morris_3d_engine PUBLIC
             "NM3D_FOR_DISTRIBUTION"
         )
 
-        message(STATUS "NM3D: Building Nine Morris 3D engine for DISTRIBUTION")
+        message(STATUS "Nine-Morris-3D: Building Nine Morris 3D engine for DISTRIBUTION")
     endif()
-else()
-    message(FATAL_ERROR "NM3D: Unknown build type")
 endif()
 
-target_compile_definitions(${ENGINE} PRIVATE
+target_compile_definitions(nine_morris_3d_engine PRIVATE
     "IMGUI_IMPL_OPENGL_LOADER_GLAD"
     "UTF_CPP_CPLUSPLUS=201703"
     "AL_LIBTYPE_STATIC"
 )
 
 # Both engine and client
-target_compile_definitions(${ENGINE} PUBLIC
+target_compile_definitions(nine_morris_3d_engine PUBLIC
     "SPDLOG_ACTIVE_LEVEL=0"
     "_CRT_SECURE_NO_WARNINGS"
     "ENTT_NO_ETO"
@@ -313,12 +344,12 @@ target_compile_definitions(${ENGINE} PUBLIC
 # On Windows set runtime library
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET
-        ${ENGINE} ${GLAD_STB} ${DEAR_IMGUI} spdlog assimp glfw cppblowfish OpenAL
+        nine_morris_3d_engine glad stb dear_imgui spdlog assimp glfw cppblowfish OpenAL
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug"
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     set_property(TARGET
-        ${ENGINE} ${GLAD_STB} ${DEAR_IMGUI} spdlog assimp glfw cppblowfish OpenAL
+        nine_morris_3d_engine glad stb dear_imgui spdlog assimp glfw cppblowfish OpenAL
         PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded"
     )
 endif()

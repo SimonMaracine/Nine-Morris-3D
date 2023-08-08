@@ -1,6 +1,6 @@
 #pragma once
 
-#include <resmanager/resmanager.h>
+#include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/application_properties.h"
 #include "engine/application_base/events.h"

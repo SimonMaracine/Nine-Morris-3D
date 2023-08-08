@@ -6,8 +6,8 @@
 #include <spdlog/version.h>
 #include <entt/entt.hpp>
 #include <cereal/version.hpp>
-#include <cppblowfish/cppblowfish.h>
-#include <resmanager/resmanager.h>
+#include <cppblowfish/cppblowfish.hpp>
+#include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/platform.h"
 #include "engine/other/dependencies.h"
