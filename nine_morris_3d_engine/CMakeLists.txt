@@ -22,7 +22,6 @@ set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_TESTS OFF)
 set(GLFW_BUILD_DOCS OFF)
 
-
 # OpenAL Soft
 set(ALSOFT_UTILS OFF)
 set(ALSOFT_EXAMPLES OFF)
@@ -226,15 +225,15 @@ target_link_libraries(nine_morris_3d_engine PUBLIC
 target_include_directories(nine_morris_3d_engine PUBLIC "src")
 
 # Enable warnings only for engine
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(UNIX)
     target_compile_options(nine_morris_3d_engine PRIVATE "-Wall" "-Wextra" "-Wpedantic")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+elseif(WIN32)
     target_compile_options(nine_morris_3d_engine PRIVATE "/W3")
 endif()
 
 # Enable sanitizing in debug mode for GCC
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(UNIX)
         target_compile_options(nine_morris_3d_engine PRIVATE "-fsanitize=undefined" "-g")
         target_link_options(nine_morris_3d_engine PRIVATE "-static-libasan" "-fsanitize=undefined")
 
@@ -243,7 +242,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 # Use UTF-8 encoding on Windows for both engine and client
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+if(WIN32)
     target_compile_options(nine_morris_3d_engine PUBLIC "/utf-8")
 endif()
 
@@ -254,54 +253,6 @@ set_target_properties(nine_morris_3d_engine PROPERTIES CXX_EXTENSIONS OFF)
 # Use PCH
 target_precompile_headers(nine_morris_3d_engine PRIVATE "src/pch.hpp")
 
-
-
-
-
-# Add all include directories
-
-
-# These have to be public in client
-# target_include_directories(nine_morris_3d_engine SYSTEM PUBLIC
-#     "dependencies/cereal/include"
-#     "dependencies/glad/include"
-#     "dependencies/stb_image"
-#     "dependencies/stb_truetype"
-#     "dependencies/stb_image_write"
-#     "dependencies/stb_vorbis"
-#     "extern/spdlog/include"
-#     "extern/assimp/include"
-#     "extern/glm"
-#     "extern/imgui"
-#     "extern/glfw/include"
-#     "extern/utfcpp/source"
-#     "extern/cppblowfish/include"
-#     "extern/entt/src"
-#     "extern/resmanager/src"
-#     "extern/openal_soft/include"
-# )
-
-
-
-
-
-
-
-# Add all libraries
-# target_link_libraries(nine_morris_3d_engine PRIVATE
-#     assimp
-#     cppblowfish
-#     glfw
-#     OpenAL::OpenAL
-#     glad_stb
-# )
-
-# But link these ones publicly
-# target_link_libraries(nine_morris_3d_engine PUBLIC
-#     spdlog
-#     dear_imgui
-# )
-
 # Add compile definitions for engine and client
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Both engine and client
@@ -309,8 +260,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #     "NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES"  # To easily enable or disable encrypted files # FIXME remove this
     # )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    # message(STATUS "NM3D: Building Nine Morris 3D engine in RELEASE mode")
-
     # Optimization on in both engine and client
     target_compile_definitions(nine_morris_3d_engine PUBLIC
         "NDEBUG"  # Disable asserts globally

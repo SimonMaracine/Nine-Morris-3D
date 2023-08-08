@@ -13,6 +13,10 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 message(STATUS "Nine-Morris-3D: Project compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "Nine-Morris-3D: Project build type: ${CMAKE_BUILD_TYPE}")
 
+if(NOT UNIX AND NOT WIN32)
+    message(FATAL_ERROR "Nine-Morris-3D: Operating system is not Linux or Windows")
+endif()
+
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message(FATAL_ERROR "Nine-Morris-3D: Compiler is not GCC or MSVC")
 endif()

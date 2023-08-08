@@ -7,13 +7,13 @@ add_executable(encrypter_helper "main.cpp")
 target_link_libraries(encrypter_helper PRIVATE cppblowfish)
 
 # Copy executable into a different location
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(UNIX)
     add_custom_command(TARGET encrypter_helper POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         "${CMAKE_CURRENT_BINARY_DIR}/encrypter_helper"
         "${CMAKE_CURRENT_SOURCE_DIR}/encrypter_helper"
     )
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+elseif(WIN32)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_custom_command(TARGET encrypter_helper POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
