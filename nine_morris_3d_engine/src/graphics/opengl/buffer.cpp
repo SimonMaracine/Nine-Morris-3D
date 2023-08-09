@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <unordered_map>
 
 #include <glad/glad.h>
 
@@ -89,7 +90,7 @@ namespace sm {
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        ASSERT(size % sizeof(unsigned int) == 0, "Data may be corrupted");
+        SM_ASSERT(size % sizeof(unsigned int) == 0, "Data may be corrupted");
 
         index_count = static_cast<int>(size / sizeof(unsigned int));
 
@@ -138,8 +139,8 @@ namespace sm {
     }
 
     void GlUniformBuffer::set(const void* field_data, size_t field_index) {
-        ASSERT(configured, "Uniform buffer must be configured");
-        ASSERT(data != nullptr && size > 0, "Data must be allocated");
+        SM_ASSERT(configured, "Uniform buffer must be configured");
+        SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
 #ifdef SM_BUILD_DEBUG
         memcpy(data + fields.at(field_index).offset, field_data, fields.at(field_index).size);
@@ -149,7 +150,7 @@ namespace sm {
     }
 
     void GlUniformBuffer::upload_sub_data() {
-        ASSERT(data != nullptr && size > 0, "Data must be allocated");
+        SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
     }

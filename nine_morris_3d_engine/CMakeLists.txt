@@ -114,7 +114,7 @@ set(ENGINE_HEADERS
     "include/engine/graphics/opengl/texture.hpp"
     "include/engine/graphics/opengl/vertex_array.hpp"
     "include/engine/graphics/renderer/gui_renderer.hpp"
-    "include/engine/graphics/renderer/render_helpers.hpp"
+    "include/engine/graphics/renderer/render_gl.hpp"
     "include/engine/graphics/renderer/renderer.hpp"
     "include/engine/graphics/camera.hpp"
     "include/engine/graphics/font.hpp"
@@ -175,7 +175,7 @@ add_library(nine_morris_3d_engine STATIC
     "src/graphics/opengl/texture.cpp"
     "src/graphics/opengl/vertex_array.cpp"
     "src/graphics/renderer/gui_renderer.cpp"
-    "src/graphics/renderer/render_helpers.cpp"
+    "src/graphics/renderer/render_gl.cpp"
     "src/graphics/renderer/renderer.cpp"
     "src/graphics/camera.cpp"
     "src/graphics/font.cpp"
@@ -199,24 +199,24 @@ add_library(nine_morris_3d_engine STATIC
 
 target_link_libraries(nine_morris_3d_engine PRIVATE
     glad
-    stb
-    cereal
     assimp
-    cppblowfish
-    EnTT::EnTT
     glfw
-    glm
     OpenAL::OpenAL
-    resmanager
     utf8cpp
 )
 
 target_link_libraries(nine_morris_3d_engine PUBLIC
     dear_imgui
     spdlog
+    resmanager
+    EnTT::EnTT
+    cppblowfish
+    glm
+    cereal
+    stb
 )
 
-target_include_directories(nine_morris_3d_engine PUBLIC "src")
+target_include_directories(nine_morris_3d_engine PUBLIC "include")
 
 # Enable warnings only for engine
 if(UNIX)

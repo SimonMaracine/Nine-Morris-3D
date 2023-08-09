@@ -24,7 +24,7 @@ namespace sm {
 
     static std::string get_name(std::string_view file_path) {
         size_t last_slash = file_path.find_last_of("/");
-        ASSERT(last_slash != std::string::npos, "Could not find slash");
+        SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
 
         return std::string(file_path.substr(last_slash + 1));
     }
@@ -42,16 +42,16 @@ namespace sm {
             token = std::strtok(nullptr, "/");
         }
 
-        ASSERT(tokens.size() >= 2, "Invalid file path name");
+        SM_ASSERT(tokens.size() >= 2, "Invalid file path name");
 
         return tokens[tokens.size() - 2];  // It's ok
     }
 
-    static bool use_mipmapping(const gl::TextureSpecification& specification) {
+    static bool use_mipmapping(const TextureSpecification& specification) {
         return specification.mipmap_levels > 1;
     }
 
-    static void configure_mipmapping(const gl::TextureSpecification& specification) {
+    static void configure_mipmapping(const TextureSpecification& specification) {
         if (!use_mipmapping(specification)) {
             return;
         }
@@ -64,7 +64,7 @@ namespace sm {
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
 
         if (anisotropic_filtering_enabled) {
-            ASSERT(
+            SM_ASSERT(
                 specification.anisotropic_filtering <= max_anisotropic_filtering_supported(),
                 "Invalid anisotropic filtering value"
             );
@@ -108,7 +108,7 @@ namespace sm {
         return result;
     }
 
-    static void configure_filter_and_wrap(const gl::TextureSpecification& specification) {
+    static void configure_filter_and_wrap(const TextureSpecification& specification) {
         const int min_filter = (
             use_mipmapping(specification) ? GL_LINEAR_MIPMAP_LINEAR : filter_to_int(specification.min_filter)
         );
@@ -132,7 +132,7 @@ namespace sm {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 
-    Texture::Texture(std::string_view file_path, const gl::TextureSpecification& specification)
+    GlTexture::GlTexture(std::string_view file_path, const TextureSpecification& specification)
         : specification(specification) {
         LOG_DEBUG("Loading texture `{}`...", file_path);
 
@@ -163,7 +163,7 @@ namespace sm {
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
-    Texture::Texture(Encrypt::EncryptedFile file_path, const gl::TextureSpecification& specification)
+    GlTexture::GlTexture(Encrypt::EncryptedFile file_path, const TextureSpecification& specification)
         : specification(specification) {
         LOG_DEBUG("Loading texture `{}`...", file_path);
 
@@ -198,9 +198,9 @@ namespace sm {
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
-    Texture::Texture(std::shared_ptr<TextureData> data, const gl::TextureSpecification& specification)
+    GlTexture::GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification)
         : specification(specification) {
-        ASSERT(data->data != nullptr, "No data");
+        SM_ASSERT(data->data != nullptr, "No data");
 
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -218,9 +218,9 @@ namespace sm {
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
-    Texture::Texture(int width, int height, unsigned char* data, const TextureSpecification& specification)
+    GlTexture::GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification)
         : specification(specification) {
-        ASSERT(data != nullptr, "No data");
+        SM_ASSERT(data != nullptr, "No data");
 
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -238,29 +238,29 @@ namespace sm {
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
-    Texture::~Texture() {
+    GlTexture::~GlTexture() {
         glDeleteTextures(1, &texture);
 
         LOG_DEBUG("Deleted GL texture {} ({})", texture, name);
     }
 
-    void Texture::bind(unsigned int unit) {
+    void GlTexture::bind(unsigned int unit) {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
-    void Texture::unbind() {
+    void GlTexture::unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void Texture::allocate_texture(int width, int height, unsigned char* data) {
+    void GlTexture::allocate_texture(int width, int height, unsigned char* data) {
         switch (specification.format) {
-            case gl::Format::Rgba8:
+            case Format::Rgba8:
                 glTexStorage2D(GL_TEXTURE_2D, specification.mipmap_levels, GL_RGBA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
                 break;
-            case gl::Format::R8:
+            case Format::R8:
                 glTexStorage2D(GL_TEXTURE_2D, specification.mipmap_levels, GL_R8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, data);
 
@@ -270,7 +270,7 @@ namespace sm {
 
     // --- 3D texture
 
-    Texture3D::Texture3D(const char** file_paths) {
+    GlTexture3D::GlTexture3D(const char** file_paths) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
@@ -310,7 +310,7 @@ namespace sm {
         LOG_DEBUG("Created GL 3D texture {} ({})", texture, name);
     }
 
-    Texture3D::Texture3D(const std::array<std::shared_ptr<TextureData>, 6>& data) {
+    GlTexture3D::GlTexture3D(const std::array<std::shared_ptr<TextureData>, 6>& data) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
@@ -332,18 +332,18 @@ namespace sm {
         LOG_DEBUG("Created GL 3D texture {} ({})", texture, name);
     }
 
-    Texture3D::~Texture3D() {
+    GlTexture3D::~GlTexture3D() {
         glDeleteTextures(1, &texture);
 
         LOG_DEBUG("Deleted GL 3D texture {} ({})", texture, name);
     }
 
-    void Texture3D::bind(unsigned int unit) {
+    void GlTexture3D::bind(unsigned int unit) {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
     }
 
-    void Texture3D::unbind() {
+    void GlTexture3D::unbind() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     }
 }

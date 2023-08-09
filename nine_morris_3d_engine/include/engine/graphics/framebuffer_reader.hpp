@@ -27,7 +27,7 @@ namespace sm {
 
         // Call this after the framebuffer is bound to begin reading the framebuffer
         void read(int attachment_index, int x, int y) {
-            ASSERT(attachment_index >= 0, "Attachment index must be positive");
+            SM_ASSERT(attachment_index >= 0, "Attachment index must be positive");
 
             buffer_index = (buffer_index + 1) % BufferCount;
             next_buffer_index = (buffer_index + 1) % BufferCount;

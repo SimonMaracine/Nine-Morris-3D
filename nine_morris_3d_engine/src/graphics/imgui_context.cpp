@@ -6,99 +6,11 @@
 #include <GLFW/glfw3.h>
 
 #include "engine/application_base/platform.hpp"
-#include "engine/dear_imgui/imgui_context.hpp"
+#include "engine/graphics/imgui_context.hpp"
 
 namespace sm {
-    void ImGuiContext::initialize(void* window_handle) {
-        IMGUI_CHECKVERSION();
-
-        ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window_handle), false);
-        ImGui_ImplOpenGL3_Init("#version 430 core");
-
-        ImGuiIO& io = ImGui::GetIO();
-        io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;  // TODO needed?
-        io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // TODO maybe not needed
-        io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;  // TODO needed?
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // TODO needed?
-#ifdef SM_BUILD_DISTRIBUTION
-        io.IniFilename = nullptr;
-#endif
-    }
-
-    void ImGuiContext::uninitialize() {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
-    }
-
-    void ImGuiContext::begin_frame() {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-    }
-
-    void ImGuiContext::end_frame() {
-        ImGui::EndFrame();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }
-
-    bool ImGuiContext::on_mouse_scrolled(float yoffset) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMouseWheelEvent(0.0f, yoffset);
-
-        return io.WantCaptureMouse;
-    }
-
-    bool ImGuiContext::on_mouse_moved(float xpos, float ypos) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMousePosEvent(xpos, ypos);
-
-        return io.WantCaptureMouse;
-    }
-
-    bool ImGuiContext::on_mouse_button_pressed(int button) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMouseButtonEvent(button, true);
-
-        return io.WantCaptureMouse;
-    }
-
-    bool ImGuiContext::on_mouse_button_released(int button) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMouseButtonEvent(button, false);
-
-        return io.WantCaptureMouse;
-    }
-
-    bool ImGuiContext::on_key_pressed(int key, int scancode) {
-        key = translate_untranslated_key(key, scancode);
-
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddKeyEvent(glfw_to_imgui_key(key), true);
-
-        return io.WantCaptureKeyboard;
-    }
-
-    bool ImGuiContext::on_key_released(int key, int scancode) {
-        key = translate_untranslated_key(key, scancode);
-
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddKeyEvent(glfw_to_imgui_key(key), false);
-
-        return io.WantCaptureKeyboard;
-    }
-
-    bool ImGuiContext::on_char_typed(unsigned int codepoint) {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddInputCharacter(codepoint);
-
-        return io.WantCaptureKeyboard;
-    }
-
     // Taken from Dear ImGui; it's not rock-solid, as it's just a workaround
-    int ImGuiContext::translate_untranslated_key(int key, int scancode) {
+    static int translate_untranslated_key(int key, int scancode) {
         if (key >= GLFW_KEY_KP_0 && key <= GLFW_KEY_KP_EQUAL) {
             return key;
         }
@@ -137,7 +49,7 @@ namespace sm {
     }
 
     // Taken from Dear ImGui
-    ImGuiKey ImGuiContext::glfw_to_imgui_key(int key) {
+    static ImGuiKey glfw_to_imgui_key(int key) {
         switch (key) {
             case GLFW_KEY_TAB: return ImGuiKey_Tab;
             case GLFW_KEY_LEFT: return ImGuiKey_LeftArrow;
@@ -246,5 +158,93 @@ namespace sm {
             case GLFW_KEY_F12: return ImGuiKey_F12;
             default: return ImGuiKey_None;
         }
+    }
+
+    void ImGuiContext::initialize(void* window_handle) {
+        IMGUI_CHECKVERSION();
+
+        ImGui::CreateContext();
+        ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window_handle), false);
+        ImGui_ImplOpenGL3_Init("#version 430 core");
+
+        ImGuiIO& io = ImGui::GetIO();
+        io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;  // TODO needed?
+        io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // TODO maybe not needed
+        io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;  // TODO needed?
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // TODO needed?
+#ifdef SM_BUILD_DISTRIBUTION
+        io.IniFilename = nullptr;
+#endif
+    }
+
+    void ImGuiContext::uninitialize() {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+    }
+
+    void ImGuiContext::begin_frame() {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    }
+
+    void ImGuiContext::end_frame() {
+        ImGui::EndFrame();
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
+    bool ImGuiContext::on_mouse_scrolled(float yoffset) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseWheelEvent(0.0f, yoffset);
+
+        return io.WantCaptureMouse;
+    }
+
+    bool ImGuiContext::on_mouse_moved(float xpos, float ypos) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMousePosEvent(xpos, ypos);
+
+        return io.WantCaptureMouse;
+    }
+
+    bool ImGuiContext::on_mouse_button_pressed(int button) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(button, true);
+
+        return io.WantCaptureMouse;
+    }
+
+    bool ImGuiContext::on_mouse_button_released(int button) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(button, false);
+
+        return io.WantCaptureMouse;
+    }
+
+    bool ImGuiContext::on_key_pressed(int key, int scancode) {
+        key = translate_untranslated_key(key, scancode);
+
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddKeyEvent(glfw_to_imgui_key(key), true);
+
+        return io.WantCaptureKeyboard;
+    }
+
+    bool ImGuiContext::on_key_released(int key, int scancode) {
+        key = translate_untranslated_key(key, scancode);
+
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddKeyEvent(glfw_to_imgui_key(key), false);
+
+        return io.WantCaptureKeyboard;
+    }
+
+    bool ImGuiContext::on_char_typed(unsigned int codepoint) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddInputCharacter(codepoint);
+
+        return io.WantCaptureKeyboard;
     }
 }

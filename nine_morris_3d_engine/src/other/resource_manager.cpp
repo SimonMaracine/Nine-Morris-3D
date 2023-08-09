@@ -1,4 +1,6 @@
-#include "engine/other/resource_manager.h"
+#include <utility>
+
+#include "engine/other/resource_manager.hpp"
 
 namespace sm {
     void ResourcesCache::merge(ResourcesCache& other) {

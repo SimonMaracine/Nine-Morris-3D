@@ -26,9 +26,9 @@ namespace sm {
         Wrapper struct around public functionality exposed to user.
     */
     class Ctx {
-    private:
-        using SceneId = resmanager::HashedStr64;
     public:
+        using SceneId = resmanager::HashedStr64;
+
         Ctx() = default;
         ~Ctx() = default;
 
@@ -40,7 +40,7 @@ namespace sm {
         void change_scene(SceneId id);
         const Scene* get_current_scene();
 
-        // GlFramebuffer management functions
+        // Framebuffer management functions
         void add_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);  // TODO better way?
         void purge_framebuffers();
 
@@ -58,10 +58,10 @@ namespace sm {
         void* user_data = nullptr;  // Arbitrary data defined by the user
         const ApplicationProperties* properties = nullptr;  // Ctx data like window width and height
 
-        std::unique_ptr<Window> window;  // The last* object destroyed in an application instance
+        std::unique_ptr<Window> window;  // One of the last object destroyed in an application instance
         std::unique_ptr<OpenAlContext> snd;  // Sound context
-        std::unique_ptr<Renderer> r3d;  // 3D renderer
-        std::unique_ptr<GuiRenderer> r2d;  // 2D renderer
+        // std::unique_ptr<Renderer> r3d;  // 3D renderer
+        // std::unique_ptr<GuiRenderer> r2d;  // 2D renderer
         std::unique_ptr<RandomGenerator> rng;  // Random number generator
         Input input;  // Self explanatory
         EventDispatcher evt;  // Manager of application events

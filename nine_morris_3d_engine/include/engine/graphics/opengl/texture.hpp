@@ -45,18 +45,18 @@ namespace sm {
         int anisotropic_filtering = 0;
     };
 
-    class Texture {
+    class GlTexture {
     public:
-        Texture(std::string_view file_path, const TextureSpecification& specification);
-        Texture(Encrypt::EncryptedFile file_path, const TextureSpecification& specification);
-        Texture(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
-        Texture(int width, int height, unsigned char* data, const TextureSpecification& specification);
-        ~Texture();
+        GlTexture(std::string_view file_path, const TextureSpecification& specification);
+        GlTexture(Encrypt::EncryptedFile file_path, const TextureSpecification& specification);
+        GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
+        GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification);
+        ~GlTexture();
 
-        Texture(const Texture&) = delete;
-        Texture& operator=(const Texture&) = delete;
-        Texture(Texture&&) = delete;
-        Texture& operator=(Texture&&) = delete;
+        GlTexture(const GlTexture&) = delete;
+        GlTexture& operator=(const GlTexture&) = delete;
+        GlTexture(GlTexture&&) = delete;
+        GlTexture& operator=(GlTexture&&) = delete;
 
         int get_width() { return width; }
         int get_height() { return height; }
@@ -76,16 +76,16 @@ namespace sm {
         std::string name;
     };
 
-    class Texture3D {
+    class GlTexture3D {
     public:
-        Texture3D(const char** file_paths);  // Don't need encrypted version
-        Texture3D(const std::array<std::shared_ptr<TextureData>, 6>& data);
-        ~Texture3D();
+        GlTexture3D(const char** file_paths);  // Don't need encrypted version
+        GlTexture3D(const std::array<std::shared_ptr<TextureData>, 6>& data);
+        ~GlTexture3D();
 
-        Texture3D(const Texture3D&) = delete;
-        Texture3D& operator=(const Texture3D&) = delete;
-        Texture3D(Texture3D&&) = delete;
-        Texture3D& operator=(Texture3D&&) = delete;
+        GlTexture3D(const GlTexture3D&) = delete;
+        GlTexture3D& operator=(const GlTexture3D&) = delete;
+        GlTexture3D(GlTexture3D&&) = delete;
+        GlTexture3D& operator=(GlTexture3D&&) = delete;
 
         void bind(unsigned int unit);
         static void unbind();

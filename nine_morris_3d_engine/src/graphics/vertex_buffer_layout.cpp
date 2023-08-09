@@ -20,7 +20,13 @@ namespace sm {
     }
 
     VertexBufferLayout& VertexBufferLayout::add(unsigned int index, Type type, int size, bool per_instance) {
-        elements.push_back(VertexElement(index, type, size, per_instance));
+        VertexElement element;
+        element.index = index;
+        element.type = type;
+        element.size = size;
+        element.per_instance = per_instance;
+
+        elements.push_back(element);
         stride += size * VertexElement::get_size(type);
 
         return *this;

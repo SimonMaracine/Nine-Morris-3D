@@ -1,8 +1,10 @@
 #pragma once
 
+#include <string>
+
 namespace sm {
-    namespace dependencies {
+    struct Dependencies {
         // Get information about dependencies
-        std::string get_info();
-    }
+        static std::string get_info();
+    };
 }

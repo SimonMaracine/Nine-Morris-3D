@@ -1,9 +1,7 @@
 #pragma once
 
-#include <imgui.h>
-
 namespace sm {
-    class ImGuiContext {
+    struct ImGuiContext {
         static void initialize(void* window_handle);
         static void uninitialize();
 
@@ -17,8 +15,5 @@ namespace sm {
         static bool on_key_pressed(int key, int scancode);
         static bool on_key_released(int key, int scancode);
         static bool on_char_typed(unsigned int codepoint);
-
-        static int translate_untranslated_key(int key, int scancode);
-        static ImGuiKey glfw_to_imgui_key(int key);
     };
 }

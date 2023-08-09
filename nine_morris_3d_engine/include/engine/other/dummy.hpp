@@ -1,6 +1,6 @@
 #pragma once
 
-namespace sm {
+namespace sm {  // TODO get rid of this
     class Ctx;
 
     namespace dummy {

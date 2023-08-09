@@ -2,9 +2,9 @@
 
 #include <glm/glm.hpp>
 
-#include "engine/audio/openal/buffer.hpp"
-
 namespace sm {
+    class AlBuffer;
+
     class AlSource {
     public:
         AlSource();
@@ -15,7 +15,7 @@ namespace sm {
         AlSource(AlSource&&) = delete;
         AlSource& operator=(AlSource&&) = delete;
 
-        void play(Buffer* buffer);
+        void play(AlBuffer* buffer);
         void stop();
         void pause();
         void continue_();
@@ -47,9 +47,9 @@ namespace sm {
 
         float gain = 1.0f;
         float pitch = 1.0f;
-        glm::vec3 position = glm::vec3(0.0f);
-        glm::vec3 velocity = glm::vec3(0.0f);
-        glm::vec3 direction = glm::vec3(0.0f);
+        glm::vec3 position {};
+        glm::vec3 velocity {};
+        glm::vec3 direction {};
         bool looping = false;
 
         float rolloff_factor = 1.0f;  // How fast the gain loses energy with distance

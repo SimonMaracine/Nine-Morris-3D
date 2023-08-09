@@ -4,7 +4,7 @@
 #include <utility>
 
 namespace sm {
-    class GlInfoDebug {
+    struct GlInfoDebug {
         static void maybe_initialize_debugging();
 
         // Get various information about OpenGL

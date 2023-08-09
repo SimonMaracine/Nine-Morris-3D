@@ -1,29 +1,35 @@
+#include <cstddef>
+#include <string_view>
+#include <memory>
+#include <vector>
+#include <cstring>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <glm/glm.hpp>
 
-#include "engine/application_base/panic.h"
-#include "engine/other/mesh.h"
-#include "engine/other/logging.h"
-#include "engine/other/encrypt.h"
+#include "engine/application_base/panic.hpp"
+#include "engine/other/mesh.hpp"
+#include "engine/other/logging.hpp"
+#include "engine/other/encrypt.hpp"
 
 namespace sm {
     struct PTN {
-        glm::vec3 position = glm::vec3(0.0f);
-        glm::vec2 texture_coordinate = glm::vec2(0.0f);
-        glm::vec3 normal = glm::vec3(0.0f);
+        glm::vec3 position {};
+        glm::vec2 texture_coordinate {};
+        glm::vec3 normal {};
     };
 
     struct P {
-        glm::vec3 position = glm::vec3(0.0f);
+        glm::vec3 position {};
     };
 
     struct PTNT {
-        glm::vec3 position = glm::vec3(0.0f);
-        glm::vec2 texture_coordinate = glm::vec2(0.0f);
-        glm::vec3 normal = glm::vec3(0.0f);
-        glm::vec3 tangent = glm::vec3(0.0f);
+        glm::vec3 position {};
+        glm::vec2 texture_coordinate {};
+        glm::vec3 normal {};
+        glm::vec3 tangent {};
     };
 
     static void load_PTN(const aiMesh* mesh, std::vector<PTN>& vertices, std::vector<unsigned int>& indices) {
@@ -120,241 +126,239 @@ namespace sm {
         }
     }
 
-    namespace mesh {
-        Mesh::Mesh(const void* vertices, size_t vertices_size, const void* indices, size_t indices_size) {
-            this->vertices = new char[vertices_size];
-            memcpy(this->vertices, vertices, vertices_size);
-            this->vertices_size = vertices_size;
+    Mesh::Mesh(const void* vertices, size_t vertices_size, const void* indices, size_t indices_size) {
+        this->vertices = new char[vertices_size];
+        std::memcpy(this->vertices, vertices, vertices_size);
+        this->vertices_size = vertices_size;
 
-            this->indices = new unsigned int[indices_size];
-            memcpy(this->indices, indices, indices_size);
-            this->indices_size = indices_size;
+        this->indices = new unsigned int[indices_size];
+        std::memcpy(this->indices, indices, indices_size);
+        this->indices_size = indices_size;
+    }
+
+    Mesh::~Mesh() {
+        delete[] vertices;
+        delete[] indices;
+
+        LOG_DEBUG("Freed model data");
+    }
+
+    std::shared_ptr<Mesh> Meshes::load_model_PTN(std::string_view file_path, bool flip_winding) {
+        LOG_DEBUG("Loading PTN model data `{}`...", file_path);
+
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFile(
+            std::string(file_path),
+            aiProcess_ValidateDataStructure | flip
+        );
+
+        if (!scene) {
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
+            panic();
         }
 
-        Mesh::~Mesh() {
-            delete[] vertices;
-            delete[] indices;
+        const aiNode* root_node = scene->mRootNode;
 
-            LOG_DEBUG("Freed model data");
+        const aiNode* collection = root_node->mChildren[0];
+        const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
+
+        std::vector<PTN> vertices;
+        std::vector<unsigned int> indices;
+
+        load_PTN(mesh, vertices, indices);
+
+        return std::make_shared<Mesh>(
+            vertices.data(),
+            vertices.size() * sizeof(PTN),
+            indices.data(),
+            indices.size() * sizeof(unsigned int)
+        );
+    }
+
+    std::shared_ptr<Mesh> Meshes::load_model_PTN(Encrypt::EncryptedFile file_path, bool flip_winding) {
+        LOG_DEBUG("Loading PTN model data `{}`...", file_path);
+
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+
+        const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
+
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFileFromMemory(
+            buffer,
+            buffer_size,
+            aiProcess_ValidateDataStructure | flip
+        );
+
+        if (!scene) {
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
+            panic();
         }
 
-        std::shared_ptr<Mesh> load_model_PTN(std::string_view file_path, bool flip_winding) {
-            LOG_DEBUG("Loading PTN model data `{}`...", file_path);
+        const aiNode* root_node = scene->mRootNode;
 
-            const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiNode* collection = root_node->mChildren[0];
+        const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-            Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFile(
-                std::string(file_path),
-                aiProcess_ValidateDataStructure | flip
-            );
+        std::vector<PTN> vertices;
+        std::vector<unsigned int> indices;
 
-            if (!scene) {
-                LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
-                LOG_DIST_CRITICAL(importer.GetErrorString());
-                panic();
-            }
+        load_PTN(mesh, vertices, indices);
 
-            const aiNode* root_node = scene->mRootNode;
+        return std::make_shared<Mesh>(
+            vertices.data(),
+            vertices.size() * sizeof(PTN),
+            indices.data(),
+            indices.size() * sizeof(unsigned int)
+        );
+    }
 
-            const aiNode* collection = root_node->mChildren[0];
-            const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
+    std::shared_ptr<Mesh> Meshes::load_model_P(std::string_view file_path, bool flip_winding) {
+        LOG_DEBUG("Loading P model data `{}`...", file_path);
 
-            std::vector<PTN> vertices;
-            std::vector<unsigned int> indices;
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-            load_PTN(mesh, vertices, indices);
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFile(
+            std::string(file_path),
+            aiProcess_ValidateDataStructure | flip
+        );
 
-            return std::make_shared<Mesh>(
-                vertices.data(),
-                vertices.size() * sizeof(PTN),
-                indices.data(),
-                indices.size() * sizeof(unsigned int)
-            );
+        if (!scene) {
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
+            panic();
         }
 
-        std::shared_ptr<Mesh> load_model_PTN(Encrypt::EncryptedFile file_path, bool flip_winding) {
-            LOG_DEBUG("Loading PTN model data `{}`...", file_path);
+        const aiNode* root_node = scene->mRootNode;
 
-            const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiNode* collection = root_node->mChildren[0];
+        const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-            const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
+        std::vector<P> vertices;
+        std::vector<unsigned int> indices;
 
-            Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFileFromMemory(
-                buffer,
-                buffer_size,
-                aiProcess_ValidateDataStructure | flip
-            );
+        load_P(mesh, vertices, indices);
 
-            if (!scene) {
-                LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
-                LOG_DIST_CRITICAL(importer.GetErrorString());
-                panic();
-            }
+        return std::make_shared<Mesh>(
+            vertices.data(),
+            vertices.size() * sizeof(P),
+            indices.data(),
+            indices.size() * sizeof(unsigned int)
+        );
+    }
 
-            const aiNode* root_node = scene->mRootNode;
+    std::shared_ptr<Mesh> Meshes::load_model_P(Encrypt::EncryptedFile file_path, bool flip_winding) {
+        LOG_DEBUG("Loading P model data `{}`...", file_path);
 
-            const aiNode* collection = root_node->mChildren[0];
-            const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-            std::vector<PTN> vertices;
-            std::vector<unsigned int> indices;
+        const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
-            load_PTN(mesh, vertices, indices);
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFileFromMemory(
+            buffer,
+            buffer_size,
+            aiProcess_ValidateDataStructure | flip
+        );
 
-            return std::make_shared<Mesh>(
-                vertices.data(),
-                vertices.size() * sizeof(PTN),
-                indices.data(),
-                indices.size() * sizeof(unsigned int)
-            );
+        if (!scene) {
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
+            panic();
         }
 
-        std::shared_ptr<Mesh> load_model_P(std::string_view file_path, bool flip_winding) {
-            LOG_DEBUG("Loading P model data `{}`...", file_path);
+        const aiNode* root_node = scene->mRootNode;
 
-            const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiNode* collection = root_node->mChildren[0];
+        const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-            Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFile(
-                std::string(file_path),
-                aiProcess_ValidateDataStructure | flip
-            );
+        std::vector<P> vertices;
+        std::vector<unsigned int> indices;
 
-            if (!scene) {
-                LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
-                LOG_DIST_CRITICAL(importer.GetErrorString());
-                panic();
-            }
+        load_P(mesh, vertices, indices);
 
-            const aiNode* root_node = scene->mRootNode;
+        return std::make_shared<Mesh>(
+            vertices.data(),
+            vertices.size() * sizeof(P),
+            indices.data(),
+            indices.size() * sizeof(unsigned int)
+        );
+    }
 
-            const aiNode* collection = root_node->mChildren[0];
-            const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
+    std::shared_ptr<Mesh> Meshes::load_model_PTNT(std::string_view file_path, bool flip_winding) {
+        LOG_DEBUG("Loading PTNT model data `{}`...", file_path);
 
-            std::vector<P> vertices;
-            std::vector<unsigned int> indices;
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-            load_P(mesh, vertices, indices);
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFile(
+            std::string(file_path),
+            aiProcess_ValidateDataStructure | flip | aiProcess_CalcTangentSpace
+        );
 
-            return std::make_shared<Mesh>(
-                vertices.data(),
-                vertices.size() * sizeof(P),
-                indices.data(),
-                indices.size() * sizeof(unsigned int)
-            );
+        if (!scene) {
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
+            panic();
         }
 
-        std::shared_ptr<Mesh> load_model_P(Encrypt::EncryptedFile file_path, bool flip_winding) {
-            LOG_DEBUG("Loading P model data `{}`...", file_path);
+        const aiNode* root_node = scene->mRootNode;
 
-            const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiNode* collection = root_node->mChildren[0];
+        const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-            const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
+        std::vector<PTNT> vertices;
+        std::vector<unsigned int> indices;
 
-            Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFileFromMemory(
-                buffer,
-                buffer_size,
-                aiProcess_ValidateDataStructure | flip
-            );
+        load_PTNT(mesh, vertices, indices);
 
-            if (!scene) {
-                LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
-                LOG_DIST_CRITICAL(importer.GetErrorString());
-                panic();
-            }
+        return std::make_shared<Mesh>(
+            vertices.data(),
+            vertices.size() * sizeof(PTNT),
+            indices.data(),
+            indices.size() * sizeof(unsigned int)
+        );
+    }
 
-            const aiNode* root_node = scene->mRootNode;
+    std::shared_ptr<Mesh> Meshes::load_model_PTNT(Encrypt::EncryptedFile file_path, bool flip_winding) {
+        LOG_DEBUG("Loading PTNT model data `{}`...", file_path);
 
-            const aiNode* collection = root_node->mChildren[0];
-            const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
+        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
 
-            std::vector<P> vertices;
-            std::vector<unsigned int> indices;
+        const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
-            load_P(mesh, vertices, indices);
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFileFromMemory(
+            buffer,
+            buffer_size,
+            aiProcess_ValidateDataStructure | flip | aiProcess_CalcTangentSpace
+        );
 
-            return std::make_shared<Mesh>(
-                vertices.data(),
-                vertices.size() * sizeof(P),
-                indices.data(),
-                indices.size() * sizeof(unsigned int)
-            );
+        if (!scene) {
+            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
+            LOG_DIST_CRITICAL(importer.GetErrorString());
+            panic();
         }
 
-        std::shared_ptr<Mesh> load_model_PTNT(std::string_view file_path, bool flip_winding) {
-            LOG_DEBUG("Loading PTNT model data `{}`...", file_path);
+        const aiNode* root_node = scene->mRootNode;
 
-            const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiNode* collection = root_node->mChildren[0];
+        const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
 
-            Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFile(
-                std::string(file_path),
-                aiProcess_ValidateDataStructure | flip | aiProcess_CalcTangentSpace
-            );
+        std::vector<PTNT> vertices;
+        std::vector<unsigned int> indices;
 
-            if (!scene) {
-                LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
-                LOG_DIST_CRITICAL(importer.GetErrorString());
-                panic();
-            }
+        load_PTNT(mesh, vertices, indices);
 
-            const aiNode* root_node = scene->mRootNode;
-
-            const aiNode* collection = root_node->mChildren[0];
-            const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
-
-            std::vector<PTNT> vertices;
-            std::vector<unsigned int> indices;
-
-            load_PTNT(mesh, vertices, indices);
-
-            return std::make_shared<Mesh>(
-                vertices.data(),
-                vertices.size() * sizeof(PTNT),
-                indices.data(),
-                indices.size() * sizeof(unsigned int)
-            );
-        }
-
-        std::shared_ptr<Mesh> load_model_PTNT(Encrypt::EncryptedFile file_path, bool flip_winding) {
-            LOG_DEBUG("Loading PTNT model data `{}`...", file_path);
-
-            const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
-
-            const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
-
-            Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFileFromMemory(
-                buffer,
-                buffer_size,
-                aiProcess_ValidateDataStructure | flip | aiProcess_CalcTangentSpace
-            );
-
-            if (!scene) {
-                LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
-                LOG_DIST_CRITICAL(importer.GetErrorString());
-                panic();
-            }
-
-            const aiNode* root_node = scene->mRootNode;
-
-            const aiNode* collection = root_node->mChildren[0];
-            const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
-
-            std::vector<PTNT> vertices;
-            std::vector<unsigned int> indices;
-
-            load_PTNT(mesh, vertices, indices);
-
-            return std::make_shared<Mesh>(
-                vertices.data(),
-                vertices.size() * sizeof(PTNT),
-                indices.data(),
-                indices.size() * sizeof(unsigned int)
-            );
-        }
+        return std::make_shared<Mesh>(
+            vertices.data(),
+            vertices.size() * sizeof(PTNT),
+            indices.data(),
+            indices.size() * sizeof(unsigned int)
+        );
     }
 }

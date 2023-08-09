@@ -43,7 +43,7 @@ namespace sm {
     }
 
     TextureData::~TextureData() {
-        ASSERT(data != nullptr, "No data");
+        SM_ASSERT(data != nullptr, "No data");
 
         stbi_image_free(data);
 

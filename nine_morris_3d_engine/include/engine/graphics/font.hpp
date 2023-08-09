@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <string>
 #include <cstdint>
+#include <cstddef>
 
 #include <stb_truetype.h>
 
@@ -36,8 +37,8 @@ namespace sm {
 
         unsigned int get_bitmap_size() const { return static_cast<unsigned int>(bitmap_size); }
 
-        gl::VertexArray* get_vertex_array() const { return vertex_array.get(); }
-        gl::Texture* get_bitmap() const { return bitmap_image.get(); }
+        GlVertexArray* get_vertex_array() const { return vertex_array.get(); }
+        GlTexture* get_bitmap() const { return bitmap_image.get(); }
         int get_vertex_count() const { return vertex_count; }
 
         // Baking API
@@ -77,10 +78,10 @@ namespace sm {
 
         std::string name;
 
-        std::shared_ptr<gl::Texture> bitmap_image;
+        std::shared_ptr<GlTexture> bitmap_image;
 
         // Store references to vertex array and buffer
-        std::shared_ptr<gl::VertexArray> vertex_array;
+        std::shared_ptr<GlVertexArray> vertex_array;
         std::shared_ptr<GlVertexBuffer> buffer;
         int vertex_count = 0;
     };

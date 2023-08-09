@@ -9,7 +9,7 @@ namespace sm {
     /*
         Main class for managing application-level events
     */
-    class EventDispatcher final {
+    class EventDispatcher {
     public:
         EventDispatcher() = default;
         ~EventDispatcher() = default;

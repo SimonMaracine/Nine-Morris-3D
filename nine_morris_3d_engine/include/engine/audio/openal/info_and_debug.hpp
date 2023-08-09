@@ -3,7 +3,7 @@
 #include <string>
 
 namespace sm {
-    class AlInfoDebug {
+    struct AlInfoDebug {
         static void maybe_check_errors();
 
         // Get various information about OpenAL

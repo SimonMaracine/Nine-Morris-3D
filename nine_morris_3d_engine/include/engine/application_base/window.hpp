@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <initializer_list>
 #include <utility>
+#include <vector>
 
 #include <resmanager/resmanager.hpp>
 
@@ -18,11 +19,11 @@ namespace sm {
     class Application;
     class Monitor;
 
-    class Window final {
-    private:
+    class Window {
+    public:
         using CursorId = resmanager::HashedStr64;
         using CursorHashFunction = resmanager::Hash<CursorId>;
-    public:
+
         Window(Application* application);
         ~Window();
 
@@ -54,7 +55,7 @@ namespace sm {
         std::unordered_map<CursorId, GLFWcursor*, CursorHashFunction> cursors;
     };
 
-    class Monitor final {
+    class Monitor {
     public:
         Monitor() = default;
         ~Monitor() = default;

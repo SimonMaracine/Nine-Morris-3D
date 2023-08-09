@@ -1,4 +1,8 @@
-#include "engine/application_base/platform.h"
+#include <string>
+#include <string_view>
+#include <stdexcept>
+
+#include "engine/application_base/platform.hpp"
 
 #if defined(SM_PLATFORM_LINUX)
     #include <pwd.h>
@@ -9,9 +13,9 @@
     #include <Lmcons.h>
 #endif
 
-#include "engine/other/file_system.h"
-#include "engine/other/logging.h"
-#include "engine/other/assert.h"
+#include "engine/other/file_system.hpp"
+#include "engine/other/logging.hpp"
+#include "engine/other/assert.hpp"
 
 namespace sm {
     // These don't need to be reset explicitly
@@ -47,7 +51,7 @@ namespace sm {
             struct passwd* pw = getpwuid(uid);
 
             if (pw == nullptr) {
-                throw file_system::UserNameError("Could not get user name");
+                throw FileSystem::UserNameError("Could not get user name");
             }
 
             return std::string(pw->pw_name);
@@ -56,7 +60,7 @@ namespace sm {
         static void check_and_fix_directories_impl() {
             const std::string path = USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
 
-            if (!directory_exists_impl(file_system::cut_slash(path))) {
+            if (!directory_exists_impl(FileSystem::cut_slash(path))) {
                 LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
                 if (create_directory_impl(path)) {
@@ -101,7 +105,7 @@ namespace sm {
             const bool success = GetUserName(user_name, &_);
 
             if (!success) {
-                throw file_system::UserNameError("Could not get user name");
+                throw FileSystem::UserNameError("Could not get user name");
             }
 
             return std::string(user_name);
@@ -111,7 +115,7 @@ namespace sm {
             {
                 const std::string path = USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
 
-                if (!directory_exists_impl(file_system::cut_slash(path))) {
+                if (!directory_exists_impl(FileSystem::cut_slash(path))) {
                     LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
                     if (create_directory_impl(path)) {
@@ -125,7 +129,7 @@ namespace sm {
             {
                 const std::string path = DOCUMENTS_DIRECTORY_PATH(g_user_name, g_app_name);
 
-                if (!directory_exists_impl(file_system::cut_slash(path))) {
+                if (!directory_exists_impl(FileSystem::cut_slash(path))) {
                     LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
                     if (create_directory_impl(path)) {
@@ -179,59 +183,57 @@ namespace sm {
         }
 #endif
 
-    namespace file_system {
-        void initialize_for_applications(std::string_view application_name) noexcept(false) {
-            g_user_name = get_user_name();
-            g_app_name = application_name;
-        }
+    void FileSystem::initialize_for_applications(std::string_view application_name) noexcept(false) {
+        g_user_name = get_user_name();
+        g_app_name = application_name;
+    }
 
-        bool directory_exists(std::string_view path) {
-            return directory_exists_impl(path);
-        }
+    bool FileSystem::directory_exists(std::string_view path) {
+        return directory_exists_impl(path);
+    }
 
-        bool create_directory(std::string_view path) {
-            return create_directory_impl(path);
-        }
+    bool FileSystem::create_directory(std::string_view path) {
+        return create_directory_impl(path);
+    }
 
-        bool delete_file(std::string_view path) {
-            return remove(path.data()) != 0;
-        }
+    bool FileSystem::delete_file(std::string_view path) {
+        return remove(path.data()) != 0;
+    }
 
-        std::string cut_slash(std::string_view path) {
-            // Needs to return a new string
-            return std::string(path.substr(0, path.length() - 1));
-        }
+    std::string FileSystem::cut_slash(std::string_view path) {
+        // Needs to return a new string
+        return std::string(path.substr(0, path.length() - 1));
+    }
 
-        std::string get_user_name() noexcept(false) {
-            return get_user_name_impl();
-        }
+    std::string FileSystem::get_user_name() noexcept(false) {
+        return get_user_name_impl();
+    }
 
-        void check_and_fix_directories() {
-            check_and_fix_directories_impl();
-        }
+    void FileSystem::check_and_fix_directories() {
+        check_and_fix_directories_impl();
+    }
 
-        std::string path_for_logs() {
-            return path_for_logs_impl();
-        }
+    std::string FileSystem::path_for_logs() {
+        return path_for_logs_impl();
+    }
 
-        std::string path_for_saved_data() {
-            return path_for_saved_data_impl();
-        }
+    std::string FileSystem::path_for_saved_data() {
+        return path_for_saved_data_impl();
+    }
 
-        std::string path_for_assets() {
-            return path_for_assets_impl();
-        }
+    std::string FileSystem::path_for_assets() {
+        return path_for_assets_impl();
+    }
 
-        std::string path_for_logs(std::string_view file) {
-            return path_for_logs_impl() + std::string(file);
-        }
+    std::string FileSystem::path_for_logs(std::string_view file) {
+        return path_for_logs_impl() + std::string(file);
+    }
 
-        std::string path_for_saved_data(std::string_view file) {
-            return path_for_saved_data_impl() + std::string(file);
-        }
+    std::string FileSystem::path_for_saved_data(std::string_view file) {
+        return path_for_saved_data_impl() + std::string(file);
+    }
 
-        std::string path_for_assets(std::string_view file) {
-            return path_for_assets_impl() + std::string(file);
-        }
+    std::string FileSystem::path_for_assets(std::string_view file) {
+        return path_for_assets_impl() + std::string(file);
     }
 }

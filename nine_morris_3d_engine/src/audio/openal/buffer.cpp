@@ -32,7 +32,7 @@ namespace sm {
         alGenBuffers(1, &buffer);
         alBufferData(buffer, get_format(channels, bps), data, size, frequency);
 
-        maybe_check_errors();
+        AlInfoDebug::maybe_check_errors();
 
         LOG_DEBUG("Created AL buffer {}", buffer);
     }
@@ -47,7 +47,7 @@ namespace sm {
             data->get_frequency()
         );
 
-        maybe_check_errors();
+        AlInfoDebug::maybe_check_errors();
 
         LOG_DEBUG("Created AL buffer {}", buffer);
     }
@@ -57,12 +57,12 @@ namespace sm {
             alSourceStop(source);
             alSourcei(source, AL_BUFFER, 0);
 
-            maybe_check_errors();
+            AlInfoDebug::maybe_check_errors();
         }
 
         alDeleteBuffers(1, &buffer);
 
-        maybe_check_errors();
+        AlInfoDebug::maybe_check_errors();
 
         LOG_DEBUG("Deleted AL buffer {}", buffer);
     }

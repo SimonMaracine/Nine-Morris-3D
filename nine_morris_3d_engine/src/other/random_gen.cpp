@@ -1,5 +1,10 @@
-#include "engine/other/random_gen.h"
-#include "engine/other/assert.h"
+#include <initializer_list>
+#include <random>
+#include <cstddef>
+#include <cstdint>
+
+#include "engine/other/random_gen.hpp"
+#include "engine/other/assert.hpp"
 
 namespace sm {
     RandomGenerator::RandomGenerator() {
@@ -18,7 +23,7 @@ namespace sm {
     }
 
     uint32_t RandomGenerator::next(uint32_t begin, uint32_t end) {
-        ASSERT(end > begin, "Invalid range");
+        SM_ASSERT(end > begin, "Invalid range");
 
         std::uniform_int_distribution<std::mt19937::result_type> distribution {begin, end};
 

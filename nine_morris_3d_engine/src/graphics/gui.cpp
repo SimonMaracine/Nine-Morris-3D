@@ -53,7 +53,7 @@
 
 //         Ctx* Widget::ctx = nullptr;
 
-//         Image::Image(std::shared_ptr<gl::Texture> texture)
+//         Image::Image(std::shared_ptr<GlTexture> texture)
 //             : texture(texture) {
 //             type = WidgetType::Image;
 //             size.x = texture->get_width();
@@ -64,7 +64,7 @@
 //             ctx->r2d->draw_quad(position, size * scale_parameters.current_scale, texture);
 //         }
 
-//         void Image::set_image(std::shared_ptr<gl::Texture> texture) {
+//         void Image::set_image(std::shared_ptr<GlTexture> texture) {
 //             this->texture = texture;
 //             size.x = texture->get_width();
 //             size.y = texture->get_height();

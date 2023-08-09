@@ -13,10 +13,10 @@
 #include "engine/audio/context.hpp"
 #include "engine/audio/music.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
-#include "engine/graphics/renderer/render_helpers.hpp"
+#include "engine/graphics/renderer/render_gl.hpp"
 #include "engine/graphics/renderer/gui_renderer.hpp"
 #include "engine/graphics/opengl/info_and_debug.hpp"
-#include "engine/dear_imgui/imgui_context.hpp"
+#include "engine/graphics/imgui_context.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
 #include "engine/other/encrypt.hpp"
@@ -27,18 +27,18 @@
 namespace sm {
     void Application::preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file) {
         try {
-            file_system::initialize_for_applications(app_name);
-        } catch (const file_system::UserNameError& e) {
+            FileSystem::initialize_for_applications(app_name);
+        } catch (const FileSystem::UserNameError& e) {
             panic();  // Really bad that there is no feedback
         }
 
         // Set locale for the applications; used mostly by spdlog
         std::locale::global(std::locale("en_US.UTF-8"));
 
-        logging::initialize_for_applications(log_file, info_file);
+        Logging::initialize_for_applications(log_file, info_file);
 
 #ifdef SM_BUILD_DISTRIBUTION
-        file_system::check_and_fix_directories();
+        FileSystem::check_and_fix_directories();
 #endif
     }
 
@@ -73,14 +73,14 @@ namespace sm {
         }
 
     #ifndef SM_BUILD_DISTRIBUTION
-        logging::log_general_information(logging::LogTarget::Console);
+        Logging::log_general_information(Logging::LogTarget::Console);
     #endif
 
-        gl::maybe_initialize_debugging();
-        render_helpers::initialize_default();
+        GlInfoDebug::maybe_initialize_debugging();
+        RenderGl::initialize_default();
         Encrypt::initialize(builder.encryption_key);
 
-        const auto [version_major, version_minor] = gl::get_version_number();
+        const auto [version_major, version_minor] = GlInfoDebug::get_version_number();
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
         if (builder.renderer_3d) {
@@ -108,10 +108,10 @@ namespace sm {
 
     Application::~Application() {  // Destructor is called before all member variables
         if (builder.dear_imgui) {
-            imgui_context::uninitialize();
+            ImGuiContext::uninitialize();
         }
 
-        music::uninitialize();
+        MusicPlayer::uninitialize();
     }
 
     int Application::run(SceneId start_scene_id) {
@@ -135,7 +135,7 @@ namespace sm {
             current_scene->on_update();
 
             // Clear the default framebuffer, as nobody does that for us
-            render_helpers::clear(render_helpers::Color);
+            RenderGl::clear(RenderGl::C);
 
             r3d_update();
             r2d_update();
@@ -223,19 +223,19 @@ namespace sm {
     }
 
     void Application::r3d_function() {
-        ctx.r3d->render(current_scene->scene_list);
+        // ctx.r3d->render(current_scene->scene_list);
     }
 
     void Application::r2d_function() {
-        ctx.r2d->render(current_scene->scene_list, true);
+        // ctx.r2d->render(current_scene->scene_list, true);
     }
 
     void Application::dear_imgui_function() {
-        imgui_context::begin_frame();
+        ImGuiContext::begin_frame();
 
         current_scene->on_imgui_update();
 
-        imgui_context::end_frame();
+        ImGuiContext::end_frame();
     }
 
     void Application::prepare_scenes(SceneId start_scene_id) {
@@ -271,21 +271,21 @@ namespace sm {
     void Application::initialize_r3d() {
         LOG_INFO("With renderer 3D");
 
-        ctx.r3d = std::make_unique<Renderer>(&ctx);
+        // ctx.r3d = std::make_unique<Renderer>(&ctx);
         r3d_update = std::bind(&Application::r3d_function, this);
     }
 
     void Application::initialize_r2d() {
         LOG_INFO("With renderer 2D");
 
-        ctx.r2d = std::make_unique<GuiRenderer>(&ctx);
+        // ctx.r2d = std::make_unique<GuiRenderer>(&ctx);
         r2d_update = std::bind(&Application::r2d_function, this);
     }
 
     void Application::initialize_dear_imgui() {
         LOG_INFO("With renderer Dear ImGui");
 
-        imgui_context::initialize(ctx.window->get_handle());
+        ImGuiContext::initialize(ctx.window->get_handle());
 
         dear_imgui_update = std::bind(&Application::dear_imgui_function, this);
     }
@@ -311,7 +311,7 @@ namespace sm {
             return;
         }
 
-        render_helpers::viewport(event.width, event.height);
+        RenderGl::viewport(event.width, event.height);
 
         for (std::weak_ptr<GlFramebuffer> framebuffer : framebuffers) {
             std::shared_ptr<GlFramebuffer> fb = framebuffer.lock();

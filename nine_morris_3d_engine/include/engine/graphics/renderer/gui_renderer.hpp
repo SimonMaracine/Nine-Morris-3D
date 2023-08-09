@@ -44,7 +44,7 @@
 //         void begin_quads_batch();
 //         void end_quads_batch();
 //         void flush_quads();
-//         void draw_quad(glm::vec2 position, glm::vec2 size, std::shared_ptr<gl::Texture> texture);
+//         void draw_quad(glm::vec2 position, glm::vec2 size, std::shared_ptr<GlTexture> texture);
 
 //         void begin_draw_image();
 //         void end_draw_image();
@@ -68,8 +68,8 @@
 
 //             gl::UniformBlockSpecification projection_uniform_block;
 
-//             std::shared_ptr<gl::Shader> quad2d_shader;
-//             std::shared_ptr<gl::Shader> text_shader;
+//             std::shared_ptr<gl::GlShader> quad2d_shader;
+//             std::shared_ptr<gl::GlShader> text_shader;
 
 //             std::shared_ptr<gl::VertexArray> quad2d_vertex_array;
 //             std::shared_ptr<GlVertexBuffer> quad2d_buffer;
@@ -91,11 +91,11 @@
 //             } quads;
 //         } storage;
 
-//         const char* QUAD2D_VERTEX_SHADER = ENCR("engine_data/shaders/quad2d.vert");
-//         const char* QUAD2D_FRAGMENT_SHADER = ENCR("engine_data/shaders/quad2d.frag");
-//         const char* TEXT_VERTEX_SHADER = ENCR("engine_data/shaders/text.vert");
-//         const char* TEXT_FRAGMENT_SHADER = ENCR("engine_data/shaders/text.frag");
-//         const char* DEBUG_TEXT_FONT = ENCR("engine_data/fonts/CodeNewRoman/code-new-roman.regular.ttf");
+//         const char* QUAD2D_VERTEX_SHADER = SM_ENCR("engine_data/shaders/quad2d.vert");
+//         const char* QUAD2D_FRAGMENT_SHADER = SM_ENCR("engine_data/shaders/quad2d.frag");
+//         const char* TEXT_VERTEX_SHADER = SM_ENCR("engine_data/shaders/text.vert");
+//         const char* TEXT_FRAGMENT_SHADER = SM_ENCR("engine_data/shaders/text.frag");
+//         const char* DEBUG_TEXT_FONT = SM_ENCR("engine_data/fonts/CodeNewRoman/code-new-roman.regular.ttf");
 
 //         Ctx* ctx = nullptr;
 

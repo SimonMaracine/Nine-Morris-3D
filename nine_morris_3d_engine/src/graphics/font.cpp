@@ -6,6 +6,7 @@
 #include <string>
 #include <cstddef>
 #include <cstdint>
+#include <algorithm>
 
 #include <stb_truetype.h>
 #include <stb_image_write.h>
@@ -26,7 +27,7 @@ namespace sm {
 
     static std::string get_name(std::string_view file_path) {
         size_t last_slash = file_path.find_last_of("/");
-        ASSERT(last_slash != std::string::npos, "Could not find slash");
+        SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
 
         return std::string(file_path.substr(last_slash + 1));
     }
@@ -55,7 +56,7 @@ namespace sm {
             for (int y = 0; y < height; y++) {
                 const size_t index = static_cast<size_t>((y + dest_y) * dest_width + (x + dest_x));
 
-                ASSERT(index < static_cast<size_t>(dest_width * dest_height), "Write out of bounds");
+                SM_ASSERT(index < static_cast<size_t>(dest_width * dest_height), "Write out of bounds");
 
                 dest[index] = glyph[y * width + x];
             }
@@ -102,7 +103,7 @@ namespace sm {
 
         static constexpr size_t FLOATS_PER_VERTEX = 4;
 
-        ASSERT(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0, "Data may be corrupted");
+        SM_ASSERT(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0, "Data may be corrupted");
 
         vertex_count = static_cast<int>(size / (sizeof(float) * FLOATS_PER_VERTEX));
     }
@@ -126,11 +127,11 @@ namespace sm {
     }
 
     void Font::end_baking() {
-        gl::TextureSpecification specification;
-        specification.format = gl::Format::R8;
+        TextureSpecification specification;
+        specification.format = Format::R8;
         specification.border_color = std::make_optional<glm::vec4>(0.0f, 0.0f, 0.0f, 1.0f);
 
-        bitmap_image = std::make_shared<gl::Texture>(bitmap_size, bitmap_size, bake_context.bitmap, specification);
+        bitmap_image = std::make_shared<GlTexture>(bitmap_size, bitmap_size, bake_context.bitmap, specification);
 
 #ifdef SM_BUILD_DEBUG
         write_bitmap_to_file();
@@ -239,13 +240,13 @@ namespace sm {
     }
 
     void Font::initialize() {
-        buffer = std::make_shared<GlVertexBuffer>(gl::DrawHint::Stream);
+        buffer = std::make_shared<GlVertexBuffer>(DrawHint::Stream);
 
-        VertexBufferLayout layout = VertexBufferLayout {}
+        VertexBufferLayout layout = VertexBufferLayout()
             .add(0, VertexBufferLayout::Float, 2)
             .add(1, VertexBufferLayout::Float, 2);
 
-        vertex_array = std::make_shared<gl::VertexArray>();
+        vertex_array = std::make_shared<GlVertexArray>();
         vertex_array->begin_definition()
             .add_buffer(buffer, layout)
             .end_definition();

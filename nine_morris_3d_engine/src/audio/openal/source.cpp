@@ -1,151 +1,150 @@
 #include <AL/al.h>
 
-#include "engine/audio/openal/source.h"
-#include "engine/audio/openal/info_and_debug.h"
-#include "engine/other/logging.h"
-#include "engine/other/assert.h"
+#include "engine/audio/openal/source.hpp"
+#include "engine/audio/openal/buffer.hpp"
+#include "engine/audio/openal/info_and_debug.hpp"
+#include "engine/other/logging.hpp"
+#include "engine/other/assert.hpp"
 
 namespace sm {
-    namespace al {
-        AlSource::AlSource() {
-            alGenSources(1, &source);
-            alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
-            alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
-            alSourcef(source, AL_MAX_DISTANCE, max_distance);
+    AlSource::AlSource() {
+        alGenSources(1, &source);
+        alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
+        alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
+        alSourcef(source, AL_MAX_DISTANCE, max_distance);
 
-            maybe_check_errors();
+        AlInfoDebug::maybe_check_errors();
 
-            LOG_DEBUG("Created AL source {}", source);
+        LOG_DEBUG("Created AL source {}", source);
+    }
+
+    AlSource::~AlSource() {
+        stop();
+
+        alDeleteSources(1, &source);
+
+        AlInfoDebug::maybe_check_errors();
+
+        LOG_DEBUG("Deleted AL source {}", source);
+    }
+
+    void AlSource::play(AlBuffer* buffer) {
+        stop();
+
+        if (buffer->buffer != attached_buffer) {
+            attached_buffer = buffer->buffer;
+            alSourcei(source, AL_BUFFER, attached_buffer);
+
+            AlInfoDebug::maybe_check_errors();
+
+            buffer->sources_attached.insert(source);
         }
 
-        AlSource::~AlSource() {
-            stop();
+        alSourcePlay(source);
 
-            alDeleteSources(1, &source);
+        AlInfoDebug::maybe_check_errors();
+    }
 
-            maybe_check_errors();
+    void AlSource::stop() {
+        alSourceStop(source);
 
-            LOG_DEBUG("Deleted AL source {}", source);
-        }
+        AlInfoDebug::maybe_check_errors();
+    }
 
-        void AlSource::play(Buffer* buffer) {
-            stop();
+    void AlSource::pause() {
+        alSourcePause(source);
 
-            if (buffer->buffer != attached_buffer) {
-                attached_buffer = buffer->buffer;
-                alSourcei(source, AL_BUFFER, attached_buffer);
+        AlInfoDebug::maybe_check_errors();
+    }
 
-                maybe_check_errors();
+    void AlSource::continue_() {
+        alSourcePlay(source);
 
-                buffer->sources_attached.insert(source);
-            }
+        AlInfoDebug::maybe_check_errors();
+    }
 
-            alSourcePlay(source);
+    bool AlSource::is_playing() {
+        int state = 0;
+        alGetSourcei(source, AL_SOURCE_STATE, &state);
 
-            maybe_check_errors();
-        }
+        AlInfoDebug::maybe_check_errors();
 
-        void AlSource::stop() {
-            alSourceStop(source);
+        return state == AL_PLAYING;
+    }
 
-            maybe_check_errors();
-        }
+    void AlSource::set_gain(float gain) {
+        SM_ASSERT(gain >= 0.0f, "Must be positive");
 
-        void AlSource::pause() {
-            alSourcePause(source);
+        alSourcef(source, AL_GAIN, gain);
 
-            maybe_check_errors();
-        }
+        AlInfoDebug::maybe_check_errors();
 
-        void AlSource::continue_() {
-            alSourcePlay(source);
+        this->gain = gain;
+    }
 
-            maybe_check_errors();
-        }
+    void AlSource::set_pitch(float pitch) {
+        SM_ASSERT(pitch >= 0.0f, "Must be positive");
 
-        bool AlSource::is_playing() {
-            int state = 0;
-            alGetSourcei(source, AL_SOURCE_STATE, &state);
+        alSourcef(source, AL_PITCH, pitch);
 
-            maybe_check_errors();
+        AlInfoDebug::maybe_check_errors();
 
-            return state == AL_PLAYING;
-        }
+        this->pitch = pitch;
+    }
 
-        void AlSource::set_gain(float gain) {
-            ASSERT(gain >= 0.0f, "Must be positive");
+    void AlSource::set_position(const glm::vec3& position) {
+        alSource3f(source, AL_POSITION, position.x, position.y, position.z);
 
-            alSourcef(source, AL_GAIN, gain);
+        AlInfoDebug::maybe_check_errors();
 
-            maybe_check_errors();
+        this->position = position;
+    }
 
-            this->gain = gain;
-        }
+    void AlSource::set_velocity(const glm::vec3& velocity) {
+        alSource3f(source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
-        void AlSource::set_pitch(float pitch) {
-            ASSERT(pitch >= 0.0f, "Must be positive");
+        AlInfoDebug::maybe_check_errors();
 
-            alSourcef(source, AL_PITCH, pitch);
+        this->velocity = velocity;
+    }
 
-            maybe_check_errors();
+    void AlSource::set_direction(const glm::vec3& direction) {
+        alSource3f(source, AL_DIRECTION, direction.x, direction.y, direction.z);
 
-            this->pitch = pitch;
-        }
+        AlInfoDebug::maybe_check_errors();
 
-        void AlSource::set_position(const glm::vec3& position) {
-            alSource3f(source, AL_POSITION, position.x, position.y, position.z);
+        this->direction = direction;
+    }
 
-            maybe_check_errors();
+    void AlSource::set_looping(bool looping) {
+        alSourcei(source, AL_LOOPING, static_cast<ALint>(looping));
 
-            this->position = position;
-        }
+        AlInfoDebug::maybe_check_errors();
 
-        void AlSource::set_velocity(const glm::vec3& velocity) {
-            alSource3f(source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+        this->looping = looping;
+    }
 
-            maybe_check_errors();
+    void AlSource::set_rolloff_factor(float rolloff_factor) {
+        alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
 
-            this->velocity = velocity;
-        }
+        AlInfoDebug::maybe_check_errors();
 
-        void AlSource::set_direction(const glm::vec3& direction) {
-            alSource3f(source, AL_DIRECTION, direction.x, direction.y, direction.z);
+        this->rolloff_factor = rolloff_factor;
+    }
 
-            maybe_check_errors();
+    void AlSource::set_reference_distance(float reference_distance) {
+        alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
 
-            this->direction = direction;
-        }
+        AlInfoDebug::maybe_check_errors();
 
-        void AlSource::set_looping(bool looping) {
-            alSourcei(source, AL_LOOPING, static_cast<ALint>(looping));
+        this->reference_distance = reference_distance;
+    }
 
-            maybe_check_errors();
+    void AlSource::set_max_distance(float max_distance) {
+        alSourcef(source, AL_MAX_DISTANCE, max_distance);
 
-            this->looping = looping;
-        }
+        AlInfoDebug::maybe_check_errors();
 
-        void AlSource::set_rolloff_factor(float rolloff_factor) {
-            alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
-
-            maybe_check_errors();
-
-            this->rolloff_factor = rolloff_factor;
-        }
-
-        void AlSource::set_reference_distance(float reference_distance) {
-            alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
-
-            maybe_check_errors();
-
-            this->reference_distance = reference_distance;
-        }
-
-        void AlSource::set_max_distance(float max_distance) {
-            alSourcef(source, AL_MAX_DISTANCE, max_distance);
-
-            maybe_check_errors();
-
-            this->max_distance = max_distance;
-        }
+        this->max_distance = max_distance;
     }
 }

@@ -88,16 +88,16 @@
 
 //         class Image : public Widget {
 //         public:
-//             Image(std::shared_ptr<gl::Texture> texture);
+//             Image(std::shared_ptr<GlTexture> texture);
 //             virtual ~Image() = default;
 
 //             virtual void render() override;
 
-//             void set_image(std::shared_ptr<gl::Texture> texture);
+//             void set_image(std::shared_ptr<GlTexture> texture);
 //             void set_position(glm::vec2 position);
 //             void set_size(glm::vec2 size);
 //         private:
-//             std::shared_ptr<gl::Texture> texture;
+//             std::shared_ptr<GlTexture> texture;
 //         };
 
 //         class Text : public Widget {

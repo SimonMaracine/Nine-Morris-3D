@@ -1,22 +1,25 @@
 #pragma once
 
+#include <string>
+#include <string_view>
+
 #include <resmanager/resmanager.hpp>
 
-#include "engine/application_base/events.h"
-#include "engine/other/dummy.h"
-#include "engine/scene/scene_list.h"
-#include "engine/scene/object_manager.h"
+#include "engine/application_base/events.hpp"
+#include "engine/other/dummy.hpp"
+#include "engine/scene/scene_list.hpp"
+#include "engine/scene/object_manager.hpp"
 
 namespace sm {
     class Ctx;
 
-    /**
-     * Class representing an entire scene of a game. Subclasses need to be heap-allocated.
-     */
+    /*
+        Class representing an entire scene of a game. Subclasses need to be heap-allocated.
+    */
     class Scene {
-    private:
-        using SceneId = resmanager::HashedStr64;
     public:
+        using SceneId = resmanager::HashedStr64;
+
         Scene(const std::string& name)
             : name(name), id(SceneId(name)) {}
         virtual ~Scene() = default;
@@ -36,14 +39,14 @@ namespace sm {
         std::string_view get_name() const { return name; }
         SceneId get_id() const { return id; }
 
-        SceneList scene_list;  // List of all objects to be rendered
-        ObjectManager objects;  // Storage for all the renderable objects
+        // SceneList scene_list;  // List of all objects to be rendered
+        // ObjectManager objects;  // Storage for all the renderable objects
 
         Ctx* ctx = nullptr;
     private:
         inline void objects_on_stop() {  // Used to clean up objects
-            scene_list.clear();
-            objects.clear();
+            // scene_list.clear();
+            // objects.clear();
         }
 
         std::string name;

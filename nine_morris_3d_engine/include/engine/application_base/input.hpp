@@ -2,8 +2,6 @@
 
 #include <utility>
 
-struct GLFWwindow;
-
 namespace sm {
     enum class Key;
     enum class MouseButton;
@@ -27,7 +25,7 @@ namespace sm {
         static Key key_from_code(int code);
         static MouseButton mouse_button_from_code(int code);
     private:
-        GLFWwindow* window_handle = nullptr;
+        void* window_handle = nullptr;
 
         friend class Application;
     };

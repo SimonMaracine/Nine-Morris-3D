@@ -54,7 +54,7 @@ namespace sm {
     }
 
     SoundData::~SoundData() {
-        ASSERT(data != nullptr, "No data");
+        SM_ASSERT(data != nullptr, "No data");
 
         std::free(data);
 

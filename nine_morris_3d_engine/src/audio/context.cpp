@@ -36,7 +36,7 @@ namespace sm {
         global_device = device;
         global_context = context;
 
-        listener.set_distance_model(al::DistanceModel::InverseClamped);
+        listener.set_distance_model(DistanceModel::InverseClamped);
 
         LOG_INFO("Created OpenAL device and context");
     }

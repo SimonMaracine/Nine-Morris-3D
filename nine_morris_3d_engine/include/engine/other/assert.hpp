@@ -1,3 +1,5 @@
 #pragma once
 
-#define ASSERT(expression, message) assert((expression) && message)
+#include <cassert>
+
+#define SM_ASSERT(expression, message) assert((expression) && message)

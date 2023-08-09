@@ -12,10 +12,10 @@
 
 namespace sm {
     class Material {
-    private:
+    public:
         using Key = resmanager::HashedStr64;
         using HashFunction = resmanager::Hash<Key>;
-    public:
+
         enum class Uniform {
             Mat4,
             Int,
@@ -29,7 +29,7 @@ namespace sm {
             // FIXME flags here; anything needed?
         };
 
-        Material(std::shared_ptr<gl::Shader> shader, int flags = 0);
+        Material(std::shared_ptr<GlShader> shader, int flags = 0);
         ~Material();
 
         Material(const Material&) = delete;
@@ -40,7 +40,7 @@ namespace sm {
         void add_uniform(Uniform type, Key name);
         void add_texture(Key name);
     private:
-        std::shared_ptr<gl::Shader> shader;
+        std::shared_ptr<GlShader> shader;
 
         std::unordered_map<Key, glm::mat4, HashFunction> uniforms_mat4;
         std::unordered_map<Key, int, HashFunction> uniforms_int;
@@ -49,18 +49,18 @@ namespace sm {
         std::unordered_map<Key, glm::vec3, HashFunction> uniforms_vec3;
         std::unordered_map<Key, glm::vec4, HashFunction> uniforms_vec4;
 
-        std::unordered_map<Key, std::pair<int, std::shared_ptr<gl::Texture>>, HashFunction> textures;
+        std::unordered_map<Key, std::pair<int, std::shared_ptr<GlTexture>>, HashFunction> textures;
 
         int flags = 0;  // FIXME is needed?
 
         friend class MaterialInstance;
     };
 
-    class MaterialInstance final {
-    private:
+    class MaterialInstance {
+    public:
         using Key = Material::Key;
         using HashFunction = Material::HashFunction;
-    public:
+
         MaterialInstance(std::shared_ptr<Material> material);
         ~MaterialInstance();
 
@@ -77,11 +77,11 @@ namespace sm {
         void set_vec2(Key name, glm::vec2 vector);
         void set_vec3(Key name, const glm::vec3& vector);
         void set_vec4(Key name, const glm::vec4& vector);
-        void set_texture(Key name, std::shared_ptr<gl::Texture> texture, int unit);
+        void set_texture(Key name, std::shared_ptr<GlTexture> texture, int unit);
 
-        std::shared_ptr<gl::Shader> get_shader() { return shader; }
+        std::shared_ptr<GlShader> get_shader() { return shader; }
     private:
-        std::shared_ptr<gl::Shader> shader;
+        std::shared_ptr<GlShader> shader;
 
         std::unordered_map<Key, glm::mat4, HashFunction> uniforms_mat4;
         std::unordered_map<Key, int, HashFunction> uniforms_int;
@@ -90,7 +90,7 @@ namespace sm {
         std::unordered_map<Key, glm::vec3, HashFunction> uniforms_vec3;
         std::unordered_map<Key, glm::vec4, HashFunction> uniforms_vec4;
 
-        std::unordered_map<Key, std::pair<int, std::shared_ptr<gl::Texture>>, HashFunction> textures;
+        std::unordered_map<Key, std::pair<int, std::shared_ptr<GlTexture>>, HashFunction> textures;
 
         int flags = 0;  // FIXME is needed?
     };

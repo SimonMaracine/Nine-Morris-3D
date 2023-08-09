@@ -102,7 +102,7 @@ namespace sm {
         delete[] buffer;
 
         if (!check_compilation(shader, type, name)) {
-            throw std::runtime_error("Shader compilation error");  // FIXME put these in class and don't use exceptons
+            throw std::runtime_error("GlShader compilation error");  // FIXME put these in class and don't use exceptons
         }
 
         return shader;
@@ -119,7 +119,7 @@ namespace sm {
         glCompileShader(shader);
 
         if (!check_compilation(shader, type, name)) {
-            throw std::runtime_error("Shader compilation error");
+            throw std::runtime_error("GlShader compilation error");
         }
 
         return shader;
@@ -134,12 +134,12 @@ namespace sm {
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("Shader linking error with no message in shader `{}`", name);
+                LOG_DIST_CRITICAL("GlShader linking error with no message in shader `{}`", name);
             } else {
                 char* log_message = new char[log_length];
                 glGetProgramInfoLog(program, log_length, nullptr, log_message);
 
-                LOG_DIST_CRITICAL("Shader linking error in shader `{}`\n{}", name, log_message);
+                LOG_DIST_CRITICAL("GlShader linking error in shader `{}`\n{}", name, log_message);
                 delete[] log_message;
             }
 
@@ -151,17 +151,17 @@ namespace sm {
 
     static std::string get_name_sources(std::string_view vertex_source, std::string_view fragment_source) {
         size_t last_slash_v = vertex_source.find_last_of("/");
-        ASSERT(last_slash_v != std::string::npos, "Could not find slash");
+        SM_ASSERT(last_slash_v != std::string::npos, "Could not find slash");
         const std::string vertex = std::string(vertex_source.substr(last_slash_v + 1));
 
         size_t last_slash_f = fragment_source.find_last_of("/");
-        ASSERT(last_slash_f != std::string::npos, "Could not find slash");
+        SM_ASSERT(last_slash_f != std::string::npos, "Could not find slash");
         const std::string fragment = std::string(fragment_source.substr(last_slash_f + 1));
 
         return vertex + " & " + fragment;
     }
 
-    Shader::Shader(std::string_view vertex_source, std::string_view fragment_source,
+    GlShader::GlShader(std::string_view vertex_source, std::string_view fragment_source,
             const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks)
         : vertex_source_path(vertex_source), fragment_source_path(fragment_source), uniforms(uniforms) {
         name = get_name_sources(vertex_source_path, fragment_source_path);
@@ -194,7 +194,7 @@ namespace sm {
         LOG_DEBUG("Created GL shader {} ({})", program, name);
     }
 
-    Shader::Shader(Encrypt::EncryptedFile vertex_source, Encrypt::EncryptedFile fragment_source,
+    GlShader::GlShader(Encrypt::EncryptedFile vertex_source, Encrypt::EncryptedFile fragment_source,
             const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks)
         : vertex_source_path(vertex_source), fragment_source_path(fragment_source), uniforms(uniforms) {
         name = get_name_sources(vertex_source_path, fragment_source_path);
@@ -230,51 +230,51 @@ namespace sm {
         LOG_DEBUG("Created GL shader {} ({})", program, name);
     }
 
-    Shader::~Shader() {
+    GlShader::~GlShader() {
         delete_shader(program, vertex_shader, fragment_shader);
 
         LOG_DEBUG("Deleted GL shader {} ({})", program, name);
     }
 
-    void Shader::bind() {
+    void GlShader::bind() {
         glUseProgram(program);
     }
 
-    void Shader::unbind() {
+    void GlShader::unbind() {
         glUseProgram(0);
     }
 
-    void Shader::upload_uniform_mat4(Key name, const glm::mat4& matrix) {
+    void GlShader::upload_uniform_mat4(Key name, const glm::mat4& matrix) {
         const GLint location = get_uniform_location(name);
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
-    void Shader::upload_uniform_int(Key name, int value) {
+    void GlShader::upload_uniform_int(Key name, int value) {
         const GLint location = get_uniform_location(name);
         glUniform1i(location, value);
     }
 
-    void Shader::upload_uniform_float(Key name, float value) {
+    void GlShader::upload_uniform_float(Key name, float value) {
         const GLint location = get_uniform_location(name);
         glUniform1f(location, value);
     }
 
-    void Shader::upload_uniform_vec2(Key name, glm::vec2 vector) {
+    void GlShader::upload_uniform_vec2(Key name, glm::vec2 vector) {
         const GLint location = get_uniform_location(name);
         glUniform2f(location, vector.x, vector.y);
     }
 
-    void Shader::upload_uniform_vec3(Key name, const glm::vec3& vector) {
+    void GlShader::upload_uniform_vec3(Key name, const glm::vec3& vector) {
         const GLint location = get_uniform_location(name);
         glUniform3f(location, vector.x, vector.y, vector.z);
     }
 
-    void Shader::upload_uniform_vec4(Key name, const glm::vec4& vector) {
+    void GlShader::upload_uniform_vec4(Key name, const glm::vec4& vector) {
         const GLint location = get_uniform_location(name);
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
     }
 
-    void Shader::recompile() {
+    void GlShader::recompile() {
         GLuint new_vertex_shader;
         GLuint new_fragment_shader;
         try {
@@ -309,7 +309,7 @@ namespace sm {
         fragment_shader = new_fragment_shader;
     }
 
-    int Shader::get_uniform_location(Key name) const {
+    int GlShader::get_uniform_location(Key name) const {
 #ifdef SM_BUILD_DEBUG
         try {
             return cache.at(name);
@@ -322,7 +322,7 @@ namespace sm {
 #endif
     }
 
-    void Shader::check_and_cache_uniforms(const std::vector<std::string>& uniforms) {
+    void GlShader::check_and_cache_uniforms(const std::vector<std::string>& uniforms) {
         for (const auto& uniform : uniforms) {
             const GLint location = glGetUniformLocation(program, uniform.c_str());
 
@@ -335,12 +335,12 @@ namespace sm {
         }
     }
 
-    void Shader::configure_uniform_blocks(unsigned int program, const UniformBlocks& uniform_blocks) {
+    void GlShader::configure_uniform_blocks(unsigned int program, const UniformBlocks& uniform_blocks) {
         if (uniform_blocks.size() == 0) {
             LOG_WARNING("Uniform blocks structure is empty; this function does nothing");
         }
 
-        for (const gl::UniformBlockSpecification& block : uniform_blocks) {
+        for (const UniformBlockSpecification& block : uniform_blocks) {
             const GLuint block_index = glGetUniformBlockIndex(program, block.block_name.c_str());
 
             if (block_index == GL_INVALID_INDEX) {
@@ -369,7 +369,7 @@ namespace sm {
             const size_t field_count = block.field_names.size();
             static constexpr size_t MAX_FIELD_COUNT = 8;
 
-            ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 8 fields for now");
+            SM_ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 8 fields for now");
 
             GLuint indices[MAX_FIELD_COUNT];
             GLint offsets[MAX_FIELD_COUNT];
@@ -413,7 +413,7 @@ namespace sm {
 
             // Finally setup the uniform block fields
             for (size_t i = 0; i < field_count; i++) {
-                const gl::UniformBlockField field = {
+                const UniformBlockField field = {
                     static_cast<size_t>(offsets[i]),
                     static_cast<size_t>(sizes[i]) * type_size(types[i])
                 };

@@ -31,7 +31,7 @@ Fonts:
 Cube maps:
     https://polyhaven.com/hdris
 
-Music (temporary):
+MusicPlayer (temporary):
     https://pixabay.com/music/search/mood/relaxing/
 
 ----------------------------------------------------------------------------------------------------

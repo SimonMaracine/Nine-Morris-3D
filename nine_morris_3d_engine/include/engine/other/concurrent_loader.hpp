@@ -1,14 +1,18 @@
 #pragma once
 
-#include "engine/application_base/application.h"
-#include "engine/other/logging.h"
-#include "engine/other/resource_manager.h"
+#include <functional>
+#include <atomic>
+#include <thread>
+
+#include "engine/application_base/application.hpp"
+#include "engine/other/logging.hpp"
+#include "engine/other/resource_manager.hpp"
 
 namespace sm {
-    /**
-     * Objects of this class load assets in a separate thread.
-     * Inherit this and implement a loading function to load the assets.
-     */
+    /*
+        Objects of this class load assets in a separate thread.
+        Inherit this and implement a loading function to load the assets.
+    */
     template<typename D, typename... Args>
     class ConcurrentLoader {
     public:
@@ -52,12 +56,10 @@ namespace sm {
     void ConcurrentLoader<D, Args...>::start_loading_thread(const Args&... args) {
         LOG_INFO("Loading some assets from separate thread...");
 
-        const auto load_function = [&]() {
-            static_cast<D*>(this)->load(args...);
-        };
-
         in_use = true;
-        loading_thread = std::thread(load_function);
+        loading_thread = std::thread([&]() {
+            static_cast<D*>(this)->load(args...);
+        });
     }
 
     template<typename D, typename... Args>
@@ -101,8 +103,8 @@ namespace sm {
 
     template<typename D, typename... Args>
     void ConcurrentLoader<D, Args...>::reset() {
-        res = ResourcesCache {};
-        loading_thread = std::thread {};
+        res = {};
+        loading_thread = {};
         loaded.store(false);
         in_use = false;
     }

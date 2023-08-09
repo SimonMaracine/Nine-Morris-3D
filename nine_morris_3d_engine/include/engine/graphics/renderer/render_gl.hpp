@@ -3,7 +3,7 @@
 namespace sm {
     struct FramebufferSpecification;
 
-    class RenderGl {
+    struct RenderGl {
         /*
             Color
             Depth

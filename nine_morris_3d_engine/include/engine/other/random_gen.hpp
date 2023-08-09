@@ -1,9 +1,14 @@
 #pragma once
 
-#include "engine/other/assert.h"
+#include <initializer_list>
+#include <random>
+#include <cstddef>
+#include <cstdint>
+
+#include "engine/other/assert.hpp"
 
 namespace sm {
-    class RandomGenerator final {
+    class RandomGenerator {
     public:
         RandomGenerator();
         ~RandomGenerator() = default;
@@ -21,7 +26,7 @@ namespace sm {
 
         template<typename T>
         T choice(std::initializer_list<T> list) {
-            ASSERT(list.size() > 0, "List must not be empty");
+            SM_ASSERT(list.size() > 0, "List must not be empty");
 
             const uint32_t index = next(list.size() - 1);
 
@@ -32,7 +37,7 @@ namespace sm {
         T choice(Iter first, Iter last) {
             const size_t size = std::distance(first, last);
 
-            ASSERT(size > 0, "List must not be empty");
+            SM_ASSERT(size > 0, "List must not be empty");
 
             const uint32_t index = next(size - 1);
 

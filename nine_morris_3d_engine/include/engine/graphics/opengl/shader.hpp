@@ -24,21 +24,21 @@ namespace sm {
 
     using UniformBlocks = std::initializer_list<UniformBlockSpecification>;
 
-    class Shader {
+    class GlShader {
     private:
         using Key = resmanager::HashedStr64;
         using HashFunction = resmanager::Hash<Key>;
     public:
-        Shader(std::string_view vertex_source, std::string_view fragment_source,
+        GlShader(std::string_view vertex_source, std::string_view fragment_source,
             const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks = {});
-        Shader(Encrypt::EncryptedFile vertex_source, Encrypt::EncryptedFile fragment_source,
+        GlShader(Encrypt::EncryptedFile vertex_source, Encrypt::EncryptedFile fragment_source,
             const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks = {});
-        ~Shader();
+        ~GlShader();
 
-        Shader(const Shader&) = delete;
-        Shader& operator=(const Shader&) = delete;
-        Shader(Shader&&) = delete;
-        Shader& operator=(Shader&&) = delete;
+        GlShader(const GlShader&) = delete;
+        GlShader& operator=(const GlShader&) = delete;
+        GlShader(GlShader&&) = delete;
+        GlShader& operator=(GlShader&&) = delete;
 
         void bind();
         static void unbind();
@@ -56,7 +56,7 @@ namespace sm {
         std::string_view get_name() { return name; }
         const std::vector<std::string>& get_uniforms() { return uniforms; }
     private:
-        GLint get_uniform_location(Key name) const;
+        int get_uniform_location(Key name) const;
         void check_and_cache_uniforms(const std::vector<std::string>& uniforms);
 
         static void configure_uniform_blocks(unsigned int program, const UniformBlocks& uniform_blocks);

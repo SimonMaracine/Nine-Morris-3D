@@ -6,10 +6,8 @@
 #include "engine/other/encrypt.hpp"
 
 namespace sm {
-    namespace gl {
-        class Texture;
-        class Texture3D;
-    }
+    class GlTexture;
+    class GlTexture3D;
 
     class TextureData {
     public:
@@ -36,7 +34,7 @@ namespace sm {
         int height = 0;
         std::string file_path;
 
-        friend class gl::Texture;
-        friend class gl::Texture3D;
+        friend class GlTexture;
+        friend class GlTexture3D;
     };
 }

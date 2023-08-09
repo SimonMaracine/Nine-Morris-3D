@@ -68,7 +68,7 @@ namespace sm {
                 LOG_DIST_WARNING("({}) {}", id, message);
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
-                ASSERT(false, "This should have been disabled");
+                SM_ASSERT(false, "This should have been disabled");
                 break;
         }
     }

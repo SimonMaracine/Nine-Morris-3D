@@ -8,7 +8,7 @@ namespace sm {
     class GlVertexBuffer;
     class GlIndexBuffer;
 
-    class VertexArray {
+    class GlVertexArray {
     public:
         class Def {
         public:
@@ -18,16 +18,16 @@ namespace sm {
         private:
             Def() = default;
 
-            friend class VertexArray;
+            friend class GlVertexArray;
         };
-    public:
-        VertexArray();
-        ~VertexArray();
 
-        VertexArray(const VertexArray&) = delete;
-        VertexArray& operator=(const VertexArray&) = delete;
-        VertexArray(VertexArray&&) = delete;
-        VertexArray& operator=(VertexArray&&) = delete;
+        GlVertexArray();
+        ~GlVertexArray();
+
+        GlVertexArray(const GlVertexArray&) = delete;
+        GlVertexArray& operator=(const GlVertexArray&) = delete;
+        GlVertexArray(GlVertexArray&&) = delete;
+        GlVertexArray& operator=(GlVertexArray&&) = delete;
 
         void bind();
         static void unbind();

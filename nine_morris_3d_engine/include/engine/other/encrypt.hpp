@@ -1,17 +1,20 @@
 #pragma once
 
+#include <string_view>
+#include <utility>
+
 #include <cppblowfish/cppblowfish.hpp>
 
-#include "engine/application_base/platform.h"
+#include "engine/application_base/platform.hpp"
 
-#ifdef NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
-    #define ENCR(file_string) (file_string)
+#ifdef SM_BUILD_DISTRIBUTION
+    #define SM_ENCR(file_string) (file_string ".dat")
 #else
-    #define ENCR(file_string) (file_string ".dat")
+    #define SM_ENCR(file_string) (file_string)
 #endif
 
 namespace sm {
-    class Encrypt final {
+    class Encrypt {
     public:
         Encrypt() = default;
         ~Encrypt() = default;
@@ -21,10 +24,11 @@ namespace sm {
         Encrypt(Encrypt&&) = delete;
         Encrypt& operator=(Encrypt&&) = delete;
 
-        class EncryptedFile final {
+        class EncryptedFile {
         public:
             explicit constexpr EncryptedFile(std::string_view file_path)
                 : file_path(file_path) {}
+            ~EncryptedFile() = default;
 
             EncryptedFile(const EncryptedFile&) = default;
             EncryptedFile& operator=(const EncryptedFile&) = default;
@@ -38,13 +42,13 @@ namespace sm {
 
         static std::pair<unsigned char*, size_t> load_file(EncryptedFile file_path);
 
-#ifdef NM3D_TREAT_ENCRYPTED_FILES_AS_NORMAL_FILES
-        static constexpr std::string_view encr(std::string_view file_path) {
-            return file_path;
+#ifdef SM_BUILD_DISTRIBUTION
+        static constexpr EncryptedFile encr(std::string_view file_path) {
+            return EncryptedFile(file_path);
         }
 #else
-        static constexpr EncryptedFile encr(std::string_view file_path) {
-            return EncryptedFile {file_path};
+        static constexpr std::string_view encr(std::string_view file_path) {
+            return file_path;
         }
 #endif
     private:

@@ -10,7 +10,7 @@
 #include "engine/other/assert.hpp"
 
 namespace sm {
-    VertexArray::VertexArray() {
+    GlVertexArray::GlVertexArray() {
         glGenVertexArrays(1, &array);
         glBindVertexArray(array);
 
@@ -19,28 +19,28 @@ namespace sm {
         LOG_DEBUG("Created GL vertex array {}", array);
     }
 
-    VertexArray::~VertexArray() {
+    GlVertexArray::~GlVertexArray() {
         glDeleteVertexArrays(1, &array);
 
         LOG_DEBUG("Deleted GL vertex array {}", array);
     }
 
-    void VertexArray::bind() {
+    void GlVertexArray::bind() {
         glBindVertexArray(array);
     }
 
-    void VertexArray::unbind() {
+    void GlVertexArray::unbind() {
         glBindVertexArray(0);
     }
 
-    VertexArray::Def VertexArray::begin_definition() {
+    GlVertexArray::Def GlVertexArray::begin_definition() {
         glBindVertexArray(array);
 
         return Def {};
     }
 
-    VertexArray::Def& VertexArray::Def::add_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout) {
-        ASSERT(layout.elements.size() > 0, "Invalid layout");
+    GlVertexArray::Def& GlVertexArray::Def::add_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout) {
+        SM_ASSERT(layout.elements.size() > 0, "Invalid layout");
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
 
@@ -75,13 +75,13 @@ namespace sm {
         return *this;
     }
 
-    VertexArray::Def& VertexArray::Def::add_index_buffer(std::shared_ptr<GlIndexBuffer> index_buffer) {
+    GlVertexArray::Def& GlVertexArray::Def::add_index_buffer(std::shared_ptr<GlIndexBuffer> index_buffer) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer->buffer);
 
         return *this;
     }
 
-    void VertexArray::Def::end_definition() {
+    void GlVertexArray::Def::end_definition() {
         glBindVertexArray(0);
     }
 }

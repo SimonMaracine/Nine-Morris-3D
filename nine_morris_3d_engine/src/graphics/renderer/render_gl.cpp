@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 
 #include "engine/graphics/opengl/framebuffer.hpp"
+#include "engine/graphics/renderer/render_gl.hpp"
 
 namespace sm {
     void RenderGl::initialize_default() {

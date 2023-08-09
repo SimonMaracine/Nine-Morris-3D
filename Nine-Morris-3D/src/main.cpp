@@ -4,6 +4,8 @@
 #include <engine/prelude.hpp>
 #include <engine/application_base/application.hpp>
 #include <engine/application_base/application_builder.hpp>
+#include <engine/application_base/application_builder.hpp>
+#include <engine/external/resmanager.h++>
 
 // #include <engine/public/application_base.h>
 // #include <engine/public/other.h>
@@ -33,13 +35,17 @@ static constexpr unsigned int PATCH = 0;
 
 static const char* KEY = "data/models/board/board.obj";
 
+struct Game : public sm::Scene {
+    Game() : sm::Scene("loading") {}
+};
+
 void application_main() {
     sm::Application::preinitialize(APP_NAME, LOG_FILE, INFO_FILE);
 
     while (true) {
         int exit_code {};
 
-        Data* global_data = new Data;
+        // Data* global_data = new Data;
 
         // {
         //     auto launcher_builder = sm::ApplicationBuilder {}
@@ -63,11 +69,11 @@ void application_main() {
         }
 
         {
-            const auto& options = global_data->launcher_options;
+            // const auto& options = global_data->launcher_options;
 
-            auto game_builder = sm::ApplicationBuilder {}
-                .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
-                .display_flags(options.fullscreen, options.native_resolution, true)
+            auto game_builder = sm::ApplicationBuilder()
+                // .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
+                // .display_flags(options.fullscreen, options.native_resolution, true)
                 .display_min_resolution(512, 288)
                 .application_name(APP_NAME)
                 .version(MAJOR, MINOR, PATCH)
@@ -78,13 +84,14 @@ void application_main() {
                 .with_audio()
                 .with_random_generator();
 
-            auto game = sm::Application {game_builder, global_data};
-            game.set_start_function(game::start);
-            game.set_stop_function(game::stop);
-            game.add_scene<LoadingScene>();
-            game.add_scene<StandardGameScene>();
-            game.add_scene<JumpVariantScene>();
-            game.add_scene<JumpPlusVariantScene>();
+            auto game = sm::Application(game_builder/*, global_data*/);
+            // game.set_start_function(game::start);
+            // game.set_stop_function(game::stop);
+            // game.add_scene<LoadingScene>();
+            // game.add_scene<StandardGameScene>();
+            // game.add_scene<JumpVariantScene>();
+            // game.add_scene<JumpPlusVariantScene>();
+            game.add_scene<Game>();
             exit_code = game.run("loading"_H);
         }
 

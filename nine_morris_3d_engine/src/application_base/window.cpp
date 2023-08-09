@@ -15,7 +15,7 @@
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/panic.hpp"
-#include "engine/dear_imgui/imgui_context.hpp"
+#include "engine/graphics/imgui_context.hpp"
 #include "engine/graphics/texture_data.hpp"
 #include "engine/other/logging.hpp"
 
@@ -134,7 +134,7 @@ namespace sm {
     }
 
     void Window::set_vsync(int interval) {
-        ASSERT(interval >= 0, "Invalid interval");
+        SM_ASSERT(interval >= 0, "Invalid interval");
 
         glfwSwapInterval(interval);
     }
@@ -247,7 +247,7 @@ namespace sm {
 
             switch (action) {
                 case GLFW_PRESS: {
-                    if (WITH_DEAR_IMGUI() && imgui_context::on_key_pressed(key, scancode)) {
+                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_key_pressed(key, scancode)) {
                         return;
                     }
 
@@ -259,7 +259,7 @@ namespace sm {
                     break;
                 }
                 case GLFW_RELEASE: {
-                    if (WITH_DEAR_IMGUI() && imgui_context::on_key_released(key, scancode)) {
+                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_key_released(key, scancode)) {
                         return;
                     }
 
@@ -267,7 +267,7 @@ namespace sm {
                     break;
                 }
                 case GLFW_REPEAT: {
-                    if (WITH_DEAR_IMGUI() && imgui_context::on_key_pressed(key, scancode)) {
+                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_key_pressed(key, scancode)) {
                         return;
                     }
 
@@ -284,7 +284,7 @@ namespace sm {
         glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int codepoint) {
             APPLICATION_DATA(data)
 
-            if (WITH_DEAR_IMGUI() && imgui_context::on_char_typed(codepoint)) {
+            if (WITH_DEAR_IMGUI() && ImGuiContext::on_char_typed(codepoint)) {
                 return;
             }
 
@@ -296,7 +296,7 @@ namespace sm {
 
             switch (action) {
                 case GLFW_PRESS: {
-                    if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_button_pressed(button)) {
+                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_mouse_button_pressed(button)) {
                         return;
                     }
 
@@ -304,7 +304,7 @@ namespace sm {
                     break;
                 }
                 case GLFW_RELEASE: {
-                    if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_button_released(button)) {
+                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_mouse_button_released(button)) {
                         return;
                     }
 
@@ -317,7 +317,7 @@ namespace sm {
         glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
             APPLICATION_DATA(data)
 
-            if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_scrolled(static_cast<float>(yoffset))) {
+            if (WITH_DEAR_IMGUI() && ImGuiContext::on_mouse_scrolled(static_cast<float>(yoffset))) {
                 return;
             }
 
@@ -327,7 +327,7 @@ namespace sm {
         glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
             APPLICATION_DATA(data)
 
-            if (WITH_DEAR_IMGUI() && imgui_context::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
+            if (WITH_DEAR_IMGUI() && ImGuiContext::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
                 return;
             }
 

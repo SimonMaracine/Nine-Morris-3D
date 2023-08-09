@@ -5,13 +5,13 @@
 #include <glm/glm.hpp>
 #include <resmanager/resmanager.hpp>
 
-#include "engine/graphics/material.hpp"
 #include "engine/graphics/opengl/shader.hpp"
+#include "engine/graphics/material.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
 
 namespace sm {
-    Material::Material(std::shared_ptr<gl::Shader> shader, int flags)
+    Material::Material(std::shared_ptr<GlShader> shader, int flags)
         : shader(shader), flags(flags) {
         LOG_DEBUG("Created material from shader `{}` with flags `{}`", shader->get_name(), flags);
     }
@@ -41,12 +41,12 @@ namespace sm {
                 uniforms_vec4[name] = glm::vec4(0.0f);
                 break;
             default:
-                ASSERT(false, "Unknown uniform type");
+                SM_ASSERT(false, "Unknown uniform type");
         }
     }
 
     void Material::add_texture(Key name) {
-        textures[name] = std::make_pair<int, std::shared_ptr<gl::Texture>>(0, {});
+        textures[name] = std::make_pair<int, std::shared_ptr<GlTexture>>(0, {});
     }
 
     // --- Material instance
@@ -128,7 +128,7 @@ namespace sm {
         uniforms_vec4.at(name) = vector;
     }
 
-    void MaterialInstance::set_texture(Key name, std::shared_ptr<gl::Texture> texture, int unit) {
+    void MaterialInstance::set_texture(Key name, std::shared_ptr<GlTexture> texture, int unit) {
         textures.at(name) = std::make_pair(unit, texture);
     }
 }

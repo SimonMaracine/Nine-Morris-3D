@@ -22,11 +22,11 @@
 
 namespace sm {
     class Application final {
-    private:
+    public:
         using UserFunc = std::function<void(Ctx*)>;
         using SceneId = resmanager::HashedStr64;
         using RendererFunc = std::function<void()>;
-    public:
+
         static void preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file);
 
         Application(const ApplicationBuilder& builder, void* user_data = nullptr);

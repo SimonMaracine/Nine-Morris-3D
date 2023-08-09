@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <unordered_map>
 
 #include "engine/graphics/opengl/vertex_array.hpp"
 
@@ -32,7 +33,7 @@ namespace sm {
         unsigned int buffer = 0;
         DrawHint hint = DrawHint::Static;
 
-        friend class VertexArray::Def;
+        friend class GlVertexArray::Def;
     };
 
     class GlIndexBuffer {
@@ -53,7 +54,7 @@ namespace sm {
         unsigned int buffer = 0;
         int index_count = 0;
 
-        friend class VertexArray;
+        friend class GlVertexArray;
     };
 
     struct UniformBlockField {
@@ -92,7 +93,7 @@ namespace sm {
 
         bool configured = false;
 
-        friend class Shader;
+        friend class GlShader;
     };
 
     class GlPixelBuffer {

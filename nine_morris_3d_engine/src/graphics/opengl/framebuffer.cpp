@@ -19,10 +19,10 @@ namespace sm {
         return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     }
 
-    static bool depth_attachment_present(const gl::FramebufferSpecification& specification) {
+    static bool depth_attachment_present(const FramebufferSpecification& specification) {
         return (
-            specification.depth_attachment.format != gl::AttachmentFormat::None
-            && specification.depth_attachment.type != gl::AttachmentType::None
+            specification.depth_attachment.format != AttachmentFormat::None
+            && specification.depth_attachment.type != AttachmentType::None
         );
     }
 
@@ -133,7 +133,7 @@ namespace sm {
                 message = "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS";
                 break;
             case GL_FRAMEBUFFER_COMPLETE:
-                ASSERT(false, "Don't call this function, if the status is GL_FRAMEBUFFER_COMPLETE");
+                SM_ASSERT(false, "Don't call this function, if the status is GL_FRAMEBUFFER_COMPLETE");
                 break;
             default:
                 break;
@@ -144,22 +144,22 @@ namespace sm {
 
     GlFramebuffer::GlFramebuffer(const FramebufferSpecification& specification)
         : specification(specification) {
-        ASSERT(
+        SM_ASSERT(
             specification.samples == 1 || specification.samples == 2 || specification.samples == 4,
             "Invalid sample size"
         );
 
         if (specification.white_border_for_depth_texture) {
-            ASSERT(specification.depth_attachment.format != AttachmentFormat::None, "Invalid configuration");
-            ASSERT(specification.depth_attachment.type == AttachmentType::Texture, "Invalid configuration");
+            SM_ASSERT(specification.depth_attachment.format != AttachmentFormat::None, "Invalid configuration");
+            SM_ASSERT(specification.depth_attachment.type == AttachmentType::Texture, "Invalid configuration");
         }
 
-        ASSERT(specification.width > 0 && specification.height > 0, "Invalid size");
+        SM_ASSERT(specification.width > 0 && specification.height > 0, "Invalid size");
 
-        ASSERT(specification.clear_drawbuffer >= 0, "Invalid drawbuffer to clear");
+        SM_ASSERT(specification.clear_drawbuffer >= 0, "Invalid drawbuffer to clear");
 
         if (!specification.color_attachments.empty()) {
-            ASSERT(
+            SM_ASSERT(
                 static_cast<size_t>(specification.clear_drawbuffer) < specification.color_attachments.size(),
                 "Invalid drawbuffer to clear"
             );
@@ -174,7 +174,7 @@ namespace sm {
         for (size_t i = 0; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
-                    ASSERT(false, "Attachment type None is invalid");
+                    SM_ASSERT(false, "Attachment type None is invalid");
                     break;
                 case AttachmentType::Texture:
                     glDeleteTextures(1, &color_attachments[i]);
@@ -188,7 +188,7 @@ namespace sm {
         if (depth_attachment_present(specification)) {
             switch (specification.depth_attachment.type) {
                 case AttachmentType::None:
-                    ASSERT(false, "Attachment type None is invalid");
+                    SM_ASSERT(false, "Attachment type None is invalid");
                     break;
                 case AttachmentType::Texture:
                     glDeleteTextures(1, &depth_attachment);
@@ -213,7 +213,7 @@ namespace sm {
     }
 
     unsigned int GlFramebuffer::get_color_attachment(int attachment_index) {
-        ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
+        SM_ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
         return color_attachments[attachment_index];
     }
@@ -235,7 +235,7 @@ namespace sm {
     }
 
     float GlFramebuffer::read_pixel_float(int attachment_index, int x, int y) {
-        ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
+        SM_ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         float pixel;
@@ -245,7 +245,7 @@ namespace sm {
     }
 
     void GlFramebuffer::read_pixel_float_pbo(int attachment_index, int x, int y) {
-        ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
+        SM_ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
@@ -256,7 +256,7 @@ namespace sm {
     }
 
     void GlFramebuffer::blit(GlFramebuffer* draw_framebuffer, int width, int height) {
-        ASSERT(
+        SM_ASSERT(
             color_attachments.size() == draw_framebuffer->color_attachments.size(),
             "Framebuffers must have the same attachments"
         );
@@ -279,7 +279,7 @@ namespace sm {
             for (size_t i = 0; i < specification.color_attachments.size(); i++) {
                 switch (specification.color_attachments[i].type) {
                     case AttachmentType::None:
-                        ASSERT(false, "Attachment type None is invalid");
+                        SM_ASSERT(false, "Attachment type None is invalid");
                         break;
                     case AttachmentType::Texture:
                         glDeleteTextures(1, &color_attachments[i]);
@@ -293,7 +293,7 @@ namespace sm {
             if (depth_attachment_present(specification)) {
                 switch (specification.depth_attachment.type) {
                     case AttachmentType::None:
-                        ASSERT(false, "Attachment type None is invalid");
+                        SM_ASSERT(false, "Attachment type None is invalid");
                         break;
                     case AttachmentType::Texture:
                         glDeleteTextures(1, &depth_attachment);
@@ -321,7 +321,7 @@ namespace sm {
         for (size_t i = 0; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
-                    ASSERT(false, "Attachment type None is invalid");
+                    SM_ASSERT(false, "Attachment type None is invalid");
 
                     break;
                 case AttachmentType::Texture: {
@@ -331,7 +331,7 @@ namespace sm {
 
                     switch (specification.color_attachments[i].format) {
                         case AttachmentFormat::None:
-                            ASSERT(false, "Attachment format None is invalid");
+                            SM_ASSERT(false, "Attachment format None is invalid");
                             break;
                         case AttachmentFormat::Rgba8:
                             attach_color_texture(
@@ -368,7 +368,7 @@ namespace sm {
 
                     switch (specification.color_attachments[i].format) {
                         case AttachmentFormat::None:
-                            ASSERT(false, "Attachment format None is invalid");
+                            SM_ASSERT(false, "Attachment format None is invalid");
                             break;
                         case AttachmentFormat::Rgba8:
                             attach_color_renderbuffer(
@@ -404,7 +404,7 @@ namespace sm {
         if (depth_attachment_present(specification)) {
             switch (specification.depth_attachment.type) {
                 case AttachmentType::None:
-                    ASSERT(false, "Attachment type None is invalid");
+                    SM_ASSERT(false, "Attachment type None is invalid");
 
                     break;
                 case AttachmentType::Texture: {
@@ -414,7 +414,7 @@ namespace sm {
 
                     switch (specification.depth_attachment.format) {
                         case AttachmentFormat::None:
-                            ASSERT(false, "Attachment format None is invalid");
+                            SM_ASSERT(false, "Attachment format None is invalid");
                             break;
                         case AttachmentFormat::Depth24Stencil8:
                             attach_depth_texture(
@@ -447,7 +447,7 @@ namespace sm {
 
                     switch (specification.depth_attachment.format) {
                         case AttachmentFormat::None:
-                            ASSERT(false, "Attachment format None is invalid");
+                            SM_ASSERT(false, "Attachment format None is invalid");
                             break;
                         case AttachmentFormat::Depth24Stencil8:
                             attach_depth_renderbuffer(
@@ -477,7 +477,7 @@ namespace sm {
         }
 
         if (color_attachments.size() > 1) {
-            ASSERT(color_attachments.size() <= 4, "Currently there can be maximum 4 color attachments");
+            SM_ASSERT(color_attachments.size() <= 4, "Currently there can be maximum 4 color attachments");
 
             glDrawBuffers(color_attachments.size(), COLOR_ATTACHMENTS);
         } else if (color_attachments.empty()) {

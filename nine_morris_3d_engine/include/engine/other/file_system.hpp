@@ -1,7 +1,11 @@
 #pragma once
 
+#include <string>
+#include <string_view>
+#include <stdexcept>
+
 namespace sm {
-    namespace file_system {
+    struct FileSystem {  // TODO use C++ 17 filesystem
         class UserNameError : public std::runtime_error {
         public:
             explicit UserNameError(const std::string& message)
@@ -11,23 +15,23 @@ namespace sm {
         };
 
         // There is no uninitialization
-        void initialize_for_applications(std::string_view application_name) noexcept(false);
+        static void initialize_for_applications(std::string_view application_name) noexcept(false);
 
-        bool directory_exists(std::string_view path);  // Path must not end with trailing backslash
-        bool create_directory(std::string_view path);
-        bool delete_file(std::string_view path);
+        static bool directory_exists(std::string_view path);  // Path must not end with trailing backslash
+        static bool create_directory(std::string_view path);
+        static bool delete_file(std::string_view path);
 
-        std::string cut_slash(std::string_view path);
+        static std::string cut_slash(std::string_view path);
 
-        std::string get_user_name() noexcept(false);
-        void check_and_fix_directories();
+        static std::string get_user_name() noexcept(false);
+        static void check_and_fix_directories();
 
-        std::string path_for_logs();
-        std::string path_for_saved_data();
-        std::string path_for_assets();
+        static std::string path_for_logs();
+        static std::string path_for_saved_data();
+        static std::string path_for_assets();
 
-        std::string path_for_logs(std::string_view file);
-        std::string path_for_saved_data(std::string_view file);
-        std::string path_for_assets(std::string_view file_path);
-    }
+        static std::string path_for_logs(std::string_view file);
+        static std::string path_for_saved_data(std::string_view file);
+        static std::string path_for_assets(std::string_view file_path);
+    };
 }

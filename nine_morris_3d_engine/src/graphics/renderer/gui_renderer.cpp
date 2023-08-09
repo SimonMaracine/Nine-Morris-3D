@@ -121,7 +121,7 @@
 //         render_helpers::draw_elements(storage.quads.quad_count * 6);
 //     }
 
-//     void GuiRenderer::draw_quad(glm::vec2 position, glm::vec2 size, std::shared_ptr<gl::Texture> texture) {
+//     void GuiRenderer::draw_quad(glm::vec2 position, glm::vec2 size, std::shared_ptr<GlTexture> texture) {
 //         if (storage.quads.quad_count == MAX_QUAD_COUNT || storage.quads.texture_slot_index == storage.quads.MAX_TEXTURE_UNITS) {
 //             end_quads_batch();
 //             flush_quads();
@@ -306,9 +306,9 @@
 //     }
 
 //     void GuiRenderer::initialize_quad_renderer() {
-//         storage.quad2d_shader = std::make_shared<gl::Shader>(
-//             Encrypt::encr(file_system::path_for_assets(QUAD2D_VERTEX_SHADER)),
-//             Encrypt::encr(file_system::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
+//         storage.quad2d_shader = std::make_shared<gl::GlShader>(
+//             Encrypt::encr(FileSystem::path_for_assets(QUAD2D_VERTEX_SHADER)),
+//             Encrypt::encr(FileSystem::path_for_assets(QUAD2D_FRAGMENT_SHADER)),
 //             std::vector<std::string> {
 //                 "u_texture[0]",  // FIXME this should be max
 //                 "u_texture[1]",
@@ -331,12 +331,12 @@
 //             );
 //         }
 
-//         gl::Shader::unbind();
+//         gl::GlShader::unbind();
 
 //         storage.quad2d_buffer = std::make_shared<GlVertexBuffer>(MAX_VERTEX_BUFFER_SIZE, gl::DrawHint::Stream);
 //         storage.quad2d_index_buffer = initialize_quads_index_buffer();
 
-//         VertexBufferLayout layout = VertexBufferLayout {}
+//         VertexBufferLayout layout = VertexBufferLayout()
 //             .add(0, VertexBufferLayout::Float, 2)
 //             .add(1, VertexBufferLayout::Float, 2)
 //             .add(2, VertexBufferLayout::Float, 1);
@@ -375,9 +375,9 @@
 //     }
 
 //     void GuiRenderer::initialize_text_renderer() {
-//         storage.text_shader = std::make_shared<gl::Shader>(
-//             Encrypt::encr(file_system::path_for_assets(TEXT_VERTEX_SHADER)),
-//             Encrypt::encr(file_system::path_for_assets(TEXT_FRAGMENT_SHADER)),
+//         storage.text_shader = std::make_shared<gl::GlShader>(
+//             Encrypt::encr(FileSystem::path_for_assets(TEXT_VERTEX_SHADER)),
+//             Encrypt::encr(FileSystem::path_for_assets(TEXT_FRAGMENT_SHADER)),
 //             std::vector<std::string> {
 //                 "u_model_matrix",
 //                 "u_bitmap",

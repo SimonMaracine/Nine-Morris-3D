@@ -27,7 +27,7 @@ namespace sm {
             }
         }
 
-        ASSERT(false, "Scene not found");
+        SM_ASSERT(false, "Scene not found");
     }
 
     const Scene* Ctx::get_current_scene() {

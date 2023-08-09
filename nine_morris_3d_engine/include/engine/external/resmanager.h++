@@ -1,6 +1,6 @@
 #pragma once
 
-#include <resmanager/resmanager.h>
+#include <resmanager/resmanager.hpp>
 
 using namespace resmanager::literals;
 using hs = resmanager::HashedStr64;

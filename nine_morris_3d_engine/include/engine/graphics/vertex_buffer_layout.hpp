@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace sm {
-    struct VertexBufferLayout final {
+    struct VertexBufferLayout {
         enum Type {
             Float,
             Int
