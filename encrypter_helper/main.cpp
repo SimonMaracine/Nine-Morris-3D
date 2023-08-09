@@ -5,7 +5,7 @@
 
 #include <cppblowfish/cppblowfish.hpp>
 
-static void open_file(const std::string& file_name, unsigned char** out, size_t* size) {
+static void open_file(const std::string& file_name, unsigned char** out, std::size_t* size) {
     std::ifstream file {file_name, std::ios::binary};
 
     if (!file.is_open()) {
@@ -14,7 +14,7 @@ static void open_file(const std::string& file_name, unsigned char** out, size_t*
     }
 
     file.seekg(0, file.end);
-    const size_t length = file.tellg();
+    const std::size_t length = file.tellg();
     file.seekg(0, file.beg);
 
     char* buffer = new char[length];
@@ -24,7 +24,7 @@ static void open_file(const std::string& file_name, unsigned char** out, size_t*
     *size = length;
 }
 
-static void write_file(const std::string& file_name, const unsigned char* data, size_t size) {
+static void write_file(const std::string& file_name, const unsigned char* data, std::size_t size) {
     std::ofstream file {file_name, std::ios::binary | std::ios::trunc};
 
     if (!file.is_open()) {
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     cppblowfish::BlowfishContext blowfish {key};
 
     unsigned char* contents = nullptr;
-    size_t contents_size = 0;
+    std::size_t contents_size = 0;
     open_file(input_file, &contents, &contents_size);
 
     cppblowfish::Buffer input {contents, contents_size};
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
     cppblowfish::Buffer cipher;
     blowfish.encrypt(input, cipher);
 
-    const size_t size = cipher.size() + cipher.padding() + cppblowfish::BUFFER_OFFSET;
+    const std::size_t size = cipher.size() + cipher.padding() + cppblowfish::BUFFER_OFFSET;
     unsigned char* buffer = new unsigned char[size];
     cipher.write_whole_data(buffer);
     write_file(output_file, buffer, size);

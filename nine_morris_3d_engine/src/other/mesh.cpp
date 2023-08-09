@@ -126,7 +126,7 @@ namespace sm {
         }
     }
 
-    Mesh::Mesh(const void* vertices, size_t vertices_size, const void* indices, size_t indices_size) {
+    Mesh::Mesh(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size) {
         this->vertices = new char[vertices_size];
         std::memcpy(this->vertices, vertices, vertices_size);
         this->vertices_size = vertices_size;

@@ -9,7 +9,7 @@
 #include "engine/other/assert.hpp"
 
 namespace sm {
-    template<size_t BufferCount>
+    template<std::size_t BufferCount>
     class FramebufferReader {
     public:
         FramebufferReader() = default;
@@ -53,7 +53,7 @@ namespace sm {
         // Store references to pixel buffers and framebuffers
         std::array<std::shared_ptr<GlPixelBuffer>, BufferCount> buffers;
         std::shared_ptr<GlFramebuffer> framebuffer;
-        size_t buffer_index = 0;
-        size_t next_buffer_index = 0;
+        std::size_t buffer_index = 0;
+        std::size_t next_buffer_index = 0;
     };
 }

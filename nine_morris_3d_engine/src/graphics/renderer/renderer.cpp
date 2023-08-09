@@ -208,7 +208,7 @@
 //         post_processing_context.last_texture = post_processing_context.original_texture;
 //         post_processing_context.textures.clear();
 
-//         for (size_t i = 0; i < post_processing_context.steps.size(); i++) {
+//         for (std::size_t i = 0; i < post_processing_context.steps.size(); i++) {
 //             const PostProcessingStep* step = post_processing_context.steps[i].get();
 
 //             step->framebuffer->bind();
@@ -319,7 +319,7 @@
 //     }
 
 //     void Renderer::draw_models(const SceneList& scene) {
-//         for (size_t i = 0; i < scene.models.size(); i++) {
+//         for (std::size_t i = 0; i < scene.models.size(); i++) {
 //             const renderables::Model* model = scene.models[i];
 
 //             if (model->outline_color.has_value()) {
@@ -359,7 +359,7 @@
 //     void Renderer::draw_models_to_depth_buffer(const SceneList& scene) {
 //         storage.shadow_shader->bind();
 
-//         for (size_t i = 0; i < scene.models.size(); i++) {
+//         for (std::size_t i = 0; i < scene.models.size(); i++) {
 //             const renderables::Model* model = scene.models[i];
 
 //             if (model->cast_shadow) {
@@ -415,7 +415,7 @@
 //             return distance1 > distance2;
 //         });
 
-//         for (size_t i = 0; i < quads.size(); i++) {
+//         for (std::size_t i = 0; i < quads.size(); i++) {
 //             const renderables::Quad* quad = quads[i];
 
 //             draw_quad(quad);

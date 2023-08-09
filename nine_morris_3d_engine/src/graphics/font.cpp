@@ -26,7 +26,7 @@ namespace sm {
     static constexpr char32_t ERROR_CHARACTER = 127;
 
     static std::string get_name(std::string_view file_path) {
-        size_t last_slash = file_path.find_last_of("/");
+        std::size_t last_slash = file_path.find_last_of("/");
         SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
 
         return std::string(file_path.substr(last_slash + 1));
@@ -41,7 +41,7 @@ namespace sm {
         }
 
         file.seekg(0, file.end);
-        const size_t length = file.tellg();
+        const std::size_t length = file.tellg();
         file.seekg(0, file.beg);
 
         char* buffer = new char[length];
@@ -54,9 +54,9 @@ namespace sm {
             int width, int height, int dest_x, int dest_y, float* s0, float* t0, float* s1, float* t1) {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                const size_t index = static_cast<size_t>((y + dest_y) * dest_width + (x + dest_x));
+                const std::size_t index = static_cast<std::size_t>((y + dest_y) * dest_width + (x + dest_x));
 
-                SM_ASSERT(index < static_cast<size_t>(dest_width * dest_height), "Write out of bounds");
+                SM_ASSERT(index < static_cast<std::size_t>(dest_width * dest_height), "Write out of bounds");
 
                 dest[index] = glyph[y * width + x];
             }
@@ -95,13 +95,13 @@ namespace sm {
         LOG_DEBUG("Unloaded font `{}`", name);
     }
 
-    void Font::update_data(const float* data, size_t size) {
+    void Font::update_data(const float* data, std::size_t size) {
         buffer->bind();
         buffer->upload_data(data, size);
 
         GlVertexBuffer::unbind();
 
-        static constexpr size_t FLOATS_PER_VERTEX = 4;
+        static constexpr std::size_t FLOATS_PER_VERTEX = 4;
 
         SM_ASSERT(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0, "Data may be corrupted");
 
@@ -114,7 +114,7 @@ namespace sm {
         // Delete the previous bitmap before creating another one
         bitmap_image.reset();
 
-        const size_t SIZE = sizeof(unsigned char) * bitmap_size * bitmap_size;
+        const std::size_t SIZE = sizeof(unsigned char) * bitmap_size * bitmap_size;
 
         bake_context = BakeContext {};
         bake_context.bitmap = new unsigned char[SIZE];

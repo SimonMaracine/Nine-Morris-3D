@@ -33,7 +33,7 @@ namespace sm {
         Font(Font&&) = delete;
         Font& operator=(Font&&) = delete;
 
-        void update_data(const float* data, size_t size);
+        void update_data(const float* data, std::size_t size);
 
         unsigned int get_bitmap_size() const { return static_cast<unsigned int>(bitmap_size); }
 

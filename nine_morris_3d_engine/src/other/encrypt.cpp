@@ -11,7 +11,7 @@
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    std::pair<unsigned char*, size_t> Encrypt::load_file(EncryptedFile file_path) {
+    std::pair<unsigned char*, std::size_t> Encrypt::load_file(EncryptedFile file_path) {
         std::ifstream file {std::string(file_path), std::ios::binary};
 
         if (!file.is_open()) {
@@ -20,7 +20,7 @@ namespace sm {
         }
 
         file.seekg(0, file.end);
-        const size_t length = file.tellg();
+        const std::size_t length = file.tellg();
         file.seekg(0, file.beg);
 
         char* raw_buffer = new char[length];
@@ -34,7 +34,7 @@ namespace sm {
         context.decrypt(cipher, original);
 
         unsigned char* data = original.steal();
-        const size_t size = original.size();
+        const std::size_t size = original.size();
 
         return std::make_pair(data, size);
     }

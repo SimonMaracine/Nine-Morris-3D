@@ -15,7 +15,7 @@
 #include "engine/other/dependencies.hpp"
 
 namespace sm {
-    static constexpr size_t BUFFER_LEN = 128;
+    static constexpr std::size_t BUFFER_LEN = 128;
 
     std::string Dependencies::get_info() {
         std::string output;

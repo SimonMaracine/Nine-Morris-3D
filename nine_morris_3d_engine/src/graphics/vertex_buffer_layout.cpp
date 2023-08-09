@@ -8,7 +8,7 @@
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    size_t VertexBufferLayout::VertexElement::get_size(Type type) {
+    std::size_t VertexBufferLayout::VertexElement::get_size(Type type) {
         switch (type) {
             case Float:
                 return sizeof(GLfloat);

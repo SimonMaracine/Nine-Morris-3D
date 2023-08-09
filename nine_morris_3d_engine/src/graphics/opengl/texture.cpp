@@ -23,7 +23,7 @@ namespace sm {
     static constexpr int CHANNELS = 4;
 
     static std::string get_name(std::string_view file_path) {
-        size_t last_slash = file_path.find_last_of("/");
+        std::size_t last_slash = file_path.find_last_of("/");
         SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
 
         return std::string(file_path.substr(last_slash + 1));
@@ -281,7 +281,7 @@ namespace sm {
         int width, height, channels;
         unsigned char* data[6];
 
-        for (size_t i = 0; i < 6; i++) {
+        for (std::size_t i = 0; i < 6; i++) {
             LOG_DEBUG("Loading texture `{}`...", file_paths[i]);
 
             data[i] = stbi_load(file_paths[i], &width, &height, &channels, CHANNELS);
@@ -294,7 +294,7 @@ namespace sm {
 
         glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
 
-        for (size_t i = 0; i < 6; i++) {
+        for (std::size_t i = 0; i < 6; i++) {
             glTexSubImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height,
                 GL_RGBA, GL_UNSIGNED_BYTE, data[i]
@@ -318,7 +318,7 @@ namespace sm {
 
         glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, data[0]->width, data[0]->height);
 
-        for (size_t i = 0; i < 6; i++) {
+        for (std::size_t i = 0; i < 6; i++) {
             glTexSubImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, data[i]->width, data[i]->height,
                 GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data

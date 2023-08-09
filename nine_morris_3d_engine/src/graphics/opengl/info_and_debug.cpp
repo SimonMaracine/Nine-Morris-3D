@@ -53,7 +53,7 @@ namespace sm {
         "GL_MAX_VIEWPORT_DIMS"
     };
 
-    static constexpr size_t BUFFER_LENGTH = 128;
+    static constexpr std::size_t BUFFER_LENGTH = 128;
 
 #ifdef SM_BUILD_DEBUG
     static void error_callback(GLenum, GLenum, GLuint id, GLenum severity,
@@ -94,7 +94,7 @@ namespace sm {
         output.append("\n*** OpenGL Version And Driver ***\n");
 
         {
-            static constexpr size_t LENGTH = 256;  // 256 should be enough
+            static constexpr std::size_t LENGTH = 256;  // 256 should be enough
 
             char line[LENGTH];
             std::snprintf(line, LENGTH, "OpenGL version: %s\n", glGetString(GL_VERSION));
@@ -109,9 +109,9 @@ namespace sm {
 
         output.append("\n*** OpenGL Context Parameters ***\n");
 
-        size_t parameter_index = 15;
+        std::size_t parameter_index = 15;
 
-        for (size_t i = 0; i <= parameter_index; i++) {
+        for (std::size_t i = 0; i <= parameter_index; i++) {
             GLint result;
             glGetIntegerv(parameters[i], &result);
 

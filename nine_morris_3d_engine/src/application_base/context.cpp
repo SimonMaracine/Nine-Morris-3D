@@ -39,18 +39,18 @@ namespace sm {
     }
 
     void Ctx::purge_framebuffers() {
-        std::vector<size_t> indices;
+        std::vector<std::size_t> indices;
 
-        for (size_t i = 0; i < application->framebuffers.size(); i++) {
+        for (std::size_t i = 0; i < application->framebuffers.size(); i++) {
             if (application->framebuffers[i].expired()) {
                 indices.push_back(i);
             }
         }
 
-        for (size_t i = application->framebuffers.size(); i > 0; i--) {
-            const size_t I = i - 1;
+        for (std::size_t i = application->framebuffers.size(); i > 0; i--) {
+            const std::size_t I = i - 1;
 
-            for (size_t index : indices) {
+            for (std::size_t index : indices) {
                 if (index == I) {
                     application->framebuffers.erase(std::next(application->framebuffers.begin(), index));
                     break;

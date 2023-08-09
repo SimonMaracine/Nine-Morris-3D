@@ -21,9 +21,9 @@
 // #include "engine/scene/scene_list.h"
 
 // namespace sm {
-//     static constexpr size_t MAX_QUAD_COUNT = 1000;
-//     static constexpr size_t MAX_VERTEX_BUFFER_SIZE = sizeof(GuiRenderer::QuadVertex) * 4 * MAX_QUAD_COUNT;
-//     static constexpr size_t MAX_INDICES = 6 * MAX_QUAD_COUNT;
+//     static constexpr std::size_t MAX_QUAD_COUNT = 1000;
+//     static constexpr std::size_t MAX_VERTEX_BUFFER_SIZE = sizeof(GuiRenderer::QuadVertex) * 4 * MAX_QUAD_COUNT;
+//     static constexpr std::size_t MAX_INDICES = 6 * MAX_QUAD_COUNT;
 
 //     static float map(float x, float in_min, float in_max, float out_min, float out_max) {  // TODO maybe put this in utilities
 //         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -104,7 +104,7 @@
 //     }
 
 //     void GuiRenderer::end_quads_batch() {
-//         const size_t size = sizeof(QuadVertex) * (storage.quads.buffer_pointer - storage.quads.buffer);
+//         const std::size_t size = sizeof(QuadVertex) * (storage.quads.buffer_pointer - storage.quads.buffer);
 
 //         storage.quad2d_buffer->bind();
 //         storage.quad2d_buffer->upload_sub_data(storage.quads.buffer, 0, size);
@@ -114,7 +114,7 @@
 //         storage.quad2d_vertex_array->bind();
 //         storage.quad2d_shader->bind();
 
-//         for (size_t i = 0; i < storage.quads.texture_slot_index; i++) {
+//         for (std::size_t i = 0; i < storage.quads.texture_slot_index; i++) {
 //             render_helpers::bind_texture_2d(storage.quads.texture_slots[i], i);
 //         }
 
@@ -131,7 +131,7 @@
 //         float texture_index = -1.0f;
 
 //         // Search for this texture in slots array
-//         for (size_t i = 0; i < storage.quads.texture_slot_index; i++) {
+//         for (std::size_t i = 0; i < storage.quads.texture_slot_index; i++) {
 //             if (storage.quads.texture_slots[i] == texture->get_id()) {
 //                 texture_index = static_cast<float>(i);
 //                 break;
@@ -324,7 +324,7 @@
 
 //         storage.quad2d_shader->bind();
 
-//         for (size_t i = 0; i < 8; i++) {  // FIXME should be storage.quads.MAX_TEXTURE_UNITS
+//         for (std::size_t i = 0; i < 8; i++) {  // FIXME should be storage.quads.MAX_TEXTURE_UNITS
 //             storage.quad2d_shader->upload_uniform_int(
 //                 resmanager::HashedStr64("u_texture[" + std::to_string(i) + "]"),
 //                 i
@@ -354,9 +354,9 @@
 
 //     std::shared_ptr<GlIndexBuffer> GuiRenderer::initialize_quads_index_buffer() {
 //         unsigned int* buffer = new unsigned int[MAX_INDICES];
-//         size_t offset = 0;
+//         std::size_t offset = 0;
 
-//         for (size_t i = 0; i < MAX_QUAD_COUNT * 6; i += 6) {
+//         for (std::size_t i = 0; i < MAX_QUAD_COUNT * 6; i += 6) {
 //             buffer[i + 0] = 0 + offset;
 //             buffer[i + 1] = 1 + offset;
 //             buffer[i + 2] = 2 + offset;

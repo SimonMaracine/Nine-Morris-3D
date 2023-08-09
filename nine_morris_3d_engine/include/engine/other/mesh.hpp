@@ -11,7 +11,7 @@
 namespace sm {
     class Mesh {
     public:
-        Mesh(const void* vertices, size_t vertices_size, const void* indices, size_t indices_size);
+        Mesh(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
         ~Mesh();
 
         Mesh(const Mesh&) = delete;
@@ -21,13 +21,13 @@ namespace sm {
 
         const char* get_vertices() const { return vertices; }
         const unsigned int* get_indices() const { return indices; }
-        size_t get_vertices_size() const { return vertices_size; }
-        size_t get_indices_size() const { return indices_size; }
+        std::size_t get_vertices_size() const { return vertices_size; }
+        std::size_t get_indices_size() const { return indices_size; }
     private:
         char* vertices = nullptr;
         unsigned int* indices = nullptr;
-        size_t vertices_size = 0;
-        size_t indices_size = 0;
+        std::size_t vertices_size = 0;
+        std::size_t indices_size = 0;
     };
 
     struct Meshes {

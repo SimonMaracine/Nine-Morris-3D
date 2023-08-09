@@ -15,8 +15,8 @@ namespace sm {
     class GlVertexBuffer {
     public:
         GlVertexBuffer(DrawHint hint = DrawHint::Static);
-        GlVertexBuffer(size_t size, DrawHint hint = DrawHint::Static);
-        GlVertexBuffer(const void* data, size_t size, DrawHint hint = DrawHint::Static);
+        GlVertexBuffer(std::size_t size, DrawHint hint = DrawHint::Static);
+        GlVertexBuffer(const void* data, std::size_t size, DrawHint hint = DrawHint::Static);
         ~GlVertexBuffer();
 
         GlVertexBuffer(const GlVertexBuffer&) = delete;
@@ -27,8 +27,8 @@ namespace sm {
         void bind();
         static void unbind();
 
-        void upload_data(const void* data, size_t size);
-        void upload_sub_data(const void* data, size_t offset, size_t size);
+        void upload_data(const void* data, std::size_t size);
+        void upload_sub_data(const void* data, std::size_t offset, std::size_t size);
     private:
         unsigned int buffer = 0;
         DrawHint hint = DrawHint::Static;
@@ -38,7 +38,7 @@ namespace sm {
 
     class GlIndexBuffer {
     public:
-        GlIndexBuffer(const unsigned int* data, size_t size);
+        GlIndexBuffer(const unsigned int* data, std::size_t size);
         ~GlIndexBuffer();
 
         GlIndexBuffer(const GlIndexBuffer&) = delete;
@@ -58,8 +58,8 @@ namespace sm {
     };
 
     struct UniformBlockField {
-        size_t offset = 0;
-        size_t size = 0;
+        std::size_t offset = 0;
+        std::size_t size = 0;
     };
 
     class GlUniformBuffer {
@@ -77,19 +77,19 @@ namespace sm {
 
         bool is_configured() { return configured; }
 
-        void set(const void* data, size_t field_index);
+        void set(const void* data, std::size_t field_index);
         void upload_sub_data();
     private:
-        void allocate_memory(size_t size);
-        void add_field(size_t index, const UniformBlockField& field);
+        void allocate_memory(std::size_t size);
+        void add_field(std::size_t index, const UniformBlockField& field);
         void configure();
 
         unsigned int buffer = 0;
 
         char* data = nullptr;
-        size_t size = 0;
+        std::size_t size = 0;
 
-        std::unordered_map<size_t, UniformBlockField> fields;
+        std::unordered_map<std::size_t, UniformBlockField> fields;
 
         bool configured = false;
 
@@ -98,7 +98,7 @@ namespace sm {
 
     class GlPixelBuffer {
     public:
-        GlPixelBuffer(size_t size);
+        GlPixelBuffer(std::size_t size);
         ~GlPixelBuffer();
 
         GlPixelBuffer(const GlPixelBuffer&) = delete;

@@ -11,7 +11,7 @@
 #include "engine/other/encrypt.hpp"
 
 namespace sm {
-    static void check_bits_per_sample(size_t bits_per_sample, [[maybe_unused]] std::string_view file_path) {
+    static void check_bits_per_sample(std::size_t bits_per_sample, [[maybe_unused]] std::string_view file_path) {
         if (bits_per_sample == 8) {
             LOG_WARNING("bits_per_sample = 8 for sound file `{}`", file_path);
         }
@@ -61,11 +61,11 @@ namespace sm {
         LOG_DEBUG("Freed sound data `{}`", file_path);
     }
 
-    size_t SoundData::compute_size() {
+    std::size_t SoundData::compute_size() {
         return samples * channels * sizeof(short);
     }
 
-    size_t SoundData::compute_bits_per_sample() {
+    std::size_t SoundData::compute_bits_per_sample() {
         return (8 * size) / (samples * channels);
     }
 }

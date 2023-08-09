@@ -160,7 +160,7 @@ namespace sm {
 
         if (!specification.color_attachments.empty()) {
             SM_ASSERT(
-                static_cast<size_t>(specification.clear_drawbuffer) < specification.color_attachments.size(),
+                static_cast<std::size_t>(specification.clear_drawbuffer) < specification.color_attachments.size(),
                 "Invalid drawbuffer to clear"
             );
         }
@@ -171,7 +171,7 @@ namespace sm {
     }
 
     GlFramebuffer::~GlFramebuffer() {
-        for (size_t i = 0; i < specification.color_attachments.size(); i++) {
+        for (std::size_t i = 0; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
                     SM_ASSERT(false, "Attachment type None is invalid");
@@ -213,7 +213,7 @@ namespace sm {
     }
 
     unsigned int GlFramebuffer::get_color_attachment(int attachment_index) {
-        SM_ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
+        SM_ASSERT(static_cast<std::size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
         return color_attachments[attachment_index];
     }
@@ -235,7 +235,7 @@ namespace sm {
     }
 
     float GlFramebuffer::read_pixel_float(int attachment_index, int x, int y) {
-        SM_ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
+        SM_ASSERT(static_cast<std::size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         float pixel;
@@ -245,7 +245,7 @@ namespace sm {
     }
 
     void GlFramebuffer::read_pixel_float_pbo(int attachment_index, int x, int y) {
-        SM_ASSERT(static_cast<size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
+        SM_ASSERT(static_cast<std::size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
@@ -264,7 +264,7 @@ namespace sm {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer->framebuffer);
 
-        for (size_t i = 0; i < color_attachments.size(); i++) {
+        for (std::size_t i = 0; i < color_attachments.size(); i++) {
             glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
             glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
             glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -276,7 +276,7 @@ namespace sm {
     void GlFramebuffer::build() {
         // Delete old framebuffer first
         if (framebuffer != 0) {
-            for (size_t i = 0; i < specification.color_attachments.size(); i++) {
+            for (std::size_t i = 0; i < specification.color_attachments.size(); i++) {
                 switch (specification.color_attachments[i].type) {
                     case AttachmentType::None:
                         SM_ASSERT(false, "Attachment type None is invalid");
@@ -318,7 +318,7 @@ namespace sm {
 
         color_attachments.resize(specification.color_attachments.size());
 
-        for (size_t i = 0; i < specification.color_attachments.size(); i++) {
+        for (std::size_t i = 0; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
                     SM_ASSERT(false, "Attachment type None is invalid");

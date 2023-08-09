@@ -24,8 +24,8 @@
 #define CASE(enum_, count, type) case enum_: size = (count) * sizeof(type); break;
 
 namespace sm {
-    static size_t type_size(GLenum type) {
-        size_t size = 0;
+    static std::size_t type_size(GLenum type) {
+        std::size_t size = 0;
 
         switch (type) {
             CASE(GL_FLOAT_VEC3, 3, GLfloat)
@@ -85,7 +85,7 @@ namespace sm {
         }
 
         file.seekg(0, file.end);
-        const size_t length = file.tellg();
+        const std::size_t length = file.tellg();
         file.seekg(0, file.beg);
 
         char* buffer = new char[length];
@@ -108,7 +108,7 @@ namespace sm {
         return shader;
     }
 
-    static GLuint compile_shader(const std::pair<unsigned char*, size_t>& source_buffer, GLenum type, std::string_view name) noexcept(false) {
+    static GLuint compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, GLenum type, std::string_view name) noexcept(false) {
         GLuint shader = glCreateShader(type);
 
         const char* buffer = reinterpret_cast<const char*>(source_buffer.first);  // It is safe
@@ -150,11 +150,11 @@ namespace sm {
     }
 
     static std::string get_name_sources(std::string_view vertex_source, std::string_view fragment_source) {
-        size_t last_slash_v = vertex_source.find_last_of("/");
+        std::size_t last_slash_v = vertex_source.find_last_of("/");
         SM_ASSERT(last_slash_v != std::string::npos, "Could not find slash");
         const std::string vertex = std::string(vertex_source.substr(last_slash_v + 1));
 
-        size_t last_slash_f = fragment_source.find_last_of("/");
+        std::size_t last_slash_f = fragment_source.find_last_of("/");
         SM_ASSERT(last_slash_f != std::string::npos, "Could not find slash");
         const std::string fragment = std::string(fragment_source.substr(last_slash_f + 1));
 
@@ -366,8 +366,8 @@ namespace sm {
             // Link uniform buffer to binding index
             glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
 
-            const size_t field_count = block.field_names.size();
-            static constexpr size_t MAX_FIELD_COUNT = 8;
+            const std::size_t field_count = block.field_names.size();
+            static constexpr std::size_t MAX_FIELD_COUNT = 8;
 
             SM_ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 8 fields for now");
 
@@ -379,9 +379,9 @@ namespace sm {
             // Create the uniforms names list; the order of these names matters
             char* field_names[MAX_FIELD_COUNT];
 
-            for (size_t i = 0; i < field_count; i++) {
+            for (std::size_t i = 0; i < field_count; i++) {
                 const std::string& name = block.field_names[i];
-                const size_t size = name.size() + 1;
+                const std::size_t size = name.size() + 1;
 
                 field_names[i] = new char[size];
                 std::strncpy(field_names[i], name.c_str(), size);
@@ -396,11 +396,11 @@ namespace sm {
                 indices
             );
 
-            for (size_t i = 0; i < field_count; i++) {
+            for (std::size_t i = 0; i < field_count; i++) {
                 delete[] field_names[i];
             }
 
-            for (size_t i = 0; i < field_count; i++) {
+            for (std::size_t i = 0; i < field_count; i++) {
                 if (indices[i] == GL_INVALID_INDEX) {
                     LOG_DIST_CRITICAL("Invalid field index");
                     panic();
@@ -412,10 +412,10 @@ namespace sm {
             glGetActiveUniformsiv(program, field_count, indices, GL_UNIFORM_TYPE, types);
 
             // Finally setup the uniform block fields
-            for (size_t i = 0; i < field_count; i++) {
+            for (std::size_t i = 0; i < field_count; i++) {
                 const UniformBlockField field = {
-                    static_cast<size_t>(offsets[i]),
-                    static_cast<size_t>(sizes[i]) * type_size(types[i])
+                    static_cast<std::size_t>(offsets[i]),
+                    static_cast<std::size_t>(sizes[i]) * type_size(types[i])
                 };
 
                 block.uniform_buffer->add_field(i, field);

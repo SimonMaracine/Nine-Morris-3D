@@ -9,7 +9,7 @@
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    static ALenum get_format(int channels, size_t bps) {
+    static ALenum get_format(int channels, std::size_t bps) {
         ALenum format = 0;
 
         if (channels == 1 && bps == 8) {
@@ -28,7 +28,7 @@ namespace sm {
         return format;
     }
 
-    AlBuffer::AlBuffer(const void* data, size_t size, int channels, size_t bps, int frequency) {
+    AlBuffer::AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency) {
         alGenBuffers(1, &buffer);
         alBufferData(buffer, get_format(channels, bps), data, size, frequency);
 

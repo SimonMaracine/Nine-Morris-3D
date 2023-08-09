@@ -44,9 +44,9 @@ namespace sm {
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
 
-        size_t offset = 0;
+        std::size_t offset = 0;
 
-        for (size_t i = 0; i < layout.elements.size(); i++) {
+        for (std::size_t i = 0; i < layout.elements.size(); i++) {
             const VertexBufferLayout::VertexElement& element = layout.elements[i];
 
             switch (element.type) {

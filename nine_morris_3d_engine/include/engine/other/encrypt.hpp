@@ -40,7 +40,7 @@ namespace sm {
             std::string_view file_path;
         };
 
-        static std::pair<unsigned char*, size_t> load_file(EncryptedFile file_path);
+        static std::pair<unsigned char*, std::size_t> load_file(EncryptedFile file_path);
 
 #ifdef SM_BUILD_DISTRIBUTION
         static constexpr EncryptedFile encr(std::string_view file_path) {

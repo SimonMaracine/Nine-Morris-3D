@@ -37,7 +37,7 @@ namespace sm {
         LOG_DEBUG("Created GL vertex buffer {}", buffer);
     }
 
-    GlVertexBuffer::GlVertexBuffer(size_t size, DrawHint hint)
+    GlVertexBuffer::GlVertexBuffer(std::size_t size, DrawHint hint)
         : hint(hint) {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -48,7 +48,7 @@ namespace sm {
         LOG_DEBUG("Created GL vertex buffer {}", buffer);
     }
 
-    GlVertexBuffer::GlVertexBuffer(const void* data, size_t size, DrawHint hint)
+    GlVertexBuffer::GlVertexBuffer(const void* data, std::size_t size, DrawHint hint)
         : hint(hint) {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -73,17 +73,17 @@ namespace sm {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void GlVertexBuffer::upload_data(const void* data, size_t size) {
+    void GlVertexBuffer::upload_data(const void* data, std::size_t size) {
         glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(hint));
     }
 
-    void GlVertexBuffer::upload_sub_data(const void* data, size_t offset, size_t size) {
+    void GlVertexBuffer::upload_sub_data(const void* data, std::size_t offset, std::size_t size) {
         glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
     }
 
     // --- Index buffer
 
-    GlIndexBuffer::GlIndexBuffer(const unsigned int* data, size_t size) {
+    GlIndexBuffer::GlIndexBuffer(const unsigned int* data, std::size_t size) {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
@@ -138,7 +138,7 @@ namespace sm {
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
-    void GlUniformBuffer::set(const void* field_data, size_t field_index) {
+    void GlUniformBuffer::set(const void* field_data, std::size_t field_index) {
         SM_ASSERT(configured, "Uniform buffer must be configured");
         SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
@@ -155,14 +155,14 @@ namespace sm {
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
     }
 
-    void GlUniformBuffer::allocate_memory(size_t size) {
+    void GlUniformBuffer::allocate_memory(std::size_t size) {
         data = new char[size];
         this->size = size;
 
         glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STREAM_DRAW);
     }
 
-    void GlUniformBuffer::add_field(size_t index, const UniformBlockField& field) {
+    void GlUniformBuffer::add_field(std::size_t index, const UniformBlockField& field) {
         fields[index] = field;
     }
 
@@ -172,7 +172,7 @@ namespace sm {
 
     // --- Pixel buffer
 
-    GlPixelBuffer::GlPixelBuffer(size_t size) {
+    GlPixelBuffer::GlPixelBuffer(std::size_t size) {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
         glBufferData(GL_PIXEL_PACK_BUFFER, size, nullptr, GL_STREAM_READ);

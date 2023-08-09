@@ -9,7 +9,7 @@
 namespace sm {
     class AlBuffer {
     public:
-        AlBuffer(const void* data, size_t size, int channels, size_t bps, int frequency);
+        AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency);
         AlBuffer(std::shared_ptr<SoundData> data);
         ~AlBuffer();
 
