@@ -11,7 +11,7 @@ namespace sm {
 
     class PostProcessingStep {
     public:
-        PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::shared_ptr<gl::GlShader> shader)
+        PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::shared_ptr<GlShader> shader)
             : framebuffer(framebuffer), shader(shader) {}
         virtual ~PostProcessingStep() = default;
 
@@ -25,7 +25,7 @@ namespace sm {
     protected:
         // Store references to shaders and framebuffers
         std::shared_ptr<GlFramebuffer> framebuffer;
-        std::shared_ptr<gl::GlShader> shader;
+        std::shared_ptr<GlShader> shader;
 
         friend class Renderer;
     };

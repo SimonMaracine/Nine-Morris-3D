@@ -162,8 +162,8 @@ namespace sm {
     }
 
     GlShader::GlShader(std::string_view vertex_source, std::string_view fragment_source,
-            const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks)
-        : vertex_source_path(vertex_source), fragment_source_path(fragment_source), uniforms(uniforms) {
+            Uniforms uniforms, UniformBlocks uniform_blocks)
+        : vertex_source_path(vertex_source), fragment_source_path(fragment_source) {
         name = get_name_sources(vertex_source_path, fragment_source_path);
 
         try {
@@ -195,8 +195,8 @@ namespace sm {
     }
 
     GlShader::GlShader(Encrypt::EncryptedFile vertex_source, Encrypt::EncryptedFile fragment_source,
-            const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks)
-        : vertex_source_path(vertex_source), fragment_source_path(fragment_source), uniforms(uniforms) {
+            Uniforms uniforms, UniformBlocks uniform_blocks)
+        : vertex_source_path(vertex_source), fragment_source_path(fragment_source) {
         name = get_name_sources(vertex_source_path, fragment_source_path);
 
         const auto buffer_vertex = Encrypt::load_file(vertex_source);
@@ -274,6 +274,7 @@ namespace sm {
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
     }
 
+#if 0
     void GlShader::recompile() {
         GLuint new_vertex_shader;
         GLuint new_fragment_shader;
@@ -308,6 +309,7 @@ namespace sm {
         vertex_shader = new_vertex_shader;
         fragment_shader = new_fragment_shader;
     }
+#endif
 
     int GlShader::get_uniform_location(Key name) const {
 #ifdef SM_BUILD_DEBUG
@@ -322,16 +324,18 @@ namespace sm {
 #endif
     }
 
-    void GlShader::check_and_cache_uniforms(const std::vector<std::string>& uniforms) {
+    void GlShader::check_and_cache_uniforms(Uniforms uniforms) {
         for (const auto& uniform : uniforms) {
-            const GLint location = glGetUniformLocation(program, uniform.c_str());
+            this->uniforms.emplace_back(uniform);
+
+            const GLint location = glGetUniformLocation(program, uniform.data());
 
             if (location == -1) {
-                LOG_ERROR("Uniform variable `{}` in shader `{}` not found", uniform.c_str(), name);
+                LOG_ERROR("Uniform variable `{}` in shader `{}` not found", uniform.data(), name);
                 continue;
             }
 
-            cache[Key(uniform)] = location;
+            cache[Key(std::string(uniform))] = location;
         }
     }
 

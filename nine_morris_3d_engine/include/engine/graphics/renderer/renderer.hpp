@@ -1,182 +1,79 @@
-// #pragma once
+#pragma once
 
-// #include <glm/glm.hpp>
+#include <vector>
+#include <memory>
 
-// #include "engine/application_base/platform.h"
-// #include "engine/application_base/events.h"
-// #include "engine/graphics/opengl/vertex_array.h"
-// #include "engine/graphics/opengl/buffer.h"
-// #include "engine/graphics/opengl/shader.h"
-// #include "engine/graphics/opengl/texture.h"
-// #include "engine/graphics/opengl/framebuffer.h"
-// #include "engine/graphics/framebuffer_reader.h"
-// #include "engine/graphics/font.h"
-// #include "engine/graphics/camera.h"
-// #include "engine/graphics/material.h"
-// #include "engine/graphics/light.h"
-// #include "engine/graphics/identifier.h"
-// #include "engine/graphics/post_processing.h"
-// #include "engine/other/camera_controller.h"
-// #include "engine/other/encrypt.h"
-// #include "engine/scene/renderables.h"
-// #include "engine/scene/scene_list.h"
+#include <glm/glm.hpp>
 
-// namespace sm {
-//     class Application;
+#include "engine/graphics/opengl/vertex_array.hpp"
+#include "engine/graphics/opengl/buffer.hpp"
+#include "engine/graphics/opengl/framebuffer.hpp"
+#include "engine/graphics/material.hpp"
+#include "engine/graphics/post_processing.hpp"
+#include "engine/graphics/camera.hpp"
 
-//     class Renderer final {
-//     public:
-//         struct Storage;
+namespace sm {
+    struct Renderable {
+        std::shared_ptr<GlVertexArray> vertex_array;
+        std::shared_ptr<GlIndexBuffer> index_buffer;
+        std::shared_ptr<MaterialInstance> material;
 
-//         Renderer(Ctx* ctx);
-//         ~Renderer();
+        glm::vec3 position {};
+        glm::vec3 rotation {};
+        float scale = 1.0f;
 
-//         Renderer(const Renderer&) = delete;
-//         Renderer& operator=(const Renderer&) = delete;
-//         Renderer(Renderer&&) = delete;
-//         Renderer& operator=(Renderer&&) = delete;
+        glm::vec3 outline_color {};
+    };
 
-//         void render(const SceneList& scene);
+    class Renderer {
+    public:
+        Renderer(int width, int height);
+        ~Renderer();
 
-//         void add_post_processing(std::unique_ptr<PostProcessingStep>&& post_processing_step);
+        Renderer(const Renderer&) = delete;
+        Renderer& operator=(const Renderer&) = delete;
+        Renderer(Renderer&&) = delete;
+        Renderer& operator=(Renderer&&) = delete;
 
-//         void set_scene_framebuffer(int samples);
-//         void set_shadow_map_framebuffer(int size);
-//         void set_skybox(std::shared_ptr<gl::Texture3D> texture);
-//         void set_camera_controller(const CameraController* camera_controller);
+        // TODO add light
+        void add_renderable(const Renderable& renderable);
 
-//         Identifier::Id get_hovered_id() { return hovered_id; }
-//         PostProcessingContext& get_post_processing_context() { return post_processing_context; }
-//         const Storage& get_storage() { return storage; }
+        void capture(const Camera& camera, const glm::vec3& position);
+    private:
+        void render(int width, int height);
 
-//     #ifndef SM_BUILD_DISTRIBUTION
-//         bool origin = false;
-//     #endif
+        void draw_screen_quad(unsigned int texture);
+        void post_processing();
+        void end_rendering();
 
-//         DirectionalLight directional_light;
+        void draw_renderables();
+        void draw_renderable(const Renderable& renderable);
 
-//         struct LightSpace {
-//             float left = 0.0f;
-//             float right = 0.0f;
-//             float bottom = 0.0f;
-//             float top = 0.0f;
-//             float lens_near = 1.0f;
-//             float lens_far = 1.0f;
-//             float position_divisor = 1.0f;
-//         } light_space;
-//     private:
-//         struct IdMatrix {
-//             float id;
-//             glm::mat4 model_matrix;
-//         };
+        void draw_renderables_outlined();
+        void draw_renderable_outlined(const Renderable& renderable);
 
-//         void draw_screen_quad(GLuint texture);
-//         void post_processing();
-//         void end_rendering();
+        struct Storage {
+            std::shared_ptr<GlFramebuffer> scene_framebuffer;
 
-//         void draw_origin();
-//         void draw_skybox();
-//         void draw_model(const renderables::Model* model);
-//         void draw_model_with_outline(const renderables::Model* model);
-//         void draw_models(const SceneList& scene);
-//         void draw_models_with_outline(const SceneList& scene);
-//         void draw_models_to_depth_buffer(const SceneList& scene);
-//         void draw_quad(const renderables::Quad* quad);
-//         void draw_quads(const SceneList& scene);
+            std::shared_ptr<GlUniformBuffer> projection_view_uniform_buffer;
+            UniformBlockSpecification projection_view_uniform_block;
 
-//         void add_bounding_box(const renderables::Model* model, std::vector<IdMatrix>& buffer_ids_transforms);
-//         void draw_bounding_boxes(const SceneList& scene);
-//         void setup_shadows();
-//         void setup_uniform_buffers();
-//         void validate_hovered_id(int x, int y);
-//         void cache_camera_data();
-//         void on_window_resized(const WindowResizedEvent&);
+            std::shared_ptr<GlShader> screen_quad_shader;
+            std::shared_ptr<GlVertexArray> screen_quad_vertex_array;
+            std::shared_ptr<GlVertexBuffer> screen_quad_vertex_buffer;
+        } storage;
 
-//         void initialize_uniform_buffers();
-//         void initialize_skybox_renderer();
-//         void initialize_screen_quad_renderer();
-//         void initialize_quad3d_renderer();
-//         void initialize_shadow_renderer();
-//         void initialize_outline_renderer();
-//         void initialize_bounding_box_renderer();
-//         void initialize_origin_renderer();
-//         void initialize_framebuffers();
-//         void initialize_pixel_buffers();
+        PostProcessingContext post_processing_context;  // TODO implement
 
-//         struct Storage {
-//             std::shared_ptr<GlUniformBuffer> projection_view_uniform_buffer;
-//             std::shared_ptr<GlUniformBuffer> light_uniform_buffer;
-//             std::shared_ptr<GlUniformBuffer> light_view_uniform_buffer;
-//             std::shared_ptr<GlUniformBuffer> light_space_uniform_buffer;
+        struct {
+            glm::mat4 view_matrix = glm::mat4(1.0f);
+            glm::mat4 projection_matrix = glm::mat4(1.0f);
+            glm::mat4 projection_view_matrix = glm::mat4(1.0f);
+            glm::vec3 position {};
+        } camera;
 
-//             gl::UniformBlockSpecification projection_view_uniform_block;
-//             gl::UniformBlockSpecification light_uniform_block;
-//             gl::UniformBlockSpecification light_view_uniform_block;
-//             gl::UniformBlockSpecification light_space_uniform_block;
+        std::vector<Renderable> scene_list;
 
-//             std::shared_ptr<gl::GlShader> skybox_shader;
-//             std::shared_ptr<gl::GlShader> screen_quad_shader;
-//             std::shared_ptr<gl::GlShader> quad3d_shader;
-//             std::shared_ptr<gl::GlShader> shadow_shader;
-//             std::shared_ptr<gl::GlShader> outline_shader;
-//             std::shared_ptr<gl::GlShader> box_shader;
-//             std::shared_ptr<gl::GlShader> origin_shader;
-
-//             std::shared_ptr<gl::VertexArray> skybox_vertex_array;
-//             std::shared_ptr<GlVertexBuffer> skybox_buffer;
-//             std::shared_ptr<gl::VertexArray> screen_quad_vertex_array;
-//             std::shared_ptr<GlVertexBuffer> screen_quad_buffer;
-//             std::shared_ptr<gl::VertexArray> quad3d_vertex_array;
-//             std::shared_ptr<GlVertexBuffer> quad3d_buffer;
-//             std::shared_ptr<gl::VertexArray> box_vertex_array;
-//             std::shared_ptr<GlVertexBuffer> box_buffer;
-//             std::shared_ptr<GlVertexBuffer> box_ids_transforms_buffer;
-//             std::shared_ptr<GlIndexBuffer> box_index_buffer;
-//             std::shared_ptr<gl::VertexArray> origin_vertex_array;
-//             std::shared_ptr<GlVertexBuffer> origin_buffer;
-
-//             std::shared_ptr<gl::Texture3D> skybox_texture;
-
-//             std::shared_ptr<GlFramebuffer> scene_framebuffer;
-//             std::shared_ptr<GlFramebuffer> intermediate_framebuffer;
-//             std::shared_ptr<GlFramebuffer> shadow_map_framebuffer;
-//             std::shared_ptr<GlFramebuffer> bounding_box_framebuffer;
-
-//             std::array<std::shared_ptr<GlPixelBuffer>, 4> pixel_buffers;
-//         } storage;
-
-//         struct CameraCache {
-//             glm::mat4 projection_matrix = glm::mat4(1.0f);
-//             glm::mat4 view_matrix = glm::mat4(1.0f);
-//             glm::mat4 projection_view_matrix = glm::mat4(1.0f);
-//             glm::vec3 position = glm::vec3(0.0f);
-//         } camera_cache;
-
-//         Identifier::Id hovered_id = Identifier::null;
-//         FramebufferReader<4> framebuffer_reader;
-//         const CameraController* camera_controller = nullptr;  // Don't use this directly
-
-//         int shadow_map_size = 4096;
-
-//         PostProcessingContext post_processing_context;
-
-//         const char* SHADOW_VERTEX_SHADER = SM_ENCR("engine_data/shaders/shadow.vert");
-//         const char* SHADOW_FRAGMENT_SHADER = SM_ENCR("engine_data/shaders/shadow.frag");
-//         const char* SCREEN_QUAD_VERTEX_SHADER = SM_ENCR("engine_data/shaders/screen_quad.vert");
-//         const char* SCREEN_QUAD_FRAGMENT_SHADER = SM_ENCR("engine_data/shaders/screen_quad.frag");
-//         const char* OUTLINE_VERTEX_SHADER = SM_ENCR("engine_data/shaders/outline.vert");
-//         const char* OUTLINE_FRAGMENT_SHADER = SM_ENCR("engine_data/shaders/outline.frag");
-//         const char* SKYBOX_VERTEX_SHADER = SM_ENCR("engine_data/shaders/skybox.vert");
-//         const char* SKYBOX_FRAGMENT_SHADER = SM_ENCR("engine_data/shaders/skybox.frag");
-//         const char* QUAD3D_VERTEX_SHADER = SM_ENCR("engine_data/shaders/quad3d.vert");
-//         const char* QUAD3D_FRAGMENT_SHADER = SM_ENCR("engine_data/shaders/quad3d.frag");
-//         const char* BOUNDING_BOX_VERTEX_SHADER = SM_ENCR("engine_data/shaders/bounding_box.vert");
-//         const char* BOUNDING_BOX_FRAGMENT_SHADER = SM_ENCR("engine_data/shaders/bounding_box.frag");
-//         const char* ORIGIN_VERTEX_SHADER = "engine_data/shaders/origin.vert";
-//         const char* ORIGIN_FRAGMENT_SHADER = "engine_data/shaders/origin.frag";
-
-//         Ctx* ctx = nullptr;
-
-//         friend class Application;
-//     };
-// }
+        friend class Application;
+    };
+}

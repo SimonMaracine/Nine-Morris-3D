@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "engine/graphics/vertex_buffer_layout.hpp"
+#include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 
 namespace sm {
     class GlVertexBuffer;

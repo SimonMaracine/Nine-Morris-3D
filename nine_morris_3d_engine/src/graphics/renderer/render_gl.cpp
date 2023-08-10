@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 
-#include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/renderer/render_gl.hpp"
 
 namespace sm {
@@ -14,25 +13,25 @@ namespace sm {
         int result = 0;
 
         switch (buffers) {
-            case C:
+            case Buffers::C:
                 result = GL_COLOR_BUFFER_BIT;
                 break;
-            case D:
+            case Buffers::D:
                 result = GL_DEPTH_BUFFER_BIT;
                 break;
-            case S:
+            case Buffers::S:
                 result = GL_STENCIL_BUFFER_BIT;
                 break;
-            case CD:
+            case Buffers::CD:
                 result = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
                 break;
-            case CS:
+            case Buffers::CS:
                 result |= GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
                 break;
-            case DS:
+            case Buffers::DS:
                 result |= GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
                 break;
-            case CDS:
+            case Buffers::CDS:
                 result |= GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
                 break;
         }
@@ -46,10 +45,6 @@ namespace sm {
 
     void RenderGl::viewport(int width, int height) {
         glViewport(0, 0, width, height);
-    }
-
-    void RenderGl::viewport(const FramebufferSpecification& specification) {
-        glViewport(0, 0, specification.width, specification.height);
     }
 
     void RenderGl::bind_texture_2d(unsigned int texture, int unit) {
@@ -99,10 +94,10 @@ namespace sm {
         unsigned int result = 0;
 
         switch (function) {
-            case Always:
+            case Function::Always:
                 result = GL_ALWAYS;
                 break;
-            case NotEqual:
+            case Function::NotEqual:
                 result = GL_NOTEQUAL;
                 break;
         }

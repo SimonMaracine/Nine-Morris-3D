@@ -26,7 +26,7 @@ namespace sm {
         };
 
         enum Flags : unsigned int {
-
+            Outline = 1 << 0
         };
 
         Material(std::shared_ptr<GlShader> shader, unsigned int flags = 0);
@@ -81,6 +81,7 @@ namespace sm {
 
         std::shared_ptr<GlShader> get_shader() { return shader; }  // TODO maybe const pointer
 
+        // It's left public
         unsigned int flags = 0;
     private:
         struct Element {

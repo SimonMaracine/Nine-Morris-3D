@@ -22,6 +22,7 @@ namespace sm {
         unsigned int binding_index = 0;
     };
 
+    using Uniforms = std::initializer_list<std::string_view>;
     using UniformBlocks = std::initializer_list<UniformBlockSpecification>;
 
     class GlShader {
@@ -30,9 +31,9 @@ namespace sm {
         using KeyHash = resmanager::Hash<Key>;
 
         GlShader(std::string_view vertex_source, std::string_view fragment_source,
-            const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks = {});
+            Uniforms uniforms, UniformBlocks uniform_blocks = {});
         GlShader(Encrypt::EncryptedFile vertex_source, Encrypt::EncryptedFile fragment_source,
-            const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks = {});
+            Uniforms uniforms, UniformBlocks uniform_blocks = {});
         ~GlShader();
 
         GlShader(const GlShader&) = delete;
@@ -50,14 +51,16 @@ namespace sm {
         void upload_uniform_vec3(Key name, const glm::vec3& vector);
         void upload_uniform_vec4(Key name, const glm::vec4& vector);
 
+#if 0
         // Make sure to reupload any uniforms that need to after calling this function
         void recompile();
+#endif
 
         std::string_view get_name() { return name; }
         const std::vector<std::string>& get_uniforms() { return uniforms; }
     private:
         int get_uniform_location(Key name) const;
-        void check_and_cache_uniforms(const std::vector<std::string>& uniforms);
+        void check_and_cache_uniforms(Uniforms uniforms);
 
         static void configure_uniform_blocks(unsigned int program, const UniformBlocks& uniform_blocks);
 

@@ -61,7 +61,7 @@ namespace sm {
 
         std::unique_ptr<Window> window;  // One of the last object destroyed in an application instance
         std::unique_ptr<OpenAlContext> snd;  // Sound context
-        // std::unique_ptr<Renderer> r3d;  // 3D renderer
+        std::unique_ptr<Renderer> r3d;  // 3D renderer
         // std::unique_ptr<GuiRenderer> r2d;  // 2D renderer
         std::unique_ptr<RandomGenerator> rng;  // Random number generator
         Input inp;  // Self explanatory

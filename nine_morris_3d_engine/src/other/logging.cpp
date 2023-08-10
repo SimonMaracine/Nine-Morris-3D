@@ -65,7 +65,7 @@ namespace sm {
 
         switch (target) {
             case LogTarget::File: {
-                const std::string file_path = FileSystem::path_for_logs(info_file);
+                const std::string file_path = FileSystem::path_logs(info_file);
 
                 std::ofstream file {file_path, std::ios::trunc};
 

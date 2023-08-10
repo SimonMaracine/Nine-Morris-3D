@@ -27,7 +27,7 @@
 namespace sm {
     void Application::preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file) {
         try {
-            FileSystem::initialize_for_applications(app_name);
+            FileSystem::initialize_applications(app_name);
         } catch (const FileSystem::UserNameError& e) {
             panic();  // Really bad that there is no feedback
         }
@@ -136,7 +136,7 @@ namespace sm {
             ctx.tsk.update();
 
             // Clear the default framebuffer, as nobody does that for us
-            RenderGl::clear(RenderGl::C);
+            RenderGl::clear(RenderGl::Buffers::C);
 
             r3d_update();
             r2d_update();
@@ -223,10 +223,6 @@ namespace sm {
         }
     }
 
-    void Application::r3d_function() {
-        // ctx.r3d->render(current_scene->scene_list);
-    }
-
     void Application::r2d_function() {
         // ctx.r2d->render(current_scene->scene_list, true);
     }
@@ -272,8 +268,11 @@ namespace sm {
     void Application::initialize_r3d() {
         LOG_INFO("With renderer 3D");
 
-        // ctx.r3d = std::make_unique<Renderer>(&ctx);
-        r3d_update = std::bind(&Application::r3d_function, this);
+        ctx.r3d = std::make_unique<Renderer>(properties.width, properties.height);
+
+        r3d_update = [this]() {
+            ctx.r3d->render(properties.width, properties.height);
+        };
     }
 
     void Application::initialize_r2d() {

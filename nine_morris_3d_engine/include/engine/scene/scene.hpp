@@ -6,7 +6,6 @@
 #include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/events.hpp"
-#include "engine/other/dummy.hpp"
 #include "engine/scene/scene_list.hpp"
 #include "engine/scene/object_manager.hpp"
 

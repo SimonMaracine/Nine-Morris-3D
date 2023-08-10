@@ -18,14 +18,10 @@
 #include "engine/other/assert.hpp"
 
 namespace sm {
-    // These don't need to be reset explicitly
-    static std::string g_user_name;
-    static std::string g_app_name;
-
 #if defined(SM_PLATFORM_LINUX)
-        #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
+    #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
             ("/home/" + (user_name) + "/." + (application_name) + "/")
-        #define ASSETS_DIRECTORY_PATH(application_name) \
+    #define ASSETS_DIRECTORY_PATH(application_name) \
             ("/usr/local/share/" + (application_name) + "/")
 
         static bool directory_exists_impl(std::string_view path) {
@@ -47,7 +43,7 @@ namespace sm {
         }
 
         static std::string get_user_name_impl() noexcept(false) {
-            uid_t uid = geteuid();
+            const uid_t uid = geteuid();
             struct passwd* pw = getpwuid(uid);
 
             if (pw == nullptr) {
@@ -58,7 +54,7 @@ namespace sm {
         }
 
         static void check_and_fix_directories_impl() {
-            const std::string path = USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
+            const std::string path = USER_DATA_DIRECTORY_PATH(FileSystem::user_name, FileSystem::app_name);
 
             if (!directory_exists_impl(FileSystem::cut_slash(path))) {
                 LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
@@ -71,9 +67,9 @@ namespace sm {
             }
         }
 #elif defined(SM_PLATFORM_WINDOWS)
-        #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
+    #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
             ("C:\\Users\\" + (user_name) + "\\AppData\\Roaming\\" + (application_name) + "\\")
-        #define DOCUMENTS_DIRECTORY_PATH(user_name, application_name) \
+    #define DOCUMENTS_DIRECTORY_PATH(user_name, application_name) \
             ("C:\\Users\\" + (user_name) + "\\Documents\\" + (application_name) + "\\")
 
         static bool directory_exists_impl(std::string_view path) {
@@ -112,31 +108,29 @@ namespace sm {
         }
 
         static void check_and_fix_directories_impl() {
-            {
-                const std::string path = USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
+            std::string path;
 
-                if (!directory_exists_impl(FileSystem::cut_slash(path))) {
-                    LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
+            path = USER_DATA_DIRECTORY_PATH(FileSystem::user_name, FileSystem::app_name);
 
-                    if (create_directory_impl(path)) {
-                        LOG_DIST_INFO("Created directory `{}`", path);
-                    } else {
-                        LOG_DIST_ERROR("Could not create directory `{}`", path);
-                    }
+            if (!directory_exists_impl(FileSystem::cut_slash(path))) {
+                LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
+
+                if (create_directory_impl(path)) {
+                    LOG_DIST_INFO("Created directory `{}`", path);
+                } else {
+                    LOG_DIST_ERROR("Could not create directory `{}`", path);
                 }
             }
 
-            {
-                const std::string path = DOCUMENTS_DIRECTORY_PATH(g_user_name, g_app_name);
+            path = DOCUMENTS_DIRECTORY_PATH(FileSystem::user_name, FileSystem::app_name);
 
-                if (!directory_exists_impl(FileSystem::cut_slash(path))) {
-                    LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
+            if (!directory_exists_impl(FileSystem::cut_slash(path))) {
+                LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
 
-                    if (create_directory_impl(path)) {
-                        LOG_DIST_INFO("Created directory `{}`", path);
-                    } else {
-                        LOG_DIST_ERROR("Could not create directory `{}`", path);
-                    }
+                if (create_directory_impl(path)) {
+                    LOG_DIST_INFO("Created directory `{}`", path);
+                } else {
+                    LOG_DIST_ERROR("Could not create directory `{}`", path);
                 }
             }
         }
@@ -144,48 +138,48 @@ namespace sm {
 
 #ifdef SM_BUILD_DISTRIBUTION
     #if defined(SM_PLATFORM_LINUX)
-            static std::string path_for_logs_impl() {
-                return USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
+            static std::string path_logs_impl() {
+                return USER_DATA_DIRECTORY_PATH(FileSystem::user_name, FileSystem::app_name);
             }
 
-            static std::string path_for_saved_data_impl() {
-                return USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
+            static std::string path_saved_data_impl() {
+                return USER_DATA_DIRECTORY_PATH(FileSystem::user_name, FileSystem::app_name);
             }
 
-            static std::string path_for_assets_impl() {
+            static std::string path_assets_impl() {
                 return ASSETS_DIRECTORY_PATH(g_app_name);
             }
     #elif defined(SM_PLATFORM_WINDOWS)
-            static std::string path_for_logs_impl() {
-                return DOCUMENTS_DIRECTORY_PATH(g_user_name, g_app_name);
+            static std::string path_logs_impl() {
+                return DOCUMENTS_DIRECTORY_PATH(FileSystem::user_name, FileSystem::app_name);
             }
 
-            static std::string path_for_saved_data_impl() {
-                return USER_DATA_DIRECTORY_PATH(g_user_name, g_app_name);
+            static std::string path_saved_data_impl() {
+                return USER_DATA_DIRECTORY_PATH(FileSystem::user_name, FileSystem::app_name);
             }
 
-            static std::string path_for_assets_impl() {
+            static std::string path_assets_impl() {
                 return {};
             }
     #endif
 #else
         // Use relative path for both operating systems
-        static std::string path_for_logs_impl() {
+        static std::string path_logs_impl() {
             return {};
         }
 
-        static std::string path_for_saved_data_impl() {
+        static std::string path_saved_data_impl() {
             return {};
         }
 
-        static std::string path_for_assets_impl() {
+        static std::string path_assets_impl() {
             return {};
         }
 #endif
 
-    void FileSystem::initialize_for_applications(std::string_view application_name) noexcept(false) {
-        g_user_name = get_user_name();
-        g_app_name = application_name;
+    void FileSystem::initialize_applications(std::string_view application_name) noexcept(false) {
+        user_name = get_user_name();
+        app_name = application_name;
     }
 
     bool FileSystem::directory_exists(std::string_view path) {
@@ -213,27 +207,30 @@ namespace sm {
         check_and_fix_directories_impl();
     }
 
-    std::string FileSystem::path_for_logs() {
-        return path_for_logs_impl();
+    std::string FileSystem::path_logs() {
+        return path_logs_impl();
     }
 
-    std::string FileSystem::path_for_saved_data() {
-        return path_for_saved_data_impl();
+    std::string FileSystem::path_saved_data() {
+        return path_saved_data_impl();
     }
 
-    std::string FileSystem::path_for_assets() {
-        return path_for_assets_impl();
+    std::string FileSystem::path_assets() {
+        return path_assets_impl();
     }
 
-    std::string FileSystem::path_for_logs(std::string_view file) {
-        return path_for_logs_impl() + std::string(file);
+    std::string FileSystem::path_logs(std::string_view file) {
+        return path_logs_impl() + std::string(file);
     }
 
-    std::string FileSystem::path_for_saved_data(std::string_view file) {
-        return path_for_saved_data_impl() + std::string(file);
+    std::string FileSystem::path_saved_data(std::string_view file) {
+        return path_saved_data_impl() + std::string(file);
     }
 
-    std::string FileSystem::path_for_assets(std::string_view file) {
-        return path_for_assets_impl() + std::string(file);
+    std::string FileSystem::path_assets(std::string_view file) {
+        return path_assets_impl() + std::string(file);
     }
+
+    std::string FileSystem::user_name;
+    std::string FileSystem::app_name;
 }

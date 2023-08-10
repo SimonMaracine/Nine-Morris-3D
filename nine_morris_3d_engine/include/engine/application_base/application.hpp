@@ -5,8 +5,6 @@
 #include <memory>
 #include <vector>
 
-#include <resmanager/resmanager.hpp>
-
 #include "engine/application_base/application_properties.hpp"
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/window.hpp"
@@ -17,14 +15,13 @@
 #include "engine/graphics/renderer/renderer.hpp"
 #include "engine/graphics/renderer/gui_renderer.hpp"
 #include "engine/other/resource_manager.hpp"
-#include "engine/other/dummy.hpp"
 #include "engine/scene/scene.hpp"
 
 namespace sm {
     class Application final {
     public:
+        using SceneId = Scene::SceneId;
         using UserFunc = std::function<void(Ctx*)>;
-        using SceneId = resmanager::HashedStr64;
         using RendererFunc = std::function<void()>;
 
         static void preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file);
@@ -75,8 +72,8 @@ namespace sm {
 
         ApplicationBuilder builder;
         ApplicationProperties properties;
-        UserFunc start = dummy::UserFunc {};
-        UserFunc stop = dummy::UserFunc {};
+        UserFunc start = [](Ctx*) {};
+        UserFunc stop = [](Ctx*) {};
 
         // Data for the scene system
         std::vector<std::unique_ptr<Scene>> scenes;
@@ -86,9 +83,9 @@ namespace sm {
         Scene* to_scene = nullptr;  // Next scene to enter
 
         // Data for modular rendering
-        RendererFunc r3d_update = dummy::ProcFunc {};
-        RendererFunc r2d_update = dummy::ProcFunc {};
-        RendererFunc dear_imgui_update = dummy::ProcFunc {};
+        RendererFunc r3d_update = []() {};
+        RendererFunc r2d_update = []() {};
+        RendererFunc dear_imgui_update = []() {};
 
         // Keep track of all framebuffers to resize them, if needed
         std::vector<std::weak_ptr<GlFramebuffer>> framebuffers;

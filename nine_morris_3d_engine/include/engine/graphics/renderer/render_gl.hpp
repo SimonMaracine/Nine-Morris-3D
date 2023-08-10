@@ -1,15 +1,13 @@
 #pragma once
 
 namespace sm {
-    struct FramebufferSpecification;
-
     struct RenderGl {
         /*
             Color
             Depth
             Stencil
         */
-        enum Buffers {
+        enum class Buffers {
             C,
             D,
             S,
@@ -19,7 +17,7 @@ namespace sm {
             CDS
         };
 
-        enum Function {
+        enum class Function {
             Always,
             NotEqual
         };
@@ -30,7 +28,6 @@ namespace sm {
         static void clear_color(float red, float green, float blue);
 
         static void viewport(int width, int height);
-        static void viewport(const FramebufferSpecification& specification);
 
         static void bind_texture_2d(unsigned int texture, int unit);
 

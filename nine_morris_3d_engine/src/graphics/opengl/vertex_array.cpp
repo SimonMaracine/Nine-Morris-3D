@@ -5,7 +5,7 @@
 #include "engine/application_base/panic.hpp"
 #include "engine/graphics/opengl/vertex_array.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
-#include "engine/graphics/vertex_buffer_layout.hpp"
+#include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
 
@@ -36,7 +36,7 @@ namespace sm {
     GlVertexArray::Def GlVertexArray::begin_definition() {
         glBindVertexArray(array);
 
-        return Def {};
+        return Def();
     }
 
     GlVertexArray::Def& GlVertexArray::Def::add_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout) {
