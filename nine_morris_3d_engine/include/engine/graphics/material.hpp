@@ -15,7 +15,6 @@ namespace sm {
     class Material {
     public:
         using Key = resmanager::HashedStr64;
-        using HashFunction = resmanager::Hash<Key>;
 
         enum class Uniform {
             Mat4,
@@ -59,7 +58,7 @@ namespace sm {
     class MaterialInstance {
     public:
         using Key = Material::Key;
-        using HashFunction = Material::HashFunction;
+        using KeyHash = resmanager::Hash<Key>;
 
         MaterialInstance(std::shared_ptr<Material> material);
         ~MaterialInstance();
@@ -108,6 +107,6 @@ namespace sm {
         unsigned char* data = nullptr;
         std::size_t size = 0;
 
-        std::unordered_map<Key, Element, HashFunction> offsets;
+        std::unordered_map<Key, Element, KeyHash> offsets;
     };
 }

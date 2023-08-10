@@ -22,7 +22,7 @@ namespace sm {
     class Window {
     public:
         using CursorId = resmanager::HashedStr64;
-        using CursorHashFunction = resmanager::Hash<CursorId>;
+        using CursorHash = resmanager::Hash<CursorId>;
 
         Window(Application* application);
         ~Window();
@@ -36,7 +36,6 @@ namespace sm {
         void update();
 
         GLFWwindow* get_handle();
-        double get_time();
         std::vector<Monitor> get_monitors();
 
         // VSync, cursor and icon API
@@ -46,13 +45,14 @@ namespace sm {
         void set_cursor(CursorId id);
         void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons);
 
+        static double get_time();
         static void destroy_glfw_context();
     private:
         GLFWwindow* create_window(Application* application);
         void install_callbacks();
 
         GLFWwindow* window = nullptr;
-        std::unordered_map<CursorId, GLFWcursor*, CursorHashFunction> cursors;
+        std::unordered_map<CursorId, GLFWcursor*, CursorHash> cursors;
     };
 
     class Monitor {

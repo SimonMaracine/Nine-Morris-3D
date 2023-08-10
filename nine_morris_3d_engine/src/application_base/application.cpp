@@ -66,7 +66,7 @@ namespace sm {
         properties.ctx = &ctx;
 
         ctx.window = std::make_unique<Window>(this);
-        ctx.input.window_handle = ctx.window->get_handle();
+        ctx.inp.window_handle = ctx.window->get_handle();
 
         if (builder.dear_imgui) {
             initialize_dear_imgui();
@@ -102,8 +102,8 @@ namespace sm {
         ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
         ctx.evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);
 
-        frame_counter.previous_seconds = ctx.window->get_time();
-        fixed_update.previous_seconds = ctx.window->get_time();
+        frame_counter.previous_seconds = Window::get_time();
+        fixed_update.previous_seconds = Window::get_time();
     }
 
     Application::~Application() {  // Destructor is called before all member variables
@@ -133,6 +133,7 @@ namespace sm {
             }
 
             current_scene->on_update();
+            ctx.tsk.update();
 
             // Clear the default framebuffer, as nobody does that for us
             RenderGl::clear(RenderGl::C);
@@ -168,7 +169,7 @@ namespace sm {
     float Application::update_frame_counter() {
         static constexpr double MAX_DT = 1.0 / 20.0;
 
-        const double current_seconds = ctx.window->get_time();
+        const double current_seconds = Window::get_time();
         const double elapsed_seconds = current_seconds - frame_counter.previous_seconds;
         frame_counter.previous_seconds = current_seconds;
 
@@ -189,7 +190,7 @@ namespace sm {
     unsigned int Application::calculate_fixed_update() {
         static constexpr double FIXED_DT = 1.0 / 50.0;
 
-        const double current_seconds = ctx.window->get_time();
+        const double current_seconds = Window::get_time();
         const double elapsed_seconds = current_seconds - fixed_update.previous_seconds;
         fixed_update.previous_seconds = current_seconds;
 

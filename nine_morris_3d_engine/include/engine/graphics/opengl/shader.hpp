@@ -25,10 +25,10 @@ namespace sm {
     using UniformBlocks = std::initializer_list<UniformBlockSpecification>;
 
     class GlShader {
-    private:
-        using Key = resmanager::HashedStr64;
-        using HashFunction = resmanager::Hash<Key>;
     public:
+        using Key = resmanager::HashedStr64;
+        using KeyHash = resmanager::Hash<Key>;
+
         GlShader(std::string_view vertex_source, std::string_view fragment_source,
             const std::vector<std::string>& uniforms, UniformBlocks uniform_blocks = {});
         GlShader(Encrypt::EncryptedFile vertex_source, Encrypt::EncryptedFile fragment_source,
@@ -68,7 +68,7 @@ namespace sm {
         std::string name;
 
         // Uniforms cache
-        std::unordered_map<Key, int, HashFunction> cache;
+        std::unordered_map<Key, int, KeyHash> cache;
 
         // Keep these for hot-reloading functionality
         std::string vertex_source_path;

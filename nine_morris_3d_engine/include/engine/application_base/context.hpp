@@ -8,6 +8,7 @@
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/window.hpp"
 #include "engine/application_base/input.hpp"
+#include "engine/application_base/tasks.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
@@ -63,10 +64,11 @@ namespace sm {
         // std::unique_ptr<Renderer> r3d;  // 3D renderer
         // std::unique_ptr<GuiRenderer> r2d;  // 2D renderer
         std::unique_ptr<RandomGenerator> rng;  // Random number generator
-        Input input;  // Self explanatory
+        Input inp;  // Self explanatory
         EventDispatcher evt;  // Manager of application events
         ResourcesCache res;  // Global cache of resources
         Identifier idt;  // Generator of IDs
+        TaskManager tsk;  // Manager of general purpose procedures
     private:
         Application* application = nullptr;
 

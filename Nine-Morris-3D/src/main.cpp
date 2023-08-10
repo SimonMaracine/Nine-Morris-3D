@@ -36,6 +36,24 @@ static const char* KEY = "data/models/board/board.obj";
 
 struct Game : public sm::Scene {
     Game() : sm::Scene("loading") {}
+
+    virtual void on_start() override {
+        ctx->tsk.add("test"_H, [this](const sm::Task& task) {
+            if (task.get_total_time() > 3.0) {
+                LOG_DEBUG("Done");
+
+                return sm::Task::Result::Done;
+            }
+
+            LOG_DEBUG("frame: {}", task.get_frames());
+
+            return sm::Task::Result::Continue;
+        });
+    }
+
+    virtual void on_update() override {
+
+    }
 };
 
 void application_main() {

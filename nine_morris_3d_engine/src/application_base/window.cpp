@@ -104,10 +104,6 @@ namespace sm {
         return window;
     }
 
-    double Window::get_time() {
-        return glfwGetTime();
-    }
-
     std::vector<Monitor> Window::get_monitors() {
         int count;
         GLFWmonitor** monitors = glfwGetMonitors(&count);
@@ -186,6 +182,10 @@ namespace sm {
         }
 
         glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
+    }
+
+    double Window::get_time() {
+        return glfwGetTime();
     }
 
     void Window::destroy_glfw_context() {
