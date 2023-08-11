@@ -30,7 +30,7 @@
 */
 
 namespace sm {
-    void Logging::initialize_for_applications([[maybe_unused]] std::string_view log_file, std::string_view info_file) {
+    void Logging::initialize_applications([[maybe_unused]] std::string_view log_file, std::string_view info_file) {
         info_file = info_file;
 
 #ifdef SM_BUILD_DISTRIBUTION

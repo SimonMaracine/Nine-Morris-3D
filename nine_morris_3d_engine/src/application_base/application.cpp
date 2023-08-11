@@ -1,4 +1,5 @@
 #include <string_view>
+#include <string>
 #include <locale>
 #include <memory>
 
@@ -10,6 +11,7 @@
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/application_builder.hpp"
 #include "engine/application_base/panic.hpp"
+#include "engine/application_base/platform.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/audio/music.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
@@ -25,9 +27,9 @@
 #include "engine/scene/scene.hpp"
 
 namespace sm {
-    void Application::preinitialize(std::string_view app_name, std::string_view log_file, std::string_view info_file) {
+    void Application::initialize_applications(const ApplicationsData& data) {
         try {
-            FileSystem::initialize_applications(app_name);
+            FileSystem::initialize_applications(data.app_name, data.res_directory);
         } catch (const FileSystem::UserNameError& e) {
             panic();  // Really bad that there is no feedback
         }
@@ -35,15 +37,14 @@ namespace sm {
         // Set locale for the applications; used mostly by spdlog
         std::locale::global(std::locale("en_US.UTF-8"));
 
-        Logging::initialize_for_applications(log_file, info_file);
+        Logging::initialize_applications(data.log_file, data.info_file);
 
 #ifdef SM_BUILD_DISTRIBUTION
         FileSystem::check_and_fix_directories();
 #endif
     }
 
-    Application::Application(const ApplicationBuilder& builder, void* user_data)
-        : builder(builder) {
+    Application::Application(const ApplicationBuilder& builder, void* user_data) {
         LOG_INFO("Initializing application...");
 
         ctx.application = this;
@@ -70,11 +71,12 @@ namespace sm {
 
         if (builder.dear_imgui) {
             initialize_dear_imgui();
+            with_dear_imgui = true;
         }
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
         Logging::log_general_information(Logging::LogTarget::Console);
-    #endif
+#endif
 
         GlInfoDebug::maybe_initialize_debugging();
         RenderGl::initialize_default();
@@ -107,7 +109,7 @@ namespace sm {
     }
 
     Application::~Application() {  // Destructor is called before all member variables
-        if (builder.dear_imgui) {
+        if (with_dear_imgui) {
             ImGuiContext::uninitialize();
         }
 

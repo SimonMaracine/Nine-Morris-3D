@@ -19,12 +19,12 @@ namespace sm {
         Mesh(Mesh&&) = delete;
         Mesh& operator=(Mesh&&) = delete;
 
-        const char* get_vertices() const { return vertices; }
+        const unsigned char* get_vertices() const { return vertices; }
         const unsigned int* get_indices() const { return indices; }
         std::size_t get_vertices_size() const { return vertices_size; }
         std::size_t get_indices_size() const { return indices_size; }
     private:
-        char* vertices = nullptr;
+        unsigned char* vertices = nullptr;
         unsigned int* indices = nullptr;
         std::size_t vertices_size = 0;
         std::size_t indices_size = 0;

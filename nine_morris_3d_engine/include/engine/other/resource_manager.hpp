@@ -29,17 +29,17 @@ namespace sm {
 
         template<typename... Args>
         std::shared_ptr<Mesh> load(PTN, Args&&... args) const {
-            return load_model_PTN(std::forward<Args>(args)...);
+            return Meshes::load_model_PTN(std::forward<Args>(args)...);
         }
 
         template<typename... Args>
         std::shared_ptr<Mesh> load(P, Args&&... args) const {
-            return load_model_P(std::forward<Args>(args)...);
+            return Meshes::load_model_P(std::forward<Args>(args)...);
         }
 
         template<typename... Args>
         std::shared_ptr<Mesh> load(PTNT, Args&&... args) const {
-            return load_model_PTNT(std::forward<Args>(args)...);
+            return Meshes::load_model_PTNT(std::forward<Args>(args)...);
         }
     };
 

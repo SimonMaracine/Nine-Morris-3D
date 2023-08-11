@@ -82,11 +82,11 @@ namespace sm {
     private:
         void allocate_memory(std::size_t size);
         void add_field(std::size_t index, const UniformBlockField& field);
-        void configure();
+        void set_configured();
 
         unsigned int buffer = 0;
 
-        char* data = nullptr;
+        unsigned char* data = nullptr;
         std::size_t size = 0;
 
         std::unordered_map<std::size_t, UniformBlockField> fields;
@@ -119,6 +119,6 @@ namespace sm {
     private:
         unsigned int buffer = 0;
         void* data = nullptr;  // TODO clear value is float; should be generic
-        char* dummy_data = nullptr;
+        unsigned char* dummy_data = nullptr;
     };
 }

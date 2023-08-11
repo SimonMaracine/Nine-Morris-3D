@@ -102,7 +102,7 @@ namespace sm {
         delete[] buffer;
 
         if (!check_compilation(shader, type, name)) {
-            throw std::runtime_error("GlShader compilation error");  // FIXME put these in class and don't use exceptons
+            throw std::runtime_error("Shader compilation error");  // FIXME put these in class and don't use exceptons
         }
 
         return shader;
@@ -119,7 +119,7 @@ namespace sm {
         glCompileShader(shader);
 
         if (!check_compilation(shader, type, name)) {
-            throw std::runtime_error("GlShader compilation error");
+            throw std::runtime_error("Shader compilation error");
         }
 
         return shader;
@@ -134,12 +134,12 @@ namespace sm {
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("GlShader linking error with no message in shader `{}`", name);
+                LOG_DIST_CRITICAL("Shader linking error with no message in shader `{}`", name);
             } else {
                 char* log_message = new char[log_length];
                 glGetProgramInfoLog(program, log_length, nullptr, log_message);
 
-                LOG_DIST_CRITICAL("GlShader linking error in shader `{}`\n{}", name, log_message);
+                LOG_DIST_CRITICAL("Shader linking error in shader `{}`\n{}", name, log_message);
                 delete[] log_message;
             }
 
@@ -326,16 +326,16 @@ namespace sm {
 
     void GlShader::check_and_cache_uniforms(Uniforms uniforms) {
         for (const auto& uniform : uniforms) {
-            this->uniforms.emplace_back(uniform);
+            this->uniforms.push_back(uniform);
 
-            const GLint location = glGetUniformLocation(program, uniform.data());
+            const GLint location = glGetUniformLocation(program, uniform.c_str());
 
             if (location == -1) {
-                LOG_ERROR("Uniform variable `{}` in shader `{}` not found", uniform.data(), name);
+                LOG_ERROR("Uniform variable `{}` in shader `{}` not found", uniform, name);
                 continue;
             }
 
-            cache[Key(std::string(uniform))] = location;
+            cache[Key(uniform)] = location;
         }
     }
 
@@ -364,11 +364,10 @@ namespace sm {
             // Allocate memory on both CPU and GPU side
             block.uniform_buffer->bind();
             block.uniform_buffer->allocate_memory(block_size);
-
             GlUniformBuffer::unbind();
 
             // Link uniform buffer to binding index
-            glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);
+            glBindBufferBase(GL_UNIFORM_BUFFER, block.binding_index, block.uniform_buffer->buffer);  // TODO move this to buffer class
 
             const std::size_t field_count = block.field_names.size();
             static constexpr std::size_t MAX_FIELD_COUNT = 8;
@@ -417,15 +416,14 @@ namespace sm {
 
             // Finally setup the uniform block fields
             for (std::size_t i = 0; i < field_count; i++) {
-                const UniformBlockField field = {
-                    static_cast<std::size_t>(offsets[i]),
-                    static_cast<std::size_t>(sizes[i]) * type_size(types[i])
-                };
+                UniformBlockField field;
+                field.offset = static_cast<std::size_t>(offsets[i]);
+                field.size = static_cast<std::size_t>(sizes[i]) * type_size(types[i]);
 
                 block.uniform_buffer->add_field(i, field);
             }
 
-            block.uniform_buffer->configure();
+            block.uniform_buffer->set_configured();
         }
     }
 }

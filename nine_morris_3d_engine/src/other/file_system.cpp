@@ -147,7 +147,7 @@ namespace sm {
             }
 
             static std::string path_assets_impl() {
-                return ASSETS_DIRECTORY_PATH(g_app_name);
+                return ASSETS_DIRECTORY_PATH(FileSystem::app_name);
             }
     #elif defined(SM_PLATFORM_WINDOWS)
             static std::string path_logs_impl() {
@@ -163,7 +163,7 @@ namespace sm {
             }
     #endif
 #else
-        // Use relative path for both operating systems
+        // Use relative paths for both operating systems
         static std::string path_logs_impl() {
             return {};
         }
@@ -177,9 +177,10 @@ namespace sm {
         }
 #endif
 
-    void FileSystem::initialize_applications(std::string_view application_name) noexcept(false) {
+    void FileSystem::initialize_applications(std::string_view app_name, std::string_view res_directory) noexcept(false) {
         user_name = get_user_name();
-        app_name = application_name;
+        FileSystem::app_name = app_name;
+        FileSystem::res_directory = res_directory;
     }
 
     bool FileSystem::directory_exists(std::string_view path) {
@@ -216,7 +217,11 @@ namespace sm {
     }
 
     std::string FileSystem::path_assets() {
-        return path_assets_impl();
+        return path_assets_impl() + FileSystem::res_directory + '/';
+    }
+
+    std::string FileSystem::path_engine_data() {
+        return path_assets_impl() + "engine_data/";
     }
 
     std::string FileSystem::path_logs(std::string_view file) {
@@ -228,9 +233,14 @@ namespace sm {
     }
 
     std::string FileSystem::path_assets(std::string_view file) {
-        return path_assets_impl() + std::string(file);
+        return path_assets_impl() + FileSystem::res_directory + '/' + std::string(file);
+    }
+
+    std::string FileSystem::path_engine_data(std::string_view file) {
+        return path_assets_impl() + "engine_data/" + std::string(file);
     }
 
     std::string FileSystem::user_name;
     std::string FileSystem::app_name;
+    std::string FileSystem::res_directory;
 }

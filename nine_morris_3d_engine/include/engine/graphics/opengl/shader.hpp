@@ -22,7 +22,7 @@ namespace sm {
         unsigned int binding_index = 0;
     };
 
-    using Uniforms = std::initializer_list<std::string_view>;
+    using Uniforms = std::initializer_list<std::string>;
     using UniformBlocks = std::initializer_list<UniformBlockSpecification>;
 
     class GlShader {

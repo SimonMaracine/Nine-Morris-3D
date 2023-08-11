@@ -19,11 +19,13 @@ using namespace resmanager::literals;
 
 namespace sm {
     Renderer::Renderer(int width, int height) {
+        RenderGl::enable_depth_test();
+
         FramebufferSpecification specification;
         specification.width = width;
         specification.height = height;
         specification.color_attachments = {
-            Attachment(AttachmentFormat::Rgba8, AttachmentType::Renderbuffer)
+            Attachment(AttachmentFormat::Rgba8, AttachmentType::Texture)
         };
         specification.depth_attachment = Attachment(
             AttachmentFormat::Depth32, AttachmentType::Renderbuffer
@@ -37,16 +39,16 @@ namespace sm {
 
         storage.projection_view_uniform_buffer = std::make_shared<GlUniformBuffer>();
 
-        storage.projection_view_uniform_block.block_name = "ProjectionView";
-        storage.projection_view_uniform_block.field_names = { "u_projection_view_matrix" };
-        storage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;
-        storage.projection_view_uniform_block.binding_index = 0;
+        pstorage.projection_view_uniform_block.block_name = "ProjectionView";
+        pstorage.projection_view_uniform_block.field_names = { "u_projection_view_matrix" };
+        pstorage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;
+        pstorage.projection_view_uniform_block.binding_index = 0;
 
         {
             storage.screen_quad_shader = std::make_shared<GlShader>(
-                Encrypt::encr(FileSystem::path_assets("shaders/board/board.vert")),
-                Encrypt::encr(FileSystem::path_assets("shaders/board/board.frag")),
-                std::initializer_list<std::string_view> { "u_screen_texture" }  // FIXME use introspection
+                Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.vert")),
+                Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.frag")),
+                std::initializer_list<std::string> { "u_screen_texture" }  // FIXME use introspection
             );
 
             const float vertices[] = {
@@ -91,12 +93,13 @@ namespace sm {
         storage.projection_view_uniform_buffer->set(&camera.projection_view_matrix, 0);
         storage.projection_view_uniform_buffer->bind();
         storage.projection_view_uniform_buffer->upload_sub_data();
+        GlUniformBuffer::unbind();
 
         // TODO draw to depth buffer for shadows
 
         storage.scene_framebuffer->bind();
 
-        RenderGl::clear(RenderGl::Buffers::C);
+        RenderGl::clear(RenderGl::Buffers::CD);
         RenderGl::viewport(
             storage.scene_framebuffer->get_specification().width,
             storage.scene_framebuffer->get_specification().height

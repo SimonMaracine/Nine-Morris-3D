@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
-file(GLOB_RECURSE GAME_HEADERS "src/*.h")
+file(GLOB_RECURSE GAME_HEADERS "src/*.hpp")
 
 # Add WIN32 option for Windows in release mode
 if(WIN32)
@@ -37,9 +37,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "Nine-Morris-3D: Building with sanitizers")
     endif()
 endif()
-
-# Use PCH
-target_precompile_headers(Nine-Morris-3D PRIVATE "src/pch.hpp")
 
 # On Windows set runtime library
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

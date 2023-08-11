@@ -1,9 +1,9 @@
 #include <cstddef>
 #include <unordered_map>
+#include <cstring>
 
 #include <glad/glad.h>
 
-#include "engine/application_base/platform.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
@@ -74,7 +74,7 @@ namespace sm {
     }
 
     void GlVertexBuffer::upload_data(const void* data, std::size_t size) {
-        glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<int>(hint));
+        glBufferData(GL_ARRAY_BUFFER, size, data, draw_hint_to_int(hint));
     }
 
     void GlVertexBuffer::upload_sub_data(const void* data, std::size_t offset, std::size_t size) {
@@ -142,11 +142,7 @@ namespace sm {
         SM_ASSERT(configured, "Uniform buffer must be configured");
         SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
-#ifdef SM_BUILD_DEBUG
-        memcpy(data + fields.at(field_index).offset, field_data, fields.at(field_index).size);
-#else
-        memcpy(data + fields[field_index].offset, field_data, fields[field_index].size);
-#endif
+        std::memcpy(data + fields.at(field_index).offset, field_data, fields.at(field_index).size);
     }
 
     void GlUniformBuffer::upload_sub_data() {
@@ -156,7 +152,7 @@ namespace sm {
     }
 
     void GlUniformBuffer::allocate_memory(std::size_t size) {
-        data = new char[size];
+        data = new unsigned char[size];
         this->size = size;
 
         glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STREAM_DRAW);
@@ -166,7 +162,7 @@ namespace sm {
         fields[index] = field;
     }
 
-    void GlUniformBuffer::configure() {
+    void GlUniformBuffer::set_configured() {
         configured = true;
     }
 
@@ -181,8 +177,8 @@ namespace sm {
 
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
-        dummy_data = new char[size];
-        memset(dummy_data, 0, size);
+        dummy_data = new unsigned char[size];
+        std::memset(dummy_data, 0, size);
 
         LOG_DEBUG("Created GL pixel buffer {}", buffer);
     }

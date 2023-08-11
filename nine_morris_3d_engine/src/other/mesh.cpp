@@ -127,7 +127,7 @@ namespace sm {
     }
 
     Mesh::Mesh(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size) {
-        this->vertices = new char[vertices_size];
+        this->vertices = new unsigned char[vertices_size];
         std::memcpy(this->vertices, vertices, vertices_size);
         this->vertices_size = vertices_size;
 
@@ -146,7 +146,9 @@ namespace sm {
     std::shared_ptr<Mesh> Meshes::load_model_PTN(std::string_view file_path, bool flip_winding) {
         LOG_DEBUG("Loading PTN model data `{}`...", file_path);
 
-        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = (
+            flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)
+        );
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(
@@ -154,7 +156,7 @@ namespace sm {
             aiProcess_ValidateDataStructure | flip
         );
 
-        if (!scene) {
+        if (scene == nullptr) {
             LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
             panic();
@@ -181,7 +183,9 @@ namespace sm {
     std::shared_ptr<Mesh> Meshes::load_model_PTN(Encrypt::EncryptedFile file_path, bool flip_winding) {
         LOG_DEBUG("Loading PTN model data `{}`...", file_path);
 
-        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = (
+            flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)
+        );
 
         const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
@@ -192,7 +196,7 @@ namespace sm {
             aiProcess_ValidateDataStructure | flip
         );
 
-        if (!scene) {
+        if (scene == nullptr) {
             LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
             panic();
@@ -219,7 +223,9 @@ namespace sm {
     std::shared_ptr<Mesh> Meshes::load_model_P(std::string_view file_path, bool flip_winding) {
         LOG_DEBUG("Loading P model data `{}`...", file_path);
 
-        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = (
+            flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)
+        );
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(
@@ -227,7 +233,7 @@ namespace sm {
             aiProcess_ValidateDataStructure | flip
         );
 
-        if (!scene) {
+        if (scene == nullptr) {
             LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL(importer.GetErrorString());
             panic();
@@ -254,7 +260,9 @@ namespace sm {
     std::shared_ptr<Mesh> Meshes::load_model_P(Encrypt::EncryptedFile file_path, bool flip_winding) {
         LOG_DEBUG("Loading P model data `{}`...", file_path);
 
-        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = (
+            flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)
+        );
 
         const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
@@ -292,7 +300,9 @@ namespace sm {
     std::shared_ptr<Mesh> Meshes::load_model_PTNT(std::string_view file_path, bool flip_winding) {
         LOG_DEBUG("Loading PTNT model data `{}`...", file_path);
 
-        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = (
+            flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)
+        );
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(
@@ -327,7 +337,9 @@ namespace sm {
     std::shared_ptr<Mesh> Meshes::load_model_PTNT(Encrypt::EncryptedFile file_path, bool flip_winding) {
         LOG_DEBUG("Loading PTNT model data `{}`...", file_path);
 
-        const aiPostProcessSteps flip = flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0);
+        const aiPostProcessSteps flip = (
+            flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)
+        );
 
         const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 

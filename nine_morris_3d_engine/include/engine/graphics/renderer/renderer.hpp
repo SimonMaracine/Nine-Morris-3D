@@ -39,6 +39,10 @@ namespace sm {
         void add_renderable(const Renderable& renderable);
 
         void capture(const Camera& camera, const glm::vec3& position);
+
+        struct PublicStorage {
+            UniformBlockSpecification projection_view_uniform_block;
+        } pstorage;
     private:
         void render(int width, int height);
 
@@ -56,7 +60,6 @@ namespace sm {
             std::shared_ptr<GlFramebuffer> scene_framebuffer;
 
             std::shared_ptr<GlUniformBuffer> projection_view_uniform_buffer;
-            UniformBlockSpecification projection_view_uniform_block;
 
             std::shared_ptr<GlShader> screen_quad_shader;
             std::shared_ptr<GlVertexArray> screen_quad_vertex_array;

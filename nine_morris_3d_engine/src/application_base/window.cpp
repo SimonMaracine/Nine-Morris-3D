@@ -23,7 +23,7 @@
     const ApplicationProperties* VARIABLE = ( \
         static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window)) \
     );
-#define WITH_DEAR_IMGUI() (data->application->builder.dear_imgui)
+#define WITH_DEAR_IMGUI() (data->application->with_dear_imgui)
 
 namespace sm {
     Window::Window(Application* application) {
@@ -239,7 +239,7 @@ namespace sm {
         glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {
             APPLICATION_DATA(data)
 
-            data->ctx->evt.enqueue<WindowFocusedEvent>(focused);
+            data->ctx->evt.enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
         });
 
         glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {

@@ -1,14 +1,8 @@
 // Include entry point first as it includes Windows.h
 #include <engine/application_base/entry_point.hpp>
 
-#include <engine/prelude.hpp>
-#include <engine/application_base/application.hpp>
-#include <engine/application_base/application_builder.hpp>
+#include <engine/nine_morris_3d.hpp>
 #include <engine/external/resmanager.h++>
-
-// #include <engine/public/application_base.h>
-// #include <engine/public/other.h>
-// #include <engine/public/external/resmanager.h++>
 
 // #include "game/game.h"
 // #include "game/scenes/standard_game_scene.h"
@@ -18,6 +12,7 @@
 // #include "launcher/launcher.h"
 // #include "launcher/scenes/launcher_scene.h"
 // #include "other/data.h"
+#include "game/scenes/game_scene.hpp"
 
 #if defined(SM_PLATFORM_LINUX)
     static const char* APP_NAME = "ninemorris3d";
@@ -34,30 +29,14 @@ static constexpr unsigned int PATCH = 0;
 
 static const char* KEY = "data/models/board/board.obj";
 
-struct Game : public sm::Scene {
-    Game() : sm::Scene("loading") {}
-
-    virtual void on_start() override {
-        ctx->tsk.add("test"_H, [this](const sm::Task& task) {
-            if (task.get_total_time() > 3.0) {
-                LOG_DEBUG("Done");
-
-                return sm::Task::Result::Done;
-            }
-
-            LOG_DEBUG("frame: {}", task.get_frames());
-
-            return sm::Task::Result::Continue;
-        });
-    }
-
-    virtual void on_update() override {
-
-    }
-};
-
 void application_main() {
-    sm::Application::preinitialize(APP_NAME, LOG_FILE, INFO_FILE);
+    sm::Application::ApplicationsData data;
+    data.app_name = APP_NAME;
+    data.log_file = LOG_FILE;
+    data.info_file = INFO_FILE;
+    data.res_directory = "data";
+
+    sm::Application::initialize_applications(data);
 
     while (true) {
         int exit_code {};
@@ -96,10 +75,10 @@ void application_main() {
                 .version(MAJOR, MINOR, PATCH)
                 .encrypt_key(KEY)
                 .with_renderer(sm::ApplicationBuilder::Renderer3D)
-                .with_renderer(sm::ApplicationBuilder::Renderer2D)
-                .with_dear_imgui()
-                .with_audio()
-                .with_random_generator();
+                .with_renderer(sm::ApplicationBuilder::Renderer2D);
+                // .with_dear_imgui()
+                // .with_audio()
+                // .with_random_generator();
 
             auto game = sm::Application(game_builder/*, global_data*/);
             // game.set_start_function(game::start);
@@ -108,7 +87,7 @@ void application_main() {
             // game.add_scene<StandardGameScene>();
             // game.add_scene<JumpVariantScene>();
             // game.add_scene<JumpPlusVariantScene>();
-            game.add_scene<Game>();
+            game.add_scene<GameScene>();
             exit_code = game.run("loading"_H);
         }
 

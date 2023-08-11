@@ -151,7 +151,7 @@ set(ENGINE_HEADERS
     "include/engine/external/glm.h++"
     "include/engine/external/imgui.h++"
     "include/engine/external/resmanager.h++"
-    "include/engine/prelude.hpp"  # Very common functionality
+    "include/engine/nine_morris_3d.hpp"
 )
 
 add_library(nine_morris_3d_engine STATIC

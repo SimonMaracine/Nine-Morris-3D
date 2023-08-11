@@ -48,7 +48,7 @@ namespace sm {
         };
 
         // There is no uninitialization
-        static void initialize_for_applications(std::string_view log_file, std::string_view info_file);
+        static void initialize_applications(std::string_view log_file, std::string_view info_file);
         static void log_general_information(LogTarget target);
         static spdlog::logger* get_global_logger();
         static std::string_view get_info_file();
