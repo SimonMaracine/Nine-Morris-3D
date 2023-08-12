@@ -1,9 +1,12 @@
 #include <cstddef>
 #include <unordered_map>
+#include <vector>
 #include <cstring>
 
 #include <glad/glad.h>
+#include <resmanager/resmanager.hpp>
 
+#include "engine/application_base/panic.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
@@ -113,7 +116,8 @@ namespace sm {
 
     // --- Uniform buffer
 
-    GlUniformBuffer::GlUniformBuffer() {
+    GlUniformBuffer::GlUniformBuffer(const UniformBlockSpecification& specification)
+        : specification(specification) {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_UNIFORM_BUFFER, buffer);
 
@@ -138,17 +142,99 @@ namespace sm {
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
-    void GlUniformBuffer::set(const void* field_data, std::size_t field_index) {
+    void GlUniformBuffer::configure(unsigned int shader_program) {
+        const GLuint block_index = glGetUniformBlockIndex(shader_program, specification.block_name.c_str());
+
+        if (block_index == GL_INVALID_INDEX) {
+            LOG_DIST_CRITICAL("Invalid block index");
+            panic();
+        }
+
+        // If it's already configured, skip everything else
+        if (configured) {
+            return;
+        }
+
+        // Get data block size
+        GLint block_size;
+        glGetActiveUniformBlockiv(shader_program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
+
+        // Allocate memory on both CPU and GPU side
+        allocate_memory(block_size);
+
+        // Link uniform buffer to binding index
+        glBindBufferBase(GL_UNIFORM_BUFFER, specification.binding_index, buffer);
+
+        const std::size_t field_count = specification.field_names.size();
+        static constexpr std::size_t MAX_FIELD_COUNT = 8;
+
+        SM_ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 8 fields for now");
+
+        GLuint indices[MAX_FIELD_COUNT];
+        GLint offsets[MAX_FIELD_COUNT];
+        GLint sizes[MAX_FIELD_COUNT];
+        GLint types[MAX_FIELD_COUNT];
+
+        // Create the uniforms names list; the order of these names matters
+        const char* field_names[MAX_FIELD_COUNT];
+
+        for (std::size_t i = 0; i < field_count; i++) {
+            field_names[i] = specification.field_names[i].c_str();
+        }
+
+        // Get uniform indices just to later get offsets, sizes and types
+        glGetUniformIndices(
+            shader_program,
+            field_count,
+            static_cast<const char* const*>(field_names),
+            indices
+        );
+
+        for (std::size_t i = 0; i < field_count; i++) {
+            if (indices[i] == GL_INVALID_INDEX) {
+                LOG_DIST_CRITICAL("Invalid field index");
+                panic();
+            }
+        }
+
+        glGetActiveUniformsiv(shader_program, field_count, indices, GL_UNIFORM_OFFSET, offsets);
+        glGetActiveUniformsiv(shader_program, field_count, indices, GL_UNIFORM_SIZE, sizes);  // For arrays
+        glGetActiveUniformsiv(shader_program, field_count, indices, GL_UNIFORM_TYPE, types);
+
+        // Finally setup the uniform block fields
+        for (std::size_t i = 0; i < field_count; i++) {
+            UniformBlockField field;
+            field.offset = static_cast<std::size_t>(offsets[i]);
+            field.size = static_cast<std::size_t>(sizes[i]) * type_size(types[i]);
+
+            fields[Key(field_names[i])] = field;
+        }
+
+        configured = true;
+    }
+
+    void GlUniformBuffer::set(const void* field_data, Key field) {
         SM_ASSERT(configured, "Uniform buffer must be configured");
         SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
-        std::memcpy(data + fields.at(field_index).offset, field_data, fields.at(field_index).size);
+        std::memcpy(data + fields.at(field).offset, field_data, fields.at(field).size);
     }
 
-    void GlUniformBuffer::upload_sub_data() {
+    void GlUniformBuffer::upload_all() {
         SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
+    }
+
+    void GlUniformBuffer::set_and_upload(const void* field_data, Key field) {
+        SM_ASSERT(configured, "Uniform buffer must be configured");
+        SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
+
+        const std::size_t offset = fields.at(field).offset;
+        const std::size_t size = fields.at(field).size;
+
+        std::memcpy(data + offset, field_data, size);
+        glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
     }
 
     void GlUniformBuffer::allocate_memory(std::size_t size) {
@@ -158,12 +244,22 @@ namespace sm {
         glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STREAM_DRAW);
     }
 
-    void GlUniformBuffer::add_field(std::size_t index, const UniformBlockField& field) {
-        fields[index] = field;
-    }
+    std::size_t GlUniformBuffer::type_size(unsigned int type) {
+        std::size_t size = 0;
 
-    void GlUniformBuffer::set_configured() {
-        configured = true;
+        switch (type) {
+            case GL_FLOAT_VEC3:
+                size = 3 * sizeof(GLfloat);
+                break;
+            case GL_FLOAT_MAT4:
+                size = 16 * sizeof(GLfloat);
+                break;
+            default:
+                SM_ASSERT(false, "Invalid type");
+                break;
+        }
+
+        return size;
     }
 
     // --- Pixel buffer

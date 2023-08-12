@@ -21,34 +21,39 @@ namespace sm {
     Renderer::Renderer(int width, int height) {
         RenderGl::enable_depth_test();
 
-        FramebufferSpecification specification;
-        specification.width = width;
-        specification.height = height;
-        specification.color_attachments = {
-            Attachment(AttachmentFormat::Rgba8, AttachmentType::Texture)
-        };
-        specification.depth_attachment = Attachment(
-            AttachmentFormat::Depth32, AttachmentType::Renderbuffer
-        );
+        {
+            FramebufferSpecification specification;
+            specification.width = width;
+            specification.height = height;
+            specification.color_attachments = {
+                Attachment(AttachmentFormat::Rgba8, AttachmentType::Texture)
+            };
+            specification.depth_attachment = Attachment(
+                AttachmentFormat::Depth32, AttachmentType::Renderbuffer
+            );
 
-        storage.scene_framebuffer = std::make_shared<GlFramebuffer>(specification);
+            storage.scene_framebuffer = std::make_shared<GlFramebuffer>(specification);
 
-        // FIXME
-        // ctx->purge_framebuffers();
-        // ctx->add_framebuffer(storage.scene_framebuffer);
+            // FIXME
+            // ctx->purge_framebuffers();
+            // ctx->add_framebuffer(storage.scene_framebuffer);
+        }
 
-        storage.projection_view_uniform_buffer = std::make_shared<GlUniformBuffer>();
+        {
+            UniformBlockSpecification specification;
 
-        pstorage.projection_view_uniform_block.block_name = "ProjectionView";
-        pstorage.projection_view_uniform_block.field_names = { "u_projection_view_matrix" };
-        pstorage.projection_view_uniform_block.uniform_buffer = storage.projection_view_uniform_buffer;
-        pstorage.projection_view_uniform_block.binding_index = 0;
+            specification.block_name = "ProjectionView";
+            specification.field_names = { "u_projection_view_matrix" };
+            specification.binding_index = 0;
+
+            storage.projection_view_uniform_buffer = std::make_shared<GlUniformBuffer>(specification);
+        }
 
         {
             storage.screen_quad_shader = std::make_shared<GlShader>(
                 Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.vert")),
-                Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.frag")),
-                std::initializer_list<std::string> { "u_screen_texture" }  // FIXME use introspection
+                Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.frag"))
+                // std::initializer_list<std::string> { "u_screen_texture" }  // FIXME use introspection
             );
 
             const float vertices[] = {
@@ -87,13 +92,17 @@ namespace sm {
         this->camera.position = position;
     }
 
+    void Renderer::acknowledge_shader(std::shared_ptr<GlShader> shader) {
+        // storage.projection_view_uniform_buffer->configure()
+    }
+
     void Renderer::render(int width, int height) {
         // TODO pre-render setup
 
-        storage.projection_view_uniform_buffer->set(&camera.projection_view_matrix, 0);
-        storage.projection_view_uniform_buffer->bind();
-        storage.projection_view_uniform_buffer->upload_sub_data();
-        GlUniformBuffer::unbind();
+        // storage.projection_view_uniform_buffer->set(&camera.projection_view_matrix, "u_projection_view_matrix"_H);
+        // storage.projection_view_uniform_buffer->bind();
+        // storage.projection_view_uniform_buffer->upload_all();
+        // GlUniformBuffer::unbind();
 
         // TODO draw to depth buffer for shadows
 

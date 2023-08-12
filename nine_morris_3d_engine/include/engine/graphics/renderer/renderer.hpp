@@ -40,9 +40,7 @@ namespace sm {
 
         void capture(const Camera& camera, const glm::vec3& position);
 
-        struct PublicStorage {
-            UniformBlockSpecification projection_view_uniform_block;
-        } pstorage;
+        void acknowledge_shader(std::shared_ptr<GlShader> shader);
     private:
         void render(int width, int height);
 

@@ -2,8 +2,9 @@
 
 #include <cstddef>
 #include <unordered_map>
+#include <vector>
 
-#include "engine/graphics/opengl/vertex_array.hpp"
+#include <resmanager/resmanager.hpp>
 
 namespace sm {
     enum class DrawHint {
@@ -29,11 +30,11 @@ namespace sm {
 
         void upload_data(const void* data, std::size_t size);
         void upload_sub_data(const void* data, std::size_t offset, std::size_t size);
+
+        unsigned int get_id() const { return buffer; }
     private:
         unsigned int buffer = 0;
         DrawHint hint = DrawHint::Static;
-
-        friend class GlVertexArray::Def;
     };
 
     class GlIndexBuffer {
@@ -49,22 +50,25 @@ namespace sm {
         void bind();
         static void unbind();
 
+        unsigned int get_id() const { return buffer; }
         int get_index_count() { return index_count; }
     private:
         unsigned int buffer = 0;
         int index_count = 0;
-
-        friend class GlVertexArray;
     };
 
-    struct UniformBlockField {
-        std::size_t offset = 0;
-        std::size_t size = 0;
+    struct UniformBlockSpecification {
+        std::string block_name;
+        std::vector<std::string> field_names;
+        unsigned int binding_index {};
     };
 
     class GlUniformBuffer {
     public:
-        GlUniformBuffer();
+        using Key = resmanager::HashedStr64;
+        using KeyHash = resmanager::Hash<Key>;
+
+        GlUniformBuffer(const UniformBlockSpecification& specification);
         ~GlUniformBuffer();
 
         GlUniformBuffer(const GlUniformBuffer&) = delete;
@@ -75,21 +79,29 @@ namespace sm {
         void bind();
         static void unbind();
 
-        bool is_configured() { return configured; }
+        bool is_configured() const { return configured; }
+        void configure(unsigned int shader_program);
 
-        void set(const void* data, std::size_t field_index);
-        void upload_sub_data();
+        void set(const void* field_data, Key field);
+        void upload_all();
+        void set_and_upload(const void* field_data, Key field);
     private:
         void allocate_memory(std::size_t size);
-        void add_field(std::size_t index, const UniformBlockField& field);
-        void set_configured();
+        static std::size_t type_size(unsigned int type);
 
         unsigned int buffer = 0;
+
+        struct UniformBlockField {
+            std::size_t offset = 0;
+            std::size_t size = 0;
+        };
+
+        UniformBlockSpecification specification;
 
         unsigned char* data = nullptr;
         std::size_t size = 0;
 
-        std::unordered_map<std::size_t, UniformBlockField> fields;
+        std::unordered_map<Key, UniformBlockField, KeyHash> fields;
 
         bool configured = false;
 

@@ -110,14 +110,11 @@ void GameScene::on_start() {
     auto shader = ctx->res.shader.load(
         "dragon"_H,
         sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/dragon.vert")),
-        sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/dragon.frag")),
-        std::initializer_list<std::string> {
-            "u_model_matrix",
-            "u_color"
-        },
-        std::initializer_list {
-            ctx->r3d->pstorage.projection_view_uniform_block
-        }
+        sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/dragon.frag"))
+        // std::initializer_list<std::string> {
+        //     "u_model_matrix",
+        //     "u_color"
+        // }
     );
 
     auto mesh = ctx->res.mesh.load(
@@ -152,7 +149,7 @@ void GameScene::on_start() {
     material->add_uniform(sm::Material::Uniform::Vec3, "u_color"_H);
 
     auto material_instance = ctx->res.material_instance.load("dragon"_H, material);
-    material_instance->set_vec3("u_color"_H, glm::vec3(1.0f, 0.0f, 0.0f));
+    material_instance->set_vec3("u_color"_H, glm::vec3(1.0f, 1.0f, 0.0f));
 
     cam_controller = PointCameraController(
         &cam,
@@ -169,9 +166,6 @@ void GameScene::on_start() {
     );
 
     cam_controller.connect_events(ctx);
-
-    // cam.set_projection_matrix(ctx->properties->width, ctx->properties->height, 45.0f, 0.1f, 400.0f);
-    // cam.set_position_orientation(glm::vec3(10.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void GameScene::on_update() {
@@ -180,7 +174,6 @@ void GameScene::on_update() {
     cam_controller.update_friction();
 
     ctx->r3d->capture(cam, cam_controller.get_position());
-    // ctx->r3d->capture(cam, glm::vec3(10.0f, 0.0f, 0.0f));
 
     sm::Renderable board;
     board.vertex_array = ctx->res.vertex_array["dragon"_H];
@@ -188,5 +181,5 @@ void GameScene::on_update() {
     board.material = ctx->res.material_instance["dragon"_H];
     board.scale = 0.7f;
 
-    ctx->r3d->add_renderable(board);
+    // ctx->r3d->add_renderable(board);
 }

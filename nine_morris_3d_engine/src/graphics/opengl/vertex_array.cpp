@@ -42,7 +42,7 @@ namespace sm {
     GlVertexArray::Def& GlVertexArray::Def::add_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout) {
         SM_ASSERT(layout.elements.size() > 0, "Invalid layout");
 
-        glBindBuffer(GL_ARRAY_BUFFER, buffer->buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer->get_id());
 
         std::size_t offset = 0;
 
@@ -76,7 +76,7 @@ namespace sm {
     }
 
     GlVertexArray::Def& GlVertexArray::Def::add_index_buffer(std::shared_ptr<GlIndexBuffer> index_buffer) {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer->buffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer->get_id());
 
         return *this;
     }
