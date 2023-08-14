@@ -68,7 +68,7 @@ namespace sm {
         MaterialInstance(MaterialInstance&&) = delete;
         MaterialInstance& operator=(MaterialInstance&&) = delete;
 
-        void bind();
+        void bind_and_upload();
 
         void set_mat4(Key name, const glm::mat4& matrix);
         void set_int(Key name, int integer);

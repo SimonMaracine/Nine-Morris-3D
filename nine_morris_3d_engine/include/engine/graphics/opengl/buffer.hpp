@@ -59,7 +59,7 @@ namespace sm {
 
     struct UniformBlockSpecification {
         std::string block_name;
-        std::vector<std::string> field_names;
+        std::vector<std::string> uniforms;
         unsigned int binding_index {};
     };
 
@@ -83,7 +83,7 @@ namespace sm {
         void configure(unsigned int shader_program);
 
         void set(const void* field_data, Key field);
-        void upload_all();
+        void upload();
         void set_and_upload(const void* field_data, Key field);
     private:
         void allocate_memory(std::size_t size);

@@ -128,6 +128,7 @@ set(ENGINE_HEADERS
     "include/engine/graphics/light.hpp"
     "include/engine/graphics/material.hpp"
     "include/engine/graphics/post_processing.hpp"
+    "include/engine/graphics/renderable.hpp"
     "include/engine/graphics/texture_data.hpp"
     "include/engine/other/assert.hpp"
     "include/engine/other/camera_controller.hpp"

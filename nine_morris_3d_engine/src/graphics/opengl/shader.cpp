@@ -5,6 +5,7 @@
 #include <optional>
 #include <cstddef>
 #include <utility>
+#include <memory>
 #include <cstring>
 #include <fstream>
 #include <stdexcept>
@@ -18,9 +19,9 @@
 #include "engine/application_base/panic.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
+#include "engine/other/encrypt.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
-#include "engine/other/encrypt.hpp"
 
 namespace sm {
     static std::string get_name_sources(std::string_view vertex_source, std::string_view fragment_source) {
@@ -148,6 +149,14 @@ namespace sm {
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
     }
 
+    void GlShader::add_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer) {
+        uniform_buffer->bind();
+        uniform_buffer->configure(program);  // No problem, if it's already configured
+        GlUniformBuffer::unbind();
+
+        uniform_buffers.push_back(uniform_buffer);
+    }
+
     int GlShader::get_uniform_location(Key name) const {
 #ifdef SM_BUILD_DEBUG
         try {
@@ -162,11 +171,17 @@ namespace sm {
     }
 
     void GlShader::check_and_cache_uniforms() {
-        std::vector<std::string> filtered_uniforms;
-        // TODO filter uniforms
-
         for (const auto& uniform : uniforms) {
-            const GLint location = glGetUniformLocation(program, uniform.c_str());
+            GLint location = 0;
+
+            // Don't touch uniforms that are in blocks
+            for (const auto& block : uniform_blocks) {
+                if (std::find(block.uniforms.cbegin(), block.uniforms.cend(), uniform) != block.uniforms.cend()) {
+                    goto skip_uniform;
+                }
+            }
+
+            location = glGetUniformLocation(program, uniform.c_str());
 
             if (location == -1) {
                 LOG_ERROR("Uniform variable `{}` in program `{}` not found", uniform, name);
@@ -174,11 +189,14 @@ namespace sm {
             }
 
             cache[Key(uniform)] = location;
+
+            skip_uniform:
+            continue;
         }
     }
 
     void GlShader::introspect_program() {
-        // Uniforms
+        // Uniforms stuff
         int uniform_count;
         glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &uniform_count);
 
@@ -186,27 +204,26 @@ namespace sm {
 
         for (unsigned int i = 0; i < static_cast<unsigned int>(uniform_count); i++) {
             char buffer[64];
-            int size;
-            glGetProgramResourceName(program, GL_UNIFORM, i, 64, &size, buffer);
+            glGetProgramResourceName(program, GL_UNIFORM, i, 64, nullptr, buffer);
 
             uniforms.push_back(buffer);
         }
 
-        // Uniform blocks
+        // Uniform blocks stuff
         int uniform_block_count;
         glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &uniform_block_count);
 
         uniform_blocks.reserve(uniform_block_count);
 
         for (unsigned int i = 0; i < static_cast<unsigned int>(uniform_block_count); i++) {
-            UniformBlock block;
-            std::size_t active_uniforms_count = 0;
+            UniformBlockSpecification block;
+            std::size_t block_active_uniforms_count = 0;
 
             {
                 char buffer[64];
                 glGetProgramResourceName(program, GL_UNIFORM_BLOCK, i, 64, nullptr, buffer);
 
-                block.name = buffer;
+                block.block_name = buffer;
             }
 
             {
@@ -215,29 +232,27 @@ namespace sm {
                 glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, i, 2, properties, 2, nullptr, buffer);
 
                 block.binding_index = static_cast<unsigned int>(buffer[0]);
-                active_uniforms_count = static_cast<std::size_t>(buffer[1]);
-                uniforms_in_blocks.reserve(active_uniforms_count);
+                block_active_uniforms_count = static_cast<std::size_t>(buffer[1]);
+                block.uniforms.reserve(block_active_uniforms_count);
             }
 
             {
-                int* buffer = new int[active_uniforms_count];
+                int* buffer_uniforms = new int[block_active_uniforms_count];
                 const GLenum properties[] = { GL_ACTIVE_VARIABLES };
-                glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, i, 1, properties, active_uniforms_count, nullptr, buffer);
+                glGetProgramResourceiv(
+                    program, GL_UNIFORM_BLOCK, i, 1, properties,
+                    block_active_uniforms_count, nullptr, buffer_uniforms
+                );
 
-                for (unsigned int j = 0; j < static_cast<unsigned int>(active_uniforms_count); j++) {
-                    int buffer[3];
-                    const GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
-                    glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, buffer[j], 3, properties, 3, nullptr, buffer);
+                for (unsigned int j = 0; j < static_cast<unsigned int>(block_active_uniforms_count); j++) {
+                    char buffer[64];
+                    glGetProgramResourceName(program, GL_UNIFORM, buffer_uniforms[j], 64, nullptr, buffer);
 
-                    {
-                        char buffer[64];
-                        glGetProgramResourceName(program, GL_UNIFORM, buffer[j], 64, nullptr, buffer);
-
-                        uniforms_in_blocks.push_back(buffer);
-                    }
+                    // uniforms_in_blocks.push_back(buffer);
+                    block.uniforms.push_back(buffer);
                 }
 
-                delete[] buffer;
+                delete[] buffer_uniforms;
             }
 
             uniform_blocks.push_back(block);

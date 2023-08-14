@@ -7,6 +7,7 @@
 #include <optional>
 #include <cstddef>
 #include <utility>
+#include <memory>
 
 #include <glm/glm.hpp>
 #include <cppblowfish/cppblowfish.hpp>
@@ -16,6 +17,8 @@
 #include "engine/other/encrypt.hpp"
 
 namespace sm {
+    class Renderer;
+
     class GlShader {
     public:
         using Key = resmanager::HashedStr64;
@@ -40,7 +43,10 @@ namespace sm {
         void upload_uniform_vec3(Key name, const glm::vec3& vector);
         void upload_uniform_vec4(Key name, const glm::vec4& vector);
 
+        unsigned int get_id() { return program; }
         std::string_view get_name() { return name; }
+
+        void add_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
     private:
         int get_uniform_location(Key name) const;
         void check_and_cache_uniforms();
@@ -64,13 +70,12 @@ namespace sm {
         std::unordered_map<Key, int, KeyHash> cache;
 
         // Data from introspection
-        struct UniformBlock {
-            std::string name;
-            unsigned int binding_index {};
-        };
-
         std::vector<std::string> uniforms;
-        std::vector<UniformBlock> uniform_blocks;
-        std::vector<std::string> uniforms_in_blocks;
+        std::vector<UniformBlockSpecification> uniform_blocks;
+
+        // Shaders own uniform buffers
+        std::vector<std::shared_ptr<GlUniformBuffer>> uniform_buffers;
+
+        friend class Renderer;
     };
 }

@@ -123,6 +123,8 @@ namespace sm {
 
         on_start(current_scene);
 
+        ctx.r3d->prerender_setup();
+
         ctx.window->show();
         LOG_INFO("Initialized application, entering main loop...");
 
@@ -153,7 +155,8 @@ namespace sm {
         LOG_INFO("Closing application...");
 
         current_scene->on_stop();
-        current_scene->objects_on_stop();
+
+        ctx.r3d->postrender_setup();
 
         user_stop_function();
 
@@ -215,11 +218,17 @@ namespace sm {
     void Application::check_changed_scene() {
         if (changed_scene) {
             current_scene->on_stop();
-            current_scene->objects_on_stop();
 
+            ctx.r3d->postrender_setup();
+
+            // Initialize the new scene
             current_scene = to_scene;
-
             on_start(current_scene);
+
+            // Clear all cached resources
+            ctx.res = {};
+
+            ctx.r3d->prerender_setup();
 
             changed_scene = false;
         }

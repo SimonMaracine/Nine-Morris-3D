@@ -51,7 +51,7 @@ namespace sm {
             scenes.push_back(std::make_unique<S>());
         }
 
-        void set_start_function(const UserFunc& start);
+        void set_start_function(const UserFunc& start);  // TODO change
         void set_stop_function(const UserFunc& stop);
 
         // API accessible to the user

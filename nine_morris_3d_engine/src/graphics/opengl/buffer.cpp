@@ -150,7 +150,7 @@ namespace sm {
             panic();
         }
 
-        // If it's already configured, skip everything else
+        // If it's already configured, return
         if (configured) {
             return;
         }
@@ -165,7 +165,7 @@ namespace sm {
         // Link uniform buffer to binding index
         glBindBufferBase(GL_UNIFORM_BUFFER, specification.binding_index, buffer);
 
-        const std::size_t field_count = specification.field_names.size();
+        const std::size_t field_count = specification.uniforms.size();
         static constexpr std::size_t MAX_FIELD_COUNT = 8;
 
         SM_ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 8 fields for now");
@@ -179,7 +179,7 @@ namespace sm {
         const char* field_names[MAX_FIELD_COUNT];
 
         for (std::size_t i = 0; i < field_count; i++) {
-            field_names[i] = specification.field_names[i].c_str();
+            field_names[i] = specification.uniforms[i].c_str();
         }
 
         // Get uniform indices just to later get offsets, sizes and types
@@ -220,7 +220,7 @@ namespace sm {
         std::memcpy(data + fields.at(field).offset, field_data, fields.at(field).size);
     }
 
-    void GlUniformBuffer::upload_all() {
+    void GlUniformBuffer::upload() {
         SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);

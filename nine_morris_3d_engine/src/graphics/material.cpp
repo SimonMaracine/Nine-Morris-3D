@@ -133,7 +133,7 @@ namespace sm {
         LOG_DEBUG("Deleted material instance");
     }
 
-    void MaterialInstance::bind() {
+    void MaterialInstance::bind_and_upload() {
         shader->bind();
 
         for (const auto& [name, element] : offsets) {

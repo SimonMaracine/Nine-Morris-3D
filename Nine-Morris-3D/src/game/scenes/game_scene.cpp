@@ -111,11 +111,9 @@ void GameScene::on_start() {
         "dragon"_H,
         sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/dragon.vert")),
         sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/dragon.frag"))
-        // std::initializer_list<std::string> {
-        //     "u_model_matrix",
-        //     "u_color"
-        // }
     );
+
+    ctx->r3d->scene_acknowledge_shader(shader);
 
     auto mesh = ctx->res.mesh.load(
         "dragon"_H,
@@ -181,5 +179,5 @@ void GameScene::on_update() {
     board.material = ctx->res.material_instance["dragon"_H];
     board.scale = 0.7f;
 
-    // ctx->r3d->add_renderable(board);
+    ctx->r3d->add_renderable(board);
 }

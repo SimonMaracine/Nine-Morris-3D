@@ -64,5 +64,6 @@ namespace sm {
         resmanager::Cache<MusicTrack> music_track;
 
         void merge(ResourcesCache& other);
+        void merge_replace(ResourcesCache& other);
     };
 }

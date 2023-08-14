@@ -8,16 +8,19 @@
 #include "engine/graphics/opengl/vertex_array.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
+#include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
 #include "engine/graphics/renderer/render_gl.hpp"
-#include "engine/graphics/material.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/camera.hpp"
+#include "engine/graphics/renderable.hpp"
 #include "engine/other/file_system.hpp"
 
 using namespace resmanager::literals;
 
 namespace sm {
+    static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING = 0;
+
     Renderer::Renderer(int width, int height) {
         RenderGl::enable_depth_test();
 
@@ -40,20 +43,9 @@ namespace sm {
         }
 
         {
-            UniformBlockSpecification specification;
-
-            specification.block_name = "ProjectionView";
-            specification.field_names = { "u_projection_view_matrix" };
-            specification.binding_index = 0;
-
-            storage.projection_view_uniform_buffer = std::make_shared<GlUniformBuffer>(specification);
-        }
-
-        {
             storage.screen_quad_shader = std::make_shared<GlShader>(
                 Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.vert")),
                 Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.frag"))
-                // std::initializer_list<std::string> { "u_screen_texture" }  // FIXME use introspection
             );
 
             const float vertices[] = {
@@ -92,17 +84,33 @@ namespace sm {
         this->camera.position = position;
     }
 
-    void Renderer::acknowledge_shader(std::shared_ptr<GlShader> shader) {
-        // storage.projection_view_uniform_buffer->configure()
+    void Renderer::scene_acknowledge_shader(std::shared_ptr<GlShader> shader) {
+        scene_data.shaders.push_back(shader);
     }
 
     void Renderer::render(int width, int height) {
         // TODO pre-render setup
 
-        // storage.projection_view_uniform_buffer->set(&camera.projection_view_matrix, "u_projection_view_matrix"_H);
-        // storage.projection_view_uniform_buffer->bind();
-        // storage.projection_view_uniform_buffer->upload_all();
-        // GlUniformBuffer::unbind();
+        {
+            auto uniform_buffer = storage.projection_view_uniform_buffer.lock();
+
+            if (uniform_buffer != nullptr) {
+                uniform_buffer->set(&camera.projection_view_matrix, "u_projection_view_matrix"_H);
+            }
+        }
+
+        for (std::weak_ptr<GlUniformBuffer> wuniform_buffer : storage.uniform_buffers) {
+            std::shared_ptr<GlUniformBuffer> uniform_buffer = wuniform_buffer.lock();
+
+            if (uniform_buffer == nullptr) {
+                continue;
+            }
+
+            uniform_buffer->bind();
+            uniform_buffer->upload();
+        }
+
+        GlUniformBuffer::unbind();
 
         // TODO draw to depth buffer for shadows
 
@@ -121,6 +129,31 @@ namespace sm {
         end_rendering();
 
         scene_list.clear();
+    }
+
+    void Renderer::prerender_setup() {
+        for (std::weak_ptr<GlShader> wshader : scene_data.shaders) {
+            std::shared_ptr<GlShader> shader = wshader.lock();
+
+            if (shader == nullptr) {
+                continue;
+            }
+
+            for (const UniformBlockSpecification& block : shader->uniform_blocks) {
+                auto uniform_buffer = std::make_shared<GlUniformBuffer>(block);
+                shader->add_uniform_buffer(uniform_buffer);
+
+                storage.uniform_buffers.push_back(uniform_buffer);
+
+                if (block.binding_index == PROJECTON_VIEW_UNIFORM_BLOCK_BINDING) {
+                    storage.projection_view_uniform_buffer = uniform_buffer;
+                }
+            }
+        }
+    }
+
+    void Renderer::postrender_setup() {
+        scene_data.shaders.clear();
     }
 
     void Renderer::draw_screen_quad(unsigned int texture) {
@@ -175,7 +208,7 @@ namespace sm {
         matrix = glm::scale(matrix, glm::vec3(renderable.scale));
 
         renderable.vertex_array->bind();
-        renderable.material->bind();
+        renderable.material->bind_and_upload();
 
         renderable.material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
