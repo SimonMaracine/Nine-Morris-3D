@@ -23,7 +23,6 @@
     const ApplicationProperties* VARIABLE = ( \
         static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window)) \
     );
-#define WITH_DEAR_IMGUI() (data->application->with_dear_imgui)
 
 namespace sm {
     Window::Window(Application* application) {
@@ -247,7 +246,7 @@ namespace sm {
 
             switch (action) {
                 case GLFW_PRESS: {
-                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_key_pressed(key, scancode)) {
+                    if (ImGuiContext::on_key_pressed(key, scancode)) {
                         return;
                     }
 
@@ -259,7 +258,7 @@ namespace sm {
                     break;
                 }
                 case GLFW_RELEASE: {
-                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_key_released(key, scancode)) {
+                    if (ImGuiContext::on_key_released(key, scancode)) {
                         return;
                     }
 
@@ -267,7 +266,7 @@ namespace sm {
                     break;
                 }
                 case GLFW_REPEAT: {
-                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_key_pressed(key, scancode)) {
+                    if (ImGuiContext::on_key_pressed(key, scancode)) {
                         return;
                     }
 
@@ -281,10 +280,8 @@ namespace sm {
             }
         });
 
-        glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int codepoint) {
-            APPLICATION_DATA(data)
-
-            if (WITH_DEAR_IMGUI() && ImGuiContext::on_char_typed(codepoint)) {
+        glfwSetCharCallback(window, [](GLFWwindow*, unsigned int codepoint) {
+            if (ImGuiContext::on_char_typed(codepoint)) {
                 return;
             }
 
@@ -296,7 +293,7 @@ namespace sm {
 
             switch (action) {
                 case GLFW_PRESS: {
-                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_mouse_button_pressed(button)) {
+                    if (ImGuiContext::on_mouse_button_pressed(button)) {
                         return;
                     }
 
@@ -304,7 +301,7 @@ namespace sm {
                     break;
                 }
                 case GLFW_RELEASE: {
-                    if (WITH_DEAR_IMGUI() && ImGuiContext::on_mouse_button_released(button)) {
+                    if (ImGuiContext::on_mouse_button_released(button)) {
                         return;
                     }
 
@@ -317,7 +314,7 @@ namespace sm {
         glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
             APPLICATION_DATA(data)
 
-            if (WITH_DEAR_IMGUI() && ImGuiContext::on_mouse_scrolled(static_cast<float>(yoffset))) {
+            if (ImGuiContext::on_mouse_scrolled(static_cast<float>(yoffset))) {
                 return;
             }
 
@@ -327,7 +324,7 @@ namespace sm {
         glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
             APPLICATION_DATA(data)
 
-            if (WITH_DEAR_IMGUI() && ImGuiContext::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
+            if (ImGuiContext::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
                 return;
             }
 

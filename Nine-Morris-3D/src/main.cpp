@@ -73,10 +73,7 @@ void application_main() {
                 .display_min_resolution(512, 288)
                 .application_name(APP_NAME)
                 .version(MAJOR, MINOR, PATCH)
-                .encrypt_key(KEY)
-                .with_renderer(sm::ApplicationBuilder::Renderer3D)
-                .with_renderer(sm::ApplicationBuilder::Renderer2D);
-                // .with_dear_imgui()
+                .encrypt_key(KEY);
                 // .with_audio()
                 // .with_random_generator();
 

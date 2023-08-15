@@ -21,7 +21,7 @@
 namespace sm {
     struct ResourcesCache {
         resmanager::Cache<GlTexture> texture;
-        resmanager::Cache<GlTexture3D> texture_3d;
+        resmanager::Cache<GlTextureCubemap> texture_3d;
         resmanager::Cache<GlVertexArray> vertex_array;
         resmanager::Cache<GlShader> shader;
         resmanager::Cache<GlVertexBuffer> vertex_buffer;

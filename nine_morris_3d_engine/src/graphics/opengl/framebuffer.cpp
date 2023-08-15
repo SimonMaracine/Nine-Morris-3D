@@ -204,7 +204,7 @@ namespace sm {
         LOG_DEBUG("Deleted GL framebuffer {}", framebuffer);
     }
 
-    void GlFramebuffer::bind() {
+    void GlFramebuffer::bind() const {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     }
 
@@ -212,13 +212,13 @@ namespace sm {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    unsigned int GlFramebuffer::get_color_attachment(int attachment_index) {
+    unsigned int GlFramebuffer::get_color_attachment(int attachment_index) const {
         SM_ASSERT(static_cast<std::size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
         return color_attachments[attachment_index];
     }
 
-    unsigned int GlFramebuffer::get_depth_attachment() {
+    unsigned int GlFramebuffer::get_depth_attachment() const {
         return depth_attachment;
     }
 
@@ -234,7 +234,7 @@ namespace sm {
         build();
     }
 
-    float GlFramebuffer::read_pixel_float(int attachment_index, int x, int y) {
+    float GlFramebuffer::read_pixel_float(int attachment_index, int x, int y) const {
         SM_ASSERT(static_cast<std::size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -244,18 +244,18 @@ namespace sm {
         return pixel;
     }
 
-    void GlFramebuffer::read_pixel_float_pbo(int attachment_index, int x, int y) {
+    void GlFramebuffer::read_pixel_float_pbo(int attachment_index, int x, int y) const {
         SM_ASSERT(static_cast<std::size_t>(attachment_index) < color_attachments.size(), "Invalid color attachment");
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
     }
 
-    void GlFramebuffer::clear_color_attachment_float() {  // TODO right now not used
+    void GlFramebuffer::clear_color_attachment_float() const {  // TODO right now not used
         glClearBufferfv(GL_COLOR, specification.clear_drawbuffer, specification.color_clear_value);
     }
 
-    void GlFramebuffer::blit(GlFramebuffer* draw_framebuffer, int width, int height) {
+    void GlFramebuffer::blit(const GlFramebuffer* draw_framebuffer, int width, int height) const {
         SM_ASSERT(
             color_attachments.size() == draw_framebuffer->color_attachments.size(),
             "Framebuffers must have the same attachments"

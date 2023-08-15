@@ -10,10 +10,10 @@
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/tasks.hpp"
 #include "engine/audio/context.hpp"
-#include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
 #include "engine/graphics/renderer/gui_renderer.hpp"
 #include "engine/graphics/identifier.hpp"
+#include "engine/graphics/screen.hpp"
 #include "engine/other/resource_manager.hpp"
 #include "engine/other/random_gen.hpp"
 #include "engine/other/encrypt.hpp"
@@ -24,7 +24,7 @@ namespace sm {
     class Scene;
 
     /*
-        Wrapper struct around public functionality exposed to user.
+        Wrapper struct around public functionality exposed to user
     */
     class Ctx {
     public:
@@ -41,10 +41,6 @@ namespace sm {
         void change_scene(SceneId id);
         const Scene* get_current_scene();
 
-        // Framebuffer management functions
-        void add_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);  // TODO better way?
-        void purge_framebuffers();
-
         // Helper function
         template<typename T>
         T& data() {
@@ -59,7 +55,7 @@ namespace sm {
         void* user_data = nullptr;  // Arbitrary data defined by the user
         const ApplicationProperties* properties = nullptr;  // Ctx data like window width and height
 
-        std::unique_ptr<Window> window;  // One of the last object destroyed in an application instance
+        std::unique_ptr<Window> win;  // One of the last objects destroyed in an application instance
         std::unique_ptr<OpenAlContext> snd;  // Sound context
         std::unique_ptr<Renderer> r3d;  // 3D renderer
         // std::unique_ptr<GuiRenderer> r2d;  // 2D renderer
@@ -69,6 +65,7 @@ namespace sm {
         ResourcesCache res;  // Global cache of resources
         Identifier idt;  // Generator of IDs
         TaskManager tsk;  // Manager of general purpose procedures
+        Screen scr;  // Manages framebuffers and screen area
     private:
         Application* application = nullptr;
 

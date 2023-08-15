@@ -66,13 +66,10 @@ namespace sm {
         properties.application = this;
         properties.ctx = &ctx;
 
-        ctx.window = std::make_unique<Window>(this);
-        ctx.inp.window_handle = ctx.window->get_handle();
+        ctx.win = std::make_unique<Window>(this);
+        ctx.inp.window_handle = ctx.win->get_handle();
 
-        if (builder.dear_imgui) {
-            initialize_dear_imgui();
-            with_dear_imgui = true;
-        }
+        ImGuiContext::initialize(ctx.win->get_handle());
 
 #ifndef SM_BUILD_DISTRIBUTION
         Logging::log_general_information(Logging::LogTarget::Console);
@@ -85,13 +82,9 @@ namespace sm {
         const auto [version_major, version_minor] = GlInfoDebug::get_version_number();
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
-        if (builder.renderer_3d) {
-            initialize_r3d();
-        }
+        ctx.r3d = std::make_unique<Renderer>(ctx.scr, properties.width, properties.height);
 
-        if (builder.renderer_2d) {
-            initialize_r2d();
-        }
+        // ctx.r2d = std::make_unique<Renderer2D>(properties.width, properties.height);
 
         if (builder.audio) {
             initialize_audio();
@@ -109,23 +102,17 @@ namespace sm {
     }
 
     Application::~Application() {  // Destructor is called before all member variables
-        if (with_dear_imgui) {
-            ImGuiContext::uninitialize();
-        }
-
+        ImGuiContext::uninitialize();
         MusicPlayer::uninitialize();
     }
 
     int Application::run(SceneId start_scene_id) {
         user_start_function();
-
         prepare_scenes(start_scene_id);
-
         on_start(current_scene);
-
         ctx.r3d->prerender_setup();
 
-        ctx.window->show();
+        ctx.win->show();
         LOG_INFO("Initialized application, entering main loop...");
 
         while (ctx.running) {
@@ -142,11 +129,11 @@ namespace sm {
             // Clear the default framebuffer, as nobody does that for us
             RenderGl::clear(RenderGl::Buffers::C);
 
-            r3d_update();
-            r2d_update();
-            dear_imgui_update();
+            ctx.r3d->render(properties.width, properties.height);
+            // TODO r2d
+            dear_imgui_render();
 
-            ctx.window->update();
+            ctx.win->update();
             ctx.evt.update();
 
             check_changed_scene();
@@ -155,9 +142,8 @@ namespace sm {
         LOG_INFO("Closing application...");
 
         current_scene->on_stop();
-
         ctx.r3d->postrender_setup();
-
+        ctx.scr.clear_framebuffers();
         user_stop_function();
 
         return ctx.exit_code;
@@ -234,11 +220,7 @@ namespace sm {
         }
     }
 
-    void Application::r2d_function() {
-        // ctx.r2d->render(current_scene->scene_list, true);
-    }
-
-    void Application::dear_imgui_function() {
+    void Application::dear_imgui_render() {
         ImGuiContext::begin_frame();
 
         current_scene->on_imgui_update();
@@ -276,31 +258,6 @@ namespace sm {
         stop(&ctx);
     }
 
-    void Application::initialize_r3d() {
-        LOG_INFO("With renderer 3D");
-
-        ctx.r3d = std::make_unique<Renderer>(properties.width, properties.height);
-
-        r3d_update = [this]() {
-            ctx.r3d->render(properties.width, properties.height);
-        };
-    }
-
-    void Application::initialize_r2d() {
-        LOG_INFO("With renderer 2D");
-
-        // ctx.r2d = std::make_unique<GuiRenderer>(&ctx);
-        r2d_update = std::bind(&Application::r2d_function, this);
-    }
-
-    void Application::initialize_dear_imgui() {
-        LOG_INFO("With renderer Dear ImGui");
-
-        ImGuiContext::initialize(ctx.window->get_handle());
-
-        dear_imgui_update = std::bind(&Application::dear_imgui_function, this);
-    }
-
     void Application::initialize_audio() {
         LOG_INFO("With audio");
 
@@ -318,24 +275,6 @@ namespace sm {
     }
 
     void Application::on_window_resized(const WindowResizedEvent& event) {
-        if (event.width == 0 || event.height == 0) {
-            return;
-        }
-
-        RenderGl::viewport(event.width, event.height);
-
-        for (std::weak_ptr<GlFramebuffer> framebuffer : framebuffers) {
-            std::shared_ptr<GlFramebuffer> fb = framebuffer.lock();
-
-            if (fb == nullptr) {
-                return;
-            }
-
-            if (!fb->get_specification().resizable) {
-                return;
-            }
-
-            fb->resize(event.width, event.height);
-        }
+        ctx.scr.resize(event.width, event.height);
     }
 }

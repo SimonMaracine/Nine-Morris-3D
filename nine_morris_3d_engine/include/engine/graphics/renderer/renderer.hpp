@@ -9,6 +9,7 @@
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/opengl/shader.hpp"
+#include "engine/graphics/screen.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/renderable.hpp"
@@ -18,7 +19,7 @@ namespace sm {
 
     class Renderer {
     public:
-        Renderer(int width, int height);
+        Renderer(Screen& screen, int width, int height);
         ~Renderer();
 
         Renderer(const Renderer&) = delete;
@@ -31,7 +32,7 @@ namespace sm {
 
         void capture(const Camera& camera, const glm::vec3& position);
 
-        void scene_acknowledge_shader(std::shared_ptr<GlShader> shader);
+        void add_shader(std::shared_ptr<GlShader> shader);
     private:
         void render(int width, int height);
         void prerender_setup();

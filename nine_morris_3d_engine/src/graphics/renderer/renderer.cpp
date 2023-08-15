@@ -11,6 +11,7 @@
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
 #include "engine/graphics/renderer/render_gl.hpp"
+#include "engine/graphics/screen.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/renderable.hpp"
@@ -21,7 +22,7 @@ using namespace resmanager::literals;
 namespace sm {
     static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING = 0;
 
-    Renderer::Renderer(int width, int height) {
+    Renderer::Renderer(Screen& screen, int width, int height) {
         RenderGl::enable_depth_test();
 
         {
@@ -37,9 +38,7 @@ namespace sm {
 
             storage.scene_framebuffer = std::make_shared<GlFramebuffer>(specification);
 
-            // FIXME
-            // ctx->purge_framebuffers();
-            // ctx->add_framebuffer(storage.scene_framebuffer);
+            screen.add_framebuffer(storage.scene_framebuffer);
         }
 
         {
@@ -84,7 +83,7 @@ namespace sm {
         this->camera.position = position;
     }
 
-    void Renderer::scene_acknowledge_shader(std::shared_ptr<GlShader> shader) {
+    void Renderer::add_shader(std::shared_ptr<GlShader> shader) {
         scene_data.shaders.push_back(shader);
     }
 
@@ -125,7 +124,7 @@ namespace sm {
         draw_renderables();
         draw_renderables_outlined();
 
-        // Do post processing and render the final image to the screen
+        // Do post processing and render the final 3D image to the screen
         end_rendering();
 
         scene_list.clear();

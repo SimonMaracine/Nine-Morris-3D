@@ -46,25 +46,6 @@ namespace sm {
         return *this;
     }
 
-    ApplicationBuilder& ApplicationBuilder::with_renderer(Renderer renderer) {
-        switch (renderer) {
-            case Renderer::Renderer3D:
-                renderer_3d = true;
-                break;
-            case Renderer::Renderer2D:
-                renderer_2d = true;
-                break;
-        }
-
-        return *this;
-    }
-
-    ApplicationBuilder& ApplicationBuilder::with_dear_imgui() {
-        dear_imgui = true;
-
-        return *this;
-    }
-
     ApplicationBuilder& ApplicationBuilder::with_audio() {
         audio = true;
 

@@ -7,7 +7,7 @@
 
 namespace sm {
     class GlTexture;
-    class GlTexture3D;
+    class GlTextureCubemap;
 
     class TextureData {
     public:
@@ -35,6 +35,6 @@ namespace sm {
         std::string file_path;
 
         friend class GlTexture;
-        friend class GlTexture3D;
+        friend class GlTextureCubemap;
     };
 }

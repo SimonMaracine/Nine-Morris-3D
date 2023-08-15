@@ -15,6 +15,7 @@
 #include "engine/application_base/capabilities.hpp"
 #include "engine/application_base/panic.hpp"
 #include "engine/graphics/opengl/texture.hpp"
+#include "engine/graphics/texture_data.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
 #include "engine/other/encrypt.hpp"
@@ -244,7 +245,7 @@ namespace sm {
         LOG_DEBUG("Deleted GL texture {} ({})", texture, name);
     }
 
-    void GlTexture::bind(unsigned int unit) {
+    void GlTexture::bind(unsigned int unit) const {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
@@ -253,7 +254,7 @@ namespace sm {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void GlTexture::allocate_texture(int width, int height, unsigned char* data) {
+    void GlTexture::allocate_texture(int width, int height, unsigned char* data) const {
         switch (specification.format) {
             case Format::Rgba8:
                 glTexStorage2D(GL_TEXTURE_2D, specification.mipmap_levels, GL_RGBA8, width, height);
@@ -270,7 +271,7 @@ namespace sm {
 
     // --- 3D texture
 
-    GlTexture3D::GlTexture3D(const char** file_paths) {
+    GlTextureCubemap::GlTextureCubemap(const char** file_paths) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
@@ -310,7 +311,7 @@ namespace sm {
         LOG_DEBUG("Created GL 3D texture {} ({})", texture, name);
     }
 
-    GlTexture3D::GlTexture3D(const std::array<std::shared_ptr<TextureData>, 6>& data) {
+    GlTextureCubemap::GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
@@ -332,18 +333,18 @@ namespace sm {
         LOG_DEBUG("Created GL 3D texture {} ({})", texture, name);
     }
 
-    GlTexture3D::~GlTexture3D() {
+    GlTextureCubemap::~GlTextureCubemap() {
         glDeleteTextures(1, &texture);
 
         LOG_DEBUG("Deleted GL 3D texture {} ({})", texture, name);
     }
 
-    void GlTexture3D::bind(unsigned int unit) {
+    void GlTextureCubemap::bind(unsigned int unit) const {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
     }
 
-    void GlTexture3D::unbind() {
+    void GlTextureCubemap::unbind() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     }
 }

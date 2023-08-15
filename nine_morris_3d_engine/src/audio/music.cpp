@@ -50,7 +50,7 @@ namespace sm {
         source->set_looping(true);
 
         if (data->get_channels() != 2) {
-            LOG_WARNING("MusicPlayer track is not stereo");
+            LOG_WARNING("Music track is not stereo");
         }
     }
 
@@ -72,7 +72,7 @@ namespace sm {
 
     void MusicPlayer::stop_music_track() {
         if (current_music_track == nullptr) {
-            LOG_WARNING("No music track pointer");
+            LOG_WARNING("No music track");
             return;
         }
 
@@ -85,7 +85,7 @@ namespace sm {
 
     void MusicPlayer::pause_music_track() {
         if (current_music_track == nullptr) {
-            LOG_WARNING("No music track pointer");
+            LOG_WARNING("No music track");
             return;
         }
 
@@ -96,7 +96,7 @@ namespace sm {
 
     void MusicPlayer::continue_music_track() {
         if (current_music_track == nullptr) {
-            LOG_WARNING("No music track pointer");
+            LOG_WARNING("No music track");
             return;
         }
 

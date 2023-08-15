@@ -112,7 +112,7 @@ void GameScene::on_start() {
         sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/dragon.frag"))
     );
 
-    ctx->r3d->scene_acknowledge_shader(shader);
+    ctx->r3d->add_shader(shader);
 
     auto mesh = std::make_shared<sm::Mesh>(
         sm::Encrypt::encr(sm::FileSystem::path_assets("models/dragon.obj")),

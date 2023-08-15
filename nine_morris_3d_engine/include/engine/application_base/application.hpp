@@ -12,7 +12,6 @@
 #include "engine/application_base/application_builder.hpp"
 #include "engine/application_base/context.hpp"
 #include "engine/audio/context.hpp"
-#include "engine/graphics/opengl/framebuffer.hpp"  // TODO remove
 #include "engine/graphics/renderer/renderer.hpp"
 #include "engine/graphics/renderer/gui_renderer.hpp"
 #include "engine/other/resource_manager.hpp"
@@ -61,26 +60,22 @@ namespace sm {
         unsigned int calculate_fixed_update();
         void check_changed_scene();
 
-        void r2d_function();
-        void dear_imgui_function();
+        void dear_imgui_render();
 
         void prepare_scenes(SceneId start_scene_id);
         void on_start(Scene* scene);
         void user_start_function();
         void user_stop_function();
-        void initialize_r3d();
-        void initialize_r2d();
-        void initialize_dear_imgui();
         void initialize_audio();
         void initialize_random_generator();
 
         void on_window_closed(const WindowClosedEvent&);
         void on_window_resized(const WindowResizedEvent& event);
 
+        // Properties
         ApplicationProperties properties;
         UserFunc start = [](Ctx*) {};
         UserFunc stop = [](Ctx*) {};
-        bool with_dear_imgui = false;
 
         // Data for the scene system
         std::vector<std::unique_ptr<Scene>> scenes;
@@ -88,14 +83,6 @@ namespace sm {
 
         bool changed_scene = false;  // Flag set when the user requested a scene change
         Scene* to_scene = nullptr;  // Next scene to enter
-
-        // Data for modular rendering
-        RendererFunc r3d_update = []() {};
-        RendererFunc r2d_update = []() {};
-        RendererFunc dear_imgui_update = []() {};
-
-        // Keep track of all framebuffers to resize them, if needed
-        std::vector<std::weak_ptr<GlFramebuffer>> framebuffers;
 
         // Clock variables
         struct {

@@ -58,14 +58,14 @@ namespace sm {
         GlTexture(GlTexture&&) = delete;
         GlTexture& operator=(GlTexture&&) = delete;
 
-        int get_width() { return width; }
-        int get_height() { return height; }
-        unsigned int get_id() { return texture; }
+        int get_width() const { return width; }
+        int get_height() const { return height; }
+        unsigned int get_id() const { return texture; }
 
-        void bind(unsigned int unit);
+        void bind(unsigned int unit) const;
         static void unbind();
     private:
-        void allocate_texture(int width, int height, unsigned char* data);
+        void allocate_texture(int width, int height, unsigned char* data) const;
 
         TextureSpecification specification;
 
@@ -76,18 +76,18 @@ namespace sm {
         std::string name;
     };
 
-    class GlTexture3D {
+    class GlTextureCubemap {
     public:
-        GlTexture3D(const char** file_paths);  // Don't need encrypted version
-        GlTexture3D(const std::array<std::shared_ptr<TextureData>, 6>& data);
-        ~GlTexture3D();
+        GlTextureCubemap(const char** file_paths);  // Don't need encrypted version
+        GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data);
+        ~GlTextureCubemap();
 
-        GlTexture3D(const GlTexture3D&) = delete;
-        GlTexture3D& operator=(const GlTexture3D&) = delete;
-        GlTexture3D(GlTexture3D&&) = delete;
-        GlTexture3D& operator=(GlTexture3D&&) = delete;
+        GlTextureCubemap(const GlTextureCubemap&) = delete;
+        GlTextureCubemap& operator=(const GlTextureCubemap&) = delete;
+        GlTextureCubemap(GlTextureCubemap&&) = delete;
+        GlTextureCubemap& operator=(GlTextureCubemap&&) = delete;
 
-        void bind(unsigned int unit);
+        void bind(unsigned int unit) const;
         static void unbind();
     private:
         unsigned int texture = 0;

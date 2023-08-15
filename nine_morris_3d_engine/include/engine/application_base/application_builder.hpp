@@ -9,19 +9,12 @@ namespace sm {
     */
     class ApplicationBuilder {
     public:
-        enum Renderer {
-            Renderer3D,
-            Renderer2D
-        };
-
         ApplicationBuilder& display(int width, int height, std::string_view title = "Nine Morris 3D Engine");
         ApplicationBuilder& display_flags(bool fullscreen, bool native_resolution, bool resizable);
         ApplicationBuilder& display_min_resolution(int min_width, int min_height);
         ApplicationBuilder& application_name(std::string_view app_name);
         ApplicationBuilder& version(unsigned int major, unsigned int minor, unsigned int patch);
         ApplicationBuilder& encrypt_key(std::string_view encryption_key);
-        ApplicationBuilder& with_renderer(Renderer renderer);
-        ApplicationBuilder& with_dear_imgui();
         ApplicationBuilder& with_audio();
         ApplicationBuilder& with_random_generator();
     private:
@@ -38,9 +31,6 @@ namespace sm {
         unsigned int minor = 1;
         unsigned int patch = 0;
         std::string encryption_key = "Nine Morris 3D Engine";
-        bool renderer_3d = false;
-        bool renderer_2d = false;
-        bool dear_imgui = false;
         bool audio = false;
         bool random_generator = false;
 
