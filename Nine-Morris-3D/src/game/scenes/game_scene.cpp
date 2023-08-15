@@ -107,29 +107,25 @@ void GameScene::on_start() {
     // material_instance->set_float("u_material.shininess"_H, 4.0f);
     // material_instance->set_texture("u_material.normal"_H, normal_texture, 1);
 
-    auto shader = ctx->res.shader.load(
-        "dragon"_H,
+    auto shader = std::make_shared<sm::GlShader>(
         sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/dragon.vert")),
         sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/dragon.frag"))
     );
 
     ctx->r3d->scene_acknowledge_shader(shader);
 
-    auto mesh = ctx->res.mesh.load(
-        "dragon"_H,
-        sm::MeshLoader::P(),
+    auto mesh = std::make_shared<sm::Mesh>(
         sm::Encrypt::encr(sm::FileSystem::path_assets("models/dragon.obj")),
+        sm::Mesh::Type::P,
         true
     );
 
-    auto vertex_buffer = ctx->res.vertex_buffer.load(
-        "dragon"_H,
+    auto vertex_buffer = std::make_shared<sm::GlVertexBuffer>(
         mesh->get_vertices(),
         mesh->get_vertices_size()
     );
 
-    auto index_buffer = ctx->res.index_buffer.load(
-        "dragon"_H,
+    auto index_buffer = std::make_shared<sm::GlIndexBuffer>(
         mesh->get_indices(),
         mesh->get_indices_size()
     );
@@ -138,10 +134,10 @@ void GameScene::on_start() {
     layout.add(0, sm::VertexBufferLayout::Float, 3);
 
     auto vertex_array = ctx->res.vertex_array.load("dragon"_H);
-    vertex_array->begin_definition()
-        .add_buffer(vertex_buffer, layout)
-        .add_index_buffer(index_buffer)
-        .end_definition();
+    vertex_array->bind();
+    vertex_array->add_vertex_buffer(vertex_buffer, layout);
+    vertex_array->add_index_buffer(index_buffer);
+    sm::GlVertexArray::unbind();
 
     auto material = ctx->res.material.load("simple"_H, shader);
     material->add_uniform(sm::Material::Uniform::Vec3, "u_color"_H);
@@ -160,7 +156,7 @@ void GameScene::on_start() {
         glm::vec3(0.0f),
         8.0f,
         47.0f,
-        0.2f
+        0.5f
     );
 
     cam_controller.connect_events(ctx);
@@ -175,9 +171,13 @@ void GameScene::on_update() {
 
     sm::Renderable board;
     board.vertex_array = ctx->res.vertex_array["dragon"_H];
-    board.index_buffer = ctx->res.index_buffer["dragon"_H];
     board.material = ctx->res.material_instance["dragon"_H];
     board.scale = 0.7f;
+
+    ctx->r3d->add_renderable(board);
+
+    board.position = glm::vec3(4.0f, 0.0, 0.0f);
+    board.scale = 0.2f;
 
     ctx->r3d->add_renderable(board);
 }

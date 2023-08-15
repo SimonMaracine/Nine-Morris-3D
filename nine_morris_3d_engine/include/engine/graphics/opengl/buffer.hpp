@@ -25,11 +25,11 @@ namespace sm {
         GlVertexBuffer(GlVertexBuffer&&) = delete;
         GlVertexBuffer& operator=(GlVertexBuffer&&) = delete;
 
-        void bind();
+        void bind() const;
         static void unbind();
 
-        void upload_data(const void* data, std::size_t size);
-        void upload_sub_data(const void* data, std::size_t offset, std::size_t size);
+        void upload_data(const void* data, std::size_t size) const;
+        void upload_sub_data(const void* data, std::size_t offset, std::size_t size) const;
 
         unsigned int get_id() const { return buffer; }
     private:
@@ -47,11 +47,11 @@ namespace sm {
         GlIndexBuffer(GlIndexBuffer&&) = delete;
         GlIndexBuffer& operator=(GlIndexBuffer&&) = delete;
 
-        void bind();
+        void bind() const;
         static void unbind();
 
         unsigned int get_id() const { return buffer; }
-        int get_index_count() { return index_count; }
+        int get_index_count() const { return index_count; }
     private:
         unsigned int buffer = 0;
         int index_count = 0;
@@ -76,14 +76,14 @@ namespace sm {
         GlUniformBuffer(GlUniformBuffer&&) = delete;
         GlUniformBuffer& operator=(GlUniformBuffer&&) = delete;
 
-        void bind();
+        void bind() const;
         static void unbind();
 
         bool is_configured() const { return configured; }
         void configure(unsigned int shader_program);
 
         void set(const void* field_data, Key field);
-        void upload();
+        void upload() const;
         void set_and_upload(const void* field_data, Key field);
     private:
         void allocate_memory(std::size_t size);
@@ -118,11 +118,11 @@ namespace sm {
         GlPixelBuffer(GlPixelBuffer&&) = delete;
         GlPixelBuffer& operator=(GlPixelBuffer&&) = delete;
 
-        void bind();
+        void bind() const;
         static void unbind();
 
         void map_data();
-        void unmap_data();
+        void unmap_data() const;
 
         template<typename T>
         void get_data(T** data_out) {

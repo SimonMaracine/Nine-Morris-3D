@@ -63,9 +63,9 @@ namespace sm {
             layout.add(0, VertexBufferLayout::Float, 2);
 
             storage.screen_quad_vertex_array = std::make_shared<GlVertexArray>();
-            storage.screen_quad_vertex_array->begin_definition()
-                .add_buffer(storage.screen_quad_vertex_buffer, layout)
-                .end_definition();
+            storage.screen_quad_vertex_array->bind();
+            storage.screen_quad_vertex_array->add_vertex_buffer(storage.screen_quad_vertex_buffer, layout);
+            GlVertexArray::unbind();
         }
     }
 
@@ -195,8 +195,7 @@ namespace sm {
             draw_renderable(renderable);
         }
 
-        // Don't unbind for every renderable
-        GlVertexArray::unbind();
+        GlVertexArray::unbind();  // Don't unbind for every renderable
     }
 
     void Renderer::draw_renderable(const Renderable& renderable) {
@@ -212,7 +211,7 @@ namespace sm {
 
         renderable.material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
-        RenderGl::draw_elements(renderable.index_buffer->get_index_count());
+        RenderGl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
     }
 
     void Renderer::draw_renderables_outlined() {

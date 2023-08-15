@@ -111,7 +111,7 @@ namespace sm {
         LOG_DEBUG("Deleted GL shader {} ({})", program, name);
     }
 
-    void GlShader::bind() {
+    void GlShader::bind() const {
         glUseProgram(program);
     }
 
@@ -119,32 +119,32 @@ namespace sm {
         glUseProgram(0);
     }
 
-    void GlShader::upload_uniform_mat4(Key name, const glm::mat4& matrix) {
+    void GlShader::upload_uniform_mat4(Key name, const glm::mat4& matrix) const {
         const GLint location = get_uniform_location(name);
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
-    void GlShader::upload_uniform_int(Key name, int value) {
+    void GlShader::upload_uniform_int(Key name, int value) const {
         const GLint location = get_uniform_location(name);
         glUniform1i(location, value);
     }
 
-    void GlShader::upload_uniform_float(Key name, float value) {
+    void GlShader::upload_uniform_float(Key name, float value) const {
         const GLint location = get_uniform_location(name);
         glUniform1f(location, value);
     }
 
-    void GlShader::upload_uniform_vec2(Key name, glm::vec2 vector) {
+    void GlShader::upload_uniform_vec2(Key name, glm::vec2 vector) const {
         const GLint location = get_uniform_location(name);
         glUniform2f(location, vector.x, vector.y);
     }
 
-    void GlShader::upload_uniform_vec3(Key name, const glm::vec3& vector) {
+    void GlShader::upload_uniform_vec3(Key name, const glm::vec3& vector) const {
         const GLint location = get_uniform_location(name);
         glUniform3f(location, vector.x, vector.y, vector.z);
     }
 
-    void GlShader::upload_uniform_vec4(Key name, const glm::vec4& vector) {
+    void GlShader::upload_uniform_vec4(Key name, const glm::vec4& vector) const {
         const GLint location = get_uniform_location(name);
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
     }
@@ -259,7 +259,7 @@ namespace sm {
         }
     }
 
-    unsigned int GlShader::create_program() {
+    unsigned int GlShader::create_program() const {
         SM_ASSERT(vertex_shader, "Invalid shader");
         SM_ASSERT(fragment_shader, "Invalid shader");
 
@@ -284,7 +284,7 @@ namespace sm {
         fragment_shader = 0;
     }
 
-    std::optional<unsigned int> GlShader::compile_shader(std::string_view source_path, unsigned int type) {
+    std::optional<unsigned int> GlShader::compile_shader(std::string_view source_path, unsigned int type) const {
         std::ifstream file {std::string(source_path), std::ios::binary};
 
         if (!file.is_open()) {
@@ -316,7 +316,7 @@ namespace sm {
         return std::make_optional(shader);
     }
 
-    std::optional<unsigned int> GlShader::compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) {
+    std::optional<unsigned int> GlShader::compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const {
         const GLuint shader = glCreateShader(type);
 
         const char* buffer = reinterpret_cast<const char*>(source_buffer.first);  // It is safe
@@ -333,7 +333,7 @@ namespace sm {
         return std::make_optional(shader);
     }
 
-    bool GlShader::check_compilation(unsigned int shader, unsigned int type) {
+    bool GlShader::check_compilation(unsigned int shader, unsigned int type) const {
         GLint compile_status;
         glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 
@@ -364,7 +364,7 @@ namespace sm {
         return true;
     }
 
-    bool GlShader::check_linking(unsigned int program) {
+    bool GlShader::check_linking(unsigned int program) const {
         GLint link_status;
         glGetProgramiv(program, GL_LINK_STATUS, &link_status);
 

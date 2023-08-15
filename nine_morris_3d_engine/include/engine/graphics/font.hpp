@@ -6,7 +6,6 @@
 #include <utility>
 #include <unordered_map>
 #include <string>
-#include <cstdint>
 #include <cstddef>
 
 #include <stb_truetype.h>
@@ -17,12 +16,6 @@
 
 namespace sm {
     class Font {
-    private:
-        struct Glyph {
-            float s0, t0, s1, t1;
-            int width, height;
-            int xoff, yoff, xadvance;
-        };
     public:
         Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
             int pixel_dist_scale, int bitmap_size);
@@ -37,8 +30,8 @@ namespace sm {
 
         unsigned int get_bitmap_size() const { return static_cast<unsigned int>(bitmap_size); }
 
-        GlVertexArray* get_vertex_array() const { return vertex_array.get(); }
-        GlTexture* get_bitmap() const { return bitmap_image.get(); }
+        const GlVertexArray* get_vertex_array() const { return vertex_array.get(); }
+        const GlTexture* get_bitmap() const { return bitmap_image.get(); }
         int get_vertex_count() const { return vertex_count; }
 
         // Baking API
@@ -55,6 +48,12 @@ namespace sm {
         // Get width and height of a line of text
         std::pair<int, int> get_string_size(std::string_view string, float scale) const;
     private:
+        struct Glyph {
+            float s0, t0, s1, t1;
+            int width, height;
+            int xoff, yoff, xadvance;
+        };
+
         void initialize();
         void try_bake_character(int codepoint, int descent);
         const Glyph& get_character_glyph(char32_t character) const;
@@ -78,11 +77,12 @@ namespace sm {
 
         std::string name;
 
+        // Fonts own vertex arrays and bitmap textures
+        std::shared_ptr<GlVertexArray> vertex_array;
         std::shared_ptr<GlTexture> bitmap_image;
 
-        // Store references to vertex array and buffer
-        std::shared_ptr<GlVertexArray> vertex_array;
-        std::shared_ptr<GlVertexBuffer> buffer;
+        std::weak_ptr<GlVertexBuffer> buffer;
+
         int vertex_count = 0;
     };
 }

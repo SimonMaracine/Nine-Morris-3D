@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <string_view>
-#include <memory>
 
 #include <glm/glm.hpp>
 
@@ -11,7 +10,14 @@
 namespace sm {
     class Mesh {
     public:
-        Mesh(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
+        enum class Type {
+            PTN,
+            P,
+            PTNT
+        };
+
+        Mesh(std::string_view file_path, Type type, bool flip_winding = false);
+        Mesh(Encrypt::EncryptedFile file_path, Type type, bool flip_winding = false);
         ~Mesh();
 
         Mesh(const Mesh&) = delete;
@@ -24,20 +30,12 @@ namespace sm {
         std::size_t get_vertices_size() const { return vertices_size; }
         std::size_t get_indices_size() const { return indices_size; }
     private:
+        void load(Type type, const void* pmesh, std::string_view file_path);
+        void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
+
         unsigned char* vertices = nullptr;
         unsigned int* indices = nullptr;
         std::size_t vertices_size = 0;
         std::size_t indices_size = 0;
-    };
-
-    struct Meshes {
-        static std::shared_ptr<Mesh> load_model_PTN(std::string_view file_path, bool flip_winding = false);
-        static std::shared_ptr<Mesh> load_model_PTN(Encrypt::EncryptedFile file_path, bool flip_winding = false);
-
-        static std::shared_ptr<Mesh> load_model_P(std::string_view file_path, bool flip_winding = false);
-        static std::shared_ptr<Mesh> load_model_P(Encrypt::EncryptedFile file_path, bool flip_winding = false);
-
-        static std::shared_ptr<Mesh> load_model_PTNT(std::string_view file_path, bool flip_winding = false);
-        static std::shared_ptr<Mesh> load_model_PTNT(Encrypt::EncryptedFile file_path, bool flip_winding = false);
     };
 }

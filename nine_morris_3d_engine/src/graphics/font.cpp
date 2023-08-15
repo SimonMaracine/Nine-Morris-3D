@@ -5,7 +5,6 @@
 #include <fstream>
 #include <string>
 #include <cstddef>
-#include <cstdint>
 #include <algorithm>
 
 #include <stb_truetype.h>
@@ -96,9 +95,9 @@ namespace sm {
     }
 
     void Font::update_data(const float* data, std::size_t size) {
-        buffer->bind();
-        buffer->upload_data(data, size);
-
+        auto vertex_buffer = buffer.lock();  // Should be valid
+        vertex_buffer->bind();
+        vertex_buffer->upload_data(data, size);
         GlVertexBuffer::unbind();
 
         static constexpr std::size_t FLOATS_PER_VERTEX = 4;
@@ -116,9 +115,9 @@ namespace sm {
 
         const std::size_t SIZE = sizeof(unsigned char) * bitmap_size * bitmap_size;
 
-        bake_context = BakeContext {};
+        bake_context = {};
         bake_context.bitmap = new unsigned char[SIZE];
-        memset(bake_context.bitmap, 0, SIZE);
+        std::memset(bake_context.bitmap, 0, SIZE);
 
         glyphs.clear();
 
@@ -240,16 +239,18 @@ namespace sm {
     }
 
     void Font::initialize() {
-        buffer = std::make_shared<GlVertexBuffer>(DrawHint::Stream);
+        auto vertex_buffer = std::make_shared<GlVertexBuffer>(DrawHint::Stream);
 
-        VertexBufferLayout layout = VertexBufferLayout()
-            .add(0, VertexBufferLayout::Float, 2)
-            .add(1, VertexBufferLayout::Float, 2);
+        VertexBufferLayout layout;
+        layout.add(0, VertexBufferLayout::Float, 2);
+        layout.add(1, VertexBufferLayout::Float, 2);
 
         vertex_array = std::make_shared<GlVertexArray>();
-        vertex_array->begin_definition()
-            .add_buffer(buffer, layout)
-            .end_definition();
+        vertex_array->bind();
+        vertex_array->add_vertex_buffer(vertex_buffer, layout);
+        GlVertexArray::unbind();
+
+        buffer = vertex_buffer;
     }
 
     void Font::try_bake_character(int codepoint, int descent) {

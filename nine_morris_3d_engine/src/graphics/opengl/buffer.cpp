@@ -68,7 +68,7 @@ namespace sm {
         LOG_DEBUG("Deleted GL vertex buffer {}", buffer);
     }
 
-    void GlVertexBuffer::bind() {
+    void GlVertexBuffer::bind() const {
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
     }
 
@@ -76,11 +76,11 @@ namespace sm {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void GlVertexBuffer::upload_data(const void* data, std::size_t size) {
+    void GlVertexBuffer::upload_data(const void* data, std::size_t size) const {
         glBufferData(GL_ARRAY_BUFFER, size, data, draw_hint_to_int(hint));
     }
 
-    void GlVertexBuffer::upload_sub_data(const void* data, std::size_t offset, std::size_t size) {
+    void GlVertexBuffer::upload_sub_data(const void* data, std::size_t offset, std::size_t size) const {
         glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
     }
 
@@ -106,7 +106,7 @@ namespace sm {
         LOG_DEBUG("Deleted GL index buffer {}", buffer);
     }
 
-    void GlIndexBuffer::bind() {
+    void GlIndexBuffer::bind() const {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
     }
 
@@ -134,7 +134,7 @@ namespace sm {
         LOG_DEBUG("Deleted GL uniform buffer {}", buffer);
     }
 
-    void GlUniformBuffer::bind() {
+    void GlUniformBuffer::bind() const {
         glBindBuffer(GL_UNIFORM_BUFFER, buffer);
     }
 
@@ -220,7 +220,7 @@ namespace sm {
         std::memcpy(data + fields.at(field).offset, field_data, fields.at(field).size);
     }
 
-    void GlUniformBuffer::upload() {
+    void GlUniformBuffer::upload() const {
         SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
@@ -287,7 +287,7 @@ namespace sm {
         LOG_DEBUG("Deleted GL pixel buffer {}", buffer);
     }
 
-    void GlPixelBuffer::bind() {
+    void GlPixelBuffer::bind() const {
         glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
     }
 
@@ -305,7 +305,7 @@ namespace sm {
         }
     }
 
-    void GlPixelBuffer::unmap_data() {
+    void GlPixelBuffer::unmap_data() const {
         const GLboolean success = glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 
         if (success == GL_FALSE) {

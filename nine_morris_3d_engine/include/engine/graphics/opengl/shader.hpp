@@ -33,18 +33,18 @@ namespace sm {
         GlShader(GlShader&&) = delete;
         GlShader& operator=(GlShader&&) = delete;
 
-        void bind();
+        void bind() const;
         static void unbind();
 
-        void upload_uniform_mat4(Key name, const glm::mat4& matrix);
-        void upload_uniform_int(Key name, int value);
-        void upload_uniform_float(Key name, float value);
-        void upload_uniform_vec2(Key name, glm::vec2 vector);
-        void upload_uniform_vec3(Key name, const glm::vec3& vector);
-        void upload_uniform_vec4(Key name, const glm::vec4& vector);
+        void upload_uniform_mat4(Key name, const glm::mat4& matrix) const;
+        void upload_uniform_int(Key name, int value) const;
+        void upload_uniform_float(Key name, float value) const;
+        void upload_uniform_vec2(Key name, glm::vec2 vector) const;
+        void upload_uniform_vec3(Key name, const glm::vec3& vector) const;
+        void upload_uniform_vec4(Key name, const glm::vec4& vector) const;
 
-        unsigned int get_id() { return program; }
-        std::string_view get_name() { return name; }
+        unsigned int get_id() const { return program; }
+        std::string_view get_name() const { return name; }
 
         void add_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
     private:
@@ -53,12 +53,12 @@ namespace sm {
 
         void introspect_program();
 
-        unsigned int create_program();
+        unsigned int create_program() const;
         void delete_intermediates();
-        std::optional<unsigned int> compile_shader(std::string_view source_path, unsigned int type);
-        std::optional<unsigned int> compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type);
-        bool check_compilation(unsigned int shader, unsigned int type);
-        bool check_linking(unsigned int program);
+        std::optional<unsigned int> compile_shader(std::string_view source_path, unsigned int type) const;
+        std::optional<unsigned int> compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const;
+        bool check_compilation(unsigned int shader, unsigned int type) const;
+        bool check_linking(unsigned int program) const;
 
         unsigned int program = 0;
         unsigned int vertex_shader = 0;

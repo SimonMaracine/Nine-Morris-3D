@@ -1,4 +1,5 @@
 #include <memory>
+#include <vector>
 
 #include <glad/glad.h>
 
@@ -25,7 +26,7 @@ namespace sm {
         LOG_DEBUG("Deleted GL vertex array {}", array);
     }
 
-    void GlVertexArray::bind() {
+    void GlVertexArray::bind() const {
         glBindVertexArray(array);
     }
 
@@ -33,13 +34,7 @@ namespace sm {
         glBindVertexArray(0);
     }
 
-    GlVertexArray::Def GlVertexArray::begin_definition() {
-        glBindVertexArray(array);
-
-        return Def();
-    }
-
-    GlVertexArray::Def& GlVertexArray::Def::add_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout) {
+    void GlVertexArray::add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout) {
         SM_ASSERT(layout.elements.size() > 0, "Invalid layout");
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer->get_id());
@@ -72,16 +67,12 @@ namespace sm {
             }
         }
 
-        return *this;
+        vertex_buffers.push_back(buffer);
     }
 
-    GlVertexArray::Def& GlVertexArray::Def::add_index_buffer(std::shared_ptr<GlIndexBuffer> index_buffer) {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer->get_id());
+    void GlVertexArray::add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->get_id());
 
-        return *this;
-    }
-
-    void GlVertexArray::Def::end_definition() {
-        glBindVertexArray(0);
+        index_buffer = buffer;
     }
 }

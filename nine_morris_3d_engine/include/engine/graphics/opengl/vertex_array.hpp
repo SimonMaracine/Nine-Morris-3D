@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 
@@ -10,17 +11,6 @@ namespace sm {
 
     class GlVertexArray {
     public:
-        class Def {
-        public:
-            Def& add_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout);
-            Def& add_index_buffer(std::shared_ptr<GlIndexBuffer> index_buffer);
-            void end_definition();
-        private:
-            Def() = default;
-
-            friend class GlVertexArray;
-        };
-
         GlVertexArray();
         ~GlVertexArray();
 
@@ -29,11 +19,18 @@ namespace sm {
         GlVertexArray(GlVertexArray&&) = delete;
         GlVertexArray& operator=(GlVertexArray&&) = delete;
 
-        void bind();
+        void bind() const;
         static void unbind();
 
-        Def begin_definition();
+        void add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout);
+        void add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer);
+
+        const GlIndexBuffer* get_index_buffer() const { return index_buffer.get(); }
     private:
         unsigned int array = 0;
+
+        // Vertex arrays own vertex and index buffers
+        std::vector<std::shared_ptr<GlVertexBuffer>> vertex_buffers;
+        std::shared_ptr<GlIndexBuffer> index_buffer;
     };
 }

@@ -20,15 +20,15 @@ namespace sm {
 
         // The range is inclusive: [a, b]
 
-        uint32_t next();
-        uint32_t next(uint32_t end);
-        uint32_t next(uint32_t begin, uint32_t end);
+        std::uint32_t next();
+        std::uint32_t next(std::uint32_t end);
+        std::uint32_t next(std::uint32_t begin, std::uint32_t end);
 
         template<typename T>
         T choice(std::initializer_list<T> list) {
             SM_ASSERT(list.size() > 0, "List must not be empty");
 
-            const uint32_t index = next(list.size() - 1);
+            const std::uint32_t index = next(list.size() - 1);
 
             return list.begin()[index];
         }
@@ -39,7 +39,7 @@ namespace sm {
 
             SM_ASSERT(size > 0, "List must not be empty");
 
-            const uint32_t index = next(size - 1);
+            const std::uint32_t index = next(size - 1);
 
             return first[index];
         }

@@ -40,6 +40,7 @@ namespace sm {
         void add_uniform(Uniform type, Key name);
         void add_texture(Key name);
     private:
+        // Materials own shaders
         std::shared_ptr<GlShader> shader;
 
         std::vector<Key> uniforms_mat4;
@@ -68,7 +69,7 @@ namespace sm {
         MaterialInstance(MaterialInstance&&) = delete;
         MaterialInstance& operator=(MaterialInstance&&) = delete;
 
-        void bind_and_upload();
+        void bind_and_upload() const;
 
         void set_mat4(Key name, const glm::mat4& matrix);
         void set_int(Key name, int integer);
@@ -79,7 +80,7 @@ namespace sm {
         void set_texture(Key name, std::shared_ptr<GlTexture> texture, int unit);
         void set_texture(Key name, unsigned int texture, int unit);
 
-        std::shared_ptr<GlShader> get_shader() { return shader; }  // TODO maybe const pointer
+        const GlShader* get_shader() const { return shader.get(); }
 
         // It's left public
         unsigned int flags = 0;
@@ -103,6 +104,7 @@ namespace sm {
             unsigned int texture = 0;
         };
 
+        // Material instances own shaders
         std::shared_ptr<GlShader> shader;
 
         unsigned char* data = nullptr;

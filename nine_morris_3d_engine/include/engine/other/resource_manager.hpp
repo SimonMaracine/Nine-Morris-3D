@@ -1,8 +1,5 @@
 #pragma once
 
-#include <utility>
-#include <memory>
-
 #include <resmanager/resmanager.hpp>
 
 #include "engine/audio/openal/source.hpp"
@@ -22,27 +19,6 @@
 #include "engine/other/mesh.hpp"
 
 namespace sm {
-    struct MeshLoader : public resmanager::DefaultLoader<Mesh> {
-        struct PTN {};
-        struct P {};
-        struct PTNT {};
-
-        template<typename... Args>
-        std::shared_ptr<Mesh> load(PTN, Args&&... args) const {
-            return Meshes::load_model_PTN(std::forward<Args>(args)...);
-        }
-
-        template<typename... Args>
-        std::shared_ptr<Mesh> load(P, Args&&... args) const {
-            return Meshes::load_model_P(std::forward<Args>(args)...);
-        }
-
-        template<typename... Args>
-        std::shared_ptr<Mesh> load(PTNT, Args&&... args) const {
-            return Meshes::load_model_PTNT(std::forward<Args>(args)...);
-        }
-    };
-
     struct ResourcesCache {
         resmanager::Cache<GlTexture> texture;
         resmanager::Cache<GlTexture3D> texture_3d;
@@ -57,7 +33,7 @@ namespace sm {
         resmanager::Cache<Material> material;
         resmanager::Cache<MaterialInstance> material_instance;
         resmanager::Cache<TextureData> texture_data;
-        resmanager::Cache<Mesh, MeshLoader> mesh;
+        resmanager::Cache<Mesh> mesh;
         resmanager::Cache<AlSource> al_source;
         resmanager::Cache<AlBuffer> al_buffer;
         resmanager::Cache<SoundData> sound_data;
