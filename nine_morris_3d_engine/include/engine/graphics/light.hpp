@@ -7,6 +7,6 @@ namespace sm {
         glm::vec3 position {};
         glm::vec3 ambient_color {};
         glm::vec3 diffuse_color {};
-        glm::vec3 specular_color {};
+        // Specular component omitted
     };
 }

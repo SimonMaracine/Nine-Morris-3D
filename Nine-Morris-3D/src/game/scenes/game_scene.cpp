@@ -79,16 +79,22 @@ void GameScene::on_start() {
     ctx->r3d->add_shader(shader);
 
     auto material = ctx->res.material.load("simple"_H, shader);
-    material->add_uniform(sm::Material::Uniform::Vec3, "u_color"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
+    material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
+    material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
 
     {
         auto material_instance = ctx->res.material_instance.load("dragon"_H, material);
-        material_instance->set_vec3("u_color"_H, glm::vec3(1.0f, 1.0f, 0.0f));
+        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 1.0f, 0.0f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
+        material_instance->set_float("u_material.shininess"_H, 32.0f);
     }
 
     {
         auto material_instance = ctx->res.material_instance.load("teapot"_H, material);
-        material_instance->set_vec3("u_color"_H, glm::vec3(0.7f, 0.7f, 0.7f));
+        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.7f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.7f));
+        material_instance->set_float("u_material.shininess"_H, 64.0f);
         material_instance->flags |= sm::Material::DisableBackFaceCulling;
     }
 
@@ -111,7 +117,6 @@ void GameScene::on_start() {
     directional_light.position = glm::vec3(2.5f, 15.0f, -18.0f);
     directional_light.ambient_color = glm::vec3(0.1f);
     directional_light.diffuse_color = glm::vec3(1.0f);
-    directional_light.specular_color = glm::vec3(1.0f);
 
     teapot.position = glm::vec3(2.6f, 0.0, -7.0f);
     teapot.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
@@ -149,7 +154,6 @@ void GameScene::on_imgui_update() {
     ImGui::SliderFloat3("Position", glm::value_ptr(directional_light.position), -30.0f, 30.0f);
     ImGui::SliderFloat3("Ambient color", glm::value_ptr(directional_light.ambient_color), 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse color", glm::value_ptr(directional_light.diffuse_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Specular color", glm::value_ptr(directional_light.specular_color), 0.0f, 1.0f);
     ImGui::End();
 
     // ImGui::Begin("Transform");
