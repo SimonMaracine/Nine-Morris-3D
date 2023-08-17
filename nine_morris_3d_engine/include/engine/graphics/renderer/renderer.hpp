@@ -13,6 +13,7 @@
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/renderable.hpp"
+#include "engine/graphics/light.hpp"
 
 namespace sm {
     class Application;
@@ -27,8 +28,9 @@ namespace sm {
         Renderer(Renderer&&) = delete;
         Renderer& operator=(Renderer&&) = delete;
 
-        // TODO add light
         void add_renderable(const Renderable& renderable);
+        void add_light(const DirectionalLight& light);
+        // void add_light(const DirectionalLight& light);
 
         void capture(const Camera& camera, const glm::vec3& position);
 
@@ -57,6 +59,8 @@ namespace sm {
 
             std::vector<std::weak_ptr<GlUniformBuffer>> uniform_buffers;
             std::weak_ptr<GlUniformBuffer> projection_view_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> light_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> view_position_uniform_buffer;
         } storage;
 
         PostProcessingContext post_processing_context;  // TODO implement
@@ -68,7 +72,13 @@ namespace sm {
             glm::vec3 position {};
         } camera;
 
-        std::vector<Renderable> scene_list;
+        struct SceneList {
+            std::vector<Renderable> renderables;
+            DirectionalLight directional_light;
+            // std::vector<DirectionalLight> point_lights;
+
+            void clear();
+        } scene_list;
 
         struct {
             std::vector<std::weak_ptr<GlShader>> shaders;

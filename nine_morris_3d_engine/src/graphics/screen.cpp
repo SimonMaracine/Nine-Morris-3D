@@ -36,7 +36,7 @@ namespace sm {
     void Screen::clear_framebuffers() {
         std::vector<std::weak_ptr<GlFramebuffer>> valid_framebuffers;
 
-        for (const std::weak_ptr<GlFramebuffer> wframebufer : framebuffers) {
+        for (const std::weak_ptr<GlFramebuffer>& wframebufer : framebuffers) {
             if (wframebufer.expired()) {
                 continue;
             }

@@ -15,14 +15,19 @@
 #include "engine/other/encrypt.hpp"
 
 namespace sm {
+    struct VertexP {
+        glm::vec3 position {};
+    };
+
+    struct VertexPN {
+        glm::vec3 position {};
+        glm::vec3 normal {};
+    };
+
     struct VertexPTN {
         glm::vec3 position {};
         glm::vec2 texture_coordinate {};
         glm::vec3 normal {};
-    };
-
-    struct VertexP {
-        glm::vec3 position {};
     };
 
     struct VertexPTNT {
@@ -31,6 +36,56 @@ namespace sm {
         glm::vec3 normal {};
         glm::vec3 tangent {};
     };
+
+    static void load_P(const aiMesh* mesh, std::vector<VertexP>& vertices, std::vector<unsigned int>& indices) {
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+            VertexP vertex;
+
+            glm::vec3 position;
+            position.x = mesh->mVertices[i].x;
+            position.y = mesh->mVertices[i].y;
+            position.z = mesh->mVertices[i].z;
+            vertex.position = position;
+
+            vertices.push_back(vertex);
+        }
+
+        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+            const aiFace face = mesh->mFaces[i];
+
+            for (unsigned int j = 0; j < face.mNumIndices; j++) {
+                indices.push_back(face.mIndices[j]);
+            }
+        }
+    }
+
+    static void load_PN(const aiMesh* mesh, std::vector<VertexPN>& vertices, std::vector<unsigned int>& indices) {
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+            VertexPN vertex;
+
+            glm::vec3 position;
+            position.x = mesh->mVertices[i].x;
+            position.y = mesh->mVertices[i].y;
+            position.z = mesh->mVertices[i].z;
+            vertex.position = position;
+
+            glm::vec3 normal;
+            normal.x = mesh->mNormals[i].x;
+            normal.y = mesh->mNormals[i].y;
+            normal.z = mesh->mNormals[i].z;
+            vertex.normal = normal;
+
+            vertices.push_back(vertex);
+        }
+
+        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+            const aiFace face = mesh->mFaces[i];
+
+            for (unsigned int j = 0; j < face.mNumIndices; j++) {
+                indices.push_back(face.mIndices[j]);
+            }
+        }
+    }
 
     static void load_PTN(const aiMesh* mesh, std::vector<VertexPTN>& vertices, std::vector<unsigned int>& indices) {
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -57,29 +112,7 @@ namespace sm {
         }
 
         for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-            aiFace face = mesh->mFaces[i];
-
-            for (unsigned int j = 0; j < face.mNumIndices; j++) {
-                indices.push_back(face.mIndices[j]);
-            }
-        }
-    }
-
-    static void load_P(const aiMesh* mesh, std::vector<VertexP>& vertices, std::vector<unsigned int>& indices) {
-        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-            VertexP vertex;
-
-            glm::vec3 position;
-            position.x = mesh->mVertices[i].x;
-            position.y = mesh->mVertices[i].y;
-            position.z = mesh->mVertices[i].z;
-            vertex.position = position;
-
-            vertices.push_back(vertex);
-        }
-
-        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-            aiFace face = mesh->mFaces[i];
+            const aiFace face = mesh->mFaces[i];
 
             for (unsigned int j = 0; j < face.mNumIndices; j++) {
                 indices.push_back(face.mIndices[j]);
@@ -118,7 +151,7 @@ namespace sm {
         }
 
         for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-            aiFace face = mesh->mFaces[i];
+            const aiFace face = mesh->mFaces[i];
 
             for (unsigned int j = 0; j < face.mNumIndices; j++) {
                 indices.push_back(face.mIndices[j]);
@@ -127,14 +160,25 @@ namespace sm {
     }
 
     Mesh::Mesh(std::string_view file_path, Type type, bool flip_winding) {
-        const aiPostProcessSteps flip = (
-            flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)
-        );
+        unsigned int flags = aiProcess_ValidateDataStructure;
+
+        if (flip_winding) {
+            flags |= aiProcess_FlipWindingOrder;
+        }
+
+        if (type == Type::PTNT) {
+            flags |= aiProcess_CalcTangentSpace;
+        }
+
+        if (type != Type::P) {
+            flags |= aiProcess_GenNormals;
+        }
+
 
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(
             std::string(file_path),
-            aiProcess_ValidateDataStructure | flip
+            flags
         );
 
         if (scene == nullptr) {
@@ -152,9 +196,19 @@ namespace sm {
     }
 
     Mesh::Mesh(Encrypt::EncryptedFile file_path, Type type, bool flip_winding) {
-        const aiPostProcessSteps flip = (
-            flip_winding ? aiProcess_FlipWindingOrder : static_cast<aiPostProcessSteps>(0)
-        );
+        unsigned int flags = aiProcess_ValidateDataStructure;
+
+        if (flip_winding) {
+            flags |= aiProcess_FlipWindingOrder;
+        }
+
+        if (type == Type::PTNT) {
+            flags |= aiProcess_CalcTangentSpace;
+        }
+
+        if (type != Type::P) {
+            flags |= aiProcess_GenNormals;
+        }
 
         const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
@@ -162,7 +216,7 @@ namespace sm {
         const aiScene* scene = importer.ReadFileFromMemory(
             buffer,
             buffer_size,
-            aiProcess_ValidateDataStructure | flip
+            flags
         );
 
         if (scene == nullptr) {
@@ -190,23 +244,6 @@ namespace sm {
         const aiMesh* mesh = static_cast<const aiMesh*>(pmesh);
 
         switch (type) {
-            case Type::PTN: {
-                std::vector<VertexPTN> vertices;
-                std::vector<unsigned int> indices;
-
-                load_PTN(mesh, vertices, indices);
-
-                allocate(
-                    vertices.data(),
-                    vertices.size() * sizeof(VertexPTN),
-                    indices.data(),
-                    indices.size() * sizeof(unsigned int)
-                );
-
-                LOG_DEBUG("Loaded PTN model data `{}`...", file_path);
-
-                break;
-            }
             case Type::P: {
                 std::vector<VertexP> vertices;
                 std::vector<unsigned int> indices;
@@ -220,7 +257,41 @@ namespace sm {
                     indices.size() * sizeof(unsigned int)
                 );
 
-                LOG_DEBUG("Loaded P model data `{}`...", file_path);
+                LOG_DEBUG("Loaded P model data `{}`", file_path);
+
+                break;
+            }
+            case Type::PN: {
+                std::vector<VertexPN> vertices;
+                std::vector<unsigned int> indices;
+
+                load_PN(mesh, vertices, indices);
+
+                allocate(
+                    vertices.data(),
+                    vertices.size() * sizeof(VertexPN),
+                    indices.data(),
+                    indices.size() * sizeof(unsigned int)
+                );
+
+                LOG_DEBUG("Loaded PN model data `{}`", file_path);
+
+                break;
+            }
+            case Type::PTN: {
+                std::vector<VertexPTN> vertices;
+                std::vector<unsigned int> indices;
+
+                load_PTN(mesh, vertices, indices);
+
+                allocate(
+                    vertices.data(),
+                    vertices.size() * sizeof(VertexPTN),
+                    indices.data(),
+                    indices.size() * sizeof(unsigned int)
+                );
+
+                LOG_DEBUG("Loaded PTN model data `{}`", file_path);
 
                 break;
             }
@@ -237,7 +308,7 @@ namespace sm {
                     indices.size() * sizeof(unsigned int)
                 );
 
-                LOG_DEBUG("Loaded PTNT model data `{}`...", file_path);
+                LOG_DEBUG("Loaded PTNT model data `{}`", file_path);
 
                 break;
             }

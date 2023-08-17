@@ -69,6 +69,7 @@ void application_main() {
 
             auto game_builder = sm::ApplicationBuilder()
                 // .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
+                .display(1024, 576)
                 // .display_flags(options.fullscreen, options.native_resolution, true)
                 .display_min_resolution(512, 288)
                 .application_name(APP_NAME)

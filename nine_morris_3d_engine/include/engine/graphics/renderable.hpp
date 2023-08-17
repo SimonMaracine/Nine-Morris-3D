@@ -16,6 +16,6 @@ namespace sm {
         glm::vec3 rotation {};
         float scale = 1.0f;
 
-        glm::vec3 outline_color {};
+        glm::vec3 outline_color {};  // TODO think of a good solution
     };
 }

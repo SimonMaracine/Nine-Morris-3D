@@ -15,12 +15,15 @@
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/renderable.hpp"
+#include "engine/graphics/light.hpp"
 #include "engine/other/file_system.hpp"
 
 using namespace resmanager::literals;
 
 namespace sm {
     static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING = 0;
+    static constexpr unsigned int LIGHT_UNIFORM_BLOCK_BINDING = 1;
+    static constexpr unsigned int VIEW_POSITION_BLOCK_BINDING = 2;
 
     Renderer::Renderer(Screen& screen, int width, int height) {
         RenderGl::enable_depth_test();
@@ -73,7 +76,11 @@ namespace sm {
     }
 
     void Renderer::add_renderable(const Renderable& renderable) {
-        scene_list.push_back(renderable);
+        scene_list.renderables.push_back(renderable);
+    }
+
+    void Renderer::add_light(const DirectionalLight& light) {
+        scene_list.directional_light = light;
     }
 
     void Renderer::capture(const Camera& camera, const glm::vec3& position) {
@@ -97,8 +104,25 @@ namespace sm {
                 uniform_buffer->set(&camera.projection_view_matrix, "u_projection_view_matrix"_H);
             }
         }
+        {
+            auto uniform_buffer = storage.light_uniform_buffer.lock();
 
-        for (std::weak_ptr<GlUniformBuffer> wuniform_buffer : storage.uniform_buffers) {
+            if (uniform_buffer != nullptr) {
+                uniform_buffer->set(&scene_list.directional_light.position, "u_light_position"_H);
+                uniform_buffer->set(&scene_list.directional_light.ambient_color, "u_light_ambient"_H);
+                uniform_buffer->set(&scene_list.directional_light.diffuse_color, "u_light_diffuse"_H);
+                uniform_buffer->set(&scene_list.directional_light.specular_color, "u_light_specular"_H);
+            }
+        }
+        {
+            auto uniform_buffer = storage.view_position_uniform_buffer.lock();
+
+            if (uniform_buffer != nullptr) {
+                uniform_buffer->set(&camera.position, "u_view_position"_H);
+            }
+        }
+
+        for (const std::weak_ptr<GlUniformBuffer>& wuniform_buffer : storage.uniform_buffers) {
             std::shared_ptr<GlUniformBuffer> uniform_buffer = wuniform_buffer.lock();
 
             if (uniform_buffer == nullptr) {
@@ -131,7 +155,7 @@ namespace sm {
     }
 
     void Renderer::prerender_setup() {
-        for (std::weak_ptr<GlShader> wshader : scene_data.shaders) {
+        for (const std::weak_ptr<GlShader>& wshader : scene_data.shaders) {
             std::shared_ptr<GlShader> shader = wshader.lock();
 
             if (shader == nullptr) {
@@ -144,8 +168,18 @@ namespace sm {
 
                 storage.uniform_buffers.push_back(uniform_buffer);
 
-                if (block.binding_index == PROJECTON_VIEW_UNIFORM_BLOCK_BINDING) {
-                    storage.projection_view_uniform_buffer = uniform_buffer;
+                switch (block.binding_index) {
+                    case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
+                        storage.projection_view_uniform_buffer = uniform_buffer;
+                        break;
+                    case LIGHT_UNIFORM_BLOCK_BINDING:
+                        storage.light_uniform_buffer = uniform_buffer;
+                        break;
+                    case VIEW_POSITION_BLOCK_BINDING:
+                        storage.view_position_uniform_buffer = uniform_buffer;
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -186,12 +220,20 @@ namespace sm {
     }
 
     void Renderer::draw_renderables() {
-        for (const Renderable& renderable : scene_list) {
+        for (const Renderable& renderable : scene_list.renderables) {
             if (renderable.material->flags & Material::Outline) {
                 continue;  // This one is rendered differently
             }
 
+            if (renderable.material->flags & Material::DisableBackFaceCulling) {  // FIXME improve; maybe use scene graph
+                RenderGl::disable_back_face_culling();
+            }
+
             draw_renderable(renderable);
+
+            if (renderable.material->flags & Material::DisableBackFaceCulling) {
+                RenderGl::enable_back_face_culling();
+            }
         }
 
         GlVertexArray::unbind();  // Don't unbind for every renderable
@@ -206,7 +248,7 @@ namespace sm {
         matrix = glm::scale(matrix, glm::vec3(renderable.scale));
 
         renderable.vertex_array->bind();
-        renderable.material->bind_and_upload();
+        renderable.material->bind_and_upload();  // TODO sort and batch models based on material
 
         renderable.material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
@@ -219,5 +261,10 @@ namespace sm {
 
     void Renderer::draw_renderable_outlined(const Renderable& renderable) {
 
+    }
+
+    void Renderer::SceneList::clear() {
+        renderables.clear();
+        // point_lights.clear();
     }
 }

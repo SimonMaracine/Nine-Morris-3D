@@ -84,6 +84,14 @@ namespace sm {
         glEnable(GL_BLEND);
     }
 
+    void RenderGl::disable_back_face_culling() {
+        glDisable(GL_CULL_FACE);
+    }
+
+    void RenderGl::enable_back_face_culling() {
+        glEnable(GL_CULL_FACE);
+    }
+
     void RenderGl::initialize_stencil() {
         glEnable(GL_STENCIL_TEST);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);

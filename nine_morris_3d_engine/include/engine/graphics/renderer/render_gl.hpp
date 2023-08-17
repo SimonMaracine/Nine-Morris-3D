@@ -42,6 +42,9 @@ namespace sm {
         static void disable_blending();
         static void enable_blending();
 
+        static void disable_back_face_culling();
+        static void enable_back_face_culling();
+
         static void initialize_stencil();
         static void stencil_function(Function function, int ref, unsigned int mask);
         static void stencil_mask(unsigned int mask);

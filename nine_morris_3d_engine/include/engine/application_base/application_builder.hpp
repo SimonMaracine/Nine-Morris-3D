@@ -8,8 +8,10 @@ namespace sm {
         Parameters for an instance of an application or a game
     */
     class ApplicationBuilder {
+    private:
+        static constexpr const char* TITLE = "Nine Morris 3D Engine";
     public:
-        ApplicationBuilder& display(int width, int height, std::string_view title = "Nine Morris 3D Engine");
+        ApplicationBuilder& display(int width, int height, std::string_view title = TITLE);
         ApplicationBuilder& display_flags(bool fullscreen, bool native_resolution, bool resizable);
         ApplicationBuilder& display_min_resolution(int min_width, int min_height);
         ApplicationBuilder& application_name(std::string_view app_name);
@@ -20,7 +22,7 @@ namespace sm {
     private:
         int width = 800;
         int height = 600;
-        std::string title = "Nine Morris 3D Engine";
+        std::string title = TITLE;
         bool fullscreen = false;
         bool native_resolution = true;
         bool resizable = true;
@@ -30,7 +32,7 @@ namespace sm {
         unsigned int major = 0;
         unsigned int minor = 1;
         unsigned int patch = 0;
-        std::string encryption_key = "Nine Morris 3D Engine";
+        std::string encryption_key = TITLE;
         bool audio = false;
         bool random_generator = false;
 

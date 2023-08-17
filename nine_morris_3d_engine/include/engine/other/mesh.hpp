@@ -11,8 +11,9 @@ namespace sm {
     class Mesh {
     public:
         enum class Type {
-            PTN,
             P,
+            PN,
+            PTN,
             PTNT
         };
 

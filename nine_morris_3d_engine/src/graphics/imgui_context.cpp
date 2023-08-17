@@ -167,11 +167,8 @@ namespace sm {
         ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window_handle), false);
         ImGui_ImplOpenGL3_Init("#version 430 core");
 
-        ImGuiIO& io = ImGui::GetIO();
-        io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;  // TODO needed?
-        io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;  // TODO maybe not needed
-        io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;  // TODO needed?
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // TODO needed?
+        [[maybe_unused]] ImGuiIO& io = ImGui::GetIO();
+        // io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 #ifdef SM_BUILD_DISTRIBUTION
         io.IniFilename = nullptr;
 #endif
