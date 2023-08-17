@@ -117,6 +117,7 @@ void GameScene::on_start() {
     directional_light.position = glm::vec3(2.5f, 15.0f, -18.0f);
     directional_light.ambient_color = glm::vec3(0.1f);
     directional_light.diffuse_color = glm::vec3(1.0f);
+    directional_light.specular_color = glm::vec3(1.0f);
 
     teapot.position = glm::vec3(2.6f, 0.0, -7.0f);
     teapot.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
@@ -154,6 +155,7 @@ void GameScene::on_imgui_update() {
     ImGui::SliderFloat3("Position", glm::value_ptr(directional_light.position), -30.0f, 30.0f);
     ImGui::SliderFloat3("Ambient color", glm::value_ptr(directional_light.ambient_color), 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse color", glm::value_ptr(directional_light.diffuse_color), 0.0f, 1.0f);
+    ImGui::SliderFloat3("Specular color", glm::value_ptr(directional_light.specular_color), 0.0f, 1.0f);
     ImGui::End();
 
     // ImGui::Begin("Transform");

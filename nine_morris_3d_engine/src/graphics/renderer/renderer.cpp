@@ -111,6 +111,7 @@ namespace sm {
                 uniform_buffer->set(&scene_list.directional_light.position, "u_light_position"_H);
                 uniform_buffer->set(&scene_list.directional_light.ambient_color, "u_light_ambient"_H);
                 uniform_buffer->set(&scene_list.directional_light.diffuse_color, "u_light_diffuse"_H);
+                uniform_buffer->set(&scene_list.directional_light.specular_color, "u_light_specular"_H);
             }
         }
         {

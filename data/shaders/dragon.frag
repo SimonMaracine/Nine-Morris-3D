@@ -11,7 +11,7 @@ struct Material {
     vec3 specular;
 
     float shininess;
-    // TODO here could also be normals
+    // TODO here could also be normal or emission maps
 };
 
 uniform Material u_material;
@@ -20,7 +20,7 @@ layout(shared, binding = 1) uniform Light {
     vec3 u_light_position;
     vec3 u_light_ambient;
     vec3 u_light_diffuse;
-    // Specular component omitted
+    vec3 u_light_specular;
 };
 
 layout(shared, binding = 2) uniform ViewPosition {  // TODO maybe just do calculations in view space
@@ -44,7 +44,7 @@ vec3 calculate_light() {
     const vec3 view_direction = normalize(u_view_position - v_fragment_position);
     const vec3 reflection = reflect(-light_direction, normal);
     const float specular_strength = pow(max(dot(view_direction, reflection), 0.0), u_material.shininess);
-    const vec3 specular_light = u_material.specular * specular_strength;
+    const vec3 specular_light = u_material.specular * u_light_specular * specular_strength;
 
     // All together
     const vec3 result = ambient_light + diffuse_light + specular_light;
