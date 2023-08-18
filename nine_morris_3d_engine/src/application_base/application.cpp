@@ -17,6 +17,7 @@
 #include "engine/graphics/renderer/renderer.hpp"
 #include "engine/graphics/renderer/render_gl.hpp"
 #include "engine/graphics/renderer/gui_renderer.hpp"
+#include "engine/graphics/renderer/renderer_debug.hpp"
 #include "engine/graphics/opengl/info_and_debug.hpp"
 #include "engine/graphics/imgui_context.hpp"
 #include "engine/other/logging.hpp"
@@ -84,6 +85,8 @@ namespace sm {
 
         ctx.r3d = std::make_unique<Renderer>(ctx.scr, properties.width, properties.height);
 
+        ctx.rdb = std::make_unique<RendererDebug>();
+
         // ctx.r2d = std::make_unique<Renderer2D>(properties.width, properties.height);
 
         if (builder.audio) {
@@ -126,10 +129,8 @@ namespace sm {
             current_scene->on_update();
             ctx.tsk.update();
 
-            // Clear the default framebuffer, as nobody does that for us
-            RenderGl::clear(RenderGl::Buffers::C);
-
             ctx.r3d->render(properties.width, properties.height);
+            ctx.rdb->render_3d(ctx.r3d->get_projection_view_matrix());
             // TODO r2d
             dear_imgui_render();
 

@@ -17,6 +17,7 @@
 #include "engine/graphics/renderable.hpp"
 #include "engine/graphics/light.hpp"
 #include "engine/other/file_system.hpp"
+#include "engine/other/encrypt.hpp"
 
 using namespace resmanager::literals;
 
@@ -45,7 +46,7 @@ namespace sm {
         }
 
         {
-            storage.screen_quad_shader = std::make_shared<GlShader>(
+            storage.screen_quad_shader = std::make_unique<GlShader>(
                 Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.vert")),
                 Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.frag"))
             );
@@ -59,14 +60,14 @@ namespace sm {
                  1.0f, -1.0f
             };
 
-            storage.screen_quad_vertex_buffer = std::make_shared<GlVertexBuffer>(vertices, sizeof(vertices));
+            auto screen_quad_vertex_buffer = std::make_shared<GlVertexBuffer>(vertices, sizeof(vertices));
 
             VertexBufferLayout layout;
             layout.add(0, VertexBufferLayout::Float, 2);
 
-            storage.screen_quad_vertex_array = std::make_shared<GlVertexArray>();
+            storage.screen_quad_vertex_array = std::make_unique<GlVertexArray>();
             storage.screen_quad_vertex_array->bind();
-            storage.screen_quad_vertex_array->add_vertex_buffer(storage.screen_quad_vertex_buffer, layout);
+            storage.screen_quad_vertex_array->add_vertex_buffer(screen_quad_vertex_buffer, layout);
             GlVertexArray::unbind();
         }
     }
@@ -189,6 +190,10 @@ namespace sm {
         scene_data.shaders.clear();
     }
 
+    const glm::mat4& Renderer::get_projection_view_matrix() {
+        return camera.projection_view_matrix;
+    }
+
     void Renderer::draw_screen_quad(unsigned int texture) {
         storage.screen_quad_shader->bind();
         RenderGl::bind_texture_2d(texture, 0);
@@ -207,8 +212,11 @@ namespace sm {
 
         post_processing();
 
-        // Draw the final result to the screen; don't need clearing
+        // Draw the final result to the screen
         GlFramebuffer::bind_default();
+
+        // Clear even the default framebuffer, for debug renderer
+        RenderGl::clear(RenderGl::Buffers::CD);
 
         // draw_screen_quad(post_processing_context.last_texture);  // FIXME
         draw_screen_quad(storage.scene_framebuffer->get_color_attachment(0));

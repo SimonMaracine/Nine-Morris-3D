@@ -12,6 +12,7 @@
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
 #include "engine/graphics/renderer/gui_renderer.hpp"
+#include "engine/graphics/renderer/renderer_debug.hpp"
 #include "engine/graphics/identifier.hpp"
 #include "engine/graphics/screen.hpp"
 #include "engine/other/resource_manager.hpp"
@@ -58,6 +59,7 @@ namespace sm {
         std::unique_ptr<Window> win;  // One of the last objects destroyed in an application instance
         std::unique_ptr<OpenAlContext> snd;  // Sound context
         std::unique_ptr<Renderer> r3d;  // 3D renderer
+        std::unique_ptr<RendererDebug> rdb;  // Debug renderer
         // std::unique_ptr<GuiRenderer> r2d;  // 2D renderer
         std::unique_ptr<RandomGenerator> rng;  // Random number generator
         Input inp;  // Self explanatory

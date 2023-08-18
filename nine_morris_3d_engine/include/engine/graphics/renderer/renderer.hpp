@@ -30,7 +30,6 @@ namespace sm {
 
         void add_renderable(const Renderable& renderable);
         void add_light(const DirectionalLight& light);
-        // void add_light(const DirectionalLight& light);
 
         void capture(const Camera& camera, const glm::vec3& position);
 
@@ -39,6 +38,7 @@ namespace sm {
         void render(int width, int height);
         void prerender_setup();
         void postrender_setup();
+        const glm::mat4& get_projection_view_matrix();
 
         void draw_screen_quad(unsigned int texture);
         void post_processing();
@@ -53,9 +53,8 @@ namespace sm {
         struct {
             std::shared_ptr<GlFramebuffer> scene_framebuffer;
 
-            std::shared_ptr<GlShader> screen_quad_shader;
-            std::shared_ptr<GlVertexArray> screen_quad_vertex_array;
-            std::shared_ptr<GlVertexBuffer> screen_quad_vertex_buffer;
+            std::unique_ptr<GlShader> screen_quad_shader;
+            std::unique_ptr<GlVertexArray> screen_quad_vertex_array;
 
             std::vector<std::weak_ptr<GlUniformBuffer>> uniform_buffers;
             std::weak_ptr<GlUniformBuffer> projection_view_uniform_buffer;
