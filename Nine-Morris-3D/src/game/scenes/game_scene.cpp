@@ -167,6 +167,8 @@ void GameScene::on_update() {
     );
 
     ctx->rdb->add_lamp(directional_light.position, directional_light.diffuse_color);
+
+    ctx->rdb->add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
 }
 
 void GameScene::on_imgui_update() {

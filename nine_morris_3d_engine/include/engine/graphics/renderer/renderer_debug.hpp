@@ -24,8 +24,8 @@ namespace sm {
 
         void add_line(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& color);
         void add_lines(const std::vector<glm::vec3>& points, const glm::vec3& color);
-        void add_point(const glm::vec3& p, const glm::vec3& color);
 
+        void add_point(const glm::vec3& p, const glm::vec3& color);
         void add_lamp(const glm::vec3& position, const glm::vec3& color);
     private:
         void render_3d(const glm::mat4& projectio_view_matrix);
