@@ -15,6 +15,7 @@ struct GameScene : public sm::Scene {
     sm::Camera cam;
     PointCameraController cam_controller;
     sm::DirectionalLight directional_light;
+    sm::PointLight point_light;
 
     sm::Renderable teapot;
 };

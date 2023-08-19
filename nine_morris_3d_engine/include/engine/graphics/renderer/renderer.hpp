@@ -35,6 +35,7 @@ namespace sm {
         // 3D API
         void add_renderable(const Renderable& renderable);
         void add_light(const DirectionalLight& light);
+        void add_light(const PointLight& light);
 
         // Debug API
         void debug_add_line(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& color);
@@ -49,15 +50,20 @@ namespace sm {
 
         void resize_framebuffers(int width, int height);
 
-        void draw_screen_quad(unsigned int texture);
+        // Render functions
+        void screen_quad(unsigned int texture);
         void post_processing();
         void end_rendering();
 
+        // Draw functions
         void draw_renderables();
         void draw_renderable(const Renderable& renderable);
 
         void draw_renderables_outlined();
         void draw_renderable_outlined(const Renderable& renderable);
+
+        // Helper functions
+        void setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer);
 
         struct {
             std::shared_ptr<GlFramebuffer> scene_framebuffer;
@@ -67,8 +73,9 @@ namespace sm {
 
             std::unordered_map<unsigned int, std::weak_ptr<GlUniformBuffer>> uniform_buffers;
             std::weak_ptr<GlUniformBuffer> projection_view_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> light_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> directional_light_uniform_buffer;
             std::weak_ptr<GlUniformBuffer> view_position_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> point_light_uniform_buffer;
         } storage;
 
         PostProcessingContext post_processing_context;  // TODO implement
@@ -83,7 +90,7 @@ namespace sm {
         struct SceneList {
             std::vector<Renderable> renderables;
             DirectionalLight directional_light;
-            // std::vector<DirectionalLight> point_lights;
+            std::vector<PointLight> point_lights;
 
             void clear();
         } scene_list;

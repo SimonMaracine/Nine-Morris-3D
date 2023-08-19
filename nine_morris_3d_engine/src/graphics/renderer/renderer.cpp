@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <cstddef>
 #include <array>
+#include <algorithm>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -27,8 +28,10 @@ using namespace resmanager::literals;
 
 namespace sm {
     static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING = 0;
-    static constexpr unsigned int LIGHT_UNIFORM_BLOCK_BINDING = 1;
+    static constexpr unsigned int DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING = 1;
     static constexpr unsigned int VIEW_POSITION_BLOCK_BINDING = 2;
+    static constexpr unsigned int POINT_LIGHT_BLOCK_BINDING = 3;
+    static constexpr std::size_t SHADER_POINT_LIGHTS = 4;
 
     Renderer::Renderer(int width, int height) {
         RenderGl::enable_depth_test();
@@ -107,6 +110,10 @@ namespace sm {
         scene_list.directional_light = light;
     }
 
+    void Renderer::add_light(const PointLight& light) {
+        scene_list.point_lights.push_back(light);
+    }
+
     void Renderer::debug_add_line(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& color) {
         Line line;
         line.p1 = p1;
@@ -139,9 +146,9 @@ namespace sm {
     }
 
     void Renderer::debug_add_lamp(const glm::vec3& position, const glm::vec3& color) {
-        static constexpr float SIZE = 0.4f;
-        static constexpr float SIZE2 = 0.2f;
-        static constexpr float SIZE3 = 0.6f;
+        static constexpr float SIZE = 0.3f;
+        static constexpr float SIZE2 = 0.15f;
+        static constexpr float SIZE3 = 0.5f;
         static constexpr float OFFSET = -(SIZE + SIZE3);
         const std::array<Line, 24> LINES = {
             // Top
@@ -195,13 +202,13 @@ namespace sm {
             }
         }
         {
-            auto uniform_buffer = storage.light_uniform_buffer.lock();
+            auto uniform_buffer = storage.directional_light_uniform_buffer.lock();
 
             if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&scene_list.directional_light.position, "u_light_position"_H);
-                uniform_buffer->set(&scene_list.directional_light.ambient_color, "u_light_ambient"_H);
-                uniform_buffer->set(&scene_list.directional_light.diffuse_color, "u_light_diffuse"_H);
-                uniform_buffer->set(&scene_list.directional_light.specular_color, "u_light_specular"_H);
+                uniform_buffer->set(&scene_list.directional_light.direction, "u_directional_light.direction"_H);
+                uniform_buffer->set(&scene_list.directional_light.ambient_color, "u_directional_light.ambient"_H);
+                uniform_buffer->set(&scene_list.directional_light.diffuse_color, "u_directional_light.diffuse"_H);
+                uniform_buffer->set(&scene_list.directional_light.specular_color, "u_directional_light.specular"_H);
             }
         }
         {
@@ -209,6 +216,13 @@ namespace sm {
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&camera.position, "u_view_position"_H);
+            }
+        }
+        {
+            auto uniform_buffer = storage.point_light_uniform_buffer.lock();
+
+            if (uniform_buffer != nullptr) {
+                setup_point_light_uniform_buffer(uniform_buffer);
             }
         }
 
@@ -271,11 +285,14 @@ namespace sm {
                     case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
                         storage.projection_view_uniform_buffer = uniform_buffer;
                         break;
-                    case LIGHT_UNIFORM_BLOCK_BINDING:
-                        storage.light_uniform_buffer = uniform_buffer;
+                    case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
+                        storage.directional_light_uniform_buffer = uniform_buffer;
                         break;
                     case VIEW_POSITION_BLOCK_BINDING:
                         storage.view_position_uniform_buffer = uniform_buffer;
+                        break;
+                    case POINT_LIGHT_BLOCK_BINDING:
+                        storage.point_light_uniform_buffer = uniform_buffer;
                         break;
                     default:
                         break;
@@ -310,7 +327,7 @@ namespace sm {
         }
     }
 
-    void Renderer::draw_screen_quad(unsigned int texture) {
+    void Renderer::screen_quad(unsigned int texture) {
         storage.screen_quad_shader->bind();
         RenderGl::bind_texture_2d(texture, 0);
         RenderGl::draw_arrays(6);
@@ -334,8 +351,8 @@ namespace sm {
         // Clear even the default framebuffer, for debug renderer
         RenderGl::clear(RenderGl::Buffers::CD);
 
-        // draw_screen_quad(post_processing_context.last_texture);  // FIXME
-        draw_screen_quad(storage.scene_framebuffer->get_color_attachment(0));
+        // screen_quad(post_processing_context.last_texture);  // FIXME
+        screen_quad(storage.scene_framebuffer->get_color_attachment(0));
 
         RenderGl::clear_color(0.3f, 0.1f, 0.3f);
         RenderGl::enable_depth_test();
@@ -387,10 +404,41 @@ namespace sm {
 
     }
 
+    void Renderer::setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer) {
+        // Sort front to back with respect to the camera; lights in the front of the list will be used
+        std::sort(
+            scene_list.point_lights.begin(),
+            scene_list.point_lights.end(),
+            [this](const PointLight& lhs, const PointLight& rhs) {
+                const float distance_left = glm::distance(lhs.position, camera.position);
+                const float distance_right = glm::distance(rhs.position, camera.position);
+
+                return distance_left < distance_right;
+            }
+        );
+
+        // Add dummy point lights to make the size 4, which is a requirement from the shader
+        if (scene_list.point_lights.size() < SHADER_POINT_LIGHTS) {
+            scene_list.point_lights.resize(SHADER_POINT_LIGHTS);
+        }
+
+        for (std::size_t i = 0; i < SHADER_POINT_LIGHTS; i++) {
+            const PointLight& light = scene_list.point_lights[i];
+            const std::string index = std::to_string(i);
+
+            uniform_buffer->set(&light.position, resmanager::HashedStr64("u_point_lights[" + index + "].position"));
+            uniform_buffer->set(&light.ambient_color, resmanager::HashedStr64("u_point_lights[" + index + "].ambient"));
+            uniform_buffer->set(&light.diffuse_color, resmanager::HashedStr64("u_point_lights[" + index + "].diffuse"));
+            uniform_buffer->set(&light.specular_color, resmanager::HashedStr64("u_point_lights[" + index + "].specular"));
+            uniform_buffer->set(&light.falloff_linear, resmanager::HashedStr64("u_point_lights[" + index + "].falloff_linear"));
+            uniform_buffer->set(&light.falloff_quadratic, resmanager::HashedStr64("u_point_lights[" + index + "].falloff_quadratic"));
+        }
+    }
+
     void Renderer::SceneList::clear() {
         renderables.clear();
         directional_light = {};
-        // point_lights.clear();
+        point_lights.clear();
     }
 
     void Renderer::debug_initialize() {

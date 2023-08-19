@@ -26,6 +26,9 @@ namespace sm {
         GL_MAX_VERTEX_UNIFORM_COMPONENTS,
         GL_MAX_TEXTURE_LOD_BIAS,
         GL_MAX_UNIFORM_BUFFER_BINDINGS,
+        GL_MAX_UNIFORM_BLOCK_SIZE,
+        GL_MAX_VERTEX_UNIFORM_BLOCKS,
+        GL_MAX_FRAGMENT_UNIFORM_BLOCKS,
         GL_MAX_SAMPLES,
         GL_MAX_DEPTH_TEXTURE_SAMPLES,
         GL_MAX_COLOR_TEXTURE_SAMPLES,
@@ -46,6 +49,9 @@ namespace sm {
         "GL_MAX_VERTEX_UNIFORM_COMPONENTS",
         "GL_MAX_TEXTURE_LOD_BIAS",
         "GL_MAX_UNIFORM_BUFFER_BINDINGS",
+        "GL_MAX_UNIFORM_BLOCK_SIZE",
+        "GL_MAX_VERTEX_UNIFORM_BLOCKS",
+        "GL_MAX_FRAGMENT_UNIFORM_BLOCKS",
         "GL_MAX_SAMPLES",
         "GL_MAX_DEPTH_TEXTURE_SAMPLES",
         "GL_MAX_COLOR_TEXTURE_SAMPLES",
@@ -109,7 +115,7 @@ namespace sm {
 
         output.append("\n*** OpenGL Context Parameters ***\n");
 
-        std::size_t parameter_index = 15;
+        std::size_t parameter_index = 18;
 
         for (std::size_t i = 0; i <= parameter_index; i++) {
             GLint result;

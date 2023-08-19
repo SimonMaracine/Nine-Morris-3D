@@ -166,9 +166,9 @@ namespace sm {
         glBindBufferBase(GL_UNIFORM_BUFFER, specification.binding_index, buffer);
 
         const std::size_t field_count = specification.uniforms.size();
-        static constexpr std::size_t MAX_FIELD_COUNT = 8;
+        static constexpr std::size_t MAX_FIELD_COUNT = 24;
 
-        SM_ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 8 fields for now");
+        SM_ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 24 fields for now");
 
         GLuint indices[MAX_FIELD_COUNT];
         GLint offsets[MAX_FIELD_COUNT];
@@ -250,6 +250,9 @@ namespace sm {
         switch (type) {
             case GL_FLOAT_VEC3:
                 size = 3 * sizeof(GLfloat);
+                break;
+            case GL_FLOAT:
+                size = 1 * sizeof(GLfloat);
                 break;
             case GL_FLOAT_MAT4:
                 size = 16 * sizeof(GLfloat);
