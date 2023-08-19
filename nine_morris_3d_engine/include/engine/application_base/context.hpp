@@ -11,10 +11,7 @@
 #include "engine/application_base/tasks.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
-#include "engine/graphics/renderer/gui_renderer.hpp"
-#include "engine/graphics/renderer/renderer_debug.hpp"
 #include "engine/graphics/identifier.hpp"
-#include "engine/graphics/screen.hpp"
 #include "engine/other/resource_manager.hpp"
 #include "engine/other/random_gen.hpp"
 #include "engine/other/encrypt.hpp"
@@ -58,16 +55,13 @@ namespace sm {
 
         std::unique_ptr<Window> win;  // One of the last objects destroyed in an application instance
         std::unique_ptr<OpenAlContext> snd;  // Sound context
-        std::unique_ptr<Renderer> r3d;  // 3D renderer
-        std::unique_ptr<RendererDebug> rdb;  // Debug renderer
-        // std::unique_ptr<GuiRenderer> r2d;  // 2D renderer
+        std::unique_ptr<Renderer> rnd;  // Renderer for 3D, 2D and debug
         std::unique_ptr<RandomGenerator> rng;  // Random number generator
         Input inp;  // Self explanatory
         EventDispatcher evt;  // Manager of application events
         ResourcesCache res;  // Global cache of resources
         Identifier idt;  // Generator of IDs
         TaskManager tsk;  // Manager of general purpose procedures
-        Screen scr;  // Manages framebuffers and screen area
     private:
         Application* application = nullptr;
 

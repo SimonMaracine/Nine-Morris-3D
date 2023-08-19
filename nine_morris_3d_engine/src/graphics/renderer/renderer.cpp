@@ -1,5 +1,8 @@
 #include <vector>
 #include <memory>
+#include <unordered_map>
+#include <cstddef>
+#include <array>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -9,15 +12,16 @@
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/opengl/shader.hpp"
+#include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
 #include "engine/graphics/renderer/render_gl.hpp"
-#include "engine/graphics/screen.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/renderable.hpp"
 #include "engine/graphics/light.hpp"
 #include "engine/other/file_system.hpp"
 #include "engine/other/encrypt.hpp"
+#include "engine/other/assert.hpp"
 
 using namespace resmanager::literals;
 
@@ -26,7 +30,7 @@ namespace sm {
     static constexpr unsigned int LIGHT_UNIFORM_BLOCK_BINDING = 1;
     static constexpr unsigned int VIEW_POSITION_BLOCK_BINDING = 2;
 
-    Renderer::Renderer(Screen& screen, int width, int height) {
+    Renderer::Renderer(int width, int height) {
         RenderGl::enable_depth_test();
 
         {
@@ -42,10 +46,11 @@ namespace sm {
 
             storage.scene_framebuffer = std::make_shared<GlFramebuffer>(specification);
 
-            screen.add_framebuffer(storage.scene_framebuffer);
+            add_framebuffer(storage.scene_framebuffer);
         }
 
         {
+            // Doesn't have uniform buffers for sure
             storage.screen_quad_shader = std::make_unique<GlShader>(
                 Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.vert")),
                 Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.frag"))
@@ -70,18 +75,13 @@ namespace sm {
             storage.screen_quad_vertex_array->add_vertex_buffer(screen_quad_vertex_buffer, layout);
             GlVertexArray::unbind();
         }
+
+        debug_initialize();
     }
 
     Renderer::~Renderer() {
-
-    }
-
-    void Renderer::add_renderable(const Renderable& renderable) {
-        scene_list.renderables.push_back(renderable);
-    }
-
-    void Renderer::add_light(const DirectionalLight& light) {
-        scene_list.directional_light = light;
+        // Not really needed
+        scene_data.framebuffers.clear();
     }
 
     void Renderer::capture(const Camera& camera, const glm::vec3& position) {
@@ -93,6 +93,95 @@ namespace sm {
 
     void Renderer::add_shader(std::shared_ptr<GlShader> shader) {
         scene_data.shaders.push_back(shader);
+    }
+
+    void Renderer::add_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer) {
+        scene_data.framebuffers.push_back(framebuffer);
+    }
+
+    void Renderer::add_renderable(const Renderable& renderable) {
+        scene_list.renderables.push_back(renderable);
+    }
+
+    void Renderer::add_light(const DirectionalLight& light) {
+        scene_list.directional_light = light;
+    }
+
+    void Renderer::debug_add_line(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& color) {
+        Line line;
+        line.p1 = p1;
+        line.p2 = p2;
+        line.color = color;
+
+        debug_scene_list.push_back(line);
+    }
+
+    void Renderer::debug_add_lines(const std::vector<glm::vec3>& points, const glm::vec3& color) {
+        SM_ASSERT(points.size() >= 2, "There must be at least one line");
+
+        Line line;
+        line.color = color;
+
+        for (std::size_t i = 1; i < points.size(); i++) {
+            line.p1 = points[i - 1];
+            line.p2 = points[i];
+
+            debug_scene_list.push_back(line);
+        }
+    }
+
+    void Renderer::debug_add_point(const glm::vec3& p, const glm::vec3& color) {
+        static constexpr float SIZE = 0.5f;
+
+        debug_add_line(glm::vec3(-SIZE, 0.0f, 0.0f) + p, glm::vec3(SIZE, 0.0f, 0.0f) + p, color);
+        debug_add_line(glm::vec3(0.0f, -SIZE, 0.0f) + p, glm::vec3(0.0f, SIZE, 0.0f) + p, color);
+        debug_add_line(glm::vec3(0.0f, 0.0f, -SIZE) + p, glm::vec3(0.0f, 0.0f, SIZE) + p, color);
+    }
+
+    void Renderer::debug_add_lamp(const glm::vec3& position, const glm::vec3& color) {
+        static constexpr float SIZE = 0.4f;
+        static constexpr float SIZE2 = 0.2f;
+        static constexpr float SIZE3 = 0.6f;
+        static constexpr float OFFSET = -(SIZE + SIZE3);
+        const std::array<Line, 24> LINES = {
+            // Top
+            Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, -SIZE, -SIZE), color},
+            Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, SIZE, SIZE), color},
+            Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(-SIZE, -SIZE, SIZE), color},
+
+            Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(-SIZE, -SIZE, SIZE), color},
+            Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(-SIZE, SIZE, -SIZE), color},
+            Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(SIZE, -SIZE, -SIZE), color},
+
+            Line {glm::vec3(SIZE, -SIZE, -SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
+            Line {glm::vec3(-SIZE, -SIZE, SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
+
+            Line {glm::vec3(SIZE, SIZE, SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
+            Line {glm::vec3(SIZE, SIZE, SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
+            Line {glm::vec3(-SIZE, SIZE, -SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
+            Line {glm::vec3(-SIZE, SIZE, -SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
+
+            // Bottom
+            Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), color},
+            Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), color},
+            Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), color},
+
+            Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), color},
+            Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), color},
+            Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), color},
+
+            Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
+            Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
+
+            Line {glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
+            Line {glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
+            Line {glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
+            Line {glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
+        };
+
+        for (const Line& line : LINES) {
+            debug_add_line(line.p1 + position, line.p2 + position, line.color);
+        }
     }
 
     void Renderer::render(int width, int height) {
@@ -123,7 +212,7 @@ namespace sm {
             }
         }
 
-        for (const std::weak_ptr<GlUniformBuffer>& wuniform_buffer : storage.uniform_buffers) {
+        for (const auto& [_, wuniform_buffer] : storage.uniform_buffers) {
             std::shared_ptr<GlUniformBuffer> uniform_buffer = wuniform_buffer.lock();
 
             if (uniform_buffer == nullptr) {
@@ -153,6 +242,9 @@ namespace sm {
         end_rendering();
 
         scene_list.clear();
+
+        debug_render();
+        debug_clear();
     }
 
     void Renderer::prerender_setup() {
@@ -163,11 +255,17 @@ namespace sm {
                 continue;
             }
 
+            // Create and store references to particular uniform buffers
             for (const UniformBlockSpecification& block : shader->uniform_blocks) {
+                // Don't create duplicate buffers
+                if (storage.uniform_buffers.count(block.binding_index) == 1) {
+                    continue;
+                }
+
                 auto uniform_buffer = std::make_shared<GlUniformBuffer>(block);
                 shader->add_uniform_buffer(uniform_buffer);
 
-                storage.uniform_buffers.push_back(uniform_buffer);
+                storage.uniform_buffers[block.binding_index] = uniform_buffer;
 
                 switch (block.binding_index) {
                     case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
@@ -190,8 +288,26 @@ namespace sm {
         scene_data.shaders.clear();
     }
 
-    const glm::mat4& Renderer::get_projection_view_matrix() {
-        return camera.projection_view_matrix;
+    void Renderer::resize_framebuffers(int width, int height) {
+        if (width == 0 || height == 0) {
+            return;
+        }
+
+        RenderGl::viewport(width, height);
+
+        for (std::weak_ptr<GlFramebuffer> wframebuffer : scene_data.framebuffers) {
+            std::shared_ptr<GlFramebuffer> framebuffer = wframebuffer.lock();
+
+            if (framebuffer == nullptr) {
+                continue;
+            }
+
+            if (!framebuffer->get_specification().resizable) {
+                continue;
+            }
+
+            framebuffer->resize(width, height);
+        }
     }
 
     void Renderer::draw_screen_quad(unsigned int texture) {
@@ -273,6 +389,70 @@ namespace sm {
 
     void Renderer::SceneList::clear() {
         renderables.clear();
+        directional_light = {};
         // point_lights.clear();
+    }
+
+    void Renderer::debug_initialize() {
+        debug_storage.shader = std::make_shared<GlShader>(
+            Encrypt::encr(FileSystem::path_engine_data("shaders/debug.vert")),
+            Encrypt::encr(FileSystem::path_engine_data("shaders/debug.frag"))
+        );
+
+        add_shader(debug_storage.shader);
+
+        auto vertex_buffer = std::make_shared<GlVertexBuffer>(DrawHint::Stream);
+        debug_storage.vertex_buffer = vertex_buffer;
+
+        VertexBufferLayout layout;
+        layout.add(0, VertexBufferLayout::Float, 3);
+        layout.add(1, VertexBufferLayout::Float, 3);
+
+        debug_storage.vertex_array = std::make_unique<GlVertexArray>();
+        debug_storage.vertex_array->bind();
+        debug_storage.vertex_array->add_vertex_buffer(vertex_buffer, layout);
+        GlVertexArray::unbind();
+    }
+
+    void Renderer::debug_render() {
+        static std::vector<BufferVertexStruct> buffer;
+        buffer.clear();
+
+        for (const Line& line : debug_scene_list) {
+            BufferVertexStruct v1;
+            v1.position = line.p1;
+            v1.color = line.color;
+
+            buffer.push_back(v1);
+
+            BufferVertexStruct v2;
+            v2.position = line.p2;
+            v2.color = line.color;
+
+            buffer.push_back(v2);
+        }
+
+        if (buffer.empty()) {
+            return;
+        }
+
+        auto vertex_buffer = debug_storage.vertex_buffer.lock();
+
+        vertex_buffer->bind();
+        vertex_buffer->upload_data(buffer.data(), buffer.size() * sizeof(BufferVertexStruct));
+        GlVertexBuffer::unbind();
+
+        debug_storage.shader->bind();
+        debug_storage.vertex_array->bind();
+
+        RenderGl::draw_arrays_lines(debug_scene_list.size() * 2);
+
+        GlVertexArray::unbind();
+
+        debug_scene_list.clear();
+    }
+
+    void Renderer::debug_clear() {
+        debug_scene_list.clear();
     }
 }

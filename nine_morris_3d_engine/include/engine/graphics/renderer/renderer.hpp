@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 #include <glm/glm.hpp>
 
@@ -9,7 +10,6 @@
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/opengl/shader.hpp"
-#include "engine/graphics/screen.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/renderable.hpp"
@@ -20,7 +20,7 @@ namespace sm {
 
     class Renderer {
     public:
-        Renderer(Screen& screen, int width, int height);
+        Renderer(int width, int height);
         ~Renderer();
 
         Renderer(const Renderer&) = delete;
@@ -28,17 +28,26 @@ namespace sm {
         Renderer(Renderer&&) = delete;
         Renderer& operator=(Renderer&&) = delete;
 
+        void capture(const Camera& camera, const glm::vec3& position);
+        void add_shader(std::shared_ptr<GlShader> shader);
+        void add_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
+
+        // 3D API
         void add_renderable(const Renderable& renderable);
         void add_light(const DirectionalLight& light);
 
-        void capture(const Camera& camera, const glm::vec3& position);
+        // Debug API
+        void debug_add_line(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& color);
+        void debug_add_lines(const std::vector<glm::vec3>& points, const glm::vec3& color);
 
-        void add_shader(std::shared_ptr<GlShader> shader);
+        void debug_add_point(const glm::vec3& p, const glm::vec3& color);
+        void debug_add_lamp(const glm::vec3& position, const glm::vec3& color);
     private:
         void render(int width, int height);
         void prerender_setup();
         void postrender_setup();
-        const glm::mat4& get_projection_view_matrix();
+
+        void resize_framebuffers(int width, int height);
 
         void draw_screen_quad(unsigned int texture);
         void post_processing();
@@ -56,7 +65,7 @@ namespace sm {
             std::unique_ptr<GlShader> screen_quad_shader;
             std::unique_ptr<GlVertexArray> screen_quad_vertex_array;
 
-            std::vector<std::weak_ptr<GlUniformBuffer>> uniform_buffers;
+            std::unordered_map<unsigned int, std::weak_ptr<GlUniformBuffer>> uniform_buffers;
             std::weak_ptr<GlUniformBuffer> projection_view_uniform_buffer;
             std::weak_ptr<GlUniformBuffer> light_uniform_buffer;
             std::weak_ptr<GlUniformBuffer> view_position_uniform_buffer;
@@ -81,7 +90,33 @@ namespace sm {
 
         struct {
             std::vector<std::weak_ptr<GlShader>> shaders;
+            std::vector<std::weak_ptr<GlFramebuffer>> framebuffers;
         } scene_data;
+
+        // Debug stuff
+        void debug_initialize();
+        void debug_render();
+        void debug_clear();
+
+        struct {
+            std::shared_ptr<GlShader> shader;
+
+            std::weak_ptr<GlVertexBuffer> vertex_buffer;
+            std::unique_ptr<GlVertexArray> vertex_array;
+        } debug_storage;
+
+        struct BufferVertexStruct {
+            glm::vec3 position;
+            glm::vec3 color;
+        };
+
+        struct Line {
+            glm::vec3 p1;
+            glm::vec3 p2;
+            glm::vec3 color;
+        };
+
+        std::vector<Line> debug_scene_list;
 
         friend class Application;
     };

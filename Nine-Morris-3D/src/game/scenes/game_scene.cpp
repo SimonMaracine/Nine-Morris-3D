@@ -78,7 +78,7 @@ void GameScene::on_start() {
         sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/dragon.frag"))
     );
 
-    ctx->r3d->add_shader(shader);
+    ctx->rnd->add_shader(shader);
 
     auto material = ctx->res.material.load("simple"_H, shader);
     material->add_uniform(sm::Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
@@ -130,32 +130,32 @@ void GameScene::on_update() {
     cam_controller.update_camera(ctx->delta);
     cam_controller.update_friction();
 
-    ctx->r3d->capture(cam, cam_controller.get_position());
+    ctx->rnd->capture(cam, cam_controller.get_position());
 
-    ctx->r3d->add_light(directional_light);
+    ctx->rnd->add_light(directional_light);
 
     sm::Renderable dragon;
     dragon.vertex_array = ctx->res.vertex_array["dragon"_H];
     dragon.material = ctx->res.material_instance["dragon"_H];
     dragon.scale = 0.7f;
 
-    ctx->r3d->add_renderable(dragon);
+    ctx->rnd->add_renderable(dragon);
 
     dragon.position = glm::vec3(4.0f, 0.0, 0.0f);
     dragon.scale = 0.2f;
 
-    ctx->r3d->add_renderable(dragon);
+    ctx->rnd->add_renderable(dragon);
 
     teapot.vertex_array = ctx->res.vertex_array["teapot"_H];
     teapot.material = ctx->res.material_instance["teapot"_H];
 
-    ctx->r3d->add_renderable(teapot);
+    ctx->rnd->add_renderable(teapot);
 
-    ctx->rdb->add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    ctx->rdb->add_line(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    ctx->rdb->add_line(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ctx->rnd->debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    ctx->rnd->debug_add_line(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    ctx->rnd->debug_add_line(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-    ctx->rdb->add_lines(
+    ctx->rnd->debug_add_lines(
         std::vector {
             glm::vec3(0.0f, 6.0f, 0.0f),
             glm::vec3(2.0f, 7.0f, 0.0f),
@@ -166,9 +166,9 @@ void GameScene::on_update() {
         glm::vec3(0.0f, 0.0f, 0.0f)
     );
 
-    ctx->rdb->add_lamp(directional_light.position, directional_light.diffuse_color);
+    ctx->rnd->debug_add_lamp(directional_light.position, directional_light.diffuse_color);
 
-    ctx->rdb->add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
+    ctx->rnd->debug_add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
 }
 
 void GameScene::on_imgui_update() {

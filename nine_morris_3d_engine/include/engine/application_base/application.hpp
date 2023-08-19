@@ -13,7 +13,6 @@
 #include "engine/application_base/context.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
-#include "engine/graphics/renderer/gui_renderer.hpp"
 #include "engine/other/resource_manager.hpp"
 #include "engine/scene/scene.hpp"
 

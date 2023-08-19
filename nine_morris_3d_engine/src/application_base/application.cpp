@@ -16,8 +16,6 @@
 #include "engine/audio/music.hpp"
 #include "engine/graphics/renderer/renderer.hpp"
 #include "engine/graphics/renderer/render_gl.hpp"
-#include "engine/graphics/renderer/gui_renderer.hpp"
-#include "engine/graphics/renderer/renderer_debug.hpp"
 #include "engine/graphics/opengl/info_and_debug.hpp"
 #include "engine/graphics/imgui_context.hpp"
 #include "engine/other/logging.hpp"
@@ -83,11 +81,7 @@ namespace sm {
         const auto [version_major, version_minor] = GlInfoDebug::get_version_number();
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
-        ctx.r3d = std::make_unique<Renderer>(ctx.scr, properties.width, properties.height);
-
-        ctx.rdb = std::make_unique<RendererDebug>();
-
-        // ctx.r2d = std::make_unique<Renderer2D>(properties.width, properties.height);
+        ctx.rnd = std::make_unique<Renderer>(properties.width, properties.height);
 
         if (builder.audio) {
             initialize_audio();
@@ -113,7 +107,7 @@ namespace sm {
         user_start_function();
         prepare_scenes(start_scene_id);
         on_start(current_scene);
-        ctx.r3d->prerender_setup();
+        ctx.rnd->prerender_setup();
 
         ctx.win->show();
         LOG_INFO("Initialized application, entering main loop...");
@@ -129,9 +123,7 @@ namespace sm {
             current_scene->on_update();
             ctx.tsk.update();
 
-            ctx.r3d->render(properties.width, properties.height);
-            ctx.rdb->render_3d(ctx.r3d->get_projection_view_matrix());
-            // TODO r2d
+            ctx.rnd->render(properties.width, properties.height);
             dear_imgui_render();
 
             ctx.win->update();
@@ -143,8 +135,7 @@ namespace sm {
         LOG_INFO("Closing application...");
 
         current_scene->on_stop();
-        ctx.r3d->postrender_setup();
-        ctx.scr.clear_framebuffers();
+        ctx.rnd->postrender_setup();
         user_stop_function();
 
         return ctx.exit_code;
@@ -206,7 +197,7 @@ namespace sm {
         if (changed_scene) {
             current_scene->on_stop();
 
-            ctx.r3d->postrender_setup();
+            ctx.rnd->postrender_setup();
 
             // Initialize the new scene
             current_scene = to_scene;
@@ -215,7 +206,7 @@ namespace sm {
             // Clear all cached resources
             ctx.res = {};
 
-            ctx.r3d->prerender_setup();
+            ctx.rnd->prerender_setup();
 
             changed_scene = false;
         }
@@ -276,6 +267,6 @@ namespace sm {
     }
 
     void Application::on_window_resized(const WindowResizedEvent& event) {
-        ctx.scr.resize(event.width, event.height);
+        ctx.rnd->resize_framebuffers(event.width, event.height);
     }
 }
