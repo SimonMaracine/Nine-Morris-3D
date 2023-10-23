@@ -1,12 +1,10 @@
 #! /bin/bash
 
-clear
+./build.sh Nine-Morris-3D
 
-cd ../build
-cmake --build . -j 8
-
-if [ $? -eq 0 ]; then
-    cd ..
-    clear
-    build/Nine-Morris-3D/Nine-Morris-3D
+if [ "$?" -ne 0 ]; then
+    exit 1
 fi
+
+cd ..
+build/Nine-Morris-3D/Nine-Morris-3D

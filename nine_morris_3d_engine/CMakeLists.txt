@@ -203,7 +203,7 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
     assimp
     glfw
     OpenAL::OpenAL
-    utf8cpp
+    utf8cpp  # TODO upgrade submodule
 )
 
 target_link_libraries(nine_morris_3d_engine PUBLIC
@@ -236,18 +236,20 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     endif()
 endif()
 
-# Use UTF-8 encoding on Windows for both engine and client
+# Use UTF-8 encoding on Windows
 if(WIN32)
     target_compile_options(nine_morris_3d_engine PUBLIC "/utf-8")
 endif()
 
-# Use C++ 17 for both engine and client
+# Use C++ 17
 target_compile_features(nine_morris_3d_engine PUBLIC cxx_std_17)
 set_target_properties(nine_morris_3d_engine PROPERTIES CXX_EXTENSIONS OFF)
 
-# Add compile definitions for engine and client
+# Add compile definitions for engine and client and others
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    # Optimization on in both engine and client
+    # These are set in both engine and client
+
+    # Optimization on
     target_compile_definitions(nine_morris_3d_engine PUBLIC
         "NDEBUG"  # Disable asserts globally
         "NM3D_RELEASE_MODE"  # Just a flag used by platform.h
@@ -255,12 +257,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     )
 
     if(NM3D_DISTRIBUTION_MODE)
-        # Distribution flag on in both engine and client
-        target_compile_definitions(nine_morris_3d_engine PUBLIC
-            "NM3D_DISTRIBUTION_MODE"
-        )
-
-        message(STATUS "Nine-Morris-3D: Building Nine Morris 3D engine for DISTRIBUTION")
+        # Distribution flag on
+        target_compile_definitions(nine_morris_3d_engine PUBLIC "NM3D_DISTRIBUTION_MODE")
     endif()
 endif()
 
@@ -270,22 +268,10 @@ target_compile_definitions(nine_morris_3d_engine PRIVATE
     "AL_LIBTYPE_STATIC"
 )
 
-# Both engine and client
 target_compile_definitions(nine_morris_3d_engine PUBLIC
     "SPDLOG_ACTIVE_LEVEL=0"
     "_CRT_SECURE_NO_WARNINGS"
     "ENTT_NO_ETO"
 )
 
-# On Windows set runtime library
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set_property(TARGET
-        nine_morris_3d_engine glad stb dear_imgui spdlog assimp glfw cppblowfish OpenAL
-        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug"
-    )
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set_property(TARGET
-        nine_morris_3d_engine glad stb dear_imgui spdlog assimp glfw cppblowfish OpenAL
-        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded"
-    )
-endif()
+target_compile_definitions(dear_imgui PRIVATE "NDEBUG")

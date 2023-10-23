@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstddef>
 
 #include <cppblowfish/cppblowfish.hpp>
 
@@ -9,8 +10,8 @@ static void open_file(const std::string& file_name, unsigned char** out, std::si
     std::ifstream file {file_name, std::ios::binary};
 
     if (!file.is_open()) {
-        std::cout << "Could not open file `" << file_name << "` for reading" << std::endl;
-        exit(1);
+        std::cout << "Could not open file `" << file_name << "` for reading\n";
+        std::exit(1);
     }
 
     file.seekg(0, file.end);
@@ -28,18 +29,20 @@ static void write_file(const std::string& file_name, const unsigned char* data, 
     std::ofstream file {file_name, std::ios::binary | std::ios::trunc};
 
     if (!file.is_open()) {
-        std::cout << "Could not open file `" << file_name << "` for writing" << std::endl;
-        exit(1);
+        std::cout << "Could not open file `" << file_name << "` for writing\n";
+        std::exit(1);
     }
 
     file.write(reinterpret_cast<const char*>(data), size);  // It is safe
 }
 
+// TODO use newest cppblowfish features
+
 int main(int argc, char** argv) {
     if (argc != 4) {
         std::cout << "Invalid arguments\n";
-        std::cout << "Usage: encrypter <input_file> <output_file> <key>" << std::endl;
-        exit(1);
+        std::cout << "Usage: encrypter <input_file> <output_file> <key>\n";
+        std::exit(1);
     }
 
     const std::string input_file = argv[1];
@@ -64,5 +67,5 @@ int main(int argc, char** argv) {
     write_file(output_file, buffer, size);
     delete[] buffer;
 
-    std::cout << "Successfully written cipher to `" << output_file << "`" << std::endl;
+    std::cout << "Successfully written cipher to `" << output_file << "`\n";
 }

@@ -174,7 +174,6 @@ namespace sm {
             flags |= aiProcess_GenNormals;
         }
 
-
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(
             std::string(file_path),
