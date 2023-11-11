@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <utility>
+#include <cstddef>
 
 #include <cppblowfish/cppblowfish.hpp>
 
@@ -14,6 +15,8 @@
 #endif
 
 namespace sm {
+    class Application;
+
     class Encrypt {
     public:
         Encrypt() = default;
