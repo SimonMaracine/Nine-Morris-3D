@@ -83,7 +83,7 @@ add_subdirectory(extern/cppblowfish)
 add_subdirectory(extern/entt)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/glm)
-add_subdirectory(extern/openal_soft)
+add_subdirectory(extern/openal_soft)  # TODO be sure that system packages are available when building
 add_subdirectory(extern/resmanager)
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/utfcpp)
@@ -203,7 +203,7 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
     assimp
     glfw
     OpenAL::OpenAL
-    utf8cpp  # TODO upgrade submodule
+    utf8cpp
 )
 
 target_link_libraries(nine_morris_3d_engine PUBLIC
