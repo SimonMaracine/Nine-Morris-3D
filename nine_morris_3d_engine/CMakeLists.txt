@@ -208,13 +208,13 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
 
 target_link_libraries(nine_morris_3d_engine PUBLIC
     dear_imgui
+    stb
     spdlog
     resmanager
     EnTT::EnTT
     cppblowfish
     glm
     cereal
-    stb
 )
 
 target_include_directories(nine_morris_3d_engine PUBLIC "include")

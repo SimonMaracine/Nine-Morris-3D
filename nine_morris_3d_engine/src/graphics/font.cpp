@@ -154,7 +154,7 @@ namespace sm {
         int descent;
         stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
-        const std::u32string utf32_string = utf8::utf8to32(string);
+        const std::u32string utf32_string = utf8::utf8to32(std::string(string));
 
         for (const char32_t character : utf32_string) {
             try_bake_character(character, descent);
