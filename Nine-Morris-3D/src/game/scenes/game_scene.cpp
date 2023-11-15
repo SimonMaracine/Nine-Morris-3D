@@ -5,8 +5,8 @@
 #include <engine/external/glm.h++>
 #include <engine/external/imgui.h++>
 
-#include <game/scenes/game_scene.hpp>
-#include <game/point_camera_controller.hpp>
+#include "game/scenes/game_scene.hpp"
+#include "game/point_camera_controller.hpp"
 
 void GameScene::on_start() {
     ctx->tsk.add("test"_H, [this](const sm::Task& task) {

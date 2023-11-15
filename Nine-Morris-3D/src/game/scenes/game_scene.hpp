@@ -2,7 +2,7 @@
 
 #include <engine/nine_morris_3d.hpp>
 
-#include <game/point_camera_controller.hpp>
+#include "game/point_camera_controller.hpp"
 
 struct GameScene : public sm::Scene {
     GameScene()

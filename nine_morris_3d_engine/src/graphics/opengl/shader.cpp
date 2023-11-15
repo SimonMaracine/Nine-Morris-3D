@@ -248,7 +248,6 @@ namespace sm {
                     char buffer[64];
                     glGetProgramResourceName(program, GL_UNIFORM, buffer_uniforms[j], 64, nullptr, buffer);
 
-                    // uniforms_in_blocks.push_back(buffer);
                     block.uniforms.push_back(buffer);
                 }
 

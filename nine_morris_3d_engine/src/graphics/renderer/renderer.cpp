@@ -362,17 +362,19 @@ namespace sm {
 
     void Renderer::draw_renderables() {
         for (const Renderable& renderable : scene_list.renderables) {
-            if (renderable.material->flags & Material::Outline) {
+            auto material = renderable.material.lock();
+
+            if (material->flags & Material::Outline) {
                 continue;  // This one is rendered differently
             }
 
-            if (renderable.material->flags & Material::DisableBackFaceCulling) {  // FIXME improve; maybe use scene graph
+            if (material->flags & Material::DisableBackFaceCulling) {  // FIXME improve; maybe use scene graph
                 RenderGl::disable_back_face_culling();
             }
 
             draw_renderable(renderable);
 
-            if (renderable.material->flags & Material::DisableBackFaceCulling) {
+            if (material->flags & Material::DisableBackFaceCulling) {
                 RenderGl::enable_back_face_culling();
             }
         }
@@ -381,6 +383,9 @@ namespace sm {
     }
 
     void Renderer::draw_renderable(const Renderable& renderable) {
+        auto vertex_array = renderable.vertex_array.lock();
+        auto material = renderable.material.lock();
+
         glm::mat4 matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, renderable.position);
         matrix = glm::rotate(matrix, renderable.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -388,12 +393,12 @@ namespace sm {
         matrix = glm::rotate(matrix, renderable.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(renderable.scale));
 
-        renderable.vertex_array->bind();
-        renderable.material->bind_and_upload();  // TODO sort and batch models based on material
+        vertex_array->bind();
+        material->bind_and_upload();  // TODO sort and batch models based on material
 
-        renderable.material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
+        material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
-        RenderGl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
+        RenderGl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
     }
 
     void Renderer::draw_renderables_outlined() {

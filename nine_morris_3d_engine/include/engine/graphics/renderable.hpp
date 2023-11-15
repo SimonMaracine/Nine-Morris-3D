@@ -8,9 +8,10 @@
 #include "engine/graphics/material.hpp"
 
 namespace sm {
+    // Right now every renderable is analogous to a mesh, to a render call
     struct Renderable {
-        std::shared_ptr<GlVertexArray> vertex_array;
-        std::shared_ptr<MaterialInstance> material;
+        std::weak_ptr<GlVertexArray> vertex_array;
+        std::weak_ptr<MaterialInstance> material;
 
         glm::vec3 position {};
         glm::vec3 rotation {};
