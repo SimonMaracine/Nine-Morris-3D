@@ -7,7 +7,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <glm/glm.hpp>
 
 #include "engine/application_base/panic.hpp"
 #include "engine/other/mesh.hpp"
@@ -16,36 +15,31 @@
 
 namespace sm {
     struct VertexP {
-        glm::vec3 position {};
+        aiVector3D position;
     };
 
     struct VertexPN {
-        glm::vec3 position {};
-        glm::vec3 normal {};
+        aiVector3D position;
+        aiVector3D normal;
     };
 
     struct VertexPTN {
-        glm::vec3 position {};
-        glm::vec2 texture_coordinate {};
-        glm::vec3 normal {};
+        aiVector3D position;
+        aiVector2D texture_coordinate;
+        aiVector3D normal;
     };
 
     struct VertexPTNT {
-        glm::vec3 position {};
-        glm::vec2 texture_coordinate {};
-        glm::vec3 normal {};
-        glm::vec3 tangent {};
+        aiVector3D position;
+        aiVector2D texture_coordinate;
+        aiVector3D normal;
+        aiVector3D tangent;
     };
 
     static void load_P(const aiMesh* mesh, std::vector<VertexP>& vertices, std::vector<unsigned int>& indices) {
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
             VertexP vertex;
-
-            glm::vec3 position;
-            position.x = mesh->mVertices[i].x;
-            position.y = mesh->mVertices[i].y;
-            position.z = mesh->mVertices[i].z;
-            vertex.position = position;
+            vertex.position = mesh->mVertices[i];
 
             vertices.push_back(vertex);
         }
@@ -62,18 +56,8 @@ namespace sm {
     static void load_PN(const aiMesh* mesh, std::vector<VertexPN>& vertices, std::vector<unsigned int>& indices) {
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
             VertexPN vertex;
-
-            glm::vec3 position;
-            position.x = mesh->mVertices[i].x;
-            position.y = mesh->mVertices[i].y;
-            position.z = mesh->mVertices[i].z;
-            vertex.position = position;
-
-            glm::vec3 normal;
-            normal.x = mesh->mNormals[i].x;
-            normal.y = mesh->mNormals[i].y;
-            normal.z = mesh->mNormals[i].z;
-            vertex.normal = normal;
+            vertex.position = mesh->mVertices[i];
+            vertex.normal = mesh->mNormals[i];
 
             vertices.push_back(vertex);
         }
@@ -90,23 +74,10 @@ namespace sm {
     static void load_PTN(const aiMesh* mesh, std::vector<VertexPTN>& vertices, std::vector<unsigned int>& indices) {
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
             VertexPTN vertex;
-
-            glm::vec3 position;
-            position.x = mesh->mVertices[i].x;
-            position.y = mesh->mVertices[i].y;
-            position.z = mesh->mVertices[i].z;
-            vertex.position = position;
-
-            glm::vec2 texture_coordinate;
-            texture_coordinate.x = mesh->mTextureCoords[0][i].x;
-            texture_coordinate.y = mesh->mTextureCoords[0][i].y;
-            vertex.texture_coordinate = texture_coordinate;
-
-            glm::vec3 normal;
-            normal.x = mesh->mNormals[i].x;
-            normal.y = mesh->mNormals[i].y;
-            normal.z = mesh->mNormals[i].z;
-            vertex.normal = normal;
+            vertex.position = mesh->mVertices[i];
+            vertex.texture_coordinate.x = mesh->mTextureCoords[0][i].x;
+            vertex.texture_coordinate.y = mesh->mTextureCoords[0][i].y;
+            vertex.normal = mesh->mNormals[i];
 
             vertices.push_back(vertex);
         }
@@ -123,29 +94,11 @@ namespace sm {
     static void load_PTNT(const aiMesh* mesh, std::vector<VertexPTNT>& vertices, std::vector<unsigned int>& indices) {
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
             VertexPTNT vertex;
-
-            glm::vec3 position;
-            position.x = mesh->mVertices[i].x;
-            position.y = mesh->mVertices[i].y;
-            position.z = mesh->mVertices[i].z;
-            vertex.position = position;
-
-            glm::vec2 texture_coordinate;
-            texture_coordinate.x = mesh->mTextureCoords[0][i].x;
-            texture_coordinate.y = mesh->mTextureCoords[0][i].y;
-            vertex.texture_coordinate = texture_coordinate;
-
-            glm::vec3 normal;
-            normal.x = mesh->mNormals[i].x;
-            normal.y = mesh->mNormals[i].y;
-            normal.z = mesh->mNormals[i].z;
-            vertex.normal = normal;
-
-            glm::vec3 tangent;
-            tangent.x = mesh->mTangents[i].x;
-            tangent.y = mesh->mTangents[i].y;
-            tangent.z = mesh->mTangents[i].z;
-            vertex.tangent = tangent;
+            vertex.position = mesh->mVertices[i];
+            vertex.texture_coordinate.x = mesh->mTextureCoords[0][i].x;
+            vertex.texture_coordinate.y = mesh->mTextureCoords[0][i].y;
+            vertex.normal = mesh->mNormals[i];
+            vertex.tangent = mesh->mTangents[i];
 
             vertices.push_back(vertex);
         }
@@ -159,7 +112,23 @@ namespace sm {
         }
     }
 
-    Mesh::Mesh(std::string_view file_path, Type type, bool flip_winding) {
+    static const aiMesh* find_mesh(const aiNode* node, std::string_view object_name, const aiScene* scene) {
+        for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+            const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+            if (std::strcmp(mesh->mName.C_Str(), std::string(object_name).c_str()) == 0) {
+                return mesh;
+            }
+        }
+
+        for (unsigned int i = 0; i < node->mNumChildren; i++) {
+            return find_mesh(node->mChildren[i], object_name, scene);
+        }
+
+        return nullptr;
+    }
+
+    Mesh::Mesh(std::string_view file_path, std::string_view object_name, Type type, bool flip_winding) {
         unsigned int flags = aiProcess_ValidateDataStructure;
 
         if (flip_winding) {
@@ -175,10 +144,8 @@ namespace sm {
         }
 
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(
-            std::string(file_path),
-            flags
-        );
+
+        const aiScene* scene = importer.ReadFile(std::string(file_path), flags);
 
         if (scene == nullptr) {
             LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
@@ -187,14 +154,17 @@ namespace sm {
         }
 
         const aiNode* root_node = scene->mRootNode;
+        const aiMesh* mesh = find_mesh(root_node, object_name, scene);
 
-        const aiNode* collection = root_node->mChildren[0];
-        const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
+        if (mesh == nullptr) {
+            LOG_CRITICAL("Model file `{}` does not contain `{}` mesh", file_path, object_name);
+            panic();
+        }
 
         load(type, mesh, file_path);
     }
 
-    Mesh::Mesh(Encrypt::EncryptedFile file_path, Type type, bool flip_winding) {
+    Mesh::Mesh(Encrypt::EncryptedFile file_path, std::string_view object_name, Type type, bool flip_winding) {
         unsigned int flags = aiProcess_ValidateDataStructure;
 
         if (flip_winding) {
@@ -212,11 +182,8 @@ namespace sm {
         const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
 
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFileFromMemory(
-            buffer,
-            buffer_size,
-            flags
-        );
+
+        const aiScene* scene = importer.ReadFileFromMemory(buffer, buffer_size, flags);
 
         if (scene == nullptr) {
             LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
@@ -225,9 +192,12 @@ namespace sm {
         }
 
         const aiNode* root_node = scene->mRootNode;
+        const aiMesh* mesh = find_mesh(root_node, object_name, scene);
 
-        const aiNode* collection = root_node->mChildren[0];
-        const aiMesh* mesh = scene->mMeshes[collection->mMeshes[0]];
+        if (mesh == nullptr) {
+            LOG_CRITICAL("Model file `{}` does not contain mesh `{}`", file_path, object_name);
+            panic();
+        }
 
         load(type, mesh, file_path);
     }
@@ -319,7 +289,7 @@ namespace sm {
         std::memcpy(this->vertices, vertices, vertices_size);
         this->vertices_size = vertices_size;
 
-        this->indices = new unsigned int[indices_size];
+        this->indices = new unsigned char[indices_size];
         std::memcpy(this->indices, indices, indices_size);
         this->indices_size = indices_size;
     }

@@ -102,7 +102,7 @@ namespace sm {
     struct fmt::formatter<EVENT> { \
         constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) { \
             if (ctx.begin() != ctx.end()) { \
-                throw format_error("invalid format"); \
+                throw format_error("Invalid format"); \
             } \
         \
             return ctx.begin(); \
@@ -114,7 +114,7 @@ namespace sm {
         } \
     };
 
-SM_EVENT_FORMATTER(sm::WindowClosedEvent, "WindowClosedEvent()")
+SM_EVENT_FORMATTER(sm::WindowClosedEvent, "WindowClosedEvent")
 SM_EVENT_FORMATTER(sm::WindowResizedEvent, "WindowResizedEvent({}, {})", event.width, event.height)
 SM_EVENT_FORMATTER(sm::WindowFocusedEvent, "WindowFocusedEvent({})", event.focused)
 SM_EVENT_FORMATTER(sm::KeyPressedEvent, "KeyPressedEvent({}, {})", static_cast<int>(event.key), event.repeat)

@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <unordered_map>
 #include <vector>
+#include <string>
 #include <cstring>
 
 #include <glad/glad.h>
@@ -86,7 +87,7 @@ namespace sm {
 
     // --- Index buffer
 
-    GlIndexBuffer::GlIndexBuffer(const unsigned int* data, std::size_t size) {
+    GlIndexBuffer::GlIndexBuffer(const void* data, std::size_t size) {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);

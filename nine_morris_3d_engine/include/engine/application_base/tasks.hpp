@@ -18,7 +18,7 @@ namespace sm {
         using TaskFunction = std::function<Result(const Task&)>;
 
         Task(Task::TaskId id, const Task::TaskFunction& function)
-            : id(id), function(function) {}
+            : function(function), id(id) {}
         ~Task() = default;
 
         Task(const Task&) = default;
@@ -30,13 +30,12 @@ namespace sm {
         double get_total_time() const { return total_time; }
         unsigned int get_frames() const { return frames; }
     private:
-        TaskId id;
         TaskFunction function;
+        TaskId id;
 
         double total_time = 0.0;
-        unsigned int frames = 0;
-
         double start_time = 0.0;
+        unsigned int frames = 0;
 
         friend class TaskManager;
     };
@@ -58,8 +57,6 @@ namespace sm {
 
         std::vector<Task> tasks_active;
         std::vector<Task> tasks_next;
-
-        void* window = nullptr;
 
         friend class Application;
     };

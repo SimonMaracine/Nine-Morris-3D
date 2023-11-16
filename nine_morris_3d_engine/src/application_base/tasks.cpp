@@ -1,5 +1,8 @@
 #include <vector>
+#include <functional>
 #include <algorithm>
+
+#include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/tasks.hpp"
 #include "engine/application_base/window.hpp"

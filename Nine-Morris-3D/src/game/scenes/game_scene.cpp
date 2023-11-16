@@ -22,6 +22,7 @@ void GameScene::on_start() {
     {
         auto mesh = std::make_shared<sm::Mesh>(
             sm::Encrypt::encr(sm::FileSystem::path_assets("models/dragon.obj")),
+            "default",
             sm::Mesh::Type::PN
         );
 
@@ -49,6 +50,7 @@ void GameScene::on_start() {
     {
         auto mesh = std::make_shared<sm::Mesh>(
             sm::Encrypt::encr(sm::FileSystem::path_assets("models/teapot.obj")),
+            sm::Mesh::DEFAULT_OBJECT,
             sm::Mesh::Type::PN
         );
 
@@ -67,6 +69,34 @@ void GameScene::on_start() {
         layout.add(1, sm::VertexBufferLayout::Float, 3);
 
         auto vertex_array = ctx->res.vertex_array.load("teapot"_H);
+        vertex_array->bind();
+        vertex_array->add_vertex_buffer(vertex_buffer, layout);
+        vertex_array->add_index_buffer(index_buffer);
+        sm::GlVertexArray::unbind();
+    }
+
+    {
+        auto mesh = std::make_shared<sm::Mesh>(
+            sm::Encrypt::encr(sm::FileSystem::path_assets("scene/scene.obj")),
+            "Cube_Cube.001",
+            sm::Mesh::Type::PN
+        );
+
+        auto vertex_buffer = std::make_shared<sm::GlVertexBuffer>(
+            mesh->get_vertices(),
+            mesh->get_vertices_size()
+        );
+
+        auto index_buffer = std::make_shared<sm::GlIndexBuffer>(
+            mesh->get_indices(),
+            mesh->get_indices_size()
+        );
+
+        sm::VertexBufferLayout layout;
+        layout.add(0, sm::VertexBufferLayout::Float, 3);
+        layout.add(1, sm::VertexBufferLayout::Float, 3);
+
+        auto vertex_array = ctx->res.vertex_array.load("cube"_H);
         vertex_array->bind();
         vertex_array->add_vertex_buffer(vertex_buffer, layout);
         vertex_array->add_index_buffer(index_buffer);
@@ -105,6 +135,13 @@ void GameScene::on_start() {
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.7f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
         material_instance->flags |= sm::Material::DisableBackFaceCulling;
+    }
+
+    {
+        auto material_instance = ctx->res.material_instance.load("cube"_H, material);
+        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 0.0f, 0.0f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.8f));
+        material_instance->set_float("u_material.shininess"_H, 128.0f);
     }
 
     cam_controller = PointCameraController(
@@ -166,6 +203,13 @@ void GameScene::on_update() {
     teapot.material = ctx->res.material_instance["teapot"_H];
 
     ctx->rnd->add_renderable(teapot);
+
+    sm::Renderable cube;
+    cube.vertex_array = ctx->res.vertex_array["cube"_H];
+    cube.material = ctx->res.material_instance["cube"_H];
+    cube.position = glm::vec3(5.0f, 2.0f, -2.0f);
+
+    ctx->rnd->add_renderable(cube);
 
     // Origin
     ctx->rnd->debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));

@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <unordered_map>
 #include <vector>
+#include <string>
 
 #include <resmanager/resmanager.hpp>
 
@@ -37,9 +38,10 @@ namespace sm {
         DrawHint hint = DrawHint::Static;
     };
 
+    // Only supports unsigned int
     class GlIndexBuffer {
     public:
-        GlIndexBuffer(const unsigned int* data, std::size_t size);
+        GlIndexBuffer(const void* data, std::size_t size);
         ~GlIndexBuffer();
 
         GlIndexBuffer(const GlIndexBuffer&) = delete;
