@@ -60,9 +60,9 @@ namespace sm {
         bool check_compilation(unsigned int shader, unsigned int type) const;
         bool check_linking(unsigned int program) const;
 
-        unsigned int program = 0;
-        unsigned int vertex_shader = 0;
-        unsigned int fragment_shader = 0;
+        unsigned int program {0};
+        unsigned int vertex_shader {0};
+        unsigned int fragment_shader {0};
 
         std::string name;
 

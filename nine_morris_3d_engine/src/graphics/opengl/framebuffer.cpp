@@ -8,7 +8,7 @@
 #include "engine/other/assert.hpp"
 
 namespace sm {
-    static const GLenum COLOR_ATTACHMENTS[4] = {
+    static const GLenum COLOR_ATTACHMENTS[4] {
         GL_COLOR_ATTACHMENT0,
         GL_COLOR_ATTACHMENT1,
         GL_COLOR_ATTACHMENT2,
@@ -28,7 +28,7 @@ namespace sm {
 
     static void attach_color_texture(GLuint texture, int samples, GLenum internal_format,
             int width, int height, unsigned int index) {
-        const bool multisampled = samples > 1;
+        const bool multisampled {samples > 1};
 
         if (multisampled) {
             glTexImage2DMultisample(
@@ -40,7 +40,7 @@ namespace sm {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-            float border_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+            float border_color[4] { 0.0f, 0.0f, 0.0f, 1.0f };
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
 
             glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
@@ -53,7 +53,7 @@ namespace sm {
 
     static void attach_depth_texture(GLuint texture, int samples, GLenum internal_format,
             GLenum attachment, int width, int height, bool white_border) {
-        const bool multisampled = samples > 1;
+        const bool multisampled {samples > 1};
 
         if (multisampled) {
             glTexImage2DMultisample(
@@ -66,7 +66,7 @@ namespace sm {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
             if (white_border) {
-                const float border_color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+                const float border_color[4] { 1.0f, 1.0f, 1.0f, 1.0f };
                 glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
             }
 
@@ -78,7 +78,7 @@ namespace sm {
 
     static void attach_color_renderbuffer(GLuint renderbuffer, int samples, GLenum internal_format,
             int width, int height, unsigned int index) {
-        const bool multisampled = samples > 1;
+        const bool multisampled {samples > 1};
 
         if (multisampled) {
             glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
@@ -93,7 +93,7 @@ namespace sm {
 
     static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum internal_format,
             GLenum attachment, int width, int height) {
-        const bool multisampled = samples > 1;
+        const bool multisampled {samples > 1};
 
         if (multisampled) {
             glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, internal_format, width, height);
@@ -105,7 +105,7 @@ namespace sm {
     }
 
     static const char* print_framebuffer_status_message(GLenum status) {
-        const char* message = nullptr;
+        const char* message {nullptr};
 
         switch (status) {
             case GL_FRAMEBUFFER_UNDEFINED:
@@ -171,7 +171,7 @@ namespace sm {
     }
 
     GlFramebuffer::~GlFramebuffer() {
-        for (std::size_t i = 0; i < specification.color_attachments.size(); i++) {
+        for (std::size_t i {0}; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
                     SM_ASSERT(false, "Attachment type None is invalid");
@@ -264,7 +264,7 @@ namespace sm {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer->framebuffer);
 
-        for (std::size_t i = 0; i < color_attachments.size(); i++) {
+        for (std::size_t i {0}; i < color_attachments.size(); i++) {
             glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
             glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
             glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -276,7 +276,7 @@ namespace sm {
     void GlFramebuffer::build() {
         // Delete old framebuffer first
         if (framebuffer != 0) {
-            for (std::size_t i = 0; i < specification.color_attachments.size(); i++) {
+            for (std::size_t i {0}; i < specification.color_attachments.size(); i++) {
                 switch (specification.color_attachments[i].type) {
                     case AttachmentType::None:
                         SM_ASSERT(false, "Attachment type None is invalid");
@@ -314,11 +314,11 @@ namespace sm {
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-        const bool multisampled = specification.samples > 1;
+        const bool multisampled {specification.samples > 1};
 
         color_attachments.resize(specification.color_attachments.size());
 
-        for (std::size_t i = 0; i < specification.color_attachments.size(); i++) {
+        for (std::size_t i {0}; i < specification.color_attachments.size(); i++) {
             switch (specification.color_attachments[i].type) {
                 case AttachmentType::None:
                     SM_ASSERT(false, "Attachment type None is invalid");
@@ -485,11 +485,11 @@ namespace sm {
             glReadBuffer(GL_NONE);
         }
 
-        const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        const GLenum status {glCheckFramebufferStatus(GL_FRAMEBUFFER)};
 
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             LOG_DIST_CRITICAL("GL framebuffer {} is incomplete", framebuffer);
-            LOG_DIST_CRITICAL("GL framebuffer status: {}", print_framebuffer_status_message(status));
+            LOG_DIST_CRITICAL("Status: {}", print_framebuffer_status_message(status));
             panic();
         }
 

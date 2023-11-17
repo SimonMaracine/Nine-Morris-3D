@@ -39,11 +39,11 @@ namespace sm {
         std::string_view get_name() const { return name; }
         SceneId get_id() const { return id; }
 
-        Ctx* ctx = nullptr;
+        Ctx* ctx {nullptr};
     private:
         std::string name;
         SceneId id;
-        bool on_awake_called = false;
+        bool on_awake_called {false};
 
         friend class Ctx;
         friend class Application;

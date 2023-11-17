@@ -15,7 +15,7 @@ namespace sm {
             PTNT
         };
 
-        static constexpr std::string_view DEFAULT_OBJECT = "defaultobject";
+        static constexpr std::string_view DEFAULT_OBJECT {"defaultobject"};
 
         Mesh(std::string_view file_path, std::string_view object_name, Type type, bool flip_winding = false);
         Mesh(Encrypt::EncryptedFile file_path, std::string_view object_name, Type type, bool flip_winding = false);
@@ -35,10 +35,10 @@ namespace sm {
         void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
 
         // Raw data
-        unsigned char* vertices = nullptr;
-        unsigned char* indices = nullptr;
+        unsigned char* vertices {nullptr};
+        unsigned char* indices {nullptr};
 
-        std::size_t vertices_size = 0;
-        std::size_t indices_size = 0;
+        std::size_t vertices_size {0};
+        std::size_t indices_size {0};
     };
 }

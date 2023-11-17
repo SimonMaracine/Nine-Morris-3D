@@ -10,7 +10,7 @@ namespace sm {
     }
 
     void RenderGl::clear(Buffers buffers) {
-        int result = 0;
+        unsigned int result {0};
 
         switch (buffers) {
             case Buffers::C:
@@ -99,7 +99,7 @@ namespace sm {
     }
 
     void RenderGl::stencil_function(Function function, int ref, unsigned int mask) {
-        unsigned int result = 0;
+        unsigned int result {0};
 
         switch (function) {
             case Function::Always:

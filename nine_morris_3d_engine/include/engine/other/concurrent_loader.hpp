@@ -43,8 +43,8 @@ namespace sm {
 
         Callback callback_function;
         std::thread loading_thread;
-        std::atomic<bool> loaded = false;
-        bool in_use = false;
+        std::atomic<bool> loaded {false};
+        bool in_use {false};
     };
 
     template<typename D, typename... Args>

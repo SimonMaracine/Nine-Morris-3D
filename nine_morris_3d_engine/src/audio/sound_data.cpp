@@ -38,7 +38,7 @@ namespace sm {
         : file_path(file_path) {
         LOG_DEBUG("Loading sound data `{}`...", file_path);
 
-        const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
+        const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
 
         samples = stb_vorbis_decode_memory(buffer, buffer_size, &channels, &sample_rate, &data);
 

@@ -56,7 +56,7 @@ namespace sm {
         shader = material->shader;
         flags = material->flags;
 
-        std::size_t offset = 0;
+        std::size_t offset {0};
 
         for (const auto& name : material->uniforms_mat4) {
             Element element;
@@ -200,32 +200,32 @@ namespace sm {
     }
 
     void MaterialInstance::set_mat4(Key name, const glm::mat4& matrix) {
-        const Element& element = offsets.at(name);
+        const Element& element {offsets.at(name)};
         std::memcpy(data + element.offset, &matrix, sizeof(matrix));
     }
 
     void MaterialInstance::set_int(Key name, int integer) {
-        const Element& element = offsets.at(name);
+        const Element& element {offsets.at(name)};
         std::memcpy(data + element.offset, &integer, sizeof(integer));
     }
 
     void MaterialInstance::set_float(Key name, float real) {
-        const Element& element = offsets.at(name);
+        const Element& element {offsets.at(name)};
         std::memcpy(data + element.offset, &real, sizeof(real));
     }
 
     void MaterialInstance::set_vec2(Key name, glm::vec2 vector) {
-        const Element& element = offsets.at(name);
+        const Element& element {offsets.at(name)};
         std::memcpy(data + element.offset, &vector, sizeof(vector));
     }
 
     void MaterialInstance::set_vec3(Key name, const glm::vec3& vector) {
-        const Element& element = offsets.at(name);
+        const Element& element {offsets.at(name)};
         std::memcpy(data + element.offset, &vector, sizeof(vector));
     }
 
     void MaterialInstance::set_vec4(Key name, const glm::vec4& vector) {
-        const Element& element = offsets.at(name);
+        const Element& element {offsets.at(name)};
         std::memcpy(data + element.offset, &vector, sizeof(vector));
     }
 
@@ -234,7 +234,7 @@ namespace sm {
         result_texure.unit = unit;
         result_texure.texture = texture->get_id();
 
-        const Element& element = offsets.at(name);
+        const Element& element {offsets.at(name)};
         std::memcpy(data + element.offset, &result_texure, sizeof(result_texure));
     }
 
@@ -243,7 +243,7 @@ namespace sm {
         result_texure.unit = unit;
         result_texure.texture = texture;
 
-        const Element& element = offsets.at(name);
+        const Element& element {offsets.at(name)};
         std::memcpy(data + element.offset, &result_texure, sizeof(result_texure));
     }
 }

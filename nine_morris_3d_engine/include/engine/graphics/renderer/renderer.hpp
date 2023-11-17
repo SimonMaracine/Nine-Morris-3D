@@ -81,9 +81,9 @@ namespace sm {
         PostProcessingContext post_processing_context;  // TODO implement
 
         struct {
-            glm::mat4 view_matrix = glm::mat4(1.0f);
-            glm::mat4 projection_matrix = glm::mat4(1.0f);
-            glm::mat4 projection_view_matrix = glm::mat4(1.0f);
+            glm::mat4 view_matrix {glm::mat4(1.0f)};
+            glm::mat4 projection_matrix {glm::mat4(1.0f)};
+            glm::mat4 projection_view_matrix {glm::mat4(1.0f)};
             glm::vec3 position {};
         } camera;
 

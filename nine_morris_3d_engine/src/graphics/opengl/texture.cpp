@@ -21,10 +21,10 @@
 #include "engine/other/encrypt.hpp"
 
 namespace sm {
-    static constexpr int CHANNELS = 4;
+    static constexpr int CHANNELS {4};
 
     static std::string get_name(std::string_view file_path) {
-        std::size_t last_slash = file_path.find_last_of("/");
+        std::size_t last_slash {file_path.find_last_of("/")};
         SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
 
         return std::string(file_path.substr(last_slash + 1));
@@ -36,7 +36,7 @@ namespace sm {
         char copy[512];
         std::strncpy(copy, file_path, 512 - 1);
 
-        char* token = std::strtok(copy, "/");
+        char* token {std::strtok(copy, "/")};
 
         while (token != nullptr) {
             tokens.push_back(token);
@@ -57,9 +57,9 @@ namespace sm {
             return;
         }
 
-        const bool anisotropic_filtering_enabled = specification.anisotropic_filtering > 0;
+        const bool anisotropic_filtering_enabled {specification.anisotropic_filtering > 0};
 
-        const float bias = anisotropic_filtering_enabled ? 0.0f : specification.bias;
+        const float bias {anisotropic_filtering_enabled ? 0.0f : specification.bias};
 
         glGenerateMipmap(GL_TEXTURE_2D);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
@@ -70,14 +70,14 @@ namespace sm {
                 "Invalid anisotropic filtering value"
             );
 
-            const float amount = static_cast<float>(specification.anisotropic_filtering);
+            const float amount {static_cast<float>(specification.anisotropic_filtering)};
 
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
         }
     }
 
     static int filter_to_int(Filter filter) {
-        int result = 0;
+        int result {0};
 
         switch (filter) {
             case Filter::Linear:
@@ -92,7 +92,7 @@ namespace sm {
     }
 
     static int wrap_to_int(Wrap wrap) {
-        int result = 0;
+        int result {0};
 
         switch (wrap) {
             case Wrap::Repeat:
@@ -110,9 +110,9 @@ namespace sm {
     }
 
     static void configure_filter_and_wrap(const TextureSpecification& specification) {
-        const int min_filter = (
+        const int min_filter {
             use_mipmapping(specification) ? GL_LINEAR_MIPMAP_LINEAR : filter_to_int(specification.min_filter)
-        );
+        };
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_to_int(specification.mag_filter));
@@ -120,7 +120,7 @@ namespace sm {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_to_int(specification.wrap_t));
 
         if (specification.border_color != std::nullopt) {
-            const glm::vec4& color = specification.border_color.value();
+            const glm::vec4& color {specification.border_color.value()};
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
         }
     }
@@ -140,7 +140,7 @@ namespace sm {
         stbi_set_flip_vertically_on_load(1);
 
         int width, height, channels;
-        unsigned char* data = stbi_load(file_path.data(), &width, &height, &channels, CHANNELS);
+        unsigned char* data {stbi_load(file_path.data(), &width, &height, &channels, CHANNELS)};
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
@@ -168,14 +168,12 @@ namespace sm {
         : specification(specification) {
         LOG_DEBUG("Loading texture `{}`...", file_path);
 
-        const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
+        const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
 
         stbi_set_flip_vertically_on_load(1);
 
         int width, height, channels;
-        unsigned char* data = stbi_load_from_memory(
-            buffer, buffer_size, &width, &height, &channels, CHANNELS
-        );
+        unsigned char* data {stbi_load_from_memory(buffer, buffer_size, &width, &height, &channels, CHANNELS)};
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
@@ -282,7 +280,7 @@ namespace sm {
         int width, height, channels;
         unsigned char* data[6];
 
-        for (std::size_t i = 0; i < 6; i++) {
+        for (std::size_t i {0}; i < 6; i++) {
             LOG_DEBUG("Loading texture `{}`...", file_paths[i]);
 
             data[i] = stbi_load(file_paths[i], &width, &height, &channels, CHANNELS);
@@ -295,7 +293,7 @@ namespace sm {
 
         glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
 
-        for (std::size_t i = 0; i < 6; i++) {
+        for (std::size_t i {0}; i < 6; i++) {
             glTexSubImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height,
                 GL_RGBA, GL_UNSIGNED_BYTE, data[i]
@@ -319,7 +317,7 @@ namespace sm {
 
         glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, data[0]->width, data[0]->height);
 
-        for (std::size_t i = 0; i < 6; i++) {
+        for (std::size_t i {0}; i < 6; i++) {
             glTexSubImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, data[i]->width, data[i]->height,
                 GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data

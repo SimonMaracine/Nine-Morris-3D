@@ -5,8 +5,6 @@
 
 #include "engine/application_base/input.hpp"
 
-struct GLFWwindow;
-
 namespace sm {
     bool Input::is_key_pressed(Key key) {
         return glfwGetKey(static_cast<GLFWwindow*>(window_handle), static_cast<int>(key)) == GLFW_PRESS;

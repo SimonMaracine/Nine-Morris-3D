@@ -27,11 +27,11 @@
 using namespace resmanager::literals;
 
 namespace sm {
-    static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING = 0;
-    static constexpr unsigned int DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING = 1;
-    static constexpr unsigned int VIEW_POSITION_BLOCK_BINDING = 2;
-    static constexpr unsigned int POINT_LIGHT_BLOCK_BINDING = 3;
-    static constexpr std::size_t SHADER_POINT_LIGHTS = 4;
+    static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING {0};
+    static constexpr unsigned int DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING {1};
+    static constexpr unsigned int VIEW_POSITION_BLOCK_BINDING {2};
+    static constexpr unsigned int POINT_LIGHT_BLOCK_BINDING {3};
+    static constexpr std::size_t SHADER_POINT_LIGHTS {4};
 
     Renderer::Renderer(int width, int height) {
         RenderGl::enable_depth_test();
@@ -59,7 +59,7 @@ namespace sm {
                 Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.frag"))
             );
 
-            const float vertices[] = {
+            const float vertices[] {
                 -1.0f,  1.0f,
                 -1.0f, -1.0f,
                  1.0f,  1.0f,
@@ -68,7 +68,7 @@ namespace sm {
                  1.0f, -1.0f
             };
 
-            auto screen_quad_vertex_buffer = std::make_shared<GlVertexBuffer>(vertices, sizeof(vertices));
+            auto screen_quad_vertex_buffer {std::make_shared<GlVertexBuffer>(vertices, sizeof(vertices))};
 
             VertexBufferLayout layout;
             layout.add(0, VertexBufferLayout::Float, 2);
@@ -129,7 +129,7 @@ namespace sm {
         Line line;
         line.color = color;
 
-        for (std::size_t i = 1; i < points.size(); i++) {
+        for (std::size_t i {1}; i < points.size(); i++) {
             line.p1 = points[i - 1];
             line.p2 = points[i];
 
@@ -138,7 +138,7 @@ namespace sm {
     }
 
     void Renderer::debug_add_point(const glm::vec3& p, const glm::vec3& color) {
-        static constexpr float SIZE = 0.5f;
+        static constexpr float SIZE {0.5f};
 
         debug_add_line(glm::vec3(-SIZE, 0.0f, 0.0f) + p, glm::vec3(SIZE, 0.0f, 0.0f) + p, color);
         debug_add_line(glm::vec3(0.0f, -SIZE, 0.0f) + p, glm::vec3(0.0f, SIZE, 0.0f) + p, color);
@@ -146,11 +146,11 @@ namespace sm {
     }
 
     void Renderer::debug_add_lamp(const glm::vec3& position, const glm::vec3& color) {
-        static constexpr float SIZE = 0.3f;
-        static constexpr float SIZE2 = 0.15f;
-        static constexpr float SIZE3 = 0.5f;
-        static constexpr float OFFSET = -(SIZE + SIZE3);
-        const std::array<Line, 24> LINES = {
+        static constexpr float SIZE {0.3f};
+        static constexpr float SIZE2 {0.15f};
+        static constexpr float SIZE3 {0.5f};
+        static constexpr float OFFSET {-(SIZE + SIZE3)};
+        const std::array<Line, 24> LINES {
             // Top
             Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, -SIZE, -SIZE), color},
             Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, SIZE, SIZE), color},
@@ -195,14 +195,14 @@ namespace sm {
         // TODO pre-render setup
 
         {
-            auto uniform_buffer = storage.projection_view_uniform_buffer.lock();
+            auto uniform_buffer {storage.projection_view_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&camera.projection_view_matrix, "u_projection_view_matrix"_H);
             }
         }
         {
-            auto uniform_buffer = storage.directional_light_uniform_buffer.lock();
+            auto uniform_buffer {storage.directional_light_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&scene_list.directional_light.direction, "u_directional_light.direction"_H);
@@ -212,14 +212,14 @@ namespace sm {
             }
         }
         {
-            auto uniform_buffer = storage.view_position_uniform_buffer.lock();
+            auto uniform_buffer {storage.view_position_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&camera.position, "u_view_position"_H);
             }
         }
         {
-            auto uniform_buffer = storage.point_light_uniform_buffer.lock();
+            auto uniform_buffer {storage.point_light_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 setup_point_light_uniform_buffer(uniform_buffer);
@@ -227,7 +227,7 @@ namespace sm {
         }
 
         for (const auto& [_, wuniform_buffer] : storage.uniform_buffers) {
-            std::shared_ptr<GlUniformBuffer> uniform_buffer = wuniform_buffer.lock();
+            std::shared_ptr<GlUniformBuffer> uniform_buffer {wuniform_buffer.lock()};
 
             if (uniform_buffer == nullptr) {
                 continue;
@@ -263,7 +263,7 @@ namespace sm {
 
     void Renderer::prerender_setup() {
         for (const std::weak_ptr<GlShader>& wshader : scene_data.shaders) {
-            std::shared_ptr<GlShader> shader = wshader.lock();
+            std::shared_ptr<GlShader> shader {wshader.lock()};
 
             if (shader == nullptr) {
                 continue;
@@ -276,7 +276,7 @@ namespace sm {
                     continue;
                 }
 
-                auto uniform_buffer = std::make_shared<GlUniformBuffer>(block);
+                auto uniform_buffer {std::make_shared<GlUniformBuffer>(block)};
                 shader->add_uniform_buffer(uniform_buffer);
 
                 storage.uniform_buffers[block.binding_index] = uniform_buffer;
@@ -313,7 +313,7 @@ namespace sm {
         RenderGl::viewport(width, height);
 
         for (std::weak_ptr<GlFramebuffer> wframebuffer : scene_data.framebuffers) {
-            std::shared_ptr<GlFramebuffer> framebuffer = wframebuffer.lock();
+            std::shared_ptr<GlFramebuffer> framebuffer {wframebuffer.lock()};
 
             if (framebuffer == nullptr) {
                 continue;
@@ -362,7 +362,7 @@ namespace sm {
 
     void Renderer::draw_renderables() {
         for (const Renderable& renderable : scene_list.renderables) {
-            auto material = renderable.material.lock();
+            auto material {renderable.material.lock()};
 
             if (material->flags & Material::Outline) {
                 continue;  // This one is rendered differently
@@ -383,10 +383,10 @@ namespace sm {
     }
 
     void Renderer::draw_renderable(const Renderable& renderable) {
-        auto vertex_array = renderable.vertex_array.lock();
-        auto material = renderable.material.lock();
+        auto vertex_array {renderable.vertex_array.lock()};
+        auto material {renderable.material.lock()};
 
-        glm::mat4 matrix = glm::mat4(1.0f);
+        glm::mat4 matrix {glm::mat4(1.0f)};
         matrix = glm::translate(matrix, renderable.position);
         matrix = glm::rotate(matrix, renderable.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
         matrix = glm::rotate(matrix, renderable.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -415,8 +415,8 @@ namespace sm {
             scene_list.point_lights.begin(),
             scene_list.point_lights.end(),
             [this](const PointLight& lhs, const PointLight& rhs) {
-                const float distance_left = glm::distance(lhs.position, camera.position);
-                const float distance_right = glm::distance(rhs.position, camera.position);
+                const float distance_left {glm::distance(lhs.position, camera.position)};
+                const float distance_right {glm::distance(rhs.position, camera.position)};
 
                 return distance_left < distance_right;
             }
@@ -427,9 +427,9 @@ namespace sm {
             scene_list.point_lights.resize(SHADER_POINT_LIGHTS);
         }
 
-        for (std::size_t i = 0; i < SHADER_POINT_LIGHTS; i++) {
-            const PointLight& light = scene_list.point_lights[i];
-            const std::string index = std::to_string(i);
+        for (std::size_t i {0}; i < SHADER_POINT_LIGHTS; i++) {
+            const PointLight& light {scene_list.point_lights[i]};
+            const std::string index {std::to_string(i)};
 
             uniform_buffer->set(&light.position, resmanager::HashedStr64("u_point_lights[" + index + "].position"));
             uniform_buffer->set(&light.ambient_color, resmanager::HashedStr64("u_point_lights[" + index + "].ambient"));
@@ -454,7 +454,7 @@ namespace sm {
 
         add_shader(debug_storage.shader);
 
-        auto vertex_buffer = std::make_shared<GlVertexBuffer>(DrawHint::Stream);
+        auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
         debug_storage.vertex_buffer = vertex_buffer;
 
         VertexBufferLayout layout;
@@ -489,7 +489,7 @@ namespace sm {
             return;
         }
 
-        auto vertex_buffer = debug_storage.vertex_buffer.lock();
+        auto vertex_buffer {debug_storage.vertex_buffer.lock()};
 
         vertex_buffer->bind();
         vertex_buffer->upload_data(buffer.data(), buffer.size() * sizeof(BufferVertexStruct));

@@ -15,11 +15,11 @@ namespace sm {
             return key;
         }
 
-        const char* key_name = glfwGetKeyName(key, scancode);
+        const char* key_name {glfwGetKeyName(key, scancode)};
 
         if (key_name && key_name[0] != 0 && key_name[1] == 0) {
-            const char char_names[] = "`-=[]\\,;\'./";
-            const int char_keys[] = {
+            const char char_names[] {"`-=[]\\,;\'./"};
+            const int char_keys[] {
                 GLFW_KEY_GRAVE_ACCENT,
                 GLFW_KEY_MINUS,
                 GLFW_KEY_EQUAL,
@@ -40,7 +40,7 @@ namespace sm {
                 key = GLFW_KEY_A + (key_name[0] - 'A');
             } else if (key_name[0] >= 'a' && key_name[0] <= 'z') {
                 key = GLFW_KEY_A + (key_name[0] - 'a');
-            } else if (const char* p = std::strchr(char_names, key_name[0])) {
+            } else if (const char* p {std::strchr(char_names, key_name[0])}) {
                 key = char_keys[p - char_names];
             }
         }
@@ -167,8 +167,7 @@ namespace sm {
         ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window_handle), false);
         ImGui_ImplOpenGL3_Init("#version 430 core");
 
-        [[maybe_unused]] ImGuiIO& io = ImGui::GetIO();
-        // io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+        [[maybe_unused]] ImGuiIO& io {ImGui::GetIO()};  // TODO other flags?
 #ifdef SM_BUILD_DISTRIBUTION
         io.IniFilename = nullptr;
 #endif
@@ -193,28 +192,28 @@ namespace sm {
     }
 
     bool ImGuiContext::on_mouse_scrolled(float yoffset) {
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseWheelEvent(0.0f, yoffset);
 
         return io.WantCaptureMouse;
     }
 
     bool ImGuiContext::on_mouse_moved(float xpos, float ypos) {
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO& io {ImGui::GetIO()};
         io.AddMousePosEvent(xpos, ypos);
 
         return io.WantCaptureMouse;
     }
 
     bool ImGuiContext::on_mouse_button_pressed(int button) {
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseButtonEvent(button, true);
 
         return io.WantCaptureMouse;
     }
 
     bool ImGuiContext::on_mouse_button_released(int button) {
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseButtonEvent(button, false);
 
         return io.WantCaptureMouse;
@@ -223,7 +222,7 @@ namespace sm {
     bool ImGuiContext::on_key_pressed(int key, int scancode) {
         key = translate_untranslated_key(key, scancode);
 
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO& io {ImGui::GetIO()};
         io.AddKeyEvent(glfw_to_imgui_key(key), true);
 
         return io.WantCaptureKeyboard;
@@ -232,14 +231,14 @@ namespace sm {
     bool ImGuiContext::on_key_released(int key, int scancode) {
         key = translate_untranslated_key(key, scancode);
 
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO& io {ImGui::GetIO()};
         io.AddKeyEvent(glfw_to_imgui_key(key), false);
 
         return io.WantCaptureKeyboard;
     }
 
     bool ImGuiContext::on_char_typed(unsigned int codepoint) {
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO& io {ImGui::GetIO()};
         io.AddInputCharacter(codepoint);
 
         return io.WantCaptureKeyboard;

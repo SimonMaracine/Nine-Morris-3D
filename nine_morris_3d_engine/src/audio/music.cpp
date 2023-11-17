@@ -11,7 +11,7 @@
 
 namespace sm {
     MusicTrack::MusicTrack(std::string_view file_path) {
-        const auto data = std::make_shared<SoundData>(file_path);
+        const auto data {std::make_shared<SoundData>(file_path)};
 
         setup(data);
 
@@ -21,7 +21,7 @@ namespace sm {
     }
 
     MusicTrack::MusicTrack(Encrypt::EncryptedFile file_path) {
-        const auto data = std::make_shared<SoundData>(file_path);
+        const auto data {std::make_shared<SoundData>(file_path)};
 
         setup(data);
 
@@ -119,6 +119,6 @@ namespace sm {
         }
     }
 
-    std::shared_ptr<MusicTrack> MusicPlayer::current_music_track = nullptr;
-    float MusicPlayer::current_gain = 1.0f;
+    std::shared_ptr<MusicTrack> MusicPlayer::current_music_track {nullptr};
+    float MusicPlayer::current_gain {1.0f};
 }

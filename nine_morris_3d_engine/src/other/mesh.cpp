@@ -37,24 +37,24 @@ namespace sm {
     };
 
     static void load_P(const aiMesh* mesh, std::vector<VertexP>& vertices, std::vector<unsigned int>& indices) {
-        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
             VertexP vertex;
             vertex.position = mesh->mVertices[i];
 
             vertices.push_back(vertex);
         }
 
-        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-            const aiFace face = mesh->mFaces[i];
+        for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
+            const aiFace face {mesh->mFaces[i]};
 
-            for (unsigned int j = 0; j < face.mNumIndices; j++) {
+            for (unsigned int j {0}; j < face.mNumIndices; j++) {
                 indices.push_back(face.mIndices[j]);
             }
         }
     }
 
     static void load_PN(const aiMesh* mesh, std::vector<VertexPN>& vertices, std::vector<unsigned int>& indices) {
-        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
             VertexPN vertex;
             vertex.position = mesh->mVertices[i];
             vertex.normal = mesh->mNormals[i];
@@ -62,17 +62,17 @@ namespace sm {
             vertices.push_back(vertex);
         }
 
-        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-            const aiFace face = mesh->mFaces[i];
+        for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
+            const aiFace face {mesh->mFaces[i]};
 
-            for (unsigned int j = 0; j < face.mNumIndices; j++) {
+            for (unsigned int j {0}; j < face.mNumIndices; j++) {
                 indices.push_back(face.mIndices[j]);
             }
         }
     }
 
     static void load_PTN(const aiMesh* mesh, std::vector<VertexPTN>& vertices, std::vector<unsigned int>& indices) {
-        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
             VertexPTN vertex;
             vertex.position = mesh->mVertices[i];
             vertex.texture_coordinate.x = mesh->mTextureCoords[0][i].x;
@@ -82,17 +82,17 @@ namespace sm {
             vertices.push_back(vertex);
         }
 
-        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-            const aiFace face = mesh->mFaces[i];
+        for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
+            const aiFace face {mesh->mFaces[i]};
 
-            for (unsigned int j = 0; j < face.mNumIndices; j++) {
+            for (unsigned int j {0}; j < face.mNumIndices; j++) {
                 indices.push_back(face.mIndices[j]);
             }
         }
     }
 
     static void load_PTNT(const aiMesh* mesh, std::vector<VertexPTNT>& vertices, std::vector<unsigned int>& indices) {
-        for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
             VertexPTNT vertex;
             vertex.position = mesh->mVertices[i];
             vertex.texture_coordinate.x = mesh->mTextureCoords[0][i].x;
@@ -103,25 +103,25 @@ namespace sm {
             vertices.push_back(vertex);
         }
 
-        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-            const aiFace face = mesh->mFaces[i];
+        for (unsigned int i {0}; i < mesh->mNumFaces; i++) {
+            const aiFace face {mesh->mFaces[i]};
 
-            for (unsigned int j = 0; j < face.mNumIndices; j++) {
+            for (unsigned int j {0}; j < face.mNumIndices; j++) {
                 indices.push_back(face.mIndices[j]);
             }
         }
     }
 
     static const aiMesh* find_mesh(const aiNode* node, std::string_view object_name, const aiScene* scene) {
-        for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-            const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        for (unsigned int i {0}; i < node->mNumMeshes; i++) {
+            const aiMesh* mesh {scene->mMeshes[node->mMeshes[i]]};
 
             if (std::strcmp(mesh->mName.C_Str(), std::string(object_name).c_str()) == 0) {
                 return mesh;
             }
         }
 
-        for (unsigned int i = 0; i < node->mNumChildren; i++) {
+        for (unsigned int i {0}; i < node->mNumChildren; i++) {
             return find_mesh(node->mChildren[i], object_name, scene);
         }
 
@@ -129,7 +129,7 @@ namespace sm {
     }
 
     Mesh::Mesh(std::string_view file_path, std::string_view object_name, Type type, bool flip_winding) {
-        unsigned int flags = aiProcess_ValidateDataStructure;
+        unsigned int flags {aiProcess_ValidateDataStructure};
 
         if (flip_winding) {
             flags |= aiProcess_FlipWindingOrder;
@@ -145,7 +145,7 @@ namespace sm {
 
         Assimp::Importer importer;
 
-        const aiScene* scene = importer.ReadFile(std::string(file_path), flags);
+        const aiScene* scene {importer.ReadFile(std::string(file_path), flags)};
 
         if (scene == nullptr) {
             LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
@@ -153,8 +153,8 @@ namespace sm {
             panic();
         }
 
-        const aiNode* root_node = scene->mRootNode;
-        const aiMesh* mesh = find_mesh(root_node, object_name, scene);
+        const aiNode* root_node {scene->mRootNode};
+        const aiMesh* mesh {find_mesh(root_node, object_name, scene)};
 
         if (mesh == nullptr) {
             LOG_CRITICAL("Model file `{}` does not contain `{}` mesh", file_path, object_name);
@@ -165,7 +165,7 @@ namespace sm {
     }
 
     Mesh::Mesh(Encrypt::EncryptedFile file_path, std::string_view object_name, Type type, bool flip_winding) {
-        unsigned int flags = aiProcess_ValidateDataStructure;
+        unsigned int flags {aiProcess_ValidateDataStructure};
 
         if (flip_winding) {
             flags |= aiProcess_FlipWindingOrder;
@@ -179,11 +179,11 @@ namespace sm {
             flags |= aiProcess_GenNormals;
         }
 
-        const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
+        const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
 
         Assimp::Importer importer;
 
-        const aiScene* scene = importer.ReadFileFromMemory(buffer, buffer_size, flags);
+        const aiScene* scene {importer.ReadFileFromMemory(buffer, buffer_size, flags)};
 
         if (scene == nullptr) {
             LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
@@ -191,8 +191,8 @@ namespace sm {
             panic();
         }
 
-        const aiNode* root_node = scene->mRootNode;
-        const aiMesh* mesh = find_mesh(root_node, object_name, scene);
+        const aiNode* root_node {scene->mRootNode};
+        const aiMesh* mesh {find_mesh(root_node, object_name, scene)};
 
         if (mesh == nullptr) {
             LOG_CRITICAL("Model file `{}` does not contain mesh `{}`", file_path, object_name);
@@ -210,7 +210,7 @@ namespace sm {
     }
 
     void Mesh::load(Type type, const void* pmesh, std::string_view file_path) {
-        const aiMesh* mesh = static_cast<const aiMesh*>(pmesh);
+        const aiMesh* mesh {static_cast<const aiMesh*>(pmesh)};
 
         switch (type) {
             case Type::P: {

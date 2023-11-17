@@ -45,13 +45,13 @@ namespace sm {
             return *static_cast<T*>(user_data);
         }
 
-        bool running = true;
-        int exit_code = 0;
-        double fps = 0.0;
-        float delta = 0.0f;
+        bool running {true};
+        int exit_code {0};
+        double fps {0.0};
+        float delta {0.0f};
 
-        void* user_data = nullptr;  // Arbitrary data defined by the user
-        const ApplicationProperties* properties = nullptr;  // Ctx data like window width and height
+        void* user_data {nullptr};  // Arbitrary data defined by the user
+        const ApplicationProperties* properties {nullptr};  // Ctx data like window width and height
 
         std::unique_ptr<Window> win;  // One of the last objects destroyed in an application instance
         std::unique_ptr<OpenAlContext> snd;  // Sound context
@@ -63,7 +63,7 @@ namespace sm {
         Identifier idt;  // Generator of IDs
         TaskManager tsk;  // Manager of general purpose procedures
     private:
-        Application* application = nullptr;
+        Application* application {nullptr};
 
         friend class Application;
     };

@@ -28,18 +28,18 @@ namespace sm {
         T choice(std::initializer_list<T> list) {
             SM_ASSERT(list.size() > 0, "List must not be empty");
 
-            const std::uint32_t index = next(list.size() - 1);
+            const std::uint32_t index {next(list.size() - 1)};
 
             return list.begin()[index];
         }
 
         template<typename T, typename Iter>
         T choice(Iter first, Iter last) {
-            const std::size_t size = std::distance(first, last);
+            const std::size_t size {std::distance(first, last)};
 
             SM_ASSERT(size > 0, "List must not be empty");
 
-            const std::uint32_t index = next(size - 1);
+            const std::uint32_t index {next(size - 1)};
 
             return first[index];
         }

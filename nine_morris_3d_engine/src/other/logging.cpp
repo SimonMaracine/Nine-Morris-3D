@@ -14,7 +14,7 @@
 #include "engine/other/file_system.hpp"
 #include "engine/other/dependencies.hpp"
 
-#define LOG_PATTERN_DEBUG "%^[%l] [t %t] [%H:%M:%S]%$ %v"
+#define LOG_PATTERN_DEBUG "%^[%l] [t %t] [%H:%M:%S]%$ %v"  // TODO
 #define LOG_PATTERN_RELEASE "%^[%l] [t %t] [%!:%#] [%c]%$ %v"
 
 #define FILE_SIZE (1048576 * 2)  // 2 MiB
@@ -34,7 +34,7 @@ namespace sm {
         info_file = info_file;
 
 #ifdef SM_BUILD_DISTRIBUTION
-        const std::string file_path = FileSystem::path_for_logs(log_file);
+        const std::string file_path {FileSystem::path_for_logs(log_file)};
 
         try {
             global_logger = spdlog::rotating_logger_mt(
@@ -65,7 +65,7 @@ namespace sm {
 
         switch (target) {
             case LogTarget::File: {
-                const std::string file_path = FileSystem::path_logs(info_file);
+                const std::string file_path {FileSystem::path_logs(info_file)};
 
                 std::ofstream file {file_path, std::ios::trunc};
 

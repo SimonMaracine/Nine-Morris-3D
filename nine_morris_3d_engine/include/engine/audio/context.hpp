@@ -20,9 +20,9 @@ namespace sm {
 
         static void destroy_openal_context();
     private:
-        ALCdevice* device = nullptr;
-        ALCcontext* context = nullptr;
-
         AlListener listener;
+
+        ALCdevice* device {nullptr};
+        ALCcontext* context {nullptr};
     };
 }

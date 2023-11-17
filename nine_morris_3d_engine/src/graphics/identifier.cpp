@@ -7,5 +7,5 @@ namespace sm {
         return id;
     }
 
-    Identifier::Id Identifier::null = 0.0f;
+    Identifier::Id Identifier::null {0.0f};
 }

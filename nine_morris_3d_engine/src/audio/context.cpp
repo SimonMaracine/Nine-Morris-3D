@@ -6,8 +6,8 @@
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    static ALCdevice* global_device = nullptr;
-    static ALCcontext* global_context = nullptr;
+    static ALCdevice* global_device {nullptr};
+    static ALCcontext* global_context {nullptr};
 
     OpenAlContext::OpenAlContext() {
         // Choose the default device

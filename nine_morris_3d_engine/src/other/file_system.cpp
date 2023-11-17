@@ -20,9 +20,9 @@
 namespace sm {
 #if defined(SM_PLATFORM_LINUX)
     #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
-            ("/home/" + (user_name) + "/." + (application_name) + "/")
+        ("/home/" + (user_name) + "/." + (application_name) + "/")
     #define ASSETS_DIRECTORY_PATH(application_name) \
-            ("/usr/local/share/" + (application_name) + "/")
+        ("/usr/local/share/" + (application_name) + "/")
 
         static bool directory_exists_impl(std::string_view path) {
             struct stat sb;
@@ -43,8 +43,8 @@ namespace sm {
         }
 
         static std::string get_user_name_impl() noexcept(false) {
-            const uid_t uid = geteuid();
-            struct passwd* pw = getpwuid(uid);
+            const uid_t uid {geteuid()};
+            struct passwd* pw {getpwuid(uid)};
 
             if (pw == nullptr) {
                 throw FileSystem::UserNameError("Could not get user name");
@@ -54,7 +54,7 @@ namespace sm {
         }
 
         static void check_and_fix_directories_impl() {
-            const std::string path = USER_DATA_DIRECTORY_PATH(FileSystem::user_name, FileSystem::app_name);
+            const std::string path {USER_DATA_DIRECTORY_PATH(FileSystem::user_name, FileSystem::app_name)};
 
             if (!directory_exists_impl(FileSystem::cut_slash(path))) {
                 LOG_DIST_WARNING("Directory `{}` doesn't exist, creating it...", path);
@@ -68,13 +68,13 @@ namespace sm {
         }
 #elif defined(SM_PLATFORM_WINDOWS)
     #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
-            ("C:\\Users\\" + (user_name) + "\\AppData\\Roaming\\" + (application_name) + "\\")
+        ("C:\\Users\\" + (user_name) + "\\AppData\\Roaming\\" + (application_name) + "\\")
     #define DOCUMENTS_DIRECTORY_PATH(user_name, application_name) \
-            ("C:\\Users\\" + (user_name) + "\\Documents\\" + (application_name) + "\\")
+        ("C:\\Users\\" + (user_name) + "\\Documents\\" + (application_name) + "\\")
 
         static bool directory_exists_impl(std::string_view path) {
             WIN32_FIND_DATA find_data;
-            HANDLE handle = FindFirstFile(path.data(), &find_data);
+            HANDLE handle {FindFirstFile(path.data(), &find_data)};
 
             if (handle == INVALID_HANDLE_VALUE) {
                 FindClose(handle);
@@ -91,14 +91,14 @@ namespace sm {
         }
 
         static bool create_directory_impl(std::string_view path) {
-            const bool success = CreateDirectory(path.data(), nullptr);
+            const bool success {CreateDirectory(path.data(), nullptr)};
             return success;
         }
 
         static std::string get_user_name_impl() noexcept(false) {
             char user_name[UNLEN + 1];
-            DWORD _ = UNLEN + 1;
-            const bool success = GetUserName(user_name, &_);
+            DWORD _ {UNLEN + 1};
+            const bool success {GetUserName(user_name, &_)};
 
             if (!success) {
                 throw FileSystem::UserNameError("Could not get user name");

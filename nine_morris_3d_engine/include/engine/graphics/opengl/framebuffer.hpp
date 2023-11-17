@@ -29,21 +29,21 @@ namespace sm {
 
     struct FramebufferSpecification {
         // Must be specified
-        int width = 0;
-        int height = 0;
+        int width {0};  // TODO reorder members
+        int height {0};
 
         // At least one of these two must be specified
         std::vector<Attachment> color_attachments;
         Attachment depth_attachment;
 
-        int samples = 1;
-        bool resizable = true;
-        unsigned int resize_divisor = 1;
-        bool white_border_for_depth_texture = false;
+        int samples {1};
+        bool resizable {true};
+        unsigned int resize_divisor {1};
+        bool white_border_for_depth_texture {false};
 
         // Color attachment clearing stuff
-        int clear_drawbuffer = 0;
-        float color_clear_value[4];
+        int clear_drawbuffer {0};  // TODO put in a struct
+        float color_clear_value[4] {};
     };
 
     class GlFramebuffer {
@@ -67,7 +67,7 @@ namespace sm {
         void resize(int width, int height);
 
         // Read pixels from some buffer
-        float read_pixel_float(int attachment_index, int x, int y) const;  // TODO red value is float; should be generic
+        float read_pixel_float(int attachment_index, int x, int y) const;  // TODO read value is float; should be generic
         void read_pixel_float_pbo(int attachment_index, int x, int y) const;
 
         // Clear some buffer
@@ -80,10 +80,10 @@ namespace sm {
 
         FramebufferSpecification specification;
 
-        unsigned int framebuffer = 0;
+        unsigned int framebuffer {0};
 
         // These can be texture or renderbuffer handles
         std::vector<unsigned int> color_attachments;
-        unsigned int depth_attachment = 0;
+        unsigned int depth_attachment {0};
     };
 }

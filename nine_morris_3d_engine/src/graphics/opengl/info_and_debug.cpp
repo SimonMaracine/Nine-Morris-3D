@@ -13,7 +13,7 @@
 #include "engine/other/assert.hpp"
 
 namespace sm {
-    static const GLenum parameters[] = {
+    static const GLenum parameters[] {
         GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
         GL_MAX_CUBE_MAP_TEXTURE_SIZE,
         GL_MAX_DRAW_BUFFERS,
@@ -36,7 +36,7 @@ namespace sm {
         GL_MAX_VIEWPORT_DIMS
     };
 
-    static const char* names[] = {
+    static const char* names[] {
         "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS",
         "GL_MAX_CUBE_MAP_TEXTURE_SIZE",
         "GL_MAX_DRAW_BUFFERS",
@@ -59,11 +59,18 @@ namespace sm {
         "GL_MAX_VIEWPORT_DIMS"
     };
 
-    static constexpr std::size_t BUFFER_LENGTH = 128;
+    static constexpr std::size_t BUFFER_LENGTH {128};
 
 #ifdef SM_BUILD_DEBUG
-    static void error_callback(GLenum, GLenum, GLuint id, GLenum severity,
-            GLsizei, const GLchar* message, const void*) {
+    static void error_callback(
+        GLenum,
+        GLenum,
+        GLuint id,
+        GLenum severity,
+        GLsizei,
+        const GLchar* message,
+        const void*
+    ) {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
                 LOG_DIST_CRITICAL("({}) {}", id, message);
@@ -100,7 +107,7 @@ namespace sm {
         output.append("\n*** OpenGL Version And Driver ***\n");
 
         {
-            static constexpr std::size_t LENGTH = 256;  // 256 should be enough
+            static constexpr std::size_t LENGTH {256};  // 256 should be enough
 
             char line[LENGTH];
             std::snprintf(line, LENGTH, "OpenGL version: %s\n", glGetString(GL_VERSION));
@@ -115,9 +122,9 @@ namespace sm {
 
         output.append("\n*** OpenGL Context Parameters ***\n");
 
-        std::size_t parameter_index = 18;
+        std::size_t parameter_index {18};
 
-        for (std::size_t i = 0; i <= parameter_index; i++) {
+        for (std::size_t i {0}; i <= parameter_index; i++) {
             GLint result;
             glGetIntegerv(parameters[i], &result);
 

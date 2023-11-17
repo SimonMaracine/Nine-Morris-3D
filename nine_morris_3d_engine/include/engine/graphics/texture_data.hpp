@@ -29,9 +29,9 @@ namespace sm {
         Image get_data();
         std::string_view get_file_path() { return file_path; }
     private:
-        unsigned char* data = nullptr;
-        int width = 0;
-        int height = 0;
+        unsigned char* data {nullptr};
+        int width {0};
+        int height {0};
         std::string file_path;
 
         friend class GlTexture;

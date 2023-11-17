@@ -20,27 +20,27 @@ void GameScene::on_start() {
     });
 
     {
-        auto mesh = std::make_shared<sm::Mesh>(
+        auto mesh {std::make_shared<sm::Mesh>(
             sm::Encrypt::encr(sm::FileSystem::path_assets("models/dragon.obj")),
             "default",
             sm::Mesh::Type::PN
-        );
+        )};
 
-        auto vertex_buffer = std::make_shared<sm::GlVertexBuffer>(
+        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
             mesh->get_vertices(),
             mesh->get_vertices_size()
-        );
+        )};
 
-        auto index_buffer = std::make_shared<sm::GlIndexBuffer>(
+        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
             mesh->get_indices(),
             mesh->get_indices_size()
-        );
+        )};
 
         sm::VertexBufferLayout layout;
         layout.add(0, sm::VertexBufferLayout::Float, 3);
         layout.add(1, sm::VertexBufferLayout::Float, 3);
 
-        auto vertex_array = ctx->res.vertex_array.load("dragon"_H);
+        auto vertex_array {ctx->res.vertex_array.load("dragon"_H)};
         vertex_array->bind();
         vertex_array->add_vertex_buffer(vertex_buffer, layout);
         vertex_array->add_index_buffer(index_buffer);
@@ -48,27 +48,27 @@ void GameScene::on_start() {
     }
 
     {
-        auto mesh = std::make_shared<sm::Mesh>(
+        auto mesh {std::make_shared<sm::Mesh>(
             sm::Encrypt::encr(sm::FileSystem::path_assets("models/teapot.obj")),
             sm::Mesh::DEFAULT_OBJECT,
             sm::Mesh::Type::PN
-        );
+        )};
 
-        auto vertex_buffer = std::make_shared<sm::GlVertexBuffer>(
+        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
             mesh->get_vertices(),
             mesh->get_vertices_size()
-        );
+        )};
 
-        auto index_buffer = std::make_shared<sm::GlIndexBuffer>(
+        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
             mesh->get_indices(),
             mesh->get_indices_size()
-        );
+        )};
 
         sm::VertexBufferLayout layout;
         layout.add(0, sm::VertexBufferLayout::Float, 3);
         layout.add(1, sm::VertexBufferLayout::Float, 3);
 
-        auto vertex_array = ctx->res.vertex_array.load("teapot"_H);
+        auto vertex_array {ctx->res.vertex_array.load("teapot"_H)};
         vertex_array->bind();
         vertex_array->add_vertex_buffer(vertex_buffer, layout);
         vertex_array->add_index_buffer(index_buffer);
@@ -76,61 +76,63 @@ void GameScene::on_start() {
     }
 
     {
-        auto mesh = std::make_shared<sm::Mesh>(
+        auto mesh {std::make_shared<sm::Mesh>(
             sm::Encrypt::encr(sm::FileSystem::path_assets("scene/scene.obj")),
             "Cube_Cube.001",
             sm::Mesh::Type::PN
-        );
+        )};
 
-        auto vertex_buffer = std::make_shared<sm::GlVertexBuffer>(
+        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
             mesh->get_vertices(),
             mesh->get_vertices_size()
-        );
+        )};
 
-        auto index_buffer = std::make_shared<sm::GlIndexBuffer>(
+        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
             mesh->get_indices(),
             mesh->get_indices_size()
-        );
+        )};
 
         sm::VertexBufferLayout layout;
         layout.add(0, sm::VertexBufferLayout::Float, 3);
         layout.add(1, sm::VertexBufferLayout::Float, 3);
 
-        auto vertex_array = ctx->res.vertex_array.load("cube"_H);
+        auto vertex_array {ctx->res.vertex_array.load("cube"_H)};
         vertex_array->bind();
         vertex_array->add_vertex_buffer(vertex_buffer, layout);
         vertex_array->add_index_buffer(index_buffer);
         sm::GlVertexArray::unbind();
     }
 
-    auto shader = std::make_shared<sm::GlShader>(
-        sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.vert")),
-        sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.frag"))
-    );
+    auto shader {
+        std::make_shared<sm::GlShader>(
+            sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.vert")),
+            sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.frag"))
+        )
+    };
 
     ctx->rnd->add_shader(shader);
 
-    auto material = ctx->res.material.load("simple"_H, shader);
+    auto material {ctx->res.material.load("simple"_H, shader)};
     material->add_uniform(sm::Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
     material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
     material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
 
     {
-        auto material_instance = ctx->res.material_instance.load("dragon1"_H, material);
+        auto material_instance {ctx->res.material_instance.load("dragon1"_H, material)};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
     }
 
     {
-        auto material_instance = ctx->res.material_instance.load("dragon2"_H, material);
+        auto material_instance {ctx->res.material_instance.load("dragon2"_H, material)};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 0.2f, 0.1f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
     }
 
     {
-        auto material_instance = ctx->res.material_instance.load("teapot"_H, material);
+        auto material_instance {ctx->res.material_instance.load("teapot"_H, material)};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.7f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.7f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
@@ -138,7 +140,7 @@ void GameScene::on_start() {
     }
 
     {
-        auto material_instance = ctx->res.material_instance.load("cube"_H, material);
+        auto material_instance {ctx->res.material_instance.load("cube"_H, material)};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 0.0f, 0.0f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.8f));
         material_instance->set_float("u_material.shininess"_H, 128.0f);
@@ -218,13 +220,13 @@ void GameScene::on_update() {
 
     // Whatever
     ctx->rnd->debug_add_lines(
-        std::vector {
+        std::vector({
             glm::vec3(0.0f, 6.0f, 0.0f),
             glm::vec3(2.0f, 7.0f, 0.0f),
             glm::vec3(4.0f, 6.0f, 2.0f),
             glm::vec3(3.0f, 8.0f, 0.0f),
             glm::vec3(0.0f, 11.0f, -4.0f)
-        },
+        }),
         glm::vec3(0.0f, 0.0f, 0.0f)
     );
 

@@ -25,7 +25,7 @@ namespace sm {
         static Key key_from_code(int code);
         static MouseButton mouse_button_from_code(int code);
     private:
-        void* window_handle = nullptr;
+        void* window_handle {nullptr};
 
         friend class Application;
     };
@@ -155,17 +155,17 @@ namespace sm {
     };
 
     enum class MouseButton {
-        B1 =         0,
-        B2 =         1,
-        B3 =         2,
-        B4 =         3,
-        B5 =         4,
-        B6 =         5,
-        B7 =         6,
-        B8 =         7,
-        Last =      B8,
-        Left =      B1,
-        Right =     B2,
-        Middle =    B3
+        B1 =            0,
+        B2 =            1,
+        B3 =            2,
+        B4 =            3,
+        B5 =            4,
+        B6 =            5,
+        B7 =            6,
+        B8 =            7,
+        Last =          B8,
+        Left =          B1,
+        Right =         B2,
+        Middle =        B3
     };
 }

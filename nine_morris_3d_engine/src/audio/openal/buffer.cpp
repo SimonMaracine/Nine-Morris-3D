@@ -10,7 +10,7 @@
 
 namespace sm {
     static ALenum get_format(int channels, std::size_t bps) {
-        ALenum format = 0;
+        ALenum format {0};
 
         if (channels == 1 && bps == 8) {
             format = AL_FORMAT_MONO8;

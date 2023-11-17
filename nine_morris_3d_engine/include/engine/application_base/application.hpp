@@ -73,26 +73,26 @@ namespace sm {
 
         // Properties
         ApplicationProperties properties;
-        UserFunc start = [](Ctx*) {};
-        UserFunc stop = [](Ctx*) {};
+        UserFunc start {[](Ctx*) {}};
+        UserFunc stop {[](Ctx*) {}};
 
         // Data for the scene system
         std::vector<std::unique_ptr<Scene>> scenes;
-        Scene* current_scene = nullptr;
+        Scene* current_scene {nullptr};
 
-        bool changed_scene = false;  // Flag set when the user requested a scene change
-        Scene* to_scene = nullptr;  // Next scene to enter
+        bool changed_scene {false};  // Flag set when the user requested a scene change
+        Scene* to_scene {nullptr};  // Next scene to enter
 
         // Clock variables
         struct {
-            double previous_seconds = 0.0;
-            double total_time = 0.0;
-            int frame_count = 0;
+            double previous_seconds {0.0};
+            double total_time {0.0};
+            int frame_count {0};
         } frame_counter;
 
         struct {
-            double previous_seconds = 0.0;
-            double total_time = 0.0;
+            double previous_seconds {0.0};
+            double total_time {0.0};
         } fixed_update;
 
         friend class Scene;

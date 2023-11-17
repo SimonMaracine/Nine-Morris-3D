@@ -33,9 +33,9 @@ namespace sm {
         TaskFunction function;
         TaskId id;
 
-        double total_time = 0.0;
-        double start_time = 0.0;
-        unsigned int frames = 0;
+        double total_time {0.0};
+        double start_time {0.0};
+        unsigned int frames {0};
 
         friend class TaskManager;
     };

@@ -20,21 +20,21 @@ namespace sm {
         }
 
         file.seekg(0, file.end);
-        const std::size_t length = file.tellg();
+        const std::size_t length {file.tellg()};
         file.seekg(0, file.beg);
 
-        char* raw_buffer = new char[length];
+        char* raw_buffer {new char[length]};
         file.read(raw_buffer, length);
 
-        cppblowfish::Buffer cipher = cppblowfish::Buffer::from_whole_data(raw_buffer, length);
+        cppblowfish::Buffer cipher {cppblowfish::Buffer::from_whole_data(raw_buffer, length)};
 
         delete[] raw_buffer;
 
         cppblowfish::Buffer original;
         context.decrypt(cipher, original);
 
-        unsigned char* data = original.steal();
-        const std::size_t size = original.size();
+        unsigned char* data {original.steal()};
+        const std::size_t size {original.size()};
 
         return std::make_pair(data, size);
     }

@@ -1,4 +1,5 @@
 #include <string>
+#include <cstdio>
 
 #include <AL/al.h>
 
@@ -10,7 +11,7 @@
 namespace sm {
     void AlInfoDebug::maybe_check_errors() {
 #ifdef SM_BUILD_DEBUG
-        const ALenum error = alGetError();
+        const ALenum error {alGetError()};
 
         if (error != AL_NO_ERROR) {
             switch(error) {
@@ -44,10 +45,10 @@ namespace sm {
 
         output.append("\n*** OpenAL Version ***\n");
 
-        static constexpr std::size_t LENGTH = 256;  // 256 should be enough
+        static constexpr std::size_t LENGTH {256};  // 256 should be enough
 
         char line[LENGTH];
-        snprintf(line, LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));
+        std::snprintf(line, LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));
         output.append(line);
 
         return output;

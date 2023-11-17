@@ -18,10 +18,10 @@ namespace sm {
         void set_projection_matrix(int width, int height, float fov, float near, float far);
         void set_view_matrix(const glm::mat4& view_matrix);
 
-        glm::mat4 view_matrix = glm::mat4(1.0f);
-        glm::mat4 projection_matrix = glm::mat4(1.0f);
+        glm::mat4 view_matrix {glm::mat4(1.0f)};
+        glm::mat4 projection_matrix {glm::mat4(1.0f)};
 
         // This is a cache
-        glm::mat4 projection_view_matrix = glm::mat4(1.0f);
+        glm::mat4 projection_view_matrix {glm::mat4(1.0f)};
     };
 }

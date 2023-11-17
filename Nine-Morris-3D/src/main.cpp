@@ -15,19 +15,19 @@
 #include "game/scenes/game_scene.hpp"
 
 #if defined(SM_PLATFORM_LINUX)
-    static const char* APP_NAME = "ninemorris3d";
+    static const char* APP_NAME {"ninemorris3d"};
 #elif defined(SM_PLATFORM_WINDOWS)
-    static const char* APP_NAME = "NineMorris3D";
+    static const char* APP_NAME {"NineMorris3D"};
 #endif
 
-static const char* LOG_FILE = "debug.log";
-static const char* INFO_FILE = "info.txt";
+static const char* LOG_FILE {"debug.log"};
+static const char* INFO_FILE {"info.txt"};
 
-static constexpr unsigned int MAJOR = 0;
-static constexpr unsigned int MINOR = 4;
-static constexpr unsigned int PATCH = 0;
+static constexpr unsigned int MAJOR {0};
+static constexpr unsigned int MINOR {4};
+static constexpr unsigned int PATCH {0};
 
-static const char* KEY = "data/models/board/board.obj";
+static const char* KEY {"data/models/board/board.obj"};
 
 void application_main() {
     sm::Application::ApplicationsData data;
@@ -67,18 +67,20 @@ void application_main() {
         {
             // const auto& options = global_data->launcher_options;
 
-            auto game_builder = sm::ApplicationBuilder()
+            auto game_builder {
+                sm::ApplicationBuilder()
                 // .display(options.resolution.first, options.resolution.second, "Nine Morris 3D")
                 .display(1024, 576)
                 // .display_flags(options.fullscreen, options.native_resolution, true)
                 .display_min_resolution(512, 288)
                 .application_name(APP_NAME)
                 .version(MAJOR, MINOR, PATCH)
-                .encrypt_key(KEY);
+                .encrypt_key(KEY)
+            };
                 // .with_audio()
                 // .with_random_generator();
 
-            auto game = sm::Application(game_builder/*, global_data*/);
+            auto game {sm::Application(game_builder/*, global_data*/)};
             // game.set_start_function(game::start);
             // game.set_stop_function(game::stop);
             // game.add_scene<LoadingScene>();

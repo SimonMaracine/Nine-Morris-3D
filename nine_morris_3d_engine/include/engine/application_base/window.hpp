@@ -51,7 +51,7 @@ namespace sm {
         GLFWwindow* create_window(Application* application);
         void install_callbacks();
 
-        GLFWwindow* window = nullptr;
+        GLFWwindow* window {nullptr};
         std::unordered_map<CursorId, GLFWcursor*, CursorHash> cursors;
     };
 
@@ -69,7 +69,7 @@ namespace sm {
         std::pair<float, float> get_content_scale() const;
         const char* get_name() const;
     private:
-        GLFWmonitor* monitor = nullptr;
+        GLFWmonitor* monitor {nullptr};
 
         friend class Window;
     };

@@ -27,13 +27,13 @@ namespace sm {
             Id& operator+=(const Id& other) { value += other.value; return *this; }
             constexpr bool operator==(const Id& other) const { return value == other.value; }
         private:
-            float value = 0.0f;
+            float value {0.0f};
         };
 
         Id generate();
 
         static Id null;  // Should have been static constexpr, but compiler is too dumb
     private:
-        Id id = 0.0f;
+        Id id {0.0f};
     };
 }

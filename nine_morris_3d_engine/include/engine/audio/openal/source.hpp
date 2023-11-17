@@ -42,18 +42,18 @@ namespace sm {
         void set_reference_distance(float reference_distance);
         void set_max_distance(float max_distance);
     private:
-        unsigned int source = 0;
-        unsigned int attached_buffer = 0;  // The buffer that is currently attached to this source
+        unsigned int source {0};
+        unsigned int attached_buffer {0};  // The buffer that is currently attached to this source
 
-        float gain = 1.0f;
-        float pitch = 1.0f;
+        float gain {1.0f};
+        float pitch {1.0f};
         glm::vec3 position {};
         glm::vec3 velocity {};
         glm::vec3 direction {};
-        bool looping = false;
+        bool looping {false};
 
-        float rolloff_factor = 1.0f;  // How fast the gain loses energy with distance
-        float reference_distance = 8.0f;  // The distance at which gain is 1.0
-        float max_distance = 22.0f;  // The distance at which the gain is 0.0 (linear) or at which the gain doesn't decrease (clamped)
+        float rolloff_factor {1.0f};  // How fast the gain loses energy with distance
+        float reference_distance {8.0f};  // The distance at which gain is 1.0
+        float max_distance {22.0f};  // The distance at which the gain is 0.0 (linear) or at which the gain doesn't decrease (clamped)
     };
 }

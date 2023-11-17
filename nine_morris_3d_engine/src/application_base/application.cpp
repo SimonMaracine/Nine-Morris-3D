@@ -78,7 +78,7 @@ namespace sm {
         RenderGl::initialize_default();
         Encrypt::initialize(builder.encryption_key);
 
-        const auto [version_major, version_minor] = GlInfoDebug::get_version_number();
+        const auto [version_major, version_minor] {GlInfoDebug::get_version_number()};
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
         ctx.rnd = std::make_unique<Renderer>(properties.width, properties.height);
@@ -114,9 +114,9 @@ namespace sm {
 
         while (ctx.running) {
             ctx.delta = update_frame_counter();
-            const unsigned int fixed_updates = calculate_fixed_update();
+            const unsigned int fixed_updates {calculate_fixed_update()};
 
-            for (unsigned int i = 0; i < fixed_updates; i++) {
+            for (unsigned int i {0}; i < fixed_updates; i++) {
                 current_scene->on_fixed_update();
             }
 
@@ -150,7 +150,7 @@ namespace sm {
     }
 
     float Application::update_frame_counter() {
-        static constexpr double MAX_DT = 1.0 / 20.0;
+        static constexpr double MAX_DT {1.0 / 20.0};
 
         const double current_seconds = Window::get_time();
         const double elapsed_seconds = current_seconds - frame_counter.previous_seconds;
@@ -165,21 +165,21 @@ namespace sm {
         }
         frame_counter.frame_count++;
 
-        const double delta_time = std::min(elapsed_seconds, MAX_DT);
+        const double delta_time {std::min(elapsed_seconds, MAX_DT)};
 
         return static_cast<float>(delta_time);
     }
 
     unsigned int Application::calculate_fixed_update() {
-        static constexpr double FIXED_DT = 1.0 / 50.0;
+        static constexpr double FIXED_DT {1.0 / 50.0};
 
-        const double current_seconds = Window::get_time();
-        const double elapsed_seconds = current_seconds - fixed_update.previous_seconds;
+        const double current_seconds {Window::get_time()};
+        const double elapsed_seconds {current_seconds - fixed_update.previous_seconds};
         fixed_update.previous_seconds = current_seconds;
 
         fixed_update.total_time += elapsed_seconds;
 
-        unsigned int updates = 0;
+        unsigned int updates {0};
 
         while (true) {
             if (fixed_update.total_time > FIXED_DT) {

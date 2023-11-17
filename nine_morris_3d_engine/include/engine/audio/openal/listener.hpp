@@ -36,11 +36,11 @@ namespace sm {
         void set_look_at_and_up(const glm::vec3& look_at, const glm::vec3& up);
         void set_distance_model(DistanceModel distance_model);
     private:
-        float gain = 1.0f;
+        float gain {1.0f};
         glm::vec3 position {};
         glm::vec3 velocity {};
-        glm::vec3 look_at = glm::vec3(0.0f, 0.0f, -1.0f);
-        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-        DistanceModel distance_model = DistanceModel::InverseClamped;
+        glm::vec3 look_at {glm::vec3(0.0f, 0.0f, -1.0f)};
+        glm::vec3 up {glm::vec3(0.0f, 1.0f, 0.0f)};
+        DistanceModel distance_model {DistanceModel::InverseClamped};
     };
 }

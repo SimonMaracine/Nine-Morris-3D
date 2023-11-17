@@ -52,7 +52,7 @@ namespace sm {
         std::vector<Key> uniforms_vec4;
         std::vector<Key> textures;
 
-        unsigned int flags = 0;
+        unsigned int flags {0};
 
         friend class MaterialInstance;
     };
@@ -83,8 +83,8 @@ namespace sm {
 
         const GlShader* get_shader() const { return shader.get(); }
 
-        // It's left public
-        unsigned int flags = 0;
+        // It's okay to be public
+        unsigned int flags {0};
     private:
         struct Element {
             enum class Type {
@@ -97,19 +97,19 @@ namespace sm {
                 Texture
             } type {};
 
-            std::size_t offset = 0;
+            std::size_t offset {0};
         };
 
         struct Texture {
-            int unit = 0;
-            unsigned int texture = 0;
+            int unit {0};
+            unsigned int texture {0};
         };
 
         // Material instances own shaders
         std::shared_ptr<GlShader> shader;
 
-        unsigned char* data = nullptr;
-        std::size_t size = 0;
+        unsigned char* data {nullptr};
+        std::size_t size {0};
 
         std::unordered_map<Key, Element, KeyHash> offsets;
     };

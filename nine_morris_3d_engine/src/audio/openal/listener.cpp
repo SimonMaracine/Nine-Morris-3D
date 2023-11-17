@@ -33,9 +33,13 @@ namespace sm {
     }
 
     void AlListener::set_look_at_and_up(const glm::vec3& look_at, const glm::vec3& up) {
-        const float orientation[6] = {
-            look_at.x, look_at.y, look_at.z,
-            up.x, up.y, up.z
+        const float orientation[6] {
+            look_at.x,
+            look_at.y,
+            look_at.z,
+            up.x,
+            up.y,
+            up.z
         };
 
         alListenerfv(AL_ORIENTATION, orientation);
@@ -47,7 +51,7 @@ namespace sm {
     }
 
     void AlListener::set_distance_model(DistanceModel distance_model) {
-        ALenum result = 0;
+        ALenum result {0};
 
         switch (distance_model) {
             case DistanceModel::None:

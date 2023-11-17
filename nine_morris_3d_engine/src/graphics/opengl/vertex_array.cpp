@@ -1,5 +1,6 @@
 #include <memory>
 #include <vector>
+#include <cstddef>
 
 #include <glad/glad.h>
 
@@ -39,22 +40,29 @@ namespace sm {
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer->get_id());
 
-        std::size_t offset = 0;
+        std::size_t offset {0};
 
-        for (std::size_t i = 0; i < layout.elements.size(); i++) {
-            const VertexBufferLayout::VertexElement& element = layout.elements[i];
+        for (std::size_t i {0}; i < layout.elements.size(); i++) {
+            const VertexBufferLayout::VertexElement& element {layout.elements[i]};
 
             switch (element.type) {
                 case VertexBufferLayout::Float:
                     glVertexAttribPointer(
-                        element.index, element.size, GL_FLOAT, GL_FALSE,
-                        layout.stride, reinterpret_cast<GLvoid*>(offset)  // It is safe
+                        element.index,
+                        element.size,
+                        GL_FLOAT,
+                        GL_FALSE,
+                        layout.stride,
+                        reinterpret_cast<void*>(offset)  // It is safe
                     );
                     break;
                 case VertexBufferLayout::Int:
                     glVertexAttribIPointer(
-                        element.index, element.size, GL_INT,
-                        layout.stride, reinterpret_cast<GLvoid*>(offset)
+                        element.index,
+                        element.size,
+                        GL_INT,
+                        layout.stride,
+                        reinterpret_cast<void*>(offset)
                     );
                     break;
             }

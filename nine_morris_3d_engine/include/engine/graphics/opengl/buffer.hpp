@@ -34,8 +34,8 @@ namespace sm {
 
         unsigned int get_id() const { return buffer; }
     private:
-        unsigned int buffer = 0;
-        DrawHint hint = DrawHint::Static;
+        unsigned int buffer {0};
+        DrawHint hint {DrawHint::Static};
     };
 
     // Only supports unsigned int
@@ -55,8 +55,8 @@ namespace sm {
         unsigned int get_id() const { return buffer; }
         int get_index_count() const { return index_count; }
     private:
-        unsigned int buffer = 0;
-        int index_count = 0;
+        unsigned int buffer {0};
+        int index_count {0};
     };
 
     struct UniformBlockSpecification {
@@ -91,21 +91,21 @@ namespace sm {
         void allocate_memory(std::size_t size);
         static std::size_t type_size(unsigned int type);
 
-        unsigned int buffer = 0;
+        unsigned int buffer {0};  // TODO reorder members
 
         struct UniformBlockField {
-            std::size_t offset = 0;
-            std::size_t size = 0;
+            std::size_t offset {0};
+            std::size_t size {0};
         };
 
         UniformBlockSpecification specification;
 
-        unsigned char* data = nullptr;
-        std::size_t size = 0;
+        unsigned char* data {nullptr};
+        std::size_t size {0};
 
         std::unordered_map<Key, UniformBlockField, KeyHash> fields;
 
-        bool configured = false;
+        bool configured {false};
 
         friend class GlShader;
     };
@@ -131,8 +131,8 @@ namespace sm {
             *data_out = static_cast<T*>(data);
         }
     private:
-        unsigned int buffer = 0;
-        void* data = nullptr;  // TODO clear value is float; should be generic
-        unsigned char* dummy_data = nullptr;
+        unsigned int buffer {0};
+        void* data {nullptr};  // TODO clear value is float; should be generic
+        unsigned char* dummy_data {nullptr};
     };
 }

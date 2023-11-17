@@ -13,11 +13,15 @@ namespace sm {
     class FramebufferReader {
     public:
         FramebufferReader() = default;
-        FramebufferReader(const std::array<std::shared_ptr<GlPixelBuffer>, BufferCount>& buffers,
-                std::shared_ptr<GlFramebuffer> framebuffer)
+
+        FramebufferReader(
+            const std::array<std::shared_ptr<GlPixelBuffer>, BufferCount>& buffers,
+            std::shared_ptr<GlFramebuffer> framebuffer
+        )
             : buffers(buffers), framebuffer(framebuffer) {
             static_assert(BufferCount > 0);
         }
+
         ~FramebufferReader() = default;
 
         FramebufferReader(const FramebufferReader&) = delete;
@@ -53,7 +57,7 @@ namespace sm {
         // Store references to pixel buffers and framebuffers
         std::array<std::shared_ptr<GlPixelBuffer>, BufferCount> buffers;
         std::shared_ptr<GlFramebuffer> framebuffer;
-        std::size_t buffer_index = 0;
-        std::size_t next_buffer_index = 0;
+        std::size_t buffer_index {0};
+        std::size_t next_buffer_index {0};
     };
 }

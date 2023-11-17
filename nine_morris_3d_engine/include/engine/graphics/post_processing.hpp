@@ -32,8 +32,8 @@ namespace sm {
 
     struct PostProcessingContext {
         std::vector<std::unique_ptr<PostProcessingStep>> steps;
-        unsigned int last_texture = 0;  // Last texture at any moment in the processing pipeline
+        unsigned int last_texture {0};  // Last texture at any moment in the processing pipeline
         std::vector<unsigned int> textures;  // All textures in order
-        unsigned int original_texture = 0;
+        unsigned int original_texture {0};
     };
 }

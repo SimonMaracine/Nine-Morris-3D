@@ -11,16 +11,16 @@ namespace sm {
         };
 
         struct VertexElement {
-            unsigned int index = 0;
+            unsigned int index {0};
             Type type {};
-            int size = 0;
-            bool per_instance = false;
+            int size {0};
+            bool per_instance {false};
 
             static std::size_t get_size(Type type);
         };
 
         std::vector<VertexElement> elements;
-        int stride = 0;
+        int stride {0};
 
         VertexBufferLayout& add(unsigned int index, Type type, int size, bool per_instance = false);
     };

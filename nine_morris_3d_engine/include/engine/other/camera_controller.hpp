@@ -34,7 +34,7 @@ namespace sm {
             this->camera = camera;
         }
     protected:
-        Camera* camera = nullptr;
-        Ctx* ctx = nullptr;
+        Camera* camera {nullptr};
+        Ctx* ctx {nullptr};
     };
 }

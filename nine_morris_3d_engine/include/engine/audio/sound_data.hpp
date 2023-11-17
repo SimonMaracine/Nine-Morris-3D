@@ -29,12 +29,12 @@ namespace sm {
         std::size_t compute_size();
         std::size_t compute_bits_per_sample();
 
-        short* data = nullptr;
-        std::size_t size = 0;
-        int samples = 0;  // Total number of samples
-        int channels = 0;  // Usually mono or stereo
-        int sample_rate = 0;  // Frequency
-        std::size_t bits_per_sample = 0;
+        short* data {nullptr};  // TODO reorder members
+        std::size_t size {0};
+        int samples {0};  // Total number of samples
+        int channels {0};  // Usually mono or stereo
+        int sample_rate {0};  // Frequency
+        std::size_t bits_per_sample {0};
         std::string file_path;
     };
 }

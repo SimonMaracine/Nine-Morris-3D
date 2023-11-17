@@ -31,7 +31,7 @@ namespace sm {
 
         stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
-        const auto [buffer, buffer_size] = Encrypt::load_file(file_path);
+        const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
 
         int channels;
         data = stbi_load_from_memory(buffer, buffer_size, &width, &height, &channels, 4);

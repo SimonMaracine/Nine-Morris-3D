@@ -29,20 +29,20 @@ namespace sm {
     };
 
     struct TextureSpecification {
-        Format format = Format::Rgba8;
+        Format format {Format::Rgba8};
 
-        Filter min_filter = Filter::Linear;
-        Filter mag_filter = Filter::Linear;
+        Filter min_filter {Filter::Linear};
+        Filter mag_filter {Filter::Linear};
 
-        Wrap wrap_s = Wrap::ClampBorder;
-        Wrap wrap_t = Wrap::ClampBorder;
+        Wrap wrap_s {Wrap::ClampBorder};
+        Wrap wrap_t {Wrap::ClampBorder};
 
-        std::optional<glm::vec4> border_color = std::nullopt;
+        std::optional<glm::vec4> border_color;
 
         // Mipmapping is off by default
-        int mipmap_levels = 1;
-        float bias = 0.0f;
-        int anisotropic_filtering = 0;
+        int mipmap_levels {1};  // TODO put in a struct
+        float bias {0.0f};
+        int anisotropic_filtering {0};
     };
 
     class GlTexture {
@@ -69,9 +69,9 @@ namespace sm {
 
         TextureSpecification specification;
 
-        unsigned int texture = 0;
-        int width = 0;
-        int height = 0;
+        unsigned int texture {0};
+        int width {0};
+        int height {0};
 
         std::string name;
     };
@@ -90,12 +90,12 @@ namespace sm {
         void bind(unsigned int unit) const;
         static void unbind();
     private:
-        unsigned int texture = 0;
+        unsigned int texture {0};
 
         std::string name;
     };
 
-    inline constexpr float CUBEMAP_VERTICES[] = {
+    inline constexpr float CUBEMAP_VERTICES[] {
         -5.0f,  5.0f, -5.0f,
         -5.0f, -5.0f, -5.0f,
          5.0f, -5.0f, -5.0f,

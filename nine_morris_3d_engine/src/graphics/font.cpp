@@ -22,10 +22,10 @@
 #include "engine/other/assert.hpp"
 
 namespace sm {
-    static constexpr char32_t ERROR_CHARACTER = 127;
+    static constexpr char32_t ERROR_CHARACTER {127};
 
     static std::string get_name(std::string_view file_path) {
-        std::size_t last_slash = file_path.find_last_of("/");
+        const std::size_t last_slash {file_path.find_last_of("/")};
         SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
 
         return std::string(file_path.substr(last_slash + 1));
@@ -40,10 +40,10 @@ namespace sm {
         }
 
         file.seekg(0, file.end);
-        const std::size_t length = file.tellg();
+        const std::size_t length {file.tellg()};
         file.seekg(0, file.beg);
 
-        char* buffer = new char[length];
+        char* buffer {new char[length]};
         file.read(buffer, length);
 
         return buffer;
@@ -51,9 +51,9 @@ namespace sm {
 
     static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsigned char* glyph,
             int width, int height, int dest_x, int dest_y, float* s0, float* t0, float* s1, float* t1) {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                const std::size_t index = static_cast<std::size_t>((y + dest_y) * dest_width + (x + dest_x));
+        for (int x {0}; x < width; x++) {
+            for (int y {0}; y < height; y++) {
+                const std::size_t index {static_cast<std::size_t>((y + dest_y) * dest_width + (x + dest_x))};
 
                 SM_ASSERT(index < static_cast<std::size_t>(dest_width * dest_height), "Write out of bounds");
 
@@ -67,10 +67,15 @@ namespace sm {
         *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
     }
 
-    Font::Font(std::string_view file_path, float size, int padding, unsigned char on_edge_value,
-            int pixel_dist_scale, int bitmap_size)
-        : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value),
-          pixel_dist_scale(pixel_dist_scale) {
+    Font::Font(
+        std::string_view file_path,
+        float size,
+        int padding,
+        unsigned char on_edge_value,
+        int pixel_dist_scale,
+        int bitmap_size
+    )
+        : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value), pixel_dist_scale(pixel_dist_scale) {
         font_info_buffer = get_font_file_data(file_path);
 
         // Cast is safe
@@ -95,12 +100,12 @@ namespace sm {
     }
 
     void Font::update_data(const float* data, std::size_t size) {
-        auto vertex_buffer = buffer.lock();  // Should be valid
+        auto vertex_buffer {buffer.lock()};  // Should be valid
         vertex_buffer->bind();
         vertex_buffer->upload_data(data, size);
         GlVertexBuffer::unbind();
 
-        static constexpr std::size_t FLOATS_PER_VERTEX = 4;
+        static constexpr std::size_t FLOATS_PER_VERTEX {4};
 
         SM_ASSERT(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0, "Data may be corrupted");
 
@@ -113,7 +118,7 @@ namespace sm {
         // Delete the previous bitmap before creating another one
         bitmap_image.reset();
 
-        const std::size_t SIZE = sizeof(unsigned char) * bitmap_size * bitmap_size;
+        const std::size_t SIZE {sizeof(unsigned char) * bitmap_size * bitmap_size};
 
         bake_context = {};
         bake_context.bitmap = new unsigned char[SIZE];
@@ -145,7 +150,7 @@ namespace sm {
         int descent;
         stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
-        for (int codepoint = begin_codepoint; codepoint <= end_codepoint; codepoint++) {
+        for (int codepoint {begin_codepoint}; codepoint <= end_codepoint; codepoint++) {
             try_bake_character(codepoint, descent);
         }
     }
@@ -154,7 +159,7 @@ namespace sm {
         int descent;
         stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
 
-        const std::u32string utf32_string = utf8::utf8to32(std::string(string));
+        const std::u32string utf32_string {utf8::utf8to32(std::string(string))};
 
         for (const char32_t character : utf32_string) {
             try_bake_character(character, descent);
@@ -173,17 +178,17 @@ namespace sm {
     }
 
     void Font::render(std::string_view string, std::vector<float>& buffer) const {
-        const std::u32string utf32_string = utf8::utf8to32(string);
+        const std::u32string utf32_string {utf8::utf8to32(string)};
 
-        int x = 0;
+        int x {0};
 
         for (const char32_t character : utf32_string) {
-            const Glyph& glyph = get_character_glyph(character);
+            const Glyph& glyph {get_character_glyph(character)};
 
-            const float x0 = static_cast<float>(x + glyph.xoff);
-            const float y0 = -static_cast<float>(glyph.height - glyph.yoff);
-            const float x1 = static_cast<float>(x + glyph.xoff + glyph.width);
-            const float y1 = static_cast<float>(glyph.yoff);
+            const float x0 {static_cast<float>(x + glyph.xoff)};
+            const float y0 {-static_cast<float>(glyph.height - glyph.yoff)};
+            const float x1 {static_cast<float>(x + glyph.xoff + glyph.width)};
+            const float y1 {static_cast<float>(glyph.yoff)};
 
             buffer.push_back(x0);
             buffer.push_back(y1);
@@ -220,26 +225,26 @@ namespace sm {
     }
 
     std::pair<int, int> Font::get_string_size(std::string_view string, float scale) const {
-        const std::u32string utf32_string = utf8::utf8to32(string);
+        const std::u32string utf32_string {utf8::utf8to32(string)};
 
-        int x = 0;
-        int height = 0;
+        int x {0};
+        int height {0};
 
         for (const char32_t character : utf32_string) {
-            const Glyph& glyph = get_character_glyph(character);
+            const Glyph& glyph {get_character_glyph(character)};
 
             x += glyph.xadvance;
 
             height = std::max(height, static_cast<int>(std::roundf(static_cast<float>(glyph.yoff) * scale)));
         }
 
-        const int width = static_cast<int>(std::roundf((x + padding * 2) * scale));  // Take padding into consideration
+        const int width {static_cast<int>(std::roundf((x + padding * 2) * scale))};  // Take padding into consideration
 
         return std::make_pair(width, height);
     }
 
     void Font::initialize() {
-        auto vertex_buffer = std::make_shared<GlVertexBuffer>(DrawHint::Stream);
+        auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
 
         VertexBufferLayout layout;
         layout.add(0, VertexBufferLayout::Float, 2);
@@ -265,8 +270,11 @@ namespace sm {
         int y0;
         stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
-        int width = 0, height = 0;  // Assume 0, because glyph can be null
-        unsigned char* glyph = stbtt_GetCodepointSDF(
+        // Assume 0, because glyph can be null
+        int width {0};
+        int height {0};
+
+        unsigned char* glyph {stbtt_GetCodepointSDF(
             &info,
             sf,
             codepoint,
@@ -277,7 +285,7 @@ namespace sm {
             &height,
             nullptr,
             nullptr
-        );
+        )};
 
         if (glyph == nullptr) {
             LOG_WARNING("Could not bake character with codepoint `{}`; still adding to map...", codepoint);
@@ -327,7 +335,7 @@ namespace sm {
     }
 
     void Font::write_bitmap_to_file() {
-        const std::string file_name = "bitmap_" + name + ".png";
+        const std::string file_name {"bitmap_" + name + ".png"};
 
         if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
             LOG_ERROR("Failed to create bitmap png file `{}`", file_name);

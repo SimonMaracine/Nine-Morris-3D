@@ -15,7 +15,7 @@ namespace sm {
         int width;
         int height;
 
-        std::string title;
+        std::string title;  // TODO reorder members
         bool fullscreen;
         bool native_resolution;
         bool resizable;
@@ -26,8 +26,8 @@ namespace sm {
         unsigned int version_minor;
         unsigned int version_patch;
     private:
-        Application* application = nullptr;
-        Ctx* ctx = nullptr;
+        Application* application {nullptr};
+        Ctx* ctx {nullptr};
 
         friend class Application;
         friend class Window;

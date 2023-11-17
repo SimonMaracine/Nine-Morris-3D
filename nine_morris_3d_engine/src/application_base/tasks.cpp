@@ -30,7 +30,7 @@ namespace sm {
 
             task.frames++;
 
-            const Task::Result result = task.function(task);
+            const Task::Result result {task.function(task)};
 
             switch (result) {
                 case Task::Result::Done:

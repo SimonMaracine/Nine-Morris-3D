@@ -14,7 +14,7 @@
 
 namespace sm {
     static int draw_hint_to_int(DrawHint hint) {
-        int result = 0;
+        int result {0};
 
         switch (hint) {
             case DrawHint::Static:
@@ -144,7 +144,9 @@ namespace sm {
     }
 
     void GlUniformBuffer::configure(unsigned int shader_program) {
-        const GLuint block_index = glGetUniformBlockIndex(shader_program, specification.block_name.c_str());
+        const GLuint block_index {
+            glGetUniformBlockIndex(shader_program, specification.block_name.c_str())
+        };
 
         if (block_index == GL_INVALID_INDEX) {
             LOG_DIST_CRITICAL("Invalid block index");
@@ -166,8 +168,8 @@ namespace sm {
         // Link uniform buffer to binding index
         glBindBufferBase(GL_UNIFORM_BUFFER, specification.binding_index, buffer);
 
-        const std::size_t field_count = specification.uniforms.size();
-        static constexpr std::size_t MAX_FIELD_COUNT = 24;
+        const std::size_t field_count {specification.uniforms.size()};
+        static constexpr std::size_t MAX_FIELD_COUNT {24};
 
         SM_ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 24 fields for now");
 
@@ -179,7 +181,7 @@ namespace sm {
         // Create the uniforms names list; the order of these names matters
         const char* field_names[MAX_FIELD_COUNT];
 
-        for (std::size_t i = 0; i < field_count; i++) {
+        for (std::size_t i {0}; i < field_count; i++) {
             field_names[i] = specification.uniforms[i].c_str();
         }
 
@@ -191,7 +193,7 @@ namespace sm {
             indices
         );
 
-        for (std::size_t i = 0; i < field_count; i++) {
+        for (std::size_t i {0}; i < field_count; i++) {
             if (indices[i] == GL_INVALID_INDEX) {
                 LOG_DIST_CRITICAL("Invalid field index");
                 panic();
@@ -203,7 +205,7 @@ namespace sm {
         glGetActiveUniformsiv(shader_program, field_count, indices, GL_UNIFORM_TYPE, types);
 
         // Finally setup the uniform block fields
-        for (std::size_t i = 0; i < field_count; i++) {
+        for (std::size_t i {0}; i < field_count; i++) {
             UniformBlockField field;
             field.offset = static_cast<std::size_t>(offsets[i]);
             field.size = static_cast<std::size_t>(sizes[i]) * type_size(types[i]);
@@ -231,8 +233,8 @@ namespace sm {
         SM_ASSERT(configured, "Uniform buffer must be configured");
         SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
 
-        const std::size_t offset = fields.at(field).offset;
-        const std::size_t size = fields.at(field).size;
+        const std::size_t offset {fields.at(field).offset};
+        const std::size_t size {fields.at(field).size};
 
         std::memcpy(data + offset, field_data, size);
         glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
@@ -246,7 +248,7 @@ namespace sm {
     }
 
     std::size_t GlUniformBuffer::type_size(unsigned int type) {
-        std::size_t size = 0;
+        std::size_t size {0};
 
         switch (type) {
             case GL_FLOAT_VEC3:
@@ -272,7 +274,7 @@ namespace sm {
         glGenBuffers(1, &buffer);
         glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
         glBufferData(GL_PIXEL_PACK_BUFFER, size, nullptr, GL_STREAM_READ);
-        const float value = 0.0f;
+        const float value {0.0f};
         glClearBufferData(GL_PIXEL_PACK_BUFFER, GL_R32F, GL_RED, GL_FLOAT, &value);
 
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
@@ -310,7 +312,7 @@ namespace sm {
     }
 
     void GlPixelBuffer::unmap_data() const {
-        const GLboolean success = glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+        const GLboolean success {glUnmapBuffer(GL_PIXEL_PACK_BUFFER)};
 
         if (success == GL_FALSE) {
             LOG_ERROR("Memory mapped by GL buffer {} became corrupted while it was used", buffer);

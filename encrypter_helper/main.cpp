@@ -15,10 +15,10 @@ static void open_file(const std::string& file_name, unsigned char** out, std::si
     }
 
     file.seekg(0, file.end);
-    const std::size_t length = file.tellg();
+    const std::size_t length {file.tellg()};
     file.seekg(0, file.beg);
 
-    char* buffer = new char[length];
+    char* buffer {new char[length]};
     file.read(buffer, length);
 
     *out = reinterpret_cast<unsigned char*>(buffer);  // It is safe
@@ -45,14 +45,14 @@ int main(int argc, char** argv) {
         std::exit(1);
     }
 
-    const std::string input_file = argv[1];
-    const std::string output_file = argv[2];
-    const std::string key = argv[3];
+    const std::string input_file {argv[1]};
+    const std::string output_file {argv[2]};
+    const std::string key {argv[3]};
 
     cppblowfish::BlowfishContext blowfish {key};
 
-    unsigned char* contents = nullptr;
-    std::size_t contents_size = 0;
+    unsigned char* contents {nullptr};
+    std::size_t contents_size {0};
     open_file(input_file, &contents, &contents_size);
 
     cppblowfish::Buffer input {contents, contents_size};
@@ -61,8 +61,8 @@ int main(int argc, char** argv) {
     cppblowfish::Buffer cipher;
     blowfish.encrypt(input, cipher);
 
-    const std::size_t size = cipher.size() + cipher.padding() + cppblowfish::BUFFER_OFFSET;
-    unsigned char* buffer = new unsigned char[size];
+    const std::size_t size {cipher.size() + cipher.padding() + cppblowfish::BUFFER_OFFSET};
+    unsigned char* buffer {new unsigned char[size]};
     cipher.write_whole_data(buffer);
     write_file(output_file, buffer, size);
     delete[] buffer;

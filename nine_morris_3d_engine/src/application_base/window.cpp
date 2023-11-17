@@ -20,9 +20,9 @@
 #include "engine/other/logging.hpp"
 
 #define APPLICATION_DATA(VARIABLE) \
-    const ApplicationProperties* VARIABLE = ( \
+    const ApplicationProperties* VARIABLE { \
         static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window)) \
-    );
+    };
 
 namespace sm {
     Window::Window(Application* application) {
@@ -105,7 +105,7 @@ namespace sm {
 
     std::vector<Monitor> Window::get_monitors() {
         int count;
-        GLFWmonitor** monitors = glfwGetMonitors(&count);
+        GLFWmonitor** monitors {glfwGetMonitors(&count)};
 
         if (monitors == nullptr) {
             LOG_DIST_CRITICAL("Could not retrieve monitors");
@@ -114,7 +114,7 @@ namespace sm {
 
         std::vector<Monitor> result;
 
-        for (int i = 0; i < count; i++) {
+        for (int i {0}; i < count; i++) {
             Monitor monitor;
             monitor.monitor = monitors[i];
 
@@ -135,15 +135,15 @@ namespace sm {
     }
 
     void Window::add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
-        const TextureData::Image data = cursor->get_data();
+        const TextureData::Image data {cursor->get_data()};
 
-        GLFWimage image = {
+        GLFWimage image {
             data.width,
             data.height,
             data.pixels
         };
 
-        GLFWcursor* glfw_cursor = glfwCreateCursor(&image, x_hotspot, y_hotspot);
+        GLFWcursor* glfw_cursor {glfwCreateCursor(&image, x_hotspot, y_hotspot)};
 
         if (glfw_cursor == nullptr) {
             LOG_DIST_ERROR("Could not create custom cursor `{}`", cursor->get_file_path());
@@ -153,14 +153,14 @@ namespace sm {
     }
 
     void Window::set_cursor(CursorId id) {
-        static constexpr auto null = resmanager::HashedStr64("null");
+        static constexpr auto null {resmanager::HashedStr64("null")};
 
         if (id == null) {
             glfwSetCursor(window, nullptr);
             return;
         }
 
-        GLFWcursor* cursor = cursors.at(id);
+        GLFWcursor* cursor {cursors.at(id)};
         glfwSetCursor(window, cursor);
     }
 
@@ -169,9 +169,9 @@ namespace sm {
         glfw_icons.reserve(icons.size());
 
         for (const std::unique_ptr<TextureData>& icon : icons) {
-            const TextureData::Image data = icon->get_data();
+            const TextureData::Image data {icon->get_data()};
 
-            const GLFWimage image = {
+            const GLFWimage image {
                 data.width,
                 data.height,
                 data.pixels
@@ -192,14 +192,15 @@ namespace sm {
     }
 
     GLFWwindow* Window::create_window(Application* application) {
-        GLFWmonitor* primary_monitor = nullptr;
-        int width = 0, height = 0;
+        GLFWmonitor* primary_monitor {nullptr};
+        int width {0};
+        int height {0};
 
         if (application->properties.fullscreen) {
             primary_monitor = glfwGetPrimaryMonitor();
 
             if (application->properties.native_resolution) {
-                const GLFWvidmode* video_mode = glfwGetVideoMode(primary_monitor);
+                const GLFWvidmode* video_mode {glfwGetVideoMode(primary_monitor)};
 
                 width = video_mode->width;
                 height = video_mode->height;
@@ -227,7 +228,7 @@ namespace sm {
         });
 
         glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-            ApplicationProperties* data = static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window));
+            ApplicationProperties* data {static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window))};
 
             data->width = width;
             data->height = height;
@@ -333,7 +334,7 @@ namespace sm {
     }
 
     std::pair<int, int> Monitor::get_resolution() const {
-        const GLFWvidmode* video_mode = glfwGetVideoMode(monitor);
+        const GLFWvidmode* video_mode {glfwGetVideoMode(monitor)};
 
         return std::make_pair(video_mode->width, video_mode->height);
     }
@@ -346,7 +347,7 @@ namespace sm {
     }
 
     const char* Monitor::get_name() const {
-        const char* name = glfwGetMonitorName(monitor);
+        const char* name {glfwGetMonitorName(monitor)};
 
         if (name == nullptr) {
             LOG_DIST_CRITICAL("Could not retrieve monitor name");

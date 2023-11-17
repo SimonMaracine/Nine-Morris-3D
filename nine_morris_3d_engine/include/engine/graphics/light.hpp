@@ -16,8 +16,8 @@ namespace sm {
         glm::vec3 diffuse_color {};
         glm::vec3 specular_color {};
 
-        float falloff_linear = 0.07f;
-        float falloff_quadratic = 0.017f;
+        float falloff_linear {0.07f};
+        float falloff_quadratic {0.017f};
     };
 
     /*
