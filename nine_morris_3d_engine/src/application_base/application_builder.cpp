@@ -1,9 +1,9 @@
-#include <string_view>
+#include <string>
 
 #include "engine/application_base/application_builder.hpp"
 
 namespace sm {
-    ApplicationBuilder& ApplicationBuilder::display(int width, int height, std::string_view title) {
+    ApplicationBuilder& ApplicationBuilder::display(int width, int height, const std::string& title) {
         this->width = width;
         this->height = height;
         this->title = title;
@@ -26,7 +26,7 @@ namespace sm {
         return *this;
     }
 
-    ApplicationBuilder& ApplicationBuilder::application_name(std::string_view app_name) {
+    ApplicationBuilder& ApplicationBuilder::application_name(const std::string& app_name) {
         this->app_name = app_name;
 
         return *this;
@@ -40,7 +40,7 @@ namespace sm {
         return *this;
     }
 
-    ApplicationBuilder& ApplicationBuilder::encrypt_key(std::string_view encryption_key) {
+    ApplicationBuilder& ApplicationBuilder::encrypt_key(const std::string& encryption_key) {
         this->encryption_key = encryption_key;
 
         return *this;

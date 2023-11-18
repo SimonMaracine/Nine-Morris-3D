@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 #include <stdexcept>
 
 namespace sm {
@@ -15,13 +14,13 @@ namespace sm {
         };
 
         // There is no uninitialization
-        static void initialize_applications(std::string_view app_name, std::string_view res_directory) noexcept(false);
+        static void initialize_applications(const std::string& app_name, const std::string& res_directory) noexcept(false);
 
-        static bool directory_exists(std::string_view path);  // Path must not end with trailing backslash
-        static bool create_directory(std::string_view path);
-        static bool delete_file(std::string_view path);
+        static bool directory_exists(const std::string& path);  // Path must not end with trailing backslash
+        static bool create_directory(const std::string& path);
+        static bool delete_file(const std::string& path);
 
-        static std::string cut_slash(std::string_view path);
+        static std::string cut_slash(const std::string& path);
 
         static std::string get_user_name() noexcept(false);
         static void check_and_fix_directories();
@@ -31,10 +30,10 @@ namespace sm {
         static std::string path_assets();
         static std::string path_engine_data();
 
-        static std::string path_logs(std::string_view file);
-        static std::string path_saved_data(std::string_view file);
-        static std::string path_assets(std::string_view file);
-        static std::string path_engine_data(std::string_view file);
+        static std::string path_logs(const std::string& file);
+        static std::string path_saved_data(const std::string& file);
+        static std::string path_assets(const std::string& file);
+        static std::string path_engine_data(const std::string& file);
 
         // These don't need to be reset explicitly
         static std::string user_name;

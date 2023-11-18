@@ -1,5 +1,4 @@
 #include <memory>
-#include <string_view>
 #include <vector>
 #include <utility>
 #include <fstream>
@@ -24,15 +23,15 @@
 namespace sm {
     static constexpr char32_t ERROR_CHARACTER {127};
 
-    static std::string get_name(std::string_view file_path) {
+    static std::string get_name(const std::string& file_path) {
         const std::size_t last_slash {file_path.find_last_of("/")};
         SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
 
-        return std::string(file_path.substr(last_slash + 1));
+        return file_path.substr(last_slash + 1);
     }
 
-    static const char* get_font_file_data(std::string_view file_path) {
-        std::ifstream file {std::string(file_path), std::ios::binary};
+    static const char* get_font_file_data(const std::string& file_path) {
+        std::ifstream file {file_path, std::ios::binary};
 
         if (!file.is_open()) {
             LOG_DIST_CRITICAL("Could not open file `{}` for reading", file_path);
@@ -40,7 +39,7 @@ namespace sm {
         }
 
         file.seekg(0, file.end);
-        const std::size_t length {file.tellg()};
+        const auto length {file.tellg()};
         file.seekg(0, file.beg);
 
         char* buffer {new char[length]};
@@ -68,7 +67,7 @@ namespace sm {
     }
 
     Font::Font(
-        std::string_view file_path,
+        const std::string& file_path,
         float size,
         int padding,
         unsigned char on_edge_value,
@@ -177,7 +176,7 @@ namespace sm {
         bake_characters(32, 126);
     }
 
-    void Font::render(std::string_view string, std::vector<float>& buffer) const {
+    void Font::render(const std::string& string, std::vector<float>& buffer) const {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
         int x {0};
@@ -224,7 +223,7 @@ namespace sm {
         }
     }
 
-    std::pair<int, int> Font::get_string_size(std::string_view string, float scale) const {
+    std::pair<int, int> Font::get_string_size(const std::string& string, float scale) const {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
         int x {0};

@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <string>
-#include <string_view>
 
 #include "engine/audio/openal/source.hpp"
 #include "engine/audio/openal/buffer.hpp"
@@ -17,8 +16,8 @@ namespace sm {
 
    class MusicTrack {
         public:
-            MusicTrack(std::string_view file_path);
-            MusicTrack(Encrypt::EncryptedFile file_path);
+            MusicTrack(const std::string& file_path);
+            MusicTrack(const EncrFile& file_path);
             MusicTrack(std::shared_ptr<SoundData> data);
             ~MusicTrack();
 

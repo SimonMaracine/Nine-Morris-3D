@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <string>
-#include <string_view>
 #include <array>
 #include <optional>
 
@@ -47,8 +46,8 @@ namespace sm {
 
     class GlTexture {
     public:
-        GlTexture(std::string_view file_path, const TextureSpecification& specification);
-        GlTexture(Encrypt::EncryptedFile file_path, const TextureSpecification& specification);
+        GlTexture(const std::string& file_path, const TextureSpecification& specification);
+        GlTexture(const EncrFile& file_path, const TextureSpecification& specification);
         GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
         GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification);
         ~GlTexture();

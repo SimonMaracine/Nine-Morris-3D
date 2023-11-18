@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string_view>
 #include <string>
 
 #include "engine/other/encrypt.hpp"
@@ -17,8 +16,8 @@ namespace sm {
             unsigned char* pixels;
         };
 
-        TextureData(std::string_view file_path, bool flip = false);
-        TextureData(Encrypt::EncryptedFile file_path, bool flip = false);
+        TextureData(const std::string& file_path, bool flip = false);
+        TextureData(const EncrFile& file_path, bool flip = false);
         ~TextureData();
 
         TextureData(const TextureData&) = delete;
@@ -27,7 +26,7 @@ namespace sm {
         TextureData& operator=(TextureData&&) = delete;
 
         Image get_data();
-        std::string_view get_file_path() { return file_path; }
+        const std::string& get_file_path() { return file_path; }
     private:
         unsigned char* data {nullptr};
         int width {0};

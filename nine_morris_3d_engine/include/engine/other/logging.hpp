@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string_view>
+#include <string>
 
 #include <spdlog/spdlog.h>
 
@@ -48,10 +48,10 @@ namespace sm {
         };
 
         // There is no uninitialization
-        static void initialize_applications(std::string_view log_file, std::string_view info_file);
+        static void initialize_applications(const std::string& log_file, const std::string& info_file);
         static void log_general_information(LogTarget target);
         static spdlog::logger* get_global_logger();
-        static std::string_view get_info_file();
+        static const std::string& get_info_file();
     private:
         static void set_fallback_logger_release(const char* error_message);
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <string_view>
 #include <vector>
 #include <utility>
 #include <unordered_map>
@@ -18,7 +17,7 @@ namespace sm {
     class Font {
     public:
         Font(
-            std::string_view file_path,
+            const std::string& file_path,
             float size,
             int padding,
             unsigned char on_edge_value,
@@ -50,10 +49,10 @@ namespace sm {
         void bake_ascii();
 
         // Call render to get the buffer of data used in the end by OpenGL
-        void render(std::string_view string, std::vector<float>& buffer) const;
+        void render(const std::string& string, std::vector<float>& buffer) const;
 
         // Get width and height of a line of text
-        std::pair<int, int> get_string_size(std::string_view string, float scale) const;
+        std::pair<int, int> get_string_size(const std::string& string, float scale) const;
     private:
         struct Glyph {
             float s0, t0, s1, t1;

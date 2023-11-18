@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string_view>
 #include <string>
 #include <cstddef>
 
@@ -9,8 +8,8 @@
 namespace sm {
     class SoundData {
     public:
-        SoundData(std::string_view file_path);
-        SoundData(Encrypt::EncryptedFile file_path);
+        SoundData(const std::string& file_path);
+        SoundData(const EncrFile& file_path);
         ~SoundData();
 
         SoundData(const SoundData&) = delete;
@@ -24,7 +23,7 @@ namespace sm {
         int get_channels() { return channels; }
         int get_frequency() { return sample_rate; }
         std::size_t get_bps() { return bits_per_sample; }
-        std::string_view get_file_path() { return file_path; }
+        const std::string& get_file_path() { return file_path; }
     private:
         std::size_t compute_size();
         std::size_t compute_bits_per_sample();

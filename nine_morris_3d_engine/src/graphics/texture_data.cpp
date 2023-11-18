@@ -1,4 +1,3 @@
-#include <string_view>
 #include <string>
 
 #include <stb_image.h>
@@ -10,14 +9,14 @@
 #include "engine/other/encrypt.hpp"
 
 namespace sm {
-    TextureData::TextureData(std::string_view file_path, bool flip)
+    TextureData::TextureData(const std::string& file_path, bool flip)
         : file_path(file_path) {
         LOG_DEBUG("Loading texture data `{}`...", file_path);
 
         stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
         int channels;
-        data = stbi_load(file_path.data(), &width, &height, &channels, 4);
+        data = stbi_load(file_path.c_str(), &width, &height, &channels, 4);
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture data `{}`", file_path);
@@ -25,7 +24,7 @@ namespace sm {
         }
     }
 
-    TextureData::TextureData(Encrypt::EncryptedFile file_path, bool flip)
+    TextureData::TextureData(const EncrFile& file_path, bool flip)
         : file_path(file_path) {
         LOG_DEBUG("Loading texture data `{}`...", file_path);
 

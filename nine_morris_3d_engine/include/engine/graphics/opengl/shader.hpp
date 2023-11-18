@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 #include <unordered_map>
 #include <vector>
 #include <optional>
@@ -10,7 +9,6 @@
 #include <memory>
 
 #include <glm/glm.hpp>
-#include <cppblowfish/cppblowfish.hpp>
 #include <resmanager/resmanager.hpp>
 
 #include "engine/graphics/opengl/buffer.hpp"
@@ -24,8 +22,8 @@ namespace sm {
         using Key = resmanager::HashedStr64;
         using KeyHash = resmanager::Hash<Key>;
 
-        GlShader(std::string_view source_vertex, std::string_view source_fragment);
-        GlShader(Encrypt::EncryptedFile source_vertex, Encrypt::EncryptedFile source_fragment);
+        GlShader(const std::string& source_vertex, const std::string& source_fragment);
+        GlShader(const EncrFile& source_vertex, const EncrFile& source_fragment);
         ~GlShader();
 
         GlShader(const GlShader&) = delete;
@@ -44,7 +42,7 @@ namespace sm {
         void upload_uniform_vec4(Key name, const glm::vec4& vector) const;
 
         unsigned int get_id() const { return program; }
-        std::string_view get_name() const { return name; }
+        const std::string& get_name() const { return name; }
 
         void add_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
     private:
@@ -55,7 +53,7 @@ namespace sm {
 
         unsigned int create_program() const;
         void delete_intermediates();
-        std::optional<unsigned int> compile_shader(std::string_view source_path, unsigned int type) const;
+        std::optional<unsigned int> compile_shader(const std::string& source_path, unsigned int type) const;
         std::optional<unsigned int> compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const;
         bool check_compilation(unsigned int shader, unsigned int type) const;
         bool check_linking(unsigned int program) const;

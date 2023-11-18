@@ -1,5 +1,4 @@
 #include <string>
-#include <string_view>
 #include <stdexcept>
 
 #include "engine/application_base/platform.hpp"
@@ -24,18 +23,18 @@ namespace sm {
     #define ASSETS_DIRECTORY_PATH(application_name) \
         ("/usr/local/share/" + (application_name) + "/")
 
-        static bool directory_exists_impl(std::string_view path) {
+        static bool directory_exists_impl(const std::string& path) {
             struct stat sb;
 
-            if (stat(path.data(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
+            if (stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
                 return true;
             } else {
                 return false;
             }
         }
 
-        static bool create_directory_impl(std::string_view path) {
-            if (mkdir(path.data(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < 0) {
+        static bool create_directory_impl(const std::string& path) {
+            if (mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) < 0) {
                 return false;
             } else {
                 return true;
@@ -72,9 +71,9 @@ namespace sm {
     #define DOCUMENTS_DIRECTORY_PATH(user_name, application_name) \
         ("C:\\Users\\" + (user_name) + "\\Documents\\" + (application_name) + "\\")
 
-        static bool directory_exists_impl(std::string_view path) {
+        static bool directory_exists_impl(const std::string& path) {
             WIN32_FIND_DATA find_data;
-            HANDLE handle {FindFirstFile(path.data(), &find_data)};
+            HANDLE handle {FindFirstFile(path.c_str(), &find_data)};
 
             if (handle == INVALID_HANDLE_VALUE) {
                 FindClose(handle);
@@ -90,8 +89,8 @@ namespace sm {
             }
         }
 
-        static bool create_directory_impl(std::string_view path) {
-            const bool success {CreateDirectory(path.data(), nullptr)};
+        static bool create_directory_impl(const std::string& path) {
+            const bool success {CreateDirectory(path.c_str(), nullptr)};
             return success;
         }
 
@@ -177,27 +176,26 @@ namespace sm {
         }
 #endif
 
-    void FileSystem::initialize_applications(std::string_view app_name, std::string_view res_directory) noexcept(false) {
+    void FileSystem::initialize_applications(const std::string& app_name, const std::string& res_directory) noexcept(false) {
         user_name = get_user_name();
         FileSystem::app_name = app_name;
         FileSystem::res_directory = res_directory;
     }
 
-    bool FileSystem::directory_exists(std::string_view path) {
+    bool FileSystem::directory_exists(const std::string& path) {
         return directory_exists_impl(path);
     }
 
-    bool FileSystem::create_directory(std::string_view path) {
+    bool FileSystem::create_directory(const std::string& path) {
         return create_directory_impl(path);
     }
 
-    bool FileSystem::delete_file(std::string_view path) {
-        return remove(path.data()) != 0;
+    bool FileSystem::delete_file(const std::string& path) {
+        return remove(path.c_str()) != 0;
     }
 
-    std::string FileSystem::cut_slash(std::string_view path) {
-        // Needs to return a new string
-        return std::string(path.substr(0, path.length() - 1));
+    std::string FileSystem::cut_slash(const std::string& path) {
+        return path.substr(0, path.length() - 1);
     }
 
     std::string FileSystem::get_user_name() noexcept(false) {
@@ -224,20 +222,20 @@ namespace sm {
         return path_assets_impl() + "engine_data/";
     }
 
-    std::string FileSystem::path_logs(std::string_view file) {
-        return path_logs_impl() + std::string(file);
+    std::string FileSystem::path_logs(const std::string& file) {
+        return path_logs_impl() + file;
     }
 
-    std::string FileSystem::path_saved_data(std::string_view file) {
-        return path_saved_data_impl() + std::string(file);
+    std::string FileSystem::path_saved_data(const std::string& file) {
+        return path_saved_data_impl() + file;
     }
 
-    std::string FileSystem::path_assets(std::string_view file) {
-        return path_assets_impl() + FileSystem::res_directory + '/' + std::string(file);
+    std::string FileSystem::path_assets(const std::string& file) {
+        return path_assets_impl() + FileSystem::res_directory + '/' + file;
     }
 
-    std::string FileSystem::path_engine_data(std::string_view file) {
-        return path_assets_impl() + "engine_data/" + std::string(file);
+    std::string FileSystem::path_engine_data(const std::string& file) {
+        return path_assets_impl() + "engine_data/" + file;
     }
 
     std::string FileSystem::user_name;

@@ -1,6 +1,5 @@
 #include <memory>
 #include <string>
-#include <string_view>
 #include <array>
 #include <optional>
 #include <vector>
@@ -23,11 +22,11 @@
 namespace sm {
     static constexpr int CHANNELS {4};
 
-    static std::string get_name(std::string_view file_path) {
+    static std::string get_name(const std::string& file_path) {
         std::size_t last_slash {file_path.find_last_of("/")};
         SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
 
-        return std::string(file_path.substr(last_slash + 1));
+        return file_path.substr(last_slash + 1);
     }
 
     static std::string get_name_texture3d(const char* file_path) {
@@ -133,14 +132,14 @@ namespace sm {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 
-    GlTexture::GlTexture(std::string_view file_path, const TextureSpecification& specification)
+    GlTexture::GlTexture(const std::string& file_path, const TextureSpecification& specification)
         : specification(specification) {
         LOG_DEBUG("Loading texture `{}`...", file_path);
 
         stbi_set_flip_vertically_on_load(1);
 
         int width, height, channels;
-        unsigned char* data {stbi_load(file_path.data(), &width, &height, &channels, CHANNELS)};
+        unsigned char* data {stbi_load(file_path.c_str(), &width, &height, &channels, CHANNELS)};
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
@@ -164,7 +163,7 @@ namespace sm {
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
-    GlTexture::GlTexture(Encrypt::EncryptedFile file_path, const TextureSpecification& specification)
+    GlTexture::GlTexture(const EncrFile& file_path, const TextureSpecification& specification)
         : specification(specification) {
         LOG_DEBUG("Loading texture `{}`...", file_path);
 

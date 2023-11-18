@@ -1,5 +1,4 @@
 #include <string>
-#include <string_view>
 #include <unordered_map>
 #include <vector>
 #include <optional>
@@ -11,8 +10,9 @@
 #include <stdexcept>
 #include <algorithm>
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <resmanager/resmanager.hpp>
+#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "engine/application_base/platform.hpp"
@@ -24,19 +24,19 @@
 #include "engine/other/assert.hpp"
 
 namespace sm {
-    static std::string get_name_sources(std::string_view vertex_source, std::string_view fragment_source) {
+    static std::string get_name_sources(const std::string& vertex_source, const std::string& fragment_source) {
         std::size_t last_slash_v {vertex_source.find_last_of("/")};
         SM_ASSERT(last_slash_v != std::string::npos, "Could not find slash");
-        const std::string vertex {std::string(vertex_source.substr(last_slash_v + 1))};
+        const auto vertex {vertex_source.substr(last_slash_v + 1)};
 
         std::size_t last_slash_f {fragment_source.find_last_of("/")};
         SM_ASSERT(last_slash_f != std::string::npos, "Could not find slash");
-        const std::string fragment {std::string(fragment_source.substr(last_slash_f + 1))};
+        const auto fragment {fragment_source.substr(last_slash_f + 1)};
 
         return vertex + " & " + fragment;
     }
 
-    GlShader::GlShader(std::string_view source_vertex, std::string_view source_fragment) {
+    GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment) {
         name = get_name_sources(source_vertex, source_fragment);
 
         const auto vertex_shader_code {compile_shader(source_vertex, GL_VERTEX_SHADER)};
@@ -69,7 +69,7 @@ namespace sm {
         LOG_DEBUG("Created GL shader {} ({})", program, name);
     }
 
-    GlShader::GlShader(Encrypt::EncryptedFile source_vertex, Encrypt::EncryptedFile source_fragment) {
+    GlShader::GlShader(const EncrFile& source_vertex, const EncrFile& source_fragment) {
         name = get_name_sources(source_vertex, source_fragment);
 
         const auto buffer_vertex {Encrypt::load_file(source_vertex)};
@@ -283,8 +283,8 @@ namespace sm {
         fragment_shader = 0;
     }
 
-    std::optional<unsigned int> GlShader::compile_shader(std::string_view source_path, unsigned int type) const {
-        std::ifstream file {std::string(source_path), std::ios::binary};
+    std::optional<unsigned int> GlShader::compile_shader(const std::string& source_path, unsigned int type) const {
+        std::ifstream file {source_path, std::ios::binary};
 
         if (!file.is_open()) {
             LOG_DIST_CRITICAL("Could not open file `{}` for reading", source_path);
@@ -292,7 +292,7 @@ namespace sm {
         }
 
         file.seekg(0, file.end);
-        const std::size_t length {file.tellg()};
+        const auto length {file.tellg()};
         file.seekg(0, file.beg);
 
         char* buffer {new char[length]};
@@ -301,7 +301,7 @@ namespace sm {
         const unsigned int shader {glCreateShader(type)};
 
         const char* const source {buffer};
-        const int source_length {length};
+        const int source_length {static_cast<int>(length)};
 
         glShaderSource(shader, 1, &source, &source_length);
         glCompileShader(shader);
@@ -320,7 +320,7 @@ namespace sm {
 
         const char* buffer {reinterpret_cast<const char*>(source_buffer.first)};  // It is safe
         const char* const source {buffer};
-        const int source_length {source_buffer.second};
+        const int source_length {static_cast<int>(source_buffer.second)};
 
         glShaderSource(shader, 1, &source, &source_length);
         glCompileShader(shader);

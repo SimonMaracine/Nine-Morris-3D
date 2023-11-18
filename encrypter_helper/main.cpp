@@ -15,7 +15,7 @@ static void open_file(const std::string& file_name, unsigned char** out, std::si
     }
 
     file.seekg(0, file.end);
-    const std::size_t length {file.tellg()};
+    const auto length {file.tellg()};
     file.seekg(0, file.beg);
 
     char* buffer {new char[length]};

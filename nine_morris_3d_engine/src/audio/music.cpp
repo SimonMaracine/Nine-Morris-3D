@@ -1,5 +1,5 @@
 #include <memory>
-#include <string_view>
+#include <string>
 
 #include "engine/audio/openal/source.hpp"
 #include "engine/audio/openal/buffer.hpp"
@@ -10,7 +10,7 @@
 #include "engine/other/assert.hpp"
 
 namespace sm {
-    MusicTrack::MusicTrack(std::string_view file_path) {
+    MusicTrack::MusicTrack(const std::string& file_path) {
         const auto data {std::make_shared<SoundData>(file_path)};
 
         setup(data);
@@ -20,7 +20,7 @@ namespace sm {
         LOG_DEBUG("Loaded music track `{}`", name);
     }
 
-    MusicTrack::MusicTrack(Encrypt::EncryptedFile file_path) {
+    MusicTrack::MusicTrack(const EncrFile& file_path) {
         const auto data {std::make_shared<SoundData>(file_path)};
 
         setup(data);

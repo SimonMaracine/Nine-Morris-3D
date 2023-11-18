@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
 #include <resmanager/resmanager.hpp>
 
@@ -36,7 +35,7 @@ namespace sm {
         virtual void on_fixed_update() {}  // Called once every 50 milliseconds
         virtual void on_imgui_update() {}  // Called every frame for Dear ImGui only
 
-        std::string_view get_name() const { return name; }
+        const std::string& get_name() const { return name; }
         SceneId get_id() const { return id; }
 
         Ctx* ctx {nullptr};

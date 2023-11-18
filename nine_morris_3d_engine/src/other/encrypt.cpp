@@ -1,8 +1,7 @@
-#include <string_view>
+#include <string>
 #include <utility>
 #include <cstddef>
 #include <fstream>
-#include <string>
 
 #include <cppblowfish/cppblowfish.hpp>
 
@@ -11,8 +10,8 @@
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    std::pair<unsigned char*, std::size_t> Encrypt::load_file(EncryptedFile file_path) {
-        std::ifstream file {std::string(file_path), std::ios::binary};
+    std::pair<unsigned char*, std::size_t> Encrypt::load_file(const EncrFile& file_path) {
+        std::ifstream file {file_path, std::ios::binary};
 
         if (!file.is_open()) {
             LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading", file_path);
@@ -20,7 +19,7 @@ namespace sm {
         }
 
         file.seekg(0, file.end);
-        const std::size_t length {file.tellg()};
+        const auto length {file.tellg()};
         file.seekg(0, file.beg);
 
         char* raw_buffer {new char[length]};
@@ -39,8 +38,8 @@ namespace sm {
         return std::make_pair(data, size);
     }
 
-    void Encrypt::initialize(std::string_view key) {
-        context = cppblowfish::BlowfishContext(std::string(key) + 'S');
+    void Encrypt::initialize(const std::string& key) {
+        context = cppblowfish::BlowfishContext(key + 'S');
     }
 
     cppblowfish::BlowfishContext Encrypt::context {};

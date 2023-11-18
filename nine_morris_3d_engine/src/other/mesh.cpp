@@ -1,5 +1,4 @@
 #include <cstddef>
-#include <string_view>
 #include <string>
 #include <vector>
 #include <cstring>
@@ -112,11 +111,11 @@ namespace sm {
         }
     }
 
-    static const aiMesh* find_mesh(const aiNode* node, std::string_view object_name, const aiScene* scene) {
+    static const aiMesh* find_mesh(const aiNode* node, const std::string& object_name, const aiScene* scene) {
         for (unsigned int i {0}; i < node->mNumMeshes; i++) {
             const aiMesh* mesh {scene->mMeshes[node->mMeshes[i]]};
 
-            if (std::strcmp(mesh->mName.C_Str(), std::string(object_name).c_str()) == 0) {
+            if (std::strcmp(mesh->mName.C_Str(), object_name.c_str()) == 0) {
                 return mesh;
             }
         }
@@ -128,7 +127,7 @@ namespace sm {
         return nullptr;
     }
 
-    Mesh::Mesh(std::string_view file_path, std::string_view object_name, Type type, bool flip_winding) {
+    Mesh::Mesh(const std::string& file_path, const std::string& object_name, Type type, bool flip_winding) {
         unsigned int flags {aiProcess_ValidateDataStructure};
 
         if (flip_winding) {
@@ -145,7 +144,7 @@ namespace sm {
 
         Assimp::Importer importer;
 
-        const aiScene* scene {importer.ReadFile(std::string(file_path), flags)};
+        const aiScene* scene {importer.ReadFile(file_path, flags)};
 
         if (scene == nullptr) {
             LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
@@ -164,7 +163,7 @@ namespace sm {
         load(type, mesh, file_path);
     }
 
-    Mesh::Mesh(Encrypt::EncryptedFile file_path, std::string_view object_name, Type type, bool flip_winding) {
+    Mesh::Mesh(const EncrFile& file_path, const std::string& object_name, Type type, bool flip_winding) {
         unsigned int flags {aiProcess_ValidateDataStructure};
 
         if (flip_winding) {
@@ -209,7 +208,7 @@ namespace sm {
         LOG_DEBUG("Freed model data");
     }
 
-    void Mesh::load(Type type, const void* pmesh, std::string_view file_path) {
+    void Mesh::load(Type type, const void* pmesh, const std::string& file_path) {
         const aiMesh* mesh {static_cast<const aiMesh*>(pmesh)};
 
         switch (type) {

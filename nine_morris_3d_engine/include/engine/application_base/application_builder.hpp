@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
 namespace sm {
     /*
@@ -11,12 +10,12 @@ namespace sm {
     private:
         static constexpr const char* TITLE {"Nine Morris 3D Engine"};
     public:
-        ApplicationBuilder& display(int width, int height, std::string_view title = TITLE);
+        ApplicationBuilder& display(int width, int height, const std::string& title = TITLE);
         ApplicationBuilder& display_flags(bool fullscreen, bool native_resolution, bool resizable);
         ApplicationBuilder& display_min_resolution(int min_width, int min_height);
-        ApplicationBuilder& application_name(std::string_view app_name);
+        ApplicationBuilder& application_name(const std::string& app_name);
         ApplicationBuilder& version(unsigned int major, unsigned int minor, unsigned int patch);
-        ApplicationBuilder& encrypt_key(std::string_view encryption_key);
+        ApplicationBuilder& encrypt_key(const std::string& encryption_key);
         ApplicationBuilder& with_audio();
         ApplicationBuilder& with_random_generator();
     private:

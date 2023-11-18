@@ -1,4 +1,3 @@
-#include <string_view>
 #include <string>
 #include <memory>
 #include <fstream>
@@ -30,8 +29,8 @@
 */
 
 namespace sm {
-    void Logging::initialize_applications([[maybe_unused]] std::string_view log_file, std::string_view info_file) {
-        info_file = info_file;
+    void Logging::initialize_applications([[maybe_unused]] const std::string& log_file, const std::string& info_file) {
+        Logging::info_file = info_file;
 
 #ifdef SM_BUILD_DISTRIBUTION
         const std::string file_path {FileSystem::path_for_logs(log_file)};
@@ -93,7 +92,7 @@ namespace sm {
         return global_logger.get();
     }
 
-    std::string_view Logging::get_info_file() {
+    const std::string& Logging::get_info_file() {
         return info_file;
     }
 
