@@ -22,7 +22,8 @@ namespace sm {
             format = AL_FORMAT_STEREO16;
         } else {
             LOG_DIST_CRITICAL("Unknown format: channels = `{}`, bps = `{}`", channels, bps);
-            panic();
+            // panic();
+            throw ErrorResourceLoading;
         }
 
         return format;

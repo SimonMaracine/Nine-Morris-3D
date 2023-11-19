@@ -1,5 +1,13 @@
 #pragma once
 
 namespace sm {
-    void panic();
+    // void panic();
+
+    enum RuntimeError {
+        ErrorInitialization,
+        ErrorResourceLoading,
+        ErrorOpenAl,
+        ErrorOpenGl,
+        ErrorOther
+    };
 }

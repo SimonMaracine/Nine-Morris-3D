@@ -25,11 +25,12 @@
 #include "engine/scene/scene.hpp"
 
 namespace sm {
-    void Application::initialize_applications(const ApplicationsData& data) {
-        try {
+    bool Application::initialize_applications(const ApplicationsData& data) {
+        try {  // TODO use lighter exceptions
             FileSystem::initialize_applications(data.app_name, data.res_directory);
-        } catch (const FileSystem::UserNameError& e) {
-            panic();  // Really bad that there is no feedback
+        } catch (const FileSystem::UserNameError&) {
+            // panic();  // Really bad that there is no feedback  // FIXME
+            return false;  // Really bad that there is no feedback
         }
 
         // Set locale for the applications; used mostly by spdlog
@@ -40,6 +41,8 @@ namespace sm {
 #ifdef SM_BUILD_DISTRIBUTION
         FileSystem::check_and_fix_directories();
 #endif
+
+        return true;
     }
 
     Application::Application(const ApplicationBuilder& builder, void* user_data) {
@@ -69,7 +72,7 @@ namespace sm {
 
         ImGuiContext::initialize(ctx.win->get_handle());
 
-#ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION  // FIXME
         Logging::log_general_information(Logging::LogTarget::Console);
 #endif
 

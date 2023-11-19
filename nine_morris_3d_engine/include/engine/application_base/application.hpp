@@ -29,7 +29,7 @@ namespace sm {
             std::string res_directory;
         };
 
-        static void initialize_applications(const ApplicationsData& data);
+        static bool initialize_applications(const ApplicationsData& data);
 
         Application(const ApplicationBuilder& builder, void* user_data = nullptr);
         ~Application();

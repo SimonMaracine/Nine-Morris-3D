@@ -34,7 +34,8 @@ namespace sm {
                     LOG_DIST_CRITICAL("({}) Unknown AL error", error);
             }
 
-            panic();
+            // panic();
+            throw ErrorOpenAl;
         }
 #endif
     }

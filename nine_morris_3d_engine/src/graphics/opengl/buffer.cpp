@@ -150,7 +150,8 @@ namespace sm {
 
         if (block_index == GL_INVALID_INDEX) {
             LOG_DIST_CRITICAL("Invalid block index");
-            panic();
+            // panic();
+            throw ErrorOther;
         }
 
         // If it's already configured, return
@@ -196,7 +197,8 @@ namespace sm {
         for (std::size_t i {0}; i < field_count; i++) {
             if (indices[i] == GL_INVALID_INDEX) {
                 LOG_DIST_CRITICAL("Invalid field index");
-                panic();
+                // panic();
+                throw ErrorOther;
             }
         }
 

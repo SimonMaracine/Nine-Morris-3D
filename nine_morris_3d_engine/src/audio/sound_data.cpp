@@ -25,7 +25,8 @@ namespace sm {
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load sound data `{}`", file_path);
-            panic();
+            // panic();
+            throw ErrorResourceLoading;
         }
 
         size = compute_size();
@@ -44,7 +45,8 @@ namespace sm {
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load sound data `{}`", file_path);
-            panic();
+            // panic();
+            throw ErrorResourceLoading;
         }
 
         size = compute_size();

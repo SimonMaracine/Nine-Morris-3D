@@ -36,7 +36,9 @@ void application_main() {
     data.info_file = INFO_FILE;
     data.res_directory = "data";
 
-    sm::Application::initialize_applications(data);
+    if (!sm::Application::initialize_applications(data)) {
+        return;
+    }
 
     while (true) {
         int exit_code {};
@@ -60,9 +62,9 @@ void application_main() {
         //     exit_code = launcher.run("launcher"_H);
         // }
 
-        if (exit_code == 1) {
-            break;
-        }
+        // if (exit_code == 1) {
+        //     break;
+        // }
 
         {
             // const auto& options = global_data->launcher_options;
@@ -76,25 +78,29 @@ void application_main() {
                 .application_name(APP_NAME)
                 .version(MAJOR, MINOR, PATCH)
                 .encrypt_key(KEY)
-            };
                 // .with_audio()
                 // .with_random_generator();
+            };
 
-            auto game {sm::Application(game_builder/*, global_data*/)};
-            // game.set_start_function(game::start);
-            // game.set_stop_function(game::stop);
-            // game.add_scene<LoadingScene>();
-            // game.add_scene<StandardGameScene>();
-            // game.add_scene<JumpVariantScene>();
-            // game.add_scene<JumpPlusVariantScene>();
-            game.add_scene<GameScene>();
-            exit_code = game.run("loading"_H);
+            try {
+                auto game {sm::Application(game_builder/*, global_data*/)};
+                // game.set_start_function(game::start);
+                // game.set_stop_function(game::stop);
+                // game.add_scene<LoadingScene>();
+                // game.add_scene<StandardGameScene>();
+                // game.add_scene<JumpVariantScene>();
+                // game.add_scene<JumpPlusVariantScene>();
+                game.add_scene<GameScene>();
+                exit_code = game.run("loading"_H);
+            } catch (sm::RuntimeError error) {
+                LOG_DIST_INFO("Terminated game with error code {}", error);
+                break;
+            }
         }
 
         if (exit_code == 0) {
+            LOG_DIST_INFO("Terminated game successfully");
             break;
         }
     }
-
-    LOG_DIST_INFO("Terminated game successfully");
 }

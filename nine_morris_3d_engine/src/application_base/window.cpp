@@ -28,7 +28,8 @@ namespace sm {
     Window::Window(Application* application) {
         if (!glfwInit()) {
             LOG_DIST_CRITICAL("Could not initialize GLFW");
-            panic();
+            // panic();
+            throw ErrorInitialization;
         }
 
 #ifdef SM_BUILD_DEBUG
@@ -56,7 +57,8 @@ namespace sm {
 
         if (window == nullptr) {
             LOG_DIST_CRITICAL("Could not create window");
-            panic();
+            // panic();
+            throw ErrorInitialization;
         }
 
         LOG_INFO("Initialized GLFW and created window and OpenGL context");
@@ -65,7 +67,8 @@ namespace sm {
 
         if (!gladLoadGL()) {
             LOG_DIST_CRITICAL("Could not initialize GLAD");
-            panic();
+            // panic();
+            throw ErrorInitialization;
         }
 
         glfwSwapInterval(1);
@@ -109,7 +112,8 @@ namespace sm {
 
         if (monitors == nullptr) {
             LOG_DIST_CRITICAL("Could not retrieve monitors");
-            panic();
+            // panic();
+            throw ErrorOther;
         }
 
         std::vector<Monitor> result;
@@ -351,7 +355,8 @@ namespace sm {
 
         if (name == nullptr) {
             LOG_DIST_CRITICAL("Could not retrieve monitor name");
-            panic();
+            // panic();
+            throw ErrorOther;
         }
 
         return name;

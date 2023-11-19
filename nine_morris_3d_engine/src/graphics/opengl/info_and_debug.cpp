@@ -73,15 +73,19 @@ namespace sm {
     ) {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                LOG_DIST_CRITICAL("({}) {}", id, message);
-                panic();
+                LOG_CRITICAL("({}) {}", id, message);
+                // panic();
+                throw ErrorOpenGl;
+
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:
-                LOG_DIST_WARNING("({}) {}", id, message);
+                LOG_WARNING("({}) {}", id, message);
+
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
                 SM_ASSERT(false, "This should have been disabled");
+
                 break;
         }
     }

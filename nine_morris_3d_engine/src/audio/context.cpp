@@ -15,14 +15,16 @@ namespace sm {
 
         if (device == nullptr) {
             LOG_DIST_CRITICAL("Could not open an AL device");
-            panic();
+            // panic();
+            throw ErrorInitialization;
         }
 
         context = alcCreateContext(device, nullptr);
 
         if (context == nullptr) {
             LOG_DIST_CRITICAL("Could not create AL context");
-            panic();
+            // panic();
+            throw ErrorInitialization;
         }
 
         if (alcMakeContextCurrent(context) == ALC_FALSE) {
@@ -30,7 +32,8 @@ namespace sm {
             alcCloseDevice(device);
 
             LOG_DIST_CRITICAL("Could not make AL context current");
-            panic();
+            // panic();
+            throw ErrorInitialization;
         }
 
         global_device = device;

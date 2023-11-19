@@ -352,8 +352,8 @@ namespace sm {
                             );
                             break;
                         default:
-                            LOG_DIST_CRITICAL("Wrong attachment format");
-                            panic();
+                            SM_ASSERT(false, "Wrong attachment format");
+                            break;
                     }
 
                     color_attachments[i] = texture;
@@ -389,8 +389,8 @@ namespace sm {
                             );
                             break;
                         default:
-                            LOG_DIST_CRITICAL("Wrong attachment format");
-                            panic();
+                            SM_ASSERT(false, "Wrong attachment format");
+                            break;
                     }
 
                     color_attachments[i] = renderbuffer;
@@ -431,8 +431,8 @@ namespace sm {
                             );
                             break;
                         default:
-                            LOG_DIST_CRITICAL("Wrong attachment format");
-                            panic();
+                            SM_ASSERT(false, "Wrong attachment format");
+                            break;
                     }
 
                     depth_attachment = texture;
@@ -464,8 +464,8 @@ namespace sm {
                             );
                             break;
                         default:
-                            LOG_DIST_CRITICAL("Wrong attachment format");
-                            panic();
+                            SM_ASSERT(false, "Wrong attachment format");
+                            break;
                     }
 
                     depth_attachment = renderbuffer;
@@ -490,7 +490,8 @@ namespace sm {
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             LOG_DIST_CRITICAL("GL framebuffer {} is incomplete", framebuffer);
             LOG_DIST_CRITICAL("Status: {}", print_framebuffer_status_message(status));
-            panic();
+            // panic();
+            throw ErrorOther;
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
