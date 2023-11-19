@@ -35,7 +35,7 @@
 */
 #ifdef NM3D_RELEASE_MODE  // Defined in CMake
     #ifdef NM3D_DISTRIBUTION_MODE  // Defined in CMake
-        #define SM_BUILD_DISTRIBUTION  // Flag for building for distribution
+        #define SM_BUILD_DISTRIBUTION  // Compiled with optimization, without any additional debug code
     #else
         #define SM_BUILD_RELEASE  // Compiled with optimization, but with additional debug code
     #endif

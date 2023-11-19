@@ -318,7 +318,7 @@ namespace sm {
     std::optional<unsigned int> GlShader::compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const {
         const unsigned int shader {glCreateShader(type)};
 
-        const char* buffer {reinterpret_cast<const char*>(source_buffer.first)};  // It is safe
+        const char* buffer {reinterpret_cast<const char*>(source_buffer.first)};
         const char* const source {buffer};
         const int source_length {static_cast<int>(source_buffer.second)};
 

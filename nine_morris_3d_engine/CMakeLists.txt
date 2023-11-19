@@ -204,11 +204,11 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
     glfw
     OpenAL::OpenAL
     utf8cpp
+    stb
 )
 
 target_link_libraries(nine_morris_3d_engine PUBLIC
     dear_imgui
-    stb
     spdlog
     resmanager
     EnTT::EnTT
@@ -241,23 +241,21 @@ if(WIN32)
     target_compile_options(nine_morris_3d_engine PUBLIC "/utf-8")
 endif()
 
-# Use C++ 17
+# Use C++17
 target_compile_features(nine_morris_3d_engine PUBLIC cxx_std_17)
 set_target_properties(nine_morris_3d_engine PROPERTIES CXX_EXTENSIONS OFF)
 
 # Add compile definitions for engine and client and others
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    # These are set in both engine and client
-
     # Optimization on
     target_compile_definitions(nine_morris_3d_engine PUBLIC
         "NDEBUG"  # Disable asserts globally
-        "NM3D_RELEASE_MODE"  # Just a flag used by platform.h
+        "NM3D_RELEASE_MODE"  # Just a flag used by platform.hpp
         "ENTT_DISABLE_ASSERT"
     )
 
     if(NM3D_DISTRIBUTION_MODE)
-        # Distribution flag on
+        # Another flag used by platform.hpp
         target_compile_definitions(nine_morris_3d_engine PUBLIC "NM3D_DISTRIBUTION_MODE")
     endif()
 endif()
@@ -271,7 +269,7 @@ target_compile_definitions(nine_morris_3d_engine PRIVATE
 target_compile_definitions(nine_morris_3d_engine PUBLIC
     "SPDLOG_ACTIVE_LEVEL=0"
     "_CRT_SECURE_NO_WARNINGS"
-    "ENTT_NO_ETO"
+    "ENTT_NO_ETO"  # TODO check if needed
 )
 
 target_compile_definitions(dear_imgui PRIVATE "NDEBUG")

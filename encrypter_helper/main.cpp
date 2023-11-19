@@ -21,7 +21,7 @@ static void open_file(const std::string& file_name, unsigned char** out, std::si
     char* buffer {new char[length]};
     file.read(buffer, length);
 
-    *out = reinterpret_cast<unsigned char*>(buffer);  // It is safe
+    *out = reinterpret_cast<unsigned char*>(buffer);
     *size = length;
 }
 
@@ -33,7 +33,7 @@ static void write_file(const std::string& file_name, const unsigned char* data, 
         std::exit(1);
     }
 
-    file.write(reinterpret_cast<const char*>(data), size);  // It is safe
+    file.write(reinterpret_cast<const char*>(data), size);
 }
 
 // TODO use newest cppblowfish features

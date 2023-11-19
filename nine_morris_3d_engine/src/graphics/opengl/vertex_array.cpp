@@ -53,7 +53,7 @@ namespace sm {
                         GL_FLOAT,
                         GL_FALSE,
                         layout.stride,
-                        reinterpret_cast<void*>(offset)  // It is safe
+                        reinterpret_cast<void*>(offset)
                     );
                     break;
                 case VertexBufferLayout::Int:

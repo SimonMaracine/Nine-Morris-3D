@@ -7,11 +7,11 @@
 #include <string>
 #include <cstddef>
 
-#include <stb_truetype.h>
-
 #include "engine/graphics/opengl/vertex_array.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/texture.hpp"
+
+struct stbtt_fontinfo;
 
 namespace sm {
     class Font {
@@ -72,10 +72,10 @@ namespace sm {
             unsigned char* bitmap {nullptr};
         } bake_context;
 
-        mutable std::unordered_map<char32_t, Glyph> glyphs;
+        std::unordered_map<char32_t, Glyph> glyphs;  // TODO reorder members
 
-        stbtt_fontinfo info;
-        const char* font_info_buffer {nullptr};
+        stbtt_fontinfo* font_info {nullptr};
+        const unsigned char* font_info_buffer {nullptr};
         int bitmap_size {0};
         int padding {0};  // Between glyphs
         unsigned char on_edge_value {0};

@@ -30,7 +30,7 @@ namespace sm {
         return file_path.substr(last_slash + 1);
     }
 
-    static const char* get_font_file_data(const std::string& file_path) {
+    static const unsigned char* get_font_file_data(const std::string& file_path) {
         std::ifstream file {file_path, std::ios::binary};
 
         if (!file.is_open()) {
@@ -45,18 +45,30 @@ namespace sm {
         char* buffer {new char[length]};
         file.read(buffer, length);
 
-        return buffer;
+        return reinterpret_cast<const unsigned char*>(buffer);
     }
 
-    static void blit_glyph(unsigned char* dest, int dest_width, int dest_height, unsigned char* glyph,
-            int width, int height, int dest_x, int dest_y, float* s0, float* t0, float* s1, float* t1) {
+    static void blit_glyph(
+        unsigned char* dest,
+        int dest_width,
+        int dest_height,
+        unsigned char* glyph,
+        int width,
+        int height,
+        int dest_x,
+        int dest_y,
+        float* s0,
+        float* t0,
+        float* s1,
+        float* t1
+    ) {
         for (int x {0}; x < width; x++) {
             for (int y {0}; y < height; y++) {
-                const std::size_t index {static_cast<std::size_t>((y + dest_y) * dest_width + (x + dest_x))};
+                const int index {(y + dest_y) * dest_width + x + dest_x};
 
-                SM_ASSERT(index < static_cast<std::size_t>(dest_width * dest_height), "Write out of bounds");
+                SM_ASSERT(index < dest_width * dest_height, "Write out of bounds");
 
-                dest[index] = glyph[y * width + x];
+                dest[static_cast<std::size_t>(index)] = glyph[y * width + x];
             }
         }
 
@@ -76,14 +88,14 @@ namespace sm {
     )
         : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value), pixel_dist_scale(pixel_dist_scale) {
         font_info_buffer = get_font_file_data(file_path);
+        font_info = new stbtt_fontinfo;
 
-        // Cast is safe
-        if (!stbtt_InitFont(&info, reinterpret_cast<const unsigned char*>(font_info_buffer), 0)) {
+        if (!stbtt_InitFont(font_info, font_info_buffer, 0)) {
             LOG_DIST_CRITICAL("Could not load font `{}`", file_path);
             panic();
         }
 
-        sf = stbtt_ScaleForPixelHeight(&info, size);
+        sf = stbtt_ScaleForPixelHeight(font_info, size);
 
         initialize();
 
@@ -93,6 +105,7 @@ namespace sm {
     }
 
     Font::~Font() {
+        delete font_info;
         delete[] font_info_buffer;
 
         LOG_DEBUG("Unloaded font `{}`", name);
@@ -147,7 +160,7 @@ namespace sm {
 
     void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         int descent;
-        stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
+        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
 
         for (int codepoint {begin_codepoint}; codepoint <= end_codepoint; codepoint++) {
             try_bake_character(codepoint, descent);
@@ -156,7 +169,7 @@ namespace sm {
 
     void Font::bake_characters(const char* string) {
         int descent;
-        stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
+        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
 
         const std::u32string utf32_string {utf8::utf8to32(std::string(string))};
 
@@ -167,7 +180,7 @@ namespace sm {
 
     void Font::bake_character(int codepoint) {
         int descent;
-        stbtt_GetFontVMetrics(&info, nullptr, &descent, nullptr);
+        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
 
         try_bake_character(codepoint, descent);
     }
@@ -264,17 +277,17 @@ namespace sm {
         }
 
         int advance_width, left_side_bearing;
-        stbtt_GetCodepointHMetrics(&info, codepoint, &advance_width, &left_side_bearing);
+        stbtt_GetCodepointHMetrics(font_info, codepoint, &advance_width, &left_side_bearing);
 
         int y0;
-        stbtt_GetCodepointBitmapBox(&info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
+        stbtt_GetCodepointBitmapBox(font_info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
         // Assume 0, because glyph can be null
         int width {0};
         int height {0};
 
         unsigned char* glyph {stbtt_GetCodepointSDF(
-            &info,
+            font_info,
             sf,
             codepoint,
             padding,
@@ -329,7 +342,7 @@ namespace sm {
         try {
             return glyphs.at(character);
         } catch (const std::out_of_range&) {
-            return glyphs[ERROR_CHARACTER];
+            return glyphs.at(ERROR_CHARACTER);
         }
     }
 
