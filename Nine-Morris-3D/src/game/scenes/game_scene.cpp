@@ -19,6 +19,10 @@ void GameScene::on_start() {
         return sm::Task::Result::Continue;
     });
 
+    ctx->evt.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
+
+    sm::RenderGl::clear_color(0.3f, 0.1f, 0.3f);
+
     {
         auto mesh {std::make_shared<sm::Mesh>(
             sm::Encrypt::encr(sm::FileSystem::path_assets("models/dragon.obj")),
@@ -258,4 +262,8 @@ void GameScene::on_imgui_update() {
     // ImGui::SliderFloat3("Position", glm::value_ptr(teapot.position), -30.0f, 30.0f);
     // ImGui::SliderFloat3("Rotation", glm::value_ptr(teapot.rotation), 0.0f, glm::two_pi<float>());
     // ImGui::End();
+}
+
+void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
+    LOG_DEBUG("{}", event);
 }

@@ -68,14 +68,17 @@ namespace sm {
             }
 
             glEnableVertexAttribArray(element.index);
-            offset += element.size * VertexBufferLayout::VertexElement::get_size(element.type);
 
             if (element.per_instance) {
                 glVertexAttribDivisor(element.index, 1);
             }
+
+            offset += element.size * VertexBufferLayout::VertexElement::get_size(element.type);
         }
 
         vertex_buffers.push_back(buffer);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     void GlVertexArray::add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer) {

@@ -35,6 +35,7 @@ namespace sm {
 
     Renderer::Renderer(int width, int height) {
         RenderGl::enable_depth_test();
+        RenderGl::clear_color(0.0f, 0.0f, 0.0f);
 
         {
             FramebufferSpecification specification;
@@ -341,7 +342,6 @@ namespace sm {
         storage.screen_quad_vertex_array->bind();
 
         RenderGl::disable_depth_test();
-        RenderGl::clear_color(0.0f, 0.0f, 0.0f);
 
         post_processing();
 
@@ -354,7 +354,6 @@ namespace sm {
         // screen_quad(post_processing_context.last_texture);  // FIXME
         screen_quad(storage.scene_framebuffer->get_color_attachment(0));
 
-        RenderGl::clear_color(0.3f, 0.1f, 0.3f);
         RenderGl::enable_depth_test();
 
         GlVertexArray::unbind();

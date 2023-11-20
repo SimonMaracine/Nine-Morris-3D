@@ -12,6 +12,8 @@ struct GameScene : public sm::Scene {
     virtual void on_update() override;
     virtual void on_imgui_update() override;
 
+    void on_window_resized(const sm::WindowResizedEvent& event);
+
     sm::Camera cam;
     PointCameraController cam_controller;
     sm::DirectionalLight directional_light;

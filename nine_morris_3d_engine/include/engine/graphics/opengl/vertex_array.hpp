@@ -22,7 +22,7 @@ namespace sm {
         void bind() const;
         static void unbind();
 
-        void add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout);
+        void add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout);  // TODO rework
         void add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer);
 
         const GlIndexBuffer* get_index_buffer() const { return index_buffer.get(); }
