@@ -15,8 +15,7 @@ namespace sm {
 
         if (!file.is_open()) {
             LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading", file_path);
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;
         }
 
         file.seekg(0, file.end);

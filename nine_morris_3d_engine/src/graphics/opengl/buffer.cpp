@@ -148,11 +148,7 @@ namespace sm {
             glGetUniformBlockIndex(shader_program, specification.block_name.c_str())
         };
 
-        if (block_index == GL_INVALID_INDEX) {
-            LOG_DIST_CRITICAL("Invalid block index");
-            // panic();
-            throw ErrorOther;
-        }
+        SM_ASSERT(block_index != GL_INVALID_INDEX, "Invalid block index");
 
         // If it's already configured, return
         if (configured) {
@@ -195,11 +191,7 @@ namespace sm {
         );
 
         for (std::size_t i {0}; i < field_count; i++) {
-            if (indices[i] == GL_INVALID_INDEX) {
-                LOG_DIST_CRITICAL("Invalid field index");
-                // panic();
-                throw ErrorOther;
-            }
+            SM_ASSERT(indices[i] != GL_INVALID_INDEX, "Invalid field index");
         }
 
         glGetActiveUniformsiv(shader_program, field_count, indices, GL_UNIFORM_OFFSET, offsets);

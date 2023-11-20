@@ -42,17 +42,15 @@ namespace sm {
         const auto vertex_shader_code {compile_shader(source_vertex, GL_VERTEX_SHADER)};
 
         if (!vertex_shader_code.has_value()) {
-            LOG_DIST_CRITICAL("Exiting...");
-            // panic();
-            throw ErrorResourceLoading;
+            LOG_DIST_CRITICAL("Exiting...");  // FIXME
+            throw ResourceLoadingError;
         }
 
         const auto fragment_shader_code {compile_shader(source_fragment, GL_FRAGMENT_SHADER)};
 
         if (!fragment_shader_code.has_value()) {
             LOG_DIST_CRITICAL("Exiting...");
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;
         }
 
         vertex_shader = vertex_shader_code.value();
@@ -61,8 +59,7 @@ namespace sm {
 
         if (!check_linking(program)) {
             LOG_DIST_CRITICAL("Exiting...");
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;
         }
 
         delete_intermediates();
@@ -81,17 +78,15 @@ namespace sm {
         const auto vertex_shader_code {compile_shader(buffer_vertex, GL_VERTEX_SHADER)};
 
         if (!vertex_shader_code.has_value()) {
-            LOG_DIST_CRITICAL("Exiting...");
-            // panic();
-            throw ErrorResourceLoading;
+            LOG_DIST_CRITICAL("Exiting...");  // FIXME
+            throw ResourceLoadingError;
         }
 
         const auto fragment_shader_code {compile_shader(buffer_fragment, GL_FRAGMENT_SHADER)};
 
         if (!fragment_shader_code.has_value()) {
             LOG_DIST_CRITICAL("Exiting...");
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;
         }
 
         vertex_shader = vertex_shader_code.value();
@@ -100,8 +95,7 @@ namespace sm {
 
         if (!check_linking(program)) {
             LOG_DIST_CRITICAL("Exiting...");
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;
         }
 
         delete_intermediates();
@@ -294,8 +288,7 @@ namespace sm {
 
         if (!file.is_open()) {
             LOG_DIST_CRITICAL("Could not open file `{}` for reading", source_path);
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;  // FIXME
         }
 
         file.seekg(0, file.end);
@@ -315,7 +308,7 @@ namespace sm {
 
         delete[] buffer;
 
-        if (!check_compilation(shader, type)) {  // TODO use only one error handling mechanism
+        if (!check_compilation(shader, type)) {  // FIXME use only one error handling mechanism
             return std::nullopt;
         }
 

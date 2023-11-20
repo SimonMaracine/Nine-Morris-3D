@@ -143,8 +143,7 @@ namespace sm {
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;
         }
 
         glGenTextures(1, &texture);
@@ -177,8 +176,7 @@ namespace sm {
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;
         }
 
         glGenTextures(1, &texture);
@@ -288,8 +286,7 @@ namespace sm {
 
             if (data[i] == nullptr) {
                 LOG_DIST_CRITICAL("Could not load texture `{}`", file_paths[i]);
-                // panic();
-                throw ErrorResourceLoading;
+                throw ResourceLoadingError;
             }
         }
 
@@ -308,7 +305,7 @@ namespace sm {
 
         name = get_name_texture3d(file_paths[0]);
 
-        LOG_DEBUG("Created GL cubemap texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL texture cubemap {} ({})", texture, name);
     }
 
     GlTextureCubemap::GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data) {
@@ -330,13 +327,13 @@ namespace sm {
 
         name = get_name_texture3d(data[0]->file_path.c_str());
 
-        LOG_DEBUG("Created GL cubemap texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL texture cubemap {} ({})", texture, name);
     }
 
     GlTextureCubemap::~GlTextureCubemap() {
         glDeleteTextures(1, &texture);
 
-        LOG_DEBUG("Deleted GL cubemap texture {} ({})", texture, name);
+        LOG_DEBUG("Deleted GL texture cubemap {} ({})", texture, name);
     }
 
     void GlTextureCubemap::bind(unsigned int unit) const {

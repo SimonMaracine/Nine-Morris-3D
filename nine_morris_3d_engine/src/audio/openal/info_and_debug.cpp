@@ -10,32 +10,32 @@
 
 namespace sm {
     void AlInfoDebug::maybe_check_errors() {
-#ifdef SM_BUILD_DEBUG
+#ifndef SM_BUILD_DISTRIBUTION
         const ALenum error {alGetError()};
 
         if (error != AL_NO_ERROR) {
             switch(error) {
                 case AL_INVALID_NAME:
-                    LOG_DIST_CRITICAL("({}) AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function", error);
+                    LOG_CRITICAL("({}) AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function", error);
                     break;
                 case AL_INVALID_ENUM:
-                    LOG_DIST_CRITICAL("({}) AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function", error);
+                    LOG_CRITICAL("({}) AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function", error);
                     break;
                 case AL_INVALID_VALUE:
-                    LOG_DIST_CRITICAL("({}) AL_INVALID_VALUE: an invalid value was passed to an OpenAL function", error);
+                    LOG_CRITICAL("({}) AL_INVALID_VALUE: an invalid value was passed to an OpenAL function", error);
                     break;
                 case AL_INVALID_OPERATION:
-                    LOG_DIST_CRITICAL("({}) AL_INVALID_OPERATION: the requested operation is not valid", error);
+                    LOG_CRITICAL("({}) AL_INVALID_OPERATION: the requested operation is not valid", error);
                     break;
                 case AL_OUT_OF_MEMORY:
-                    LOG_DIST_CRITICAL("({}) AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory", error);
+                    LOG_CRITICAL("({}) AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory", error);
                     break;
                 default:
-                    LOG_DIST_CRITICAL("({}) Unknown AL error", error);
+                    LOG_CRITICAL("({}) Unknown AL error", error);
+                    break;
             }
 
-            // panic();
-            throw ErrorOpenAl;
+            throw OpenAlError;
         }
 #endif
     }

@@ -28,13 +28,12 @@ namespace sm {
     Window::Window(Application* application) {
         if (!glfwInit()) {
             LOG_DIST_CRITICAL("Could not initialize GLFW");
-            // panic();
-            throw ErrorInitialization;
+            throw InitializationError;
         }
 
-#ifdef SM_BUILD_DEBUG
+#ifndef SM_BUILD_DISTRIBUTION
         glfwSetErrorCallback([](int error, const char* description) {
-            LOG_CRITICAL("({}) GLFW Error Callback: {}", error, description);
+            LOG_CRITICAL("({}) GLFW: {}", error, description);
         });
 #endif
 
@@ -46,7 +45,7 @@ namespace sm {
         glfwWindowHint(GLFW_RESIZABLE, application->properties.resizable ? GLFW_TRUE : GLFW_FALSE);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-#ifdef SM_BUILD_DEBUG
+#ifndef SM_BUILD_DISTRIBUTION
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
         LOG_INFO("Using OpenGL debug context");
 #else
@@ -57,8 +56,7 @@ namespace sm {
 
         if (window == nullptr) {
             LOG_DIST_CRITICAL("Could not create window");
-            // panic();
-            throw ErrorInitialization;
+            throw InitializationError;
         }
 
         LOG_INFO("Initialized GLFW and created window and OpenGL context");
@@ -67,8 +65,7 @@ namespace sm {
 
         if (!gladLoadGL()) {
             LOG_DIST_CRITICAL("Could not initialize GLAD");
-            // panic();
-            throw ErrorInitialization;
+            throw InitializationError;
         }
 
         glfwSwapInterval(1);
@@ -83,7 +80,7 @@ namespace sm {
 
         install_callbacks();
 
-        LOG_INFO("Installed window and input callbacks");
+        LOG_INFO("Created window and installed input callbacks");
     }
 
     Window::~Window() {
@@ -112,8 +109,7 @@ namespace sm {
 
         if (monitors == nullptr) {
             LOG_DIST_CRITICAL("Could not retrieve monitors");
-            // panic();
-            throw ErrorOther;
+            throw OtherError;
         }
 
         std::vector<Monitor> result;
@@ -189,10 +185,6 @@ namespace sm {
 
     double Window::get_time() {
         return glfwGetTime();
-    }
-
-    void Window::destroy_glfw_context() {
-        glfwTerminate();
     }
 
     GLFWwindow* Window::create_window(Application* application) {
@@ -350,13 +342,12 @@ namespace sm {
         return std::make_pair(xscale, yscale);
     }
 
-    const char* Monitor::get_name() const {
+    const char* Monitor::get_name() const {  // TODO used?
         const char* name {glfwGetMonitorName(monitor)};
 
         if (name == nullptr) {
             LOG_DIST_CRITICAL("Could not retrieve monitor name");
-            // panic();
-            throw ErrorOther;
+            throw OtherError;
         }
 
         return name;

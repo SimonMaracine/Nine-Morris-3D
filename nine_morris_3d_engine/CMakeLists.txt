@@ -160,7 +160,6 @@ add_library(nine_morris_3d_engine STATIC
     "src/application_base/capabilities.cpp"
     "src/application_base/context.cpp"
     "src/application_base/input.cpp"
-    "src/application_base/panic.cpp"
     "src/application_base/tasks.cpp"
     "src/application_base/window.cpp"
     "src/audio/openal/buffer.cpp"

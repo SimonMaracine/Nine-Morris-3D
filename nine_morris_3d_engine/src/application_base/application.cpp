@@ -29,7 +29,6 @@ namespace sm {
         try {  // TODO use lighter exceptions
             FileSystem::initialize_applications(data.app_name, data.res_directory);
         } catch (const FileSystem::UserNameError&) {
-            // panic();  // Really bad that there is no feedback  // FIXME
             return false;  // Really bad that there is no feedback
         }
 
@@ -72,7 +71,7 @@ namespace sm {
 
         ImGuiContext::initialize(ctx.win->get_handle());
 
-#ifndef SM_BUILD_DISTRIBUTION  // FIXME
+#ifndef SM_BUILD_DISTRIBUTION
         Logging::log_general_information(Logging::LogTarget::Console);
 #endif
 

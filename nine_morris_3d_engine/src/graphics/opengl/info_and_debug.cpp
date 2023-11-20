@@ -73,14 +73,13 @@ namespace sm {
     ) {
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
-                LOG_CRITICAL("({}) {}", id, message);
-                // panic();
-                throw ErrorOpenGl;
+                LOG_CRITICAL("({}) OpenGL: {}", id, message);
+                throw OpenGlError;
 
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:
-                LOG_WARNING("({}) {}", id, message);
+                LOG_WARNING("({}) OpenGL: {}", id, message);
 
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
@@ -97,7 +96,12 @@ namespace sm {
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageControl(
-            GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE
+            GL_DONT_CARE,
+            GL_DONT_CARE,
+            GL_DEBUG_SEVERITY_NOTIFICATION,
+            0,
+            nullptr,
+            GL_FALSE
         );
 
         LOG_INFO("OpenGL message callback is set");

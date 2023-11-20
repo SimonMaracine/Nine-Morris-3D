@@ -6,25 +6,20 @@
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    static ALCdevice* global_device {nullptr};
-    static ALCcontext* global_context {nullptr};
-
     OpenAlContext::OpenAlContext() {
         // Choose the default device
         device = alcOpenDevice(nullptr);
 
         if (device == nullptr) {
             LOG_DIST_CRITICAL("Could not open an AL device");
-            // panic();
-            throw ErrorInitialization;
+            throw InitializationError;
         }
 
         context = alcCreateContext(device, nullptr);
 
         if (context == nullptr) {
             LOG_DIST_CRITICAL("Could not create AL context");
-            // panic();
-            throw ErrorInitialization;
+            throw InitializationError;
         }
 
         if (alcMakeContextCurrent(context) == ALC_FALSE) {
@@ -32,16 +27,12 @@ namespace sm {
             alcCloseDevice(device);
 
             LOG_DIST_CRITICAL("Could not make AL context current");
-            // panic();
-            throw ErrorInitialization;
+            throw InitializationError;
         }
-
-        global_device = device;
-        global_context = context;
 
         listener.set_distance_model(DistanceModel::InverseClamped);
 
-        LOG_INFO("Created OpenAL device and context");
+        LOG_INFO("Opened OpenAL device and created context");
     }
 
     OpenAlContext::~OpenAlContext() {
@@ -49,23 +40,6 @@ namespace sm {
         alcDestroyContext(context);
         alcCloseDevice(device);
 
-        global_device = nullptr;
-        global_context = nullptr;
-
-        LOG_INFO("Destroyed OpenAL context and device");
-    }
-
-    void OpenAlContext::destroy_openal_context() {
-        alcMakeContextCurrent(nullptr);
-
-        if (global_context != nullptr) {
-            alcDestroyContext(global_context);
-
-            if (global_device != nullptr) {
-                alcCloseDevice(global_device);
-            }
-        }
-
-        // Global device and context pointers don't need to be reset
+        LOG_INFO("Destroyed OpenAL context and closed device");
     }
 }

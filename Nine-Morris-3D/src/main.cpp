@@ -29,7 +29,7 @@ static constexpr unsigned int PATCH {0};
 
 static const char* KEY {"data/models/board/board.obj"};
 
-void application_main() {
+int application_main() {
     sm::Application::ApplicationsData data;
     data.app_name = APP_NAME;
     data.log_file = LOG_FILE;
@@ -37,7 +37,7 @@ void application_main() {
     data.res_directory = "data";
 
     if (!sm::Application::initialize_applications(data)) {
-        return;
+        return 1;
     }
 
     while (true) {
@@ -94,13 +94,15 @@ void application_main() {
                 exit_code = game.run("loading"_H);
             } catch (sm::RuntimeError error) {
                 LOG_DIST_INFO("Terminated game with error code {}", error);
-                break;
+
+                return 1;
             }
         }
 
         if (exit_code == 0) {
             LOG_DIST_INFO("Terminated game successfully");
-            break;
+
+            return 0;
         }
     }
 }

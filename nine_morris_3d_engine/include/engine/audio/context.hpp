@@ -17,8 +17,6 @@ namespace sm {
         OpenAlContext& operator=(OpenAlContext&&) = delete;
 
         AlListener& get_listener() { return listener; }
-
-        static void destroy_openal_context();
     private:
         AlListener listener;
 

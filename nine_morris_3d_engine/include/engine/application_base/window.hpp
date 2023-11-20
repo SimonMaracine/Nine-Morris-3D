@@ -46,7 +46,6 @@ namespace sm {
         void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons);
 
         static double get_time();
-        static void destroy_glfw_context();
     private:
         GLFWwindow* create_window(Application* application);
         void install_callbacks();

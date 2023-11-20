@@ -35,8 +35,7 @@ namespace sm {
 
         if (!file.is_open()) {
             LOG_DIST_CRITICAL("Could not open file `{}` for reading", file_path);
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;
         }
 
         file.seekg(0, file.end);
@@ -93,8 +92,7 @@ namespace sm {
 
         if (!stbtt_InitFont(font_info, font_info_buffer, 0)) {
             LOG_DIST_CRITICAL("Could not load font `{}`", file_path);
-            // panic();
-            throw ErrorResourceLoading;
+            throw ResourceLoadingError;
         }
 
         sf = stbtt_ScaleForPixelHeight(font_info, size);

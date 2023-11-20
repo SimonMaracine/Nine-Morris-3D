@@ -490,8 +490,7 @@ namespace sm {
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             LOG_DIST_CRITICAL("GL framebuffer {} is incomplete", framebuffer);
             LOG_DIST_CRITICAL("Status: {}", print_framebuffer_status_message(status));
-            // panic();
-            throw ErrorOther;
+            throw OtherError;
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
