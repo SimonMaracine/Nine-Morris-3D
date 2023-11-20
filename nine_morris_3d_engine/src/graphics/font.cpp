@@ -5,6 +5,7 @@
 #include <string>
 #include <cstddef>
 #include <algorithm>
+#include <stdexcept>
 
 #include <stb_truetype.h>
 #include <stb_image_write.h>

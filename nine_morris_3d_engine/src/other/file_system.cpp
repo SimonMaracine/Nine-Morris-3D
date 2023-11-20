@@ -1,5 +1,5 @@
 #include <string>
-#include <stdexcept>
+#include <optional>
 
 #include "engine/application_base/platform.hpp"
 
@@ -41,15 +41,15 @@ namespace sm {
             }
         }
 
-        static std::string get_user_name_impl() noexcept(false) {
+        static std::optional<std::string> get_user_name_impl() {
             const uid_t uid {geteuid()};
             struct passwd* pw {getpwuid(uid)};
 
             if (pw == nullptr) {
-                throw FileSystem::UserNameError("Could not get user name");
+                return std::nullopt;
             }
 
-            return std::string(pw->pw_name);
+            return std::make_optional(pw->pw_name);
         }
 
         static void check_and_fix_directories_impl() {
@@ -94,16 +94,16 @@ namespace sm {
             return success;
         }
 
-        static std::string get_user_name_impl() noexcept(false) {
+        static std::optional<std::string> get_user_name_impl() {
             char user_name[UNLEN + 1];
             DWORD _ {UNLEN + 1};
             const bool success {GetUserName(user_name, &_)};
 
             if (!success) {
-                throw FileSystem::UserNameError("Could not get user name");
+                return std::nullopt;
             }
 
-            return std::string(user_name);
+            return std::make_optional(user_name);
         }
 
         static void check_and_fix_directories_impl() {
@@ -176,10 +176,18 @@ namespace sm {
         }
 #endif
 
-    void FileSystem::initialize_applications(const std::string& app_name, const std::string& res_directory) noexcept(false) {
-        user_name = get_user_name();
+    bool FileSystem::initialize_applications(const std::string& app_name, const std::string& res_directory) {
+        const auto username {get_user_name()};
+
+        if (!username) {
+            return false;
+        }
+
+        user_name = *username;
         FileSystem::app_name = app_name;
         FileSystem::res_directory = res_directory;
+
+        return true;
     }
 
     bool FileSystem::directory_exists(const std::string& path) {
@@ -198,7 +206,7 @@ namespace sm {
         return path.substr(0, path.length() - 1);
     }
 
-    std::string FileSystem::get_user_name() noexcept(false) {
+    std::optional<std::string> FileSystem::get_user_name() {
         return get_user_name_impl();
     }
 

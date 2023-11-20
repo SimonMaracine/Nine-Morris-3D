@@ -26,9 +26,7 @@
 
 namespace sm {
     bool Application::initialize_applications(const ApplicationsData& data) {
-        try {  // TODO use lighter exceptions
-            FileSystem::initialize_applications(data.app_name, data.res_directory);
-        } catch (const FileSystem::UserNameError&) {
+        if (!FileSystem::initialize_applications(data.app_name, data.res_directory)) {
             return false;  // Really bad that there is no feedback
         }
 
