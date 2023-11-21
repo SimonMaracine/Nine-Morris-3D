@@ -40,12 +40,12 @@ void GameScene::on_start() {
             mesh->get_indices_size()
         )};
 
-        sm::VertexBufferLayout layout;
-        layout.add(0, sm::VertexBufferLayout::Float, 3);
-        layout.add(1, sm::VertexBufferLayout::Float, 3);
-
         auto vertex_array {ctx->res.vertex_array.load("dragon"_H)};
         vertex_array->configure([&](sm::GlVertexArray* va) {
+            sm::VertexBufferLayout layout;
+            layout.add(0, sm::VertexBufferLayout::Float, 3);
+            layout.add(1, sm::VertexBufferLayout::Float, 3);
+
             va->add_vertex_buffer(vertex_buffer, layout);
             va->add_index_buffer(index_buffer);
         });
@@ -68,12 +68,12 @@ void GameScene::on_start() {
             mesh->get_indices_size()
         )};
 
-        sm::VertexBufferLayout layout;
-        layout.add(0, sm::VertexBufferLayout::Float, 3);
-        layout.add(1, sm::VertexBufferLayout::Float, 3);
-
         auto vertex_array {ctx->res.vertex_array.load("teapot"_H)};
         vertex_array->configure([&](sm::GlVertexArray* va) {
+            sm::VertexBufferLayout layout;
+            layout.add(0, sm::VertexBufferLayout::Float, 3);
+            layout.add(1, sm::VertexBufferLayout::Float, 3);
+
             va->add_vertex_buffer(vertex_buffer, layout);
             va->add_index_buffer(index_buffer);
         });
@@ -96,12 +96,12 @@ void GameScene::on_start() {
             mesh->get_indices_size()
         )};
 
-        sm::VertexBufferLayout layout;
-        layout.add(0, sm::VertexBufferLayout::Float, 3);
-        layout.add(1, sm::VertexBufferLayout::Float, 3);
-
         auto vertex_array {ctx->res.vertex_array.load("cube"_H)};
         vertex_array->configure([&](sm::GlVertexArray* va) {
+            sm::VertexBufferLayout layout;
+            layout.add(0, sm::VertexBufferLayout::Float, 3);
+            layout.add(1, sm::VertexBufferLayout::Float, 3);
+
             va->add_vertex_buffer(vertex_buffer, layout);
             va->add_index_buffer(index_buffer);
         });

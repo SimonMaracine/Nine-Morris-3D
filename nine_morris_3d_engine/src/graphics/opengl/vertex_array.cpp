@@ -1,5 +1,6 @@
 #include <memory>
 #include <vector>
+#include <functional>
 #include <cstddef>
 
 #include <glad/glad.h>
