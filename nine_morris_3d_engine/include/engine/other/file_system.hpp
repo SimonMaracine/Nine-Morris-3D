@@ -4,7 +4,7 @@
 #include <optional>
 
 namespace sm {
-    struct FileSystem {  // TODO use C++ 17 filesystem
+    struct FileSystem {  // TODO use C++17 filesystem
         // There is no uninitialization
         static bool initialize_applications(const std::string& app_name, const std::string& res_directory);
 

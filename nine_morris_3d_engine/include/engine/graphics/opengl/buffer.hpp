@@ -31,8 +31,6 @@ namespace sm {
 
         void upload_data(const void* data, std::size_t size) const;
         void upload_sub_data(const void* data, std::size_t offset, std::size_t size) const;
-
-        unsigned int get_id() const { return buffer; }
     private:
         unsigned int buffer {0};
         DrawHint hint {DrawHint::Static};
@@ -52,7 +50,6 @@ namespace sm {
         void bind() const;
         static void unbind();
 
-        unsigned int get_id() const { return buffer; }
         int get_index_count() const { return index_count; }
     private:
         unsigned int buffer {0};

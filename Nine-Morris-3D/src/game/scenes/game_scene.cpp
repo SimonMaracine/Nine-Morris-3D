@@ -45,10 +45,10 @@ void GameScene::on_start() {
         layout.add(1, sm::VertexBufferLayout::Float, 3);
 
         auto vertex_array {ctx->res.vertex_array.load("dragon"_H)};
-        vertex_array->bind();
-        vertex_array->add_vertex_buffer(vertex_buffer, layout);
-        vertex_array->add_index_buffer(index_buffer);
-        sm::GlVertexArray::unbind();
+        vertex_array->configure([&](sm::GlVertexArray* va) {
+            va->add_vertex_buffer(vertex_buffer, layout);
+            va->add_index_buffer(index_buffer);
+        });
     }
 
     {
@@ -73,10 +73,10 @@ void GameScene::on_start() {
         layout.add(1, sm::VertexBufferLayout::Float, 3);
 
         auto vertex_array {ctx->res.vertex_array.load("teapot"_H)};
-        vertex_array->bind();
-        vertex_array->add_vertex_buffer(vertex_buffer, layout);
-        vertex_array->add_index_buffer(index_buffer);
-        sm::GlVertexArray::unbind();
+        vertex_array->configure([&](sm::GlVertexArray* va) {
+            va->add_vertex_buffer(vertex_buffer, layout);
+            va->add_index_buffer(index_buffer);
+        });
     }
 
     {
@@ -101,10 +101,10 @@ void GameScene::on_start() {
         layout.add(1, sm::VertexBufferLayout::Float, 3);
 
         auto vertex_array {ctx->res.vertex_array.load("cube"_H)};
-        vertex_array->bind();
-        vertex_array->add_vertex_buffer(vertex_buffer, layout);
-        vertex_array->add_index_buffer(index_buffer);
-        sm::GlVertexArray::unbind();
+        vertex_array->configure([&](sm::GlVertexArray* va) {
+            va->add_vertex_buffer(vertex_buffer, layout);
+            va->add_index_buffer(index_buffer);
+        });
     }
 
     auto shader {
@@ -164,7 +164,7 @@ void GameScene::on_start() {
         0.5f
     );
 
-    cam_controller.connect_events(ctx);
+    cam_controller.connect_events();
 
     directional_light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     directional_light.ambient_color = glm::vec3(0.1f);

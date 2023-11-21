@@ -147,7 +147,6 @@ set(ENGINE_HEADERS
 
     # For client
     "include/engine/external/cereal.h++"
-    "include/engine/external/entt.h++"
     "include/engine/external/glm.h++"
     "include/engine/external/imgui.h++"
     "include/engine/external/resmanager.h++"
@@ -248,14 +247,15 @@ set_target_properties(nine_morris_3d_engine PROPERTIES CXX_EXTENSIONS OFF)
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     # Optimization on
     target_compile_definitions(nine_morris_3d_engine PUBLIC
-        "NDEBUG"  # Disable asserts globally
         "NM3D_RELEASE_MODE"  # Just a flag used by platform.hpp
         "ENTT_DISABLE_ASSERT"
     )
 
     if(NM3D_DISTRIBUTION_MODE)
-        # Another flag used by platform.hpp
-        target_compile_definitions(nine_morris_3d_engine PUBLIC "NM3D_DISTRIBUTION_MODE")
+        target_compile_definitions(nine_morris_3d_engine PUBLIC
+            "NDEBUG"  # Disable asserts globally
+            "NM3D_DISTRIBUTION_MODE"  # Another flag used by platform.hpp
+        )
     endif()
 endif()
 
@@ -271,4 +271,4 @@ target_compile_definitions(nine_morris_3d_engine PUBLIC
     "ENTT_NO_ETO"  # TODO check if needed
 )
 
-target_compile_definitions(dear_imgui PRIVATE "NDEBUG")
+target_compile_definitions(dear_imgui PRIVATE "NDEBUG")  # TODO is it right?

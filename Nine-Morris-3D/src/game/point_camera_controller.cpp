@@ -32,7 +32,7 @@ static float calculate_angle_velocity(float target_angle, float angle) {
 }
 
 PointCameraController::PointCameraController(sm::Camera* camera, sm::Ctx* ctx)
-    : CameraController(camera, ctx) {  // TODO maybe put ctx in base class
+    : CameraController(camera, ctx) {
     update_camera(1.0f);
 }
 
@@ -193,16 +193,16 @@ void PointCameraController::go_towards_position(const glm::vec3& position) {
     go_towards_position_x(direction);
 }
 
-void PointCameraController::connect_events(sm::Ctx* ctx) {
+void PointCameraController::connect_events() {
     ctx->evt.connect<sm::MouseScrolledEvent, &PointCameraController::on_mouse_scrolled>(this);
     ctx->evt.connect<sm::MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
 }
 
-void PointCameraController::disconnect_events(sm::Ctx* ctx) {
+void PointCameraController::disconnect_events() {
     ctx->evt.disconnect(this);
 }
 
-void PointCameraController::discard_events(sm::Ctx* ctx) {
+void PointCameraController::discard_events() {
     ctx->evt.discard<sm::MouseScrolledEvent>();  // TODO dirty solution
     ctx->evt.discard<sm::MouseMovedEvent>();
 }

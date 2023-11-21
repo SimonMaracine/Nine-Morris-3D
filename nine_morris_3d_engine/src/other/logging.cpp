@@ -13,8 +13,8 @@
 #include "engine/other/file_system.hpp"
 #include "engine/other/dependencies.hpp"
 
-#define LOG_PATTERN_DEBUG "%^[%l] [t %t] [%H:%M:%S]%$ %v"  // TODO
-#define LOG_PATTERN_RELEASE "%^[%l] [t %t] [%!:%#] [%c]%$ %v"
+#define LOG_PATTERN_DEBUG "%^[%l] [%t] [%H:%M:%S]%$ %v"
+#define LOG_PATTERN_RELEASE "%^[%l] [%t] [%!:%#] [%c]%$ %v"
 
 #define FILE_SIZE (1048576 * 2)  // 2 MiB
 #define ROTATING_FILES 2  // 3 total log files

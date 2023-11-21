@@ -30,7 +30,7 @@ namespace sm {
         }
 
         inline void set_camera(Camera* camera) {
-            SM_ASSERT(camera != nullptr, "Must not be null");
+            SM_ASSERT(camera != nullptr, "Camera must not be null");
             this->camera = camera;
         }
     protected:

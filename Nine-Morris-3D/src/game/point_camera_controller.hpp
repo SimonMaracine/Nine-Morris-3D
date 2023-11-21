@@ -42,9 +42,9 @@ public:
     void set_position(const glm::vec3& position);
     void go_towards_position(const glm::vec3& position);
 
-    void connect_events(sm::Ctx* ctx);
-    void disconnect_events(sm::Ctx* ctx);
-    void discard_events(sm::Ctx* ctx);
+    void connect_events();
+    void disconnect_events();
+    void discard_events();
 
     float sensitivity {1.0f};  // Best from 0.5 to 2.0
 private:

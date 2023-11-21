@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <functional>
 
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 
@@ -11,6 +12,8 @@ namespace sm {
 
     class GlVertexArray {
     public:
+        using Configuration = std::function<void(GlVertexArray*)>;
+
         GlVertexArray();
         ~GlVertexArray();
 
@@ -22,7 +25,9 @@ namespace sm {
         void bind() const;
         static void unbind();
 
-        void add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout);  // TODO rework
+        void configure(const Configuration& configuration);
+
+        void add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout);
         void add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer);
 
         const GlIndexBuffer* get_index_buffer() const { return index_buffer.get(); }
