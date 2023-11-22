@@ -103,8 +103,9 @@ namespace sm {
     }
 
     int Application::run(SceneId start_scene_id) {
-        user_start_function();
         prepare_scenes(start_scene_id);
+
+        user_start_function();
         on_start(current_scene);
         ctx.rnd->prerender_setup();
 
@@ -133,8 +134,8 @@ namespace sm {
 
         LOG_INFO("Closing application...");
 
-        current_scene->on_stop();
         ctx.rnd->postrender_setup();
+        current_scene->on_stop();
         user_stop_function();
 
         return ctx.exit_code;
@@ -194,9 +195,8 @@ namespace sm {
 
     void Application::check_changed_scene() {
         if (changed_scene) {
-            current_scene->on_stop();
-
             ctx.rnd->postrender_setup();
+            current_scene->on_stop();
 
             // Initialize the new scene
             current_scene = to_scene;

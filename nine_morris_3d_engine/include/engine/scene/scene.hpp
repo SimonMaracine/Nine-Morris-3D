@@ -30,7 +30,7 @@ namespace sm {
 
         virtual void on_start() {}  // Called when the scene is entered
         virtual void on_stop() {}  // Called when the scene is exited
-        virtual void on_awake() {}  // Called once, before on_start is called for the first time
+        virtual void on_awake() {}  // Called once, before on_start is called for the first time  // TODO try to avoid and delete this
         virtual void on_update() {}  // Called every frame
         virtual void on_fixed_update() {}  // Called once every 50 milliseconds
         virtual void on_imgui_update() {}  // Called every frame for Dear ImGui only
