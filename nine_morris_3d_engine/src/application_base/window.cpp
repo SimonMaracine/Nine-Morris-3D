@@ -31,6 +31,8 @@ namespace sm {
             throw InitializationError;
         }
 
+        LOG_INFO("Initialized GLFW");
+
 #ifndef SM_BUILD_DISTRIBUTION
         glfwSetErrorCallback([](int error, const char* description) {
             LOG_CRITICAL("({}) GLFW: {}", error, description);
@@ -59,7 +61,7 @@ namespace sm {
             throw InitializationError;
         }
 
-        LOG_INFO("Initialized GLFW and created window and OpenGL context");
+        LOG_INFO("Created window and OpenGL context");
 
         glfwMakeContextCurrent(window);
 
@@ -80,7 +82,7 @@ namespace sm {
 
         install_callbacks();
 
-        LOG_INFO("Created window and installed input callbacks");
+        LOG_INFO("Installed window input callbacks");
     }
 
     Window::~Window() {

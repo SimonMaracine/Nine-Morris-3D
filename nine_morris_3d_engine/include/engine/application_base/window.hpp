@@ -8,7 +8,6 @@
 
 #include <resmanager/resmanager.hpp>
 
-#include "engine/application_base/platform.hpp"
 #include "engine/graphics/texture_data.hpp"
 
 struct GLFWwindow;
