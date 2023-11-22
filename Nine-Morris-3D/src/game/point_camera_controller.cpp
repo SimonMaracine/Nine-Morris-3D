@@ -55,16 +55,12 @@ PointCameraController::PointCameraController(
     update_camera(1.0f);
 }
 
-const glm::vec3& PointCameraController::get_position() const {
+glm::vec3 PointCameraController::get_position() const {
     return position;
 }
 
-const glm::vec3& PointCameraController::get_rotation() const {
-    static glm::vec3 rotation {glm::vec3(0.0f)};
-    rotation.x = pitch;
-    rotation.y = yaw;
-
-    return rotation;
+glm::vec3 PointCameraController::get_rotation() const {
+    return glm::vec3(pitch, yaw, 0.0f);
 }
 
 void PointCameraController::update_controls(float dt) {

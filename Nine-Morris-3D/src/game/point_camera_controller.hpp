@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engine/nine_morris_3d.hpp>
+#include <engine/external/glm.h++>
 
 inline constexpr float LENS_FOV {45.0f};
 inline constexpr float LENS_NEAR {0.1f};
@@ -24,8 +25,8 @@ public:
         float sensitivity
     );
 
-    virtual const glm::vec3& get_position() const override;
-    virtual const glm::vec3& get_rotation() const override;
+    virtual glm::vec3 get_position() const override;
+    virtual glm::vec3 get_rotation() const override;
 
     const glm::vec3& get_point() const { return point; }
     float get_distance_to_point() const { return distance_to_point; }

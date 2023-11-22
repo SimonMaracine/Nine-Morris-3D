@@ -27,7 +27,7 @@
 namespace sm {
     bool Application::initialize_applications(const ApplicationsData& data) {
         if (!FileSystem::initialize_applications(data.app_name, data.res_directory)) {
-            return false;  // Really bad that there is no feedback
+            return false;
         }
 
         // Set locale for the applications; used mostly by spdlog

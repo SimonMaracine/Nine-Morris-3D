@@ -3,7 +3,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <optional>
 #include <cstddef>
 #include <utility>
 #include <memory>
@@ -53,8 +52,8 @@ namespace sm {
 
         unsigned int create_program() const;
         void delete_intermediates();
-        std::optional<unsigned int> compile_shader(const std::string& source_path, unsigned int type) const;
-        std::optional<unsigned int> compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const;
+        unsigned int compile_shader(const std::string& source_path, unsigned int type) const;
+        unsigned int compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const;
         bool check_compilation(unsigned int shader, unsigned int type) const;
         bool check_linking(unsigned int program) const;
 

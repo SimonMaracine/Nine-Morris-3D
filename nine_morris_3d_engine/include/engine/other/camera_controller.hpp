@@ -22,14 +22,14 @@ namespace sm {
 
         virtual void update_controls(float dt) = 0;
         virtual void update_camera(float dt) = 0;
-        virtual const glm::vec3& get_position() const = 0;
-        virtual const glm::vec3& get_rotation() const = 0;
+        virtual glm::vec3 get_position() const = 0;
+        virtual glm::vec3 get_rotation() const = 0;
 
-        const Camera& get_camera() const {
-            return *camera;
+        const Camera* get_camera() const {
+            return camera;
         }
 
-        inline void set_camera(Camera* camera) {
+        void set_camera(Camera* camera) {
             SM_ASSERT(camera != nullptr, "Camera must not be null");
             this->camera = camera;
         }

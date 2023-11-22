@@ -1,3 +1,5 @@
+#include <iostream>
+
 // Include entry point first as it includes Windows.h
 #include <engine/application_base/entry_point.hpp>
 
@@ -37,6 +39,7 @@ int application_main() {
     data.res_directory = "data";
 
     if (!sm::Application::initialize_applications(data)) {
+        std::cerr << "Fatal: Could not retrieve username\n";
         return 1;
     }
 

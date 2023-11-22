@@ -1,7 +1,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <optional>
 #include <cstddef>
 #include <utility>
 #include <memory>
@@ -39,26 +38,12 @@ namespace sm {
     GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment) {
         name = get_name_sources(source_vertex, source_fragment);
 
-        const auto vertex_shader_code {compile_shader(source_vertex, GL_VERTEX_SHADER)};
-
-        if (!vertex_shader_code.has_value()) {
-            LOG_DIST_CRITICAL("Exiting...");  // FIXME
-            throw ResourceLoadingError;
-        }
-
-        const auto fragment_shader_code {compile_shader(source_fragment, GL_FRAGMENT_SHADER)};
-
-        if (!fragment_shader_code.has_value()) {
-            LOG_DIST_CRITICAL("Exiting...");
-            throw ResourceLoadingError;
-        }
-
-        vertex_shader = vertex_shader_code.value();
-        fragment_shader = fragment_shader_code.value();
+        vertex_shader = compile_shader(source_vertex, GL_VERTEX_SHADER);
+        fragment_shader = compile_shader(source_fragment, GL_FRAGMENT_SHADER);
         program = create_program();
 
         if (!check_linking(program)) {
-            LOG_DIST_CRITICAL("Exiting...");
+            LOG_DIST_CRITICAL("Could not link shader program {}", program);
             throw ResourceLoadingError;
         }
 
@@ -75,26 +60,12 @@ namespace sm {
         const auto buffer_vertex {Encrypt::load_file(source_vertex)};
         const auto buffer_fragment {Encrypt::load_file(source_fragment)};
 
-        const auto vertex_shader_code {compile_shader(buffer_vertex, GL_VERTEX_SHADER)};
-
-        if (!vertex_shader_code.has_value()) {
-            LOG_DIST_CRITICAL("Exiting...");  // FIXME
-            throw ResourceLoadingError;
-        }
-
-        const auto fragment_shader_code {compile_shader(buffer_fragment, GL_FRAGMENT_SHADER)};
-
-        if (!fragment_shader_code.has_value()) {
-            LOG_DIST_CRITICAL("Exiting...");
-            throw ResourceLoadingError;
-        }
-
-        vertex_shader = vertex_shader_code.value();
-        fragment_shader = fragment_shader_code.value();
+        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER);
+        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER);
         program = create_program();
 
         if (!check_linking(program)) {
-            LOG_DIST_CRITICAL("Exiting...");
+            LOG_DIST_CRITICAL("Could not link shader program {}", program);
             throw ResourceLoadingError;
         }
 
@@ -259,8 +230,8 @@ namespace sm {
     }
 
     unsigned int GlShader::create_program() const {
-        SM_ASSERT(vertex_shader, "Invalid shader");
-        SM_ASSERT(fragment_shader, "Invalid shader");
+        SM_ASSERT(vertex_shader != 0, "Invalid shader");
+        SM_ASSERT(fragment_shader != 0, "Invalid shader");
 
         const unsigned int program {glCreateProgram()};
         glAttachShader(program, vertex_shader);
@@ -272,7 +243,7 @@ namespace sm {
     }
 
     void GlShader::delete_intermediates() {
-        SM_ASSERT(program, "Invalid program");
+        SM_ASSERT(program != 0, "Invalid program");
 
         glDetachShader(program, vertex_shader);
         glDetachShader(program, fragment_shader);
@@ -283,12 +254,12 @@ namespace sm {
         fragment_shader = 0;
     }
 
-    std::optional<unsigned int> GlShader::compile_shader(const std::string& source_path, unsigned int type) const {
+    unsigned int GlShader::compile_shader(const std::string& source_path, unsigned int type) const {
         std::ifstream file {source_path, std::ios::binary};
 
         if (!file.is_open()) {
             LOG_DIST_CRITICAL("Could not open file `{}` for reading", source_path);
-            throw ResourceLoadingError;  // FIXME
+            throw ResourceLoadingError;
         }
 
         file.seekg(0, file.end);
@@ -308,14 +279,15 @@ namespace sm {
 
         delete[] buffer;
 
-        if (!check_compilation(shader, type)) {  // FIXME use only one error handling mechanism
-            return std::nullopt;
+        if (!check_compilation(shader, type)) {
+            LOG_DIST_CRITICAL("Could not compile shader {}", shader);
+            throw ResourceLoadingError;
         }
 
-        return std::make_optional(shader);
+        return shader;
     }
 
-    std::optional<unsigned int> GlShader::compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const {
+    unsigned int GlShader::compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const {
         const unsigned int shader {glCreateShader(type)};
 
         const char* buffer {reinterpret_cast<const char*>(source_buffer.first)};
@@ -326,10 +298,11 @@ namespace sm {
         glCompileShader(shader);
 
         if (!check_compilation(shader, type)) {
-            return std::nullopt;
+            LOG_DIST_CRITICAL("Could not compile shader {}", shader);
+            throw ResourceLoadingError;
         }
 
-        return std::make_optional(shader);
+        return shader;
     }
 
     bool GlShader::check_compilation(unsigned int shader, unsigned int type) const {
@@ -340,20 +313,26 @@ namespace sm {
             int log_length;
             glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
 
-            const char* t;
+            const char* type_name {nullptr};
             switch (type) {
-                case GL_VERTEX_SHADER: t = "Vertex"; break;
-                case GL_FRAGMENT_SHADER: t = "Fragment"; break;
-                default: t = "Unknown"; break;
+                case GL_VERTEX_SHADER:
+                    type_name = "Vertex";
+                    break;
+                case GL_FRAGMENT_SHADER:
+                    type_name = "Fragment";
+                    break;
+                default:
+                    type_name = "Unknown";
+                    break;
             }
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("{} shader compilation error with no message in program `{}`", t, name);
+                LOG_DIST_CRITICAL("{} shader compilation error with no message in program `{}`", type_name, name);
             } else {
                 char* log_message {new char[log_length]};
                 glGetShaderInfoLog(shader, log_length, nullptr, log_message);
 
-                LOG_DIST_CRITICAL("{} shader compilation error in program `{}`\n{}", t, name, log_message);
+                LOG_DIST_CRITICAL("{} shader compilation error in program `{}`\n{}", type_name, name, log_message);
                 delete[] log_message;
             }
 
@@ -372,12 +351,12 @@ namespace sm {
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("Shader linking error with no message in program `{}`", name);
+                LOG_DIST_CRITICAL("Linking error with no message in program `{}`", name);
             } else {
                 char* log_message {new char[log_length]};
                 glGetProgramInfoLog(program, log_length, nullptr, log_message);
 
-                LOG_DIST_CRITICAL("Shader linking error in program `{}`\n{}", name, log_message);
+                LOG_DIST_CRITICAL("Linking error in program `{}`\n{}", name, log_message);
                 delete[] log_message;
             }
 
