@@ -42,4 +42,25 @@ namespace sm {
         sound_data.merge_replace(other.sound_data);
         music_track.merge_replace(other.music_track);
     }
+
+    void ResourcesCache::clear() {
+        texture.clear();
+        texture_3d.clear();
+        vertex_array.clear();
+        shader.clear();
+        vertex_buffer.clear();
+        index_buffer.clear();
+        uniform_buffer.clear();
+        pixel_buffer.clear();
+        framebuffer.clear();
+        font.clear();
+        material.clear();
+        material_instance.clear();
+        texture_data.clear();
+        mesh.clear();
+        al_source.clear();
+        al_buffer.clear();
+        sound_data.clear();
+        music_track.clear();
+    }
 }

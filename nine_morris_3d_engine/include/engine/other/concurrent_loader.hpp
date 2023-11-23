@@ -103,16 +103,17 @@ namespace sm {
 
     template<typename D, typename... Args>
     void ConcurrentLoader<D, Args...>::reset() {
-        res = {};
-        loading_thread = {};
+        if (loading_thread.joinable()) {
+            loading_thread.join();
+        }
+
+        res.clear();
         loaded.store(false);
         in_use = false;
     }
 
     template<typename D, typename... Args>
     void ConcurrentLoader<D, Args...>::join_thread() {
-        if (loading_thread.joinable()) {
-            loading_thread.join();
-        }
+        loading_thread.join();
     }
 }

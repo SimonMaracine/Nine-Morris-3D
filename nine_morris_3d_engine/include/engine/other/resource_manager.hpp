@@ -18,7 +18,7 @@
 #include "engine/other/mesh.hpp"
 
 namespace sm {
-    struct ResourcesCache {  // TODO add clear method
+    struct ResourcesCache {
         resmanager::Cache<GlTexture> texture;
         resmanager::Cache<GlTextureCubemap> texture_3d;
         resmanager::Cache<GlVertexArray> vertex_array;
@@ -40,5 +40,6 @@ namespace sm {
 
         void merge(ResourcesCache& other);
         void merge_replace(ResourcesCache& other);
+        void clear();
     };
 }

@@ -198,13 +198,13 @@ namespace sm {
             ctx.rnd->postrender_setup();
             current_scene->on_stop();
 
-            // Initialize the new scene
-            current_scene = to_scene;
-            on_start(current_scene);
-
             // Clear all cached resources
-            ctx.res = {};
+            ctx.res.clear();
 
+            // Set and initialize the new scene
+            current_scene = to_scene;
+
+            on_start(current_scene);
             ctx.rnd->prerender_setup();
 
             changed_scene = false;
