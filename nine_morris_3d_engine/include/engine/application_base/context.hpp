@@ -22,7 +22,7 @@ namespace sm {
     class Scene;
 
     /*
-        Wrapper struct around public functionality exposed to user
+        Wrapper struct around public functionality exposed to the user
     */
     class Ctx {
     public:

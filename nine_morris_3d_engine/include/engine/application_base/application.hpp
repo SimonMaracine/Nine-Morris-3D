@@ -71,16 +71,14 @@ namespace sm {
         void on_window_resized(const WindowResizedEvent& event);
 
         // Properties
-        ApplicationProperties properties;
+        ApplicationProperties properties;  // TODO reorder members
         UserFunc start {[](Ctx*) {}};
         UserFunc stop {[](Ctx*) {}};
 
         // Data for the scene system
         std::vector<std::unique_ptr<Scene>> scenes;
         Scene* current_scene {nullptr};
-
-        bool changed_scene {false};  // Flag set when the user requested a scene change
-        Scene* to_scene {nullptr};  // Next scene to enter
+        Scene* next_scene {nullptr};  // Next scene to enter
 
         // Clock variables
         struct {

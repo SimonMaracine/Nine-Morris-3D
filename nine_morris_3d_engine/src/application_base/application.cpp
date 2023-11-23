@@ -2,14 +2,11 @@
 #include <locale>
 #include <memory>
 
-#include <imgui.h>
-
 #include "engine/application_base/application.hpp"
 #include "engine/application_base/window.hpp"
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/application_builder.hpp"
-#include "engine/application_base/panic.hpp"
 #include "engine/application_base/platform.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/audio/music.hpp"
@@ -194,7 +191,7 @@ namespace sm {
     }
 
     void Application::check_changed_scene() {
-        if (changed_scene) {
+        if (next_scene != nullptr) {
             ctx.rnd->postrender_setup();
             current_scene->on_stop();
 
@@ -202,13 +199,14 @@ namespace sm {
             ctx.res.clear();
 
             // Set and initialize the new scene
-            current_scene = to_scene;
+            current_scene = next_scene;
+            next_scene = nullptr;
 
             on_start(current_scene);
             ctx.rnd->prerender_setup();
-
-            changed_scene = false;
         }
+
+        SM_ASSERT(next_scene == nullptr, "Scene must be reset");
     }
 
     void Application::dear_imgui_render() {
@@ -227,6 +225,8 @@ namespace sm {
                 current_scene = scene.get();
             }
         }
+
+        SM_ASSERT(current_scene != nullptr, "Must be set");
     }
 
     void Application::on_start(Scene* scene) {

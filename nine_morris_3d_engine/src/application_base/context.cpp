@@ -7,10 +7,11 @@
 
 namespace sm {
     void Ctx::change_scene(SceneId id) {
+        SM_ASSERT(application->next_scene == nullptr, "Must be null");
+
         for (std::unique_ptr<Scene>& scene : application->scenes) {
             if (scene->id == id) {
-                application->to_scene = scene.get();
-                application->changed_scene = true;
+                application->next_scene = scene.get();
                 return;
             }
         }
