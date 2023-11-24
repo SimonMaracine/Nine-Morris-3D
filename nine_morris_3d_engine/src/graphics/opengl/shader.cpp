@@ -244,6 +244,8 @@ namespace sm {
 
     void GlShader::delete_intermediates() {
         SM_ASSERT(program != 0, "Invalid program");
+        SM_ASSERT(vertex_shader != 0, "Invalid shader");
+        SM_ASSERT(fragment_shader != 0, "Invalid shader");
 
         glDetachShader(program, vertex_shader);
         glDetachShader(program, fragment_shader);
