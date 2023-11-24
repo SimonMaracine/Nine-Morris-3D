@@ -14,8 +14,8 @@
 #include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
-#include "engine/graphics/renderer/renderer.hpp"
-#include "engine/graphics/renderer/render_gl.hpp"
+#include "engine/graphics/renderer.hpp"
+#include "engine/graphics/opengl/gl.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/renderable.hpp"
@@ -34,8 +34,8 @@ namespace sm {
     static constexpr std::size_t SHADER_POINT_LIGHTS {4};
 
     Renderer::Renderer(int width, int height) {
-        RenderGl::enable_depth_test();
-        RenderGl::clear_color(0.0f, 0.0f, 0.0f);
+        Gl::enable_depth_test();
+        Gl::clear_color(0.0f, 0.0f, 0.0f);
 
         {
             FramebufferSpecification specification;
@@ -244,8 +244,8 @@ namespace sm {
 
         storage.scene_framebuffer->bind();
 
-        RenderGl::clear(RenderGl::Buffers::CD);
-        RenderGl::viewport(
+        Gl::clear(Gl::Buffers::CD);
+        Gl::viewport(
             storage.scene_framebuffer->get_specification().width,
             storage.scene_framebuffer->get_specification().height
         );
@@ -311,7 +311,7 @@ namespace sm {
             return;
         }
 
-        RenderGl::viewport(width, height);
+        Gl::viewport(width, height);
 
         for (std::weak_ptr<GlFramebuffer> wframebuffer : scene_data.framebuffers) {
             std::shared_ptr<GlFramebuffer> framebuffer {wframebuffer.lock()};
@@ -330,8 +330,8 @@ namespace sm {
 
     void Renderer::screen_quad(unsigned int texture) {
         storage.screen_quad_shader->bind();
-        RenderGl::bind_texture_2d(texture, 0);
-        RenderGl::draw_arrays(6);
+        Gl::bind_texture_2d(texture, 0);
+        Gl::draw_arrays(6);
     }
 
     void Renderer::post_processing() {
@@ -341,7 +341,7 @@ namespace sm {
     void Renderer::end_rendering() {
         storage.screen_quad_vertex_array->bind();
 
-        RenderGl::disable_depth_test();
+        Gl::disable_depth_test();
 
         post_processing();
 
@@ -349,12 +349,12 @@ namespace sm {
         GlFramebuffer::bind_default();
 
         // Clear even the default framebuffer, for debug renderer
-        RenderGl::clear(RenderGl::Buffers::CD);
+        Gl::clear(Gl::Buffers::CD);
 
         // screen_quad(post_processing_context.last_texture);  // FIXME
         screen_quad(storage.scene_framebuffer->get_color_attachment(0));
 
-        RenderGl::enable_depth_test();
+        Gl::enable_depth_test();
 
         GlVertexArray::unbind();
     }
@@ -368,13 +368,13 @@ namespace sm {
             }
 
             if (material->flags & Material::DisableBackFaceCulling) {  // FIXME improve; maybe use scene graph
-                RenderGl::disable_back_face_culling();
+                Gl::disable_back_face_culling();
             }
 
             draw_renderable(renderable);
 
             if (material->flags & Material::DisableBackFaceCulling) {
-                RenderGl::enable_back_face_culling();
+                Gl::enable_back_face_culling();
             }
         }
 
@@ -397,7 +397,7 @@ namespace sm {
 
         material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
-        RenderGl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
+        Gl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
     }
 
     void Renderer::draw_renderables_outlined() {
@@ -497,7 +497,7 @@ namespace sm {
         debug_storage.shader->bind();
         debug_storage.vertex_array->bind();
 
-        RenderGl::draw_arrays_lines(debug_scene_list.size() * 2);
+        Gl::draw_arrays_lines(debug_scene_list.size() * 2);
 
         GlVertexArray::unbind();
 

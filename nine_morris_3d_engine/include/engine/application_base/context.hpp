@@ -10,7 +10,7 @@
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/tasks.hpp"
 #include "engine/audio/context.hpp"
-#include "engine/graphics/renderer/renderer.hpp"
+#include "engine/graphics/renderer.hpp"
 #include "engine/graphics/identifier.hpp"
 #include "engine/other/resource_manager.hpp"
 #include "engine/other/random_gen.hpp"

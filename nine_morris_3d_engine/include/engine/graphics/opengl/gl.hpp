@@ -1,7 +1,7 @@
 #pragma once
 
 namespace sm {
-    struct RenderGl {
+    struct Gl {
         /*
             Color
             Depth

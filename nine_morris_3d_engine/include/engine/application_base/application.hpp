@@ -11,7 +11,7 @@
 #include "engine/application_base/application_builder.hpp"
 #include "engine/application_base/context.hpp"
 #include "engine/audio/context.hpp"
-#include "engine/graphics/renderer/renderer.hpp"
+#include "engine/graphics/renderer.hpp"
 #include "engine/other/resource_manager.hpp"
 #include "engine/scene/scene.hpp"
 

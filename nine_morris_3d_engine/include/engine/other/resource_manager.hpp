@@ -11,7 +11,7 @@
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
-#include "engine/graphics/renderer/renderer.hpp"
+#include "engine/graphics/renderer.hpp"
 #include "engine/graphics/font.hpp"
 #include "engine/graphics/material.hpp"
 #include "engine/graphics/texture_data.hpp"

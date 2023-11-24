@@ -9,7 +9,7 @@
 
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/texture.hpp"
-#include "engine/graphics/renderer/render_gl.hpp"
+#include "engine/graphics/opengl/gl.hpp"
 #include "engine/graphics/material.hpp"
 #include "engine/other/logging.hpp"
 
@@ -191,7 +191,7 @@ namespace sm {
                     std::memcpy(&texture, data + element.offset, sizeof(texture));
 
                     shader->upload_uniform_int(name, texture.unit);
-                    RenderGl::bind_texture_2d(texture.texture, texture.unit);
+                    Gl::bind_texture_2d(texture.texture, texture.unit);
 
                     break;
                 }

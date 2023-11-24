@@ -10,8 +10,8 @@
 #include "engine/application_base/platform.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/audio/music.hpp"
-#include "engine/graphics/renderer/renderer.hpp"
-#include "engine/graphics/renderer/render_gl.hpp"
+#include "engine/graphics/renderer.hpp"
+#include "engine/graphics/opengl/gl.hpp"
 #include "engine/graphics/opengl/info_and_debug.hpp"
 #include "engine/graphics/imgui_context.hpp"
 #include "engine/other/logging.hpp"
@@ -71,7 +71,7 @@ namespace sm {
 #endif
 
         GlInfoDebug::maybe_initialize_debugging();
-        RenderGl::initialize_default();
+        Gl::initialize_default();
         Encrypt::initialize(builder.encryption_key);
 
         const auto [version_major, version_minor] {GlInfoDebug::get_version_number()};
