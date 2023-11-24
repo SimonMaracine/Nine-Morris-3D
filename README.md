@@ -31,24 +31,24 @@ Hopefully an Android version will be made.
 
 ### Exporting on Linux
 
-- Create a new folder called **_Nine-Morris-3D-vX.Y.Z-Linux_**
+- Create a new directory called **_Nine-Morris-3D-vX.Y.Z-Linux_**
 - Copy the executable from **build-release/Nine-Morris-3D/**
 - Make sure that all assets are encrypted
-- Use **filter_assets.py** to create the filtered data folders
-- Copy the two newly created data directories and rename them from ***data-filtered** to ***data**
+- Use **filter_assets.py** to create the filtered data directories
+- Copy the two newly created data directories and rename them from **data-filtered** to **data**
 - Copy **HELP_LINUX.txt**
 - Copy **README.txt**
 - Copy **install.sh**, **uninstall.sh** and **user_data_remove.sh** from **scripts/linux_install/**
-- Archive the **_Nine-Morris-3D-vX.Y.Z-Linux_** folder  
-  (`tar -c --file=Nine-Morris-3D-vX.Y.Z-Linux.tar.gz --gzip Nine-Morris-3D-vX.Y.Z-Linux`)
+- Archive the **_Nine-Morris-3D-vX.Y.Z-Linux_** directory  
+  `tar -c --file=Nine-Morris-3D-vX.Y.Z-Linux.tar.gz --gzip Nine-Morris-3D-vX.Y.Z-Linux`
 
 ### Exporting on Windows
 
-- Create a new folder called whatever
+- Create a new directory called whatever
 - Copy the executable from **build\Nine-Morris-3D\Release\\**
 - Make sure that all assets are encrypted
-- Use **filter_assets.py** to create the filtered data folders
-- Copy the two newly created data directories and rename them from ***data-filtered** to ***data**
+- Use **filter_assets.py** to create the filtered data directories
+- Copy the two newly created data directories and rename them from **data-filtered** to **data**
 - Copy **README.txt**
 - Copy **installer.nsi** from **scripts\windows_install\\**
 - Create an NSIS installer called **_Nine-Morris-3D-vX.Y.Z-Windows_** using the **installer.nsi** script

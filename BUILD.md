@@ -28,28 +28,20 @@
 - PulseAudio: libasound2-dev libpulse-dev
 - libopengl-dev | libegl1-mesa-dev | mesa-common-dev (one of these)
 
-## Linux release distribution
+## Linux distribution
 
     mkdir build-release
     cd build-release
-    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_FOR_DISTRIBUTION=ON -D GLFW_USE_WAYLAND=OFF
-    cmake --build . -j4
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DNM3D_DISTRIBUTION_MODE=ON -DGLFW_USE_WAYLAND=OFF
+    cmake --build . -j8
 
-## Windows release distribution
-
-### Visual Studio Code
+## Windows distribution
 
     mkdir build
     cd build
-    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_FOR_DISTRIBUTION=ON -A x64
-    cmake --build . --config Release -j4
-
-### Visual Studio
-
-    mkdir build
-    cd build
-    cmake .. -D CMAKE_BUILD_TYPE=Release -D NM3D_FOR_DISTRIBUTION=ON -A x64
-    :: Open in Visual Studio, change to Release mode and build from there
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DNM3D_DISTRIBUTION_MODE=ON -A x64
+    cmake --build . --config Release -j8
+    :: Or open in Visual Studio, change to Release mode and build from there
 
 ## Linux debug
 
@@ -60,16 +52,7 @@
 
 ## Windows debug
 
-### Visual Studio Code
-
     cd scripts
-    Setup.bat
-    Build.bat
-    :: Test.bat
-
-### Visual Studio
-
-    mkdir build
-    cd build
-    cmake .. -D CMAKE_BUILD_TYPE=Debug -A x64
-    :: Open in Visual Studio and build from there
+    setup.bat
+    cmake --build . --config Release -j8
+    :: Or open in Visual Studio and build from there
