@@ -42,15 +42,17 @@ target_include_directories(glad PUBLIC "dependencies/glad/include")
 # Make stb
 add_library(stb STATIC
     "dependencies/stb_image/stb_image.c"
-    "dependencies/stb_truetype/stb_truetype.c"
+    "dependencies/stb_image_resize2/stb_image_resize2.c"
     "dependencies/stb_image_write/stb_image_write.c"
+    "dependencies/stb_truetype/stb_truetype.c"
     "dependencies/stb_vorbis/stb_vorbis.c"
 )
 
 target_include_directories(stb PUBLIC
     "dependencies/stb_image"
-    "dependencies/stb_truetype"
+    "dependencies/stb_image_resize2"
     "dependencies/stb_image_write"
+    "dependencies/stb_truetype"
     "dependencies/stb_vorbis"
 )
 
