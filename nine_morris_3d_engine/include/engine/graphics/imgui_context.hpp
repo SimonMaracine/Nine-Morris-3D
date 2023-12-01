@@ -8,7 +8,7 @@ namespace sm {
         static void begin_frame();
         static void end_frame();
 
-        static bool on_mouse_scrolled(float yoffset);
+        static bool on_mouse_wheel_scrolled(float yoffset);
         static bool on_mouse_moved(float xpos, float ypos);
         static bool on_mouse_button_pressed(int button);
         static bool on_mouse_button_released(int button);

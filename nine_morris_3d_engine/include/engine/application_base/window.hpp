@@ -31,13 +31,12 @@ namespace sm {
         Window(Window&&) = delete;
         Window& operator=(Window&&) = delete;
 
-        // Call this to swap buffers and update events
+        // Swap buffers and update events
         void update();
 
         GLFWwindow* get_handle();
         std::vector<Monitor> get_monitors();
 
-        // VSync, cursor and icon API
         void show();
         void set_vsync(int interval);
         void add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);

@@ -48,7 +48,7 @@ namespace sm {
     }
 
     static bool use_mipmapping(const TextureSpecification& specification) {
-        return specification.mipmap_levels > 1;
+        return specification.mipmapping.levels > 1;
     }
 
     static void configure_mipmapping(const TextureSpecification& specification) {
@@ -56,20 +56,20 @@ namespace sm {
             return;
         }
 
-        const bool anisotropic_filtering_enabled {specification.anisotropic_filtering > 0};
+        const bool anisotropic_filtering_enabled {specification.mipmapping.anisotropic_filtering > 0};
 
-        const float bias {anisotropic_filtering_enabled ? 0.0f : specification.bias};
+        const float bias {anisotropic_filtering_enabled ? 0.0f : specification.mipmapping.bias};
 
         glGenerateMipmap(GL_TEXTURE_2D);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
 
         if (anisotropic_filtering_enabled) {
             SM_ASSERT(
-                specification.anisotropic_filtering <= max_anisotropic_filtering_supported(),
+                specification.mipmapping.anisotropic_filtering <= max_anisotropic_filtering_supported(),
                 "Invalid anisotropic filtering value"
             );
 
-            const float amount {static_cast<float>(specification.anisotropic_filtering)};
+            const float amount {static_cast<float>(specification.mipmapping.anisotropic_filtering)};
 
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
         }
@@ -119,7 +119,7 @@ namespace sm {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_to_int(specification.wrap_t));
 
         if (specification.border_color != std::nullopt) {
-            const glm::vec4& color {specification.border_color.value()};
+            const glm::vec4& color {*specification.border_color};
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
         }
     }
@@ -254,19 +254,19 @@ namespace sm {
     void GlTexture::allocate_texture(int width, int height, unsigned char* data) const {
         switch (specification.format) {
             case Format::Rgba8:
-                glTexStorage2D(GL_TEXTURE_2D, specification.mipmap_levels, GL_RGBA8, width, height);
+                glTexStorage2D(GL_TEXTURE_2D, specification.mipmapping.levels, GL_RGBA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
                 break;
             case Format::R8:
-                glTexStorage2D(GL_TEXTURE_2D, specification.mipmap_levels, GL_R8, width, height);
+                glTexStorage2D(GL_TEXTURE_2D, specification.mipmapping.levels, GL_R8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, data);
 
                 break;
         }
     }
 
-    // --- 3D texture
+    // --- Cubemap texture
 
     GlTextureCubemap::GlTextureCubemap(const char** file_paths) {
         glGenTextures(1, &texture);

@@ -156,11 +156,11 @@ namespace sm {
 
         SM_ASSERT(specification.width > 0 && specification.height > 0, "Invalid size");
 
-        SM_ASSERT(specification.clear_drawbuffer >= 0, "Invalid drawbuffer to clear");
+        SM_ASSERT(specification.color_clear.drawbuffer >= 0, "Invalid drawbuffer to clear");
 
         if (!specification.color_attachments.empty()) {
             SM_ASSERT(
-                static_cast<std::size_t>(specification.clear_drawbuffer) < specification.color_attachments.size(),
+                static_cast<std::size_t>(specification.color_clear.drawbuffer) < specification.color_attachments.size(),
                 "Invalid drawbuffer to clear"
             );
         }
@@ -252,7 +252,7 @@ namespace sm {
     }
 
     void GlFramebuffer::clear_color_attachment_float() const {  // TODO right now not used
-        glClearBufferfv(GL_COLOR, specification.clear_drawbuffer, specification.color_clear_value);
+        glClearBufferfv(GL_COLOR, specification.color_clear.drawbuffer, specification.color_clear.value);
     }
 
     void GlFramebuffer::blit(const GlFramebuffer* draw_framebuffer, int width, int height) const {

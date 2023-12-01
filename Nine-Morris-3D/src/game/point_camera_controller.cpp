@@ -190,7 +190,7 @@ void PointCameraController::go_towards_position(const glm::vec3& position) {
 }
 
 void PointCameraController::connect_events() {
-    ctx->evt.connect<sm::MouseScrolledEvent, &PointCameraController::on_mouse_scrolled>(this);
+    ctx->evt.connect<sm::MouseWheelScrolledEvent, &PointCameraController::on_mouse_wheel_scrolled>(this);
     ctx->evt.connect<sm::MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
 }
 
@@ -199,11 +199,11 @@ void PointCameraController::disconnect_events() {
 }
 
 void PointCameraController::discard_events() {
-    ctx->evt.discard<sm::MouseScrolledEvent>();  // TODO dirty solution
+    ctx->evt.discard<sm::MouseWheelScrolledEvent>();  // TODO dirty solution
     ctx->evt.discard<sm::MouseMovedEvent>();
 }
 
-void PointCameraController::on_mouse_scrolled(const sm::MouseScrolledEvent& event) {
+void PointCameraController::on_mouse_wheel_scrolled(const sm::MouseWheelScrolledEvent& event) {
     mouse_input.mouse_wheel = event.scroll;
 }
 

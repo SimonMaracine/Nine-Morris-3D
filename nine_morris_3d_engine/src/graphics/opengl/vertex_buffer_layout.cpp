@@ -1,17 +1,15 @@
 #include <cstddef>
 #include <vector>
 
-#include <glad/glad.h>
-
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 
 namespace sm {
     std::size_t VertexBufferLayout::VertexElement::get_size(Type type) {
         switch (type) {
             case Float:
-                return sizeof(GLfloat);
+                return sizeof(float);
             case Int:
-                return sizeof(GLint);
+                return sizeof(int);
         }
 
         return 0;

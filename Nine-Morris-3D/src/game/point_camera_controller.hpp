@@ -49,7 +49,7 @@ public:
 
     float sensitivity {1.0f};  // Best from 0.5 to 2.0
 private:
-    void on_mouse_scrolled(const sm::MouseScrolledEvent& event);
+    void on_mouse_wheel_scrolled(const sm::MouseWheelScrolledEvent& event);
     void on_mouse_moved(const sm::MouseMovedEvent& event);
 
     void go_towards_position_x(const glm::vec3& direction);

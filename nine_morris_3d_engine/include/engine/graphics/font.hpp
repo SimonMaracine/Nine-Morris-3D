@@ -72,7 +72,7 @@ namespace sm {
             unsigned char* bitmap {nullptr};
         } bake_context;
 
-        std::unordered_map<char32_t, Glyph> glyphs;  // TODO reorder members
+        std::unordered_map<char32_t, Glyph> glyphs;
 
         stbtt_fontinfo* font_info {nullptr};
         const unsigned char* font_info_buffer {nullptr};

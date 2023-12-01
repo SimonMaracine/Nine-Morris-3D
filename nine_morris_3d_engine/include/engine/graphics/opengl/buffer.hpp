@@ -88,7 +88,7 @@ namespace sm {
         void allocate_memory(std::size_t size);
         static std::size_t type_size(unsigned int type);
 
-        unsigned int buffer {0};  // TODO reorder members
+        unsigned int buffer {0};
 
         struct UniformBlockField {
             std::size_t offset {0};

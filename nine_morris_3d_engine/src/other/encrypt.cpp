@@ -1,6 +1,7 @@
 #include <string>
 #include <utility>
 #include <cstddef>
+#include <memory>
 #include <fstream>
 
 #include <cppblowfish/cppblowfish.hpp>
@@ -30,7 +31,7 @@ namespace sm {
         delete[] raw_buffer;
 
         cppblowfish::Buffer original;
-        context.decrypt(cipher, original);
+        context->decrypt(cipher, original);
 
         unsigned char* data {original.steal()};
         const std::size_t size {original.size()};
@@ -39,8 +40,8 @@ namespace sm {
     }
 
     void Encrypt::initialize(const std::string& key) {
-        context = cppblowfish::BlowfishContext(key + 'S');
+        context = std::make_unique<cppblowfish::BlowfishContext>(key + 'S');
     }
 
-    cppblowfish::BlowfishContext Encrypt::context {};
+    std::unique_ptr<cppblowfish::BlowfishContext> Encrypt::context {};
 }

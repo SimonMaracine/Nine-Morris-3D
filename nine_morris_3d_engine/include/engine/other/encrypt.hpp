@@ -3,8 +3,8 @@
 #include <string>
 #include <utility>
 #include <cstddef>
+#include <memory>
 
-#include <cppblowfish/cppblowfish.hpp>
 #include <spdlog/fmt/fmt.h>
 
 #include "engine/application_base/platform.hpp"
@@ -14,6 +14,10 @@
 #else
     #define SM_ENCR(file_path_string) (file_path_string)
 #endif
+
+namespace cppblowfish {
+    class BlowfishContext;
+}
 
 namespace sm {
     class Application;
@@ -53,7 +57,7 @@ namespace sm {
     private:
         static void initialize(const std::string& key);
 
-        static cppblowfish::BlowfishContext context;
+        static std::unique_ptr<cppblowfish::BlowfishContext> context;
 
         friend class Application;
     };

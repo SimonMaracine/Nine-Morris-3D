@@ -71,7 +71,7 @@ namespace sm {
         void on_window_resized(const WindowResizedEvent& event);
 
         // Properties
-        ApplicationProperties properties;  // TODO reorder members
+        ApplicationProperties properties;
         UserFunc start {[](Ctx*) {}};
         UserFunc stop {[](Ctx*) {}};
 

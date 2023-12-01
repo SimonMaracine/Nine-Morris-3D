@@ -198,6 +198,9 @@ namespace sm {
             // Clear all cached resources
             ctx.res.clear();
 
+            // Disconnect all scene callbacks to events
+            ctx.evt.disconnect(current_scene);
+
             // Set and initialize the new scene
             current_scene = next_scene;
             next_scene = nullptr;

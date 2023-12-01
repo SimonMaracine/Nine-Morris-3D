@@ -3,6 +3,7 @@
 #include <utility>
 
 namespace sm {
+    class Application;
     enum class Key;
     enum class MouseButton;
 

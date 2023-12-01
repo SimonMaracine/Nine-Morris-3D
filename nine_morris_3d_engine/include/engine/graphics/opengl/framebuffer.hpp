@@ -29,7 +29,7 @@ namespace sm {
 
     struct FramebufferSpecification {
         // Must be specified
-        int width {0};  // TODO reorder members
+        int width {0};
         int height {0};
 
         // At least one of these two must be specified
@@ -42,8 +42,10 @@ namespace sm {
         bool white_border_for_depth_texture {false};
 
         // Color attachment clearing stuff
-        int clear_drawbuffer {0};  // TODO put in a struct
-        float color_clear_value[4] {};
+        struct {
+            int drawbuffer {0};
+            float value[4] {};
+        } color_clear;
     };
 
     class GlFramebuffer {

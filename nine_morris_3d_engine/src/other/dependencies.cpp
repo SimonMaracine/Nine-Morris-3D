@@ -123,6 +123,11 @@ namespace sm {
         }
         {
             char line[BUFFER_LEN];
+            std::snprintf(line, BUFFER_LEN, "stb_image_resize2\n");
+            output.append(line);
+        }
+        {
+            char line[BUFFER_LEN];
             std::snprintf(line, BUFFER_LEN, "utfcpp\n");
             output.append(line);
         }

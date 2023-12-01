@@ -22,7 +22,12 @@
 #define APPLICATION_DATA(VARIABLE) \
     const ApplicationProperties* VARIABLE { \
         static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window)) \
-    };
+    }
+
+#define MUT_APPLICATION_DATA(VARIABLE) \
+    ApplicationProperties* VARIABLE { \
+        static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window)) \
+    }
 
 namespace sm {
     Window::Window(Application* application) {
@@ -139,7 +144,7 @@ namespace sm {
     void Window::add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
         const TextureData::Image data {cursor->get_data()};
 
-        GLFWimage image {
+        const GLFWimage image {
             data.width,
             data.height,
             data.pixels
@@ -220,13 +225,13 @@ namespace sm {
 
     void Window::install_callbacks() {
         glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
-            APPLICATION_DATA(data)
+            APPLICATION_DATA(data);
 
             data->ctx->evt.enqueue<WindowClosedEvent>();
         });
 
         glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-            ApplicationProperties* data {static_cast<ApplicationProperties*>(glfwGetWindowUserPointer(window))};
+            MUT_APPLICATION_DATA(data);
 
             data->width = width;
             data->height = height;
@@ -235,13 +240,13 @@ namespace sm {
         });
 
         glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {
-            APPLICATION_DATA(data)
+            APPLICATION_DATA(data);
 
             data->ctx->evt.enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
         });
 
         glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-            APPLICATION_DATA(data)
+            APPLICATION_DATA(data);
 
             switch (action) {
                 case GLFW_PRESS: {
@@ -288,7 +293,7 @@ namespace sm {
         });
 
         glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
-            APPLICATION_DATA(data)
+            APPLICATION_DATA(data);
 
             switch (action) {
                 case GLFW_PRESS: {
@@ -311,17 +316,17 @@ namespace sm {
         });
 
         glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
-            APPLICATION_DATA(data)
+            APPLICATION_DATA(data);
 
-            if (ImGuiContext::on_mouse_scrolled(static_cast<float>(yoffset))) {
+            if (ImGuiContext::on_mouse_wheel_scrolled(static_cast<float>(yoffset))) {
                 return;
             }
 
-            data->ctx->evt.enqueue<MouseScrolledEvent>(static_cast<float>(yoffset));
+            data->ctx->evt.enqueue<MouseWheelScrolledEvent>(static_cast<float>(yoffset));
         });
 
         glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-            APPLICATION_DATA(data)
+            APPLICATION_DATA(data);
 
             if (ImGuiContext::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
                 return;

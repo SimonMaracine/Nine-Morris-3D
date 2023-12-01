@@ -46,10 +46,10 @@ namespace sm {
 
         output.append("\n*** OpenAL Version ***\n");
 
-        static constexpr std::size_t LENGTH {256};  // 256 should be enough
+        static constexpr std::size_t BUFFER_LENGTH {256};  // 256 should be enough
 
-        char line[LENGTH];
-        std::snprintf(line, LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));
+        char line[BUFFER_LENGTH];
+        std::snprintf(line, BUFFER_LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));
         output.append(line);
 
         return output;

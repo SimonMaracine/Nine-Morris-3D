@@ -28,7 +28,7 @@ namespace sm {
         std::size_t compute_size();
         std::size_t compute_bits_per_sample();
 
-        short* data {nullptr};  // TODO reorder members
+        short* data {nullptr};
         std::size_t size {0};
         int samples {0};  // Total number of samples
         int channels {0};  // Usually mono or stereo

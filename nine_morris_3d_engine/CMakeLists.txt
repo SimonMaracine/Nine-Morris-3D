@@ -201,6 +201,7 @@ add_library(nine_morris_3d_engine STATIC
 target_link_libraries(nine_morris_3d_engine PRIVATE
     glad
     assimp
+    cppblowfish
     glfw
     OpenAL::OpenAL
     utf8cpp
@@ -208,13 +209,12 @@ target_link_libraries(nine_morris_3d_engine PRIVATE
 )
 
 target_link_libraries(nine_morris_3d_engine PUBLIC
-    dear_imgui
-    spdlog
-    resmanager
-    EnTT::EnTT
-    cppblowfish
-    glm
     cereal
+    EnTT::EnTT
+    glm::glm
+    dear_imgui
+    resmanager
+    spdlog
 )
 
 target_include_directories(nine_morris_3d_engine PUBLIC "include")

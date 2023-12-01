@@ -191,7 +191,7 @@ namespace sm {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-    bool ImGuiContext::on_mouse_scrolled(float yoffset) {
+    bool ImGuiContext::on_mouse_wheel_scrolled(float yoffset) {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseWheelEvent(0.0f, yoffset);
 

@@ -19,7 +19,7 @@ namespace sm {
         ApplicationBuilder& with_audio();
         ApplicationBuilder& with_random_generator();
     private:
-        int width {800};  // TODO reorder members
+        int width {800};
         int height {600};
         std::string title {TITLE};
         bool fullscreen {false};

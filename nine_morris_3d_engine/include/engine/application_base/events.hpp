@@ -19,44 +19,42 @@ namespace sm {
         EventDispatcher(EventDispatcher&&) = delete;
         EventDispatcher& operator=(EventDispatcher&&) = delete;
 
-        template<typename E, auto F, typename T>
-        void connect(T&& instance);
+        template<typename E, auto F, typename... T>
+        void connect(T&&... value_or_instance) {
+            dispatcher.template sink<E>().template connect<F>(value_or_instance...);
+        }
+
+        template<typename E, auto F, typename... T>
+        void disconnect(T&&... value_or_instance) {
+            dispatcher.template sink<E>().template disconnect<F>(value_or_instance...);
+        }
 
         template<typename T>
-        void disconnect(T&& instance);
+        void disconnect(T& value_or_instance) {
+            dispatcher.disconnect(value_or_instance);
+        }
 
-        template<typename E>
-        void discard();
+        template<typename T>
+        void disconnect(T* value_or_instance) {
+            dispatcher.disconnect(value_or_instance);
+        }
 
         template<typename E, typename... Args>
-        void enqueue(Args&&...);
+        void enqueue(Args&&... args) {
+            dispatcher.template enqueue<E>(std::forward<Args>(args)...);
+        }
 
-        inline void update() {
+        template<typename E>
+        void discard() {
+            dispatcher.clear<E>();
+        }
+
+        void update() {
             dispatcher.update();
         }
     private:
         entt::dispatcher dispatcher;
     };
-
-    template<typename E, auto F, typename T>
-    void EventDispatcher::connect(T&& instance) {
-        dispatcher.template sink<E>().template connect<F, T>(std::forward<T>(instance));
-    }
-
-    template<typename T>
-    void EventDispatcher::disconnect(T&& instance) {
-        dispatcher.disconnect(std::forward<T>(instance));
-    }
-
-    template<typename E>
-    void EventDispatcher::discard() {
-        dispatcher.clear<E>();
-    }
-
-    template<typename E, typename... Args>
-    void EventDispatcher::enqueue(Args&&... args) {
-        dispatcher.template enqueue<E>(std::forward<Args>(args)...);
-    }
 
     struct WindowClosedEvent {};
 
@@ -87,7 +85,7 @@ namespace sm {
         MouseButton button;
     };
 
-    struct MouseScrolledEvent {
+    struct MouseWheelScrolledEvent {
         float scroll;
     };
 
@@ -121,5 +119,5 @@ SM_EVENT_FORMATTER(sm::KeyPressedEvent, "KeyPressedEvent({}, {})", static_cast<i
 SM_EVENT_FORMATTER(sm::KeyReleasedEvent, "KeyReleasedEvent({})", static_cast<int>(event.key))
 SM_EVENT_FORMATTER(sm::MouseButtonPressedEvent, "MouseButtonPressedEvent({})", static_cast<int>(event.button))
 SM_EVENT_FORMATTER(sm::MouseButtonReleasedEvent, "MouseButtonReleasedEvent({})", static_cast<int>(event.button))
-SM_EVENT_FORMATTER(sm::MouseScrolledEvent, "MouseScrolledEvent({})", event.scroll)
+SM_EVENT_FORMATTER(sm::MouseWheelScrolledEvent, "MouseWheelScrolledEvent({})", event.scroll)
 SM_EVENT_FORMATTER(sm::MouseMovedEvent, "MouseMovedEvent({}, {})", event.mouse_x, event.mouse_y)

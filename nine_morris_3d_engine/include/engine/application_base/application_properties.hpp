@@ -15,7 +15,7 @@ namespace sm {
         int width;
         int height;
 
-        std::string title;  // TODO reorder members
+        std::string title;
         bool fullscreen;
         bool native_resolution;
         bool resizable;

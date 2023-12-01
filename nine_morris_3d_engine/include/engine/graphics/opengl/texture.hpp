@@ -39,9 +39,11 @@ namespace sm {
         std::optional<glm::vec4> border_color;
 
         // Mipmapping is off by default
-        int mipmap_levels {1};  // TODO put in a struct
-        float bias {0.0f};
-        int anisotropic_filtering {0};
+        struct {
+            int levels {1};
+            float bias {0.0f};
+            int anisotropic_filtering {0};
+        } mipmapping;
     };
 
     class GlTexture {
