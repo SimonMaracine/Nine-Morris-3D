@@ -1,9 +1,9 @@
 #include <memory>
 #include <vector>
 #include <utility>
-#include <fstream>
 #include <string>
 #include <cstddef>
+#include <unordered_map>
 #include <algorithm>
 #include <stdexcept>
 
@@ -20,34 +20,10 @@
 #include "engine/graphics/font.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
+#include "engine/other/utilities.hpp"
 
 namespace sm {
     static constexpr char32_t ERROR_CHARACTER {127};
-
-    static std::string get_name(const std::string& file_path) {
-        const std::size_t last_slash {file_path.find_last_of("/")};
-        SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
-
-        return file_path.substr(last_slash + 1);
-    }
-
-    static const unsigned char* get_font_file_data(const std::string& file_path) {
-        std::ifstream file {file_path, std::ios::binary};
-
-        if (!file.is_open()) {
-            LOG_DIST_CRITICAL("Could not open file `{}` for reading", file_path);
-            throw ResourceLoadingError;
-        }
-
-        file.seekg(0, file.end);
-        const auto length {file.tellg()};
-        file.seekg(0, file.beg);
-
-        char* buffer {new char[length]};
-        file.read(buffer, length);
-
-        return reinterpret_cast<const unsigned char*>(buffer);
-    }
 
     static void blit_glyph(
         unsigned char* dest,
@@ -88,7 +64,14 @@ namespace sm {
         int bitmap_size
     )
         : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value), pixel_dist_scale(pixel_dist_scale) {
-        font_info_buffer = get_font_file_data(file_path);
+        const auto contents {Utils::read_file(file_path)};
+
+        if (!contents) {
+            LOG_DIST_CRITICAL("Could not open file `{}` for reading", file_path);
+            throw ResourceLoadingError;
+        }
+
+        font_info_buffer = contents->first;
         font_info = new stbtt_fontinfo;
 
         if (!stbtt_InitFont(font_info, font_info_buffer, 0)) {
@@ -100,7 +83,7 @@ namespace sm {
 
         initialize();
 
-        name = get_name(file_path);
+        name = Utils::get_file_name(file_path);
 
         LOG_DEBUG("Loaded font `{}`", file_path);
     }

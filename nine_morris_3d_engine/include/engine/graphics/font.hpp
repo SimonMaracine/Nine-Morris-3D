@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 #include <utility>
-#include <unordered_map>
 #include <string>
 #include <cstddef>
+#include <unordered_map>
 
 #include "engine/graphics/opengl/vertex_array.hpp"
 #include "engine/graphics/opengl/buffer.hpp"

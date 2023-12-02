@@ -51,4 +51,5 @@
 #include "engine/other/mesh.hpp"
 #include "engine/other/random_gen.hpp"
 #include "engine/other/resource_manager.hpp"
+#include "engine/other/utilities.hpp"
 #include "engine/scene/scene.hpp"

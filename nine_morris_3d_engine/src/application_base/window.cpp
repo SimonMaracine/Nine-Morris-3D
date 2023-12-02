@@ -142,7 +142,7 @@ namespace sm {
     }
 
     void Window::add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
-        const TextureData::Image data {cursor->get_data()};
+        const TextureData::Image data {cursor->get_image()};
 
         const GLFWimage image {
             data.width,
@@ -176,7 +176,7 @@ namespace sm {
         glfw_icons.reserve(icons.size());
 
         for (const std::unique_ptr<TextureData>& icon : icons) {
-            const TextureData::Image data {icon->get_data()};
+            const TextureData::Image data {icon->get_image()};
 
             const GLFWimage image {
                 data.width,

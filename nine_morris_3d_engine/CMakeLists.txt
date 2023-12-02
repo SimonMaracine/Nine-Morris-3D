@@ -141,6 +141,7 @@ set(ENGINE_HEADERS
     "include/engine/other/mesh.hpp"
     "include/engine/other/random_gen.hpp"
     "include/engine/other/resource_manager.hpp"
+    "include/engine/other/utilities.hpp"
     "include/engine/scene/object_manager.hpp"
     "include/engine/scene/object.hpp"
     "include/engine/scene/renderables.hpp"
@@ -193,6 +194,7 @@ add_library(nine_morris_3d_engine STATIC
     "src/other/mesh.cpp"
     "src/other/random_gen.cpp"
     "src/other/resource_manager.cpp"
+    "src/other/utilities.cpp"
     "src/scene/object_manager.cpp"
     "src/scene/scene_list.cpp"
     ${ENGINE_HEADERS}

@@ -5,9 +5,6 @@
 #include "engine/other/encrypt.hpp"
 
 namespace sm {
-    class GlTexture;
-    class GlTextureCubemap;
-
     class TextureData {
     public:
         struct Image {
@@ -25,15 +22,16 @@ namespace sm {
         TextureData(TextureData&&) = delete;
         TextureData& operator=(TextureData&&) = delete;
 
-        Image get_data();
-        const std::string& get_file_path() { return file_path; }
+        Image get_image() const;
+        const std::string& get_file_path() const { return file_path; }
+
+        const unsigned char* get_data() const { return data; }
+        int get_width() const { return width; }
+        int get_height() const { return height; }
     private:
         unsigned char* data {nullptr};
         int width {0};
         int height {0};
         std::string file_path;
-
-        friend class GlTexture;
-        friend class GlTextureCubemap;
     };
 }

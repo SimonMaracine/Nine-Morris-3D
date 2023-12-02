@@ -2,29 +2,24 @@
 #include <utility>
 #include <cstddef>
 #include <memory>
-#include <fstream>
 
 #include <cppblowfish/cppblowfish.hpp>
 
 #include "engine/application_base/panic.hpp"
 #include "engine/other/encrypt.hpp"
 #include "engine/other/logging.hpp"
+#include "engine/other/utilities.hpp"
 
 namespace sm {
     std::pair<unsigned char*, std::size_t> Encrypt::load_file(const EncrFile& file_path) {
-        std::ifstream file {file_path, std::ios::binary};
+        const auto contents {Utils::read_file(file_path)};
 
-        if (!file.is_open()) {
+        if (!contents) {
             LOG_DIST_CRITICAL("Could not open encrypted file `{}` for reading", file_path);
             throw ResourceLoadingError;
         }
 
-        file.seekg(0, file.end);
-        const auto length {file.tellg()};
-        file.seekg(0, file.beg);
-
-        char* raw_buffer {new char[length]};
-        file.read(raw_buffer, length);
+        const auto [raw_buffer, length] {*contents};
 
         cppblowfish::Buffer cipher {cppblowfish::Buffer::from_whole_data(raw_buffer, length)};
 

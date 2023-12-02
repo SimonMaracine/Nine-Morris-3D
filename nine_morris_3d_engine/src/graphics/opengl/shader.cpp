@@ -4,8 +4,6 @@
 #include <cstddef>
 #include <utility>
 #include <memory>
-#include <cstring>
-#include <fstream>
 #include <stdexcept>
 #include <algorithm>
 
@@ -21,22 +19,11 @@
 #include "engine/other/encrypt.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
+#include "engine/other/utilities.hpp"
 
 namespace sm {
-    static std::string get_name_sources(const std::string& vertex_source, const std::string& fragment_source) {
-        std::size_t last_slash_v {vertex_source.find_last_of("/")};
-        SM_ASSERT(last_slash_v != std::string::npos, "Could not find slash");
-        const auto vertex {vertex_source.substr(last_slash_v + 1)};
-
-        std::size_t last_slash_f {fragment_source.find_last_of("/")};
-        SM_ASSERT(last_slash_f != std::string::npos, "Could not find slash");
-        const auto fragment {fragment_source.substr(last_slash_f + 1)};
-
-        return vertex + " & " + fragment;
-    }
-
     GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment) {
-        name = get_name_sources(source_vertex, source_fragment);
+        name = Utils::get_file_name(source_vertex) + " & " + Utils::get_file_name(source_fragment);
 
         vertex_shader = compile_shader(source_vertex, GL_VERTEX_SHADER);
         fragment_shader = compile_shader(source_fragment, GL_FRAGMENT_SHADER);
@@ -55,7 +42,7 @@ namespace sm {
     }
 
     GlShader::GlShader(const EncrFile& source_vertex, const EncrFile& source_fragment) {
-        name = get_name_sources(source_vertex, source_fragment);
+        name = Utils::get_file_name(source_vertex) + " & " + Utils::get_file_name(source_fragment);
 
         const auto buffer_vertex {Encrypt::load_file(source_vertex)};
         const auto buffer_fragment {Encrypt::load_file(source_fragment)};
@@ -257,23 +244,18 @@ namespace sm {
     }
 
     unsigned int GlShader::compile_shader(const std::string& source_path, unsigned int type) const {
-        std::ifstream file {source_path, std::ios::binary};
+        const auto contents {Utils::read_file(source_path)};
 
-        if (!file.is_open()) {
+        if (!contents) {
             LOG_DIST_CRITICAL("Could not open file `{}` for reading", source_path);
             throw ResourceLoadingError;
         }
 
-        file.seekg(0, file.end);
-        const auto length {file.tellg()};
-        file.seekg(0, file.beg);
-
-        char* buffer {new char[length]};
-        file.read(buffer, length);
+        const auto [buffer, length] {*contents};
 
         const unsigned int shader {glCreateShader(type)};
 
-        const char* const source {buffer};
+        const char* const source {reinterpret_cast<const char*>(buffer)};
         const int source_length {static_cast<int>(length)};
 
         glShaderSource(shader, 1, &source, &source_length);

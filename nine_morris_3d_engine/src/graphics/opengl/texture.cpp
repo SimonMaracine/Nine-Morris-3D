@@ -2,9 +2,7 @@
 #include <string>
 #include <array>
 #include <optional>
-#include <vector>
 #include <cstddef>
-#include <cstring>
 
 #include <glad/glad.h>
 #include <stb_image.h>
@@ -18,34 +16,10 @@
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
 #include "engine/other/encrypt.hpp"
+#include "engine/other/utilities.hpp"
 
 namespace sm {
     static constexpr int CHANNELS {4};
-
-    static std::string get_name(const std::string& file_path) {
-        std::size_t last_slash {file_path.find_last_of("/")};
-        SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
-
-        return file_path.substr(last_slash + 1);
-    }
-
-    static std::string get_name_texture3d(const char* file_path) {
-        std::vector<std::string> tokens;
-
-        char copy[512];
-        std::strncpy(copy, file_path, 512 - 1);
-
-        char* token {std::strtok(copy, "/")};
-
-        while (token != nullptr) {
-            tokens.push_back(token);
-            token = std::strtok(nullptr, "/");
-        }
-
-        SM_ASSERT(tokens.size() >= 2, "Invalid file path name");
-
-        return tokens[tokens.size() - 2];  // It's ok
-    }
 
     static bool use_mipmapping(const TextureSpecification& specification) {
         return specification.mipmapping.levels > 1;
@@ -158,7 +132,7 @@ namespace sm {
 
         this->width = width;
         this->height = height;
-        name = get_name(file_path);
+        name = Utils::get_file_name(file_path);
 
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
@@ -191,27 +165,27 @@ namespace sm {
 
         this->width = width;
         this->height = height;
-        name = get_name(file_path);
+        name = Utils::get_file_name(file_path);
 
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
     GlTexture::GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification)
         : specification(specification) {
-        SM_ASSERT(data->data != nullptr, "No data");
+        SM_ASSERT(data->get_data() != nullptr, "No data");
 
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
 
         configure_filter_and_wrap(specification);
-        allocate_texture(data->width, data->height, data->data);
+        allocate_texture(data->get_width(), data->get_height(), data->get_data());
         configure_mipmapping(specification);
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        width = data->width;
-        height = data->height;
-        name = get_name(data->file_path);
+        width = data->get_width();
+        height = data->get_height();
+        name = Utils::get_file_name(data->get_file_path());
 
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
@@ -251,7 +225,7 @@ namespace sm {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void GlTexture::allocate_texture(int width, int height, unsigned char* data) const {
+    void GlTexture::allocate_texture(int width, int height, const unsigned char* data) const {
         switch (specification.format) {
             case Format::Rgba8:
                 glTexStorage2D(GL_TEXTURE_2D, specification.mipmapping.levels, GL_RGBA8, width, height);
@@ -303,7 +277,7 @@ namespace sm {
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-        name = get_name_texture3d(file_paths[0]);
+        name = Utils::get_directory_name(file_paths[0]);
 
         LOG_DEBUG("Created GL texture cubemap {} ({})", texture, name);
     }
@@ -314,18 +288,18 @@ namespace sm {
 
         configure_filter_and_wrap_3d();
 
-        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, data[0]->width, data[0]->height);
+        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, data[0]->get_width(), data[0]->get_height());
 
         for (std::size_t i {0}; i < 6; i++) {
             glTexSubImage2D(
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, data[i]->width, data[i]->height,
-                GL_RGBA, GL_UNSIGNED_BYTE, data[i]->data
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, data[i]->get_width(), data[i]->get_height(),
+                GL_RGBA, GL_UNSIGNED_BYTE, data[i]->get_data()
             );
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-        name = get_name_texture3d(data[0]->file_path.c_str());
+        name = Utils::get_directory_name(data[0]->get_file_path().c_str());
 
         LOG_DEBUG("Created GL texture cubemap {} ({})", texture, name);
     }
