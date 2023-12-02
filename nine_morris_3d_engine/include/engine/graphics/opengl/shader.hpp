@@ -41,7 +41,6 @@ namespace sm {
         void upload_uniform_vec4(Key name, const glm::vec4& vector) const;
 
         unsigned int get_id() const { return program; }
-        const std::string& get_name() const { return name; }
 
         void add_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
     private:

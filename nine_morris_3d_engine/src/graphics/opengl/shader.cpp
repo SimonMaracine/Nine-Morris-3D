@@ -38,7 +38,7 @@ namespace sm {
         introspect_program();
         check_and_cache_uniforms();
 
-        LOG_DEBUG("Created GL shader {} ({})", program, name);
+        LOG_DEBUG("Created GL shader {} `{}`", program, name);
     }
 
     GlShader::GlShader(const EncrFile& source_vertex, const EncrFile& source_fragment) {
@@ -60,13 +60,13 @@ namespace sm {
         introspect_program();
         check_and_cache_uniforms();
 
-        LOG_DEBUG("Created GL shader {} ({})", program, name);
+        LOG_DEBUG("Created GL shader {} `{}`", program, name);
     }
 
     GlShader::~GlShader() {
         glDeleteProgram(program);
 
-        LOG_DEBUG("Deleted GL shader {} ({})", program, name);
+        LOG_DEBUG("Deleted GL shader {} `{}`", program, name);
     }
 
     void GlShader::bind() const {

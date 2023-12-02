@@ -104,7 +104,7 @@ namespace sm {
             GL_FALSE
         );
 
-        LOG_INFO("OpenGL message callback is set");
+        LOG_INFO("Set OpenGL message callback");
 #endif
     }
 
