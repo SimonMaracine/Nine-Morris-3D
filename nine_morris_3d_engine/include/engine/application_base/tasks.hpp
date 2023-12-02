@@ -17,7 +17,7 @@ namespace sm {
         using TaskId = resmanager::HashedStr64;
         using TaskFunction = std::function<Result(const Task&)>;
 
-        Task(Task::TaskId id, const Task::TaskFunction& function)
+        Task(TaskId id, const TaskFunction& function)
             : function(function), id(id) {}
         ~Task() = default;
 

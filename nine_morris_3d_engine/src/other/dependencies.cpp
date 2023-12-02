@@ -1,5 +1,6 @@
 #include <string>
 #include <cstdio>
+#include <cstddef>
 
 #include <imgui.h>
 #include <GLFW/glfw3.h>
@@ -17,7 +18,7 @@
 namespace sm {
     static constexpr std::size_t BUFFER_LEN {128};
 
-    std::string Dependencies::get_info() {
+    std::string Dependencies::get_information() {
         std::string output;
         output.reserve(512);
 

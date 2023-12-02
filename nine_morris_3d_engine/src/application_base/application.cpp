@@ -103,7 +103,7 @@ namespace sm {
         prepare_scenes(start_scene_id);
 
         user_start_function();
-        on_start(current_scene);
+        current_scene->on_start();
         ctx.rnd->prerender_setup();
 
         ctx.win->show();
@@ -149,8 +149,8 @@ namespace sm {
     float Application::update_frame_counter() {
         static constexpr double MAX_DT {1.0 / 20.0};
 
-        const double current_seconds = Window::get_time();
-        const double elapsed_seconds = current_seconds - frame_counter.previous_seconds;
+        const double current_seconds {Window::get_time()};
+        const double elapsed_seconds {current_seconds - frame_counter.previous_seconds};
         frame_counter.previous_seconds = current_seconds;
 
         frame_counter.total_time += elapsed_seconds;
@@ -205,7 +205,7 @@ namespace sm {
             current_scene = next_scene;
             next_scene = nullptr;
 
-            on_start(current_scene);
+            current_scene->on_start();
             ctx.rnd->prerender_setup();
         }
 
@@ -214,9 +214,7 @@ namespace sm {
 
     void Application::dear_imgui_render() {
         ImGuiContext::begin_frame();
-
         current_scene->on_imgui_update();
-
         ImGuiContext::end_frame();
     }
 
@@ -230,14 +228,6 @@ namespace sm {
         }
 
         SM_ASSERT(current_scene != nullptr, "Must be set");
-    }
-
-    void Application::on_start(Scene* scene) {
-        if (!scene->on_awake_called) {
-            scene->on_awake();
-            scene->on_awake_called = true;
-        }
-        scene->on_start();
     }
 
     void Application::user_start_function() {

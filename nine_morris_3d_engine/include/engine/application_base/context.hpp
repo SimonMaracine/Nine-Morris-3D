@@ -18,7 +18,7 @@
 
 namespace sm {
     class Application;
-    struct ApplicationProperties;
+    class ApplicationProperties;
     class Scene;
 
     /*

@@ -1,5 +1,6 @@
 #include <string>
 #include <cstdio>
+#include <cstdlib>
 
 #include <AL/al.h>
 
@@ -35,12 +36,12 @@ namespace sm {
                     break;
             }
 
-            throw OpenAlError;
+            std::exit(1);
         }
 #endif
     }
 
-    std::string AlInfoDebug::get_info() {
+    std::string AlInfoDebug::get_information() {
         std::string output;
         output.reserve(64);
 

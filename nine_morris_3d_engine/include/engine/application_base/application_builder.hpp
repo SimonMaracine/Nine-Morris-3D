@@ -3,6 +3,9 @@
 #include <string>
 
 namespace sm {
+    class Application;
+    class Window;
+
     /*
         Parameters for an instance of an application or a game
     */

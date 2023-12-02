@@ -61,7 +61,6 @@ namespace sm {
         void dear_imgui_render();
 
         void prepare_scenes(SceneId start_scene_id);
-        void on_start(Scene* scene);
         void user_start_function();
         void user_stop_function();
         void initialize_audio();

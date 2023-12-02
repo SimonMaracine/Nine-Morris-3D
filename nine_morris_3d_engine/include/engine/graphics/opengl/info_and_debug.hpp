@@ -8,7 +8,7 @@ namespace sm {
         static void maybe_initialize_debugging();
 
         // Get various information about OpenGL
-        static std::string get_info();
+        static std::string get_information();
 
         static std::pair<int, int> get_version_number();
         static const unsigned char* get_opengl_version();

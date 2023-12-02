@@ -14,29 +14,31 @@ namespace sm {
         Sound effects should be sound files shorter than 45-50 seconds.
     */
 
-   class MusicTrack {
-        public:
-            MusicTrack(const std::string& file_path);
-            MusicTrack(const EncrFile& file_path);
-            MusicTrack(std::shared_ptr<SoundData> data);
-            ~MusicTrack();
+    class MusicPlayer;
 
-            MusicTrack(const MusicTrack&) = delete;
-            MusicTrack& operator=(const MusicTrack&) = delete;
-            MusicTrack(MusicTrack&&) = delete;
-            MusicTrack& operator=(MusicTrack&&) = delete;
-        private:
-            void setup(std::shared_ptr<SoundData> data);
+    class MusicTrack {
+    public:
+        MusicTrack(const std::string& file_path);
+        MusicTrack(const EncrFile& file_path);
+        MusicTrack(std::shared_ptr<SoundData> data);
+        ~MusicTrack();
 
-            std::shared_ptr<AlSource> source;
-            std::shared_ptr<AlBuffer> buffer;
+        MusicTrack(const MusicTrack&) = delete;
+        MusicTrack& operator=(const MusicTrack&) = delete;
+        MusicTrack(MusicTrack&&) = delete;
+        MusicTrack& operator=(MusicTrack&&) = delete;
+    private:
+        void setup(std::shared_ptr<SoundData> data);
 
-            std::string name;
+        std::shared_ptr<AlSource> source;  // TODO maybe these don't need to be shared
+        std::shared_ptr<AlBuffer> buffer;
 
-            friend class MusicPlayer;
-        };
+        std::string name;
 
-    class MusicPlayer {
+        friend class MusicPlayer;
+    };
+
+    class MusicPlayer {  // TODO maybe make it instanced
     public:
         static void uninitialize();
         static void play_music_track(std::shared_ptr<MusicTrack> music_track);

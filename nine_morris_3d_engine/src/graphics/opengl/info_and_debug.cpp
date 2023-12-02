@@ -2,6 +2,7 @@
 #include <utility>
 #include <cstddef>
 #include <cstdio>
+#include <cstdlib>
 
 #include <glad/glad.h>
 
@@ -61,40 +62,42 @@ namespace sm {
 
     static constexpr std::size_t BUFFER_LENGTH {128};
 
-#ifdef SM_BUILD_DEBUG
-    static void error_callback(
-        GLenum,
-        GLenum,
-        GLuint id,
-        GLenum severity,
-        GLsizei,
-        const GLchar* message,
-        const void*
-    ) {
-        switch (severity) {
-            case GL_DEBUG_SEVERITY_HIGH:
-                LOG_CRITICAL("({}) OpenGL: {}", id, message);
-                throw OpenGlError;
-
-                break;
-            case GL_DEBUG_SEVERITY_MEDIUM:
-            case GL_DEBUG_SEVERITY_LOW:
-                LOG_WARNING("({}) OpenGL: {}", id, message);
-
-                break;
-            case GL_DEBUG_SEVERITY_NOTIFICATION:
-                SM_ASSERT(false, "This should have been disabled");
-
-                break;
-        }
-    }
-#endif
-
     void GlInfoDebug::maybe_initialize_debugging() {
-#ifdef SM_BUILD_DEBUG
-        glDebugMessageCallback(error_callback, nullptr);
+#ifndef SM_BUILD_DISTRIBUTION
+        glDebugMessageCallback(
+            [](
+                GLenum,
+                GLenum,
+                GLuint id,
+                GLenum severity,
+                GLsizei,
+                const GLchar* message,
+                const GLvoid*
+            ) {
+                switch (severity) {
+                    case GL_DEBUG_SEVERITY_HIGH:
+                        LOG_CRITICAL("({}) OpenGL: {}", id, message);
+
+                        std::exit(1);
+
+                        break;
+                    case GL_DEBUG_SEVERITY_MEDIUM:
+                    case GL_DEBUG_SEVERITY_LOW:
+                        LOG_WARNING("({}) OpenGL: {}", id, message);
+
+                        break;
+                    case GL_DEBUG_SEVERITY_NOTIFICATION:
+                        SM_ASSERT(false, "This should have been disabled");
+
+                        break;
+                }
+            },
+            nullptr
+        );
+
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
         glDebugMessageControl(
             GL_DONT_CARE,
             GL_DONT_CARE,
@@ -108,7 +111,7 @@ namespace sm {
 #endif
     }
 
-    std::string GlInfoDebug::get_info() {
+    std::string GlInfoDebug::get_information() {
         std::string output;
         output.reserve(1024);
 

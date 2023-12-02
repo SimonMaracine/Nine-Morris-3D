@@ -53,7 +53,7 @@ namespace sm {
         static spdlog::logger* get_global_logger();
         static const std::string& get_info_file();
     private:
-        static void set_fallback_logger_release(const char* error_message);
+        static void set_fallback_logger_distribution(const char* error_message);
 
         // These don't need to be reset explicitly
         // Should be cleaned up at exit()

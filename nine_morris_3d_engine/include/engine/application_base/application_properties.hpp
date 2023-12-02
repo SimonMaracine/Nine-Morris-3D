@@ -5,6 +5,7 @@
 namespace sm {
     class Ctx;
     class Application;
+    class Window;
 
     /*
         Struct for mostly constant application properties
@@ -12,19 +13,19 @@ namespace sm {
     class ApplicationProperties {
     public:
         // These two change when the window resizes
-        int width;
-        int height;
+        int width {};
+        int height {};
 
         std::string title;
-        bool fullscreen;
-        bool native_resolution;
-        bool resizable;
-        int min_width;
-        int min_height;
+        bool fullscreen {};
+        bool native_resolution {};
+        bool resizable {};
+        int min_width {};
+        int min_height {};
         std::string app_name;
-        unsigned int version_major;
-        unsigned int version_minor;
-        unsigned int version_patch;
+        unsigned int version_major {};
+        unsigned int version_minor {};
+        unsigned int version_patch {};
     private:
         Application* application {nullptr};
         Ctx* ctx {nullptr};

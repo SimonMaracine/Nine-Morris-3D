@@ -477,7 +477,10 @@ namespace sm {
         }
 
         if (color_attachments.size() > 1) {
-            SM_ASSERT(color_attachments.size() <= 4, "Currently there can be maximum 4 color attachments");
+            SM_ASSERT(
+                color_attachments.size() <= std::size(COLOR_ATTACHMENTS),
+                "Currently there can be maximum 4 color attachments"
+            );
 
             glDrawBuffers(color_attachments.size(), COLOR_ATTACHMENTS);
         } else if (color_attachments.empty()) {

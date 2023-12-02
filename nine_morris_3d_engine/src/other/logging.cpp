@@ -37,10 +37,10 @@ namespace sm {
 
         try {
             global_logger = spdlog::rotating_logger_mt(
-                "Release Logger [File]", file_path, FILE_SIZE, ROTATING_FILES
+                "Distribution Logger [File]", file_path, FILE_SIZE, ROTATING_FILES
             );
         } catch (const spdlog::spdlog_ex& e) {
-            set_fallback_logger_release(e.what());
+            set_fallback_logger_distribution(e.what());
             return;
         }
 
@@ -56,17 +56,17 @@ namespace sm {
 
     void Logging::log_general_information(LogTarget target) {
         std::string contents;
-        contents.reserve(1024 + 64 + 512);
+        contents.reserve(1024 + 64 + 512);  // FIXME really bad; use something else
 
-        contents += AlInfoDebug::get_info();
-        contents += GlInfoDebug::get_info();
-        contents += Dependencies::get_info();
+        contents += AlInfoDebug::get_information();
+        contents += GlInfoDebug::get_information();
+        contents += Dependencies::get_information();
 
         switch (target) {
             case LogTarget::File: {
                 const std::string file_path {FileSystem::path_logs(info_file)};
 
-                std::ofstream file {file_path, std::ios::trunc};
+                std::ofstream file {file_path};
 
                 if (!file.is_open()) {
                     LOG_DIST_ERROR("Could not open file `{}` for writing", file_path);
@@ -96,12 +96,12 @@ namespace sm {
         return info_file;
     }
 
-    void Logging::set_fallback_logger_release(const char* error_message) {
-        global_logger = spdlog::stdout_color_mt("Release Logger Fallback [Console]");
+    void Logging::set_fallback_logger_distribution(const char* error_message) {
+        global_logger = spdlog::stdout_color_mt("Distribution Logger Fallback [Console]");
         global_logger->set_pattern(LOG_PATTERN_RELEASE);
         global_logger->set_level(spdlog::level::trace);
 
-        global_logger->error("Using Fallback Logger (Console): {}", error_message);
+        global_logger->error("Using fallback distribution logger: {}", error_message);
     }
 
     std::shared_ptr<spdlog::logger> Logging::global_logger;
