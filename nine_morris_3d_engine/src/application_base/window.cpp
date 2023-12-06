@@ -249,7 +249,7 @@ namespace sm {
             APPLICATION_DATA(data);
 
             switch (action) {
-                case GLFW_PRESS: {
+                case GLFW_PRESS:
                     if (ImGuiContext::on_key_pressed(key, scancode)) {
                         return;
                     }
@@ -259,17 +259,17 @@ namespace sm {
                         false,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
                     );
+
                     break;
-                }
-                case GLFW_RELEASE: {
+                case GLFW_RELEASE:
                     if (ImGuiContext::on_key_released(key, scancode)) {
                         return;
                     }
 
                     data->ctx->evt.enqueue<KeyReleasedEvent>(Input::key_from_code(key));
+
                     break;
-                }
-                case GLFW_REPEAT: {
+                case GLFW_REPEAT:
                     if (ImGuiContext::on_key_pressed(key, scancode)) {
                         return;
                     }
@@ -279,8 +279,8 @@ namespace sm {
                         true,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
                     );
+
                     break;
-                }
             }
         });
 
@@ -296,22 +296,22 @@ namespace sm {
             APPLICATION_DATA(data);
 
             switch (action) {
-                case GLFW_PRESS: {
+                case GLFW_PRESS:
                     if (ImGuiContext::on_mouse_button_pressed(button)) {
                         return;
                     }
 
                     data->ctx->evt.enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
+
                     break;
-                }
-                case GLFW_RELEASE: {
+                case GLFW_RELEASE:
                     if (ImGuiContext::on_mouse_button_released(button)) {
                         return;
                     }
 
                     data->ctx->evt.enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
+
                     break;
-                }
             }
         });
 
