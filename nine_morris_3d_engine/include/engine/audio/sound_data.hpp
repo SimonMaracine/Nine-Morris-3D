@@ -17,16 +17,16 @@ namespace sm {
         SoundData(SoundData&&) = delete;
         SoundData& operator=(SoundData&&) = delete;
 
-        short* get_data() { return data; }
-        std::size_t get_size() { return size; }
-        int get_samples() { return samples; }
-        int get_channels() { return channels; }
-        int get_frequency() { return sample_rate; }
-        std::size_t get_bps() { return bits_per_sample; }
-        const std::string& get_file_path() { return file_path; }
+        const short* get_data() const { return data; }
+        std::size_t get_size() const { return size; }
+        int get_samples() const { return samples; }
+        int get_channels() const { return channels; }
+        int get_frequency() const { return sample_rate; }
+        std::size_t get_bps() const { return bits_per_sample; }
+        const std::string& get_file_path() const { return file_path; }
     private:
-        std::size_t compute_size();
-        std::size_t compute_bits_per_sample();
+        std::size_t compute_size() const;
+        std::size_t compute_bits_per_sample() const;
 
         short* data {nullptr};
         std::size_t size {0};

@@ -7,12 +7,6 @@
 namespace sm {
     class TextureData {
     public:
-        struct Image {
-            int width;
-            int height;
-            unsigned char* pixels;
-        };
-
         TextureData(const std::string& file_path, bool flip = false);
         TextureData(const EncrFile& file_path, bool flip = false);
         ~TextureData();
@@ -22,10 +16,10 @@ namespace sm {
         TextureData(TextureData&&) = delete;
         TextureData& operator=(TextureData&&) = delete;
 
-        Image get_image() const;
         const std::string& get_file_path() const { return file_path; }
 
         const unsigned char* get_data() const { return data; }
+        unsigned char* get_data() { return data; }
         int get_width() const { return width; }
         int get_height() const { return height; }
     private:

@@ -6,6 +6,8 @@
 #include "engine/application_base/input.hpp"
 
 namespace sm {
+    class Application;
+
     /*
         Main class for managing application-level events
     */
@@ -48,12 +50,14 @@ namespace sm {
         void discard() {
             dispatcher.clear<E>();
         }
-
+    private:
         void update() {
             dispatcher.update();
         }
-    private:
+
         entt::dispatcher dispatcher;
+
+        friend class Application;
     };
 
     struct WindowClosedEvent {};

@@ -6,6 +6,9 @@
 #include <resmanager/resmanager.hpp>
 
 namespace sm {
+    class Application;
+    class TaskManager;
+
     class Task {  // TODO on done function
     public:
         enum class Result {

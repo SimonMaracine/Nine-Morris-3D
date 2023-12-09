@@ -8,8 +8,6 @@
 
 #include <resmanager/resmanager.hpp>
 
-#include "engine/graphics/texture_data.hpp"
-
 struct GLFWwindow;
 struct GLFWcursor;
 struct GLFWmonitor;
@@ -17,6 +15,7 @@ struct GLFWmonitor;
 namespace sm {
     class Application;
     class Monitor;
+    class TextureData;
 
     class Window {
     public:
@@ -31,25 +30,33 @@ namespace sm {
         Window(Window&&) = delete;
         Window& operator=(Window&&) = delete;
 
-        // Swap buffers and update events
-        void update();
+        GLFWwindow* get_handle() const;
+        std::vector<Monitor> get_monitors() const;
 
-        GLFWwindow* get_handle();
-        std::vector<Monitor> get_monitors();
+        int get_width() const { return width; }
+        int get_height() const { return height; }
 
-        void show();
-        void set_vsync(int interval);
+        void show() const;
+        void set_vsync(int interval) const;
         void add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
-        void set_cursor(CursorId id);
-        void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons);
+        void set_cursor(CursorId id) const;
+        void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
 
         static double get_time();
     private:
-        GLFWwindow* create_window(Application* application);
-        void install_callbacks();
+        // Swap buffers and update events
+        void update() const;
+
+        GLFWwindow* create_window(const Application* application);
+        void install_callbacks() const;
+
+        int width {};
+        int height {};
 
         GLFWwindow* window {nullptr};
         std::unordered_map<CursorId, GLFWcursor*, CursorHash> cursors;
+
+        friend class Application;
     };
 
     class Monitor {

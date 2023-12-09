@@ -23,8 +23,8 @@ namespace sm {
         Attachment(AttachmentFormat format, AttachmentType type)
             : format(format), type(type) {}
 
-        AttachmentFormat format = AttachmentFormat::None;
-        AttachmentType type = AttachmentType::None;
+        AttachmentFormat format {AttachmentFormat::None};
+        AttachmentType type {AttachmentType::None};
     };
 
     struct FramebufferSpecification {

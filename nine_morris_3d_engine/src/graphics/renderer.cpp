@@ -15,6 +15,7 @@
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/graphics/renderer.hpp"
+#include "engine/graphics/material.hpp"
 #include "engine/graphics/opengl/gl.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/camera.hpp"

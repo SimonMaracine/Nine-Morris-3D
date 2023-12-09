@@ -16,21 +16,21 @@ namespace sm {
         AlSource& operator=(AlSource&&) = delete;
 
         void play(AlBuffer* buffer);
-        void stop();
-        void pause();
-        void continue_();
+        void stop() const;
+        void pause() const;
+        void continue_() const;
 
-        float get_gain() { return gain; }
-        float get_pitch() { return pitch; }
-        const glm::vec3& get_position() { return position; }
-        const glm::vec3& get_velocity() { return velocity; }
-        const glm::vec3& get_direction() { return direction; }
-        bool get_looping() { return looping; }
-        float get_rolloff_factor() { return rolloff_factor; }
-        float get_reference_distance() { return reference_distance; }
-        float get_max_distance() { return max_distance; }
+        float get_gain() const { return gain; }
+        float get_pitch() const { return pitch; }
+        const glm::vec3& get_position() const { return position; }
+        const glm::vec3& get_velocity() const { return velocity; }
+        const glm::vec3& get_direction() const { return direction; }
+        bool get_looping() const { return looping; }
+        float get_rolloff_factor() const { return rolloff_factor; }
+        float get_reference_distance() const { return reference_distance; }
+        float get_max_distance() const { return max_distance; }
 
-        bool is_playing();
+        bool is_playing() const;
 
         void set_gain(float gain);
         void set_pitch(float pitch);

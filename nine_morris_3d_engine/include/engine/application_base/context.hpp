@@ -18,7 +18,7 @@
 
 namespace sm {
     class Application;
-    class ApplicationProperties;
+    struct ApplicationProperties;
     class Scene;
 
     /*
@@ -37,9 +37,8 @@ namespace sm {
         Ctx& operator=(Ctx&&) = delete;
 
         void change_scene(SceneId id);
-        const Scene* get_current_scene();
+        const Scene* get_current_scene() const;
 
-        // Helper function
         template<typename T>
         T& data() {
             return *static_cast<T*>(user_data);
@@ -50,8 +49,7 @@ namespace sm {
         double fps {0.0};
         float delta {0.0f};
 
-        void* user_data {nullptr};  // Arbitrary data defined by the user
-        const ApplicationProperties* properties {nullptr};  // Ctx data like window width and height
+        const ApplicationProperties* properties {nullptr};  // Application data
 
         std::unique_ptr<Window> win;  // One of the last objects destroyed in an application instance
         std::unique_ptr<OpenAlContext> snd;  // Sound context
@@ -63,6 +61,8 @@ namespace sm {
         Identifier idt;  // Generator of IDs
         TaskManager tsk;  // Manager of general purpose procedures
     private:
+        void* user_data {nullptr};  // Arbitrary data defined by the user
+
         Application* application {nullptr};
 
         friend class Application;

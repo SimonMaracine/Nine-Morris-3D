@@ -4,11 +4,10 @@
 #include <vector>
 #include <functional>
 
-#include "engine/graphics/opengl/vertex_buffer_layout.hpp"
-
 namespace sm {
     class GlVertexBuffer;
     class GlIndexBuffer;
+    class VertexBufferLayout;
 
     class GlVertexArray {
     public:

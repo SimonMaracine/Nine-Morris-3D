@@ -9,14 +9,6 @@
 namespace sm {
     class Identifier {
     public:
-        Identifier() = default;
-        ~Identifier() = default;
-
-        Identifier(const Identifier&) = delete;
-        Identifier& operator=(const Identifier&) = delete;
-        Identifier(Identifier&&) = delete;
-        Identifier& operator=(Identifier&&) = delete;
-
         class Id {
         public:
             constexpr Id() = default;
@@ -29,6 +21,14 @@ namespace sm {
         private:
             float value {0.0f};
         };
+
+        Identifier() = default;
+        ~Identifier() = default;
+
+        Identifier(const Identifier&) = delete;
+        Identifier& operator=(const Identifier&) = delete;
+        Identifier(Identifier&&) = delete;
+        Identifier& operator=(Identifier&&) = delete;
 
         Id generate();
 

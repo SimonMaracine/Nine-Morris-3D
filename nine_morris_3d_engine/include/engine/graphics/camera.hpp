@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 
 namespace sm {
-    struct Camera {  // TODO maybe refactor camera using quaternions
+    struct Camera {
         Camera() noexcept = default;
         ~Camera() noexcept = default;
 

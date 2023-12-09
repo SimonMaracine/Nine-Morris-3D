@@ -1,8 +1,6 @@
 #pragma once
 
-/**
- * Queryable OpenGL implementation and GPU capabilities.
- */
+// Query OpenGL implementation and GPU capabilities
 namespace sm {
     int max_anisotropic_filtering_supported();
     int max_samples_supported();

@@ -3,11 +3,11 @@
 #include <memory>
 #include <vector>
 
-#include "engine/graphics/opengl/framebuffer.hpp"
-#include "engine/graphics/opengl/shader.hpp"
-
 namespace sm {
     struct PostProcessingContext;
+    class GlFramebuffer;
+    class GlShader;
+    class Renderer;
 
     class PostProcessingStep {
     public:

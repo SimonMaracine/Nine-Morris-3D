@@ -124,7 +124,7 @@ namespace sm {
         void unmap_data() const;
 
         template<typename T>
-        void get_data(T** data_out) {
+        void get_data(T** data_out) const {
             *data_out = static_cast<T*>(data);
         }
     private:

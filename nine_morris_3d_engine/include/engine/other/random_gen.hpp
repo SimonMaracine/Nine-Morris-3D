@@ -4,6 +4,7 @@
 #include <random>
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 
 #include "engine/other/assert.hpp"
 
@@ -45,6 +46,5 @@ namespace sm {
         }
     private:
         std::mt19937 random;
-        std::uniform_int_distribution<std::mt19937::result_type> default_distribution;
     };
 }

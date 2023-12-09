@@ -50,13 +50,4 @@ namespace sm {
 
         LOG_DEBUG("Freed texture data `{}`", file_path);
     }
-
-    TextureData::Image TextureData::get_image() const {
-        Image image;
-        image.width = width;
-        image.height = height;
-        image.pixels = data;
-
-        return image;
-    }
 }

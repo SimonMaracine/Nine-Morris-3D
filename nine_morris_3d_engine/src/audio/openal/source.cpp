@@ -45,25 +45,25 @@ namespace sm {
         AlInfoDebug::maybe_check_errors();
     }
 
-    void AlSource::stop() {
+    void AlSource::stop() const {
         alSourceStop(source);
 
         AlInfoDebug::maybe_check_errors();
     }
 
-    void AlSource::pause() {
+    void AlSource::pause() const {
         alSourcePause(source);
 
         AlInfoDebug::maybe_check_errors();
     }
 
-    void AlSource::continue_() {
+    void AlSource::continue_() const {
         alSourcePlay(source);
 
         AlInfoDebug::maybe_check_errors();
     }
 
-    bool AlSource::is_playing() {
+    bool AlSource::is_playing() const {
         int state {0};
         alGetSourcei(source, AL_SOURCE_STATE, &state);
 

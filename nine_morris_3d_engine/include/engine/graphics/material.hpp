@@ -8,10 +8,11 @@
 #include <glm/glm.hpp>
 #include <resmanager/resmanager.hpp>
 
-#include "engine/graphics/opengl/shader.hpp"
-#include "engine/graphics/opengl/texture.hpp"
-
 namespace sm {
+    class MaterialInstance;
+    class GlShader;
+    class GlTexture;
+
     class Material {
     public:
         using Key = resmanager::HashedStr64;

@@ -1,5 +1,6 @@
 #include <memory>
 #include <cstddef>
+#include <unordered_set>
 
 #include <AL/al.h>
 

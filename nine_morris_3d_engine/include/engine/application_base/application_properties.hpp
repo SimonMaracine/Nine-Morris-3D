@@ -3,19 +3,12 @@
 #include <string>
 
 namespace sm {
-    class Ctx;
-    class Application;
-    class Window;
-
     /*
-        Struct for mostly constant application properties
+        Struct for constant application properties
     */
-    class ApplicationProperties {
-    public:
-        // These two change when the window resizes
-        int width {};
+    struct ApplicationProperties {
+        int width {};  // Initial width and height
         int height {};
-
         std::string title;
         bool fullscreen {};
         bool native_resolution {};
@@ -26,11 +19,5 @@ namespace sm {
         unsigned int version_major {};
         unsigned int version_minor {};
         unsigned int version_patch {};
-    private:
-        Application* application {nullptr};
-        Ctx* ctx {nullptr};
-
-        friend class Application;
-        friend class Window;
     };
 }

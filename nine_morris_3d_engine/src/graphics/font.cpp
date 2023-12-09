@@ -14,9 +14,10 @@
 
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/panic.hpp"
-#include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/vertex_array.hpp"
+#include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/texture.hpp"
+#include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/graphics/font.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"

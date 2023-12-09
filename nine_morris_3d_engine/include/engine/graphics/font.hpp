@@ -7,13 +7,13 @@
 #include <cstddef>
 #include <unordered_map>
 
-#include "engine/graphics/opengl/vertex_array.hpp"
-#include "engine/graphics/opengl/buffer.hpp"
-#include "engine/graphics/opengl/texture.hpp"
-
 struct stbtt_fontinfo;
 
 namespace sm {
+    class GlVertexArray;
+    class GlVertexBuffer;
+    class GlTexture;
+
     class Font {
     public:
         Font(

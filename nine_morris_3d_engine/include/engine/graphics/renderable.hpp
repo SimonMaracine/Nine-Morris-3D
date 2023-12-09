@@ -4,10 +4,10 @@
 
 #include <glm/glm.hpp>
 
-#include "engine/graphics/opengl/vertex_array.hpp"
-#include "engine/graphics/material.hpp"
-
 namespace sm {
+    class GlVertexArray;
+    class MaterialInstance;
+
     // Right now every renderable is analogous to a mesh, to a render call
     struct Renderable {
         std::weak_ptr<GlVertexArray> vertex_array;

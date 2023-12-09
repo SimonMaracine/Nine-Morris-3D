@@ -1,6 +1,7 @@
 #include <string>
 #include <locale>
 #include <memory>
+#include <algorithm>
 
 #include "engine/application_base/application.hpp"
 #include "engine/application_base/window.hpp"
@@ -58,8 +59,6 @@ namespace sm {
         properties.version_major = builder.major;
         properties.version_minor = builder.minor;
         properties.version_patch = builder.patch;
-        properties.application = this;
-        properties.ctx = &ctx;
 
         ctx.win = std::make_unique<Window>(this);
         ctx.inp.window_handle = ctx.win->get_handle();
@@ -120,7 +119,7 @@ namespace sm {
             current_scene->on_update();
             ctx.tsk.update();
 
-            ctx.rnd->render(properties.width, properties.height);
+            ctx.rnd->render(ctx.win->get_width(), ctx.win->get_height());
             dear_imgui_render();
 
             ctx.win->update();

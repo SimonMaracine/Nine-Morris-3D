@@ -7,6 +7,7 @@ inline constexpr float LENS_FOV {45.0f};
 inline constexpr float LENS_NEAR {0.1f};
 inline constexpr float LENS_FAR {300.0f};
 
+// TODO maybe refactor camera using quaternions
 class PointCameraController : public sm::CameraController {
 public:
     PointCameraController() = default;

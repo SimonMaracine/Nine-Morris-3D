@@ -7,7 +7,7 @@ namespace sm {
     enum class Key;
     enum class MouseButton;
 
-    class Input {
+    class Input {  // TODO maybe make static
     public:
         Input() = default;
         ~Input() = default;

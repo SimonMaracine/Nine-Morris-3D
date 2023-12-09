@@ -153,8 +153,8 @@ void GameScene::on_start() {
     cam_controller = PointCameraController(
         &cam,
         ctx,
-        ctx->properties->width,
-        ctx->properties->height,
+        ctx->win->get_width(),
+        ctx->win->get_height(),
         LENS_FOV,
         LENS_NEAR,
         LENS_FAR,

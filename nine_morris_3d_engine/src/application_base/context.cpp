@@ -19,7 +19,7 @@ namespace sm {
         SM_ASSERT(false, "Scene not found");
     }
 
-    const Scene* Ctx::get_current_scene() {
+    const Scene* Ctx::get_current_scene() const {
         return application->current_scene;
     }
 }
