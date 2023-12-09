@@ -2,31 +2,29 @@
 
 #include <memory>
 
-#include <resmanager/resmanager.hpp>
-
-#include "engine/application_base/context.hpp"
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/window.hpp"
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/tasks.hpp"
+#include "engine/application_base/application_properties.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer.hpp"
 #include "engine/graphics/identifier.hpp"
 #include "engine/other/resource_manager.hpp"
 #include "engine/other/random_gen.hpp"
 #include "engine/other/encrypt.hpp"
+#include "engine/scene/scene.hpp"
 
 namespace sm {
     class Application;
     struct ApplicationProperties;
-    class Scene;
 
     /*
         Wrapper struct around public functionality exposed to the user
     */
     class Ctx {
     public:
-        using SceneId = resmanager::HashedStr64;
+        using SceneId = Scene::SceneId;
 
         Ctx() = default;
         ~Ctx() = default;

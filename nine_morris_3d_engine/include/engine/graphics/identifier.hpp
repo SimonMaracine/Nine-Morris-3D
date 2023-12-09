@@ -7,21 +7,21 @@
     floating-point standard used should be IEEE-754.
 */
 namespace sm {
+    class Id {
+    public:
+        constexpr Id() = default;
+        constexpr Id(const float value)
+            : value(value) {}
+
+        constexpr operator float() const { return value; }
+        Id& operator+=(const Id& other) { value += other.value; return *this; }
+        constexpr bool operator==(const Id& other) const { return value == other.value; }
+    private:
+        float value {0.0f};
+    };
+
     class Identifier {
     public:
-        class Id {
-        public:
-            constexpr Id() = default;
-            constexpr Id(const float value)
-                : value(value) {}
-
-            constexpr operator float() const { return value; }
-            Id& operator+=(const Id& other) { value += other.value; return *this; }
-            constexpr bool operator==(const Id& other) const { return value == other.value; }
-        private:
-            float value {0.0f};
-        };
-
         Identifier() = default;
         ~Identifier() = default;
 
@@ -32,7 +32,7 @@ namespace sm {
 
         Id generate();
 
-        static Id null;  // Should have been static constexpr, but compiler is too dumb
+        static constexpr Id null {Id()};
     private:
         Id id {0.0f};
     };

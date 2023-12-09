@@ -4,9 +4,9 @@
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    int max_anisotropic_filtering_supported() {
+    int Capabilities::max_anisotropic_filtering_supported() {
         if (GLAD_GL_EXT_texture_filter_anisotropic) {
-            float max_amount {0.0f};
+            float max_amount;
             glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_amount);
 
             return static_cast<int>(max_amount);
@@ -15,7 +15,7 @@ namespace sm {
         }
     }
 
-    int max_samples_supported() {
+    int Capabilities::max_samples_supported() {
         int max_samples;
         glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
 
@@ -36,7 +36,7 @@ namespace sm {
         return max_samples;
     }
 
-    int max_texture_units_supported() {
+    int Capabilities::max_texture_units_supported() {
         int max_units;
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_units);
 

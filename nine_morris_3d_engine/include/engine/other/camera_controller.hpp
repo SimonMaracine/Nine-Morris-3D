@@ -2,8 +2,6 @@
 
 #include <glm/glm.hpp>
 
-#include "engine/other/assert.hpp"
-
 namespace sm {
     class Camera;
     class Ctx;
@@ -20,7 +18,7 @@ namespace sm {
         CameraController(CameraController&&) noexcept = default;
         CameraController& operator=(CameraController&&) noexcept = default;
 
-        virtual void update_controls(float dt) = 0;
+        virtual void update_controls(float dt) = 0;  // TODO take delta?
         virtual void update_camera(float dt) = 0;
         virtual glm::vec3 get_position() const = 0;
         virtual glm::vec3 get_rotation() const = 0;
@@ -30,11 +28,10 @@ namespace sm {
         }
 
         void set_camera(Camera* camera) {
-            SM_ASSERT(camera != nullptr, "Camera must not be null");
             this->camera = camera;
         }
     protected:
         Camera* camera {nullptr};
-        Ctx* ctx {nullptr};
+        Ctx* ctx {nullptr};  // TODO store Ctx?
     };
 }

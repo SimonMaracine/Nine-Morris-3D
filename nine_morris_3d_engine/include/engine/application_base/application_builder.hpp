@@ -4,7 +4,6 @@
 
 namespace sm {
     class Application;
-    class Window;
 
     /*
         Parameters for an instance of an application or a game
@@ -39,6 +38,5 @@ namespace sm {
         bool random_generator {false};
 
         friend class Application;
-        friend class Window;
     };
 }

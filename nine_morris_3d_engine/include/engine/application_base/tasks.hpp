@@ -22,12 +22,6 @@ namespace sm {
 
         Task(TaskId id, const TaskFunction& function)
             : function(function), id(id) {}
-        ~Task() = default;
-
-        Task(const Task&) = default;
-        Task& operator=(const Task&) = default;
-        Task(Task&&) noexcept = default;
-        Task& operator=(Task&&) noexcept = default;
 
         TaskId get_id() const { return id; }
         double get_total_time() const { return total_time; }

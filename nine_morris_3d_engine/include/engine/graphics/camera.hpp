@@ -4,14 +4,6 @@
 
 namespace sm {
     struct Camera {
-        Camera() noexcept = default;
-        ~Camera() noexcept = default;
-
-        Camera(const Camera&) noexcept = default;
-        Camera& operator=(const Camera&) noexcept = default;
-        Camera(Camera&&) noexcept = default;
-        Camera& operator=(Camera&&) noexcept = default;
-
         void set_position_orientation(const glm::vec3& position, const glm::vec3& at, const glm::vec3& up);
         void set_position_rotation(const glm::vec3& position, const glm::vec3& rotation);
 

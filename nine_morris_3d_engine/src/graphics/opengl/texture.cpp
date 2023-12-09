@@ -3,6 +3,7 @@
 #include <array>
 #include <optional>
 #include <cstddef>
+#include <algorithm>
 
 #include <glad/glad.h>
 #include <stb_image.h>
@@ -38,12 +39,15 @@ namespace sm {
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
 
         if (anisotropic_filtering_enabled) {
-            SM_ASSERT(
-                specification.mipmapping.anisotropic_filtering <= max_anisotropic_filtering_supported(),
-                "Invalid anisotropic filtering value"
-            );
+            const int max_anisotropic_filtering {Capabilities::max_anisotropic_filtering_supported()};
 
-            const float amount {static_cast<float>(specification.mipmapping.anisotropic_filtering)};
+            if (specification.mipmapping.anisotropic_filtering > max_anisotropic_filtering) {
+                LOG_DIST_WARNING("Invalid anisotropic filtering value: {}", specification.mipmapping.anisotropic_filtering);
+            }
+
+            const float amount {
+                static_cast<float>(std::min(specification.mipmapping.anisotropic_filtering, max_anisotropic_filtering))
+            };
 
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
         }

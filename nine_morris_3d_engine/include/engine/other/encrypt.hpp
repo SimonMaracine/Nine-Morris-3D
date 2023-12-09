@@ -35,14 +35,6 @@ namespace sm {
 
     class Encrypt {
     public:
-        Encrypt() = default;
-        ~Encrypt() = default;
-
-        Encrypt(const Encrypt&) = delete;
-        Encrypt& operator=(const Encrypt&) = delete;
-        Encrypt(Encrypt&&) = delete;
-        Encrypt& operator=(Encrypt&&) = delete;
-
         static std::pair<unsigned char*, std::size_t> load_file(const EncrFile& file_path);
 
 #ifdef SM_BUILD_DISTRIBUTION

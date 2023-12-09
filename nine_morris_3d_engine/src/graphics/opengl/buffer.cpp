@@ -299,7 +299,7 @@ namespace sm {
         data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 
         if (data == nullptr) {
-            LOG_ERROR("Could not map GL buffer {}", buffer);
+            LOG_ERROR("Could not map GL pixel buffer {}", buffer);
 
             data = dummy_data;
         }

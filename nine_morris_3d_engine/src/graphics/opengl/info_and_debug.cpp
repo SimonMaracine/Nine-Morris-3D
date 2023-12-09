@@ -159,7 +159,7 @@ namespace sm {
             line,
             BUFFER_LENGTH,
             "GL_EXT_texture_filter_anisotropic max samples: %d\n",
-            max_anisotropic_filtering_supported()
+            Capabilities::max_anisotropic_filtering_supported()
         );
         output.append(line);
 

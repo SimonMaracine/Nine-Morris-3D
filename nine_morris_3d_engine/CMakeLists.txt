@@ -35,25 +35,25 @@ set(ALSOFT_UPDATE_BUILD_VERSION OFF)
 set(LIBTYPE "STATIC")  # To make static library
 
 # Make glad
-add_library(glad STATIC "dependencies/glad/src/glad.c")
+add_library(glad STATIC "extern/glad/src/glad.c")
 
-target_include_directories(glad PUBLIC "dependencies/glad/include")
+target_include_directories(glad PUBLIC "extern/glad/include")
 
 # Make stb
 add_library(stb STATIC
-    "dependencies/stb_image/stb_image.c"
-    "dependencies/stb_image_resize2/stb_image_resize2.c"
-    "dependencies/stb_image_write/stb_image_write.c"
-    "dependencies/stb_truetype/stb_truetype.c"
-    "dependencies/stb_vorbis/stb_vorbis.c"
+    "extern/stb_image/stb_image.c"
+    "extern/stb_image_resize2/stb_image_resize2.c"
+    "extern/stb_image_write/stb_image_write.c"
+    "extern/stb_truetype/stb_truetype.c"
+    "extern/stb_vorbis/stb_vorbis.c"
 )
 
 target_include_directories(stb PUBLIC
-    "dependencies/stb_image"
-    "dependencies/stb_image_resize2"
-    "dependencies/stb_image_write"
-    "dependencies/stb_truetype"
-    "dependencies/stb_vorbis"
+    "extern/stb_image"
+    "extern/stb_image_resize2"
+    "extern/stb_image_write"
+    "extern/stb_truetype"
+    "extern/stb_vorbis"
 )
 
 # Make Dear ImGui
@@ -78,7 +78,7 @@ target_include_directories(dear_imgui PRIVATE "extern/glfw/include")
 # Make cereal
 add_library(cereal INTERFACE)  # FIXME use submodule
 
-target_include_directories(cereal INTERFACE "dependencies/cereal/include")
+target_include_directories(cereal INTERFACE "extern/cereal/include")
 
 add_subdirectory(extern/assimp)
 add_subdirectory(extern/cppblowfish)

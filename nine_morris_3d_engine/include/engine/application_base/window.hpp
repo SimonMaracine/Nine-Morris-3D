@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <initializer_list>
 #include <utility>
-#include <vector>
+#include <cstddef>
 
 #include <resmanager/resmanager.hpp>
 
@@ -13,9 +13,21 @@ struct GLFWcursor;
 struct GLFWmonitor;
 
 namespace sm {
+    class Window;
     class Application;
-    class Monitor;
     class TextureData;
+
+    class Monitors {
+    public:
+        std::pair<int, int> get_resolution(std::size_t index) const;
+        std::pair<float, float> get_content_scale(std::size_t index) const;
+        const char* get_name(std::size_t index) const;
+    private:
+        GLFWmonitor** monitors {nullptr};
+        std::size_t count {};
+
+        friend class Window;
+    };
 
     class Window {
     public:
@@ -31,7 +43,7 @@ namespace sm {
         Window& operator=(Window&&) = delete;
 
         GLFWwindow* get_handle() const;
-        std::vector<Monitor> get_monitors() const;
+        const Monitors& get_monitors();
 
         int get_width() const { return width; }
         int get_height() const { return height; }
@@ -55,26 +67,8 @@ namespace sm {
 
         GLFWwindow* window {nullptr};
         std::unordered_map<CursorId, GLFWcursor*, CursorHash> cursors;
+        Monitors monitors;
 
         friend class Application;
-    };
-
-    class Monitor {
-    public:
-        Monitor() = default;
-        ~Monitor() = default;
-
-        Monitor(const Monitor&) = default;
-        Monitor& operator=(const Monitor&) = default;
-        Monitor(Monitor&&) noexcept = default;
-        Monitor& operator=(Monitor&&) noexcept = default;
-
-        std::pair<int, int> get_resolution() const;
-        std::pair<float, float> get_content_scale() const;
-        const char* get_name() const;
-    private:
-        GLFWmonitor* monitor {nullptr};
-
-        friend class Window;
     };
 }

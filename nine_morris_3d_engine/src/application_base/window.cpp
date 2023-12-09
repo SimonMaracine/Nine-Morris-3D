@@ -1,6 +1,8 @@
 #include <memory>
+#include <unordered_map>
 #include <initializer_list>
 #include <utility>
+#include <cstddef>
 #include <vector>
 
 #include <glad/glad.h>
@@ -99,25 +101,19 @@ namespace sm {
         return window;
     }
 
-    std::vector<Monitor> Window::get_monitors() const {
+    const Monitors& Window::get_monitors() {
         int count;
-        GLFWmonitor** monitors {glfwGetMonitors(&count)};
+        GLFWmonitor** connected_monitors {glfwGetMonitors(&count)};
 
-        if (monitors == nullptr) {
+        if (connected_monitors == nullptr) {
             LOG_DIST_CRITICAL("Could not retrieve monitors");
             throw OtherError;
         }
 
-        std::vector<Monitor> result;
+        monitors.count = static_cast<std::size_t>(count);
+        monitors.monitors = connected_monitors;
 
-        for (int i {0}; i < count; i++) {
-            Monitor monitor;
-            monitor.monitor = monitors[i];
-
-            result.push_back(monitor);
-        }
-
-        return result;
+        return monitors;
     }
 
     void Window::show() const {
@@ -315,21 +311,27 @@ namespace sm {
         });
     }
 
-    std::pair<int, int> Monitor::get_resolution() const {
-        const GLFWvidmode* video_mode {glfwGetVideoMode(monitor)};
+    std::pair<int, int> Monitors::get_resolution(std::size_t index) const {
+        SM_ASSERT(index < count, "Invalid index");
+
+        const GLFWvidmode* video_mode {glfwGetVideoMode(monitors[index])};
 
         return std::make_pair(video_mode->width, video_mode->height);
     }
 
-    std::pair<float, float> Monitor::get_content_scale() const {
+    std::pair<float, float> Monitors::get_content_scale(std::size_t index) const {
+        SM_ASSERT(index < count, "Invalid index");
+
         float xscale, yscale;
-        glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+        glfwGetMonitorContentScale(monitors[index], &xscale, &yscale);
 
         return std::make_pair(xscale, yscale);
     }
 
-    const char* Monitor::get_name() const {  // TODO used?
-        const char* name {glfwGetMonitorName(monitor)};
+    const char* Monitors::get_name(std::size_t index) const {  // TODO used?
+        SM_ASSERT(index < count, "Invalid index");
+
+        const char* name {glfwGetMonitorName(monitors[index])};
 
         if (name == nullptr) {
             LOG_DIST_CRITICAL("Could not retrieve monitor name");

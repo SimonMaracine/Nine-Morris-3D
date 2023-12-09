@@ -13,7 +13,6 @@ namespace sm {
     class FramebufferReader {
     public:
         FramebufferReader() = default;
-
         FramebufferReader(
             const std::array<std::shared_ptr<GlPixelBuffer>, BufferCount>& buffers,
             std::shared_ptr<GlFramebuffer> framebuffer
@@ -21,13 +20,6 @@ namespace sm {
             : buffers(buffers), framebuffer(framebuffer) {
             static_assert(BufferCount > 0);
         }
-
-        ~FramebufferReader() = default;
-
-        FramebufferReader(const FramebufferReader&) = delete;
-        FramebufferReader& operator=(const FramebufferReader&) = delete;
-        FramebufferReader(FramebufferReader&&) noexcept = default;
-        FramebufferReader& operator=(FramebufferReader&&) noexcept = default;
 
         // Call this after the framebuffer is bound to begin reading the framebuffer
         void read(int attachment_index, int x, int y) {
