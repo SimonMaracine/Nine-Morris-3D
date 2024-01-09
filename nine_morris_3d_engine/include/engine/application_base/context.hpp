@@ -9,15 +9,12 @@
 #include "engine/application_base/application_properties.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer.hpp"
-#include "engine/graphics/identifier.hpp"
 #include "engine/other/resource_manager.hpp"
 #include "engine/other/random_gen.hpp"
-#include "engine/other/encrypt.hpp"
 #include "engine/scene/scene.hpp"
 
 namespace sm {
     class Application;
-    struct ApplicationProperties;
 
     /*
         Wrapper struct around public functionality exposed to the user
@@ -44,8 +41,8 @@ namespace sm {
 
         bool running {true};
         int exit_code {0};
-        double fps {0.0};
         float delta {0.0f};
+        double fps {0.0};
 
         const ApplicationProperties* properties {nullptr};  // Application data
 
@@ -53,14 +50,11 @@ namespace sm {
         std::unique_ptr<OpenAlContext> snd;  // Sound context
         std::unique_ptr<Renderer> rnd;  // Renderer for 3D, 2D and debug
         std::unique_ptr<RandomGenerator> rng;  // Random number generator
-        Input inp;  // Self explanatory
         EventDispatcher evt;  // Manager of application events
         ResourcesCache res;  // Global cache of resources
-        Identifier idt;  // Generator of IDs
         TaskManager tsk;  // Manager of general purpose procedures
     private:
         void* user_data {nullptr};  // Arbitrary data defined by the user
-
         Application* application {nullptr};
 
         friend class Application;

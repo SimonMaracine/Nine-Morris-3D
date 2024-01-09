@@ -2,36 +2,31 @@
 
 #include <utility>
 
+struct GLFWwindow;
+
 namespace sm {
     class Application;
     enum class Key;
     enum class MouseButton;
 
-    class Input {  // TODO maybe make static
+    class Input {
     public:
-        Input() = default;
-        ~Input() = default;
-
-        Input(const Input&) = delete;
-        Input& operator=(const Input&) = delete;
-        Input(Input&&) = delete;
-        Input& operator=(Input&&) = delete;
-
-        bool is_key_pressed(Key key);
-        bool is_mouse_button_pressed(MouseButton button);
-        float get_mouse_x();
-        float get_mouse_y();
-        std::pair<float, float> get_mouse();
+        static bool is_key_pressed(Key key);
+        static bool is_mouse_button_pressed(MouseButton button);
+        static float get_mouse_x();
+        static float get_mouse_y();
+        static std::pair<float, float> get_mouse();
 
         static Key key_from_code(int code);
         static MouseButton mouse_button_from_code(int code);
     private:
-        void* window_handle {nullptr};
+        static void initialize(GLFWwindow* handle);
+        static void uninitialize();
 
         friend class Application;
     };
 
-    enum class Key {
+    enum class Key {  // TODO maybe remove class
         Unknown =             -1,
         Space =               32,
         Apostrophe =          39,

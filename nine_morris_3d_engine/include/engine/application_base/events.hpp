@@ -63,39 +63,39 @@ namespace sm {
     struct WindowClosedEvent {};
 
     struct WindowResizedEvent {
-        int width;
-        int height;
+        int width {};
+        int height {};
     };
 
     struct WindowFocusedEvent {
-        bool focused;
+        bool focused {};
     };
 
     struct KeyPressedEvent {
-        Key key;
-        bool repeat;
-        bool ctrl;
+        Key key {};
+        bool repeat {};
+        bool ctrl {};
     };
 
     struct KeyReleasedEvent {
-        Key key;
+        Key key {};
     };
 
     struct MouseButtonPressedEvent {
-        MouseButton button;
+        MouseButton button {};
     };
 
     struct MouseButtonReleasedEvent {
-        MouseButton button;
+        MouseButton button {};
     };
 
     struct MouseWheelScrolledEvent {
-        float scroll;
+        float scroll {};
     };
 
     struct MouseMovedEvent {
-        float mouse_x;
-        float mouse_y;
+        float mouse_x {};
+        float mouse_y {};
     };
 }
 

@@ -28,24 +28,24 @@ namespace sm {
     };
 
     struct FramebufferSpecification {
-        // Must be specified
-        int width {0};
-        int height {0};
-
         // At least one of these two must be specified
         std::vector<Attachment> color_attachments;
         Attachment depth_attachment;
 
-        int samples {1};
-        bool resizable {true};
-        unsigned int resize_divisor {1};
-        bool white_border_for_depth_texture {false};
+        // Must be specified
+        int width {0};
+        int height {0};
 
         // Color attachment clearing stuff
         struct {
             int drawbuffer {0};
             float value[4] {};
         } color_clear;
+
+        int samples {1};
+        unsigned int resize_divisor {1};
+        bool resizable {true};
+        bool white_border_for_depth_texture {false};
     };
 
     class GlFramebuffer {
@@ -80,12 +80,12 @@ namespace sm {
     private:
         void build();
 
-        FramebufferSpecification specification;
-
         unsigned int framebuffer {0};
 
         // These can be texture or renderbuffer handles
-        std::vector<unsigned int> color_attachments;
         unsigned int depth_attachment {0};
+        std::vector<unsigned int> color_attachments;
+
+        FramebufferSpecification specification;
     };
 }

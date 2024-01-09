@@ -32,7 +32,7 @@ static float calculate_angle_velocity(float target_angle, float angle) {
 }
 
 PointCameraController::PointCameraController(sm::Camera* camera, sm::Ctx* ctx)
-    : CameraController(camera, ctx) {
+    : sm::CameraController(camera, ctx) {
     update_camera(1.0f);
 }
 
@@ -49,9 +49,9 @@ PointCameraController::PointCameraController(
     float pitch,
     float sensitivity
 )
-    : CameraController(camera, ctx), sensitivity(sensitivity), pitch(pitch), point(point),
+    : sm::CameraController(camera, ctx), sensitivity(sensitivity), pitch(pitch), point(point),
       distance_to_point(distance_to_point) {
-    camera->set_projection_matrix(width, height, fov, near, far);
+    camera->set_projection(width, height, fov, near, far);
     update_camera(1.0f);
 }
 
@@ -71,26 +71,26 @@ void PointCameraController::update_controls(float dt) {
 
     zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_input.mouse_wheel;
 
-    if (ctx->inp.is_key_pressed(sm::Key::R)) {
+    if (sm::Input::is_key_pressed(sm::Key::R)) {
         zoom_velocity -= ZOOM_SPEED * dt;
-    } else if (ctx->inp.is_key_pressed(sm::Key::F)) {
+    } else if (sm::Input::is_key_pressed(sm::Key::F)) {
         zoom_velocity += ZOOM_SPEED * dt;
     }
 
-    if (ctx->inp.is_mouse_button_pressed(sm::MouseButton::Right)) {
+    if (sm::Input::is_mouse_button_pressed(sm::MouseButton::Right)) {
         y_velocity -= MOVE_SPEED_MOUSE * mouse_input.dy;
         x_velocity += MOVE_SPEED_MOUSE * mouse_input.dx;
     }
 
-    if (ctx->inp.is_key_pressed(sm::Key::W)) {
+    if (sm::Input::is_key_pressed(sm::Key::W)) {
         y_velocity += MOVE_SPEED * dt;
-    } else if (ctx->inp.is_key_pressed(sm::Key::S)) {
+    } else if (sm::Input::is_key_pressed(sm::Key::S)) {
         y_velocity -= MOVE_SPEED * dt;
     }
 
-    if (ctx->inp.is_key_pressed(sm::Key::A)) {
+    if (sm::Input::is_key_pressed(sm::Key::A)) {
         x_velocity -= MOVE_SPEED * dt;
-    } else if (ctx->inp.is_key_pressed(sm::Key::D)) {
+    } else if (sm::Input::is_key_pressed(sm::Key::D)) {
         x_velocity += MOVE_SPEED * dt;
     }
 
@@ -136,12 +136,12 @@ void PointCameraController::update_camera(float dt) {
     yaw = 180.0f - angle_around_point;
 
     // Update camera data
-    glm::mat4 matrix {glm::mat4(1.0f)};
+    glm::mat4 matrix {1.0f};
     matrix = glm::rotate(matrix, glm::radians(pitch), glm::vec3(1.0f, 0.0f, 0.0f));
     matrix = glm::rotate(matrix, glm::radians(yaw), glm::vec3(0.0f, 1.0f, 0.0f));
     matrix = glm::translate(matrix, -position);
 
-    camera->set_view_matrix(matrix);
+    camera->set_view(matrix);
 }
 
 void PointCameraController::update_friction() {

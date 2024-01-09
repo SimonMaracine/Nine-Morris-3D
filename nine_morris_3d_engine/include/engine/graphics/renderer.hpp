@@ -64,7 +64,7 @@ namespace sm {
         void draw_renderable_outlined(const Renderable& renderable);
 
         // Helper functions
-        void setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer);
+        void setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer);  // FIXME
 
         struct {
             std::shared_ptr<GlFramebuffer> scene_framebuffer;

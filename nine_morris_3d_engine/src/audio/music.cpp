@@ -100,7 +100,7 @@ namespace sm {
             return;
         }
 
-        current_music_track->source->continue_();
+        current_music_track->source->resume();
 
         LOG_DEBUG("Continued playing music track `{}`", current_music_track->name);
     }

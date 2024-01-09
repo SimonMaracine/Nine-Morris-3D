@@ -61,8 +61,8 @@ namespace sm {
         properties.version_patch = builder.patch;
 
         ctx.win = std::make_unique<Window>(this);
-        ctx.inp.window_handle = ctx.win->get_handle();
 
+        Input::initialize(ctx.win->get_handle());
         ImGuiContext::initialize(ctx.win->get_handle());
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -94,8 +94,9 @@ namespace sm {
     }
 
     Application::~Application() {  // Destructor is called before all member variables
-        ImGuiContext::uninitialize();
         MusicPlayer::uninitialize();
+        ImGuiContext::uninitialize();
+        Input::uninitialize();
     }
 
     int Application::run(SceneId start_scene_id) {

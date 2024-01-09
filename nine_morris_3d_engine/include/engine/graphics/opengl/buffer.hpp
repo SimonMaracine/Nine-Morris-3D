@@ -8,6 +8,8 @@
 #include <resmanager/resmanager.hpp>
 
 namespace sm {
+    class GlShader;
+
     enum class DrawHint {
         Static,
         Dynamic,

@@ -18,7 +18,7 @@ namespace sm {
         void play(AlBuffer* buffer);
         void stop() const;
         void pause() const;
-        void continue_() const;
+        void resume() const;
 
         float get_gain() const { return gain; }
         float get_pitch() const { return pitch; }

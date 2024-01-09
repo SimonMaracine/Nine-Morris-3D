@@ -107,12 +107,10 @@ void GameScene::on_start() {
         });
     }
 
-    auto shader {
-        std::make_shared<sm::GlShader>(
-            sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.vert")),
-            sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.frag"))
-        )
-    };
+    auto shader {std::make_shared<sm::GlShader>(
+        sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.vert")),
+        sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.frag"))
+    )};
 
     ctx->rnd->add_shader(shader);
 

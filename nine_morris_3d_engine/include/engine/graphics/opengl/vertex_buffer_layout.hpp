@@ -5,15 +5,15 @@
 
 namespace sm {
     struct VertexBufferLayout {
-        enum Type {
+        enum Type : unsigned char{
             Float,
             Int
         };
 
         struct VertexElement {
             unsigned int index {0};
-            Type type {};
             int size {0};
+            Type type {};
             bool per_instance {false};
 
             static std::size_t get_size(Type type);

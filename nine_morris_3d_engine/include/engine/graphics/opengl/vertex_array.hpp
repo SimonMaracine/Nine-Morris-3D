@@ -4,11 +4,10 @@
 #include <vector>
 #include <functional>
 
-namespace sm {
-    class GlVertexBuffer;
-    class GlIndexBuffer;
-    class VertexBufferLayout;
+#include "engine/graphics/opengl/buffer.hpp"
+#include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 
+namespace sm {
     class GlVertexArray {
     public:
         using Configuration = std::function<void(GlVertexArray*)>;

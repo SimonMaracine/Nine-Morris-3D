@@ -122,8 +122,6 @@ set(ENGINE_HEADERS
     "include/engine/graphics/camera.hpp"
     "include/engine/graphics/font.hpp"
     "include/engine/graphics/framebuffer_reader.hpp"
-    "include/engine/graphics/gui.hpp"
-    "include/engine/graphics/identifier.hpp"
     "include/engine/graphics/imgui_context.hpp"
     "include/engine/graphics/light.hpp"
     "include/engine/graphics/material.hpp"
@@ -137,16 +135,12 @@ set(ENGINE_HEADERS
     "include/engine/other/dependencies.hpp"
     "include/engine/other/encrypt.hpp"
     "include/engine/other/file_system.hpp"
+    "include/engine/other/identifier.hpp"
     "include/engine/other/logging.hpp"
     "include/engine/other/mesh.hpp"
     "include/engine/other/random_gen.hpp"
     "include/engine/other/resource_manager.hpp"
     "include/engine/other/utilities.hpp"
-    "include/engine/scene/object_manager.hpp"
-    "include/engine/scene/object.hpp"
-    "include/engine/scene/renderables.hpp"
-    "include/engine/scene/scene_list.hpp"
-    "include/engine/scene/scene.hpp"
 
     # For client
     "include/engine/external/cereal.h++"
@@ -181,8 +175,6 @@ add_library(nine_morris_3d_engine STATIC
     "src/graphics/opengl/vertex_buffer_layout.cpp"
     "src/graphics/camera.cpp"
     "src/graphics/font.cpp"
-    "src/graphics/gui.cpp"
-    "src/graphics/identifier.cpp"
     "src/graphics/imgui_context.cpp"
     "src/graphics/material.cpp"
     "src/graphics/renderer.cpp"
@@ -195,14 +187,12 @@ add_library(nine_morris_3d_engine STATIC
     "src/other/random_gen.cpp"
     "src/other/resource_manager.cpp"
     "src/other/utilities.cpp"
-    "src/scene/object_manager.cpp"
-    "src/scene/scene_list.cpp"
     ${ENGINE_HEADERS}
 )
 
 target_link_libraries(nine_morris_3d_engine PRIVATE
     glad
-    assimp
+    assimp::assimp
     cppblowfish
     glfw
     OpenAL::OpenAL

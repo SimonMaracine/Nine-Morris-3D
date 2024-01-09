@@ -57,7 +57,7 @@ namespace sm {
         AlInfoDebug::maybe_check_errors();
     }
 
-    void AlSource::continue_() const {
+    void AlSource::resume() const {
         alSourcePlay(source);
 
         AlInfoDebug::maybe_check_errors();

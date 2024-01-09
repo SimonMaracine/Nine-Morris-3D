@@ -31,7 +31,7 @@ namespace sm {
 
         static bool initialize_applications(const ApplicationsData& data);
 
-        Application(const ApplicationBuilder& builder, void* user_data = nullptr);
+        Application(const ApplicationBuilder& builder, void* user_data = nullptr);  // TODO move to app properties
         ~Application();
 
         Application(const Application&) = delete;
