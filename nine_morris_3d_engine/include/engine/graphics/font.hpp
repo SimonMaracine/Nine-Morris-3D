@@ -67,9 +67,9 @@ namespace sm {
         void write_bitmap_to_file();
 
         struct BakeContext {
-            int x {0};
+            int x {};
             int y {0};
-            int max_row_height {0};
+            int max_row_height {};
             unsigned char* bitmap {nullptr};
         } bake_context;
 
@@ -77,11 +77,11 @@ namespace sm {
 
         stbtt_fontinfo* font_info {nullptr};
         const unsigned char* font_info_buffer {nullptr};
-        int bitmap_size {0};
-        int padding {0};  // Between glyphs
-        unsigned char on_edge_value {0};
-        int pixel_dist_scale {0};
-        float sf {0.0f};  // Scale factor
+        int bitmap_size {};
+        int padding {};  // Between glyphs
+        unsigned char on_edge_value {};
+        int pixel_dist_scale {};
+        float sf {};  // Scale factor
 
         std::string name;
 
@@ -91,6 +91,6 @@ namespace sm {
 
         std::weak_ptr<GlVertexBuffer> buffer;
 
-        int vertex_count {0};
+        int vertex_count {};
     };
 }

@@ -1,11 +1,17 @@
+#include "engine/audio/context.hpp"
+
 #include <AL/alc.h>
 
 #include "engine/application_base/panic.hpp"
-#include "engine/audio/context.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    OpenAlContext::OpenAlContext() {
+    OpenAlContext::OpenAlContext(bool create)
+        : create(create) {
+        if (!create) {
+            return;
+        }
+
         // Choose the default device
         device = alcOpenDevice(nullptr);
 
@@ -35,6 +41,10 @@ namespace sm {
     }
 
     OpenAlContext::~OpenAlContext() {
+        if (!create) {
+            return;
+        }
+
         alcMakeContextCurrent(nullptr);
         alcDestroyContext(context);
         alcCloseDevice(device);

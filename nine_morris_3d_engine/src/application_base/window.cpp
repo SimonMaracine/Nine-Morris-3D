@@ -48,7 +48,8 @@ namespace sm {
         return name;
     }
 
-    Window::Window(const ApplicationProperties& properties, Ctx* ctx) {
+    Window::Window(const ApplicationProperties& properties, EventDispatcher* evt)
+        : evt(evt) {
         if (!glfwInit()) {
             LOG_DIST_CRITICAL("Could not initialize GLFW");
             throw InitializationError;
@@ -94,7 +95,7 @@ namespace sm {
         }
 
         glfwSwapInterval(1);
-        glfwSetWindowUserPointer(window, ctx);
+        glfwSetWindowUserPointer(window, this);
         glfwSetWindowSizeLimits(
             window,
             properties.min_width,
@@ -227,28 +228,28 @@ namespace sm {
 
     void Window::install_callbacks() const {
         glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
-            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
+            auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            ctx->evt.enqueue<WindowClosedEvent>();
+            win->evt->enqueue<WindowClosedEvent>();
         });
 
         glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
+            auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            ctx->win->width = width;
-            ctx->win->height = height;
+            win->width = width;
+            win->height = height;
 
-            ctx->evt.enqueue<WindowResizedEvent>(width, height);
+            win->evt->enqueue<WindowResizedEvent>(width, height);
         });
 
         glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {
-            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
+            auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            ctx->evt.enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
+            win->evt->enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
         });
 
         glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
+            auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
             switch (action) {
                 case GLFW_PRESS:
@@ -256,7 +257,7 @@ namespace sm {
                         return;
                     }
 
-                    ctx->evt.enqueue<KeyPressedEvent>(
+                    win->evt->enqueue<KeyPressedEvent>(
                         Input::key_from_code(key),
                         false,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -268,7 +269,7 @@ namespace sm {
                         return;
                     }
 
-                    ctx->evt.enqueue<KeyReleasedEvent>(Input::key_from_code(key));
+                    win->evt->enqueue<KeyReleasedEvent>(Input::key_from_code(key));
 
                     break;
                 case GLFW_REPEAT:
@@ -276,7 +277,7 @@ namespace sm {
                         return;
                     }
 
-                    ctx->evt.enqueue<KeyPressedEvent>(
+                    win->evt->enqueue<KeyPressedEvent>(
                         Input::key_from_code(key),
                         true,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -295,7 +296,7 @@ namespace sm {
         });
 
         glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
-            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
+            auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
             switch (action) {
                 case GLFW_PRESS:
@@ -303,7 +304,7 @@ namespace sm {
                         return;
                     }
 
-                    ctx->evt.enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
+                    win->evt->enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
 
                     break;
                 case GLFW_RELEASE:
@@ -311,30 +312,30 @@ namespace sm {
                         return;
                     }
 
-                    ctx->evt.enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
+                    win->evt->enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
 
                     break;
             }
         });
 
         glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
-            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
+            auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
             if (DearImGuiContext::on_mouse_wheel_scrolled(static_cast<float>(yoffset))) {
                 return;
             }
 
-            ctx->evt.enqueue<MouseWheelScrolledEvent>(static_cast<float>(yoffset));
+            win->evt->enqueue<MouseWheelScrolledEvent>(static_cast<float>(yoffset));
         });
 
         glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
+            auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
             if (DearImGuiContext::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
                 return;
             }
 
-            ctx->evt.enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
+            win->evt->enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
         });
     }
 }

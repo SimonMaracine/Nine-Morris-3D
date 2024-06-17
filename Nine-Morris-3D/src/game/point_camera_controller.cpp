@@ -1,6 +1,3 @@
-#include <engine/nine_morris_3d.hpp>
-#include <engine/external/glm.h++>
-
 #include "game/point_camera_controller.hpp"
 
 static constexpr float ZOOM_BASE_VELOCITY {0.03f};

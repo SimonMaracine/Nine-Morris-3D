@@ -30,7 +30,7 @@ namespace sm {
 
         static bool initialize_applications(const ApplicationsData& data);
 
-        Application(const ApplicationProperties& properties);
+        explicit Application(const ApplicationProperties& properties);
         ~Application();
 
         Application(const Application&) = delete;
@@ -62,7 +62,6 @@ namespace sm {
         void prepare_scenes(SceneId start_scene_id);
         void user_start_function();
         void user_stop_function();
-        void initialize_audio();
 
         void on_window_closed(const WindowClosedEvent&);
         void on_window_resized(const WindowResizedEvent& event);
@@ -77,14 +76,14 @@ namespace sm {
 
         // Clock variables
         struct {
-            double previous_seconds {0.0};
-            double total_time {0.0};
-            int frame_count {0};
+            double previous_seconds {};
+            double total_time {};
+            int frame_count {};
         } frame_counter;
 
         struct {
-            double previous_seconds {0.0};
-            double total_time {0.0};
+            double previous_seconds {};
+            double total_time {};
         } fixed_update;
 
         friend class Scene;

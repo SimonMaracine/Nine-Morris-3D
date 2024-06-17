@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.20)
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB_RECURSE GAME_HEADERS "src/*.hpp")
 
-# Add WIN32 option for Windows in release mode
+# Add WIN32 option for Windows in release + distribution mode
 if(WIN32)
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NM3D_DISTRIBUTION_MODE)
         set(GUI_EXECUTABLE_WINDOWS WIN32)
     endif()
 endif()
@@ -15,9 +15,9 @@ add_executable(Nine-Morris-3D "${GUI_EXECUTABLE_WINDOWS}"
     ${GAME_HEADERS}
 )
 
-target_link_libraries(Nine-Morris-3D PRIVATE nine_morris_3d_engine)
-
 target_include_directories(Nine-Morris-3D PRIVATE "src")
+
+target_link_libraries(Nine-Morris-3D PRIVATE nine_morris_3d_engine)
 
 if(UNIX)
     target_compile_options(Nine-Morris-3D PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")

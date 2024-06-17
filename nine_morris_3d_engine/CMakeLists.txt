@@ -228,15 +228,13 @@ set_target_properties(nine_morris_3d_engine PROPERTIES CXX_EXTENSIONS OFF)
 # Add compile definitions for engine and client and others
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     # Optimization on
-    target_compile_definitions(nine_morris_3d_engine PUBLIC
-        "NM3D_RELEASE_MODE"  # Just a flag used by platform.hpp
-        "ENTT_DISABLE_ASSERT"
-    )
+    target_compile_definitions(nine_morris_3d_engine PUBLIC "NM3D_RELEASE_MODE")  # Just a flag used by platform.hpp
 
     if(NM3D_DISTRIBUTION_MODE)
         target_compile_definitions(nine_morris_3d_engine PUBLIC
             "NM3D_DISTRIBUTION_MODE"  # Another flag used by platform.hpp
             "NDEBUG"  # Disable asserts globally
+            "ENTT_DISABLE_ASSERT"
         )
     endif()
 endif()

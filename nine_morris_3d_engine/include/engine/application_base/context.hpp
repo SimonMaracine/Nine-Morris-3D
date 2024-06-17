@@ -4,7 +4,6 @@
 
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/window.hpp"
-#include "engine/application_base/input.hpp"
 #include "engine/application_base/tasks.hpp"
 #include "engine/application_base/properties.hpp"
 #include "engine/audio/context.hpp"
@@ -16,12 +15,14 @@
 namespace sm {
     class Application;
 
-    // Wrapper around public functionality exposed to the user
+    // Wrapper around functionality exposed to the user
     class Ctx {
     public:
         using SceneId = Scene::SceneId;
 
-        Ctx() = default;
+        explicit Ctx(const ApplicationProperties& properties)
+            : win(properties, &evt), rnd(properties.width, properties.height), snd(properties.audio) {}
+
         ~Ctx() = default;
 
         Ctx(const Ctx&) = delete;
@@ -38,19 +39,17 @@ namespace sm {
         }
 
         bool running {true};
-        int exit_code {0};
-        float delta {0.0f};
-        double fps {0.0};
+        int exit_code {};
+        float delta {};
+        double fps {};
 
-        // const ApplicationProperties* properties {nullptr};  // Application data
-
-        std::unique_ptr<Window> win;  // One of the last objects destroyed in an application instance
-        std::unique_ptr<OpenAlContext> snd;  // Sound context
-        std::unique_ptr<Renderer> rnd;  // Renderer for 3D, 2D and debug
-        RandomGenerator rng;  // Random number generator
         EventDispatcher evt;  // Manager of application events
+        Window win;  // One of the last objects destroyed in an application instance
+        Renderer rnd;  // Renderer for 3D, 2D and debug
+        OpenAlContext snd;  // Audio context
         ResourcesCache res;  // Global cache of resources
         TaskManager tsk;  // Manager of general purpose procedures
+        RandomGenerator rng;  // Random number generator
     private:
         void* user_data {nullptr};  // Arbitrary data defined by the user
         Application* application {nullptr};

@@ -49,7 +49,7 @@ namespace sm {
         // Store references to pixel buffers and framebuffers
         std::array<std::shared_ptr<GlPixelBuffer>, BufferCount> buffers;
         std::shared_ptr<GlFramebuffer> framebuffer;
-        std::size_t buffer_index {0};
-        std::size_t next_buffer_index {0};
+        std::size_t buffer_index {};
+        std::size_t next_buffer_index {};
     };
 }

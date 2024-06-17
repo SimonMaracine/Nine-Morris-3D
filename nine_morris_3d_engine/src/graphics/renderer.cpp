@@ -12,6 +12,7 @@
 #include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
+#include "engine/graphics/opengl/info_and_debug.hpp"
 #include "engine/graphics/material.hpp"
 #include "engine/graphics/opengl/opengl.hpp"
 #include "engine/graphics/camera.hpp"
@@ -27,6 +28,9 @@ namespace sm {
     static constexpr std::size_t SHADER_POINT_LIGHTS {4};
 
     Renderer::Renderer(int width, int height) {
+        GlInfoDebug::maybe_initialize_debugging();  // TODO not great here
+        OpenGl::initialize_default();
+
         OpenGl::enable_depth_test();
         OpenGl::clear_color(0.0f, 0.0f, 0.0f);
 

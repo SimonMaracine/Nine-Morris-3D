@@ -13,7 +13,6 @@
 #include "engine/graphics/dear_imgui_context.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/file_system.hpp"
-#include "engine/other/random_gen.hpp"
 
 namespace sm {
     bool Application::initialize_applications(const ApplicationsData& data) {
@@ -33,31 +32,20 @@ namespace sm {
         return true;
     }
 
-    Application::Application(const ApplicationProperties& properties) {
-        LOG_INFO("Initializing application...");
-
+    Application::Application(const ApplicationProperties& properties)
+        : ctx(properties) {
         ctx.application = this;
         ctx.user_data = properties.user_data;
-        ctx.win = std::make_unique<Window>(properties, &ctx);
 
-        Input::initialize(ctx.win->get_handle());
-        DearImGuiContext::initialize(ctx.win->get_handle());
+        Input::initialize(ctx.win.get_handle());
+        DearImGuiContext::initialize(ctx.win.get_handle());
 
 #ifndef SM_BUILD_DISTRIBUTION
         Logging::log_general_information(Logging::LogTarget::Console);
 #endif
 
-        GlInfoDebug::maybe_initialize_debugging();
-        OpenGl::initialize_default();
-
         const auto [version_major, version_minor] {GlInfoDebug::get_version_number()};
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
-
-        ctx.rnd = std::make_unique<Renderer>(properties.width, properties.height);
-
-        if (properties.audio) {
-            initialize_audio();
-        }
 
         ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
         ctx.evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);
@@ -77,9 +65,9 @@ namespace sm {
 
         user_start_function();
         current_scene->on_start();
-        ctx.rnd->prerender_setup();
+        ctx.rnd.prerender_setup();
 
-        ctx.win->show();
+        ctx.win.show();
         LOG_INFO("Initialized application, entering main loop...");
 
         while (ctx.running) {
@@ -93,10 +81,10 @@ namespace sm {
             current_scene->on_update();
             ctx.tsk.update();
 
-            ctx.rnd->render(ctx.win->get_width(), ctx.win->get_height());
+            ctx.rnd.render(ctx.win.get_width(), ctx.win.get_height());
             dear_imgui_render();
 
-            ctx.win->update();
+            ctx.win.update();
             ctx.evt.update();
 
             check_changed_scene();
@@ -104,7 +92,7 @@ namespace sm {
 
         LOG_INFO("Closing application...");
 
-        ctx.rnd->postrender_setup();
+        ctx.rnd.postrender_setup();
         current_scene->on_stop();
         user_stop_function();
 
@@ -165,7 +153,7 @@ namespace sm {
 
     void Application::check_changed_scene() {
         if (next_scene != nullptr) {
-            ctx.rnd->postrender_setup();
+            ctx.rnd.postrender_setup();
             current_scene->on_stop();
 
             // Clear all cached resources
@@ -179,7 +167,7 @@ namespace sm {
             next_scene = nullptr;
 
             current_scene->on_start();
-            ctx.rnd->prerender_setup();
+            ctx.rnd.prerender_setup();
         }
 
         assert(next_scene == nullptr);
@@ -215,17 +203,11 @@ namespace sm {
         stop(&ctx);
     }
 
-    void Application::initialize_audio() {
-        LOG_INFO("With audio");
-
-        ctx.snd = std::make_unique<OpenAlContext>();
-    }
-
     void Application::on_window_closed(const WindowClosedEvent&) {
         ctx.running = false;
     }
 
     void Application::on_window_resized(const WindowResizedEvent& event) {
-        ctx.rnd->resize_framebuffers(event.width, event.height);
+        ctx.rnd.resize_framebuffers(event.width, event.height);
     }
 }

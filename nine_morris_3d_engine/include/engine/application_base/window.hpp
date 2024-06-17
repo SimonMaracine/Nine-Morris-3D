@@ -9,6 +9,7 @@
 #include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/properties.hpp"
+#include "engine/application_base/events.hpp"
 
 struct GLFWwindow;
 struct GLFWcursor;
@@ -37,7 +38,7 @@ namespace sm {
         using CursorId = resmanager::HashedStr64;
         using CursorHash = resmanager::Hash<CursorId>;
 
-        Window(const ApplicationProperties& properties, Ctx* ctx);
+        Window(const ApplicationProperties& properties, EventDispatcher* evt);
         ~Window();
 
         Window(const Window&) = delete;
@@ -71,6 +72,7 @@ namespace sm {
         GLFWwindow* window {nullptr};
         Monitors monitors;
         std::unordered_map<CursorId, GLFWcursor*, CursorHash> cursors;
+        EventDispatcher* evt {nullptr};
 
         friend class Application;
     };

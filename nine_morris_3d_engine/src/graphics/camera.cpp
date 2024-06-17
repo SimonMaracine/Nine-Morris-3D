@@ -1,7 +1,6 @@
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "engine/graphics/camera.hpp"
+
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace sm {
     void Camera::set_position_orientation(const glm::vec3& position, const glm::vec3& at, const glm::vec3& up) {

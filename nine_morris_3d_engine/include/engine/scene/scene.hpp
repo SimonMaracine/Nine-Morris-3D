@@ -14,14 +14,14 @@ namespace sm {
     public:
         using SceneId = resmanager::HashedStr64;
 
-        Scene(const std::string& name)
+        explicit Scene(const std::string& name)
             : name(name), id(SceneId(name)) {}
         virtual ~Scene() = default;
 
-        Scene(const Scene&) = delete;
-        Scene& operator=(const Scene&) = delete;
-        Scene(Scene&&) = delete;
-        Scene& operator=(Scene&&) = delete;
+        Scene(const Scene&) = default;
+        Scene& operator=(const Scene&) = default;
+        Scene(Scene&&) = default;
+        Scene& operator=(Scene&&) = default;
 
         virtual void on_start() {}  // Called when the scene is entered
         virtual void on_stop() {}  // Called when the scene is exited

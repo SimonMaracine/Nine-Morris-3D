@@ -48,7 +48,7 @@ namespace sm {
         shader = material->shader;
         flags = material->flags;
 
-        std::size_t offset {0};
+        std::size_t offset {};
 
         for (const auto& name : material->uniforms_mat4) {
             Element element;

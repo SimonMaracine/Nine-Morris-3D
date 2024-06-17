@@ -9,7 +9,7 @@ namespace sm {
         bool native_resolution {true};
         bool resizable {true};
         bool audio {false};
-        int width {1280};  // Initial width and height
+        int width {1280};
         int height {720};
         int min_width {-1};
         int min_height {-1};

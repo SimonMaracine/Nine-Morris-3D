@@ -35,7 +35,7 @@ namespace sm {
                 case Task::Result::Continue:
                     tasks_next.push_back(task);
                     break;
-                case Task::Result::Again:
+                case Task::Result::Repeat:
                     // FIXME
                     break;
             }

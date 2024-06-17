@@ -14,7 +14,7 @@ namespace sm {
         enum class Result {
             Done,
             Continue,
-            Again
+            Repeat
         };
 
         using TaskId = resmanager::HashedStr64;

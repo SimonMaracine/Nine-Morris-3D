@@ -54,7 +54,7 @@ namespace sm {
         std::vector<Key> uniforms_vec4;
         std::vector<Key> textures;
 
-        unsigned int flags {0};
+        unsigned int flags {};
 
         friend class MaterialInstance;
     };
@@ -64,7 +64,7 @@ namespace sm {
         using Key = Material::Key;
         using KeyHash = resmanager::Hash<Key>;
 
-        MaterialInstance(std::shared_ptr<Material> material);
+        explicit MaterialInstance(std::shared_ptr<Material> material);
         ~MaterialInstance();
 
         MaterialInstance(const MaterialInstance&) = delete;
@@ -86,7 +86,7 @@ namespace sm {
         const GlShader* get_shader() const { return shader.get(); }
 
         // It's okay to be public
-        unsigned int flags {0};
+        unsigned int flags {};
     private:
         struct Element {
             enum class Type {
@@ -99,19 +99,19 @@ namespace sm {
                 Texture
             } type {};
 
-            std::size_t offset {0};
+            std::size_t offset {};
         };
 
         struct Texture {
-            int unit {0};
-            unsigned int texture {0};
+            int unit {};
+            unsigned int texture {};
         };
 
         // Material instances own shaders
         std::shared_ptr<GlShader> shader;
 
         unsigned char* data {nullptr};
-        std::size_t size {0};
+        std::size_t size {};
 
         std::unordered_map<Key, Element, KeyHash> offsets;
     };

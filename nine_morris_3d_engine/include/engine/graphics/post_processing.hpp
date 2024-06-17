@@ -16,10 +16,10 @@ namespace sm {
             : framebuffer(framebuffer), shader(shader) {}
         virtual ~PostProcessingStep() = default;
 
-        PostProcessingStep(const PostProcessingStep&) = delete;
-        PostProcessingStep& operator=(const PostProcessingStep&) = delete;
-        PostProcessingStep(PostProcessingStep&&) = delete;
-        PostProcessingStep& operator=(PostProcessingStep&&) = delete;
+        PostProcessingStep(const PostProcessingStep&) = default;
+        PostProcessingStep& operator=(const PostProcessingStep&) = default;
+        PostProcessingStep(PostProcessingStep&&) noexcept = default;
+        PostProcessingStep& operator=(PostProcessingStep&&) noexcept = default;
 
         virtual void render(const PostProcessingContext& context) const = 0;
         virtual void prepare(const PostProcessingContext& context) const = 0;
@@ -34,7 +34,7 @@ namespace sm {
     struct PostProcessingContext {
         std::vector<std::unique_ptr<PostProcessingStep>> steps;
         std::vector<unsigned int> textures;  // All textures in order
-        unsigned int last_texture {0};  // Last texture at any moment in the processing pipeline
-        unsigned int original_texture {0};
+        unsigned int last_texture {};  // Last texture at any moment in the processing pipeline
+        unsigned int original_texture {};
     };
 }

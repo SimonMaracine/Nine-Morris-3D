@@ -8,7 +8,7 @@ struct ALCcontext;
 namespace sm {
     class OpenAlContext {
     public:
-        OpenAlContext();
+        explicit OpenAlContext(bool create = true);
         ~OpenAlContext();
 
         OpenAlContext(const OpenAlContext&) = delete;
@@ -18,6 +18,7 @@ namespace sm {
 
         AlListener& get_listener() { return listener; }
     private:
+        bool create {};
         AlListener listener;
 
         ALCdevice* device {nullptr};
