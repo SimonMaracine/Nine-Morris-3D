@@ -17,7 +17,6 @@
 #include "engine/graphics/imgui_context.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
-#include "engine/other/encrypt.hpp"
 #include "engine/other/file_system.hpp"
 #include "engine/other/random_gen.hpp"
 #include "engine/scene/scene.hpp"
@@ -71,7 +70,6 @@ namespace sm {
 
         GlInfoDebug::maybe_initialize_debugging();
         Gl::initialize_default();
-        Encrypt::initialize(builder.encryption_key);
 
         const auto [version_major, version_minor] {GlInfoDebug::get_version_number()};
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);

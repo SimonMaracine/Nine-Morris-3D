@@ -3,13 +3,11 @@
 #include <string>
 #include <cstddef>
 
-#include "engine/other/encrypt.hpp"
 
 namespace sm {
     class SoundData {
     public:
         SoundData(const std::string& file_path);
-        SoundData(const EncrFile& file_path);
         ~SoundData();
 
         SoundData(const SoundData&) = delete;

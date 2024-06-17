@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.20)
 set(BUILD_SHARED_LIBS OFF)
 
 # Assimp
-set(USE_STATIC_CRT ON)  # Windows stuff
+# set(USE_STATIC_CRT ON)  # FIXME
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_INSTALL OFF)
 set(ASSIMP_INSTALL_PDB OFF)
@@ -16,7 +16,7 @@ set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON)
 
 # GLFW
-set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)  # Windows stuff
+# set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)  # FIXME
 set(GLFW_INSTALL OFF)
 set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_TESTS OFF)
@@ -32,11 +32,10 @@ set(ALSOFT_INSTALL_AMBDEC_PRESETS OFF)
 set(ALSOFT_INSTALL_EXAMPLES OFF)
 set(ALSOFT_INSTALL_UTILS OFF)
 set(ALSOFT_UPDATE_BUILD_VERSION OFF)
-set(LIBTYPE "STATIC")  # To make static library
+set(LIBTYPE "STATIC")
 
 # Make glad
 add_library(glad STATIC "extern/glad/src/glad.c")
-
 target_include_directories(glad PUBLIC "extern/glad/include")
 
 # Make stb
@@ -77,11 +76,9 @@ target_include_directories(dear_imgui PRIVATE "extern/glfw/include")
 
 # Make cereal
 add_library(cereal INTERFACE)  # FIXME use submodule
-
 target_include_directories(cereal INTERFACE "extern/cereal/include")
 
 add_subdirectory(extern/assimp)
-add_subdirectory(extern/cppblowfish)
 add_subdirectory(extern/entt)
 add_subdirectory(extern/glfw)
 add_subdirectory(extern/glm)
@@ -90,7 +87,43 @@ add_subdirectory(extern/resmanager)
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/utfcpp)
 
-set(ENGINE_HEADERS
+add_library(nine_morris_3d_engine STATIC
+    "src/application_base/application_builder.cpp"
+    "src/application_base/application.cpp"
+    "src/application_base/capabilities.cpp"
+    "src/application_base/context.cpp"
+    "src/application_base/input.cpp"
+    "src/application_base/tasks.cpp"
+    "src/application_base/window.cpp"
+    "src/audio/openal/buffer.cpp"
+    "src/audio/openal/info_and_debug.cpp"
+    "src/audio/openal/listener.cpp"
+    "src/audio/openal/source.cpp"
+    "src/audio/context.cpp"
+    "src/audio/music.cpp"
+    "src/audio/sound_data.cpp"
+    "src/graphics/opengl/buffer.cpp"
+    "src/graphics/opengl/framebuffer.cpp"
+    "src/graphics/opengl/gl.cpp"
+    "src/graphics/opengl/info_and_debug.cpp"
+    "src/graphics/opengl/shader.cpp"
+    "src/graphics/opengl/texture.cpp"
+    "src/graphics/opengl/vertex_array.cpp"
+    "src/graphics/opengl/vertex_buffer_layout.cpp"
+    "src/graphics/camera.cpp"
+    "src/graphics/font.cpp"
+    "src/graphics/imgui_context.cpp"
+    "src/graphics/material.cpp"
+    "src/graphics/renderer.cpp"
+    "src/graphics/texture_data.cpp"
+    "src/other/dependencies.cpp"
+    "src/other/file_system.cpp"
+    "src/other/logging.cpp"
+    "src/other/mesh.cpp"
+    "src/other/random_gen.cpp"
+    "src/other/resource_manager.cpp"
+    "src/other/utilities.cpp"
+
     "include/engine/application_base/application_builder.hpp"
     "include/engine/application_base/application_properties.hpp"
     "include/engine/application_base/application.hpp"
@@ -133,7 +166,6 @@ set(ENGINE_HEADERS
     "include/engine/other/camera_controller.hpp"
     "include/engine/other/concurrent_loader.hpp"
     "include/engine/other/dependencies.hpp"
-    "include/engine/other/encrypt.hpp"
     "include/engine/other/file_system.hpp"
     "include/engine/other/identifier.hpp"
     "include/engine/other/logging.hpp"
@@ -150,50 +182,9 @@ set(ENGINE_HEADERS
     "include/engine/nine_morris_3d.hpp"
 )
 
-add_library(nine_morris_3d_engine STATIC
-    "src/application_base/application_builder.cpp"
-    "src/application_base/application.cpp"
-    "src/application_base/capabilities.cpp"
-    "src/application_base/context.cpp"
-    "src/application_base/input.cpp"
-    "src/application_base/tasks.cpp"
-    "src/application_base/window.cpp"
-    "src/audio/openal/buffer.cpp"
-    "src/audio/openal/info_and_debug.cpp"
-    "src/audio/openal/listener.cpp"
-    "src/audio/openal/source.cpp"
-    "src/audio/context.cpp"
-    "src/audio/music.cpp"
-    "src/audio/sound_data.cpp"
-    "src/graphics/opengl/buffer.cpp"
-    "src/graphics/opengl/framebuffer.cpp"
-    "src/graphics/opengl/gl.cpp"
-    "src/graphics/opengl/info_and_debug.cpp"
-    "src/graphics/opengl/shader.cpp"
-    "src/graphics/opengl/texture.cpp"
-    "src/graphics/opengl/vertex_array.cpp"
-    "src/graphics/opengl/vertex_buffer_layout.cpp"
-    "src/graphics/camera.cpp"
-    "src/graphics/font.cpp"
-    "src/graphics/imgui_context.cpp"
-    "src/graphics/material.cpp"
-    "src/graphics/renderer.cpp"
-    "src/graphics/texture_data.cpp"
-    "src/other/dependencies.cpp"
-    "src/other/encrypt.cpp"
-    "src/other/file_system.cpp"
-    "src/other/logging.cpp"
-    "src/other/mesh.cpp"
-    "src/other/random_gen.cpp"
-    "src/other/resource_manager.cpp"
-    "src/other/utilities.cpp"
-    ${ENGINE_HEADERS}
-)
-
 target_link_libraries(nine_morris_3d_engine PRIVATE
     glad
     assimp::assimp
-    cppblowfish
     glfw
     OpenAL::OpenAL
     utf8cpp
@@ -213,16 +204,16 @@ target_include_directories(nine_morris_3d_engine PUBLIC "include")
 
 # Enable warnings only for engine
 if(UNIX)
-    target_compile_options(nine_morris_3d_engine PRIVATE "-Wall" "-Wextra" "-Wpedantic")
+    target_compile_options(nine_morris_3d_engine PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")
 elseif(WIN32)
-    target_compile_options(nine_morris_3d_engine PRIVATE "/W3")
+    target_compile_options(nine_morris_3d_engine PRIVATE "/W4")
 endif()
 
 # Enable sanitizing in debug mode for GCC
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(UNIX)
-        target_compile_options(nine_morris_3d_engine PRIVATE "-fsanitize=undefined" "-g")
-        target_link_options(nine_morris_3d_engine PRIVATE "-static-libasan" "-fsanitize=undefined")
+    if(UNIX AND NM3D_ASAN)
+        target_compile_options(nine_morris_3d_engine PRIVATE "-fsanitize=address" "-fsanitize=undefined" "-g" "-fno-omit-frame-pointer")
+        target_link_options(nine_morris_3d_engine PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 
         message(STATUS "Nine-Morris-3D: Building engine with sanitizers")
     endif()

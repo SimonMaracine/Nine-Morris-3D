@@ -11,7 +11,6 @@
 #include <resmanager/resmanager.hpp>
 
 #include "engine/graphics/opengl/buffer.hpp"
-#include "engine/other/encrypt.hpp"
 
 namespace sm {
     class Renderer;
@@ -22,7 +21,6 @@ namespace sm {
         using KeyHash = resmanager::Hash<Key>;
 
         GlShader(const std::string& source_vertex, const std::string& source_fragment);
-        GlShader(const EncrFile& source_vertex, const EncrFile& source_fragment);
         ~GlShader();
 
         GlShader(const GlShader&) = delete;

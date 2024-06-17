@@ -1,7 +1,7 @@
-/old
-.vscode/
-build/
-/build-release
+old
+.vscode
+build
+build-release
 *.log
 info.txt
 ninemorris3d_info.txt
@@ -9,9 +9,7 @@ imgui.ini
 *.blend1
 bitmap_*.png
 *.dat
-encrypter_helper/encrypter_helper
-encrypter_helper/encrypter_helper.exe
-/data-filtered
-/engine_data-filtered
-/renderdoc_captures
+data-filtered
+engine_data-filtered
+renderdoc_captures
 *.aup3-wal

@@ -5,7 +5,6 @@
 #include "engine/audio/openal/buffer.hpp"
 #include "engine/audio/music.hpp"
 #include "engine/audio/sound_data.hpp"
-#include "engine/other/encrypt.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
 
@@ -20,15 +19,15 @@ namespace sm {
         LOG_DEBUG("Loaded music track `{}`", name);
     }
 
-    MusicTrack::MusicTrack(const EncrFile& file_path) {
-        const auto data {std::make_shared<SoundData>(file_path)};
+    // MusicTrack::MusicTrack(const EncrFile& file_path) {
+    //     const auto data {std::make_shared<SoundData>(file_path)};
 
-        setup(data);
+    //     setup(data);
 
-        name = file_path;
+    //     name = file_path;
 
-        LOG_DEBUG("Loaded music track `{}`", name);
-    }
+    //     LOG_DEBUG("Loaded music track `{}`", name);
+    // }
 
     MusicTrack::MusicTrack(std::shared_ptr<SoundData> data) {
         setup(data);

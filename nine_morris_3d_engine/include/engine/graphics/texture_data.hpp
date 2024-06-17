@@ -2,13 +2,10 @@
 
 #include <string>
 
-#include "engine/other/encrypt.hpp"
-
 namespace sm {
     class TextureData {
     public:
         TextureData(const std::string& file_path, bool flip = false);
-        TextureData(const EncrFile& file_path, bool flip = false);
         ~TextureData();
 
         TextureData(const TextureData&) = delete;

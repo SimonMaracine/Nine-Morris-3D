@@ -6,7 +6,6 @@
 #include "engine/graphics/texture_data.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
-#include "engine/other/encrypt.hpp"
 
 namespace sm {
     static constexpr int CHANNELS {4};
@@ -26,22 +25,22 @@ namespace sm {
         }
     }
 
-    TextureData::TextureData(const EncrFile& file_path, bool flip)
-        : file_path(file_path) {
-        LOG_DEBUG("Loading texture data `{}`...", file_path);
+    // TextureData::TextureData(const EncrFile& file_path, bool flip)
+    //     : file_path(file_path) {
+    //     LOG_DEBUG("Loading texture data `{}`...", file_path);
 
-        stbi_set_flip_vertically_on_load(static_cast<int>(flip));
+    //     stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
-        const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
+    //     const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
 
-        int channels;
-        data = stbi_load_from_memory(buffer, buffer_size, &width, &height, &channels, CHANNELS);
+    //     int channels;
+    //     data = stbi_load_from_memory(buffer, buffer_size, &width, &height, &channels, CHANNELS);
 
-        if (data == nullptr) {
-            LOG_DIST_CRITICAL("Could not load texture data `{}`", file_path);
-            throw ResourceLoadingError;
-        }
-    }
+    //     if (data == nullptr) {
+    //         LOG_DIST_CRITICAL("Could not load texture data `{}`", file_path);
+    //         throw ResourceLoadingError;
+    //     }
+    // }
 
     TextureData::~TextureData() {
         SM_ASSERT(data != nullptr, "No data");

@@ -16,9 +16,6 @@
 [submodule "nine_morris_3d_engine/extern/utfcpp"]
 	path = nine_morris_3d_engine/extern/utfcpp
 	url = https://github.com/SimonMaracine/utfcpp.git
-[submodule "nine_morris_3d_engine/extern/cppblowfish"]
-	path = nine_morris_3d_engine/extern/cppblowfish
-	url = https://github.com/SimonMaracine/cppblowfish.git
 [submodule "nine_morris_3d_engine/extern/entt"]
 	path = nine_morris_3d_engine/extern/entt
 	url = https://github.com/SimonMaracine/entt.git

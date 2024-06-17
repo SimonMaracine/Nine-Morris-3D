@@ -29,6 +29,8 @@ Hopefully an Android version will be made.
 - Indie
 - 3D
 
+<!-- TODO things have chaged -->
+
 ### Exporting on Linux
 
 - Create a new directory called **_Nine-Morris-3D-vX.Y.Z-Linux_**

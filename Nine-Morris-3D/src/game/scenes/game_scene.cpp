@@ -25,7 +25,7 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            sm::Encrypt::encr(sm::FileSystem::path_assets("models/dragon.obj")),
+            sm::FileSystem::path_assets("models/dragon.obj"),
             "default",
             sm::Mesh::Type::PN
         )};
@@ -53,7 +53,7 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            sm::Encrypt::encr(sm::FileSystem::path_assets("models/teapot.obj")),
+            sm::FileSystem::path_assets("models/teapot.obj"),
             sm::Mesh::DEFAULT_OBJECT,
             sm::Mesh::Type::PN
         )};
@@ -81,7 +81,7 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            sm::Encrypt::encr(sm::FileSystem::path_assets("scene/scene.obj")),
+            sm::FileSystem::path_assets("scene/scene.obj"),
             "Cube_Cube.001",
             sm::Mesh::Type::PN
         )};
@@ -108,8 +108,8 @@ void GameScene::on_start() {
     }
 
     auto shader {std::make_shared<sm::GlShader>(
-        sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.vert")),
-        sm::Encrypt::encr(sm::FileSystem::path_assets("shaders/simple.frag"))
+        sm::FileSystem::path_assets("shaders/simple.vert"),
+        sm::FileSystem::path_assets("shaders/simple.frag")
     )};
 
     ctx->rnd->add_shader(shader);

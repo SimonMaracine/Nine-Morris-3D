@@ -6,7 +6,6 @@
 #include "engine/audio/openal/source.hpp"
 #include "engine/audio/openal/buffer.hpp"
 #include "engine/audio/sound_data.hpp"
-#include "engine/other/encrypt.hpp"
 
 namespace sm {
     /*
@@ -19,7 +18,6 @@ namespace sm {
     class MusicTrack {
     public:
         MusicTrack(const std::string& file_path);
-        MusicTrack(const EncrFile& file_path);
         MusicTrack(std::shared_ptr<SoundData> data);
         ~MusicTrack();
 

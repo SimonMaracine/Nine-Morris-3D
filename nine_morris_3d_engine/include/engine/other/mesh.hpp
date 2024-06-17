@@ -3,8 +3,6 @@
 #include <cstddef>
 #include <string>
 
-#include "engine/other/encrypt.hpp"
-
 namespace sm {
     class Mesh {
     public:
@@ -18,7 +16,6 @@ namespace sm {
         static constexpr const char* DEFAULT_OBJECT {"defaultobject"};
 
         Mesh(const std::string& file_path, const std::string& object_name, Type type, bool flip_winding = false);
-        Mesh(const EncrFile& file_path, const std::string& object_name, Type type, bool flip_winding = false);
         ~Mesh();
 
         Mesh(const Mesh&) = delete;

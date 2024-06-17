@@ -11,7 +11,6 @@
 #include "engine/graphics/renderer.hpp"
 #include "engine/other/resource_manager.hpp"
 #include "engine/other/random_gen.hpp"
-#include "engine/other/encrypt.hpp"
 #include "engine/other/assert.hpp"
 #include "engine/scene/scene.hpp"
 

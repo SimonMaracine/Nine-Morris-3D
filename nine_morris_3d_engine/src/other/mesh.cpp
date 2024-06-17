@@ -10,7 +10,6 @@
 #include "engine/application_base/panic.hpp"
 #include "engine/other/mesh.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/encrypt.hpp"
 
 namespace sm {
     struct VertexP {
@@ -163,43 +162,43 @@ namespace sm {
         load(type, mesh, file_path);
     }
 
-    Mesh::Mesh(const EncrFile& file_path, const std::string& object_name, Type type, bool flip_winding) {
-        unsigned int flags {aiProcess_ValidateDataStructure};
+    // Mesh::Mesh(const EncrFile& file_path, const std::string& object_name, Type type, bool flip_winding) {
+    //     unsigned int flags {aiProcess_ValidateDataStructure};
 
-        if (flip_winding) {
-            flags |= aiProcess_FlipWindingOrder;
-        }
+    //     if (flip_winding) {
+    //         flags |= aiProcess_FlipWindingOrder;
+    //     }
 
-        if (type == Type::PTNT) {
-            flags |= aiProcess_CalcTangentSpace;
-        }
+    //     if (type == Type::PTNT) {
+    //         flags |= aiProcess_CalcTangentSpace;
+    //     }
 
-        if (type != Type::P) {
-            flags |= aiProcess_GenNormals;
-        }
+    //     if (type != Type::P) {
+    //         flags |= aiProcess_GenNormals;
+    //     }
 
-        const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
+    //     const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
 
-        Assimp::Importer importer;
+    //     Assimp::Importer importer;
 
-        const aiScene* scene {importer.ReadFileFromMemory(buffer, buffer_size, flags)};
+    //     const aiScene* scene {importer.ReadFileFromMemory(buffer, buffer_size, flags)};
 
-        if (scene == nullptr) {
-            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
-            LOG_DIST_CRITICAL("Assimp: ", importer.GetErrorString());
-            throw ResourceLoadingError;
-        }
+    //     if (scene == nullptr) {
+    //         LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
+    //         LOG_DIST_CRITICAL("Assimp: ", importer.GetErrorString());
+    //         throw ResourceLoadingError;
+    //     }
 
-        const aiNode* root_node {scene->mRootNode};
-        const aiMesh* mesh {find_mesh(root_node, object_name, scene)};
+    //     const aiNode* root_node {scene->mRootNode};
+    //     const aiMesh* mesh {find_mesh(root_node, object_name, scene)};
 
-        if (mesh == nullptr) {
-            LOG_CRITICAL("Model file `{}` does not contain mesh `{}`", file_path, object_name);
-            throw ResourceLoadingError;
-        }
+    //     if (mesh == nullptr) {
+    //         LOG_CRITICAL("Model file `{}` does not contain mesh `{}`", file_path, object_name);
+    //         throw ResourceLoadingError;
+    //     }
 
-        load(type, mesh, file_path);
-    }
+    //     load(type, mesh, file_path);
+    // }
 
     Mesh::~Mesh() {
         delete[] vertices;

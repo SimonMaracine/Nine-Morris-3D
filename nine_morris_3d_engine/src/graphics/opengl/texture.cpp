@@ -16,7 +16,6 @@
 #include "engine/graphics/texture_data.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
-#include "engine/other/encrypt.hpp"
 #include "engine/other/utilities.hpp"
 
 namespace sm {
@@ -141,38 +140,38 @@ namespace sm {
         LOG_DEBUG("Created GL texture {} ({})", texture, name);
     }
 
-    GlTexture::GlTexture(const EncrFile& file_path, const TextureSpecification& specification)
-        : specification(specification) {
-        LOG_DEBUG("Loading texture `{}`...", file_path);
+    // GlTexture::GlTexture(const EncrFile& file_path, const TextureSpecification& specification)
+    //     : specification(specification) {
+    //     LOG_DEBUG("Loading texture `{}`...", file_path);
 
-        const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
+    //     const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
 
-        stbi_set_flip_vertically_on_load(1);
+    //     stbi_set_flip_vertically_on_load(1);
 
-        int width, height, channels;
-        unsigned char* data {stbi_load_from_memory(buffer, buffer_size, &width, &height, &channels, CHANNELS)};
+    //     int width, height, channels;
+    //     unsigned char* data {stbi_load_from_memory(buffer, buffer_size, &width, &height, &channels, CHANNELS)};
 
-        if (data == nullptr) {
-            LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
-            throw ResourceLoadingError;
-        }
+    //     if (data == nullptr) {
+    //         LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
+    //         throw ResourceLoadingError;
+    //     }
 
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+    //     glGenTextures(1, &texture);
+    //     glBindTexture(GL_TEXTURE_2D, texture);
 
-        configure_filter_and_wrap(specification);
-        allocate_texture(width, height, data);
-        configure_mipmapping(specification);
+    //     configure_filter_and_wrap(specification);
+    //     allocate_texture(width, height, data);
+    //     configure_mipmapping(specification);
 
-        glBindTexture(GL_TEXTURE_2D, 0);
-        stbi_image_free(data);
+    //     glBindTexture(GL_TEXTURE_2D, 0);
+    //     stbi_image_free(data);
 
-        this->width = width;
-        this->height = height;
-        name = Utils::get_file_name(file_path);
+    //     this->width = width;
+    //     this->height = height;
+    //     name = Utils::get_file_name(file_path);
 
-        LOG_DEBUG("Created GL texture {} ({})", texture, name);
-    }
+    //     LOG_DEBUG("Created GL texture {} ({})", texture, name);
+    // }
 
     GlTexture::GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification)
         : specification(specification) {

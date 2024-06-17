@@ -22,7 +22,6 @@
 #include "engine/graphics/renderable.hpp"
 #include "engine/graphics/light.hpp"
 #include "engine/other/file_system.hpp"
-#include "engine/other/encrypt.hpp"
 #include "engine/other/assert.hpp"
 
 using namespace resmanager::literals;
@@ -57,8 +56,8 @@ namespace sm {
         {
             // Doesn't have uniform buffers for sure
             storage.screen_quad_shader = std::make_unique<GlShader>(
-                Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.vert")),
-                Encrypt::encr(FileSystem::path_engine_data("shaders/screen_quad.frag"))
+                FileSystem::path_engine_data("shaders/screen_quad.vert"),
+                FileSystem::path_engine_data("shaders/screen_quad.frag")
             );
 
             const float vertices[] {
@@ -448,8 +447,8 @@ namespace sm {
 
     void Renderer::debug_initialize() {
         debug_storage.shader = std::make_shared<GlShader>(
-            Encrypt::encr(FileSystem::path_engine_data("shaders/debug.vert")),
-            Encrypt::encr(FileSystem::path_engine_data("shaders/debug.frag"))
+            FileSystem::path_engine_data("shaders/debug.vert"),
+            FileSystem::path_engine_data("shaders/debug.frag")
         );
 
         add_shader(debug_storage.shader);

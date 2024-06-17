@@ -44,7 +44,6 @@
 #include "engine/other/camera_controller.hpp"
 #include "engine/other/concurrent_loader.hpp"
 #include "engine/other/dependencies.hpp"
-#include "engine/other/encrypt.hpp"
 #include "engine/other/file_system.hpp"
 #include "engine/other/identifier.hpp"
 #include "engine/other/logging.hpp"

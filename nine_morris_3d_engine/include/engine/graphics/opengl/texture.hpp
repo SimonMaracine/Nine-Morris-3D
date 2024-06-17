@@ -8,7 +8,6 @@
 #include <glm/glm.hpp>
 
 #include "engine/graphics/texture_data.hpp"
-#include "engine/other/encrypt.hpp"
 
 namespace sm {
     enum class Filter {
@@ -49,7 +48,6 @@ namespace sm {
     class GlTexture {
     public:
         GlTexture(const std::string& file_path, const TextureSpecification& specification);
-        GlTexture(const EncrFile& file_path, const TextureSpecification& specification);
         GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
         GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification);
         ~GlTexture();

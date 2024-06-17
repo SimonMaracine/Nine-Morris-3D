@@ -9,7 +9,6 @@
 #include <spdlog/version.h>
 #include <entt/entt.hpp>
 #include <cereal/version.hpp>
-#include <cppblowfish/cppblowfish.hpp>
 #include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/platform.hpp"
@@ -78,12 +77,6 @@ namespace sm {
             char line[BUFFER_LEN];
             std::snprintf(line, BUFFER_LEN, "cereal version: %d.%d.%d\n", CEREAL_VERSION_MAJOR,
                 CEREAL_VERSION_MINOR, CEREAL_VERSION_PATCH);
-            output.append(line);
-        }
-        {
-            char line[BUFFER_LEN];
-            std::snprintf(line, BUFFER_LEN, "cppblowfish version: %d.%d.%d\n", cppblowfish::VERSION_MAJOR,
-                cppblowfish::VERSION_MINOR, cppblowfish::VERSION_PATCH);
             output.append(line);
         }
         {

@@ -16,7 +16,6 @@
 #include "engine/application_base/panic.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
-#include "engine/other/encrypt.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/assert.hpp"
 #include "engine/other/utilities.hpp"
@@ -41,27 +40,27 @@ namespace sm {
         LOG_DEBUG("Created GL shader {} `{}`", program, name);
     }
 
-    GlShader::GlShader(const EncrFile& source_vertex, const EncrFile& source_fragment) {
-        name = Utils::get_file_name(source_vertex) + " & " + Utils::get_file_name(source_fragment);
+    // GlShader::GlShader(const EncrFile& source_vertex, const EncrFile& source_fragment) {
+    //     name = Utils::get_file_name(source_vertex) + " & " + Utils::get_file_name(source_fragment);
 
-        const auto buffer_vertex {Encrypt::load_file(source_vertex)};
-        const auto buffer_fragment {Encrypt::load_file(source_fragment)};
+    //     const auto buffer_vertex {Encrypt::load_file(source_vertex)};
+    //     const auto buffer_fragment {Encrypt::load_file(source_fragment)};
 
-        vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER);
-        fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER);
-        program = create_program();
+    //     vertex_shader = compile_shader(buffer_vertex, GL_VERTEX_SHADER);
+    //     fragment_shader = compile_shader(buffer_fragment, GL_FRAGMENT_SHADER);
+    //     program = create_program();
 
-        if (!check_linking(program)) {
-            LOG_DIST_CRITICAL("Could not link shader program {}", program);
-            throw ResourceLoadingError;
-        }
+    //     if (!check_linking(program)) {
+    //         LOG_DIST_CRITICAL("Could not link shader program {}", program);
+    //         throw ResourceLoadingError;
+    //     }
 
-        delete_intermediates();
-        introspect_program();
-        check_and_cache_uniforms();
+    //     delete_intermediates();
+    //     introspect_program();
+    //     check_and_cache_uniforms();
 
-        LOG_DEBUG("Created GL shader {} `{}`", program, name);
-    }
+    //     LOG_DEBUG("Created GL shader {} `{}`", program, name);
+    // }
 
     GlShader::~GlShader() {
         glDeleteProgram(program);
