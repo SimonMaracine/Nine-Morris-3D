@@ -88,7 +88,6 @@ add_subdirectory(extern/spdlog)
 add_subdirectory(extern/utfcpp)
 
 add_library(nine_morris_3d_engine STATIC
-    "src/application_base/application_builder.cpp"
     "src/application_base/application.cpp"
     "src/application_base/capabilities.cpp"
     "src/application_base/context.cpp"
@@ -104,15 +103,15 @@ add_library(nine_morris_3d_engine STATIC
     "src/audio/sound_data.cpp"
     "src/graphics/opengl/buffer.cpp"
     "src/graphics/opengl/framebuffer.cpp"
-    "src/graphics/opengl/gl.cpp"
     "src/graphics/opengl/info_and_debug.cpp"
+    "src/graphics/opengl/opengl.cpp"
     "src/graphics/opengl/shader.cpp"
     "src/graphics/opengl/texture.cpp"
     "src/graphics/opengl/vertex_array.cpp"
     "src/graphics/opengl/vertex_buffer_layout.cpp"
     "src/graphics/camera.cpp"
+    "src/graphics/dear_imgui_context.cpp"
     "src/graphics/font.cpp"
-    "src/graphics/imgui_context.cpp"
     "src/graphics/material.cpp"
     "src/graphics/renderer.cpp"
     "src/graphics/texture_data.cpp"
@@ -124,7 +123,6 @@ add_library(nine_morris_3d_engine STATIC
     "src/other/resource_manager.cpp"
     "src/other/utilities.cpp"
 
-    "include/engine/application_base/application_builder.hpp"
     "include/engine/application_base/application_properties.hpp"
     "include/engine/application_base/application.hpp"
     "include/engine/application_base/capabilities.hpp"
@@ -145,24 +143,23 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/audio/sound_data.hpp"
     "include/engine/graphics/opengl/buffer.hpp"
     "include/engine/graphics/opengl/framebuffer.hpp"
-    "include/engine/graphics/opengl/gl.hpp"
     "include/engine/graphics/opengl/info_and_debug.hpp"
+    "include/engine/graphics/opengl/opengl.hpp"
     "include/engine/graphics/opengl/shader.hpp"
     "include/engine/graphics/opengl/texture.hpp"
     "include/engine/graphics/opengl/vertex_array.hpp"
     "include/engine/graphics/opengl/vertex_buffer_layout.hpp"
     "include/engine/graphics/camera_2d.hpp"
     "include/engine/graphics/camera.hpp"
+    "include/engine/graphics/dear_imgui_context.hpp"
     "include/engine/graphics/font.hpp"
     "include/engine/graphics/framebuffer_reader.hpp"
-    "include/engine/graphics/imgui_context.hpp"
     "include/engine/graphics/light.hpp"
     "include/engine/graphics/material.hpp"
     "include/engine/graphics/post_processing.hpp"
     "include/engine/graphics/renderable.hpp"
     "include/engine/graphics/renderer.hpp"
     "include/engine/graphics/texture_data.hpp"
-    "include/engine/other/assert.hpp"
     "include/engine/other/camera_controller.hpp"
     "include/engine/other/concurrent_loader.hpp"
     "include/engine/other/dependencies.hpp"
@@ -173,6 +170,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/other/random_gen.hpp"
     "include/engine/other/resource_manager.hpp"
     "include/engine/other/utilities.hpp"
+    "include/engine/scene/scene.hpp"
 
     # For client
     "include/engine/external/cereal.h++"
@@ -202,7 +200,6 @@ target_link_libraries(nine_morris_3d_engine PUBLIC
 
 target_include_directories(nine_morris_3d_engine PUBLIC "include")
 
-# Enable warnings only for engine
 if(UNIX)
     target_compile_options(nine_morris_3d_engine PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")
 elseif(WIN32)
@@ -224,7 +221,6 @@ if(WIN32)
     target_compile_options(nine_morris_3d_engine PUBLIC "/utf-8")
 endif()
 
-# Use C++17
 target_compile_features(nine_morris_3d_engine PUBLIC cxx_std_17)
 set_target_properties(nine_morris_3d_engine PROPERTIES CXX_EXTENSIONS OFF)
 

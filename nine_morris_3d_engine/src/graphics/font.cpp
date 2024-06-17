@@ -1,11 +1,8 @@
-#include <memory>
-#include <vector>
-#include <utility>
-#include <string>
-#include <cstddef>
-#include <unordered_map>
+#include "engine/graphics/font.hpp"
+
 #include <algorithm>
 #include <stdexcept>
+#include <cassert>
 
 #include <stb_truetype.h>
 #include <stb_image_write.h>
@@ -14,13 +11,9 @@
 
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/panic.hpp"
-#include "engine/graphics/opengl/vertex_array.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
-#include "engine/graphics/opengl/texture.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
-#include "engine/graphics/font.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 #include "engine/other/utilities.hpp"
 
 namespace sm {
@@ -44,7 +37,7 @@ namespace sm {
             for (int y {0}; y < height; y++) {
                 const int index {(y + dest_y) * dest_width + x + dest_x};
 
-                SM_ASSERT(index < dest_width * dest_height, "Write out of bounds");
+                assert(index < dest_width * dest_height);
 
                 dest[static_cast<std::size_t>(index)] = glyph[y * width + x];
             }
@@ -104,7 +97,7 @@ namespace sm {
 
         static constexpr std::size_t FLOATS_PER_VERTEX {4};
 
-        SM_ASSERT(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0, "Data may be corrupted");
+        assert(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0);
 
         vertex_count = static_cast<int>(size / (sizeof(float) * FLOATS_PER_VERTEX));
     }

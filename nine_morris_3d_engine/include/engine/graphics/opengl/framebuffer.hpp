@@ -33,12 +33,12 @@ namespace sm {
         Attachment depth_attachment;
 
         // Must be specified
-        int width {0};
-        int height {0};
+        int width {};
+        int height {};
 
         // Color attachment clearing stuff
         struct {
-            int drawbuffer {0};
+            int drawbuffer {};
             float value[4] {};
         } color_clear;
 
@@ -81,11 +81,10 @@ namespace sm {
         void build();
 
         unsigned int framebuffer {0};
+        FramebufferSpecification specification;
 
         // These can be texture or renderbuffer handles
         unsigned int depth_attachment {0};
         std::vector<unsigned int> color_attachments;
-
-        FramebufferSpecification specification;
     };
 }

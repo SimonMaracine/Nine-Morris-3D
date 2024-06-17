@@ -1,12 +1,11 @@
+#include "game/scenes/game_scene.hpp"
+
 #include <vector>
 
 #include <engine/nine_morris_3d.hpp>
 #include <engine/external/resmanager.h++>
 #include <engine/external/glm.h++>
 #include <engine/external/imgui.h++>
-
-#include "game/scenes/game_scene.hpp"
-#include "game/point_camera_controller.hpp"
 
 void GameScene::on_start() {
     ctx->tsk.add("test"_H, [this](const sm::Task& task) {
@@ -21,7 +20,7 @@ void GameScene::on_start() {
 
     ctx->evt.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
 
-    sm::Gl::clear_color(0.3f, 0.1f, 0.3f);
+    sm::OpenGl::clear_color(0.3f, 0.1f, 0.3f);
 
     {
         auto mesh {std::make_shared<sm::Mesh>(

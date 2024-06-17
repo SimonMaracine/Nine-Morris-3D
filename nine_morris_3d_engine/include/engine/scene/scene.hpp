@@ -4,13 +4,12 @@
 
 #include <resmanager/resmanager.hpp>
 
+#include "engine/application_base/context.hpp"
+
 namespace sm {
-    class Ctx;
     class Application;
 
-    /*
-        Class representing an entire scene of a game. Subclasses need to be heap-allocated.
-    */
+    // An entire scene of a game
     class Scene {
     public:
         using SceneId = resmanager::HashedStr64;

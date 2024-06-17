@@ -1,12 +1,8 @@
-#include <memory>
-#include <string>
-
-#include "engine/audio/openal/source.hpp"
-#include "engine/audio/openal/buffer.hpp"
 #include "engine/audio/music.hpp"
-#include "engine/audio/sound_data.hpp"
+
+#include <cassert>
+
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
     MusicTrack::MusicTrack(const std::string& file_path) {
@@ -105,7 +101,7 @@ namespace sm {
     }
 
     void MusicPlayer::set_music_gain(float gain) {
-        SM_ASSERT(gain >= 0.0f, "Gain must be positive");
+        assert(gain >= 0.0f);
 
         if (gain > 1.0f) {
             LOG_WARNING("Gain is larger than 1.0");

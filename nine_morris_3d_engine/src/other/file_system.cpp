@@ -1,5 +1,4 @@
-#include <string>
-#include <optional>
+#include "engine/other/file_system.hpp"
 
 #include "engine/application_base/platform.hpp"
 
@@ -12,9 +11,7 @@
     #include <Lmcons.h>
 #endif
 
-#include "engine/other/file_system.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
 #if defined(SM_PLATFORM_LINUX)

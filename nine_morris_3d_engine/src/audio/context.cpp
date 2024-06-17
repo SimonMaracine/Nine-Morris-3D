@@ -2,7 +2,6 @@
 
 #include "engine/application_base/panic.hpp"
 #include "engine/audio/context.hpp"
-#include "engine/audio/openal/listener.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {

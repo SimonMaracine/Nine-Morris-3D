@@ -99,10 +99,10 @@ namespace sm {
 
         UniformBlockSpecification specification;
 
+        std::unordered_map<Key, UniformBlockField, KeyHash> fields;
+
         unsigned char* data {nullptr};
         std::size_t size {0};
-
-        std::unordered_map<Key, UniformBlockField, KeyHash> fields;
 
         bool configured {false};
 

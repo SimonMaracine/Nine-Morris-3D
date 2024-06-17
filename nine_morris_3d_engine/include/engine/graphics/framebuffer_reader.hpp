@@ -3,27 +3,27 @@
 #include <memory>
 #include <array>
 #include <cstddef>
+#include <cassert>
 
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
     template<std::size_t BufferCount>
     class FramebufferReader {
     public:
+        static_assert(BufferCount > 0);
+
         FramebufferReader() = default;
         FramebufferReader(
             const std::array<std::shared_ptr<GlPixelBuffer>, BufferCount>& buffers,
             std::shared_ptr<GlFramebuffer> framebuffer
         )
-            : buffers(buffers), framebuffer(framebuffer) {
-            static_assert(BufferCount > 0);
-        }
+            : buffers(buffers), framebuffer(framebuffer) {}
 
         // Call this after the framebuffer is bound to begin reading the framebuffer
         void read(int attachment_index, int x, int y) {
-            SM_ASSERT(attachment_index >= 0, "Attachment index must be positive");
+            assert(attachment_index >= 0);
 
             buffer_index = (buffer_index + 1) % BufferCount;
             next_buffer_index = (buffer_index + 1) % BufferCount;

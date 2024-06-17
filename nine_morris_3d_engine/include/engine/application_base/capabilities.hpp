@@ -1,8 +1,6 @@
 #pragma once
 
-/*
-    Query OpenGL implementation and GPU capabilities
-*/
+// Query OpenGL implementation and GPU capabilities
 namespace sm {
     struct Capabilities {
         static int max_anisotropic_filtering_supported();

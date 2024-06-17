@@ -39,14 +39,6 @@ namespace sm {
 
     class TaskManager {  // TODO async tasks, delayed tasks
     public:
-        TaskManager() = default;
-        ~TaskManager() = default;
-
-        TaskManager(const TaskManager&) = delete;
-        TaskManager& operator=(const TaskManager&) = delete;
-        TaskManager(TaskManager&&) = delete;
-        TaskManager& operator=(TaskManager&&) = delete;
-
         void add(Task::TaskId id, const Task::TaskFunction& function);
         void remove(Task::TaskId id);
     private:

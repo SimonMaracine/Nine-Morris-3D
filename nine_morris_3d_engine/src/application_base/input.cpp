@@ -1,9 +1,7 @@
-#include <utility>
+#include "engine/application_base/input.hpp"
 
 #include <glad/glad.h>  // Include glad just to make everything compile
 #include <GLFW/glfw3.h>
-
-#include "engine/application_base/input.hpp"
 
 namespace sm {
     static GLFWwindow* window_handle {nullptr};

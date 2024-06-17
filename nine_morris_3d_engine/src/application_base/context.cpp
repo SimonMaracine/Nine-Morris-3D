@@ -1,23 +1,12 @@
-#include <memory>
-
-#include "engine/application_base/events.hpp"
-#include "engine/application_base/window.hpp"
-#include "engine/application_base/input.hpp"
-#include "engine/application_base/tasks.hpp"
-#include "engine/application_base/application_properties.hpp"
 #include "engine/application_base/context.hpp"
-#include "engine/application_base/application.hpp"
-#include "engine/audio/context.hpp"
-#include "engine/graphics/renderer.hpp"
-#include "engine/other/resource_manager.hpp"
-#include "engine/other/random_gen.hpp"
-#include "engine/other/assert.hpp"
-#include "engine/scene/scene.hpp"
 
+#include <cassert>
+
+#include "engine/application_base/application.hpp"
 
 namespace sm {
     void Ctx::change_scene(SceneId id) {
-        SM_ASSERT(application->next_scene == nullptr, "Must be null");
+        assert(application->next_scene == nullptr);
 
         for (std::unique_ptr<Scene>& scene : application->scenes) {
             if (scene->id == id) {
@@ -26,7 +15,7 @@ namespace sm {
             }
         }
 
-        SM_ASSERT(false, "Scene not found");
+        assert(false);
     }
 
     const Scene* Ctx::get_current_scene() const {

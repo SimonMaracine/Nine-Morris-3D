@@ -1,6 +1,7 @@
+#include "engine/application_base/capabilities.hpp"
+
 #include <glad/glad.h>
 
-#include "engine/application_base/capabilities.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {

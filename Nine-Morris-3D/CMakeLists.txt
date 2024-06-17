@@ -15,24 +15,21 @@ add_executable(Nine-Morris-3D "${GUI_EXECUTABLE_WINDOWS}"
     ${GAME_HEADERS}
 )
 
-# Add all libraries
 target_link_libraries(Nine-Morris-3D PRIVATE nine_morris_3d_engine)
 
-# Add all include directories
 target_include_directories(Nine-Morris-3D PRIVATE "src")
 
-# Enable warnings
 if(UNIX)
-    target_compile_options(Nine-Morris-3D PRIVATE "-Wall" "-Wextra" "-Wpedantic")
+    target_compile_options(Nine-Morris-3D PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")
 elseif(WIN32)
-    target_compile_options(Nine-Morris-3D PRIVATE "/W3")
+    target_compile_options(Nine-Morris-3D PRIVATE "/W4")
 endif()
 
 # Enable sanitizing in debug mode for GCC
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(UNIX)
-        target_compile_options(Nine-Morris-3D PRIVATE "-fsanitize=undefined" "-g")
-        target_link_options(Nine-Morris-3D PRIVATE "-static-libasan" "-fsanitize=undefined")
+    if(UNIX AND NM3D_ASAN)
+        target_compile_options(Nine-Morris-3D PRIVATE "-fsanitize=address" "-fsanitize=undefined" "-g" "-fno-omit-frame-pointer")
+        target_link_options(Nine-Morris-3D PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 
         message(STATUS "Nine-Morris-3D: Building with sanitizers")
     endif()

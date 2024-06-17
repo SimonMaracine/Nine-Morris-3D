@@ -8,19 +8,9 @@
 namespace sm {
     class Application;
 
-    /*
-        Main class for managing application-level events
-    */
+    // Application-level events
     class EventDispatcher {
     public:
-        EventDispatcher() = default;
-        ~EventDispatcher() = default;
-
-        EventDispatcher(const EventDispatcher&) = delete;
-        EventDispatcher& operator=(const EventDispatcher&) = delete;
-        EventDispatcher(EventDispatcher&&) = delete;
-        EventDispatcher& operator=(EventDispatcher&&) = delete;
-
         template<typename E, auto F, typename... T>
         void connect(T&&... value_or_instance) {
             dispatcher.template sink<E>().template connect<F>(value_or_instance...);

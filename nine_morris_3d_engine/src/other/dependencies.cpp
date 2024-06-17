@@ -1,4 +1,5 @@
-#include <string>
+#include "engine/other/dependencies.hpp"
+
 #include <cstdio>
 #include <cstddef>
 
@@ -12,7 +13,6 @@
 #include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/platform.hpp"
-#include "engine/other/dependencies.hpp"
 
 namespace sm {
     static constexpr std::size_t BUFFER_LEN {128};

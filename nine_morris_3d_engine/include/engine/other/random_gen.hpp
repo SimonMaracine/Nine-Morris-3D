@@ -5,29 +5,21 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-
-#include "engine/other/assert.hpp"
+#include <cassert>
 
 namespace sm {
     class RandomGenerator {
     public:
         RandomGenerator();
-        ~RandomGenerator() = default;
-
-        RandomGenerator(const RandomGenerator&) = delete;
-        RandomGenerator& operator=(const RandomGenerator&) = delete;
-        RandomGenerator(RandomGenerator&&) = delete;
-        RandomGenerator& operator=(RandomGenerator&&) = delete;
 
         // The range is inclusive: [a, b]
-
         std::uint32_t next();
         std::uint32_t next(std::uint32_t end);
         std::uint32_t next(std::uint32_t begin, std::uint32_t end);
 
         template<typename T>
         T choice(std::initializer_list<T> list) {
-            SM_ASSERT(list.size() > 0, "List must not be empty");
+            assert(list.size() > 0);
 
             const std::uint32_t index {next(list.size() - 1)};
 
@@ -38,7 +30,7 @@ namespace sm {
         T choice(Iter first, Iter last) {
             const std::size_t size {std::distance(first, last)};
 
-            SM_ASSERT(size > 0, "List must not be empty");
+            assert(size > 0);
 
             const std::uint32_t index {next(size - 1)};
 

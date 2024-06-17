@@ -16,9 +16,7 @@
 namespace sm {
     class Application;
 
-    /*
-        Wrapper struct around public functionality exposed to the user
-    */
+    // Wrapper around public functionality exposed to the user
     class Ctx {
     public:
         using SceneId = Scene::SceneId;
@@ -44,12 +42,12 @@ namespace sm {
         float delta {0.0f};
         double fps {0.0};
 
-        const ApplicationProperties* properties {nullptr};  // Application data
+        // const ApplicationProperties* properties {nullptr};  // Application data
 
         std::unique_ptr<Window> win;  // One of the last objects destroyed in an application instance
         std::unique_ptr<OpenAlContext> snd;  // Sound context
         std::unique_ptr<Renderer> rnd;  // Renderer for 3D, 2D and debug
-        std::unique_ptr<RandomGenerator> rng;  // Random number generator
+        RandomGenerator rng;  // Random number generator
         EventDispatcher evt;  // Manager of application events
         ResourcesCache res;  // Global cache of resources
         TaskManager tsk;  // Manager of general purpose procedures

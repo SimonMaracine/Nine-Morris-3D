@@ -1,17 +1,16 @@
-#include <string>
-#include <utility>
+#include "engine/graphics/opengl/info_and_debug.hpp"
+
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <cassert>
 
 #include <glad/glad.h>
 
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/capabilities.hpp"
 #include "engine/application_base/panic.hpp"
-#include "engine/graphics/opengl/info_and_debug.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
     static const GLenum parameters[] {
@@ -65,19 +64,10 @@ namespace sm {
     void GlInfoDebug::maybe_initialize_debugging() {
 #ifndef SM_BUILD_DISTRIBUTION
         glDebugMessageCallback(
-            [](
-                GLenum,
-                GLenum,
-                GLuint id,
-                GLenum severity,
-                GLsizei,
-                const GLchar* message,
-                const GLvoid*
-            ) {
+            [](GLenum, GLenum, GLuint id, GLenum severity, GLsizei, const GLchar* message, const GLvoid*) {
                 switch (severity) {
                     case GL_DEBUG_SEVERITY_HIGH:
                         LOG_CRITICAL("({}) OpenGL: {}", id, message);
-
                         std::exit(1);
 
                         break;
@@ -87,7 +77,7 @@ namespace sm {
 
                         break;
                     case GL_DEBUG_SEVERITY_NOTIFICATION:
-                        SM_ASSERT(false, "This should have been disabled");
+                        assert(false);
 
                         break;
                 }

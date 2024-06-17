@@ -1,13 +1,12 @@
-#include <string>
-#include <cstddef>
+#include "engine/audio/sound_data.hpp"
+
 #include <cstdlib>
+#include <cassert>
 
 #include <stb_vorbis.h>
 
 #include "engine/application_base/panic.hpp"
-#include "engine/audio/sound_data.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
     static void check_bits_per_sample(std::size_t bits_per_sample, [[maybe_unused]] const std::string& file_path) {
@@ -53,7 +52,7 @@ namespace sm {
     // }
 
     SoundData::~SoundData() {
-        SM_ASSERT(data != nullptr, "No data");
+        assert(data != nullptr);
 
         std::free(data);
 

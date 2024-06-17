@@ -1,25 +1,19 @@
-#include <string>
+#include "engine/application_base/application.hpp"
+
 #include <locale>
 #include <memory>
 #include <algorithm>
+#include <cassert>
 
-#include "engine/application_base/application.hpp"
-#include "engine/application_base/window.hpp"
-#include "engine/application_base/events.hpp"
 #include "engine/application_base/input.hpp"
-#include "engine/application_base/application_builder.hpp"
 #include "engine/application_base/platform.hpp"
-#include "engine/audio/context.hpp"
 #include "engine/audio/music.hpp"
-#include "engine/graphics/renderer.hpp"
-#include "engine/graphics/opengl/gl.hpp"
+#include "engine/graphics/opengl/opengl.hpp"
 #include "engine/graphics/opengl/info_and_debug.hpp"
-#include "engine/graphics/imgui_context.hpp"
+#include "engine/graphics/dear_imgui_context.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 #include "engine/other/file_system.hpp"
 #include "engine/other/random_gen.hpp"
-#include "engine/scene/scene.hpp"
 
 namespace sm {
     bool Application::initialize_applications(const ApplicationsData& data) {
@@ -39,49 +33,30 @@ namespace sm {
         return true;
     }
 
-    Application::Application(const ApplicationBuilder& builder, void* user_data) {
+    Application::Application(const ApplicationProperties& properties) {
         LOG_INFO("Initializing application...");
 
         ctx.application = this;
-        ctx.user_data = user_data;
-        ctx.properties = &properties;
-
-        properties.width = builder.width;
-        properties.height = builder.height;
-        properties.title = builder.title;
-        properties.fullscreen = builder.fullscreen;
-        properties.native_resolution = builder.native_resolution;
-        properties.resizable = builder.resizable;
-        properties.min_width = builder.min_width;
-        properties.min_height = builder.min_height;
-        properties.app_name = builder.app_name;
-        properties.version_major = builder.major;
-        properties.version_minor = builder.minor;
-        properties.version_patch = builder.patch;
-
-        ctx.win = std::make_unique<Window>(this);
+        ctx.user_data = properties.user_data;
+        ctx.win = std::make_unique<Window>(properties, &ctx);
 
         Input::initialize(ctx.win->get_handle());
-        ImGuiContext::initialize(ctx.win->get_handle());
+        DearImGuiContext::initialize(ctx.win->get_handle());
 
 #ifndef SM_BUILD_DISTRIBUTION
         Logging::log_general_information(Logging::LogTarget::Console);
 #endif
 
         GlInfoDebug::maybe_initialize_debugging();
-        Gl::initialize_default();
+        OpenGl::initialize_default();
 
         const auto [version_major, version_minor] {GlInfoDebug::get_version_number()};
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
         ctx.rnd = std::make_unique<Renderer>(properties.width, properties.height);
 
-        if (builder.audio) {
+        if (properties.audio) {
             initialize_audio();
-        }
-
-        if (builder.random_generator) {
-            initialize_random_generator();
         }
 
         ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
@@ -93,7 +68,7 @@ namespace sm {
 
     Application::~Application() {  // Destructor is called before all member variables
         MusicPlayer::uninitialize();
-        ImGuiContext::uninitialize();
+        DearImGuiContext::uninitialize();
         Input::uninitialize();
     }
 
@@ -207,13 +182,13 @@ namespace sm {
             ctx.rnd->prerender_setup();
         }
 
-        SM_ASSERT(next_scene == nullptr, "Scene must be reset");
+        assert(next_scene == nullptr);
     }
 
     void Application::dear_imgui_render() {
-        ImGuiContext::begin_frame();
+        DearImGuiContext::begin_frame();
         current_scene->on_imgui_update();
-        ImGuiContext::end_frame();
+        DearImGuiContext::end_frame();
     }
 
     void Application::prepare_scenes(SceneId start_scene_id) {
@@ -225,7 +200,7 @@ namespace sm {
             }
         }
 
-        SM_ASSERT(current_scene != nullptr, "Must be set");
+        assert(current_scene != nullptr);
     }
 
     void Application::user_start_function() {
@@ -244,12 +219,6 @@ namespace sm {
         LOG_INFO("With audio");
 
         ctx.snd = std::make_unique<OpenAlContext>();
-    }
-
-    void Application::initialize_random_generator() {
-        LOG_INFO("With random number generator");
-
-        ctx.rng = std::make_unique<RandomGenerator>();
     }
 
     void Application::on_window_closed(const WindowClosedEvent&) {

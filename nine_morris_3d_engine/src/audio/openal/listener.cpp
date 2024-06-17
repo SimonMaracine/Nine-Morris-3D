@@ -1,13 +1,14 @@
-#include <AL/al.h>
-#include <glm/glm.hpp>
-
 #include "engine/audio/openal/listener.hpp"
+
+#include <cassert>
+
+#include <AL/al.h>
+
 #include "engine/audio/openal/info_and_debug.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
     void AlListener::set_gain(float gain) {
-        SM_ASSERT(gain >= 0.0f, "Must be positive");
+        assert(gain >= 0.0f);
 
         alListenerf(AL_GAIN, gain);
 

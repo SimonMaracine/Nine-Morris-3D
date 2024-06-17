@@ -8,10 +8,11 @@
 #include <glm/glm.hpp>
 #include <resmanager/resmanager.hpp>
 
+#include "engine/graphics/opengl/shader.hpp"
+#include "engine/graphics/opengl/texture.hpp"
+
 namespace sm {
     class MaterialInstance;
-    class GlShader;
-    class GlTexture;
 
     class Material {
     public:
@@ -27,8 +28,8 @@ namespace sm {
         };
 
         enum Flags : unsigned int {
-            Outline = 1 << 0,
-            DisableBackFaceCulling = 1 << 1
+            Outline = 1u << 0,
+            DisableBackFaceCulling = 1u << 1
         };
 
         Material(std::shared_ptr<GlShader> shader, unsigned int flags = 0);

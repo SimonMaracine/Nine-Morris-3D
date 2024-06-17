@@ -1,10 +1,12 @@
+#include "engine/audio/openal/source.hpp"
+
+#include <cassert>
+
 #include <AL/al.h>
 
-#include "engine/audio/openal/source.hpp"
 #include "engine/audio/openal/buffer.hpp"
 #include "engine/audio/openal/info_and_debug.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
     AlSource::AlSource() {
@@ -73,7 +75,7 @@ namespace sm {
     }
 
     void AlSource::set_gain(float gain) {
-        SM_ASSERT(gain >= 0.0f, "Must be positive");
+        assert(gain >= 0.0f);
 
         alSourcef(source, AL_GAIN, gain);
 
@@ -83,7 +85,7 @@ namespace sm {
     }
 
     void AlSource::set_pitch(float pitch) {
-        SM_ASSERT(pitch >= 0.0f, "Must be positive");
+        assert(pitch >= 0.0f);
 
         alSourcef(source, AL_PITCH, pitch);
 

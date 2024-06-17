@@ -1,11 +1,8 @@
-#include <memory>
-#include <cstddef>
-#include <unordered_set>
+#include "engine/audio/openal/buffer.hpp"
 
 #include <AL/al.h>
 
 #include "engine/application_base/panic.hpp"
-#include "engine/audio/openal/buffer.hpp"
 #include "engine/audio/openal/info_and_debug.hpp"
 #include "engine/other/logging.hpp"
 

@@ -3,10 +3,11 @@
 #include <memory>
 #include <vector>
 
+#include "engine/graphics/opengl/framebuffer.hpp"
+#include "engine/graphics/opengl/shader.hpp"
+
 namespace sm {
     struct PostProcessingContext;
-    class GlFramebuffer;
-    class GlShader;
     class Renderer;
 
     class PostProcessingStep {
@@ -32,8 +33,8 @@ namespace sm {
 
     struct PostProcessingContext {
         std::vector<std::unique_ptr<PostProcessingStep>> steps;
-        unsigned int last_texture {0};  // Last texture at any moment in the processing pipeline
         std::vector<unsigned int> textures;  // All textures in order
+        unsigned int last_texture {0};  // Last texture at any moment in the processing pipeline
         unsigned int original_texture {0};
     };
 }

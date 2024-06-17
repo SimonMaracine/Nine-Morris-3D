@@ -1,16 +1,12 @@
-#include <cstddef>
-#include <unordered_map>
-#include <vector>
-#include <string>
+#include "engine/graphics/opengl/buffer.hpp"
+
 #include <cstring>
+#include <cassert>
 
 #include <glad/glad.h>
-#include <resmanager/resmanager.hpp>
 
 #include "engine/application_base/panic.hpp"
-#include "engine/graphics/opengl/buffer.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
     static int draw_hint_to_int(DrawHint hint) {
@@ -94,7 +90,7 @@ namespace sm {
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        SM_ASSERT(size % sizeof(unsigned int) == 0, "Data may be corrupted");
+        assert(size % sizeof(unsigned int) == 0);
 
         index_count = static_cast<int>(size / sizeof(unsigned int));
 
@@ -148,7 +144,7 @@ namespace sm {
             glGetUniformBlockIndex(shader_program, specification.block_name.c_str())
         };
 
-        SM_ASSERT(block_index != GL_INVALID_INDEX, "Invalid block index");
+        assert(block_index != GL_INVALID_INDEX);
 
         // If it's already configured, return
         if (configured) {
@@ -168,7 +164,7 @@ namespace sm {
         const std::size_t field_count {specification.uniforms.size()};
         static constexpr std::size_t MAX_FIELD_COUNT {24};
 
-        SM_ASSERT(field_count <= MAX_FIELD_COUNT, "Maximum 24 fields for now");
+        assert(field_count <= MAX_FIELD_COUNT);
 
         GLuint indices[MAX_FIELD_COUNT];
         GLint offsets[MAX_FIELD_COUNT];
@@ -191,7 +187,7 @@ namespace sm {
         );
 
         for (std::size_t i {0}; i < field_count; i++) {
-            SM_ASSERT(indices[i] != GL_INVALID_INDEX, "Invalid field index");
+            assert(indices[i] != GL_INVALID_INDEX);
         }
 
         glGetActiveUniformsiv(shader_program, field_count, indices, GL_UNIFORM_OFFSET, offsets);
@@ -211,21 +207,21 @@ namespace sm {
     }
 
     void GlUniformBuffer::set(const void* field_data, Key field) {
-        SM_ASSERT(configured, "Uniform buffer must be configured");
-        SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
+        assert(configured);
+        assert(data != nullptr && size > 0);
 
         std::memcpy(data + fields.at(field).offset, field_data, fields.at(field).size);
     }
 
     void GlUniformBuffer::upload() const {
-        SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
+        assert(data != nullptr && size > 0);
 
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
     }
 
     void GlUniformBuffer::set_and_upload(const void* field_data, Key field) {
-        SM_ASSERT(configured, "Uniform buffer must be configured");
-        SM_ASSERT(data != nullptr && size > 0, "Data must be allocated");
+        assert(configured);
+        assert(data != nullptr && size > 0);
 
         const std::size_t offset {fields.at(field).offset};
         const std::size_t size {fields.at(field).size};
@@ -255,7 +251,7 @@ namespace sm {
                 size = 16 * sizeof(GLfloat);
                 break;
             default:
-                SM_ASSERT(false, "Invalid type");
+                assert(false);
                 break;
         }
 

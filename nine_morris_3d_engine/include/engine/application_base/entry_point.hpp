@@ -9,7 +9,6 @@
 
     Include this entry_point.hpp header file once into your main compilation unit.
 */
-
 int application_main();
 
 #if defined(SM_PLATFORM_LINUX)

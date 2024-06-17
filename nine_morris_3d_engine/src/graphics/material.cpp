@@ -1,16 +1,8 @@
-#include <memory>
-#include <unordered_map>
-#include <cstddef>
-#include <vector>
+#include "engine/graphics/material.hpp"
+
 #include <cstring>
 
-#include <glm/glm.hpp>
-#include <resmanager/resmanager.hpp>
-
-#include "engine/graphics/opengl/shader.hpp"
-#include "engine/graphics/opengl/texture.hpp"
-#include "engine/graphics/opengl/gl.hpp"
-#include "engine/graphics/material.hpp"
+#include "engine/graphics/opengl/opengl.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -191,7 +183,7 @@ namespace sm {
                     std::memcpy(&texture, data + element.offset, sizeof(texture));
 
                     shader->upload_uniform_int(name, texture.unit);
-                    Gl::bind_texture_2d(texture.texture, texture.unit);
+                    OpenGl::bind_texture_2d(texture.texture, texture.unit);
 
                     break;
                 }

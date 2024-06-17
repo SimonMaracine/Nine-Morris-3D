@@ -1,23 +1,15 @@
-#include <string>
-#include <unordered_map>
-#include <vector>
-#include <cstddef>
-#include <utility>
-#include <memory>
+#include "engine/graphics/opengl/shader.hpp"
+
 #include <stdexcept>
 #include <algorithm>
+#include <cassert>
 
-#include <glm/glm.hpp>
-#include <resmanager/resmanager.hpp>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/panic.hpp"
-#include "engine/graphics/opengl/shader.hpp"
-#include "engine/graphics/opengl/buffer.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 #include "engine/other/utilities.hpp"
 
 namespace sm {
@@ -216,8 +208,8 @@ namespace sm {
     }
 
     unsigned int GlShader::create_program() const {
-        SM_ASSERT(vertex_shader != 0, "Invalid shader");
-        SM_ASSERT(fragment_shader != 0, "Invalid shader");
+        assert(vertex_shader != 0);
+        assert(fragment_shader != 0);
 
         const unsigned int program {glCreateProgram()};
         glAttachShader(program, vertex_shader);
@@ -229,9 +221,9 @@ namespace sm {
     }
 
     void GlShader::delete_intermediates() {
-        SM_ASSERT(program != 0, "Invalid program");
-        SM_ASSERT(vertex_shader != 0, "Invalid shader");
-        SM_ASSERT(fragment_shader != 0, "Invalid shader");
+        assert(program != 0);
+        assert(vertex_shader != 0);
+        assert(fragment_shader != 0);
 
         glDetachShader(program, vertex_shader);
         glDetachShader(program, fragment_shader);

@@ -2,10 +2,10 @@
 
 #include <glm/glm.hpp>
 
-namespace sm {
-    class Camera;
-    class Ctx;
+#include "engine/graphics/camera.hpp"
+#include "engine/application_base/context.hpp"
 
+namespace sm {
     class CameraController {
     public:
         CameraController() = default;
@@ -15,8 +15,8 @@ namespace sm {
 
         CameraController(const CameraController&) = default;
         CameraController& operator=(const CameraController&) = default;
-        CameraController(CameraController&&) noexcept = default;
-        CameraController& operator=(CameraController&&) noexcept = default;
+        CameraController(CameraController&&) = default;
+        CameraController& operator=(CameraController&&) = default;
 
         virtual void update_controls(float dt) = 0;  // TODO take delta?
         virtual void update_camera(float dt) = 0;

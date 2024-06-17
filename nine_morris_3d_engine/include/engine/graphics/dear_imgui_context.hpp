@@ -1,7 +1,7 @@
 #pragma once
 
 namespace sm {
-    struct ImGuiContext {
+    struct DearImGuiContext {
         static void initialize(void* window_handle);
         static void uninitialize();
 

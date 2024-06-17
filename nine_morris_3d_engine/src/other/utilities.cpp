@@ -1,26 +1,22 @@
-#include <string>
-#include <optional>
-#include <utility>
-#include <cstddef>
+#include "engine/other/utilities.hpp"
+
 #include <vector>
 #include <cstring>
 #include <fstream>
-
-#include "engine/other/utilities.hpp"
-#include "engine/other/assert.hpp"
+#include <cassert>
 
 namespace sm {
     std::string Utils::get_file_name(const std::string& file_path) {
         const std::size_t last_slash {file_path.find_last_of("/")};
-        SM_ASSERT(last_slash != std::string::npos, "Could not find slash");
+        assert(last_slash != std::string::npos);
 
         return file_path.substr(last_slash + 1);
     }
 
     std::string Utils::get_directory_name(const std::string& file_path) {  // FIXME ?????
-        SM_ASSERT(file_path.size() < 512, "File path too large");
+        assert(file_path.size() < 512);
 
-        char file_path_copy[512];
+        char file_path_copy[512] {};
         std::strncpy(file_path_copy, file_path.c_str(), 512 - 1);
 
         std::vector<std::string> tokens;
@@ -32,24 +28,24 @@ namespace sm {
             token = std::strtok(nullptr, "/");
         }
 
-        SM_ASSERT(tokens.size() >= 2, "Invalid file path name");
+        assert(tokens.size() >= 2);
 
         return tokens[tokens.size() - 2];  // It's ok
     }
 
-    std::optional<std::pair<unsigned char*, std::size_t>> Utils::read_file(const std::string& file_path) {
-        std::ifstream file {file_path, std::ios::binary};
+    std::optional<std::pair<unsigned char*, std::size_t>> Utils::read_file(const std::string& file_path) {  // FIXME error handling, maybe return unique_ptr
+        std::ifstream stream {file_path, std::ios::binary};
 
-        if (!file.is_open()) {
+        if (!stream.is_open()) {
             return std::nullopt;
         }
 
-        file.seekg(0, file.end);
-        const auto length {file.tellg()};
-        file.seekg(0, file.beg);
+        stream.seekg(0, stream.end);
+        const auto length {stream.tellg()};
+        stream.seekg(0, stream.beg);
 
         char* buffer {new char[length]};
-        file.read(buffer, length);
+        stream.read(buffer, length);
 
         return std::make_optional(std::make_pair(
             reinterpret_cast<unsigned char*>(buffer),

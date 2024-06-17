@@ -1,10 +1,7 @@
 #pragma once
 
-/*
-    Convenience header
-*/
+// Convenience header
 
-#include "engine/application_base/application_builder.hpp"
 #include "engine/application_base/application_properties.hpp"
 #include "engine/application_base/application.hpp"
 #include "engine/application_base/platform.hpp"
@@ -23,8 +20,8 @@
 #include "engine/audio/music.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
-#include "engine/graphics/opengl/gl.hpp"
 #include "engine/graphics/opengl/info_and_debug.hpp"
+#include "engine/graphics/opengl/opengl.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/texture.hpp"
 #include "engine/graphics/opengl/vertex_array.hpp"
@@ -32,15 +29,14 @@
 #include "engine/graphics/renderer.hpp"
 #include "engine/graphics/camera_2d.hpp"
 #include "engine/graphics/camera.hpp"
+#include "engine/graphics/dear_imgui_context.hpp"
 #include "engine/graphics/font.hpp"
 #include "engine/graphics/framebuffer_reader.hpp"
-#include "engine/graphics/imgui_context.hpp"
 #include "engine/graphics/light.hpp"
 #include "engine/graphics/material.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/renderable.hpp"
 #include "engine/graphics/texture_data.hpp"
-#include "engine/other/assert.hpp"
 #include "engine/other/camera_controller.hpp"
 #include "engine/other/concurrent_loader.hpp"
 #include "engine/other/dependencies.hpp"

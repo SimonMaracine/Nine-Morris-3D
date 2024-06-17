@@ -1,15 +1,12 @@
-#include <string>
-#include <memory>
+#include "engine/other/logging.hpp"
+
 #include <fstream>
 
-#include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "engine/application_base/platform.hpp"
 #include "engine/audio/openal/info_and_debug.hpp"
 #include "engine/graphics/opengl/info_and_debug.hpp"
-#include "engine/other/logging.hpp"
 #include "engine/other/file_system.hpp"
 #include "engine/other/dependencies.hpp"
 
@@ -66,14 +63,14 @@ namespace sm {
             case LogTarget::File: {
                 const std::string file_path {FileSystem::path_logs(info_file)};
 
-                std::ofstream file {file_path};
+                std::ofstream stream {file_path};
 
-                if (!file.is_open()) {
+                if (!stream.is_open()) {
                     LOG_DIST_ERROR("Could not open file `{}` for writing", file_path);
                     break;
                 }
 
-                file << contents;
+                stream << contents;
 
                 break;
             }

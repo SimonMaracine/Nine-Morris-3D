@@ -1,5 +1,7 @@
 #include "engine/application_base/events.h"
 
+#include <ostream>
+
 namespace sm {
     void EventDispatcher::update() {
         dispatcher.update();

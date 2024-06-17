@@ -1,27 +1,54 @@
-#include <memory>
-#include <unordered_map>
-#include <initializer_list>
-#include <utility>
-#include <cstddef>
+#include "engine/application_base/window.hpp"
+
 #include <vector>
+#include <cassert>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
-#include <resmanager/resmanager.hpp>
 
-#include "engine/application_base/window.hpp"
 #include "engine/application_base/application.hpp"
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/panic.hpp"
-#include "engine/graphics/imgui_context.hpp"
+#include "engine/application_base/context.hpp"
+#include "engine/graphics/dear_imgui_context.hpp"
 #include "engine/graphics/texture_data.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    Window::Window(Application* application) {
+    std::pair<int, int> Monitors::get_resolution(std::size_t index) const {
+        assert(index < count);
+
+        const GLFWvidmode* video_mode {glfwGetVideoMode(monitors[index])};
+
+        return std::make_pair(video_mode->width, video_mode->height);
+    }
+
+    std::pair<float, float> Monitors::get_content_scale(std::size_t index) const {
+        assert(index < count);
+
+        float xscale, yscale;
+        glfwGetMonitorContentScale(monitors[index], &xscale, &yscale);
+
+        return std::make_pair(xscale, yscale);
+    }
+
+    const char* Monitors::get_name(std::size_t index) const {  // TODO used?
+        assert(index < count);
+
+        const char* name {glfwGetMonitorName(monitors[index])};
+
+        if (name == nullptr) {
+            LOG_DIST_CRITICAL("Could not retrieve monitor name");
+            throw OtherError;
+        }
+
+        return name;
+    }
+
+    Window::Window(const ApplicationProperties& properties, Ctx* ctx) {
         if (!glfwInit()) {
             LOG_DIST_CRITICAL("Could not initialize GLFW");
             throw InitializationError;
@@ -40,7 +67,7 @@ namespace sm {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
         glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-        glfwWindowHint(GLFW_RESIZABLE, application->properties.resizable ? GLFW_TRUE : GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, properties.resizable ? GLFW_TRUE : GLFW_FALSE);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -50,7 +77,7 @@ namespace sm {
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif
 
-        window = create_window(application);
+        window = create_window(properties);
 
         if (window == nullptr) {
             LOG_DIST_CRITICAL("Could not create window");
@@ -67,11 +94,11 @@ namespace sm {
         }
 
         glfwSwapInterval(1);
-        glfwSetWindowUserPointer(window, application);
+        glfwSetWindowUserPointer(window, ctx);
         glfwSetWindowSizeLimits(
             window,
-            application->properties.min_width,
-            application->properties.min_height,
+            properties.min_width,
+            properties.min_height,
             GLFW_DONT_CARE,
             GLFW_DONT_CARE
         );
@@ -102,7 +129,7 @@ namespace sm {
     }
 
     const Monitors& Window::get_monitors() {
-        int count;
+        int count {};
         GLFWmonitor** connected_monitors {glfwGetMonitors(&count)};
 
         if (connected_monitors == nullptr) {
@@ -121,7 +148,7 @@ namespace sm {
     }
 
     void Window::set_vsync(int interval) const {
-        SM_ASSERT(interval >= 0, "Invalid interval");
+        assert(interval >= 0);
 
         glfwSwapInterval(interval);
     }
@@ -173,63 +200,63 @@ namespace sm {
         return glfwGetTime();  // FIXME this can return 0.0 on error
     }
 
-    GLFWwindow* Window::create_window(const Application* application) {
+    GLFWwindow* Window::create_window(const ApplicationProperties& properties) {
         GLFWmonitor* primary_monitor {nullptr};
 
-        if (application->properties.fullscreen) {
+        if (properties.fullscreen) {
             primary_monitor = glfwGetPrimaryMonitor();
 
-            if (application->properties.native_resolution) {
+            if (properties.native_resolution) {
                 const GLFWvidmode* video_mode {glfwGetVideoMode(primary_monitor)};
 
                 width = video_mode->width;
                 height = video_mode->height;
             } else {
-                width = application->properties.width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
-                height = application->properties.height;
+                width = properties.width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
+                height = properties.height;
             }
         } else {
-            width = application->properties.width;
-            height = application->properties.height;
+            width = properties.width;
+            height = properties.height;
         }
 
-        SM_ASSERT(width > 0 && height > 0, "Invalid resolution");
+        assert(width > 0 && height > 0);
 
-        return glfwCreateWindow(width, height, application->properties.title.c_str(), primary_monitor, nullptr);
+        return glfwCreateWindow(width, height, properties.title.c_str(), primary_monitor, nullptr);
     }
 
     void Window::install_callbacks() const {
         glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
-            auto* app {static_cast<Application*>(glfwGetWindowUserPointer(window))};
+            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
 
-            app->ctx.evt.enqueue<WindowClosedEvent>();
+            ctx->evt.enqueue<WindowClosedEvent>();
         });
 
         glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-            auto* app {static_cast<Application*>(glfwGetWindowUserPointer(window))};
+            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
 
-            app->ctx.win->width = width;
-            app->ctx.win->height = height;
+            ctx->win->width = width;
+            ctx->win->height = height;
 
-            app->ctx.evt.enqueue<WindowResizedEvent>(width, height);
+            ctx->evt.enqueue<WindowResizedEvent>(width, height);
         });
 
         glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {
-            auto* app {static_cast<Application*>(glfwGetWindowUserPointer(window))};
+            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
 
-            app->ctx.evt.enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
+            ctx->evt.enqueue<WindowFocusedEvent>(static_cast<bool>(focused));
         });
 
         glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-            auto* app {static_cast<Application*>(glfwGetWindowUserPointer(window))};
+            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
 
             switch (action) {
                 case GLFW_PRESS:
-                    if (ImGuiContext::on_key_pressed(key, scancode)) {
+                    if (DearImGuiContext::on_key_pressed(key, scancode)) {
                         return;
                     }
 
-                    app->ctx.evt.enqueue<KeyPressedEvent>(
+                    ctx->evt.enqueue<KeyPressedEvent>(
                         Input::key_from_code(key),
                         false,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -237,19 +264,19 @@ namespace sm {
 
                     break;
                 case GLFW_RELEASE:
-                    if (ImGuiContext::on_key_released(key, scancode)) {
+                    if (DearImGuiContext::on_key_released(key, scancode)) {
                         return;
                     }
 
-                    app->ctx.evt.enqueue<KeyReleasedEvent>(Input::key_from_code(key));
+                    ctx->evt.enqueue<KeyReleasedEvent>(Input::key_from_code(key));
 
                     break;
                 case GLFW_REPEAT:
-                    if (ImGuiContext::on_key_pressed(key, scancode)) {
+                    if (DearImGuiContext::on_key_pressed(key, scancode)) {
                         return;
                     }
 
-                    app->ctx.evt.enqueue<KeyPressedEvent>(
+                    ctx->evt.enqueue<KeyPressedEvent>(
                         Input::key_from_code(key),
                         true,
                         static_cast<bool>(mods & GLFW_MOD_CONTROL)
@@ -260,7 +287,7 @@ namespace sm {
         });
 
         glfwSetCharCallback(window, [](GLFWwindow*, unsigned int codepoint) {
-            if (ImGuiContext::on_char_typed(codepoint)) {
+            if (DearImGuiContext::on_char_typed(codepoint)) {
                 return;
             }
 
@@ -268,76 +295,46 @@ namespace sm {
         });
 
         glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int) {
-            auto* app {static_cast<Application*>(glfwGetWindowUserPointer(window))};
+            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
 
             switch (action) {
                 case GLFW_PRESS:
-                    if (ImGuiContext::on_mouse_button_pressed(button)) {
+                    if (DearImGuiContext::on_mouse_button_pressed(button)) {
                         return;
                     }
 
-                    app->ctx.evt.enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
+                    ctx->evt.enqueue<MouseButtonPressedEvent>(Input::mouse_button_from_code(button));
 
                     break;
                 case GLFW_RELEASE:
-                    if (ImGuiContext::on_mouse_button_released(button)) {
+                    if (DearImGuiContext::on_mouse_button_released(button)) {
                         return;
                     }
 
-                    app->ctx.evt.enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
+                    ctx->evt.enqueue<MouseButtonReleasedEvent>(Input::mouse_button_from_code(button));
 
                     break;
             }
         });
 
         glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
-            auto* app {static_cast<Application*>(glfwGetWindowUserPointer(window))};
+            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
 
-            if (ImGuiContext::on_mouse_wheel_scrolled(static_cast<float>(yoffset))) {
+            if (DearImGuiContext::on_mouse_wheel_scrolled(static_cast<float>(yoffset))) {
                 return;
             }
 
-            app->ctx.evt.enqueue<MouseWheelScrolledEvent>(static_cast<float>(yoffset));
+            ctx->evt.enqueue<MouseWheelScrolledEvent>(static_cast<float>(yoffset));
         });
 
         glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-            auto* app {static_cast<Application*>(glfwGetWindowUserPointer(window))};
+            auto* ctx {static_cast<Ctx*>(glfwGetWindowUserPointer(window))};
 
-            if (ImGuiContext::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
+            if (DearImGuiContext::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
                 return;
             }
 
-            app->ctx.evt.enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
+            ctx->evt.enqueue<MouseMovedEvent>(static_cast<float>(xpos), static_cast<float>(ypos));
         });
-    }
-
-    std::pair<int, int> Monitors::get_resolution(std::size_t index) const {
-        SM_ASSERT(index < count, "Invalid index");
-
-        const GLFWvidmode* video_mode {glfwGetVideoMode(monitors[index])};
-
-        return std::make_pair(video_mode->width, video_mode->height);
-    }
-
-    std::pair<float, float> Monitors::get_content_scale(std::size_t index) const {
-        SM_ASSERT(index < count, "Invalid index");
-
-        float xscale, yscale;
-        glfwGetMonitorContentScale(monitors[index], &xscale, &yscale);
-
-        return std::make_pair(xscale, yscale);
-    }
-
-    const char* Monitors::get_name(std::size_t index) const {  // TODO used?
-        SM_ASSERT(index < count, "Invalid index");
-
-        const char* name {glfwGetMonitorName(monitors[index])};
-
-        if (name == nullptr) {
-            LOG_DIST_CRITICAL("Could not retrieve monitor name");
-            throw OtherError;
-        }
-
-        return name;
     }
 }

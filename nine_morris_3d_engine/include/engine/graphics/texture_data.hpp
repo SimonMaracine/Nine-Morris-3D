@@ -13,16 +13,15 @@ namespace sm {
         TextureData(TextureData&&) = delete;
         TextureData& operator=(TextureData&&) = delete;
 
-        const std::string& get_file_path() const { return file_path; }
-
-        const unsigned char* get_data() const { return data; }
-        unsigned char* get_data() { return data; }
         int get_width() const { return width; }
         int get_height() const { return height; }
+        const unsigned char* get_data() const { return data; }
+        unsigned char* get_data() { return data; }
+        const std::string& get_file_path() const { return file_path; }
     private:
-        unsigned char* data {nullptr};
         int width {0};
         int height {0};
+        unsigned char* data {nullptr};
         std::string file_path;
     };
 }

@@ -8,9 +8,9 @@ struct GameScene : public sm::Scene {
     GameScene()
         : sm::Scene("loading") {}
 
-    virtual void on_start() override;
-    virtual void on_update() override;
-    virtual void on_imgui_update() override;
+    void on_start() override;
+    void on_update() override;
+    void on_imgui_update() override;
 
     void on_window_resized(const sm::WindowResizedEvent& event);
 

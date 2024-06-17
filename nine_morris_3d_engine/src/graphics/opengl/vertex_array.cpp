@@ -1,16 +1,12 @@
-#include <memory>
-#include <vector>
-#include <functional>
+#include "engine/graphics/opengl/vertex_array.hpp"
+
 #include <cstddef>
+#include <cassert>
 
 #include <glad/glad.h>
 
 #include "engine/application_base/panic.hpp"
-#include "engine/graphics/opengl/vertex_array.hpp"
-#include "engine/graphics/opengl/buffer.hpp"
-#include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
     GlVertexArray::GlVertexArray() {
@@ -46,7 +42,7 @@ namespace sm {
     }
 
     void GlVertexArray::add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout) {
-        SM_ASSERT(layout.elements.size() > 0, "Invalid layout");
+        assert(layout.elements.size() > 0);
 
         buffer->bind();
 

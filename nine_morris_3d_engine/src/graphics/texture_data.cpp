@@ -1,11 +1,9 @@
-#include <string>
+#include "engine/graphics/texture_data.hpp"
 
 #include <stb_image.h>
 
 #include "engine/application_base/panic.hpp"
-#include "engine/graphics/texture_data.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 
 namespace sm {
     static constexpr int CHANNELS {4};
@@ -16,7 +14,7 @@ namespace sm {
 
         stbi_set_flip_vertically_on_load(static_cast<int>(flip));
 
-        int channels;
+        int channels {};
         data = stbi_load(file_path.c_str(), &width, &height, &channels, CHANNELS);
 
         if (data == nullptr) {
@@ -43,7 +41,7 @@ namespace sm {
     // }
 
     TextureData::~TextureData() {
-        SM_ASSERT(data != nullptr, "No data");
+        assert(data != nullptr);
 
         stbi_image_free(data);
 

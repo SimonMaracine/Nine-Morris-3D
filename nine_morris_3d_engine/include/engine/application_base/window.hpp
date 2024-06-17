@@ -8,6 +8,8 @@
 
 #include <resmanager/resmanager.hpp>
 
+#include "engine/application_base/application_properties.hpp"
+
 struct GLFWwindow;
 struct GLFWcursor;
 struct GLFWmonitor;
@@ -15,6 +17,7 @@ struct GLFWmonitor;
 namespace sm {
     class Window;
     class Application;
+    class Ctx;
     class TextureData;
 
     class Monitors {
@@ -34,7 +37,7 @@ namespace sm {
         using CursorId = resmanager::HashedStr64;
         using CursorHash = resmanager::Hash<CursorId>;
 
-        Window(Application* application);
+        Window(const ApplicationProperties& properties, Ctx* ctx);
         ~Window();
 
         Window(const Window&) = delete;
@@ -59,15 +62,15 @@ namespace sm {
         // Swap buffers and update events
         void update() const;
 
-        GLFWwindow* create_window(const Application* application);
+        GLFWwindow* create_window(const ApplicationProperties& properties);
         void install_callbacks() const;
 
         int width {};
         int height {};
 
         GLFWwindow* window {nullptr};
-        std::unordered_map<CursorId, GLFWcursor*, CursorHash> cursors;
         Monitors monitors;
+        std::unordered_map<CursorId, GLFWcursor*, CursorHash> cursors;
 
         friend class Application;
     };

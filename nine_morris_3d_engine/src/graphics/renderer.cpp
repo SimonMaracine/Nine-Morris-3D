@@ -1,11 +1,9 @@
-#include <vector>
-#include <memory>
-#include <unordered_map>
+#include "engine/graphics/renderer.hpp"
+
 #include <cstddef>
 #include <array>
 #include <algorithm>
 
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.hpp>
 
@@ -14,15 +12,10 @@
 #include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
-#include "engine/graphics/renderer.hpp"
 #include "engine/graphics/material.hpp"
-#include "engine/graphics/opengl/gl.hpp"
-#include "engine/graphics/post_processing.hpp"
+#include "engine/graphics/opengl/opengl.hpp"
 #include "engine/graphics/camera.hpp"
-#include "engine/graphics/renderable.hpp"
-#include "engine/graphics/light.hpp"
 #include "engine/other/file_system.hpp"
-#include "engine/other/assert.hpp"
 
 using namespace resmanager::literals;
 
@@ -34,8 +27,8 @@ namespace sm {
     static constexpr std::size_t SHADER_POINT_LIGHTS {4};
 
     Renderer::Renderer(int width, int height) {
-        Gl::enable_depth_test();
-        Gl::clear_color(0.0f, 0.0f, 0.0f);
+        OpenGl::enable_depth_test();
+        OpenGl::clear_color(0.0f, 0.0f, 0.0f);
 
         {
             FramebufferSpecification specification;
@@ -125,7 +118,7 @@ namespace sm {
     }
 
     void Renderer::debug_add_lines(const std::vector<glm::vec3>& points, const glm::vec3& color) {
-        SM_ASSERT(points.size() >= 2, "There must be at least one line");
+        assert(points.size() >= 2);
 
         Line line;
         line.color = color;
@@ -244,8 +237,8 @@ namespace sm {
 
         storage.scene_framebuffer->bind();
 
-        Gl::clear(Gl::Buffers::CD);
-        Gl::viewport(
+        OpenGl::clear(OpenGl::Buffers::CD);
+        OpenGl::viewport(
             storage.scene_framebuffer->get_specification().width,
             storage.scene_framebuffer->get_specification().height
         );
@@ -311,7 +304,7 @@ namespace sm {
             return;
         }
 
-        Gl::viewport(width, height);
+        OpenGl::viewport(width, height);
 
         for (std::weak_ptr<GlFramebuffer> wframebuffer : scene_data.framebuffers) {
             std::shared_ptr<GlFramebuffer> framebuffer {wframebuffer.lock()};
@@ -330,8 +323,8 @@ namespace sm {
 
     void Renderer::screen_quad(unsigned int texture) {
         storage.screen_quad_shader->bind();
-        Gl::bind_texture_2d(texture, 0);
-        Gl::draw_arrays(6);
+        OpenGl::bind_texture_2d(texture, 0);
+        OpenGl::draw_arrays(6);
     }
 
     void Renderer::post_processing() {
@@ -341,7 +334,7 @@ namespace sm {
     void Renderer::end_rendering() {
         storage.screen_quad_vertex_array->bind();
 
-        Gl::disable_depth_test();
+        OpenGl::disable_depth_test();
 
         post_processing();
 
@@ -349,12 +342,12 @@ namespace sm {
         GlFramebuffer::bind_default();
 
         // Clear even the default framebuffer, for debug renderer
-        Gl::clear(Gl::Buffers::CD);
+        OpenGl::clear(OpenGl::Buffers::CD);
 
         // screen_quad(post_processing_context.last_texture);  // FIXME
         screen_quad(storage.scene_framebuffer->get_color_attachment(0));
 
-        Gl::enable_depth_test();
+        OpenGl::enable_depth_test();
 
         GlVertexArray::unbind();
     }
@@ -368,13 +361,13 @@ namespace sm {
             }
 
             if (material->flags & Material::DisableBackFaceCulling) {  // FIXME improve; maybe use scene graph
-                Gl::disable_back_face_culling();
+                OpenGl::disable_back_face_culling();
             }
 
             draw_renderable(renderable);
 
             if (material->flags & Material::DisableBackFaceCulling) {
-                Gl::enable_back_face_culling();
+                OpenGl::enable_back_face_culling();
             }
         }
 
@@ -397,7 +390,7 @@ namespace sm {
 
         material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
-        Gl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
+        OpenGl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
     }
 
     void Renderer::draw_renderables_outlined() {
@@ -497,7 +490,7 @@ namespace sm {
         debug_storage.shader->bind();
         debug_storage.vertex_array->bind();
 
-        Gl::draw_arrays_lines(debug_scene_list.size() * 2);
+        OpenGl::draw_arrays_lines(debug_scene_list.size() * 2);
 
         GlVertexArray::unbind();
 

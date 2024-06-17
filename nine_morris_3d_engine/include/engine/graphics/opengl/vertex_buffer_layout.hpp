@@ -11,8 +11,8 @@ namespace sm {
         };
 
         struct VertexElement {
-            unsigned int index {0};
-            int size {0};
+            unsigned int index {};
+            int size {};
             Type type {};
             bool per_instance {false};
 
@@ -20,7 +20,7 @@ namespace sm {
         };
 
         std::vector<VertexElement> elements;
-        int stride {0};
+        int stride {};
 
         VertexBufferLayout& add(unsigned int index, Type type, int size, bool per_instance = false);
     };

@@ -1,6 +1,3 @@
-#include <cstddef>
-#include <vector>
-
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 
 namespace sm {

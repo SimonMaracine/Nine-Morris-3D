@@ -8,7 +8,6 @@
 #include "engine/application_base/application_properties.hpp"
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/window.hpp"
-#include "engine/application_base/application_builder.hpp"
 #include "engine/application_base/context.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer.hpp"
@@ -31,7 +30,7 @@ namespace sm {
 
         static bool initialize_applications(const ApplicationsData& data);
 
-        Application(const ApplicationBuilder& builder, void* user_data = nullptr);  // TODO move to app properties
+        Application(const ApplicationProperties& properties);
         ~Application();
 
         Application(const Application&) = delete;
@@ -64,13 +63,10 @@ namespace sm {
         void user_start_function();
         void user_stop_function();
         void initialize_audio();
-        void initialize_random_generator();
 
         void on_window_closed(const WindowClosedEvent&);
         void on_window_resized(const WindowResizedEvent& event);
 
-        // Properties
-        ApplicationProperties properties;
         UserFunc start {[](Ctx*) {}};
         UserFunc stop {[](Ctx*) {}};
 

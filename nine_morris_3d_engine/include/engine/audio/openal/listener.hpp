@@ -15,14 +15,6 @@ namespace sm {
 
     class AlListener {
     public:
-        AlListener() = default;
-        ~AlListener() = default;
-
-        AlListener(const AlListener&) = delete;
-        AlListener& operator=(const AlListener&) = delete;
-        AlListener(AlListener&&) = delete;
-        AlListener& operator=(AlListener&&) = delete;
-
         float get_gain() const { return gain; }
         const glm::vec3& get_position() const { return position; }
         const glm::vec3& get_velocity() const { return velocity; }

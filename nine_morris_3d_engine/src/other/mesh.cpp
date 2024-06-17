@@ -1,5 +1,5 @@
-#include <cstddef>
-#include <string>
+#include "engine/other/mesh.hpp"
+
 #include <vector>
 #include <cstring>
 
@@ -8,7 +8,6 @@
 #include <assimp/postprocess.h>
 
 #include "engine/application_base/panic.hpp"
-#include "engine/other/mesh.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -120,7 +119,11 @@ namespace sm {
         }
 
         for (unsigned int i {0}; i < node->mNumChildren; i++) {
-            return find_mesh(node->mChildren[i], object_name, scene);
+            const aiMesh* mesh {find_mesh(node->mChildren[i], object_name, scene)};
+
+            if (mesh != nullptr) {
+                return mesh;
+            }
         }
 
         return nullptr;

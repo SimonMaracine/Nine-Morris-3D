@@ -77,7 +77,7 @@ namespace sm {
 
     class GlTextureCubemap {
     public:
-        GlTextureCubemap(const char** file_paths);  // Don't need encrypted version
+        GlTextureCubemap(const char** file_paths);
         GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data);
         ~GlTextureCubemap();
 

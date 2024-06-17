@@ -1,21 +1,16 @@
-#include <memory>
-#include <string>
-#include <array>
-#include <optional>
+#include "engine/graphics/opengl/texture.hpp"
+
 #include <cstddef>
 #include <algorithm>
+#include <cassert>
 
 #include <glad/glad.h>
 #include <stb_image.h>
-#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "engine/application_base/capabilities.hpp"
 #include "engine/application_base/panic.hpp"
-#include "engine/graphics/opengl/texture.hpp"
-#include "engine/graphics/texture_data.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/assert.hpp"
 #include "engine/other/utilities.hpp"
 
 namespace sm {
@@ -175,7 +170,7 @@ namespace sm {
 
     GlTexture::GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification)
         : specification(specification) {
-        SM_ASSERT(data->get_data() != nullptr, "No data");
+        assert(data->get_data() != nullptr);
 
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -195,7 +190,7 @@ namespace sm {
 
     GlTexture::GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification)
         : specification(specification) {
-        SM_ASSERT(data != nullptr, "No data");
+        assert(data != nullptr);
 
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);

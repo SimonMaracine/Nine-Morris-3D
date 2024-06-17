@@ -1,4 +1,5 @@
-#include <string>
+#include "engine/audio/openal/info_and_debug.hpp"
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -6,7 +7,6 @@
 
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/panic.hpp"
-#include "engine/audio/openal/info_and_debug.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -49,7 +49,7 @@ namespace sm {
 
         static constexpr std::size_t BUFFER_LENGTH {256};  // 256 should be enough
 
-        char line[BUFFER_LENGTH];
+        char line[BUFFER_LENGTH] {};
         std::snprintf(line, BUFFER_LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));
         output.append(line);
 
