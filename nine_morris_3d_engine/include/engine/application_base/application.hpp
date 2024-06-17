@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "engine/application_base/application_properties.hpp"
+#include "engine/application_base/properties.hpp"
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/window.hpp"
 #include "engine/application_base/context.hpp"

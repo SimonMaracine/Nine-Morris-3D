@@ -266,8 +266,14 @@ namespace sm {
 
         for (std::size_t i {0}; i < 6; i++) {
             glTexSubImage2D(
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height,
-                GL_RGBA, GL_UNSIGNED_BYTE, data[i]
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<unsigned int>(i),
+                0,
+                0,
+                0,
+                width,
+                height,
+                GL_RGBA,
+                GL_UNSIGNED_BYTE, data[i]
             );
 
             stbi_image_free(data[i]);
@@ -290,8 +296,15 @@ namespace sm {
 
         for (std::size_t i {0}; i < 6; i++) {
             glTexSubImage2D(
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, data[i]->get_width(), data[i]->get_height(),
-                GL_RGBA, GL_UNSIGNED_BYTE, data[i]->get_data()
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<unsigned int>(i),
+                0,
+                0,
+                0,
+                data[i]->get_width(),
+                data[i]->get_height(),
+                GL_RGBA,
+                GL_UNSIGNED_BYTE,
+                data[i]->get_data()
             );
         }
 

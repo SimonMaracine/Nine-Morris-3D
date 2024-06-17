@@ -490,7 +490,7 @@ namespace sm {
         debug_storage.shader->bind();
         debug_storage.vertex_array->bind();
 
-        OpenGl::draw_arrays_lines(debug_scene_list.size() * 2);
+        OpenGl::draw_arrays_lines(static_cast<int>(debug_scene_list.size()) * 2);
 
         GlVertexArray::unbind();
 

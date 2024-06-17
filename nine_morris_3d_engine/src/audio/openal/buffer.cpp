@@ -28,7 +28,7 @@ namespace sm {
 
     AlBuffer::AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency) {
         alGenBuffers(1, &buffer);
-        alBufferData(buffer, get_format(channels, bps), data, size, frequency);
+        alBufferData(buffer, get_format(channels, bps), data, static_cast<int>(size), frequency);
 
         AlInfoDebug::maybe_check_errors();
 
@@ -41,7 +41,7 @@ namespace sm {
             buffer,
             get_format(data->get_channels(), data->get_bps()),
             data->get_data(),
-            data->get_size(),
+            static_cast<int>(data->get_size()),
             data->get_frequency()
         );
 

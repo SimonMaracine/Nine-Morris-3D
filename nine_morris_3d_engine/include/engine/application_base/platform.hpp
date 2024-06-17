@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-// Include platform.h whenever there is conditional code regarding platform and build mode.
+// Include platform.hpp whenever there is conditional code regarding platform or build mode
 #if defined(__linux__)
     #if defined(__GNUG__)
         #define SM_PLATFORM_LINUX
@@ -39,4 +39,8 @@
     #endif
 #else
     #define SM_BUILD_DEBUG  // Compiled without optimization and with additional debug code
+
+    #ifdef NM3D_DISTRIBUTION_MODE
+        #error "Cannot build in distribution mode while also in debug mode"
+    #endif
 #endif

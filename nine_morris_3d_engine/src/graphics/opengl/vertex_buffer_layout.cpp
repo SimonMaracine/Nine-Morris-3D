@@ -20,7 +20,7 @@ namespace sm {
         element.per_instance = per_instance;
 
         elements.push_back(element);
-        stride += size * VertexElement::get_size(type);
+        stride += size * static_cast<int>(VertexElement::get_size(type));
 
         return *this;
     }

@@ -8,7 +8,7 @@
 
 #include <resmanager/resmanager.hpp>
 
-#include "engine/application_base/application_properties.hpp"
+#include "engine/application_base/properties.hpp"
 
 struct GLFWwindow;
 struct GLFWcursor;

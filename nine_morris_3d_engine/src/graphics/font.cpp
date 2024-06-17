@@ -228,7 +228,7 @@ namespace sm {
             height = std::max(height, static_cast<int>(std::roundf(static_cast<float>(glyph.yoff) * scale)));
         }
 
-        const int width {static_cast<int>(std::roundf((x + padding * 2) * scale))};  // Take padding into consideration
+        const int width {static_cast<int>(std::roundf((static_cast<float>(x + padding * 2) * scale)))};  // Take padding into consideration
 
         return std::make_pair(width, height);
     }

@@ -152,7 +152,7 @@ namespace sm {
         uniforms.reserve(uniform_count);
 
         for (unsigned int i {0}; i < static_cast<unsigned int>(uniform_count); i++) {
-            char buffer[64];
+            char buffer[64] {};
             glGetProgramResourceName(program, GL_UNIFORM, i, 64, nullptr, buffer);
 
             uniforms.push_back(buffer);
@@ -169,14 +169,14 @@ namespace sm {
             std::size_t block_active_uniforms_count {0};
 
             {
-                char buffer[64];
+                char buffer[64] {};
                 glGetProgramResourceName(program, GL_UNIFORM_BLOCK, i, 64, nullptr, buffer);
 
                 block.block_name = buffer;
             }
 
             {
-                int buffer[2];
+                int buffer[2] {};
                 const GLenum properties[] { GL_BUFFER_BINDING, GL_NUM_ACTIVE_VARIABLES };
                 glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, i, 2, properties, 2, nullptr, buffer);
 
@@ -189,12 +189,18 @@ namespace sm {
                 int* buffer_uniforms {new int[block_active_uniforms_count]};
                 const GLenum properties[] { GL_ACTIVE_VARIABLES };
                 glGetProgramResourceiv(
-                    program, GL_UNIFORM_BLOCK, i, 1, properties,
-                    block_active_uniforms_count, nullptr, buffer_uniforms
+                    program,
+                    GL_UNIFORM_BLOCK,
+                    i,
+                    1,
+                    properties,
+                    static_cast<int>(block_active_uniforms_count),
+                    nullptr,
+                    buffer_uniforms
                 );
 
                 for (unsigned int j {0}; j < static_cast<unsigned int>(block_active_uniforms_count); j++) {
-                    char buffer[64];
+                    char buffer[64] {};
                     glGetProgramResourceName(program, GL_UNIFORM, buffer_uniforms[j], 64, nullptr, buffer);
 
                     block.uniforms.push_back(buffer);
@@ -281,11 +287,11 @@ namespace sm {
     }
 
     bool GlShader::check_compilation(unsigned int shader, unsigned int type) const {
-        int compile_status;
+        int compile_status {};
         glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 
         if (compile_status == GL_FALSE) {
-            int log_length;
+            int log_length {};
             glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
 
             const char* type_name {nullptr};
@@ -318,11 +324,11 @@ namespace sm {
     }
 
     bool GlShader::check_linking(unsigned int program) const {
-        int link_status;
+        int link_status {};
         glGetProgramiv(program, GL_LINK_STATUS, &link_status);
 
         if (link_status == GL_FALSE) {
-            int log_length;
+            int log_length {};
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
             if (log_length == 0) {

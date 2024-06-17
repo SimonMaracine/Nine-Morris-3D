@@ -73,6 +73,7 @@ add_library(dear_imgui STATIC
 
 target_include_directories(dear_imgui PUBLIC "extern/imgui")
 target_include_directories(dear_imgui PRIVATE "extern/glfw/include")
+target_compile_definitions(dear_imgui PRIVATE "NDEBUG")
 
 # Make cereal
 add_library(cereal INTERFACE)  # FIXME use submodule
@@ -123,7 +124,6 @@ add_library(nine_morris_3d_engine STATIC
     "src/other/resource_manager.cpp"
     "src/other/utilities.cpp"
 
-    "include/engine/application_base/application_properties.hpp"
     "include/engine/application_base/application.hpp"
     "include/engine/application_base/capabilities.hpp"
     "include/engine/application_base/context.hpp"
@@ -132,6 +132,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/application_base/input.hpp"
     "include/engine/application_base/panic.hpp"
     "include/engine/application_base/platform.hpp"
+    "include/engine/application_base/properties.hpp"
     "include/engine/application_base/tasks.hpp"
     "include/engine/application_base/window.hpp"
     "include/engine/audio/openal/buffer.hpp"
@@ -234,8 +235,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 
     if(NM3D_DISTRIBUTION_MODE)
         target_compile_definitions(nine_morris_3d_engine PUBLIC
-            "NDEBUG"  # Disable asserts globally
             "NM3D_DISTRIBUTION_MODE"  # Another flag used by platform.hpp
+            "NDEBUG"  # Disable asserts globally
         )
     endif()
 endif()
@@ -249,7 +250,4 @@ target_compile_definitions(nine_morris_3d_engine PRIVATE
 target_compile_definitions(nine_morris_3d_engine PUBLIC
     "SPDLOG_ACTIVE_LEVEL=0"
     "_CRT_SECURE_NO_WARNINGS"
-    "ENTT_NO_ETO"  # TODO check if needed
 )
-
-target_compile_definitions(dear_imgui PRIVATE "NDEBUG")  # TODO is it right?

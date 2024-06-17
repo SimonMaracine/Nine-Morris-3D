@@ -1,6 +1,16 @@
 #pragma once
 
+#ifdef __GNUG__
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
+#endif
+
 #include <entt/signal/dispatcher.hpp>
+
+#ifdef __GNUG__
+    #pragma GCC diagnostic pop
+#endif
+
 #include <spdlog/fmt/fmt.h>
 
 #include "engine/application_base/input.hpp"

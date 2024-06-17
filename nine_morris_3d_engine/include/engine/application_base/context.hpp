@@ -6,7 +6,7 @@
 #include "engine/application_base/window.hpp"
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/tasks.hpp"
-#include "engine/application_base/application_properties.hpp"
+#include "engine/application_base/properties.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer.hpp"
 #include "engine/other/resource_manager.hpp"

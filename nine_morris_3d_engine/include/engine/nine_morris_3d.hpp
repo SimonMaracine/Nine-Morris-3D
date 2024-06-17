@@ -2,7 +2,6 @@
 
 // Convenience header
 
-#include "engine/application_base/application_properties.hpp"
 #include "engine/application_base/application.hpp"
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/capabilities.hpp"
@@ -11,6 +10,7 @@
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/panic.hpp"
 #include "engine/application_base/platform.hpp"
+#include "engine/application_base/properties.hpp"
 #include "engine/application_base/tasks.hpp"
 #include "engine/audio/openal/buffer.hpp"
 #include "engine/audio/openal/info_and_debug.hpp"

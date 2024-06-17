@@ -193,7 +193,7 @@ namespace sm {
             glfw_icons.push_back(image);
         }
 
-        glfwSetWindowIcon(window, glfw_icons.size(), glfw_icons.data());
+        glfwSetWindowIcon(window, static_cast<int>(glfw_icons.size()), glfw_icons.data());
     }
 
     double Window::get_time() {

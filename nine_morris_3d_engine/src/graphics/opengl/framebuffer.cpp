@@ -256,12 +256,12 @@ namespace sm {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer->framebuffer);
 
         for (std::size_t i {0}; i < color_attachments.size(); i++) {
-            glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-            glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glReadBuffer(GL_COLOR_ATTACHMENT0 + static_cast<unsigned int>(i));
+            glDrawBuffer(GL_COLOR_ATTACHMENT0 + static_cast<unsigned int>(i));
             glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
         }
 
-        glDrawBuffers(draw_framebuffer->color_attachments.size(), COLOR_ATTACHMENTS);
+        glDrawBuffers(static_cast<int>(draw_framebuffer->color_attachments.size()), COLOR_ATTACHMENTS);
     }
 
     void GlFramebuffer::build() {
@@ -326,20 +326,32 @@ namespace sm {
                             break;
                         case AttachmentFormat::Rgba8:
                             attach_color_texture(
-                                texture, specification.samples, GL_RGBA8,
-                                specification.width, specification.height, i
+                                texture,
+                                specification.samples,
+                                GL_RGBA8,
+                                specification.width,
+                                specification.height,
+                                static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::RedInt:
                             attach_color_texture(
-                                texture, specification.samples, GL_R32I,
-                                specification.width, specification.height, i
+                                texture,
+                                specification.samples,
+                                GL_R32I,
+                                specification.width,
+                                specification.height,
+                                static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::RedFloat:
                             attach_color_texture(
-                                texture, specification.samples, GL_R32F,
-                                specification.width, specification.height, i
+                                texture,
+                                specification.samples,
+                                GL_R32F,
+                                specification.width,
+                                specification.height,
+                                static_cast<unsigned int>(i)
                             );
                             break;
                         default:
@@ -363,20 +375,32 @@ namespace sm {
                             break;
                         case AttachmentFormat::Rgba8:
                             attach_color_renderbuffer(
-                                renderbuffer, specification.samples, GL_RGBA8,
-                                specification.width, specification.height, i
+                                renderbuffer,
+                                specification.samples,
+                                GL_RGBA8,
+                                specification.width,
+                                specification.height,
+                                static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::RedInt:
                             attach_color_renderbuffer(
-                                renderbuffer, specification.samples, GL_R32I,
-                                specification.width, specification.height, i
+                                renderbuffer,
+                                specification.samples,
+                                GL_R32I,
+                                specification.width,
+                                specification.height,
+                                static_cast<unsigned int>(i)
                             );
                             break;
                         case AttachmentFormat::RedFloat:
                             attach_color_renderbuffer(
-                                renderbuffer, specification.samples, GL_R32F,
-                                specification.width, specification.height, i
+                                renderbuffer,
+                                specification.samples,
+                                GL_R32F,
+                                specification.width,
+                                specification.height,
+                                static_cast<unsigned int>(i)
                             );
                             break;
                         default:
@@ -470,7 +494,7 @@ namespace sm {
         if (color_attachments.size() > 1) {
             assert(color_attachments.size() <= std::size(COLOR_ATTACHMENTS));
 
-            glDrawBuffers(color_attachments.size(), COLOR_ATTACHMENTS);
+            glDrawBuffers(static_cast<int>(color_attachments.size()), COLOR_ATTACHMENTS);
         } else if (color_attachments.empty()) {
             glDrawBuffer(GL_NONE);  // TODO what is this?
             glReadBuffer(GL_NONE);

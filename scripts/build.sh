@@ -8,4 +8,4 @@ fi
 
 clear
 cd ../build
-cmake --build . -j 8 --target "$TARGET"
+cmake --build . -j 10 --target "$TARGET"

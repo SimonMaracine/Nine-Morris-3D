@@ -181,7 +181,7 @@ namespace sm {
         // Get uniform indices just to later get offsets, sizes and types
         glGetUniformIndices(
             shader_program,
-            field_count,
+            static_cast<int>(field_count),
             static_cast<const char* const*>(field_names),
             indices
         );
@@ -190,9 +190,9 @@ namespace sm {
             assert(indices[i] != GL_INVALID_INDEX);
         }
 
-        glGetActiveUniformsiv(shader_program, field_count, indices, GL_UNIFORM_OFFSET, offsets);
-        glGetActiveUniformsiv(shader_program, field_count, indices, GL_UNIFORM_SIZE, sizes);  // For arrays
-        glGetActiveUniformsiv(shader_program, field_count, indices, GL_UNIFORM_TYPE, types);
+        glGetActiveUniformsiv(shader_program, static_cast<int>(field_count), indices, GL_UNIFORM_OFFSET, offsets);
+        glGetActiveUniformsiv(shader_program, static_cast<int>(field_count), indices, GL_UNIFORM_SIZE, sizes);  // For arrays
+        glGetActiveUniformsiv(shader_program, static_cast<int>(field_count), indices, GL_UNIFORM_TYPE, types);
 
         // Finally setup the uniform block fields
         for (std::size_t i {0}; i < field_count; i++) {
