@@ -5,7 +5,6 @@
 #include <cassert>
 
 #include <glad/glad.h>
-#include <stb_image.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "engine/application_base/capabilities.hpp"
@@ -104,36 +103,36 @@ namespace sm {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 
-    GlTexture::GlTexture(const std::string& file_path, const TextureSpecification& specification)
-        : specification(specification) {
-        LOG_DEBUG("Loading texture `{}`...", file_path);
+    // GlTexture::GlTexture(const std::string& file_path, const TextureSpecification& specification)
+    //     : specification(specification) {
+    //     LOG_DEBUG("Loading texture `{}`...", file_path);
 
-        stbi_set_flip_vertically_on_load(1);
+    //     stbi_set_flip_vertically_on_load(1);
 
-        int width, height, channels;
-        unsigned char* data {stbi_load(file_path.c_str(), &width, &height, &channels, CHANNELS)};
+    //     int width, height, channels;
+    //     unsigned char* data {stbi_load(file_path.c_str(), &width, &height, &channels, CHANNELS)};
 
-        if (data == nullptr) {
-            LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
-            throw ResourceLoadingError;
-        }
+    //     if (data == nullptr) {
+    //         LOG_DIST_CRITICAL("Could not load texture `{}`", file_path);
+    //         throw ResourceLoadingError;
+    //     }
 
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+    //     glGenTextures(1, &texture);
+    //     glBindTexture(GL_TEXTURE_2D, texture);
 
-        configure_filter_and_wrap(specification);
-        allocate_texture(width, height, data);
-        configure_mipmapping(specification);
+    //     configure_filter_and_wrap(specification);
+    //     allocate_texture(width, height, data);
+    //     configure_mipmapping(specification);
 
-        glBindTexture(GL_TEXTURE_2D, 0);
-        stbi_image_free(data);
+    //     glBindTexture(GL_TEXTURE_2D, 0);
+    //     stbi_image_free(data);
 
-        this->width = width;
-        this->height = height;
-        name = Utils::get_file_name(file_path);
+    //     this->width = width;
+    //     this->height = height;
+    //     name = Utils::get_file_name(file_path);
 
-        LOG_DEBUG("Created GL texture {} ({})", texture, name);
-    }
+    //     LOG_DEBUG("Created GL texture {} ({})", texture, name);
+    // }
 
     // GlTexture::GlTexture(const EncrFile& file_path, const TextureSpecification& specification)
     //     : specification(specification) {
@@ -240,51 +239,51 @@ namespace sm {
 
     // --- Cubemap texture
 
-    GlTextureCubemap::GlTextureCubemap(const char** file_paths) {
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+    // GlTextureCubemap::GlTextureCubemap(const char** file_paths) {
+    //     glGenTextures(1, &texture);
+    //     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
-        configure_filter_and_wrap_3d();
+    //     configure_filter_and_wrap_3d();
 
-        stbi_set_flip_vertically_on_load(0);
+    //     stbi_set_flip_vertically_on_load(0);
 
-        int width, height, channels;
-        unsigned char* data[6];
+    //     int width, height, channels;
+    //     unsigned char* data[6];
 
-        for (std::size_t i {0}; i < 6; i++) {
-            LOG_DEBUG("Loading texture `{}`...", file_paths[i]);
+    //     for (std::size_t i {0}; i < 6; i++) {
+    //         LOG_DEBUG("Loading texture `{}`...", file_paths[i]);
 
-            data[i] = stbi_load(file_paths[i], &width, &height, &channels, CHANNELS);
+    //         data[i] = stbi_load(file_paths[i], &width, &height, &channels, CHANNELS);
 
-            if (data[i] == nullptr) {
-                LOG_DIST_CRITICAL("Could not load texture `{}`", file_paths[i]);
-                throw ResourceLoadingError;
-            }
-        }
+    //         if (data[i] == nullptr) {
+    //             LOG_DIST_CRITICAL("Could not load texture `{}`", file_paths[i]);
+    //             throw ResourceLoadingError;
+    //         }
+    //     }
 
-        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
+    //     glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
 
-        for (std::size_t i {0}; i < 6; i++) {
-            glTexSubImage2D(
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<unsigned int>(i),
-                0,
-                0,
-                0,
-                width,
-                height,
-                GL_RGBA,
-                GL_UNSIGNED_BYTE, data[i]
-            );
+    //     for (std::size_t i {0}; i < 6; i++) {
+    //         glTexSubImage2D(
+    //             GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<unsigned int>(i),
+    //             0,
+    //             0,
+    //             0,
+    //             width,
+    //             height,
+    //             GL_RGBA,
+    //             GL_UNSIGNED_BYTE, data[i]
+    //         );
 
-            stbi_image_free(data[i]);
-        }
+    //         stbi_image_free(data[i]);
+    //     }
 
-        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    //     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-        name = Utils::get_directory_name(file_paths[0]);
+    //     name = Utils::get_directory_name(file_paths[0]);
 
-        LOG_DEBUG("Created GL texture cubemap {} ({})", texture, name);
-    }
+    //     LOG_DEBUG("Created GL texture cubemap {} ({})", texture, name);
+    // }
 
     GlTextureCubemap::GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data) {
         glGenTextures(1, &texture);

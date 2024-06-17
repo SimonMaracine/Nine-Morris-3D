@@ -236,10 +236,11 @@ namespace sm {
         glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
+            win->evt->enqueue<WindowResizedEvent>(width, height);
+
+            // Set these after firing the event
             win->width = width;
             win->height = height;
-
-            win->evt->enqueue<WindowResizedEvent>(width, height);
         });
 
         glfwSetWindowFocusCallback(window, [](GLFWwindow* window, int focused) {

@@ -17,6 +17,7 @@
 #include "engine/graphics/opengl/opengl.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/other/file_system.hpp"
+#include "engine/other/utilities.hpp"
 
 using namespace resmanager::literals;
 
@@ -51,10 +52,13 @@ namespace sm {
         }
 
         {
+            const auto contents_vert {Utils::read_file(FileSystem::path_engine_data("shaders/screen_quad.vert"))};
+            const auto contents_frag {Utils::read_file(FileSystem::path_engine_data("shaders/screen_quad.frag"))};
+
             // Doesn't have uniform buffers for sure
             storage.screen_quad_shader = std::make_unique<GlShader>(
-                FileSystem::path_engine_data("shaders/screen_quad.vert"),
-                FileSystem::path_engine_data("shaders/screen_quad.frag")
+                contents_vert.value_or(""),
+                contents_frag.value_or("")
             );
 
             const float vertices[] {
@@ -443,9 +447,12 @@ namespace sm {
     }
 
     void Renderer::debug_initialize() {
+        const auto contents_vert {Utils::read_file(FileSystem::path_engine_data("shaders/debug.vert"))};
+        const auto contents_frag {Utils::read_file(FileSystem::path_engine_data("shaders/debug.frag"))};
+
         debug_storage.shader = std::make_shared<GlShader>(
-            FileSystem::path_engine_data("shaders/debug.vert"),
-            FileSystem::path_engine_data("shaders/debug.frag")
+            contents_vert.value_or(""),
+            contents_frag.value_or("")
         );
 
         add_shader(debug_storage.shader);

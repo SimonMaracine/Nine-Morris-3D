@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstring>
 #include <fstream>
+#include <cstddef>
 #include <cassert>
 
 namespace sm {
@@ -33,7 +34,7 @@ namespace sm {
         return tokens[tokens.size() - 2];  // It's ok
     }
 
-    std::optional<std::pair<unsigned char*, std::size_t>> Utils::read_file(const std::string& file_path) {  // FIXME error handling, maybe return unique_ptr
+    std::optional<std::string> Utils::read_file(const std::string& file_path) {  // FIXME error handling
         std::ifstream stream {file_path, std::ios::binary};
 
         if (!stream.is_open()) {
@@ -47,9 +48,10 @@ namespace sm {
         char* buffer {new char[length]};
         stream.read(buffer, length);
 
-        return std::make_optional(std::make_pair(
-            reinterpret_cast<unsigned char*>(buffer),
-            static_cast<std::size_t>(length)
-        ));
+        const std::string contents {buffer, static_cast<std::size_t>(length)};
+
+        delete[] buffer;
+
+        return std::make_optional(contents);
     }
 }

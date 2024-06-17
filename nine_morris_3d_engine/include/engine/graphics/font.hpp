@@ -76,7 +76,6 @@ namespace sm {
         std::unordered_map<char32_t, Glyph> glyphs;
 
         stbtt_fontinfo* font_info {nullptr};
-        const unsigned char* font_info_buffer {nullptr};
         int bitmap_size {};
         int padding {};  // Between glyphs
         unsigned char on_edge_value {};

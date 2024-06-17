@@ -106,9 +106,12 @@ void GameScene::on_start() {
         });
     }
 
+    const auto contents_vert {sm::Utils::read_file(sm::FileSystem::path_assets("shaders/simple.vert"))};
+    const auto contents_frag {sm::Utils::read_file(sm::FileSystem::path_assets("shaders/simple.frag"))};
+
     auto shader {std::make_shared<sm::GlShader>(
-        sm::FileSystem::path_assets("shaders/simple.vert"),
-        sm::FileSystem::path_assets("shaders/simple.frag")
+        contents_vert.value_or(""),
+        contents_frag.value_or("")
     )};
 
     ctx->rnd.add_shader(shader);

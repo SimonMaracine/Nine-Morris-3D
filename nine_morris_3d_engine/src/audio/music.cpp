@@ -5,15 +5,15 @@
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    MusicTrack::MusicTrack(const std::string& file_path) {
-        const auto data {std::make_shared<SoundData>(file_path)};
+    // MusicTrack::MusicTrack(const std::string& file_path) {
+    //     const auto data {std::make_shared<SoundData>(file_path)};
 
-        setup(data);
+    //     setup(data);
 
-        name = file_path;
+    //     name = file_path;
 
-        LOG_DEBUG("Loaded music track `{}`", name);
-    }
+    //     LOG_DEBUG("Loaded music track `{}`", name);
+    // }
 
     // MusicTrack::MusicTrack(const EncrFile& file_path) {
     //     const auto data {std::make_shared<SoundData>(file_path)};

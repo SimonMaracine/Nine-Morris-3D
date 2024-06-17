@@ -40,14 +40,13 @@ namespace sm {
         // Mipmapping is off by default
         struct {
             int levels {1};
-            float bias {0.0f};
-            int anisotropic_filtering {0};
+            float bias {};
+            int anisotropic_filtering {};
         } mipmapping;
     };
 
     class GlTexture {
     public:
-        GlTexture(const std::string& file_path, const TextureSpecification& specification);
         GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
         GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification);
         ~GlTexture();
@@ -68,16 +67,15 @@ namespace sm {
 
         TextureSpecification specification;
 
-        unsigned int texture {0};
-        int width {0};
-        int height {0};
+        unsigned int texture {};
+        int width {};
+        int height {};
 
         std::string name;
     };
 
     class GlTextureCubemap {
     public:
-        GlTextureCubemap(const char** file_paths);
         GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data);
         ~GlTextureCubemap();
 
@@ -89,7 +87,7 @@ namespace sm {
         void bind(unsigned int unit) const;
         static void unbind();
     private:
-        unsigned int texture {0};
+        unsigned int texture {};
 
         std::string name;
     };

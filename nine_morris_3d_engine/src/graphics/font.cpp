@@ -65,10 +65,9 @@ namespace sm {
             throw ResourceLoadingError;
         }
 
-        font_info_buffer = contents->first;
         font_info = new stbtt_fontinfo;
 
-        if (!stbtt_InitFont(font_info, font_info_buffer, 0)) {
+        if (!stbtt_InitFont(font_info, reinterpret_cast<const unsigned char*>(contents->c_str()), 0)) {
             LOG_DIST_CRITICAL("Could not load font `{}`", file_path);
             throw ResourceLoadingError;
         }
@@ -84,7 +83,6 @@ namespace sm {
 
     Font::~Font() {
         delete font_info;
-        delete[] font_info_buffer;
 
         LOG_DEBUG("Unloaded font `{}`", name);
     }

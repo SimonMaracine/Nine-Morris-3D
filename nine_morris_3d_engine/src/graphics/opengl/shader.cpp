@@ -10,11 +10,10 @@
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/panic.hpp"
 #include "engine/other/logging.hpp"
-#include "engine/other/utilities.hpp"
 
 namespace sm {
     GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment) {
-        name = Utils::get_file_name(source_vertex) + " & " + Utils::get_file_name(source_fragment);
+        // name = Utils::get_file_name(source_vertex) + " & " + Utils::get_file_name(source_fragment);  // FIXME
 
         vertex_shader = compile_shader(source_vertex, GL_VERTEX_SHADER);
         fragment_shader = compile_shader(source_fragment, GL_FRAGMENT_SHADER);
@@ -240,42 +239,13 @@ namespace sm {
         fragment_shader = 0;
     }
 
-    unsigned int GlShader::compile_shader(const std::string& source_path, unsigned int type) const {
-        const auto contents {Utils::read_file(source_path)};
-
-        if (!contents) {
-            LOG_DIST_CRITICAL("Could not open file `{}` for reading", source_path);
-            throw ResourceLoadingError;
-        }
-
-        const auto [buffer, length] {*contents};
-
+    unsigned int GlShader::compile_shader(const std::string& source, unsigned int type) const {
         const unsigned int shader {glCreateShader(type)};
 
-        const char* const source {reinterpret_cast<const char*>(buffer)};
-        const int source_length {static_cast<int>(length)};
+        const char* const source_data {source.c_str()};
+        const int source_length {static_cast<int>(source.size())};
 
-        glShaderSource(shader, 1, &source, &source_length);
-        glCompileShader(shader);
-
-        delete[] buffer;
-
-        if (!check_compilation(shader, type)) {
-            LOG_DIST_CRITICAL("Could not compile shader {}", shader);
-            throw ResourceLoadingError;
-        }
-
-        return shader;
-    }
-
-    unsigned int GlShader::compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const {
-        const unsigned int shader {glCreateShader(type)};
-
-        const char* buffer {reinterpret_cast<const char*>(source_buffer.first)};
-        const char* const source {buffer};
-        const int source_length {static_cast<int>(source_buffer.second)};
-
-        glShaderSource(shader, 1, &source, &source_length);
+        glShaderSource(shader, 1, &source_data, &source_length);
         glCompileShader(shader);
 
         if (!check_compilation(shader, type)) {
@@ -285,6 +255,24 @@ namespace sm {
 
         return shader;
     }
+
+    // unsigned int GlShader::compile_shader(const std::pair<unsigned char*, std::size_t>& source, unsigned int type) const {
+    //     const unsigned int shader {glCreateShader(type)};
+
+    //     const char* buffer {reinterpret_cast<const char*>(source_buffer.first)};
+    //     const char* const source {buffer};
+    //     const int source_length {static_cast<int>(source_buffer.second)};
+
+    //     glShaderSource(shader, 1, &source, &source_length);
+    //     glCompileShader(shader);
+
+    //     if (!check_compilation(shader, type)) {
+    //         LOG_DIST_CRITICAL("Could not compile shader {}", shader);
+    //         throw ResourceLoadingError;
+    //     }
+
+    //     return shader;
+    // }
 
     bool GlShader::check_compilation(unsigned int shader, unsigned int type) const {
         int compile_status {};

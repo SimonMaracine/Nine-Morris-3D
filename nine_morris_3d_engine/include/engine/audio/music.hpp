@@ -17,8 +17,7 @@ namespace sm {
 
     class MusicTrack {
     public:
-        MusicTrack(const std::string& file_path);
-        MusicTrack(std::shared_ptr<SoundData> data);
+        explicit MusicTrack(std::shared_ptr<SoundData> data);
         ~MusicTrack();
 
         MusicTrack(const MusicTrack&) = delete;

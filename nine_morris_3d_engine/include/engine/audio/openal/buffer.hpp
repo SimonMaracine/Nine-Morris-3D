@@ -12,7 +12,7 @@ namespace sm {
     class AlBuffer {
     public:
         AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency);
-        AlBuffer(std::shared_ptr<SoundData> data);
+        explicit AlBuffer(std::shared_ptr<SoundData> data);
         ~AlBuffer();
 
         AlBuffer(const AlBuffer&) = delete;
@@ -20,7 +20,7 @@ namespace sm {
         AlBuffer(AlBuffer&&) = delete;
         AlBuffer& operator=(AlBuffer&&) = delete;
     private:
-        unsigned int buffer {0};
+        unsigned int buffer {};
         std::unordered_set<unsigned int> sources_attached;  // The sources that this buffer is attached to
 
         friend class AlSource;

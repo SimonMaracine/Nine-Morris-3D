@@ -49,14 +49,13 @@ namespace sm {
 
         unsigned int create_program() const;
         void delete_intermediates();
-        unsigned int compile_shader(const std::string& source_path, unsigned int type) const;
-        unsigned int compile_shader(const std::pair<unsigned char*, std::size_t>& source_buffer, unsigned int type) const;
+        unsigned int compile_shader(const std::string& source, unsigned int type) const;
         bool check_compilation(unsigned int shader, unsigned int type) const;
         bool check_linking(unsigned int program) const;
 
-        unsigned int program {0};
-        unsigned int vertex_shader {0};
-        unsigned int fragment_shader {0};
+        unsigned int program {};
+        unsigned int vertex_shader {};
+        unsigned int fragment_shader {};
 
         std::string name;
 
