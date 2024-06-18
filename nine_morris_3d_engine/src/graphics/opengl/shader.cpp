@@ -9,7 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "engine/application_base/platform.hpp"
-#include "engine/application_base/panic.hpp"
+#include "engine/application_base/error.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -20,7 +20,7 @@ namespace sm {
 
         if (!check_linking(program)) {
             LOG_DIST_CRITICAL("Could not link shader program {}", program);
-            throw ResourceLoadingError;
+            throw RuntimeError::ResourceLoading;
         }
 
         delete_intermediates();
@@ -249,7 +249,7 @@ namespace sm {
 
         if (!check_compilation(shader, type)) {
             LOG_DIST_CRITICAL("Could not compile shader {}", shader);
-            throw ResourceLoadingError;
+            throw RuntimeError::ResourceLoading;
         }
 
         return shader;

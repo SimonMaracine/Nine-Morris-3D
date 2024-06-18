@@ -10,8 +10,8 @@
 #include "engine/application_base/platform.hpp"
 #include "engine/audio/music.hpp"
 #include "engine/graphics/opengl/opengl.hpp"
-#include "engine/graphics/opengl/info_and_debug.hpp"
-#include "engine/graphics/dear_imgui_context.hpp"
+#include "engine/graphics/opengl/debug.hpp"
+#include "engine/graphics/imgui_context.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/file_system.hpp"
 
@@ -39,13 +39,13 @@ namespace sm {
         ctx.user_data = properties.user_data;
 
         Input::initialize(ctx.win.get_handle());
-        DearImGuiContext::initialize(ctx.win.get_handle());
+        ImGuiContext::initialize(ctx.win.get_handle());
 
 #ifndef SM_BUILD_DISTRIBUTION
         Logging::log_general_information(Logging::LogTarget::Console);
 #endif
 
-        const auto [version_major, version_minor] {GlInfoDebug::get_version_number()};
+        const auto [version_major, version_minor] {GlDebug::get_version_number()};
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
         ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
@@ -58,7 +58,7 @@ namespace sm {
 
     Application::~Application() {  // Destructor is called before all member variables
         MusicPlayer::uninitialize();
-        DearImGuiContext::uninitialize();
+        ImGuiContext::uninitialize();
         Input::uninitialize();
     }
 
@@ -175,9 +175,9 @@ namespace sm {
     }
 
     void Application::dear_imgui_render() {
-        DearImGuiContext::begin_frame();
+        ImGuiContext::begin_frame();
         current_scene->on_imgui_update();
-        DearImGuiContext::end_frame();
+        ImGuiContext::end_frame();
     }
 
     void Application::prepare_scenes(Id start_scene_id) {

@@ -5,7 +5,7 @@
 
 #include <stb_vorbis.h>
 
-#include "engine/application_base/panic.hpp"
+#include "engine/application_base/error.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -22,7 +22,7 @@ namespace sm {
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load sound data `{}`", file_path);
-            throw ResourceLoadingError;
+            throw RuntimeError::ResourceLoading;
         }
 
         size = compute_size();

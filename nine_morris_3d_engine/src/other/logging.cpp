@@ -5,13 +5,13 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "engine/audio/openal/info_and_debug.hpp"
-#include "engine/graphics/opengl/info_and_debug.hpp"
+#include "engine/audio/openal/debug.hpp"
+#include "engine/graphics/opengl/debug.hpp"
 #include "engine/other/file_system.hpp"
 #include "engine/other/dependencies.hpp"
 
-#define LOG_PATTERN_DEBUG "%^[%l] [%t] [%H:%M:%S]%$ %v"
-#define LOG_PATTERN_RELEASE "%^[%l] [%t] [%!:%#] [%c]%$ %v"
+#define LOG_PATTERN_DEVELOPMENT "%^[%l] [%t] [%H:%M:%S]%$ %v"
+#define LOG_PATTERN_DISTRIBUTION "%^[%l] [%t] [%!:%#] [%c]%$ %v"
 
 #define FILE_SIZE (1048576 * 2)  // 2 MiB
 #define ROTATING_FILES 2  // 3 total log files
@@ -33,30 +33,28 @@ namespace sm {
         const std::string file_path {FileSystem::path_for_logs(log_file)};
 
         try {
-            global_logger = spdlog::rotating_logger_mt(
-                "Distribution Logger [File]", file_path, FILE_SIZE, ROTATING_FILES
-            );
+            global_logger = spdlog::rotating_logger_mt("Distribution Logger [File]", file_path, FILE_SIZE, ROTATING_FILES);
         } catch (const spdlog::spdlog_ex& e) {
             set_fallback_logger_distribution(e.what());
             return;
         }
 
-        global_logger->set_pattern(LOG_PATTERN_RELEASE);
+        global_logger->set_pattern(LOG_PATTERN_DISTRIBUTION);
         global_logger->set_level(spdlog::level::trace);
         global_logger->flush_on(spdlog::level::info);
 #else
-        global_logger = spdlog::stdout_color_mt("Debug Logger [Console]");
-        global_logger->set_pattern(LOG_PATTERN_DEBUG);
+        global_logger = spdlog::stdout_color_mt("Development Logger [Console]");
+        global_logger->set_pattern(LOG_PATTERN_DEVELOPMENT);
         global_logger->set_level(spdlog::level::trace);
 #endif
     }
 
     void Logging::log_general_information(LogTarget target) {
         std::string contents;
-        contents.reserve(1024 + 64 + 512);  // FIXME really bad; use something else
 
-        contents += AlInfoDebug::get_information();
-        contents += GlInfoDebug::get_information();
+        contents += '\n';
+        contents += AlDebug::get_information();
+        contents += GlDebug::get_information();
         contents += Dependencies::get_information();
 
         switch (target) {
@@ -95,7 +93,7 @@ namespace sm {
 
     void Logging::set_fallback_logger_distribution(const char* error_message) {
         global_logger = spdlog::stdout_color_mt("Distribution Logger Fallback [Console]");
-        global_logger->set_pattern(LOG_PATTERN_RELEASE);
+        global_logger->set_pattern(LOG_PATTERN_DISTRIBUTION);
         global_logger->set_level(spdlog::level::trace);
 
         global_logger->error("Using fallback distribution logger: {}", error_message);

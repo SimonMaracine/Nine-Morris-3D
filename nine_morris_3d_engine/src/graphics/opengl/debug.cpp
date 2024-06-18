@@ -1,4 +1,4 @@
-#include "engine/graphics/opengl/info_and_debug.hpp"
+#include "engine/graphics/opengl/debug.hpp"
 
 #include <cstddef>
 #include <cstdio>
@@ -9,7 +9,6 @@
 
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/capabilities.hpp"
-#include "engine/application_base/panic.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -61,14 +60,14 @@ namespace sm {
 
     static constexpr std::size_t BUFFER_LENGTH {128};
 
-    void GlInfoDebug::maybe_initialize_debugging() {
+    void GlDebug::initialize_debug() {
 #ifndef SM_BUILD_DISTRIBUTION
         glDebugMessageCallback(
             [](GLenum, GLenum, GLuint id, GLenum severity, GLsizei, const GLchar* message, const GLvoid*) {
                 switch (severity) {
                     case GL_DEBUG_SEVERITY_HIGH:
                         LOG_CRITICAL("({}) OpenGL: {}", id, message);
-                        std::exit(1);
+                        std::abort();
 
                         break;
                     case GL_DEBUG_SEVERITY_MEDIUM:
@@ -101,82 +100,81 @@ namespace sm {
 #endif
     }
 
-    std::string GlInfoDebug::get_information() {
-        std::string output;
-        output.reserve(1024);
+    std::string GlDebug::get_information() {
+        char buffer[BUFFER_LENGTH] {};
+        std::string result;
 
-        output.append("\n*** OpenGL Version And Driver ***\n");
+        result += "*** OpenGL Version And Driver ***\n";
 
         {
             static constexpr std::size_t BUFFER_LENGTH {256};  // 256 should be enough
 
-            char line[BUFFER_LENGTH];
-            std::snprintf(line, BUFFER_LENGTH, "OpenGL version: %s\n", glGetString(GL_VERSION));
-            output.append(line);
-            std::snprintf(line, BUFFER_LENGTH, "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-            output.append(line);
-            std::snprintf(line, BUFFER_LENGTH, "Vendor: %s\n", glGetString(GL_VENDOR));
-            output.append(line);
-            std::snprintf(line, BUFFER_LENGTH, "Renderer: %s\n", glGetString(GL_RENDERER));
-            output.append(line);
+            char buffer[BUFFER_LENGTH] {};
+
+            std::snprintf(buffer, BUFFER_LENGTH, "OpenGL version: %s\n", glGetString(GL_VERSION));
+            result += buffer;
+            std::snprintf(buffer, BUFFER_LENGTH, "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+            result += buffer;
+            std::snprintf(buffer, BUFFER_LENGTH, "Vendor: %s\n", glGetString(GL_VENDOR));
+            result += buffer;
+            std::snprintf(buffer, BUFFER_LENGTH, "Renderer: %s\n", glGetString(GL_RENDERER));
+            result += buffer;
         }
 
-        output.append("\n*** OpenGL Context Parameters ***\n");
+        result += "*** OpenGL Context Parameters ***\n";
 
         std::size_t parameter_index {18};
 
         for (std::size_t i {0}; i <= parameter_index; i++) {
-            GLint result;
-            glGetIntegerv(parameters[i], &result);
+            GLint value {};
+            glGetIntegerv(parameters[i], &value);
 
-            char line[BUFFER_LENGTH];
-            std::snprintf(line, BUFFER_LENGTH, "%s %i\n", names[i], result);
-            output.append(line);
+            std::snprintf(buffer, BUFFER_LENGTH, "%s %i\n", names[i], value);
+            result += buffer;
         }
         {
-            GLint result[2];
-            glGetIntegerv(parameters[++parameter_index], result);
+            GLint value[2] {};
+            glGetIntegerv(parameters[++parameter_index], value);
 
-            char line[BUFFER_LENGTH];
-            std::snprintf(line, BUFFER_LENGTH, "%s %i %i\n", names[parameter_index], result[0], result[1]);
-            output.append(line);
+            std::snprintf(buffer, BUFFER_LENGTH, "%s %i %i\n", names[parameter_index], value[0], value[1]);
+            result += buffer;
         }
 
-        output.append("\n*** OpenGL Extensions ***\n");
+        result += "*** OpenGL Extensions ***\n";
 
-        char line[BUFFER_LENGTH];
         std::snprintf(
-            line,
+            buffer,
             BUFFER_LENGTH,
             "GL_EXT_texture_filter_anisotropic max samples: %d\n",
             Capabilities::max_anisotropic_filtering_supported()
         );
-        output.append(line);
+        result += buffer;
 
-        return output;
+        return result;
     }
 
-    std::pair<int, int> GlInfoDebug::get_version_number() {
-        int major, minor;
+    std::pair<int, int> GlDebug::get_version_number() {
+        int major {};
+        int minor {};
         glGetIntegerv(GL_MAJOR_VERSION, &major);
         glGetIntegerv(GL_MINOR_VERSION, &minor);
 
         return std::make_pair(major, minor);
     }
 
-    const unsigned char* GlInfoDebug::get_opengl_version() {
+    const unsigned char* GlDebug::get_opengl_version() {
         return glGetString(GL_VERSION);
     }
 
-    const unsigned char* GlInfoDebug::get_glsl_version() {
+    const unsigned char* GlDebug::get_glsl_version() {
         return glGetString(GL_SHADING_LANGUAGE_VERSION);
     }
 
-    const unsigned char* GlInfoDebug::get_vendor() {
+    const unsigned char* GlDebug::get_vendor() {
         return glGetString(GL_VENDOR);
     }
 
-    const unsigned char* GlInfoDebug::get_renderer() {
+    const unsigned char* GlDebug::get_renderer() {
         return glGetString(GL_RENDERER);
     }
 }

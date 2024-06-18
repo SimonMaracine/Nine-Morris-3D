@@ -2,7 +2,7 @@
 
 #include <AL/alc.h>
 
-#include "engine/application_base/panic.hpp"
+#include "engine/application_base/error.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -17,14 +17,14 @@ namespace sm {
 
         if (device == nullptr) {
             LOG_DIST_CRITICAL("Could not open an AL device");
-            throw InitializationError;
+            throw RuntimeError::Initialization;
         }
 
         context = alcCreateContext(device, nullptr);
 
         if (context == nullptr) {
             LOG_DIST_CRITICAL("Could not create AL context");
-            throw InitializationError;
+            throw RuntimeError::Initialization;
         }
 
         if (alcMakeContextCurrent(context) == ALC_FALSE) {
@@ -32,7 +32,7 @@ namespace sm {
             alcCloseDevice(device);
 
             LOG_DIST_CRITICAL("Could not make AL context current");
-            throw InitializationError;
+            throw RuntimeError::Initialization;
         }
 
         listener.set_distance_model(DistanceModel::InverseClamped);

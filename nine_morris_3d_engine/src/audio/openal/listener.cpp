@@ -4,7 +4,7 @@
 
 #include <AL/al.h>
 
-#include "engine/audio/openal/info_and_debug.hpp"
+#include "engine/audio/openal/debug.hpp"
 
 namespace sm {
     void AlListener::set_gain(float gain) {
@@ -12,7 +12,7 @@ namespace sm {
 
         alListenerf(AL_GAIN, gain);
 
-        AlInfoDebug::maybe_check_errors();
+        AlDebug::check_errors();
 
         this->gain = gain;
     }
@@ -20,7 +20,7 @@ namespace sm {
     void AlListener::set_position(const glm::vec3& position) {
         alListener3f(AL_POSITION, position.x, position.y, position.z);
 
-        AlInfoDebug::maybe_check_errors();
+        AlDebug::check_errors();
 
         this->position = position;
     }
@@ -28,7 +28,7 @@ namespace sm {
     void AlListener::set_velocity(const glm::vec3& velocity) {
         alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
-        AlInfoDebug::maybe_check_errors();
+        AlDebug::check_errors();
 
         this->velocity = velocity;
     }
@@ -45,7 +45,7 @@ namespace sm {
 
         alListenerfv(AL_ORIENTATION, orientation);
 
-        AlInfoDebug::maybe_check_errors();
+        AlDebug::check_errors();
 
         this->look_at = look_at;
         this->up = up;
@@ -80,7 +80,7 @@ namespace sm {
 
         alDistanceModel(result);
 
-        AlInfoDebug::maybe_check_errors();
+        AlDebug::check_errors();
 
         this->distance_model = distance_model;
     }

@@ -4,11 +4,11 @@
 
 #include <glad/glad.h>
 
-#include "engine/application_base/panic.hpp"
+#include "engine/application_base/error.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
-    static const GLenum COLOR_ATTACHMENTS[4] {
+    static const GLenum COLOR_ATTACHMENTS[] {
         GL_COLOR_ATTACHMENT0,
         GL_COLOR_ATTACHMENT1,
         GL_COLOR_ATTACHMENT2,
@@ -505,7 +505,7 @@ namespace sm {
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             LOG_DIST_CRITICAL("GL framebuffer {} is incomplete", framebuffer);
             LOG_DIST_CRITICAL("Status: {}", print_framebuffer_status_message(status));
-            throw OtherError;
+            throw RuntimeError::Other;
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

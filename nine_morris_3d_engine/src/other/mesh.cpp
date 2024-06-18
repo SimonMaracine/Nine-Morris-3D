@@ -7,7 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "engine/application_base/panic.hpp"
+#include "engine/application_base/error.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -151,7 +151,7 @@ namespace sm {
         if (scene == nullptr) {
             LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
             LOG_DIST_CRITICAL("Assimp: ", importer.GetErrorString());
-            throw ResourceLoadingError;
+            throw RuntimeError::ResourceLoading;
         }
 
         const aiNode* root_node {scene->mRootNode};
@@ -159,7 +159,7 @@ namespace sm {
 
         if (mesh == nullptr) {
             LOG_CRITICAL("Model file `{}` does not contain `{}` mesh", file_path, object_name);
-            throw ResourceLoadingError;
+            throw RuntimeError::ResourceLoading;
         }
 
         load(type, mesh, file_path);

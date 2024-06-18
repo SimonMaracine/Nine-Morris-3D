@@ -1,5 +1,6 @@
 #include "engine/other/dependencies.hpp"
 
+#include <cstdio>
 #include <cstddef>
 
 #include <imgui.h>
@@ -30,7 +31,7 @@ namespace sm {
         char buffer[BUFFER_LENGTH] {};
         std::string result;
 
-        result += "\n*** Compiler ***\n";
+        result += "*** Compiler ***\n";
 
 #if defined(SM_PLATFORM_LINUX)
         {
@@ -44,7 +45,7 @@ namespace sm {
         }
 #endif
 
-        result += "\n*** Dependencies ***\n";
+        result += "*** Dependencies ***\n";
 
         {
             std::snprintf(buffer, BUFFER_LENGTH, "GLFW version: %s\n", glfwGetVersionString());

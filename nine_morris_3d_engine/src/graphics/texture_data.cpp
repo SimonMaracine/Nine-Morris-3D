@@ -2,7 +2,7 @@
 
 #include <stb_image.h>
 
-#include "engine/application_base/panic.hpp"
+#include "engine/application_base/error.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -18,7 +18,7 @@ namespace sm {
 
         if (data == nullptr) {
             LOG_DIST_CRITICAL("Could not load texture data `{}`", file_path);
-            throw ResourceLoadingError;
+            throw RuntimeError::ResourceLoading;
         }
     }
 

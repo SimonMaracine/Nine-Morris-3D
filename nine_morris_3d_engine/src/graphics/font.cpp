@@ -10,7 +10,7 @@
 #include <utf8.h>
 
 #include "engine/application_base/platform.hpp"
-#include "engine/application_base/panic.hpp"
+#include "engine/application_base/error.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/other/logging.hpp"
@@ -62,14 +62,14 @@ namespace sm {
 
         if (!contents) {
             LOG_DIST_CRITICAL("Could not open file `{}` for reading", file_path);
-            throw ResourceLoadingError;
+            throw RuntimeError::ResourceLoading;
         }
 
         font_info = new stbtt_fontinfo;
 
         if (!stbtt_InitFont(font_info, reinterpret_cast<const unsigned char*>(contents->c_str()), 0)) {
             LOG_DIST_CRITICAL("Could not load font `{}`", file_path);
-            throw ResourceLoadingError;
+            throw RuntimeError::ResourceLoading;
         }
 
         sf = stbtt_ScaleForPixelHeight(font_info, size);

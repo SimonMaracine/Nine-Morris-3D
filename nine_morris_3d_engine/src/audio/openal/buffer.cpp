@@ -2,8 +2,8 @@
 
 #include <AL/al.h>
 
-#include "engine/application_base/panic.hpp"
-#include "engine/audio/openal/info_and_debug.hpp"
+#include "engine/application_base/error.hpp"
+#include "engine/audio/openal/debug.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -19,8 +19,8 @@ namespace sm {
         } else if (channels == 2 && bps == 16) {
             format = AL_FORMAT_STEREO16;
         } else {
-            LOG_DIST_CRITICAL("Unknown format: channels = `{}`, bps = `{}`", channels, bps);
-            throw ResourceLoadingError;
+            LOG_DIST_CRITICAL("Unknown format: channels = {}, bps = {}", channels, bps);
+            throw RuntimeError::ResourceLoading;
         }
 
         return format;
@@ -30,7 +30,7 @@ namespace sm {
         alGenBuffers(1, &buffer);
         alBufferData(buffer, get_format(channels, bps), data, static_cast<int>(size), frequency);
 
-        AlInfoDebug::maybe_check_errors();
+        AlDebug::check_errors();
 
         LOG_DEBUG("Created AL buffer {}", buffer);
     }
@@ -45,22 +45,22 @@ namespace sm {
             data->get_frequency()
         );
 
-        AlInfoDebug::maybe_check_errors();
+        AlDebug::check_errors();
 
         LOG_DEBUG("Created AL buffer {}", buffer);
     }
 
     AlBuffer::~AlBuffer() {
-        for (ALuint source : sources_attached) {
+        for (const ALuint source : sources_attached) {
             alSourceStop(source);
             alSourcei(source, AL_BUFFER, 0);
 
-            AlInfoDebug::maybe_check_errors();
+            AlDebug::check_errors();
         }
 
         alDeleteBuffers(1, &buffer);
 
-        AlInfoDebug::maybe_check_errors();
+        AlDebug::check_errors();
 
         LOG_DEBUG("Deleted AL buffer {}", buffer);
     }

@@ -3,12 +3,9 @@
 #include <string>
 
 namespace sm {
-    struct AlInfoDebug {
-        static void maybe_check_errors();
-
-        // Get various information about OpenAL
+    struct AlDebug {
+        static void check_errors();
         static std::string get_information();
-
         static const char* get_version();
     };
 }

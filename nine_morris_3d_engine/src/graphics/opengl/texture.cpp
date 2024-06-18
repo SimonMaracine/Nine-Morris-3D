@@ -8,7 +8,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "engine/application_base/capabilities.hpp"
-#include "engine/application_base/panic.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/utilities.hpp"
 

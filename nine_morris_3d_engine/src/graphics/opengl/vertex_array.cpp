@@ -5,7 +5,6 @@
 
 #include <glad/glad.h>
 
-#include "engine/application_base/panic.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
