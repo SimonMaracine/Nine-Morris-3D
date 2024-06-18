@@ -24,4 +24,5 @@
 	url = https://github.com/SimonMaracine/openal-soft.git
 [submodule "nine_morris_3d_engine/extern/resmanager"]
 	path = nine_morris_3d_engine/extern/resmanager
-	url = https://github.com/SimonMaracine/resource-manager.git
+	url = https://github.com/SimonMaracine/resource-manager
+	branch = stable
