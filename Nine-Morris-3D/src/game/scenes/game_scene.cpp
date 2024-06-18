@@ -80,8 +80,8 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            sm::FileSystem::path_assets("scene/scene.obj"),
-            "Cube_Cube.001",
+            sm::FileSystem::path_assets("models/cube.obj"),
+            "Cube",
             sm::Mesh::Type::PN
         )};
 
@@ -214,6 +214,7 @@ void GameScene::on_update() {
     cube.vertex_array = ctx->res.vertex_array["cube"_H];
     cube.material = ctx->res.material_instance["cube"_H];
     cube.position = glm::vec3(5.0f, 2.0f, -2.0f);
+    cube.scale = 0.8f;
 
     ctx->rnd.add_renderable(cube);
 

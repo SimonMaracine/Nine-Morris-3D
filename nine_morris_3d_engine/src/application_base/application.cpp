@@ -49,6 +49,7 @@ namespace sm {
 
         ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
         ctx.evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);
+        ctx.evt.connect<WindowIconifiedEvent, &Application::on_window_iconified>(this);
 
         frame_counter.previous_seconds = Window::get_time();
         fixed_update.previous_seconds = Window::get_time();
@@ -60,14 +61,17 @@ namespace sm {
         Input::uninitialize();
     }
 
-    int Application::run(Id start_scene_id) {
+    int Application::run(Id start_scene_id, UserFunctions&& user_functions) {
         prepare_scenes(start_scene_id);
 
-        user_start_function();
+        LOG_INFO("Calling user start function...");
+
+        user_functions.start(ctx);
         current_scene->on_start();
         ctx.rnd.prerender_setup();
 
         ctx.win.show();
+
         LOG_INFO("Initialized application, entering main loop...");
 
         while (ctx.running) {
@@ -94,17 +98,12 @@ namespace sm {
 
         ctx.rnd.postrender_setup();
         current_scene->on_stop();
-        user_stop_function();
+
+        LOG_INFO("Calling user stop function...");
+
+        user_functions.stop(ctx);
 
         return ctx.exit_code;
-    }
-
-    void Application::set_start_function(const UserFunc& start) {
-        this->start = start;
-    }
-
-    void Application::set_stop_function(const UserFunc& stop) {
-        this->stop = stop;
     }
 
     float Application::update_frame_counter() {
@@ -191,23 +190,15 @@ namespace sm {
         assert(current_scene != nullptr);
     }
 
-    void Application::user_start_function() {
-        LOG_INFO("Calling user start routine...");
-
-        start(&ctx);
-    }
-
-    void Application::user_stop_function() {
-        LOG_INFO("Calling user stop routine...");
-
-        stop(&ctx);
-    }
-
     void Application::on_window_closed(const WindowClosedEvent&) {
         ctx.running = false;
     }
 
     void Application::on_window_resized(const WindowResizedEvent& event) {
         ctx.rnd.resize_framebuffers(event.width, event.height);
+    }
+
+    void Application::on_window_iconified(const WindowIconifiedEvent& event) {
+        // TODO don't render
     }
 }

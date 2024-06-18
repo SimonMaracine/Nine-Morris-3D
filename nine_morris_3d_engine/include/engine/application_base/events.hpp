@@ -71,6 +71,10 @@ namespace sm {
         bool focused {};
     };
 
+    struct WindowIconifiedEvent {
+        bool iconified {};
+    };
+
     struct KeyPressedEvent {
         Key key {};
         bool repeat {};

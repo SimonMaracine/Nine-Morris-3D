@@ -18,14 +18,18 @@
 namespace sm {
     class Application final {
     public:
-        using UserFunc = std::function<void(Ctx*)>;
-        using RendererFunc = std::function<void()>;
+        using UserFunction = std::function<void(Ctx&)>;
 
         struct ApplicationsData {
             std::string app_name;
             std::string log_file;
             std::string info_file;
             std::string res_directory;
+        };
+
+        struct UserFunctions {
+            UserFunction start {[](Ctx&) {}};
+            UserFunction stop {[](Ctx&) {}};
         };
 
         static bool initialize_applications(const ApplicationsData& data);
@@ -39,7 +43,7 @@ namespace sm {
         Application& operator=(Application&&) = delete;
 
         // Call this to launch the application; it can return an exit code
-        int run(Id start_scene_id);
+        int run(Id start_scene_id, UserFunctions&& user_functions = {});
 
         // Add scenes to the application before calling run()
         template<typename S>
@@ -47,8 +51,8 @@ namespace sm {
             scenes.push_back(std::make_unique<S>());
         }
 
-        void set_start_function(const UserFunc& start);  // TODO change
-        void set_stop_function(const UserFunc& stop);
+        void set_start(const UserFunction& start);  // TODO change
+        void set_stop(const UserFunction& stop);
 
         // API accessible to the user
         Ctx ctx;
@@ -56,18 +60,12 @@ namespace sm {
         float update_frame_counter();
         unsigned int calculate_fixed_update();
         void check_changed_scene();
-
         void dear_imgui_render();
-
         void prepare_scenes(Id start_scene_id);
-        void user_start_function();
-        void user_stop_function();
 
         void on_window_closed(const WindowClosedEvent&);
         void on_window_resized(const WindowResizedEvent& event);
-
-        UserFunc start {[](Ctx*) {}};
-        UserFunc stop {[](Ctx*) {}};
+        void on_window_iconified(const WindowIconifiedEvent& event);
 
         // Data for the scene system
         std::vector<std::unique_ptr<Scene>> scenes;
