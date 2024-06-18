@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <algorithm>
+#include <cstdint>
 #include <cassert>
 
 #include <glad/glad.h>
@@ -110,7 +111,12 @@ namespace sm {
         try {
             return cache.at(name);
         } catch (const std::out_of_range&) {
-            LOG_ERROR("Cannot get hashed uniform variable `{}` from program `{}`", name, this->name);
+            LOG_ERROR(
+                "Cannot get hashed uniform variable `{}` from program `{}`",
+                static_cast<std::uint64_t>(name),
+                this->name
+            );
+
             return -1;
         }
 #else

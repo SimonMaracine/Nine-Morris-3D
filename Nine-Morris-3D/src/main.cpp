@@ -53,7 +53,7 @@ int application_main() {
                 game.add_scene<GameScene>();
                 exit_code = game.run("loading"_H);
             } catch (sm::RuntimeError error) {
-                LOG_DIST_INFO("Terminated game with error code {}", error);
+                LOG_DIST_INFO("Terminated game with error code {}", static_cast<int>(error));
 
                 return 1;
             }
