@@ -32,14 +32,13 @@ Cube maps:
     https://polyhaven.com/hdris
 
 Music (temporary):
-    https://pixabay.com/music/search/mood/relaxing/
+    https://pixabay.com/music/search/mood/relaxing
 
 ----------------------------------------------------------------------------------------------------
 
 TOOLS I USED:
 
 Code editing: Visual Studio Code, Visual Studio
-Graphics: GIMP, Blender, https://matheowis.github.io/HDRI-to-CubeMap/
+Graphics: GIMP, Blender, https://matheowis.github.io/HDRI-to-CubeMap
 Audio: Audacity
-Workflow: Git, CMake
 Other: NSIS, Trello, RenderDoc

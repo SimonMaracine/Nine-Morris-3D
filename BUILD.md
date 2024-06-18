@@ -5,13 +5,11 @@
 - Git
 - CMake (version >= 3.20)
 
-**On Linux, prefer building on Wayland instead of X11.**
-
-### On Windows
+### Windows
 
 - Visual Studio (version >= 2022)
 
-### On Linux - Fedora
+### Linux - Fedora
 
 - GCC (version >= 13)
 - X11: libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel
@@ -20,9 +18,9 @@
 - mesa-libGL-devel.x86_64
 - libasan libubsan
 
-### On Linux - Ubuntu
+### Linux - Ubuntu
 
-- GCC (version >= 11)
+- GCC (version >= 13)
 - X11: xorg-dev
 - Wayland: libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules
 - PulseAudio: libasound2-dev libpulse-dev
@@ -32,7 +30,7 @@
 
     mkdir build-release
     cd build-release
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DNM3D_DISTRIBUTION_MODE=ON -DGLFW_USE_WAYLAND=OFF
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DNM3D_DISTRIBUTION_MODE=ON
     cmake --build . -j8
 
 ## Windows distribution
@@ -46,7 +44,7 @@
 ## Linux debug
 
     cd scripts
-    setup.sh
+    setup.sh <type>
     build.sh
     # test.sh
 
