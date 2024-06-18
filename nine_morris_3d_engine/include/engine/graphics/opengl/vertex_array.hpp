@@ -30,7 +30,7 @@ namespace sm {
 
         const GlIndexBuffer* get_index_buffer() const { return index_buffer.get(); }
     private:
-        unsigned int array {0};
+        unsigned int array {};
 
         // Vertex arrays own vertex and index buffers
         std::vector<std::shared_ptr<GlVertexBuffer>> vertex_buffers;

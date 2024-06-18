@@ -66,7 +66,7 @@ namespace sm {
     }
 
     bool AlSource::is_playing() const {
-        int state {0};
+        int state {};
         alGetSourcei(source, AL_SOURCE_STATE, &state);
 
         AlInfoDebug::maybe_check_errors();

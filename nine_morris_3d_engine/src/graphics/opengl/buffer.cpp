@@ -10,7 +10,7 @@
 
 namespace sm {
     static int draw_hint_to_int(DrawHint hint) {
-        int result {0};
+        int result {};
 
         switch (hint) {
             case DrawHint::Static:
@@ -200,13 +200,13 @@ namespace sm {
             field.offset = static_cast<std::size_t>(offsets[i]);
             field.size = static_cast<std::size_t>(sizes[i]) * type_size(types[i]);
 
-            fields[Key(field_names[i])] = field;
+            fields[Id(field_names[i])] = field;
         }
 
         configured = true;
     }
 
-    void GlUniformBuffer::set(const void* field_data, Key field) {
+    void GlUniformBuffer::set(const void* field_data, Id field) {
         assert(configured);
         assert(data != nullptr && size > 0);
 
@@ -219,7 +219,7 @@ namespace sm {
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
     }
 
-    void GlUniformBuffer::set_and_upload(const void* field_data, Key field) {
+    void GlUniformBuffer::set_and_upload(const void* field_data, Id field) {
         assert(configured);
         assert(data != nullptr && size > 0);
 

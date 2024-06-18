@@ -25,12 +25,12 @@ namespace sm {
         std::size_t compute_size() const;
         std::size_t compute_bits_per_sample() const;
 
-        int samples {0};  // Total number of samples
-        int channels {0};  // Usually mono or stereo
-        int sample_rate {0};  // Frequency
+        int samples {};  // Total number of samples
+        int channels {};  // Usually mono or stereo
+        int sample_rate {};  // Frequency
         short* data {nullptr};
-        std::size_t size {0};
-        std::size_t bits_per_sample {0};
+        std::size_t size {};
+        std::size_t bits_per_sample {};
         std::string file_path;
     };
 }

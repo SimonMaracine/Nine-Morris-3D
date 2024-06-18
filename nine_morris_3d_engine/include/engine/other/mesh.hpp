@@ -35,7 +35,7 @@ namespace sm {
         unsigned char* vertices {nullptr};
         unsigned char* indices {nullptr};
 
-        std::size_t vertices_size {0};
-        std::size_t indices_size {0};
+        std::size_t vertices_size {};
+        std::size_t indices_size {};
     };
 }

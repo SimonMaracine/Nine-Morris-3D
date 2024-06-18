@@ -383,7 +383,7 @@ namespace sm {
         auto vertex_array {renderable.vertex_array.lock()};
         auto material {renderable.material.lock()};
 
-        glm::mat4 matrix {glm::mat4(1.0f)};
+        glm::mat4 matrix {1.0f};
         matrix = glm::translate(matrix, renderable.position);
         matrix = glm::rotate(matrix, renderable.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
         matrix = glm::rotate(matrix, renderable.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));

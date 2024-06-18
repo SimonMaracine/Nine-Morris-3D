@@ -34,7 +34,7 @@ namespace sm {
         void upload_data(const void* data, std::size_t size) const;
         void upload_sub_data(const void* data, std::size_t offset, std::size_t size) const;
     private:
-        unsigned int buffer {0};
+        unsigned int buffer {};
         DrawHint hint {DrawHint::Static};
     };
 
@@ -54,8 +54,8 @@ namespace sm {
 
         int get_index_count() const { return index_count; }
     private:
-        unsigned int buffer {0};
-        int index_count {0};
+        unsigned int buffer {};
+        int index_count {};
     };
 
     struct UniformBlockSpecification {

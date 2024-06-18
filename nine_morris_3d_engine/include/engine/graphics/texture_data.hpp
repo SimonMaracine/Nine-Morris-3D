@@ -19,8 +19,8 @@ namespace sm {
         unsigned char* get_data() { return data; }
         const std::string& get_file_path() const { return file_path; }
     private:
-        int width {0};
-        int height {0};
+        int width {};
+        int height {};
         unsigned char* data {nullptr};
         std::string file_path;
     };

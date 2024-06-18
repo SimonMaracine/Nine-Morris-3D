@@ -68,7 +68,7 @@ namespace sm {
 
         struct BakeContext {
             int x {};
-            int y {0};
+            int y {};
             int max_row_height {};
             unsigned char* bitmap {nullptr};
         } bake_context;

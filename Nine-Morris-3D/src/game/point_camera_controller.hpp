@@ -61,44 +61,44 @@ private:
     void calculate_auto_pitch(float dt);
     void calculate_auto_distance_to_point(float dt);
 
-    glm::vec3 position {glm::vec3(0.0f)};
-    float pitch {0.0f};
-    float yaw {0.0f};
+    glm::vec3 position {};
+    float pitch {};
+    float yaw {};
 
-    glm::vec3 point {glm::vec3(0.0f)};
-    float distance_to_point {0.0f};
-    float angle_around_point {0.0f};
+    glm::vec3 point {};
+    float distance_to_point {};
+    float angle_around_point {};
 
-    float x_velocity {0.0f};
-    float y_velocity {0.0f};
-    float zoom_velocity {0.0f};
+    float x_velocity {};
+    float y_velocity {};
+    float zoom_velocity {};
 
     // Interpolated movement stuff
     struct {
         bool auto_move_x {false};
-        float target_angle_around_point {0.0f};
-        float auto_x_velocity {0.0f};
-        float virtual_angle_around_point {0.0f};
+        float target_angle_around_point {};
+        float auto_x_velocity {};
+        float virtual_angle_around_point {};
 
         bool auto_move_y {false};
-        float target_pitch {0.0f};
-        float auto_y_velocity {0.0f};
-        float virtual_pitch {0.0f};
+        float target_pitch {};
+        float auto_y_velocity {};
+        float virtual_pitch {};
 
         bool auto_move_zoom {false};
-        float target_distance_to_point {0.0f};
-        float auto_zoom_velocity {0.0f};
-        float virtual_distance_to_point {0.0f};
+        float target_distance_to_point {};
+        float auto_zoom_velocity {};
+        float virtual_distance_to_point {};
 
-        glm::vec3 cached_towards_position {glm::vec3(0.0f)};
+        glm::vec3 cached_towards_position {};
         bool dont_auto_call_go_towards_position {false};
     } movement;
 
     struct {
-        float mouse_wheel {0.0f};
-        float dx {0.0f};
-        float dy {0.0f};
-        float last_mouse_x {0.0f};
-        float last_mouse_y {0.0f};
+        float mouse_wheel {};
+        float dx {};
+        float dy {};
+        float last_mouse_x {};
+        float last_mouse_y {};
     } mouse_input;
 };

@@ -47,7 +47,7 @@ namespace sm {
     }
 
     static int filter_to_int(Filter filter) {
-        int result {0};
+        int result {};
 
         switch (filter) {
             case Filter::Linear:
@@ -62,7 +62,7 @@ namespace sm {
     }
 
     static int wrap_to_int(Wrap wrap) {
-        int result {0};
+        int result {};
 
         switch (wrap) {
             case Wrap::Repeat:

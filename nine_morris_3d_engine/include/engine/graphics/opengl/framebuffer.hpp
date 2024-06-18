@@ -80,11 +80,11 @@ namespace sm {
     private:
         void build();
 
-        unsigned int framebuffer {0};
+        unsigned int framebuffer {};
         FramebufferSpecification specification;
 
         // These can be texture or renderbuffer handles
-        unsigned int depth_attachment {0};
+        unsigned int depth_attachment {};
         std::vector<unsigned int> color_attachments;
     };
 }

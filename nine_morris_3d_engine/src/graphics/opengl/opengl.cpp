@@ -10,7 +10,7 @@ namespace sm {
     }
 
     void OpenGl::clear(Buffers buffers) {
-        unsigned int result {0};
+        unsigned int result {};
 
         switch (buffers) {
             case Buffers::C:
@@ -99,7 +99,7 @@ namespace sm {
     }
 
     void OpenGl::stencil_function(Function function, int ref, unsigned int mask) {
-        unsigned int result {0};
+        unsigned int result {};
 
         switch (function) {
             case Function::Always:

@@ -42,8 +42,8 @@ namespace sm {
         void set_reference_distance(float reference_distance);
         void set_max_distance(float max_distance);
     private:
-        unsigned int source {0};
-        unsigned int attached_buffer {0};  // The buffer that is currently attached to this source
+        unsigned int source {};
+        unsigned int attached_buffer {};  // The buffer that is currently attached to this source
 
         float gain {1.0f};
         float pitch {1.0f};

@@ -52,7 +52,7 @@ namespace sm {
     }
 
     void AlListener::set_distance_model(DistanceModel distance_model) {
-        ALenum result {0};
+        ALenum result {};
 
         switch (distance_model) {
             case DistanceModel::None:
