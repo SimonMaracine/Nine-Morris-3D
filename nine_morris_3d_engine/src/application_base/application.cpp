@@ -61,7 +61,7 @@ namespace sm {
         Input::uninitialize();
     }
 
-    int Application::run(Id start_scene_id, UserFunctions&& user_functions) {
+    int Application::run(Id start_scene_id, const UserFunctions& user_functions) {
         prepare_scenes(start_scene_id);
 
         LOG_INFO("Calling user start function...");

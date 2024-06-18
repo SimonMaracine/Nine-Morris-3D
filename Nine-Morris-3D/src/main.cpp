@@ -22,7 +22,7 @@ static constexpr unsigned int MINOR {4};
 static constexpr unsigned int PATCH {0};
 
 int application_main() {
-    sm::Application::ApplicationsData data;
+    sm::ApplicationsData data;
     data.app_name = APP_NAME;
     data.log_file = LOG_FILE;
     data.info_file = INFO_FILE;

@@ -16,22 +16,20 @@
 #include "engine/scene/scene.hpp"
 
 namespace sm {
+    struct ApplicationsData {
+        std::string app_name;
+        std::string log_file;
+        std::string info_file;
+        std::string res_directory;
+    };
+
+    struct UserFunctions {
+        std::function<void(Ctx&)> start {[](Ctx&) {}};
+        std::function<void(Ctx&)> stop {[](Ctx&) {}};
+    };
+
     class Application final {
     public:
-        using UserFunction = std::function<void(Ctx&)>;
-
-        struct ApplicationsData {
-            std::string app_name;
-            std::string log_file;
-            std::string info_file;
-            std::string res_directory;
-        };
-
-        struct UserFunctions {
-            UserFunction start {[](Ctx&) {}};
-            UserFunction stop {[](Ctx&) {}};
-        };
-
         static bool initialize_applications(const ApplicationsData& data);
 
         explicit Application(const ApplicationProperties& properties);
@@ -43,16 +41,13 @@ namespace sm {
         Application& operator=(Application&&) = delete;
 
         // Call this to launch the application; it can return an exit code
-        int run(Id start_scene_id, UserFunctions&& user_functions = {});
+        int run(Id start_scene_id, const UserFunctions& user_functions = {});
 
         // Add scenes to the application before calling run()
         template<typename S>
         void add_scene() {
             scenes.push_back(std::make_unique<S>());
         }
-
-        void set_start(const UserFunction& start);  // TODO change
-        void set_stop(const UserFunction& stop);
 
         // API accessible to the user
         Ctx ctx;

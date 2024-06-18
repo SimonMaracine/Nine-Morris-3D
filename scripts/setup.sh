@@ -19,5 +19,4 @@ mkdir -p build
 cd build
 cmake .. \
     -DCMAKE_BUILD_TYPE=$build_type \
-    -DNM3D_DISTRIBUTION_MODE=$distribution_mode \
-    -DGLFW_USE_WAYLAND=OFF
+    -DNM3D_DISTRIBUTION_MODE=$distribution_mode
