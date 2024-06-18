@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <array>
 #include <optional>
 
@@ -70,13 +69,11 @@ namespace sm {
         unsigned int texture {};
         int width {};
         int height {};
-
-        std::string name;
     };
 
     class GlTextureCubemap {
     public:
-        GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data);
+        explicit GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data);
         ~GlTextureCubemap();
 
         GlTextureCubemap(const GlTextureCubemap&) = delete;
@@ -88,8 +85,6 @@ namespace sm {
         static void unbind();
     private:
         unsigned int texture {};
-
-        std::string name;
     };
 
     inline constexpr float CUBEMAP_VERTICES[] {

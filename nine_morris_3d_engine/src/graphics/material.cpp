@@ -8,11 +8,7 @@
 namespace sm {
     Material::Material(std::shared_ptr<GlShader> shader, unsigned int flags)
         : shader(shader), flags(flags) {
-        LOG_DEBUG("Created material from shader {} with flags `{}`", shader->get_id(), flags);
-    }
-
-    Material::~Material() {
-        LOG_DEBUG("Deleted material from shader {} with flags `{}`", shader->get_id(), flags);
+        LOG_DEBUG("Created material from shader {} with flags {}", shader->get_id(), flags);
     }
 
     void Material::add_uniform(Uniform type, Id name) {
@@ -116,7 +112,7 @@ namespace sm {
         size = offset;
         data = new unsigned char[size];
 
-        LOG_DEBUG("Created material instance");
+        LOG_DEBUG("Created material instance from shader {}", shader->get_id());
     }
 
     MaterialInstance::~MaterialInstance() {

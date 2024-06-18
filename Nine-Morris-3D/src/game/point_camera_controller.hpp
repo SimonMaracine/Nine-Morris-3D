@@ -11,10 +11,9 @@ inline constexpr float LENS_FAR {300.0f};
 class PointCameraController : public sm::CameraController {
 public:
     PointCameraController() = default;
-    PointCameraController(sm::Camera* camera, sm::Ctx* ctx);
+    explicit PointCameraController(sm::Camera* camera);
     PointCameraController(
         sm::Camera* camera,
-        sm::Ctx* ctx,
         int width,
         int height,
         float fov,
@@ -26,16 +25,16 @@ public:
         float sensitivity
     );
 
-    virtual glm::vec3 get_position() const override;
-    virtual glm::vec3 get_rotation() const override;
+    glm::vec3 get_position() const override;
+    glm::vec3 get_rotation() const override;
 
     const glm::vec3& get_point() const { return point; }
     float get_distance_to_point() const { return distance_to_point; }
     float get_angle_around_point() const { return angle_around_point; }
 
     // Call these every frame
-    virtual void update_controls(float dt) override;
-    virtual void update_camera(float dt) override;
+    void update_controls(float dt) override;
+    void update_camera(float dt) override;
 
     // Call this regularly
     void update_friction();
@@ -44,9 +43,9 @@ public:
     void set_position(const glm::vec3& position);
     void go_towards_position(const glm::vec3& position);
 
-    void connect_events();
-    void disconnect_events();
-    void discard_events();
+    void connect_events(sm::Ctx* ctx);
+    void disconnect_events(sm::Ctx* ctx);
+    void discard_events(sm::Ctx* ctx);
 
     float sensitivity {1.0f};  // Best from 0.5 to 2.0
 private:

@@ -4,7 +4,6 @@
 
 #include <AL/al.h>
 
-#include "engine/audio/openal/buffer.hpp"
 #include "engine/audio/openal/info_and_debug.hpp"
 #include "engine/other/logging.hpp"
 

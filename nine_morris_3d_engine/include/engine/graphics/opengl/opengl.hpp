@@ -2,11 +2,7 @@
 
 namespace sm {
     struct OpenGl {
-        /*
-            Color
-            Depth
-            Stencil
-        */
+        // Color, Depth, Stencil
         enum class Buffers {
             C,
             D,

@@ -53,8 +53,6 @@ namespace sm {
         unsigned int vertex_shader {};
         unsigned int fragment_shader {};
 
-        std::string name;
-
         // Uniforms cache
         std::unordered_map<Id, int, Hash> cache;
 

@@ -152,7 +152,6 @@ void GameScene::on_start() {
 
     cam_controller = PointCameraController(
         &cam,
-        ctx,
         ctx->win.get_width(),
         ctx->win.get_height(),
         LENS_FOV,
@@ -164,7 +163,7 @@ void GameScene::on_start() {
         0.5f
     );
 
-    cam_controller.connect_events();
+    cam_controller.connect_events(ctx);
 
     directional_light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     directional_light.ambient_color = glm::vec3(0.1f);

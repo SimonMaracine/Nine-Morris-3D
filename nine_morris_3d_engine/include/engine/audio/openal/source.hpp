@@ -2,9 +2,9 @@
 
 #include <glm/glm.hpp>
 
-namespace sm {
-    class AlBuffer;
+#include "engine/audio/openal/buffer.hpp"
 
+namespace sm {
     class AlSource {
     public:
         AlSource();

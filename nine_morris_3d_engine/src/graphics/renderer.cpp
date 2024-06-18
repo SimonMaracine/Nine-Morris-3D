@@ -81,11 +81,6 @@ namespace sm {
         debug_initialize();
     }
 
-    Renderer::~Renderer() {
-        // Not really needed
-        scene_data.framebuffers.clear();
-    }
-
     void Renderer::capture(const Camera& camera, const glm::vec3& position) {
         this->camera.view_matrix = camera.view_matrix;
         this->camera.projection_matrix = camera.projection_matrix;

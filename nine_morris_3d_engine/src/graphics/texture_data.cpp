@@ -8,8 +8,7 @@
 namespace sm {
     static constexpr int CHANNELS {4};
 
-    TextureData::TextureData(const std::string& file_path, bool flip)
-        : file_path(file_path) {
+    TextureData::TextureData(const std::string& file_path, bool flip) {
         LOG_DEBUG("Loading texture data `{}`...", file_path);
 
         stbi_set_flip_vertically_on_load(static_cast<int>(flip));
@@ -45,6 +44,6 @@ namespace sm {
 
         stbi_image_free(data);
 
-        LOG_DEBUG("Freed texture data `{}`", file_path);
+        LOG_DEBUG("Freed texture data");
     }
 }

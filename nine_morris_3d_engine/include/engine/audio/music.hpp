@@ -1,10 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
-#include "engine/audio/openal/source.hpp"
-#include "engine/audio/openal/buffer.hpp"
 #include "engine/audio/sound_data.hpp"
 
 namespace sm {
@@ -13,24 +10,18 @@ namespace sm {
         Sound effects should be sound files shorter than 45-50 seconds.
     */
 
+    class AlSource;
+    class AlBuffer;
     class MusicPlayer;
 
     class MusicTrack {
     public:
         explicit MusicTrack(std::shared_ptr<SoundData> data);
-        ~MusicTrack();
-
-        MusicTrack(const MusicTrack&) = delete;
-        MusicTrack& operator=(const MusicTrack&) = delete;
-        MusicTrack(MusicTrack&&) = delete;
-        MusicTrack& operator=(MusicTrack&&) = delete;
     private:
         void setup(std::shared_ptr<SoundData> data);
 
         std::shared_ptr<AlSource> source;  // TODO maybe these don't need to be shared
         std::shared_ptr<AlBuffer> buffer;
-
-        std::string name;
 
         friend class MusicPlayer;
     };

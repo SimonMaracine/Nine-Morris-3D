@@ -78,13 +78,13 @@ namespace sm {
 
         name = Utils::get_file_name(file_path);
 
-        LOG_DEBUG("Loaded font `{}`", file_path);
+        LOG_DEBUG("Created font `{}`", file_path);
     }
 
     Font::~Font() {
         delete font_info;
 
-        LOG_DEBUG("Unloaded font `{}`", name);
+        LOG_DEBUG("Deleted font `{}`", name);
     }
 
     void Font::update_data(const float* data, std::size_t size) {

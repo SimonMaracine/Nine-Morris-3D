@@ -14,8 +14,6 @@
 
 namespace sm {
     GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment) {
-        // name = Utils::get_file_name(source_vertex) + " & " + Utils::get_file_name(source_fragment);  // FIXME
-
         vertex_shader = compile_shader(source_vertex, GL_VERTEX_SHADER);
         fragment_shader = compile_shader(source_fragment, GL_FRAGMENT_SHADER);
         program = create_program();
@@ -29,7 +27,7 @@ namespace sm {
         introspect_program();
         check_and_cache_uniforms();
 
-        LOG_DEBUG("Created GL shader {} `{}`", program, name);
+        LOG_DEBUG("Created GL shader {}", program);
     }
 
     // GlShader::GlShader(const EncrFile& source_vertex, const EncrFile& source_fragment) {
@@ -57,7 +55,7 @@ namespace sm {
     GlShader::~GlShader() {
         glDeleteProgram(program);
 
-        LOG_DEBUG("Deleted GL shader {} `{}`", program, name);
+        LOG_DEBUG("Deleted GL shader {}", program);
     }
 
     void GlShader::bind() const {
@@ -111,12 +109,7 @@ namespace sm {
         try {
             return cache.at(name);
         } catch (const std::out_of_range&) {
-            LOG_ERROR(
-                "Cannot get hashed uniform variable `{}` from program `{}`",
-                static_cast<std::uint64_t>(name),
-                this->name
-            );
-
+            LOG_ERROR("Cannot get hashed uniform variable `{}` from program `{}`", static_cast<std::uint64_t>(name), program);
             return -1;
         }
 #else
@@ -138,7 +131,7 @@ namespace sm {
             location = glGetUniformLocation(program, uniform.c_str());
 
             if (location == -1) {
-                LOG_ERROR("Uniform variable `{}` in program `{}` not found", uniform, name);
+                LOG_ERROR("Uniform variable `{}` in program `{}` not found", uniform, program);
                 continue;
             }
 
@@ -151,7 +144,7 @@ namespace sm {
 
     void GlShader::introspect_program() {
         // Uniforms stuff
-        int uniform_count;
+        int uniform_count {};
         glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &uniform_count);
 
         uniforms.reserve(uniform_count);
@@ -164,7 +157,7 @@ namespace sm {
         }
 
         // Uniform blocks stuff
-        int uniform_block_count;
+        int uniform_block_count {};
         glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &uniform_block_count);
 
         uniform_blocks.reserve(uniform_block_count);
@@ -302,12 +295,12 @@ namespace sm {
             }
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("{} shader compilation error with no message in program `{}`", type_name, name);
+                LOG_DIST_CRITICAL("{} shader compilation error with no message in program `{}`", type_name, program);
             } else {
                 char* log_message {new char[log_length]};
                 glGetShaderInfoLog(shader, log_length, nullptr, log_message);
 
-                LOG_DIST_CRITICAL("{} shader compilation error in program `{}`\n{}", type_name, name, log_message);
+                LOG_DIST_CRITICAL("{} shader compilation error in program `{}`\n{}", type_name, program, log_message);
                 delete[] log_message;
             }
 
@@ -326,12 +319,12 @@ namespace sm {
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("Linking error with no message in program `{}`", name);
+                LOG_DIST_CRITICAL("Linking error with no message in program `{}`", program);
             } else {
                 char* log_message {new char[log_length]};
                 glGetProgramInfoLog(program, log_length, nullptr, log_message);
 
-                LOG_DIST_CRITICAL("Linking error in program `{}`\n{}", name, log_message);
+                LOG_DIST_CRITICAL("Linking error in program `{}`\n{}", program, log_message);
                 delete[] log_message;
             }
 

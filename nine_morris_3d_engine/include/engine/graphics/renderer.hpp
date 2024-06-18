@@ -22,12 +22,11 @@ namespace sm {
     class Renderer {
     public:
         Renderer(int width, int height);
-        ~Renderer();
 
         Renderer(const Renderer&) = delete;
         Renderer& operator=(const Renderer&) = delete;
-        Renderer(Renderer&&) = delete;
-        Renderer& operator=(Renderer&&) = delete;
+        Renderer(Renderer&&) = default;
+        Renderer& operator=(Renderer&&) = default;
 
         void capture(const Camera& camera, const glm::vec3& position);
         void add_shader(std::shared_ptr<GlShader> shader);

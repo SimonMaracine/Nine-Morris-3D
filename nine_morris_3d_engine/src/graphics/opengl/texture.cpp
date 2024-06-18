@@ -182,9 +182,8 @@ namespace sm {
 
         width = data->get_width();
         height = data->get_height();
-        name = Utils::get_file_name(data->get_file_path());
 
-        LOG_DEBUG("Created GL texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL texture {}", texture);
     }
 
     GlTexture::GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification)
@@ -202,15 +201,14 @@ namespace sm {
 
         this->width = width;
         this->height = height;
-        name = "Unnamed";
 
-        LOG_DEBUG("Created GL texture {} ({})", texture, name);
+        LOG_DEBUG("Created GL texture {}", texture);
     }
 
     GlTexture::~GlTexture() {
         glDeleteTextures(1, &texture);
 
-        LOG_DEBUG("Deleted GL texture {} ({})", texture, name);
+        LOG_DEBUG("Deleted GL texture {}", texture);
     }
 
     void GlTexture::bind(unsigned int unit) const {
@@ -309,15 +307,13 @@ namespace sm {
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-        name = Utils::get_directory_name(data[0]->get_file_path().c_str());
-
-        LOG_DEBUG("Created GL texture cubemap {} ({})", texture, name);
+        LOG_DEBUG("Created GL texture cubemap {}", texture);
     }
 
     GlTextureCubemap::~GlTextureCubemap() {
         glDeleteTextures(1, &texture);
 
-        LOG_DEBUG("Deleted GL texture cubemap {} ({})", texture, name);
+        LOG_DEBUG("Deleted GL texture cubemap {}", texture);
     }
 
     void GlTextureCubemap::bind(unsigned int unit) const {

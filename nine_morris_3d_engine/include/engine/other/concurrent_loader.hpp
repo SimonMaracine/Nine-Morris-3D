@@ -4,7 +4,6 @@
 #include <atomic>
 #include <thread>
 
-#include "engine/application_base/application.hpp"
 #include "engine/application_base/context.hpp"
 #include "engine/other/resources_cache.hpp"
 #include "engine/other/logging.hpp"
@@ -19,7 +18,7 @@ namespace sm {
     public:
         using Callback = std::function<void()>;
 
-        ConcurrentLoader(const Callback& callback_function)
+        explicit ConcurrentLoader(const Callback& callback_function)
             : callback_function(callback_function) {}
         virtual ~ConcurrentLoader();
 

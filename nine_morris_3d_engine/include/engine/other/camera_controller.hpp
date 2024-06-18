@@ -3,14 +3,13 @@
 #include <glm/glm.hpp>
 
 #include "engine/graphics/camera.hpp"
-#include "engine/application_base/context.hpp"
 
 namespace sm {
     class CameraController {
     public:
         CameraController() = default;
-        CameraController(Camera* camera, Ctx* ctx)
-            : camera(camera), ctx(ctx) {}
+        explicit CameraController(Camera* camera)
+            : camera(camera) {}
         virtual ~CameraController() = default;
 
         CameraController(const CameraController&) = default;
@@ -32,6 +31,5 @@ namespace sm {
         }
     protected:
         Camera* camera {nullptr};
-        Ctx* ctx {nullptr};  // TODO store Ctx?
     };
 }

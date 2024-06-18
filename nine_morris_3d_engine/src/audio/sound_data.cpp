@@ -15,8 +15,7 @@ namespace sm {
         }
     }
 
-    SoundData::SoundData(const std::string& file_path)
-        : file_path(file_path) {
+    SoundData::SoundData(const std::string& file_path) {
         LOG_DEBUG("Loading sound data `{}`...", file_path);
 
         samples = stb_vorbis_decode_filename(file_path.c_str(), &channels, &sample_rate, &data);
@@ -56,7 +55,7 @@ namespace sm {
 
         std::free(data);
 
-        LOG_DEBUG("Freed sound data `{}`", file_path);
+        LOG_DEBUG("Freed sound data");
     }
 
     std::size_t SoundData::compute_size() const {

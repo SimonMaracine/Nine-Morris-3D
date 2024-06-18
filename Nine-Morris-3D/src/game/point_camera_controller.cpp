@@ -28,14 +28,13 @@ static float calculate_angle_velocity(float target_angle, float angle) {
     return result;
 }
 
-PointCameraController::PointCameraController(sm::Camera* camera, sm::Ctx* ctx)
-    : sm::CameraController(camera, ctx) {
+PointCameraController::PointCameraController(sm::Camera* camera)
+    : sm::CameraController(camera) {
     update_camera(1.0f);
 }
 
 PointCameraController::PointCameraController(
     sm::Camera* camera,
-    sm::Ctx* ctx,
     int width,
     int height,
     float fov,
@@ -46,7 +45,7 @@ PointCameraController::PointCameraController(
     float pitch,
     float sensitivity
 )
-    : sm::CameraController(camera, ctx), sensitivity(sensitivity), pitch(pitch), point(point),
+    : sm::CameraController(camera), sensitivity(sensitivity), pitch(pitch), point(point),
       distance_to_point(distance_to_point) {
     camera->set_projection(width, height, fov, near, far);
     update_camera(1.0f);
@@ -186,17 +185,16 @@ void PointCameraController::go_towards_position(const glm::vec3& position) {
     go_towards_position_x(direction);
 }
 
-void PointCameraController::connect_events() {
+void PointCameraController::connect_events(sm::Ctx* ctx) {
     ctx->evt.connect<sm::MouseWheelScrolledEvent, &PointCameraController::on_mouse_wheel_scrolled>(this);
     ctx->evt.connect<sm::MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
 }
 
-void PointCameraController::disconnect_events() {
-    ctx->evt.disconnect(this);
-}
+void PointCameraController::disconnect_events(sm::Ctx* ctx) {
+    ctx->evt.disconnect(this);}
 
-void PointCameraController::discard_events() {
-    ctx->evt.discard<sm::MouseWheelScrolledEvent>();  // TODO dirty solution
+void PointCameraController::discard_events(sm::Ctx* ctx) {
+    ctx->evt.discard<sm::MouseWheelScrolledEvent>();  // FIXME dirty solution
     ctx->evt.discard<sm::MouseMovedEvent>();
 }
 

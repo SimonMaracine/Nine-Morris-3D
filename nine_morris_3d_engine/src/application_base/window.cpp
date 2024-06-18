@@ -161,7 +161,7 @@ namespace sm {
         GLFWcursor* glfw_cursor {glfwCreateCursor(&image, x_hotspot, y_hotspot)};
 
         if (glfw_cursor == nullptr) {
-            LOG_DIST_ERROR("Could not create custom cursor `{}`", cursor->get_file_path());
+            LOG_DIST_ERROR("Could not create custom cursor");
         }
 
         cursors[id] = glfw_cursor;

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "engine/audio/openal/source.hpp"
+#include "engine/audio/openal/buffer.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -28,13 +30,7 @@ namespace sm {
     MusicTrack::MusicTrack(std::shared_ptr<SoundData> data) {
         setup(data);
 
-        name = data->get_file_path();
-
-        LOG_DEBUG("Loaded music track `{}`", name);
-    }
-
-    MusicTrack::~MusicTrack() {
-        LOG_DEBUG("Unloaded music track `{}`", name);
+        LOG_DEBUG("Loaded music track");
     }
 
     void MusicTrack::setup(std::shared_ptr<SoundData> data) {
@@ -62,7 +58,7 @@ namespace sm {
         current_music_track->source->set_gain(current_gain);  // Set the gain for this potentially new music track
         current_music_track->source->play(current_music_track->buffer.get());
 
-        LOG_DEBUG("Started playing music track `{}`", current_music_track->name);
+        LOG_DEBUG("Started playing music track");
     }
 
     void MusicPlayer::stop_music_track() {
@@ -73,7 +69,7 @@ namespace sm {
 
         current_music_track->source->stop();
 
-        LOG_DEBUG("Stopped playing music track `{}`", current_music_track->name);
+        LOG_DEBUG("Stopped playing music track");
 
         current_music_track = nullptr;
     }
@@ -86,7 +82,7 @@ namespace sm {
 
         current_music_track->source->pause();
 
-        LOG_DEBUG("Paused playing music track `{}`", current_music_track->name);
+        LOG_DEBUG("Paused playing music track");
     }
 
     void MusicPlayer::continue_music_track() {
@@ -97,7 +93,7 @@ namespace sm {
 
         current_music_track->source->resume();
 
-        LOG_DEBUG("Continued playing music track `{}`", current_music_track->name);
+        LOG_DEBUG("Continued playing music track");
     }
 
     void MusicPlayer::set_music_gain(float gain) {

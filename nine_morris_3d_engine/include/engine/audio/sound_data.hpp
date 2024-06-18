@@ -6,7 +6,7 @@
 namespace sm {
     class SoundData {
     public:
-        SoundData(const std::string& file_path);
+        explicit SoundData(const std::string& file_path);
         ~SoundData();
 
         SoundData(const SoundData&) = delete;
@@ -20,7 +20,6 @@ namespace sm {
         const short* get_data() const { return data; }
         std::size_t get_size() const { return size; }
         std::size_t get_bps() const { return bits_per_sample; }
-        const std::string& get_file_path() const { return file_path; }
     private:
         std::size_t compute_size() const;
         std::size_t compute_bits_per_sample() const;
@@ -31,6 +30,5 @@ namespace sm {
         short* data {nullptr};
         std::size_t size {};
         std::size_t bits_per_sample {};
-        std::string file_path;
     };
 }

@@ -50,7 +50,7 @@ namespace sm {
 
     class GlFramebuffer {
     public:
-        GlFramebuffer(const FramebufferSpecification& specification);
+        explicit GlFramebuffer(const FramebufferSpecification& specification);
         ~GlFramebuffer();
 
         GlFramebuffer(const GlFramebuffer&) = delete;

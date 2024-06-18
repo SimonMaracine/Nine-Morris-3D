@@ -18,7 +18,7 @@ namespace sm {
 
     class GlVertexBuffer {
     public:
-        GlVertexBuffer(DrawHint hint = DrawHint::Static);
+        explicit GlVertexBuffer(DrawHint hint = DrawHint::Static);
         GlVertexBuffer(std::size_t size, DrawHint hint = DrawHint::Static);
         GlVertexBuffer(const void* data, std::size_t size, DrawHint hint = DrawHint::Static);
         ~GlVertexBuffer();
@@ -66,7 +66,7 @@ namespace sm {
 
     class GlUniformBuffer {
     public:
-        GlUniformBuffer(const UniformBlockSpecification& specification);
+        explicit GlUniformBuffer(const UniformBlockSpecification& specification);
         ~GlUniformBuffer();
 
         GlUniformBuffer(const GlUniformBuffer&) = delete;
@@ -108,7 +108,7 @@ namespace sm {
 
     class GlPixelBuffer {
     public:
-        GlPixelBuffer(std::size_t size);
+        explicit GlPixelBuffer(std::size_t size);
         ~GlPixelBuffer();
 
         GlPixelBuffer(const GlPixelBuffer&) = delete;

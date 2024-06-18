@@ -31,12 +31,6 @@ namespace sm {
         };
 
         Material(std::shared_ptr<GlShader> shader, unsigned int flags = 0);
-        ~Material();
-
-        Material(const Material&) = delete;
-        Material& operator=(const Material&) = delete;
-        Material(Material&&) = delete;
-        Material& operator=(Material&&) = delete;
 
         void add_uniform(Uniform type, Id name);
         void add_texture(Id name);
@@ -59,8 +53,7 @@ namespace sm {
 
     class MaterialInstance {
     public:
-
-        explicit MaterialInstance(std::shared_ptr<Material> material);
+        explicit MaterialInstance(std::shared_ptr<Material> material);  // TODO create shared_ptr materials?
         ~MaterialInstance();
 
         MaterialInstance(const MaterialInstance&) = delete;
