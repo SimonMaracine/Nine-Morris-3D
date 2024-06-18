@@ -3,6 +3,7 @@
 #include <locale>
 #include <memory>
 #include <algorithm>
+#include <utility>
 #include <cassert>
 
 #include "engine/application_base/input.hpp"
@@ -85,8 +86,10 @@ namespace sm {
             current_scene->on_update();
             ctx.tsk.update();
 
-            ctx.rnd.render(ctx.win.get_width(), ctx.win.get_height());
-            dear_imgui_render();
+            if (!minimized) {
+                ctx.rnd.render(ctx.win.get_width(), ctx.win.get_height());
+                dear_imgui_render();
+            }
 
             ctx.win.update();
             ctx.evt.update();
@@ -162,8 +165,7 @@ namespace sm {
             ctx.evt.disconnect(current_scene);
 
             // Set and initialize the new scene
-            current_scene = next_scene;
-            next_scene = nullptr;
+            current_scene = std::exchange(next_scene, nullptr);
 
             current_scene->on_start();
             ctx.rnd.prerender_setup();
@@ -199,6 +201,6 @@ namespace sm {
     }
 
     void Application::on_window_iconified(const WindowIconifiedEvent& event) {
-        // TODO don't render
+        minimized = event.iconified;
     }
 }
