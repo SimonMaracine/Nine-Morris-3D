@@ -13,15 +13,15 @@ namespace sm {
         RandomGenerator();
 
         // The range is inclusive: [a, b]
-        std::uint32_t next();
-        std::uint32_t next(std::uint32_t end);
-        std::uint32_t next(std::uint32_t begin, std::uint32_t end);
+        std::uint_fast32_t next();
+        std::uint_fast32_t next(std::uint_fast32_t end);
+        std::uint_fast32_t next(std::uint_fast32_t begin, std::uint_fast32_t end);
 
         template<typename T>
         T choice(std::initializer_list<T> list) {
             assert(list.size() > 0);
 
-            const std::uint32_t index {next(list.size() - 1)};
+            const std::uint_fast32_t index {next(list.size() - 1)};
 
             return list.begin()[index];
         }
@@ -32,7 +32,7 @@ namespace sm {
 
             assert(size > 0);
 
-            const std::uint32_t index {next(size - 1)};
+            const std::uint_fast32_t index {next(size - 1)};
 
             return first[index];
         }
