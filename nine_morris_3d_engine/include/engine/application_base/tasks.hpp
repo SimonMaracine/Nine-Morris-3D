@@ -3,7 +3,7 @@
 #include <vector>
 #include <functional>
 
-#include <resmanager/resmanager.hpp>
+#include "engine/application_base/id.hpp"
 
 namespace sm {
     class Application;
@@ -17,30 +17,29 @@ namespace sm {
             Repeat
         };
 
-        using TaskId = resmanager::HashedStr64;
         using TaskFunction = std::function<Result(const Task&)>;
 
-        Task(TaskId id, const TaskFunction& function)
+        Task(Id id, const TaskFunction& function)
             : function(function), id(id) {}
 
-        TaskId get_id() const { return id; }
+        Id get_id() const { return id; }
         double get_total_time() const { return total_time; }
         unsigned int get_frames() const { return frames; }
     private:
         TaskFunction function;
-        TaskId id;
+        Id id;
 
-        double total_time {0.0};
-        double start_time {0.0};
-        unsigned int frames {0};
+        double total_time {};
+        double start_time {};
+        unsigned int frames {};
 
         friend class TaskManager;
     };
 
     class TaskManager {  // TODO async tasks, delayed tasks
     public:
-        void add(Task::TaskId id, const Task::TaskFunction& function);
-        void remove(Task::TaskId id);
+        void add(Id id, const Task::TaskFunction& function);
+        void remove(Id id);
     private:
         void update();
 

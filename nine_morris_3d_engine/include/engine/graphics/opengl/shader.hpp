@@ -4,12 +4,11 @@
 #include <unordered_map>
 #include <vector>
 #include <cstddef>
-#include <utility>
 #include <memory>
 
 #include <glm/glm.hpp>
-#include <resmanager/resmanager.hpp>
 
+#include "engine/application_base/id.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 
 namespace sm {
@@ -17,9 +16,6 @@ namespace sm {
 
     class GlShader {
     public:
-        using Key = resmanager::HashedStr64;
-        using KeyHash = resmanager::Hash<Key>;
-
         GlShader(const std::string& source_vertex, const std::string& source_fragment);
         ~GlShader();
 
@@ -31,18 +27,18 @@ namespace sm {
         void bind() const;
         static void unbind();
 
-        void upload_uniform_mat4(Key name, const glm::mat4& matrix) const;
-        void upload_uniform_int(Key name, int value) const;
-        void upload_uniform_float(Key name, float value) const;
-        void upload_uniform_vec2(Key name, glm::vec2 vector) const;
-        void upload_uniform_vec3(Key name, const glm::vec3& vector) const;
-        void upload_uniform_vec4(Key name, const glm::vec4& vector) const;
+        void upload_uniform_mat4(Id name, const glm::mat4& matrix) const;
+        void upload_uniform_int(Id name, int value) const;
+        void upload_uniform_float(Id name, float value) const;
+        void upload_uniform_vec2(Id name, glm::vec2 vector) const;
+        void upload_uniform_vec3(Id name, const glm::vec3& vector) const;
+        void upload_uniform_vec4(Id name, const glm::vec4& vector) const;
 
         unsigned int get_id() const { return program; }
 
         void add_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
     private:
-        int get_uniform_location(Key name) const;
+        int get_uniform_location(Id name) const;
         void check_and_cache_uniforms();
 
         void introspect_program();
@@ -60,7 +56,7 @@ namespace sm {
         std::string name;
 
         // Uniforms cache
-        std::unordered_map<Key, int, KeyHash> cache;
+        std::unordered_map<Id, int, Hash> cache;
 
         // Data from introspection
         std::vector<std::string> uniforms;

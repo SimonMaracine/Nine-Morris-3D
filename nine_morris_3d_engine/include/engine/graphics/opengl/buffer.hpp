@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include <resmanager/resmanager.hpp>
+#include "engine/application_base/id.hpp"
 
 namespace sm {
     class GlShader;
@@ -66,9 +66,6 @@ namespace sm {
 
     class GlUniformBuffer {
     public:
-        using Key = resmanager::HashedStr64;
-        using KeyHash = resmanager::Hash<Key>;
-
         GlUniformBuffer(const UniformBlockSpecification& specification);
         ~GlUniformBuffer();
 
@@ -83,26 +80,26 @@ namespace sm {
         bool is_configured() const { return configured; }
         void configure(unsigned int shader_program);
 
-        void set(const void* field_data, Key field);
+        void set(const void* field_data, Id field);
         void upload() const;
-        void set_and_upload(const void* field_data, Key field);
+        void set_and_upload(const void* field_data, Id field);
     private:
         void allocate_memory(std::size_t size);
         static std::size_t type_size(unsigned int type);
 
-        unsigned int buffer {0};
+        unsigned int buffer {};
 
         struct UniformBlockField {
-            std::size_t offset {0};
-            std::size_t size {0};
+            std::size_t offset {};
+            std::size_t size {};
         };
 
         UniformBlockSpecification specification;
 
-        std::unordered_map<Key, UniformBlockField, KeyHash> fields;
+        std::unordered_map<Id, UniformBlockField, Hash> fields;
 
         unsigned char* data {nullptr};
-        std::size_t size {0};
+        std::size_t size {};
 
         bool configured {false};
 
@@ -130,7 +127,7 @@ namespace sm {
             *data_out = static_cast<T*>(data);
         }
     private:
-        unsigned int buffer {0};
+        unsigned int buffer {};
         void* data {nullptr};  // TODO clear value is float; should be generic
         unsigned char* dummy_data {nullptr};
     };

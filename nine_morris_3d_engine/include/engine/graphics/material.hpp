@@ -6,8 +6,8 @@
 #include <vector>
 
 #include <glm/glm.hpp>
-#include <resmanager/resmanager.hpp>
 
+#include "engine/application_base/id.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/texture.hpp"
 
@@ -16,8 +16,6 @@ namespace sm {
 
     class Material {
     public:
-        using Key = resmanager::HashedStr64;
-
         enum class Uniform {
             Mat4,
             Int,
@@ -40,19 +38,19 @@ namespace sm {
         Material(Material&&) = delete;
         Material& operator=(Material&&) = delete;
 
-        void add_uniform(Uniform type, Key name);
-        void add_texture(Key name);
+        void add_uniform(Uniform type, Id name);
+        void add_texture(Id name);
     private:
         // Materials own shaders
         std::shared_ptr<GlShader> shader;
 
-        std::vector<Key> uniforms_mat4;
-        std::vector<Key> uniforms_int;
-        std::vector<Key> uniforms_float;
-        std::vector<Key> uniforms_vec2;
-        std::vector<Key> uniforms_vec3;
-        std::vector<Key> uniforms_vec4;
-        std::vector<Key> textures;
+        std::vector<Id> uniforms_mat4;
+        std::vector<Id> uniforms_int;
+        std::vector<Id> uniforms_float;
+        std::vector<Id> uniforms_vec2;
+        std::vector<Id> uniforms_vec3;
+        std::vector<Id> uniforms_vec4;
+        std::vector<Id> textures;
 
         unsigned int flags {};
 
@@ -61,8 +59,6 @@ namespace sm {
 
     class MaterialInstance {
     public:
-        using Key = Material::Key;
-        using KeyHash = resmanager::Hash<Key>;
 
         explicit MaterialInstance(std::shared_ptr<Material> material);
         ~MaterialInstance();
@@ -74,14 +70,14 @@ namespace sm {
 
         void bind_and_upload() const;
 
-        void set_mat4(Key name, const glm::mat4& matrix);
-        void set_int(Key name, int integer);
-        void set_float(Key name, float real);
-        void set_vec2(Key name, glm::vec2 vector);
-        void set_vec3(Key name, const glm::vec3& vector);
-        void set_vec4(Key name, const glm::vec4& vector);
-        void set_texture(Key name, std::shared_ptr<GlTexture> texture, int unit);
-        void set_texture(Key name, unsigned int texture, int unit);
+        void set_mat4(Id name, const glm::mat4& matrix);
+        void set_int(Id name, int integer);
+        void set_float(Id name, float real);
+        void set_vec2(Id name, glm::vec2 vector);
+        void set_vec3(Id name, const glm::vec3& vector);
+        void set_vec4(Id name, const glm::vec4& vector);
+        void set_texture(Id name, std::shared_ptr<GlTexture> texture, int unit);
+        void set_texture(Id name, unsigned int texture, int unit);
 
         const GlShader* get_shader() const { return shader.get(); }
 
@@ -113,6 +109,6 @@ namespace sm {
         unsigned char* data {nullptr};
         std::size_t size {};
 
-        std::unordered_map<Key, Element, KeyHash> offsets;
+        std::unordered_map<Id, Element, Hash> offsets;
     };
 }

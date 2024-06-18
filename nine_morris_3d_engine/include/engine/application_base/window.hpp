@@ -10,6 +10,8 @@
 
 #include "engine/application_base/properties.hpp"
 #include "engine/application_base/events.hpp"
+#include "engine/application_base/id.hpp"
+#include "engine/graphics/texture_data.hpp"
 
 struct GLFWwindow;
 struct GLFWcursor;
@@ -18,8 +20,6 @@ struct GLFWmonitor;
 namespace sm {
     class Window;
     class Application;
-    class Ctx;
-    class TextureData;
 
     class Monitors {
     public:
@@ -35,9 +35,6 @@ namespace sm {
 
     class Window {
     public:
-        using CursorId = resmanager::HashedStr64;
-        using CursorHash = resmanager::Hash<CursorId>;
-
         Window(const ApplicationProperties& properties, EventDispatcher* evt);
         ~Window();
 
@@ -54,8 +51,8 @@ namespace sm {
 
         void show() const;
         void set_vsync(int interval) const;
-        void add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
-        void set_cursor(CursorId id) const;
+        void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
+        void set_cursor(Id id) const;
         void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
 
         static double get_time();
@@ -71,7 +68,7 @@ namespace sm {
 
         GLFWwindow* window {nullptr};
         Monitors monitors;
-        std::unordered_map<CursorId, GLFWcursor*, CursorHash> cursors;
+        std::unordered_map<Id, GLFWcursor*, Hash> cursors;
         EventDispatcher* evt {nullptr};
 
         friend class Application;

@@ -60,7 +60,7 @@ namespace sm {
         Input::uninitialize();
     }
 
-    int Application::run(SceneId start_scene_id) {
+    int Application::run(Id start_scene_id) {
         prepare_scenes(start_scene_id);
 
         user_start_function();
@@ -117,7 +117,7 @@ namespace sm {
         frame_counter.total_time += elapsed_seconds;
 
         if (frame_counter.total_time > 0.25) {
-            ctx.fps = static_cast<double>(frame_counter.frame_count) / frame_counter.total_time;
+            ctx.fps = static_cast<float>(static_cast<double>(frame_counter.frame_count) / frame_counter.total_time);
             frame_counter.frame_count = 0;
             frame_counter.total_time = 0.0;
         }
@@ -179,8 +179,8 @@ namespace sm {
         DearImGuiContext::end_frame();
     }
 
-    void Application::prepare_scenes(SceneId start_scene_id) {
-        for (std::unique_ptr<Scene>& scene : scenes) {
+    void Application::prepare_scenes(Id start_scene_id) {
+        for (const std::unique_ptr<Scene>& scene : scenes) {
             scene->ctx = &ctx;
 
             if (scene->id == start_scene_id) {

@@ -3,12 +3,13 @@
 #include <cassert>
 
 #include "engine/application_base/application.hpp"
+#include "engine/scene/scene.hpp"
 
 namespace sm {
-    void Ctx::change_scene(SceneId id) {
+    void Ctx::change_scene(Id id) {
         assert(application->next_scene == nullptr);
 
-        for (std::unique_ptr<Scene>& scene : application->scenes) {
+        for (const std::unique_ptr<Scene>& scene : application->scenes) {
             if (scene->id == id) {
                 application->next_scene = scene.get();
                 return;
@@ -16,9 +17,5 @@ namespace sm {
         }
 
         assert(false);
-    }
-
-    const Scene* Ctx::get_current_scene() const {
-        return application->current_scene;
     }
 }

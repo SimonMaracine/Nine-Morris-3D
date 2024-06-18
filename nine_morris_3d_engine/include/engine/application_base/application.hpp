@@ -9,15 +9,15 @@
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/window.hpp"
 #include "engine/application_base/context.hpp"
+#include "engine/application_base/id.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer.hpp"
-#include "engine/other/resource_manager.hpp"
+#include "engine/other/resources_cache.hpp"
 #include "engine/scene/scene.hpp"
 
 namespace sm {
     class Application final {
     public:
-        using SceneId = Scene::SceneId;
         using UserFunc = std::function<void(Ctx*)>;
         using RendererFunc = std::function<void()>;
 
@@ -39,7 +39,7 @@ namespace sm {
         Application& operator=(Application&&) = delete;
 
         // Call this to launch the application; it can return an exit code
-        int run(SceneId start_scene_id);
+        int run(Id start_scene_id);
 
         // Add scenes to the application before calling run()
         template<typename S>
@@ -59,7 +59,7 @@ namespace sm {
 
         void dear_imgui_render();
 
-        void prepare_scenes(SceneId start_scene_id);
+        void prepare_scenes(Id start_scene_id);
         void user_start_function();
         void user_stop_function();
 

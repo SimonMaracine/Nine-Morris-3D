@@ -121,7 +121,7 @@ add_library(nine_morris_3d_engine STATIC
     "src/other/logging.cpp"
     "src/other/mesh.cpp"
     "src/other/random_gen.cpp"
-    "src/other/resource_manager.cpp"
+    "src/other/resources_cache.cpp"
     "src/other/utilities.cpp"
 
     "include/engine/application_base/application.hpp"
@@ -129,6 +129,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/application_base/context.hpp"
     "include/engine/application_base/entry_point.hpp"
     "include/engine/application_base/events.hpp"
+    "include/engine/application_base/id.hpp"
     "include/engine/application_base/input.hpp"
     "include/engine/application_base/panic.hpp"
     "include/engine/application_base/platform.hpp"
@@ -169,7 +170,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/other/logging.hpp"
     "include/engine/other/mesh.hpp"
     "include/engine/other/random_gen.hpp"
-    "include/engine/other/resource_manager.hpp"
+    "include/engine/other/resources_cache.hpp"
     "include/engine/other/utilities.hpp"
     "include/engine/scene/scene.hpp"
 

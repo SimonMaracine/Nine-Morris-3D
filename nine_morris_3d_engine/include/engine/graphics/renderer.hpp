@@ -6,18 +6,18 @@
 
 #include <glm/glm.hpp>
 
+#include "engine/graphics/opengl/shader.hpp"
+#include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/renderable.hpp"
 #include "engine/graphics/light.hpp"
+#include "engine/graphics/camera.hpp"
 
 namespace sm {
     class Application;
-    class GlFramebuffer;
-    class GlShader;
     class GlVertexArray;
     class GlVertexBuffer;
     class GlUniformBuffer;
-    class Camera;
 
     class Renderer {
     public:

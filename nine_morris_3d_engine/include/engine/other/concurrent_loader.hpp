@@ -6,7 +6,7 @@
 
 #include "engine/application_base/application.hpp"
 #include "engine/application_base/context.hpp"
-#include "engine/other/resource_manager.hpp"
+#include "engine/other/resources_cache.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {

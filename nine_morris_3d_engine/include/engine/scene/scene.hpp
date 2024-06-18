@@ -2,9 +2,8 @@
 
 #include <string>
 
-#include <resmanager/resmanager.hpp>
-
 #include "engine/application_base/context.hpp"
+#include "engine/application_base/id.hpp"
 
 namespace sm {
     class Application;
@@ -12,10 +11,8 @@ namespace sm {
     // An entire scene of a game
     class Scene {
     public:
-        using SceneId = resmanager::HashedStr64;
-
         explicit Scene(const std::string& name)
-            : name(name), id(SceneId(name)) {}
+            : name(name), id(Id(name)) {}
         virtual ~Scene() = default;
 
         Scene(const Scene&) = default;
@@ -30,12 +27,12 @@ namespace sm {
         virtual void on_imgui_update() {}  // Called every frame for Dear ImGui only
 
         const std::string& get_name() const { return name; }
-        SceneId get_id() const { return id; }
+        Id get_id() const { return id; }
 
         Ctx* ctx {nullptr};
     private:
         std::string name;
-        SceneId id;
+        Id id;
 
         friend class Ctx;
         friend class Application;

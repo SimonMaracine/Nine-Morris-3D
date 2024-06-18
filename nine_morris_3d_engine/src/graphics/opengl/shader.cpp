@@ -67,32 +67,32 @@ namespace sm {
         glUseProgram(0);
     }
 
-    void GlShader::upload_uniform_mat4(Key name, const glm::mat4& matrix) const {
+    void GlShader::upload_uniform_mat4(Id name, const glm::mat4& matrix) const {
         const int location {get_uniform_location(name)};
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
-    void GlShader::upload_uniform_int(Key name, int value) const {
+    void GlShader::upload_uniform_int(Id name, int value) const {
         const int location {get_uniform_location(name)};
         glUniform1i(location, value);
     }
 
-    void GlShader::upload_uniform_float(Key name, float value) const {
+    void GlShader::upload_uniform_float(Id name, float value) const {
         const int location {get_uniform_location(name)};
         glUniform1f(location, value);
     }
 
-    void GlShader::upload_uniform_vec2(Key name, glm::vec2 vector) const {
+    void GlShader::upload_uniform_vec2(Id name, glm::vec2 vector) const {
         const int location {get_uniform_location(name)};
         glUniform2f(location, vector.x, vector.y);
     }
 
-    void GlShader::upload_uniform_vec3(Key name, const glm::vec3& vector) const {
+    void GlShader::upload_uniform_vec3(Id name, const glm::vec3& vector) const {
         const int location {get_uniform_location(name)};
         glUniform3f(location, vector.x, vector.y, vector.z);
     }
 
-    void GlShader::upload_uniform_vec4(Key name, const glm::vec4& vector) const {
+    void GlShader::upload_uniform_vec4(Id name, const glm::vec4& vector) const {
         const int location {get_uniform_location(name)};
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
     }
@@ -105,7 +105,7 @@ namespace sm {
         uniform_buffers.push_back(uniform_buffer);
     }
 
-    int GlShader::get_uniform_location(Key name) const {
+    int GlShader::get_uniform_location(Id name) const {
 #ifdef SM_BUILD_DEBUG
         try {
             return cache.at(name);
@@ -120,7 +120,7 @@ namespace sm {
 
     void GlShader::check_and_cache_uniforms() {
         for (const auto& uniform : uniforms) {
-            int location {0};
+            int location {};
 
             // Don't touch uniforms that are in blocks
             for (const auto& block : uniform_blocks) {
@@ -136,7 +136,7 @@ namespace sm {
                 continue;
             }
 
-            cache[Key(uniform)] = location;
+            cache[Id(uniform)] = location;
 
             skip_uniform:
             continue;

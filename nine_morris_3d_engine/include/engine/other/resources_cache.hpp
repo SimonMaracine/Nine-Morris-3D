@@ -19,24 +19,24 @@
 
 namespace sm {
     struct ResourcesCache {
-        resmanager::Cache<GlTexture> texture;
-        resmanager::Cache<GlTextureCubemap> texture_3d;
+        // resmanager::Cache<GlTexture> texture;
+        // resmanager::Cache<GlTextureCubemap> texture_3d;
         resmanager::Cache<GlVertexArray> vertex_array;
-        resmanager::Cache<GlShader> shader;
-        resmanager::Cache<GlVertexBuffer> vertex_buffer;
-        resmanager::Cache<GlIndexBuffer> index_buffer;
-        resmanager::Cache<GlUniformBuffer> uniform_buffer;
-        resmanager::Cache<GlPixelBuffer> pixel_buffer;
-        resmanager::Cache<GlFramebuffer> framebuffer;
-        resmanager::Cache<Font> font;
+        // resmanager::Cache<GlShader> shader;
+        // resmanager::Cache<GlVertexBuffer> vertex_buffer;
+        // resmanager::Cache<GlIndexBuffer> index_buffer;
+        // resmanager::Cache<GlUniformBuffer> uniform_buffer;
+        // resmanager::Cache<GlPixelBuffer> pixel_buffer;
+        // resmanager::Cache<GlFramebuffer> framebuffer;
+        // resmanager::Cache<Font> font;
         resmanager::Cache<Material> material;
         resmanager::Cache<MaterialInstance> material_instance;
-        resmanager::Cache<TextureData> texture_data;
-        resmanager::Cache<Mesh> mesh;
-        resmanager::Cache<AlSource> al_source;
-        resmanager::Cache<AlBuffer> al_buffer;
-        resmanager::Cache<SoundData> sound_data;
-        resmanager::Cache<MusicTrack> music_track;
+        // resmanager::Cache<TextureData> texture_data;
+        // resmanager::Cache<Mesh> mesh;
+        // resmanager::Cache<AlSource> al_source;
+        // resmanager::Cache<AlBuffer> al_buffer;
+        // resmanager::Cache<SoundData> sound_data;
+        // resmanager::Cache<MusicTrack> music_track;
 
         void merge(ResourcesCache& other);
         void merge_replace(ResourcesCache& other);

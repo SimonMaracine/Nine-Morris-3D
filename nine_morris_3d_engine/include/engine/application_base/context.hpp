@@ -6,11 +6,11 @@
 #include "engine/application_base/window.hpp"
 #include "engine/application_base/tasks.hpp"
 #include "engine/application_base/properties.hpp"
+#include "engine/application_base/id.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer.hpp"
-#include "engine/other/resource_manager.hpp"
+#include "engine/other/resources_cache.hpp"
 #include "engine/other/random_gen.hpp"
-#include "engine/scene/scene.hpp"
 
 namespace sm {
     class Application;
@@ -18,8 +18,6 @@ namespace sm {
     // Wrapper around functionality exposed to the user
     class Ctx {
     public:
-        using SceneId = Scene::SceneId;
-
         explicit Ctx(const ApplicationProperties& properties)
             : win(properties, &evt), rnd(properties.width, properties.height), snd(properties.audio) {}
 
@@ -30,8 +28,7 @@ namespace sm {
         Ctx(Ctx&&) = delete;
         Ctx& operator=(Ctx&&) = delete;
 
-        void change_scene(SceneId id);
-        const Scene* get_current_scene() const;
+        void change_scene(Id id);
 
         template<typename T>
         T& data() {
@@ -41,7 +38,7 @@ namespace sm {
         bool running {true};
         int exit_code {};
         float delta {};
-        double fps {};
+        float fps {};
 
         EventDispatcher evt;  // Manager of application events
         Window win;  // One of the last objects destroyed in an application instance

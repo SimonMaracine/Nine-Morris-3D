@@ -5,7 +5,6 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stb_image.h>
 
 #include "engine/application_base/application.hpp"
 #include "engine/application_base/events.hpp"
@@ -14,7 +13,6 @@
 #include "engine/application_base/panic.hpp"
 #include "engine/application_base/context.hpp"
 #include "engine/graphics/dear_imgui_context.hpp"
-#include "engine/graphics/texture_data.hpp"
 #include "engine/other/logging.hpp"
 
 namespace sm {
@@ -154,7 +152,7 @@ namespace sm {
         glfwSwapInterval(interval);
     }
 
-    void Window::add_cursor(CursorId id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
+    void Window::add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
         GLFWimage image;
         image.width = cursor->get_width();
         image.height = cursor->get_height();
@@ -169,7 +167,7 @@ namespace sm {
         cursors[id] = glfw_cursor;
     }
 
-    void Window::set_cursor(CursorId id) const {
+    void Window::set_cursor(Id id) const {
         static constexpr auto null {resmanager::HashedStr64("null")};
 
         if (id == null) {

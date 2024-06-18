@@ -9,13 +9,10 @@
 
 #include "engine/graphics/opengl/vertex_array.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
-#include "engine/graphics/opengl/framebuffer.hpp"
-#include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/graphics/opengl/info_and_debug.hpp"
 #include "engine/graphics/material.hpp"
 #include "engine/graphics/opengl/opengl.hpp"
-#include "engine/graphics/camera.hpp"
 #include "engine/other/file_system.hpp"
 #include "engine/other/utilities.hpp"
 

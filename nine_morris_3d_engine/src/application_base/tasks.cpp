@@ -5,11 +5,11 @@
 #include "engine/application_base/window.hpp"
 
 namespace sm {
-    void TaskManager::add(Task::TaskId id, const Task::TaskFunction& function) {
+    void TaskManager::add(Id id, const Task::TaskFunction& function) {
         tasks_active.emplace_back(id, function);
     }
 
-    void TaskManager::remove(Task::TaskId id) {
+    void TaskManager::remove(Id id) {
         tasks_active.erase(
             std::find_if(tasks_active.cbegin(), tasks_active.cend(), [this, id](const Task& task) {
                 return task.id == id;
