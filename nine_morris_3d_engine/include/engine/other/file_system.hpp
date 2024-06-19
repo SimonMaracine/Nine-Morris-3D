@@ -20,12 +20,12 @@ namespace sm {
         static std::string path_logs();
         static std::string path_saved_data();
         static std::string path_assets();
-        static std::string path_engine_data();
+        static std::string path_engine_assets();
 
         static std::string path_logs(const std::string& file);
         static std::string path_saved_data(const std::string& file);
         static std::string path_assets(const std::string& file);
-        static std::string path_engine_data(const std::string& file);
+        static std::string path_engine_assets(const std::string& file);
 
         // These don't need to be reset explicitly
         static std::string user_name;

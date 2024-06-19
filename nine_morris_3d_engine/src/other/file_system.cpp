@@ -223,8 +223,8 @@ namespace sm {
         return path_assets_impl() + FileSystem::res_directory + '/';
     }
 
-    std::string FileSystem::path_engine_data() {
-        return path_assets_impl() + "engine_data/";
+    std::string FileSystem::path_engine_assets() {
+        return path_assets_impl() + "engine_assets/";
     }
 
     std::string FileSystem::path_logs(const std::string& file) {
@@ -239,8 +239,8 @@ namespace sm {
         return path_assets_impl() + FileSystem::res_directory + '/' + file;
     }
 
-    std::string FileSystem::path_engine_data(const std::string& file) {
-        return path_assets_impl() + "engine_data/" + file;
+    std::string FileSystem::path_engine_assets(const std::string& file) {
+        return path_assets_impl() + "engine_assets/" + file;
     }
 
     std::string FileSystem::user_name;
