@@ -1,9 +1,10 @@
 #include "engine/application_base/application.hpp"
 
-#include <locale>
 #include <memory>
 #include <algorithm>
 #include <utility>
+#include <cstdlib>
+#include <iostream>
 #include <cassert>
 
 #include "engine/application_base/input.hpp"
@@ -14,23 +15,18 @@
 #include "engine/graphics/imgui_context.hpp"
 #include "engine/other/logging.hpp"
 #include "engine/other/file_system.hpp"
+#include "engine/other/utilities.hpp"
 
 namespace sm {
-    bool Application::initialize_applications(const ApplicationsData& data) {
-        if (!FileSystem::initialize_applications(data.app_name, data.res_directory)) {
-            return false;
+    void Application::preinitialize(const std::string& app_name, const std::string& assets_directory_path) {
+        if (!FileSystem::initialize(app_name, assets_directory_path)) {  // FIXME
+            std::cerr << "An unrecoverable error occurred!\n";
+            std::abort();
         }
-
-        // Set locale for the applications; used mostly by spdlog
-        std::locale::global(std::locale("en_US.UTF-8"));
-
-        Logging::initialize_applications(data.log_file, data.info_file);
 
 #ifdef SM_BUILD_DISTRIBUTION
         FileSystem::check_and_fix_directories();
 #endif
-
-        return true;
     }
 
     Application::Application(const ApplicationProperties& properties)
@@ -38,11 +34,13 @@ namespace sm {
         ctx.application = this;
         ctx.user_data = properties.user_data;
 
+        ctx.shd.load_shaders_from_include_directories({"engine_assets", properties.assets_directory_path});
+
         Input::initialize(ctx.win.get_handle());
         ImGuiContext::initialize(ctx.win.get_handle());
 
 #ifndef SM_BUILD_DISTRIBUTION
-        Logging::log_general_information(Logging::LogTarget::Console);
+        LOG_DIST_INFO("{}", Utils::get_information());  // FIXME move function into this class
 #endif
 
         const auto [version_major, version_minor] {GlDebug::get_version_number()};

@@ -6,7 +6,7 @@
 namespace sm {
     struct FileSystem {  // TODO use C++17 filesystem
         // There is no uninitialization
-        static bool initialize_applications(const std::string& app_name, const std::string& res_directory);
+        static bool initialize(const std::string& app_name, const std::string& assets_directory);
 
         static bool directory_exists(const std::string& path);  // Path must not end with trailing backslash
         static bool create_directory(const std::string& path);
@@ -30,6 +30,6 @@ namespace sm {
         // These don't need to be reset explicitly
         static std::string user_name;
         static std::string app_name;
-        static std::string res_directory;
+        static std::string assets_directory;
     };
 }

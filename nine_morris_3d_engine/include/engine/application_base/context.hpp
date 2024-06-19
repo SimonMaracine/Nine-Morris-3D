@@ -9,6 +9,7 @@
 #include "engine/application_base/id.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer.hpp"
+#include "engine/graphics/shader_library.hpp"
 #include "engine/other/resources_cache.hpp"
 #include "engine/other/random_gen.hpp"
 
@@ -40,13 +41,14 @@ namespace sm {
         float delta {};
         float fps {};
 
-        EventDispatcher evt;  // Manager of application events
+        EventDispatcher evt;  // Application events
         Window win;  // One of the last objects destroyed in an application instance
         Renderer rnd;  // Renderer for 3D, 2D and debug
-        OpenAlContext snd;  // Audio context
+        OpenAlContext snd;
+        ShaderLibrary shd;
         ResourcesCache res;  // Global cache of resources
-        TaskManager tsk;  // Manager of general purpose procedures
-        RandomGenerator rng;  // Random number generator
+        TaskManager tsk;
+        RandomGenerator rng;
     private:
         void* user_data {nullptr};  // Arbitrary data defined by the user
         Application* application {nullptr};

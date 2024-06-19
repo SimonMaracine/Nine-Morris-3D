@@ -173,7 +173,7 @@ namespace sm {
         }
 #endif
 
-    bool FileSystem::initialize_applications(const std::string& app_name, const std::string& res_directory) {
+    bool FileSystem::initialize(const std::string& app_name, const std::string& assets_directory) {
         const auto username {get_user_name()};
 
         if (!username) {
@@ -182,7 +182,7 @@ namespace sm {
 
         user_name = *username;
         FileSystem::app_name = app_name;
-        FileSystem::res_directory = res_directory;
+        FileSystem::assets_directory = assets_directory;
 
         return true;
     }
@@ -220,7 +220,7 @@ namespace sm {
     }
 
     std::string FileSystem::path_assets() {
-        return path_assets_impl() + FileSystem::res_directory + '/';
+        return path_assets_impl() + FileSystem::assets_directory + '/';
     }
 
     std::string FileSystem::path_engine_assets() {
@@ -236,7 +236,7 @@ namespace sm {
     }
 
     std::string FileSystem::path_assets(const std::string& file) {
-        return path_assets_impl() + FileSystem::res_directory + '/' + file;
+        return path_assets_impl() + FileSystem::assets_directory + '/' + file;
     }
 
     std::string FileSystem::path_engine_assets(const std::string& file) {
@@ -245,5 +245,5 @@ namespace sm {
 
     std::string FileSystem::user_name;
     std::string FileSystem::app_name;
-    std::string FileSystem::res_directory;
+    std::string FileSystem::assets_directory;
 }

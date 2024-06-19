@@ -37,6 +37,7 @@
 #include "engine/graphics/material.hpp"
 #include "engine/graphics/post_processing.hpp"
 #include "engine/graphics/renderable.hpp"
+#include "engine/graphics/shader_library.hpp"
 #include "engine/graphics/texture_data.hpp"
 #include "engine/other/camera_controller.hpp"
 #include "engine/other/concurrent_loader.hpp"

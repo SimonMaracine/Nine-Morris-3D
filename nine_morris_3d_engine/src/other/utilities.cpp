@@ -6,6 +6,10 @@
 #include <cstddef>
 #include <cassert>
 
+#include "engine/audio/openal/debug.hpp"
+#include "engine/graphics/opengl/debug.hpp"
+#include "engine/other/dependencies.hpp"
+
 namespace sm {
     std::string Utils::get_file_name(const std::string& file_path) {
         const std::size_t last_slash {file_path.find_last_of("/")};
@@ -53,5 +57,16 @@ namespace sm {
         delete[] buffer;
 
         return std::make_optional(contents);
+    }
+
+    std::string Utils::get_information() {
+        std::string result;;
+
+        result += '\n';
+        result += AlDebug::get_information();
+        result += GlDebug::get_information();
+        result += Dependencies::get_information();
+
+        return result;
     }
 }

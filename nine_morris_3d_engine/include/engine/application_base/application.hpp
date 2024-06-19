@@ -6,22 +6,13 @@
 #include <vector>
 
 #include "engine/application_base/properties.hpp"
-#include "engine/application_base/events.hpp"
-#include "engine/application_base/window.hpp"
 #include "engine/application_base/context.hpp"
 #include "engine/application_base/id.hpp"
 #include "engine/audio/context.hpp"
-#include "engine/graphics/renderer.hpp"
-#include "engine/other/resources_cache.hpp"
 #include "engine/scene/scene.hpp"
 
 namespace sm {
-    struct ApplicationsData {
-        std::string app_name;
-        std::string log_file;
-        std::string info_file;
-        std::string res_directory;
-    };
+    class Window;
 
     struct UserFunctions {
         std::function<void(Ctx&)> start {[](Ctx&) {}};
@@ -30,7 +21,7 @@ namespace sm {
 
     class Application final {
     public:
-        static bool initialize_applications(const ApplicationsData& data);
+        static void preinitialize(const std::string& app_name, const std::string& assets_directory_path);
 
         explicit Application(const ApplicationProperties& properties);
         ~Application();

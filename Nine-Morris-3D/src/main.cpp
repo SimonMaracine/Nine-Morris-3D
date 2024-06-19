@@ -22,31 +22,22 @@ static constexpr unsigned int MINOR {4};
 static constexpr unsigned int PATCH {0};
 
 int application_main() {
-    sm::ApplicationsData data;
-    data.app_name = APP_NAME;
-    data.log_file = LOG_FILE;
-    data.info_file = INFO_FILE;
-    data.res_directory = "data";
-
-    if (!sm::Application::initialize_applications(data)) {
-        std::cerr << "Fatal: Could not retrieve username\n";
-        return 1;
-    }
+    sm::Logging::initialize(LOG_FILE);
+    sm::Application::preinitialize(APP_NAME, "assets");  // FIXME
 
     while (true) {
         int exit_code {};
 
         {
-
             sm::ApplicationProperties properties;
             properties.width = 1024;
             properties.height = 576;
             properties.min_width = 512;
             properties.min_height = 288;
-            properties.app_name = APP_NAME;
             properties.version_major = MAJOR;
             properties.version_minor = MINOR;
             properties.version_patch = PATCH;
+            properties.assets_directory_path = "assets";
 
             try {
                 auto game {sm::Application(properties)};
@@ -55,12 +46,16 @@ int application_main() {
             } catch (sm::RuntimeError error) {
                 LOG_DIST_INFO("Terminated game with error code {}", static_cast<int>(error));
 
+                sm::Logging::uninitialize();
+
                 return 1;
             }
         }
 
         if (exit_code == 0) {
             LOG_DIST_INFO("Terminated game successfully");
+
+            sm::Logging::uninitialize();
 
             return 0;
         }

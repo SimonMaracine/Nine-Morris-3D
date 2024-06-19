@@ -40,25 +40,14 @@
 #define LOG_DIST_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(sm::Logging::get_global_logger(), __VA_ARGS__)
 
 namespace sm {
-    class Logging {
+    class Logging {  // FIXME
     public:
-        enum class LogTarget {
-            None,
-            Console,
-            File
-        };
-
-        // There is no uninitialization
-        static void initialize_applications(const std::string& log_file, const std::string& info_file);
-        static void log_general_information(LogTarget target);
+        static void initialize(const std::string& log_file);
+        static void uninitialize();
         static spdlog::logger* get_global_logger();
-        static const std::string& get_info_file();
     private:
         static void set_fallback_logger_distribution(const char* error_message);
 
-        // These don't need to be reset explicitly
-        // Should be cleaned up at exit()
-        static std::shared_ptr<spdlog::logger> global_logger;
-        static std::string info_file;
+        static std::shared_ptr<spdlog::logger> global_logger;  // FIXME
     };
 }
