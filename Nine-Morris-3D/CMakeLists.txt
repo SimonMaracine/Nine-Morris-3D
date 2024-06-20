@@ -10,10 +10,7 @@ if(WIN32)
     endif()
 endif()
 
-add_executable(Nine-Morris-3D "${GUI_EXECUTABLE_WINDOWS}"
-    ${GAME_SOURCES}
-    ${GAME_HEADERS}
-)
+add_executable(Nine-Morris-3D "${GUI_EXECUTABLE_WINDOWS}" ${GAME_SOURCES} ${GAME_HEADERS})
 
 target_include_directories(Nine-Morris-3D PRIVATE "src")
 

@@ -18,7 +18,7 @@ if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_CXX_COMPILER_ID STREQU
 endif()
 
 if(NM3D_DISTRIBUTION_MODE AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
-message(FATAL_ERROR "Nine-Morris-3D: Distribution mode is incompatible with debug mode")
+    message(FATAL_ERROR "Nine-Morris-3D: Distribution mode is incompatible with debug mode")
 endif()
 
 # On Windows set runtime library for all targets

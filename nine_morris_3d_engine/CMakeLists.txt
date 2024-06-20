@@ -185,6 +185,8 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/nine_morris_3d.hpp"
 )
 
+target_include_directories(nine_morris_3d_engine PUBLIC "include")
+
 target_link_libraries(nine_morris_3d_engine PRIVATE
     glad
     assimp::assimp
@@ -202,8 +204,6 @@ target_link_libraries(nine_morris_3d_engine PUBLIC
     resmanager
     spdlog
 )
-
-target_include_directories(nine_morris_3d_engine PUBLIC "include")
 
 if(UNIX)
     target_compile_options(nine_morris_3d_engine PRIVATE "-Wall" "-Wextra" "-Wpedantic" "-Wconversion")

@@ -1,15 +1,11 @@
 old
 .vscode
 build
-build-release
 *.log
-info.txt
-ninemorris3d_info.txt
+*info.txt
 imgui.ini
 *.blend1
 bitmap_*.png
 *.dat
-data-filtered
-engine_data-filtered
 renderdoc_captures
 *.aup3-wal
