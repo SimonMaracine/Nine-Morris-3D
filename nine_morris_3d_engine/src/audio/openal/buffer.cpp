@@ -3,8 +3,8 @@
 #include <AL/al.h>
 
 #include "engine/application_base/error.hpp"
+#include "engine/application_base/logging.hpp"
 #include "engine/audio/openal/debug.hpp"
-#include "engine/other/logging.hpp"
 
 namespace sm {
     static ALenum get_format(int channels, std::size_t bps) {

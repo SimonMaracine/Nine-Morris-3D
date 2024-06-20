@@ -21,8 +21,6 @@ namespace sm {
 
     class Application final {
     public:
-        static void preinitialize(const std::string& app_name, const std::string& assets_directory_path);
-
         explicit Application(const ApplicationProperties& properties);
         ~Application();
 
@@ -48,6 +46,7 @@ namespace sm {
         void check_changed_scene();
         void dear_imgui_render();
         void prepare_scenes(Id start_scene_id);
+        std::string get_information();
 
         void on_window_closed(const WindowClosedEvent&);
         void on_window_resized(const WindowResizedEvent& event);

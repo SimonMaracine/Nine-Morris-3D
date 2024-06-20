@@ -2,9 +2,9 @@
 
 #include <cassert>
 
+#include "engine/application_base/logging.hpp"
 #include "engine/audio/openal/source.hpp"
 #include "engine/audio/openal/buffer.hpp"
-#include "engine/other/logging.hpp"
 
 namespace sm {
     // MusicTrack::MusicTrack(const std::string& file_path) {

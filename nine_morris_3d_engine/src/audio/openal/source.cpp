@@ -4,8 +4,8 @@
 
 #include <AL/al.h>
 
+#include "engine/application_base/logging.hpp"
 #include "engine/audio/openal/debug.hpp"
-#include "engine/other/logging.hpp"
 
 namespace sm {
     AlSource::AlSource() {

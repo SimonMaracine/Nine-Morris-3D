@@ -5,7 +5,7 @@
 
 #include <glad/glad.h>
 
-#include "engine/other/logging.hpp"
+#include "engine/application_base/logging.hpp"
 
 namespace sm {
     static int draw_hint_to_int(DrawHint hint) {

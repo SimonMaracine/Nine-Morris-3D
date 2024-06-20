@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 
 #include "engine/application_base/error.hpp"
-#include "engine/other/logging.hpp"
+#include "engine/application_base/logging.hpp"
 
 namespace sm {
     static const GLenum COLOR_ATTACHMENTS[] {

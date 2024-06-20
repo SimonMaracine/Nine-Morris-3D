@@ -24,7 +24,7 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            sm::FileSystem::path_assets("models/dragon.obj"),
+            ctx->fs.path_assets("models/dragon.obj"),
             "default",
             sm::Mesh::Type::PN
         )};
@@ -52,7 +52,7 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            sm::FileSystem::path_assets("models/teapot.obj"),
+            ctx->fs.path_assets("models/teapot.obj"),
             sm::Mesh::DEFAULT_OBJECT,
             sm::Mesh::Type::PN
         )};
@@ -80,7 +80,7 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            sm::FileSystem::path_assets("models/cube.obj"),
+            ctx->fs.path_assets("models/cube.obj"),
             "Cube",
             sm::Mesh::Type::PN
         )};
@@ -106,8 +106,8 @@ void GameScene::on_start() {
         });
     }
 
-    const auto contents_vert {sm::Utils::read_file(sm::FileSystem::path_assets("shaders/simple.vert"))};
-    const auto contents_frag {sm::Utils::read_file(sm::FileSystem::path_assets("shaders/simple.frag"))};
+    const auto contents_vert {sm::Utils::read_file(ctx->fs.path_assets("shaders/simple.vert"))};
+    const auto contents_frag {sm::Utils::read_file(ctx->fs.path_assets("shaders/simple.frag"))};
 
     auto shader {std::make_shared<sm::GlShader>(
         contents_vert.value_or(""),

@@ -10,7 +10,7 @@
 
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/error.hpp"
-#include "engine/other/logging.hpp"
+#include "engine/application_base/logging.hpp"
 
 namespace sm {
     GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment) {

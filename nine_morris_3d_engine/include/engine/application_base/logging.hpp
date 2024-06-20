@@ -40,14 +40,25 @@
 #define LOG_DIST_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(sm::Logging::get_global_logger(), __VA_ARGS__)
 
 namespace sm {
-    class Logging {  // FIXME
+    class FileSystem;
+    class Ctx;
+
+    class Logging {
     public:
-        static void initialize(const std::string& log_file);
-        static void uninitialize();
         static spdlog::logger* get_global_logger();
     private:
+        Logging(const std::string& log_file, const FileSystem& fs);
+        ~Logging();
+
+        Logging(const Logging&) = default;
+        Logging& operator=(const Logging&) = default;
+        Logging(Logging&&) = default;
+        Logging& operator=(Logging&&) = default;
+
         static void set_fallback_logger_distribution(const char* error_message);
 
-        static std::shared_ptr<spdlog::logger> global_logger;  // FIXME
+        static std::shared_ptr<spdlog::logger> global_logger;
+
+        friend class Ctx;
     };
 }

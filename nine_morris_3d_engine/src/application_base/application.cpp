@@ -3,44 +3,32 @@
 #include <memory>
 #include <algorithm>
 #include <utility>
-#include <cstdlib>
-#include <iostream>
 #include <cassert>
 
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/platform.hpp"
+#include "engine/application_base/logging.hpp"
+#include "engine/audio/openal/debug.hpp"
 #include "engine/audio/music.hpp"
 #include "engine/graphics/opengl/opengl.hpp"
 #include "engine/graphics/opengl/debug.hpp"
 #include "engine/graphics/imgui_context.hpp"
-#include "engine/other/logging.hpp"
-#include "engine/other/file_system.hpp"
 #include "engine/other/utilities.hpp"
+#include "engine/other/dependencies.hpp"
 
 namespace sm {
-    void Application::preinitialize(const std::string& app_name, const std::string& assets_directory_path) {
-        if (!FileSystem::initialize(app_name, assets_directory_path)) {  // FIXME
-            std::cerr << "An unrecoverable error occurred!\n";
-            std::abort();
-        }
-
-#ifdef SM_BUILD_DISTRIBUTION
-        FileSystem::check_and_fix_directories();
-#endif
-    }
-
     Application::Application(const ApplicationProperties& properties)
         : ctx(properties) {
         ctx.application = this;
         ctx.user_data = properties.user_data;
 
-        ctx.shd.load_shaders_from_include_directories({"engine_assets", properties.assets_directory_path});
+        ctx.shd.load_shaders_from_include_directories({"engine_assets", properties.assets_directory});
 
         Input::initialize(ctx.win.get_handle());
         ImGuiContext::initialize(ctx.win.get_handle());
 
 #ifndef SM_BUILD_DISTRIBUTION
-        LOG_DIST_INFO("{}", Utils::get_information());  // FIXME move function into this class
+        LOG_DIST_INFO("{}", get_information());
 #endif
 
         const auto [version_major, version_minor] {GlDebug::get_version_number()};
@@ -188,6 +176,17 @@ namespace sm {
         }
 
         assert(current_scene != nullptr);
+    }
+
+    std::string Application::get_information() {
+        std::string result;;
+
+        result += '\n';
+        result += AlDebug::get_information();
+        result += GlDebug::get_information();
+        result += Dependencies::get_information();
+
+        return result;
     }
 
     void Application::on_window_closed(const WindowClosedEvent&) {

@@ -5,8 +5,8 @@
 #include <thread>
 
 #include "engine/application_base/context.hpp"
+#include "engine/application_base/logging.hpp"
 #include "engine/other/resources_cache.hpp"
-#include "engine/other/logging.hpp"
 
 namespace sm {
     /*

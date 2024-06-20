@@ -9,7 +9,7 @@
 
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/capabilities.hpp"
-#include "engine/other/logging.hpp"
+#include "engine/application_base/logging.hpp"
 
 namespace sm {
     static const GLenum parameters[] {

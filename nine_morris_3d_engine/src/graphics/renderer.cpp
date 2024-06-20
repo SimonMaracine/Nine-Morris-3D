@@ -12,7 +12,6 @@
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/graphics/opengl/opengl.hpp"
 #include "engine/graphics/material.hpp"
-#include "engine/other/file_system.hpp"
 #include "engine/other/utilities.hpp"
 
 using namespace resmanager::literals;
@@ -24,7 +23,7 @@ namespace sm {
     static constexpr unsigned int POINT_LIGHT_BLOCK_BINDING {3};
     static constexpr std::size_t SHADER_POINT_LIGHTS {4};
 
-    Renderer::Renderer(int width, int height) {
+    Renderer::Renderer(int width, int height, const FileSystem& fs) {
         OpenGl::initialize_default();
 
         OpenGl::enable_depth_test();
@@ -47,8 +46,8 @@ namespace sm {
         }
 
         {
-            const auto contents_vert {Utils::read_file(FileSystem::path_engine_assets("shaders/screen_quad.vert"))};
-            const auto contents_frag {Utils::read_file(FileSystem::path_engine_assets("shaders/screen_quad.frag"))};
+            const auto contents_vert {Utils::read_file(fs.path_engine_assets("shaders/screen_quad.vert"))};
+            const auto contents_frag {Utils::read_file(fs.path_engine_assets("shaders/screen_quad.frag"))};
 
             // Doesn't have uniform buffers for sure
             storage.screen_quad_shader = std::make_unique<GlShader>(
@@ -76,7 +75,7 @@ namespace sm {
             GlVertexArray::unbind();
         }
 
-        debug_initialize();
+        debug_initialize(fs);
     }
 
     void Renderer::capture(const Camera& camera, const glm::vec3& position) {
@@ -436,9 +435,9 @@ namespace sm {
         point_lights.clear();
     }
 
-    void Renderer::debug_initialize() {
-        const auto contents_vert {Utils::read_file(FileSystem::path_engine_assets("shaders/debug.vert"))};
-        const auto contents_frag {Utils::read_file(FileSystem::path_engine_assets("shaders/debug.frag"))};
+    void Renderer::debug_initialize(const FileSystem& fs) {
+        const auto contents_vert {Utils::read_file(fs.path_engine_assets("shaders/debug.vert"))};
+        const auto contents_frag {Utils::read_file(fs.path_engine_assets("shaders/debug.frag"))};
 
         debug_storage.shader = std::make_shared<GlShader>(
             contents_vert.value_or(""),

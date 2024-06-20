@@ -2,8 +2,8 @@
 
 #include <cstring>
 
+#include "engine/application_base/logging.hpp"
 #include "engine/graphics/opengl/opengl.hpp"
-#include "engine/other/logging.hpp"
 
 namespace sm {
     Material::Material(std::shared_ptr<GlShader> shader, unsigned int flags)

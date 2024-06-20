@@ -6,6 +6,7 @@
 
 #include <glm/glm.hpp>
 
+#include "engine/application_base/file_system.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/post_processing.hpp"
@@ -15,13 +16,14 @@
 
 namespace sm {
     class Application;
+    class FileSystem;
     class GlVertexArray;
     class GlVertexBuffer;
     class GlUniformBuffer;
 
     class Renderer {
     public:
-        Renderer(int width, int height);
+        Renderer(int width, int height, const FileSystem& fs);
 
         Renderer(const Renderer&) = delete;
         Renderer& operator=(const Renderer&) = delete;
@@ -101,7 +103,7 @@ namespace sm {
         } scene_data;
 
         // Debug stuff
-        void debug_initialize();
+        void debug_initialize(const FileSystem& fs);
         void debug_render();
         void debug_clear();
 

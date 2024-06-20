@@ -8,7 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "engine/application_base/capabilities.hpp"
-#include "engine/other/logging.hpp"
+#include "engine/application_base/logging.hpp"
 #include "engine/other/utilities.hpp"
 
 namespace sm {

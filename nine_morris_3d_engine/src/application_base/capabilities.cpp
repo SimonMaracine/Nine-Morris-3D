@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 
-#include "engine/other/logging.hpp"
+#include "engine/application_base/logging.hpp"
 
 namespace sm {
     int Capabilities::max_anisotropic_filtering_supported() {

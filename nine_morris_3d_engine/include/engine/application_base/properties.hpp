@@ -17,9 +17,10 @@ namespace sm {
         unsigned int version_minor {1};
         unsigned int version_patch {0};
         std::string title {"Nine Morris 3D Engine"};
-        std::string app_name {"NineMorris3DEngine"};
+        std::string application_name {"NineMorris3DEngine"};
         std::string info_file;
-        std::string assets_directory_path;
+        std::string log_file;
+        std::string assets_directory;
         void* user_data {nullptr};
     };
 }

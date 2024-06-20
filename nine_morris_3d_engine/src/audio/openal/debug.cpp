@@ -6,7 +6,7 @@
 #include <AL/al.h>
 
 #include "engine/application_base/platform.hpp"
-#include "engine/other/logging.hpp"
+#include "engine/application_base/logging.hpp"
 
 namespace sm {
     void AlDebug::check_errors() {

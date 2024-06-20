@@ -1,11 +1,11 @@
 #pragma once
 
-#include <memory>
-
 #include "engine/application_base/events.hpp"
 #include "engine/application_base/window.hpp"
 #include "engine/application_base/tasks.hpp"
 #include "engine/application_base/properties.hpp"
+#include "engine/application_base/logging.hpp"
+#include "engine/application_base/file_system.hpp"
 #include "engine/application_base/id.hpp"
 #include "engine/audio/context.hpp"
 #include "engine/graphics/renderer.hpp"
@@ -20,7 +20,8 @@ namespace sm {
     class Ctx {
     public:
         explicit Ctx(const ApplicationProperties& properties)
-            : win(properties, &evt), rnd(properties.width, properties.height), snd(properties.audio) {}
+            : fs(properties.application_name, properties.assets_directory), log(properties.log_file, fs),
+            win(properties, &evt), rnd(properties.width, properties.height, fs), snd(properties.audio) {}
 
         ~Ctx() = default;
 
@@ -41,6 +42,10 @@ namespace sm {
         float delta {};
         float fps {};
 
+        // The order of these members matters
+
+        FileSystem fs;
+        Logging log;
         EventDispatcher evt;  // Application events
         Window win;  // One of the last objects destroyed in an application instance
         Renderer rnd;  // Renderer for 3D, 2D and debug

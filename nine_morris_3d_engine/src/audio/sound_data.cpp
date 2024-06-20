@@ -6,7 +6,7 @@
 #include <stb_vorbis.h>
 
 #include "engine/application_base/error.hpp"
-#include "engine/other/logging.hpp"
+#include "engine/application_base/logging.hpp"
 
 namespace sm {
     static void check_bits_per_sample(std::size_t bits_per_sample, [[maybe_unused]] const std::string& file_path) {

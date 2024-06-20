@@ -11,10 +11,10 @@
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/input.hpp"
 #include "engine/application_base/error.hpp"
+#include "engine/application_base/logging.hpp"
 #include "engine/application_base/context.hpp"
 #include "engine/graphics/opengl/debug.hpp"
 #include "engine/graphics/imgui_context.hpp"
-#include "engine/other/logging.hpp"
 
 namespace sm {
     std::pair<int, int> Monitors::get_resolution(std::size_t index) const {

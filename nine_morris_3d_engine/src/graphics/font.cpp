@@ -11,9 +11,9 @@
 
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/error.hpp"
+#include "engine/application_base/logging.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
-#include "engine/other/logging.hpp"
 #include "engine/other/utilities.hpp"
 
 namespace sm {

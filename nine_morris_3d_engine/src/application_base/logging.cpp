@@ -1,11 +1,11 @@
-#include "engine/other/logging.hpp"
+#include "engine/application_base/logging.hpp"
 
 #include <fstream>
 
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "engine/other/file_system.hpp"
+#include "engine/application_base/file_system.hpp"
 
 #define LOG_PATTERN_DEVELOPMENT "%^[%l] [%t] [%H:%M:%S]%$ %v"
 #define LOG_PATTERN_DISTRIBUTION "%^[%l] [%t] [%!:%#] [%c]%$ %v"
@@ -23,9 +23,13 @@
 */
 
 namespace sm {
-    void Logging::initialize([[maybe_unused]] const std::string& log_file) {
+    spdlog::logger* Logging::get_global_logger() {
+        return global_logger.get();
+    }
+
+    Logging::Logging([[maybe_unused]] const std::string& log_file, [[maybe_unused]] const FileSystem& fs) {
 #ifdef SM_BUILD_DISTRIBUTION
-        const std::string file_path {FileSystem::path_for_logs(log_file)};
+        const std::string file_path {fs.path_for_logs(log_file)};
 
         try {
             global_logger = spdlog::rotating_logger_mt("Distribution Logger [File]", file_path, FILE_SIZE, ROTATING_FILES);
@@ -44,13 +48,9 @@ namespace sm {
 #endif
     }
 
-    void Logging::uninitialize() {
+    Logging::~Logging() {
         global_logger->flush();
         global_logger.reset();
-    }
-
-    spdlog::logger* Logging::get_global_logger() {
-        return global_logger.get();
     }
 
     void Logging::set_fallback_logger_distribution(const char* error_message) {
