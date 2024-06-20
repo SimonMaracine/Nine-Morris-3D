@@ -12,7 +12,7 @@ class AssetsDirectoryProcessError(RuntimeError):
 
 @dataclasses.dataclass(frozen=True)
 class ManifestFile:
-    asset_paths: list[str]
+    assets_paths: list[str]
 
 
 def process_assets_directory(assets_directory_path: str, output_path: str):
@@ -49,7 +49,7 @@ def create_new_assets_directory(assets_directory_path: str, output_path: str, ma
     except FileExistsError:
         pass
 
-    for file_path in manifest.asset_paths:
+    for file_path in manifest.assets_paths:
         os.makedirs(os.path.join(new_directory, os.path.dirname(file_path)), exist_ok=True)
         shutil.copyfile(
             os.path.join(assets_directory_path, file_path),
@@ -58,9 +58,14 @@ def create_new_assets_directory(assets_directory_path: str, output_path: str, ma
         print(f"Copied: {file_path}")
 
 
+def print_help():
+    print("Usage: export_assets.py <output_directory> <assets_directories...>", file=sys.stderr)
+
+
 def main(args: list[str]) -> int:
     if len(args) < 3:
         print("Error: no assets directory", file=sys.stderr)
+        print_help()
         return 1
 
     output = args[1]
@@ -71,6 +76,7 @@ def main(args: list[str]) -> int:
 
     if not os.path.isdir(output):
         print(f"Error: `{output}` is not a directory", file=sys.stderr)
+        print_help()
         return 1
 
     exit_code = 0
@@ -85,6 +91,7 @@ def main(args: list[str]) -> int:
             process_assets_directory(directory, output)
         except AssetsDirectoryProcessError as err:
             print(f"Error: {err}", file=sys.stderr)
+            exit_code = 1
 
     return exit_code
 
