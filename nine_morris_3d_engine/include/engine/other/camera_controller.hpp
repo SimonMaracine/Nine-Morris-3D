@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 
+#include "engine/application_base/input.hpp"
 #include "engine/graphics/camera.hpp"
 
 namespace sm {
@@ -17,7 +18,7 @@ namespace sm {
         CameraController(CameraController&&) = default;
         CameraController& operator=(CameraController&&) = default;
 
-        virtual void update_controls(float dt) = 0;  // TODO take delta?
+        virtual void update_controls(float dt, const Input& inp) = 0;  // TODO take delta?
         virtual void update_camera(float dt) = 0;
         virtual glm::vec3 get_position() const = 0;
         virtual glm::vec3 get_rotation() const = 0;

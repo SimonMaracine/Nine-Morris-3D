@@ -7,16 +7,20 @@
 
 namespace sm {
     class Application;
+    class Ctx;
 
     class ShaderLibrary {
     public:
         std::string load_shader(const std::string& source);
     private:
+        ShaderLibrary() = default;
+
         void load_shaders_from_include_directories(std::initializer_list<std::string> include_directories);
 
         std::vector<std::string> include_shader_sources;
 
         friend class Application;
+        friend class Ctx;
     };
 
     struct ProcessError : public std::runtime_error {

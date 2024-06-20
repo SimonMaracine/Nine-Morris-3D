@@ -6,9 +6,12 @@ struct ALCdevice;
 struct ALCcontext;
 
 namespace sm {
+    class Ctx;
+
     class OpenAlContext {
-    public:
+    private:
         explicit OpenAlContext(bool create = true);
+    public:
         ~OpenAlContext();
 
         OpenAlContext(const OpenAlContext&) = delete;
@@ -23,5 +26,7 @@ namespace sm {
 
         ALCdevice* device {nullptr};
         ALCcontext* context {nullptr};
+
+        friend class Ctx;
     };
 }

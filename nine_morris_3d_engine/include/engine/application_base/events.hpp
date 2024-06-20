@@ -17,6 +17,7 @@
 
 namespace sm {
     class Application;
+    class Ctx;
 
     // Application-level events
     class EventDispatcher {
@@ -51,6 +52,8 @@ namespace sm {
             dispatcher.clear<E>();
         }
     private:
+        EventDispatcher() = default;
+
         void update() {
             dispatcher.update();
         }
@@ -58,6 +61,7 @@ namespace sm {
         entt::dispatcher dispatcher;
 
         friend class Application;
+        friend class Ctx;
     };
 
     struct WindowClosedEvent {};

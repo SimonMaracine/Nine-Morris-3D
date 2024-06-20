@@ -1,11 +1,6 @@
 #include "engine/other/random_gen.hpp"
 
 namespace sm {
-    RandomGenerator::RandomGenerator() {
-        std::random_device dev;
-        random = std::mt19937(dev());
-    }
-
     std::uint_fast32_t RandomGenerator::next() {
         std::uniform_int_distribution<std::mt19937::result_type> distribution {};
 
@@ -24,5 +19,10 @@ namespace sm {
         std::uniform_int_distribution<std::mt19937::result_type> distribution {begin, end};
 
         return distribution(random);
+    }
+
+    RandomGenerator::RandomGenerator() {
+        std::random_device dev;
+        random = std::mt19937(dev());
     }
 }

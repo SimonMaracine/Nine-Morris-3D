@@ -106,8 +106,8 @@ void GameScene::on_start() {
         });
     }
 
-    const auto contents_vert {sm::Utils::read_file(ctx->fs.path_assets("shaders/simple.vert"))};
-    const auto contents_frag {sm::Utils::read_file(ctx->fs.path_assets("shaders/simple.frag"))};
+    const auto contents_vert {sm::utils::read_file(ctx->fs.path_assets("shaders/simple.vert"))};
+    const auto contents_frag {sm::utils::read_file(ctx->fs.path_assets("shaders/simple.frag"))};
 
     auto shader {std::make_shared<sm::GlShader>(
         contents_vert.value_or(""),
@@ -182,7 +182,7 @@ void GameScene::on_start() {
 }
 
 void GameScene::on_update() {
-    cam_controller.update_controls(ctx->delta);
+    cam_controller.update_controls(ctx->delta, ctx->inp);
     cam_controller.update_camera(ctx->delta);
     cam_controller.update_friction();
 

@@ -5,11 +5,9 @@
 #include <utility>
 #include <cassert>
 
-#include "engine/application_base/input.hpp"
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/logging.hpp"
 #include "engine/audio/openal/debug.hpp"
-#include "engine/audio/music.hpp"
 #include "engine/graphics/opengl/opengl.hpp"
 #include "engine/graphics/opengl/debug.hpp"
 #include "engine/graphics/imgui_context.hpp"
@@ -24,8 +22,7 @@ namespace sm {
 
         ctx.shd.load_shaders_from_include_directories({"engine_assets", properties.assets_directory});
 
-        Input::initialize(ctx.win.get_handle());
-        ImGuiContext::initialize(ctx.win.get_handle());
+        imgui_context::initialize(ctx.win.get_handle());
 
 #ifndef SM_BUILD_DISTRIBUTION
         LOG_DIST_INFO("{}", get_information());
@@ -43,9 +40,7 @@ namespace sm {
     }
 
     Application::~Application() {  // Destructor is called before all member variables
-        MusicPlayer::uninitialize();
-        ImGuiContext::uninitialize();
-        Input::uninitialize();
+        imgui_context::uninitialize();
     }
 
     int Application::run(Id start_scene_id, const UserFunctions& user_functions) {
@@ -161,9 +156,9 @@ namespace sm {
     }
 
     void Application::dear_imgui_render() {
-        ImGuiContext::begin_frame();
+        imgui_context::begin_frame();
         current_scene->on_imgui_update();
-        ImGuiContext::end_frame();
+        imgui_context::end_frame();
     }
 
     void Application::prepare_scenes(Id start_scene_id) {

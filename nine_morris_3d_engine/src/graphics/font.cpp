@@ -58,7 +58,7 @@ namespace sm {
         int bitmap_size
     )
         : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value), pixel_dist_scale(pixel_dist_scale) {
-        const auto contents {Utils::read_file(file_path)};
+        const auto contents {utils::read_file(file_path)};
 
         if (!contents) {
             LOG_DIST_CRITICAL("Could not open file `{}` for reading", file_path);
@@ -76,15 +76,13 @@ namespace sm {
 
         initialize();
 
-        name = Utils::get_file_name(file_path);
-
         LOG_DEBUG("Created font `{}`", file_path);
     }
 
     Font::~Font() {
         delete font_info;
 
-        LOG_DEBUG("Deleted font `{}`", name);
+        LOG_DEBUG("Deleted font");
     }
 
     void Font::update_data(const float* data, std::size_t size) {
@@ -101,7 +99,7 @@ namespace sm {
     }
 
     void Font::begin_baking() {
-        LOG_DEBUG("Begin baking font `{}`", name);
+        LOG_DEBUG("Begin baking font");
 
         // Delete the previous bitmap before creating another one
         bitmap_image.reset();
@@ -118,7 +116,7 @@ namespace sm {
         bake_character(ERROR_CHARACTER);
     }
 
-    void Font::end_baking() {
+    void Font::end_baking([[maybe_unused]] const char* name) {
         TextureSpecification specification;
         specification.format = Format::R8;
         specification.border_color = std::make_optional<glm::vec4>(0.0f, 0.0f, 0.0f, 1.0f);
@@ -126,12 +124,12 @@ namespace sm {
         bitmap_image = std::make_shared<GlTexture>(bitmap_size, bitmap_size, bake_context.bitmap, specification);
 
 #ifdef SM_BUILD_DEBUG
-        write_bitmap_to_file();
+        write_bitmap_to_file(name);
 #endif
 
         delete[] bake_context.bitmap;
 
-        LOG_DEBUG("End baking font `{}`", name);
+        LOG_DEBUG("End baking font");
     }
 
     void Font::bake_characters(int begin_codepoint, int end_codepoint) {
@@ -322,8 +320,8 @@ namespace sm {
         }
     }
 
-    void Font::write_bitmap_to_file() {
-        const std::string file_name {"bitmap_" + name + ".png"};
+    void Font::write_bitmap_to_file(const char* name) {
+        const std::string file_name {"bitmap_" + std::string(name) + ".png"};
 
         if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
             LOG_ERROR("Failed to create bitmap png file `{}`", file_name);

@@ -48,12 +48,6 @@ namespace sm {
         static spdlog::logger* get_global_logger();
     private:
         Logging(const std::string& log_file, const FileSystem& fs);
-        ~Logging();
-
-        Logging(const Logging&) = default;
-        Logging& operator=(const Logging&) = default;
-        Logging(Logging&&) = default;
-        Logging& operator=(Logging&&) = default;
 
         static void set_fallback_logger_distribution(const char* error_message);
 

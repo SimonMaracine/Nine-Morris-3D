@@ -161,7 +161,7 @@ namespace sm {
         }
     }
 
-    void ImGuiContext::initialize(void* window_handle) {
+    void imgui_context::initialize(void* window_handle) {
         IMGUI_CHECKVERSION();
 
         ImGui::CreateContext();
@@ -174,53 +174,53 @@ namespace sm {
 #endif
     }
 
-    void ImGuiContext::uninitialize() {
+    void imgui_context::uninitialize() {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
 
-    void ImGuiContext::begin_frame() {
+    void imgui_context::begin_frame() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
     }
 
-    void ImGuiContext::end_frame() {
+    void imgui_context::end_frame() {
         ImGui::EndFrame();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-    bool ImGuiContext::on_mouse_wheel_scrolled(float yoffset) {
+    bool imgui_context::on_mouse_wheel_scrolled(float yoffset) {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseWheelEvent(0.0f, yoffset);
 
         return io.WantCaptureMouse;
     }
 
-    bool ImGuiContext::on_mouse_moved(float xpos, float ypos) {
+    bool imgui_context::on_mouse_moved(float xpos, float ypos) {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMousePosEvent(xpos, ypos);
 
         return io.WantCaptureMouse;
     }
 
-    bool ImGuiContext::on_mouse_button_pressed(int button) {
+    bool imgui_context::on_mouse_button_pressed(int button) {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseButtonEvent(button, true);
 
         return io.WantCaptureMouse;
     }
 
-    bool ImGuiContext::on_mouse_button_released(int button) {
+    bool imgui_context::on_mouse_button_released(int button) {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseButtonEvent(button, false);
 
         return io.WantCaptureMouse;
     }
 
-    bool ImGuiContext::on_key_pressed(int key, int scancode) {
+    bool imgui_context::on_key_pressed(int key, int scancode) {
         key = translate_untranslated_key(key, scancode);
 
         ImGuiIO& io {ImGui::GetIO()};
@@ -229,7 +229,7 @@ namespace sm {
         return io.WantCaptureKeyboard;
     }
 
-    bool ImGuiContext::on_key_released(int key, int scancode) {
+    bool imgui_context::on_key_released(int key, int scancode) {
         key = translate_untranslated_key(key, scancode);
 
         ImGuiIO& io {ImGui::GetIO()};
@@ -238,7 +238,7 @@ namespace sm {
         return io.WantCaptureKeyboard;
     }
 
-    bool ImGuiContext::on_char_typed(unsigned int codepoint) {
+    bool imgui_context::on_char_typed(unsigned int codepoint) {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddInputCharacter(codepoint);
 

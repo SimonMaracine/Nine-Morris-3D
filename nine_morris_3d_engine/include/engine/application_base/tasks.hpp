@@ -7,6 +7,7 @@
 
 namespace sm {
     class Application;
+    class Ctx;
     class TaskManager;
 
     class Task {  // TODO on done function
@@ -41,11 +42,14 @@ namespace sm {
         void add(Id id, const Task::TaskFunction& function);
         void remove(Id id);
     private:
+        TaskManager() = default;
+
         void update();
 
         std::vector<Task> tasks_active;
         std::vector<Task> tasks_next;
 
         friend class Application;
+        friend class Ctx;
     };
 }

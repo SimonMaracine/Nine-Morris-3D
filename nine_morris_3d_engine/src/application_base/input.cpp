@@ -4,31 +4,29 @@
 #include <GLFW/glfw3.h>
 
 namespace sm {
-    static GLFWwindow* window_handle {nullptr};
-
-    bool Input::is_key_pressed(Key key) {
+    bool Input::is_key_pressed(Key key) const {
         return glfwGetKey(window_handle, static_cast<int>(key)) == GLFW_PRESS;
     }
 
-    bool Input::is_mouse_button_pressed(MouseButton button) {
+    bool Input::is_mouse_button_pressed(MouseButton button) const {
         return glfwGetMouseButton(window_handle, static_cast<int>(button)) == GLFW_PRESS;
     }
 
-    float Input::get_mouse_x() {
+    float Input::get_mouse_x() const {
         double x, y;
         glfwGetCursorPos(window_handle, &x, &y);
 
         return static_cast<float>(x);
     }
 
-    float Input::get_mouse_y() {
+    float Input::get_mouse_y() const {
         double x, y;
         glfwGetCursorPos(window_handle, &x, &y);
 
         return static_cast<float>(y);
     }
 
-    std::pair<float, float> Input::get_mouse() {
+    std::pair<float, float> Input::get_mouse() const {
         double x, y;
         glfwGetCursorPos(window_handle, &x, &y);
 
@@ -41,13 +39,5 @@ namespace sm {
 
     MouseButton Input::mouse_button_from_code(int code) {
         return static_cast<MouseButton>(code);
-    }
-
-    void Input::initialize(GLFWwindow* handle) {
-        window_handle = handle;
-    }
-
-    void Input::uninitialize() {
-        window_handle = nullptr;
     }
 }

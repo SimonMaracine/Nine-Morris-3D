@@ -8,10 +8,12 @@
 #include <cassert>
 
 namespace sm {
-    class RandomGenerator {
-    public:
-        RandomGenerator();
+    class Ctx;
 
+    class RandomGenerator {
+    private:
+        RandomGenerator();
+    public:
         // The range is inclusive: [a, b]
         std::uint_fast32_t next();
         std::uint_fast32_t next(std::uint_fast32_t end);
@@ -38,5 +40,7 @@ namespace sm {
         }
     private:
         std::mt19937 random;
+
+        friend class Ctx;
     };
 }

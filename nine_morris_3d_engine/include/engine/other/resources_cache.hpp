@@ -18,7 +18,11 @@
 #include "engine/other/mesh.hpp"
 
 namespace sm {
-    struct ResourcesCache {
+    class Application;
+    class Ctx;
+
+    class ResourcesCache {
+    public:
         // resmanager::Cache<GlTexture> texture;
         // resmanager::Cache<GlTextureCubemap> texture_3d;
         resmanager::Cache<GlVertexArray> vertex_array;
@@ -37,9 +41,14 @@ namespace sm {
         // resmanager::Cache<AlBuffer> al_buffer;
         // resmanager::Cache<SoundData> sound_data;
         // resmanager::Cache<MusicTrack> music_track;
+    private:
+        ResourcesCache() = default;
 
         void merge(ResourcesCache& other);
         void merge_replace(ResourcesCache& other);
         void clear();
+
+        friend class Application;
+        friend class Ctx;
     };
 }

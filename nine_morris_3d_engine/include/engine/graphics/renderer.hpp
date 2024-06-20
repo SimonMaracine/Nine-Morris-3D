@@ -16,15 +16,16 @@
 
 namespace sm {
     class Application;
+    class Ctx;
     class FileSystem;
     class GlVertexArray;
     class GlVertexBuffer;
     class GlUniformBuffer;
 
     class Renderer {
-    public:
+    private:
         Renderer(int width, int height, const FileSystem& fs);
-
+    public:
         Renderer(const Renderer&) = delete;
         Renderer& operator=(const Renderer&) = delete;
         Renderer(Renderer&&) = default;
@@ -128,5 +129,6 @@ namespace sm {
         std::vector<Line> debug_scene_list;
 
         friend class Application;
+        friend class Ctx;
     };
 }

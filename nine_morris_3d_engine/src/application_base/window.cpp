@@ -261,7 +261,7 @@ namespace sm {
 
             switch (action) {
                 case GLFW_PRESS:
-                    if (ImGuiContext::on_key_pressed(key, scancode)) {
+                    if (imgui_context::on_key_pressed(key, scancode)) {
                         return;
                     }
 
@@ -273,7 +273,7 @@ namespace sm {
 
                     break;
                 case GLFW_RELEASE:
-                    if (ImGuiContext::on_key_released(key, scancode)) {
+                    if (imgui_context::on_key_released(key, scancode)) {
                         return;
                     }
 
@@ -281,7 +281,7 @@ namespace sm {
 
                     break;
                 case GLFW_REPEAT:
-                    if (ImGuiContext::on_key_pressed(key, scancode)) {
+                    if (imgui_context::on_key_pressed(key, scancode)) {
                         return;
                     }
 
@@ -296,7 +296,7 @@ namespace sm {
         });
 
         glfwSetCharCallback(window, [](GLFWwindow*, unsigned int codepoint) {
-            if (ImGuiContext::on_char_typed(codepoint)) {
+            if (imgui_context::on_char_typed(codepoint)) {
                 return;
             }
 
@@ -308,7 +308,7 @@ namespace sm {
 
             switch (action) {
                 case GLFW_PRESS:
-                    if (ImGuiContext::on_mouse_button_pressed(button)) {
+                    if (imgui_context::on_mouse_button_pressed(button)) {
                         return;
                     }
 
@@ -316,7 +316,7 @@ namespace sm {
 
                     break;
                 case GLFW_RELEASE:
-                    if (ImGuiContext::on_mouse_button_released(button)) {
+                    if (imgui_context::on_mouse_button_released(button)) {
                         return;
                     }
 
@@ -329,7 +329,7 @@ namespace sm {
         glfwSetScrollCallback(window, [](GLFWwindow* window, double, double yoffset) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            if (ImGuiContext::on_mouse_wheel_scrolled(static_cast<float>(yoffset))) {
+            if (imgui_context::on_mouse_wheel_scrolled(static_cast<float>(yoffset))) {
                 return;
             }
 
@@ -339,7 +339,7 @@ namespace sm {
         glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
-            if (ImGuiContext::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
+            if (imgui_context::on_mouse_moved(static_cast<float>(xpos), static_cast<float>(ypos))) {
                 return;
             }
 

@@ -5,25 +5,27 @@
 struct GLFWwindow;
 
 namespace sm {
-    class Application;
+    class Ctx;
     enum class Key;
     enum class MouseButton;
 
     class Input {
     public:
-        static bool is_key_pressed(Key key);
-        static bool is_mouse_button_pressed(MouseButton button);
-        static float get_mouse_x();
-        static float get_mouse_y();
-        static std::pair<float, float> get_mouse();
+        bool is_key_pressed(Key key) const;
+        bool is_mouse_button_pressed(MouseButton button) const;
+        float get_mouse_x() const;
+        float get_mouse_y() const;
+        std::pair<float, float> get_mouse() const;
 
         static Key key_from_code(int code);
         static MouseButton mouse_button_from_code(int code);
     private:
-        static void initialize(GLFWwindow* handle);
-        static void uninitialize();
+        explicit Input(GLFWwindow* window_handle)
+            : window_handle(window_handle) {}
 
-        friend class Application;
+        GLFWwindow* window_handle {nullptr};
+
+        friend class Ctx;
     };
 
     enum class Key {  // TODO maybe remove class

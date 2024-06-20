@@ -6,8 +6,10 @@
 #include "engine/application_base/properties.hpp"
 #include "engine/application_base/logging.hpp"
 #include "engine/application_base/file_system.hpp"
+#include "engine/application_base/input.hpp"
 #include "engine/application_base/id.hpp"
 #include "engine/audio/context.hpp"
+#include "engine/audio/music.hpp"
 #include "engine/graphics/renderer.hpp"
 #include "engine/graphics/shader_library.hpp"
 #include "engine/other/resources_cache.hpp"
@@ -21,7 +23,7 @@ namespace sm {
     public:
         explicit Ctx(const ApplicationProperties& properties)
             : fs(properties.application_name, properties.assets_directory), log(properties.log_file, fs),
-            win(properties, &evt), rnd(properties.width, properties.height, fs), snd(properties.audio) {}
+            win(properties, &evt), rnd(properties.width, properties.height, fs), snd(properties.audio), inp(win.get_handle()) {}
 
         ~Ctx() = default;
 
@@ -50,10 +52,12 @@ namespace sm {
         Window win;  // One of the last objects destroyed in an application instance
         Renderer rnd;  // Renderer for 3D, 2D and debug
         OpenAlContext snd;
+        MusicPlayer mus;
         ShaderLibrary shd;
         ResourcesCache res;  // Global cache of resources
         TaskManager tsk;
         RandomGenerator rng;
+        Input inp;
     private:
         void* user_data {nullptr};  // Arbitrary data defined by the user
         Application* application {nullptr};

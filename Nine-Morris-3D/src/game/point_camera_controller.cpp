@@ -59,7 +59,7 @@ glm::vec3 PointCameraController::get_rotation() const {
     return glm::vec3(pitch, yaw, 0.0f);
 }
 
-void PointCameraController::update_controls(float dt) {
+void PointCameraController::update_controls(float dt, const sm::Input& inp) {
     static constexpr float MOVE_SPEED {2700.0f};
     static constexpr float MOVE_SPEED_MOUSE {MOVE_SPEED * 0.004f};
     static constexpr float ZOOM_SPEED {370.0f};
@@ -67,26 +67,26 @@ void PointCameraController::update_controls(float dt) {
 
     zoom_velocity -= ZOOM_SPEED_WHEEL * mouse_input.mouse_wheel;
 
-    if (sm::Input::is_key_pressed(sm::Key::R)) {
+    if (inp.is_key_pressed(sm::Key::R)) {
         zoom_velocity -= ZOOM_SPEED * dt;
-    } else if (sm::Input::is_key_pressed(sm::Key::F)) {
+    } else if (inp.is_key_pressed(sm::Key::F)) {
         zoom_velocity += ZOOM_SPEED * dt;
     }
 
-    if (sm::Input::is_mouse_button_pressed(sm::MouseButton::Right)) {
+    if (inp.is_mouse_button_pressed(sm::MouseButton::Right)) {
         y_velocity -= MOVE_SPEED_MOUSE * mouse_input.dy;
         x_velocity += MOVE_SPEED_MOUSE * mouse_input.dx;
     }
 
-    if (sm::Input::is_key_pressed(sm::Key::W)) {
+    if (inp.is_key_pressed(sm::Key::W)) {
         y_velocity += MOVE_SPEED * dt;
-    } else if (sm::Input::is_key_pressed(sm::Key::S)) {
+    } else if (inp.is_key_pressed(sm::Key::S)) {
         y_velocity -= MOVE_SPEED * dt;
     }
 
-    if (sm::Input::is_key_pressed(sm::Key::A)) {
+    if (inp.is_key_pressed(sm::Key::A)) {
         x_velocity -= MOVE_SPEED * dt;
-    } else if (sm::Input::is_key_pressed(sm::Key::D)) {
+    } else if (inp.is_key_pressed(sm::Key::D)) {
         x_velocity += MOVE_SPEED * dt;
     }
 

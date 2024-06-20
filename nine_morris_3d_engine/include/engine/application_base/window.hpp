@@ -18,8 +18,9 @@ struct GLFWcursor;
 struct GLFWmonitor;
 
 namespace sm {
-    class Window;
     class Application;
+    class Ctx;
+    class Window;
 
     class Monitors {
     public:
@@ -34,8 +35,9 @@ namespace sm {
     };
 
     class Window {
-    public:
+    private:
         Window(const ApplicationProperties& properties, EventDispatcher* evt);
+    public:
         ~Window();
 
         Window(const Window&) = delete;
@@ -72,5 +74,6 @@ namespace sm {
         EventDispatcher* evt {nullptr};
 
         friend class Application;
+        friend class Ctx;
     };
 }

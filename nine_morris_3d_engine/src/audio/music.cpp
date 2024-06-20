@@ -45,13 +45,6 @@ namespace sm {
         }
     }
 
-    void MusicPlayer::uninitialize() {
-        stop_music_track();
-        current_gain = 1.0f;
-
-        LOG_INFO("Uninitialized music");
-    }
-
     void MusicPlayer::play_music_track(std::shared_ptr<MusicTrack> music_track) {
         current_music_track = music_track;
 
@@ -109,7 +102,4 @@ namespace sm {
             current_music_track->source->set_gain(gain);
         }
     }
-
-    std::shared_ptr<MusicTrack> MusicPlayer::current_music_track {nullptr};
-    float MusicPlayer::current_gain {1.0f};
 }

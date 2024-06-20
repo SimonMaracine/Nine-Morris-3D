@@ -33,7 +33,7 @@ public:
     float get_angle_around_point() const { return angle_around_point; }
 
     // Call these every frame
-    void update_controls(float dt) override;
+    void update_controls(float dt, const sm::Input& inp) override;
     void update_camera(float dt) override;
 
     // Call this regularly

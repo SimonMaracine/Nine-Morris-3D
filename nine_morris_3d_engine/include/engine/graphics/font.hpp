@@ -43,7 +43,7 @@ namespace sm {
 
         // Baking API
         void begin_baking();
-        void end_baking();
+        void end_baking(const char* name);
         void bake_characters(int begin_codepoint, int end_codepoint);
         void bake_characters(const char* string);
         void bake_character(int codepoint);
@@ -64,7 +64,7 @@ namespace sm {
         void initialize();
         void try_bake_character(int codepoint, int descent);
         const Glyph& get_character_glyph(char32_t character) const;
-        void write_bitmap_to_file();
+        void write_bitmap_to_file(const char* name);
 
         struct BakeContext {
             int x {};
@@ -81,8 +81,6 @@ namespace sm {
         unsigned char on_edge_value {};
         int pixel_dist_scale {};
         float sf {};  // Scale factor
-
-        std::string name;
 
         // Fonts own vertex arrays and bitmap textures
         std::shared_ptr<GlVertexArray> vertex_array;

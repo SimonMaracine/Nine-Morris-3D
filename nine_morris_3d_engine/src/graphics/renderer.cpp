@@ -46,8 +46,8 @@ namespace sm {
         }
 
         {
-            const auto contents_vert {Utils::read_file(fs.path_engine_assets("shaders/screen_quad.vert"))};
-            const auto contents_frag {Utils::read_file(fs.path_engine_assets("shaders/screen_quad.frag"))};
+            const auto contents_vert {utils::read_file(fs.path_engine_assets("shaders/screen_quad.vert"))};
+            const auto contents_frag {utils::read_file(fs.path_engine_assets("shaders/screen_quad.frag"))};
 
             // Doesn't have uniform buffers for sure
             storage.screen_quad_shader = std::make_unique<GlShader>(
@@ -436,8 +436,8 @@ namespace sm {
     }
 
     void Renderer::debug_initialize(const FileSystem& fs) {
-        const auto contents_vert {Utils::read_file(fs.path_engine_assets("shaders/debug.vert"))};
-        const auto contents_frag {Utils::read_file(fs.path_engine_assets("shaders/debug.frag"))};
+        const auto contents_vert {utils::read_file(fs.path_engine_assets("shaders/debug.vert"))};
+        const auto contents_frag {utils::read_file(fs.path_engine_assets("shaders/debug.frag"))};
 
         debug_storage.shader = std::make_shared<GlShader>(
             contents_vert.value_or(""),

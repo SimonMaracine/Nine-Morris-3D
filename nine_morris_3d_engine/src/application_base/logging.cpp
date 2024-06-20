@@ -48,11 +48,6 @@ namespace sm {
 #endif
     }
 
-    Logging::~Logging() {
-        global_logger->flush();
-        global_logger.reset();
-    }
-
     void Logging::set_fallback_logger_distribution(const char* error_message) {
         global_logger = spdlog::stdout_color_mt("Distribution Logger Fallback [Console]");
         global_logger->set_pattern(LOG_PATTERN_DISTRIBUTION);
