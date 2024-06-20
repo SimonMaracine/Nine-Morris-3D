@@ -1,0 +1,13 @@
+fonts/CodeNewRoman/code-new-roman.regular.ttf
+shaders/debug.frag
+shaders/debug.vert
+shaders/quad2d.frag
+shaders/quad2d.vert
+shaders/screen_quad.frag
+shaders/screen_quad.vert
+shaders/shadow.frag
+shaders/shadow.vert
+shaders/skybox.frag
+shaders/skybox.vert
+shaders/text.frag
+shaders/text.vert
