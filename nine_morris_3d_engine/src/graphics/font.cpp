@@ -63,8 +63,7 @@ namespace sm {
         font_info = std::make_unique<stbtt_fontinfo>();
 
         if (!stbtt_InitFont(font_info.get(), reinterpret_cast<const unsigned char*>(contents.c_str()), 0)) {
-            LOG_DIST_CRITICAL("Could not load font `{}`", file_path);
-            throw RuntimeError::ResourceLoading;
+            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load font `{}`", file_path);
         }
 
         sf = stbtt_ScaleForPixelHeight(font_info.get(), size);

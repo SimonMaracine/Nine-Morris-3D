@@ -503,9 +503,12 @@ namespace sm {
         const GLenum status {glCheckFramebufferStatus(GL_FRAMEBUFFER)};
 
         if (status != GL_FRAMEBUFFER_COMPLETE) {
-            LOG_DIST_CRITICAL("GL framebuffer {} is incomplete", framebuffer);
-            LOG_DIST_CRITICAL("Status: {}", print_framebuffer_status_message(status));
-            throw RuntimeError::Other;
+            SM_CRITICAL_ERROR(
+                RuntimeError::Other,
+                "GL framebuffer {} is incomplete: {}",
+                framebuffer,
+                print_framebuffer_status_message(status)
+            );
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

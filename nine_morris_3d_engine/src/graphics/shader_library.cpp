@@ -63,8 +63,7 @@ namespace sm {
             const auto iter {include_shader_sources.find(argument)};
 
             if (iter == include_shader_sources.cend()) {
-                LOG_CRITICAL("Cannot include `{}`; file not found", argument);
-                throw RuntimeError::ResourceLoading;
+                SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Cannot include `{}`; file not found", argument);
             }
 
             string.replace(match.first, match.second, load_shader(iter->second));

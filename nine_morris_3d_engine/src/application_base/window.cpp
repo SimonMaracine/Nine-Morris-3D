@@ -40,8 +40,7 @@ namespace sm {
         const char* name {glfwGetMonitorName(monitors[index])};
 
         if (name == nullptr) {
-            LOG_DIST_CRITICAL("Could not retrieve monitor name");
-            throw RuntimeError::Other;
+            SM_CRITICAL_ERROR(RuntimeError::Other, "Could not retrieve monitor name");
         }
 
         return name;
@@ -50,8 +49,7 @@ namespace sm {
     Window::Window(const ApplicationProperties& properties, EventDispatcher* evt)
         : evt(evt) {
         if (!glfwInit()) {
-            LOG_DIST_CRITICAL("Could not initialize GLFW");
-            throw RuntimeError::Initialization;
+            SM_CRITICAL_ERROR(RuntimeError::Initialization, "Could not initialize GLFW");
         }
 
         LOG_INFO("Initialized GLFW");
@@ -80,8 +78,7 @@ namespace sm {
         window = create_window(properties);
 
         if (window == nullptr) {
-            LOG_DIST_CRITICAL("Could not create window");
-            throw RuntimeError::Initialization;
+            SM_CRITICAL_ERROR(RuntimeError::Initialization, "Could not create window");
         }
 
         LOG_INFO("Created window and OpenGL context");
@@ -89,8 +86,7 @@ namespace sm {
         glfwMakeContextCurrent(window);
 
         if (!gladLoadGL()) {
-            LOG_DIST_CRITICAL("Could not initialize GLAD");
-            throw RuntimeError::Initialization;
+            SM_CRITICAL_ERROR(RuntimeError::Initialization, "Could not initialize GLAD");
         }
 
         GlDebug::initialize_debug();
@@ -135,8 +131,7 @@ namespace sm {
         GLFWmonitor** connected_monitors {glfwGetMonitors(&count)};
 
         if (connected_monitors == nullptr) {
-            LOG_DIST_CRITICAL("Could not retrieve monitors");
-            throw RuntimeError::Other;
+            SM_CRITICAL_ERROR(RuntimeError::Other, "Could not retrieve monitors");
         }
 
         monitors.count = static_cast<std::size_t>(count);

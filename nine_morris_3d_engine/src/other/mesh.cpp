@@ -149,17 +149,24 @@ namespace sm {
         const aiScene* scene {importer.ReadFile(file_path, flags)};
 
         if (scene == nullptr) {
-            LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
-            LOG_DIST_CRITICAL("Assimp: ", importer.GetErrorString());
-            throw RuntimeError::ResourceLoading;
+            SM_CRITICAL_ERROR(
+                RuntimeError::ResourceLoading,
+                "Could not load model data `{}`: {}",
+                file_path,
+                importer.GetErrorString()
+            );
         }
 
         const aiNode* root_node {scene->mRootNode};
         const aiMesh* mesh {find_mesh(root_node, object_name, scene)};
 
         if (mesh == nullptr) {
-            LOG_CRITICAL("Model file `{}` does not contain `{}` mesh", file_path, object_name);
-            throw RuntimeError::ResourceLoading;
+            SM_CRITICAL_ERROR(
+                RuntimeError::ResourceLoading,
+                "Model file `{}` does not contain `{}` mesh",
+                file_path,
+                object_name
+            );
         }
 
         load(type, mesh, file_path);

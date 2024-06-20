@@ -21,8 +21,7 @@ namespace sm {
         samples = stb_vorbis_decode_filename(file_path.c_str(), &channels, &sample_rate, &data);
 
         if (data == nullptr) {
-            LOG_DIST_CRITICAL("Could not load sound data `{}`", file_path);
-            throw RuntimeError::ResourceLoading;
+            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load sound data `{}`", file_path);
         }
 
         size = compute_size();

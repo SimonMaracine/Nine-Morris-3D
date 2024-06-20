@@ -19,8 +19,7 @@ namespace sm {
         program = create_program();
 
         if (!check_linking(program)) {
-            LOG_DIST_CRITICAL("Could not link shader program {}", program);
-            throw RuntimeError::ResourceLoading;
+            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not link shader program {}", program);
         }
 
         delete_intermediates();
@@ -252,8 +251,7 @@ namespace sm {
         glCompileShader(shader);
 
         if (!check_compilation(shader, type)) {
-            LOG_DIST_CRITICAL("Could not compile shader {}", shader);
-            throw RuntimeError::ResourceLoading;
+            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not compile shader {}", shader);
         }
 
         return shader;

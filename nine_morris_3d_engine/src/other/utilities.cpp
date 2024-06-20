@@ -34,8 +34,7 @@ namespace sm {
         try {
             return read_file_ex(file_path);
         } catch (const utils::FileReadError& e) {
-            LOG_DIST_CRITICAL("Could not read file `{}`: {}", file_path, e.what());
-            throw RuntimeError::ResourceLoading;
+            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not read file `{}`: {}", file_path, e.what());
         }
     }
 }

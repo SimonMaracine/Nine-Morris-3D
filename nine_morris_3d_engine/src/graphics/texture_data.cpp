@@ -17,8 +17,7 @@ namespace sm {
         data = stbi_load(file_path.c_str(), &width, &height, &channels, CHANNELS);
 
         if (data == nullptr) {
-            LOG_DIST_CRITICAL("Could not load texture data `{}`", file_path);
-            throw RuntimeError::ResourceLoading;
+            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load texture data `{}`", file_path);
         }
     }
 
