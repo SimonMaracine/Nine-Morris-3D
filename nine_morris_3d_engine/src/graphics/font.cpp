@@ -60,29 +60,18 @@ namespace sm {
         : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value), pixel_dist_scale(pixel_dist_scale) {
         const auto contents {utils::read_file(file_path)};
 
-        if (!contents) {
-            LOG_DIST_CRITICAL("Could not open file `{}` for reading", file_path);
-            throw RuntimeError::ResourceLoading;
-        }
+        font_info = std::make_unique<stbtt_fontinfo>();
 
-        font_info = new stbtt_fontinfo;
-
-        if (!stbtt_InitFont(font_info, reinterpret_cast<const unsigned char*>(contents->c_str()), 0)) {
+        if (!stbtt_InitFont(font_info.get(), reinterpret_cast<const unsigned char*>(contents.c_str()), 0)) {
             LOG_DIST_CRITICAL("Could not load font `{}`", file_path);
             throw RuntimeError::ResourceLoading;
         }
 
-        sf = stbtt_ScaleForPixelHeight(font_info, size);
+        sf = stbtt_ScaleForPixelHeight(font_info.get(), size);
 
         initialize();
 
         LOG_DEBUG("Created font `{}`", file_path);
-    }
-
-    Font::~Font() {
-        delete font_info;
-
-        LOG_DEBUG("Deleted font");
     }
 
     void Font::update_data(const float* data, std::size_t size) {
@@ -134,7 +123,7 @@ namespace sm {
 
     void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         int descent;
-        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
+        stbtt_GetFontVMetrics(font_info.get(), nullptr, &descent, nullptr);
 
         for (int codepoint {begin_codepoint}; codepoint <= end_codepoint; codepoint++) {
             try_bake_character(codepoint, descent);
@@ -143,7 +132,7 @@ namespace sm {
 
     void Font::bake_characters(const char* string) {
         int descent;
-        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
+        stbtt_GetFontVMetrics(font_info.get(), nullptr, &descent, nullptr);
 
         const std::u32string utf32_string {utf8::utf8to32(std::string(string))};
 
@@ -154,7 +143,7 @@ namespace sm {
 
     void Font::bake_character(int codepoint) {
         int descent;
-        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
+        stbtt_GetFontVMetrics(font_info.get(), nullptr, &descent, nullptr);
 
         try_bake_character(codepoint, descent);
     }
@@ -251,17 +240,17 @@ namespace sm {
         }
 
         int advance_width, left_side_bearing;
-        stbtt_GetCodepointHMetrics(font_info, codepoint, &advance_width, &left_side_bearing);
+        stbtt_GetCodepointHMetrics(font_info.get(), codepoint, &advance_width, &left_side_bearing);
 
         int y0;
-        stbtt_GetCodepointBitmapBox(font_info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
+        stbtt_GetCodepointBitmapBox(font_info.get(), codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
         // Assume 0, because glyph can be null
         int width {0};
         int height {0};
 
         unsigned char* glyph {stbtt_GetCodepointSDF(
-            font_info,
+            font_info.get(),
             sf,
             codepoint,
             padding,

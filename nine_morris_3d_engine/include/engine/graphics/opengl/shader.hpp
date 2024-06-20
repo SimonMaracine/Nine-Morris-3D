@@ -10,6 +10,7 @@
 
 #include "engine/application_base/id.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
+#include "engine/graphics/shader_library.hpp"
 
 namespace sm {
     class Renderer;
@@ -17,6 +18,7 @@ namespace sm {
     class GlShader {
     public:
         GlShader(const std::string& source_vertex, const std::string& source_fragment);
+        GlShader(const std::string& source_vertex, const std::string& source_fragment, const ShaderLibrary& shd);
         ~GlShader();
 
         GlShader(const GlShader&) = delete;

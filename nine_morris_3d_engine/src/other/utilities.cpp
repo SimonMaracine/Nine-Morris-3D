@@ -3,25 +3,39 @@
 #include <fstream>
 #include <cstddef>
 
+#include "engine/application_base/logging.hpp"
+#include "engine/application_base/error.hpp"
+
 namespace sm {
-    std::optional<std::string> utils::read_file(const std::string& file_path) {  // FIXME error handling
+    std::string utils::read_file_ex(const std::string& file_path) {
         std::ifstream stream {file_path, std::ios::binary};
 
         if (!stream.is_open()) {
-            return std::nullopt;
+            throw FileReadError("Could not open file for reading");
         }
 
         stream.seekg(0, stream.end);
         const auto length {stream.tellg()};
         stream.seekg(0, stream.beg);
 
-        char* buffer {new char[length]};
-        stream.read(buffer, length);
+        std::string buffer;
+        buffer.resize(static_cast<std::size_t>(length));
 
-        const std::string contents {buffer, static_cast<std::size_t>(length)};
+        stream.read(buffer.data(), length);
 
-        delete[] buffer;
+        if (stream.fail()) {
+            throw FileReadError("Error reading file");
+        }
 
-        return std::make_optional(contents);
+        return buffer;
+    }
+
+    std::string utils::read_file(const std::string& file_path) {
+        try {
+            return read_file_ex(file_path);
+        } catch (const utils::FileReadError& e) {
+            LOG_DIST_CRITICAL("Could not read file `{}`: {}", file_path, e.what());
+            throw RuntimeError::ResourceLoading;
+        }
     }
 }

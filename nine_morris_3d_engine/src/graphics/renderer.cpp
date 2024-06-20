@@ -7,6 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.hpp>
 
+#include "engine/application_base/logging.hpp"
+#include "engine/application_base/error.hpp"
 #include "engine/graphics/opengl/vertex_array.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
@@ -46,13 +48,10 @@ namespace sm {
         }
 
         {
-            const auto contents_vert {utils::read_file(fs.path_engine_assets("shaders/screen_quad.vert"))};
-            const auto contents_frag {utils::read_file(fs.path_engine_assets("shaders/screen_quad.frag"))};
-
             // Doesn't have uniform buffers for sure
             storage.screen_quad_shader = std::make_unique<GlShader>(
-                contents_vert.value_or(""),
-                contents_frag.value_or("")
+                utils::read_file(fs.path_engine_assets("shaders/screen_quad.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/screen_quad.frag"))
             );
 
             const float vertices[] {
@@ -436,12 +435,9 @@ namespace sm {
     }
 
     void Renderer::debug_initialize(const FileSystem& fs) {
-        const auto contents_vert {utils::read_file(fs.path_engine_assets("shaders/debug.vert"))};
-        const auto contents_frag {utils::read_file(fs.path_engine_assets("shaders/debug.frag"))};
-
         debug_storage.shader = std::make_shared<GlShader>(
-            contents_vert.value_or(""),
-            contents_frag.value_or("")
+            utils::read_file(fs.path_engine_assets("shaders/debug.vert")),
+            utils::read_file(fs.path_engine_assets("shaders/debug.frag"))
         );
 
         add_shader(debug_storage.shader);

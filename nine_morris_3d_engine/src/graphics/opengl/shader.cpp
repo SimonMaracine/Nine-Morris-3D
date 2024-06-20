@@ -30,6 +30,10 @@ namespace sm {
         LOG_DEBUG("Created GL shader {}", program);
     }
 
+    GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment, const ShaderLibrary& shd) {
+        GlShader(shd.load_shader(source_vertex), shd.load_shader(source_fragment));
+    }
+
     // GlShader::GlShader(const EncrFile& source_vertex, const EncrFile& source_fragment) {
     //     name = Utils::get_file_name(source_vertex) + " & " + Utils::get_file_name(source_fragment);
 
@@ -109,7 +113,7 @@ namespace sm {
         try {
             return cache.at(name);
         } catch (const std::out_of_range&) {
-            LOG_ERROR("Cannot get hashed uniform variable `{}` from program `{}`", static_cast<std::uint64_t>(name), program);
+            LOG_ERROR("Cannot get hashed uniform variable {} from program {}", static_cast<std::uint64_t>(name), program);
             return -1;
         }
 #else
@@ -131,7 +135,7 @@ namespace sm {
             location = glGetUniformLocation(program, uniform.c_str());
 
             if (location == -1) {
-                LOG_ERROR("Uniform variable `{}` in program `{}` not found", uniform, program);
+                LOG_ERROR("Uniform variable `{}` in program {} not found", uniform, program);
                 continue;
             }
 
@@ -295,12 +299,12 @@ namespace sm {
             }
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("{} shader compilation error with no message in program `{}`", type_name, program);
+                LOG_DIST_CRITICAL("{} shader compilation error with no message in program {}", type_name, program);
             } else {
                 char* log_message {new char[log_length]};
                 glGetShaderInfoLog(shader, log_length, nullptr, log_message);
 
-                LOG_DIST_CRITICAL("{} shader compilation error in program `{}`\n{}", type_name, program, log_message);
+                LOG_DIST_CRITICAL("{} shader compilation error in program {}\n{}", type_name, program, log_message);
                 delete[] log_message;
             }
 
@@ -319,12 +323,12 @@ namespace sm {
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("Linking error with no message in program `{}`", program);
+                LOG_DIST_CRITICAL("Linking error with no message in program {}", program);
             } else {
                 char* log_message {new char[log_length]};
                 glGetProgramInfoLog(program, log_length, nullptr, log_message);
 
-                LOG_DIST_CRITICAL("Linking error in program `{}`\n{}", program, log_message);
+                LOG_DIST_CRITICAL("Linking error in program {}\n{}", program, log_message);
                 delete[] log_message;
             }
 

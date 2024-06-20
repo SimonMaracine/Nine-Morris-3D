@@ -1,7 +1,5 @@
 #include "game/scenes/game_scene.hpp"
 
-#include <vector>
-
 #include <engine/nine_morris_3d.hpp>
 #include <engine/external/resmanager.h++>
 #include <engine/external/glm.h++>
@@ -106,12 +104,9 @@ void GameScene::on_start() {
         });
     }
 
-    const auto contents_vert {sm::utils::read_file(ctx->fs.path_assets("shaders/simple.vert"))};
-    const auto contents_frag {sm::utils::read_file(ctx->fs.path_assets("shaders/simple.frag"))};
-
     auto shader {std::make_shared<sm::GlShader>(
-        contents_vert.value_or(""),
-        contents_frag.value_or("")
+        sm::utils::read_file(ctx->fs.path_assets("shaders/simple.vert")),
+        sm::utils::read_file(ctx->fs.path_assets("shaders/simple.frag"))
     )};
 
     ctx->rnd.add_shader(shader);
@@ -179,6 +174,8 @@ void GameScene::on_start() {
 
     teapot.position = glm::vec3(2.6f, 0.0, -7.0f);
     teapot.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
+
+    test_shader();
 }
 
 void GameScene::on_update() {
@@ -266,4 +263,9 @@ void GameScene::on_imgui_update() {
 
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     LOG_DEBUG("{}", event);
+}
+
+void GameScene::test_shader() {
+    LOG_DEBUG("{}", ctx->shd.load_shader(sm::utils::read_file(ctx->fs.path_assets("shaders/simple2.vert"))));
+    LOG_DEBUG("{}", ctx->shd.load_shader(sm::utils::read_file(ctx->fs.path_assets("shaders/simple2.frag"))));
 }

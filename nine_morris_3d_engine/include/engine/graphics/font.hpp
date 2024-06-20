@@ -26,12 +26,12 @@ namespace sm {
             int bitmap_size
         );
 
-        ~Font();
+        ~Font() = default;
 
         Font(const Font&) = delete;
         Font& operator=(const Font&) = delete;
-        Font(Font&&) = delete;
-        Font& operator=(Font&&) = delete;
+        Font(Font&&) = default;
+        Font& operator=(Font&&) = default;
 
         void update_data(const float* data, std::size_t size);
 
@@ -75,7 +75,7 @@ namespace sm {
 
         std::unordered_map<char32_t, Glyph> glyphs;
 
-        stbtt_fontinfo* font_info {nullptr};
+        std::unique_ptr<stbtt_fontinfo> font_info;
         int bitmap_size {};
         int padding {};  // Between glyphs
         unsigned char on_edge_value {};

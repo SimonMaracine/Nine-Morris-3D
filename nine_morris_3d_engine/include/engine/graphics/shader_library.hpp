@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 #include <stdexcept>
 #include <initializer_list>
 
@@ -11,22 +11,18 @@ namespace sm {
 
     class ShaderLibrary {
     public:
-        std::string load_shader(const std::string& source);
+        // Only the source is needed; shaders are included relative to (not including) the include directories
+        std::string load_shader(const std::string& source) const;
     private:
         ShaderLibrary() = default;
 
         void load_shaders_from_include_directories(std::initializer_list<std::string> include_directories);
+        std::string match_and_include(std::string&& string) const;
+        static std::string get_include_argument(const std::string& string);
 
-        std::vector<std::string> include_shader_sources;
+        std::unordered_map<std::string, std::string> include_shader_sources;
 
         friend class Application;
         friend class Ctx;
-    };
-
-    struct ProcessError : public std::runtime_error {
-        explicit ProcessError(const std::string& message)
-            : runtime_error(message) {}
-        explicit ProcessError(const char* message)
-            : runtime_error(message) {}
     };
 }
