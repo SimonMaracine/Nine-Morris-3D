@@ -24,12 +24,14 @@ namespace sm {
 
         imgui_context::initialize(ctx.win.get_handle());
 
-#ifndef SM_BUILD_DISTRIBUTION
-        LOG_DIST_INFO("{}", get_information());
-#endif
+        LOG_DIST_INFO("Working directory: {}", FileSystem::current_working_directory());
 
         const auto [version_major, version_minor] {GlDebug::get_version_number()};
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
+
+#ifndef SM_BUILD_DISTRIBUTION
+        LOG_DIST_INFO("{}", get_information());
+#endif
 
         ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
         ctx.evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);

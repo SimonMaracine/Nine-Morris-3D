@@ -67,16 +67,20 @@ namespace sm {
 #endif
     }
 
-    bool FileSystem::directory_exists(const std::string& path) const {
-        return std::filesystem::is_directory(path);
+    bool FileSystem::directory_exists(const std::string& path) {
+        return std::filesystem::is_directory(path);  // FIXME handle exceptions
     }
 
-    bool FileSystem::create_directory(const std::string& path) const {
+    bool FileSystem::create_directory(const std::string& path) {
         return std::filesystem::create_directory(path);
     }
 
-    bool FileSystem::delete_file(const std::string& path) const {
+    bool FileSystem::delete_file(const std::string& path) {
         return std::filesystem::remove(path);
+    }
+
+    std::string FileSystem::current_working_directory() {
+        return std::filesystem::current_path().string();
     }
 
     std::string FileSystem::path_logs() const {

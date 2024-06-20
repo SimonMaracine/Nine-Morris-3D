@@ -7,9 +7,10 @@ namespace sm {
 
     struct FileSystem {
     public:
-        bool directory_exists(const std::string& path) const;
-        bool create_directory(const std::string& path) const;
-        bool delete_file(const std::string& path) const;
+        static bool directory_exists(const std::string& path);
+        static bool create_directory(const std::string& path);
+        static bool delete_file(const std::string& path);
+        static std::string current_working_directory();
 
         std::string path_logs() const;
         std::string path_saved_data() const;
