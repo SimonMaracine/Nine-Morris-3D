@@ -23,7 +23,8 @@ namespace sm {
     public:
         explicit Ctx(const ApplicationProperties& properties)
             : fs(properties.application_name, properties.assets_directory), log(properties.log_file, fs),
-            win(properties, &evt), rnd(properties.width, properties.height, fs), snd(properties.audio), inp(win.get_handle()) {}
+            win(properties, &evt), rnd(properties.width, properties.height, properties.samples, fs),
+            snd(properties.audio), inp(win.get_handle()) {}
 
         ~Ctx() = default;
 

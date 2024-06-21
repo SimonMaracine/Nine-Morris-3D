@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <array>
 #include <optional>
 
 #include <glm/glm.hpp>
@@ -73,7 +72,7 @@ namespace sm {
 
     class GlTextureCubemap {
     public:
-        explicit GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data);
+        explicit GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data);
         ~GlTextureCubemap();
 
         GlTextureCubemap(const GlTextureCubemap&) = delete;

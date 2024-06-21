@@ -43,16 +43,16 @@ namespace sm {
 
         // Baking API
         void begin_baking();
-        void end_baking(const char* name);
+        void end_baking(const char* name = "");
         void bake_characters(int begin_codepoint, int end_codepoint);
         void bake_characters(const char* string);
         void bake_character(int codepoint);
         void bake_ascii();
 
-        // Call render to get the buffer of data used in the end by OpenGL
+        // Get the buffer of data used in the end by OpenGL
         void render(const std::string& string, std::vector<float>& buffer) const;
 
-        // Get width and height of a line of text
+        // Get the width and height of a piece of text
         std::pair<int, int> get_string_size(const std::string& string, float scale) const;
     private:
         struct Glyph {
@@ -64,13 +64,13 @@ namespace sm {
         void initialize();
         void try_bake_character(int codepoint, int descent);
         const Glyph& get_character_glyph(char32_t character) const;
-        void write_bitmap_to_file(const char* name);
+        void write_bitmap_to_file(const char* name) const;
 
-        struct BakeContext {
+        struct {
             int x {};
             int y {};
             int max_row_height {};
-            unsigned char* bitmap {nullptr};
+            std::unique_ptr<unsigned char[]> bitmap;
         } bake_context;
 
         std::unordered_map<char32_t, Glyph> glyphs;
@@ -82,12 +82,12 @@ namespace sm {
         int pixel_dist_scale {};
         float sf {};  // Scale factor
 
-        // Fonts own vertex arrays and bitmap textures
-        std::shared_ptr<GlVertexArray> vertex_array;
-        std::shared_ptr<GlTexture> bitmap_image;
-
-        std::weak_ptr<GlVertexBuffer> buffer;
-
         int vertex_count {};
+
+        // Fonts own vertex arrays and bitmap textures
+        std::unique_ptr<GlVertexArray> vertex_array;
+        std::unique_ptr<GlTexture> bitmap_image;
+
+        std::weak_ptr<GlVertexBuffer> wvertex_buffer;
     };
 }

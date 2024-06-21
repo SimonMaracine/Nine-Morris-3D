@@ -218,13 +218,13 @@ namespace sm {
     //     LOG_DEBUG("Created GL texture cubemap {} ({})", texture, name);
     // }
 
-    GlTextureCubemap::GlTextureCubemap(const std::array<std::shared_ptr<TextureData>, 6>& data) {
+    GlTextureCubemap::GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
         configure_filter_and_wrap_3d();
 
-        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, data[0]->get_width(), data[0]->get_height());
+        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, data.begin()[0]->get_width(), data.begin()[0]->get_height());
 
         for (std::size_t i {0}; i < 6; i++) {
             glTexSubImage2D(
@@ -232,11 +232,11 @@ namespace sm {
                 0,
                 0,
                 0,
-                data[i]->get_width(),
-                data[i]->get_height(),
+                data.begin()[i]->get_width(),
+                data.begin()[i]->get_height(),
                 GL_RGBA,
                 GL_UNSIGNED_BYTE,
-                data[i]->get_data()
+                data.begin()[i]->get_data()
             );
         }
 

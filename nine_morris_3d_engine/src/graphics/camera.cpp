@@ -33,4 +33,13 @@ namespace sm {
         this->view_matrix = view_matrix;
         projection_view_matrix = projection_matrix * view_matrix;
     }
+
+    void Camera2D::set_projection(int left, int right, int bottom, int top) {
+        projection_matrix = glm::ortho(
+            static_cast<float>(left),
+            static_cast<float>(right),
+            static_cast<float>(bottom),
+            static_cast<float>(top)
+        );
+    }
 }

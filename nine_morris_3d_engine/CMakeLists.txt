@@ -155,7 +155,6 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/graphics/opengl/texture.hpp"
     "include/engine/graphics/opengl/vertex_array.hpp"
     "include/engine/graphics/opengl/vertex_buffer_layout.hpp"
-    "include/engine/graphics/camera_2d.hpp"
     "include/engine/graphics/camera.hpp"
     "include/engine/graphics/font.hpp"
     "include/engine/graphics/framebuffer_reader.hpp"

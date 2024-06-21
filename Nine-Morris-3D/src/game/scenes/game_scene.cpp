@@ -109,7 +109,7 @@ void GameScene::on_start() {
         sm::utils::read_file(ctx->fs.path_assets("shaders/simple.frag"))
     )};
 
-    ctx->rnd.add_shader(shader);
+    ctx->rnd.register_shader(shader);
 
     auto material {ctx->res.material.load("simple"_H, shader)};
     material->add_uniform(sm::Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
@@ -172,8 +172,8 @@ void GameScene::on_start() {
     point_light.falloff_linear = 0.09f;
     point_light.falloff_quadratic = 0.032f;
 
-    teapot.position = glm::vec3(2.6f, 0.0, -7.0f);
-    teapot.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
+    teapot.position(glm::vec3(2.6f, 0.0, -7.0f));
+    teapot.rotation(glm::vec3(0.0f, 5.3f, 0.0f));
 
     test_shader();
 }
@@ -191,13 +191,13 @@ void GameScene::on_update() {
     sm::Renderable dragon;
     dragon.vertex_array = ctx->res.vertex_array["dragon"_H];
     dragon.material = ctx->res.material_instance["dragon1"_H];
-    dragon.scale = 0.7f;
+    dragon.scale(0.7f);
 
     ctx->rnd.add_renderable(dragon);
 
     dragon.material = ctx->res.material_instance["dragon2"_H];
-    dragon.position = glm::vec3(4.0f, 0.0, 0.0f);
-    dragon.scale = 0.2f;
+    dragon.position(glm::vec3(4.0f, 0.0, 0.0f));
+    dragon.scale(0.2f);
 
     ctx->rnd.add_renderable(dragon);
 
@@ -209,8 +209,8 @@ void GameScene::on_update() {
     sm::Renderable cube;
     cube.vertex_array = ctx->res.vertex_array["cube"_H];
     cube.material = ctx->res.material_instance["cube"_H];
-    cube.position = glm::vec3(5.0f, 2.0f, -2.0f);
-    cube.scale = 0.8f;
+    cube.position(glm::vec3(5.0f, 2.0f, -2.0f));
+    cube.scale(0.8f);
 
     ctx->rnd.add_renderable(cube);
 

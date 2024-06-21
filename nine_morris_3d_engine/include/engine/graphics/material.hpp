@@ -27,7 +27,8 @@ namespace sm {
 
         enum Flags : unsigned int {
             Outline = 1u << 0,
-            DisableBackFaceCulling = 1u << 1
+            DisableBackFaceCulling = 1u << 1,
+            CastShadow = 1u << 2
         };
 
         Material(std::shared_ptr<GlShader> shader, unsigned int flags = 0);

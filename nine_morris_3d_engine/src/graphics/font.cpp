@@ -1,7 +1,6 @@
 #include "engine/graphics/font.hpp"
 
 #include <algorithm>
-#include <stdexcept>
 #include <cassert>
 
 #include <stb_truetype.h>
@@ -14,7 +13,6 @@
 #include "engine/application_base/logging.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
-#include "engine/other/utilities.hpp"
 
 namespace sm {
     static constexpr char32_t ERROR_CHARACTER {127};
@@ -72,7 +70,7 @@ namespace sm {
     }
 
     void Font::update_data(const float* data, std::size_t size) {
-        auto vertex_buffer {buffer.lock()};  // Should be valid
+        auto vertex_buffer {wvertex_buffer.lock()};  // Should be valid
         vertex_buffer->bind();
         vertex_buffer->upload_data(data, size);
         GlVertexBuffer::unbind();
@@ -87,16 +85,14 @@ namespace sm {
     void Font::begin_baking() {
         LOG_DEBUG("Begin baking font");
 
-        // Delete the previous bitmap before creating another one
+        // Delete the previous data first
         bitmap_image.reset();
+        glyphs.clear();
 
         const std::size_t SIZE {sizeof(unsigned char) * bitmap_size * bitmap_size};
 
         bake_context = {};
-        bake_context.bitmap = new unsigned char[SIZE];
-        std::memset(bake_context.bitmap, 0, SIZE);
-
-        glyphs.clear();
+        bake_context.bitmap = std::make_unique<unsigned char[]>(SIZE);
 
         // This character should always be present
         bake_character(ERROR_CHARACTER);
@@ -107,19 +103,19 @@ namespace sm {
         specification.format = Format::R8;
         specification.border_color = std::make_optional<glm::vec4>(0.0f, 0.0f, 0.0f, 1.0f);
 
-        bitmap_image = std::make_shared<GlTexture>(bitmap_size, bitmap_size, bake_context.bitmap, specification);
+        bitmap_image = std::make_unique<GlTexture>(bitmap_size, bitmap_size, bake_context.bitmap.get(), specification);
 
-#ifdef SM_BUILD_DEBUG
+#ifndef SM_BUILD_DISTRIBUTION
         write_bitmap_to_file(name);
 #endif
 
-        delete[] bake_context.bitmap;
+        bake_context.bitmap.reset();
 
         LOG_DEBUG("End baking font");
     }
 
     void Font::bake_characters(int begin_codepoint, int end_codepoint) {
-        int descent;
+        int descent {};
         stbtt_GetFontVMetrics(font_info.get(), nullptr, &descent, nullptr);
 
         for (int codepoint {begin_codepoint}; codepoint <= end_codepoint; codepoint++) {
@@ -128,7 +124,7 @@ namespace sm {
     }
 
     void Font::bake_characters(const char* string) {
-        int descent;
+        int descent {};
         stbtt_GetFontVMetrics(font_info.get(), nullptr, &descent, nullptr);
 
         const std::u32string utf32_string {utf8::utf8to32(std::string(string))};
@@ -139,7 +135,7 @@ namespace sm {
     }
 
     void Font::bake_character(int codepoint) {
-        int descent;
+        int descent {};
         stbtt_GetFontVMetrics(font_info.get(), nullptr, &descent, nullptr);
 
         try_bake_character(codepoint, descent);
@@ -218,16 +214,16 @@ namespace sm {
     void Font::initialize() {
         auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
 
-        VertexBufferLayout layout;
-        layout.add(0, VertexBufferLayout::Float, 2);
-        layout.add(1, VertexBufferLayout::Float, 2);
+        vertex_array = std::make_unique<GlVertexArray>();  // TODO
+        vertex_array->configure([&](GlVertexArray* va) {
+            VertexBufferLayout layout;
+            layout.add(0, VertexBufferLayout::Float, 2);
+            layout.add(1, VertexBufferLayout::Float, 2);
 
-        vertex_array = std::make_shared<GlVertexArray>();  // TODO
-        vertex_array->bind();
-        vertex_array->add_vertex_buffer(vertex_buffer, layout);
-        GlVertexArray::unbind();
+            vertex_array->add_vertex_buffer(vertex_buffer, layout);
+        });
 
-        buffer = vertex_buffer;
+        wvertex_buffer = vertex_buffer;
     }
 
     void Font::try_bake_character(int codepoint, int descent) {
@@ -236,10 +232,10 @@ namespace sm {
             return;
         }
 
-        int advance_width, left_side_bearing;
+        int advance_width {}, left_side_bearing {};
         stbtt_GetCodepointHMetrics(font_info.get(), codepoint, &advance_width, &left_side_bearing);
 
-        int y0;
+        int y0 {};
         stbtt_GetCodepointBitmapBox(font_info.get(), codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
         // Assume 0, because glyph can be null
@@ -271,7 +267,7 @@ namespace sm {
 
         float s0, t0, s1, t1;
         blit_glyph(
-            bake_context.bitmap,
+            bake_context.bitmap.get(),
             bitmap_size, bitmap_size,
             glyph,
             width, height,
@@ -299,17 +295,17 @@ namespace sm {
     }
 
     const Font::Glyph& Font::get_character_glyph(char32_t character) const {
-        try {
-            return glyphs.at(character);
-        } catch (const std::out_of_range&) {
+        if (auto glyph {glyphs.find(character)}; glyph != glyphs.cend()) {
+            return glyph->second;
+        } else {
             return glyphs.at(ERROR_CHARACTER);
         }
     }
 
-    void Font::write_bitmap_to_file(const char* name) {
+    void Font::write_bitmap_to_file(const char* name) const {
         const std::string file_name {"bitmap_" + std::string(name) + ".png"};
 
-        if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap, 0)) {
+        if (!stbi_write_png(file_name.c_str(), bitmap_size, bitmap_size, 1, bake_context.bitmap.get(), 0)) {
             LOG_ERROR("Failed to create bitmap png file `{}`", file_name);
         }
     }

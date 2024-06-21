@@ -16,4 +16,10 @@ namespace sm {
         // This is a cache
         glm::mat4 projection_view_matrix {1.0f};
     };
+
+    struct Camera2D {
+        void set_projection(int left, int right, int bottom, int top);
+
+        glm::mat4 projection_matrix {1.0f};
+    };
 }

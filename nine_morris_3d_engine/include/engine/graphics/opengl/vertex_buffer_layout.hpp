@@ -5,7 +5,7 @@
 
 namespace sm {
     struct VertexBufferLayout {
-        enum Type : unsigned char{
+        enum Type : unsigned char {
             Float,
             Int
         };

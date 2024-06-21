@@ -29,7 +29,6 @@
 #include "engine/graphics/opengl/vertex_array.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/graphics/renderer.hpp"
-#include "engine/graphics/camera_2d.hpp"
 #include "engine/graphics/camera.hpp"
 #include "engine/graphics/font.hpp"
 #include "engine/graphics/framebuffer_reader.hpp"
