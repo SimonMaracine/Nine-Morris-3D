@@ -34,7 +34,7 @@ namespace sm {
         std::string name;
         Id id;
 
-        friend class Ctx;
         friend class Application;
+        friend class Ctx;
     };
 }

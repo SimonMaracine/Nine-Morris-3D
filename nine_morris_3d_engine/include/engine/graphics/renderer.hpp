@@ -36,7 +36,7 @@ namespace sm {
         void capture(const Camera& camera, const glm::vec3& position);
         void capture(const Camera2D& camera_2d);
         void skybox(std::shared_ptr<GlTextureCubemap> texture);
-        void shadows(float left, float right, float bottom, float top, float lens_near, float lens_far, glm::vec3 position);
+        void shadows(float left, float right, float bottom, float top, float lens_near, float lens_far, const glm::vec3& position);
         void register_shader(std::shared_ptr<GlShader> shader);
         void register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
 
@@ -56,11 +56,10 @@ namespace sm {
         void debug_add_point(const glm::vec3& position, const glm::vec3& color);
         void debug_add_lamp(const glm::vec3& position, const glm::vec3& color);
     private:
-        void render(int width, int height);
-        void prerender_setup();
-        void postrender_setup();
+        void render();
+        void pre_setup();
+        void post_setup();
         void clear();
-
         void resize_framebuffers(int width, int height);
 
         // Render functions
@@ -84,7 +83,7 @@ namespace sm {
         // Helper functions
         void setup_point_light_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
         void setup_light_space_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
-        glm::mat4 get_renderable_transform(const Renderable& renderable);
+        static glm::mat4 get_renderable_transform(const Renderable& renderable);
 
         struct {
             std::shared_ptr<GlFramebuffer> scene_framebuffer;
@@ -94,7 +93,7 @@ namespace sm {
             std::unique_ptr<GlShader> screen_quad_shader;
             std::shared_ptr<GlShader> shadow_shader;
             std::unique_ptr<GlShader> text_shader;
-            std::shared_ptr<GlShader> skybox_shader;
+            std::unique_ptr<GlShader> skybox_shader;
 
             std::unique_ptr<GlVertexArray> screen_quad_vertex_array;
             std::unique_ptr<GlVertexArray> skybox_vertex_array;
@@ -129,7 +128,7 @@ namespace sm {
             std::vector<Text> texts;
             std::vector<float> texts_buffer;
 
-            struct LightSpace {
+            struct {
                 float left {};
                 float right {};
                 float bottom {};

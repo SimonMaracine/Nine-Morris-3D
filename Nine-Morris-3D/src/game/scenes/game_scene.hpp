@@ -14,9 +14,8 @@ struct GameScene : public sm::Scene {
 
     void on_window_resized(const sm::WindowResizedEvent& event);
 
-    void test_shader();
-
     sm::Camera cam;
+    sm::Camera2D cam_2d;
     PointCameraController cam_controller;
     sm::DirectionalLight directional_light;
     sm::PointLight point_light;

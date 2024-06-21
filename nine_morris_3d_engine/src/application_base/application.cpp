@@ -52,7 +52,7 @@ namespace sm {
 
         user_functions.start(ctx);
         current_scene->on_start();
-        ctx.rnd.prerender_setup();
+        ctx.rnd.pre_setup();
 
         ctx.win.show();
 
@@ -70,7 +70,7 @@ namespace sm {
             ctx.tsk.update();
 
             if (!minimized) {
-                ctx.rnd.render(ctx.win.get_width(), ctx.win.get_height());
+                ctx.rnd.render();
                 dear_imgui_render();
             }
 
@@ -82,7 +82,7 @@ namespace sm {
 
         LOG_INFO("Closing application...");
 
-        ctx.rnd.postrender_setup();
+        ctx.rnd.post_setup();
         current_scene->on_stop();
 
         LOG_INFO("Calling user stop function...");
@@ -138,7 +138,7 @@ namespace sm {
 
     void Application::check_changed_scene() {
         if (next_scene != nullptr) {
-            ctx.rnd.postrender_setup();
+            ctx.rnd.post_setup();
             current_scene->on_stop();
 
             // Clear all cached resources
@@ -151,7 +151,7 @@ namespace sm {
             current_scene = std::exchange(next_scene, nullptr);
 
             current_scene->on_start();
-            ctx.rnd.prerender_setup();
+            ctx.rnd.pre_setup();
         }
 
         assert(next_scene == nullptr);

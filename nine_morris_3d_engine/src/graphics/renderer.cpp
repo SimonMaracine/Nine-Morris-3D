@@ -107,12 +107,11 @@ namespace sm {
         }
 
         {
-            storage.skybox_shader = std::make_shared<GlShader>(
+            // Doesn't have uniform buffers for sure
+            storage.skybox_shader = std::make_unique<GlShader>(
                 utils::read_file(fs.path_engine_assets("shaders/skybox.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/skybox.frag"))
             );
-
-            register_shader(storage.skybox_shader);
         }
 
         {
@@ -166,7 +165,7 @@ namespace sm {
         storage.skybox_texture = texture;
     }
 
-    void Renderer::shadows(float left, float right, float bottom, float top, float lens_near, float lens_far, glm::vec3 position) {
+    void Renderer::shadows(float left, float right, float bottom, float top, float lens_near, float lens_far, const glm::vec3& position) {
         scene_list.light_space.left = left;
         scene_list.light_space.right = right;
         scene_list.light_space.bottom = bottom;
@@ -291,7 +290,7 @@ namespace sm {
         }
     }
 
-    void Renderer::render(int width, int height) {
+    void Renderer::render() {
         // TODO pre-render setup
 
         {
@@ -404,7 +403,7 @@ namespace sm {
         debug_clear();
     }
 
-    void Renderer::prerender_setup() {
+    void Renderer::pre_setup() {
         for (const std::weak_ptr<GlShader>& wshader : scene_data.shaders) {
             std::shared_ptr<GlShader> shader {wshader.lock()};
 
@@ -447,7 +446,7 @@ namespace sm {
         }
     }
 
-    void Renderer::postrender_setup() {
+    void Renderer::post_setup() {
         scene_data.shaders.clear();
     }
 
@@ -715,8 +714,8 @@ namespace sm {
         auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
         debug_storage.wvertex_buffer = vertex_buffer;
 
-        storage.skybox_vertex_array = std::make_unique<GlVertexArray>();
-        storage.skybox_vertex_array->configure([&](GlVertexArray* va) {
+        debug_storage.vertex_array = std::make_unique<GlVertexArray>();
+        debug_storage.vertex_array->configure([&](GlVertexArray* va) {
             VertexBufferLayout layout;
             layout.add(0, VertexBufferLayout::Float, 3);
             layout.add(1, VertexBufferLayout::Float, 3);

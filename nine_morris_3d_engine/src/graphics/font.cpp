@@ -69,6 +69,8 @@ namespace sm {
         LOG_DEBUG("Loaded font");
     }
 
+    Font::~Font() {}  // Make unique_ptr happy
+
     void Font::update_data(const float* data, std::size_t size) {
         auto vertex_buffer {wvertex_buffer.lock()};  // Should be valid
         vertex_buffer->bind();
@@ -150,6 +152,8 @@ namespace sm {
 
         int x {0};
 
+        const int offset {get_character_glyph(utf32_string.at(0)).xoff};
+
         for (const char32_t character : utf32_string) {
             const Glyph& glyph {get_character_glyph(character)};
 
@@ -214,13 +218,13 @@ namespace sm {
     void Font::initialize() {
         auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
 
-        vertex_array = std::make_unique<GlVertexArray>();  // TODO
+        vertex_array = std::make_unique<GlVertexArray>();
         vertex_array->configure([&](GlVertexArray* va) {
             VertexBufferLayout layout;
             layout.add(0, VertexBufferLayout::Float, 2);
             layout.add(1, VertexBufferLayout::Float, 2);
 
-            vertex_array->add_vertex_buffer(vertex_buffer, layout);
+            va->add_vertex_buffer(vertex_buffer, layout);
         });
 
         wvertex_buffer = vertex_buffer;

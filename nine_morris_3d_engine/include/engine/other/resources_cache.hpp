@@ -32,7 +32,7 @@ namespace sm {
         // resmanager::Cache<GlUniformBuffer> uniform_buffer;
         // resmanager::Cache<GlPixelBuffer> pixel_buffer;
         // resmanager::Cache<GlFramebuffer> framebuffer;
-        // resmanager::Cache<Font> font;
+        resmanager::Cache<Font> font;
         resmanager::Cache<Material> material;
         resmanager::Cache<MaterialInstance> material_instance;
         // resmanager::Cache<TextureData> texture_data;

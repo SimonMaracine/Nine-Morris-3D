@@ -26,12 +26,12 @@ namespace sm {
             int bitmap_size
         );
 
-        ~Font() = default;
+        ~Font();
 
         Font(const Font&) = delete;
         Font& operator=(const Font&) = delete;
-        Font(Font&&) = default;
-        Font& operator=(Font&&) = default;
+        Font(Font&&) = delete;
+        Font& operator=(Font&&) = delete;
 
         void update_data(const float* data, std::size_t size);
 

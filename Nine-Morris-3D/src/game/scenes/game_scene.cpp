@@ -21,7 +21,7 @@ void GameScene::on_start() {
     sm::OpenGl::clear_color(0.3f, 0.1f, 0.3f);
 
     {
-        auto mesh {std::make_shared<sm::Mesh>(
+        auto mesh {std::make_unique<sm::Mesh>(
             sm::utils::read_file(ctx->fs.path_assets("models/dragon.obj")),
             "default",
             sm::Mesh::Type::PN
@@ -49,7 +49,7 @@ void GameScene::on_start() {
     }
 
     {
-        auto mesh {std::make_shared<sm::Mesh>(
+        auto mesh {std::make_unique<sm::Mesh>(
             sm::utils::read_file(ctx->fs.path_assets("models/teapot.obj")),
             sm::Mesh::DEFAULT_OBJECT,
             sm::Mesh::Type::PN
@@ -77,7 +77,7 @@ void GameScene::on_start() {
     }
 
     {
-        auto mesh {std::make_shared<sm::Mesh>(
+        auto mesh {std::make_unique<sm::Mesh>(
             sm::utils::read_file(ctx->fs.path_assets("models/cube.obj")),
             "Cube",
             sm::Mesh::Type::PN
@@ -145,6 +145,22 @@ void GameScene::on_start() {
         material_instance->set_float("u_material.shininess"_H, 128.0f);
     }
 
+    {
+        auto font {ctx->res.font.load(
+            "font"_H,
+            sm::utils::read_file(ctx->fs.path_assets("fonts/OpenSans/OpenSans-Regular.ttf")),
+            40.0f,
+            8,
+            180,
+            40,
+            512
+        )};
+
+        font->begin_baking();
+        font->bake_ascii();
+        font->end_baking("font");
+    }
+
     cam_controller = PointCameraController(
         &cam,
         ctx->win.get_width(),
@@ -160,6 +176,8 @@ void GameScene::on_start() {
 
     cam_controller.connect_events(ctx);
 
+    cam_2d.set_projection(0, ctx->win.get_width(), 0, ctx->win.get_height());
+
     directional_light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     directional_light.ambient_color = glm::vec3(0.1f);
     directional_light.diffuse_color = glm::vec3(1.0f);
@@ -174,8 +192,6 @@ void GameScene::on_start() {
 
     teapot.position(glm::vec3(2.6f, 0.0, -7.0f));
     teapot.rotation(glm::vec3(0.0f, 5.3f, 0.0f));
-
-    test_shader();
 }
 
 void GameScene::on_update() {
@@ -184,6 +200,7 @@ void GameScene::on_update() {
     cam_controller.update_friction();
 
     ctx->rnd.capture(cam, cam_controller.get_position());
+    ctx->rnd.capture(cam_2d);
 
     ctx->rnd.add_light(directional_light);
     ctx->rnd.add_light(point_light);
@@ -214,6 +231,12 @@ void GameScene::on_update() {
 
     ctx->rnd.add_renderable(cube);
 
+    sm::Text fps;
+    fps.font = ctx->res.font["font"_H];
+    fps.text = std::to_string(ctx->fps);
+
+    ctx->rnd.add_text(fps);
+
     // Origin
     ctx->rnd.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     ctx->rnd.debug_add_line(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -221,13 +244,13 @@ void GameScene::on_update() {
 
     // Whatever
     ctx->rnd.debug_add_lines(
-        std::vector({
+        {
             glm::vec3(0.0f, 6.0f, 0.0f),
             glm::vec3(2.0f, 7.0f, 0.0f),
             glm::vec3(4.0f, 6.0f, 2.0f),
             glm::vec3(3.0f, 8.0f, 0.0f),
             glm::vec3(0.0f, 11.0f, -4.0f)
-        }),
+        },
         glm::vec3(0.0f, 0.0f, 0.0f)
     );
 
@@ -262,10 +285,6 @@ void GameScene::on_imgui_update() {
 }
 
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
-    LOG_DEBUG("{}", event);
-}
-
-void GameScene::test_shader() {
-    LOG_DEBUG("{}", ctx->shd.load_shader(sm::utils::read_file(ctx->fs.path_assets("shaders/simple2.vert"))));
-    LOG_DEBUG("{}", ctx->shd.load_shader(sm::utils::read_file(ctx->fs.path_assets("shaders/simple2.frag"))));
+    cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
+    cam_2d.set_projection(0, event.width, 0, event.height);
 }

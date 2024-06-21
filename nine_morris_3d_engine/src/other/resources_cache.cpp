@@ -11,7 +11,7 @@ namespace sm {
         // uniform_buffer.merge(other.uniform_buffer);
         // pixel_buffer.merge(other.pixel_buffer);
         // framebuffer.merge(other.framebuffer);
-        // font.merge(other.font);
+        font.merge(other.font);
         material.merge(other.material);
         material_instance.merge(other.material_instance);
         // texture_data.merge(other.texture_data);
@@ -32,7 +32,7 @@ namespace sm {
         // uniform_buffer.merge_replace(other.uniform_buffer);
         // pixel_buffer.merge_replace(other.pixel_buffer);
         // framebuffer.merge_replace(other.framebuffer);
-        // font.merge_replace(other.font);
+        font.merge_replace(other.font);
         material.merge_replace(other.material);
         material_instance.merge_replace(other.material_instance);
         // texture_data.merge_replace(other.texture_data);
@@ -53,7 +53,7 @@ namespace sm {
         // uniform_buffer.clear();
         // pixel_buffer.clear();
         // framebuffer.clear();
-        // font.clear();
+        font.clear();
         material.clear();
         material_instance.clear();
         // texture_data.clear();
