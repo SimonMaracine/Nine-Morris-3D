@@ -50,7 +50,7 @@ namespace sm {
     }
 
     Font::Font(
-        const std::string& file_path,
+        const std::string& buffer,
         float size,
         int padding,
         unsigned char on_edge_value,
@@ -58,19 +58,17 @@ namespace sm {
         int bitmap_size
     )
         : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value), pixel_dist_scale(pixel_dist_scale) {
-        const auto contents {utils::read_file(file_path)};
-
         font_info = std::make_unique<stbtt_fontinfo>();
 
-        if (!stbtt_InitFont(font_info.get(), reinterpret_cast<const unsigned char*>(contents.c_str()), 0)) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load font `{}`", file_path);
+        if (!stbtt_InitFont(font_info.get(), reinterpret_cast<const unsigned char*>(buffer.data()), 0)) {
+            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load font");
         }
 
         sf = stbtt_ScaleForPixelHeight(font_info.get(), size);
 
         initialize();
 
-        LOG_DEBUG("Created font `{}`", file_path);
+        LOG_DEBUG("Loaded font");
     }
 
     void Font::update_data(const float* data, std::size_t size) {
@@ -224,7 +222,7 @@ namespace sm {
         layout.add(0, VertexBufferLayout::Float, 2);
         layout.add(1, VertexBufferLayout::Float, 2);
 
-        vertex_array = std::make_shared<GlVertexArray>();
+        vertex_array = std::make_shared<GlVertexArray>();  // TODO
         vertex_array->bind();
         vertex_array->add_vertex_buffer(vertex_buffer, layout);
         GlVertexArray::unbind();

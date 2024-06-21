@@ -150,19 +150,19 @@ namespace sm {
         glfwSwapInterval(interval);
     }
 
-    void Window::add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
+    void Window::add_cursor(Id id, std::unique_ptr<TextureData>&& data, int x_hotspot, int y_hotspot) {
         GLFWimage image;
-        image.width = cursor->get_width();
-        image.height = cursor->get_height();
-        image.pixels = cursor->get_data();
+        image.width = data->get_width();
+        image.height = data->get_height();
+        image.pixels = const_cast<unsigned char*>(data->get_data());  // :P
 
-        GLFWcursor* glfw_cursor {glfwCreateCursor(&image, x_hotspot, y_hotspot)};
+        GLFWcursor* cursor {glfwCreateCursor(&image, x_hotspot, y_hotspot)};
 
-        if (glfw_cursor == nullptr) {
+        if (cursor == nullptr) {
             LOG_DIST_ERROR("Could not create custom cursor");
         }
 
-        cursors[id] = glfw_cursor;
+        cursors[id] = cursor;
     }
 
     void Window::set_cursor(Id id) const {
@@ -177,20 +177,20 @@ namespace sm {
         glfwSetCursor(window, cursor);
     }
 
-    void Window::set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const {
-        std::vector<GLFWimage> glfw_icons;
-        glfw_icons.reserve(icons.size());
+    void Window::set_icons(std::initializer_list<std::unique_ptr<TextureData>> datas) const {
+        std::vector<GLFWimage> icons;
+        icons.reserve(datas.size());
 
-        for (const std::unique_ptr<TextureData>& icon : icons) {
-            GLFWimage image;
-            image.width = icon->get_width();
-            image.height = icon->get_height();
-            image.pixels = icon->get_data();
+        for (const std::unique_ptr<TextureData>& data : datas) {
+            GLFWimage icon;
+            icon.width = data->get_width();
+            icon.height = data->get_height();
+            icon.pixels = const_cast<unsigned char*>(data->get_data());  // :P
 
-            glfw_icons.push_back(image);
+            icons.push_back(icon);
         }
 
-        glfwSetWindowIcon(window, static_cast<int>(glfw_icons.size()), glfw_icons.data());
+        glfwSetWindowIcon(window, static_cast<int>(icons.size()), icons.data());
     }
 
     double Window::get_time() {

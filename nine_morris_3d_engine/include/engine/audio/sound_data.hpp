@@ -6,7 +6,7 @@
 namespace sm {
     class SoundData {
     public:
-        explicit SoundData(const std::string& file_path);
+        explicit SoundData(const std::string& buffer);
         ~SoundData();
 
         SoundData(const SoundData&) = delete;

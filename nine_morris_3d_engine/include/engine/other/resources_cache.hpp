@@ -15,7 +15,7 @@
 #include "engine/graphics/font.hpp"
 #include "engine/graphics/material.hpp"
 #include "engine/graphics/texture_data.hpp"
-#include "engine/other/mesh.hpp"
+#include "engine/graphics/mesh.hpp"
 
 namespace sm {
     class Application;

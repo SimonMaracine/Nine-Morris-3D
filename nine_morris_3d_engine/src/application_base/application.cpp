@@ -56,7 +56,7 @@ namespace sm {
 
         ctx.win.show();
 
-        LOG_INFO("Initialized application, entering main loop...");
+        LOG_INFO("Entering application main loop...");
 
         while (ctx.running) {
             ctx.delta = update_frame_counter();

@@ -22,7 +22,7 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            ctx->fs.path_assets("models/dragon.obj"),
+            sm::utils::read_file(ctx->fs.path_assets("models/dragon.obj")),
             "default",
             sm::Mesh::Type::PN
         )};
@@ -50,7 +50,7 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            ctx->fs.path_assets("models/teapot.obj"),
+            sm::utils::read_file(ctx->fs.path_assets("models/teapot.obj")),
             sm::Mesh::DEFAULT_OBJECT,
             sm::Mesh::Type::PN
         )};
@@ -78,7 +78,7 @@ void GameScene::on_start() {
 
     {
         auto mesh {std::make_shared<sm::Mesh>(
-            ctx->fs.path_assets("models/cube.obj"),
+            sm::utils::read_file(ctx->fs.path_assets("models/cube.obj")),
             "Cube",
             sm::Mesh::Type::PN
         )};

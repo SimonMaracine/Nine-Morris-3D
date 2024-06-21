@@ -7,26 +7,6 @@
 #include "engine/audio/openal/buffer.hpp"
 
 namespace sm {
-    // MusicTrack::MusicTrack(const std::string& file_path) {
-    //     const auto data {std::make_shared<SoundData>(file_path)};
-
-    //     setup(data);
-
-    //     name = file_path;
-
-    //     LOG_DEBUG("Loaded music track `{}`", name);
-    // }
-
-    // MusicTrack::MusicTrack(const EncrFile& file_path) {
-    //     const auto data {std::make_shared<SoundData>(file_path)};
-
-    //     setup(data);
-
-    //     name = file_path;
-
-    //     LOG_DEBUG("Loaded music track `{}`", name);
-    // }
-
     MusicTrack::MusicTrack(std::shared_ptr<SoundData> data) {
         setup(data);
 

@@ -5,7 +5,7 @@
 namespace sm {
     class TextureData {
     public:
-        TextureData(const std::string& file_path, bool flip = false);
+        TextureData(const std::string& buffer, bool flip = false);
         ~TextureData();
 
         TextureData(const TextureData&) = delete;
@@ -16,7 +16,6 @@ namespace sm {
         int get_width() const { return width; }
         int get_height() const { return height; }
         const unsigned char* get_data() const { return data; }
-        unsigned char* get_data() { return data; }
     private:
         int width {};
         int height {};

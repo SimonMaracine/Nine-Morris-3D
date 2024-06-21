@@ -18,7 +18,7 @@ namespace sm {
     class Font {
     public:
         Font(
-            const std::string& file_path,
+            const std::string& buffer,
             float size,
             int padding,
             unsigned char on_edge_value,

@@ -1,4 +1,4 @@
-#include "engine/other/mesh.hpp"
+#include "engine/graphics/mesh.hpp"
 
 #include <vector>
 #include <cstring>
@@ -129,7 +129,7 @@ namespace sm {
         return nullptr;
     }
 
-    Mesh::Mesh(const std::string& file_path, const std::string& object_name, Type type, bool flip_winding) {
+    Mesh::Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding) {
         unsigned int flags {aiProcess_ValidateDataStructure};
 
         if (flip_winding) {
@@ -146,69 +146,21 @@ namespace sm {
 
         Assimp::Importer importer;
 
-        const aiScene* scene {importer.ReadFile(file_path, flags)};
+        const aiScene* scene {importer.ReadFileFromMemory(buffer.data(), buffer.size(), flags)};
 
         if (scene == nullptr) {
-            SM_CRITICAL_ERROR(
-                RuntimeError::ResourceLoading,
-                "Could not load model data `{}`: {}",
-                file_path,
-                importer.GetErrorString()
-            );
+            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load model data: {}", importer.GetErrorString());
         }
 
         const aiNode* root_node {scene->mRootNode};
         const aiMesh* mesh {find_mesh(root_node, object_name, scene)};
 
         if (mesh == nullptr) {
-            SM_CRITICAL_ERROR(
-                RuntimeError::ResourceLoading,
-                "Model file `{}` does not contain `{}` mesh",
-                file_path,
-                object_name
-            );
+            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Model file does not contain `{}` mesh", object_name);
         }
 
-        load(type, mesh, file_path);
+        load(type, mesh);
     }
-
-    // Mesh::Mesh(const EncrFile& file_path, const std::string& object_name, Type type, bool flip_winding) {
-    //     unsigned int flags {aiProcess_ValidateDataStructure};
-
-    //     if (flip_winding) {
-    //         flags |= aiProcess_FlipWindingOrder;
-    //     }
-
-    //     if (type == Type::PTNT) {
-    //         flags |= aiProcess_CalcTangentSpace;
-    //     }
-
-    //     if (type != Type::P) {
-    //         flags |= aiProcess_GenNormals;
-    //     }
-
-    //     const auto [buffer, buffer_size] {Encrypt::load_file(file_path)};
-
-    //     Assimp::Importer importer;
-
-    //     const aiScene* scene {importer.ReadFileFromMemory(buffer, buffer_size, flags)};
-
-    //     if (scene == nullptr) {
-    //         LOG_DIST_CRITICAL("Could not load model data `{}`", file_path);
-    //         LOG_DIST_CRITICAL("Assimp: ", importer.GetErrorString());
-    //         throw ResourceLoadingError;
-    //     }
-
-    //     const aiNode* root_node {scene->mRootNode};
-    //     const aiMesh* mesh {find_mesh(root_node, object_name, scene)};
-
-    //     if (mesh == nullptr) {
-    //         LOG_CRITICAL("Model file `{}` does not contain mesh `{}`", file_path, object_name);
-    //         throw ResourceLoadingError;
-    //     }
-
-    //     load(type, mesh, file_path);
-    // }
 
     Mesh::~Mesh() {
         delete[] vertices;
@@ -217,7 +169,7 @@ namespace sm {
         LOG_DEBUG("Freed model data");
     }
 
-    void Mesh::load(Type type, const void* pmesh, const std::string& file_path) {
+    void Mesh::load(Type type, const void* pmesh) {
         const aiMesh* mesh {static_cast<const aiMesh*>(pmesh)};
 
         switch (type) {
@@ -234,7 +186,7 @@ namespace sm {
                     indices.size() * sizeof(unsigned int)
                 );
 
-                LOG_DEBUG("Loaded P model data `{}`", file_path);
+                LOG_DEBUG("Loaded P model data");
 
                 break;
             }
@@ -251,7 +203,7 @@ namespace sm {
                     indices.size() * sizeof(unsigned int)
                 );
 
-                LOG_DEBUG("Loaded PN model data `{}`", file_path);
+                LOG_DEBUG("Loaded PN model data");
 
                 break;
             }
@@ -268,7 +220,7 @@ namespace sm {
                     indices.size() * sizeof(unsigned int)
                 );
 
-                LOG_DEBUG("Loaded PTN model data `{}`", file_path);
+                LOG_DEBUG("Loaded PTN model data");
 
                 break;
             }
@@ -285,7 +237,7 @@ namespace sm {
                     indices.size() * sizeof(unsigned int)
                 );
 
-                LOG_DEBUG("Loaded PTNT model data `{}`", file_path);
+                LOG_DEBUG("Loaded PTNT model data");
 
                 break;
             }

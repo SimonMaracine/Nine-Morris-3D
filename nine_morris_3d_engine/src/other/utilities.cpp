@@ -31,6 +31,8 @@ namespace sm {
     }
 
     std::string utils::read_file(const std::string& file_path) {
+        LOG_DEBUG("Reading file `{}`...", file_path);
+
         try {
             return read_file_ex(file_path);
         } catch (const utils::FileReadError& e) {

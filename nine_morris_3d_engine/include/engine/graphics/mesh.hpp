@@ -15,7 +15,7 @@ namespace sm {
 
         static constexpr const char* DEFAULT_OBJECT {"defaultobject"};
 
-        Mesh(const std::string& file_path, const std::string& object_name, Type type, bool flip_winding = false);
+        Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding = false);
         ~Mesh();
 
         Mesh(const Mesh&) = delete;
@@ -28,7 +28,7 @@ namespace sm {
         std::size_t get_vertices_size() const { return vertices_size; }
         std::size_t get_indices_size() const { return indices_size; }
     private:
-        void load(Type type, const void* pmesh, const std::string& file_path);
+        void load(Type type, const void* pmesh);
         void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
 
         // Raw data
