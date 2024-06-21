@@ -3,9 +3,19 @@
 #include <string>
 
 namespace sm {
+    enum class Size {
+        Default,
+        Half
+    };
+
+    struct TexturePostProcessing {
+        bool flip {false};
+        Size size {Size::Default};
+    };
+
     class TextureData {
     public:
-        TextureData(const std::string& buffer, bool flip = false);
+        TextureData(const std::string& buffer, const TexturePostProcessing& post_processing = {});
         ~TextureData();
 
         TextureData(const TextureData&) = delete;
@@ -17,6 +27,8 @@ namespace sm {
         int get_height() const { return height; }
         const unsigned char* get_data() const { return data; }
     private:
+        void resize(int new_width, int new_height);
+
         int width {};
         int height {};
         unsigned char* data {nullptr};
