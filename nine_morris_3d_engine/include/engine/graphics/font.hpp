@@ -35,11 +35,11 @@ namespace sm {
 
         void update_data(const float* data, std::size_t size);
 
-        unsigned int get_bitmap_size() const { return static_cast<unsigned int>(bitmap_size); }
+        int get_bitmap_size() const { return bitmap_size; }
 
-        const GlVertexArray* get_vertex_array() const { return vertex_array.get(); }
+        const GlVertexArray* get_vertex_array() const { return vertex_array.get(); }  // TODO remove
         const GlTexture* get_bitmap() const { return bitmap_image.get(); }
-        int get_vertex_count() const { return vertex_count; }
+        int get_vertex_count() const { return vertex_count; }  // TODO remove
 
         // Baking API
         void begin_baking();

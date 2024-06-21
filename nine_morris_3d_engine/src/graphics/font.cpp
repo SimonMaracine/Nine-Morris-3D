@@ -71,7 +71,7 @@ namespace sm {
 
     Font::~Font() {}  // Make unique_ptr happy
 
-    void Font::update_data(const float* data, std::size_t size) {
+    void Font::update_data(const float* data, std::size_t size) {  // TODO remove this
         auto vertex_buffer {wvertex_buffer.lock()};  // Should be valid
         vertex_buffer->bind();
         vertex_buffer->upload_data(data, size);
@@ -81,7 +81,7 @@ namespace sm {
 
         assert(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0);
 
-        vertex_count = static_cast<int>(size / (sizeof(float) * FLOATS_PER_VERTEX));
+        vertex_count = static_cast<int>(size / (sizeof(float) * FLOATS_PER_VERTEX));  // FIXME
     }
 
     void Font::begin_baking() {
@@ -152,8 +152,6 @@ namespace sm {
 
         int x {0};
 
-        const int offset {get_character_glyph(utf32_string.at(0)).xoff};
-
         for (const char32_t character : utf32_string) {
             const Glyph& glyph {get_character_glyph(character)};
 
@@ -218,7 +216,7 @@ namespace sm {
     void Font::initialize() {
         auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
 
-        vertex_array = std::make_unique<GlVertexArray>();
+        vertex_array = std::make_unique<GlVertexArray>();  // FIXME this doesn't belong here
         vertex_array->configure([&](GlVertexArray* va) {
             VertexBufferLayout layout;
             layout.add(0, VertexBufferLayout::Float, 2);
@@ -236,7 +234,8 @@ namespace sm {
             return;
         }
 
-        int advance_width {}, left_side_bearing {};
+        int advance_width {};
+        int left_side_bearing {};
         stbtt_GetCodepointHMetrics(font_info.get(), codepoint, &advance_width, &left_side_bearing);
 
         int y0 {};

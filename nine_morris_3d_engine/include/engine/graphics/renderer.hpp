@@ -23,6 +23,7 @@ namespace sm {
     class GlVertexArray;
     class GlVertexBuffer;
     class GlUniformBuffer;
+    class Font;
 
     class Renderer {
     private:
@@ -47,12 +48,12 @@ namespace sm {
 
         // 2D API
         void add_text(const Text& text);
+        void add_info_text(float fps);
 
         // Debug API
         void debug_add_line(const glm::vec3& position1, const glm::vec3& position2, const glm::vec3& color);
         void debug_add_lines(const std::vector<glm::vec3>& points, const glm::vec3& color);
         void debug_add_lines(std::initializer_list<glm::vec3> points, const glm::vec3& color);
-
         void debug_add_point(const glm::vec3& position, const glm::vec3& color);
         void debug_add_lamp(const glm::vec3& position, const glm::vec3& color);
     private:
@@ -98,6 +99,8 @@ namespace sm {
             std::unique_ptr<GlVertexArray> screen_quad_vertex_array;
             std::unique_ptr<GlVertexArray> skybox_vertex_array;
 
+            std::shared_ptr<Font> default_font;
+
             std::shared_ptr<GlTextureCubemap> skybox_texture;
 
             std::unordered_map<unsigned int, std::weak_ptr<GlUniformBuffer>> uniform_buffers;
@@ -111,22 +114,22 @@ namespace sm {
         PostProcessingContext post_processing_context;  // TODO implement
 
         struct {
-            glm::mat4 view_matrix {1.0f};
-            glm::mat4 projection_matrix {1.0f};
-            glm::mat4 projection_view_matrix {1.0f};
-            glm::vec3 position {};
-        } camera;
-
-        struct {
-            glm::mat4 projection_matrix {1.0f};
-        } camera_2d;
-
-        struct {
             std::vector<Renderable> renderables;
             DirectionalLight directional_light;
             std::vector<PointLight> point_lights;
             std::vector<Text> texts;
             std::vector<float> texts_buffer;
+
+            struct {
+                glm::mat4 view_matrix {1.0f};
+                glm::mat4 projection_matrix {1.0f};
+                glm::mat4 projection_view_matrix {1.0f};
+                glm::vec3 position {};
+            } camera;
+
+            struct {
+                glm::mat4 projection_matrix {1.0f};
+            } camera_2d;
 
             struct {
                 float left {};
@@ -156,14 +159,14 @@ namespace sm {
             std::unique_ptr<GlVertexArray> vertex_array;
         } debug_storage;
 
-        struct BufferVertex {
-            glm::vec3 position;
-            glm::vec3 color;
-        };
-
         struct Line {
             glm::vec3 position1;
             glm::vec3 position2;
+            glm::vec3 color;
+        };
+
+        struct BufferVertex {
+            glm::vec3 position;
             glm::vec3 color;
         };
 

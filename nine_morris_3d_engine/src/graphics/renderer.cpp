@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <array>
 #include <algorithm>
+#include <string>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.hpp>
@@ -14,6 +15,7 @@
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "engine/graphics/opengl/opengl.hpp"
 #include "engine/graphics/material.hpp"
+#include "engine/graphics/font.hpp"
 #include "engine/other/utilities.hpp"
 
 using namespace resmanager::literals;
@@ -147,18 +149,33 @@ namespace sm {
             });
         }
 
+        {
+            storage.default_font = std::make_unique<Font>(
+                utils::read_file(fs.path_engine_assets("fonts/CodeNewRoman/code-new-roman.regular.ttf")),
+                16.0f,
+                4,  // FIXME bitmap doesn't take padding into consideration
+                180,
+                40,
+                256
+            );
+
+            storage.default_font->begin_baking();
+            storage.default_font->bake_ascii();
+            storage.default_font->end_baking("default");
+        }
+
         debug_initialize(fs);
     }
 
     void Renderer::capture(const Camera& camera, const glm::vec3& position) {
-        this->camera.view_matrix = camera.view_matrix;
-        this->camera.projection_matrix = camera.projection_matrix;
-        this->camera.projection_view_matrix = camera.projection_view_matrix;
-        this->camera.position = position;
+        scene_list.camera.view_matrix = camera.view_matrix;
+        scene_list.camera.projection_matrix = camera.projection_matrix;
+        scene_list.camera.projection_view_matrix = camera.projection_view_matrix;
+        scene_list.camera.position = position;
     }
 
     void Renderer::capture(const Camera2D& camera_2d) {
-        this->camera_2d.projection_matrix = camera_2d.projection_matrix;
+        scene_list.camera_2d.projection_matrix = camera_2d.projection_matrix;
     }
 
     void Renderer::skybox(std::shared_ptr<GlTextureCubemap> texture) {
@@ -196,6 +213,16 @@ namespace sm {
     }
 
     void Renderer::add_text(const Text& text) {
+        scene_list.texts.push_back(text);
+    }
+
+    void Renderer::add_info_text(float fps) {
+        Text text;
+        text.font = storage.default_font;
+        text.text = std::to_string(fps) + " FPS";
+        text.position = glm::vec2(1.0f);
+        text.color = glm::vec3(0.75f);
+
         scene_list.texts.push_back(text);
     }
 
@@ -297,7 +324,7 @@ namespace sm {
             auto uniform_buffer {storage.projection_view_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&camera.projection_view_matrix, "u_projection_view_matrix"_H);
+                uniform_buffer->set(&scene_list.camera.projection_view_matrix, "u_projection_view_matrix"_H);
             }
         }
         {
@@ -314,7 +341,7 @@ namespace sm {
             auto uniform_buffer {storage.view_position_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&camera.position, "u_view_position"_H);
+                uniform_buffer->set(&scene_list.camera.position, "u_view_position"_H);
             }
         }
         {
@@ -576,8 +603,8 @@ namespace sm {
     }
 
     void Renderer::draw_skybox() {
-        const glm::mat4& projection {camera.projection_matrix};
-        const glm::mat4 view {glm::mat4(glm::mat3(camera.view_matrix))};
+        const glm::mat4& projection {scene_list.camera.projection_matrix};
+        const glm::mat4 view {glm::mat4(glm::mat3(scene_list.camera.view_matrix))};
 
         storage.skybox_shader->bind();
         storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
@@ -616,7 +643,7 @@ namespace sm {
 
         storage.text_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
         storage.text_shader->upload_uniform_vec3("u_color"_H, text.color);
-        storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, camera_2d.projection_matrix);
+        storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene_list.camera_2d.projection_matrix);
 
         const float border_width {text.shadows ? 0.3f : 0.0f};
         const float offset {text.shadows ? -0.003f : 0.0f};
@@ -637,8 +664,8 @@ namespace sm {
             scene_list.point_lights.begin(),
             scene_list.point_lights.end(),
             [this](const PointLight& lhs, const PointLight& rhs) {
-                const float distance_left {glm::distance(lhs.position, camera.position)};
-                const float distance_right {glm::distance(rhs.position, camera.position)};
+                const float distance_left {glm::distance(lhs.position, scene_list.camera.position)};
+                const float distance_right {glm::distance(rhs.position, scene_list.camera.position)};
 
                 return distance_left < distance_right;
             }

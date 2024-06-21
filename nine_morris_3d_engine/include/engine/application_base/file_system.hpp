@@ -17,10 +17,10 @@ namespace sm {
         std::string path_assets() const;
         std::string path_engine_assets() const;
 
-        std::string path_logs(const std::string& file) const;
-        std::string path_saved_data(const std::string& file) const;
-        std::string path_assets(const std::string& file) const;
-        std::string path_engine_assets(const std::string& file) const;
+        std::string path_logs(const std::string& path) const;
+        std::string path_saved_data(const std::string& path) const;
+        std::string path_assets(const std::string& path) const;
+        std::string path_engine_assets(const std::string& path) const;
     private:
         FileSystem(const std::string& application_name, const std::string& assets_directory);
 

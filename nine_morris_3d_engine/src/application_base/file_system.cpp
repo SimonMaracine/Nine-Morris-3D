@@ -135,20 +135,20 @@ namespace sm {
 #endif
     }
 
-    std::string FileSystem::path_logs(const std::string& file) const {
-        return path_logs() + file;
+    std::string FileSystem::path_logs(const std::string& path) const {
+        return path_logs() + path;
     }
 
-    std::string FileSystem::path_saved_data(const std::string& file) const {
-        return path_saved_data() + file;
+    std::string FileSystem::path_saved_data(const std::string& path) const {
+        return path_saved_data() + path;
     }
 
-    std::string FileSystem::path_assets(const std::string& file) const {
-        return path_assets() + file;
+    std::string FileSystem::path_assets(const std::string& path) const {
+        return path_assets() + path;
     }
 
-    std::string FileSystem::path_engine_assets(const std::string& file) const {
-        return path_engine_assets() + file;
+    std::string FileSystem::path_engine_assets(const std::string& path) const {
+        return path_engine_assets() + path;
     }
 
     void FileSystem::check_and_fix_directories() const {

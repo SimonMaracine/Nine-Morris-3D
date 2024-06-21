@@ -231,11 +231,7 @@ void GameScene::on_update() {
 
     ctx->rnd.add_renderable(cube);
 
-    sm::Text fps;
-    fps.font = ctx->res.font["font"_H];
-    fps.text = std::to_string(ctx->fps);
-
-    ctx->rnd.add_text(fps);
+    ctx->rnd.add_info_text(ctx->fps);
 
     // Origin
     ctx->rnd.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
