@@ -50,13 +50,18 @@ namespace sm {
         std::pair<int, int> get_string_size(const std::string& string, float scale) const;
     private:
         struct Glyph {
-            float s0, t0, s1, t1;
+            struct {
+                float s0, t0, s1, t1;
+                // int width, height;
+            } bitmap;
+
             int width, height;
             int xoff, yoff, xadvance;
         };
 
-        void try_bake_character(int codepoint, int descent);
+        void try_bake_character(int codepoint);
         const Glyph& get_character_glyph(char32_t character) const;
+        std::tuple<int, int, int> get_vertical_metrics() const;
         void write_bitmap_to_file(const char* name) const;
 
         struct {
@@ -78,5 +83,6 @@ namespace sm {
         float pixel_dist_scale {};
 
         float sf {};  // Scale factor
+        int baseline {};
     };
 }

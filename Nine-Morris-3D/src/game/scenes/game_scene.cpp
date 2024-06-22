@@ -149,7 +149,7 @@ void GameScene::on_start() {
         sm::FontSpecification specification;
         specification.bitmap_size = 512;
         specification.size_height = 40.0f;
-        specification.padding = 8;
+        specification.padding = 6;
         specification.on_edge_value = 180;
         specification.pixel_dist_scale = 36.0f;
 
@@ -234,7 +234,19 @@ void GameScene::on_update() {
 
     ctx->rnd.add_renderable(cube);
 
-    ctx->rnd.add_info_text(ctx->fps);
+    // ctx->rnd.add_info_text(ctx->fps);
+
+    sm::Text test;
+    test.font = ctx->res.font["font"_H];
+    test.text = "The quick brown fox jumped over the lazy dog.";
+    test.color = glm::vec3(0.9f);
+
+    // ctx->rnd.add_text(test);
+
+    test.position = glm::vec2(200.0f);
+    test.color = glm::vec3(0.8f, 0.7f, 0.1f);
+
+    ctx->rnd.add_text(test);
 
     // Origin
     ctx->rnd.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));

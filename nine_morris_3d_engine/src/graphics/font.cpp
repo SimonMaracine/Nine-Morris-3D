@@ -1,6 +1,7 @@
 #include "engine/graphics/font.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <cstddef>
 #include <cassert>
@@ -23,11 +24,11 @@ namespace sm {
         unsigned char* dest,
         int dest_width,
         int dest_height,
+        int dest_x,
+        int dest_y,
         unsigned char* glyph,
         int width,
         int height,
-        int dest_x,
-        int dest_y,
         float* s0,
         float* t0,
         float* s1,
@@ -62,6 +63,14 @@ namespace sm {
         }
 
         sf = stbtt_ScaleForPixelHeight(font_info, specification.size_height);
+
+        int x0 {};
+        int y0 {};
+        int x1 {};
+        int y1 {};
+        stbtt_GetFontBoundingBox(font_info, &x0, &y0, &x1, &y1);
+
+        baseline = static_cast<float>(-y0) * sf;
 
         LOG_DEBUG("Loaded font");
     }
@@ -103,30 +112,27 @@ namespace sm {
     }
 
     void Font::bake_characters(int begin_codepoint, int end_codepoint) {
-        int descent {};
-        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
+        const auto [ascent, descent, line_gap] {get_vertical_metrics()};  // TODO
 
         for (int codepoint {begin_codepoint}; codepoint <= end_codepoint; codepoint++) {
-            try_bake_character(codepoint, descent);
+            try_bake_character(codepoint);
         }
     }
 
     void Font::bake_characters(const char* string) {
-        int descent {};
-        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
+        const auto [ascent, descent, line_gap] {get_vertical_metrics()};
 
         const std::u32string utf32_string {utf8::utf8to32(std::string(string))};
 
         for (const char32_t character : utf32_string) {
-            try_bake_character(character, descent);
+            try_bake_character(character);
         }
     }
 
     void Font::bake_character(int codepoint) {
-        int descent {};
-        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
+        const auto [ascent, descent, line_gap] {get_vertical_metrics()};
 
-        try_bake_character(codepoint, descent);
+        try_bake_character(codepoint);
     }
 
     void Font::bake_ascii() {
@@ -150,46 +156,46 @@ namespace sm {
             const Glyph& glyph {get_character_glyph(character)};
 
             const float x0 {static_cast<float>(x + glyph.xoff)};
-            const float y0 {-static_cast<float>(glyph.height - glyph.yoff)};
+            const float y0 {static_cast<float>(baseline + glyph.yoff)};
             const float x1 {static_cast<float>(x + glyph.xoff + glyph.width)};
-            const float y1 {static_cast<float>(glyph.yoff)};
+            const float y1 {static_cast<float>(baseline + glyph.yoff + glyph.height)};
 
             static constexpr std::size_t ITEM_SIZE {4};
 
             SM_PUSH_BACK_ITEM(buffer, x0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.s0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.t0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.s0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.t0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             SM_PUSH_BACK_ITEM(buffer, x0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.s0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.t1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.s0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.t1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             SM_PUSH_BACK_ITEM(buffer, x1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.s1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.t0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.s1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.t0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             SM_PUSH_BACK_ITEM(buffer, x1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.s1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.t0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.s1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.t0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             SM_PUSH_BACK_ITEM(buffer, x0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.s0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.t1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.s0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.t1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             SM_PUSH_BACK_ITEM(buffer, x1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.s1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, glyph.t1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.s1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.bitmap.t1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             x += glyph.xadvance;
@@ -216,18 +222,11 @@ namespace sm {
         return std::make_pair(width, height);
     }
 
-    void Font::try_bake_character(int codepoint, int descent) {
+    void Font::try_bake_character(int codepoint) {
         if (glyphs.count(codepoint) > 0) {
             LOG_WARNING("Character with codepoint `{}` is already baked");
             return;
         }
-
-        int advance_width {};
-        int left_side_bearing {};
-        stbtt_GetCodepointHMetrics(font_info, codepoint, &advance_width, &left_side_bearing);
-
-        int y0 {};
-        stbtt_GetCodepointBitmapBox(font_info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
         // Assume 0, because glyph can be null
         int width {0};
@@ -242,7 +241,7 @@ namespace sm {
             static_cast<float>(pixel_dist_scale),
             &width,
             &height,
-            nullptr,  // FIXME
+            nullptr,
             nullptr
         )};
 
@@ -256,13 +255,16 @@ namespace sm {
             bake_context.max_row_height = 0;
         }
 
-        float s0, t0, s1, t1;
+        float s0 {};
+        float t0 {};
+        float s1 {};
+        float t1 {};
         blit_glyph(
             bake_context.bitmap.get(),
             bitmap_size, bitmap_size,
+            bake_context.x, bake_context.y,
             glyph,
             width, height,
-            bake_context.x, bake_context.y,
             &s0, &t0, &s1, &t1
         );
 
@@ -271,15 +273,27 @@ namespace sm {
         bake_context.x += width;
         bake_context.max_row_height = std::max(bake_context.max_row_height, height);
 
+        int advance_width {};
+        int left_side_bearing {};
+        stbtt_GetCodepointHMetrics(font_info, codepoint, &advance_width, &left_side_bearing);
+
+        int x0 {};
+        int y0 {};
+        int x1 {};
+        int y1 {};
+        stbtt_GetCodepointBox(font_info, codepoint, &x0, &y0, &x1, &y1);
+
         Glyph gl;
-        gl.s0 = s0;
-        gl.t0 = t0;
-        gl.s1 = s1;
-        gl.t1 = t1;
-        gl.width = width;
-        gl.height = height;
+        gl.bitmap.s0 = s0;
+        gl.bitmap.t0 = t0;
+        gl.bitmap.s1 = s1;
+        gl.bitmap.t1 = t1;
+        // gl.bitmap.width = width;
+        // gl.bitmap.height = height;
+        gl.width = static_cast<float>(x1 - x0) * sf;
+        gl.height = static_cast<float>(y1 - y0) * sf;
         gl.xoff = static_cast<int>(std::roundf(static_cast<float>(left_side_bearing) * sf));
-        gl.yoff = static_cast<int>(std::roundf(static_cast<float>(-descent) * sf - static_cast<float>(y0)));
+        gl.yoff = static_cast<int>(std::roundf(static_cast<float>(y0) * sf));
         gl.xadvance = static_cast<int>(std::roundf(static_cast<float>(advance_width) * sf));
 
         glyphs[static_cast<char32_t>(codepoint)] = gl;
@@ -291,6 +305,15 @@ namespace sm {
         } else {
             return glyphs.at(ERROR_CHARACTER);
         }
+    }
+
+    std::tuple<int, int, int> Font::get_vertical_metrics() const {
+        int ascent {};
+        int descent {};
+        int line_gap {};
+        stbtt_GetFontVMetrics(font_info, &ascent, &descent, &line_gap);
+
+        return std::make_tuple(ascent, descent, line_gap);
     }
 
     void Font::write_bitmap_to_file(const char* name) const {
