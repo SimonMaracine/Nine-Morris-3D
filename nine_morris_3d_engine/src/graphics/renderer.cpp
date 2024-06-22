@@ -233,7 +233,7 @@ namespace sm {
         text.font = storage.default_font;
         text.text = std::to_string(fps) + " FPS";
         text.position = glm::vec2(1.0f);
-        text.color = glm::vec3(0.75f);
+        text.color = glm::vec3(1.0f);
 
         scene_list.texts.push_back(text);
     }

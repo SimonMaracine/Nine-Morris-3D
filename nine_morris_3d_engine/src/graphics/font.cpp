@@ -29,6 +29,7 @@ namespace sm {
         unsigned char* glyph,
         int width,
         int height,
+        int padding,
         float* s0,
         float* t0,
         float* s1,
@@ -44,10 +45,10 @@ namespace sm {
             }
         }
 
-        *s0 = static_cast<float>(dest_x) / static_cast<float>(dest_width);
-        *t0 = static_cast<float>(dest_y) / static_cast<float>(dest_height);
-        *s1 = static_cast<float>(dest_x + width) / static_cast<float>(dest_width);
-        *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
+        *s0 = static_cast<float>(dest_x + padding) / static_cast<float>(dest_width);
+        *t0 = static_cast<float>(dest_y + padding) / static_cast<float>(dest_height);
+        *s1 = static_cast<float>(dest_x + width - padding) / static_cast<float>(dest_width);
+        *t1 = static_cast<float>(dest_y + height - padding) / static_cast<float>(dest_height);
     }
 
     Font::Font(const std::string& buffer, const FontSpecification& specification)
@@ -70,7 +71,9 @@ namespace sm {
         int y1 {};
         stbtt_GetFontBoundingBox(font_info, &x0, &y0, &x1, &y1);
 
-        baseline = static_cast<float>(-y0) * sf;
+        baseline = static_cast<int>(std::roundf(static_cast<float>(-y0) * sf));
+
+        const auto [ascent, descent, line_gap] {get_vertical_metrics()};  // TODO
 
         LOG_DEBUG("Loaded font");
     }
@@ -112,16 +115,12 @@ namespace sm {
     }
 
     void Font::bake_characters(int begin_codepoint, int end_codepoint) {
-        const auto [ascent, descent, line_gap] {get_vertical_metrics()};  // TODO
-
         for (int codepoint {begin_codepoint}; codepoint <= end_codepoint; codepoint++) {
             try_bake_character(codepoint);
         }
     }
 
     void Font::bake_characters(const char* string) {
-        const auto [ascent, descent, line_gap] {get_vertical_metrics()};
-
         const std::u32string utf32_string {utf8::utf8to32(std::string(string))};
 
         for (const char32_t character : utf32_string) {
@@ -130,8 +129,6 @@ namespace sm {
     }
 
     void Font::bake_character(int codepoint) {
-        const auto [ascent, descent, line_gap] {get_vertical_metrics()};
-
         try_bake_character(codepoint);
     }
 
@@ -265,6 +262,7 @@ namespace sm {
             bake_context.x, bake_context.y,
             glyph,
             width, height,
+            padding,
             &s0, &t0, &s1, &t1
         );
 
@@ -288,10 +286,8 @@ namespace sm {
         gl.bitmap.t0 = t0;
         gl.bitmap.s1 = s1;
         gl.bitmap.t1 = t1;
-        // gl.bitmap.width = width;
-        // gl.bitmap.height = height;
-        gl.width = static_cast<float>(x1 - x0) * sf;
-        gl.height = static_cast<float>(y1 - y0) * sf;
+        gl.width = static_cast<int>(std::roundf(static_cast<float>(x1 - x0) * sf));
+        gl.height = static_cast<int>(std::roundf(static_cast<float>(y1 - y0) * sf));
         gl.xoff = static_cast<int>(std::roundf(static_cast<float>(left_side_bearing) * sf));
         gl.yoff = static_cast<int>(std::roundf(static_cast<float>(y0) * sf));
         gl.xadvance = static_cast<int>(std::roundf(static_cast<float>(advance_width) * sf));

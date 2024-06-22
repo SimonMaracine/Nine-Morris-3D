@@ -52,7 +52,6 @@ namespace sm {
         struct Glyph {
             struct {
                 float s0, t0, s1, t1;
-                // int width, height;
             } bitmap;
 
             int width, height;
