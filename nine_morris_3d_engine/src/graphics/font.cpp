@@ -1,6 +1,8 @@
 #include "engine/graphics/font.hpp"
 
 #include <algorithm>
+#include <cstring>
+#include <cstddef>
 #include <cassert>
 
 #include <stb_truetype.h>
@@ -47,41 +49,27 @@ namespace sm {
         *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
     }
 
-    Font::Font(
-        const std::string& buffer,
-        float size,
-        int padding,
-        unsigned char on_edge_value,
-        int pixel_dist_scale,
-        int bitmap_size
-    )
-        : bitmap_size(bitmap_size), padding(padding), on_edge_value(on_edge_value), pixel_dist_scale(pixel_dist_scale) {
-        font_info = std::make_unique<stbtt_fontinfo>();
+    Font::Font(const std::string& buffer, const FontSpecification& specification)
+        : bitmap_size(specification.bitmap_size), padding(specification.padding),
+        on_edge_value(specification.on_edge_value), pixel_dist_scale(specification.pixel_dist_scale) {
+        assert(bitmap_size % 4 == 0);  // Needs 4 byte alignment
 
-        if (!stbtt_InitFont(font_info.get(), reinterpret_cast<const unsigned char*>(buffer.data()), 0)) {
+        font_buffer = buffer;
+        font_info = new stbtt_fontinfo;
+
+        if (!stbtt_InitFont(font_info, reinterpret_cast<const unsigned char*>(font_buffer.data()), 0)) {
             SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load font");
         }
 
-        sf = stbtt_ScaleForPixelHeight(font_info.get(), size);
-
-        initialize();
+        sf = stbtt_ScaleForPixelHeight(font_info, specification.size_height);
 
         LOG_DEBUG("Loaded font");
     }
 
-    Font::~Font() {}  // Make unique_ptr happy
+    Font::~Font() {
+        delete font_info;
 
-    void Font::update_data(const float* data, std::size_t size) {  // TODO remove this
-        auto vertex_buffer {wvertex_buffer.lock()};  // Should be valid
-        vertex_buffer->bind();
-        vertex_buffer->upload_data(data, size);
-        GlVertexBuffer::unbind();
-
-        static constexpr std::size_t FLOATS_PER_VERTEX {4};
-
-        assert(size % (sizeof(float) * FLOATS_PER_VERTEX) == 0);
-
-        vertex_count = static_cast<int>(size / (sizeof(float) * FLOATS_PER_VERTEX));  // FIXME
+        LOG_DEBUG("Freed font");
     }
 
     void Font::begin_baking() {
@@ -91,10 +79,8 @@ namespace sm {
         bitmap_image.reset();
         glyphs.clear();
 
-        const std::size_t SIZE {sizeof(unsigned char) * bitmap_size * bitmap_size};
-
         bake_context = {};
-        bake_context.bitmap = std::make_unique<unsigned char[]>(SIZE);
+        bake_context.bitmap = std::make_unique<unsigned char[]>(bitmap_size * bitmap_size);
 
         // This character should always be present
         bake_character(ERROR_CHARACTER);
@@ -118,7 +104,7 @@ namespace sm {
 
     void Font::bake_characters(int begin_codepoint, int end_codepoint) {
         int descent {};
-        stbtt_GetFontVMetrics(font_info.get(), nullptr, &descent, nullptr);
+        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
 
         for (int codepoint {begin_codepoint}; codepoint <= end_codepoint; codepoint++) {
             try_bake_character(codepoint, descent);
@@ -127,7 +113,7 @@ namespace sm {
 
     void Font::bake_characters(const char* string) {
         int descent {};
-        stbtt_GetFontVMetrics(font_info.get(), nullptr, &descent, nullptr);
+        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
 
         const std::u32string utf32_string {utf8::utf8to32(std::string(string))};
 
@@ -138,7 +124,7 @@ namespace sm {
 
     void Font::bake_character(int codepoint) {
         int descent {};
-        stbtt_GetFontVMetrics(font_info.get(), nullptr, &descent, nullptr);
+        stbtt_GetFontVMetrics(font_info, nullptr, &descent, nullptr);
 
         try_bake_character(codepoint, descent);
     }
@@ -147,10 +133,18 @@ namespace sm {
         bake_characters(32, 126);
     }
 
-    void Font::render(const std::string& string, std::vector<float>& buffer) const {
+#define SM_PUSH_BACK_ITEM(buffer, item_data, item_size) \
+    static_assert(sizeof(item_data) == item_size); \
+    buffer.emplace_back(); \
+    buffer.emplace_back(); \
+    buffer.emplace_back(); \
+    buffer.emplace_back(); \
+    std::memcpy(buffer.data() + buffer.size() - item_size, &item_data, item_size)
+
+    void Font::render(const std::string& string, int index, std::vector<unsigned char>& buffer) const {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
-        int x {0};
+        int x {0};  // TODO C++20
 
         for (const char32_t character : utf32_string) {
             const Glyph& glyph {get_character_glyph(character)};
@@ -160,35 +154,43 @@ namespace sm {
             const float x1 {static_cast<float>(x + glyph.xoff + glyph.width)};
             const float y1 {static_cast<float>(glyph.yoff)};
 
-            buffer.push_back(x0);
-            buffer.push_back(y1);
-            buffer.push_back(glyph.s0);
-            buffer.push_back(glyph.t0);
+            static constexpr std::size_t ITEM_SIZE {4};
 
-            buffer.push_back(x0);
-            buffer.push_back(y0);
-            buffer.push_back(glyph.s0);
-            buffer.push_back(glyph.t1);
+            SM_PUSH_BACK_ITEM(buffer, x0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.s0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.t0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
-            buffer.push_back(x1);
-            buffer.push_back(y1);
-            buffer.push_back(glyph.s1);
-            buffer.push_back(glyph.t0);
+            SM_PUSH_BACK_ITEM(buffer, x0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.s0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.t1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
-            buffer.push_back(x1);
-            buffer.push_back(y1);
-            buffer.push_back(glyph.s1);
-            buffer.push_back(glyph.t0);
+            SM_PUSH_BACK_ITEM(buffer, x1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.s1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.t0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
-            buffer.push_back(x0);
-            buffer.push_back(y0);
-            buffer.push_back(glyph.s0);
-            buffer.push_back(glyph.t1);
+            SM_PUSH_BACK_ITEM(buffer, x1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.s1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.t0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
-            buffer.push_back(x1);
-            buffer.push_back(y0);
-            buffer.push_back(glyph.s1);
-            buffer.push_back(glyph.t1);
+            SM_PUSH_BACK_ITEM(buffer, x0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.s0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.t1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
+
+            SM_PUSH_BACK_ITEM(buffer, x1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.s1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, glyph.t1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             x += glyph.xadvance;
         }
@@ -208,24 +210,10 @@ namespace sm {
             height = std::max(height, static_cast<int>(std::roundf(static_cast<float>(glyph.yoff) * scale)));
         }
 
-        const int width {static_cast<int>(std::roundf((static_cast<float>(x + padding * 2) * scale)))};  // Take padding into consideration
+        // Take padding into consideration
+        const int width {static_cast<int>(std::roundf((static_cast<float>(x + padding * 2) * scale)))};
 
         return std::make_pair(width, height);
-    }
-
-    void Font::initialize() {
-        auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
-
-        vertex_array = std::make_unique<GlVertexArray>();  // FIXME this doesn't belong here
-        vertex_array->configure([&](GlVertexArray* va) {
-            VertexBufferLayout layout;
-            layout.add(0, VertexBufferLayout::Float, 2);
-            layout.add(1, VertexBufferLayout::Float, 2);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-        });
-
-        wvertex_buffer = vertex_buffer;
     }
 
     void Font::try_bake_character(int codepoint, int descent) {
@@ -236,17 +224,17 @@ namespace sm {
 
         int advance_width {};
         int left_side_bearing {};
-        stbtt_GetCodepointHMetrics(font_info.get(), codepoint, &advance_width, &left_side_bearing);
+        stbtt_GetCodepointHMetrics(font_info, codepoint, &advance_width, &left_side_bearing);
 
         int y0 {};
-        stbtt_GetCodepointBitmapBox(font_info.get(), codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
+        stbtt_GetCodepointBitmapBox(font_info, codepoint, sf, sf, nullptr, &y0, nullptr, nullptr);
 
         // Assume 0, because glyph can be null
         int width {0};
         int height {0};
 
         unsigned char* glyph {stbtt_GetCodepointSDF(
-            font_info.get(),
+            font_info,
             sf,
             codepoint,
             padding,
@@ -254,7 +242,7 @@ namespace sm {
             static_cast<float>(pixel_dist_scale),
             &width,
             &height,
-            nullptr,
+            nullptr,  // FIXME
             nullptr
         )};
 

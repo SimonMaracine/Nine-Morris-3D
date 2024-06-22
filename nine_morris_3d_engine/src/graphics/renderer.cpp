@@ -150,13 +150,25 @@ namespace sm {
         }
 
         {
+            auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
+
+            storage.text_vertex_array = std::make_unique<GlVertexArray>();
+            storage.text_vertex_array->configure([&](GlVertexArray* va) {
+                VertexBufferLayout layout;
+                layout.add(0, VertexBufferLayout::Float, 2);
+                layout.add(1, VertexBufferLayout::Float, 2);
+                layout.add(2, VertexBufferLayout::Int, 1);
+
+                va->add_vertex_buffer(vertex_buffer, layout);
+            });
+
+            storage.wtext_vertex_buffer = vertex_buffer;
+        }
+
+        {
             storage.default_font = std::make_unique<Font>(
                 utils::read_file(fs.path_engine_assets("fonts/CodeNewRoman/code-new-roman.regular.ttf")),
-                16.0f,
-                4,  // FIXME bitmap doesn't take padding into consideration
-                180,
-                40,
-                256
+                FontSpecification()  // FIXME bitmap doesn't take padding into consideration
             );
 
             storage.default_font->begin_baking();
@@ -321,14 +333,14 @@ namespace sm {
         // TODO pre-render setup
 
         {
-            auto uniform_buffer {storage.projection_view_uniform_buffer.lock()};
+            auto uniform_buffer {storage.wprojection_view_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&scene_list.camera.projection_view_matrix, "u_projection_view_matrix"_H);
             }
         }
         {
-            auto uniform_buffer {storage.directional_light_uniform_buffer.lock()};
+            auto uniform_buffer {storage.wdirectional_light_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&scene_list.directional_light.direction, "u_directional_light.direction"_H);
@@ -338,21 +350,21 @@ namespace sm {
             }
         }
         {
-            auto uniform_buffer {storage.view_position_uniform_buffer.lock()};
+            auto uniform_buffer {storage.wview_position_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&scene_list.camera.position, "u_view_position"_H);
             }
         }
         {
-            auto uniform_buffer {storage.point_light_uniform_buffer.lock()};
+            auto uniform_buffer {storage.wpoint_light_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 setup_point_light_uniform_buffer(uniform_buffer);
             }
         }
         {
-            auto uniform_buffer {storage.light_space_uniform_buffer.lock()};
+            auto uniform_buffer {storage.wlight_space_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 setup_light_space_uniform_buffer(uniform_buffer);
@@ -452,19 +464,19 @@ namespace sm {
 
                 switch (block.binding_index) {
                     case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
-                        storage.projection_view_uniform_buffer = uniform_buffer;
+                        storage.wprojection_view_uniform_buffer = uniform_buffer;
                         break;
                     case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
-                        storage.directional_light_uniform_buffer = uniform_buffer;
+                        storage.wdirectional_light_uniform_buffer = uniform_buffer;
                         break;
                     case VIEW_POSITION_BLOCK_BINDING:
-                        storage.view_position_uniform_buffer = uniform_buffer;
+                        storage.wview_position_uniform_buffer = uniform_buffer;
                         break;
                     case POINT_LIGHT_BLOCK_BINDING:
-                        storage.point_light_uniform_buffer = uniform_buffer;
+                        storage.wpoint_light_uniform_buffer = uniform_buffer;
                         break;
                     case LIGHT_SPACE_BLOCK_BINDING:
-                        storage.light_space_uniform_buffer = uniform_buffer;
+                        storage.wlight_space_uniform_buffer = uniform_buffer;
                         break;
                     default:
                         break;
@@ -482,7 +494,9 @@ namespace sm {
         scene_list.directional_light = {};
         scene_list.point_lights.clear();
         scene_list.texts.clear();
-        scene_list.texts_buffer.clear();
+
+        storage.text_batches.clear();
+        storage.texts_buffer.clear();
     }
 
     void Renderer::resize_framebuffers(int width, int height) {
@@ -622,8 +636,32 @@ namespace sm {
 
         OpenGl::disable_depth_test();
 
+        std::stable_sort(scene_list.texts.begin(), scene_list.texts.end(), [](const Text& lhs, const Text& rhs) {
+            return lhs.font.lock().get() < rhs.font.lock().get();
+        });
+
+        const void* font_ptr {nullptr};  // TODO C++20
+
         for (const auto& text : scene_list.texts) {
-            draw_text(text);
+            const void* this_ptr {text.font.lock().get()};
+
+            assert(this_ptr != nullptr);
+
+            if (this_ptr != font_ptr) {
+                font_ptr = this_ptr;
+
+                storage.text_batches.emplace_back().font = text.font;
+            }
+
+            if (storage.text_batches.back().objects.size() > 10) {
+                storage.text_batches.emplace_back().font = text.font;
+            }
+
+            storage.text_batches.back().objects.push_back(text);
+        }
+
+        for (const auto& batch : storage.text_batches) {
+            draw_text_batch(batch);
         }
 
         OpenGl::enable_depth_test();
@@ -631,31 +669,54 @@ namespace sm {
         GlVertexArray::unbind();
     }
 
-    void Renderer::draw_text(const Text& text) {
-        auto font {text.font.lock()};
+    void Renderer::draw_text_batch(const TextBatch& batch) {
+        auto font {batch.font.lock()};
 
-        font->render(text.text, scene_list.texts_buffer);
-        font->update_data(scene_list.texts_buffer.data(), sizeof(float) * scene_list.texts_buffer.size());
+        std::size_t i {};  // TODO C++20
 
-        glm::mat4 matrix {1.0f};
-        matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
-        matrix = glm::scale(matrix, glm::vec3(text.scale, text.scale, 1.0f));
+        for (const Text& text : batch.objects) {
+            assert(i < 10);
 
-        storage.text_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
-        storage.text_shader->upload_uniform_vec3("u_color"_H, text.color);
+            // Pushes the rendered text onto the buffer
+            font->render(text.text, static_cast<int>(i), storage.texts_buffer);
+
+            glm::mat4 matrix {1.0f};
+            matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
+            matrix = glm::scale(matrix, glm::vec3(text.scale, text.scale, 1.0f));
+
+            const std::string index {std::to_string(i)};
+
+            storage.text_shader->upload_uniform_mat4(resmanager::HashedStr64("u_model_matrix[" + index + ']'), matrix);
+            storage.text_shader->upload_uniform_vec3(resmanager::HashedStr64("u_color[" + index + ']'), text.color);
+
+            const float border_width {text.shadows ? 0.3f : 0.0f};
+            const float offset {text.shadows ? -0.003f : 0.0f};
+
+            storage.text_shader->upload_uniform_float(resmanager::HashedStr64("u_border_width[" + index + ']'), border_width);
+            storage.text_shader->upload_uniform_vec2(resmanager::HashedStr64("u_offset[" + index + ']'), glm::vec2(offset, offset));
+
+            i++;
+        }
+
         storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene_list.camera_2d.projection_matrix);
 
-        const float border_width {text.shadows ? 0.3f : 0.0f};
-        const float offset {text.shadows ? -0.003f : 0.0f};
+        auto vertex_buffer {storage.wtext_vertex_buffer.lock()};
+        vertex_buffer->bind();
+        vertex_buffer->upload_data(storage.texts_buffer.data(), storage.texts_buffer.size());
+        GlVertexBuffer::unbind();
 
-        storage.text_shader->upload_uniform_float("u_border_width"_H, border_width);
-        storage.text_shader->upload_uniform_vec2("u_offset"_H, glm::vec2(offset, offset));
+        static constexpr std::size_t ITEMS_PER_VERTEX {5};
+        static constexpr std::size_t ITEM_SIZE {4};
 
-        font->get_vertex_array()->bind();
+        assert(storage.texts_buffer.size() % (ITEM_SIZE * ITEMS_PER_VERTEX) == 0);
+
+        const int vertex_count {static_cast<int>(storage.texts_buffer.size() / (ITEM_SIZE * ITEMS_PER_VERTEX))};
+
+        storage.text_vertex_array->bind();
 
         OpenGl::bind_texture_2d(font->get_bitmap()->get_id(), 0);
 
-        OpenGl::draw_arrays(font->get_vertex_count());
+        OpenGl::draw_arrays(vertex_count);
     }
 
     void Renderer::setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer) {
@@ -757,23 +818,23 @@ namespace sm {
             v1.position = line.position1;
             v1.color = line.color;
 
-            debug_scene_list.lines_buffer.push_back(v1);
+            debug_storage.lines_buffer.push_back(v1);
 
             BufferVertex v2;
             v2.position = line.position2;
             v2.color = line.color;
 
-            debug_scene_list.lines_buffer.push_back(v2);
+            debug_storage.lines_buffer.push_back(v2);
         }
 
-        if (debug_scene_list.lines_buffer.empty()) {
+        if (debug_storage.lines_buffer.empty()) {
             return;
         }
 
         auto vertex_buffer {debug_storage.wvertex_buffer.lock()};
 
         vertex_buffer->bind();
-        vertex_buffer->upload_data(debug_scene_list.lines_buffer.data(), debug_scene_list.lines_buffer.size() * sizeof(BufferVertex));
+        vertex_buffer->upload_data(debug_storage.lines_buffer.data(), debug_storage.lines_buffer.size() * sizeof(BufferVertex));
         GlVertexBuffer::unbind();
 
         debug_storage.shader->bind();
@@ -786,6 +847,6 @@ namespace sm {
 
     void Renderer::debug_clear() {
         debug_scene_list.lines.clear();
-        debug_scene_list.lines_buffer.clear();
+        debug_storage.lines_buffer.clear();
     }
 }

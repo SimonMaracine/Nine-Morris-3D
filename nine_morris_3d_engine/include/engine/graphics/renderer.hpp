@@ -78,8 +78,13 @@ namespace sm {
         void draw_renderables_to_depth_buffer();
         void draw_skybox();
 
+        struct TextBatch {
+            std::weak_ptr<Font> font;
+            std::vector<Text> objects;
+        };
+
         void draw_texts();
-        void draw_text(const Text& text);
+        void draw_text_batch(const TextBatch& batch);
 
         // Helper functions
         void setup_point_light_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
@@ -98,17 +103,23 @@ namespace sm {
 
             std::unique_ptr<GlVertexArray> screen_quad_vertex_array;
             std::unique_ptr<GlVertexArray> skybox_vertex_array;
+            std::unique_ptr<GlVertexArray> text_vertex_array;
 
             std::shared_ptr<Font> default_font;
 
             std::shared_ptr<GlTextureCubemap> skybox_texture;
 
+            std::weak_ptr<GlVertexBuffer> wtext_vertex_buffer;
+
             std::unordered_map<unsigned int, std::weak_ptr<GlUniformBuffer>> uniform_buffers;
-            std::weak_ptr<GlUniformBuffer> projection_view_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> directional_light_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> view_position_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> point_light_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> light_space_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> wprojection_view_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> wdirectional_light_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> wview_position_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> wpoint_light_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> wlight_space_uniform_buffer;
+
+            std::vector<TextBatch> text_batches;
+            std::vector<unsigned char> texts_buffer;
         } storage;
 
         PostProcessingContext post_processing_context;  // TODO implement
@@ -118,7 +129,6 @@ namespace sm {
             DirectionalLight directional_light;
             std::vector<PointLight> point_lights;
             std::vector<Text> texts;
-            std::vector<float> texts_buffer;
 
             struct {
                 glm::mat4 view_matrix {1.0f};
@@ -153,10 +163,17 @@ namespace sm {
         void debug_render();
         void debug_clear();
 
+        struct BufferVertex {
+            glm::vec3 position;
+            glm::vec3 color;
+        };
+
         struct {
             std::shared_ptr<GlShader> shader;
             std::weak_ptr<GlVertexBuffer> wvertex_buffer;
             std::unique_ptr<GlVertexArray> vertex_array;
+
+            std::vector<BufferVertex> lines_buffer;
         } debug_storage;
 
         struct Line {
@@ -165,14 +182,8 @@ namespace sm {
             glm::vec3 color;
         };
 
-        struct BufferVertex {
-            glm::vec3 position;
-            glm::vec3 color;
-        };
-
         struct {
             std::vector<Line> lines;
-            std::vector<BufferVertex> lines_buffer;
         } debug_scene_list;
 
         friend class Application;

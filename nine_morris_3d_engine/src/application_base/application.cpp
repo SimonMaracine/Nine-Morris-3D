@@ -30,7 +30,7 @@ namespace sm {
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
 #ifndef SM_BUILD_DISTRIBUTION
-        LOG_DIST_INFO("{}", get_information());
+        LOG_INFO("{}", get_information());
 #endif
 
         ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);

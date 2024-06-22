@@ -4,7 +4,6 @@
 #include <vector>
 #include <utility>
 #include <string>
-#include <cstddef>
 #include <unordered_map>
 
 #include "engine/graphics/opengl/vertex_array.hpp"
@@ -15,17 +14,17 @@ struct stbtt_fontinfo;
 namespace sm {
     class GlVertexBuffer;
 
+    struct FontSpecification {
+        float size_height {16.0f};
+        int bitmap_size {256};
+        int padding {4};  // Between glyphs
+        unsigned char on_edge_value {180};
+        float pixel_dist_scale {45.0f};
+    };
+
     class Font {
     public:
-        Font(
-            const std::string& buffer,
-            float size,
-            int padding,
-            unsigned char on_edge_value,
-            int pixel_dist_scale,
-            int bitmap_size
-        );
-
+        Font(const std::string& buffer, const FontSpecification& specification);
         ~Font();
 
         Font(const Font&) = delete;
@@ -33,13 +32,8 @@ namespace sm {
         Font(Font&&) = delete;
         Font& operator=(Font&&) = delete;
 
-        void update_data(const float* data, std::size_t size);
-
         int get_bitmap_size() const { return bitmap_size; }
-
-        const GlVertexArray* get_vertex_array() const { return vertex_array.get(); }  // TODO remove
         const GlTexture* get_bitmap() const { return bitmap_image.get(); }
-        int get_vertex_count() const { return vertex_count; }  // TODO remove
 
         // Baking API
         void begin_baking();
@@ -50,7 +44,7 @@ namespace sm {
         void bake_ascii();
 
         // Get the buffer of data used in the end by OpenGL
-        void render(const std::string& string, std::vector<float>& buffer) const;
+        void render(const std::string& string, int index, std::vector<unsigned char>& buffer) const;
 
         // Get the width and height of a piece of text
         std::pair<int, int> get_string_size(const std::string& string, float scale) const;
@@ -61,7 +55,6 @@ namespace sm {
             int xoff, yoff, xadvance;
         };
 
-        void initialize();
         void try_bake_character(int codepoint, int descent);
         const Glyph& get_character_glyph(char32_t character) const;
         void write_bitmap_to_file(const char* name) const;
@@ -73,21 +66,17 @@ namespace sm {
             std::unique_ptr<unsigned char[]> bitmap;
         } bake_context;
 
+        std::unique_ptr<GlTexture> bitmap_image;
         std::unordered_map<char32_t, Glyph> glyphs;
 
-        std::unique_ptr<stbtt_fontinfo> font_info;
+        std::string font_buffer;
+        stbtt_fontinfo* font_info {nullptr};
+
         int bitmap_size {};
-        int padding {};  // Between glyphs
+        int padding {};
         unsigned char on_edge_value {};
-        int pixel_dist_scale {};
+        float pixel_dist_scale {};
+
         float sf {};  // Scale factor
-
-        int vertex_count {};
-
-        // Fonts own vertex arrays and bitmap textures
-        std::unique_ptr<GlVertexArray> vertex_array;
-        std::unique_ptr<GlTexture> bitmap_image;
-
-        std::weak_ptr<GlVertexBuffer> wvertex_buffer;
     };
 }

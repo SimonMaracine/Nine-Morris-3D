@@ -146,14 +146,17 @@ void GameScene::on_start() {
     }
 
     {
+        sm::FontSpecification specification;
+        specification.bitmap_size = 512;
+        specification.size_height = 40.0f;
+        specification.padding = 8;
+        specification.on_edge_value = 180;
+        specification.pixel_dist_scale = 36.0f;
+
         auto font {ctx->res.font.load(
             "font"_H,
             sm::utils::read_file(ctx->fs.path_assets("fonts/OpenSans/OpenSans-Regular.ttf")),
-            40.0f,
-            8,
-            180,
-            40,
-            512
+            specification
         )};
 
         font->begin_baking();
