@@ -13,9 +13,10 @@ namespace sm {
     // Right now every renderable is analogous to a mesh, to a render call
     struct Renderable {
         struct Transform {
-            glm::vec3 position {};
-            glm::vec3 rotation {};
-            float scale {1.0f};
+            // Don't default initialize
+            glm::vec3 position;
+            glm::vec3 rotation;
+            float scale;
         };
 
         void position(const glm::vec3& position) {

@@ -54,8 +54,8 @@ namespace sm {
                 float s0, t0, s1, t1;
             } bitmap;
 
-            int width, height;
-            int xoff, yoff, xadvance;
+            float width, height;
+            float xoff, yoff, xadvance;
         };
 
         void try_bake_character(int codepoint);
@@ -82,6 +82,6 @@ namespace sm {
         float pixel_dist_scale {};
 
         float sf {};  // Scale factor
-        int baseline {};
+        float baseline {};
     };
 }

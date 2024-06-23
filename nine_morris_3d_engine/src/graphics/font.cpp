@@ -45,10 +45,15 @@ namespace sm {
             }
         }
 
-        *s0 = static_cast<float>(dest_x + padding) / static_cast<float>(dest_width);
-        *t0 = static_cast<float>(dest_y + padding) / static_cast<float>(dest_height);
-        *s1 = static_cast<float>(dest_x + width - padding) / static_cast<float>(dest_width);
-        *t1 = static_cast<float>(dest_y + height - padding) / static_cast<float>(dest_height);
+        // *s0 = static_cast<float>(dest_x + padding) / static_cast<float>(dest_width);
+        // *t0 = static_cast<float>(dest_y + padding) / static_cast<float>(dest_height);
+        // *s1 = static_cast<float>(dest_x + width - padding) / static_cast<float>(dest_width);
+        // *t1 = static_cast<float>(dest_y + height - padding) / static_cast<float>(dest_height);
+
+        *s0 = static_cast<float>(dest_x) / static_cast<float>(dest_width);
+        *t0 = static_cast<float>(dest_y) / static_cast<float>(dest_height);
+        *s1 = static_cast<float>(dest_x + width) / static_cast<float>(dest_width);
+        *t1 = static_cast<float>(dest_y + height) / static_cast<float>(dest_height);
     }
 
     Font::Font(const std::string& buffer, const FontSpecification& specification)
@@ -71,7 +76,7 @@ namespace sm {
         int y1 {};
         stbtt_GetFontBoundingBox(font_info, &x0, &y0, &x1, &y1);
 
-        baseline = static_cast<int>(std::roundf(static_cast<float>(-y0) * sf));
+        baseline = static_cast<float>(-y0) * sf;
 
         const auto [ascent, descent, line_gap] {get_vertical_metrics()};  // TODO
 
@@ -147,15 +152,15 @@ namespace sm {
     void Font::render(const std::string& string, int index, std::vector<unsigned char>& buffer) const {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
-        int x {0};  // TODO C++20
+        float x {0.0f};  // TODO C++20
 
         for (const char32_t character : utf32_string) {
             const Glyph& glyph {get_character_glyph(character)};
 
-            const float x0 {static_cast<float>(x + glyph.xoff)};
-            const float y0 {static_cast<float>(baseline + glyph.yoff)};
-            const float x1 {static_cast<float>(x + glyph.xoff + glyph.width)};
-            const float y1 {static_cast<float>(baseline + glyph.yoff + glyph.height)};
+            const float x0 {x + glyph.xoff};
+            const float y0 {baseline + glyph.yoff};
+            const float x1 {x + glyph.xoff + glyph.width};
+            const float y1 {baseline + glyph.yoff + glyph.height};
 
             static constexpr std::size_t ITEM_SIZE {4};
 
@@ -235,7 +240,7 @@ namespace sm {
             codepoint,
             padding,
             on_edge_value,
-            static_cast<float>(pixel_dist_scale),
+            pixel_dist_scale,
             &width,
             &height,
             nullptr,
@@ -286,11 +291,11 @@ namespace sm {
         gl.bitmap.t0 = t0;
         gl.bitmap.s1 = s1;
         gl.bitmap.t1 = t1;
-        gl.width = static_cast<int>(std::roundf(static_cast<float>(x1 - x0) * sf));
-        gl.height = static_cast<int>(std::roundf(static_cast<float>(y1 - y0) * sf));
-        gl.xoff = static_cast<int>(std::roundf(static_cast<float>(left_side_bearing) * sf));
-        gl.yoff = static_cast<int>(std::roundf(static_cast<float>(y0) * sf));
-        gl.xadvance = static_cast<int>(std::roundf(static_cast<float>(advance_width) * sf));
+        gl.width = static_cast<float>(x1 - x0) * sf;
+        gl.height = static_cast<float>(y1 - y0) * sf;
+        gl.xoff = static_cast<float>(left_side_bearing) * sf;
+        gl.yoff = static_cast<float>(y0) * sf;
+        gl.xadvance = static_cast<float>(advance_width) * sf;
 
         glyphs[static_cast<char32_t>(codepoint)] = gl;
     }
