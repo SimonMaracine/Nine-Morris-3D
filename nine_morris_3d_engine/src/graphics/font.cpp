@@ -33,7 +33,7 @@ namespace sm {
         int y1 {};
         stbtt_GetFontBoundingBox(font_info, &x0, &y0, &x1, &y1);
 
-        baseline = static_cast<float>(-y0) * sf;
+        baseline = static_cast<float>(y0) * sf;
 
         const auto [ascent, descent, line_gap] {get_vertical_metrics()};  // TODO
 
@@ -131,40 +131,43 @@ namespace sm {
 
             static constexpr std::size_t ITEM_SIZE {4};
 
+            const float y0 {-quad.y0};
+            const float y1 {-quad.y1};
+
             SM_PUSH_BACK_ITEM(buffer, quad.x0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.y1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, quad.s0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, quad.t0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             SM_PUSH_BACK_ITEM(buffer, quad.x0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.y0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, quad.s0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, quad.t1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             SM_PUSH_BACK_ITEM(buffer, quad.x1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.y1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, quad.s1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.t0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, quad.t1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             SM_PUSH_BACK_ITEM(buffer, quad.x1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.y1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, quad.s1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, quad.t1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
+
+            SM_PUSH_BACK_ITEM(buffer, quad.x1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, quad.s1, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, quad.t0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
 
             SM_PUSH_BACK_ITEM(buffer, quad.x0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.y0, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, quad.s0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.t1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
-
-            SM_PUSH_BACK_ITEM(buffer, quad.x1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.y0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.s1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.t1, ITEM_SIZE);
+            SM_PUSH_BACK_ITEM(buffer, quad.t0, ITEM_SIZE);
             SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
         }
     }

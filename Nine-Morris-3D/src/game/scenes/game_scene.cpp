@@ -231,7 +231,7 @@ void GameScene::on_update() {
 
     ctx->rnd.add_renderable(cube);
 
-    // ctx->rnd.add_info_text(ctx->fps);
+    ctx->rnd.add_info_text(ctx->fps);
 
     sm::Text test;
     test.font = ctx->res.font["font"_H];
