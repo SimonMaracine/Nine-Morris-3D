@@ -20,5 +20,7 @@ struct GameScene : public sm::Scene {
     sm::DirectionalLight directional_light;
     sm::PointLight point_light;
 
+    glm::vec2 pos {};
+
     sm::Renderable teapot;
 };

@@ -168,7 +168,7 @@ namespace sm {
         {
             storage.default_font = std::make_unique<Font>(
                 utils::read_file(fs.path_engine_assets("fonts/CodeNewRoman/code-new-roman.regular.ttf")),
-                FontSpecification()  // FIXME bitmap doesn't take padding into consideration
+                FontSpecification()
             );
 
             storage.default_font->begin_baking();
@@ -686,12 +686,6 @@ namespace sm {
 
             storage.text_shader->upload_uniform_mat4(resmanager::HashedStr64("u_model_matrix[" + index + ']'), matrix);
             storage.text_shader->upload_uniform_vec3(resmanager::HashedStr64("u_color[" + index + ']'), text.color);
-
-            // const float border_width {text.shadows ? 0.3f : 0.0f};
-            // const float offset {text.shadows ? -0.003f : 0.0f};
-
-            // storage.text_shader->upload_uniform_float(resmanager::HashedStr64("u_border_width[" + index + ']'), border_width);
-            // storage.text_shader->upload_uniform_vec2(resmanager::HashedStr64("u_offset[" + index + ']'), glm::vec2(offset, offset));
 
             i++;
         }

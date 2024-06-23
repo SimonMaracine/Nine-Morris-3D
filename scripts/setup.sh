@@ -2,7 +2,7 @@
 
 build_type="Debug"
 distribution_mode="OFF"
-asan="ON"
+asan="OFF"
 
 case "$1" in
     "rel")

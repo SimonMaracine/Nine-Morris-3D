@@ -149,9 +149,6 @@ void GameScene::on_start() {
         sm::FontSpecification specification;
         specification.bitmap_size = 512;
         specification.size_height = 40.0f;
-        specification.padding = 6;
-        specification.on_edge_value = 180;
-        specification.pixel_dist_scale = 36.0f;
 
         auto font {ctx->res.font.load(
             "font"_H,
@@ -241,12 +238,12 @@ void GameScene::on_update() {
     test.text = "The quick brown fox jumps over the lazy dog.";
     test.color = glm::vec3(0.9f);
 
-    ctx->rnd.add_text(test);
+    // ctx->rnd.add_text(test);
 
-    test.position = glm::vec2(200.0f);
+    test.position = glm::vec2(200.0f) + pos;
     test.color = glm::vec3(0.8f, 0.7f, 0.1f);
 
-    // ctx->rnd.add_text(test);
+    ctx->rnd.add_text(test);
 
     // Origin
     ctx->rnd.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -289,10 +286,9 @@ void GameScene::on_imgui_update() {
     ImGui::SliderFloat("Falloff Q.", &point_light.falloff_quadratic, 0.00001f, 1.0f);
     ImGui::End();
 
-    // ImGui::Begin("Transform");
-    // ImGui::SliderFloat3("Position", glm::value_ptr(teapot.position), -30.0f, 30.0f);
-    // ImGui::SliderFloat3("Rotation", glm::value_ptr(teapot.rotation), 0.0f, glm::two_pi<float>());
-    // ImGui::End();
+    ImGui::Begin("Transform");
+    ImGui::SliderFloat2("Position", glm::value_ptr(pos), -500.0f, 500.0f);
+    ImGui::End();
 }
 
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
