@@ -29,7 +29,6 @@ namespace sm {
         unsigned char* glyph,
         int width,
         int height,
-        int padding,
         float* s0,
         float* t0,
         float* s1,
@@ -45,11 +44,6 @@ namespace sm {
             }
         }
 
-        // *s0 = static_cast<float>(dest_x + padding) / static_cast<float>(dest_width);
-        // *t0 = static_cast<float>(dest_y + padding) / static_cast<float>(dest_height);
-        // *s1 = static_cast<float>(dest_x + width - padding) / static_cast<float>(dest_width);
-        // *t1 = static_cast<float>(dest_y + height - padding) / static_cast<float>(dest_height);
-
         *s0 = static_cast<float>(dest_x) / static_cast<float>(dest_width);
         *t0 = static_cast<float>(dest_y) / static_cast<float>(dest_height);
         *s1 = static_cast<float>(dest_x + width) / static_cast<float>(dest_width);
@@ -57,8 +51,8 @@ namespace sm {
     }
 
     Font::Font(const std::string& buffer, const FontSpecification& specification)
-        : bitmap_size(specification.bitmap_size), padding(specification.padding),
-        on_edge_value(specification.on_edge_value), pixel_dist_scale(specification.pixel_dist_scale) {
+        : bitmap_size(specification.bitmap_size)/*, padding(specification.padding),
+        on_edge_value(specification.on_edge_value), pixel_dist_scale(specification.pixel_dist_scale)*/ {
         assert(bitmap_size % 4 == 0);  // Needs 4 byte alignment
 
         font_buffer = buffer;
@@ -218,11 +212,86 @@ namespace sm {
             height = std::max(height, static_cast<int>(std::roundf(static_cast<float>(glyph.yoff) * scale)));
         }
 
-        // Take padding into consideration
-        const int width {static_cast<int>(std::roundf((static_cast<float>(x + padding * 2) * scale)))};
+        const int width {static_cast<int>(std::roundf((static_cast<float>(x) * scale)))};
 
         return std::make_pair(width, height);
     }
+
+    // void Font::try_bake_character(int codepoint) {
+    //     if (glyphs.count(codepoint) > 0) {
+    //         LOG_WARNING("Character with codepoint `{}` is already baked");
+    //         return;
+    //     }
+
+    //     // Assume 0, because glyph can be null
+    //     int width {0};
+    //     int height {0};
+
+    //     unsigned char* glyph {stbtt_GetCodepointSDF(
+    //         font_info,
+    //         sf,
+    //         codepoint,
+    //         padding,
+    //         on_edge_value,
+    //         pixel_dist_scale,
+    //         &width,
+    //         &height,
+    //         nullptr,
+    //         nullptr
+    //     )};
+
+    //     if (glyph == nullptr) {
+    //         LOG_WARNING("Could not bake character with codepoint `{}`; still adding to map...", codepoint);
+    //     }
+
+    //     if (bake_context.x + width > bitmap_size) {
+    //         bake_context.y += bake_context.max_row_height;
+    //         bake_context.x = 0;
+    //         bake_context.max_row_height = 0;
+    //     }
+
+    //     float s0 {};
+    //     float t0 {};
+    //     float s1 {};
+    //     float t1 {};
+    //     blit_glyph(
+    //         bake_context.bitmap.get(),
+    //         bitmap_size, bitmap_size,
+    //         bake_context.x, bake_context.y,
+    //         glyph,
+    //         width, height,
+    //         padding,
+    //         &s0, &t0, &s1, &t1
+    //     );
+
+    //     stbtt_FreeSDF(glyph, nullptr);
+
+    //     bake_context.x += width;
+    //     bake_context.max_row_height = std::max(bake_context.max_row_height, height);
+
+    //     int advance_width {};
+    //     int left_side_bearing {};
+    //     stbtt_GetCodepointHMetrics(font_info, codepoint, &advance_width, &left_side_bearing);
+
+    //     int x0 {};
+    //     int y0 {};
+    //     int x1 {};
+    //     int y1 {};
+    //     stbtt_GetCodepointBox(font_info, codepoint, &x0, &y0, &x1, &y1);
+
+    //     Glyph gl;
+    //     gl.bitmap.s0 = s0;
+    //     gl.bitmap.t0 = t0;
+    //     gl.bitmap.s1 = s1;
+    //     gl.bitmap.t1 = t1;
+    //     gl.width = static_cast<float>(x1 - x0) * sf;
+    //     gl.height = static_cast<float>(y1 - y0) * sf;
+    //     gl.xoff = static_cast<float>(left_side_bearing) * sf;
+    //     gl.yoff = static_cast<float>(y0) * sf;
+    //     gl.xadvance = static_cast<float>(advance_width) * sf;
+
+    //     glyphs[static_cast<char32_t>(codepoint)] = gl;
+    // }
 
     void Font::try_bake_character(int codepoint) {
         if (glyphs.count(codepoint) > 0) {
@@ -234,18 +303,7 @@ namespace sm {
         int width {0};
         int height {0};
 
-        unsigned char* glyph {stbtt_GetCodepointSDF(
-            font_info,
-            sf,
-            codepoint,
-            padding,
-            on_edge_value,
-            pixel_dist_scale,
-            &width,
-            &height,
-            nullptr,
-            nullptr
-        )};
+        unsigned char* glyph {stbtt_GetCodepointBitmap(font_info, sf, sf, codepoint, &width, &height, nullptr, nullptr)};
 
         if (glyph == nullptr) {
             LOG_WARNING("Could not bake character with codepoint `{}`; still adding to map...", codepoint);
@@ -267,11 +325,10 @@ namespace sm {
             bake_context.x, bake_context.y,
             glyph,
             width, height,
-            padding,
             &s0, &t0, &s1, &t1
         );
 
-        stbtt_FreeSDF(glyph, nullptr);
+        stbtt_FreeBitmap(glyph, nullptr);
 
         bake_context.x += width;
         bake_context.max_row_height = std::max(bake_context.max_row_height, height);

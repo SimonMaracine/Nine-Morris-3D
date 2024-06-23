@@ -665,8 +665,6 @@ namespace sm {
         }
 
         OpenGl::enable_depth_test();
-
-        GlVertexArray::unbind();
     }
 
     void Renderer::draw_text_batch(const TextBatch& batch) {
@@ -689,11 +687,11 @@ namespace sm {
             storage.text_shader->upload_uniform_mat4(resmanager::HashedStr64("u_model_matrix[" + index + ']'), matrix);
             storage.text_shader->upload_uniform_vec3(resmanager::HashedStr64("u_color[" + index + ']'), text.color);
 
-            const float border_width {text.shadows ? 0.3f : 0.0f};
-            const float offset {text.shadows ? -0.003f : 0.0f};
+            // const float border_width {text.shadows ? 0.3f : 0.0f};
+            // const float offset {text.shadows ? -0.003f : 0.0f};
 
-            storage.text_shader->upload_uniform_float(resmanager::HashedStr64("u_border_width[" + index + ']'), border_width);
-            storage.text_shader->upload_uniform_vec2(resmanager::HashedStr64("u_offset[" + index + ']'), glm::vec2(offset, offset));
+            // storage.text_shader->upload_uniform_float(resmanager::HashedStr64("u_border_width[" + index + ']'), border_width);
+            // storage.text_shader->upload_uniform_vec2(resmanager::HashedStr64("u_offset[" + index + ']'), glm::vec2(offset, offset));
 
             i++;
         }
@@ -717,6 +715,8 @@ namespace sm {
         OpenGl::bind_texture_2d(font->get_bitmap()->get_id(), 0);
 
         OpenGl::draw_arrays(vertex_count);
+
+        GlVertexArray::unbind();
     }
 
     void Renderer::setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer) {

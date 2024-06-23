@@ -77,9 +77,9 @@ namespace sm {
         stbtt_fontinfo* font_info {nullptr};
 
         int bitmap_size {};
-        int padding {};
-        unsigned char on_edge_value {};
-        float pixel_dist_scale {};
+        // int padding {};
+        // unsigned char on_edge_value {};
+        // float pixel_dist_scale {};
 
         float sf {};  // Scale factor
         float baseline {};
