@@ -232,7 +232,6 @@ namespace sm {
         Text text;
         text.font = storage.default_font;
         text.text = std::to_string(fps) + " FPS";
-        text.position = glm::vec2(1.0f);
         text.color = glm::vec3(1.0f);
 
         scene_list.texts.push_back(text);
@@ -436,10 +435,6 @@ namespace sm {
 
         // Debug stuff
         debug_render();
-
-        // Purge
-        clear();
-        debug_clear();
     }
 
     void Renderer::pre_setup() {
@@ -494,9 +489,9 @@ namespace sm {
         scene_list.directional_light = {};
         scene_list.point_lights.clear();
         scene_list.texts.clear();
-
         storage.text_batches.clear();
-        storage.texts_buffer.clear();
+
+        debug_clear();
     }
 
     void Renderer::resize_framebuffers(int width, int height) {
@@ -662,6 +657,9 @@ namespace sm {
 
         for (const auto& batch : storage.text_batches) {
             draw_text_batch(batch);
+            storage.text_batch_buffer.clear();
+            storage.text_batch_matrices.clear();
+            storage.text_batch_colors.clear();
         }
 
         OpenGl::enable_depth_test();
@@ -676,33 +674,32 @@ namespace sm {
             assert(i < 10);
 
             // Pushes the rendered text onto the buffer
-            font->render(text.text, static_cast<int>(i), storage.texts_buffer);
+            font->render(text.text, static_cast<int>(i++), storage.text_batch_buffer);
 
             glm::mat4 matrix {1.0f};
             matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
-            matrix = glm::scale(matrix, glm::vec3(text.scale, text.scale, 1.0f));
+            matrix = glm::scale(matrix, glm::vec3(std::min(text.scale, 1.0f), std::min(text.scale, 1.0f), 1.0f));
 
-            const std::string index {std::to_string(i)};
-
-            storage.text_shader->upload_uniform_mat4(resmanager::HashedStr64("u_model_matrix[" + index + ']'), matrix);
-            storage.text_shader->upload_uniform_vec3(resmanager::HashedStr64("u_color[" + index + ']'), text.color);
-
-            i++;
+            storage.text_batch_matrices.push_back(matrix);
+            storage.text_batch_colors.push_back(text.color);
         }
 
+        // Uniforms must be set as arrays
+        storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, storage.text_batch_matrices);
+        storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, storage.text_batch_colors);
         storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene_list.camera_2d.projection_matrix);
 
         auto vertex_buffer {storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
-        vertex_buffer->upload_data(storage.texts_buffer.data(), storage.texts_buffer.size());
+        vertex_buffer->upload_data(storage.text_batch_buffer.data(), storage.text_batch_buffer.size());
         GlVertexBuffer::unbind();
 
         static constexpr std::size_t ITEMS_PER_VERTEX {5};
         static constexpr std::size_t ITEM_SIZE {4};
 
-        assert(storage.texts_buffer.size() % (ITEM_SIZE * ITEMS_PER_VERTEX) == 0);
+        assert(storage.text_batch_buffer.size() % (ITEM_SIZE * ITEMS_PER_VERTEX) == 0);
 
-        const int vertex_count {static_cast<int>(storage.texts_buffer.size() / (ITEM_SIZE * ITEMS_PER_VERTEX))};
+        const int vertex_count {static_cast<int>(storage.text_batch_buffer.size() / (ITEM_SIZE * ITEMS_PER_VERTEX))};
 
         storage.text_vertex_array->bind();
 
@@ -735,6 +732,7 @@ namespace sm {
             const PointLight& light {scene_list.point_lights[i]};
             const std::string index {std::to_string(i)};
 
+            // Uniforms must be set individually by index
             uniform_buffer->set(&light.position, resmanager::HashedStr64("u_point_lights[" + index + "].position"));
             uniform_buffer->set(&light.ambient_color, resmanager::HashedStr64("u_point_lights[" + index + "].ambient"));
             uniform_buffer->set(&light.diffuse_color, resmanager::HashedStr64("u_point_lights[" + index + "].diffuse"));

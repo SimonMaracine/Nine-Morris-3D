@@ -27,15 +27,16 @@ namespace sm {
 
         sf = stbtt_ScaleForPixelHeight(font_info, specification.size_height);
 
-        int x0 {};
         int y0 {};
-        int x1 {};
-        int y1 {};
+        int x0, x1, y1;
         stbtt_GetFontBoundingBox(font_info, &x0, &y0, &x1, &y1);
 
         baseline = static_cast<float>(y0) * sf;
 
-        const auto [ascent, descent, line_gap] {get_vertical_metrics()};  // TODO
+        int ascent {};
+        int descent {};
+        int line_gap {};
+        stbtt_GetFontVMetrics(font_info, &ascent, &descent, &line_gap);  // TODO
 
         LOG_DEBUG("Loaded font");
     }
@@ -87,7 +88,10 @@ namespace sm {
 
         pack_range.packed_characters = new stbtt_packedchar[count];
 
-        if (!stbtt_PackFontRange(pack_context, reinterpret_cast<unsigned char*>(font_buffer.data()), 0, size_height, begin_codepoint, count, static_cast<stbtt_packedchar*>(pack_range.packed_characters))) {
+        const auto* data {reinterpret_cast<unsigned char*>(font_buffer.data())};
+        auto* characters {static_cast<stbtt_packedchar*>(pack_range.packed_characters)};
+
+        if (!stbtt_PackFontRange(pack_context, data, 0, size_height, begin_codepoint, count, characters)) {
             SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not pack range [{}, {}]", begin_codepoint, begin_codepoint + count);
         }
 
@@ -121,7 +125,16 @@ namespace sm {
 
             for (const PackRange& pack_range : pack_ranges) {
                 if (codepoint >= pack_range.begin_codepoint && codepoint <= pack_range.begin_codepoint + pack_range.count) {
-                    stbtt_GetPackedQuad(static_cast<stbtt_packedchar*>(pack_range.packed_characters), bitmap_size, bitmap_size, codepoint - pack_range.begin_codepoint, &x, &y, &quad, 0);
+                    stbtt_GetPackedQuad(
+                        static_cast<stbtt_packedchar*>(pack_range.packed_characters),
+                        bitmap_size,
+                        bitmap_size,
+                        codepoint - pack_range.begin_codepoint,
+                        &x,
+                        &y,
+                        &quad,
+                        0
+                    );
                     found_character = true;
                     break;
                 }
@@ -173,33 +186,20 @@ namespace sm {
     }
 
     std::pair<int, int> Font::get_string_size(const std::string& string, float scale) const {
-        // const std::u32string utf32_string {utf8::utf8to32(string)};
+        const std::u32string utf32_string {utf8::utf8to32(string)};
 
-        // int x {0};
-        // int height {0};
+        float x {0.0f};
 
-        // for (const char32_t character : utf32_string) {
-        //     const Glyph& glyph {get_character_glyph(character)};
+        for (const char32_t character : utf32_string) {
+            int advance_width {};
+            stbtt_GetCodepointHMetrics(font_info, static_cast<int>(character), &advance_width, nullptr);
 
-        //     x += glyph.xadvance;
+            x += static_cast<float>(advance_width) * sf;
+        }
 
-        //     height = std::max(height, static_cast<int>(std::roundf(static_cast<float>(glyph.yoff) * scale)));
-        // }
-
-        // const int width {static_cast<int>(std::roundf((static_cast<float>(x) * scale)))};
-
-        // return std::make_pair(width, height);
+        return std::make_pair(x * std::min(scale, 1.0f), size_height * std::min(scale, 1.0f));
 
         return {};
-    }
-
-    std::tuple<int, int, int> Font::get_vertical_metrics() const {
-        int ascent {};
-        int descent {};
-        int line_gap {};
-        stbtt_GetFontVMetrics(font_info, &ascent, &descent, &line_gap);
-
-        return std::make_tuple(ascent, descent, line_gap);
     }
 
     void Font::write_bitmap_to_file(const char* name, const unsigned char* bitmap, int size) {

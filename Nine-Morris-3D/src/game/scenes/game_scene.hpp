@@ -21,6 +21,7 @@ struct GameScene : public sm::Scene {
     sm::PointLight point_light;
 
     glm::vec2 pos {};
+    float scl {1.0f};
 
     sm::Renderable teapot;
 };

@@ -119,7 +119,9 @@ namespace sm {
             std::weak_ptr<GlUniformBuffer> wlight_space_uniform_buffer;
 
             std::vector<TextBatch> text_batches;
-            std::vector<unsigned char> texts_buffer;
+            std::vector<unsigned char> text_batch_buffer;
+            std::vector<glm::mat4> text_batch_matrices;
+            std::vector<glm::vec3> text_batch_colors;
         } storage;
 
         PostProcessingContext post_processing_context;  // TODO implement

@@ -47,6 +47,5 @@ namespace sm {
         glm::vec2 position {};
         glm::vec3 color {};
         float scale {1.0f};
-        bool shadows {false};
     };
 }

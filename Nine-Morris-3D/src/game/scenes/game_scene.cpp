@@ -158,6 +158,10 @@ void GameScene::on_start() {
 
         font->begin_baking();
         font->bake_ascii();
+        font->bake_characters(256, 127);
+        font->bake_characters(192, 22);
+        font->bake_characters(223, 23);
+        font->bake_characters(536, 4);
         font->end_baking("font");
     }
 
@@ -236,14 +240,40 @@ void GameScene::on_update() {
     sm::Text test;
     test.font = ctx->res.font["font"_H];
     test.text = "The quick brown fox jumps over the lazy dog.";
-    test.color = glm::vec3(0.9f);
+    test.color = glm::vec3(0.8f);
 
-    // ctx->rnd.add_text(test);
+    ctx->rnd.add_text(test);
 
     test.position = glm::vec2(200.0f) + pos;
     test.color = glm::vec3(0.8f, 0.7f, 0.1f);
 
     ctx->rnd.add_text(test);
+
+    test.position = glm::vec2(100.0f, 50.0f) + pos;
+    test.scale = scl;
+    test.color = glm::vec3(0.0f, 1.0f, 1.0f);
+
+    ctx->rnd.add_text(test);
+
+    {
+        const auto [w, h] {ctx->res.font["font"_H]->get_string_size("Some Text. Three spaces   !!?@#&^`~*&\"", scl)};
+
+        test.text = "Some Text. Three spaces   !!?@#&^`~*&\"";
+        test.position = glm::vec2(static_cast<float>(ctx->win.get_width() - w), static_cast<float>(ctx->win.get_height() - h));
+        test.color = glm::vec3(1.0f, 0.1f, 0.1f);
+
+        ctx->rnd.add_text(test);
+    }
+
+    {
+        const auto [w, h] {ctx->res.font["font"_H]->get_string_size("Simon Mărăcine ăîâșț ĂÎÂȘȚ", scl)};
+
+        test.text = "Simon Mărăcine ăîâșț ĂÎÂȘȚ";
+        test.position = glm::vec2(static_cast<float>(ctx->win.get_width() / 2 - w / 2), static_cast<float>(ctx->win.get_height() / 2 - h / 2));
+        test.color = glm::vec3(0.8f, 0.1f, 0.9f);
+
+        ctx->rnd.add_text(test);
+    }
 
     // Origin
     ctx->rnd.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -286,8 +316,9 @@ void GameScene::on_imgui_update() {
     ImGui::SliderFloat("Falloff Q.", &point_light.falloff_quadratic, 0.00001f, 1.0f);
     ImGui::End();
 
-    ImGui::Begin("Transform");
+    ImGui::Begin("Test");
     ImGui::SliderFloat2("Position", glm::value_ptr(pos), -500.0f, 500.0f);
+    ImGui::SliderFloat("Scale", &scl, 0.0f, 3.0f);
     ImGui::End();
 }
 

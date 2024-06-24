@@ -1,7 +1,7 @@
 #include "engine/graphics/opengl/shader.hpp"
 
-#include <stdexcept>
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <cassert>
 
@@ -14,17 +14,17 @@
 
 namespace sm {
     GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment) {
-        vertex_shader = compile_shader(source_vertex, GL_VERTEX_SHADER);
-        fragment_shader = compile_shader(source_fragment, GL_FRAGMENT_SHADER);
-        program = create_program();
+        const unsigned int vertex_shader {compile_shader(source_vertex, GL_VERTEX_SHADER)};
+        const unsigned int fragment_shader {compile_shader(source_fragment, GL_FRAGMENT_SHADER)};
+        create_program(vertex_shader, fragment_shader);
 
         if (!check_linking(program)) {
             SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not link shader program {}", program);
         }
 
-        delete_intermediates();
-        introspect_program();
-        check_and_cache_uniforms();
+        delete_intermediates(vertex_shader, fragment_shader);
+        const auto uniforms {introspect_program()};
+        check_and_cache_uniforms(uniforms);
 
         LOG_DEBUG("Created GL shader {}", program);
     }
@@ -52,6 +52,11 @@ namespace sm {
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
+    void GlShader::upload_uniform_mat4_array(Id name, const std::vector<glm::mat4>& matrices) const {
+        const int location {get_uniform_location(name)};
+        glUniformMatrix4fv(location, static_cast<int>(matrices.size()), GL_FALSE, glm::value_ptr(matrices.front()));
+    }
+
     void GlShader::upload_uniform_int(Id name, int value) const {
         const int location {get_uniform_location(name)};
         glUniform1i(location, value);
@@ -72,6 +77,11 @@ namespace sm {
         glUniform3f(location, vector.x, vector.y, vector.z);
     }
 
+    void GlShader::upload_uniform_vec3_array(Id name, const std::vector<glm::vec3>& vectors) const {
+        const int location {get_uniform_location(name)};
+        glUniform3fv(location, static_cast<int>(vectors.size()), glm::value_ptr(vectors.front()));
+    }
+
     void GlShader::upload_uniform_vec4(Id name, const glm::vec4& vector) const {
         const int location {get_uniform_location(name)};
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
@@ -86,19 +96,19 @@ namespace sm {
     }
 
     int GlShader::get_uniform_location(Id name) const {
-#ifdef SM_BUILD_DEBUG
-        try {
-            return cache.at(name);
-        } catch (const std::out_of_range&) {
+#ifndef SM_BUILD_DISTRIBUTION
+        if (const auto iter {cache.find(name)}; iter == cache.cend()) {
             LOG_ERROR("Cannot get hashed uniform variable {} from program {}", static_cast<std::uint64_t>(name), program);
             return -1;
+        } else {
+            return iter->second;
         }
 #else
         return cache.at(name);
 #endif
     }
 
-    void GlShader::check_and_cache_uniforms() {
+    void GlShader::check_and_cache_uniforms(const std::vector<std::string>& uniforms) {
         for (const auto& uniform : uniforms) {
             int location {};
 
@@ -123,16 +133,18 @@ namespace sm {
         }
     }
 
-    void GlShader::introspect_program() {
+    std::vector<std::string> GlShader::introspect_program() {
+        std::vector<std::string> uniforms;
+
         // Uniforms stuff
         int uniform_count {};
         glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &uniform_count);
 
         uniforms.reserve(uniform_count);
 
-        for (unsigned int i {0}; i < static_cast<unsigned int>(uniform_count); i++) {
+        for (int i {0}; i < uniform_count; i++) {
             char buffer[64] {};
-            glGetProgramResourceName(program, GL_UNIFORM, i, 64, nullptr, buffer);
+            glGetProgramResourceName(program, GL_UNIFORM, static_cast<unsigned int>(i), 64, nullptr, buffer);
 
             uniforms.push_back(buffer);
         }
@@ -143,13 +155,13 @@ namespace sm {
 
         uniform_blocks.reserve(uniform_block_count);
 
-        for (unsigned int i {0}; i < static_cast<unsigned int>(uniform_block_count); i++) {
+        for (int i {0}; i < uniform_block_count; i++) {
             UniformBlockSpecification block;
-            std::size_t block_active_uniforms_count {0};
+            std::size_t block_active_uniforms_count {};
 
             {
                 char buffer[64] {};
-                glGetProgramResourceName(program, GL_UNIFORM_BLOCK, i, 64, nullptr, buffer);
+                glGetProgramResourceName(program, GL_UNIFORM_BLOCK, static_cast<unsigned int>(i), 64, nullptr, buffer);
 
                 block.block_name = buffer;
             }
@@ -157,7 +169,7 @@ namespace sm {
             {
                 int buffer[2] {};
                 const GLenum properties[] { GL_BUFFER_BINDING, GL_NUM_ACTIVE_VARIABLES };
-                glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, i, 2, properties, 2, nullptr, buffer);
+                glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, static_cast<unsigned int>(i), 2, properties, 2, nullptr, buffer);
 
                 block.binding_index = static_cast<unsigned int>(buffer[0]);
                 block_active_uniforms_count = static_cast<std::size_t>(buffer[1]);
@@ -165,47 +177,46 @@ namespace sm {
             }
 
             {
-                int* buffer_uniforms {new int[block_active_uniforms_count]};
+                const std::unique_ptr<int[]> buffer_uniforms {std::make_unique<int[]>(block_active_uniforms_count)};
+
                 const GLenum properties[] { GL_ACTIVE_VARIABLES };
                 glGetProgramResourceiv(
                     program,
                     GL_UNIFORM_BLOCK,
-                    i,
+                    static_cast<unsigned int>(i),
                     1,
                     properties,
                     static_cast<int>(block_active_uniforms_count),
                     nullptr,
-                    buffer_uniforms
+                    buffer_uniforms.get()
                 );
 
-                for (unsigned int j {0}; j < static_cast<unsigned int>(block_active_uniforms_count); j++) {
+                for (std::size_t j {0}; j < block_active_uniforms_count; j++) {
                     char buffer[64] {};
                     glGetProgramResourceName(program, GL_UNIFORM, buffer_uniforms[j], 64, nullptr, buffer);
 
                     block.uniforms.push_back(buffer);
                 }
-
-                delete[] buffer_uniforms;
             }
 
             uniform_blocks.push_back(block);
         }
+
+        return uniforms;
     }
 
-    unsigned int GlShader::create_program() const {
+    void GlShader::create_program(unsigned int vertex_shader, unsigned int fragment_shader) {
         assert(vertex_shader != 0);
         assert(fragment_shader != 0);
 
-        const unsigned int program {glCreateProgram()};
+        program = glCreateProgram();
         glAttachShader(program, vertex_shader);
         glAttachShader(program, fragment_shader);
         glLinkProgram(program);
         glValidateProgram(program);
-
-        return program;
     }
 
-    void GlShader::delete_intermediates() {
+    void GlShader::delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader) {
         assert(program != 0);
         assert(vertex_shader != 0);
         assert(fragment_shader != 0);
@@ -214,12 +225,9 @@ namespace sm {
         glDetachShader(program, fragment_shader);
         glDeleteShader(vertex_shader);
         glDeleteShader(fragment_shader);
-
-        vertex_shader = 0;
-        fragment_shader = 0;
     }
 
-    unsigned int GlShader::compile_shader(const std::string& source, unsigned int type) const {
+    unsigned int GlShader::compile_shader(const std::string& source, unsigned int type) {
         const unsigned int shader {glCreateShader(type)};
 
         const char* const source_data {source.c_str()};
@@ -235,25 +243,7 @@ namespace sm {
         return shader;
     }
 
-    // unsigned int GlShader::compile_shader(const std::pair<unsigned char*, std::size_t>& source, unsigned int type) const {
-    //     const unsigned int shader {glCreateShader(type)};
-
-    //     const char* buffer {reinterpret_cast<const char*>(source_buffer.first)};
-    //     const char* const source {buffer};
-    //     const int source_length {static_cast<int>(source_buffer.second)};
-
-    //     glShaderSource(shader, 1, &source, &source_length);
-    //     glCompileShader(shader);
-
-    //     if (!check_compilation(shader, type)) {
-    //         LOG_DIST_CRITICAL("Could not compile shader {}", shader);
-    //         throw ResourceLoadingError;
-    //     }
-
-    //     return shader;
-    // }
-
-    bool GlShader::check_compilation(unsigned int shader, unsigned int type) const {
+    bool GlShader::check_compilation(unsigned int shader, unsigned int type) {
         int compile_status {};
         glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 
@@ -275,13 +265,13 @@ namespace sm {
             }
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("{} shader compilation error with no message in program {}", type_name, program);
+                LOG_DIST_CRITICAL("{} shader compilation error with no message", type_name);
             } else {
-                char* log_message {new char[log_length]};
-                glGetShaderInfoLog(shader, log_length, nullptr, log_message);
+                std::string log_message;
+                log_message.resize(log_length);
+                glGetShaderInfoLog(shader, log_length, nullptr, log_message.data());
 
-                LOG_DIST_CRITICAL("{} shader compilation error in program {}\n{}", type_name, program, log_message);
-                delete[] log_message;
+                LOG_DIST_CRITICAL("{} shader compilation error\n{}", type_name, log_message);
             }
 
             return false;
@@ -301,11 +291,11 @@ namespace sm {
             if (log_length == 0) {
                 LOG_DIST_CRITICAL("Linking error with no message in program {}", program);
             } else {
-                char* log_message {new char[log_length]};
-                glGetProgramInfoLog(program, log_length, nullptr, log_message);
+                std::string log_message;
+                log_message.resize(log_length);
+                glGetProgramInfoLog(program, log_length, nullptr, log_message.data());
 
                 LOG_DIST_CRITICAL("Linking error in program {}\n{}", program, log_message);
-                delete[] log_message;
             }
 
             return false;

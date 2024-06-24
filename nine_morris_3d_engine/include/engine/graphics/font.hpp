@@ -13,7 +13,7 @@ struct stbtt_pack_context;
 namespace sm {
     struct FontSpecification {
         float size_height {16.0f};
-        int bitmap_size {256};
+        int bitmap_size {128};
     };
 
     class Font {
@@ -41,7 +41,6 @@ namespace sm {
         // Get the width and height of a piece of text
         std::pair<int, int> get_string_size(const std::string& string, float scale) const;
     private:
-        std::tuple<int, int, int> get_vertical_metrics() const;
         static void write_bitmap_to_file(const char* name, const unsigned char* bitmap, int size);
 
         struct PackRange {

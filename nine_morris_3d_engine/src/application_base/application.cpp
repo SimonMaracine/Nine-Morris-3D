@@ -74,6 +74,8 @@ namespace sm {
                 dear_imgui_render();
             }
 
+            ctx.rnd.clear();
+
             ctx.win.update();
             ctx.evt.update();
 
