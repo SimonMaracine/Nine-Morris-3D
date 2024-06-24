@@ -23,7 +23,8 @@ namespace sm {
     public:
         explicit Ctx(const ApplicationProperties& properties)
             : fs(properties.application_name, properties.assets_directory), log(properties.log_file, fs),
-            win(properties, &evt), rnd(properties.width, properties.height, properties.samples, fs),
+            shd({"engine_assets", properties.assets_directory}), win(properties, &evt),
+            rnd(properties.width, properties.height, properties.samples, fs, shd),
             snd(properties.audio), inp(win.get_handle()) {}
 
         ~Ctx() = default;
@@ -49,12 +50,12 @@ namespace sm {
 
         FileSystem fs;
         Logging log;
+        ShaderLibrary shd;
         EventDispatcher evt;  // Application events
         Window win;  // One of the last objects destroyed in an application instance
         Renderer rnd;  // Renderer for 3D, 2D and debug
         OpenAlContext snd;
         MusicPlayer mus;
-        ShaderLibrary shd;
         ResourcesCache res;  // Global cache of resources
         TaskManager tsk;
         RandomGenerator rng;

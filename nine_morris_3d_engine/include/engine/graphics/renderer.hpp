@@ -15,6 +15,7 @@
 #include "engine/graphics/renderable.hpp"
 #include "engine/graphics/light.hpp"
 #include "engine/graphics/camera.hpp"
+#include "engine/graphics/shader_library.hpp"
 
 namespace sm {
     class Application;
@@ -27,7 +28,7 @@ namespace sm {
 
     class Renderer {
     private:
-        Renderer(int width, int height, int samples, const FileSystem& fs);
+        Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary& shd);
     public:
         Renderer(const Renderer&) = delete;
         Renderer& operator=(const Renderer&) = delete;

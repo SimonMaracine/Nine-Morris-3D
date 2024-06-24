@@ -29,7 +29,7 @@ namespace sm {
     static constexpr std::size_t SHADER_POINT_LIGHTS {4};
     static constexpr int SHADOW_MAP_UNIT {1};
 
-    Renderer::Renderer(int width, int height, int samples, const FileSystem& fs) {
+    Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary&) {
         OpenGl::initialize_default();
         OpenGl::enable_depth_test();
         OpenGl::clear_color(0.0f, 0.0f, 0.0f);

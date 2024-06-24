@@ -20,8 +20,6 @@ namespace sm {
         ctx.application = this;
         ctx.user_data = properties.user_data;
 
-        ctx.shd.load_shaders_from_include_directories({"engine_assets", properties.assets_directory});
-
         imgui_context::initialize(ctx.win.get_handle());
 
         LOG_DIST_INFO("Working directory: {}", FileSystem::current_working_directory());
