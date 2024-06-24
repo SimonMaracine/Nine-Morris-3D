@@ -58,17 +58,22 @@ target_include_directories(stb PUBLIC
 
 # Make Dear ImGui
 add_library(dear_imgui STATIC
-    "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_demo.cpp"
+    "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_tables.cpp"
     "extern/imgui/imgui_widgets.cpp"
     "extern/imgui/imgui.cpp"
-    "extern/imgui/imgui.h"
+    "extern/imgui/imconfig.h"
     "extern/imgui/imgui_internal.h"
+    "extern/imgui/imgui.h"
+    "extern/imgui/imstb_rectpack.h"
+    "extern/imgui/imstb_textedit.h"
+    "extern/imgui/imstb_truetype.h"
 
     "extern/imgui/backends/imgui_impl_glfw.cpp"
     "extern/imgui/backends/imgui_impl_opengl3.cpp"
     "extern/imgui/backends/imgui_impl_glfw.h"
+    "extern/imgui/backends/imgui_impl_opengl3_loader.h"
     "extern/imgui/backends/imgui_impl_opengl3.h"
 )
 
@@ -77,7 +82,7 @@ target_include_directories(dear_imgui PRIVATE "extern/glfw/include")
 target_compile_definitions(dear_imgui PRIVATE "NDEBUG")
 
 # Make cereal
-add_library(cereal INTERFACE)  # FIXME use submodule
+add_library(cereal INTERFACE)
 target_include_directories(cereal INTERFACE "extern/cereal/include")
 
 add_subdirectory(extern/assimp)
@@ -243,7 +248,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 target_compile_definitions(nine_morris_3d_engine PRIVATE
-    "IMGUI_IMPL_OPENGL_LOADER_GLAD"
+    # "IMGUI_IMPL_OPENGL_LOADER_GLAD"
     "UTF_CPP_CPLUSPLUS=201703"
     "AL_LIBTYPE_STATIC"
 )
