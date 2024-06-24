@@ -676,7 +676,7 @@ namespace sm {
             // Pushes the rendered text onto the buffer
             font->render(text.text, static_cast<int>(i++), storage.text_batch_buffer);
 
-            glm::mat4 matrix {1.0f};
+            glm::mat4 matrix {1.0f};  // TODO send mat3 instead
             matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
             matrix = glm::scale(matrix, glm::vec3(std::min(text.scale, 1.0f), std::min(text.scale, 1.0f), 1.0f));
 

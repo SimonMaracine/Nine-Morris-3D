@@ -31,6 +31,8 @@ namespace sm {
         void bind() const;
         static void unbind();
 
+        void upload_uniform_mat3(Id name, const glm::mat3& matrix) const;
+        void upload_uniform_mat3_array(Id name, const std::vector<glm::mat3>& matrices) const;
         void upload_uniform_mat4(Id name, const glm::mat4& matrix) const;
         void upload_uniform_mat4_array(Id name, const std::vector<glm::mat4>& matrices) const;
         void upload_uniform_int(Id name, int value) const;

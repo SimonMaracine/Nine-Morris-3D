@@ -47,6 +47,16 @@ namespace sm {
         glUseProgram(0);
     }
 
+    void GlShader::upload_uniform_mat3(Id name, const glm::mat3& matrix) const {
+        const int location {get_uniform_location(name)};
+        glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+    }
+
+    void GlShader::upload_uniform_mat3_array(Id name, const std::vector<glm::mat3>& matrices) const {
+        const int location {get_uniform_location(name)};
+        glUniformMatrix3fv(location, static_cast<int>(matrices.size()), GL_FALSE, glm::value_ptr(matrices.front()));
+    }
+
     void GlShader::upload_uniform_mat4(Id name, const glm::mat4& matrix) const {
         const int location {get_uniform_location(name)};
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
@@ -265,13 +275,13 @@ namespace sm {
             }
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("{} shader compilation error with no message", type_name);
+                LOG_DIST_ERROR("{} shader compilation error with no message", type_name);
             } else {
                 std::string log_message;
                 log_message.resize(log_length);
                 glGetShaderInfoLog(shader, log_length, nullptr, log_message.data());
 
-                LOG_DIST_CRITICAL("{} shader compilation error\n{}", type_name, log_message);
+                LOG_DIST_ERROR("{} shader compilation error\n{}", type_name, log_message);
             }
 
             return false;
@@ -289,13 +299,13 @@ namespace sm {
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
 
             if (log_length == 0) {
-                LOG_DIST_CRITICAL("Linking error with no message in program {}", program);
+                LOG_DIST_ERROR("Linking error with no message in program {}", program);
             } else {
                 std::string log_message;
                 log_message.resize(log_length);
                 glGetProgramInfoLog(program, log_length, nullptr, log_message.data());
 
-                LOG_DIST_CRITICAL("Linking error in program {}\n{}", program, log_message);
+                LOG_DIST_ERROR("Linking error in program {}\n{}", program, log_message);
             }
 
             return false;

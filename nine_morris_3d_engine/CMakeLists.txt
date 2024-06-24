@@ -251,4 +251,5 @@ target_compile_definitions(nine_morris_3d_engine PRIVATE
 target_compile_definitions(nine_morris_3d_engine PUBLIC
     "SPDLOG_ACTIVE_LEVEL=0"
     "_CRT_SECURE_NO_WARNINGS"
+    "GLM_ENABLE_EXPERIMENTAL"
 )
