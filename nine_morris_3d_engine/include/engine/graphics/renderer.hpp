@@ -80,8 +80,8 @@ namespace sm {
         void draw_skybox();
 
         struct TextBatch {
-            std::weak_ptr<Font> font;
-            std::vector<Text> objects;
+            std::weak_ptr<Font> wfont;
+            std::vector<Text> texts;
         };
 
         void draw_texts();

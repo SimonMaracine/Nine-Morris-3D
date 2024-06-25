@@ -18,6 +18,8 @@
 #include "engine/graphics/font.hpp"
 #include "engine/other/utilities.hpp"
 
+// shader uniform limit https://www.khronos.org/opengl/wiki/Uniform_(GLSL)#Implementation_limits
+
 using namespace resmanager::literals;
 
 namespace sm {
@@ -26,7 +28,8 @@ namespace sm {
     static constexpr unsigned int VIEW_POSITION_BLOCK_BINDING {2};
     static constexpr unsigned int POINT_LIGHT_BLOCK_BINDING {3};
     static constexpr unsigned int LIGHT_SPACE_BLOCK_BINDING {4};
-    static constexpr std::size_t SHADER_POINT_LIGHTS {4};
+    static constexpr std::size_t SHADER_MAX_POINT_LIGHTS {4};
+    static constexpr std::size_t SHADER_MAX_BATCH_TEXTS {32};  // This should never reach the limit
     static constexpr int SHADOW_MAP_UNIT {1};
 
     Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary&) {
@@ -645,15 +648,17 @@ namespace sm {
             if (this_ptr != font_ptr) {
                 font_ptr = this_ptr;
 
-                storage.text_batches.emplace_back().font = text.font;
+                storage.text_batches.emplace_back().wfont = text.font;
             }
 
-            if (storage.text_batches.back().objects.size() > 10) {
-                storage.text_batches.emplace_back().font = text.font;
+            if (storage.text_batches.back().texts.size() >= SHADER_MAX_BATCH_TEXTS) {
+                storage.text_batches.emplace_back().wfont = text.font;
             }
 
-            storage.text_batches.back().objects.push_back(text);
+            storage.text_batches.back().texts.push_back(text);
         }
+
+        LOG_DEBUG("{} batches", storage.text_batches.size());
 
         for (const auto& batch : storage.text_batches) {
             draw_text_batch(batch);
@@ -666,12 +671,12 @@ namespace sm {
     }
 
     void Renderer::draw_text_batch(const TextBatch& batch) {
-        auto font {batch.font.lock()};
+        auto font {batch.wfont.lock()};
 
         std::size_t i {};  // TODO C++20
 
-        for (const Text& text : batch.objects) {
-            assert(i < 10);
+        for (const Text& text : batch.texts) {
+            assert(i < SHADER_MAX_BATCH_TEXTS);
 
             // Pushes the rendered text onto the buffer
             font->render(text.text, static_cast<int>(i++), storage.text_batch_buffer);
@@ -724,11 +729,11 @@ namespace sm {
         );
 
         // Add dummy point lights to make the size 4, which is a requirement from the shader
-        if (scene_list.point_lights.size() < SHADER_POINT_LIGHTS) {
-            scene_list.point_lights.resize(SHADER_POINT_LIGHTS);
+        if (scene_list.point_lights.size() < SHADER_MAX_POINT_LIGHTS) {
+            scene_list.point_lights.resize(SHADER_MAX_POINT_LIGHTS);
         }
 
-        for (std::size_t i {0}; i < SHADER_POINT_LIGHTS; i++) {
+        for (std::size_t i {0}; i < SHADER_MAX_POINT_LIGHTS; i++) {
             const PointLight& light {scene_list.point_lights[i]};
             const std::string index {std::to_string(i)};
 
