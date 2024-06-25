@@ -37,5 +37,6 @@ add_subdirectory(Nine-Morris-3D)
 message(STATUS "Nine-Morris-3D: Project compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "Nine-Morris-3D: Project build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Nine-Morris-3D: Building for distribution: ${NM3D_DISTRIBUTION_MODE}")
+message(STATUS "Nine-Morris-3D: Building wih sanitizers: ${NM3D_ASAN}")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

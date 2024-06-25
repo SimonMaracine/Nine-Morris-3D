@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string>
-#include <memory>
-
 #include <spdlog/spdlog.h>
 
 #include "engine/application_base/platform.hpp"
+#include "engine/application_base/logging_base.hpp"
+
+// Never include this header file in another header file!
 
 /*
     Use LOG_ macros for messages to be printed only in debug mode.
@@ -38,21 +38,3 @@
 #define LOG_DIST_WARNING(...) SPDLOG_LOGGER_WARN(sm::Logging::get_global_logger(), __VA_ARGS__)
 #define LOG_DIST_ERROR(...) SPDLOG_LOGGER_ERROR(sm::Logging::get_global_logger(), __VA_ARGS__)
 #define LOG_DIST_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(sm::Logging::get_global_logger(), __VA_ARGS__)
-
-namespace sm {
-    class FileSystem;
-    class Ctx;
-
-    class Logging {
-    public:
-        static spdlog::logger* get_global_logger();
-    private:
-        Logging(const std::string& log_file, const FileSystem& fs);
-
-        static void set_fallback_logger_distribution(const char* error_message);
-
-        static std::shared_ptr<spdlog::logger> global_logger;
-
-        friend class Ctx;
-    };
-}

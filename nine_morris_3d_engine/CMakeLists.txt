@@ -100,7 +100,7 @@ add_library(nine_morris_3d_engine STATIC
     "src/application_base/context.cpp"
     "src/application_base/file_system.cpp"
     "src/application_base/input.cpp"
-    "src/application_base/logging.cpp"
+    "src/application_base/logging_base.cpp"
     "src/application_base/tasks.cpp"
     "src/application_base/window.cpp"
     "src/audio/openal/buffer.cpp"
@@ -140,6 +140,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/application_base/file_system.hpp"
     "include/engine/application_base/id.hpp"
     "include/engine/application_base/input.hpp"
+    "include/engine/application_base/logging_base.hpp"
     "include/engine/application_base/logging.hpp"
     "include/engine/application_base/platform.hpp"
     "include/engine/application_base/properties.hpp"
@@ -220,8 +221,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(UNIX AND NM3D_ASAN)
         target_compile_options(nine_morris_3d_engine PRIVATE "-fsanitize=address" "-fsanitize=undefined" "-g" "-fno-omit-frame-pointer")
         target_link_options(nine_morris_3d_engine PRIVATE "-fsanitize=address" "-fsanitize=undefined")
-
-        message(STATUS "Nine-Morris-3D: Building engine with sanitizers")
     endif()
 endif()
 

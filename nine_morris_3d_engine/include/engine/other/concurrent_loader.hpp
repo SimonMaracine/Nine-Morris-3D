@@ -5,7 +5,6 @@
 #include <thread>
 
 #include "engine/application_base/context.hpp"
-#include "engine/application_base/logging.hpp"
 #include "engine/other/resources_cache.hpp"
 
 namespace sm {
@@ -54,8 +53,6 @@ namespace sm {
 
     template<typename D, typename... Args>
     void ConcurrentLoader<D, Args...>::start_loading_thread(const Args&... args) {
-        LOG_INFO("Loading some assets from separate thread...");
-
         in_use = true;
         loading_thread = std::thread([&]() {
             static_cast<D*>(this)->load(args...);
@@ -87,8 +84,6 @@ namespace sm {
         loading_thread.join();
 
         res.merge(this->res);
-
-        LOG_INFO("Merged local resources into global ones");
     }
 
     template<typename D, typename... Args>

@@ -10,6 +10,7 @@
 #include "engine/application_base/file_system.hpp"
 #include "engine/application_base/id.hpp"
 #include "engine/application_base/input.hpp"
+#include "engine/application_base/logging_base.hpp"
 #include "engine/application_base/logging.hpp"
 #include "engine/application_base/platform.hpp"
 #include "engine/application_base/properties.hpp"

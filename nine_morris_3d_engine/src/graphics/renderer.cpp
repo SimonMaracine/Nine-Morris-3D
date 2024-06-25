@@ -8,8 +8,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.hpp>
 
-#include "engine/application_base/logging.hpp"
-#include "engine/application_base/error.hpp"
 #include "engine/graphics/opengl/vertex_array.hpp"
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/vertex_buffer_layout.hpp"
@@ -657,8 +655,6 @@ namespace sm {
 
             storage.text_batches.back().texts.push_back(text);
         }
-
-        LOG_DEBUG("{} batches", storage.text_batches.size());
 
         for (const auto& batch : storage.text_batches) {
             draw_text_batch(batch);

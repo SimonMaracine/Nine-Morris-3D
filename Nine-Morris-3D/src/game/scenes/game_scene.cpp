@@ -275,6 +275,26 @@ void GameScene::on_update() {
         ctx->rnd.add_text(test);
     }
 
+    {
+        const auto [_, h] {ctx->res.font["font"_H]->get_string_size("Text that spans\nmultiple lines\nlike that.", scl)};
+
+        test.text = "Text that spans\nmultiple lines\nlike that.";
+        test.position = glm::vec2(0.0f, static_cast<float>(ctx->win.get_height() - h));
+        test.color = glm::vec3(0.0f, 1.0f, 0.0f);
+
+        ctx->rnd.add_text(test);
+    }
+
+    {
+        const auto [w, _] {ctx->res.font["font"_H]->get_string_size("Another\ntext\nwith multiple\nlines.", scl)};
+
+        test.text = "Another\ntext\nwith multiple\nlines.";
+        test.position = glm::vec2(static_cast<float>(ctx->win.get_width() - w), 0.0f);
+        test.color = glm::vec3(0.0f, 0.0f, 1.0f);
+
+        ctx->rnd.add_text(test);
+    }
+
     // Origin
     ctx->rnd.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     ctx->rnd.debug_add_line(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));

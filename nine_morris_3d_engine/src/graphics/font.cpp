@@ -31,12 +31,14 @@ namespace sm {
         int x0, x1, y1;
         stbtt_GetFontBoundingBox(font_info, &x0, &y0, &x1, &y1);
 
-        baseline = static_cast<float>(y0) * sf;
+        baseline = static_cast<float>(-y0) * sf;
 
         int ascent {};
         int descent {};
         int line_gap {};
-        stbtt_GetFontVMetrics(font_info, &ascent, &descent, &line_gap);  // TODO
+        stbtt_GetFontVMetrics(font_info, &ascent, &descent, &line_gap);
+
+        vertical_advance = static_cast<float>(ascent - descent + line_gap) * sf;
 
         LOG_DEBUG("Loaded font");
     }
@@ -103,103 +105,137 @@ namespace sm {
         bake_characters(32, 95);
     }
 
-#define SM_PUSH_BACK_ITEM(buffer, item_data, item_size) \
-    static_assert(sizeof(item_data) == item_size); \
-    buffer.emplace_back(); \
-    buffer.emplace_back(); \
-    buffer.emplace_back(); \
-    buffer.emplace_back(); \
-    std::memcpy(buffer.data() + buffer.size() - item_size, &item_data, item_size)
-
     void Font::render(const std::string& string, int index, std::vector<unsigned char>& buffer) const {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
         float x {0.0f};  // TODO C++20
-        float y {baseline};
+        float y {-baseline};
+
+        // This makes multi-line text have its origin at bottom-left
+        float vertical_positioning {0.0f};
+
+        std::vector<CharacterBuffer> character_buffers;
+        character_buffers.reserve(utf32_string.size());
 
         for (const char32_t character : utf32_string) {
-            const int codepoint {static_cast<int>(character)};
-
-            bool found_character {false};
-            stbtt_aligned_quad quad {};
-
-            for (const PackRange& pack_range : pack_ranges) {
-                if (codepoint >= pack_range.begin_codepoint && codepoint <= pack_range.begin_codepoint + pack_range.count) {
-                    stbtt_GetPackedQuad(
-                        static_cast<stbtt_packedchar*>(pack_range.packed_characters),
-                        bitmap_size,
-                        bitmap_size,
-                        codepoint - pack_range.begin_codepoint,
-                        &x,
-                        &y,
-                        &quad,
-                        0
-                    );
-                    found_character = true;
-                    break;
-                }
+            if (character == '\n') {
+                y -= (-vertical_advance);
+                vertical_positioning += vertical_advance;
+                x = 0.0f;
+                continue;
             }
 
-            assert(found_character);
+            Quad quad {};
+            get_character_quad(static_cast<int>(character), &x, &y, &quad);
 
-            static constexpr std::size_t ITEM_SIZE {4};
+            CharacterBuffer character_buffer;
+            character_buffer.f0 = quad.x0;
+            character_buffer.f1 = -quad.y0;
+            character_buffer.f2 = quad.s0;
+            character_buffer.f3 = quad.t0;
+            character_buffer.i0 = index;
+            character_buffer.f4 = quad.x0;
+            character_buffer.f5 = -quad.y1;
+            character_buffer.f6 = quad.s0;
+            character_buffer.f7 = quad.t1;
+            character_buffer.i1 = index;
+            character_buffer.f8 = quad.x1;
+            character_buffer.f9 = -quad.y1;
+            character_buffer.f10 = quad.s1;
+            character_buffer.f11 = quad.t1;
+            character_buffer.i2 = index;
+            character_buffer.f12 = quad.x1;
+            character_buffer.f13 = -quad.y1;
+            character_buffer.f14 = quad.s1;
+            character_buffer.f15 = quad.t1;
+            character_buffer.i3 = index;
+            character_buffer.f16 = quad.x1;
+            character_buffer.f17 = -quad.y0;
+            character_buffer.f18 = quad.s1;
+            character_buffer.f19 = quad.t0;
+            character_buffer.i4 = index;
+            character_buffer.f20 = quad.x0;
+            character_buffer.f21 = -quad.y0;
+            character_buffer.f22 = quad.s0;
+            character_buffer.f23 = quad.t0;
+            character_buffer.i5 = index;
 
-            const float y0 {-quad.y0};
-            const float y1 {-quad.y1};
-
-            SM_PUSH_BACK_ITEM(buffer, quad.x0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.s0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.t0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
-
-            SM_PUSH_BACK_ITEM(buffer, quad.x0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.s0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.t1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
-
-            SM_PUSH_BACK_ITEM(buffer, quad.x1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.s1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.t1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
-
-            SM_PUSH_BACK_ITEM(buffer, quad.x1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, y1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.s1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.t1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
-
-            SM_PUSH_BACK_ITEM(buffer, quad.x1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.s1, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.t0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
-
-            SM_PUSH_BACK_ITEM(buffer, quad.x0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, y0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.s0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, quad.t0, ITEM_SIZE);
-            SM_PUSH_BACK_ITEM(buffer, index, ITEM_SIZE);
+            character_buffers.push_back(character_buffer);
         }
+
+        for (CharacterBuffer& character : character_buffers) {
+            character.f1 += vertical_positioning;
+            character.f5 += vertical_positioning;
+            character.f9 += vertical_positioning;
+            character.f13 += vertical_positioning;
+            character.f17 += vertical_positioning;
+            character.f21 += vertical_positioning;
+        }
+
+        buffer.resize(buffer.size() + character_buffers.size() * sizeof(CharacterBuffer));
+        std::memcpy(buffer.data() + buffer.size() - character_buffers.size() * sizeof(CharacterBuffer), character_buffers.data(), character_buffers.size() * sizeof(CharacterBuffer));
     }
 
     std::pair<int, int> Font::get_string_size(const std::string& string, float scale) const {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
-        float x {0.0f};
+        float width {-1.0f};
+        float height {size_height};
+
+        float line_width {0.0f};
 
         for (const char32_t character : utf32_string) {
+            if (character == '\n') {
+                height += vertical_advance;
+
+                width = std::max(width, line_width);
+                line_width = 0.0f;
+
+                continue;
+            }
+
             int advance_width {};
             stbtt_GetCodepointHMetrics(font_info, static_cast<int>(character), &advance_width, nullptr);
 
-            x += static_cast<float>(advance_width) * sf;
+            line_width += static_cast<float>(advance_width) * sf;
         }
 
-        return std::make_pair(x * std::min(scale, 1.0f), size_height * std::min(scale, 1.0f));
+        width = std::max(width, line_width);
 
-        return {};
+        return std::make_pair(width * std::min(scale, 1.0f), height * std::min(scale, 1.0f));
+    }
+
+    void Font::get_character_quad(int codepoint, float* x, float* y, Quad* quad) const {
+        stbtt_aligned_quad aligned_quad {};
+        bool found_character {false};
+
+        for (const PackRange& pack_range : pack_ranges) {
+            if (codepoint >= pack_range.begin_codepoint && codepoint <= pack_range.begin_codepoint + pack_range.count) {
+                stbtt_GetPackedQuad(
+                    static_cast<stbtt_packedchar*>(pack_range.packed_characters),
+                    bitmap_size,
+                    bitmap_size,
+                    codepoint - pack_range.begin_codepoint,
+                    x,
+                    y,
+                    &aligned_quad,
+                    0
+                );
+                found_character = true;
+                break;
+            }
+        }
+
+        assert(found_character);
+
+        quad->x0 = aligned_quad.x0;
+        quad->y0 = aligned_quad.y0;
+        quad->x1 = aligned_quad.x1;
+        quad->y1 = aligned_quad.y1;
+        quad->s0 = aligned_quad.s0;
+        quad->t0 = aligned_quad.t0;
+        quad->s1 = aligned_quad.s1;
+        quad->t1 = aligned_quad.t1;
     }
 
     void Font::write_bitmap_to_file(const char* name, const unsigned char* bitmap, int size) {

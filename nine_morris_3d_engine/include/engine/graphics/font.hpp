@@ -39,8 +39,32 @@ namespace sm {
         void render(const std::string& string, int index, std::vector<unsigned char>& buffer) const;
 
         // Get the width and height of a piece of text
-        std::pair<int, int> get_string_size(const std::string& string, float scale) const;
+        std::pair<int, int> get_string_size(const std::string& string, float scale = 1.0f) const;
     private:
+        // The library author forgot to actually name the struct, so I made another one :P
+        struct Quad {
+            float x0, y0, s0, t0;
+            float x1, y1, s1, t1;
+        };
+
+        struct CharacterBuffer {
+            float f0, f1, f2, f3;
+            int i0;
+            float f4, f5, f6, f7;
+            int i1;
+            float f8, f9, f10, f11;
+            int i2;
+            float f12, f13, f14, f15;
+            int i3;
+            float f16, f17, f18, f19;
+            int i4;
+            float f20, f21, f22, f23;
+            int i5;
+        };
+
+        static_assert(sizeof(CharacterBuffer) == 5 * 6 * 4);
+
+        void get_character_quad(int codepoint, float* x, float* y, Quad* quad) const;
         static void write_bitmap_to_file(const char* name, const unsigned char* bitmap, int size);
 
         struct PackRange {
@@ -64,5 +88,6 @@ namespace sm {
 
         float sf {};  // Scale factor
         float baseline {};
+        float vertical_advance {};
     };
 }
