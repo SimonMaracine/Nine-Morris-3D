@@ -4,7 +4,6 @@
 #include <regex>
 #include <iterator>
 #include <vector>
-#include <cstddef>
 #include <utility>
 
 #include "engine/application_base/logging.hpp"
@@ -13,28 +12,7 @@
 
 namespace sm {
     std::string ShaderLibrary::load_shader(const std::string& source) const {
-        std::vector<std::pair<std::size_t, std::string>> lines;
-        std::size_t last_position {};  // TODO C++20
-        std::size_t position {};
-        std::size_t line {1};
-
-        for (const char character : source) {
-            if (character == '\n' || character == '\r' || position == source.size() - 1) {
-                lines.push_back(std::make_pair(line, std::string(source, last_position, position - last_position + 1)));
-                last_position = position + 1;
-                line++;
-            }
-
-            position++;
-        }
-
-        std::string result;
-
-        for (auto&& line : lines) {
-            result += match_and_include(line.first, std::move(line.second));
-        }
-
-        return result;
+        return match_and_include(std::string(source));
     }
 
     ShaderLibrary::ShaderLibrary(std::initializer_list<std::string> include_directories) {
@@ -56,32 +34,55 @@ namespace sm {
         LOG_INFO("Loaded shaders from include directories");
     }
 
-    std::string ShaderLibrary::match_and_include(std::size_t line, std::string&& line_string) const {
-        const std::regex pattern {R"(^\s*#include\s*"[\w\/\.]+"\s*$)"};
+    std::string ShaderLibrary::match_and_include(std::string&& string) const {
+        const std::regex pattern (R"(^[ \t]*#include[ \t]*"[\w\-\/\.]+"[ \t]*$)", std::regex::ECMAScript | std::regex::multiline);
         std::smatch results;
 
-        if (!std::regex_match(line_string, results, pattern)) {
-            return line_string;
+        std::sregex_iterator begin_regex {string.cbegin(), string.cend(), pattern};
+        std::sregex_iterator end_regex;
+
+        std::vector<std::tuple<std::string::const_iterator, std::string::const_iterator, std::size_t, std::string>> matches;
+
+        for (auto iter {begin_regex}; iter != end_regex; iter++) {
+            const auto& match {*iter};
+            const auto& sub_match {*match.cbegin()};
+
+            const auto argument {get_include_argument(match.str())};
+            const auto iter_arg {include_shader_sources.find(argument)};
+
+            if (iter_arg == include_shader_sources.cend()) {
+                SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Cannot include `{}`; file not found", argument);
+            }
+
+            const std::size_t line {get_line(string.cbegin(), sub_match.first)};
+
+            matches.push_back(std::make_tuple(sub_match.first, sub_match.second, line, iter_arg->second));
         }
 
-        if (results.size() != 1) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Invalid #include directive");
+        if (matches.empty()) {
+            return string;
         }
 
-        const auto& match {*results.cbegin()};
-        const auto argument {get_include_argument(match.str())};
-        const auto iter {include_shader_sources.find(argument)};
+        std::string result;
+        std::string::const_iterator begin {string.cbegin()};
 
-        if (iter == include_shader_sources.cend()) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Cannot include `{}`; file not found", argument);
+        for (auto iter {matches.begin()}; iter != matches.end(); iter++) {
+            std::string::const_iterator end;
+
+            if (std::next(iter) != matches.end()) {
+                end = std::get<0>(*std::next(iter));
+            } else {
+                end = string.cend();
+            }
+
+            result += std::string(begin, std::get<0>(*iter));
+            result += "#line 1\n" + load_shader(std::get<3>(*iter)) + "\n#line " + std::to_string(std::get<2>(*iter) + 1);
+            result += std::string(std::get<1>(*iter), end);  // Endline comes from here
+
+            begin = std::get<1>(*iter);
         }
 
-        line_string.clear();
-        line_string += "#line 1\n";
-        line_string += load_shader(iter->second) + '\n';
-        line_string += "#line " + std::to_string(line + 1) + '\n';
-
-        return line_string;
+        return result;
     }
 
     std::string ShaderLibrary::get_include_argument(const std::string& string) {
@@ -89,5 +90,9 @@ namespace sm {
         const auto last_quote {string.find_last_of("\"")};
 
         return string.substr(first_quote + 1, last_quote - first_quote - 1);
+    }
+
+    std::size_t ShaderLibrary::get_line(std::string::const_iterator begin, std::string::const_iterator end) {
+        return std::count(begin, end, '\n') + 1;
     }
 }

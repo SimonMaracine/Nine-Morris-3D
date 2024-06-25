@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <stdexcept>
 #include <initializer_list>
+#include <cstddef>
 
 namespace sm {
     class Application;
@@ -17,8 +18,9 @@ namespace sm {
         explicit ShaderLibrary(std::initializer_list<std::string> include_directories);
 
         void load_shaders_from_include_directories(std::initializer_list<std::string> include_directories);
-        std::string match_and_include(std::size_t line, std::string&& line_string) const;
+        std::string match_and_include(std::string&& string) const;
         static std::string get_include_argument(const std::string& string);
+        static std::size_t get_line(std::string::const_iterator begin, std::string::const_iterator end);
 
         std::unordered_map<std::string, std::string> include_shader_sources;
 
