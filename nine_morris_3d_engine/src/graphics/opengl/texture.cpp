@@ -31,7 +31,7 @@ namespace sm {
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
 
         if (anisotropic_filtering_enabled) {
-            const int max_anisotropic_filtering {Capabilities::max_anisotropic_filtering_supported()};
+            const int max_anisotropic_filtering {capabilities::max_anisotropic_filtering_supported()};
 
             if (specification.mipmapping.anisotropic_filtering > max_anisotropic_filtering) {
                 LOG_DIST_WARNING("Invalid anisotropic filtering value: {}", specification.mipmapping.anisotropic_filtering);

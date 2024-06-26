@@ -60,7 +60,7 @@ namespace sm {
 
     static constexpr std::size_t BUFFER_LENGTH {128};
 
-    void GlDebug::initialize_debug() {
+    void opengl_debug::initialize_debug() {
 #ifndef SM_BUILD_DISTRIBUTION
         glDebugMessageCallback(
             [](GLenum, GLenum, GLuint id, GLenum severity, GLsizei, const GLchar* message, const GLvoid*) {
@@ -100,7 +100,7 @@ namespace sm {
 #endif
     }
 
-    std::string GlDebug::get_information() {
+    std::string opengl_debug::get_information() {
         char buffer[BUFFER_LENGTH] {};
         std::string result;
 
@@ -146,14 +146,14 @@ namespace sm {
             buffer,
             BUFFER_LENGTH,
             "GL_EXT_texture_filter_anisotropic max samples: %d\n",
-            Capabilities::max_anisotropic_filtering_supported()
+            capabilities::max_anisotropic_filtering_supported()
         );
         result += buffer;
 
         return result;
     }
 
-    std::pair<int, int> GlDebug::get_version_number() {
+    std::pair<int, int> opengl_debug::get_version_number() {
         int major {};
         int minor {};
         glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -162,19 +162,19 @@ namespace sm {
         return std::make_pair(major, minor);
     }
 
-    const unsigned char* GlDebug::get_opengl_version() {
+    const unsigned char* opengl_debug::get_opengl_version() {
         return glGetString(GL_VERSION);
     }
 
-    const unsigned char* GlDebug::get_glsl_version() {
+    const unsigned char* opengl_debug::get_glsl_version() {
         return glGetString(GL_SHADING_LANGUAGE_VERSION);
     }
 
-    const unsigned char* GlDebug::get_vendor() {
+    const unsigned char* opengl_debug::get_vendor() {
         return glGetString(GL_VENDOR);
     }
 
-    const unsigned char* GlDebug::get_renderer() {
+    const unsigned char* opengl_debug::get_renderer() {
         return glGetString(GL_RENDERER);
     }
 }

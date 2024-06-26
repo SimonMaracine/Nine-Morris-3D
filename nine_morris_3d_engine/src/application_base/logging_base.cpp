@@ -1,17 +1,17 @@
 #include "engine/application_base/logging.hpp"
 
 #include <fstream>
+#include <cstddef>
 
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "engine/application_base/file_system.hpp"
 
-#define LOG_PATTERN_DEVELOPMENT "%^[%l] [%t] [%H:%M:%S]%$ %v"
-#define LOG_PATTERN_DISTRIBUTION "%^[%l] [%t] [%!:%#] [%c]%$ %v"
-
-#define FILE_SIZE (1048576 * 2)  // 2 MiB
-#define ROTATING_FILES 2  // 3 total log files
+static const char* LOG_PATTERN_DEVELOPMENT {"%^[%l] [%t] [%H:%M:%S]%$ %v"};
+static const char* LOG_PATTERN_DISTRIBUTION {"%^[%l] [%t] [%!:%#] [%c]%$ %v"};
+static constexpr std::size_t FILE_SIZE {1048576 * 2};  // 2 MiB
+static constexpr std::size_t ROTATING_FILES {2};  // 3 total log files
 
 /*
     SPDLOG_TRACE

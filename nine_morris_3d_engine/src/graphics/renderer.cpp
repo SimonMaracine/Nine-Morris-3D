@@ -69,7 +69,7 @@ namespace sm {
         storage.shader->bind();
         storage.vertex_array->bind();
 
-        OpenGl::draw_arrays_lines(static_cast<int>(scene_list.lines.size()) * 2);
+        opengl::draw_arrays_lines(static_cast<int>(scene_list.lines.size()) * 2);
 
         GlVertexArray::unbind();
     }
@@ -80,9 +80,9 @@ namespace sm {
     }
 
     Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary&) {
-        OpenGl::initialize_default();
-        OpenGl::enable_depth_test();
-        OpenGl::clear_color(0.0f, 0.0f, 0.0f);
+        opengl::initialize_default();
+        opengl::enable_depth_test();
+        opengl::clear_color(0.0f, 0.0f, 0.0f);
 
         // Scene
         {
@@ -480,8 +480,8 @@ namespace sm {
         // Draw to depth buffer for shadows
         storage.shadow_map_framebuffer->bind();
 
-        OpenGl::clear(OpenGl::Buffers::D);
-        OpenGl::viewport(
+        opengl::clear(opengl::Buffers::D);
+        opengl::viewport(
             storage.shadow_map_framebuffer->get_specification().width,
             storage.shadow_map_framebuffer->get_specification().height
         );
@@ -491,13 +491,13 @@ namespace sm {
         // Draw normal things
         storage.scene_framebuffer->bind();
 
-        OpenGl::clear(OpenGl::Buffers::CD);
-        OpenGl::viewport(
+        opengl::clear(opengl::Buffers::CD);
+        opengl::viewport(
             storage.scene_framebuffer->get_specification().width,
             storage.scene_framebuffer->get_specification().height
         );
 
-        OpenGl::bind_texture_2d(storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
+        opengl::bind_texture_2d(storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
 
         draw_renderables();
         draw_renderables_outlined();
@@ -517,7 +517,7 @@ namespace sm {
         // Do post processing and render the final 3D image to the screen
         storage.intermediate_framebuffer->bind();
 
-        OpenGl::viewport(
+        opengl::viewport(
             storage.intermediate_framebuffer->get_specification().width,
             storage.intermediate_framebuffer->get_specification().height
         );
@@ -598,7 +598,7 @@ namespace sm {
             return;
         }
 
-        OpenGl::viewport(width, height);
+        opengl::viewport(width, height);
 
         for (std::weak_ptr<GlFramebuffer> wframebuffer : scene_data.framebuffers) {
             std::shared_ptr<GlFramebuffer> framebuffer {wframebuffer.lock()};
@@ -617,8 +617,8 @@ namespace sm {
 
     void Renderer::screen_quad(unsigned int texture) {
         storage.screen_quad_shader->bind();
-        OpenGl::bind_texture_2d(texture, 0);
-        OpenGl::draw_arrays(6);
+        opengl::bind_texture_2d(texture, 0);
+        opengl::draw_arrays(6);
     }
 
     void Renderer::post_processing() {
@@ -628,7 +628,7 @@ namespace sm {
     void Renderer::end_rendering() {
         storage.screen_quad_vertex_array->bind();
 
-        OpenGl::disable_depth_test();
+        opengl::disable_depth_test();
 
         post_processing();
 
@@ -636,12 +636,12 @@ namespace sm {
         GlFramebuffer::bind_default();
 
         // Clear even the default framebuffer, for debug renderer
-        OpenGl::clear(OpenGl::Buffers::CD);
+        opengl::clear(opengl::Buffers::CD);
 
         // screen_quad(post_processing_context.last_texture);  // FIXME
         screen_quad(storage.intermediate_framebuffer->get_color_attachment(0));
 
-        OpenGl::enable_depth_test();
+        opengl::enable_depth_test();
 
         GlVertexArray::unbind();
     }
@@ -655,9 +655,9 @@ namespace sm {
             }
 
             if (material->flags & Material::DisableBackFaceCulling) {  // FIXME improve; maybe use scene graph
-                OpenGl::disable_back_face_culling();
+                opengl::disable_back_face_culling();
                 draw_renderable(renderable);
-                OpenGl::enable_back_face_culling();
+                opengl::enable_back_face_culling();
             } else {
                 draw_renderable(renderable);
             }
@@ -676,7 +676,7 @@ namespace sm {
         material->bind_and_upload();  // TODO sort and batch models based on material
         material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
-        OpenGl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
+        opengl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
     }
 
     void Renderer::draw_renderables_outlined() {
@@ -703,7 +703,7 @@ namespace sm {
             vertex_array->bind();
             storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
-            OpenGl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
+            opengl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
         }
 
         // Don't unbind for every renderable
@@ -720,13 +720,13 @@ namespace sm {
         storage.skybox_vertex_array->bind();
         storage.skybox_texture->bind(0);
 
-        OpenGl::draw_arrays(36);
+        opengl::draw_arrays(36);
 
         GlVertexArray::unbind();
     }
 
     void Renderer::draw_texts() {
-        OpenGl::disable_depth_test();
+        opengl::disable_depth_test();
 
         storage.text_shader->bind();
 
@@ -761,7 +761,7 @@ namespace sm {
             storage.text.batch_colors.clear();
         }
 
-        OpenGl::enable_depth_test();
+        opengl::enable_depth_test();
     }
 
     void Renderer::draw_text_batch(const TextBatch& batch) {
@@ -802,15 +802,15 @@ namespace sm {
 
         storage.text_vertex_array->bind();
 
-        OpenGl::bind_texture_2d(font->get_bitmap()->get_id(), 0);
+        opengl::bind_texture_2d(font->get_bitmap()->get_id(), 0);
 
-        OpenGl::draw_arrays(vertex_count);
+        opengl::draw_arrays(vertex_count);
 
         GlVertexArray::unbind();
     }
 
     void Renderer::draw_quads() {
-        OpenGl::disable_depth_test();
+        opengl::disable_depth_test();
 
         storage.quad_shader->bind();
         storage.quad_vertex_array->bind();
@@ -833,7 +833,7 @@ namespace sm {
 
         GlVertexArray::unbind();
 
-        OpenGl::enable_depth_test();
+        opengl::enable_depth_test();
     }
 
     void Renderer::draw_quad(glm::vec2 position, glm::vec2 size, glm::vec2 scale, unsigned int texture) {
@@ -902,10 +902,10 @@ namespace sm {
 
     void Renderer::flush_quads_batch() {
         for (std::size_t i {0}; i < storage.quad.texture_slot_index; i++) {
-            OpenGl::bind_texture_2d(storage.quad.texture_slots[i], static_cast<int>(i));
+            opengl::bind_texture_2d(storage.quad.texture_slots[i], static_cast<int>(i));
         }
 
-        OpenGl::draw_elements(static_cast<int>(storage.quad.quad_count * 6));
+        opengl::draw_elements(static_cast<int>(storage.quad.quad_count * 6));
     }
 
     void Renderer::setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer) {

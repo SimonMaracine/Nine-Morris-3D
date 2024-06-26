@@ -3,13 +3,13 @@
 #include <glad/glad.h>
 
 namespace sm {
-    void OpenGl::initialize_default() {
+    void opengl::initialize_default() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_CULL_FACE);
     }
 
-    void OpenGl::clear(Buffers buffers) {
+    void opengl::clear(Buffers buffers) {
         unsigned int result {};
 
         switch (buffers) {
@@ -39,66 +39,66 @@ namespace sm {
         glClear(result);
     }
 
-    void OpenGl::clear_color(float red, float green, float blue) {
+    void opengl::clear_color(float red, float green, float blue) {
         glClearColor(red, green, blue, 1.0f);
     }
 
-    void OpenGl::viewport(int width, int height) {
+    void opengl::viewport(int width, int height) {
         glViewport(0, 0, width, height);
     }
 
-    void OpenGl::bind_texture_2d(unsigned int texture, int unit) {
+    void opengl::bind_texture_2d(unsigned int texture, int unit) {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
-    void OpenGl::draw_arrays(int count) {
+    void opengl::draw_arrays(int count) {
         glDrawArrays(GL_TRIANGLES, 0, count);
     }
 
-    void OpenGl::draw_arrays_lines(int count) {
+    void opengl::draw_arrays_lines(int count) {
         glDrawArrays(GL_LINES, 0, count);
     }
 
-    void OpenGl::draw_elements(int count) {
+    void opengl::draw_elements(int count) {
         glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
     }
 
-    void OpenGl::draw_elements_instanced(int count, int instance_count) {
+    void opengl::draw_elements_instanced(int count, int instance_count) {
         glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr, instance_count);
     }
 
-    void OpenGl::disable_depth_test() {
+    void opengl::disable_depth_test() {
         glDisable(GL_DEPTH_TEST);
     }
 
-    void OpenGl::enable_depth_test() {
+    void opengl::enable_depth_test() {
         glEnable(GL_DEPTH_TEST);
     }
 
-    void OpenGl::disable_blending() {
+    void opengl::disable_blending() {
         glDisable(GL_BLEND);
     }
 
-    void OpenGl::enable_blending() {
+    void opengl::enable_blending() {
         glEnable(GL_BLEND);
     }
 
-    void OpenGl::disable_back_face_culling() {
+    void opengl::disable_back_face_culling() {
         glDisable(GL_CULL_FACE);
     }
 
-    void OpenGl::enable_back_face_culling() {
+    void opengl::enable_back_face_culling() {
         glEnable(GL_CULL_FACE);
     }
 
-    void OpenGl::initialize_stencil() {
+    void opengl::initialize_stencil() {
         glEnable(GL_STENCIL_TEST);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     }
 
-    void OpenGl::stencil_function(Function function, int ref, unsigned int mask) {
+    void opengl::stencil_function(Function function, int ref, unsigned int mask) {
         unsigned int result {};
 
         switch (function) {
@@ -113,7 +113,7 @@ namespace sm {
         glStencilFunc(result, ref, mask);
     }
 
-    void OpenGl::stencil_mask(unsigned int mask) {
+    void opengl::stencil_mask(unsigned int mask) {
         glStencilMask(mask);
     }
 }

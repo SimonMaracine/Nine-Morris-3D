@@ -1,8 +1,10 @@
 #pragma once
 
+struct GLFWwindow;
+
 namespace sm {
     namespace imgui_context {
-        void initialize(void* window_handle);
+        void initialize(GLFWwindow* window_handle);
         void uninitialize();
 
         void begin_frame();

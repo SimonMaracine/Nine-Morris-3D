@@ -3,7 +3,7 @@
 #include <string>
 
 namespace sm {
-    struct Dependencies {
-        static std::string get_information();
-    };
+    namespace dependencies {
+        std::string get_information();
+    }
 }

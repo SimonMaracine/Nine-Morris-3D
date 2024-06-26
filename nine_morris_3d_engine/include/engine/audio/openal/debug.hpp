@@ -3,9 +3,9 @@
 #include <string>
 
 namespace sm {
-    struct AlDebug {
-        static void check_errors();
-        static std::string get_information();
-        static const char* get_version();
-    };
+    namespace openal_debug {
+        void check_errors();
+        std::string get_information();
+        const char* get_version();
+    }
 }

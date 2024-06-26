@@ -24,7 +24,7 @@ int application_main();
         INT WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, INT) {
             return application_main();
         }
-    #elif defined(SM_BUILD_DEBUG)
+    #else
         int main(int, char**) {
             return application_main();
         }

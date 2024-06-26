@@ -8,8 +8,8 @@
 // Separate logging base from logging macros to keep things clean in the engine
 
 namespace sm {
-    class FileSystem;
     class Ctx;
+    class FileSystem;
 
     class Logging {
     public:

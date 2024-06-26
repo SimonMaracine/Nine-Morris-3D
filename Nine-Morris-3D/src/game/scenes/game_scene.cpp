@@ -18,7 +18,7 @@ void GameScene::on_start() {
 
     ctx->evt.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
 
-    sm::OpenGl::clear_color(0.3f, 0.1f, 0.3f);
+    sm::opengl::clear_color(0.3f, 0.1f, 0.3f);
 
     {
         auto mesh {std::make_unique<sm::Mesh>(

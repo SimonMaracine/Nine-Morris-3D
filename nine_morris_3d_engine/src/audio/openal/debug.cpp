@@ -9,7 +9,7 @@
 #include "engine/application_base/logging.hpp"
 
 namespace sm {
-    void AlDebug::check_errors() {
+    void openal_debug::check_errors() {
 #ifndef SM_BUILD_DISTRIBUTION
         const ALenum error {alGetError()};
 
@@ -42,7 +42,7 @@ namespace sm {
 #endif
     }
 
-    std::string AlDebug::get_information() {
+    std::string openal_debug::get_information() {
         static constexpr std::size_t BUFFER_LENGTH {256};  // 256 should be enough
 
         char buffer[BUFFER_LENGTH] {};
@@ -56,7 +56,7 @@ namespace sm {
         return result;
     }
 
-    const char* AlDebug::get_version() {
+    const char* openal_debug::get_version() {
         return alGetString(AL_VERSION);
     }
 }

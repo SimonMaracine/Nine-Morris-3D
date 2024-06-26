@@ -7,6 +7,29 @@
 #include "engine/application_base/error.hpp"
 
 namespace sm {
+    void utils::center_image(
+        float screen_width,
+        float screen_height,
+        float image_width,
+        float image_height,
+        float& x,
+        float& y,
+        float& width,
+        float& height
+    ) {
+        if (screen_width / screen_height > image_width / image_height) {
+            width = screen_width;
+            height = screen_width * (image_height / image_width);
+            x = 0.0f;
+            y = (height - screen_height) / -2.0f;
+        } else {
+            height = screen_height;
+            width = screen_height * (image_width / image_height);
+            x = (width - screen_width) / -2.0f;
+            y = 0.0f;
+        }
+    }
+
     std::string utils::read_file_ex(const std::string& file_path) {
         std::ifstream stream {file_path, std::ios::binary};
 

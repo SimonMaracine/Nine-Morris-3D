@@ -35,55 +35,10 @@ set(ALSOFT_INSTALL_UTILS OFF)
 set(ALSOFT_UPDATE_BUILD_VERSION OFF)
 set(LIBTYPE "STATIC")
 
-# Make glad
-add_library(glad STATIC "extern/glad/src/glad.c")
-target_include_directories(glad PUBLIC "extern/glad/include")
-
-# Make stb
-add_library(stb STATIC
-    "extern/stb_image/stb_image.c"
-    "extern/stb_image_resize2/stb_image_resize2.c"
-    "extern/stb_image_write/stb_image_write.c"
-    "extern/stb_truetype/stb_truetype.c"
-    "extern/stb_vorbis/stb_vorbis.c"
-)
-
-target_include_directories(stb PUBLIC
-    "extern/stb_image"
-    "extern/stb_image_resize2"
-    "extern/stb_image_write"
-    "extern/stb_truetype"
-    "extern/stb_vorbis"
-)
-
-# Make Dear ImGui
-add_library(dear_imgui STATIC
-    "extern/imgui/imgui_demo.cpp"
-    "extern/imgui/imgui_draw.cpp"
-    "extern/imgui/imgui_tables.cpp"
-    "extern/imgui/imgui_widgets.cpp"
-    "extern/imgui/imgui.cpp"
-    "extern/imgui/imconfig.h"
-    "extern/imgui/imgui_internal.h"
-    "extern/imgui/imgui.h"
-    "extern/imgui/imstb_rectpack.h"
-    "extern/imgui/imstb_textedit.h"
-    "extern/imgui/imstb_truetype.h"
-
-    "extern/imgui/backends/imgui_impl_glfw.cpp"
-    "extern/imgui/backends/imgui_impl_opengl3.cpp"
-    "extern/imgui/backends/imgui_impl_glfw.h"
-    "extern/imgui/backends/imgui_impl_opengl3_loader.h"
-    "extern/imgui/backends/imgui_impl_opengl3.h"
-)
-
-target_include_directories(dear_imgui PUBLIC "extern/imgui")
-target_include_directories(dear_imgui PRIVATE "extern/glfw/include")
-target_compile_definitions(dear_imgui PRIVATE "NDEBUG")
-
-# Make cereal
-add_library(cereal INTERFACE)
-target_include_directories(cereal INTERFACE "extern/cereal/include")
+include(cmake/cereal.cmake)
+include(cmake/dear_imgui.cmake)
+include(cmake/glad.cmake)
+include(cmake/stb.cmake)
 
 add_subdirectory(extern/assimp)
 add_subdirectory(extern/entt)
@@ -176,7 +131,6 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/other/camera_controller.hpp"
     "include/engine/other/concurrent_loader.hpp"
     "include/engine/other/dependencies.hpp"
-    "include/engine/other/identifier.hpp"
     "include/engine/other/random_gen.hpp"
     "include/engine/other/resources_cache.hpp"
     "include/engine/other/utilities.hpp"
@@ -232,22 +186,15 @@ endif()
 target_compile_features(nine_morris_3d_engine PUBLIC cxx_std_17)
 set_target_properties(nine_morris_3d_engine PROPERTIES CXX_EXTENSIONS OFF)
 
-# Add compile definitions for engine and client and others
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    # Optimization on
-    target_compile_definitions(nine_morris_3d_engine PUBLIC "NM3D_RELEASE_MODE")  # Just a flag used by platform.hpp
-
-    if(NM3D_DISTRIBUTION_MODE)
-        target_compile_definitions(nine_morris_3d_engine PUBLIC
-            "NM3D_DISTRIBUTION_MODE"  # Another flag used by platform.hpp
-            "NDEBUG"  # Disable asserts globally
-            "ENTT_DISABLE_ASSERT"
-        )
-    endif()
+if(NM3D_DISTRIBUTION_MODE)
+    target_compile_definitions(nine_morris_3d_engine PUBLIC
+        "NM3D_DISTRIBUTION_MODE"  # Flag used by platform.hpp
+        "NDEBUG"  # Disable asserts globally
+        "ENTT_DISABLE_ASSERT"
+    )
 endif()
 
 target_compile_definitions(nine_morris_3d_engine PRIVATE
-    # "IMGUI_IMPL_OPENGL_LOADER_GLAD"
     "UTF_CPP_CPLUSPLUS=201703"
     "AL_LIBTYPE_STATIC"
 )

@@ -5,7 +5,7 @@ file(GLOB_RECURSE NM3D_HEADERS "src/*.hpp")
 
 # Add WIN32 option for Windows in release + distribution mode
 if(WIN32)
-    if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NM3D_DISTRIBUTION_MODE)
+    if(NM3D_DISTRIBUTION_MODE)
         set(GUI_EXECUTABLE_WINDOWS WIN32)
     endif()
 endif()

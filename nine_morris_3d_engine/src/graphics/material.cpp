@@ -179,7 +179,7 @@ namespace sm {
                     std::memcpy(&texture, data + element.offset, sizeof(texture));
 
                     shader->upload_uniform_int(name, texture.unit);
-                    OpenGl::bind_texture_2d(texture.texture, texture.unit);
+                    opengl::bind_texture_2d(texture.texture, texture.unit);
 
                     break;
                 }

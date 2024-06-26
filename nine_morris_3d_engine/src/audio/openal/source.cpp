@@ -14,7 +14,7 @@ namespace sm {
         alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
         alSourcef(source, AL_MAX_DISTANCE, max_distance);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         LOG_DEBUG("Created AL source {}", source);
     }
@@ -24,7 +24,7 @@ namespace sm {
 
         alDeleteSources(1, &source);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         LOG_DEBUG("Deleted AL source {}", source);
     }
@@ -36,39 +36,39 @@ namespace sm {
             attached_buffer = buffer->buffer;
             alSourcei(source, AL_BUFFER, attached_buffer);
 
-            AlDebug::check_errors();
+            openal_debug::check_errors();
 
             buffer->sources_attached.insert(source);
         }
 
         alSourcePlay(source);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
     }
 
     void AlSource::stop() const {
         alSourceStop(source);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
     }
 
     void AlSource::pause() const {
         alSourcePause(source);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
     }
 
     void AlSource::resume() const {
         alSourcePlay(source);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
     }
 
     bool AlSource::is_playing() const {
         int state {};
         alGetSourcei(source, AL_SOURCE_STATE, &state);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         return state == AL_PLAYING;
     }
@@ -78,7 +78,7 @@ namespace sm {
 
         alSourcef(source, AL_GAIN, gain);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->gain = gain;
     }
@@ -88,7 +88,7 @@ namespace sm {
 
         alSourcef(source, AL_PITCH, pitch);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->pitch = pitch;
     }
@@ -96,7 +96,7 @@ namespace sm {
     void AlSource::set_position(const glm::vec3& position) {
         alSource3f(source, AL_POSITION, position.x, position.y, position.z);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->position = position;
     }
@@ -104,7 +104,7 @@ namespace sm {
     void AlSource::set_velocity(const glm::vec3& velocity) {
         alSource3f(source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->velocity = velocity;
     }
@@ -112,7 +112,7 @@ namespace sm {
     void AlSource::set_direction(const glm::vec3& direction) {
         alSource3f(source, AL_DIRECTION, direction.x, direction.y, direction.z);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->direction = direction;
     }
@@ -120,7 +120,7 @@ namespace sm {
     void AlSource::set_looping(bool looping) {
         alSourcei(source, AL_LOOPING, static_cast<ALint>(looping));
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->looping = looping;
     }
@@ -128,7 +128,7 @@ namespace sm {
     void AlSource::set_rolloff_factor(float rolloff_factor) {
         alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->rolloff_factor = rolloff_factor;
     }
@@ -136,7 +136,7 @@ namespace sm {
     void AlSource::set_reference_distance(float reference_distance) {
         alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->reference_distance = reference_distance;
     }
@@ -144,7 +144,7 @@ namespace sm {
     void AlSource::set_max_distance(float max_distance) {
         alSourcef(source, AL_MAX_DISTANCE, max_distance);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->max_distance = max_distance;
     }

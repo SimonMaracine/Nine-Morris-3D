@@ -161,11 +161,11 @@ namespace sm {
         }
     }
 
-    void imgui_context::initialize(void* window_handle) {
+    void imgui_context::initialize(GLFWwindow* window_handle) {
         IMGUI_CHECKVERSION();
 
         ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window_handle), false);
+        ImGui_ImplGlfw_InitForOpenGL(window_handle, false);
         ImGui_ImplOpenGL3_Init("#version 430 core");
 
         [[maybe_unused]] ImGuiIO& io {ImGui::GetIO()};  // TODO other flags?

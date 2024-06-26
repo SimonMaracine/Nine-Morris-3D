@@ -27,7 +27,7 @@
 namespace sm {
     static constexpr std::size_t BUFFER_LENGTH {128};
 
-    std::string Dependencies::get_information() {
+    std::string dependencies::get_information() {
         char buffer[BUFFER_LENGTH] {};
         std::string result;
 

@@ -12,7 +12,7 @@ namespace sm {
 
         alListenerf(AL_GAIN, gain);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->gain = gain;
     }
@@ -20,7 +20,7 @@ namespace sm {
     void AlListener::set_position(const glm::vec3& position) {
         alListener3f(AL_POSITION, position.x, position.y, position.z);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->position = position;
     }
@@ -28,7 +28,7 @@ namespace sm {
     void AlListener::set_velocity(const glm::vec3& velocity) {
         alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->velocity = velocity;
     }
@@ -45,7 +45,7 @@ namespace sm {
 
         alListenerfv(AL_ORIENTATION, orientation);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->look_at = look_at;
         this->up = up;
@@ -80,7 +80,7 @@ namespace sm {
 
         alDistanceModel(result);
 
-        AlDebug::check_errors();
+        openal_debug::check_errors();
 
         this->distance_model = distance_model;
     }

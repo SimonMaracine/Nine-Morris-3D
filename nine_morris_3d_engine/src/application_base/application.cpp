@@ -24,7 +24,7 @@ namespace sm {
 
         LOG_DIST_INFO("Working directory: {}", FileSystem::current_working_directory());
 
-        const auto [version_major, version_minor] {GlDebug::get_version_number()};
+        const auto [version_major, version_minor] {opengl_debug::get_version_number()};
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -179,9 +179,9 @@ namespace sm {
         std::string result;;
 
         result += '\n';
-        result += AlDebug::get_information();
-        result += GlDebug::get_information();
-        result += Dependencies::get_information();
+        result += openal_debug::get_information();
+        result += opengl_debug::get_information();
+        result += dependencies::get_information();
 
         return result;
     }
