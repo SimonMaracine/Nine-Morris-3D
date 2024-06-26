@@ -192,6 +192,45 @@ void GameScene::on_start() {
         ctx->res.texture.load("white_indicator"_H, data);
     }
 
+    {
+        sm::TexturePostProcessing processing;
+        processing.size = sm::Size::Half;  // Half looks better
+
+        auto px {std::make_shared<sm::TextureData>(
+            sm::utils::read_file(ctx->fs.path_assets("textures/skybox/field/px.png")),
+            processing
+        )};
+
+        auto nx {std::make_shared<sm::TextureData>(
+            sm::utils::read_file(ctx->fs.path_assets("textures/skybox/field/nx.png")),
+            processing
+        )};
+
+        auto py {std::make_shared<sm::TextureData>(
+            sm::utils::read_file(ctx->fs.path_assets("textures/skybox/field/py.png")),
+            processing
+        )};
+
+        auto ny {std::make_shared<sm::TextureData>(
+            sm::utils::read_file(ctx->fs.path_assets("textures/skybox/field/ny.png")),
+            processing
+        )};
+
+        auto pz {std::make_shared<sm::TextureData>(
+            sm::utils::read_file(ctx->fs.path_assets("textures/skybox/field/pz.png")),
+            processing
+        )};
+
+        auto nz {std::make_shared<sm::TextureData>(
+            sm::utils::read_file(ctx->fs.path_assets("textures/skybox/field/nz.png")),
+            processing
+        )};
+
+        const std::initializer_list list {px, nx, py, ny, pz, nz};
+
+        ctx->res.texture_cubemap.load("field"_H, list);
+    }
+
     cam_controller = PointCameraController(
         &cam,
         ctx->win.get_width(),
@@ -235,6 +274,8 @@ void GameScene::on_update() {
 
     ctx->rnd.add_light(directional_light);
     ctx->rnd.add_light(point_light);
+
+    ctx->rnd.skybox(ctx->res.texture_cubemap["field"_H]);
 
     sm::Renderable dragon;
     dragon.vertex_array = ctx->res.vertex_array["dragon"_H];

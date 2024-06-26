@@ -24,7 +24,7 @@ namespace sm {
     class ResourcesCache {
     public:
         resmanager::Cache<GlTexture> texture;
-        // resmanager::Cache<GlTextureCubemap> texture_3d;
+        resmanager::Cache<GlTextureCubemap> texture_cubemap;
         resmanager::Cache<GlVertexArray> vertex_array;
         // resmanager::Cache<GlShader> shader;
         // resmanager::Cache<GlVertexBuffer> vertex_buffer;

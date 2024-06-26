@@ -3,7 +3,7 @@
 namespace sm {
     void ResourcesCache::merge(ResourcesCache& other) {
         texture.merge(other.texture);
-        // texture_3d.merge(other.texture_3d);
+        texture_cubemap.merge(other.texture_cubemap);
         vertex_array.merge(other.vertex_array);
         // shader.merge(other.shader);
         // vertex_buffer.merge(other.vertex_buffer);
@@ -24,7 +24,7 @@ namespace sm {
 
     void ResourcesCache::merge_replace(ResourcesCache& other) {
         texture.merge_replace(other.texture);
-        // texture_3d.merge_replace(other.texture_3d);
+        texture_cubemap.merge_replace(other.texture_cubemap);
         vertex_array.merge_replace(other.vertex_array);
         // shader.merge_replace(other.shader);
         // vertex_buffer.merge_replace(other.vertex_buffer);
@@ -45,7 +45,7 @@ namespace sm {
 
     void ResourcesCache::clear() {
         texture.clear();
-        // texture_3d.clear();
+        texture_cubemap.clear();
         vertex_array.clear();
         // shader.clear();
         // vertex_buffer.clear();

@@ -170,61 +170,21 @@ namespace sm {
         }
     }
 
-    // --- Cubemap texture
-
-    // GlTextureCubemap::GlTextureCubemap(const char** file_paths) {
-    //     glGenTextures(1, &texture);
-    //     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-
-    //     configure_filter_and_wrap_3d();
-
-    //     stbi_set_flip_vertically_on_load(0);
-
-    //     int width, height, channels;
-    //     unsigned char* data[6];
-
-    //     for (std::size_t i {0}; i < 6; i++) {
-    //         LOG_DEBUG("Loading texture `{}`...", file_paths[i]);
-
-    //         data[i] = stbi_load(file_paths[i], &width, &height, &channels, CHANNELS);
-
-    //         if (data[i] == nullptr) {
-    //             LOG_DIST_CRITICAL("Could not load texture `{}`", file_paths[i]);
-    //             throw ResourceLoadingError;
-    //         }
-    //     }
-
-    //     glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
-
-    //     for (std::size_t i {0}; i < 6; i++) {
-    //         glTexSubImage2D(
-    //             GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<unsigned int>(i),
-    //             0,
-    //             0,
-    //             0,
-    //             width,
-    //             height,
-    //             GL_RGBA,
-    //             GL_UNSIGNED_BYTE, data[i]
-    //         );
-
-    //         stbi_image_free(data[i]);
-    //     }
-
-    //     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-    //     name = Utils::get_directory_name(file_paths[0]);
-
-    //     LOG_DEBUG("Created GL texture cubemap {} ({})", texture, name);
-    // }
-
     GlTextureCubemap::GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
         configure_filter_and_wrap_3d();
 
-        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, data.begin()[0]->get_width(), data.begin()[0]->get_height());
+        int width {data.begin()[0]->get_width()};
+        int height {data.begin()[0]->get_height()};
+
+        for (const auto& texture : data) {
+            assert(texture->get_width() == width);
+            assert(texture->get_height() == height);
+        }
+
+        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
 
         for (std::size_t i {0}; i < 6; i++) {
             glTexSubImage2D(
