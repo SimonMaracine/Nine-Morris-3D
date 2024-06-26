@@ -1,9 +1,10 @@
 #pragma once
 
 #include <vector>
-#include <memory>
+#include <array>
 #include <unordered_map>
 #include <initializer_list>
+#include <memory>
 
 #include <glm/glm.hpp>
 
@@ -87,6 +88,8 @@ namespace sm {
         void add_text(const Text& text);
         void add_info_text(float fps);
 
+        void add_quad(const Quad& quad);
+
         // Debug API
         void debug_add_line(const glm::vec3& position1, const glm::vec3& position2, const glm::vec3& color);
         void debug_add_lines(const std::vector<glm::vec3>& points, const glm::vec3& color);
@@ -123,10 +126,23 @@ namespace sm {
         void draw_texts();
         void draw_text_batch(const TextBatch& batch);
 
+        void draw_quads();
+        void draw_quad(glm::vec2 position, glm::vec2 size, glm::vec2 scale, unsigned int texture);
+        void begin_quads_batch();
+        void end_quads_batch();
+        void flush_quads_batch();
+
         // Helper functions
         void setup_point_light_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
         void setup_light_space_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer);
+        std::shared_ptr<GlIndexBuffer> initialize_quads_index_buffer();
         static glm::mat4 get_renderable_transform(const Renderable& renderable);
+
+        struct QuadVertex {
+            glm::vec2 position {};
+            glm::vec2 texture_coordinate {};
+            int texture_index {};
+        };
 
         struct {
             std::shared_ptr<GlFramebuffer> scene_framebuffer;
@@ -136,17 +152,20 @@ namespace sm {
             std::unique_ptr<GlShader> screen_quad_shader;
             std::shared_ptr<GlShader> shadow_shader;
             std::unique_ptr<GlShader> text_shader;
+            std::unique_ptr<GlShader> quad_shader;
             std::unique_ptr<GlShader> skybox_shader;
 
             std::unique_ptr<GlVertexArray> screen_quad_vertex_array;
-            std::unique_ptr<GlVertexArray> skybox_vertex_array;
             std::unique_ptr<GlVertexArray> text_vertex_array;
+            std::unique_ptr<GlVertexArray> quad_vertex_array;
+            std::unique_ptr<GlVertexArray> skybox_vertex_array;
 
             std::shared_ptr<Font> default_font;
 
             std::shared_ptr<GlTextureCubemap> skybox_texture;
 
             std::weak_ptr<GlVertexBuffer> wtext_vertex_buffer;
+            std::weak_ptr<GlVertexBuffer> wquad_vertex_buffer;
 
             std::unordered_map<unsigned int, std::weak_ptr<GlUniformBuffer>> uniform_buffers;
             std::weak_ptr<GlUniformBuffer> wprojection_view_uniform_buffer;
@@ -155,10 +174,22 @@ namespace sm {
             std::weak_ptr<GlUniformBuffer> wpoint_light_uniform_buffer;
             std::weak_ptr<GlUniformBuffer> wlight_space_uniform_buffer;
 
-            std::vector<TextBatch> text_batches;
-            std::vector<unsigned char> text_batch_buffer;
-            std::vector<glm::mat4> text_batch_matrices;
-            std::vector<glm::vec3> text_batch_colors;
+            struct {
+                std::vector<TextBatch> batches;
+                std::vector<unsigned char> batch_buffer;
+                std::vector<glm::mat4> batch_matrices;
+                std::vector<glm::vec3> batch_colors;
+            } text;
+
+            struct {
+                std::unique_ptr<QuadVertex[]> buffer;
+                QuadVertex* buffer_pointer {nullptr};
+
+                std::array<unsigned int, 8> texture_slots {};
+                std::size_t texture_slot_index {};
+
+                std::size_t quad_count {};
+            } quad;
         } storage;
 
         PostProcessingContext post_processing_context;  // TODO implement
@@ -168,6 +199,7 @@ namespace sm {
             DirectionalLight directional_light;
             std::vector<PointLight> point_lights;
             std::vector<Text> texts;
+            std::vector<Quad> quads;
 
             struct {
                 glm::mat4 view_matrix {1.0f};
@@ -199,6 +231,19 @@ namespace sm {
 #ifndef SM_BUILD_DISTRIBUTION
         DebugRenderer debug;
 #endif
+
+        static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING {0};
+        static constexpr unsigned int DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING {1};
+        static constexpr unsigned int VIEW_POSITION_BLOCK_BINDING {2};
+        static constexpr unsigned int POINT_LIGHT_BLOCK_BINDING {3};
+        static constexpr unsigned int LIGHT_SPACE_BLOCK_BINDING {4};
+        static constexpr std::size_t SHADER_MAX_POINT_LIGHTS {4};
+        static constexpr std::size_t SHADER_MAX_BATCH_TEXTS {32};  // This should never reach the limit
+        static constexpr int SHADOW_MAP_UNIT {1};
+        static constexpr std::size_t MAX_QUAD_COUNT {1000};
+        static constexpr std::size_t MAX_QUADS_BUFFER_SIZE {MAX_QUAD_COUNT * 4 * sizeof(QuadVertex)};
+        static constexpr std::size_t MAX_QUADS_INDICES {MAX_QUAD_COUNT * 6};
+        static constexpr std::size_t MAX_QUADS_TEXTURES {8};
 
         friend class Application;
         friend class Ctx;

@@ -36,6 +36,7 @@ namespace sm {
         void upload_uniform_mat4(Id name, const glm::mat4& matrix) const;
         void upload_uniform_mat4_array(Id name, const std::vector<glm::mat4>& matrices) const;
         void upload_uniform_int(Id name, int value) const;
+        void upload_uniform_int_array(Id name, const std::vector<int>& values) const;
         void upload_uniform_float(Id name, float value) const;
         void upload_uniform_vec2(Id name, glm::vec2 vector) const;
         void upload_uniform_vec3(Id name, const glm::vec3& vector) const;

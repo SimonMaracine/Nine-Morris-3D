@@ -48,4 +48,10 @@ namespace sm {
         glm::vec3 color {};
         float scale {1.0f};
     };
+
+    struct Quad {
+        glm::vec2 position {};
+        glm::vec2 scale {1.0f};
+        std::shared_ptr<GlTexture> texture;
+    };
 }

@@ -151,7 +151,7 @@ void GameScene::on_start() {
         specification.size_height = 40.0f;
 
         auto font {ctx->res.font.load(
-            "font"_H,
+            "sans"_H,
             sm::utils::read_file(ctx->fs.path_assets("fonts/OpenSans/OpenSans-Regular.ttf")),
             specification
         )};
@@ -162,7 +162,34 @@ void GameScene::on_start() {
         font->bake_characters(192, 22);
         font->bake_characters(223, 23);
         font->bake_characters(536, 4);
-        font->end_baking("font");
+        font->end_baking("sans");
+    }
+
+    {
+        sm::TexturePostProcessing post_processing;
+        post_processing.flip = true;
+
+        auto data {ctx->res.texture_data.load(
+            "wait_indicator"_H,
+            sm::utils::read_file(ctx->fs.path_assets("textures/indicator/wait_indicator.png")),
+            post_processing
+        )};
+
+        ctx->res.texture.load("wait_indicator"_H, data);
+    }
+
+    {
+        sm::TexturePostProcessing post_processing;
+        post_processing.flip = true;
+        post_processing.size = sm::Size::Half;
+
+        auto data {ctx->res.texture_data.load(
+            "white_indicator"_H,
+            sm::utils::read_file(ctx->fs.path_assets("textures/indicator/white_indicator.png")),
+            post_processing
+        )};
+
+        ctx->res.texture.load("white_indicator"_H, data);
     }
 
     cam_controller = PointCameraController(
@@ -238,7 +265,7 @@ void GameScene::on_update() {
     ctx->rnd.add_info_text(ctx->fps);
 
     sm::Text test;
-    test.font = ctx->res.font["font"_H];
+    test.font = ctx->res.font["sans"_H];
     test.text = "The quick brown fox jumps over the lazy dog.";
     test.color = glm::vec3(0.8f);
 
@@ -256,7 +283,25 @@ void GameScene::on_update() {
     ctx->rnd.add_text(test);
 
     {
-        const auto [w, h] {ctx->res.font["font"_H]->get_string_size("Some Text. Three spaces   !!?@#&^`~*&\"", scl)};
+        sm::Quad quad;
+        quad.texture = ctx->res.texture["wait_indicator"_H];
+        quad.position = glm::vec2(10.0f) + pos;
+        quad.scale = glm::vec2(scl);
+
+        ctx->rnd.add_quad(quad);
+    }
+
+    {
+        sm::Quad quad;
+        quad.texture = ctx->res.texture["white_indicator"_H];
+        quad.scale = glm::vec2(scl);
+        quad.position = glm::vec2(100.0f, 100.0f) + pos;
+
+        ctx->rnd.add_quad(quad);
+    }
+
+    {
+        const auto [w, h] {ctx->res.font["sans"_H]->get_string_size("Some Text. Three spaces   !!?@#&^`~*&\"", scl)};
 
         test.text = "Some Text. Three spaces   !!?@#&^`~*&\"";
         test.position = glm::vec2(static_cast<float>(ctx->win.get_width() - w), static_cast<float>(ctx->win.get_height() - h));
@@ -266,7 +311,7 @@ void GameScene::on_update() {
     }
 
     {
-        const auto [w, h] {ctx->res.font["font"_H]->get_string_size("Simon Mărăcine ăîâșț ĂÎÂȘȚ", scl)};
+        const auto [w, h] {ctx->res.font["sans"_H]->get_string_size("Simon Mărăcine ăîâșț ĂÎÂȘȚ", scl)};
 
         test.text = "Simon Mărăcine ăîâșț ĂÎÂȘȚ";
         test.position = glm::vec2(static_cast<float>(ctx->win.get_width() / 2 - w / 2), static_cast<float>(ctx->win.get_height() / 2 - h / 2));
@@ -276,7 +321,7 @@ void GameScene::on_update() {
     }
 
     {
-        const auto [_, h] {ctx->res.font["font"_H]->get_string_size("Text that spans\nmultiple lines\nlike that.", scl)};
+        const auto [_, h] {ctx->res.font["sans"_H]->get_string_size("Text that spans\nmultiple lines\nlike that.", scl)};
 
         test.text = "Text that spans\nmultiple lines\nlike that.";
         test.position = glm::vec2(0.0f, static_cast<float>(ctx->win.get_height() - h));
@@ -286,7 +331,7 @@ void GameScene::on_update() {
     }
 
     {
-        const auto [w, _] {ctx->res.font["font"_H]->get_string_size("Another\ntext\nwith multiple\nlines.", scl)};
+        const auto [w, _] {ctx->res.font["sans"_H]->get_string_size("Another\ntext\nwith multiple\nlines.", scl)};
 
         test.text = "Another\ntext\nwith multiple\nlines.";
         test.position = glm::vec2(static_cast<float>(ctx->win.get_width() - w), 0.0f);

@@ -23,7 +23,7 @@ namespace sm {
 
     class ResourcesCache {
     public:
-        // resmanager::Cache<GlTexture> texture;
+        resmanager::Cache<GlTexture> texture;
         // resmanager::Cache<GlTextureCubemap> texture_3d;
         resmanager::Cache<GlVertexArray> vertex_array;
         // resmanager::Cache<GlShader> shader;
@@ -35,7 +35,7 @@ namespace sm {
         resmanager::Cache<Font> font;
         resmanager::Cache<Material> material;
         resmanager::Cache<MaterialInstance> material_instance;
-        // resmanager::Cache<TextureData> texture_data;
+        resmanager::Cache<TextureData> texture_data;
         // resmanager::Cache<Mesh> mesh;
         // resmanager::Cache<AlSource> al_source;
         // resmanager::Cache<AlBuffer> al_buffer;

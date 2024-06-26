@@ -72,6 +72,11 @@ namespace sm {
         glUniform1i(location, value);
     }
 
+    void GlShader::upload_uniform_int_array(Id name, const std::vector<int>& values) const {
+        const int location {get_uniform_location(name)};
+        glUniform1iv(location, static_cast<int>(values.size()), values.data());
+    }
+
     void GlShader::upload_uniform_float(Id name, float value) const {
         const int location {get_uniform_location(name)};
         glUniform1f(location, value);

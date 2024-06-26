@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <optional>
+#include <initializer_list>
 
 #include <glm/glm.hpp>
 
@@ -45,8 +46,8 @@ namespace sm {
 
     class GlTexture {
     public:
-        GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification);
-        GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification);
+        GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification = {});
+        GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification = {});
         ~GlTexture();
 
         GlTexture(const GlTexture&) = delete;

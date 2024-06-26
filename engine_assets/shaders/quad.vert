@@ -2,14 +2,12 @@
 
 layout(location = 0) in vec2 a_position;
 layout(location = 1) in vec2 a_texture_coordinate;
-layout(location = 2) in float a_texture_index;
+layout(location = 2) in int a_texture_index;
 
 out vec2 v_texture_coordinate;
-out flat float v_texture_index;
+out flat int v_texture_index;
 
-layout(binding = 4) uniform Projection {
-    mat4 u_projection_matrix;
-};
+uniform mat4 u_projection_matrix;
 
 void main() {
     v_texture_coordinate = a_texture_coordinate;

@@ -1,7 +1,6 @@
 #include "engine/graphics/renderer.hpp"
 
 #include <cstddef>
-#include <array>
 #include <algorithm>
 #include <string>
 
@@ -21,15 +20,6 @@
 using namespace resmanager::literals;
 
 namespace sm {
-    static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING {0};
-    static constexpr unsigned int DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING {1};
-    static constexpr unsigned int VIEW_POSITION_BLOCK_BINDING {2};
-    static constexpr unsigned int POINT_LIGHT_BLOCK_BINDING {3};
-    static constexpr unsigned int LIGHT_SPACE_BLOCK_BINDING {4};
-    static constexpr std::size_t SHADER_MAX_POINT_LIGHTS {4};
-    static constexpr std::size_t SHADER_MAX_BATCH_TEXTS {32};  // This should never reach the limit
-    static constexpr int SHADOW_MAP_UNIT {1};
-
     DebugRenderer::DebugRenderer(const FileSystem& fs, Renderer& renderer) {
         storage.shader = std::make_shared<GlShader>(
             utils::read_file(fs.path_engine_assets("shaders/debug.vert")),
@@ -170,6 +160,19 @@ namespace sm {
 
         {
             // Doesn't have uniform buffers for sure
+            storage.quad_shader = std::make_unique<GlShader>(
+                utils::read_file(fs.path_engine_assets("shaders/quad.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/quad.frag"))
+            );
+
+            storage.quad_shader->bind();
+            storage.quad_shader->upload_uniform_int_array("u_texture[0]"_H, {0, 1, 2, 3, 4, 5, 6, 7});
+
+            GlShader::unbind();
+        }
+
+        {
+            // Doesn't have uniform buffers for sure
             storage.skybox_shader = std::make_unique<GlShader>(
                 utils::read_file(fs.path_engine_assets("shaders/skybox.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/skybox.frag"))
@@ -226,9 +229,28 @@ namespace sm {
         }
 
         {
+            auto vertex_buffer {std::make_shared<GlVertexBuffer>(MAX_QUADS_BUFFER_SIZE, DrawHint::Stream)};
+            auto index_buffer {initialize_quads_index_buffer()};
+
+            storage.quad_vertex_array = std::make_unique<GlVertexArray>();
+            storage.quad_vertex_array->configure([&](GlVertexArray* va) {
+                VertexBufferLayout layout;
+                layout.add(0, VertexBufferLayout::Float, 2);
+                layout.add(1, VertexBufferLayout::Float, 2);
+                layout.add(2, VertexBufferLayout::Int, 1);
+
+                va->add_vertex_buffer(vertex_buffer, layout);
+                va->add_index_buffer(index_buffer);
+            });
+
+            storage.wquad_vertex_buffer = vertex_buffer;
+
+            storage.quad.buffer = std::make_unique<QuadVertex[]>(MAX_QUAD_COUNT * 4);
+        }
+
+        {
             storage.default_font = std::make_unique<Font>(
-                utils::read_file(fs.path_engine_assets("fonts/CodeNewRoman/code-new-roman.regular.ttf")),
-                FontSpecification()
+                utils::read_file(fs.path_engine_assets("fonts/CodeNewRoman/code-new-roman.regular.ttf"))
             );
 
             storage.default_font->begin_baking();
@@ -297,6 +319,10 @@ namespace sm {
         text.color = glm::vec3(1.0f);
 
         scene_list.texts.push_back(text);
+    }
+
+    void Renderer::add_quad(const Quad& quad) {
+        scene_list.quads.push_back(quad);
     }
 
     void Renderer::debug_add_line(const glm::vec3& position1, const glm::vec3& position2, const glm::vec3& color) {
@@ -500,6 +526,7 @@ namespace sm {
 
         // 2D stuff
         draw_texts();
+        draw_quads();
 
 #ifndef SM_BUILD_DISTRIBUTION
         debug.render();
@@ -558,7 +585,8 @@ namespace sm {
         scene_list.directional_light = {};
         scene_list.point_lights.clear();
         scene_list.texts.clear();
-        storage.text_batches.clear();
+        scene_list.quads.clear();
+        storage.text.batches.clear();
 
 #ifndef SM_BUILD_DISTRIBUTION
         debug.clear();
@@ -698,9 +726,9 @@ namespace sm {
     }
 
     void Renderer::draw_texts() {
-        storage.text_shader->bind();
-
         OpenGl::disable_depth_test();
+
+        storage.text_shader->bind();
 
         std::stable_sort(scene_list.texts.begin(), scene_list.texts.end(), [](const Text& lhs, const Text& rhs) {
             return lhs.font.lock().get() < rhs.font.lock().get();
@@ -716,21 +744,21 @@ namespace sm {
             if (this_ptr != font_ptr) {
                 font_ptr = this_ptr;
 
-                storage.text_batches.emplace_back().wfont = text.font;
+                storage.text.batches.emplace_back().wfont = text.font;
             }
 
-            if (storage.text_batches.back().texts.size() >= SHADER_MAX_BATCH_TEXTS) {
-                storage.text_batches.emplace_back().wfont = text.font;
+            if (storage.text.batches.back().texts.size() >= SHADER_MAX_BATCH_TEXTS) {
+                storage.text.batches.emplace_back().wfont = text.font;
             }
 
-            storage.text_batches.back().texts.push_back(text);
+            storage.text.batches.back().texts.push_back(text);
         }
 
-        for (const auto& batch : storage.text_batches) {
+        for (const auto& batch : storage.text.batches) {
             draw_text_batch(batch);
-            storage.text_batch_buffer.clear();
-            storage.text_batch_matrices.clear();
-            storage.text_batch_colors.clear();
+            storage.text.batch_buffer.clear();
+            storage.text.batch_matrices.clear();
+            storage.text.batch_colors.clear();
         }
 
         OpenGl::enable_depth_test();
@@ -745,32 +773,32 @@ namespace sm {
             assert(i < SHADER_MAX_BATCH_TEXTS);
 
             // Pushes the rendered text onto the buffer
-            font->render(text.text, static_cast<int>(i++), storage.text_batch_buffer);
+            font->render(text.text, static_cast<int>(i++), storage.text.batch_buffer);
 
             glm::mat4 matrix {1.0f};  // TODO send mat3 instead
             matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
             matrix = glm::scale(matrix, glm::vec3(std::min(text.scale, 1.0f), std::min(text.scale, 1.0f), 1.0f));
 
-            storage.text_batch_matrices.push_back(matrix);
-            storage.text_batch_colors.push_back(text.color);
+            storage.text.batch_matrices.push_back(matrix);
+            storage.text.batch_colors.push_back(text.color);
         }
 
         // Uniforms must be set as arrays
-        storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, storage.text_batch_matrices);
-        storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, storage.text_batch_colors);
+        storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, storage.text.batch_matrices);
+        storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, storage.text.batch_colors);
         storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene_list.camera_2d.projection_matrix);
 
         auto vertex_buffer {storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
-        vertex_buffer->upload_data(storage.text_batch_buffer.data(), storage.text_batch_buffer.size());
+        vertex_buffer->upload_data(storage.text.batch_buffer.data(), storage.text.batch_buffer.size());
         GlVertexBuffer::unbind();
 
         static constexpr std::size_t ITEMS_PER_VERTEX {5};
         static constexpr std::size_t ITEM_SIZE {4};
 
-        assert(storage.text_batch_buffer.size() % (ITEM_SIZE * ITEMS_PER_VERTEX) == 0);
+        assert(storage.text.batch_buffer.size() % (ITEM_SIZE * ITEMS_PER_VERTEX) == 0);
 
-        const int vertex_count {static_cast<int>(storage.text_batch_buffer.size() / (ITEM_SIZE * ITEMS_PER_VERTEX))};
+        const int vertex_count {static_cast<int>(storage.text.batch_buffer.size() / (ITEM_SIZE * ITEMS_PER_VERTEX))};
 
         storage.text_vertex_array->bind();
 
@@ -779,6 +807,105 @@ namespace sm {
         OpenGl::draw_arrays(vertex_count);
 
         GlVertexArray::unbind();
+    }
+
+    void Renderer::draw_quads() {
+        OpenGl::disable_depth_test();
+
+        storage.quad_shader->bind();
+        storage.quad_vertex_array->bind();
+
+        storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene_list.camera_2d.projection_matrix);
+
+        begin_quads_batch();
+
+        for (const Quad& quad : scene_list.quads) {
+            draw_quad(
+                quad.position,
+                glm::vec2(static_cast<float>(quad.texture->get_width()), static_cast<float>(quad.texture->get_height())),
+                quad.scale,
+                quad.texture->get_id()
+            );
+        }
+
+        end_quads_batch();
+        flush_quads_batch();
+
+        GlVertexArray::unbind();
+
+        OpenGl::enable_depth_test();
+    }
+
+    void Renderer::draw_quad(glm::vec2 position, glm::vec2 size, glm::vec2 scale, unsigned int texture) {
+        if (storage.quad.quad_count == MAX_QUAD_COUNT || storage.quad.texture_slot_index == MAX_QUADS_TEXTURES) {
+            end_quads_batch();
+            flush_quads_batch();
+            begin_quads_batch();
+        }
+
+        int texture_index {-1};
+
+        // Search for this texture in slots array
+        for (std::size_t i {0}; i < storage.quad.texture_slot_index; i++) {
+            if (storage.quad.texture_slots[i] == texture) {
+                texture_index = static_cast<int>(i);
+                break;
+            }
+        }
+
+        if (texture_index < 0) {
+            // Not found in slots
+            texture_index = static_cast<int>(storage.quad.texture_slot_index);
+            storage.quad.texture_slots[storage.quad.texture_slot_index] = texture;
+            storage.quad.texture_slot_index++;
+        }
+
+        size *= glm::min(scale, glm::vec2(1.0f));
+
+        storage.quad.buffer_pointer->position = glm::vec2(position.x + size.x, position.y + size.y);
+        storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 1.0f);
+        storage.quad.buffer_pointer->texture_index = texture_index;
+        storage.quad.buffer_pointer++;
+
+        storage.quad.buffer_pointer->position = glm::vec2(position.x, position.y + size.y);
+        storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 1.0f);
+        storage.quad.buffer_pointer->texture_index = texture_index;
+        storage.quad.buffer_pointer++;
+
+        storage.quad.buffer_pointer->position = glm::vec2(position.x, position.y);
+        storage.quad.buffer_pointer->texture_coordinate = glm::vec2(0.0f, 0.0f);
+        storage.quad.buffer_pointer->texture_index = texture_index;
+        storage.quad.buffer_pointer++;
+
+        storage.quad.buffer_pointer->position = glm::vec2(position.x + size.x, position.y);
+        storage.quad.buffer_pointer->texture_coordinate = glm::vec2(1.0f, 0.0f);
+        storage.quad.buffer_pointer->texture_index = texture_index;
+        storage.quad.buffer_pointer++;
+
+        storage.quad.quad_count++;
+    }
+
+    void Renderer::begin_quads_batch() {
+        storage.quad.quad_count = 0;
+        storage.quad.buffer_pointer = storage.quad.buffer.get();
+        storage.quad.texture_slot_index = 0;
+    }
+
+    void Renderer::end_quads_batch() {
+        const std::size_t size {(storage.quad.buffer_pointer - storage.quad.buffer.get()) * sizeof(QuadVertex)};
+
+        auto vertex_buffer {storage.wquad_vertex_buffer.lock()};
+
+        vertex_buffer->bind();
+        vertex_buffer->upload_sub_data(storage.quad.buffer.get(), 0, size);
+    }
+
+    void Renderer::flush_quads_batch() {
+        for (std::size_t i {0}; i < storage.quad.texture_slot_index; i++) {
+            OpenGl::bind_texture_2d(storage.quad.texture_slots[i], static_cast<int>(i));
+        }
+
+        OpenGl::draw_elements(static_cast<int>(storage.quad.quad_count * 6));
     }
 
     void Renderer::setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer) {
@@ -836,6 +963,24 @@ namespace sm {
         const glm::mat4 light_space_matrix {projection * view};
 
         uniform_buffer->set(&light_space_matrix, "u_light_space_matrix"_H);
+    }
+
+    std::shared_ptr<GlIndexBuffer> Renderer::initialize_quads_index_buffer() {
+        const auto buffer {std::make_unique<unsigned int[]>(MAX_QUADS_INDICES)};
+        unsigned int offset {};
+
+        for (std::size_t i {0}; i < MAX_QUAD_COUNT * 6; i += 6) {
+            buffer[i + 0] = 0 + offset;
+            buffer[i + 1] = 1 + offset;
+            buffer[i + 2] = 2 + offset;
+            buffer[i + 3] = 2 + offset;
+            buffer[i + 4] = 3 + offset;
+            buffer[i + 5] = 0 + offset;
+
+            offset += 4;
+        }
+
+        return std::make_shared<GlIndexBuffer>(buffer.get(), MAX_QUADS_INDICES * sizeof(unsigned int));
     }
 
     glm::mat4 Renderer::get_renderable_transform(const Renderable& renderable) {

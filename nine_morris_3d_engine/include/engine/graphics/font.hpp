@@ -18,7 +18,7 @@ namespace sm {
 
     class Font {
     public:
-        Font(const std::string& buffer, const FontSpecification& specification);
+        Font(const std::string& buffer, const FontSpecification& specification = {});
         ~Font();
 
         Font(const Font&) = delete;
