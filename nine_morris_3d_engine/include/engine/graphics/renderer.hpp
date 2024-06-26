@@ -7,6 +7,7 @@
 
 #include <glm/glm.hpp>
 
+#include "engine/application_base/platform.hpp"
 #include "engine/application_base/file_system.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
@@ -20,11 +21,46 @@
 namespace sm {
     class Application;
     class Ctx;
+    class Renderer;
     class FileSystem;
     class GlVertexArray;
     class GlVertexBuffer;
     class GlUniformBuffer;
     class Font;
+
+    struct DebugRenderer {
+    public:
+        DebugRenderer() = default;
+        DebugRenderer(const FileSystem& fs, Renderer& renderer);
+    private:
+        void render();
+        void clear();
+
+        struct BufferVertex {
+            glm::vec3 position;
+            glm::vec3 color;
+        };
+
+        struct {
+            std::shared_ptr<GlShader> shader;
+            std::weak_ptr<GlVertexBuffer> wvertex_buffer;
+            std::unique_ptr<GlVertexArray> vertex_array;
+
+            std::vector<BufferVertex> lines_buffer;
+        } storage;
+
+        struct Line {
+            glm::vec3 position1;
+            glm::vec3 position2;
+            glm::vec3 color;
+        };
+
+        struct {
+            std::vector<Line> lines;
+        } scene_list;
+
+        friend class Renderer;
+    };
 
     class Renderer {
     private:
@@ -160,34 +196,9 @@ namespace sm {
             std::vector<std::weak_ptr<GlFramebuffer>> framebuffers;
         } scene_data;
 
-        // Debug ---------------------------------------------------------------
-
-        void debug_initialize(const FileSystem& fs);
-        void debug_render();
-        void debug_clear();
-
-        struct BufferVertex {
-            glm::vec3 position;
-            glm::vec3 color;
-        };
-
-        struct {
-            std::shared_ptr<GlShader> shader;
-            std::weak_ptr<GlVertexBuffer> wvertex_buffer;
-            std::unique_ptr<GlVertexArray> vertex_array;
-
-            std::vector<BufferVertex> lines_buffer;
-        } debug_storage;
-
-        struct Line {
-            glm::vec3 position1;
-            glm::vec3 position2;
-            glm::vec3 color;
-        };
-
-        struct {
-            std::vector<Line> lines;
-        } debug_scene_list;
+#ifndef SM_BUILD_DISTRIBUTION
+        DebugRenderer debug;
+#endif
 
         friend class Application;
         friend class Ctx;

@@ -30,6 +30,65 @@ namespace sm {
     static constexpr std::size_t SHADER_MAX_BATCH_TEXTS {32};  // This should never reach the limit
     static constexpr int SHADOW_MAP_UNIT {1};
 
+    DebugRenderer::DebugRenderer(const FileSystem& fs, Renderer& renderer) {
+        storage.shader = std::make_shared<GlShader>(
+            utils::read_file(fs.path_engine_assets("shaders/debug.vert")),
+            utils::read_file(fs.path_engine_assets("shaders/debug.frag"))
+        );
+
+        renderer.register_shader(storage.shader);
+
+        auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
+        storage.wvertex_buffer = vertex_buffer;
+
+        storage.vertex_array = std::make_unique<GlVertexArray>();
+        storage.vertex_array->configure([&](GlVertexArray* va) {
+            VertexBufferLayout layout;
+            layout.add(0, VertexBufferLayout::Float, 3);
+            layout.add(1, VertexBufferLayout::Float, 3);
+
+            va->add_vertex_buffer(vertex_buffer, layout);
+        });
+    }
+
+    void DebugRenderer::render() {
+        for (const Line& line : scene_list.lines) {
+            BufferVertex v1;
+            v1.position = line.position1;
+            v1.color = line.color;
+
+            storage.lines_buffer.push_back(v1);
+
+            BufferVertex v2;
+            v2.position = line.position2;
+            v2.color = line.color;
+
+            storage.lines_buffer.push_back(v2);
+        }
+
+        if (storage.lines_buffer.empty()) {
+            return;
+        }
+
+        auto vertex_buffer {storage.wvertex_buffer.lock()};
+
+        vertex_buffer->bind();
+        vertex_buffer->upload_data(storage.lines_buffer.data(), storage.lines_buffer.size() * sizeof(BufferVertex));
+        GlVertexBuffer::unbind();
+
+        storage.shader->bind();
+        storage.vertex_array->bind();
+
+        OpenGl::draw_arrays_lines(static_cast<int>(scene_list.lines.size()) * 2);
+
+        GlVertexArray::unbind();
+    }
+
+    void DebugRenderer::clear() {
+        scene_list.lines.clear();
+        storage.lines_buffer.clear();
+    }
+
     Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary&) {
         OpenGl::initialize_default();
         OpenGl::enable_depth_test();
@@ -177,7 +236,9 @@ namespace sm {
             storage.default_font->end_baking("default");
         }
 
-        debug_initialize(fs);
+#ifndef SM_BUILD_DISTRIBUTION
+        debug = DebugRenderer(fs, *this);
+#endif
     }
 
     void Renderer::capture(const Camera& camera, const glm::vec3& position) {
@@ -239,39 +300,45 @@ namespace sm {
     }
 
     void Renderer::debug_add_line(const glm::vec3& position1, const glm::vec3& position2, const glm::vec3& color) {
-        Line line;
+        DebugRenderer::Line line;
         line.position1 = position1;
         line.position2 = position2;
         line.color = color;
 
-        debug_scene_list.lines.push_back(line);
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.scene_list.lines.push_back(line);
+#endif
     }
 
     void Renderer::debug_add_lines(const std::vector<glm::vec3>& points, const glm::vec3& color) {
         assert(points.size() >= 2);
 
-        Line line;
+        DebugRenderer::Line line;
         line.color = color;
 
         for (std::size_t i {1}; i < points.size(); i++) {
             line.position1 = points[i - 1];
             line.position2 = points[i];
 
-            debug_scene_list.lines.push_back(line);
+#ifndef SM_BUILD_DISTRIBUTION
+            debug.scene_list.lines.push_back(line);
+#endif
         }
     }
 
     void Renderer::debug_add_lines(std::initializer_list<glm::vec3> points, const glm::vec3& color) {
         assert(points.size() >= 2);
 
-        Line line;
+        DebugRenderer::Line line;
         line.color = color;
 
         for (std::size_t i {1}; i < points.size(); i++) {
             line.position1 = points.begin()[i - 1];
             line.position2 = points.begin()[i];
 
-            debug_scene_list.lines.push_back(line);
+#ifndef SM_BUILD_DISTRIBUTION
+            debug.scene_list.lines.push_back(line);
+#endif
         }
     }
 
@@ -288,43 +355,43 @@ namespace sm {
         static constexpr float SIZE2 {0.15f};
         static constexpr float SIZE3 {0.5f};
         static constexpr float OFFSET {-(SIZE + SIZE3)};
-        const std::array<Line, 24> LINES {
+        const std::array<DebugRenderer::Line, 24> LINES {
             // Top
-            Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, -SIZE, -SIZE), color},
-            Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, SIZE, SIZE), color},
-            Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(-SIZE, -SIZE, SIZE), color},
+            DebugRenderer::Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, -SIZE, -SIZE), color},
+            DebugRenderer::Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, SIZE, SIZE), color},
+            DebugRenderer::Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(-SIZE, -SIZE, SIZE), color},
 
-            Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(-SIZE, -SIZE, SIZE), color},
-            Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(-SIZE, SIZE, -SIZE), color},
-            Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(SIZE, -SIZE, -SIZE), color},
+            DebugRenderer::Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(-SIZE, -SIZE, SIZE), color},
+            DebugRenderer::Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(-SIZE, SIZE, -SIZE), color},
+            DebugRenderer::Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(SIZE, -SIZE, -SIZE), color},
 
-            Line {glm::vec3(SIZE, -SIZE, -SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
-            Line {glm::vec3(-SIZE, -SIZE, SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
+            DebugRenderer::Line {glm::vec3(SIZE, -SIZE, -SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
+            DebugRenderer::Line {glm::vec3(-SIZE, -SIZE, SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
 
-            Line {glm::vec3(SIZE, SIZE, SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
-            Line {glm::vec3(SIZE, SIZE, SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
-            Line {glm::vec3(-SIZE, SIZE, -SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
-            Line {glm::vec3(-SIZE, SIZE, -SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
+            DebugRenderer::Line {glm::vec3(SIZE, SIZE, SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
+            DebugRenderer::Line {glm::vec3(SIZE, SIZE, SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
+            DebugRenderer::Line {glm::vec3(-SIZE, SIZE, -SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
+            DebugRenderer::Line {glm::vec3(-SIZE, SIZE, -SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
 
             // Bottom
-            Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), color},
-            Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), color},
-            Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), color},
+            DebugRenderer::Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), color},
+            DebugRenderer::Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), color},
+            DebugRenderer::Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), color},
 
-            Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), color},
-            Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), color},
-            Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), color},
+            DebugRenderer::Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), color},
+            DebugRenderer::Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), color},
+            DebugRenderer::Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), color},
 
-            Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
-            Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
+            DebugRenderer::Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
+            DebugRenderer::Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
 
-            Line {glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
-            Line {glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
-            Line {glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
-            Line {glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
+            DebugRenderer::Line {glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
+            DebugRenderer::Line {glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
+            DebugRenderer::Line {glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
+            DebugRenderer::Line {glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
         };
 
-        for (const Line& line : LINES) {
+        for (const DebugRenderer::Line& line : LINES) {
             debug_add_line(line.position1 + position, line.position2 + position, line.color);
         }
     }
@@ -434,8 +501,9 @@ namespace sm {
         // 2D stuff
         draw_texts();
 
-        // Debug stuff
-        debug_render();
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.render();
+#endif
     }
 
     void Renderer::pre_setup() {
@@ -492,7 +560,9 @@ namespace sm {
         scene_list.texts.clear();
         storage.text_batches.clear();
 
-        debug_clear();
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.clear();
+#endif
     }
 
     void Renderer::resize_framebuffers(int width, int height) {
@@ -782,64 +852,5 @@ namespace sm {
         }
 
         return matrix;
-    }
-
-    void Renderer::debug_initialize(const FileSystem& fs) {
-        debug_storage.shader = std::make_shared<GlShader>(
-            utils::read_file(fs.path_engine_assets("shaders/debug.vert")),
-            utils::read_file(fs.path_engine_assets("shaders/debug.frag"))
-        );
-
-        register_shader(debug_storage.shader);
-
-        auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
-        debug_storage.wvertex_buffer = vertex_buffer;
-
-        debug_storage.vertex_array = std::make_unique<GlVertexArray>();
-        debug_storage.vertex_array->configure([&](GlVertexArray* va) {
-            VertexBufferLayout layout;
-            layout.add(0, VertexBufferLayout::Float, 3);
-            layout.add(1, VertexBufferLayout::Float, 3);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-        });
-    }
-
-    void Renderer::debug_render() {
-        for (const Line& line : debug_scene_list.lines) {
-            BufferVertex v1;
-            v1.position = line.position1;
-            v1.color = line.color;
-
-            debug_storage.lines_buffer.push_back(v1);
-
-            BufferVertex v2;
-            v2.position = line.position2;
-            v2.color = line.color;
-
-            debug_storage.lines_buffer.push_back(v2);
-        }
-
-        if (debug_storage.lines_buffer.empty()) {
-            return;
-        }
-
-        auto vertex_buffer {debug_storage.wvertex_buffer.lock()};
-
-        vertex_buffer->bind();
-        vertex_buffer->upload_data(debug_storage.lines_buffer.data(), debug_storage.lines_buffer.size() * sizeof(BufferVertex));
-        GlVertexBuffer::unbind();
-
-        debug_storage.shader->bind();
-        debug_storage.vertex_array->bind();
-
-        OpenGl::draw_arrays_lines(static_cast<int>(debug_scene_list.lines.size()) * 2);
-
-        GlVertexArray::unbind();
-    }
-
-    void Renderer::debug_clear() {
-        debug_scene_list.lines.clear();
-        debug_storage.lines_buffer.clear();
     }
 }
