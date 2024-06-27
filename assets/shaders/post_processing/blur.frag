@@ -4,20 +4,20 @@ in vec2 v_texture_coordinate;
 
 layout(location = 0) out vec4 fragment_color;
 
-uniform sampler2D u_screen_texture;
+layout(binding = 0) uniform sampler2D u_screen_texture;
 
 const float offset = 1.0 / 300.0;
 
 const vec2 offsets[9] = vec2[](
-    vec2(-offset, offset),  // top-left
-    vec2(0.0, offset),  // top-center
-    vec2(offset, offset),  // top-right
-    vec2(-offset, 0.0),  // center-left
-    vec2(0.0, 0.0),  // center-center
-    vec2(offset, 0.0f),  // center-right
+    vec2(-offset, offset),   // top-left
+    vec2(0.0, offset),       // top-center
+    vec2(offset, offset),    // top-right
+    vec2(-offset, 0.0),      // center-left
+    vec2(0.0, 0.0),          // center-center
+    vec2(offset, 0.0f),      // center-right
     vec2(-offset, -offset),  // bottom-left
-    vec2(0.0, -offset),  // bottom-center
-    vec2(offset, -offset)  // bottom-right
+    vec2(0.0, -offset),      // bottom-center
+    vec2(offset, -offset)    // bottom-right
 );
 
 const float kernel[9] = float[](

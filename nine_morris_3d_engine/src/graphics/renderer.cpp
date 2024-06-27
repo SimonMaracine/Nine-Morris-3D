@@ -28,7 +28,7 @@ namespace sm {
 
         renderer.register_shader(storage.shader);
 
-        auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
+        const auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
         storage.wvertex_buffer = vertex_buffer;
 
         storage.vertex_array = std::make_unique<GlVertexArray>();
@@ -60,7 +60,7 @@ namespace sm {
             return;
         }
 
-        auto vertex_buffer {storage.wvertex_buffer.lock()};
+        const auto vertex_buffer {storage.wvertex_buffer.lock()};
 
         vertex_buffer->bind();
         vertex_buffer->upload_data(storage.lines_buffer.data(), storage.lines_buffer.size() * sizeof(BufferVertex));
@@ -189,7 +189,7 @@ namespace sm {
                  1.0f, -1.0f
             };
 
-            auto vertex_buffer {std::make_shared<GlVertexBuffer>(vertices, sizeof(vertices))};
+            const auto vertex_buffer {std::make_shared<GlVertexBuffer>(vertices, sizeof(vertices))};
 
             storage.screen_quad_vertex_array = std::make_unique<GlVertexArray>();
             storage.screen_quad_vertex_array->configure([&](GlVertexArray* va) {
@@ -201,7 +201,7 @@ namespace sm {
         }
 
         {
-            auto vertex_buffer {std::make_shared<GlVertexBuffer>(CUBEMAP_VERTICES, sizeof(CUBEMAP_VERTICES))};
+            const auto vertex_buffer {std::make_shared<GlVertexBuffer>(CUBEMAP_VERTICES, sizeof(CUBEMAP_VERTICES))};
 
             storage.skybox_vertex_array = std::make_unique<GlVertexArray>();
             storage.skybox_vertex_array->configure([&](GlVertexArray* va) {
@@ -213,7 +213,7 @@ namespace sm {
         }
 
         {
-            auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
+            const auto vertex_buffer {std::make_shared<GlVertexBuffer>(DrawHint::Stream)};
 
             storage.text_vertex_array = std::make_unique<GlVertexArray>();
             storage.text_vertex_array->configure([&](GlVertexArray* va) {
@@ -229,8 +229,8 @@ namespace sm {
         }
 
         {
-            auto vertex_buffer {std::make_shared<GlVertexBuffer>(MAX_QUADS_BUFFER_SIZE, DrawHint::Stream)};
-            auto index_buffer {initialize_quads_index_buffer()};
+            const auto vertex_buffer {std::make_shared<GlVertexBuffer>(MAX_QUADS_BUFFER_SIZE, DrawHint::Stream)};
+            const auto index_buffer {initialize_quads_index_buffer()};
 
             storage.quad_vertex_array = std::make_unique<GlVertexArray>();
             storage.quad_vertex_array->configure([&](GlVertexArray* va) {
@@ -422,18 +422,65 @@ namespace sm {
         }
     }
 
-    void Renderer::render() {
-        // TODO pre-render setup
+    void Renderer::pre_setup() {
+        for (const std::weak_ptr<GlShader>& wshader : scene_data.shaders) {
+            std::shared_ptr<GlShader> shader {wshader.lock()};
+
+            if (shader == nullptr) {
+                continue;
+            }
+
+            // Create and store references to particular uniform buffers
+            for (const UniformBlockSpecification& block : shader->uniform_blocks) {
+                // Don't create duplicate buffers
+                if (storage.uniform_buffers.find(block.binding_index) != storage.uniform_buffers.cend()) {
+                    continue;
+                }
+
+                const auto uniform_buffer {std::make_shared<GlUniformBuffer>(block)};
+                shader->add_uniform_buffer(uniform_buffer);
+
+                storage.uniform_buffers[block.binding_index] = uniform_buffer;
+
+                switch (block.binding_index) {
+                    case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
+                        storage.wprojection_view_uniform_buffer = uniform_buffer;
+                        break;
+                    case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
+                        storage.wdirectional_light_uniform_buffer = uniform_buffer;
+                        break;
+                    case VIEW_POSITION_BLOCK_BINDING:
+                        storage.wview_position_uniform_buffer = uniform_buffer;
+                        break;
+                    case POINT_LIGHT_BLOCK_BINDING:
+                        storage.wpoint_light_uniform_buffer = uniform_buffer;
+                        break;
+                    case LIGHT_SPACE_BLOCK_BINDING:
+                        storage.wlight_space_uniform_buffer = uniform_buffer;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    void Renderer::post_setup() {
+        scene_data.shaders.clear();
+    }
+
+    void Renderer::render(int width, int height) {
+        // TODO see if this can be improved
 
         {
-            auto uniform_buffer {storage.wprojection_view_uniform_buffer.lock()};
+            const auto uniform_buffer {storage.wprojection_view_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&scene_list.camera.projection_view_matrix, "u_projection_view_matrix"_H);
             }
         }
         {
-            auto uniform_buffer {storage.wdirectional_light_uniform_buffer.lock()};
+            const auto uniform_buffer {storage.wdirectional_light_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&scene_list.directional_light.direction, "u_directional_light.direction"_H);
@@ -443,21 +490,21 @@ namespace sm {
             }
         }
         {
-            auto uniform_buffer {storage.wview_position_uniform_buffer.lock()};
+            const auto uniform_buffer {storage.wview_position_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&scene_list.camera.position, "u_view_position"_H);
             }
         }
         {
-            auto uniform_buffer {storage.wpoint_light_uniform_buffer.lock()};
+            const auto uniform_buffer {storage.wpoint_light_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 setup_point_light_uniform_buffer(uniform_buffer);
             }
         }
         {
-            auto uniform_buffer {storage.wlight_space_uniform_buffer.lock()};
+            const auto uniform_buffer {storage.wlight_space_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 setup_light_space_uniform_buffer(uniform_buffer);
@@ -522,7 +569,7 @@ namespace sm {
             storage.intermediate_framebuffer->get_specification().height
         );
 
-        end_rendering();
+        end_3d_rendering(width, height);
 
         // 2D stuff
         draw_texts();
@@ -533,51 +580,52 @@ namespace sm {
 #endif
     }
 
-    void Renderer::pre_setup() {
-        for (const std::weak_ptr<GlShader>& wshader : scene_data.shaders) {
-            std::shared_ptr<GlShader> shader {wshader.lock()};
+    void Renderer::post_processing() {
+        post_processing_context.original_texture = storage.intermediate_framebuffer->get_color_attachment(0);
+        post_processing_context.last_texture = post_processing_context.original_texture;
+        post_processing_context.textures.clear();
 
-            if (shader == nullptr) {
-                continue;
-            }
+        for (const auto& step : post_processing_context.steps) {
+            step->framebuffer->bind();
 
-            // Create and store references to particular uniform buffers
-            for (const UniformBlockSpecification& block : shader->uniform_blocks) {
-                // Don't create duplicate buffers
-                if (storage.uniform_buffers.find(block.binding_index) != storage.uniform_buffers.cend()) {
-                    continue;
-                }
+            opengl::clear(opengl::Buffers::C);
+            opengl::viewport(step->framebuffer->get_specification().width, step->framebuffer->get_specification().height);
 
-                auto uniform_buffer {std::make_shared<GlUniformBuffer>(block)};
-                shader->add_uniform_buffer(uniform_buffer);
+            step->shader->bind();
+            step->setup(post_processing_context);
 
-                storage.uniform_buffers[block.binding_index] = uniform_buffer;
+            sm::opengl::draw_arrays(6);
 
-                switch (block.binding_index) {
-                    case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
-                        storage.wprojection_view_uniform_buffer = uniform_buffer;
-                        break;
-                    case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
-                        storage.wdirectional_light_uniform_buffer = uniform_buffer;
-                        break;
-                    case VIEW_POSITION_BLOCK_BINDING:
-                        storage.wview_position_uniform_buffer = uniform_buffer;
-                        break;
-                    case POINT_LIGHT_BLOCK_BINDING:
-                        storage.wpoint_light_uniform_buffer = uniform_buffer;
-                        break;
-                    case LIGHT_SPACE_BLOCK_BINDING:
-                        storage.wlight_space_uniform_buffer = uniform_buffer;
-                        break;
-                    default:
-                        break;
-                }
-            }
+            post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
+            post_processing_context.textures.push_back(post_processing_context.last_texture);
         }
     }
 
-    void Renderer::post_setup() {
-        scene_data.shaders.clear();
+    void Renderer::end_3d_rendering(int width, int height) {
+        opengl::disable_depth_test();
+
+        storage.screen_quad_vertex_array->bind();
+
+        post_processing();
+
+        // Draw the final result to the screen
+        GlFramebuffer::bind_default();
+
+        // Clear for debug renderer
+        opengl::clear(opengl::Buffers::CD);
+        opengl::viewport(width, height);
+
+        screen_quad(post_processing_context.last_texture);
+
+        GlVertexArray::unbind();
+
+        opengl::enable_depth_test();
+    }
+
+    void Renderer::screen_quad(unsigned int texture) {
+        storage.screen_quad_shader->bind();
+        opengl::bind_texture_2d(texture, 0);
+        opengl::draw_arrays(6);
     }
 
     void Renderer::clear() {
@@ -615,40 +663,9 @@ namespace sm {
         }
     }
 
-    void Renderer::screen_quad(unsigned int texture) {
-        storage.screen_quad_shader->bind();
-        opengl::bind_texture_2d(texture, 0);
-        opengl::draw_arrays(6);
-    }
-
-    void Renderer::post_processing() {
-
-    }
-
-    void Renderer::end_rendering() {
-        storage.screen_quad_vertex_array->bind();
-
-        opengl::disable_depth_test();
-
-        post_processing();
-
-        // Draw the final result to the screen
-        GlFramebuffer::bind_default();
-
-        // Clear even the default framebuffer, for debug renderer
-        opengl::clear(opengl::Buffers::CD);
-
-        // screen_quad(post_processing_context.last_texture);  // FIXME
-        screen_quad(storage.intermediate_framebuffer->get_color_attachment(0));
-
-        opengl::enable_depth_test();
-
-        GlVertexArray::unbind();
-    }
-
     void Renderer::draw_renderables() {
         for (const Renderable& renderable : scene_list.renderables) {
-            auto material {renderable.material.lock()};
+            const auto material {renderable.material.lock()};
 
             if (material->flags & Material::Outline) {
                 continue;  // This one is rendered differently
@@ -663,12 +680,12 @@ namespace sm {
             }
         }
 
-        GlVertexArray::unbind();  // Don't unbind for every renderable
+        GlVertexArray::unbind();
     }
 
     void Renderer::draw_renderable(const Renderable& renderable) {
-        auto vertex_array {renderable.vertex_array.lock()};
-        auto material {renderable.material.lock()};
+        const auto vertex_array {renderable.vertex_array.lock()};
+        const auto material {renderable.material.lock()};
 
         const glm::mat4 matrix {get_renderable_transform(renderable)};
 
@@ -691,8 +708,8 @@ namespace sm {
         storage.shadow_shader->bind();
 
         for (const Renderable& renderable : scene_list.renderables) {
-            auto vertex_array {renderable.vertex_array.lock()};
-            auto material {renderable.material.lock()};
+            const auto vertex_array {renderable.vertex_array.lock()};
+            const auto material {renderable.material.lock()};
 
             if (!(material->flags & Material::CastShadow)) {
                 continue;
@@ -706,7 +723,6 @@ namespace sm {
             opengl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
         }
 
-        // Don't unbind for every renderable
         GlVertexArray::unbind();
     }
 
@@ -765,7 +781,7 @@ namespace sm {
     }
 
     void Renderer::draw_text_batch(const TextBatch& batch) {
-        auto font {batch.wfont.lock()};
+        const auto font {batch.wfont.lock()};
 
         std::size_t i {};  // TODO C++20
 
@@ -788,7 +804,7 @@ namespace sm {
         storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, storage.text.batch_colors);
         storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene_list.camera_2d.projection_matrix);
 
-        auto vertex_buffer {storage.wtext_vertex_buffer.lock()};
+        const auto vertex_buffer {storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
         vertex_buffer->upload_data(storage.text.batch_buffer.data(), storage.text.batch_buffer.size());
         GlVertexBuffer::unbind();
@@ -894,7 +910,7 @@ namespace sm {
     void Renderer::end_quads_batch() {
         const std::size_t size {(storage.quad.buffer_pointer - storage.quad.buffer.get()) * sizeof(QuadVertex)};
 
-        auto vertex_buffer {storage.wquad_vertex_buffer.lock()};
+        const auto vertex_buffer {storage.wquad_vertex_buffer.lock()};
 
         vertex_buffer->bind();
         vertex_buffer->upload_sub_data(storage.quad.buffer.get(), 0, size);

@@ -68,7 +68,7 @@ namespace sm {
             ctx.tsk.update();
 
             if (!minimized) {
-                ctx.rnd.render();
+                ctx.rnd.render(ctx.win.get_width(), ctx.win.get_height());
                 dear_imgui_render();
             }
 

@@ -6,6 +6,7 @@
 #include <engine/external/resmanager.h++>
 
 #include "game/scenes/game_scene.hpp"
+#include "game/game.hpp"
 
 #if defined(SM_PLATFORM_LINUX)
     static const char* APP_NAME {"ninemorris3d"};
@@ -39,10 +40,13 @@ int application_main() {
             properties.log_file = LOG_FILE;
             properties.assets_directory = ASSETS_DIRECTORY;
 
+            sm::UserFunctions functions;
+            functions.start = game_start;
+
             try {
                 auto game {sm::Application(properties)};
                 game.add_scene<GameScene>();
-                exit_code = game.run("loading"_H);
+                exit_code = game.run("loading"_H, functions);
             } catch (sm::RuntimeError error) {
                 std::cerr << "Terminated game with error code " << static_cast<int>(error) << '\n';
                 return 1;

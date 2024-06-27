@@ -2,18 +2,19 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "engine/graphics/opengl/framebuffer.hpp"
 #include "engine/graphics/opengl/shader.hpp"
 
 namespace sm {
-    struct PostProcessingContext;
     class Renderer;
+    struct PostProcessingContext;
 
     class PostProcessingStep {
     public:
-        PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::shared_ptr<GlShader> shader)
-            : framebuffer(framebuffer), shader(shader) {}
+        PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::unique_ptr<GlShader>&& shader)
+            : framebuffer(framebuffer), shader(std::move(shader)) {}
         virtual ~PostProcessingStep() = default;
 
         PostProcessingStep(const PostProcessingStep&) = default;
@@ -21,12 +22,10 @@ namespace sm {
         PostProcessingStep(PostProcessingStep&&) noexcept = default;
         PostProcessingStep& operator=(PostProcessingStep&&) noexcept = default;
 
-        virtual void render(const PostProcessingContext& context) const = 0;
-        virtual void prepare(const PostProcessingContext& context) const = 0;
+        virtual void setup(const PostProcessingContext& context) const = 0;
     protected:
-        // Store references to shaders and framebuffers
         std::shared_ptr<GlFramebuffer> framebuffer;
-        std::shared_ptr<GlShader> shader;
+        std::unique_ptr<GlShader> shader;
 
         friend class Renderer;
     };

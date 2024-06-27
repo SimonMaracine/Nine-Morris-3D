@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <initializer_list>
 #include <memory>
+#include <utility>
 
 #include <glm/glm.hpp>
 
@@ -79,6 +80,11 @@ namespace sm {
         void register_shader(std::shared_ptr<GlShader> shader);
         void register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
 
+        template<typename T, typename... Args>
+        void add_post_processing(Args&&... args) {
+            post_processing_context.steps.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+        }
+
         // 3D API
         void add_renderable(const Renderable& renderable);
         void add_light(const DirectionalLight& light);
@@ -97,16 +103,14 @@ namespace sm {
         void debug_add_point(const glm::vec3& position, const glm::vec3& color);
         void debug_add_lamp(const glm::vec3& position, const glm::vec3& color);
     private:
-        void render();
         void pre_setup();
         void post_setup();
+        void render(int width, int height);
+        void post_processing();
+        void end_3d_rendering(int width, int height);
+        void screen_quad(unsigned int texture);
         void clear();
         void resize_framebuffers(int width, int height);
-
-        // Render functions
-        void screen_quad(unsigned int texture);
-        void post_processing();
-        void end_rendering();
 
         // Draw functions
         void draw_renderables();
@@ -192,7 +196,7 @@ namespace sm {
             } quad;
         } storage;
 
-        PostProcessingContext post_processing_context;  // TODO implement
+        PostProcessingContext post_processing_context;
 
         struct {
             std::vector<Renderable> renderables;
