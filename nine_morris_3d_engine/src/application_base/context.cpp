@@ -1,9 +1,10 @@
 #include "engine/application_base/context.hpp"
 
+#include <memory>
 #include <cassert>
 
 #include "engine/application_base/application.hpp"
-#include "engine/scene/scene.hpp"
+#include "engine/application_base/scene.hpp"
 
 namespace sm {
     void Ctx::change_scene(Id id) {

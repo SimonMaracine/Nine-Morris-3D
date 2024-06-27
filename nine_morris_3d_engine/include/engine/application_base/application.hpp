@@ -7,9 +7,9 @@
 
 #include "engine/application_base/properties.hpp"
 #include "engine/application_base/context.hpp"
+#include "engine/application_base/scene.hpp"
 #include "engine/application_base/id.hpp"
 #include "engine/audio/context.hpp"
-#include "engine/scene/scene.hpp"
 
 namespace sm {
     class Window;
@@ -35,7 +35,7 @@ namespace sm {
         // Add scenes to the application before calling run()
         template<typename S>
         void add_scene() {
-            scenes.push_back(std::make_unique<S>());
+            scenes.push_back(std::make_unique<S>(ctx));
         }
 
         // API accessible to the user
@@ -45,7 +45,7 @@ namespace sm {
         unsigned int calculate_fixed_update();
         void check_changed_scene();
         void dear_imgui_render();
-        void prepare_scenes(Id start_scene_id);
+        void setup_start_scene(Id start_scene_id);
         std::string get_information();
 
         void on_window_closed(const WindowClosedEvent&);

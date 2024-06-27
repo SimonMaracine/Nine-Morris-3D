@@ -3,7 +3,6 @@
 #include <memory>
 #include <array>
 #include <cstddef>
-#include <cassert>
 
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/opengl/framebuffer.hpp"
@@ -23,8 +22,6 @@ namespace sm {
 
         // Call this after the framebuffer is bound to begin reading the framebuffer
         void read(int attachment_index, int x, int y) {
-            assert(attachment_index >= 0);
-
             buffer_index = (buffer_index + 1) % BufferCount;
             next_buffer_index = (buffer_index + 1) % BufferCount;
 

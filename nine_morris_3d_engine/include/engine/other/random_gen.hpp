@@ -1,11 +1,11 @@
 #pragma once
 
+#include <random>
 #include <initializer_list>
 #include <random>
-#include <cstddef>
 #include <cstdint>
+#include <cstddef>
 #include <iterator>
-#include <cassert>
 
 namespace sm {
     class Ctx;
@@ -21,24 +21,20 @@ namespace sm {
 
         template<typename T>
         T choice(std::initializer_list<T> list) {
-            assert(list.size() > 0);
-
-            const std::uint_fast32_t index {next(list.size() - 1)};
+            const std::uint_fast32_t index {choice(list.size())};
 
             return list.begin()[index];
         }
 
         template<typename T, typename Iter>
         T choice(Iter first, Iter last) {
-            const std::size_t size {std::distance(first, last)};
-
-            assert(size > 0);
-
-            const std::uint_fast32_t index {next(size - 1)};
+            const std::uint_fast32_t index {choice(std::distance(first, last))};
 
             return first[index];
         }
     private:
+        std::uint_fast32_t choice(std::size_t size);
+
         std::mt19937 random;
 
         friend class Ctx;

@@ -38,8 +38,6 @@ namespace sm {
         textures.push_back(name);
     }
 
-    // --- Material instance
-
     MaterialInstance::MaterialInstance(std::shared_ptr<Material> material) {
         shader = material->shader;
         flags = material->flags;
@@ -121,7 +119,7 @@ namespace sm {
         for (const auto& [name, element] : offsets) {
             switch (element.type) {
                 case Element::Type::Mat4: {
-                    glm::mat4 matrix;
+                    glm::mat4 matrix {};
                     std::memcpy(&matrix, data.get() + element.offset, sizeof(matrix));
 
                     shader->upload_uniform_mat4(name, matrix);
@@ -129,7 +127,7 @@ namespace sm {
                     break;
                 }
                 case Element::Type::Int: {
-                    int integer;
+                    int integer {};
                     std::memcpy(&integer, data.get() + element.offset, sizeof(integer));
 
                     shader->upload_uniform_int(name, integer);
@@ -137,7 +135,7 @@ namespace sm {
                     break;
                 }
                 case Element::Type::Float: {
-                    float real;
+                    float real {};
                     std::memcpy(&real, data.get() + element.offset, sizeof(real));
 
                     shader->upload_uniform_float(name, real);
@@ -145,7 +143,7 @@ namespace sm {
                     break;
                 }
                 case Element::Type::Vec2: {
-                    glm::vec2 vector;
+                    glm::vec2 vector {};
                     std::memcpy(&vector, data.get() + element.offset, sizeof(vector));
 
                     shader->upload_uniform_vec2(name, vector);
@@ -153,7 +151,7 @@ namespace sm {
                     break;
                 }
                 case Element::Type::Vec3: {
-                    glm::vec3 vector;
+                    glm::vec3 vector {};
                     std::memcpy(&vector, data.get() + element.offset, sizeof(vector));
 
                     shader->upload_uniform_vec3(name, vector);
@@ -161,7 +159,7 @@ namespace sm {
                     break;
                 }
                 case Element::Type::Vec4: {
-                    glm::vec4 vector;
+                    glm::vec4 vector {};
                     std::memcpy(&vector, data.get() + element.offset, sizeof(vector));
 
                     shader->upload_uniform_vec4(name, vector);
@@ -169,7 +167,7 @@ namespace sm {
                     break;
                 }
                 case Element::Type::Texture: {
-                    Texture texture;
+                    Texture texture {};
                     std::memcpy(&texture, data.get() + element.offset, sizeof(texture));
 
                     shader->upload_uniform_int(name, texture.unit);
@@ -212,7 +210,7 @@ namespace sm {
     }
 
     void MaterialInstance::set_texture(Id name, std::shared_ptr<GlTexture> texture, int unit) {
-        Texture result_texure;
+        Texture result_texure {};
         result_texure.unit = unit;
         result_texure.texture = texture->get_id();
 
@@ -221,7 +219,7 @@ namespace sm {
     }
 
     void MaterialInstance::set_texture(Id name, unsigned int texture, int unit) {
-        Texture result_texure;
+        Texture result_texure {};
         result_texure.unit = unit;
         result_texure.texture = texture;
 

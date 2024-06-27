@@ -99,6 +99,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/application_base/logging.hpp"
     "include/engine/application_base/platform.hpp"
     "include/engine/application_base/properties.hpp"
+    "include/engine/application_base/scene.hpp"
     "include/engine/application_base/tasks.hpp"
     "include/engine/application_base/window.hpp"
     "include/engine/audio/openal/buffer.hpp"
@@ -134,7 +135,6 @@ add_library(nine_morris_3d_engine STATIC
     "include/engine/other/random_gen.hpp"
     "include/engine/other/resources_cache.hpp"
     "include/engine/other/utilities.hpp"
-    "include/engine/scene/scene.hpp"
 
     # For client
     "include/engine/external/cereal.h++"

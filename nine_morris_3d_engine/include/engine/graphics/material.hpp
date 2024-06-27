@@ -55,12 +55,6 @@ namespace sm {
     class MaterialInstance {
     public:
         explicit MaterialInstance(std::shared_ptr<Material> material);  // TODO create shared_ptr materials?
-        ~MaterialInstance() = default;
-
-        MaterialInstance(const MaterialInstance&) = delete;
-        MaterialInstance& operator=(const MaterialInstance&) = delete;
-        MaterialInstance(MaterialInstance&&) = default;
-        MaterialInstance& operator=(MaterialInstance&&) = default;
 
         void bind_and_upload() const;
 
@@ -93,8 +87,8 @@ namespace sm {
         };
 
         struct Texture {
-            int unit {};
-            unsigned int texture {};
+            int unit;
+            unsigned int texture;
         };
 
         // Material instances own shaders

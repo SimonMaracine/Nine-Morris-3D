@@ -44,7 +44,7 @@ namespace sm {
     }
 
     int Application::run(Id start_scene_id, const UserFunctions& user_functions) {
-        prepare_scenes(start_scene_id);
+        setup_start_scene(start_scene_id);
 
         LOG_INFO("Calling user start function...");
 
@@ -163,10 +163,8 @@ namespace sm {
         imgui_context::end_frame();
     }
 
-    void Application::prepare_scenes(Id start_scene_id) {
+    void Application::setup_start_scene(Id start_scene_id) {
         for (const std::unique_ptr<Scene>& scene : scenes) {
-            scene->ctx = &ctx;
-
             if (scene->id == start_scene_id) {
                 current_scene = scene.get();
             }

@@ -4,9 +4,9 @@
 
 #include "game/point_camera_controller.hpp"
 
-struct GameScene : public sm::Scene {
-    GameScene()
-        : sm::Scene("loading") {}
+struct GameScene : sm::Scene {
+    explicit GameScene(sm::Ctx& ctx)
+        : sm::Scene(ctx, "loading") {}
 
     void on_start() override;
     void on_update() override;

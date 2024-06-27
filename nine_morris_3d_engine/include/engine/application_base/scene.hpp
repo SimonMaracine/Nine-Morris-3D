@@ -8,17 +8,17 @@
 namespace sm {
     class Application;
 
-    // An entire scene of a game
+    // An entire part of a game, holding lots of state
     class Scene {
     public:
-        explicit Scene(const std::string& name)
-            : name(name), id(Id(name)) {}
+        Scene(Ctx& ctx, const std::string& name)
+            : ctx(ctx), name(name), id(Id(name)) {}
         virtual ~Scene() = default;
 
-        Scene(const Scene&) = default;
-        Scene& operator=(const Scene&) = default;
-        Scene(Scene&&) = default;
-        Scene& operator=(Scene&&) = default;
+        Scene(const Scene&) = delete;
+        Scene& operator=(const Scene&) = delete;
+        Scene(Scene&&) = delete;
+        Scene& operator=(Scene&&) = delete;
 
         virtual void on_start() {}  // Called when the scene is entered
         virtual void on_stop() {}  // Called when the scene is exited
@@ -29,7 +29,7 @@ namespace sm {
         const std::string& get_name() const { return name; }
         Id get_id() const { return id; }
 
-        Ctx* ctx {nullptr};
+        Ctx& ctx;
     private:
         std::string name;
         Id id;

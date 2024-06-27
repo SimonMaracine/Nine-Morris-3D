@@ -1,6 +1,13 @@
 #include "engine/other/random_gen.hpp"
 
+#include <cassert>
+
 namespace sm {
+    RandomGenerator::RandomGenerator() {
+        std::random_device dev;
+        random = std::mt19937(dev());
+    }
+
     std::uint_fast32_t RandomGenerator::next() {
         std::uniform_int_distribution<std::mt19937::result_type> distribution {};
 
@@ -21,8 +28,9 @@ namespace sm {
         return distribution(random);
     }
 
-    RandomGenerator::RandomGenerator() {
-        std::random_device dev;
-        random = std::mt19937(dev());
+    std::uint_fast32_t RandomGenerator::choice(std::size_t size) {
+        assert(size > 0);
+
+        return next(size - 1);
     }
 }
