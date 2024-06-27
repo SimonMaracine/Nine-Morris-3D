@@ -23,5 +23,5 @@ void setup_post_processing(sm::Ctx& ctx) {
 }
 
 void game_start(sm::Ctx& ctx) {
-    setup_post_processing(ctx);
+    // setup_post_processing(ctx);  // TODO
 }

@@ -110,15 +110,9 @@ namespace sm {
         }
 
         size = offset;
-        data = new unsigned char[size];
+        data = std::make_unique<unsigned char[]>(size);
 
         LOG_DEBUG("Created material instance from shader {}", shader->get_id());
-    }
-
-    MaterialInstance::~MaterialInstance() {
-        delete[] data;
-
-        LOG_DEBUG("Deleted material instance");
     }
 
     void MaterialInstance::bind_and_upload() const {
@@ -128,7 +122,7 @@ namespace sm {
             switch (element.type) {
                 case Element::Type::Mat4: {
                     glm::mat4 matrix;
-                    std::memcpy(&matrix, data + element.offset, sizeof(matrix));
+                    std::memcpy(&matrix, data.get() + element.offset, sizeof(matrix));
 
                     shader->upload_uniform_mat4(name, matrix);
 
@@ -136,7 +130,7 @@ namespace sm {
                 }
                 case Element::Type::Int: {
                     int integer;
-                    std::memcpy(&integer, data + element.offset, sizeof(integer));
+                    std::memcpy(&integer, data.get() + element.offset, sizeof(integer));
 
                     shader->upload_uniform_int(name, integer);
 
@@ -144,7 +138,7 @@ namespace sm {
                 }
                 case Element::Type::Float: {
                     float real;
-                    std::memcpy(&real, data + element.offset, sizeof(real));
+                    std::memcpy(&real, data.get() + element.offset, sizeof(real));
 
                     shader->upload_uniform_float(name, real);
 
@@ -152,7 +146,7 @@ namespace sm {
                 }
                 case Element::Type::Vec2: {
                     glm::vec2 vector;
-                    std::memcpy(&vector, data + element.offset, sizeof(vector));
+                    std::memcpy(&vector, data.get() + element.offset, sizeof(vector));
 
                     shader->upload_uniform_vec2(name, vector);
 
@@ -160,7 +154,7 @@ namespace sm {
                 }
                 case Element::Type::Vec3: {
                     glm::vec3 vector;
-                    std::memcpy(&vector, data + element.offset, sizeof(vector));
+                    std::memcpy(&vector, data.get() + element.offset, sizeof(vector));
 
                     shader->upload_uniform_vec3(name, vector);
 
@@ -168,7 +162,7 @@ namespace sm {
                 }
                 case Element::Type::Vec4: {
                     glm::vec4 vector;
-                    std::memcpy(&vector, data + element.offset, sizeof(vector));
+                    std::memcpy(&vector, data.get() + element.offset, sizeof(vector));
 
                     shader->upload_uniform_vec4(name, vector);
 
@@ -176,7 +170,7 @@ namespace sm {
                 }
                 case Element::Type::Texture: {
                     Texture texture;
-                    std::memcpy(&texture, data + element.offset, sizeof(texture));
+                    std::memcpy(&texture, data.get() + element.offset, sizeof(texture));
 
                     shader->upload_uniform_int(name, texture.unit);
                     opengl::bind_texture_2d(texture.texture, texture.unit);
@@ -189,32 +183,32 @@ namespace sm {
 
     void MaterialInstance::set_mat4(Id name, const glm::mat4& matrix) {
         const Element& element {offsets.at(name)};
-        std::memcpy(data + element.offset, &matrix, sizeof(matrix));
+        std::memcpy(data.get() + element.offset, &matrix, sizeof(matrix));
     }
 
     void MaterialInstance::set_int(Id name, int integer) {
         const Element& element {offsets.at(name)};
-        std::memcpy(data + element.offset, &integer, sizeof(integer));
+        std::memcpy(data.get() + element.offset, &integer, sizeof(integer));
     }
 
     void MaterialInstance::set_float(Id name, float real) {
         const Element& element {offsets.at(name)};
-        std::memcpy(data + element.offset, &real, sizeof(real));
+        std::memcpy(data.get() + element.offset, &real, sizeof(real));
     }
 
     void MaterialInstance::set_vec2(Id name, glm::vec2 vector) {
         const Element& element {offsets.at(name)};
-        std::memcpy(data + element.offset, &vector, sizeof(vector));
+        std::memcpy(data.get() + element.offset, &vector, sizeof(vector));
     }
 
     void MaterialInstance::set_vec3(Id name, const glm::vec3& vector) {
         const Element& element {offsets.at(name)};
-        std::memcpy(data + element.offset, &vector, sizeof(vector));
+        std::memcpy(data.get() + element.offset, &vector, sizeof(vector));
     }
 
     void MaterialInstance::set_vec4(Id name, const glm::vec4& vector) {
         const Element& element {offsets.at(name)};
-        std::memcpy(data + element.offset, &vector, sizeof(vector));
+        std::memcpy(data.get() + element.offset, &vector, sizeof(vector));
     }
 
     void MaterialInstance::set_texture(Id name, std::shared_ptr<GlTexture> texture, int unit) {
@@ -223,7 +217,7 @@ namespace sm {
         result_texure.texture = texture->get_id();
 
         const Element& element {offsets.at(name)};
-        std::memcpy(data + element.offset, &result_texure, sizeof(result_texure));
+        std::memcpy(data.get() + element.offset, &result_texure, sizeof(result_texure));
     }
 
     void MaterialInstance::set_texture(Id name, unsigned int texture, int unit) {
@@ -232,6 +226,6 @@ namespace sm {
         result_texure.texture = texture;
 
         const Element& element {offsets.at(name)};
-        std::memcpy(data + element.offset, &result_texure, sizeof(result_texure));
+        std::memcpy(data.get() + element.offset, &result_texure, sizeof(result_texure));
     }
 }

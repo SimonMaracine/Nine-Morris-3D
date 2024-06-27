@@ -22,6 +22,8 @@ struct GameScene : public sm::Scene {
 
     glm::vec2 pos {};
     float scl {1.0f};
+    bool blur {true};
+    bool outline {true};
 
     sm::Renderable teapot;
 };

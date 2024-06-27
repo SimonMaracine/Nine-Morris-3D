@@ -55,12 +55,12 @@ namespace sm {
     class MaterialInstance {
     public:
         explicit MaterialInstance(std::shared_ptr<Material> material);  // TODO create shared_ptr materials?
-        ~MaterialInstance();
+        ~MaterialInstance() = default;
 
         MaterialInstance(const MaterialInstance&) = delete;
         MaterialInstance& operator=(const MaterialInstance&) = delete;
-        MaterialInstance(MaterialInstance&&) = delete;
-        MaterialInstance& operator=(MaterialInstance&&) = delete;
+        MaterialInstance(MaterialInstance&&) = default;
+        MaterialInstance& operator=(MaterialInstance&&) = default;
 
         void bind_and_upload() const;
 
@@ -100,7 +100,7 @@ namespace sm {
         // Material instances own shaders
         std::shared_ptr<GlShader> shader;
 
-        unsigned char* data {nullptr};
+        std::unique_ptr<unsigned char[]> data;
         std::size_t size {};
 
         std::unordered_map<Id, Element, Hash> offsets;

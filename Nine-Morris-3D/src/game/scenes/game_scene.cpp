@@ -121,6 +121,7 @@ void GameScene::on_start() {
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
+        material_instance->flags |= sm::Material::Outline;
     }
 
     {
@@ -281,6 +282,8 @@ void GameScene::on_update() {
     dragon.vertex_array = ctx->res.vertex_array["dragon"_H];
     dragon.material = ctx->res.material_instance["dragon1"_H];
     dragon.scale(0.7f);
+    dragon.outline.color = glm::vec3(0.2f, 0.1f, 1.0f);
+    dragon.outline.offset = glm::vec3(0.04f, -0.2f, 0.0f);
 
     ctx->rnd.add_renderable(dragon);
 
@@ -422,9 +425,25 @@ void GameScene::on_imgui_update() {
     ImGui::SliderFloat("Falloff Q.", &point_light.falloff_quadratic, 0.00001f, 1.0f);
     ImGui::End();
 
-    ImGui::Begin("Test");
+    ImGui::Begin("Quads");
     ImGui::SliderFloat2("Position", glm::value_ptr(pos), -500.0f, 500.0f);
     ImGui::SliderFloat("Scale", &scl, 0.0f, 3.0f);
+    ImGui::End();
+
+    ImGui::Begin("Blur");
+    if (ImGui::Checkbox("Enable", &blur)) {
+        // TODO
+    }
+    ImGui::End();
+
+    ImGui::Begin("Outline");
+    if (ImGui::Checkbox("Enable", &outline)) {
+        if (outline) {
+            ctx->res.material_instance["dragon1"_H]->flags ^= sm::Material::Outline;
+        } else {
+            ctx->res.material_instance["dragon1"_H]->flags ^= sm::Material::Outline;
+        }
+    }
     ImGui::End();
 }
 

@@ -59,7 +59,7 @@ namespace sm {
 
         struct {
             std::vector<Line> lines;
-        } scene_list;
+        } scene;
 
         friend class Renderer;
     };
@@ -93,7 +93,6 @@ namespace sm {
         // 2D API
         void add_text(const Text& text);
         void add_info_text(float fps);
-
         void add_quad(const Quad& quad);
 
         // Debug API
@@ -158,6 +157,7 @@ namespace sm {
             std::unique_ptr<GlShader> text_shader;
             std::unique_ptr<GlShader> quad_shader;
             std::unique_ptr<GlShader> skybox_shader;
+            std::shared_ptr<GlShader> outline_shader;
 
             std::unique_ptr<GlVertexArray> screen_quad_vertex_array;
             std::unique_ptr<GlVertexArray> text_vertex_array;
@@ -194,6 +194,11 @@ namespace sm {
 
                 std::size_t quad_count {};
             } quad;
+
+            struct {
+                std::vector<std::weak_ptr<GlShader>> shaders;
+                std::vector<std::weak_ptr<GlFramebuffer>> framebuffers;
+            } scene;
         } storage;
 
         PostProcessingContext post_processing_context;
@@ -225,12 +230,7 @@ namespace sm {
                 float lens_far {1.0f};
                 glm::vec3 position {};
             } light_space;
-        } scene_list;
-
-        struct {
-            std::vector<std::weak_ptr<GlShader>> shaders;
-            std::vector<std::weak_ptr<GlFramebuffer>> framebuffers;
-        } scene_data;
+        } scene;
 
 #ifndef SM_BUILD_DISTRIBUTION
         DebugRenderer debug;

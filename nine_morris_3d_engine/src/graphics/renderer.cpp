@@ -42,7 +42,7 @@ namespace sm {
     }
 
     void DebugRenderer::render() {
-        for (const Line& line : scene_list.lines) {
+        for (const Line& line : scene.lines) {
             BufferVertex v1;
             v1.position = line.position1;
             v1.color = line.color;
@@ -69,18 +69,19 @@ namespace sm {
         storage.shader->bind();
         storage.vertex_array->bind();
 
-        opengl::draw_arrays_lines(static_cast<int>(scene_list.lines.size()) * 2);
+        opengl::draw_arrays_lines(static_cast<int>(scene.lines.size()) * 2);
 
         GlVertexArray::unbind();
     }
 
     void DebugRenderer::clear() {
-        scene_list.lines.clear();
+        scene.lines.clear();
         storage.lines_buffer.clear();
     }
 
     Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary&) {
         opengl::initialize_default();
+        opengl::initialize_stencil();
         opengl::enable_depth_test();
         opengl::clear_color(0.0f, 0.0f, 0.0f);
 
@@ -93,7 +94,7 @@ namespace sm {
                 Attachment(AttachmentFormat::Rgba8, AttachmentType::Renderbuffer)
             };
             specification.depth_attachment = Attachment(
-                AttachmentFormat::Depth32, AttachmentType::Renderbuffer
+                AttachmentFormat::Depth24Stencil8, AttachmentType::Renderbuffer
             );
             specification.samples = samples;
 
@@ -167,7 +168,6 @@ namespace sm {
 
             storage.quad_shader->bind();
             storage.quad_shader->upload_uniform_int_array("u_texture[0]"_H, {0, 1, 2, 3, 4, 5, 6, 7});
-
             GlShader::unbind();
         }
 
@@ -177,6 +177,15 @@ namespace sm {
                 utils::read_file(fs.path_engine_assets("shaders/skybox.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/skybox.frag"))
             );
+        }
+
+        {
+            storage.outline_shader = std::make_shared<GlShader>(
+                utils::read_file(fs.path_engine_assets("shaders/outline.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/outline.frag"))
+            );
+
+            register_shader(storage.outline_shader);
         }
 
         {
@@ -264,14 +273,14 @@ namespace sm {
     }
 
     void Renderer::capture(const Camera& camera, const glm::vec3& position) {
-        scene_list.camera.view_matrix = camera.view_matrix;
-        scene_list.camera.projection_matrix = camera.projection_matrix;
-        scene_list.camera.projection_view_matrix = camera.projection_view_matrix;
-        scene_list.camera.position = position;
+        scene.camera.view_matrix = camera.view_matrix;
+        scene.camera.projection_matrix = camera.projection_matrix;
+        scene.camera.projection_view_matrix = camera.projection_view_matrix;
+        scene.camera.position = position;
     }
 
     void Renderer::capture(const Camera2D& camera_2d) {
-        scene_list.camera_2d.projection_matrix = camera_2d.projection_matrix;
+        scene.camera_2d.projection_matrix = camera_2d.projection_matrix;
     }
 
     void Renderer::skybox(std::shared_ptr<GlTextureCubemap> texture) {
@@ -279,37 +288,37 @@ namespace sm {
     }
 
     void Renderer::shadows(float left, float right, float bottom, float top, float lens_near, float lens_far, const glm::vec3& position) {
-        scene_list.light_space.left = left;
-        scene_list.light_space.right = right;
-        scene_list.light_space.bottom = bottom;
-        scene_list.light_space.top = top;
-        scene_list.light_space.lens_near = lens_near;
-        scene_list.light_space.lens_far = lens_far;
-        scene_list.light_space.position = position;
+        scene.light_space.left = left;
+        scene.light_space.right = right;
+        scene.light_space.bottom = bottom;
+        scene.light_space.top = top;
+        scene.light_space.lens_near = lens_near;
+        scene.light_space.lens_far = lens_far;
+        scene.light_space.position = position;
     }
 
     void Renderer::register_shader(std::shared_ptr<GlShader> shader) {
-        scene_data.shaders.push_back(shader);
+        storage.scene.shaders.push_back(shader);
     }
 
     void Renderer::register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer) {
-        scene_data.framebuffers.push_back(framebuffer);
+        storage.scene.framebuffers.push_back(framebuffer);
     }
 
     void Renderer::add_renderable(const Renderable& renderable) {
-        scene_list.renderables.push_back(renderable);
+        scene.renderables.push_back(renderable);
     }
 
     void Renderer::add_light(const DirectionalLight& light) {
-        scene_list.directional_light = light;
+        scene.directional_light = light;
     }
 
     void Renderer::add_light(const PointLight& light) {
-        scene_list.point_lights.push_back(light);
+        scene.point_lights.push_back(light);
     }
 
     void Renderer::add_text(const Text& text) {
-        scene_list.texts.push_back(text);
+        scene.texts.push_back(text);
     }
 
     void Renderer::add_info_text(float fps) {
@@ -318,11 +327,11 @@ namespace sm {
         text.text = std::to_string(fps) + " FPS";
         text.color = glm::vec3(1.0f);
 
-        scene_list.texts.push_back(text);
+        scene.texts.push_back(text);
     }
 
     void Renderer::add_quad(const Quad& quad) {
-        scene_list.quads.push_back(quad);
+        scene.quads.push_back(quad);
     }
 
     void Renderer::debug_add_line(const glm::vec3& position1, const glm::vec3& position2, const glm::vec3& color) {
@@ -332,7 +341,7 @@ namespace sm {
         line.color = color;
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.scene_list.lines.push_back(line);
+        debug.scene.lines.push_back(line);
 #endif
     }
 
@@ -347,7 +356,7 @@ namespace sm {
             line.position2 = points[i];
 
 #ifndef SM_BUILD_DISTRIBUTION
-            debug.scene_list.lines.push_back(line);
+            debug.scene.lines.push_back(line);
 #endif
         }
     }
@@ -363,7 +372,7 @@ namespace sm {
             line.position2 = points.begin()[i];
 
 #ifndef SM_BUILD_DISTRIBUTION
-            debug.scene_list.lines.push_back(line);
+            debug.scene.lines.push_back(line);
 #endif
         }
     }
@@ -423,7 +432,7 @@ namespace sm {
     }
 
     void Renderer::pre_setup() {
-        for (const std::weak_ptr<GlShader>& wshader : scene_data.shaders) {
+        for (const std::weak_ptr<GlShader>& wshader : storage.scene.shaders) {
             std::shared_ptr<GlShader> shader {wshader.lock()};
 
             if (shader == nullptr) {
@@ -466,7 +475,7 @@ namespace sm {
     }
 
     void Renderer::post_setup() {
-        scene_data.shaders.clear();
+        storage.scene.shaders.clear();
     }
 
     void Renderer::render(int width, int height) {
@@ -476,24 +485,24 @@ namespace sm {
             const auto uniform_buffer {storage.wprojection_view_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&scene_list.camera.projection_view_matrix, "u_projection_view_matrix"_H);
+                uniform_buffer->set(&scene.camera.projection_view_matrix, "u_projection_view_matrix"_H);
             }
         }
         {
             const auto uniform_buffer {storage.wdirectional_light_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&scene_list.directional_light.direction, "u_directional_light.direction"_H);
-                uniform_buffer->set(&scene_list.directional_light.ambient_color, "u_directional_light.ambient"_H);
-                uniform_buffer->set(&scene_list.directional_light.diffuse_color, "u_directional_light.diffuse"_H);
-                uniform_buffer->set(&scene_list.directional_light.specular_color, "u_directional_light.specular"_H);
+                uniform_buffer->set(&scene.directional_light.direction, "u_directional_light.direction"_H);
+                uniform_buffer->set(&scene.directional_light.ambient_color, "u_directional_light.ambient"_H);
+                uniform_buffer->set(&scene.directional_light.diffuse_color, "u_directional_light.diffuse"_H);
+                uniform_buffer->set(&scene.directional_light.specular_color, "u_directional_light.specular"_H);
             }
         }
         {
             const auto uniform_buffer {storage.wview_position_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&scene_list.camera.position, "u_view_position"_H);
+                uniform_buffer->set(&scene.camera.position, "u_view_position"_H);
             }
         }
         {
@@ -538,7 +547,7 @@ namespace sm {
         // Draw normal things
         storage.scene_framebuffer->bind();
 
-        opengl::clear(opengl::Buffers::CD);
+        opengl::clear(opengl::Buffers::CDS);
         opengl::viewport(
             storage.scene_framebuffer->get_specification().width,
             storage.scene_framebuffer->get_specification().height
@@ -629,11 +638,11 @@ namespace sm {
     }
 
     void Renderer::clear() {
-        scene_list.renderables.clear();
-        scene_list.directional_light = {};
-        scene_list.point_lights.clear();
-        scene_list.texts.clear();
-        scene_list.quads.clear();
+        scene.renderables.clear();
+        scene.directional_light = {};
+        scene.point_lights.clear();
+        scene.texts.clear();
+        scene.quads.clear();
         storage.text.batches.clear();
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -648,7 +657,7 @@ namespace sm {
 
         opengl::viewport(width, height);
 
-        for (std::weak_ptr<GlFramebuffer> wframebuffer : scene_data.framebuffers) {
+        for (std::weak_ptr<GlFramebuffer> wframebuffer : storage.scene.framebuffers) {
             std::shared_ptr<GlFramebuffer> framebuffer {wframebuffer.lock()};
 
             if (framebuffer == nullptr) {
@@ -664,7 +673,7 @@ namespace sm {
     }
 
     void Renderer::draw_renderables() {
-        for (const Renderable& renderable : scene_list.renderables) {
+        for (const Renderable& renderable : scene.renderables) {
             const auto material {renderable.material.lock()};
 
             if (material->flags & Material::Outline) {
@@ -694,20 +703,67 @@ namespace sm {
         material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
 
         opengl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
+
+        // Don't unbind the vertex array
     }
 
     void Renderer::draw_renderables_outlined() {
+        std::vector<Renderable> outline_renderables;
 
+        std::for_each(scene.renderables.cbegin(), scene.renderables.cend(), [&](const Renderable& renderable) {
+            const auto material {renderable.material.lock()};
+
+            if (material->flags & Material::Outline) {
+                outline_renderables.push_back(renderable);
+            }
+        });
+
+        std::sort(outline_renderables.begin(), outline_renderables.end(), [this](const Renderable& lhs, const Renderable& rhs) {
+            const float distance_left {glm::distance(std::get<0>(lhs.transform).position, scene.camera.position)};
+            const float distance_right {glm::distance(std::get<0>(rhs.transform).position, scene.camera.position)};
+
+            return distance_left < distance_right;
+        });
+
+        for (const Renderable& renderable : outline_renderables) {
+            draw_renderable_outlined(renderable);
+        }
     }
 
     void Renderer::draw_renderable_outlined(const Renderable& renderable) {
+        opengl::stencil_mask(0xFF);
 
+        draw_renderable(renderable);
+
+        opengl::stencil_function(opengl::Function::NotEqual, 1, 0xFF);
+        opengl::stencil_mask(0x00);
+
+        {
+            const auto vertex_array {renderable.vertex_array.lock()};
+
+            glm::mat4 matrix {get_renderable_transform(renderable)};
+            matrix = glm::scale(matrix, glm::vec3(renderable.outline.scale));
+            matrix = glm::translate(matrix, renderable.outline.offset);
+
+            // Vertex array is already bound
+
+            storage.outline_shader->bind();
+            storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
+            storage.outline_shader->upload_uniform_vec3("u_color"_H, renderable.outline.color);
+
+            opengl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
+
+            GlVertexArray::unbind();
+        }
+
+        opengl::stencil_function(opengl::Function::Always, 1, 0xFF);
+        opengl::stencil_mask(0xFF);
     }
 
     void Renderer::draw_renderables_to_depth_buffer() {
         storage.shadow_shader->bind();
 
-        for (const Renderable& renderable : scene_list.renderables) {
+        for (const Renderable& renderable : scene.renderables) {
             const auto vertex_array {renderable.vertex_array.lock()};
             const auto material {renderable.material.lock()};
 
@@ -727,8 +783,8 @@ namespace sm {
     }
 
     void Renderer::draw_skybox() {
-        const glm::mat4& projection {scene_list.camera.projection_matrix};
-        const glm::mat4 view {glm::mat4(glm::mat3(scene_list.camera.view_matrix))};
+        const glm::mat4& projection {scene.camera.projection_matrix};
+        const glm::mat4 view {glm::mat4(glm::mat3(scene.camera.view_matrix))};
 
         storage.skybox_shader->bind();
         storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
@@ -746,13 +802,13 @@ namespace sm {
 
         storage.text_shader->bind();
 
-        std::stable_sort(scene_list.texts.begin(), scene_list.texts.end(), [](const Text& lhs, const Text& rhs) {
+        std::stable_sort(scene.texts.begin(), scene.texts.end(), [](const Text& lhs, const Text& rhs) {
             return lhs.font.lock().get() < rhs.font.lock().get();
         });
 
         const void* font_ptr {nullptr};  // TODO C++20
 
-        for (const auto& text : scene_list.texts) {
+        for (const auto& text : scene.texts) {
             const void* this_ptr {text.font.lock().get()};
 
             assert(this_ptr != nullptr);
@@ -791,7 +847,7 @@ namespace sm {
             // Pushes the rendered text onto the buffer
             font->render(text.text, static_cast<int>(i++), storage.text.batch_buffer);
 
-            glm::mat4 matrix {1.0f};  // TODO send mat3 instead
+            glm::mat4 matrix {1.0f};  // TODO upload mat3 instead
             matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
             matrix = glm::scale(matrix, glm::vec3(std::min(text.scale, 1.0f), std::min(text.scale, 1.0f), 1.0f));
 
@@ -802,7 +858,7 @@ namespace sm {
         // Uniforms must be set as arrays
         storage.text_shader->upload_uniform_mat4_array("u_model_matrix[0]"_H, storage.text.batch_matrices);
         storage.text_shader->upload_uniform_vec3_array("u_color[0]"_H, storage.text.batch_colors);
-        storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene_list.camera_2d.projection_matrix);
+        storage.text_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.camera_2d.projection_matrix);
 
         const auto vertex_buffer {storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
@@ -831,11 +887,11 @@ namespace sm {
         storage.quad_shader->bind();
         storage.quad_vertex_array->bind();
 
-        storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene_list.camera_2d.projection_matrix);
+        storage.quad_shader->upload_uniform_mat4("u_projection_matrix"_H, scene.camera_2d.projection_matrix);
 
         begin_quads_batch();
 
-        for (const Quad& quad : scene_list.quads) {
+        for (const Quad& quad : scene.quads) {
             draw_quad(
                 quad.position,
                 glm::vec2(static_cast<float>(quad.texture->get_width()), static_cast<float>(quad.texture->get_height())),
@@ -927,23 +983,23 @@ namespace sm {
     void Renderer::setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         // Sort front to back with respect to the camera; lights in the front of the list will be used
         std::sort(
-            scene_list.point_lights.begin(),
-            scene_list.point_lights.end(),
+            scene.point_lights.begin(),
+            scene.point_lights.end(),
             [this](const PointLight& lhs, const PointLight& rhs) {
-                const float distance_left {glm::distance(lhs.position, scene_list.camera.position)};
-                const float distance_right {glm::distance(rhs.position, scene_list.camera.position)};
+                const float distance_left {glm::distance(lhs.position, scene.camera.position)};
+                const float distance_right {glm::distance(rhs.position, scene.camera.position)};
 
                 return distance_left < distance_right;
             }
         );
 
         // Add dummy point lights to make the size 4, which is a requirement from the shader
-        if (scene_list.point_lights.size() < SHADER_MAX_POINT_LIGHTS) {
-            scene_list.point_lights.resize(SHADER_MAX_POINT_LIGHTS);
+        if (scene.point_lights.size() < SHADER_MAX_POINT_LIGHTS) {
+            scene.point_lights.resize(SHADER_MAX_POINT_LIGHTS);
         }
 
         for (std::size_t i {0}; i < SHADER_MAX_POINT_LIGHTS; i++) {
-            const PointLight& light {scene_list.point_lights[i]};
+            const PointLight& light {scene.point_lights[i]};
             const std::string index {std::to_string(i)};
 
             // Uniforms must be set individually by index
@@ -959,19 +1015,19 @@ namespace sm {
     void Renderer::setup_light_space_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         const glm::mat4 projection {
             glm::ortho(
-                scene_list.light_space.left,
-                scene_list.light_space.right,
-                scene_list.light_space.bottom,
-                scene_list.light_space.top,
-                scene_list.light_space.lens_near,
-                scene_list.light_space.lens_far
+                scene.light_space.left,
+                scene.light_space.right,
+                scene.light_space.bottom,
+                scene.light_space.top,
+                scene.light_space.lens_near,
+                scene.light_space.lens_far
             )
         };
 
         const glm::mat4 view {
             glm::lookAt(
-                scene_list.light_space.position,
-                scene_list.directional_light.direction,
+                scene.light_space.position,
+                scene.directional_light.direction,
                 glm::vec3(0.0f, 1.0f, 0.0f)
             )
         };

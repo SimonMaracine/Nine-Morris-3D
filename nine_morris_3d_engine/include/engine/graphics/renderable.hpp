@@ -36,7 +36,11 @@ namespace sm {
 
         std::variant<Transform, glm::mat4> transform;
 
-        glm::vec3 outline_color {};  // TODO think of a good solution
+        struct {
+            glm::vec3 color {};  // TODO think of a good solution
+            glm::vec3 offset {};
+            float scale {1.05f};
+        } outline;
     };
 
     // Every piece of text is a render call too
