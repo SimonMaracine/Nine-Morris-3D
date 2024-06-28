@@ -554,7 +554,7 @@ void GameScene::load_material_instances() {
     {
         auto material_instance {ctx.res.material_instance.load("brick"_H, ctx.res.material["phong_textured"_H])};
         material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["brick"_H], 0);
-        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.4f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
     }
 }

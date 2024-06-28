@@ -1,13 +1,13 @@
 #version 430 core
 
-#include "shaders/common/light.glsl"
-
 in vec3 v_normal;
 in vec2 v_texture_coordinate;
 in vec3 v_fragment_position;
 in vec4 v_fragment_position_light_space;
 
 layout(location = 0) out vec4 fragment_color;
+
+#include "shaders/common/light.glsl"
 
 layout(binding = 1) uniform sampler2D u_shadow_map;
 

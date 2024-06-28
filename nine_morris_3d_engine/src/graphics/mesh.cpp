@@ -20,16 +20,16 @@ namespace sm {
         aiVector3D normal;
     };
 
-    struct VertexPTN {
+    struct VertexPNT {
         aiVector3D position;
-        aiVector2D texture_coordinate;
         aiVector3D normal;
+        aiVector2D texture_coordinate;
     };
 
-    struct VertexPTNT {
+    struct VertexPNTT {
         aiVector3D position;
-        aiVector2D texture_coordinate;
         aiVector3D normal;
+        aiVector2D texture_coordinate;
         aiVector3D tangent;
     };
 
@@ -68,9 +68,9 @@ namespace sm {
         }
     }
 
-    static void load_PTN(const aiMesh* mesh, std::vector<VertexPTN>& vertices, std::vector<unsigned int>& indices) {
+    static void load_PNT(const aiMesh* mesh, std::vector<VertexPNT>& vertices, std::vector<unsigned int>& indices) {
         for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
-            VertexPTN vertex;
+            VertexPNT vertex;
             vertex.position = mesh->mVertices[i];
             vertex.texture_coordinate.x = mesh->mTextureCoords[0][i].x;
             vertex.texture_coordinate.y = mesh->mTextureCoords[0][i].y;
@@ -88,9 +88,9 @@ namespace sm {
         }
     }
 
-    static void load_PTNT(const aiMesh* mesh, std::vector<VertexPTNT>& vertices, std::vector<unsigned int>& indices) {
+    static void load_PNTT(const aiMesh* mesh, std::vector<VertexPNTT>& vertices, std::vector<unsigned int>& indices) {
         for (unsigned int i {0}; i < mesh->mNumVertices; i++) {
-            VertexPTNT vertex;
+            VertexPNTT vertex;
             vertex.position = mesh->mVertices[i];
             vertex.texture_coordinate.x = mesh->mTextureCoords[0][i].x;
             vertex.texture_coordinate.y = mesh->mTextureCoords[0][i].y;
@@ -208,36 +208,36 @@ namespace sm {
                 break;
             }
             case Type::PNT: {
-                std::vector<VertexPTN> vertices;
+                std::vector<VertexPNT> vertices;
                 std::vector<unsigned int> indices;
 
-                load_PTN(mesh, vertices, indices);
+                load_PNT(mesh, vertices, indices);
 
                 allocate(
                     vertices.data(),
-                    vertices.size() * sizeof(VertexPTN),
+                    vertices.size() * sizeof(VertexPNT),
                     indices.data(),
                     indices.size() * sizeof(unsigned int)
                 );
 
-                LOG_DEBUG("Loaded PTN model data");
+                LOG_DEBUG("Loaded PNT model data");
 
                 break;
             }
             case Type::PNTT: {
-                std::vector<VertexPTNT> vertices;
+                std::vector<VertexPNTT> vertices;
                 std::vector<unsigned int> indices;
 
-                load_PTNT(mesh, vertices, indices);
+                load_PNTT(mesh, vertices, indices);
 
                 allocate(
                     vertices.data(),
-                    vertices.size() * sizeof(VertexPTNT),
+                    vertices.size() * sizeof(VertexPNTT),
                     indices.data(),
                     indices.size() * sizeof(unsigned int)
                 );
 
-                LOG_DEBUG("Loaded PTNT model data");
+                LOG_DEBUG("Loaded PNTT model data");
 
                 break;
             }

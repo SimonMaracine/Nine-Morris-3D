@@ -21,7 +21,7 @@ namespace sm {
 
     void ShaderLibrary::load_shaders_from_include_directories(std::initializer_list<std::string> include_directories) {
         for (const auto& include_directory : include_directories) {
-            for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(include_directory)) {
+            for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(include_directory)) {  // FIXME throws exception
                 if (entry.is_regular_file() && entry.path().extension() == ".glsl") {
                     const auto file_path {entry.path().string()};
                     const auto first_slash {file_path.find_first_of("/")};

@@ -81,7 +81,7 @@ namespace sm {
 
     Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary&) {
         opengl::initialize_default();
-        // opengl::initialize_stencil();  // FIXME
+        opengl::initialize_stencil();
         opengl::enable_depth_test();
         opengl::clear_color(0.0f, 0.0f, 0.0f);
 
@@ -686,7 +686,7 @@ namespace sm {
             const auto material {renderable.material.lock()};
 
             if (material->flags & Material::Outline) {
-                // continue;  // This one is rendered differently  // FIXME
+                continue;  // This one is rendered differently
             }
 
             if (material->flags & Material::DisableBackFaceCulling) {  // FIXME improve; maybe use scene graph
@@ -717,26 +717,26 @@ namespace sm {
     }
 
     void Renderer::draw_renderables_outlined() {
-        // std::vector<Renderable> outline_renderables;  // FIXME
+        std::vector<Renderable> outline_renderables;
 
-        // std::for_each(scene.renderables.cbegin(), scene.renderables.cend(), [&](const Renderable& renderable) {
-        //     const auto material {renderable.material.lock()};
+        std::for_each(scene.renderables.cbegin(), scene.renderables.cend(), [&](const Renderable& renderable) {
+            const auto material {renderable.material.lock()};
 
-        //     if (material->flags & Material::Outline) {
-        //         outline_renderables.push_back(renderable);
-        //     }
-        // });
+            if (material->flags & Material::Outline) {
+                outline_renderables.push_back(renderable);
+            }
+        });
 
-        // std::sort(outline_renderables.begin(), outline_renderables.end(), [this](const Renderable& lhs, const Renderable& rhs) {
-        //     const float distance_left {glm::distance(lhs.transform.position, scene.camera.position)};
-        //     const float distance_right {glm::distance(rhs.transform.position, scene.camera.position)};
+        std::sort(outline_renderables.begin(), outline_renderables.end(), [this](const Renderable& lhs, const Renderable& rhs) {
+            const float distance_left {glm::distance(lhs.transform.position, scene.camera.position)};
+            const float distance_right {glm::distance(rhs.transform.position, scene.camera.position)};
 
-        //     return distance_left < distance_right;
-        // });
+            return distance_left < distance_right;
+        });
 
-        // for (const Renderable& renderable : outline_renderables) {
-        //     draw_renderable_outlined(renderable);
-        // }
+        for (const Renderable& renderable : outline_renderables) {
+            draw_renderable_outlined(renderable);
+        }
     }
 
     void Renderer::draw_renderable_outlined(const Renderable& renderable) {

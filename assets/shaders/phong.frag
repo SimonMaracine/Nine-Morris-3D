@@ -1,11 +1,11 @@
 #version 430 core
 
-#include "shaders/common/light.glsl"
-
 in vec3 v_normal;
 in vec3 v_fragment_position;
 
 layout(location = 0) out vec4 fragment_color;
+
+#include "shaders/common/light.glsl"
 
 struct Material {
     vec3 ambient_diffuse;
