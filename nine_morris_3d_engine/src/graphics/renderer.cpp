@@ -862,21 +862,14 @@ namespace sm {
 
         const auto vertex_buffer {storage.wtext_vertex_buffer.lock()};
         vertex_buffer->bind();
-        vertex_buffer->upload_data(storage.text.batch_buffer.data(), storage.text.batch_buffer.size());
+        vertex_buffer->upload_data(storage.text.batch_buffer.data(), storage.text.batch_buffer.size() * sizeof(Font::CharacterBuffer));
         GlVertexBuffer::unbind();
-
-        static constexpr std::size_t ITEMS_PER_VERTEX {5};
-        static constexpr std::size_t ITEM_SIZE {4};
-
-        assert(storage.text.batch_buffer.size() % (ITEM_SIZE * ITEMS_PER_VERTEX) == 0);
-
-        const int vertex_count {static_cast<int>(storage.text.batch_buffer.size() / (ITEM_SIZE * ITEMS_PER_VERTEX))};
 
         storage.text_vertex_array->bind();
 
         opengl::bind_texture_2d(font->get_bitmap()->get_id(), 0);
 
-        opengl::draw_arrays(vertex_count);
+        opengl::draw_arrays(static_cast<int>(storage.text.batch_buffer.size()) * 6);
 
         GlVertexArray::unbind();
     }

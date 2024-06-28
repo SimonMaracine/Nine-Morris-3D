@@ -180,7 +180,7 @@ namespace sm {
 
             struct {
                 std::vector<TextBatch> batches;
-                std::vector<unsigned char> batch_buffer;
+                std::vector<Font::CharacterBuffer> batch_buffer;
                 std::vector<glm::mat4> batch_matrices;
                 std::vector<glm::vec3> batch_colors;
             } text;

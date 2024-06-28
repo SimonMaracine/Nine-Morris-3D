@@ -35,18 +35,6 @@ namespace sm {
         void bake_characters(int begin_codepoint, int end_codepoint);
         void bake_ascii();
 
-        // Get the buffer of data used in the end by OpenGL
-        void render(const std::string& string, int index, std::vector<unsigned char>& buffer) const;
-
-        // Get the width and height of a piece of text
-        std::pair<int, int> get_string_size(const std::string& string, float scale = 1.0f) const;
-    private:
-        // The library author forgot to actually name the struct, so I made another one :P
-        struct Quad {
-            float x0, y0, s0, t0;
-            float x1, y1, s1, t1;
-        };
-
         struct CharacterBuffer {
             float f0, f1, f2, f3;
             int i0;
@@ -62,7 +50,17 @@ namespace sm {
             int i5;
         };
 
-        static_assert(sizeof(CharacterBuffer) == 5 * 6 * 4);
+        // Get the buffer of data used in the end by OpenGL
+        void render(const std::string& string, int index, std::vector<CharacterBuffer>& buffer) const;
+
+        // Get the width and height of a piece of text
+        std::pair<int, int> get_string_size(const std::string& string, float scale = 1.0f) const;
+    private:
+        // The library author forgot to actually name the struct, so I made another one :P
+        struct Quad {
+            float x0, y0, s0, t0;
+            float x1, y1, s1, t1;
+        };
 
         void get_character_quad(int codepoint, float* x, float* y, Quad* quad) const;
         static void write_bitmap_to_file(const char* name, const unsigned char* bitmap, int size);

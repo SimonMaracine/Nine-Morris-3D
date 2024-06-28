@@ -105,7 +105,7 @@ namespace sm {
         bake_characters(32, 95);
     }
 
-    void Font::render(const std::string& string, int index, std::vector<unsigned char>& buffer) const {
+    void Font::render(const std::string& string, int index, std::vector<CharacterBuffer>& buffer) const {
         const std::u32string utf32_string {utf8::utf8to32(string)};
 
         float x {0.0f};  // TODO C++20
@@ -113,9 +113,6 @@ namespace sm {
 
         // This makes multi-line text have its origin at bottom-left
         float vertical_positioning {0.0f};
-
-        std::vector<CharacterBuffer> character_buffers;
-        character_buffers.reserve(utf32_string.size());
 
         for (const char32_t character : utf32_string) {
             if (character == '\n') {
@@ -160,10 +157,12 @@ namespace sm {
             character_buffer.f23 = quad.t0;
             character_buffer.i5 = index;
 
-            character_buffers.push_back(character_buffer);
+            buffer.push_back(character_buffer);
         }
 
-        for (CharacterBuffer& character : character_buffers) {
+        for (std::size_t i {buffer.size() - utf32_string.size()}; i < buffer.size(); i++) {
+            CharacterBuffer& character {buffer[i]};
+
             character.f1 += vertical_positioning;
             character.f5 += vertical_positioning;
             character.f9 += vertical_positioning;
@@ -171,9 +170,6 @@ namespace sm {
             character.f17 += vertical_positioning;
             character.f21 += vertical_positioning;
         }
-
-        buffer.resize(buffer.size() + character_buffers.size() * sizeof(CharacterBuffer));
-        std::memcpy(buffer.data() + buffer.size() - character_buffers.size() * sizeof(CharacterBuffer), character_buffers.data(), character_buffers.size() * sizeof(CharacterBuffer));
     }
 
     std::pair<int, int> Font::get_string_size(const std::string& string, float scale) const {
