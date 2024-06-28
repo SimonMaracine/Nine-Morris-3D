@@ -11,7 +11,7 @@
 #include "engine/graphics/opengl/buffer.hpp"
 #include "engine/graphics/shader_library.hpp"
 
-// See that setting uniforms is a little weird
+// Setting uniforms is a little weird
 // https://www.khronos.org/opengl/wiki/Program_Introspection#Naming
 
 namespace sm {
@@ -67,7 +67,6 @@ namespace sm {
         // Needed by renderer
         std::vector<UniformBlockSpecification> uniform_blocks;
 
-        // Shaders own uniform buffers
         std::vector<std::shared_ptr<GlUniformBuffer>> uniform_buffers;
 
         friend class Renderer;

@@ -76,11 +76,12 @@ namespace sm {
             }
 
             result += std::string(begin, std::get<0>(*iter));
-            result += "#line 1\n" + load_shader(std::get<3>(*iter)) + "\n#line " + std::to_string(std::get<2>(*iter) + 1);
-            result += std::string(std::get<1>(*iter), end);  // Endline comes from here
+            result += "#line 1\n" + load_shader(std::get<3>(*iter)) + "\n#line " + std::to_string(std::get<2>(*iter) + 1);  // FIXME why no new line?
 
             begin = std::get<1>(*iter);
         }
+
+        result += std::string(std::get<1>(*std::prev(matches.cend())), string.cend());
 
         return result;
     }

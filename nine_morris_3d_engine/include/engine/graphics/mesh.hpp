@@ -9,8 +9,8 @@ namespace sm {
         enum class Type {
             P,
             PN,
-            PTN,
-            PTNT
+            PNT,
+            PNTT
         };
 
         static constexpr const char* DEFAULT_OBJECT {"defaultobject"};

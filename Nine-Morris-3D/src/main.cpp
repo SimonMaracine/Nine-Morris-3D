@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 
 // Include entry point first as it includes Windows.h
 #include <engine/application_base/entry_point.hpp>
@@ -26,7 +27,7 @@ static constexpr unsigned int PATCH {0};
 int application_main() {
     while (true) {
         int exit_code {};
-        Global g;
+        Global g;  // FIXME no data should live before Application
 
         {
             sm::ApplicationProperties properties;
@@ -45,6 +46,7 @@ int application_main() {
 
             sm::UserFunctions functions;
             functions.start = game_start;
+            functions.stop = game_stop;
 
             try {
                 auto game {sm::Application(properties)};

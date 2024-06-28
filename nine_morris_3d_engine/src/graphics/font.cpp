@@ -114,6 +114,8 @@ namespace sm {
         // This makes multi-line text have its origin at bottom-left
         float vertical_positioning {0.0f};
 
+        std::size_t character_count {};
+
         for (const char32_t character : utf32_string) {
             if (character == '\n') {
                 y -= (-vertical_advance);
@@ -158,9 +160,11 @@ namespace sm {
             character_buffer.i5 = index;
 
             buffer.push_back(character_buffer);
+
+            character_count++;
         }
 
-        for (std::size_t i {buffer.size() - utf32_string.size()}; i < buffer.size(); i++) {
+        for (std::size_t i {buffer.size() - character_count}; i < buffer.size(); i++) {
             CharacterBuffer& character {buffer[i]};
 
             character.f1 += vertical_positioning;

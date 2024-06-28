@@ -25,7 +25,7 @@ namespace sm {
             Vec4
         };
 
-        enum Flags : unsigned int {
+        enum : unsigned int {
             Outline = 1u << 0,
             DisableBackFaceCulling = 1u << 1,
             CastShadow = 1u << 2
@@ -36,7 +36,6 @@ namespace sm {
         void add_uniform(Uniform type, Id name);
         void add_texture(Id name);
     private:
-        // Materials own shaders
         std::shared_ptr<GlShader> shader;
 
         std::vector<Id> uniforms_mat4;
@@ -69,7 +68,7 @@ namespace sm {
 
         const GlShader* get_shader() const { return shader.get(); }
 
-        // It's okay to be public
+        // Intentionally public
         unsigned int flags {};
     private:
         struct Element {
@@ -91,7 +90,6 @@ namespace sm {
             unsigned int texture;
         };
 
-        // Material instances own shaders
         std::shared_ptr<GlShader> shader;
 
         std::unique_ptr<unsigned char[]> data;

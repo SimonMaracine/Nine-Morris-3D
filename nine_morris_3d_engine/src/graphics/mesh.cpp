@@ -136,7 +136,7 @@ namespace sm {
             flags |= aiProcess_FlipWindingOrder;
         }
 
-        if (type == Type::PTNT) {
+        if (type == Type::PNTT) {
             flags |= aiProcess_CalcTangentSpace;
         }
 
@@ -207,7 +207,7 @@ namespace sm {
 
                 break;
             }
-            case Type::PTN: {
+            case Type::PNT: {
                 std::vector<VertexPTN> vertices;
                 std::vector<unsigned int> indices;
 
@@ -224,7 +224,7 @@ namespace sm {
 
                 break;
             }
-            case Type::PTNT: {
+            case Type::PNTT: {
                 std::vector<VertexPTNT> vertices;
                 std::vector<unsigned int> indices;
 

@@ -25,5 +25,12 @@ void create_post_processing(sm::Ctx& ctx) {
 }
 
 void game_start(sm::Ctx& ctx) {
-    create_post_processing(ctx);
+
+}
+
+void game_stop(sm::Ctx& ctx) {
+    // This function is not called on error
+
+    auto& g {ctx.global<Global>()};
+    g.blur_step = nullptr;
 }

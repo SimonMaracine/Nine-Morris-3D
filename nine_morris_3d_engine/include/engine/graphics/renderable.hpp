@@ -12,29 +12,35 @@
 namespace sm {
     // Right now every renderable is analogous to a mesh, to a render call
     struct Renderable {
-        struct Transform {
-            // Don't default initialize
-            glm::vec3 position;
-            glm::vec3 rotation;
-            float scale;
-        };
+        // struct Transform {  // FIXME
+        //     // Don't default initialize
+        //     glm::vec3 position;
+        //     glm::vec3 rotation;
+        //     float scale;  // Only uniform scaling
+        // };
 
-        void position(const glm::vec3& position) {
-            std::get<0>(transform).position = position;
-        }
+        // void position(const glm::vec3& position) {
+        //     std::get<0>(transform).position = position;
+        // }
 
-        void rotation(const glm::vec3& rotation) {
-            std::get<0>(transform).rotation = rotation;
-        }
+        // void rotation(const glm::vec3& rotation) {
+        //     std::get<0>(transform).rotation = rotation;
+        // }
 
-        void scale(float scale) {
-            std::get<0>(transform).scale = scale;
-        }
+        // void scale(float scale) {
+        //     std::get<0>(transform).scale = scale;
+        // }
 
         std::weak_ptr<GlVertexArray> vertex_array;
         std::weak_ptr<MaterialInstance> material;
 
-        std::variant<Transform, glm::mat4> transform;
+        // std::variant<Transform, glm::mat4> transform;
+
+        struct {
+            glm::vec3 position {};
+            glm::vec3 rotation {};
+            float scale {1.0f};  // Only uniform scaling
+        } transform;
 
         struct {
             glm::vec3 color {};  // TODO think of a good solution

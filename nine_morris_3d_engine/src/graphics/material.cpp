@@ -210,12 +210,7 @@ namespace sm {
     }
 
     void MaterialInstance::set_texture(Id name, std::shared_ptr<GlTexture> texture, int unit) {
-        Texture result_texure {};
-        result_texure.unit = unit;
-        result_texure.texture = texture->get_id();
-
-        const Element& element {offsets.at(name)};
-        std::memcpy(data.get() + element.offset, &result_texure, sizeof(result_texure));
+        set_texture(name, texture->get_id(), unit);
     }
 
     void MaterialInstance::set_texture(Id name, unsigned int texture, int unit) {

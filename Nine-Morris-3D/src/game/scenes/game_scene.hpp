@@ -14,6 +14,11 @@ struct GameScene : sm::Scene {
 
     void on_window_resized(const sm::WindowResizedEvent& event);
 
+    void load_models();
+    void load_textures();
+    void load_materials();
+    void load_material_instances();
+
     sm::Camera cam;
     sm::Camera2D cam_2d;
     PointCameraController cam_controller;
@@ -23,8 +28,6 @@ struct GameScene : sm::Scene {
     glm::vec2 pos {};
     float scl {1.0f};
     bool sky {true};
-    bool blur {true};
+    bool blur {false};
     bool outline {true};
-
-    sm::Renderable teapot;
 };

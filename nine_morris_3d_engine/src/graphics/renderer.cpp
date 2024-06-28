@@ -81,7 +81,7 @@ namespace sm {
 
     Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary&) {
         opengl::initialize_default();
-        opengl::initialize_stencil();
+        // opengl::initialize_stencil();  // FIXME
         opengl::enable_depth_test();
         opengl::clear_color(0.0f, 0.0f, 0.0f);
 
@@ -686,7 +686,7 @@ namespace sm {
             const auto material {renderable.material.lock()};
 
             if (material->flags & Material::Outline) {
-                continue;  // This one is rendered differently
+                // continue;  // This one is rendered differently  // FIXME
             }
 
             if (material->flags & Material::DisableBackFaceCulling) {  // FIXME improve; maybe use scene graph
@@ -717,26 +717,26 @@ namespace sm {
     }
 
     void Renderer::draw_renderables_outlined() {
-        std::vector<Renderable> outline_renderables;
+        // std::vector<Renderable> outline_renderables;  // FIXME
 
-        std::for_each(scene.renderables.cbegin(), scene.renderables.cend(), [&](const Renderable& renderable) {
-            const auto material {renderable.material.lock()};
+        // std::for_each(scene.renderables.cbegin(), scene.renderables.cend(), [&](const Renderable& renderable) {
+        //     const auto material {renderable.material.lock()};
 
-            if (material->flags & Material::Outline) {
-                outline_renderables.push_back(renderable);
-            }
-        });
+        //     if (material->flags & Material::Outline) {
+        //         outline_renderables.push_back(renderable);
+        //     }
+        // });
 
-        std::sort(outline_renderables.begin(), outline_renderables.end(), [this](const Renderable& lhs, const Renderable& rhs) {
-            const float distance_left {glm::distance(std::get<0>(lhs.transform).position, scene.camera.position)};
-            const float distance_right {glm::distance(std::get<0>(rhs.transform).position, scene.camera.position)};
+        // std::sort(outline_renderables.begin(), outline_renderables.end(), [this](const Renderable& lhs, const Renderable& rhs) {
+        //     const float distance_left {glm::distance(lhs.transform.position, scene.camera.position)};
+        //     const float distance_right {glm::distance(rhs.transform.position, scene.camera.position)};
 
-            return distance_left < distance_right;
-        });
+        //     return distance_left < distance_right;
+        // });
 
-        for (const Renderable& renderable : outline_renderables) {
-            draw_renderable_outlined(renderable);
-        }
+        // for (const Renderable& renderable : outline_renderables) {
+        //     draw_renderable_outlined(renderable);
+        // }
     }
 
     void Renderer::draw_renderable_outlined(const Renderable& renderable) {
@@ -1060,15 +1060,21 @@ namespace sm {
     glm::mat4 Renderer::get_renderable_transform(const Renderable& renderable) {
         glm::mat4 matrix {1.0f};
 
-        if (renderable.transform.index() == 0) {
-            matrix = glm::translate(matrix, std::get<0>(renderable.transform).position);
-            matrix = glm::rotate(matrix, std::get<0>(renderable.transform).rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            matrix = glm::rotate(matrix, std::get<0>(renderable.transform).rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            matrix = glm::rotate(matrix, std::get<0>(renderable.transform).rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix = glm::scale(matrix, glm::vec3(std::get<0>(renderable.transform).scale));
-        } else {
-            matrix = std::get<1>(renderable.transform);
-        }
+        // if (renderable.transform.index() == 0) {  // FIXME
+        //     matrix = glm::translate(matrix, std::get<0>(renderable.transform).position);
+        //     matrix = glm::rotate(matrix, std::get<0>(renderable.transform).rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        //     matrix = glm::rotate(matrix, std::get<0>(renderable.transform).rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        //     matrix = glm::rotate(matrix, std::get<0>(renderable.transform).rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        //     matrix = glm::scale(matrix, glm::vec3(std::get<0>(renderable.transform).scale));
+        // } else {
+        //     matrix = std::get<1>(renderable.transform);
+        // }
+
+        matrix = glm::translate(matrix, renderable.transform.position);
+        matrix = glm::rotate(matrix, renderable.transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, renderable.transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, renderable.transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(renderable.transform.scale));
 
         return matrix;
     }
