@@ -22,6 +22,7 @@ struct GameScene : sm::Scene {
 
     glm::vec2 pos {};
     float scl {1.0f};
+    bool sky {true};
     bool blur {true};
     bool outline {true};
 

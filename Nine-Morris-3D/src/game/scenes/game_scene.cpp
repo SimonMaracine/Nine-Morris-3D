@@ -5,6 +5,9 @@
 #include <engine/external/glm.h++>
 #include <engine/external/imgui.h++>
 
+#include "game/global.hpp"
+#include "game/game.hpp"
+
 void GameScene::on_start() {
     ctx.tsk.add("test"_H, [this](const sm::Task& task) {
         if (task.get_total_time() > 3.0) {
@@ -276,7 +279,15 @@ void GameScene::on_update() {
     ctx.rnd.add_light(directional_light);
     ctx.rnd.add_light(point_light);
 
-    ctx.rnd.skybox(ctx.res.texture_cubemap["field"_H]);
+    if (sky) {
+        ctx.rnd.skybox(ctx.res.texture_cubemap["field"_H]);
+    }
+
+    const auto& g {ctx.global<Global>()};
+
+    if (blur) {
+        ctx.rnd.add_post_processing(g.blur_step);
+    }
 
     sm::Renderable dragon;
     dragon.vertex_array = ctx.res.vertex_array["dragon"_H];
@@ -430,14 +441,16 @@ void GameScene::on_imgui_update() {
     ImGui::SliderFloat("Scale", &scl, 0.0f, 3.0f);
     ImGui::End();
 
-    ImGui::Begin("Blur");
-    if (ImGui::Checkbox("Enable", &blur)) {
-        // TODO
+    ImGui::Begin("Features");
+    ImGui::Checkbox("Skybox", &sky);
+    if (ImGui::Checkbox("Blur", &blur)) {
+        if (blur) {
+            create_post_processing(ctx);
+        } else {
+            ctx.global<Global>().blur_step = nullptr;
+        }
     }
-    ImGui::End();
-
-    ImGui::Begin("Outline");
-    if (ImGui::Checkbox("Enable", &outline)) {
+    if (ImGui::Checkbox("Outline", &outline)) {
         if (outline) {
             ctx.res.material_instance["dragon1"_H]->flags ^= sm::Material::Outline;
         } else {

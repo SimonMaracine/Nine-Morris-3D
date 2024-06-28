@@ -11,6 +11,8 @@ namespace sm {
     class Renderer;
     struct PostProcessingContext;
 
+    // Extend this class for every step of the post processing pipeline
+    // Pointers of post processing steps should be retained as a resource
     class PostProcessingStep {
     public:
         PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::unique_ptr<GlShader>&& shader)
@@ -30,10 +32,15 @@ namespace sm {
         friend class Renderer;
     };
 
-    struct PostProcessingContext {
-        std::vector<std::unique_ptr<PostProcessingStep>> steps;
+    class PostProcessingContext {
+    private:
+        PostProcessingContext() = default;
+    public:
+        std::vector<std::shared_ptr<PostProcessingStep>> steps;
         std::vector<unsigned int> textures;  // All textures in order
         unsigned int last_texture {};  // Last texture at any moment in the processing pipeline
         unsigned int original_texture {};
+
+        friend class Renderer;
     };
 }

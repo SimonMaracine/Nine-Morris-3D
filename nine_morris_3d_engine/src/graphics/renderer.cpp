@@ -297,6 +297,10 @@ namespace sm {
         scene.light_space.position = position;
     }
 
+    void Renderer::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
+        post_processing_context.steps.push_back(step);
+    }
+
     void Renderer::register_shader(std::shared_ptr<GlShader> shader) {
         storage.scene.shaders.push_back(shader);
     }
@@ -638,12 +642,17 @@ namespace sm {
     }
 
     void Renderer::clear() {
+        storage.text.batches.clear();
+        storage.skybox_texture = nullptr;
+        post_processing_context.steps.clear();
         scene.renderables.clear();
         scene.directional_light = {};
         scene.point_lights.clear();
         scene.texts.clear();
         scene.quads.clear();
-        storage.text.batches.clear();
+        scene.camera = {};
+        scene.camera_2d = {};
+        scene.light_space = {};
 
 #ifndef SM_BUILD_DISTRIBUTION
         debug.clear();

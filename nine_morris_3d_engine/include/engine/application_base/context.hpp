@@ -37,7 +37,7 @@ namespace sm {
         void change_scene(Id id);
 
         template<typename T>
-        T& data() {
+        T& global() {
             return *static_cast<T*>(user_data);
         }
 

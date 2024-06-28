@@ -7,6 +7,7 @@
 
 #include "game/scenes/game_scene.hpp"
 #include "game/game.hpp"
+#include "game/global.hpp"
 
 #if defined(SM_PLATFORM_LINUX)
     static const char* APP_NAME {"ninemorris3d"};
@@ -25,6 +26,7 @@ static constexpr unsigned int PATCH {0};
 int application_main() {
     while (true) {
         int exit_code {};
+        Global g;
 
         {
             sm::ApplicationProperties properties;
@@ -39,6 +41,7 @@ int application_main() {
             properties.info_file = INFO_FILE;
             properties.log_file = LOG_FILE;
             properties.assets_directory = ASSETS_DIRECTORY;
+            properties.user_data = &g;
 
             sm::UserFunctions functions;
             functions.start = game_start;

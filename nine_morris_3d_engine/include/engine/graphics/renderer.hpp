@@ -73,17 +73,16 @@ namespace sm {
         Renderer(Renderer&&) = default;
         Renderer& operator=(Renderer&&) = default;
 
+        // Immediate
         void capture(const Camera& camera, const glm::vec3& position);
         void capture(const Camera2D& camera_2d);
         void skybox(std::shared_ptr<GlTextureCubemap> texture);
         void shadows(float left, float right, float bottom, float top, float lens_near, float lens_far, const glm::vec3& position);
+        void add_post_processing(std::shared_ptr<PostProcessingStep> step);
+
+        // Retained
         void register_shader(std::shared_ptr<GlShader> shader);
         void register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
-
-        template<typename T, typename... Args>
-        void add_post_processing(Args&&... args) {
-            post_processing_context.steps.push_back(std::make_unique<T>(std::forward<Args>(args)...));
-        }
 
         // 3D API
         void add_renderable(const Renderable& renderable);
