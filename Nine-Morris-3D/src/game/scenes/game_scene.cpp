@@ -723,16 +723,78 @@ void GameScene::load_material_instances() {
 
 void GameScene::draw_bounding_box(float left, float right, float bottom, float top, float near, float far, const glm::vec3& position, const glm::vec3& orientation) {
     const glm::vec3 color {1.0f};
+    const glm::vec3 third {glm::cross(orientation, glm::vec3(0.0f, 1.0f, 0.0f))};
+    const glm::vec3 third2 {-glm::cross(orientation, glm::cross(orientation, glm::vec3(0.0f, 1.0f, 0.0f)))};
 
-    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * near + left + bottom, position + glm::normalize(orientation) * near + right + bottom, color);
-    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * near + left + top, position + glm::normalize(orientation) * near + right + top, color);
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * bottom,
+        position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * top,
+        color
+    );
 
-    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * near + bottom + left, position + glm::normalize(orientation) * near + top + left, color);
-    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * near + bottom + right, position + glm::normalize(orientation) * near + top + right, color);
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * bottom,
+        position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * top,
+        color
+    );
 
-    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * far + left + bottom, position + glm::normalize(orientation) * far + right + bottom, color);
-    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * far + left + top, position + glm::normalize(orientation) * far + right + top, color);
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * near + glm::normalize(third2) * bottom + glm::normalize(third) * left,
+        position + glm::normalize(orientation) * near + glm::normalize(third2) * bottom + glm::normalize(third) * right,
+        color
+    );
 
-    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * far + bottom + left, position + glm::normalize(orientation) * far + top + left, color);
-    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * far + bottom + right, position + glm::normalize(orientation) * far + top + right, color);
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * near + glm::normalize(third2) * top + glm::normalize(third) * left,
+        position + glm::normalize(orientation) * near + glm::normalize(third2) * top + glm::normalize(third) * right,
+        color
+    );
+
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * bottom,
+        position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * top,
+        color
+    );
+
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * bottom,
+        position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * top,
+        color
+    );
+
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * far + glm::normalize(third2) * bottom + glm::normalize(third) * left,
+        position + glm::normalize(orientation) * far + glm::normalize(third2) * bottom + glm::normalize(third) * right,
+        color
+    );
+
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * far + glm::normalize(third2) * top + glm::normalize(third) * left,
+        position + glm::normalize(orientation) * far + glm::normalize(third2) * top + glm::normalize(third) * right,
+        color
+    );
+
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * bottom,
+        position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * bottom,
+        color
+    );
+
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * bottom,
+        position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * bottom,
+        color
+    );
+
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * top,
+        position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * top,
+        color
+    );
+
+    ctx.rnd.debug_add_line(
+        position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * top,
+        position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * top,
+        color
+    );
 }

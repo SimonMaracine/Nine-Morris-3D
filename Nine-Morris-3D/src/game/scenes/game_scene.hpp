@@ -20,7 +20,7 @@ struct GameScene : sm::Scene {
     void load_materials();
     void load_material_instances();
 
-    // TODO make it right andmove it to engine
+    // TODO move to engine
     // TODO also draw lights and other debug things from engine
     void draw_bounding_box(float left, float right, float bottom, float top, float near, float far, const glm::vec3& position, const glm::vec3& orientation);
 

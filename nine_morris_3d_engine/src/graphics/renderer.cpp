@@ -516,7 +516,7 @@ namespace sm {
         }
 
         for (const auto& [_, wuniform_buffer] : storage.uniform_buffers) {
-            std::shared_ptr<GlUniformBuffer> uniform_buffer {wuniform_buffer.lock()};
+            const auto uniform_buffer {wuniform_buffer.lock()};
 
             if (uniform_buffer == nullptr) {
                 continue;
