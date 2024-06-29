@@ -35,9 +35,7 @@ layout(shared, binding = 2) uniform ViewPosition {
 #include "lighting.glsl"
 
 void main() {
-    const vec3 ambient_diffuse = vec3(
-        texture(u_material.ambient_diffuse, vec2(v_texture_coordinate.x, 1.0 - v_texture_coordinate.y))
-    );
+    const vec3 ambient_diffuse = vec3(texture(u_material.ambient_diffuse, v_texture_coordinate));
 
     const float shadow = calculate_shadow(v_fragment_position_light_space, normal, u_directional_light.direction, u_shadow_map);
 

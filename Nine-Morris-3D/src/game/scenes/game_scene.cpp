@@ -21,7 +21,7 @@ void GameScene::on_start() {
 
     ctx.evt.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
 
-    sm::opengl::clear_color(0.3f, 0.1f, 0.3f);
+    sm::opengl::clear_color(0.2f, 0.05f, 0.2f);
 
     load_models();
     load_textures();
@@ -142,6 +142,20 @@ void GameScene::on_update() {
         brick.transform.rotation = glm::vec3(10.0f);
 
         ctx.rnd.add_renderable(brick);
+    }
+
+    {
+        sm::Renderable lamp;
+        lamp.vertex_array = ctx.res.vertex_array["lamp_stand"_H];
+        lamp.material = ctx.res.material_instance["lamp_stand"_H];
+        lamp.transform.position = glm::vec3(-6.0f, 0.0f, -6.0f);
+
+        ctx.rnd.add_renderable(lamp);
+
+        lamp.vertex_array = ctx.res.vertex_array["lamp_bulb"_H];
+        lamp.material = ctx.res.material_instance["lamp_bulb"_H];
+
+        ctx.rnd.add_renderable(lamp);
     }
 
     ctx.add_info_text();
@@ -296,7 +310,7 @@ void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
 
 void GameScene::load_models() {
     {
-        sm::Mesh mesh {
+        const sm::Mesh mesh {
             sm::utils::read_file(ctx.fs.path_assets("models/dragon.obj")),
             "default",
             sm::Mesh::Type::PN
@@ -324,7 +338,7 @@ void GameScene::load_models() {
     }
 
     {
-        sm::Mesh mesh {
+        const sm::Mesh mesh {
             sm::utils::read_file(ctx.fs.path_assets("models/teapot.obj")),
             sm::Mesh::DEFAULT_OBJECT,
             sm::Mesh::Type::PN
@@ -352,7 +366,7 @@ void GameScene::load_models() {
     }
 
     {
-        sm::Mesh mesh {
+        const sm::Mesh mesh {
             sm::utils::read_file(ctx.fs.path_assets("models/cube.obj")),
             "Cube",
             sm::Mesh::Type::PN
@@ -380,7 +394,7 @@ void GameScene::load_models() {
     }
 
     {
-        sm::Mesh mesh {
+        const sm::Mesh mesh {
             sm::utils::read_file(ctx.fs.path_assets("models/brick.obj")),
             "Brick",
             sm::Mesh::Type::PNT
@@ -402,6 +416,62 @@ void GameScene::load_models() {
             layout.add(0, sm::VertexBufferLayout::Float, 3);
             layout.add(1, sm::VertexBufferLayout::Float, 3);
             layout.add(2, sm::VertexBufferLayout::Float, 2);
+
+            va->add_vertex_buffer(vertex_buffer, layout);
+            va->add_index_buffer(index_buffer);
+        });
+    }
+
+    {
+        const sm::Mesh mesh {
+            sm::utils::read_file(ctx.fs.path_assets("models/lamp.obj")),
+            "Stand",
+            sm::Mesh::Type::PNT
+        };
+
+        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
+            mesh.get_vertices(),
+            mesh.get_vertices_size()
+        )};
+
+        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
+            mesh.get_indices(),
+            mesh.get_indices_size()
+        )};
+
+        auto vertex_array {ctx.res.vertex_array.load("lamp_stand"_H)};
+        vertex_array->configure([&](sm::GlVertexArray* va) {
+            sm::VertexBufferLayout layout;
+            layout.add(0, sm::VertexBufferLayout::Float, 3);
+            layout.add(1, sm::VertexBufferLayout::Float, 3);
+            layout.add(2, sm::VertexBufferLayout::Float, 2);
+
+            va->add_vertex_buffer(vertex_buffer, layout);
+            va->add_index_buffer(index_buffer);
+        });
+    }
+
+    {
+        const sm::Mesh mesh {
+            sm::utils::read_file(ctx.fs.path_assets("models/lamp.obj")),
+            "Bulb",
+            sm::Mesh::Type::P
+        };
+
+        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
+            mesh.get_vertices(),
+            mesh.get_vertices_size()
+        )};
+
+        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
+            mesh.get_indices(),
+            mesh.get_indices_size()
+        )};
+
+        auto vertex_array {ctx.res.vertex_array.load("lamp_bulb"_H)};
+        vertex_array->configure([&](sm::GlVertexArray* va) {
+            sm::VertexBufferLayout layout;
+            layout.add(0, sm::VertexBufferLayout::Float, 3);
 
             va->add_vertex_buffer(vertex_buffer, layout);
             va->add_index_buffer(index_buffer);
@@ -488,6 +558,19 @@ void GameScene::load_textures() {
 
         ctx.res.texture_cubemap.load("field"_H, list);
     }
+
+    {
+        sm::TexturePostProcessing post_processing;
+        post_processing.flip = true;
+
+        auto data {ctx.res.texture_data.load(
+            "lamp"_H,
+            sm::utils::read_file(ctx.fs.path_assets("textures/lamp-texture.png")),
+            post_processing
+        )};
+
+        ctx.res.texture.load("lamp"_H, data);
+    }
 }
 
 void GameScene::load_materials() {
@@ -517,6 +600,18 @@ void GameScene::load_materials() {
         material->add_texture("u_material.ambient_diffuse"_H);
         material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
         material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
+    }
+
+    {
+        auto shader {std::make_shared<sm::GlShader>(
+            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/flat.vert"))),
+            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/flat.frag")))
+        )};
+
+        ctx.rnd.register_shader(shader);
+
+        auto material {ctx.res.material.load("flat"_H, shader)};
+        material->add_uniform(sm::Material::Uniform::Vec3, "u_material.color"_H);
     }
 }
 
@@ -556,5 +651,17 @@ void GameScene::load_material_instances() {
         material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["brick"_H], 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
+    }
+
+    {
+        auto material_instance {ctx.res.material_instance.load("lamp_stand"_H, ctx.res.material["phong_textured"_H])};
+        material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["lamp"_H], 0);
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
+        material_instance->set_float("u_material.shininess"_H, 64.0f);
+    }
+
+    {
+        auto material_instance {ctx.res.material_instance.load("lamp_bulb"_H, ctx.res.material["flat"_H])};
+        material_instance->set_vec3("u_material.color"_H, glm::vec3(1.0f));
     }
 }

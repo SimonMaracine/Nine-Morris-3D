@@ -31,7 +31,7 @@ layout(shared, binding = 2) uniform ViewPosition {
 #include "shaders/common/lighting.glsl"
 
 void main() {
-    const vec3 ambient_diffuse = vec3(texture(u_material.ambient_diffuse, v_texture_coordinate));  // TODO see if it's right
+    const vec3 ambient_diffuse = vec3(texture(u_material.ambient_diffuse, v_texture_coordinate));
 
     vec3 color = calculate_directional_light(ambient_diffuse);
 
