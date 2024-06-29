@@ -7,7 +7,6 @@
 
 #include <glad/glad.h>
 
-#include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/capabilities.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
@@ -60,8 +59,7 @@ namespace sm {
 
     static constexpr std::size_t BUFFER_LENGTH {128};
 
-    void opengl_debug::initialize_debug() {
-#ifndef SM_BUILD_DISTRIBUTION
+    void opengl_debug::initialize() {
         glDebugMessageCallback(
             [](GLenum, GLenum, GLuint id, GLenum severity, GLsizei, const GLchar* message, const GLvoid*) {
                 switch (severity) {
@@ -97,7 +95,6 @@ namespace sm {
         );
 
         LOG_INFO("Set OpenGL message callback");
-#endif
     }
 
     std::string opengl_debug::get_information() {

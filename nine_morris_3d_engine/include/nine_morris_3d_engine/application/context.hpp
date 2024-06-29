@@ -35,6 +35,7 @@ namespace sm {
         Ctx& operator=(Ctx&&) = delete;
 
         void change_scene(Id id);
+        void add_info_text();
 
         template<typename T>
         T& global() {

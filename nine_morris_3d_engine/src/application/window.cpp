@@ -89,7 +89,9 @@ namespace sm {
             SM_CRITICAL_ERROR(RuntimeError::Initialization, "Could not initialize GLAD");
         }
 
-        opengl_debug::initialize_debug();
+#ifndef SM_BUILD_DISTRIBUTION
+        opengl_debug::initialize();
+#endif
 
         glfwSwapInterval(1);
         glfwSetWindowUserPointer(window, this);

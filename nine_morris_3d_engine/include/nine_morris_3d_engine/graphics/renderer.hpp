@@ -91,7 +91,6 @@ namespace sm {
 
         // 2D API
         void add_text(const Text& text);
-        void add_info_text(float fps);
         void add_quad(const Quad& quad);
 
         // Debug API

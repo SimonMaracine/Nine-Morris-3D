@@ -325,15 +325,6 @@ namespace sm {
         scene.texts.push_back(text);
     }
 
-    void Renderer::add_info_text(float fps) {
-        Text text;
-        text.font = storage.default_font;
-        text.text = std::to_string(fps) + " FPS";
-        text.color = glm::vec3(1.0f);
-
-        scene.texts.push_back(text);
-    }
-
     void Renderer::add_quad(const Quad& quad) {
         scene.quads.push_back(quad);
     }

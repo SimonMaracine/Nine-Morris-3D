@@ -144,13 +144,13 @@ void GameScene::on_update() {
         ctx.rnd.add_renderable(brick);
     }
 
-    ctx.rnd.add_info_text(ctx.fps);
+    ctx.add_info_text();
 
     {
         sm::Text test;
         test.font = ctx.res.font["sans"_H];
         test.text = "The quick brown fox jumps over the lazy dog.";
-        test.color = glm::vec3(0.8f);
+        test.color = glm::vec3(0.7f);
 
         ctx.rnd.add_text(test);
 
@@ -159,7 +159,7 @@ void GameScene::on_update() {
 
         ctx.rnd.add_text(test);
 
-        test.position = glm::vec2(100.0f, 50.0f) + pos;
+        test.position = glm::vec2(200.0f, 100.0f) + pos;
         test.scale = scl;
         test.color = glm::vec3(0.0f, 1.0f, 1.0f);
 
@@ -209,7 +209,7 @@ void GameScene::on_update() {
     {
         sm::Quad quad;
         quad.texture = ctx.res.texture["wait_indicator"_H];
-        quad.position = glm::vec2(10.0f) + pos;
+        quad.position = glm::vec2(70.0f) + pos;
         quad.scale = glm::vec2(scl);
 
         ctx.rnd.add_quad(quad);
@@ -219,7 +219,7 @@ void GameScene::on_update() {
         sm::Quad quad;
         quad.texture = ctx.res.texture["white_indicator"_H];
         quad.scale = glm::vec2(scl);
-        quad.position = glm::vec2(100.0f, 100.0f) + pos;
+        quad.position = glm::vec2(210.0f, 210.0f) + pos;
 
         ctx.rnd.add_quad(quad);
     }
