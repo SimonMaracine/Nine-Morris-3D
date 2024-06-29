@@ -77,7 +77,7 @@ namespace sm {
         void capture(const Camera& camera, const glm::vec3& position);
         void capture(const Camera2D& camera_2d);
         void skybox(std::shared_ptr<GlTextureCubemap> texture);
-        void shadows(float left, float right, float bottom, float top, float lens_near, float lens_far, const glm::vec3& position);
+        void shadows(float left, float right, float bottom, float top, float near, float far, const glm::vec3& position);
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
 
         // Retained
@@ -116,7 +116,7 @@ namespace sm {
         void draw_renderables_outlined();
         void draw_renderable_outlined(const Renderable& renderable);
 
-        void draw_renderables_to_depth_buffer();
+        void draw_renderables_to_shadow_map();
         void draw_skybox();
 
         struct TextBatch {
@@ -224,8 +224,8 @@ namespace sm {
                 float right {};
                 float bottom {};
                 float top {};
-                float lens_near {1.0f};
-                float lens_far {1.0f};
+                float near {1.0f};
+                float far {1.0f};
                 glm::vec3 position {};
             } light_space;
         } scene;

@@ -2,7 +2,7 @@
 
 in vec2 v_texture_coordinate;
 
-layout(location = 0) out vec4 fragment_color;
+layout(location = 0) out vec4 o_fragment_color;
 
 layout(binding = 0) uniform sampler2D u_screen_texture;
 
@@ -39,5 +39,5 @@ void main() {
         result += samples[i] * kernel[i];
     }
 
-    fragment_color = vec4(result, 1.0);
+    o_fragment_color = vec4(result, 1.0);
 }

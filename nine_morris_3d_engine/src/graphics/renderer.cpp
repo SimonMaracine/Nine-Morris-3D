@@ -287,13 +287,13 @@ namespace sm {
         storage.skybox_texture = texture;
     }
 
-    void Renderer::shadows(float left, float right, float bottom, float top, float lens_near, float lens_far, const glm::vec3& position) {
+    void Renderer::shadows(float left, float right, float bottom, float top, float near, float far, const glm::vec3& position) {
         scene.light_space.left = left;
         scene.light_space.right = right;
         scene.light_space.bottom = bottom;
         scene.light_space.top = top;
-        scene.light_space.lens_near = lens_near;
-        scene.light_space.lens_far = lens_far;
+        scene.light_space.near = near;
+        scene.light_space.far = far;
         scene.light_space.position = position;
     }
 
@@ -537,7 +537,7 @@ namespace sm {
             storage.shadow_map_framebuffer->get_specification().height
         );
 
-        draw_renderables_to_depth_buffer();
+        draw_renderables_to_shadow_map();
 
         // Draw normal things
         storage.scene_framebuffer->bind();
@@ -551,7 +551,7 @@ namespace sm {
         opengl::bind_texture_2d(storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
 
         draw_renderables();
-        draw_renderables_outlined();
+        draw_renderables_outlined();  // FIXME
 
         // Skybox
         if (storage.skybox_texture != nullptr) {
@@ -760,7 +760,9 @@ namespace sm {
         opengl::stencil_mask(0xFF);
     }
 
-    void Renderer::draw_renderables_to_depth_buffer() {
+    void Renderer::draw_renderables_to_shadow_map() {
+        opengl::disable_back_face_culling();
+
         storage.shadow_shader->bind();
 
         for (const Renderable& renderable : scene.renderables) {
@@ -780,6 +782,8 @@ namespace sm {
         }
 
         GlVertexArray::unbind();
+
+        opengl::enable_back_face_culling();
     }
 
     void Renderer::draw_skybox() {
@@ -1012,8 +1016,8 @@ namespace sm {
                 scene.light_space.right,
                 scene.light_space.bottom,
                 scene.light_space.top,
-                scene.light_space.lens_near,
-                scene.light_space.lens_far
+                scene.light_space.near,
+                scene.light_space.far
             )
         };
 

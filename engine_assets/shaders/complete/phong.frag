@@ -5,8 +5,16 @@ in vec3 v_fragment_position;
 
 layout(location = 0) out vec4 o_fragment_color;
 
-#include "shaders/common/frag/light.glsl"
-#include "shaders/common/frag/material/phong.glsl"
+#include "shaders/common/light.glsl"
+
+struct Material {
+    vec3 ambient_diffuse;
+    vec3 specular;
+    float shininess;
+    // TODO here could also be normal or emission maps
+};
+
+uniform Material u_material;
 
 layout(shared, binding = 1) uniform DirectionalLight {
     DirectionalLight_ u_directional_light;
@@ -20,7 +28,7 @@ layout(shared, binding = 2) uniform ViewPosition {  // TODO maybe just do calcul
     vec3 u_view_position;
 };
 
-#include "shaders/common/frag/lighting.glsl"
+#include "shaders/common/lighting.glsl"
 
 void main() {
     vec3 color = calculate_directional_light(u_material.ambient_diffuse);

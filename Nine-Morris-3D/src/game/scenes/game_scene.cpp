@@ -2,7 +2,6 @@
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <nine_morris_3d_engine/external/resmanager.h++>
-#include <nine_morris_3d_engine/external/glm.h++>
 #include <nine_morris_3d_engine/external/imgui.h++>
 
 #include "game/global.hpp"
@@ -21,7 +20,7 @@ void GameScene::on_start() {
 
     ctx.evt.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
 
-    sm::opengl::clear_color(0.2f, 0.05f, 0.2f);
+    sm::opengl::clear_color(0.1f, 0.05f, 0.1f);
 
     load_models();
     load_textures();
@@ -65,14 +64,14 @@ void GameScene::on_start() {
 
     cam_2d.set_projection(0, ctx.win.get_width(), 0, ctx.win.get_height());
 
-    directional_light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+    directional_light.direction = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
     directional_light.ambient_color = glm::vec3(0.1f);
-    directional_light.diffuse_color = glm::vec3(1.0f);
+    directional_light.diffuse_color = glm::vec3(0.9f);
     directional_light.specular_color = glm::vec3(1.0f);
 
     point_light.position = glm::vec3(3.0f, 3.0f, 1.0f);
     point_light.ambient_color = glm::vec3(0.1f, 0.08f, 0.02f);
-    point_light.diffuse_color = glm::vec3(1.0f, 0.8f, 0.2f);
+    point_light.diffuse_color = glm::vec3(0.9f, 0.8f, 0.2f);
     point_light.specular_color = glm::vec3(1.0f);
     point_light.falloff_linear = 0.09f;
     point_light.falloff_quadratic = 0.032f;
@@ -88,6 +87,7 @@ void GameScene::on_update() {
 
     ctx.rnd.add_light(directional_light);
     ctx.rnd.add_light(point_light);
+    ctx.rnd.shadows(shadow_left, shadow_right, shadow_bottom, shadow_top, 1.0f, shadow_far, directional_light.direction * -30.0f);
 
     if (sky) {
         ctx.rnd.skybox(ctx.res.texture_cubemap["field"_H]);
@@ -95,6 +95,16 @@ void GameScene::on_update() {
 
     if (blur) {
         ctx.rnd.add_post_processing(ctx.global<Global>().blur_step);
+    }
+
+    {
+        sm::Renderable ground;
+        ground.vertex_array = ctx.res.vertex_array["ground"_H];
+        ground.material = ctx.res.material_instance["ground"_H];
+        ground.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
+        ground.transform.scale = 2.0f;
+
+        ctx.rnd.add_renderable(ground);
     }
 
     {
@@ -260,6 +270,8 @@ void GameScene::on_update() {
 
     // Whatever part two
     ctx.rnd.debug_add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
+
+    draw_bounding_box(shadow_left, shadow_right, shadow_bottom, shadow_top, 1.0f, shadow_far, directional_light.direction * -30.0f, directional_light.direction);
 }
 
 void GameScene::on_imgui_update() {
@@ -275,8 +287,16 @@ void GameScene::on_imgui_update() {
     ImGui::SliderFloat3("Ambient", glm::value_ptr(point_light.ambient_color), 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse", glm::value_ptr(point_light.diffuse_color), 0.0f, 1.0f);
     ImGui::SliderFloat3("Specular", glm::value_ptr(point_light.specular_color), 0.0f, 1.0f);
-    ImGui::SliderFloat("Falloff L.", &point_light.falloff_linear, 0.0001f, 1.0f);
-    ImGui::SliderFloat("Falloff Q.", &point_light.falloff_quadratic, 0.00001f, 1.0f);
+    ImGui::SliderFloat("Falloff L", &point_light.falloff_linear, 0.0001f, 1.0f);
+    ImGui::SliderFloat("Falloff Q", &point_light.falloff_quadratic, 0.00001f, 1.0f);
+    ImGui::End();
+
+    ImGui::Begin("Shadow");
+    ImGui::SliderFloat("Left", &shadow_left, -100.0f, 100.0f);
+    ImGui::SliderFloat("Right", &shadow_right, -100.0f, 100.0f);
+    ImGui::SliderFloat("Bottom", &shadow_bottom, -100.0f, 100.0f);
+    ImGui::SliderFloat("Top", &shadow_top, -100.0f, 100.0f);
+    ImGui::SliderFloat("Far", &shadow_far, 2.0f, 150.0f);
     ImGui::End();
 
     ImGui::Begin("Quads");
@@ -477,6 +497,34 @@ void GameScene::load_models() {
             va->add_index_buffer(index_buffer);
         });
     }
+
+    {
+        const sm::Mesh mesh {
+            sm::utils::read_file(ctx.fs.path_assets("models/ground.obj")),
+            "Cube",
+            sm::Mesh::Type::PN
+        };
+
+        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
+            mesh.get_vertices(),
+            mesh.get_vertices_size()
+        )};
+
+        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
+            mesh.get_indices(),
+            mesh.get_indices_size()
+        )};
+
+        auto vertex_array {ctx.res.vertex_array.load("ground"_H)};
+        vertex_array->configure([&](sm::GlVertexArray* va) {
+            sm::VertexBufferLayout layout;
+            layout.add(0, sm::VertexBufferLayout::Float, 3);
+            layout.add(1, sm::VertexBufferLayout::Float, 3);
+
+            va->add_vertex_buffer(vertex_buffer, layout);
+            va->add_index_buffer(index_buffer);
+        });
+    }
 }
 
 void GameScene::load_textures() {
@@ -576,13 +624,13 @@ void GameScene::load_textures() {
 void GameScene::load_materials() {
     {
         auto shader {std::make_shared<sm::GlShader>(
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong.vert"))),
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong.frag")))
+            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_shadows.vert"))),
+            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_shadows.frag")))
         )};
 
         ctx.rnd.register_shader(shader);
 
-        auto material {ctx.res.material.load("phong"_H, shader)};
+        auto material {ctx.res.material.load("phong_shadows"_H, shader, sm::Material::CastShadow)};
         material->add_uniform(sm::Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
         material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
         material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
@@ -590,13 +638,13 @@ void GameScene::load_materials() {
 
     {
         auto shader {std::make_shared<sm::GlShader>(
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured.vert"))),
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured.frag")))
+            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured_shadows.vert"))),
+            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured_shadows.frag")))
         )};
 
         ctx.rnd.register_shader(shader);
 
-        auto material {ctx.res.material.load("phong_textured"_H, shader)};
+        auto material {ctx.res.material.load("phong_textured_shadows"_H, shader, sm::Material::CastShadow)};
         material->add_texture("u_material.ambient_diffuse"_H);
         material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
         material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
@@ -610,14 +658,14 @@ void GameScene::load_materials() {
 
         ctx.rnd.register_shader(shader);
 
-        auto material {ctx.res.material.load("flat"_H, shader)};
+        auto material {ctx.res.material.load("flat"_H, shader, sm::Material::CastShadow)};
         material->add_uniform(sm::Material::Uniform::Vec3, "u_material.color"_H);
     }
 }
 
 void GameScene::load_material_instances() {
     {
-        auto material_instance {ctx.res.material_instance.load("dragon1"_H, ctx.res.material["phong"_H])};
+        auto material_instance {ctx.res.material_instance.load("dragon1"_H, ctx.res.material["phong_shadows"_H])};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
@@ -625,14 +673,14 @@ void GameScene::load_material_instances() {
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("dragon2"_H, ctx.res.material["phong"_H])};
+        auto material_instance {ctx.res.material_instance.load("dragon2"_H, ctx.res.material["phong_shadows"_H])};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 0.2f, 0.1f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("teapot"_H, ctx.res.material["phong"_H])};
+        auto material_instance {ctx.res.material_instance.load("teapot"_H, ctx.res.material["phong_shadows"_H])};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.7f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.7f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
@@ -640,21 +688,21 @@ void GameScene::load_material_instances() {
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("cube"_H, ctx.res.material["phong"_H])};
+        auto material_instance {ctx.res.material_instance.load("cube"_H, ctx.res.material["phong_shadows"_H])};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 0.0f, 0.0f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.8f));
         material_instance->set_float("u_material.shininess"_H, 128.0f);
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("brick"_H, ctx.res.material["phong_textured"_H])};
+        auto material_instance {ctx.res.material_instance.load("brick"_H, ctx.res.material["phong_textured_shadows"_H])};
         material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["brick"_H], 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("lamp_stand"_H, ctx.res.material["phong_textured"_H])};
+        auto material_instance {ctx.res.material_instance.load("lamp_stand"_H, ctx.res.material["phong_textured_shadows"_H])};
         material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["lamp"_H], 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
@@ -664,4 +712,27 @@ void GameScene::load_material_instances() {
         auto material_instance {ctx.res.material_instance.load("lamp_bulb"_H, ctx.res.material["flat"_H])};
         material_instance->set_vec3("u_material.color"_H, glm::vec3(1.0f));
     }
+
+    {
+        auto material_instance {ctx.res.material_instance.load("ground"_H, ctx.res.material["phong_shadows"_H])};
+        material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.7f));
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.4f));
+        material_instance->set_float("u_material.shininess"_H, 16.0f);
+    }
+}
+
+void GameScene::draw_bounding_box(float left, float right, float bottom, float top, float near, float far, const glm::vec3& position, const glm::vec3& orientation) {
+    const glm::vec3 color {1.0f};
+
+    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * near + left + bottom, position + glm::normalize(orientation) * near + right + bottom, color);
+    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * near + left + top, position + glm::normalize(orientation) * near + right + top, color);
+
+    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * near + bottom + left, position + glm::normalize(orientation) * near + top + left, color);
+    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * near + bottom + right, position + glm::normalize(orientation) * near + top + right, color);
+
+    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * far + left + bottom, position + glm::normalize(orientation) * far + right + bottom, color);
+    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * far + left + top, position + glm::normalize(orientation) * far + right + top, color);
+
+    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * far + bottom + left, position + glm::normalize(orientation) * far + top + left, color);
+    ctx.rnd.debug_add_line(position + glm::normalize(orientation) * far + bottom + right, position + glm::normalize(orientation) * far + top + right, color);
 }

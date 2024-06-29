@@ -7,10 +7,17 @@ in vec4 v_fragment_position_light_space;
 
 layout(location = 0) out vec4 o_fragment_color;
 
-#include "shaders/common/frag/light.glsl"
-#include "shaders/common/frag/material/phong_textured.glsl"
+#include "shaders/common/light.glsl"
 
 layout(binding = 1) uniform sampler2D u_shadow_map;
+
+struct Material {
+    sampler2D ambient_diffuse;
+    vec3 specular;
+    float shininess;
+};
+
+uniform Material u_material;
 
 layout(shared, binding = 1) uniform DirectionalLight {
     DirectionalLight_ u_directional_light;
@@ -24,13 +31,13 @@ layout(shared, binding = 2) uniform ViewPosition {
     vec3 u_view_position;
 };
 
-#include "shaders/common/frag/shadow.glsl"
-#include "shaders/common/frag/lighting.glsl"
+#include "shaders/common/shadow.glsl"
+#include "shaders/common/lighting.glsl"
 
 void main() {
     const vec3 ambient_diffuse = vec3(texture(u_material.ambient_diffuse, v_texture_coordinate));
 
-    const float shadow = calculate_shadow(v_fragment_position_light_space, v_normal, u_directional_light.direction, u_shadow_map);
+    const float shadow = calculate_shadow(v_fragment_position_light_space, normal, u_directional_light.direction, u_shadow_map);
 
     vec3 color = calculate_directional_light(ambient_diffuse, shadow);
 
