@@ -1,4 +1,4 @@
-#include "engine/graphics/font.hpp"
+#include "nine_morris_3d_engine/graphics/font.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -10,9 +10,9 @@
 #include <stb_image_write.h>
 #include <utf8.h>
 
-#include "engine/application_base/platform.hpp"
-#include "engine/application_base/error.hpp"
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/platform.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     Font::Font(const std::string& buffer, const FontSpecification& specification)

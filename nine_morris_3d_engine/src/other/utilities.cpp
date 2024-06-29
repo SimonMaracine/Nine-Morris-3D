@@ -1,10 +1,10 @@
-#include "engine/other/utilities.hpp"
+#include "nine_morris_3d_engine/other/utilities.hpp"
 
 #include <fstream>
 #include <cstddef>
 
-#include "engine/application_base/logging.hpp"
-#include "engine/application_base/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
 
 namespace sm {
     void utils::center_image(

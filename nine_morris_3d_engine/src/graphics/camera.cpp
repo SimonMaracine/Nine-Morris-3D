@@ -1,4 +1,4 @@
-#include "engine/graphics/camera.hpp"
+#include "nine_morris_3d_engine/graphics/camera.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 

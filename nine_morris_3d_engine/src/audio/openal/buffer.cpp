@@ -1,10 +1,10 @@
-#include "engine/audio/openal/buffer.hpp"
+#include "nine_morris_3d_engine/audio/openal/buffer.hpp"
 
 #include <AL/al.h>
 
-#include "engine/application_base/error.hpp"
-#include "engine/application_base/logging.hpp"
-#include "engine/audio/openal/debug.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/audio/openal/debug.hpp"
 
 namespace sm {
     static ALenum get_format(int channels, std::size_t bps) {

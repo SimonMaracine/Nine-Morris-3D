@@ -1,10 +1,10 @@
-#include "engine/audio/openal/listener.hpp"
+#include "nine_morris_3d_engine/audio/openal/listener.hpp"
 
 #include <cassert>
 
 #include <AL/al.h>
 
-#include "engine/audio/openal/debug.hpp"
+#include "nine_morris_3d_engine/audio/openal/debug.hpp"
 
 namespace sm {
     void AlListener::set_gain(float gain) {

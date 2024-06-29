@@ -1,11 +1,11 @@
-#include "engine/graphics/opengl/buffer.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
 
 #include <cstring>
 #include <cassert>
 
 #include <glad/glad.h>
 
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     static int draw_hint_to_int(DrawHint hint) {

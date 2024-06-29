@@ -1,12 +1,12 @@
-#include "engine/audio/openal/debug.hpp"
+#include "nine_morris_3d_engine/audio/openal/debug.hpp"
 
 #include <cstdio>
 #include <cstdlib>
 
 #include <AL/al.h>
 
-#include "engine/application_base/platform.hpp"
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/platform.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     void openal_debug::check_errors() {

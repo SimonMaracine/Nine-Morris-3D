@@ -1,4 +1,4 @@
-#include "engine/graphics/shader_library.hpp"
+#include "nine_morris_3d_engine/graphics/shader_library.hpp"
 
 #include <filesystem>
 #include <regex>
@@ -6,9 +6,9 @@
 #include <vector>
 #include <utility>
 
-#include "engine/application_base/logging.hpp"
-#include "engine/application_base/error.hpp"
-#include "engine/other/utilities.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
     std::string ShaderLibrary::load_shader(const std::string& source) const {

@@ -1,4 +1,4 @@
-#include "engine/graphics/mesh.hpp"
+#include "nine_morris_3d_engine/graphics/mesh.hpp"
 
 #include <vector>
 #include <cstring>
@@ -7,8 +7,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "engine/application_base/error.hpp"
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     struct VertexP {

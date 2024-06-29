@@ -1,11 +1,11 @@
-#include "engine/audio/openal/source.hpp"
+#include "nine_morris_3d_engine/audio/openal/source.hpp"
 
 #include <cassert>
 
 #include <AL/al.h>
 
-#include "engine/application_base/logging.hpp"
-#include "engine/audio/openal/debug.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/audio/openal/debug.hpp"
 
 namespace sm {
     AlSource::AlSource() {

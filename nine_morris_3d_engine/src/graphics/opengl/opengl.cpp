@@ -1,4 +1,4 @@
-#include "engine/graphics/opengl/opengl.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
 
 #include <glad/glad.h>
 

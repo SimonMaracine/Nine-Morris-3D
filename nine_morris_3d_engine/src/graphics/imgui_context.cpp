@@ -1,4 +1,4 @@
-#include "engine/graphics/imgui_context.hpp"
+#include "nine_morris_3d_engine/graphics/imgui_context.hpp"
 
 #include <cstring>
 
@@ -7,7 +7,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <GLFW/glfw3.h>
 
-#include "engine/application_base/platform.hpp"
+#include "nine_morris_3d_engine/application/platform.hpp"
 
 namespace sm {
     // Taken from Dear ImGui; it's not rock-solid, as it's just a workaround

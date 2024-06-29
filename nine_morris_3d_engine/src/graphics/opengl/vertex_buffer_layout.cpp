@@ -1,4 +1,4 @@
-#include "engine/graphics/opengl/vertex_buffer_layout.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_buffer_layout.hpp"
 
 namespace sm {
     std::size_t VertexBufferLayout::VertexElement::get_size(Type type) {

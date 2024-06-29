@@ -1,4 +1,4 @@
-#include "engine/graphics/renderer.hpp"
+#include "nine_morris_3d_engine/graphics/renderer.hpp"
 
 #include <cstddef>
 #include <algorithm>
@@ -7,13 +7,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.hpp>
 
-#include "engine/graphics/opengl/vertex_array.hpp"
-#include "engine/graphics/opengl/buffer.hpp"
-#include "engine/graphics/opengl/vertex_buffer_layout.hpp"
-#include "engine/graphics/opengl/opengl.hpp"
-#include "engine/graphics/material.hpp"
-#include "engine/graphics/font.hpp"
-#include "engine/other/utilities.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_buffer_layout.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
+#include "nine_morris_3d_engine/graphics/material.hpp"
+#include "nine_morris_3d_engine/graphics/font.hpp"
+#include "nine_morris_3d_engine/other/utilities.hpp"
 
 // shader uniform limit https://www.khronos.org/opengl/wiki/Uniform_(GLSL)#Implementation_limits
 

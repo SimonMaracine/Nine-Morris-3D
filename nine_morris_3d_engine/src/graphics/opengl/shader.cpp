@@ -1,4 +1,4 @@
-#include "engine/graphics/opengl/shader.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/shader.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -8,9 +8,9 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "engine/application_base/platform.hpp"
-#include "engine/application_base/error.hpp"
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/platform.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment) {

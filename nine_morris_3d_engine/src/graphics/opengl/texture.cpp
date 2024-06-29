@@ -1,4 +1,4 @@
-#include "engine/graphics/opengl/texture.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
 
 #include <cstddef>
 #include <algorithm>
@@ -7,9 +7,9 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "engine/application_base/capabilities.hpp"
-#include "engine/application_base/logging.hpp"
-#include "engine/other/utilities.hpp"
+#include "nine_morris_3d_engine/application/capabilities.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
     static constexpr int CHANNELS {4};

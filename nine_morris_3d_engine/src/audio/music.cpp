@@ -1,10 +1,10 @@
-#include "engine/audio/music.hpp"
+#include "nine_morris_3d_engine/audio/music.hpp"
 
 #include <cassert>
 
-#include "engine/application_base/logging.hpp"
-#include "engine/audio/openal/source.hpp"
-#include "engine/audio/openal/buffer.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/audio/openal/source.hpp"
+#include "nine_morris_3d_engine/audio/openal/buffer.hpp"
 
 namespace sm {
     MusicTrack::MusicTrack(std::shared_ptr<SoundData> data) {

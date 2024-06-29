@@ -1,11 +1,11 @@
-#include "engine/graphics/opengl/vertex_array.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 
 #include <cstddef>
 #include <cassert>
 
 #include <glad/glad.h>
 
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     GlVertexArray::GlVertexArray() {

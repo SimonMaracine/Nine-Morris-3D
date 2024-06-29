@@ -1,12 +1,12 @@
-#include "engine/audio/sound_data.hpp"
+#include "nine_morris_3d_engine/audio/sound_data.hpp"
 
 #include <cstdlib>
 #include <cassert>
 
 #include <stb_vorbis.h>
 
-#include "engine/application_base/error.hpp"
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     SoundData::SoundData(const std::string& buffer) {

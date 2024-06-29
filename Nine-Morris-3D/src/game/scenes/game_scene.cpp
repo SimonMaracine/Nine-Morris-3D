@@ -1,9 +1,9 @@
 #include "game/scenes/game_scene.hpp"
 
-#include <engine/nine_morris_3d.hpp>
-#include <engine/external/resmanager.h++>
-#include <engine/external/glm.h++>
-#include <engine/external/imgui.h++>
+#include <nine_morris_3d_engine/nine_morris_3d.hpp>
+#include <nine_morris_3d_engine/external/resmanager.h++>
+#include <nine_morris_3d_engine/external/glm.h++>
+#include <nine_morris_3d_engine/external/imgui.h++>
 
 #include "game/global.hpp"
 #include "game/game.hpp"

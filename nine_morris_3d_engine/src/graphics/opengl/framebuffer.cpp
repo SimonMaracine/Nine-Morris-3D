@@ -1,11 +1,11 @@
-#include "engine/graphics/opengl/framebuffer.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
 
 #include <cassert>
 
 #include <glad/glad.h>
 
-#include "engine/application_base/error.hpp"
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     static const GLenum COLOR_ATTACHMENTS[] {

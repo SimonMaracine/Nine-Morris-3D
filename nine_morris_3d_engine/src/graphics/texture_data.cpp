@@ -1,12 +1,12 @@
-#include "engine/graphics/texture_data.hpp"
+#include "nine_morris_3d_engine/graphics/texture_data.hpp"
 
 #include <cstdlib>
 
 #include <stb_image.h>
 #include <stb_image_resize2.h>
 
-#include "engine/application_base/error.hpp"
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 // Define these to guarantee we're only using only malloc
 #define STBI_MALLOC(size) std::malloc(size)

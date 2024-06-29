@@ -1,4 +1,4 @@
-#include "engine/other/dependencies.hpp"
+#include "nine_morris_3d_engine/other/dependencies.hpp"
 
 #include <cstdio>
 #include <cstddef>
@@ -22,7 +22,7 @@
     #pragma GCC diagnostic pop
 #endif
 
-#include "engine/application_base/platform.hpp"
+#include "nine_morris_3d_engine/application/platform.hpp"
 
 namespace sm {
     static constexpr std::size_t BUFFER_LENGTH {128};

@@ -1,9 +1,9 @@
-#include "engine/graphics/material.hpp"
+#include "nine_morris_3d_engine/graphics/material.hpp"
 
 #include <cstring>
 
-#include "engine/application_base/logging.hpp"
-#include "engine/graphics/opengl/opengl.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
 
 namespace sm {
     Material::Material(std::shared_ptr<GlShader> shader, unsigned int flags)

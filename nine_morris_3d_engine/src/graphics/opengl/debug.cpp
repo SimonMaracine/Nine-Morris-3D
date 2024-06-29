@@ -1,4 +1,4 @@
-#include "engine/graphics/opengl/debug.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 
 #include <cstddef>
 #include <cstdio>
@@ -7,9 +7,9 @@
 
 #include <glad/glad.h>
 
-#include "engine/application_base/platform.hpp"
-#include "engine/application_base/capabilities.hpp"
-#include "engine/application_base/logging.hpp"
+#include "nine_morris_3d_engine/application/platform.hpp"
+#include "nine_morris_3d_engine/application/capabilities.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     static const GLenum parameters[] {
