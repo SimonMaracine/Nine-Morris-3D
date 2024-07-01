@@ -26,10 +26,23 @@ struct GameScene : sm::ApplicationScene {
     sm::DirectionalLight directional_light;
     sm::PointLight point_light;
 
+    sm::Renderable ground;
+    sm::Renderable dragon1;
+    sm::Renderable dragon2;
+    sm::Renderable teapot;
+    sm::Renderable cube;
+    sm::Renderable brick;
+    sm::Renderable lamp_stand;
+    sm::Renderable lamp_bulb;
+    sm::Text text;
+    sm::Quad wait;
+    sm::Quad white;
+
     float shadow_left {-30.0f};
     float shadow_right {30.0f};
     float shadow_bottom {-30.0f};
     float shadow_top {30.0f};
+    float shadow_near {0.1f};
     float shadow_far {35.0f};
 
     glm::vec2 pos {};

@@ -75,6 +75,53 @@ void GameScene::on_start() {
     point_light.specular_color = glm::vec3(1.0f);
     point_light.falloff_linear = 0.09f;
     point_light.falloff_quadratic = 0.032f;
+
+    ground.vertex_array = ctx.res.vertex_array["ground"_H];
+    ground.material = ctx.res.material_instance["ground"_H];
+    ground.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
+    ground.transform.scale = 2.0f;
+
+    dragon1.vertex_array = ctx.res.vertex_array["dragon"_H];
+    dragon1.material = ctx.res.material_instance["dragon1"_H];
+    dragon1.transform.scale = 0.7f;
+    dragon1.outline.color = glm::vec3(0.2f, 0.1f, 1.0f);
+    dragon1.outline.offset = glm::vec3(0.04f, -0.2f, 0.0f);
+
+    dragon2 = dragon1;
+    dragon2.material = ctx.res.material_instance["dragon2"_H];
+    dragon2.transform.position = glm::vec3(4.0f, 0.0, 0.0f);
+    dragon2.transform.scale = 0.2f;
+
+    teapot.vertex_array = ctx.res.vertex_array["teapot"_H];
+    teapot.material = ctx.res.material_instance["teapot"_H];
+    teapot.transform.position = glm::vec3(2.6f, 0.0, -7.0f);
+    teapot.transform.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
+
+    cube.vertex_array = ctx.res.vertex_array["cube"_H];
+    cube.material = ctx.res.material_instance["cube"_H];
+    cube.transform.position = glm::vec3(5.0f, 2.0f, -2.0f);
+    cube.transform.scale = 0.8f;
+
+    brick.vertex_array = ctx.res.vertex_array["brick"_H];
+    brick.material = ctx.res.material_instance["brick"_H];
+    brick.transform.position = glm::vec3(6.0f);
+    brick.transform.rotation = glm::vec3(10.0f);
+
+    lamp_stand.vertex_array = ctx.res.vertex_array["lamp_stand"_H];
+    lamp_stand.material = ctx.res.material_instance["lamp_stand"_H];
+    lamp_stand.transform.position = glm::vec3(-6.0f, 0.0f, -6.0f);
+
+    lamp_bulb = lamp_stand;
+    lamp_bulb.vertex_array = ctx.res.vertex_array["lamp_bulb"_H];
+    lamp_bulb.material = ctx.res.material_instance["lamp_bulb"_H];
+
+    wait.texture = ctx.res.texture["wait_indicator"_H];
+    wait.position = glm::vec2(70.0f) + pos;
+    wait.scale = glm::vec2(scl);
+
+    white.texture = ctx.res.texture["white_indicator"_H];
+    white.scale = glm::vec2(scl);
+    white.position = glm::vec2(210.0f, 210.0f) + pos;
 }
 
 void GameScene::on_update() {
@@ -85,9 +132,10 @@ void GameScene::on_update() {
     ctx.scn.capture(cam, cam_controller.get_position());
     ctx.scn.capture(cam_2d);
 
-    ctx.scn.add_light(directional_light);
-    ctx.scn.add_light(point_light);
-    ctx.scn.shadows(shadow_left, shadow_right, shadow_bottom, shadow_top, 1.0f, shadow_far, directional_light.direction * -30.0f);
+    ctx.scn.add_light(&directional_light);
+    ctx.scn.add_light(&point_light);
+    glm::vec3 shadow_position {directional_light.direction * -30.0f};
+    ctx.scn.shadows(&shadow_left, &shadow_right, &shadow_bottom, &shadow_top, &shadow_near, &shadow_far, &shadow_position);
 
     if (sky) {
         ctx.scn.skybox(ctx.res.texture_cubemap["field"_H]);
@@ -97,156 +145,79 @@ void GameScene::on_update() {
         ctx.scn.add_post_processing(ctx.global<Global>().blur_step);
     }
 
-    {
-        sm::Renderable ground;
-        ground.vertex_array = ctx.res.vertex_array["ground"_H];
-        ground.material = ctx.res.material_instance["ground"_H];
-        ground.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
-        ground.transform.scale = 2.0f;
-
-        ctx.scn.add_renderable(ground);
-    }
-
-    {
-        sm::Renderable dragon;
-        dragon.vertex_array = ctx.res.vertex_array["dragon"_H];
-        dragon.material = ctx.res.material_instance["dragon1"_H];
-        dragon.transform.scale = 0.7f;
-        dragon.outline.color = glm::vec3(0.2f, 0.1f, 1.0f);
-        dragon.outline.offset = glm::vec3(0.04f, -0.2f, 0.0f);
-
-        ctx.scn.add_renderable(dragon);
-
-        dragon.material = ctx.res.material_instance["dragon2"_H];
-        dragon.transform.position = glm::vec3(4.0f, 0.0, 0.0f);
-        dragon.transform.scale = 0.2f;
-
-        ctx.scn.add_renderable(dragon);
-    }
-
-    {
-        sm::Renderable teapot;
-        teapot.vertex_array = ctx.res.vertex_array["teapot"_H];
-        teapot.material = ctx.res.material_instance["teapot"_H];
-        teapot.transform.position = glm::vec3(2.6f, 0.0, -7.0f);
-        teapot.transform.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
-
-        ctx.scn.add_renderable(teapot);
-    }
-
-    {
-        sm::Renderable cube;
-        cube.vertex_array = ctx.res.vertex_array["cube"_H];
-        cube.material = ctx.res.material_instance["cube"_H];
-        cube.transform.position = glm::vec3(5.0f, 2.0f, -2.0f);
-        cube.transform.scale = 0.8f;
-
-        ctx.scn.add_renderable(cube);
-    }
-
-    {
-        sm::Renderable brick;
-        brick.vertex_array = ctx.res.vertex_array["brick"_H];
-        brick.material = ctx.res.material_instance["brick"_H];
-        brick.transform.position = glm::vec3(6.0f);
-        brick.transform.rotation = glm::vec3(10.0f);
-
-        ctx.scn.add_renderable(brick);
-    }
-
-    {
-        sm::Renderable lamp;
-        lamp.vertex_array = ctx.res.vertex_array["lamp_stand"_H];
-        lamp.material = ctx.res.material_instance["lamp_stand"_H];
-        lamp.transform.position = glm::vec3(-6.0f, 0.0f, -6.0f);
-
-        ctx.scn.add_renderable(lamp);
-
-        lamp.vertex_array = ctx.res.vertex_array["lamp_bulb"_H];
-        lamp.material = ctx.res.material_instance["lamp_bulb"_H];
-
-        ctx.scn.add_renderable(lamp);
-    }
+    ctx.scn.add_renderable(&ground);
+    ctx.scn.add_renderable(&dragon1);
+    ctx.scn.add_renderable(&dragon2);
+    ctx.scn.add_renderable(&teapot);
+    ctx.scn.add_renderable(&cube);
+    ctx.scn.add_renderable(&brick);
+    ctx.scn.add_renderable(&lamp_stand);
+    ctx.scn.add_renderable(&lamp_bulb);
 
     ctx.show_info_text();
 
     {
-        sm::Text test;
-        test.font = ctx.res.font["sans"_H];
-        test.text = "The quick brown fox jumps over the lazy dog.";
-        test.color = glm::vec3(0.7f);
+        text.font = ctx.res.font["sans"_H];
+        text.text = "The quick brown fox jumps over the lazy dog.";
+        text.position = glm::vec2();
+        text.color = glm::vec3(0.7f);
 
-        ctx.scn.add_text(test);
+        ctx.scn.add_text(text);
 
-        test.position = glm::vec2(200.0f) + pos;
-        test.color = glm::vec3(0.8f, 0.7f, 0.1f);
+        text.position = glm::vec2(200.0f) + pos;
+        text.color = glm::vec3(0.8f, 0.7f, 0.1f);
 
-        ctx.scn.add_text(test);
+        ctx.scn.add_text(text);
 
-        test.position = glm::vec2(200.0f, 100.0f) + pos;
-        test.scale = scl;
-        test.color = glm::vec3(0.0f, 1.0f, 1.0f);
+        text.position = glm::vec2(200.0f, 100.0f) + pos;
+        text.scale = scl;
+        text.color = glm::vec3(0.0f, 1.0f, 1.0f);
 
-        ctx.scn.add_text(test);
+        ctx.scn.add_text(text);
 
         {
             const auto [w, h] {ctx.res.font["sans"_H]->get_string_size("Some Text. Three spaces   !!?@#&^`~*&\"", scl)};
 
-            test.text = "Some Text. Three spaces   !!?@#&^`~*&\"";
-            test.position = glm::vec2(static_cast<float>(ctx.win.get_width() - w), static_cast<float>(ctx.win.get_height() - h));
-            test.color = glm::vec3(1.0f, 0.1f, 0.1f);
+            text.text = "Some Text. Three spaces   !!?@#&^`~*&\"";
+            text.position = glm::vec2(static_cast<float>(ctx.win.get_width() - w), static_cast<float>(ctx.win.get_height() - h));
+            text.color = glm::vec3(1.0f, 0.1f, 0.1f);
 
-            ctx.scn.add_text(test);
+            ctx.scn.add_text(text);
         }
 
         {
             const auto [w, h] {ctx.res.font["sans"_H]->get_string_size("Simon Mărăcine ăîâșț ĂÎÂȘȚ", scl)};
 
-            test.text = "Simon Mărăcine ăîâșț ĂÎÂȘȚ";
-            test.position = glm::vec2(static_cast<float>(ctx.win.get_width() / 2 - w / 2), static_cast<float>(ctx.win.get_height() / 2 - h / 2));
-            test.color = glm::vec3(0.8f, 0.1f, 0.9f);
+            text.text = "Simon Mărăcine ăîâșț ĂÎÂȘȚ";
+            text.position = glm::vec2(static_cast<float>(ctx.win.get_width() / 2 - w / 2), static_cast<float>(ctx.win.get_height() / 2 - h / 2));
+            text.color = glm::vec3(0.8f, 0.1f, 0.9f);
 
-            ctx.scn.add_text(test);
+            ctx.scn.add_text(text);
         }
 
         {
             const auto [_, h] {ctx.res.font["sans"_H]->get_string_size("Text that spans\nmultiple lines\nlike that.", scl)};
 
-            test.text = "Text that spans\nmultiple lines\nlike that.";
-            test.position = glm::vec2(0.0f, static_cast<float>(ctx.win.get_height() - h));
-            test.color = glm::vec3(0.0f, 1.0f, 0.0f);
+            text.text = "Text that spans\nmultiple lines\nlike that.";
+            text.position = glm::vec2(0.0f, static_cast<float>(ctx.win.get_height() - h));
+            text.color = glm::vec3(0.0f, 1.0f, 0.0f);
 
-            ctx.scn.add_text(test);
+            ctx.scn.add_text(text);
         }
 
         {
             const auto [w, _] {ctx.res.font["sans"_H]->get_string_size("Another\ntext\nwith multiple\nlines.", scl)};
 
-            test.text = "Another\ntext\nwith multiple\nlines.";
-            test.position = glm::vec2(static_cast<float>(ctx.win.get_width() - w), 0.0f);
-            test.color = glm::vec3(0.0f, 0.0f, 1.0f);
+            text.text = "Another\ntext\nwith multiple\nlines.";
+            text.position = glm::vec2(static_cast<float>(ctx.win.get_width() - w), 0.0f);
+            text.color = glm::vec3(0.0f, 0.0f, 1.0f);
 
-            ctx.scn.add_text(test);
+            ctx.scn.add_text(text);
         }
     }
 
-    {
-        sm::Quad quad;
-        quad.texture = ctx.res.texture["wait_indicator"_H];
-        quad.position = glm::vec2(70.0f) + pos;
-        quad.scale = glm::vec2(scl);
-
-        ctx.scn.add_quad(quad);
-    }
-
-    {
-        sm::Quad quad;
-        quad.texture = ctx.res.texture["white_indicator"_H];
-        quad.scale = glm::vec2(scl);
-        quad.position = glm::vec2(210.0f, 210.0f) + pos;
-
-        ctx.scn.add_quad(quad);
-    }
+    ctx.scn.add_quad(&wait);
+    ctx.scn.add_quad(&white);
 
     // Origin
     ctx.scn.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -273,30 +244,6 @@ void GameScene::on_update() {
 }
 
 void GameScene::on_imgui_update() {
-    // ImGui::Begin("Directional Light");
-    // ImGui::SliderFloat3("Direction", glm::value_ptr(directional_light.direction), -1.0f, 1.0f);
-    // ImGui::SliderFloat3("Ambient", glm::value_ptr(directional_light.ambient_color), 0.0f, 1.0f);
-    // ImGui::SliderFloat3("Diffuse", glm::value_ptr(directional_light.diffuse_color), 0.0f, 1.0f);
-    // ImGui::SliderFloat3("Specular", glm::value_ptr(directional_light.specular_color), 0.0f, 1.0f);
-    // ImGui::End();
-
-    // ImGui::Begin("Point Light");
-    // ImGui::SliderFloat3("Position", glm::value_ptr(point_light.position), -30.0f, 30.0f);
-    // ImGui::SliderFloat3("Ambient", glm::value_ptr(point_light.ambient_color), 0.0f, 1.0f);
-    // ImGui::SliderFloat3("Diffuse", glm::value_ptr(point_light.diffuse_color), 0.0f, 1.0f);
-    // ImGui::SliderFloat3("Specular", glm::value_ptr(point_light.specular_color), 0.0f, 1.0f);
-    // ImGui::SliderFloat("Falloff L", &point_light.falloff_linear, 0.0001f, 1.0f);
-    // ImGui::SliderFloat("Falloff Q", &point_light.falloff_quadratic, 0.00001f, 1.0f);
-    // ImGui::End();
-
-    // ImGui::Begin("Shadow");
-    // ImGui::SliderFloat("Left", &shadow_left, -100.0f, 100.0f);
-    // ImGui::SliderFloat("Right", &shadow_right, -100.0f, 100.0f);
-    // ImGui::SliderFloat("Bottom", &shadow_bottom, -100.0f, 100.0f);
-    // ImGui::SliderFloat("Top", &shadow_top, -100.0f, 100.0f);
-    // ImGui::SliderFloat("Far", &shadow_far, 2.0f, 150.0f);
-    // ImGui::End();
-
     ImGui::Begin("Quads");
     ImGui::SliderFloat2("Position", glm::value_ptr(pos), -500.0f, 500.0f);
     ImGui::SliderFloat("Scale", &scl, 0.0f, 3.0f);

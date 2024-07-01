@@ -11,6 +11,14 @@ namespace sm {
         this->camera.position = position;
     }
 
+    void Scene::capture(const Camera& camera, glm::vec3* position) {
+        capture(camera, *position);
+
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.camera.position = position;
+#endif;
+    }
+
     void Scene::capture(const Camera2D& camera_2d) {
         this->camera_2d.projection_matrix = camera_2d.projection_matrix;
     }
@@ -29,6 +37,20 @@ namespace sm {
         light_space.position = position;
     }
 
+    void Scene::shadows(float* left, float* right, float* bottom, float* top, float* near, float* far, glm::vec3* position) {
+        shadows(*left, *right, *bottom, *top, *near, *far, *position);
+
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.light_space.left = left;
+        debug.light_space.right = right;
+        debug.light_space.bottom = bottom;
+        debug.light_space.top = top;
+        debug.light_space.near = near;
+        debug.light_space.far = far;
+        debug.light_space.position = position;
+#endif;
+    }
+
     void Scene::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
         post_processing_steps.push_back(step);
     }
@@ -37,20 +59,60 @@ namespace sm {
         renderables.push_back(renderable);
     }
 
+    void Scene::add_renderable(Renderable* renderable) {
+        add_renderable(*renderable);
+
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.renderables.push_back(renderable);
+#endif
+    }
+
     void Scene::add_light(const DirectionalLight& light) {
         directional_light = light;
+    }
+
+    void Scene::add_light(DirectionalLight* light) {
+        add_light(*light);
+
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.directional_light = light;
+#endif
     }
 
     void Scene::add_light(const PointLight& light) {
         point_lights.push_back(light);
     }
 
+    void Scene::add_light(PointLight* light) {
+        add_light(*light);
+
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.point_lights.push_back(light);
+#endif
+    }
+
     void Scene::add_text(const Text& text) {
         texts.push_back(text);
     }
 
+    void Scene::add_text(Text* text) {
+        add_text(*text);
+
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.texts.push_back(text);
+#endif
+    }
+
     void Scene::add_quad(const Quad& quad) {
         quads.push_back(quad);
+    }
+
+    void Scene::add_quad(Quad* quad) {
+        add_quad(*quad);
+
+#ifndef SM_BUILD_DISTRIBUTION
+        debug.quads.push_back(quad);
+#endif
     }
 
     void Scene::debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color) {
@@ -60,7 +122,7 @@ namespace sm {
         line.color = color;
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug_lines.push_back(line);
+        debug.debug_lines.push_back(line);
 #endif
     }
 
@@ -75,7 +137,7 @@ namespace sm {
             line.position2 = points.begin()[i];
 
 #ifndef SM_BUILD_DISTRIBUTION
-            debug_lines.push_back(line);
+            debug.debug_lines.push_back(line);
 #endif
         }
     }
@@ -144,14 +206,21 @@ namespace sm {
         point_lights.clear();
         texts.clear();
         quads.clear();
-        skybox_texture = nullptr;
+        skybox_texture = {};
         post_processing_steps.clear();
         camera = {};
         camera_2d = {};
         light_space = {};
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug_lines.clear();
+        debug.debug_lines.clear();
+        debug.renderables.clear();
+        debug.directional_light = {};
+        debug.point_lights.clear();
+        debug.texts.clear();
+        debug.quads.clear();
+        debug.camera = {};
+        debug.light_space = {};
 #endif
     }
 }

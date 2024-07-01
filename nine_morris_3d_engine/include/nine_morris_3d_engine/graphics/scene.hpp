@@ -21,19 +21,26 @@ namespace sm {
     public:
         // Immediate
         void capture(const Camera& camera, glm::vec3 position);
+        void capture(const Camera& camera, glm::vec3* position);
         void capture(const Camera2D& camera_2d);
         void skybox(std::shared_ptr<GlTextureCubemap> texture);
         void shadows(float left, float right, float bottom, float top, float near, float far, glm::vec3 position);
+        void shadows(float* left, float* right, float* bottom, float* top, float* near, float* far, glm::vec3* position);
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
 
         // 3D API
         void add_renderable(const Renderable& renderable);
+        void add_renderable(Renderable* renderable);
         void add_light(const DirectionalLight& light);
+        void add_light(DirectionalLight* light);
         void add_light(const PointLight& light);
+        void add_light(PointLight* light);
 
         // 2D API
         void add_text(const Text& text);
+        void add_text(Text* text);
         void add_quad(const Quad& quad);
+        void add_quad(Quad* quad);
 
         // Debug API
         void debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color);
@@ -51,10 +58,6 @@ namespace sm {
         std::vector<Quad> quads;
         std::vector<std::shared_ptr<PostProcessingStep>> post_processing_steps;
         std::shared_ptr<GlTextureCubemap> skybox_texture;
-
-#ifndef SM_BUILD_DISTRIBUTION
-        std::vector<DebugLine> debug_lines;
-#endif
 
         struct {
             glm::mat4 view_matrix {1.0f};
@@ -76,6 +79,31 @@ namespace sm {
             float far {1.0f};
             glm::vec3 position {};
         } light_space;
+
+#ifndef SM_BUILD_DISTRIBUTION
+        struct {
+            std::vector<DebugLine> debug_lines;
+            std::vector<Renderable*> renderables;
+            DirectionalLight* directional_light {};
+            std::vector<PointLight*> point_lights;
+            std::vector<Text*> texts;
+            std::vector<Quad*> quads;
+
+            struct {
+                glm::vec3* position {};
+            } camera;
+
+            struct {
+                float* left {};
+                float* right {};
+                float* bottom {};
+                float* top {};
+                float* near {};
+                float* far {};
+                glm::vec3* position {};
+            } light_space;
+        } debug;
+#endif
 
         friend class Renderer;
         friend class DebugRenderer;

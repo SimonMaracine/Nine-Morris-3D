@@ -43,7 +43,7 @@ namespace sm {
     }
 
     void DebugRenderer::render(const Scene& scene) {
-        for (const DebugLine& line : scene.debug_lines) {
+        for (const DebugLine& line : scene.debug.debug_lines) {
             BufferVertex v1;
             v1.position = line.position1;
             v1.color = line.color;
@@ -72,7 +72,7 @@ namespace sm {
         storage.shader->bind();
         storage.vertex_array->bind();
 
-        opengl::draw_arrays_lines(static_cast<int>(scene.debug_lines.size()) * 2);
+        opengl::draw_arrays_lines(static_cast<int>(scene.debug.debug_lines.size()) * 2);
 
         GlVertexArray::unbind();
     }

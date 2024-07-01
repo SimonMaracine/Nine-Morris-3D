@@ -11,7 +11,7 @@ namespace sm {
     private:
         DebugUi() = default;
 
-        void render_dear_imgui(Scene& scene);
+        void render_dear_imgui(Scene& scene);  // TODO camera, renderables, other
         void add_lines(Scene& scene);
         void draw_shadows(Scene& scene);
         void draw_lights(Scene& scene);

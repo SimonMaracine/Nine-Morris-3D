@@ -27,27 +27,27 @@ namespace sm {
         if (shadows) {
             draw_shadows_lines(
                 scene,
-                scene.light_space.left,
-                scene.light_space.right,
-                scene.light_space.bottom,
-                scene.light_space.top,
-                scene.light_space.near,
-                scene.light_space.far,
-                scene.light_space.position,
-                scene.directional_light.direction
+                *scene.debug.light_space.left,
+                *scene.debug.light_space.right,
+                *scene.debug.light_space.bottom,
+                *scene.debug.light_space.top,
+                *scene.debug.light_space.near,
+                *scene.debug.light_space.far,
+                *scene.debug.light_space.position,
+                scene.debug.directional_light->direction
             );
         }
     }
 
     void DebugUi::draw_shadows(Scene& scene) {
         if (ImGui::Begin("Debug Shadows")) {
-            ImGui::SliderFloat("Left", &scene.light_space.left, -500.0f, 0.0f);
-            ImGui::SliderFloat("Right", &scene.light_space.right, 0.0f, 500.0f);
-            ImGui::SliderFloat("Bottom", &scene.light_space.bottom, -500.0f, 0.0f);
-            ImGui::SliderFloat("Top", &scene.light_space.top, 0.0f, 500.0f);
-            ImGui::SliderFloat("Near", &scene.light_space.near, 0.1f, 2.0f);
-            ImGui::SliderFloat("Far", &scene.light_space.far, 2.0f, 500.0f);
-            ImGui::Text("Position %f, %f, %f", scene.light_space.position.x, scene.light_space.position.y, scene.light_space.position.z);
+            ImGui::SliderFloat("Left", scene.debug.light_space.left, -500.0f, 0.0f);
+            ImGui::SliderFloat("Right", scene.debug.light_space.right, 0.0f, 500.0f);
+            ImGui::SliderFloat("Bottom", scene.debug.light_space.bottom, -500.0f, 0.0f);
+            ImGui::SliderFloat("Top", scene.debug.light_space.top, 0.0f, 500.0f);
+            ImGui::SliderFloat("Near", scene.debug.light_space.near, 0.1f, 2.0f);
+            ImGui::SliderFloat("Far", scene.debug.light_space.far, 2.0f, 500.0f);
+            ImGui::Text("Position %f, %f, %f", scene.debug.light_space.position->x, scene.debug.light_space.position->y, scene.debug.light_space.position->z);
         }
 
         ImGui::End();
@@ -55,10 +55,10 @@ namespace sm {
 
     void DebugUi::draw_lights(Scene& scene) {
         if (ImGui::Begin("Debug Directional Light")) {
-            ImGui::SliderFloat3("Direction", glm::value_ptr(scene.directional_light.direction), -1.0f, 1.0f);
-            ImGui::SliderFloat3("Ambient", glm::value_ptr(scene.directional_light.ambient_color), 0.0f, 1.0f);
-            ImGui::SliderFloat3("Diffuse", glm::value_ptr(scene.directional_light.diffuse_color), 0.0f, 1.0f);
-            ImGui::SliderFloat3("Specular", glm::value_ptr(scene.directional_light.specular_color), 0.0f, 1.0f);
+            ImGui::SliderFloat3("Direction", glm::value_ptr(scene.debug.directional_light->direction), -1.0f, 1.0f);
+            ImGui::SliderFloat3("Ambient", glm::value_ptr(scene.debug.directional_light->ambient_color), 0.0f, 1.0f);
+            ImGui::SliderFloat3("Diffuse", glm::value_ptr(scene.debug.directional_light->diffuse_color), 0.0f, 1.0f);
+            ImGui::SliderFloat3("Specular", glm::value_ptr(scene.debug.directional_light->specular_color), 0.0f, 1.0f);
         }
 
         ImGui::End();
@@ -66,15 +66,15 @@ namespace sm {
         if (ImGui::Begin("Debug Point Lights")) {
             int index {};  // TODO C++20
 
-            for (PointLight& point_light : scene.point_lights) {
+            for (PointLight* point_light : scene.debug.point_lights) {
                 ImGui::PushID(index++);
                 ImGui::Text("Light %d", index);
-                ImGui::SliderFloat3("Position", glm::value_ptr(point_light.position), -30.0f, 30.0f);
-                ImGui::SliderFloat3("Ambient", glm::value_ptr(point_light.ambient_color), 0.0f, 1.0f);
-                ImGui::SliderFloat3("Diffuse", glm::value_ptr(point_light.diffuse_color), 0.0f, 1.0f);
-                ImGui::SliderFloat3("Specular", glm::value_ptr(point_light.specular_color), 0.0f, 1.0f);
-                ImGui::SliderFloat("Falloff L", &point_light.falloff_linear, 0.0001f, 1.0f);
-                ImGui::SliderFloat("Falloff Q", &point_light.falloff_quadratic, 0.00001f, 1.0f);
+                ImGui::SliderFloat3("Position", glm::value_ptr(point_light->position), -30.0f, 30.0f);
+                ImGui::SliderFloat3("Ambient", glm::value_ptr(point_light->ambient_color), 0.0f, 1.0f);
+                ImGui::SliderFloat3("Diffuse", glm::value_ptr(point_light->diffuse_color), 0.0f, 1.0f);
+                ImGui::SliderFloat3("Specular", glm::value_ptr(point_light->specular_color), 0.0f, 1.0f);
+                ImGui::SliderFloat("Falloff L", &point_light->falloff_linear, 0.0001f, 1.0f);
+                ImGui::SliderFloat("Falloff Q", &point_light->falloff_quadratic, 0.00001f, 1.0f);
                 ImGui::PopID();
                 ImGui::Spacing();
             }
