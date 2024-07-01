@@ -9,16 +9,16 @@ namespace sm {
     class Application;
 
     // An entire part of a game, holding lots of state
-    class Scene {
+    class ApplicationScene {
     public:
-        Scene(Ctx& ctx, const std::string& name)
+        ApplicationScene(Ctx& ctx, const std::string& name)
             : ctx(ctx), name(name), id(Id(name)) {}
-        virtual ~Scene() = default;
+        virtual ~ApplicationScene() = default;
 
-        Scene(const Scene&) = delete;
-        Scene& operator=(const Scene&) = delete;
-        Scene(Scene&&) = delete;
-        Scene& operator=(Scene&&) = delete;
+        ApplicationScene(const ApplicationScene&) = delete;
+        ApplicationScene& operator=(const ApplicationScene&) = delete;
+        ApplicationScene(ApplicationScene&&) = delete;
+        ApplicationScene& operator=(ApplicationScene&&) = delete;
 
         virtual void on_start() {}  // Called when the scene is entered
         virtual void on_stop() {}  // Called when the scene is exited

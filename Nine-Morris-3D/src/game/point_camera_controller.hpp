@@ -19,7 +19,7 @@ public:
         float fov,
         float near,
         float far,
-        const glm::vec3& point,
+        glm::vec3 point,
         float distance_to_point,
         float pitch,
         float sensitivity
@@ -28,7 +28,7 @@ public:
     glm::vec3 get_position() const override;
     glm::vec3 get_rotation() const override;
 
-    const glm::vec3& get_point() const { return point; }
+    glm::vec3 get_point() const { return point; }
     float get_distance_to_point() const { return distance_to_point; }
     float get_angle_around_point() const { return angle_around_point; }
 
@@ -40,8 +40,8 @@ public:
     void update_friction();
 
     // Directly set this position and linearly interpolate to this position respectively
-    void set_position(const glm::vec3& position);
-    void go_towards_position(const glm::vec3& position);
+    void set_position(glm::vec3 position);
+    void go_towards_position(glm::vec3 position);
 
     void connect_events(sm::Ctx& ctx);
     void disconnect_events(sm::Ctx& ctx);
@@ -52,9 +52,9 @@ private:
     void on_mouse_wheel_scrolled(const sm::MouseWheelScrolledEvent& event);
     void on_mouse_moved(const sm::MouseMovedEvent& event);
 
-    void go_towards_position_x(const glm::vec3& direction);
-    void go_towards_position_y(const glm::vec3& direction);
-    void go_towards_position_zoom(const glm::vec3& position);
+    void go_towards_position_x(glm::vec3 direction);
+    void go_towards_position_y(glm::vec3 direction);
+    void go_towards_position_zoom(glm::vec3 position);
 
     void calculate_auto_angle_around_point(float dt);
     void calculate_auto_pitch(float dt);

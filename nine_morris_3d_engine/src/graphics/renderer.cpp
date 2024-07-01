@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <algorithm>
 #include <string>
+#include <cassert>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <resmanager/resmanager.hpp>
@@ -41,8 +42,8 @@ namespace sm {
         });
     }
 
-    void DebugRenderer::render() {
-        for (const Line& line : scene.lines) {
+    void DebugRenderer::render(const Scene& scene) {
+        for (const DebugLine& line : scene.debug_lines) {
             BufferVertex v1;
             v1.position = line.position1;
             v1.color = line.color;
@@ -66,17 +67,14 @@ namespace sm {
         vertex_buffer->upload_data(storage.lines_buffer.data(), storage.lines_buffer.size() * sizeof(BufferVertex));
         GlVertexBuffer::unbind();
 
+        storage.lines_buffer.clear();
+
         storage.shader->bind();
         storage.vertex_array->bind();
 
-        opengl::draw_arrays_lines(static_cast<int>(scene.lines.size()) * 2);
+        opengl::draw_arrays_lines(static_cast<int>(scene.debug_lines.size()) * 2);
 
         GlVertexArray::unbind();
-    }
-
-    void DebugRenderer::clear() {
-        scene.lines.clear();
-        storage.lines_buffer.clear();
     }
 
     Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary&) {
@@ -272,35 +270,6 @@ namespace sm {
 #endif
     }
 
-    void Renderer::capture(const Camera& camera, const glm::vec3& position) {
-        scene.camera.view_matrix = camera.view_matrix;
-        scene.camera.projection_matrix = camera.projection_matrix;
-        scene.camera.projection_view_matrix = camera.projection_view_matrix;
-        scene.camera.position = position;
-    }
-
-    void Renderer::capture(const Camera2D& camera_2d) {
-        scene.camera_2d.projection_matrix = camera_2d.projection_matrix;
-    }
-
-    void Renderer::skybox(std::shared_ptr<GlTextureCubemap> texture) {
-        storage.skybox_texture = texture;
-    }
-
-    void Renderer::shadows(float left, float right, float bottom, float top, float near, float far, const glm::vec3& position) {
-        scene.light_space.left = left;
-        scene.light_space.right = right;
-        scene.light_space.bottom = bottom;
-        scene.light_space.top = top;
-        scene.light_space.near = near;
-        scene.light_space.far = far;
-        scene.light_space.position = position;
-    }
-
-    void Renderer::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
-        post_processing_context.steps.push_back(step);
-    }
-
     void Renderer::register_shader(std::shared_ptr<GlShader> shader) {
         storage.scene.shaders.push_back(shader);
     }
@@ -309,121 +278,115 @@ namespace sm {
         storage.scene.framebuffers.push_back(framebuffer);
     }
 
-    void Renderer::add_renderable(const Renderable& renderable) {
-        scene.renderables.push_back(renderable);
-    }
+    void Renderer::render(const Scene& scene, int width, int height) {
+        // TODO see if this can be improved
 
-    void Renderer::add_light(const DirectionalLight& light) {
-        scene.directional_light = light;
-    }
+        {
+            const auto uniform_buffer {storage.wprojection_view_uniform_buffer.lock()};
 
-    void Renderer::add_light(const PointLight& light) {
-        scene.point_lights.push_back(light);
-    }
+            if (uniform_buffer != nullptr) {
+                uniform_buffer->set(&scene.camera.projection_view_matrix, "u_projection_view_matrix"_H);
+            }
+        }
+        {
+            const auto uniform_buffer {storage.wdirectional_light_uniform_buffer.lock()};
 
-    void Renderer::add_text(const Text& text) {
-        scene.texts.push_back(text);
-    }
+            if (uniform_buffer != nullptr) {
+                uniform_buffer->set(&scene.directional_light.direction, "u_directional_light.direction"_H);
+                uniform_buffer->set(&scene.directional_light.ambient_color, "u_directional_light.ambient"_H);
+                uniform_buffer->set(&scene.directional_light.diffuse_color, "u_directional_light.diffuse"_H);
+                uniform_buffer->set(&scene.directional_light.specular_color, "u_directional_light.specular"_H);
+            }
+        }
+        {
+            const auto uniform_buffer {storage.wview_position_uniform_buffer.lock()};
 
-    void Renderer::add_quad(const Quad& quad) {
-        scene.quads.push_back(quad);
-    }
+            if (uniform_buffer != nullptr) {
+                uniform_buffer->set(&scene.camera.position, "u_view_position"_H);
+            }
+        }
+        {
+            const auto uniform_buffer {storage.wpoint_light_uniform_buffer.lock()};
 
-    void Renderer::debug_add_line(const glm::vec3& position1, const glm::vec3& position2, const glm::vec3& color) {
-        DebugRenderer::Line line;
-        line.position1 = position1;
-        line.position2 = position2;
-        line.color = color;
+            if (uniform_buffer != nullptr) {
+                setup_point_light_uniform_buffer(scene, uniform_buffer);
+            }
+        }
+        {
+            const auto uniform_buffer {storage.wlight_space_uniform_buffer.lock()};
+
+            if (uniform_buffer != nullptr) {
+                setup_light_space_uniform_buffer(scene, uniform_buffer);
+            }
+        }
+
+        for (const auto& [_, wuniform_buffer] : storage.uniform_buffers) {
+            const auto uniform_buffer {wuniform_buffer.lock()};
+
+            if (uniform_buffer == nullptr) {
+                continue;
+            }
+
+            uniform_buffer->bind();
+            uniform_buffer->upload();
+        }
+
+        GlUniformBuffer::unbind();
+
+        // Draw to depth buffer for shadows
+        storage.shadow_map_framebuffer->bind();
+
+        opengl::clear(opengl::Buffers::D);
+        opengl::viewport(
+            storage.shadow_map_framebuffer->get_specification().width,
+            storage.shadow_map_framebuffer->get_specification().height
+        );
+
+        draw_renderables_to_shadow_map(scene);
+
+        // Draw normal things
+        storage.scene_framebuffer->bind();
+
+        opengl::clear(opengl::Buffers::CDS);
+        opengl::viewport(
+            storage.scene_framebuffer->get_specification().width,
+            storage.scene_framebuffer->get_specification().height
+        );
+
+        opengl::bind_texture_2d(storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
+
+        draw_renderables(scene);
+        draw_renderables_outlined(scene);  // FIXME
+
+        // Skybox
+        if (scene.skybox_texture != nullptr) {
+            draw_skybox(scene);
+        }
+
+        // Blit the resulted scene texture to an intermediate texture, resolving anti-aliasing
+        storage.scene_framebuffer->blit(
+            storage.intermediate_framebuffer.get(),
+            storage.scene_framebuffer->get_specification().width,
+            storage.scene_framebuffer->get_specification().height
+        );
+
+        // Do post processing and render the final 3D image to the screen
+        storage.intermediate_framebuffer->bind();
+
+        opengl::viewport(
+            storage.intermediate_framebuffer->get_specification().width,
+            storage.intermediate_framebuffer->get_specification().height
+        );
+
+        end_3d_rendering(scene, width, height);
+
+        // 2D stuff
+        draw_texts(scene);
+        draw_quads(scene);
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.scene.lines.push_back(line);
+        debug.render(scene);
 #endif
-    }
-
-    void Renderer::debug_add_lines(const std::vector<glm::vec3>& points, const glm::vec3& color) {
-        assert(points.size() >= 2);
-
-        DebugRenderer::Line line;
-        line.color = color;
-
-        for (std::size_t i {1}; i < points.size(); i++) {
-            line.position1 = points[i - 1];
-            line.position2 = points[i];
-
-#ifndef SM_BUILD_DISTRIBUTION
-            debug.scene.lines.push_back(line);
-#endif
-        }
-    }
-
-    void Renderer::debug_add_lines(std::initializer_list<glm::vec3> points, const glm::vec3& color) {
-        assert(points.size() >= 2);
-
-        DebugRenderer::Line line;
-        line.color = color;
-
-        for (std::size_t i {1}; i < points.size(); i++) {
-            line.position1 = points.begin()[i - 1];
-            line.position2 = points.begin()[i];
-
-#ifndef SM_BUILD_DISTRIBUTION
-            debug.scene.lines.push_back(line);
-#endif
-        }
-    }
-
-    void Renderer::debug_add_point(const glm::vec3& position, const glm::vec3& color) {
-        static constexpr float SIZE {0.5f};
-
-        debug_add_line(glm::vec3(-SIZE, 0.0f, 0.0f) + position, glm::vec3(SIZE, 0.0f, 0.0f) + position, color);
-        debug_add_line(glm::vec3(0.0f, -SIZE, 0.0f) + position, glm::vec3(0.0f, SIZE, 0.0f) + position, color);
-        debug_add_line(glm::vec3(0.0f, 0.0f, -SIZE) + position, glm::vec3(0.0f, 0.0f, SIZE) + position, color);
-    }
-
-    void Renderer::debug_add_lamp(const glm::vec3& position, const glm::vec3& color) {
-        static constexpr float SIZE {0.3f};
-        static constexpr float SIZE2 {0.15f};
-        static constexpr float SIZE3 {0.5f};
-        static constexpr float OFFSET {-(SIZE + SIZE3)};
-        const std::array<DebugRenderer::Line, 24> LINES {
-            // Top
-            DebugRenderer::Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, -SIZE, -SIZE), color},
-            DebugRenderer::Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(SIZE, SIZE, SIZE), color},
-            DebugRenderer::Line {glm::vec3(SIZE, -SIZE, SIZE), glm::vec3(-SIZE, -SIZE, SIZE), color},
-
-            DebugRenderer::Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(-SIZE, -SIZE, SIZE), color},
-            DebugRenderer::Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(-SIZE, SIZE, -SIZE), color},
-            DebugRenderer::Line {glm::vec3(-SIZE, -SIZE, -SIZE), glm::vec3(SIZE, -SIZE, -SIZE), color},
-
-            DebugRenderer::Line {glm::vec3(SIZE, -SIZE, -SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
-            DebugRenderer::Line {glm::vec3(-SIZE, -SIZE, SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
-
-            DebugRenderer::Line {glm::vec3(SIZE, SIZE, SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
-            DebugRenderer::Line {glm::vec3(SIZE, SIZE, SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
-            DebugRenderer::Line {glm::vec3(-SIZE, SIZE, -SIZE), glm::vec3(SIZE, SIZE, -SIZE), color},
-            DebugRenderer::Line {glm::vec3(-SIZE, SIZE, -SIZE), glm::vec3(-SIZE, SIZE, SIZE), color},
-
-            // Bottom
-            DebugRenderer::Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), color},
-            DebugRenderer::Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), color},
-            DebugRenderer::Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), color},
-
-            DebugRenderer::Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), color},
-            DebugRenderer::Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), color},
-            DebugRenderer::Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), color},
-
-            DebugRenderer::Line {glm::vec3(SIZE2, -SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
-            DebugRenderer::Line {glm::vec3(-SIZE2, -SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
-
-            DebugRenderer::Line {glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
-            DebugRenderer::Line {glm::vec3(SIZE2, SIZE3 + OFFSET, SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
-            DebugRenderer::Line {glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), glm::vec3(SIZE2, SIZE3 + OFFSET, -SIZE2), color},
-            DebugRenderer::Line {glm::vec3(-SIZE2, SIZE3 + OFFSET, -SIZE2), glm::vec3(-SIZE2, SIZE3 + OFFSET, SIZE2), color},
-        };
-
-        for (const DebugRenderer::Line& line : LINES) {
-            debug_add_line(line.position1 + position, line.position2 + position, line.color);
-        }
     }
 
     void Renderer::pre_setup() {
@@ -473,123 +436,12 @@ namespace sm {
         storage.scene.shaders.clear();
     }
 
-    void Renderer::render(int width, int height) {
-        // TODO see if this can be improved
-
-        {
-            const auto uniform_buffer {storage.wprojection_view_uniform_buffer.lock()};
-
-            if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&scene.camera.projection_view_matrix, "u_projection_view_matrix"_H);
-            }
-        }
-        {
-            const auto uniform_buffer {storage.wdirectional_light_uniform_buffer.lock()};
-
-            if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&scene.directional_light.direction, "u_directional_light.direction"_H);
-                uniform_buffer->set(&scene.directional_light.ambient_color, "u_directional_light.ambient"_H);
-                uniform_buffer->set(&scene.directional_light.diffuse_color, "u_directional_light.diffuse"_H);
-                uniform_buffer->set(&scene.directional_light.specular_color, "u_directional_light.specular"_H);
-            }
-        }
-        {
-            const auto uniform_buffer {storage.wview_position_uniform_buffer.lock()};
-
-            if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&scene.camera.position, "u_view_position"_H);
-            }
-        }
-        {
-            const auto uniform_buffer {storage.wpoint_light_uniform_buffer.lock()};
-
-            if (uniform_buffer != nullptr) {
-                setup_point_light_uniform_buffer(uniform_buffer);
-            }
-        }
-        {
-            const auto uniform_buffer {storage.wlight_space_uniform_buffer.lock()};
-
-            if (uniform_buffer != nullptr) {
-                setup_light_space_uniform_buffer(uniform_buffer);
-            }
-        }
-
-        for (const auto& [_, wuniform_buffer] : storage.uniform_buffers) {
-            const auto uniform_buffer {wuniform_buffer.lock()};
-
-            if (uniform_buffer == nullptr) {
-                continue;
-            }
-
-            uniform_buffer->bind();
-            uniform_buffer->upload();
-        }
-
-        GlUniformBuffer::unbind();
-
-        // Draw to depth buffer for shadows
-        storage.shadow_map_framebuffer->bind();
-
-        opengl::clear(opengl::Buffers::D);
-        opengl::viewport(
-            storage.shadow_map_framebuffer->get_specification().width,
-            storage.shadow_map_framebuffer->get_specification().height
-        );
-
-        draw_renderables_to_shadow_map();
-
-        // Draw normal things
-        storage.scene_framebuffer->bind();
-
-        opengl::clear(opengl::Buffers::CDS);
-        opengl::viewport(
-            storage.scene_framebuffer->get_specification().width,
-            storage.scene_framebuffer->get_specification().height
-        );
-
-        opengl::bind_texture_2d(storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
-
-        draw_renderables();
-        draw_renderables_outlined();  // FIXME
-
-        // Skybox
-        if (storage.skybox_texture != nullptr) {
-            draw_skybox();
-        }
-
-        // Blit the resulted scene texture to an intermediate texture, resolving anti-aliasing
-        storage.scene_framebuffer->blit(
-            storage.intermediate_framebuffer.get(),
-            storage.scene_framebuffer->get_specification().width,
-            storage.scene_framebuffer->get_specification().height
-        );
-
-        // Do post processing and render the final 3D image to the screen
-        storage.intermediate_framebuffer->bind();
-
-        opengl::viewport(
-            storage.intermediate_framebuffer->get_specification().width,
-            storage.intermediate_framebuffer->get_specification().height
-        );
-
-        end_3d_rendering(width, height);
-
-        // 2D stuff
-        draw_texts();
-        draw_quads();
-
-#ifndef SM_BUILD_DISTRIBUTION
-        debug.render();
-#endif
-    }
-
-    void Renderer::post_processing() {
+    void Renderer::post_processing(const Scene& scene) {
         post_processing_context.original_texture = storage.intermediate_framebuffer->get_color_attachment(0);
         post_processing_context.last_texture = post_processing_context.original_texture;
         post_processing_context.textures.clear();
 
-        for (const auto& step : post_processing_context.steps) {
+        for (const auto& step : scene.post_processing_steps) {
             step->framebuffer->bind();
 
             opengl::clear(opengl::Buffers::C);
@@ -605,12 +457,12 @@ namespace sm {
         }
     }
 
-    void Renderer::end_3d_rendering(int width, int height) {
+    void Renderer::end_3d_rendering(const Scene& scene, int width, int height) {
         opengl::disable_depth_test();
 
         storage.screen_quad_vertex_array->bind();
 
-        post_processing();
+        post_processing(scene);
 
         // Draw the final result to the screen
         GlFramebuffer::bind_default();
@@ -630,24 +482,6 @@ namespace sm {
         storage.screen_quad_shader->bind();
         opengl::bind_texture_2d(texture, 0);
         opengl::draw_arrays(6);
-    }
-
-    void Renderer::clear() {
-        storage.text.batches.clear();
-        storage.skybox_texture = nullptr;
-        post_processing_context.steps.clear();
-        scene.renderables.clear();
-        scene.directional_light = {};
-        scene.point_lights.clear();
-        scene.texts.clear();
-        scene.quads.clear();
-        scene.camera = {};
-        scene.camera_2d = {};
-        scene.light_space = {};
-
-#ifndef SM_BUILD_DISTRIBUTION
-        debug.clear();
-#endif
     }
 
     void Renderer::resize_framebuffers(int width, int height) {
@@ -672,7 +506,7 @@ namespace sm {
         }
     }
 
-    void Renderer::draw_renderables() {
+    void Renderer::draw_renderables(const Scene& scene) {
         for (const Renderable& renderable : scene.renderables) {
             const auto material {renderable.material.lock()};
 
@@ -707,7 +541,7 @@ namespace sm {
         // Don't unbind the vertex array
     }
 
-    void Renderer::draw_renderables_outlined() {
+    void Renderer::draw_renderables_outlined(const Scene& scene) {
         std::vector<Renderable> outline_renderables;
 
         std::for_each(scene.renderables.cbegin(), scene.renderables.cend(), [&](const Renderable& renderable) {
@@ -718,7 +552,7 @@ namespace sm {
             }
         });
 
-        std::sort(outline_renderables.begin(), outline_renderables.end(), [this](const Renderable& lhs, const Renderable& rhs) {
+        std::sort(outline_renderables.begin(), outline_renderables.end(), [&](const Renderable& lhs, const Renderable& rhs) {
             const float distance_left {glm::distance(lhs.transform.position, scene.camera.position)};
             const float distance_right {glm::distance(rhs.transform.position, scene.camera.position)};
 
@@ -760,7 +594,7 @@ namespace sm {
         opengl::stencil_mask(0xFF);
     }
 
-    void Renderer::draw_renderables_to_shadow_map() {
+    void Renderer::draw_renderables_to_shadow_map(const Scene& scene) {
         opengl::disable_back_face_culling();
 
         storage.shadow_shader->bind();
@@ -786,7 +620,7 @@ namespace sm {
         opengl::enable_back_face_culling();
     }
 
-    void Renderer::draw_skybox() {
+    void Renderer::draw_skybox(const Scene& scene) {
         const glm::mat4& projection {scene.camera.projection_matrix};
         const glm::mat4 view {glm::mat4(glm::mat3(scene.camera.view_matrix))};
 
@@ -794,25 +628,27 @@ namespace sm {
         storage.skybox_shader->upload_uniform_mat4("u_projection_view_matrix"_H, projection * view);
 
         storage.skybox_vertex_array->bind();
-        storage.skybox_texture->bind(0);
+        scene.skybox_texture->bind(0);
 
         opengl::draw_arrays(36);
 
         GlVertexArray::unbind();
     }
 
-    void Renderer::draw_texts() {
+    void Renderer::draw_texts(const Scene& scene) {
         opengl::disable_depth_test();
 
         storage.text_shader->bind();
 
-        std::stable_sort(scene.texts.begin(), scene.texts.end(), [](const Text& lhs, const Text& rhs) {
+        auto texts {scene.texts};
+
+        std::stable_sort(texts.begin(), texts.end(), [](const Text& lhs, const Text& rhs) {
             return lhs.font.lock().get() < rhs.font.lock().get();
         });
 
         const void* font_ptr {nullptr};  // TODO C++20
 
-        for (const auto& text : scene.texts) {
+        for (const auto& text : texts) {
             const void* this_ptr {text.font.lock().get()};
 
             assert(this_ptr != nullptr);
@@ -831,16 +667,18 @@ namespace sm {
         }
 
         for (const auto& batch : storage.text.batches) {
-            draw_text_batch(batch);
+            draw_text_batch(scene, batch);
             storage.text.batch_buffer.clear();
             storage.text.batch_matrices.clear();
             storage.text.batch_colors.clear();
         }
 
+        storage.text.batches.clear();
+
         opengl::enable_depth_test();
     }
 
-    void Renderer::draw_text_batch(const TextBatch& batch) {
+    void Renderer::draw_text_batch(const Scene& scene, const TextBatch& batch) {
         const auto font {batch.wfont.lock()};
 
         std::size_t i {};  // TODO C++20
@@ -878,7 +716,7 @@ namespace sm {
         GlVertexArray::unbind();
     }
 
-    void Renderer::draw_quads() {
+    void Renderer::draw_quads(const Scene& scene) {
         opengl::disable_depth_test();
 
         storage.quad_shader->bind();
@@ -977,12 +815,14 @@ namespace sm {
         opengl::draw_elements(static_cast<int>(storage.quad.quad_count * 6));
     }
 
-    void Renderer::setup_point_light_uniform_buffer(const std::shared_ptr<GlUniformBuffer> uniform_buffer) {
+    void Renderer::setup_point_light_uniform_buffer(const Scene& scene, const std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         // Sort front to back with respect to the camera; lights in the front of the list will be used
+        auto point_lights {scene.point_lights};
+
         std::sort(
-            scene.point_lights.begin(),
-            scene.point_lights.end(),
-            [this](const PointLight& lhs, const PointLight& rhs) {
+            point_lights.begin(),
+            point_lights.end(),
+            [&](const PointLight& lhs, const PointLight& rhs) {
                 const float distance_left {glm::distance(lhs.position, scene.camera.position)};
                 const float distance_right {glm::distance(rhs.position, scene.camera.position)};
 
@@ -991,12 +831,12 @@ namespace sm {
         );
 
         // Add dummy point lights to make the size 4, which is a requirement from the shader
-        if (scene.point_lights.size() < SHADER_MAX_POINT_LIGHTS) {
-            scene.point_lights.resize(SHADER_MAX_POINT_LIGHTS);
+        if (point_lights.size() < SHADER_MAX_POINT_LIGHTS) {
+            point_lights.resize(SHADER_MAX_POINT_LIGHTS);
         }
 
         for (std::size_t i {0}; i < SHADER_MAX_POINT_LIGHTS; i++) {
-            const PointLight& light {scene.point_lights[i]};
+            const PointLight& light {point_lights[i]};
             const std::string index {std::to_string(i)};
 
             // Uniforms must be set individually by index
@@ -1009,7 +849,7 @@ namespace sm {
         }
     }
 
-    void Renderer::setup_light_space_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer) {
+    void Renderer::setup_light_space_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         const glm::mat4 projection {
             glm::ortho(
                 scene.light_space.left,

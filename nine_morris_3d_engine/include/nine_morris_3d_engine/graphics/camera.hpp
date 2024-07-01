@@ -4,8 +4,8 @@
 
 namespace sm {
     struct Camera {
-        void set_position_orientation(const glm::vec3& position, const glm::vec3& at, const glm::vec3& up);
-        void set_position_rotation(const glm::vec3& position, const glm::vec3& rotation);
+        void set_position_orientation(glm::vec3 position, glm::vec3 at, glm::vec3 up);
+        void set_position_rotation(glm::vec3 position, glm::vec3 rotation);
 
         void set_projection(int width, int height, float fov, float near, float far);
         void set_view(const glm::mat4& view_matrix);

@@ -93,7 +93,7 @@ namespace sm {
         this->pitch = pitch;
     }
 
-    void AlSource::set_position(const glm::vec3& position) {
+    void AlSource::set_position(glm::vec3 position) {
         alSource3f(source, AL_POSITION, position.x, position.y, position.z);
 
         openal_debug::check_errors();
@@ -101,7 +101,7 @@ namespace sm {
         this->position = position;
     }
 
-    void AlSource::set_velocity(const glm::vec3& velocity) {
+    void AlSource::set_velocity(glm::vec3 velocity) {
         alSource3f(source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
         openal_debug::check_errors();
@@ -109,7 +109,7 @@ namespace sm {
         this->velocity = velocity;
     }
 
-    void AlSource::set_direction(const glm::vec3& direction) {
+    void AlSource::set_direction(glm::vec3 direction) {
         alSource3f(source, AL_DIRECTION, direction.x, direction.y, direction.z);
 
         openal_debug::check_errors();

@@ -61,8 +61,8 @@ namespace sm {
         void set_int(Id name, int integer);
         void set_float(Id name, float real);
         void set_vec2(Id name, glm::vec2 vector);
-        void set_vec3(Id name, const glm::vec3& vector);
-        void set_vec4(Id name, const glm::vec4& vector);
+        void set_vec3(Id name, glm::vec3 vector);
+        void set_vec4(Id name, glm::vec4 vector);
         void set_texture(Id name, std::shared_ptr<GlTexture> texture, int unit);
         void set_texture(Id name, unsigned int texture, int unit);
 

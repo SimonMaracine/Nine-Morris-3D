@@ -199,12 +199,12 @@ namespace sm {
         std::memcpy(data.get() + element.offset, &vector, sizeof(vector));
     }
 
-    void MaterialInstance::set_vec3(Id name, const glm::vec3& vector) {
+    void MaterialInstance::set_vec3(Id name, glm::vec3 vector) {
         const Element& element {offsets.at(name)};
         std::memcpy(data.get() + element.offset, &vector, sizeof(vector));
     }
 
-    void MaterialInstance::set_vec4(Id name, const glm::vec4& vector) {
+    void MaterialInstance::set_vec4(Id name, glm::vec4 vector) {
         const Element& element {offsets.at(name)};
         std::memcpy(data.get() + element.offset, &vector, sizeof(vector));
     }

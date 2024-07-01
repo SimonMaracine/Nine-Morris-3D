@@ -19,11 +19,11 @@ namespace sm {
         //     float scale;  // Only uniform scaling
         // };
 
-        // void position(const glm::vec3& position) {
+        // void position(glm::vec3 position) {
         //     std::get<0>(transform).position = position;
         // }
 
-        // void rotation(const glm::vec3& rotation) {
+        // void rotation(glm::vec3 rotation) {
         //     std::get<0>(transform).rotation = rotation;
         // }
 
@@ -63,5 +63,11 @@ namespace sm {
         glm::vec2 position {};
         glm::vec2 scale {1.0f};
         std::shared_ptr<GlTexture> texture;
+    };
+
+    struct DebugLine {
+        glm::vec3 position1 {};
+        glm::vec3 position2 {};
+        glm::vec3 color {};
     };
 }

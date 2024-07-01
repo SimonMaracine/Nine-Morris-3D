@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/events.hpp"
 #include "nine_morris_3d_engine/application/window.hpp"
 #include "nine_morris_3d_engine/application/tasks.hpp"
@@ -12,6 +13,8 @@
 #include "nine_morris_3d_engine/audio/music.hpp"
 #include "nine_morris_3d_engine/graphics/renderer.hpp"
 #include "nine_morris_3d_engine/graphics/shader_library.hpp"
+#include "nine_morris_3d_engine/graphics/scene.hpp"
+#include "nine_morris_3d_engine/graphics/debug_ui.hpp"
 #include "nine_morris_3d_engine/other/resources_cache.hpp"
 #include "nine_morris_3d_engine/other/random_gen.hpp"
 
@@ -35,7 +38,7 @@ namespace sm {
         Ctx& operator=(Ctx&&) = delete;
 
         void change_scene(Id id);
-        void add_info_text();
+        void show_info_text();
 
         template<typename T>
         T& global() {
@@ -61,7 +64,11 @@ namespace sm {
         TaskManager tsk;
         RandomGenerator rng;
         Input inp;
+        Scene scn;
     private:
+#ifndef SM_BUILD_DISTRIBUTION
+        DebugUi dbg;
+#endif
         void* user_data {nullptr};  // Arbitrary data defined by the user
         Application* application {nullptr};
 

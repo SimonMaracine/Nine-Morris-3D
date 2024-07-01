@@ -82,19 +82,19 @@ void GameScene::on_update() {
     cam_controller.update_camera(ctx.delta);
     cam_controller.update_friction();
 
-    ctx.rnd.capture(cam, cam_controller.get_position());
-    ctx.rnd.capture(cam_2d);
+    ctx.scn.capture(cam, cam_controller.get_position());
+    ctx.scn.capture(cam_2d);
 
-    ctx.rnd.add_light(directional_light);
-    ctx.rnd.add_light(point_light);
-    ctx.rnd.shadows(shadow_left, shadow_right, shadow_bottom, shadow_top, 1.0f, shadow_far, directional_light.direction * -30.0f);
+    ctx.scn.add_light(directional_light);
+    ctx.scn.add_light(point_light);
+    ctx.scn.shadows(shadow_left, shadow_right, shadow_bottom, shadow_top, 1.0f, shadow_far, directional_light.direction * -30.0f);
 
     if (sky) {
-        ctx.rnd.skybox(ctx.res.texture_cubemap["field"_H]);
+        ctx.scn.skybox(ctx.res.texture_cubemap["field"_H]);
     }
 
     if (blur) {
-        ctx.rnd.add_post_processing(ctx.global<Global>().blur_step);
+        ctx.scn.add_post_processing(ctx.global<Global>().blur_step);
     }
 
     {
@@ -104,7 +104,7 @@ void GameScene::on_update() {
         ground.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
         ground.transform.scale = 2.0f;
 
-        ctx.rnd.add_renderable(ground);
+        ctx.scn.add_renderable(ground);
     }
 
     {
@@ -115,13 +115,13 @@ void GameScene::on_update() {
         dragon.outline.color = glm::vec3(0.2f, 0.1f, 1.0f);
         dragon.outline.offset = glm::vec3(0.04f, -0.2f, 0.0f);
 
-        ctx.rnd.add_renderable(dragon);
+        ctx.scn.add_renderable(dragon);
 
         dragon.material = ctx.res.material_instance["dragon2"_H];
         dragon.transform.position = glm::vec3(4.0f, 0.0, 0.0f);
         dragon.transform.scale = 0.2f;
 
-        ctx.rnd.add_renderable(dragon);
+        ctx.scn.add_renderable(dragon);
     }
 
     {
@@ -131,7 +131,7 @@ void GameScene::on_update() {
         teapot.transform.position = glm::vec3(2.6f, 0.0, -7.0f);
         teapot.transform.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
 
-        ctx.rnd.add_renderable(teapot);
+        ctx.scn.add_renderable(teapot);
     }
 
     {
@@ -141,7 +141,7 @@ void GameScene::on_update() {
         cube.transform.position = glm::vec3(5.0f, 2.0f, -2.0f);
         cube.transform.scale = 0.8f;
 
-        ctx.rnd.add_renderable(cube);
+        ctx.scn.add_renderable(cube);
     }
 
     {
@@ -151,7 +151,7 @@ void GameScene::on_update() {
         brick.transform.position = glm::vec3(6.0f);
         brick.transform.rotation = glm::vec3(10.0f);
 
-        ctx.rnd.add_renderable(brick);
+        ctx.scn.add_renderable(brick);
     }
 
     {
@@ -160,15 +160,15 @@ void GameScene::on_update() {
         lamp.material = ctx.res.material_instance["lamp_stand"_H];
         lamp.transform.position = glm::vec3(-6.0f, 0.0f, -6.0f);
 
-        ctx.rnd.add_renderable(lamp);
+        ctx.scn.add_renderable(lamp);
 
         lamp.vertex_array = ctx.res.vertex_array["lamp_bulb"_H];
         lamp.material = ctx.res.material_instance["lamp_bulb"_H];
 
-        ctx.rnd.add_renderable(lamp);
+        ctx.scn.add_renderable(lamp);
     }
 
-    ctx.add_info_text();
+    ctx.show_info_text();
 
     {
         sm::Text test;
@@ -176,18 +176,18 @@ void GameScene::on_update() {
         test.text = "The quick brown fox jumps over the lazy dog.";
         test.color = glm::vec3(0.7f);
 
-        ctx.rnd.add_text(test);
+        ctx.scn.add_text(test);
 
         test.position = glm::vec2(200.0f) + pos;
         test.color = glm::vec3(0.8f, 0.7f, 0.1f);
 
-        ctx.rnd.add_text(test);
+        ctx.scn.add_text(test);
 
         test.position = glm::vec2(200.0f, 100.0f) + pos;
         test.scale = scl;
         test.color = glm::vec3(0.0f, 1.0f, 1.0f);
 
-        ctx.rnd.add_text(test);
+        ctx.scn.add_text(test);
 
         {
             const auto [w, h] {ctx.res.font["sans"_H]->get_string_size("Some Text. Three spaces   !!?@#&^`~*&\"", scl)};
@@ -196,7 +196,7 @@ void GameScene::on_update() {
             test.position = glm::vec2(static_cast<float>(ctx.win.get_width() - w), static_cast<float>(ctx.win.get_height() - h));
             test.color = glm::vec3(1.0f, 0.1f, 0.1f);
 
-            ctx.rnd.add_text(test);
+            ctx.scn.add_text(test);
         }
 
         {
@@ -206,7 +206,7 @@ void GameScene::on_update() {
             test.position = glm::vec2(static_cast<float>(ctx.win.get_width() / 2 - w / 2), static_cast<float>(ctx.win.get_height() / 2 - h / 2));
             test.color = glm::vec3(0.8f, 0.1f, 0.9f);
 
-            ctx.rnd.add_text(test);
+            ctx.scn.add_text(test);
         }
 
         {
@@ -216,7 +216,7 @@ void GameScene::on_update() {
             test.position = glm::vec2(0.0f, static_cast<float>(ctx.win.get_height() - h));
             test.color = glm::vec3(0.0f, 1.0f, 0.0f);
 
-            ctx.rnd.add_text(test);
+            ctx.scn.add_text(test);
         }
 
         {
@@ -226,7 +226,7 @@ void GameScene::on_update() {
             test.position = glm::vec2(static_cast<float>(ctx.win.get_width() - w), 0.0f);
             test.color = glm::vec3(0.0f, 0.0f, 1.0f);
 
-            ctx.rnd.add_text(test);
+            ctx.scn.add_text(test);
         }
     }
 
@@ -236,7 +236,7 @@ void GameScene::on_update() {
         quad.position = glm::vec2(70.0f) + pos;
         quad.scale = glm::vec2(scl);
 
-        ctx.rnd.add_quad(quad);
+        ctx.scn.add_quad(quad);
     }
 
     {
@@ -245,16 +245,16 @@ void GameScene::on_update() {
         quad.scale = glm::vec2(scl);
         quad.position = glm::vec2(210.0f, 210.0f) + pos;
 
-        ctx.rnd.add_quad(quad);
+        ctx.scn.add_quad(quad);
     }
 
     // Origin
-    ctx.rnd.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    ctx.rnd.debug_add_line(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    ctx.rnd.debug_add_line(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ctx.scn.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    ctx.scn.debug_add_line(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    ctx.scn.debug_add_line(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Whatever
-    ctx.rnd.debug_add_lines(
+    ctx.scn.debug_add_lines(
         {
             glm::vec3(0.0f, 6.0f, 0.0f),
             glm::vec3(2.0f, 7.0f, 0.0f),
@@ -266,38 +266,36 @@ void GameScene::on_update() {
     );
 
     // Point light
-    ctx.rnd.debug_add_lamp(point_light.position, point_light.diffuse_color);
+    ctx.scn.debug_add_lamp(point_light.position, point_light.diffuse_color);
 
     // Whatever part two
-    ctx.rnd.debug_add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
-
-    draw_bounding_box(shadow_left, shadow_right, shadow_bottom, shadow_top, 1.0f, shadow_far, directional_light.direction * -30.0f, directional_light.direction);
+    ctx.scn.debug_add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
 }
 
 void GameScene::on_imgui_update() {
-    ImGui::Begin("Directional Light");
-    ImGui::SliderFloat3("Direction", glm::value_ptr(directional_light.direction), -1.0f, 1.0f);
-    ImGui::SliderFloat3("Ambient", glm::value_ptr(directional_light.ambient_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse", glm::value_ptr(directional_light.diffuse_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Specular", glm::value_ptr(directional_light.specular_color), 0.0f, 1.0f);
-    ImGui::End();
+    // ImGui::Begin("Directional Light");
+    // ImGui::SliderFloat3("Direction", glm::value_ptr(directional_light.direction), -1.0f, 1.0f);
+    // ImGui::SliderFloat3("Ambient", glm::value_ptr(directional_light.ambient_color), 0.0f, 1.0f);
+    // ImGui::SliderFloat3("Diffuse", glm::value_ptr(directional_light.diffuse_color), 0.0f, 1.0f);
+    // ImGui::SliderFloat3("Specular", glm::value_ptr(directional_light.specular_color), 0.0f, 1.0f);
+    // ImGui::End();
 
-    ImGui::Begin("Point Light");
-    ImGui::SliderFloat3("Position", glm::value_ptr(point_light.position), -30.0f, 30.0f);
-    ImGui::SliderFloat3("Ambient", glm::value_ptr(point_light.ambient_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse", glm::value_ptr(point_light.diffuse_color), 0.0f, 1.0f);
-    ImGui::SliderFloat3("Specular", glm::value_ptr(point_light.specular_color), 0.0f, 1.0f);
-    ImGui::SliderFloat("Falloff L", &point_light.falloff_linear, 0.0001f, 1.0f);
-    ImGui::SliderFloat("Falloff Q", &point_light.falloff_quadratic, 0.00001f, 1.0f);
-    ImGui::End();
+    // ImGui::Begin("Point Light");
+    // ImGui::SliderFloat3("Position", glm::value_ptr(point_light.position), -30.0f, 30.0f);
+    // ImGui::SliderFloat3("Ambient", glm::value_ptr(point_light.ambient_color), 0.0f, 1.0f);
+    // ImGui::SliderFloat3("Diffuse", glm::value_ptr(point_light.diffuse_color), 0.0f, 1.0f);
+    // ImGui::SliderFloat3("Specular", glm::value_ptr(point_light.specular_color), 0.0f, 1.0f);
+    // ImGui::SliderFloat("Falloff L", &point_light.falloff_linear, 0.0001f, 1.0f);
+    // ImGui::SliderFloat("Falloff Q", &point_light.falloff_quadratic, 0.00001f, 1.0f);
+    // ImGui::End();
 
-    ImGui::Begin("Shadow");
-    ImGui::SliderFloat("Left", &shadow_left, -100.0f, 100.0f);
-    ImGui::SliderFloat("Right", &shadow_right, -100.0f, 100.0f);
-    ImGui::SliderFloat("Bottom", &shadow_bottom, -100.0f, 100.0f);
-    ImGui::SliderFloat("Top", &shadow_top, -100.0f, 100.0f);
-    ImGui::SliderFloat("Far", &shadow_far, 2.0f, 150.0f);
-    ImGui::End();
+    // ImGui::Begin("Shadow");
+    // ImGui::SliderFloat("Left", &shadow_left, -100.0f, 100.0f);
+    // ImGui::SliderFloat("Right", &shadow_right, -100.0f, 100.0f);
+    // ImGui::SliderFloat("Bottom", &shadow_bottom, -100.0f, 100.0f);
+    // ImGui::SliderFloat("Top", &shadow_top, -100.0f, 100.0f);
+    // ImGui::SliderFloat("Far", &shadow_far, 2.0f, 150.0f);
+    // ImGui::End();
 
     ImGui::Begin("Quads");
     ImGui::SliderFloat2("Position", glm::value_ptr(pos), -500.0f, 500.0f);
@@ -719,82 +717,4 @@ void GameScene::load_material_instances() {
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.4f));
         material_instance->set_float("u_material.shininess"_H, 16.0f);
     }
-}
-
-void GameScene::draw_bounding_box(float left, float right, float bottom, float top, float near, float far, const glm::vec3& position, const glm::vec3& orientation) {
-    const glm::vec3 color {1.0f};
-    const glm::vec3 third {glm::cross(orientation, glm::vec3(0.0f, 1.0f, 0.0f))};
-    const glm::vec3 third2 {-glm::cross(orientation, glm::cross(orientation, glm::vec3(0.0f, 1.0f, 0.0f)))};
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * bottom,
-        position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * top,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * bottom,
-        position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * top,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * near + glm::normalize(third2) * bottom + glm::normalize(third) * left,
-        position + glm::normalize(orientation) * near + glm::normalize(third2) * bottom + glm::normalize(third) * right,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * near + glm::normalize(third2) * top + glm::normalize(third) * left,
-        position + glm::normalize(orientation) * near + glm::normalize(third2) * top + glm::normalize(third) * right,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * bottom,
-        position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * top,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * bottom,
-        position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * top,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * far + glm::normalize(third2) * bottom + glm::normalize(third) * left,
-        position + glm::normalize(orientation) * far + glm::normalize(third2) * bottom + glm::normalize(third) * right,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * far + glm::normalize(third2) * top + glm::normalize(third) * left,
-        position + glm::normalize(orientation) * far + glm::normalize(third2) * top + glm::normalize(third) * right,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * bottom,
-        position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * bottom,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * bottom,
-        position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * bottom,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * near + glm::normalize(third) * left + glm::normalize(third2) * top,
-        position + glm::normalize(orientation) * far + glm::normalize(third) * left + glm::normalize(third2) * top,
-        color
-    );
-
-    ctx.rnd.debug_add_line(
-        position + glm::normalize(orientation) * near + glm::normalize(third) * right + glm::normalize(third2) * top,
-        position + glm::normalize(orientation) * far + glm::normalize(third) * right + glm::normalize(third2) * top,
-        color
-    );
 }

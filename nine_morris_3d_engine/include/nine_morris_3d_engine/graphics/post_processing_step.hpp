@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <utility>
 
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
@@ -9,7 +8,7 @@
 
 namespace sm {
     class Renderer;
-    struct PostProcessingContext;
+    class PostProcessingContext;
 
     // Extend this class for every step of the post processing pipeline
     // Pointers of post processing steps should be retained as a resource
@@ -28,18 +27,6 @@ namespace sm {
     protected:
         std::shared_ptr<GlFramebuffer> framebuffer;
         std::unique_ptr<GlShader> shader;
-
-        friend class Renderer;
-    };
-
-    class PostProcessingContext {
-    private:
-        PostProcessingContext() = default;
-    public:
-        std::vector<std::shared_ptr<PostProcessingStep>> steps;
-        std::vector<unsigned int> textures;  // All textures in order
-        unsigned int last_texture {};  // Last texture at any moment in the processing pipeline
-        unsigned int original_texture {};
 
         friend class Renderer;
     };

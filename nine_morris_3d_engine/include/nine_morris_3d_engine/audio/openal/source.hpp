@@ -22,9 +22,9 @@ namespace sm {
 
         float get_gain() const { return gain; }
         float get_pitch() const { return pitch; }
-        const glm::vec3& get_position() const { return position; }
-        const glm::vec3& get_velocity() const { return velocity; }
-        const glm::vec3& get_direction() const { return direction; }
+        glm::vec3 get_position() const { return position; }
+        glm::vec3 get_velocity() const { return velocity; }
+        glm::vec3 get_direction() const { return direction; }
         bool get_looping() const { return looping; }
         float get_rolloff_factor() const { return rolloff_factor; }
         float get_reference_distance() const { return reference_distance; }
@@ -34,9 +34,9 @@ namespace sm {
 
         void set_gain(float gain);
         void set_pitch(float pitch);
-        void set_position(const glm::vec3& position);
-        void set_velocity(const glm::vec3& velocity);
-        void set_direction(const glm::vec3& direction);
+        void set_position(glm::vec3 position);
+        void set_velocity(glm::vec3 velocity);
+        void set_direction(glm::vec3 direction);
         void set_looping(bool looping);
         void set_rolloff_factor(float rolloff_factor);
         void set_reference_distance(float reference_distance);

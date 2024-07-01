@@ -68,11 +68,12 @@ namespace sm {
             ctx.tsk.update();
 
             if (!minimized) {
-                ctx.rnd.render(ctx.win.get_width(), ctx.win.get_height());
+                ctx.dbg.add_lines(ctx.scn);
+                ctx.rnd.render(ctx.scn, ctx.win.get_width(), ctx.win.get_height());
                 dear_imgui_render();
             }
 
-            ctx.rnd.clear();
+            ctx.scn.clear();
 
             ctx.win.update();
             ctx.evt.update();
@@ -159,12 +160,15 @@ namespace sm {
 
     void Application::dear_imgui_render() {
         imgui_context::begin_frame();
+
         current_scene->on_imgui_update();
+        ctx.dbg.render_dear_imgui(ctx.scn);
+
         imgui_context::end_frame();
     }
 
     void Application::setup_start_scene(Id start_scene_id) {
-        for (const std::unique_ptr<Scene>& scene : scenes) {
+        for (const std::unique_ptr<ApplicationScene>& scene : scenes) {
             if (scene->id == start_scene_id) {
                 current_scene = scene.get();
             }

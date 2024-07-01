@@ -39,9 +39,9 @@ namespace sm {
         void upload_uniform_int_array(Id name, const std::vector<int>& values) const;
         void upload_uniform_float(Id name, float value) const;
         void upload_uniform_vec2(Id name, glm::vec2 vector) const;
-        void upload_uniform_vec3(Id name, const glm::vec3& vector) const;
+        void upload_uniform_vec3(Id name, glm::vec3 vector) const;
         void upload_uniform_vec3_array(Id name, const std::vector<glm::vec3>& vectors) const;
-        void upload_uniform_vec4(Id name, const glm::vec4& vector) const;
+        void upload_uniform_vec4(Id name, glm::vec4 vector) const;
 
         unsigned int get_id() const { return program; }
 

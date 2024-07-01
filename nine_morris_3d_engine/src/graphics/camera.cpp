@@ -3,12 +3,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace sm {
-    void Camera::set_position_orientation(const glm::vec3& position, const glm::vec3& at, const glm::vec3& up) {
+    void Camera::set_position_orientation(glm::vec3 position, glm::vec3 at, glm::vec3 up) {
         view_matrix = glm::lookAt(position, at, up);
         projection_view_matrix = projection_matrix * view_matrix;
     }
 
-    void Camera::set_position_rotation(const glm::vec3& position, const glm::vec3& rotation) {
+    void Camera::set_position_rotation(glm::vec3 position, glm::vec3 rotation) {
         glm::mat4 matrix {1.0f};
         matrix = glm::translate(matrix, position);
         matrix = glm::rotate(matrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));

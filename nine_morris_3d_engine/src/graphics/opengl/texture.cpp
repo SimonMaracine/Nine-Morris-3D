@@ -89,7 +89,7 @@ namespace sm {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_to_int(specification.wrap_t));
 
         if (specification.border_color != std::nullopt) {
-            const glm::vec4& color {*specification.border_color};
+            glm::vec4 color {*specification.border_color};
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
         }
     }

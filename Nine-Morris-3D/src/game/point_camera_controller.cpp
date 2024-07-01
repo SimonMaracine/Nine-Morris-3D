@@ -40,7 +40,7 @@ PointCameraController::PointCameraController(
     float fov,
     float near,
     float far,
-    const glm::vec3& point,
+    glm::vec3 point,
     float distance_to_point,
     float pitch,
     float sensitivity
@@ -147,7 +147,7 @@ void PointCameraController::update_friction() {
     zoom_velocity *= 0.81f;
 }
 
-void PointCameraController::set_position(const glm::vec3& position) {
+void PointCameraController::set_position(glm::vec3 position) {
     this->position = position;
 
     // Calculate distance to point
@@ -168,7 +168,7 @@ void PointCameraController::set_position(const glm::vec3& position) {
     movement.auto_move_zoom = false;
 }
 
-void PointCameraController::go_towards_position(const glm::vec3& position) {
+void PointCameraController::go_towards_position(glm::vec3 position) {
     movement.cached_towards_position = position;
     movement.dont_auto_call_go_towards_position = false;
 
@@ -209,7 +209,7 @@ void PointCameraController::on_mouse_moved(const sm::MouseMovedEvent& event) {
     mouse_input.last_mouse_y = event.mouse_y;
 }
 
-void PointCameraController::go_towards_position_x(const glm::vec3& direction) {
+void PointCameraController::go_towards_position_x(glm::vec3 direction) {
     float integer_angle;
     const float fract {
         glm::modf(180.0f - glm::degrees(glm::atan(-direction.x, direction.z)), integer_angle)
@@ -234,7 +234,7 @@ void PointCameraController::go_towards_position_x(const glm::vec3& direction) {
     x_velocity = 0.0f;
 }
 
-void PointCameraController::go_towards_position_y(const glm::vec3& direction) {
+void PointCameraController::go_towards_position_y(glm::vec3 direction) {
     movement.target_pitch = glm::degrees(glm::asin(direction.y));
 
     movement.auto_y_velocity = (movement.target_pitch - pitch) * Y_BASE_VELOCITY;
@@ -243,7 +243,7 @@ void PointCameraController::go_towards_position_y(const glm::vec3& direction) {
     y_velocity = 0.0f;
 }
 
-void PointCameraController::go_towards_position_zoom(const glm::vec3& position) {
+void PointCameraController::go_towards_position_zoom(glm::vec3 position) {
     movement.target_distance_to_point = glm::length(position - point);
 
     movement.auto_zoom_velocity = (movement.target_distance_to_point - distance_to_point) * ZOOM_BASE_VELOCITY;

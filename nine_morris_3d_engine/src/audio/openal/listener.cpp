@@ -17,7 +17,7 @@ namespace sm {
         this->gain = gain;
     }
 
-    void AlListener::set_position(const glm::vec3& position) {
+    void AlListener::set_position(glm::vec3 position) {
         alListener3f(AL_POSITION, position.x, position.y, position.z);
 
         openal_debug::check_errors();
@@ -25,7 +25,7 @@ namespace sm {
         this->position = position;
     }
 
-    void AlListener::set_velocity(const glm::vec3& velocity) {
+    void AlListener::set_velocity(glm::vec3 velocity) {
         alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
         openal_debug::check_errors();
@@ -33,7 +33,7 @@ namespace sm {
         this->velocity = velocity;
     }
 
-    void AlListener::set_look_at_and_up(const glm::vec3& look_at, const glm::vec3& up) {
+    void AlListener::set_look_at_and_up(glm::vec3 look_at, glm::vec3 up) {
         const float orientation[6] {
             look_at.x,
             look_at.y,

@@ -13,7 +13,7 @@ namespace sm {
     void Ctx::change_scene(Id id) {
         assert(application->next_scene == nullptr);
 
-        for (const std::unique_ptr<Scene>& scene : application->scenes) {
+        for (const std::unique_ptr<ApplicationScene>& scene : application->scenes) {
             if (scene->id == id) {
                 application->next_scene = scene.get();
                 return;
@@ -23,7 +23,7 @@ namespace sm {
         assert(false);
     }
 
-    void Ctx::add_info_text() {
+    void Ctx::show_info_text() {
         std::string info_text;
         info_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_opengl_version())) + '\n';
         info_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_glsl_version())) + '\n';
@@ -36,6 +36,6 @@ namespace sm {
         text.text = std::move(info_text);
         text.color = glm::vec3(1.0f);
 
-        rnd.add_text(text);
+        scn.add_text(text);
     }
 }

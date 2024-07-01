@@ -87,7 +87,7 @@ namespace sm {
         glUniform2f(location, vector.x, vector.y);
     }
 
-    void GlShader::upload_uniform_vec3(Id name, const glm::vec3& vector) const {
+    void GlShader::upload_uniform_vec3(Id name, glm::vec3 vector) const {
         const int location {get_uniform_location(name)};
         glUniform3f(location, vector.x, vector.y, vector.z);
     }
@@ -97,7 +97,7 @@ namespace sm {
         glUniform3fv(location, static_cast<int>(vectors.size()), glm::value_ptr(vectors.front()));
     }
 
-    void GlShader::upload_uniform_vec4(Id name, const glm::vec4& vector) const {
+    void GlShader::upload_uniform_vec4(Id name, glm::vec4 vector) const {
         const int location {get_uniform_location(name)};
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
     }

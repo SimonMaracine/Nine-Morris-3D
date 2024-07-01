@@ -53,9 +53,9 @@ namespace sm {
         void on_window_iconified(const WindowIconifiedEvent& event);
 
         // Scene system
-        std::vector<std::unique_ptr<Scene>> scenes;
-        Scene* current_scene {nullptr};
-        Scene* next_scene {nullptr};  // Next scene to enter
+        std::vector<std::unique_ptr<ApplicationScene>> scenes;
+        ApplicationScene* current_scene {nullptr};
+        ApplicationScene* next_scene {nullptr};  // Next scene to enter
 
         // Clock variables
         struct {
@@ -72,7 +72,7 @@ namespace sm {
         // Keep track of window state to skip rendering
         bool minimized {false};
 
-        friend class Scene;
+        friend class ApplicationScene;
         friend class Window;
         friend class Ctx;
     };
