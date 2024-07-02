@@ -25,6 +25,7 @@ struct GameScene : sm::ApplicationScene {
     PointCameraController cam_controller;
     sm::DirectionalLight directional_light;
     sm::PointLight point_light;
+    sm::Shadows shadows;
 
     sm::Renderable ground;
     sm::Renderable dragon1;
@@ -34,19 +35,13 @@ struct GameScene : sm::ApplicationScene {
     sm::Renderable brick;
     sm::Renderable lamp_stand;
     sm::Renderable lamp_bulb;
-    sm::Text text;
+    sm::Text text1;
+    sm::Text text2;
+    sm::Text text3;
+    sm::Text text4;
     sm::Quad wait;
     sm::Quad white;
 
-    float shadow_left {-30.0f};
-    float shadow_right {30.0f};
-    float shadow_bottom {-30.0f};
-    float shadow_top {30.0f};
-    float shadow_near {0.1f};
-    float shadow_far {35.0f};
-
-    glm::vec2 pos {};
-    float scl {1.0f};
     bool sky {true};
     bool blur {false};
     bool outline {true};

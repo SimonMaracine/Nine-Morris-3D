@@ -35,4 +35,14 @@ namespace sm {
         600      1.0      0.007  0.0002
         3250     1.0      0.0014 0.000007 - not useful
     */
+
+    struct Shadows {
+        float left {};
+        float right {};
+        float bottom {};
+        float top {};
+        float near {};
+        float far {};
+        glm::vec3 position {};
+    };
 }

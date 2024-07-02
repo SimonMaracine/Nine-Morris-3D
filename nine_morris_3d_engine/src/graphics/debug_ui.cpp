@@ -1,5 +1,7 @@
 #include "nine_morris_3d_engine/graphics/debug_ui.hpp"
 
+#include <cstring>
+
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 
@@ -8,18 +10,33 @@
 namespace sm {
     void DebugUi::render_dear_imgui(Scene& scene) {
         if (ImGui::Begin("Debug")) {
-            ImGui::Checkbox("Shadows", &shadows);
+            ImGui::Checkbox("Renderables", &renderables);
             ImGui::Checkbox("Lights", &lights);
+            ImGui::Checkbox("Shadows", &shadows);
+            ImGui::Checkbox("Texts", &texts);
+            ImGui::Checkbox("Quads", &quads);
         }
 
         ImGui::End();
+
+        if (renderables) {
+            draw_renderables(scene);
+        }
+
+        if (lights) {
+            draw_lights(scene);
+        }
 
         if (shadows) {
             draw_shadows(scene);
         }
 
-        if (lights) {
-            draw_lights(scene);
+        if (texts) {
+            draw_texts(scene);
+        }
+
+        if (quads) {
+            draw_quads(scene);
         }
     }
 
@@ -27,27 +44,33 @@ namespace sm {
         if (shadows) {
             draw_shadows_lines(
                 scene,
-                *scene.debug.light_space.left,
-                *scene.debug.light_space.right,
-                *scene.debug.light_space.bottom,
-                *scene.debug.light_space.top,
-                *scene.debug.light_space.near,
-                *scene.debug.light_space.far,
-                *scene.debug.light_space.position,
+                scene.debug.shadows->left,
+                scene.debug.shadows->right,
+                scene.debug.shadows->bottom,
+                scene.debug.shadows->top,
+                scene.debug.shadows->near,
+                scene.debug.shadows->far,
+                scene.debug.shadows->position,
                 scene.debug.directional_light->direction
             );
         }
     }
 
-    void DebugUi::draw_shadows(Scene& scene) {
-        if (ImGui::Begin("Debug Shadows")) {
-            ImGui::SliderFloat("Left", scene.debug.light_space.left, -500.0f, 0.0f);
-            ImGui::SliderFloat("Right", scene.debug.light_space.right, 0.0f, 500.0f);
-            ImGui::SliderFloat("Bottom", scene.debug.light_space.bottom, -500.0f, 0.0f);
-            ImGui::SliderFloat("Top", scene.debug.light_space.top, 0.0f, 500.0f);
-            ImGui::SliderFloat("Near", scene.debug.light_space.near, 0.1f, 2.0f);
-            ImGui::SliderFloat("Far", scene.debug.light_space.far, 2.0f, 500.0f);
-            ImGui::Text("Position %f, %f, %f", scene.debug.light_space.position->x, scene.debug.light_space.position->y, scene.debug.light_space.position->z);
+    void DebugUi::draw_renderables(Scene& scene) {
+        if (ImGui::Begin("Debug Renderables")) {
+            int index {};  // TODO C++20
+
+            for (Renderable* renderable : scene.debug.renderables) {
+                ImGui::PushID(index);
+                ImGui::Text("Renderable %d", index);
+                ImGui::DragFloat3("Position", glm::value_ptr(renderable->transform.position), 1.0f, -200.0f, 200.0f);
+                ImGui::DragFloat3("Rotation", glm::value_ptr(renderable->transform.rotation), 1.0f, 0.0f, 360.0f);
+                ImGui::DragFloat("Scale", &renderable->transform.scale, 1.0f, 0.0f, 100.0f);
+                ImGui::PopID();
+                ImGui::Spacing();
+
+                index++;
+            }
         }
 
         ImGui::End();
@@ -55,10 +78,10 @@ namespace sm {
 
     void DebugUi::draw_lights(Scene& scene) {
         if (ImGui::Begin("Debug Directional Light")) {
-            ImGui::SliderFloat3("Direction", glm::value_ptr(scene.debug.directional_light->direction), -1.0f, 1.0f);
-            ImGui::SliderFloat3("Ambient", glm::value_ptr(scene.debug.directional_light->ambient_color), 0.0f, 1.0f);
-            ImGui::SliderFloat3("Diffuse", glm::value_ptr(scene.debug.directional_light->diffuse_color), 0.0f, 1.0f);
-            ImGui::SliderFloat3("Specular", glm::value_ptr(scene.debug.directional_light->specular_color), 0.0f, 1.0f);
+            ImGui::DragFloat3("Direction", glm::value_ptr(scene.debug.directional_light->direction), 1.0f, -1.0f, 1.0f);
+            ImGui::DragFloat3("Ambient", glm::value_ptr(scene.debug.directional_light->ambient_color), 1.0f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.debug.directional_light->diffuse_color), 1.0f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Specular", glm::value_ptr(scene.debug.directional_light->specular_color), 1.0f, 0.0f, 1.0f);
         }
 
         ImGui::End();
@@ -67,16 +90,77 @@ namespace sm {
             int index {};  // TODO C++20
 
             for (PointLight* point_light : scene.debug.point_lights) {
-                ImGui::PushID(index++);
+                ImGui::PushID(index);
                 ImGui::Text("Light %d", index);
-                ImGui::SliderFloat3("Position", glm::value_ptr(point_light->position), -30.0f, 30.0f);
-                ImGui::SliderFloat3("Ambient", glm::value_ptr(point_light->ambient_color), 0.0f, 1.0f);
-                ImGui::SliderFloat3("Diffuse", glm::value_ptr(point_light->diffuse_color), 0.0f, 1.0f);
-                ImGui::SliderFloat3("Specular", glm::value_ptr(point_light->specular_color), 0.0f, 1.0f);
-                ImGui::SliderFloat("Falloff L", &point_light->falloff_linear, 0.0001f, 1.0f);
-                ImGui::SliderFloat("Falloff Q", &point_light->falloff_quadratic, 0.00001f, 1.0f);
+                ImGui::DragFloat3("Position", glm::value_ptr(point_light->position), 1.0f, -30.0f, 30.0f);
+                ImGui::DragFloat3("Ambient", glm::value_ptr(point_light->ambient_color), 1.0f, 0.0f, 1.0f);
+                ImGui::DragFloat3("Diffuse", glm::value_ptr(point_light->diffuse_color), 1.0f, 0.0f, 1.0f);
+                ImGui::DragFloat3("Specular", glm::value_ptr(point_light->specular_color), 1.0f, 0.0f, 1.0f);
+                ImGui::DragFloat("Falloff L", &point_light->falloff_linear, 1.0f, 0.0001f, 1.0f);
+                ImGui::DragFloat("Falloff Q", &point_light->falloff_quadratic, 1.0f, 0.00001f, 1.0f);
                 ImGui::PopID();
                 ImGui::Spacing();
+
+                index++;
+            }
+        }
+
+        ImGui::End();
+    }
+
+    void DebugUi::draw_shadows(Scene& scene) {
+        if (ImGui::Begin("Debug Shadows")) {
+            ImGui::DragFloat("Left", &scene.debug.shadows->left, 1.0f, -500.0f, 0.0f);
+            ImGui::DragFloat("Right", &scene.debug.shadows->right, 1.0f, 0.0f, 500.0f);
+            ImGui::DragFloat("Bottom", &scene.debug.shadows->bottom, 1.0f, -500.0f, 0.0f);
+            ImGui::DragFloat("Top", &scene.debug.shadows->top, 1.0f, 0.0f, 500.0f);
+            ImGui::DragFloat("Near", &scene.debug.shadows->near, 1.0f, 0.1f, 2.0f);
+            ImGui::DragFloat("Far", &scene.debug.shadows->far, 1.0f, 2.0f, 500.0f);
+            ImGui::Text("Position %f, %f, %f", scene.debug.shadows->position.x, scene.debug.shadows->position.y, scene.debug.shadows->position.z);
+        }
+
+        ImGui::End();
+    }
+
+    void DebugUi::draw_texts(Scene& scene) {
+        if (ImGui::Begin("Debug Texts")) {
+            int index {};  // TODO C++20
+
+            for (Text* text : scene.debug.texts) {
+                char buffer[512] {};
+                std::strncpy(buffer, text->text.c_str(), sizeof(buffer));
+
+                ImGui::PushID(index);
+                ImGui::Text("Text %d", index);
+                ImGui::DragFloat2("Position", glm::value_ptr(text->position), 1.0f, -2000.0f, 2000.0f);
+                ImGui::DragFloat("Scale", &text->scale, 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat3("Color", glm::value_ptr(text->color), 1.0f, 0.0f, 1.0f);
+                ImGui::InputTextMultiline("Text", buffer, sizeof(buffer));
+                ImGui::PopID();
+                ImGui::Spacing();
+
+                text->text = buffer;
+
+                index++;
+            }
+        }
+
+        ImGui::End();
+    }
+
+    void DebugUi::draw_quads(Scene& scene) {
+        if (ImGui::Begin("Debug Quads")) {
+            int index {};  // TODO C++20
+
+            for (Quad* quad : scene.debug.quads) {
+                ImGui::PushID(index);
+                ImGui::Text("Quad %d", index);
+                ImGui::DragFloat2("Position", glm::value_ptr(quad->position), 1.0f, -2000.0f, 2000.0f);
+                ImGui::DragFloat2("Scale", glm::value_ptr(quad->scale), 0.01f, 0.0f, 1.0f);
+                ImGui::PopID();
+                ImGui::Spacing();
+
+                index++;
             }
         }
 

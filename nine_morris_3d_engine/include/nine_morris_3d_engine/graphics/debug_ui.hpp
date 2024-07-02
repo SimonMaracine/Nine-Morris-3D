@@ -11,10 +11,15 @@ namespace sm {
     private:
         DebugUi() = default;
 
-        void render_dear_imgui(Scene& scene);  // TODO camera, renderables, other
+        void render_dear_imgui(Scene& scene);
         void add_lines(Scene& scene);
-        void draw_shadows(Scene& scene);
+
+        void draw_renderables(Scene& scene);
         void draw_lights(Scene& scene);
+        void draw_shadows(Scene& scene);
+        void draw_texts(Scene& scene);
+        void draw_quads(Scene& scene);
+
         void draw_shadows_lines(
             Scene& scene,
             float left,
@@ -27,8 +32,11 @@ namespace sm {
             glm::vec3 orientation
         );
 
-        bool shadows {false};
+        bool renderables {false};
         bool lights {false};
+        bool shadows {false};
+        bool texts {false};
+        bool quads {false};
 
         friend class Application;
         friend class Ctx;

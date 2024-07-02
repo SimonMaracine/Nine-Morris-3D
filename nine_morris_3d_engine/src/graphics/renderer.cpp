@@ -302,7 +302,7 @@ namespace sm {
             const auto uniform_buffer {storage.wview_position_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
-                uniform_buffer->set(&scene.camera.position, "u_view_position"_H);
+                uniform_buffer->set(&scene.camera_position, "u_view_position"_H);
             }
         }
         {
@@ -553,8 +553,8 @@ namespace sm {
         });
 
         std::sort(outline_renderables.begin(), outline_renderables.end(), [&](const Renderable& lhs, const Renderable& rhs) {
-            const float distance_left {glm::distance(lhs.transform.position, scene.camera.position)};
-            const float distance_right {glm::distance(rhs.transform.position, scene.camera.position)};
+            const float distance_left {glm::distance(lhs.transform.position, scene.camera_position)};
+            const float distance_right {glm::distance(rhs.transform.position, scene.camera_position)};
 
             return distance_left < distance_right;
         });
@@ -823,8 +823,8 @@ namespace sm {
             point_lights.begin(),
             point_lights.end(),
             [&](const PointLight& lhs, const PointLight& rhs) {
-                const float distance_left {glm::distance(lhs.position, scene.camera.position)};
-                const float distance_right {glm::distance(rhs.position, scene.camera.position)};
+                const float distance_left {glm::distance(lhs.position, scene.camera_position)};
+                const float distance_right {glm::distance(rhs.position, scene.camera_position)};
 
                 return distance_left < distance_right;
             }
@@ -852,18 +852,18 @@ namespace sm {
     void Renderer::setup_light_space_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         const glm::mat4 projection {
             glm::ortho(
-                scene.light_space.left,
-                scene.light_space.right,
-                scene.light_space.bottom,
-                scene.light_space.top,
-                scene.light_space.near,
-                scene.light_space.far
+                scene.shadows.left,
+                scene.shadows.right,
+                scene.shadows.bottom,
+                scene.shadows.top,
+                scene.shadows.near,
+                scene.shadows.far
             )
         };
 
         const glm::mat4 view {
             glm::lookAt(
-                scene.light_space.position,
+                scene.shadows.position,
                 scene.directional_light.direction,
                 glm::vec3(0.0f, 1.0f, 0.0f)
             )

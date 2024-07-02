@@ -5,113 +5,67 @@
 
 namespace sm {
     void Scene::capture(const Camera& camera, glm::vec3 position) {
-        this->camera.view_matrix = camera.view_matrix;
-        this->camera.projection_matrix = camera.projection_matrix;
-        this->camera.projection_view_matrix = camera.projection_view_matrix;
-        this->camera.position = position;
-    }
-
-    void Scene::capture(const Camera& camera, glm::vec3* position) {
-        capture(camera, *position);
-
-#ifndef SM_BUILD_DISTRIBUTION
-        debug.camera.position = position;
-#endif;
+        this->camera = camera;
+        camera_position = position;
     }
 
     void Scene::capture(const Camera2D& camera_2d) {
-        this->camera_2d.projection_matrix = camera_2d.projection_matrix;
+        this->camera_2d = camera_2d;
     }
 
     void Scene::skybox(std::shared_ptr<GlTextureCubemap> texture) {
         skybox_texture = texture;
     }
 
-    void Scene::shadows(float left, float right, float bottom, float top, float near, float far, glm::vec3 position) {
-        light_space.left = left;
-        light_space.right = right;
-        light_space.bottom = bottom;
-        light_space.top = top;
-        light_space.near = near;
-        light_space.far = far;
-        light_space.position = position;
-    }
-
-    void Scene::shadows(float* left, float* right, float* bottom, float* top, float* near, float* far, glm::vec3* position) {
-        shadows(*left, *right, *bottom, *top, *near, *far, *position);
+    void Scene::shadow(Shadows& shadows) {
+        shadow(const_cast<const Shadows&>(shadows));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.light_space.left = left;
-        debug.light_space.right = right;
-        debug.light_space.bottom = bottom;
-        debug.light_space.top = top;
-        debug.light_space.near = near;
-        debug.light_space.far = far;
-        debug.light_space.position = position;
-#endif;
+        debug.shadows = &shadows;
+#endif
     }
 
     void Scene::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
         post_processing_steps.push_back(step);
     }
 
-    void Scene::add_renderable(const Renderable& renderable) {
-        renderables.push_back(renderable);
-    }
-
-    void Scene::add_renderable(Renderable* renderable) {
-        add_renderable(*renderable);
+    void Scene::add_renderable(Renderable& renderable) {
+        add_renderable(const_cast<const Renderable&>(renderable));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.renderables.push_back(renderable);
+        debug.renderables.push_back(&renderable);
 #endif
     }
 
-    void Scene::add_light(const DirectionalLight& light) {
-        directional_light = light;
-    }
-
-    void Scene::add_light(DirectionalLight* light) {
-        add_light(*light);
+    void Scene::add_light(DirectionalLight& light) {
+        add_light(const_cast<const DirectionalLight&>(light));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.directional_light = light;
+        debug.directional_light = &light;
 #endif
     }
 
-    void Scene::add_light(const PointLight& light) {
-        point_lights.push_back(light);
-    }
-
-    void Scene::add_light(PointLight* light) {
-        add_light(*light);
+    void Scene::add_light(PointLight& light) {
+        add_light(const_cast<const PointLight&>(light));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.point_lights.push_back(light);
+        debug.point_lights.push_back(&light);
 #endif
     }
 
-    void Scene::add_text(const Text& text) {
-        texts.push_back(text);
-    }
-
-    void Scene::add_text(Text* text) {
-        add_text(*text);
+    void Scene::add_text(Text& text) {
+        add_text(const_cast<const Text&>(text));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.texts.push_back(text);
+        debug.texts.push_back(&text);
 #endif
     }
 
-    void Scene::add_quad(const Quad& quad) {
-        quads.push_back(quad);
-    }
-
-    void Scene::add_quad(Quad* quad) {
-        add_quad(*quad);
+    void Scene::add_quad(Quad& quad) {
+        add_quad(const_cast<const Quad&>(quad));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.quads.push_back(quad);
+        debug.quads.push_back(&quad);
 #endif
     }
 
@@ -204,23 +158,46 @@ namespace sm {
         renderables.clear();
         directional_light = {};
         point_lights.clear();
+        shadows = {};
         texts.clear();
         quads.clear();
         skybox_texture = {};
         post_processing_steps.clear();
         camera = {};
         camera_2d = {};
-        light_space = {};
 
 #ifndef SM_BUILD_DISTRIBUTION
         debug.debug_lines.clear();
         debug.renderables.clear();
         debug.directional_light = {};
         debug.point_lights.clear();
+        debug.shadows = {};
         debug.texts.clear();
         debug.quads.clear();
-        debug.camera = {};
-        debug.light_space = {};
 #endif
+    }
+
+    void Scene::shadow(const Shadows& shadows) {
+        this->shadows = shadows;
+    }
+
+    void Scene::add_renderable(const Renderable& renderable) {
+        renderables.push_back(renderable);
+    }
+
+    void Scene::add_light(const DirectionalLight& light) {
+        directional_light = light;
+    }
+
+    void Scene::add_light(const PointLight& light) {
+        point_lights.push_back(light);
+    }
+
+    void Scene::add_text(const Text& text) {
+        texts.push_back(text);
+    }
+
+    void Scene::add_quad(const Quad& quad) {
+        quads.push_back(quad);
     }
 }

@@ -36,6 +36,7 @@ namespace sm {
         text.text = std::move(info_text);
         text.color = glm::vec3(1.0f);
 
-        scn.add_text(text);
+        // Don't add it to the debug lists
+        scn.add_text(const_cast<const Text&>(text));
     }
 }
