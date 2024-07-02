@@ -32,10 +32,6 @@ namespace sm {
         static Shadows shadows;  // FIXME
 
         const glm::mat4 view_matrix {
-            glm::lookAt(directional_light.direction * -50.0f, directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
-        };
-
-        const glm::mat4 view_matrix_origin {
             glm::lookAt(glm::vec3(0.0f), directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
         };
 
@@ -43,7 +39,7 @@ namespace sm {
         float max_x_negative {std::numeric_limits<float>::max()};
         float max_y_positive {std::numeric_limits<float>::min()};
         float max_y_negative {std::numeric_limits<float>::max()};
-        float max_z_positive_origin {std::numeric_limits<float>::min()};
+        float max_z_positive {std::numeric_limits<float>::min()};
         float max_z_negative {std::numeric_limits<float>::max()};
 
         for (const Renderable& renderable : renderables) {
@@ -52,23 +48,23 @@ namespace sm {
                 glm::length(glm::max(renderable.get_aabb().max, renderable.get_aabb().min)) * renderable.get_scale()
             };
 
-            const glm::vec3 position_origin {view_matrix_origin * glm::vec4(renderable.get_position(), 1.0f)};
-
             max_x_positive = glm::max(max_x_positive, position.x + radius);
             max_x_negative = glm::min(max_x_negative, position.x - radius);
             max_y_positive = glm::max(max_y_positive, position.y + radius);
             max_y_negative = glm::min(max_y_negative, position.y - radius);
-            max_z_positive_origin = glm::max(max_z_positive_origin, position_origin.z + radius);
+            max_z_positive = glm::max(max_z_positive, position.z + radius);
             max_z_negative = glm::min(max_z_negative, position.z - radius);
         }
 
-        shadows.position = glm::normalize(directional_light.direction) * -max_z_positive_origin;
         shadows.left = max_x_negative;
         shadows.right = max_x_positive;
         shadows.bottom = max_y_negative;
         shadows.top = max_y_positive;
-        // shadows.near = max_z_positive;
-        shadows.far = -max_z_negative;
+
+        // After calculating some bound values, offset the position according to those values
+        shadows.position = glm::normalize(directional_light.direction) * -max_z_positive;
+        shadows.near = 1.0f;
+        shadows.far = -max_z_negative + max_z_positive;
 
         this->shadows = shadows;
 
