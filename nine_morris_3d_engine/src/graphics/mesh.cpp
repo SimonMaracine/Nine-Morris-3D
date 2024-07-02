@@ -130,7 +130,7 @@ namespace sm {
     }
 
     Mesh::Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding) {
-        unsigned int flags {aiProcess_ValidateDataStructure};
+        unsigned int flags {aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes};
 
         if (flip_winding) {
             flags |= aiProcess_FlipWindingOrder;
@@ -160,6 +160,9 @@ namespace sm {
         }
 
         load(type, mesh);
+
+        aabb.min = glm::vec3(mesh->mAABB.mMin.x, mesh->mAABB.mMin.y, mesh->mAABB.mMin.z);
+        aabb.max = glm::vec3(mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z);
     }
 
     Mesh::~Mesh() {

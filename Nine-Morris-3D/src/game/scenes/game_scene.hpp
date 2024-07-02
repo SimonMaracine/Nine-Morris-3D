@@ -19,6 +19,7 @@ struct GameScene : sm::ApplicationScene {
     void load_textures();
     void load_materials();
     void load_material_instances();
+    void setup_renderables();
 
     sm::Camera cam;
     sm::Camera2D cam_2d;

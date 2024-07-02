@@ -36,7 +36,7 @@ namespace sm {
         resmanager::Cache<Material> material;
         resmanager::Cache<MaterialInstance> material_instance;
         resmanager::Cache<TextureData> texture_data;
-        // resmanager::Cache<Mesh> mesh;
+        resmanager::Cache<Mesh> mesh;
         // resmanager::Cache<AlSource> al_source;
         // resmanager::Cache<AlBuffer> al_buffer;
         // resmanager::Cache<SoundData> sound_data;

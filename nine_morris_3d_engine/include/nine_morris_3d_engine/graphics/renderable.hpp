@@ -7,34 +7,38 @@
 
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 #include "nine_morris_3d_engine/graphics/material.hpp"
+#include "nine_morris_3d_engine/graphics/mesh.hpp"
 #include "nine_morris_3d_engine/graphics/font.hpp"
+#include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
-    // Right now every renderable is analogous to a mesh, to a render call
-    struct Renderable {
-        // struct Transform {  // FIXME
-        //     // Don't default initialize
-        //     glm::vec3 position;
-        //     glm::vec3 rotation;
-        //     float scale;  // Only uniform scaling
-        // };
+    class Renderer;
+    class DebugUi;
 
-        // void position(glm::vec3 position) {
-        //     std::get<0>(transform).position = position;
-        // }
+    class Renderable {
+    public:
+        Renderable() = default;
+        Renderable(std::shared_ptr<Mesh> mesh, std::shared_ptr<GlVertexArray> vertex_array, std::shared_ptr<MaterialInstance> material)
+            : mesh(mesh), vertex_array(vertex_array), material(material), aabb(mesh->get_aabb()) {}
 
-        // void rotation(glm::vec3 rotation) {
-        //     std::get<0>(transform).rotation = rotation;
-        // }
+        void set_position(glm::vec3 position) { transform.position = position; }
+        void set_rotation(glm::vec3 rotation) { transform.rotation = rotation; }
+        void set_scale(float scale) { transform.scale = scale; }
+        void set_x(float x) { transform.position.x = x; }
+        void set_y(float y) { transform.position.y = y; }
+        void set_z(float z) { transform.position.z = z; }
+        void set_rx(float rx) { transform.rotation.x = rx; }
+        void set_ry(float ry) { transform.rotation.y = ry; }
+        void set_rz(float rz) { transform.rotation.z = rz; }
 
-        // void scale(float scale) {
-        //     std::get<0>(transform).scale = scale;
-        // }
-
-        std::weak_ptr<GlVertexArray> vertex_array;
-        std::weak_ptr<MaterialInstance> material;
-
-        // std::variant<Transform, glm::mat4> transform;
+        glm::vec3 get_position() const { return transform.position; }
+        glm::vec3 get_rotation() const { return transform.rotation; }
+        float get_scale() const { return transform.scale; }
+        const utils::AABB& get_aabb() const { return aabb; }
+    private:
+        std::shared_ptr<Mesh> mesh;
+        std::shared_ptr<GlVertexArray> vertex_array;
+        std::shared_ptr<MaterialInstance> material;
 
         struct {
             glm::vec3 position {};
@@ -47,12 +51,15 @@ namespace sm {
             glm::vec3 offset {};
             float scale {1.05f};
         } outline;
+
+        utils::AABB aabb;  // FIXME think of a good solution
+
+        friend class Renderer;
+        friend class DebugUi;
     };
 
-    // Every piece of text is a render call too
     struct Text {
-        std::weak_ptr<Font> font;
-
+        std::shared_ptr<Font> font;
         std::string text;
         glm::vec2 position {};
         glm::vec3 color {};

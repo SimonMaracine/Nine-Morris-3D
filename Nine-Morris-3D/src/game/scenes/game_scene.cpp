@@ -47,6 +47,8 @@ void GameScene::on_start() {
         font->end_baking("sans");
     }
 
+    setup_renderables();
+
     cam_controller = PointCameraController(
         &cam,
         ctx.win.get_width(),
@@ -82,65 +84,6 @@ void GameScene::on_start() {
     shadows.top = 30.0f;
     shadows.near = 0.1f;
     shadows.far = 35.0f;
-
-    ground.vertex_array = ctx.res.vertex_array["ground"_H];
-    ground.material = ctx.res.material_instance["ground"_H];
-    ground.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
-    ground.transform.scale = 2.0f;
-
-    dragon1.vertex_array = ctx.res.vertex_array["dragon"_H];
-    dragon1.material = ctx.res.material_instance["dragon1"_H];
-    dragon1.transform.scale = 0.7f;
-    dragon1.outline.color = glm::vec3(0.2f, 0.1f, 1.0f);
-    dragon1.outline.offset = glm::vec3(0.04f, -0.2f, 0.0f);
-
-    dragon2 = dragon1;
-    dragon2.material = ctx.res.material_instance["dragon2"_H];
-    dragon2.transform.position = glm::vec3(4.0f, 0.0, 0.0f);
-    dragon2.transform.scale = 0.2f;
-
-    teapot.vertex_array = ctx.res.vertex_array["teapot"_H];
-    teapot.material = ctx.res.material_instance["teapot"_H];
-    teapot.transform.position = glm::vec3(2.6f, 0.0, -7.0f);
-    teapot.transform.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
-
-    cube.vertex_array = ctx.res.vertex_array["cube"_H];
-    cube.material = ctx.res.material_instance["cube"_H];
-    cube.transform.position = glm::vec3(5.0f, 2.0f, -2.0f);
-    cube.transform.scale = 0.8f;
-
-    brick.vertex_array = ctx.res.vertex_array["brick"_H];
-    brick.material = ctx.res.material_instance["brick"_H];
-    brick.transform.position = glm::vec3(6.0f);
-    brick.transform.rotation = glm::vec3(10.0f);
-
-    lamp_stand.vertex_array = ctx.res.vertex_array["lamp_stand"_H];
-    lamp_stand.material = ctx.res.material_instance["lamp_stand"_H];
-    lamp_stand.transform.position = glm::vec3(-6.0f, 0.0f, -6.0f);
-
-    lamp_bulb = lamp_stand;
-    lamp_bulb.vertex_array = ctx.res.vertex_array["lamp_bulb"_H];
-    lamp_bulb.material = ctx.res.material_instance["lamp_bulb"_H];
-
-    text1.font = ctx.res.font["sans"_H];
-    text1.text = "The quick brown fox jumps over the lazy dog.";
-    text1.color = glm::vec3(0.7f);
-
-    text2 = text1;
-    text2.position = glm::vec2(200.0f);
-    text2.color = glm::vec3(0.8f, 0.7f, 0.1f);
-
-    text3 = text1;
-    text3.position = glm::vec2(200.0f, 100.0f);
-    text3.color = glm::vec3(0.0f, 1.0f, 1.0f);
-
-    text4.font = ctx.res.font["sans"_H];
-
-    wait.texture = ctx.res.texture["wait_indicator"_H];
-    wait.position = glm::vec2(70.0f);
-
-    white.texture = ctx.res.texture["white_indicator"_H];
-    white.position = glm::vec2(210.0f, 210.0f);
 }
 
 void GameScene::on_update() {
@@ -154,7 +97,6 @@ void GameScene::on_update() {
     ctx.scn.add_light(directional_light);
     ctx.scn.add_light(point_light);
     shadows.position = directional_light.direction * -30.0f;
-    ctx.scn.shadow(shadows);
 
     if (sky) {
         ctx.scn.skybox(ctx.res.texture_cubemap["field"_H]);
@@ -246,6 +188,8 @@ void GameScene::on_update() {
 
     // Whatever part two
     ctx.scn.debug_add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
+
+    ctx.scn.shadow();
 }
 
 void GameScene::on_imgui_update() {
@@ -275,20 +219,21 @@ void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
 
 void GameScene::load_models() {
     {
-        const sm::Mesh mesh {
+        auto mesh {ctx.res.mesh.load(
+            "dragon"_H,
             sm::utils::read_file(ctx.fs.path_assets("models/dragon.obj")),
             "default",
             sm::Mesh::Type::PN
-        };
+        )};
 
         auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh.get_vertices(),
-            mesh.get_vertices_size()
+            mesh->get_vertices(),
+            mesh->get_vertices_size()
         )};
 
         auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh.get_indices(),
-            mesh.get_indices_size()
+            mesh->get_indices(),
+            mesh->get_indices_size()
         )};
 
         auto vertex_array {ctx.res.vertex_array.load("dragon"_H)};
@@ -303,20 +248,21 @@ void GameScene::load_models() {
     }
 
     {
-        const sm::Mesh mesh {
+        auto mesh {ctx.res.mesh.load(
+            "teapot"_H,
             sm::utils::read_file(ctx.fs.path_assets("models/teapot.obj")),
             sm::Mesh::DEFAULT_OBJECT,
             sm::Mesh::Type::PN
-        };
+        )};
 
         auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh.get_vertices(),
-            mesh.get_vertices_size()
+            mesh->get_vertices(),
+            mesh->get_vertices_size()
         )};
 
         auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh.get_indices(),
-            mesh.get_indices_size()
+            mesh->get_indices(),
+            mesh->get_indices_size()
         )};
 
         auto vertex_array {ctx.res.vertex_array.load("teapot"_H)};
@@ -331,20 +277,21 @@ void GameScene::load_models() {
     }
 
     {
-        const sm::Mesh mesh {
+        auto mesh {ctx.res.mesh.load(
+            "cube"_H,
             sm::utils::read_file(ctx.fs.path_assets("models/cube.obj")),
             "Cube",
             sm::Mesh::Type::PN
-        };
+        )};
 
         auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh.get_vertices(),
-            mesh.get_vertices_size()
+            mesh->get_vertices(),
+            mesh->get_vertices_size()
         )};
 
         auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh.get_indices(),
-            mesh.get_indices_size()
+            mesh->get_indices(),
+            mesh->get_indices_size()
         )};
 
         auto vertex_array {ctx.res.vertex_array.load("cube"_H)};
@@ -359,20 +306,21 @@ void GameScene::load_models() {
     }
 
     {
-        const sm::Mesh mesh {
+        auto mesh {ctx.res.mesh.load(
+            "brick"_H,
             sm::utils::read_file(ctx.fs.path_assets("models/brick.obj")),
             "Brick",
             sm::Mesh::Type::PNT
-        };
+        )};
 
         auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh.get_vertices(),
-            mesh.get_vertices_size()
+            mesh->get_vertices(),
+            mesh->get_vertices_size()
         )};
 
         auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh.get_indices(),
-            mesh.get_indices_size()
+            mesh->get_indices(),
+            mesh->get_indices_size()
         )};
 
         auto vertex_array {ctx.res.vertex_array.load("brick"_H)};
@@ -388,20 +336,21 @@ void GameScene::load_models() {
     }
 
     {
-        const sm::Mesh mesh {
+        auto mesh {ctx.res.mesh.load(
+            "lamp_stand"_H,
             sm::utils::read_file(ctx.fs.path_assets("models/lamp.obj")),
             "Stand",
             sm::Mesh::Type::PNT
-        };
+        )};
 
         auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh.get_vertices(),
-            mesh.get_vertices_size()
+            mesh->get_vertices(),
+            mesh->get_vertices_size()
         )};
 
         auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh.get_indices(),
-            mesh.get_indices_size()
+            mesh->get_indices(),
+            mesh->get_indices_size()
         )};
 
         auto vertex_array {ctx.res.vertex_array.load("lamp_stand"_H)};
@@ -417,20 +366,21 @@ void GameScene::load_models() {
     }
 
     {
-        const sm::Mesh mesh {
+        auto mesh {ctx.res.mesh.load(
+            "lamp_bulb"_H,
             sm::utils::read_file(ctx.fs.path_assets("models/lamp.obj")),
             "Bulb",
             sm::Mesh::Type::P
-        };
+        )};
 
         auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh.get_vertices(),
-            mesh.get_vertices_size()
+            mesh->get_vertices(),
+            mesh->get_vertices_size()
         )};
 
         auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh.get_indices(),
-            mesh.get_indices_size()
+            mesh->get_indices(),
+            mesh->get_indices_size()
         )};
 
         auto vertex_array {ctx.res.vertex_array.load("lamp_bulb"_H)};
@@ -444,20 +394,21 @@ void GameScene::load_models() {
     }
 
     {
-        const sm::Mesh mesh {
+        auto mesh {ctx.res.mesh.load(
+            "ground"_H,
             sm::utils::read_file(ctx.fs.path_assets("models/ground.obj")),
             "Cube",
             sm::Mesh::Type::PN
-        };
+        )};
 
         auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh.get_vertices(),
-            mesh.get_vertices_size()
+            mesh->get_vertices(),
+            mesh->get_vertices_size()
         )};
 
         auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh.get_indices(),
-            mesh.get_indices_size()
+            mesh->get_indices(),
+            mesh->get_indices_size()
         )};
 
         auto vertex_array {ctx.res.vertex_array.load("ground"_H)};
@@ -664,4 +615,57 @@ void GameScene::load_material_instances() {
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.4f));
         material_instance->set_float("u_material.shininess"_H, 16.0f);
     }
+}
+
+void GameScene::setup_renderables() {
+    ground = sm::Renderable(ctx.res.mesh["ground"_H], ctx.res.vertex_array["ground"_H], ctx.res.material_instance["ground"_H]);
+    ground.set_position(glm::vec3(0.0f, -1.0f, 0.0f));
+    ground.set_scale(2.0f);
+
+    dragon1 = sm::Renderable(ctx.res.mesh["dragon"_H], ctx.res.vertex_array["dragon"_H], ctx.res.material_instance["dragon1"_H]);
+    dragon1.set_scale(0.7f);
+    // dragon1.outline.color = glm::vec3(0.2f, 0.1f, 1.0f);  // TODO
+    // dragon1.outline.offset = glm::vec3(0.04f, -0.2f, 0.0f);
+
+    dragon2 = sm::Renderable(ctx.res.mesh["dragon"_H], ctx.res.vertex_array["dragon"_H], ctx.res.material_instance["dragon2"_H]);
+    dragon2.set_position(glm::vec3(4.0f, 0.0, 0.0f));
+    dragon2.set_scale(0.2f);
+
+    teapot = sm::Renderable(ctx.res.mesh["teapot"_H], ctx.res.vertex_array["teapot"_H], ctx.res.material_instance["teapot"_H]);
+    teapot.set_position(glm::vec3(2.6f, 0.0, -7.0f));
+    teapot.set_rotation(glm::vec3(0.0f, 5.3f, 0.0f));
+
+    cube = sm::Renderable(ctx.res.mesh["cube"_H], ctx.res.vertex_array["cube"_H], ctx.res.material_instance["cube"_H]);
+    cube.set_position(glm::vec3(5.0f, 2.0f, -2.0f));
+    cube.set_scale(0.8f);
+
+    brick = sm::Renderable(ctx.res.mesh["brick"_H], ctx.res.vertex_array["brick"_H], ctx.res.material_instance["brick"_H]);
+    brick.set_position(glm::vec3(6.0f));
+    brick.set_rotation(glm::vec3(10.0f));
+
+    lamp_stand = sm::Renderable(ctx.res.mesh["lamp_stand"_H], ctx.res.vertex_array["lamp_stand"_H], ctx.res.material_instance["lamp_stand"_H]);
+    lamp_stand.set_position(glm::vec3(-6.0f, 0.0f, -6.0f));
+
+    lamp_bulb = sm::Renderable(ctx.res.mesh["lamp_bulb"_H], ctx.res.vertex_array["lamp_bulb"_H], ctx.res.material_instance["lamp_bulb"_H]);
+    lamp_bulb.set_position(glm::vec3(-6.0f, 0.0f, -6.0f));
+
+    text1.font = ctx.res.font["sans"_H];
+    text1.text = "The quick brown fox jumps over the lazy dog.";
+    text1.color = glm::vec3(0.7f);
+
+    text2 = text1;
+    text2.position = glm::vec2(200.0f);
+    text2.color = glm::vec3(0.8f, 0.7f, 0.1f);
+
+    text3 = text1;
+    text3.position = glm::vec2(200.0f, 100.0f);
+    text3.color = glm::vec3(0.0f, 1.0f, 1.0f);
+
+    text4.font = ctx.res.font["sans"_H];
+
+    wait.texture = ctx.res.texture["wait_indicator"_H];
+    wait.position = glm::vec2(70.0f);
+
+    white.texture = ctx.res.texture["white_indicator"_H];
+    white.position = glm::vec2(210.0f, 210.0f);
 }

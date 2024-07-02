@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <string>
 
+#include "nine_morris_3d_engine/other/utilities.hpp"
+
 namespace sm {
     class Mesh {
     public:
@@ -27,6 +29,7 @@ namespace sm {
         const unsigned char* get_indices() const { return indices; }
         std::size_t get_vertices_size() const { return vertices_size; }
         std::size_t get_indices_size() const { return indices_size; }
+        const utils::AABB& get_aabb() const { return aabb; }
     private:
         void load(Type type, const void* pmesh);
         void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
@@ -36,5 +39,7 @@ namespace sm {
         unsigned char* indices {nullptr};
         std::size_t vertices_size {};
         std::size_t indices_size {};
+
+        utils::AABB aabb;
     };
 }

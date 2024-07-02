@@ -25,6 +25,7 @@ namespace sm {
         void capture(const Camera2D& camera_2d);
         void skybox(std::shared_ptr<GlTextureCubemap> texture);
         void shadow(Shadows& shadows);
+        void shadow();
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
 
         // 3D API

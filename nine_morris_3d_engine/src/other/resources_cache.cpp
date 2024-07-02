@@ -15,7 +15,7 @@ namespace sm {
         material.merge(other.material);
         material_instance.merge(other.material_instance);
         texture_data.merge(other.texture_data);
-        // mesh.merge(other.mesh);
+        mesh.merge(other.mesh);
         // al_source.merge(other.al_source);
         // al_buffer.merge(other.al_buffer);
         // sound_data.merge(other.sound_data);
@@ -36,7 +36,7 @@ namespace sm {
         material.merge_replace(other.material);
         material_instance.merge_replace(other.material_instance);
         texture_data.merge_replace(other.texture_data);
-        // mesh.merge_replace(other.mesh);
+        mesh.merge_replace(other.mesh);
         // al_source.merge_replace(other.al_source);
         // al_buffer.merge_replace(other.al_buffer);
         // sound_data.merge_replace(other.sound_data);
@@ -57,7 +57,7 @@ namespace sm {
         material.clear();
         material_instance.clear();
         texture_data.clear();
-        // mesh.clear();
+        mesh.clear();
         // al_source.clear();
         // al_buffer.clear();
         // sound_data.clear();

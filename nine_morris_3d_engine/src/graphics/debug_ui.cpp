@@ -64,8 +64,8 @@ namespace sm {
                 ImGui::PushID(index);
                 ImGui::Text("Renderable %d", index);
                 ImGui::DragFloat3("Position", glm::value_ptr(renderable->transform.position), 1.0f, -200.0f, 200.0f);
-                ImGui::DragFloat3("Rotation", glm::value_ptr(renderable->transform.rotation), 1.0f, 0.0f, 360.0f);
-                ImGui::DragFloat("Scale", &renderable->transform.scale, 1.0f, 0.0f, 100.0f);
+                ImGui::DragFloat3("Rotation", glm::value_ptr(renderable->transform.rotation), 1.0f, 0.0f, 360.0f);  // TODO
+                ImGui::DragFloat("Scale", &renderable->transform.scale, 0.1f, 0.0f, 100.0f);
                 ImGui::PopID();
                 ImGui::Spacing();
 
@@ -78,10 +78,10 @@ namespace sm {
 
     void DebugUi::draw_lights(Scene& scene) {
         if (ImGui::Begin("Debug Directional Light")) {
-            ImGui::DragFloat3("Direction", glm::value_ptr(scene.debug.directional_light->direction), 1.0f, -1.0f, 1.0f);
-            ImGui::DragFloat3("Ambient", glm::value_ptr(scene.debug.directional_light->ambient_color), 1.0f, 0.0f, 1.0f);
-            ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.debug.directional_light->diffuse_color), 1.0f, 0.0f, 1.0f);
-            ImGui::DragFloat3("Specular", glm::value_ptr(scene.debug.directional_light->specular_color), 1.0f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Direction", glm::value_ptr(scene.debug.directional_light->direction), 0.01f, -1.0f, 1.0f);
+            ImGui::DragFloat3("Ambient", glm::value_ptr(scene.debug.directional_light->ambient_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Diffuse", glm::value_ptr(scene.debug.directional_light->diffuse_color), 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Specular", glm::value_ptr(scene.debug.directional_light->specular_color), 0.01f, 0.0f, 1.0f);
         }
 
         ImGui::End();
@@ -93,11 +93,11 @@ namespace sm {
                 ImGui::PushID(index);
                 ImGui::Text("Light %d", index);
                 ImGui::DragFloat3("Position", glm::value_ptr(point_light->position), 1.0f, -30.0f, 30.0f);
-                ImGui::DragFloat3("Ambient", glm::value_ptr(point_light->ambient_color), 1.0f, 0.0f, 1.0f);
-                ImGui::DragFloat3("Diffuse", glm::value_ptr(point_light->diffuse_color), 1.0f, 0.0f, 1.0f);
-                ImGui::DragFloat3("Specular", glm::value_ptr(point_light->specular_color), 1.0f, 0.0f, 1.0f);
-                ImGui::DragFloat("Falloff L", &point_light->falloff_linear, 1.0f, 0.0001f, 1.0f);
-                ImGui::DragFloat("Falloff Q", &point_light->falloff_quadratic, 1.0f, 0.00001f, 1.0f);
+                ImGui::DragFloat3("Ambient", glm::value_ptr(point_light->ambient_color), 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat3("Diffuse", glm::value_ptr(point_light->diffuse_color), 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat3("Specular", glm::value_ptr(point_light->specular_color), 0.01f, 0.0f, 1.0f);
+                ImGui::DragFloat("Falloff L", &point_light->falloff_linear, 0.0001f, 0.0001f, 1.0f);
+                ImGui::DragFloat("Falloff Q", &point_light->falloff_quadratic, 0.00001f, 0.00001f, 1.0f);
                 ImGui::PopID();
                 ImGui::Spacing();
 

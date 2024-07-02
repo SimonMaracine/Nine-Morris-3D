@@ -508,7 +508,7 @@ namespace sm {
 
     void Renderer::draw_renderables(const Scene& scene) {
         for (const Renderable& renderable : scene.renderables) {
-            const auto material {renderable.material.lock()};
+            const auto material {renderable.material};
 
             if (material->flags & Material::Outline) {
                 continue;  // This one is rendered differently
@@ -527,8 +527,8 @@ namespace sm {
     }
 
     void Renderer::draw_renderable(const Renderable& renderable) {
-        const auto vertex_array {renderable.vertex_array.lock()};
-        const auto material {renderable.material.lock()};
+        const auto vertex_array {renderable.vertex_array};
+        const auto material {renderable.material};
 
         const glm::mat4 matrix {get_renderable_transform(renderable)};
 
@@ -545,7 +545,7 @@ namespace sm {
         std::vector<Renderable> outline_renderables;
 
         std::for_each(scene.renderables.cbegin(), scene.renderables.cend(), [&](const Renderable& renderable) {
-            const auto material {renderable.material.lock()};
+            const auto material {renderable.material};
 
             if (material->flags & Material::Outline) {
                 outline_renderables.push_back(renderable);
@@ -573,7 +573,7 @@ namespace sm {
         opengl::stencil_mask(0x00);
 
         {
-            const auto vertex_array {renderable.vertex_array.lock()};
+            const auto vertex_array {renderable.vertex_array};
 
             glm::mat4 matrix {get_renderable_transform(renderable)};
             matrix = glm::scale(matrix, glm::vec3(renderable.outline.scale));
@@ -600,8 +600,8 @@ namespace sm {
         storage.shadow_shader->bind();
 
         for (const Renderable& renderable : scene.renderables) {
-            const auto vertex_array {renderable.vertex_array.lock()};
-            const auto material {renderable.material.lock()};
+            const auto vertex_array {renderable.vertex_array};
+            const auto material {renderable.material};
 
             if (!(material->flags & Material::CastShadow)) {
                 continue;
@@ -643,13 +643,13 @@ namespace sm {
         auto texts {scene.texts};
 
         std::stable_sort(texts.begin(), texts.end(), [](const Text& lhs, const Text& rhs) {
-            return lhs.font.lock().get() < rhs.font.lock().get();
+            return lhs.font.get() < rhs.font.get();
         });
 
         const void* font_ptr {nullptr};  // TODO C++20
 
         for (const auto& text : texts) {
-            const void* this_ptr {text.font.lock().get()};
+            const void* this_ptr {text.font.get()};
 
             assert(this_ptr != nullptr);
 
@@ -894,16 +894,6 @@ namespace sm {
 
     glm::mat4 Renderer::get_renderable_transform(const Renderable& renderable) {
         glm::mat4 matrix {1.0f};
-
-        // if (renderable.transform.index() == 0) {  // FIXME
-        //     matrix = glm::translate(matrix, std::get<0>(renderable.transform).position);
-        //     matrix = glm::rotate(matrix, std::get<0>(renderable.transform).rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        //     matrix = glm::rotate(matrix, std::get<0>(renderable.transform).rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        //     matrix = glm::rotate(matrix, std::get<0>(renderable.transform).rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        //     matrix = glm::scale(matrix, glm::vec3(std::get<0>(renderable.transform).scale));
-        // } else {
-        //     matrix = std::get<1>(renderable.transform);
-        // }
 
         matrix = glm::translate(matrix, renderable.transform.position);
         matrix = glm::rotate(matrix, renderable.transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
