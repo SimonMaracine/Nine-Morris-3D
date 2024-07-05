@@ -24,8 +24,7 @@ namespace sm {
         void capture(const Camera& camera, glm::vec3 position);
         void capture(const Camera2D& camera_2d);
         void skybox(std::shared_ptr<GlTextureCubemap> texture);
-        void shadow(Shadows& shadows);
-        void shadow();
+        void shadow(ShadowBox& box);
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
 
         // 3D API
@@ -46,7 +45,7 @@ namespace sm {
 
         void clear();
     private:
-        void shadow(const Shadows& shadows);
+        void shadow(const ShadowBox& box);
         void add_renderable(const Renderable& renderable);
         void add_light(const DirectionalLight& light);
         void add_light(const PointLight& light);
@@ -56,15 +55,13 @@ namespace sm {
         std::vector<Renderable> renderables;
         DirectionalLight directional_light;
         std::vector<PointLight> point_lights;
-        Shadows shadows;
+        ShadowBox shadow_box;
         std::vector<Text> texts;
         std::vector<Quad> quads;
         std::vector<std::shared_ptr<PostProcessingStep>> post_processing_steps;
         std::shared_ptr<GlTextureCubemap> skybox_texture;
-
         Camera camera;
         glm::vec3 camera_position {};
-
         Camera2D camera_2d;
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -73,7 +70,7 @@ namespace sm {
             std::vector<Renderable*> renderables;
             DirectionalLight* directional_light {};
             std::vector<PointLight*> point_lights;
-            Shadows* shadows {};
+            ShadowBox* shadow_box {};
             std::vector<Text*> texts;
             std::vector<Quad*> quads;
         } debug;

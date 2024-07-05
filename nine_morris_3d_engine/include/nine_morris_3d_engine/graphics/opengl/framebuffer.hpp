@@ -36,7 +36,6 @@ namespace sm {
         int width {};
         int height {};
 
-        // Color attachment clearing stuff
         struct {
             int drawbuffer {};
             float value[4] {};
@@ -45,7 +44,8 @@ namespace sm {
         int samples {1};
         unsigned int resize_divisor {1};
         bool resizable {true};
-        bool white_border_for_depth_texture {false};
+        bool white_border_depth_texture {false};
+        bool comparison_mode_depth_texture {false};
     };
 
     class GlFramebuffer {

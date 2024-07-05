@@ -20,17 +20,7 @@ namespace sm {
         skybox_texture = texture;
     }
 
-    void Scene::shadow(Shadows& shadows) {
-        shadow(const_cast<const Shadows&>(shadows));
-
-#ifndef SM_BUILD_DISTRIBUTION
-        debug.shadows = &shadows;
-#endif
-    }
-
-    void Scene::shadow() {
-        static Shadows shadows;  // FIXME
-
+    void Scene::shadow(ShadowBox& box) {
         const glm::mat4 view_matrix {
             glm::lookAt(glm::vec3(0.0f), directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
         };
@@ -43,6 +33,10 @@ namespace sm {
         float max_z_negative {std::numeric_limits<float>::max()};
 
         for (const Renderable& renderable : renderables) {
+            if (!(renderable.get_material()->flags & Material::CastShadow)) {
+                continue;
+            }
+
             const glm::vec3 position {view_matrix * glm::vec4(renderable.get_position(), 1.0f)};
             const float radius {
                 glm::length(glm::max(renderable.get_aabb().max, renderable.get_aabb().min)) * renderable.get_scale()
@@ -56,20 +50,20 @@ namespace sm {
             max_z_negative = glm::min(max_z_negative, position.z - radius);
         }
 
-        shadows.left = max_x_negative;
-        shadows.right = max_x_positive;
-        shadows.bottom = max_y_negative;
-        shadows.top = max_y_positive;
+        box.left = max_x_negative;
+        box.right = max_x_positive;
+        box.bottom = max_y_negative;
+        box.top = max_y_positive;
 
         // After calculating some bound values, offset the position according to those values
-        shadows.position = glm::normalize(directional_light.direction) * -max_z_positive;
-        shadows.near = 1.0f;
-        shadows.far = -max_z_negative + max_z_positive;
+        box.position = glm::normalize(directional_light.direction) * -max_z_positive;
+        box.near = 1.0f;
+        box.far = -max_z_negative + max_z_positive;
 
-        this->shadows = shadows;
+        shadow(const_cast<const ShadowBox&>(box));
 
 #ifndef SM_BUILD_DISTRIBUTION
-        debug.shadows = &shadows;
+        debug.shadow_box = &box;
 #endif
     }
 
@@ -206,7 +200,7 @@ namespace sm {
         renderables.clear();
         directional_light = {};
         point_lights.clear();
-        shadows = {};
+        shadow_box = {};
         texts.clear();
         quads.clear();
         skybox_texture = {};
@@ -219,14 +213,14 @@ namespace sm {
         debug.renderables.clear();
         debug.directional_light = {};
         debug.point_lights.clear();
-        debug.shadows = {};
+        debug.shadow_box = {};
         debug.texts.clear();
         debug.quads.clear();
 #endif
     }
 
-    void Scene::shadow(const Shadows& shadows) {
-        this->shadows = shadows;
+    void Scene::shadow(const ShadowBox& box) {
+        shadow_box = box;
     }
 
     void Scene::add_renderable(const Renderable& renderable) {

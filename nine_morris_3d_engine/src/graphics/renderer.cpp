@@ -124,7 +124,7 @@ namespace sm {
             specification.width = 2048;
             specification.height = 2048;
             specification.depth_attachment = Attachment(AttachmentFormat::Depth32, AttachmentType::Texture);
-            specification.white_border_for_depth_texture = true;
+            specification.white_border_depth_texture = true;
             specification.resizable = false;
 
             storage.shadow_map_framebuffer = std::make_shared<GlFramebuffer>(specification);
@@ -852,18 +852,18 @@ namespace sm {
     void Renderer::setup_light_space_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer) {
         const glm::mat4 projection {
             glm::ortho(
-                scene.shadows.left,
-                scene.shadows.right,
-                scene.shadows.bottom,
-                scene.shadows.top,
-                scene.shadows.near,
-                scene.shadows.far
+                scene.shadow_box.left,
+                scene.shadow_box.right,
+                scene.shadow_box.bottom,
+                scene.shadow_box.top,
+                scene.shadow_box.near,
+                scene.shadow_box.far
             )
         };
 
         const glm::mat4 view {
             glm::lookAt(
-                scene.shadows.position,
+                scene.shadow_box.position,
                 scene.directional_light.direction,
                 glm::vec3(0.0f, 1.0f, 0.0f)
             )

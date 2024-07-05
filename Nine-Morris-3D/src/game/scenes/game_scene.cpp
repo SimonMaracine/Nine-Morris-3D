@@ -77,13 +77,6 @@ void GameScene::on_start() {
     point_light.specular_color = glm::vec3(1.0f);
     point_light.falloff_linear = 0.09f;
     point_light.falloff_quadratic = 0.032f;
-
-    shadows.left = -30.0f;
-    shadows.right = 30.0f;
-    shadows.bottom = -30.0f;
-    shadows.top = 30.0f;
-    shadows.near = 0.1f;
-    shadows.far = 35.0f;
 }
 
 void GameScene::on_update() {
@@ -96,7 +89,6 @@ void GameScene::on_update() {
 
     ctx.scn.add_light(directional_light);
     ctx.scn.add_light(point_light);
-    shadows.position = directional_light.direction * -30.0f;
 
     if (sky) {
         ctx.scn.skybox(ctx.res.texture_cubemap["field"_H]);
@@ -189,7 +181,7 @@ void GameScene::on_update() {
     // Whatever part two
     ctx.scn.debug_add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
 
-    ctx.scn.shadow();
+    ctx.scn.shadow(shadow_box);
 }
 
 void GameScene::on_imgui_update() {

@@ -92,6 +92,14 @@ namespace sm {
         glEnable(GL_CULL_FACE);
     }
 
+    void opengl::enable_polygon_offset_fill() {
+        glEnable(GL_POLYGON_OFFSET_FILL);
+    }
+
+    void opengl::disable_polygon_offset_fill() {
+        glDisable(GL_POLYGON_OFFSET_FILL);
+    }
+
     void opengl::initialize_stencil() {
         glEnable(GL_STENCIL_TEST);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -115,5 +123,9 @@ namespace sm {
 
     void opengl::stencil_mask(unsigned int mask) {
         glStencilMask(mask);
+    }
+
+    void opengl::initialize_polygon_offset() {
+        glPolygonOffset(2.0f, 4.0f);
     }
 }

@@ -44,13 +44,13 @@ namespace sm {
         if (shadows) {
             draw_shadows_lines(
                 scene,
-                scene.debug.shadows->left,
-                scene.debug.shadows->right,
-                scene.debug.shadows->bottom,
-                scene.debug.shadows->top,
-                scene.debug.shadows->near,
-                scene.debug.shadows->far,
-                scene.debug.shadows->position,
+                scene.debug.shadow_box->left,
+                scene.debug.shadow_box->right,
+                scene.debug.shadow_box->bottom,
+                scene.debug.shadow_box->top,
+                scene.debug.shadow_box->near,
+                scene.debug.shadow_box->far,
+                scene.debug.shadow_box->position,
                 scene.debug.directional_light->direction
             );
         }
@@ -110,13 +110,18 @@ namespace sm {
 
     void DebugUi::draw_shadows(Scene& scene) {
         if (ImGui::Begin("Debug Shadows")) {
-            ImGui::DragFloat("Left", &scene.debug.shadows->left, 1.0f, -500.0f, 0.0f);
-            ImGui::DragFloat("Right", &scene.debug.shadows->right, 1.0f, 0.0f, 500.0f);
-            ImGui::DragFloat("Bottom", &scene.debug.shadows->bottom, 1.0f, -500.0f, 0.0f);
-            ImGui::DragFloat("Top", &scene.debug.shadows->top, 1.0f, 0.0f, 500.0f);
-            ImGui::DragFloat("Near", &scene.debug.shadows->near, 1.0f, 0.1f, 2.0f);
-            ImGui::DragFloat("Far", &scene.debug.shadows->far, 1.0f, 2.0f, 500.0f);
-            ImGui::Text("Position %f, %f, %f", scene.debug.shadows->position.x, scene.debug.shadows->position.y, scene.debug.shadows->position.z);
+            ImGui::DragFloat("Left", &scene.debug.shadow_box->left, 1.0f, -500.0f, 0.0f);
+            ImGui::DragFloat("Right", &scene.debug.shadow_box->right, 1.0f, 0.0f, 500.0f);
+            ImGui::DragFloat("Bottom", &scene.debug.shadow_box->bottom, 1.0f, -500.0f, 0.0f);
+            ImGui::DragFloat("Top", &scene.debug.shadow_box->top, 1.0f, 0.0f, 500.0f);
+            ImGui::DragFloat("Near", &scene.debug.shadow_box->near, 1.0f, 0.1f, 2.0f);
+            ImGui::DragFloat("Far", &scene.debug.shadow_box->far, 1.0f, 2.0f, 500.0f);
+            ImGui::Text(
+                "Position %f, %f, %f",
+                scene.debug.shadow_box->position.x,
+                scene.debug.shadow_box->position.y,
+                scene.debug.shadow_box->position.z
+            );
         }
 
         ImGui::End();

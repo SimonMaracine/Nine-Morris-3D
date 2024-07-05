@@ -41,8 +41,13 @@ namespace sm {
         void disable_back_face_culling();
         void enable_back_face_culling();
 
+        void enable_polygon_offset_fill();
+        void disable_polygon_offset_fill();
+
         void initialize_stencil();
         void stencil_function(Function function, int ref, unsigned int mask);
         void stencil_mask(unsigned int mask);
+
+        void initialize_polygon_offset();
     }
 }

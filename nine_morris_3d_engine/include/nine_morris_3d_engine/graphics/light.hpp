@@ -36,7 +36,7 @@ namespace sm {
         3250     1.0      0.0014 0.000007 - not useful
     */
 
-    struct Shadows {
+    struct ShadowBox {
         float left {};
         float right {};
         float bottom {};

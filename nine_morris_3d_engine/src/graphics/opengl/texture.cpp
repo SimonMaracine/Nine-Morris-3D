@@ -78,7 +78,7 @@ namespace sm {
         return result;
     }
 
-    static void configure_filter_and_wrap(const TextureSpecification& specification) {
+    static void configure_options(const TextureSpecification& specification) {
         const int min_filter {
             use_mipmapping(specification) ? GL_LINEAR_MIPMAP_LINEAR : filter_to_int(specification.min_filter)
         };
@@ -88,18 +88,10 @@ namespace sm {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_to_int(specification.wrap_s));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_to_int(specification.wrap_t));
 
-        if (specification.border_color != std::nullopt) {
-            glm::vec4 color {*specification.border_color};
+        if (specification.border_color) {
+            const glm::vec4 color {*specification.border_color};
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
         }
-    }
-
-    static void configure_filter_and_wrap_3d() {
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 
     GlTexture::GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification)
@@ -109,7 +101,7 @@ namespace sm {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        configure_filter_and_wrap(specification);
+        configure_options(specification);
         allocate_texture(data->get_width(), data->get_height(), data->get_data());
         configure_mipmapping(specification);
 
@@ -128,7 +120,7 @@ namespace sm {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        configure_filter_and_wrap(specification);
+        configure_options(specification);
         allocate_texture(width, height, data);
         configure_mipmapping(specification);
 
@@ -174,10 +166,14 @@ namespace sm {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
-        configure_filter_and_wrap_3d();
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-        int width {data.begin()[0]->get_width()};
-        int height {data.begin()[0]->get_height()};
+        const int width {data.begin()[0]->get_width()};
+        const int height {data.begin()[0]->get_height()};
 
         for (const auto& texture : data) {
             assert(texture->get_width() == width);

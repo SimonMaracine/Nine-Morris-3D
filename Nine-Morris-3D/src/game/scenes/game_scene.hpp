@@ -26,7 +26,7 @@ struct GameScene : sm::ApplicationScene {
     PointCameraController cam_controller;
     sm::DirectionalLight directional_light;
     sm::PointLight point_light;
-    sm::Shadows shadows;
+    sm::ShadowBox shadow_box;
 
     sm::Renderable ground;
     sm::Renderable dragon1;

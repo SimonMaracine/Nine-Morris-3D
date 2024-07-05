@@ -28,7 +28,7 @@ vec3 calculate_directional_light(vec3 color, float shadow) {
     vec3 ambient_light, diffuse_light, specular_light;
     calculate_directional_light(color, ambient_light, diffuse_light, specular_light);
 
-    return ambient_light + (diffuse_light + specular_light) * (1.0 - shadow);
+    return ambient_light + (diffuse_light + specular_light) * shadow;
 }
 
 vec3 calculate_point_light(int i, vec3 color) {

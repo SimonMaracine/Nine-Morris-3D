@@ -2,7 +2,7 @@ float calculate_shadow(
     vec4 fragment_position_light_space,
     vec3 normal,
     vec3 light_direction,
-    sampler2D shadow_map
+    in sampler2D shadow_map
 ) {
     vec3 projection_coordinates = fragment_position_light_space.xyz / fragment_position_light_space.w;
     projection_coordinates = projection_coordinates * 0.5 + 0.5;
@@ -26,5 +26,10 @@ float calculate_shadow(
         shadow = 0.0;
     }
 
-    return shadow;
+    return 1.0 - shadow;
+}
+
+float calculate_shadow_sampler2d_shadow(vec4 fragment_position_light_space, in sampler2DShadow shadow_map) {
+    const vec4 coordinates = vec4(fragment_position_light_space.xyz * 0.5 + 0.5, fragment_position_light_space.w);
+    return textureProj(shadow_map, coordinates);
 }

@@ -26,8 +26,14 @@ namespace sm {
         );
     }
 
-    static void attach_color_texture(GLuint texture, int samples, GLenum internal_format,
-            int width, int height, unsigned int index) {
+    static void attach_color_texture(
+        GLuint texture,
+        int samples,
+        GLenum internal_format,
+        int width,
+        int height,
+        unsigned int index
+    ) {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -51,8 +57,16 @@ namespace sm {
         );
     }
 
-    static void attach_depth_texture(GLuint texture, int samples, GLenum internal_format,
-            GLenum attachment, int width, int height, bool white_border) {
+    static void attach_depth_texture(
+        GLuint texture,
+        int samples,
+        GLenum internal_format,
+        GLenum attachment,
+        int width,
+        int height,
+        bool white_border,
+        bool comparison_mode
+    ) {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -70,14 +84,25 @@ namespace sm {
                 glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
             }
 
+            if (comparison_mode) {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+            }
+
             glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
         }
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, target(multisampled), texture, 0);
     }
 
-    static void attach_color_renderbuffer(GLuint renderbuffer, int samples, GLenum internal_format,
-            int width, int height, unsigned int index) {
+    static void attach_color_renderbuffer(
+        GLuint renderbuffer,
+        int samples,
+        GLenum internal_format,
+        int width,
+        int height,
+        unsigned int index
+    ) {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -91,8 +116,14 @@ namespace sm {
         );
     }
 
-    static void attach_depth_renderbuffer(GLuint renderbuffer, int samples, GLenum internal_format,
-            GLenum attachment, int width, int height) {
+    static void attach_depth_renderbuffer(
+        GLuint renderbuffer,
+        int samples,
+        GLenum internal_format,
+        GLenum attachment,
+        int width,
+        int height
+    ) {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -146,9 +177,16 @@ namespace sm {
         : specification(specification) {
         assert(specification.samples == 1 || specification.samples == 2 || specification.samples == 4);
 
-        if (specification.white_border_for_depth_texture) {
+        if (specification.white_border_depth_texture) {
             assert(specification.depth_attachment.format != AttachmentFormat::None);
             assert(specification.depth_attachment.type == AttachmentType::Texture);
+            assert(specification.samples == 1);
+        }
+
+        if (specification.comparison_mode_depth_texture) {
+            assert(specification.depth_attachment.format != AttachmentFormat::None);
+            assert(specification.depth_attachment.type == AttachmentType::Texture);
+            assert(specification.samples == 1);
         }
 
         assert(specification.width > 0 && specification.height > 0);
@@ -435,14 +473,16 @@ namespace sm {
                             attach_depth_texture(
                                 texture, specification.samples,
                                 GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, specification.width,
-                                specification.height, specification.white_border_for_depth_texture
+                                specification.height, specification.white_border_depth_texture,
+                                specification.comparison_mode_depth_texture
                             );
                             break;
                         case AttachmentFormat::Depth32:
                             attach_depth_texture(
                                 texture, specification.samples,
                                 GL_DEPTH_COMPONENT32, GL_DEPTH_ATTACHMENT, specification.width,
-                                specification.height, specification.white_border_for_depth_texture
+                                specification.height, specification.white_border_depth_texture,
+                                specification.comparison_mode_depth_texture
                             );
                             break;
                         default:
@@ -497,7 +537,6 @@ namespace sm {
             glDrawBuffers(static_cast<int>(color_attachments.size()), COLOR_ATTACHMENTS);
         } else if (color_attachments.empty()) {
             glDrawBuffer(GL_NONE);  // TODO what is this?
-            glReadBuffer(GL_NONE);
         }
 
         const GLenum status {glCheckFramebufferStatus(GL_FRAMEBUFFER)};

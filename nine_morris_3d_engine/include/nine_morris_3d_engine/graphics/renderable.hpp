@@ -35,6 +35,7 @@ namespace sm {
         glm::vec3 get_rotation() const { return transform.rotation; }
         float get_scale() const { return transform.scale; }
         const utils::AABB& get_aabb() const { return aabb; }
+        MaterialInstance* get_material() const { return material.get(); }
     private:
         std::shared_ptr<Mesh> mesh;
         std::shared_ptr<GlVertexArray> vertex_array;
