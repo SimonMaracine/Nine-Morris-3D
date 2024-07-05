@@ -896,9 +896,9 @@ namespace sm {
         glm::mat4 matrix {1.0f};
 
         matrix = glm::translate(matrix, renderable.transform.position);
-        matrix = glm::rotate(matrix, renderable.transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, renderable.transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, renderable.transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::rotate(matrix, glm::radians(renderable.transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, glm::radians(renderable.transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, glm::radians(renderable.transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
         matrix = glm::scale(matrix, glm::vec3(renderable.transform.scale));
 
         return matrix;
