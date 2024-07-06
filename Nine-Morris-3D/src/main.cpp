@@ -51,7 +51,7 @@ int application_main() {
             try {
                 auto game {sm::Application(properties)};
                 game.add_scene<GameScene>();
-                exit_code = game.run("loading"_H, functions);
+                exit_code = game.run("game"_H, functions);
             } catch (sm::RuntimeError error) {
                 std::cerr << "Terminated game with error code " << static_cast<int>(error) << '\n';
                 return 1;

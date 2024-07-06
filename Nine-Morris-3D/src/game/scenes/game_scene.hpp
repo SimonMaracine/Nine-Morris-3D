@@ -7,7 +7,7 @@
 
 struct GameScene : sm::ApplicationScene {
     explicit GameScene(sm::Ctx& ctx)
-        : sm::ApplicationScene(ctx, "loading") {}
+        : sm::ApplicationScene(ctx, "game") {}
 
     void on_start() override;
     void on_update() override;
@@ -36,6 +36,7 @@ struct GameScene : sm::ApplicationScene {
     sm::Renderable brick;
     sm::Renderable lamp_stand;
     sm::Renderable lamp_bulb;
+    sm::Renderable barrel;
     sm::Text text1;
     sm::Text text2;
     sm::Text text3;

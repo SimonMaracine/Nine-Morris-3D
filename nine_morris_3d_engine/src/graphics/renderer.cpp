@@ -299,7 +299,7 @@ namespace sm {
             }
         }
         {
-            const auto uniform_buffer {storage.wview_position_uniform_buffer.lock()};
+            const auto uniform_buffer {storage.wview_uniform_buffer.lock()};
 
             if (uniform_buffer != nullptr) {
                 uniform_buffer->set(&scene.camera_position, "u_view_position"_H);
@@ -417,13 +417,13 @@ namespace sm {
                     case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
                         storage.wdirectional_light_uniform_buffer = uniform_buffer;
                         break;
-                    case VIEW_POSITION_BLOCK_BINDING:
-                        storage.wview_position_uniform_buffer = uniform_buffer;
+                    case VIEW_UNIFORM_BLOCK_BINDING:
+                        storage.wview_uniform_buffer = uniform_buffer;
                         break;
-                    case POINT_LIGHT_BLOCK_BINDING:
+                    case POINT_LIGHT_UNIFORM_BLOCK_BINDING:
                         storage.wpoint_light_uniform_buffer = uniform_buffer;
                         break;
-                    case LIGHT_SPACE_BLOCK_BINDING:
+                    case LIGHT_SPACE_UNIFORM_BLOCK_BINDING:
                         storage.wlight_space_uniform_buffer = uniform_buffer;
                         break;
                     default:

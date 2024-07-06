@@ -106,6 +106,7 @@ void GameScene::on_update() {
     ctx.scn.add_renderable(brick);
     ctx.scn.add_renderable(lamp_stand);
     ctx.scn.add_renderable(lamp_bulb);
+    ctx.scn.add_renderable(barrel);
 
     ctx.show_info_text();
 
@@ -413,6 +414,37 @@ void GameScene::load_models() {
             va->add_index_buffer(index_buffer);
         });
     }
+
+    {
+        auto mesh {ctx.res.mesh.load(
+            "barrel"_H,
+            sm::utils::read_file(ctx.fs.path_assets("models/barrel.obj")),
+            "Mesh_Mesh_Cylinder.001",
+            sm::Mesh::Type::PNTT
+        )};
+
+        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
+            mesh->get_vertices(),
+            mesh->get_vertices_size()
+        )};
+
+        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
+            mesh->get_indices(),
+            mesh->get_indices_size()
+        )};
+
+        auto vertex_array {ctx.res.vertex_array.load("barrel"_H)};
+        vertex_array->configure([&](sm::GlVertexArray* va) {
+            sm::VertexBufferLayout layout;
+            layout.add(0, sm::VertexBufferLayout::Float, 3);
+            layout.add(1, sm::VertexBufferLayout::Float, 3);
+            layout.add(2, sm::VertexBufferLayout::Float, 2);
+            layout.add(3, sm::VertexBufferLayout::Float, 3);
+
+            va->add_vertex_buffer(vertex_buffer, layout);
+            va->add_index_buffer(index_buffer);
+        });
+    }
 }
 
 void GameScene::load_textures() {
@@ -507,6 +539,32 @@ void GameScene::load_textures() {
 
         ctx.res.texture.load("lamp"_H, data);
     }
+
+    {
+        sm::TexturePostProcessing post_processing;
+        post_processing.flip = true;
+
+        auto data {ctx.res.texture_data.load(
+            "barrel"_H,
+            sm::utils::read_file(ctx.fs.path_assets("textures/barrel.png")),
+            post_processing
+        )};
+
+        ctx.res.texture.load("barrel"_H, data);
+    }
+
+    {
+        sm::TexturePostProcessing post_processing;
+        post_processing.flip = true;
+
+        auto data {ctx.res.texture_data.load(
+            "barrel_normal"_H,
+            sm::utils::read_file(ctx.fs.path_assets("textures/barrelNormal.png")),
+            post_processing
+        )};
+
+        ctx.res.texture.load("barrel_normal"_H, data);
+    }
 }
 
 void GameScene::load_materials() {
@@ -536,6 +594,21 @@ void GameScene::load_materials() {
         material->add_texture("u_material.ambient_diffuse"_H);
         material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
         material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
+    }
+
+    {
+        auto shader {std::make_shared<sm::GlShader>(
+            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured_normal_shadows.vert"))),
+            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured_normal_shadows.frag")))
+        )};
+
+        ctx.rnd.register_shader(shader);
+
+        auto material {ctx.res.material.load("phong_textured_normal_shadows"_H, shader, sm::Material::CastShadow)};
+        material->add_texture("u_material.ambient_diffuse"_H);
+        material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
+        material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
+        material->add_texture("u_material.normal"_H);
     }
 
     {
@@ -607,6 +680,14 @@ void GameScene::load_material_instances() {
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.4f));
         material_instance->set_float("u_material.shininess"_H, 16.0f);
     }
+
+    {
+        auto material_instance {ctx.res.material_instance.load("barrel"_H, ctx.res.material["phong_textured_normal_shadows"_H])};
+        material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["barrel"_H], 0);
+        material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
+        material_instance->set_float("u_material.shininess"_H, 32.0f);
+        material_instance->set_texture("u_material.normal"_H, ctx.res.texture["barrel_normal"_H], 1);
+    }
 }
 
 void GameScene::setup_renderables() {
@@ -640,6 +721,10 @@ void GameScene::setup_renderables() {
 
     lamp_bulb = sm::Renderable(ctx.res.mesh["lamp_bulb"_H], ctx.res.vertex_array["lamp_bulb"_H], ctx.res.material_instance["lamp_bulb"_H]);
     lamp_bulb.transform.position = glm::vec3(-6.0f, 0.0f, -6.0f);
+
+    barrel = sm::Renderable(ctx.res.mesh["barrel"_H], ctx.res.vertex_array["barrel"_H], ctx.res.material_instance["barrel"_H]);
+    barrel.transform.position = glm::vec3(-7.0f, 4.5f, 6.0f);
+    barrel.transform.scale = 0.5f;
 
     text1.font = ctx.res.font["sans"_H];
     text1.text = "The quick brown fox jumps over the lazy dog.";

@@ -132,7 +132,7 @@ namespace sm {
             std::unordered_map<unsigned int, std::weak_ptr<GlUniformBuffer>> uniform_buffers;
             std::weak_ptr<GlUniformBuffer> wprojection_view_uniform_buffer;
             std::weak_ptr<GlUniformBuffer> wdirectional_light_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> wview_position_uniform_buffer;
+            std::weak_ptr<GlUniformBuffer> wview_uniform_buffer;
             std::weak_ptr<GlUniformBuffer> wpoint_light_uniform_buffer;
             std::weak_ptr<GlUniformBuffer> wlight_space_uniform_buffer;
 
@@ -167,12 +167,12 @@ namespace sm {
 
         static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING {0};
         static constexpr unsigned int DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING {1};
-        static constexpr unsigned int VIEW_POSITION_BLOCK_BINDING {2};
-        static constexpr unsigned int POINT_LIGHT_BLOCK_BINDING {3};
-        static constexpr unsigned int LIGHT_SPACE_BLOCK_BINDING {4};
+        static constexpr unsigned int VIEW_UNIFORM_BLOCK_BINDING {2};
+        static constexpr unsigned int POINT_LIGHT_UNIFORM_BLOCK_BINDING {3};
+        static constexpr unsigned int LIGHT_SPACE_UNIFORM_BLOCK_BINDING {4};
         static constexpr std::size_t SHADER_MAX_POINT_LIGHTS {4};
         static constexpr std::size_t SHADER_MAX_BATCH_TEXTS {32};  // This should never reach the limit
-        static constexpr int SHADOW_MAP_UNIT {1};
+        static constexpr int SHADOW_MAP_UNIT {2};
         static constexpr std::size_t MAX_QUAD_COUNT {1000};
         static constexpr std::size_t MAX_QUADS_BUFFER_SIZE {MAX_QUAD_COUNT * 4 * sizeof(QuadVertex)};
         static constexpr std::size_t MAX_QUADS_INDICES {MAX_QUAD_COUNT * 6};
