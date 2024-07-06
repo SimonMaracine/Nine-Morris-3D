@@ -355,8 +355,9 @@ namespace sm {
 
         opengl::bind_texture_2d(storage.shadow_map_framebuffer->get_depth_attachment(), SHADOW_MAP_UNIT);
 
+        // I sincerely have no idea why outlined objects need to be rendered first; it seems the opposite
+        draw_renderables_outlined(scene);
         draw_renderables(scene);
-        draw_renderables_outlined(scene);  // FIXME
 
         // Skybox
         if (scene.skybox_texture != nullptr) {
@@ -565,33 +566,34 @@ namespace sm {
     }
 
     void Renderer::draw_renderable_outlined(const Renderable& renderable) {
+        // Don't disable and enable depth testing
+
         opengl::stencil_mask(0xFF);
 
         draw_renderable(renderable);
 
-        opengl::stencil_function(opengl::Function::NotEqual, 1, 0xFF);
         opengl::stencil_mask(0x00);
+        opengl::stencil_function(opengl::Function::NotEqual, 1, 0xFF);
 
         {
             const auto vertex_array {renderable.vertex_array};
 
-            glm::mat4 matrix {get_renderable_transform(renderable)};
-            matrix = glm::scale(matrix, glm::vec3(renderable.outline.scale));
-            matrix = glm::translate(matrix, renderable.outline.offset);
+            const glm::mat4 matrix {get_renderable_transform(renderable)};
 
             // Vertex array is already bound
 
             storage.outline_shader->bind();
             storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
             storage.outline_shader->upload_uniform_vec3("u_color"_H, renderable.outline.color);
+            storage.outline_shader->upload_uniform_float("u_outline_thickness"_H, renderable.outline.thickness);
 
             opengl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
 
             GlVertexArray::unbind();
         }
 
-        opengl::stencil_function(opengl::Function::Always, 1, 0xFF);
         opengl::stencil_mask(0xFF);
+        opengl::stencil_function(opengl::Function::Always, 1, 0xFF);
     }
 
     void Renderer::draw_renderables_to_shadow_map(const Scene& scene) {

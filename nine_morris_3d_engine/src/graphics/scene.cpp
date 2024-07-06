@@ -37,9 +37,9 @@ namespace sm {
                 continue;
             }
 
-            const glm::vec3 position {view_matrix * glm::vec4(renderable.get_position(), 1.0f)};
+            const glm::vec3 position {view_matrix * glm::vec4(renderable.transform.position, 1.0f)};
             const float radius {
-                glm::length(glm::max(renderable.get_aabb().max, renderable.get_aabb().min)) * renderable.get_scale()
+                glm::length(glm::max(renderable.get_aabb().max, renderable.get_aabb().min)) * renderable.transform.scale
             };
 
             max_x_positive = glm::max(max_x_positive, position.x + radius);

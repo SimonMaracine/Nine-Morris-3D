@@ -21,25 +21,8 @@ namespace sm {
         Renderable(std::shared_ptr<Mesh> mesh, std::shared_ptr<GlVertexArray> vertex_array, std::shared_ptr<MaterialInstance> material)
             : mesh(mesh), vertex_array(vertex_array), material(material), aabb(mesh->get_aabb()) {}
 
-        void set_position(glm::vec3 position) { transform.position = position; }
-        void set_rotation(glm::vec3 rotation) { transform.rotation = rotation; }
-        void set_scale(float scale) { transform.scale = scale; }
-        void set_x(float x) { transform.position.x = x; }
-        void set_y(float y) { transform.position.y = y; }
-        void set_z(float z) { transform.position.z = z; }
-        void set_rx(float rx) { transform.rotation.x = rx; }
-        void set_ry(float ry) { transform.rotation.y = ry; }
-        void set_rz(float rz) { transform.rotation.z = rz; }
-
-        glm::vec3 get_position() const { return transform.position; }
-        glm::vec3 get_rotation() const { return transform.rotation; }
-        float get_scale() const { return transform.scale; }
         const utils::AABB& get_aabb() const { return aabb; }
         MaterialInstance* get_material() const { return material.get(); }
-    private:
-        std::shared_ptr<Mesh> mesh;
-        std::shared_ptr<GlVertexArray> vertex_array;
-        std::shared_ptr<MaterialInstance> material;
 
         struct {
             glm::vec3 position {};
@@ -48,10 +31,13 @@ namespace sm {
         } transform;
 
         struct {
-            glm::vec3 color {};  // TODO think of a good solution
-            glm::vec3 offset {};
-            float scale {1.05f};
+            glm::vec3 color {1.0f};  // TODO think of a good solution
+            float thickness {0.1f};
         } outline;
+    private:
+        std::shared_ptr<Mesh> mesh;
+        std::shared_ptr<GlVertexArray> vertex_array;
+        std::shared_ptr<MaterialInstance> material;
 
         utils::AABB aabb;  // FIXME think of a good solution
 

@@ -4,7 +4,7 @@
 
 namespace sm {
     struct DirectionalLight {
-        glm::vec3 direction {};
+        glm::vec3 direction {};  // Never set both x and z to 0.0
         glm::vec3 ambient_color {};  // Usually quite a low value
         glm::vec3 diffuse_color {};  // Usually just 1.0
         glm::vec3 specular_color {};  // Usually either 0.0 or 1.0
