@@ -1,11 +1,10 @@
-old
 .vscode
 build
+build_dist
 *.log
 *info.txt
 imgui.ini
 *.blend1
 bitmap_*.png
 *.dat
-renderdoc_captures
 *.aup3-wal

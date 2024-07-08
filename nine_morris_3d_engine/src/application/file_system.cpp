@@ -2,7 +2,7 @@
 
 #include <filesystem>
 #include <optional>
-#include <iostream>
+#include <iostream>  // Use stderr stream, because logging doesn't exist at this point
 #include <cstdlib>
 
 #include "nine_morris_3d_engine/application/platform.hpp"
@@ -20,8 +20,15 @@
         ("/home/" + (user_name) + "/." + (application_name) + "/")
     #define DATA_DIRECTORY_PATH(application_name) \
         ("/usr/local/share/" + (application_name) + "/")
+#elif defined(SM_PLATFORM_WINDOWS)
+    #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
+        ("C:\\Users\\" + (user_name) + "\\AppData\\Roaming\\" + (application_name) + "\\")
+    #define USER_DATA2_DIRECTORY_PATH(user_name, application_name) \
+        ("C:\\Users\\" + (user_name) + "\\Documents\\" + (application_name) + "\\")
+#endif
 
 static std::optional<std::string> get_user_name() {
+#if defined(SM_PLATFORM_LINUX)
     const uid_t uid {geteuid()};
     struct passwd* pw {getpwuid(uid)};
 
@@ -30,14 +37,7 @@ static std::optional<std::string> get_user_name() {
     }
 
     return std::make_optional(pw->pw_name);
-}
 #elif defined(SM_PLATFORM_WINDOWS)
-    #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
-        ("C:\\Users\\" + (user_name) + "\\AppData\\Roaming\\" + (application_name) + "\\")
-    #define USER_DATA2_DIRECTORY_PATH(user_name, application_name) \
-        ("C:\\Users\\" + (user_name) + "\\Documents\\" + (application_name) + "\\")
-
-static std::optional<std::string> get_user_name() {
     char user_name[UNLEN + 1] {};
     const DWORD _ {UNLEN + 1};
     const bool success {GetUserName(user_name, &_)};
@@ -47,8 +47,8 @@ static std::optional<std::string> get_user_name() {
     }
 
     return std::make_optional(user_name);
-}
 #endif
+}
 
 namespace sm {
     FileSystem::FileSystem(const std::string& application_name, const std::string& assets_directory)
@@ -156,12 +156,12 @@ namespace sm {
         const std::string path {USER_DATA_DIRECTORY_PATH(user_name, application_name)};
 
         if (!directory_exists(path)) {
-            std::cerr << "Directory `" << path << "` doesn't exist, creating it...";
+            std::cerr << "Directory `" << path << "` doesn't exist, creating it...\n";
 
             if (create_directory(path)) {
-                std::cerr << "Created directory `" << path << '`';
+                std::cerr << "Created directory `" << path << "`\n";
             } else {
-                std::cerr << "Could not create directory `" << path << '`';
+                std::cerr << "Could not create directory `" << path << "`\n";
             }
         }
 #elif defined(SM_PLATFORM_WINDOWS)
@@ -170,24 +170,24 @@ namespace sm {
         path = USER_DATA_DIRECTORY_PATH(user_name, application_name);
 
         if (!directory_exists(path)) {
-            std::cerr << "Directory `" << path << "` doesn't exist, creating it...";
+            std::cerr << "Directory `" << path << "` doesn't exist, creating it...\n";
 
             if (create_directory(path)) {
-                std::cerr << "Created directory `" << path << '`';
+                std::cerr << "Created directory `" << path << "`\n";
             } else {
-                std::cerr << "Could not create directory `" << path << '`';
+                std::cerr << "Could not create directory `" << path << "`\n";
             }
         }
 
         path = USER_DATA2_DIRECTORY_PATH(user_name, application_name);
 
         if (!directory_exists(path)) {
-            std::cerr << "Directory `" << path << "` doesn't exist, creating it...";
+            std::cerr << "Directory `" << path << "` doesn't exist, creating it...\n";
 
             if (create_directory(path)) {
-                std::cerr << "Could not create directory `" << path << '`';
+                std::cerr << "Could not create directory `" << path << "`\n";
             } else {
-                std::cerr << "Could not create directory `" << path << '`';
+                std::cerr << "Could not create directory `" << path << "`\n";
             }
         }
 #endif

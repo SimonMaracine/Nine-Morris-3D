@@ -8,7 +8,7 @@ case "$1" in
     "rel")
         build_type="Release"
         distribution_mode="OFF"
-        asan="ON"
+        asan="OFF"
         ;;
     "dist")
         build_type="Release"
@@ -17,9 +17,15 @@ case "$1" in
         ;;
 esac
 
+build_directory="build"
+
+if [ "$1" = "dist" ]; then
+    build_directory="build_dist"
+fi
+
 cd ..
-mkdir -p build
-cd build
+mkdir -p $build_directory
+cd $build_directory
 cmake .. \
     -DCMAKE_BUILD_TYPE=$build_type \
     -DNM3D_DISTRIBUTION_MODE=$distribution_mode \

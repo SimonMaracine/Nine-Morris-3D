@@ -6,6 +6,8 @@ namespace sm {
     class Ctx;
 
     struct FileSystem {
+    private:
+        FileSystem(const std::string& application_name, const std::string& assets_directory);
     public:
         static bool directory_exists(const std::string& path);
         static bool create_directory(const std::string& path);
@@ -22,8 +24,6 @@ namespace sm {
         std::string path_assets(const std::string& path) const;
         std::string path_engine_assets(const std::string& path) const;
     private:
-        FileSystem(const std::string& application_name, const std::string& assets_directory);
-
         void check_and_fix_directories() const;
 
         std::string application_name;
