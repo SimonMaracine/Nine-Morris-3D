@@ -11,14 +11,11 @@ inline constexpr float LENS_FAR {200.0f};
 class PointCameraController : public sm::CameraController {
 public:
     PointCameraController() = default;
-    explicit PointCameraController(sm::Camera* camera);
+    explicit PointCameraController(sm::Camera& camera);
     PointCameraController(
-        sm::Camera* camera,
+        sm::Camera& camera,
         int width,
         int height,
-        float fov,
-        float near,
-        float far,
         glm::vec3 point,
         float distance_to_point,
         float pitch,
@@ -33,7 +30,7 @@ public:
     float get_angle_around_point() const { return angle_around_point; }
 
     // Call these every frame
-    void update_controls(float dt, const sm::Input& inp) override;
+    void update_controls(float dt, const sm::Input&) override;
     void update_camera(float dt) override;
 
     // Call this regularly
@@ -43,14 +40,17 @@ public:
     void set_position(glm::vec3 position);
     void go_towards_position(glm::vec3 position);
 
-    void connect_events(sm::Ctx& ctx);
-    void disconnect_events(sm::Ctx& ctx);
-    void discard_events(sm::Ctx& ctx);
+    void connect_events(sm::EventDispatcher& evt);
+    void disconnect_events(sm::EventDispatcher& evt);
 
     float sensitivity {1.0f};  // Best from 0.5 to 2.0
 private:
     void on_mouse_wheel_scrolled(const sm::MouseWheelScrolledEvent& event);
     void on_mouse_moved(const sm::MouseMovedEvent& event);
+    void on_mouse_button_pressed(const sm::MouseButtonPressedEvent& event);
+    void on_mouse_button_released(const sm::MouseButtonReleasedEvent& event);
+    void on_key_pressed(const sm::KeyPressedEvent& event);
+    void on_key_released(const sm::KeyReleasedEvent& event);
 
     void go_towards_position_x(glm::vec3 direction);
     void go_towards_position_y(glm::vec3 direction);
@@ -99,5 +99,12 @@ private:
         float dy {};
         float last_mouse_x {};
         float last_mouse_y {};
-    } mouse_input;
+        bool mouse_right {false};
+        bool key_w {false};
+        bool key_a {false};
+        bool key_s {false};
+        bool key_d {false};
+        bool key_r {false};
+        bool key_f {false};
+    } input;
 };

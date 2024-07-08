@@ -21,6 +21,8 @@ namespace sm {
 
     // Application-level events
     class EventDispatcher {
+    private:
+        EventDispatcher() = default;
     public:
         template<typename E, auto F, typename... T>
         void connect(T&&... value_or_instance) {
@@ -48,12 +50,10 @@ namespace sm {
         }
 
         template<typename E>
-        void discard() {
+        void clear() {
             dispatcher.clear<E>();
         }
     private:
-        EventDispatcher() = default;
-
         void update() {
             dispatcher.update();
         }

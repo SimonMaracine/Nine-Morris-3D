@@ -50,19 +50,16 @@ void GameScene::on_start() {
     setup_renderables();
 
     cam_controller = PointCameraController(
-        &cam,
+        cam,
         ctx.win.get_width(),
         ctx.win.get_height(),
-        LENS_FOV,
-        LENS_NEAR,
-        LENS_FAR,
         glm::vec3(0.0f),
         8.0f,
         47.0f,
         0.5f
     );
 
-    cam_controller.connect_events(ctx);
+    cam_controller.connect_events(ctx.evt);
 
     cam_2d.set_projection(0, ctx.win.get_width(), 0, ctx.win.get_height());
 
@@ -79,10 +76,13 @@ void GameScene::on_start() {
     point_light.falloff_quadratic = 0.032f;
 }
 
+void GameScene::on_stop() {
+    cam_controller.disconnect_events(ctx.evt);
+}
+
 void GameScene::on_update() {
     cam_controller.update_controls(ctx.delta, ctx.inp);
     cam_controller.update_camera(ctx.delta);
-    cam_controller.update_friction();
 
     ctx.scn.capture(cam, cam_controller.get_position());
     ctx.scn.capture(cam_2d);
@@ -185,8 +185,15 @@ void GameScene::on_update() {
     ctx.scn.shadow(shadow_box);
 }
 
+void GameScene::on_fixed_update() {
+    cam_controller.update_friction();
+}
+
 void GameScene::on_imgui_update() {
     ImGui::Begin("Features");
+    if (ImGui::Checkbox("Sync", &sync)) {
+        ctx.win.set_vsync(1 ? sync : 0);
+    }
     ImGui::Checkbox("Skybox", &sky);
     if (ImGui::Checkbox("Blur", &blur)) {
         if (blur) {
