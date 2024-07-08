@@ -29,7 +29,8 @@ namespace sm {
         info_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_glsl_version())) + '\n';
         info_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_renderer())) + '\n';
         info_text += std::string(reinterpret_cast<const char*>(opengl_debug::get_vendor())) + '\n';
-        info_text += std::to_string(fps) + " FPS";
+        info_text += std::to_string(static_cast<int>(fps)) + " FPS ";
+        info_text += std::to_string(static_cast<int>(delta * 1000.0f)) + " ms";
 
         Text text;
         text.font = rnd.storage.default_font;
