@@ -1,5 +1,9 @@
+if(NOT NM3D_DISTRIBUTION_MODE)
+    set(IMGUI_DEMO_FILE "extern/imgui/imgui_demo.cpp")
+endif()
+
 add_library(dear_imgui STATIC
-    "extern/imgui/imgui_demo.cpp"
+    ${IMGUI_DEMO_FILE}
     "extern/imgui/imgui_draw.cpp"
     "extern/imgui/imgui_tables.cpp"
     "extern/imgui/imgui_widgets.cpp"
