@@ -359,7 +359,7 @@ namespace sm {
         draw_renderables_outlined(scene);
         draw_renderables(scene);
 
-        // Skybox
+        // Skybox is rendered last, but with its depth values modified to keep it in the background
         if (scene.skybox_texture != nullptr) {
             draw_skybox(scene);
         }
@@ -658,11 +658,11 @@ namespace sm {
             if (this_ptr != font_ptr) {
                 font_ptr = this_ptr;
 
-                storage.text.batches.emplace_back().wfont = text.font;
+                storage.text.batches.emplace_back().font = text.font;
             }
 
             if (storage.text.batches.back().texts.size() >= SHADER_MAX_BATCH_TEXTS) {
-                storage.text.batches.emplace_back().wfont = text.font;
+                storage.text.batches.emplace_back().font = text.font;
             }
 
             storage.text.batches.back().texts.push_back(text);
@@ -681,15 +681,13 @@ namespace sm {
     }
 
     void Renderer::draw_text_batch(const Scene& scene, const TextBatch& batch) {
-        const auto font {batch.wfont.lock()};
-
         std::size_t i {};  // TODO C++20
 
         for (const Text& text : batch.texts) {
             assert(i < SHADER_MAX_BATCH_TEXTS);
 
             // Pushes the rendered text onto the buffer
-            font->render(text.text, static_cast<int>(i++), storage.text.batch_buffer);
+            batch.font->render(text.text, static_cast<int>(i++), storage.text.batch_buffer);
 
             glm::mat4 matrix {1.0f};  // TODO upload mat3 instead
             matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
@@ -711,7 +709,7 @@ namespace sm {
 
         storage.text_vertex_array->bind();
 
-        opengl::bind_texture_2d(font->get_bitmap()->get_id(), 0);
+        opengl::bind_texture_2d(batch.font->get_bitmap()->get_id(), 0);
 
         opengl::draw_arrays(static_cast<int>(storage.text.batch_buffer.size()) * 6);
 

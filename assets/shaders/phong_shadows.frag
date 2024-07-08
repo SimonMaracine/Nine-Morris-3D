@@ -9,7 +9,7 @@ in vec4 v_fragment_position_light_space;
 
 layout(location = 0) out vec4 o_fragment_color;
 
-layout(binding = 1) uniform sampler2D u_shadow_map;
+layout(binding = 2) uniform sampler2D u_shadow_map;
 
 layout(shared, binding = 1) uniform DirectionalLight {
     DirectionalLight_ u_directional_light;

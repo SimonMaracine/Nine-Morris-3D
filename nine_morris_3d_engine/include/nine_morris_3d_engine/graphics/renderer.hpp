@@ -82,7 +82,7 @@ namespace sm {
         void draw_skybox(const Scene& scene);
 
         struct TextBatch {
-            std::weak_ptr<Font> wfont;
+            std::shared_ptr<Font> font;
             std::vector<Text> texts;
         };
 
