@@ -1,7 +1,6 @@
 #pragma once
 
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
-#include <nine_morris_3d_engine/external/glm.h++>
 
 #include "game/point_camera_controller.hpp"
 

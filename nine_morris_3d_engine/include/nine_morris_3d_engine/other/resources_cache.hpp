@@ -26,9 +26,9 @@ namespace sm {
         resmanager::Cache<GlTexture> texture;
         resmanager::Cache<GlTextureCubemap> texture_cubemap;
         resmanager::Cache<GlVertexArray> vertex_array;
-        // resmanager::Cache<GlShader> shader;
-        // resmanager::Cache<GlVertexBuffer> vertex_buffer;
-        // resmanager::Cache<GlIndexBuffer> index_buffer;
+        resmanager::Cache<GlShader> shader;
+        resmanager::Cache<GlVertexBuffer> vertex_buffer;
+        resmanager::Cache<GlIndexBuffer> index_buffer;
         // resmanager::Cache<GlUniformBuffer> uniform_buffer;
         // resmanager::Cache<GlPixelBuffer> pixel_buffer;
         // resmanager::Cache<GlFramebuffer> framebuffer;

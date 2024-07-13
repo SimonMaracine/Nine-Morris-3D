@@ -5,9 +5,9 @@ namespace sm {
         texture.merge(other.texture);
         texture_cubemap.merge(other.texture_cubemap);
         vertex_array.merge(other.vertex_array);
-        // shader.merge(other.shader);
-        // vertex_buffer.merge(other.vertex_buffer);
-        // index_buffer.merge(other.index_buffer);
+        shader.merge(other.shader);
+        vertex_buffer.merge(other.vertex_buffer);
+        index_buffer.merge(other.index_buffer);
         // uniform_buffer.merge(other.uniform_buffer);
         // pixel_buffer.merge(other.pixel_buffer);
         // framebuffer.merge(other.framebuffer);
@@ -26,9 +26,9 @@ namespace sm {
         texture.merge_replace(other.texture);
         texture_cubemap.merge_replace(other.texture_cubemap);
         vertex_array.merge_replace(other.vertex_array);
-        // shader.merge_replace(other.shader);
-        // vertex_buffer.merge_replace(other.vertex_buffer);
-        // index_buffer.merge_replace(other.index_buffer);
+        shader.merge_replace(other.shader);
+        vertex_buffer.merge_replace(other.vertex_buffer);
+        index_buffer.merge_replace(other.index_buffer);
         // uniform_buffer.merge_replace(other.uniform_buffer);
         // pixel_buffer.merge_replace(other.pixel_buffer);
         // framebuffer.merge_replace(other.framebuffer);
@@ -47,9 +47,9 @@ namespace sm {
         texture.clear();
         texture_cubemap.clear();
         vertex_array.clear();
-        // shader.clear();
-        // vertex_buffer.clear();
-        // index_buffer.clear();
+        shader.clear();
+        vertex_buffer.clear();
+        index_buffer.clear();
         // uniform_buffer.clear();
         // pixel_buffer.clear();
         // framebuffer.clear();

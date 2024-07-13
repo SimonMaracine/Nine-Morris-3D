@@ -1,7 +1,7 @@
 #version 430 core
 
 #include "shaders/common/frag/light.glsl"
-#include "shaders/common/frag/material/phong_textured_normal.glsl"
+#include "shaders/common/frag/material/phong_diffuse_normal.glsl"
 
 in vec3 v_fragment_position_tangent_space;
 in vec2 v_texture_coordinate;

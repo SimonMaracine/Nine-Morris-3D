@@ -2,6 +2,8 @@
 
 #include <fstream>
 #include <cstddef>
+#include <filesystem>
+#include <cassert>
 
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
@@ -28,6 +30,13 @@ namespace sm {
             x = (width - screen_width) / -2.0f;
             y = 0.0f;
         }
+    }
+
+    std::string utils::file_name(const std::string& file_path) {
+        const auto path {std::filesystem::path(file_path)};
+        assert(path.has_filename());
+
+        return path.filename().string();
     }
 
     std::string utils::read_file_ex(const std::string& file_path) {

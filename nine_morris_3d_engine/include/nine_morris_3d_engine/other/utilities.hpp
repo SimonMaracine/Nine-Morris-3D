@@ -28,6 +28,8 @@ namespace sm {
             float& height
         );
 
+        std::string file_name(const std::string& file_path);
+
         std::string read_file_ex(const std::string& file_path);
         std::string read_file(const std::string& file_path);
 

@@ -1,6 +1,5 @@
 #include "game/scenes/game_scene.hpp"
 
-#include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <nine_morris_3d_engine/external/resmanager.h++>
 #include <nine_morris_3d_engine/external/imgui.h++>
 
@@ -218,422 +217,60 @@ void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
 }
 
 void GameScene::load_models() {
-    {
-        auto mesh {ctx.res.mesh.load(
-            "dragon"_H,
-            sm::utils::read_file(ctx.fs.path_assets("models/dragon.obj")),
-            "default",
-            sm::Mesh::Type::PN
-        )};
-
-        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh->get_vertices(),
-            mesh->get_vertices_size()
-        )};
-
-        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh->get_indices(),
-            mesh->get_indices_size()
-        )};
-
-        auto vertex_array {ctx.res.vertex_array.load("dragon"_H)};
-        vertex_array->configure([&](sm::GlVertexArray* va) {
-            sm::VertexBufferLayout layout;
-            layout.add(0, sm::VertexBufferLayout::Float, 3);
-            layout.add(1, sm::VertexBufferLayout::Float, 3);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-            va->add_index_buffer(index_buffer);
-        });
-    }
-
-    {
-        auto mesh {ctx.res.mesh.load(
-            "teapot"_H,
-            sm::utils::read_file(ctx.fs.path_assets("models/teapot.obj")),
-            sm::Mesh::DEFAULT_OBJECT,
-            sm::Mesh::Type::PN
-        )};
-
-        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh->get_vertices(),
-            mesh->get_vertices_size()
-        )};
-
-        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh->get_indices(),
-            mesh->get_indices_size()
-        )};
-
-        auto vertex_array {ctx.res.vertex_array.load("teapot"_H)};
-        vertex_array->configure([&](sm::GlVertexArray* va) {
-            sm::VertexBufferLayout layout;
-            layout.add(0, sm::VertexBufferLayout::Float, 3);
-            layout.add(1, sm::VertexBufferLayout::Float, 3);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-            va->add_index_buffer(index_buffer);
-        });
-    }
-
-    {
-        auto mesh {ctx.res.mesh.load(
-            "cube"_H,
-            sm::utils::read_file(ctx.fs.path_assets("models/cube.obj")),
-            "Cube",
-            sm::Mesh::Type::PN
-        )};
-
-        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh->get_vertices(),
-            mesh->get_vertices_size()
-        )};
-
-        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh->get_indices(),
-            mesh->get_indices_size()
-        )};
-
-        auto vertex_array {ctx.res.vertex_array.load("cube"_H)};
-        vertex_array->configure([&](sm::GlVertexArray* va) {
-            sm::VertexBufferLayout layout;
-            layout.add(0, sm::VertexBufferLayout::Float, 3);
-            layout.add(1, sm::VertexBufferLayout::Float, 3);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-            va->add_index_buffer(index_buffer);
-        });
-    }
-
-    {
-        auto mesh {ctx.res.mesh.load(
-            "brick"_H,
-            sm::utils::read_file(ctx.fs.path_assets("models/brick.obj")),
-            "Brick",
-            sm::Mesh::Type::PNT
-        )};
-
-        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh->get_vertices(),
-            mesh->get_vertices_size()
-        )};
-
-        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh->get_indices(),
-            mesh->get_indices_size()
-        )};
-
-        auto vertex_array {ctx.res.vertex_array.load("brick"_H)};
-        vertex_array->configure([&](sm::GlVertexArray* va) {
-            sm::VertexBufferLayout layout;
-            layout.add(0, sm::VertexBufferLayout::Float, 3);
-            layout.add(1, sm::VertexBufferLayout::Float, 3);
-            layout.add(2, sm::VertexBufferLayout::Float, 2);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-            va->add_index_buffer(index_buffer);
-        });
-    }
-
-    {
-        auto mesh {ctx.res.mesh.load(
-            "lamp_stand"_H,
-            sm::utils::read_file(ctx.fs.path_assets("models/lamp.obj")),
-            "Stand",
-            sm::Mesh::Type::PNT
-        )};
-
-        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh->get_vertices(),
-            mesh->get_vertices_size()
-        )};
-
-        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh->get_indices(),
-            mesh->get_indices_size()
-        )};
-
-        auto vertex_array {ctx.res.vertex_array.load("lamp_stand"_H)};
-        vertex_array->configure([&](sm::GlVertexArray* va) {
-            sm::VertexBufferLayout layout;
-            layout.add(0, sm::VertexBufferLayout::Float, 3);
-            layout.add(1, sm::VertexBufferLayout::Float, 3);
-            layout.add(2, sm::VertexBufferLayout::Float, 2);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-            va->add_index_buffer(index_buffer);
-        });
-    }
-
-    {
-        auto mesh {ctx.res.mesh.load(
-            "lamp_bulb"_H,
-            sm::utils::read_file(ctx.fs.path_assets("models/lamp.obj")),
-            "Bulb",
-            sm::Mesh::Type::P
-        )};
-
-        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh->get_vertices(),
-            mesh->get_vertices_size()
-        )};
-
-        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh->get_indices(),
-            mesh->get_indices_size()
-        )};
-
-        auto vertex_array {ctx.res.vertex_array.load("lamp_bulb"_H)};
-        vertex_array->configure([&](sm::GlVertexArray* va) {
-            sm::VertexBufferLayout layout;
-            layout.add(0, sm::VertexBufferLayout::Float, 3);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-            va->add_index_buffer(index_buffer);
-        });
-    }
-
-    {
-        auto mesh {ctx.res.mesh.load(
-            "ground"_H,
-            sm::utils::read_file(ctx.fs.path_assets("models/ground.obj")),
-            "Cube",
-            sm::Mesh::Type::PN
-        )};
-
-        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh->get_vertices(),
-            mesh->get_vertices_size()
-        )};
-
-        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh->get_indices(),
-            mesh->get_indices_size()
-        )};
-
-        auto vertex_array {ctx.res.vertex_array.load("ground"_H)};
-        vertex_array->configure([&](sm::GlVertexArray* va) {
-            sm::VertexBufferLayout layout;
-            layout.add(0, sm::VertexBufferLayout::Float, 3);
-            layout.add(1, sm::VertexBufferLayout::Float, 3);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-            va->add_index_buffer(index_buffer);
-        });
-    }
-
-    {
-        auto mesh {ctx.res.mesh.load(
-            "barrel"_H,
-            sm::utils::read_file(ctx.fs.path_assets("models/barrel.obj")),
-            "Mesh_Mesh_Cylinder.001",
-            sm::Mesh::Type::PNTT
-        )};
-
-        auto vertex_buffer {std::make_shared<sm::GlVertexBuffer>(
-            mesh->get_vertices(),
-            mesh->get_vertices_size()
-        )};
-
-        auto index_buffer {std::make_shared<sm::GlIndexBuffer>(
-            mesh->get_indices(),
-            mesh->get_indices_size()
-        )};
-
-        auto vertex_array {ctx.res.vertex_array.load("barrel"_H)};
-        vertex_array->configure([&](sm::GlVertexArray* va) {
-            sm::VertexBufferLayout layout;
-            layout.add(0, sm::VertexBufferLayout::Float, 3);
-            layout.add(1, sm::VertexBufferLayout::Float, 3);
-            layout.add(2, sm::VertexBufferLayout::Float, 2);
-            layout.add(3, sm::VertexBufferLayout::Float, 3);
-
-            va->add_vertex_buffer(vertex_buffer, layout);
-            va->add_index_buffer(index_buffer);
-        });
-    }
+    ctx.load_model(ctx.fs.path_assets("models/dragon.obj"), "default", sm::Mesh::Type::PN);
+    ctx.load_model(ctx.fs.path_assets("models/teapot.obj"), sm::Mesh::DEFAULT_OBJECT, sm::Mesh::Type::PN);
+    ctx.load_model(ctx.fs.path_assets("models/cube.obj"), "Cube", sm::Mesh::Type::PN);
+    ctx.load_model(ctx.fs.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT);
+    ctx.load_model("lamp_stand", ctx.fs.path_assets("models/lamp.obj"), "Stand", sm::Mesh::Type::PNT);
+    ctx.load_model("lamp_bulb", ctx.fs.path_assets("models/lamp.obj"), "Bulb", sm::Mesh::Type::P);
+    ctx.load_model(ctx.fs.path_assets("models/ground.obj"), "Cube", sm::Mesh::Type::PN);
+    ctx.load_model(ctx.fs.path_assets("models/barrel.obj"), "Mesh_Mesh_Cylinder.001", sm::Mesh::Type::PNTT);
 }
 
 void GameScene::load_textures() {
-    {
-        sm::TexturePostProcessing post_processing;
-        post_processing.flip = true;
-
-        auto data {ctx.res.texture_data.load(
-            "brick-texture3"_H,
-            sm::utils::read_file(ctx.fs.path_assets("textures/brick-texture3.png")),
-            post_processing
-        )};
-
-        ctx.res.texture.load("brick"_H, data);
-    }
+    ctx.load_texture(ctx.fs.path_assets("textures/brick-texture3.png"), {}, {});
+    ctx.load_texture(ctx.fs.path_assets("textures/indicator/wait_indicator.png"), {}, {});
 
     {
         sm::TexturePostProcessing post_processing;
-        post_processing.flip = true;
-
-        auto data {ctx.res.texture_data.load(
-            "wait_indicator"_H,
-            sm::utils::read_file(ctx.fs.path_assets("textures/indicator/wait_indicator.png")),
-            post_processing
-        )};
-
-        ctx.res.texture.load("wait_indicator"_H, data);
-    }
-
-    {
-        sm::TexturePostProcessing post_processing;
-        post_processing.flip = true;
         post_processing.size = sm::Size::Half;
 
-        auto data {ctx.res.texture_data.load(
-            "white_indicator"_H,
-            sm::utils::read_file(ctx.fs.path_assets("textures/indicator/white_indicator.png")),
-            post_processing
-        )};
-
-        ctx.res.texture.load("white_indicator"_H, data);
+        ctx.load_texture(ctx.fs.path_assets("textures/indicator/white_indicator.png"), post_processing, {});
     }
+
+    ctx.load_texture(ctx.fs.path_assets("textures/lamp-texture.png"), {}, {});
+    ctx.load_texture(ctx.fs.path_assets("textures/barrel.png"), {}, {});
+    ctx.load_texture(ctx.fs.path_assets("textures/barrelNormal.png"), {}, {});
 
     {
         sm::TexturePostProcessing processing;
         processing.size = sm::Size::Half;  // Half looks better
 
-        auto px {std::make_shared<sm::TextureData>(
-            sm::utils::read_file(ctx.fs.path_assets("textures/skybox/field/px.png")),
+        ctx.load_texture_cubemap(
+            "field",
+            {
+                ctx.fs.path_assets("textures/skybox/field/px.png"),
+                ctx.fs.path_assets("textures/skybox/field/nx.png"),
+                ctx.fs.path_assets("textures/skybox/field/py.png"),
+                ctx.fs.path_assets("textures/skybox/field/ny.png"),
+                ctx.fs.path_assets("textures/skybox/field/pz.png"),
+                ctx.fs.path_assets("textures/skybox/field/nz.png")
+            },
             processing
-        )};
-
-        auto nx {std::make_shared<sm::TextureData>(
-            sm::utils::read_file(ctx.fs.path_assets("textures/skybox/field/nx.png")),
-            processing
-        )};
-
-        auto py {std::make_shared<sm::TextureData>(
-            sm::utils::read_file(ctx.fs.path_assets("textures/skybox/field/py.png")),
-            processing
-        )};
-
-        auto ny {std::make_shared<sm::TextureData>(
-            sm::utils::read_file(ctx.fs.path_assets("textures/skybox/field/ny.png")),
-            processing
-        )};
-
-        auto pz {std::make_shared<sm::TextureData>(
-            sm::utils::read_file(ctx.fs.path_assets("textures/skybox/field/pz.png")),
-            processing
-        )};
-
-        auto nz {std::make_shared<sm::TextureData>(
-            sm::utils::read_file(ctx.fs.path_assets("textures/skybox/field/nz.png")),
-            processing
-        )};
-
-        const std::initializer_list list {px, nx, py, ny, pz, nz};
-
-        ctx.res.texture_cubemap.load("field"_H, list);
-    }
-
-    {
-        sm::TexturePostProcessing post_processing;
-        post_processing.flip = true;
-
-        auto data {ctx.res.texture_data.load(
-            "lamp"_H,
-            sm::utils::read_file(ctx.fs.path_assets("textures/lamp-texture.png")),
-            post_processing
-        )};
-
-        ctx.res.texture.load("lamp"_H, data);
-    }
-
-    {
-        sm::TexturePostProcessing post_processing;
-        post_processing.flip = true;
-
-        auto data {ctx.res.texture_data.load(
-            "barrel"_H,
-            sm::utils::read_file(ctx.fs.path_assets("textures/barrel.png")),
-            post_processing
-        )};
-
-        ctx.res.texture.load("barrel"_H, data);
-    }
-
-    {
-        sm::TexturePostProcessing post_processing;
-        post_processing.flip = true;
-
-        auto data {ctx.res.texture_data.load(
-            "barrel_normal"_H,
-            sm::utils::read_file(ctx.fs.path_assets("textures/barrelNormal.png")),
-            post_processing
-        )};
-
-        ctx.res.texture.load("barrel_normal"_H, data);
+        );
     }
 }
 
 void GameScene::load_materials() {
-    {
-        auto shader {std::make_shared<sm::GlShader>(
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_shadows.vert"))),
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_shadows.frag")))
-        )};
-
-        ctx.rnd.register_shader(shader);
-
-        auto material {ctx.res.material.load("phong_shadows"_H, shader, sm::Material::CastShadow)};
-        material->add_uniform(sm::Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
-        material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
-        material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
-    }
-
-    {
-        auto shader {std::make_shared<sm::GlShader>(
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured_shadows.vert"))),
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured_shadows.frag")))
-        )};
-
-        ctx.rnd.register_shader(shader);
-
-        auto material {ctx.res.material.load("phong_textured_shadows"_H, shader, sm::Material::CastShadow)};
-        material->add_texture("u_material.ambient_diffuse"_H);
-        material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
-        material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
-    }
-
-    {
-        auto shader {std::make_shared<sm::GlShader>(
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured_normal_shadows.vert"))),
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/phong_textured_normal_shadows.frag")))
-        )};
-
-        ctx.rnd.register_shader(shader);
-
-        auto material {ctx.res.material.load("phong_textured_normal_shadows"_H, shader, sm::Material::CastShadow)};
-        material->add_texture("u_material.ambient_diffuse"_H);
-        material->add_uniform(sm::Material::Uniform::Vec3, "u_material.specular"_H);
-        material->add_uniform(sm::Material::Uniform::Float, "u_material.shininess"_H);
-        material->add_texture("u_material.normal"_H);
-    }
-
-    {
-        auto shader {std::make_shared<sm::GlShader>(
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/flat.vert"))),
-            ctx.shd.load_shader(sm::utils::read_file(ctx.fs.path_assets("shaders/flat.frag")))
-        )};
-
-        ctx.rnd.register_shader(shader);
-
-        auto material {ctx.res.material.load("flat"_H, shader, sm::Material::CastShadow)};
-        material->add_uniform(sm::Material::Uniform::Vec3, "u_material.color"_H);
-    }
+    ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow);
+    ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow);
+    ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow);
+    ctx.load_material(sm::MaterialType::Flat, sm::Material::CastShadow);
 }
 
 void GameScene::load_material_instances() {
     {
-        auto material_instance {ctx.res.material_instance.load("dragon1"_H, ctx.res.material["phong_shadows"_H])};
+        auto material_instance {ctx.res.material_instance.load("dragon1"_H, ctx.res.material["phong_shadow"_H])};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
@@ -641,14 +278,14 @@ void GameScene::load_material_instances() {
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("dragon2"_H, ctx.res.material["phong_shadows"_H])};
+        auto material_instance {ctx.res.material_instance.load("dragon2"_H, ctx.res.material["phong_shadow"_H])};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 0.2f, 0.1f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("teapot"_H, ctx.res.material["phong_shadows"_H])};
+        auto material_instance {ctx.res.material_instance.load("teapot"_H, ctx.res.material["phong_shadow"_H])};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.7f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.7f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
@@ -656,22 +293,22 @@ void GameScene::load_material_instances() {
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("cube"_H, ctx.res.material["phong_shadows"_H])};
+        auto material_instance {ctx.res.material_instance.load("cube"_H, ctx.res.material["phong_shadow"_H])};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 0.0f, 0.0f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.8f));
         material_instance->set_float("u_material.shininess"_H, 128.0f);
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("brick"_H, ctx.res.material["phong_textured_shadows"_H])};
-        material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["brick"_H], 0);
+        auto material_instance {ctx.res.material_instance.load("brick"_H, ctx.res.material["phong_diffuse_shadow"_H])};
+        material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["brick-texture3.png"_H], 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("lamp_stand"_H, ctx.res.material["phong_textured_shadows"_H])};
-        material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["lamp"_H], 0);
+        auto material_instance {ctx.res.material_instance.load("lamp_stand"_H, ctx.res.material["phong_diffuse_shadow"_H])};
+        material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["lamp-texture.png"_H], 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
     }
@@ -682,44 +319,44 @@ void GameScene::load_material_instances() {
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("ground"_H, ctx.res.material["phong_shadows"_H])};
+        auto material_instance {ctx.res.material_instance.load("ground"_H, ctx.res.material["phong_shadow"_H])};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.7f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.4f));
         material_instance->set_float("u_material.shininess"_H, 16.0f);
     }
 
     {
-        auto material_instance {ctx.res.material_instance.load("barrel"_H, ctx.res.material["phong_textured_normal_shadows"_H])};
-        material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["barrel"_H], 0);
+        auto material_instance {ctx.res.material_instance.load("barrel"_H, ctx.res.material["phong_diffuse_normal_shadow"_H])};
+        material_instance->set_texture("u_material.ambient_diffuse"_H, ctx.res.texture["barrel.png"_H], 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
-        material_instance->set_texture("u_material.normal"_H, ctx.res.texture["barrel_normal"_H], 1);
+        material_instance->set_texture("u_material.normal"_H, ctx.res.texture["barrelNormal.png"_H], 1);
     }
 }
 
 void GameScene::setup_renderables() {
-    ground = sm::Renderable(ctx.res.mesh["ground"_H], ctx.res.vertex_array["ground"_H], ctx.res.material_instance["ground"_H]);
+    ground = sm::Renderable(ctx.res.mesh["ground.obj"_H], ctx.res.vertex_array["ground.obj"_H], ctx.res.material_instance["ground"_H]);
     ground.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
     ground.transform.scale = 2.0f;
 
-    dragon1 = sm::Renderable(ctx.res.mesh["dragon"_H], ctx.res.vertex_array["dragon"_H], ctx.res.material_instance["dragon1"_H]);
+    dragon1 = sm::Renderable(ctx.res.mesh["dragon.obj"_H], ctx.res.vertex_array["dragon.obj"_H], ctx.res.material_instance["dragon1"_H]);
     dragon1.transform.scale = 0.7f;
     dragon1.outline.color = glm::vec3(0.2f, 0.1f, 1.0f);
     dragon1.outline.thickness = 0.2f;
 
-    dragon2 = sm::Renderable(ctx.res.mesh["dragon"_H], ctx.res.vertex_array["dragon"_H], ctx.res.material_instance["dragon2"_H]);
+    dragon2 = sm::Renderable(ctx.res.mesh["dragon.obj"_H], ctx.res.vertex_array["dragon.obj"_H], ctx.res.material_instance["dragon2"_H]);
     dragon2.transform.position = glm::vec3(4.0f, 0.0, 0.0f);
     dragon2.transform.scale = 0.2f;
 
-    teapot = sm::Renderable(ctx.res.mesh["teapot"_H], ctx.res.vertex_array["teapot"_H], ctx.res.material_instance["teapot"_H]);
+    teapot = sm::Renderable(ctx.res.mesh["teapot.obj"_H], ctx.res.vertex_array["teapot.obj"_H], ctx.res.material_instance["teapot"_H]);
     teapot.transform.position = glm::vec3(2.6f, 0.0, -7.0f);
     teapot.transform.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
 
-    cube = sm::Renderable(ctx.res.mesh["cube"_H], ctx.res.vertex_array["cube"_H], ctx.res.material_instance["cube"_H]);
+    cube = sm::Renderable(ctx.res.mesh["cube.obj"_H], ctx.res.vertex_array["cube.obj"_H], ctx.res.material_instance["cube"_H]);
     cube.transform.position = glm::vec3(5.0f, 2.0f, -2.0f);
     cube.transform.scale = 0.8f;
 
-    brick = sm::Renderable(ctx.res.mesh["brick"_H], ctx.res.vertex_array["brick"_H], ctx.res.material_instance["brick"_H]);
+    brick = sm::Renderable(ctx.res.mesh["brick.obj"_H], ctx.res.vertex_array["brick.obj"_H], ctx.res.material_instance["brick"_H]);
     brick.transform.position = glm::vec3(6.0f);
     brick.transform.rotation = glm::vec3(10.0f);
 
@@ -729,7 +366,7 @@ void GameScene::setup_renderables() {
     lamp_bulb = sm::Renderable(ctx.res.mesh["lamp_bulb"_H], ctx.res.vertex_array["lamp_bulb"_H], ctx.res.material_instance["lamp_bulb"_H]);
     lamp_bulb.transform.position = glm::vec3(-6.0f, 0.0f, -6.0f);
 
-    barrel = sm::Renderable(ctx.res.mesh["barrel"_H], ctx.res.vertex_array["barrel"_H], ctx.res.material_instance["barrel"_H]);
+    barrel = sm::Renderable(ctx.res.mesh["barrel.obj"_H], ctx.res.vertex_array["barrel.obj"_H], ctx.res.material_instance["barrel"_H]);
     barrel.transform.position = glm::vec3(-7.0f, 4.5f, 6.0f);
     barrel.transform.scale = 0.5f;
 
@@ -747,9 +384,9 @@ void GameScene::setup_renderables() {
 
     text4.font = ctx.res.font["sans"_H];
 
-    wait.texture = ctx.res.texture["wait_indicator"_H];
+    wait.texture = ctx.res.texture["wait_indicator.png"_H];
     wait.position = glm::vec2(70.0f);
 
-    white.texture = ctx.res.texture["white_indicator"_H];
+    white.texture = ctx.res.texture["white_indicator.png"_H];
     white.position = glm::vec2(210.0f, 210.0f);
 }

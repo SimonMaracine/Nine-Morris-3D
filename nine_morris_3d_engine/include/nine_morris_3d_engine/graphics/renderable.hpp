@@ -54,9 +54,9 @@ namespace sm {
     };
 
     struct Quad {
+        std::shared_ptr<GlTexture> texture;
         glm::vec2 position {};
         glm::vec2 scale {1.0f};
-        std::shared_ptr<GlTexture> texture;
     };
 
     struct DebugLine {

@@ -9,7 +9,7 @@ namespace sm {
     };
 
     struct TexturePostProcessing {
-        bool flip {false};
+        bool flip {true};
         Size size {Size::Default};
     };
 

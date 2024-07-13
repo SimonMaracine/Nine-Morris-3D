@@ -2,6 +2,8 @@
 
 #include <any>
 #include <string>
+#include <utility>
+#include <initializer_list>
 
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/events.hpp"
@@ -14,15 +16,30 @@
 #include "nine_morris_3d_engine/application/id.hpp"
 #include "nine_morris_3d_engine/audio/context.hpp"
 #include "nine_morris_3d_engine/audio/music.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
 #include "nine_morris_3d_engine/graphics/renderer.hpp"
 #include "nine_morris_3d_engine/graphics/shader_library.hpp"
 #include "nine_morris_3d_engine/graphics/scene.hpp"
 #include "nine_morris_3d_engine/graphics/debug_ui.hpp"
+#include "nine_morris_3d_engine/graphics/mesh.hpp"
+#include "nine_morris_3d_engine/graphics/texture_data.hpp"
 #include "nine_morris_3d_engine/other/resources_cache.hpp"
 #include "nine_morris_3d_engine/other/random_gen.hpp"
 
 namespace sm {
     class Application;
+
+    using Model = std::pair<std::shared_ptr<Mesh>, std::shared_ptr<GlVertexArray>>;
+
+    enum class MaterialType {
+        Flat,
+        Phong,
+        PhongShadow,
+        PhongDiffuse,
+        PhongDiffuseShadow,
+        PhongDiffuseNormalShadow,
+    };
 
     // Wrapper around functionality exposed to the user
     class Ctx {
@@ -42,7 +59,32 @@ namespace sm {
 
         void change_scene(Id id);
         void show_info_text();
-        std::string get_information();
+        std::string get_information() const;
+        Model load_model(
+            const std::string& identifier,
+            const std::string& file_path,
+            const std::string& mesh_name,
+            Mesh::Type type
+        );
+        Model load_model(const std::string& file_path, const std::string& mesh_name, Mesh::Type type);
+        std::shared_ptr<GlTexture> load_texture(
+            const std::string& file_path,
+            const TexturePostProcessing& post_processing,
+            const TextureSpecification& specification
+        );
+        std::shared_ptr<GlTextureCubemap> load_texture_cubemap(
+            const std::string& identifier,
+            std::initializer_list<std::string> file_paths,
+            const TexturePostProcessing& post_processing
+        );
+        std::shared_ptr<Material> load_material(MaterialType type, unsigned int flags = 0);
+        std::shared_ptr<Material> load_material(
+            const std::string& identifier,
+            const std::string& vertex_file_path,
+            const std::string& fragment_file_path,
+            MaterialType type,
+            unsigned int flags = 0
+        );
 
         template<typename T>
         T& global() {
