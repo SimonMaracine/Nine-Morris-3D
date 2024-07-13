@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -15,6 +14,7 @@ namespace sm {
     class Window;
 
     struct UserFunctions {
+        // Not called when an exception is thrown
         std::function<void(Ctx&)> start {[](Ctx&) {}};
         std::function<void(Ctx&)> stop {[](Ctx&) {}};
     };
@@ -38,6 +38,12 @@ namespace sm {
             scenes.push_back(std::make_unique<S>(ctx));
         }
 
+        // Setup a struct that is shared across all scenes
+        template<typename T>
+        void set_global_data() {
+            ctx.global_data.emplace<T>();
+        }
+
         // API accessible to the user
         Ctx ctx;
     private:
@@ -46,7 +52,6 @@ namespace sm {
         void check_changed_scene();
         void dear_imgui_render();
         void setup_start_scene(Id start_scene_id);
-        std::string get_information();
 
         void on_window_closed(const WindowClosedEvent&);
         void on_window_resized(const WindowResizedEvent& event);
@@ -55,7 +60,7 @@ namespace sm {
         // Scene system
         std::vector<std::unique_ptr<ApplicationScene>> scenes;
         ApplicationScene* current_scene {nullptr};
-        ApplicationScene* next_scene {nullptr};  // Next scene to enter
+        ApplicationScene* next_scene {nullptr};
 
         // Clock variables
         struct {

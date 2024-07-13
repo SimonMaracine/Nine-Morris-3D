@@ -7,12 +7,10 @@
 
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
-#include "nine_morris_3d_engine/audio/openal/debug.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 #include "nine_morris_3d_engine/graphics/imgui_context.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
-#include "nine_morris_3d_engine/other/dependencies.hpp"
 
 namespace sm {
     Application::Application(const ApplicationProperties& properties)
@@ -28,7 +26,7 @@ namespace sm {
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
 
 #ifndef SM_BUILD_DISTRIBUTION
-        LOG_INFO("{}", get_information());
+        LOG_INFO("{}", ctx.get_information());
 #endif
 
         ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
@@ -175,17 +173,6 @@ namespace sm {
         }
 
         assert(current_scene != nullptr);
-    }
-
-    std::string Application::get_information() {
-        std::string result;;
-
-        result += '\n';
-        result += openal_debug::get_information();
-        result += opengl_debug::get_information();
-        result += dependencies::get_information();
-
-        return result;
     }
 
     void Application::on_window_closed(const WindowClosedEvent&) {

@@ -1,13 +1,13 @@
 #include "nine_morris_3d_engine/application/context.hpp"
 
-#include <memory>
-#include <string>
 #include <utility>
 #include <cassert>
 
 #include "nine_morris_3d_engine/application/application.hpp"
 #include "nine_morris_3d_engine/application/scene.hpp"
+#include "nine_morris_3d_engine/audio/openal/debug.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
+#include "nine_morris_3d_engine/other/dependencies.hpp"
 
 namespace sm {
     void Ctx::change_scene(Id id) {
@@ -39,5 +39,16 @@ namespace sm {
 
         // Don't add it to the debug lists
         scn.add_text(const_cast<const Text&>(text));
+    }
+
+    std::string Ctx::get_information() {
+        std::string result;
+
+        result += '\n';
+        result += openal_debug::get_information();
+        result += opengl_debug::get_information();
+        result += dependencies::get_information();
+
+        return result;
     }
 }

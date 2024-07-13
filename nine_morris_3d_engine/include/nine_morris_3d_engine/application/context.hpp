@@ -1,5 +1,8 @@
 #pragma once
 
+#include <any>
+#include <string>
+
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/events.hpp"
 #include "nine_morris_3d_engine/application/window.hpp"
@@ -39,9 +42,15 @@ namespace sm {
 
         void change_scene(Id id);
         void show_info_text();
+        std::string get_information();
 
         template<typename T>
         T& global() {
+            return std::any_cast<T&>(global_data);
+        }
+
+        template<typename T>
+        T& user() {
             return *static_cast<T*>(user_data);
         }
 
@@ -69,6 +78,7 @@ namespace sm {
 #ifndef SM_BUILD_DISTRIBUTION
         DebugUi dbg;
 #endif
+        std::any global_data;
         void* user_data {nullptr};  // Arbitrary data defined by the user
         Application* application {nullptr};
 

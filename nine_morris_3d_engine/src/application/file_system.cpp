@@ -1,5 +1,7 @@
 #include "nine_morris_3d_engine/application/file_system.hpp"
 
+// FIXME use exceptions!!!
+
 #include <filesystem>
 #include <optional>
 #include <iostream>  // Use stderr stream, because logging doesn't exist at this point

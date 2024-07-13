@@ -27,7 +27,6 @@ static constexpr unsigned int PATCH {0};
 int application_main() {
     while (true) {
         int exit_code {};
-        Global g;  // FIXME no data should live before Application
 
         {
             sm::ApplicationProperties properties;
@@ -42,7 +41,6 @@ int application_main() {
             properties.info_file = INFO_FILE;
             properties.log_file = LOG_FILE;
             properties.assets_directory = ASSETS_DIRECTORY;
-            properties.user_data = &g;
 
             sm::UserFunctions functions;
             functions.start = game_start;
@@ -51,6 +49,7 @@ int application_main() {
             try {
                 auto game {sm::Application(properties)};
                 game.add_scene<GameScene>();
+                game.set_global_data<Global>();
                 exit_code = game.run("game"_H, functions);
             } catch (sm::RuntimeError error) {
                 std::cerr << "Terminated game with error code " << static_cast<int>(error) << '\n';
