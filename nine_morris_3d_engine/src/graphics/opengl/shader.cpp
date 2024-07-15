@@ -19,7 +19,7 @@ namespace sm {
         create_program(vertex_shader, fragment_shader);
 
         if (!check_linking(program)) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not link shader program {}", program);
+            SM_THROW_ERROR(ResourceError, "Could not link shader program {}", program);
         }
 
         delete_intermediates(vertex_shader, fragment_shader);
@@ -252,7 +252,7 @@ namespace sm {
         glCompileShader(shader);
 
         if (!check_compilation(shader, type)) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not compile shader {}", shader);
+            SM_THROW_ERROR(ResourceError, "Could not compile shader {}", shader);
         }
 
         return shader;

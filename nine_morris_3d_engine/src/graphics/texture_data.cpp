@@ -34,7 +34,7 @@ namespace sm {
         );
 
         if (data == nullptr) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load texture data");
+            SM_THROW_ERROR(ResourceError, "Could not load texture data");
         }
 
         if (post_processing.size == Size::Half) {

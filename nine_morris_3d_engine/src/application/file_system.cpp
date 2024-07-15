@@ -1,11 +1,7 @@
 #include "nine_morris_3d_engine/application/file_system.hpp"
 
-// FIXME use exceptions!!!
-
 #include <filesystem>
 #include <optional>
-#include <iostream>  // Use stderr stream, because logging doesn't exist at this point
-#include <cstdlib>
 
 #include "nine_morris_3d_engine/application/platform.hpp"
 
@@ -16,6 +12,8 @@
 #elif defined(SM_PLATFORM_WINDOWS)
     #include <Windows.h>
 #endif
+
+#include "nine_morris_3d_engine/application/error.hpp"
 
 #if defined(SM_PLATFORM_LINUX)
     #define USER_DATA_DIRECTORY_PATH(user_name, application_name) \
@@ -58,8 +56,7 @@ namespace sm {
         const auto name {get_user_name()};
 
         if (!name) {
-            std::cerr << "An unrecoverable error occurred!\n";
-            std::abort();
+            throw InitializationError("Could not retrieve user name");
         }
 
         user_name = *name;
@@ -158,12 +155,10 @@ namespace sm {
         const std::string path {USER_DATA_DIRECTORY_PATH(user_name, application_name)};
 
         if (!directory_exists(path)) {
-            std::cerr << "Directory `" << path << "` doesn't exist, creating it...\n";
+            error_string = "Directory `" + path + "` doesn't exist, creating it...";
 
-            if (create_directory(path)) {
-                std::cerr << "Created directory `" << path << "`\n";
-            } else {
-                std::cerr << "Could not create directory `" << path << "`\n";
+            if (!create_directory(path)) {
+                throw InitializationError("Could not create directory `" + path + "`");
             }
         }
 #elif defined(SM_PLATFORM_WINDOWS)
@@ -172,24 +167,20 @@ namespace sm {
         path = USER_DATA_DIRECTORY_PATH(user_name, application_name);
 
         if (!directory_exists(path)) {
-            std::cerr << "Directory `" << path << "` doesn't exist, creating it...\n";
+            error_string + "Directory `" + path + "` doesn't exist, creating it...";
 
-            if (create_directory(path)) {
-                std::cerr << "Created directory `" << path << "`\n";
-            } else {
-                std::cerr << "Could not create directory `" << path << "`\n";
+            if (!create_directory(path)) {
+                throw InitializationError("Could not create directory `" + path + "`");
             }
         }
 
         path = USER_DATA2_DIRECTORY_PATH(user_name, application_name);
 
         if (!directory_exists(path)) {
-            std::cerr << "Directory `" << path << "` doesn't exist, creating it...\n";
+            error_string = "Directory `" + path + "` doesn't exist, creating it...";
 
-            if (create_directory(path)) {
-                std::cerr << "Could not create directory `" << path << "`\n";
-            } else {
-                std::cerr << "Could not create directory `" << path << "`\n";
+            if (!create_directory(path)) {
+                throw InitializationError("Could not create directory `" + path + "`");
             }
         }
 #endif

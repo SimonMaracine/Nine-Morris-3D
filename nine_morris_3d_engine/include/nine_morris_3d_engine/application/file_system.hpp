@@ -30,6 +30,8 @@ namespace sm {
         std::string assets_directory;
         std::string user_name;
 
+        mutable std::string error_string;
+
         friend class Ctx;
     };
 }

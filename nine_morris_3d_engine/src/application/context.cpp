@@ -8,12 +8,23 @@
 
 #include "nine_morris_3d_engine/application/application.hpp"
 #include "nine_morris_3d_engine/application/scene.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/audio/openal/debug.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 #include "nine_morris_3d_engine/other/dependencies.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
+    Ctx::Ctx(const ApplicationProperties& properties)
+        : fs(properties.application_name, properties.assets_directory), log(properties.log_file, fs),
+        shd({"engine_assets", properties.assets_directory}), win(properties, &evt),
+        rnd(properties.width, properties.height, properties.samples, fs, shd),
+        snd(properties.audio), inp(win.get_handle()) {
+        if (!fs.error_string.empty()) {
+            LOG_DIST_ERROR("{}", fs.error_string);
+        }
+    }
+
     void Ctx::change_scene(Id id) {
         assert(application->next_scene == nullptr);
 

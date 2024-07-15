@@ -22,7 +22,7 @@ namespace sm {
         font_info = new stbtt_fontinfo;
 
         if (!stbtt_InitFont(font_info, reinterpret_cast<unsigned char*>(font_buffer.data()), 0)) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load font");
+            SM_THROW_ERROR(ResourceError, "Could not load font");
         }
 
         sf = stbtt_ScaleForPixelHeight(font_info, specification.size_height);
@@ -60,7 +60,7 @@ namespace sm {
         pack_context = new stbtt_pack_context;
 
         if (!stbtt_PackBegin(pack_context, bitmap.get(), bitmap_size, bitmap_size, 0, 1, nullptr)) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not begin packing");
+            SM_THROW_ERROR(ResourceError, "Could not begin packing");
         }
 
         bitmap_texture.reset();
@@ -94,7 +94,7 @@ namespace sm {
         auto* characters {static_cast<stbtt_packedchar*>(pack_range.packed_characters)};
 
         if (!stbtt_PackFontRange(pack_context, data, 0, size_height, begin_codepoint, count, characters)) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not pack range [{}, {}]", begin_codepoint, begin_codepoint + count);
+            SM_THROW_ERROR(ResourceError, "Could not pack range [{}, {}]", begin_codepoint, begin_codepoint + count);
         }
 
         pack_range.begin_codepoint = begin_codepoint;

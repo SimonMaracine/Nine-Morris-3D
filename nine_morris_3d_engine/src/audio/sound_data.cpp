@@ -19,7 +19,7 @@ namespace sm {
         );
 
         if (data == nullptr) {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Could not load sound data");
+            SM_THROW_ERROR(ResourceError, "Could not load sound data");
         }
 
         size = compute_size();

@@ -19,7 +19,7 @@ namespace sm {
         } else if (channels == 2 && bps == 16) {
             format = AL_FORMAT_STEREO16;
         } else {
-            SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Unknown format: channels = {}, bps = {}", channels, bps);
+            SM_THROW_ERROR(ResourceError, "Unknown format: channels = {}, bps = {}", channels, bps);
         }
 
         return format;

@@ -44,12 +44,7 @@ namespace sm {
     // Wrapper around functionality exposed to the user
     class Ctx {
     public:
-        explicit Ctx(const ApplicationProperties& properties)
-            : fs(properties.application_name, properties.assets_directory), log(properties.log_file, fs),
-            shd({"engine_assets", properties.assets_directory}), win(properties, &evt),
-            rnd(properties.width, properties.height, properties.samples, fs, shd),
-            snd(properties.audio), inp(win.get_handle()) {}
-
+        explicit Ctx(const ApplicationProperties& properties);
         ~Ctx() = default;
 
         Ctx(const Ctx&) = delete;

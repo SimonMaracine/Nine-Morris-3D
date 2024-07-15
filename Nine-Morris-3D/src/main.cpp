@@ -51,8 +51,8 @@ int application_main() {
                 game.add_scene<GameScene>();
                 game.set_global_data<Global>();
                 exit_code = game.run("game"_H, functions);
-            } catch (sm::RuntimeError error) {
-                std::cerr << "Terminated game with error code " << static_cast<int>(error) << '\n';
+            } catch (const sm::RuntimeError& error) {
+                std::cerr << "Terminated game with error: " << error.what() << '\n';
                 return 1;
             }
         }

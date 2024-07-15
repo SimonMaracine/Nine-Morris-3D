@@ -51,7 +51,7 @@ namespace sm {
             const auto iter_arg {include_shader_sources.find(argument)};
 
             if (iter_arg == include_shader_sources.cend()) {
-                SM_CRITICAL_ERROR(RuntimeError::ResourceLoading, "Cannot include `{}`; file not found", argument);
+                SM_THROW_ERROR(ResourceError, "Cannot include `{}`; file not found", argument);
             }
 
             const std::size_t line {get_line(string.cbegin(), sub_match.first)};

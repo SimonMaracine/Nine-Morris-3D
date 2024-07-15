@@ -16,7 +16,7 @@ namespace sm {
         device = alcOpenDevice(nullptr);
 
         if (device == nullptr) {
-            SM_CRITICAL_ERROR(RuntimeError::Initialization, "Could not open an AL device");
+            SM_THROW_ERROR(InitializationError, "Could not open an AL device");
         }
 
         context = alcCreateContext(device, nullptr);
@@ -24,14 +24,14 @@ namespace sm {
         if (context == nullptr) {
             alcCloseDevice(device);
 
-            SM_CRITICAL_ERROR(RuntimeError::Initialization, "Could not create AL context");
+            SM_THROW_ERROR(InitializationError, "Could not create AL context");
         }
 
         if (alcMakeContextCurrent(context) == ALC_FALSE) {
             alcDestroyContext(context);
             alcCloseDevice(device);
 
-            SM_CRITICAL_ERROR(RuntimeError::Initialization, "Could not make AL context current");
+            SM_THROW_ERROR(InitializationError, "Could not make AL context current");
         }
 
         listener.set_distance_model(DistanceModel::InverseClamped);
