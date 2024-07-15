@@ -9,39 +9,39 @@
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
 
 namespace sm {
-    enum class Filter {
+    enum class TextureFilter {
         Linear,
         Nearest
     };
 
-    enum class Wrap {
+    enum class TextureWrap {
         Repeat,
         ClampEdge,
         ClampBorder
     };
 
-    enum class Format {
+    enum class TextureFormat {
         Rgba8,
         R8
     };
 
+    struct TextureMipmapping {
+        int levels {1};
+        float bias {};
+        int anisotropic_filtering {};
+    };
+
     struct TextureSpecification {
-        Format format {Format::Rgba8};
+        TextureFormat format {TextureFormat::Rgba8};
 
-        Filter min_filter {Filter::Linear};
-        Filter mag_filter {Filter::Linear};
+        TextureFilter min_filter {TextureFilter::Linear};
+        TextureFilter mag_filter {TextureFilter::Linear};
 
-        Wrap wrap_s {Wrap::ClampBorder};
-        Wrap wrap_t {Wrap::ClampBorder};
+        TextureWrap wrap_s {TextureWrap::ClampBorder};
+        TextureWrap wrap_t {TextureWrap::ClampBorder};
 
         std::optional<glm::vec4> border_color;
-
-        // Mipmapping is off by default
-        struct {
-            int levels {1};
-            float bias {};
-            int anisotropic_filtering {};
-        } mipmapping;
+        std::optional<TextureMipmapping> mipmapping;
     };
 
     class GlTexture {

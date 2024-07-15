@@ -36,7 +36,7 @@ namespace sm {
         int width {};
         int height {};
 
-        struct {
+        struct {  // TODO get rid of this, if not used
             int drawbuffer {};
             float value[4] {};
         } color_clear;

@@ -1,7 +1,6 @@
 #include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
 
 #include <cstddef>
-#include <algorithm>
 #include <cassert>
 
 #include <glad/glad.h>
@@ -15,7 +14,7 @@ namespace sm {
     static constexpr int CHANNELS {4};
 
     static bool use_mipmapping(const TextureSpecification& specification) {
-        return specification.mipmapping.levels > 1;
+        return specification.mipmapping && specification.mipmapping->levels > 1;
     }
 
     static void configure_mipmapping(const TextureSpecification& specification) {
@@ -23,9 +22,9 @@ namespace sm {
             return;
         }
 
-        const bool anisotropic_filtering_enabled {specification.mipmapping.anisotropic_filtering > 0};
+        const bool anisotropic_filtering_enabled {specification.mipmapping->anisotropic_filtering > 0};
 
-        const float bias {anisotropic_filtering_enabled ? 0.0f : specification.mipmapping.bias};
+        const float bias {anisotropic_filtering_enabled ? 0.0f : specification.mipmapping->bias};
 
         glGenerateMipmap(GL_TEXTURE_2D);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
@@ -33,26 +32,26 @@ namespace sm {
         if (anisotropic_filtering_enabled) {
             const int max_anisotropic_filtering {capabilities::max_anisotropic_filtering_supported()};
 
-            if (specification.mipmapping.anisotropic_filtering > max_anisotropic_filtering) {
-                LOG_DIST_WARNING("Invalid anisotropic filtering value: {}", specification.mipmapping.anisotropic_filtering);
+            if (specification.mipmapping->anisotropic_filtering > max_anisotropic_filtering) {
+                LOG_DIST_WARNING("Invalid anisotropic filtering value: {}", specification.mipmapping->anisotropic_filtering);
             }
 
             const float amount {
-                static_cast<float>(std::min(specification.mipmapping.anisotropic_filtering, max_anisotropic_filtering))
+                static_cast<float>(glm::min(specification.mipmapping->anisotropic_filtering, max_anisotropic_filtering))
             };
 
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
         }
     }
 
-    static int filter_to_int(Filter filter) {
+    static int filter_to_int(TextureFilter filter) {
         int result {};
 
         switch (filter) {
-            case Filter::Linear:
+            case TextureFilter::Linear:
                 result = GL_LINEAR;
                 break;
-            case Filter::Nearest:
+            case TextureFilter::Nearest:
                 result = GL_NEAREST;
                 break;
         }
@@ -60,17 +59,17 @@ namespace sm {
         return result;
     }
 
-    static int wrap_to_int(Wrap wrap) {
+    static int wrap_to_int(TextureWrap wrap) {
         int result {};
 
         switch (wrap) {
-            case Wrap::Repeat:
+            case TextureWrap::Repeat:
                 result = GL_REPEAT;
                 break;
-            case Wrap::ClampEdge:
+            case TextureWrap::ClampEdge:
                 result = GL_CLAMP_TO_EDGE;
                 break;
-            case Wrap::ClampBorder:
+            case TextureWrap::ClampBorder:
                 result = GL_CLAMP_TO_BORDER;
                 break;
         }
@@ -148,14 +147,16 @@ namespace sm {
     }
 
     void GlTexture::allocate_texture(int width, int height, const unsigned char* data) const {
+        const int levels {use_mipmapping(specification) ? specification.mipmapping->levels : 1};
+
         switch (specification.format) {
-            case Format::Rgba8:
-                glTexStorage2D(GL_TEXTURE_2D, specification.mipmapping.levels, GL_RGBA8, width, height);
+            case TextureFormat::Rgba8:
+                glTexStorage2D(GL_TEXTURE_2D, levels, GL_RGBA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
                 break;
-            case Format::R8:
-                glTexStorage2D(GL_TEXTURE_2D, specification.mipmapping.levels, GL_R8, width, height);
+            case TextureFormat::R8:
+                glTexStorage2D(GL_TEXTURE_2D, levels, GL_R8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, data);
 
                 break;

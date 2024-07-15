@@ -71,7 +71,7 @@ namespace sm {
         delete pack_context;
 
         TextureSpecification specification;
-        specification.format = Format::R8;
+        specification.format = TextureFormat::R8;
         specification.border_color = std::make_optional<glm::vec4>(0.0f, 0.0f, 0.0f, 1.0f);
 
         bitmap_texture = std::make_unique<GlTexture>(bitmap_size, bitmap_size, bitmap.get(), specification);
