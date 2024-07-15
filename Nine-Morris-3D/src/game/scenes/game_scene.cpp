@@ -191,7 +191,7 @@ void GameScene::setup_ground() {
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
-    const auto material_instance {ctx.res.material_instance.load("ground"_H, material)};
+    const auto material_instance {ctx.load_material_instance("ground"_H, material)};
     material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.7f));
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.4f));
     material_instance->set_float("u_material.shininess"_H, 16.0f);
@@ -207,7 +207,7 @@ void GameScene::setup_dragon() {
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
     {
-        const auto material_instance {ctx.res.material_instance.load("dragon1"_H, material)};
+        const auto material_instance {ctx.load_material_instance("dragon1"_H, material)};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
@@ -220,7 +220,7 @@ void GameScene::setup_dragon() {
     }
 
     {
-        const auto material_instance {ctx.res.material_instance.load("dragon2"_H, material)};
+        const auto material_instance {ctx.load_material_instance("dragon2"_H, material)};
         material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 0.2f, 0.1f));
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(1.0f, 1.0f, 0.0f));
         material_instance->set_float("u_material.shininess"_H, 32.0f);
@@ -236,7 +236,7 @@ void GameScene::setup_teapot() {
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
-    const auto material_instance {ctx.res.material_instance.load("teapot"_H, material)};
+    const auto material_instance {ctx.load_material_instance("teapot"_H, material)};
     material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(0.7f));
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.7f));
     material_instance->set_float("u_material.shininess"_H, 64.0f);
@@ -252,7 +252,7 @@ void GameScene::setup_cube() {
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
-    const auto material_instance {ctx.res.material_instance.load("cube"_H, material)};
+    const auto material_instance {ctx.load_material_instance("cube"_H, material)};
     material_instance->set_vec3("u_material.ambient_diffuse"_H, glm::vec3(1.0f, 0.0f, 0.0f));
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.8f));
     material_instance->set_float("u_material.shininess"_H, 128.0f);
@@ -269,7 +269,7 @@ void GameScene::setup_brick() {
 
     const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/brick-texture3.png"), {}, {})};
 
-    const auto material_instance {ctx.res.material_instance.load("brick"_H, material)};
+    const auto material_instance {ctx.load_material_instance("brick"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
     material_instance->set_float("u_material.shininess"_H, 64.0f);
@@ -281,13 +281,13 @@ void GameScene::setup_brick() {
 
 void GameScene::setup_lamp() {
     {
-        const auto [mesh, vertex_array] {ctx.load_model("lamp_stand", ctx.fs.path_assets("models/lamp.obj"), "Stand", sm::Mesh::Type::PNT)};
+        const auto [mesh, vertex_array] {ctx.load_model("lamp_stand"_H, ctx.fs.path_assets("models/lamp.obj"), "Stand", sm::Mesh::Type::PNT)};
 
         const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
         const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/lamp-texture.png"), {}, {})};
 
-        const auto material_instance {ctx.res.material_instance.load("lamp_stand"_H, material)};
+        const auto material_instance {ctx.load_material_instance("lamp_stand"_H, material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
@@ -297,11 +297,11 @@ void GameScene::setup_lamp() {
     }
 
     {
-        const auto [mesh, vertex_array] {ctx.load_model("lamp_bulb", ctx.fs.path_assets("models/lamp.obj"), "Bulb", sm::Mesh::Type::P)};
+        const auto [mesh, vertex_array] {ctx.load_model("lamp_bulb"_H, ctx.fs.path_assets("models/lamp.obj"), "Bulb", sm::Mesh::Type::P)};
 
         const auto material {ctx.load_material(sm::MaterialType::Flat, sm::Material::CastShadow)};
 
-        const auto material_instance {ctx.res.material_instance.load("lamp_bulb"_H, material)};
+        const auto material_instance {ctx.load_material_instance("lamp_bulb"_H, material)};
         material_instance->set_vec3("u_material.color"_H, glm::vec3(1.0f));
 
         lamp_bulb = sm::Renderable(mesh, vertex_array, material_instance);
@@ -317,7 +317,7 @@ void GameScene::setup_barrel() {
     const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/barrel.png"), {}, {})};
     const auto normal {ctx.load_texture(ctx.fs.path_assets("textures/barrelNormal.png"), {}, {})};
 
-    const auto material_instance {ctx.res.material_instance.load("barrel"_H, material)};
+    const auto material_instance {ctx.load_material_instance("barrel"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
     material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.9f));
     material_instance->set_float("u_material.shininess"_H, 32.0f);
@@ -333,9 +333,9 @@ void GameScene::setup_texts() {
     specification.bitmap_size = 512;
     specification.size_height = 40.0f;
 
-    sans = ctx.res.font.load(
+    sans = ctx.load_font(
         "sans"_H,
-        sm::utils::read_file(ctx.fs.path_assets("fonts/OpenSans/OpenSans-Regular.ttf")),
+        ctx.fs.path_assets("fonts/OpenSans/OpenSans-Regular.ttf"),
         specification
     );
 

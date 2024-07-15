@@ -18,8 +18,8 @@ namespace sm {
     Ctx::Ctx(const ApplicationProperties& properties)
         : fs(properties.application_name, properties.assets_directory), log(properties.log_file, fs),
         shd({"engine_assets", properties.assets_directory}), win(properties, &evt),
-        rnd(properties.width, properties.height, properties.samples, fs, shd),
-        snd(properties.audio), inp(win.get_handle()) {
+        snd(properties.audio), inp(win.get_handle()),
+        rnd(properties.width, properties.height, properties.samples, fs, shd) {
         if (!fs.error_string.empty()) {
             LOG_DIST_ERROR("{}", fs.error_string);
         }
@@ -68,20 +68,18 @@ namespace sm {
     }
 
     Model Ctx::load_model(
-        const std::string& identifier,
+        resmanager::HashedStr64 identifier,
         const std::string& file_path,
         const std::string& mesh_name,
         Mesh::Type type
     ) {
-        const auto identifier_ {resmanager::HashedStr64(identifier)};
+        const auto mesh {res.mesh.load(identifier, utils::read_file(file_path), mesh_name, type)};
 
-        const auto mesh {res.mesh.load(identifier_, utils::read_file(file_path), mesh_name, type)};
+        const auto vertex_buffer {res.vertex_buffer.load(identifier, mesh->get_vertices(), mesh->get_vertices_size())};
+        const auto index_buffer {res.index_buffer.load(identifier, mesh->get_indices(), mesh->get_indices_size())};
 
-        const auto vertex_buffer {res.vertex_buffer.load(identifier_, mesh->get_vertices(), mesh->get_vertices_size())};
-        const auto index_buffer {res.index_buffer.load(identifier_, mesh->get_indices(), mesh->get_indices_size())};
-
-        const auto vertex_array {res.vertex_array.load(identifier_)};
-        vertex_array->configure([&](GlVertexArray* va) {
+        const auto vertex_array {res.vertex_array.load(identifier)};
+        vertex_array->configure([&](GlVertexArray* va) {  // FIXME this gets called every time
             VertexBufferLayout layout;
 
             switch (type) {
@@ -112,8 +110,12 @@ namespace sm {
         return std::make_pair(mesh, vertex_array);
     }
 
-    Model Ctx::load_model(const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
-        return load_model(utils::file_name(file_path), file_path, mesh_name, type);
+    Model Ctx::load_model(
+        const std::string& file_path,
+        const std::string& mesh_name,
+        Mesh::Type type
+    ) {
+        return load_model(resmanager::HashedStr64(utils::file_name(file_path)), file_path, mesh_name, type);
     }
 
     std::shared_ptr<GlTexture> Ctx::load_texture(
@@ -129,7 +131,7 @@ namespace sm {
     }
 
     std::shared_ptr<GlTextureCubemap> Ctx::load_texture_cubemap(
-        const std::string& identifier,
+        const char* identifier,
         std::initializer_list<std::string> file_paths,
         const TexturePostProcessing& post_processing
     ) {
@@ -138,8 +140,8 @@ namespace sm {
 
         for (const auto& file_path : file_paths) {
             textures[i++] = res.texture_data.load(
-                resmanager::HashedStr64(identifier + "_" + file_path),
-                utils::read_file(file_path),
+                resmanager::HashedStr64(std::string(identifier) + ":" + file_path),
+                utils::read_file(file_path),  // FIXME this gets called every time
                 post_processing
             );
         }
@@ -156,35 +158,35 @@ namespace sm {
         return res.texture_cubemap.load(resmanager::HashedStr64(identifier), list);
     }
 
-    std::shared_ptr<Material> Ctx::load_material(MaterialType type, unsigned int flags) {
+    std::shared_ptr<Material> Ctx::load_material(
+        MaterialType type,
+        unsigned int flags
+    ) {
         using namespace resmanager::literals;
 
         switch (type) {
             case MaterialType::Flat: {
                 const auto identifier {"flat"_H};
 
-                const auto shader {res.shader.load(identifier,
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/flat.vert"))),
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/flat.frag")))
+                const auto shader {load_shader(
+                    identifier,
+                    fs.path_assets("shaders/flat.vert"),  // TODO engine_assets
+                    fs.path_assets("shaders/flat.frag")
                 )};
 
-                rnd.register_shader(shader);
-
                 const auto material {res.material.load(identifier, shader, flags)};
-                material->add_uniform(Material::Uniform::Vec3, "u_material.color"_H);
+                material->add_uniform(Material::Uniform::Vec3, "u_material.color"_H);  // FIXME this gets called every time
 
                 return material;
             }
             case MaterialType::Phong: {
                 const auto identifier {"phong"_H};
 
-                const auto shader {res.shader.load(
+                const auto shader {load_shader(
                     identifier,
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong.vert"))),
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong.frag")))
+                    fs.path_assets("shaders/phong.vert"),  // TODO engine_assets
+                    fs.path_assets("shaders/phong.frag")
                 )};
-
-                rnd.register_shader(shader);
 
                 const auto material {res.material.load(identifier, shader, flags)};
                 material->add_uniform(Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
@@ -196,13 +198,11 @@ namespace sm {
             case MaterialType::PhongShadow: {
                 const auto identifier {"phong_shadow"_H};
 
-                const auto shader {res.shader.load(
+                const auto shader {load_shader(
                     identifier,
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong_shadow.vert"))),
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong_shadow.frag")))
+                    fs.path_assets("shaders/phong_shadow.vert"),  // TODO engine_assets
+                    fs.path_assets("shaders/phong_shadow.frag")
                 )};
-
-                rnd.register_shader(shader);
 
                 const auto material {res.material.load(identifier, shader, flags)};
                 material->add_uniform(Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
@@ -214,13 +214,11 @@ namespace sm {
             case MaterialType::PhongDiffuse: {
                 const auto identifier {"phong_diffuse"_H};
 
-                const auto shader {res.shader.load(
+                const auto shader {load_shader(
                     identifier,
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong_diffuse.vert"))),
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong_diffuse.frag")))
+                    fs.path_assets("shaders/phong_diffuse.vert"),  // TODO engine_assets
+                    fs.path_assets("shaders/phong_diffuse.frag")
                 )};
-
-                rnd.register_shader(shader);
 
                 const auto material {res.material.load(identifier, shader, flags)};
                 material->add_uniform(Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
@@ -232,13 +230,11 @@ namespace sm {
             case MaterialType::PhongDiffuseShadow: {
                 const auto identifier {"phong_diffuse_shadow"_H};
 
-                const auto shader {res.shader.load(
+                const auto shader {load_shader(
                     identifier,
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong_diffuse_shadow.vert"))),
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong_diffuse_shadow.frag")))
+                    fs.path_assets("shaders/phong_diffuse_shadow.vert"),  // TODO engine_assets
+                    fs.path_assets("shaders/phong_diffuse_shadow.frag")
                 )};
-
-                rnd.register_shader(shader);
 
                 const auto material {res.material.load(identifier, shader, flags)};
                 material->add_texture("u_material.ambient_diffuse"_H);
@@ -250,13 +246,11 @@ namespace sm {
             case MaterialType::PhongDiffuseNormalShadow: {
                 const auto identifier {"phong_diffuse_normal_shadow"_H};
 
-                const auto shader {res.shader.load(
+                const auto shader {load_shader(
                     identifier,
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong_diffuse_normal_shadow.vert"))),
-                    shd.load_shader(utils::read_file(fs.path_assets("shaders/phong_diffuse_normal_shadow.frag")))
+                    fs.path_assets("shaders/phong_diffuse_normal_shadow.vert"),  // TODO engine_assets
+                    fs.path_assets("shaders/phong_diffuse_normal_shadow.frag")
                 )};
-
-                rnd.register_shader(shader);
 
                 const auto material {res.material.load(identifier, shader, flags)};
                 material->add_texture("u_material.ambient_diffuse"_H);
@@ -273,7 +267,7 @@ namespace sm {
     }
 
     std::shared_ptr<Material> Ctx::load_material(
-        const std::string& identifier,
+        resmanager::HashedStr64 identifier,
         const std::string& vertex_file_path,
         const std::string& fragment_file_path,
         MaterialType type,
@@ -281,21 +275,13 @@ namespace sm {
     ) {
         using namespace resmanager::literals;
 
-        const auto identifier_ {resmanager::HashedStr64(identifier)};
+        const auto shader {load_shader(identifier, vertex_file_path, fragment_file_path)};
 
-        const auto shader {res.shader.load(
-            identifier_,
-            shd.load_shader(utils::read_file(vertex_file_path)),
-            shd.load_shader(utils::read_file(fragment_file_path))
-        )};
-
-        rnd.register_shader(shader);
-
-        const auto material {res.material.load(identifier_, shader, flags)};
+        const auto material {res.material.load(identifier, shader, flags)};
 
         switch (type) {
             case MaterialType::Flat: {
-                material->add_uniform(Material::Uniform::Vec3, "u_material.color"_H);
+                material->add_uniform(Material::Uniform::Vec3, "u_material.color"_H);  // FIXME this gets called every time
                 break;
             }
             case MaterialType::Phong:
@@ -322,5 +308,63 @@ namespace sm {
         }
 
         return material;
+    }
+
+    std::shared_ptr<MaterialInstance> Ctx::load_material_instance(
+        resmanager::HashedStr64 identifier,
+        std::shared_ptr<Material> material
+    ) {
+        return res.material_instance.load(identifier, material);
+    }
+
+    std::shared_ptr<GlShader> Ctx::load_shader(
+        resmanager::HashedStr64 identifier,
+        const std::string& vertex_file_path,
+        const std::string& fragment_file_path,
+        bool include_processing
+    ) {
+        std::shared_ptr<GlShader> shader;
+
+        if (include_processing) {
+            shader = res.shader.load(
+                identifier,
+                utils::read_file(vertex_file_path),  // FIXME this gets called every time
+                utils::read_file(fragment_file_path),
+                shd
+            );
+        } else {
+            shader = res.shader.load(
+                identifier,
+                utils::read_file(vertex_file_path),
+                utils::read_file(fragment_file_path)
+            );
+        }
+
+        rnd.register_shader(shader);  // FIXME this gets called every time
+
+        return shader;
+    }
+
+    std::shared_ptr<GlFramebuffer> Ctx::load_framebuffer(
+        resmanager::HashedStr64 identifier,
+        const sm::FramebufferSpecification& specification
+    ) {
+        const auto framebuffer {res.framebuffer.load(identifier, specification)};
+
+        rnd.register_framebuffer(framebuffer);  // FIXME this gets called every time
+
+        return framebuffer;
+    }
+
+    std::shared_ptr<Font> Ctx::load_font(
+        resmanager::HashedStr64 identifier,
+        const std::string& file_path,
+        sm::FontSpecification specification
+    ) {
+        return res.font.load(
+            identifier,
+            sm::utils::read_file(file_path),
+            specification
+        );
     }
 }

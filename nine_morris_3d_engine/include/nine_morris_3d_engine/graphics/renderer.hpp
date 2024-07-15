@@ -57,13 +57,12 @@ namespace sm {
     class Renderer {
     private:
         Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary& shd);
-    public:
-        // Retained
-        void register_shader(std::shared_ptr<GlShader> shader);  // TODO maybe make these automatic
+
+        void register_shader(std::shared_ptr<GlShader> shader);
         void register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
 
         void render(const Scene& scene, int width, int height);
-    private:
+
         void pre_setup();
         void post_setup();
         void post_processing(const Scene& scene);
@@ -180,5 +179,6 @@ namespace sm {
 
         friend class Application;
         friend class Ctx;
+        friend class DebugRenderer;
     };
 }

@@ -47,7 +47,7 @@ int application_main() {
             functions.stop = game_stop;
 
             try {
-                auto game {sm::Application(properties)};
+                sm::Application game {properties};
                 game.add_scene<GameScene>();
                 game.set_global_data<Global>();
                 exit_code = game.run("game"_H, functions);

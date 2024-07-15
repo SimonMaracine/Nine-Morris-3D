@@ -1,5 +1,7 @@
 #include "game/game.hpp"
 
+#include <nine_morris_3d_engine/external/resmanager.h++>
+
 #include "game/post_processing/blur.hpp"
 #include "game/global.hpp"
 
@@ -11,15 +13,12 @@ void create_post_processing(sm::Ctx& ctx) {
         sm::Attachment(sm::AttachmentFormat::Rgba8, sm::AttachmentType::Texture)
     };
 
-    const auto framebuffer {std::make_shared<sm::GlFramebuffer>(specification)};
-
-    ctx.rnd.register_framebuffer(framebuffer);
-
     ctx.global<Global>().blur_step = std::make_shared<BlurStep>(
-        framebuffer,
-        std::make_unique<sm::GlShader>(
-            sm::utils::read_file(ctx.fs.path_engine_assets("shaders/screen_quad.vert")),
-            sm::utils::read_file(ctx.fs.path_assets("shaders/post_processing/blur.frag"))
+        ctx.load_framebuffer("blur"_H, specification),
+        ctx.load_shader(
+            "blur"_H,
+            ctx.fs.path_engine_assets("shaders/screen_quad.vert"),
+            ctx.fs.path_assets("shaders/post_processing/blur.frag")
         )
     );
 }
