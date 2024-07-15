@@ -16,11 +16,17 @@ struct GameScene : sm::ApplicationScene {
 
     void on_window_resized(const sm::WindowResizedEvent& event);
 
-    void load_models();
-    void load_textures();
-    void load_materials();
-    void load_material_instances();
-    void setup_renderables();
+    void setup_ground();
+    void setup_dragon();
+    void setup_teapot();
+    void setup_cube();
+    void setup_brick();
+    void setup_lamp();
+    void setup_barrel();
+    void setup_texts();
+    void setup_quads();
+    void setup_skybox();
+    void setup_lights();
 
     sm::Camera cam;
     sm::Camera2D cam_2d;
@@ -44,6 +50,9 @@ struct GameScene : sm::ApplicationScene {
     sm::Text text4;
     sm::Quad wait;
     sm::Quad white;
+
+    std::shared_ptr<sm::GlTextureCubemap> field;
+    std::shared_ptr<sm::Font> sans;
 
     bool sync {true};
     bool sky {true};
