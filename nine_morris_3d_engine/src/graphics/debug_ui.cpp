@@ -2,19 +2,24 @@
 
 #include <cstring>
 
-#include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
+#include <glm/gtc/type_ptr.hpp>
 
+#include "nine_morris_3d_engine/application/context.hpp"
 #include "nine_morris_3d_engine/graphics/scene.hpp"
 
 namespace sm {
-    void DebugUi::render_dear_imgui(Scene& scene) {
+    void DebugUi::render_dear_imgui(Scene& scene, Ctx& ctx) {
         if (ImGui::Begin("Debug")) {
             ImGui::Checkbox("Renderables", &renderables);
             ImGui::Checkbox("Lights", &lights);
             ImGui::Checkbox("Shadows", &shadows);
             ImGui::Checkbox("Texts", &texts);
             ImGui::Checkbox("Quads", &quads);
+
+            if (ImGui::Checkbox("VSync", &vsync)) {
+                ctx.win.set_vsync(static_cast<int>(vsync));
+            }
         }
 
         ImGui::End();

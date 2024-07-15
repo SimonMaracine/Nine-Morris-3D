@@ -11,7 +11,7 @@ namespace sm {
     private:
         DebugUi() = default;
 
-        void render_dear_imgui(Scene& scene);
+        void render_dear_imgui(Scene& scene, Ctx& ctx);
         void add_lines(Scene& scene);
 
         void draw_renderables(Scene& scene);
@@ -37,6 +37,7 @@ namespace sm {
         bool shadows {false};
         bool texts {false};
         bool quads {false};
+        bool vsync {true};
 
         friend class Application;
         friend class Ctx;

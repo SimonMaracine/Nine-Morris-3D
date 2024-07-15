@@ -54,7 +54,6 @@ struct GameScene : sm::ApplicationScene {
     std::shared_ptr<sm::GlTextureCubemap> field;
     std::shared_ptr<sm::Font> sans;
 
-    bool sync {true};
     bool sky {true};
     bool blur {false};
     bool outline {true};

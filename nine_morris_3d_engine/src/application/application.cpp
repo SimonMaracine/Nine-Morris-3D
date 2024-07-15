@@ -47,6 +47,9 @@ namespace sm {
         LOG_INFO("Calling user start function...");
 
         user_functions.start(ctx);
+
+        LOG_INFO("Calling scene on_start...");
+
         current_scene->on_start();
         ctx.rnd.pre_setup();
 
@@ -82,6 +85,9 @@ namespace sm {
         LOG_INFO("Closing application...");
 
         ctx.rnd.post_setup();
+
+        LOG_INFO("Calling scene on_stop...");
+
         current_scene->on_stop();
 
         LOG_INFO("Calling user stop function...");
@@ -137,7 +143,12 @@ namespace sm {
 
     void Application::check_changed_scene() {
         if (next_scene != nullptr) {
+            LOG_INFO("Changing scene to {}", next_scene->get_name());
+
             ctx.rnd.post_setup();
+
+            LOG_INFO("Calling scene on_stop...");
+
             current_scene->on_stop();
 
             // Clear all cached resources
@@ -148,6 +159,8 @@ namespace sm {
 
             // Set and initialize the new scene
             current_scene = std::exchange(next_scene, nullptr);
+
+            LOG_INFO("Calling scene on_start...");
 
             current_scene->on_start();
             ctx.rnd.pre_setup();
@@ -160,7 +173,7 @@ namespace sm {
         imgui_context::begin_frame();
 
         current_scene->on_imgui_update();
-        ctx.dbg.render_dear_imgui(ctx.scn);
+        ctx.dbg.render_dear_imgui(ctx.scn, ctx);
 
         imgui_context::end_frame();
     }

@@ -53,8 +53,8 @@ void GameScene::on_stop() {
 }
 
 void GameScene::on_update() {
-    cam_controller.update_controls(ctx.delta, ctx.inp);
-    cam_controller.update_camera(ctx.delta);
+    cam_controller.update_controls(ctx.get_delta(), ctx.inp);
+    cam_controller.update_camera(ctx.get_delta());
 
     ctx.scn.capture(cam, cam_controller.get_position());
     ctx.scn.capture(cam_2d);
@@ -163,9 +163,6 @@ void GameScene::on_fixed_update() {
 
 void GameScene::on_imgui_update() {
     ImGui::Begin("Features");
-    if (ImGui::Checkbox("Sync", &sync)) {
-        ctx.win.set_vsync(1 ? sync : 0);
-    }
     ImGui::Checkbox("Skybox", &sky);
     if (ImGui::Checkbox("Blur", &blur)) {
         if (blur) {

@@ -96,10 +96,11 @@ namespace sm {
             return *static_cast<T*>(user_data);
         }
 
+        float get_delta() const { return delta; }
+        float get_fps() const { return fps; }
+
         bool running {true};
         int exit_code {};
-        float delta {};
-        float fps {};
 
         // The order of these members matters
 
@@ -120,6 +121,10 @@ namespace sm {
 #ifndef SM_BUILD_DISTRIBUTION
         DebugUi dbg;
 #endif
+
+        float delta {};
+        float fps {};
+
         std::any global_data;
         void* user_data {nullptr};  // Arbitrary data defined by the user
         Application* application {nullptr};
