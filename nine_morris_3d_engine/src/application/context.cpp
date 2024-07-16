@@ -78,8 +78,13 @@ namespace sm {
         const auto vertex_buffer {res.vertex_buffer.load(identifier, mesh->get_vertices(), mesh->get_vertices_size())};
         const auto index_buffer {res.index_buffer.load(identifier, mesh->get_indices(), mesh->get_indices_size())};
 
-        const auto vertex_array {res.vertex_array.load(identifier)};
-        vertex_array->configure([&](GlVertexArray* va) {  // FIXME this gets called every time
+        const auto [vertex_array, present] {res.vertex_array.load_check(identifier)};
+
+        if (present) {
+            return std::make_pair(mesh, vertex_array);
+        }
+
+        vertex_array->configure([&](GlVertexArray* va) {
             VertexBufferLayout layout;
 
             switch (type) {
@@ -135,13 +140,17 @@ namespace sm {
         std::initializer_list<std::string> file_paths,
         const TexturePostProcessing& post_processing
     ) {
+        if (res.texture_cubemap.contains(resmanager::HashedStr64(identifier))) {
+            return res.texture_cubemap[resmanager::HashedStr64(identifier)];
+        }
+
         std::array<std::shared_ptr<TextureData>, 6> textures {};
         std::size_t i {0};  // TODO C++20
 
         for (const auto& file_path : file_paths) {
-            textures[i++] = res.texture_data.load(
+            textures[i++] = res.texture_data.force_load(
                 resmanager::HashedStr64(std::string(identifier) + ":" + file_path),
-                utils::read_file(file_path),  // FIXME this gets called every time
+                utils::read_file(file_path),
                 post_processing
             );
         }
@@ -152,10 +161,10 @@ namespace sm {
             textures[2],
             textures[3],
             textures[4],
-            textures[5],
+            textures[5]
         };
 
-        return res.texture_cubemap.load(resmanager::HashedStr64(identifier), list);
+        return res.texture_cubemap.force_load(resmanager::HashedStr64(identifier), list);
     }
 
     std::shared_ptr<Material> Ctx::load_material(
@@ -174,8 +183,13 @@ namespace sm {
                     fs.path_assets("shaders/flat.frag")
                 )};
 
-                const auto material {res.material.load(identifier, shader, flags)};
-                material->add_uniform(Material::Uniform::Vec3, "u_material.color"_H);  // FIXME this gets called every time
+                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+
+                if (present) {
+                    return material;
+                }
+
+                material->add_uniform(Material::Uniform::Vec3, "u_material.color"_H);
 
                 return material;
             }
@@ -188,7 +202,12 @@ namespace sm {
                     fs.path_assets("shaders/phong.frag")
                 )};
 
-                const auto material {res.material.load(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+
+                if (present) {
+                    return material;
+                }
+
                 material->add_uniform(Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
                 material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
                 material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
@@ -204,7 +223,12 @@ namespace sm {
                     fs.path_assets("shaders/phong_shadow.frag")
                 )};
 
-                const auto material {res.material.load(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+
+                if (present) {
+                    return material;
+                }
+
                 material->add_uniform(Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
                 material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
                 material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
@@ -220,7 +244,12 @@ namespace sm {
                     fs.path_assets("shaders/phong_diffuse.frag")
                 )};
 
-                const auto material {res.material.load(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+
+                if (present) {
+                    return material;
+                }
+
                 material->add_uniform(Material::Uniform::Vec3, "u_material.ambient_diffuse"_H);
                 material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
                 material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
@@ -236,7 +265,12 @@ namespace sm {
                     fs.path_assets("shaders/phong_diffuse_shadow.frag")
                 )};
 
-                const auto material {res.material.load(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+
+                if (present) {
+                    return material;
+                }
+
                 material->add_texture("u_material.ambient_diffuse"_H);
                 material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
                 material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
@@ -252,7 +286,12 @@ namespace sm {
                     fs.path_assets("shaders/phong_diffuse_normal_shadow.frag")
                 )};
 
-                const auto material {res.material.load(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+
+                if (present) {
+                    return material;
+                }
+
                 material->add_texture("u_material.ambient_diffuse"_H);
                 material->add_uniform(Material::Uniform::Vec3, "u_material.specular"_H);
                 material->add_uniform(Material::Uniform::Float, "u_material.shininess"_H);
@@ -277,11 +316,15 @@ namespace sm {
 
         const auto shader {load_shader(identifier, vertex_file_path, fragment_file_path)};
 
-        const auto material {res.material.load(identifier, shader, flags)};
+        const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+
+        if (present) {
+            return material;
+        }
 
         switch (type) {
             case MaterialType::Flat: {
-                material->add_uniform(Material::Uniform::Vec3, "u_material.color"_H);  // FIXME this gets called every time
+                material->add_uniform(Material::Uniform::Vec3, "u_material.color"_H);
                 break;
             }
             case MaterialType::Phong:
@@ -323,24 +366,28 @@ namespace sm {
         const std::string& fragment_file_path,
         bool include_processing
     ) {
+        if (res.shader.contains(identifier)) {
+            return res.shader[identifier];
+        }
+
         std::shared_ptr<GlShader> shader;
 
         if (include_processing) {
-            shader = res.shader.load(
+            shader = res.shader.force_load(
                 identifier,
-                utils::read_file(vertex_file_path),  // FIXME this gets called every time
+                utils::read_file(vertex_file_path),
                 utils::read_file(fragment_file_path),
                 shd
             );
         } else {
-            shader = res.shader.load(
+            shader = res.shader.force_load(
                 identifier,
                 utils::read_file(vertex_file_path),
                 utils::read_file(fragment_file_path)
             );
         }
 
-        rnd.register_shader(shader);  // FIXME this gets called every time
+        rnd.register_shader(shader);
 
         return shader;
     }
@@ -349,9 +396,13 @@ namespace sm {
         resmanager::HashedStr64 identifier,
         const sm::FramebufferSpecification& specification
     ) {
-        const auto framebuffer {res.framebuffer.load(identifier, specification)};
+        const auto [framebuffer, present] {res.framebuffer.load_check(identifier, specification)};
 
-        rnd.register_framebuffer(framebuffer);  // FIXME this gets called every time
+        if (present) {
+            return framebuffer;
+        }
+
+        rnd.register_framebuffer(framebuffer);
 
         return framebuffer;
     }
