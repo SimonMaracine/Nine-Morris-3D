@@ -114,13 +114,13 @@ namespace sm {
 
         std::shared_ptr<GlFramebuffer> load_framebuffer(
             resmanager::HashedStr64 identifier,
-            const sm::FramebufferSpecification& specification
+            const FramebufferSpecification& specification
         );
 
         std::shared_ptr<Font> load_font(
             resmanager::HashedStr64 identifier,
             const std::string& file_path,
-            sm::FontSpecification specification
+            const FontSpecification& specification
         );
 
         template<typename T>

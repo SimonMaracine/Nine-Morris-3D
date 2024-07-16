@@ -23,8 +23,8 @@ using namespace resmanager::literals;
 namespace sm {
     DebugRenderer::DebugRenderer(const FileSystem& fs, Renderer& renderer) {
         storage.shader = std::make_shared<GlShader>(
-            utils::read_file(fs.path_engine_assets("shaders/debug.vert")),
-            utils::read_file(fs.path_engine_assets("shaders/debug.frag"))
+            utils::read_file(fs.path_engine_assets("shaders/internal/debug.vert")),
+            utils::read_file(fs.path_engine_assets("shaders/internal/debug.frag"))
         );
 
         renderer.register_shader(storage.shader);
@@ -135,15 +135,15 @@ namespace sm {
         {
             // Doesn't have uniform buffers for sure
             storage.screen_quad_shader = std::make_unique<GlShader>(
-                utils::read_file(fs.path_engine_assets("shaders/screen_quad.vert")),
-                utils::read_file(fs.path_engine_assets("shaders/screen_quad.frag"))
+                utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.frag"))
             );
         }
 
         {
             storage.shadow_shader = std::make_shared<GlShader>(
-                utils::read_file(fs.path_engine_assets("shaders/shadow.vert")),
-                utils::read_file(fs.path_engine_assets("shaders/shadow.frag"))
+                utils::read_file(fs.path_engine_assets("shaders/internal/shadow.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/internal/shadow.frag"))
             );
 
             register_shader(storage.shadow_shader);
@@ -152,16 +152,16 @@ namespace sm {
         {
             // Doesn't have uniform buffers for sure
             storage.text_shader = std::make_unique<GlShader>(
-                utils::read_file(fs.path_engine_assets("shaders/text.vert")),
-                utils::read_file(fs.path_engine_assets("shaders/text.frag"))
+                utils::read_file(fs.path_engine_assets("shaders/internal/text.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/internal/text.frag"))
             );
         }
 
         {
             // Doesn't have uniform buffers for sure
             storage.quad_shader = std::make_unique<GlShader>(
-                utils::read_file(fs.path_engine_assets("shaders/quad.vert")),
-                utils::read_file(fs.path_engine_assets("shaders/quad.frag"))
+                utils::read_file(fs.path_engine_assets("shaders/internal/quad.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/internal/quad.frag"))
             );
 
             storage.quad_shader->bind();
@@ -172,15 +172,15 @@ namespace sm {
         {
             // Doesn't have uniform buffers for sure
             storage.skybox_shader = std::make_unique<GlShader>(
-                utils::read_file(fs.path_engine_assets("shaders/skybox.vert")),
-                utils::read_file(fs.path_engine_assets("shaders/skybox.frag"))
+                utils::read_file(fs.path_engine_assets("shaders/internal/skybox.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/internal/skybox.frag"))
             );
         }
 
         {
             storage.outline_shader = std::make_shared<GlShader>(
-                utils::read_file(fs.path_engine_assets("shaders/outline.vert")),
-                utils::read_file(fs.path_engine_assets("shaders/outline.frag"))
+                utils::read_file(fs.path_engine_assets("shaders/internal/outline.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/internal/outline.frag"))
             );
 
             register_shader(storage.outline_shader);

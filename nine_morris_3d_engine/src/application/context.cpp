@@ -155,6 +155,7 @@ namespace sm {
             );
         }
 
+        // For some reason only like this you can pass a list to a variadic template argument
         const std::initializer_list list {
             textures[0],
             textures[1],
@@ -179,8 +180,8 @@ namespace sm {
 
                 const auto shader {load_shader(
                     identifier,
-                    fs.path_assets("shaders/flat.vert"),  // TODO engine_assets
-                    fs.path_assets("shaders/flat.frag")
+                    fs.path_engine_assets("shaders/flat.vert"),
+                    fs.path_engine_assets("shaders/flat.frag")
                 )};
 
                 const auto [material, present] {res.material.load_check(identifier, shader, flags)};
@@ -198,8 +199,8 @@ namespace sm {
 
                 const auto shader {load_shader(
                     identifier,
-                    fs.path_assets("shaders/phong.vert"),  // TODO engine_assets
-                    fs.path_assets("shaders/phong.frag")
+                    fs.path_engine_assets("shaders/phong.vert"),
+                    fs.path_engine_assets("shaders/phong.frag")
                 )};
 
                 const auto [material, present] {res.material.load_check(identifier, shader, flags)};
@@ -219,8 +220,8 @@ namespace sm {
 
                 const auto shader {load_shader(
                     identifier,
-                    fs.path_assets("shaders/phong_shadow.vert"),  // TODO engine_assets
-                    fs.path_assets("shaders/phong_shadow.frag")
+                    fs.path_engine_assets("shaders/phong_shadow.vert"),
+                    fs.path_engine_assets("shaders/phong_shadow.frag")
                 )};
 
                 const auto [material, present] {res.material.load_check(identifier, shader, flags)};
@@ -240,8 +241,8 @@ namespace sm {
 
                 const auto shader {load_shader(
                     identifier,
-                    fs.path_assets("shaders/phong_diffuse.vert"),  // TODO engine_assets
-                    fs.path_assets("shaders/phong_diffuse.frag")
+                    fs.path_engine_assets("shaders/phong_diffuse.vert"),
+                    fs.path_engine_assets("shaders/phong_diffuse.frag")
                 )};
 
                 const auto [material, present] {res.material.load_check(identifier, shader, flags)};
@@ -261,8 +262,8 @@ namespace sm {
 
                 const auto shader {load_shader(
                     identifier,
-                    fs.path_assets("shaders/phong_diffuse_shadow.vert"),  // TODO engine_assets
-                    fs.path_assets("shaders/phong_diffuse_shadow.frag")
+                    fs.path_engine_assets("shaders/phong_diffuse_shadow.vert"),
+                    fs.path_engine_assets("shaders/phong_diffuse_shadow.frag")
                 )};
 
                 const auto [material, present] {res.material.load_check(identifier, shader, flags)};
@@ -282,8 +283,8 @@ namespace sm {
 
                 const auto shader {load_shader(
                     identifier,
-                    fs.path_assets("shaders/phong_diffuse_normal_shadow.vert"),  // TODO engine_assets
-                    fs.path_assets("shaders/phong_diffuse_normal_shadow.frag")
+                    fs.path_engine_assets("shaders/phong_diffuse_normal_shadow.vert"),
+                    fs.path_engine_assets("shaders/phong_diffuse_normal_shadow.frag")
                 )};
 
                 const auto [material, present] {res.material.load_check(identifier, shader, flags)};
@@ -394,7 +395,7 @@ namespace sm {
 
     std::shared_ptr<GlFramebuffer> Ctx::load_framebuffer(
         resmanager::HashedStr64 identifier,
-        const sm::FramebufferSpecification& specification
+        const FramebufferSpecification& specification
     ) {
         const auto [framebuffer, present] {res.framebuffer.load_check(identifier, specification)};
 
@@ -410,11 +411,11 @@ namespace sm {
     std::shared_ptr<Font> Ctx::load_font(
         resmanager::HashedStr64 identifier,
         const std::string& file_path,
-        sm::FontSpecification specification
+        const FontSpecification& specification
     ) {
         return res.font.load(
             identifier,
-            sm::utils::read_file(file_path),
+            utils::read_file(file_path),
             specification
         );
     }

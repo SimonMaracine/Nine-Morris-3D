@@ -17,7 +17,7 @@ void create_post_processing(sm::Ctx& ctx) {
         ctx.load_framebuffer("blur"_H, specification),
         ctx.load_shader(
             "blur"_H,
-            ctx.fs.path_engine_assets("shaders/screen_quad.vert"),
+            ctx.fs.path_engine_assets("shaders/internal/screen_quad.vert"),
             ctx.fs.path_assets("shaders/post_processing/blur.frag")
         )
     );
