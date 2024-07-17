@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <initializer_list>
 #include <memory>
-#include <utility>
 
 #include <glm/glm.hpp>
 
@@ -128,13 +127,6 @@ namespace sm {
             std::weak_ptr<GlVertexBuffer> wtext_vertex_buffer;
             std::weak_ptr<GlVertexBuffer> wquad_vertex_buffer;
 
-            std::unordered_map<unsigned int, std::weak_ptr<GlUniformBuffer>> uniform_buffers;
-            std::weak_ptr<GlUniformBuffer> wprojection_view_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> wdirectional_light_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> wview_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> wpoint_light_uniform_buffer;
-            std::weak_ptr<GlUniformBuffer> wlight_space_uniform_buffer;
-
             struct {
                 std::vector<TextBatch> batches;
                 std::vector<Font::CharacterBuffer> batch_buffer;
@@ -152,10 +144,9 @@ namespace sm {
                 std::size_t quad_count {};
             } quad;
 
-            struct {
-                std::vector<std::weak_ptr<GlShader>> shaders;
-                std::vector<std::weak_ptr<GlFramebuffer>> framebuffers;
-            } scene;
+            std::vector<std::weak_ptr<GlShader>> shaders;
+            std::vector<std::weak_ptr<GlFramebuffer>> framebuffers;
+            std::unordered_map<unsigned int, std::weak_ptr<GlUniformBuffer>> uniform_buffers;
         } storage;
 
         PostProcessingContext post_processing_context;

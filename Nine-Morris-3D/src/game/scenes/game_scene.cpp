@@ -19,6 +19,7 @@ void GameScene::on_start() {
     });
 
     ctx.evt.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
+    ctx.evt.connect<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
 
     sm::opengl::clear_color(0.1f, 0.05f, 0.1f);
 
@@ -190,6 +191,12 @@ void GameScene::on_imgui_update() {
 void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
     cam.set_projection(event.width, event.height, LENS_FOV, LENS_NEAR, LENS_FAR);
     cam_2d.set_projection(0, event.width, 0, event.height);
+}
+
+void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
+    if (event.key == sm::Key::Escape) {
+        ctx.change_scene("game"_H);  // FIXME crashes
+    }
 }
 
 void GameScene::setup_ground() {

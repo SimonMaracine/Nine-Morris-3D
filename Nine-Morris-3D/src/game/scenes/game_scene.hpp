@@ -17,6 +17,7 @@ struct GameScene : sm::ApplicationScene {
     void on_imgui_update() override;
 
     void on_window_resized(const sm::WindowResizedEvent& event);
+    void on_key_released(const sm::KeyReleasedEvent& event);
 
     void setup_ground();
     void setup_dragon();

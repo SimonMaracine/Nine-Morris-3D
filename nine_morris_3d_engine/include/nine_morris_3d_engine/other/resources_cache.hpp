@@ -23,6 +23,12 @@ namespace sm {
 
     class ResourcesCache {
     private:
+        ResourcesCache() = default;
+
+        void merge(ResourcesCache& other);
+        void merge_replace(ResourcesCache& other);
+        void clear();
+
         resmanager::Cache<GlTexture> texture;
         resmanager::Cache<GlTextureCubemap> texture_cubemap;
         resmanager::Cache<GlVertexArray> vertex_array;
@@ -41,12 +47,6 @@ namespace sm {
         // resmanager::Cache<AlBuffer> al_buffer;
         // resmanager::Cache<SoundData> sound_data;
         // resmanager::Cache<MusicTrack> music_track;
-
-        ResourcesCache() = default;
-
-        void merge(ResourcesCache& other);
-        void merge_replace(ResourcesCache& other);
-        void clear();
 
         friend class Application;
         friend class Ctx;

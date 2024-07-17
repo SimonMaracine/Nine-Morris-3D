@@ -143,7 +143,7 @@ namespace sm {
 
     void Application::check_changed_scene() {
         if (next_scene != nullptr) {
-            LOG_INFO("Changing scene to {}", next_scene->get_name());
+            LOG_INFO("Changing scene to {}...", next_scene->get_name());
 
             ctx.rnd.post_setup();
 
@@ -151,13 +151,10 @@ namespace sm {
 
             current_scene->on_stop();
 
-            // Clear all cached resources
+            LOG_INFO("Clearing resources cache...");
+
             ctx.res.clear();
-
-            // Disconnect all scene callbacks to events
             ctx.evt.disconnect(current_scene);
-
-            // Set and initialize the new scene
             current_scene = std::exchange(next_scene, nullptr);
 
             LOG_INFO("Calling scene on_start...");
