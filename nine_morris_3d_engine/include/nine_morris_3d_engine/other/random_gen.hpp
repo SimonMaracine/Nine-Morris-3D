@@ -10,6 +10,7 @@
 namespace sm {
     class Ctx;
 
+    // TODO remove this, use GLM's random functions instead and move these in utils
     class RandomGenerator {
     private:
         RandomGenerator();

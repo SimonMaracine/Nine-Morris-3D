@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #include "game/point_camera_controller.hpp"
@@ -23,6 +25,7 @@ struct GameScene : sm::ApplicationScene {
     void setup_brick();
     void setup_lamp();
     void setup_barrel();
+    void setup_textured_bricks();
     void setup_texts();
     void setup_quads();
     void setup_skybox();
@@ -44,6 +47,9 @@ struct GameScene : sm::ApplicationScene {
     sm::Renderable lamp_stand;
     sm::Renderable lamp_bulb;
     sm::Renderable barrel;
+
+    std::vector<sm::Renderable> textured_bricks;
+
     sm::Text text1;
     sm::Text text2;
     sm::Text text3;

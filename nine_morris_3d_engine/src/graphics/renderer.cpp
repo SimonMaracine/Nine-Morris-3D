@@ -515,7 +515,7 @@ namespace sm {
                 continue;  // This one is rendered differently
             }
 
-            if (material->flags & Material::DisableBackFaceCulling) {  // FIXME improve; maybe use scene graph
+            if (material->flags & Material::DisableBackFaceCulling) {
                 opengl::disable_back_face_culling();
                 draw_renderable(renderable);
                 opengl::enable_back_face_culling();
@@ -528,16 +528,11 @@ namespace sm {
     }
 
     void Renderer::draw_renderable(const Renderable& renderable) {
-        const auto vertex_array {renderable.vertex_array};
-        const auto material {renderable.material};
+        renderable.vertex_array->bind();
+        renderable.material->bind_and_upload();
+        renderable.material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, get_renderable_transform(renderable.transform));
 
-        const glm::mat4 matrix {get_renderable_transform(renderable)};
-
-        vertex_array->bind();
-        material->bind_and_upload();  // TODO sort and batch models based on material
-        material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, matrix);
-
-        opengl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
+        opengl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
 
         // Don't unbind the vertex array
     }
@@ -546,9 +541,7 @@ namespace sm {
         std::vector<Renderable> outline_renderables;
 
         std::for_each(scene.renderables.cbegin(), scene.renderables.cend(), [&](const Renderable& renderable) {
-            const auto material {renderable.material};
-
-            if (material->flags & Material::Outline) {
+            if (renderable.material->flags & Material::Outline) {
                 outline_renderables.push_back(renderable);
             }
         });
@@ -570,24 +563,28 @@ namespace sm {
 
         opengl::stencil_mask(0xFF);
 
-        draw_renderable(renderable);
+        const glm::mat4 transform {get_renderable_transform(renderable.transform)};
+
+        {
+            renderable.vertex_array->bind();
+            renderable.material->bind_and_upload();
+            renderable.material->get_shader()->upload_uniform_mat4("u_model_matrix"_H, transform);
+
+            opengl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
+        }
 
         opengl::stencil_mask(0x00);
         opengl::stencil_function(opengl::Function::NotEqual, 1, 0xFF);
 
         {
-            const auto vertex_array {renderable.vertex_array};
-
-            const glm::mat4 matrix {get_renderable_transform(renderable)};
-
             // Vertex array is already bound
 
             storage.outline_shader->bind();
-            storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
+            storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, transform);
             storage.outline_shader->upload_uniform_vec3("u_color"_H, renderable.outline.color);
             storage.outline_shader->upload_uniform_float("u_outline_thickness"_H, renderable.outline.thickness);
 
-            opengl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
+            opengl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
 
             GlVertexArray::unbind();
         }
@@ -602,19 +599,15 @@ namespace sm {
         storage.shadow_shader->bind();
 
         for (const Renderable& renderable : scene.renderables) {
-            const auto vertex_array {renderable.vertex_array};
-            const auto material {renderable.material};
-
-            if (!(material->flags & Material::CastShadow)) {
+            if (!(renderable.material->flags & Material::CastShadow)) {
                 continue;
             }
 
-            const glm::mat4 matrix {get_renderable_transform(renderable)};
+            renderable.vertex_array->bind();
 
-            vertex_array->bind();
-            storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, matrix);
+            storage.shadow_shader->upload_uniform_mat4("u_model_matrix"_H, get_renderable_transform(renderable.transform));
 
-            opengl::draw_elements(vertex_array->get_index_buffer()->get_index_count());
+            opengl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
         }
 
         GlVertexArray::unbind();
@@ -648,15 +641,15 @@ namespace sm {
             return lhs.font.get() < rhs.font.get();
         });
 
-        const void* font_ptr {nullptr};  // TODO C++20
+        const void* last {nullptr};  // TODO C++20
 
         for (const auto& text : texts) {
-            const void* this_ptr {text.font.get()};
+            const void* current {text.font.get()};
 
-            assert(this_ptr != nullptr);
+            assert(current != nullptr);
 
-            if (this_ptr != font_ptr) {
-                font_ptr = this_ptr;
+            if (current != last) {
+                last = current;
 
                 storage.text.batches.emplace_back().font = text.font;
             }
@@ -892,14 +885,14 @@ namespace sm {
         return std::make_shared<GlIndexBuffer>(buffer.get(), MAX_QUADS_INDICES * sizeof(unsigned int));
     }
 
-    glm::mat4 Renderer::get_renderable_transform(const Renderable& renderable) {
+    glm::mat4 Renderer::get_renderable_transform(const Renderable::Transform& transform) {
         glm::mat4 matrix {1.0f};
 
-        matrix = glm::translate(matrix, renderable.transform.position);
-        matrix = glm::rotate(matrix, glm::radians(renderable.transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix = glm::rotate(matrix, glm::radians(renderable.transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix = glm::rotate(matrix, glm::radians(renderable.transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix = glm::scale(matrix, glm::vec3(renderable.transform.scale));
+        matrix = glm::translate(matrix, transform.position);
+        matrix = glm::rotate(matrix, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        matrix = glm::rotate(matrix, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        matrix = glm::rotate(matrix, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        matrix = glm::scale(matrix, glm::vec3(transform.scale));
 
         return matrix;
     }

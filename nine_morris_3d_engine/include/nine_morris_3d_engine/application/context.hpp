@@ -44,7 +44,7 @@ namespace sm {
         PhongShadow,
         PhongDiffuse,
         PhongDiffuseShadow,
-        PhongDiffuseNormalShadow,
+        PhongDiffuseNormalShadow
     };
 
     // Wrapper around functionality exposed to the user
@@ -149,7 +149,7 @@ namespace sm {
         OpenAlContext snd;
         MusicPlayer mus;
         TaskManager tsk;
-        RandomGenerator rng;
+        RandomGenerator rng;  // TODO remove
         Input inp;
         Scene scn;
     private:

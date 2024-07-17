@@ -27,7 +27,9 @@ namespace sm {
         friend class MusicPlayer;
     };
 
-    class MusicPlayer {
+    class MusicPlayer {  // TODO revisit this class; rename things
+    private:
+        MusicPlayer() = default;
     public:
         void play_music_track(std::shared_ptr<MusicTrack> music_track);
         void stop_music_track();  // Must be called before the OpenAL context is destroyed
@@ -35,8 +37,6 @@ namespace sm {
         void continue_music_track();
         void set_music_gain(float gain);
     private:
-        MusicPlayer() = default;
-
         // Pointer is reset when music is stopped
         // Both are reset at the coresponding function call
         std::shared_ptr<MusicTrack> current_music_track;

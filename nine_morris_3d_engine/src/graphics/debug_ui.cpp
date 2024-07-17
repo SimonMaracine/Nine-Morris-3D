@@ -138,7 +138,7 @@ namespace sm {
 
             for (Text* text : scene.debug.texts) {
                 char buffer[512] {};
-                std::strncpy(buffer, text->text.c_str(), sizeof(buffer));
+                std::strncpy(buffer, text->text.c_str(), sizeof(buffer) - 1);
 
                 ImGui::PushID(index);
                 ImGui::Text("Text %d", index);

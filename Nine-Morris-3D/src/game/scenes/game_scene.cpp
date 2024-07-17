@@ -2,6 +2,7 @@
 
 #include <nine_morris_3d_engine/external/resmanager.h++>
 #include <nine_morris_3d_engine/external/imgui.h++>
+#include <nine_morris_3d_engine/external/glm.h++>
 
 #include "game/global.hpp"
 #include "game/game.hpp"
@@ -28,6 +29,7 @@ void GameScene::on_start() {
     setup_brick();
     setup_lamp();
     setup_barrel();
+    setup_textured_bricks();
     setup_texts();
     setup_quads();
     setup_skybox();
@@ -79,6 +81,10 @@ void GameScene::on_update() {
     ctx.scn.add_renderable(lamp_stand);
     ctx.scn.add_renderable(lamp_bulb);
     ctx.scn.add_renderable(barrel);
+
+    for (auto& brick : textured_bricks) {
+        ctx.scn.add_renderable(brick);
+    }
 
     ctx.show_info_text();
 
@@ -326,6 +332,25 @@ void GameScene::setup_barrel() {
     barrel = sm::Renderable(mesh, vertex_array, material_instance);
     barrel.transform.position = glm::vec3(-7.0f, 4.5f, 6.0f);
     barrel.transform.scale = 0.5f;
+}
+
+void GameScene::setup_textured_bricks() {
+    const auto [mesh, vertex_array] {ctx.load_model(ctx.fs.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT)};
+
+    const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
+
+    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/brick-texture3.png"), {}, {})};
+
+    const auto material_instance {ctx.load_material_instance("brick"_H, material)};
+    material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
+    material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
+    material_instance->set_float("u_material.shininess"_H, 64.0f);
+
+    for (std::size_t i {0}; i < 100; i++) {
+        auto& brick {textured_bricks.emplace_back(mesh, vertex_array, material_instance)};
+        brick.transform.position = glm::linearRand(-glm::vec3(150), glm::vec3(150));
+        brick.transform.rotation = glm::linearRand(glm::vec3(0), glm::vec3(360));
+    }
 }
 
 void GameScene::setup_texts() {

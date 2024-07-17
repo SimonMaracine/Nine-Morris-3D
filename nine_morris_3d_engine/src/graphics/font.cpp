@@ -207,7 +207,7 @@ namespace sm {
 
     void Font::get_character_quad(int codepoint, float* x, float* y, Quad* quad) const {
         stbtt_aligned_quad aligned_quad {};
-        bool found_character {false};
+        [[maybe_unused]] bool found_character {false};
 
         for (const PackRange& pack_range : pack_ranges) {
             if (codepoint >= pack_range.begin_codepoint && codepoint <= pack_range.begin_codepoint + pack_range.count) {

@@ -19,12 +19,12 @@ namespace sm {
     public:
         Renderable() = default;
         Renderable(std::shared_ptr<Mesh> mesh, std::shared_ptr<GlVertexArray> vertex_array, std::shared_ptr<MaterialInstance> material)
-            : mesh(mesh), vertex_array(vertex_array), material(material), aabb(mesh->get_aabb()) {}
+            : mesh(mesh), vertex_array(vertex_array), material(material) {}
 
-        const utils::AABB& get_aabb() const { return aabb; }
+        const utils::AABB& get_aabb() const { return mesh->get_aabb(); }
         MaterialInstance* get_material() const { return material.get(); }
 
-        struct {
+        struct Transform {
             glm::vec3 position {};
             glm::vec3 rotation {};
             float scale {1.0f};  // Only uniform scaling
@@ -38,8 +38,6 @@ namespace sm {
         std::shared_ptr<Mesh> mesh;
         std::shared_ptr<GlVertexArray> vertex_array;
         std::shared_ptr<MaterialInstance> material;
-
-        utils::AABB aabb;  // FIXME think of a good solution
 
         friend class Renderer;
         friend class DebugUi;

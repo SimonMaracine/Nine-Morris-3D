@@ -176,7 +176,7 @@ namespace sm {
         const int width {data.begin()[0]->get_width()};
         const int height {data.begin()[0]->get_height()};
 
-        for (const auto& texture : data) {
+        for ([[maybe_unused]] const auto& texture : data) {
             assert(texture->get_width() == width);
             assert(texture->get_height() == height);
         }

@@ -98,7 +98,7 @@ namespace sm {
         void setup_point_light_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer);
         void setup_light_space_uniform_buffer(const Scene& scene, std::shared_ptr<GlUniformBuffer> uniform_buffer);
         std::shared_ptr<GlIndexBuffer> initialize_quads_index_buffer();
-        static glm::mat4 get_renderable_transform(const Renderable& renderable);
+        static glm::mat4 get_renderable_transform(const Renderable::Transform& transform);
 
         struct QuadVertex {
             glm::vec2 position {};
