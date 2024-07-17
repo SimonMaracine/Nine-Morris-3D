@@ -31,7 +31,6 @@
 #include "nine_morris_3d_engine/graphics/font.hpp"
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
 #include "nine_morris_3d_engine/other/resources_cache.hpp"
-#include "nine_morris_3d_engine/other/random_gen.hpp"
 
 namespace sm {
     class Application;
@@ -149,7 +148,6 @@ namespace sm {
         OpenAlContext snd;
         MusicPlayer mus;
         TaskManager tsk;
-        RandomGenerator rng;  // TODO remove
         Input inp;
         Scene scn;
     private:

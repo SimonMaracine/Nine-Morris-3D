@@ -2,6 +2,8 @@
 
 #include <string>
 #include <stdexcept>
+#include <initializer_list>
+#include <iterator>
 
 #include <glm/glm.hpp>
 
@@ -12,10 +14,8 @@ namespace sm {
             glm::vec3 max {};
         };
 
-        template<typename T>
-        T map(T x, T in_min, T in_max, T out_min, T out_max) {
-            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-        }
+        unsigned int random_int(unsigned int end);
+        unsigned int random_int(unsigned int begin, unsigned int end);
 
         void center_image(
             float screen_width,
@@ -39,5 +39,24 @@ namespace sm {
             explicit FileReadError(const char* message)
                 : std::runtime_error(message) {}
         };
+
+        template<typename T>
+        T map(T x, T in_min, T in_max, T out_min, T out_max) {
+            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
+
+        template<typename T>
+        T choice(std::initializer_list<T> list) {
+            const unsigned int index {random_int(static_cast<unsigned int>(list.size() - 1))};
+
+            return list.begin()[index];
+        }
+
+        template<typename T, typename Iter>
+        T choice(Iter first, Iter last) {
+            const unsigned int index {random_int(static_cast<unsigned int>(std::distance(first, last)))};
+
+            return first[index];
+        }
     };
 }

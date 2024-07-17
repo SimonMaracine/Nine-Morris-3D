@@ -5,10 +5,24 @@
 #include <filesystem>
 #include <cassert>
 
+#include <glm/gtc/random.hpp>
+
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
 
 namespace sm {
+    unsigned int utils::random_int(unsigned int end) {
+        assert(end > 0);
+
+        return glm::linearRand(0u, end);
+    }
+
+    unsigned int utils::random_int(unsigned int begin, unsigned int end) {
+        assert(end > begin);
+
+        return glm::linearRand(begin, end);
+    }
+
     void utils::center_image(
         float screen_width,
         float screen_height,

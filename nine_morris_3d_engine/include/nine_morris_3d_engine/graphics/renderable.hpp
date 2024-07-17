@@ -31,7 +31,7 @@ namespace sm {
         } transform;
 
         struct {
-            glm::vec3 color {1.0f};  // TODO think of a good solution
+            glm::vec3 color {1.0f};
             float thickness {0.1f};
         } outline;
     private:

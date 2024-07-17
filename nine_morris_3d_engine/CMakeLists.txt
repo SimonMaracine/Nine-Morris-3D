@@ -84,7 +84,6 @@ add_library(nine_morris_3d_engine STATIC
     "src/graphics/shader_library.cpp"
     "src/graphics/texture_data.cpp"
     "src/other/dependencies.cpp"
-    "src/other/random_gen.cpp"
     "src/other/resources_cache.cpp"
     "src/other/utilities.cpp"
 
@@ -137,7 +136,6 @@ add_library(nine_morris_3d_engine STATIC
     "include/nine_morris_3d_engine/other/camera_controller.hpp"
     "include/nine_morris_3d_engine/other/concurrent_loader.hpp"
     "include/nine_morris_3d_engine/other/dependencies.hpp"
-    "include/nine_morris_3d_engine/other/random_gen.hpp"
     "include/nine_morris_3d_engine/other/resources_cache.hpp"
     "include/nine_morris_3d_engine/other/utilities.hpp"
 
