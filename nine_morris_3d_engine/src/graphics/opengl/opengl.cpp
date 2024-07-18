@@ -92,6 +92,14 @@ namespace sm {
         glEnable(GL_CULL_FACE);
     }
 
+    void opengl::enable_framebuffer_srgb() {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+    }
+
+    void opengl::disable_framebuffer_srgb() {
+        glDisable(GL_FRAMEBUFFER_SRGB);
+    }
+
     void opengl::enable_polygon_offset_fill() {
         glEnable(GL_POLYGON_OFFSET_FILL);
     }

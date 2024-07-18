@@ -372,6 +372,16 @@ namespace sm {
                                 static_cast<unsigned int>(i)
                             );
                             break;
+                        case AttachmentFormat::Rgba8Float:
+                            attach_color_texture(
+                                texture,
+                                specification.samples,
+                                GL_RGBA16F,
+                                specification.width,
+                                specification.height,
+                                static_cast<unsigned int>(i)
+                            );
+                            break;
                         case AttachmentFormat::RedInt:
                             attach_color_texture(
                                 texture,
@@ -416,6 +426,16 @@ namespace sm {
                                 renderbuffer,
                                 specification.samples,
                                 GL_RGBA8,
+                                specification.width,
+                                specification.height,
+                                static_cast<unsigned int>(i)
+                            );
+                            break;
+                        case AttachmentFormat::Rgba8Float:
+                            attach_color_renderbuffer(
+                                renderbuffer,
+                                specification.samples,
+                                GL_RGBA16F,
                                 specification.width,
                                 specification.height,
                                 static_cast<unsigned int>(i)

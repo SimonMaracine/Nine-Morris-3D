@@ -90,7 +90,7 @@ namespace sm {
             specification.width = width;
             specification.height = height;
             specification.color_attachments = {
-                Attachment(AttachmentFormat::Rgba8, AttachmentType::Renderbuffer)
+                Attachment(AttachmentFormat::Rgba8Float, AttachmentType::Renderbuffer)
             };
             specification.depth_attachment = Attachment(
                 AttachmentFormat::Depth24Stencil8, AttachmentType::Renderbuffer
@@ -108,7 +108,7 @@ namespace sm {
             specification.width = width;
             specification.height = height;
             specification.color_attachments = {
-                Attachment(AttachmentFormat::Rgba8, AttachmentType::Texture)
+                Attachment(AttachmentFormat::Rgba8Float, AttachmentType::Texture)
             };
             specification.depth_attachment = Attachment(
                 AttachmentFormat::Depth32, AttachmentType::Renderbuffer
@@ -365,6 +365,8 @@ namespace sm {
             storage.intermediate_framebuffer->get_specification().height
         );
 
+        opengl::enable_framebuffer_srgb();  // TODO use post processing
+
         end_3d_rendering(scene, width, height);
 
         // 2D stuff
@@ -374,6 +376,8 @@ namespace sm {
 #ifndef SM_BUILD_DISTRIBUTION
         debug.render(scene);
 #endif
+
+        opengl::disable_framebuffer_srgb();
     }
 
     void Renderer::pre_setup() {

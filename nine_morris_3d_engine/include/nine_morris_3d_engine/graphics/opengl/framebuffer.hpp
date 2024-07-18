@@ -6,6 +6,7 @@ namespace sm {
     enum class AttachmentFormat {
         None,
         Rgba8,
+        Rgba8Float,
         RedInt,
         RedFloat,
         Depth24Stencil8,

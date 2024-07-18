@@ -21,7 +21,9 @@ void GameScene::on_start() {
     ctx.evt.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
     ctx.evt.connect<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
 
-    sm::opengl::clear_color(0.1f, 0.05f, 0.1f);
+    const glm::vec3 color {glm::convertSRGBToLinear(glm::vec3(0.1f, 0.05f, 0.1f))};  // TODO do this in the renderer, use 2.2 instead
+
+    sm::opengl::clear_color(color.x, color.y, color.z);
 
     setup_ground();
     setup_dragon();
@@ -228,7 +230,7 @@ void GameScene::setup_dragon() {
 
         dragon1 = sm::Renderable(mesh, vertex_array, material_instance);
         dragon1.transform.scale = 0.7f;
-        dragon1.outline.color = glm::vec3(0.2f, 0.1f, 1.0f);
+        dragon1.outline.color = glm::convertSRGBToLinear(glm::vec3(0.2f, 0.1f, 1.0f));  // TODO do this in the renderer
         dragon1.outline.thickness = 0.2f;
     }
 
@@ -280,7 +282,10 @@ void GameScene::setup_brick() {
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
-    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/brick-texture3.png"), {}, {})};
+    sm::TextureSpecification specification;
+    specification.format = sm::TextureFormat::Srgba8Alpha;
+
+    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/brick-texture3.png"), {}, specification)};
 
     const auto material_instance {ctx.load_material_instance("brick"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -298,7 +303,10 @@ void GameScene::setup_lamp() {
 
         const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
-        const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/lamp-texture.png"), {}, {})};
+        sm::TextureSpecification specification;
+        specification.format = sm::TextureFormat::Srgba8Alpha;
+
+        const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/lamp-texture.png"), {}, specification)};
 
         const auto material_instance {ctx.load_material_instance("lamp_stand"_H, material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -327,7 +335,10 @@ void GameScene::setup_barrel() {
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
 
-    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/barrel.png"), {}, {})};
+    sm::TextureSpecification specification;
+    specification.format = sm::TextureFormat::Srgba8Alpha;
+
+    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/barrel.png"), {}, specification)};
     const auto normal {ctx.load_texture(ctx.fs.path_assets("textures/barrelNormal.png"), {}, {})};
 
     const auto material_instance {ctx.load_material_instance("barrel"_H, material)};
@@ -346,7 +357,10 @@ void GameScene::setup_textured_bricks() {
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
-    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/brick-texture3.png"), {}, {})};
+    sm::TextureSpecification specification;
+    specification.format = sm::TextureFormat::Srgba8Alpha;
+
+    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/brick-texture3.png"), {}, specification)};
 
     const auto material_instance {ctx.load_material_instance("brick"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -381,22 +395,25 @@ void GameScene::setup_texts() {
 
     text1.font = sans;
     text1.text = "The quick brown fox jumps over the lazy dog.";
-    text1.color = glm::vec3(0.7f);
+    text1.color = glm::convertSRGBToLinear(glm::vec3(0.7f));  // TODO do this in the renderer
 
     text2 = text1;
     text2.position = glm::vec2(200.0f);
-    text2.color = glm::vec3(0.8f, 0.7f, 0.1f);
+    text2.color = glm::convertSRGBToLinear(glm::vec3(0.8f, 0.7f, 0.1f));
 
     text3 = text1;
     text3.position = glm::vec2(200.0f, 100.0f);
-    text3.color = glm::vec3(0.0f, 1.0f, 1.0f);
+    text3.color = glm::convertSRGBToLinear(glm::vec3(0.0f, 1.0f, 1.0f));
 
     text4.font = sans;
 }
 
 void GameScene::setup_quads() {
     {
-        const auto texture {ctx.load_texture(ctx.fs.path_assets("textures/indicator/wait_indicator.png"), {}, {})};
+        sm::TextureSpecification specification;
+        specification.format = sm::TextureFormat::Srgba8Alpha;
+
+        const auto texture {ctx.load_texture(ctx.fs.path_assets("textures/indicator/wait_indicator.png"), {}, specification)};
 
         wait.texture = texture;
         wait.position = glm::vec2(70.0f);
@@ -406,7 +423,10 @@ void GameScene::setup_quads() {
         sm::TexturePostProcessing post_processing;
         post_processing.size = sm::Size::Half;
 
-        const auto texture {ctx.load_texture(ctx.fs.path_assets("textures/indicator/white_indicator.png"), post_processing, {})};
+        sm::TextureSpecification specification;
+        specification.format = sm::TextureFormat::Srgba8Alpha;
+
+        const auto texture {ctx.load_texture(ctx.fs.path_assets("textures/indicator/white_indicator.png"), post_processing, specification)};
 
         white.texture = texture;
         white.position = glm::vec2(210.0f, 210.0f);
@@ -428,7 +448,8 @@ void GameScene::setup_skybox() {
             ctx.fs.path_assets("textures/skybox/field/pz.png"),
             ctx.fs.path_assets("textures/skybox/field/nz.png")
         },
-        processing
+        processing,
+        sm::TextureFormat::Srgba8Alpha
     );
 }
 

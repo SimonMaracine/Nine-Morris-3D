@@ -138,7 +138,8 @@ namespace sm {
     std::shared_ptr<GlTextureCubemap> Ctx::load_texture_cubemap(
         const char* identifier,
         std::initializer_list<std::string> file_paths,
-        const TexturePostProcessing& post_processing
+        const TexturePostProcessing& post_processing,
+        TextureFormat format
     ) {
         if (res.texture_cubemap.contains(resmanager::HashedStr64(identifier))) {
             return res.texture_cubemap.get(resmanager::HashedStr64(identifier));
@@ -165,7 +166,7 @@ namespace sm {
             textures[5]
         };
 
-        return res.texture_cubemap.force_load(resmanager::HashedStr64(identifier), list);
+        return res.texture_cubemap.force_load(resmanager::HashedStr64(identifier), list, format);
     }
 
     std::shared_ptr<Material> Ctx::load_material(

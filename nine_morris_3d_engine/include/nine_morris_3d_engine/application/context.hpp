@@ -83,7 +83,8 @@ namespace sm {
         std::shared_ptr<GlTextureCubemap> load_texture_cubemap(
             const char* identifier,
             std::initializer_list<std::string> file_paths,
-            const TexturePostProcessing& post_processing
+            const TexturePostProcessing& post_processing,
+            TextureFormat format
         );
 
         std::shared_ptr<Material> load_material(

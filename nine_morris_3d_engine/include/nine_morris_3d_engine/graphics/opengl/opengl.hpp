@@ -25,7 +25,7 @@ namespace sm {
 
         void viewport(int width, int height);
 
-        void  bind_texture_2d(unsigned int texture, int unit);
+        void bind_texture_2d(unsigned int texture, int unit);
 
         void draw_arrays(int count);
         void draw_arrays_lines(int count);
@@ -40,6 +40,9 @@ namespace sm {
 
         void disable_back_face_culling();
         void enable_back_face_culling();
+
+        void enable_framebuffer_srgb();
+        void disable_framebuffer_srgb();
 
         void enable_polygon_offset_fill();
         void disable_polygon_offset_fill();

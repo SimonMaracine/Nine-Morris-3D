@@ -22,6 +22,8 @@ namespace sm {
 
     enum class TextureFormat {
         Rgba8,
+        Srgba8,
+        Srgba8Alpha,
         R8
     };
 
@@ -73,7 +75,7 @@ namespace sm {
 
     class GlTextureCubemap {
     public:
-        explicit GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data);
+        GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format = TextureFormat::Rgba8);
         ~GlTextureCubemap();
 
         GlTextureCubemap(const GlTextureCubemap&) = delete;

@@ -153,17 +153,23 @@ namespace sm {
             case TextureFormat::Rgba8:
                 glTexStorage2D(GL_TEXTURE_2D, levels, GL_RGBA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
+                break;
+            case TextureFormat::Srgba8:
+                glTexStorage2D(GL_TEXTURE_2D, levels, GL_SRGB8, width, height);
+                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+                break;
+            case TextureFormat::Srgba8Alpha:
+                glTexStorage2D(GL_TEXTURE_2D, levels, GL_SRGB8_ALPHA8, width, height);
+                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
                 break;
             case TextureFormat::R8:
                 glTexStorage2D(GL_TEXTURE_2D, levels, GL_R8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, data);
-
                 break;
         }
     }
 
-    GlTextureCubemap::GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data) {
+    GlTextureCubemap::GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format) {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
@@ -181,7 +187,20 @@ namespace sm {
             assert(texture->get_height() == height);
         }
 
-        glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
+        switch (format) {
+            case TextureFormat::Rgba8:
+                glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_RGBA8, width, height);
+                break;
+            case TextureFormat::Srgba8:
+                glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_SRGB8, width, height);
+                break;
+            case TextureFormat::Srgba8Alpha:
+                glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, GL_SRGB8_ALPHA8, width, height);
+                break;
+            default:
+                assert(false);
+                break;
+        }
 
         for (std::size_t i {0}; i < 6; i++) {
             glTexSubImage2D(
