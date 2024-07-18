@@ -141,7 +141,7 @@ namespace sm {
         const TexturePostProcessing& post_processing
     ) {
         if (res.texture_cubemap.contains(resmanager::HashedStr64(identifier))) {
-            return res.texture_cubemap[resmanager::HashedStr64(identifier)];
+            return res.texture_cubemap.get(resmanager::HashedStr64(identifier));
         }
 
         std::array<std::shared_ptr<TextureData>, 6> textures {};
@@ -368,7 +368,7 @@ namespace sm {
         bool include_processing
     ) {
         if (res.shader.contains(identifier)) {
-            return res.shader[identifier];
+            return res.shader.get(identifier);
         }
 
         std::shared_ptr<GlShader> shader;
