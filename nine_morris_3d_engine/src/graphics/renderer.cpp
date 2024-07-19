@@ -119,6 +119,23 @@ namespace sm {
             register_framebuffer(storage.intermediate_framebuffer);
         }
 
+        // Final
+        {
+            FramebufferSpecification specification;
+            specification.width = width;
+            specification.height = height;
+            specification.color_attachments = {
+                Attachment(AttachmentFormat::Rgba8Float, AttachmentType::Texture)
+            };
+            specification.depth_attachment = Attachment(
+                AttachmentFormat::Depth32, AttachmentType::Renderbuffer
+            );
+
+            storage.final_framebuffer = std::make_shared<GlFramebuffer>(specification);
+
+            register_framebuffer(storage.final_framebuffer);
+        }
+
         // Shadow
         {
             FramebufferSpecification specification;
@@ -138,6 +155,14 @@ namespace sm {
             storage.screen_quad_shader = std::make_unique<GlShader>(
                 utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.frag"))
+            );
+        }
+
+        {
+            // Doesn't have uniform buffers for sure
+            storage.color_correction_shader = std::make_unique<GlShader>(
+                utils::read_file(fs.path_engine_assets("shaders/internal/color_correction.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/internal/color_correction.frag"))
             );
         }
 
@@ -279,6 +304,10 @@ namespace sm {
         storage.framebuffers.push_back(framebuffer);
     }
 
+    void Renderer::set_color_correction(bool enable) {
+        color_correction = enable;
+    }
+
     void Renderer::render(const Scene& scene, int width, int height) {
         // TODO see if this can be improved
 
@@ -365,9 +394,9 @@ namespace sm {
             storage.intermediate_framebuffer->get_specification().height
         );
 
-        opengl::enable_framebuffer_srgb();  // TODO use post processing
+        // opengl::enable_framebuffer_srgb();  // TODO use post processing
 
-        end_3d_rendering(scene, width, height);
+        end_3d_rendering(scene);
 
         // 2D stuff
         draw_texts(scene);
@@ -377,7 +406,9 @@ namespace sm {
         debug.render(scene);
 #endif
 
-        opengl::disable_framebuffer_srgb();
+        present(width, height);
+
+        // opengl::disable_framebuffer_srgb();
     }
 
     void Renderer::pre_setup() {
@@ -442,19 +473,17 @@ namespace sm {
         }
     }
 
-    void Renderer::end_3d_rendering(const Scene& scene, int width, int height) {
+    void Renderer::end_3d_rendering(const Scene& scene) {
         opengl::disable_depth_test();
 
         storage.screen_quad_vertex_array->bind();
 
         post_processing(scene);
 
-        // Draw the final result to the screen
-        GlFramebuffer::bind_default();
+        storage.final_framebuffer->bind();
 
-        // Clear for debug renderer
-        opengl::clear(opengl::Buffers::CD);
-        opengl::viewport(width, height);
+        opengl::clear(opengl::Buffers::CD);  // Clear for debug renderer
+        opengl::viewport(storage.final_framebuffer->get_specification().width, storage.final_framebuffer->get_specification().height);
 
         screen_quad(post_processing_context.last_texture);
 
@@ -463,7 +492,26 @@ namespace sm {
         opengl::enable_depth_test();
     }
 
-    void Renderer::screen_quad(unsigned int texture) {
+    void Renderer::present(int width, int height) {
+        opengl::disable_depth_test();
+
+        storage.screen_quad_vertex_array->bind();
+
+        GlFramebuffer::bind_default();
+
+        opengl::viewport(width, height);
+
+        storage.color_correction_shader->bind();
+        opengl::bind_texture_2d(storage.final_framebuffer->get_color_attachment(0), 0);
+
+        sm::opengl::draw_arrays(6);
+
+        GlVertexArray::unbind();
+
+        opengl::enable_depth_test();
+    }
+
+    void Renderer::screen_quad(unsigned int texture) {  // TODO take shader and reuse function
         storage.screen_quad_shader->bind();
         opengl::bind_texture_2d(texture, 0);
         opengl::draw_arrays(6);

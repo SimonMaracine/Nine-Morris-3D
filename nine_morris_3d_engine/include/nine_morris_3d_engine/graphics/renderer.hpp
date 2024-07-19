@@ -59,13 +59,15 @@ namespace sm {
 
         void register_shader(std::shared_ptr<GlShader> shader);
         void register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
+        void set_color_correction(bool enable);  // TODO make classes have public interface, put them in internal namespace, add forward functions in context for the public interface, pass context around
 
         void render(const Scene& scene, int width, int height);
 
         void pre_setup();
         void post_setup();
         void post_processing(const Scene& scene);
-        void end_3d_rendering(const Scene& scene, int width, int height);
+        void end_3d_rendering(const Scene& scene);
+        void present(int width, int height);
         void screen_quad(unsigned int texture);
         void resize_framebuffers(int width, int height);
 
@@ -108,9 +110,11 @@ namespace sm {
         struct {
             std::shared_ptr<GlFramebuffer> scene_framebuffer;
             std::shared_ptr<GlFramebuffer> intermediate_framebuffer;
+            std::shared_ptr<GlFramebuffer> final_framebuffer;
             std::shared_ptr<GlFramebuffer> shadow_map_framebuffer;
 
             std::unique_ptr<GlShader> screen_quad_shader;
+            std::unique_ptr<GlShader> color_correction_shader;
             std::shared_ptr<GlShader> shadow_shader;
             std::unique_ptr<GlShader> text_shader;
             std::unique_ptr<GlShader> quad_shader;
@@ -150,6 +154,8 @@ namespace sm {
         } storage;
 
         PostProcessingContext post_processing_context;
+
+        bool color_correction {true};
 
 #ifndef SM_BUILD_DISTRIBUTION
         DebugRenderer debug;

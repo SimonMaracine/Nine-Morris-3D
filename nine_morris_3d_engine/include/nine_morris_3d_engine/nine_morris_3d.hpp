@@ -42,7 +42,7 @@
 #include "nine_morris_3d_engine/graphics/post_processing_context.hpp"
 #include "nine_morris_3d_engine/graphics/post_processing_step.hpp"
 #include "nine_morris_3d_engine/graphics/renderable.hpp"
-#include "nine_morris_3d_engine/graphics/renderer.hpp"
+#include "nine_morris_3d_engine/graphics/renderer.hpp"  // FIXME internal
 #include "nine_morris_3d_engine/graphics/scene.hpp"
 #include "nine_morris_3d_engine/graphics/shader_library.hpp"
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
