@@ -21,9 +21,7 @@ void GameScene::on_start() {
     ctx.evt.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
     ctx.evt.connect<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
 
-    const glm::vec3 color {glm::convertSRGBToLinear(glm::vec3(0.1f, 0.05f, 0.1f))};  // TODO do this in the renderer, use 2.2 instead
-
-    sm::opengl::clear_color(color.x, color.y, color.z);
+    // sm::opengl::clear_color(0.1f, 0.05f, 0.1f);  // FIXME
 
     setup_ground();
     setup_dragon();
@@ -187,6 +185,9 @@ void GameScene::on_imgui_update() {
             dragon1.get_material()->flags ^= sm::Material::Outline;
         }
     }
+    if (ImGui::Checkbox("Color Correction", &color_correction)) {
+        ctx.set_color_correction(color_correction);  // FIXME recreate textures without sRGB
+    }
     ImGui::End();
 }
 
@@ -230,7 +231,7 @@ void GameScene::setup_dragon() {
 
         dragon1 = sm::Renderable(mesh, vertex_array, material_instance);
         dragon1.transform.scale = 0.7f;
-        dragon1.outline.color = glm::convertSRGBToLinear(glm::vec3(0.2f, 0.1f, 1.0f));  // TODO do this in the renderer
+        dragon1.outline.color = glm::vec3(0.2f, 0.1f, 1.0f);
         dragon1.outline.thickness = 0.2f;
     }
 
@@ -369,8 +370,8 @@ void GameScene::setup_textured_bricks() {
 
     for (std::size_t i {0}; i < 100; i++) {
         auto& brick {textured_bricks.emplace_back(mesh, vertex_array, material_instance)};
-        brick.transform.position = glm::linearRand(-glm::vec3(150), glm::vec3(150));
-        brick.transform.rotation = glm::linearRand(glm::vec3(0), glm::vec3(360));
+        brick.transform.position = glm::linearRand(-glm::vec3(150.0f), glm::vec3(150.0f));
+        brick.transform.rotation = glm::linearRand(glm::vec3(0.0f), glm::vec3(360.0f));
     }
 }
 
@@ -395,15 +396,15 @@ void GameScene::setup_texts() {
 
     text1.font = sans;
     text1.text = "The quick brown fox jumps over the lazy dog.";
-    text1.color = glm::convertSRGBToLinear(glm::vec3(0.7f));  // TODO do this in the renderer
+    text1.color = glm::vec3(0.7f);
 
     text2 = text1;
     text2.position = glm::vec2(200.0f);
-    text2.color = glm::convertSRGBToLinear(glm::vec3(0.8f, 0.7f, 0.1f));
+    text2.color = glm::vec3(0.8f, 0.7f, 0.1f);
 
     text3 = text1;
     text3.position = glm::vec2(200.0f, 100.0f);
-    text3.color = glm::convertSRGBToLinear(glm::vec3(0.0f, 1.0f, 1.0f));
+    text3.color = glm::vec3(0.0f, 1.0f, 1.0f);
 
     text4.font = sans;
 }

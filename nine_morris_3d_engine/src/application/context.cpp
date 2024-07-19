@@ -25,6 +25,10 @@ namespace sm {
         }
     }
 
+    void Ctx::set_color_correction(bool enable) {
+        rnd.set_color_correction(enable);
+    }
+
     void Ctx::change_scene(Id id) {
         assert(application->next_scene == nullptr);
 

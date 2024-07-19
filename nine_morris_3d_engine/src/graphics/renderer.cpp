@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/color_space.hpp>
 #include <resmanager/resmanager.hpp>
 
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
@@ -161,7 +162,7 @@ namespace sm {
         {
             // Doesn't have uniform buffers for sure
             storage.color_correction_shader = std::make_unique<GlShader>(
-                utils::read_file(fs.path_engine_assets("shaders/internal/color_correction.vert")),
+                utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.vert")),
                 utils::read_file(fs.path_engine_assets("shaders/internal/color_correction.frag"))
             );
         }
@@ -191,7 +192,7 @@ namespace sm {
             );
 
             storage.quad_shader->bind();
-            storage.quad_shader->upload_uniform_int_array("u_texture[0]"_H, {0, 1, 2, 3, 4, 5, 6, 7});
+            storage.quad_shader->upload_uniform_int_array("u_texture[0]"_H, {0, 1, 2, 3, 4, 5, 6, 7});  // TODO see if this can be avoided
             GlShader::unbind();
         }
 
@@ -308,6 +309,14 @@ namespace sm {
         color_correction = enable;
     }
 
+    void Renderer::set_clear_color(glm::vec3 color) {
+        if (color_correction) {
+            color = glm::convertSRGBToLinear(color, 2.2f);
+        }
+
+        opengl::clear_color(color.r, color.g, color.b);
+    }
+
     void Renderer::render(const Scene& scene, int width, int height) {
         // TODO see if this can be improved
 
@@ -350,7 +359,6 @@ namespace sm {
 
         // Draw to depth buffer for shadows
         storage.shadow_map_framebuffer->bind();
-
         opengl::clear(opengl::Buffers::D);
         opengl::viewport(
             storage.shadow_map_framebuffer->get_specification().width,
@@ -361,7 +369,6 @@ namespace sm {
 
         // Draw normal things
         storage.scene_framebuffer->bind();
-
         opengl::clear(opengl::Buffers::CDS);
         opengl::viewport(
             storage.scene_framebuffer->get_specification().width,
@@ -388,7 +395,6 @@ namespace sm {
 
         // Do post processing and render the final 3D image to the screen
         storage.intermediate_framebuffer->bind();
-
         opengl::viewport(
             storage.intermediate_framebuffer->get_specification().width,
             storage.intermediate_framebuffer->get_specification().height
@@ -481,7 +487,6 @@ namespace sm {
         post_processing(scene);
 
         storage.final_framebuffer->bind();
-
         opengl::clear(opengl::Buffers::CD);  // Clear for debug renderer
         opengl::viewport(storage.final_framebuffer->get_specification().width, storage.final_framebuffer->get_specification().height);
 
@@ -495,14 +500,17 @@ namespace sm {
     void Renderer::present(int width, int height) {
         opengl::disable_depth_test();
 
-        storage.screen_quad_vertex_array->bind();
-
         GlFramebuffer::bind_default();
-
         opengl::viewport(width, height);
 
-        storage.color_correction_shader->bind();
+        storage.screen_quad_vertex_array->bind();
         opengl::bind_texture_2d(storage.final_framebuffer->get_color_attachment(0), 0);
+
+        if (color_correction) {
+            storage.color_correction_shader->bind();
+        } else {
+            storage.screen_quad_shader->bind();
+        }
 
         sm::opengl::draw_arrays(6);
 
@@ -611,9 +619,11 @@ namespace sm {
         {
             // Vertex array is already bound
 
+            const glm::vec3 color {color_correction ? glm::convertSRGBToLinear(renderable.outline.color, 2.2f) : renderable.outline.color};
+
             storage.outline_shader->bind();
             storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, transform);
-            storage.outline_shader->upload_uniform_vec3("u_color"_H, renderable.outline.color);
+            storage.outline_shader->upload_uniform_vec3("u_color"_H, color);
             storage.outline_shader->upload_uniform_float("u_outline_thickness"_H, renderable.outline.thickness);
 
             opengl::draw_elements(renderable.vertex_array->get_index_buffer()->get_index_count());
@@ -718,8 +728,10 @@ namespace sm {
             matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
             matrix = glm::scale(matrix, glm::vec3(std::min(text.scale, 1.0f), std::min(text.scale, 1.0f), 1.0f));
 
+            const glm::vec3 color {color_correction ? glm::convertSRGBToLinear(text.color, 2.2f) : text.color};
+
             storage.text.batch_matrices.push_back(matrix);
-            storage.text.batch_colors.push_back(text.color);
+            storage.text.batch_colors.push_back(color);
         }
 
         // Uniforms must be set as arrays

@@ -57,6 +57,8 @@ namespace sm {
         Ctx(Ctx&&) = delete;
         Ctx& operator=(Ctx&&) = delete;
 
+        void set_color_correction(bool enable);
+
         void change_scene(Id id);
         void show_info_text();
         std::string get_information() const;

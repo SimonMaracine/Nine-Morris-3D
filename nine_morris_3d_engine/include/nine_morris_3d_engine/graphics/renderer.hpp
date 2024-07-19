@@ -60,6 +60,7 @@ namespace sm {
         void register_shader(std::shared_ptr<GlShader> shader);
         void register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
         void set_color_correction(bool enable);  // TODO make classes have public interface, put them in internal namespace, add forward functions in context for the public interface, pass context around
+        void set_clear_color(glm::vec3 color);
 
         void render(const Scene& scene, int width, int height);
 

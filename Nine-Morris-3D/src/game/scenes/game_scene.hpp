@@ -64,4 +64,5 @@ struct GameScene : sm::ApplicationScene {
     bool sky {true};
     bool blur {false};
     bool outline {true};
+    bool color_correction {true};
 };
