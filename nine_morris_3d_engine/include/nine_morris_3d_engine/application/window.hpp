@@ -18,9 +18,9 @@ struct GLFWcursor;
 struct GLFWmonitor;
 
 namespace sm {
-    class Application;
-    class Ctx;
-    class Window;
+    namespace internal {
+        class Window;
+    }
 
     class Monitors {
     public:
@@ -31,49 +31,47 @@ namespace sm {
         GLFWmonitor** monitors {nullptr};
         std::size_t count {};
 
-        friend class Window;
+        friend class internal::Window;
     };
 
-    class Window {
-    private:
-        Window(const ApplicationProperties& properties, EventDispatcher* evt);
-    public:
-        ~Window();
+    namespace internal {
+        class Window {
+        public:
+            Window(const ApplicationProperties& properties, EventDispatcher* evt);
+            ~Window();
 
-        Window(const Window&) = delete;
-        Window& operator=(const Window&) = delete;
-        Window(Window&&) = delete;
-        Window& operator=(Window&&) = delete;
+            Window(const Window&) = delete;
+            Window& operator=(const Window&) = delete;
+            Window(Window&&) = delete;
+            Window& operator=(Window&&) = delete;
 
-        GLFWwindow* get_handle() const;
-        const Monitors& get_monitors();
+            GLFWwindow* get_handle() const;
+            const Monitors& get_monitors();
 
-        int get_width() const { return width; }
-        int get_height() const { return height; }
+            int get_width() const { return width; }
+            int get_height() const { return height; }
 
-        void show() const;
-        void set_vsync(int interval) const;
-        void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
-        void set_cursor(Id id) const;
-        void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
+            void show() const;
+            void set_vsync(int interval) const;
+            void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
+            void set_cursor(Id id) const;
+            void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
 
-        static double get_time();
-    private:
-        // Swap buffers and update events
-        void update() const;
+            static double get_time();
 
-        GLFWwindow* create_window(const ApplicationProperties& properties);
-        void install_callbacks() const;
+            // Swap buffers and update events
+            void update() const;
+        private:
+            GLFWwindow* create_window(const ApplicationProperties& properties);
+            void install_callbacks() const;
 
-        int width {};
-        int height {};
+            int width {};
+            int height {};
 
-        GLFWwindow* window {nullptr};
-        Monitors monitors;
-        std::unordered_map<Id, GLFWcursor*, Hash> cursors;
-        EventDispatcher* evt {nullptr};
-
-        friend class Application;
-        friend class Ctx;
-    };
+            GLFWwindow* window {nullptr};
+            Monitors monitors;
+            std::unordered_map<Id, GLFWcursor*, Hash> cursors;
+            EventDispatcher* evt {nullptr};
+        };
+    }
 }

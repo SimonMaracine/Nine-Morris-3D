@@ -5,22 +5,21 @@
 
 #include <spdlog/spdlog.h>
 
+#include "nine_morris_3d_engine/application/file_system.hpp"
+
 // Separate logging base from logging macros to keep things clean in the engine
 
 namespace sm {
-    class Ctx;
-    class FileSystem;
+    namespace internal {
+        class Logging {
+        public:
+            Logging(const std::string& log_file, const FileSystem& fs);
 
-    class Logging {
-    public:
-        static spdlog::logger* get_global_logger();
-    private:
-        Logging(const std::string& log_file, const FileSystem& fs);
+            static spdlog::logger* get_global_logger();
+        private:
+            static void set_fallback_logger_distribution(const char* error_message);
 
-        static void set_fallback_logger_distribution(const char* error_message);
-
-        static std::shared_ptr<spdlog::logger> global_logger;
-
-        friend class Ctx;
-    };
+            static std::shared_ptr<spdlog::logger> global_logger;
+        };
+    }
 }

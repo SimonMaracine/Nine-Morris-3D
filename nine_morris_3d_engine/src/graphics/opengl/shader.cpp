@@ -29,9 +29,6 @@ namespace sm {
         LOG_DEBUG("Created GL shader {}", program);
     }
 
-    GlShader::GlShader(const std::string& source_vertex, const std::string& source_fragment, const ShaderLibrary& shd)
-        : GlShader(shd.load_shader(source_vertex), shd.load_shader(source_fragment)) {}
-
     GlShader::~GlShader() {
         glDeleteProgram(program);
 

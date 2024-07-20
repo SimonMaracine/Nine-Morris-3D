@@ -16,53 +16,47 @@
 #include "nine_morris_3d_engine/application/input.hpp"
 
 namespace sm {
-    class Application;
-    class Ctx;
+    namespace internal {
+        // Application-level events
+        class EventDispatcher {
+        public:
+            template<typename E, auto F, typename... T>
+            void connect(T&&... value_or_instance) {
+                dispatcher.template sink<E>().template connect<F>(value_or_instance...);
+            }
 
-    // Application-level events
-    class EventDispatcher {
-    private:
-        EventDispatcher() = default;
-    public:
-        template<typename E, auto F, typename... T>
-        void connect(T&&... value_or_instance) {
-            dispatcher.template sink<E>().template connect<F>(value_or_instance...);
-        }
+            template<typename E, auto F, typename... T>
+            void disconnect(T&&... value_or_instance) {
+                dispatcher.template sink<E>().template disconnect<F>(value_or_instance...);
+            }
 
-        template<typename E, auto F, typename... T>
-        void disconnect(T&&... value_or_instance) {
-            dispatcher.template sink<E>().template disconnect<F>(value_or_instance...);
-        }
+            template<typename T>
+            void disconnect(T& value_or_instance) {
+                dispatcher.disconnect(value_or_instance);
+            }
 
-        template<typename T>
-        void disconnect(T& value_or_instance) {
-            dispatcher.disconnect(value_or_instance);
-        }
+            template<typename T>
+            void disconnect(T* value_or_instance) {
+                dispatcher.disconnect(value_or_instance);
+            }
 
-        template<typename T>
-        void disconnect(T* value_or_instance) {
-            dispatcher.disconnect(value_or_instance);
-        }
+            template<typename E, typename... Args>
+            void enqueue(Args&&... args) {
+                dispatcher.template enqueue<E>(std::forward<Args>(args)...);
+            }
 
-        template<typename E, typename... Args>
-        void enqueue(Args&&... args) {
-            dispatcher.template enqueue<E>(std::forward<Args>(args)...);
-        }
+            template<typename E>
+            void clear() {
+                dispatcher.clear<E>();
+            }
 
-        template<typename E>
-        void clear() {
-            dispatcher.clear<E>();
-        }
-    private:
-        void update() {
-            dispatcher.update();
-        }
-
-        entt::dispatcher dispatcher;
-
-        friend class Application;
-        friend class Ctx;
-    };
+            void update() {
+                dispatcher.update();
+            }
+        private:
+            entt::dispatcher dispatcher;
+        };
+    }
 
     struct WindowClosedEvent {};
 

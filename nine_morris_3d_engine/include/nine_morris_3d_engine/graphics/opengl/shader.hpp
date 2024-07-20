@@ -9,18 +9,18 @@
 
 #include "nine_morris_3d_engine/application/id.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
-#include "nine_morris_3d_engine/graphics/shader_library.hpp"
 
 // Setting uniforms is a little weird
 // https://www.khronos.org/opengl/wiki/Program_Introspection#Naming
 
 namespace sm {
-    class Renderer;
+    namespace internal {
+        class Renderer;
+    }
 
     class GlShader {
     public:
         GlShader(const std::string& source_vertex, const std::string& source_fragment);
-        GlShader(const std::string& source_vertex, const std::string& source_fragment, const ShaderLibrary& shd);
         ~GlShader();
 
         GlShader(const GlShader&) = delete;
@@ -63,12 +63,11 @@ namespace sm {
         // Uniforms cache
         std::unordered_map<Id, int, Hash> cache;
 
-        // Data from introspection
-        // Needed by renderer
+        // Data from introspection; needed by renderer
         std::vector<UniformBlockSpecification> uniform_blocks;
 
         std::vector<std::shared_ptr<GlUniformBuffer>> uniform_buffers;
 
-        friend class Renderer;
+        friend class internal::Renderer;
     };
 }

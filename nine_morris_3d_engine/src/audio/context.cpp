@@ -6,48 +6,50 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
-    OpenAlContext::OpenAlContext(bool create)
-        : create(create) {
-        if (!create) {
-            return;
+    namespace internal {
+        OpenAlContext::OpenAlContext(bool create)
+            : create(create) {
+            if (!create) {
+                return;
+            }
+
+            // Choose the default device
+            device = alcOpenDevice(nullptr);
+
+            if (device == nullptr) {
+                SM_THROW_ERROR(InitializationError, "Could not open an AL device");
+            }
+
+            context = alcCreateContext(device, nullptr);
+
+            if (context == nullptr) {
+                alcCloseDevice(device);
+
+                SM_THROW_ERROR(InitializationError, "Could not create AL context");
+            }
+
+            if (alcMakeContextCurrent(context) == ALC_FALSE) {
+                alcDestroyContext(context);
+                alcCloseDevice(device);
+
+                SM_THROW_ERROR(InitializationError, "Could not make AL context current");
+            }
+
+            listener.set_distance_model(DistanceModel::InverseClamped);
+
+            LOG_INFO("Opened OpenAL device and created context");
         }
 
-        // Choose the default device
-        device = alcOpenDevice(nullptr);
+        OpenAlContext::~OpenAlContext() {
+            if (!create) {
+                return;
+            }
 
-        if (device == nullptr) {
-            SM_THROW_ERROR(InitializationError, "Could not open an AL device");
-        }
-
-        context = alcCreateContext(device, nullptr);
-
-        if (context == nullptr) {
-            alcCloseDevice(device);
-
-            SM_THROW_ERROR(InitializationError, "Could not create AL context");
-        }
-
-        if (alcMakeContextCurrent(context) == ALC_FALSE) {
+            alcMakeContextCurrent(nullptr);
             alcDestroyContext(context);
             alcCloseDevice(device);
 
-            SM_THROW_ERROR(InitializationError, "Could not make AL context current");
+            LOG_INFO("Destroyed OpenAL context and closed device");
         }
-
-        listener.set_distance_model(DistanceModel::InverseClamped);
-
-        LOG_INFO("Opened OpenAL device and created context");
-    }
-
-    OpenAlContext::~OpenAlContext() {
-        if (!create) {
-            return;
-        }
-
-        alcMakeContextCurrent(nullptr);
-        alcDestroyContext(context);
-        alcCloseDevice(device);
-
-        LOG_INFO("Destroyed OpenAL context and closed device");
     }
 }

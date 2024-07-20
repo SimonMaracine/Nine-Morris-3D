@@ -6,27 +6,24 @@ struct ALCdevice;
 struct ALCcontext;
 
 namespace sm {
-    class Ctx;
+    namespace internal {
+        class OpenAlContext {
+        public:
+            explicit OpenAlContext(bool create = true);
+            ~OpenAlContext();
 
-    class OpenAlContext {
-    private:
-        explicit OpenAlContext(bool create = true);
-    public:
-        ~OpenAlContext();
+            OpenAlContext(const OpenAlContext&) = delete;
+            OpenAlContext& operator=(const OpenAlContext&) = delete;
+            OpenAlContext(OpenAlContext&&) = delete;
+            OpenAlContext& operator=(OpenAlContext&&) = delete;
 
-        OpenAlContext(const OpenAlContext&) = delete;
-        OpenAlContext& operator=(const OpenAlContext&) = delete;
-        OpenAlContext(OpenAlContext&&) = delete;
-        OpenAlContext& operator=(OpenAlContext&&) = delete;
+            AlListener& get_listener() { return listener; }
+        private:
+            bool create {};
+            AlListener listener;
 
-        AlListener& get_listener() { return listener; }
-    private:
-        bool create {};
-        AlListener listener;
-
-        ALCdevice* device {nullptr};
-        ALCcontext* context {nullptr};
-
-        friend class Ctx;
-    };
+            ALCdevice* device {nullptr};
+            ALCcontext* context {nullptr};
+        };
+    }
 }

@@ -20,7 +20,7 @@ namespace sm {
 
         imgui_context::initialize(ctx.win.get_handle());
 
-        LOG_DIST_INFO("Working directory: {}", FileSystem::current_working_directory());
+        LOG_DIST_INFO("Working directory: {}", internal::FileSystem::current_working_directory());
 
         const auto [version_major, version_minor] {opengl_debug::get_version_number()};
         LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
@@ -33,8 +33,8 @@ namespace sm {
         ctx.evt.connect<WindowResizedEvent, &Application::on_window_resized>(this);
         ctx.evt.connect<WindowIconifiedEvent, &Application::on_window_iconified>(this);
 
-        frame_counter.previous_seconds = Window::get_time();
-        fixed_update.previous_seconds = Window::get_time();
+        frame_counter.previous_seconds = internal::Window::get_time();
+        fixed_update.previous_seconds = internal::Window::get_time();
     }
 
     Application::~Application() {  // Destructor is called before all member variables
@@ -100,7 +100,7 @@ namespace sm {
     float Application::update_frame_counter() {
         static constexpr double MAX_DT {1.0 / 20.0};
 
-        const double current_seconds {Window::get_time()};
+        const double current_seconds {internal::Window::get_time()};
         const double elapsed_seconds {current_seconds - frame_counter.previous_seconds};
         frame_counter.previous_seconds = current_seconds;
 
@@ -121,7 +121,7 @@ namespace sm {
     unsigned int Application::calculate_fixed_update() {
         static constexpr double FIXED_DT {1.0 / 50.0};
 
-        const double current_seconds {Window::get_time()};
+        const double current_seconds {internal::Window::get_time()};
         const double elapsed_seconds {current_seconds - fixed_update.previous_seconds};
         fixed_update.previous_seconds = current_seconds;
 

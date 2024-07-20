@@ -16,12 +16,14 @@
 
 namespace sm {
     Ctx::Ctx(const ApplicationProperties& properties)
-        : fs(properties.application_name, properties.assets_directory), log(properties.log_file, fs),
-        shd({"engine_assets", properties.assets_directory}), win(properties, &evt),
-        snd(properties.audio), inp(win.get_handle()),
-        rnd(properties.width, properties.height, properties.samples, fs, shd) {
-        if (!fs.error_string.empty()) {
-            LOG_DIST_ERROR("{}", fs.error_string);
+        : fs(properties.application_name, properties.assets_directory),
+        log(properties.log_file, fs),
+        shd({"engine_assets", properties.assets_directory}),
+        win(properties, &evt),
+        rnd(properties.width, properties.height, properties.samples, fs, shd),
+        snd(properties.audio), inp(win.get_handle()) {
+        if (!fs.get_error_string().empty()) {
+            LOG_DIST_ERROR("{}", fs.get_error_string());
         }
     }
 
@@ -52,7 +54,7 @@ namespace sm {
         info_text += std::to_string(static_cast<int>(delta * 1000.0f)) + " ms";
 
         Text text;
-        text.font = rnd.storage.default_font;
+        text.font = rnd.get_default_font();
         text.text = std::move(info_text);
         text.color = glm::vec3(1.0f);
 
@@ -381,9 +383,8 @@ namespace sm {
         if (include_processing) {
             shader = res.shader.force_load(
                 identifier,
-                utils::read_file(vertex_file_path),
-                utils::read_file(fragment_file_path),
-                shd
+                shd.load_shader(utils::read_file(vertex_file_path)),
+                shd.load_shader(utils::read_file(fragment_file_path))
             );
         } else {
             shader = res.shader.force_load(

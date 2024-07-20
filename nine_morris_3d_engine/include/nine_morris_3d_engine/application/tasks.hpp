@@ -6,9 +6,9 @@
 #include "nine_morris_3d_engine/application/id.hpp"
 
 namespace sm {
-    class Application;
-    class Ctx;
-    class TaskManager;
+    namespace internal {
+        class TaskManager;
+    }
 
     class Task {  // TODO on done function
     public:
@@ -34,22 +34,18 @@ namespace sm {
         double start_time {};
         unsigned int frames {};
 
-        friend class TaskManager;
+        friend class internal::TaskManager;
     };
 
-    class TaskManager {  // TODO async tasks, delayed tasks
-    public:
-        void add(Id id, const Task::TaskFunction& function);
-        void remove(Id id);
-    private:
-        TaskManager() = default;
-
-        void update();
-
-        std::vector<Task> tasks_active;
-        std::vector<Task> tasks_next;
-
-        friend class Application;
-        friend class Ctx;
-    };
+    namespace internal {
+        class TaskManager {  // TODO async tasks, delayed tasks
+        public:
+            void add(Id id, const Task::TaskFunction& function);
+            void remove(Id id);
+            void update();
+        private:
+            std::vector<Task> tasks_active;
+            std::vector<Task> tasks_next;
+        };
+    }
 }

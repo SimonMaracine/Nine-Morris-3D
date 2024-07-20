@@ -12,8 +12,10 @@
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
-    class Renderer;
-    class DebugUi;
+    namespace internal {
+        class Renderer;
+        class DebugUi;
+    }
 
     class Renderable {
     public:
@@ -39,8 +41,8 @@ namespace sm {
         std::shared_ptr<GlVertexArray> vertex_array;
         std::shared_ptr<MaterialInstance> material;
 
-        friend class Renderer;
-        friend class DebugUi;
+        friend class internal::Renderer;
+        friend class internal::DebugUi;
     };
 
     struct Text {

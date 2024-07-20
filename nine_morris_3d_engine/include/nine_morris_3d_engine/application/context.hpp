@@ -48,8 +48,9 @@ namespace sm {
 
     // Wrapper around functionality exposed to the user
     class Ctx {
-    public:
+    private:
         explicit Ctx(const ApplicationProperties& properties);
+    public:
         ~Ctx() = default;
 
         Ctx(const Ctx&) = delete;
@@ -140,25 +141,24 @@ namespace sm {
 
         bool running {true};
         int exit_code {};
-
+    private:
         // The order of these members matters
 
-        FileSystem fs;
-        Logging log;
-        ShaderLibrary shd;
-        EventDispatcher evt;  // Application events
-        Window win;  // One of the last objects destroyed in an application instance
-        OpenAlContext snd;
-        MusicPlayer mus;
-        TaskManager tsk;
-        Input inp;
-        Scene scn;
-    private:
-        Renderer rnd;  // Renderer for 3D, 2D and debug
-        ResourcesCache res;  // Global cache of resources
+        internal::FileSystem fs;
+        internal::Logging log;
+        internal::ShaderLibrary shd;
+        internal::EventDispatcher evt;  // Application events
+        internal::Window win;  // One of the last objects destroyed in an application instance
+        internal::Renderer rnd;  // Renderer for 3D, 2D and debug
+        internal::OpenAlContext snd;
+        internal::MusicPlayer mus;
+        internal::TaskManager tsk;
+        internal::Input inp;
+        internal::Scene scn;
+        internal::ResourcesCache res;  // Global cache of resources
 
 #ifndef SM_BUILD_DISTRIBUTION
-        DebugUi dbg;
+        internal::DebugUi dbg;
 #endif
 
         float delta {};
@@ -169,5 +169,6 @@ namespace sm {
         Application* application {nullptr};
 
         friend class Application;
+        friend class internal::DebugUi;
     };
 }
