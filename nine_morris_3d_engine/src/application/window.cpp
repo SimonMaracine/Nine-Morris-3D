@@ -55,11 +55,11 @@ namespace sm {
 
             LOG_INFO("Initialized GLFW");
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             glfwSetErrorCallback([](int error, const char* description) {
                 LOG_CRITICAL("({}) GLFW: {}", error, description);
             });
-    #endif
+#endif
 
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -69,12 +69,12 @@ namespace sm {
             glfwWindowHint(GLFW_RESIZABLE, properties.resizable ? GLFW_TRUE : GLFW_FALSE);
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
             LOG_INFO("Using OpenGL debug context");
-    #else
+#else
             glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
-    #endif
+#endif
 
             window = create_window(properties);
 
@@ -123,20 +123,6 @@ namespace sm {
         void Window::update() const {
             glfwPollEvents();
             glfwSwapBuffers(window);
-        }
-
-        const Monitors& Window::get_monitors() {
-            int count {};
-            GLFWmonitor** connected_monitors {glfwGetMonitors(&count)};
-
-            if (connected_monitors == nullptr) {
-                SM_THROW_ERROR(OtherError, "Could not retrieve monitors");
-            }
-
-            monitors.count = static_cast<std::size_t>(count);
-            monitors.monitors = connected_monitors;
-
-            return monitors;
         }
 
         int Window::get_width() const {
@@ -198,6 +184,20 @@ namespace sm {
             }
 
             glfwSetWindowIcon(window, static_cast<int>(icons.size()), icons.data());
+        }
+
+        const Monitors& Window::get_monitors() {
+            int count {};
+            GLFWmonitor** connected_monitors {glfwGetMonitors(&count)};
+
+            if (connected_monitors == nullptr) {
+                SM_THROW_ERROR(OtherError, "Could not retrieve monitors");
+            }
+
+            monitors.count = static_cast<std::size_t>(count);
+            monitors.monitors = connected_monitors;
+
+            return monitors;
         }
 
         double Window::get_time() {

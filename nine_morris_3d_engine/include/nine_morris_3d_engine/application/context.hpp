@@ -77,32 +77,32 @@ namespace sm {
 
         // Events
         template<typename E, auto F, typename... T>
-        void connect(T&&... value_or_instance) { evt.connect<E, F>(value_or_instance...); }
+        void connect_event(T&&... value_or_instance) { evt.connect<E, F>(value_or_instance...); }
 
         template<typename E, auto F, typename... T>
-        void disconnect(T&&... value_or_instance) { evt.disconnect<E, F>(value_or_instance...); }
+        void disconnect_event(T&&... value_or_instance) { evt.disconnect<E, F>(value_or_instance...); }
 
         template<typename T>
-        void disconnect(T& value_or_instance) { evt.disconnect(value_or_instance); }
+        void disconnect_event(T& value_or_instance) { evt.disconnect(value_or_instance); }
 
         template<typename T>
-        void disconnect(T* value_or_instance) { evt.disconnect(value_or_instance); }
+        void disconnect_event(T* value_or_instance) { evt.disconnect(value_or_instance); }
 
         template<typename E, typename... Args>
-        void enqueue(Args&&... args) { evt.enqueue<E>(std::forward<Args>(args)...); }
+        void enqueue_event(Args&&... args) { evt.enqueue<E>(std::forward<Args>(args)...); }
 
         template<typename E>
-        void clear() { evt.clear<E>(); }
+        void clear_events() { evt.clear<E>(); }
 
         // Window
+        int get_window_width() const;
+        int get_window_height() const;
+        void show_window() const;
+        void set_window_vsync(int interval) const;
+        void add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
+        void set_window_cursor(Id id) const;
+        void set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
         const Monitors& get_monitors();
-        int get_width() const;
-        int get_height() const;
-        void show() const;
-        void set_vsync(int interval) const;
-        void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
-        void set_cursor(Id id) const;
-        void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
         static double get_time();
 
         // Renderer
@@ -127,9 +127,7 @@ namespace sm {
         // Input
         bool is_key_pressed(Key key) const;
         bool is_mouse_button_pressed(MouseButton button) const;
-        float get_mouse_x() const;
-        float get_mouse_y() const;
-        std::pair<float, float> get_mouse() const;
+        std::pair<float, float> get_mouse_position() const;
 
         // Scene
         void capture(const Camera& camera, glm::vec3 position);
@@ -143,11 +141,12 @@ namespace sm {
         void add_text(Text& text);
         void add_quad(Quad& quad);
         void debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color);
-        void debug_add_lines(const std::vector<glm::vec3>& points, glm::vec3 color);
-        void debug_add_lines(std::initializer_list<glm::vec3> points, glm::vec3 color);
+        void debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color);
+        void debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color);
         void debug_add_point(glm::vec3 position, glm::vec3 color);
         void debug_add_lamp(glm::vec3 position, glm::vec3 color);
 
+        // Context
         void change_scene(Id id);
         void show_info_text();
         std::string get_information() const;

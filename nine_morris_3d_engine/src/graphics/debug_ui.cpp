@@ -69,7 +69,7 @@ namespace sm {
                     ImGui::PushID(index);
                     ImGui::Text("Renderable %d", index);
                     ImGui::DragFloat3("Position", glm::value_ptr(renderable->transform.position), 1.0f, -200.0f, 200.0f);
-                    ImGui::DragFloat3("Rotation", glm::value_ptr(renderable->transform.rotation), 1.0f, 0.0f, 360.0f);  // TODO
+                    ImGui::DragFloat3("Rotation", glm::value_ptr(renderable->transform.rotation), 1.0f, 0.0f, 360.0f);
                     ImGui::DragFloat("Scale", &renderable->transform.scale, 0.1f, 0.0f, 100.0f);
                     ImGui::PopID();
                     ImGui::Spacing();

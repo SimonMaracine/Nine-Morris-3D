@@ -79,36 +79,36 @@ namespace sm {
         return shd.load_shader(source);
     }
 
-    const Monitors& Ctx::get_monitors() {
-        return win.get_monitors();
-    }
-
-    int Ctx::get_width() const {
+    int Ctx::get_window_width() const {
         return win.get_width();
     }
 
-    int Ctx::get_height() const {
+    int Ctx::get_window_height() const {
         return win.get_height();
     }
 
-    void Ctx::show() const {
+    void Ctx::show_window() const {
         win.show();
     }
 
-    void Ctx::set_vsync(int interval) const {
+    void Ctx::set_window_vsync(int interval) const {
         win.set_vsync(interval);
     }
 
-    void Ctx::add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
+    void Ctx::add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
         win.add_cursor(id, std::move(cursor), x_hotspot, y_hotspot);
     }
 
-    void Ctx::set_cursor(Id id) const {
+    void Ctx::set_window_cursor(Id id) const {
         win.set_cursor(id);
     }
 
-    void Ctx::set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const {
+    void Ctx::set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const {
         win.set_icons(icons);
+    }
+
+    const Monitors& Ctx::get_monitors() {
+        return win.get_monitors();
     }
 
     double Ctx::get_time() {
@@ -152,11 +152,11 @@ namespace sm {
     }
 
     void Ctx::add_task(Id id, const Task::TaskFunction& function) {
-        tsk.add_task(id, function);
+        tsk.add(id, function);
     }
 
     void Ctx::remove_task(Id id) {
-        tsk.remove_task(id);
+        tsk.remove(id);
     }
 
     bool Ctx::is_key_pressed(Key key) const {
@@ -167,16 +167,8 @@ namespace sm {
         return inp.is_mouse_button_pressed(button);
     }
 
-    float Ctx::get_mouse_x() const {
-        return inp.get_mouse_x();
-    }
-
-    float Ctx::get_mouse_y() const {
-        return inp.get_mouse_y();
-    }
-
-    std::pair<float, float> Ctx::get_mouse() const {
-        return inp.get_mouse();
+    std::pair<float, float> Ctx::get_mouse_position() const {
+        return inp.get_mouse_position();
     }
 
     void Ctx::capture(const Camera& camera, glm::vec3 position) {
@@ -223,12 +215,12 @@ namespace sm {
         scn.debug_add_line(position1, position2, color);
     }
 
-    void Ctx::debug_add_lines(const std::vector<glm::vec3>& points, glm::vec3 color) {  // TODO rename to positions
-        scn.debug_add_lines(points, color);
+    void Ctx::debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color) {
+        scn.debug_add_lines(positions, color);
     }
 
-    void Ctx::debug_add_lines(std::initializer_list<glm::vec3> points, glm::vec3 color) {  // TODO rename to positions
-        scn.debug_add_lines(points, color);
+    void Ctx::debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color) {
+        scn.debug_add_lines(positions, color);
     }
 
     void Ctx::debug_add_point(glm::vec3 position, glm::vec3 color) {
@@ -238,9 +230,6 @@ namespace sm {
     void Ctx::debug_add_lamp(glm::vec3 position, glm::vec3 color) {
         scn.debug_add_lamp(position, color);
     }
-
-
-
 
     void Ctx::change_scene(Id id) {
         assert(application->next_scene == nullptr);

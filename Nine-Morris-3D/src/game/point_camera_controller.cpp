@@ -185,16 +185,16 @@ void PointCameraController::go_towards_position(glm::vec3 position) {
 }
 
 void PointCameraController::connect_events(sm::Ctx& ctx) {
-    ctx.connect<sm::MouseWheelScrolledEvent, &PointCameraController::on_mouse_wheel_scrolled>(this);
-    ctx.connect<sm::MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
-    ctx.connect<sm::MouseButtonPressedEvent, &PointCameraController::on_mouse_button_pressed>(this);
-    ctx.connect<sm::MouseButtonReleasedEvent, &PointCameraController::on_mouse_button_released>(this);
-    ctx.connect<sm::KeyPressedEvent, &PointCameraController::on_key_pressed>(this);
-    ctx.connect<sm::KeyReleasedEvent, &PointCameraController::on_key_released>(this);
+    ctx.connect_event<sm::MouseWheelScrolledEvent, &PointCameraController::on_mouse_wheel_scrolled>(this);
+    ctx.connect_event<sm::MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
+    ctx.connect_event<sm::MouseButtonPressedEvent, &PointCameraController::on_mouse_button_pressed>(this);
+    ctx.connect_event<sm::MouseButtonReleasedEvent, &PointCameraController::on_mouse_button_released>(this);
+    ctx.connect_event<sm::KeyPressedEvent, &PointCameraController::on_key_pressed>(this);
+    ctx.connect_event<sm::KeyReleasedEvent, &PointCameraController::on_key_released>(this);
 }
 
 void PointCameraController::disconnect_events(sm::Ctx& ctx) {
-    ctx.disconnect(this);
+    ctx.disconnect_event(this);
 }
 
 void PointCameraController::on_mouse_wheel_scrolled(const sm::MouseWheelScrolledEvent& event) {

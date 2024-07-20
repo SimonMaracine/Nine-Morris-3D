@@ -23,7 +23,7 @@ static constexpr std::size_t ROTATING_FILES {2};  // 3 total log files
 namespace sm {
     namespace internal {
         Logging::Logging([[maybe_unused]] const std::string& log_file, [[maybe_unused]] const FileSystem& fs) {
-    #ifdef SM_BUILD_DISTRIBUTION
+#ifdef SM_BUILD_DISTRIBUTION
             const std::string file_path {fs.path_for_logs(log_file)};
 
             try {
@@ -36,11 +36,11 @@ namespace sm {
             global_logger->set_pattern(LOG_PATTERN_DISTRIBUTION);
             global_logger->set_level(spdlog::level::trace);
             global_logger->flush_on(spdlog::level::info);
-    #else
+#else
             global_logger = spdlog::stdout_color_mt("Development Logger [Console]");
             global_logger->set_pattern(LOG_PATTERN_DEVELOPMENT);
             global_logger->set_level(spdlog::level::trace);
-    #endif
+#endif
         }
 
         spdlog::logger* Logging::get_global_logger() {

@@ -293,9 +293,9 @@ namespace sm {
                 storage.default_font->end_baking("default");
             }
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug = DebugRenderer(fs, *this);
-    #endif
+#endif
         }
 
         std::shared_ptr<Font> Renderer::get_default_font() const {
@@ -517,7 +517,7 @@ namespace sm {
             opengl::clear(opengl::Buffers::CD);  // Clear for debug renderer
             opengl::viewport(storage.final_framebuffer->get_specification().width, storage.final_framebuffer->get_specification().height);
 
-            screen_quad(post_processing_context.last_texture);
+            screen_quad(storage.screen_quad_shader.get(), post_processing_context.last_texture);
 
             GlVertexArray::unbind();
 
@@ -531,23 +531,19 @@ namespace sm {
             opengl::viewport(width, height);
 
             storage.screen_quad_vertex_array->bind();
-            opengl::bind_texture_2d(storage.final_framebuffer->get_color_attachment(0), 0);
 
-            if (color_correction) {
-                storage.color_correction_shader->bind();
-            } else {
-                storage.screen_quad_shader->bind();
-            }
-
-            sm::opengl::draw_arrays(6);
+            screen_quad(
+                color_correction ? storage.color_correction_shader.get() : storage.screen_quad_shader.get(),
+                storage.final_framebuffer->get_color_attachment(0)
+            );
 
             GlVertexArray::unbind();
 
             opengl::enable_depth_test();
         }
 
-        void Renderer::screen_quad(unsigned int texture) {  // TODO take shader and reuse function
-            storage.screen_quad_shader->bind();
+        void Renderer::screen_quad(const GlShader* shader, unsigned int texture) {
+            shader->bind();
             opengl::bind_texture_2d(texture, 0);
             opengl::draw_arrays(6);
         }

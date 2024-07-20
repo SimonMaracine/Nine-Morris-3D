@@ -38,8 +38,8 @@ namespace sm {
 
             // Debug API
             void debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color);
-            void debug_add_lines(const std::vector<glm::vec3>& points, glm::vec3 color);
-            void debug_add_lines(std::initializer_list<glm::vec3> points, glm::vec3 color);
+            void debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color);
+            void debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color);
             void debug_add_point(glm::vec3 position, glm::vec3 color);
             void debug_add_lamp(glm::vec3 position, glm::vec3 color);
 
@@ -64,7 +64,7 @@ namespace sm {
             glm::vec3 camera_position {};
             Camera2D camera_2d;
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             struct {
                 std::vector<DebugLine> debug_lines;
                 std::vector<Renderable*> renderables;
@@ -74,7 +74,7 @@ namespace sm {
                 std::vector<Text*> texts;
                 std::vector<Quad*> quads;
             } debug;
-    #endif
+#endif
 
             friend class Renderer;
             friend class DebugRenderer;

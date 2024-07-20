@@ -45,8 +45,6 @@ namespace sm {
             Window(Window&&) = delete;
             Window& operator=(Window&&) = delete;
 
-            const Monitors& get_monitors();
-
             int get_width() const;
             int get_height() const;
 
@@ -56,6 +54,7 @@ namespace sm {
             void set_cursor(Id id) const;
             void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
 
+            const Monitors& get_monitors();
             static double get_time();
 
             GLFWwindow* get_handle() const;

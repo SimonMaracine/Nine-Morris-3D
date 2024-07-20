@@ -7,8 +7,8 @@
 
 void create_post_processing(sm::Ctx& ctx) {
     sm::FramebufferSpecification specification;
-    specification.width = ctx.get_width();
-    specification.height = ctx.get_height();
+    specification.width = ctx.get_window_width();
+    specification.height = ctx.get_window_height();
     specification.color_attachments = {
         sm::Attachment(sm::AttachmentFormat::Rgba8, sm::AttachmentType::Texture)
     };

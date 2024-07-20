@@ -18,8 +18,8 @@ void GameScene::on_start() {
         return sm::Task::Result::Continue;
     });
 
-    ctx.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
-    ctx.connect<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
+    ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
+    ctx.connect_event<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
 
     ctx.set_clear_color(glm::vec3(0.1f, 0.05f, 0.1f));
 
@@ -38,8 +38,8 @@ void GameScene::on_start() {
 
     cam_controller = PointCameraController(
         cam,
-        ctx.get_width(),
-        ctx.get_height(),
+        ctx.get_window_width(),
+        ctx.get_window_height(),
         glm::vec3(0.0f),
         8.0f,
         47.0f,
@@ -48,7 +48,7 @@ void GameScene::on_start() {
 
     cam_controller.connect_events(ctx);
 
-    cam_2d.set_projection(0, ctx.get_width(), 0, ctx.get_height());
+    cam_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
 }
 
 void GameScene::on_stop() {
@@ -98,7 +98,7 @@ void GameScene::on_update() {
             const auto [w, h] {sans->get_string_size("Some Text. Three spaces   !!?@#&^`~*&\"", text4.scale)};
 
             text4.text = "Some Text. Three spaces   !!?@#&^`~*&\"";
-            text4.position = glm::vec2(static_cast<float>(ctx.get_width() - w), static_cast<float>(ctx.get_height() - h));
+            text4.position = glm::vec2(static_cast<float>(ctx.get_window_width() - w), static_cast<float>(ctx.get_window_height() - h));
             text4.color = glm::vec3(1.0f, 0.1f, 0.1f);
 
             ctx.add_text(text4);
@@ -108,7 +108,7 @@ void GameScene::on_update() {
             const auto [w, h] {sans->get_string_size("Simon Mărăcine ăîâșț ĂÎÂȘȚ", text4.scale)};
 
             text4.text = "Simon Mărăcine ăîâșț ĂÎÂȘȚ";
-            text4.position = glm::vec2(static_cast<float>(ctx.get_width() / 2 - w / 2), static_cast<float>(ctx.get_height() / 2 - h / 2));
+            text4.position = glm::vec2(static_cast<float>(ctx.get_window_width() / 2 - w / 2), static_cast<float>(ctx.get_window_height() / 2 - h / 2));
             text4.color = glm::vec3(0.8f, 0.1f, 0.9f);
 
             ctx.add_text(text4);
@@ -118,7 +118,7 @@ void GameScene::on_update() {
             const auto [_, h] {sans->get_string_size("Text that spans\nmultiple lines\nlike that.", text4.scale)};
 
             text4.text = "Text that spans\nmultiple lines\nlike that.";
-            text4.position = glm::vec2(0.0f, static_cast<float>(ctx.get_height() - h));
+            text4.position = glm::vec2(0.0f, static_cast<float>(ctx.get_window_height() - h));
             text4.color = glm::vec3(0.0f, 1.0f, 0.0f);
 
             ctx.add_text(text4);
@@ -128,7 +128,7 @@ void GameScene::on_update() {
             const auto [w, _] {sans->get_string_size("Another\ntext\nwith multiple\nlines.", text4.scale)};
 
             text4.text = "Another\ntext\nwith multiple\nlines.";
-            text4.position = glm::vec2(static_cast<float>(ctx.get_width() - w), 0.0f);
+            text4.position = glm::vec2(static_cast<float>(ctx.get_window_width() - w), 0.0f);
             text4.color = glm::vec3(0.0f, 0.0f, 1.0f);
 
             ctx.add_text(text4);

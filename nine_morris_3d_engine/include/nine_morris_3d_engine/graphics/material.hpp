@@ -53,7 +53,7 @@ namespace sm {
 
     class MaterialInstance {
     public:
-        explicit MaterialInstance(std::shared_ptr<Material> material);  // TODO create shared_ptr materials?
+        explicit MaterialInstance(std::shared_ptr<Material> material);
 
         void bind_and_upload() const;
 

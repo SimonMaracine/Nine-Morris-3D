@@ -63,9 +63,9 @@ namespace sm {
 
             shadow(const_cast<const ShadowBox&>(box));
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug.shadow_box = &box;
-    #endif
+#endif
         }
 
         void Scene::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
@@ -75,41 +75,41 @@ namespace sm {
         void Scene::add_renderable(Renderable& renderable) {
             add_renderable(const_cast<const Renderable&>(renderable));
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug.renderables.push_back(&renderable);
-    #endif
+#endif
         }
 
         void Scene::add_light(DirectionalLight& light) {
             add_light(const_cast<const DirectionalLight&>(light));
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug.directional_light = &light;
-    #endif
+#endif
         }
 
         void Scene::add_light(PointLight& light) {
             add_light(const_cast<const PointLight&>(light));
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug.point_lights.push_back(&light);
-    #endif
+#endif
         }
 
         void Scene::add_text(Text& text) {
             add_text(const_cast<const Text&>(text));
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug.texts.push_back(&text);
-    #endif
+#endif
         }
 
         void Scene::add_quad(Quad& quad) {
             add_quad(const_cast<const Quad&>(quad));
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug.quads.push_back(&quad);
-    #endif
+#endif
         }
 
         void Scene::debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color) {
@@ -118,29 +118,29 @@ namespace sm {
             line.position2 = position2;
             line.color = color;
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug.debug_lines.push_back(line);
-    #endif
+#endif
         }
 
-        void Scene::debug_add_lines(const std::vector<glm::vec3>& points, glm::vec3 color) {
-            assert(points.size() >= 2);
+        void Scene::debug_add_lines(const std::vector<glm::vec3>& positions, glm::vec3 color) {
+            assert(positions.size() >= 2);
 
             DebugLine line;
             line.color = color;
 
-            for (std::size_t i {1}; i < points.size(); i++) {
-                line.position1 = points.begin()[i - 1];
-                line.position2 = points.begin()[i];
+            for (std::size_t i {1}; i < positions.size(); i++) {
+                line.position1 = positions.begin()[i - 1];
+                line.position2 = positions.begin()[i];
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
                 debug.debug_lines.push_back(line);
-    #endif
+#endif
             }
         }
 
-        void Scene::debug_add_lines(std::initializer_list<glm::vec3> points, glm::vec3 color) {
-            debug_add_lines(std::vector(points), color);
+        void Scene::debug_add_lines(std::initializer_list<glm::vec3> positions, glm::vec3 color) {
+            debug_add_lines(std::vector(positions), color);
         }
 
         void Scene::debug_add_point(glm::vec3 position, glm::vec3 color) {
@@ -209,7 +209,7 @@ namespace sm {
             camera = {};
             camera_2d = {};
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug.debug_lines.clear();
             debug.renderables.clear();
             debug.directional_light = {};
@@ -217,7 +217,7 @@ namespace sm {
             debug.shadow_box = {};
             debug.texts.clear();
             debug.quads.clear();
-    #endif
+#endif
         }
 
         void Scene::shadow(const ShadowBox& box) {

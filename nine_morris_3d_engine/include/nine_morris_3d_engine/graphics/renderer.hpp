@@ -53,7 +53,7 @@ namespace sm {
             Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary& shd);
 
             std::shared_ptr<Font> get_default_font() const;
-            void set_color_correction(bool enable);  // TODO make classes have public interface, put them in internal namespace, add forward functions in context for the public interface, pass context around
+            void set_color_correction(bool enable);
             void set_clear_color(glm::vec3 color);
 
             void register_shader(std::shared_ptr<GlShader> shader);
@@ -67,7 +67,7 @@ namespace sm {
             void post_processing(const Scene& scene);
             void end_3d_rendering(const Scene& scene);
             void present(int width, int height);
-            void screen_quad(unsigned int texture);
+            void screen_quad(const GlShader* shader, unsigned int texture);
 
             // Draw functions
             void draw_renderables(const Scene& scene);
@@ -155,9 +155,9 @@ namespace sm {
 
             bool color_correction {true};
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             DebugRenderer debug;
-    #endif
+#endif
 
             static constexpr unsigned int PROJECTON_VIEW_UNIFORM_BLOCK_BINDING {0};
             static constexpr unsigned int DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING {1};

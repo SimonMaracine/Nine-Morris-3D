@@ -13,21 +13,7 @@ namespace sm {
             return glfwGetMouseButton(window_handle, static_cast<int>(button)) == GLFW_PRESS;
         }
 
-        float Input::get_mouse_x() const {
-            double x, y;
-            glfwGetCursorPos(window_handle, &x, &y);
-
-            return static_cast<float>(x);
-        }
-
-        float Input::get_mouse_y() const {
-            double x, y;
-            glfwGetCursorPos(window_handle, &x, &y);
-
-            return static_cast<float>(y);
-        }
-
-        std::pair<float, float> Input::get_mouse() const {
+        std::pair<float, float> Input::get_mouse_position() const {
             double x, y;
             glfwGetCursorPos(window_handle, &x, &y);
 
