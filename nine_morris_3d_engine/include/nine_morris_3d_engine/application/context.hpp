@@ -58,7 +58,95 @@ namespace sm {
         Ctx(Ctx&&) = delete;
         Ctx& operator=(Ctx&&) = delete;
 
+        // File system
+        static bool directory_exists(const std::string& path);
+        static bool create_directory(const std::string& path);
+        static bool delete_file(const std::string& path);
+        static std::string current_working_directory();
+        std::string path_logs() const;
+        std::string path_saved_data() const;
+        std::string path_assets() const;
+        std::string path_engine_assets() const;
+        std::string path_logs(const std::string& path) const;
+        std::string path_saved_data(const std::string& path) const;
+        std::string path_assets(const std::string& path) const;
+        std::string path_engine_assets(const std::string& path) const;
+
+        // Shader library
+        std::string load_shader(const std::string& source) const;
+
+        // Events
+        template<typename E, auto F, typename... T>
+        void connect(T&&... value_or_instance) { evt.connect<E, F>(value_or_instance...); }
+
+        template<typename E, auto F, typename... T>
+        void disconnect(T&&... value_or_instance) { evt.disconnect<E, F>(value_or_instance...); }
+
+        template<typename T>
+        void disconnect(T& value_or_instance) { evt.disconnect(value_or_instance); }
+
+        template<typename T>
+        void disconnect(T* value_or_instance) { evt.disconnect(value_or_instance); }
+
+        template<typename E, typename... Args>
+        void enqueue(Args&&... args) { evt.enqueue<E>(std::forward<Args>(args)...); }
+
+        template<typename E>
+        void clear() { evt.clear<E>(); }
+
+        // Window
+        const Monitors& get_monitors();
+        int get_width() const;
+        int get_height() const;
+        void show() const;
+        void set_vsync(int interval) const;
+        void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
+        void set_cursor(Id id) const;
+        void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
+        static double get_time();
+
+        // Renderer
+        std::shared_ptr<Font> get_default_font() const;
         void set_color_correction(bool enable);
+        void set_clear_color(glm::vec3 color);
+
+        // OpenAL
+        AlListener& get_listener();
+
+        // Music player
+        void play_music_track(std::shared_ptr<MusicTrack> music_track);
+        void stop_music_track();
+        void pause_music_track();
+        void continue_music_track();
+        void set_music_gain(float gain);
+
+        // Task manager
+        void add_task(Id id, const Task::TaskFunction& function);
+        void remove_task(Id id);
+
+        // Input
+        bool is_key_pressed(Key key) const;
+        bool is_mouse_button_pressed(MouseButton button) const;
+        float get_mouse_x() const;
+        float get_mouse_y() const;
+        std::pair<float, float> get_mouse() const;
+
+        // Scene
+        void capture(const Camera& camera, glm::vec3 position);
+        void capture(const Camera2D& camera_2d);
+        void skybox(std::shared_ptr<GlTextureCubemap> texture);
+        void shadow(ShadowBox& box);
+        void add_post_processing(std::shared_ptr<PostProcessingStep> step);
+        void add_renderable(Renderable& renderable);
+        void add_light(DirectionalLight& light);
+        void add_light(PointLight& light);
+        void add_text(Text& text);
+        void add_quad(Quad& quad);
+        void debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color);
+        void debug_add_lines(const std::vector<glm::vec3>& points, glm::vec3 color);
+        void debug_add_lines(std::initializer_list<glm::vec3> points, glm::vec3 color);
+        void debug_add_point(glm::vec3 position, glm::vec3 color);
+        void debug_add_lamp(glm::vec3 position, glm::vec3 color);
 
         void change_scene(Id id);
         void show_info_text();
@@ -156,7 +244,6 @@ namespace sm {
         internal::Input inp;
         internal::Scene scn;
         internal::ResourcesCache res;  // Global cache of resources
-
 #ifndef SM_BUILD_DISTRIBUTION
         internal::DebugUi dbg;
 #endif

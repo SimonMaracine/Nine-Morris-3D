@@ -298,12 +298,8 @@ namespace sm {
     #endif
         }
 
-        void Renderer::register_shader(std::shared_ptr<GlShader> shader) {
-            storage.shaders.push_back(shader);
-        }
-
-        void Renderer::register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer) {
-            storage.framebuffers.push_back(framebuffer);
+        std::shared_ptr<Font> Renderer::get_default_font() const {
+            return storage.default_font;
         }
 
         void Renderer::set_color_correction(bool enable) {
@@ -316,6 +312,14 @@ namespace sm {
             }
 
             opengl::clear_color(color.r, color.g, color.b);
+        }
+
+        void Renderer::register_shader(std::shared_ptr<GlShader> shader) {
+            storage.shaders.push_back(shader);
+        }
+
+        void Renderer::register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer) {
+            storage.framebuffers.push_back(framebuffer);
         }
 
         void Renderer::render(const Scene& scene, int width, int height) {

@@ -30,7 +30,7 @@ public:
     float get_angle_around_point() const { return angle_around_point; }
 
     // Call these every frame
-    void update_controls(float dt, const sm::Input&) override;
+    void update_controls(float dt, const sm::Ctx&) override;
     void update_camera(float dt) override;
 
     // Call this regularly
@@ -40,8 +40,8 @@ public:
     void set_position(glm::vec3 position);
     void go_towards_position(glm::vec3 position);
 
-    void connect_events(sm::EventDispatcher& evt);
-    void disconnect_events(sm::EventDispatcher& evt);
+    void connect_events(sm::Ctx& ctx);
+    void disconnect_events(sm::Ctx& ctx);
 
     float sensitivity {1.0f};  // Best from 0.5 to 2.0
 private:

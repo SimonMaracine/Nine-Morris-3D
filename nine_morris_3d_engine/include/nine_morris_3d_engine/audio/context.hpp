@@ -17,7 +17,7 @@ namespace sm {
             OpenAlContext(OpenAlContext&&) = delete;
             OpenAlContext& operator=(OpenAlContext&&) = delete;
 
-            AlListener& get_listener() { return listener; }
+            AlListener& get_listener();
         private:
             bool create {};
             AlListener listener;

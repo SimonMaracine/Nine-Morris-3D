@@ -32,7 +32,7 @@ endif()
 add_subdirectory(nine_morris_3d_engine)
 
 # Build the actual game
-# add_subdirectory(Nine-Morris-3D)  # TODO temp
+add_subdirectory(Nine-Morris-3D)
 
 message(STATUS "Nine-Morris-3D: Project compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "Nine-Morris-3D: Project build type: ${CMAKE_BUILD_TYPE}")

@@ -40,8 +40,9 @@ namespace sm {
     namespace internal {
         class TaskManager {  // TODO async tasks, delayed tasks
         public:
-            void add(Id id, const Task::TaskFunction& function);
-            void remove(Id id);
+            void add_task(Id id, const Task::TaskFunction& function);
+            void remove_task(Id id);
+
             void update();
         private:
             std::vector<Task> tasks_active;

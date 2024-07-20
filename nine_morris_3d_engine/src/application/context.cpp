@@ -27,9 +27,220 @@ namespace sm {
         }
     }
 
+    bool Ctx::directory_exists(const std::string& path) {
+        return internal::FileSystem::directory_exists(path);
+    }
+
+    bool Ctx::create_directory(const std::string& path) {
+        return internal::FileSystem::create_directory(path);
+    }
+
+    bool Ctx::delete_file(const std::string& path) {
+        return internal::FileSystem::delete_file(path);
+    }
+
+    std::string Ctx::current_working_directory() {
+        return internal::FileSystem::current_working_directory();
+    }
+
+    std::string Ctx::path_logs() const {
+        return fs.path_logs();
+    }
+
+    std::string Ctx::path_saved_data() const {
+        return fs.path_saved_data();
+    }
+
+    std::string Ctx::path_assets() const {
+        return fs.path_assets();
+    }
+
+    std::string Ctx::path_engine_assets() const {
+        return fs.path_engine_assets();
+    }
+
+    std::string Ctx::path_logs(const std::string& path) const {
+        return fs.path_logs(path);
+    }
+
+    std::string Ctx::path_saved_data(const std::string& path) const {
+        return fs.path_saved_data(path);
+    }
+
+    std::string Ctx::path_assets(const std::string& path) const {
+        return fs.path_assets(path);
+    }
+
+    std::string Ctx::path_engine_assets(const std::string& path) const {
+        return fs.path_engine_assets(path);
+    }
+
+    std::string Ctx::load_shader(const std::string& source) const {
+        return shd.load_shader(source);
+    }
+
+    const Monitors& Ctx::get_monitors() {
+        return win.get_monitors();
+    }
+
+    int Ctx::get_width() const {
+        return win.get_width();
+    }
+
+    int Ctx::get_height() const {
+        return win.get_height();
+    }
+
+    void Ctx::show() const {
+        win.show();
+    }
+
+    void Ctx::set_vsync(int interval) const {
+        win.set_vsync(interval);
+    }
+
+    void Ctx::add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot) {
+        win.add_cursor(id, std::move(cursor), x_hotspot, y_hotspot);
+    }
+
+    void Ctx::set_cursor(Id id) const {
+        win.set_cursor(id);
+    }
+
+    void Ctx::set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const {
+        win.set_icons(icons);
+    }
+
+    double Ctx::get_time() {
+        return internal::Window::get_time();
+    }
+
+    std::shared_ptr<Font> Ctx::get_default_font() const {
+        return rnd.get_default_font();
+    }
+
     void Ctx::set_color_correction(bool enable) {
         rnd.set_color_correction(enable);
     }
+
+    void Ctx::set_clear_color(glm::vec3 color) {
+        rnd.set_clear_color(color);
+    }
+
+    AlListener& Ctx::get_listener() {
+        return snd.get_listener();
+    }
+
+    void Ctx::play_music_track(std::shared_ptr<MusicTrack> music_track) {
+        mus.play_music_track(music_track);
+    }
+
+    void Ctx::stop_music_track() {
+        mus.stop_music_track();
+    }
+
+    void Ctx::pause_music_track() {
+        mus.pause_music_track();
+    }
+
+    void Ctx::continue_music_track() {
+        mus.continue_music_track();
+    }
+
+    void Ctx::set_music_gain(float gain) {
+        mus.set_music_gain(gain);
+    }
+
+    void Ctx::add_task(Id id, const Task::TaskFunction& function) {
+        tsk.add_task(id, function);
+    }
+
+    void Ctx::remove_task(Id id) {
+        tsk.remove_task(id);
+    }
+
+    bool Ctx::is_key_pressed(Key key) const {
+        return inp.is_key_pressed(key);
+    }
+
+    bool Ctx::is_mouse_button_pressed(MouseButton button) const {
+        return inp.is_mouse_button_pressed(button);
+    }
+
+    float Ctx::get_mouse_x() const {
+        return inp.get_mouse_x();
+    }
+
+    float Ctx::get_mouse_y() const {
+        return inp.get_mouse_y();
+    }
+
+    std::pair<float, float> Ctx::get_mouse() const {
+        return inp.get_mouse();
+    }
+
+    void Ctx::capture(const Camera& camera, glm::vec3 position) {
+        scn.capture(camera, position);
+    }
+
+    void Ctx::capture(const Camera2D& camera_2d) {
+        scn.capture(camera_2d);
+    }
+
+    void Ctx::skybox(std::shared_ptr<GlTextureCubemap> texture) {
+        scn.skybox(texture);
+    }
+
+    void Ctx::shadow(ShadowBox& box) {
+        scn.shadow(box);
+    }
+
+    void Ctx::add_post_processing(std::shared_ptr<PostProcessingStep> step) {
+        scn.add_post_processing(step);
+    }
+
+    void Ctx::add_renderable(Renderable& renderable) {
+        scn.add_renderable(renderable);
+    }
+
+    void Ctx::add_light(DirectionalLight& light) {
+        scn.add_light(light);
+    }
+
+    void Ctx::add_light(PointLight& light) {
+        scn.add_light(light);
+    }
+
+    void Ctx::add_text(Text& text) {
+        scn.add_text(text);
+    }
+
+    void Ctx::add_quad(Quad& quad) {
+        scn.add_quad(quad);
+    }
+
+    void Ctx::debug_add_line(glm::vec3 position1, glm::vec3 position2, glm::vec3 color) {
+        scn.debug_add_line(position1, position2, color);
+    }
+
+    void Ctx::debug_add_lines(const std::vector<glm::vec3>& points, glm::vec3 color) {  // TODO rename to positions
+        scn.debug_add_lines(points, color);
+    }
+
+    void Ctx::debug_add_lines(std::initializer_list<glm::vec3> points, glm::vec3 color) {  // TODO rename to positions
+        scn.debug_add_lines(points, color);
+    }
+
+    void Ctx::debug_add_point(glm::vec3 position, glm::vec3 color) {
+        scn.debug_add_point(position, color);
+    }
+
+    void Ctx::debug_add_lamp(glm::vec3 position, glm::vec3 color) {
+        scn.debug_add_lamp(position, color);
+    }
+
+
+
 
     void Ctx::change_scene(Id id) {
         assert(application->next_scene == nullptr);

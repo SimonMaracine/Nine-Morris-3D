@@ -45,11 +45,10 @@ namespace sm {
             Window(Window&&) = delete;
             Window& operator=(Window&&) = delete;
 
-            GLFWwindow* get_handle() const;
             const Monitors& get_monitors();
 
-            int get_width() const { return width; }
-            int get_height() const { return height; }
+            int get_width() const;
+            int get_height() const;
 
             void show() const;
             void set_vsync(int interval) const;
@@ -58,6 +57,8 @@ namespace sm {
             void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
 
             static double get_time();
+
+            GLFWwindow* get_handle() const;
 
             // Swap buffers and update events
             void update() const;

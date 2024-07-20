@@ -52,12 +52,12 @@ namespace sm {
         public:
             Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary& shd);
 
-            std::shared_ptr<Font> get_default_font() const { return storage.default_font; }
+            std::shared_ptr<Font> get_default_font() const;
+            void set_color_correction(bool enable);  // TODO make classes have public interface, put them in internal namespace, add forward functions in context for the public interface, pass context around
+            void set_clear_color(glm::vec3 color);
 
             void register_shader(std::shared_ptr<GlShader> shader);
             void register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
-            void set_color_correction(bool enable);  // TODO make classes have public interface, put them in internal namespace, add forward functions in context for the public interface, pass context around
-            void set_clear_color(glm::vec3 color);
 
             void render(const Scene& scene, int width, int height);
             void pre_setup();

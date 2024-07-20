@@ -58,7 +58,7 @@ glm::vec3 PointCameraController::get_rotation() const {
     return glm::vec3(pitch, yaw, 0.0f);
 }
 
-void PointCameraController::update_controls(float dt, const sm::Input&) {
+void PointCameraController::update_controls(float dt, const sm::Ctx&) {
     static constexpr float MOVE_SPEED {2700.0f};
     static constexpr float MOVE_SPEED_MOUSE {MOVE_SPEED * 0.004f};
     static constexpr float ZOOM_SPEED {370.0f};
@@ -184,17 +184,17 @@ void PointCameraController::go_towards_position(glm::vec3 position) {
     go_towards_position_x(direction);
 }
 
-void PointCameraController::connect_events(sm::EventDispatcher& evt) {
-    evt.connect<sm::MouseWheelScrolledEvent, &PointCameraController::on_mouse_wheel_scrolled>(this);
-    evt.connect<sm::MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
-    evt.connect<sm::MouseButtonPressedEvent, &PointCameraController::on_mouse_button_pressed>(this);
-    evt.connect<sm::MouseButtonReleasedEvent, &PointCameraController::on_mouse_button_released>(this);
-    evt.connect<sm::KeyPressedEvent, &PointCameraController::on_key_pressed>(this);
-    evt.connect<sm::KeyReleasedEvent, &PointCameraController::on_key_released>(this);
+void PointCameraController::connect_events(sm::Ctx& ctx) {
+    ctx.connect<sm::MouseWheelScrolledEvent, &PointCameraController::on_mouse_wheel_scrolled>(this);
+    ctx.connect<sm::MouseMovedEvent, &PointCameraController::on_mouse_moved>(this);
+    ctx.connect<sm::MouseButtonPressedEvent, &PointCameraController::on_mouse_button_pressed>(this);
+    ctx.connect<sm::MouseButtonReleasedEvent, &PointCameraController::on_mouse_button_released>(this);
+    ctx.connect<sm::KeyPressedEvent, &PointCameraController::on_key_pressed>(this);
+    ctx.connect<sm::KeyReleasedEvent, &PointCameraController::on_key_released>(this);
 }
 
-void PointCameraController::disconnect_events(sm::EventDispatcher& evt) {
-    evt.disconnect(this);
+void PointCameraController::disconnect_events(sm::Ctx& ctx) {
+    ctx.disconnect(this);
 }
 
 void PointCameraController::on_mouse_wheel_scrolled(const sm::MouseWheelScrolledEvent& event) {

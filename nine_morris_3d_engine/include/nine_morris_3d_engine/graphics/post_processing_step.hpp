@@ -4,12 +4,14 @@
 
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/shader.hpp"
+#include "nine_morris_3d_engine/graphics/post_processing_context.hpp"
 
 namespace sm {
     namespace internal {
         class Renderer;
-        class PostProcessingContext;
     }
+
+    using PostProcessingCtx = internal::PostProcessingContext;
 
     // Extend this class for every step of the post processing pipeline
     // Pointers of post processing steps should be retained as a resource
@@ -24,7 +26,7 @@ namespace sm {
         PostProcessingStep(PostProcessingStep&&) noexcept = default;
         PostProcessingStep& operator=(PostProcessingStep&&) noexcept = default;
 
-        virtual void setup(const internal::PostProcessingContext& context) const = 0;
+        virtual void setup(const PostProcessingCtx& ctx) const = 0;
     protected:
         std::shared_ptr<GlFramebuffer> framebuffer;
         std::shared_ptr<GlShader> shader;

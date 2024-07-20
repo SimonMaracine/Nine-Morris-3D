@@ -51,5 +51,9 @@ namespace sm {
 
             LOG_INFO("Destroyed OpenAL context and closed device");
         }
+
+        AlListener& OpenAlContext::get_listener() {
+            return listener;
+        }
     }
 }

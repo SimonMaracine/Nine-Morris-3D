@@ -23,6 +23,7 @@ namespace sm {
     private:
         void setup(std::shared_ptr<SoundData> data);
 
+        // TODO maybe source should be in music player
         std::shared_ptr<AlSource> source;  // TODO maybe these don't need to be shared
         std::shared_ptr<AlBuffer> buffer;
 

@@ -6,11 +6,11 @@
 
 namespace sm {
     namespace internal {
-        void TaskManager::add(Id id, const Task::TaskFunction& function) {
+        void TaskManager::add_task(Id id, const Task::TaskFunction& function) {
             tasks_active.emplace_back(id, function);
         }
 
-        void TaskManager::remove(Id id) {
+        void TaskManager::remove_task(Id id) {
             tasks_active.erase(
                 std::find_if(tasks_active.cbegin(), tasks_active.cend(), [this, id](const Task& task) {
                     return task.id == id;

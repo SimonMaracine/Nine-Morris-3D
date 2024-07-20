@@ -125,10 +125,6 @@ namespace sm {
             glfwSwapBuffers(window);
         }
 
-        GLFWwindow* Window::get_handle() const {
-            return window;
-        }
-
         const Monitors& Window::get_monitors() {
             int count {};
             GLFWmonitor** connected_monitors {glfwGetMonitors(&count)};
@@ -141,6 +137,14 @@ namespace sm {
             monitors.monitors = connected_monitors;
 
             return monitors;
+        }
+
+        int Window::get_width() const {
+            return width;
+        }
+
+        int Window::get_height() const {
+            return height;
         }
 
         void Window::show() const {
@@ -198,6 +202,10 @@ namespace sm {
 
         double Window::get_time() {
             return glfwGetTime();  // FIXME this can return 0.0 on error
+        }
+
+        GLFWwindow* Window::get_handle() const {
+            return window;
         }
 
         GLFWwindow* Window::create_window(const ApplicationProperties& properties) {

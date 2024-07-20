@@ -16,7 +16,7 @@ namespace sm {
 
             bool is_key_pressed(Key key) const;
             bool is_mouse_button_pressed(MouseButton button) const;
-            float get_mouse_x() const;
+            float get_mouse_x() const;  // TODO remove
             float get_mouse_y() const;
             std::pair<float, float> get_mouse() const;
 

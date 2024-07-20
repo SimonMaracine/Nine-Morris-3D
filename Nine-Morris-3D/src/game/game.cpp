@@ -7,8 +7,8 @@
 
 void create_post_processing(sm::Ctx& ctx) {
     sm::FramebufferSpecification specification;
-    specification.width = ctx.win.get_width();
-    specification.height = ctx.win.get_height();
+    specification.width = ctx.get_width();
+    specification.height = ctx.get_height();
     specification.color_attachments = {
         sm::Attachment(sm::AttachmentFormat::Rgba8, sm::AttachmentType::Texture)
     };
@@ -17,13 +17,13 @@ void create_post_processing(sm::Ctx& ctx) {
         ctx.load_framebuffer("blur"_H, specification),
         ctx.load_shader(
             "blur"_H,
-            ctx.fs.path_engine_assets("shaders/internal/screen_quad.vert"),
-            ctx.fs.path_assets("shaders/post_processing/blur.frag")
+            ctx.path_engine_assets("shaders/internal/screen_quad.vert"),
+            ctx.path_assets("shaders/post_processing/blur.frag")
         )
     );
 }
 
-void game_start(sm::Ctx& ctx) {
+void game_start(sm::Ctx&) {
 
 }
 

@@ -8,7 +8,7 @@
 #include "game/game.hpp"
 
 void GameScene::on_start() {
-    ctx.tsk.add("test"_H, [this](const sm::Task& task) {
+    ctx.add_task("test"_H, [this](const sm::Task& task) {
         if (task.get_total_time() > 3.0) {
             LOG_DEBUG("Done");
 
@@ -18,10 +18,10 @@ void GameScene::on_start() {
         return sm::Task::Result::Continue;
     });
 
-    ctx.evt.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
-    ctx.evt.connect<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
+    ctx.connect<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
+    ctx.connect<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
 
-    // sm::opengl::clear_color(0.1f, 0.05f, 0.1f);  // FIXME
+    ctx.set_clear_color(glm::vec3(0.1f, 0.05f, 0.1f));
 
     setup_ground();
     setup_dragon();
@@ -38,113 +38,113 @@ void GameScene::on_start() {
 
     cam_controller = PointCameraController(
         cam,
-        ctx.win.get_width(),
-        ctx.win.get_height(),
+        ctx.get_width(),
+        ctx.get_height(),
         glm::vec3(0.0f),
         8.0f,
         47.0f,
         0.5f
     );
 
-    cam_controller.connect_events(ctx.evt);
+    cam_controller.connect_events(ctx);
 
-    cam_2d.set_projection(0, ctx.win.get_width(), 0, ctx.win.get_height());
+    cam_2d.set_projection(0, ctx.get_width(), 0, ctx.get_height());
 }
 
 void GameScene::on_stop() {
-    cam_controller.disconnect_events(ctx.evt);
+    cam_controller.disconnect_events(ctx);
 }
 
 void GameScene::on_update() {
-    cam_controller.update_controls(ctx.get_delta(), ctx.inp);
+    cam_controller.update_controls(ctx.get_delta(), ctx);
     cam_controller.update_camera(ctx.get_delta());
 
-    ctx.scn.capture(cam, cam_controller.get_position());
-    ctx.scn.capture(cam_2d);
+    ctx.capture(cam, cam_controller.get_position());
+    ctx.capture(cam_2d);
 
-    ctx.scn.add_light(directional_light);
-    ctx.scn.add_light(point_light);
+    ctx.add_light(directional_light);
+    ctx.add_light(point_light);
 
     if (sky) {
-        ctx.scn.skybox(field);
+        ctx.skybox(field);
     }
 
     if (blur) {
-        ctx.scn.add_post_processing(ctx.global<Global>().blur_step);
+        ctx.add_post_processing(ctx.global<Global>().blur_step);
     }
 
-    ctx.scn.add_renderable(ground);
-    ctx.scn.add_renderable(dragon1);
-    ctx.scn.add_renderable(dragon2);
-    ctx.scn.add_renderable(teapot);
-    ctx.scn.add_renderable(cube);
-    ctx.scn.add_renderable(brick);
-    ctx.scn.add_renderable(lamp_stand);
-    ctx.scn.add_renderable(lamp_bulb);
-    ctx.scn.add_renderable(barrel);
+    ctx.add_renderable(ground);
+    ctx.add_renderable(dragon1);
+    ctx.add_renderable(dragon2);
+    ctx.add_renderable(teapot);
+    ctx.add_renderable(cube);
+    ctx.add_renderable(brick);
+    ctx.add_renderable(lamp_stand);
+    ctx.add_renderable(lamp_bulb);
+    ctx.add_renderable(barrel);
 
     for (auto& brick : textured_bricks) {
-        ctx.scn.add_renderable(brick);
+        ctx.add_renderable(brick);
     }
 
     ctx.show_info_text();
 
     {
-        ctx.scn.add_text(text1);
-        ctx.scn.add_text(text2);
-        ctx.scn.add_text(text3);
+        ctx.add_text(text1);
+        ctx.add_text(text2);
+        ctx.add_text(text3);
 
         {
             const auto [w, h] {sans->get_string_size("Some Text. Three spaces   !!?@#&^`~*&\"", text4.scale)};
 
             text4.text = "Some Text. Three spaces   !!?@#&^`~*&\"";
-            text4.position = glm::vec2(static_cast<float>(ctx.win.get_width() - w), static_cast<float>(ctx.win.get_height() - h));
+            text4.position = glm::vec2(static_cast<float>(ctx.get_width() - w), static_cast<float>(ctx.get_height() - h));
             text4.color = glm::vec3(1.0f, 0.1f, 0.1f);
 
-            ctx.scn.add_text(text4);
+            ctx.add_text(text4);
         }
 
         {
             const auto [w, h] {sans->get_string_size("Simon Mărăcine ăîâșț ĂÎÂȘȚ", text4.scale)};
 
             text4.text = "Simon Mărăcine ăîâșț ĂÎÂȘȚ";
-            text4.position = glm::vec2(static_cast<float>(ctx.win.get_width() / 2 - w / 2), static_cast<float>(ctx.win.get_height() / 2 - h / 2));
+            text4.position = glm::vec2(static_cast<float>(ctx.get_width() / 2 - w / 2), static_cast<float>(ctx.get_height() / 2 - h / 2));
             text4.color = glm::vec3(0.8f, 0.1f, 0.9f);
 
-            ctx.scn.add_text(text4);
+            ctx.add_text(text4);
         }
 
         {
             const auto [_, h] {sans->get_string_size("Text that spans\nmultiple lines\nlike that.", text4.scale)};
 
             text4.text = "Text that spans\nmultiple lines\nlike that.";
-            text4.position = glm::vec2(0.0f, static_cast<float>(ctx.win.get_height() - h));
+            text4.position = glm::vec2(0.0f, static_cast<float>(ctx.get_height() - h));
             text4.color = glm::vec3(0.0f, 1.0f, 0.0f);
 
-            ctx.scn.add_text(text4);
+            ctx.add_text(text4);
         }
 
         {
             const auto [w, _] {sans->get_string_size("Another\ntext\nwith multiple\nlines.", text4.scale)};
 
             text4.text = "Another\ntext\nwith multiple\nlines.";
-            text4.position = glm::vec2(static_cast<float>(ctx.win.get_width() - w), 0.0f);
+            text4.position = glm::vec2(static_cast<float>(ctx.get_width() - w), 0.0f);
             text4.color = glm::vec3(0.0f, 0.0f, 1.0f);
 
-            ctx.scn.add_text(text4);
+            ctx.add_text(text4);
         }
     }
 
-    ctx.scn.add_quad(wait);
-    ctx.scn.add_quad(white);
+    ctx.add_quad(wait);
+    ctx.add_quad(white);
 
     // Origin
-    ctx.scn.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    ctx.scn.debug_add_line(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    ctx.scn.debug_add_line(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ctx.debug_add_line(glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    ctx.debug_add_line(glm::vec3(0.0f, -5.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    ctx.debug_add_line(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Whatever
-    ctx.scn.debug_add_lines(
+    ctx.debug_add_lines(
         {
             glm::vec3(0.0f, 6.0f, 0.0f),
             glm::vec3(2.0f, 7.0f, 0.0f),
@@ -156,12 +156,12 @@ void GameScene::on_update() {
     );
 
     // Point light
-    ctx.scn.debug_add_lamp(point_light.position, point_light.diffuse_color);
+    ctx.debug_add_lamp(point_light.position, point_light.diffuse_color);
 
     // Whatever part two
-    ctx.scn.debug_add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
+    ctx.debug_add_point(glm::vec3(0.0f, -3.0f, 4.0f), glm::vec3(0.0f, 1.0f, 1.0f));
 
-    ctx.scn.shadow(shadow_box);
+    ctx.shadow(shadow_box);
 }
 
 void GameScene::on_fixed_update() {
@@ -203,7 +203,7 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
 }
 
 void GameScene::setup_ground() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.fs.path_assets("models/ground.obj"), "Cube", sm::Mesh::Type::PN)};
+    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/ground.obj"), "Cube", sm::Mesh::Type::PN)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
@@ -218,7 +218,7 @@ void GameScene::setup_ground() {
 }
 
 void GameScene::setup_dragon() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.fs.path_assets("models/dragon.obj"), "default", sm::Mesh::Type::PN)};
+    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/dragon.obj"), "default", sm::Mesh::Type::PN)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
@@ -248,7 +248,7 @@ void GameScene::setup_dragon() {
 }
 
 void GameScene::setup_teapot() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.fs.path_assets("models/teapot.obj"), sm::Mesh::DEFAULT_OBJECT, sm::Mesh::Type::PN)};
+    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/teapot.obj"), sm::Mesh::DEFAULT_OBJECT, sm::Mesh::Type::PN)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
@@ -264,7 +264,7 @@ void GameScene::setup_teapot() {
 }
 
 void GameScene::setup_cube() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.fs.path_assets("models/cube.obj"), "Cube", sm::Mesh::Type::PN)};
+    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/cube.obj"), "Cube", sm::Mesh::Type::PN)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
@@ -279,14 +279,14 @@ void GameScene::setup_cube() {
 }
 
 void GameScene::setup_brick() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.fs.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT)};
+    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
 
-    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/brick-texture3.png"), {}, specification)};
+    const auto diffuse {ctx.load_texture(ctx.path_assets("textures/brick-texture3.png"), {}, specification)};
 
     const auto material_instance {ctx.load_material_instance("brick"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -300,14 +300,14 @@ void GameScene::setup_brick() {
 
 void GameScene::setup_lamp() {
     {
-        const auto [mesh, vertex_array] {ctx.load_model("lamp_stand"_H, ctx.fs.path_assets("models/lamp.obj"), "Stand", sm::Mesh::Type::PNT)};
+        const auto [mesh, vertex_array] {ctx.load_model("lamp_stand"_H, ctx.path_assets("models/lamp.obj"), "Stand", sm::Mesh::Type::PNT)};
 
         const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
         sm::TextureSpecification specification;
         specification.format = sm::TextureFormat::Srgba8Alpha;
 
-        const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/lamp-texture.png"), {}, specification)};
+        const auto diffuse {ctx.load_texture(ctx.path_assets("textures/lamp-texture.png"), {}, specification)};
 
         const auto material_instance {ctx.load_material_instance("lamp_stand"_H, material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -319,7 +319,7 @@ void GameScene::setup_lamp() {
     }
 
     {
-        const auto [mesh, vertex_array] {ctx.load_model("lamp_bulb"_H, ctx.fs.path_assets("models/lamp.obj"), "Bulb", sm::Mesh::Type::P)};
+        const auto [mesh, vertex_array] {ctx.load_model("lamp_bulb"_H, ctx.path_assets("models/lamp.obj"), "Bulb", sm::Mesh::Type::P)};
 
         const auto material {ctx.load_material(sm::MaterialType::Flat, sm::Material::CastShadow)};
 
@@ -332,15 +332,15 @@ void GameScene::setup_lamp() {
 }
 
 void GameScene::setup_barrel() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.fs.path_assets("models/barrel.obj"), "Mesh_Mesh_Cylinder.001", sm::Mesh::Type::PNTT)};
+    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/barrel.obj"), "Mesh_Mesh_Cylinder.001", sm::Mesh::Type::PNTT)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
 
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
 
-    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/barrel.png"), {}, specification)};
-    const auto normal {ctx.load_texture(ctx.fs.path_assets("textures/barrelNormal.png"), {}, {})};
+    const auto diffuse {ctx.load_texture(ctx.path_assets("textures/barrel.png"), {}, specification)};
+    const auto normal {ctx.load_texture(ctx.path_assets("textures/barrelNormal.png"), {}, {})};
 
     const auto material_instance {ctx.load_material_instance("barrel"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -354,14 +354,14 @@ void GameScene::setup_barrel() {
 }
 
 void GameScene::setup_textured_bricks() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.fs.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT)};
+    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
 
-    const auto diffuse {ctx.load_texture(ctx.fs.path_assets("textures/brick-texture3.png"), {}, specification)};
+    const auto diffuse {ctx.load_texture(ctx.path_assets("textures/brick-texture3.png"), {}, specification)};
 
     const auto material_instance {ctx.load_material_instance("brick"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -382,7 +382,7 @@ void GameScene::setup_texts() {
 
     sans = ctx.load_font(
         "sans"_H,
-        ctx.fs.path_assets("fonts/OpenSans/OpenSans-Regular.ttf"),
+        ctx.path_assets("fonts/OpenSans/OpenSans-Regular.ttf"),
         specification
     );
 
@@ -414,7 +414,7 @@ void GameScene::setup_quads() {
         sm::TextureSpecification specification;
         specification.format = sm::TextureFormat::Srgba8Alpha;
 
-        const auto texture {ctx.load_texture(ctx.fs.path_assets("textures/indicator/wait_indicator.png"), {}, specification)};
+        const auto texture {ctx.load_texture(ctx.path_assets("textures/indicator/wait_indicator.png"), {}, specification)};
 
         wait.texture = texture;
         wait.position = glm::vec2(70.0f);
@@ -427,7 +427,7 @@ void GameScene::setup_quads() {
         sm::TextureSpecification specification;
         specification.format = sm::TextureFormat::Srgba8Alpha;
 
-        const auto texture {ctx.load_texture(ctx.fs.path_assets("textures/indicator/white_indicator.png"), post_processing, specification)};
+        const auto texture {ctx.load_texture(ctx.path_assets("textures/indicator/white_indicator.png"), post_processing, specification)};
 
         white.texture = texture;
         white.position = glm::vec2(210.0f, 210.0f);
@@ -442,12 +442,12 @@ void GameScene::setup_skybox() {
     field = ctx.load_texture_cubemap(
         "field",
         {
-            ctx.fs.path_assets("textures/skybox/field/px.png"),
-            ctx.fs.path_assets("textures/skybox/field/nx.png"),
-            ctx.fs.path_assets("textures/skybox/field/py.png"),
-            ctx.fs.path_assets("textures/skybox/field/ny.png"),
-            ctx.fs.path_assets("textures/skybox/field/pz.png"),
-            ctx.fs.path_assets("textures/skybox/field/nz.png")
+            ctx.path_assets("textures/skybox/field/px.png"),
+            ctx.path_assets("textures/skybox/field/nx.png"),
+            ctx.path_assets("textures/skybox/field/py.png"),
+            ctx.path_assets("textures/skybox/field/ny.png"),
+            ctx.path_assets("textures/skybox/field/pz.png"),
+            ctx.path_assets("textures/skybox/field/nz.png")
         },
         processing,
         sm::TextureFormat::Srgba8Alpha

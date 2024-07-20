@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include "nine_morris_3d_engine/graphics/post_processing_step.hpp"
-
 namespace sm {
     namespace internal {
         struct PostProcessingContext {
