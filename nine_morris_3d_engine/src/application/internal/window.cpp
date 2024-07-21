@@ -1,51 +1,23 @@
-#include "nine_morris_3d_engine/application/window.hpp"
+#include "nine_morris_3d_engine/application/internal/window.hpp"
 
 #include <vector>
+#include <cstddef>
 #include <cassert>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "nine_morris_3d_engine/application/internal/input.hpp"
 #include "nine_morris_3d_engine/application/application.hpp"
 #include "nine_morris_3d_engine/application/events.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
-#include "nine_morris_3d_engine/application/input.hpp"
-#include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/context.hpp"
+#include "nine_morris_3d_engine/graphics/internal/imgui_context.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
-#include "nine_morris_3d_engine/graphics/imgui_context.hpp"
 
 namespace sm {
-    std::pair<int, int> Monitors::get_resolution(std::size_t index) const {
-        assert(index < count);
-
-        const GLFWvidmode* video_mode {glfwGetVideoMode(monitors[index])};
-
-        return std::make_pair(video_mode->width, video_mode->height);
-    }
-
-    std::pair<float, float> Monitors::get_content_scale(std::size_t index) const {
-        assert(index < count);
-
-        float xscale, yscale;
-        glfwGetMonitorContentScale(monitors[index], &xscale, &yscale);
-
-        return std::make_pair(xscale, yscale);
-    }
-
-    const char* Monitors::get_name(std::size_t index) const {  // TODO used?
-        assert(index < count);
-
-        const char* name {glfwGetMonitorName(monitors[index])};
-
-        if (name == nullptr) {
-            SM_THROW_ERROR(OtherError, "Could not retrieve monitor name");
-        }
-
-        return name;
-    }
-
     namespace internal {
         Window::Window(const ApplicationProperties& properties, EventDispatcher* evt)
             : evt(evt) {

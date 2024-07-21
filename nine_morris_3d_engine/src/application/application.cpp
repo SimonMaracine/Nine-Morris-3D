@@ -7,9 +7,9 @@
 
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/graphics/internal/imgui_context.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
-#include "nine_morris_3d_engine/graphics/imgui_context.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
@@ -18,7 +18,7 @@ namespace sm {
         ctx.application = this;
         ctx.user_data = properties.user_data;
 
-        imgui_context::initialize(ctx.win.get_handle());
+        internal::imgui_context::initialize(ctx.win.get_handle());
 
         LOG_DIST_INFO("Working directory: {}", internal::FileSystem::current_working_directory());
 
@@ -38,7 +38,7 @@ namespace sm {
     }
 
     Application::~Application() {  // Destructor is called before all member variables
-        imgui_context::uninitialize();
+        internal::imgui_context::uninitialize();
     }
 
     int Application::run(Id start_scene_id, const UserFunctions& user_functions) {
@@ -167,12 +167,12 @@ namespace sm {
     }
 
     void Application::dear_imgui_render() {
-        imgui_context::begin_frame();
+        internal::imgui_context::begin_frame();
 
         current_scene->on_imgui_update();
         ctx.dbg.render_dear_imgui(ctx.scn, ctx);
 
-        imgui_context::end_frame();
+        internal::imgui_context::end_frame();
     }
 
     void Application::setup_start_scene(Id start_scene_id) {

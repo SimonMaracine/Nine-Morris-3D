@@ -1,4 +1,4 @@
-#include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/application/internal/logging_base.hpp"
 
 #include <fstream>
 #include <cstddef>

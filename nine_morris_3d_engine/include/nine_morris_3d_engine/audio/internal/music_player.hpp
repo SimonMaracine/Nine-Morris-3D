@@ -2,33 +2,13 @@
 
 #include <memory>
 
-#include "nine_morris_3d_engine/audio/sound_data.hpp"
+#include "nine_morris_3d_engine/audio/music_track.hpp"
 
 namespace sm {
     /*
         All music tracks are streamed, so they should be considered sound files longer than 1 minute.  // TODO do this!
         Sound effects should be sound files shorter than 45-50 seconds.
     */
-
-    class AlSource;
-    class AlBuffer;
-
-    namespace internal {
-        class MusicPlayer;
-    }
-
-    class MusicTrack {
-    public:
-        explicit MusicTrack(std::shared_ptr<SoundData> data);
-    private:
-        void setup(std::shared_ptr<SoundData> data);
-
-        // TODO maybe source should be in music player
-        std::shared_ptr<AlSource> source;  // TODO maybe these don't need to be shared
-        std::shared_ptr<AlBuffer> buffer;
-
-        friend class internal::MusicPlayer;
-    };
 
     namespace internal {
         class MusicPlayer {  // TODO revisit this class; rename things

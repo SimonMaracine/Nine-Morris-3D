@@ -5,7 +5,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "nine_morris_3d_engine/application/file_system.hpp"
+#include "nine_morris_3d_engine/application/internal/file_system.hpp"
 
 // Separate logging base from logging macros to keep things clean in the engine
 

@@ -3,37 +3,19 @@
 #include <memory>
 #include <unordered_map>
 #include <initializer_list>
-#include <utility>
-#include <cstddef>
 
 #include <resmanager/resmanager.hpp>
 
+#include "nine_morris_3d_engine/application/internal/event_dispatcher.hpp"
+#include "nine_morris_3d_engine/application/monitors.hpp"
 #include "nine_morris_3d_engine/application/properties.hpp"
-#include "nine_morris_3d_engine/application/events.hpp"
 #include "nine_morris_3d_engine/application/id.hpp"
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
 
 struct GLFWwindow;
 struct GLFWcursor;
-struct GLFWmonitor;
 
 namespace sm {
-    namespace internal {
-        class Window;
-    }
-
-    class Monitors {
-    public:
-        std::pair<int, int> get_resolution(std::size_t index) const;
-        std::pair<float, float> get_content_scale(std::size_t index) const;
-        const char* get_name(std::size_t index) const;
-    private:
-        GLFWmonitor** monitors {nullptr};
-        std::size_t count {};
-
-        friend class internal::Window;
-    };
-
     namespace internal {
         class Window {
         public:

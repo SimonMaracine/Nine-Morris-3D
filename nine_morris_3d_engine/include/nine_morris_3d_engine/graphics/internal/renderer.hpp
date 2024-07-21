@@ -8,17 +8,17 @@
 
 #include <glm/glm.hpp>
 
+#include "nine_morris_3d_engine/application/internal/file_system.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
-#include "nine_morris_3d_engine/application/file_system.hpp"
+#include "nine_morris_3d_engine/graphics/internal/shader_library.hpp"
+#include "nine_morris_3d_engine/graphics/internal/post_processing_context.hpp"
+#include "nine_morris_3d_engine/graphics/internal/scene.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/shader.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
-#include "nine_morris_3d_engine/graphics/post_processing_context.hpp"
 #include "nine_morris_3d_engine/graphics/renderable.hpp"
 #include "nine_morris_3d_engine/graphics/light.hpp"
 #include "nine_morris_3d_engine/graphics/camera.hpp"
-#include "nine_morris_3d_engine/graphics/shader_library.hpp"
-#include "nine_morris_3d_engine/graphics/scene.hpp"
 
 namespace sm {
     class GlVertexArray;

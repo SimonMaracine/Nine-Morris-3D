@@ -1,4 +1,4 @@
-#include "nine_morris_3d_engine/graphics/renderer.hpp"
+#include "nine_morris_3d_engine/graphics/internal/renderer.hpp"
 
 #include <cstddef>
 #include <algorithm>
@@ -620,7 +620,9 @@ namespace sm {
             {
                 // Vertex array is already bound
 
-                const glm::vec3 color {color_correction ? glm::convertSRGBToLinear(renderable.outline.color, 2.2f) : renderable.outline.color};
+                const glm::vec3 color {
+                    color_correction ? glm::convertSRGBToLinear(renderable.outline.color, 2.2f) : renderable.outline.color
+                };
 
                 storage.outline_shader->bind();
                 storage.outline_shader->upload_uniform_mat4("u_model_matrix"_H, transform);

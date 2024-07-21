@@ -1,4 +1,4 @@
-#include "nine_morris_3d_engine/application/input.hpp"
+#include "nine_morris_3d_engine/application/internal/input.hpp"
 
 #include <glad/glad.h>  // Include glad just to make everything compile
 #include <GLFW/glfw3.h>

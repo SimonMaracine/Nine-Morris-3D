@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "nine_morris_3d_engine/application/platform.hpp"
-#include "nine_morris_3d_engine/application/logging_base.hpp"
+#include "nine_morris_3d_engine/application/internal/logging_base.hpp"
 
 // Never include this header file in another header file!
 

@@ -1,4 +1,4 @@
-#include "nine_morris_3d_engine/other/resources_cache.hpp"
+#include "nine_morris_3d_engine/other/internal/resources_cache.hpp"
 
 namespace sm {
     namespace internal {

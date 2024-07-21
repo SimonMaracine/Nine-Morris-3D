@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "nine_morris_3d_engine/graphics/scene.hpp"
+#include "nine_morris_3d_engine/graphics/internal/scene.hpp"
 
 namespace sm {
     class Ctx;

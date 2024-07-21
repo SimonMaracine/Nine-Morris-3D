@@ -1,8 +1,8 @@
-#include "nine_morris_3d_engine/application/tasks.hpp"
+#include "nine_morris_3d_engine/application/internal/task_manager.hpp"
 
 #include <algorithm>
 
-#include "nine_morris_3d_engine/application/window.hpp"
+#include "nine_morris_3d_engine/application/internal/window.hpp"
 
 namespace sm {
     namespace internal {

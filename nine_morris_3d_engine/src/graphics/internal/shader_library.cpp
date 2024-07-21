@@ -1,4 +1,4 @@
-#include "nine_morris_3d_engine/graphics/shader_library.hpp"
+#include "nine_morris_3d_engine/graphics/internal/shader_library.hpp"
 
 #include <filesystem>
 #include <regex>

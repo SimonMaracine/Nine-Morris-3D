@@ -1,4 +1,4 @@
-#include "nine_morris_3d_engine/graphics/debug_ui.hpp"
+#include "nine_morris_3d_engine/graphics/internal/debug_ui.hpp"
 
 #include <cstring>
 

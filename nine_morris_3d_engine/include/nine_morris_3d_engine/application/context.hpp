@@ -7,30 +7,30 @@
 
 #include <resmanager/resmanager.hpp>
 
+#include "nine_morris_3d_engine/application/internal/file_system.hpp"
+#include "nine_morris_3d_engine/application/internal/logging_base.hpp"
+#include "nine_morris_3d_engine/application/internal/event_dispatcher.hpp"
+#include "nine_morris_3d_engine/application/internal/window.hpp"
+#include "nine_morris_3d_engine/application/internal/task_manager.hpp"
+#include "nine_morris_3d_engine/application/internal/input.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
-#include "nine_morris_3d_engine/application/events.hpp"
-#include "nine_morris_3d_engine/application/window.hpp"
-#include "nine_morris_3d_engine/application/tasks.hpp"
 #include "nine_morris_3d_engine/application/properties.hpp"
-#include "nine_morris_3d_engine/application/logging_base.hpp"
-#include "nine_morris_3d_engine/application/file_system.hpp"
-#include "nine_morris_3d_engine/application/input.hpp"
 #include "nine_morris_3d_engine/application/id.hpp"
-#include "nine_morris_3d_engine/audio/context.hpp"
-#include "nine_morris_3d_engine/audio/music.hpp"
+#include "nine_morris_3d_engine/audio/internal/context.hpp"
+#include "nine_morris_3d_engine/audio/internal/music_player.hpp"
+#include "nine_morris_3d_engine/graphics/internal/shader_library.hpp"
+#include "nine_morris_3d_engine/graphics/internal/renderer.hpp"
+#include "nine_morris_3d_engine/graphics/internal/scene.hpp"
+#include "nine_morris_3d_engine/graphics/internal/debug_ui.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/shader.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
-#include "nine_morris_3d_engine/graphics/renderer.hpp"
-#include "nine_morris_3d_engine/graphics/shader_library.hpp"
-#include "nine_morris_3d_engine/graphics/scene.hpp"
-#include "nine_morris_3d_engine/graphics/debug_ui.hpp"
 #include "nine_morris_3d_engine/graphics/mesh.hpp"
 #include "nine_morris_3d_engine/graphics/material.hpp"
 #include "nine_morris_3d_engine/graphics/font.hpp"
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
-#include "nine_morris_3d_engine/other/resources_cache.hpp"
+#include "nine_morris_3d_engine/other/internal/resources_cache.hpp"
 
 namespace sm {
     class Application;
@@ -234,9 +234,9 @@ namespace sm {
         internal::FileSystem fs;
         internal::Logging log;
         internal::ShaderLibrary shd;
-        internal::EventDispatcher evt;  // Application events
-        internal::Window win;  // One of the last objects destroyed in an application instance
-        internal::Renderer rnd;  // Renderer for 3D, 2D and debug
+        internal::EventDispatcher evt;
+        internal::Window win;
+        internal::Renderer rnd;
         internal::OpenAlContext snd;
         internal::MusicPlayer mus;
         internal::TaskManager tsk;
