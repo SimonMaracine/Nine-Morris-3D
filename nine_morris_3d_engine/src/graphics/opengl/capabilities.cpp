@@ -1,4 +1,4 @@
-#include "nine_morris_3d_engine/application/capabilities.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
 
 #include <glad/glad.h>
 
@@ -42,5 +42,12 @@ namespace sm {
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_units);
 
         return max_units;
+    }
+
+    bool capabilities::is_srgb_capable() {
+        int encoding;
+        glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_BACK, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &encoding);
+
+        return encoding == GL_SRGB;
     }
 }

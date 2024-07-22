@@ -10,6 +10,7 @@
 #include "nine_morris_3d_engine/graphics/internal/imgui_context.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
@@ -23,7 +24,11 @@ namespace sm {
         LOG_DIST_INFO("Working directory: {}", internal::FileSystem::current_working_directory());
 
         const auto [version_major, version_minor] {opengl_debug::get_version_number()};
-        LOG_DIST_INFO("OpenGL version {}.{}", version_major, version_minor);
+        LOG_DIST_INFO("GL version {}.{}", version_major, version_minor);
+
+        if (!capabilities::is_srgb_capable()) {
+            LOG_DIST_WARNING("Default GL framebuffer is not sRGB capable");
+        }
 
 #ifndef SM_BUILD_DISTRIBUTION
         LOG_INFO("{}", ctx.get_information());

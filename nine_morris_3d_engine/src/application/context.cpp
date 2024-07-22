@@ -273,18 +273,13 @@ namespace sm {
         return result;
     }
 
-    Model Ctx::load_model(
-        resmanager::HashedStr64 identifier,
-        const std::string& file_path,
-        const std::string& mesh_name,
-        Mesh::Type type
-    ) {
-        const auto mesh {res.mesh.load(identifier, utils::read_file(file_path), mesh_name, type)};
+    Model Ctx::load_model(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
+        const auto mesh {res.mesh.load(id, utils::read_file(file_path), mesh_name, type)};
 
-        const auto vertex_buffer {res.vertex_buffer.load(identifier, mesh->get_vertices(), mesh->get_vertices_size())};
-        const auto index_buffer {res.index_buffer.load(identifier, mesh->get_indices(), mesh->get_indices_size())};
+        const auto vertex_buffer {res.vertex_buffer.load(id, mesh->get_vertices(), mesh->get_vertices_size())};
+        const auto index_buffer {res.index_buffer.load(id, mesh->get_indices(), mesh->get_indices_size())};
 
-        const auto [vertex_array, present] {res.vertex_array.load_check(identifier)};
+        const auto [vertex_array, present] {res.vertex_array.load_check(id)};
 
         if (present) {
             return std::make_pair(mesh, vertex_array);
@@ -321,77 +316,50 @@ namespace sm {
         return std::make_pair(mesh, vertex_array);
     }
 
-    Model Ctx::load_model(
-        const std::string& file_path,
-        const std::string& mesh_name,
-        Mesh::Type type
-    ) {
-        return load_model(resmanager::HashedStr64(utils::file_name(file_path)), file_path, mesh_name, type);
+    Model Ctx::load_model(const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
+        return load_model(Id(utils::file_name(file_path)), file_path, mesh_name, type);
     }
 
-    std::shared_ptr<GlTexture> Ctx::load_texture(
-        const std::string& file_path,
-        const TexturePostProcessing& post_processing,
-        const TextureSpecification& specification
-    ) {
-        const auto identifier {resmanager::HashedStr64(utils::file_name(file_path))};
+    std::shared_ptr<TextureData> Ctx::load_texture_data(const std::string& file_path, const TexturePostProcessing& post_processing) {
+        const auto id {Id(utils::file_name(file_path))};
 
-        const auto data {res.texture_data.load(identifier, utils::read_file(file_path), post_processing)};
-
-        return res.texture.load(identifier, data, specification);
-    }
-
-    std::shared_ptr<GlTextureCubemap> Ctx::load_texture_cubemap(
-        const char* identifier,
-        std::initializer_list<std::string> file_paths,
-        const TexturePostProcessing& post_processing,
-        TextureFormat format
-    ) {
-        if (res.texture_cubemap.contains(resmanager::HashedStr64(identifier))) {
-            return res.texture_cubemap.get(resmanager::HashedStr64(identifier));
+        if (res.texture_data.contains(id)) {
+            return res.texture_data.get(id);
         }
 
-        std::array<std::shared_ptr<TextureData>, 6> textures {};
-        std::size_t i {0};  // TODO C++20
-
-        for (const auto& file_path : file_paths) {
-            textures[i++] = res.texture_data.force_load(
-                resmanager::HashedStr64(std::string(identifier) + ":" + file_path),
-                utils::read_file(file_path),
-                post_processing
-            );
-        }
-
-        // For some reason only like this you can pass a list to a variadic template argument
-        const std::initializer_list list {
-            textures[0],
-            textures[1],
-            textures[2],
-            textures[3],
-            textures[4],
-            textures[5]
-        };
-
-        return res.texture_cubemap.force_load(resmanager::HashedStr64(identifier), list, format);
+        return res.texture_data.force_load(id, utils::read_file(file_path), post_processing);
     }
 
-    std::shared_ptr<Material> Ctx::load_material(
-        MaterialType type,
-        unsigned int flags
-    ) {
+    std::shared_ptr<GlTexture> Ctx::load_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification) {
+        return res.texture.load(id, texture_data, specification);
+    }
+
+    std::shared_ptr<GlTexture> Ctx::reload_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification) {
+        return res.texture.force_load(id, texture_data, specification);
+    }
+
+    std::shared_ptr<GlTextureCubemap> Ctx::load_texture_cubemap(Id id, std::initializer_list<std::shared_ptr<TextureData>> texture_data, TextureFormat format) {
+        return res.texture_cubemap.load(id, texture_data, format);
+    }
+
+    std::shared_ptr<GlTextureCubemap> Ctx::reload_texture_cubemap(Id id, std::initializer_list<std::shared_ptr<TextureData>> texture_data, TextureFormat format) {
+        return res.texture_cubemap.force_load(id, texture_data, format);
+    }
+
+    std::shared_ptr<Material> Ctx::load_material(MaterialType type, unsigned int flags) {
         using namespace resmanager::literals;
 
         switch (type) {
             case MaterialType::Flat: {
-                const auto identifier {"flat"_H};
+                const auto id {"flat"_H};
 
                 const auto shader {load_shader(
-                    identifier,
+                    id,
                     fs.path_engine_assets("shaders/flat.vert"),
                     fs.path_engine_assets("shaders/flat.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -402,15 +370,15 @@ namespace sm {
                 return material;
             }
             case MaterialType::Phong: {
-                const auto identifier {"phong"_H};
+                const auto id {"phong"_H};
 
                 const auto shader {load_shader(
-                    identifier,
+                    id,
                     fs.path_engine_assets("shaders/phong.vert"),
                     fs.path_engine_assets("shaders/phong.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -423,15 +391,15 @@ namespace sm {
                 return material;
             }
             case MaterialType::PhongShadow: {
-                const auto identifier {"phong_shadow"_H};
+                const auto id {"phong_shadow"_H};
 
                 const auto shader {load_shader(
-                    identifier,
+                    id,
                     fs.path_engine_assets("shaders/phong_shadow.vert"),
                     fs.path_engine_assets("shaders/phong_shadow.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -444,15 +412,15 @@ namespace sm {
                 return material;
             }
             case MaterialType::PhongDiffuse: {
-                const auto identifier {"phong_diffuse"_H};
+                const auto id {"phong_diffuse"_H};
 
                 const auto shader {load_shader(
-                    identifier,
+                    id,
                     fs.path_engine_assets("shaders/phong_diffuse.vert"),
                     fs.path_engine_assets("shaders/phong_diffuse.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -465,15 +433,15 @@ namespace sm {
                 return material;
             }
             case MaterialType::PhongDiffuseShadow: {
-                const auto identifier {"phong_diffuse_shadow"_H};
+                const auto id {"phong_diffuse_shadow"_H};
 
                 const auto shader {load_shader(
-                    identifier,
+                    id,
                     fs.path_engine_assets("shaders/phong_diffuse_shadow.vert"),
                     fs.path_engine_assets("shaders/phong_diffuse_shadow.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -486,15 +454,15 @@ namespace sm {
                 return material;
             }
             case MaterialType::PhongDiffuseNormalShadow: {
-                const auto identifier {"phong_diffuse_normal_shadow"_H};
+                const auto id {"phong_diffuse_normal_shadow"_H};
 
                 const auto shader {load_shader(
-                    identifier,
+                    id,
                     fs.path_engine_assets("shaders/phong_diffuse_normal_shadow.vert"),
                     fs.path_engine_assets("shaders/phong_diffuse_normal_shadow.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+                const auto [material, present] {res.material.load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -513,18 +481,12 @@ namespace sm {
         return {};
     }
 
-    std::shared_ptr<Material> Ctx::load_material(
-        resmanager::HashedStr64 identifier,
-        const std::string& vertex_file_path,
-        const std::string& fragment_file_path,
-        MaterialType type,
-        unsigned int flags
-    ) {
+    std::shared_ptr<Material> Ctx::load_material(Id id, const std::string& vertex_file_path, const std::string& fragment_file_path, MaterialType type, unsigned int flags) {
         using namespace resmanager::literals;
 
-        const auto shader {load_shader(identifier, vertex_file_path, fragment_file_path)};
+        const auto shader {load_shader(id, vertex_file_path, fragment_file_path)};
 
-        const auto [material, present] {res.material.load_check(identifier, shader, flags)};
+        const auto [material, present] {res.material.load_check(id, shader, flags)};
 
         if (present) {
             return material;
@@ -561,34 +523,26 @@ namespace sm {
         return material;
     }
 
-    std::shared_ptr<MaterialInstance> Ctx::load_material_instance(
-        resmanager::HashedStr64 identifier,
-        std::shared_ptr<Material> material
-    ) {
-        return res.material_instance.load(identifier, material);
+    std::shared_ptr<MaterialInstance> Ctx::load_material_instance(Id id, std::shared_ptr<Material> material) {
+        return res.material_instance.load(id, material);
     }
 
-    std::shared_ptr<GlShader> Ctx::load_shader(
-        resmanager::HashedStr64 identifier,
-        const std::string& vertex_file_path,
-        const std::string& fragment_file_path,
-        bool include_processing
-    ) {
-        if (res.shader.contains(identifier)) {
-            return res.shader.get(identifier);
+    std::shared_ptr<GlShader> Ctx::load_shader(Id id, const std::string& vertex_file_path, const std::string& fragment_file_path, bool include_processing) {
+        if (res.shader.contains(id)) {
+            return res.shader.get(id);
         }
 
         std::shared_ptr<GlShader> shader;
 
         if (include_processing) {
             shader = res.shader.force_load(
-                identifier,
+                id,
                 shd.load_shader(utils::read_file(vertex_file_path)),
                 shd.load_shader(utils::read_file(fragment_file_path))
             );
         } else {
             shader = res.shader.force_load(
-                identifier,
+                id,
                 utils::read_file(vertex_file_path),
                 utils::read_file(fragment_file_path)
             );
@@ -599,11 +553,8 @@ namespace sm {
         return shader;
     }
 
-    std::shared_ptr<GlFramebuffer> Ctx::load_framebuffer(
-        resmanager::HashedStr64 identifier,
-        const FramebufferSpecification& specification
-    ) {
-        const auto [framebuffer, present] {res.framebuffer.load_check(identifier, specification)};
+    std::shared_ptr<GlFramebuffer> Ctx::load_framebuffer(Id id, const FramebufferSpecification& specification) {
+        const auto [framebuffer, present] {res.framebuffer.load_check(id, specification)};
 
         if (present) {
             return framebuffer;
@@ -614,13 +565,9 @@ namespace sm {
         return framebuffer;
     }
 
-    std::shared_ptr<Font> Ctx::load_font(
-        resmanager::HashedStr64 identifier,
-        const std::string& file_path,
-        const FontSpecification& specification
-    ) {
+    std::shared_ptr<Font> Ctx::load_font(Id id, const std::string& file_path, const FontSpecification& specification) {
         return res.font.load(
-            identifier,
+            id,
             utils::read_file(file_path),
             specification
         );

@@ -7,8 +7,8 @@
 
 #include <glad/glad.h>
 
-#include "nine_morris_3d_engine/application/capabilities.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
 
 namespace sm {
     static const GLenum parameters[] {

@@ -10,6 +10,7 @@
 #include <glm/gtc/color_space.hpp>
 #include <resmanager/resmanager.hpp>
 
+#include "nine_morris_3d_engine/application/id.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_buffer_layout.hpp"
@@ -19,6 +20,7 @@
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 // shader uniform limit https://www.khronos.org/opengl/wiki/Uniform_(GLSL)#Implementation_limits
+// gamma https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/
 
 using namespace resmanager::literals;
 
@@ -157,14 +159,6 @@ namespace sm {
                 storage.screen_quad_shader = std::make_unique<GlShader>(
                     utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.vert")),
                     utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.frag"))
-                );
-            }
-
-            {
-                // Doesn't have uniform buffers for sure
-                storage.color_correction_shader = std::make_unique<GlShader>(
-                    utils::read_file(fs.path_engine_assets("shaders/internal/screen_quad.vert")),
-                    utils::read_file(fs.path_engine_assets("shaders/internal/color_correction.frag"))
                 );
             }
 
@@ -405,8 +399,6 @@ namespace sm {
                 storage.intermediate_framebuffer->get_specification().height
             );
 
-            // opengl::enable_framebuffer_srgb();  // TODO use post processing
-
             end_3d_rendering(scene);
 
             // 2D stuff
@@ -418,8 +410,6 @@ namespace sm {
     #endif
 
             present(width, height);
-
-            // opengl::disable_framebuffer_srgb();
         }
 
         void Renderer::pre_setup() {
@@ -532,10 +522,13 @@ namespace sm {
 
             storage.screen_quad_vertex_array->bind();
 
-            screen_quad(
-                color_correction ? storage.color_correction_shader.get() : storage.screen_quad_shader.get(),
-                storage.final_framebuffer->get_color_attachment(0)
-            );
+            if (color_correction) {
+                opengl::enable_framebuffer_srgb();
+                screen_quad(storage.screen_quad_shader.get(), storage.final_framebuffer->get_color_attachment(0));
+                opengl::disable_framebuffer_srgb();
+            } else {
+                screen_quad(storage.screen_quad_shader.get(), storage.final_framebuffer->get_color_attachment(0));
+            }
 
             GlVertexArray::unbind();
 
@@ -880,12 +873,12 @@ namespace sm {
                 const std::string index {std::to_string(i)};
 
                 // Uniforms must be set individually by index
-                uniform_buffer->set(&light.position, resmanager::HashedStr64("u_point_lights[" + index + "].position"));
-                uniform_buffer->set(&light.ambient_color, resmanager::HashedStr64("u_point_lights[" + index + "].ambient"));
-                uniform_buffer->set(&light.diffuse_color, resmanager::HashedStr64("u_point_lights[" + index + "].diffuse"));
-                uniform_buffer->set(&light.specular_color, resmanager::HashedStr64("u_point_lights[" + index + "].specular"));
-                uniform_buffer->set(&light.falloff_linear, resmanager::HashedStr64("u_point_lights[" + index + "].falloff_linear"));
-                uniform_buffer->set(&light.falloff_quadratic, resmanager::HashedStr64("u_point_lights[" + index + "].falloff_quadratic"));
+                uniform_buffer->set(&light.position, Id("u_point_lights[" + index + "].position"));
+                uniform_buffer->set(&light.ambient_color, Id("u_point_lights[" + index + "].ambient"));
+                uniform_buffer->set(&light.diffuse_color, Id("u_point_lights[" + index + "].diffuse"));
+                uniform_buffer->set(&light.specular_color, Id("u_point_lights[" + index + "].specular"));
+                uniform_buffer->set(&light.falloff_linear, Id("u_point_lights[" + index + "].falloff_linear"));
+                uniform_buffer->set(&light.falloff_quadratic, Id("u_point_lights[" + index + "].falloff_quadratic"));
             }
         }
 

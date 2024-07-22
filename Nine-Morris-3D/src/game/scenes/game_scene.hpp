@@ -32,6 +32,8 @@ struct GameScene : sm::ApplicationScene {
     void setup_skybox();
     void setup_lights();
 
+    void reload_textures(bool srgb);
+
     sm::Camera cam;
     sm::Camera2D cam_2d;
     PointCameraController cam_controller;

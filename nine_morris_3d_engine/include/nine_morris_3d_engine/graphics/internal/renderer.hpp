@@ -112,7 +112,6 @@ namespace sm {
                 std::shared_ptr<GlFramebuffer> shadow_map_framebuffer;
 
                 std::unique_ptr<GlShader> screen_quad_shader;
-                std::unique_ptr<GlShader> color_correction_shader;
                 std::shared_ptr<GlShader> shadow_shader;
                 std::unique_ptr<GlShader> text_shader;
                 std::unique_ptr<GlShader> quad_shader;

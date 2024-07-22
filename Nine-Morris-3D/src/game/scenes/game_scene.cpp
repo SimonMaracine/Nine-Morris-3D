@@ -186,7 +186,8 @@ void GameScene::on_imgui_update() {
         }
     }
     if (ImGui::Checkbox("Color Correction", &color_correction)) {
-        ctx.set_color_correction(color_correction);  // FIXME recreate textures without sRGB
+        ctx.set_color_correction(color_correction);
+        reload_textures(color_correction);
     }
     ImGui::End();
 }
@@ -286,7 +287,11 @@ void GameScene::setup_brick() {
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
 
-    const auto diffuse {ctx.load_texture(ctx.path_assets("textures/brick-texture3.png"), {}, specification)};
+    const auto diffuse {ctx.load_texture(
+        "brick_diffuse"_H,
+        ctx.load_texture_data(ctx.path_assets("textures/brick-texture3.png"), {}),
+        specification
+    )};
 
     const auto material_instance {ctx.load_material_instance("brick"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -307,7 +312,11 @@ void GameScene::setup_lamp() {
         sm::TextureSpecification specification;
         specification.format = sm::TextureFormat::Srgba8Alpha;
 
-        const auto diffuse {ctx.load_texture(ctx.path_assets("textures/lamp-texture.png"), {}, specification)};
+        const auto diffuse {ctx.load_texture(
+            "lamp_stand_diffuse"_H,
+            ctx.load_texture_data(ctx.path_assets("textures/lamp-texture.png"), {}),
+            specification
+        )};
 
         const auto material_instance {ctx.load_material_instance("lamp_stand"_H, material)};
         material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -339,8 +348,17 @@ void GameScene::setup_barrel() {
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
 
-    const auto diffuse {ctx.load_texture(ctx.path_assets("textures/barrel.png"), {}, specification)};
-    const auto normal {ctx.load_texture(ctx.path_assets("textures/barrelNormal.png"), {}, {})};
+    const auto diffuse {ctx.load_texture(
+        "barrel_diffuse"_H,
+        ctx.load_texture_data(ctx.path_assets("textures/barrel.png"), {}),
+        specification
+    )};
+
+    const auto normal {ctx.load_texture(
+        "barrel_normal"_H,
+        ctx.load_texture_data(ctx.path_assets("textures/barrelNormal.png"), {}),
+        {}
+    )};
 
     const auto material_instance {ctx.load_material_instance("barrel"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -361,7 +379,11 @@ void GameScene::setup_textured_bricks() {
     sm::TextureSpecification specification;
     specification.format = sm::TextureFormat::Srgba8Alpha;
 
-    const auto diffuse {ctx.load_texture(ctx.path_assets("textures/brick-texture3.png"), {}, specification)};
+    const auto diffuse {ctx.load_texture(
+        "brick_diffuse"_H,
+        ctx.load_texture_data(ctx.path_assets("textures/brick-texture3.png"), {}),
+        specification
+    )};
 
     const auto material_instance {ctx.load_material_instance("brick"_H, material)};
     material_instance->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
@@ -414,7 +436,11 @@ void GameScene::setup_quads() {
         sm::TextureSpecification specification;
         specification.format = sm::TextureFormat::Srgba8Alpha;
 
-        const auto texture {ctx.load_texture(ctx.path_assets("textures/indicator/wait_indicator.png"), {}, specification)};
+        const auto texture {ctx.load_texture(
+            "wait"_H,
+            ctx.load_texture_data(ctx.path_assets("textures/indicator/wait_indicator.png"), {}),
+            specification
+        )};
 
         wait.texture = texture;
         wait.position = glm::vec2(70.0f);
@@ -427,7 +453,11 @@ void GameScene::setup_quads() {
         sm::TextureSpecification specification;
         specification.format = sm::TextureFormat::Srgba8Alpha;
 
-        const auto texture {ctx.load_texture(ctx.path_assets("textures/indicator/white_indicator.png"), post_processing, specification)};
+        const auto texture {ctx.load_texture(
+            "white"_H,
+            ctx.load_texture_data(ctx.path_assets("textures/indicator/white_indicator.png"), post_processing),
+            specification
+        )};
 
         white.texture = texture;
         white.position = glm::vec2(210.0f, 210.0f);
@@ -435,21 +465,20 @@ void GameScene::setup_quads() {
 }
 
 void GameScene::setup_skybox() {
-    sm::TexturePostProcessing processing;
-    processing.size = sm::Size::Half;  // Half looks better
-    processing.flip = false;
+    sm::TexturePostProcessing post_processing;
+    post_processing.size = sm::Size::Half;  // Half looks better
+    post_processing.flip = false;
 
     field = ctx.load_texture_cubemap(
-        "field",
+        "field"_H,
         {
-            ctx.path_assets("textures/skybox/field/px.png"),
-            ctx.path_assets("textures/skybox/field/nx.png"),
-            ctx.path_assets("textures/skybox/field/py.png"),
-            ctx.path_assets("textures/skybox/field/ny.png"),
-            ctx.path_assets("textures/skybox/field/pz.png"),
-            ctx.path_assets("textures/skybox/field/nz.png")
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing),
+            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing)
         },
-        processing,
         sm::TextureFormat::Srgba8Alpha
     );
 }
@@ -466,4 +495,95 @@ void GameScene::setup_lights() {
     point_light.specular_color = glm::vec3(1.0f);
     point_light.falloff_linear = 0.09f;
     point_light.falloff_quadratic = 0.032f;
+}
+
+void GameScene::reload_textures(bool srgb) {
+    const sm::TextureFormat format {srgb ? sm::TextureFormat::Srgba8Alpha : sm::TextureFormat::Rgba8};
+
+    sm::TextureSpecification specification;
+    specification.format = format;
+
+    {
+        const auto diffuse {ctx.reload_texture(
+            "brick_diffuse"_H,
+            ctx.load_texture_data(ctx.path_assets("textures/brick-texture3.png"), {}),
+            specification
+        )};
+
+        brick.get_material()->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
+    }
+
+    {
+        const auto diffuse {ctx.reload_texture(
+            "lamp_stand_diffuse"_H,
+            ctx.load_texture_data(ctx.path_assets("textures/lamp-texture.png"), {}),
+            specification
+        )};
+
+        lamp_stand.get_material()->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
+    }
+
+    {
+        const auto diffuse {ctx.reload_texture(
+            "barrel_diffuse"_H,
+            ctx.load_texture_data(ctx.path_assets("textures/barrel.png"), {}),
+            specification
+        )};
+
+        barrel.get_material()->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
+    }
+
+    {
+        const auto diffuse {ctx.reload_texture(
+            "brick_diffuse"_H,
+            ctx.load_texture_data(ctx.path_assets("textures/brick-texture3.png"), {}),
+            specification
+        )};
+
+        for (const auto& brick : textured_bricks) {
+            brick.get_material()->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
+        }
+    }
+
+    {
+        const auto texture {ctx.reload_texture(
+            "wait"_H,
+            ctx.load_texture_data(ctx.path_assets("textures/indicator/wait_indicator.png"), {}),
+            specification
+        )};
+
+        wait.texture = texture;
+    }
+
+    {
+        sm::TexturePostProcessing post_processing;
+        post_processing.size = sm::Size::Half;
+
+        const auto texture {ctx.reload_texture(
+            "white"_H,
+            ctx.load_texture_data(ctx.path_assets("textures/indicator/white_indicator.png"), post_processing),
+            specification
+        )};
+
+        white.texture = texture;
+    }
+
+    {
+        sm::TexturePostProcessing post_processing;
+        post_processing.size = sm::Size::Half;  // Half looks better
+        post_processing.flip = false;
+
+        field = ctx.reload_texture_cubemap(
+            "field"_H,
+            {
+                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing),
+                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing),
+                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing),
+                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing),
+                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing),
+                ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing)
+            },
+            format
+        );
+    }
 }

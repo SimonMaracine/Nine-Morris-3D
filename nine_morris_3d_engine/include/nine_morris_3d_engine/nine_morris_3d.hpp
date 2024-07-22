@@ -3,7 +3,6 @@
 // Convenience header
 
 #include "nine_morris_3d_engine/application/application.hpp"
-#include "nine_morris_3d_engine/application/capabilities.hpp"
 #include "nine_morris_3d_engine/application/context.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/events.hpp"
@@ -18,6 +17,7 @@
 #include "nine_morris_3d_engine/audio/openal/source.hpp"
 #include "nine_morris_3d_engine/audio/music_track.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"

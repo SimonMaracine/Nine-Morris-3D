@@ -37,15 +37,13 @@ namespace sm {
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-            glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
             glfwWindowHint(GLFW_RESIZABLE, properties.resizable ? GLFW_TRUE : GLFW_FALSE);
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+            glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE);
 
 #ifndef SM_BUILD_DISTRIBUTION
-            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+            glfwWindowHint(GLFW_CONTEXT_DEBUG, GLFW_TRUE);
             LOG_INFO("Using OpenGL debug context");
-#else
-            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
 #endif
 
             window = create_window(properties);
@@ -131,7 +129,7 @@ namespace sm {
         }
 
         void Window::set_cursor(Id id) const {
-            static constexpr auto null {resmanager::HashedStr64("null")};
+            static constexpr auto null {Id("null")};
 
             if (id == null) {
                 glfwSetCursor(window, nullptr);
