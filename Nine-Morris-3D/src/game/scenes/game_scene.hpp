@@ -8,7 +8,9 @@
 
 struct GameScene : sm::ApplicationScene {
     explicit GameScene(sm::Ctx& ctx)
-        : sm::ApplicationScene(ctx, "game") {}
+        : sm::ApplicationScene(ctx) {}
+
+    SM_SCENE_NAME("game")
 
     void on_start() override;
     void on_stop() override;

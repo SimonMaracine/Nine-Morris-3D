@@ -423,8 +423,10 @@ namespace sm {
                 // Create and store references to particular uniform buffers
                 for (const UniformBlockSpecification& block : shader->uniform_blocks) {
                     // Don't create duplicate buffers
-                    if (storage.uniform_buffers.find(block.binding_index) != storage.uniform_buffers.cend()) {
-                        continue;
+                    if (const auto iter {storage.uniform_buffers.find(block.binding_index)}; iter != storage.uniform_buffers.cend()) {
+                        if (!iter->second.expired()) {
+                            continue;
+                        }
                     }
 
                     const auto uniform_buffer {std::make_shared<GlUniformBuffer>(block)};

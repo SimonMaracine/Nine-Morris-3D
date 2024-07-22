@@ -232,11 +232,11 @@ namespace sm {
     }
 
     void Ctx::change_scene(Id id) {
-        assert(application->next_scene == nullptr);
+        assert(application->scene.next == nullptr);
 
-        for (const std::unique_ptr<ApplicationScene>& scene : application->scenes) {
-            if (scene->id == id) {
-                application->next_scene = scene.get();
+        for (auto& meta_scene : application->scene.meta_scenes) {
+            if (meta_scene.id == id) {
+                application->scene.next = &meta_scene;
                 return;
             }
         }

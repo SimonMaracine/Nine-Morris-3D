@@ -53,9 +53,7 @@ namespace sm {
 
         user_functions.start(ctx);
 
-        LOG_INFO("Calling scene on_start...");
-
-        current_scene->on_start();
+        scene_on_start(scene.current);
         ctx.rnd.pre_setup();
 
         ctx.win.show();
@@ -67,10 +65,10 @@ namespace sm {
             const unsigned int fixed_updates {calculate_fixed_update()};
 
             for (unsigned int i {0}; i < fixed_updates; i++) {
-                current_scene->on_fixed_update();
+                scene.current->scene->on_fixed_update();
             }
 
-            current_scene->on_update();
+            scene.current->scene->on_update();
             ctx.tsk.update();
 
             if (!minimized) {
@@ -91,9 +89,7 @@ namespace sm {
 
         ctx.rnd.post_setup();
 
-        LOG_INFO("Calling scene on_stop...");
-
-        current_scene->on_stop();
+        scene_on_stop(scene.current);
 
         LOG_INFO("Calling user stop function...");
 
@@ -147,47 +143,57 @@ namespace sm {
     }
 
     void Application::check_changed_scene() {
-        if (next_scene != nullptr) {
-            LOG_INFO("Changing scene to {}...", next_scene->get_name());
+        if (scene.next != nullptr) {
+            LOG_INFO("Changing scene to {}...", scene.next->scene->name());
 
             ctx.rnd.post_setup();
 
-            LOG_INFO("Calling scene on_stop...");
-
-            current_scene->on_stop();
+            scene_on_stop(scene.current);
 
             LOG_INFO("Clearing resources cache...");
 
             ctx.res.clear();
-            ctx.evt.disconnect(current_scene);
-            current_scene = std::exchange(next_scene, nullptr);
+            ctx.evt.disconnect(scene.current->scene);
+            scene.current = std::exchange(scene.next, nullptr);
 
-            LOG_INFO("Calling scene on_start...");
-
-            current_scene->on_start();
+            scene_on_start(scene.current);
             ctx.rnd.pre_setup();
         }
 
-        assert(next_scene == nullptr);
+        assert(scene.next == nullptr);
     }
 
     void Application::dear_imgui_render() {
         internal::imgui_context::begin_frame();
 
-        current_scene->on_imgui_update();
+        scene.current->scene->on_imgui_update();
         ctx.dbg.render_dear_imgui(ctx.scn, ctx);
 
         internal::imgui_context::end_frame();
     }
 
     void Application::setup_start_scene(Id start_scene_id) {
-        for (const std::unique_ptr<ApplicationScene>& scene : scenes) {
-            if (scene->id == start_scene_id) {
-                current_scene = scene.get();
+        for (auto& meta_scene : scene.meta_scenes) {
+            if (meta_scene.id == start_scene_id) {
+                scene.current = &meta_scene;
             }
         }
 
-        assert(current_scene != nullptr);
+        assert(scene.current != nullptr);
+    }
+
+    void Application::scene_on_start(MetaScene* meta_scene) {
+        LOG_INFO("Starting scene...");
+
+        meta_scene->scene = meta_scene->constructor();
+        meta_scene->scene->on_start();
+    }
+
+    void Application::scene_on_stop(MetaScene* meta_scene) {
+        LOG_INFO("Stopping scene...");
+
+        meta_scene->scene->on_stop();
+        meta_scene->scene.reset();
     }
 
     void Application::on_window_closed(const WindowClosedEvent&) {

@@ -153,24 +153,16 @@ namespace sm {
 
         Model load_model(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type);
         Model load_model(const std::string& file_path, const std::string& mesh_name, Mesh::Type type);
-
         std::shared_ptr<TextureData> load_texture_data(const std::string& file_path, const TexturePostProcessing& post_processing);
-
         std::shared_ptr<GlTexture> load_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification);
         std::shared_ptr<GlTexture> reload_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification);
-
         std::shared_ptr<GlTextureCubemap> load_texture_cubemap(Id id, std::initializer_list<std::shared_ptr<TextureData>> texture_data, TextureFormat format);
         std::shared_ptr<GlTextureCubemap> reload_texture_cubemap(Id id, std::initializer_list<std::shared_ptr<TextureData>> texture_data, TextureFormat format);
-
         std::shared_ptr<Material> load_material(MaterialType type, unsigned int flags = 0);
         std::shared_ptr<Material> load_material(Id id, const std::string& vertex_file_path, const std::string& fragment_file_path, MaterialType type, unsigned int flags = 0);
-
         std::shared_ptr<MaterialInstance> load_material_instance(Id id, std::shared_ptr<Material> material);
-
         std::shared_ptr<GlShader> load_shader(Id id, const std::string& source_vertex, const std::string& source_fragment, bool include_processing = true);
-
         std::shared_ptr<GlFramebuffer> load_framebuffer(Id id, const FramebufferSpecification& specification);
-
         std::shared_ptr<Font> load_font(Id id, const std::string& file_path, const FontSpecification& specification);
 
         template<typename T>
