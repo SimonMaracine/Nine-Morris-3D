@@ -5,7 +5,6 @@ in flat int v_texture_index;
 
 layout(location = 0) out vec4 o_fragment_color;
 
-// FIXME shader compile error causes segmentation fault in the application
 uniform sampler2D u_texture[8];  // TODO this should be max
 
 void main() {

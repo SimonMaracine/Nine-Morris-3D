@@ -187,7 +187,7 @@ namespace sm {
                 );
 
                 storage.quad_shader->bind();
-                storage.quad_shader->upload_uniform_int_array("u_texture[0]"_H, {0, 1, 2, 3, 4, 5, 6, 7});  // TODO see if this can be avoided
+                storage.quad_shader->upload_uniform_int_array("u_texture[0]"_H, {0, 1, 2, 3, 4, 5, 6, 7});  // This is the only way
                 GlShader::unbind();
             }
 
