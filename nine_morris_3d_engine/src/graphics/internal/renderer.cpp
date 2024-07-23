@@ -304,6 +304,7 @@ namespace sm {
 
         void Renderer::register_shader(std::shared_ptr<GlShader> shader) {
             storage.shaders.push_back(shader);
+            setup_shader_uniform_buffers(shader);
         }
 
         void Renderer::register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer) {
@@ -399,32 +400,19 @@ namespace sm {
         }
 
         void Renderer::pre_setup() {
-            for (const auto& wshader : storage.shaders) {
+            for (const auto& wshader : storage.shaders) {  // TODO no longer really needed
                 const auto shader {wshader.lock()};
 
                 if (shader == nullptr) {
                     continue;
                 }
 
-                // Create and store references to particular uniform buffers
-                for (const UniformBlockSpecification& block : shader->uniform_blocks) {
-                    // Don't create duplicate buffers
-                    if (const auto iter {storage.uniform_buffers.find(block.binding_index)}; iter != storage.uniform_buffers.cend()) {
-                        if (!iter->second.expired()) {
-                            continue;
-                        }
-                    }
-
-                    const auto uniform_buffer {std::make_shared<GlUniformBuffer>(block)};
-                    shader->add_uniform_buffer(uniform_buffer);
-
-                    storage.uniform_buffers[block.binding_index] = uniform_buffer;
-                }
+                setup_shader_uniform_buffers(shader);
             }
         }
 
         void Renderer::post_setup() {
-            storage.shaders.erase(
+            storage.shaders.erase(  // TODO do this in pre_setup too
                 std::remove_if(storage.shaders.begin(), storage.shaders.end(), [](const std::weak_ptr<GlShader>& wshader) {
                     return wshader.lock() == nullptr;
                 }),
@@ -519,6 +507,23 @@ namespace sm {
             shader->bind();
             opengl::bind_texture_2d(texture, 0);
             opengl::draw_arrays(6);
+        }
+
+        void Renderer::setup_shader_uniform_buffers(std::shared_ptr<GlShader> shader) {
+            // Create and store references to particular uniform buffers
+            for (const UniformBlockSpecification& block : shader->uniform_blocks) {
+                // Don't create duplicate buffers
+                if (const auto iter {storage.uniform_buffers.find(block.binding_index)}; iter != storage.uniform_buffers.cend()) {
+                    if (!iter->second.expired()) {
+                        continue;
+                    }
+                }
+
+                const auto uniform_buffer {std::make_shared<GlUniformBuffer>(block)};
+                shader->add_uniform_buffer(uniform_buffer);
+
+                storage.uniform_buffers[block.binding_index] = uniform_buffer;
+            }
         }
 
         void Renderer::draw_renderables(const Scene& scene) {

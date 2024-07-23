@@ -129,7 +129,8 @@ namespace sm {
         return nullptr;
     }
 
-    Mesh::Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding) {
+    Mesh::Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding)
+        : type(type) {
         unsigned int flags {aiProcess_ValidateDataStructure | aiProcess_GenBoundingBoxes};
 
         if (flip_winding) {

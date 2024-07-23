@@ -5,6 +5,7 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #include "game/point_camera_controller.hpp"
+#include "game/heavy_resources.hpp"
 
 struct GameScene : sm::ApplicationScene {
     explicit GameScene(sm::Ctx& ctx)
@@ -29,12 +30,13 @@ struct GameScene : sm::ApplicationScene {
     void setup_lamp();
     void setup_barrel();
     void setup_textured_bricks();
+    void setup_skybox();
     void setup_texts();
     void setup_quads();
-    void setup_skybox();
     void setup_lights();
 
     void reload_textures(bool srgb);
+    void load_heavy_resources();
 
     sm::Camera cam;
     sm::Camera2D cam_2d;
@@ -69,4 +71,6 @@ struct GameScene : sm::ApplicationScene {
     bool blur {false};
     bool outline {true};
     bool color_correction {true};
+
+    HeavyResources heavy_res;
 };

@@ -25,6 +25,7 @@ namespace sm {
 
         const utils::AABB& get_aabb() const { return mesh->get_aabb(); }
         MaterialInstance* get_material() const { return material.get(); }
+        operator bool() const { return mesh && vertex_array && material; }
 
         struct Transform {
             glm::vec3 position {};

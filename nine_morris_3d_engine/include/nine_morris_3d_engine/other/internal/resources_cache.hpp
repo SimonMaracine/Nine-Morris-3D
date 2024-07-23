@@ -19,8 +19,6 @@
 namespace sm {
     namespace internal {
         struct ResourcesCache {
-            void merge(ResourcesCache& other);  // TODO make API
-            void merge_replace(ResourcesCache& other);
             void clear();
 
             resmanager::Cache<GlTexture> texture;

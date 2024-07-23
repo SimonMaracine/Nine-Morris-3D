@@ -273,22 +273,28 @@ namespace sm {
         return result;
     }
 
-    Model Ctx::load_model(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
-        const auto mesh {res.mesh.load(id, utils::read_file(file_path), mesh_name, type)};
+    std::shared_ptr<Mesh> Ctx::load_mesh(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
+        return res.mesh.load(id, utils::read_file(file_path), mesh_name, type);
+    }
 
+    std::shared_ptr<Mesh> Ctx::load_mesh(const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
+        return res.mesh.load(Id(utils::file_name(file_path)), utils::read_file(file_path), mesh_name, type);
+    }
+
+    std::shared_ptr<GlVertexArray> Ctx::load_vertex_array(Id id, std::shared_ptr<Mesh> mesh) {
         const auto vertex_buffer {res.vertex_buffer.load(id, mesh->get_vertices(), mesh->get_vertices_size())};
         const auto index_buffer {res.index_buffer.load(id, mesh->get_indices(), mesh->get_indices_size())};
 
         const auto [vertex_array, present] {res.vertex_array.load_check(id)};
 
         if (present) {
-            return std::make_pair(mesh, vertex_array);
+            return vertex_array;
         }
 
         vertex_array->configure([&](GlVertexArray* va) {
             VertexBufferLayout layout;
 
-            switch (type) {
+            switch (mesh->get_type()) {
                 case Mesh::Type::P:
                     layout.add(0, VertexBufferLayout::Float, 3);
                     break;
@@ -313,11 +319,7 @@ namespace sm {
             va->add_index_buffer(index_buffer);
         });
 
-        return std::make_pair(mesh, vertex_array);
-    }
-
-    Model Ctx::load_model(const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
-        return load_model(Id(utils::file_name(file_path)), file_path, mesh_name, type);
+        return vertex_array;
     }
 
     std::shared_ptr<TextureData> Ctx::load_texture_data(const std::string& file_path, const TexturePostProcessing& post_processing) {

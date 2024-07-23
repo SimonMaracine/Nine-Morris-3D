@@ -70,6 +70,7 @@ namespace sm {
             void post_processing(const Scene& scene);
             void finish_3d(const Scene& scene, int width, int height);
             void screen_quad(const GlShader* shader, unsigned int texture);
+            void setup_shader_uniform_buffers(std::shared_ptr<GlShader> shader);
 
             // Draw functions
             void draw_renderables(const Scene& scene);

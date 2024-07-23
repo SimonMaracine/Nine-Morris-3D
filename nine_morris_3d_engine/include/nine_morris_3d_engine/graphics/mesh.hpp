@@ -30,6 +30,7 @@ namespace sm {
         std::size_t get_vertices_size() const { return vertices_size; }
         std::size_t get_indices_size() const { return indices_size; }
         const utils::AABB& get_aabb() const { return aabb; }
+        Type get_type() const { return type; }
     private:
         void load(Type type, const void* pmesh);
         void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
@@ -41,5 +42,7 @@ namespace sm {
         std::size_t indices_size {};
 
         utils::AABB aabb;
+
+        Type type;
     };
 }

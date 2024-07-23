@@ -21,9 +21,9 @@ void GameScene::on_start() {
     ctx.add_task_async([this](sm::AsyncTask& async_task, void*) {
         using namespace std::chrono_literals;
 
-        for (unsigned int i {0}; i < 7; i++) {
+        for (unsigned int i {0}; i < 3; i++) {
             LOG_INFO("Doing stuff...");
-            std::this_thread::sleep_for(2s);
+            std::this_thread::sleep_for(5s);
         }
 
         ctx.add_task([this](const sm::Task&, void*) {
@@ -35,22 +35,18 @@ void GameScene::on_start() {
         async_task.set_done();
     });
 
+    ctx.add_task_async([this](sm::AsyncTask& async_task, void*) {
+        load_heavy_resources();
+        async_task.set_done();
+    });
+
     ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
     ctx.connect_event<sm::KeyReleasedEvent, &GameScene::on_key_released>(this);
 
     ctx.set_clear_color(glm::vec3(0.1f, 0.05f, 0.1f));
 
-    setup_ground();
-    setup_dragon();
-    setup_teapot();
-    setup_cube();
-    setup_brick();
-    setup_lamp();
-    setup_barrel();
-    setup_textured_bricks();
     setup_texts();
     setup_quads();
-    setup_skybox();
     setup_lights();
 
     cam_controller = PointCameraController(
@@ -58,7 +54,7 @@ void GameScene::on_start() {
         ctx.get_window_width(),
         ctx.get_window_height(),
         glm::vec3(0.0f),
-        8.0f,
+        40.0f,
         47.0f,
         0.5f
     );
@@ -84,7 +80,7 @@ void GameScene::on_update() {
     ctx.add_light(directional_light);
     ctx.add_light(point_light);
 
-    if (sky) {
+    if (sky && field) {
         ctx.skybox(field);
     }
 
@@ -92,18 +88,18 @@ void GameScene::on_update() {
         ctx.add_post_processing(ctx.global<Global>().blur_step);
     }
 
-    ctx.add_renderable(ground);
-    ctx.add_renderable(dragon1);
-    ctx.add_renderable(dragon2);
-    ctx.add_renderable(teapot);
-    ctx.add_renderable(cube);
-    ctx.add_renderable(brick);
-    ctx.add_renderable(lamp_stand);
-    ctx.add_renderable(lamp_bulb);
-    ctx.add_renderable(barrel);
+    if (ground) ctx.add_renderable(ground);
+    if (dragon1) ctx.add_renderable(dragon1);
+    if (dragon2) ctx.add_renderable(dragon2);
+    if (teapot) ctx.add_renderable(teapot);
+    if (cube) ctx.add_renderable(cube);
+    if (brick) ctx.add_renderable(brick);
+    if (lamp_stand) ctx.add_renderable(lamp_stand);
+    if (lamp_bulb) ctx.add_renderable(lamp_bulb);
+    if (barrel) ctx.add_renderable(barrel);
 
     for (auto& brick : textured_bricks) {
-        ctx.add_renderable(brick);
+        if (brick) ctx.add_renderable(brick);
     }
 
     ctx.show_info_text();
@@ -223,7 +219,9 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
 }
 
 void GameScene::setup_ground() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/ground.obj"), "Cube", sm::Mesh::Type::PN)};
+    const auto mesh {heavy_res.mesh.get("ground"_H)};
+
+    const auto vertex_array {ctx.load_vertex_array("ground"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
@@ -238,7 +236,9 @@ void GameScene::setup_ground() {
 }
 
 void GameScene::setup_dragon() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/dragon.obj"), "default", sm::Mesh::Type::PN)};
+    const auto mesh {heavy_res.mesh.get("dragon"_H)};
+
+    const auto vertex_array {ctx.load_vertex_array("dragon"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
@@ -268,7 +268,9 @@ void GameScene::setup_dragon() {
 }
 
 void GameScene::setup_teapot() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/teapot.obj"), sm::Mesh::DEFAULT_OBJECT, sm::Mesh::Type::PN)};
+    const auto mesh {heavy_res.mesh.get("teapot"_H)};
+
+    const auto vertex_array {ctx.load_vertex_array("teapot"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
@@ -284,7 +286,9 @@ void GameScene::setup_teapot() {
 }
 
 void GameScene::setup_cube() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/cube.obj"), "Cube", sm::Mesh::Type::PN)};
+    const auto mesh {heavy_res.mesh.get("cube"_H)};
+
+    const auto vertex_array {ctx.load_vertex_array("cube"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
 
@@ -299,7 +303,9 @@ void GameScene::setup_cube() {
 }
 
 void GameScene::setup_brick() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT)};
+    const auto mesh {heavy_res.mesh.get("brick"_H)};
+
+    const auto vertex_array {ctx.load_vertex_array("brick"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
@@ -308,7 +314,7 @@ void GameScene::setup_brick() {
 
     const auto diffuse {ctx.load_texture(
         "brick_diffuse"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/brick-texture3.png"), {}),
+        heavy_res.texture_data.get("brick_diffuse"_H),
         specification
     )};
 
@@ -324,7 +330,9 @@ void GameScene::setup_brick() {
 
 void GameScene::setup_lamp() {
     {
-        const auto [mesh, vertex_array] {ctx.load_model("lamp_stand"_H, ctx.path_assets("models/lamp.obj"), "Stand", sm::Mesh::Type::PNT)};
+        const auto mesh {heavy_res.mesh.get("lamp_stand"_H)};
+
+        const auto vertex_array {ctx.load_vertex_array("lamp_stand"_H, mesh)};
 
         const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
@@ -333,7 +341,7 @@ void GameScene::setup_lamp() {
 
         const auto diffuse {ctx.load_texture(
             "lamp_stand_diffuse"_H,
-            ctx.load_texture_data(ctx.path_assets("textures/lamp-texture.png"), {}),
+            heavy_res.texture_data.get("lamp_stand_diffuse"_H),
             specification
         )};
 
@@ -347,7 +355,9 @@ void GameScene::setup_lamp() {
     }
 
     {
-        const auto [mesh, vertex_array] {ctx.load_model("lamp_bulb"_H, ctx.path_assets("models/lamp.obj"), "Bulb", sm::Mesh::Type::P)};
+        const auto mesh {heavy_res.mesh.get("lamp_bulb"_H)};
+
+        const auto vertex_array {ctx.load_vertex_array("lamp_bulb"_H, mesh)};
 
         const auto material {ctx.load_material(sm::MaterialType::Flat, sm::Material::CastShadow)};
 
@@ -360,7 +370,9 @@ void GameScene::setup_lamp() {
 }
 
 void GameScene::setup_barrel() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/barrel.obj"), "Mesh_Mesh_Cylinder.001", sm::Mesh::Type::PNTT)};
+    const auto mesh {heavy_res.mesh.get("barrel"_H)};
+
+    const auto vertex_array {ctx.load_vertex_array("barrel"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
 
@@ -369,13 +381,13 @@ void GameScene::setup_barrel() {
 
     const auto diffuse {ctx.load_texture(
         "barrel_diffuse"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/barrel.png"), {}),
+        heavy_res.texture_data.get("barrel_diffuse"_H),
         specification
     )};
 
     const auto normal {ctx.load_texture(
         "barrel_normal"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/barrelNormal.png"), {}),
+        heavy_res.texture_data.get("barrel_normal"_H),
         {}
     )};
 
@@ -391,7 +403,9 @@ void GameScene::setup_barrel() {
 }
 
 void GameScene::setup_textured_bricks() {
-    const auto [mesh, vertex_array] {ctx.load_model(ctx.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT)};
+    const auto mesh {heavy_res.mesh.get("brick"_H)};
+
+    const auto vertex_array {ctx.load_vertex_array("brick"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
@@ -400,7 +414,7 @@ void GameScene::setup_textured_bricks() {
 
     const auto diffuse {ctx.load_texture(
         "brick_diffuse"_H,
-        ctx.load_texture_data(ctx.path_assets("textures/brick-texture3.png"), {}),
+        heavy_res.texture_data.get("brick_diffuse"_H),
         specification
     )};
 
@@ -414,6 +428,21 @@ void GameScene::setup_textured_bricks() {
         brick.transform.position = glm::linearRand(-glm::vec3(150.0f), glm::vec3(150.0f));
         brick.transform.rotation = glm::linearRand(glm::vec3(0.0f), glm::vec3(360.0f));
     }
+}
+
+void GameScene::setup_skybox() {
+    field = ctx.load_texture_cubemap(
+        "field"_H,
+        {
+            heavy_res.texture_data.get("field_px"_H),
+            heavy_res.texture_data.get("field_nx"_H),
+            heavy_res.texture_data.get("field_py"_H),
+            heavy_res.texture_data.get("field_ny"_H),
+            heavy_res.texture_data.get("field_pz"_H),
+            heavy_res.texture_data.get("field_nz"_H)
+        },
+        sm::TextureFormat::Srgba8Alpha
+    );
 }
 
 void GameScene::setup_texts() {
@@ -481,25 +510,6 @@ void GameScene::setup_quads() {
         white.texture = texture;
         white.position = glm::vec2(210.0f, 210.0f);
     }
-}
-
-void GameScene::setup_skybox() {
-    sm::TexturePostProcessing post_processing;
-    post_processing.size = sm::Size::Half;  // Half looks better
-    post_processing.flip = false;
-
-    field = ctx.load_texture_cubemap(
-        "field"_H,
-        {
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing),
-            ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing)
-        },
-        sm::TextureFormat::Srgba8Alpha
-    );
 }
 
 void GameScene::setup_lights() {
@@ -582,4 +592,108 @@ void GameScene::reload_textures(bool srgb) {
             format
         );
     }
+}
+
+void GameScene::load_heavy_resources() {
+    {
+        heavy_res.mesh.load("ground"_H, sm::utils::read_file(ctx.path_assets("models/ground.obj")), "Cube", sm::Mesh::Type::PN);
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_ground();
+        return sm::Task::Result::Done;
+    });
+
+    {
+        heavy_res.mesh.load("dragon"_H, sm::utils::read_file(ctx.path_assets("models/dragon.obj")), "default", sm::Mesh::Type::PN);
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_dragon();
+        return sm::Task::Result::Done;
+    });
+
+    {
+        heavy_res.mesh.load("teapot"_H, sm::utils::read_file(ctx.path_assets("models/teapot.obj")), sm::Mesh::DEFAULT_OBJECT, sm::Mesh::Type::PN);
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_teapot();
+        return sm::Task::Result::Done;
+    });
+
+    {
+        heavy_res.mesh.load("cube"_H, sm::utils::read_file(ctx.path_assets("models/cube.obj")), "Cube", sm::Mesh::Type::PN);
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_cube();
+        return sm::Task::Result::Done;
+    });
+
+    {
+        heavy_res.mesh.load("brick"_H, sm::utils::read_file(ctx.path_assets("models/brick.obj")), "Brick", sm::Mesh::Type::PNT);
+
+        heavy_res.texture_data.load("brick_diffuse"_H, sm::utils::read_file(ctx.path_assets("textures/brick-texture3.png")), sm::TexturePostProcessing());
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_brick();
+        return sm::Task::Result::Done;
+    });
+
+    {
+        heavy_res.mesh.load("lamp_stand"_H, sm::utils::read_file(ctx.path_assets("models/lamp.obj")), "Stand", sm::Mesh::Type::PNT);
+
+        heavy_res.texture_data.load("lamp_stand_diffuse"_H, sm::utils::read_file(ctx.path_assets("textures/lamp-texture.png")), sm::TexturePostProcessing());
+
+        heavy_res.mesh.load("lamp_bulb"_H, sm::utils::read_file(ctx.path_assets("models/lamp.obj")), "Bulb", sm::Mesh::Type::P);
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_lamp();
+        return sm::Task::Result::Done;
+    });
+
+    {
+        heavy_res.mesh.load("barrel"_H, sm::utils::read_file(ctx.path_assets("models/barrel.obj")), "Mesh_Mesh_Cylinder.001", sm::Mesh::Type::PNTT);
+
+        heavy_res.texture_data.load("barrel_diffuse"_H, sm::utils::read_file(ctx.path_assets("textures/barrel.png")), sm::TexturePostProcessing());
+
+        heavy_res.texture_data.load("barrel_normal"_H, sm::utils::read_file(ctx.path_assets("textures/barrelNormal.png")), sm::TexturePostProcessing());
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_barrel();
+        return sm::Task::Result::Done;
+    });
+
+    {
+        heavy_res.mesh.load("brick"_H, sm::utils::read_file(ctx.path_assets("models/brick.obj")), "Brick", sm::Mesh::Type::PNT);
+
+        heavy_res.texture_data.load("brick_diffuse"_H, sm::utils::read_file(ctx.path_assets("textures/brick-texture3.png")), sm::TexturePostProcessing());
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_textured_bricks();
+        return sm::Task::Result::Done;
+    });
+
+    {
+        sm::TexturePostProcessing post_processing;
+        post_processing.size = sm::Size::Half;  // Half looks better
+        post_processing.flip = false;
+
+        heavy_res.texture_data.load("field_px"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/px.png")), post_processing);
+        heavy_res.texture_data.load("field_nx"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/nx.png")), post_processing);
+        heavy_res.texture_data.load("field_py"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/py.png")), post_processing);
+        heavy_res.texture_data.load("field_ny"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/ny.png")), post_processing);
+        heavy_res.texture_data.load("field_pz"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/pz.png")), post_processing);
+        heavy_res.texture_data.load("field_nz"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/nz.png")), post_processing);
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_skybox();
+        return sm::Task::Result::Done;
+    });
 }

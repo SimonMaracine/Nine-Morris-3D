@@ -35,8 +35,6 @@
 namespace sm {
     class Application;
 
-    using Model = std::pair<std::shared_ptr<Mesh>, std::shared_ptr<GlVertexArray>>;
-
     enum class MaterialType {
         Flat,
         Phong,
@@ -149,8 +147,9 @@ namespace sm {
         void show_info_text();
         std::string get_information() const;
 
-        Model load_model(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type);
-        Model load_model(const std::string& file_path, const std::string& mesh_name, Mesh::Type type);
+        std::shared_ptr<Mesh> load_mesh(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type);
+        std::shared_ptr<Mesh> load_mesh(const std::string& file_path, const std::string& mesh_name, Mesh::Type type);
+        std::shared_ptr<GlVertexArray> load_vertex_array(Id id, std::shared_ptr<Mesh> mesh);
         std::shared_ptr<TextureData> load_texture_data(const std::string& file_path, const TexturePostProcessing& post_processing);
         std::shared_ptr<GlTexture> load_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification);
         std::shared_ptr<GlTexture> reload_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification);
