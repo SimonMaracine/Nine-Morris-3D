@@ -20,6 +20,28 @@ namespace sm {
             return match_and_include(std::string(source));
         }
 
+        std::string ShaderLibrary::load_shader(const std::string& source, std::initializer_list<Define> defines) const {
+            std::string result {source};
+
+            for (const auto& define : defines) {
+                std::size_t index {};
+
+                while (true) {
+                    const auto position {result.find(define.first, index)};
+
+                    if (position == std::string::npos) {
+                        break;
+                    }
+
+                    result.replace(position, define.first.size(), define.second);
+
+                    index = position + define.second.size();
+                }
+            }
+
+            return result;
+        }
+
         void ShaderLibrary::load_shaders_from_include_directories(std::initializer_list<std::string> include_directories) {
             for (const auto& include_directory : include_directories) {
                 for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(include_directory)) {  // FIXME throws exception
@@ -77,7 +99,7 @@ namespace sm {
                 }
 
                 result += std::string(begin, std::get<0>(*iter));
-                result += "#line 1\n" + load_shader(std::get<3>(*iter)) + "\n#line " + std::to_string(std::get<2>(*iter) + 1);  // FIXME why no new line?
+                result += "#line 1\n" + load_shader(std::get<3>(*iter)) + "\n#line " + std::to_string(std::get<2>(*iter) + 1);
 
                 begin = std::get<1>(*iter);
             }

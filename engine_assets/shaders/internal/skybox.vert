@@ -10,6 +10,6 @@ void main() {
     v_texture_coordinate = a_position;
 
     vec4 position = u_projection_view_matrix * vec4(a_position, 1.0);
-    position.z = position.w - 0.01;
+    position.z = position.w - 0.01;  // Make the skybox visible, even if rendered last
     gl_Position = position;
 }

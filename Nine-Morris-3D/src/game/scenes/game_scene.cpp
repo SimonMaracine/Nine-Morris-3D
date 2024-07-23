@@ -201,7 +201,7 @@ void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
 
 void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     if (event.key == sm::Key::Escape) {
-        ctx.change_scene("game"_H);  // FIXME crashes
+        ctx.change_scene("game"_H);
     }
 }
 

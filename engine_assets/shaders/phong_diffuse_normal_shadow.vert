@@ -12,7 +12,7 @@ out vec2 v_texture_coordinate;
 out vec4 v_fragment_position_light_space;
 out vec3 v_view_position_tangent_space;
 out vec3 v_light_direction_tangent_space;
-out vec3 v_light_position_tangent_space[POINT_LIGHTS];
+out vec3 v_light_position_tangent_space[D_POINT_LIGHTS];
 
 uniform mat4 u_model_matrix;
 
@@ -33,7 +33,7 @@ layout(shared, binding = 1) uniform DirectionalLight {
 };
 
 layout(shared, binding = 3) uniform PointLight {
-    PointLight_ u_point_lights[POINT_LIGHTS];
+    PointLight_ u_point_lights[D_POINT_LIGHTS];
 };
 
 #include "shaders/common/vert/tangent_space.glsl"
@@ -46,7 +46,7 @@ void main() {
     v_fragment_position_light_space = u_light_space_matrix * u_model_matrix * vec4(a_position, 1.0);
     v_view_position_tangent_space = TBN * u_view_position;
     v_light_direction_tangent_space = TBN * u_directional_light.direction;
-    for (int i = 0; i < POINT_LIGHTS; i++) {
+    for (int i = 0; i < D_POINT_LIGHTS; i++) {
         v_light_position_tangent_space[i] = TBN * u_point_lights[i].position;
     }
 

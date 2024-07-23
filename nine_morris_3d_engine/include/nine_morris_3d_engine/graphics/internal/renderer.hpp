@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <initializer_list>
 #include <memory>
+#include <cstddef>
 
 #include <glm/glm.hpp>
 
@@ -15,7 +16,6 @@
 #include "nine_morris_3d_engine/graphics/internal/scene.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/shader.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
-#include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
 #include "nine_morris_3d_engine/graphics/renderable.hpp"
 #include "nine_morris_3d_engine/graphics/light.hpp"
 #include "nine_morris_3d_engine/graphics/camera.hpp"
@@ -64,6 +64,8 @@ namespace sm {
             void pre_setup();
             void post_setup();
             void resize_framebuffers(int width, int height);
+
+            static std::size_t get_max_point_lights() { return SHADER_MAX_POINT_LIGHTS; }
         private:
             void post_processing(const Scene& scene);
             void finish_3d(const Scene& scene, int width, int height);
@@ -138,8 +140,8 @@ namespace sm {
                     std::unique_ptr<QuadVertex[]> buffer;
                     QuadVertex* buffer_pointer {nullptr};
 
-                    std::array<unsigned int, 8> texture_slots {};
-                    std::size_t texture_slot_index {};
+                    std::array<unsigned int, 8> textures {};
+                    std::size_t texture_index {};
 
                     std::size_t quad_count {};
                 } quad;
@@ -151,6 +153,7 @@ namespace sm {
 
             PostProcessingContext post_processing_context;
 
+            glm::vec3 clear_color {};
             bool color_correction {true};
 
 #ifndef SM_BUILD_DISTRIBUTION
@@ -168,7 +171,6 @@ namespace sm {
             static constexpr std::size_t MAX_QUAD_COUNT {1000};
             static constexpr std::size_t MAX_QUADS_BUFFER_SIZE {MAX_QUAD_COUNT * 4 * sizeof(QuadVertex)};
             static constexpr std::size_t MAX_QUADS_INDICES {MAX_QUAD_COUNT * 6};
-            static constexpr std::size_t MAX_QUADS_TEXTURES {8};
 
             friend class DebugRenderer;
         };

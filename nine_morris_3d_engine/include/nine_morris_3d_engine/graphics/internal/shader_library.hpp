@@ -12,8 +12,13 @@ namespace sm {
         public:
             explicit ShaderLibrary(std::initializer_list<std::string> include_directories);
 
-            // Only the source is needed; shaders are included relative to (not including) the include directories
+            using Define = std::pair<std::string, std::string>;
+
+            // Include shaders relative to (not including) the include directories
             std::string load_shader(const std::string& source) const;
+
+            // Replace defines with their respective values
+            std::string load_shader(const std::string& source, std::initializer_list<Define> defines) const;
 
             void load_shaders_from_include_directories(std::initializer_list<std::string> include_directories);
         private:

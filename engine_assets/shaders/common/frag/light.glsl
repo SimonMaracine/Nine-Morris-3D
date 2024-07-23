@@ -13,5 +13,3 @@ struct PointLight_ {
     float falloff_linear;
     float falloff_quadratic;
 };
-
-const int POINT_LIGHTS = 4;

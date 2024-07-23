@@ -5,7 +5,7 @@ in flat int v_texture_index;
 
 layout(location = 0) out vec4 o_fragment_color;
 
-uniform sampler2D u_texture[8];  // TODO this should be max
+uniform sampler2D u_texture[8];
 
 void main() {
     vec4 color;
@@ -19,7 +19,7 @@ void main() {
         case 4: color = texture(u_texture[4], v_texture_coordinate); break;
         case 5: color = texture(u_texture[5], v_texture_coordinate); break;
         case 6: color = texture(u_texture[6], v_texture_coordinate); break;
-        case 7: color = texture(u_texture[7], v_texture_coordinate); break;  // TODO this should be max
+        case 7: color = texture(u_texture[7], v_texture_coordinate); break;
     }
 
     o_fragment_color = color;

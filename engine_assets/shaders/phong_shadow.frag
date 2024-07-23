@@ -16,7 +16,7 @@ layout(shared, binding = 1) uniform DirectionalLight {
 };
 
 layout(shared, binding = 3) uniform PointLight {
-    PointLight_ u_point_lights[POINT_LIGHTS];
+    PointLight_ u_point_lights[D_POINT_LIGHTS];
 };
 
 layout(shared, binding = 2) uniform View {
@@ -43,7 +43,7 @@ void main() {
         shadow
     );
 
-    for (int i = 0; i < POINT_LIGHTS; i++) {
+    for (int i = 0; i < D_POINT_LIGHTS; i++) {
         color += calculate_point_light(
             i,
             u_material.ambient_diffuse,

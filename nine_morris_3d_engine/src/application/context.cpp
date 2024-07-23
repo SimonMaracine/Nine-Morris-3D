@@ -75,10 +75,6 @@ namespace sm {
         return fs.path_engine_assets(path);
     }
 
-    std::string Ctx::load_shader(const std::string& source) const {
-        return shd.load_shader(source);
-    }
-
     int Ctx::get_window_width() const {
         return win.get_width();
     }
@@ -121,6 +117,10 @@ namespace sm {
 
     void Ctx::set_color_correction(bool enable) {
         rnd.set_color_correction(enable);
+    }
+
+    bool Ctx::get_color_correction() const {
+        return rnd.get_color_correction();
     }
 
     void Ctx::set_clear_color(glm::vec3 color) {
@@ -527,26 +527,24 @@ namespace sm {
         return res.material_instance.load(id, material);
     }
 
-    std::shared_ptr<GlShader> Ctx::load_shader(Id id, const std::string& vertex_file_path, const std::string& fragment_file_path, bool include_processing) {
+    std::shared_ptr<GlShader> Ctx::load_shader(Id id, const std::string& vertex_file_path, const std::string& fragment_file_path) {
         if (res.shader.contains(id)) {
             return res.shader.get(id);
         }
 
-        std::shared_ptr<GlShader> shader;
-
-        if (include_processing) {
-            shader = res.shader.force_load(
+        std::shared_ptr<GlShader> shader {
+            res.shader.force_load(
                 id,
-                shd.load_shader(utils::read_file(vertex_file_path)),
-                shd.load_shader(utils::read_file(fragment_file_path))
-            );
-        } else {
-            shader = res.shader.force_load(
-                id,
-                utils::read_file(vertex_file_path),
-                utils::read_file(fragment_file_path)
-            );
-        }
+                shd.load_shader(
+                    shd.load_shader(utils::read_file(vertex_file_path)),
+                    {{"D_POINT_LIGHTS", std::to_string(internal::Renderer::get_max_point_lights())}}
+                ),
+                shd.load_shader(
+                    shd.load_shader(utils::read_file(fragment_file_path)),
+                    {{"D_POINT_LIGHTS", std::to_string(internal::Renderer::get_max_point_lights())}}
+                )
+            )
+        };
 
         rnd.register_shader(shader);
 

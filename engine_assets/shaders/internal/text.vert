@@ -7,9 +7,7 @@ layout(location = 2) in int a_index;
 out vec2 v_texture_coordinate;
 out flat int v_index;
 
-const int MAX_TEXTS = 32;
-
-uniform mat4 u_model_matrix[MAX_TEXTS];
+uniform mat4 u_model_matrix[D_MAX_TEXTS];
 uniform mat4 u_projection_matrix;
 
 void main() {

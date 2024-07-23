@@ -1,6 +1,5 @@
 #include "nine_morris_3d_engine/graphics/internal/renderer.hpp"
 
-#include <cstddef>
 #include <algorithm>
 #include <string>
 #include <utility>
@@ -15,6 +14,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_buffer_layout.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
+#include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
 #include "nine_morris_3d_engine/graphics/material.hpp"
 #include "nine_morris_3d_engine/graphics/font.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
@@ -82,11 +82,10 @@ namespace sm {
             GlVertexArray::unbind();
         }
 
-        Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary&) {
+        Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary& shd) {
             opengl::initialize_default();
             opengl::initialize_stencil();
             opengl::enable_depth_test();
-            opengl::clear_color(0.0f, 0.0f, 0.0f);
 
             // Scene
             {
@@ -157,8 +156,14 @@ namespace sm {
             {
                 // Doesn't have uniform buffers for sure
                 storage.text_shader = std::make_unique<GlShader>(
-                    utils::read_file(fs.path_engine_assets("shaders/internal/text.vert")),
-                    utils::read_file(fs.path_engine_assets("shaders/internal/text.frag"))
+                    shd.load_shader(
+                        utils::read_file(fs.path_engine_assets("shaders/internal/text.vert")),
+                        {{"D_MAX_TEXTS", std::to_string(SHADER_MAX_BATCH_TEXTS)}}
+                    ),
+                    shd.load_shader(
+                        utils::read_file(fs.path_engine_assets("shaders/internal/text.frag")),
+                        {{"D_MAX_TEXTS", std::to_string(SHADER_MAX_BATCH_TEXTS)}}
+                    )
                 );
             }
 
@@ -289,10 +294,12 @@ namespace sm {
 
         void Renderer::set_clear_color(glm::vec3 color) {
             if (color_correction) {
-                color = glm::convertSRGBToLinear(color, 2.2f);
+                clear_color = glm::convertSRGBToLinear(color);
+            } else {
+                clear_color = color;
             }
 
-            opengl::clear_color(color.r, color.g, color.b);
+            opengl::clear_color(clear_color.r, clear_color.g, clear_color.b);
         }
 
         void Renderer::register_shader(std::shared_ptr<GlShader> shader) {
@@ -478,7 +485,7 @@ namespace sm {
 
         void Renderer::finish_3d(const Scene& scene, int width, int height) {
             opengl::disable_depth_test();
-            opengl::disable_blending();
+            opengl::clear_color(0.0f, 0.0f, 0.0f);
 
             storage.screen_quad_vertex_array->bind();
 
@@ -498,7 +505,7 @@ namespace sm {
 
             GlVertexArray::unbind();
 
-            opengl::enable_blending();
+            opengl::clear_color(clear_color.r, clear_color.g, clear_color.b);
             opengl::enable_depth_test();
         }
 
@@ -581,7 +588,7 @@ namespace sm {
                 // Vertex array is already bound
 
                 const glm::vec3 color {
-                    color_correction ? glm::convertSRGBToLinear(renderable.outline.color, 2.2f) : renderable.outline.color
+                    color_correction ? glm::convertSRGBToLinear(renderable.outline.color) : renderable.outline.color
                 };
 
                 storage.outline_shader->bind();
@@ -742,7 +749,7 @@ namespace sm {
         }
 
         void Renderer::draw_quad(glm::vec2 position, glm::vec2 size, glm::vec2 scale, unsigned int texture) {
-            if (storage.quad.quad_count == MAX_QUAD_COUNT || storage.quad.texture_slot_index == MAX_QUADS_TEXTURES) {
+            if (storage.quad.quad_count == MAX_QUAD_COUNT || storage.quad.texture_index == storage.quad.textures.size()) {
                 end_quads_batch();
                 flush_quads_batch();
                 begin_quads_batch();
@@ -750,19 +757,19 @@ namespace sm {
 
             int texture_index {-1};
 
-            // Search for this texture in slots array
-            for (std::size_t i {0}; i < storage.quad.texture_slot_index; i++) {
-                if (storage.quad.texture_slots[i] == texture) {
+            // Search for this texture in textures array
+            for (std::size_t i {0}; i < storage.quad.texture_index; i++) {
+                if (storage.quad.textures[i] == texture) {
                     texture_index = static_cast<int>(i);
                     break;
                 }
             }
 
             if (texture_index < 0) {
-                // Not found in slots
-                texture_index = static_cast<int>(storage.quad.texture_slot_index);
-                storage.quad.texture_slots[storage.quad.texture_slot_index] = texture;
-                storage.quad.texture_slot_index++;
+                // Not found in textures
+                texture_index = static_cast<int>(storage.quad.texture_index);
+                storage.quad.textures[storage.quad.texture_index] = texture;
+                storage.quad.texture_index++;
             }
 
             size *= glm::min(scale, glm::vec2(1.0f));
@@ -793,7 +800,7 @@ namespace sm {
         void Renderer::begin_quads_batch() {
             storage.quad.quad_count = 0;
             storage.quad.buffer_pointer = storage.quad.buffer.get();
-            storage.quad.texture_slot_index = 0;
+            storage.quad.texture_index = 0;
         }
 
         void Renderer::end_quads_batch() {
@@ -806,8 +813,8 @@ namespace sm {
         }
 
         void Renderer::flush_quads_batch() {
-            for (std::size_t i {0}; i < storage.quad.texture_slot_index; i++) {
-                opengl::bind_texture_2d(storage.quad.texture_slots[i], static_cast<int>(i));
+            for (std::size_t i {0}; i < storage.quad.texture_index; i++) {
+                opengl::bind_texture_2d(storage.quad.textures[i], static_cast<int>(i));
             }
 
             opengl::draw_elements(static_cast<int>(storage.quad.quad_count * 6));

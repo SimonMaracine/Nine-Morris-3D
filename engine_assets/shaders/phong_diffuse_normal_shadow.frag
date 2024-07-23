@@ -8,7 +8,7 @@ in vec2 v_texture_coordinate;
 in vec4 v_fragment_position_light_space;
 in vec3 v_view_position_tangent_space;
 in vec3 v_light_direction_tangent_space;
-in vec3 v_light_position_tangent_space[POINT_LIGHTS];
+in vec3 v_light_position_tangent_space[D_POINT_LIGHTS];
 
 layout(location = 0) out vec4 o_fragment_color;
 
@@ -19,7 +19,7 @@ layout(shared, binding = 1) uniform DirectionalLight {
 };
 
 layout(shared, binding = 3) uniform PointLight {
-    PointLight_ u_point_lights[POINT_LIGHTS];
+    PointLight_ u_point_lights[D_POINT_LIGHTS];
 };
 
 #include "shaders/common/frag/shadow.glsl"
@@ -45,7 +45,7 @@ void main() {
         shadow
     );
 
-    for (int i = 0; i < POINT_LIGHTS; i++) {
+    for (int i = 0; i < D_POINT_LIGHTS; i++) {
         color += calculate_point_light(
             i,
             ambient_diffuse,

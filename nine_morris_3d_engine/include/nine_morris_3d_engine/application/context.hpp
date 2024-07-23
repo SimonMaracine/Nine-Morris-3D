@@ -72,9 +72,6 @@ namespace sm {
         std::string path_assets(const std::string& path) const;
         std::string path_engine_assets(const std::string& path) const;
 
-        // Shader library
-        std::string load_shader(const std::string& source) const;
-
         // Events
         template<typename E, auto F, typename... T>
         void connect_event(T&&... value_or_instance) { evt.connect<E, F>(value_or_instance...); }
@@ -108,6 +105,7 @@ namespace sm {
         // Renderer
         std::shared_ptr<Font> get_default_font() const;
         void set_color_correction(bool enable);
+        bool get_color_correction() const;
         void set_clear_color(glm::vec3 color);
 
         // OpenAL
@@ -161,7 +159,7 @@ namespace sm {
         std::shared_ptr<Material> load_material(MaterialType type, unsigned int flags = 0);
         std::shared_ptr<Material> load_material(Id id, const std::string& vertex_file_path, const std::string& fragment_file_path, MaterialType type, unsigned int flags = 0);
         std::shared_ptr<MaterialInstance> load_material_instance(Id id, std::shared_ptr<Material> material);
-        std::shared_ptr<GlShader> load_shader(Id id, const std::string& source_vertex, const std::string& source_fragment, bool include_processing = true);
+        std::shared_ptr<GlShader> load_shader(Id id, const std::string& source_vertex, const std::string& source_fragment);
         std::shared_ptr<GlFramebuffer> load_framebuffer(Id id, const FramebufferSpecification& specification);
         std::shared_ptr<Font> load_font(Id id, const std::string& file_path, const FontSpecification& specification);
 
