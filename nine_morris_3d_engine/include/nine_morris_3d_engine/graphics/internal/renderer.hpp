@@ -54,6 +54,7 @@ namespace sm {
 
             std::shared_ptr<Font> get_default_font() const;
             void set_color_correction(bool enable);
+            bool get_color_correction() const;
             void set_clear_color(glm::vec3 color);
 
             void register_shader(std::shared_ptr<GlShader> shader);
@@ -65,8 +66,7 @@ namespace sm {
             void resize_framebuffers(int width, int height);
         private:
             void post_processing(const Scene& scene);
-            void end_3d_rendering(const Scene& scene);
-            void present(int width, int height);
+            void finish_3d(const Scene& scene, int width, int height);
             void screen_quad(const GlShader* shader, unsigned int texture);
 
             // Draw functions
@@ -107,7 +107,6 @@ namespace sm {
 
             struct {
                 std::shared_ptr<GlFramebuffer> scene_framebuffer;
-                std::shared_ptr<GlFramebuffer> intermediate_framebuffer;
                 std::shared_ptr<GlFramebuffer> final_framebuffer;
                 std::shared_ptr<GlFramebuffer> shadow_map_framebuffer;
 

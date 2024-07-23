@@ -62,9 +62,9 @@ namespace sm {
 
             user_name = *name;
 
-    #ifdef SM_BUILD_DISTRIBUTION
+#ifdef SM_BUILD_DISTRIBUTION
             check_and_fix_directories();
-    #endif
+#endif
         }
 
         bool FileSystem::directory_exists(const std::string& path) {
@@ -84,55 +84,55 @@ namespace sm {
         }
 
         std::string FileSystem::path_logs() const {
-    #ifdef SM_BUILD_DISTRIBUTION
-        #if defined(SM_PLATFORM_LINUX)
+#ifdef SM_BUILD_DISTRIBUTION
+    #if defined(SM_PLATFORM_LINUX)
             return USER_DATA_DIRECTORY_PATH(user_name, application_name);
-        #elif defined(SM_PLATFORM_WINDOWS)
+    #elif defined(SM_PLATFORM_WINDOWS)
             return USER_DATA2_DIRECTORY_PATH(user_name, application_name);
-        #endif
-    #else
-            return {};
     #endif
+#else
+            return {};
+#endif
         }
 
         std::string FileSystem::path_saved_data() const {
-    #ifdef SM_BUILD_DISTRIBUTION
-        #if defined(SM_PLATFORM_LINUX)
+#ifdef SM_BUILD_DISTRIBUTION
+    #if defined(SM_PLATFORM_LINUX)
             return USER_DATA_DIRECTORY_PATH(user_name, application_name);
-        #elif defined(SM_PLATFORM_WINDOWS)
+    #elif defined(SM_PLATFORM_WINDOWS)
             return USER_DATA_DIRECTORY_PATH(user_name, application_name);
-        #endif
-    #else
-            return {};
     #endif
+#else
+            return {};
+#endif
         }
 
         std::string FileSystem::path_assets() const {
-    #ifdef SM_BUILD_DISTRIBUTION
-        #if defined(SM_PLATFORM_LINUX)
+#ifdef SM_BUILD_DISTRIBUTION
+    #if defined(SM_PLATFORM_LINUX)
             return DATA_DIRECTORY_PATH(application_name) + assets_directory + '/';
-        #elif defined(SM_PLATFORM_WINDOWS)
+    #elif defined(SM_PLATFORM_WINDOWS)
             return assets_directory + '\\';
-        #endif
-    #else
-        #if defined(SM_PLATFORM_LINUX)
-            return assets_directory + '/';
-        #elif defined(SM_PLATFORM_WINDOWS)
-            return assets_directory + '\\';
-        #endif
     #endif
+#else
+    #if defined(SM_PLATFORM_LINUX)
+            return assets_directory + '/';
+    #elif defined(SM_PLATFORM_WINDOWS)
+            return assets_directory + '\\';
+    #endif
+#endif
         }
 
         std::string FileSystem::path_engine_assets() const {
-    #ifdef SM_BUILD_DISTRIBUTION
-        #if defined(SM_PLATFORM_LINUX)
+#ifdef SM_BUILD_DISTRIBUTION
+    #if defined(SM_PLATFORM_LINUX)
             return DATA_DIRECTORY_PATH(application_name) + "engine_assets/";
-        #elif defined(SM_PLATFORM_WINDOWS)
-            return "engine_assets/";
-        #endif
-    #else
+    #elif defined(SM_PLATFORM_WINDOWS)
             return "engine_assets/";
     #endif
+#else
+            return "engine_assets/";
+#endif
         }
 
         std::string FileSystem::path_logs(const std::string& path) const {
@@ -152,7 +152,7 @@ namespace sm {
         }
 
         void FileSystem::check_and_fix_directories() const {
-    #if defined(SM_PLATFORM_LINUX)
+#if defined(SM_PLATFORM_LINUX)
             const std::string path {USER_DATA_DIRECTORY_PATH(user_name, application_name)};
 
             if (!directory_exists(path)) {
@@ -162,7 +162,7 @@ namespace sm {
                     throw InitializationError("Could not create directory `" + path + "`");
                 }
             }
-    #elif defined(SM_PLATFORM_WINDOWS)
+#elif defined(SM_PLATFORM_WINDOWS)
             std::string path;
 
             path = USER_DATA_DIRECTORY_PATH(user_name, application_name);
@@ -184,7 +184,7 @@ namespace sm {
                     throw InitializationError("Could not create directory `" + path + "`");
                 }
             }
-    #endif
+#endif
         }
     }
 }

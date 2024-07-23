@@ -49,6 +49,8 @@ void GameScene::on_start() {
     cam_controller.connect_events(ctx);
 
     cam_2d.set_projection(0, ctx.get_window_width(), 0, ctx.get_window_height());
+
+    ctx.set_color_correction(color_correction);
 }
 
 void GameScene::on_stop() {
@@ -434,7 +436,7 @@ void GameScene::setup_texts() {
 void GameScene::setup_quads() {
     {
         sm::TextureSpecification specification;
-        specification.format = sm::TextureFormat::Srgba8Alpha;
+        specification.format = sm::TextureFormat::Rgba8;
 
         const auto texture {ctx.load_texture(
             "wait"_H,
@@ -451,7 +453,7 @@ void GameScene::setup_quads() {
         post_processing.size = sm::Size::Half;
 
         sm::TextureSpecification specification;
-        specification.format = sm::TextureFormat::Srgba8Alpha;
+        specification.format = sm::TextureFormat::Rgba8;
 
         const auto texture {ctx.load_texture(
             "white"_H,
@@ -543,29 +545,6 @@ void GameScene::reload_textures(bool srgb) {
         for (const auto& brick : textured_bricks) {
             brick.get_material()->set_texture("u_material.ambient_diffuse"_H, diffuse, 0);
         }
-    }
-
-    {
-        const auto texture {ctx.reload_texture(
-            "wait"_H,
-            ctx.load_texture_data(ctx.path_assets("textures/indicator/wait_indicator.png"), {}),
-            specification
-        )};
-
-        wait.texture = texture;
-    }
-
-    {
-        sm::TexturePostProcessing post_processing;
-        post_processing.size = sm::Size::Half;
-
-        const auto texture {ctx.reload_texture(
-            "white"_H,
-            ctx.load_texture_data(ctx.path_assets("textures/indicator/white_indicator.png"), post_processing),
-            specification
-        )};
-
-        white.texture = texture;
     }
 
     {

@@ -106,23 +106,6 @@ namespace sm {
                 register_framebuffer(storage.scene_framebuffer);
             }
 
-            // Intermediate
-            {
-                FramebufferSpecification specification;
-                specification.width = width;
-                specification.height = height;
-                specification.color_attachments = {
-                    Attachment(AttachmentFormat::Rgba8Float, AttachmentType::Texture)
-                };
-                specification.depth_attachment = Attachment(
-                    AttachmentFormat::Depth32, AttachmentType::Renderbuffer
-                );
-
-                storage.intermediate_framebuffer = std::make_shared<GlFramebuffer>(specification);
-
-                register_framebuffer(storage.intermediate_framebuffer);
-            }
-
             // Final
             {
                 FramebufferSpecification specification;
@@ -300,6 +283,10 @@ namespace sm {
             color_correction = enable;
         }
 
+        bool Renderer::get_color_correction() const {
+            return color_correction;
+        }
+
         void Renderer::set_clear_color(glm::vec3 color) {
             if (color_correction) {
                 color = glm::convertSRGBToLinear(color, 2.2f);
@@ -387,29 +374,21 @@ namespace sm {
 
             // Blit the resulted scene texture to an intermediate texture, resolving anti-aliasing
             storage.scene_framebuffer->blit(
-                storage.intermediate_framebuffer.get(),
+                storage.final_framebuffer.get(),
                 storage.scene_framebuffer->get_specification().width,
                 storage.scene_framebuffer->get_specification().height
             );
 
             // Do post processing and render the final 3D image to the screen
-            storage.intermediate_framebuffer->bind();
-            opengl::viewport(
-                storage.intermediate_framebuffer->get_specification().width,
-                storage.intermediate_framebuffer->get_specification().height
-            );
-
-            end_3d_rendering(scene);
+            finish_3d(scene, width, height);
 
             // 2D stuff
             draw_texts(scene);
             draw_quads(scene);
 
-    #ifndef SM_BUILD_DISTRIBUTION
+#ifndef SM_BUILD_DISTRIBUTION
             debug.render(scene);
-    #endif
-
-            present(width, height);
+#endif
         }
 
         void Renderer::pre_setup() {
@@ -478,13 +457,12 @@ namespace sm {
         }
 
         void Renderer::post_processing(const Scene& scene) {
-            post_processing_context.original_texture = storage.intermediate_framebuffer->get_color_attachment(0);
+            post_processing_context.original_texture = storage.final_framebuffer->get_color_attachment(0);
             post_processing_context.last_texture = post_processing_context.original_texture;
             post_processing_context.textures.clear();
 
             for (const auto& step : scene.post_processing_steps) {
                 step->framebuffer->bind();
-
                 opengl::clear(opengl::Buffers::C);
                 opengl::viewport(step->framebuffer->get_specification().width, step->framebuffer->get_specification().height);
 
@@ -498,42 +476,29 @@ namespace sm {
             }
         }
 
-        void Renderer::end_3d_rendering(const Scene& scene) {
+        void Renderer::finish_3d(const Scene& scene, int width, int height) {
             opengl::disable_depth_test();
+            opengl::disable_blending();
 
             storage.screen_quad_vertex_array->bind();
 
             post_processing(scene);
 
-            storage.final_framebuffer->bind();
-            opengl::clear(opengl::Buffers::CD);  // Clear for debug renderer
-            opengl::viewport(storage.final_framebuffer->get_specification().width, storage.final_framebuffer->get_specification().height);
-
-            screen_quad(storage.screen_quad_shader.get(), post_processing_context.last_texture);
-
-            GlVertexArray::unbind();
-
-            opengl::enable_depth_test();
-        }
-
-        void Renderer::present(int width, int height) {
-            opengl::disable_depth_test();
-
             GlFramebuffer::bind_default();
+            opengl::clear(opengl::Buffers::CD);  // Clear for debug renderer
             opengl::viewport(width, height);
-
-            storage.screen_quad_vertex_array->bind();
 
             if (color_correction) {
                 opengl::enable_framebuffer_srgb();
-                screen_quad(storage.screen_quad_shader.get(), storage.final_framebuffer->get_color_attachment(0));
+                screen_quad(storage.screen_quad_shader.get(), post_processing_context.last_texture);
                 opengl::disable_framebuffer_srgb();
             } else {
-                screen_quad(storage.screen_quad_shader.get(), storage.final_framebuffer->get_color_attachment(0));
+                screen_quad(storage.screen_quad_shader.get(), post_processing_context.last_texture);
             }
 
             GlVertexArray::unbind();
 
+            opengl::enable_blending();
             opengl::enable_depth_test();
         }
 
@@ -726,10 +691,8 @@ namespace sm {
                 matrix = glm::translate(matrix, glm::vec3(text.position, 0.0f));
                 matrix = glm::scale(matrix, glm::vec3(std::min(text.scale, 1.0f), std::min(text.scale, 1.0f), 1.0f));
 
-                const glm::vec3 color {color_correction ? glm::convertSRGBToLinear(text.color, 2.2f) : text.color};
-
                 storage.text.batch_matrices.push_back(matrix);
-                storage.text.batch_colors.push_back(color);
+                storage.text.batch_colors.push_back(text.color);
             }
 
             // Uniforms must be set as arrays

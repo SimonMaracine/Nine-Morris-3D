@@ -170,9 +170,9 @@ namespace sm {
             ImGui_ImplOpenGL3_Init("#version 430 core");
 
             [[maybe_unused]] ImGuiIO& io {ImGui::GetIO()};  // TODO other flags?
-    #ifdef SM_BUILD_DISTRIBUTION
+#ifdef SM_BUILD_DISTRIBUTION
             io.IniFilename = nullptr;
-    #endif
+#endif
         }
 
         void imgui_context::uninitialize() {
