@@ -190,6 +190,9 @@ namespace sm {
     }
 
     void Application::scene_on_stop(MetaScene* meta_scene) {
+        // Long-running tasks are bound to the current scene
+        ctx.tsk.wait_async();
+
         LOG_INFO("Stopping scene...");
 
         meta_scene->scene->on_stop();

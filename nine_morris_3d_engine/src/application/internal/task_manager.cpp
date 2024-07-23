@@ -6,19 +6,32 @@
 
 namespace sm {
     namespace internal {
-        void TaskManager::add(Id id, const Task::TaskFunction& function) {
-            tasks_active.emplace_back(id, function);
+        void TaskManager::add(const Task::TaskFunction& function, void* user_data) {
+            std::lock_guard<std::mutex> lock {mutex};
+
+            tasks_active.emplace_back(function, user_data);
         }
 
-        void TaskManager::remove(Id id) {
-            tasks_active.erase(
-                std::find_if(tasks_active.cbegin(), tasks_active.cend(), [this, id](const Task& task) {
-                    return task.id == id;
-                })
-            );
+        void TaskManager::add_async(const AsyncTask::TaskFunction& function, void* user_data) {
+            std::lock_guard<std::mutex> lock {async.mutex};
+
+            async.tasks.push_back(std::make_unique<AsyncTask>(function, user_data));
         }
 
         void TaskManager::update() {
+            update_tasks();
+            update_async_tasks();
+        }
+
+        void TaskManager::wait_async() {
+            while (!async.tasks.empty()) {
+                update_async_tasks();
+            }
+        }
+
+        void TaskManager::update_tasks() {
+            std::lock_guard<std::mutex> lock {mutex};
+
             for (Task& task : tasks_active) {
                 if (task.start_time == 0.0) {
                     task.start_time = Window::get_time();
@@ -26,24 +39,30 @@ namespace sm {
                     task.total_time = Window::get_time() - task.start_time;
                 }
 
-                task.frames++;
-
-                const Task::Result result {task.function(task)};
+                const Task::Result result {task.function(task, task.user_data)};
 
                 switch (result) {
                     case Task::Result::Done:
                         break;
-                    case Task::Result::Continue:
-                        tasks_next.push_back(task);
-                        break;
                     case Task::Result::Repeat:
-                        // FIXME
+                        tasks_next.push_back(task);
                         break;
                 }
             }
 
-            tasks_active.clear();
             std::swap(tasks_active, tasks_next);
+            tasks_next.clear();
+        }
+
+        void TaskManager::update_async_tasks() {
+            std::lock_guard<std::mutex> lock {async.mutex};
+
+            async.tasks.erase(
+                std::remove_if(async.tasks.begin(), async.tasks.end(), [](const std::unique_ptr<AsyncTask>& async_task) {
+                    return async_task->done.load();
+                }),
+                async.tasks.cend()
+            );
         }
     }
 }

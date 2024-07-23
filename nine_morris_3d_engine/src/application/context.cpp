@@ -151,12 +151,12 @@ namespace sm {
         mus.set_music_gain(gain);
     }
 
-    void Ctx::add_task(Id id, const Task::TaskFunction& function) {
-        tsk.add(id, function);
+    void Ctx::add_task(const Task::TaskFunction& function, void* user_data) {
+        tsk.add(function, user_data);
     }
 
-    void Ctx::remove_task(Id id) {
-        tsk.remove(id);
+    void Ctx::add_task_async(const AsyncTask::TaskFunction& function, void* user_data) {
+        tsk.add_async(function, user_data);
     }
 
     bool Ctx::is_key_pressed(Key key) const {

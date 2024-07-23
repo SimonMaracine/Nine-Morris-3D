@@ -1,37 +1,58 @@
 #pragma once
 
 #include <functional>
-
-#include "nine_morris_3d_engine/application/id.hpp"
+#include <thread>
+#include <atomic>
 
 namespace sm {
     namespace internal {
         class TaskManager;
     }
 
-    class Task {  // TODO on done function
+    // Short-lived procedure executed in the main loop
+    class Task {
     public:
         enum class Result {
             Done,
-            Continue,
             Repeat
         };
 
-        using TaskFunction = std::function<Result(const Task&)>;
+        using TaskFunction = std::function<Result(const Task&, void*)>;
 
-        Task(Id id, const TaskFunction& function)
-            : function(function), id(id) {}
+        Task(const TaskFunction& function, void* user_data)
+            : function(function), user_data(user_data) {}
 
-        Id get_id() const { return id; }
         double get_total_time() const { return total_time; }
-        unsigned int get_frames() const { return frames; }
     private:
         TaskFunction function;
-        Id id;
-
+        void* user_data {nullptr};
         double total_time {};
         double start_time {};
-        unsigned int frames {};
+
+        friend class internal::TaskManager;
+    };
+
+    // Long-lived procedure executed on a separate thread, bound to the calling scene
+    class AsyncTask {
+    public:
+        using TaskFunction = std::function<void(AsyncTask&, void*)>;
+
+        AsyncTask(const TaskFunction& function, void* user_data)
+            : thread(function, std::ref(*this), user_data) {}
+
+        ~AsyncTask() {
+            thread.join();
+        }
+
+        AsyncTask(const AsyncTask&) = delete;
+        AsyncTask& operator=(const AsyncTask&) = delete;
+        AsyncTask(AsyncTask&&) = delete;
+        AsyncTask& operator=(AsyncTask&&) = delete;
+
+        void set_done() { done.store(true); }
+    private:
+        std::thread thread;
+        std::atomic_bool done {false};
 
         friend class internal::TaskManager;
     };

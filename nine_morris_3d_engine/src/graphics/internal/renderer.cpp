@@ -424,13 +424,19 @@ namespace sm {
         }
 
         void Renderer::post_setup() {
-            storage.shaders.erase(std::remove_if(storage.shaders.begin(), storage.shaders.end(), [](const std::weak_ptr<GlShader>& wshader) {
-                return wshader.lock() == nullptr;
-            }), storage.shaders.cend());
+            storage.shaders.erase(
+                std::remove_if(storage.shaders.begin(), storage.shaders.end(), [](const std::weak_ptr<GlShader>& wshader) {
+                    return wshader.lock() == nullptr;
+                }),
+                storage.shaders.cend()
+            );
 
-            storage.framebuffers.erase(std::remove_if(storage.framebuffers.begin(), storage.framebuffers.end(), [](const std::weak_ptr<GlFramebuffer>& wframebuffer) {
-                return wframebuffer.lock() == nullptr;
-            }), storage.framebuffers.cend());
+            storage.framebuffers.erase(
+                std::remove_if(storage.framebuffers.begin(), storage.framebuffers.end(), [](const std::weak_ptr<GlFramebuffer>& wframebuffer) {
+                    return wframebuffer.lock() == nullptr;
+                }),
+                storage.framebuffers.cend()
+            );
 
             for (auto iter {storage.uniform_buffers.begin()}; iter != storage.uniform_buffers.end();) {
                 if (iter->second.lock() == nullptr) {

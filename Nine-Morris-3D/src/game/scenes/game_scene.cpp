@@ -8,14 +8,31 @@
 #include "game/game.hpp"
 
 void GameScene::on_start() {
-    ctx.add_task("test"_H, [this](const sm::Task& task) {
+    ctx.add_task([this](const sm::Task& task, void*) {
         if (task.get_total_time() > 3.0) {
             LOG_DEBUG("Done");
 
             return sm::Task::Result::Done;
         }
 
-        return sm::Task::Result::Continue;
+        return sm::Task::Result::Repeat;
+    });
+
+    ctx.add_task_async([this](sm::AsyncTask& async_task, void*) {
+        using namespace std::chrono_literals;
+
+        for (unsigned int i {0}; i < 7; i++) {
+            LOG_INFO("Doing stuff...");
+            std::this_thread::sleep_for(2s);
+        }
+
+        ctx.add_task([this](const sm::Task&, void*) {
+            LOG_WARNING("DONE");
+
+            return sm::Task::Result::Done;
+        });
+
+        async_task.set_done();
     });
 
     ctx.connect_event<sm::WindowResizedEvent, &GameScene::on_window_resized>(this);
