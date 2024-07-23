@@ -22,6 +22,7 @@ struct GameScene : sm::ApplicationScene {
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
 
+    void setup_skybox();
     void setup_ground();
     void setup_dragon();
     void setup_teapot();
@@ -30,7 +31,6 @@ struct GameScene : sm::ApplicationScene {
     void setup_lamp();
     void setup_barrel();
     void setup_textured_bricks();
-    void setup_skybox();
     void setup_texts();
     void setup_quads();
     void setup_lights();
@@ -54,7 +54,6 @@ struct GameScene : sm::ApplicationScene {
     sm::Renderable lamp_stand;
     sm::Renderable lamp_bulb;
     sm::Renderable barrel;
-
     std::vector<sm::Renderable> textured_bricks;
 
     sm::Text text1;

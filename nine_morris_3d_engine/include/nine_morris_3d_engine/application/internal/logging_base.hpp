@@ -19,7 +19,7 @@ namespace sm {
         private:
             static void set_fallback_logger_distribution(const char* error_message);
 
-            static std::shared_ptr<spdlog::logger> global_logger;
+            static std::shared_ptr<spdlog::logger> g_logger;
         };
     }
 }

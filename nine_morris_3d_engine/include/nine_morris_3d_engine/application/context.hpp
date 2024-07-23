@@ -78,10 +78,10 @@ namespace sm {
         void disconnect_event(T&&... value_or_instance) { evt.disconnect<E, F>(value_or_instance...); }
 
         template<typename T>
-        void disconnect_event(T& value_or_instance) { evt.disconnect(value_or_instance); }
+        void disconnect_events(T& value_or_instance) { evt.disconnect(value_or_instance); }
 
         template<typename T>
-        void disconnect_event(T* value_or_instance) { evt.disconnect(value_or_instance); }
+        void disconnect_events(T* value_or_instance) { evt.disconnect(value_or_instance); }
 
         template<typename E, typename... Args>
         void enqueue_event(Args&&... args) { evt.enqueue<E>(std::forward<Args>(args)...); }

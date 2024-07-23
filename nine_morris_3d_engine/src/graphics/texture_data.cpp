@@ -1,6 +1,7 @@
 #include "nine_morris_3d_engine/graphics/texture_data.hpp"
 
 #include <cstdlib>
+#include <mutex>
 
 #include <stb_image.h>
 #include <stb_image_resize2.h>
@@ -8,7 +9,7 @@
 #include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 
-// Define these to guarantee we're only using only malloc
+// Define these to guarantee we're only using malloc
 #define STBI_MALLOC(size) std::malloc(size)
 #define STBI_REALLOC(ptr, new_size) std::realloc(ptr, new_size)
 #define STBI_FREE(ptr) std::free(ptr)
@@ -18,20 +19,25 @@
 
 namespace sm {
     static constexpr int CHANNELS {4};
+    static std::mutex g_mutex;
 
     TextureData::TextureData(const std::string& buffer, const TexturePostProcessing& post_processing) {
-        stbi_set_flip_vertically_on_load(static_cast<int>(post_processing.flip));
+        {
+            std::lock_guard lock {g_mutex};
 
-        int channels {};
+            stbi_set_flip_vertically_on_load(static_cast<int>(post_processing.flip));
 
-        data = stbi_load_from_memory(
-            reinterpret_cast<const unsigned char*>(buffer.data()),
-            static_cast<int>(buffer.size()),
-            &width,
-            &height,
-            &channels,
-            CHANNELS
-        );
+            int channels {};
+
+            data = stbi_load_from_memory(
+                reinterpret_cast<const unsigned char*>(buffer.data()),
+                static_cast<int>(buffer.size()),
+                &width,
+                &height,
+                &channels,
+                CHANNELS
+            );
+        }
 
         if (data == nullptr) {
             SM_THROW_ERROR(ResourceError, "Could not load texture data");

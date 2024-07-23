@@ -194,7 +194,7 @@ void PointCameraController::connect_events(sm::Ctx& ctx) {
 }
 
 void PointCameraController::disconnect_events(sm::Ctx& ctx) {
-    ctx.disconnect_event(this);
+    ctx.disconnect_events(this);
 }
 
 void PointCameraController::on_mouse_wheel_scrolled(const sm::MouseWheelScrolledEvent& event) {

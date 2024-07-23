@@ -88,7 +88,6 @@ namespace sm {
         LOG_INFO("Closing application...");
 
         ctx.rnd.post_setup();
-
         scene_on_stop(scene.current);
 
         LOG_INFO("Calling user stop function...");
@@ -147,13 +146,11 @@ namespace sm {
             LOG_INFO("Changing scene to {}...", scene.next->scene->name());
 
             ctx.rnd.post_setup();
-
             scene_on_stop(scene.current);
 
             LOG_INFO("Clearing resources cache...");
 
             ctx.res.clear();
-            ctx.evt.disconnect(scene.current->scene);
             scene.current = std::exchange(scene.next, nullptr);
 
             scene_on_start(scene.current);

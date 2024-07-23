@@ -68,6 +68,7 @@ void GameScene::on_start() {
 
 void GameScene::on_stop() {
     cam_controller.disconnect_events(ctx);
+    ctx.disconnect_events(this);
 }
 
 void GameScene::on_update() {
@@ -216,6 +217,21 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     if (event.key == sm::Key::Escape) {
         ctx.change_scene("game"_H);
     }
+}
+
+void GameScene::setup_skybox() {
+    field = ctx.load_texture_cubemap(
+        "field"_H,
+        {
+            heavy_res.texture_data.get("field_px"_H),
+            heavy_res.texture_data.get("field_nx"_H),
+            heavy_res.texture_data.get("field_py"_H),
+            heavy_res.texture_data.get("field_ny"_H),
+            heavy_res.texture_data.get("field_pz"_H),
+            heavy_res.texture_data.get("field_nz"_H)
+        },
+        sm::TextureFormat::Srgba8Alpha
+    );
 }
 
 void GameScene::setup_ground() {
@@ -430,21 +446,6 @@ void GameScene::setup_textured_bricks() {
     }
 }
 
-void GameScene::setup_skybox() {
-    field = ctx.load_texture_cubemap(
-        "field"_H,
-        {
-            heavy_res.texture_data.get("field_px"_H),
-            heavy_res.texture_data.get("field_nx"_H),
-            heavy_res.texture_data.get("field_py"_H),
-            heavy_res.texture_data.get("field_ny"_H),
-            heavy_res.texture_data.get("field_pz"_H),
-            heavy_res.texture_data.get("field_nz"_H)
-        },
-        sm::TextureFormat::Srgba8Alpha
-    );
-}
-
 void GameScene::setup_texts() {
     sm::FontSpecification specification;
     specification.bitmap_size = 512;
@@ -596,6 +597,24 @@ void GameScene::reload_textures(bool srgb) {
 
 void GameScene::load_heavy_resources() {
     {
+        sm::TexturePostProcessing post_processing;
+        post_processing.size = sm::Size::Half;  // Half looks better
+        post_processing.flip = false;
+
+        heavy_res.texture_data.load("field_px"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/px.png")), post_processing);
+        heavy_res.texture_data.load("field_nx"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/nx.png")), post_processing);
+        heavy_res.texture_data.load("field_py"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/py.png")), post_processing);
+        heavy_res.texture_data.load("field_ny"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/ny.png")), post_processing);
+        heavy_res.texture_data.load("field_pz"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/pz.png")), post_processing);
+        heavy_res.texture_data.load("field_nz"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/nz.png")), post_processing);
+    }
+
+    ctx.add_task([this](const sm::Task&, void*) {
+        setup_skybox();
+        return sm::Task::Result::Done;
+    });
+
+    {
         heavy_res.mesh.load("ground"_H, sm::utils::read_file(ctx.path_assets("models/ground.obj")), "Cube", sm::Mesh::Type::PN);
     }
 
@@ -679,21 +698,11 @@ void GameScene::load_heavy_resources() {
         return sm::Task::Result::Done;
     });
 
-    {
-        sm::TexturePostProcessing post_processing;
-        post_processing.size = sm::Size::Half;  // Half looks better
-        post_processing.flip = false;
-
-        heavy_res.texture_data.load("field_px"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/px.png")), post_processing);
-        heavy_res.texture_data.load("field_nx"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/nx.png")), post_processing);
-        heavy_res.texture_data.load("field_py"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/py.png")), post_processing);
-        heavy_res.texture_data.load("field_ny"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/ny.png")), post_processing);
-        heavy_res.texture_data.load("field_pz"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/pz.png")), post_processing);
-        heavy_res.texture_data.load("field_nz"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/nz.png")), post_processing);
-    }
-
+    // This is executed last
     ctx.add_task([this](const sm::Task&, void*) {
-        setup_skybox();
+        heavy_res.texture_data.clear();
+        heavy_res.mesh.clear();
+        heavy_res.sound_data.clear();
         return sm::Task::Result::Done;
     });
 }
