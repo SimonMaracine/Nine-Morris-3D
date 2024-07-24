@@ -275,7 +275,7 @@ void PointCameraController::on_key_released(const sm::KeyReleasedEvent& event) {
     }
 }
 
-void PointCameraController::on_window_moved(const sm::WindowMovedEvent& event) {
+void PointCameraController::on_window_moved(const sm::WindowMovedEvent&) {
     input.key_w = false;
     input.key_a = false;
     input.key_s = false;

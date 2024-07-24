@@ -15,45 +15,43 @@
 struct GLFWwindow;
 struct GLFWcursor;
 
-namespace sm {
-    namespace internal {
-        class Window {
-        public:
-            Window(const ApplicationProperties& properties, EventDispatcher* evt);
-            ~Window();
+namespace sm::internal {
+    class Window {
+    public:
+        Window(const ApplicationProperties& properties, EventDispatcher* evt);
+        ~Window();
 
-            Window(const Window&) = delete;
-            Window& operator=(const Window&) = delete;
-            Window(Window&&) = delete;
-            Window& operator=(Window&&) = delete;
+        Window(const Window&) = delete;
+        Window& operator=(const Window&) = delete;
+        Window(Window&&) = delete;
+        Window& operator=(Window&&) = delete;
 
-            int get_width() const;
-            int get_height() const;
+        int get_width() const;
+        int get_height() const;
 
-            void show() const;
-            void set_vsync(int interval) const;
-            void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
-            void set_cursor(Id id) const;
-            void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
+        void show() const;
+        void set_vsync(int interval) const;
+        void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
+        void set_cursor(Id id) const;
+        void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
 
-            const Monitors& get_monitors();
-            static double get_time();
+        const Monitors& get_monitors();
+        static double get_time();
 
-            GLFWwindow* get_handle() const;
+        GLFWwindow* get_handle() const;
 
-            // Swap buffers and update events
-            void update() const;
-        private:
-            GLFWwindow* create_window(const ApplicationProperties& properties);
-            void install_callbacks() const;
+        // Swap buffers and update events
+        void update() const;
+    private:
+        GLFWwindow* create_window(const ApplicationProperties& properties);
+        void install_callbacks() const;
 
-            int width {};
-            int height {};
+        int width {};
+        int height {};
 
-            GLFWwindow* window {nullptr};
-            Monitors monitors;
-            std::unordered_map<Id, GLFWcursor*, Hash> cursors;
-            EventDispatcher* evt {nullptr};
-        };
-    }
+        GLFWwindow* window {nullptr};
+        Monitors monitors;
+        std::unordered_map<Id, GLFWcursor*, Hash> cursors;
+        EventDispatcher* evt {nullptr};
+    };
 }
