@@ -50,9 +50,11 @@ namespace sm {
         AsyncTask& operator=(AsyncTask&&) = delete;
 
         void set_done() { done.store(true); }
+        bool stop_requested() const { return stop.load(); }
     private:
         std::thread thread;
         std::atomic_bool done {false};
+        std::atomic_bool stop {false};
 
         friend class internal::TaskManager;
     };

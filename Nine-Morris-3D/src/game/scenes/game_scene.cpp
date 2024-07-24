@@ -21,9 +21,14 @@ void GameScene::on_start() {
     ctx.add_task_async([this](sm::AsyncTask& async_task, void*) {
         using namespace std::chrono_literals;
 
-        for (unsigned int i {0}; i < 3; i++) {
+        for (unsigned int i {0}; i < 6; i++) {
+            std::this_thread::sleep_for(3s);
             LOG_INFO("Doing stuff...");
-            std::this_thread::sleep_for(5s);
+
+            if (async_task.stop_requested()) {
+                async_task.set_done();
+                return;
+            }
         }
 
         ctx.add_task([this](const sm::Task&, void*) {

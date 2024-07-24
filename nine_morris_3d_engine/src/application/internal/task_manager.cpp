@@ -24,6 +24,10 @@ namespace sm {
         }
 
         void TaskManager::wait_async() {
+            for (const auto& async_task : async.tasks) {
+                async_task->stop.store(true);
+            }
+
             while (!async.tasks.empty()) {
                 update_async_tasks();
             }
