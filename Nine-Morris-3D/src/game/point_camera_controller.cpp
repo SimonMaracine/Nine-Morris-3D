@@ -191,6 +191,7 @@ void PointCameraController::connect_events(sm::Ctx& ctx) {
     ctx.connect_event<sm::MouseButtonReleasedEvent, &PointCameraController::on_mouse_button_released>(this);
     ctx.connect_event<sm::KeyPressedEvent, &PointCameraController::on_key_pressed>(this);
     ctx.connect_event<sm::KeyReleasedEvent, &PointCameraController::on_key_released>(this);
+    ctx.connect_event<sm::WindowMovedEvent, &PointCameraController::on_window_moved>(this);
 }
 
 void PointCameraController::disconnect_events(sm::Ctx& ctx) {
@@ -221,6 +222,10 @@ void PointCameraController::on_mouse_button_released(const sm::MouseButtonReleas
 }
 
 void PointCameraController::on_key_pressed(const sm::KeyPressedEvent& event) {
+    if (event.repeat) {
+        return;
+    }
+
     switch (event.key) {
         case sm::Key::W:
             input.key_w = true;
@@ -268,6 +273,15 @@ void PointCameraController::on_key_released(const sm::KeyReleasedEvent& event) {
         default:
             break;
     }
+}
+
+void PointCameraController::on_window_moved(const sm::WindowMovedEvent& event) {
+    input.key_w = false;
+    input.key_a = false;
+    input.key_s = false;
+    input.key_d = false;
+    input.key_r = false;
+    input.key_f = false;
 }
 
 void PointCameraController::go_towards_position_x(glm::vec3 direction) {

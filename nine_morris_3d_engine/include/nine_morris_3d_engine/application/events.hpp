@@ -20,6 +20,11 @@ namespace sm {
         bool iconified {};
     };
 
+    struct WindowMovedEvent {
+        int position_x {};
+        int position_y {};
+    };
+
     struct KeyPressedEvent {
         Key key {};
         bool repeat {};
@@ -69,6 +74,7 @@ SM_EVENT_FORMATTER(sm::WindowClosedEvent, "WindowClosedEvent")
 SM_EVENT_FORMATTER(sm::WindowResizedEvent, "WindowResizedEvent({}, {})", event.width, event.height)
 SM_EVENT_FORMATTER(sm::WindowFocusedEvent, "WindowFocusedEvent({})", event.focused)
 SM_EVENT_FORMATTER(sm::WindowIconifiedEvent, "WindowIconifiedEvent({})", event.iconified)
+SM_EVENT_FORMATTER(sm::WindowMovedEvent, "WindowMovedEvent({}, {})", event.position_x, event.position_y)
 SM_EVENT_FORMATTER(sm::KeyPressedEvent, "KeyPressedEvent({}, {})", static_cast<int>(event.key), event.repeat)
 SM_EVENT_FORMATTER(sm::KeyReleasedEvent, "KeyReleasedEvent({})", static_cast<int>(event.key))
 SM_EVENT_FORMATTER(sm::MouseButtonPressedEvent, "MouseButtonPressedEvent({})", static_cast<int>(event.button))

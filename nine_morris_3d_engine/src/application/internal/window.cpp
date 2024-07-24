@@ -232,6 +232,12 @@ namespace sm {
                 win->evt->enqueue<WindowIconifiedEvent>(static_cast<bool>(iconified));
             });
 
+            glfwSetWindowPosCallback(window, [](GLFWwindow* window, int xpos, int ypos) {
+                auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
+
+                win->evt->enqueue<WindowMovedEvent>(xpos, ypos);
+            });
+
             glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
                 auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 
