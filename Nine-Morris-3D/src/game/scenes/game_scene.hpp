@@ -40,6 +40,7 @@ struct GameScene : sm::ApplicationScene {
     void setup_texts();
     void setup_quads();
     void setup_lights();
+    void setup_sounds();
 
     void reload_textures(bool srgb);
     void load_heavy_resources();
@@ -71,6 +72,12 @@ struct GameScene : sm::ApplicationScene {
 
     std::shared_ptr<sm::GlTextureCubemap> field;
     std::shared_ptr<sm::Font> sans;
+    std::shared_ptr<sm::AlSource> emitter;
+    std::shared_ptr<sm::AlBuffer> sound_move;
+    std::shared_ptr<sm::AlBuffer> sound_place;
+    std::shared_ptr<sm::MusicTrack> relaxing;
+
+    bool music_playing {false};
 
     bool sky {true};
     bool blur {false};

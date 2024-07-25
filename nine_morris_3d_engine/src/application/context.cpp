@@ -1,6 +1,5 @@
 #include "nine_morris_3d_engine/application/context.hpp"
 
-#include <utility>
 #include <array>
 #include <cassert>
 
@@ -128,23 +127,23 @@ namespace sm {
     }
 
     void Ctx::play_music_track(std::shared_ptr<MusicTrack> music_track) {
-        mus.play_music_track(music_track);
+        mus.play(music_track);
     }
 
     void Ctx::stop_music_track() {
-        mus.stop_music_track();
+        mus.stop();
     }
 
     void Ctx::pause_music_track() {
-        mus.pause_music_track();
+        mus.pause();
     }
 
-    void Ctx::continue_music_track() {
-        mus.continue_music_track();
+    void Ctx::resume_music_track() {
+        mus.resume();
     }
 
     void Ctx::set_music_gain(float gain) {
-        mus.set_music_gain(gain);
+        mus.set_gain(gain);
     }
 
     void Ctx::add_task(const Task::TaskFunction& function, void* user_data) {
@@ -577,14 +576,32 @@ namespace sm {
             return res.font->get(id);
         }
 
-        const auto font {res.font->force_load(
-            id,
-            utils::read_file(file_path),
-            specification
-        )};
+        const auto font {res.font->force_load(id, utils::read_file(file_path), specification)};
 
         bake(font.get());
 
         return font;
+    }
+
+    std::shared_ptr<SoundData> Ctx::load_sound_data(const std::string& file_path) {
+        const auto id {Id(utils::file_name(file_path))};
+
+        if (res.sound_data->contains(id)) {
+            return res.sound_data->get(id);
+        }
+
+        return res.sound_data->force_load(id, utils::read_file(file_path));
+    }
+
+    std::shared_ptr<MusicTrack> Ctx::load_music_track(Id id, std::shared_ptr<SoundData> sound_data) {
+        return res.music_track->load(id, sound_data);
+    }
+
+    std::shared_ptr<AlSource> Ctx::load_source(Id id) {
+        return res.source->load(id);
+    }
+
+    std::shared_ptr<AlBuffer> Ctx::load_buffer(Id id, std::shared_ptr<SoundData> sound_data) {
+        return res.buffer->load(id, sound_data);
     }
 }

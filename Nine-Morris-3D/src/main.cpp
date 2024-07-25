@@ -41,7 +41,7 @@ int application_main() {
             properties.info_file = INFO_FILE;
             properties.log_file = LOG_FILE;
             properties.assets_directory = ASSETS_DIRECTORY;
-            // properties.audio = true;
+            properties.audio = true;
 
             sm::UserFunctions functions;
             functions.start = game_start;

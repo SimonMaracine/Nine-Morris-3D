@@ -80,6 +80,8 @@ void GameScene::on_update() {
     cam_controller.update_controls(ctx.get_delta(), ctx);
     cam_controller.update_camera(ctx.get_delta());
 
+    sm::listener::set_position(cam_controller.get_position());
+
     ctx.capture(cam, cam_controller.get_position());
     ctx.capture(cam_2d);
 
@@ -219,8 +221,28 @@ void GameScene::on_window_resized(const sm::WindowResizedEvent& event) {
 }
 
 void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
-    if (event.key == sm::Key::Escape) {
-        ctx.change_scene("game"_H);
+    switch (event.key) {
+        case sm::Key::Escape:
+            ctx.change_scene("game"_H);
+            break;
+        case sm::Key::M:
+            if (emitter && sound_move) emitter->play(sound_move.get());
+            break;
+        case sm::Key::P:
+            if (emitter && sound_place) emitter->play(sound_place.get());
+            break;
+        case sm::Key::Space:
+            if (music_playing) {
+                if (relaxing) ctx.stop_music_track();
+            } else {
+                if (relaxing) ctx.play_music_track(relaxing);
+            }
+
+            if (relaxing) music_playing = !music_playing;
+
+            break;
+        default:
+            break;
     }
 }
 
@@ -515,6 +537,15 @@ void GameScene::setup_lights() {
     point_light.falloff_quadratic = 0.032f;
 }
 
+void GameScene::setup_sounds() {
+    sound_move = ctx.load_buffer("piece_move"_H, ctx.load_sound_data(ctx.path_assets("sounds/piece_move-01.ogg")));
+    sound_place = ctx.load_buffer("piece_place"_H, ctx.load_sound_data(ctx.path_assets("sounds/piece_place-01.ogg")));
+    relaxing = ctx.load_music_track("relaxing"_H, ctx.load_sound_data(ctx.path_assets("sounds/music/relaxing.ogg")));
+
+    emitter = ctx.load_source("source"_H);
+    emitter->set_position(glm::vec3(0.0f));
+}
+
 void GameScene::reload_textures(bool srgb) {
     const sm::TextureFormat format {srgb ? sm::TextureFormat::Srgba8Alpha : sm::TextureFormat::Rgba8};
 
@@ -683,6 +714,17 @@ void GameScene::load_heavy_resources() {
 
         ctx.add_task([=](const sm::Task&, void*) {
             setup_textured_bricks(mesh, load_texture);
+            return sm::Task::Result::Done;
+        });
+    }
+
+    {
+        ctx.load_sound_data(ctx.path_assets("sounds/piece_move-01.ogg"));
+        ctx.load_sound_data(ctx.path_assets("sounds/piece_place-01.ogg"));
+        ctx.load_sound_data(ctx.path_assets("sounds/music/relaxing.ogg"));
+
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_sounds();
             return sm::Task::Result::Done;
         });
     }

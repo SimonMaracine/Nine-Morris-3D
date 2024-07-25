@@ -41,23 +41,21 @@ namespace sm::internal {
     struct ResourcesCache {
         void clear();
 
-        LockedCache<GlTexture> texture;
-        LockedCache<GlTextureCubemap> texture_cubemap;
-        LockedCache<GlVertexArray> vertex_array;
-        LockedCache<GlShader> shader;
-        LockedCache<GlVertexBuffer> vertex_buffer;
-        LockedCache<GlIndexBuffer> index_buffer;
-        // resmanager::Cache<GlUniformBuffer> uniform_buffer;
-        // resmanager::Cache<GlPixelBuffer> pixel_buffer;
-        LockedCache<GlFramebuffer> framebuffer;
+        LockedCache<Mesh> mesh;
+        LockedCache<TextureData> texture_data;
         LockedCache<Font> font;
         LockedCache<Material> material;
         LockedCache<MaterialInstance> material_instance;
-        LockedCache<TextureData> texture_data;
-        LockedCache<Mesh> mesh;
-        // resmanager::Cache<AlSource> al_source;
-        // resmanager::Cache<AlBuffer> al_buffer;
-        // resmanager::Cache<SoundData> sound_data;
-        // resmanager::Cache<MusicTrack> music_track;
+        LockedCache<GlTexture> texture;
+        LockedCache<GlTextureCubemap> texture_cubemap;
+        LockedCache<GlVertexArray> vertex_array;
+        LockedCache<GlVertexBuffer> vertex_buffer;
+        LockedCache<GlIndexBuffer> index_buffer;
+        LockedCache<GlShader> shader;
+        LockedCache<GlFramebuffer> framebuffer;
+        LockedCache<SoundData> sound_data;
+        LockedCache<MusicTrack> music_track;
+        LockedCache<AlSource> source;
+        LockedCache<AlBuffer> buffer;
     };
 }

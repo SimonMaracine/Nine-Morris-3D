@@ -6,8 +6,6 @@
 #include <initializer_list>
 #include <functional>
 
-#include <resmanager/resmanager.hpp>
-
 #include "nine_morris_3d_engine/application/internal/file_system.hpp"
 #include "nine_morris_3d_engine/application/internal/logging_base.hpp"
 #include "nine_morris_3d_engine/application/internal/event_dispatcher.hpp"
@@ -19,6 +17,10 @@
 #include "nine_morris_3d_engine/application/id.hpp"
 #include "nine_morris_3d_engine/audio/internal/context.hpp"
 #include "nine_morris_3d_engine/audio/internal/music_player.hpp"
+#include "nine_morris_3d_engine/audio/openal/buffer.hpp"
+#include "nine_morris_3d_engine/audio/openal/source.hpp"
+#include "nine_morris_3d_engine/audio/music_track.hpp"
+#include "nine_morris_3d_engine/audio/sound_data.hpp"
 #include "nine_morris_3d_engine/graphics/internal/shader_library.hpp"
 #include "nine_morris_3d_engine/graphics/internal/renderer.hpp"
 #include "nine_morris_3d_engine/graphics/internal/scene.hpp"
@@ -111,7 +113,7 @@ namespace sm {
         void play_music_track(std::shared_ptr<MusicTrack> music_track);
         void stop_music_track();
         void pause_music_track();
-        void continue_music_track();
+        void resume_music_track();
         void set_music_gain(float gain);
 
         // Task manager
@@ -159,6 +161,10 @@ namespace sm {
         std::shared_ptr<GlShader> load_shader(Id id, const std::string& source_vertex, const std::string& source_fragment);
         std::shared_ptr<GlFramebuffer> load_framebuffer(Id id, const FramebufferSpecification& specification);
         std::shared_ptr<Font> load_font(Id id, const std::string& file_path, const FontSpecification& specification, const std::function<void(Font*)>& bake);
+        std::shared_ptr<SoundData> load_sound_data(const std::string& file_path);
+        std::shared_ptr<MusicTrack> load_music_track(Id id, std::shared_ptr<SoundData> sound_data);
+        std::shared_ptr<AlSource> load_source(Id id);
+        std::shared_ptr<AlBuffer> load_buffer(Id id, std::shared_ptr<SoundData> sound_data);
 
         template<typename T>
         T& global() {
