@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <initializer_list>
+#include <functional>
 
 #include <resmanager/resmanager.hpp>
 
@@ -143,7 +144,7 @@ namespace sm {
         void debug_add_lamp(glm::vec3 position, glm::vec3 color);
 
         // Context
-        void change_scene(Id id);
+        void change_scene(Id id, bool clear_resources = false);
         void show_info_text();
         std::string get_information() const;
 
@@ -160,7 +161,7 @@ namespace sm {
         std::shared_ptr<MaterialInstance> load_material_instance(Id id, std::shared_ptr<Material> material);
         std::shared_ptr<GlShader> load_shader(Id id, const std::string& source_vertex, const std::string& source_fragment);
         std::shared_ptr<GlFramebuffer> load_framebuffer(Id id, const FramebufferSpecification& specification);
-        std::shared_ptr<Font> load_font(Id id, const std::string& file_path, const FontSpecification& specification);
+        std::shared_ptr<Font> load_font(Id id, const std::string& file_path, const FontSpecification& specification, const std::function<void(Font*)>& bake);
 
         template<typename T>
         T& global() {

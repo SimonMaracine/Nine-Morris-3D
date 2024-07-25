@@ -5,7 +5,6 @@
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 
 #include "game/point_camera_controller.hpp"
-#include "game/heavy_resources.hpp"
 
 struct GameScene : sm::ApplicationScene {
     explicit GameScene(sm::Ctx& ctx)
@@ -22,15 +21,22 @@ struct GameScene : sm::ApplicationScene {
     void on_window_resized(const sm::WindowResizedEvent& event);
     void on_key_released(const sm::KeyReleasedEvent& event);
 
-    void setup_skybox();
-    void setup_ground();
-    void setup_dragon();
-    void setup_teapot();
-    void setup_cube();
-    void setup_brick();
-    void setup_lamp();
-    void setup_barrel();
-    void setup_textured_bricks();
+    void setup_skybox(
+        std::shared_ptr<sm::TextureData> px,
+        std::shared_ptr<sm::TextureData> nx,
+        std::shared_ptr<sm::TextureData> py,
+        std::shared_ptr<sm::TextureData> ny,
+        std::shared_ptr<sm::TextureData> pz,
+        std::shared_ptr<sm::TextureData> nz
+    );
+    void setup_ground(std::shared_ptr<sm::Mesh> mesh);
+    void setup_dragon(std::shared_ptr<sm::Mesh> mesh);
+    void setup_teapot(std::shared_ptr<sm::Mesh> mesh);
+    void setup_cube(std::shared_ptr<sm::Mesh> mesh);
+    void setup_brick(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data);
+    void setup_lamp(std::shared_ptr<sm::Mesh> mesh_stand, std::shared_ptr<sm::TextureData> texture_data_stand, std::shared_ptr<sm::Mesh> mesh_bulb);
+    void setup_barrel(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data_diffuse, std::shared_ptr<sm::TextureData> texture_data_normal);
+    void setup_textured_bricks(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data);
     void setup_texts();
     void setup_quads();
     void setup_lights();
@@ -70,6 +76,4 @@ struct GameScene : sm::ApplicationScene {
     bool blur {false};
     bool outline {true};
     bool color_correction {true};
-
-    HeavyResources heavy_res;
 };

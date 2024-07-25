@@ -22,9 +22,7 @@ namespace sm::internal {
         std::vector<Task> tasks_next;
         std::mutex mutex;
 
-        struct {
-            std::vector<std::unique_ptr<AsyncTask>> tasks;
-            std::mutex mutex;
-        } async;
+        std::vector<std::unique_ptr<AsyncTask>> async_tasks;
+        std::mutex async_mutex;
     };
 }

@@ -231,12 +231,13 @@ namespace sm {
         scn.debug_add_lamp(position, color);
     }
 
-    void Ctx::change_scene(Id id) {
-        assert(application->scene.next == nullptr);
+    void Ctx::change_scene(Id id, bool clear_resources) {
+        assert(application->scene_next == nullptr);
 
-        for (auto& meta_scene : application->scene.meta_scenes) {
+        for (auto& meta_scene : application->scene_meta_scenes) {
             if (meta_scene.id == id) {
-                application->scene.next = &meta_scene;
+                application->scene_next = &meta_scene;
+                application->scene_clear_resources = clear_resources;
                 return;
             }
         }
@@ -274,24 +275,34 @@ namespace sm {
     }
 
     std::shared_ptr<Mesh> Ctx::load_mesh(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
-        return res.mesh.load(id, utils::read_file(file_path), mesh_name, type);
+        if (res.mesh->contains(id)) {
+            return res.mesh->get(id);
+        }
+
+        return res.mesh->force_load(id, utils::read_file(file_path), mesh_name, type);
     }
 
     std::shared_ptr<Mesh> Ctx::load_mesh(const std::string& file_path, const std::string& mesh_name, Mesh::Type type) {
-        return res.mesh.load(Id(utils::file_name(file_path)), utils::read_file(file_path), mesh_name, type);
+        const auto id {Id(utils::file_name(file_path))};
+
+        if (res.mesh->contains(id)) {
+            return res.mesh->get(id);
+        }
+
+        return res.mesh->force_load(id, utils::read_file(file_path), mesh_name, type);
     }
 
     std::shared_ptr<GlVertexArray> Ctx::load_vertex_array(Id id, std::shared_ptr<Mesh> mesh) {
-        const auto vertex_buffer {res.vertex_buffer.load(id, mesh->get_vertices(), mesh->get_vertices_size())};
-        const auto index_buffer {res.index_buffer.load(id, mesh->get_indices(), mesh->get_indices_size())};
+        const auto vertex_buffer {res.vertex_buffer->load(id, mesh->get_vertices(), mesh->get_vertices_size())};
+        const auto index_buffer {res.index_buffer->load(id, mesh->get_indices(), mesh->get_indices_size())};
 
-        const auto [vertex_array, present] {res.vertex_array.load_check(id)};
+        const auto [vertex_array, present] {res.vertex_array->load_check(id)};
 
         if (present) {
             return vertex_array;
         }
 
-        vertex_array->configure([&](GlVertexArray* va) {
+        vertex_array->configure([=](GlVertexArray* va) {
             VertexBufferLayout layout;
 
             switch (mesh->get_type()) {
@@ -325,27 +336,27 @@ namespace sm {
     std::shared_ptr<TextureData> Ctx::load_texture_data(const std::string& file_path, const TexturePostProcessing& post_processing) {
         const auto id {Id(utils::file_name(file_path))};
 
-        if (res.texture_data.contains(id)) {
-            return res.texture_data.get(id);
+        if (res.texture_data->contains(id)) {
+            return res.texture_data->get(id);
         }
 
-        return res.texture_data.force_load(id, utils::read_file(file_path), post_processing);
+        return res.texture_data->force_load(id, utils::read_file(file_path), post_processing);
     }
 
     std::shared_ptr<GlTexture> Ctx::load_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification) {
-        return res.texture.load(id, texture_data, specification);
+        return res.texture->load(id, texture_data, specification);
     }
 
     std::shared_ptr<GlTexture> Ctx::reload_texture(Id id, std::shared_ptr<TextureData> texture_data, const TextureSpecification& specification) {
-        return res.texture.force_load(id, texture_data, specification);
+        return res.texture->force_load(id, texture_data, specification);
     }
 
     std::shared_ptr<GlTextureCubemap> Ctx::load_texture_cubemap(Id id, std::initializer_list<std::shared_ptr<TextureData>> texture_data, TextureFormat format) {
-        return res.texture_cubemap.load(id, texture_data, format);
+        return res.texture_cubemap->load(id, texture_data, format);
     }
 
     std::shared_ptr<GlTextureCubemap> Ctx::reload_texture_cubemap(Id id, std::initializer_list<std::shared_ptr<TextureData>> texture_data, TextureFormat format) {
-        return res.texture_cubemap.force_load(id, texture_data, format);
+        return res.texture_cubemap->force_load(id, texture_data, format);
     }
 
     std::shared_ptr<Material> Ctx::load_material(MaterialType type, unsigned int flags) {
@@ -361,7 +372,7 @@ namespace sm {
                     fs.path_engine_assets("shaders/flat.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(id, shader, flags)};
+                const auto [material, present] {res.material->load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -380,7 +391,7 @@ namespace sm {
                     fs.path_engine_assets("shaders/phong.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(id, shader, flags)};
+                const auto [material, present] {res.material->load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -401,7 +412,7 @@ namespace sm {
                     fs.path_engine_assets("shaders/phong_shadow.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(id, shader, flags)};
+                const auto [material, present] {res.material->load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -422,7 +433,7 @@ namespace sm {
                     fs.path_engine_assets("shaders/phong_diffuse.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(id, shader, flags)};
+                const auto [material, present] {res.material->load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -443,7 +454,7 @@ namespace sm {
                     fs.path_engine_assets("shaders/phong_diffuse_shadow.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(id, shader, flags)};
+                const auto [material, present] {res.material->load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -464,7 +475,7 @@ namespace sm {
                     fs.path_engine_assets("shaders/phong_diffuse_normal_shadow.frag")
                 )};
 
-                const auto [material, present] {res.material.load_check(id, shader, flags)};
+                const auto [material, present] {res.material->load_check(id, shader, flags)};
 
                 if (present) {
                     return material;
@@ -488,7 +499,7 @@ namespace sm {
 
         const auto shader {load_shader(id, vertex_file_path, fragment_file_path)};
 
-        const auto [material, present] {res.material.load_check(id, shader, flags)};
+        const auto [material, present] {res.material->load_check(id, shader, flags)};
 
         if (present) {
             return material;
@@ -526,16 +537,16 @@ namespace sm {
     }
 
     std::shared_ptr<MaterialInstance> Ctx::load_material_instance(Id id, std::shared_ptr<Material> material) {
-        return res.material_instance.load(id, material);
+        return res.material_instance->load(id, material);
     }
 
     std::shared_ptr<GlShader> Ctx::load_shader(Id id, const std::string& vertex_file_path, const std::string& fragment_file_path) {
-        if (res.shader.contains(id)) {
-            return res.shader.get(id);
+        if (res.shader->contains(id)) {
+            return res.shader->get(id);
         }
 
         std::shared_ptr<GlShader> shader {
-            res.shader.force_load(
+            res.shader->force_load(
                 id,
                 shd.load_shader(
                     shd.load_shader(utils::read_file(vertex_file_path)),
@@ -554,7 +565,7 @@ namespace sm {
     }
 
     std::shared_ptr<GlFramebuffer> Ctx::load_framebuffer(Id id, const FramebufferSpecification& specification) {
-        const auto [framebuffer, present] {res.framebuffer.load_check(id, specification)};
+        const auto [framebuffer, present] {res.framebuffer->load_check(id, specification)};
 
         if (present) {
             return framebuffer;
@@ -565,11 +576,19 @@ namespace sm {
         return framebuffer;
     }
 
-    std::shared_ptr<Font> Ctx::load_font(Id id, const std::string& file_path, const FontSpecification& specification) {
-        return res.font.load(
+    std::shared_ptr<Font> Ctx::load_font(Id id, const std::string& file_path, const FontSpecification& specification, const std::function<void(Font*)>& bake) {
+        if (res.font->contains(id)) {
+            return res.font->get(id);
+        }
+
+        const auto font {res.font->force_load(
             id,
             utils::read_file(file_path),
             specification
-        );
+        )};
+
+        bake(font.get());
+
+        return font;
     }
 }

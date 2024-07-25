@@ -1,6 +1,5 @@
 #include "nine_morris_3d_engine/application/application.hpp"
 
-#include <memory>
 #include <algorithm>
 #include <utility>
 #include <cassert>
@@ -53,7 +52,7 @@ namespace sm {
 
         user_functions.start(ctx);
 
-        scene_on_start(scene.current);
+        scene_on_start(scene_current);
         ctx.rnd.pre_setup();
 
         ctx.win.show();
@@ -65,10 +64,10 @@ namespace sm {
             const unsigned int fixed_updates {calculate_fixed_update()};
 
             for (unsigned int i {0}; i < fixed_updates; i++) {
-                scene.current->scene->on_fixed_update();
+                scene_current->scene->on_fixed_update();
             }
 
-            scene.current->scene->on_update();
+            scene_current->scene->on_update();
             ctx.tsk.update();
 
             if (!minimized) {
@@ -88,7 +87,7 @@ namespace sm {
         LOG_INFO("Closing application...");
 
         ctx.rnd.post_setup();
-        scene_on_stop(scene.current);
+        scene_on_stop(scene_current);
 
         LOG_INFO("Calling user stop function...");
 
@@ -142,41 +141,44 @@ namespace sm {
     }
 
     void Application::check_changed_scene() {
-        if (scene.next != nullptr) {
-            LOG_INFO("Changing scene to {}...", scene.next->scene->name());
+        if (scene_next != nullptr) {
+            LOG_INFO("Changing scene to {}...", scene_next->scene->name());
 
             ctx.rnd.post_setup();
-            scene_on_stop(scene.current);
+            scene_on_stop(scene_current);
 
-            LOG_INFO("Clearing resources cache...");
+            if (scene_clear_resources) {
+                LOG_INFO("Clearing resources cache...");
 
-            ctx.res.clear();
-            scene.current = std::exchange(scene.next, nullptr);
+                ctx.res.clear();
+            }
 
-            scene_on_start(scene.current);
+            scene_current = std::exchange(scene_next, nullptr);
+
+            scene_on_start(scene_current);
             ctx.rnd.pre_setup();
         }
 
-        assert(scene.next == nullptr);
+        assert(scene_next == nullptr);
     }
 
     void Application::dear_imgui_render() {
         internal::imgui_context::begin_frame();
 
-        scene.current->scene->on_imgui_update();
+        scene_current->scene->on_imgui_update();
         ctx.dbg.render_dear_imgui(ctx.scn, ctx);
 
         internal::imgui_context::end_frame();
     }
 
     void Application::setup_start_scene(Id start_scene_id) {
-        for (auto& meta_scene : scene.meta_scenes) {
+        for (auto& meta_scene : scene_meta_scenes) {
             if (meta_scene.id == start_scene_id) {
-                scene.current = &meta_scene;
+                scene_current = &meta_scene;
             }
         }
 
-        assert(scene.current != nullptr);
+        assert(scene_current != nullptr);
     }
 
     void Application::scene_on_start(MetaScene* meta_scene) {

@@ -35,7 +35,7 @@ namespace sm {
         // Add scenes to the application before calling run()
         template<typename S>
         void add_scene() {
-            scene.meta_scenes.push_back({
+            scene_meta_scenes.push_back({
                 Id(S::static_name()),
                 [this]() {
                     return std::make_unique<S>(ctx);
@@ -71,11 +71,13 @@ namespace sm {
         void on_window_resized(const WindowResizedEvent& event);
         void on_window_iconified(const WindowIconifiedEvent& event);
 
-        struct {
-            std::vector<MetaScene> meta_scenes;
-            MetaScene* current {nullptr};
-            MetaScene* next {nullptr};
-        } scene;
+        std::vector<MetaScene> scene_meta_scenes;
+        MetaScene* scene_current {nullptr};
+        MetaScene* scene_next {nullptr};
+        bool scene_clear_resources {};
+
+        // Keep track of window state to skip rendering
+        bool minimized {false};
 
         // Clock variables
         struct {
@@ -88,9 +90,6 @@ namespace sm {
             double previous_seconds {};
             double total_time {};
         } fixed_update;
-
-        // Keep track of window state to skip rendering
-        bool minimized {false};
 
         friend class ApplicationScene;
         friend class Window;

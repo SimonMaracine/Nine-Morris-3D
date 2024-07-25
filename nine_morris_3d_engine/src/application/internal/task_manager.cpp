@@ -12,9 +12,9 @@ namespace sm::internal {
     }
 
     void TaskManager::add_async(const AsyncTask::TaskFunction& function, void* user_data) {
-        std::lock_guard<std::mutex> lock {async.mutex};
+        std::lock_guard<std::mutex> lock {async_mutex};
 
-        async.tasks.push_back(std::make_unique<AsyncTask>(function, user_data));
+        async_tasks.push_back(std::make_unique<AsyncTask>(function, user_data));
     }
 
     void TaskManager::update() {
@@ -23,11 +23,11 @@ namespace sm::internal {
     }
 
     void TaskManager::wait_async() {
-        for (const auto& async_task : async.tasks) {
+        for (const auto& async_task : async_tasks) {
             async_task->stop.store(true);
         }
 
-        while (!async.tasks.empty()) {
+        while (!async_tasks.empty()) {
             update_async_tasks();
         }
     }
@@ -58,13 +58,13 @@ namespace sm::internal {
     }
 
     void TaskManager::update_async_tasks() {
-        std::lock_guard<std::mutex> lock {async.mutex};
+        std::lock_guard<std::mutex> lock {async_mutex};
 
-        async.tasks.erase(
-            std::remove_if(async.tasks.begin(), async.tasks.end(), [](const std::unique_ptr<AsyncTask>& async_task) {
+        async_tasks.erase(
+            std::remove_if(async_tasks.begin(), async_tasks.end(), [](const std::unique_ptr<AsyncTask>& async_task) {
                 return async_task->done.load();
             }),
-            async.tasks.cend()
+            async_tasks.cend()
         );
     }
 }

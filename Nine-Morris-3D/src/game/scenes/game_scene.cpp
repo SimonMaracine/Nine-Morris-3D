@@ -10,7 +10,7 @@
 void GameScene::on_start() {
     ctx.add_task([this](const sm::Task& task, void*) {
         if (task.get_total_time() > 3.0) {
-            LOG_DEBUG("Done");
+            LOG_INFO("Three second task done");
 
             return sm::Task::Result::Done;
         }
@@ -32,7 +32,7 @@ void GameScene::on_start() {
         }
 
         ctx.add_task([this](const sm::Task&, void*) {
-            LOG_WARNING("DONE");
+            LOG_INFO("Long running task done");
 
             return sm::Task::Result::Done;
         });
@@ -224,24 +224,22 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
     }
 }
 
-void GameScene::setup_skybox() {
+void GameScene::setup_skybox(
+    std::shared_ptr<sm::TextureData> px,
+    std::shared_ptr<sm::TextureData> nx,
+    std::shared_ptr<sm::TextureData> py,
+    std::shared_ptr<sm::TextureData> ny,
+    std::shared_ptr<sm::TextureData> pz,
+    std::shared_ptr<sm::TextureData> nz
+) {
     field = ctx.load_texture_cubemap(
         "field"_H,
-        {
-            heavy_res.texture_data.get("field_px"_H),
-            heavy_res.texture_data.get("field_nx"_H),
-            heavy_res.texture_data.get("field_py"_H),
-            heavy_res.texture_data.get("field_ny"_H),
-            heavy_res.texture_data.get("field_pz"_H),
-            heavy_res.texture_data.get("field_nz"_H)
-        },
+        {px, nx, py, ny, pz, nz},
         sm::TextureFormat::Srgba8Alpha
     );
 }
 
-void GameScene::setup_ground() {
-    const auto mesh {heavy_res.mesh.get("ground"_H)};
-
+void GameScene::setup_ground(std::shared_ptr<sm::Mesh> mesh) {
     const auto vertex_array {ctx.load_vertex_array("ground"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
@@ -256,9 +254,7 @@ void GameScene::setup_ground() {
     ground.transform.scale = 2.0f;
 }
 
-void GameScene::setup_dragon() {
-    const auto mesh {heavy_res.mesh.get("dragon"_H)};
-
+void GameScene::setup_dragon(std::shared_ptr<sm::Mesh> mesh) {
     const auto vertex_array {ctx.load_vertex_array("dragon"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
@@ -288,9 +284,7 @@ void GameScene::setup_dragon() {
     }
 }
 
-void GameScene::setup_teapot() {
-    const auto mesh {heavy_res.mesh.get("teapot"_H)};
-
+void GameScene::setup_teapot(std::shared_ptr<sm::Mesh> mesh) {
     const auto vertex_array {ctx.load_vertex_array("teapot"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
@@ -306,9 +300,7 @@ void GameScene::setup_teapot() {
     teapot.transform.rotation = glm::vec3(0.0f, 5.3f, 0.0f);
 }
 
-void GameScene::setup_cube() {
-    const auto mesh {heavy_res.mesh.get("cube"_H)};
-
+void GameScene::setup_cube(std::shared_ptr<sm::Mesh> mesh) {
     const auto vertex_array {ctx.load_vertex_array("cube"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongShadow, sm::Material::CastShadow)};
@@ -323,9 +315,7 @@ void GameScene::setup_cube() {
     cube.transform.scale = 0.8f;
 }
 
-void GameScene::setup_brick() {
-    const auto mesh {heavy_res.mesh.get("brick"_H)};
-
+void GameScene::setup_brick(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data) {
     const auto vertex_array {ctx.load_vertex_array("brick"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
@@ -335,7 +325,7 @@ void GameScene::setup_brick() {
 
     const auto diffuse {ctx.load_texture(
         "brick_diffuse"_H,
-        heavy_res.texture_data.get("brick_diffuse"_H),
+        texture_data,
         specification
     )};
 
@@ -349,11 +339,9 @@ void GameScene::setup_brick() {
     brick.transform.rotation = glm::vec3(10.0f);
 }
 
-void GameScene::setup_lamp() {
+void GameScene::setup_lamp(std::shared_ptr<sm::Mesh> mesh_stand, std::shared_ptr<sm::TextureData> texture_data_stand, std::shared_ptr<sm::Mesh> mesh_bulb) {
     {
-        const auto mesh {heavy_res.mesh.get("lamp_stand"_H)};
-
-        const auto vertex_array {ctx.load_vertex_array("lamp_stand"_H, mesh)};
+        const auto vertex_array {ctx.load_vertex_array("lamp_stand"_H, mesh_stand)};
 
         const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
 
@@ -362,7 +350,7 @@ void GameScene::setup_lamp() {
 
         const auto diffuse {ctx.load_texture(
             "lamp_stand_diffuse"_H,
-            heavy_res.texture_data.get("lamp_stand_diffuse"_H),
+            texture_data_stand,
             specification
         )};
 
@@ -371,28 +359,24 @@ void GameScene::setup_lamp() {
         material_instance->set_vec3("u_material.specular"_H, glm::vec3(0.5f));
         material_instance->set_float("u_material.shininess"_H, 64.0f);
 
-        lamp_stand = sm::Renderable(mesh, vertex_array, material_instance);
+        lamp_stand = sm::Renderable(mesh_stand, vertex_array, material_instance);
         lamp_stand.transform.position = glm::vec3(-6.0f, 0.0f, -6.0f);
     }
 
     {
-        const auto mesh {heavy_res.mesh.get("lamp_bulb"_H)};
-
-        const auto vertex_array {ctx.load_vertex_array("lamp_bulb"_H, mesh)};
+        const auto vertex_array {ctx.load_vertex_array("lamp_bulb"_H, mesh_bulb)};
 
         const auto material {ctx.load_material(sm::MaterialType::Flat, sm::Material::CastShadow)};
 
         const auto material_instance {ctx.load_material_instance("lamp_bulb"_H, material)};
         material_instance->set_vec3("u_material.color"_H, glm::vec3(1.0f));
 
-        lamp_bulb = sm::Renderable(mesh, vertex_array, material_instance);
+        lamp_bulb = sm::Renderable(mesh_bulb, vertex_array, material_instance);
         lamp_bulb.transform.position = glm::vec3(-6.0f, 0.0f, -6.0f);
     }
 }
 
-void GameScene::setup_barrel() {
-    const auto mesh {heavy_res.mesh.get("barrel"_H)};
-
+void GameScene::setup_barrel(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data_diffuse, std::shared_ptr<sm::TextureData> texture_data_normal) {
     const auto vertex_array {ctx.load_vertex_array("barrel"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseNormalShadow, sm::Material::CastShadow)};
@@ -402,13 +386,13 @@ void GameScene::setup_barrel() {
 
     const auto diffuse {ctx.load_texture(
         "barrel_diffuse"_H,
-        heavy_res.texture_data.get("barrel_diffuse"_H),
+        texture_data_diffuse,
         specification
     )};
 
     const auto normal {ctx.load_texture(
         "barrel_normal"_H,
-        heavy_res.texture_data.get("barrel_normal"_H),
+        texture_data_normal,
         {}
     )};
 
@@ -423,9 +407,7 @@ void GameScene::setup_barrel() {
     barrel.transform.scale = 0.5f;
 }
 
-void GameScene::setup_textured_bricks() {
-    const auto mesh {heavy_res.mesh.get("brick"_H)};
-
+void GameScene::setup_textured_bricks(std::shared_ptr<sm::Mesh> mesh, std::shared_ptr<sm::TextureData> texture_data) {
     const auto vertex_array {ctx.load_vertex_array("brick"_H, mesh)};
 
     const auto material {ctx.load_material(sm::MaterialType::PhongDiffuseShadow, sm::Material::CastShadow)};
@@ -435,7 +417,7 @@ void GameScene::setup_textured_bricks() {
 
     const auto diffuse {ctx.load_texture(
         "brick_diffuse"_H,
-        heavy_res.texture_data.get("brick_diffuse"_H),
+        texture_data,
         specification
     )};
 
@@ -459,16 +441,17 @@ void GameScene::setup_texts() {
     sans = ctx.load_font(
         "sans"_H,
         ctx.path_assets("fonts/OpenSans/OpenSans-Regular.ttf"),
-        specification
+        specification,
+        [](sm::Font* font) {
+            font->begin_baking();
+            font->bake_ascii();
+            font->bake_characters(256, 127);
+            font->bake_characters(192, 22);
+            font->bake_characters(223, 23);
+            font->bake_characters(536, 4);
+            font->end_baking("sans");
+        }
     );
-
-    sans->begin_baking();
-    sans->bake_ascii();
-    sans->bake_characters(256, 127);
-    sans->bake_characters(192, 22);
-    sans->bake_characters(223, 23);
-    sans->bake_characters(536, 4);
-    sans->end_baking("sans");
 
     text1.font = sans;
     text1.text = "The quick brown fox jumps over the lazy dog.";
@@ -606,108 +589,101 @@ void GameScene::load_heavy_resources() {
         post_processing.size = sm::Size::Half;  // Half looks better
         post_processing.flip = false;
 
-        heavy_res.texture_data.load("field_px"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/px.png")), post_processing);
-        heavy_res.texture_data.load("field_nx"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/nx.png")), post_processing);
-        heavy_res.texture_data.load("field_py"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/py.png")), post_processing);
-        heavy_res.texture_data.load("field_ny"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/ny.png")), post_processing);
-        heavy_res.texture_data.load("field_pz"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/pz.png")), post_processing);
-        heavy_res.texture_data.load("field_nz"_H, sm::utils::read_file(ctx.path_assets("textures/skybox/field/nz.png")), post_processing);
-    }
+        const auto px {ctx.load_texture_data(ctx.path_assets("textures/skybox/field/px.png"), post_processing)};
+        const auto nx {ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nx.png"), post_processing)};
+        const auto py {ctx.load_texture_data(ctx.path_assets("textures/skybox/field/py.png"), post_processing)};
+        const auto ny {ctx.load_texture_data(ctx.path_assets("textures/skybox/field/ny.png"), post_processing)};
+        const auto pz {ctx.load_texture_data(ctx.path_assets("textures/skybox/field/pz.png"), post_processing)};
+        const auto nz {ctx.load_texture_data(ctx.path_assets("textures/skybox/field/nz.png"), post_processing)};
 
-    ctx.add_task([this](const sm::Task&, void*) {
-        setup_skybox();
-        return sm::Task::Result::Done;
-    });
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_skybox(px, nx, py, ny, pz, nz);
+            return sm::Task::Result::Done;
+        });
+    }
 
     {
-        heavy_res.mesh.load("ground"_H, sm::utils::read_file(ctx.path_assets("models/ground.obj")), "Cube", sm::Mesh::Type::PN);
+        const auto mesh {ctx.load_mesh(ctx.path_assets("models/ground.obj"), "Cube", sm::Mesh::Type::PN)};
+
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_ground(mesh);
+            return sm::Task::Result::Done;
+        });
     }
 
-    ctx.add_task([this](const sm::Task&, void*) {
-        setup_ground();
-        return sm::Task::Result::Done;
-    });
 
     {
-        heavy_res.mesh.load("dragon"_H, sm::utils::read_file(ctx.path_assets("models/dragon.obj")), "default", sm::Mesh::Type::PN);
-    }
+        const auto mesh {ctx.load_mesh(ctx.path_assets("models/dragon.obj"), "default", sm::Mesh::Type::PN)};
 
-    ctx.add_task([this](const sm::Task&, void*) {
-        setup_dragon();
-        return sm::Task::Result::Done;
-    });
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_dragon(mesh);
+            return sm::Task::Result::Done;
+        });
+    }
 
     {
-        heavy_res.mesh.load("teapot"_H, sm::utils::read_file(ctx.path_assets("models/teapot.obj")), sm::Mesh::DEFAULT_OBJECT, sm::Mesh::Type::PN);
-    }
+        const auto mesh {ctx.load_mesh(ctx.path_assets("models/teapot.obj"), sm::Mesh::DEFAULT_OBJECT, sm::Mesh::Type::PN)};
 
-    ctx.add_task([this](const sm::Task&, void*) {
-        setup_teapot();
-        return sm::Task::Result::Done;
-    });
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_teapot(mesh);
+            return sm::Task::Result::Done;
+        });
+    }
 
     {
-        heavy_res.mesh.load("cube"_H, sm::utils::read_file(ctx.path_assets("models/cube.obj")), "Cube", sm::Mesh::Type::PN);
-    }
+        const auto mesh {ctx.load_mesh(ctx.path_assets("models/cube.obj"), "Cube", sm::Mesh::Type::PN)};
 
-    ctx.add_task([this](const sm::Task&, void*) {
-        setup_cube();
-        return sm::Task::Result::Done;
-    });
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_cube(mesh);
+            return sm::Task::Result::Done;
+        });
+    }
 
     {
-        heavy_res.mesh.load("brick"_H, sm::utils::read_file(ctx.path_assets("models/brick.obj")), "Brick", sm::Mesh::Type::PNT);
+        const auto mesh {ctx.load_mesh(ctx.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT)};
 
-        heavy_res.texture_data.load("brick_diffuse"_H, sm::utils::read_file(ctx.path_assets("textures/brick-texture3.png")), sm::TexturePostProcessing());
+        const auto texture_data {ctx.load_texture_data(ctx.path_assets("textures/brick-texture3.png"), sm::TexturePostProcessing())};
+
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_brick(mesh, texture_data);
+            return sm::Task::Result::Done;
+        });
     }
-
-    ctx.add_task([this](const sm::Task&, void*) {
-        setup_brick();
-        return sm::Task::Result::Done;
-    });
 
     {
-        heavy_res.mesh.load("lamp_stand"_H, sm::utils::read_file(ctx.path_assets("models/lamp.obj")), "Stand", sm::Mesh::Type::PNT);
+        const auto mesh_stand {ctx.load_mesh("lamp_stand"_H, ctx.path_assets("models/lamp.obj"), "Stand", sm::Mesh::Type::PNT)};
 
-        heavy_res.texture_data.load("lamp_stand_diffuse"_H, sm::utils::read_file(ctx.path_assets("textures/lamp-texture.png")), sm::TexturePostProcessing());
+        const auto texture_data_stand {ctx.load_texture_data(ctx.path_assets("textures/lamp-texture.png"), sm::TexturePostProcessing())};
 
-        heavy_res.mesh.load("lamp_bulb"_H, sm::utils::read_file(ctx.path_assets("models/lamp.obj")), "Bulb", sm::Mesh::Type::P);
+        const auto mesh_bulb {ctx.load_mesh("lamp_bulb"_H, ctx.path_assets("models/lamp.obj"), "Bulb", sm::Mesh::Type::P)};
+
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_lamp(mesh_stand, texture_data_stand, mesh_bulb);
+            return sm::Task::Result::Done;
+        });
     }
-
-    ctx.add_task([this](const sm::Task&, void*) {
-        setup_lamp();
-        return sm::Task::Result::Done;
-    });
 
     {
-        heavy_res.mesh.load("barrel"_H, sm::utils::read_file(ctx.path_assets("models/barrel.obj")), "Mesh_Mesh_Cylinder.001", sm::Mesh::Type::PNTT);
+        const auto mesh {ctx.load_mesh(ctx.path_assets("models/barrel.obj"), "Mesh_Mesh_Cylinder.001", sm::Mesh::Type::PNTT)};
 
-        heavy_res.texture_data.load("barrel_diffuse"_H, sm::utils::read_file(ctx.path_assets("textures/barrel.png")), sm::TexturePostProcessing());
+        const auto texture_data_diffuse {ctx.load_texture_data(ctx.path_assets("textures/barrel.png"), sm::TexturePostProcessing())};
 
-        heavy_res.texture_data.load("barrel_normal"_H, sm::utils::read_file(ctx.path_assets("textures/barrelNormal.png")), sm::TexturePostProcessing());
+        const auto texture_data_normal {ctx.load_texture_data(ctx.path_assets("textures/barrelNormal.png"), sm::TexturePostProcessing())};
+
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_barrel(mesh, texture_data_diffuse, texture_data_normal);
+            return sm::Task::Result::Done;
+        });
     }
-
-    ctx.add_task([this](const sm::Task&, void*) {
-        setup_barrel();
-        return sm::Task::Result::Done;
-    });
 
     {
-        heavy_res.mesh.load("brick"_H, sm::utils::read_file(ctx.path_assets("models/brick.obj")), "Brick", sm::Mesh::Type::PNT);
+        const auto mesh {ctx.load_mesh("brick"_H, ctx.path_assets("models/brick.obj"), "Brick", sm::Mesh::Type::PNT)};
 
-        heavy_res.texture_data.load("brick_diffuse"_H, sm::utils::read_file(ctx.path_assets("textures/brick-texture3.png")), sm::TexturePostProcessing());
+        const auto load_texture {ctx.load_texture_data(ctx.path_assets("textures/brick-texture3.png"), sm::TexturePostProcessing())};
+
+        ctx.add_task([=](const sm::Task&, void*) {
+            setup_textured_bricks(mesh, load_texture);
+            return sm::Task::Result::Done;
+        });
     }
-
-    ctx.add_task([this](const sm::Task&, void*) {
-        setup_textured_bricks();
-        return sm::Task::Result::Done;
-    });
-
-    // This is executed last
-    ctx.add_task([this](const sm::Task&, void*) {
-        heavy_res.texture_data.clear();
-        heavy_res.mesh.clear();
-        heavy_res.sound_data.clear();
-        return sm::Task::Result::Done;
-    });
 }
