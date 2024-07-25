@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nine_morris_3d_engine/audio/openal/listener.hpp"
+// https://www.openal.org/documentation/openal-1.1-specification.pdf
 
 struct ALCdevice;
 struct ALCcontext;
@@ -15,11 +15,8 @@ namespace sm::internal {
         OpenAlContext& operator=(const OpenAlContext&) = delete;
         OpenAlContext(OpenAlContext&&) = delete;
         OpenAlContext& operator=(OpenAlContext&&) = delete;
-
-        AlListener& get_listener();
     private:
         bool create {};
-        AlListener listener;
 
         ALCdevice* device {nullptr};
         ALCcontext* context {nullptr};

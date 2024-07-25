@@ -43,14 +43,18 @@ namespace sm {
     }
 
     std::string openal_debug::get_information() {
-        static constexpr std::size_t BUFFER_LENGTH {256};  // 256 should be enough
+        static constexpr auto BUFFER_LENGTH {256};  // Should be enough
 
         char buffer[BUFFER_LENGTH] {};
         std::string result;
 
-        result += "*** OpenAL Version ***\n";
+        result += "*** OpenAL Version And Driver ***\n";
 
         std::snprintf(buffer, BUFFER_LENGTH, "OpenAL version: %s\n", alGetString(AL_VERSION));
+        result += buffer;
+        std::snprintf(buffer, BUFFER_LENGTH, "Renderer: %s\n", alGetString(AL_RENDERER));
+        result += buffer;
+        std::snprintf(buffer, BUFFER_LENGTH, "Vendor: %s\n", alGetString(AL_VENDOR));
         result += buffer;
 
         return result;

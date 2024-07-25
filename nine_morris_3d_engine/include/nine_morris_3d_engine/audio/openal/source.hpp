@@ -19,41 +19,29 @@ namespace sm {
         void stop() const;
         void pause() const;
         void resume() const;
-
-        float get_gain() const { return gain; }
-        float get_pitch() const { return pitch; }
-        glm::vec3 get_position() const { return position; }
-        glm::vec3 get_velocity() const { return velocity; }
-        glm::vec3 get_direction() const { return direction; }
-        bool get_looping() const { return looping; }
-        float get_rolloff_factor() const { return rolloff_factor; }
-        float get_reference_distance() const { return reference_distance; }
-        float get_max_distance() const { return max_distance; }
-
         bool is_playing() const;
 
-        void set_gain(float gain);
-        void set_pitch(float pitch);
-        void set_position(glm::vec3 position);
-        void set_velocity(glm::vec3 velocity);
-        void set_direction(glm::vec3 direction);
-        void set_looping(bool looping);
-        void set_rolloff_factor(float rolloff_factor);
-        void set_reference_distance(float reference_distance);
-        void set_max_distance(float max_distance);
+        void set_gain(float gain) const;
+        void set_pitch(float pitch) const;
+        void set_position(glm::vec3 position) const;
+        void set_velocity(glm::vec3 velocity) const;
+        void set_direction(glm::vec3 direction) const;
+        void set_looping(bool looping) const;
+        void set_rolloff_factor(float rolloff_factor) const;  // How fast the gain loses energy with distance
+        void set_reference_distance(float reference_distance) const;  // The distance at which gain is 1.0
+        void set_max_distance(float max_distance) const;  // The distance at which the gain is 0.0 (linear) or at which the gain doesn't decrease (clamped)
+
+        float get_gain() const;
+        float get_pitch() const;
+        glm::vec3 get_position() const;
+        glm::vec3 get_velocity() const;
+        glm::vec3 get_direction() const;
+        bool get_looping() const;
+        float get_rolloff_factor() const;
+        float get_reference_distance() const;
+        float get_max_distance() const;
     private:
         unsigned int source {};
         unsigned int attached_buffer {};  // The buffer that is currently attached to this source
-
-        float gain {1.0f};
-        float pitch {1.0f};
-        glm::vec3 position {};
-        glm::vec3 velocity {};
-        glm::vec3 direction {};
-        bool looping {false};
-
-        float rolloff_factor {1.0f};  // How fast the gain loses energy with distance
-        float reference_distance {8.0f};  // The distance at which gain is 1.0
-        float max_distance {22.0f};  // The distance at which the gain is 0.0 (linear) or at which the gain doesn't decrease (clamped)
     };
 }

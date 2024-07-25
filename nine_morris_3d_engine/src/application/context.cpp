@@ -127,10 +127,6 @@ namespace sm {
         rnd.set_clear_color(color);
     }
 
-    AlListener& Ctx::get_listener() {
-        return snd.get_listener();
-    }
-
     void Ctx::play_music_track(std::shared_ptr<MusicTrack> music_track) {
         mus.play_music_track(music_track);
     }

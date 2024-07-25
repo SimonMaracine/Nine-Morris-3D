@@ -2,8 +2,9 @@
 
 #include <AL/alc.h>
 
-#include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
+#include "nine_morris_3d_engine/audio/openal/listener.hpp"
 
 namespace sm::internal {
     OpenAlContext::OpenAlContext(bool create)
@@ -34,7 +35,10 @@ namespace sm::internal {
             SM_THROW_ERROR(InitializationError, "Could not make AL context current");
         }
 
-        listener.set_distance_model(DistanceModel::InverseClamped);
+        // Defaults
+        listener::set_look_at_and_up(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        listener::set_gain(1.0f);
+        listener::set_distance_model(listener::DistanceModel::InverseClamped);
 
         LOG_INFO("Opened OpenAL device and created context");
     }
@@ -51,7 +55,7 @@ namespace sm::internal {
         LOG_INFO("Destroyed OpenAL context and closed device");
     }
 
-    AlListener& OpenAlContext::get_listener() {
-        return listener;
-    }
+    // AlListener& OpenAlContext::get_listener() {
+    //     return listener;
+    // }
 }

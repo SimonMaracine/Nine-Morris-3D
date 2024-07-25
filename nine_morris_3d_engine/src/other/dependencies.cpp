@@ -57,43 +57,67 @@ namespace sm {
         }
         {
             std::snprintf(
-                buffer, BUFFER_LENGTH, "EnTT version: %d.%d.%d\n",
-                ENTT_VERSION_MAJOR, ENTT_VERSION_MINOR, ENTT_VERSION_PATCH
+                buffer,
+                BUFFER_LENGTH,
+                "EnTT version: %d.%d.%d\n",
+                ENTT_VERSION_MAJOR,
+                ENTT_VERSION_MINOR,
+                ENTT_VERSION_PATCH
             );
             result += buffer;
         }
         {
             std::snprintf(
-                buffer, BUFFER_LENGTH, "Assimp version: %d.%d.%d\n",
-                aiGetVersionMajor(), aiGetVersionMinor(), aiGetVersionPatch()
+                buffer,
+                BUFFER_LENGTH,
+                "Assimp version: %d.%d.%d\n",
+                aiGetVersionMajor(),
+                aiGetVersionMinor(),
+                aiGetVersionPatch()
             );
             result += buffer;
         }
         {
             std::snprintf(
-                buffer, BUFFER_LENGTH, "GLM version: %d.%d.%d\n",
-                GLM_VERSION_MAJOR, GLM_VERSION_MINOR, GLM_VERSION_PATCH
+                buffer,
+                BUFFER_LENGTH,
+                "GLM version: %d.%d.%d\n",
+                GLM_VERSION_MAJOR,
+                GLM_VERSION_MINOR,
+                GLM_VERSION_PATCH
             );
             result += buffer;
         }
         {
             std::snprintf(
-                buffer, BUFFER_LENGTH, "spdlog version: %d.%d.%d\n",
-                SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR, SPDLOG_VER_PATCH
+                buffer,
+                BUFFER_LENGTH,
+                "spdlog version: %d.%d.%d\n",
+                SPDLOG_VER_MAJOR,
+                SPDLOG_VER_MINOR,
+                SPDLOG_VER_PATCH
             );
             result += buffer;
         }
         {
             std::snprintf(
-                buffer, BUFFER_LENGTH, "cereal version: %d.%d.%d\n",
-                CEREAL_VERSION_MAJOR, CEREAL_VERSION_MINOR, CEREAL_VERSION_PATCH
+                buffer,
+                BUFFER_LENGTH,
+                "cereal version: %d.%d.%d\n",
+                CEREAL_VERSION_MAJOR,
+                CEREAL_VERSION_MINOR,
+                CEREAL_VERSION_PATCH
             );
             result += buffer;
         }
         {
             std::snprintf(
-                buffer, BUFFER_LENGTH, "resmanager version: %d.%d.%d\n",
-                resmanager::VERSION_MAJOR, resmanager::VERSION_MINOR, resmanager::VERSION_PATCH
+                buffer,
+                BUFFER_LENGTH,
+                "resmanager version: %d.%d.%d\n",
+                resmanager::VERSION_MAJOR,
+                resmanager::VERSION_MINOR,
+                resmanager::VERSION_PATCH
             );
             result += buffer;
         }

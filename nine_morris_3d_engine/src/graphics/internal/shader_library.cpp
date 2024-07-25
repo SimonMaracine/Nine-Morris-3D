@@ -6,8 +6,8 @@
 #include <vector>
 #include <utility>
 
-#include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm::internal {

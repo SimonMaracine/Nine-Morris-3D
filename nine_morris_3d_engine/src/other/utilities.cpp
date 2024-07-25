@@ -7,8 +7,8 @@
 
 #include <glm/gtc/random.hpp>
 
-#include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     unsigned int utils::random_int(unsigned int end) {

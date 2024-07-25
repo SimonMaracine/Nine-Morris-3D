@@ -104,7 +104,7 @@ namespace sm {
         result += "*** OpenGL Version And Driver ***\n";
 
         {
-            static constexpr std::size_t BUFFER_LENGTH {256};  // 256 should be enough
+            static constexpr std::size_t BUFFER_LENGTH {256};  // Should be enough
 
             char buffer[BUFFER_LENGTH] {};
 
@@ -112,9 +112,9 @@ namespace sm {
             result += buffer;
             std::snprintf(buffer, BUFFER_LENGTH, "GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
             result += buffer;
-            std::snprintf(buffer, BUFFER_LENGTH, "Vendor: %s\n", glGetString(GL_VENDOR));
-            result += buffer;
             std::snprintf(buffer, BUFFER_LENGTH, "Renderer: %s\n", glGetString(GL_RENDERER));
+            result += buffer;
+            std::snprintf(buffer, BUFFER_LENGTH, "Vendor: %s\n", glGetString(GL_VENDOR));
             result += buffer;
         }
 

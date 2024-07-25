@@ -107,9 +107,6 @@ namespace sm {
         bool get_color_correction() const;
         void set_clear_color(glm::vec3 color);
 
-        // OpenAL
-        AlListener& get_listener();
-
         // Music player
         void play_music_track(std::shared_ptr<MusicTrack> music_track);
         void stop_music_track();

@@ -4,8 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
-#include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/application/error.hpp"
+#include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
     std::pair<int, int> Monitors::get_resolution(std::size_t index) const {
