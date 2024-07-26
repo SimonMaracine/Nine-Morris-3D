@@ -12,7 +12,7 @@
 namespace sm {
     static constexpr int CHANNELS {4};
 
-    static bool use_mipmapping(const TextureSpecification& specification) {
+    static bool use_mipmapping(const TextureSpecification& specification) noexcept {
         return specification.mipmapping && specification.mipmapping->levels > 1;
     }
 
@@ -43,7 +43,7 @@ namespace sm {
         }
     }
 
-    static int filter_to_int(TextureFilter filter) {
+    static int filter_to_int(TextureFilter filter) noexcept {
         int result {};
 
         switch (filter) {
@@ -58,7 +58,7 @@ namespace sm {
         return result;
     }
 
-    static int wrap_to_int(TextureWrap wrap) {
+    static int wrap_to_int(TextureWrap wrap) noexcept {
         int result {};
 
         switch (wrap) {
@@ -76,7 +76,7 @@ namespace sm {
         return result;
     }
 
-    static void configure_options(const TextureSpecification& specification) {
+    static void configure_options(const TextureSpecification& specification) noexcept {
         const int min_filter {
             use_mipmapping(specification) ? GL_LINEAR_MIPMAP_LINEAR : filter_to_int(specification.min_filter)
         };
@@ -136,12 +136,24 @@ namespace sm {
         LOG_DEBUG("Deleted GL texture {}", texture);
     }
 
-    void GlTexture::bind(unsigned int unit) const {
+    int GlTexture::get_width() const noexcept {
+        return width;
+    }
+
+    int GlTexture::get_height() const noexcept {
+        return height;
+    }
+
+    unsigned int GlTexture::get_id() const noexcept {
+        return texture;
+    }
+
+    void GlTexture::bind(unsigned int unit) const noexcept {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
-    void GlTexture::unbind() {
+    void GlTexture::unbind() noexcept {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -226,12 +238,12 @@ namespace sm {
         LOG_DEBUG("Deleted GL texture cubemap {}", texture);
     }
 
-    void GlTextureCubemap::bind(unsigned int unit) const {
+    void GlTextureCubemap::bind(unsigned int unit) const noexcept {
         glActiveTexture(GL_TEXTURE0 + unit);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
     }
 
-    void GlTextureCubemap::unbind() {
+    void GlTextureCubemap::unbind() noexcept {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     }
 }

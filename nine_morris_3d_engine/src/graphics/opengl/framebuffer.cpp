@@ -230,22 +230,26 @@ namespace sm {
         LOG_DEBUG("Deleted GL framebuffer {}", framebuffer);
     }
 
-    void GlFramebuffer::bind() const {
+    void GlFramebuffer::bind() const noexcept {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     }
 
-    void GlFramebuffer::bind_default() {
+    void GlFramebuffer::bind_default() noexcept {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    unsigned int GlFramebuffer::get_color_attachment(int attachment_index) const {
+    unsigned int GlFramebuffer::get_color_attachment(int attachment_index) const noexcept {
         assert(static_cast<std::size_t>(attachment_index) < color_attachments.size());
 
         return color_attachments[attachment_index];
     }
 
-    unsigned int GlFramebuffer::get_depth_attachment() const {
+    unsigned int GlFramebuffer::get_depth_attachment() const noexcept {
         return depth_attachment;
+    }
+
+    const FramebufferSpecification& GlFramebuffer::get_specification() const noexcept {
+        return specification;
     }
 
     void GlFramebuffer::resize(int width, int height) {
@@ -260,7 +264,7 @@ namespace sm {
         build();
     }
 
-    float GlFramebuffer::read_pixel_float(int attachment_index, int x, int y) const {
+    float GlFramebuffer::read_pixel_float(int attachment_index, int x, int y) const noexcept {
         assert(static_cast<std::size_t>(attachment_index) < color_attachments.size());
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -270,14 +274,14 @@ namespace sm {
         return pixel;
     }
 
-    void GlFramebuffer::read_pixel_float_pbo(int attachment_index, int x, int y) const {
+    void GlFramebuffer::read_pixel_float_pbo(int attachment_index, int x, int y) const noexcept {
         assert(static_cast<std::size_t>(attachment_index) < color_attachments.size());
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
     }
 
-    void GlFramebuffer::blit(const GlFramebuffer* draw_framebuffer, int width, int height) const {
+    void GlFramebuffer::blit(const GlFramebuffer* draw_framebuffer, int width, int height) const noexcept {
         assert(color_attachments.size() == draw_framebuffer->color_attachments.size());
 
         glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);

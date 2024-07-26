@@ -79,24 +79,19 @@ namespace sm::internal {
         LOG_INFO("Destroyed window and OpenGL context and terminated GLFW");
     }
 
-    void Window::update() const {
-        glfwPollEvents();
-        glfwSwapBuffers(window);
-    }
-
-    int Window::get_width() const {
+    int Window::get_width() const noexcept {
         return width;
     }
 
-    int Window::get_height() const {
+    int Window::get_height() const noexcept {
         return height;
     }
 
-    void Window::show() const {
+    void Window::show() const noexcept {
         glfwShowWindow(window);
     }
 
-    void Window::set_vsync(int interval) const {
+    void Window::set_vsync(int interval) const noexcept {
         assert(interval >= 0);
 
         glfwSwapInterval(interval);
@@ -145,7 +140,7 @@ namespace sm::internal {
         glfwSetWindowIcon(window, static_cast<int>(icons.size()), icons.data());
     }
 
-    Monitors Window::get_monitors() {
+    Monitors Window::get_monitors() const {
         int count {};
         GLFWmonitor** connected_monitors {glfwGetMonitors(&count)};
 
@@ -160,20 +155,27 @@ namespace sm::internal {
         return monitors;
     }
 
-    double Window::get_time() {
+    double Window::get_time() noexcept {
         const double time {glfwGetTime()};
 
 #ifndef SM_BUILD_DISTRIBUTION
         if (time == 0.0) {
-            LOG_ERROR("Could not get time");
+            try {
+                LOG_ERROR("Could not get time");
+            } catch (...) {}
         }
 #endif
 
         return time;
     }
 
-    GLFWwindow* Window::get_handle() const {
+    GLFWwindow* Window::get_handle() const noexcept {
         return window;
+    }
+
+    void Window::update() const noexcept {
+        glfwPollEvents();
+        glfwSwapBuffers(window);
     }
 
     void Window::create_window(const ApplicationProperties& properties) {
@@ -217,7 +219,7 @@ namespace sm::internal {
         }
     }
 
-    void Window::install_callbacks() const {
+    void Window::install_callbacks() const noexcept {
         glfwSetWindowCloseCallback(window, [](GLFWwindow* window) {
             auto* win {static_cast<Window*>(glfwGetWindowUserPointer(window))};
 

@@ -53,6 +53,14 @@ namespace sm {
         LOG_DEBUG("Freed font");
     }
 
+    int Font::get_bitmap_size() const noexcept {
+        return bitmap_size;
+    }
+
+    const GlTexture* Font::get_bitmap() const noexcept {
+        return bitmap_texture.get();
+    }
+
     void Font::begin_baking() {
         LOG_DEBUG("Begin baking font");
 
@@ -205,7 +213,7 @@ namespace sm {
         return std::make_pair(width * std::min(scale, 1.0f), height * std::min(scale, 1.0f));
     }
 
-    void Font::get_character_quad(int codepoint, float* x, float* y, Quad* quad) const {
+    void Font::get_character_quad(int codepoint, float* x, float* y, Quad* quad) const noexcept {
         stbtt_aligned_quad aligned_quad {};
         [[maybe_unused]] bool found_character {false};
 

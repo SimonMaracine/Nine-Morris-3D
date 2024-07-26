@@ -57,12 +57,12 @@ namespace sm {
         GlTexture(GlTexture&&) = delete;
         GlTexture& operator=(GlTexture&&) = delete;
 
-        int get_width() const { return width; }
-        int get_height() const { return height; }
-        unsigned int get_id() const { return texture; }
+        int get_width() const noexcept;
+        int get_height() const noexcept;
+        unsigned int get_id() const noexcept;
 
-        void bind(unsigned int unit) const;
-        static void unbind();
+        void bind(unsigned int unit) const noexcept;
+        static void unbind() noexcept;
     private:
         void allocate_texture(int width, int height, const unsigned char* data) const;
 
@@ -83,8 +83,8 @@ namespace sm {
         GlTextureCubemap(GlTextureCubemap&&) = delete;
         GlTextureCubemap& operator=(GlTextureCubemap&&) = delete;
 
-        void bind(unsigned int unit) const;
-        static void unbind();
+        void bind(unsigned int unit) const noexcept;
+        static void unbind() noexcept;
     private:
         unsigned int texture {};
     };

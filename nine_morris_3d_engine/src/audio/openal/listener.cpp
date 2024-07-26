@@ -12,7 +12,7 @@ namespace sm {
         glm::vec3 up;
     };
 
-    void listener::set_gain(float gain) {
+    void listener::set_gain(float gain) noexcept {
         assert(gain >= 0.0f);
 
         alListenerf(AL_GAIN, gain);
@@ -20,19 +20,19 @@ namespace sm {
         openal_debug::check_errors();
     }
 
-    void listener::set_position(glm::vec3 position) {
+    void listener::set_position(glm::vec3 position) noexcept {
         alListener3f(AL_POSITION, position.x, position.y, position.z);
 
         openal_debug::check_errors();
     }
 
-    void listener::set_velocity(glm::vec3 velocity) {
+    void listener::set_velocity(glm::vec3 velocity) noexcept {
         alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
         openal_debug::check_errors();
     }
 
-    void listener::set_look_at_and_up(glm::vec3 look_at, glm::vec3 up) {
+    void listener::set_look_at_and_up(glm::vec3 look_at, glm::vec3 up) noexcept {
         LookAtAndUp look_up_and_up;
         look_up_and_up.look_at = look_at;
         look_up_and_up.up = up;
@@ -42,7 +42,7 @@ namespace sm {
         openal_debug::check_errors();
     }
 
-    void listener::set_distance_model(DistanceModel distance_model) {
+    void listener::set_distance_model(DistanceModel distance_model) noexcept {
         ALenum result {};
 
         switch (distance_model) {
@@ -74,7 +74,7 @@ namespace sm {
         openal_debug::check_errors();
     }
 
-    float listener::get_gain() {
+    float listener::get_gain() noexcept {
         float gain {};
         alGetListenerf(AL_GAIN, &gain);
 
@@ -83,7 +83,7 @@ namespace sm {
         return gain;
     }
 
-    glm::vec3 listener::get_position() {
+    glm::vec3 listener::get_position() noexcept {
         glm::vec3 position {};
         alGetListener3f(AL_POSITION, &position.x, &position.y, &position.z);
 
@@ -92,7 +92,7 @@ namespace sm {
         return position;
     }
 
-    glm::vec3 listener::get_velocity() {
+    glm::vec3 listener::get_velocity() noexcept {
         glm::vec3 velocity {};
         alGetListener3f(AL_VELOCITY, &velocity.x, &velocity.y, &velocity.z);
 
@@ -101,7 +101,7 @@ namespace sm {
         return velocity;
     }
 
-    glm::vec3 listener::get_look_at() {
+    glm::vec3 listener::get_look_at() noexcept {
         LookAtAndUp look_up_and_up {};
         alGetListenerfv(AL_ORIENTATION, reinterpret_cast<float*>(&look_up_and_up));  // Actually safe
 
@@ -110,7 +110,7 @@ namespace sm {
         return look_up_and_up.look_at;
     }
 
-    glm::vec3 listener::get_up() {
+    glm::vec3 listener::get_up() noexcept {
         LookAtAndUp look_up_and_up {};
         alGetListenerfv(AL_ORIENTATION, reinterpret_cast<float*>(&look_up_and_up));  // Actually safe
 
@@ -119,7 +119,7 @@ namespace sm {
         return look_up_and_up.up;
     }
 
-    listener::DistanceModel listener::get_distance_model() {
+    listener::DistanceModel listener::get_distance_model() noexcept {
         const ALenum distance_model {alGetInteger(AL_DISTANCE_MODEL)};
 
         openal_debug::check_errors();

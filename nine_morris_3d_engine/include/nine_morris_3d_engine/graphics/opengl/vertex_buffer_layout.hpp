@@ -16,7 +16,7 @@ namespace sm {
             Type type {};
             bool per_instance {false};
 
-            static std::size_t get_size(Type type);
+            static std::size_t get_size(Type type) noexcept;
         };
 
         std::vector<VertexElement> elements;

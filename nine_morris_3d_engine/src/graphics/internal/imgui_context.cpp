@@ -161,7 +161,7 @@ namespace sm::internal {
         }
     }
 
-    void imgui_context::initialize(GLFWwindow* window_handle) {
+    void imgui_context::initialize(GLFWwindow* window_handle) noexcept {
         IMGUI_CHECKVERSION();
 
         ImGui::CreateContext();
@@ -174,53 +174,53 @@ namespace sm::internal {
 #endif
     }
 
-    void imgui_context::uninitialize() {
+    void imgui_context::uninitialize() noexcept {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
 
-    void imgui_context::begin_frame() {
+    void imgui_context::begin_frame() noexcept {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
     }
 
-    void imgui_context::end_frame() {
+    void imgui_context::end_frame() noexcept {
         ImGui::EndFrame();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-    bool imgui_context::on_mouse_wheel_scrolled(float yoffset) {
+    bool imgui_context::on_mouse_wheel_scrolled(float yoffset) noexcept {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseWheelEvent(0.0f, yoffset);
 
         return io.WantCaptureMouse;
     }
 
-    bool imgui_context::on_mouse_moved(float xpos, float ypos) {
+    bool imgui_context::on_mouse_moved(float xpos, float ypos) noexcept {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMousePosEvent(xpos, ypos);
 
         return io.WantCaptureMouse;
     }
 
-    bool imgui_context::on_mouse_button_pressed(int button) {
+    bool imgui_context::on_mouse_button_pressed(int button) noexcept {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseButtonEvent(button, true);
 
         return io.WantCaptureMouse;
     }
 
-    bool imgui_context::on_mouse_button_released(int button) {
+    bool imgui_context::on_mouse_button_released(int button) noexcept {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddMouseButtonEvent(button, false);
 
         return io.WantCaptureMouse;
     }
 
-    bool imgui_context::on_key_pressed(int key, int scancode) {
+    bool imgui_context::on_key_pressed(int key, int scancode) noexcept {
         key = translate_untranslated_key(key, scancode);
 
         ImGuiIO& io {ImGui::GetIO()};
@@ -229,7 +229,7 @@ namespace sm::internal {
         return io.WantCaptureKeyboard;
     }
 
-    bool imgui_context::on_key_released(int key, int scancode) {
+    bool imgui_context::on_key_released(int key, int scancode) noexcept {
         key = translate_untranslated_key(key, scancode);
 
         ImGuiIO& io {ImGui::GetIO()};
@@ -238,7 +238,7 @@ namespace sm::internal {
         return io.WantCaptureKeyboard;
     }
 
-    bool imgui_context::on_char_typed(unsigned int codepoint) {
+    bool imgui_context::on_char_typed(unsigned int codepoint) noexcept {
         ImGuiIO& io {ImGui::GetIO()};
         io.AddInputCharacter(codepoint);
 

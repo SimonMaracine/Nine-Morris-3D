@@ -20,15 +20,15 @@ namespace sm {
         GlVertexArray(GlVertexArray&&) = delete;
         GlVertexArray& operator=(GlVertexArray&&) = delete;
 
-        void bind() const;
-        static void unbind();
+        void bind() const noexcept;
+        static void unbind() noexcept;
 
         void configure(const Configuration& configuration);
 
         void add_vertex_buffer(std::shared_ptr<GlVertexBuffer> buffer, const VertexBufferLayout& layout);
         void add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer);
 
-        const GlIndexBuffer* get_index_buffer() const { return index_buffer.get(); }
+        const GlIndexBuffer* get_index_buffer() const noexcept;
     private:
         unsigned int array {};
 

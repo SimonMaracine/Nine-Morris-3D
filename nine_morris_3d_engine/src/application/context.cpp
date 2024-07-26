@@ -74,19 +74,19 @@ namespace sm {
         return fs.path_engine_assets(path);
     }
 
-    int Ctx::get_window_width() const {
+    int Ctx::get_window_width() const noexcept {
         return win.get_width();
     }
 
-    int Ctx::get_window_height() const {
+    int Ctx::get_window_height() const noexcept {
         return win.get_height();
     }
 
-    void Ctx::show_window() const {
+    void Ctx::show_window() const noexcept {
         win.show();
     }
 
-    void Ctx::set_window_vsync(int interval) const {
+    void Ctx::set_window_vsync(int interval) const noexcept {
         win.set_vsync(interval);
     }
 
@@ -102,27 +102,27 @@ namespace sm {
         win.set_icons(icons);
     }
 
-    Monitors Ctx::get_monitors() {
+    Monitors Ctx::get_monitors() const {
         return win.get_monitors();
     }
 
-    double Ctx::get_time() {
+    double Ctx::get_time() noexcept {
         return internal::Window::get_time();
     }
 
-    std::shared_ptr<Font> Ctx::get_default_font() const {
+    std::shared_ptr<Font> Ctx::get_default_font() const noexcept {
         return rnd.get_default_font();
     }
 
-    void Ctx::set_color_correction(bool enable) {
+    void Ctx::set_color_correction(bool enable) noexcept {
         rnd.set_color_correction(enable);
     }
 
-    bool Ctx::get_color_correction() const {
+    bool Ctx::get_color_correction() const noexcept {
         return rnd.get_color_correction();
     }
 
-    void Ctx::set_clear_color(glm::vec3 color) {
+    void Ctx::set_clear_color(glm::vec3 color) noexcept {
         rnd.set_clear_color(color);
     }
 
@@ -154,31 +154,31 @@ namespace sm {
         tsk.add_async(function, user_data);
     }
 
-    bool Ctx::is_key_pressed(Key key) const {
+    bool Ctx::is_key_pressed(Key key) const noexcept {
         return inp.is_key_pressed(key);
     }
 
-    bool Ctx::is_mouse_button_pressed(MouseButton button) const {
+    bool Ctx::is_mouse_button_pressed(MouseButton button) const noexcept {
         return inp.is_mouse_button_pressed(button);
     }
 
-    std::pair<float, float> Ctx::get_mouse_position() const {
+    std::pair<float, float> Ctx::get_mouse_position() const noexcept {
         return inp.get_mouse_position();
     }
 
-    void Ctx::capture(const Camera& camera, glm::vec3 position) {
+    void Ctx::capture(const Camera& camera, glm::vec3 position) noexcept {
         scn.capture(camera, position);
     }
 
-    void Ctx::capture(const Camera2D& camera_2d) {
+    void Ctx::capture(const Camera2D& camera_2d) noexcept {
         scn.capture(camera_2d);
     }
 
-    void Ctx::skybox(std::shared_ptr<GlTextureCubemap> texture) {
+    void Ctx::skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept {
         scn.skybox(texture);
     }
 
-    void Ctx::shadow(ShadowBox& box) {
+    void Ctx::shadow(ShadowBox& box) noexcept {
         scn.shadow(box);
     }
 
@@ -226,7 +226,7 @@ namespace sm {
         scn.debug_add_lamp(position, color);
     }
 
-    void Ctx::change_scene(Id id, bool clear_resources) {
+    void Ctx::change_scene(Id id, bool clear_resources) noexcept {
         assert(application->scene_next == nullptr);
 
         for (auto& meta_scene : application->scene_meta_scenes) {

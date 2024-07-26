@@ -23,9 +23,9 @@ namespace sm {
         TextureData(TextureData&&) = delete;
         TextureData& operator=(TextureData&&) = delete;
 
-        int get_width() const { return width; }
-        int get_height() const { return height; }
-        const unsigned char* get_data() const { return data; }
+        int get_width() const noexcept;
+        int get_height() const noexcept;
+        const unsigned char* get_data() const noexcept;
     private:
         void resize(int new_width, int new_height);
 

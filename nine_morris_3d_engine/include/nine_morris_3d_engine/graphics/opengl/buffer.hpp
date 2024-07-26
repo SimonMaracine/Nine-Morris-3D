@@ -28,11 +28,11 @@ namespace sm {
         GlVertexBuffer(GlVertexBuffer&&) = delete;
         GlVertexBuffer& operator=(GlVertexBuffer&&) = delete;
 
-        void bind() const;
-        static void unbind();
+        void bind() const noexcept;
+        static void unbind() noexcept;
 
-        void upload_data(const void* data, std::size_t size) const;
-        void upload_sub_data(const void* data, std::size_t offset, std::size_t size) const;
+        void upload_data(const void* data, std::size_t size) const noexcept;
+        void upload_sub_data(const void* data, std::size_t offset, std::size_t size) const noexcept;
     private:
         unsigned int buffer {};
         DrawHint hint {DrawHint::Static};
@@ -49,10 +49,10 @@ namespace sm {
         GlIndexBuffer(GlIndexBuffer&&) = delete;
         GlIndexBuffer& operator=(GlIndexBuffer&&) = delete;
 
-        void bind() const;
-        static void unbind();
+        void bind() const noexcept;
+        static void unbind() noexcept;
 
-        int get_index_count() const { return index_count; }
+        int get_index_count() const noexcept;
     private:
         unsigned int buffer {};
         int index_count {};
@@ -74,18 +74,18 @@ namespace sm {
         GlUniformBuffer(GlUniformBuffer&&) = delete;
         GlUniformBuffer& operator=(GlUniformBuffer&&) = delete;
 
-        void bind() const;
-        static void unbind();
+        void bind() const noexcept;
+        static void unbind() noexcept;
 
-        bool is_configured() const { return configured; }
+        bool is_configured() const noexcept;
         void configure(unsigned int shader_program);
 
         void set(const void* field_data, Id field);
-        void upload() const;
+        void upload() const noexcept;
         void set_and_upload(const void* field_data, Id field);
     private:
         void allocate_memory(std::size_t size);
-        static std::size_t type_size(unsigned int type);
+        static std::size_t type_size(unsigned int type) noexcept;
 
         unsigned int buffer {};
 
@@ -116,14 +116,14 @@ namespace sm {
         GlPixelBuffer(GlPixelBuffer&&) = delete;
         GlPixelBuffer& operator=(GlPixelBuffer&&) = delete;
 
-        void bind() const;
-        static void unbind();
+        void bind() const noexcept;
+        static void unbind() noexcept;
 
         void map_data();
         void unmap_data() const;
 
         template<typename T>
-        void get_data(T** data_out) const {
+        void get_data(T** data_out) const noexcept {
             *data_out = static_cast<T*>(data);
         }
     private:

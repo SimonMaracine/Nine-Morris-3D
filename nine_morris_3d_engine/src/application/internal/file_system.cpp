@@ -27,7 +27,7 @@
         ("C:\\Users\\" + (user_name) + "\\Documents\\" + (application_name) + "\\")
 #endif
 
-static std::optional<std::string> get_user_name() {
+static std::optional<std::string> get_user_name() noexcept {
 #if defined(SM_PLATFORM_LINUX)
     const uid_t uid {geteuid()};
     struct passwd* pw {getpwuid(uid)};
@@ -68,7 +68,7 @@ namespace sm::internal {
 
     bool FileSystem::directory_exists(const std::string& path) {
         std::error_code ec;
-        const bool result {std::filesystem::is_directory(path)};
+        const bool result {std::filesystem::is_directory(path, ec)};
 
         if (ec) {
             throw OtherError("Could not check if path is a directory: " + ec.message());
@@ -79,7 +79,7 @@ namespace sm::internal {
 
     bool FileSystem::create_directory(const std::string& path) {
         std::error_code ec;
-        const bool result {std::filesystem::create_directory(path)};
+        const bool result {std::filesystem::create_directory(path, ec)};
 
         if (ec) {
             throw OtherError("Could not create directory: " + ec.message());
@@ -214,7 +214,7 @@ namespace sm::internal {
 #endif
     }
 
-    const std::string& FileSystem::get_error_string() const {
+    const std::string& FileSystem::get_error_string() const noexcept {
         return error_string;
     }
 }

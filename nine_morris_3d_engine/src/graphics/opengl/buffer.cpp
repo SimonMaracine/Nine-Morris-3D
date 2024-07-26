@@ -8,7 +8,7 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
-    static int draw_hint_to_int(DrawHint hint) {
+    static int draw_hint_to_int(DrawHint hint) noexcept {
         int result {};
 
         switch (hint) {
@@ -64,19 +64,19 @@ namespace sm {
         LOG_DEBUG("Deleted GL vertex buffer {}", buffer);
     }
 
-    void GlVertexBuffer::bind() const {
+    void GlVertexBuffer::bind() const noexcept {
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
     }
 
-    void GlVertexBuffer::unbind() {
+    void GlVertexBuffer::unbind() noexcept {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void GlVertexBuffer::upload_data(const void* data, std::size_t size) const {
+    void GlVertexBuffer::upload_data(const void* data, std::size_t size) const noexcept {
         glBufferData(GL_ARRAY_BUFFER, size, data, draw_hint_to_int(hint));
     }
 
-    void GlVertexBuffer::upload_sub_data(const void* data, std::size_t offset, std::size_t size) const {
+    void GlVertexBuffer::upload_sub_data(const void* data, std::size_t offset, std::size_t size) const noexcept {
         glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
     }
 
@@ -102,12 +102,16 @@ namespace sm {
         LOG_DEBUG("Deleted GL index buffer {}", buffer);
     }
 
-    void GlIndexBuffer::bind() const {
+    void GlIndexBuffer::bind() const noexcept {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
     }
 
-    void GlIndexBuffer::unbind() {
+    void GlIndexBuffer::unbind() noexcept {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    int GlIndexBuffer::get_index_count() const noexcept {
+        return index_count;
     }
 
     // --- Uniform buffer
@@ -130,12 +134,16 @@ namespace sm {
         LOG_DEBUG("Deleted GL uniform buffer {}", buffer);
     }
 
-    void GlUniformBuffer::bind() const {
+    void GlUniformBuffer::bind() const noexcept {
         glBindBuffer(GL_UNIFORM_BUFFER, buffer);
     }
 
-    void GlUniformBuffer::unbind() {
+    void GlUniformBuffer::unbind() noexcept {
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
+
+    bool GlUniformBuffer::is_configured() const noexcept {
+        return configured;
     }
 
     void GlUniformBuffer::configure(unsigned int shader_program) {
@@ -212,7 +220,7 @@ namespace sm {
         std::memcpy(data + fields.at(field).offset, field_data, fields.at(field).size);
     }
 
-    void GlUniformBuffer::upload() const {
+    void GlUniformBuffer::upload() const noexcept {
         assert(data != nullptr && size > 0);
 
         glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
@@ -236,7 +244,7 @@ namespace sm {
         glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STREAM_DRAW);
     }
 
-    std::size_t GlUniformBuffer::type_size(unsigned int type) {
+    std::size_t GlUniformBuffer::type_size(unsigned int type) noexcept {
         std::size_t size {0};
 
         switch (type) {
@@ -282,11 +290,11 @@ namespace sm {
         LOG_DEBUG("Deleted GL pixel buffer {}", buffer);
     }
 
-    void GlPixelBuffer::bind() const {
+    void GlPixelBuffer::bind() const noexcept {
         glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer);
     }
 
-    void GlPixelBuffer::unbind() {
+    void GlPixelBuffer::unbind() noexcept {
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
     }
 
@@ -300,7 +308,7 @@ namespace sm {
         }
     }
 
-    void GlPixelBuffer::unmap_data() const {
+    void GlPixelBuffer::unmap_data() const {  // TODO conditional noexcept
         const GLboolean success {glUnmapBuffer(GL_PIXEL_PACK_BUFFER)};
 
         if (success == GL_FALSE) {

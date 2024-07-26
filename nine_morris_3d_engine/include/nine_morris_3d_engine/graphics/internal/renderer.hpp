@@ -26,7 +26,7 @@ namespace sm {
 namespace sm::internal {
     class DebugRenderer {
     public:
-        DebugRenderer() = default;
+        DebugRenderer() noexcept = default;
         DebugRenderer(const FileSystem& fs, Renderer& renderer);
 
         void render(const Scene& scene);
@@ -49,10 +49,10 @@ namespace sm::internal {
     public:
         Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary& shd);
 
-        std::shared_ptr<Font> get_default_font() const;
-        void set_color_correction(bool enable);
-        bool get_color_correction() const;
-        void set_clear_color(glm::vec3 color);
+        std::shared_ptr<Font> get_default_font() const noexcept;
+        void set_color_correction(bool enable) noexcept;
+        bool get_color_correction() const noexcept;
+        void set_clear_color(glm::vec3 color) noexcept;
 
         void register_shader(std::shared_ptr<GlShader> shader);
         void register_framebuffer(std::shared_ptr<GlFramebuffer> framebuffer);
@@ -62,7 +62,7 @@ namespace sm::internal {
         void post_setup();
         void resize_framebuffers(int width, int height);
 
-        static std::size_t get_max_point_lights() { return SHADER_MAX_POINT_LIGHTS; }
+        static std::size_t get_max_point_lights() noexcept;
     private:
         void set_and_upload_uniform_buffer_data(const Scene& scene);
         void post_processing(const Scene& scene);

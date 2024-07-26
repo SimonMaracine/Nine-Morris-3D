@@ -21,10 +21,10 @@ namespace sm::internal {
     class Scene {
     public:
         // Immediate
-        void capture(const Camera& camera, glm::vec3 position);
-        void capture(const Camera2D& camera_2d);
-        void skybox(std::shared_ptr<GlTextureCubemap> texture);
-        void shadow(ShadowBox& box);
+        void capture(const Camera& camera, glm::vec3 position) noexcept;
+        void capture(const Camera2D& camera_2d) noexcept;
+        void skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept;
+        void shadow(ShadowBox& box) noexcept;
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
 
         // 3D API
@@ -43,9 +43,9 @@ namespace sm::internal {
         void debug_add_point(glm::vec3 position, glm::vec3 color);
         void debug_add_lamp(glm::vec3 position, glm::vec3 color);
 
-        void clear();
+        void clear() noexcept;
 
-        void shadow(const ShadowBox& box);
+        void shadow(const ShadowBox& box) noexcept;
         void add_renderable(const Renderable& renderable);
         void add_light(const DirectionalLight& light);
         void add_light(const PointLight& light);

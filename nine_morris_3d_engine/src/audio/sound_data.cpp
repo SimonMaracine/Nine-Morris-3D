@@ -40,11 +40,11 @@ namespace sm {
         LOG_DEBUG("Freed sound data");
     }
 
-    std::size_t SoundData::compute_size() const {
+    std::size_t SoundData::compute_size() const noexcept {
         return samples * channels * sizeof(short);
     }
 
-    std::size_t SoundData::compute_bits_per_sample() const {
+    std::size_t SoundData::compute_bits_per_sample() const noexcept {
         return (8 * size) / (samples * channels);
     }
 }

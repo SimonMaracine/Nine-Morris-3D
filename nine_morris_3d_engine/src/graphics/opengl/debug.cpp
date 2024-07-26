@@ -147,7 +147,7 @@ namespace sm {
         return result;
     }
 
-    std::pair<int, int> opengl_debug::get_version_number() {
+    std::pair<int, int> opengl_debug::get_version_number() noexcept {
         int major {};
         int minor {};
         glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -156,19 +156,19 @@ namespace sm {
         return std::make_pair(major, minor);
     }
 
-    const unsigned char* opengl_debug::get_opengl_version() {
+    const unsigned char* opengl_debug::get_opengl_version() noexcept {
         return glGetString(GL_VERSION);
     }
 
-    const unsigned char* opengl_debug::get_glsl_version() {
+    const unsigned char* opengl_debug::get_glsl_version() noexcept {
         return glGetString(GL_SHADING_LANGUAGE_VERSION);
     }
 
-    const unsigned char* opengl_debug::get_vendor() {
+    const unsigned char* opengl_debug::get_vendor() noexcept {
         return glGetString(GL_VENDOR);
     }
 
-    const unsigned char* opengl_debug::get_renderer() {
+    const unsigned char* opengl_debug::get_renderer() noexcept {
         return glGetString(GL_RENDERER);
     }
 }

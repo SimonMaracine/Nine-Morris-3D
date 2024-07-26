@@ -13,8 +13,8 @@ namespace sm {
             glm::vec3 max {};
         };
 
-        unsigned int random_int(unsigned int end);
-        unsigned int random_int(unsigned int begin, unsigned int end);
+        unsigned int random_int(unsigned int end) noexcept;
+        unsigned int random_int(unsigned int begin, unsigned int end) noexcept;
 
         void center_image(
             float screen_width,
@@ -25,7 +25,7 @@ namespace sm {
             float& y,
             float& width,
             float& height
-        );
+        ) noexcept;
 
         std::string file_name(const std::string& file_path);
 
@@ -33,19 +33,19 @@ namespace sm {
         std::string read_file(const std::string& file_path);
 
         template<typename T>
-        T map(T x, T in_min, T in_max, T out_min, T out_max) {
+        T map(T x, T in_min, T in_max, T out_min, T out_max) noexcept {
             return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
 
         template<typename T>
-        T choice(std::initializer_list<T> list) {
+        T choice(std::initializer_list<T> list) noexcept {
             const unsigned int index {random_int(static_cast<unsigned int>(list.size() - 1))};
 
             return list.begin()[index];
         }
 
         template<typename T, typename Iter>
-        T choice(Iter first, Iter last) {
+        T choice(Iter first, Iter last) noexcept {
             const unsigned int index {random_int(static_cast<unsigned int>(std::distance(first, last)))};
 
             return first[index];

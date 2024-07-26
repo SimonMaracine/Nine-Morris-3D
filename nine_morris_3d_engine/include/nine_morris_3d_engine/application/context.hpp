@@ -93,21 +93,21 @@ namespace sm {
         void clear_events() { evt.clear<E>(); }
 
         // Window
-        int get_window_width() const;
-        int get_window_height() const;
-        void show_window() const;
-        void set_window_vsync(int interval) const;
+        int get_window_width() const noexcept;
+        int get_window_height() const noexcept;
+        void show_window() const noexcept;
+        void set_window_vsync(int interval) const noexcept;
         void add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
         void set_window_cursor(Id id) const;
         void set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
-        Monitors get_monitors();
-        static double get_time();
+        Monitors get_monitors() const;
+        static double get_time() noexcept;
 
         // Renderer
-        std::shared_ptr<Font> get_default_font() const;
-        void set_color_correction(bool enable);
-        bool get_color_correction() const;
-        void set_clear_color(glm::vec3 color);
+        std::shared_ptr<Font> get_default_font() const noexcept;
+        void set_color_correction(bool enable) noexcept;
+        bool get_color_correction() const noexcept;
+        void set_clear_color(glm::vec3 color) noexcept;
 
         // Music player
         void play_music_track(std::shared_ptr<MusicTrack> music_track);
@@ -121,15 +121,15 @@ namespace sm {
         void add_task_async(const AsyncTask::TaskFunction& function, void* user_data = nullptr);
 
         // Input
-        bool is_key_pressed(Key key) const;
-        bool is_mouse_button_pressed(MouseButton button) const;
-        std::pair<float, float> get_mouse_position() const;
+        bool is_key_pressed(Key key) const noexcept;
+        bool is_mouse_button_pressed(MouseButton button) const noexcept;
+        std::pair<float, float> get_mouse_position() const noexcept;
 
         // Scene
-        void capture(const Camera& camera, glm::vec3 position);
-        void capture(const Camera2D& camera_2d);
-        void skybox(std::shared_ptr<GlTextureCubemap> texture);
-        void shadow(ShadowBox& box);
+        void capture(const Camera& camera, glm::vec3 position) noexcept;
+        void capture(const Camera2D& camera_2d) noexcept;
+        void skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept;
+        void shadow(ShadowBox& box) noexcept;
         void add_post_processing(std::shared_ptr<PostProcessingStep> step);
         void add_renderable(Renderable& renderable);
         void add_light(DirectionalLight& light);
@@ -143,7 +143,7 @@ namespace sm {
         void debug_add_lamp(glm::vec3 position, glm::vec3 color);
 
         // Context
-        void change_scene(Id id, bool clear_resources = false);
+        void change_scene(Id id, bool clear_resources = false) noexcept;
         void show_info_text();
         std::string get_information() const;
 

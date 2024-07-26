@@ -42,7 +42,7 @@ namespace sm::internal {
 #endif
     }
 
-    spdlog::logger* Logging::get_global_logger() {
+    spdlog::logger* Logging::get_global_logger() noexcept {
         return g_logger.get();
     }
 

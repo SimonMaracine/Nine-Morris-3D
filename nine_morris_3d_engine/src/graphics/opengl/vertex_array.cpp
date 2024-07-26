@@ -23,11 +23,11 @@ namespace sm {
         LOG_DEBUG("Deleted GL vertex array {}", array);
     }
 
-    void GlVertexArray::bind() const {
+    void GlVertexArray::bind() const noexcept {
         glBindVertexArray(array);
     }
 
-    void GlVertexArray::unbind() {
+    void GlVertexArray::unbind() noexcept {
         glBindVertexArray(0);
     }
 
@@ -90,5 +90,9 @@ namespace sm {
         buffer->bind();
 
         index_buffer = buffer;
+    }
+
+    const GlIndexBuffer* GlVertexArray::get_index_buffer() const noexcept {
+        return index_buffer.get();
     }
 }

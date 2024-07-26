@@ -22,8 +22,8 @@ public:
         float sensitivity
     );
 
-    glm::vec3 get_position() const override;
-    glm::vec3 get_rotation() const override;
+    glm::vec3 get_position() const noexcept override;
+    glm::vec3 get_rotation() const noexcept override;
 
     glm::vec3 get_point() const { return point; }
     float get_distance_to_point() const { return distance_to_point; }

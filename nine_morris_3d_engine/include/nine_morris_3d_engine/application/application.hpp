@@ -59,17 +59,17 @@ namespace sm {
             std::unique_ptr<ApplicationScene> scene;
         };
 
-        float update_frame_counter();
-        unsigned int calculate_fixed_update();
+        float update_frame_counter() noexcept;
+        unsigned int calculate_fixed_update() noexcept;
         void check_changed_scene();
         void dear_imgui_render();
-        void setup_start_scene(Id start_scene_id);
+        void setup_start_scene(Id start_scene_id) noexcept;
         void scene_on_start(MetaScene* meta_scene);
         void scene_on_stop(MetaScene* meta_scene);
 
-        void on_window_closed(const WindowClosedEvent&);
+        void on_window_closed(const WindowClosedEvent&) noexcept;
         void on_window_resized(const WindowResizedEvent& event);
-        void on_window_iconified(const WindowIconifiedEvent& event);
+        void on_window_iconified(const WindowIconifiedEvent& event) noexcept;
 
         std::vector<MetaScene> scene_meta_scenes;
         MetaScene* scene_current {};

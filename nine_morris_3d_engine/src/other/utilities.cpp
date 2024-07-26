@@ -11,13 +11,13 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
-    unsigned int utils::random_int(unsigned int end) {
+    unsigned int utils::random_int(unsigned int end) noexcept {
         assert(end > 0);
 
         return glm::linearRand(0u, end);
     }
 
-    unsigned int utils::random_int(unsigned int begin, unsigned int end) {
+    unsigned int utils::random_int(unsigned int begin, unsigned int end) noexcept {
         assert(end > begin);
 
         return glm::linearRand(begin, end);
@@ -32,7 +32,7 @@ namespace sm {
         float& y,
         float& width,
         float& height
-    ) {
+    ) noexcept {
         if (screen_width / screen_height > image_width / image_height) {
             width = screen_width;
             height = screen_width * (image_height / image_width);

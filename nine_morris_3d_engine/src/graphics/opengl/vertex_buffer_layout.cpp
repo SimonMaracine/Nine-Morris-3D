@@ -1,7 +1,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/vertex_buffer_layout.hpp"
 
 namespace sm {
-    std::size_t VertexBufferLayout::VertexElement::get_size(Type type) {
+    std::size_t VertexBufferLayout::VertexElement::get_size(Type type) noexcept {
         switch (type) {
             case Float:
                 return sizeof(float);

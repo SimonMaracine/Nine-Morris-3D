@@ -3,12 +3,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace sm {
-    void Camera::set_position_orientation(glm::vec3 position, glm::vec3 at, glm::vec3 up) {
+    void Camera::set_position_orientation(glm::vec3 position, glm::vec3 at, glm::vec3 up) noexcept {
         view_matrix = glm::lookAt(position, at, up);
         projection_view_matrix = projection_matrix * view_matrix;
     }
 
-    void Camera::set_position_rotation(glm::vec3 position, glm::vec3 rotation) {
+    void Camera::set_position_rotation(glm::vec3 position, glm::vec3 rotation) noexcept {
         glm::mat4 matrix {1.0f};
         matrix = glm::translate(matrix, position);
         matrix = glm::rotate(matrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -19,7 +19,7 @@ namespace sm {
         projection_view_matrix = projection_matrix * view_matrix;
     }
 
-    void Camera::set_projection(int width, int height, float fov, float near, float far) {
+    void Camera::set_projection(int width, int height, float fov, float near, float far) noexcept {
         projection_matrix = glm::perspective(
             glm::radians(fov),
             static_cast<float>(width) / static_cast<float>(height),
@@ -29,12 +29,12 @@ namespace sm {
         projection_view_matrix = projection_matrix * view_matrix;
     }
 
-    void Camera::set_view(const glm::mat4& view_matrix) {
+    void Camera::set_view(const glm::mat4& view_matrix) noexcept {
         this->view_matrix = view_matrix;
         projection_view_matrix = projection_matrix * view_matrix;
     }
 
-    void Camera2D::set_projection(int left, int right, int bottom, int top) {
+    void Camera2D::set_projection(int left, int right, int bottom, int top) noexcept {
         projection_matrix = glm::ortho(
             static_cast<float>(left),
             static_cast<float>(right),

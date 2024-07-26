@@ -280,19 +280,19 @@ namespace sm::internal {
 #endif
     }
 
-    std::shared_ptr<Font> Renderer::get_default_font() const {
+    std::shared_ptr<Font> Renderer::get_default_font() const noexcept {
         return storage.default_font;
     }
 
-    void Renderer::set_color_correction(bool enable) {
+    void Renderer::set_color_correction(bool enable) noexcept {
         color_correction = enable;
     }
 
-    bool Renderer::get_color_correction() const {
+    bool Renderer::get_color_correction() const noexcept {
         return color_correction;
     }
 
-    void Renderer::set_clear_color(glm::vec3 color) {
+    void Renderer::set_clear_color(glm::vec3 color) noexcept {
         if (color_correction) {
             clear_color = glm::convertSRGBToLinear(color);
         } else {
@@ -390,6 +390,10 @@ namespace sm::internal {
 
             framebuffer->resize(width, height);
         }
+    }
+
+    std::size_t Renderer::get_max_point_lights() noexcept {
+        return SHADER_MAX_POINT_LIGHTS;
     }
 
     void Renderer::set_and_upload_uniform_buffer_data(const Scene& scene) {

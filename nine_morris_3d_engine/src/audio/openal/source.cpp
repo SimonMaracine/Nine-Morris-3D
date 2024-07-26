@@ -37,25 +37,25 @@ namespace sm {
         play(buffer.get());
     }
 
-    void AlSource::stop() const {
+    void AlSource::stop() const noexcept {
         alSourceStop(source);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::pause() const {
+    void AlSource::pause() const noexcept {
         alSourcePause(source);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::resume() const {
+    void AlSource::resume() const noexcept {
         alSourcePlay(source);
 
         openal_debug::check_errors();
     }
 
-    bool AlSource::is_playing() const {
+    bool AlSource::is_playing() const noexcept {
         int state {};
         alGetSourcei(source, AL_SOURCE_STATE, &state);
 
@@ -64,7 +64,7 @@ namespace sm {
         return state == AL_PLAYING;
     }
 
-    void AlSource::set_gain(float gain) const {
+    void AlSource::set_gain(float gain) const noexcept {
         assert(gain >= 0.0f);
 
         alSourcef(source, AL_GAIN, gain);
@@ -72,7 +72,7 @@ namespace sm {
         openal_debug::check_errors();
     }
 
-    void AlSource::set_pitch(float pitch) const {
+    void AlSource::set_pitch(float pitch) const noexcept {
         assert(pitch >= 0.0f);
 
         alSourcef(source, AL_PITCH, pitch);
@@ -80,49 +80,49 @@ namespace sm {
         openal_debug::check_errors();
     }
 
-    void AlSource::set_position(glm::vec3 position) const {
+    void AlSource::set_position(glm::vec3 position) const noexcept {
         alSource3f(source, AL_POSITION, position.x, position.y, position.z);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_velocity(glm::vec3 velocity) const {
+    void AlSource::set_velocity(glm::vec3 velocity) const noexcept {
         alSource3f(source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_direction(glm::vec3 direction) const {
+    void AlSource::set_direction(glm::vec3 direction) const noexcept {
         alSource3f(source, AL_DIRECTION, direction.x, direction.y, direction.z);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_looping(bool looping) const {
+    void AlSource::set_looping(bool looping) const noexcept {
         alSourcei(source, AL_LOOPING, static_cast<ALint>(looping));
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_rolloff_factor(float rolloff_factor) const {
+    void AlSource::set_rolloff_factor(float rolloff_factor) const noexcept {
         alSourcef(source, AL_ROLLOFF_FACTOR, rolloff_factor);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_reference_distance(float reference_distance) const {
+    void AlSource::set_reference_distance(float reference_distance) const noexcept {
         alSourcef(source, AL_REFERENCE_DISTANCE, reference_distance);
 
         openal_debug::check_errors();
     }
 
-    void AlSource::set_max_distance(float max_distance) const {
+    void AlSource::set_max_distance(float max_distance) const noexcept {
         alSourcef(source, AL_MAX_DISTANCE, max_distance);
 
         openal_debug::check_errors();
     }
 
-    float AlSource::get_gain() const {
+    float AlSource::get_gain() const noexcept {
         float gain {};
         alGetSourcef(source, AL_GAIN, &gain);
 
@@ -131,7 +131,7 @@ namespace sm {
         return gain;
     }
 
-    float AlSource::get_pitch() const {
+    float AlSource::get_pitch() const noexcept {
         float pitch {};
         alGetSourcef(source, AL_PITCH, &pitch);
 
@@ -140,7 +140,7 @@ namespace sm {
         return pitch;
     }
 
-    glm::vec3 AlSource::get_position() const {
+    glm::vec3 AlSource::get_position() const noexcept {
         glm::vec3 position {};
         alGetSource3f(source, AL_POSITION, &position.x, &position.y, &position.z);
 
@@ -149,7 +149,7 @@ namespace sm {
         return position;
     }
 
-    glm::vec3 AlSource::get_velocity() const {
+    glm::vec3 AlSource::get_velocity() const noexcept {
         glm::vec3 velocity {};
         alGetSource3f(source, AL_VELOCITY, &velocity.x, &velocity.y, &velocity.z);
 
@@ -158,7 +158,7 @@ namespace sm {
         return velocity;
     }
 
-    glm::vec3 AlSource::get_direction() const {
+    glm::vec3 AlSource::get_direction() const noexcept {
         glm::vec3 direction {};
         alGetSource3f(source, AL_DIRECTION, &direction.x, &direction.y, &direction.z);
 
@@ -167,7 +167,7 @@ namespace sm {
         return direction;
     }
 
-    bool AlSource::get_looping() const {
+    bool AlSource::get_looping() const noexcept {
         int looping {};
         alGetSourcei(source, AL_LOOPING, &looping);
 
@@ -176,7 +176,7 @@ namespace sm {
         return static_cast<bool>(looping);
     }
 
-    float AlSource::get_rolloff_factor() const {
+    float AlSource::get_rolloff_factor() const noexcept {
         float rolloff_factor {};
         alGetSourcef(source, AL_ROLLOFF_FACTOR, &rolloff_factor);
 
@@ -185,7 +185,7 @@ namespace sm {
         return rolloff_factor;
     }
 
-    float AlSource::get_reference_distance() const {
+    float AlSource::get_reference_distance() const noexcept {
         float reference_distance {};
         alGetSourcef(source, AL_REFERENCE_DISTANCE, &reference_distance);
 
@@ -194,7 +194,7 @@ namespace sm {
         return reference_distance;
     }
 
-    float AlSource::get_max_distance() const {
+    float AlSource::get_max_distance() const noexcept {
         float max_distance {};
         alGetSourcef(source, AL_MAX_DISTANCE, &max_distance);
 

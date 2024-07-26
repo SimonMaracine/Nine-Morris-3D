@@ -20,7 +20,7 @@ namespace sm {
         return std::make_pair(video_mode->width, video_mode->height);
     }
 
-    std::pair<float, float> Monitors::get_content_scale(std::size_t index) const {
+    std::pair<float, float> Monitors::get_content_scale(std::size_t index) const noexcept {
         assert(index < count);
 
         float xscale, yscale;
@@ -41,7 +41,7 @@ namespace sm {
         return name;
     }
 
-    std::size_t Monitors::get_count() const {
+    std::size_t Monitors::get_count() const noexcept {
         return count;
     }
 }

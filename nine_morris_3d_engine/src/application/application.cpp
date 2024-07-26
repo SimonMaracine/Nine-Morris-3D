@@ -95,7 +95,7 @@ namespace sm {
         return ctx.exit_code;
     }
 
-    float Application::update_frame_counter() {
+    float Application::update_frame_counter() noexcept {
         static constexpr double MAX_DT {1.0 / 20.0};
 
         const double current_seconds {internal::Window::get_time()};
@@ -116,7 +116,7 @@ namespace sm {
         return static_cast<float>(delta_time);
     }
 
-    unsigned int Application::calculate_fixed_update() {
+    unsigned int Application::calculate_fixed_update() noexcept {
         static constexpr double FIXED_DT {1.0 / 50.0};
 
         const double current_seconds {internal::Window::get_time()};
@@ -170,7 +170,7 @@ namespace sm {
         internal::imgui_context::end_frame();
     }
 
-    void Application::setup_start_scene(Id start_scene_id) {
+    void Application::setup_start_scene(Id start_scene_id) noexcept {
         for (auto& meta_scene : scene_meta_scenes) {
             if (meta_scene.id == start_scene_id) {
                 scene_current = &meta_scene;
@@ -197,7 +197,7 @@ namespace sm {
         meta_scene->scene.reset();
     }
 
-    void Application::on_window_closed(const WindowClosedEvent&) {
+    void Application::on_window_closed(const WindowClosedEvent&) noexcept {
         ctx.running = false;
     }
 
@@ -205,7 +205,7 @@ namespace sm {
         ctx.rnd.resize_framebuffers(event.width, event.height);
     }
 
-    void Application::on_window_iconified(const WindowIconifiedEvent& event) {
+    void Application::on_window_iconified(const WindowIconifiedEvent& event) noexcept {
         minimized = event.iconified;
     }
 }

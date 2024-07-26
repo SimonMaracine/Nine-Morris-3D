@@ -50,11 +50,11 @@ PointCameraController::PointCameraController(
     update_camera(1.0f);
 }
 
-glm::vec3 PointCameraController::get_position() const {
+glm::vec3 PointCameraController::get_position() const noexcept {
     return position;
 }
 
-glm::vec3 PointCameraController::get_rotation() const {
+glm::vec3 PointCameraController::get_rotation() const noexcept {
     return glm::vec3(pitch, yaw, 0.0f);
 }
 

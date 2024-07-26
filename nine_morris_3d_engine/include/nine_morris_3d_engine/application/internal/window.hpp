@@ -26,25 +26,25 @@ namespace sm::internal {
         Window(Window&&) = delete;
         Window& operator=(Window&&) = delete;
 
-        int get_width() const;
-        int get_height() const;
+        int get_width() const noexcept;
+        int get_height() const noexcept;
 
-        void show() const;
-        void set_vsync(int interval) const;
+        void show() const noexcept;
+        void set_vsync(int interval) const noexcept;
         void add_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
         void set_cursor(Id id) const;
         void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
 
-        Monitors get_monitors();
-        static double get_time();
+        Monitors get_monitors() const;
+        static double get_time() noexcept;
 
-        GLFWwindow* get_handle() const;
+        GLFWwindow* get_handle() const noexcept;
 
         // Swap buffers and update events
-        void update() const;
+        void update() const noexcept;
     private:
         void create_window(const ApplicationProperties& properties);
-        void install_callbacks() const;
+        void install_callbacks() const noexcept;
 
         int width {};
         int height {};

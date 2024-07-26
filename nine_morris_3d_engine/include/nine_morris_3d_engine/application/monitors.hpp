@@ -13,9 +13,9 @@ namespace sm {
     class Monitors {
     public:
         std::pair<int, int> get_resolution(std::size_t index) const;
-        std::pair<float, float> get_content_scale(std::size_t index) const;
+        std::pair<float, float> get_content_scale(std::size_t index) const noexcept;
         const char* get_name(std::size_t index) const;
-        std::size_t get_count() const;
+        std::size_t get_count() const noexcept;
     private:
         GLFWmonitor** monitors {};
         std::size_t count {};

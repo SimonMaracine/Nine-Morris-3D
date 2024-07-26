@@ -9,7 +9,7 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
-    void openal_debug::check_errors() {
+    void openal_debug::check_errors() noexcept {
 #ifndef SM_BUILD_DISTRIBUTION
         const ALenum error {alGetError()};
 
@@ -17,26 +17,28 @@ namespace sm {
             return;
         }
 
-        switch(error) {
-            case AL_INVALID_NAME:
-                LOG_CRITICAL("({}) OpenAL AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function", error);
-                break;
-            case AL_INVALID_ENUM:
-                LOG_CRITICAL("({}) OpenAL AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function", error);
-                break;
-            case AL_INVALID_VALUE:
-                LOG_CRITICAL("({}) OpenAL AL_INVALID_VALUE: an invalid value was passed to an OpenAL function", error);
-                break;
-            case AL_INVALID_OPERATION:
-                LOG_CRITICAL("({}) OpenAL AL_INVALID_OPERATION: the requested operation is not valid", error);
-                break;
-            case AL_OUT_OF_MEMORY:
-                LOG_CRITICAL("({}) OpenAL AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory", error);
-                break;
-            default:
-                LOG_CRITICAL("({}) OpenAL: unknown error", error);
-                break;
-        }
+        try {
+            switch(error) {
+                case AL_INVALID_NAME:
+                    LOG_CRITICAL("({}) OpenAL AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function", error);
+                    break;
+                case AL_INVALID_ENUM:
+                    LOG_CRITICAL("({}) OpenAL AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function", error);
+                    break;
+                case AL_INVALID_VALUE:
+                    LOG_CRITICAL("({}) OpenAL AL_INVALID_VALUE: an invalid value was passed to an OpenAL function", error);
+                    break;
+                case AL_INVALID_OPERATION:
+                    LOG_CRITICAL("({}) OpenAL AL_INVALID_OPERATION: the requested operation is not valid", error);
+                    break;
+                case AL_OUT_OF_MEMORY:
+                    LOG_CRITICAL("({}) OpenAL AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory", error);
+                    break;
+                default:
+                    LOG_CRITICAL("({}) OpenAL: unknown error", error);
+                    break;
+            }
+        } catch (...) {}
 
         std::abort();
 #endif
@@ -60,7 +62,7 @@ namespace sm {
         return result;
     }
 
-    const char* openal_debug::get_version() {
+    const char* openal_debug::get_version() noexcept {
         return alGetString(AL_VERSION);
     }
 }

@@ -7,20 +7,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace sm::internal {
-    void Scene::capture(const Camera& camera, glm::vec3 position) {
+    void Scene::capture(const Camera& camera, glm::vec3 position) noexcept {
         this->camera = camera;
         camera_position = position;
     }
 
-    void Scene::capture(const Camera2D& camera_2d) {
+    void Scene::capture(const Camera2D& camera_2d) noexcept {
         this->camera_2d = camera_2d;
     }
 
-    void Scene::skybox(std::shared_ptr<GlTextureCubemap> texture) {
+    void Scene::skybox(std::shared_ptr<GlTextureCubemap> texture) noexcept {
         skybox_texture = texture;
     }
 
-    void Scene::shadow(ShadowBox& box) {
+    void Scene::shadow(ShadowBox& box) noexcept {
         const glm::mat4 view_matrix {
             glm::lookAt(glm::vec3(0.0f), directional_light.direction, glm::vec3(0.0f, 1.0f, 0.0f))
         };
@@ -196,7 +196,7 @@ namespace sm::internal {
         }
     }
 
-    void Scene::clear() {
+    void Scene::clear() noexcept {
         renderables.clear();
         directional_light = {};
         point_lights.clear();
@@ -219,7 +219,7 @@ namespace sm::internal {
 #endif
     }
 
-    void Scene::shadow(const ShadowBox& box) {
+    void Scene::shadow(const ShadowBox& box) noexcept {
         shadow_box = box;
     }
 

@@ -60,6 +60,18 @@ namespace sm {
         LOG_DEBUG("Freed texture data");
     }
 
+    int TextureData::get_width() const noexcept {
+        return width;
+    }
+
+    int TextureData::get_height() const noexcept {
+        return height;
+    }
+
+    const unsigned char* TextureData::get_data() const noexcept {
+        return data;
+    }
+
     void TextureData::resize(int new_width, int new_height) {
         unsigned char* new_data {stbir_resize_uint8_linear(data, width, height, 0, nullptr, new_width, new_height, 0, STBIR_RGBA)};
         stbi_image_free(data);

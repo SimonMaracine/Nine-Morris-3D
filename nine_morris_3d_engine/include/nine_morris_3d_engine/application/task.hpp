@@ -22,7 +22,7 @@ namespace sm {
         Task(const TaskFunction& function, void* user_data)
             : function(function), user_data(user_data) {}
 
-        double get_total_time() const { return total_time; }
+        double get_total_time() const noexcept { return total_time; }
     private:
         TaskFunction function;
         void* user_data {};
@@ -49,8 +49,8 @@ namespace sm {
         AsyncTask(AsyncTask&&) = delete;
         AsyncTask& operator=(AsyncTask&&) = delete;
 
-        void set_done() { done.store(true); }
-        bool stop_requested() const { return stop.load(); }
+        void set_done() noexcept { done.store(true); }
+        bool stop_requested() const noexcept { return stop.load(); }
     private:
         std::thread thread;
         std::atomic_bool done {false};

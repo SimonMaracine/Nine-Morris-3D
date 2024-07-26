@@ -23,7 +23,7 @@ namespace sm::internal {
         std::string path_engine_assets(const std::string& path) const;
 
         void check_and_fix_directories() const;
-        const std::string& get_error_string() const;
+        const std::string& get_error_string() const noexcept;
     private:
         std::string application_name;
         std::string assets_directory;

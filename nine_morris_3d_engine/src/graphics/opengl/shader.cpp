@@ -35,11 +35,11 @@ namespace sm {
         LOG_DEBUG("Deleted GL shader {}", program);
     }
 
-    void GlShader::bind() const {
+    void GlShader::bind() const noexcept {
         glUseProgram(program);
     }
 
-    void GlShader::unbind() {
+    void GlShader::unbind() noexcept {
         glUseProgram(0);
     }
 
@@ -96,6 +96,10 @@ namespace sm {
     void GlShader::upload_uniform_vec4(Id name, glm::vec4 vector) const {
         const int location {get_uniform_location(name)};
         glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
+    }
+
+    unsigned int GlShader::get_id() const noexcept {
+        return program;
     }
 
     void GlShader::add_uniform_buffer(std::shared_ptr<GlUniformBuffer> uniform_buffer) {
@@ -216,7 +220,7 @@ namespace sm {
         return uniforms;
     }
 
-    void GlShader::create_program(unsigned int vertex_shader, unsigned int fragment_shader) {
+    void GlShader::create_program(unsigned int vertex_shader, unsigned int fragment_shader) noexcept {
         assert(vertex_shader != 0);
         assert(fragment_shader != 0);
 
@@ -227,7 +231,7 @@ namespace sm {
         glValidateProgram(program);
     }
 
-    void GlShader::delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader) {
+    void GlShader::delete_intermediates(unsigned int vertex_shader, unsigned int fragment_shader) noexcept {
         assert(program != 0);
         assert(vertex_shader != 0);
         assert(fragment_shader != 0);
