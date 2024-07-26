@@ -67,19 +67,47 @@ namespace sm::internal {
     }
 
     bool FileSystem::directory_exists(const std::string& path) {
-        return std::filesystem::is_directory(path);  // FIXME handle exceptions
+        std::error_code ec;
+        const bool result {std::filesystem::is_directory(path)};
+
+        if (ec) {
+            throw OtherError("Could not check if path is a directory: " + ec.message());
+        }
+
+        return result;
     }
 
     bool FileSystem::create_directory(const std::string& path) {
-        return std::filesystem::create_directory(path);
+        std::error_code ec;
+        const bool result {std::filesystem::create_directory(path)};
+
+        if (ec) {
+            throw OtherError("Could not create directory: " + ec.message());
+        }
+
+        return result;
     }
 
     bool FileSystem::delete_file(const std::string& path) {
-        return std::filesystem::remove(path);
+        std::error_code ec;
+        const bool result {std::filesystem::remove(path, ec)};
+
+        if (ec) {
+            throw OtherError("Could not remove file or directory: " + ec.message());
+        }
+
+        return result;
     }
 
     std::string FileSystem::current_working_directory() {
-        return std::filesystem::current_path().string();
+        std::error_code ec;
+        const auto path {std::filesystem::current_path(ec).string()};
+
+        if (ec) {
+            throw OtherError("Could not retrieve current working directory: " + ec.message());
+        }
+
+        return path;
     }
 
     std::string FileSystem::path_logs() const {
@@ -184,5 +212,9 @@ namespace sm::internal {
             }
         }
 #endif
+    }
+
+    const std::string& FileSystem::get_error_string() const {
+        return error_string;
     }
 }

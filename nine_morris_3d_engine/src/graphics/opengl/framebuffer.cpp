@@ -191,12 +191,6 @@ namespace sm {
 
         assert(specification.width > 0 && specification.height > 0);
 
-        assert(specification.color_clear.drawbuffer >= 0);
-
-        if (!specification.color_attachments.empty()) {
-            assert(static_cast<std::size_t>(specification.color_clear.drawbuffer) < specification.color_attachments.size());
-        }
-
         build();
 
         LOG_DEBUG("Created GL framebuffer {}", framebuffer);
@@ -281,10 +275,6 @@ namespace sm {
 
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
         glReadPixels(x, y, 1, 1, GL_RED, GL_FLOAT, nullptr);
-    }
-
-    void GlFramebuffer::clear_color_attachment_float() const {  // TODO right now not used
-        glClearBufferfv(GL_COLOR, specification.color_clear.drawbuffer, specification.color_clear.value);
     }
 
     void GlFramebuffer::blit(const GlFramebuffer* draw_framebuffer, int width, int height) const {

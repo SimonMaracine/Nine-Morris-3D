@@ -100,7 +100,7 @@ namespace sm {
         void add_window_cursor(Id id, std::unique_ptr<TextureData>&& cursor, int x_hotspot, int y_hotspot);
         void set_window_cursor(Id id) const;
         void set_window_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
-        const Monitors& get_monitors();
+        Monitors get_monitors();
         static double get_time();
 
         // Renderer

@@ -312,44 +312,7 @@ namespace sm::internal {
     }
 
     void Renderer::render(const Scene& scene, int width, int height) {
-        // TODO see if this can be improved
-
-        for (const auto& [binding_index, wuniform_buffer] : storage.uniform_buffers) {
-            const auto uniform_buffer {wuniform_buffer.lock()};
-
-            if (uniform_buffer == nullptr) {
-                continue;
-            }
-
-            switch (binding_index) {
-                case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.camera.projection_view_matrix, "u_projection_view_matrix"_H);
-                    break;
-                case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.directional_light.direction, "u_directional_light.direction"_H);
-                    uniform_buffer->set(&scene.directional_light.ambient_color, "u_directional_light.ambient"_H);
-                    uniform_buffer->set(&scene.directional_light.diffuse_color, "u_directional_light.diffuse"_H);
-                    uniform_buffer->set(&scene.directional_light.specular_color, "u_directional_light.specular"_H);
-                    break;
-                case VIEW_UNIFORM_BLOCK_BINDING:
-                    uniform_buffer->set(&scene.camera_position, "u_view_position"_H);
-                    break;
-                case POINT_LIGHT_UNIFORM_BLOCK_BINDING:
-                    setup_point_light_uniform_buffer(scene, uniform_buffer);
-                    break;
-                case LIGHT_SPACE_UNIFORM_BLOCK_BINDING:
-                    setup_light_space_uniform_buffer(scene, uniform_buffer);
-                    break;
-                default:
-                    assert(false);
-                    break;
-            }
-
-            uniform_buffer->bind();
-            uniform_buffer->upload();
-        }
-
-        GlUniformBuffer::unbind();
+        set_and_upload_uniform_buffer_data(scene);
 
         // Draw to depth buffer for shadows
         storage.shadow_map_framebuffer->bind();
@@ -400,39 +363,11 @@ namespace sm::internal {
     }
 
     void Renderer::pre_setup() {
-        for (const auto& wshader : storage.shaders) {  // TODO no longer really needed
-            const auto shader {wshader.lock()};
-
-            if (shader == nullptr) {
-                continue;
-            }
-
-            setup_shader_uniform_buffers(shader);
-        }
+        clear_expired_resources();
     }
 
     void Renderer::post_setup() {
-        storage.shaders.erase(  // TODO do this in pre_setup too
-            std::remove_if(storage.shaders.begin(), storage.shaders.end(), [](const std::weak_ptr<GlShader>& wshader) {
-                return wshader.lock() == nullptr;
-            }),
-            storage.shaders.cend()
-        );
-
-        storage.framebuffers.erase(
-            std::remove_if(storage.framebuffers.begin(), storage.framebuffers.end(), [](const std::weak_ptr<GlFramebuffer>& wframebuffer) {
-                return wframebuffer.lock() == nullptr;
-            }),
-            storage.framebuffers.cend()
-        );
-
-        for (auto iter {storage.uniform_buffers.begin()}; iter != storage.uniform_buffers.end();) {
-            if (iter->second.lock() == nullptr) {
-                iter = storage.uniform_buffers.erase(iter);
-            } else {
-                iter++;
-            }
-        }
+        clear_expired_resources();
     }
 
     void Renderer::resize_framebuffers(int width, int height) {
@@ -455,6 +390,45 @@ namespace sm::internal {
 
             framebuffer->resize(width, height);
         }
+    }
+
+    void Renderer::set_and_upload_uniform_buffer_data(const Scene& scene) {
+        for (const auto& [binding_index, wuniform_buffer] : storage.uniform_buffers) {
+            const auto uniform_buffer {wuniform_buffer.lock()};
+
+            if (uniform_buffer == nullptr) {
+                continue;
+            }
+
+            switch (binding_index) {
+                case PROJECTON_VIEW_UNIFORM_BLOCK_BINDING:
+                    uniform_buffer->set(&scene.camera.projection_view_matrix, "u_projection_view_matrix"_H);
+                    break;
+                case DIRECTIONAL_LIGHT_UNIFORM_BLOCK_BINDING:
+                    uniform_buffer->set(&scene.directional_light.direction, "u_directional_light.direction"_H);
+                    uniform_buffer->set(&scene.directional_light.ambient_color, "u_directional_light.ambient"_H);
+                    uniform_buffer->set(&scene.directional_light.diffuse_color, "u_directional_light.diffuse"_H);
+                    uniform_buffer->set(&scene.directional_light.specular_color, "u_directional_light.specular"_H);
+                    break;
+                case VIEW_UNIFORM_BLOCK_BINDING:
+                    uniform_buffer->set(&scene.camera_position, "u_view_position"_H);
+                    break;
+                case POINT_LIGHT_UNIFORM_BLOCK_BINDING:
+                    setup_point_light_uniform_buffer(scene, uniform_buffer);
+                    break;
+                case LIGHT_SPACE_UNIFORM_BLOCK_BINDING:
+                    setup_light_space_uniform_buffer(scene, uniform_buffer);
+                    break;
+                default:
+                    assert(false);
+                    break;
+            }
+
+            uniform_buffer->bind();
+            uniform_buffer->upload();
+        }
+
+        GlUniformBuffer::unbind();
     }
 
     void Renderer::post_processing(const Scene& scene) {
@@ -523,6 +497,30 @@ namespace sm::internal {
             shader->add_uniform_buffer(uniform_buffer);
 
             storage.uniform_buffers[block.binding_index] = uniform_buffer;
+        }
+    }
+
+    void Renderer::clear_expired_resources() {
+        storage.shaders.erase(
+            std::remove_if(storage.shaders.begin(), storage.shaders.end(), [](const std::weak_ptr<GlShader>& wshader) {
+                return wshader.lock() == nullptr;
+            }),
+            storage.shaders.cend()
+        );
+
+        storage.framebuffers.erase(
+            std::remove_if(storage.framebuffers.begin(), storage.framebuffers.end(), [](const std::weak_ptr<GlFramebuffer>& wframebuffer) {
+                return wframebuffer.lock() == nullptr;
+            }),
+            storage.framebuffers.cend()
+        );
+
+        for (auto iter {storage.uniform_buffers.begin()}; iter != storage.uniform_buffers.end();) {
+            if (iter->second.lock() == nullptr) {
+                iter = storage.uniform_buffers.erase(iter);
+            } else {
+                iter++;
+            }
         }
     }
 

@@ -37,11 +37,6 @@ namespace sm {
         int width {};
         int height {};
 
-        struct {  // TODO get rid of this, if not used
-            int drawbuffer {};
-            float value[4] {};
-        } color_clear;
-
         int samples {1};
         int resize_divisor {1};
         bool resizable {true};
@@ -72,9 +67,6 @@ namespace sm {
         // Read pixels from some buffer
         float read_pixel_float(int attachment_index, int x, int y) const;  // TODO read value is float; should be generic
         void read_pixel_float_pbo(int attachment_index, int x, int y) const;
-
-        // Clear some buffer
-        void clear_color_attachment_float() const;  // TODO should be generic
 
         // Resolve this to draw_framebuffer
         void blit(const GlFramebuffer* draw_framebuffer, int width, int height) const;

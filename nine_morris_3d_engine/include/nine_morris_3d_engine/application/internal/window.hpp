@@ -35,7 +35,7 @@ namespace sm::internal {
         void set_cursor(Id id) const;
         void set_icons(std::initializer_list<std::unique_ptr<TextureData>> icons) const;
 
-        const Monitors& get_monitors();
+        Monitors get_monitors();
         static double get_time();
 
         GLFWwindow* get_handle() const;
@@ -43,14 +43,13 @@ namespace sm::internal {
         // Swap buffers and update events
         void update() const;
     private:
-        GLFWwindow* create_window(const ApplicationProperties& properties);
+        void create_window(const ApplicationProperties& properties);
         void install_callbacks() const;
 
         int width {};
         int height {};
 
         GLFWwindow* window {};
-        Monitors monitors;
         std::unordered_map<Id, GLFWcursor*, Hash> cursors;
         EventDispatcher* evt {};
     };

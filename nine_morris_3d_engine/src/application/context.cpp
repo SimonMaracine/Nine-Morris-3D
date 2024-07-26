@@ -102,7 +102,7 @@ namespace sm {
         win.set_icons(icons);
     }
 
-    const Monitors& Ctx::get_monitors() {
+    Monitors Ctx::get_monitors() {
         return win.get_monitors();
     }
 

@@ -13,6 +13,10 @@ namespace sm {
 
         const GLFWvidmode* video_mode {glfwGetVideoMode(monitors[index])};
 
+        if (video_mode == nullptr) {
+            SM_THROW_ERROR(OtherError, "Could not get monitor video mode");
+        }
+
         return std::make_pair(video_mode->width, video_mode->height);
     }
 
@@ -25,15 +29,19 @@ namespace sm {
         return std::make_pair(xscale, yscale);
     }
 
-    const char* Monitors::get_name(std::size_t index) const {  // TODO used?
+    const char* Monitors::get_name(std::size_t index) const {
         assert(index < count);
 
         const char* name {glfwGetMonitorName(monitors[index])};
 
         if (name == nullptr) {
-            SM_THROW_ERROR(OtherError, "Could not retrieve monitor name");
+            SM_THROW_ERROR(OtherError, "Could not get monitor name");
         }
 
         return name;
+    }
+
+    std::size_t Monitors::get_count() const {
+        return count;
     }
 }

@@ -64,10 +64,12 @@ namespace sm::internal {
 
         static std::size_t get_max_point_lights() { return SHADER_MAX_POINT_LIGHTS; }
     private:
+        void set_and_upload_uniform_buffer_data(const Scene& scene);
         void post_processing(const Scene& scene);
         void finish_3d(const Scene& scene, int width, int height);
         void screen_quad(const GlShader* shader, unsigned int texture);
         void setup_shader_uniform_buffers(std::shared_ptr<GlShader> shader);
+        void clear_expired_resources();
 
         // Draw functions
         void draw_renderables(const Scene& scene);

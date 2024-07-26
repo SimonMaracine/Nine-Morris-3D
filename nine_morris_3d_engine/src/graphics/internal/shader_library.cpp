@@ -42,7 +42,14 @@ namespace sm::internal {
 
     void ShaderLibrary::load_shaders_from_include_directories(std::initializer_list<std::string> include_directories) {
         for (const auto& include_directory : include_directories) {
-            for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(include_directory)) {  // FIXME throws exception
+            std::error_code ec;
+            auto iter {std::filesystem::recursive_directory_iterator(include_directory, ec)};
+
+            if (ec) {
+                SM_THROW_ERROR(ResourceError, "Could not iterate over include directory: {}", ec.message());
+            }
+
+            for (const std::filesystem::directory_entry& entry : iter) {
                 if (entry.is_regular_file() && entry.path().extension() == ".glsl") {
                     const auto file_path {entry.path().string()};
                     const auto first_slash {file_path.find_first_of("/")};

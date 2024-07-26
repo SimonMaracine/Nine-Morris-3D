@@ -57,7 +57,7 @@ namespace sm {
         std::ifstream stream {file_path, std::ios::binary};
 
         if (!stream.is_open()) {
-            throw FileReadError("Could not open file for reading");
+            throw ResourceError("Could not open file for reading");
         }
 
         stream.seekg(0, stream.end);
@@ -70,7 +70,7 @@ namespace sm {
         stream.read(buffer.data(), length);
 
         if (stream.fail()) {
-            throw FileReadError("Error reading file");
+            throw ResourceError("Error reading file");
         }
 
         return buffer;
@@ -81,8 +81,9 @@ namespace sm {
 
         try {
             return read_file_ex(file_path);
-        } catch (const utils::FileReadError& e) {
-            SM_THROW_ERROR(ResourceError, "Could not read file `{}`: {}", file_path, e.what());
+        } catch (const ResourceError& e) {
+            LOG_DIST_CRITICAL("Could not read file `{}`: {}", file_path, e.what());
+            throw;
         }
     }
 }

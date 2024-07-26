@@ -45,11 +45,7 @@ namespace sm::internal {
         LOG_INFO("Using OpenGL debug context");
 #endif
 
-        window = create_window(properties);
-
-        if (window == nullptr) {
-            SM_THROW_ERROR(InitializationError, "Could not create window");
-        }
+        create_window(properties);
 
         LOG_INFO("Created window and OpenGL context");
 
@@ -149,14 +145,15 @@ namespace sm::internal {
         glfwSetWindowIcon(window, static_cast<int>(icons.size()), icons.data());
     }
 
-    const Monitors& Window::get_monitors() {
+    Monitors Window::get_monitors() {
         int count {};
         GLFWmonitor** connected_monitors {glfwGetMonitors(&count)};
 
         if (connected_monitors == nullptr) {
-            SM_THROW_ERROR(OtherError, "Could not retrieve monitors");
+            SM_THROW_ERROR(OtherError, "Could not get monitors");
         }
 
+        Monitors monitors;
         monitors.count = static_cast<std::size_t>(count);
         monitors.monitors = connected_monitors;
 
@@ -164,26 +161,46 @@ namespace sm::internal {
     }
 
     double Window::get_time() {
-        return glfwGetTime();  // FIXME this can return 0.0 on error
+        const double time {glfwGetTime()};
+
+#ifndef SM_BUILD_DISTRIBUTION
+        if (time == 0.0) {
+            LOG_ERROR("Could not get time");
+        }
+#endif
+
+        return time;
     }
 
     GLFWwindow* Window::get_handle() const {
         return window;
     }
 
-    GLFWwindow* Window::create_window(const ApplicationProperties& properties) {
+    void Window::create_window(const ApplicationProperties& properties) {
         GLFWmonitor* primary_monitor {};
 
         if (properties.fullscreen) {
             primary_monitor = glfwGetPrimaryMonitor();
 
-            if (properties.native_resolution) {
-                const GLFWvidmode* video_mode {glfwGetVideoMode(primary_monitor)};
+            if (primary_monitor == nullptr) {
+                SM_THROW_ERROR(InitializationError, "Could not get primary monitor");
+            }
 
+            const GLFWvidmode* video_mode {glfwGetVideoMode(primary_monitor)};
+
+            if (video_mode == nullptr) {
+                SM_THROW_ERROR(InitializationError, "Could not get monitor video mode");
+            }
+
+            if (properties.native_resolution) {
                 width = video_mode->width;
                 height = video_mode->height;
             } else {
-                width = properties.width;  // FIXME maybe this could be larger than monitor's native resolution, which would crash the game
+                if (properties.width > video_mode->width || properties.height > video_mode->height) {
+                    SM_THROW_ERROR(InitializationError, "Invalid window width or height");
+                }
+
+                width = properties.width;
                 height = properties.height;
             }
         } else {
@@ -193,7 +210,11 @@ namespace sm::internal {
 
         assert(width > 0 && height > 0);
 
-        return glfwCreateWindow(width, height, properties.title, primary_monitor, nullptr);
+        window = glfwCreateWindow(width, height, properties.title, primary_monitor, nullptr);
+
+        if (window == nullptr) {
+            SM_THROW_ERROR(InitializationError, "Could not create window");
+        }
     }
 
     void Window::install_callbacks() const {
