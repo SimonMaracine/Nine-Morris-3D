@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <variant>
+#include <string>
 
 #include <glm/glm.hpp>
 
@@ -9,7 +9,6 @@
 #include "nine_morris_3d_engine/graphics/material.hpp"
 #include "nine_morris_3d_engine/graphics/mesh.hpp"
 #include "nine_morris_3d_engine/graphics/font.hpp"
-#include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
     namespace internal {

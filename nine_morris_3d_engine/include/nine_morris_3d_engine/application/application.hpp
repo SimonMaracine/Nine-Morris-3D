@@ -4,13 +4,13 @@
 #include <memory>
 #include <vector>
 
-#include "nine_morris_3d_engine/application/scene.hpp"
 #include "nine_morris_3d_engine/application/properties.hpp"
 #include "nine_morris_3d_engine/application/context.hpp"
 #include "nine_morris_3d_engine/application/events.hpp"
 #include "nine_morris_3d_engine/application/id.hpp"
 
 namespace sm {
+    class ApplicationScene;
     class Window;
 
     struct UserFunctions {
@@ -72,8 +72,8 @@ namespace sm {
         void on_window_iconified(const WindowIconifiedEvent& event);
 
         std::vector<MetaScene> scene_meta_scenes;
-        MetaScene* scene_current {nullptr};
-        MetaScene* scene_next {nullptr};
+        MetaScene* scene_current {};
+        MetaScene* scene_next {};
         bool scene_clear_resources {};
 
         // Keep track of window state to skip rendering

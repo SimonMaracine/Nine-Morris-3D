@@ -19,6 +19,6 @@ namespace sm::internal {
         static Key key_from_code(int code);
         static MouseButton mouse_button_from_code(int code);
     private:
-        GLFWwindow* window_handle {nullptr};
+        GLFWwindow* window_handle {};
     };
 }

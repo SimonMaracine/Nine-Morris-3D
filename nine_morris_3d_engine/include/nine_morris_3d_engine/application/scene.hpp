@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include "nine_morris_3d_engine/application/context.hpp"
 #include "nine_morris_3d_engine/application/id.hpp"
 

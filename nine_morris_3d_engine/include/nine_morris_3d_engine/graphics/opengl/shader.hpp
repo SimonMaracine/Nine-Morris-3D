@@ -10,8 +10,7 @@
 #include "nine_morris_3d_engine/application/id.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
 
-// Setting uniforms is a little weird
-// https://www.khronos.org/opengl/wiki/Program_Introspection#Naming
+// setting uniforms https://www.khronos.org/opengl/wiki/Program_Introspection#Naming
 
 namespace sm {
     namespace internal {

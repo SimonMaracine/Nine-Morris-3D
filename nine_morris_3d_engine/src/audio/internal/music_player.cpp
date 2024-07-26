@@ -63,7 +63,5 @@ namespace sm::internal {
         }
 
         source->set_gain(gain);
-
-        current_gain = gain;
     }
 }

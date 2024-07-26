@@ -3,7 +3,6 @@
 #include <vector>
 #include <array>
 #include <unordered_map>
-#include <initializer_list>
 #include <memory>
 #include <cstddef>
 
@@ -16,15 +15,12 @@
 #include "nine_morris_3d_engine/graphics/internal/scene.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/shader.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/framebuffer.hpp"
-#include "nine_morris_3d_engine/graphics/renderable.hpp"
-#include "nine_morris_3d_engine/graphics/light.hpp"
-#include "nine_morris_3d_engine/graphics/camera.hpp"
+#include "nine_morris_3d_engine/graphics/font.hpp"
 
 namespace sm {
     class GlVertexArray;
     class GlVertexBuffer;
     class GlUniformBuffer;
-    class Font;
 }
 
 namespace sm::internal {
@@ -140,11 +136,9 @@ namespace sm::internal {
 
             struct {
                 std::unique_ptr<QuadVertex[]> buffer;
-                QuadVertex* buffer_pointer {nullptr};
-
+                QuadVertex* buffer_pointer {};
                 std::array<unsigned int, 8> textures {};
                 std::size_t texture_index {};
-
                 std::size_t quad_count {};
             } quad;
 

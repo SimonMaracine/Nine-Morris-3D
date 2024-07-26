@@ -16,7 +16,7 @@ namespace sm {
         std::pair<float, float> get_content_scale(std::size_t index) const;
         const char* get_name(std::size_t index) const;
     private:
-        GLFWmonitor** monitors {nullptr};
+        GLFWmonitor** monitors {};
         std::size_t count {};
 
         friend class internal::Window;

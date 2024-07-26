@@ -98,7 +98,7 @@ namespace sm {
 
         std::unordered_map<Id, UniformBlockField, Hash> fields;
 
-        unsigned char* data {nullptr};
+        unsigned char* data {};
         std::size_t size {};
 
         bool configured {false};
@@ -128,7 +128,7 @@ namespace sm {
         }
     private:
         unsigned int buffer {};
-        void* data {nullptr};  // TODO clear value is float; should be generic
-        unsigned char* dummy_data {nullptr};
+        void* data {};  // TODO clear value is float; should be generic
+        unsigned char* dummy_data {};
     };
 }

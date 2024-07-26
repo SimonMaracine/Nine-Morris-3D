@@ -136,7 +136,7 @@ namespace sm {
     }
 
     static const char* print_framebuffer_status_message(GLenum status) {
-        const char* message {nullptr};
+        const char* message {};
 
         switch (status) {
             case GL_FRAMEBUFFER_UNDEFINED:

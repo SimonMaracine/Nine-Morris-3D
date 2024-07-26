@@ -10,13 +10,14 @@
 #include <resmanager/resmanager.hpp>
 
 #include "nine_morris_3d_engine/application/id.hpp"
+#include "nine_morris_3d_engine/graphics/internal/opengl.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_buffer_layout.hpp"
-#include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/texture.hpp"
-#include "nine_morris_3d_engine/graphics/material.hpp"
-#include "nine_morris_3d_engine/graphics/font.hpp"
+#include "nine_morris_3d_engine/graphics/renderable.hpp"
+#include "nine_morris_3d_engine/graphics/light.hpp"
+#include "nine_morris_3d_engine/graphics/camera.hpp"
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 // shader uniform limit https://www.khronos.org/opengl/wiki/Uniform_(GLSL)#Implementation_limits
@@ -469,7 +470,7 @@ namespace sm::internal {
             step->shader->bind();
             step->setup(post_processing_context);
 
-            sm::opengl::draw_arrays(6);
+            opengl::draw_arrays(6);
 
             post_processing_context.last_texture = step->framebuffer->get_color_attachment(0);
             post_processing_context.textures.push_back(post_processing_context.last_texture);
@@ -663,7 +664,7 @@ namespace sm::internal {
             return lhs.font.get() < rhs.font.get();
         });
 
-        const void* last {nullptr};  // TODO C++20
+        const void* last {};  // TODO C++20
 
         for (const auto& text : texts) {
             const void* current {text.font.get()};

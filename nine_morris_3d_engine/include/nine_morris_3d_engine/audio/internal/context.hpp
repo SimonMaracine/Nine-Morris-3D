@@ -18,7 +18,7 @@ namespace sm::internal {
     private:
         bool create {};
 
-        ALCdevice* device {nullptr};
-        ALCcontext* context {nullptr};
+        ALCdevice* device {};
+        ALCcontext* context {};
     };
 }

@@ -13,7 +13,7 @@ namespace sm {
     Sound effects should be sound files shorter than 45-50 seconds.
 */
 namespace sm::internal {
-    class MusicPlayer {  // TODO revisit this class; rename things
+    class MusicPlayer {
     public:
         MusicPlayer();
 
@@ -27,8 +27,6 @@ namespace sm::internal {
         std::unique_ptr<AlSource> source;
 
         // Pointer is reset when music is stopped
-        // Both are reset at the coresponding function call
         std::shared_ptr<MusicTrack> current_music_track;
-        float current_gain {1.0f};
     };
 }

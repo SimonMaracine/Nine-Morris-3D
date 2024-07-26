@@ -25,7 +25,7 @@ namespace sm {
         double get_total_time() const { return total_time; }
     private:
         TaskFunction function;
-        void* user_data {nullptr};
+        void* user_data {};
         double total_time {};
         double start_time {};
 

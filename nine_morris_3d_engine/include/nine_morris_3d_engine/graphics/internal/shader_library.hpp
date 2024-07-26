@@ -2,8 +2,8 @@
 
 #include <string>
 #include <unordered_map>
-#include <stdexcept>
 #include <initializer_list>
+#include <utility>
 #include <cstddef>
 
 namespace sm::internal {

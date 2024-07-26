@@ -204,8 +204,8 @@ namespace sm {
         float fps {};
 
         std::any global_data;
-        void* user_data {nullptr};  // Arbitrary data defined by the user
-        Application* application {nullptr};
+        void* user_data {};  // Arbitrary data defined by the user
+        Application* application {};
 
         friend class Application;
         friend class internal::DebugUi;

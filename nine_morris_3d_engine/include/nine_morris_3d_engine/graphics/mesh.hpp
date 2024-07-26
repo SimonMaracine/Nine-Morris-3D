@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstddef>
 #include <string>
+#include <cstddef>
 
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
@@ -36,8 +36,8 @@ namespace sm {
         void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);
 
         // Raw data
-        unsigned char* vertices {nullptr};
-        unsigned char* indices {nullptr};
+        unsigned char* vertices {};
+        unsigned char* indices {};
         std::size_t vertices_size {};
         std::size_t indices_size {};
 

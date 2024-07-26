@@ -1,8 +1,8 @@
 #pragma once
 
-namespace sm {
+namespace sm::internal {
     namespace opengl {
-        // Color, Depth, Stencil
+        // Color, depth, stencil
         enum class Buffers {
             C,
             D,

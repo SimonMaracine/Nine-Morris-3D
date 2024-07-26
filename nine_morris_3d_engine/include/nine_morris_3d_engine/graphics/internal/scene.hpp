@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <initializer_list>
 
 #include <glm/glm.hpp>
 

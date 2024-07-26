@@ -66,16 +66,13 @@ namespace sm {
                     case GL_DEBUG_SEVERITY_HIGH:
                         LOG_CRITICAL("({}) OpenGL: {}", id, message);
                         std::abort();
-
                         break;
                     case GL_DEBUG_SEVERITY_MEDIUM:
                     case GL_DEBUG_SEVERITY_LOW:
                         LOG_WARNING("({}) OpenGL: {}", id, message);
-
                         break;
                     case GL_DEBUG_SEVERITY_NOTIFICATION:
                         assert(false);
-
                         break;
                 }
             },

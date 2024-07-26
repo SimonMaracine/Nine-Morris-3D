@@ -4,13 +4,12 @@
 #include <utility>
 #include <cassert>
 
+#include "nine_morris_3d_engine/application/scene.hpp"
 #include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/graphics/internal/imgui_context.hpp"
-#include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/debug.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
-#include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
     Application::Application(const ApplicationProperties& properties)

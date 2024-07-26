@@ -67,19 +67,19 @@ namespace sm {
 
         struct PackRange {
             // The library author forgot to actually name the struct :P
-            void* packed_characters {nullptr};
+            void* packed_characters {};
             int begin_codepoint {};
             int count {};
         };
 
         std::unique_ptr<unsigned char[]> bitmap;
         std::vector<PackRange> pack_ranges;
-        stbtt_pack_context* pack_context {nullptr};
+        stbtt_pack_context* pack_context {};
 
         std::unique_ptr<GlTexture> bitmap_texture;
 
         std::string font_buffer;
-        stbtt_fontinfo* font_info {nullptr};
+        stbtt_fontinfo* font_info {};
 
         float size_height {};
         int bitmap_size {};

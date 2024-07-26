@@ -49,9 +49,9 @@ namespace sm::internal {
         int width {};
         int height {};
 
-        GLFWwindow* window {nullptr};
+        GLFWwindow* window {};
         Monitors monitors;
         std::unordered_map<Id, GLFWcursor*, Hash> cursors;
-        EventDispatcher* evt {nullptr};
+        EventDispatcher* evt {};
     };
 }

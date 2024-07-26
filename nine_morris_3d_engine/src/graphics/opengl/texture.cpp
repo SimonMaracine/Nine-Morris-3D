@@ -8,7 +8,6 @@
 
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
-#include "nine_morris_3d_engine/other/utilities.hpp"
 
 namespace sm {
     static constexpr int CHANNELS {4};

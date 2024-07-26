@@ -31,6 +31,6 @@ namespace sm {
 
         int width {};
         int height {};
-        unsigned char* data {nullptr};
+        unsigned char* data {};
     };
 }

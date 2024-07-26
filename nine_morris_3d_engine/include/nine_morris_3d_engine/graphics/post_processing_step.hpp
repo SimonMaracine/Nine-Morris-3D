@@ -27,6 +27,8 @@ namespace sm {
         PostProcessingStep& operator=(PostProcessingStep&&) noexcept = default;
 
         virtual void setup(const PostProcessingCtx& ctx) const = 0;
+
+        static void bind_texture(unsigned int texture, int unit);
     protected:
         std::shared_ptr<GlFramebuffer> framebuffer;
         std::shared_ptr<GlShader> shader;

@@ -4,7 +4,6 @@
 #include <regex>
 #include <iterator>
 #include <vector>
-#include <utility>
 
 #include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"

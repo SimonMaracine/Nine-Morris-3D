@@ -43,7 +43,7 @@ namespace sm {
         } color_clear;
 
         int samples {1};
-        unsigned int resize_divisor {1};
+        int resize_divisor {1};
         bool resizable {true};
         bool white_border_depth_texture {false};
         bool comparison_mode_depth_texture {false};

@@ -3,6 +3,7 @@
 #include <cstdint>
 
 // Include platform.hpp whenever there is conditional code regarding platform or build mode
+
 #if defined(__linux__)
     #if defined(__GNUG__)
         #define SM_PLATFORM_LINUX

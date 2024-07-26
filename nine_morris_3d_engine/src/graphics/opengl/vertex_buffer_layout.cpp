@@ -9,7 +9,7 @@ namespace sm {
                 return sizeof(int);
         }
 
-        return 0;
+        return {};
     }
 
     VertexBufferLayout& VertexBufferLayout::add(unsigned int index, Type type, int size, bool per_instance) {

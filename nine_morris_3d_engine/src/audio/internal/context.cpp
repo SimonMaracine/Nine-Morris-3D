@@ -17,7 +17,7 @@ namespace sm::internal {
         device = alcOpenDevice(nullptr);
 
         if (device == nullptr) {
-            SM_THROW_ERROR(InitializationError, "Could not open an AL device");
+            SM_THROW_ERROR(InitializationError, "Could not open a playback device");
         }
 
         context = alcCreateContext(device, nullptr);
@@ -25,14 +25,14 @@ namespace sm::internal {
         if (context == nullptr) {
             alcCloseDevice(device);
 
-            SM_THROW_ERROR(InitializationError, "Could not create AL context");
+            SM_THROW_ERROR(InitializationError, "Could not create OpenAL context");
         }
 
         if (alcMakeContextCurrent(context) == ALC_FALSE) {
             alcDestroyContext(context);
             alcCloseDevice(device);
 
-            SM_THROW_ERROR(InitializationError, "Could not make AL context current");
+            SM_THROW_ERROR(InitializationError, "Could not make OpenAL context current");
         }
 
         // Defaults
@@ -40,7 +40,7 @@ namespace sm::internal {
         listener::set_gain(1.0f);
         listener::set_distance_model(listener::DistanceModel::InverseClamped);
 
-        LOG_INFO("Opened OpenAL device and created context");
+        LOG_INFO("Opened playback device and created OpenAL context");
     }
 
     OpenAlContext::~OpenAlContext() {
@@ -52,10 +52,6 @@ namespace sm::internal {
         alcDestroyContext(context);
         alcCloseDevice(device);
 
-        LOG_INFO("Destroyed OpenAL context and closed device");
+        LOG_INFO("Destroyed OpenAL context and closed playback device");
     }
-
-    // AlListener& OpenAlContext::get_listener() {
-    //     return listener;
-    // }
 }

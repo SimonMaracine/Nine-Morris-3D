@@ -27,7 +27,7 @@ namespace sm {
         int samples {};  // Total number of samples
         int channels {};  // Usually mono or stereo
         int sample_rate {};  // Frequency
-        short* data {nullptr};
+        short* data {};
         std::size_t size {};
         std::size_t bits_per_sample {};
     };

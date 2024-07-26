@@ -1,8 +1,8 @@
-#include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
+#include "nine_morris_3d_engine/graphics/internal/opengl.hpp"
 
 #include <glad/glad.h>
 
-namespace sm {
+namespace sm::internal {
     void opengl::initialize_default() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

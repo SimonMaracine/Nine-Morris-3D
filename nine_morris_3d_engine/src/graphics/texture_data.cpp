@@ -23,7 +23,7 @@ namespace sm {
 
     TextureData::TextureData(const std::string& buffer, const TexturePostProcessing& post_processing) {
         {
-            std::lock_guard lock {g_mutex};
+            std::lock_guard lock {g_mutex};  // For some stupid reason stbi_load_from_memory is not thread safe :P
 
             stbi_set_flip_vertically_on_load(static_cast<int>(post_processing.flip));
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 namespace sm {
     // Constant application properties
     struct ApplicationProperties {
@@ -17,11 +15,11 @@ namespace sm {
         unsigned int version_major {0};
         unsigned int version_minor {1};
         unsigned int version_patch {0};
-        std::string title {"Nine Morris 3D Engine"};
-        std::string application_name {"NineMorris3DEngine"};
-        std::string info_file;
-        std::string log_file;
-        std::string assets_directory;
-        void* user_data {nullptr};
+        const char* title {"Nine Morris 3D Engine"};
+        const char* application_name {"NineMorris3DEngine"};
+        const char* info_file {};
+        const char* log_file {};
+        const char* assets_directory {};
+        void* user_data {};
     };
 }

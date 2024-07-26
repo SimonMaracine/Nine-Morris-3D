@@ -3,7 +3,7 @@
 #include <cstring>
 
 #include "nine_morris_3d_engine/application/logging.hpp"
-#include "nine_morris_3d_engine/graphics/opengl/opengl.hpp"
+#include "nine_morris_3d_engine/graphics/internal/opengl.hpp"
 
 namespace sm {
     Material::Material(std::shared_ptr<GlShader> shader, unsigned int flags)
@@ -171,7 +171,7 @@ namespace sm {
                     std::memcpy(&texture, data.get() + element.offset, sizeof(texture));
 
                     shader->upload_uniform_int(name, texture.unit);
-                    opengl::bind_texture_2d(texture.texture, texture.unit);
+                    internal::opengl::bind_texture_2d(texture.texture, texture.unit);
 
                     break;
                 }

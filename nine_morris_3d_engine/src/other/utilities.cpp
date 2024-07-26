@@ -1,8 +1,8 @@
 #include "nine_morris_3d_engine/other/utilities.hpp"
 
 #include <fstream>
-#include <cstddef>
 #include <filesystem>
+#include <cstddef>
 #include <cassert>
 
 #include <glm/gtc/random.hpp>

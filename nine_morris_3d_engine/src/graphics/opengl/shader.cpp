@@ -262,7 +262,7 @@ namespace sm {
             int log_length {};
             glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
 
-            const char* type_name {nullptr};
+            const char* type_name {};
             switch (type) {
                 case GL_VERTEX_SHADER:
                     type_name = "Vertex";

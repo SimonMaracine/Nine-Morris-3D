@@ -65,13 +65,7 @@ namespace sm::internal {
 
         glfwSwapInterval(1);
         glfwSetWindowUserPointer(window, this);
-        glfwSetWindowSizeLimits(
-            window,
-            properties.min_width,
-            properties.min_height,
-            GLFW_DONT_CARE,
-            GLFW_DONT_CARE
-        );
+        glfwSetWindowSizeLimits(window, properties.min_width, properties.min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
         install_callbacks();
 
@@ -178,7 +172,7 @@ namespace sm::internal {
     }
 
     GLFWwindow* Window::create_window(const ApplicationProperties& properties) {
-        GLFWmonitor* primary_monitor {nullptr};
+        GLFWmonitor* primary_monitor {};
 
         if (properties.fullscreen) {
             primary_monitor = glfwGetPrimaryMonitor();
@@ -199,7 +193,7 @@ namespace sm::internal {
 
         assert(width > 0 && height > 0);
 
-        return glfwCreateWindow(width, height, properties.title.c_str(), primary_monitor, nullptr);
+        return glfwCreateWindow(width, height, properties.title, primary_monitor, nullptr);
     }
 
     void Window::install_callbacks() const {
