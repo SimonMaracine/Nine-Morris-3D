@@ -15,7 +15,7 @@ namespace sm::internal {
     void MusicPlayer::play(std::shared_ptr<MusicTrack> music_track) {
         current_music_track = music_track;
 
-        source->play(current_music_track->buffer.get());
+        source->play(current_music_track->buffer);
 
         LOG_DEBUG("Started playing music track");
     }
@@ -52,7 +52,7 @@ namespace sm::internal {
 
         source->resume();
 
-        LOG_DEBUG("Continued playing music track");
+        LOG_DEBUG("Resumed playing music track");
     }
 
     void MusicPlayer::set_gain(float gain) {

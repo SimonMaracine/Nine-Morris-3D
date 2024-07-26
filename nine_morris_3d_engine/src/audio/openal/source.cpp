@@ -29,21 +29,12 @@ namespace sm {
         LOG_DEBUG("Deleted AL source {}", source);
     }
 
-    void AlSource::play(AlBuffer* buffer) {
-        stop();
+    void AlSource::play(std::shared_ptr<AlBuffer> buffer) {
+        play(buffer.get());
+    }
 
-        if (buffer->buffer != attached_buffer) {
-            attached_buffer = buffer->buffer;
-            buffer->sources_attached.insert(source);
-
-            alSourcei(source, AL_BUFFER, attached_buffer);
-
-            openal_debug::check_errors();
-        }
-
-        alSourcePlay(source);
-
-        openal_debug::check_errors();
+    void AlSource::play(const std::unique_ptr<AlBuffer>& buffer) {
+        play(buffer.get());
     }
 
     void AlSource::stop() const {
@@ -210,5 +201,22 @@ namespace sm {
         openal_debug::check_errors();
 
         return max_distance;
+    }
+
+    void AlSource::play(AlBuffer* buffer) {
+        stop();
+
+        if (buffer->buffer != attached_buffer) {
+            attached_buffer = buffer->buffer;
+            buffer->sources_attached.insert(source);
+
+            alSourcei(source, AL_BUFFER, attached_buffer);
+
+            openal_debug::check_errors();
+        }
+
+        alSourcePlay(source);
+
+        openal_debug::check_errors();
     }
 }

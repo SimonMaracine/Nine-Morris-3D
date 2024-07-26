@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <glm/glm.hpp>
 
 #include "nine_morris_3d_engine/audio/openal/buffer.hpp"
@@ -15,7 +17,8 @@ namespace sm {
         AlSource(AlSource&&) = delete;
         AlSource& operator=(AlSource&&) = delete;
 
-        void play(AlBuffer* buffer);
+        void play(std::shared_ptr<AlBuffer> buffer);
+        void play(const std::unique_ptr<AlBuffer>& buffer);
         void stop() const;
         void pause() const;
         void resume() const;
@@ -41,6 +44,8 @@ namespace sm {
         float get_reference_distance() const;
         float get_max_distance() const;
     private:
+        void play(AlBuffer* buffer);
+
         unsigned int source {};
         unsigned int attached_buffer {};  // The buffer that is currently attached to this source
     };

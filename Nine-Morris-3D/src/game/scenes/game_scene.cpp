@@ -226,10 +226,10 @@ void GameScene::on_key_released(const sm::KeyReleasedEvent& event) {
             ctx.change_scene("game"_H);
             break;
         case sm::Key::M:
-            if (emitter && sound_move) emitter->play(sound_move.get());
+            if (emitter && sound_move) emitter->play(sound_move);
             break;
         case sm::Key::P:
-            if (emitter && sound_place) emitter->play(sound_place.get());
+            if (emitter && sound_place) emitter->play(sound_place);
             break;
         case sm::Key::Space:
             if (music_playing) {
