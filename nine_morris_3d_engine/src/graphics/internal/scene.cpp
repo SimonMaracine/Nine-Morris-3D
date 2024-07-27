@@ -6,6 +6,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "nine_morris_3d_engine/application/platform.hpp"
+
 namespace sm::internal {
     void Scene::capture(const Camera& camera, glm::vec3 position) noexcept {
         this->camera = camera;

@@ -10,6 +10,7 @@
 #include <resmanager/resmanager.hpp>
 
 #include "nine_morris_3d_engine/application/id.hpp"
+#include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/graphics/internal/opengl.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/vertex_array.hpp"
 #include "nine_morris_3d_engine/graphics/opengl/buffer.hpp"
@@ -26,6 +27,7 @@
 using namespace resmanager::literals;
 
 namespace sm::internal {
+#ifndef SM_BUILD_DISTRIBUTION
     DebugRenderer::DebugRenderer(const FileSystem& fs, Renderer& renderer) {
         storage.shader = std::make_shared<GlShader>(
             utils::read_file(fs.path_engine_assets("shaders/internal/debug.vert")),
@@ -81,6 +83,7 @@ namespace sm::internal {
 
         GlVertexArray::unbind();
     }
+#endif
 
     Renderer::Renderer(int width, int height, int samples, const FileSystem& fs, const ShaderLibrary& shd) {
         opengl::initialize_default();

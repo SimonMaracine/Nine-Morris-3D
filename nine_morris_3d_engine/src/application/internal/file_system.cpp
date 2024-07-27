@@ -66,12 +66,23 @@ namespace sm::internal {
 #endif
     }
 
-    bool FileSystem::directory_exists(const std::string& path) {
+    bool FileSystem::file_exists(const std::string& path) {
+        std::error_code ec;
+        const bool result {std::filesystem::exists(path, ec)};
+
+        if (ec) {
+            throw OtherError("Could not check if file exists: " + ec.message());
+        }
+
+        return result;
+    }
+
+    bool FileSystem::is_directory(const std::string& path) {
         std::error_code ec;
         const bool result {std::filesystem::is_directory(path, ec)};
 
         if (ec) {
-            throw OtherError("Could not check if path is a directory: " + ec.message());
+            throw OtherError("Could not check if file is a directory: " + ec.message());
         }
 
         return result;
@@ -182,7 +193,7 @@ namespace sm::internal {
 #if defined(SM_PLATFORM_LINUX)
         const std::string path {USER_DATA_DIRECTORY_PATH(user_name, application_name)};
 
-        if (!directory_exists(path)) {
+        if (no_directory(path)) {
             error_string = "Directory `" + path + "` doesn't exist, creating it...";
 
             if (!create_directory(path)) {
@@ -194,7 +205,7 @@ namespace sm::internal {
 
         path = USER_DATA_DIRECTORY_PATH(user_name, application_name);
 
-        if (!directory_exists(path)) {
+        if (no_directory(path)) {
             error_string + "Directory `" + path + "` doesn't exist, creating it...";
 
             if (!create_directory(path)) {
@@ -204,7 +215,7 @@ namespace sm::internal {
 
         path = USER_DATA2_DIRECTORY_PATH(user_name, application_name);
 
-        if (!directory_exists(path)) {
+        if (no_directory(path)) {
             error_string = "Directory `" + path + "` doesn't exist, creating it...";
 
             if (!create_directory(path)) {
@@ -217,4 +228,17 @@ namespace sm::internal {
     const std::string& FileSystem::get_error_string() const noexcept {
         return error_string;
     }
+
+#ifdef __GNUG__
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wparentheses"
+#endif
+
+    bool FileSystem::no_directory(const std::string& path) {
+        return !file_exists(path) || file_exists(path) && !is_directory(path);
+    }
+
+#ifdef __GNUG__
+    #pragma GCC diagnostic pop
+#endif
 }

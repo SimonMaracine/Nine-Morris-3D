@@ -1,11 +1,11 @@
 #! /bin/bash
 
-target="all"
+build_directory="build"
 
-if [ ! -z "$1" ]; then
-    target="$1"
+if [ "$1" = "dist" ]; then
+    build_directory="build_dist"
 fi
 
 clear
-cd ../build
-cmake --build . -j 10 --target "$target"
+cd ../$build_directory
+cmake --build . -j 10

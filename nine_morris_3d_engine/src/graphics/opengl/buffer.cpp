@@ -143,7 +143,7 @@ namespace sm {
     }
 
     void GlUniformBuffer::configure(unsigned int shader_program) {
-        const GLuint block_index {
+        const unsigned int block_index {
             glGetUniformBlockIndex(shader_program, specification.block_name.c_str())
         };
 
@@ -155,7 +155,7 @@ namespace sm {
         }
 
         // Get data block size
-        GLint block_size;
+        int block_size;
         glGetActiveUniformBlockiv(shader_program, block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
 
         // Allocate memory on both CPU and GPU side
@@ -169,10 +169,10 @@ namespace sm {
 
         assert(field_count <= MAX_FIELD_COUNT);
 
-        GLuint indices[MAX_FIELD_COUNT];
-        GLint offsets[MAX_FIELD_COUNT];
-        GLint sizes[MAX_FIELD_COUNT];
-        GLint types[MAX_FIELD_COUNT];
+        unsigned int indices[MAX_FIELD_COUNT];
+        int offsets[MAX_FIELD_COUNT];
+        int sizes[MAX_FIELD_COUNT];
+        int types[MAX_FIELD_COUNT];
 
         // Create the uniforms names list; the order of these names matters
         const char* field_names[MAX_FIELD_COUNT];
@@ -245,13 +245,13 @@ namespace sm {
 
         switch (type) {
             case GL_FLOAT_VEC3:
-                size = 3 * sizeof(GLfloat);
+                size = 3 * sizeof(float);
                 break;
             case GL_FLOAT:
-                size = 1 * sizeof(GLfloat);
+                size = 1 * sizeof(float);
                 break;
             case GL_FLOAT_MAT4:
-                size = 16 * sizeof(GLfloat);
+                size = 16 * sizeof(float);
                 break;
             default:
                 assert(false);
@@ -303,7 +303,7 @@ namespace sm {
     }
 
     void GlPixelBuffer::unmap_data() const noexcept {
-        const GLboolean success {glUnmapBuffer(GL_PIXEL_PACK_BUFFER)};
+        const auto success {glUnmapBuffer(GL_PIXEL_PACK_BUFFER)};
 
         if (success == GL_FALSE) {
             LOG_ERROR("Memory mapped by GL buffer {} became corrupted while it was used", buffer);

@@ -8,14 +8,14 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
-    static const GLenum COLOR_ATTACHMENTS[] {
+    static const unsigned int COLOR_ATTACHMENTS[] {
         GL_COLOR_ATTACHMENT0,
         GL_COLOR_ATTACHMENT1,
         GL_COLOR_ATTACHMENT2,
         GL_COLOR_ATTACHMENT3
     };
 
-    static GLenum target(bool multisampled) noexcept {
+    static unsigned int target(bool multisampled) noexcept {
         return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     }
 
@@ -27,9 +27,9 @@ namespace sm {
     }
 
     static void attach_color_texture(
-        GLuint texture,
+        unsigned int texture,
         int samples,
-        GLenum internal_format,
+        unsigned int internal_format,
         int width,
         int height,
         unsigned int index
@@ -58,10 +58,10 @@ namespace sm {
     }
 
     static void attach_depth_texture(
-        GLuint texture,
+        unsigned int texture,
         int samples,
-        GLenum internal_format,
-        GLenum attachment,
+        unsigned int internal_format,
+        unsigned int attachment,
         int width,
         int height,
         bool white_border,
@@ -96,9 +96,9 @@ namespace sm {
     }
 
     static void attach_color_renderbuffer(
-        GLuint renderbuffer,
+        unsigned int renderbuffer,
         int samples,
-        GLenum internal_format,
+        unsigned int internal_format,
         int width,
         int height,
         unsigned int index
@@ -117,10 +117,10 @@ namespace sm {
     }
 
     static void attach_depth_renderbuffer(
-        GLuint renderbuffer,
+        unsigned int renderbuffer,
         int samples,
-        GLenum internal_format,
-        GLenum attachment,
+        unsigned int internal_format,
+        unsigned int attachment,
         int width,
         int height
     ) noexcept {
@@ -553,7 +553,7 @@ namespace sm {
             glDrawBuffer(GL_NONE);  // TODO what is this?
         }
 
-        const GLenum status {glCheckFramebufferStatus(GL_FRAMEBUFFER)};
+        const unsigned int status {glCheckFramebufferStatus(GL_FRAMEBUFFER)};
 
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             SM_THROW_ERROR(

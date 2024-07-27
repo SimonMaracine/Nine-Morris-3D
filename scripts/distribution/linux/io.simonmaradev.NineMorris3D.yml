@@ -1,0 +1,15 @@
+id: io.simonmaradev.NineMorris3D
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: NineMorris3D
+modules:
+  - name: NineMorris3D
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 hello.sh /app/bin/hello
+    sources:
+      - type: dir
+        dest-filename: hello.sh
+        commands:
+          - echo "Hello world, from a sandbox"

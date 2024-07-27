@@ -24,6 +24,7 @@ namespace sm {
 }
 
 namespace sm::internal {
+#ifndef SM_BUILD_DISTRIBUTION
     class DebugRenderer {
     public:
         DebugRenderer() noexcept = default;
@@ -44,6 +45,9 @@ namespace sm::internal {
             std::vector<BufferVertex> lines_buffer;
         } storage;
     };
+#else
+    class DebugRenderer {};
+#endif
 
     class Renderer {
     public:

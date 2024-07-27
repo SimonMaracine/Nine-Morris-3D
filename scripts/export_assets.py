@@ -51,10 +51,15 @@ def create_new_assets_directory(assets_directory_path: str, output_path: str, ma
 
     for file_path in manifest.assets_paths:
         os.makedirs(os.path.join(new_directory, os.path.dirname(file_path)), exist_ok=True)
-        shutil.copyfile(
-            os.path.join(assets_directory_path, file_path),
-            os.path.join(new_directory, file_path)
-        )
+
+        try:
+            shutil.copyfile(
+                os.path.join(assets_directory_path, file_path),
+                os.path.join(new_directory, file_path)
+            )
+        except FileNotFoundError as err:
+            raise AssetsDirectoryProcessError(f"Could not copy file: {err}")
+
         print(f"Copied: {file_path}")
 
 
@@ -64,7 +69,7 @@ def print_help():
 
 def main(args: list[str]) -> int:
     if len(args) < 3:
-        print("Error: no assets directory", file=sys.stderr)
+        print("Error: No assets directory", file=sys.stderr)
         print_help()
         return 1
 

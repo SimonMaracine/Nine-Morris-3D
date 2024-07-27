@@ -183,7 +183,7 @@ namespace sm {
 
             {
                 int buffer[2] {};
-                const GLenum properties[] { GL_BUFFER_BINDING, GL_NUM_ACTIVE_VARIABLES };
+                const unsigned int properties[] { GL_BUFFER_BINDING, GL_NUM_ACTIVE_VARIABLES };
                 glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, static_cast<unsigned int>(i), 2, properties, 2, nullptr, buffer);
 
                 block.binding_index = static_cast<unsigned int>(buffer[0]);
@@ -194,7 +194,7 @@ namespace sm {
             {
                 const std::unique_ptr<int[]> buffer_uniforms {std::make_unique<int[]>(block_active_uniforms_count)};
 
-                const GLenum properties[] { GL_ACTIVE_VARIABLES };
+                const unsigned int properties[] { GL_ACTIVE_VARIABLES };
                 glGetProgramResourceiv(
                     program,
                     GL_UNIFORM_BLOCK,

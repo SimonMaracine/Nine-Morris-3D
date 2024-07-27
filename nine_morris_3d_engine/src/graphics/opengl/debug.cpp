@@ -11,7 +11,7 @@
 #include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
 
 namespace sm {
-    static const GLenum parameters[] {
+    static const unsigned int parameters[] {
         GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
         GL_MAX_CUBE_MAP_TEXTURE_SIZE,
         GL_MAX_DRAW_BUFFERS,
@@ -61,7 +61,15 @@ namespace sm {
 
     void opengl_debug::initialize() noexcept {
         glDebugMessageCallback(
-            [](GLenum, GLenum, GLuint id, GLenum severity, GLsizei, const GLchar* message, const GLvoid*) {
+            [](
+                unsigned int,
+                unsigned int,
+                [[maybe_unused]] unsigned int id,
+                unsigned int severity,
+                int,
+                [[maybe_unused]] const char* message,
+                const void*
+            ) {
                 switch (severity) {
                     case GL_DEBUG_SEVERITY_HIGH:
                         LOG_CRITICAL("({}) OpenGL: {}", id, message);
@@ -120,14 +128,14 @@ namespace sm {
         std::size_t parameter_index {18};
 
         for (std::size_t i {0}; i <= parameter_index; i++) {
-            GLint value {};
+            int value {};
             glGetIntegerv(parameters[i], &value);
 
             std::snprintf(buffer, BUFFER_LENGTH, "%s %i\n", names[i], value);
             result += buffer;
         }
         {
-            GLint value[2] {};
+            int value[2] {};
             glGetIntegerv(parameters[++parameter_index], value);
 
             std::snprintf(buffer, BUFFER_LENGTH, "%s %i %i\n", names[parameter_index], value[0], value[1]);

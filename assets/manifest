@@ -1,7 +1,3 @@
 models/cube.obj
 models/dragon.obj
 models/teapot.obj
-shaders/simple.frag
-shaders/simple.vert
-shaders/simple2.frag
-shaders/simple2.vert

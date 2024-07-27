@@ -60,7 +60,8 @@ namespace sm {
         Ctx& operator=(Ctx&&) = delete;
 
         // File system
-        static bool directory_exists(const std::string& path);
+        static bool file_exists(const std::string& path);
+        static bool is_directory(const std::string& path);
         static bool create_directory(const std::string& path);
         static bool delete_file(const std::string& path);
         static std::string current_working_directory();

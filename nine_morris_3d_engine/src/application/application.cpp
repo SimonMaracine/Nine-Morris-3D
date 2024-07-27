@@ -29,7 +29,7 @@ namespace sm {
         }
 
 #ifndef SM_BUILD_DISTRIBUTION
-        LOG_INFO("{}", ctx.get_information());
+        LOG_INFO("{}", Ctx::get_information());
 #endif
 
         ctx.evt.connect<WindowClosedEvent, &Application::on_window_closed>(this);
@@ -70,7 +70,9 @@ namespace sm {
             ctx.tsk.update();
 
             if (!minimized) {
+#ifndef SM_BUILD_DISTRIBUTION
                 ctx.dbg.add_lines(ctx.scn);
+#endif
                 ctx.rnd.render(ctx.scn, ctx.win.get_width(), ctx.win.get_height());
                 dear_imgui_render();
             }
@@ -179,7 +181,9 @@ namespace sm {
         internal::imgui_context::begin_frame();
 
         scene_current->scene->on_imgui_update();
+#ifndef SM_BUILD_DISTRIBUTION
         ctx.dbg.render_dear_imgui(ctx.scn, ctx);
+#endif
 
         internal::imgui_context::end_frame();
     }

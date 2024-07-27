@@ -17,8 +17,8 @@ namespace sm {
         unsigned int version_patch {0};
         const char* title {"Nine Morris 3D Engine"};
         const char* application_name {"NineMorris3DEngine"};
-        const char* info_file {};
-        const char* log_file {};
+        const char* info_file {"nine_morris_3d.txt"};
+        const char* log_file {"nine_morris_3d.log"};
         const char* assets_directory {};
         void* user_data {};
     };

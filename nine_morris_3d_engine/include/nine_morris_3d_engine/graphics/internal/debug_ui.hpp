@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 
+#include "nine_morris_3d_engine/application/platform.hpp"
 #include "nine_morris_3d_engine/graphics/internal/scene.hpp"
 
 namespace sm {
@@ -9,6 +10,7 @@ namespace sm {
 }
 
 namespace sm::internal {
+#ifndef SM_BUILD_DISTRIBUTION
     class DebugUi {
     public:
         void render_dear_imgui(Scene& scene, Ctx& ctx) noexcept;
@@ -41,4 +43,7 @@ namespace sm::internal {
         bool quads {false};
         bool tasks {false};
     };
+#else
+    class DebugUi {};
+#endif
 }

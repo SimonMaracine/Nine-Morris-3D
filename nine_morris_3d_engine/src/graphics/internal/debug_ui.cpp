@@ -6,8 +6,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "nine_morris_3d_engine/application/context.hpp"
+#include "nine_morris_3d_engine/application/platform.hpp"
 
 namespace sm::internal {
+#ifndef SM_BUILD_DISTRIBUTION
     void DebugUi::render_dear_imgui(Scene& scene, Ctx& ctx) noexcept {
         if (ImGui::Begin("Debug")) {
             ImGui::Checkbox("Renderables", &renderables);
@@ -277,4 +279,5 @@ namespace sm::internal {
             color
         );
     }
+#endif
 }

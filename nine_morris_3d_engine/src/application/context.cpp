@@ -25,8 +25,12 @@ namespace sm {
         }
     }
 
-    bool Ctx::directory_exists(const std::string& path) {
-        return internal::FileSystem::directory_exists(path);
+    bool Ctx::file_exists(const std::string& path) {
+        return internal::FileSystem::file_exists(path);
+    }
+
+    bool Ctx::is_directory(const std::string& path) {
+        return internal::FileSystem::is_directory(path);
     }
 
     bool Ctx::create_directory(const std::string& path) {

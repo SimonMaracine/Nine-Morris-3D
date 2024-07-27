@@ -7,7 +7,8 @@ namespace sm::internal {
     public:
         FileSystem(const std::string& application_name, const std::string& assets_directory);
 
-        static bool directory_exists(const std::string& path);
+        static bool file_exists(const std::string& path);
+        static bool is_directory(const std::string& path);
         static bool create_directory(const std::string& path);
         static bool delete_file(const std::string& path);
         static std::string current_working_directory();
@@ -25,6 +26,8 @@ namespace sm::internal {
         void check_and_fix_directories() const;
         const std::string& get_error_string() const noexcept;
     private:
+        static bool no_directory(const std::string& path);
+
         std::string application_name;
         std::string assets_directory;
         std::string user_name;
