@@ -21,8 +21,8 @@ namespace sm {
             : framebuffer(framebuffer), shader(shader) {}
         virtual ~PostProcessingStep() = default;
 
-        PostProcessingStep(const PostProcessingStep&) = default;
-        PostProcessingStep& operator=(const PostProcessingStep&) = default;
+        PostProcessingStep(const PostProcessingStep&) noexcept = default;
+        PostProcessingStep& operator=(const PostProcessingStep&) noexcept = default;
         PostProcessingStep(PostProcessingStep&&) noexcept = default;
         PostProcessingStep& operator=(PostProcessingStep&&) noexcept = default;
 

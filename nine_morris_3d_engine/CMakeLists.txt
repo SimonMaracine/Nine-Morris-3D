@@ -96,7 +96,6 @@ add_library(nine_morris_3d_engine STATIC
     "include/nine_morris_3d_engine/application/internal/window.hpp"
     "include/nine_morris_3d_engine/application/application.hpp"
     "include/nine_morris_3d_engine/application/context.hpp"
-    "include/nine_morris_3d_engine/application/entry_point.hpp"
     "include/nine_morris_3d_engine/application/error.hpp"
     "include/nine_morris_3d_engine/application/events.hpp"
     "include/nine_morris_3d_engine/application/id.hpp"
@@ -148,6 +147,7 @@ add_library(nine_morris_3d_engine STATIC
     "include/nine_morris_3d_engine/other/camera_controller.hpp"
     "include/nine_morris_3d_engine/other/dependencies.hpp"
     "include/nine_morris_3d_engine/other/utilities.hpp"
+    "include/nine_morris_3d_engine/entry_point.hpp"
     "include/nine_morris_3d_engine/nine_morris_3d.hpp"
 )
 

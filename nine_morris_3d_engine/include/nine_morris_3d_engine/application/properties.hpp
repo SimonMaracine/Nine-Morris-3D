@@ -1,7 +1,7 @@
 #pragma once
 
 namespace sm {
-    // Constant application properties
+    // Initialization application properties
     struct ApplicationProperties {
         bool fullscreen {false};
         bool native_resolution {true};

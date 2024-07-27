@@ -8,13 +8,13 @@
 // Never include this header file in another header file!
 
 /*
-    Use LOG_* macros for messages to be printed only in debug mode.
-    Use LOG_DIST_* macros for messages to be printed both in debug and release mode.
+    Use LOG_* macros for messages to be printed only in non-distribution mode.
+    Use LOG_DIST_* macros for messages to be printed always.
 
-    Messages in debug mode are printed in the console. Messages in release mode are printed
+    Messages in non-distribution mode are printed in the console. In distribution mode they are printed
     in a log file (with console as fallback).
 
-    Use LOG_DIST_CRITICAL only right before aborting.
+    Use LOG_DIST_CRITICAL only right before aborting or throwing.
 
     LOG_* macros are exception-safe.
 */

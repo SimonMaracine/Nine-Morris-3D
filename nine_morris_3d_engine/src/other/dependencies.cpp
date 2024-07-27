@@ -33,17 +33,15 @@ namespace sm {
 
         result += "*** Compiler ***\n";
 
-#if defined(SM_PLATFORM_LINUX)
         {
+#if defined(SM_PLATFORM_LINUX)
             std::snprintf(buffer, BUFFER_LENGTH, "GCC version: %d.%d\n", __GNUC__, __GNUC_MINOR__);
             result += buffer;
-        }
 #elif defined(SM_PLATFORM_WINDOWS)
-        {
             std::snprintf(buffer, BUFFER_LENGTH, "MSVC version: %d\n", _MSC_VER);
             result += buffer;
-        }
 #endif
+        }
 
         result += "*** Dependencies ***\n";
 

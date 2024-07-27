@@ -15,6 +15,7 @@ namespace sm::internal {
             ImGui::Checkbox("Shadows", &shadows);
             ImGui::Checkbox("Texts", &texts);
             ImGui::Checkbox("Quads", &quads);
+            ImGui::Checkbox("Tasks", &tasks);
 
             if (ImGui::Checkbox("VSync", &vsync)) {
                 ctx.win.set_vsync(static_cast<int>(vsync));
@@ -41,6 +42,10 @@ namespace sm::internal {
 
         if (quads) {
             draw_quads(scene);
+        }
+
+        if (tasks) {
+            draw_tasks(ctx);
         }
     }
 
@@ -171,6 +176,15 @@ namespace sm::internal {
 
                 index++;
             }
+        }
+
+        ImGui::End();
+    }
+
+    void DebugUi::draw_tasks(Ctx& ctx) noexcept {
+        if (ImGui::Begin("Debug Tasks")) {
+            ImGui::Text("Tasks count %lu", ctx.tsk.tasks_active.size());
+            ImGui::Text("Async tasks count %lu", ctx.tsk.async_tasks.size());
         }
 
         ImGui::End();

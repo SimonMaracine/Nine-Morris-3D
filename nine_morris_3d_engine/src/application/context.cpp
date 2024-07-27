@@ -247,6 +247,14 @@ namespace sm {
         scn.add_text(const_cast<const Text&>(text));
     }
 
+    float Ctx::get_delta() const noexcept {
+        return delta;
+    }
+
+    float Ctx::get_fps() const noexcept {
+        return fps;
+    }
+
     std::string Ctx::get_information() {
         std::string result;
 

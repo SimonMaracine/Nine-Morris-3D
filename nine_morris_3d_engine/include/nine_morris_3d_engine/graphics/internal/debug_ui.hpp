@@ -19,6 +19,7 @@ namespace sm::internal {
         void draw_shadows(Scene& scene) noexcept;
         void draw_texts(Scene& scene) noexcept;
         void draw_quads(Scene& scene) noexcept;
+        void draw_tasks(Ctx& ctx) noexcept;
 
         void add_shadows_lines(
             Scene& scene,
@@ -32,11 +33,12 @@ namespace sm::internal {
             glm::vec3 orientation
         );
     private:
+        bool vsync {true};
         bool renderables {false};
         bool lights {false};
         bool shadows {false};
         bool texts {false};
         bool quads {false};
-        bool vsync {true};
+        bool tasks {false};
     };
 }

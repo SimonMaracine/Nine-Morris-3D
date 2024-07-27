@@ -47,7 +47,7 @@ namespace sm {
         PhongDiffuseNormalShadow
     };
 
-    // Wrapper around functionality exposed to the user
+    // Wrapper around functionality exposed to the user, i.e. the API
     class Ctx {
     private:
         explicit Ctx(const ApplicationProperties& properties);
@@ -145,6 +145,8 @@ namespace sm {
         // Context
         void change_scene(Id id, bool clear_resources = false) noexcept;
         void show_info_text();
+        float get_delta() const noexcept;
+        float get_fps() const noexcept;
         static std::string get_information();
 
         std::shared_ptr<Mesh> load_mesh(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type);
@@ -172,12 +174,9 @@ namespace sm {
         }
 
         template<typename T>
-        T& user() {
+        T& user() noexcept {
             return *static_cast<T*>(user_data);
         }
-
-        float get_delta() const { return delta; }
-        float get_fps() const { return fps; }
 
         bool running {true};
         int exit_code {};
@@ -195,7 +194,7 @@ namespace sm {
         internal::TaskManager tsk;
         internal::Input inp;
         internal::Scene scn;
-        internal::ResourcesCache res;  // Global cache of resources
+        internal::ResourcesCache res;
 #ifndef SM_BUILD_DISTRIBUTION
         internal::DebugUi dbg;
 #endif

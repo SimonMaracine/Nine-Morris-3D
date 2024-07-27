@@ -2,7 +2,7 @@
 #include <memory>
 
 // Include entry point first as it includes Windows.h
-#include <nine_morris_3d_engine/application/entry_point.hpp>
+#include <nine_morris_3d_engine/entry_point.hpp>
 #include <nine_morris_3d_engine/nine_morris_3d.hpp>
 #include <nine_morris_3d_engine/external/resmanager.h++>
 

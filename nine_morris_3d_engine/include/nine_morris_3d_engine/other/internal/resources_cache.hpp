@@ -38,6 +38,7 @@ namespace sm::internal {
         std::mutex mutex;
     };
 
+    // Global cache of resources
     struct ResourcesCache {
         void clear();
 

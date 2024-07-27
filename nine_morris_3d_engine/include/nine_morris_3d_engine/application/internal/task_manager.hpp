@@ -7,6 +7,8 @@
 #include "nine_morris_3d_engine/application/task.hpp"
 
 namespace sm::internal {
+    class DebugUi;
+
     class TaskManager {
     public:
         void add(const Task::TaskFunction& function, void* user_data = nullptr);
@@ -24,5 +26,7 @@ namespace sm::internal {
 
         std::vector<std::unique_ptr<AsyncTask>> async_tasks;
         std::mutex async_mutex;
+
+        friend class DebugUi;
     };
 }

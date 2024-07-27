@@ -12,7 +12,7 @@
 #endif
 
 namespace sm::internal {
-    // Application-level events
+    // Application-level event system
     class EventDispatcher {
     public:
         template<typename E, auto F, typename... T>
