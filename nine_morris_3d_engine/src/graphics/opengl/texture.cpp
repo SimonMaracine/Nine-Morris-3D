@@ -130,7 +130,7 @@ namespace sm {
         LOG_DEBUG("Created GL texture {}", texture);
     }
 
-    GlTexture::~GlTexture() {
+    GlTexture::~GlTexture() noexcept {
         glDeleteTextures(1, &texture);
 
         LOG_DEBUG("Deleted GL texture {}", texture);
@@ -180,7 +180,7 @@ namespace sm {
         }
     }
 
-    GlTextureCubemap::GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format) {
+    GlTextureCubemap::GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format) noexcept {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
@@ -232,7 +232,7 @@ namespace sm {
         LOG_DEBUG("Created GL texture cubemap {}", texture);
     }
 
-    GlTextureCubemap::~GlTextureCubemap() {
+    GlTextureCubemap::~GlTextureCubemap() noexcept {
         glDeleteTextures(1, &texture);
 
         LOG_DEBUG("Deleted GL texture cubemap {}", texture);

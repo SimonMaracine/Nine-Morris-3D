@@ -19,10 +19,10 @@ namespace sm::internal {
 
         // Must be called before the OpenAL context is destroyed
         void play(std::shared_ptr<MusicTrack> music_track);
-        void stop();
-        void pause();
-        void resume();
-        void set_gain(float gain);
+        void stop() noexcept;
+        void pause() noexcept;
+        void resume() noexcept;
+        void set_gain(float gain) noexcept;
     private:
         std::unique_ptr<AlSource> source;
 

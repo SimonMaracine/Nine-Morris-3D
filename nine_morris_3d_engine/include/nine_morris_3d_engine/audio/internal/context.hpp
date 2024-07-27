@@ -9,7 +9,7 @@ namespace sm::internal {
     class OpenAlContext {
     public:
         explicit OpenAlContext(bool create = true);
-        ~OpenAlContext();
+        ~OpenAlContext() noexcept;
 
         OpenAlContext(const OpenAlContext&) = delete;
         OpenAlContext& operator=(const OpenAlContext&) = delete;

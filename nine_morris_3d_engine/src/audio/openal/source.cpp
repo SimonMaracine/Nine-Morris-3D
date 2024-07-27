@@ -8,7 +8,7 @@
 #include "nine_morris_3d_engine/audio/openal/debug.hpp"
 
 namespace sm {
-    AlSource::AlSource() {
+    AlSource::AlSource() noexcept {
         alGenSources(1, &source);
         alSourcef(source, AL_ROLLOFF_FACTOR, 1.0f);
         alSourcef(source, AL_REFERENCE_DISTANCE, 8.0f);
@@ -19,7 +19,7 @@ namespace sm {
         LOG_DEBUG("Created AL source {}", source);
     }
 
-    AlSource::~AlSource() {
+    AlSource::~AlSource() noexcept {
         stop();
 
         alDeleteSources(1, &source);

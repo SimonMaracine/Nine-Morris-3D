@@ -17,7 +17,7 @@ namespace sm {
     // Pointers of post processing steps should be retained as a resource
     class PostProcessingStep {
     public:
-        PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::shared_ptr<GlShader> shader)
+        PostProcessingStep(std::shared_ptr<GlFramebuffer> framebuffer, std::shared_ptr<GlShader> shader) noexcept
             : framebuffer(framebuffer), shader(shader) {}
         virtual ~PostProcessingStep() = default;
 

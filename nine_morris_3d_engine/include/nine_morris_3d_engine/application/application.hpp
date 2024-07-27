@@ -62,6 +62,7 @@ namespace sm {
         float update_frame_counter() noexcept;
         unsigned int calculate_fixed_update() noexcept;
         void check_changed_scene();
+        void change_scene(Id id, bool clear_resources = false) noexcept;
         void dear_imgui_render();
         void setup_start_scene(Id start_scene_id) noexcept;
         void scene_on_start(MetaScene* meta_scene);

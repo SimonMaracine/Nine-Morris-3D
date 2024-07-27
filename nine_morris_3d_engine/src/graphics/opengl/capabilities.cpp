@@ -1,8 +1,8 @@
 #include "nine_morris_3d_engine/graphics/opengl/capabilities.hpp"
 
-#include <glad/glad.h>
+#include <algorithm>
 
-#include "nine_morris_3d_engine/application/logging.hpp"
+#include <glad/glad.h>
 
 namespace sm {
     int capabilities::max_anisotropic_filtering_supported() noexcept {
@@ -16,7 +16,7 @@ namespace sm {
         }
     }
 
-    int capabilities::max_samples_supported() {  // FIXME
+    int capabilities::max_samples_supported() noexcept {
         int max_samples;
         glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
 
@@ -26,15 +26,7 @@ namespace sm {
         int max_color_texture_samples;
         glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &max_color_texture_samples);
 
-        if (max_depth_texture_samples < max_samples) {
-            LOG_DIST_ERROR("GL_MAX_DEPTH_TEXTURE_SAMPLES < GL_MAX_SAMPLES");
-        }
-
-        if (max_color_texture_samples < max_samples) {
-            LOG_DIST_ERROR("GL_MAX_COLOR_TEXTURE_SAMPLES < GL_MAX_SAMPLES");
-        }
-
-        return max_samples;
+        return std::min(std::min(max_samples, max_depth_texture_samples), max_color_texture_samples);
     }
 
     int capabilities::max_texture_units_supported() noexcept {

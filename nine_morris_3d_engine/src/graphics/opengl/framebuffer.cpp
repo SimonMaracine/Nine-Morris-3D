@@ -15,11 +15,11 @@ namespace sm {
         GL_COLOR_ATTACHMENT3
     };
 
-    static GLenum target(bool multisampled) {
+    static GLenum target(bool multisampled) noexcept {
         return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     }
 
-    static bool depth_attachment_present(const FramebufferSpecification& specification) {
+    static bool depth_attachment_present(const FramebufferSpecification& specification) noexcept {
         return (
             specification.depth_attachment.format != AttachmentFormat::None &&
             specification.depth_attachment.type != AttachmentType::None
@@ -33,7 +33,7 @@ namespace sm {
         int width,
         int height,
         unsigned int index
-    ) {
+    ) noexcept {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -46,7 +46,7 @@ namespace sm {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-            float border_color[4] { 0.0f, 0.0f, 0.0f, 1.0f };
+            const float border_color[4] { 0.0f, 0.0f, 0.0f, 1.0f };
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
 
             glTexStorage2D(GL_TEXTURE_2D, 1, internal_format, width, height);
@@ -66,7 +66,7 @@ namespace sm {
         int height,
         bool white_border,
         bool comparison_mode
-    ) {
+    ) noexcept {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -102,7 +102,7 @@ namespace sm {
         int width,
         int height,
         unsigned int index
-    ) {
+    ) noexcept {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -123,7 +123,7 @@ namespace sm {
         GLenum attachment,
         int width,
         int height
-    ) {
+    ) noexcept {
         const bool multisampled {samples > 1};
 
         if (multisampled) {
@@ -135,7 +135,7 @@ namespace sm {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderbuffer);
     }
 
-    static const char* print_framebuffer_status_message(GLenum status) {
+    static const char* framebuffer_status_message(GLenum status) noexcept {
         const char* message {};
 
         switch (status) {
@@ -560,7 +560,7 @@ namespace sm {
                 OtherError,
                 "GL framebuffer {} is incomplete: {}",
                 framebuffer,
-                print_framebuffer_status_message(status)
+                framebuffer_status_message(status)
             );
         }
 

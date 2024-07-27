@@ -8,7 +8,7 @@
 #include "nine_morris_3d_engine/application/context.hpp"
 
 namespace sm::internal {
-    void DebugUi::render_dear_imgui(Scene& scene, Ctx& ctx) {
+    void DebugUi::render_dear_imgui(Scene& scene, Ctx& ctx) noexcept {
         if (ImGui::Begin("Debug")) {
             ImGui::Checkbox("Renderables", &renderables);
             ImGui::Checkbox("Lights", &lights);
@@ -46,7 +46,7 @@ namespace sm::internal {
 
     void DebugUi::add_lines(Scene& scene) {
         if (shadows) {
-            draw_shadows_lines(
+            add_shadows_lines(
                 scene,
                 scene.debug.shadow_box->left,
                 scene.debug.shadow_box->right,
@@ -60,7 +60,7 @@ namespace sm::internal {
         }
     }
 
-    void DebugUi::draw_renderables(Scene& scene) {
+    void DebugUi::draw_renderables(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Renderables")) {
             int index {};  // TODO C++20
 
@@ -80,7 +80,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_lights(Scene& scene) {
+    void DebugUi::draw_lights(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Directional Light")) {
             ImGui::DragFloat3("Direction", glm::value_ptr(scene.debug.directional_light->direction), 0.01f, -1.0f, 1.0f);
             ImGui::DragFloat3("Ambient", glm::value_ptr(scene.debug.directional_light->ambient_color), 0.01f, 0.0f, 1.0f);
@@ -112,7 +112,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_shadows(Scene& scene) {
+    void DebugUi::draw_shadows(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Shadows")) {
             ImGui::DragFloat("Left", &scene.debug.shadow_box->left, 1.0f, -500.0f, 0.0f);
             ImGui::DragFloat("Right", &scene.debug.shadow_box->right, 1.0f, 0.0f, 500.0f);
@@ -131,7 +131,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_texts(Scene& scene) {
+    void DebugUi::draw_texts(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Texts")) {
             int index {};  // TODO C++20
 
@@ -157,7 +157,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_quads(Scene& scene) {
+    void DebugUi::draw_quads(Scene& scene) noexcept {
         if (ImGui::Begin("Debug Quads")) {
             int index {};  // TODO C++20
 
@@ -176,7 +176,7 @@ namespace sm::internal {
         ImGui::End();
     }
 
-    void DebugUi::draw_shadows_lines(
+    void DebugUi::add_shadows_lines(
         Scene& scene,
         float left,
         float right,

@@ -52,7 +52,7 @@ namespace sm {
         LOG_DEBUG("Loaded texture data");
     }
 
-    TextureData::~TextureData() {
+    TextureData::~TextureData() noexcept {
         assert(data != nullptr);
 
         stbi_image_free(data);
@@ -73,7 +73,9 @@ namespace sm {
     }
 
     void TextureData::resize(int new_width, int new_height) {
-        unsigned char* new_data {stbir_resize_uint8_linear(data, width, height, 0, nullptr, new_width, new_height, 0, STBIR_RGBA)};
+        unsigned char* new_data {
+            stbir_resize_uint8_linear(data, width, height, 0, nullptr, new_width, new_height, 0, STBIR_RGBA)
+        };
         stbi_image_free(data);
 
         data = new_data;

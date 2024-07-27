@@ -1,7 +1,6 @@
 #include "nine_morris_3d_engine/application/context.hpp"
 
 #include <array>
-#include <cassert>
 
 #include <resmanager/resmanager.hpp>
 
@@ -130,19 +129,19 @@ namespace sm {
         mus.play(music_track);
     }
 
-    void Ctx::stop_music_track() {
+    void Ctx::stop_music_track() noexcept {
         mus.stop();
     }
 
-    void Ctx::pause_music_track() {
+    void Ctx::pause_music_track() noexcept {
         mus.pause();
     }
 
-    void Ctx::resume_music_track() {
+    void Ctx::resume_music_track() noexcept {
         mus.resume();
     }
 
-    void Ctx::set_music_gain(float gain) {
+    void Ctx::set_music_gain(float gain) noexcept {
         mus.set_gain(gain);
     }
 
@@ -227,17 +226,7 @@ namespace sm {
     }
 
     void Ctx::change_scene(Id id, bool clear_resources) noexcept {
-        assert(application->scene_next == nullptr);
-
-        for (auto& meta_scene : application->scene_meta_scenes) {
-            if (meta_scene.id == id) {
-                application->scene_next = &meta_scene;
-                application->scene_clear_resources = clear_resources;
-                return;
-            }
-        }
-
-        assert(false);
+        application->change_scene(id, clear_resources);
     }
 
     void Ctx::show_info_text() {
@@ -258,7 +247,7 @@ namespace sm {
         scn.add_text(const_cast<const Text&>(text));
     }
 
-    std::string Ctx::get_information() const {
+    std::string Ctx::get_information() {
         std::string result;
 
         result += '\n';
@@ -485,7 +474,6 @@ namespace sm {
             }
         }
 
-        assert(false);
         return {};
     }
 

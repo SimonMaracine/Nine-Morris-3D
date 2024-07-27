@@ -2,12 +2,11 @@
 
 #include <AL/al.h>
 
-#include "nine_morris_3d_engine/application/error.hpp"
 #include "nine_morris_3d_engine/application/logging.hpp"
 #include "nine_morris_3d_engine/audio/openal/debug.hpp"
 
 namespace sm {
-    static ALenum get_format(int channels, std::size_t bps) {
+    static ALenum get_format(int channels, std::size_t bps) noexcept {
         ALenum format {};
 
         if (channels == 1 && bps == 8) {
@@ -19,13 +18,13 @@ namespace sm {
         } else if (channels == 2 && bps == 16) {
             format = AL_FORMAT_STEREO16;
         } else {
-            SM_THROW_ERROR(ResourceError, "Unknown format: channels = {}, bps = {}", channels, bps);
+            assert(false);
         }
 
         return format;
     }
 
-    AlBuffer::AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency) {
+    AlBuffer::AlBuffer(const void* data, std::size_t size, int channels, std::size_t bps, int frequency) noexcept {
         alGenBuffers(1, &buffer);
         alBufferData(buffer, get_format(channels, bps), data, static_cast<int>(size), frequency);
 
@@ -34,7 +33,7 @@ namespace sm {
         LOG_DEBUG("Created AL buffer {}", buffer);
     }
 
-    AlBuffer::AlBuffer(std::shared_ptr<SoundData> data) {
+    AlBuffer::AlBuffer(std::shared_ptr<SoundData> data) noexcept {
         alGenBuffers(1, &buffer);
         alBufferData(
             buffer,

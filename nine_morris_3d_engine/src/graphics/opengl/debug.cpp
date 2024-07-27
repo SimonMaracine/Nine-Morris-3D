@@ -59,7 +59,7 @@ namespace sm {
 
     static constexpr std::size_t BUFFER_LENGTH {128};
 
-    void opengl_debug::initialize() {
+    void opengl_debug::initialize() noexcept {
         glDebugMessageCallback(
             [](GLenum, GLenum, GLuint id, GLenum severity, GLsizei, const GLchar* message, const GLvoid*) {
                 switch (severity) {

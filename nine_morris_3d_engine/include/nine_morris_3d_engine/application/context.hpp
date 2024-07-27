@@ -111,10 +111,10 @@ namespace sm {
 
         // Music player
         void play_music_track(std::shared_ptr<MusicTrack> music_track);
-        void stop_music_track();
-        void pause_music_track();
-        void resume_music_track();
-        void set_music_gain(float gain);
+        void stop_music_track() noexcept;
+        void pause_music_track() noexcept;
+        void resume_music_track() noexcept;
+        void set_music_gain(float gain) noexcept;
 
         // Task manager
         void add_task(const Task::TaskFunction& function, void* user_data = nullptr);
@@ -145,7 +145,7 @@ namespace sm {
         // Context
         void change_scene(Id id, bool clear_resources = false) noexcept;
         void show_info_text();
-        std::string get_information() const;
+        static std::string get_information();
 
         std::shared_ptr<Mesh> load_mesh(Id id, const std::string& file_path, const std::string& mesh_name, Mesh::Type type);
         std::shared_ptr<Mesh> load_mesh(const std::string& file_path, const std::string& mesh_name, Mesh::Type type);

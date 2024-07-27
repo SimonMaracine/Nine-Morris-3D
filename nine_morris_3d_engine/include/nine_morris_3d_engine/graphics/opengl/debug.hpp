@@ -5,7 +5,7 @@
 
 namespace sm {
     namespace opengl_debug {
-        void initialize();
+        void initialize() noexcept;
         std::string get_information();
         std::pair<int, int> get_version_number() noexcept;
         const unsigned char* get_opengl_version() noexcept;

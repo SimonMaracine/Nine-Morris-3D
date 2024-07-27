@@ -9,8 +9,8 @@
 namespace sm {
     class AlSource {
     public:
-        AlSource();
-        ~AlSource();
+        AlSource() noexcept;
+        ~AlSource() noexcept;
 
         AlSource(const AlSource&) = delete;
         AlSource& operator=(const AlSource&) = delete;

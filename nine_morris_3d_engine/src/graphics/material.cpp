@@ -6,7 +6,7 @@
 #include "nine_morris_3d_engine/graphics/internal/opengl.hpp"
 
 namespace sm {
-    Material::Material(std::shared_ptr<GlShader> shader, unsigned int flags)
+    Material::Material(std::shared_ptr<GlShader> shader, unsigned int flags) noexcept
         : shader(shader), flags(flags) {
         LOG_DEBUG("Created material from shader {} with flags {}", shader->get_id(), flags);
     }
@@ -220,5 +220,9 @@ namespace sm {
 
         const Element& element {offsets.at(name)};
         std::memcpy(data.get() + element.offset, &result_texure, sizeof(result_texure));
+    }
+
+    const GlShader* MaterialInstance::get_shader() const noexcept {
+        return shader.get();
     }
 }

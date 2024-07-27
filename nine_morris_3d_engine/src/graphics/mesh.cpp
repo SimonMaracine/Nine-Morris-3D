@@ -166,11 +166,35 @@ namespace sm {
         aabb.max = glm::vec3(mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z);
     }
 
-    Mesh::~Mesh() {
+    Mesh::~Mesh() noexcept {
         delete[] vertices;
         delete[] indices;
 
         LOG_DEBUG("Freed model data");
+    }
+
+    const unsigned char* Mesh::get_vertices() const noexcept {
+        return vertices;
+    }
+
+    const unsigned char* Mesh::get_indices() const noexcept {
+        return indices;
+    }
+
+    std::size_t Mesh::get_vertices_size() const noexcept {
+        return vertices_size;
+    }
+
+    std::size_t Mesh::get_indices_size() const noexcept {
+        return indices_size;
+    }
+
+    const utils::AABB& Mesh::get_aabb() const noexcept {
+        return aabb;
+    }
+
+    Mesh::Type Mesh::get_type() const noexcept {
+        return type;
     }
 
     void Mesh::load(Type type, const void* pmesh) {

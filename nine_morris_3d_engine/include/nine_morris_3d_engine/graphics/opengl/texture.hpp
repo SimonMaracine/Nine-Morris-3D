@@ -50,7 +50,7 @@ namespace sm {
     public:
         GlTexture(std::shared_ptr<TextureData> data, const TextureSpecification& specification = {});
         GlTexture(int width, int height, unsigned char* data, const TextureSpecification& specification = {});
-        ~GlTexture();
+        ~GlTexture() noexcept;
 
         GlTexture(const GlTexture&) = delete;
         GlTexture& operator=(const GlTexture&) = delete;
@@ -75,8 +75,8 @@ namespace sm {
 
     class GlTextureCubemap {
     public:
-        GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format = TextureFormat::Rgba8);
-        ~GlTextureCubemap();
+        GlTextureCubemap(std::initializer_list<std::shared_ptr<TextureData>> data, TextureFormat format = TextureFormat::Rgba8) noexcept;
+        ~GlTextureCubemap() noexcept;
 
         GlTextureCubemap(const GlTextureCubemap&) = delete;
         GlTextureCubemap& operator=(const GlTextureCubemap&) = delete;

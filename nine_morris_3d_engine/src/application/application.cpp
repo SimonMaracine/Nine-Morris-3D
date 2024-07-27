@@ -161,6 +161,20 @@ namespace sm {
         assert(scene_next == nullptr);
     }
 
+    void Application::change_scene(Id id, bool clear_resources) noexcept {
+        assert(scene_next == nullptr);
+
+        for (auto& meta_scene : scene_meta_scenes) {
+            if (meta_scene.id == id) {
+                scene_next = &meta_scene;
+                scene_clear_resources = clear_resources;
+                return;
+            }
+        }
+
+        assert(false);
+    }
+
     void Application::dear_imgui_render() {
         internal::imgui_context::begin_frame();
 

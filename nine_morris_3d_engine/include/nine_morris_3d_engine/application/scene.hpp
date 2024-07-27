@@ -7,9 +7,9 @@ namespace sm {
     // An entire part of a game, holding lots of state
     class ApplicationScene {
     public:
-        explicit ApplicationScene(Ctx& ctx)
+        explicit ApplicationScene(Ctx& ctx) noexcept
             : ctx(ctx) {}
-        virtual ~ApplicationScene() = default;
+        virtual ~ApplicationScene() noexcept = default;
 
         ApplicationScene(const ApplicationScene&) = delete;
         ApplicationScene& operator=(const ApplicationScene&) = delete;

@@ -8,29 +8,29 @@
 // Never include this header file in another header file!
 
 /*
-    Use LOG_ macros for messages to be printed only in debug mode.
-    Use LOG_DIST_ macros for messages to be printed both in debug and release mode.
+    Use LOG_* macros for messages to be printed only in debug mode.
+    Use LOG_DIST_* macros for messages to be printed both in debug and release mode.
 
     Messages in debug mode are printed in the console. Messages in release mode are printed
     in a log file (with console as fallback).
 
-    Use LOG_CRITICAL only right before panicking.
+    Use LOG_DIST_CRITICAL only right before aborting.
 
-    spdlog is used directly only in the engine, which means it should work fine.
+    LOG_* macros are exception-safe.
 */
 
-#if defined(SM_BUILD_DISTRIBUTION)
+#ifdef SM_BUILD_DISTRIBUTION
     #define LOG_DEBUG(...) static_cast<void>(0)
     #define LOG_INFO(...) static_cast<void>(0)
     #define LOG_WARNING(...) static_cast<void>(0)
     #define LOG_ERROR(...) static_cast<void>(0)
     #define LOG_CRITICAL(...) static_cast<void>(0)
 #else
-    #define LOG_DEBUG(...) SPDLOG_LOGGER_DEBUG(sm::internal::Logging::get_global_logger(), __VA_ARGS__)
-    #define LOG_INFO(...) SPDLOG_LOGGER_INFO(sm::internal::Logging::get_global_logger(), __VA_ARGS__)
-    #define LOG_WARNING(...) SPDLOG_LOGGER_WARN(sm::internal::Logging::get_global_logger(), __VA_ARGS__)
-    #define LOG_ERROR(...) SPDLOG_LOGGER_ERROR(sm::internal::Logging::get_global_logger(), __VA_ARGS__)
-    #define LOG_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(sm::internal::Logging::get_global_logger(), __VA_ARGS__)
+    #define LOG_DEBUG(...) do { try { sm::internal::Logging::get_global_logger()->debug(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
+    #define LOG_INFO(...) do { try { sm::internal::Logging::get_global_logger()->info(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
+    #define LOG_WARNING(...) do { try { sm::internal::Logging::get_global_logger()->warn(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
+    #define LOG_ERROR(...) do { try { sm::internal::Logging::get_global_logger()->error(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
+    #define LOG_CRITICAL(...) do { try { sm::internal::Logging::get_global_logger()->critical(__VA_ARGS__); } catch (...) { sm::internal::Logging::abort(); } } while (false)
 #endif
 
 #define LOG_DIST_DEBUG(...) SPDLOG_LOGGER_DEBUG(sm::internal::Logging::get_global_logger(), __VA_ARGS__)

@@ -8,7 +8,7 @@
 #include "nine_morris_3d_engine/application/logging.hpp"
 
 namespace sm {
-    GlVertexArray::GlVertexArray() {
+    GlVertexArray::GlVertexArray() noexcept {
         glGenVertexArrays(1, &array);
         glBindVertexArray(array);
 
@@ -86,7 +86,7 @@ namespace sm {
         GlVertexBuffer::unbind();
     }
 
-    void GlVertexArray::add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer) {
+    void GlVertexArray::add_index_buffer(std::shared_ptr<GlIndexBuffer> buffer) noexcept {
         buffer->bind();
 
         index_buffer = buffer;

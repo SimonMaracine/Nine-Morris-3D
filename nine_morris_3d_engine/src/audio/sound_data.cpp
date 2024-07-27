@@ -32,12 +32,36 @@ namespace sm {
         LOG_DEBUG("Loaded sound data");
     }
 
-    SoundData::~SoundData() {
+    SoundData::~SoundData() noexcept {
         assert(data != nullptr);
 
         std::free(data);
 
         LOG_DEBUG("Freed sound data");
+    }
+
+    int SoundData::get_samples() const noexcept {
+        return samples;
+    }
+
+    int SoundData::get_channels() const noexcept {
+        return channels;
+    }
+
+    int SoundData::get_frequency() const noexcept {
+        return sample_rate;
+    }
+
+    const short* SoundData::get_data() const noexcept {
+        return data;
+    }
+
+    std::size_t SoundData::get_size() const noexcept {
+        return size;
+    }
+
+    std::size_t SoundData::get_bps() const noexcept {
+        return bits_per_sample;
     }
 
     std::size_t SoundData::compute_size() const noexcept {

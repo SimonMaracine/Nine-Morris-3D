@@ -16,7 +16,7 @@ namespace sm {
     class TextureData {
     public:
         TextureData(const std::string& buffer, const TexturePostProcessing& post_processing = {});
-        ~TextureData();
+        ~TextureData() noexcept;
 
         TextureData(const TextureData&) = delete;
         TextureData& operator=(const TextureData&) = delete;

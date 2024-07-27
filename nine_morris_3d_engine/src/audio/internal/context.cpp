@@ -43,7 +43,7 @@ namespace sm::internal {
         LOG_INFO("Opened playback device and created OpenAL context");
     }
 
-    OpenAlContext::~OpenAlContext() {
+    OpenAlContext::~OpenAlContext() noexcept {
         if (!create) {
             return;
         }

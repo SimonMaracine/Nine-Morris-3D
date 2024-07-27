@@ -15,6 +15,7 @@ namespace sm::internal {
         Logging(const std::string& log_file, const FileSystem& fs);
 
         static spdlog::logger* get_global_logger() noexcept;
+        static void abort() noexcept;
     private:
         static void set_fallback_logger_distribution(const char* error_message);
 

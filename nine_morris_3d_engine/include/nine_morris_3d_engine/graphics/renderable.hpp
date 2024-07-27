@@ -19,7 +19,7 @@ namespace sm {
     class Renderable {
     public:
         Renderable() noexcept = default;
-        Renderable(std::shared_ptr<Mesh> mesh, std::shared_ptr<GlVertexArray> vertex_array, std::shared_ptr<MaterialInstance> material)
+        Renderable(std::shared_ptr<Mesh> mesh, std::shared_ptr<GlVertexArray> vertex_array, std::shared_ptr<MaterialInstance> material) noexcept
             : mesh(mesh), vertex_array(vertex_array), material(material) {}
 
         const utils::AABB& get_aabb() const noexcept { return mesh->get_aabb(); }

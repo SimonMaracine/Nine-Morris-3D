@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <cstddef>
+#include <cstdlib>
 
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -10,15 +11,6 @@ static const char* LOG_PATTERN_DEVELOPMENT {"%^[%l] [%t] [%H:%M:%S]%$ %v"};
 static const char* LOG_PATTERN_DISTRIBUTION {"%^[%l] [%t] [%!:%#] [%c]%$ %v"};
 static constexpr std::size_t FILE_SIZE {1048576 * 1};  // 1 MiB
 static constexpr std::size_t ROTATING_FILES {2};  // 3 total log files
-
-/*
-    SPDLOG_TRACE
-    SPDLOG_DEBUG
-    SPDLOG_INFO
-    SPDLOG_WARN
-    SPDLOG_ERROR
-    SPDLOG_CRITICAL
-*/
 
 namespace sm::internal {
     Logging::Logging([[maybe_unused]] const std::string& log_file, [[maybe_unused]] const FileSystem& fs) {
@@ -34,7 +26,7 @@ namespace sm::internal {
 
         g_logger->set_pattern(LOG_PATTERN_DISTRIBUTION);
         g_logger->set_level(spdlog::level::trace);
-        g_logger->flush_on(spdlog::level::info);
+        g_logger->flush_on(spdlog::level::error);
 #else
         g_logger = spdlog::stdout_color_mt("Development Logger [Console]");
         g_logger->set_pattern(LOG_PATTERN_DEVELOPMENT);
@@ -44,6 +36,10 @@ namespace sm::internal {
 
     spdlog::logger* Logging::get_global_logger() noexcept {
         return g_logger.get();
+    }
+
+    void Logging::abort() noexcept {
+        std::abort();
     }
 
     void Logging::set_fallback_logger_distribution(const char* error_message) {

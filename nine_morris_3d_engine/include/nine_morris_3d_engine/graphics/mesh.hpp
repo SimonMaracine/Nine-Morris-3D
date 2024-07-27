@@ -18,19 +18,19 @@ namespace sm {
         static constexpr const char* DEFAULT_OBJECT {"defaultobject"};
 
         Mesh(const std::string& buffer, const std::string& object_name, Type type, bool flip_winding = false);
-        ~Mesh();
+        ~Mesh() noexcept;
 
         Mesh(const Mesh&) = delete;
         Mesh& operator=(const Mesh&) = delete;
         Mesh(Mesh&&) = delete;
         Mesh& operator=(Mesh&&) = delete;
 
-        const unsigned char* get_vertices() const noexcept { return vertices; }
-        const unsigned char* get_indices() const noexcept { return indices; }
-        std::size_t get_vertices_size() const noexcept { return vertices_size; }
-        std::size_t get_indices_size() const noexcept { return indices_size; }
-        const utils::AABB& get_aabb() const noexcept { return aabb; }
-        Type get_type() const noexcept { return type; }
+        const unsigned char* get_vertices() const noexcept;
+        const unsigned char* get_indices() const noexcept;
+        std::size_t get_vertices_size() const noexcept;
+        std::size_t get_indices_size() const noexcept;
+        const utils::AABB& get_aabb() const noexcept;
+        Type get_type() const noexcept;
     private:
         void load(Type type, const void* pmesh);
         void allocate(const void* vertices, std::size_t vertices_size, const void* indices, std::size_t indices_size);

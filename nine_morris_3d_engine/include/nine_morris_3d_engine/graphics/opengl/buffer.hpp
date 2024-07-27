@@ -18,10 +18,10 @@ namespace sm {
 
     class GlVertexBuffer {
     public:
-        explicit GlVertexBuffer(DrawHint hint = DrawHint::Static);
-        GlVertexBuffer(std::size_t size, DrawHint hint = DrawHint::Static);
-        GlVertexBuffer(const void* data, std::size_t size, DrawHint hint = DrawHint::Static);
-        ~GlVertexBuffer();
+        explicit GlVertexBuffer(DrawHint hint = DrawHint::Static) noexcept;
+        GlVertexBuffer(std::size_t size, DrawHint hint = DrawHint::Static) noexcept;
+        GlVertexBuffer(const void* data, std::size_t size, DrawHint hint = DrawHint::Static) noexcept;
+        ~GlVertexBuffer() noexcept;
 
         GlVertexBuffer(const GlVertexBuffer&) = delete;
         GlVertexBuffer& operator=(const GlVertexBuffer&) = delete;
@@ -41,8 +41,8 @@ namespace sm {
     // Only supports unsigned int
     class GlIndexBuffer {
     public:
-        GlIndexBuffer(const void* data, std::size_t size);
-        ~GlIndexBuffer();
+        GlIndexBuffer(const void* data, std::size_t size) noexcept;
+        ~GlIndexBuffer() noexcept;
 
         GlIndexBuffer(const GlIndexBuffer&) = delete;
         GlIndexBuffer& operator=(const GlIndexBuffer&) = delete;
@@ -109,7 +109,7 @@ namespace sm {
     class GlPixelBuffer {
     public:
         explicit GlPixelBuffer(std::size_t size);
-        ~GlPixelBuffer();
+        ~GlPixelBuffer() noexcept;
 
         GlPixelBuffer(const GlPixelBuffer&) = delete;
         GlPixelBuffer& operator=(const GlPixelBuffer&) = delete;
@@ -119,8 +119,8 @@ namespace sm {
         void bind() const noexcept;
         static void unbind() noexcept;
 
-        void map_data();
-        void unmap_data() const;
+        void map_data() noexcept;
+        void unmap_data() const noexcept;
 
         template<typename T>
         void get_data(T** data_out) const noexcept {

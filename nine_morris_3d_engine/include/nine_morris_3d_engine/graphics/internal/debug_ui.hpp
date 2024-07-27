@@ -11,16 +11,16 @@ namespace sm {
 namespace sm::internal {
     class DebugUi {
     public:
-        void render_dear_imgui(Scene& scene, Ctx& ctx);
+        void render_dear_imgui(Scene& scene, Ctx& ctx) noexcept;
         void add_lines(Scene& scene);
 
-        void draw_renderables(Scene& scene);
-        void draw_lights(Scene& scene);
-        void draw_shadows(Scene& scene);
-        void draw_texts(Scene& scene);
-        void draw_quads(Scene& scene);
+        void draw_renderables(Scene& scene) noexcept;
+        void draw_lights(Scene& scene) noexcept;
+        void draw_shadows(Scene& scene) noexcept;
+        void draw_texts(Scene& scene) noexcept;
+        void draw_quads(Scene& scene) noexcept;
 
-        void draw_shadows_lines(
+        void add_shadows_lines(
             Scene& scene,
             float left,
             float right,
