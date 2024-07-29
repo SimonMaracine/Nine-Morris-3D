@@ -82,8 +82,7 @@ namespace sm {
         try {
             return read_file_ex(file_path);
         } catch (const ResourceError& e) {
-            LOG_DIST_CRITICAL("Could not read file `{}`: {}", file_path, e.what());
-            throw;
+            SM_THROW_ERROR(ResourceError, "Could not read file `{}`: {}", file_path, e.what());
         }
     }
 }

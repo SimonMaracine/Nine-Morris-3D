@@ -64,15 +64,15 @@ namespace sm {
         static bool is_directory(const std::string& path);
         static bool create_directory(const std::string& path);
         static bool delete_file(const std::string& path);
-        static std::string current_working_directory();
-        std::string path_logs() const;
-        std::string path_saved_data() const;
-        std::string path_assets() const;
-        std::string path_engine_assets() const;
-        std::string path_logs(const std::string& path) const;
-        std::string path_saved_data(const std::string& path) const;
-        std::string path_assets(const std::string& path) const;
-        std::string path_engine_assets(const std::string& path) const;
+        static std::filesystem::path current_working_directory();
+        std::filesystem::path path_logs() const;
+        std::filesystem::path path_saved_data() const;
+        std::filesystem::path path_assets() const;
+        std::filesystem::path path_engine_assets() const;
+        std::filesystem::path path_logs(const std::string& path) const;
+        std::filesystem::path path_saved_data(const std::string& path) const;
+        std::filesystem::path path_assets(const std::string& path) const;
+        std::filesystem::path path_engine_assets(const std::string& path) const;
 
         // Events
         template<typename E, auto F, typename... T>

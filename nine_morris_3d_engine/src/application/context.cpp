@@ -14,9 +14,9 @@
 
 namespace sm {
     Ctx::Ctx(const ApplicationProperties& properties)
-        : fs(properties.application_name, properties.assets_directory),
+        : fs(properties.path_logs, properties.path_saved_data, properties.path_assets, properties.assets_directory),
         log(properties.log_file, fs),
-        shd({"engine_assets", properties.assets_directory}),
+        shd({fs.path_engine_assets(), fs.path_assets()}),
         win(properties, &evt),
         rnd(properties.width, properties.height, properties.samples, fs, shd),
         snd(properties.audio), inp(win.get_handle()) {
@@ -41,39 +41,39 @@ namespace sm {
         return internal::FileSystem::delete_file(path);
     }
 
-    std::string Ctx::current_working_directory() {
+    std::filesystem::path Ctx::current_working_directory() {
         return internal::FileSystem::current_working_directory();
     }
 
-    std::string Ctx::path_logs() const {
+    std::filesystem::path Ctx::path_logs() const {
         return fs.path_logs();
     }
 
-    std::string Ctx::path_saved_data() const {
+    std::filesystem::path Ctx::path_saved_data() const {
         return fs.path_saved_data();
     }
 
-    std::string Ctx::path_assets() const {
+    std::filesystem::path Ctx::path_assets() const {
         return fs.path_assets();
     }
 
-    std::string Ctx::path_engine_assets() const {
+    std::filesystem::path Ctx::path_engine_assets() const {
         return fs.path_engine_assets();
     }
 
-    std::string Ctx::path_logs(const std::string& path) const {
+    std::filesystem::path Ctx::path_logs(const std::string& path) const {
         return fs.path_logs(path);
     }
 
-    std::string Ctx::path_saved_data(const std::string& path) const {
+    std::filesystem::path Ctx::path_saved_data(const std::string& path) const {
         return fs.path_saved_data(path);
     }
 
-    std::string Ctx::path_assets(const std::string& path) const {
+    std::filesystem::path Ctx::path_assets(const std::string& path) const {
         return fs.path_assets(path);
     }
 
-    std::string Ctx::path_engine_assets(const std::string& path) const {
+    std::filesystem::path Ctx::path_engine_assets(const std::string& path) const {
         return fs.path_engine_assets(path);
     }
 

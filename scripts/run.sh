@@ -1,10 +1,10 @@
 #! /bin/bash
 
-./build.sh Nine-Morris-3D
+./build.sh NineMorris3D
 
 if [ "$?" -ne 0 ]; then
     exit 1
 fi
 
 cd ..
-build/Nine-Morris-3D/Nine-Morris-3D
+build/nine_morris_3d/NineMorris3D

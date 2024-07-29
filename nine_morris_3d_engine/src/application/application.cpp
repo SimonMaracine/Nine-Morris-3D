@@ -19,7 +19,7 @@ namespace sm {
 
         internal::imgui_context::initialize(ctx.win.get_handle());
 
-        LOG_DIST_INFO("Working directory: {}", internal::FileSystem::current_working_directory());
+        LOG_DIST_INFO("Working directory: {}", internal::FileSystem::current_working_directory().string());
 
         const auto [version_major, version_minor] {opengl_debug::get_version_number()};
         LOG_DIST_INFO("GL version {}.{}", version_major, version_minor);

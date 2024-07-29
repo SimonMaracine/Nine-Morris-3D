@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace sm {
     // Initialization application properties
     struct ApplicationProperties {
@@ -16,10 +18,11 @@ namespace sm {
         unsigned int version_minor {1};
         unsigned int version_patch {0};
         const char* title {"Nine Morris 3D Engine"};
-        const char* application_name {"NineMorris3DEngine"};
-        const char* info_file {"nine_morris_3d.txt"};
-        const char* log_file {"nine_morris_3d.log"};
-        const char* assets_directory {};
+        const char* log_file {"nine_morris_3d_engine.log"};
+        const char* assets_directory {"assets"};
+        std::string path_logs {""};
+        std::string path_saved_data {""};
+        std::string path_assets {""};
         void* user_data {};
     };
 }

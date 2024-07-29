@@ -46,7 +46,7 @@ namespace sm::internal {
             auto iter {std::filesystem::recursive_directory_iterator(include_directory, ec)};
 
             if (ec) {
-                SM_THROW_ERROR(ResourceError, "Could not iterate over include directory: {}", ec.message());
+                SM_THROW_ERROR(ResourceError, "Could not iterate over include directory `{}`: {}", include_directory, ec.message());
             }
 
             for (const std::filesystem::directory_entry& entry : iter) {

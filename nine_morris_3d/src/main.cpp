@@ -1,5 +1,8 @@
 #include <iostream>
-#include <memory>
+#include <string>
+#include <cstdlib>
+#include <stdexcept>
+#include <filesystem>
 
 // Include entry point first as it includes Windows.h
 #include <nine_morris_3d_engine/entry_point.hpp>
@@ -10,21 +13,53 @@
 #include "game/game.hpp"
 #include "game/global.hpp"
 
-#if defined(SM_PLATFORM_LINUX)
-    static const char* APP_NAME {"ninemorris3d"};
-#elif defined(SM_PLATFORM_WINDOWS)
-    static const char* APP_NAME {"NineMorris3D"};
+struct Paths {
+    std::string logs;
+    std::string saved_data;
+    std::string assets;
+};
+
+static Paths get_paths() {
+    Paths paths;
+
+#ifdef SM_BUILD_DISTRIBUTION
+    #if defined(SM_PLATFORM_LINUX)
+    const char* home {std::getenv("HOME")};
+
+    if (home == nullptr) {
+        throw std::runtime_error("Could not get `HOME` environment variable");
+    }
+
+    const std::filesystem::path home_directory {home};
+
+    paths.logs = home_directory / ".ninemorris3d";
+    paths.saved_data = home_directory / ".ninemorris3d";
+    paths.assets = "/usr/local/share/ninemorris3d";
+    #elif defined(SM_PLATFORM_WINDOWS)
+    // TODO
+    paths.logs = "";
+    paths.saved_data = "";
+    paths.assets = "";
+    #endif
+#else
+    paths.logs = "";
+    paths.saved_data = "";
+    paths.assets = "";
 #endif
 
-static const char* LOG_FILE {"debug.log"};
-static const char* INFO_FILE {"info.txt"};
-static const char* ASSETS_DIRECTORY {"assets"};
-
-static constexpr unsigned int MAJOR {0};
-static constexpr unsigned int MINOR {4};
-static constexpr unsigned int PATCH {0};
+    return paths;
+}
 
 int application_main() {
+    Paths paths;
+
+    try {
+        paths = get_paths();
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error initializing paths: " << e.what() << '\n';
+        return 1;
+    }
+
     while (true) {
         int exit_code {};
 
@@ -34,13 +69,12 @@ int application_main() {
             properties.height = 576;
             properties.min_width = 512;
             properties.min_height = 288;
-            properties.version_major = MAJOR;
-            properties.version_minor = MINOR;
-            properties.version_patch = PATCH;
-            properties.application_name = APP_NAME;
-            properties.info_file = INFO_FILE;
-            properties.log_file = LOG_FILE;
-            properties.assets_directory = ASSETS_DIRECTORY;
+            properties.version_major = 0;
+            properties.version_minor = 4;
+            properties.version_patch = 0;
+            properties.path_logs = paths.logs;
+            properties.path_saved_data = paths.saved_data;
+            properties.path_assets = paths.assets;
             properties.audio = true;
 
             sm::UserFunctions functions;
@@ -52,8 +86,8 @@ int application_main() {
                 game.add_scene<GameScene>();
                 game.set_global_data<Global>();
                 exit_code = game.run("game"_H, functions);
-            } catch (const sm::RuntimeError& error) {
-                std::cerr << "Terminated game with error: " << error.what() << '\n';
+            } catch (const sm::RuntimeError& e) {  // FIXME exceptions from other threads
+                std::cerr << "Terminated game with error: " << e.what() << '\n';
                 return 1;
             }
         }

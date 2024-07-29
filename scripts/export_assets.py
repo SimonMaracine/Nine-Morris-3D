@@ -39,9 +39,13 @@ def read_manifest_file(file_path: str) -> ManifestFile:
 def strip_trailing_slash(file_path: str) -> str:
     if file_path.endswith("/"):
         return file_path[:-1]
+    else:
+        return file_path
 
 
 def create_new_assets_directory(assets_directory_path: str, output_path: str, manifest: ManifestFile):
+    print(assets_directory_path)
+
     new_directory = os.path.join(output_path, os.path.basename(strip_trailing_slash(assets_directory_path)))
     try:
         os.mkdir(new_directory)
